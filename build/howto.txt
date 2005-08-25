@@ -1,0 +1,168 @@
+HOW TO BUILD PROCESSING ON YOUR FAVORITE PLATFORM
+
+With frequently asked questions, scroll to the end of the file.
+
+
+////////////////////////////////////////////////////////////////////
+
+//// Steps for First Time Setup 
+
+
+1. INSTALL DEVELOPMENT TOOLS
+
+1a. On Windows, install Cygwin. It's downloadable from 
+    www.cygwin.com or specifically: www.cygwin.com/setup.exe
+
+** of the packages, begin with the defaults, and add:
+
++ cvs - used for version control
+
++ make, gcc-mingw, and g++ - used to build processing.exe
+  (this will also pull in gcc-core)
+
++ perl - use this version, activestate or other distros have trouble
+  
++ unzip, zip - for dealing with archives
+
++ included in the defaults, but make sure:
+  coreutils (or textutils), gzip, tar
+
++ not required but useful: 
+  openssh - command line ssh client
+  nano - handy/simple text editor
+
+** and be sure to leave the option selected for 'unix line endings' 
+
+the cygwin installer is sometimes a little flakey, so it may take more 
+than one try to get everything in there. in fact, it's often best to
+run the installer once, and let it install all its defaults, then run 
+it again, and select the items above. it's also useful to run the 
+installer every few months to keep things fresh.
+
+
+1b. On Mac OS X, install Apple's Developer Tools. Should work with 
+    everything from the December 2002 Tools for Jaguar on OS X 10.2, 
+    up through the more recent Xcode stuff. 
+
+
+1c. On Linux, you're pretty much on your own.. You need a pretty 
+    standard development setup.
+
+
+2. GRAB THE CODE FROM SOURCEFORGE
+
+* this grabs the code as an anonymous user. if you have a sourceforge
+  account, you should know how to grab the code as yourself.
+
+# first do this
+cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/processing login
+# just hit enter when it asks for a password
+
+# then do this (may take a while)
+cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/processing co processing
+# (maybe even a long while for you dialup and international folks)
+
+# gonna do a few things in the p5 folder
+cd processing
+
+# a quick cleanup, removes empty (dead/old) folders
+cvs update -P
+
+# get back to the processing/ folder
+cd ..
+
+
+3. INSTALL QUICKTIME FOR JAVA (windows users only)
+
+* you'll also need to install quicktime for java. grab a quicktime
+  installer from: http://www.apple.com/quicktime/download/
+  don't try to be sly & use the itunes installer. we all love itunes
+  but it doesn't include quicktime for java by default. or if you were
+  sly, you might need to read the point below about using the updater:
+
+* if you already have quicktime installed, just make sure that
+  quicktime for java has already been installed, use the quicktime
+  updater (Program Files -> QuickTime -> QuickTime Updater) hit the
+  'Details' button in the updater, and if it lists "Not installed" 
+  for "QuickTime for Java", well, take care of that.
+
+
+4. BUILD IT
+
+# now to build for the first time:
+cd /path/to/processing/build/windows
+
+# or if you're on linux
+cd /path/to/processing/build/linux
+
+# for the followers of goatee man
+cd /path/to/processing/build/macosx
+
+# and then..
+./make.sh
+
+# if everything went well, you'll have no errors. (feel free to make
+# suggestions for things to include here for common problems)
+
+# then to run it
+./run.sh
+
+# each time you make a change, use make to build the thing 
+# and run to get it up and running. 
+
+
+////////////////////////////////////////////////////////////////////
+
+//// Updating to the Latest Version
+
+
+5a. Each time you want to update to latest version from cvs:
+
+cd /path/to/processing
+cvs -z3 update
+# -z3 means make it snappy (using compression)
+
+
+5b. If new folders have been added, or you're gettin odd errors, use:
+
+# get to the processing folder
+cd /path/to/processing
+
+# remove the work directory
+rm -rf work
+
+# -d grabs new directories and -P cleans out old (empty) ones
+# cvs is a little brain dead about this stuff
+cvs -z3 update -d -P
+
+Unfortunately there isn't a way to know (?) if new folders have
+since been added. but if you're getting "class not found" errors
+while building, then that's a good indicator that something is
+missing from a subfolder.
+
+If there have been significant changes, or you get weird build
+errors, try deleting your 'work' folder. This will create a 
+fresh build. This includes any changes to the reference, 
+the examples, the libraries, jikes, or just about any time you
+have to use -d -P with the update.
+
+
+////////////////////////////////////////////////////////////////////
+
+//// Frequently Asked Questions
+
+- What about eclipse? What about ant? The command line is frightening
+  and gives me nightmares!
+
+In a basic sense, the command line stuff isn't as scary as it might 
+seem. Hopefully it's just a matter of following the instructions 
+above (and being patient). If not, let us know where you have trouble
+so we can fix things.
+
+Conceivably, it wouldn't take much to make Processing build under
+Eclipse or any other IDE, but we don't do it by default. Same goes for 
+ANT. We don't use it, but if someone were to make build scripts that 
+emulated everything that the current build scripts do (not just build
+the code, but all the other annoying crap that the build scripts do) 
+then maybe we could switch to it. It's all about reaching some kind 
+of critical mass. 

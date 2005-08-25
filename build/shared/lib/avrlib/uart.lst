@@ -1,0 +1,789 @@
+   1               		.file	"uart.c"
+   2               		.arch atmega8
+   3               	__SREG__ = 0x3f
+   4               	__SP_H__ = 0x3e
+   5               	__SP_L__ = 0x3d
+   6               	__tmp_reg__ = 0
+   7               	__zero_reg__ = 1
+   8               		.global __do_copy_data
+   9               		.global __do_clear_bss
+  12               		.text
+  13               	.Ltext0:
+  86               	.global	uartSetBaudRate
+  88               	uartSetBaudRate:
+   1:../avrlib/uart.c **** /*! \file uart.c \brief UART driver with buffer support. */
+   2:../avrlib/uart.c **** // *****************************************************************************
+   3:../avrlib/uart.c **** //
+   4:../avrlib/uart.c **** // File Name	: 'uart.c'
+   5:../avrlib/uart.c **** // Title		: UART driver with buffer support
+   6:../avrlib/uart.c **** // Author		: Pascal Stang - Copyright (C) 2000-2002
+   7:../avrlib/uart.c **** // Created		: 11/22/2000
+   8:../avrlib/uart.c **** // Revised		: 06/09/2003
+   9:../avrlib/uart.c **** // Version		: 1.3
+  10:../avrlib/uart.c **** // Target MCU	: ATMEL AVR Series
+  11:../avrlib/uart.c **** // Editor Tabs	: 4
+  12:../avrlib/uart.c **** //
+  13:../avrlib/uart.c **** // This code is distributed under the GNU Public License
+  14:../avrlib/uart.c **** //		which can be found at http://www.gnu.org/licenses/gpl.txt
+  15:../avrlib/uart.c **** //
+  16:../avrlib/uart.c **** // *****************************************************************************
+  17:../avrlib/uart.c **** 
+  18:../avrlib/uart.c **** #include <avr/io.h>
+  19:../avrlib/uart.c **** #include <avr/interrupt.h>
+  20:../avrlib/uart.c **** #include <avr/signal.h>
+  21:../avrlib/uart.c **** 
+  22:../avrlib/uart.c **** #include "buffer.h"
+  23:../avrlib/uart.c **** #include "uart.h"
+  24:../avrlib/uart.c **** 
+  25:../avrlib/uart.c **** // UART global variables
+  26:../avrlib/uart.c **** // flag variables
+  27:../avrlib/uart.c **** volatile u08   uartReadyTx;			///< uartReadyTx flag
+  28:../avrlib/uart.c **** volatile u08   uartBufferedTx;		///< uartBufferedTx flag
+  29:../avrlib/uart.c **** // receive and transmit buffers
+  30:../avrlib/uart.c **** cBuffer uartRxBuffer;				///< uart receive buffer
+  31:../avrlib/uart.c **** cBuffer uartTxBuffer;				///< uart transmit buffer
+  32:../avrlib/uart.c **** unsigned short uartRxOverflow;		///< receive overflow counter
+  33:../avrlib/uart.c **** 
+  34:../avrlib/uart.c **** #ifndef UART_BUFFERS_EXTERNAL_RAM
+  35:../avrlib/uart.c **** 	// using internal ram,
+  36:../avrlib/uart.c **** 	// automatically allocate space in ram for each buffer
+  37:../avrlib/uart.c **** 	static char uartRxData[UART_RX_BUFFER_SIZE];
+  38:../avrlib/uart.c **** 	static char uartTxData[UART_TX_BUFFER_SIZE];
+  39:../avrlib/uart.c **** #endif
+  40:../avrlib/uart.c **** 
+  41:../avrlib/uart.c **** typedef void (*voidFuncPtru08)(unsigned char);
+  42:../avrlib/uart.c **** volatile static voidFuncPtru08 UartRxFunc;
+  43:../avrlib/uart.c **** 
+  44:../avrlib/uart.c **** //! enable and initialize the uart
+  45:../avrlib/uart.c **** void uartInit(void)
+  46:../avrlib/uart.c **** {
+  47:../avrlib/uart.c **** 	// initialize the buffers
+  48:../avrlib/uart.c **** 	uartInitBuffers();
+  49:../avrlib/uart.c **** 	// initialize user receive handler
+  50:../avrlib/uart.c **** 	UartRxFunc = 0;
+  51:../avrlib/uart.c **** 
+  52:../avrlib/uart.c **** 	// enable RxD/TxD and interrupts
+  53:../avrlib/uart.c **** 	outb(UCR, BV(RXCIE)|BV(TXCIE)|BV(RXEN)|BV(TXEN));
+  54:../avrlib/uart.c **** 
+  55:../avrlib/uart.c **** 	// set default baud rate
+  56:../avrlib/uart.c **** 	uartSetBaudRate(UART_DEFAULT_BAUD_RATE);  
+  57:../avrlib/uart.c **** 	// initialize states
+  58:../avrlib/uart.c **** 	uartReadyTx = TRUE;
+  59:../avrlib/uart.c **** 	uartBufferedTx = FALSE;
+  60:../avrlib/uart.c **** 	// clear overflow count
+  61:../avrlib/uart.c **** 	uartRxOverflow = 0;
+  62:../avrlib/uart.c **** 	// enable interrupts
+  63:../avrlib/uart.c **** 	sei();
+  64:../avrlib/uart.c **** }
+  65:../avrlib/uart.c **** 
+  66:../avrlib/uart.c **** //! create and initialize the uart transmit and receive buffers
+  67:../avrlib/uart.c **** void uartInitBuffers(void)
+  68:../avrlib/uart.c **** {
+  69:../avrlib/uart.c **** 	#ifndef UART_BUFFERS_EXTERNAL_RAM
+  70:../avrlib/uart.c **** 		// initialize the UART receive buffer
+  71:../avrlib/uart.c **** 		bufferInit(&uartRxBuffer, uartRxData, UART_RX_BUFFER_SIZE);
+  72:../avrlib/uart.c **** 		// initialize the UART transmit buffer
+  73:../avrlib/uart.c **** 		bufferInit(&uartTxBuffer, uartTxData, UART_TX_BUFFER_SIZE);
+  74:../avrlib/uart.c **** 	#else
+  75:../avrlib/uart.c **** 		// initialize the UART receive buffer
+  76:../avrlib/uart.c **** 		bufferInit(&uartRxBuffer, (u08*) UART_RX_BUFFER_ADDR, UART_RX_BUFFER_SIZE);
+  77:../avrlib/uart.c **** 		// initialize the UART transmit buffer
+  78:../avrlib/uart.c **** 		bufferInit(&uartTxBuffer, (u08*) UART_TX_BUFFER_ADDR, UART_TX_BUFFER_SIZE);
+  79:../avrlib/uart.c **** 	#endif
+  80:../avrlib/uart.c **** }
+  81:../avrlib/uart.c **** 
+  82:../avrlib/uart.c **** //! redirects received data to a user function
+  83:../avrlib/uart.c **** void uartSetRxHandler(void (*rx_func)(unsigned char c))
+  84:../avrlib/uart.c **** {
+  85:../avrlib/uart.c **** 	// set the receive interrupt to run the supplied user function
+  86:../avrlib/uart.c **** 	UartRxFunc = rx_func;
+  87:../avrlib/uart.c **** }
+  88:../avrlib/uart.c **** 
+  89:../avrlib/uart.c **** //! set the uart baud rate
+  90:../avrlib/uart.c **** void uartSetBaudRate(u32 baudrate)
+  91:../avrlib/uart.c **** {
+  90               	.LM1:
+  91               	/* prologue: frame size=0 */
+  92               	/* prologue end (size=0) */
+  93 0000 DC01      		movw r26,r24
+  94 0002 CB01      		movw r24,r22
+  92:../avrlib/uart.c **** 	// calculate division factor for requested baud rate, and set it
+  93:../avrlib/uart.c **** 	u16 bauddiv = ((F_CPU+(baudrate*8L))/(baudrate*16L)-1);
+  96               	.LM2:
+  97 0004 73E0      		ldi r23,3
+  98 0006 880F      	1:	lsl r24
+  99 0008 991F      		rol r25
+ 100 000a AA1F      		rol r26
+ 101 000c BB1F      		rol r27
+ 102 000e 7A95      		dec r23
+ 103 0010 D1F7      		brne 1b
+ 104 0012 9C01      		movw r18,r24
+ 105 0014 AD01      		movw r20,r26
+ 106 0016 220F      		lsl r18
+ 107 0018 331F      		rol r19
+ 108 001a 441F      		rol r20
+ 109 001c 551F      		rol r21
+ 110 001e 8050      		subi r24,lo8(-(16000000))
+ 111 0020 9C4D      		sbci r25,hi8(-(16000000))
+ 112 0022 AB40      		sbci r26,hlo8(-(16000000))
+ 113 0024 BF4F      		sbci r27,hhi8(-(16000000))
+ 114 0026 BC01      		movw r22,r24
+ 115 0028 CD01      		movw r24,r26
+ 116 002a 00D0      		rcall __udivmodsi4
+ 117 002c DA01      		movw r26,r20
+ 118 002e C901      		movw r24,r18
+ 119 0030 0197      		sbiw r24,1
+  94:../avrlib/uart.c **** 	outb(UBRRL, bauddiv);
+ 121               	.LM3:
+ 122 0032 89B9      		out 41-0x20,r24
+  95:../avrlib/uart.c **** 	#ifdef UBRRH
+  96:../avrlib/uart.c **** 	outb(UBRRH, bauddiv>>8);
+ 124               	.LM4:
+ 125 0034 892F      		mov r24,r25
+ 126 0036 9927      		clr r25
+ 127 0038 80BD      		out 64-0x20,r24
+ 128               	/* epilogue: frame size=0 */
+ 129 003a 0895      		ret
+ 130               	/* epilogue end (size=1) */
+ 131               	/* function uartSetBaudRate size 30 (29) */
+ 136               	.Lscope0:
+ 139               	.global	uartInitBuffers
+ 141               	uartInitBuffers:
+ 143               	.LM5:
+ 144               	/* prologue: frame size=0 */
+ 145               	/* prologue end (size=0) */
+ 147               	.LM6:
+ 148 003c 40E4      		ldi r20,lo8(64)
+ 149 003e 50E0      		ldi r21,hi8(64)
+ 150 0040 60E0      		ldi r22,lo8(uartRxData)
+ 151 0042 70E0      		ldi r23,hi8(uartRxData)
+ 152 0044 80E0      		ldi r24,lo8(uartRxBuffer)
+ 153 0046 90E0      		ldi r25,hi8(uartRxBuffer)
+ 154 0048 00D0      		rcall bufferInit
+ 156               	.LM7:
+ 157 004a 40E4      		ldi r20,lo8(64)
+ 158 004c 50E0      		ldi r21,hi8(64)
+ 159 004e 60E0      		ldi r22,lo8(uartTxData)
+ 160 0050 70E0      		ldi r23,hi8(uartTxData)
+ 161 0052 80E0      		ldi r24,lo8(uartTxBuffer)
+ 162 0054 90E0      		ldi r25,hi8(uartTxBuffer)
+ 163 0056 00D0      		rcall bufferInit
+ 164               	/* epilogue: frame size=0 */
+ 165 0058 0895      		ret
+ 166               	/* epilogue end (size=1) */
+ 167               	/* function uartInitBuffers size 15 (14) */
+ 169               	.Lscope1:
+ 172               	.global	uartInit
+ 174               	uartInit:
+ 176               	.LM8:
+ 177               	/* prologue: frame size=0 */
+ 178               	/* prologue end (size=0) */
+ 180               	.LM9:
+ 181 005a F0DF      		rcall uartInitBuffers
+ 183               	.LM10:
+ 184 005c 1092 0000 		sts (UartRxFunc)+1,__zero_reg__
+ 185 0060 1092 0000 		sts UartRxFunc,__zero_reg__
+ 187               	.LM11:
+ 188 0064 88ED      		ldi r24,lo8(-40)
+ 189 0066 8AB9      		out 42-0x20,r24
+ 191               	.LM12:
+ 192 0068 60E8      		ldi r22,lo8(9600)
+ 193 006a 75E2      		ldi r23,hi8(9600)
+ 194 006c 80E0      		ldi r24,hlo8(9600)
+ 195 006e 90E0      		ldi r25,hhi8(9600)
+ 196 0070 C7DF      		rcall uartSetBaudRate
+ 198               	.LM13:
+ 199 0072 8FEF      		ldi r24,lo8(-1)
+ 200 0074 8093 0000 		sts uartReadyTx,r24
+ 202               	.LM14:
+ 203 0078 1092 0000 		sts uartBufferedTx,__zero_reg__
+ 205               	.LM15:
+ 206 007c 1092 0000 		sts (uartRxOverflow)+1,__zero_reg__
+ 207 0080 1092 0000 		sts uartRxOverflow,__zero_reg__
+ 209               	.LM16:
+ 210               	/* #APP */
+ 211 0084 7894      		sei
+ 212               	/* #NOAPP */
+ 213               	/* epilogue: frame size=0 */
+ 214 0086 0895      		ret
+ 215               	/* epilogue end (size=1) */
+ 216               	/* function uartInit size 24 (23) */
+ 218               	.Lscope2:
+ 222               	.global	uartSetRxHandler
+ 224               	uartSetRxHandler:
+ 226               	.LM17:
+ 227               	/* prologue: frame size=0 */
+ 228               	/* prologue end (size=0) */
+ 230               	.LM18:
+ 231 0088 9093 0000 		sts (UartRxFunc)+1,r25
+ 232 008c 8093 0000 		sts UartRxFunc,r24
+ 233               	/* epilogue: frame size=0 */
+ 234 0090 0895      		ret
+ 235               	/* epilogue end (size=1) */
+ 236               	/* function uartSetRxHandler size 5 (4) */
+ 238               	.Lscope3:
+ 241               	.global	uartGetRxBuffer
+ 243               	uartGetRxBuffer:
+  97:../avrlib/uart.c **** 	#endif
+  98:../avrlib/uart.c **** }
+  99:../avrlib/uart.c **** 
+ 100:../avrlib/uart.c **** //! returns the receive buffer structure 
+ 101:../avrlib/uart.c **** cBuffer* uartGetRxBuffer(void)
+ 102:../avrlib/uart.c **** {
+ 245               	.LM19:
+ 246               	/* prologue: frame size=0 */
+ 247               	/* prologue end (size=0) */
+ 103:../avrlib/uart.c **** 	// return rx buffer pointer
+ 104:../avrlib/uart.c **** 	return &uartRxBuffer;
+ 105:../avrlib/uart.c **** }
+ 249               	.LM20:
+ 250 0092 80E0      		ldi r24,lo8(uartRxBuffer)
+ 251 0094 90E0      		ldi r25,hi8(uartRxBuffer)
+ 252               	/* epilogue: frame size=0 */
+ 253 0096 0895      		ret
+ 254               	/* epilogue end (size=1) */
+ 255               	/* function uartGetRxBuffer size 3 (2) */
+ 257               	.Lscope4:
+ 260               	.global	uartGetTxBuffer
+ 262               	uartGetTxBuffer:
+ 106:../avrlib/uart.c **** 
+ 107:../avrlib/uart.c **** //! returns the transmit buffer structure 
+ 108:../avrlib/uart.c **** cBuffer* uartGetTxBuffer(void)
+ 109:../avrlib/uart.c **** {
+ 264               	.LM21:
+ 265               	/* prologue: frame size=0 */
+ 266               	/* prologue end (size=0) */
+ 110:../avrlib/uart.c **** 	// return tx buffer pointer
+ 111:../avrlib/uart.c **** 	return &uartTxBuffer;
+ 112:../avrlib/uart.c **** }
+ 268               	.LM22:
+ 269 0098 80E0      		ldi r24,lo8(uartTxBuffer)
+ 270 009a 90E0      		ldi r25,hi8(uartTxBuffer)
+ 271               	/* epilogue: frame size=0 */
+ 272 009c 0895      		ret
+ 273               	/* epilogue end (size=1) */
+ 274               	/* function uartGetTxBuffer size 3 (2) */
+ 276               	.Lscope5:
+ 280               	.global	uartSendByte
+ 282               	uartSendByte:
+ 113:../avrlib/uart.c **** 
+ 114:../avrlib/uart.c **** //! transmits a byte over the uart
+ 115:../avrlib/uart.c **** void uartSendByte(u08 txData)
+ 116:../avrlib/uart.c **** {
+ 284               	.LM23:
+ 285               	/* prologue: frame size=0 */
+ 286               	/* prologue end (size=0) */
+ 287 009e 982F      		mov r25,r24
+ 288               	.L8:
+ 117:../avrlib/uart.c **** 	// wait for the transmitter to be ready
+ 118:../avrlib/uart.c **** 	while(!uartReadyTx);
+ 290               	.LM24:
+ 291 00a0 8091 0000 		lds r24,uartReadyTx
+ 292 00a4 8823      		tst r24
+ 293 00a6 E1F3      		breq .L8
+ 119:../avrlib/uart.c **** 	// send byte
+ 120:../avrlib/uart.c **** 	outb(UDR, txData);
+ 295               	.LM25:
+ 296 00a8 9CB9      		out 44-0x20,r25
+ 121:../avrlib/uart.c **** 	// set ready state to FALSE
+ 122:../avrlib/uart.c **** 	uartReadyTx = FALSE;
+ 298               	.LM26:
+ 299 00aa 1092 0000 		sts uartReadyTx,__zero_reg__
+ 300               	/* epilogue: frame size=0 */
+ 301 00ae 0895      		ret
+ 302               	/* epilogue end (size=1) */
+ 303               	/* function uartSendByte size 9 (8) */
+ 305               	.Lscope6:
+ 309               	.global	uartReceiveByte
+ 311               	uartReceiveByte:
+ 123:../avrlib/uart.c **** }
+ 124:../avrlib/uart.c **** 
+ 125:../avrlib/uart.c **** //! gets a single byte from the uart receive buffer (getchar-style)
+ 126:../avrlib/uart.c **** int uartGetByte(void)
+ 127:../avrlib/uart.c **** {
+ 128:../avrlib/uart.c **** 	u08 c;
+ 129:../avrlib/uart.c **** 	if(uartReceiveByte(&c))
+ 130:../avrlib/uart.c **** 		return c;
+ 131:../avrlib/uart.c **** 	else
+ 132:../avrlib/uart.c **** 		return -1;
+ 133:../avrlib/uart.c **** }
+ 134:../avrlib/uart.c **** 
+ 135:../avrlib/uart.c **** //! gets a byte (if available) from the uart receive buffer
+ 136:../avrlib/uart.c **** u08 uartReceiveByte(u08* rxData)
+ 137:../avrlib/uart.c **** {
+ 313               	.LM27:
+ 314               	/* prologue: frame size=0 */
+ 315 00b0 CF93      		push r28
+ 316 00b2 DF93      		push r29
+ 317               	/* prologue end (size=2) */
+ 318 00b4 EC01      		movw r28,r24
+ 138:../avrlib/uart.c **** 	// make sure we have a receive buffer
+ 139:../avrlib/uart.c **** 	if(uartRxBuffer.size)
+ 320               	.LM28:
+ 321 00b6 8091 0000 		lds r24,uartRxBuffer+2
+ 322 00ba 9091 0000 		lds r25,(uartRxBuffer+2)+1
+ 323 00be 0097      		sbiw r24,0
+ 324 00c0 61F0      		breq .L11
+ 140:../avrlib/uart.c **** 	{
+ 141:../avrlib/uart.c **** 		// make sure we have data
+ 142:../avrlib/uart.c **** 		if(uartRxBuffer.datalength)
+ 326               	.LM29:
+ 327 00c2 8091 0000 		lds r24,uartRxBuffer+4
+ 328 00c6 9091 0000 		lds r25,(uartRxBuffer+4)+1
+ 329 00ca 0097      		sbiw r24,0
+ 330 00cc 31F0      		breq .L11
+ 143:../avrlib/uart.c **** 		{
+ 144:../avrlib/uart.c **** 			// get byte from beginning of buffer
+ 145:../avrlib/uart.c **** 			*rxData = bufferGetFromFront(&uartRxBuffer);
+ 332               	.LM30:
+ 333 00ce 80E0      		ldi r24,lo8(uartRxBuffer)
+ 334 00d0 90E0      		ldi r25,hi8(uartRxBuffer)
+ 335 00d2 00D0      		rcall bufferGetFromFront
+ 336 00d4 8883      		st Y,r24
+ 146:../avrlib/uart.c **** 			return TRUE;
+ 338               	.LM31:
+ 339 00d6 8FEF      		ldi r24,lo8(255)
+ 340 00d8 90E0      		ldi r25,hi8(255)
+ 341               	.L11:
+ 342               	/* epilogue: frame size=0 */
+ 343 00da DF91      		pop r29
+ 344 00dc CF91      		pop r28
+ 345 00de 0895      		ret
+ 346               	/* epilogue end (size=3) */
+ 347               	/* function uartReceiveByte size 24 (19) */
+ 349               	.Lscope7:
+ 352               	.global	uartGetByte
+ 354               	uartGetByte:
+ 356               	.LM32:
+ 357               	/* prologue: frame size=1 */
+ 358 00e0 CF93      		push r28
+ 359 00e2 DF93      		push r29
+ 360 00e4 CDB7      		in r28,__SP_L__
+ 361 00e6 DEB7      		in r29,__SP_H__
+ 362 00e8 2197      		sbiw r28,1
+ 363 00ea 0FB6      		in __tmp_reg__,__SREG__
+ 364 00ec F894      		cli
+ 365 00ee DEBF      		out __SP_H__,r29
+ 366 00f0 0FBE      		out __SREG__,__tmp_reg__
+ 367 00f2 CDBF      		out __SP_L__,r28
+ 368               	/* prologue end (size=10) */
+ 370               	.LM33:
+ 371 00f4 CE01      		movw r24,r28
+ 372 00f6 0196      		adiw r24,1
+ 373 00f8 DBDF      		rcall uartReceiveByte
+ 374 00fa 8823      		tst r24
+ 375 00fc 19F0      		breq .L17
+ 377               	.LM34:
+ 378 00fe 8981      		ldd r24,Y+1
+ 379 0100 9927      		clr r25
+ 380 0102 02C0      		rjmp .L16
+ 381               	.L17:
+ 383               	.LM35:
+ 384 0104 8FEF      		ldi r24,lo8(-1)
+ 385 0106 9FEF      		ldi r25,hi8(-1)
+ 386               	.L16:
+ 387               	/* epilogue: frame size=1 */
+ 388 0108 2196      		adiw r28,1
+ 389 010a 0FB6      		in __tmp_reg__,__SREG__
+ 390 010c F894      		cli
+ 391 010e DEBF      		out __SP_H__,r29
+ 392 0110 0FBE      		out __SREG__,__tmp_reg__
+ 393 0112 CDBF      		out __SP_L__,r28
+ 394 0114 DF91      		pop r29
+ 395 0116 CF91      		pop r28
+ 396 0118 0895      		ret
+ 397               	/* epilogue end (size=9) */
+ 398               	/* function uartGetByte size 29 (10) */
+ 403               	.Lscope8:
+ 406               	.global	uartFlushReceiveBuffer
+ 408               	uartFlushReceiveBuffer:
+ 147:../avrlib/uart.c **** 		}
+ 148:../avrlib/uart.c **** 		else
+ 149:../avrlib/uart.c **** 		{
+ 150:../avrlib/uart.c **** 			// no data
+ 151:../avrlib/uart.c **** 			return FALSE;
+ 152:../avrlib/uart.c **** 		}
+ 153:../avrlib/uart.c **** 	}
+ 154:../avrlib/uart.c **** 	else
+ 155:../avrlib/uart.c **** 	{
+ 156:../avrlib/uart.c **** 		// no buffer
+ 157:../avrlib/uart.c **** 		return FALSE;
+ 158:../avrlib/uart.c **** 	}
+ 159:../avrlib/uart.c **** }
+ 160:../avrlib/uart.c **** 
+ 161:../avrlib/uart.c **** //! flush all data out of the receive buffer
+ 162:../avrlib/uart.c **** void uartFlushReceiveBuffer(void)
+ 163:../avrlib/uart.c **** {
+ 410               	.LM36:
+ 411               	/* prologue: frame size=0 */
+ 412               	/* prologue end (size=0) */
+ 164:../avrlib/uart.c **** 	// flush all data from receive buffer
+ 165:../avrlib/uart.c **** 	//bufferFlush(&uartRxBuffer);
+ 166:../avrlib/uart.c **** 	// same effect as above
+ 167:../avrlib/uart.c **** 	uartRxBuffer.datalength = 0;
+ 414               	.LM37:
+ 415 011a 1092 0000 		sts (uartRxBuffer+4)+1,__zero_reg__
+ 416 011e 1092 0000 		sts uartRxBuffer+4,__zero_reg__
+ 417               	/* epilogue: frame size=0 */
+ 418 0122 0895      		ret
+ 419               	/* epilogue end (size=1) */
+ 420               	/* function uartFlushReceiveBuffer size 5 (4) */
+ 422               	.Lscope9:
+ 425               	.global	uartReceiveBufferIsEmpty
+ 427               	uartReceiveBufferIsEmpty:
+ 168:../avrlib/uart.c **** }
+ 169:../avrlib/uart.c **** 
+ 170:../avrlib/uart.c **** //! return true if uart receive buffer is empty
+ 171:../avrlib/uart.c **** u08 uartReceiveBufferIsEmpty(void)
+ 172:../avrlib/uart.c **** {
+ 429               	.LM38:
+ 430               	/* prologue: frame size=0 */
+ 431               	/* prologue end (size=0) */
+ 173:../avrlib/uart.c **** 	if(uartRxBuffer.datalength == 0)
+ 433               	.LM39:
+ 434 0124 8091 0000 		lds r24,uartRxBuffer+4
+ 435 0128 9091 0000 		lds r25,(uartRxBuffer+4)+1
+ 436 012c 892B      		or r24,r25
+ 437 012e 19F4      		brne .L21
+ 174:../avrlib/uart.c **** 	{
+ 175:../avrlib/uart.c **** 		return TRUE;
+ 439               	.LM40:
+ 440 0130 8FEF      		ldi r24,lo8(255)
+ 441 0132 90E0      		ldi r25,hi8(255)
+ 442 0134 0895      		ret
+ 443               	.L21:
+ 176:../avrlib/uart.c **** 	}
+ 177:../avrlib/uart.c **** 	else
+ 178:../avrlib/uart.c **** 	{
+ 179:../avrlib/uart.c **** 		return FALSE;
+ 445               	.LM41:
+ 446 0136 80E0      		ldi r24,lo8(0)
+ 447 0138 90E0      		ldi r25,hi8(0)
+ 180:../avrlib/uart.c **** 	}
+ 181:../avrlib/uart.c **** }
+ 449               	.LM42:
+ 450 013a 0895      		ret
+ 451               	/* epilogue: frame size=0 */
+ 452 013c 0895      		ret
+ 453               	/* epilogue end (size=1) */
+ 454               	/* function uartReceiveBufferIsEmpty size 13 (12) */
+ 456               	.Lscope10:
+ 460               	.global	uartAddToTxBuffer
+ 462               	uartAddToTxBuffer:
+ 182:../avrlib/uart.c **** 
+ 183:../avrlib/uart.c **** //! add byte to end of uart Tx buffer
+ 184:../avrlib/uart.c **** void uartAddToTxBuffer(u08 data)
+ 185:../avrlib/uart.c **** {
+ 464               	.LM43:
+ 465               	/* prologue: frame size=0 */
+ 466               	/* prologue end (size=0) */
+ 186:../avrlib/uart.c **** 	// add data byte to the end of the tx buffer
+ 187:../avrlib/uart.c **** 	bufferAddToEnd(&uartTxBuffer, data);
+ 468               	.LM44:
+ 469 013e 682F      		mov r22,r24
+ 470 0140 80E0      		ldi r24,lo8(uartTxBuffer)
+ 471 0142 90E0      		ldi r25,hi8(uartTxBuffer)
+ 472 0144 00D0      		rcall bufferAddToEnd
+ 473               	/* epilogue: frame size=0 */
+ 474 0146 0895      		ret
+ 475               	/* epilogue end (size=1) */
+ 476               	/* function uartAddToTxBuffer size 5 (4) */
+ 478               	.Lscope11:
+ 481               	.global	uartSendTxBuffer
+ 483               	uartSendTxBuffer:
+ 188:../avrlib/uart.c **** }
+ 189:../avrlib/uart.c **** 
+ 190:../avrlib/uart.c **** //! start transmission of the current uart Tx buffer contents
+ 191:../avrlib/uart.c **** void uartSendTxBuffer(void)
+ 192:../avrlib/uart.c **** {
+ 485               	.LM45:
+ 486               	/* prologue: frame size=0 */
+ 487               	/* prologue end (size=0) */
+ 193:../avrlib/uart.c **** 	// turn on buffered transmit
+ 194:../avrlib/uart.c **** 	uartBufferedTx = TRUE;
+ 489               	.LM46:
+ 490 0148 8FEF      		ldi r24,lo8(-1)
+ 491 014a 8093 0000 		sts uartBufferedTx,r24
+ 195:../avrlib/uart.c **** 	// send the first byte to get things going by interrupts
+ 196:../avrlib/uart.c **** 	uartSendByte(bufferGetFromFront(&uartTxBuffer));
+ 493               	.LM47:
+ 494 014e 80E0      		ldi r24,lo8(uartTxBuffer)
+ 495 0150 90E0      		ldi r25,hi8(uartTxBuffer)
+ 496 0152 00D0      		rcall bufferGetFromFront
+ 497 0154 A4DF      		rcall uartSendByte
+ 498               	/* epilogue: frame size=0 */
+ 499 0156 0895      		ret
+ 500               	/* epilogue end (size=1) */
+ 501               	/* function uartSendTxBuffer size 8 (7) */
+ 503               	.Lscope12:
+ 506               	.global	__vector_13
+ 508               	__vector_13:
+ 197:../avrlib/uart.c **** }
+ 198:../avrlib/uart.c **** /*
+ 199:../avrlib/uart.c **** //! transmit nBytes from buffer out the uart
+ 200:../avrlib/uart.c **** u08 uartSendBuffer(char *buffer, u16 nBytes)
+ 201:../avrlib/uart.c **** {
+ 202:../avrlib/uart.c **** 	register u08 first;
+ 203:../avrlib/uart.c **** 	register u16 i;
+ 204:../avrlib/uart.c **** 
+ 205:../avrlib/uart.c **** 	// check if there's space (and that we have any bytes to send at all)
+ 206:../avrlib/uart.c **** 	if((uartTxBuffer.datalength + nBytes < uartTxBuffer.size) && nBytes)
+ 207:../avrlib/uart.c **** 	{
+ 208:../avrlib/uart.c **** 		// grab first character
+ 209:../avrlib/uart.c **** 		first = *buffer++;
+ 210:../avrlib/uart.c **** 		// copy user buffer to uart transmit buffer
+ 211:../avrlib/uart.c **** 		for(i = 0; i < nBytes-1; i++)
+ 212:../avrlib/uart.c **** 		{
+ 213:../avrlib/uart.c **** 			// put data bytes at end of buffer
+ 214:../avrlib/uart.c **** 			bufferAddToEnd(&uartTxBuffer, *buffer++);
+ 215:../avrlib/uart.c **** 		}
+ 216:../avrlib/uart.c **** 
+ 217:../avrlib/uart.c **** 		// send the first byte to get things going by interrupts
+ 218:../avrlib/uart.c **** 		uartBufferedTx = TRUE;
+ 219:../avrlib/uart.c **** 		uartSendByte(first);
+ 220:../avrlib/uart.c **** 		// return success
+ 221:../avrlib/uart.c **** 		return TRUE;
+ 222:../avrlib/uart.c **** 	}
+ 223:../avrlib/uart.c **** 	else
+ 224:../avrlib/uart.c **** 	{
+ 225:../avrlib/uart.c **** 		// return failure
+ 226:../avrlib/uart.c **** 		return FALSE;
+ 227:../avrlib/uart.c **** 	}
+ 228:../avrlib/uart.c **** }
+ 229:../avrlib/uart.c **** */
+ 230:../avrlib/uart.c **** //! UART Transmit Complete Interrupt Handler
+ 231:../avrlib/uart.c **** UART_INTERRUPT_HANDLER(SIG_UART_TRANS)
+ 232:../avrlib/uart.c **** {
+ 510               	.LM48:
+ 511               	/* prologue: frame size=0 */
+ 512 0158 1F92      		push __zero_reg__
+ 513 015a 0F92      		push __tmp_reg__
+ 514 015c 0FB6      		in __tmp_reg__,__SREG__
+ 515 015e 0F92      		push __tmp_reg__
+ 516 0160 1124      		clr __zero_reg__
+ 517 0162 2F93      		push r18
+ 518 0164 3F93      		push r19
+ 519 0166 4F93      		push r20
+ 520 0168 5F93      		push r21
+ 521 016a 6F93      		push r22
+ 522 016c 7F93      		push r23
+ 523 016e 8F93      		push r24
+ 524 0170 9F93      		push r25
+ 525 0172 AF93      		push r26
+ 526 0174 BF93      		push r27
+ 527 0176 EF93      		push r30
+ 528 0178 FF93      		push r31
+ 529               	/* prologue end (size=17) */
+ 233:../avrlib/uart.c **** 	// check if buffered tx is enabled
+ 234:../avrlib/uart.c **** 	if(uartBufferedTx)
+ 531               	.LM49:
+ 532 017a 8091 0000 		lds r24,uartBufferedTx
+ 533 017e 8823      		tst r24
+ 534 0180 69F0      		breq .L26
+ 235:../avrlib/uart.c **** 	{
+ 236:../avrlib/uart.c **** 		// check if there's data left in the buffer
+ 237:../avrlib/uart.c **** 		if(uartTxBuffer.datalength)
+ 536               	.LM50:
+ 537 0182 8091 0000 		lds r24,uartTxBuffer+4
+ 538 0186 9091 0000 		lds r25,(uartTxBuffer+4)+1
+ 539 018a 892B      		or r24,r25
+ 540 018c 29F0      		breq .L27
+ 238:../avrlib/uart.c **** 		{
+ 239:../avrlib/uart.c **** 			// send byte from top of buffer
+ 240:../avrlib/uart.c **** 			outb(UDR, bufferGetFromFront(&uartTxBuffer));
+ 542               	.LM51:
+ 543 018e 80E0      		ldi r24,lo8(uartTxBuffer)
+ 544 0190 90E0      		ldi r25,hi8(uartTxBuffer)
+ 545 0192 00D0      		rcall bufferGetFromFront
+ 546 0194 8CB9      		out 44-0x20,r24
+ 547 0196 05C0      		rjmp .L25
+ 548               	.L27:
+ 241:../avrlib/uart.c **** 		}
+ 242:../avrlib/uart.c **** 		else
+ 243:../avrlib/uart.c **** 		{
+ 244:../avrlib/uart.c **** 			// no data left
+ 245:../avrlib/uart.c **** 			uartBufferedTx = FALSE;
+ 550               	.LM52:
+ 551 0198 1092 0000 		sts uartBufferedTx,__zero_reg__
+ 552               	.L26:
+ 246:../avrlib/uart.c **** 			// return to ready state
+ 247:../avrlib/uart.c **** 			uartReadyTx = TRUE;
+ 248:../avrlib/uart.c **** 		}
+ 249:../avrlib/uart.c **** 	}
+ 250:../avrlib/uart.c **** 	else
+ 251:../avrlib/uart.c **** 	{
+ 252:../avrlib/uart.c **** 		// we're using single-byte tx mode
+ 253:../avrlib/uart.c **** 		// indicate transmit complete, back to ready
+ 254:../avrlib/uart.c **** 		uartReadyTx = TRUE;
+ 554               	.LM53:
+ 555 019c 8FEF      		ldi r24,lo8(-1)
+ 556 019e 8093 0000 		sts uartReadyTx,r24
+ 557               	.L25:
+ 558               	/* epilogue: frame size=0 */
+ 559 01a2 FF91      		pop r31
+ 560 01a4 EF91      		pop r30
+ 561 01a6 BF91      		pop r27
+ 562 01a8 AF91      		pop r26
+ 563 01aa 9F91      		pop r25
+ 564 01ac 8F91      		pop r24
+ 565 01ae 7F91      		pop r23
+ 566 01b0 6F91      		pop r22
+ 567 01b2 5F91      		pop r21
+ 568 01b4 4F91      		pop r20
+ 569 01b6 3F91      		pop r19
+ 570 01b8 2F91      		pop r18
+ 571 01ba 0F90      		pop __tmp_reg__
+ 572 01bc 0FBE      		out __SREG__,__tmp_reg__
+ 573 01be 0F90      		pop __tmp_reg__
+ 574 01c0 1F90      		pop __zero_reg__
+ 575 01c2 1895      		reti
+ 576               	/* epilogue end (size=17) */
+ 577               	/* function __vector_13 size 54 (20) */
+ 579               	.Lscope13:
+ 582               	.global	__vector_11
+ 584               	__vector_11:
+ 255:../avrlib/uart.c **** 	}
+ 256:../avrlib/uart.c **** }
+ 257:../avrlib/uart.c **** 
+ 258:../avrlib/uart.c **** //! UART Receive Complete Interrupt Handler
+ 259:../avrlib/uart.c **** UART_INTERRUPT_HANDLER(SIG_UART_RECV)
+ 260:../avrlib/uart.c **** {
+ 586               	.LM54:
+ 587               	/* prologue: frame size=0 */
+ 588 01c4 1F92      		push __zero_reg__
+ 589 01c6 0F92      		push __tmp_reg__
+ 590 01c8 0FB6      		in __tmp_reg__,__SREG__
+ 591 01ca 0F92      		push __tmp_reg__
+ 592 01cc 1124      		clr __zero_reg__
+ 593 01ce 2F93      		push r18
+ 594 01d0 3F93      		push r19
+ 595 01d2 4F93      		push r20
+ 596 01d4 5F93      		push r21
+ 597 01d6 6F93      		push r22
+ 598 01d8 7F93      		push r23
+ 599 01da 8F93      		push r24
+ 600 01dc 9F93      		push r25
+ 601 01de AF93      		push r26
+ 602 01e0 BF93      		push r27
+ 603 01e2 EF93      		push r30
+ 604 01e4 FF93      		push r31
+ 605               	/* prologue end (size=17) */
+ 261:../avrlib/uart.c **** 	u08 c;
+ 262:../avrlib/uart.c **** 	
+ 263:../avrlib/uart.c **** 	// get received char
+ 264:../avrlib/uart.c **** 	c = inb(UDR);
+ 607               	.LM55:
+ 608 01e6 6CB1      		in r22,44-0x20
+ 265:../avrlib/uart.c **** 
+ 266:../avrlib/uart.c **** 	// if there's a user function to handle this receive event
+ 267:../avrlib/uart.c **** 	if(UartRxFunc)
+ 610               	.LM56:
+ 611 01e8 8091 0000 		lds r24,UartRxFunc
+ 612 01ec 9091 0000 		lds r25,(UartRxFunc)+1
+ 613 01f0 892B      		or r24,r25
+ 614 01f2 39F0      		breq .L31
+ 268:../avrlib/uart.c **** 	{
+ 269:../avrlib/uart.c **** 		// call it and pass the received data
+ 270:../avrlib/uart.c **** 		UartRxFunc(c);
+ 616               	.LM57:
+ 617 01f4 E091 0000 		lds r30,UartRxFunc
+ 618 01f8 F091 0000 		lds r31,(UartRxFunc)+1
+ 619 01fc 862F      		mov r24,r22
+ 620 01fe 0995      		icall
+ 621 0200 0EC0      		rjmp .L30
+ 622               	.L31:
+ 271:../avrlib/uart.c **** 	}
+ 272:../avrlib/uart.c **** 	else
+ 273:../avrlib/uart.c **** 	{
+ 274:../avrlib/uart.c **** 		// otherwise do default processing
+ 275:../avrlib/uart.c **** 		// put received char in buffer
+ 276:../avrlib/uart.c **** 		// check if there's space
+ 277:../avrlib/uart.c **** 		if( !bufferAddToEnd(&uartRxBuffer, c) )
+ 624               	.LM58:
+ 625 0202 80E0      		ldi r24,lo8(uartRxBuffer)
+ 626 0204 90E0      		ldi r25,hi8(uartRxBuffer)
+ 627 0206 00D0      		rcall bufferAddToEnd
+ 628 0208 8823      		tst r24
+ 629 020a 49F4      		brne .L30
+ 278:../avrlib/uart.c **** 		{
+ 279:../avrlib/uart.c **** 			// no space in buffer
+ 280:../avrlib/uart.c **** 			// count overflow
+ 281:../avrlib/uart.c **** 			uartRxOverflow++;
+ 631               	.LM59:
+ 632 020c 8091 0000 		lds r24,uartRxOverflow
+ 633 0210 9091 0000 		lds r25,(uartRxOverflow)+1
+ 634 0214 0196      		adiw r24,1
+ 635 0216 9093 0000 		sts (uartRxOverflow)+1,r25
+ 636 021a 8093 0000 		sts uartRxOverflow,r24
+ 637               	.L30:
+ 638               	/* epilogue: frame size=0 */
+ 639 021e FF91      		pop r31
+ 640 0220 EF91      		pop r30
+ 641 0222 BF91      		pop r27
+ 642 0224 AF91      		pop r26
+ 643 0226 9F91      		pop r25
+ 644 0228 8F91      		pop r24
+ 645 022a 7F91      		pop r23
+ 646 022c 6F91      		pop r22
+ 647 022e 5F91      		pop r21
+ 648 0230 4F91      		pop r20
+ 649 0232 3F91      		pop r19
+ 650 0234 2F91      		pop r18
+ 651 0236 0F90      		pop __tmp_reg__
+ 652 0238 0FBE      		out __SREG__,__tmp_reg__
+ 653 023a 0F90      		pop __tmp_reg__
+ 654 023c 1F90      		pop __zero_reg__
+ 655 023e 1895      		reti
+ 656               	/* epilogue end (size=17) */
+ 657               	/* function __vector_11 size 62 (28) */
+ 662               	.Lscope14:
+ 664               		.comm uartReadyTx,1,1
+ 665               		.comm uartBufferedTx,1,1
+ 666               		.comm uartRxBuffer,8,1
+ 667               		.comm uartTxBuffer,8,1
+ 668               		.comm uartRxOverflow,2,1
+ 669               		.lcomm uartRxData,64
+ 670               		.lcomm uartTxData,64
+ 671               		.lcomm UartRxFunc,2
+ 680               		.text
+ 682               	Letext:
+ 683               	/* File "../avrlib/uart.c": code  289 = 0x0121 ( 186), prologues  46, epilogues  57 */
+DEFINED SYMBOLS
+                            *ABS*:00000000 uart.c
+                            *ABS*:0000003f __SREG__
+                            *ABS*:0000003e __SP_H__
+                            *ABS*:0000003d __SP_L__
+                            *ABS*:00000000 __tmp_reg__
+                            *ABS*:00000001 __zero_reg__
+/var/tmp//cclgUhYv.s:88     .text:00000000 uartSetBaudRate
+/var/tmp//cclgUhYv.s:141    .text:0000003c uartInitBuffers
+                             .bss:00000000 uartRxData
+                            *COM*:00000008 uartRxBuffer
+/var/tmp//cclgUhYv.s:669    .bss:00000040 uartTxData
+                            *COM*:00000008 uartTxBuffer
+/var/tmp//cclgUhYv.s:174    .text:0000005a uartInit
+/var/tmp//cclgUhYv.s:670    .bss:00000080 UartRxFunc
+                            *COM*:00000001 uartReadyTx
+                            *COM*:00000001 uartBufferedTx
+                            *COM*:00000002 uartRxOverflow
+/var/tmp//cclgUhYv.s:224    .text:00000088 uartSetRxHandler
+/var/tmp//cclgUhYv.s:243    .text:00000092 uartGetRxBuffer
+/var/tmp//cclgUhYv.s:262    .text:00000098 uartGetTxBuffer
+/var/tmp//cclgUhYv.s:282    .text:0000009e uartSendByte
+/var/tmp//cclgUhYv.s:311    .text:000000b0 uartReceiveByte
+/var/tmp//cclgUhYv.s:354    .text:000000e0 uartGetByte
+/var/tmp//cclgUhYv.s:408    .text:0000011a uartFlushReceiveBuffer
+/var/tmp//cclgUhYv.s:427    .text:00000124 uartReceiveBufferIsEmpty
+/var/tmp//cclgUhYv.s:462    .text:0000013e uartAddToTxBuffer
+/var/tmp//cclgUhYv.s:483    .text:00000148 uartSendTxBuffer
+/var/tmp//cclgUhYv.s:508    .text:00000158 __vector_13
+/var/tmp//cclgUhYv.s:584    .text:000001c4 __vector_11
+/var/tmp//cclgUhYv.s:682    .text:00000240 Letext
+
+UNDEFINED SYMBOLS
+__do_copy_data
+__do_clear_bss
+__udivmodsi4
+bufferInit
+bufferGetFromFront
+bufferAddToEnd

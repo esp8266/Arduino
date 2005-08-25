@@ -1,0 +1,134 @@
+<html>
+<head>
+<title>Procyon AVRlib - C-Language Function Library for Atmel AVR Processors</title>
+</head>
+
+<body>
+<!--#config timefmt="%A %B %d, %Y" -->
+<h1 align="center"><font color="#990000"><b><font color="#0066CC">Procyon AVRlib</font></b></font><font size="4" face="Arial" color="#990000"><b><br>
+  </b></font><font size="4" color="#990000"><b>C-Language Function Library for 
+  Atmel AVR Processors</b></font></h1>
+
+  <center>
+    Written by Pascal Stang | Updated: 
+    <!--#echo var="LAST_MODIFIED" -->
+  </center>
+  <hr>
+<ul>
+  <li><b>AVRlib is a library of easy-to-use C functions for a variety of common 
+    and uncommon tasks using AVR processors. </b></li>
+  <li>The goal of AVRlib is to allow programmers to work quickly towards their 
+    end goal by reducing the time needed to write basic support functions and 
+    code. </li>
+  <li> Most AVRlib header (*.h) files have lengthy descriptions of how to use 
+    the supplied library functions. All code (*.c) files are heavily commented 
+    with additional information. </li>
+  <li> Documentation is still being improved and refined on many libraries. When 
+    getting familiar with a library, look first at the HTML docs and any example 
+    code that is available in the examples directory. Then look inside the *.h 
+    and *conf.h files, and then the *.c file for that library for more details 
+    and documentation.</li>
+  <li> Significant example code is included in <i>avrlib.zip.</i> The example 
+    code is heavily commented and strives to illustrate how to use various AVRlib 
+    function libraries.</li>
+  <li><font color="#FF0000"><strong>Download AVRlib (with docs and code examples)</strong> 
+    </font> 
+    <ul>
+      <li><a href="avrlib.zip">AVRlib (zip file, 1MB, <!--#flastmod virtual="avrlib.zip"-->)</a></li>
+      <li><a href="avrlib_setup.exe">AVRlib (win32 installer package, 1MB, 
+        <!--#flastmod virtual="avrlib.zip"-->
+        )</a></li>
+    </ul>
+  </li>
+  <li><a href="docs/html/index.html">On-line HTML Documentation</a></li>
+  <li> <a href="release_notes.html">Release Notes</a></li>
+  <li> <a href="install.html">AVRlib Install Guide</a> for manual installation 
+    of zip file</li>
+</ul>
+
+<hr>
+
+<div align="center">
+  <h3><font color="#0066CC"><b>Procyon AVRlib Overview</b></font></h3>
+</div>
+
+<table border="1" width="100%">
+  <tr> 
+    <td width="50%" bgcolor="#3C2D74"><font color="#FFFFFF"><b>General</b></font></td>
+    <td width="50%" bgcolor="#3C2D74"><font color="#FFFFFF"><b>AVR Built-In Peripheral 
+      Drivers </b></font></td>
+  </tr>
+  <tr> 
+    <td width="50%">
+	<ul>
+	<li>Byte Buffering (circular)</li>
+	<li>Bit Buffering (linear)</li>
+	<li>Printf and other formatted print functions</li>
+	<li>VT100 Terminal Output</li>
+	<li>Command Line Interface</li>
+	<li>FAT16/32 File System (support is read-only for now)</li>
+	<li>STX/ETX Packet Protocol</li>
+	<li>Fixed-Point Math Library (basic operations only)</li>
+	</ul>
+	</td>
+    <td width="50%">
+	<ul>
+        <li>Timers (with PWM, interrupt management)</li>
+        <li>UART (interrupt driven)</li>
+        <li>A/D Converter</li>
+        <li>I2C Master/Slave (interrupt and non-intr)</li>
+        <li>SPI Interface</li>
+        <li>External Interrupts</li>
+      </ul>
+	</td>
+  </tr>
+  <tr> 
+    <td width="50%" bgcolor="#3C2D74"><font color="#FFFFFF"><b> External Hardware 
+      Device Drivers</b></font></td>
+    <td width="50%" bgcolor="#3C2D74"><font color="#FFFFFF"><b>AVR Software-Emulated Devices</b></font></td>
+  </tr>
+  <tr> 
+    <td width="50%">
+	<ul>
+        <li>Character LCD Modules (HD44780-based)</li>
+        <li>I2C EEPROM Memories</li>
+        <li>SPI EEPROM Memories</li>
+        <li>MMC/SD Card Interface (SPI mode)</li>
+        <li>LIS3L02 ST Accelerometer</li>
+        <li>IDE/ATA Interface (for hard disks and CF cards)</li>
+        <li>Quadrature Encoders</li>
+        <li>RC-Servos (up to 8 channels)</li>
+        <li>STA013 MP3 Decoder Chip</li>
+        <li>GPS Receivers (via serial port) 
+          <ul>
+            <li>NMEA-0813 Protocol</li>
+            <li>Trimble TSIP Protocol</li>
+          </ul>
+        </li>
+        <li>Graphic LCD Modules 
+          <ul>
+            <li>KS0108/HD61202 Controller</li>
+            <li>T6963 Controller</li>
+            <li>LCD Fonts and Symbols</li>
+          </ul>
+        </li>
+      </ul>
+	</td>
+    <td width="50%"> <ul>
+        <li>I2c Master (Bit-Bang)</li>
+        <li>UART (software-based, timer interrupt driven)</li>
+        <li>Pulse Output (timer-based, variable frequency)</li>
+        <li>Intel-type Memory Bus (Address & Data Buses + nRD,nWR)</li>
+      </ul>
+	</td>
+  </tr>
+</table>
+<hr>
+<center>
+    Written by Pascal Stang | Updated: 
+    <!--#echo var="LAST_MODIFIED" -->
+</center>
+
+</body>
+
+</html>

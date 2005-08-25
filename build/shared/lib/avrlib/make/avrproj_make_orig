@@ -1,0 +1,111 @@
+#----------------------------------------------------------------------------------
+# GCC-AVR standard Makefile part 3
+# Based on Volker Oth's makefiles of jan.2000
+# Modified and merged by AVRfreaks.net for smoother integration with AVR Studio,
+# and easier comprehension for the average user (nov.2001). Minor errors corrected.
+# ---------------------------------------------------------------------------------
+
+###### BLOCK 1) define some variables based on the AVR base path in $(AVR) #######
+
+	CC	= avr-gcc
+	AS	= avr-gcc -x assembler-with-cpp	
+	RM	= rm -f
+	RN	= mv
+	CP	= cp
+	BIN	= avr-objcopy
+	SIZE	= avr-size
+	INCDIR	= .
+#	LIBDIR	= $(AVR)/avr/lib
+#	SHELL   = $(AVR)/bin/sh.exe
+
+
+###### BLOCK 2) output format can be srec, ihex (avrobj is always created) #######
+
+	FORMAT = ihex	
+
+
+###### BLOCK 3) define all project specific object files ######
+
+	SRC	+= $(AVRLIBSRC)
+	OBJ	= $(ASRC:.s=.o) $(SRC:.c=.o) 
+	CPFLAGS += -mmcu=$(MCU)
+	ASFLAGS += -mmcu=$(MCU)
+	LDFLAGS += -mmcu=$(MCU)
+  
+###### BLOCK 4) this defines the aims of the make process ######
+
+#all:	$(TRG).obj $(TRG).elf $(TRG).hex  $(TRG).cof $(TRG).eep $(TRG).ok
+all:	$(TRG).elf $(TRG).cof $(TRG).hex $(TRG).eep $(TRG).ok
+
+
+###### BLOCK 5) compile: instructions to create assembler and/or object files from C source ######
+
+%.o : %.c 
+	$(CC) -c $(CPFLAGS) -I$(INCDIR) $< -o $@
+
+%.s : %.c
+	$(CC) -S $(CPFLAGS) -I$(INCDIR) $< -o $@
+
+
+###### BLOCK 6) assemble: instructions to create object file from assembler files ######
+
+%.o : %.s
+	$(AS) -c $(ASFLAGS) -I$(INCDIR) $< -o $@
+
+
+###### BLOCK 7)  link: instructions to create elf output file from object files ######
+%.elf: $(OBJ)
+	$(CC) $(OBJ) $(LIB) $(LDFLAGS) -o $@
+
+###### BLOCK 8) create avrobj file from elf output file ######
+
+#%.obj: %.elf
+#	$(BIN) -O avrobj -R .eeprom $< $@
+
+
+###### BLOCK 9) create bin (.hex and .eep) files from elf output file ######
+
+%.hex: %.elf
+	$(BIN) -O $(FORMAT) -R .eeprom $< $@
+
+%.eep: %.elf
+	$(BIN) -j .eeprom --set-section-flags=.eeprom="alloc,load" --change-section-lma .eeprom=0 -O $(FORMAT) $< $@
+
+%.cof: %.elf
+	$(BIN) --debugging -O coff-ext-avr \
+		--change-section-address   .data-0x800000 \
+		--change-section-address    .bss-0x800000 \
+		--change-section-address .noinit-0x800000 \
+		--change-section-address .eeprom-0x810000 \
+		$< $@
+
+
+###### BLOCK 10) If all other steps compile ok then echo "Errors: none" ######
+
+%ok:
+	$(SIZE) $(TRG).elf
+	@echo "Errors: none" 
+
+
+###### BLOCK 11)  make instruction to delete created files ######
+
+clean:
+	$(RM) $(OBJ)
+	$(RM) $(SRC:.c=.s)
+	$(RM) $(SRC:.c=.lst)
+	$(RM) $(TRG).map
+	$(RM) $(TRG).elf
+	$(RM) $(TRG).cof
+	$(RM) $(TRG).obj
+	$(RM) $(TRG).a90
+	$(RM) $(TRG).hex
+	$(RM) $(TRG).sym
+	$(RM) $(TRG).eep
+	$(RM) $(TRG).hex
+	$(RM) *.bak
+	$(RM) *.log
+	@echo "Errors: none"
+	
+size:
+	$(SIZE) $(TRG).elf
+

@@ -1,0 +1,340 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Procyon AVRlib Release Notes</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body>
+<!--#config timefmt="%a %b %d, %Y" -->
+<h1 align="center">Procyon AVRlib Release Notes</h1>
+<center>Written by Pascal Stang | Updated: 
+  <!--#echo var="LAST_MODIFIED" -->
+</center>
+<hr>
+<p><strong>3/12/2005</strong> 
+<ul>
+  <li>Fixed AVRlib to comply to new WinAVR package (avr-libc has dropped several 
+    methods that were depricated causing the old AVRlib to fail to compile). Sorry 
+    about the delay. Please note that I've changed small parts of dozens of files. 
+    I may have introduced bugs that I haven't yet detected. Your feedback welcome.</li>
+</ul>
+<p><strong>1/30/2005</strong> 
+<ul>
+  <li>Added new <strong>lis3l02</strong> accelerometer library. This ST accelerometer 
+    incorporates a 3-axis sensor and A/D converter in one 28-pin SOIC package 
+    with I2C and SPI bus. Unfortunately, the production future of the digital 
+    version of this accelerometer is unknown.</li>
+  <li>Added new <strong>extint</strong> external interrupt library. The library 
+    is not complete, but does work nicely for some processors. It is primarily 
+    designed to do two things: 
+    <ul>
+      <li>abstract AVR external interrupts so that programs which use them can 
+        more easily cross-compile between different processors</li>
+      <li>allow novice (and even advanced) users to be able to use external interrupts 
+        without looking up a bunch of register and bit defines in the datasheets.</li>
+    </ul>
+  </li>
+  <li>Revised GPS library to standardize on units used for latitude/longitude 
+    angles</li>
+  <li>Improved NMEA library. Packet processing function now returns type of packet 
+    decoded. Packet parsers reject valid but empty packets.</li>
+  <li>MMC library has proper #defines to turn on/off debugging statements</li>
+  <li>uartsw and uartsw2 libraries now support optional inversion of serial signal 
+    via #define in conf file</li>
+</ul>
+<p><strong></strong><strong>10/15/2004</strong> 
+<ul>
+  <li>Added new spieeprom library. Not quite sure if it works properly.</li>
+</ul>
+<p><strong></strong><strong>9/25/2004</strong> 
+<ul>
+  <li>Added a simple MultiMedia Card / SecureDigital Card interface library. The 
+    library allows you to read and write sector-sized (512 byte) data chunks. 
+    Please see mmc.h for information about how to connect the card to the microcontroller.</li>
+  <li>Added uartGetByte() functions to uart.c and uart2.c. These functions emulate 
+    the typical getchar() function and return a received character if available, 
+    otherwise -1.</li>
+  <li>Fixed bug causing incorrect I2C bus speed.</li>
+</ul>
+<p><strong>6/25/2004</strong> 
+<ul>
+  <li>Changed encoder library to new read-in scheme which is more technically 
+    correct and resistant to error. New scheme counts both rising and falling 
+    edges of PHASEA, so be prepared for twice the precision (you'll get double 
+    the usual number of counts per revolution).</li>
+  <li>Added timer functions to exploit arbitrary frequency/precision PWM in new 
+    AVR processors</li>
+  <li>Fixed timerPause() precision management bug in Timer/Timer128 libraries.<br>
+    TimerPause function should now work correctly for longer delays</li>
+  <li>Added timerXGetPrescaler() functions to timer libraries to avoid code maintenance 
+    issues and to reduce overall code size</li>
+  <li>Fixed bug in Pulse library that cause wildly incorrect frequencies to be 
+    produced</li>
+</ul>
+<p><strong>5/04/2004</strong> 
+<ul>
+  <li>Added MegaIO directory with simple routines for accessing the MegaIO peripheral 
+    expander. MegaIO allows you to use a slave AVR processor as a peripheral expander 
+    and control it easily from a master AVR processor over the I2C bus. This gives 
+    your master processor easy access to: an extra buffered UART, extra PWM outputs, 
+    extra A/D inputs, extra I/O lines, extra RAM, and more.</li>
+</ul>
+<p><strong>2/27/2004</strong> 
+<ul>
+  <li>Improved original Software UART library (uartsw: uses Timer1 OC1A OC1B and 
+    IC1)</li>
+  <li>Added new Software UART library (uartsw2: uses Timer0 and Timer2 and INT2)</li>
+  <li>Fixed small but catastrophic bug in the Software Memory Bus (sramsw)</li>
+  <li>Fixed small but catastrophic bug in the Timer library when using Timer 0 
+    Output Compare</li>
+  <li>Fixed Timer128 library bug when using Timer 3 Output Compare B</li>
+  <li>Added support for ICR top-count PWM when supported by processor</li>
+  <li><strong>Thanks to all the users who have offered bugfixes and feedback!</strong></li>
+</ul>
+<p><strong>2/22/2004</strong>
+<ul>
+  <li>Added ADS7828 I2C A/D Converter Library + example code</li>
+  <li>Added DS1631 I2C Temperature Sensor Library + example code</li>
+  <li>Timer/Timer128 Library</li>
+	<ol>
+      <li>For processor that support it, timerPause() will sleep the processor during the delay time,
+	  thereby reducing power consumption.  All interrupts are still active so hopefully this shouldn't
+	  break anybody's code.</li>
+      <li>The timer library will now compile properly for the processors with only timers 0,1
+	   (by excluding timer2 functions automatically)</li>
+      <li>Bugfix on Timer3 initialization</li>
+	  <li>A big thanks to those that wrote in to report bugs or offer suggestions for improvement!</li>
+    </ol>
+  <li>Servo Library: optimized slightly</li>
+  <li>UART/UART2 Library: Improved compile compatibility across more AVR processors</li>
+</ul>
+<p><strong>9/15/2003</strong>
+<ul>
+  <li>I2C Library
+<ol>
+      <li>A few bugfixes here. i2cMasterSend and i2cMasterReceive finally return 
+        error values if the target device is not present. This is especially important 
+        in the case of receive because that would otherwise hang. Some debugging 
+        has been added to the I2C interrupt state machine. Debugging can be turned 
+        on via #define but needs to be customized based on the processor in use.</li>
+    </ol>
+</ul>
+<p><strong>7/23/2003</strong> 
+<ul>
+  <li>Cmdline Library (<strong>NEW</strong>) 
+    <ol>
+      <li>This library is a complete fairly-easy-to-use command line interface 
+        complete with advanced line editing and history buffer. You add the commands 
+        and the functions to run for those commands. The arguments passed to your 
+        commands are available as strings or interpreted as decimal or hex integers.</li>
+    </ol>
+  <li>Uart/Uart2 Library 
+    <ol>
+      <li>Added a new method uartAddToTxBuffer() which adds one character at a 
+        time to the uart transmit buffer. The function can be used the the same 
+        way as uartSendByte, but writes only to the buffer. This is helpful for 
+        printf-ing inside interrupts or time-critical sections.</li>
+    </ol>
+  <li>i2ceeprom function library 
+    <ol>
+      <li>Fixed a compile bug that escaped last time.</li>
+      <li>Bugfix: there was an endian-ness discrepancy between the read and write 
+        byte routines for the eeprom. Problem has been fixed thanks to feedback 
+        from users.</li>
+    </ol>
+</ul>
+<p><strong>7/12/2003</strong> 
+<ul>
+  <li>General Note 
+    <ol>
+      <li>CAUTION: The makefile and build process for AVRlib has changed to make 
+        installation and management simpler. You will need to define an AVRLIB 
+        environment variable to point to the location where you keep AVRlib. See 
+        the revised installation guide for more details.</li>
+      <li>I made a lot of small fixes to various libraries without properly recording 
+        the changes. Sorry.</li>
+    </ol>
+  <li>STX/ETX function library 
+    <ol>
+      <li>The receiving packet engine has been revised for the stx/etx protocol. 
+        It's somewhat less stupidly coded now and should perform better. Fixed 
+        a bug that made servicing an empty receive buffer excessively long.</li>
+    </ol>
+  <li>Timer/Timer128 function library 
+    <ol>
+      <li>Since the creation of the timer library, the timerPause function had 
+        a bug/deficiency which caused it to be either slightly or grossly off 
+        in timing depending on the delay requested and the current prescaler setting. 
+        This bug is now fixed at the expense of a little extra code and timing 
+        performance should be considerably more accurate.</li>
+    </ol>
+</ul>
+<p><strong>6/06/2003</strong> 
+<ul>
+  <li>General Note 
+    <ol>
+      <li>I've recently seen the need for more project-dependent configurable 
+        settings in the core AVRlib libraries (uart, timer, rprintf). Rather than 
+        creating a smorgasboard of new &quot;conf&quot; files to handle the settings, 
+        I've decided to handle most things via #ifdefs and user-optional #defines. 
+        My feeling is that for core libraries, it nice to not have to lug around 
+        &quot;conf&quot; files all the time. We'll see how it goes...</li>
+    </ol>
+  <li>UART and UART2 function libraries 
+    <ol>
+      <li>You can now override the default UART receive handling (placing of the 
+        data into the receive buffer), by using the uartSetRxHandler() function 
+        and providing your own function.</li>
+      <li>You can now adjust the default size of the UART Rx/Tx buffers by #defining 
+        the size before including uart.h. I recommend placing such #defines in 
+        your global.h.</li>
+    </ol>
+  <li>UARTSW function library 
+    <ol>
+      <li>Out of personal need, I have finally gotten the software-driven UART 
+        code working. Please consider this an alpha release. It works well, but 
+        the library is still in flux.</li>
+    </ol>
+  <li>A2D function library 
+    <ol>
+      <li>Efforts are being made to make the A2D functions compatible (compile 
+        transparently) over a greater range of AVR processors including the new 
+        Mega8,16,32,64. Please be patient if proper support for your processor 
+        is temporarily broken.</li>
+    </ol>
+  <li>Timer/Timer128 function library 
+    <ol>
+      <li>#defines have been added to specify the timer prescaler rates on RealTimeClock-equipped 
+        timer. You may have noticed that the RTC-equipped timer always has a different 
+        prescaler selection range than the other timers. You must use the new 
+        TIMERRTC_CLK_DIV defines instead of the TIMER_CLK_DIV defines on these 
+        timers, otherwise you will get wrong results. </li>
+      <li>You can now change the default interrupt handler type (INTERRUPT vs. 
+        SIGNAL) used for the timers by #defining it before including timer.h. 
+        I recommend placing such #defines in your global.h.</li>
+    </ol>
+</ul>
+<p><strong>5/29/2003</strong> 
+<ul>
+  <li>Pulse function library 
+    <ol>
+      <li>There are two new functions PulseT1AStop() and PulseT1BStop(), that 
+        allow the stopping of pulse output regardless of the previously programmed 
+        number of pulses to be output. The new stop commands are crucial when 
+        using the continuous pulse output mode.</li>
+    </ol>
+</ul>
+<p><strong>5/1/2003</strong>
+<ul>
+  <li>KS0108 Graphic LCD driver library
+    <ol>
+      <li>Made some improvements to the code structure and #define names, eliminates 
+        some unnecessary lines.</li>
+      <li>Implemented <font color="#FF0000">untested</font> support for up to 
+        4 controller chips (240x64 pixel display).</li>
+    </ol>
+  <li>rprintf library
+<ol>
+      <li>Thanks to some feedback, and some testing, I recently realized I had 
+        doubled the compiled size of the printf library when I added a floating-point 
+        print function a several months ago.</li>
+      <li>The floating-point print can now be enabled or disabled in the rprintfconf.h 
+        file. (it is disabled by default)</li>
+    </ol>
+  </li>
+</ul>
+<p><strong>4/30/2003</strong> 
+<ul>
+  <li>Uart function library
+  <ol>
+      <li>Like the timer library, you can now universally switch from SIGNAL-type 
+        interrupt handlers to INTERRUPT-type handlers by changing a #define in 
+        uart.h or uart2.h. Note, for the time being, I'm avoiding creating a &quot;conf&quot; 
+        file for the uart libraries because of their widespread use. Don't want 
+        to confuse users any mor than I have to.</li>
+  </ol>
+  <li>Pulse function library </li>
+  <ol>
+    <li>Fixed a major bug which caused some pulse output requests to idle until 
+      the timer overflowed</li>
+  </ol>
+  <li>ATA/IDE interface driver</li>
+    <ol>
+      <li>Brought this code out of basic disrepair and into service again - effort 
+        will continue as time permits</li>
+    </ol>
+  <li>FAT filesystem driver 
+    <ol>
+      <li>Brought this code out of basic disrepair and into service again - effort 
+        will continue as time permits</li>
+      <li>Will attempt to improve the overall interface for FAT as well as begin 
+        to support file writing</li>
+    </ol>
+  </li>
+</ul>
+<p><strong>3/13/2003</strong> 
+<ul>
+  <li>New &quot;debug&quot; function library 
+    <ol>
+      <li>Added a new library for general functions useful when debugging. Currently 
+        the only available function is for nicely formatted hex/ascii table dumps 
+        (useful when inspecting memory or buffers).</li>
+    </ol>
+  </li>
+</ul>
+<p><strong>3/2/2003</strong>
+<ul>
+	<li>I2C Library
+	<ol>
+      <li>Continued updating of I2C library - NOTE: some old functions have changed 
+        names slightly to clarify their purpose and relationship to new functions.</li>
+      <li>Added two function pointers designed to be set by the user to handle 
+        incoming Slave Receive and Slave Transmit operations.</li>
+      <li>Added i2cMasterTransfer function which does the common write-then-read 
+        operation with repeated start in between so control of the bus is not 
+        lost. This kind of access is common when accessing memories or register 
+        based devices where the address must be written before reading back a 
+        value. </li>
+      <li>NOTE: Structure of the library continues to change but has solidified 
+        substantially.</li>
+    </ol>
+	</li>
+</ul>
+</p>
+<p><strong>2/24/2003</strong>
+<ul>
+	<li>Encoder Library
+	<ol>
+		<li>Improved interrupt flexibility and processor compatibility for this library</li>
+		<li>Unfortunately, the complexity comes at the cost of a somewhat more complicated
+		encoderconf.h which the user must edit to suit their specific needs on a per-project basis.</li>
+	</ol>
+	</li>
+	<li>I2C Library
+	<ol>
+		<li>Second major revision of I2C library in an attempt to make it general enough to use for
+		any common I2C operations.</li>
+		<li>Changes include the "functionalizing" of basic low-level I2C operations
+		such as generate start,stop, and send address/data.</li>
+		<li>NOTE: Structure of the library has changed somewhat and will likely continue to be refined.</li>
+	</ol>
+	</li>
+	<li>Timer128 Library
+	<ol>
+		<li>Added missing PWM on and off functions in Timer128 library</li>
+	</ol>
+	</li>
+</ul>
+</p>
+<p><strong>2/24/2003</strong>
+<ul>
+	<li>Release Notes Started</li>
+</ul>
+</p>
+<hr>
+<center>Written by Pascal Stang | Updated: 
+  <!--#echo var="LAST_MODIFIED" -->
+</center>
+</body>
+</html>

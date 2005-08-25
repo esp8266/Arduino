@@ -1,0 +1,264 @@
+# !!!!!!!! UNLIKE PREVIOUS VERSIONS OF PROCESSING !!!!!!!!!!
+# DO NOT MODIFY THIS FILE, OR DELETE SETTINGS FROM THIS FILE
+
+# These are the default preferences. If you want to modify 
+# them directly, use the per-user local version of the file:
+
+# Documents and Settings -> Application Data -> 
+#    Processing -> preferences.txt (on windows)
+
+# ~/Library -> Processing -> preferences.txt (on macosx)
+
+# ~/.processing -> preferences.txt (on linux)
+
+# You'll have problems running Processing if you incorrectly 
+# modify lines in this file.
+
+
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+# DEFAULT PATHS FOR SKETCHBOOK AND SETTINGS
+
+# relative paths will be relative to processing.exe or procesing.app.
+# absolute paths may also be used.
+
+# note that this path should use forward slashes (like unix)
+# instead of \ on windows or : on macos or whatever else
+
+# the .fallback locations are used in case the default location 
+# cannot be written (and the line above it is not customized)
+
+# if you don't want users to have their sketchbook default to 
+# "my documents/processing" on windows and "documents/processing" on osx, 
+# set this to another path that will be used by default
+#sketchbook.path=sketchbook
+sketchbook.path.fallback=sketchbook
+
+# if you don't want settings to go into "application data" on windows
+# and "library" on macosx, set this to the alternate location.
+#settings.path=data
+settings.path.fallback=data
+
+# temporary build path, normally this goes into the default
+# "temp" folder for that platform (as defined by java)
+# but this can be used to set a specific file in case of problems
+#build.path=build
+
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+# by default, check the processing server for any updates
+# (please avoid disabling, this also helps us know basic numbers 
+# on how many people are using Processing)
+update.check = true
+
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+# default size for the main window
+default.window.width = 500
+default.window.height = 600
+
+# font size for editor
+editor.font=Monospaced,plain,12
+
+# monospaced on java 1.3 was monaco, but on 1.4 it has changed
+# to courier, which actually matches other platforms better.
+# (and removes the 12 point being too large issue)
+# monaco is nicer on macosx, so use that explicitly
+editor.font.macosx = Monaco,plain,10
+
+# anti-aliased text, turned off by default
+editor.antialias=false
+
+# foreground and background colors
+editor.fgcolor=#000000
+editor.bgcolor=#ffffff
+
+# color to be used for background when 'external editor' enabled
+editor.external=false
+editor.external.bgcolor=#ddddbb
+
+# styles for various types of text
+
+# comments
+editor.comment1.style=#777755,plain
+editor.comment2.style=#777755,plain
+
+# e.g abstract, final, private
+editor.keyword1.style=#cc6600,plain
+# e.g. beginShape, point, line
+editor.keyword2.style=#996600,plain
+# e.g. byte, char, short, color
+editor.keyword3.style=#993300,bold
+
+# constants: e.g. null, true, this, RGB, TWO_PI
+editor.literal1.style=#cc0000,plain
+# p5 built in variables: e.g. mouseX, width, pixels
+editor.literal2.style=#cc0000,plain
+
+# ?? maybe this is for words followed by a colon
+# like in case statements or goto
+editor.label.style=#7E7E00,bold
+
+# e.g. + - = /
+editor.operator.style=#000000,plain
+
+# caret blinking and caret color
+editor.caret.blink=true
+editor.caret.color=#333300
+
+# selection color
+editor.selection.color=#ffcc00
+
+# highlight for the current line
+editor.linehighlight=true
+editor.linehighlight.color=#ddddbb
+
+# bracket/brace highlighting
+editor.brackethighlight=true
+editor.brackethighlight.color=#000000
+
+# little pooties at the end of lines that show where they finish
+editor.eolmarkers=false
+editor.eolmarkers.color=#99991A
+
+# area that's not in use by the text (replaced with tildes)
+editor.invalid=false
+editor.invalid.style=#7E7E00,bold
+
+buttons.bgcolor      = #66665A
+buttons.status.font  = SansSerif,plain,12
+buttons.status.color = #FFFFFF
+
+# settings for the tabs at the top
+# actual tab images are stored in the lib/ folder
+header.bgcolor               = #999988
+header.text.selected.color   = #1A1A00
+header.text.unselected.color = #ffffff
+header.text.font             = SansSerif,plain,12
+
+console                  = true
+console.color            = #000000
+console.output.color     = #ccccbb
+console.output.file      = stdout.txt
+console.error.color      = #ff3000
+console.error.file       = stderr.txt
+console.font             = Monospaced,plain,11
+console.font.macosx      = Monaco,plain,10
+console.lines            = 4
+
+# set to false to disable automatically clearing the console
+# each time 'run' is hit
+console.auto_clear = true
+
+# set the maximum number of lines remembered by the console
+# the default is 500, lengthen at your own peril
+console.length = 500
+
+status.notice.fgcolor = #ffffff
+status.notice.bgcolor = #bbbbaa
+status.error.fgcolor  = #ffffff
+status.error.bgcolor  = #662000
+status.prompt.fgcolor = #000000
+status.prompt.bgcolor = #cc9900
+status.font           = SansSerif,plain,12
+
+# convert tabs to spaces? how many spaces?
+editor.tabs.expand = true
+editor.tabs.size   = 2
+
+# automatically indent each line
+editor.indent = true
+
+# size of divider between editing area and the console
+editor.divider.size = 0
+# the larger divider on windows is ugly with the little arrows
+# this makes it large enough to see (mouse changes) and use, 
+# but keeps it from being annoyingly obtrusive
+editor.divider.size.windows = 2
+
+# background color for full-screen presentation mode
+run.present.bgcolor = #666666
+
+# any additional java options when running externally
+# (for applets that are run external to the environment...
+# those with a code folder, or using any libraries)
+# if you hose this and can't run things, it's your own durn fault 
+run.options = 
+
+# example of increasing the memory size for applets run externally
+#run.options = -Xms128m -Xmx1024m
+
+# color of the stop button when running in present mode
+run.present.stop.color = #cccccc
+
+# index of the default display to use for present mode
+# (this setting not yet completely implemented)
+run.display = 1
+
+# set internally
+#run.window.bgcolor=
+
+# minimum size for the run window. windows can't go much smaller.
+# macosx can, though it's sorta nice to have the border.
+run.window.width.minimum = 120
+run.window.height.minimum = 120
+
+# prompt for sketch location when 'new' is hit
+sketchbook.prompt = false
+
+# true if empty sketches should be removed automatically
+sketchbook.auto_clean = true
+
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+history.recording = true
+
+# for advanced users, enable option to export a library
+export.library = false
+
+# may be useful when attempting to debug the preprocessor
+preproc.save_build_files=false
+
+# allows various preprocessor features to be toggled 
+# in case they are causing problems
+
+# preprocessor: pde.g
+preproc.color_datatype = true
+preproc.web_colors = true
+preproc.enhanced_casting = true
+
+# preprocessor: PdeEmitter.java
+preproc.substitute_floats = true
+#preproc.substitute_image = false
+#preproc.substitute_font = false
+
+# auto-convert non-ascii chars to unicode escape sequences
+preproc.substitute_unicode = true
+
+# PdePreproc.java
+# writes out the parse tree as parseTree.xml, which can be usefully
+# viewed in (at least) Mozilla or IE.  useful when debugging the preprocessor.
+preproc.output_parse_tree = false
+
+# jdk version to use.. 
+preproc.jdk_version = 1.1
+
+# base imports to include for java 1.1 (or higher)
+preproc.imports.jdk11 = java.applet,java.awt,java.awt.image,java.awt.event,java.io,java.net,java.text,java.util,java.util.zip
+
+# additional imports when exporting to java 1.3 or higher
+preproc.imports.jdk13 = javax.sound.midi,javax.sound.midi.spi,javax.sound.sampled,javax.sound.sampled.spi
+
+# additional imports when exporting to java 1.4 or higher
+preproc.imports.jdk14 = javax.xml.parsers,javax.xml.transform,javax.xml.transform.dom,javax.xml.transform.sax,javax.xml.transform.stream,org.xml.sax,org.xml.sax.ext,org.xml.sax.helpers
+
+# set the browser to be used on linux
+browser.linux = mozilla
+
+# coloring for the editor line number status bar at the bottom of the screen
+linestatus.bgcolor = #66665a
+linestatus.font	   = SansSerif,plain,10
+linestatus.color   = #ffffff
+linestatus.height  = 20

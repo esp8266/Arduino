@@ -1,0 +1,154 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>SCU Robotic Systems Laboratory - Installing Procyon AVRlib</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body>
+<!--#config timefmt="%a %b %d, %Y" -->
+<h1>Installing Procyon AVRlib</h1>
+<h2>Sections</h2>
+<ol>
+  <li><a href="#1">Overview</a></li>
+  <li><a href="#2">Downloading</a></li>
+  <li><a href="#3">Installing</a></li>
+  <li><a href="#4">Testing</a></li>
+</ol>
+<center>Written by Pascal Stang | Updated: 
+  <!--#echo var="LAST_MODIFIED" -->
+</center>
+<hr>
+<h3><a name="1"></a>1. Overview</h3>
+<blockquote> 
+  <p>Procyon AVRlib is an open-source collection of C-language function libraries 
+    for the Atmel AVR series processors. The goal of AVRlib is to provide the 
+    programmer with a code base which performs the most often needed tasks in 
+    embedded system programming. Hopefully, this will allow the programmer to 
+    focus on high-level operation of their code rather than get bogged down in 
+    the details of low-level code.</p>
+  <p>In short, AVRlib is a bunch of functions that do things commonly needed in 
+    embedded systems. Despite the learning curve of getting started, for most 
+    projects, using AVRlib will shorten the time spent programming and/or improve 
+    the quality or functionality of the final product.</p>
+  <p>AVRlib functions are available for a wide variety of tasks and purposes. 
+    In general, AVRlib tries to address the following kinds of needs:</p>
+<ul>
+  <li>Functions which control or interface to AVR processor hardware (like timers, 
+    uarts, the a2d converter, etc)</li>
+  <li>Functions which interface to or drive devices often used in embedded systems 
+    (like LCDs, hard disks, gps units, etc)</li>
+  <li>Functions which create higher-level functionality from processor resources 
+    (like pulse generation, software uarts, software i2c bus, etc)</li>
+</ul>
+  <p>For a partial list of currently available function libraries see the <a href="index.html">AVRlib 
+    Main Page</a>.</p>
+</blockquote>
+<h3><a name="2"></a>2. Downloading</h3>
+<blockquote> 
+  <p>AVRlib is currently available as individual files, or a complete zip file. 
+    Both are available from the <a href="index.html">AVRlib Main Page</a>.</p>
+  <p><strong><font color="#FF0000">Downloading the complete <a href="avrlib.zip">avrlib.zip</a> 
+    file is highly recommended as documentation and code examples are included 
+    in the zip.</font></strong></p>
+</blockquote>
+<h3><a name="3"></a>3. Installing</h3>
+<blockquote> 
+  <p><strong><font color="#FF0000">This installation for AVRlib assumes you have 
+    already installed the AVR-GCC or WinAVR compiler and successfully tested it.</font></strong></p>
+  <p>You can install AVRlib anywhere you like, however, it's suggested that you 
+    install it in a directory alongside your own AVR code projects. Create or 
+    choose a top-level directory to hold both AVRlib and the project folders which 
+    you will create to hold the code for each individual project you work on. 
+    The directory you choose should not contain spaces in its name or path. Some 
+    examples are: </p>
+<pre>
+c:\Code\AVR                          <font color="#009900">(GOOD)</font>
+c:\My Code                           <font color="#FF0000">(NOT RECOMMENDED - HAS SPACES IN PATH)</font>
+</pre>
+  <p>From the download step you should have an <strong>avrlib.zip</strong> file. 
+    Unzip this file into the code directory you chose above. Be sure to preserve 
+    the internal directory structure of the zip file when you unzip it. Afterward, 
+    you can delete avrlib.zip but you may want to keep it for later re-installs 
+    or as a backup.</p>
+  <p>You should now have an <strong>avrlib</strong> directory where you installed 
+    AVRlib. If you have some time, get familiar with what's inside some of the 
+    directories. Your directories should look something like this:</p>
+  <pre>
+c:\Code\AVR\avrlib                   <font color="#0000FF"><-- AVRlib header and code files</font>
+c:\Code\AVR\avrlib\conf              <font color="#0000FF"><-- AVRlib template configuration files</font>
+c:\Code\AVR\avrlib\docs              <font color="#0000FF"><-- AVRlib documentation</font>
+c:\Code\AVR\avrlib\examples          <font color="#0000FF"><-- AVRlib example applications</font>
+c:\Code\AVR\avrlib\make              <font color="#0000FF"><-- AVRlib makefile include (avrproj_make file in here)</font></pre>
+  <p>Finally, you need to create an environment variable <strong>AVRLIB</strong> 
+    which points to the directory where you &quot;installed&quot; or unzipped 
+    the AVRlib files so the compiler can find them. An example might be:</p>
+  <pre>AVRLIB = c:/code/avr/avrlib         <font color="#0000FF"><-- change to actual AVRlib install directory</font>
+</pre>
+  <p>If you are unsure how to set environment variables on your system, look at 
+    the WinAVR/AVR-GCC installation guide elsewhere on this site or consult the 
+    web.</p>
+  <p>AVRlib installation is complete!</p>
+  </blockquote>
+<h3><a name="4"></a>4. Testing</h3>
+<blockquote> 
+  <p>There are a few simple steps you can take to verify that AVRlib is properly 
+    installed:<br>
+    <font color="#FF0000"><strong>(This assumes you have previously installed 
+    and tested the AVR-GCC or WinAVR compiler)</strong></font></p>
+  <ul>
+    <li>Open a Command Prompt (find it in your <strong>Start Menu</strong> or 
+      select <strong>Run</strong>, and run <strong>cmd.exe</strong>) </li>
+    <li>Change directories to the location where you installed AVRlib. For example:<br>
+      <strong>cd c:\Code\AVR\AVRlib</strong></li>
+    <li>Go into the examples directory. <strong>cd examples</strong></li>
+    <li>Pick an example to try compiling such as rprintf and change to that directory. 
+      <strong>cd rprintf</strong></li>
+    <li>Type <strong>make clean</strong> at the prompt</li>
+    <li>Type <strong>make</strong></li>
+    <li>If your output looked like this then you just compiled your first AVRlib 
+      program: 
+      <pre>
+C:\Code\AVR\avrlib\examples\rprintf>make
+avr-gcc -c -g -Os -Wall -Wstrict-prototypes -Ic:/code/avr/avrlib -Wa,-ahlms=rpri
+ntftest.lst -mmcu=atmega323 -I. rprintftest.c -o rprintftest.o
+avr-gcc -c -g -Os -Wall -Wstrict-prototypes -Ic:/code/avr/avrlib -Wa,-ahlms=c:/c
+ode/avr/avrlib/buffer.lst -mmcu=atmega323 -I. c:/code/avr/avrlib/buffer.c -o c:/
+code/avr/avrlib/buffer.o
+avr-gcc -c -g -Os -Wall -Wstrict-prototypes -Ic:/code/avr/avrlib -Wa,-ahlms=c:/c
+ode/avr/avrlib/uart.lst -mmcu=atmega323 -I. c:/code/avr/avrlib/uart.c -o c:/code
+/avr/avrlib/uart.o
+avr-gcc -c -g -Os -Wall -Wstrict-prototypes -Ic:/code/avr/avrlib -Wa,-ahlms=c:/c
+ode/avr/avrlib/rprintf.lst -mmcu=atmega323 -I. c:/code/avr/avrlib/rprintf.c -o c
+:/code/avr/avrlib/rprintf.o
+avr-gcc -c -g -Os -Wall -Wstrict-prototypes -Ic:/code/avr/avrlib -Wa,-ahlms=c:/c
+ode/avr/avrlib/timer.lst -mmcu=atmega323 -I. c:/code/avr/avrlib/timer.c -o c:/co
+de/avr/avrlib/timer.o
+avr-gcc -c -g -Os -Wall -Wstrict-prototypes -Ic:/code/avr/avrlib -Wa,-ahlms=c:/c
+ode/avr/avrlib/vt100.lst -mmcu=atmega323 -I. c:/code/avr/avrlib/vt100.c -o c:/co
+de/avr/avrlib/vt100.o
+avr-gcc  c:/code/avr/avrlib/buffer.o c:/code/avr/avrlib/uart.o c:/code/avr/avrli
+b/rprintf.o c:/code/avr/avrlib/timer.o c:/code/avr/avrlib/vt100.o rprintftest.o
+  -Wl,-Map=rprintftest.map,--cref -mmcu=atmega323 -o rprintftest.elf
+avr-objcopy -O ihex      -R .eeprom rprintftest.elf rprintftest.hex
+avr-objcopy -j .eeprom --set-section-flags=.eeprom="alloc,load" --change-section
+-lma .eeprom=0 -O ihex   rprintftest.elf rprintftest.eep
+avr-size rprintftest.elf
+   text    data     bss     dec     hex filename
+   9596       0     192    9788    263c rprintftest.elf
+Errors: none
+rm c:/code/avr/avrlib/vt100.o c:/code/avr/avrlib/rprintf.o c:/code/avr/avrlib/ua
+rt.o c:/code/avr/avrlib/timer.o c:/code/avr/avrlib/buffer.o
+
+C:\Code\AVR\avrlib\examples\rprintf>
+</pre>
+    </li>
+    <strong>AVRlib is ready to use!</strong> 
+  </ul>
+</blockquote>
+<hr>
+<center>Written by Pascal Stang | Updated: 
+  <!--#echo var="LAST_MODIFIED" -->
+</center>
+</body>
+</html>

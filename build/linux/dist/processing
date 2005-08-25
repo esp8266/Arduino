@@ -1,0 +1,47 @@
+#!/bin/sh
+
+CLASSPATH=java/lib/rt.jar:lib:lib/build:lib/pde.jar:lib/core.jar:lib/antlr.jar:lib/oro.jar:lib/registry.jar:lib/mrj.jar
+export CLASSPATH
+
+# put the directory where this file lives in the front of the path, because
+# that directory also contains jikes, which we will need at runtime.
+#
+PATH=`pwd`/`dirname $0`:`pwd`/java/bin:${PATH}
+export PATH
+
+# test to see if jikes is operable. i'm a crappy bash scripter
+# so if someone knows a more elegant way to do this, let me know.
+#
+jikes -version 1> /dev/null 2> /dev/null
+if [ $? == 0 ]
+then 
+  java processing.app.Base
+else 
+  echo
+  echo It appears that the version of Jikes distributed with Processing
+  echo cannot properly run on this system.
+  echo 
+  echo Possible solutions:
+  echo
+  echo + If you already have Jikes installed on your system, you may
+  echo   just need to remove the version that is included with Processing.
+  echo
+  echo + You probably just need to track down a version of Jikes that will 
+  echo   work with your distribution.
+  echo 
+  echo + You may need to install the rpm/package for compat-libstdc++
+  echo   This is what it takes to get things running on most versions
+  echo   of RedHat Linux or Fedora Core.
+  echo 
+  echo + If all else fails, or if you just like building stuff yourself,
+  echo   you can download the source for Jikes from SourceForge:
+  echo   http://sourceforge.net/project/showfiles.php?group_id=128803
+  echo   And it just takes a simple ./configure and make, followed by
+  echo   copying src/jikes to the processing-XXXX folder and you should 
+  echo   be all set. 
+  echo
+  echo If you get stuck, ask questions online from the helpful folks via 
+  echo the Processing discussion board: http://processing.org/discourse/
+  echo
+  echo Good luck!
+fi
