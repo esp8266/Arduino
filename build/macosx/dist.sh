@@ -7,32 +7,21 @@
 # the power of open source
 
 
-# prefers that fink is intalled, but not required
-if test -f /sw/bin/head
+REVISION=`head -1 ../../todo.txt | cut -c 1-4`
+SHORT_REVISION=`head -1 ../../todo.txt | cut -c 3-4`
+
+VERSIONED=`cat ../../app/Base.java | grep $REVISION`
+if [ -z "$VERSIONED" ]
 then
-  # old 4 char version.. osx only uses the two chars
-  #REVISION=`head -c 4 ../../todo.txt`
-  # a more useful version of head than what's included with osx
-  SHORT_REVISION=`/sw/bin/head -c 4 ../../todo.txt | tail -c 2`
-  REVISION=`/sw/bin/head -c 4 ../../todo.txt`
-
-  VERSIONED=`cat ../../app/Base.java | grep $REVISION`
-  if [ -z "$VERSIONED" ]
-  then
-    echo Fix the revision number in Base.java
-    exit
-  fi
-
-else
-  # can't get four bytes of head (osx doesn't support -c)
-  SHORT_REVISION=00
-  REVISION=0000
+  echo Fix the revision number in Base.java
+  exit
 fi
 
-
+echo REBUILDING ARDUINO
+rm -rf work
 ./make.sh
 
-echo Creating Arduino distribution for revision $REVISION...
+echo CREATING ARDUINO $REVISION DISTRIBUTION
 
 # remove any old boogers
 rm -rf arduino 
@@ -41,62 +30,10 @@ rm -rf arduino-*
 
 mkdir arduino
 
+# use 'work' files as starting point
+cp -r work/* arduino
 
-# use 'shared' files as starting point
-cp -r ../shared arduino
-
-# add the libraries folder with source
-#cp -r ../../lib arduino/libraries
-
-
-# new style examples thing ala reas
-# not there yet in arduino
-# cd arduino
-# unzip -q examples.zip
-# rm examples.zip
-# cd ..
-
-# new style reference
-# not there yet in arduino
-# cd arduino
-# unzip -q reference.zip
-# rm reference.zip
-# cd ..
-
-# get ds_store file (!)
-cp dist/DS_Store arduino/.DS_Store
-
-# get package from the dist dir
-cp -R dist/Arduino.app arduino/
-chmod +x arduino/Arduino.app/Contents/MacOS/JavaApplicationStub
-
-# put jar files into the resource dir, leave the rest in lib
-RES=arduino/Arduino.app/Contents/Resources/Java
-mkdir -p $RES
-mv work/lib/*.jar $RES/
-
-# directories used by the app
-#mkdir arduino/lib/build
-
-# grab pde.jar and export from the working dir
-cp work/Arduino.app/Contents/Resources/Java/pde.jar $RES/
-
-# removed dependecies from the processing core
-#cp work/lib/core.jar arduino/lib/
-
-# get platform-specific goodies from the dist dir
-#cp `which jikes` arduino
-#gunzip < dist/jikes.gz > arduino/jikes
-
-# not needed in arduino
-# cp dist/jikes arduino/
-# chmod a+x arduino /jikes
-
-chmod a+x arduino/Arduino.app/Contents/MacOS/JavaApplicationStub
-
-#cd ../..
-#javadoc -public -d doc app/*.java app/preproc/*.java app/syntax/*.java core/*.java opengl/*.java net/*.java video/*.java serial/*.java
-#cd build/macosx
+rm -rf arduino/classes
 
 # remove boogers
 find arduino -name "*~" -exec rm -f {} ';'
@@ -109,10 +46,14 @@ find arduino -name "Thumbs.db" -exec rm -f {} ';'
 find arduino -name "CVS" -exec rm -rf {} ';' 2> /dev/null
 find arduino -name ".cvsignore" -exec rm -rf {} ';'
 
+# clean out the svn entries
+find arduino -name ".svn" -exec rm -rf {} ';' 2> /dev/null
+
 mv arduino/Arduino.app "arduino/Arduino $SHORT_REVISION.app"
 mv arduino arduino-$REVISION
+zip -r arduino-$REVISION.zip arduino-$REVISION
 
-# don't have deluxe on my laptop right now
+#` don't have deluxe on my laptop right now
 #stuff -f sitx arduino-$REVISION
 
 # zip it all up for release
