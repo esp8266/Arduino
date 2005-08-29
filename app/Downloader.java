@@ -60,32 +60,30 @@ public class Downloader implements MessageConsumer {
   private int serial_databits = 8;
   private float serial_stopbits = 1;
 
-  public void serialPreferences() {
-    // System.out.println("setting serial properties");
-    serial_port = Preferences.get("serial.port");
-    //serial_rate = 9600; //Preferences.getInteger("serial.download_rate");
-    //serial_parity = Preferences.get("serial.parity").charAt(0);
-    //serial_databits = Preferences.getInteger("serial.databits");
-    //serial_stopbits = new Float(Preferences.get("serial.stopbits")).floatValue();
-  }
+
 
 
 
   public Downloader() {
+  	serial_port = Preferences.get("serial.port");
+  	
   }
 
-
+  // Calls the makefile with the "program" option
+  // TODO Windows paths!
   private boolean downloadMake(String userdir) {
     System.out.println("Downloading - makefile");
     Process process;
     int result = 0;
     try {
-      serialPreferences();
-      String command = userdir + "tools/gnumake SERIAL=" + serial_port + "  -C " + userdir + "lib program";
+      serial_port = Preferences.get("serial.port");
+      String command = userdir + "lib/wiringlite/bin/gnumake SERIAL=" + serial_port + "  -C " + userdir + "lib/wiringlite program";
       System.out.println(command);
       process = Runtime.getRuntime().exec(command);
       new MessageSiphon(process.getInputStream(), this);
       new MessageSiphon(process.getErrorStream(), this);
+      
+      
       boolean compiling = true;
       while (compiling) {
         try {
@@ -110,19 +108,22 @@ public class Downloader implements MessageConsumer {
       String userdir = System.getProperty("user.dir") + File.separator;
     
 	
-      return downloadMake(userdir);
+      return downloadNative(userdir);
     
   }
   
   
-  
+  // Calls UISP directly, skipping the makefile
+  //
+  // TODO Windows paths!!
   public boolean downloadNative(String userdir) {
-	System.out.println("Downloading - native");
+	System.out.println("Downloading code");
     
+    
+    buildPath = userdir + "lib/tmp";
     
     String commandDownloader[] = new String[] {
-    (( Base.isMacOS()) ?  "tools/avr/bin/uisp" :
-      userdir + "tools/avr/bin/uisp"),
+     userdir + "tools/avr/bin/uisp",
     //[2] Serial port
     //[6] hex class file
      "-dprog=stk500",
@@ -139,16 +140,19 @@ public class Downloader implements MessageConsumer {
     int result=0; // pre-initialized to quiet a bogus warning from gcc
     try {
 
-      serialPreferences();
-      commandDownloader[2] = ((Base.isMacOS()) ? "-dserial=" + serial_port.toLowerCase() : "-dserial=" + serial_port );
-      commandDownloader[6] = "if=" + buildPath + File.separator + className + ".hex";
-      // for(int i = 0; i < commandDownloader.length; i++) {
-	  // System.out.println(commandDownloader[i]);
-      // }
-      Process process = Runtime.getRuntime().exec(commandDownloader);
-      new MessageSiphon(process.getInputStream(), this);
-      new MessageSiphon(process.getErrorStream(), this);
+      serial_port = Preferences.get("serial.port");
+      commandDownloader[2] = "-dserial=" + serial_port;
+      commandDownloader[6] = "if=" + buildPath + File.separator + "prog.hex";
 
+      // for(int i = 0; i < commandDownloader.length; i++) {
+	  // System.out.print(commandDownloader[i] + " "); 
+      //}
+      
+      Process process = Runtime.getRuntime().exec(commandDownloader);
+      new processing.app.MessageSiphon(process.getInputStream(), this);
+      new processing.app.MessageSiphon(process.getErrorStream(), this);
+
+	  
       // wait for the process to finish.  if interrupted
       // before waitFor returns, continue waiting
       //
@@ -192,76 +196,112 @@ public class Downloader implements MessageConsumer {
   boolean firstErrorFound;
   boolean secondErrorFound;
 
-  // part of the PdeMessageConsumer interface
+  // part of the MessageConsumer interface
   //
+  // at the moment we are pretty happy just to see the error messages coming back
   public void message(String s) {
     //System.err.println("MSG: " + s);
-    //System.err.print(s);
+    System.err.print(s);
 
-    // ignore cautions
-    if (s.indexOf("Caution") != -1) return;
-
-    // gcc always uses a forward slash character as its separator, so
-    // we need to replace any platform-specific separator characters before
-    // attemping to compare
-    //
-    String partialTempPath = buildPath.replace(File.separatorChar, '/')
-      + "/" + className + ".c";
-
-    // if the partial temp path appears in the error message...
-    //
-    int partialStartIndex = s.indexOf(partialTempPath);
-    //System.out.println(partialStartIndex);
-    if (partialStartIndex != -1) {
-
-      // skip past the path and parse the int after the first colon
-      //
-      String s1 = s.substring(partialStartIndex + partialTempPath.length()
-                              + 1);
-      int colon = s1.indexOf(':');
-      int lineNumber = Integer.parseInt(s1.substring(0, colon));
-      //System.out.println("pde / line number: " + lineNumber);
-
-      //String s2 = s1.substring(colon + 2);
-      int err = s1.indexOf("Error:");
-      if (err != -1) {
-
-        // if the first error has already been found, then this must be
-        // (at least) the second error found
-        if (firstErrorFound) {
-          secondErrorFound = true;
-          return;
-        }
-
-        // if we're here at all, this is at least the first error
-        firstErrorFound = true;
-
-        //err += "error:".length();
-        String description = s1.substring(err + "Error:".length());
-        description = description.trim();
-        //System.out.println("description = " + description);
-        exception = new RunnerException(description, lineNumber-1);
-        //editor.error(exception);
-
-      } else {
-        System.err.println("i suck: " + s);
-      }
-
-    } else {
-
-      // this isn't the start of an error line, so don't attempt to parse
-      // a line number out of it.
-
-      // if we're not yet at the second error, these lines are probably
-      // associated with the first error message, which is already in the
-      // status bar, and are likely to be of interest to the user, so
-      // spit them to the console.
-      //
-      if (!secondErrorFound) {
-        System.err.println(s);
-      }
-    }
+ 
   }
+  
+  
+   public boolean downloadNew(String userdir) {
+	
+	serial_port = Preferences.get("serial.port");
+	
+	// TODO must manage this flag from the editor
+	boolean alreadyCompiled = true;
+	
+	// TODO must manage this flag from global prefs
+	boolean debug = true;
+	
+	String verbose = " ";
+	
+  	if (alreadyCompiled) {
+		if (serial_port == "") {
+			System.out.println("The serial port is not set!");
+			System.out.println("Use the Options -> Serial menu to select");
+			System.out.println("where you have connected your arduino board");
+			return false;
+		};
+		
+		String commandLine = "";
+	    
+
+		if (debug) System.out.println("userdir is "+userdir);
+	
+		int result = -1;
+		String ext = "";
+		
+		
+		// TODO make this code more portable using File.separator
+	    if (Base.isMacOS()) {          
+		   ext = "";      
+		   commandLine = userdir + "tools/avr/bin/uisp ";
+		   commandLine += " -dprog=stk500 -dspeed=9600 ";
+		   commandLine += " -dserial=" + serial_port; 
+		   commandLine += " -dpart=ATmega8";
+		   commandLine += " if=" +userdir + "lib/wiringlite/tmp/prog.hex --upload";
+	    } else {          
+			ext = ".exe";      
+			commandLine = userdir + "lib\\wiringlite\\bin\\gnumake" + ext + " SERIAL=" + serial_port + verbose + " -C " + userdir + "lib\\wiringlite program";
+		}
+	    if (debug) System.out.println(commandLine);
+	    
+		// Launch the command as a thread (this way we can kill it
+		// in the case it times out)
+		Command command = new Command(commandLine, true);
+		command.setName("theDownloader");
+		command.start();
+		
+		// TODO move this to Preferences
+		// Default timeout when calling a command (in seconds)
+    	final int maxTimeOut = 30;  // 10 secs
+		
+		
+	    // Start timer to monitor buffer timeout ==> deadlock in process
+	int timeCount = 0;
+	
+	while ((timeCount <= maxTimeOut) && (result == -1) && command.isAlive()) {
+		try {
+			result = command.waitResult;
+			Thread.currentThread().sleep(1000);
+		} catch (InterruptedException ie) {
+		}
+		timeCount++;
+	}
+	result = command.waitResult;
+	
+		if ((result != 0) && (command.errorResult == -1)) {
+//			result = 94;
+			System.out.println("Time out error when trying to upload the program");
+			System.out.println("Board not present, bootloader not installed or processor's failure");
+			System.out.println("Arduino download unsuccessful (error: " + result + ")");
+		} else if (result == 0) {
+			System.out.println(command.errorMsg);
+			System.out.println("OK - Arduino download successful");
+		} else if ((result != 0) && (49 == command.errorResult)) {
+			System.out.println(command.errorMsg);
+			System.out.println("Bootloader not responding");
+			System.out.println("Arduino download unsuccessful (error: " + result + ")");
+	    } else {
+			System.out.println(command.errorMsg);
+			System.out.println("Arduino download unsuccessful (error: " + result + ")");
+	    }
+		if (command.isAlive()) command.process.destroy();
+  	} else {
+		System.out.println("You have to compile the code first");
+		System.out.println("Arduino download unsuccessful");
+  	}
+		
+	return true;
+  }  
+  
+  
+  
+  
 
 
 }

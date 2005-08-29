@@ -1,9 +1,9 @@
-/* -*- mode: jde; c-basic-offset: 2; indent-tabs-mode: nil -*- */
-
 /*
-  Compiler - default compiler class that connects to jikes
-  Part of the Processing project - http://processing.org
+  Compiler - default compiler class that connects to the external compiler
 
+  Part of the Arduino project - http://arduino.berlios.de
+
+  Derived from the Processing project - http://processing.org
 
   Copyleft  2005 Massimo Banzi (arduino modifications)
   Copyright (c) 2004-05 Ben Fry and Casey Reas
@@ -25,8 +25,6 @@
 */
 
 package processing.app;
-
-//import processing.core.*;
 
 import java.io.*;
 import java.util.*;
@@ -74,11 +72,14 @@ public class Compiler implements MessageConsumer {
     
     System.out.println("Compiling Arduino program");
     Process process;
+    String commandLine = userdir + "tools/gnumake  -C " + userdir + "lib compile";
+    //TODO test this in windows 
+    if (Base.isWindows())  commandLine.replace('/','\\');
     int result = 0;
     try {
-      process = Runtime.getRuntime().exec(userdir + "tools/gnumake -s -C " + userdir + "lib compile");
+     // System.out.println(commandLine);
+     process = Runtime.getRuntime().exec(commandLine);
       
-      // System.err.println(userdir + "lib/wiringlite/bin/gnumake -s -C " + userdir + "lib compile");
       
       new MessageSiphon(process.getInputStream(), this);
       new MessageSiphon(process.getErrorStream(), this);
@@ -112,11 +113,40 @@ public class Compiler implements MessageConsumer {
    * whenever a piece (usually a line) of error message is spewed
    * out from the compiler. The errors are parsed for their contents
    * and line number, which is then reported back to Editor.
+   * In Arduino v1 this is very very crude
    */
   public void message(String s) {
     // This receives messages as full lines, so a newline needs
     // to be added as they're printed to the console.
-    System.err.println(s);
+    //System.out.print(s);
+    
+    
+	//if ((s.indexOf("warning:") != -1) && (s.indexOf("prog.c:") != -1) ) {
+	//	 String[] result = s.split(":");
+    // 	 for (int x=0; x<result.length; x++)
+    //     System.out.println(x + " " +result[x]);
+	//	//System.out.print(s);
+	//	//totalErrors++;
+	//}
+	if (((s.indexOf("error:") != -1) || (s.indexOf("warning:") != -1)) && (s.indexOf("prog.c:") != -1) ) {
+		 String[] result = s.split(":");
+         // 0 = prog.c
+         // 1 = line number
+         // 2 = error or warning
+         // 3 = message
+         // TODO put the length of the header file into a Preference!!!
+         //if ((s.indexOf("(Each undeclared") == 0) && (s.indexOf("for each function it appears in") == 0)) {
+		 	int lineNum = Integer.parseInt(result[1]) - 15;
+		 	System.out.print( result[2] + " at line " + lineNum + " " + result[3]);
+		 //}
+		
+	}
+
+    
+
+  }
+
+  public void processing_message(String s) {
 
     // ignore cautions
     if (s.indexOf("Caution") != -1) return;
@@ -255,7 +285,7 @@ public class Compiler implements MessageConsumer {
     }
   }
 
-
+/*
   static String bootClassPath;
 
   static public String calcBootClassPath() {
@@ -270,7 +300,7 @@ public class Compiler implements MessageConsumer {
     return bootClassPath;
   }
 
-
+*/
   ///
 
 

@@ -51,7 +51,13 @@ find arduino -name ".svn" -exec rm -rf {} ';' 2> /dev/null
 
 mv arduino/Arduino.app "arduino/Arduino $SHORT_REVISION.app"
 mv arduino arduino-$REVISION
-zip -r arduino-$REVISION.zip arduino-$REVISION
+#zip -r arduino-$REVISION.zip arduino-$REVISION
+
+rm -Rf tmp
+
+mkdir tmp
+mv arduino-$REVISION/ tmp/
+hdiutil create -fs HFS+ -srcfolder "./tmp/" -volname "arduino-$REVISION" "arduino-$REVISION.dmg"
 
 #` don't have deluxe on my laptop right now
 #stuff -f sitx arduino-$REVISION

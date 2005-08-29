@@ -632,7 +632,7 @@ public class Editor extends JFrame
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           new AutoFormat(Editor.this).show();
-          //handleBeautify();
+          
         }
       });
     menu.add(item);
@@ -1140,17 +1140,16 @@ public class Editor extends JFrame
     for (int i = 0; i < 10; i++) System.out.println();
 
     // clear the console on each run, unless the user doesn't want to
-    //if (Base.getBoolean("console.auto_clear", true)) {
     //if (Preferences.getBoolean("console.auto_clear", true)) {
     if (Preferences.getBoolean("console.auto_clear")) {
-      console.clear();
+    console.clear();
     }
 
     presenting = present;
-      console.message("Arduino compiling\n", false,true);
+      // console.message("Arduino compiling\n", false,true);
       
       String cfilename = System.getProperty("user.dir") + File.separator + "lib/build/arduino.c";
-      // console.message(" file = " + cfilename, false,true);
+      //console.message(" file = " + cfilename, false,true);
       try {
             Writer out = new FileWriter(cfilename);
             out.write(textarea.getText());
@@ -1164,12 +1163,12 @@ public class Editor extends JFrame
 
        Compiler compiler = new Compiler();
        String buildPath = Preferences.get("build.path");
-		// console.message(" buildpath = " + buildPath, false,true);
+		//console.message(" buildpath = " + buildPath, false,true);
        try {
-       boolean success = compiler.compile(sketch, buildPath); 
+       		boolean success = compiler.compile(sketch, buildPath); 
        } catch (RunnerException e) {
 		error(e);
-	}
+	   }
 	buttons.clear();
 
 
@@ -1287,6 +1286,7 @@ public class Editor extends JFrame
    * mode, this will always be called instead of doStop().
    */
   public void doClose() {
+  /*
     //if (presenting) {
     //presentationWindow.hide();
     //} else {
@@ -1295,7 +1295,7 @@ public class Editor extends JFrame
       // externally. so don't even try setting if window is null
       // since Runner will set the appletLocation when an
       // external process is in use.
-      if (runtime.window != null) {
+      //if (runtime.window != null) {
         appletLocation = runtime.window.getLocation();
       }
     } catch (NullPointerException e) { }
@@ -1311,7 +1311,7 @@ public class Editor extends JFrame
       }
     } catch (Exception e) { }
     //buttons.clear();  // done by doStop
-
+    */
     sketch.cleanup();
 
     // [toxi 030903]
