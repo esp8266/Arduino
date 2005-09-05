@@ -72,9 +72,16 @@ public class Compiler implements MessageConsumer {
     
     System.out.println("Compiling Arduino program");
     Process process;
-    String commandLine = userdir + "tools/gnumake  -C " + userdir + "lib compile";
-    //TODO test this in windows 
-    if (Base.isWindows())  commandLine.replace('/','\\');
+    String commandLine = "";
+    //TODO test this in windows
+    // FIXME: this is really nasty, it seems that MACOS is making the
+    //        compilation inside the lib folder, while windows is doing it
+    //        inside the work folder ... why why why  --DojoDave 
+    if (Base.isWindows()) {
+	    commandLine = userdir + "tools\\gnumake.exe  -C " + userdir + ". compile";
+    } else if (Base.isMacOS()) {
+	    commandLine = userdir + "tools/gnumake  -C " + userdir + "lib compile";
+    }
     int result = 0;
     try {
      // System.out.println(commandLine);

@@ -1169,7 +1169,9 @@ public class Editor extends JFrame
        } catch (RunnerException e) {
 		error(e);
 	   }
-	buttons.clear();
+	    // FIXED: 20050902 - DojoDave
+		// the clear button requires a the clearRun method instead of only clear!!
+		buttons.clearRun();
 
 
       //- if (!sketch.handleRun()) return;

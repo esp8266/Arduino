@@ -75,9 +75,19 @@ public class Downloader implements MessageConsumer {
     System.out.println("Downloading - makefile");
     Process process;
     int result = 0;
+    String command = "";
     try {
       serial_port = Preferences.get("serial.port");
-      String command = userdir + "lib/wiringlite/bin/gnumake SERIAL=" + serial_port + "  -C " + userdir + "lib/wiringlite program";
+    //TODO test this in windows
+    // FIXME: this is really nasty, it seems that MACOS is making the
+    //        compilation inside the lib folder, while windows is doing it
+    //        inside the work folder ... why why why  --DojoDave 
+    if (Base.isWindows()) {
+	    command = userdir + "tools\\gnumake.exe  SERIAL=" + serial_port + " -C " + userdir + ". program";
+    } else if (Base.isMacOS()) {
+	    command = userdir + "tools/gnumake SERIAL=" + serial_port + "  -C " + "lib program";
+    }
+//      String command = userdir + "lib/wiringlite/bin/gnumake SERIAL=" + serial_port + "  -C " + userdir + "lib/wiringlite program";
       System.out.println(command);
       process = Runtime.getRuntime().exec(command);
       new MessageSiphon(process.getInputStream(), this);
@@ -108,7 +118,8 @@ public class Downloader implements MessageConsumer {
       String userdir = System.getProperty("user.dir") + File.separator;
     
 	
-      return downloadNative(userdir);
+      //return downloadNative(userdir);
+      return downloadNew(userdir);
     
   }
   
@@ -120,8 +131,15 @@ public class Downloader implements MessageConsumer {
 	System.out.println("Downloading code");
     
     
-    buildPath = userdir + "lib/tmp";
-    
+    // FIXME: this is really nasty, it seems that MACOS is making the
+    //        compilation inside the lib folder, while windows is doing it
+    //        inside the work folder ... why why why  --DojoDave 
+    if (Base.isWindows()) {
+		buildPath = userdir + "tmp";
+    } else if (Base.isMacOS()) {
+		buildPath = userdir + "lib/tmp";
+    }
+     
     String commandDownloader[] = new String[] {
      userdir + "tools/avr/bin/uisp",
     //[2] Serial port
@@ -215,9 +233,9 @@ public class Downloader implements MessageConsumer {
 	boolean alreadyCompiled = true;
 	
 	// TODO must manage this flag from global prefs
-	boolean debug = true;
+	boolean debug = false;
 	
-	String verbose = " ";
+	String verbose = " -s ";
 	
   	if (alreadyCompiled) {
 		if (serial_port == "") {
@@ -233,20 +251,17 @@ public class Downloader implements MessageConsumer {
 		if (debug) System.out.println("userdir is "+userdir);
 	
 		int result = -1;
-		String ext = "";
 		
 		
 		// TODO make this code more portable using File.separator
 	    if (Base.isMacOS()) {          
-		   ext = "";      
 		   commandLine = userdir + "tools/avr/bin/uisp ";
 		   commandLine += " -dprog=stk500 -dspeed=9600 ";
 		   commandLine += " -dserial=" + serial_port; 
 		   commandLine += " -dpart=ATmega8";
 		   commandLine += " if=" +userdir + "lib/wiringlite/tmp/prog.hex --upload";
 	    } else {          
-			ext = ".exe";      
-			commandLine = userdir + "lib\\wiringlite\\bin\\gnumake" + ext + " SERIAL=" + serial_port + verbose + " -C " + userdir + "lib\\wiringlite program";
+			commandLine = userdir + "tools\\gnumake.exe" + " SERIAL=" + serial_port + verbose + " -C " + userdir + ". program";
 		}
 	    if (debug) System.out.println(commandLine);
 	    
