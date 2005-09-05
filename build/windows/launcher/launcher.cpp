@@ -96,7 +96,7 @@ WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmd, int nShow)
     env_classpath[0] = 0;
   }
   */
-
+/* WE DUNNO NEED QUICKTIME JAVA FOR ARDUINO
   char *qtjava_path = (char *)malloc(16384 * sizeof(char));
   qtjava_path[0] = 0;
 
@@ -129,7 +129,7 @@ WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmd, int nShow)
       }
     }
   }
-  
+END WE DUNNO NEED QUICKTIME JAVA FOR ARDUINO*/  
   // NO! put quotes around contents of cp, because %s might have spaces in it.
   // don't put quotes in it, because it's setting the environment variable
   // for CLASSPATH, not being included on the command line. so setting the
@@ -140,13 +140,15 @@ WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmd, int nShow)
           //"'"
 
           "%s"  // local jre or blank
-          "%s"  // qtjava path
+          //"%s"  // qtjava path
+          ""
 
           "%s\\lib;"
           "%s\\lib\\build;"
           "%s\\lib\\pde.jar;"
-          "%s\\lib\\core.jar;"
+          //"%s\\lib\\core.jar;"
           "%s\\lib\\mrj.jar;"
+          "%s\\lib\\RXTXcomm.jar;"
           "%s\\lib\\oro.jar;"
           "%s\\lib\\registry.jar;"
           "%s\\lib\\antlr.jar;"
@@ -164,7 +166,7 @@ WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmd, int nShow)
           // the first three %s args
           //local_jre_installed ? "java\\lib\\rt.jar;java\\lib\\jaws.jar;" : "", 
           local_jre_installed ? "java\\lib\\rt.jar;" : "", 
-          qtjava_path,
+          //qtjava_path,
           loaddir, loaddir, loaddir, loaddir, 
           loaddir, loaddir, loaddir, loaddir, 
           env_classpath);
@@ -173,7 +175,7 @@ WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmd, int nShow)
 
   if (!SetEnvironmentVariable("CLASSPATH", cp)) {
     MessageBox(NULL, "Could not set CLASSPATH environment variable",
-               "Processing Error", MB_OK);
+               "Arduino Error", MB_OK);
     return 0;
   }
   
@@ -185,11 +187,11 @@ WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmd, int nShow)
     char *env_path = (char *)malloc(strlen(getenv("PATH")) * sizeof(char));
     strcpy(env_path, getenv("PATH"));
     char *paf = (char *)malloc((strlen(env_path) + strlen(loaddir) + 32) * sizeof(char));
-    sprintf(paf, "%s\\java\\bin;%s", loaddir, env_path);
+    sprintf(paf, "%s\\java\\bin;lib;%s", loaddir, env_path);
 
     if (!SetEnvironmentVariable("PATH", paf)) {
       MessageBox(NULL, "Could not set PATH environment variable",
-                 "Processing Error", MB_OK);
+                 "Arduino Error", MB_OK);
       return 0;
     }
     
@@ -231,7 +233,7 @@ WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmd, int nShow)
 
   if (!ShellExecuteEx(&ShExecInfo)) {
     MessageBox(NULL, "Error calling ShellExecuteEx()", 
-               "Processing Error", MB_OK);
+               "Arduino Error", MB_OK);
     return 0;
   }
 
@@ -243,19 +245,19 @@ WinMain (HINSTANCE hInst, HINSTANCE hPrev, LPSTR lpCmd, int nShow)
     case ERROR_PATH_NOT_FOUND:
 	    MessageBox(NULL, "A required file could not be found. \n"
                  "You may need to install a Java runtime\n"
-                 "or re-install Processing.",
-                 "Processing Error", MB_OK);
+                 "or re-install Arduino.",
+                 "Arduino Error", MB_OK);
 	    break;
     case 0:
     case SE_ERR_OOM:
 	    MessageBox(NULL, "Not enough memory or resources to run at"
-                 " this time.", "Processing Error", MB_OK);
+                 " this time.", "Arduino Error", MB_OK);
 	    
 	    break;
     default:
 	    MessageBox(NULL, "There is a problem with your installation.\n"
                  "If the problem persists, re-install the program.", 
-                 "Processing Error", MB_OK);
+                 "Arduino Error", MB_OK);
 	    break;
     }
   }
