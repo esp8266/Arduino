@@ -39,7 +39,7 @@ else
  # cd ..
 
   echo Extracting enormous JRE...
-  unzip -q -d work jre.zip
+  unzip -q  -d work jre.zip
   # cygwin requires this because of unknown weirdness
   # it was not formerly this anal retentive
   cd work/java/bin/
@@ -60,6 +60,17 @@ else
   #chmod +x work/jikes.exe
 
   cp dist/ICE_JNIRegistry.dll work/
+  cp dist/serial/*.* work/lib/
+  mkdir work/tools
+  cp dist/avr_tools.zip .
+  echo Extracting avr tools ...
+  unzip -q  -d work avr.zip
+  rm -f avr_tools.zip
+  cp dist/tools/*.* work/tools
+  cp dist/lib/makefile.win work/Makefile
+  mkdir work/core
+  cp ../../../core/*.* work/core
+  cp dist/core/makefile.win work/core/Makefile
 
   # chmod +x the crew
   find work -name "*.dll" -exec chmod +x {} ';'
@@ -104,13 +115,13 @@ fi
 
 cd app
 
-CLASSPATH="..\\build\\windows\\work\\lib\\core.jar;..\\build\\windows\\work\\lib\\mrj.jar;..\\build\\windows\\work\\lib\antlr.jar;..\\build\\windows\\work\\lib\\oro.jar;..\\build\\windows\\work\\lib\\registry.jar;..\\build\\windows\\work\\java\\lib\\rt.jar"
+CLASSPATH="..\\build\\windows\\work\\lib\\RXTXcomm.jar;..\\build\\windows\\work\\lib\\core.jar;..\\build\\windows\\work\\lib\\mrj.jar;..\\build\\windows\\work\\lib\antlr.jar;..\\build\\windows\\work\\lib\\oro.jar;..\\build\\windows\\work\\lib\\registry.jar;..\\build\\windows\\work\\java\\lib\\rt.jar"
 
 # compile the code as java 1.3, so that the application will run and
 # show the user an error, rather than crapping out with some strange
 # "class not found" crap
-../build/windows/work/jikes -target 1.3 +D -classpath "$CLASSPATH;..\\build\\windows\\work/classes" -d ..\\build\\windows\\work/classes *.java preproc/*.java syntax/*.java tools/*.java
-#/cygdrive/c/jdk-1.4.2_05/bin/javac.exe -classpath $CLASSPATH -d ..\\build\\windows\\work/classes *.java jeditsyntax/*.java preprocessor/*.java
+../build/windows/work/jikes -target 1.3 +D -classpath "$CLASSPATH;..\\build\\windows\\work\\classes" -d ..\\build\\windows\\work\\classes *.java preproc/*.java syntax/*.java tools/*.java
+#/cygdrive/c/jdk-1.4.2_05/bin/javac.exe -classpath $CLASSPATH -d ..\\build\\windows\\work\\classes *.java jeditsyntax/*.java preprocessor/*.java
 
 cd ../build/windows/work/classes
 rm -f ../lib/pde.jar
