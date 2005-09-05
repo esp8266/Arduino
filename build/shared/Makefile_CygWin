@@ -1,0 +1,54 @@
+# Arduino Makefile (for Windows XP)
+# Nick Zambetti, David A. Mellis, and D. Cuartielles
+# $Id: makefile.win,v 1.10 2005/08/31 02:47:04 cuartielles Exp $
+
+# By default, this makefile uses the serial device specified by
+# Wiring (either in the Tools | Serial Port menu or the Wiring
+# preferences file in the sketchbook directory) and passed as
+# an argument to make.  To override this value, uncomment the
+# following line and change the value to the desired device.
+# SERIAL=com1
+
+# The Wiring Lite IDE runs the "compile" rule when you click the play button.
+compile:
+	-tools/rm tmp/*
+	tools/cat core/wiringlite.inc > tmp/prog.c
+	tools/cat lib/build/*.c >> tmp/prog.c
+	tools/cp core/* tmp
+	tools/cp lib/cyg*.dll tmp
+	tools/gnumake -s -C tmp
+
+# The IDE runs the "program" rule when you hit the export button.
+# The string after the colon determines the method used to 
+# program the microcontroller: program-using-bootloader,
+# program-with-isp, or program-over-parallel-port.
+program: program-using-bootloader-avrdude
+
+# This rule is for uploading code using a bootloader already on
+# the microcontroller.  It should run at the baud rate specified
+# in the bootloader's code, current 9600 baud.
+program-using-bootloader-avrdude:
+	tools/avrdude -p atmega8 -P ${SERIAL} -c stk500@9600 -V -q -U flash:w:tmp/prog.hex
+
+# This rule is for uploading code using a bootloader already on
+# the microcontroller.  It should run at the baud rate specified
+# in the bootloader's code, current 9600 baud.  On Windows, use
+# program-using-bootloader-avrdude instead, as uisp seems to have
+# problems talking to the bootloader over the serial port (though
+# it appears to work fine with a Keyspan USB-to-serial adapter).
+program-using-bootloader:
+	# cp lib/cyg*.dll .
+	tools/uisp -dprog=stk500 -dspeed=9600 -dserial=${SERIAL} -dpart=ATmega8 if=tmp/prog.hex --upload
+
+# This rule is for uploading code using an in-system programmer,
+# e.g. the one sold by Atmel.  In this case, you want to erase the
+# microcontroller, upload the code, and then verify it.
+# Atmel's isp follows the stk500 protocol and works at 115200 baud.
+program-with-isp:
+	# cp lib/cyg*.dll .
+	tools/uisp -dprog=stk500 -dspeed=115200 -dserial=${SERIAL} -dpart=ATmega8 if=tmp/prog.hex --erase --upload --verify
+
+# This rule is for uploading code using a parallel port programmer.
+program-over-parallel-port:
+	# cp lib/cyg*.dll .
+	tools/uisp -dprog=dapa -dpart=ATmega8 if=tmp/prog.hex -dlpt=0x378 --erase --upload
