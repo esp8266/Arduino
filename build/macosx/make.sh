@@ -24,9 +24,10 @@ else
   mkdir -p work/classes/processing/app/tools
   mkdir -p work/lib/build
 
+  cp ../../lib/librxtxSerial.jnilib work/
+
   # to have a copy of this guy around for messing with
   echo Copying Arduino.app...
-
   cp -pR dist/Arduino.app work/
   # cvs doesn't seem to want to honor the +x bit 
   chmod +x work/Arduino.app/Contents/MacOS/JavaApplicationStub

@@ -9,6 +9,8 @@
 
 #define __MCU_CLOCK_FREQUENCY__ _16.0000_MHz
 
+#include <avr/io.h>
+
 #include "wiring.h"
 
 #include <avr/interrupt.h>

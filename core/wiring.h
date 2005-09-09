@@ -67,6 +67,8 @@ void setup(void);
 void loop(void);
 void beginSerial(int);
 void serialWrite(unsigned char);
+void print(const char *, ...);
+void printMode(int);
 
 typedef struct {
 	int port;

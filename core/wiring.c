@@ -46,7 +46,6 @@
 // it so our delay can be in milliseconds.
 #undef delay
 
-#include "BConstants.h"
 #include "wiring.h"
 
 // Get the hardware port of the given virtual pin number.  This comes from

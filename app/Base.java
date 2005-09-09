@@ -51,7 +51,7 @@ import com.ice.jni.registry.*;
  */
 public class Base {
   static final int VERSION = 1;
-  static final String VERSION_NAME = "0001 pre-alpha";
+  static final String VERSION_NAME = "0002";
   
   static public int platform;
   

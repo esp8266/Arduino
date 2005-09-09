@@ -23,7 +23,6 @@
 */
 
 #include <avr/io.h>
-#include "BConstants.h"
 #include "wiring.h"
 
 // We map the pin numbers passed to digitalRead() or
