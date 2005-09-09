@@ -25,7 +25,6 @@
 #ifndef Wiring_h
 #define Wiring_h
 
-
 #define HIGH 0x1
 #define LOW  0x0
 
@@ -35,9 +34,26 @@
 #define true 0x1
 #define false 0x0
 
+#define PI 3.14159265
+#define HALF_PI 1.57079
+#define TWO_PI 6.283185
+
+#define SERIAL  0x0
+#define DISPLAY 0x1
 
 #define NOT_A_PIN 0
 #define NOT_A_PORT -1
+
+#define min(a,b) ((a<b)?(a):(b))
+#define max(a,b) ((a>b)?(a):(b))
+#define abs(x) ((x>0)?(x):(-x))
+#define constrain(amt,low,high) ((amt<low)?(low):((amt>high)?(high):(amt)))
+#define radians(deg) ((deg)*DEG_TO_RAD)
+#define degrees(rad) ((rad)*RAD_TO_DEG)
+#define sq(x) ((x)*(x))
+
+typedef uint8_t boolean;
+typedef uint8_t byte;
 
 void delay(unsigned long);
 void delay_ms(unsigned short ms);
