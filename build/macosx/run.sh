@@ -1,6 +1,6 @@
 #!/bin/sh
 
-CLASSPATH=:lib:lib/build:lib/pde.jar:lib/antlr.jar:lib/oro.jar:lib/registry.jar
+CLASSPATH=:lib:lib/build:lib/pde.jar:lib/antlr.jar:lib/oro.jar:lib/registry.jar:lib/RXTXcomm.jar
 
 export CLASSPATH
 
