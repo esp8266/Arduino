@@ -259,7 +259,7 @@ public class Downloader implements MessageConsumer {
 		   commandLine += " -dprog=stk500 -dspeed=9600 ";
 		   commandLine += " -dserial=" + serial_port; 
 		   commandLine += " -dpart=ATmega8";
-		   commandLine += " if=" +userdir + "lib/wiringlite/tmp/prog.hex --upload";
+		   commandLine += " if=" +userdir + "lib/tmp/prog.hex --upload";
 	    } else {          
 			commandLine = userdir + "tools\\gnumake.exe" + " SERIAL=" + serial_port + verbose + " -C " + userdir + ". program";
 		}
