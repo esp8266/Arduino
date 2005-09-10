@@ -64,13 +64,22 @@ else
   mkdir work/tools
   cp dist/avr_tools.zip .
   echo Extracting avr tools ...
-  unzip -q  -d work avr.zip
+  unzip -q  -d work avr_tools.zip
   rm -f avr_tools.zip
   cp dist/tools/*.* work/tools
   cp dist/lib/makefile.win work/Makefile
   mkdir work/core
   cp ../../../core/*.* work/core
   cp dist/core/makefile.win work/core/Makefile
+
+  # take care of the examples
+  mkdir work/examples
+  cd work/examples
+  cp ../shared/dist/examples.zip .
+  echo Extracting examples ...
+  unzip -q  -d . examples.zip
+  rm -f examples.zip
+  cd ../..
 
   # chmod +x the crew
   find work -name "*.dll" -exec chmod +x {} ';'
