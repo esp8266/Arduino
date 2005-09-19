@@ -220,6 +220,16 @@ void serialWrite(unsigned char c)
 	uartSendByte(c);
 }
 
+int serialAvailable()
+{
+    return uartGetRxBuffer()->datalength;
+}
+
+int serialRead()
+{
+    return uartGetByte();
+}
+
 void printMode(int mode)
 {
 	// do nothing, we only support serial printing, not lcd.

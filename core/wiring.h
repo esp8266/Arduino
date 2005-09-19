@@ -67,6 +67,8 @@ void setup(void);
 void loop(void);
 void beginSerial(int);
 void serialWrite(unsigned char);
+int serialAvailable();
+int serialRead();
 void print(const char *, ...);
 void printMode(int);
 
