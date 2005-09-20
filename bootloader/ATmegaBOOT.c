@@ -3,19 +3,10 @@
 /*                                                        */
 /* ATmegaBOOT.c                                           */
 /*                                                        */
-/* build: 050123                                          */
+/* Copyright (c) 2003, Jason P. Kyle                      */
+/* All rights reserved.                                   */
 /*                                                        */
 /* Hacked by DojoCorp - ZGZ - MMX - IVR                   */
-/*                                                        */
-/* For the latest version see:                            */
-/* http://www.0j0.org and                                 */
-/* http://www.potemkin.org								  */
-/*                                                        */
-/* ------------------------------------------------------ */
-/*                                                        */
-/* Copyleft (c) 2005, DojoDave                            */
-/* Creative Commons   .                                   */
-/* see avr1.org for original file and information         */
 /*                                                        */
 /* This program is free software; you can redistribute it */
 /* and/or modify it under the terms of the GNU General    */
@@ -123,8 +114,6 @@ char getch(void);
 void getNch(uint8_t);
 void byte_response(uint8_t);
 void nothing_response(void);
-char gethex(void);
-void puthex(char);
 
 union address_union {
   uint16_t word;
@@ -182,7 +171,10 @@ int main(void)
   //UCSRC = 0x86;
   //UCSRB = _BV(TXEN)|_BV(RXEN);
 
-  putch('\0');
+
+  /* this was giving uisp problems, so I removed it; without it, the boot
+     works on with uisp and avrdude on the mac (at least). */
+  //putch('\0');
 
   uint32_t l;
   uint32_t time_count;
@@ -198,7 +190,9 @@ int main(void)
     for(l=0; l<40000000; ++l);
     cbi(LED_PORT,LED);
   }
- putch('\0'); // this line is needed for the synchronization of the programmer
+
+ /* see comment at previous call to putch() */
+ //putch('\0'); // this line is needed for the synchronization of the programmer
 
   /* forever */
   for (;;) {
@@ -466,44 +460,6 @@ int main(void)
  }
   /* end of forever loop */
 
-}
-
-
-char gethex(void) {
-  char ah,al;
-
-  ah = getch(); putch(ah);
-  al = getch(); putch(al);
-  if(ah >= 'a') {
-    ah = ah - 'a' + 0x0a;
-  } else if(ah >= '0') {
-    ah -= '0';
-  }
-  if(al >= 'a') {
-    al = al - 'a' + 0x0a;
-  } else if(al >= '0') {
-    al -= '0';
-  }
-  return (ah << 4) + al;
-}
-
-void puthex(char ch) {
-  char ah,al;
-
-  ah = (ch & 0xf0) >> 4;
-  if(ah >= 0x0a) {
-    ah = ah - 0x0a + 'a';
-  } else {
-    ah += '0';
-  }
-  al = (ch & 0x0f);
-  if(al >= 0x0a) {
-    al = al - 0x0a + 'a';
-  } else {
-    al += '0';
-  }
-  putch(ah);
-  putch(al);
 }
 
 void putch(char ch)
