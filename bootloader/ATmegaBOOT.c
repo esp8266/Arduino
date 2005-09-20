@@ -47,7 +47,7 @@
 /* We, Malmoitians, like slow interaction
  * therefore the slow baud rate ;-)
  */
-#define BAUD_RATE		19200
+#define BAUD_RATE		9600
 
 /* 6.000.000 is more or less 8 seconds at the
  * speed configured here

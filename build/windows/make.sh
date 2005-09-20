@@ -60,6 +60,8 @@ else
   #chmod +x work/jikes.exe
 
   cp dist/ICE_JNIRegistry.dll work/
+  mkdir work/bootloader
+  cp dist/bootloader/*.* work/bootloader
   cp dist/serial/*.* work/lib/
   mkdir work/tools
   cp dist/avr_tools.zip .
@@ -119,6 +121,13 @@ cd ../..
 
 fi
 
+### -- BUILD BOOTLOADER -----------------------------------------
+
+cd bootloader
+export AVRDIR=../build/windows/work/tools/avr
+make
+cp ATmegaBOOT.hex ../build/windows/work/bootloader
+cd ..
 
 ### -- BUILD PDE ------------------------------------------------
 
@@ -161,16 +170,6 @@ JIKES=../../build/$PLATFORM/work/jikes
 CORE=..\\..\\build\\$PLATFORM\\work\\lib\\core.jar
 LIBRARIES=..\\..\\build\\$PLATFORM\\work\\libraries
 
-
-# PARTICLES LIBRARY
-#echo Build particles library...
-#cd ../lib/particles
-#$JIKES -target 1.1 +D -d . *.java 
-#rm -f library/particles.jar
-#zip -r0q library/particles.jar simong
-#rm -rf simong
-#mkdir -p $LIBRARIES/particles/library/
-#cp library/particles.jar $LIBRARIES/particles/library/
 
 echo
 echo Done.

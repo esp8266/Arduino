@@ -17,7 +17,7 @@ ISPPARAMS  = -dprog=stk500 -dserial=/dev/com1 -dspeed=115200
 # You should not have to change anything below here.
 ############################################################
 
-DIRAVR = /usr/local/avr
+#DIRAVR = /usr/local/avr
 DIRAVRBIN = $(DIRAVR)/bin
 DIRAVRUTILS = $(DIRAVR)/utils/bin
 DIRINC = .

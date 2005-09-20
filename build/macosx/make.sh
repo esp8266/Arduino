@@ -53,6 +53,7 @@ cp -r ../../core work
 echo Copying dist files...
 cp -r dist/lib work/
 cp -r dist/core work/
+cp -r dist/bootloader work/
 
 ### -- START BUILDING -------------------------------------------
 
@@ -62,6 +63,13 @@ cd ../..
 
 ### -- BUILD GCC ------------------------------------------------
 # in the future we will build avr-gcc and tools (if they don't exist)
+
+### -- BUILD BOOTLOADER  ----------------------------------------
+cd bootloader
+export DIRAVR=../build/macosx/work/tools/avr
+make
+cp ATmegaBOOT.hex ../build/macosx/work/bootloader
+cd ..
 
 ### -- BUILD JAVA -----------------------------------------------
 
