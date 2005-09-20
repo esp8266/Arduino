@@ -23,6 +23,7 @@ else
   mkdir -p work/classes/processing/app/syntax
   mkdir -p work/classes/processing/app/tools
   mkdir -p work/lib/build
+  mkdir -p work/examples
 
   cp ../../lib/librxtxSerial.jnilib work/
 
@@ -49,6 +50,9 @@ fi
 echo Copying shared and core files...
 cp -r ../shared/* work
 cp -r ../../core work
+
+echo Extracting examples...
+unzip -d work/examples ../shared/dist/examples.zip
 
 echo Copying dist files...
 cp -r dist/lib work/
