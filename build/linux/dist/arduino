@@ -1,6 +1,6 @@
 #!/bin/sh
 
-CLASSPATH=java/lib/rt.jar:lib:lib/build:lib/pde.jar:lib/core.jar:lib/antlr.jar:lib/oro.jar:lib/registry.jar:lib/mrj.jar
+CLASSPATH=java/lib/rt.jar:lib:lib/build:lib/pde.jar:lib/core.jar:lib/antlr.jar:lib/oro.jar:lib/registry.jar:lib/mrj.jar:lib/RXTXcomm.jar
 export CLASSPATH
 
 # put the directory where this file lives in the front of the path, because
@@ -8,6 +8,10 @@ export CLASSPATH
 #
 PATH=`pwd`/`dirname $0`:`pwd`/java/bin:${PATH}
 export PATH
+
+# put the directory with the native RXTX libs in the library path
+LD_LIBRARY_PATH=`pwd`/lib:${LD_LIBRARY_PATH}
+export LD_LIBRARY_PATH
 
 # test to see if jikes is operable. i'm a crappy bash scripter
 # so if someone knows a more elegant way to do this, let me know.

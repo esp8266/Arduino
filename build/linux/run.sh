@@ -1,3 +1,3 @@
 #!/bin/sh
 
-cd work && ./processing && cd ..
+cd work && ./arduino && cd ..
