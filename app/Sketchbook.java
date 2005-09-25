@@ -565,8 +565,8 @@ public class Sketchbook {
         librariesClassPath +=
           File.pathSeparatorChar + libraryClassPath;
         // need to associate each import with a library folder
-        String packages[] =
-          Compiler.packageListFromClassPath(libraryClassPath);
+        String packages[] = new String[0];
+          //Compiler.packageListFromClassPath(libraryClassPath);
         for (int k = 0; k < packages.length; k++) {
           importToLibraryTable.put(packages[k], exported);
         }

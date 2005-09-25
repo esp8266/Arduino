@@ -32,6 +32,9 @@ else
   cp -pR dist/Arduino.app work/
   # cvs doesn't seem to want to honor the +x bit 
   chmod +x work/Arduino.app/Contents/MacOS/JavaApplicationStub
+
+  echo Extracting examples...
+  unzip -d work/examples ../shared/dist/examples.zip
   
   # copy the avr-gcc distribution
   echo Copying tools \(this may take a minute\)...
@@ -47,16 +50,15 @@ else
   chmod +x work/jikes
 fi
 
-echo Copying shared and core files...
+echo Copying shared files...
 cp -r ../shared/* work
-cp -r ../../core work
 
-echo Extracting examples...
-unzip -d work/examples ../shared/dist/examples.zip
+echo Copying targets...
+# make sure there's no cruft in the targets folder
+rm -rf work/lib/targets
+cp -r ../../targets work/lib/
 
 echo Copying dist files...
-cp -r dist/lib work/
-cp -r dist/core work/
 cp -r dist/bootloader work/
 
 ### -- START BUILDING -------------------------------------------
@@ -85,17 +87,19 @@ cd app
 
 ### -- BUILD PARSER ---------------------------------------------
 
-#BUILD_PREPROC=true
-
-if $BUILD_PREPROC
+if test -f preproc/expandedpde.g
 then
+  echo
+else
   cd preproc
   # build classes/grammar for preprocessor
   echo Building antlr grammar code...
   # first build the default java goop
-  java -cp ../../build/macosx/work/lib/antlr.jar antlr.Tool java.g
+  java -cp ../../build/macosx/work/lib/antlr.jar antlr.Tool StdCParser.g
   # now build the pde stuff that extends the java classes
-  java -cp ../../build/macosx/work/lib/antlr.jar antlr.Tool -glib java.g pde.g
+  java -cp ../../build/macosx/work/lib/antlr.jar antlr.Tool -glib StdCParser.g WParser.g
+  java -cp ../../build/macosx/work/lib/antlr.jar antlr.Tool WTreeParser.g
+  java -cp ../../build/macosx/work/lib/antlr.jar antlr.Tool -glib WTreeParser.g WEmitter.g
   cd ..
 fi
 

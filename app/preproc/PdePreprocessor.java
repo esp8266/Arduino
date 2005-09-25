@@ -2,9 +2,11 @@
 
 /*
   PdePreprocessor - wrapper for default ANTLR-generated parser
-  Part of the Processing project - http://processing.org
+  Part of the Wiring project - http://wiring.org.co
 
-  Copyright (c) 2004-05 Ben Fry and Casey Reas
+  Copyright (c) 2004-05 Hernando Barragan
+
+  Processing version Copyright (c) 2004-05 Ben Fry and Casey Reas
   Copyright (c) 2001-04 Massachusetts Institute of Technology
 
   ANTLR-generated parser and several supporting classes written
@@ -68,26 +70,28 @@ public class PdePreprocessor {
 
   // used for calling the ASTFactory to get the root node
   private static final int ROOT_ID = 0;
-
+  
+  // stores number of built user-defined function prototypes
+  public int prototypeCount = 0;
 
   /**
    * These may change in-between (if the prefs panel adds this option)
    * so grab them here on construction.
    */
   public PdePreprocessor() {
-    defaultImports[JDK11] =
+/*    defaultImports[JDK11] =
       Base.split(Preferences.get("preproc.imports.jdk11"), ',');
     defaultImports[JDK13] =
       Base.split(Preferences.get("preproc.imports.jdk13"), ',');
     defaultImports[JDK14] =
       Base.split(Preferences.get("preproc.imports.jdk14"), ',');
-  }
+*/  }
 
 
   /**
    * Used by PdeEmitter.dumpHiddenTokens()
    */
-  public static TokenStreamCopyingHiddenTokenFilter filter;
+  //public static TokenStreamCopyingHiddenTokenFilter filter;
 
 
   /**
@@ -159,6 +163,7 @@ public class PdePreprocessor {
       return null;
     }
 
+    /*
     do {
       PatternMatcherInput input = new PatternMatcherInput(program);
       if (!matcher.contains(input, pattern)) break;
@@ -179,6 +184,7 @@ public class PdePreprocessor {
       //System.out.println("removing " + piece);
 
     } while (true);
+    */
 
     extraImports = new String[imports.size()];
     imports.copyInto(extraImports);
@@ -215,43 +221,85 @@ public class PdePreprocessor {
     // do this after the program gets re-combobulated
     this.programReader = new StringReader(program);
     this.buildPath = buildPath;
+    
+    // create function prototypes
+    mess = "^(\\w+)\\s+(\\w+)\\s*\\(([^)]*)\\)\\s*{";
+    pattern = null;
+    try {
+      pattern = compiler.compile(mess);
+    } catch (MalformedPatternException e) {
+      e.printStackTrace();
+      return null;
+    }
+    PatternMatcherInput input = new PatternMatcherInput(program);
+    MatchResult result;
+    String returntype, functioname, parameterlist, prototype;
+    java.util.LinkedList prototypes = new java.util.LinkedList();
+    //System.out.println("prototypes:");
+    if (Preferences.get("build.extension").equals("cpp")) {
+      while(matcher.contains(input, pattern)){
+        result = matcher.getMatch();
+        //System.out.println(result);
+        returntype = result.group(1).toString();
+        functioname = result.group(2).toString();
+        parameterlist = result.group(3).toString().replace('\n', ' ');
+        prototype = returntype + " " + functioname + "(" + parameterlist + ");";
+        if(0 == functioname.compareTo("setup")){
+          continue;
+        }
+        if(0 == functioname.compareTo("loop")){
+          continue;
+        }
+        prototypes.add(prototype);
+        //System.out.println(prototype);
+      }
+    }
+    // store # of prototypes so that line number reporting can be adjusted
+    prototypeCount = prototypes.size();
+  
 
     // create a lexer with the stream reader, and tell it to handle
     // hidden tokens (eg whitespace, comments) since we want to pass these
     // through so that the line numbers when the compiler reports errors
     // match those that will be highlighted in the PDE IDE
     //
-    PdeLexer lexer  = new PdeLexer(programReader);
-    lexer.setTokenObjectClass("antlr.CommonHiddenStreamToken");
+    WLexer lexer  = new WLexer(programReader);
+    //lexer.setTokenObjectClass("antlr.CommonHiddenStreamToken");
+    lexer.setTokenObjectClass("processing.app.preproc.CToken");
+    lexer.initialize();
 
     // create the filter for hidden tokens and specify which tokens to
     // hide and which to copy to the hidden text
     //
-    filter = new TokenStreamCopyingHiddenTokenFilter(lexer);
-    filter.hide(PdeRecognizer.SL_COMMENT);
-    filter.hide(PdeRecognizer.ML_COMMENT);
-    filter.hide(PdeRecognizer.WS);
-    filter.copy(PdeRecognizer.SEMI);
-    filter.copy(PdeRecognizer.LPAREN);
-    filter.copy(PdeRecognizer.RPAREN);
-    filter.copy(PdeRecognizer.LCURLY);
-    filter.copy(PdeRecognizer.RCURLY);
-    filter.copy(PdeRecognizer.COMMA);
-    filter.copy(PdeRecognizer.RBRACK);
-    filter.copy(PdeRecognizer.LBRACK);
-    filter.copy(PdeRecognizer.COLON);
-
+    /*filter = new TokenStreamCopyingHiddenTokenFilter(lexer);
+    filter.hide(WParser.CPPComment);
+    filter.hide(WParser.Comment);
+    filter.hide(WParser.Whitespace);
+    filter.copy(WParser.SEMI);
+    filter.copy(WParser.LPAREN);
+    filter.copy(WParser.RPAREN);
+    filter.copy(WParser.LCURLY);
+    filter.copy(WParser.RCURLY);
+    filter.copy(WParser.COMMA);
+    filter.copy(WParser.RBRACK);
+    filter.copy(WParser.LBRACK);
+    filter.copy(WParser.COLON);
+    */
     // create a parser and set what sort of AST should be generated
     //
-    PdeRecognizer parser = new PdeRecognizer(filter);
+    //PdeRecognizer parser = new PdeRecognizer(filter);
+    WParser parser = new WParser(lexer);
 
     // use our extended AST class
     //
-    parser.setASTNodeClass("antlr.ExtendedCommonASTWithHiddenTokens");
+    //parser.setASTNodeClass("antlr.ExtendedCommonASTWithHiddenTokens");
+    parser.setASTNodeType(TNode.class.getName());
+    TNode.setTokenVocabulary("processing.app.preproc.WTokenTypes");
 
     // start parsing at the compilationUnit non-terminal
     //
-    parser.pdeProgram();
+    //parser.pdeProgram();
+    parser.translationUnit();
 
     // set up the AST for traversal by PdeEmitter
     //
@@ -280,15 +328,17 @@ public class PdePreprocessor {
 
     // output the code
     //
-    PdeEmitter emitter = new PdeEmitter();
-    File streamFile = new File(buildPath, name + ".java");
+    WEmitter emitter = new WEmitter(lexer.getPreprocessorInfoChannel());
+    File streamFile = new File(buildPath, name + "." + Preferences.get("build.extension"));
     PrintStream stream = new PrintStream(new FileOutputStream(streamFile));
 
     //writeHeader(stream, extraImports, name);
-    writeHeader(stream, name);
-
+    writeHeader(stream, name, prototypes);
+    emitter.setASTNodeType(TNode.class.getName());
     emitter.setOut(stream);
-    emitter.print(rootNode);
+    emitter.printDeclarations(rootNode);
+    //emitter.print(rootNode);
+    emitter.translationUnit(parser.getAST());
 
     writeFooter(stream);
     stream.close();
@@ -313,7 +363,6 @@ public class PdePreprocessor {
     return name;
   }
 
-
   /**
    * Write any required header material (eg imports, class decl stuff)
    *
@@ -321,15 +370,18 @@ public class PdePreprocessor {
    * @param exporting           Is this being exported from PDE?
    * @param name                Name of the class being created.
    */
-  void writeHeader(PrintStream out, String className) {
+  void writeHeader(PrintStream out, String className, java.util.LinkedList prototypes) {
+    out.print("#include \"WProgram.h\"\n");
 
-    // must include processing.core
-    out.print("import processing.core.*; ");
+    // print user defined prototypes
+    while(0 < prototypes.size()){
+      out.print(prototypes.removeFirst() + "\n");
+    }
 
     // emit emports that are needed for classes from the code folder
     if (extraImports != null) {
       for (int i = 0; i < extraImports.length; i++) {
-        out.print("import " + extraImports[i] + "; ");
+        out.print("#include \"" + extraImports[i] + "\"\n");
       }
     }
 
@@ -341,7 +393,7 @@ public class PdePreprocessor {
 
     // emit standard imports (read from pde.properties)
     // for each language level that's being used.
-    String jdkVersionStr = Preferences.get("preproc.jdk_version");
+/*    String jdkVersionStr = Preferences.get("preproc.jdk_version");
 
     int jdkVersion = JDK11;  // default
     if (jdkVersionStr.equals("1.3")) { jdkVersion = JDK13; };
@@ -357,8 +409,8 @@ public class PdePreprocessor {
     //if (opengl) {
     //out.println("import processing.opengl.*; ");
     //}
-
-    if (programType < JAVA) {
+*/
+/*    if (programType < JAVA) {
       // open the class definition
       out.print("public class " + className + " extends ");
       //if (opengl) {
@@ -377,7 +429,7 @@ public class PdePreprocessor {
         out.print("public void setup() {");
       }
     }
-  }
+*/  }
 
   /**
    * Write any necessary closing text.
@@ -385,8 +437,9 @@ public class PdePreprocessor {
    * @param out         PrintStream to write it to.
    */
   void writeFooter(PrintStream out) {
+    //out.print("}");
 
-    if (programType == STATIC) {
+/*    if (programType == STATIC) {
       // close off draw() definition
       out.print("noLoop(); ");
       out.print("}");
@@ -396,7 +449,7 @@ public class PdePreprocessor {
       // close off the class definition
       out.print("}");
     }
-  }
+*/  }
 
 
   static String advClassName = "";

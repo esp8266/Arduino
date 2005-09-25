@@ -20,6 +20,8 @@
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software Foundation,
   Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  
+  $Id:$
 */
 
 package processing.app;
@@ -1135,58 +1137,52 @@ public class Editor extends JFrame
     doClose();
     running = true;
     buttons.run();
-
+    message("Compiling...");
     // do this for the terminal window / dos prompt / etc
     for (int i = 0; i < 10; i++) System.out.println();
 
     // clear the console on each run, unless the user doesn't want to
+    //if (Base.getBoolean("console.auto_clear", true)) {
     //if (Preferences.getBoolean("console.auto_clear", true)) {
     if (Preferences.getBoolean("console.auto_clear")) {
-    console.clear();
+      console.clear();
     }
 
     presenting = present;
-      // console.message("Arduino compiling\n", false,true);
-      
-      String cfilename = System.getProperty("user.dir") + File.separator + "lib/build/arduino.c";
-      //console.message(" file = " + cfilename, false,true);
-      try {
-            Writer out = new FileWriter(cfilename);
-            out.write(textarea.getText());
-            out.flush();
-            out.close();
-        }
-        catch (IOException e)
-        {
-            error(e);
-        }
+    if (presenting && Base.isMacOS()) {
+      // check to see if osx 10.2, if so, show a warning
+      String osver = System.getProperty("os.version").substring(0, 4);
+      if (osver.equals("10.2")) {
+        Base.showWarning("Time for an OS Upgrade",
+                         "The \"Present\" feature may not be available on\n" +
+                         "Mac OS X 10.2, because of what appears to be\n" +
+                         "a bug in the Java 1.4 implementation on 10.2.\n" +
+                         "In case it works on your machine, present mode\n" +
+                         "will start, but if you get a flickering white\n" +
+                         "window, using Command-Q to quit the sketch", null);
+      }
+    }
 
-       Compiler compiler = new Compiler();
-       String buildPath = Preferences.get("build.path");
-		//console.message(" buildpath = " + buildPath, false,true);
-       try {
-       		boolean success = compiler.compile(sketch, buildPath); 
-       } catch (RunnerException e) {
-		error(e);
-	   }
-	    // FIXED: 20050902 - DojoDave
-		// the clear button requires a the clearRun method instead of only clear!!
-		buttons.clearRun();
+    try {
+      if (!sketch.handleRun(new Target(
+          System.getProperty("user.dir") + File.separator + "lib" +
+          File.separator + "targets", Preferences.get("build.target"))))
+        return;
 
+      //runtime = new Runner(sketch, Editor.this);
+      //runtime.start(appletLocation);
+      watcher = new RunButtonWatcher();
+      message("Done compiling.");
+      if(watcher != null) watcher.stop();
 
-      //- if (!sketch.handleRun()) return;
+    } catch (RunnerException e) {
+      message("Error compiling...");
+      error(e);
 
-      //- runtime = new Runner(sketch, Editor.this);
-      //- runtime.start(appletLocation);
-      //- watcher = new RunButtonWatcher();
-
-    //- } catch (RunnerException e) {
-    //-   error(e);
-
-    //- } catch (Exception e) {
-    //-   e.printStackTrace();
-    //- }
-
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    
     // this doesn't seem to help much or at all
     /*
     final SwingWorker worker = new SwingWorker() {
@@ -1197,10 +1193,12 @@ public class Editor extends JFrame
             runtime = new Runner(sketch, Editor.this);
             runtime.start(presenting ? presentLocation : appletLocation);
             watcher = new RunButtonWatcher();
+            message("Done compiling.");
 
           } catch (RunnerException e) {
+            message("Error compiling...");
             error(e);
-
+          
           } catch (Exception e) {
             e.printStackTrace();
           }
@@ -1210,6 +1208,7 @@ public class Editor extends JFrame
     worker.start();
     */
     //sketch.cleanup();  // where does this go?
+    buttons.clear();
   }
 
 
@@ -1661,9 +1660,30 @@ public class Editor extends JFrame
    * hitting export twice, quickly, and horking things up.
    */
   synchronized public void handleExport() {
+    //if(debugging)
+      //doStop();
+    console.clear();
+    //String what = sketch.isLibrary() ? "Applet" : "Library";
     //message("Exporting " + what + "...");
-	Downloader d = new Downloader();
-	d.downloadJava();
+    message("Uploading to I/O Board...");
+    try {
+      //boolean success = sketch.isLibrary() ?
+      //sketch.exportLibrary() : sketch.exportApplet();
+      boolean success = sketch.exportApplet(new Target(
+          System.getProperty("user.dir") + File.separator + "lib" +
+          File.separator + "targets", Preferences.get("build.target")));
+      if (success) {
+        message("Done uploading.");
+      } else {
+        // error message will already be visible
+      }
+    } catch (RunnerException e) {
+      message("Error during upload.");
+      //e.printStackTrace();
+      error(e);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
     buttons.clear();
   }
 

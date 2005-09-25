@@ -69,10 +69,13 @@ else
   unzip -q  -d work avr_tools.zip
   rm -f avr_tools.zip
   cp dist/tools/*.* work/tools
-  cp dist/lib/makefile.win work/Makefile
-  mkdir work/core
-  cp ../../../core/*.* work/core
-  cp dist/core/makefile.win work/core/Makefile
+
+  # core/ has been replaced by targets/ and we no longer use makefiles
+  #cp dist/lib/makefile.win work/Makefile
+  #mkdir work/core
+  #cp ../../../core/*.* work/core
+  #cp dist/core/makefile.win work/core/Makefile
+  cp -r ../../targets work/lib/
 
   # take care of the examples
   mkdir work/examples

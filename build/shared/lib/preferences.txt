@@ -262,3 +262,25 @@ linestatus.bgcolor = #66665a
 linestatus.font	   = SansSerif,plain,10
 linestatus.color   = #ffffff
 linestatus.height  = 20
+
+# set the upload defaults
+upload.erase=false
+upload.verify=false
+upload.programmer=stk500
+
+# set the parallel port defaults (used if upload.programmer=dapa)
+parallel.port=0x378
+
+# set the serial port defaults
+serial.databits=8
+serial.stopbits=1
+serial.parity=N
+serial.port=COM1
+serial.download_rate=9600
+serial.debug_rate=9600
+
+# set the build defaults
+build.mcu=atmega8
+build.f_cpu=16000000L
+build.extension=c
+build.target=arduino

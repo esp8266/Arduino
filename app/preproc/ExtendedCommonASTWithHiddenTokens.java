@@ -4,7 +4,7 @@ package antlr;
  * Project led by Terence Parr at http://www.jGuru.com
  * Software rights: http://www.antlr.org/RIGHTS.html
  *
- * $Id: ExtendedCommonASTWithHiddenTokens.java,v 1.1 2005/04/09 02:30:36 benfry Exp $
+ * $Id: ExtendedCommonASTWithHiddenTokens.java,v 1.1.1.1 2005/06/22 22:18:14 h Exp $
  */
 
 import java.io.*;
