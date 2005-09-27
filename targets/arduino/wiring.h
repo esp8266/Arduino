@@ -57,7 +57,7 @@ typedef uint8_t byte;
 
 void delay(unsigned long);
 void delay_ms(unsigned short ms);
-void delayMicro(unsigned long us);
+void delayMicroseconds(unsigned long us);
 void pinMode(int, int);
 void digitalWrite(int, int);
 int digitalRead(int);

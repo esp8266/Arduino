@@ -267,7 +267,7 @@ void delay(unsigned long ms)
 	timerPause(ms);
 }
 
-void delayMicro(unsigned long us)
+void delayMicroseconds(unsigned long us)
 {
 	delay_us(us);
 }
