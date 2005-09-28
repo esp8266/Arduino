@@ -25,6 +25,6 @@ PORT=/dev/ttyS0
 #PORT=/dev/tty.USA19QW1b1P1.1
 
 uisp -dpart=ATmega8 -dprog=stk500 -dserial=$PORT -dspeed=115200 --wr_lock=0xFF
-uisp -dpart=ATmega8 -dprog=stk500 -dserial=$PORT -dspeed=115200 --wr_fuse_l=0xdf --wr_fuse_h=0xc8
+uisp -dpart=ATmega8 -dprog=stk500 -dserial=$PORT -dspeed=115200 --wr_fuse_l=0xdf --wr_fuse_h=0xca
 uisp -dpart=ATmega8 -dprog=stk500 -dserial=$PORT -dspeed=115200 --erase --upload if=ATMegaBOOT.hex -v
 uisp -dpart=ATmega8 -dprog=stk500 -dserial=$PORT -dspeed=115200 --wr_lock=0xCF

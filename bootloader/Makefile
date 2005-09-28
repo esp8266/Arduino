@@ -4,18 +4,11 @@
 # program name should not be changed...
 PROGRAM    = ATmegaBOOT
 
-# enter the product name for which you want to build the bootloader/monitor
-# currently CRUMB8, CRUMB128 and PROBOMEGA128 are supported
-PRODUCT    = CRUMB8
+PRODUCT=atmega8
 
 # enter the parameters for the UISP isp tool
-#ISPPARAMS  = -dprog=stk200 -dlpt=0x378
-ISPPARAMS  = -dprog=stk500 -dserial=/dev/com1 -dspeed=115200
+ISPPARAMS  = -dprog=stk500 -dserial=$(SERIAL) -dspeed=115200
 
-
-############################################################
-# You should not have to change anything below here.
-############################################################
 
 #DIRAVR = /usr/local/avr
 DIRAVRBIN = $(DIRAVR)/bin
@@ -24,45 +17,21 @@ DIRINC = .
 DIRLIB = $(DIRAVR)/avr/lib
 
 
-
-
-ifeq ($(PRODUCT),CRUMB8)
 MCU_TARGET = atmega8
-LDSECTION  = --section-start=.text=0x1800
+LDSECTION  = --section-start=.text=0x1c00
 FUSE_L     = 0xdf
-FUSE_H     = 0xc8
+FUSE_H     = 0xca
 ISPFUSES   = $(DIRAVRBIN)/uisp -dpart=ATmega8 $(ISPPARAMS) --wr_fuse_l=$(FUSE_L) --wr_fuse_h=$(FUSE_H)
 ISPFLASH   = $(DIRAVRBIN)/uisp -dpart=ATmega8 $(ISPPARAMS) --erase --upload if=$(PROGRAM).hex -v
-endif
-
-ifeq ($(PRODUCT),CRUMB128)
-MCU_TARGET = atmega128
-LDSECTION  = --section-start=.text=0x1E000
-FUSE_L     = 0xdf
-FUSE_H     = 0xc8
-FUSE_E     = 0xff
-ISPFUSES   = ./uisp -dpart=ATmega128 $(ISPPARAMS) --wr_fuse_l=$(FUSE_L) --wr_fuse_h=$(FUSE_H) --wr_fuse_e=$(FUSE_E)
-ISPFLASH   = ./uisp -dpart=ATmega128 $(ISPPARAMS) --erase --upload if=$(PROGRAM).hex -v
-endif
-
-ifeq ($(PRODUCT),PROBOMEGA128)
-MCU_TARGET = atmega128
-LDSECTION  = --section-start=.text=0x1E000
-FUSE_L     = 0xdf
-FUSE_H     = 0xc8
-FUSE_E     = 0xff
-ISPFUSES   = ./uisp -dpart=ATmega128 $(ISPPARAMS) --wr_fuse_l=$(FUSE_L) --wr_fuse_h=$(FUSE_H) --wr_fuse_e=$(FUSE_E)
-ISPFLASH   = ./uisp -dpart=ATmega128 $(ISPPARAMS) --erase --upload if=$(PROGRAM).hex -v
-endif
 
 
 OBJ        = $(PROGRAM).o
-OPTIMIZE   = -O3
+OPTIMIZE   = -Os
 
-DEFS       =
+DEFS       = -DF_CPU=16000000 -DBAUD_RATE=9600
 LIBS       =
 
-CC             = $(DIRAVRBIN)/avr-gcc
+CC         = $(DIRAVRBIN)/avr-gcc
 
 
 # Override is only needed by avr-lib build system.
@@ -72,8 +41,9 @@ override LDFLAGS       = -Wl,-Map,$(PROGRAM).map,$(LDSECTION)
 
 OBJCOPY        = $(DIRAVRBIN)/avr-objcopy
 OBJDUMP        = $(DIRAVRBIN)/avr-objdump
+SIZE           = $(DIRAVRBIN)/avr-size
 
-all: $(PROGRAM).elf lst text
+all: $(PROGRAM).elf lst text asm size
 
 isp: $(PROGRAM).hex
 	$(ISPFUSES)
@@ -83,13 +53,22 @@ $(PROGRAM).elf: $(OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 clean:
+	rm -rf *.s
 	rm -rf *.o *.elf
 	rm -rf *.lst *.map
+
+asm: $(PROGRAM).s
+
+%.s: %.c
+	$(CC) -S $(CFLAGS) -g1 $^
 
 lst:  $(PROGRAM).lst
 
 %.lst: %.elf
 	$(OBJDUMP) -h -S $< > $@
+
+size: $(PROGRAM).hex
+	$(SIZE) $^
 
 # Rules for building the .text rom images
 
