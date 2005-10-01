@@ -109,6 +109,7 @@ public class Editor extends JFrame
   
   
   JMenu serialSubMenu;
+  JMenu serialRateSubMenu;
 
   //
 
@@ -622,11 +623,41 @@ public class Editor extends JFrame
 	
   }
 
+  // manages the serial port speed menu
+  class SerialRateMenuListener implements  ActionListener {
+   
+	SerialRateMenuListener() {}
+
+    public void actionPerformed(ActionEvent actionevent) {
+      int count = serialRateSubMenu.getItemCount();
+	  Object to;
+	  
+      for (int i = 0; i < count; i++) {
+		 to = serialRateSubMenu.getItem(i);
+	     if ( to instanceof JCheckBoxMenuItem) ((JCheckBoxMenuItem)serialRateSubMenu.getItem(i)).setState(false);
+      }
+	  
+      JCheckBoxMenuItem item = (JCheckBoxMenuItem)actionevent.getSource();
+      item.setState(true);
+      String name = item.getLabel();
+      
+	  Preferences.set("serial.download_rate", name);
+      System.out.println("serial port speed set to " + name);
+    }
+	
+	
+  }
+
+
+
+
   protected JMenu buildToolsMenu() {
 	JMenuItem item;
 	JMenuItem rbMenuItem;
 	JMenuItem cbMenuItem;
-	SerialMenuListener   sml = new SerialMenuListener();
+	SerialMenuListener   		sml  = new SerialMenuListener();
+	SerialRateMenuListener		srml = new SerialRateMenuListener();
+	// Enumeration portRates = {"9600","19200","38400","57600","115200"};
 
     JMenu menu = new JMenu("Tools");
 
@@ -638,7 +669,7 @@ public class Editor extends JFrame
         }
       });
     menu.add(item);
-	
+	menu.addSeparator();
 	
 	// The serial options
 	
@@ -652,9 +683,11 @@ public class Editor extends JFrame
 		}
 	});
 
-	serialSubMenu.add(item);
-	serialSubMenu.addSeparator();
-	ButtonGroup group = new ButtonGroup();
+
+
+
+
+	ButtonGroup  group = new ButtonGroup();
 	
 
 	// getting list of ports
@@ -687,39 +720,36 @@ public class Editor extends JFrame
 		serialSubMenu.setEnabled(false);
 	}
 
-	
+	serialSubMenu.addSeparator();
+	serialSubMenu.add(item);
+		
 	menu.add(serialSubMenu);
 	
 	// End of The serial options
 
-	menu.addSeparator();
+	// menu.addSeparator();
+	
+	// add the serial speed submenu
+	
+	serialRateSubMenu = new JMenu("Serial port speed");
  
+    serialSubMenu.add(item);
+	//serialSubMenu.addSeparator();
+	group = new ButtonGroup();
 
-	
-	
-	
-	
-	
+	int curr_rate = Preferences.getInteger("serial.download_rate");
 
-    //item = new JMenuItem("Create Font...");
-    //item.addActionListener(new ActionListener() {
-    //    public void actionPerformed(ActionEvent e) {
-    //      //new CreateFont().show(sketch.dataFolder);
-    //      new CreateFont(Editor.this).show();
-    //    }
-    //  });
-    //menu.add(item);
+	rbMenuItem = new JCheckBoxMenuItem("9600", 9600 == curr_rate);
+	rbMenuItem.addActionListener(srml);
+	group.add(rbMenuItem);
+	serialRateSubMenu.add(rbMenuItem);
 
-    //item = new JMenuItem("Archive Sketch");
-    //item.addActionListener(new ActionListener() {
-    //    public void actionPerformed(ActionEvent e) {
-    //      new Archiver(Editor.this).show();
-          //Archiver archiver = new Archiver();
-          //archiver.setup(Editor.this);
-          //archiver.show();
-    //    }
-    //  });
-    //menu.add(item);
+	rbMenuItem = new JCheckBoxMenuItem("19200", 19200  == curr_rate);
+	rbMenuItem.addActionListener(srml);
+	group.add(rbMenuItem);
+	serialRateSubMenu.add(rbMenuItem);	
+
+	menu.add(serialRateSubMenu);
 
     return menu;
   }

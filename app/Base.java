@@ -39,7 +39,6 @@ import javax.swing.undo.*;
 import com.apple.mrj.*;
 import com.ice.jni.registry.*;
 
-//import processing.core.*;
 
 
 /**
@@ -51,7 +50,7 @@ import com.ice.jni.registry.*;
  */
 public class Base {
   static final int VERSION = 1;
-  static final String VERSION_NAME = "0002 Pre-Alpha";
+  static final String VERSION_NAME = "0002 Alpha";
   
   static public int platform;
   
