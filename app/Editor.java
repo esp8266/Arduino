@@ -749,6 +749,11 @@ public class Editor extends JFrame
 	group.add(rbMenuItem);
 	serialRateSubMenu.add(rbMenuItem);	
 
+	rbMenuItem = new JCheckBoxMenuItem("115200", 115200  == curr_rate);
+	rbMenuItem.addActionListener(srml);
+	group.add(rbMenuItem);
+	serialRateSubMenu.add(rbMenuItem);	
+
 	menu.add(serialRateSubMenu);
 
     return menu;
