@@ -15,7 +15,7 @@ With frequently asked questions, scroll to the end of the file.
 
 ** of the packages, begin with the defaults, and add:
 
-+ cvs - used for version control
++ svn - used for version control
 
 + make, gcc-mingw, and g++ - used to build processing.exe
   (this will also pull in gcc-core)
