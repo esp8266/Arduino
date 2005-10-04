@@ -124,39 +124,6 @@ int digitalRead(int pin)
 	return LOW;
 }
 
-/*
-int analogRead(int pin)
-{
-	unsigned long start_time = millis();
-	int ch = analogInPinToBit(pin);
-	volatile unsigned int low, high;
-
-	//return a2dConvert10bit(ch);
-
-	a2dSetChannel(ch);
-	a2dStartConvert();
-
-	// wait until the conversion is complete or we
-	// time out.  without the timeout, this sometimes
-	// becomes an infinite loop.  page 245 of the atmega8
-	// datasheet says the conversion should take at most
-	// 260 microseconds, so if two milliseconds have ticked
-	// by, something's wrong.
-	//while (!a2dIsComplete() && millis() - start_time < 50);
-	while (!a2dIsComplete());
-
-	// a2Convert10bit sometimes read ADCL and ADCH in the
-	// wrong order (?) causing it to sometimes miss reading,
-	// especially if called multiple times in rapid succession.
-	//return a2dConvert10bit(ch);
-	//return ADCW;
-	low = ADCL;
-	high = ADCH;
-
-	return (high << 8) | low;
-}
-*/
-
 int analogRead(int pin)
 {
 	unsigned int low, high, ch = analogInPinToBit(pin);
@@ -222,12 +189,12 @@ void serialWrite(unsigned char c)
 
 int serialAvailable()
 {
-    return uartGetRxBuffer()->datalength;
+	return uartGetRxBuffer()->datalength;
 }
 
 int serialRead()
 {
-    return uartGetByte();
+	return uartGetByte();
 }
 
 void printMode(int mode)
@@ -235,12 +202,62 @@ void printMode(int mode)
 	// do nothing, we only support serial printing, not lcd.
 }
 
-void uartSendString(unsigned char *str)
+void printByte(unsigned char c)
 {
-	while (*str)
-		uartSendByte(*str++);
+	serialWrite(c);
 }
 
+void printString(unsigned char *s)
+{
+	while (*s)
+		printByte(*s++);
+}
+
+void printIntegerInBase(unsigned int n, int base)
+{ 
+        unsigned char buf[8 * sizeof(int)]; // Assumes 8-bit chars. 
+        int i = 0;
+
+        if (n == 0) {
+                printByte('0');
+                return;
+        } 
+
+        while (n > 0) {
+                buf[i++] = n % base;
+                n /= base;
+        }
+
+        for (i--; i >= 0; i--)
+                printByte(buf[i] < 10 ? '0' + buf[i] : 'A' + buf[i] - 10);
+}
+
+void printInteger(int n)
+{
+        if (n < 0) {
+                printByte('-');
+                n = -n;
+        }
+
+	printIntegerInBase(n, 10);
+}
+
+void printHex(unsigned int n)
+{
+	printIntegerInBase(n, 16);
+}
+
+void printOctal(unsigned int n)
+{
+	printIntegerInBase(n, 8);
+}
+
+void printBinary(unsigned int n)
+{
+	printIntegerInBase(n, 2);
+}
+
+/* Including print() adds approximately 1500 bytes to the binary size.
 void print(const char *format, ...)
 {
 	char buf[256];
@@ -250,8 +267,9 @@ void print(const char *format, ...)
 	vsnprintf(buf, 256, format, ap);
 	va_end(ap);
 	
-	uartSendString(buf);
+	printString(buf);
 }
+*/
 
 unsigned long millis()
 {
