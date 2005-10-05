@@ -276,7 +276,7 @@ serial.databits=8
 serial.stopbits=1
 serial.parity=N
 serial.port=COM1
-serial.download_rate=9600
+serial.download_rate=19200
 serial.debug_rate=9600
 
 # set the build defaults
