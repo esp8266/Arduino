@@ -17,88 +17,80 @@ echo Creating P5 distribution for revision $REVISION...
 echo
 
 # remove any old boogers
-rm -rf processing
-rm -rf processing-*
+rm -rf arduino
+rm -rf arduino-*
 
 # use 'shared' files as starting point
-cp -r ../shared processing
-
-# add the libraries folder with source
-cp -r ../../net processing/libraries/
-cp -r ../../opengl processing/libraries/
-cp -r ../../serial processing/libraries/
-cp -r ../../video processing/libraries/
+cp -r ../shared arduino
+cp -r work/lib/targets arduino/lib
 
 # new style examples thing ala reas
-cd processing
-unzip -q examples.zip
-rm examples.zip
-cd ..
-
-# new style reference
-cd processing
-unzip -q reference.zip
-# necessary for launching reference from shell/command prompt
-# which is done internally to view reference
-chmod +x reference/*.html
-# needed by 'help' menu
-chmod +x reference/environment/*.html
-# get rid of the zip file
-rm reference.zip
+cd arduino
+mkdir examples
+unzip -d examples -q dist/examples.zip
+rm dist/examples.zip
+rm -rf dist
 cd ..
 
 # add java (jre) files
-unzip -q -d processing jre.zip
+unzip -q -d arduino jre.zip
+
+# copy tools from work/
+cp -r work/tools arduino
 
 # directories used by the app
-#mkdir processing/lib/build
+#mkdir arduino/lib/build
 
 # grab pde.jar and export from the working dir
-cp work/lib/pde.jar processing/lib/
-cp work/lib/core.jar processing/lib/
-#cp -r work/lib/export processing/lib/
-#rm -rf processing/lib/export/CVS
+cp work/lib/pde.jar arduino/lib/
+cp work/java/lib/rt.jar arduino/lib/
+#cp work/lib/core.jar arduino/lib/
+#cp -r work/lib/export arduino/lib/
+#rm -rf arduino/lib/export/CVS
 
 # get jikes and depedencies
-#gunzip < dist/jikes.gz > processing/jikes.exe
-cp dist/jikes.exe processing/
-chmod +x processing/jikes.exe
+#gunzip < dist/jikes.gz > arduino/jikes.exe
+cp dist/jikes.exe arduino/
+chmod +x arduino/jikes.exe
 
-cp dist/ICE_JNIRegistry.dll processing/
-chmod +x processing/ICE_JNIRegistry.dll
+cp dist/ICE_JNIRegistry.dll arduino/
+chmod +x arduino/ICE_JNIRegistry.dll
+cp work/rxtxSerial.dll arduino/
+chmod +x arduino/rxtxSerial.dll
+cp work/*.dll arduino
+chmod +x arduino/*.dll
 
 # get platform-specific goodies from the dist dir
-cp launcher/processing.exe processing/
-cp dist/run.bat processing/
+cp launcher/arduino.exe arduino/
+#cp dist/run.bat arduino/
 
 # convert notes.txt to windows LFs
 # the 2> is because the app is a little chatty
-unix2dos processing/revisions.txt 2> /dev/null
-unix2dos processing/lib/preferences.txt 2> /dev/null
-unix2dos processing/lib/keywords.txt 2> /dev/null
-rm -f processing/*.bak
-rm -f processing/lib/*.bak
+unix2dos arduino/revisions.txt 2> /dev/null
+unix2dos arduino/lib/preferences.txt 2> /dev/null
+unix2dos arduino/lib/keywords.txt 2> /dev/null
+rm -f arduino/*.bak
+rm -f arduino/lib/*.bak
 
 # remove boogers
-find processing -name "*~" -exec rm -f {} ';'
-find processing -name ".DS_Store" -exec rm -f {} ';'
-find processing -name "._*" -exec rm -f {} ';'
-find processing -name "Thumbs.db" -exec rm -f {} ';'
+find arduino -name "*~" -exec rm -f {} ';'
+find arduino -name ".DS_Store" -exec rm -f {} ';'
+find arduino -name "._*" -exec rm -f {} ';'
+find arduino -name "Thumbs.db" -exec rm -f {} ';'
 
 # chmod +x the crew
-find processing -name "*.dll" -exec chmod +x {} ';'
-find processing -name "*.exe" -exec chmod +x {} ';'
-find processing -name "*.html" -exec chmod +x {} ';'
+find arduino -name "*.dll" -exec chmod +x {} ';'
+find arduino -name "*.exe" -exec chmod +x {} ';'
+find arduino -name "*.html" -exec chmod +x {} ';'
 
-# clean out the cvs entries
-find processing -name "CVS" -exec rm -rf {} ';' 2> /dev/null
-find processing -name ".cvsignore" -exec rm -rf {} ';'
+# clean out the svn entries
+find arduino -name ".svn" -exec rm -rf {} ';' 2> /dev/null
 
 # zip it all up for release
 echo Packaging standard release...
 echo
-P5=processing-$REVISION
-mv processing $P5
+P5=arduino-$REVISION
+mv arduino $P5
 zip -rq $P5.zip $P5
 # nah, keep the new directory around
 #rm -rf $P5

@@ -12,6 +12,8 @@ else
   cp -r ../shared work
   rm -rf work/CVS
   rm -f work/.DS_Store 
+  cp ../../lib/*.dll work
+  cp dist/lib/*.dll work
   
   # needs to make the dir because of packaging goofiness
   mkdir -p work/classes/arduino/app/preproc
@@ -80,7 +82,7 @@ else
   # take care of the examples
   mkdir work/examples
   cd work/examples
-  cp ../shared/dist/examples.zip .
+  cp ../../../shared/dist/examples.zip .
   echo Extracting examples ...
   unzip -q  -d . examples.zip
   rm -f examples.zip
@@ -112,12 +114,14 @@ cd app/preproc
 
 # first build the default java goop
 ../../build/windows/work/java/bin/java \
-    -cp "..\\..\\build\\windows\\work\\lib\\antlr.jar" antlr.Tool java.g
-
+    -cp "..\\..\\build\\windows\\work\\lib\\antlr.jar" antlr.Tool StdCParser.g
 # now build the pde stuff that extends the java classes
 ../../build/windows/work/java/bin/java \
-    -cp "..\\..\\build\\windows\\work\\lib\\antlr.jar" antlr.Tool \
-    -glib java.g pde.g
+    -cp "..\\..\\build\\windows\\work\\lib\\antlr.jar" antlr.Tool -glib StdCParser.g WParser.g
+../../build/windows/work/java/bin/java \
+    -cp "..\\..\\build\\windows\\work\\lib\\antlr.jar" antlr.Tool WTreeParser.g
+../../build/windows/work/java/bin/java \
+    -cp "..\\..\\build\\windows\\work\\lib\\antlr.jar" antlr.Tool -glib WTreeParser.g WEmitter.g
 
 # back to base arduino dir
 cd ../..
@@ -127,8 +131,8 @@ fi
 ### -- BUILD BOOTLOADER -----------------------------------------
 
 cd bootloader
-export AVRDIR=../build/windows/work/tools/avr
-make
+export DIRAVR=../build/windows/work/tools/avr
+make 
 cp ATmegaBOOT.hex ../build/windows/work/bootloader
 cd ..
 
@@ -136,13 +140,14 @@ cd ..
 
 cd app
 
-CLASSPATH="..\\build\\windows\\work\\lib\\RXTXcomm.jar;..\\build\\windows\\work\\lib\\core.jar;..\\build\\windows\\work\\lib\\mrj.jar;..\\build\\windows\\work\\lib\antlr.jar;..\\build\\windows\\work\\lib\\oro.jar;..\\build\\windows\\work\\lib\\registry.jar;..\\build\\windows\\work\\java\\lib\\rt.jar"
+CLASSPATH="..\\build\\windows\\work\\lib\\RXTXcomm.jar;..\\build\\windows\\work\\lib\\mrj.jar;..\\build\\windows\\work\\lib\antlr.jar;..\\build\\windows\\work\\lib\\oro.jar;..\\build\\windows\\work\\lib\\registry.jar;..\\build\\windows\\work\\java\\lib\\rt.jar"
 
 # compile the code as java 1.3, so that the application will run and
 # show the user an error, rather than crapping out with some strange
 # "class not found" crap
-../build/windows/work/jikes -target 1.3 +D -classpath "$CLASSPATH;..\\build\\windows\\work\\classes" -d ..\\build\\windows\\work\\classes *.java preproc/*.java syntax/*.java tools/*.java
-#/cygdrive/c/jdk-1.4.2_05/bin/javac.exe -classpath $CLASSPATH -d ..\\build\\windows\\work\\classes *.java jeditsyntax/*.java preprocessor/*.java
+# need to do this twice because otherwise dependencies aren't resolved right.
+../build/windows/work/jikes -target 1.3 +D -classpath "$CLASSPATH;..\\build\\windows\\work\\classes" -d ..\\build\\windows\\work\\classes preproc/*.java syntax/*.java tools/*.java *.java
+../build/windows/work/jikes -target 1.3 +D -classpath "$CLASSPATH;..\\build\\windows\\work\\classes" -d ..\\build\\windows\\work\\classes preproc/*.java syntax/*.java tools/*.java *.java
 
 cd ../build/windows/work/classes
 rm -f ../lib/pde.jar
@@ -151,27 +156,6 @@ zip -0rq ../lib/pde.jar .
 # back to build/windows
 cd ../..
 
-
-### -- BUILD LIBRARIES ------------------------------------------------
-
-
-PLATFORM=windows
-
-
-CLASSPATH="..\\build\\$PLATFORM\\work\\lib\\core.jar;..\\build\\$PLATFORM\\work\\java\\lib\\rt.jar"
-JIKES=../build/$PLATFORM/work/jikes
-CORE="..\\build\\$PLATFORM\\work\\lib\\core.jar"
-LIBRARIES="..\\build\\$PLATFORM\\work\\libraries"
-
-# move to arduino/build 
-cd ..
-
-
-
-CLASSPATH="..\\..\\build\\$PLATFORM\\work\\lib\\core.jar;..\\..\\build\\$PLATFORM\\work\\java\\lib\\rt.jar"
-JIKES=../../build/$PLATFORM/work/jikes
-CORE=..\\..\\build\\$PLATFORM\\work\\lib\\core.jar
-LIBRARIES=..\\..\\build\\$PLATFORM\\work\\libraries
 
 
 echo
