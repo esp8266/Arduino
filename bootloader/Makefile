@@ -13,7 +13,7 @@ ISPPARAMS  = -dprog=stk500 -dserial=$(SERIAL) -dspeed=115200
 #DIRAVR = /usr/local/avr
 DIRAVRBIN = $(DIRAVR)/bin
 DIRAVRUTILS = $(DIRAVR)/utils/bin
-DIRINC = .
+DIRINC = $(DIRAVR)/include
 DIRLIB = $(DIRAVR)/avr/lib
 
 
@@ -36,7 +36,7 @@ CC         = $(DIRAVRBIN)/avr-gcc
 
 # Override is only needed by avr-lib build system.
 
-override CFLAGS        = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) -D$(PRODUCT) $(DEFS)
+override CFLAGS        = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) -D$(PRODUCT) $(DEFS) -I$(DIRINC)
 override LDFLAGS       = -Wl,-Map,$(PROGRAM).map,$(LDSECTION)
 
 OBJCOPY        = $(DIRAVRBIN)/avr-objcopy
