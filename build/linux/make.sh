@@ -30,7 +30,7 @@ else
   mkdir -p work/examples
 
   #need to replace this with the linux native library for RXTX
-  #cp ../../lib/librxtxSerial.jnilib work/
+  cp ../../lib/librxtxSerial.so work/
 
   cp dist/arduino work/
  
@@ -47,14 +47,14 @@ fi
 
 echo Copying shared and core files...
 cp -r ../shared/* work
-cp -r ../../core work
+cp -r ../../targets work/lib
 
 echo Extracting examples...
 unzip -d work/examples ../shared/dist/examples.zip
 
 echo Copying dist files...
 cp -r dist/lib work/
-cp -r dist/core work/
+#cp -r dist/core work/
 cp -r dist/bootloader work/
 
 ### -- START BUILDING -------------------------------------------
@@ -81,9 +81,11 @@ then
   # build classes/grammar for preprocessor
   echo Building antlr grammar code...
   # first build the default java goop
-  java -cp ../../build/linux/work/lib/antlr.jar antlr.Tool java.g
+  java -cp ../../build/linux/work/lib/antlr.jar antlr.Tool StdCParser.g
   # now build the pde stuff that extends the java classes
-  java -cp ../../build/linux/work/lib/antlr.jar antlr.Tool -glib java.g pde.g
+  java -cp ../../build/linux/work/lib/antlr.jar antlr.Tool -glib StdCParser.g WParser.g
+  java -cp ../../build/linux/work/lib/antlr.jar antlr.Tool WTreeParser.g
+  java -cp ../../build/linux/work/lib/antlr.jar antlr.Tool -glib WTreeParser.g WEmitter.g
   cd ..
 fi
 
