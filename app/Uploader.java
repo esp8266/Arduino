@@ -108,7 +108,7 @@ public class Uploader implements MessageConsumer  {
       if (Preferences.get("upload.programmer").equals("dapa"))
         commandDownloader.add("-dlpt=" + Preferences.get("parallel.port"));
       else {
-        commandDownloader.add("-dserial=" + (!Base.isMacOS() ? "/dev/" + serial_port.toLowerCase() : serial_port));
+        commandDownloader.add("-dserial=" + (Base.isWindows() ? "/dev/" + serial_port.toLowerCase() : serial_port));
         commandDownloader.add("-dspeed=" + serial_rate);
       }
       if (Preferences.getBoolean("upload.erase"))
