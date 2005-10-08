@@ -277,7 +277,7 @@ unsigned long millis()
 	// overflows when it reaches 256.  we calculate the total
 	// number of clock cycles, then divide by the number of clock
 	// cycles per millisecond.
-	return timer0GetOverflowCount() * timer0GetPrescaler() * 256L / F_CPU * 1000L;
+	return timer0GetOverflowCount() * timer0GetPrescaler() * 256L / (F_CPU / 1000L);
 }
 
 void delay(unsigned long ms)
