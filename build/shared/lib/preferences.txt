@@ -1,17 +1,16 @@
-# !!!!!!!! UNLIKE PREVIOUS VERSIONS OF PROCESSING !!!!!!!!!!
 # DO NOT MODIFY THIS FILE, OR DELETE SETTINGS FROM THIS FILE
 
 # These are the default preferences. If you want to modify 
 # them directly, use the per-user local version of the file:
 
 # Documents and Settings -> Application Data -> 
-#    Processing -> preferences.txt (on windows)
+#    Arduino -> preferences.txt (on windows)
 
-# ~/Library -> Processing -> preferences.txt (on macosx)
+# ~/Library -> Arduino -> preferences.txt (on macosx)
 
 # ~/.processing -> preferences.txt (on linux)
 
-# You'll have problems running Processing if you incorrectly 
+# You'll have problems running Arduino if you incorrectly 
 # modify lines in this file.
 
 
@@ -49,7 +48,7 @@ settings.path.fallback=data
 
 # by default, check the processing server for any updates
 # (please avoid disabling, this also helps us know basic numbers 
-# on how many people are using Processing)
+# on how many people are using Arduino)
 update.check = true
 
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -76,7 +75,7 @@ editor.bgcolor=#ffffff
 
 # color to be used for background when 'external editor' enabled
 editor.external=false
-editor.external.bgcolor=#ddddbb
+editor.external.bgcolor=#168299
 
 # styles for various types of text
 
@@ -126,13 +125,13 @@ editor.eolmarkers.color=#99991A
 editor.invalid=false
 editor.invalid.style=#7E7E00,bold
 
-buttons.bgcolor      = #66665A
+buttons.bgcolor      = #044F6F
 buttons.status.font  = SansSerif,plain,12
 buttons.status.color = #FFFFFF
 
 # settings for the tabs at the top
 # actual tab images are stored in the lib/ folder
-header.bgcolor               = #999988
+header.bgcolor               = #216886
 header.text.selected.color   = #1A1A00
 header.text.unselected.color = #ffffff
 header.text.font             = SansSerif,plain,12
@@ -156,8 +155,8 @@ console.auto_clear = true
 console.length = 500
 
 status.notice.fgcolor = #ffffff
-status.notice.bgcolor = #bbbbaa
-status.error.fgcolor  = #ffffff
+status.notice.bgcolor = #54919E
+status.error.fgcolor  = #ffffff 
 status.error.bgcolor  = #662000
 status.prompt.fgcolor = #000000
 status.prompt.bgcolor = #cc9900
@@ -258,7 +257,7 @@ preproc.imports.jdk14 = javax.xml.parsers,javax.xml.transform,javax.xml.transfor
 browser.linux = mozilla
 
 # coloring for the editor line number status bar at the bottom of the screen
-linestatus.bgcolor = #66665a
+linestatus.bgcolor = #044F6F
 linestatus.font	   = SansSerif,plain,10
 linestatus.color   = #ffffff
 linestatus.height  = 20
