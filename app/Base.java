@@ -1,8 +1,11 @@
 /* -*- mode: jde; c-basic-offset: 2; indent-tabs-mode: nil -*- */
 
 /*
-  Part of the Processing project - http://processing.org
+  Part of the Arduino project - http://arduino.berlios.de
 
+  
+
+  Based on processing http://www.processing.org
   Copyright (c) 2004-05 Ben Fry and Casey Reas
   Copyright (c) 2001-04 Massachusetts Institute of Technology
 
@@ -42,7 +45,7 @@ import com.ice.jni.registry.*;
 
 
 /**
- * The base class for the main processing application.
+ * The base class for the main Arduino application.
  * <P>
  * Primary role of this class is for platform identification and
  * general interaction with the system (launching URLs, loading
@@ -65,7 +68,7 @@ public class Base {
   
   // moved from PApplet
   // in preperation of detaching the IDE from the
-  // processing core classes
+  // Arduino core classes
   
    /**
    * Current platform in use.
@@ -126,7 +129,7 @@ public class Base {
     //if (PApplet.javaVersion < 1.4f) {
       //System.err.println("no way man");
     //  Base.showError("Need to install Java 1.4",
-    //                 "This version of Processing requires    \n" +
+    //                 "This version of Arduino requires    \n" +
     //                 "Java 1.4 or later to run properly.\n" +
     //                 "Please visit java.com to upgrade.", null);
    // }
@@ -199,7 +202,7 @@ public class Base {
 
 
   /**
-   * returns true if the Processing is running on a Mac OS machine,
+   * returns true if the Arduino is running on a Mac OS machine,
    * specifically a Mac OS X machine because it doesn't un on OS 9 anymore.
    */
   static public boolean isMacOS() {
@@ -291,7 +294,7 @@ public class Base {
       }
 
     } else if (Base.isWindows()) {
-      // looking for Documents and Settings/blah/Application Data/Processing
+      // looking for Documents and Settings/blah/Application Data/Arduino
 
       // this is just based on the other documentation, and eyeballing
       // that part of the registry.. not confirmed by any msft/msdn docs.
@@ -324,9 +327,9 @@ public class Base {
       //return null;
 
     } else {
-      // otherwise make a .processing directory int the user's home dir
+      // otherwise make a .arduino directory int the user's home dir
       File home = new File(System.getProperty("user.home"));
-      dataFolder = new File(home, ".processing");
+      dataFolder = new File(home, ".arduino");
     }
 
     // create the folder if it doesn't exist already
@@ -406,7 +409,7 @@ public class Base {
     File sketchbookFolder = null;
 
     if (Base.isMacOS()) {
-      // looking for /Users/blah/Documents/Processing
+      // looking for /Users/blah/Documents/Arduino
 
       // carbon folder constants
       // http://developer.apple.com/documentation/Carbon/Reference/Folder_Manager/folder_manager_ref/constant_6.html#//apple_ref/doc/uid/TP30000238/C006889
@@ -440,7 +443,7 @@ public class Base {
       }
 
     } else if (isWindows()) {
-      // looking for Documents and Settings/blah/My Documents/Processing
+      // looking for Documents and Settings/blah/My Documents/Arduino
       // (though using a reg key since it's different on other platforms)
 
       // http://support.microsoft.com/?kbid=221837&sd=RMVP
@@ -737,7 +740,7 @@ public class Base {
     // macos doesn't seem to think that files in the lib folder
     // are part of the resources, unlike windows or linux.
     // actually, this is only the case when running as a .app,
-    // since it works fine from run.sh, but not Processing.app
+    // since it works fine from run.sh, but not Arduino.app
     return new FileInputStream("lib/" + filename);
     //}
 
