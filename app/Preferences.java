@@ -1,7 +1,9 @@
 /* -*- mode: jde; c-basic-offset: 2; indent-tabs-mode: nil -*- */
 
 /*
-  Part of the Processing project - http://processing.org
+  Part of the Arduino project - http://arduino.berlios.de
+
+  Based on the Processing project - http://www.processing.org
 
   Copyright (c) 2004-05 Ben Fry and Casey Reas
   Copyright (c) 2001-04 Massachusetts Institute of Technology
@@ -39,7 +41,6 @@ import javax.swing.filechooser.*;
 import javax.swing.text.*;
 import javax.swing.undo.*;
 
-//import processing.core.PApplet;
 
 
 /**
@@ -123,7 +124,7 @@ public class Preferences extends JComponent {
 
     } catch (Exception e) {
       Base.showError(null, "Could not read default settings.\n" +
-                     "You'll need to reinstall Processing.", e);
+                     "You'll need to reinstall Arduino.", e);
     }
 
     // check for platform-specific properties in the defaults
@@ -152,7 +153,7 @@ public class Preferences extends JComponent {
     // next load user preferences file
 
     //File home = new File(System.getProperty("user.home"));
-    //File processingHome = new File(home, "Processing");
+    //File arduinoHome = new File(home, "Arduino");
     //preferencesFile = new File(home, PREFS_FILE);
     preferencesFile = Base.getSettingsFile(PREFS_FILE);
 
@@ -172,7 +173,7 @@ public class Preferences extends JComponent {
                        "Error reading the preferences file. " +
                        "Please delete (or move)\n" +
                        preferencesFile.getAbsolutePath() +
-                       " and restart Processing.", ex);
+                       " and restart Arduino.", ex);
       }
     }
   }
@@ -350,7 +351,7 @@ public class Preferences extends JComponent {
     right = Math.max(right, left + d.width);
     top += d.height;
 
-    label = new JLabel("(edit only when Processing is not running)");
+    label = new JLabel("(edit only when Arduino is not running)");
     pain.add(label);
     d = label.getPreferredSize();
     label.setForeground(Color.gray);
@@ -580,7 +581,7 @@ public class Preferences extends JComponent {
 
       // save() is deprecated, and didn't properly
       // throw exceptions when it wasn't working
-      skprops.store(output, "Settings for processing. " +
+      skprops.store(output, "Settings for arduino. " +
                     "See lib/preferences.txt for defaults.");
 
       // need to close the stream.. didn't do this before
