@@ -26,6 +26,7 @@ else
   mkdir -p work/examples
 
   cp ../../lib/librxtxSerial.jnilib work/
+  cp -pR dist/drivers work/
 
   # to have a copy of this guy around for messing with
   echo Copying Arduino.app...

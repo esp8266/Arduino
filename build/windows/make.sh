@@ -20,7 +20,6 @@ else
   mkdir -p work/classes/arduino/app/syntax
   mkdir -p work/classes/arduino/app/tools
 
-
 #  echo Extracting examples...
  # cd work
   #unzip -q examples.zip
@@ -65,6 +64,8 @@ else
   mkdir work/bootloader
   cp dist/bootloader/*.* work/bootloader
   cp dist/serial/*.* work/lib/
+  mkdir work/drivers
+  cp dist/drivers/*.* works/drivers/
   mkdir work/tools
   cp dist/avr_tools.zip .
   echo Extracting avr tools ...
