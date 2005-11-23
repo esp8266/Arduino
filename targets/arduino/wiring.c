@@ -257,7 +257,9 @@ void printBinary(unsigned int n)
 	printIntegerInBase(n, 2);
 }
 
-/* Including print() adds approximately 1500 bytes to the binary size.
+/* Including print() adds approximately 1500 bytes to the binary size,
+ * so we replace it with the smaller and less-confusing printString(),
+ * printInteger(), etc.
 void print(const char *format, ...)
 {
 	char buf[256];

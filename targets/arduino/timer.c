@@ -229,12 +229,16 @@ void timerPause(unsigned short pause_ms)
 	// loop until time expires
 	while( ((TimerPauseReg<<8) | inb(TCNT0)) < (pause+timerThres) )
 	{
-		if( TimerPauseReg < (pause>>8));
-		{
+		// DAM: these lines (in particular, the call to set_sleep_mode)
+		// caused avr-gcc to give an error about a misplaced } in linux,
+		// presumambly caused by a macro somewhere.  Since they're not
+		// vital (and are causing problems), I'm commenting them out.
+		//if( TimerPauseReg < (pause>>8));
+		//{
 			// save power by idling the processor
-			set_sleep_mode(SLEEP_MODE_IDLE);
-			sleep_mode();
-		}
+			//set_sleep_mode(SLEEP_MODE_IDLE);
+			//sleep_mode();
+		//}
 	}
 
 	/* old inaccurate code, for reference
