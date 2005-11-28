@@ -105,6 +105,7 @@ public class Uploader implements MessageConsumer  {
       commandDownloader.add((!Base.isMacOS() ? "" : userdir) + "tools/avr/bin/uisp");
       commandDownloader.add("-dprog=" + Preferences.get("upload.programmer"));
       commandDownloader.add("-dpart=" + Preferences.get("build.mcu"));
+	  //commandDownloader.add("-v=4"); // extra verbosity for help debugging.
       if (Preferences.get("upload.programmer").equals("dapa"))
         commandDownloader.add("-dlpt=" + Preferences.get("parallel.port"));
       else {
@@ -126,7 +127,7 @@ public class Uploader implements MessageConsumer  {
       }*/
 
       // Cleanup the serial buffer
-      serialPort = new Serial();
+      Serial serialPort = new Serial();
       byte[] readBuffer;
       while(serialPort.available() > 0) {
         readBuffer = serialPort.readBytes();
