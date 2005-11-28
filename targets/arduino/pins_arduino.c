@@ -126,12 +126,12 @@ pin_t analog_out_pin_to_port_array[NUM_DIGITAL_PINS] = {
 pin_t *analog_out_pin_to_port = analog_out_pin_to_port_array;
 
 pin_t analog_in_pin_to_port_array[NUM_ANALOG_IN_PINS] = {
-	{ PC, 5 },
-	{ PC, 4 },
-	{ PC, 3 },
-	{ PC, 2 },
-	{ PC, 1 },
 	{ PC, 0 },
+	{ PC, 1 },
+	{ PC, 2 },
+	{ PC, 3 },
+	{ PC, 4 },
+	{ PC, 5 },
 };
 
 pin_t *analog_in_pin_to_port = analog_in_pin_to_port_array;

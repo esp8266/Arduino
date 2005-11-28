@@ -207,6 +207,11 @@ void printByte(unsigned char c)
 	serialWrite(c);
 }
 
+void printNewline()
+{
+	printByte('\n');
+}
+
 void printString(unsigned char *s)
 {
 	while (*s)

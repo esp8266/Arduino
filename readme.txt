@@ -13,6 +13,16 @@ taking care of the production.
 Yaniv Steiner and Giorgio Olivero have been supporting the project and are
 working at using it with the Instant Soup platform.
 
+0003
+millis() now updates every millisecond instead of every second.
+FTDI USB drivers included with Mac and Windows distributions.
+Bootloader included with Windows distribution.
+Reversed the analog input pins to correspond to newer boards.  This means
+a call, for example, to analogRead(0) must be changed to analogRead(5) in
+order to read the same physical pin.
+Now flushing the serial port before uploading (should fix some errors).
+Added a printNewline() function.
+
 0002 - 2005.10.05
 New build process no longer uses makefiles; now controlled by preferences.txt.
 core/ replaced with targets/; can now link against Wiring libraries.
