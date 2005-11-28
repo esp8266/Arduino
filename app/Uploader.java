@@ -126,13 +126,13 @@ public class Uploader implements MessageConsumer  {
       }*/
 
       // Cleanup the serial buffer
-      /*serialPort = new Serial();
+      serialPort = new Serial();
       byte[] readBuffer;
       while(serialPort.available() > 0) {
         readBuffer = serialPort.readBytes();
         Thread.sleep(100);
       }
-      serialPort.dispose(); */
+      serialPort.dispose();
 
       String[] commandArray = new String[commandDownloader.size()];
       Process process = Runtime.getRuntime().exec((String[]) commandDownloader.toArray(commandArray));
