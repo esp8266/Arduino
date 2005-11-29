@@ -63,15 +63,13 @@ else
   cp dist/ICE_JNIRegistry.dll work/
   mkdir work/bootloader
   cp dist/bootloader/*.* work/bootloader
-  cp dist/serial/*.* work/lib/
   mkdir work/drivers
-  cp dist/drivers/*.* works/drivers/
+  cp dist/drivers/*.* work/drivers/
   mkdir work/tools
   cp dist/avr_tools.zip .
   echo Extracting avr tools ...
   unzip -q  -d work avr_tools.zip
   rm -f avr_tools.zip
-  cp dist/tools/*.* work/tools
 
   # core/ has been replaced by targets/ and we no longer use makefiles
   #cp dist/lib/makefile.win work/Makefile

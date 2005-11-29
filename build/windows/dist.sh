@@ -38,6 +38,9 @@ unzip -q -d arduino jre.zip
 # copy tools from work/
 cp -r work/tools arduino
 
+cp -r work/bootloader arduino
+cp -r work/drivers arduino
+
 # directories used by the app
 #mkdir arduino/lib/build
 
