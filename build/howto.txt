@@ -17,7 +17,7 @@ With frequently asked questions, scroll to the end of the file.
 
 + svn - used for version control
 
-+ make, gcc-mingw, and g++ - used to build processing.exe
++ make, gcc-mingw, and g++ - used to build arduino.exe
   (this will also pull in gcc-core)
 
 + perl - use this version, activestate or other distros have trouble
@@ -60,22 +60,7 @@ svn co svn://svn.berlios.de/arduino/trunk
 # (maybe even a long while for you dialup and international folks)
 
 
-3. INSTALL QUICKTIME FOR JAVA (windows users only)
-
-* you'll also need to install quicktime for java. grab a quicktime
-  installer from: http://www.apple.com/quicktime/download/
-  don't try to be sly & use the itunes installer. we all love itunes
-  but it doesn't include quicktime for java by default. or if you were
-  sly, you might need to read the point below about using the updater:
-
-* if you already have quicktime installed, just make sure that
-  quicktime for java has already been installed, use the quicktime
-  updater (Program Files -> QuickTime -> QuickTime Updater) hit the
-  'Details' button in the updater, and if it lists "Not installed" 
-  for "QuickTime for Java", well, take care of that.
-
-
-4. BUILD IT
+3. BUILD IT
 
 # now to build for the first time:
 cd /path/to/arduino/build/windows
@@ -104,13 +89,13 @@ cd /path/to/arduino/build/macosx
 //// Updating to the Latest Version
 
 
-5a. Each time you want to update to latest version from cvs:
+4a. Each time you want to update to latest version from cvs:
 
 cd /path/to/arduino
 svn update
 
 
-5b. If new folders have been added, or you're gettin odd errors, use:
+4b. If new folders have been added, or you're gettin odd errors, use:
 
 # remove the work directory
 rm -rf work
