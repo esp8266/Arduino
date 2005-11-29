@@ -18,7 +18,7 @@
 # 
 
 BINDIR=../tools/avr/bin
-PORT=/dev/tty.USA19QW?b1P1.1
+PORT=/dev/tty.USA19QW1b1P1.1
 
 # unlock bootloader segment
 $BINDIR/uisp -dpart=ATmega8 -dprog=stk500 -dserial=$PORT -dspeed=115200 --wr_lock=0xFF
