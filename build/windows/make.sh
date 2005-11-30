@@ -12,8 +12,8 @@ else
   cp -r ../shared work
   rm -rf work/CVS
   rm -f work/.DS_Store 
-  cp ../../lib/*.dll work
-  cp dist/lib/*.dll work
+  #cp ../../lib/*.dll work
+  cp dist/*.dll work
   
   # needs to make the dir because of packaging goofiness
   mkdir -p work/classes/arduino/app/preproc
