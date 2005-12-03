@@ -25,6 +25,7 @@ order to read the same physical pin.
 Now flushing the serial port before uploading (should fix some errors).
 Added a printNewline() function.
 Updated icon of the Windows executable.
+Improved accuracy of the delayMicroseconds() function.
 
 0002 - 2005.10.05
 New build process no longer uses makefiles; now controlled by preferences.txt.

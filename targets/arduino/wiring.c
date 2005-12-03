@@ -19,7 +19,7 @@
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
 
-  $Id: wiring.c,v 1.7 2005/05/28 21:04:15 mellis Exp $
+  $Id$
 */
 
 #include <avr/io.h>
@@ -292,9 +292,40 @@ void delay(unsigned long ms)
 	timerPause(ms);
 }
 
-void delayMicroseconds(unsigned long us)
+/* Delay for the given number of microseconds.  Assumes a 16 MHz clock. 
+ * Disables interrupts, which will disrupt the millis() function if used
+ * too frequently. */
+void delayMicroseconds(unsigned int us)
 {
-	delay_us(us);
+	// calling avrlib's delay_us() function with low values (e.g. 1 or
+	// 2 microseconds) gives delays longer than desired.
+	//delay_us(us);
+
+	// for a one-microsecond delay, simply return.  the overhead
+	// of the function call yields a delay of approximately 1 1/8 us.
+	if (--us == 0)
+		return;
+
+	// the following loop takes a quarter of a microsecond (4 cycles)
+	// per iteration, so execute it four times for each microsecond of
+	// delay requested.
+	us <<= 2;
+
+	// account for the time taken in the preceeding commands.
+	us -= 2;
+
+	// disable interrupts, otherwise the timer 0 overflow interrupt that
+	// tracks milliseconds will make us delay longer than we want.
+	cli();
+
+	// busy wait
+	__asm__ __volatile__ (
+		"1: sbiw %0,1" "\n\t" // 2 cycles
+		"brne 1b" : "=w" (us) : "0" (us) // 2 cycles
+	);
+
+	// reenable interrupts.
+	sei();
 }
 
 int main(void)

@@ -19,7 +19,7 @@
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
 
-  $Id: wiring.h,v 1.4 2005/05/24 17:47:41 mellis Exp $
+  $Id$
 */
 
 #ifndef Wiring_h
@@ -57,7 +57,7 @@ typedef uint8_t byte;
 
 void delay(unsigned long);
 void delay_ms(unsigned short ms);
-void delayMicroseconds(unsigned long us);
+void delayMicroseconds(unsigned int us);
 void pinMode(int, int);
 void digitalWrite(int, int);
 int digitalRead(int);
