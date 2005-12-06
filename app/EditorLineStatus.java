@@ -52,7 +52,10 @@ public class EditorLineStatus extends JComponent {
     this.textarea = textarea;
     textarea.editorLineStatus = this;
 
-    background = Preferences.getColor("linestatus.bgcolor");
+	// hardcoding new blue color scheme for consistency with images,
+	// see EditorStatus.java for details.
+    //background = Preferences.getColor("linestatus.bgcolor");
+	background = new Color(0x04, 0x4F, 0x6F);
     font = Preferences.getFont("linestatus.font");
     foreground = Preferences.getColor("linestatus.color");
     high = Preferences.getInteger("linestatus.height");

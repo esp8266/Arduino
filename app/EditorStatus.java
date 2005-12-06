@@ -76,7 +76,19 @@ public class EditorStatus extends JPanel implements ActionListener {
 
     if (bgcolor == null) {
       bgcolor = new Color[4];
-      bgcolor[0] = Preferences.getColor("status.notice.bgcolor");
+	  // Arduino 0003 switched to a blue color scheme to visually distinguish
+	  // itself from Processing.  Because the image files for certain interface
+	  // elements (e.g. buttons and tabs) are distributed with the application
+	  // while the preference file that specifies the IDE colors is stored in
+	  // the user's home directory and shared across all versions of Arduino,
+	  // we need to hardcode certain colors here to match the images.
+	  // Otherwise, users who used different multiple versions of the software
+	  // would sometimes see colors that didn't match the interface elements.
+	  // This is a hack and prevents users from customizing the IDE colors,
+	  // however, it obviates the need to provide for version-specific
+	  // preferences.
+      //bgcolor[0] = Preferences.getColor("status.notice.bgcolor");
+	  bgcolor[0] = new Color(0x54, 0x91, 0x9e);
       bgcolor[1] = Preferences.getColor("status.error.bgcolor");
       bgcolor[2] = Preferences.getColor("status.prompt.bgcolor");
       bgcolor[3] = Preferences.getColor("status.prompt.bgcolor");
