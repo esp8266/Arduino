@@ -21,7 +21,7 @@
   along with this program; if not, write to the Free Software Foundation,
   Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
   
-  $Id:$
+  $Id$
 */
 
 package processing.app;
@@ -551,13 +551,13 @@ public class Editor extends JFrame
       });
     menu.add(item);
 
-    item = newJMenuItem("Present", 'R', true);
-    item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          handleRun(true);
-        }
-      });
-    menu.add(item);
+    //item = newJMenuItem("Present", 'R', true);
+    //item.addActionListener(new ActionListener() {
+    //    public void actionPerformed(ActionEvent e) {
+    //      handleRun(true);
+    //    }
+    //  });
+    //menu.add(item);
 
     item = new JMenuItem("Stop");
     item.addActionListener(new ActionListener() {
@@ -577,7 +577,7 @@ public class Editor extends JFrame
       });
     menu.add(item);
 
-    menu.add(sketchbook.getImportMenu());
+    //menu.add(sketchbook.getImportMenu());
 
     if (Base.isWindows() || Base.isMacOS()) {
       // no way to do an 'open in file browser' on other platforms
@@ -617,7 +617,7 @@ public class Editor extends JFrame
       String name = item.getLabel();
       
 	  Preferences.set("serial.port", name);
-      System.out.println("port set to " + name);
+      //System.out.println("port set to " + name);
     }
 	
 	
@@ -642,7 +642,7 @@ public class Editor extends JFrame
       String name = item.getLabel();
       
 	  Preferences.set("serial.download_rate", name);
-      System.out.println("serial port speed set to " + name);
+      //System.out.println("serial port speed set to " + name);
     }
 	
 	
@@ -720,8 +720,8 @@ public class Editor extends JFrame
 		serialSubMenu.setEnabled(false);
 	}
 
-	serialSubMenu.addSeparator();
-	serialSubMenu.add(item);
+	//serialSubMenu.addSeparator();
+	//serialSubMenu.add(item);
 		
 	menu.add(serialSubMenu);
 	
@@ -733,7 +733,7 @@ public class Editor extends JFrame
 	
 	serialRateSubMenu = new JMenu("Serial port speed");
  
-    serialSubMenu.add(item);
+    //serialSubMenu.add(item);
 	//serialSubMenu.addSeparator();
 	group = new ButtonGroup();
 
