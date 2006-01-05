@@ -141,3 +141,4 @@ printByte	KEYWORD2
 printHex	KEYWORD2
 printOctal	KEYWORD2
 printBinary	KEYWORD2
+printNewline	KEYWORD2
