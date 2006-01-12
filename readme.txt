@@ -8,7 +8,7 @@ For more information, see the website at: http://arduino.berlios.de/ or the
 forums at arduino.berlios.de/cgi-bin/yabb/YaBB.cgi
 
 The Team is composed of Massimo Banzi, David Cuartielles, Tom Igoe,
-David Mellis and Nicholas Zambetti.
+David A. Mellis and Nicholas Zambetti.
 
 Gianluca Martino works with us on many projects providing help, ideas and
 taking care of the production.
@@ -20,14 +20,6 @@ Arduino uses the GNU avr-gcc toolchain, uisp, avr-libc, avrlib, and code
 from Processing and Wiring.
 
 UPDATES
-
-0004
-Serial monitor added (click the toolbar button to turn it on or off).  Baud
-rate is controlled by the serial.debug_rate field in preferences.txt, defaults
-to 9600.
-Serial port menu now automatically refreshes when opened.
-Created Xcode project for building Arduino on the Mac (doesn't yet regenerate
-the grammar files or package the distribution); active target should be "App".
 
 0003
 millis() now updates every millisecond instead of every second.
@@ -42,6 +34,12 @@ Updated icon of the Windows executable.
 Improved accuracy of the delayMicroseconds() function.
 New blue color scheme and icons courtesy of Noah Shibley (colors are hardcoded
 into the source to ensure consistency with image files).
+Serial monitor added (click the toolbar button to turn it on or off).  Baud
+rate is controlled by the serial.debug_rate field in preferences.txt, defaults
+to 9600.  Icon and implementation from Wiring.
+Serial port menu now automatically refreshes when opened.
+Created Xcode project for building Arduino on the Mac (doesn't yet regenerate
+the grammar files or package the distribution); active target should be "App".
 
 0002 - 2005.10.05
 New build process no longer uses makefiles; now controlled by preferences.txt.
