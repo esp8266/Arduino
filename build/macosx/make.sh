@@ -25,7 +25,7 @@ else
   mkdir -p work/lib/build
   mkdir -p work/examples
 
-  cp ../../lib/librxtxSerial.jnilib work/
+  cp dist/librxtxSerial.jnilib work/
   cp -pR dist/drivers work/
 
   # to have a copy of this guy around for messing with

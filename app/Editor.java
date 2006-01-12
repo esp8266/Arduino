@@ -82,7 +82,7 @@ public class Editor extends JFrame
   EditorHeader header;
   EditorStatus status;
   EditorConsole console;
-
+  Serial serialPort;
   JSplitPane splitPane;
   JPanel consolePanel;
 
@@ -107,12 +107,13 @@ public class Editor extends JFrame
   JMenuItem saveMenuItem;
   JMenuItem saveAsMenuItem;
   
-  
+  //ButtonGroup serialGroup;
   JMenu serialSubMenu;
   JMenu serialRateSubMenu;
+  SerialMenuListener serialMenuListener;
 
   //
-
+  boolean debugging;
   boolean running;
   boolean presenting;
 
@@ -655,9 +656,10 @@ public class Editor extends JFrame
 	JMenuItem item;
 	JMenuItem rbMenuItem;
 	JMenuItem cbMenuItem;
-	SerialMenuListener   		sml  = new SerialMenuListener();
 	SerialRateMenuListener		srml = new SerialRateMenuListener();
 	// Enumeration portRates = {"9600","19200","38400","57600","115200"};
+    
+	serialMenuListener  = new SerialMenuListener();
 
     JMenu menu = new JMenu("Tools");
 
@@ -675,55 +677,17 @@ public class Editor extends JFrame
 	
 	serialSubMenu = new JMenu("Serial port");
 
-	item = newJMenuItem("Update List", 'E', false);
-	item.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			// if (debug) displayResult("Serial Port List Updated");
-			//updateSerial();
-		}
-	});
+//	item = newJMenuItem("Update List", 'E', false);
+//	item.addActionListener(new ActionListener() {
+//		public void actionPerformed(ActionEvent e) {
+//			// if (debug) displayResult("Serial Port List Updated");
+//			//updateSerial();
+//		}
+//	});
 
-
-
-
-
-	ButtonGroup  group = new ButtonGroup();
-	
-
-	// getting list of ports
-
-	
-	try
-	{
-		for (Enumeration enumeration = CommPortIdentifier.getPortIdentifiers(); enumeration.hasMoreElements();)
-		{
-			CommPortIdentifier commportidentifier = (CommPortIdentifier)enumeration.nextElement();
-			if (commportidentifier.getPortType() == CommPortIdentifier.PORT_SERIAL)
-			{
-				String curr_port = commportidentifier.getName();
-				rbMenuItem = new JCheckBoxMenuItem(curr_port, curr_port.equals(Preferences.get("serial.port")));
-				rbMenuItem.addActionListener(sml);
-				group.add(rbMenuItem);
-				serialSubMenu.add(rbMenuItem);
-			}
-		}
-
-	}
-
-	catch (Exception exception)
-	{
-		System.out.println("error retrieving port list");
-		exception.printStackTrace();
-	}
-	
-	if (serialSubMenu.getItemCount() == 0) {
-		serialSubMenu.setEnabled(false);
-	}
-
-	//serialSubMenu.addSeparator();
-	//serialSubMenu.add(item);
-		
-	menu.add(serialSubMenu);
+    //serialGroup = new ButtonGroup();
+	populateSerialMenu();
+    menu.add(serialSubMenu);
 	
 	// End of The serial options
 
@@ -735,7 +699,7 @@ public class Editor extends JFrame
  
     //serialSubMenu.add(item);
 	//serialSubMenu.addSeparator();
-	group = new ButtonGroup();
+	ButtonGroup group = new ButtonGroup();
 
 	int curr_rate = Preferences.getInteger("serial.download_rate");
 
@@ -755,8 +719,54 @@ public class Editor extends JFrame
 	serialRateSubMenu.add(rbMenuItem);	
 
 	menu.add(serialRateSubMenu);
+    
+    menu.addMenuListener(new MenuListener() {
+      public void menuCanceled(MenuEvent e) {}
+      public void menuDeselected(MenuEvent e) {}
+      public void menuSelected(MenuEvent e) {
+        populateSerialMenu();
+      }
+    });
 
     return menu;
+  }
+  
+  protected void populateSerialMenu() {
+	// getting list of ports
+
+    JMenuItem rbMenuItem;
+    
+    serialSubMenu.removeAll();
+
+	try
+	{
+		for (Enumeration enumeration = CommPortIdentifier.getPortIdentifiers(); enumeration.hasMoreElements();)
+		{
+			CommPortIdentifier commportidentifier = (CommPortIdentifier)enumeration.nextElement();
+			if (commportidentifier.getPortType() == CommPortIdentifier.PORT_SERIAL)
+			{
+				String curr_port = commportidentifier.getName();
+				rbMenuItem = new JCheckBoxMenuItem(curr_port, curr_port.equals(Preferences.get("serial.port")));
+				rbMenuItem.addActionListener(serialMenuListener);
+				//serialGroup.add(rbMenuItem);
+				serialSubMenu.add(rbMenuItem);
+			}
+		}
+
+	}
+
+	catch (Exception exception)
+	{
+		System.out.println("error retrieving port list");
+		exception.printStackTrace();
+	}
+	
+	if (serialSubMenu.getItemCount() == 0) {
+		serialSubMenu.setEnabled(false);
+	}
+
+	//serialSubMenu.addSeparator();
+	//serialSubMenu.add(item);
   }
 
 
@@ -1292,6 +1302,17 @@ public class Editor extends JFrame
   }
 
 
+  public void handleSerial() {
+    if (!debugging) {
+      console.clear();
+      serialPort = new Serial(true);
+      debugging = true;
+    } else {
+      doStop();
+    }
+  }
+
+
   public void handleStop() {  // called by menu or buttons
     if (presenting) {
       doClose();
@@ -1305,6 +1326,10 @@ public class Editor extends JFrame
    * Stop the applet but don't kill its window.
    */
   public void doStop() {
+    if (debugging)  {
+      serialPort.dispose();
+      debugging = false;
+    }
     if (runtime != null) runtime.stop();
     if (watcher != null) watcher.stop();
     message(EMPTY);
@@ -1695,8 +1720,8 @@ public class Editor extends JFrame
    * hitting export twice, quickly, and horking things up.
    */
   synchronized public void handleExport() {
-    //if(debugging)
-      //doStop();
+    if(debugging)
+      doStop();
     console.clear();
     //String what = sketch.isLibrary() ? "Applet" : "Library";
     //message("Exporting " + what + "...");

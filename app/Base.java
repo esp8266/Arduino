@@ -52,7 +52,7 @@ import com.ice.jni.registry.*;
  * files and images, etc) that comes from that.
  */
 public class Base {
-  static final int VERSION = 3;
+  static final int VERSION = 1;
   static final String VERSION_NAME = "0003 Alpha";
   
   static public int platform;

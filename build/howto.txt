@@ -121,4 +121,4 @@ the code, but all the other annoying crap that the build scripts do)
 then maybe we could switch to it. It's all about reaching some kind 
 of critical mass. 
 
-$Id:$
+$Id$

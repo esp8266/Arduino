@@ -1,0 +1,1167 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXAggregateTarget section */
+		33FFFE1C0965BBEF0016AC38 /* Dist */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 33FFFE1F0965BC300016AC38 /* Build configuration list for PBXAggregateTarget "Dist" */;
+			buildPhases = (
+				33FFFE1D0965BC050016AC38 /* CopyFiles */,
+				33FF070C0965BF760016AC38 /* CopyFiles */,
+				33FF07130965BFA80016AC38 /* CopyFiles */,
+				33FF071D0965C1C20016AC38 /* CopyFiles */,
+				33FF07170965BFFE0016AC38 /* ShellScript */,
+			);
+			buildSettings = {
+				OPTIMIZATION_CFLAGS = "";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = Arduino;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			dependencies = (
+			);
+			name = Dist;
+			productName = Arduino;
+		};
+/* End PBXAggregateTarget section */
+
+/* Begin PBXApplicationTarget section */
+		33AF61680965C4C600B514A9 /* App */ = {
+			isa = PBXApplicationTarget;
+			buildConfigurationList = 33AF616B0965C4CB00B514A9 /* Build configuration list for PBXApplicationTarget "App" */;
+			buildPhases = (
+				33AF61640965C4C600B514A9 /* Sources */,
+				33AF61650965C4C600B514A9 /* Resources */,
+				33AF61660965C4C600B514A9 /* JavaArchive */,
+				33AF61670965C4C600B514A9 /* Frameworks */,
+				33CF03C809662DA200F2C9A9 /* CopyFiles */,
+			);
+			buildSettings = {
+				JAVA_COMPILER = /usr/bin/javac;
+				JAVA_COMPILER_FLAGS = "";
+				JAVA_ONLY = YES;
+				JAVA_SOURCE_SUBDIR = .;
+				OPTIMIZATION_CFLAGS = "";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = App;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				WRAPPER_EXTENSION = app;
+			};
+			dependencies = (
+				33AF61710965C51E00B514A9 /* PBXTargetDependency */,
+			);
+			name = App;
+			productInstallPath = "$(USER_APPS_DIR)";
+			productName = App;
+			productReference = 33DD8FB6096AC8DA0013AF8F /* Arduino.app */;
+			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string></string>
+	<key>CFBundleGetInfoString</key>
+	<string></string>
+	<key>CFBundleIconFile</key>
+	<string>arduino.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string></string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Arduino</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string></string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>0.0.1d1</string>
+	<key>Java</key>
+	<dict>
+		<key>ClassPath</key>
+		<array>
+			<string>$JAVAROOT/antlr.jar</string>
+			<string>$JAVAROOT/Arduino.jar</string>
+			<string>$JAVAROOT/oro.jar</string>
+			<string>$JAVAROOT/mrj.jar</string>
+			<string>$JAVAROOT/registry.jar</string>
+			<string>$JAVAROOT/RXTXcomm.jar</string>
+		</array>
+		<key>JVMVersion</key>
+		<string>1.4+</string>
+		<key>MainClass</key>
+		<string>processing.app.Base</string>
+		<key>Properties</key>
+		<dict>
+			<key>apple.laf.useScreenMenuBar</key>
+			<string>true</string>
+		</dict>
+	</dict>
+</dict>
+</plist>
+";
+		};
+/* End PBXApplicationTarget section */
+
+/* Begin PBXBuildFile section */
+		330B21540968180400345666 /* librxtxSerial.jnilib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 330B21530968180400345666 /* librxtxSerial.jnilib */; };
+		33AF61760965C54B00B514A9 /* PreprocessorInfoChannel.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE3D0965BD110016AC38 /* PreprocessorInfoChannel.java */; };
+		33AF61770965C54B00B514A9 /* EditorListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE2C0965BD110016AC38 /* EditorListener.java */; };
+		33AF61780965C54B00B514A9 /* LineObject.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE3A0965BD110016AC38 /* LineObject.java */; };
+		33AF61790965C54B00B514A9 /* Serial.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE590965BD110016AC38 /* Serial.java */; };
+		33AF617A0965C54B00B514A9 /* TextUtilities.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE6D0965BD110016AC38 /* TextUtilities.java */; };
+		33AF617B0965C54B00B514A9 /* EditorConsole.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE290965BD110016AC38 /* EditorConsole.java */; };
+		33AF617C0965C54B00B514A9 /* TokenMarker.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE6F0965BD110016AC38 /* TokenMarker.java */; };
+		33AF617D0965C54B00B514A9 /* MessageSiphon.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE310965BD110016AC38 /* MessageSiphon.java */; };
+		33AF617E0965C54B00B514A9 /* FindReplace.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE2E0965BD110016AC38 /* FindReplace.java */; };
+		33AF617F0965C54B00B514A9 /* SketchCode.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE5C0965BD110016AC38 /* SketchCode.java */; };
+		33AF61800965C54B00B514A9 /* EditorLineStatus.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE2B0965BD110016AC38 /* EditorLineStatus.java */; };
+		33AF61810965C54B00B514A9 /* EditorHeader.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE2A0965BD110016AC38 /* EditorHeader.java */; };
+		33AF61820965C54B00B514A9 /* EditorButtons.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE280965BD100016AC38 /* EditorButtons.java */; };
+		33AF61830965C54B00B514A9 /* SyntaxStyle.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE690965BD110016AC38 /* SyntaxStyle.java */; };
+		33AF61840965C54B00B514A9 /* Uploader.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE740965BD110016AC38 /* Uploader.java */; };
+		33AF61850965C54B00B514A9 /* RunnerException.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE580965BD110016AC38 /* RunnerException.java */; };
+		33AF61860965C54B00B514A9 /* WParser.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE4E0965BD110016AC38 /* WParser.java */; };
+		33AF61870965C54B00B514A9 /* TextAreaPainter.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE6C0965BD110016AC38 /* TextAreaPainter.java */; };
+		33AF61880965C54B00B514A9 /* Sketchbook.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE5B0965BD110016AC38 /* Sketchbook.java */; };
+		33AF61890965C54B00B514A9 /* EditorStatus.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE2D0965BD110016AC38 /* EditorStatus.java */; };
+		33AF618A0965C54B00B514A9 /* WTokenTypes.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE4F0965BD110016AC38 /* WTokenTypes.java */; };
+		33AF618B0965C54B00B514A9 /* TextAreaDefaults.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE6B0965BD110016AC38 /* TextAreaDefaults.java */; };
+		33AF618C0965C54B00B514A9 /* PdePreprocessor.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE3C0965BD110016AC38 /* PdePreprocessor.java */; };
+		33AF618D0965C54B00B514A9 /* CSymbolTable.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE350965BD110016AC38 /* CSymbolTable.java */; };
+		33AF618E0965C54B00B514A9 /* SketchHistory.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE5D0965BD110016AC38 /* SketchHistory.java */; };
+		33AF618F0965C54B00B514A9 /* RunnerClassLoader.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE570965BD110016AC38 /* RunnerClassLoader.java */; };
+		33AF61900965C54B00B514A9 /* MessageStream.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE320965BD110016AC38 /* MessageStream.java */; };
+		33AF61910965C54B00B514A9 /* SyntaxUtilities.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE6A0965BD110016AC38 /* SyntaxUtilities.java */; };
+		33AF61930965C54B00B514A9 /* PresentMode.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE550965BD110016AC38 /* PresentMode.java */; };
+		33AF61940965C54B00B514A9 /* STDCTokenTypes.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE410965BD110016AC38 /* STDCTokenTypes.java */; };
+		33AF61950965C54B00B514A9 /* CTokenMarker.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE600965BD110016AC38 /* CTokenMarker.java */; };
+		33AF61960965C54B00B514A9 /* CToken.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE360965BD110016AC38 /* CToken.java */; };
+		33AF61970965C54B00B514A9 /* WTreeParserTokenTypes.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE530965BD110016AC38 /* WTreeParserTokenTypes.java */; };
+		33AF61990965C54B00B514A9 /* Runner.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE560965BD110016AC38 /* Runner.java */; };
+		33AF619A0965C54B00B514A9 /* TNode.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE430965BD110016AC38 /* TNode.java */; };
+		33AF619B0965C54B00B514A9 /* KeywordMap.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE640965BD110016AC38 /* KeywordMap.java */; };
+		33AF619C0965C54B00B514A9 /* ExtendedCommonASTWithHiddenTokens.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE390965BD110016AC38 /* ExtendedCommonASTWithHiddenTokens.java */; };
+		33AF619D0965C54B00B514A9 /* Sketch.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE5A0965BD110016AC38 /* Sketch.java */; };
+		33AF619E0965C54B00B514A9 /* WEmitterTokenTypes.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE470965BD110016AC38 /* WEmitterTokenTypes.java */; };
+		33AF619F0965C54B00B514A9 /* TNodeFactory.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE440965BD110016AC38 /* TNodeFactory.java */; };
+		33AF61A00965C54B00B514A9 /* Target.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE700965BD110016AC38 /* Target.java */; };
+		33AF61A10965C54B00B514A9 /* UpdateCheck.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE730965BD110016AC38 /* UpdateCheck.java */; };
+		33AF61A20965C54B00B514A9 /* InputHandler.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE620965BD110016AC38 /* InputHandler.java */; };
+		33AF61A30965C54B00B514A9 /* MessageConsumer.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE300965BD110016AC38 /* MessageConsumer.java */; };
+		33AF61A40965C54B00B514A9 /* WLexer.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE4A0965BD110016AC38 /* WLexer.java */; };
+		33AF61A50965C54B00B514A9 /* Compiler.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE260965BD100016AC38 /* Compiler.java */; };
+		33AF61A60965C54B00B514A9 /* AutoFormat.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE720965BD110016AC38 /* AutoFormat.java */; };
+		33AF61A70965C54B00B514A9 /* StdCLexer.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE3E0965BD110016AC38 /* StdCLexer.java */; };
+		33AF61A80965C54B00B514A9 /* StdCParser.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE400965BD110016AC38 /* StdCParser.java */; };
+		33AF61A90965C54B00B514A9 /* PdeKeywords.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE650965BD110016AC38 /* PdeKeywords.java */; };
+		33AF61AA0965C54B00B514A9 /* Editor.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE270965BD100016AC38 /* Editor.java */; };
+		33AF61AB0965C54B00B514A9 /* WEmitter.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE460965BD110016AC38 /* WEmitter.java */; };
+		33AF61AC0965C54B00B514A9 /* SwingWorker.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE5E0965BD110016AC38 /* SwingWorker.java */; };
+		33AF61AD0965C54B00B514A9 /* DefaultInputHandler.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE610965BD110016AC38 /* DefaultInputHandler.java */; };
+		33AF61AE0965C54B00B514A9 /* SyntaxDocument.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE680965BD110016AC38 /* SyntaxDocument.java */; };
+		33AF61AF0965C54B00B514A9 /* WLexerTokenTypes.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE4B0965BD110016AC38 /* WLexerTokenTypes.java */; };
+		33AF61B00965C54B00B514A9 /* Token.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE6E0965BD110016AC38 /* Token.java */; };
+		33AF61B10965C54B00B514A9 /* Preferences.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE330965BD110016AC38 /* Preferences.java */; };
+		33AF61B20965C54B00B514A9 /* PdeTextAreaDefaults.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE660965BD110016AC38 /* PdeTextAreaDefaults.java */; };
+		33AF61B30965C54B00B514A9 /* WTreeParser.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE520965BD110016AC38 /* WTreeParser.java */; };
+		33AF61B40965C54B00B514A9 /* JEditTextArea.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE630965BD110016AC38 /* JEditTextArea.java */; };
+		33AF61B50965C54B00B514A9 /* Base.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE240965BD100016AC38 /* Base.java */; };
+		33CF03B209662CB700F2C9A9 /* arduino.icns in Resources */ = {isa = PBXBuildFile; fileRef = 33CF03B009662CA800F2C9A9 /* arduino.icns */; };
+		33CF03CC09662DC000F2C9A9 /* mrj.jar in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33AF620C0965D67900B514A9 /* mrj.jar */; settings = {JAVA_ARCHIVE_SUBDIR = ../shared/lib; }; };
+		33CF03CD09662DC000F2C9A9 /* RXTXcomm.jar in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33AF620F0965D67A00B514A9 /* RXTXcomm.jar */; settings = {JAVA_ARCHIVE_SUBDIR = ../shared/lib; }; };
+		33CF03CE09662DC000F2C9A9 /* antlr.jar in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33AF620A0965D67800B514A9 /* antlr.jar */; settings = {JAVA_ARCHIVE_SUBDIR = ../shared/lib; }; };
+		33CF03CF09662DC000F2C9A9 /* registry.jar in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33AF620E0965D67A00B514A9 /* registry.jar */; settings = {JAVA_ARCHIVE_SUBDIR = ../shared/lib; }; };
+		33CF03D009662DC000F2C9A9 /* oro.jar in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33AF620D0965D67900B514A9 /* oro.jar */; settings = {JAVA_ARCHIVE_SUBDIR = ../shared/lib; }; };
+		33FF07020965BEE60016AC38 /* jikes in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FFFEB60965BD110016AC38 /* jikes */; };
+		33FF07050965BEE60016AC38 /* macosx_setup.command in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FFFEB90965BD110016AC38 /* macosx_setup.command */; };
+		33FF07100965BF8A0016AC38 /* burn.command in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FFFEAF0965BD110016AC38 /* burn.command */; };
+		33FF07150965BFC10016AC38 /* FTDIUSBSerialDriver_v2_0_1.dmg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FFFEB30965BD110016AC38 /* FTDIUSBSerialDriver_v2_0_1.dmg */; };
+		33FF07160965BFC10016AC38 /* KeyspanUSAdrvr20.dmg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FFFEB40965BD110016AC38 /* KeyspanUSAdrvr20.dmg */; };
+		33FF071F0965C1E30016AC38 /* about.jpg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF01DE0965BD160016AC38 /* about.jpg */; };
+		33FF07220965C1E30016AC38 /* buttons.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02770965BD160016AC38 /* buttons.gif */; };
+		33FF07230965C1E30016AC38 /* icon.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02780965BD160016AC38 /* icon.gif */; };
+		33FF07240965C1E30016AC38 /* keywords.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02790965BD160016AC38 /* keywords.txt */; };
+		33FF07250965C1E30016AC38 /* loading.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF027A0965BD160016AC38 /* loading.gif */; };
+		33FF07280965C1E30016AC38 /* preferences.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF027D0965BD160016AC38 /* preferences.txt */; };
+		33FF072A0965C1E30016AC38 /* resize.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF027F0965BD160016AC38 /* resize.gif */; };
+		33FF072C0965C1E30016AC38 /* tab-sel-left.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02810965BD160016AC38 /* tab-sel-left.gif */; };
+		33FF072D0965C1E30016AC38 /* tab-sel-menu.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02820965BD160016AC38 /* tab-sel-menu.gif */; };
+		33FF072E0965C1E30016AC38 /* tab-sel-mid.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02830965BD160016AC38 /* tab-sel-mid.gif */; };
+		33FF072F0965C1E30016AC38 /* tab-sel-right.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02840965BD160016AC38 /* tab-sel-right.gif */; };
+		33FF07300965C1E30016AC38 /* tab-unsel-left.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02850965BD160016AC38 /* tab-unsel-left.gif */; };
+		33FF07310965C1E30016AC38 /* tab-unsel-menu.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02860965BD160016AC38 /* tab-unsel-menu.gif */; };
+		33FF07320965C1E30016AC38 /* tab-unsel-mid.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02870965BD160016AC38 /* tab-unsel-mid.gif */; };
+		33FF07330965C1E30016AC38 /* tab-unsel-right.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02880965BD160016AC38 /* tab-unsel-right.gif */; };
+		33FF07360965C2590016AC38 /* ATmegaBOOT.hex in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FFFE790965BD110016AC38 /* ATmegaBOOT.hex */; };
+		33FF07D30965C2B10016AC38 /* avrlib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF07370965C2B10016AC38 /* avrlib */; };
+		33FF07FD0965C3560016AC38 /* targets in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF07D50965C3560016AC38 /* targets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXBuildStyle section */
+		33AF609C0965C4B700B514A9 /* Development */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = Development;
+		};
+		33AF609D0965C4B700B514A9 /* Deployment */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+			};
+			name = Deployment;
+		};
+/* End PBXBuildStyle section */
+
+/* Begin PBXContainerItemProxy section */
+		33AF61700965C51E00B514A9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 33FFFD3F0965B1E40016AC38 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 33FFFE1C0965BBEF0016AC38;
+			remoteInfo = Dist;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		33CF03C809662DA200F2C9A9 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 15;
+			files = (
+				33CF03CC09662DC000F2C9A9 /* mrj.jar in CopyFiles */,
+				33CF03CD09662DC000F2C9A9 /* RXTXcomm.jar in CopyFiles */,
+				33CF03CE09662DC000F2C9A9 /* antlr.jar in CopyFiles */,
+				33CF03CF09662DC000F2C9A9 /* registry.jar in CopyFiles */,
+				33CF03D009662DC000F2C9A9 /* oro.jar in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		33FF070C0965BF760016AC38 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = bootloader;
+			dstSubfolderSpec = 16;
+			files = (
+				33FF07360965C2590016AC38 /* ATmegaBOOT.hex in CopyFiles */,
+				33FF07100965BF8A0016AC38 /* burn.command in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		33FF07130965BFA80016AC38 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = drivers;
+			dstSubfolderSpec = 16;
+			files = (
+				33FF07150965BFC10016AC38 /* FTDIUSBSerialDriver_v2_0_1.dmg in CopyFiles */,
+				33FF07160965BFC10016AC38 /* KeyspanUSAdrvr20.dmg in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		33FF071D0965C1C20016AC38 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = lib;
+			dstSubfolderSpec = 16;
+			files = (
+				33FF07FD0965C3560016AC38 /* targets in CopyFiles */,
+				33FF07D30965C2B10016AC38 /* avrlib in CopyFiles */,
+				33FF071F0965C1E30016AC38 /* about.jpg in CopyFiles */,
+				33FF07220965C1E30016AC38 /* buttons.gif in CopyFiles */,
+				33FF07230965C1E30016AC38 /* icon.gif in CopyFiles */,
+				33FF07240965C1E30016AC38 /* keywords.txt in CopyFiles */,
+				33FF07250965C1E30016AC38 /* loading.gif in CopyFiles */,
+				33FF07280965C1E30016AC38 /* preferences.txt in CopyFiles */,
+				33FF072A0965C1E30016AC38 /* resize.gif in CopyFiles */,
+				33FF072C0965C1E30016AC38 /* tab-sel-left.gif in CopyFiles */,
+				33FF072D0965C1E30016AC38 /* tab-sel-menu.gif in CopyFiles */,
+				33FF072E0965C1E30016AC38 /* tab-sel-mid.gif in CopyFiles */,
+				33FF072F0965C1E30016AC38 /* tab-sel-right.gif in CopyFiles */,
+				33FF07300965C1E30016AC38 /* tab-unsel-left.gif in CopyFiles */,
+				33FF07310965C1E30016AC38 /* tab-unsel-menu.gif in CopyFiles */,
+				33FF07320965C1E30016AC38 /* tab-unsel-mid.gif in CopyFiles */,
+				33FF07330965C1E30016AC38 /* tab-unsel-right.gif in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		33FFFE1D0965BC050016AC38 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 16;
+			files = (
+				33FF07020965BEE60016AC38 /* jikes in CopyFiles */,
+				33FF07050965BEE60016AC38 /* macosx_setup.command in CopyFiles */,
+				330B21540968180400345666 /* librxtxSerial.jnilib in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		330B21530968180400345666 /* librxtxSerial.jnilib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = librxtxSerial.jnilib; sourceTree = "<group>"; };
+		33AF620A0965D67800B514A9 /* antlr.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = antlr.jar; sourceTree = "<group>"; };
+		33AF620B0965D67900B514A9 /* applet.html */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.html; path = applet.html; sourceTree = "<group>"; };
+		33AF620C0965D67900B514A9 /* mrj.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = mrj.jar; sourceTree = "<group>"; };
+		33AF620D0965D67900B514A9 /* oro.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = oro.jar; sourceTree = "<group>"; };
+		33AF620E0965D67A00B514A9 /* registry.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = registry.jar; sourceTree = "<group>"; };
+		33AF620F0965D67A00B514A9 /* RXTXcomm.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = RXTXcomm.jar; sourceTree = "<group>"; };
+		33CF03B009662CA800F2C9A9 /* arduino.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = arduino.icns; path = dist/arduino.icns; sourceTree = "<group>"; };
+		33DD8FB6096AC8DA0013AF8F /* Arduino.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Arduino.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		33FF01DC0965BD160016AC38 /* examples.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = examples.zip; sourceTree = "<group>"; };
+		33FF01DE0965BD160016AC38 /* about.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = about.jpg; sourceTree = "<group>"; };
+		33FF02770965BD160016AC38 /* buttons.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = buttons.gif; sourceTree = "<group>"; };
+		33FF02780965BD160016AC38 /* icon.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = icon.gif; sourceTree = "<group>"; };
+		33FF02790965BD160016AC38 /* keywords.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = keywords.txt; sourceTree = "<group>"; };
+		33FF027A0965BD160016AC38 /* loading.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = loading.gif; sourceTree = "<group>"; };
+		33FF027D0965BD160016AC38 /* preferences.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = preferences.txt; sourceTree = "<group>"; };
+		33FF027F0965BD160016AC38 /* resize.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = resize.gif; sourceTree = "<group>"; };
+		33FF02810965BD160016AC38 /* tab-sel-left.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "tab-sel-left.gif"; sourceTree = "<group>"; };
+		33FF02820965BD160016AC38 /* tab-sel-menu.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "tab-sel-menu.gif"; sourceTree = "<group>"; };
+		33FF02830965BD160016AC38 /* tab-sel-mid.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "tab-sel-mid.gif"; sourceTree = "<group>"; };
+		33FF02840965BD160016AC38 /* tab-sel-right.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "tab-sel-right.gif"; sourceTree = "<group>"; };
+		33FF02850965BD160016AC38 /* tab-unsel-left.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "tab-unsel-left.gif"; sourceTree = "<group>"; };
+		33FF02860965BD160016AC38 /* tab-unsel-menu.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "tab-unsel-menu.gif"; sourceTree = "<group>"; };
+		33FF02870965BD160016AC38 /* tab-unsel-mid.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "tab-unsel-mid.gif"; sourceTree = "<group>"; };
+		33FF02880965BD160016AC38 /* tab-unsel-right.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "tab-unsel-right.gif"; sourceTree = "<group>"; };
+		33FF028B0965BD160016AC38 /* run.bat */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = run.bat; sourceTree = "<group>"; };
+		33FF02900965BD160016AC38 /* .cvsignore */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = .cvsignore; sourceTree = "<group>"; };
+		33FF02920965BD160016AC38 /* avr_tools.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = avr_tools.zip; sourceTree = "<group>"; };
+		33FF02940965BD160016AC38 /* burn.bat */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = burn.bat; sourceTree = "<group>"; };
+		33FF02960965BD160016AC38 /* makefile.w2k */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = makefile.w2k; sourceTree = "<group>"; };
+		33FF02970965BD160016AC38 /* makefile.win */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = makefile.win; sourceTree = "<group>"; };
+		33FF02990965BD160016AC38 /* FTDI USB Drivers.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = "FTDI USB Drivers.zip"; sourceTree = "<group>"; };
+		33FF029A0965BD160016AC38 /* KeyspanUSA19wWinV31.exe */ = {isa = PBXFileReference; lastKnownFileType = file; path = KeyspanUSA19wWinV31.exe; sourceTree = "<group>"; };
+		33FF029B0965BD160016AC38 /* ICE_JNIRegistry.dll */ = {isa = PBXFileReference; lastKnownFileType = file; path = ICE_JNIRegistry.dll; sourceTree = "<group>"; };
+		33FF029C0965BD160016AC38 /* jikes.exe */ = {isa = PBXFileReference; lastKnownFileType = file; path = jikes.exe; sourceTree = "<group>"; };
+		33FF029E0965BD170016AC38 /* makefile.w2k */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = makefile.w2k; sourceTree = "<group>"; };
+		33FF029F0965BD170016AC38 /* makefile.win */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = makefile.win; sourceTree = "<group>"; };
+		33FF02A00965BD170016AC38 /* run-expert.bat */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = "run-expert.bat"; sourceTree = "<group>"; };
+		33FF02A10965BD170016AC38 /* run.bat */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = run.bat; sourceTree = "<group>"; };
+		33FF02A20965BD170016AC38 /* rxtxSerial.dll */ = {isa = PBXFileReference; lastKnownFileType = file; path = rxtxSerial.dll; sourceTree = "<group>"; };
+		33FF02A40965BD170016AC38 /* dist.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = dist.sh; sourceTree = "<group>"; };
+		33FF02A50965BD170016AC38 /* jre.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = jre.zip; sourceTree = "<group>"; };
+		33FF02A70965BD170016AC38 /* .cvsignore */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = .cvsignore; sourceTree = "<group>"; };
+		33FF02A80965BD170016AC38 /* application.ico */ = {isa = PBXFileReference; lastKnownFileType = image.ico; path = application.ico; sourceTree = "<group>"; };
+		33FF02A90965BD170016AC38 /* document.ico */ = {isa = PBXFileReference; lastKnownFileType = image.ico; path = document.ico; sourceTree = "<group>"; };
+		33FF02AA0965BD170016AC38 /* launcher.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = launcher.cpp; sourceTree = "<group>"; };
+		33FF02AB0965BD170016AC38 /* launcher.rc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = launcher.rc; sourceTree = "<group>"; };
+		33FF02AC0965BD170016AC38 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		33FF02AE0965BD170016AC38 /* make.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = make.sh; sourceTree = "<group>"; };
+		33FF02AF0965BD170016AC38 /* run.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = run.sh; sourceTree = "<group>"; };
+		33FF02B00965BD170016AC38 /* srun.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = srun.sh; sourceTree = "<group>"; };
+		33FF02B60965BD170016AC38 /* license.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = license.txt; path = ../../license.txt; sourceTree = SOURCE_ROOT; };
+		33FF02B70965BD170016AC38 /* readme.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = readme.txt; path = ../../readme.txt; sourceTree = SOURCE_ROOT; };
+		33FF02DC0965BD170016AC38 /* todo.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = todo.txt; path = ../../todo.txt; sourceTree = SOURCE_ROOT; };
+		33FF07370965C2B10016AC38 /* avrlib */ = {isa = PBXFileReference; lastKnownFileType = folder; path = avrlib; sourceTree = "<group>"; };
+		33FF07D50965C3560016AC38 /* targets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = targets; path = ../../targets; sourceTree = SOURCE_ROOT; };
+		33FFFE240965BD100016AC38 /* Base.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = Base.java; sourceTree = "<group>"; };
+		33FFFE260965BD100016AC38 /* Compiler.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = Compiler.java; sourceTree = "<group>"; };
+		33FFFE270965BD100016AC38 /* Editor.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = Editor.java; sourceTree = "<group>"; };
+		33FFFE280965BD100016AC38 /* EditorButtons.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = EditorButtons.java; sourceTree = "<group>"; };
+		33FFFE290965BD110016AC38 /* EditorConsole.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = EditorConsole.java; sourceTree = "<group>"; };
+		33FFFE2A0965BD110016AC38 /* EditorHeader.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = EditorHeader.java; sourceTree = "<group>"; };
+		33FFFE2B0965BD110016AC38 /* EditorLineStatus.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = EditorLineStatus.java; sourceTree = "<group>"; };
+		33FFFE2C0965BD110016AC38 /* EditorListener.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = EditorListener.java; sourceTree = "<group>"; };
+		33FFFE2D0965BD110016AC38 /* EditorStatus.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = EditorStatus.java; sourceTree = "<group>"; };
+		33FFFE2E0965BD110016AC38 /* FindReplace.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = FindReplace.java; sourceTree = "<group>"; };
+		33FFFE300965BD110016AC38 /* MessageConsumer.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = MessageConsumer.java; sourceTree = "<group>"; };
+		33FFFE310965BD110016AC38 /* MessageSiphon.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = MessageSiphon.java; sourceTree = "<group>"; };
+		33FFFE320965BD110016AC38 /* MessageStream.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = MessageStream.java; sourceTree = "<group>"; };
+		33FFFE330965BD110016AC38 /* Preferences.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = Preferences.java; sourceTree = "<group>"; };
+		33FFFE350965BD110016AC38 /* CSymbolTable.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = CSymbolTable.java; sourceTree = "<group>"; };
+		33FFFE360965BD110016AC38 /* CToken.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = CToken.java; sourceTree = "<group>"; };
+		33FFFE370965BD110016AC38 /* expandedWEmitter.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = expandedWEmitter.g; sourceTree = "<group>"; };
+		33FFFE380965BD110016AC38 /* expandedWParser.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = expandedWParser.g; sourceTree = "<group>"; };
+		33FFFE390965BD110016AC38 /* ExtendedCommonASTWithHiddenTokens.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = ExtendedCommonASTWithHiddenTokens.java; sourceTree = "<group>"; };
+		33FFFE3A0965BD110016AC38 /* LineObject.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = LineObject.java; sourceTree = "<group>"; };
+		33FFFE3B0965BD110016AC38 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		33FFFE3C0965BD110016AC38 /* PdePreprocessor.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = PdePreprocessor.java; sourceTree = "<group>"; };
+		33FFFE3D0965BD110016AC38 /* PreprocessorInfoChannel.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = PreprocessorInfoChannel.java; sourceTree = "<group>"; };
+		33FFFE3E0965BD110016AC38 /* StdCLexer.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = StdCLexer.java; sourceTree = "<group>"; };
+		33FFFE3F0965BD110016AC38 /* StdCParser.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = StdCParser.g; sourceTree = "<group>"; };
+		33FFFE400965BD110016AC38 /* StdCParser.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = StdCParser.java; sourceTree = "<group>"; };
+		33FFFE410965BD110016AC38 /* STDCTokenTypes.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = STDCTokenTypes.java; sourceTree = "<group>"; };
+		33FFFE420965BD110016AC38 /* STDCTokenTypes.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = STDCTokenTypes.txt; sourceTree = "<group>"; };
+		33FFFE430965BD110016AC38 /* TNode.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = TNode.java; sourceTree = "<group>"; };
+		33FFFE440965BD110016AC38 /* TNodeFactory.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = TNodeFactory.java; sourceTree = "<group>"; };
+		33FFFE450965BD110016AC38 /* WEmitter.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = WEmitter.g; sourceTree = "<group>"; };
+		33FFFE460965BD110016AC38 /* WEmitter.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = WEmitter.java; sourceTree = "<group>"; };
+		33FFFE470965BD110016AC38 /* WEmitterTokenTypes.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = WEmitterTokenTypes.java; sourceTree = "<group>"; };
+		33FFFE480965BD110016AC38 /* WEmitterTokenTypes.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = WEmitterTokenTypes.txt; sourceTree = "<group>"; };
+		33FFFE490965BD110016AC38 /* whitespace_test.pde */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = whitespace_test.pde; sourceTree = "<group>"; };
+		33FFFE4A0965BD110016AC38 /* WLexer.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = WLexer.java; sourceTree = "<group>"; };
+		33FFFE4B0965BD110016AC38 /* WLexerTokenTypes.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = WLexerTokenTypes.java; sourceTree = "<group>"; };
+		33FFFE4C0965BD110016AC38 /* WLexerTokenTypes.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = WLexerTokenTypes.txt; sourceTree = "<group>"; };
+		33FFFE4D0965BD110016AC38 /* WParser.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = WParser.g; sourceTree = "<group>"; };
+		33FFFE4E0965BD110016AC38 /* WParser.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = WParser.java; sourceTree = "<group>"; };
+		33FFFE4F0965BD110016AC38 /* WTokenTypes.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = WTokenTypes.java; sourceTree = "<group>"; };
+		33FFFE500965BD110016AC38 /* WTokenTypes.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = WTokenTypes.txt; sourceTree = "<group>"; };
+		33FFFE510965BD110016AC38 /* WTreeParser.g */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = WTreeParser.g; sourceTree = "<group>"; };
+		33FFFE520965BD110016AC38 /* WTreeParser.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = WTreeParser.java; sourceTree = "<group>"; };
+		33FFFE530965BD110016AC38 /* WTreeParserTokenTypes.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = WTreeParserTokenTypes.java; sourceTree = "<group>"; };
+		33FFFE540965BD110016AC38 /* WTreeParserTokenTypes.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = WTreeParserTokenTypes.txt; sourceTree = "<group>"; };
+		33FFFE550965BD110016AC38 /* PresentMode.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = PresentMode.java; sourceTree = "<group>"; };
+		33FFFE560965BD110016AC38 /* Runner.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = Runner.java; sourceTree = "<group>"; };
+		33FFFE570965BD110016AC38 /* RunnerClassLoader.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = RunnerClassLoader.java; sourceTree = "<group>"; };
+		33FFFE580965BD110016AC38 /* RunnerException.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = RunnerException.java; sourceTree = "<group>"; };
+		33FFFE590965BD110016AC38 /* Serial.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = Serial.java; sourceTree = "<group>"; };
+		33FFFE5A0965BD110016AC38 /* Sketch.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = Sketch.java; sourceTree = "<group>"; };
+		33FFFE5B0965BD110016AC38 /* Sketchbook.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = Sketchbook.java; sourceTree = "<group>"; };
+		33FFFE5C0965BD110016AC38 /* SketchCode.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = SketchCode.java; sourceTree = "<group>"; };
+		33FFFE5D0965BD110016AC38 /* SketchHistory.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = SketchHistory.java; sourceTree = "<group>"; };
+		33FFFE5E0965BD110016AC38 /* SwingWorker.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = SwingWorker.java; sourceTree = "<group>"; };
+		33FFFE600965BD110016AC38 /* CTokenMarker.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = CTokenMarker.java; sourceTree = "<group>"; };
+		33FFFE610965BD110016AC38 /* DefaultInputHandler.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = DefaultInputHandler.java; sourceTree = "<group>"; };
+		33FFFE620965BD110016AC38 /* InputHandler.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = InputHandler.java; sourceTree = "<group>"; };
+		33FFFE630965BD110016AC38 /* JEditTextArea.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = JEditTextArea.java; sourceTree = "<group>"; };
+		33FFFE640965BD110016AC38 /* KeywordMap.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = KeywordMap.java; sourceTree = "<group>"; };
+		33FFFE650965BD110016AC38 /* PdeKeywords.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = PdeKeywords.java; sourceTree = "<group>"; };
+		33FFFE660965BD110016AC38 /* PdeTextAreaDefaults.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = PdeTextAreaDefaults.java; sourceTree = "<group>"; };
+		33FFFE670965BD110016AC38 /* readme.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = readme.txt; sourceTree = "<group>"; };
+		33FFFE680965BD110016AC38 /* SyntaxDocument.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = SyntaxDocument.java; sourceTree = "<group>"; };
+		33FFFE690965BD110016AC38 /* SyntaxStyle.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = SyntaxStyle.java; sourceTree = "<group>"; };
+		33FFFE6A0965BD110016AC38 /* SyntaxUtilities.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = SyntaxUtilities.java; sourceTree = "<group>"; };
+		33FFFE6B0965BD110016AC38 /* TextAreaDefaults.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = TextAreaDefaults.java; sourceTree = "<group>"; };
+		33FFFE6C0965BD110016AC38 /* TextAreaPainter.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = TextAreaPainter.java; sourceTree = "<group>"; };
+		33FFFE6D0965BD110016AC38 /* TextUtilities.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = TextUtilities.java; sourceTree = "<group>"; };
+		33FFFE6E0965BD110016AC38 /* Token.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = Token.java; sourceTree = "<group>"; };
+		33FFFE6F0965BD110016AC38 /* TokenMarker.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = TokenMarker.java; sourceTree = "<group>"; };
+		33FFFE700965BD110016AC38 /* Target.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = Target.java; sourceTree = "<group>"; };
+		33FFFE720965BD110016AC38 /* AutoFormat.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = AutoFormat.java; sourceTree = "<group>"; };
+		33FFFE730965BD110016AC38 /* UpdateCheck.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = UpdateCheck.java; sourceTree = "<group>"; };
+		33FFFE740965BD110016AC38 /* Uploader.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = Uploader.java; sourceTree = "<group>"; };
+		33FFFE770965BD110016AC38 /* ATmegaBOOT.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = ATmegaBOOT.c; sourceTree = "<group>"; };
+		33FFFE790965BD110016AC38 /* ATmegaBOOT.hex */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = ATmegaBOOT.hex; sourceTree = "<group>"; };
+		33FFFE7F0965BD110016AC38 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		33FFFE810965BD110016AC38 /* howto.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = howto.txt; sourceTree = "<group>"; };
+		33FFFE830965BD110016AC38 /* .cvsignore */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = .cvsignore; sourceTree = "<group>"; };
+		33FFFE850965BD110016AC38 /* .cvsignore */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = .cvsignore; sourceTree = "<group>"; };
+		33FFFE860965BD110016AC38 /* arduino */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = arduino; sourceTree = "<group>"; };
+		33FFFE880965BD110016AC38 /* burn */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = burn; sourceTree = "<group>"; };
+		33FFFE8A0965BD110016AC38 /* librxtxI2C.so */ = {isa = PBXFileReference; lastKnownFileType = file; path = librxtxI2C.so; sourceTree = "<group>"; };
+		33FFFE8B0965BD110016AC38 /* librxtxParallel.so */ = {isa = PBXFileReference; lastKnownFileType = file; path = librxtxParallel.so; sourceTree = "<group>"; };
+		33FFFE8C0965BD110016AC38 /* librxtxRaw.so */ = {isa = PBXFileReference; lastKnownFileType = file; path = librxtxRaw.so; sourceTree = "<group>"; };
+		33FFFE8D0965BD110016AC38 /* librxtxRS485.so */ = {isa = PBXFileReference; lastKnownFileType = file; path = librxtxRS485.so; sourceTree = "<group>"; };
+		33FFFE8E0965BD110016AC38 /* librxtxSerial.so */ = {isa = PBXFileReference; lastKnownFileType = file; path = librxtxSerial.so; sourceTree = "<group>"; };
+		33FFFE8F0965BD110016AC38 /* dist.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = dist.sh; sourceTree = "<group>"; };
+		33FFFE900965BD110016AC38 /* make.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = make.sh; sourceTree = "<group>"; };
+		33FFFE910965BD110016AC38 /* run.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = run.sh; sourceTree = "<group>"; };
+		33FFFE930965BD110016AC38 /* .cvsignore */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = .cvsignore; sourceTree = "<group>"; };
+		33FFFE940965BD110016AC38 /* Arduino.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Arduino.xcodeproj; sourceTree = "<group>"; };
+		33FFFEAF0965BD110016AC38 /* burn.command */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = burn.command; sourceTree = "<group>"; };
+		33FFFEB30965BD110016AC38 /* FTDIUSBSerialDriver_v2_0_1.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = FTDIUSBSerialDriver_v2_0_1.dmg; sourceTree = "<group>"; };
+		33FFFEB40965BD110016AC38 /* KeyspanUSAdrvr20.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = KeyspanUSAdrvr20.dmg; sourceTree = "<group>"; };
+		33FFFEB50965BD110016AC38 /* DS_Store */ = {isa = PBXFileReference; lastKnownFileType = file; path = DS_Store; sourceTree = "<group>"; };
+		33FFFEB60965BD110016AC38 /* jikes */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = jikes; sourceTree = "<group>"; };
+		33FFFEB90965BD110016AC38 /* macosx_setup.command */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = macosx_setup.command; sourceTree = "<group>"; };
+		33FFFEBC0965BD110016AC38 /* tools.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = tools.zip; sourceTree = "<group>"; };
+		33FFFEBD0965BD110016AC38 /* dist.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = dist.sh; sourceTree = "<group>"; };
+		33FFFEBE0965BD110016AC38 /* make.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = make.sh; sourceTree = "<group>"; };
+		33FFFEBF0965BD110016AC38 /* mkdmg */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = mkdmg; sourceTree = "<group>"; };
+		33FFFEC00965BD110016AC38 /* run.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = run.sh; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		33AF61670965C4C600B514A9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		33FF01DA0965BD160016AC38 /* shared */ = {
+			isa = PBXGroup;
+			children = (
+				33FF01DB0965BD160016AC38 /* dist */,
+				33FF01DD0965BD160016AC38 /* lib */,
+				33FF02890965BD160016AC38 /* reference */,
+				33FF028B0965BD160016AC38 /* run.bat */,
+				33FF028C0965BD160016AC38 /* sketchbook */,
+			);
+			path = shared;
+			sourceTree = "<group>";
+		};
+		33FF01DB0965BD160016AC38 /* dist */ = {
+			isa = PBXGroup;
+			children = (
+				33FF01DC0965BD160016AC38 /* examples.zip */,
+			);
+			path = dist;
+			sourceTree = "<group>";
+		};
+		33FF01DD0965BD160016AC38 /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				33AF620A0965D67800B514A9 /* antlr.jar */,
+				33AF620B0965D67900B514A9 /* applet.html */,
+				33AF620C0965D67900B514A9 /* mrj.jar */,
+				33AF620D0965D67900B514A9 /* oro.jar */,
+				33AF620E0965D67A00B514A9 /* registry.jar */,
+				33AF620F0965D67A00B514A9 /* RXTXcomm.jar */,
+				33FF07370965C2B10016AC38 /* avrlib */,
+				33FF01DE0965BD160016AC38 /* about.jpg */,
+				33FF02770965BD160016AC38 /* buttons.gif */,
+				33FF02780965BD160016AC38 /* icon.gif */,
+				33FF02790965BD160016AC38 /* keywords.txt */,
+				33FF027A0965BD160016AC38 /* loading.gif */,
+				33FF027D0965BD160016AC38 /* preferences.txt */,
+				33FF027F0965BD160016AC38 /* resize.gif */,
+				33FF02810965BD160016AC38 /* tab-sel-left.gif */,
+				33FF02820965BD160016AC38 /* tab-sel-menu.gif */,
+				33FF02830965BD160016AC38 /* tab-sel-mid.gif */,
+				33FF02840965BD160016AC38 /* tab-sel-right.gif */,
+				33FF02850965BD160016AC38 /* tab-unsel-left.gif */,
+				33FF02860965BD160016AC38 /* tab-unsel-menu.gif */,
+				33FF02870965BD160016AC38 /* tab-unsel-mid.gif */,
+				33FF02880965BD160016AC38 /* tab-unsel-right.gif */,
+			);
+			path = lib;
+			sourceTree = "<group>";
+		};
+		33FF02890965BD160016AC38 /* reference */ = {
+			isa = PBXGroup;
+			children = (
+				33FF028A0965BD160016AC38 /* images */,
+			);
+			path = reference;
+			sourceTree = "<group>";
+		};
+		33FF028A0965BD160016AC38 /* images */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = images;
+			sourceTree = "<group>";
+		};
+		33FF028C0965BD160016AC38 /* sketchbook */ = {
+			isa = PBXGroup;
+			children = (
+				33FF028D0965BD160016AC38 /* default */,
+				33FF028E0965BD160016AC38 /* examples */,
+			);
+			path = sketchbook;
+			sourceTree = "<group>";
+		};
+		33FF028D0965BD160016AC38 /* default */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = default;
+			sourceTree = "<group>";
+		};
+		33FF028E0965BD160016AC38 /* examples */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = examples;
+			sourceTree = "<group>";
+		};
+		33FF028F0965BD160016AC38 /* windows */ = {
+			isa = PBXGroup;
+			children = (
+				33FF02900965BD160016AC38 /* .cvsignore */,
+				33FF02910965BD160016AC38 /* dist */,
+				33FF02A40965BD170016AC38 /* dist.sh */,
+				33FF02A50965BD170016AC38 /* jre.zip */,
+				33FF02A60965BD170016AC38 /* launcher */,
+				33FF02AE0965BD170016AC38 /* make.sh */,
+				33FF02AF0965BD170016AC38 /* run.sh */,
+				33FF02B00965BD170016AC38 /* srun.sh */,
+			);
+			path = windows;
+			sourceTree = "<group>";
+		};
+		33FF02910965BD160016AC38 /* dist */ = {
+			isa = PBXGroup;
+			children = (
+				33FF02920965BD160016AC38 /* avr_tools.zip */,
+				33FF02930965BD160016AC38 /* bootloader */,
+				33FF02950965BD160016AC38 /* core */,
+				33FF02980965BD160016AC38 /* drivers */,
+				33FF029B0965BD160016AC38 /* ICE_JNIRegistry.dll */,
+				33FF029C0965BD160016AC38 /* jikes.exe */,
+				33FF029D0965BD160016AC38 /* lib */,
+				33FF02A00965BD170016AC38 /* run-expert.bat */,
+				33FF02A10965BD170016AC38 /* run.bat */,
+				33FF02A20965BD170016AC38 /* rxtxSerial.dll */,
+				33FF02A30965BD170016AC38 /* serial */,
+			);
+			path = dist;
+			sourceTree = "<group>";
+		};
+		33FF02930965BD160016AC38 /* bootloader */ = {
+			isa = PBXGroup;
+			children = (
+				33FF02940965BD160016AC38 /* burn.bat */,
+			);
+			path = bootloader;
+			sourceTree = "<group>";
+		};
+		33FF02950965BD160016AC38 /* core */ = {
+			isa = PBXGroup;
+			children = (
+				33FF02960965BD160016AC38 /* makefile.w2k */,
+				33FF02970965BD160016AC38 /* makefile.win */,
+			);
+			path = core;
+			sourceTree = "<group>";
+		};
+		33FF02980965BD160016AC38 /* drivers */ = {
+			isa = PBXGroup;
+			children = (
+				33FF02990965BD160016AC38 /* FTDI USB Drivers.zip */,
+				33FF029A0965BD160016AC38 /* KeyspanUSA19wWinV31.exe */,
+			);
+			path = drivers;
+			sourceTree = "<group>";
+		};
+		33FF029D0965BD160016AC38 /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				33FF029E0965BD170016AC38 /* makefile.w2k */,
+				33FF029F0965BD170016AC38 /* makefile.win */,
+			);
+			path = lib;
+			sourceTree = "<group>";
+		};
+		33FF02A30965BD170016AC38 /* serial */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = serial;
+			sourceTree = "<group>";
+		};
+		33FF02A60965BD170016AC38 /* launcher */ = {
+			isa = PBXGroup;
+			children = (
+				33FF02A70965BD170016AC38 /* .cvsignore */,
+				33FF02A80965BD170016AC38 /* application.ico */,
+				33FF02A90965BD170016AC38 /* document.ico */,
+				33FF02AA0965BD170016AC38 /* launcher.cpp */,
+				33FF02AB0965BD170016AC38 /* launcher.rc */,
+				33FF02AC0965BD170016AC38 /* Makefile */,
+				33FF02AD0965BD170016AC38 /* res */,
+			);
+			path = launcher;
+			sourceTree = "<group>";
+		};
+		33FF02AD0965BD170016AC38 /* res */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = res;
+			sourceTree = "<group>";
+		};
+		33FFFD3D0965B1E40016AC38 = {
+			isa = PBXGroup;
+			children = (
+				33CF03B009662CA800F2C9A9 /* arduino.icns */,
+				33FF07D50965C3560016AC38 /* targets */,
+				33FFFE220965BD100016AC38 /* app */,
+				33FFFE750965BD110016AC38 /* bootloader */,
+				33FFFE800965BD110016AC38 /* build */,
+				33FF02B60965BD170016AC38 /* license.txt */,
+				33FF02B70965BD170016AC38 /* readme.txt */,
+				33FF02DC0965BD170016AC38 /* todo.txt */,
+				33DD8FB6096AC8DA0013AF8F /* Arduino.app */,
+			);
+			sourceTree = "<group>";
+		};
+		33FFFE220965BD100016AC38 /* app */ = {
+			isa = PBXGroup;
+			children = (
+				33FFFE240965BD100016AC38 /* Base.java */,
+				33FFFE260965BD100016AC38 /* Compiler.java */,
+				33FFFE270965BD100016AC38 /* Editor.java */,
+				33FFFE280965BD100016AC38 /* EditorButtons.java */,
+				33FFFE290965BD110016AC38 /* EditorConsole.java */,
+				33FFFE2A0965BD110016AC38 /* EditorHeader.java */,
+				33FFFE2B0965BD110016AC38 /* EditorLineStatus.java */,
+				33FFFE2C0965BD110016AC38 /* EditorListener.java */,
+				33FFFE2D0965BD110016AC38 /* EditorStatus.java */,
+				33FFFE2E0965BD110016AC38 /* FindReplace.java */,
+				33FFFE2F0965BD110016AC38 /* language */,
+				33FFFE300965BD110016AC38 /* MessageConsumer.java */,
+				33FFFE310965BD110016AC38 /* MessageSiphon.java */,
+				33FFFE320965BD110016AC38 /* MessageStream.java */,
+				33FFFE330965BD110016AC38 /* Preferences.java */,
+				33FFFE340965BD110016AC38 /* preproc */,
+				33FFFE550965BD110016AC38 /* PresentMode.java */,
+				33FFFE560965BD110016AC38 /* Runner.java */,
+				33FFFE570965BD110016AC38 /* RunnerClassLoader.java */,
+				33FFFE580965BD110016AC38 /* RunnerException.java */,
+				33FFFE590965BD110016AC38 /* Serial.java */,
+				33FFFE5A0965BD110016AC38 /* Sketch.java */,
+				33FFFE5B0965BD110016AC38 /* Sketchbook.java */,
+				33FFFE5C0965BD110016AC38 /* SketchCode.java */,
+				33FFFE5D0965BD110016AC38 /* SketchHistory.java */,
+				33FFFE5E0965BD110016AC38 /* SwingWorker.java */,
+				33FFFE5F0965BD110016AC38 /* syntax */,
+				33FFFE700965BD110016AC38 /* Target.java */,
+				33FFFE710965BD110016AC38 /* tools */,
+				33FFFE730965BD110016AC38 /* UpdateCheck.java */,
+				33FFFE740965BD110016AC38 /* Uploader.java */,
+			);
+			name = app;
+			path = ../../app;
+			sourceTree = SOURCE_ROOT;
+		};
+		33FFFE2F0965BD110016AC38 /* language */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = language;
+			sourceTree = "<group>";
+		};
+		33FFFE340965BD110016AC38 /* preproc */ = {
+			isa = PBXGroup;
+			children = (
+				33FFFE350965BD110016AC38 /* CSymbolTable.java */,
+				33FFFE360965BD110016AC38 /* CToken.java */,
+				33FFFE370965BD110016AC38 /* expandedWEmitter.g */,
+				33FFFE380965BD110016AC38 /* expandedWParser.g */,
+				33FFFE390965BD110016AC38 /* ExtendedCommonASTWithHiddenTokens.java */,
+				33FFFE3A0965BD110016AC38 /* LineObject.java */,
+				33FFFE3B0965BD110016AC38 /* Makefile */,
+				33FFFE3C0965BD110016AC38 /* PdePreprocessor.java */,
+				33FFFE3D0965BD110016AC38 /* PreprocessorInfoChannel.java */,
+				33FFFE3E0965BD110016AC38 /* StdCLexer.java */,
+				33FFFE3F0965BD110016AC38 /* StdCParser.g */,
+				33FFFE400965BD110016AC38 /* StdCParser.java */,
+				33FFFE410965BD110016AC38 /* STDCTokenTypes.java */,
+				33FFFE420965BD110016AC38 /* STDCTokenTypes.txt */,
+				33FFFE430965BD110016AC38 /* TNode.java */,
+				33FFFE440965BD110016AC38 /* TNodeFactory.java */,
+				33FFFE450965BD110016AC38 /* WEmitter.g */,
+				33FFFE460965BD110016AC38 /* WEmitter.java */,
+				33FFFE470965BD110016AC38 /* WEmitterTokenTypes.java */,
+				33FFFE480965BD110016AC38 /* WEmitterTokenTypes.txt */,
+				33FFFE490965BD110016AC38 /* whitespace_test.pde */,
+				33FFFE4A0965BD110016AC38 /* WLexer.java */,
+				33FFFE4B0965BD110016AC38 /* WLexerTokenTypes.java */,
+				33FFFE4C0965BD110016AC38 /* WLexerTokenTypes.txt */,
+				33FFFE4D0965BD110016AC38 /* WParser.g */,
+				33FFFE4E0965BD110016AC38 /* WParser.java */,
+				33FFFE4F0965BD110016AC38 /* WTokenTypes.java */,
+				33FFFE500965BD110016AC38 /* WTokenTypes.txt */,
+				33FFFE510965BD110016AC38 /* WTreeParser.g */,
+				33FFFE520965BD110016AC38 /* WTreeParser.java */,
+				33FFFE530965BD110016AC38 /* WTreeParserTokenTypes.java */,
+				33FFFE540965BD110016AC38 /* WTreeParserTokenTypes.txt */,
+			);
+			path = preproc;
+			sourceTree = "<group>";
+		};
+		33FFFE5F0965BD110016AC38 /* syntax */ = {
+			isa = PBXGroup;
+			children = (
+				33FFFE600965BD110016AC38 /* CTokenMarker.java */,
+				33FFFE610965BD110016AC38 /* DefaultInputHandler.java */,
+				33FFFE620965BD110016AC38 /* InputHandler.java */,
+				33FFFE630965BD110016AC38 /* JEditTextArea.java */,
+				33FFFE640965BD110016AC38 /* KeywordMap.java */,
+				33FFFE650965BD110016AC38 /* PdeKeywords.java */,
+				33FFFE660965BD110016AC38 /* PdeTextAreaDefaults.java */,
+				33FFFE670965BD110016AC38 /* readme.txt */,
+				33FFFE680965BD110016AC38 /* SyntaxDocument.java */,
+				33FFFE690965BD110016AC38 /* SyntaxStyle.java */,
+				33FFFE6A0965BD110016AC38 /* SyntaxUtilities.java */,
+				33FFFE6B0965BD110016AC38 /* TextAreaDefaults.java */,
+				33FFFE6C0965BD110016AC38 /* TextAreaPainter.java */,
+				33FFFE6D0965BD110016AC38 /* TextUtilities.java */,
+				33FFFE6E0965BD110016AC38 /* Token.java */,
+				33FFFE6F0965BD110016AC38 /* TokenMarker.java */,
+			);
+			path = syntax;
+			sourceTree = "<group>";
+		};
+		33FFFE710965BD110016AC38 /* tools */ = {
+			isa = PBXGroup;
+			children = (
+				33FFFE720965BD110016AC38 /* AutoFormat.java */,
+			);
+			path = tools;
+			sourceTree = "<group>";
+		};
+		33FFFE750965BD110016AC38 /* bootloader */ = {
+			isa = PBXGroup;
+			children = (
+				33FFFE770965BD110016AC38 /* ATmegaBOOT.c */,
+				33FFFE790965BD110016AC38 /* ATmegaBOOT.hex */,
+				33FFFE7F0965BD110016AC38 /* Makefile */,
+			);
+			name = bootloader;
+			path = ../../bootloader;
+			sourceTree = SOURCE_ROOT;
+		};
+		33FFFE800965BD110016AC38 /* build */ = {
+			isa = PBXGroup;
+			children = (
+				33FFFE810965BD110016AC38 /* howto.txt */,
+				33FFFE820965BD110016AC38 /* linux */,
+				33FFFE920965BD110016AC38 /* macosx */,
+				33FF01DA0965BD160016AC38 /* shared */,
+				33FF028F0965BD160016AC38 /* windows */,
+			);
+			name = build;
+			path = ..;
+			sourceTree = SOURCE_ROOT;
+		};
+		33FFFE820965BD110016AC38 /* linux */ = {
+			isa = PBXGroup;
+			children = (
+				33FFFE830965BD110016AC38 /* .cvsignore */,
+				33FFFE840965BD110016AC38 /* dist */,
+				33FFFE8F0965BD110016AC38 /* dist.sh */,
+				33FFFE900965BD110016AC38 /* make.sh */,
+				33FFFE910965BD110016AC38 /* run.sh */,
+			);
+			path = linux;
+			sourceTree = "<group>";
+		};
+		33FFFE840965BD110016AC38 /* dist */ = {
+			isa = PBXGroup;
+			children = (
+				33FFFE850965BD110016AC38 /* .cvsignore */,
+				33FFFE860965BD110016AC38 /* arduino */,
+				33FFFE870965BD110016AC38 /* bootloader */,
+				33FFFE890965BD110016AC38 /* lib */,
+			);
+			path = dist;
+			sourceTree = "<group>";
+		};
+		33FFFE870965BD110016AC38 /* bootloader */ = {
+			isa = PBXGroup;
+			children = (
+				33FFFE880965BD110016AC38 /* burn */,
+			);
+			path = bootloader;
+			sourceTree = "<group>";
+		};
+		33FFFE890965BD110016AC38 /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				33FFFE8A0965BD110016AC38 /* librxtxI2C.so */,
+				33FFFE8B0965BD110016AC38 /* librxtxParallel.so */,
+				33FFFE8C0965BD110016AC38 /* librxtxRaw.so */,
+				33FFFE8D0965BD110016AC38 /* librxtxRS485.so */,
+				33FFFE8E0965BD110016AC38 /* librxtxSerial.so */,
+			);
+			path = lib;
+			sourceTree = "<group>";
+		};
+		33FFFE920965BD110016AC38 /* macosx */ = {
+			isa = PBXGroup;
+			children = (
+				33FFFE930965BD110016AC38 /* .cvsignore */,
+				33FFFE940965BD110016AC38 /* Arduino.xcodeproj */,
+				33FFFEAC0965BD110016AC38 /* dist */,
+				33FFFEBD0965BD110016AC38 /* dist.sh */,
+				33FFFEBE0965BD110016AC38 /* make.sh */,
+				33FFFEBF0965BD110016AC38 /* mkdmg */,
+				33FFFEC00965BD110016AC38 /* run.sh */,
+			);
+			path = macosx;
+			sourceTree = "<group>";
+		};
+		33FFFE950965BD110016AC38 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		33FFFEAC0965BD110016AC38 /* dist */ = {
+			isa = PBXGroup;
+			children = (
+				330B21530968180400345666 /* librxtxSerial.jnilib */,
+				33FFFEAE0965BD110016AC38 /* bootloader */,
+				33FFFEB20965BD110016AC38 /* drivers */,
+				33FFFEB50965BD110016AC38 /* DS_Store */,
+				33FFFEB60965BD110016AC38 /* jikes */,
+				33FFFEB90965BD110016AC38 /* macosx_setup.command */,
+				33FFFEBA0965BD110016AC38 /* serial */,
+				33FFFEBC0965BD110016AC38 /* tools.zip */,
+			);
+			path = dist;
+			sourceTree = "<group>";
+		};
+		33FFFEAE0965BD110016AC38 /* bootloader */ = {
+			isa = PBXGroup;
+			children = (
+				33FFFEAF0965BD110016AC38 /* burn.command */,
+			);
+			path = bootloader;
+			sourceTree = "<group>";
+		};
+		33FFFEB20965BD110016AC38 /* drivers */ = {
+			isa = PBXGroup;
+			children = (
+				33FFFEB30965BD110016AC38 /* FTDIUSBSerialDriver_v2_0_1.dmg */,
+				33FFFEB40965BD110016AC38 /* KeyspanUSAdrvr20.dmg */,
+			);
+			path = drivers;
+			sourceTree = "<group>";
+		};
+		33FFFEBA0965BD110016AC38 /* serial */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = serial;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXJavaArchiveBuildPhase section */
+		33AF61660965C4C600B514A9 /* JavaArchive */ = {
+			isa = PBXJavaArchiveBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXJavaArchiveBuildPhase section */
+
+/* Begin PBXProject section */
+		33FFFD3F0965B1E40016AC38 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 33FFFD400965B1E40016AC38 /* Build configuration list for PBXProject "Arduino" */;
+			buildSettings = {
+			};
+			buildStyles = (
+				33AF609C0965C4B700B514A9 /* Development */,
+				33AF609D0965C4B700B514A9 /* Deployment */,
+			);
+			hasScannedForEncodings = 0;
+			mainGroup = 33FFFD3D0965B1E40016AC38;
+			productRefGroup = 33FFFD3D0965B1E40016AC38;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 33FFFE950965BD110016AC38 /* Products */;
+					ProjectRef = 33FFFE940965BD110016AC38 /* Arduino.xcodeproj */;
+				},
+			);
+			targets = (
+				33FFFE1C0965BBEF0016AC38 /* Dist */,
+				33AF61680965C4C600B514A9 /* App */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		33AF61650965C4C600B514A9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				33CF03B209662CB700F2C9A9 /* arduino.icns in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		33FF07170965BFFE0016AC38 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "unzip -od $BUILT_PRODUCTS_DIR/examples ../shared/dist/examples.zip\nunzip -od $BUILT_PRODUCTS_DIR dist/tools.zip";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		33AF61640965C4C600B514A9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				33AF61760965C54B00B514A9 /* PreprocessorInfoChannel.java in Sources */,
+				33AF61770965C54B00B514A9 /* EditorListener.java in Sources */,
+				33AF61780965C54B00B514A9 /* LineObject.java in Sources */,
+				33AF61790965C54B00B514A9 /* Serial.java in Sources */,
+				33AF617A0965C54B00B514A9 /* TextUtilities.java in Sources */,
+				33AF617B0965C54B00B514A9 /* EditorConsole.java in Sources */,
+				33AF617C0965C54B00B514A9 /* TokenMarker.java in Sources */,
+				33AF617D0965C54B00B514A9 /* MessageSiphon.java in Sources */,
+				33AF617E0965C54B00B514A9 /* FindReplace.java in Sources */,
+				33AF617F0965C54B00B514A9 /* SketchCode.java in Sources */,
+				33AF61800965C54B00B514A9 /* EditorLineStatus.java in Sources */,
+				33AF61810965C54B00B514A9 /* EditorHeader.java in Sources */,
+				33AF61820965C54B00B514A9 /* EditorButtons.java in Sources */,
+				33AF61830965C54B00B514A9 /* SyntaxStyle.java in Sources */,
+				33AF61840965C54B00B514A9 /* Uploader.java in Sources */,
+				33AF61850965C54B00B514A9 /* RunnerException.java in Sources */,
+				33AF61860965C54B00B514A9 /* WParser.java in Sources */,
+				33AF61870965C54B00B514A9 /* TextAreaPainter.java in Sources */,
+				33AF61880965C54B00B514A9 /* Sketchbook.java in Sources */,
+				33AF61890965C54B00B514A9 /* EditorStatus.java in Sources */,
+				33AF618A0965C54B00B514A9 /* WTokenTypes.java in Sources */,
+				33AF618B0965C54B00B514A9 /* TextAreaDefaults.java in Sources */,
+				33AF618C0965C54B00B514A9 /* PdePreprocessor.java in Sources */,
+				33AF618D0965C54B00B514A9 /* CSymbolTable.java in Sources */,
+				33AF618E0965C54B00B514A9 /* SketchHistory.java in Sources */,
+				33AF618F0965C54B00B514A9 /* RunnerClassLoader.java in Sources */,
+				33AF61900965C54B00B514A9 /* MessageStream.java in Sources */,
+				33AF61910965C54B00B514A9 /* SyntaxUtilities.java in Sources */,
+				33AF61930965C54B00B514A9 /* PresentMode.java in Sources */,
+				33AF61940965C54B00B514A9 /* STDCTokenTypes.java in Sources */,
+				33AF61950965C54B00B514A9 /* CTokenMarker.java in Sources */,
+				33AF61960965C54B00B514A9 /* CToken.java in Sources */,
+				33AF61970965C54B00B514A9 /* WTreeParserTokenTypes.java in Sources */,
+				33AF61990965C54B00B514A9 /* Runner.java in Sources */,
+				33AF619A0965C54B00B514A9 /* TNode.java in Sources */,
+				33AF619B0965C54B00B514A9 /* KeywordMap.java in Sources */,
+				33AF619C0965C54B00B514A9 /* ExtendedCommonASTWithHiddenTokens.java in Sources */,
+				33AF619D0965C54B00B514A9 /* Sketch.java in Sources */,
+				33AF619E0965C54B00B514A9 /* WEmitterTokenTypes.java in Sources */,
+				33AF619F0965C54B00B514A9 /* TNodeFactory.java in Sources */,
+				33AF61A00965C54B00B514A9 /* Target.java in Sources */,
+				33AF61A10965C54B00B514A9 /* UpdateCheck.java in Sources */,
+				33AF61A20965C54B00B514A9 /* InputHandler.java in Sources */,
+				33AF61A30965C54B00B514A9 /* MessageConsumer.java in Sources */,
+				33AF61A40965C54B00B514A9 /* WLexer.java in Sources */,
+				33AF61A50965C54B00B514A9 /* Compiler.java in Sources */,
+				33AF61A60965C54B00B514A9 /* AutoFormat.java in Sources */,
+				33AF61A70965C54B00B514A9 /* StdCLexer.java in Sources */,
+				33AF61A80965C54B00B514A9 /* StdCParser.java in Sources */,
+				33AF61A90965C54B00B514A9 /* PdeKeywords.java in Sources */,
+				33AF61AA0965C54B00B514A9 /* Editor.java in Sources */,
+				33AF61AB0965C54B00B514A9 /* WEmitter.java in Sources */,
+				33AF61AC0965C54B00B514A9 /* SwingWorker.java in Sources */,
+				33AF61AD0965C54B00B514A9 /* DefaultInputHandler.java in Sources */,
+				33AF61AE0965C54B00B514A9 /* SyntaxDocument.java in Sources */,
+				33AF61AF0965C54B00B514A9 /* WLexerTokenTypes.java in Sources */,
+				33AF61B00965C54B00B514A9 /* Token.java in Sources */,
+				33AF61B10965C54B00B514A9 /* Preferences.java in Sources */,
+				33AF61B20965C54B00B514A9 /* PdeTextAreaDefaults.java in Sources */,
+				33AF61B30965C54B00B514A9 /* WTreeParser.java in Sources */,
+				33AF61B40965C54B00B514A9 /* JEditTextArea.java in Sources */,
+				33AF61B50965C54B00B514A9 /* Base.java in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		33AF61710965C51E00B514A9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 33FFFE1C0965BBEF0016AC38 /* Dist */;
+			targetProxy = 33AF61700965C51E00B514A9 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		33AF616C0965C4CB00B514A9 /* work */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = "";
+				JAVA_CLASS_SEARCH_PATHS = "../shared/lib/registry.jar ../shared/lib/antlr.jar ../shared/lib/mrj.jar ../shared/lib/RXTXcomm.jar ../shared/lib/oro.jar";
+				JAVA_ONLY = YES;
+				JAVA_SOURCE_SUBDIR = .;
+				OPTIMIZATION_CFLAGS = "-O0";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = Arduino;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				WRAPPER_EXTENSION = app;
+			};
+			name = work;
+		};
+		33FFFD410965B1E40016AC38 /* work */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = work;
+		};
+		33FFFE200965BC300016AC38 /* work */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				OPTIMIZATION_CFLAGS = "-O0";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = Arduino;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = work;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		33AF616B0965C4CB00B514A9 /* Build configuration list for PBXApplicationTarget "App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				33AF616C0965C4CB00B514A9 /* work */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		33FFFD400965B1E40016AC38 /* Build configuration list for PBXProject "Arduino" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				33FFFD410965B1E40016AC38 /* work */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		33FFFE1F0965BC300016AC38 /* Build configuration list for PBXAggregateTarget "Dist" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				33FFFE200965BC300016AC38 /* work */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 33FFFD3F0965B1E40016AC38 /* Project object */;
+}

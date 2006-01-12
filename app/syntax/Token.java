@@ -17,7 +17,7 @@ package processing.app.syntax;
  * token in the text, and a pointer to the next token in the list.
  *
  * @author Slava Pestov
- * @version $Id: Token.java,v 1.1 2005/04/09 02:30:37 benfry Exp $
+ * @version $Id$
  */
 public class Token
 {

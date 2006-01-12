@@ -16,7 +16,7 @@ import java.util.StringTokenizer;
  * A simple text style class. It can specify the color, italic flag,
  * and bold flag of a run of text.
  * @author Slava Pestov
- * @version $Id: SyntaxStyle.java,v 1.1 2005/04/09 02:30:37 benfry Exp $
+ * @version $Id$
  */
 public class SyntaxStyle
 {

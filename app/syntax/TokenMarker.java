@@ -23,7 +23,7 @@ import java.util.*;
  * cached.
  *
  * @author Slava Pestov
- * @version $Id: TokenMarker.java,v 1.1 2005/04/09 02:30:37 benfry Exp $
+ * @version $Id$
  *
  * @see org.gjt.sp.jedit.syntax.Token
  */

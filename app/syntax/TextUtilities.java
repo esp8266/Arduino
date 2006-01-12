@@ -14,7 +14,7 @@ import javax.swing.text.*;
 /**
  * Class with several utility functions used by the text area component.
  * @author Slava Pestov
- * @version $Id: TextUtilities.java,v 1.1 2005/04/09 02:30:37 benfry Exp $
+ * @version $Id$
  */
 public class TextUtilities
 {

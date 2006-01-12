@@ -30,7 +30,7 @@ else
   mkdir -p work/examples
 
   #need to replace this with the linux native library for RXTX
-  cp ../../lib/librxtxSerial.so work/
+  cp dist/librxtxSerial.so work/
 
   cp dist/arduino work/
  

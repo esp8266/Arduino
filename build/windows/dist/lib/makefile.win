@@ -1,6 +1,6 @@
 # Arduino Makefile (for Windows XP)
 # Nick Zambetti and David A. Mellis
-# $Id: makefile.win,v 1.9 2005/05/23 18:21:46 mellis Exp $
+# $Id$
 
 # By default, this makefile uses the serial device specified by
 # Wiring (either in the Tools | Serial Port menu or the Wiring

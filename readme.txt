@@ -4,7 +4,8 @@ language.
 
 Arduino is an open source project, owned by nobody and supported by many.
 
-For more information, see the website at: http://arduino.berlios.de/
+For more information, see the website at: http://arduino.berlios.de/ or the
+forums at arduino.berlios.de/cgi-bin/yabb/YaBB.cgi
 
 The Team is composed of Massimo Banzi, David Cuartielles, Tom Igoe,
 David Mellis and Nicholas Zambetti.
@@ -14,6 +15,19 @@ taking care of the production.
 
 Yaniv Steiner and Giorgio Olivero have been supporting the project and are
 working at using it with the Instant Soup platform.
+
+Arduino uses the GNU avr-gcc toolchain, uisp, avr-libc, avrlib, and code
+from Processing and Wiring.
+
+UPDATES
+
+0004
+Serial monitor added (click the toolbar button to turn it on or off).  Baud
+rate is controlled by the serial.debug_rate field in preferences.txt, defaults
+to 9600.
+Serial port menu now automatically refreshes when opened.
+Created Xcode project for building Arduino on the Mac (doesn't yet regenerate
+the grammar files or package the distribution); active target should be "App".
 
 0003
 millis() now updates every millisecond instead of every second.

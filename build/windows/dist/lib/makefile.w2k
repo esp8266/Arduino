@@ -1,6 +1,6 @@
 # Arduino Makefile (for Windows 2000)
 # Nick Zambetti and David A. Mellis
-# $Id: makefile.w2k,v 1.1 2005/05/23 17:19:56 mellis Exp $
+# $Id$
 
 # Windows 2000 seems to need backslashes in certain commands
 # (e.g. bin\rm in the compile rule below) where Windows XP

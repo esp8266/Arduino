@@ -37,7 +37,7 @@ import javax.swing.event.*;
 public class EditorButtons extends JComponent implements MouseInputListener {
 
   static final String title[] = {
-    "Compile", "Stop", "New", "Open", "Save", "Export"
+    "Compile", "Stop", "New", "Open", "Save", "Export", "Serial Monitor"
   };
 
   static final int BUTTON_COUNT  = title.length;
@@ -52,6 +52,7 @@ public class EditorButtons extends JComponent implements MouseInputListener {
   static final int OPEN     = 3;
   static final int SAVE     = 4;
   static final int EXPORT   = 5;
+  static final int SERIAL   = 6;
 
   static final int INACTIVE = 0;
   static final int ROLLOVER = 1;
@@ -103,6 +104,7 @@ public class EditorButtons extends JComponent implements MouseInputListener {
     which[buttonCount++] = OPEN;
     which[buttonCount++] = SAVE;
     which[buttonCount++] = EXPORT;
+    which[buttonCount++] = SERIAL;
 
     currentRollover = -1;
 
@@ -339,6 +341,7 @@ public class EditorButtons extends JComponent implements MouseInputListener {
       case NEW:    editor.handleNew(e.isShiftDown()); break;
       case SAVE:   editor.handleSave(); break;
       case EXPORT: editor.handleExport(); break;
+      case SERIAL: editor.handleSerial(); break;
     }
     currentSelection = -1;
   }

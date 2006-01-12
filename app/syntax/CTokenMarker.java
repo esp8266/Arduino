@@ -15,7 +15,7 @@ import javax.swing.text.Segment;
  * C token marker.
  *
  * @author Slava Pestov
- * @version $Id: CTokenMarker.java,v 1.1 2005/04/09 02:30:37 benfry Exp $
+ * @version $Id$
  */
 public class CTokenMarker extends TokenMarker
 {
