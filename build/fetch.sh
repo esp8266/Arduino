@@ -4,3 +4,5 @@ for i in `grep -o "http://arduino.berlios.de/index.php/Reference/[^']*" index.ht
 perl -i -pe "s|http://arduino.berlios.de/index.php/Reference/[^?\"']*\?[^'\"]*|#|g" *.html
 perl -i -pe "s|http://arduino.berlios.de/index.php/Reference/([^']*)|\1.html|g" *.html
 perl -i -pe "s|http://arduino.berlios.de/pub/skins/arduino/arduino.css|arduino.css|g" *.html
+perl -i -pe "s|HomePage.html|index.html|g" *.html
+perl -i -pe "s|/\\?PHPSESSID=[^\"]*|http://arduino.berlios.de/|g" *.html
