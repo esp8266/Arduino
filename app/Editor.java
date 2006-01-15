@@ -642,7 +642,7 @@ public class Editor extends JFrame
       item.setState(true);
       String name = item.getLabel();
       
-	  Preferences.set("serial.download_rate", name);
+	  Preferences.set("serial.debug_rate", name);
       //System.out.println("serial port speed set to " + name);
     }
 	
@@ -675,7 +675,7 @@ public class Editor extends JFrame
 	
 	// The serial options
 	
-	serialSubMenu = new JMenu("Serial port");
+	serialSubMenu = new JMenu("Serial Port");
 
 //	item = newJMenuItem("Update List", 'E', false);
 //	item.addActionListener(new ActionListener() {
@@ -695,13 +695,13 @@ public class Editor extends JFrame
 	
 	// add the serial speed submenu
 	
-	serialRateSubMenu = new JMenu("Serial port speed");
+	serialRateSubMenu = new JMenu("Serial Monitor Baud Rate");
  
     //serialSubMenu.add(item);
 	//serialSubMenu.addSeparator();
 	ButtonGroup group = new ButtonGroup();
 
-	int curr_rate = Preferences.getInteger("serial.download_rate");
+	int curr_rate = Preferences.getInteger("serial.debug_rate");
 
 	rbMenuItem = new JCheckBoxMenuItem("9600", 9600 == curr_rate);
 	rbMenuItem.addActionListener(srml);
@@ -793,26 +793,26 @@ public class Editor extends JFrame
       });
     menu.add(item);
 
-    item = newJMenuItem("Find in Reference", 'F', true);
-    item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          if (textarea.isSelectionActive()) {
-            String text = textarea.getSelectedText();
-            if (text.length() == 0) {
-              message("First select a word to find in the reference.");
-
-            } else {
-              String referenceFile = PdeKeywords.getReference(text);
-              if (referenceFile == null) {
-                message("No reference available for \"" + text + "\"");
-              } else {
-                Base.showReference(referenceFile);
-              }
-            }
-          }
-        }
-      });
-    menu.add(item);
+//    item = newJMenuItem("Find in Reference", 'F', true);
+//    item.addActionListener(new ActionListener() {
+//        public void actionPerformed(ActionEvent e) {
+//          if (textarea.isSelectionActive()) {
+//            String text = textarea.getSelectedText();
+//            if (text.length() == 0) {
+//              message("First select a word to find in the reference.");
+//
+//            } else {
+//              String referenceFile = PdeKeywords.getReference(text);
+//              if (referenceFile == null) {
+//                message("No reference available for \"" + text + "\"");
+//              } else {
+//                Base.showReference(referenceFile);
+//              }
+//            }
+//          }
+//        }
+//      });
+//    menu.add(item);
 
     item = newJMenuItem("Visit arduino.berlios.de", '5');
     item.addActionListener(new ActionListener() {
@@ -1954,13 +1954,13 @@ public class Editor extends JFrame
 
       this.addSeparator();
 
-      referenceItem = new JMenuItem("Find in Reference");
-      referenceItem.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-            Base.showReference(referenceFile);
-          }
-        });
-      this.add(referenceItem);
+//      referenceItem = new JMenuItem("Find in Reference");
+//      referenceItem.addActionListener(new ActionListener() {
+//          public void actionPerformed(ActionEvent e) {
+//            Base.showReference(referenceFile);
+//          }
+//        });
+//      this.add(referenceItem);
     }
 
     // if no text is selected, disable copy and cut menu items
