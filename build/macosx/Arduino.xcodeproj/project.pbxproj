@@ -128,6 +128,9 @@
 
 /* Begin PBXBuildFile section */
 		330B21540968180400345666 /* librxtxSerial.jnilib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 330B21530968180400345666 /* librxtxSerial.jnilib */; };
+		339514EE097AEB5900193C89 /* STDCTokenTypes.txt in Resources */ = {isa = PBXBuildFile; fileRef = 33FFFE420965BD110016AC38 /* STDCTokenTypes.txt */; };
+		339514FA097AEB8000193C89 /* license.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02B60965BD170016AC38 /* license.txt */; };
+		339514FB097AEB8000193C89 /* readme.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02B70965BD170016AC38 /* readme.txt */; };
 		33AF61760965C54B00B514A9 /* PreprocessorInfoChannel.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE3D0965BD110016AC38 /* PreprocessorInfoChannel.java */; };
 		33AF61770965C54B00B514A9 /* EditorListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE2C0965BD110016AC38 /* EditorListener.java */; };
 		33AF61780965C54B00B514A9 /* LineObject.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE3A0965BD110016AC38 /* LineObject.java */; };
@@ -196,7 +199,6 @@
 		33CF03CE09662DC000F2C9A9 /* antlr.jar in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33AF620A0965D67800B514A9 /* antlr.jar */; settings = {JAVA_ARCHIVE_SUBDIR = ../shared/lib; }; };
 		33CF03CF09662DC000F2C9A9 /* registry.jar in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33AF620E0965D67A00B514A9 /* registry.jar */; settings = {JAVA_ARCHIVE_SUBDIR = ../shared/lib; }; };
 		33CF03D009662DC000F2C9A9 /* oro.jar in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33AF620D0965D67900B514A9 /* oro.jar */; settings = {JAVA_ARCHIVE_SUBDIR = ../shared/lib; }; };
-		33FF07020965BEE60016AC38 /* jikes in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FFFEB60965BD110016AC38 /* jikes */; };
 		33FF07050965BEE60016AC38 /* macosx_setup.command in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FFFEB90965BD110016AC38 /* macosx_setup.command */; };
 		33FF07100965BF8A0016AC38 /* burn.command in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FFFEAF0965BD110016AC38 /* burn.command */; };
 		33FF07150965BFC10016AC38 /* FTDIUSBSerialDriver_v2_0_1.dmg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FFFEB30965BD110016AC38 /* FTDIUSBSerialDriver_v2_0_1.dmg */; };
@@ -317,7 +319,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
-				33FF07020965BEE60016AC38 /* jikes in CopyFiles */,
+				339514FA097AEB8000193C89 /* license.txt in CopyFiles */,
+				339514FB097AEB8000193C89 /* readme.txt in CopyFiles */,
 				33FF07050965BEE60016AC38 /* macosx_setup.command in CopyFiles */,
 				330B21540968180400345666 /* librxtxSerial.jnilib in CopyFiles */,
 			);
@@ -986,6 +989,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				33CF03B209662CB700F2C9A9 /* arduino.icns in Resources */,
+				339514EE097AEB5900193C89 /* STDCTokenTypes.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

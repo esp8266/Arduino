@@ -103,7 +103,7 @@ public class Editor extends JFrame
   RunButtonWatcher watcher;
   Runner runtime;
 
-  JMenuItem exportAppItem;
+  //JMenuItem exportAppItem;
   JMenuItem saveMenuItem;
   JMenuItem saveAsMenuItem;
   
@@ -496,13 +496,13 @@ public class Editor extends JFrame
       });
     menu.add(item);
 
-    exportAppItem = newJMenuItem("Export Application", 'E', true);
-    exportAppItem.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          handleExportApp();
-        }
-      });
-    menu.add(exportAppItem);
+//    exportAppItem = newJMenuItem("Export Application", 'E', true);
+//    exportAppItem.addActionListener(new ActionListener() {
+//        public void actionPerformed(ActionEvent e) {
+//          handleExportApp();
+//        }
+//      });
+//    menu.add(exportAppItem);
 
     menu.addSeparator();
 
@@ -774,15 +774,15 @@ public class Editor extends JFrame
     JMenu menu = new JMenu("Help");
     JMenuItem item;
 
-    item = new JMenuItem("Environment");
-    item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          Base.openURL(System.getProperty("user.dir") + File.separator +
-                          "reference" + File.separator + "environment" +
-                          File.separator + "index.html");
-        }
-      });
-    menu.add(item);
+//    item = new JMenuItem("Environment");
+//    item.addActionListener(new ActionListener() {
+//        public void actionPerformed(ActionEvent e) {
+//          Base.openURL(System.getProperty("user.dir") + File.separator +
+//                          "reference" + File.separator + "environment" +
+//                          File.separator + "index.html");
+//        }
+//      });
+//    menu.add(item);
 
     item = new JMenuItem("Reference");
     item.addActionListener(new ActionListener() {
@@ -1653,7 +1653,7 @@ public class Editor extends JFrame
 
       sketch = new Sketch(this, path);
       // TODO re-enable this once export application works
-      exportAppItem.setEnabled(false);
+      //exportAppItem.setEnabled(false);
       //exportAppItem.setEnabled(false && !sketch.isLibrary());
       //buttons.disableRun(sketch.isLibrary());
       header.rebuild();
