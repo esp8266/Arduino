@@ -7,9 +7,34 @@
 	objects = {
 
 /* Begin PBXAggregateTarget section */
-		33FFFE1C0965BBEF0016AC38 /* Dist */ = {
+		33ACA1F6097AF13D00BEC3A2 /* Distribute */ = {
 			isa = PBXAggregateTarget;
-			buildConfigurationList = 33FFFE1F0965BC300016AC38 /* Build configuration list for PBXAggregateTarget "Dist" */;
+			buildConfigurationList = 33ACA1FC097AF16500BEC3A2 /* Build configuration list for PBXAggregateTarget "Distribute" */;
+			buildPhases = (
+				33ACA202097AF31C00BEC3A2 /* ShellScript */,
+			);
+			buildSettings = {
+				OPTIMIZATION_CFLAGS = "";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = Distribute;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			dependencies = (
+				33ACA1F8097AF14400BEC3A2 /* PBXTargetDependency */,
+			);
+			name = Distribute;
+			productName = Distribute;
+		};
+		33FFFE1C0965BBEF0016AC38 /* Setup */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 33FFFE1F0965BC300016AC38 /* Build configuration list for PBXAggregateTarget "Setup" */;
 			buildPhases = (
 				33FFFE1D0965BC050016AC38 /* CopyFiles */,
 				33FF070C0965BF760016AC38 /* CopyFiles */,
@@ -32,7 +57,7 @@
 			};
 			dependencies = (
 			);
-			name = Dist;
+			name = Setup;
 			productName = Arduino;
 		};
 /* End PBXAggregateTarget section */
@@ -80,7 +105,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
-	<string></string>
+	<string>Arduino</string>
 	<key>CFBundleGetInfoString</key>
 	<string></string>
 	<key>CFBundleIconFile</key>
@@ -241,6 +266,13 @@
 /* End PBXBuildStyle section */
 
 /* Begin PBXContainerItemProxy section */
+		33ACA1F7097AF14400BEC3A2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 33FFFD3F0965B1E40016AC38 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 33AF61680965C4C600B514A9;
+			remoteInfo = App;
+		};
 		33AF61700965C51E00B514A9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 33FFFD3F0965B1E40016AC38 /* Project object */;
@@ -977,8 +1009,9 @@
 				},
 			);
 			targets = (
-				33FFFE1C0965BBEF0016AC38 /* Dist */,
+				33FFFE1C0965BBEF0016AC38 /* Setup */,
 				33AF61680965C4C600B514A9 /* App */,
+				33ACA1F6097AF13D00BEC3A2 /* Distribute */,
 			);
 		};
 /* End PBXProject section */
@@ -996,6 +1029,19 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		33ACA202097AF31C00BEC3A2 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd $BUILT_PRODUCTS_DIR/../../\n\nREVISION=`head -1 ../../todo.txt | cut -c 1-4`\nSHORT_REVISION=`head -1 ../../todo.txt | cut -c 3-4`\nVERSIONED=`cat ../../app/Base.java | grep $REVISION`\n\nif [ -z \"$VERSIONED\" ]\nthen\n  echo Fix the revision number in Base.java\n  exit\nfi\n\nrm -rf arduino\nrm -rf arduino-*\n\nmkdir -p arduino\ncp -r $BUILT_PRODUCTS_DIR/* arduino/\n\nfind arduino -name \"*~\" -exec rm -f {} ';'\n# need to leave ds store stuff cuz one of those is important\n#find arduino -name \".DS_Store\" -exec rm -f {} ';'\nfind arduino -name \"._*\" -exec rm -f {} ';'\nfind arduino -name \"Thumbs.db\" -exec rm -f {} ';'\n\n# clean out the cvs entries\nfind arduino -name \"CVS\" -exec rm -rf {} ';' 2> /dev/null\nfind arduino -name \".cvsignore\" -exec rm -rf {} ';'\n\n# clean out the svn entries\nfind arduino -name \".svn\" -exec rm -rf {} ';' 2> /dev/null\n\n#mv arduino/Arduino.app/Contents/MacOS/Arduino \"arduino/Arduino.app/Contents/MacOS/Arduino $SHORT_REVISION\"\nmv arduino/Arduino.app \"arduino/Arduino $SHORT_REVISION.app\"\nmv arduino arduino-$REVISION\nzip -r arduino-$REVISION.zip arduino-$REVISION\n";
+		};
 		33FF07170965BFFE0016AC38 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1084,14 +1130,36 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		33ACA1F8097AF14400BEC3A2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 33AF61680965C4C600B514A9 /* App */;
+			targetProxy = 33ACA1F7097AF14400BEC3A2 /* PBXContainerItemProxy */;
+		};
 		33AF61710965C51E00B514A9 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 33FFFE1C0965BBEF0016AC38 /* Dist */;
+			target = 33FFFE1C0965BBEF0016AC38 /* Setup */;
 			targetProxy = 33AF61700965C51E00B514A9 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		33ACA1FD097AF16500BEC3A2 /* work */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				OPTIMIZATION_CFLAGS = "-O0";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = Distribute;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = work;
+		};
 		33AF616C0965C4CB00B514A9 /* work */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1144,6 +1212,13 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		33ACA1FC097AF16500BEC3A2 /* Build configuration list for PBXAggregateTarget "Distribute" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				33ACA1FD097AF16500BEC3A2 /* work */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		33AF616B0965C4CB00B514A9 /* Build configuration list for PBXApplicationTarget "App" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1158,7 +1233,7 @@
 			);
 			defaultConfigurationIsVisible = 0;
 		};
-		33FFFE1F0965BC300016AC38 /* Build configuration list for PBXAggregateTarget "Dist" */ = {
+		33FFFE1F0965BC300016AC38 /* Build configuration list for PBXAggregateTarget "Setup" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				33FFFE200965BC300016AC38 /* work */,
