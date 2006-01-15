@@ -1003,7 +1003,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "unzip -od $BUILT_PRODUCTS_DIR/examples ../shared/dist/examples.zip\nunzip -od $BUILT_PRODUCTS_DIR dist/tools.zip";
+			shellScript = "unzip -od $BUILT_PRODUCTS_DIR/examples ../shared/dist/examples.zip\nunzip -od $BUILT_PRODUCTS_DIR ../shared/reference.zip\nunzip -od $BUILT_PRODUCTS_DIR dist/tools.zip";
 		};
 /* End PBXShellScriptBuildPhase section */
 
