@@ -488,7 +488,7 @@ public class Editor extends JFrame
       });
     menu.add(saveAsMenuItem);
 
-    item = newJMenuItem("Export", 'E');
+    item = newJMenuItem("Upload to I/O Board", 'U');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           handleExport();
@@ -544,7 +544,7 @@ public class Editor extends JFrame
     JMenuItem item;
     JMenu menu = new JMenu("Sketch");
 
-    item = newJMenuItem("Run", 'R');
+    item = newJMenuItem("Verify/Compile", 'R');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           handleRun(false);

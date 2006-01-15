@@ -37,7 +37,7 @@ import javax.swing.event.*;
 public class EditorButtons extends JComponent implements MouseInputListener {
 
   static final String title[] = {
-    "Compile", "Stop", "New", "Open", "Save", "Export", "Serial Monitor"
+    "Verify", "Stop", "New", "Open", "Save", "Upload to I/O Board", "Serial Monitor"
   };
 
   static final int BUTTON_COUNT  = title.length;
