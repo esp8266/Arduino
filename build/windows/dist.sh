@@ -32,6 +32,12 @@ rm dist/examples.zip
 rm -rf dist
 cd ..
 
+# extract reference
+cd arduino
+unzip reference.zip
+rm reference.zip
+cd ..
+
 # add java (jre) files
 unzip -q -d arduino jre.zip
 

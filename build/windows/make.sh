@@ -20,24 +20,17 @@ else
   mkdir -p work/classes/arduino/app/syntax
   mkdir -p work/classes/arduino/app/tools
 
-#  echo Extracting examples...
- # cd work
-  #unzip -q examples.zip
- # rm examples.zip
- # cd ..
-
   echo Extracting reference...
-#  cd work
-#  unzip -q reference.zip
+  cd work
+  unzip reference.zip
   # necessary for launching reference from shell/command prompt
   # which is done internally to view reference
   #chmod +x reference/*.html
   # needed by 'help' menu
   #chmod +x reference/environment/*.html
   # chmod -R +x *.html doesn't seem to work
-
-#  rm reference.zip
- # cd ..
+  rm reference.zip
+  cd ..
 
   echo Extracting enormous JRE...
   unzip -q  -d work jre.zip
