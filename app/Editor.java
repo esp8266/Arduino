@@ -657,7 +657,7 @@ public class Editor extends JFrame
 	JMenuItem rbMenuItem;
 	JMenuItem cbMenuItem;
 	SerialRateMenuListener		srml = new SerialRateMenuListener();
-	// Enumeration portRates = {"9600","19200","38400","57600","115200"};
+	String[] portRates = {"9600","19200","38400","57600","115200"};
     
 	serialMenuListener  = new SerialMenuListener();
 
@@ -701,23 +701,15 @@ public class Editor extends JFrame
 	//serialSubMenu.addSeparator();
 	ButtonGroup group = new ButtonGroup();
 
-	int curr_rate = Preferences.getInteger("serial.debug_rate");
+	String curr_rate = Preferences.get("serial.debug_rate");
 
-	rbMenuItem = new JCheckBoxMenuItem("9600", 9600 == curr_rate);
-	rbMenuItem.addActionListener(srml);
-	group.add(rbMenuItem);
-	serialRateSubMenu.add(rbMenuItem);
-
-	rbMenuItem = new JCheckBoxMenuItem("19200", 19200  == curr_rate);
-	rbMenuItem.addActionListener(srml);
-	group.add(rbMenuItem);
-	serialRateSubMenu.add(rbMenuItem);	
-
-	rbMenuItem = new JCheckBoxMenuItem("115200", 115200  == curr_rate);
-	rbMenuItem.addActionListener(srml);
-	group.add(rbMenuItem);
-	serialRateSubMenu.add(rbMenuItem);	
-
+    for (int i = 0; i < portRates.length; i++) {
+      rbMenuItem = new JCheckBoxMenuItem(portRates[i], portRates[i].equals(curr_rate));
+      rbMenuItem.addActionListener(srml);
+      group.add(rbMenuItem);
+      serialRateSubMenu.add(rbMenuItem);
+    }
+    
 	menu.add(serialRateSubMenu);
     
     menu.addMenuListener(new MenuListener() {

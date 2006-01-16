@@ -66,7 +66,7 @@ int analogRead(int);
 unsigned long millis(void);
 void setup(void);
 void loop(void);
-void beginSerial(int);
+void beginSerial(long);
 void serialWrite(unsigned char);
 int serialAvailable();
 int serialRead();

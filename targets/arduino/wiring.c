@@ -176,7 +176,7 @@ void analogWrite(int pin, int val)
 		digitalWrite(pin, HIGH);
 }
 
-void beginSerial(int baud)
+void beginSerial(long baud)
 {
 	uartInit();
 	uartSetBaudRate(baud);
