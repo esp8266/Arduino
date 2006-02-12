@@ -25,6 +25,10 @@
 #ifndef Wiring_h
 #define Wiring_h
 
+#ifdef __cplusplus
+extern "C"{
+#endif
+
 #define HIGH 0x1
 #define LOW  0x0
 
@@ -41,9 +45,6 @@
 #define SERIAL  0x0
 #define DISPLAY 0x1
 
-#define NOT_A_PIN 0
-#define NOT_A_PORT -1
-
 #define min(a,b) ((a<b)?(a):(b))
 #define max(a,b) ((a>b)?(a):(b))
 #define abs(x) ((x>0)?(x):(-x))
@@ -52,27 +53,40 @@
 #define degrees(rad) ((rad)*RAD_TO_DEG)
 #define sq(x) ((x)*(x))
 
+#define NOT_A_PIN 0
+#define NOT_A_PORT -1
+
 typedef uint8_t boolean;
 typedef uint8_t byte;
 
-void delay(unsigned long);
-void delay_ms(unsigned short ms);
-void delayMicroseconds(unsigned int us);
 void pinMode(int, int);
 void digitalWrite(int, int);
 int digitalRead(int);
-void analogWrite(int, int);
 int analogRead(int);
-unsigned long millis(void);
-void setup(void);
-void loop(void);
+void analogWrite(int, int);
+
 void beginSerial(long);
 void serialWrite(unsigned char);
 int serialAvailable();
 int serialRead();
-void print(const char *, ...);
 void printMode(int);
+void printByte(unsigned char c);
+void printNewline();
+void printString(char *s);
+void printInteger(int n);
+void printHex(unsigned int n);
+void printOctal(unsigned int n);
+void printBinary(unsigned int n);
 
+unsigned long millis(void);
+void delay(unsigned long);
+void delay_ms(unsigned short ms);
+void delayMicroseconds(unsigned int us);
+
+void setup(void);
+void loop(void);
+
+// XXX: internal definitions, should be moved to another header file
 typedef struct {
 	int port;
 	int bit;
@@ -84,5 +98,9 @@ extern int port_to_output[];
 extern pin_t *digital_pin_to_port;
 extern pin_t *analog_in_pin_to_port;
 extern pin_t *analog_out_pin_to_port;
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 #endif
