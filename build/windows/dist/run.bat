@@ -5,7 +5,7 @@ REM --- (which means 128 megabytes) to something higher.
 
 set SAVEDCP=%CLASSPATH%
 set SAVEDPATH=%PATH%
-set JAVA_HOME=""
+set JAVA_HOME="java\bin"
 
 if %JAVA_HOME% == "" GOTO Error
 
