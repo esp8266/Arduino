@@ -20,6 +20,25 @@ working at using it with the Instant Soup platform.
 Arduino uses the GNU avr-gcc toolchain, uisp, avr-libc, avrlib, and code
 from Processing and Wiring.
 
+INSTALLATION
+
+Detailed instructions are in reference/howto.html.
+
+If you are using a USB Arduino, you will need to install the drivers for the
+FTDI chip on the board. These can be found in the drivers/ directory.
+
+On Windows, you will need to unzip FTDI USB Drivers.zip. Then plug in the
+Arduino board and point the Windows Add Hardware wizard to the FTDI USB Drivers
+directory.
+
+On the Mac, mount the FTDIUSBSerialDriver_v2_0_1.dmg disk image and run the
+included FTDIUSBSerialDriver.pkg.
+
+Also, on the Mac, run the macosx_setup.command (after moving the Arduino
+distribution to your /Applications folder). It corrects permission on a few
+files for use with the serial port and will prompt you for your password. You
+may need to reboot after running this script.
+
 UPDATES
 
 0003
