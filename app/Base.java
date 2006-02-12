@@ -53,7 +53,7 @@ import com.ice.jni.registry.*;
  */
 public class Base {
   static final int VERSION = 1;
-  static final String VERSION_NAME = "0003 Alpha";
+  static final String VERSION_NAME = "0004 Alpha";
   
   static public int platform;
   
