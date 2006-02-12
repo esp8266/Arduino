@@ -1,3 +1,4 @@
+curl http://arduino.berlios.de/index.php/Main/Howto -o howto.html
 curl http://arduino.berlios.de/index.php/Reference/HomePage -o index.html
 curl http://arduino.berlios.de/pub/skins/arduino/arduino.css -o arduino.css
 for i in `grep -o "http://arduino.berlios.de/index.php/Reference/[^']*" index.html | sort -u | grep -v '?' | cut -d '/' -f 6`; do curl http://arduino.berlios.de/index.php/Reference/$i -o $i.html; done
