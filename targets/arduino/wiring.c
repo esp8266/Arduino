@@ -212,7 +212,7 @@ void printNewline()
 	printByte('\n');
 }
 
-void printString(unsigned char *s)
+void printString(char *s)
 {
 	while (*s)
 		printByte(*s++);
@@ -284,7 +284,9 @@ unsigned long millis()
 	// overflows when it reaches 256.  we calculate the total
 	// number of clock cycles, then divide by the number of clock
 	// cycles per millisecond.
-	return timer0GetOverflowCount() * timer0GetPrescaler() * 256L / (F_CPU / 1000L);
+	//return timer0GetOverflowCount() * timer0GetPrescaler() * 256L / (F_CPU / 1000L);
+	return (unsigned long) timer0GetOverflowCount() * timer0GetPrescaler() * 2UL / (F_CPU / 128000UL);
+	//return (((unsigned long) timer0GetOverflowCount()) / 62UL) * (unsigned long) timer0GetPrescaler();
 }
 
 void delay(unsigned long ms)
