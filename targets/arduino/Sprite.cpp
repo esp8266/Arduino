@@ -23,37 +23,24 @@
 
 #include "Sprite.h"
 
-void Sprite::init(uint8_t width, uint8_t height, uint8_t depth)
+void Sprite::init(uint8_t width, uint8_t height)
 {
-  _width = width;
-  _height = height;
-  _ppb = 8 / depth; // pixels per byte = 8 / bit depth
-  _depth = 8 / _ppb; // round bit depth up to nearest divisor of 8
-  _bpr = (_width + _ppb - 1) / _ppb; // bytes per row (rounding up)
-  _mask = (1 << _depth) - 1; // mask = a byte with 1's in the _depth LSBs
-
-  // _buffer packs _ppb pixels into each byte.  
-  // for example, Sprite(3, 2, 3) yields:
-  // _buffer[0] = LSN: pixel (0, 0); MSN: pixel (1, 0)
-  // _buffer[1] = LSN: pixel (2, 0); MSN: empty
-  // _buffer[2] = LSN: pixel (0, 1); MSN: pixel (1, 1)
-  // _buffer[3] = LSN: pixel (2, 1); MSN: empty
-  // LSN = least-significant nibble (bits 0 to 3),
-  // MSN = most-significant nibble (bits 4 to 7)
+  _width = width >= 8 ? 8 : width;
+  _height = height >= 8 ? 8 : height;
 
   // for now, do nothing if this allocation fails.  methods that require it
   // should silently fail if _buffer is null.
-  _buffer = (uint8_t *) calloc(_height * _bpr, 1);
+  _buffer = (uint8_t *) calloc(_height, 1);
 }
   
-Sprite::Sprite(uint8_t width, uint8_t height, uint8_t depth)
+Sprite::Sprite(uint8_t width, uint8_t height)
 {
-  init(width, height, depth);
+  init(width, height);
 }
 
-Sprite::Sprite(uint8_t width, uint8_t height, uint8_t depth, uint8_t row, ...)
+Sprite::Sprite(uint8_t width, uint8_t height, uint8_t row, ...)
 {
-  init(width, height, depth);
+  init(width, height);
   
   if (!_buffer) return;
   
@@ -62,7 +49,7 @@ Sprite::Sprite(uint8_t width, uint8_t height, uint8_t depth, uint8_t row, ...)
 
   int y = 0;
   
-  for  (y = 0; ; y++) {
+  for (y = 0; ; y++) {
     for (int x = 0; x < width && x < 8; x++)
       write(x, y, (row >> (width - x - 1)) & 0x01);
     
@@ -88,34 +75,17 @@ uint8_t Sprite::height() const
 void Sprite::write(uint8_t x, uint8_t y, uint8_t value)
 {
   if (!_buffer) return;
-  
-  // XXX: this should mask according to bit depth specified in constructor,
-  // not the rounded bit depth stored in _depth
-  
-  // (x, y) is in the x / _ppb byte of the y'th row (the y'th row starts at
-  // byte y * _bpr of _buffer).  this byte may contain more than one pixel.
-  uint8_t *p = _buffer + y * _bpr + x / _ppb;
-  
-  // pixel (x, y) is in position x % _ppb of the byte, and each position is
-  // _depth bits.
-  uint8_t offset = _depth * (x % _ppb);
+  if (x < 0 || x >= _width || y < 0 || y >= _height) return;
   
   // we need to bitwise-or the value of the other pixels in the byte with
   // the new value, masked and shifted into the proper bits.
-  *p = (*p & ~(_mask << offset)) | ((value & _mask) << offset);
+  _buffer[y] = (_buffer[y] & ~(0x01 << x)) | ((value & 0x01) << x);
 }
 
 uint8_t Sprite::read(uint8_t x, uint8_t y) const
 {
   if (!_buffer) return 0;
+  if (x < 0 || x >= _width || y < 0 || y >= _height) return 0;
   
-  // (x, y) is in the x / _ppb byte of the y'th row (the y'th row starts at
-  // byte y * _bpr of _buffer).  this byte may contain more than one pixel.
-  uint8_t *p = _buffer + y * _bpr + x / _ppb;
-  
-  // pixel (x, y) is in position x % _ppb of the byte, and each position is
-  // _depth bits.
-  uint8_t offset = _depth * (x % _ppb);
-  
-  return (*p >> offset) & _mask;
+  return (_buffer[y] >> x) & 0x01;
 }

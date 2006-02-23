@@ -1,6 +1,6 @@
 /*
-  Sprite.cpp - 2D sprite buffers library for Arduino & Wiring
-  Copyright (c) 2006 David A. Mellis.  All right reserved.
+  Matrix.h - Max7219 LED Matrix library for Arduino & Wiring
+  Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -17,32 +17,38 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef Sprite_h
-#define Sprite_h
+#ifndef Matrix_h
+#define Matrix_h
 
 #include <inttypes.h>
 
-#include "binary.h"
+class Sprite;
 
-class Sprite
+class Matrix
 {
   private:
-    uint8_t _width;
-    uint8_t _height;
-    uint8_t _depth;
-    uint8_t _ppb;
-    uint8_t _bpr;
-    uint8_t _mask;
-    uint8_t *_buffer;
-    
-    void init(uint8_t width, uint8_t height);
-  public: 
-    Sprite(uint8_t width, uint8_t height);
-    Sprite(uint8_t width, uint8_t height, uint8_t row, ...);
-    uint8_t width() const;
-    uint8_t height() const;
-    void write(uint8_t x, uint8_t y, uint8_t value);
-    uint8_t read(uint8_t x, uint8_t y) const;
+    uint8_t _pinData;
+    uint8_t _pinClock;
+    uint8_t _pinLoad;
+
+    uint8_t* _buffer;
+    uint8_t _screens;
+    uint8_t _maximumX;
+
+    void putByte(uint8_t);
+    void setRegister(uint8_t, uint8_t);
+    void syncRow(uint8_t);
+
+    void setScanLimit(uint8_t);
+
+    void buffer(uint8_t, uint8_t, uint8_t);
+  public:
+    Matrix(uint8_t, uint8_t, uint8_t, uint8_t = 1);
+    void setBrightness(uint8_t);
+    void write(uint8_t, uint8_t, uint8_t);
+    void write(uint8_t, uint8_t, Sprite);
+    void clear(void);
 };
 
 #endif
+
