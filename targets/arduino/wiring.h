@@ -73,10 +73,10 @@ void printMode(int);
 void printByte(unsigned char c);
 void printNewline();
 void printString(char *s);
-void printInteger(int n);
-void printHex(unsigned int n);
-void printOctal(unsigned int n);
-void printBinary(unsigned int n);
+void printInteger(long n);
+void printHex(unsigned long n);
+void printOctal(unsigned long n);
+void printBinary(unsigned long n);
 
 unsigned long millis(void);
 void delay(unsigned long);

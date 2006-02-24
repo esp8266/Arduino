@@ -218,10 +218,10 @@ void printString(char *s)
 		printByte(*s++);
 }
 
-void printIntegerInBase(unsigned int n, int base)
+void printIntegerInBase(unsigned long n, unsigned long base)
 { 
-        unsigned char buf[8 * sizeof(int)]; // Assumes 8-bit chars. 
-        int i = 0;
+        unsigned char buf[8 * sizeof(long)]; // Assumes 8-bit chars. 
+        unsigned long i = 0;
 
         if (n == 0) {
                 printByte('0');
@@ -233,11 +233,11 @@ void printIntegerInBase(unsigned int n, int base)
                 n /= base;
         }
 
-        for (i--; i >= 0; i--)
-                printByte(buf[i] < 10 ? '0' + buf[i] : 'A' + buf[i] - 10);
+        for (; i > 0; i--)
+                printByte(buf[i - 1] < 10 ? '0' + buf[i - 1] : 'A' + buf[i - 1] - 10);
 }
 
-void printInteger(int n)
+void printInteger(long n)
 {
         if (n < 0) {
                 printByte('-');
@@ -247,17 +247,17 @@ void printInteger(int n)
 	printIntegerInBase(n, 10);
 }
 
-void printHex(unsigned int n)
+void printHex(unsigned long n)
 {
 	printIntegerInBase(n, 16);
 }
 
-void printOctal(unsigned int n)
+void printOctal(unsigned long n)
 {
 	printIntegerInBase(n, 8);
 }
 
-void printBinary(unsigned int n)
+void printBinary(unsigned long n)
 {
 	printIntegerInBase(n, 2);
 }
