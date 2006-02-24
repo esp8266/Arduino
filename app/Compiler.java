@@ -526,13 +526,13 @@ public class Compiler implements MessageConsumer {
       String s1 = s.substring(partialStartIndex +
                               partialTempPath.length() + 1);
       //System.out.println(s1);
-      if (s1.indexOf("In function")!= -1) {
+      int colon = s1.indexOf(':');
+
+      if (s1.indexOf("In function") != -1 || colon == -1) {
         System.err.print(s1);
         //firstErrorFound = true;
         return;
       }
-
-      int colon = s1.indexOf(':');
 
       int lineNumber = Integer.parseInt(s1.substring(0, colon));
       

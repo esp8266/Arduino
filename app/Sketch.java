@@ -1382,7 +1382,8 @@ public class Sketch {
         //System.out.println();
 
       } else {
-        code[0].preprocName = className + "." + Preferences.get("build.extension");
+        //code[0].preprocName = className + "." + Preferences.get("build.extension");
+        code[0].preprocName = className + ".cpp";
       }
 
       // store this for the compiler and the runtime
@@ -1511,7 +1512,8 @@ public class Sketch {
         // just write the the contents of 'program' to a .java file
         // into the build directory. uses byte stream and reader/writer
         // shtuff so that unicode bunk is properly handled
-        String filename = code[i].name + "." + Preferences.get("build.extension");
+        //String filename = code[i].name + "." + Preferences.get("build.extension");
+        String filename = code[i].name + ".cpp";
         try {
           Base.saveFile(code[i].program, new File(buildPath, filename));
         } catch (IOException e) {

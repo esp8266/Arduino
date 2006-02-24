@@ -362,6 +362,7 @@
 
 /* Begin PBXFileReference section */
 		330B21530968180400345666 /* librxtxSerial.jnilib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = librxtxSerial.jnilib; sourceTree = "<group>"; };
+		333269E1099BB1FC007D3AE2 /* tools.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = tools.zip; sourceTree = "<group>"; };
 		33AF620A0965D67800B514A9 /* antlr.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = antlr.jar; sourceTree = "<group>"; };
 		33AF620B0965D67900B514A9 /* applet.html */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.html; path = applet.html; sourceTree = "<group>"; };
 		33AF620C0965D67900B514A9 /* mrj.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = mrj.jar; sourceTree = "<group>"; };
@@ -517,7 +518,6 @@
 		33FFFEB50965BD110016AC38 /* DS_Store */ = {isa = PBXFileReference; lastKnownFileType = file; path = DS_Store; sourceTree = "<group>"; };
 		33FFFEB60965BD110016AC38 /* jikes */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = jikes; sourceTree = "<group>"; };
 		33FFFEB90965BD110016AC38 /* macosx_setup.command */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = macosx_setup.command; sourceTree = "<group>"; };
-		33FFFEBC0965BD110016AC38 /* tools.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = tools.zip; sourceTree = "<group>"; };
 		33FFFEBD0965BD110016AC38 /* dist.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = dist.sh; sourceTree = "<group>"; };
 		33FFFEBE0965BD110016AC38 /* make.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = make.sh; sourceTree = "<group>"; };
 		33FFFEBF0965BD110016AC38 /* mkdmg */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = mkdmg; sourceTree = "<group>"; };
@@ -940,14 +940,13 @@
 		33FFFEAC0965BD110016AC38 /* dist */ = {
 			isa = PBXGroup;
 			children = (
+				333269E1099BB1FC007D3AE2 /* tools.zip */,
 				330B21530968180400345666 /* librxtxSerial.jnilib */,
 				33FFFEAE0965BD110016AC38 /* bootloader */,
 				33FFFEB20965BD110016AC38 /* drivers */,
 				33FFFEB50965BD110016AC38 /* DS_Store */,
 				33FFFEB60965BD110016AC38 /* jikes */,
 				33FFFEB90965BD110016AC38 /* macosx_setup.command */,
-				33FFFEBA0965BD110016AC38 /* serial */,
-				33FFFEBC0965BD110016AC38 /* tools.zip */,
 			);
 			path = dist;
 			sourceTree = "<group>";
@@ -967,13 +966,6 @@
 				33FFFEB40965BD110016AC38 /* KeyspanUSAdrvr20.dmg */,
 			);
 			path = drivers;
-			sourceTree = "<group>";
-		};
-		33FFFEBA0965BD110016AC38 /* serial */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = serial;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

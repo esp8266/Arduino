@@ -776,6 +776,15 @@ public class Editor extends JFrame
 //      });
 //    menu.add(item);
 
+    item = new JMenuItem("Howto");
+    item.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          Base.openURL(System.getProperty("user.dir") + File.separator +
+                          "reference" + File.separator + "howto.html");
+        }
+      });
+    menu.add(item);
+
     item = new JMenuItem("Reference");
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -1961,14 +1970,14 @@ public class Editor extends JFrame
         cutItem.setEnabled(true);
         copyItem.setEnabled(true);
 
-        referenceFile = PdeKeywords.getReference(textarea.getSelectedText());
-        if (referenceFile != null) {
-          referenceItem.setEnabled(true);
-        }
+        //referenceFile = PdeKeywords.getReference(textarea.getSelectedText());
+        //if (referenceFile != null) {
+          //referenceItem.setEnabled(true);
+        //}
       } else {
         cutItem.setEnabled(false);
         copyItem.setEnabled(false);
-        referenceItem.setEnabled(false);
+        //referenceItem.setEnabled(false);
       }
       super.show(component, x, y);
     }

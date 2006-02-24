@@ -236,7 +236,7 @@ public class PdePreprocessor {
     String returntype, functioname, parameterlist, prototype;
     java.util.LinkedList prototypes = new java.util.LinkedList();
     //System.out.println("prototypes:");
-    if (Preferences.get("build.extension").equals("cpp")) {
+    //if (Preferences.get("build.extension").equals("cpp")) {
       while(matcher.contains(input, pattern)){
         result = matcher.getMatch();
         //System.out.println(result);
@@ -253,7 +253,7 @@ public class PdePreprocessor {
         prototypes.add(prototype);
         //System.out.println(prototype);
       }
-    }
+    //}
     // store # of prototypes so that line number reporting can be adjusted
     prototypeCount = prototypes.size();
   
@@ -299,7 +299,7 @@ public class PdePreprocessor {
     // start parsing at the compilationUnit non-terminal
     //
     //parser.pdeProgram();
-    parser.translationUnit();
+    //parser.translationUnit();
 
     // set up the AST for traversal by PdeEmitter
     //
@@ -329,16 +329,19 @@ public class PdePreprocessor {
     // output the code
     //
     WEmitter emitter = new WEmitter(lexer.getPreprocessorInfoChannel());
-    File streamFile = new File(buildPath, name + "." + Preferences.get("build.extension"));
+    //File streamFile = new File(buildPath, name + "." + Preferences.get("build.extension"));
+    File streamFile = new File(buildPath, name + ".cpp");
     PrintStream stream = new PrintStream(new FileOutputStream(streamFile));
 
     //writeHeader(stream, extraImports, name);
     writeHeader(stream, name, prototypes);
+    //added to write the pde code to the cpp file
+    writeProgram(stream, name, program);
     emitter.setASTNodeType(TNode.class.getName());
     emitter.setOut(stream);
-    emitter.printDeclarations(rootNode);
+    //emitter.printDeclarations(rootNode);
     //emitter.print(rootNode);
-    emitter.translationUnit(parser.getAST());
+    //emitter.translationUnit(parser.getAST());
 
     writeFooter(stream);
     stream.close();
@@ -362,6 +365,12 @@ public class PdePreprocessor {
 
     return name;
   }
+
+  // Write the pde program to the cpp file
+  void writeProgram(PrintStream out, String className, String program) {
+    out.print(program);
+  }
+
 
   /**
    * Write any required header material (eg imports, class decl stuff)
