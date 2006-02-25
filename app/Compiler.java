@@ -534,7 +534,13 @@ public class Compiler implements MessageConsumer {
         return;
       }
 
-      int lineNumber = Integer.parseInt(s1.substring(0, colon));
+      int lineNumber;
+      try {
+        lineNumber = Integer.parseInt(s1.substring(0, colon));
+      } catch (NumberFormatException e) {
+        System.err.print(s1);
+        return;
+      }
       
       // the "1" corresponds to the amount of lines written to the main code
       // file by PdePreprocessor's writeHeader() routine before prototypes
