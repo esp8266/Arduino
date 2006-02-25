@@ -43,9 +43,9 @@
 //       PB6  9|    |20  AVCC
 //       PB7 10|    |19  PB5 (D 13)
 // (D 5) PD5 11|    |18  PB4 (D 12)
-// (D 6) PD6 12|    |17  PB3 (D 11)
-// (D 7) PD7 13|    |16  PB2 (D 10)
-// (D 8) PB0 14|    |15  PB1 (D 9)
+// (D 6) PD6 12|    |17  PB3 (D 11) PWM
+// (D 7) PD7 13|    |16  PB2 (D 10) PWM
+// (D 8) PB0 14|    |15  PB1 (D 9) PWM
 //             +----+
 
 #define NUM_DIGITAL_PINS 14
@@ -118,7 +118,7 @@ pin_t analog_out_pin_to_port_array[NUM_DIGITAL_PINS] = {
 	{ NOT_A_PIN, NOT_A_PIN },
 	{ PB, 1 },
 	{ PB, 2 },
-	{ NOT_A_PIN, NOT_A_PIN },
+	{ PB, 3 },
 	{ NOT_A_PIN, NOT_A_PIN },
 	{ NOT_A_PIN, NOT_A_PIN },
 };

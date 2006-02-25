@@ -1,8 +1,8 @@
 /*
   wiring.c - Wiring API Partial Implementation
-  Part of Arduino / Wiring Lite
+  Part of Arduino - http://arduino.berlios.de/
 
-  Copyright (c) 2005 David A. Mellis
+  Copyright (c) 2005-2006 David A. Mellis
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -77,13 +77,35 @@ int analogInPinToBit(int pin)
 	return analog_in_pin_to_port[pin].bit;
 }
 
+void timer2PWMOn()
+{
+	// configure timer 2 for normal (non-inverting) pwm operation
+	// this attaches the timer to the pwm pin
+	sbi(TCCR2, COM21);
+	cbi(TCCR2, COM20);
+}
+
+void timer2PWMOff()
+{
+	// disconnect the timer from the pwm pin
+	cbi(TCCR2, COM21);
+	cbi(TCCR2, COM20);
+}
+
+void timer2PWMSet(unsigned char val)
+{
+	OCR2 = val;
+}
+
 void pinMode(int pin, int mode)
 {
 	if (digitalPinToPort(pin) != NOT_A_PIN) {
 		if (mode == INPUT)
-			cbi(_SFR_IO8(port_to_mode[digitalPinToPort(pin)]), digitalPinToBit(pin));
+			cbi(_SFR_IO8(port_to_mode[digitalPinToPort(pin)]),
+				digitalPinToBit(pin));
 		else
-			sbi(_SFR_IO8(port_to_mode[digitalPinToPort(pin)]), digitalPinToBit(pin));
+			sbi(_SFR_IO8(port_to_mode[digitalPinToPort(pin)]),
+				digitalPinToBit(pin));
 	}
 }
 
@@ -99,10 +121,15 @@ void digitalWrite(int pin, int val)
 		if (analogOutPinToBit(pin) == 2)
 			timer1PWMBOff();
 
+		if (analogOutPinToBit(pin) == 3)
+			timer2PWMOff();
+
 		if (val == LOW)
-			cbi(_SFR_IO8(port_to_output[digitalPinToPort(pin)]), digitalPinToBit(pin));
+			cbi(_SFR_IO8(port_to_output[digitalPinToPort(pin)]),
+				digitalPinToBit(pin));
 		else
-			sbi(_SFR_IO8(port_to_output[digitalPinToPort(pin)]), digitalPinToBit(pin));
+			sbi(_SFR_IO8(port_to_output[digitalPinToPort(pin)]),
+				digitalPinToBit(pin));
 	}
 }
 
@@ -118,7 +145,11 @@ int digitalRead(int pin)
 		if (analogOutPinToBit(pin) == 2)
 			timer1PWMBOff();
 
-		return (_SFR_IO8(port_to_input[digitalPinToPort(pin)]) >> digitalPinToBit(pin)) & 0x01;
+		if (analogOutPinToBit(pin) == 3)
+			timer2PWMOff();
+
+		return (_SFR_IO8(port_to_input[digitalPinToPort(pin)]) >>
+			digitalPinToBit(pin)) & 0x01;
 	}
 	
 	return LOW;
@@ -170,6 +201,10 @@ void analogWrite(int pin, int val)
 		pinMode(pin, OUTPUT);
 		timer1PWMBOn();
 		timer1PWMBSet(val);
+	} else if (analogOutPinToBit(pin) == 3) {
+		pinMode(pin, OUTPUT);
+		timer2PWMOn();
+		timer2PWMSet(val);
 	} else if (val < 128)
 		digitalWrite(pin, LOW);
 	else
@@ -220,29 +255,31 @@ void printString(char *s)
 
 void printIntegerInBase(unsigned long n, unsigned long base)
 { 
-        unsigned char buf[8 * sizeof(long)]; // Assumes 8-bit chars. 
-        unsigned long i = 0;
+	unsigned char buf[8 * sizeof(long)]; // Assumes 8-bit chars. 
+	unsigned long i = 0;
 
-        if (n == 0) {
-                printByte('0');
-                return;
-        } 
+	if (n == 0) {
+		printByte('0');
+		return;
+	} 
 
-        while (n > 0) {
-                buf[i++] = n % base;
-                n /= base;
-        }
+	while (n > 0) {
+		buf[i++] = n % base;
+		n /= base;
+	}
 
-        for (; i > 0; i--)
-                printByte(buf[i - 1] < 10 ? '0' + buf[i - 1] : 'A' + buf[i - 1] - 10);
+	for (; i > 0; i--)
+		printByte(buf[i - 1] < 10 ?
+			'0' + buf[i - 1] :
+			'A' + buf[i - 1] - 10);
 }
 
 void printInteger(long n)
 {
-        if (n < 0) {
-                printByte('-');
-                n = -n;
-        }
+	if (n < 0) {
+		printByte('-');
+		n = -n;
+	}
 
 	printIntegerInBase(n, 10);
 }
@@ -284,9 +321,8 @@ unsigned long millis()
 	// overflows when it reaches 256.  we calculate the total
 	// number of clock cycles, then divide by the number of clock
 	// cycles per millisecond.
-	//return timer0GetOverflowCount() * timer0GetPrescaler() * 256L / (F_CPU / 1000L);
-	return (unsigned long) timer0GetOverflowCount() * timer0GetPrescaler() * 2UL / (F_CPU / 128000UL);
-	//return (((unsigned long) timer0GetOverflowCount()) / 62UL) * (unsigned long) timer0GetPrescaler();
+	return (unsigned long) timer0GetOverflowCount() *
+		timer0GetPrescaler() * 2UL / (F_CPU / 128000UL);
 }
 
 void delay(unsigned long ms)
@@ -332,18 +368,26 @@ void delayMicroseconds(unsigned int us)
 
 int main(void)
 {
+	// this needs to be called before setup() or some functions won't
+        // work there
 	sei();
 	
 	// timer 0 is used for millis() and delay()
 	timer0Init();
 
-	// timer 1 is used for the hardware pwm
+	// timers 1 & 2 are used for the hardware pwm
 	timer1Init();
-	timer1SetPrescaler(TIMER_CLK_DIV1);
+	//timer1SetPrescaler(TIMER_CLK_DIV1);
 	timer1PWMInit(8);
+	
+	timer2Init();
 
-	//a2dInit();
-	//a2dSetPrescaler(ADC_PRESCALE_DIV128);
+	// configure timer 2 for phase correct pwm
+	// this is better for motors as it ensures an even waveform
+	// note, however, that fast pwm mode can achieve a frequency of up
+	// 8 MHz (with a 16 MHz clock) at 50% duty cycle
+	cbi(TCCR2, WGM21);
+	sbi(TCCR2, WGM20);
 
 	// set a2d reference to AVCC (5 volts)
 	cbi(ADMUX, REFS1);

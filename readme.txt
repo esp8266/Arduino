@@ -41,6 +41,17 @@ may need to reboot after running this script.
 
 UPDATES
 
+0004
+
+Main sketch is now compiled as C++ (instead of C).
+Updated avr toolchain.
+printInteger(), printHex(), etc. now handle longs.
+millis() fixed (now overflows after days, not minutes)
+Fixed path to java in Windows run.bat.
+Added Matrix and Sprite libraries.
+PWM now working on pin 11 (as well as 9 and 10).
+Slowed PWM frequency (on all three PWM pins) to 1KHz.
+
 0003
 
 API Changes
