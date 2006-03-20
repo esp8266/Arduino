@@ -271,6 +271,7 @@ linestatus.height  = 20
 upload.erase=false
 upload.verify=false
 upload.programmer=stk500
+upload.maximum_size=7168
 
 # set the parallel port defaults (used if upload.programmer=dapa)
 parallel.port=0x378

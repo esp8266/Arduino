@@ -153,6 +153,7 @@
 
 /* Begin PBXBuildFile section */
 		330B21540968180400345666 /* librxtxSerial.jnilib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 330B21530968180400345666 /* librxtxSerial.jnilib */; };
+		332D4DB609CF147F00BF81F6 /* Sizer.java in Sources */ = {isa = PBXBuildFile; fileRef = 332D4DB509CF147F00BF81F6 /* Sizer.java */; };
 		339514EE097AEB5900193C89 /* STDCTokenTypes.txt in Resources */ = {isa = PBXBuildFile; fileRef = 33FFFE420965BD110016AC38 /* STDCTokenTypes.txt */; };
 		339514FA097AEB8000193C89 /* license.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02B60965BD170016AC38 /* license.txt */; };
 		339514FB097AEB8000193C89 /* readme.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02B70965BD170016AC38 /* readme.txt */; };
@@ -362,6 +363,7 @@
 
 /* Begin PBXFileReference section */
 		330B21530968180400345666 /* librxtxSerial.jnilib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = librxtxSerial.jnilib; sourceTree = "<group>"; };
+		332D4DB509CF147F00BF81F6 /* Sizer.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Sizer.java; sourceTree = "<group>"; };
 		333269E1099BB1FC007D3AE2 /* tools.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = tools.zip; sourceTree = "<group>"; };
 		33AF620A0965D67800B514A9 /* antlr.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = antlr.jar; sourceTree = "<group>"; };
 		33AF620B0965D67900B514A9 /* applet.html */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.html; path = applet.html; sourceTree = "<group>"; };
@@ -767,6 +769,7 @@
 				33FFFE710965BD110016AC38 /* tools */,
 				33FFFE730965BD110016AC38 /* UpdateCheck.java */,
 				33FFFE740965BD110016AC38 /* Uploader.java */,
+				332D4DB509CF147F00BF81F6 /* Sizer.java */,
 			);
 			name = app;
 			path = ../../app;
@@ -1116,6 +1119,7 @@
 				33AF61B30965C54B00B514A9 /* WTreeParser.java in Sources */,
 				33AF61B40965C54B00B514A9 /* JEditTextArea.java in Sources */,
 				33AF61B50965C54B00B514A9 /* Base.java in Sources */,
+				332D4DB609CF147F00BF81F6 /* Sizer.java in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1547,6 +1547,24 @@ public class Sketch {
     //System.out.println("success = " + success + " ... " + primaryClassName);
     return success ? primaryClassName : null;
   }
+  
+  protected void size(String buildPath, String suggestedClassName)
+    throws RunnerException {
+    long size = 0;
+    Sizer sizer = new Sizer(buildPath, suggestedClassName);
+    try {
+      size = sizer.computeSize();
+      System.out.println("Binary sketch size: " + size + " bytes (of a " +
+        Preferences.get("upload.maximum_size") + " byte maximum)");      
+    } catch (RunnerException e) {
+      System.err.println("Couldn't determine program size: " + e.getMessage());
+    }
+
+    if (size > Preferences.getInteger("upload.maximum_size"))
+      throw new RunnerException(
+        "Sketch too big; try deleting code, removing floats, or see " +
+        "http://www.arduino.cc/en/Main/FAQ for more advice.");
+  }
 
   protected String upload(String buildPath, String suggestedClassName)
     throws RunnerException {
@@ -1628,6 +1646,7 @@ public class Sketch {
 
     // build the sketch
     String foundName = build(target, appletFolder.getPath(), name);
+    size(appletFolder.getPath(), name);
     foundName = upload(appletFolder.getPath(), name);
     // (already reported) error during export, exit this function
     if (foundName == null) return false;
