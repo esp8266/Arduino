@@ -657,7 +657,10 @@ public class Editor extends JFrame
 	JMenuItem rbMenuItem;
 	JMenuItem cbMenuItem;
 	SerialRateMenuListener		srml = new SerialRateMenuListener();
-	String[] portRates = {"9600","19200","38400","57600","115200"};
+	String[] portRates = {
+    "300","1200","2400","4800","9600","14400",
+    "19200","28800","38400","57600","115200"
+  };
     
 	serialMenuListener  = new SerialMenuListener();
 
