@@ -5,8 +5,8 @@ can be connected to software on your computer (e.g. Flash, Processing, MaxMSP).
 
 Arduino is an open source project, owned by nobody and supported by many.
 
-For more information, see the website at: http://arduino.berlios.de/ or the
-forums at http://arduino.berlios.de/cgi-bin/yabb/YaBB.cgi
+For more information, see the website at: http://www.arduino.cc/ or the
+forums at http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl
 
 The Team is composed of Massimo Banzi, David Cuartielles, Tom Igoe,
 David A. Mellis and Nicholas Zambetti.
@@ -48,9 +48,11 @@ Updated avr toolchain.
 printInteger(), printHex(), etc. now handle longs.
 millis() fixed (now overflows after days, not minutes)
 Fixed path to java in Windows run.bat.
-Added Matrix and Sprite libraries.
-PWM now working on pin 11 (as well as 9 and 10).
+Added Matrix and Sprite libraries (written with Nicholas Zambetti).
+PWM now working on pin 11 (in addition to pins 9 and 10).
 Slowed PWM frequency (on all three PWM pins) to 1KHz.
+Now give an error if compiled sketch is too big.
+Fixed abs(), min(), max(), and constrain() macros.
 
 0003
 

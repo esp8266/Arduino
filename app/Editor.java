@@ -818,10 +818,10 @@ public class Editor extends JFrame
 //      });
 //    menu.add(item);
 
-    item = newJMenuItem("Visit arduino.berlios.de", '5');
+    item = newJMenuItem("Visit www.arduino.cc", '5');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          Base.openURL("http://arduino.berlios.de/");
+          Base.openURL("http://www.arduino.cc/");
         }
       });
     menu.add(item);
