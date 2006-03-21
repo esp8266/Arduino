@@ -78,32 +78,7 @@ public class Uploader implements MessageConsumer  {
     return uisp(commandDownloader);
   }
 
-  public boolean burnBootloader() throws RunnerException {
-    // I know this is ugly; apologies - that's what happens when you try to
-    // write Lisp-style code in Java.
-    
-    // Some of these values should be specified in preferences.txt.  
-    return
-      // unlock bootloader segment of flash memory
-      uploadUsingAVRISP(Arrays.asList(new String[] {
-        "--wr_lock=" + Preferences.get("bootloader.unlock_bits") })) &&
-      // write fuses:
-      // bootloader size of 512 words; from 0xE00-0xFFF
-      // clock speed of 16 MHz, external quartz
-      uploadUsingAVRISP(Arrays.asList(new String[] {
-          "--wr_fuse_l=" + Preferences.get("bootloader.low_fuses"),
-          "--wr_fuse_h=" + Preferences.get("bootloader.high_fuses") })) &&
-      // upload bootloader
-      uploadUsingAVRISP(Arrays.asList(new String[] {
-          "--erase", "--upload", "--verify",
-          "if=" + Preferences.get("bootloader.path") + File.separator +
-          Preferences.get("bootloader.file") })) &&
-      // lock bootloader segment
-      uploadUsingAVRISP(Arrays.asList(new String[] {
-        "--wr_lock=" + Preferences.get("bootloader.lock_bits") }));
-  }
-  
-  public boolean uploadUsingAVRISP(Collection params) throws RunnerException {
+  public boolean burnBootloaderAVRISP() throws RunnerException {
     List commandDownloader = new ArrayList();
     commandDownloader.add("-dprog=" + Preferences.get("bootloader.programmer"));
     commandDownloader.add(
@@ -111,12 +86,43 @@ public class Uploader implements MessageConsumer  {
         "/dev/" + Preferences.get("serial.port").toLowerCase() :
         Preferences.get("serial.port")));
     commandDownloader.add("-dspeed=" + Preferences.get("serial.burn_rate"));
-    commandDownloader.addAll(params);
-    //commandDownloader.add("--erase");
-    //commandDownloader.add("--upload");
-    //commandDownloader.add("--verify");
-    //commandDownloader.add("if=" + buildPath + File.separator + className + ".hex");
-    return uisp(commandDownloader);
+    return burnBootloader(commandDownloader);
+  }
+  
+  public boolean burnBootloaderParallel() throws RunnerException {
+    List commandDownloader = new ArrayList();
+    commandDownloader.add("-dprog=dapa");
+    commandDownloader.add("-dlpt=" + Preferences.get("parallel.port"));
+    return burnBootloader(commandDownloader);
+  }
+  
+  protected boolean burnBootloader(Collection params) throws RunnerException {
+    // I know this is ugly; apologies - that's what happens when you try to
+    // write Lisp-style code in Java.
+    return
+      // unlock bootloader segment of flash memory
+      uisp(params, Arrays.asList(new String[] {
+        "--wr_lock=" + Preferences.get("bootloader.unlock_bits") })) &&
+      // write fuses:
+      // bootloader size of 512 words; from 0xE00-0xFFF
+      // clock speed of 16 MHz, external quartz
+      uisp(params, Arrays.asList(new String[] {
+          "--wr_fuse_l=" + Preferences.get("bootloader.low_fuses"),
+          "--wr_fuse_h=" + Preferences.get("bootloader.high_fuses") })) &&
+      // upload bootloader
+      uisp(params, Arrays.asList(new String[] {
+          "--erase", "--upload", "--verify",
+          "if=" + Preferences.get("bootloader.path") + File.separator +
+          Preferences.get("bootloader.file") })) &&
+      // lock bootloader segment
+      uisp(params, Arrays.asList(new String[] {
+        "--wr_lock=" + Preferences.get("bootloader.lock_bits") }));
+  }
+  
+  public boolean uisp(Collection p1, Collection p2) throws RunnerException {
+    ArrayList p = new ArrayList(p1);
+    p.addAll(p2);
+    return uisp(p);
   }
   
   public boolean uisp(Collection params) throws RunnerException {

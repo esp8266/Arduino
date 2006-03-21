@@ -1805,7 +1805,7 @@ public class Editor extends JFrame
       //boolean success = sketch.isLibrary() ?
       //sketch.exportLibrary() : sketch.exportApplet();
       Uploader uploader = new Uploader();
-      boolean success = uploader.burnBootloader();
+      boolean success = uploader.burnBootloaderAVRISP();
       
       if (success) {
         message("Done burning bootloader.");
