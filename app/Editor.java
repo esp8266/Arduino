@@ -720,10 +720,20 @@ public class Editor extends JFrame
     item = new JMenuItem("Burn Bootloader");
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          handleBurnBootloader();
+          handleBurnBootloader(false);
         }
       });
     menu.add(item);
+    
+    if (!Base.isMacOS()) {
+      item = new JMenuItem("Burn Bootloader (parallel port)");
+      item.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            handleBurnBootloader(true);
+          }
+        });
+      menu.add(item);
+    }
     
     menu.addMenuListener(new MenuListener() {
       public void menuCanceled(MenuEvent e) {}
@@ -1794,7 +1804,7 @@ public class Editor extends JFrame
     System.exit(0);
   }
 
-  protected void handleBurnBootloader() {
+  protected void handleBurnBootloader(boolean parallel) {
     if(debugging)
       doStop();
     console.clear();
@@ -1805,7 +1815,9 @@ public class Editor extends JFrame
       //boolean success = sketch.isLibrary() ?
       //sketch.exportLibrary() : sketch.exportApplet();
       Uploader uploader = new Uploader();
-      boolean success = uploader.burnBootloaderAVRISP();
+      boolean success = parallel ? 
+        uploader.burnBootloaderParallel() :
+        uploader.burnBootloaderAVRISP();
       
       if (success) {
         message("Done burning bootloader.");
