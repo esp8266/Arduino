@@ -44,11 +44,7 @@ public class Uploader implements MessageConsumer  {
   static final String SUPER_BADNESS =
     "Compiler error, please submit this code to " + BUGS_URL;
 
-  String buildPath;
-  String className;
-  File includeFolder;
   RunnerException exception;
-  Sketch sketch;
   //PdePreferences preferences;
 
   //Serial serialPort;
@@ -56,75 +52,89 @@ public class Uploader implements MessageConsumer  {
   static OutputStream serialOutput;
   //int serial; // last byte of data received
 
-  private String serial_port = "COM1";
-  private int serial_rate = 9600;
-  private char serial_parity = 'N';
-  private int serial_databits = 8;
-  private float serial_stopbits = 1;
-
-  public void serialPreferences() {
-    //System.out.println("setting serial properties");
-    serial_port = Preferences.get("serial.port");
-    serial_rate = Preferences.getInteger("serial.download_rate");
-    serial_parity = Preferences.get("serial.parity").charAt(0);
-    serial_databits = Preferences.getInteger("serial.databits");
-    serial_stopbits = new Float(Preferences.get("serial.stopbits")).floatValue();
+  public Uploader() {
   }
 
-  public Uploader(String buildPath, String className,
-                      Sketch sketch) {
-    this.buildPath = buildPath;
-    this.includeFolder = includeFolder;
-    this.className = className;
-    this.sketch = sketch;
+  public boolean uploadUsingPreferences(String buildPath, String className)
+    throws RunnerException {
+    List commandDownloader = new ArrayList();
+    commandDownloader.add("-dprog=" + Preferences.get("upload.programmer"));
+    if (Preferences.get("upload.programmer").equals("dapa"))
+      commandDownloader.add("-dlpt=" + Preferences.get("parallel.port"));
+    else {
+      commandDownloader.add(
+        "-dserial=" + (Base.isWindows() ?
+          "/dev/" + Preferences.get("serial.port").toLowerCase() :
+          Preferences.get("serial.port")));
+      commandDownloader.add(
+        "-dspeed=" + Preferences.getInteger("serial.download_rate"));
+    }
+    if (Preferences.getBoolean("upload.erase"))
+      commandDownloader.add("--erase");
+    commandDownloader.add("--upload");
+    if (Preferences.getBoolean("upload.verify"))
+      commandDownloader.add("--verify");
+    commandDownloader.add("if=" + buildPath + File.separator + className + ".hex");
+    return uisp(commandDownloader);
   }
 
-  public boolean downloadJava(PrintStream leechErr) throws RunnerException {
+  public boolean burnBootloader() throws RunnerException {
+    // I know this is ugly; apologies - that's what happens when you try to
+    // write Lisp-style code in Java.
+    
+    // Some of these values should be specified in preferences.txt.  
+    return
+      // unlock bootloader segment of flash memory
+      uploadUsingAVRISP(Arrays.asList(new String[] {
+        "--wr_lock=" + Preferences.get("bootloader.unlock_bits") })) &&
+      // write fuses:
+      // bootloader size of 512 words; from 0xE00-0xFFF
+      // clock speed of 16 MHz, external quartz
+      uploadUsingAVRISP(Arrays.asList(new String[] {
+          "--wr_fuse_l=" + Preferences.get("bootloader.low_fuses"),
+          "--wr_fuse_h=" + Preferences.get("bootloader.high_fuses") })) &&
+      // upload bootloader
+      uploadUsingAVRISP(Arrays.asList(new String[] {
+          "--erase", "--upload", "--verify",
+          "if=" + Preferences.get("bootloader.path") + File.separator +
+          Preferences.get("bootloader.file") })) &&
+      // lock bootloader segment
+      uploadUsingAVRISP(Arrays.asList(new String[] {
+        "--wr_lock=" + Preferences.get("bootloader.lock_bits") }));
+  }
+  
+  public boolean uploadUsingAVRISP(Collection params) throws RunnerException {
+    List commandDownloader = new ArrayList();
+    commandDownloader.add("-dprog=" + Preferences.get("bootloader.programmer"));
+    commandDownloader.add(
+      "-dserial=" + (Base.isWindows() ?
+        "/dev/" + Preferences.get("serial.port").toLowerCase() :
+        Preferences.get("serial.port")));
+    commandDownloader.add("-dspeed=" + Preferences.get("serial.burn_rate"));
+    commandDownloader.addAll(params);
+    //commandDownloader.add("--erase");
+    //commandDownloader.add("--upload");
+    //commandDownloader.add("--verify");
+    //commandDownloader.add("if=" + buildPath + File.separator + className + ".hex");
+    return uisp(commandDownloader);
+  }
+  
+  public boolean uisp(Collection params) throws RunnerException {
     String userdir = System.getProperty("user.dir") + File.separator;
-//    String commandDownloader[] = new String[] {
-//    ((!Base.isMacOS()) ?  "tools/avr/bin/uisp" :
-//      userdir + "tools/avr/bin/uisp"),
-//    //[2] Serial port
-//    //[3] Serial download rate
-//    //[6] hex class file
-//     "-dprog=stk500",
-//     " ",
-//     " ",
-//     "-dpart=" + Preferences.get("build.mcu"),
-//     "--upload",
-//     " "
-//    };
 
     firstErrorFound = false;  // haven't found any errors yet
     secondErrorFound = false;
     notFoundError = false;
     int result=0; // pre-initialized to quiet a bogus warning from jikes
     try {
-      serialPreferences();
       List commandDownloader = new ArrayList();
       commandDownloader.add((!Base.isMacOS() ? "" : userdir) + "tools/avr/bin/uisp");
-      commandDownloader.add("-dprog=" + Preferences.get("upload.programmer"));
       commandDownloader.add("-dpart=" + Preferences.get("build.mcu"));
-	  //commandDownloader.add("-v=4"); // extra verbosity for help debugging.
-      if (Preferences.get("upload.programmer").equals("dapa"))
-        commandDownloader.add("-dlpt=" + Preferences.get("parallel.port"));
-      else {
-        commandDownloader.add("-dserial=" + (Base.isWindows() ? "/dev/" + serial_port.toLowerCase() : serial_port));
-        commandDownloader.add("-dspeed=" + serial_rate);
-      }
-      if (Preferences.getBoolean("upload.erase"))
-        commandDownloader.add("--erase");
-      commandDownloader.add("--upload");
-      if (Preferences.getBoolean("upload.verify"))
-        commandDownloader.add("--verify");
-      commandDownloader.add("if=" + buildPath + File.separator + className + ".hex");
-
-//      commandDownloader[2] = ((!Base.isMacOS()) ? "-dserial=/dev/" + serial_port.toLowerCase() : "-dserial=" + serial_port );
-//      commandDownloader[3] = "-dspeed=" + serial_rate;
-//      commandDownloader[6] = "if=" + buildPath + File.separator + className + ".hex";
-      /*for(int i = 0; i < commandDownloader.length; i++) {
-	System.out.println(commandDownloader[i]);
-      }*/
+      commandDownloader.addAll(params);
+  	  //commandDownloader.add("-v=4"); // extra verbosity for help debugging.
+      //for(int i = 0; i < commandDownloader.length; i++) {
+      //  System.out.println(commandDownloader[i]);
+      //}
 
       // Cleanup the serial buffer
       Serial serialPort = new Serial();

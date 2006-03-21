@@ -1571,8 +1571,7 @@ public class Sketch {
 
     // download the program
     //
-    Uploader downloader =
-      new Uploader(buildPath, suggestedClassName, this);
+    Uploader uploader = new Uploader();
     // macos9 now officially broken.. see PdeCompilerJavac
     //PdeCompiler compiler =
     //  ((PdeBase.platform == PdeBase.MACOS9) ?
@@ -1583,12 +1582,12 @@ public class Sketch {
     // which is a wrapped around
     // (this will catch and parse errors during compilation
     // the messageStream will call message() for 'compiler')
-    MessageStream messageStream = new MessageStream(downloader);
+    //MessageStream messageStream = new MessageStream(downloader);
     //PrintStream leechErr = new PrintStream(messageStream);
     //boolean result = compiler.compileJava(leechErr);
     //return compiler.compileJava(leechErr);
     boolean success =
-      downloader.downloadJava(new PrintStream(messageStream));
+      uploader.uploadUsingPreferences(buildPath, suggestedClassName);
 
     return success ? suggestedClassName : null;
   }

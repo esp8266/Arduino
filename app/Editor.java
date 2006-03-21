@@ -714,6 +714,16 @@ public class Editor extends JFrame
     }
     
 	menu.add(serialRateSubMenu);
+  
+  menu.addSeparator();
+    
+    item = new JMenuItem("Burn Bootloader");
+    item.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          handleBurnBootloader();
+        }
+      });
+    menu.add(item);
     
     menu.addMenuListener(new MenuListener() {
       public void menuCanceled(MenuEvent e) {}
@@ -1784,6 +1794,33 @@ public class Editor extends JFrame
     System.exit(0);
   }
 
+  protected void handleBurnBootloader() {
+    if(debugging)
+      doStop();
+    console.clear();
+    //String what = sketch.isLibrary() ? "Applet" : "Library";
+    //message("Exporting " + what + "...");
+    message("Burning bootloader to I/O Board...");
+    try {
+      //boolean success = sketch.isLibrary() ?
+      //sketch.exportLibrary() : sketch.exportApplet();
+      Uploader uploader = new Uploader();
+      boolean success = uploader.burnBootloader();
+      
+      if (success) {
+        message("Done burning bootloader.");
+      } else {
+        // error message will already be visible
+      }
+    } catch (RunnerException e) {
+      message("Error while burning bootloader.");
+      //e.printStackTrace();
+      error(e);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    buttons.clear();
+  }
 
   public void highlightLine(int lnum) {
     if (lnum < 0) {

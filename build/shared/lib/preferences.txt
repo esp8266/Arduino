@@ -283,6 +283,15 @@ serial.parity=N
 serial.port=COM1
 serial.download_rate=19200
 serial.debug_rate=9600
+serial.burn_rate=115200
+
+bootloader.low_fuses=0xdf
+bootloader.high_fuses=0xca
+bootloader.path=bootloader
+bootloader.file=ATmegaBOOT.hex
+bootloader.unlock_bits=0xFF
+bootloader.lock_bits=0xCF
+bootloader.programmer=stk500
 
 # set the build defaults
 build.mcu=atmega8
