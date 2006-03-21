@@ -63,7 +63,7 @@ public class Sizer implements MessageConsumer {
         } catch (InterruptedException intExc) { }
       }
     } catch (Exception e) {
-      exception = new RunnerException(e);
+      exception = new RunnerException(e.toString());
     }
     
     if (exception != null)
@@ -86,9 +86,9 @@ public class Sizer implements MessageConsumer {
         st.nextToken();
         size = (new Integer(st.nextToken().trim())).longValue();
       } catch (NoSuchElementException e) {
-        exception = new RunnerException(e);
+        exception = new RunnerException(e.toString());
       } catch (NumberFormatException e) {
-        exception = new RunnerException(e);
+        exception = new RunnerException(e.toString());
       }
     }
   }
