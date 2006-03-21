@@ -1043,8 +1043,14 @@
 			files = (
 			);
 			inputPaths = (
+				../shared/dist/examples.zip,
+				../shared/reference.zip,
+				dist/tools.zip,
 			);
 			outputPaths = (
+				$BUILT_PRODUCTS_DIR/tools,
+				$BUILT_PRODUCTS_DIR/examples,
+				$BUILT_PRODUCTS_DIR/reference,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
