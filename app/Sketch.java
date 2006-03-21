@@ -1407,7 +1407,7 @@ public class Sketch {
         }
       }
       errorLine -= code[errorFile].preprocOffset;
-      //errorLine -= preprocessor.prototypeCount;
+      errorLine -= preprocessor.prototypeCount;
 
       throw new RunnerException(re.getMessage(), errorFile,
                              errorLine, re.getColumn());
@@ -1448,7 +1448,7 @@ public class Sketch {
           }
         }
         errorLine -= code[errorFile].preprocOffset;
-        //errorLine -= preprocessor.prototypeCount;
+        errorLine -= preprocessor.prototypeCount;
 
         throw new RunnerException(tsre.getMessage(),
                                errorFile, errorLine, errorColumn);
@@ -1538,7 +1538,7 @@ public class Sketch {
     } catch (RunnerException re) {
       throw new RunnerException(re.getMessage(),
                                 re.file,
-                                re.line,// - preprocessor.prototypeCount,
+                                re.line - preprocessor.prototypeCount,
                                 re.column);
     } catch (Exception ex) {
       // TODO better method for handling this?
