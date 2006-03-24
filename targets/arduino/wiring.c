@@ -366,6 +366,39 @@ void delayMicroseconds(unsigned int us)
 	sei();
 }
 
+/*
+unsigned long pulseIn(int pin, int state)
+{
+	unsigned long width = 0;
+
+	while (digitalRead(pin) == !state)
+		;
+		
+	while (digitalRead(pin) != !state)
+		width++;
+		
+	return width * 17 / 2; // convert to microseconds
+}
+*/
+
+unsigned long pulseIn(int pin, int state)
+{
+	unsigned long width = 0;
+	int r = port_to_input[digitalPinToPort(pin)];
+	int bit = digitalPinToBit(pin);
+	int mask = 1 << bit;
+
+	state = (!!state) << bit;
+
+	while ((_SFR_IO8(r) & mask) != state)
+		;
+		
+	while ((_SFR_IO8(r) & mask) == state)
+		width++;
+		
+	return width * (16000000UL / F_CPU) * 20 / 23;
+}
+
 int main(void)
 {
 	// this needs to be called before setup() or some functions won't

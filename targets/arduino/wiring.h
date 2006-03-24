@@ -82,6 +82,7 @@ unsigned long millis(void);
 void delay(unsigned long);
 void delay_ms(unsigned short ms);
 void delayMicroseconds(unsigned int us);
+unsigned long pulseIn(int pin, int state);
 
 void setup(void);
 void loop(void);
