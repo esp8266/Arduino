@@ -101,6 +101,7 @@ void HardwareSerial::print(long n, int base)
 
 void HardwareSerial::println(void)
 {
+  print('\r');
   print('\n');  
 }
 
