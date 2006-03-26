@@ -8,6 +8,7 @@
 mkdir reference
 cd reference
 curl http://www.arduino.cc/en/Main/Howto -o howto.html
+curl http://www.arduino.cc/en/Main/FAQ -o FAQ.html
 curl http://www.arduino.cc/en/Reference/HomePage -o index.html
 curl http://www.arduino.cc/en/pub/skins/arduino/arduino.css -o arduino.css
 for i in `grep -o "http://www.arduino.cc/en/Reference/[^']*" index.html | sort -u | grep -v '?' | cut -d '/' -f 6`; do curl http://www.arduino.cc/en/Reference/$i -o $i.html; done
