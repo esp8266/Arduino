@@ -219,6 +219,10 @@
 		33AF61B30965C54B00B514A9 /* WTreeParser.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE520965BD110016AC38 /* WTreeParser.java */; };
 		33AF61B40965C54B00B514A9 /* JEditTextArea.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE630965BD110016AC38 /* JEditTextArea.java */; };
 		33AF61B50965C54B00B514A9 /* Base.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE240965BD100016AC38 /* Base.java */; };
+		33BEDDB109D6DC1300430D5B /* Library.java in Sources */ = {isa = PBXBuildFile; fileRef = 33BEDDAF09D6DC1300430D5B /* Library.java */; };
+		33BEDDB209D6DC1300430D5B /* LibraryManager.java in Sources */ = {isa = PBXBuildFile; fileRef = 33BEDDB009D6DC1300430D5B /* LibraryManager.java */; };
+		33BEDDD509D6E8D800430D5B /* Archiver.java in Sources */ = {isa = PBXBuildFile; fileRef = 33BEDDD309D6E8D800430D5B /* Archiver.java */; };
+		33BEDDD609D6E8D800430D5B /* ExportFolder.java in Sources */ = {isa = PBXBuildFile; fileRef = 33BEDDD409D6E8D800430D5B /* ExportFolder.java */; };
 		33CF03B209662CB700F2C9A9 /* arduino.icns in Resources */ = {isa = PBXBuildFile; fileRef = 33CF03B009662CA800F2C9A9 /* arduino.icns */; };
 		33CF03CC09662DC000F2C9A9 /* mrj.jar in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33AF620C0965D67900B514A9 /* mrj.jar */; settings = {JAVA_ARCHIVE_SUBDIR = ../shared/lib; }; };
 		33CF03CD09662DC000F2C9A9 /* RXTXcomm.jar in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33AF620F0965D67A00B514A9 /* RXTXcomm.jar */; settings = {JAVA_ARCHIVE_SUBDIR = ../shared/lib; }; };
@@ -371,6 +375,10 @@
 		33AF620D0965D67900B514A9 /* oro.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = oro.jar; sourceTree = "<group>"; };
 		33AF620E0965D67A00B514A9 /* registry.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = registry.jar; sourceTree = "<group>"; };
 		33AF620F0965D67A00B514A9 /* RXTXcomm.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = RXTXcomm.jar; sourceTree = "<group>"; };
+		33BEDDAF09D6DC1300430D5B /* Library.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = Library.java; sourceTree = "<group>"; };
+		33BEDDB009D6DC1300430D5B /* LibraryManager.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = LibraryManager.java; sourceTree = "<group>"; };
+		33BEDDD309D6E8D800430D5B /* Archiver.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = Archiver.java; sourceTree = "<group>"; };
+		33BEDDD409D6E8D800430D5B /* ExportFolder.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = ExportFolder.java; sourceTree = "<group>"; };
 		33CF03B009662CA800F2C9A9 /* arduino.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = arduino.icns; path = dist/arduino.icns; sourceTree = "<group>"; };
 		33DD8FB6096AC8DA0013AF8F /* Arduino.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Arduino.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		33FF01DC0965BD160016AC38 /* examples.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = examples.zip; sourceTree = "<group>"; };
@@ -738,6 +746,8 @@
 		33FFFE220965BD100016AC38 /* app */ = {
 			isa = PBXGroup;
 			children = (
+				33BEDDAF09D6DC1300430D5B /* Library.java */,
+				33BEDDB009D6DC1300430D5B /* LibraryManager.java */,
 				33FFFE240965BD100016AC38 /* Base.java */,
 				33FFFE260965BD100016AC38 /* Compiler.java */,
 				33FFFE270965BD100016AC38 /* Editor.java */,
@@ -847,6 +857,8 @@
 		33FFFE710965BD110016AC38 /* tools */ = {
 			isa = PBXGroup;
 			children = (
+				33BEDDD309D6E8D800430D5B /* Archiver.java */,
+				33BEDDD409D6E8D800430D5B /* ExportFolder.java */,
 				33FFFE720965BD110016AC38 /* AutoFormat.java */,
 			);
 			path = tools;
@@ -1126,6 +1138,10 @@
 				33AF61B40965C54B00B514A9 /* JEditTextArea.java in Sources */,
 				33AF61B50965C54B00B514A9 /* Base.java in Sources */,
 				332D4DB609CF147F00BF81F6 /* Sizer.java in Sources */,
+				33BEDDB109D6DC1300430D5B /* Library.java in Sources */,
+				33BEDDB209D6DC1300430D5B /* LibraryManager.java in Sources */,
+				33BEDDD509D6E8D800430D5B /* Archiver.java in Sources */,
+				33BEDDD609D6E8D800430D5B /* ExportFolder.java in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

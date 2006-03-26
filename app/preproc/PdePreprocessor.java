@@ -74,6 +74,9 @@ public class PdePreprocessor {
   // stores number of built user-defined function prototypes
   public int prototypeCount = 0;
 
+  // stores number of included library headers written
+  public int headerCount = 0;
+
   /**
    * These may change in-between (if the prefs panel adds this option)
    * so grab them here on construction.
@@ -236,24 +239,22 @@ public class PdePreprocessor {
     String returntype, functioname, parameterlist, prototype;
     java.util.LinkedList prototypes = new java.util.LinkedList();
     //System.out.println("prototypes:");
-    //if (Preferences.get("build.extension").equals("cpp")) {
-      while(matcher.contains(input, pattern)){
-        result = matcher.getMatch();
-        //System.out.println(result);
-        returntype = result.group(1).toString();
-        functioname = result.group(2).toString();
-        parameterlist = result.group(3).toString().replace('\n', ' ');
-        prototype = returntype + " " + functioname + "(" + parameterlist + ");";
-        if(0 == functioname.compareTo("setup")){
-          continue;
-        }
-        if(0 == functioname.compareTo("loop")){
-          continue;
-        }
-        prototypes.add(prototype);
-        //System.out.println(prototype);
+    while(matcher.contains(input, pattern)){
+      result = matcher.getMatch();
+      //System.out.println(result);
+      returntype = result.group(1).toString();
+      functioname = result.group(2).toString();
+      parameterlist = result.group(3).toString().replace('\n', ' ');
+      prototype = returntype + " " + functioname + "(" + parameterlist + ");";
+      if(0 == functioname.compareTo("setup")){
+        continue;
       }
-    //}
+      if(0 == functioname.compareTo("loop")){
+        continue;
+      }
+      prototypes.add(prototype);
+      //System.out.println(prototype);
+    }
     // store # of prototypes so that line number reporting can be adjusted
     prototypeCount = prototypes.size();
   
@@ -263,6 +264,7 @@ public class PdePreprocessor {
     // through so that the line numbers when the compiler reports errors
     // match those that will be highlighted in the PDE IDE
     //
+    //System.out.println(program);
     WLexer lexer  = new WLexer(programReader);
     //lexer.setTokenObjectClass("antlr.CommonHiddenStreamToken");
     lexer.setTokenObjectClass("processing.app.preproc.CToken");
@@ -329,7 +331,6 @@ public class PdePreprocessor {
     // output the code
     //
     WEmitter emitter = new WEmitter(lexer.getPreprocessorInfoChannel());
-    //File streamFile = new File(buildPath, name + "." + Preferences.get("build.extension"));
     File streamFile = new File(buildPath, name + ".cpp");
     PrintStream stream = new PrintStream(new FileOutputStream(streamFile));
 
@@ -381,6 +382,16 @@ public class PdePreprocessor {
    */
   void writeHeader(PrintStream out, String className, java.util.LinkedList prototypes) {
     out.print("#include \"WProgram.h\"\n");
+    
+    // print library headers
+    LibraryManager libraryManager = new LibraryManager();
+    String[] headerFiles = libraryManager.getHeaderFiles();
+    for(int i = 0; i < headerFiles.length; ++i){
+      out.print("#include \"" + headerFiles[i] + "\"\n");
+    }
+
+    // record number of header lines written for error line adjustment
+    headerCount = headerFiles.length;
 
     // print user defined prototypes
     while(0 < prototypes.size()){

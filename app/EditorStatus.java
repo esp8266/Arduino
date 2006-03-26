@@ -422,7 +422,7 @@ public class EditorStatus extends JPanel implements ActionListener {
     } else if (e.getSource() == yesButton) {
       // answer was in response to "save changes?"
       unprompt();
-      editor.handleSave();
+      editor.handleSave(true);
       editor.checkModified2();
 
     } else if (e.getSource() == cancelButton) {

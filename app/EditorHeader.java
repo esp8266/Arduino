@@ -339,8 +339,10 @@ public class EditorHeader extends JComponent {
     Sketch sketch = editor.sketch;
     if (sketch != null) {
       for (int i = 0; i < sketch.hiddenCount; i++) {
-        item = new JMenuItem(sketch.hidden[i].name);
-        item.setActionCommand(sketch.hidden[i].name);
+        item = new JMenuItem(sketch.hidden[i].name +
+          Sketch.flavorExtensionsShown[sketch.hidden[i].flavor]);
+        item.setActionCommand(sketch.hidden[i].name +
+          Sketch.flavorExtensionsShown[sketch.hidden[i].flavor]);
         item.addActionListener(unhideListener);
         unhide.add(item);
       }
@@ -360,7 +362,8 @@ public class EditorHeader extends JComponent {
           }
         };
       for (int i = 0; i < sketch.codeCount; i++) {
-        item = new JMenuItem(sketch.code[i].name);
+        item = new JMenuItem(sketch.code[i].name +
+          Sketch.flavorExtensionsShown[sketch.code[i].flavor]);
         item.addActionListener(jumpListener);
         menu.add(item);
       }

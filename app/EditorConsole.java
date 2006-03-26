@@ -28,7 +28,7 @@ import java.awt.event.*;
 import java.io.*;
 import javax.swing.*;
 import javax.swing.text.*;
-
+import java.util.*;
 
 /**
  * Message console that sits below the editing area.
@@ -41,7 +41,7 @@ public class EditorConsole extends JScrollPane {
   Editor editor;
 
   JTextPane consoleTextPane;
-  StyledDocument consoleDoc;
+  BufferedStyledDocument consoleDoc;
 
   MutableAttributeSet stdStyle;
   MutableAttributeSet errStyle;
@@ -50,6 +50,10 @@ public class EditorConsole extends JScrollPane {
 
   //int maxCharCount;
   int maxLineCount;
+
+  static File errFile;
+  static File outFile;
+  static File tempFolder;
 
   static PrintStream systemOut;
   static PrintStream systemErr;
@@ -66,9 +70,9 @@ public class EditorConsole extends JScrollPane {
 
     maxLineCount = Preferences.getInteger("console.length");
 
-    consoleTextPane = new JTextPane();
+    consoleDoc = new BufferedStyledDocument(10000, maxLineCount);
+    consoleTextPane = new JTextPane(consoleDoc);
     consoleTextPane.setEditable(false);
-    consoleDoc = consoleTextPane.getStyledDocument();
 
     // necessary?
     MutableAttributeSet standard = new SimpleAttributeSet();
@@ -115,15 +119,20 @@ public class EditorConsole extends JScrollPane {
       systemOut = System.out;
       systemErr = System.err;
 
+      tempFolder = Base.createTempFolder("console");
       try {
         String outFileName = Preferences.get("console.output.file");
         if (outFileName != null) {
-          stdoutFile = new FileOutputStream(outFileName);
+          outFile = new File(tempFolder, outFileName);
+          stdoutFile = new FileOutputStream(outFile);
+          //outFile.deleteOnExit();
         }
 
         String errFileName = Preferences.get("console.error.file");
         if (errFileName != null) {
-          stderrFile = new FileOutputStream(outFileName);
+          errFile = new File(tempFolder, errFileName);
+          stderrFile = new FileOutputStream(errFile);
+          //errFile.deleteOnExit();
         }
       } catch (IOException e) {
         Base.showWarning("Console Error",
@@ -151,6 +160,52 @@ public class EditorConsole extends JScrollPane {
     if (Base.isMacOS()) {
       setBorder(null);
     }
+
+    // periodically post buffered messages to the console
+    // should the interval come from the preferences file?
+    new javax.swing.Timer(250, new ActionListener() {
+      public void actionPerformed(ActionEvent evt) {
+        // only if new text has been added
+        if (consoleDoc.hasAppendage) {
+          // insert the text that's been added in the meantime
+          consoleDoc.insertAll();
+          // always move to the end of the text as it's added
+          consoleTextPane.setCaretPosition(consoleDoc.getLength());
+        }
+      }
+    }).start();
+  }
+
+
+  /**
+   * Close the streams so that the temporary files can be deleted.
+   * <p/>
+   * File.deleteOnExit() cannot be used because the stdout and stderr
+   * files are inside a folder, and have to be deleted before the
+   * folder itself is deleted, which can't be guaranteed when using
+   * the deleteOnExit() method.
+   */
+  public void handleQuit() {
+    // replace original streams to remove references to console's streams
+    System.setOut(systemOut);
+    System.setErr(systemErr);
+
+    // close the PrintStream
+    consoleOut.close();
+    consoleErr.close();
+
+    // also have to close the original FileOutputStream
+    // otherwise it won't be shut down completely
+    try {
+      stdoutFile.close();
+      stderrFile.close();
+    } catch (IOException e) {
+      e.printStackTrace(systemOut);
+    }
+
+    outFile.delete();
+    errFile.delete();
+    tempFolder.delete();
   }
 
 
@@ -174,10 +229,8 @@ public class EditorConsole extends JScrollPane {
   synchronized public void message(String what, boolean err, boolean advance) {
     if (err) {
       systemErr.print(what);
-      //systemErr.print("CE" + what);
     } else {
       systemOut.print(what);
-      //systemOut.print("CO" + what);
     }
 
     if (advance) {
@@ -204,65 +257,12 @@ public class EditorConsole extends JScrollPane {
    * and eventually leads to EditorConsole.appendText(), which directly
    * updates the Swing text components, causing deadlock.
    * <P>
-   * A quick hack from Francis Li (who found this to be a problem)
-   * wraps the contents of appendText() into a Runnable and uses
-   * SwingUtilities.invokeLater() to ensure that the updates only
-   * occur on the main event dispatching thread, and that appears
-   * to have solved the problem.
-   * <P>
-   * unfortunately this is probably extremely slow and helping cause
-   * some of the general print() and println() mess.. need to fix
-   * up so that it's using a proper queue instead.
+   * Updates are buffered to the console and displayed at regular
+   * intervals on Swing's event-dispatching thread. (patch by David Mellis)
    */
   synchronized private void appendText(String txt, boolean e) {
-    final String text = txt;
-    final boolean err = e;
-    SwingUtilities.invokeLater(new Runnable() {
-        public void run() {
-          try {
-            // check how many lines have been used so far
-            // if too many, shave off a few lines from the beginning
-            Element element = consoleDoc.getDefaultRootElement();
-            int lineCount = element.getElementCount();
-            int overage = lineCount - maxLineCount;
-            if (overage > 0) {
-              // if 1200 lines, and 1000 lines is max,
-              // find the position of the end of the 200th line
-              //systemOut.println("overage is " + overage);
-              Element lineElement = element.getElement(overage);
-              if (lineElement == null) return;  // do nuthin
-
-              int endOffset = lineElement.getEndOffset();
-              // remove to the end of the 200th line
-              consoleDoc.remove(0, endOffset);
-            }
-
-            // make sure this line doesn't go over 32k chars
-            lineCount = element.getElementCount(); // may have changed
-            Element currentElement = element.getElement(lineCount-1);
-            int currentStart = currentElement.getStartOffset();
-            int currentEnd = currentElement.getEndOffset();
-            //systemOut.println(currentEnd - currentStart);
-            if (currentEnd - currentStart > 10000) {   // force a newline
-              consoleDoc.insertString(consoleDoc.getLength(), "\n",
-                                      err ? errStyle : stdStyle);
-            }
-
-            // add the text to the end of the console,
-            consoleDoc.insertString(consoleDoc.getLength(), text,
-                                    err ? errStyle : stdStyle);
-
-            // always move to the end of the text as it's added
-            consoleTextPane.setCaretPosition(consoleDoc.getLength());
-
-          } catch (BadLocationException e) {
-            // ignore the error otherwise this will cause an infinite loop
-            // maybe not a good idea in the long run?
-          }
-        }
-      });
+    consoleDoc.appendString(txt, e ? errStyle : stdStyle);
   }
-
 
   public void clear() {
     try {
@@ -330,5 +330,89 @@ class EditorConsoleStream extends OutputStream {
         echo = null;
       }
     }
+  }
+}
+
+
+/**
+ * Buffer updates to the console and output them in batches. For info, see:
+ * http://java.sun.com/products/jfc/tsc/articles/text/element_buffer and
+ * http://javatechniques.com/public/java/docs/gui/jtextpane-speed-part2.html
+ * appendString() is called from multiple threads, and insertAll from the
+ * swing event thread, so they need to be synchronized
+ */
+class BufferedStyledDocument extends DefaultStyledDocument {
+  ArrayList elements = new ArrayList();
+  int maxLineLength, maxLineCount;
+  int currentLineLength = 0;
+  boolean needLineBreak = false;
+  boolean hasAppendage = false;
+
+  public BufferedStyledDocument(int maxLineLength, int maxLineCount) {
+    this.maxLineLength = maxLineLength;
+    this.maxLineCount = maxLineCount;
+  }
+
+  /** buffer a string for insertion at the end of the DefaultStyledDocument */
+  public synchronized void appendString(String str, AttributeSet a) {
+    // do this so that it's only updated when needed (otherwise console
+    // updates every 250 ms when an app isn't even running.. see bug 180)
+    hasAppendage = true;
+
+    // process each line of the string
+    while (str.length() > 0) {
+      // newlines within an element have (almost) no effect, so we need to
+      // replace them with proper paragraph breaks (start and end tags)
+      if (needLineBreak || currentLineLength > maxLineLength) {
+        elements.add(new ElementSpec(a, ElementSpec.EndTagType));
+        elements.add(new ElementSpec(a, ElementSpec.StartTagType));
+        currentLineLength = 0;
+      }
+
+      if (str.indexOf('\n') == -1) {
+        elements.add(new ElementSpec(a, ElementSpec.ContentType,
+          str.toCharArray(), 0, str.length()));
+        currentLineLength += str.length();
+        needLineBreak = false;
+        str = str.substring(str.length()); // eat the string
+      } else {
+        elements.add(new ElementSpec(a, ElementSpec.ContentType,
+          str.toCharArray(), 0, str.indexOf('\n') + 1));
+        needLineBreak = true;
+        str = str.substring(str.indexOf('\n') + 1); // eat the line
+      }
+    }
+  }
+
+  /** insert the buffered strings */
+  public synchronized void insertAll() {
+    ElementSpec[] elementArray = new ElementSpec[elements.size()];
+    elements.toArray(elementArray);
+
+    try {
+      // check how many lines have been used so far
+      // if too many, shave off a few lines from the beginning
+      Element element = super.getDefaultRootElement();
+      int lineCount = element.getElementCount();
+      int overage = lineCount - maxLineCount;
+      if (overage > 0) {
+        // if 1200 lines, and 1000 lines is max,
+        // find the position of the end of the 200th line
+        //systemOut.println("overage is " + overage);
+        Element lineElement = element.getElement(overage);
+        if (lineElement == null) return;  // do nuthin
+
+        int endOffset = lineElement.getEndOffset();
+        // remove to the end of the 200th line
+        super.remove(0, endOffset);
+      }
+      super.insert(super.getLength(), elementArray);
+
+    } catch (BadLocationException e) {
+      // ignore the error otherwise this will cause an infinite loop
+      // maybe not a good idea in the long run?
+    }
+    elements.clear();
+    hasAppendage = false;
   }
 }

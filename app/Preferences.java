@@ -41,6 +41,7 @@ import javax.swing.filechooser.*;
 import javax.swing.text.*;
 import javax.swing.undo.*;
 
+//import processing.core.PApplet;
 
 
 /**
@@ -50,7 +51,7 @@ import javax.swing.undo.*;
  * properties files are iso8859-1, which is highly likely to
  * be a problem when trying to save sketch folders and locations.
  */
-public class Preferences extends JComponent {
+public class Preferences {
 
   // what to call the feller
 
@@ -72,16 +73,32 @@ public class Preferences extends JComponent {
   static final String PROMPT_OK      = "OK";
   static final String PROMPT_BROWSE  = "Browse";
 
-  // mac needs it to be 70, windows needs 66, linux needs 76
+  /**
+   * Standardized width for buttons. Mac OS X 10.3 wants 70 as its default,
+   * Windows XP needs 66, and Linux needs 76, so 76 seems proper.
+   */
+  static public int BUTTON_WIDTH  = 76;
 
-  static int BUTTON_WIDTH  = 76;
-  static int BUTTON_HEIGHT = 24;
+  /**
+   * Standardized button height. Mac OS X 10.3 (Java 1.4) wants 29,
+   * presumably because it now includes the blue border, where it didn't
+   * in Java 1.3. Windows XP only wants 23 (not sure what default Linux
+   * would be). Because of the disparity, on Mac OS X, it will be set
+   * inside a static block.
+   */
+  static public int BUTTON_HEIGHT = 24;
+  static {
+    if (Base.isMacOS()) BUTTON_HEIGHT = 29;
+  }
 
   // value for the size bars, buttons, etc
 
   static final int GRID_SIZE     = 33;
 
-  // gui variables
+
+  // indents and spacing standards. these probably need to be modified
+  // per platform as well, since macosx is so huge, windows is smaller,
+  // and linux is all over the map
 
   static final int GUI_BIG     = 13;
   static final int GUI_BETWEEN = 10;
@@ -89,14 +106,12 @@ public class Preferences extends JComponent {
 
   // gui elements
 
-  //JFrame frame;
-  JDialog frame;
+  JDialog dialog;
   int wide, high;
 
   JTextField sketchbookLocationField;
   JCheckBox sketchPromptBox;
   JCheckBox sketchCleanBox;
-  //JCheckBox exportLibraryBox;
   JCheckBox externalEditorBox;
   JCheckBox checkUpdatesBox;
 
@@ -111,7 +126,6 @@ public class Preferences extends JComponent {
 
   static Hashtable table = new Hashtable();;
   static File preferencesFile;
-  //boolean firstTime;  // first time this feller has been run
 
 
   static public void init() {
@@ -152,9 +166,6 @@ public class Preferences extends JComponent {
 
     // next load user preferences file
 
-    //File home = new File(System.getProperty("user.home"));
-    //File arduinoHome = new File(home, "Arduino");
-    //preferencesFile = new File(home, PREFS_FILE);
     preferencesFile = Base.getSettingsFile(PREFS_FILE);
 
     if (!preferencesFile.exists()) {
@@ -181,14 +192,12 @@ public class Preferences extends JComponent {
 
   public Preferences() {
 
-    // setup frame for the prefs
+    // setup dialog for the prefs
 
-    //frame = new JFrame("Preferences");
-    frame = new JDialog(editor, "Preferences", true);
-    //frame.setResizable(false);
+    dialog = new JDialog(editor, "Preferences", true);
+    dialog.setResizable(false);
 
-    //Container pain = this;
-    Container pain = frame.getContentPane();
+    Container pain = dialog.getContentPane();
     pain.setLayout(null);
 
     int top = GUI_BIG;
@@ -284,20 +293,6 @@ public class Preferences extends JComponent {
     top += d.height + GUI_BETWEEN;
 
 
-    // [ ] Enable export to "Library"
-
-    /*
-    exportLibraryBox = new JCheckBox("Enable advanced \"Library\" features" +
-                                     " (requires restart)");
-    exportLibraryBox.setEnabled(false);
-    pain.add(exportLibraryBox);
-    d = exportLibraryBox.getPreferredSize();
-    exportLibraryBox.setBounds(left, top, d.width, d.height);
-    right = Math.max(right, left + d.width);
-    top += d.height + GUI_BETWEEN;
-    */
-
-
     // [ ] Use external editor
 
     externalEditorBox = new JCheckBox("Use external editor");
@@ -320,21 +315,6 @@ public class Preferences extends JComponent {
 
     // More preferences are in the ...
 
-    /*
-    String blather =
-      "More preferences can be edited directly\n" +
-      "in the file " + preferencesFile.getAbsolutePath();
-      //"More preferences are in the 'lib' folder inside text files\n" +
-      //"named preferences.txt and pde_" +
-      //Base.platforms[Base.platform] + ".properties";
-
-    JTextArea textarea = new JTextArea(blather);
-    textarea.setEditable(false);
-    textarea.setBorder(new EmptyBorder(0, 0, 0, 0));
-    textarea.setBackground(null);
-    textarea.setFont(new Font("Dialog", Font.PLAIN, 12));
-    pain.add(textarea);
-    */
     label = new JLabel("More preferences can be edited directly in the file");
 
     pain.add(label);
@@ -362,9 +342,6 @@ public class Preferences extends JComponent {
 
     // [  OK  ] [ Cancel ]  maybe these should be next to the message?
 
-    //right = Math.max(right, left + d.width + GUI_BETWEEN +
-    //               BUTTON_WIDTH + GUI_SMALL + BUTTON_WIDTH);
-
     button = new JButton(PROMPT_OK);
     button.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -375,9 +352,6 @@ public class Preferences extends JComponent {
     pain.add(button);
     d2 = button.getPreferredSize();
     BUTTON_HEIGHT = d2.height;
-
-    // smoosh up to the line before
-    //top -= BUTTON_HEIGHT;
 
     h = right - (BUTTON_WIDTH + GUI_SMALL + BUTTON_WIDTH);
     button.setBounds(h, top, BUTTON_WIDTH, BUTTON_HEIGHT);
@@ -398,32 +372,39 @@ public class Preferences extends JComponent {
     // finish up
 
     wide = right + GUI_BIG;
-    high = top + GUI_SMALL; //GUI_BIG;
-    setSize(wide, high);
+    high = top + GUI_SMALL;
+    //setSize(wide, high);
 
 
     // closing the window is same as hitting cancel button
 
-    frame.addWindowListener(new WindowAdapter() {
+    dialog.addWindowListener(new WindowAdapter() {
         public void windowClosing(WindowEvent e) {
           disposeFrame();
         }
       });
 
-    Container content = frame.getContentPane();
-    content.setLayout(new BorderLayout());
-    content.add(this, BorderLayout.CENTER);
-
-    frame.pack();
+    ActionListener disposer = new ActionListener() {
+        public void actionPerformed(ActionEvent actionEvent) {
+          disposeFrame();
+        }
+      };
+    Base.registerWindowCloseKeys(dialog.getRootPane(), disposer);
 
     Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-    frame.setLocation((screen.width - wide) / 2,
+    dialog.setLocation((screen.width - wide) / 2,
                       (screen.height - high) / 2);
+
+
+    dialog.pack(); // get insets
+    Insets insets = dialog.getInsets();
+    dialog.setSize(wide + insets.left + insets.right,
+                  high + insets.top + insets.bottom);
 
 
     // handle window closing commands for ctrl/cmd-W or hitting ESC.
 
-    addKeyListener(new KeyAdapter() {
+    pain.addKeyListener(new KeyAdapter() {
         public void keyPressed(KeyEvent e) {
           KeyStroke wc = Editor.WINDOW_CLOSE_KEYSTROKE;
           if ((e.getKeyCode() == KeyEvent.VK_ESCAPE) ||
@@ -433,6 +414,26 @@ public class Preferences extends JComponent {
         }
       });
   }
+
+
+  /*
+  protected JRootPane createRootPane() {
+    System.out.println("creating root pane esc received");
+
+    ActionListener actionListener = new ActionListener() {
+        public void actionPerformed(ActionEvent actionEvent) {
+          //setVisible(false);
+          System.out.println("esc received");
+        }
+      };
+
+    JRootPane rootPane = new JRootPane();
+    KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+    rootPane.registerKeyboardAction(actionListener, stroke,
+                                    JComponent.WHEN_IN_FOCUSED_WINDOW);
+    return rootPane;
+  }
+  */
 
 
   public Dimension getPreferredSize() {
@@ -447,7 +448,7 @@ public class Preferences extends JComponent {
    * Close the window after an OK or Cancel.
    */
   public void disposeFrame() {
-    frame.dispose();
+    dialog.dispose();
   }
 
 
@@ -487,7 +488,7 @@ public class Preferences extends JComponent {
     externalEditorBox.setSelected(getBoolean("editor.external"));
     checkUpdatesBox.setSelected(getBoolean("update.check"));
 
-    frame.show();
+    dialog.show();
   }
 
 

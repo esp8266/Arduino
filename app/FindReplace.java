@@ -29,10 +29,21 @@ import javax.swing.*;
 
 
 /**
- * Find & Replace window for the processing editor.
+ * Find & Replace window for the Processing editor.
+ * <p/>
+ * One major annoyance in this is that the window is re-created each time
+ * that "Find" is called. This is because Mac OS X has a strange focus
+ * issue with windows that are re-shown with setVisible() or show().
+ * requestFocusInWindow() properly sets the focus to the find field,
+ * however, just a short moment later, the focus is set to null. Even
+ * trying to catch this scenario and request it again doesn't seem to work.
+ * Most likely this is some annoyance buried deep in one of Apple's docs,
+ * or in the doc for the focus stuff (I tend to think the former because
+ * Windows doesn't seem to be quite so beligerent). Filed as
+ * <A HREF="http://dev.processing.org/bugs/show_bug.cgi?id=244"> Bug 244</A>
+ * should anyone have clues about how to fix.
  */
-public class FindReplace extends JFrame
-  implements ActionListener, KeyListener {
+public class FindReplace extends JFrame implements ActionListener {
 
   static final int BIG = 13;
   static final int SMALL = 6;
@@ -41,16 +52,17 @@ public class FindReplace extends JFrame
 
   JTextField findField;
   JTextField replaceField;
+  static String findString;
+  static String replaceString;
 
   JButton replaceButton;
   JButton replaceAllButton;
   JButton findButton;
 
   JCheckBox ignoreCaseBox;
-  boolean ignoreCase;
+  static boolean ignoreCase = true;
 
-  KeyStroke windowClose;
-
+  /// true when there's something selected in the editor
   boolean found;
 
 
@@ -74,6 +86,27 @@ public class FindReplace extends JFrame
     pain.add(replaceField = new JTextField(20));
     Dimension d2 = findField.getPreferredSize();
 
+    if (findString != null) findField.setText(findString);
+    if (replaceString != null) replaceField.setText(replaceString);
+    //System.out.println("setting find str to " + findString);
+    //findField.requestFocusInWindow();
+
+    //pain.setDefault
+    /*
+    findField.addFocusListener(new FocusListener() {
+        public void focusGained(FocusEvent e) {
+          System.out.println("Focus gained " + e.getOppositeComponent());
+        }
+
+        public void focusLost(FocusEvent e) {
+          System.out.println("Focus lost "); // + e.getOppositeComponent());
+          if (e.getOppositeComponent() == null) {
+            requestFocusInWindow();
+          }
+        }
+      });
+    */
+
     // +1 since it's better to tend downwards
     int yoff = (1 + d2.height - d1.height) / 2;
 
@@ -82,7 +115,7 @@ public class FindReplace extends JFrame
     replaceLabel.setBounds(BIG, BIG + d2.height + SMALL + yoff,
                            d1.width, d1.height);
 
-    ignoreCase = true;
+    //ignoreCase = true;
     ignoreCaseBox = new JCheckBox("Ignore Case");
     ignoreCaseBox.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -110,12 +143,8 @@ public class FindReplace extends JFrame
     }
     pain.add(buttons);
 
-    // 0069 TEMPORARILY DISABLED!
-    //replaceAllButton.setEnabled(false);
-
     // to fix ugliness.. normally macosx java 1.3 puts an
     // ugly white border around this object, so turn it off.
-    //if (Base.platform == Base.MACOSX) {
     if (Base.isMacOS()) {
       buttons.setBorder(null);
     }
@@ -146,7 +175,7 @@ public class FindReplace extends JFrame
     replaceButton.setEnabled(false);
 
     // so that typing will go straight to this field
-    findField.requestFocus();
+    //findField.requestFocus();
 
     // make the find button the blinky default
     getRootPane().setDefaultButton(findButton);
@@ -161,48 +190,62 @@ public class FindReplace extends JFrame
               (screen.height - high) / 2, wide, high);
 
     // add key listener to trap esc and ctrl/cmd-w
-    findField.addKeyListener(this);
-    replaceField.addKeyListener(this);
-    addKeyListener(this);
+    /*
+    KeyListener listener = new KeyAdapter() {
+        public void keyPressed(KeyEvent e) {
+          if (Base.isCloseWindowEvent(e)) hide();
+        }
+      };
+    findField.addKeyListener(listener);
+    replaceField.addKeyListener(listener);
+    addKeyListener(listener);
+    */
+    ActionListener disposer = new ActionListener() {
+        public void actionPerformed(ActionEvent actionEvent) {
+          //hide();
+          handleClose();
+        }
+      };
 
+    setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+    addWindowListener(new WindowAdapter() {
+        public void windowClosing(WindowEvent e) {
+          handleClose();
+        }
+      });
+    Base.registerWindowCloseKeys(getRootPane(), disposer);
+
+    /*
     // hack to to get first field to focus properly on osx
     // though this still doesn't seem to work
     addWindowListener(new WindowAdapter() {
         public void windowActivated(WindowEvent e) {
           //System.out.println("activating");
-          findField.requestFocus();
-          findField.selectAll();
+          //boolean ok = findField.requestFocusInWindow();
+          //System.out.println("got " + ok);
+          //findField.selectAll();
         }
       });
+    */
   }
 
 
-  /**
-   * Handle window closing commands for ctrl/cmd-W or hitting ESC.
-   */
-  public void keyPressed(KeyEvent e) {
-    if (windowClose == null) {
-      int modifiers = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-      windowClose = KeyStroke.getKeyStroke('W', modifiers);
-    }
-    if ((e.getKeyCode() == KeyEvent.VK_ESCAPE) ||
-        (KeyStroke.getKeyStrokeForEvent(e).equals(windowClose))) {
-      hide();
-    //} else {
-      //System.out.println("event " + e);
-    }
+  public void handleClose() {
+    //System.out.println("handling close now");
+    findString = findField.getText();
+    replaceString = replaceField.getText();
+
+    // this object should eventually become dereferenced
+    hide();
   }
-
-  public void keyReleased(KeyEvent e) { }
-
-  public void keyTyped(KeyEvent e) { }
 
 
   /*
   public void show() {
+    findField.requestFocusInWindow();
     super.show();
-    findField.selectAll();
-    findField.requestFocus();
+    //findField.selectAll();
+    //findField.requestFocus();
   }
   */
 
@@ -266,9 +309,10 @@ public class FindReplace extends JFrame
   }
 
 
-  // replace the current selection with whatever's in the
-  // replacement text field
-
+  /**
+   * Replace the current selection with whatever's in the
+   * replacement text field.
+   */
   public void replace() {
     if (!found) return;  // don't replace if nothing found
 
@@ -284,15 +328,17 @@ public class FindReplace extends JFrame
     editor.textarea.setSelectedText(replaceField.getText());
     //editor.setSketchModified(true);
     //editor.sketch.setCurrentModified(true);
-    editor.sketch.setModified();
+    editor.sketch.setModified(true);
 
     // don't allow a double replace
     replaceButton.setEnabled(false);
   }
 
 
-  // keep doing find and replace alternately until nothing more found
-
+  /**
+   * Replace everything that matches by doing find and replace
+   * alternately until nothing more found.
+   */
   public void replaceAll() {
     // move to the beginning
     editor.textarea.select(0, 0);

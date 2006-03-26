@@ -52,30 +52,63 @@ import com.ice.jni.registry.*;
  * files and images, etc) that comes from that.
  */
 public class Base {
-  static final int VERSION = 1;
+  static final int VERSION = 3;
   static final String VERSION_NAME = "0004 Alpha";
   
-  static public int platform;
-  
-   // platform IDs for platform
+  // platform IDs for PApplet.platform
 
   static final int WINDOWS = 1;
   static final int MACOS9  = 2;
   static final int MACOSX  = 3;
   static final int LINUX   = 4;
   static final int OTHER   = 0;
-  
-  
-  // moved from PApplet
-  // in preperation of detaching the IDE from the
-  // Arduino core classes
-  
-   /**
+
+  // used by split, all the standard whitespace chars
+  // (uncludes unicode nbsp, that little bostage)
+
+  static final String WHITESPACE = " \t\n\r\f\u00A0";
+
+  /**
+   * Path of filename opened on the command line,
+   * or via the MRJ open document handler.
+   */
+  static String openedAtStartup;
+
+  Editor editor;
+
+  /**
+   * "1.3" or "1.1" or whatever (just the first three chars)
+   */
+  public static final String javaVersionName =
+    System.getProperty("java.version").substring(0,3);
+
+  /**
+   * Version of Java that's in use, whether 1.1 or 1.3 or whatever,
+   * stored as a float.
+   * <P>
+   * Note that because this is stored as a float, the values may
+   * not be <EM>exactly</EM> 1.3 or 1.4. Instead, make sure you're
+   * comparing against 1.3f or 1.4f, which will have the same amount
+   * of error (i.e. 1.40000001). This could just be a double, but
+   * since Processing only uses floats, it's safer to do this,
+   * because there's no good way to specify a double with the preproc.
+   */
+  public static final float javaVersion =
+    new Float(javaVersionName).floatValue();
+
+  /**
+   * Current platform in use, one of the
+   * PConstants WINDOWS, MACOSX, MACOS9, LINUX or OTHER.
+   */
+  static public int platform;
+
+  /**
    * Current platform in use.
    * <P>
    * Equivalent to System.getProperty("os.name"), just used internally.
    */
-  static public String platformName = System.getProperty("os.name");
+  static public String platformName =
+    System.getProperty("os.name");
 
   static {
     // figure out which operating system
@@ -104,23 +137,6 @@ public class Base {
       }
     }
   }
-
-   // used by split, all the standard whitespace chars
-  // (uncludes unicode nbsp, that little bostage)
-
-  static final String WHITESPACE = " \t\n\r\f\u00A0";
-  
-  
-  
-
-  /**
-   * Path of filename opened on the command line,
-   * or via the MRJ open document handler.
-   */
-  static String openedAtStartup;
-
-  Editor editor;
-
 
   static public void main(String args[]) {
 
@@ -179,6 +195,9 @@ public class Base {
       e.printStackTrace();
     }
 
+    // use native popups so they don't look so crappy on osx
+    JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+
     // build the editor object
     editor = new Editor();
 
@@ -214,7 +233,6 @@ public class Base {
    * returns true if running on windows.
    */
   static public boolean isWindows() {
-
     return platform == WINDOWS;
   }
 
@@ -223,7 +241,6 @@ public class Base {
    * true if running on linux.
    */
   static public boolean isLinux() {
-
     return platform == LINUX;
   }
 
@@ -363,26 +380,40 @@ public class Base {
   }
 
 
-  static public File getBuildFolder() {
-    String buildPath = Preferences.get("build.path");
-    if (buildPath != null) return new File(buildPath);
+  static File buildFolder;
 
-    File folder = new File(getTempFolder(), "build");
-    if (!folder.exists()) folder.mkdirs();
-    return folder;
+  static public File getBuildFolder() {
+    if (buildFolder == null) {
+      String buildPath = Preferences.get("build.path");
+      if (buildPath != null) {
+        buildFolder = new File(buildPath);
+
+      } else {
+        //File folder = new File(getTempFolder(), "build");
+        //if (!folder.exists()) folder.mkdirs();
+        buildFolder = createTempFolder("build");
+        buildFolder.deleteOnExit();
+      }
+    }
+    return buildFolder;
   }
 
 
   /**
    * Get the path to the platform's temporary folder, by creating
    * a temporary temporary file and getting its parent folder.
+   * <br/>
+   * Modified for revision 0094 to actually make the folder randomized
+   * to avoid conflicts in multi-user environments. (Bug 177)
    */
-  static public File getTempFolder() {
+  static public File createTempFolder(String name) {
     try {
-      File ignored = File.createTempFile("ignored", null);
-      String tempPath = ignored.getParent();
-      ignored.delete();
-      return new File(tempPath);
+      File folder = File.createTempFile(name, null);
+      //String tempPath = ignored.getParent();
+      //return new File(tempPath);
+      folder.delete();
+      folder.mkdirs();
+      return folder;
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -542,6 +573,55 @@ public class Base {
     }
     //System.out.println();
     return new String(c);
+  }
+
+
+  // .................................................................
+
+
+  // someone needs to be slapped
+  //static KeyStroke closeWindowKeyStroke;
+
+  /**
+   * Return true if the key event was a Ctrl-W or an ESC,
+   * both indicators to close the window.
+   * Use as part of a keyPressed() event handler for frames.
+   */
+  /*
+  static public boolean isCloseWindowEvent(KeyEvent e) {
+    if (closeWindowKeyStroke == null) {
+      int modifiers = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+      closeWindowKeyStroke = KeyStroke.getKeyStroke('W', modifiers);
+    }
+    return ((e.getKeyCode() == KeyEvent.VK_ESCAPE) ||
+            KeyStroke.getKeyStrokeForEvent(e).equals(closeWindowKeyStroke));
+  }
+  */
+
+
+  /**
+   * Registers key events for a Ctrl-W and ESC with an ActionListener
+   * that will take care of disposing the window.
+   */
+  static public void registerWindowCloseKeys(JRootPane root, //Window window,
+                                             ActionListener disposer) {
+    /*
+    JRootPane root = null;
+    if (window instanceof JFrame) {
+      root = ((JFrame)window).getRootPane();
+    } else if (window instanceof JDialog) {
+      root = ((JDialog)window).getRootPane();
+    }
+    */
+
+    KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+    root.registerKeyboardAction(disposer, stroke,
+                                JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+    int modifiers = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+    stroke = KeyStroke.getKeyStroke('W', modifiers);
+    root.registerKeyboardAction(disposer, stroke,
+                                JComponent.WHEN_IN_FOCUSED_WINDOW);
   }
 
 
@@ -858,7 +938,9 @@ public class Base {
   static public void removeDir(File dir) {
     if (dir.exists()) {
       removeDescendants(dir);
-      dir.delete();
+      if (!dir.delete()) {
+        System.err.println("Could not delete " + dir);
+      }
     }
   }
 
@@ -918,6 +1000,46 @@ public class Base {
 
 
   /**
+   * Gets a list of all files within the specified folder,
+   * and returns a list of their relative paths.
+   * Ignores any files/folders prefixed with a dot.
+   */
+  static public String[] listFiles(String path, boolean relative) {
+    return listFiles(new File(path), relative);
+  }
+
+  static public String[] listFiles(File folder, boolean relative) {
+    String path = folder.getAbsolutePath();
+    Vector vector = new Vector();
+    listFiles(relative ? (path + File.separator) : "", path, vector);
+    String outgoing[] = new String[vector.size()];
+    vector.copyInto(outgoing);
+    return outgoing;
+  }
+
+  static protected void listFiles(String basePath,
+                                  String path, Vector vector) {
+    File folder = new File(path);
+    String list[] = folder.list();
+    if (list == null) return;
+
+    for (int i = 0; i < list.length; i++) {
+      if (list[i].charAt(0) == '.') continue;
+
+      File file = new File(path, list[i]);
+      String newPath = file.getAbsolutePath();
+      if (newPath.startsWith(basePath)) {
+        newPath = newPath.substring(basePath.length());
+      }
+      vector.add(newPath);
+      if (file.isDirectory()) {
+        listFiles(basePath, newPath, vector);
+      }
+    }
+  }
+
+
+  /**
    * Equivalent to the one in PApplet, but static (die() is removed)
    */
   static public String[] loadStrings(File file) {
@@ -954,7 +1076,7 @@ public class Base {
     return null;
   }
   
-    //////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////
 
   // STRINGS
 

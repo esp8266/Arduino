@@ -382,10 +382,18 @@ public class Sketchbook {
     } catch (IOException e) {
       e.printStackTrace();
     }
+  
+    LibraryManager libManager = new LibraryManager();
+    ActionListener listener = new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          editor.handleOpen(e.getActionCommand());
+        }
+      };
 
     try {
       JMenu examplesMenu = new JMenu("Examples");
       addSketches(examplesMenu, examplesFolder);
+      libManager.populateExamplesMenu(examplesMenu, listener);
       menu.add(examplesMenu);
     } catch (IOException e) {
       e.printStackTrace();
@@ -542,8 +550,10 @@ public class Sketchbook {
           list[i].equals("CVS")) continue;
 
       File subfolder = new File(folder, list[i]);
+      if (!subfolder.isDirectory()) continue;
+
       File exported = new File(subfolder, "library");
-      File entry = new File(exported, list[i] + ".jar");
+      File entry = new File(exported, list[i] + ".o");
       // if a .jar file of the same prefix as the folder exists
       // inside the 'library' subfolder of the sketch
       if (entry.exists()) {
@@ -556,7 +566,7 @@ public class Sketchbook {
           Base.showMessage("Ignoring bad sketch name", mess);
           continue;
         }
-
+/*
         // get the path for all .jar files in this code folder
         String libraryClassPath =
           Compiler.contentsToClassPath(exported);
@@ -565,12 +575,12 @@ public class Sketchbook {
         librariesClassPath +=
           File.pathSeparatorChar + libraryClassPath;
         // need to associate each import with a library folder
-        String packages[] = new String[0];
-          //Compiler.packageListFromClassPath(libraryClassPath);
+        String packages[] =
+          Compiler.packageListFromClassPath(libraryClassPath);
         for (int k = 0; k < packages.length; k++) {
           importToLibraryTable.put(packages[k], exported);
         }
-
+*/
         JMenuItem item = new JMenuItem(list[i]);
         item.addActionListener(listener);
         item.setActionCommand(entry.getAbsolutePath());
@@ -589,7 +599,7 @@ public class Sketchbook {
       }
     }
     return ifound;
-  }
+  /*return false;*/  }
 
 
   /**

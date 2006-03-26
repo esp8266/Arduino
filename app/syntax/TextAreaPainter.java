@@ -475,6 +475,42 @@ public class TextAreaPainter extends JComponent implements TabExpander
   Token currentLineTokens;
   Segment currentLine;
 
+  /**
+   * Accessor used by tools that want to hook in and grab the formatting.
+   */
+  public int getCurrentLineIndex() {
+    return currentLineIndex;
+  }
+
+  /**
+   * Accessor used by tools that want to hook in and grab the formatting.
+   */
+  public void setCurrentLineIndex(int what) {
+    currentLineIndex = what;
+  }
+
+  /**
+   * Accessor used by tools that want to hook in and grab the formatting.
+   */
+  public Token getCurrentLineTokens() {
+    return currentLineTokens;
+  }
+
+  /**
+   * Accessor used by tools that want to hook in and grab the formatting.
+   */
+  public void setCurrentLineTokens(Token tokens) {
+    currentLineTokens = tokens;
+  }
+
+  /**
+   * Accessor used by tools that want to hook in and grab the formatting.
+   */
+  public Segment getCurrentLine() {
+    return currentLine;
+  }
+
+
   // protected members
   protected JEditTextArea textArea;
 
