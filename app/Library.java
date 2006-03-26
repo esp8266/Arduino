@@ -266,7 +266,7 @@ public class Library implements MessageConsumer{
         "-Wall",
         "-mmcu=" + Preferences.get("build.mcu"),
         "-DF_CPU=" + Preferences.get("build.f_cpu"),
-        "-Ilib",
+        "-I" + libManager.getTarget().getPath(),
         "-I" + getFolder(),
       };
 
@@ -279,7 +279,7 @@ public class Library implements MessageConsumer{
         "-fno-exceptions",
         "-mmcu=" + Preferences.get("build.mcu"),
         "-DF_CPU=" + Preferences.get("build.f_cpu"),
-        "-Ilib",
+        "-I" + libManager.getTarget().getPath(),
         "-I" + getFolder(),
       };
 

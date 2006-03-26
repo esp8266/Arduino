@@ -75,8 +75,14 @@ public class Compiler implements MessageConsumer {
     MessageStream pms = new MessageStream(this);
 
     String userdir = System.getProperty("user.dir") + File.separator;
-
-    LibraryManager libraryManager = new LibraryManager();
+    
+//    LibraryManager libraryManager;
+//
+//    try {
+//      libraryManager = new LibraryManager();
+//    } catch (IOException e) {
+//      throw new RunnerException(e.getMessage());
+//    }
 
     String preCommandCompiler[] = new String[] {
       ((!Base.isMacOS()) ? "tools/avr/bin/avr-gcc" :
@@ -91,7 +97,11 @@ public class Compiler implements MessageConsumer {
     };
 
     // use lib directories as include paths
-    String[] libDirs = libraryManager.getFolderPaths();
+    //String[] libDirs = libraryManager.getFolderPaths();
+    String[] libDirs = new String[sketch.importedLibraries.size()];
+    
+    for (int i = 0; i < sketch.importedLibraries.size(); i++)
+      libDirs[i] = ((Library) sketch.importedLibraries.get(i)).getFolder().getPath();
     
     // Last two arguments will specify the file being compiled and the output file.
     String[] baseCommandCompiler = new String[preCommandCompiler.length + libDirs.length + 2];
@@ -131,7 +141,20 @@ public class Compiler implements MessageConsumer {
     };
 
     // use lib object files during include
-    String[] libObjectFiles = libraryManager.getObjectFiles();
+    //String[] libObjectFiles = libraryManager.getObjectFiles();
+    
+    Vector libObjectFilesVec = new Vector();
+    
+    for (Iterator i = sketch.importedLibraries.iterator(); i.hasNext(); ) {
+      Library library = (Library) i.next();
+      File[] objectFiles = library.getObjectFiles();
+      for (int j = 0; j < objectFiles.length; j++)
+        libObjectFilesVec.add(objectFiles[j].getPath());
+    }
+    
+    String[] libObjectFiles = new String[libObjectFilesVec.size()];
+    libObjectFiles = (String[]) libObjectFilesVec.toArray(libObjectFiles);
+    
     String[] baseCommandLinker = new String[preCommandLinker.length + libObjectFiles.length];
     System.arraycopy(preCommandLinker, 0, baseCommandLinker, 0, preCommandLinker.length);
     for (int i = 0; i < libObjectFiles.length; ++i) {

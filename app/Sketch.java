@@ -86,7 +86,7 @@ public class Sketch {
   String classPath;
   String libraryPath;
   boolean externalRuntime;
-  Vector importedLibraries; // vec of File objects
+  public Vector importedLibraries; // vec of Library objects
 
   /**
    * path is location of the main .pde file, because this is also
@@ -1126,10 +1126,17 @@ public class Sketch {
 
   public void importLibrary(String jarPath) {
     System.out.println(jarPath);
-/*    // make sure the user didn't hide the sketch folder
+    // make sure the user didn't hide the sketch folder
     ensureExistence();
 
-    String list[] = Compiler.packageListFromClassPath(jarPath);
+    //String list[] = Compiler.packageListFromClassPath(jarPath);
+    FileFilter onlyHFiles = new FileFilter() {
+      public boolean accept(File file) {
+        return (file.getName()).endsWith(".h");
+      }
+    };
+    
+    File list[] = new File(jarPath).listFiles(onlyHFiles);
 
     // import statements into the main sketch file (code[0])
     // if the current code is a .java file, insert into current
@@ -1141,15 +1148,15 @@ public class Sketch {
     // commented out, then this will be a problem.
     StringBuffer buffer = new StringBuffer();
     for (int i = 0; i < list.length; i++) {
-      buffer.append("import ");
-      buffer.append(list[i]);
-      buffer.append(".*;\n");
+      buffer.append("#include <");
+      buffer.append(list[i].getName());
+      buffer.append(">\n");
     }
     buffer.append('\n');
     buffer.append(editor.getText());
     editor.setText(buffer.toString(), 0, 0);  // scroll to start
-    setModified();
-*/  }
+    setModified(true);
+  }
 
 
   /**
@@ -1333,8 +1340,9 @@ public class Sketch {
 
     // build unbuilt buildable libraries
     // completely independent from sketch, so run all the time
-    LibraryManager libraryManager = new LibraryManager();
+    LibraryManager libraryManager;
     try {
+      libraryManager = new LibraryManager();
       libraryManager.buildAllUnbuilt();
     } catch (RunnerException re) {
       throw new RunnerException(re.getMessage());
@@ -1555,7 +1563,21 @@ public class Sketch {
 
     importedLibraries = new Vector();
     String imports[] = preprocessor.extraImports;
-    for (int i = 0; i < imports.length; i++) {
+    Collection libraries = libraryManager.getAll();
+    for (Iterator i = libraries.iterator(); i.hasNext(); ) {
+      Library library = (Library) i.next();
+      File[] headerFiles = library.getHeaderFiles();
+      
+      for (int j = 0; j < headerFiles.length; j++)
+        for (int k = 0; k < imports.length; k++)
+          if (headerFiles[j].getName().equals(imports[k]) &&
+            !importedLibraries.contains(library)) {
+            importedLibraries.add(library);
+            //System.out.println("Adding library " + library.getName());
+          }
+    }
+    //for (int i = 0; i < imports.length; i++) {
+      /*
       // remove things up to the last dot
       String entry = imports[i].substring(0, imports[i].lastIndexOf('.'));
       //System.out.println("found package " + entry);
@@ -1568,7 +1590,7 @@ public class Sketch {
 
       importedLibraries.add(libFolder);
       libraryPath += File.pathSeparator + libFolder.getAbsolutePath();
-
+      */
       /*
       String list[] = libFolder.list();
       if (list != null) {
@@ -1582,7 +1604,7 @@ public class Sketch {
         }
       }
       */
-    }
+    //}
 
 
     // 3. then loop over the code[] and save each .java file

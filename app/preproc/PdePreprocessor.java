@@ -155,7 +155,8 @@ public class PdePreprocessor {
     PatternMatcher matcher = new Perl5Matcher();
     PatternCompiler compiler = new Perl5Compiler();
     //String mess = "^\\s*(import\\s+\\S+\\s*;)";
-    String mess = "^\\s*(import\\s+)(\\S+)(\\s*;)";
+    //String mess = "^\\s*(import\\s+)(\\S+)(\\s*;)";
+    String mess = "^\\s*(#include\\s+[<\"])(\\S+)([\">]\\s*)";
     java.util.Vector imports = new java.util.Vector();
 
     Pattern pattern = null;
@@ -166,14 +167,13 @@ public class PdePreprocessor {
       return null;
     }
 
-    /*
     do {
       PatternMatcherInput input = new PatternMatcherInput(program);
       if (!matcher.contains(input, pattern)) break;
 
       MatchResult result = matcher.getMatch();
       String piece1 = result.group(1).toString();
-      String piece2 = result.group(2).toString();  // the package name
+      String piece2 = result.group(2).toString();  // the header file name w/o quotes
       String piece3 = result.group(3).toString();
       String piece = piece1 + piece2 + piece3;
       int len = piece.length();
@@ -187,7 +187,7 @@ public class PdePreprocessor {
       //System.out.println("removing " + piece);
 
     } while (true);
-    */
+    
 
     extraImports = new String[imports.size()];
     imports.copyInto(extraImports);
@@ -380,9 +380,10 @@ public class PdePreprocessor {
    * @param exporting           Is this being exported from PDE?
    * @param name                Name of the class being created.
    */
-  void writeHeader(PrintStream out, String className, java.util.LinkedList prototypes) {
+  void writeHeader(PrintStream out, String className, java.util.LinkedList prototypes)
+    throws IOException {
     out.print("#include \"WProgram.h\"\n");
-    
+    /* Arduino doesn't automatically use all available libraries.
     // print library headers
     LibraryManager libraryManager = new LibraryManager();
     String[] headerFiles = libraryManager.getHeaderFiles();
@@ -392,7 +393,7 @@ public class PdePreprocessor {
 
     // record number of header lines written for error line adjustment
     headerCount = headerFiles.length;
-
+    */
     // print user defined prototypes
     while(0 < prototypes.size()){
       out.print(prototypes.removeFirst() + "\n");

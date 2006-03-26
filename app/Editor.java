@@ -613,7 +613,7 @@ public class Editor extends JFrame
       });
     menu.add(item);
 
-    //menu.add(sketchbook.getImportMenu());
+    menu.add(sketchbook.getImportMenu());
 
     if (Base.isWindows() || Base.isMacOS()) {
       // no way to do an 'open in file browser' on other platforms

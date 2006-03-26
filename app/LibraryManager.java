@@ -34,17 +34,26 @@ public class LibraryManager {
 
   private File libDir;
   private List libraries = new ArrayList();
-
+  private Target target;
+  
   /*
    * Create a LibraryManager.
    */
-  public LibraryManager()
+  public LibraryManager() throws IOException
   {
     String userDir = System.getProperty("user.dir") + File.separator;
     libDir = new File(
       ((!Base.isMacOS()) ? "" : userDir) + "lib" + File.separator +
       "targets" + File.separator + "libraries");
+    target = new Target(
+      System.getProperty("user.dir") + File.separator + "lib" +
+      File.separator + "targets", Preferences.get("build.target"));
     refreshLibraries();
+  }
+  
+  public Target getTarget()
+  {
+    return target;
   }
 
   /*
@@ -159,9 +168,11 @@ public class LibraryManager {
    */
   public String[] getFolderPaths() {
     ArrayList foldersArrayList = new ArrayList();
-    Collection builtLibraries = getBuiltLibraries();
+    //Collection builtLibraries = getBuiltLibraries();
+    Collection libraries = getAll();
     Library library;
-    Iterator libIterator = builtLibraries.iterator();
+    //Iterator libIterator = builtLibraries.iterator();
+    Iterator libIterator = libraries.iterator();
     while(libIterator.hasNext()){
       library = (Library)libIterator.next();
       foldersArrayList.add(library.getFolder().getPath());
