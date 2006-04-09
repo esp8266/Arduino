@@ -210,6 +210,9 @@ public class Base {
     // show the window
     editor.show();
 
+    // attempt to build libraries
+    editor.prepareLibraries();
+
     // check for updates
     if (Preferences.getBoolean("update.check")) {
       new UpdateCheck(editor);
@@ -1075,7 +1078,8 @@ public class Base {
     }
     return null;
   }
-  
+
+
   //////////////////////////////////////////////////////////////
 
   // STRINGS
@@ -1229,7 +1233,4 @@ public class Base {
     return splits;
   }
 
-  
-    
-  
 }

@@ -330,6 +330,29 @@ public class Editor extends JFrame
 
   // ...................................................................
 
+  /**
+   * Builds any unbuilt buildable libraries
+   * Adds syntax coloring from those libraries (if exists)
+   * Rebuilds sketchbook menu with library examples (if they exist)
+   */
+  public void prepareLibraries() {
+    // build any unbuilt libraries
+    try {
+      LibraryManager libraryManager = new LibraryManager();
+      libraryManager.buildAllUnbuilt();
+      // update syntax coloring table
+      libraryManager.addSyntaxColoring(new PdeKeywords());
+    } catch (RunnerException re) {
+      message("Error compiling library ...");
+      error(re);
+    } catch (Exception ex) {
+      ex.printStackTrace();
+    }
+    // update sketchbook menu, this adds examples of any built libs
+    sketchbook.rebuildMenus();
+  }
+
+  // ...................................................................
 
   /**
    * Post-constructor setup for the editor area. Loads the last
@@ -666,7 +689,6 @@ public class Editor extends JFrame
       });
     menu.add(item);
     */
-    
     item = new JMenuItem("Archive Sketch");
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -738,7 +760,6 @@ public class Editor extends JFrame
     return menu;
   }
 
-  // taken from an ancient version of processing
   class SerialMenuListener implements ActionListener {
     //public SerialMenuListener() { }
 
@@ -751,16 +772,14 @@ public class Editor extends JFrame
       for (int i = 0; i < count; i++) {
         ((JCheckBoxMenuItem)serialMenu.getItem(i)).setState(false);
       }
-
       JCheckBoxMenuItem item = (JCheckBoxMenuItem)e.getSource();
       item.setState(true);
       String name = item.getLabel();
-
       //System.out.println(item.getLabel());
       Preferences.set("serial.port", name);
       //System.out.println("set to " + get("serial.port"));
     }
-	
+
     /*
     public void actionPerformed(ActionEvent e) {
       System.out.println(e.getSource());
@@ -839,7 +858,6 @@ public class Editor extends JFrame
     //serialMenu.addSeparator();
     //serialMenu.add(item);
   }
-
 
   protected JMenu buildHelpMenu() {
     JMenu menu = new JMenu("Help");
@@ -1831,6 +1849,7 @@ public class Editor extends JFrame
     //String what = sketch.isLibrary() ? "Applet" : "Library";
     //message("Exporting " + what + "...");
     message("Uploading to I/O Board...");
+
     SwingUtilities.invokeLater(new Runnable() {
         public void run() {
           try {

@@ -4,7 +4,7 @@
   PdeKeywords - handles text coloring and links to html reference
   Part of the Processing project - http://processing.org
 
-  Copyright (c) 2004-05 Ben Fry and Casey Reas
+  Copyright (c) 2004-06 Ben Fry and Casey Reas
   Copyright (c) 2001-04 Massachusetts Institute of Technology
 
   This program is free software; you can redistribute it and/or modify
@@ -68,6 +68,13 @@ public class PdeKeywords extends CTokenMarker {
           //System.out.println("line is " + line);
           // in case there's any garbage on the line
           //if (line.trim().length() == 0) continue;
+          
+          // don't bother if line begins with hash
+          if(0 < line.length()){
+            if('#' == line.charAt(0)){
+              continue;
+            }
+          }
 
           String pieces[] = Base.split(line, '\t');
           if (pieces.length >= 2) {
@@ -118,5 +125,9 @@ public class PdeKeywords extends CTokenMarker {
 
   static public String getReference(String keyword) {
     return (String) keywordToReference.get(keyword);
+  }
+
+  static public KeywordMap getKeywordColoring() {
+    return keywordColoring;
   }
 }

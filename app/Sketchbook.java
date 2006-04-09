@@ -346,10 +346,10 @@ public class Sketchbook {
       if (addLibraries(importMenu, new File(getSketchbookPath()))) {
         importMenu.addSeparator();
       }
+      */
       if (addLibraries(importMenu, examplesFolder)) {
         importMenu.addSeparator();
       }
-      */
       addLibraries(importMenu, librariesFolder);
       //System.out.println("libraries cp is now " + librariesClassPath);
 

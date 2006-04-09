@@ -19,6 +19,8 @@
 
 package processing.app;
 
+import processing.app.syntax.*;
+
 import java.io.*;
 import java.util.*;
 import java.util.zip.*;
@@ -223,6 +225,19 @@ public class LibraryManager {
       if(null != libraryExamples){
         examplesMenu.add(libraryExamples);
       }
+    }
+  }
+
+  /*
+   * Add syntax coloring
+   */
+  public void addSyntaxColoring(PdeKeywords keywords) {
+    Library library;
+    Collection libraries = getBuiltLibraries();
+    Iterator iterator = libraries.iterator();
+    while(iterator.hasNext()){
+      library = (Library)iterator.next();
+      library.addSyntaxColors(keywords);
     }
   }
 }

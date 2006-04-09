@@ -1125,7 +1125,7 @@ public class Sketch {
 
 
   public void importLibrary(String jarPath) {
-    System.out.println(jarPath);
+    //System.out.println(jarPath);
     // make sure the user didn't hide the sketch folder
     ensureExistence();
 
@@ -1340,17 +1340,7 @@ public class Sketch {
 
     // build unbuilt buildable libraries
     // completely independent from sketch, so run all the time
-    LibraryManager libraryManager;
-    try {
-      libraryManager = new LibraryManager();
-      libraryManager.buildAllUnbuilt();
-    } catch (RunnerException re) {
-      throw new RunnerException(re.getMessage());
-    } catch (Exception ex) {
-      throw new RunnerException(ex.toString());
-    }
-    // update sketchbook menu, this adds examples of any built libs
-    editor.sketchbook.rebuildMenus();
+    editor.prepareLibraries();
 
     // make sure the user didn't hide the sketch folder
     ensureExistence();
@@ -1563,19 +1553,27 @@ public class Sketch {
 
     importedLibraries = new Vector();
     String imports[] = preprocessor.extraImports;
-    Collection libraries = libraryManager.getAll();
-    for (Iterator i = libraries.iterator(); i.hasNext(); ) {
-      Library library = (Library) i.next();
-      File[] headerFiles = library.getHeaderFiles();
-      
-      for (int j = 0; j < headerFiles.length; j++)
-        for (int k = 0; k < imports.length; k++)
-          if (headerFiles[j].getName().equals(imports[k]) &&
-            !importedLibraries.contains(library)) {
-            importedLibraries.add(library);
-            //System.out.println("Adding library " + library.getName());
-          }
+    try {
+      LibraryManager libraryManager = new LibraryManager();
+      Collection libraries = libraryManager.getAll();
+      for (Iterator i = libraries.iterator(); i.hasNext(); ) {
+        Library library = (Library) i.next();
+        File[] headerFiles = library.getHeaderFiles();
+        
+        for (int j = 0; j < headerFiles.length; j++)
+          for (int k = 0; k < imports.length; k++)
+            if (headerFiles[j].getName().equals(imports[k]) &&
+              !importedLibraries.contains(library)) {
+              importedLibraries.add(library);
+              //System.out.println("Adding library " + library.getName());
+            }
+      }
+    } catch (IOException e) {
+      System.err.println("Error finding libraries:");
+      e.printStackTrace();
+      throw new RunnerException(e.getMessage());
     }
+
     //for (int i = 0; i < imports.length; i++) {
       /*
       // remove things up to the last dot
