@@ -1,5 +1,6 @@
 /*
-  Matrix.h - Max7219 LED Matrix library for Arduino & Wiring
+  buffer.h - Buffer library for Wiring & Arduino
+  Based on Hernando Barragan's original C implementation
   Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
 
   This library is free software; you can redistribute it and/or
@@ -17,40 +18,24 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef Matrix_h
-#define Matrix_h
+#ifndef buffer_h
+#define buffer_h
 
-// include core Wiring API
-#include "WProgram.h"
-
-// declare other libraries depended on (if any)
-class Sprite;
-
-class Matrix
-{
-  private:
-    byte _pinData;
-    byte _pinClock;
-    byte _pinLoad;
-
-    byte* _buffer;
-    byte _screens;
-    byte _maximumX;
-
-    void putByte(byte);
-    void setRegister(byte, byte);
-    void syncRow(int);
-
-    void setScanLimit(byte);
-
-    void buffer(int, int, byte);
-  public:
-    Matrix(byte, byte, byte, byte = 1);
-    void setBrightness(byte);
-    void write(int, int, byte);
-    void write(int, int, Sprite);
-    void clear(void);
-};
+  #include <inttypes.h>
+  
+  typedef struct {
+    char* in;
+    char* out;
+    char* buf;
+    uint16_t len;
+    uint16_t cnt;
+  } buffer_t;
+  
+  void buffer_init(buffer_t*, char*, uint16_t);
+  void buffer_put(buffer_t*, char);
+  uint16_t buffer_get(buffer_t*);
+  uint8_t buffer_look(buffer_t*);
+  uint8_t buffer_available(buffer_t*);
 
 #endif
 

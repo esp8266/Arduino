@@ -1,6 +1,6 @@
 /*
-  Matrix.h - Max7219 LED Matrix library for Arduino & Wiring
-  Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
+  QSlide.h - QProx 401/501 library for Arduino & Wiring
+  Copyright (c) 2006 Nicholas Zambetti & Massimo Banzi.  All right reserved.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -17,39 +17,33 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef Matrix_h
-#define Matrix_h
+#ifndef QSlide_h
+#define QSlide_h
 
-// include core Wiring API
 #include "WProgram.h"
 
-// declare other libraries depended on (if any)
-class Sprite;
-
-class Matrix
+class QSlide
 {
   private:
-    byte _pinData;
-    byte _pinClock;
-    byte _pinLoad;
-
-    byte* _buffer;
-    byte _screens;
-    byte _maximumX;
-
-    void putByte(byte);
-    void setRegister(byte, byte);
-    void syncRow(int);
-
-    void setScanLimit(byte);
-
-    void buffer(int, int, byte);
+    byte _drd;
+    byte _din;
+    byte _ss;
+    byte _clk;
+    byte _dout;
+    byte _det;
+    byte _prx;
+    byte _prevResult;
+    void calibrate(void);
+    void waitForReady(void);
+    byte transfer(byte);
+    byte driftCompensate(void);
   public:
-    Matrix(byte, byte, byte, byte = 1);
-    void setBrightness(byte);
-    void write(int, int, byte);
-    void write(int, int, Sprite);
-    void clear(void);
+    QSlide(byte, byte, byte, byte, byte, byte, byte);
+    void setProximityThreshold(byte);
+    void setTouchThreshold(byte);
+    byte isTouching(void);
+    byte isNear(void);
+    byte read(void);
 };
 
 #endif

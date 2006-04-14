@@ -1,6 +1,7 @@
 /*
-  Matrix.h - Max7219 LED Matrix library for Arduino & Wiring
-  Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
+  Encoder.cpp - Encoder library for Wiring & Arduino
+  Copyright (c) 2006 Hernando Barragan and Nicholas Zambetti.
+  All right reserved.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -17,40 +18,30 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef Matrix_h
-#define Matrix_h
+#ifndef Encoder_h
+#define Encoder_h
 
-// include core Wiring API
-#include "WProgram.h"
+#include <inttypes.h>
 
-// declare other libraries depended on (if any)
-class Sprite;
-
-class Matrix
+class Encoder
 {
   private:
-    byte _pinData;
-    byte _pinClock;
-    byte _pinLoad;
-
-    byte* _buffer;
-    byte _screens;
-    byte _maximumX;
-
-    void putByte(byte);
-    void setRegister(byte, byte);
-    void syncRow(int);
-
-    void setScanLimit(byte);
-
-    void buffer(int, int, byte);
+    uint8_t _index;
+    uint8_t _pin_a;
+    static volatile uint8_t _pin_b;
+    static volatile int32_t _position;
+    static uint8_t _count;
+    static Encoder* _encoders[];
+    static void service(void);
   public:
-    Matrix(byte, byte, byte, byte = 1);
-    void setBrightness(byte);
-    void write(int, int, byte);
-    void write(int, int, Sprite);
-    void clear(void);
+    Encoder();
+    uint8_t attach(uint8_t, uint8_t);
+    void detach();
+    void write(int32_t);
+    int32_t read(void);
+    uint8_t attached(void);
 };
 
 #endif
+
 

@@ -1,6 +1,6 @@
 /*
-  Matrix.h - Max7219 LED Matrix library for Arduino & Wiring
-  Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
+  Sprite.cpp - 2D sprite buffers library for Arduino & Wiring
+  Copyright (c) 2006 David A. Mellis.  All right reserved.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -17,39 +17,32 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef Matrix_h
-#define Matrix_h
+#ifndef Sprite_h
+#define Sprite_h
 
-// include core Wiring API
-#include "WProgram.h"
+#include <inttypes.h>
 
-// declare other libraries depended on (if any)
-class Sprite;
+#include "Binary.h"
 
-class Matrix
+class Sprite
 {
   private:
-    byte _pinData;
-    byte _pinClock;
-    byte _pinLoad;
-
-    byte* _buffer;
-    byte _screens;
-    byte _maximumX;
-
-    void putByte(byte);
-    void setRegister(byte, byte);
-    void syncRow(int);
-
-    void setScanLimit(byte);
-
-    void buffer(int, int, byte);
-  public:
-    Matrix(byte, byte, byte, byte = 1);
-    void setBrightness(byte);
-    void write(int, int, byte);
-    void write(int, int, Sprite);
-    void clear(void);
+    uint8_t _width;
+    uint8_t _height;
+    uint8_t _depth;
+    uint8_t _ppb;
+    uint8_t _bpr;
+    uint8_t _mask;
+    uint8_t *_buffer;
+    
+    void init(uint8_t width, uint8_t height);
+  public: 
+    Sprite(uint8_t width, uint8_t height);
+    Sprite(uint8_t width, uint8_t height, uint8_t row, ...);
+    uint8_t width() const;
+    uint8_t height() const;
+    void write(int8_t x, int8_t y, uint8_t value);
+    uint8_t read(int8_t x, int8_t y) const;
 };
 
 #endif
