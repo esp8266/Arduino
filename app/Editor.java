@@ -863,21 +863,29 @@ public class Editor extends JFrame
     JMenu menu = new JMenu("Help");
     JMenuItem item;
 
-//    item = new JMenuItem("Environment");
-//    item.addActionListener(new ActionListener() {
-//        public void actionPerformed(ActionEvent e) {
-//          Base.openURL(System.getProperty("user.dir") + File.separator +
-//                          "reference" + File.separator + "environment" +
-//                          File.separator + "index.html");
-//        }
-//      });
-//    menu.add(item);
-
     item = new JMenuItem("Howto");
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           Base.openURL(System.getProperty("user.dir") + File.separator +
                           "reference" + File.separator + "howto.html");
+        }
+      });
+    menu.add(item);
+
+    item = new JMenuItem("Environment");
+    item.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          Base.openURL(System.getProperty("user.dir") + File.separator +
+                          "reference" + File.separator + "environment.html");
+        }
+      });
+    menu.add(item);
+
+    item = new JMenuItem("Frequenty Asked Questions");
+    item.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          Base.openURL(System.getProperty("user.dir") + File.separator +
+                          "reference" + File.separator + "FAQ.html");
         }
       });
     menu.add(item);
