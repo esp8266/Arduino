@@ -881,20 +881,20 @@ public class Editor extends JFrame
       });
     menu.add(item);
 
-    item = new JMenuItem("Frequenty Asked Questions");
-    item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          Base.openURL(System.getProperty("user.dir") + File.separator +
-                          "reference" + File.separator + "FAQ.html");
-        }
-      });
-    menu.add(item);
-
     item = new JMenuItem("Reference");
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           Base.openURL(System.getProperty("user.dir") + File.separator +
                           "reference" + File.separator + "index.html");
+        }
+      });
+    menu.add(item);
+
+    item = new JMenuItem("Frequently Asked Questions");
+    item.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          Base.openURL(System.getProperty("user.dir") + File.separator +
+                          "reference" + File.separator + "FAQ.html");
         }
       });
     menu.add(item);
