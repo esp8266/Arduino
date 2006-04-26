@@ -41,7 +41,7 @@ may need to reboot after running this script.
 
 UPDATES
 
-0004
+0004 - 2006.04.26
 
 Main sketch is now compiled as C++ (instead of C).
 Updated avr toolchain.
@@ -59,6 +59,8 @@ Added C++ serial library.
 Resynced with Processing/Wiring IDE code (improved auto-format, faster logging
 to serial monitor console, other bug fixes)
 New library system.
+Updated to latest version of the RXTX serial library; Mac users will need to
+rerun macosx_setup.command.
 
 0003 - 2006.01.16
 
