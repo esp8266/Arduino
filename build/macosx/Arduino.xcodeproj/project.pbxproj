@@ -410,7 +410,6 @@
 		33FF02860965BD160016AC38 /* tab-unsel-menu.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "tab-unsel-menu.gif"; sourceTree = "<group>"; };
 		33FF02870965BD160016AC38 /* tab-unsel-mid.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "tab-unsel-mid.gif"; sourceTree = "<group>"; };
 		33FF02880965BD160016AC38 /* tab-unsel-right.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "tab-unsel-right.gif"; sourceTree = "<group>"; };
-		33FF028B0965BD160016AC38 /* run.bat */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = run.bat; sourceTree = "<group>"; };
 		33FF02900965BD160016AC38 /* .cvsignore */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = .cvsignore; sourceTree = "<group>"; };
 		33FF02920965BD160016AC38 /* avr_tools.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = avr_tools.zip; sourceTree = "<group>"; };
 		33FF02940965BD160016AC38 /* burn.bat */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = burn.bat; sourceTree = "<group>"; };
@@ -422,7 +421,6 @@
 		33FF029C0965BD160016AC38 /* jikes.exe */ = {isa = PBXFileReference; lastKnownFileType = file; path = jikes.exe; sourceTree = "<group>"; };
 		33FF029E0965BD170016AC38 /* makefile.w2k */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = makefile.w2k; sourceTree = "<group>"; };
 		33FF029F0965BD170016AC38 /* makefile.win */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = makefile.win; sourceTree = "<group>"; };
-		33FF02A00965BD170016AC38 /* run-expert.bat */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = "run-expert.bat"; sourceTree = "<group>"; };
 		33FF02A10965BD170016AC38 /* run.bat */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = run.bat; sourceTree = "<group>"; };
 		33FF02A20965BD170016AC38 /* rxtxSerial.dll */ = {isa = PBXFileReference; lastKnownFileType = file; path = rxtxSerial.dll; sourceTree = "<group>"; };
 		33FF02A40965BD170016AC38 /* dist.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = dist.sh; sourceTree = "<group>"; };
@@ -563,8 +561,6 @@
 			children = (
 				33FF01DB0965BD160016AC38 /* dist */,
 				33FF01DD0965BD160016AC38 /* lib */,
-				33FF02890965BD160016AC38 /* reference */,
-				33FF028B0965BD160016AC38 /* run.bat */,
 				33FF028C0965BD160016AC38 /* sketchbook */,
 			);
 			path = shared;
@@ -605,21 +601,6 @@
 				33FF02880965BD160016AC38 /* tab-unsel-right.gif */,
 			);
 			path = lib;
-			sourceTree = "<group>";
-		};
-		33FF02890965BD160016AC38 /* reference */ = {
-			isa = PBXGroup;
-			children = (
-				33FF028A0965BD160016AC38 /* images */,
-			);
-			path = reference;
-			sourceTree = "<group>";
-		};
-		33FF028A0965BD160016AC38 /* images */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = images;
 			sourceTree = "<group>";
 		};
 		33FF028C0965BD160016AC38 /* sketchbook */ = {
@@ -670,7 +651,6 @@
 				33FF029B0965BD160016AC38 /* ICE_JNIRegistry.dll */,
 				33FF029C0965BD160016AC38 /* jikes.exe */,
 				33FF029D0965BD160016AC38 /* lib */,
-				33FF02A00965BD170016AC38 /* run-expert.bat */,
 				33FF02A10965BD170016AC38 /* run.bat */,
 				33FF02A20965BD170016AC38 /* rxtxSerial.dll */,
 				33FF02A30965BD170016AC38 /* serial */,

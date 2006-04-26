@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# modified to change from /var/spool/uucp to /var/lock for rxtx 2.1_7r2
+# for processing release 0112, 13 april 2006 [fry]
+
 # originally fixperm.sh from rxtx-2.1_6/contrib
 # with a couple additions from pathsetup.command from fink [fry]
 
@@ -24,13 +27,13 @@ answer=`echo $answer | sed 's/^[yY].*$/y/'`
 if [ -z "$answer" -o "x$answer" = "xy" ]; then
     curruser=`sudo id -p | grep 'login' | sed 's/login.//'`
 
-    if [ ! -d /var/spool/uucp ]
+    if [ ! -d /var/lock ]
     then
-        sudo mkdir /var/spool/uucp
+        sudo mkdir /var/lock
     fi
 
-    sudo chgrp uucp /var/spool/uucp
-    sudo chmod 775 /var/spool/uucp
+    sudo chgrp uucp /var/lock
+    sudo chmod 775 /var/lock
 
     if [ ! `sudo niutil -readprop / /groups/uucp users | grep $curruser > /dev/null` ]
     then
