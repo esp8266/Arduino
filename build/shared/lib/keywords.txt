@@ -113,6 +113,7 @@ PI	LITERAL1	PI
 return	KEYWORD1	return
 >>		rightshift
 ;		semicolon
+Serial  KEYWORD3  Serial
 setup	KEYWORD3	setup_
 sin	KEYWORD2	sin_
 sq	KEYWORD2	sq_
@@ -126,6 +127,14 @@ TWO_PI	LITERAL1	TWO_PI
 void	KEYWORD1	void
 while	KEYWORD1	while_
 
+Serial	KEYWORD2
+begin	KEYWORD2
+read	KEYWORD2
+print	KEYWORD2
+write	KEYWORD2
+println	KEYWORD2
+pulseIn	KEYWORD2
+available	KEYWORD2
 digitalWrite	KEYWORD2
 digitalRead	KEYWORD2
 pinMode	KEYWORD2
