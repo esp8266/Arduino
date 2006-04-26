@@ -58,6 +58,7 @@ Now display binary sketch size on upload, and give error if too big.
 Added C++ serial library.
 Resynced with Processing/Wiring IDE code (improved auto-format, faster logging
 to serial monitor console, other bug fixes)
+New library system.
 
 0003 - 2006.01.16
 

@@ -39,6 +39,7 @@
 				33FFFE1D0965BC050016AC38 /* CopyFiles */,
 				33FF070C0965BF760016AC38 /* CopyFiles */,
 				33FF07130965BFA80016AC38 /* CopyFiles */,
+				336EA3E309FF84FA0052D765 /* CopyFiles */,
 				33FF071D0965C1C20016AC38 /* CopyFiles */,
 				33FF07170965BFFE0016AC38 /* ShellScript */,
 			);
@@ -154,6 +155,7 @@
 /* Begin PBXBuildFile section */
 		330B21540968180400345666 /* librxtxSerial.jnilib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 330B21530968180400345666 /* librxtxSerial.jnilib */; };
 		332D4DB609CF147F00BF81F6 /* Sizer.java in Sources */ = {isa = PBXBuildFile; fileRef = 332D4DB509CF147F00BF81F6 /* Sizer.java */; };
+		336EA55B09FF87F60052D765 /* examples in CopyFiles */ = {isa = PBXBuildFile; fileRef = 336EA4DB09FF87E30052D765 /* examples */; };
 		339514EE097AEB5900193C89 /* STDCTokenTypes.txt in Resources */ = {isa = PBXBuildFile; fileRef = 33FFFE420965BD110016AC38 /* STDCTokenTypes.txt */; };
 		339514FA097AEB8000193C89 /* license.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02B60965BD170016AC38 /* license.txt */; };
 		339514FB097AEB8000193C89 /* readme.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02B70965BD170016AC38 /* readme.txt */; };
@@ -288,6 +290,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		336EA3E309FF84FA0052D765 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 16;
+			files = (
+				336EA55B09FF87F60052D765 /* examples in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		33CF03C809662DA200F2C9A9 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -369,6 +381,7 @@
 		330B21530968180400345666 /* librxtxSerial.jnilib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = librxtxSerial.jnilib; sourceTree = "<group>"; };
 		332D4DB509CF147F00BF81F6 /* Sizer.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Sizer.java; sourceTree = "<group>"; };
 		333269E1099BB1FC007D3AE2 /* tools.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = tools.zip; sourceTree = "<group>"; };
+		336EA4DB09FF87E30052D765 /* examples */ = {isa = PBXFileReference; lastKnownFileType = folder; path = examples; sourceTree = "<group>"; };
 		337CD3F309EFC183002B890C /* fetch.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = fetch.sh; sourceTree = "<group>"; };
 		33AF620A0965D67800B514A9 /* antlr.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = antlr.jar; sourceTree = "<group>"; };
 		33AF620B0965D67900B514A9 /* applet.html */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.html; path = applet.html; sourceTree = "<group>"; };
@@ -382,7 +395,6 @@
 		33BEE0CD09D7446100430D5B /* Library.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = Library.java; sourceTree = "<group>"; };
 		33CF03B009662CA800F2C9A9 /* arduino.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = arduino.icns; path = dist/arduino.icns; sourceTree = "<group>"; };
 		33DD8FB6096AC8DA0013AF8F /* Arduino.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Arduino.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		33FF01DC0965BD160016AC38 /* examples.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = examples.zip; sourceTree = "<group>"; };
 		33FF01DE0965BD160016AC38 /* about.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = about.jpg; sourceTree = "<group>"; };
 		33FF02770965BD160016AC38 /* buttons.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = buttons.gif; sourceTree = "<group>"; };
 		33FF02780965BD160016AC38 /* icon.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = icon.gif; sourceTree = "<group>"; };
@@ -561,7 +573,7 @@
 		33FF01DB0965BD160016AC38 /* dist */ = {
 			isa = PBXGroup;
 			children = (
-				33FF01DC0965BD160016AC38 /* examples.zip */,
+				336EA4DB09FF87E30052D765 /* examples */,
 			);
 			path = dist;
 			sourceTree = "<group>";
@@ -1057,18 +1069,16 @@
 			files = (
 			);
 			inputPaths = (
-				../shared/dist/examples.zip,
 				../shared/reference.zip,
 				dist/tools.zip,
 			);
 			outputPaths = (
 				$BUILT_PRODUCTS_DIR/tools,
-				$BUILT_PRODUCTS_DIR/examples,
 				$BUILT_PRODUCTS_DIR/reference,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "unzip -od $BUILT_PRODUCTS_DIR/examples ../shared/dist/examples.zip\nunzip -od $BUILT_PRODUCTS_DIR ../shared/reference.zip\nunzip -od $BUILT_PRODUCTS_DIR dist/tools.zip";
+			shellScript = "unzip -od $BUILT_PRODUCTS_DIR ../shared/reference.zip\nunzip -od $BUILT_PRODUCTS_DIR dist/tools.zip";
 		};
 /* End PBXShellScriptBuildPhase section */
 

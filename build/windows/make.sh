@@ -74,13 +74,14 @@ else
   cp -r ../../targets work/lib/
 
   # take care of the examples
-  mkdir work/examples
-  cd work/examples
-  cp ../../../shared/dist/examples.zip .
-  echo Extracting examples ...
-  unzip -q  -d . examples.zip
-  rm -f examples.zip
-  cd ../..
+  cp -r ../shared/dist/examples work/
+  #mkdir work/examples
+  #cd work/examples
+  #cp ../../../shared/dist/examples.zip .
+  #echo Extracting examples ...
+  #unzip -q  -d . examples.zip
+  #rm -f examples.zip
+  #cd ../..
 
   # chmod +x the crew
   find work -name "*.dll" -exec chmod +x {} ';'

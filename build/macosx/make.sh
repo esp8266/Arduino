@@ -23,7 +23,7 @@ else
   mkdir -p work/classes/processing/app/syntax
   mkdir -p work/classes/processing/app/tools
   mkdir -p work/lib/build
-  mkdir -p work/examples
+  #mkdir -p work/examples
 
   cp dist/librxtxSerial.jnilib work/
   cp -pR dist/drivers work/
@@ -34,8 +34,9 @@ else
   # cvs doesn't seem to want to honor the +x bit 
   chmod +x work/Arduino.app/Contents/MacOS/JavaApplicationStub
 
-  echo Extracting examples...
-  unzip -d work/examples ../shared/dist/examples.zip
+  #echo Extracting examples...
+  #unzip -d work/examples ../shared/dist/examples.zip
+  cp -pR ../shared/
   
   # copy the avr-gcc distribution
   echo Copying tools \(this may take a minute\)...
