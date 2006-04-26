@@ -15,7 +15,7 @@ int potPin = 0;     // analog pin where to plug the potentiometer at
  
 void setup() {
   pinMode(motorPin, OUTPUT);   // declare the motor as an output
-  beginSerial(9600);           // connect to the serial port to send values back
+  Serial.begin(9600);           // connect to the serial port to send values back
 }
  
 void loop() {
@@ -23,8 +23,7 @@ void loop() {
   value = analogRead(potPin);
 
   // print its value back to the computer
-  printInteger(value);
-  printNewline();
+  Serial.println(value);
 
   // turn the motor on
   digitalWrite(motorPin,HIGH);

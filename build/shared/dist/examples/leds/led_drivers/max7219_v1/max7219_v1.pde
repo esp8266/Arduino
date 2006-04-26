@@ -130,18 +130,18 @@ void printBuff(){
 ////////////////////////////////////////////
 
 void readBuff(){
-  printString("into readbuff method");
-  serialVal = serialRead();
+  Serial.print("into readbuff method");
+  serialVal = Serial.read();
   if (serialVal != -1){
-    printString("information there");
+    Serial.print("information there");
     if ((serialVal == 43) && !reading){
       reading = true;
-      printString("plus");
+      Serial.print("plus");
     }
 
     if ((serialVal == 45) && (times == 0 && reading)){
       writing = true;
-      printString("minus");
+      Serial.print("minus");
     }
 
     if (reading && writing){
@@ -150,7 +150,7 @@ void readBuff(){
     }
 
     if (times >= 7){
-    printString("Print to buff");
+    Serial.print("Print to buff");
       times = 0;
       reading = false;
       writing = false;
@@ -179,6 +179,7 @@ void max7219_init()
 // program initialization routine
 void setup()
 {
+  Serial.begin(9600);
   setPinModes();
   max7219_init();
 }
@@ -186,7 +187,7 @@ void setup()
 // program loop
 void loop()
 {
-  printString("in the loop");
+  Serial.print("in the loop");
   //max7219_all(0x00);
   //delay(500);
   readBuff();

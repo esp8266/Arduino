@@ -26,7 +26,7 @@ void loop () {
 
   // if the input is '-1' then there is no data
   // at the input, otherwise store it
-  if (val != -1) {
+  if (serbyte != -1) {
     val = serbyte;
   }
 

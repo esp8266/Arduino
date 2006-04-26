@@ -35,7 +35,7 @@ int dato = 0;  // dato is a varible we use to send data to the LEDs
 
 void setup()
 {
-  //beginSerial(9600);    // uncomment the serial-related lines to monitor the program's progress
+  //Serial.begin(9600);    // uncomment the serial-related lines to monitor the program's progress
   pinMode(data, OUTPUT);  // declare all the control pins as outputs
   pinMode(clock, OUTPUT);
   pinMode(strob, OUTPUT);
@@ -60,7 +60,7 @@ void loop()
   // go through the "dato" variable and send it bit by bit over the data pin
   for (count = 0; count < 8; count++) {
     digitalWrite(data, dato & 01);
-    //serialWrite((dato & 01) + 48);
+    //Serial.print((dato & 01) + 48, BYTE);
     dato>>=1;
     if (count == 7){
       digitalWrite(oe, LOW);
@@ -74,6 +74,6 @@ void loop()
   digitalWrite(strob, LOW);
   delay(100);
    
-  //printNewline();
+  //Serial.println();
   delay(100);                  // waits for a second
 }

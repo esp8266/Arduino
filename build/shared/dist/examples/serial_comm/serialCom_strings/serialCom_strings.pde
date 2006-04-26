@@ -30,7 +30,7 @@ void readSerialString (char *strArray) {
        while (serialAvailable()){            
           strArray[i] = Serial.read();
           i++;
-          Serial.write(strArray[(i-1)]);         //optional: for confirmation
+          Serial.print(strArray[(i-1)]);         //optional: for confirmation
        }
        Serial.println();                          //optional: for confirmation
     }      
