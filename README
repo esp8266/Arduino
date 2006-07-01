@@ -1,0 +1,156 @@
+########################################################################
+# axTLS Quick-Start Guide
+########################################################################
+
+This is a guide to get a small SSL web-server up and running quickly.
+
+########################################################################
+# Introduction
+########################################################################
+The axTLS project is an SSL client/server library using the TLSv1 protocol. 
+It is designed to be small and fast, and is suited to embedded projects. A web
+server is included (called Anti-Web).
+
+The web server + SSL library is around 50-60kB and is configurable for
+features or size.
+
+########################################################################
+# Compilation
+########################################################################
+
+All platforms require GNU make. This means on Win32 that Cygwin needs to be
+installed with "make" and various developer options selected. 
+
+Configuration now uses a tool called "mconf" which gives a nice way to
+configure options (similar to what is used in BusyBox and the Linux kernel).
+
+You should be able to compile axTLS simply by extracting it, change into
+the extracted directory and typing:
+
+>  make
+
+Select your platform type, save the configuration, exit, and then 
+type "make" again.
+
+If all goes well, you should end up with an executable called "awhttpd" (or
+awhttpd.exe) in this directory.
+
+To play with all the various axTLS options, type:
+
+>  make menuconfig
+
+Save the new configuration and rebuild.
+
+########################################################################
+# Running it
+########################################################################
+
+To run it, type (as superuser):
+
+> awhttpd
+
+And then point your browser at:
+
+https://127.0.0.1
+
+And you should see a html page with a padlock appearing on your browser.
+
+or type:
+
+http://127.0.0.1
+
+to see the same page unencrypted.
+
+See the README in the httpd directory from more configuration information on
+Anti-Web.
+
+Note: libaxtls.so may have to in your shared library path.
+
+########################################################################
+# The axssl utilities
+########################################################################
+
+The axssl suite of tools are the SSL test tools in the various language
+bindings. They are:
+
+axssl           - C sample
+axssl.csharp    - C# sample
+axssl.vbnet     - VB.NET sample
+axtls.jar       - Java sample
+axssl.pl        - Perl sample
+
+All the tools have identical command-line parameters. e.g. to run something
+interesting:
+
+> axssl s_server -verify -CAfile ssl/test/axTLS.ca_x509
+
+and
+
+> axssl s_client -cert ssl/test/axTLS.x509_1024 -key \
+  ssl/test/axTLS.key_1024 -reconnect
+
+C#
+==
+If building under Linux or other non-Win32 platforms, Mono must be installed
+and the executable is run as:
+
+> mono axssl.csharp.exe ...
+
+Java
+====
+The java version is run as:
+
+> java -jar axtls.jar <options>
+
+Perl
+====
+> [perl] ./axssl.pl <options>
+
+If running under Win32, be sure to use the correct version of Perl (i.e.
+ActiveState's version works ok).
+
+########################################################################
+# Known Issues
+########################################################################
+
+* Perl/Java bindings don't work on 64 bit Linux machines. I can't even compile
+  the latest version of Perl on an AMD64 box (using FC3).
+
+* Java 1.4 or better is required for the Java interfaces.
+
+* Processes that fork can't use session resumption unless some form of IPC is
+  used.
+
+* Ensure libperl.so and libaxtls.so are in the shared library path when 
+  running with the perl bindings. A way to do this is with:
+
+  export LD_LIBRARY_PATH=`perl -e 'use Config; print $Config{archlib};'`/CORE:.
+
+* The default Microsoft .NET SDK is v2.0.50727. Download from:
+  http://msdn.microsoft.com/netframework/downloads/updates/default.aspx.
+
+Win32 issues
+============
+* Be careful about doing .NET executions on network drives - .NET complains 
+  with security exceptions on the binary. TODO: Add a manifest file to prevent
+  this.
+
+* The test harness appears to be broken under VC8.0. Debugging shows a problem
+  the _close() function which is weird.
+
+Solaris issues
+==============
+* mconf doesn't work well - some manual tweaking is required for string values.
+
+* GNU make and GNU patch are required and need to be in $PATH.
+
+* To get swig's library dependencies to work (and for the C library to be
+  found), I needed to type:
+  > export LD_LIBRARY_PATH=/usr/local/gcc-3.3.1/lib:.
+
+Cygwin issues
+=============
+* The bindings all compile but don't run under cygwin with the exception of
+  Perl. This is due to win32 executables being incompatible with cygwin 
+  libraries.
+

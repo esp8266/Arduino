@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DOCUMENT type="Advanced Installer" CreateVersion="3.9" version="4.0" modules="freeware" RootPath="." Language="en">
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
+    <ROW Property="ALLUSERS" Value="2"/>
+    <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install &lt;product name&gt;." ValueLocId="*"/>
+    <ROW Property="ARPPRODUCTICON" Value="controlPanelIcon.exe"/>
+    <ROW Property="ARPURLINFOABOUT" Value="http://www.leroc.com.au/axTLS"/>
+    <ROW Property="BannerBitmap" Value="default_banner.bmp" Type="1"/>
+    <ROW Property="DialogBitmap" Value="default_dialog.bmp" Type="1"/>
+    <ROW Property="Manufacturer" Value="axTLS" ValueLocId="*"/>
+    <ROW Property="ProductCode" Value="1033:{C78C84DF-8FBA-49BD-AC4B-BEEE0A3411C6} "/>
+    <ROW Property="ProductLanguage" Value="1033"/>
+    <ROW Property="ProductName" Value="Awhttpd" ValueLocId="*"/>
+    <ROW Property="ProductVersion" Value="1.0.0"/>
+    <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
+    <ROW Property="UpgradeCode" Value="{93E5623E-740C-449C-9770-EDABD392868D}"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiDirsComponent">
+    <ROW Directory="APPDIR" Directory_Parent="TARGETDIR" DefaultDir="APPDIR" IsPseudoRoot="1"/>
+    <ROW Directory="SHORTCUTDIR" Directory_Parent="TARGETDIR" DefaultDir="SHORTC~1|SHORTCUTDIR" IsPseudoRoot="1"/>
+    <ROW Directory="TARGETDIR" DefaultDir="SourceDir"/>
+    <ROW Directory="crypto_files_DIR" Directory_Parent="www_DIR" DefaultDir="crypto~1|crypto_files"/>
+    <ROW Directory="www_DIR" Directory_Parent="APPDIR" DefaultDir="www"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
+    <ROW Component="awhttpd.exe" ComponentId="{0AEFFA20-29FA-4304-8227-F9ED0E6B8A0A}" Directory_="APPDIR" Attributes="0" KeyPath="awhttpd.exe" FullKeyPath="APPDIR\awhttpd.exe"/>
+    <ROW Component="axssl.csharp.exe" ComponentId="{B9373428-79F5-4D77-8924-48D23EF3870E}" Directory_="APPDIR" Attributes="0" KeyPath="axssl.csharp.exe" FullKeyPath="APPDIR\axssl.csharp.exe"/>
+    <ROW Component="axssl.exe" ComponentId="{E1E96774-7BFC-45B9-BA33-FC0C631921FD}" Directory_="APPDIR" Attributes="0" KeyPath="axssl.exe" FullKeyPath="APPDIR\axssl.exe"/>
+    <ROW Component="axssl.vbnet.exe" ComponentId="{31F03DA9-E099-4BBD-88B7-4ABBC9F77EFB}" Directory_="APPDIR" Attributes="0" KeyPath="axssl.vbnet.exe" FullKeyPath="APPDIR\axssl.vbnet.exe"/>
+    <ROW Component="axtls.dll" ComponentId="{4C741E75-A18A-4FC9-972C-C1EF583713EB}" Directory_="APPDIR" Attributes="0" KeyPath="axtls.dll" FullKeyPath="APPDIR\axtls.dll"/>
+    <ROW Component="axtls.jar" ComponentId="{796CB0A9-6214-4531-A330-9B37420B7799}" Directory_="APPDIR" Attributes="0" KeyPath="axtls.jar" FullKeyPath="APPDIR"/>
+    <ROW Component="axtlsj.dll" ComponentId="{AB8043C7-8291-4898-B34A-561335956DC1}" Directory_="APPDIR" Attributes="0" KeyPath="axtlsj.dll" FullKeyPath="APPDIR\axtlsj.dll"/>
+    <ROW Component="crypto_2600des.gif" ComponentId="{7C3C3A24-4053-4A9D-B040-FA671C2FA638}" Directory_="crypto_files_DIR" Attributes="0" KeyPath="crypto_2600des.gif" FullKeyPath="APPDIR\www\crypto_files"/>
+    <ROW Component="favicon.ico" ComponentId="{9A1AB507-100A-470D-A002-CD8262CA4913}" Directory_="www_DIR" Attributes="0" KeyPath="favicon.ico" FullKeyPath="APPDIR\www"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
+    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0" Components="awhttpd.exe axssl.csharp.exe axssl.exe axssl.vbnet.exe axtls.dll axtls.jar axtlsj.dll crypto_2600des.gif favicon.ico"/>
+    <ATTRIBUTE name="CurrentFeature" value="MainFeature"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
+    <ROW File="awhttpd.exe" Component_="awhttpd.exe" FileName="awhttpd.exe" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\awhttpd.exe" SelfReg="false" Sequence="1"/>
+    <ROW File="axssl.csharp.exe" Component_="axssl.csharp.exe" FileName="axsslc~1.exe|axssl.csharp.exe" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\axssl.csharp.exe" SelfReg="false" Sequence="2"/>
+    <ROW File="axssl.exe" Component_="axssl.exe" FileName="axssl.exe" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\axssl.exe" SelfReg="false" Sequence="3"/>
+    <ROW File="axssl.vbnet.exe" Component_="axssl.vbnet.exe" FileName="axsslv~1.exe|axssl.vbnet.exe" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\axssl.vbnet.exe" SelfReg="false" Sequence="4"/>
+    <ROW File="axtls.dll" Component_="axtls.dll" FileName="axtls.dll" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\axtls.dll" SelfReg="false" Sequence="5"/>
+    <ROW File="axtls.jar" Component_="axtls.jar" FileName="axtls.jar" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\axtls.jar" SelfReg="false" Sequence="6"/>
+    <ROW File="axtls.lib" Component_="axtls.jar" FileName="axtls.lib" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\axtls.lib" SelfReg="false" Sequence="7"/>
+    <ROW File="axtls.static.lib" Component_="axtls.jar" FileName="axtlss~1.lib|axtls.static.lib" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\axtls.static.lib" SelfReg="false" Sequence="8"/>
+    <ROW File="axtlsj.dll" Component_="axtlsj.dll" FileName="axtlsj.dll" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\axtlsj.dll" SelfReg="false" Sequence="9"/>
+    <ROW File="crypto_2600des.gif" Component_="crypto_2600des.gif" FileName="crypto~1.gif|crypto_2600des.gif" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\www\crypto_files\crypto_2600des.gif" SelfReg="false" Sequence="10"/>
+    <ROW File="crypto_3ways.gif" Component_="crypto_2600des.gif" FileName="crypto~2.gif|crypto_3ways.gif" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\www\crypto_files\crypto_3ways.gif" SelfReg="false" Sequence="11"/>
+    <ROW File="crypto_backrsa.jpg" Component_="crypto_2600des.gif" FileName="crypto~1.jpg|crypto_backrsa.jpg" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\www\crypto_files\crypto_backrsa.jpg" SelfReg="false" Sequence="12"/>
+    <ROW File="crypto_cert.gif" Component_="crypto_2600des.gif" FileName="crypto~3.gif|crypto_cert.gif" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\www\crypto_files\crypto_cert.gif" SelfReg="false" Sequence="13"/>
+    <ROW File="crypto_des.gif" Component_="crypto_2600des.gif" FileName="crypto~4.gif|crypto_des.gif" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\www\crypto_files\crypto_des.gif" SelfReg="false" Sequence="14"/>
+    <ROW File="crypto_ecc.gif" Component_="crypto_2600des.gif" FileName="crypto~5.gif|crypto_ecc.gif" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\www\crypto_files\crypto_ecc.gif" SelfReg="false" Sequence="15"/>
+    <ROW File="crypto_sslv3.gif" Component_="crypto_2600des.gif" FileName="crypto~6.gif|crypto_sslv3.gif" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\www\crypto_files\crypto_sslv3.gif" SelfReg="false" Sequence="16"/>
+    <ROW File="crypto_types.gif" Component_="crypto_2600des.gif" FileName="crypto~7.gif|crypto_types.gif" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\www\crypto_files\crypto_types.gif" SelfReg="false" Sequence="17"/>
+    <ROW File="favicon.ico" Component_="favicon.ico" FileName="favicon.ico" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\www\favicon.ico" SelfReg="false" Sequence="19"/>
+    <ROW File="index.html" Component_="favicon.ico" FileName="index~1.htm|index.html" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\www\index.html" SelfReg="false" Sequence="20"/>
+    <ROW File="kerberos.gif" Component_="crypto_2600des.gif" FileName="kerberos.gif" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\www\crypto_files\kerberos.gif" SelfReg="false" Sequence="18"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
+    <ROW Path="&lt;ui.ail&gt;"/>
+    <ROW Path="&lt;ui_en.ail&gt;"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.FragmentComponent">
+    <ROW Fragment="FolderDlg.aip" Path="&lt;FolderDlg.aip&gt;"/>
+    <ROW Fragment="StaticUIStrings.aip" Path="&lt;StaticUIStrings.aip&gt;"/>
+    <ROW Fragment="UI.aip" Path="&lt;UI.aip&gt;"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiBinaryComponent">
+    <ROW Name="default_banner.bmp" SourcePath="&lt;default-banner.bmp&gt;"/>
+    <ROW Name="default_dialog.bmp" SourcePath="&lt;default-dialog.bmp&gt;"/>
+    <ROW Name="launcher.dll" SourcePath="&lt;launcher.dll&gt;"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiControlComponent">
+    <ATTRIBUTE name="FixedSizeBitmaps" value="0"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiControlEventComponent">
+    <ROW Dialog_="FolderDlg" Control_="Back" Event="NewDialog" Argument="WelcomeDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="WelcomeDlg" Control_="Next" Event="NewDialog" Argument="FolderDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="FolderDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="FolderDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_INSTALL" Ordering="3"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceWelcomeDlg" Condition="AI_MAINT" Ordering="1"/>
+    <ROW Dialog_="MaintenanceWelcomeDlg" Control_="Next" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT" Ordering="2"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="PatchWelcomeDlg" Condition="AI_PATCH" Ordering="1"/>
+    <ROW Dialog_="PatchWelcomeDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_PATCH" Ordering="2"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCustActComponent">
+    <ROW Action="AI_DOWNGRADE" Type="19" Target="4010"/>
+    <ROW Action="AI_PREPARE_UPGRADE" Type="1" Source="launcher.dll" Target="PrepareUpgrade"/>
+    <ROW Action="AI_RESTORE_LOCATION" Type="1" Source="launcher.dll" Target="RestoreLocation"/>
+    <ROW Action="AI_STORE_LOCATION" Type="51" Source="ARPINSTALLLOCATION" Target="[APPDIR]"/>
+    <ROW Action="SET_APPDIR" Type="307" Source="APPDIR" Target="[ProgramFilesFolder][ProductName]"/>
+    <ROW Action="SET_SHORTCUTDIR" Type="307" Source="SHORTCUTDIR" Target="[ProgramMenuFolder][ProductName]"/>
+    <ROW Action="SET_TARGETDIR_TO_APPDIR" Type="51" Source="TARGETDIR" Target="[APPDIR]"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
+    <ROW Name="controlPanelIcon.exe" SourcePath="..\www\favicon.ico" Index="0"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
+    <ROW Action="AI_DOWNGRADE" Condition="AI_NEWERPRODUCTFOUND AND (UILevel &lt;&gt; 5)" Sequence="210"/>
+    <ROW Action="AI_RESTORE_LOCATION" Condition="APPDIR=&quot;&quot;" Sequence="740"/>
+    <ROW Action="AI_STORE_LOCATION" Condition="Not Installed" Sequence="1545"/>
+    <ROW Action="AI_PREPARE_UPGRADE" Condition="AI_UPGRADE=&quot;No&quot; AND (Not Installed)" Sequence="1300"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiInstallUISequenceComponent">
+    <ROW Action="AI_RESTORE_LOCATION" Condition="APPDIR=&quot;&quot;" Sequence="740"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiMediaComponent">
+    <ATTRIBUTE name="Compress" value="1"/>
+    <ATTRIBUTE name="FirstMediaSize" value="0"/>
+    <ATTRIBUTE name="FirstMediaSizeUnit" value="0"/>
+    <ATTRIBUTE name="InstallationType" value="0"/>
+    <ATTRIBUTE name="MediaSize" value="0"/>
+    <ATTRIBUTE name="MediaSizeUnit" value="0"/>
+    <ATTRIBUTE name="Package" value="1"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiShortsComponent">
+    <ROW Shortcut="awhttpd.exe" Directory_="SHORTCUTDIR" Name="awhttpd" Component_="awhttpd.exe" Target="[#awhttpd.exe]" Description="awhttpd.exe" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>
+    <ROW Shortcut="axssl_client" Directory_="SHORTCUTDIR" Name="axsslc~1|axssl client" Component_="axssl.exe" Target="[#axssl.exe]" Arguments="s_client" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>
+    <ROW Shortcut="axssl_server" Directory_="SHORTCUTDIR" Name="axssls~1|axssl server" Component_="axssl.exe" Target="[#axssl.exe]" Arguments="s_server" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiUpgradeComponent">
+    <ROW UpgradeCode="UpgradeCode" VersionMax="ProductVersion" Attributes="1025"/>
+    <ROW UpgradeCode="UpgradeCode" VersionMin="ProductVersion" Attributes="2"/>
+  </COMPONENT>
+</DOCUMENT>

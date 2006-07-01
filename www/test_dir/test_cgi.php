@@ -1,0 +1,6 @@
+#!/usr/bin/php
+
+<?
+phpinfo();
+?>
+
