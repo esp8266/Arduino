@@ -44,7 +44,7 @@ volatile unsigned long Timer2Reg0;
 
 typedef void (*voidFuncPtr)(void);
 volatile static voidFuncPtr TimerIntFunc[TIMER_NUM_INTERRUPTS];
-
+/*
 // delay for a minimum of <us> microseconds 
 // the time resolution is dependent on the time the loop takes 
 // e.g. with 4Mhz and 5 cycles per loop, the resolution is 1.25 us 
@@ -58,6 +58,7 @@ void delay_us(unsigned short time_us)
 	// one loop takes 5 cpu cycles 
 	for (i=0; i < delay_loops; i++) {};
 }
+*/
 /*
 void delay_ms(unsigned char time_ms)
 {
@@ -76,6 +77,7 @@ void delay_ms(unsigned char time_ms)
 	);
 }
 */
+/*
 void timerInit(void)
 {
 	u08 intNum;
@@ -92,7 +94,7 @@ void timerInit(void)
 	// enable interrupts
 	sei();
 }
-
+*/
 void timer0Init()
 {
 	// initialize timer 0
@@ -149,7 +151,7 @@ u16 timer0GetPrescaler(void)
 	// get the current prescaler setting
 	return (pgm_read_word(TimerPrescaleFactor+(inb(TCCR0) & TIMER_PRESCALE_MASK)));
 }
-
+/*
 u16 timer1GetPrescaler(void)
 {
 	// get the current prescaler setting
@@ -187,6 +189,7 @@ void timerDetach(u08 interruptNum)
 		TimerIntFunc[interruptNum] = 0;
 	}
 }
+*/
 /*
 u32 timerMsToTics(u16 ms)
 {
@@ -204,6 +207,7 @@ u16 timerTicsToMs(u32 tics)
 	return (tics*1000*(prescaleDiv*256))/F_CPU;
 }
 */
+
 void timerPause(unsigned short pause_ms)
 {
 	// pauses for exactly <pause_ms> number of milliseconds
@@ -272,13 +276,14 @@ void timer2ClearOverflowCount(void)
 	// clear the timer overflow counter registers
 	Timer2Reg0 = 0;	// initialize time registers
 }
-
+/*
 long timer2GetOverflowCount(void)
 {
 	// return the current timer overflow count
 	// (this is since the last timer2ClearOverflowCount() command was called)
 	return Timer2Reg0;
 }
+*/
 #endif
 
 void timer1PWMInit(u08 bitRes)
