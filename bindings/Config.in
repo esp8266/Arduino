@@ -69,7 +69,6 @@ config CONFIG_PERL_BINDINGS
         Build Perl bindings.
 
         Current Issues (see README):
-        * Doesn't work under Win32 ActiveState Perl.
         * 64 bit versions don't work at present.
         * libperl.so needs to be in the shared library path.
 

@@ -161,16 +161,16 @@ config CONFIG_SSL_USE_PKCS12
     default y if CONFIG_SSL_FULL_MODE
     depends on !CONFIG_SSL_SERVER_ONLY && !CONFIG_SSL_SKELETON_MODE
     help
-        PKCS12 certificates combine private keys and certificates together in
+        PKCS#12 certificates combine private keys and certificates together in
         one file.
 
-        PKCS8 private keys are also suppported (as it is a subset of PKCS12).
+        PKCS#8 private keys are also suppported (as it is a subset of PKCS#12).
 
         The decryption of these certificates uses RC4-128 (and these
         certificates must be encrypted using this cipher). The actual
         algorithm is "PBE-SHA1-RC4-128".
 
-        Disable if PKCS12 is not used (which will be in most cases).
+        Disable if PKCS#12 is not used (which will be in most cases).
 
 config CONFIG_SSL_EXPIRY_TIME
     int "Session expiry time (in hours)"

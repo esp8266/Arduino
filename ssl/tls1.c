@@ -1,17 +1,17 @@
 /*
  *  Copyright(C) 2006
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
+ *  This library is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as published by
  *  the Free Software Foundation; either version 2.1 of the License, or
  *  (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
+ *  This library is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU Lesser General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
+ *  You should have received a copy of the GNU General Lesser License
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
@@ -1581,7 +1581,7 @@ SSL_SESS *ssl_session_update(int max_sessions,
             ssl->session_index = i;
             return ssl_sessions[i]; /* return the session object */
         }
-        else if (ssl_sessions[i]->conn_time < oldest_sess_time)
+        else if (ssl_sessions[i]->conn_time <= oldest_sess_time)
         {
             /* find the oldest session */
             oldest_sess_time = ssl_sessions[i]->conn_time;
