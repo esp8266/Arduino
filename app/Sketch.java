@@ -1736,6 +1736,8 @@ public class Sketch {
     // make sure the user didn't hide the sketch folder
     ensureExistence();
 
+    current.program = editor.getText();
+
     zipFileContents = new Hashtable();
 
     // nuke the old applet folder because it can cause trouble

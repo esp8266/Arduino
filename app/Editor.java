@@ -1269,7 +1269,7 @@ public class Editor extends JFrame
 
 
 
-  public void handleRun(boolean present) {
+  public void handleRun(final boolean present) {
     doClose();
     running = true;
     buttons.activate(EditorButtons.RUN);
@@ -1299,25 +1299,28 @@ public class Editor extends JFrame
       }
     }
 
-    try {
-      if (!sketch.handleRun(new Target(
-          System.getProperty("user.dir") + File.separator + "lib" +
-          File.separator + "targets", Preferences.get("build.target"))))
-        return;
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        try {
+          if (!sketch.handleRun(new Target(
+              System.getProperty("user.dir") + File.separator + "lib" +
+              File.separator + "targets", Preferences.get("build.target"))))
+            return;
+    
+          //runtime = new Runner(sketch, Editor.this);
+          //runtime.start(appletLocation);
+          watcher = new RunButtonWatcher();
+          message("Done compiling.");
+          if(watcher != null) watcher.stop();
+    
+        } catch (RunnerException e) {
+          message("Error compiling...");
+          error(e);
 
-      //runtime = new Runner(sketch, Editor.this);
-      //runtime.start(appletLocation);
-      watcher = new RunButtonWatcher();
-      message("Done compiling.");
-      if(watcher != null) watcher.stop();
-
-    } catch (RunnerException e) {
-      message("Error compiling...");
-      error(e);
-
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }});
     
     // this doesn't seem to help much or at all
     /*
@@ -1961,34 +1964,37 @@ public class Editor extends JFrame
     System.exit(0);
   }
 
-  protected void handleBurnBootloader(boolean parallel) {
+  protected void handleBurnBootloader(final boolean parallel) {
     if(debugging)
       doStop();
     console.clear();
     //String what = sketch.isLibrary() ? "Applet" : "Library";
     //message("Exporting " + what + "...");
-    message("Burning bootloader to I/O Board...");
-    try {
-      //boolean success = sketch.isLibrary() ?
-      //sketch.exportLibrary() : sketch.exportApplet();
-      Uploader uploader = new Uploader();
-      boolean success = parallel ? 
-        uploader.burnBootloaderParallel() :
-        uploader.burnBootloaderAVRISP();
-      
-      if (success) {
-        message("Done burning bootloader.");
-      } else {
-        // error message will already be visible
-      }
-    } catch (RunnerException e) {
-      message("Error while burning bootloader.");
-      //e.printStackTrace();
-      error(e);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    buttons.clear();
+    message("Burning bootloader to I/O Board (this may take a minute)...");
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        try {
+          //boolean success = sketch.isLibrary() ?
+          //sketch.exportLibrary() : sketch.exportApplet();
+          Uploader uploader = new Uploader();
+          boolean success = parallel ? 
+            uploader.burnBootloaderParallel() :
+            uploader.burnBootloaderAVRISP();
+          
+          if (success) {
+            message("Done burning bootloader.");
+          } else {
+            // error message will already be visible
+          }
+        } catch (RunnerException e) {
+          message("Error while burning bootloader.");
+          //e.printStackTrace();
+          error(e);
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+        buttons.clear();
+      }});
   }
 
   public void highlightLine(int lnum) {
