@@ -32,12 +32,12 @@
 // ATMEL ATMEGA8 / ARDUINO
 //
 //             +-\/-+
-//       PC6  1|    |28  PC5 (AI 0)
-// (D 0) PD0  2|    |27  PC4 (AI 1)
-// (D 1) PD1  3|    |26  PC3 (AI 2)
-// (D 2) PD2  4|    |25  PC2 (AI 3)
-// (D 3) PD3  5|    |24  PC1 (AI 4)
-// (D 4) PD4  6|    |23  PC0 (AI 5)
+//       PC6  1|    |28  PC5 (AI 5)
+// (D 0) PD0  2|    |27  PC4 (AI 4)
+// (D 1) PD1  3|    |26  PC3 (AI 3)
+// (D 2) PD2  4|    |25  PC2 (AI 2)
+// (D 3) PD3  5|    |24  PC1 (AI 1)
+// (D 4) PD4  6|    |23  PC0 (AI 0)
 //       VCC  7|    |22  GND
 //       GND  8|    |21  AREF
 //       PB6  9|    |20  AVCC
