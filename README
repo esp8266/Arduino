@@ -136,7 +136,9 @@ Win32 issues
   this.
 
 * The test harness appears to be broken under VC8.0. Debugging shows a problem
-  the _close() function which is weird.
+  the _close() function which is weird. CGI is also broken under VC8.0.
+
+* CGI works under Win32, but needs some more work to get it right.
 
 Solaris issues
 ==============
