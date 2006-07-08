@@ -50,7 +50,7 @@ release:
 	-$(MAKE) clean
 	-@rm config/.* config/config.h
 	-@rm config/*.msi config/*.back.aip
-	cd ../; tar cvfz $(RELEASE).tar.gz axTLS; cd -;
+	cd ../; tar cvfz $(RELEASE).tar.gz --wildcards-match-slash --exclude .svn axTLS; cd -;
 
 docs:
 	$(MAKE) -C docsrc doco
@@ -70,7 +70,8 @@ win32_demo:
         ./axTLS/axssl.vbnet.exe \
         ./axTLS/axtls.jar \
         ./axTLS/www/* \
-        ./axTLS/www/crypto_files/*; \
+        ./axTLS/www/crypto_files/* \
+        ./axTLS/www/test_dir/*; \
     unzip -d axTLS.release_test $(RELEASE).zip; cd -;
 
 # tidy up things
@@ -130,6 +131,4 @@ allyesconfig: config/scripts/config/conf
 win32releaseconf: config/scripts/config/conf
 	@./config/scripts/config/conf -D config/win32config $(CONFIG_CONFIG_IN) > /dev/null
 	$(MAKE)
-
-
 
