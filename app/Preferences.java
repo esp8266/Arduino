@@ -71,6 +71,7 @@ public class Preferences {
   static final String PROMPT_NO      = "No";
   static final String PROMPT_CANCEL  = "Cancel";
   static final String PROMPT_OK      = "OK";
+  static final String PROMPT_SEND    = "Send";
   static final String PROMPT_BROWSE  = "Browse";
 
   /**

@@ -1399,6 +1399,7 @@ public class Editor extends JFrame
       buttons.activate(EditorButtons.SERIAL);
       serialPort = new Serial(true);
       debugging = true;
+      status.serial("Serial message:");
     } else {
       doStop();
     }
@@ -1421,6 +1422,7 @@ public class Editor extends JFrame
   public void doStop() {
     //if (runtime != null) runtime.stop();
     if (debugging)  {
+      status.unserial();
       serialPort.dispose();
       debugging = false;
     }
