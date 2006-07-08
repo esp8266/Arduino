@@ -8,21 +8,25 @@
     <ROW Property="BannerBitmap" Value="default_banner.bmp" Type="1"/>
     <ROW Property="DialogBitmap" Value="default_dialog.bmp" Type="1"/>
     <ROW Property="Manufacturer" Value="axTLS" ValueLocId="*"/>
-    <ROW Property="ProductCode" Value="1033:{C78C84DF-8FBA-49BD-AC4B-BEEE0A3411C6} "/>
+    <ROW Property="ProductCode" Value="1033:{9355EAA9-8EA4-4B4B-9A1E-F5E8EDAC1BA8} "/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Awhttpd" ValueLocId="*"/>
-    <ROW Property="ProductVersion" Value="1.0.0"/>
+    <ROW Property="ProductVersion" Value="1.0.1"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{93E5623E-740C-449C-9770-EDABD392868D}"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiDirsComponent">
     <ROW Directory="APPDIR" Directory_Parent="TARGETDIR" DefaultDir="APPDIR" IsPseudoRoot="1"/>
+    <ROW Directory="New_Folder_1_DIR" Directory_Parent="www_DIR" DefaultDir="test_dir"/>
+    <ROW Directory="New_Folder_2_DIR" Directory_Parent="New_Folder_1_DIR" DefaultDir="anothe~1|another_dir"/>
+    <ROW Directory="New_Folder_DIR" Directory_Parent="APPDIR" DefaultDir="include"/>
     <ROW Directory="SHORTCUTDIR" Directory_Parent="TARGETDIR" DefaultDir="SHORTC~1|SHORTCUTDIR" IsPseudoRoot="1"/>
     <ROW Directory="TARGETDIR" DefaultDir="SourceDir"/>
     <ROW Directory="crypto_files_DIR" Directory_Parent="www_DIR" DefaultDir="crypto~1|crypto_files"/>
     <ROW Directory="www_DIR" Directory_Parent="APPDIR" DefaultDir="www"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
+    <ROW Component="New_Folder" ComponentId="{2AD064CD-A20E-40FD-9233-CF8732C8F54D}" Directory_="New_Folder_2_DIR" Attributes="0"/>
     <ROW Component="awhttpd.exe" ComponentId="{0AEFFA20-29FA-4304-8227-F9ED0E6B8A0A}" Directory_="APPDIR" Attributes="0" KeyPath="awhttpd.exe" FullKeyPath="APPDIR\awhttpd.exe"/>
     <ROW Component="axssl.csharp.exe" ComponentId="{B9373428-79F5-4D77-8924-48D23EF3870E}" Directory_="APPDIR" Attributes="0" KeyPath="axssl.csharp.exe" FullKeyPath="APPDIR\axssl.csharp.exe"/>
     <ROW Component="axssl.exe" ComponentId="{E1E96774-7BFC-45B9-BA33-FC0C631921FD}" Directory_="APPDIR" Attributes="0" KeyPath="axssl.exe" FullKeyPath="APPDIR\axssl.exe"/>
@@ -30,11 +34,13 @@
     <ROW Component="axtls.dll" ComponentId="{4C741E75-A18A-4FC9-972C-C1EF583713EB}" Directory_="APPDIR" Attributes="0" KeyPath="axtls.dll" FullKeyPath="APPDIR\axtls.dll"/>
     <ROW Component="axtls.jar" ComponentId="{796CB0A9-6214-4531-A330-9B37420B7799}" Directory_="APPDIR" Attributes="0" KeyPath="axtls.jar" FullKeyPath="APPDIR"/>
     <ROW Component="axtlsj.dll" ComponentId="{AB8043C7-8291-4898-B34A-561335956DC1}" Directory_="APPDIR" Attributes="0" KeyPath="axtlsj.dll" FullKeyPath="APPDIR\axtlsj.dll"/>
+    <ROW Component="bigint.h" ComponentId="{FC3E492B-D4F0-41FB-A977-76F6E9FE9FFE}" Directory_="New_Folder_DIR" Attributes="0" KeyPath="bigint.h" FullKeyPath="APPDIR\include"/>
     <ROW Component="crypto_2600des.gif" ComponentId="{7C3C3A24-4053-4A9D-B040-FA671C2FA638}" Directory_="crypto_files_DIR" Attributes="0" KeyPath="crypto_2600des.gif" FullKeyPath="APPDIR\www\crypto_files"/>
     <ROW Component="favicon.ico" ComponentId="{9A1AB507-100A-470D-A002-CD8262CA4913}" Directory_="www_DIR" Attributes="0" KeyPath="favicon.ico" FullKeyPath="APPDIR\www"/>
+    <ROW Component="test_cgi.php" ComponentId="{9025188F-8BED-4459-86EF-74C28A3B9301}" Directory_="New_Folder_1_DIR" Attributes="0" KeyPath="test_cgi.php" FullKeyPath="APPDIR\www\test_dir"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
-    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0" Components="awhttpd.exe axssl.csharp.exe axssl.exe axssl.vbnet.exe axtls.dll axtls.jar axtlsj.dll crypto_2600des.gif favicon.ico"/>
+    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0" Components="awhttpd.exe axssl.csharp.exe axssl.exe axssl.vbnet.exe axtls.dll axtls.jar axtlsj.dll crypto_2600des.gif favicon.ico bigint.h test_cgi.php New_Folder"/>
     <ATTRIBUTE name="CurrentFeature" value="MainFeature"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
@@ -47,9 +53,9 @@
     <ROW File="axtls.lib" Component_="axtls.jar" FileName="axtls.lib" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\axtls.lib" SelfReg="false" Sequence="7"/>
     <ROW File="axtls.static.lib" Component_="axtls.jar" FileName="axtlss~1.lib|axtls.static.lib" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\axtls.static.lib" SelfReg="false" Sequence="8"/>
     <ROW File="axtlsj.dll" Component_="axtlsj.dll" FileName="axtlsj.dll" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\axtlsj.dll" SelfReg="false" Sequence="9"/>
-    <ROW File="bigint.h" Component_="axtls.jar" FileName="bigint.h" Attributes="0" SourcePath="..\ssl\bigint.h" SelfReg="false" Sequence="25"/>
-    <ROW File="bigint_impl.h" Component_="axtls.jar" FileName="bigint~1.h|bigint_impl.h" Attributes="0" SourcePath="..\ssl\bigint_impl.h" SelfReg="false" Sequence="22"/>
-    <ROW File="crypto.h" Component_="axtls.jar" FileName="crypto.h" Attributes="0" SourcePath="..\ssl\crypto.h" SelfReg="false" Sequence="23"/>
+    <ROW File="bigint.h" Component_="bigint.h" FileName="bigint.h" Attributes="0" SourcePath="..\ssl\bigint.h" SelfReg="false" Sequence="25"/>
+    <ROW File="bigint_impl.h" Component_="bigint.h" FileName="bigint~1.h|bigint_impl.h" Attributes="0" SourcePath="..\ssl\bigint_impl.h" SelfReg="false" Sequence="22"/>
+    <ROW File="crypto.h" Component_="bigint.h" FileName="crypto.h" Attributes="0" SourcePath="..\ssl\crypto.h" SelfReg="false" Sequence="23"/>
     <ROW File="crypto_2600des.gif" Component_="crypto_2600des.gif" FileName="crypto~1.gif|crypto_2600des.gif" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\www\crypto_files\crypto_2600des.gif" SelfReg="false" Sequence="10"/>
     <ROW File="crypto_3ways.gif" Component_="crypto_2600des.gif" FileName="crypto~2.gif|crypto_3ways.gif" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\www\crypto_files\crypto_3ways.gif" SelfReg="false" Sequence="11"/>
     <ROW File="crypto_backrsa.jpg" Component_="crypto_2600des.gif" FileName="crypto~1.jpg|crypto_backrsa.jpg" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\www\crypto_files\crypto_backrsa.jpg" SelfReg="false" Sequence="12"/>
@@ -59,10 +65,14 @@
     <ROW File="crypto_sslv3.gif" Component_="crypto_2600des.gif" FileName="crypto~6.gif|crypto_sslv3.gif" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\www\crypto_files\crypto_sslv3.gif" SelfReg="false" Sequence="16"/>
     <ROW File="crypto_types.gif" Component_="crypto_2600des.gif" FileName="crypto~7.gif|crypto_types.gif" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\www\crypto_files\crypto_types.gif" SelfReg="false" Sequence="17"/>
     <ROW File="favicon.ico" Component_="favicon.ico" FileName="favicon.ico" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\www\favicon.ico" SelfReg="false" Sequence="19"/>
+    <ROW File="health.sh" Component_="test_cgi.php" FileName="health.sh" Attributes="0" SourcePath="..\www\test_dir\health.sh" SelfReg="false" Sequence="28"/>
     <ROW File="index.html" Component_="favicon.ico" FileName="index~1.htm|index.html" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\www\index.html" SelfReg="false" Sequence="20"/>
     <ROW File="kerberos.gif" Component_="crypto_2600des.gif" FileName="kerberos.gif" Attributes="0" SourcePath="..\..\axTLS.release_test\axTLS\www\crypto_files\kerberos.gif" SelfReg="false" Sequence="18"/>
-    <ROW File="ssl.h" Component_="axtls.jar" FileName="ssl.h" Attributes="0" SourcePath="..\ssl\ssl.h" SelfReg="false" Sequence="21"/>
-    <ROW File="tls1.h" Component_="axtls.jar" FileName="tls1.h" Attributes="0" SourcePath="..\ssl\tls1.h" SelfReg="false" Sequence="24"/>
+    <ROW File="os_port.h" Component_="bigint.h" FileName="os_port.h" Attributes="0" SourcePath="..\ssl\os_port.h" SelfReg="false" Sequence="26"/>
+    <ROW File="some_text.txt" Component_="test_cgi.php" FileName="some_t~1.txt|some_text.txt" Attributes="0" SourcePath="..\www\test_dir\some_text.txt" SelfReg="false" Sequence="29"/>
+    <ROW File="ssl.h" Component_="bigint.h" FileName="ssl.h" Attributes="0" SourcePath="..\ssl\ssl.h" SelfReg="false" Sequence="21"/>
+    <ROW File="test_cgi.php" Component_="test_cgi.php" FileName="test_cgi.php" Attributes="0" SourcePath="..\www\test_dir\test_cgi.php" SelfReg="false" Sequence="27"/>
+    <ROW File="tls1.h" Component_="bigint.h" FileName="tls1.h" Attributes="0" SourcePath="..\ssl\tls1.h" SelfReg="false" Sequence="24"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
     <ROW Path="&lt;ui.ail&gt;"/>
@@ -90,6 +100,9 @@
     <ROW Dialog_="MaintenanceWelcomeDlg" Control_="Next" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT" Ordering="2"/>
     <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="PatchWelcomeDlg" Condition="AI_PATCH" Ordering="1"/>
     <ROW Dialog_="PatchWelcomeDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_PATCH" Ordering="2"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCreateFolderComponent">
+    <ROW Directory_="New_Folder_2_DIR" Component_="New_Folder"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCustActComponent">
     <ROW Action="AI_DOWNGRADE" Type="19" Target="4010"/>
