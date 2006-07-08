@@ -1306,6 +1306,7 @@ public class Sketch {
     //mainClassName = build(TEMP_BUILD_PATH, suggestedClassName);
     mainClassName =
       build(target, tempBuildFolder.getAbsolutePath(), suggestedClassName);
+    size(tempBuildFolder.getAbsolutePath(), name);
     // externalPaths is magically set by build()
 
     if (!externalRuntime) {  // only if not running externally already
