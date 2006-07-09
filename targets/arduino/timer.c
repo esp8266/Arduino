@@ -14,6 +14,8 @@
 //		which can be found at http://www.gnu.org/licenses/gpl.txt
 //
 //*****************************************************************************
+//
+// Modified by David A. Mellis, 9 July 2006.
 
 #ifndef WIN32
 	#include <avr/io.h>
@@ -94,7 +96,7 @@ void timerInit(void)
 	// enable interrupts
 	sei();
 }
-*/
+
 void timer0Init()
 {
 	// initialize timer 0
@@ -104,7 +106,7 @@ void timer0Init()
 
 	timer0ClearOverflowCount();				// initialize time registers
 }
-
+*/
 void timer1Init(void)
 {
 	// initialize timer 1
@@ -125,13 +127,13 @@ void timer2Init(void)
 	timer2ClearOverflowCount();				// initialize time registers
 }
 #endif
-
+/*
 void timer0SetPrescaler(u08 prescale)
 {
 	// set prescaler on timer 0
 	outb(TCCR0, (inb(TCCR0) & ~TIMER_PRESCALE_MASK) | prescale);
 }
-
+*/
 void timer1SetPrescaler(u08 prescale)
 {
 	// set prescaler on timer 1
@@ -145,13 +147,13 @@ void timer2SetPrescaler(u08 prescale)
 	outb(TCCR2, (inb(TCCR2) & ~TIMER_PRESCALE_MASK) | prescale);
 }
 #endif
-
+/*
 u16 timer0GetPrescaler(void)
 {
 	// get the current prescaler setting
 	return (pgm_read_word(TimerPrescaleFactor+(inb(TCCR0) & TIMER_PRESCALE_MASK)));
 }
-/*
+
 u16 timer1GetPrescaler(void)
 {
 	// get the current prescaler setting
@@ -207,7 +209,7 @@ u16 timerTicsToMs(u32 tics)
 	return (tics*1000*(prescaleDiv*256))/F_CPU;
 }
 */
-
+/*
 void timerPause(unsigned short pause_ms)
 {
 	// pauses for exactly <pause_ms> number of milliseconds
@@ -245,16 +247,14 @@ void timerPause(unsigned short pause_ms)
 		//}
 	}
 
-	/* old inaccurate code, for reference
+	// old inaccurate code, for reference
 	
 	// calculate delay for [pause_ms] milliseconds
-	u16 prescaleDiv = 1<<(pgm_read_byte(TimerPrescaleFactor+inb(TCCR0)));
-	u32 pause = (pause_ms*(F_CPU/(prescaleDiv*256)))/1000;
+	//u16 prescaleDiv = 1<<(pgm_read_byte(TimerPrescaleFactor+inb(TCCR0)));
+	//u32 pause = (pause_ms*(F_CPU/(prescaleDiv*256)))/1000;
 	
-	TimerPauseReg = 0;
-	while(TimerPauseReg < pause);
-
-	*/
+	//TimerPauseReg = 0;
+	//while(TimerPauseReg < pause);
 }
 
 void timer0ClearOverflowCount(void)
@@ -269,7 +269,7 @@ long timer0GetOverflowCount(void)
 	// (this is since the last timer0ClearOverflowCount() command was called)
 	return Timer0Reg0;
 }
-
+*/
 #ifdef TCNT2	// support timer2 only if it exists
 void timer2ClearOverflowCount(void)
 {
@@ -403,7 +403,7 @@ void timer1PWMBSet(u16 pwmDuty)
 	//outp( (pwmDuty&0x00FF), OCR1BL);	// set the low 8bits of OCR1B
 	OCR1B = pwmDuty;
 }
-
+/*
 //! Interrupt handler for tcnt0 overflow interrupt
 TIMER_INTERRUPT_HANDLER(SIG_OVERFLOW0)
 {
@@ -416,7 +416,7 @@ TIMER_INTERRUPT_HANDLER(SIG_OVERFLOW0)
 	if(TimerIntFunc[TIMER0OVERFLOW_INT])
 		TimerIntFunc[TIMER0OVERFLOW_INT]();
 }
-
+*/
 //! Interrupt handler for tcnt1 overflow interrupt
 TIMER_INTERRUPT_HANDLER(SIG_OVERFLOW1)
 {
@@ -438,6 +438,7 @@ TIMER_INTERRUPT_HANDLER(SIG_OVERFLOW2)
 #endif
 
 #ifdef OCR0
+/*
 // include support for Output Compare 0 for new AVR processors that support it
 //! Interrupt handler for OutputCompare0 match (OC0) interrupt
 TIMER_INTERRUPT_HANDLER(SIG_OUTPUT_COMPARE0)
@@ -446,6 +447,7 @@ TIMER_INTERRUPT_HANDLER(SIG_OUTPUT_COMPARE0)
 	if(TimerIntFunc[TIMER0OUTCOMPARE_INT])
 		TimerIntFunc[TIMER0OUTCOMPARE_INT]();
 }
+*/
 #endif
 
 //! Interrupt handler for CutputCompare1A match (OC1A) interrupt

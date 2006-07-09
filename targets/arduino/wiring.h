@@ -1,8 +1,8 @@
 /*
-  wiring.h - Wiring API Partial Implementation
-  Part of Arduino / Wiring Lite
+  wiring.h - Partial implementation of the Wiring API for the ATmega8.
+  Part of Arduino - http://www.arduino.cc/
 
-  Copyright (c) 2005 David A. Mellis
+  Copyright (c) 2005-2006 David A. Mellis
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -55,9 +55,6 @@ extern "C"{
 #define degrees(rad) ((rad)*RAD_TO_DEG)
 #define sq(x) ((x)*(x))
 
-#define NOT_A_PIN 0
-#define NOT_A_PORT -1
-
 typedef uint8_t boolean;
 typedef uint8_t byte;
 
@@ -82,7 +79,6 @@ void printBinary(unsigned long n);
 
 unsigned long millis(void);
 void delay(unsigned long);
-void delay_ms(unsigned short ms);
 void delayMicroseconds(unsigned int us);
 unsigned long pulseIn(int pin, int state);
 
@@ -90,6 +86,9 @@ void setup(void);
 void loop(void);
 
 // XXX: internal definitions, should be moved to another header file
+#define NOT_A_PIN 0
+#define NOT_A_PORT -1
+
 typedef struct {
 	int port;
 	int bit;

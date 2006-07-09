@@ -75,7 +75,9 @@ uint8_t Sprite::height() const
 void Sprite::write(uint8_t x, uint8_t y, uint8_t value)
 {
   if (!_buffer) return;
-  if (x < 0 || x >= _width || y < 0 || y >= _height) return;
+  
+  // uint8_t's can't be negative, so don't test for negative x and y.
+  if (x >= _width || y >= _height) return;
   
   // we need to bitwise-or the value of the other pixels in the byte with
   // the new value, masked and shifted into the proper bits.
@@ -85,7 +87,9 @@ void Sprite::write(uint8_t x, uint8_t y, uint8_t value)
 uint8_t Sprite::read(uint8_t x, uint8_t y) const
 {
   if (!_buffer) return 0;
-  if (x < 0 || x >= _width || y < 0 || y >= _height) return 0;
+  
+  // uint8_t's can't be negative, so don't test for negative x and y.
+  if (x >= _width || y >= _height) return 0;
   
   return (_buffer[y] >> x) & 0x01;
 }

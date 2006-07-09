@@ -32,14 +32,19 @@ Arduino board and point the Windows Add Hardware wizard to the FTDI USB Drivers
 directory.
 
 On the Mac, mount the FTDIUSBSerialDriver_v2_0_1.dmg disk image and run the
-included FTDIUSBSerialDriver.pkg.
-
-Also, on the Mac, run the macosx_setup.command (after moving the Arduino
-distribution to your /Applications folder). It corrects permission on a few
-files for use with the serial port and will prompt you for your password. You
-may need to reboot after running this script.
+included FTDIUSBSerialDriver.pkg.  Also run the macosx_setup.command (after
+moving the Arduino distribution to your /Applications folder). It corrects
+permission on a few files for use with the serial port and will prompt you
+for your password. You may need to reboot after running this script.
 
 UPDATES
+
+0005
+
+Fixed bug that sometimes caused uploading of old versions of a sketch.
+Serial monitor nows include an interface to send messages to the Arduino
+board.  Pressing return appends a newline, pushing the send button doesn't.
+Now displaying "burning bootloader..." and "compiling..." status messages.
 
 0004 - 2006.04.26
 

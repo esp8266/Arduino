@@ -1,6 +1,6 @@
 /*
-  wiring.c - Wiring API Partial Implementation
-  Part of Arduino - http://arduino.berlios.de/
+  wiring.c - Partial implementation of the Wiring API for the ATmega8.
+  Part of Arduino - http://www.arduino.cc/
 
   Copyright (c) 2005-2006 David A. Mellis
 
@@ -47,6 +47,10 @@
 #undef delay
 
 #include "wiring.h"
+
+// The number of times timer 0 has overflowed since the program started.
+// Must be volatile or gcc will optimize away some uses of it.
+volatile unsigned long timer0_overflow_count;
 
 // Get the hardware port of the given virtual pin number.  This comes from
 // the pins_*.c file for the active board configuration.
@@ -315,19 +319,30 @@ void print(const char *format, ...)
 }
 */
 
+TIMER_INTERRUPT_HANDLER(SIG_OVERFLOW0)
+{
+	timer0_overflow_count++;
+}
+
 unsigned long millis()
 {
-	// timer 0 increments every timer0GetPrescaler() cycles, and
-	// overflows when it reaches 256.  we calculate the total
-	// number of clock cycles, then divide by the number of clock
-	// cycles per millisecond.
-	return (unsigned long) timer0GetOverflowCount() *
-		timer0GetPrescaler() * 2UL / (F_CPU / 128000UL);
+	// timer 0 increments every 8 cycles, and overflows when it reaches 256.
+	// we calculate the total number of clock cycles, then divide by the
+	// number of clock cycles per millisecond.
+	//return timer0_overflow_count * 8UL * 256UL / (F_CPU / 1000UL);
+	
+	// calculating the total number of clock cycles overflows an
+	// unsigned long, so instead find 1/128th the number of clock cycles
+	// and divide by 1/128th the number of clock cycles per millisecond.
+	return timer0_overflow_count * 8UL * 2UL / (F_CPU / 128000UL);
 }
 
 void delay(unsigned long ms)
 {
-	timerPause(ms);
+	unsigned long start = millis();
+	
+	while (millis() - start < ms)
+		;
 }
 
 /* Delay for the given number of microseconds.  Assumes a 16 MHz clock. 
@@ -389,7 +404,7 @@ unsigned long pulseIn(int pin, int state)
 {
 	// cache the port and bit of the pin in order to speed up the
 	// pulse width measuring loop and achieve finer resolution.  calling
-	// digitalWrite() instead yields much coarser resolution.
+	// digitalRead() instead yields much coarser resolution.
 	int r = port_to_input[digitalPinToPort(pin)];
 	int bit = digitalPinToBit(pin);
 	int mask = 1 << bit;
@@ -423,7 +438,12 @@ int main(void)
 	sei();
 	
 	// timer 0 is used for millis() and delay()
-	timer0Init();
+	//timer0Init();
+	timer0_overflow_count = 0;
+	// set timer 0 prescale factor to 8
+	sbi(TCCR0, CS01);
+	// enable timer 0 overflow interrupt
+	sbi(TIMSK, TOIE0);
 
 	// timers 1 & 2 are used for the hardware pwm
 	timer1Init();

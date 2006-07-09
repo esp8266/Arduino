@@ -129,7 +129,9 @@ void Matrix::setRegister(uint8_t reg, uint8_t data)
 void Matrix::syncRow(uint8_t row)
 {
   if (!_buffer) return;
-  if (row < 0 || row >= 8) return;
+  
+  // uint8_t's can't be negative, so don't test for negative row
+  if (row >= 8) return;
   digitalWrite(_pinLoad, HIGH); // begin
   for(uint8_t i = 0; i < _screens; ++i){
     putByte(8 - row);                // specify register
@@ -162,7 +164,9 @@ void Matrix::setBrightness(uint8_t value)
 void Matrix::buffer(uint8_t x, uint8_t y, uint8_t value)
 {
   if (!_buffer) return;
-  if (x < 0 || x >= _maximumX || y < 0 || y >= 8) return;
+  
+  // uint8_t's can't be negative, so don't test for negative x and y.
+  if (x >= _maximumX || y >= 8) return;
 
   uint8_t offset = x; // record x
   x %= 8;             // make x relative to a single matrix

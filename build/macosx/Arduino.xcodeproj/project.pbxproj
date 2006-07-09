@@ -13,19 +13,6 @@
 			buildPhases = (
 				33ACA202097AF31C00BEC3A2 /* ShellScript */,
 			);
-			buildSettings = {
-				OPTIMIZATION_CFLAGS = "";
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = Distribute;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-			};
 			dependencies = (
 				33ACA1F8097AF14400BEC3A2 /* PBXTargetDependency */,
 			);
@@ -43,19 +30,6 @@
 				33FF071D0965C1C20016AC38 /* CopyFiles */,
 				33FF07170965BFFE0016AC38 /* ShellScript */,
 			);
-			buildSettings = {
-				OPTIMIZATION_CFLAGS = "";
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = Arduino;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-			};
 			dependencies = (
 			);
 			name = Setup;
@@ -74,24 +48,6 @@
 				33AF61670965C4C600B514A9 /* Frameworks */,
 				33CF03C809662DA200F2C9A9 /* CopyFiles */,
 			);
-			buildSettings = {
-				JAVA_COMPILER = /usr/bin/javac;
-				JAVA_COMPILER_FLAGS = "";
-				JAVA_ONLY = YES;
-				JAVA_SOURCE_SUBDIR = .;
-				OPTIMIZATION_CFLAGS = "";
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = App;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-				WRAPPER_EXTENSION = app;
-			};
 			dependencies = (
 				33AF61710965C51E00B514A9 /* PBXTargetDependency */,
 			);
@@ -254,23 +210,6 @@
 		33FF07D30965C2B10016AC38 /* avrlib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF07370965C2B10016AC38 /* avrlib */; };
 		33FF07FD0965C3560016AC38 /* targets in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF07D50965C3560016AC38 /* targets */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXBuildStyle section */
-		33AF609C0965C4B700B514A9 /* Development */ = {
-			isa = PBXBuildStyle;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-			};
-			name = Development;
-		};
-		33AF609D0965C4B700B514A9 /* Deployment */ = {
-			isa = PBXBuildStyle;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-			};
-			name = Deployment;
-		};
-/* End PBXBuildStyle section */
 
 /* Begin PBXContainerItemProxy section */
 		33ACA1F7097AF14400BEC3A2 /* PBXContainerItemProxy */ = {
@@ -993,12 +932,6 @@
 		33FFFD3F0965B1E40016AC38 /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 33FFFD400965B1E40016AC38 /* Build configuration list for PBXProject "Arduino" */;
-			buildSettings = {
-			};
-			buildStyles = (
-				33AF609C0965C4B700B514A9 /* Development */,
-				33AF609D0965C4B700B514A9 /* Deployment */,
-			);
 			hasScannedForEncodings = 0;
 			mainGroup = 33FFFD3D0965B1E40016AC38;
 			productRefGroup = 33FFFD3D0965B1E40016AC38;
@@ -1228,6 +1161,7 @@
 				33ACA1FD097AF16500BEC3A2 /* work */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = work;
 		};
 		33AF616B0965C4CB00B514A9 /* Build configuration list for PBXApplicationTarget "App" */ = {
 			isa = XCConfigurationList;
@@ -1235,6 +1169,7 @@
 				33AF616C0965C4CB00B514A9 /* work */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = work;
 		};
 		33FFFD400965B1E40016AC38 /* Build configuration list for PBXProject "Arduino" */ = {
 			isa = XCConfigurationList;
@@ -1242,6 +1177,7 @@
 				33FFFD410965B1E40016AC38 /* work */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = work;
 		};
 		33FFFE1F0965BC300016AC38 /* Build configuration list for PBXAggregateTarget "Setup" */ = {
 			isa = XCConfigurationList;
@@ -1249,6 +1185,7 @@
 				33FFFE200965BC300016AC38 /* work */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = work;
 		};
 /* End XCConfigurationList section */
 	};
