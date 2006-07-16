@@ -33,7 +33,7 @@ Select your platform type, save the configuration, exit, and then
 type "make" again.
 
 If all goes well, you should end up with an executable called "awhttpd" (or
-awhttpd.exe) in this directory.
+awhttpd.exe) in the _stage directory.
 
 To play with all the various axTLS options, type:
 
@@ -45,7 +45,7 @@ Save the new configuration and rebuild.
 # Running it
 ########################################################################
 
-To run it, type (as superuser):
+To run it, go to the _stage directory, and type (as superuser):
 
 > awhttpd
 
@@ -64,8 +64,6 @@ to see the same page unencrypted.
 See the README in the httpd directory from more configuration information on
 Anti-Web.
 
-Note: libaxtls.so may have to in your shared library path.
-
 ########################################################################
 # The axssl utilities
 ########################################################################
@@ -82,12 +80,12 @@ axssl.pl        - Perl sample
 All the tools have identical command-line parameters. e.g. to run something
 interesting:
 
-> axssl s_server -verify -CAfile ssl/test/axTLS.ca_x509
+> axssl s_server -verify -CAfile ../ssl/test/axTLS.ca_x509
 
 and
 
-> axssl s_client -cert ssl/test/axTLS.x509_1024 -key \
-  ssl/test/axTLS.key_1024 -reconnect
+> axssl s_client -cert ../ssl/test/axTLS.x509_1024 -key \
+  ../ssl/test/axTLS.key_1024 -reconnect
 
 C#
 ==
@@ -152,7 +150,7 @@ Solaris issues
 
 Cygwin issues
 =============
-* The bindings all compile but don't run under cygwin with the exception of
-  Perl. This is due to win32 executables being incompatible with cygwin 
+* The bindings all compile but don't run under Cygwin with the exception of
+  Perl. This is due to win32 executables being incompatible with Cygwin 
   libraries.
 

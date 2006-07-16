@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
     plaintext = /* 64 byte number */
         "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ*^";
 
-    len = get_file("ssl/test/axTLS.key_512", &buf);
+    len = get_file("../ssl/test/axTLS.key_512", &buf);
     asn1_get_private_key(buf, len, &rsa_ctx);
     ctx = rsa_ctx->bi_ctx;
     bi_data = bi_import(ctx, (uint8_t *)plaintext, strlen(plaintext));
@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
         "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ*^"
         "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ*^";
 
-    len = get_file("ssl/test/axTLS.key_1024", &buf);
+    len = get_file("../ssl/test/axTLS.key_1024", &buf);
     asn1_get_private_key(buf, len, &rsa_ctx);
     ctx = rsa_ctx->bi_ctx;
     bi_data = bi_import(ctx, (uint8_t *)plaintext, strlen(plaintext));
@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
         "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ*^"
         "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ*^";
 
-    len = get_file("ssl/test/axTLS.key_2048", &buf);
+    len = get_file("../ssl/test/axTLS.key_2048", &buf);
     asn1_get_private_key(buf, len, &rsa_ctx);
     ctx = rsa_ctx->bi_ctx;
     bi_data = bi_import(ctx, (uint8_t *)plaintext, strlen(plaintext));
@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
         "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ*^"
         "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ*^";
 
-    len = get_file("ssl/test/axTLS.key_4096", &buf);
+    len = get_file("../ssl/test/axTLS.key_4096", &buf);
     asn1_get_private_key(buf, len, &rsa_ctx);
     ctx = rsa_ctx->bi_ctx;
     bi_data = bi_import(ctx, (uint8_t *)plaintext, strlen(plaintext));

@@ -21,7 +21,7 @@ include ../../config/makefile.conf
 include ../../config/makefile.dotnet.conf
 
 all : sample
-TARGET=../../axssl.csharp.exe
+TARGET=../../$(STAGE)/axssl.csharp.exe
 sample : $(TARGET)
 
 $(TARGET): ../../bindings/csharp/axTLS.cs ../../bindings/csharp/axInterface.cs axssl.cs 

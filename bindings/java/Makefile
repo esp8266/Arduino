@@ -22,12 +22,12 @@ include ../../config/makefile.java.conf
 
 all: lib jar
 
-JAR=../../axtls.jar
+JAR=../../$(STAGE)/axtls.jar
 
 ifdef CONFIG_PLATFORM_WIN32
-TARGET=../../axtlsj.dll
+TARGET=../../$(STAGE)/axtlsj.dll
 else
-TARGET=../../libaxtlsj.so
+TARGET=../../$(STAGE)/libaxtlsj.so
 endif
 
 lib: $(TARGET)
@@ -54,7 +54,7 @@ JAVA_CLASSES:=$(JAVA_FILES:%.java=classes/axTLSj/%.class)
 ifdef CONFIG_PLATFORM_WIN32
 CFLAGS += /I"$(shell cygpath -w $(SSL_HOME))"
 CFLAGS += /I"$(shell cygpath -w $(CONFIG_HOME))"
-LDFLAGS += axtls.lib /libpath:"../../"
+LDFLAGS += axtls.lib /libpath:"../../$(STAGE)"
 
 include ../../config/makefile.post
 
@@ -71,7 +71,7 @@ CFLAGS += -I$(SSL_HOME)
 CFLAGS += -I$(CONFIG_HOME)
 
 $(TARGET) : $(OBJ)
-	$(LD) $(LDFLAGS) -L ../../ $(LDSHARED) -o $@ $(OBJ) -laxtls 
+	$(LD) $(LDFLAGS) -L ../../$(STAGE) $(LDSHARED) -o $@ $(OBJ) -laxtls 
 endif
 
 jar: $(OBJ) $(JAR)
@@ -79,7 +79,7 @@ jar: $(OBJ) $(JAR)
 # if we are doing the samples then defer creating the jar until then
 $(JAR): $(JAVA_CLASSES)
 ifndef CONFIG_JAVA_SAMPLES
-	jar cvf $@ -C classes .
+	jar cvf $@ -C classes axTLSj
 else
 	@if [ ! -f $(JAR) ]; then touch $(JAR); fi
 endif

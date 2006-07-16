@@ -36,11 +36,12 @@ config CONFIG_STANDARD_AWHTTPD
         
 config CONFIG_HTTP_WEBROOT
     string "Web root location"
-    default "www"
+    default "../www" if !CONFIG_PLATFORM_WIN32
+    default "..\\www" if CONFIG_PLATFORM_WIN32
     depends on !CONFIG_STANDARD_AWHTTPD
     help
-        The location of the web root. This is the directory where 
-        index.html lives.
+        The location of the web root in relation to awhttpd. This is 
+        the directory where index.html lives.
 
 config CONFIG_HTTP_PORT
     int "HTTP port"

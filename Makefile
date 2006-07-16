@@ -24,7 +24,7 @@ else
 all: target
 endif
 
-target : $(TARGET)
+target : $(STAGE) $(TARGET)
 
 include config/makefile.conf
 
@@ -45,11 +45,18 @@ ifdef CONFIG_SAMPLES
 	$(MAKE) -C samples
 endif
 
+$(STAGE) :
+	@mkdir -p $(STAGE)
+
+$(PREFIX) :
+	@mkdir -p $(PREFIX)/lib
+	@mkdir -p $(PREFIX)/bin
+
 release:
 	$(MAKE) -C config/scripts/config clean
 	-$(MAKE) clean
-	-@rm config/.* config/config.h
-	-@rm config/*.msi config/*.back.aip
+	-@rm config/*.msi config/*.back.aip config/config.h config/.config*
+	@rm -fr $(STAGE)
 	cd ../; tar cvfz $(RELEASE).tar.gz --wildcards-match-slash --exclude .svn axTLS; cd -;
 
 docs:
@@ -59,20 +66,21 @@ docs:
 win32_demo:
 	-@rm -fr ../axTLS.release_test > /dev/null 2>&1
 	$(MAKE) win32releaseconf
-	cd ../; zip $(RELEASE).zip \
-        ./axTLS/awhttpd.exe \
-        ./axTLS/axssl.exe \
-        ./axTLS/axtls.dll \
-        ./axTLS/axtls.lib \
-        ./axTLS/axtls.static.lib \
-        ./axTLS/axtlsj.dll \
-        ./axTLS/axssl.csharp.exe \
-        ./axTLS/axssl.vbnet.exe \
-        ./axTLS/axtls.jar \
-        ./axTLS/www/* \
-        ./axTLS/www/crypto_files/* \
-        ./axTLS/www/test_dir/*; \
-    unzip -d axTLS.release_test $(RELEASE).zip; cd -;
+
+install: $(PREFIX) all
+	install -m 755 $(STAGE)/libax* $(PREFIX)/lib
+	-install -m 755 $(STAGE)/ax* $(PREFIX)/bin
+	-install -m 755 $(STAGE)/axtlsp.pm `perl -e 'use Config; print $$Config{installarchlib};'`
+	-install -m 755 $(STAGE)/awhttpd* $(PREFIX)/bin
+
+installclean:
+	-@rm $(PREFIX)/lib/libax*
+	-@rm $(PREFIX)/bin/ax*
+	-@rm $(PREFIX)/bin/awhttpd*
+	-@rm `perl -e 'use Config; print $$Config{installarchlib};'`/axtlsp.pm
+
+test:
+	cd $(STAGE); ssltest; ../ssl/test/test_axssl.sh; cd -;
 
 # tidy up things
 clean::
@@ -132,3 +140,7 @@ win32releaseconf: config/scripts/config/conf
 	@./config/scripts/config/conf -D config/win32config $(CONFIG_CONFIG_IN) > /dev/null
 	$(MAKE)
 
+# The special debian release configuration
+debianconf: config/scripts/config/conf
+	@./config/scripts/config/conf -D config/debianconfig $(CONFIG_CONFIG_IN) > /dev/null
+	$(MAKE)

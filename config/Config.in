@@ -29,6 +29,12 @@ endchoice
 
 menu "General Configuration"
 
+config PREFIX
+    string "axTLS installation prefix"
+    default "/usr/local"
+    help
+      Define your directory to install axTLS files/subdirs in.
+
 config CONFIG_DEBUG
     bool "Build axTLS with Debugging symbols"
     default n
@@ -47,7 +53,7 @@ depends on CONFIG_PLATFORM_WIN32
 choice 
     prompt "Compiler"
     depends on CONFIG_PLATFORM_WIN32
-    default CONFIG_VISUAL_STUDIO_8_0
+    default CONFIG_VISUAL_STUDIO_7_0
 
 config CONFIG_VISUAL_STUDIO_6_0
     bool "Visual Studio 6.0 (VC98)"

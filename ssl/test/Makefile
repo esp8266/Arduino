@@ -30,19 +30,19 @@ all: ssltesting
 endif
 
 ifndef CONFIG_PLATFORM_WIN32
-performance: ../../perf_bigint
-ssltesting: ../../ssltest
-LIBS=../../libaxtls.a
+performance: ../../$(STAGE)/perf_bigint
+ssltesting: ../../$(STAGE)/ssltest
+LIBS=../../$(STAGE)
 CFLAGS += -I../../ssl -I../../config
 
-../../perf_bigint: perf_bigint.o $(LIBS)
-	$(CC) $(LDFLAGS) -o $@ $^
+../../$(STAGE)/perf_bigint: perf_bigint.o
+	$(CC) $(LDFLAGS) -o $@ $^ -L $(LIBS) -laxtls
 
-../../ssltest: ssltest.o $(LIBS)
-	$(CC) $(LDFLAGS) -o $@ -lpthread $^
+../../$(STAGE)/ssltest: ssltest.o
+	$(CC) $(LDFLAGS) -o $@ $^ -lpthread -L $(LIBS) -laxtls
 else
-performance: ../../perf_bigint.exe
-ssltesting: ../../ssltest.exe
+performance: ../../$(STAGE)/perf_bigint.exe
+ssltesting: ../../$(STAGE)/ssltest.exe
 CFLAGS += /I".." /I"../../config"
 
 %.obj : %.c
@@ -52,14 +52,14 @@ OBJLIST=..\aes.obj ..\asn1.obj ..\bigint.obj ..\crypto_misc.obj ..\hmac.obj \
         ..\md5.obj ..\loader.obj ..\p12.obj ..\os_port.obj ..\rc4.obj \
         ..\rsa.obj ..\sha1.obj ..\tls1.obj ..\tls1_clnt.obj ..\tls1_svr.obj
 
-../../perf_bigint.exe: perf_bigint.obj $(OBJLIST)
+../../$(STAGE)/perf_bigint.exe: perf_bigint.obj $(OBJLIST)
 	$(LD) $(LDFLAGS) /out:$@ $^
 
-../../ssltest.exe: ssltest.obj $(OBJLIST)
+../../$(STAGE)/ssltest.exe: ssltest.obj $(OBJLIST)
 	$(LD) $(LDFLAGS) /out:$@ $^
 endif
 
 clean::
-	-@rm -f ../../perf_bigint* ../../ssltest*
+	-@rm -f ../../$(STAGE)/perf_bigint* ../../$(STAGE)/ssltest*
 
 include ../../config/makefile.post

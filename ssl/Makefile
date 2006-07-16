@@ -29,12 +29,17 @@ endif
 endif
 
 ifndef CONFIG_PLATFORM_WIN32
-TARGET1=../libaxtls.a
-TARGET2=../libaxtls.so
+TARGET1=../$(STAGE)/libaxtls.a
+BASETARGET=libaxtls.so
+TARGET2=../$(STAGE)/$(BASETARGET)
+
+# shared library major/minor numbers
+LIBMAJOR=$(BASETARGET).1
+LIBMINOR=$(BASETARGET).1.0
 else
-TARGET1=../axtls.lib
-TARGET2=../axtls.dll
-STATIC_LIB=../axtls.static.lib
+TARGET1=axtls.lib
+TARGET2=../$(STAGE)/axtls.dll
+STATIC_LIB=../$(STAGE)/axtls.static.lib
 endif
 
 libs: $(TARGET1) $(TARGET2)
@@ -61,13 +66,14 @@ endif
 
 include ../config/makefile.post
 
-ifndef CONFIG_PLATFORM_WIN32
+ifndef CONFIG_PLATFORM_WIN32     # Linux/Unix/Cygwin
 
 $(TARGET1) : $(OBJ)
 	$(AR) -r $@ $(OBJ)
 
 $(TARGET2) : $(OBJ)
-	$(LD) $(LDFLAGS) $(LDSHARED) -o $@ $(OBJ)
+	$(LD) $(LDFLAGS) -Wl,-soname,$(LIBMAJOR) $(LDSHARED) -o ../$(STAGE)/$(LIBMINOR) $(OBJ)
+	cd ../$(STAGE); ln -sf $(LIBMINOR) $(LIBMAJOR); ln -sf $(LIBMAJOR) $(BASETARGET); cd -
 
 else  # Win32
 
@@ -82,5 +88,5 @@ endif
 
 clean::
 	$(MAKE) -C test clean
-	-@rm -f *.pch ../*.so ../*.a ../*.dll ../*.lib ../*.exp ../*.pdb ../*.ilk
+	-@rm -f ../$(STAGE)/*.pch ../$(STAGE)/*.so* ../$(STAGE)/*.a ../$(STAGE)/*.dll ../$(STAGE)/*.lib ../$(STAGE)/*.exp ../$(STAGE)/*.pdb ../$(STAGE)/*.ilk
 

@@ -21,14 +21,14 @@ include ../../config/makefile.conf
 include ../../config/makefile.java.conf
 
 all : sample
-JAR=../../axtls.jar
+JAR=../../$(STAGE)/axtls.jar
 CLASSES=../../bindings/java/classes
 sample : $(JAR)
 
 $(JAR) : $(CLASSES)/axssl.class $(wildcard $(CLASSES)/axTLSj/*.class)
-	jar mcvf manifest.mf $@ -C $(CLASSES) .
+	jar mcvf manifest.mf $@ -C $(CLASSES) axTLSj -C $(CLASSES) axssl.class
 
-JAVA_FILES= axssl.java
+JAVA_FILES=axssl.java
 JAVA_CLASSES:=$(JAVA_FILES:%.java=$(CLASSES)/axTLSj/%.class)
 
 $(CLASSES)/%.class : %.java

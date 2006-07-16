@@ -20,11 +20,11 @@ include ../../config/.config
 include ../../config/makefile.conf
 
 all: samples
-TARGET=../../axssl.pl
+TARGET=../../$(STAGE)/axssl.pl
 samples: $(TARGET)
 
 $(TARGET): axssl.pl
-	@cd ../../; ln -sf samples/perl/axssl.pl axssl.pl
+	install $< $@
 
 clean::
 	-@rm -f $(TARGET)

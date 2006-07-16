@@ -22,9 +22,9 @@ include ../../config/makefile.conf
 all: lib
 
 ifdef CONFIG_PLATFORM_WIN32
-TARGET=../../axtlsp.dll
+TARGET=../../$(STAGE)/axtlsp.dll
 else
-TARGET=../../libaxtlsp.so
+TARGET=../../$(STAGE)/libaxtlsp.so
 endif
 
 ifneq ($(MAKECMDGOALS), clean)
@@ -46,13 +46,13 @@ test_perl:
 endif
 
 lib: $(TARGET)
-AXOLOTLS_HOME=../..
-SSL_HOME=$(AXOLOTLS_HOME)/ssl
-CONFIG_HOME=$(AXOLOTLS_HOME)/config
+AXTLS_HOME=../..
+SSL_HOME=$(AXTLS_HOME)/ssl
+CONFIG_HOME=$(AXTLS_HOME)/config
 OBJ:=axTLSp_wrap.o
 include ../../config/makefile.post
 
-ifndef CONFIG_PLATFORM_WIN32
+ifndef CONFIG_PLATFORM_WIN32        # Linux/Unix/Cygwin
 
 #
 # Could have used libperl.a, but it increases the library to over 1MB, so just
@@ -60,22 +60,22 @@ ifndef CONFIG_PLATFORM_WIN32
 # work.
 #
 $(TARGET) : $(OBJ)
-	$(LD) $(LDFLAGS) -L ../../ -L$(PERL5_CORE) $(LDSHARED) -o $@ $(OBJ) -laxtls -lperl
+	$(LD) $(LDFLAGS) -L ../../$(STAGE) -L$(PERL5_CORE) $(LDSHARED) -o $@ $(OBJ) -laxtls -lperl
 ifdef CONFIG_PLATFORM_CYGWIN
-	cd ../../; ln -sf $(notdir $@) axtlsp.dll
+	cd ../../$(STAGE); ln -sf $(notdir $@) axtlsp.dll
 endif
-	@install axtlsp.pm ../../
+	@install axtlsp.pm ../../$(STAGE)
 
 CFLAGS += -D__USE_GNU -I$(CONFIG_HOME) -I$(SSL_HOME) -I$(PERL5_CORE)
 else
 CFLAGS += /I"`cygpath -w $(CONFIG_HOME)`" /I"`cygpath -w $(SSL_HOME)`"
 CFLAGS += /I"$(PERL5_CORE)"
-LDFLAGS += $(CONFIG_PERL_LIB) /libpath:"$(PERL5_CORE)" axtls.lib /libpath:"../../"
+LDFLAGS += $(CONFIG_PERL_LIB) /libpath:"$(PERL5_CORE)" axtls.lib /libpath:"../../$(STAGE)"
 
 $(TARGET) : $(OBJ)
 	$(LD) $(LDFLAGS) $(LDSHARED) /out:$@ $(OBJ)
-	@install axtlsp.pm ../../
+	install axtlsp.pm ../../$(STAGE)
 endif # WIN32
 
 clean::
-	@rm -f $(TARGET) axtls* *.i axTLSp* *.c .depend ../../axtlsp.pm
+	@rm -f $(TARGET) axtls* *.i axTLSp* *.c .depend ../../$(STAGE)/axtlsp.pm

@@ -23,7 +23,7 @@ include ../../config/makefile.dotnet.conf
 # only build on Win32 platforms
 ifdef GO_DOT_NET
 all : sample
-TARGET=../../axssl.vbnet.exe
+TARGET=../../$(STAGE)/axssl.vbnet.exe
 sample : $(TARGET)
 
 $(TARGET): ../../bindings/vbnet/axTLSvb.vb ../../bindings/vbnet/axInterface.vb axssl.vb

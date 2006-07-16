@@ -24,26 +24,26 @@ include ../config/makefile.conf
 ifndef CONFIG_PLATFORM_WIN32
 
 ifdef CONFIG_PLATFORM_CYGWIN
-TARGET=../awhttpd.exe
+TARGET=../$(STAGE)/awhttpd.exe
 else
-TARGET=../awhttpd
+TARGET=../$(STAGE)/awhttpd
 endif
 
 ifdef CONFIG_HTTP_STATIC_BUILD
-LIBS=../libaxtls.a
+LIBS=../$(STAGE)/libaxtls.a
 else
-LIBS=-L../ -laxtls
+LIBS=-L../$(STAGE) -laxtls
 endif
 
 CFLAGS += -I../ssl
 
 else # win32 build
-TARGET=../awhttpd.exe
+TARGET=../$(STAGE)/awhttpd.exe
 
 ifdef CONFIG_HTTP_STATIC_BUILD
-LIBS=../axtls.static.lib ..\config\axtls.res
+LIBS=../$(STAGE)/axtls.static.lib ..\\config\\axtls.res
 else
-LIBS=../axtls.lib ..\config\axtls.res
+LIBS=../$(STAGE)/axtls.lib ..\\config\\axtls.res
 endif
 endif
 
