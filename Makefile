@@ -24,9 +24,9 @@ else
 all: target
 endif
 
-target : $(STAGE) $(TARGET)
-
 include config/makefile.conf
+
+target : $(STAGE) $(TARGET)
 
 # VERSION has to come from the command line
 RELEASE=axTLS-$(VERSION)
@@ -68,16 +68,17 @@ win32_demo:
 	$(MAKE) win32releaseconf
 
 install: $(PREFIX) all
-	install -m 755 $(STAGE)/libax* $(PREFIX)/lib
-	-install -m 755 $(STAGE)/ax* $(PREFIX)/bin
-	-install -m 755 $(STAGE)/axtlsp.pm `perl -e 'use Config; print $$Config{installarchlib};'`
-	-install -m 755 $(STAGE)/awhttpd* $(PREFIX)/bin
+	cp --no-dereference $(STAGE)/libax* $(PREFIX)/lib
+	chmod 755 $(PREFIX)/lib/libax* 
+	-@install -m 755 $(STAGE)/ax* $(PREFIX)/bin > /dev/null 2>&1
+	-@install -m 755 $(STAGE)/axtlsp.pm `perl -e 'use Config; print $$Config{installarchlib};'` > /dev/null 2>&1
+	-@install -m 755 $(STAGE)/awhttpd* $(PREFIX)/bin > /dev/null 2>&1
 
 installclean:
-	-@rm $(PREFIX)/lib/libax*
-	-@rm $(PREFIX)/bin/ax*
-	-@rm $(PREFIX)/bin/awhttpd*
-	-@rm `perl -e 'use Config; print $$Config{installarchlib};'`/axtlsp.pm
+	-@rm $(PREFIX)/lib/libax* > /dev/null 2>&1
+	-@rm $(PREFIX)/bin/ax* > /dev/null 2>&1
+	-@rm $(PREFIX)/bin/awhttpd* > /dev/null 2>&1
+	-@rm `perl -e 'use Config; print $$Config{installarchlib};'`/axtlsp.pm > /dev/null 2>&1
 
 test:
 	cd $(STAGE); ssltest; ../ssl/test/test_axssl.sh; cd -;
