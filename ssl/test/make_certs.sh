@@ -156,7 +156,7 @@ openssl pkcs12 -export -in axTLS.x509_1024.pem -inkey axTLS.key_1024.pem -keypbe
 cat axTLS.ca_x509.pem >> axTLS.x509_device.pem
 
 # set default key/cert for use in the server
-xxd -i axTLS.x509_512.cer | sed -e \
-        "s/axTLS_x509_512_cer/default_certificate/" > ../../ssl/cert.h
-xxd -i axTLS.key_512 | sed -e \
-        "s/axTLS_key_512/default_private_key/" > ../../ssl/private_key.h
+xxd -i axTLS.x509_1024.cer | sed -e \
+        "s/axTLS_x509_1024_cer/default_certificate/" > ../../ssl/cert.h
+xxd -i axTLS.key_1024 | sed -e \
+        "s/axTLS_key_1024/default_private_key/" > ../../ssl/private_key.h
