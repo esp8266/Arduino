@@ -1,6 +1,6 @@
 diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
 --- awhttpd/aw3.h	2005-01-23 13:17:14.000000000 +1000
-+++ axTLS/httpd/awhttpd/aw3.h	2006-07-07 20:37:30.890625000 +1000
++++ axTLS/httpd/awhttpd/aw3.h	2006-07-22 18:09:01.968750000 +1000
 @@ -7,17 +7,16 @@
  */
  
@@ -39,7 +39,7 @@ diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
  struct connstruct {
    struct connstruct *next;
  
-@@ -46,29 +45,46 @@
+@@ -46,29 +45,48 @@
  
    int networkdesc;
    int filedesc;
@@ -72,7 +72,9 @@ diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
    long offset;
    char databuf[BLOCKSIZE];
  
-+  int is_ssl;
++  unsigned char is_ssl;
++  unsigned char close_when_done;
++  unsigned char modified_since;
  };
  
  
@@ -86,7 +88,7 @@ diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
  };
  
  
-@@ -111,13 +127,20 @@
+@@ -111,13 +129,20 @@
  
  
  // Useful macros
@@ -108,7 +110,7 @@ diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
  void removeconnection(struct connstruct *cn);
  
  
-@@ -129,16 +152,17 @@
+@@ -129,16 +154,17 @@
  void procsendhead(struct connstruct *cn);
  void procreadfile(struct connstruct *cn);
  void procsendfile(struct connstruct *cn);
@@ -128,7 +130,7 @@ diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
  int openlistener(int port);
  int openlistener6(int port);
  
-@@ -150,9 +174,9 @@
+@@ -150,9 +176,9 @@
  
  
  // misc.c prototypes
@@ -141,7 +143,7 @@ diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
  void stripcrlf(char *p);
  char *my_strncpy(char *dest, const char *src, size_t n);
  #ifndef __HAVE_ARCH_STRNLEN
-@@ -166,12 +190,12 @@
+@@ -166,12 +192,12 @@
  void buildactualfile(struct connstruct *cn);
  int issockwriteable(int sd);
  int isdir(char *name);
@@ -156,7 +158,7 @@ diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
  
  
  // urldecode.c prototypes
-@@ -188,7 +212,7 @@
+@@ -188,7 +214,7 @@
  
  
  // conf.c prototypes
@@ -165,7 +167,7 @@ diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
  void procconf(char *filename);
  
  
-@@ -202,4 +226,4 @@
+@@ -202,4 +228,4 @@
  
  
  // main.c prototypes
@@ -173,7 +175,7 @@ diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
 +void initlists(void);
 diff -Naur awhttpd/cgi.c axTLS/httpd/awhttpd/cgi.c
 --- awhttpd/cgi.c	2005-06-04 14:09:52.000000000 +1000
-+++ axTLS/httpd/awhttpd/cgi.c	2006-07-07 20:37:30.890625000 +1000
++++ axTLS/httpd/awhttpd/cgi.c	2006-07-22 16:54:31.546875000 +1000
 @@ -7,29 +7,33 @@
  */
  
@@ -362,7 +364,7 @@ diff -Naur awhttpd/cgi.c axTLS/httpd/awhttpd/cgi.c
 +#endif  /* CONFIG_HTTP_HAS_CGI */
 diff -Naur awhttpd/conf.c axTLS/httpd/awhttpd/conf.c
 --- awhttpd/conf.c	2005-06-04 14:09:52.000000000 +1000
-+++ axTLS/httpd/awhttpd/conf.c	2006-07-07 20:37:30.890625000 +1000
++++ axTLS/httpd/awhttpd/conf.c	2006-07-22 16:54:31.562500000 +1000
 @@ -10,11 +10,7 @@
  #include <stdio.h>
  #include <string.h>
@@ -450,7 +452,7 @@ diff -Naur awhttpd/conf.c axTLS/httpd/awhttpd/conf.c
 +#endif  /* CONFIG_STANDARD_AWHTTPD */
 diff -Naur awhttpd/conn.c axTLS/httpd/awhttpd/conn.c
 --- awhttpd/conn.c	2004-12-07 16:11:02.000000000 +1000
-+++ axTLS/httpd/awhttpd/conn.c	2006-07-07 20:37:30.890625000 +1000
++++ axTLS/httpd/awhttpd/conn.c	2006-07-22 18:08:57.687500000 +1000
 @@ -9,15 +9,11 @@
  
  #include <stdio.h>
@@ -490,7 +492,13 @@ diff -Naur awhttpd/conn.c axTLS/httpd/awhttpd/conn.c
    *(tp->virtualhostreq) = '\0';
  
    tp->state = STATE_WANT_TO_READ_HEAD;
-@@ -57,7 +62,6 @@
+@@ -53,11 +58,12 @@
+   my_strncpy(tp->ip, ip, MAXIPLEN);
+ 
+   tp->offset = -1;
++  tp->close_when_done = 0;
++  tp->modified_since = 0;
+ 
    numusers++;
  
    updatetimeout(tp, time(NULL));
@@ -498,7 +506,7 @@ diff -Naur awhttpd/conn.c axTLS/httpd/awhttpd/conn.c
    return;
  
  }
-@@ -95,10 +99,22 @@
+@@ -95,10 +101,22 @@
    freeconns = cn;
  
    // Close it all down
@@ -525,7 +533,7 @@ diff -Naur awhttpd/conn.c axTLS/httpd/awhttpd/conn.c
    return;
 diff -Naur awhttpd/errors.c axTLS/httpd/awhttpd/errors.c
 --- awhttpd/errors.c	2005-01-23 06:49:29.000000000 +1000
-+++ axTLS/httpd/awhttpd/errors.c	2006-07-07 20:37:30.890625000 +1000
++++ axTLS/httpd/awhttpd/errors.c	2006-07-22 16:54:31.562500000 +1000
 @@ -8,7 +8,6 @@
  
  
@@ -562,7 +570,7 @@ diff -Naur awhttpd/errors.c axTLS/httpd/awhttpd/errors.c
    char buf[1024];
 diff -Naur awhttpd/index.c axTLS/httpd/awhttpd/index.c
 --- awhttpd/index.c	2005-06-04 14:09:52.000000000 +1000
-+++ axTLS/httpd/awhttpd/index.c	2006-07-07 20:37:30.890625000 +1000
++++ axTLS/httpd/awhttpd/index.c	2006-07-22 16:54:31.562500000 +1000
 @@ -11,7 +11,6 @@
  #include <string.h>
  #include <sys/types.h>
@@ -588,7 +596,7 @@ diff -Naur awhttpd/index.c axTLS/httpd/awhttpd/index.c
        my_strncpy(cn->actualfile, tbuf, MAXREQUESTLENGTH);
 diff -Naur awhttpd/main.c axTLS/httpd/awhttpd/main.c
 --- awhttpd/main.c	2005-06-04 14:09:52.000000000 +1000
-+++ axTLS/httpd/awhttpd/main.c	2006-07-07 20:37:30.890625000 +1000
++++ axTLS/httpd/awhttpd/main.c	2006-07-22 16:54:31.562500000 +1000
 @@ -11,7 +11,6 @@
  #include <string.h>
  #include <sys/types.h>
@@ -828,7 +836,7 @@ diff -Naur awhttpd/main.c axTLS/httpd/awhttpd/main.c
    return 0;
 diff -Naur awhttpd/mime_types.c axTLS/httpd/awhttpd/mime_types.c
 --- awhttpd/mime_types.c	2004-01-26 01:08:47.000000000 +1000
-+++ axTLS/httpd/awhttpd/mime_types.c	2006-07-07 20:37:30.890625000 +1000
++++ axTLS/httpd/awhttpd/mime_types.c	2006-07-22 16:54:31.562500000 +1000
 @@ -21,13 +21,14 @@
  
  
@@ -862,7 +870,7 @@ diff -Naur awhttpd/mime_types.c axTLS/httpd/awhttpd/mime_types.c
 +
 diff -Naur awhttpd/misc.c axTLS/httpd/awhttpd/misc.c
 --- awhttpd/misc.c	2005-01-23 12:59:09.000000000 +1000
-+++ axTLS/httpd/awhttpd/misc.c	2006-07-07 20:37:30.890625000 +1000
++++ axTLS/httpd/awhttpd/misc.c	2006-07-22 16:54:31.578125000 +1000
 @@ -7,33 +7,33 @@
  */
  
@@ -1008,7 +1016,7 @@ diff -Naur awhttpd/misc.c axTLS/httpd/awhttpd/misc.c
 +#endif
 diff -Naur awhttpd/net.c axTLS/httpd/awhttpd/net.c
 --- awhttpd/net.c	2005-06-04 14:09:52.000000000 +1000
-+++ axTLS/httpd/awhttpd/net.c	2006-07-07 20:37:30.906250000 +1000
++++ axTLS/httpd/awhttpd/net.c	2006-07-22 16:54:31.578125000 +1000
 @@ -8,9 +8,7 @@
  
  
@@ -1111,7 +1119,7 @@ diff -Naur awhttpd/net.c axTLS/httpd/awhttpd/net.c
  
 diff -Naur awhttpd/permcheck.c axTLS/httpd/awhttpd/permcheck.c
 --- awhttpd/permcheck.c	2005-01-23 06:49:29.000000000 +1000
-+++ axTLS/httpd/awhttpd/permcheck.c	2006-07-07 20:37:30.906250000 +1000
++++ axTLS/httpd/awhttpd/permcheck.c	2006-07-22 16:54:31.578125000 +1000
 @@ -7,21 +7,23 @@
  */
  
@@ -1202,7 +1210,7 @@ diff -Naur awhttpd/permcheck.c axTLS/httpd/awhttpd/permcheck.c
 +#endif  /* CONFIG_HTTP_PERM_CHECK */
 diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
 --- awhttpd/proc.c	2005-01-23 10:59:41.000000000 +1000
-+++ axTLS/httpd/awhttpd/proc.c	2006-07-07 21:07:26.250000000 +1000
++++ axTLS/httpd/awhttpd/proc.c	2006-07-23 10:32:07.593750000 +1000
 @@ -13,14 +13,12 @@
  #include <sys/types.h>
  #include <sys/stat.h>
@@ -1229,7 +1237,18 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
  
    } else if (strcmp(words[0], "Host:")==0) {
  
-@@ -85,19 +85,22 @@
+@@ -80,24 +80,32 @@
+     if (isdigit(*words[1]) == 0) return 1;
+ 
+     cn->offset = atoi(words[1]);
+-
++  } else if (strcmp(words[0], "Connection:")==0 &&
++                strcmp(words[1], "close")==0) {
++      cn->close_when_done = 1;
++  } else if (strcmp(words[0], "If-Modified-Since:")==0) {
++      /* TODO: parse this date properly with getdate() or similar */
++      cn->modified_since = 1;
+   }
  
    return 1;
  
@@ -1254,7 +1273,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
  
    if (cn->reqtype == TYPE_HEAD) {
      snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nContent-Type: text/html\n\n");
-@@ -107,7 +110,17 @@
+@@ -107,7 +115,17 @@
      return;
    }
  
@@ -1273,7 +1292,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
    if (cn->dirp == NULL) {
      send404(cn);
      removeconnection(cn);
-@@ -116,12 +129,13 @@
+@@ -116,12 +134,13 @@
  
    // Get rid of the "."
    readdir(cn->dirp);
@@ -1289,7 +1308,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
  
    cn->state = STATE_DOING_DIR;
  
-@@ -134,36 +148,48 @@
+@@ -134,36 +153,48 @@
  
  void procdodir(struct connstruct *cn) {
  
@@ -1347,7 +1366,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
  
  
  
-@@ -172,9 +198,10 @@
+@@ -172,9 +203,10 @@
    char buf[MAXREQUESTLENGTH*4], *tp, *next;
    int rv;
  
@@ -1361,14 +1380,18 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
      return;
    }
  
-@@ -217,36 +244,97 @@
+@@ -217,36 +249,100 @@
  void procsendhead(struct connstruct *cn) {
  
    char buf[1024];
 +  char actualfile[1024];
    struct stat stbuf;
- 
+-
 -  if (stat(cn->actualfile, &stbuf) == -1) {
++  time_t now = time(NULL);
++  char date[32];
++  strcpy(date, ctime(&now));
++
 +  strcpy(actualfile, cn->actualfile);
 +
 +#ifdef WIN32
@@ -1466,7 +1489,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
    if ((stbuf.st_mode & S_IFMT) == S_IFDIR) {
      if (cn->filereq[strlen(cn->filereq)-1] != '/') {
        send301(cn);
-@@ -256,16 +344,24 @@
+@@ -256,16 +352,24 @@
  
      // Check to see if this dir has an index file
      if (procindex(cn, &stbuf) == 0) {
@@ -1493,7 +1516,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
            isdir(cn->actualfile)) {
          send404(cn);
          removeconnection(cn);
-@@ -275,6 +371,7 @@
+@@ -275,39 +379,57 @@
        proccgi(cn,0);
        return;
      }
@@ -1501,40 +1524,45 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
      // If the index isn't a CGI, we continue on with the index file
  
    }
-@@ -282,6 +379,7 @@
-   if (cn->offset == -1 || cn->offset >= stbuf.st_size) {
-     cn->offset = -1;
  
-+#if defined (CONFIG_STANDARD_AWHTTPD)
-     snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nServer: Anti-Web V%s (%s)\nContent-Type: %s\nContent-Length: %ld\nLast-Modified: %s\n",
-                VERSION,
-                quote,
-@@ -299,15 +397,41 @@
-                (long) stbuf.st_size - cn->offset,
-                ctime(&(stbuf.st_mtime))); // ctime() has a \n on the end
-   }
-+#else
+-  if (cn->offset == -1 || cn->offset >= stbuf.st_size) {
++  if (cn->modified_since) {
++    snprintf(buf, sizeof(buf), "HTTP/1.1 304 Not Modified\nServer: Anti-Web V%s\nDate: %s\n", VERSION, date);
++    special_write(cn, buf, strlen(buf));
++    cn->modified_since = 0;
++    cn->state = STATE_WANT_TO_READ_HEAD;
++    return;
++  }
++  else if (cn->offset == -1 || cn->offset >= stbuf.st_size) {
 +#ifdef CONFIG_HTTP_VERBOSE
 +    printf("awhttpd: %s send %s\n", 
 +            cn->is_ssl ? "https" : "http", cn->actualfile);
 +    TTY_FLUSH();
 +#endif
-+    snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nServer: Anti-Web V%s\nContent-Type: %s\nContent-Length: %ld\nLast-Modified: %s\n",
-+               VERSION,
-+               getmimetype(cn->actualfile),
-+               (long) stbuf.st_size,
-+               ctime(&(stbuf.st_mtime))); // ctime() has a \n on the end
-+  } else {
-+    snprintf(buf, sizeof(buf), "HTTP/1.1 206 OK\nServer: Anti-Web V%s\nContent-Type: %s\nContent-Range: %ld-%ld/%ld\nContent-Length: %ld\nLast-Modified: %s\n",
-+               VERSION,
-+               getmimetype(cn->actualfile),
-+               cn->offset,
-+               (long) stbuf.st_size-1,
-+               (long) stbuf.st_size,
-+               (long) stbuf.st_size - cn->offset,
-+               ctime(&(stbuf.st_mtime))); // ctime() has a \n on the end
-+  }
-+#endif  /* CONFIG_HTTP_USE_QUOTE */
++
+     cn->offset = -1;
+ 
+-    snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nServer: Anti-Web V%s (%s)\nContent-Type: %s\nContent-Length: %ld\nLast-Modified: %s\n",
++    snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nServer: Anti-Web V%s\nContent-Type: %s\nContent-Length: %ld\nDate: %sLast-Modified: %s\n",
+                VERSION,
+-               quote,
+                getmimetype(cn->actualfile),
+                (long) stbuf.st_size,
++               date,
+                ctime(&(stbuf.st_mtime))); // ctime() has a \n on the end
+   } else {
+-    snprintf(buf, sizeof(buf), "HTTP/1.1 206 OK\nServer: Anti-Web V%s (%s)\nContent-Type: %s\nContent-Range: %ld-%ld/%ld\nContent-Length: %ld\nLast-Modified: %s\n",
++    snprintf(buf, sizeof(buf), "HTTP/1.1 206 OK\nServer: Anti-Web V%s\nContent-Type: %s\nContent-Range: %ld-%ld/%ld\nContent-Length: %ld\nDate: %sLast-Modified: %s\n",
+                VERSION,
+-               quote,
+                getmimetype(cn->actualfile),
+                cn->offset,
+                (long) stbuf.st_size-1,
+                (long) stbuf.st_size,
+                (long) stbuf.st_size - cn->offset,
++               date,
+                ctime(&(stbuf.st_mtime))); // ctime() has a \n on the end
+   }
  
 -  write(cn->networkdesc, buf, strlen(buf));
 +  special_write(cn, buf, strlen(buf));
@@ -1544,7 +1572,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
      return;
    } else {
 +    int flags = O_RDONLY;
-+#ifdef WIN32
++#if defined(WIN32) || defined(CYGWIN)
 +    flags |= O_BINARY;
 +#endif
  
@@ -1553,7 +1581,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
      if (cn->filedesc == -1) {
        send404(cn);
        removeconnection(cn);
-@@ -318,7 +442,23 @@
+@@ -318,7 +440,23 @@
        lseek(cn->filedesc, cn->offset, SEEK_SET);
      }
  
@@ -1577,7 +1605,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
      return;
    }
  
-@@ -328,13 +468,13 @@
+@@ -328,13 +466,19 @@
  
  void procreadfile(struct connstruct *cn) {
  
@@ -1591,26 +1619,32 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
 -    return;
 +      close(cn->filedesc);
 +      cn->filedesc = -1;
-+      removeconnection(cn);
++      if (cn->close_when_done)      /* close immediately */
++          removeconnection(cn);
++      else {                        /* keep socket open - HTTP 1.1 */
++          cn->state = STATE_WANT_TO_READ_HEAD;
++          cn->numbytes = 0;
++          cn->offset = -1;
++      }
 +      return;
    }
  
    cn->numbytes = rv;
-@@ -347,11 +487,9 @@
+@@ -347,11 +491,9 @@
  
  void procsendfile(struct connstruct *cn) {
  
 -  int rv;
+-
+-  rv = write(cn->networkdesc, cn->databuf, cn->numbytes);
 +  int rv = special_write(cn, cn->databuf, cn->numbytes);
  
--  rv = write(cn->networkdesc, cn->databuf, cn->numbytes);
--
 -  if (rv == -1)
 +  if (rv < 0)
      removeconnection(cn);
    else if (rv == cn->numbytes)
      cn->state = STATE_WANT_TO_READ_FILE;
-@@ -361,7 +499,47 @@
+@@ -361,7 +503,47 @@
      memmove(cn->databuf, cn->databuf + rv, cn->numbytes - rv);
      cn->numbytes -= rv;
    }
@@ -1661,7 +1695,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
  }
 diff -Naur awhttpd/socket.c axTLS/httpd/awhttpd/socket.c
 --- awhttpd/socket.c	2004-04-25 13:03:05.000000000 +1000
-+++ axTLS/httpd/awhttpd/socket.c	2006-07-07 20:37:30.906250000 +1000
++++ axTLS/httpd/awhttpd/socket.c	2006-07-22 16:54:31.578125000 +1000
 @@ -8,19 +8,11 @@
  
  
@@ -1748,7 +1782,7 @@ diff -Naur awhttpd/socket.c axTLS/httpd/awhttpd/socket.c
    memset(&(my_addr.sin_zero), 0, 8);    // zero the rest of the struct
 diff -Naur awhttpd/urlencode.c axTLS/httpd/awhttpd/urlencode.c
 --- awhttpd/urlencode.c	2004-05-14 10:53:47.000000000 +1000
-+++ axTLS/httpd/awhttpd/urlencode.c	2006-07-07 20:37:30.906250000 +1000
++++ axTLS/httpd/awhttpd/urlencode.c	2006-07-22 16:54:31.593750000 +1000
 @@ -13,7 +13,7 @@
  
  #include <ctype.h>
