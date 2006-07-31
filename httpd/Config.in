@@ -28,17 +28,10 @@ config CONFIG_HTTP_HTTPS_PORT
 
         You must be a root user in order to use the default port.
 
-config CONFIG_STANDARD_AWHTTPD
-    bool "Use Standard AWHTTPD Configuration"
-    default n
-    help
-        Use the configuration file that awhttpd normally uses.
-        
 config CONFIG_HTTP_WEBROOT
     string "Web root location"
     default "../www" if !CONFIG_PLATFORM_WIN32
     default "..\\www" if CONFIG_PLATFORM_WIN32
-    depends on !CONFIG_STANDARD_AWHTTPD
     help
         The location of the web root in relation to awhttpd. This is 
         the directory where index.html lives.
@@ -46,47 +39,20 @@ config CONFIG_HTTP_WEBROOT
 config CONFIG_HTTP_PORT
     int "HTTP port"
     default 80
-    depends on !CONFIG_STANDARD_AWHTTPD
     help
         The port number of the normal HTTP server. 
 
         You must be a root user in order to use the default port.
 
-config CONFIG_HTTP_USE_TIMEOUT
-    bool "Use Timeout"
-    default n
-    depends on !CONFIG_STANDARD_AWHTTPD
-    help
-        Enable timeouts to be used.
-
 config CONFIG_HTTP_TIMEOUT
     int "Timeout"
     default 5
-    depends on CONFIG_HTTP_USE_TIMEOUT
     help
-        Set the timeout in seconds.
-
-config CONFIG_HTTP_INITIAL_SLOTS
-    int "Initial Slots"
-    default 10
-    depends on !CONFIG_STANDARD_AWHTTPD
-    help
-        Determine the number of slots.
-
-        This is just an initial value to allocate memory. This will go all the
-        way up to max usrs.
-
-config CONFIG_HTTP_MAX_USERS
-    int "Max Users"
-    default 100
-    depends on !CONFIG_STANDARD_AWHTTPD
-    help
-        Determine the maximum number of simultaneous users at any time
+        Set the timeout of a connection in seconds.
 
 config CONFIG_HTTP_HAS_CGI
     bool "Enable CGI"
     default n
-    depends on !CONFIG_STANDARD_AWHTTPD
     help
         Enable the CGI capability.
 
@@ -100,14 +66,12 @@ config CONFIG_HTTP_CGI_EXTENSION
 config CONFIG_HTTP_DIRECTORIES
     bool "Enable Directory Listing"
     default n
-    depends on !CONFIG_STANDARD_AWHTTPD
     help
         Enable directory listing.
     
 config CONFIG_HTTP_PERM_CHECK
     bool "Permissions Check"
     default n
-    depends on !CONFIG_STANDARD_AWHTTPD
     help
         Enable permissions checking on the directories before reading the
         files in them.
@@ -115,7 +79,7 @@ config CONFIG_HTTP_PERM_CHECK
 config CONFIG_HTTP_HAS_IPV6
     bool "Enable IPv6"
     default n
-    depends on !CONFIG_STANDARD_AWHTTPD && !CONFIG_PLATFORM_WIN32
+    depends on !CONFIG_PLATFORM_WIN32
     help
         Use IPv6 instead of IPv4.
     
@@ -125,14 +89,13 @@ config CONFIG_HTTP_VERBOSE
     bool "Verbose Mode"
     default y if CONFIG_SSL_FULL_MODE
     default n if !CONFIG_SSL_FULL_MODE
-    depends on !CONFIG_STANDARD_AWHTTPD
     help
         Enable extra statements used when using awhttpd.
 
 config CONFIG_HTTP_IS_DAEMON
     bool "Run as a daemon"
     default n
-    depends on !CONFIG_STANDARD_AWHTTPD && !CONFIG_PLATFORM_WIN32
+    depends on !CONFIG_PLATFORM_WIN32
     help 
         Run awhttpd as a background process.
 

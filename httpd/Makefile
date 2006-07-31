@@ -72,8 +72,7 @@ OBJ= \
 	mime_types.o \
 	index.o \
 	urlencode.o \
-    permcheck.o \
-	conf.o
+    permcheck.o
 
 %.o : awhttpd/%.c ../config/.config
 	$(CC) -c $(CFLAGS) $< 

@@ -1,6 +1,6 @@
 diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
 --- awhttpd/aw3.h	2005-01-23 13:17:14.000000000 +1000
-+++ axTLS/httpd/awhttpd/aw3.h	2006-07-22 18:09:01.968750000 +1000
++++ axTLS/httpd/awhttpd/aw3.h	2006-07-26 23:09:27.343750000 +1000
 @@ -7,17 +7,16 @@
  */
  
@@ -39,29 +39,28 @@ diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
  struct connstruct {
    struct connstruct *next;
  
-@@ -46,29 +45,48 @@
+@@ -46,29 +45,43 @@
  
    int networkdesc;
    int filedesc;
-+
-+#if defined(CONFIG_HTTP_DIRECTORIES) || defined(CONFIG_STANDARD_AWHTTPD)
+-  DIR *dirp;
+ 
+-  int timeout;
++#if defined(CONFIG_HTTP_DIRECTORIES)
 +#ifdef WIN32
 +  HANDLE dirp;
 +  WIN32_FIND_DATA file_data;
 +#else
-   DIR *dirp;
++  DIR *dirp;
 +#endif
 +#endif
  
-+#if defined(CONFIG_STANDARD_AWHTTPD) || defined(CONFIG_HTTP_USE_TIMEOUT)
-   int timeout;
-+#endif
- 
++  time_t timeout;
    char ip[MAXIPLEN];
- 
+-
    char actualfile[MAXREQUESTLENGTH];
    char filereq[MAXREQUESTLENGTH];
-+#if defined(CONFIG_HTTP_HAS_CGI) || defined(CONFIG_STANDARD_AWHTTPD)
++#if defined(CONFIG_HTTP_HAS_CGI)
    char cgiargs[MAXREQUESTLENGTH];
    char cgiscriptinfo[MAXREQUESTLENGTH];
    char cgipathinfo[MAXREQUESTLENGTH];
@@ -69,7 +68,7 @@ diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
    char virtualhostreq[MAXREQUESTLENGTH];
  
    int numbytes;
-   long offset;
+-  long offset;
    char databuf[BLOCKSIZE];
  
 +  unsigned char is_ssl;
@@ -88,21 +87,29 @@ diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
  };
  
  
-@@ -111,13 +129,20 @@
+@@ -96,28 +109,13 @@
  
+ // Conf global prototypes
  
- // Useful macros
-+#ifdef CONFIG_STANDARD_AWHTTPD
- #define istimedout(tp,ct) ((ct) > (tp)->timeout)
- #define updatetimeout(tp,ct) ((tp)->timeout = (ct)+usertimeout)
-+#elif CONFIG_HTTP_USE_TIMEOUT
-+#define istimedout(tp,ct) ((ct) > (tp)->timeout)
-+#define updatetimeout(tp,ct) ((tp)->timeout = (ct)+CONFIG_HTTP_TIMEOUT)
-+#else
-+#define updatetimeout(tp,ct)    /* empty macro */
-+#endif
- 
- 
+-extern int usevirtualhosts;
+ extern char *webroot;
+ extern int allowdirectorylisting;
+ extern int allowcgi;
+ extern int permcheck;
+-extern int maxusers;
+-extern int usertimeout;
+-extern int initialslots;
+-extern char *quote;
+-extern int initialslots;
+-
+-extern int numusers;
+-
+-
+-// Useful macros
+-#define istimedout(tp,ct) ((ct) > (tp)->timeout)
+-#define updatetimeout(tp,ct) ((tp)->timeout = (ct)+usertimeout)
+-
+-
  
  // conn.c prototypes
 -void addconnection(int sd, char *ip);
@@ -110,7 +117,7 @@ diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
  void removeconnection(struct connstruct *cn);
  
  
-@@ -129,16 +154,17 @@
+@@ -129,30 +127,29 @@
  void procsendhead(struct connstruct *cn);
  void procreadfile(struct connstruct *cn);
  void procsendfile(struct connstruct *cn);
@@ -124,13 +131,17 @@ diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
  
  
  // socket.c prototypes
- int pollsocket(int sd, long ustimeout);
+-int pollsocket(int sd, long ustimeout);
 -void handlenewconnection(int listenfd);
 +void handlenewconnection(int listenfd, int is_ssl);
  int openlistener(int port);
  int openlistener6(int port);
  
-@@ -150,9 +176,9 @@
+ 
+ // errors.c prototypes
+-void send505(int sd, char *reason);
+ void send404(struct connstruct *cn);
+ void send301(struct connstruct *cn);
  
  
  // misc.c prototypes
@@ -143,12 +154,17 @@ diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
  void stripcrlf(char *p);
  char *my_strncpy(char *dest, const char *src, size_t n);
  #ifndef __HAVE_ARCH_STRNLEN
-@@ -166,12 +192,12 @@
+@@ -160,18 +157,16 @@
+ #endif
+ int iscgi(char *fn);
+ int split(char *tp, char *sp[], int maxwords, char sc);
+-int confsplit(char *tp, char *sp[], int maxwords);
+ int sanitizefile(char *buf);
+ int sanitizehost(char *buf);
  void buildactualfile(struct connstruct *cn);
  int issockwriteable(int sd);
  int isdir(char *name);
 -void status();
-+void status(void);
  int trycgi_withpathinfo(struct connstruct *cn);
  
  
@@ -158,16 +174,15 @@ diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
  
  
  // urldecode.c prototypes
-@@ -188,7 +214,7 @@
+@@ -188,7 +183,6 @@
  
  
  // conf.c prototypes
 -void defaultconfvals();
-+void defaultconfvals(void);
  void procconf(char *filename);
  
  
-@@ -202,4 +228,4 @@
+@@ -202,4 +196,4 @@
  
  
  // main.c prototypes
@@ -175,8 +190,8 @@ diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
 +void initlists(void);
 diff -Naur awhttpd/cgi.c axTLS/httpd/awhttpd/cgi.c
 --- awhttpd/cgi.c	2005-06-04 14:09:52.000000000 +1000
-+++ axTLS/httpd/awhttpd/cgi.c	2006-07-22 16:54:31.546875000 +1000
-@@ -7,29 +7,33 @@
++++ axTLS/httpd/awhttpd/cgi.c	2006-07-26 23:05:56.890625000 +1000
+@@ -7,93 +7,46 @@
  */
  
  
@@ -190,62 +205,69 @@ diff -Naur awhttpd/cgi.c axTLS/httpd/awhttpd/cgi.c
  
  
  
-+#if defined(CONFIG_HTTP_HAS_CGI) || defined(CONFIG_STANDARD_AWHTTPD)
++#if defined(CONFIG_HTTP_HAS_CGI)
  void addcgiext(char *tp) {
  
    struct cgiextstruct *ex;
  
    ex = (struct cgiextstruct *) malloc(sizeof(struct cgiextstruct));
-   if (ex == NULL) {
-+#ifdef CONFIG_HTTP_VERBOSE
-     fprintf(stderr, "Serious memory error...\n");
+-  if (ex == NULL) {
+-    fprintf(stderr, "Serious memory error...\n");
 -    exit(0);
-+#endif
-+    exit(1);
-   }
- 
+-  }
+-
    ex->ext = strdup(tp);
-   if (ex->ext == NULL) {
-+#ifdef CONFIG_HTTP_VERBOSE
-     fprintf(stderr, "Serious memory error...\n");
+-  if (ex->ext == NULL) {
+-    fprintf(stderr, "Serious memory error...\n");
 -    exit(0);
-+#endif
-+    exit(1);
-   }
- 
+-  }
+-
    ex->next = cgiexts;
-@@ -43,7 +47,7 @@
- 
- void gensysenv(struct connstruct *cn) {
- 
+   cgiexts = ex;
+-
+-  return;
+-
+-}
+-
+-
+-
+-void gensysenv(struct connstruct *cn) {
+-
 -  #ifndef LIMITEDCGI
-+#if !defined (LIMITEDCGI) && !defined(WIN32)
- 
-   char buf[1024];
- 
-@@ -54,7 +58,9 @@
- 
-   setenv("AW_VERSION", VERSION, 1);
- 
-+#ifdef CONFIG_STANDARD_AWHTTPD
-   setenv("AW_QUOTE", quote, 1);
-+#endif
- 
- /* Commented this out because (and this is ridiculous) PHP
-    doesn't seem to work with this variable specified
-@@ -70,30 +76,39 @@
- 
-   setenv("QUERY_STRING", cn->cgiargs, 1);
- 
+-
+-  char buf[1024];
+-
+-  setenv("REMOTE_ADDR", cn->ip, 1);
+-
+-  snprintf(buf, sizeof(buf), "%d", numusers);
+-  setenv("AW_NUMUSERS", buf, 1);
+-
+-  setenv("AW_VERSION", VERSION, 1);
+-
+-  setenv("AW_QUOTE", quote, 1);
+-
+-/* Commented this out because (and this is ridiculous) PHP
+-   doesn't seem to work with this variable specified
+- */
+-/*
+-  snprintf ( buf, sizeof(buf), "Anti-Web V%s (%s)", VERSION, quote );
+-  setenv("SERVER_SOFTWARE", buf, 1);
+-*/
+-
+-  setenv("SCRIPT_NAME", cn->cgiscriptinfo, 1);
+-
+-  setenv("PATH_INFO", cn->cgipathinfo, 1);
+-
+-  setenv("QUERY_STRING", cn->cgiargs, 1);
+-
 -  return;
 -
 -  #endif
 -
-+#endif
  }
  
- 
- 
+-
+-
  void proccgi(struct connstruct *cn, int has_pathinfo) {
  
 -  int tpipe[2], fv;
@@ -253,22 +275,19 @@ diff -Naur awhttpd/cgi.c axTLS/httpd/awhttpd/cgi.c
 +  int tpipe[2];
 +  char *myargs[5];
    char buf[MAXREQUESTLENGTH];
+-
+-  snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nServer: Anti-Web V%s (%s)\n%s",
+-                             VERSION,
+-                             quote, (cn->reqtype == TYPE_HEAD) ? "\n" : "");
+-  write(cn->networkdesc, buf, strlen(buf));
 +#ifdef WIN32
 +  int tmp_stdout;
 +#else
 +  int fv;
 +#endif
- 
-+#ifdef CONFIG_STANDARD_AWHTTPD
-   snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nServer: Anti-Web V%s (%s)\n%s",
-                              VERSION,
-                              quote, (cn->reqtype == TYPE_HEAD) ? "\n" : "");
--  write(cn->networkdesc, buf, strlen(buf));
-+#else
++
 +  snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nServer: Anti-Web V%s\n%s",
-+                             VERSION,
-+                             (cn->reqtype == TYPE_HEAD) ? "\n" : "");
-+#endif
++                             VERSION, (cn->reqtype == TYPE_HEAD) ? "\n" : "");
 +  special_write(cn, buf, strlen(buf));
  
    if (cn->reqtype == TYPE_HEAD) {
@@ -280,7 +299,7 @@ diff -Naur awhttpd/cgi.c axTLS/httpd/awhttpd/cgi.c
    if (pipe(tpipe) == -1) {
      removeconnection(cn);
      return;
-@@ -108,7 +123,8 @@
+@@ -108,7 +61,8 @@
      return;
    }
  
@@ -290,7 +309,7 @@ diff -Naur awhttpd/cgi.c axTLS/httpd/awhttpd/cgi.c
      // Close the write descriptor
      close(tpipe[1]);
      cn->filedesc = tpipe[0];
-@@ -132,19 +148,64 @@
+@@ -132,19 +86,62 @@
    close(tpipe[1]);
  
    myargs[0] = cn->actualfile;
@@ -303,12 +322,12 @@ diff -Naur awhttpd/cgi.c axTLS/httpd/awhttpd/cgi.c
 -      my_strncpy(cn->cgipathinfo, "/", MAXREQUESTLENGTH);
 -      my_strncpy(cn->cgiscriptinfo, cn->filereq, MAXREQUESTLENGTH);
 -    }
+-
+-  gensysenv(cn);
 +  if (!has_pathinfo) {
 +    my_strncpy(cn->cgipathinfo, "/", MAXREQUESTLENGTH);
 +    my_strncpy(cn->cgiscriptinfo, cn->filereq, MAXREQUESTLENGTH);
 +  }
- 
-   gensysenv(cn);
  
    execv(cn->actualfile, myargs);
 +#else /* WIN32 */
@@ -316,7 +335,8 @@ diff -Naur awhttpd/cgi.c axTLS/httpd/awhttpd/cgi.c
 +    removeconnection(cn);
 +    return;
 +  }
-+
+ 
+-  exit(0);
 +  myargs[0] = "sh";
 +  myargs[1] = "-c";
 +  myargs[2] = cn->actualfile;
@@ -331,12 +351,11 @@ diff -Naur awhttpd/cgi.c axTLS/httpd/awhttpd/cgi.c
 +          *t++ = '/';
 +      }
 +  }
- 
--  exit(0);
++
 +  tmp_stdout = _dup(_fileno(stdout));
 +  _dup2(tpipe[1], _fileno(stdout));
 +  close(tpipe[1]);
- 
++
 +  /* change to suit execution method */
 +  if (spawnl(P_NOWAIT, "c:\\Program Files\\cygwin\\bin\\sh.exe", 
 +            myargs[0], myargs[1], myargs[2], myargs[3], myargs[4]) == -1) {
@@ -352,7 +371,7 @@ diff -Naur awhttpd/cgi.c axTLS/httpd/awhttpd/cgi.c
 +  for (;;)
 +  {
 +    procreadfile(cn);
-+
+ 
 +    if (cn->filedesc == -1)
 +        break;
 +
@@ -364,96 +383,277 @@ diff -Naur awhttpd/cgi.c axTLS/httpd/awhttpd/cgi.c
 +#endif  /* CONFIG_HTTP_HAS_CGI */
 diff -Naur awhttpd/conf.c axTLS/httpd/awhttpd/conf.c
 --- awhttpd/conf.c	2005-06-04 14:09:52.000000000 +1000
-+++ axTLS/httpd/awhttpd/conf.c	2006-07-22 16:54:31.562500000 +1000
-@@ -10,11 +10,7 @@
- #include <stdio.h>
- #include <string.h>
- #include <ctype.h>
++++ axTLS/httpd/awhttpd/conf.c	1970-01-01 10:00:00.000000000 +1000
+@@ -1,265 +0,0 @@
+-/* Anti-Web HTTPD */
+-/* Hardcore Software */
+-/*
+-This software is Copyright (C) 2001-2004 By Hardcore Software and
+-others. The software is distributed under the terms of the GNU General
+-Public License. See the file 'COPYING' for more details.
+-*/
+-
+-
+-#include <stdio.h>
+-#include <string.h>
+-#include <ctype.h>
 -#include <pwd.h>
 -#include <sys/types.h>
- #include <stdlib.h>
+-#include <stdlib.h>
 -#include <unistd.h>
 -
- #include "aw3.h"
- 
- 
-@@ -23,21 +19,29 @@
- 
- int usevirtualhosts;
- char *webroot;
-+int initialslots;
-+int maxusers;
-+
-+#ifdef CONFIG_STANDARD_AWHTTPD
-+
- int allowdirectorylisting;
- int allowcgi;
- int permcheck;
+-#include "aw3.h"
+-
+-
+-
+-// CONF GLOBALS:
+-
+-int usevirtualhosts;
+-char *webroot;
+-int allowdirectorylisting;
+-int allowcgi;
+-int permcheck;
 -int maxusers;
- int usertimeout;
+-int usertimeout;
 -int initialslots;
- char *quote;
- 
-+#endif  /* CONFIG_STANDARD_AWHTTPD */
-+
-+
- int numusers;
- 
- 
- 
- void defaultconfvals() {
- 
-+#ifdef CONFIG_STANDARD_AWHTTPD
-   usevirtualhosts = 0;
-+  maxusers = 500;
-   allowdirectorylisting = 0;
-   allowcgi = 0;
-   permcheck = 0;
-@@ -45,6 +49,13 @@
-   usertimeout = 5;
-   initialslots = 10;
-   quote = "Fear and loathing on the WWW";
-+#else
-+  maxusers = 500;
-+  initialslots = CONFIG_HTTP_INITIAL_SLOTS;
-+  maxusers = CONFIG_HTTP_MAX_USERS;
-+  usevirtualhosts = 1;
-+#endif
-+
- 
-   // Not really conf stuff:
-   numusers = 0;
-@@ -54,6 +65,7 @@
- }
- 
- 
-+#ifdef CONFIG_STANDARD_AWHTTPD
- void procconf(char *filename) {
- 
-   FILE *fp;
-@@ -210,11 +222,11 @@
-         err++;
-       } else {
-         if (setgid(bl->pw_gid) != 0) {
+-char *quote;
+-
+-int numusers;
+-
+-
+-
+-void defaultconfvals() {
+-
+-  usevirtualhosts = 0;
+-  allowdirectorylisting = 0;
+-  allowcgi = 0;
+-  permcheck = 0;
+-  maxusers = 500;
+-  usertimeout = 5;
+-  initialslots = 10;
+-  quote = "Fear and loathing on the WWW";
+-
+-  // Not really conf stuff:
+-  numusers = 0;
+-
+-  return;
+-
+-}
+-
+-
+-void procconf(char *filename) {
+-
+-  FILE *fp;
+-  char buf[MAXREQUESTLENGTH];
+-  char *segs[10];
+-  int tp, err=0, warn=0;
+-
+-  usevirtualhosts = 1;
+-
+-  fp = fopen(filename, "r");
+-
+-  if (fp == NULL) {
+-    fprintf(stderr, "ERROR: Unable to open conf file '%s'\n", filename);
+-    exit(1);
+-  }
+-
+-
+-  while (fgets(buf, sizeof(buf), fp) != NULL) {
+-    stripcrlf(buf);
+-
+-    confsplit(buf, segs, 10);
+-
+-    if (segs[0] == NULL) continue;
+-
+-    if (segs[1] == NULL) {
+-      fprintf(stderr, "ERR: Unknown command in '%s': '%s'\n", filename, segs[0]);
+-      err++;
+-      continue;
+-    }
+-
+-
+-    if (strcasecmp(segs[0], "listen") == 0) {
+-      if (isdigit(*segs[1])) {
+-        if ((tp=openlistener(atoi(segs[1]))) == -1) {
+-          fprintf(stderr, "ERR: Couldn't bind to port %d (IPv4)\n", atoi(segs[1]));
+-          err++;
+-          continue;
+-        }
+-
+-        addtoservers(tp);
+-        continue;
+-      }
+-    }
+-
+-    if (strcasecmp(segs[0], "listen6") == 0) {
+-      #ifdef HAVE_IPV6
+-        if (isdigit(*segs[1])) {
+-          if ((tp=openlistener6(atoi(segs[1]))) == -1) {
+-            fprintf(stderr, "ERR: Couldn't bind to port %d (IPv6)\n", atoi(segs[1]));
+-            err++;
+-            continue;
+-          }
+-
+-          addtoservers(tp);
+-          continue;
+-        }
+-      #else
+-        fprintf(stderr, "ERR: AW was compiled without IPv6 support!\n");
+-        err++;
+-        continue;
+-      #endif
+-    }
+-
+-    if (strcasecmp(segs[0], "maxusers") == 0) {
+-      maxusers = tp = atoi(segs[1]);
+-      if (tp < 1) {
+-        fprintf(stderr, "ERR: Bad value for maxusers\n");
+-        err++;
+-      }
+-      if (tp < 10 || tp > 10000) {
+-        fprintf(stderr, "WARN: Value for maxusers (%d) is not withing the recommended range\n", tp);
+-        warn++;
+-      }
+-      continue;
+-    }
+-
+-    if (strcasecmp(segs[0], "usertimeout") == 0) {
+-      usertimeout = tp = atoi(segs[1]);
+-      if (tp < 1) {
+-        fprintf(stderr, "ERR: Bad value for usertimeout\n");
+-        err++;
+-      }
+-      if (tp > 100) {
+-        fprintf(stderr, "WARN: Value for usertimeout (%d) is not withing the recommended range\n", tp);
+-        warn++;
+-      }
+-      continue;
+-    }
+-
+-    if (strcasecmp(segs[0], "initialslots") == 0) {
+-      initialslots = tp = atoi(segs[1]);
+-      if (tp < 1) {
+-        fprintf(stderr, "ERR: Bad value for initialslots\n");
+-        err++;
+-      }
+-      continue;
+-    }
+-
+-    if (strcasecmp(segs[0], "directorylisting") == 0) {
+-      if (strcasecmp(segs[1], "on") == 0) allowdirectorylisting = 1;
+-      else if (strcasecmp(segs[1], "off") == 0) allowdirectorylisting = 0;
+-      else {
+-        fprintf(stderr, "ERR: Need on or off for directorylisting\n");
+-        err++;
+-      }
+-      continue;
+-    }
+-
+-    if (strcasecmp(segs[0], "cgi") == 0) {
+-      if (strcasecmp(segs[1], "on") == 0) allowcgi = 1;
+-      else if (strcasecmp(segs[1], "off") == 0) allowcgi = 0;
+-      else {
+-        fprintf(stderr, "ERR: Need on or off for cgi\n");
+-        err++;
+-      }
+-      continue;
+-    }
+-
+-    if (strcasecmp(segs[0], "cgiext") == 0) {
+-      if (*(segs[1]) != '.' && *(segs[1]+1) != '\0') {
+-        fprintf(stderr, "ERR: CGI extensions must start with a period and be at least 2 chars long\n");
+-        err++;
+-        continue;
+-      }
+-      addcgiext(segs[1]);
+-      continue;
+-    }
+-
+-    if (strcasecmp(segs[0], "addindex") == 0) {
+-      if (*(segs[1]) == '.') {
+-        fprintf(stderr, "ERR: Index files can't start with a dot\n");
+-        err++;
+-        continue;
+-      }
+-      addindex(segs[1]);
+-      continue;
+-    }
+-
+-    if (strcasecmp(segs[0], "permcheck") == 0) {
+-      if (strcasecmp(segs[1], "on") == 0) permcheck = 1;
+-      else if (strcasecmp(segs[1], "off") == 0) permcheck = 0;
+-      else {
+-        fprintf(stderr, "ERR: Need on or off for permcheck\n");
+-        err++;
+-      }
+-      continue;
+-    }
+-
+-    if (strcasecmp(segs[0], "dropto") == 0) {
+-      struct passwd *bl;
+-
+-      if ((bl = getpwnam(segs[1])) == NULL) {
+-        fprintf(stderr, "ERR: Unable to look up user '%s' to drop privileges\n", segs[1]);
+-        err++;
+-      } else {
+-        if (setgid(bl->pw_gid) != 0) {
 -          fprintf(stderr, "WARN: Unable to drop GID to %d\n", bl->pw_gid);
-+          fprintf(stderr, "WARN: Unable to drop GID to %ld\n", bl->pw_gid);
-           warn++;
-         }
-         if (setuid(bl->pw_uid) != 0) {
+-          warn++;
+-        }
+-        if (setuid(bl->pw_uid) != 0) {
 -          fprintf(stderr, "WARN: Unable to drop UID to %d\n", bl->pw_uid);
-+          fprintf(stderr, "WARN: Unable to drop UID to %ld\n", bl->pw_uid);
-           warn++;
-         }
-       }
-@@ -263,3 +275,4 @@
-   return;
- 
- }
-+#endif  /* CONFIG_STANDARD_AWHTTPD */
+-          warn++;
+-        }
+-      }
+-      continue;
+-    }
+-
+-    if (strcasecmp(segs[0], "quote") == 0) {
+-      quote = strdup(segs[1]);
+-      continue;
+-    }
+-
+-
+-    if (segs[2] == NULL) {
+-      fprintf(stderr, "ERR: Unknown command in '%s': '%s'\n", filename, segs[0]);
+-      err++;
+-      continue;
+-    }
+-
+-
+-    // Otherwise:
+-
+-    fprintf(stderr, "ERR: Unknown command in '%s': '%s'\n", filename, segs[0]);
+-    err++;
+-    continue;
+-
+-  }
+-
+-
+-  if (initialslots > maxusers) {
+-    fprintf(stderr, "ERR: initialslots is greater than maxusers!\n");
+-    err++;
+-  }
+-
+-
+-  if (warn) {
+-    fprintf(stderr, "Alert! %d warnings!\n", warn);
+-  }
+-
+-  if (err) {
+-    fprintf(stderr, "Unable to start: %d errors!\n", err);
+-    exit(1);
+-  }
+-
+-  fclose(fp);
+-
+-  return;
+-
+-}
 diff -Naur awhttpd/conn.c axTLS/httpd/awhttpd/conn.c
 --- awhttpd/conn.c	2004-12-07 16:11:02.000000000 +1000
-+++ axTLS/httpd/awhttpd/conn.c	2006-07-22 18:08:57.687500000 +1000
-@@ -9,15 +9,11 @@
++++ axTLS/httpd/awhttpd/conn.c	2006-07-30 22:35:55.109375000 +1000
+@@ -9,26 +9,16 @@
  
  #include <stdio.h>
  #include <string.h>
@@ -470,7 +670,18 @@ diff -Naur awhttpd/conn.c axTLS/httpd/awhttpd/conn.c
    struct connstruct *tp;
  
    // Get ourselves a connstruct
-@@ -39,12 +35,21 @@
+   if (freeconns == NULL) {
+     tp = (struct connstruct *) malloc(sizeof(struct connstruct));
+-    if (tp == NULL) {
+-      send505(sd, "Out of memory");
+-      // removeconnection() should be used normally
+-      close(sd);
+-      return;
+-    }
+   } else {
+     tp = freeconns;
+     freeconns = tp->next;
+@@ -39,12 +29,21 @@
    usedconns = tp;
  
    tp->networkdesc = sd;
@@ -479,34 +690,45 @@ diff -Naur awhttpd/conn.c axTLS/httpd/awhttpd/conn.c
 +    ssl_server_new(servers->ssl_ctx, sd);
 +#endif
    tp->filedesc = -1;
-+#if defined(CONFIG_STANDARD_AWHTTPD) || defined(CONFIG_HTTP_HAS_DIRECTORIES)
++#if defined(CONFIG_HTTP_HAS_DIRECTORIES)
    tp->dirp = NULL;
 +#endif
 +  tp->is_ssl = is_ssl;
  
    *(tp->actualfile) = '\0';
    *(tp->filereq) = '\0';
-+#if defined(CONFIG_STANDARD_AWHTTPD) || defined(CONFIG_HTTP_HAS_CGI)
++#if defined(CONFIG_HTTP_HAS_CGI)
    *(tp->cgiargs) = '\0';
 +#endif
    *(tp->virtualhostreq) = '\0';
  
    tp->state = STATE_WANT_TO_READ_HEAD;
-@@ -53,11 +58,12 @@
+@@ -52,21 +51,16 @@
+ 
    my_strncpy(tp->ip, ip, MAXIPLEN);
  
-   tp->offset = -1;
+-  tp->offset = -1;
+-
+-  numusers++;
+-
+-  updatetimeout(tp, time(NULL));
 +  tp->close_when_done = 0;
 +  tp->modified_since = 0;
  
-   numusers++;
- 
-   updatetimeout(tp, time(NULL));
--
++  tp->timeout = time(NULL) + CONFIG_HTTP_TIMEOUT;
    return;
  
  }
-@@ -95,10 +101,22 @@
+ 
+ 
+ 
+-// Remove cn from the used list
+-// FIXME: This O(N) operation could be avoided if we used
+-//        doubly linked lists...
+ void removeconnection(struct connstruct *cn) {
+ 
+   struct connstruct *tp;
+@@ -95,12 +89,21 @@
    freeconns = cn;
  
    // Close it all down
@@ -520,20 +742,24 @@ diff -Naur awhttpd/conn.c axTLS/httpd/awhttpd/conn.c
 +      SOCKET_CLOSE(cn->networkdesc);
 +  }
    if (cn->filedesc != -1) close(cn->filedesc);
-+#if defined(CONFIG_STANDARD_AWHTTPD) || defined(CONFIG_HTTP_HAS_DIRECTORIES)
-+#ifdef WIN32
-+  if (cn->dirp != NULL) FindClose(cn->dirp);
-+#else
-   if (cn->dirp != NULL) closedir(cn->dirp);
+-  if (cn->dirp != NULL) closedir(cn->dirp);
 -
+-  numusers--;
+-
+-  return;
+-
++#if defined(CONFIG_HTTP_HAS_DIRECTORIES)
++  if (cn->dirp != NULL) 
++#ifdef WIN32
++    FindClose(cn->dirp);
++#else
++    closedir(cn->dirp);
 +#endif
 +#endif
-   numusers--;
- 
-   return;
+ }
 diff -Naur awhttpd/errors.c axTLS/httpd/awhttpd/errors.c
 --- awhttpd/errors.c	2005-01-23 06:49:29.000000000 +1000
-+++ axTLS/httpd/awhttpd/errors.c	2006-07-22 16:54:31.562500000 +1000
++++ axTLS/httpd/awhttpd/errors.c	2006-07-26 21:44:20.734375000 +1000
 @@ -8,7 +8,6 @@
  
  
@@ -551,26 +777,32 @@ diff -Naur awhttpd/errors.c axTLS/httpd/awhttpd/errors.c
  
    return;
  
-@@ -34,7 +33,7 @@
+@@ -34,21 +33,7 @@
  
    snprintf(buf, sizeof(buf), "HTTP/1.0 404 Not Found\nContent-Type: text/html\n\n<HTML><BODY>\n<TITLE>404 Not Found</TITLE><H1>It ain't there my friend. (404 Not Found)</H1>\n<BR><BR>Anti-Web HTTPD - Take back some simplicity.\n</BODY></HTML>\n");
  
 -  write(cn->networkdesc, buf, strlen(buf));
+-
+-  return;
+-
+-}
+-
+-
+-
+-void send505(int sd, char *reason) {
+-
+-  char buf[1024];
+-
+-  snprintf(buf, sizeof(buf), "HTTP/1.0 505 Server Error\nContent-Type: text/html\n\n<HTML><BODY>\n<TITLE>505 Internal Server Error</TITLE><H1>Internal Server Error: %s</H1>\n<BR><BR>Anti-Web HTTPD - Take back some simplicity.\n</BODY></HTML>\n", reason);
+-
+-  write(sd, buf, strlen(buf));
 +  special_write(cn, buf, strlen(buf));
  
    return;
  
-@@ -42,6 +41,7 @@
- 
- 
- 
-+/* TODO: this really needs to use the connstruct object */
- void send505(int sd, char *reason) {
- 
-   char buf[1024];
 diff -Naur awhttpd/index.c axTLS/httpd/awhttpd/index.c
 --- awhttpd/index.c	2005-06-04 14:09:52.000000000 +1000
-+++ axTLS/httpd/awhttpd/index.c	2006-07-22 16:54:31.562500000 +1000
++++ axTLS/httpd/awhttpd/index.c	2006-07-26 22:18:07.609375000 +1000
 @@ -11,7 +11,6 @@
  #include <string.h>
  #include <sys/types.h>
@@ -579,7 +811,28 @@ diff -Naur awhttpd/index.c axTLS/httpd/awhttpd/index.c
  #include <stdlib.h>
  
  #include "aw3.h"
-@@ -52,7 +51,13 @@
+@@ -22,20 +21,9 @@
+   struct indexstruct *ex;
+ 
+   ex = (struct indexstruct *) malloc(sizeof(struct indexstruct));
+-  if (ex == NULL) {
+-    fprintf(stderr, "Serious memory error...\n");
+-    exit(1);
+-  }
+-
+   ex->name = strdup(tp);
+-  if (ex->name == NULL) {
+-    fprintf(stderr, "Serious memory error...\n");
+-    exit(1);
+-  }
+-
+   ex->next = indexlist;
+   indexlist = ex;
+-
+   return;
+ 
+ }
+@@ -52,7 +40,13 @@
    tp = indexlist;
  
    while(tp != NULL) {
@@ -596,7 +849,7 @@ diff -Naur awhttpd/index.c axTLS/httpd/awhttpd/index.c
        my_strncpy(cn->actualfile, tbuf, MAXREQUESTLENGTH);
 diff -Naur awhttpd/main.c axTLS/httpd/awhttpd/main.c
 --- awhttpd/main.c	2005-06-04 14:09:52.000000000 +1000
-+++ axTLS/httpd/awhttpd/main.c	2006-07-22 16:54:31.562500000 +1000
++++ axTLS/httpd/awhttpd/main.c	2006-07-26 22:17:40.968750000 +1000
 @@ -11,7 +11,6 @@
  #include <string.h>
  #include <sys/types.h>
@@ -605,14 +858,16 @@ diff -Naur awhttpd/main.c axTLS/httpd/awhttpd/main.c
  #include <stdlib.h>
  
  #include "aw3.h"
-@@ -21,10 +20,40 @@
+@@ -21,10 +20,42 @@
  struct serverstruct *servers;
  struct connstruct *usedconns;
  struct connstruct *freeconns;
-+#if defined(CONFIG_HTTP_HAS_CGI) || defined(CONFIG_STANDARD_AWHTTPD)
++#if defined(CONFIG_HTTP_HAS_CGI)
  struct cgiextstruct *cgiexts;
 +#endif
  struct indexstruct *indexlist;
+ 
++char *webroot = CONFIG_HTTP_WEBROOT;
  
 +/* clean up memory for valgrind */
 +static void sigint_cleanup(int sig)
@@ -640,17 +895,17 @@ diff -Naur awhttpd/main.c axTLS/httpd/awhttpd/main.c
 +        free(freeconns);
 +        freeconns = tp;
 +    }
- 
++
 +    exit(0);
 +}
  
  void initlists() {
    int i;
-@@ -33,15 +62,19 @@
+@@ -33,108 +64,118 @@
    servers = NULL;
    usedconns = NULL;
    freeconns = NULL;
-+#if defined(CONFIG_HTTP_HAS_CGI) || defined(CONFIG_STANDARD_AWHTTPD)
++#if defined(CONFIG_HTTP_HAS_CGI)
    cgiexts = NULL;
 +#endif
    indexlist = NULL;
@@ -658,39 +913,42 @@ diff -Naur awhttpd/main.c axTLS/httpd/awhttpd/main.c
    for(i=0; i<INITIAL_CONNECTION_SLOTS; i++) {
      tp = freeconns;
 -    freeconns = (struct connstruct *) malloc(sizeof(struct connstruct));
+-    if (freeconns == NULL) {
+-      fprintf(stderr, "Not enough memory to allocate %d connection slots!\n",
+-              INITIAL_CONNECTION_SLOTS);
+-      exit(1);
+-    }
 +    freeconns = (struct connstruct *) calloc(1, sizeof(struct connstruct));
-     if (freeconns == NULL) {
-+#ifdef CONFIG_HTTP_VERBOSE
-       fprintf(stderr, "Not enough memory to allocate %d connection slots!\n",
-               INITIAL_CONNECTION_SLOTS);
-+#endif
-       exit(1);
-     }
      freeconns->next = tp;
-@@ -49,6 +82,7 @@
+   }
  }
  
  
-+#ifdef CONFIG_STANDARD_AWHTTPD
- void usage(char *cmline) {
-   fprintf(stderr, "Anti-Web V%s  (C) 2001-2004 by Hardcore Software and others\n\n", VERSION);
- 
-@@ -65,76 +99,138 @@
- 
-   exit(1);
- }
-+#endif
- 
- 
+-void usage(char *cmline) {
+-  fprintf(stderr, "Anti-Web V%s  (C) 2001-2004 by Hardcore Software and others\n\n", VERSION);
+-
+-  fprintf(stderr, "  AW has 2 valid command lines (see README for details)\n\n");
+-
+-  fprintf(stderr, "  %s <dir> <port>\n", cmline);
+-  fprintf(stderr, "     <dir>                 The root of your HTML tree\n");
+-  fprintf(stderr, "     <port>                The port to use\n\n");
+-
+-  fprintf(stderr, "  %s <dir>\n", cmline);
+-  fprintf(stderr, "     <dir>/awhttpd.conf    Conf file\n");
+-  fprintf(stderr, "     <dir>/default/        Default HTML root\n");
+-  fprintf(stderr, "     <dir>/example.com/    Zero or more virtual host directories\n");
+-
+-  exit(1);
+-}
+-
+-
  int main(int argc, char *argv[]) {
  
-+#ifdef CONFIG_STANDARD_AWHTTPD
-   char buf[MAXREQUESTLENGTH];
+-  char buf[MAXREQUESTLENGTH];
 -  int pid, tp;
 -
-+#endif
 +  int tp;
-+#if defined(CONFIG_HTTP_IS_DAEMON) || defined(CONFIG_STANDARD_AWHTTPD)
++#if defined(CONFIG_HTTP_IS_DAEMON)
 +  int pid;
 +#endif
 +
@@ -701,15 +959,11 @@ diff -Naur awhttpd/main.c axTLS/httpd/awhttpd/main.c
 +#endif
 +  
    initlists();
- 
-+#ifdef CONFIG_STANDARD_AWHTTPD
-   if (argc != 2 && argc != 3) usage(argv[0]);
- 
-   webroot = strdup(argv[1]);
-+#else
-+  webroot = CONFIG_HTTP_WEBROOT;
-+#endif
- 
+-
+-  if (argc != 2 && argc != 3) usage(argv[0]);
+-
+-  webroot = strdup(argv[1]);
+-
    tp = strlen(webroot);
    if (webroot[tp-1] == '/') webroot[tp-1] = '\0';
  
@@ -720,29 +974,22 @@ diff -Naur awhttpd/main.c axTLS/httpd/awhttpd/main.c
      exit(1);
    }
  
-   defaultconfvals();
- 
-+#ifdef CONFIG_STANDARD_AWHTTPD
-   if (argc == 2) {
-     snprintf(buf, sizeof(buf), "%s/awhttpd.conf", webroot);
-     procconf(buf);
-   } else {
-     if ((tp=openlistener(atoi(argv[2]))) == -1) {
-+#ifdef CONFIG_HTTP_VERBOSE
-       fprintf(stderr, "ERR: Couldn't bind to port %d (IPv4)\n", atoi(argv[2]));
-+#endif
-       exit(1);
-     }
-+  }
-+#else   /* not command line */
+-  defaultconfvals();
+-
+-  if (argc == 2) {
+-    snprintf(buf, sizeof(buf), "%s/awhttpd.conf", webroot);
+-    procconf(buf);
+-  } else {
+-    if ((tp=openlistener(atoi(argv[2]))) == -1) {
+-      fprintf(stderr, "ERR: Couldn't bind to port %d (IPv4)\n", atoi(argv[2]));
 +  if ((tp=openlistener(CONFIG_HTTP_PORT)) == -1) {
 +#ifdef CONFIG_HTTP_VERBOSE
 +    fprintf(stderr, "ERR: Couldn't bind to port %d (IPv4)\n",
 +              CONFIG_HTTP_PORT);
 +#endif
-+      exit(1);
+       exit(1);
+-    }
 +  }
-+#endif /* CONFIG_STANDARD_AWHTTPD */
  
      addindex("index.html");
      addtoservers(tp);
@@ -750,6 +997,7 @@ diff -Naur awhttpd/main.c axTLS/httpd/awhttpd/main.c
 -    setuid(32767);
 -  }
  
+-  if (permcheck == 1) procpermcheck(webroot);
 +#ifndef WIN32
 +    if (getuid() == 0)
 +    {
@@ -773,9 +1021,7 @@ diff -Naur awhttpd/main.c axTLS/httpd/awhttpd/main.c
 +    servers->is_ssl = 1;
 +#endif /* CONFIG_HTTP_HAS_SSL */
 +
-+#if defined (CONFIG_STANDARD_AWHTTPD)
-   if (permcheck == 1) procpermcheck(webroot);
-+#elif defined(CONFIG_HTTP_PERM_CHECK) 
++#if defined(CONFIG_HTTP_PERM_CHECK) 
 +  procpermcheck(webroot);
 +#endif
 +#if defined(CONFIG_HTTP_HAS_CGI)
@@ -787,7 +1033,7 @@ diff -Naur awhttpd/main.c axTLS/httpd/awhttpd/main.c
 +  TTY_FLUSH();
 +#endif
  
-+#if defined(CONFIG_HTTP_IS_DAEMON) || defined(CONFIG_STANDARD_AWHTTPD)
++#if defined(CONFIG_HTTP_IS_DAEMON)
    pid = fork();
  
    if(pid > 0) {
@@ -808,7 +1054,7 @@ diff -Naur awhttpd/main.c axTLS/httpd/awhttpd/main.c
 -  signal(SIGQUIT, die);
 +  signal(SIGINT, sigint_cleanup);
    signal(SIGTERM, die);
-+#if defined(CONFIG_HTTP_HAS_CGI) || defined(CONFIG_STANDARD_AWHTTPD)
++#if defined(CONFIG_HTTP_HAS_CGI)
 +#ifndef WIN32
    signal(SIGCHLD, reaper);
 -
@@ -836,7 +1082,7 @@ diff -Naur awhttpd/main.c axTLS/httpd/awhttpd/main.c
    return 0;
 diff -Naur awhttpd/mime_types.c axTLS/httpd/awhttpd/mime_types.c
 --- awhttpd/mime_types.c	2004-01-26 01:08:47.000000000 +1000
-+++ axTLS/httpd/awhttpd/mime_types.c	2006-07-22 16:54:31.562500000 +1000
++++ axTLS/httpd/awhttpd/mime_types.c	2006-07-26 23:12:35.656250000 +1000
 @@ -21,13 +21,14 @@
  
  
@@ -844,7 +1090,8 @@ diff -Naur awhttpd/mime_types.c axTLS/httpd/awhttpd/mime_types.c
 +#include "os_port.h"
  
  
- char mime_default[] = "text/plain";
+-char mime_default[] = "text/plain";
++static const char mime_default[] = "text/plain";
  
  struct {
 -  char *ext;
@@ -870,7 +1117,7 @@ diff -Naur awhttpd/mime_types.c axTLS/httpd/awhttpd/mime_types.c
 +
 diff -Naur awhttpd/misc.c axTLS/httpd/awhttpd/misc.c
 --- awhttpd/misc.c	2005-01-23 12:59:09.000000000 +1000
-+++ axTLS/httpd/awhttpd/misc.c	2006-07-22 16:54:31.578125000 +1000
++++ axTLS/httpd/awhttpd/misc.c	2006-07-26 23:12:39.187500000 +1000
 @@ -7,33 +7,33 @@
  */
  
@@ -903,7 +1150,7 @@ diff -Naur awhttpd/misc.c axTLS/httpd/awhttpd/misc.c
  
  
 -void reaper() {
-+#if defined(CONFIG_HTTP_HAS_CGI) || defined(CONFIG_STANDARD_AWHTTPD)
++#if defined(CONFIG_HTTP_HAS_CGI)
 +#ifndef WIN32
 +void reaper(int sigtype) {
    wait3(NULL,WNOHANG,NULL);
@@ -917,7 +1164,7 @@ diff -Naur awhttpd/misc.c axTLS/httpd/awhttpd/misc.c
  #endif
  
  
-+#if defined(CONFIG_HTTP_HAS_CGI) || defined(CONFIG_STANDARD_AWHTTPD)
++#if defined(CONFIG_HTTP_HAS_CGI)
  int iscgi(char *fn) {
  
    struct cgiextstruct *tp;
@@ -929,23 +1176,98 @@ diff -Naur awhttpd/misc.c axTLS/httpd/awhttpd/misc.c
  
  
  
-@@ -235,6 +237,7 @@
+@@ -129,63 +131,6 @@
  
+ }
+ 
+-
+-
+-int confsplit(char *tp, char *sp[], int maxwords) {
+-
+-  int i;
+-
+-  // Skip comments
+-  i=0;
+-  while (tp[i] != '\0' && tp[i] != '#') i++;
+-  tp[i] = '\0';
+-
+-  i=0;
+-  while(1) {
+-    /* Skip leading whitespace */
+-    while(*tp == ' ') tp++;
+-
+-    if (*tp == '\0') {
+-      sp[i] = NULL;
+-      break;
+-    }
+-    if (i==maxwords-2) {
+-      sp[maxwords-2] = NULL;
+-      break;
+-    }
+-
+-    if (*tp == '"') {
+-      tp++;
+-
+-      if (*tp == '"') {
+-        tp++;
+-        continue;
+-      }
+-
+-      sp[i] = tp;
+-
+-      while(*tp != '"' && *tp != '\0') tp++;
+-      if (*tp == '"') *tp++ = '\0';
+-      i++;
+-
+-    } else {
+-      sp[i] = tp;
+-
+-      while(*tp != ' ' && *tp != '\0') tp++;
+-      if (*tp == ' ') *tp++ = '\0';
+-      i++;
+-    }
+-
+-  }
+-
+-  return i;
+-
+-}
+-
+-
+-
+-
+-
+ int sanitizefile(char *buf) {
+ 
+   int len,i;
+@@ -231,34 +176,33 @@
+ 
+ }
+ 
+-
+-
  void buildactualfile(struct connstruct *cn) {
  
-+#if 0
-   char tpbuf[MAXREQUESTLENGTH];
- 
-   if (usevirtualhosts) {
-@@ -253,6 +256,26 @@
-            webroot,
-            cn->virtualhostreq,
-            cn->filereq);
-+#endif
+-  char tpbuf[MAXREQUESTLENGTH];
+-
+-  if (usevirtualhosts) {
+-    if (*(cn->virtualhostreq) == '\0')
+-      my_strncpy(cn->virtualhostreq, "default", MAXREQUESTLENGTH);
+-
+-    snprintf(tpbuf, sizeof(tpbuf), "%s/%s", webroot, cn->virtualhostreq);
+-    if (isdir(tpbuf) == 0) {
+-      my_strncpy(cn->virtualhostreq, "default", MAXREQUESTLENGTH);
+-    }
+-  } else {
+-    *(cn->virtualhostreq) = '\0';
+-  }
+-
+-  snprintf(cn->actualfile, MAXREQUESTLENGTH, "%s/%s%s",
 +  snprintf(cn->actualfile, MAXREQUESTLENGTH, "%s%s",
-+           webroot,
-+           cn->filereq);
-+
+            webroot,
+-           cn->virtualhostreq,
+            cn->filereq);
+ 
 +  /* Add directory slash if not there */
 +  if (isdir(cn->actualfile) && 
 +          cn->actualfile[strlen(cn->actualfile)-1] != '/')
@@ -961,10 +1283,22 @@ diff -Naur awhttpd/misc.c axTLS/httpd/awhttpd/misc.c
 +      }
 +  }
 +#endif
- 
++
    return;
  
-@@ -279,7 +302,7 @@
+ }
+ 
+-
++#if defined(CONFIG_HTTP_DIRECTORIES)
+ int issockwriteable(int sd) {
+ 
+   fd_set wfds;
+@@ -275,11 +219,11 @@
+   return FD_ISSET(sd, &wfds);
+ 
+ }
+-
++#endif
  
  int isdir(char *tpbuf) {
  
@@ -973,50 +1307,51 @@ diff -Naur awhttpd/misc.c axTLS/httpd/awhttpd/misc.c
  
    if (stat(tpbuf, &st) == -1) return 0;
  
-@@ -292,6 +315,7 @@
+@@ -288,26 +232,7 @@
  
- // FIXME: Arg! This function is horrible! Rewrite it
- void status() {
-+#if defined(CONFIG_STANDARD_AWHTTPD)
- 
-   int i;
- 
-@@ -300,14 +324,16 @@
-   fprintf(stdout," [*************************************************]\n");
-   fprintf(stdout," [  DIRECTORY {%s}",webroot);
-   if(strlen(webroot)<35)
--    for(i=1;i<=35-strlen(webroot);i++) fprintf(stdout," ");
-+    for(i=1;i<=35-(int)strlen(webroot);i++) fprintf(stdout," ");
-   fprintf(stdout,"]\n");
-   fprintf(stdout," [*************************************************]\n");
- 
-+#endif
  }
  
- 
- 
-+#if defined(CONFIG_HTTP_HAS_CGI) || defined(CONFIG_STANDARD_AWHTTPD)
+-
+-
+-// FIXME: Arg! This function is horrible! Rewrite it
+-void status() {
+-
+-  int i;
+-
+-  fprintf(stdout," [*************************************************]\n");
+-  fprintf(stdout," [       Anti-Web V%-6s by Hardcore Software     ]\n",VERSION);
+-  fprintf(stdout," [*************************************************]\n");
+-  fprintf(stdout," [  DIRECTORY {%s}",webroot);
+-  if(strlen(webroot)<35)
+-    for(i=1;i<=35-strlen(webroot);i++) fprintf(stdout," ");
+-  fprintf(stdout,"]\n");
+-  fprintf(stdout," [*************************************************]\n");
+-
+-}
+-
+-
+-
++#if defined(CONFIG_HTTP_HAS_CGI)
  /* This function was originally written by Nicolas Benoit
     but I've rewritten some parts of it to work under
     as many possible AW configurations as possible.
-@@ -329,7 +355,8 @@
+@@ -329,7 +254,7 @@
    while (fr_rs[i] != NULL) {
      snprintf(tpfile, sizeof(tpfile), "%s/%s%s", webroot, cn->virtualhostreq, fr_str);
  
 -    if (iscgi(tpfile) && access(tpfile, X_OK) == 0 && isdir(tpfile) == 0) {
-+    //if (iscgi(tpfile) && access(tpfile, X_OK) == 0 && isdir(tpfile) == 0) {
 +    if (iscgi(tpfile) && isdir(tpfile) == 0) {
        /* We've found our CGI file! */
        my_strncpy(cn->actualfile, tpfile, MAXREQUESTLENGTH);
        my_strncpy(cn->cgiscriptinfo, fr_str, MAXREQUESTLENGTH);
-@@ -349,3 +376,4 @@
+@@ -349,3 +274,4 @@
    *(cn->cgipathinfo) = '\0';
    return -1;
  }
 +#endif
 diff -Naur awhttpd/net.c axTLS/httpd/awhttpd/net.c
 --- awhttpd/net.c	2005-06-04 14:09:52.000000000 +1000
-+++ axTLS/httpd/awhttpd/net.c	2006-07-22 16:54:31.578125000 +1000
++++ axTLS/httpd/awhttpd/net.c	2006-07-26 23:03:46.609375000 +1000
 @@ -8,9 +8,7 @@
  
  
@@ -1027,54 +1362,39 @@ diff -Naur awhttpd/net.c axTLS/httpd/awhttpd/net.c
  #include <time.h>
  #include <string.h>
  #include <stdlib.h>
-@@ -23,9 +21,11 @@
+@@ -23,17 +21,10 @@
  void addtoservers(int sd) {
    struct serverstruct *tp;
  
 -  tp = (struct serverstruct *) malloc(sizeof(struct serverstruct));
+-  if (tp == NULL) {
+-    fprintf(stderr, "Serious memory error...\n");
+-    exit(1);
+-  }
+-
 +  tp = (struct serverstruct *) calloc(1, sizeof(struct serverstruct));
-   if (tp == NULL) {
-+#ifdef CONFIG_HTTP_VERBOSE
-     fprintf(stderr, "Serious memory error...\n");
-+#endif
-     exit(1);
-   }
+   tp->next = servers;
+   tp->sd = sd;
+-
+   servers = tp;
+-
+   return;
+ }
  
-@@ -44,7 +44,9 @@
-   struct connstruct *tp, *to;
-   struct serverstruct *sp;
-   int rnum, wnum, active;
-+#if defined(CONFIG_STANDARD_AWHTTPD) || defined(CONFIG_HTTP_USE_TIMEOUT)
-   int currtime;
-+#endif
- 
-   while(1) {   // MAIN SELECT LOOP
-     FD_ZERO(&rfds);
-@@ -61,15 +63,19 @@
- 
-     // Add the established sockets
-     tp = usedconns;
-+#if defined(CONFIG_STANDARD_AWHTTPD) || defined(CONFIG_HTTP_USE_TIMEOUT)
+@@ -64,7 +55,7 @@
      currtime = time(NULL);
-+#endif
      while(tp != NULL) {
  
-+#if defined(CONFIG_STANDARD_AWHTTPD) || defined(CONFIG_HTTP_USE_TIMEOUT)
-       if (istimedout(tp, currtime)) {
+-      if (istimedout(tp, currtime)) {
++      if (currtime > tp->timeout) {
          to = tp;
          tp = tp->next;
          removeconnection(to);
-         continue;
-       }
-+#endif
- 
-       if (tp->state == STATE_WANT_TO_READ_HEAD) {
-         FD_SET(tp->networkdesc, &rfds);
-@@ -87,10 +93,12 @@
+@@ -87,14 +78,15 @@
          FD_SET(tp->networkdesc, &wfds);
          if (tp->networkdesc > wnum) wnum = tp->networkdesc;
        }
-+#if defined(CONFIG_HTTP_DIRECTORIES) || defined(CONFIG_STANDARD_AWHTTPD)
++#if defined(CONFIG_HTTP_DIRECTORIES)
        if (tp->state == STATE_DOING_DIR) {
          FD_SET(tp->networkdesc, &wfds);
          if (tp->networkdesc > wnum) wnum = tp->networkdesc;
@@ -1083,7 +1403,11 @@ diff -Naur awhttpd/net.c axTLS/httpd/awhttpd/net.c
        tp = tp->next;
      }
  
-@@ -104,7 +112,7 @@
+-    //active = select(4, &rfds, &wfds, NULL, NULL);
+     active = select(wnum > rnum ? wnum+1 : rnum+1,
+                     rnum != -1 ? &rfds : NULL,
+                     wnum != -1 ? &wfds : NULL,
+@@ -104,7 +96,7 @@
      sp = servers;
      while(active > 0 && sp != NULL) {
        if (FD_ISSET(sp->sd, &rfds)) {
@@ -1092,24 +1416,43 @@ diff -Naur awhttpd/net.c axTLS/httpd/awhttpd/net.c
          active--;
        }
        sp = sp->next;
-@@ -112,7 +120,9 @@
+@@ -112,41 +104,37 @@
  
      // Handle the established sockets
      tp = usedconns;
-+#if defined(CONFIG_STANDARD_AWHTTPD) || defined(CONFIG_HTTP_USE_TIMEOUT)
-     currtime = time(NULL);
-+#endif
+-    currtime = time(NULL);
      while(active > 0 && tp != NULL) {
        to = tp;
        tp = tp->next;
-@@ -141,12 +151,14 @@
+ 
+       if (to->state == STATE_WANT_TO_READ_HEAD)
+         if (FD_ISSET(to->networkdesc, &rfds)) {
+-          updatetimeout(to, currtime);
+           active--;
+           procreadhead(to);
+         } 
+       if (to->state == STATE_WANT_TO_SEND_HEAD)
+         if (FD_ISSET(to->networkdesc, &wfds)) {
+-          updatetimeout(to, currtime);
+           active--;
+           procsendhead(to);
+         } 
+       if (to->state == STATE_WANT_TO_READ_FILE)
+         if (FD_ISSET(to->filedesc, &rfds)) {
+-          updatetimeout(to, currtime);
+           active--;
+           procreadfile(to);
+         } 
+       if (to->state == STATE_WANT_TO_SEND_FILE)
+         if (FD_ISSET(to->networkdesc, &wfds)) {
+-          updatetimeout(to, currtime);
            active--;
            procsendfile(to);
          }
-+#if defined(CONFIG_HTTP_DIRECTORIES) || defined(CONFIG_STANDARD_AWHTTPD)
++#if defined(CONFIG_HTTP_DIRECTORIES)
        if (to->state == STATE_DOING_DIR)
          if (FD_ISSET(to->networkdesc, &wfds)) {
-           updatetimeout(to, currtime);
+-          updatetimeout(to, currtime);
            active--;
            procdodir(to);
          }
@@ -1119,7 +1462,7 @@ diff -Naur awhttpd/net.c axTLS/httpd/awhttpd/net.c
  
 diff -Naur awhttpd/permcheck.c axTLS/httpd/awhttpd/permcheck.c
 --- awhttpd/permcheck.c	2005-01-23 06:49:29.000000000 +1000
-+++ axTLS/httpd/awhttpd/permcheck.c	2006-07-22 16:54:31.578125000 +1000
++++ axTLS/httpd/awhttpd/permcheck.c	2006-07-26 18:46:48.233750000 +1000
 @@ -7,21 +7,23 @@
  */
  
@@ -1131,7 +1474,7 @@ diff -Naur awhttpd/permcheck.c axTLS/httpd/awhttpd/permcheck.c
  
  #include "aw3.h"
  
-+#if defined(CONFIG_HTTP_PERM_CHECK) || defined (CONFIG_STANDARD_AWHTTPD)
++#if defined(CONFIG_HTTP_PERM_CHECK)
  void procpermcheck(char *pathtocheck) {
 -
 +  char thepath[MAXREQUESTLENGTH];
@@ -1210,7 +1553,7 @@ diff -Naur awhttpd/permcheck.c axTLS/httpd/awhttpd/permcheck.c
 +#endif  /* CONFIG_HTTP_PERM_CHECK */
 diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
 --- awhttpd/proc.c	2005-01-23 10:59:41.000000000 +1000
-+++ axTLS/httpd/awhttpd/proc.c	2006-07-23 10:32:07.593750000 +1000
++++ axTLS/httpd/awhttpd/proc.c	2006-07-30 22:35:33.453125000 +1000
 @@ -13,14 +13,12 @@
  #include <sys/types.h>
  #include <sys/stat.h>
@@ -1231,16 +1574,30 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
  
      my_strncpy(cn->filereq, segs[0], MAXREQUESTLENGTH);
  
-+#if defined(CONFIG_HTTP_HAS_CGI) || defined(CONFIG_STANDARD_AWHTTPD)
++#if defined(CONFIG_HTTP_HAS_CGI)
      if (segs[1] != NULL) my_strncpy(cn->cgiargs, segs[1], MAXREQUESTLENGTH);
 +#endif
  
    } else if (strcmp(words[0], "Host:")==0) {
  
-@@ -80,24 +80,32 @@
-     if (isdigit(*words[1]) == 0) return 1;
+@@ -66,38 +66,32 @@
+     }
  
-     cn->offset = atoi(words[1]);
+     my_strncpy(cn->virtualhostreq, words[1], MAXREQUESTLENGTH);
+-  } else if (strcmp(words[0], "Range:")==0) {
+-
+-    cn->offset = -1;
+-
+-    if (strchr(words[1], '-') == NULL) return 1;
+-
+-    if (strchr(words[1], '=') != NULL) {
+-      while(*words[1] != '=') words[1]++;
+-      words[1]++;
+-    }
+-
+-    if (isdigit(*words[1]) == 0) return 1;
+-
+-    cn->offset = atoi(words[1]);
 -
 +  } else if (strcmp(words[0], "Connection:")==0 &&
 +                strcmp(words[1], "close")==0) {
@@ -1257,7 +1614,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
  
 +}
  
-+#if defined(CONFIG_HTTP_DIRECTORIES) || defined(CONFIG_STANDARD_AWHTTPD)
++#if defined(CONFIG_HTTP_DIRECTORIES)
  void procdirlisting(struct connstruct *cn) {
  
    char buf[MAXREQUESTLENGTH];
@@ -1273,7 +1630,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
  
    if (cn->reqtype == TYPE_HEAD) {
      snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nContent-Type: text/html\n\n");
-@@ -107,7 +115,17 @@
+@@ -107,7 +101,17 @@
      return;
    }
  
@@ -1292,7 +1649,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
    if (cn->dirp == NULL) {
      send404(cn);
      removeconnection(cn);
-@@ -116,12 +134,13 @@
+@@ -116,12 +120,13 @@
  
    // Get rid of the "."
    readdir(cn->dirp);
@@ -1308,7 +1665,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
  
    cn->state = STATE_DOING_DIR;
  
-@@ -134,36 +153,48 @@
+@@ -134,36 +139,48 @@
  
  void procdodir(struct connstruct *cn) {
  
@@ -1366,7 +1723,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
  
  
  
-@@ -172,9 +203,10 @@
+@@ -172,9 +189,10 @@
    char buf[MAXREQUESTLENGTH*4], *tp, *next;
    int rv;
  
@@ -1380,15 +1737,13 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
      return;
    }
  
-@@ -217,36 +249,100 @@
+@@ -217,36 +235,85 @@
  void procsendhead(struct connstruct *cn) {
  
    char buf[1024];
 +  char actualfile[1024];
    struct stat stbuf;
--
--  if (stat(cn->actualfile, &stbuf) == -1) {
-+  time_t now = time(NULL);
++  time_t now = cn->timeout - CONFIG_HTTP_TIMEOUT;
 +  char date[32];
 +  strcpy(date, ctime(&now));
 +
@@ -1399,19 +1754,16 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
 +  if (actualfile[strlen(actualfile)-1] == '\\')
 +    actualfile[strlen(actualfile)-1] = 0;
 +#endif
-+
+ 
+-  if (stat(cn->actualfile, &stbuf) == -1) {
+-    if (allowcgi != 0) {
 +  if (stat(actualfile, &stbuf) == -1) {
-+#if defined(CONFIG_HTTP_HAS_CGI) || defined(CONFIG_STANDARD_AWHTTPD)
-+#ifndef CONFIG_HTTP_HAS_CGI
-     if (allowcgi != 0) {
-+#endif
++#if defined(CONFIG_HTTP_HAS_CGI)
        if (trycgi_withpathinfo(cn) == 0) { // We Try To Find A CGI
          proccgi(cn,1);
          return;
        }
-+#ifndef CONFIG_HTTP_HAS_CGI
-     }
-+#endif
+-    }
 +#endif
  
      send404(cn);
@@ -1419,18 +1771,14 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
      return;
    }
  
-+#if defined(CONFIG_HTTP_HAS_CGI) || defined(CONFIG_STANDARD_AWHTTPD)
++#if defined(CONFIG_HTTP_HAS_CGI)
    if (iscgi(cn->actualfile)) {
 +#ifndef WIN32
      // Set up CGI script
 -    if (allowcgi == 0 ||
 -        access(cn->actualfile, X_OK) != 0 ||
 -        isdir(cn->actualfile)) {
-+    if (
-+#ifndef CONFIG_HTTP_HAS_CGI
-+        allowcgi == 0 ||
-+#endif
-+                (stbuf.st_mode & S_IEXEC) == 0 || isdir(cn->actualfile)) {
++    if ((stbuf.st_mode & S_IEXEC) == 0 || isdir(cn->actualfile)) {
 +          send404(cn);
 +          removeconnection(cn);
 +          return;
@@ -1451,7 +1799,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
 +
 +    // Check to see if this dir has an index file
 +    if (procindex(cn, &stbuf) == 0) {
-+#if defined(CONFIG_HTTP_DIRECTORIES) || defined(CONFIG_STANDARD_AWHTTPD)
++#if defined(CONFIG_HTTP_DIRECTORIES)
 +      // If not, we do a directory listing of it
 +      procdirlisting(cn);
 +#else
@@ -1464,16 +1812,11 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
 -    proccgi(cn,0);
 -    return;
 -  }
-+#if defined(CONFIG_HTTP_HAS_CGI) || defined(CONFIG_STANDARD_AWHTTPD)
++#if defined(CONFIG_HTTP_HAS_CGI)
 +    // If the index is a CGI file, handle it like any other CGI
 +    if (iscgi(cn->actualfile)) {
 +      // Set up CGI script
-+#ifndef CONFIG_HTTP_HAS_CGI
-+      if (allowcgi == 0 ||
-+          (stbuf.st_mode & S_IEXEC) == 0 != 0 || isdir(cn->actualfile)) {
-+#else
 +      if ((stbuf.st_mode & S_IEXEC) == 0 || isdir(cn->actualfile)) {
-+#endif
 +        send404(cn);
 +        removeconnection(cn);
 +        return;
@@ -1489,34 +1832,29 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
    if ((stbuf.st_mode & S_IFMT) == S_IFDIR) {
      if (cn->filereq[strlen(cn->filereq)-1] != '/') {
        send301(cn);
-@@ -256,16 +352,24 @@
+@@ -256,17 +323,18 @@
  
      // Check to see if this dir has an index file
      if (procindex(cn, &stbuf) == 0) {
-+#if defined(CONFIG_HTTP_DIRECTORIES) || defined(CONFIG_STANDARD_AWHTTPD)
++#if defined(CONFIG_HTTP_DIRECTORIES)
        // If not, we do a directory listing of it
        procdirlisting(cn);
 +#endif
        return;
      }
  
-+#if defined(CONFIG_HTTP_HAS_CGI) || defined(CONFIG_STANDARD_AWHTTPD)
++#if defined(CONFIG_HTTP_HAS_CGI)
      // If the index is a CGI file, handle it like any other CGI
      if (iscgi(cn->actualfile)) {
        // Set up CGI script
 -      if (allowcgi == 0 ||
 -          access(cn->actualfile, X_OK) != 0 ||
-+      if (
-+#ifdef CONFIG_HTTP_HAS_CGI
-+          (stbuf.st_mode & S_IEXEC) == 0 ||
-+#else
-+          allowcgi == 0 ||
-+          (stbuf.st_mode & S_IEXEC) == 0 ||
-+#endif
-           isdir(cn->actualfile)) {
+-          isdir(cn->actualfile)) {
++      if ((stbuf.st_mode & S_IEXEC) == 0 || isdir(cn->actualfile)) {
          send404(cn);
          removeconnection(cn);
-@@ -275,39 +379,57 @@
+         return;
+@@ -275,50 +343,68 @@
        proccgi(cn,0);
        return;
      }
@@ -1526,6 +1864,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
    }
  
 -  if (cn->offset == -1 || cn->offset >= stbuf.st_size) {
+-    cn->offset = -1;
 +  if (cn->modified_since) {
 +    snprintf(buf, sizeof(buf), "HTTP/1.1 304 Not Modified\nServer: Anti-Web V%s\nDate: %s\n", VERSION, date);
 +    special_write(cn, buf, strlen(buf));
@@ -1533,14 +1872,12 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
 +    cn->state = STATE_WANT_TO_READ_HEAD;
 +    return;
 +  }
-+  else if (cn->offset == -1 || cn->offset >= stbuf.st_size) {
++  else {
 +#ifdef CONFIG_HTTP_VERBOSE
 +    printf("awhttpd: %s send %s\n", 
 +            cn->is_ssl ? "https" : "http", cn->actualfile);
 +    TTY_FLUSH();
 +#endif
-+
-     cn->offset = -1;
  
 -    snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nServer: Anti-Web V%s (%s)\nContent-Type: %s\nContent-Length: %ld\nLast-Modified: %s\n",
 +    snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nServer: Anti-Web V%s\nContent-Type: %s\nContent-Length: %ld\nDate: %sLast-Modified: %s\n",
@@ -1548,18 +1885,16 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
 -               quote,
                 getmimetype(cn->actualfile),
                 (long) stbuf.st_size,
-+               date,
-                ctime(&(stbuf.st_mtime))); // ctime() has a \n on the end
-   } else {
+-               ctime(&(stbuf.st_mtime))); // ctime() has a \n on the end
+-  } else {
 -    snprintf(buf, sizeof(buf), "HTTP/1.1 206 OK\nServer: Anti-Web V%s (%s)\nContent-Type: %s\nContent-Range: %ld-%ld/%ld\nContent-Length: %ld\nLast-Modified: %s\n",
-+    snprintf(buf, sizeof(buf), "HTTP/1.1 206 OK\nServer: Anti-Web V%s\nContent-Type: %s\nContent-Range: %ld-%ld/%ld\nContent-Length: %ld\nDate: %sLast-Modified: %s\n",
-                VERSION,
+-               VERSION,
 -               quote,
-                getmimetype(cn->actualfile),
-                cn->offset,
-                (long) stbuf.st_size-1,
-                (long) stbuf.st_size,
-                (long) stbuf.st_size - cn->offset,
+-               getmimetype(cn->actualfile),
+-               cn->offset,
+-               (long) stbuf.st_size-1,
+-               (long) stbuf.st_size,
+-               (long) stbuf.st_size - cn->offset,
 +               date,
                 ctime(&(stbuf.st_mtime))); // ctime() has a \n on the end
    }
@@ -1581,10 +1916,11 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
      if (cn->filedesc == -1) {
        send404(cn);
        removeconnection(cn);
-@@ -318,7 +440,23 @@
-       lseek(cn->filedesc, cn->offset, SEEK_SET);
+       return;
      }
  
+-    if (cn->offset != -1) {
+-      lseek(cn->filedesc, cn->offset, SEEK_SET);
 +#ifdef WIN32
 +    for (;;)
 +    {
@@ -1598,14 +1934,15 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
 +        {
 +            procsendfile(cn);
 +        } while (cn->state != STATE_WANT_TO_READ_FILE);
-+    }
+     }
+-
 +#else
      cn->state = STATE_WANT_TO_READ_FILE;
 +#endif
      return;
    }
  
-@@ -328,13 +466,19 @@
+@@ -328,13 +414,18 @@
  
  void procreadfile(struct connstruct *cn) {
  
@@ -1624,27 +1961,26 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
 +      else {                        /* keep socket open - HTTP 1.1 */
 +          cn->state = STATE_WANT_TO_READ_HEAD;
 +          cn->numbytes = 0;
-+          cn->offset = -1;
 +      }
 +      return;
    }
  
    cn->numbytes = rv;
-@@ -347,11 +491,9 @@
+@@ -347,11 +438,9 @@
  
  void procsendfile(struct connstruct *cn) {
  
 -  int rv;
--
--  rv = write(cn->networkdesc, cn->databuf, cn->numbytes);
 +  int rv = special_write(cn, cn->databuf, cn->numbytes);
  
+-  rv = write(cn->networkdesc, cn->databuf, cn->numbytes);
+-
 -  if (rv == -1)
 +  if (rv < 0)
      removeconnection(cn);
    else if (rv == cn->numbytes)
      cn->state = STATE_WANT_TO_READ_FILE;
-@@ -361,7 +503,47 @@
+@@ -361,7 +450,47 @@
      memmove(cn->databuf, cn->databuf + rv, cn->numbytes - rv);
      cn->numbytes -= rv;
    }
@@ -1695,8 +2031,8 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
  }
 diff -Naur awhttpd/socket.c axTLS/httpd/awhttpd/socket.c
 --- awhttpd/socket.c	2004-04-25 13:03:05.000000000 +1000
-+++ axTLS/httpd/awhttpd/socket.c	2006-07-22 16:54:31.578125000 +1000
-@@ -8,19 +8,11 @@
++++ axTLS/httpd/awhttpd/socket.c	2006-07-26 21:52:07.750000000 +1000
+@@ -8,61 +8,17 @@
  
  
  #include <stdio.h>
@@ -1707,7 +2043,7 @@ diff -Naur awhttpd/socket.c axTLS/httpd/awhttpd/socket.c
 -#include <sys/socket.h>
 -#include <sys/wait.h>
 -#include <arpa/inet.h>
- #include <time.h>
+-#include <time.h>
 -#include <unistd.h>
  #include <string.h>
  
@@ -1716,8 +2052,42 @@ diff -Naur awhttpd/socket.c axTLS/httpd/awhttpd/socket.c
  #include "aw3.h"
  
  
-@@ -62,7 +54,7 @@
  
+-int checkmaxusers(int sd) {
+-
+-  if (maxusers <= 0) return 1;
+-
+-  if (numusers >= maxusers) {
+-    send505(sd, "Maximum user limit reached");
+-    // removeconnection() should be used normally
+-    close(sd);
+-
+-    return 0;
+-  }
+-
+-  return 1;
+-}
+-
+-
+-int pollsocket(int sd, long ustimeout) {
+-
+-  fd_set rfds;
+-  struct timeval tv;
+-
+-  tv.tv_sec = 0;
+-  tv.tv_usec = ustimeout;
+-
+-  FD_ZERO(&rfds);
+-  FD_SET(sd, &rfds);
+-
+-  select(FD_SETSIZE, &rfds, NULL, NULL, (ustimeout >= 0) ? &tv : NULL);
+-
+-  return FD_ISSET(sd, &rfds);
+-
+-}
+-
+-
+-
  #ifdef HAVE_IPV6
  
 -void handlenewconnection(int listenfd) {
@@ -1725,16 +2095,16 @@ diff -Naur awhttpd/socket.c axTLS/httpd/awhttpd/socket.c
  
    struct sockaddr_in6 their_addr;
    int tp = sizeof(their_addr);
-@@ -82,7 +74,7 @@
+@@ -82,7 +38,7 @@
      *ipbuf = '\0';
    }
  
 -  if (checkmaxusers(connfd)) addconnection(connfd, ipbuf);
-+  if (checkmaxusers(connfd)) addconnection(connfd, ipbuf, is_ssl);
++  addconnection(connfd, ipbuf, is_ssl);
  
    return;
  
-@@ -90,19 +82,18 @@
+@@ -90,19 +46,17 @@
  
  #else
  
@@ -1750,13 +2120,13 @@ diff -Naur awhttpd/socket.c axTLS/httpd/awhttpd/socket.c
  
    if (connfd == -1) return;
  
-   if (checkmaxusers(connfd))
+-  if (checkmaxusers(connfd))
 -    addconnection(connfd, inet_ntoa(their_addr.sin_addr));
 +    addconnection(connfd, inet_ntoa(their_addr.sin_addr), is_ssl);
  
    return;
  }
-@@ -113,8 +104,12 @@
+@@ -113,8 +67,12 @@
  
  
  int openlistener(int port) {
@@ -1771,7 +2141,7 @@ diff -Naur awhttpd/socket.c axTLS/httpd/awhttpd/socket.c
    struct sockaddr_in my_addr;
  
    if ((sd = socket(AF_INET, SOCK_STREAM, 0)) == -1) return -1;
-@@ -125,7 +120,7 @@
+@@ -125,7 +83,7 @@
    setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &tp, sizeof(tp));
   
    my_addr.sin_family = AF_INET;         // host byte order
@@ -1782,7 +2152,7 @@ diff -Naur awhttpd/socket.c axTLS/httpd/awhttpd/socket.c
    memset(&(my_addr.sin_zero), 0, 8);    // zero the rest of the struct
 diff -Naur awhttpd/urlencode.c axTLS/httpd/awhttpd/urlencode.c
 --- awhttpd/urlencode.c	2004-05-14 10:53:47.000000000 +1000
-+++ axTLS/httpd/awhttpd/urlencode.c	2006-07-22 16:54:31.593750000 +1000
++++ axTLS/httpd/awhttpd/urlencode.c	2006-07-26 18:46:48.233750000 +1000
 @@ -13,7 +13,7 @@
  
  #include <ctype.h>
