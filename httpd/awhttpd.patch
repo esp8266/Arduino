@@ -1,6 +1,6 @@
 diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
 --- awhttpd/aw3.h	2005-01-23 13:17:14.000000000 +1000
-+++ axTLS/httpd/awhttpd/aw3.h	2006-07-26 23:09:27.343750000 +1000
++++ axTLS/httpd/awhttpd/aw3.h	2006-08-10 18:33:47.609375000 +1000
 @@ -7,17 +7,16 @@
  */
  
@@ -117,7 +117,7 @@ diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
  void removeconnection(struct connstruct *cn);
  
  
-@@ -129,30 +127,29 @@
+@@ -129,49 +127,47 @@
  void procsendhead(struct connstruct *cn);
  void procreadfile(struct connstruct *cn);
  void procsendfile(struct connstruct *cn);
@@ -154,11 +154,12 @@ diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
  void stripcrlf(char *p);
  char *my_strncpy(char *dest, const char *src, size_t n);
  #ifndef __HAVE_ARCH_STRNLEN
-@@ -160,18 +157,16 @@
+ size_t strnlen ( const char * str, size_t maxlen );
  #endif
  int iscgi(char *fn);
- int split(char *tp, char *sp[], int maxwords, char sc);
+-int split(char *tp, char *sp[], int maxwords, char sc);
 -int confsplit(char *tp, char *sp[], int maxwords);
++void split(char *tp, char *sp[], int maxwords, char sc);
  int sanitizefile(char *buf);
  int sanitizehost(char *buf);
  void buildactualfile(struct connstruct *cn);
@@ -170,11 +171,12 @@ diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
  
  // mime_types.c prototypes
 -char *getmimetype(char *fn);
-+const char *getmimetype(char *fn);
++void mime_init(void);
++const char *getmimetype(const char *fn);
  
  
  // urldecode.c prototypes
-@@ -188,7 +183,6 @@
+@@ -188,7 +184,6 @@
  
  
  // conf.c prototypes
@@ -182,7 +184,7 @@ diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
  void procconf(char *filename);
  
  
-@@ -202,4 +196,4 @@
+@@ -202,4 +197,4 @@
  
  
  // main.c prototypes
@@ -190,7 +192,7 @@ diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
 +void initlists(void);
 diff -Naur awhttpd/cgi.c axTLS/httpd/awhttpd/cgi.c
 --- awhttpd/cgi.c	2005-06-04 14:09:52.000000000 +1000
-+++ axTLS/httpd/awhttpd/cgi.c	2006-07-26 23:05:56.890625000 +1000
++++ axTLS/httpd/awhttpd/cgi.c	2006-08-10 18:33:47.625000000 +1000
 @@ -7,93 +7,46 @@
  */
  
@@ -652,7 +654,7 @@ diff -Naur awhttpd/conf.c axTLS/httpd/awhttpd/conf.c
 -}
 diff -Naur awhttpd/conn.c axTLS/httpd/awhttpd/conn.c
 --- awhttpd/conn.c	2004-12-07 16:11:02.000000000 +1000
-+++ axTLS/httpd/awhttpd/conn.c	2006-07-30 22:35:55.109375000 +1000
++++ axTLS/httpd/awhttpd/conn.c	2006-08-10 18:33:47.625000000 +1000
 @@ -9,26 +9,16 @@
  
  #include <stdio.h>
@@ -759,7 +761,7 @@ diff -Naur awhttpd/conn.c axTLS/httpd/awhttpd/conn.c
  }
 diff -Naur awhttpd/errors.c axTLS/httpd/awhttpd/errors.c
 --- awhttpd/errors.c	2005-01-23 06:49:29.000000000 +1000
-+++ axTLS/httpd/awhttpd/errors.c	2006-07-26 21:44:20.734375000 +1000
++++ axTLS/httpd/awhttpd/errors.c	2006-08-10 18:33:47.625000000 +1000
 @@ -8,7 +8,6 @@
  
  
@@ -802,7 +804,7 @@ diff -Naur awhttpd/errors.c axTLS/httpd/awhttpd/errors.c
  
 diff -Naur awhttpd/index.c axTLS/httpd/awhttpd/index.c
 --- awhttpd/index.c	2005-06-04 14:09:52.000000000 +1000
-+++ axTLS/httpd/awhttpd/index.c	2006-07-26 22:18:07.609375000 +1000
++++ axTLS/httpd/awhttpd/index.c	2006-08-10 18:33:47.625000000 +1000
 @@ -11,7 +11,6 @@
  #include <string.h>
  #include <sys/types.h>
@@ -849,7 +851,7 @@ diff -Naur awhttpd/index.c axTLS/httpd/awhttpd/index.c
        my_strncpy(cn->actualfile, tbuf, MAXREQUESTLENGTH);
 diff -Naur awhttpd/main.c axTLS/httpd/awhttpd/main.c
 --- awhttpd/main.c	2005-06-04 14:09:52.000000000 +1000
-+++ axTLS/httpd/awhttpd/main.c	2006-07-26 22:17:40.968750000 +1000
++++ axTLS/httpd/awhttpd/main.c	2006-08-11 06:46:48.437500000 +1000
 @@ -11,7 +11,6 @@
  #include <string.h>
  #include <sys/types.h>
@@ -901,7 +903,7 @@ diff -Naur awhttpd/main.c axTLS/httpd/awhttpd/main.c
  
  void initlists() {
    int i;
-@@ -33,108 +64,118 @@
+@@ -33,108 +64,119 @@
    servers = NULL;
    usedconns = NULL;
    freeconns = NULL;
@@ -958,6 +960,7 @@ diff -Naur awhttpd/main.c axTLS/httpd/awhttpd/main.c
 +  WSAStartup(wVersionRequested,&wsaData);
 +#endif
 +  
++  mime_init();
    initlists();
 -
 -  if (argc != 2 && argc != 3) usage(argv[0]);
@@ -1017,7 +1020,7 @@ diff -Naur awhttpd/main.c axTLS/httpd/awhttpd/main.c
 +
 +    addtoservers(tp);
 +    servers->ssl_ctx = ssl_ctx_new(CONFIG_HTTP_DEFAULT_SSL_OPTIONS, 
-+            SSL_DEFAULT_SVR_SESS);
++            CONFIG_HTTP_SESSION_CACHE_SIZE);
 +    servers->is_ssl = 1;
 +#endif /* CONFIG_HTTP_HAS_SSL */
 +
@@ -1082,42 +1085,92 @@ diff -Naur awhttpd/main.c axTLS/httpd/awhttpd/main.c
    return 0;
 diff -Naur awhttpd/mime_types.c axTLS/httpd/awhttpd/mime_types.c
 --- awhttpd/mime_types.c	2004-01-26 01:08:47.000000000 +1000
-+++ axTLS/httpd/awhttpd/mime_types.c	2006-07-26 23:12:35.656250000 +1000
-@@ -21,13 +21,14 @@
++++ axTLS/httpd/awhttpd/mime_types.c	2006-08-10 18:33:47.625000000 +1000
+@@ -7,28 +7,21 @@
+ */
  
  
+-/*Code from mini_httpd - small HTTP server
+-**
+-** Copyright C 1999,2000 by Jef Poskanzer <jef@acme.com>.
+-*/
+-
+-/* mini_httpd code adapted for Anti-Web by zas@norz.org */
+-/* A couple TINY changes by Fractal */
+-
+-// Reformatted for aw3 -fractal
+-
+-// FIXME: Ideally this code would use a binary search or a hash table...
+-
+-
  #include <string.h>
++#include <stdlib.h>
++#include <stdio.h>
++#include <ctype.h>
 +#include "os_port.h"
  
  
 -char mime_default[] = "text/plain";
 +static const char mime_default[] = "text/plain";
  
- struct {
+-struct {
 -  char *ext;
 -  char *type;
-+  const char *ext;
-+  const char *type;
- } mime_table[] = {
+-} mime_table[] = {
++typedef struct {
++  const char * const ext;
++  const char * const type;
++} mime_table_t;
++
++static mime_table_t mime_table[] = {
  
  // Fundamentals
-@@ -161,7 +162,7 @@
+ { ".html", "text/html" },
+@@ -160,21 +153,29 @@
+ 
  };
  
++static int mime_cmp(const mime_table_t *t1, const mime_table_t *t2)
++{
++    return strcasecmp(t1->ext, t2->ext);
++}
  
 -char *getmimetype(char *name) {
-+const char *getmimetype(char *name) {
-   int namelen, extlen, i;
+-  int namelen, extlen, i;
+-
+-  namelen = strlen(name);
+-
+-  for (i=0; i<sizeof(mime_table)/sizeof(*mime_table); i++) {
+-    extlen = strlen(mime_table[i].ext);
++void mime_init(void)
++{
++    qsort(mime_table, sizeof(mime_table)/sizeof(mime_table_t),
++            sizeof(mime_table_t), 
++            (int (*)(const void *, const void *))mime_cmp);
++}
  
-   namelen = strlen(name);
-@@ -178,3 +179,4 @@
-   return mime_default;
+-    if (extlen >= namelen) continue;
++const char *getmimetype(const char *name) {
++    mime_table_t *mime_type;
  
+-    if (strcasecmp(name+(namelen-extlen), mime_table[i].ext) == 0)
+-      return mime_table[i].type;
+-  }
++    if ((name = strrchr(name, '.')) == NULL)
++        return mime_default;
+ 
+-  return mime_default;
++    mime_type = bsearch(&name, mime_table, 
++            sizeof(mime_table)/sizeof(mime_table_t),
++            sizeof(mime_table_t), 
++                (int (*)(const void *, const void *))mime_cmp);
+ 
++  return mime_type == NULL ? mime_default : mime_type->type;
  }
 +
 diff -Naur awhttpd/misc.c axTLS/httpd/awhttpd/misc.c
 --- awhttpd/misc.c	2005-01-23 12:59:09.000000000 +1000
-+++ axTLS/httpd/awhttpd/misc.c	2006-07-26 23:12:39.187500000 +1000
++++ axTLS/httpd/awhttpd/misc.c	2006-08-10 18:33:47.625000000 +1000
 @@ -7,33 +7,33 @@
  */
  
@@ -1160,26 +1213,63 @@ diff -Naur awhttpd/misc.c axTLS/httpd/awhttpd/misc.c
  
  
  void stripcrlf(char *p) {
-@@ -77,6 +77,7 @@
+@@ -76,116 +76,6 @@
+ }
  #endif
  
- 
-+#if defined(CONFIG_HTTP_HAS_CGI)
- int iscgi(char *fn) {
- 
-   struct cgiextstruct *tp;
-@@ -97,6 +98,7 @@
-   return 0;
- 
- }
-+#endif
- 
- 
- 
-@@ -129,63 +131,6 @@
- 
- }
- 
+-
+-int iscgi(char *fn) {
+-
+-  struct cgiextstruct *tp;
+-  int fnlen, extlen;
+-
+-  fnlen = strlen(fn);
+-  tp = cgiexts;
+-
+-  while (tp != NULL) {
+-    extlen = strlen(tp->ext);
+-
+-    if (strcasecmp(fn+(fnlen-extlen), tp->ext) == 0)
+-      return 1;
+-
+-    tp = tp->next;
+-  }
+-
+-  return 0;
+-
+-}
+-
+-
+-
+-int split(char *tp, char *sp[], int maxwords, char sc) {
+-
+-  int i=0;
+-
+-  while(1) {
+-    /* Skip leading whitespace */
+-    while(*tp == sc) tp++;
+-
+-    if (*tp == '\0') {
+-      sp[i] = NULL;
+-      break;
+-    }
+-    if (i==maxwords-2) {
+-      sp[maxwords-2] = NULL;
+-      break;
+-    }
+-
+-    sp[i] = tp;
+-
+-    while(*tp != sc && *tp != '\0') tp++;
+-    if (*tp == sc) *tp++ = '\0';
+-    i++;
+-
+-  }
+-
+-  return i;
+-
+-}
+-
 -
 -
 -int confsplit(char *tp, char *sp[], int maxwords) {
@@ -1240,7 +1330,17 @@ diff -Naur awhttpd/misc.c axTLS/httpd/awhttpd/misc.c
  int sanitizefile(char *buf) {
  
    int len,i;
-@@ -231,34 +176,33 @@
+@@ -198,9 +88,6 @@
+     // Check for "/." : In other words, don't send files starting with a .
+     // Notice, GOBBLES, that this includes ".."
+     if (buf[i] == '/' && buf[i+1] == '.') return 0;
+-
+-    // Give people a "hidden prefix" for hiding private files in the HTML tree
+-    if (strncmp(buf+i, "/aw_", 4) == 0) return 0;
+   }
+ 
+   return 1;
+@@ -231,34 +118,33 @@
  
  }
  
@@ -1293,7 +1393,7 @@ diff -Naur awhttpd/misc.c axTLS/httpd/awhttpd/misc.c
  int issockwriteable(int sd) {
  
    fd_set wfds;
-@@ -275,11 +219,11 @@
+@@ -275,11 +161,11 @@
    return FD_ISSET(sd, &wfds);
  
  }
@@ -1307,17 +1407,25 @@ diff -Naur awhttpd/misc.c axTLS/httpd/awhttpd/misc.c
  
    if (stat(tpbuf, &st) == -1) return 0;
  
-@@ -288,26 +232,7 @@
+@@ -288,25 +174,52 @@
  
  }
  
--
--
++#if defined(CONFIG_HTTP_HAS_CGI)
++int iscgi(char *fn) {
+ 
++  struct cgiextstruct *tp;
++  int fnlen, extlen;
+ 
 -// FIXME: Arg! This function is horrible! Rewrite it
 -void status() {
--
++  fnlen = strlen(fn);
++  tp = cgiexts;
+ 
 -  int i;
--
++  while (tp != NULL) {
++    extlen = strlen(tp->ext);
+ 
 -  fprintf(stdout," [*************************************************]\n");
 -  fprintf(stdout," [       Anti-Web V%-6s by Hardcore Software     ]\n",VERSION);
 -  fprintf(stdout," [*************************************************]\n");
@@ -1326,16 +1434,44 @@ diff -Naur awhttpd/misc.c axTLS/httpd/awhttpd/misc.c
 -    for(i=1;i<=35-strlen(webroot);i++) fprintf(stdout," ");
 -  fprintf(stdout,"]\n");
 -  fprintf(stdout," [*************************************************]\n");
--
--}
--
--
--
-+#if defined(CONFIG_HTTP_HAS_CGI)
++    if (strcasecmp(fn+(fnlen-extlen), tp->ext) == 0)
++      return 1;
++
++    tp = tp->next;
++  }
++
++  return 0;
+ 
+ }
+ 
++void split(char *tp, char *sp[], int maxwords, char sc) {
++
++  int i=0;
++  while(1) {
++    /* Skip leading whitespace */
++    while(*tp == sc) tp++;
++
++    if (*tp == '\0') {
++      sp[i] = NULL;
++      break;
++    }
+ 
++    if (i==maxwords-2) {
++      sp[maxwords-2] = NULL;
++      break;
++    }
++
++    sp[i] = tp;
++
++    while(*tp != sc && *tp != '\0') tp++;
++    if (*tp == sc) *tp++ = '\0';
++    i++;
++  }
++}
+ 
  /* This function was originally written by Nicolas Benoit
     but I've rewritten some parts of it to work under
-    as many possible AW configurations as possible.
-@@ -329,7 +254,7 @@
+@@ -329,7 +242,7 @@
    while (fr_rs[i] != NULL) {
      snprintf(tpfile, sizeof(tpfile), "%s/%s%s", webroot, cn->virtualhostreq, fr_str);
  
@@ -1344,14 +1480,14 @@ diff -Naur awhttpd/misc.c axTLS/httpd/awhttpd/misc.c
        /* We've found our CGI file! */
        my_strncpy(cn->actualfile, tpfile, MAXREQUESTLENGTH);
        my_strncpy(cn->cgiscriptinfo, fr_str, MAXREQUESTLENGTH);
-@@ -349,3 +274,4 @@
+@@ -349,3 +262,4 @@
    *(cn->cgipathinfo) = '\0';
    return -1;
  }
 +#endif
 diff -Naur awhttpd/net.c axTLS/httpd/awhttpd/net.c
 --- awhttpd/net.c	2005-06-04 14:09:52.000000000 +1000
-+++ axTLS/httpd/awhttpd/net.c	2006-07-26 23:03:46.609375000 +1000
++++ axTLS/httpd/awhttpd/net.c	2006-08-10 18:33:47.640625000 +1000
 @@ -8,9 +8,7 @@
  
  
@@ -1462,7 +1598,7 @@ diff -Naur awhttpd/net.c axTLS/httpd/awhttpd/net.c
  
 diff -Naur awhttpd/permcheck.c axTLS/httpd/awhttpd/permcheck.c
 --- awhttpd/permcheck.c	2005-01-23 06:49:29.000000000 +1000
-+++ axTLS/httpd/awhttpd/permcheck.c	2006-07-26 18:46:48.233750000 +1000
++++ axTLS/httpd/awhttpd/permcheck.c	2006-08-10 18:33:47.640625000 +1000
 @@ -7,21 +7,23 @@
  */
  
@@ -1553,8 +1689,8 @@ diff -Naur awhttpd/permcheck.c axTLS/httpd/awhttpd/permcheck.c
 +#endif  /* CONFIG_HTTP_PERM_CHECK */
 diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
 --- awhttpd/proc.c	2005-01-23 10:59:41.000000000 +1000
-+++ axTLS/httpd/awhttpd/proc.c	2006-07-30 22:35:33.453125000 +1000
-@@ -13,14 +13,12 @@
++++ axTLS/httpd/awhttpd/proc.c	2006-08-10 18:33:47.640625000 +1000
+@@ -13,91 +13,92 @@
  #include <sys/types.h>
  #include <sys/stat.h>
  #include <fcntl.h>
@@ -1570,20 +1706,80 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
  
  // Returns 1 if elems should continue being read, 0 otherwise
  int procheadelem(struct connstruct *cn, char *buf) {
-@@ -53,7 +51,9 @@
  
-     my_strncpy(cn->filereq, segs[0], MAXREQUESTLENGTH);
- 
+-  char *words[10];
+-
+-  split(buf, words, 10, ' ');
++  char *delim, *value;
 +#if defined(CONFIG_HTTP_HAS_CGI)
-     if (segs[1] != NULL) my_strncpy(cn->cgiargs, segs[1], MAXREQUESTLENGTH);
++  char *cgi_delim;
 +#endif
  
-   } else if (strcmp(words[0], "Host:")==0) {
+-  if (words[0] == NULL) return 0;
+-
+-  if (strcmp(words[0], "GET")==0 ||
+-      strcmp(words[0], "HEAD")==0 ||
+-      strcmp(words[0], "POST")==0) {
+-    char *segs[4];
+-
+-    if (*words[0] == 'H') cn->reqtype = TYPE_HEAD;
+-    else if (*words[0] == 'P') cn->reqtype = TYPE_POST;
++  if ((delim = strchr(buf, ' ')) == NULL)
++      return 0;
  
-@@ -66,38 +66,32 @@
+-    split(words[1], segs, 4, '?');
++  *delim = 0;
++  value = delim+1;
+ 
+-    if (segs[0] == NULL) return 0;
++  if (strcmp(buf, "GET")==0 ||
++      strcmp(buf, "HEAD")==0 ||
++      strcmp(buf, "POST")==0) 
++  {
++    if (buf[0] == 'H') 
++        cn->reqtype = TYPE_HEAD;
++    else if (buf[0] == 'P') 
++        cn->reqtype = TYPE_POST;
++
++    if ((delim = strchr(value, ' ')) == NULL)       /* expect HTTP type */
++        return 0;
++    *delim = 0;
+ 
+-    urldecode(segs[0]);
++    urldecode(value);
+ 
+-    if (sanitizefile(segs[0]) == 0) {
++    if (sanitizefile(value) == 0) {
+       send404(cn);
+       removeconnection(cn);
+       return 0;
      }
  
-     my_strncpy(cn->virtualhostreq, words[1], MAXREQUESTLENGTH);
+-    my_strncpy(cn->filereq, segs[0], MAXREQUESTLENGTH);
+-
+-    if (segs[1] != NULL) my_strncpy(cn->cgiargs, segs[1], MAXREQUESTLENGTH);
+-
+-  } else if (strcmp(words[0], "Host:")==0) {
++    my_strncpy(cn->filereq, value, MAXREQUESTLENGTH);
++#if defined(CONFIG_HTTP_HAS_CGI)
++    if ((cgi_delim = strchr(value, '?')))
++    {
++        *cgi_delim = NULL;
++        my_strncpy(cn->cgiargs, value+1, MAXREQUESTLENGTH);
++    }
++#endif
+ 
+-    if (words[1] == NULL) return 0;
++  } else if (strcmp(buf, "Host:")==0) {
+ 
+-    if (sanitizehost(words[1]) == 0) {
++    if (sanitizehost(value) == 0) {
+       send404(cn);
+       removeconnection(cn);
+       return 0;
+     }
+ 
+-    my_strncpy(cn->virtualhostreq, words[1], MAXREQUESTLENGTH);
 -  } else if (strcmp(words[0], "Range:")==0) {
 -
 -    cn->offset = -1;
@@ -1599,10 +1795,11 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
 -
 -    cn->offset = atoi(words[1]);
 -
-+  } else if (strcmp(words[0], "Connection:")==0 &&
-+                strcmp(words[1], "close")==0) {
++    my_strncpy(cn->virtualhostreq, value, MAXREQUESTLENGTH);
++  } else if (strcmp(buf, "Connection:")==0 &&
++                strcmp(value, "close")==0) {
 +      cn->close_when_done = 1;
-+  } else if (strcmp(words[0], "If-Modified-Since:")==0) {
++  } else if (strcmp(buf, "If-Modified-Since:") ==0 ) {
 +      /* TODO: parse this date properly with getdate() or similar */
 +      cn->modified_since = 1;
    }
@@ -1630,7 +1827,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
  
    if (cn->reqtype == TYPE_HEAD) {
      snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nContent-Type: text/html\n\n");
-@@ -107,7 +101,17 @@
+@@ -107,7 +108,17 @@
      return;
    }
  
@@ -1649,7 +1846,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
    if (cn->dirp == NULL) {
      send404(cn);
      removeconnection(cn);
-@@ -116,12 +120,13 @@
+@@ -116,12 +127,13 @@
  
    // Get rid of the "."
    readdir(cn->dirp);
@@ -1665,7 +1862,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
  
    cn->state = STATE_DOING_DIR;
  
-@@ -134,36 +139,48 @@
+@@ -134,36 +146,48 @@
  
  void procdodir(struct connstruct *cn) {
  
@@ -1723,7 +1920,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
  
  
  
-@@ -172,9 +189,10 @@
+@@ -172,9 +196,10 @@
    char buf[MAXREQUESTLENGTH*4], *tp, *next;
    int rv;
  
@@ -1737,7 +1934,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
      return;
    }
  
-@@ -217,36 +235,85 @@
+@@ -217,36 +242,85 @@
  void procsendhead(struct connstruct *cn) {
  
    char buf[1024];
@@ -1832,7 +2029,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
    if ((stbuf.st_mode & S_IFMT) == S_IFDIR) {
      if (cn->filereq[strlen(cn->filereq)-1] != '/') {
        send301(cn);
-@@ -256,17 +323,18 @@
+@@ -256,17 +330,18 @@
  
      // Check to see if this dir has an index file
      if (procindex(cn, &stbuf) == 0) {
@@ -1854,7 +2051,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
          send404(cn);
          removeconnection(cn);
          return;
-@@ -275,50 +343,68 @@
+@@ -275,50 +350,68 @@
        proccgi(cn,0);
        return;
      }
@@ -1880,20 +2077,20 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
 +#endif
  
 -    snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nServer: Anti-Web V%s (%s)\nContent-Type: %s\nContent-Length: %ld\nLast-Modified: %s\n",
+-               VERSION,
+-               quote,
+-               getmimetype(cn->actualfile),
+-               (long) stbuf.st_size,
+-               ctime(&(stbuf.st_mtime))); // ctime() has a \n on the end
+-  } else {
+-    snprintf(buf, sizeof(buf), "HTTP/1.1 206 OK\nServer: Anti-Web V%s (%s)\nContent-Type: %s\nContent-Range: %ld-%ld/%ld\nContent-Length: %ld\nLast-Modified: %s\n",
 +    snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nServer: Anti-Web V%s\nContent-Type: %s\nContent-Length: %ld\nDate: %sLast-Modified: %s\n",
                 VERSION,
 -               quote,
                 getmimetype(cn->actualfile),
-                (long) stbuf.st_size,
--               ctime(&(stbuf.st_mtime))); // ctime() has a \n on the end
--  } else {
--    snprintf(buf, sizeof(buf), "HTTP/1.1 206 OK\nServer: Anti-Web V%s (%s)\nContent-Type: %s\nContent-Range: %ld-%ld/%ld\nContent-Length: %ld\nLast-Modified: %s\n",
--               VERSION,
--               quote,
--               getmimetype(cn->actualfile),
 -               cn->offset,
 -               (long) stbuf.st_size-1,
--               (long) stbuf.st_size,
+                (long) stbuf.st_size,
 -               (long) stbuf.st_size - cn->offset,
 +               date,
                 ctime(&(stbuf.st_mtime))); // ctime() has a \n on the end
@@ -1942,7 +2139,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
      return;
    }
  
-@@ -328,13 +414,18 @@
+@@ -328,13 +421,18 @@
  
  void procreadfile(struct connstruct *cn) {
  
@@ -1966,21 +2163,21 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
    }
  
    cn->numbytes = rv;
-@@ -347,11 +438,9 @@
+@@ -347,11 +445,9 @@
  
  void procsendfile(struct connstruct *cn) {
  
 -  int rv;
+-
+-  rv = write(cn->networkdesc, cn->databuf, cn->numbytes);
 +  int rv = special_write(cn, cn->databuf, cn->numbytes);
  
--  rv = write(cn->networkdesc, cn->databuf, cn->numbytes);
--
 -  if (rv == -1)
 +  if (rv < 0)
      removeconnection(cn);
    else if (rv == cn->numbytes)
      cn->state = STATE_WANT_TO_READ_FILE;
-@@ -361,7 +450,47 @@
+@@ -361,7 +457,47 @@
      memmove(cn->databuf, cn->databuf + rv, cn->numbytes - rv);
      cn->numbytes -= rv;
    }
@@ -2031,7 +2228,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
  }
 diff -Naur awhttpd/socket.c axTLS/httpd/awhttpd/socket.c
 --- awhttpd/socket.c	2004-04-25 13:03:05.000000000 +1000
-+++ axTLS/httpd/awhttpd/socket.c	2006-07-26 21:52:07.750000000 +1000
++++ axTLS/httpd/awhttpd/socket.c	2006-08-10 18:33:47.640625000 +1000
 @@ -8,61 +8,17 @@
  
  
@@ -2152,7 +2349,7 @@ diff -Naur awhttpd/socket.c axTLS/httpd/awhttpd/socket.c
    memset(&(my_addr.sin_zero), 0, 8);    // zero the rest of the struct
 diff -Naur awhttpd/urlencode.c axTLS/httpd/awhttpd/urlencode.c
 --- awhttpd/urlencode.c	2004-05-14 10:53:47.000000000 +1000
-+++ axTLS/httpd/awhttpd/urlencode.c	2006-07-26 18:46:48.233750000 +1000
++++ axTLS/httpd/awhttpd/urlencode.c	2006-08-10 18:33:47.640625000 +1000
 @@ -13,7 +13,7 @@
  
  #include <ctype.h>

@@ -28,6 +28,17 @@ config CONFIG_HTTP_HTTPS_PORT
 
         You must be a root user in order to use the default port.
 
+config CONFIG_HTTP_SESSION_CACHE_SIZE
+    int "SSL session cache size"
+    default 5
+    depends on CONFIG_HTTP_HAS_SSL
+    help
+        The size of the SSL session cache.
+        
+        This is not actually related to the number of concurrent users, but 
+        for optimum performance they should be the same (with a penalty 
+        in memory usage).
+
 config CONFIG_HTTP_WEBROOT
     string "Web root location"
     default "../www" if !CONFIG_PLATFORM_WIN32
