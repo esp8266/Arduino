@@ -1,6 +1,6 @@
 diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
 --- awhttpd/aw3.h	2005-01-23 13:17:14.000000000 +1000
-+++ axTLS/httpd/awhttpd/aw3.h	2006-08-10 18:33:47.609375000 +1000
++++ axTLS/httpd/awhttpd/aw3.h	2006-08-12 18:25:58.390625000 +1000
 @@ -7,17 +7,16 @@
  */
  
@@ -192,7 +192,7 @@ diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
 +void initlists(void);
 diff -Naur awhttpd/cgi.c axTLS/httpd/awhttpd/cgi.c
 --- awhttpd/cgi.c	2005-06-04 14:09:52.000000000 +1000
-+++ axTLS/httpd/awhttpd/cgi.c	2006-08-10 18:33:47.625000000 +1000
++++ axTLS/httpd/awhttpd/cgi.c	2006-08-12 18:26:18.437500000 +1000
 @@ -7,93 +7,46 @@
  */
  
@@ -229,8 +229,8 @@ diff -Naur awhttpd/cgi.c axTLS/httpd/awhttpd/cgi.c
 -
 -  return;
 -
--}
--
+ }
+ 
 -
 -
 -void gensysenv(struct connstruct *cn) {
@@ -266,8 +266,8 @@ diff -Naur awhttpd/cgi.c axTLS/httpd/awhttpd/cgi.c
 -
 -  #endif
 -
- }
- 
+-}
+-
 -
 -
  void proccgi(struct connstruct *cn, int has_pathinfo) {
@@ -311,7 +311,7 @@ diff -Naur awhttpd/cgi.c axTLS/httpd/awhttpd/cgi.c
      // Close the write descriptor
      close(tpipe[1]);
      cn->filedesc = tpipe[0];
-@@ -132,19 +86,62 @@
+@@ -132,19 +86,61 @@
    close(tpipe[1]);
  
    myargs[0] = cn->actualfile;
@@ -364,7 +364,7 @@ diff -Naur awhttpd/cgi.c axTLS/httpd/awhttpd/cgi.c
 +    removeconnection(cn);
 +    return;
 +  }
-+
+ 
 +  _dup2(tmp_stdout, _fileno(stdout));
 +  close(tmp_stdout);
 +  cn->filedesc = tpipe[0];
@@ -373,13 +373,12 @@ diff -Naur awhttpd/cgi.c axTLS/httpd/awhttpd/cgi.c
 +  for (;;)
 +  {
 +    procreadfile(cn);
- 
++
 +    if (cn->filedesc == -1)
 +        break;
 +
 +    procsendfile(cn);
 +    usleep(200000); /* don't know why this delay makes it work (yet) */
-+  }
 +#endif
  }
 +#endif  /* CONFIG_HTTP_HAS_CGI */
@@ -654,7 +653,7 @@ diff -Naur awhttpd/conf.c axTLS/httpd/awhttpd/conf.c
 -}
 diff -Naur awhttpd/conn.c axTLS/httpd/awhttpd/conn.c
 --- awhttpd/conn.c	2004-12-07 16:11:02.000000000 +1000
-+++ axTLS/httpd/awhttpd/conn.c	2006-08-10 18:33:47.625000000 +1000
++++ axTLS/httpd/awhttpd/conn.c	2006-08-12 18:25:58.406250000 +1000
 @@ -9,26 +9,16 @@
  
  #include <stdio.h>
@@ -761,7 +760,7 @@ diff -Naur awhttpd/conn.c axTLS/httpd/awhttpd/conn.c
  }
 diff -Naur awhttpd/errors.c axTLS/httpd/awhttpd/errors.c
 --- awhttpd/errors.c	2005-01-23 06:49:29.000000000 +1000
-+++ axTLS/httpd/awhttpd/errors.c	2006-08-10 18:33:47.625000000 +1000
++++ axTLS/httpd/awhttpd/errors.c	2006-08-12 18:25:58.406250000 +1000
 @@ -8,7 +8,6 @@
  
  
@@ -804,7 +803,7 @@ diff -Naur awhttpd/errors.c axTLS/httpd/awhttpd/errors.c
  
 diff -Naur awhttpd/index.c axTLS/httpd/awhttpd/index.c
 --- awhttpd/index.c	2005-06-04 14:09:52.000000000 +1000
-+++ axTLS/httpd/awhttpd/index.c	2006-08-10 18:33:47.625000000 +1000
++++ axTLS/httpd/awhttpd/index.c	2006-08-12 18:25:58.406250000 +1000
 @@ -11,7 +11,6 @@
  #include <string.h>
  #include <sys/types.h>
@@ -851,7 +850,7 @@ diff -Naur awhttpd/index.c axTLS/httpd/awhttpd/index.c
        my_strncpy(cn->actualfile, tbuf, MAXREQUESTLENGTH);
 diff -Naur awhttpd/main.c axTLS/httpd/awhttpd/main.c
 --- awhttpd/main.c	2005-06-04 14:09:52.000000000 +1000
-+++ axTLS/httpd/awhttpd/main.c	2006-08-11 06:46:48.437500000 +1000
++++ axTLS/httpd/awhttpd/main.c	2006-08-12 18:25:58.406250000 +1000
 @@ -11,7 +11,6 @@
  #include <string.h>
  #include <sys/types.h>
@@ -1085,7 +1084,7 @@ diff -Naur awhttpd/main.c axTLS/httpd/awhttpd/main.c
    return 0;
 diff -Naur awhttpd/mime_types.c axTLS/httpd/awhttpd/mime_types.c
 --- awhttpd/mime_types.c	2004-01-26 01:08:47.000000000 +1000
-+++ axTLS/httpd/awhttpd/mime_types.c	2006-08-10 18:33:47.625000000 +1000
++++ axTLS/httpd/awhttpd/mime_types.c	2006-08-12 18:25:58.421875000 +1000
 @@ -7,28 +7,21 @@
  */
  
@@ -1170,7 +1169,7 @@ diff -Naur awhttpd/mime_types.c axTLS/httpd/awhttpd/mime_types.c
 +
 diff -Naur awhttpd/misc.c axTLS/httpd/awhttpd/misc.c
 --- awhttpd/misc.c	2005-01-23 12:59:09.000000000 +1000
-+++ axTLS/httpd/awhttpd/misc.c	2006-08-10 18:33:47.625000000 +1000
++++ axTLS/httpd/awhttpd/misc.c	2006-08-12 18:25:58.421875000 +1000
 @@ -7,33 +7,33 @@
  */
  
@@ -1487,7 +1486,7 @@ diff -Naur awhttpd/misc.c axTLS/httpd/awhttpd/misc.c
 +#endif
 diff -Naur awhttpd/net.c axTLS/httpd/awhttpd/net.c
 --- awhttpd/net.c	2005-06-04 14:09:52.000000000 +1000
-+++ axTLS/httpd/awhttpd/net.c	2006-08-10 18:33:47.640625000 +1000
++++ axTLS/httpd/awhttpd/net.c	2006-08-12 18:25:58.421875000 +1000
 @@ -8,9 +8,7 @@
  
  
@@ -1598,7 +1597,7 @@ diff -Naur awhttpd/net.c axTLS/httpd/awhttpd/net.c
  
 diff -Naur awhttpd/permcheck.c axTLS/httpd/awhttpd/permcheck.c
 --- awhttpd/permcheck.c	2005-01-23 06:49:29.000000000 +1000
-+++ axTLS/httpd/awhttpd/permcheck.c	2006-08-10 18:33:47.640625000 +1000
++++ axTLS/httpd/awhttpd/permcheck.c	2006-08-12 18:25:58.421875000 +1000
 @@ -7,21 +7,23 @@
  */
  
@@ -1689,7 +1688,7 @@ diff -Naur awhttpd/permcheck.c axTLS/httpd/awhttpd/permcheck.c
 +#endif  /* CONFIG_HTTP_PERM_CHECK */
 diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
 --- awhttpd/proc.c	2005-01-23 10:59:41.000000000 +1000
-+++ axTLS/httpd/awhttpd/proc.c	2006-08-10 18:33:47.640625000 +1000
++++ axTLS/httpd/awhttpd/proc.c	2006-08-12 18:26:51.093750000 +1000
 @@ -13,91 +13,92 @@
  #include <sys/types.h>
  #include <sys/stat.h>
@@ -1764,7 +1763,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
 +#if defined(CONFIG_HTTP_HAS_CGI)
 +    if ((cgi_delim = strchr(value, '?')))
 +    {
-+        *cgi_delim = NULL;
++        *cgi_delim = 0;
 +        my_strncpy(cn->cgiargs, value+1, MAXREQUESTLENGTH);
 +    }
 +#endif
@@ -1846,15 +1845,15 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
    if (cn->dirp == NULL) {
      send404(cn);
      removeconnection(cn);
-@@ -116,12 +127,13 @@
+@@ -116,12 +127,10 @@
  
    // Get rid of the "."
    readdir(cn->dirp);
 +#endif
  
-   // If the browser doesn't specify a virtual host, the client will
-   // see "http://default/thedir/" instead of "http://thehost.com/thedir/"
-   // Consider this punishment for using such an old browser.
+-  // If the browser doesn't specify a virtual host, the client will
+-  // see "http://default/thedir/" instead of "http://thehost.com/thedir/"
+-  // Consider this punishment for using such an old browser.
 -  snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nContent-Type: text/html\n\n<HTML><BODY>\n<TITLE>Directory Listing</TITLE>\n<H2>Directory listing of http://%s%s</H2><BR>\n", cn->virtualhostreq, cn->filereq);
 -  write(cn->networkdesc, buf, strlen(buf));
 +  snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nContent-Type: text/html\n\n<HTML><BODY>\n<TITLE>Directory Listing</TITLE>\n<H2>Directory listing of %s://%s%s</H2><BR>\n", cn->is_ssl ? "https" : "http", cn->virtualhostreq, cn->filereq);
@@ -1862,7 +1861,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
  
    cn->state = STATE_DOING_DIR;
  
-@@ -134,36 +146,48 @@
+@@ -134,36 +143,48 @@
  
  void procdodir(struct connstruct *cn) {
  
@@ -1878,13 +1877,14 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
    do {
  
 -    if ((dp = readdir(cn->dirp)) == NULL) {
+-      snprintf(buf, sizeof(buf), "<BR><BR>End of Anti-Web directory listing.</BODY></HTML>\n");
+-      write(cn->networkdesc, buf, strlen(buf));
 +#ifdef WIN32
 +    if (!FindNextFile(cn->dirp, &cn->file_data)) {
 +#else
 +    if ((dp = readdir(cn->dirp)) == NULL)  {
 +#endif
-       snprintf(buf, sizeof(buf), "<BR><BR>End of Anti-Web directory listing.</BODY></HTML>\n");
--      write(cn->networkdesc, buf, strlen(buf));
++      snprintf(buf, sizeof(buf), "</BODY></HTML>\n");
 +      special_write(cn, buf, strlen(buf));
        removeconnection(cn);
        return;
@@ -1920,7 +1920,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
  
  
  
-@@ -172,9 +196,10 @@
+@@ -172,9 +193,10 @@
    char buf[MAXREQUESTLENGTH*4], *tp, *next;
    int rv;
  
@@ -1934,7 +1934,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
      return;
    }
  
-@@ -217,36 +242,85 @@
+@@ -217,36 +239,85 @@
  void procsendhead(struct connstruct *cn) {
  
    char buf[1024];
@@ -2029,7 +2029,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
    if ((stbuf.st_mode & S_IFMT) == S_IFDIR) {
      if (cn->filereq[strlen(cn->filereq)-1] != '/') {
        send301(cn);
-@@ -256,17 +330,18 @@
+@@ -256,17 +327,18 @@
  
      // Check to see if this dir has an index file
      if (procindex(cn, &stbuf) == 0) {
@@ -2051,7 +2051,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
          send404(cn);
          removeconnection(cn);
          return;
-@@ -275,50 +350,68 @@
+@@ -275,50 +347,68 @@
        proccgi(cn,0);
        return;
      }
@@ -2139,7 +2139,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
      return;
    }
  
-@@ -328,13 +421,18 @@
+@@ -328,13 +418,18 @@
  
  void procreadfile(struct connstruct *cn) {
  
@@ -2163,7 +2163,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
    }
  
    cn->numbytes = rv;
-@@ -347,11 +445,9 @@
+@@ -347,11 +442,9 @@
  
  void procsendfile(struct connstruct *cn) {
  
@@ -2177,7 +2177,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
      removeconnection(cn);
    else if (rv == cn->numbytes)
      cn->state = STATE_WANT_TO_READ_FILE;
-@@ -361,7 +457,47 @@
+@@ -361,7 +454,47 @@
      memmove(cn->databuf, cn->databuf + rv, cn->numbytes - rv);
      cn->numbytes -= rv;
    }
@@ -2228,7 +2228,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
  }
 diff -Naur awhttpd/socket.c axTLS/httpd/awhttpd/socket.c
 --- awhttpd/socket.c	2004-04-25 13:03:05.000000000 +1000
-+++ axTLS/httpd/awhttpd/socket.c	2006-08-10 18:33:47.640625000 +1000
++++ axTLS/httpd/awhttpd/socket.c	2006-08-12 18:25:58.437500000 +1000
 @@ -8,61 +8,17 @@
  
  
@@ -2349,7 +2349,7 @@ diff -Naur awhttpd/socket.c axTLS/httpd/awhttpd/socket.c
    memset(&(my_addr.sin_zero), 0, 8);    // zero the rest of the struct
 diff -Naur awhttpd/urlencode.c axTLS/httpd/awhttpd/urlencode.c
 --- awhttpd/urlencode.c	2004-05-14 10:53:47.000000000 +1000
-+++ axTLS/httpd/awhttpd/urlencode.c	2006-08-10 18:33:47.640625000 +1000
++++ axTLS/httpd/awhttpd/urlencode.c	2006-08-12 18:25:58.437500000 +1000
 @@ -13,7 +13,7 @@
  
  #include <ctype.h>
