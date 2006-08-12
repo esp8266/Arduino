@@ -55,7 +55,8 @@ config CONFIG_SSL_FULL_MODE
         The axssl sample has 3 more options, "-debug", "-state" and "-show-rsa"
 
         This mode produces a library about 58kB in size. It is suggested that 
-        this mode is used only during development.
+        this mode is used only during development, or systems that have more
+        generous memory limits.
 
         It is the default to demonstrate the features of axTLS.
 
@@ -73,8 +74,8 @@ config CONFIG_SSL_SKELETON_MODE
         * Some other features/API calls may not work.
 
         This mode produces a library about 37kB in size. The main
-        disadvantage of this mode is speed - it may be several times slower
-        than the other build modes.
+        disadvantage of this mode is speed - it will be much slower than the 
+        other build modes.
 
 endchoice
 
