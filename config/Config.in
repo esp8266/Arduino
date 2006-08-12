@@ -31,6 +31,7 @@ menu "General Configuration"
 
 config PREFIX
     string "axTLS installation prefix"
+    depends on !CONFIG_PLATFORM_WIN32
     default "/usr/local"
     help
       Define your directory to install axTLS files/subdirs in.
