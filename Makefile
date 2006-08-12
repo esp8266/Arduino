@@ -141,7 +141,7 @@ win32releaseconf: config/scripts/config/conf
 	@./config/scripts/config/conf -D config/win32config $(CONFIG_CONFIG_IN) > /dev/null
 	$(MAKE)
 
-# The special debian release configuration
-debianconf: config/scripts/config/conf
-	@./config/scripts/config/conf -D config/debianconfig $(CONFIG_CONFIG_IN) > /dev/null
+# The special linux release configuration
+linuxconf: config/scripts/config/conf
+	@./config/scripts/config/conf -D config/linuxconfig $(CONFIG_CONFIG_IN) > /dev/null
 	$(MAKE)
