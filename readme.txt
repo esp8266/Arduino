@@ -1,46 +1,37 @@
-Arduino is an open-source Physical Computing platform based on a simple
-i/o board and a development environment that implements the Processing/Wiring
-language.  Arduino can be used to develop stand-alone interactive objects or
+Arduino is an open-source physical computing platform based on a simple i/o
+board and a development environment that implements the Processing/Wiring
+language. Arduino can be used to develop stand-alone interactive objects or
 can be connected to software on your computer (e.g. Flash, Processing, MaxMSP).
+The boards can be assembled by hand or purchased preassembled; the open-source
+IDE can be downloaded for free
 
 Arduino is an open source project, owned by nobody and supported by many.
 
-For more information, see the website at: http://www.arduino.cc/ or the
-forums at http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl
-
-The Team is composed of Massimo Banzi, David Cuartielles, Tom Igoe,
-David A. Mellis and Nicholas Zambetti.
-
-Gianluca Martino works with us on many projects providing help, ideas and
-taking care of the production.
-
-Yaniv Steiner and Giorgio Olivero have been supporting the project and are
-working at using it with the Instant Soup platform.
-
-Arduino uses the GNU avr-gcc toolchain, uisp, avr-libc, avrlib, and code
-from Processing and Wiring.
+For more information, see the website at: http://www.arduino.cc/
+or the forums at: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl
 
 INSTALLATION
-
 Detailed instructions are in reference/howto.html.
 
 If you are using a USB Arduino, you will need to install the drivers for the
 FTDI chip on the board. These can be found in the drivers/ directory.
 
-On Windows, you will need to unzip FTDI USB Drivers.zip. Then plug in the
-Arduino board and point the Windows Add Hardware wizard to the FTDI USB Drivers
-directory.
+* On Windows, you will need to unzip FTDI USB Drivers.zip. Then plug in the
+  Arduino board and point the Windows Add Hardware wizard to the FTDI USB
+  Drivers directory.
 
-On the Mac, mount the FTDIUSBSerialDriver_v2_0_1.dmg disk image and run the
-included FTDIUSBSerialDriver.pkg.  Also run the macosx_setup.command (after
-moving the Arduino distribution to your /Applications folder). It corrects
-permission on a few files for use with the serial port and will prompt you
-for your password. You may need to reboot after running this script.
+* On the Mac, mount the FTDIUSBSerialDriver_v2_0_1.dmg disk image and run the
+  included FTDIUSBSerialDriver.pkg.  Also run the macosx_setup.command (after
+  moving the Arduino distribution to your /Applications folder). It corrects
+  permission on a few files for use with the serial port and will prompt you
+  for your password. You may need to reboot after running this script.
 
 UPDATES
 
 0005
 
+New Wiring-compatible randomSeed(), random(max) and random(min, max) functions
+(except operating on longs instead of floats).
 Fixed bug that sometimes caused uploading of old versions of a sketch.
 Serial monitor nows include an interface to send messages to the Arduino
 board.  Pressing return appends a newline, pushing the send button doesn't.
@@ -113,3 +104,15 @@ This is the first released of the unified IDE + language library
 it's a terrible hack... but it works. at the moment it's in alpha stage
 but it can be used to work.
 The processing preprocessor is included but not used.
+
+CREDITS
+The Arduino team is composed of Massimo Banzi, David Cuartielles, Tom Igoe,
+Gianluca Martino, and David A. Mellis.
+
+Nicholas Zambetti has contributed from the beginning.
+
+Yaniv Steiner and Giorgio Olivero have been supporting the project and are
+working at using it with the Instant Soup platform.
+
+Arduino uses the GNU avr-gcc toolchain, uisp, avr-libc, avrlib, and code
+from Processing and Wiring.
