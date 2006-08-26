@@ -58,6 +58,20 @@
 #if defined(UBRR) && !defined(UBRRL)
 	#define	UBRRL				UBRR
 #endif
+// DAM: it seems the ATmega168 includes a '0' in its register names, despite
+// having only one uart
+#if defined(__AVR_ATmega168__)
+	#define RXCIE                                   RXCIE0
+	#define TXCIE                                   TXCIE0
+	#define RXEN                                    RXEN0
+	#define TXEN                                    TXEN0
+	#define UDR                                     UDR0
+	#define UCR                                     UCSR0B
+	#define UBRRL                           UBRR0L
+	#define UBRRH                           UBRR0H
+	#define SIG_UART_TRANS          USART_TX_vect
+	#define SIG_UART_RECV           USART_RX_vect
+#endif
 // compatibility with dual-uart processors
 // (if you need to use both uarts, please use the uart2 library)
 #if defined(__AVR_ATmega128__)
