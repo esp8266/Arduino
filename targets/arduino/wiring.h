@@ -89,6 +89,15 @@ void loop(void);
 #define NOT_A_PIN 0
 #define NOT_A_PORT -1
 
+#define NOT_ON_TIMER -1
+#define TIMER0A 0
+#define TIMER0B 1
+#define TIMER1A 2
+#define TIMER1B 3
+#define TIMER2  4
+#define TIMER2A 5
+#define TIMER2B 6
+
 typedef struct {
 	int port;
 	int bit;
@@ -99,7 +108,7 @@ extern int port_to_input[];
 extern int port_to_output[];
 extern pin_t *digital_pin_to_port;
 extern pin_t *analog_in_pin_to_port;
-extern pin_t *analog_out_pin_to_port;
+extern int *analog_out_pin_to_timer;
 
 #ifdef __cplusplus
 } // extern "C"

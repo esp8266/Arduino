@@ -37,14 +37,7 @@
 #endif
 
 // from Pascal's avrlib
-#include "global.h"
-//#include "a2d.h"
-#include "timer.h"
 #include "uart.h"
-
-// timer.h #defines delay to be delay_us, we need to undefine
-// it so our delay can be in milliseconds.
-#undef delay
 
 #include "wiring.h"
 
@@ -66,39 +59,14 @@ int digitalPinToBit(int pin)
 	return digital_pin_to_port[pin].bit;
 }
 
-int analogOutPinToPort(int pin)
+int analogOutPinToTimer(int pin)
 {
-	return analog_out_pin_to_port[pin].port;
-}
-
-int analogOutPinToBit(int pin)
-{
-	return analog_out_pin_to_port[pin].bit;
+	return analog_out_pin_to_timer[pin];
 }
 
 int analogInPinToBit(int pin)
 {
 	return analog_in_pin_to_port[pin].bit;
-}
-
-void timer2PWMOn()
-{
-	// configure timer 2 for normal (non-inverting) pwm operation
-	// this attaches the timer to the pwm pin
-	sbi(TCCR2, COM21);
-	cbi(TCCR2, COM20);
-}
-
-void timer2PWMOff()
-{
-	// disconnect the timer from the pwm pin
-	cbi(TCCR2, COM21);
-	cbi(TCCR2, COM20);
-}
-
-void timer2PWMSet(unsigned char val)
-{
-	OCR2 = val;
 }
 
 void pinMode(int pin, int mode)
@@ -119,14 +87,22 @@ void digitalWrite(int pin, int val)
 		// If the pin that support PWM output, we need to turn it off
 		// before doing a digital write.
 
-		if (analogOutPinToBit(pin) == 1)
-			timer1PWMAOff();
+		if (analogOutPinToTimer(pin) == TIMER1A)
+			cbi(TCCR1A, COM1A1);
 
-		if (analogOutPinToBit(pin) == 2)
-			timer1PWMBOff();
-
-		if (analogOutPinToBit(pin) == 3)
-			timer2PWMOff();
+		if (analogOutPinToTimer(pin) == TIMER1B)
+			cbi(TCCR1A, COM1B1);
+			
+#if defined(__AVR_ATmega168__)
+		if (analogOutPinToTimer(pin) == TIMER2A)
+			cbi(TCCR2A, COM2A1);
+			
+		if (analogOutPinToTimer(pin) == TIMER2B)
+			cbi(TCCR2A, COM2B1);
+#else
+		if (analogOutPinToTimer(pin) == TIMER2)
+			cbi(TCCR2, COM21);
+#endif
 
 		if (val == LOW)
 			cbi(_SFR_IO8(port_to_output[digitalPinToPort(pin)]),
@@ -143,14 +119,22 @@ int digitalRead(int pin)
 		// If the pin that support PWM output, we need to turn it off
 		// before getting a digital reading.
 
-		if (analogOutPinToBit(pin) == 1)
-			timer1PWMAOff();
+		if (analogOutPinToTimer(pin) == TIMER1A)
+			cbi(TCCR1A, COM1A1);
 
-		if (analogOutPinToBit(pin) == 2)
-			timer1PWMBOff();
-
-		if (analogOutPinToBit(pin) == 3)
-			timer2PWMOff();
+		if (analogOutPinToTimer(pin) == TIMER1B)
+			cbi(TCCR1A, COM1B1);
+			
+#if defined(__AVR_ATmega168__)
+		if (analogOutPinToTimer(pin) == TIMER2A)
+			cbi(TCCR2A, COM2A1);
+			
+		if (analogOutPinToTimer(pin) == TIMER2B)
+			cbi(TCCR2A, COM2B1);
+#else
+		if (analogOutPinToTimer(pin) == TIMER2)
+			cbi(TCCR2, COM21);
+#endif
 
 		return (_SFR_IO8(port_to_input[digitalPinToPort(pin)]) >>
 			digitalPinToBit(pin)) & 0x01;
@@ -197,18 +181,36 @@ void analogWrite(int pin, int val)
 	// writing with them.  Also, make sure the pin is in output mode
 	// for consistenty with Wiring, which doesn't require a pinMode
 	// call for the analog output pins.
-	if (analogOutPinToBit(pin) == 1) {
-		pinMode(pin, OUTPUT);
-		timer1PWMAOn();
-		timer1PWMASet(val);
-	} else if (analogOutPinToBit(pin) == 2) {
-		pinMode(pin, OUTPUT);
-		timer1PWMBOn();
-		timer1PWMBSet(val);
-	} else if (analogOutPinToBit(pin) == 3) {
-		pinMode(pin, OUTPUT);
-		timer2PWMOn();
-		timer2PWMSet(val);
+	pinMode(pin, OUTPUT);
+	
+	if (analogOutPinToTimer(pin) == TIMER1A) {
+		// connect pwm to pin on timer 1, channel A
+		sbi(TCCR1A, COM1A1);
+		// set pwm duty
+		OCR1A = val;
+	} else if (analogOutPinToTimer(pin) == TIMER1B) {
+		// connect pwm to pin on timer 1, channel B
+		sbi(TCCR1A, COM1B1);
+		// set pwm duty
+		OCR1B = val;
+#if defined(__AVR_ATmega168__)
+	} else if (analogOutPinToTimer(pin) == TIMER2A) {
+		// connect pwm to pin on timer 2, channel A
+		sbi(TCCR2A, COM2A1);
+		// set pwm duty
+		OCR2A = val;	
+	} else if (analogOutPinToTimer(pin) == TIMER2B) {
+		// connect pwm to pin on timer 2, channel B
+		sbi(TCCR2A, COM2B1);
+		// set pwm duty
+		OCR2B = val;
+#else
+	} else if (analogOutPinToTimer(pin) == TIMER2) {
+		// connect pwm to pin on timer 2, channel B
+		sbi(TCCR2, COM21);
+		// set pwm duty
+		OCR2 = val;
+#endif
 	} else if (val < 128)
 		digitalWrite(pin, LOW);
 	else
@@ -319,7 +321,7 @@ void print(const char *format, ...)
 }
 */
 
-TIMER_INTERRUPT_HANDLER(SIG_OVERFLOW0)
+SIGNAL(SIG_OVERFLOW0)
 {
 	timer0_overflow_count++;
 }
@@ -434,30 +436,47 @@ unsigned long pulseIn(int pin, int state)
 int main(void)
 {
 	// this needs to be called before setup() or some functions won't
-        // work there
+	// work there
 	sei();
 	
 	// timer 0 is used for millis() and delay()
-	//timer0Init();
 	timer0_overflow_count = 0;
 	// set timer 0 prescale factor to 8
+#if defined(__AVR_ATmega168__)
+	sbi(TCCR0B, CS01);
+#else
 	sbi(TCCR0, CS01);
+#endif
 	// enable timer 0 overflow interrupt
+#if defined(__AVR_ATmega168__)
+	sbi(TIMSK0, TOIE0);
+#else
 	sbi(TIMSK, TOIE0);
+#endif
 
-	// timers 1 & 2 are used for the hardware pwm
-	timer1Init();
-	//timer1SetPrescaler(TIMER_CLK_DIV1);
-	timer1PWMInit(8);
-	
-	timer2Init();
-
-	// configure timer 2 for phase correct pwm
+	// timers 1 and 2 are used for phase-correct hardware pwm
 	// this is better for motors as it ensures an even waveform
 	// note, however, that fast pwm mode can achieve a frequency of up
 	// 8 MHz (with a 16 MHz clock) at 50% duty cycle
-	cbi(TCCR2, WGM21);
+
+	// set timer 1 prescale factor to 64
+	sbi(TCCR1B, CS11);
+	sbi(TCCR1B, CS10);
+	// put timer 1 in 8-bit phase correct pwm mode
+	sbi(TCCR1A, WGM10);
+
+	// set timer 2 prescale factor to 64
+#if defined(__AVR_ATmega168__)
+	sbi(TCCR2B, CS22);
+#else
+	sbi(TCCR2, CS22);
+#endif
+	// configure timer 2 for phase correct pwm (8-bit)
+#if defined(__AVR_ATmega168__)
+	sbi(TCCR2A, WGM20);
+#else
 	sbi(TCCR2, WGM20);
+#endif
 
 	// set a2d reference to AVCC (5 volts)
 	cbi(ADMUX, REFS1);

@@ -30,6 +30,7 @@ UPDATES
 
 0005
 
+ATmega168 support on the way (currently timers and pwm working).
 New Wiring-compatible randomSeed(), random(max) and random(min, max) functions
 (except operating on longs instead of floats).
 Fixed bug that sometimes caused uploading of old versions of a sketch.
