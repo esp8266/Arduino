@@ -112,6 +112,8 @@
 		330B21540968180400345666 /* librxtxSerial.jnilib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 330B21530968180400345666 /* librxtxSerial.jnilib */; };
 		332D4DB609CF147F00BF81F6 /* Sizer.java in Sources */ = {isa = PBXBuildFile; fileRef = 332D4DB509CF147F00BF81F6 /* Sizer.java */; };
 		336EA55B09FF87F60052D765 /* examples in CopyFiles */ = {isa = PBXBuildFile; fileRef = 336EA4DB09FF87E30052D765 /* examples */; };
+		338C478A0AA204BE008F2C0D /* FTDIUSBSerialDriver_v2_1_6.dmg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 338C47870AA204B0008F2C0D /* FTDIUSBSerialDriver_v2_1_6.dmg */; };
+		338C478B0AA204BE008F2C0D /* FTDIUSBSerialDriver_v2_2_6_Intel.dmg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 338C47880AA204B0008F2C0D /* FTDIUSBSerialDriver_v2_2_6_Intel.dmg */; };
 		339514EE097AEB5900193C89 /* STDCTokenTypes.txt in Resources */ = {isa = PBXBuildFile; fileRef = 33FFFE420965BD110016AC38 /* STDCTokenTypes.txt */; };
 		339514FA097AEB8000193C89 /* license.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02B60965BD170016AC38 /* license.txt */; };
 		339514FB097AEB8000193C89 /* readme.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02B70965BD170016AC38 /* readme.txt */; };
@@ -189,7 +191,6 @@
 		33CF03D009662DC000F2C9A9 /* oro.jar in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33AF620D0965D67900B514A9 /* oro.jar */; settings = {JAVA_ARCHIVE_SUBDIR = ../shared/lib; }; };
 		33FF07050965BEE60016AC38 /* macosx_setup.command in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FFFEB90965BD110016AC38 /* macosx_setup.command */; };
 		33FF07100965BF8A0016AC38 /* burn.command in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FFFEAF0965BD110016AC38 /* burn.command */; };
-		33FF07150965BFC10016AC38 /* FTDIUSBSerialDriver_v2_0_1.dmg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FFFEB30965BD110016AC38 /* FTDIUSBSerialDriver_v2_0_1.dmg */; };
 		33FF07160965BFC10016AC38 /* KeyspanUSAdrvr20.dmg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FFFEB40965BD110016AC38 /* KeyspanUSAdrvr20.dmg */; };
 		33FF071F0965C1E30016AC38 /* about.jpg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF01DE0965BD160016AC38 /* about.jpg */; };
 		33FF07220965C1E30016AC38 /* buttons.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02770965BD160016AC38 /* buttons.gif */; };
@@ -270,7 +271,8 @@
 			dstPath = drivers;
 			dstSubfolderSpec = 16;
 			files = (
-				33FF07150965BFC10016AC38 /* FTDIUSBSerialDriver_v2_0_1.dmg in CopyFiles */,
+				338C478A0AA204BE008F2C0D /* FTDIUSBSerialDriver_v2_1_6.dmg in CopyFiles */,
+				338C478B0AA204BE008F2C0D /* FTDIUSBSerialDriver_v2_2_6_Intel.dmg in CopyFiles */,
 				33FF07160965BFC10016AC38 /* KeyspanUSAdrvr20.dmg in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -322,6 +324,8 @@
 		333269E1099BB1FC007D3AE2 /* tools.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = tools.zip; sourceTree = "<group>"; };
 		336EA4DB09FF87E30052D765 /* examples */ = {isa = PBXFileReference; lastKnownFileType = folder; path = examples; sourceTree = "<group>"; };
 		337CD3F309EFC183002B890C /* fetch.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = fetch.sh; sourceTree = "<group>"; };
+		338C47870AA204B0008F2C0D /* FTDIUSBSerialDriver_v2_1_6.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = FTDIUSBSerialDriver_v2_1_6.dmg; sourceTree = "<group>"; };
+		338C47880AA204B0008F2C0D /* FTDIUSBSerialDriver_v2_2_6_Intel.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = FTDIUSBSerialDriver_v2_2_6_Intel.dmg; sourceTree = "<group>"; };
 		33AF620A0965D67800B514A9 /* antlr.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = antlr.jar; sourceTree = "<group>"; };
 		33AF620B0965D67900B514A9 /* applet.html */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.html; path = applet.html; sourceTree = "<group>"; };
 		33AF620C0965D67900B514A9 /* mrj.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = mrj.jar; sourceTree = "<group>"; };
@@ -473,7 +477,6 @@
 		33FFFE930965BD110016AC38 /* .cvsignore */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = .cvsignore; sourceTree = "<group>"; };
 		33FFFE940965BD110016AC38 /* Arduino.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Arduino.xcodeproj; sourceTree = "<group>"; };
 		33FFFEAF0965BD110016AC38 /* burn.command */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = burn.command; sourceTree = "<group>"; };
-		33FFFEB30965BD110016AC38 /* FTDIUSBSerialDriver_v2_0_1.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = FTDIUSBSerialDriver_v2_0_1.dmg; sourceTree = "<group>"; };
 		33FFFEB40965BD110016AC38 /* KeyspanUSAdrvr20.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = KeyspanUSAdrvr20.dmg; sourceTree = "<group>"; };
 		33FFFEB50965BD110016AC38 /* DS_Store */ = {isa = PBXFileReference; lastKnownFileType = file; path = DS_Store; sourceTree = "<group>"; };
 		33FFFEB60965BD110016AC38 /* jikes */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = jikes; sourceTree = "<group>"; };
@@ -910,7 +913,8 @@
 		33FFFEB20965BD110016AC38 /* drivers */ = {
 			isa = PBXGroup;
 			children = (
-				33FFFEB30965BD110016AC38 /* FTDIUSBSerialDriver_v2_0_1.dmg */,
+				338C47870AA204B0008F2C0D /* FTDIUSBSerialDriver_v2_1_6.dmg */,
+				338C47880AA204B0008F2C0D /* FTDIUSBSerialDriver_v2_2_6_Intel.dmg */,
 				33FFFEB40965BD110016AC38 /* KeyspanUSAdrvr20.dmg */,
 			);
 			path = drivers;
