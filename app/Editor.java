@@ -108,6 +108,7 @@ public class Editor extends JFrame
   JMenuItem saveAsMenuItem;
   JMenu serialMenu;
   JMenu serialRateMenu;
+  JMenu mcuMenu;
   SerialMenuListener serialMenuListener;
 
   boolean running;
@@ -661,11 +662,11 @@ public class Editor extends JFrame
     JMenuItem item;
     JMenuItem rbMenuItem;
     JMenuItem cbMenuItem;
-    SerialRateMenuListener		srml = new SerialRateMenuListener();
+    SerialRateMenuListener srml = new SerialRateMenuListener();
     String[] portRates = {
     "300","1200","2400","4800","9600","14400",
     "19200","28800","38400","57600","115200"
-  };
+    };
     
     serialMenuListener  = new SerialMenuListener();
 
@@ -708,6 +709,23 @@ public class Editor extends JFrame
       });
     menu.add(item);
     menu.addSeparator();
+    
+    mcuMenu = new JMenu("Microcontroller (MCU)");
+    String curr_mcu = Preferences.get("build.mcu");
+    ButtonGroup mcuGroup = new ButtonGroup();
+    McuMenuListener mml = new McuMenuListener();
+    
+    item = new JCheckBoxMenuItem("atmega8", "atmega8".equals(curr_mcu));
+    item.addActionListener(mml);
+    mcuGroup.add(item);
+    mcuMenu.add(item);
+	
+    item = new JCheckBoxMenuItem("atmega168", "atmega168".equals(curr_mcu));
+    item.addActionListener(mml);
+    mcuGroup.add(item);
+    mcuMenu.add(item);
+    
+    menu.add(mcuMenu);
 	
     serialMenu = new JMenu("Serial Port");
     populateSerialMenu();
@@ -810,11 +828,24 @@ public class Editor extends JFrame
       item.setState(true);
       String name = item.getLabel();
       
-	  Preferences.set("serial.debug_rate", name);
+      Preferences.set("serial.debug_rate", name);
       //System.out.println("serial port speed set to " + name);
     }
 	
-	
+  }
+  
+  class McuMenuListener implements ActionListener {
+    McuMenuListener() {}
+  
+    public void actionPerformed(ActionEvent actionevent) {
+      for (int i = 0; i < mcuMenu.getItemCount(); i++)
+        if (mcuMenu.getItem(i) instanceof JCheckBoxMenuItem)
+          ((JCheckBoxMenuItem) mcuMenu.getItem(i)).setState(false);
+      
+      ((JCheckBoxMenuItem) actionevent.getSource()).setState(true);
+      Preferences.set("build.mcu",
+        ((JCheckBoxMenuItem) actionevent.getSource()).getLabel());
+    }
   }
   
   protected void populateSerialMenu() {
