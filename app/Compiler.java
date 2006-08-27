@@ -83,10 +83,20 @@ public class Compiler implements MessageConsumer {
 //    } catch (IOException e) {
 //      throw new RunnerException(e.getMessage());
 //    }
+	String avrBasePath;
+    if(Base.isMacOS()) {
+    	avrBasePath = new String("tools/avr/bin/"); 
+    }
+    else if(Base.isLinux()) {
+    	avrBasePath = new String("");     	
+    }
+    else {
+    	avrBasePath = new String(userdir + "tools/avr/bin/"); 
+    }
+
 
     String preCommandCompiler[] = new String[] {
-      ((!Base.isMacOS()) ? "tools/avr/bin/avr-gcc" :
-        userdir + "tools/avr/bin/avr-gcc"),
+      avrBasePath + "avr-gcc",
       "-c", // compile, don't link
       "-g", // include debugging info (so errors include line numbers)
       "-Os", // optimize for size
@@ -111,8 +121,7 @@ public class Compiler implements MessageConsumer {
     }
 
     String preCommandCompilerCPP[] = new String[] {
-      ((!Base.isMacOS()) ? "tools/avr/bin/avr-g++" :
-        userdir + "tools/avr/bin/avr-g++"),
+      avrBasePath + "avr-g++",
       "-c", // compile, don't link
       "-g", // include debugging info (so errors include line numbers)
       "-Os", // optimize for size
@@ -132,8 +141,7 @@ public class Compiler implements MessageConsumer {
     }
 
     String preCommandLinker[] = new String[] {
-      ((!Base.isMacOS()) ? "tools/avr/bin/avr-gcc" :
-        userdir + "tools/avr/bin/avr-gcc"),
+      avrBasePath + "avr-gcc",
       " ",
       "-mmcu=" + Preferences.get("build.mcu"),
       "-o",
@@ -162,8 +170,7 @@ public class Compiler implements MessageConsumer {
     }
 
     String baseCommandObjcopy[] = new String[] {
-      ((!Base.isMacOS()) ? "tools/avr/bin/avr-objcopy" :
-        userdir + "tools/avr/bin/avr-objcopy"),
+      avrBasePath + "avr-objcopy",
       "-O",
       " ",
       "-R",

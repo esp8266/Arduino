@@ -2,7 +2,7 @@
 
 /*
   Uploader - default downloader class that connects to uisp
-  Part of the Arduino project - http://arduino.berlios.de/
+  Part of the Arduino project - http://www.arduino.cc/
 
   Copyright (c) 2004-05
   Hernando Barragan
@@ -134,13 +134,23 @@ public class Uploader implements MessageConsumer  {
     int result=0; // pre-initialized to quiet a bogus warning from jikes
     try {
       List commandDownloader = new ArrayList();
-      commandDownloader.add((!Base.isMacOS() ? "" : userdir) + "tools/avr/bin/uisp");
+      String avrBasePath;
+      if(Base.isMacOS()) {
+        avrBasePath = new String("tools/avr/bin/"); 
+      }
+      else if(Base.isLinux()) {
+        avrBasePath = new String("");     	
+      }
+      else {
+        avrBasePath = new String(userdir + "tools/avr/bin/"); 
+      }
+      commandDownloader.add(avrBasePath + "uisp");
+      //commandDownloader.add((!Base.isMacOS() ? "" : userdir) + "tools/avr/bin/uisp");
+      if (Preferences.getBoolean("upload.verbose"))
+        commandDownloader.add("-v=4");
       commandDownloader.add("-dpart=" + Preferences.get("build.mcu"));
       commandDownloader.addAll(params);
   	  //commandDownloader.add("-v=4"); // extra verbosity for help debugging.
-      //for(int i = 0; i < commandDownloader.length; i++) {
-      //  System.out.println(commandDownloader[i]);
-      //}
 
       // Cleanup the serial buffer
       Serial serialPort = new Serial();
@@ -152,7 +162,14 @@ public class Uploader implements MessageConsumer  {
       serialPort.dispose();
 
       String[] commandArray = new String[commandDownloader.size()];
-      Process process = Runtime.getRuntime().exec((String[]) commandDownloader.toArray(commandArray));
+      commandDownloader.toArray(commandArray);
+      if (Preferences.getBoolean("upload.verbose")) {
+        for(int i = 0; i < commandArray.length; i++) {
+          System.out.print(commandArray[i] + " ");
+        }
+        System.out.println();
+      }
+      Process process = Runtime.getRuntime().exec(commandArray);
       new MessageSiphon(process.getInputStream(), this);
       new MessageSiphon(process.getErrorStream(), this);
 

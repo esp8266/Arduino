@@ -40,9 +40,18 @@ public class Sizer implements MessageConsumer {
   
   public long computeSize() throws RunnerException {
     String userdir = System.getProperty("user.dir") + File.separator;
+	String avrBasePath;
+    if(Base.isMacOS()) {
+    	avrBasePath = new String("tools/avr/bin/"); 
+    }
+    else if(Base.isLinux()) {
+    	avrBasePath = new String("");     	
+    }
+    else {
+    	avrBasePath = new String(userdir + "tools/avr/bin/"); 
+    }
     String commandSize[] = new String[] {
-      ((!Base.isMacOS()) ? "tools/avr/bin/avr-size" :
-        userdir + "tools/avr/bin/avr-size"),
+      avrBasePath + "avr-size",
       " "
     };
     

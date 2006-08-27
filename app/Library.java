@@ -315,10 +315,20 @@ public class Library implements MessageConsumer{
       return false;
     }
     
-    String userDir = System.getProperty("user.dir") + File.separator;
+    String userdir = System.getProperty("user.dir") + File.separator;
+    String avrBasePath;
+    if(Base.isMacOS()) {
+    	avrBasePath = new String("tools/avr/bin/"); 
+    }
+    else if(Base.isLinux()) {
+    	avrBasePath = new String("");     	
+    }
+    else {
+    	avrBasePath = new String(userdir + "tools/avr/bin/"); 
+    }
 
     String[] baseCompileCommandC = new String[] {
-      ((!Base.isMacOS()) ? "tools/avr/bin/avr-gcc" : userDir + "tools/avr/bin/avr-gcc"),
+      avrBasePath + "avr-gcc",
       "-c",
       "-g",
       "-Os",
@@ -330,7 +340,7 @@ public class Library implements MessageConsumer{
     };
 
     String[] baseCompileCommandCPP = new String[] {
-      ((!Base.isMacOS()) ? "tools/avr/bin/avr-g++" : userDir + "tools/avr/bin/avr-g++"),
+      avrBasePath + "avr-g++",
       "-c",
       "-g",
       "-Os",
