@@ -103,6 +103,9 @@ public class Editor extends JFrame
   RunButtonWatcher watcher;
   //Runner runtime;
 
+
+  JMenuItem burnBootloaderItem = null;
+  JMenuItem burnBootloaderParallelItem = null;
   JMenuItem exportAppItem;
   JMenuItem saveMenuItem;
   JMenuItem saveAsMenuItem;
@@ -724,6 +727,7 @@ public class Editor extends JFrame
     item.addActionListener(mml);
     mcuGroup.add(item);
     mcuMenu.add(item);
+
     
     menu.add(mcuMenu);
 	
@@ -748,22 +752,29 @@ public class Editor extends JFrame
   
     menu.addSeparator();
     
-    item = new JMenuItem("Burn Bootloader");
-    item.addActionListener(new ActionListener() {
+    burnBootloaderItem = new JMenuItem("Burn Bootloader");
+    burnBootloaderItem.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           handleBurnBootloader(false);
         }
       });
-    menu.add(item);
+    menu.add(burnBootloaderItem);
     
+    if (!Preferences.get("build.mcu").equals("atmega8"))
+      burnBootloaderItem.setEnabled(false);
+      
     if (!Base.isMacOS()) {
-      item = new JMenuItem("Burn Bootloader (parallel port)");
-      item.addActionListener(new ActionListener() {
+      burnBootloaderParallelItem =
+        new JMenuItem("Burn Bootloader (parallel port)");
+      burnBootloaderParallelItem.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
             handleBurnBootloader(true);
           }
         });
-      menu.add(item);
+      menu.add(burnBootloaderParallelItem);
+    
+      if (!Preferences.get("build.mcu").equals("atmega8"))
+        burnBootloaderParallelItem.setEnabled(false);
     }
     
     menu.addMenuListener(new MenuListener() {
@@ -774,6 +785,7 @@ public class Editor extends JFrame
         populateSerialMenu();
       }
     });
+
 
     return menu;
   }
@@ -845,6 +857,12 @@ public class Editor extends JFrame
       ((JCheckBoxMenuItem) actionevent.getSource()).setState(true);
       Preferences.set("build.mcu",
         ((JCheckBoxMenuItem) actionevent.getSource()).getLabel());
+
+      boolean bootloadingEnabled =
+        Preferences.get("build.mcu").equals("atmega8");
+      burnBootloaderItem.setEnabled(bootloadingEnabled);
+      if (burnBootloaderParallelItem != null)
+        burnBootloaderParallelItem.setEnabled(bootloadingEnabled);
     }
   }
   
@@ -2001,6 +2019,10 @@ public class Editor extends JFrame
     if(debugging)
       doStop();
     console.clear();
+    if (!Preferences.get("build.mcu").equals("atmega8")) {
+      error("Burn bootloader only works on ATmega8s.  See the Arduino FAQ for more info.");
+      return;
+    }
     //String what = sketch.isLibrary() ? "Applet" : "Library";
     //message("Exporting " + what + "...");
     message("Burning bootloader to I/O Board (this may take a minute)...");
