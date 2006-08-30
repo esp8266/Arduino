@@ -22,15 +22,19 @@ rm -rf arduino-*
 
 # use 'shared' files as starting point
 cp -r ../shared arduino
+mkdir arduino
 cp -r work/lib/targets arduino/lib
 
 # new style examples thing ala reas
-cd arduino
-mkdir examples
-unzip -d examples -q dist/examples.zip
-rm dist/examples.zip
-rm -rf dist
-cd ..
+#cd arduino
+#mkdir examples
+#unzip -d examples -q dist/examples.zip
+#rm dist/examples.zip
+#rm -rf dist
+#cd ..
+
+mv arduino/dist/examples arduino/examples
+rm -rf arduino/dist
 
 # extract reference
 cd arduino
@@ -41,11 +45,11 @@ cd ..
 # add java (jre) files
 unzip -q -d arduino jre.zip
 
-# copy tools from work/
+# copy stuff from work/
 cp -r work/tools arduino
-
 cp -r work/bootloader arduino
 cp -r work/drivers arduino
+#cp -r work/examples arduino
 
 # directories used by the app
 #mkdir arduino/lib/build
@@ -71,7 +75,8 @@ chmod +x arduino/*.dll
 
 # get platform-specific goodies from the dist dir
 cp launcher/arduino.exe arduino/
-#cp dist/run.bat arduino/
+cp dist/run.bat arduino/
+chmod +x arduino/run.bat
 
 # convert notes.txt to windows LFs
 # the 2> is because the app is a little chatty
@@ -112,7 +117,8 @@ cp -a $P5 $P5-expert
 
 # can't use the run.bat that's tied to a local jre
 rm $P5-expert/run.bat
-cp dist/run-expert.bat $P5-expert/
+cp dist/run-expert.bat $P5-expert/run.bat
+chmod +x $P5-expert/run.bat
 
 # remove enormous java runtime
 rm -rf $P5-expert/java
