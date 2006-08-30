@@ -1652,16 +1652,19 @@ public class Sketch {
   protected void size(String buildPath, String suggestedClassName)
     throws RunnerException {
     long size = 0;
+    long maxsize = Preferences.getInteger("upload.maximum_size");
+    if (Preferences.get("build.mcu").equals("atmega168"))
+      maxsize *= 2;
     Sizer sizer = new Sizer(buildPath, suggestedClassName);
     try {
       size = sizer.computeSize();
       System.out.println("Binary sketch size: " + size + " bytes (of a " +
-        Preferences.get("upload.maximum_size") + " byte maximum)");      
+        maxsize + " byte maximum)");      
     } catch (RunnerException e) {
       System.err.println("Couldn't determine program size: " + e.getMessage());
     }
 
-    if (size > Preferences.getInteger("upload.maximum_size"))
+    if (size > maxsize)
       throw new RunnerException(
         "Sketch too big; try deleting code, removing floats, or see " +
         "http://www.arduino.cc/en/Main/FAQ for more advice.");
