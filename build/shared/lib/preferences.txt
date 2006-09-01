@@ -299,3 +299,4 @@ build.mcu=atmega8
 build.f_cpu=16000000L
 build.extension=c
 build.target=arduino
+build.verbose=false

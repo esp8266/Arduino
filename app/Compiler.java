@@ -325,9 +325,12 @@ public class Compiler implements MessageConsumer {
         baseCommandCompiler[baseCommandCompiler.length - 2] = sourceNames[i];
         baseCommandCompiler[baseCommandCompiler.length - 1] = "-o"+ objectNames[i];
         //System.arraycopy(baseCommandCompiler.length
-        //for(int j = 0; j < baseCommandCompiler.length; j++) {
-        //  System.out.println(baseCommandCompiler[j]);
-        //}
+        if (Preferences.getBoolean("build.verbose")) {
+          for(int j = 0; j < baseCommandCompiler.length; j++) {
+            System.out.print(baseCommandCompiler[j] + " ");
+          }
+          System.out.println();
+        }
         process = Runtime.getRuntime().exec(baseCommandCompiler);
         new MessageSiphon(process.getInputStream(), this);
         new MessageSiphon(process.getErrorStream(), this);
@@ -354,9 +357,12 @@ public class Compiler implements MessageConsumer {
       for(int i = 0; i < fileCountCPP; i++) {
         baseCommandCompilerCPP[baseCommandCompilerCPP.length - 2] = sourceNamesCPP[i];
         baseCommandCompilerCPP[baseCommandCompilerCPP.length - 1] = "-o"+ objectNamesCPP[i];
-        //for(int j = 0; j < baseCommandCompilerCPP.length; j++) {
-        //  System.out.println(baseCommandCompilerCPP[j]);
-        //}
+        if (Preferences.getBoolean("build.verbose")) {
+          for(int j = 0; j < baseCommandCompilerCPP.length; j++) {
+            System.out.print(baseCommandCompilerCPP[j] + " ");
+          }
+          System.out.println();
+        }
         process = Runtime.getRuntime().exec(baseCommandCompilerCPP);
         new MessageSiphon(process.getInputStream(), this);
         new MessageSiphon(process.getErrorStream(), this);
@@ -381,9 +387,12 @@ public class Compiler implements MessageConsumer {
       }
 
 
-      //for(int j = 0; j < commandLinker.length; j++) {
-      //  System.out.println(commandLinker[j]);
-      //}
+      if (Preferences.getBoolean("build.verbose")) {
+        for(int j = 0; j < commandLinker.length; j++) {
+          System.out.print(commandLinker[j] + " ");
+        }
+        System.out.println();
+      }
       process = Runtime.getRuntime().exec(commandLinker);
       new MessageSiphon(process.getInputStream(), this);
       new MessageSiphon(process.getErrorStream(), this);
@@ -401,13 +410,16 @@ public class Compiler implements MessageConsumer {
       if(result!=0)
         return false;
 
-      /*for(int j = 0; j < baseCommandObjcopy.length; j++) {
-        System.out.println(baseCommandObjcopy[j]);
-      }*/
       baseCommandObjcopy[2] = "srec";
       baseCommandObjcopy[4] = ".eeprom";
       baseCommandObjcopy[5] = buildPath + File.separator + sketch.name + ".elf";
       baseCommandObjcopy[6] = buildPath + File.separator + sketch.name + ".rom";
+      if (Preferences.getBoolean("build.verbose")) {
+        for(int j = 0; j < baseCommandObjcopy.length; j++) {
+          System.out.print(baseCommandObjcopy[j] + " ");
+        }
+        System.out.println();
+      }
       process = Runtime.getRuntime().exec(baseCommandObjcopy);
       new MessageSiphon(process.getInputStream(), this);
       new MessageSiphon(process.getErrorStream(), this);
@@ -429,6 +441,12 @@ public class Compiler implements MessageConsumer {
       baseCommandObjcopy[4] = ".flash";
       baseCommandObjcopy[5] = buildPath + File.separator + sketch.name + ".elf";
       baseCommandObjcopy[6] = buildPath + File.separator + sketch.name + ".hex";
+      if (Preferences.getBoolean("build.verbose")) {
+        for(int j = 0; j < baseCommandObjcopy.length; j++) {
+          System.out.print(baseCommandObjcopy[j] + " ");
+        }
+        System.out.println();
+      }
       process = Runtime.getRuntime().exec(baseCommandObjcopy);
       new MessageSiphon(process.getInputStream(), this);
       new MessageSiphon(process.getErrorStream(), this);
