@@ -26,29 +26,31 @@
 #  2. Below, modify the line containing "TARGET" to refer to the name of
 #     of your program's file without an extension (e.g. TARGET = foo).
 #
-#  3. Modify the line containing "PORT" to refer to the filename
+#  3. Modify the line containg "ARDUINO" to point the directory that
+#     contains the Arduino core (for normal Arduino installations, this
+#     is the lib/targets/arduino sub-directory).
+#
+#  4. Modify the line containing "PORT" to refer to the filename
 #     representing the USB or serial connection to your Arduino board
 #     (e.g. PORT = /dev/tty.USB0).  If the exact name of this file
 #     changes, you can use * as a wildcard (e.g. PORT = /dev/tty.USB*).
 #
-#  4. At the command line, change to the directory containing your
+#  5. At the command line, change to the directory containing your
 #     program's file and the makefile.
 #
-#  5. Type "make" and press enter to compile/verify your program.
+#  6. Type "make" and press enter to compile/verify your program.
 #
-#  6. Type "make upload", reset your Arduino board, and press enter  to
+#  7. Type "make upload", reset your Arduino board, and press enter  to
 #     upload your program to the Arduino board.
 #
 # $Id$
 
 PORT = /dev/tty.usbserial*
 TARGET = foo
-ARDUINO = /Applications/arduino-0005
-ARDUINOSRC = $(ARDUINO)/lib/targets/arduino
-SRC = $(ARDUINOSRC)/buffer.c $(ARDUINOSRC)/pins_arduino.c \
-  $(ARDUINOSRC)/Serial.c $(ARDUINOSRC)/uart.c $(ARDUINOSRC)/wiring.c
-CXXSRC = $(TARGET).cpp $(ARDUINOSRC)/HardwareSerial.cpp \
-  $(ARDUINOSRC)/WRandom.cpp
+ARDUINO = /Applications/arduino-0005/lib/targets/arduino
+SRC = $(ARDUINO)/buffer.c $(ARDUINO)/pins_arduino.c \
+  $(ARDUINO)/Serial.c $(ARDUINO)/uart.c $(ARDUINO)/wiring.c
+CXXSRC = $(TARGET).cpp $(ARDUINO)/HardwareSerial.cpp $(ARDUINO)/WRandom.cpp
 MCU = atmega8
 F_CPU = 16000000
 FORMAT = ihex
@@ -69,8 +71,8 @@ CDEFS = -DF_CPU=$(F_CPU)
 CXXDEFS = -DF_CPU=$(F_CPU)
 
 # Place -I options here
-CINCS = -I$(ARDUINOSRC)
-CXXINCS = -I$(ARDUINOSRC)
+CINCS = -I$(ARDUINO)
+CXXINCS = -I$(ARDUINO)
 
 # Compiler flag to set the C Standard level.
 # c89   - "ANSI" C
