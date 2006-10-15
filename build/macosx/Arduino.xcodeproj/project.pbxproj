@@ -438,7 +438,7 @@
 		33BEDDD409D6E8D800430D5B /* ExportFolder.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = ExportFolder.java; sourceTree = "<group>"; };
 		33BEE0CD09D7446100430D5B /* Library.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = Library.java; sourceTree = "<group>"; };
 		33CF03B009662CA800F2C9A9 /* arduino.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = arduino.icns; path = dist/arduino.icns; sourceTree = "<group>"; };
-		33DD8FB6096AC8DA0013AF8F /* Arduino.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Arduino.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		33DD8FB6096AC8DA0013AF8F /* Arduino.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Arduino.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		33FF01DE0965BD160016AC38 /* about.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = about.jpg; sourceTree = "<group>"; };
 		33FF02770965BD160016AC38 /* buttons.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = buttons.gif; sourceTree = "<group>"; };
 		33FF02780965BD160016AC38 /* icon.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = icon.gif; sourceTree = "<group>"; };
@@ -1110,7 +1110,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd $BUILT_PRODUCTS_DIR/../../\n\nREVISION=`head -1 ../../todo.txt | cut -c 1-4`\nSHORT_REVISION=`head -1 ../../todo.txt | cut -c 3-4`\nVERSIONED=`cat ../../app/Base.java | grep $REVISION`\n\nif [ -z \"$VERSIONED\" ]\nthen\n  echo Fix the revision number in Base.java\n  exit\nfi\n\nrm -rf arduino\nrm -rf arduino-*\n\nmv -r $BUILT_PRODUCTS_DIR arduino\n\nfind arduino -name \"*~\" -exec rm -f {} ';'\n# need to leave ds store stuff cuz one of those is important\n#find arduino -name \".DS_Store\" -exec rm -f {} ';'\nfind arduino -name \"._*\" -exec rm -f {} ';'\nfind arduino -name \"Thumbs.db\" -exec rm -f {} ';'\n\n# clean out the cvs entries\nfind arduino -name \"CVS\" -exec rm -rf {} ';' 2> /dev/null\nfind arduino -name \".cvsignore\" -exec rm -rf {} ';'\n\n# clean out the svn entries\nfind arduino -name \".svn\" -exec rm -rf {} ';' 2> /dev/null\n\n#mv arduino/Arduino.app/Contents/MacOS/Arduino \"arduino/Arduino.app/Contents/MacOS/Arduino $SHORT_REVISION\"\nmv arduino/Arduino.app \"arduino/Arduino $SHORT_REVISION.app\"\nmv arduino arduino-$REVISION\nzip -r arduino-$REVISION-mac-ppc.zip arduino-$REVISION\n";
+			shellScript = "cd $BUILT_PRODUCTS_DIR/../../\n\nREVISION=`head -1 ../../todo.txt | cut -c 1-4`\nSHORT_REVISION=`head -1 ../../todo.txt | cut -c 3-4`\nVERSIONED=`cat ../../app/Base.java | grep $REVISION`\n\nif [ -z \"$VERSIONED\" ]\nthen\n  echo Fix the revision number in Base.java\n  exit\nfi\n\nrm -rf arduino\nrm -rf arduino-*\n\nmv $BUILT_PRODUCTS_DIR arduino\n\nfind arduino -name \"*~\" -exec rm -f {} ';'\n# need to leave ds store stuff cuz one of those is important\n#find arduino -name \".DS_Store\" -exec rm -f {} ';'\nfind arduino -name \"._*\" -exec rm -f {} ';'\nfind arduino -name \"Thumbs.db\" -exec rm -f {} ';'\n\n# clean out the cvs entries\nfind arduino -name \"CVS\" -exec rm -rf {} ';' 2> /dev/null\nfind arduino -name \".cvsignore\" -exec rm -rf {} ';'\n\n# clean out the svn entries\nfind arduino -name \".svn\" -exec rm -rf {} ';' 2> /dev/null\n\n#mv arduino/Arduino.app/Contents/MacOS/Arduino \"arduino/Arduino.app/Contents/MacOS/Arduino $SHORT_REVISION\"\nmv arduino/Arduino.app \"arduino/Arduino $SHORT_REVISION.app\"\nmv arduino arduino-$REVISION\nzip -r arduino-$REVISION-mac-ppc.zip arduino-$REVISION\n";
 		};
 		3318B15E0AD6D1FC00FE1A05 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1333,6 +1333,8 @@
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = "";
 				JAVA_CLASS_SEARCH_PATHS = "../shared/lib/registry.jar ../shared/lib/antlr.jar ../shared/lib/mrj.jar ../shared/lib/RXTXcomm.jar ../shared/lib/oro.jar";
+				JAVA_COMPILER_SOURCE_VERSION = 1.4;
+				JAVA_COMPILER_TARGET_VM_VERSION = 1.4;
 				JAVA_ONLY = YES;
 				JAVA_SOURCE_SUBDIR = .;
 				OPTIMIZATION_CFLAGS = "-O0";
