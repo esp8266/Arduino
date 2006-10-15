@@ -109,15 +109,21 @@ int analog_out_pin_to_timer_array[NUM_DIGITAL_PINS] = {
 	NOT_ON_TIMER,
 	NOT_ON_TIMER,
 	NOT_ON_TIMER,
-	// on the ATmega168, digital pin 3 has pwm
+	// on the ATmega168, digital pin 3 has hardware pwm
 #if defined(__AVR_ATmega168__)
 	TIMER2B,
 #else
 	NOT_ON_TIMER,
 #endif
 	NOT_ON_TIMER,
+	// on the ATmega168, digital pins 5 and 6 have hardware pwm
+#if defined(__AVR_ATmega168__)
+	TIMER0B,
+	TIMER0A,
+#else
 	NOT_ON_TIMER,
 	NOT_ON_TIMER,
+#endif
 	NOT_ON_TIMER,
 	NOT_ON_TIMER,
 	TIMER1A,
@@ -161,6 +167,10 @@ pin_t analog_in_pin_to_port_array[NUM_ANALOG_IN_PINS] = {
 	{ PC, 3 },
 	{ PC, 4 },
 	{ PC, 5 },
+#if defined(__AVR_ATmega168__)
+  { NOT_A_PIN, 6 },
+  { NOT_A_PIN, 7 },
+#endif
 };
 
 pin_t *analog_in_pin_to_port = analog_in_pin_to_port_array;

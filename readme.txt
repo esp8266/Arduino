@@ -5,8 +5,6 @@ can be connected to software on your computer (e.g. Flash, Processing, MaxMSP).
 The boards can be assembled by hand or purchased preassembled; the open-source
 IDE can be downloaded for free.
 
-Arduino is an open source project, owned by nobody and supported by many.
-
 For more information, see the website at: http://www.arduino.cc/
 or the forums at: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl
 
@@ -24,15 +22,36 @@ FTDI chip on the board. These can be found in the drivers/ directory.
   Arduino board and point the Windows Add Hardware wizard to the FTDI USB
   Drivers directory.
 
-* On the Mac, mount the FTDIUSBSerialDriver_v2_0_1.dmg disk image and run the
+* On the Mac, mount the FTDIUSBSerialDriver_v2_1_6.dmg (on PPC Macs) or the
+  FTDIUSBSerialDriver_v2_2_6_Intel.dmg (on Intel Macs) disk image and run the
   included FTDIUSBSerialDriver.pkg.  Also run the macosx_setup.command (after
   moving the Arduino distribution to your /Applications folder). It corrects
   permission on a few files for use with the serial port and will prompt you
   for your password. You may need to reboot after running this script.
 
+CREDITS
+Arduino is an open source project, owned by nobody and supported by many.
+
+The Arduino team is composed of Massimo Banzi, David Cuartielles, Tom Igoe,
+Gianluca Martino, and David A. Mellis.
+
+Nicholas Zambetti has contributed from the beginning.
+
+Yaniv Steiner and Giorgio Olivero have been supporting the project and are
+working at using it with the Instant Soup platform.
+
+Arduino uses the GNU avr-gcc toolchain, uisp, avr-libc, avrlib, and code
+from Processing and Wiring.
+
 UPDATES
 
-0005
+0006
+
+Added support for analog inputs 6 and 7 and pwm on pins 5 and 6 on the
+on the ATmega168 used in the Arduino Mini (extra analog inputs not available
+in DIP ATmega168s).
+
+0005 - 2006.09.26
 
 Applied patch from Hans Steiner to improve Linux support by searching for avr
 tools in the user's path instead of expecting them at a fixed location.
@@ -112,15 +131,3 @@ This is the first released of the unified IDE + language library
 it's a terrible hack... but it works. at the moment it's in alpha stage
 but it can be used to work.
 The processing preprocessor is included but not used.
-
-CREDITS
-The Arduino team is composed of Massimo Banzi, David Cuartielles, Tom Igoe,
-Gianluca Martino, and David A. Mellis.
-
-Nicholas Zambetti has contributed from the beginning.
-
-Yaniv Steiner and Giorgio Olivero have been supporting the project and are
-working at using it with the Instant Soup platform.
-
-Arduino uses the GNU avr-gcc toolchain, uisp, avr-libc, avrlib, and code
-from Processing and Wiring.

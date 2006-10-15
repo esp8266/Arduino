@@ -94,6 +94,12 @@ void digitalWrite(int pin, int val)
 			cbi(TCCR1A, COM1B1);
 			
 #if defined(__AVR_ATmega168__)
+		if (analogOutPinToTimer(pin) == TIMER0A)
+			cbi(TCCR0A, COM0A1);
+			
+		if (analogOutPinToTimer(pin) == TIMER0B)
+			cbi(TCCR0A, COM0B1);
+
 		if (analogOutPinToTimer(pin) == TIMER2A)
 			cbi(TCCR2A, COM2A1);
 			
@@ -126,6 +132,12 @@ int digitalRead(int pin)
 			cbi(TCCR1A, COM1B1);
 			
 #if defined(__AVR_ATmega168__)
+		if (analogOutPinToTimer(pin) == TIMER0A)
+			cbi(TCCR0A, COM0A1);
+			
+		if (analogOutPinToTimer(pin) == TIMER0B)
+			cbi(TCCR0A, COM0B1);
+
 		if (analogOutPinToTimer(pin) == TIMER2A)
 			cbi(TCCR2A, COM2A1);
 			
@@ -194,6 +206,16 @@ void analogWrite(int pin, int val)
 		// set pwm duty
 		OCR1B = val;
 #if defined(__AVR_ATmega168__)
+	} else if (analogOutPinToTimer(pin) == TIMER0A) {
+		// connect pwm to pin on timer 0, channel A
+		sbi(TCCR0A, COM0A1);
+		// set pwm duty
+		OCR0A = val;	
+	} else if (analogOutPinToTimer(pin) == TIMER0B) {
+		// connect pwm to pin on timer 0, channel B
+		sbi(TCCR0A, COM0B1);
+		// set pwm duty
+		OCR0B = val;
 	} else if (analogOutPinToTimer(pin) == TIMER2A) {
 		// connect pwm to pin on timer 2, channel A
 		sbi(TCCR2A, COM2A1);
@@ -328,15 +350,14 @@ SIGNAL(SIG_OVERFLOW0)
 
 unsigned long millis()
 {
-	// timer 0 increments every 8 cycles, and overflows when it reaches 256.
-	// we calculate the total number of clock cycles, then divide by the
-	// number of clock cycles per millisecond.
-	//return timer0_overflow_count * 8UL * 256UL / (F_CPU / 1000UL);
+	// timer 0 increments every 64 cycles, and overflows when it reaches 256.
+	// we would calculate the total number of clock cycles, then divide by the
+	// number of clock cycles per millisecond, but this overflows too often.
+	//return timer0_overflow_count * 64UL * 256UL / (F_CPU / 1000UL);
 	
-	// calculating the total number of clock cycles overflows an
-	// unsigned long, so instead find 1/128th the number of clock cycles
-	// and divide by 1/128th the number of clock cycles per millisecond.
-	return timer0_overflow_count * 8UL * 2UL / (F_CPU / 128000UL);
+  // instead find 1/128th the number of clock cycles and divide by 1/128th
+  // the number of clock cycles per millisecond
+  return timer0_overflow_count * 64UL * 2UL / (F_CPU / 128000UL);
 }
 
 void delay(unsigned long ms)
@@ -441,11 +462,20 @@ int main(void)
 	
 	// timer 0 is used for millis() and delay()
 	timer0_overflow_count = 0;
-	// set timer 0 prescale factor to 8
+  // on the ATmega168, timer 0 is also used for fast hardware pwm
+  // (using phase-correct PWM would mean that timer 0 overflowed half as often
+  // resulting in different millis() behavior on the ATmega8 and ATmega168)
+#if defined(__AVR_ATmega168__)
+  sbi(TCCR0A, WGM01);
+  sbi(TCCR0A, WGM00);
+#endif  
+	// set timer 0 prescale factor to 64
 #if defined(__AVR_ATmega168__)
 	sbi(TCCR0B, CS01);
+	sbi(TCCR0B, CS00);
 #else
 	sbi(TCCR0, CS01);
+	sbi(TCCR0, CS00);
 #endif
 	// enable timer 0 overflow interrupt
 #if defined(__AVR_ATmega168__)
