@@ -19,6 +19,8 @@
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software Foundation,
   Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  
+  $Id:$
 */
 
 package processing.app;
@@ -68,6 +70,8 @@ public class EditorStatus extends JPanel implements ActionListener {
   JButton okButton;
   JButton sendButton;
   JTextField editField;
+  JTextField serialField;
+  JComboBox serialRates;
 
   //Thread promptThread;
   int response;
@@ -179,15 +183,16 @@ public class EditorStatus extends JPanel implements ActionListener {
     empty();
   }
   
-  public void serial(String message)
+  public void serial()
   {
     mode = SERIAL;
-    this.message = message;
+    this.message = NO_MESSAGE;
     
     sendButton.setVisible(true);
-    editField.setVisible(true);
-    editField.setText("");
-    editField.requestFocus();
+    serialRates.setVisible(true);
+    serialField.setVisible(true);
+    serialField.setText("");
+    serialField.requestFocus();
 
     repaint();
   }
@@ -195,7 +200,8 @@ public class EditorStatus extends JPanel implements ActionListener {
   public void unserial()
   {
     sendButton.setVisible(false);
-    editField.setVisible(false);
+    serialField.setVisible(false);
+    serialRates.setVisible(false);
     empty();
   }
 
@@ -399,19 +405,48 @@ public class EditorStatus extends JPanel implements ActionListener {
                 event.consume();
                 //System.out.println("code is " + code + "  char = " + c);
               }
-            } else { // mode != EDIT (i.e. mode == SERIAL)
-              if (c == KeyEvent.VK_ENTER) {  // accept the input
-                String answer = editField.getText();
-                editor.serialPort.write(answer + "\n");
-                event.consume();
-                editField.setText("");
-              } 
-            }
+            } 
             //System.out.println("code is " + code + "  char = " + c);
           }
         });
       add(editField);
       editField.setVisible(false);
+            
+      serialField = new JTextField();
+      serialField.addActionListener(this);
+
+      serialField.addKeyListener(new KeyAdapter() {
+        public void keyTyped(KeyEvent event) {
+          int c = event.getKeyChar();
+            
+          if (c == KeyEvent.VK_ENTER) {  // accept the input
+            editor.serialPort.write(serialField.getText());
+            event.consume();
+            serialField.setText("");
+          } 
+        }});
+        
+      add(serialField);
+      serialField.setVisible(false);
+
+      String[] serialRateStrings = {
+        "300","1200","2400","4800","9600","14400",
+        "19200","28800","38400","57600","115200"
+      };
+      
+      serialRates = new JComboBox();
+
+      if (Base.isMacOS())
+        serialRates.setBackground(bgcolor[SERIAL]);
+        
+      for (int i = 0; i < serialRateStrings.length; i++)
+        serialRates.addItem(serialRateStrings[i] + " baud");
+
+      serialRates.setSelectedItem(
+        Preferences.get("serial.debug_rate") + " baud");
+      serialRates.addActionListener(this);      
+      add(serialRates);
+      serialRates.setVisible(false);
     }
   }
 
@@ -428,15 +463,19 @@ public class EditorStatus extends JPanel implements ActionListener {
     noButton.setLocation(noLeft, top);
     cancelButton.setLocation(cancelLeft, top);
     editField.setLocation(yesLeft - Preferences.BUTTON_WIDTH, top);
+    serialField.setLocation(yesLeft - Preferences.BUTTON_WIDTH, top);
     okButton.setLocation(noLeft, top);
+    serialRates.setLocation(0, top);
     sendButton.setLocation(cancelLeft, top);
 
-    yesButton.setSize(   Preferences.BUTTON_WIDTH, Preferences.BUTTON_HEIGHT);
-    noButton.setSize(    Preferences.BUTTON_WIDTH, Preferences.BUTTON_HEIGHT);
-    cancelButton.setSize(Preferences.BUTTON_WIDTH, Preferences.BUTTON_HEIGHT);
-    okButton.setSize(    Preferences.BUTTON_WIDTH, Preferences.BUTTON_HEIGHT);
-    sendButton.setSize(  Preferences.BUTTON_WIDTH, Preferences.BUTTON_HEIGHT);
-    editField.setSize( 2*Preferences.BUTTON_WIDTH, Preferences.BUTTON_HEIGHT);
+    yesButton.setSize(      Preferences.BUTTON_WIDTH, Preferences.BUTTON_HEIGHT);
+    noButton.setSize(       Preferences.BUTTON_WIDTH, Preferences.BUTTON_HEIGHT);
+    cancelButton.setSize(   Preferences.BUTTON_WIDTH, Preferences.BUTTON_HEIGHT);
+    okButton.setSize(       Preferences.BUTTON_WIDTH, Preferences.BUTTON_HEIGHT);
+    sendButton.setSize(     Preferences.BUTTON_WIDTH, Preferences.BUTTON_HEIGHT);
+    serialRates.setSize(  3*Preferences.BUTTON_WIDTH/2, Preferences.BUTTON_HEIGHT);
+    editField.setSize(    2*Preferences.BUTTON_WIDTH, Preferences.BUTTON_HEIGHT);
+    serialField.setSize(  3*Preferences.BUTTON_WIDTH, Preferences.BUTTON_HEIGHT);
   }
 
 
@@ -479,8 +518,15 @@ public class EditorStatus extends JPanel implements ActionListener {
       editor.sketch.nameCode(answer);
       unedit();
     } else if (e.getSource() == sendButton) {
-      editor.serialPort.write(editField.getText());
-      editField.setText("");
+      editor.serialPort.write(serialField.getText());
+      serialField.setText("");
+    } else if (e.getSource() == serialRates) {
+      String wholeString = (String) serialRates.getSelectedItem();
+      String rateString = wholeString.substring(0, wholeString.indexOf(' '));
+      int rate = Integer.parseInt(rateString);
+      Preferences.set("serial.debug_rate", rateString);
+      editor.serialPort.dispose();
+      editor.serialPort = new Serial(true);
     }
   }
 }

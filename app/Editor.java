@@ -665,11 +665,6 @@ public class Editor extends JFrame
     JMenuItem item;
     JMenuItem rbMenuItem;
     JMenuItem cbMenuItem;
-    SerialRateMenuListener srml = new SerialRateMenuListener();
-    String[] portRates = {
-    "300","1200","2400","4800","9600","14400",
-    "19200","28800","38400","57600","115200"
-    };
     
     serialMenuListener  = new SerialMenuListener();
 
@@ -734,22 +729,7 @@ public class Editor extends JFrame
     serialMenu = new JMenu("Serial Port");
     populateSerialMenu();
     menu.add(serialMenu);
-	
-    serialRateMenu = new JMenu("Serial Monitor Baud Rate");
-
-    ButtonGroup group = new ButtonGroup();
-
-    String curr_rate = Preferences.get("serial.debug_rate");
-
-    for (int i = 0; i < portRates.length; i++) {
-      rbMenuItem = new JCheckBoxMenuItem(portRates[i], portRates[i].equals(curr_rate));
-      rbMenuItem.addActionListener(srml);
-      group.add(rbMenuItem);
-      serialRateMenu.add(rbMenuItem);
-    }
-    
-    menu.add(serialRateMenu);
-  
+	  
     menu.addSeparator();
     
     burnBootloaderItem = new JMenuItem("Burn Bootloader");
@@ -822,30 +802,6 @@ public class Editor extends JFrame
     */
   }
 
-  // manages the serial port speed menu
-  class SerialRateMenuListener implements  ActionListener {
-   
-    SerialRateMenuListener() {}
-
-    public void actionPerformed(ActionEvent actionevent) {
-      int count = serialRateMenu.getItemCount();
-      Object to;
-
-      for (int i = 0; i < count; i++) {
-        to = serialRateMenu.getItem(i);
-        if ( to instanceof JCheckBoxMenuItem) ((JCheckBoxMenuItem)serialRateMenu.getItem(i)).setState(false);
-      }
-
-      JCheckBoxMenuItem item = (JCheckBoxMenuItem)actionevent.getSource();
-      item.setState(true);
-      String name = item.getLabel();
-      
-      Preferences.set("serial.debug_rate", name);
-      //System.out.println("serial port speed set to " + name);
-    }
-	
-  }
-  
   class McuMenuListener implements ActionListener {
     McuMenuListener() {}
   
@@ -1448,7 +1404,7 @@ public class Editor extends JFrame
       buttons.activate(EditorButtons.SERIAL);
       serialPort = new Serial(true);
       debugging = true;
-      status.serial("Serial message:");
+      status.serial();
     } else {
       doStop();
     }

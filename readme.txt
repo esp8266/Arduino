@@ -50,6 +50,10 @@ UPDATES
 Added support for analog inputs 6 and 7 and pwm on pins 5 and 6 on the
 on the ATmega168 used in the Arduino Mini (extra analog inputs not available
 in DIP ATmega168s).
+You now select the baud rate for the serial monitor from within the editor
+status bar when the serial monitor is running instead of from the Tools menu.
+Pressing enter within the serial monitor edit box no longer appends a newline
+to the message sent to the board.
 
 0005 - 2006.09.26
 
