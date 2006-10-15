@@ -276,28 +276,28 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 33FFFD3F0965B1E40016AC38 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 33FFFE1C0965BBEF0016AC38 /* Setup */;
+			remoteGlobalIDString = 33FFFE1C0965BBEF0016AC38;
 			remoteInfo = Setup;
 		};
 		3318B1260AD6CF3900FE1A05 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 33FFFD3F0965B1E40016AC38 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 33FFFE1C0965BBEF0016AC38 /* Setup */;
+			remoteGlobalIDString = 33FFFE1C0965BBEF0016AC38;
 			remoteInfo = Setup;
 		};
 		3318B1290AD6CF5E00FE1A05 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 33FFFD3F0965B1E40016AC38 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 33AF61680965C4C600B514A9 /* App */;
+			remoteGlobalIDString = 33AF61680965C4C600B514A9;
 			remoteInfo = App;
 		};
 		3318B12B0AD6CF6100FE1A05 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 33FFFD3F0965B1E40016AC38 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 3318B1140AD6CE7B00FE1A05 /* Setup PPC */;
+			remoteGlobalIDString = 3318B1140AD6CE7B00FE1A05;
 			remoteInfo = "Setup PPC";
 		};
 		3318B1330AD6CF7A00FE1A05 /* PBXContainerItemProxy */ = {
@@ -311,7 +311,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 33FFFD3F0965B1E40016AC38 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 3318B1190AD6CE9F00FE1A05 /* Setup Intel */;
+			remoteGlobalIDString = 3318B1190AD6CE9F00FE1A05;
 			remoteInfo = "Setup Intel";
 		};
 		3318B14E0AD6D1EB00FE1A05 /* PBXContainerItemProxy */ = {
