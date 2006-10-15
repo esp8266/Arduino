@@ -3,12 +3,16 @@ board and a development environment that implements the Processing/Wiring
 language. Arduino can be used to develop stand-alone interactive objects or
 can be connected to software on your computer (e.g. Flash, Processing, MaxMSP).
 The boards can be assembled by hand or purchased preassembled; the open-source
-IDE can be downloaded for free
+IDE can be downloaded for free.
 
 Arduino is an open source project, owned by nobody and supported by many.
 
 For more information, see the website at: http://www.arduino.cc/
 or the forums at: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl
+
+To report a bug or a make a suggestions, go to:
+[hardware] http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?board=hwbugs
+[software] http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?board=swbugs
 
 INSTALLATION
 Detailed instructions are in reference/howto.html.
@@ -30,7 +34,10 @@ UPDATES
 
 0005
 
-ATmega168 support in the AVR libraries.
+Applied patch from Hans Steiner to improve Linux support by searching for avr
+tools in the user's path instead of expecting them at a fixed location.
+Added an upload.verbose preference for help in debugging.
+ATmega168 support!
 New Wiring-compatible randomSeed(), random(max) and random(min, max) functions
 (except operating on longs instead of floats).
 Fixed bug that sometimes caused uploading of old versions of a sketch.
