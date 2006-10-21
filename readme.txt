@@ -45,7 +45,7 @@ from Processing and Wiring.
 
 UPDATES
 
-0006
+0006 - 2006.10.21
 
 Mac version no longer requires Java 1.5, meaning it should run on 10.3.9.
 Added support for analog inputs 6 and 7 and pwm on pins 5 and 6 on the
@@ -125,6 +125,7 @@ the grammar files or package the distribution); active target should be "App".
 Removed unused or unimplemented items from menus.
 
 0002 - 2005.10.05
+
 New build process no longer uses makefiles; now controlled by preferences.txt.
 core/ replaced with targets/; can now link against Wiring libraries.
 Replaced print() with printString, printInteger, printHex, printByte, etc.
@@ -134,6 +135,7 @@ Bootloader shrunk to less than 1 KB; fuses updated accordingly.
 Added serialRead(), serialAvailable(), and delayMicroseconds().
 
 0001 - 2005.08.25 
+
 This is the first released of the unified IDE + language library
 it's a terrible hack... but it works. at the moment it's in alpha stage
 but it can be used to work.
