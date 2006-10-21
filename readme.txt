@@ -47,6 +47,7 @@ UPDATES
 
 0006
 
+Mac version no longer requires Java 1.5, meaning it should run on 10.3.9.
 Added support for analog inputs 6 and 7 and pwm on pins 5 and 6 on the
 on the ATmega168 used in the Arduino Mini (extra analog inputs not available
 in DIP ATmega168s).
@@ -54,6 +55,8 @@ You now select the baud rate for the serial monitor from within the editor
 status bar when the serial monitor is running instead of from the Tools menu.
 Pressing enter within the serial monitor edit box no longer appends a newline
 to the message sent to the board.
+Included the Wire (TWI) library from Wiring.
+Updated the reference.
 
 0005 - 2006.09.26
 
