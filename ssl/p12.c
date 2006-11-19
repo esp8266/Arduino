@@ -192,7 +192,7 @@ static int p8_decrypt(const char *password, const uint8_t *salt, int iter,
 }
 
 /*
- * Take a raw pkcs12 block and the decrypt it and turn it into a certificates
+ * Take a raw pkcs12 block and the decrypt it and turn it into a certificate(s)
  * and keys.
  */
 int pkcs12_decode(SSLCTX *ssl_ctx, SSLObjLoader *ssl_obj, const char *password)
@@ -390,7 +390,7 @@ static int get_pbe_params(uint8_t *buf, int *offset,
         goto error;
 
     /* we expect pbeWithSHAAnd128BitRC4 (1.2.840.113549.1.12.1.1) 
-       which is the only agorithm we support */
+       which is the only algorithm we support */
     if (len != sizeof(pbeSH1RC4) || 
                     memcmp(&buf[*offset], pbeSH1RC4, sizeof(pbeSH1RC4)))
     {

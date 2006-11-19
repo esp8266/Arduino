@@ -354,7 +354,7 @@ EXP_FUNC int STDCALL ssl_verify_cert(SSL *ssl);
  * - SSL_X509_CA_CERT_ORGANIZATION
  * - SSL_X509_CA_CERT_ORGANIZATIONAL_NAME
  * @return The appropriate string (or null if not defined)
- * @note Verification mode must be enabled.
+ * @note Verification build mode must be enabled.
  */
 EXP_FUNC const char * STDCALL ssl_get_cert_dn(SSL *ssl, int component);
 
@@ -388,7 +388,7 @@ EXP_FUNC int STDCALL ssl_renegotiate(SSL *ssl);
  * @param filename [in] The location of a file in DER/PEM format.
  * @param password [in] The password used. Can be null if not required.
  * @return SSL_OK if all ok
- * @note Not available in skeleton mode.
+ * @note Not available in skeleton build mode.
  */
 EXP_FUNC int STDCALL ssl_obj_load(SSLCTX *ssl_ctx, int obj_type, const char *filename, const char *password);
 

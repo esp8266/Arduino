@@ -902,7 +902,8 @@ static void *crypt_new(SSL *ssl, uint8_t *key, uint8_t *iv, int is_decrypt)
  */
 static int send_raw_packet(SSL *ssl, uint8_t protocol)
 {
-    uint8_t rec_buf[SSL_RECORD_SIZE];
+    uint8_t *rec_buf = ssl->bm_buf.pre_data;
+    int pkt_size = SSL_RECORD_SIZE+ssl->bm_buf.index;
     int ret;
 
     rec_buf[0] = protocol;
@@ -911,17 +912,10 @@ static int send_raw_packet(SSL *ssl, uint8_t protocol)
     rec_buf[3] = ssl->bm_buf.index >> 8;
     rec_buf[4] = ssl->bm_buf.index & 0xff;
 
-    DISPLAY_BYTES(ssl, "sending %d bytes", rec_buf, 5, 5);
-    DISPLAY_BYTES(ssl, "sending %d bytes", ssl->bm_buf.data,  
-            ssl->bm_buf.index, ssl->bm_buf.index);
+    DISPLAY_BYTES(ssl, "sending %d bytes", ssl->bm_buf.pre_data, 
+                            pkt_size, pkt_size);
 
-    /* 2 system calls, but what the hell it makes life a lot simpler */
-    ret = SOCKET_WRITE(ssl->client_fd, rec_buf, SSL_RECORD_SIZE);
-
-    if (ret > 0)
-    {
-        ret = SOCKET_WRITE(ssl->client_fd, ssl->bm_buf.data, ssl->bm_buf.index);
-    }
+    ret = SOCKET_WRITE(ssl->client_fd, ssl->bm_buf.pre_data, pkt_size);
 
     SET_SSL_FLAG(SSL_NEED_RECORD);  /* reset for next time */
     ssl->bm_buf.index = 0;

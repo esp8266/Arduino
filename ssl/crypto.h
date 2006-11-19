@@ -269,7 +269,8 @@ typedef void (*hmac_func)(const uint8_t *msg, int length, const uint8_t *key,
 
 typedef struct
 {
-    uint8_t *data;
+    uint8_t *pre_data;	/* include the ssl record bytes */
+    uint8_t *data;	/* the regular ssl data */
     int max_len;
     int index;
 } BUF_MEM;

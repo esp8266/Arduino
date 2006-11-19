@@ -165,7 +165,7 @@ void bi_permanent(bigint *bi)
 }
 
 /**
- * @brief Take a permanent object and make it elligible for freedom.
+ * @brief Take a permanent object and make it eligible for freedom.
  * @param bi [in]   The bigint to be made back to temporary.
  */
 void bi_depermanent(bigint *bi)
@@ -243,7 +243,7 @@ bigint *bi_clone(BI_CTX *ctx, const bigint *bi)
 }
 
 /**
- * @brief Perform an additon operation between two bigints.
+ * @brief Perform an addition operation between two bigints.
  * @param ctx [in]  The bigint session context.
  * @param bia [in]  A bigint.
  * @param bib [in]  Another bigint.
@@ -1038,7 +1038,7 @@ static void more_comps(bigint *bi, int n)
 
 /*
  * Make a new empty bigint. It may just use an old one if one is available.
- * Otherwise get one of the heap.
+ * Otherwise get one off the heap.
  */
 static bigint *alloc(BI_CTX *ctx, int size)
 {

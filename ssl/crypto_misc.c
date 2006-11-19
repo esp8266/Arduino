@@ -31,6 +31,8 @@
 #include "wincrypt.h"
 #endif
 
+#define BM_RECORD_OFFSET 	5	/* same as SSL_RECORD_SIZE */
+
 #ifndef WIN32
 static int rng_fd = -1;
 #elif defined(CONFIG_WIN32_USE_CRYPTO_LIB)
@@ -50,8 +52,9 @@ const char * const unsupported_str = "Error: feature not supported\n";
 BUF_MEM buf_new()
 {
     BUF_MEM bm;
-    bm.data = (uint8_t *)malloc(2048); /* should be enough to start with */
-    bm.max_len = 2048;
+    bm.pre_data = (uint8_t *)malloc(2048); /* should be enough to start with */
+    bm.data = bm.pre_data+BM_RECORD_OFFSET; /* some space at the start */
+    bm.max_len = 2048-BM_RECORD_OFFSET;
     bm.index = 0;
     return bm;
 }
@@ -66,7 +69,9 @@ void buf_grow(BUF_MEM *bm, int len)
         return;
     }
 
-    bm->data = (uint8_t *)realloc(bm->data, len+1024); /* just to be sure */
+    /* add 1kB just to be sure */
+    bm->pre_data = (uint8_t *)realloc(bm->pre_data, len+1024+BM_RECORD_OFFSET); 
+    bm->data = bm->pre_data+BM_RECORD_OFFSET;
     bm->max_len = len+1024;
 }
 
@@ -75,7 +80,8 @@ void buf_grow(BUF_MEM *bm, int len)
  */
 void buf_free(BUF_MEM *bm)
 {
-    free(bm->data);
+    free(bm->pre_data);
+    bm->pre_data = NULL;
     bm->data = NULL;
 }
 
