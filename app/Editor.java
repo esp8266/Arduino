@@ -868,11 +868,27 @@ public class Editor extends JFrame
     JMenu menu = new JMenu("Help");
     JMenuItem item;
 
-    item = new JMenuItem("Howto");
+    if (!Base.isLinux()) {
+      item = new JMenuItem("Getting Started");
+      item.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            if (Base.isWindows())
+              Base.openURL(System.getProperty("user.dir") + File.separator +
+                           "reference" + File.separator + "Guide_Windows.html");
+            else
+              Base.openURL(System.getProperty("user.dir") + File.separator +
+                           "reference" + File.separator + "Guide_MacOSX.html");
+          }
+        });
+      menu.add(item);
+    }
+
+    item = new JMenuItem("Troubleshooting");
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           Base.openURL(System.getProperty("user.dir") + File.separator +
-                          "reference" + File.separator + "howto.html");
+                       "reference" + File.separator +
+                       "Guide_Troubleshooting.html");
         }
       });
     menu.add(item);
@@ -881,7 +897,7 @@ public class Editor extends JFrame
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           Base.openURL(System.getProperty("user.dir") + File.separator +
-                          "reference" + File.separator + "environment.html");
+                       "reference" + File.separator + "Guide_Environment.html");
         }
       });
     menu.add(item);
@@ -890,7 +906,7 @@ public class Editor extends JFrame
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           Base.openURL(System.getProperty("user.dir") + File.separator +
-                          "reference" + File.separator + "index.html");
+                       "reference" + File.separator + "index.html");
         }
       });
     menu.add(item);
@@ -899,7 +915,7 @@ public class Editor extends JFrame
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           Base.openURL(System.getProperty("user.dir") + File.separator +
-                          "reference" + File.separator + "FAQ.html");
+                       "reference" + File.separator + "FAQ.html");
         }
       });
     menu.add(item);

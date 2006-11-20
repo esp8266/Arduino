@@ -458,7 +458,6 @@
 		33FF02960965BD160016AC38 /* makefile.w2k */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = makefile.w2k; sourceTree = "<group>"; };
 		33FF02970965BD160016AC38 /* makefile.win */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = makefile.win; sourceTree = "<group>"; };
 		33FF02990965BD160016AC38 /* FTDI USB Drivers.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = "FTDI USB Drivers.zip"; sourceTree = "<group>"; };
-		33FF029A0965BD160016AC38 /* KeyspanUSA19wWinV31.exe */ = {isa = PBXFileReference; lastKnownFileType = file; path = KeyspanUSA19wWinV31.exe; sourceTree = "<group>"; };
 		33FF029B0965BD160016AC38 /* ICE_JNIRegistry.dll */ = {isa = PBXFileReference; lastKnownFileType = file; path = ICE_JNIRegistry.dll; sourceTree = "<group>"; };
 		33FF029C0965BD160016AC38 /* jikes.exe */ = {isa = PBXFileReference; lastKnownFileType = file; path = jikes.exe; sourceTree = "<group>"; };
 		33FF029E0965BD170016AC38 /* makefile.w2k */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = makefile.w2k; sourceTree = "<group>"; };
@@ -576,7 +575,6 @@
 		33FFFE930965BD110016AC38 /* .cvsignore */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = .cvsignore; sourceTree = "<group>"; };
 		33FFFE940965BD110016AC38 /* Arduino.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Arduino.xcodeproj; sourceTree = "<group>"; };
 		33FFFEAF0965BD110016AC38 /* burn.command */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = burn.command; sourceTree = "<group>"; };
-		33FFFEB40965BD110016AC38 /* KeyspanUSAdrvr20.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = KeyspanUSAdrvr20.dmg; sourceTree = "<group>"; };
 		33FFFEB50965BD110016AC38 /* DS_Store */ = {isa = PBXFileReference; lastKnownFileType = file; path = DS_Store; sourceTree = "<group>"; };
 		33FFFEB60965BD110016AC38 /* jikes */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = jikes; sourceTree = "<group>"; };
 		33FFFEB90965BD110016AC38 /* macosx_setup.command */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = macosx_setup.command; sourceTree = "<group>"; };
@@ -720,7 +718,6 @@
 			isa = PBXGroup;
 			children = (
 				33FF02990965BD160016AC38 /* FTDI USB Drivers.zip */,
-				33FF029A0965BD160016AC38 /* KeyspanUSA19wWinV31.exe */,
 			);
 			path = drivers;
 			sourceTree = "<group>";
@@ -1014,7 +1011,6 @@
 			children = (
 				338C47870AA204B0008F2C0D /* FTDIUSBSerialDriver_v2_1_6.dmg */,
 				338C47880AA204B0008F2C0D /* FTDIUSBSerialDriver_v2_2_6_Intel.dmg */,
-				33FFFEB40965BD110016AC38 /* KeyspanUSAdrvr20.dmg */,
 			);
 			path = drivers;
 			sourceTree = "<group>";
