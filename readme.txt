@@ -47,8 +47,8 @@ UPDATES
 
 0007
 
-You can now use digital pins 0 and 1 for input or output until you call
-Serial.begin().
+Defining binary constants: e.g. B1010 is 6.
+Digital pins 0 and 1 can be used for i/o until a call to Serial.begin().
 
 0006 - 2006.10.21
 

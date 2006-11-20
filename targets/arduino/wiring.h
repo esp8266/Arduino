@@ -26,6 +26,7 @@
 #define Wiring_h
 
 #include <avr/io.h>
+#include "binary.h"
 
 #ifdef __cplusplus
 extern "C"{
