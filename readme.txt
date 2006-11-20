@@ -45,6 +45,11 @@ from Processing and Wiring.
 
 UPDATES
 
+0007
+
+You can now use digital pins 0 and 1 for input or output until you call
+Serial.begin().
+
 0006 - 2006.10.21
 
 Mac version no longer requires Java 1.5, meaning it should run on 10.3.9.

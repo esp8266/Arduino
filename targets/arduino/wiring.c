@@ -523,6 +523,14 @@ int main(void)
 	// enable a2d conversions
 	sbi(ADCSRA, ADEN);
 	
+	// disconnect USART from pins 0 and 1 so they can be used as normal
+	// digital i/o; they will be reconnected in any call to Serial.begin()
+#if defined(__AVR_ATmega168__)
+	UCSR0B = 0;
+#else
+	UCSRB = 0;
+#endif
+
 	setup();
 	
 	for (;;)
