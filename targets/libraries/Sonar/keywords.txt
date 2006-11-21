@@ -1,0 +1,22 @@
+#######################################
+# Syntax Coloring Map For Ultrasound
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+Sonar	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+readMicroseconds	KEYWORD2
+readInches	KEYWORD2
+readCentimeters	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+

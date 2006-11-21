@@ -47,6 +47,7 @@ UPDATES
 
 0007
 
+Adding Sonar library for controlling Parallax Ultrasonic PING))) sensors.
 Defining binary constants: e.g. B1010 is 6.
 Digital pins 0 and 1 can be used for i/o until a call to Serial.begin().
 
