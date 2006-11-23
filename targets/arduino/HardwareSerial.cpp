@@ -15,14 +15,14 @@
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+  
+  Modified 23 November 2006 by David A. Mellis
 */
 
-extern "C" {
-  #include <stdio.h>
-  #include <string.h>
-  #include <inttypes.h>
-  #include "Serial.h"
-}
+#include <stdio.h>
+#include <string.h>
+#include <inttypes.h>
+#include "wiring.h"
 
 #include "HardwareSerial.h"
 
@@ -30,49 +30,53 @@ extern "C" {
 
 HardwareSerial::HardwareSerial(uint8_t uart)
 {
-  if(uart == 0){
-    _uart = 0;
-  }else{
-    _uart = 1;
-  }
+  //if(uart == 0){
+  //  _uart = 0;
+  //}else{
+  //  _uart = 1;
+  //}
 }
 
 // Public Methods //////////////////////////////////////////////////////////////
 
 void HardwareSerial::begin(long speed)
 {
-  uart_init(_uart, speed);
+  beginSerial(speed);
 }
 
 uint8_t HardwareSerial::available(void)
 {
-  return uart_available(_uart);
+  return serialAvailable();
 }
 
 int HardwareSerial::read(void)
 {
-  return uart_read(_uart);
+  return serialRead();
 }
 
 void HardwareSerial::print(char c)
 {
-  uart_write(_uart, &c, 1);
+  printByte(c);
 }
 
 void HardwareSerial::print(char c[])
 {
-  uart_write(_uart, c, strlen(c));
+  printString(c);
 }
 
 void HardwareSerial::print(uint8_t b)
 {
-  char c = b;
-  uart_write(_uart, &c, 1);
+  printByte(b);
 }
 
 void HardwareSerial::print(int n)
 {
   print((long) n);
+}
+
+void HardwareSerial::print(unsigned int n)
+{
+  print((unsigned long) n);
 }
 
 void HardwareSerial::print(long n)
@@ -113,7 +117,7 @@ void HardwareSerial::println(char c)
 
 void HardwareSerial::println(char c[])
 {
-  uart_write(_uart, c, strlen(c));
+  print(c);
   println();
 }
 
@@ -125,7 +129,8 @@ void HardwareSerial::println(uint8_t b)
 
 void HardwareSerial::println(int n)
 {
-  println((long) n);
+  print(n);
+  println();
 }
 
 void HardwareSerial::println(long n)
@@ -150,19 +155,7 @@ void HardwareSerial::println(long n, int base)
 
 void HardwareSerial::printNumber(unsigned long n, uint8_t base)
 {
-  uint8_t buf[8 * sizeof(long)]; // Assumes 8-bit chars. 
-  int i = 0;
-  if (n == 0) {
-    print('0');
-    return;
-  }
-  while (n > 0) {
-    buf[i++] = n % base;
-    n /= base;
-  }
-  for (i--; i >= 0; i--){
-    print((char)(buf[i] < 10 ? '0' + buf[i] : 'A' + buf[i] - 10));
-  }
+  printIntegerInBase(n, base);
 }
 
 // Preinstantiate Objects //////////////////////////////////////////////////////

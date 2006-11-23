@@ -31,7 +31,7 @@
 class HardwareSerial
 {
   private:
-    uint8_t _uart;
+    //uint8_t _uart;
     void printNumber(unsigned long, uint8_t);
   public:
     HardwareSerial(uint8_t);
@@ -42,6 +42,7 @@ class HardwareSerial
     void print(char[]);
     void print(uint8_t);
     void print(int);
+    void print(unsigned int);
     void print(long);
     void print(unsigned long);
     void print(long, int);
