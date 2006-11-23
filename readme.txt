@@ -47,6 +47,10 @@ UPDATES
 
 0007
 
+Replaced avr-lib's uart routines with custom code for handling serial
+communication and modified C++ serial commands to call the C serial commands,
+saving ~1 KB of space; the code may behave slightly differently in border
+cases (e.g. non-standard speeds, or on overflow).
 Adding Sonar library for controlling Parallax Ultrasonic PING))) sensors.
 Defining binary constants: e.g. B1010 is 6.
 Digital pins 0 and 1 can be used for i/o until a call to Serial.begin().

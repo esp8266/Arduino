@@ -36,10 +36,18 @@
 #define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
 #endif
 
-// from Pascal's avrlib
-#include "uart.h"
-
 #include "wiring.h"
+
+// Define constants and variables for buffering incoming serial data.  We're
+// using a ring buffer (I think), in which rx_buffer_head is the index of the
+// location to which to write the next incoming character and rx_buffer_tail
+// is the index of the location from which to read
+#define RX_BUFFER_SIZE 128
+
+unsigned char rx_buffer[RX_BUFFER_SIZE];
+
+int rx_buffer_head = 0;
+int rx_buffer_tail = 0;
 
 // The number of times timer 0 has overflowed since the program started.
 // Must be volatile or gcc will optimize away some uses of it.
@@ -241,23 +249,64 @@ void analogWrite(int pin, int val)
 
 void beginSerial(long baud)
 {
-	uartInit();
-	uartSetBaudRate(baud);
+	UBRRH = ((F_CPU / 16 + baud / 2) / baud - 1) >> 8;
+	UBRRL = ((F_CPU / 16 + baud / 2) / baud - 1);
+	
+	// enable rx and tx
+	sbi(UCSRB, RXEN);
+	sbi(UCSRB, TXEN);
+	
+	// enable interrupt on complete reception of a byte
+	sbi(UCSRB, RXCIE);
+	
+	// defaults to 8-bit, no parity, 1 stop bit
 }
 
 void serialWrite(unsigned char c)
 {
-	uartSendByte(c);
+#if defined(__AVR_ATmega168__)
+	while (!(UCSR0A & (1 << UDRE0)))
+		;
+
+	UDR0 = c;
+#else
+	while (!(UCSRA & (1 << UDRE)))
+		;
+
+	UDR = c;
+#endif
 }
 
 int serialAvailable()
 {
-	return uartGetRxBuffer()->datalength;
+	return (rx_buffer_head - rx_buffer_tail) % RX_BUFFER_SIZE;
 }
 
 int serialRead()
 {
-	return uartGetByte();
+	// if the head isn't ahead of the tail, we don't have any characters
+	if (rx_buffer_head == rx_buffer_tail) {
+		return -1;
+	} else {
+		unsigned char c = rx_buffer[rx_buffer_tail];
+		rx_buffer_tail = (rx_buffer_tail + 1) % RX_BUFFER_SIZE;
+		return c;
+	}
+}
+
+SIGNAL(SIG_UART_RECV)
+{
+	unsigned char c = UDR;
+	int i = (rx_buffer_head + 1) % RX_BUFFER_SIZE;
+
+	// if we should be storing the received character into the location
+	// just before the tail (meaning that the head would advance to the
+	// current location of the tail), we're about to overflow the buffer
+	// and so we don't write the character or advance the head.
+	if (i != rx_buffer_tail) {
+		rx_buffer[rx_buffer_head] = c;
+		rx_buffer_head = i;
+	}
 }
 
 void printMode(int mode)
@@ -522,9 +571,10 @@ int main(void)
 
 	// enable a2d conversions
 	sbi(ADCSRA, ADEN);
-	
-	// disconnect USART from pins 0 and 1 so they can be used as normal
-	// digital i/o; they will be reconnected in any call to Serial.begin()
+
+  // the bootloader connects pins 0 and 1 to the USART; disconnect them here
+  // so they can be used as normal digital i/o; they will be reconnected in
+  // Serial.begin()
 #if defined(__AVR_ATmega168__)
 	UCSR0B = 0;
 #else
