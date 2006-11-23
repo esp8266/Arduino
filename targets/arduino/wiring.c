@@ -249,6 +249,17 @@ void analogWrite(int pin, int val)
 
 void beginSerial(long baud)
 {
+#if defined(__AVR_ATmega168__)
+	UBRR0H = ((F_CPU / 16 + baud / 2) / baud - 1) >> 8;
+	UBRR0L = ((F_CPU / 16 + baud / 2) / baud - 1);
+	
+	// enable rx and tx
+	sbi(UCSR0B, RXEN0);
+	sbi(UCSR0B, TXEN0);
+	
+	// enable interrupt on complete reception of a byte
+	sbi(UCSR0B, RXCIE0);
+#else
 	UBRRH = ((F_CPU / 16 + baud / 2) / baud - 1) >> 8;
 	UBRRL = ((F_CPU / 16 + baud / 2) / baud - 1);
 	
@@ -258,6 +269,7 @@ void beginSerial(long baud)
 	
 	// enable interrupt on complete reception of a byte
 	sbi(UCSRB, RXCIE);
+#endif
 	
 	// defaults to 8-bit, no parity, 1 stop bit
 }
@@ -294,9 +306,18 @@ int serialRead()
 	}
 }
 
+#if defined(__AVR_ATmega168__)
+SIGNAL(SIG_USART_RECV)
+#else
 SIGNAL(SIG_UART_RECV)
+#endif
 {
+#if defined(__AVR_ATmega168__)
+	unsigned char c = UDR0;
+#else
 	unsigned char c = UDR;
+#endif
+
 	int i = (rx_buffer_head + 1) % RX_BUFFER_SIZE;
 
 	// if we should be storing the received character into the location
@@ -503,6 +524,20 @@ unsigned long pulseIn(int pin, int state)
 	return width * (16000000UL / F_CPU) * 20 / 23;
 }
 
+void shiftOut(int dataPin, int clockPin, int bitOrder, byte val) {
+	int i;
+
+	for (i = 0; i < 8; i++)  {
+		if (bitOrder == LSBFIRST)
+			digitalWrite(dataPin, !!(val & (1 << i)));
+		else	
+			digitalWrite(dataPin, !!(val & (1 << (7 - i))));
+			
+		digitalWrite(clockPin, HIGH);
+		digitalWrite(clockPin, LOW);		
+	}
+}
+
 int main(void)
 {
 	// this needs to be called before setup() or some functions won't
@@ -511,12 +546,12 @@ int main(void)
 	
 	// timer 0 is used for millis() and delay()
 	timer0_overflow_count = 0;
-  // on the ATmega168, timer 0 is also used for fast hardware pwm
-  // (using phase-correct PWM would mean that timer 0 overflowed half as often
-  // resulting in different millis() behavior on the ATmega8 and ATmega168)
+	// on the ATmega168, timer 0 is also used for fast hardware pwm
+	// (using phase-correct PWM would mean that timer 0 overflowed half as often
+	// resulting in different millis() behavior on the ATmega8 and ATmega168)
 #if defined(__AVR_ATmega168__)
-  sbi(TCCR0A, WGM01);
-  sbi(TCCR0A, WGM00);
+	sbi(TCCR0A, WGM01);
+	sbi(TCCR0A, WGM00);
 #endif  
 	// set timer 0 prescale factor to 64
 #if defined(__AVR_ATmega168__)
@@ -572,9 +607,9 @@ int main(void)
 	// enable a2d conversions
 	sbi(ADCSRA, ADEN);
 
-  // the bootloader connects pins 0 and 1 to the USART; disconnect them here
-  // so they can be used as normal digital i/o; they will be reconnected in
-  // Serial.begin()
+	// the bootloader connects pins 0 and 1 to the USART; disconnect them here
+	// so they can be used as normal digital i/o; they will be reconnected in
+	// Serial.begin()
 #if defined(__AVR_ATmega168__)
 	UCSR0B = 0;
 #else

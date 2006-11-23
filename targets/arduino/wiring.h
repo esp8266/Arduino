@@ -48,6 +48,9 @@ extern "C"{
 #define SERIAL  0x0
 #define DISPLAY 0x1
 
+#define LSBFIRST 0
+#define MSBFIRST 1
+
 #define min(a,b) ((a)<(b)?(a):(b))
 #define max(a,b) ((a)>(b)?(a):(b))
 #define abs(x) ((x)>0?(x):-(x))
@@ -83,6 +86,8 @@ unsigned long millis(void);
 void delay(unsigned long);
 void delayMicroseconds(unsigned int us);
 unsigned long pulseIn(int pin, int state);
+
+void shiftOut(int dataPin, int clockPin, int endianness, byte val);
 
 void setup(void);
 void loop(void);
