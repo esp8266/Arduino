@@ -420,14 +420,15 @@ SIGNAL(SIG_OVERFLOW0)
 
 unsigned long millis()
 {
-	// timer 0 increments every 64 cycles, and overflows when it reaches 256.
-	// we would calculate the total number of clock cycles, then divide by the
-	// number of clock cycles per millisecond, but this overflows too often.
+	// timer 0 increments every 64 cycles, and overflows when it reaches
+	// 256.  we would calculate the total number of clock cycles, then
+	// divide by the number of clock cycles per millisecond, but this
+	// overflows too often.
 	//return timer0_overflow_count * 64UL * 256UL / (F_CPU / 1000UL);
 	
-  // instead find 1/128th the number of clock cycles and divide by 1/128th
-  // the number of clock cycles per millisecond
-  return timer0_overflow_count * 64UL * 2UL / (F_CPU / 128000UL);
+	// instead find 1/128th the number of clock cycles and divide by
+	// 1/128th the number of clock cycles per millisecond
+	return timer0_overflow_count * 64UL * 2UL / (F_CPU / 128000UL);
 }
 
 void delay(unsigned long ms)
@@ -607,9 +608,9 @@ int main(void)
 	// enable a2d conversions
 	sbi(ADCSRA, ADEN);
 
-	// the bootloader connects pins 0 and 1 to the USART; disconnect them here
-	// so they can be used as normal digital i/o; they will be reconnected in
-	// Serial.begin()
+	// the bootloader connects pins 0 and 1 to the USART; disconnect them
+	// here so they can be used as normal digital i/o; they will be
+	// reconnected in Serial.begin()
 #if defined(__AVR_ATmega168__)
 	UCSR0B = 0;
 #else

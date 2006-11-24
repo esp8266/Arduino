@@ -47,6 +47,9 @@ UPDATES
 
 0007
 
+Added attachInterrupt() and detachInterrupt() functions for handling of
+external interrupts on pins 2 and 3.
+Implemented shiftOut() routine; see reference for details.
 Replaced avr-lib's uart routines with custom code for handling serial
 communication and modified C++ serial commands to call the C serial commands,
 saving ~1 KB of space; the code may behave slightly differently in border

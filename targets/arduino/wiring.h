@@ -51,6 +51,10 @@ extern "C"{
 #define LSBFIRST 0
 #define MSBFIRST 1
 
+#define CHANGE 1
+#define FALLING 2
+#define RISING 3
+
 #define min(a,b) ((a)<(b)?(a):(b))
 #define max(a,b) ((a)>(b)?(a):(b))
 #define abs(x) ((x)>0?(x):-(x))
@@ -89,6 +93,9 @@ unsigned long pulseIn(int pin, int state);
 
 void shiftOut(int dataPin, int clockPin, int endianness, byte val);
 
+void attachInterrupt(uint8_t, void (*)(void), int mode);
+void detachInterrupt(uint8_t);
+
 void setup(void);
 void loop(void);
 
@@ -116,6 +123,13 @@ extern int port_to_output[];
 extern pin_t *digital_pin_to_port;
 extern pin_t *analog_in_pin_to_port;
 extern int *analog_out_pin_to_timer;
+
+#define EXTERNAL_INT_0 0
+#define EXTERNAL_INT_1 1
+
+#define EXTERNAL_NUM_INTERRUPTS 2
+
+typedef void (*voidFuncPtr)(void);
 
 #ifdef __cplusplus
 } // extern "C"
