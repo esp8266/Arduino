@@ -1650,37 +1650,61 @@ int main(int argc, char *argv[])
     bi_ctx = bi_initialize();
 
     if (AES_test(bi_ctx))
+    {
+        printf("AES tests failed\n");
         goto cleanup;
+    }
     TTY_FLUSH();
 
     if (RC4_test(bi_ctx))
+    {
+        printf("RC4 tests failed\n");
         goto cleanup;
+    }
     TTY_FLUSH();
 
     if (MD5_test(bi_ctx))
+    {
+        printf("MD5 tests failed\n");
         goto cleanup;
+    }
     TTY_FLUSH();
 
     if (SHA1_test(bi_ctx))
+    {
+        printf("SHA1 tests failed\n");
         goto cleanup;
+    }
     TTY_FLUSH();
 
     if (HMAC_test(bi_ctx))
+    {
+        printf("HMAC tests failed\n");
         goto cleanup;
+    }
     TTY_FLUSH();
 
     if (BIGINT_test(bi_ctx))
+    {
+        printf("BigInt tests failed!\n");
         goto cleanup;
+    }
     TTY_FLUSH();
 
     bi_terminate(bi_ctx);
 
     if (RSA_test())
+    {
+        printf("RSA tests failed\n");
         goto cleanup;
+    }
     TTY_FLUSH();
 
     if (cert_tests())
+    {
+        printf("CERT tests failed\n");
         goto cleanup;
+    }
     TTY_FLUSH();
 
     system("sh ../ssl/test/killopenssl.sh");

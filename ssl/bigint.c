@@ -734,8 +734,8 @@ void bi_set_mod(BI_CTX *ctx, bigint *bim, int mod_offset)
 
 #if defined(CONFIG_BIGINT_MONTGOMERY)
     /* set montgomery variables */
-    R = comp_left_shift(bi_clone(ctx, ctx->bi_radix), k-1);        /* R */
-    R2 = comp_left_shift(bi_clone(ctx, ctx->bi_radix), k*2-1);     /* R^2 */
+    R = comp_left_shift(bi_clone(ctx, ctx->bi_radix), k-1);     /* R */
+    R2 = comp_left_shift(bi_clone(ctx, ctx->bi_radix), k*2-1);  /* R^2 */
     ctx->bi_RR_mod_m[mod_offset] = bi_mod(ctx, R2);             /* R^2 mod m */
     ctx->bi_R_mod_m[mod_offset] = bi_mod(ctx, R);               /* R mod m */
 
@@ -743,10 +743,11 @@ void bi_set_mod(BI_CTX *ctx, bigint *bim, int mod_offset)
     bi_permanent(ctx->bi_R_mod_m[mod_offset]);
 
     ctx->N0_dash[mod_offset] = modular_inverse(ctx->bi_mod[mod_offset]);
+
 #elif defined (CONFIG_BIGINT_BARRETT)
     ctx->bi_mu[mod_offset] = 
         bi_divide(ctx, comp_left_shift(
-               bi_clone(ctx, ctx->bi_radix), k*2-1), ctx->bi_mod[mod_offset], 0);
+            bi_clone(ctx, ctx->bi_radix), k*2-1), ctx->bi_mod[mod_offset], 0);
     bi_permanent(ctx->bi_mu[mod_offset]);
 #endif
 }
@@ -1383,10 +1384,10 @@ bigint *bi_mod_power(BI_CTX *ctx, bigint *bi, bigint *biexp)
     if (!ctx->use_classical)
     {
         /* preconvert */
-        bi = bi_residue(ctx, 
-                bi_multiply(ctx, bi, ctx->bi_RR_mod_m[mod_offset])); /* x' */
+        bi = bi_mont(ctx, 
+                bi_multiply(ctx, bi, ctx->bi_RR_mod_m[mod_offset]));    /* x' */
         bi_free(ctx, biR);
-        biR = ctx->bi_R_mod_m[mod_offset];
+        biR = ctx->bi_R_mod_m[mod_offset];                              /* A */
     }
 #endif
 

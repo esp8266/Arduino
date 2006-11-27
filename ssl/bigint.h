@@ -29,10 +29,6 @@
 #define CONFIG_SSL_CERT_VERIFICATION
 #endif
 
-#if !defined(CONFIG_BIGINT_MONTGOMERY) || !defined(CONFIG_BIGINT_BARRETT)
-#define CONFIG_BIGINT_CLASSICAL 1
-#endif
-
 #include "os_port.h"
 #include "bigint_impl.h"
 

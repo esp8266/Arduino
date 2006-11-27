@@ -35,10 +35,10 @@ ssltesting: ../../$(STAGE)/ssltest
 LIBS=../../$(STAGE)
 CFLAGS += -I../../ssl -I../../config
 
-../../$(STAGE)/perf_bigint: perf_bigint.o
+../../$(STAGE)/perf_bigint: perf_bigint.o $(LIBS)/libaxtls.a
 	$(CC) $(LDFLAGS) -o $@ $^ -L $(LIBS) -laxtls
 
-../../$(STAGE)/ssltest: ssltest.o
+../../$(STAGE)/ssltest: ssltest.o $(LIBS)/libaxtls.a
 	$(CC) $(LDFLAGS) -o $@ $^ -lpthread -L $(LIBS) -laxtls
 else
 performance: ../../$(STAGE)/perf_bigint.exe
