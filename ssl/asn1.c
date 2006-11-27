@@ -42,7 +42,7 @@ static const uint8_t sig_oid_prefix[SIG_OID_PREFIX_SIZE] =
 };
 
 /* CN, O, OU */
-static uint8_t g_dn_types[] = { 3, 10, 11 };
+static const uint8_t g_dn_types[] = { 3, 10, 11 };
 
 static int get_asn1_length(const uint8_t *buf, int *offset)
 {
@@ -152,8 +152,7 @@ int asn1_get_private_key(const uint8_t *buf, int len, RSA_CTX **rsa_ctx)
     dQ_len = asn1_get_int(buf, &offset, &dQ);
     qInv_len = asn1_get_int(buf, &offset, &qInv);
 
-    if (p_len <= 0 || q_len <= 0 || dP_len <= 0 || 
-                                dQ_len <= 0 || qInv_len <= 0)
+    if (p_len <= 0 || q_len <= 0 || dP_len <= 0 || dQ_len <= 0 || qInv_len <= 0)
         return X509_INVALID_PRIV_KEY;
 
     RSA_priv_key_new(rsa_ctx, 
@@ -191,6 +190,7 @@ static int asn1_get_utc_time(const uint8_t *buf, int *offset, time_t *t)
 
     memset(&tm, 0, sizeof(struct tm));
     tm.tm_year = (buf[t_offset] - '0')*10 + (buf[t_offset+1] - '0');
+
     if (tm.tm_year <= 50)    /* 1951-2050 thing */
     {
         tm.tm_year += 100;
@@ -228,8 +228,8 @@ end_version:
 static int asn1_validity(const uint8_t *cert, int *offset, X509_CTX *x509_ctx)
 {
     return (asn1_next_obj(cert, offset, ASN1_SEQUENCE) < 0 ||
-        asn1_get_utc_time(cert, offset, &x509_ctx->not_before) ||
-        asn1_get_utc_time(cert, offset, &x509_ctx->not_after));
+              asn1_get_utc_time(cert, offset, &x509_ctx->not_before) ||
+              asn1_get_utc_time(cert, offset, &x509_ctx->not_after));
 }
 
 /**
@@ -259,15 +259,13 @@ end_oid:
 /**
  * Obtain an ASN.1 printable string type.
  */
-static int asn1_get_printable_str(const uint8_t *buf,
-        int *offset, char **str)
+static int asn1_get_printable_str(const uint8_t *buf, int *offset, char **str)
 {
     int len = X509_NOT_OK;
 
     /* some certs have this awful crud in them for some reason */
     if (buf[*offset] != ASN1_PRINTABLE_STR && 
-            buf[*offset] != ASN1_TELETEX_STR &&
-            buf[*offset] != ASN1_IA5_STR)
+            buf[*offset] != ASN1_TELETEX_STR && buf[*offset] != ASN1_IA5_STR)
         goto end_pnt_str;
 
     (*offset)++;
@@ -334,8 +332,7 @@ end_name:
 /**
  * Read the modulus and public exponent of a certificate.
  */
-static int asn1_public_key(const uint8_t *cert, int *offset,
-        X509_CTX *x509_ctx)
+static int asn1_public_key(const uint8_t *cert, int *offset, X509_CTX *x509_ctx)
 {
     int ret = X509_NOT_OK, mod_len, pub_len;
     uint8_t *modulus, *pub_exp;
@@ -353,8 +350,7 @@ static int asn1_public_key(const uint8_t *cert, int *offset,
     mod_len = asn1_get_int(cert, offset, &modulus);
     pub_len = asn1_get_int(cert, offset, &pub_exp);
 
-    RSA_pub_key_new(&x509_ctx->rsa_ctx, 
-            modulus, mod_len, pub_exp, pub_len);
+    RSA_pub_key_new(&x509_ctx->rsa_ctx, modulus, mod_len, pub_exp, pub_len);
 
     free(modulus);
     free(pub_exp);

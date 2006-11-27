@@ -1083,31 +1083,31 @@ int SSL_server_tests(void)
     TTY_FLUSH();
 
     /*
-     * PKCS 8 key (encrypted)
+     * PKCS#8 key (encrypted)
      */
-    if ((ret = SSL_server_test(NULL, "pkcs 8 encrypted", "-cipher RC4-SHA", 
-                DEFAULT_CERT, NULL, "../ssl/test/axTLS.encrypted.p8", NULL, "abcd",
-                DEFAULT_SVR_OPTION)))
-        goto cleanup;
-
-    /*
-     * PKCS 8 key (unencrypted)
-     */
-    if ((ret = SSL_server_test(NULL, "pkcs 8 unencrypted", "-cipher RC4-SHA", 
-                DEFAULT_CERT, NULL, "../ssl/test/axTLS.unencrypted.p8", NULL, NULL,
-                DEFAULT_SVR_OPTION)))
-        goto cleanup;
-
-    /*
-     * PKCS 12 key/certificate
-     */
-    if ((ret = SSL_server_test(NULL, "pkcs 12 no CA", "-cipher RC4-SHA", 
-                DEFAULT_CERT, NULL, "../ssl/test/axTLS.withoutCA.p12", 
+    if ((ret = SSL_server_test(NULL, "pkcs#8 encrypted", "-cipher RC4-SHA", 
+                DEFAULT_CERT, NULL, "../ssl/test/axTLS.encrypted.p8", 
                 NULL, "abcd", DEFAULT_SVR_OPTION)))
         goto cleanup;
 
-    if ((ret = SSL_server_test(NULL, "pkcs 12 with CA", "-cipher RC4-SHA", 
+    /*
+     * PKCS#8 key (unencrypted)
+     */
+    if ((ret = SSL_server_test(NULL, "pkcs#8 unencrypted", "-cipher RC4-SHA", 
+                DEFAULT_CERT, NULL, "../ssl/test/axTLS.unencrypted.p8", 
+                NULL, NULL, DEFAULT_SVR_OPTION)))
+        goto cleanup;
+
+    /*
+     * PKCS#12 key/certificate
+     */
+    if ((ret = SSL_server_test(NULL, "pkcs#12 with CA", "-cipher RC4-SHA", 
                 NULL, NULL, "../ssl/test/axTLS.withCA.p12", 
+                NULL, "abcd", DEFAULT_SVR_OPTION)))
+        goto cleanup;
+
+    if ((ret = SSL_server_test(NULL, "pkcs#12 no CA", "-cipher RC4-SHA", 
+                DEFAULT_CERT, NULL, "../ssl/test/axTLS.withoutCA.p12", 
                 NULL, "abcd", DEFAULT_SVR_OPTION)))
         goto cleanup;
 

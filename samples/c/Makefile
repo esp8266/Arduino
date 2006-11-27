@@ -46,7 +46,7 @@ include ../../config/makefile.post
 
 ifndef CONFIG_PLATFORM_WIN32
 
-$(TARGET): $(OBJ) 
+$(TARGET): $(OBJ) $(LIBS)/libaxtls.a
 	$(LD) $(LDFLAGS) -o $@ $< -L$(LIBS) -laxtls 
 ifndef CONFIG_DEBUG
 ifndef CONFIG_PLATFORM_SOLARIS

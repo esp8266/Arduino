@@ -1,6 +1,6 @@
 diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
 --- awhttpd/aw3.h	2005-01-23 13:17:14.000000000 +1000
-+++ axTLS/httpd/awhttpd/aw3.h	2006-08-12 19:16:59.687500000 +1000
++++ axTLS/httpd/awhttpd/aw3.h	2006-11-15 15:09:14.196258200 +1000
 @@ -7,17 +7,16 @@
  */
  
@@ -192,7 +192,7 @@ diff -Naur awhttpd/aw3.h axTLS/httpd/awhttpd/aw3.h
 +void initlists(void);
 diff -Naur awhttpd/cgi.c axTLS/httpd/awhttpd/cgi.c
 --- awhttpd/cgi.c	2005-06-04 14:09:52.000000000 +1000
-+++ axTLS/httpd/awhttpd/cgi.c	2006-08-12 19:17:29.171875000 +1000
++++ axTLS/httpd/awhttpd/cgi.c	2006-11-15 15:09:14.211883700 +1000
 @@ -7,93 +7,46 @@
  */
  
@@ -654,7 +654,7 @@ diff -Naur awhttpd/conf.c axTLS/httpd/awhttpd/conf.c
 -}
 diff -Naur awhttpd/conn.c axTLS/httpd/awhttpd/conn.c
 --- awhttpd/conn.c	2004-12-07 16:11:02.000000000 +1000
-+++ axTLS/httpd/awhttpd/conn.c	2006-08-12 19:16:59.687500000 +1000
++++ axTLS/httpd/awhttpd/conn.c	2006-11-15 15:09:14.243134700 +1000
 @@ -9,26 +9,16 @@
  
  #include <stdio.h>
@@ -761,7 +761,7 @@ diff -Naur awhttpd/conn.c axTLS/httpd/awhttpd/conn.c
  }
 diff -Naur awhttpd/errors.c axTLS/httpd/awhttpd/errors.c
 --- awhttpd/errors.c	2005-01-23 06:49:29.000000000 +1000
-+++ axTLS/httpd/awhttpd/errors.c	2006-08-12 19:16:59.687500000 +1000
++++ axTLS/httpd/awhttpd/errors.c	2006-11-15 15:09:14.258760200 +1000
 @@ -8,7 +8,6 @@
  
  
@@ -804,7 +804,7 @@ diff -Naur awhttpd/errors.c axTLS/httpd/awhttpd/errors.c
  
 diff -Naur awhttpd/index.c axTLS/httpd/awhttpd/index.c
 --- awhttpd/index.c	2005-06-04 14:09:52.000000000 +1000
-+++ axTLS/httpd/awhttpd/index.c	2006-08-12 19:16:59.687500000 +1000
++++ axTLS/httpd/awhttpd/index.c	2006-11-15 15:09:14.258760200 +1000
 @@ -11,7 +11,6 @@
  #include <string.h>
  #include <sys/types.h>
@@ -851,7 +851,7 @@ diff -Naur awhttpd/index.c axTLS/httpd/awhttpd/index.c
        my_strncpy(cn->actualfile, tbuf, MAXREQUESTLENGTH);
 diff -Naur awhttpd/main.c axTLS/httpd/awhttpd/main.c
 --- awhttpd/main.c	2005-06-04 14:09:52.000000000 +1000
-+++ axTLS/httpd/awhttpd/main.c	2006-08-12 19:16:59.687500000 +1000
++++ axTLS/httpd/awhttpd/main.c	2006-11-21 16:30:37.093363800 +1000
 @@ -11,7 +11,6 @@
  #include <string.h>
  #include <sys/types.h>
@@ -903,7 +903,7 @@ diff -Naur awhttpd/main.c axTLS/httpd/awhttpd/main.c
  
  void initlists() {
    int i;
-@@ -33,108 +64,119 @@
+@@ -33,108 +64,118 @@
    servers = NULL;
    usedconns = NULL;
    freeconns = NULL;
@@ -1040,7 +1040,7 @@ diff -Naur awhttpd/main.c axTLS/httpd/awhttpd/main.c
    pid = fork();
  
    if(pid > 0) {
-     status();
+-    status();
      exit(0);
    } else if(pid == -1) {
 +#ifdef CONFIG_HTTP_VERBOSE
@@ -1085,7 +1085,7 @@ diff -Naur awhttpd/main.c axTLS/httpd/awhttpd/main.c
    return 0;
 diff -Naur awhttpd/mime_types.c axTLS/httpd/awhttpd/mime_types.c
 --- awhttpd/mime_types.c	2004-01-26 01:08:47.000000000 +1000
-+++ axTLS/httpd/awhttpd/mime_types.c	2006-08-12 19:16:59.703125000 +1000
++++ axTLS/httpd/awhttpd/mime_types.c	2006-11-15 15:09:14.305636700 +1000
 @@ -7,28 +7,21 @@
  */
  
@@ -1170,7 +1170,7 @@ diff -Naur awhttpd/mime_types.c axTLS/httpd/awhttpd/mime_types.c
 +
 diff -Naur awhttpd/misc.c axTLS/httpd/awhttpd/misc.c
 --- awhttpd/misc.c	2005-01-23 12:59:09.000000000 +1000
-+++ axTLS/httpd/awhttpd/misc.c	2006-08-12 19:16:59.703125000 +1000
++++ axTLS/httpd/awhttpd/misc.c	2006-11-15 15:09:14.321262200 +1000
 @@ -7,33 +7,33 @@
  */
  
@@ -1487,7 +1487,7 @@ diff -Naur awhttpd/misc.c axTLS/httpd/awhttpd/misc.c
 +#endif
 diff -Naur awhttpd/net.c axTLS/httpd/awhttpd/net.c
 --- awhttpd/net.c	2005-06-04 14:09:52.000000000 +1000
-+++ axTLS/httpd/awhttpd/net.c	2006-08-12 19:16:59.703125000 +1000
++++ axTLS/httpd/awhttpd/net.c	2006-11-15 15:09:14.352513200 +1000
 @@ -8,9 +8,7 @@
  
  
@@ -1598,7 +1598,7 @@ diff -Naur awhttpd/net.c axTLS/httpd/awhttpd/net.c
  
 diff -Naur awhttpd/permcheck.c axTLS/httpd/awhttpd/permcheck.c
 --- awhttpd/permcheck.c	2005-01-23 06:49:29.000000000 +1000
-+++ axTLS/httpd/awhttpd/permcheck.c	2006-08-12 19:16:59.703125000 +1000
++++ axTLS/httpd/awhttpd/permcheck.c	2006-11-15 15:09:14.368138700 +1000
 @@ -7,21 +7,23 @@
  */
  
@@ -1689,7 +1689,7 @@ diff -Naur awhttpd/permcheck.c axTLS/httpd/awhttpd/permcheck.c
 +#endif  /* CONFIG_HTTP_PERM_CHECK */
 diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
 --- awhttpd/proc.c	2005-01-23 10:59:41.000000000 +1000
-+++ axTLS/httpd/awhttpd/proc.c	2006-08-12 19:16:59.703125000 +1000
++++ axTLS/httpd/awhttpd/proc.c	2006-11-15 15:09:14.399389700 +1000
 @@ -13,91 +13,92 @@
  #include <sys/types.h>
  #include <sys/stat.h>
@@ -2229,7 +2229,7 @@ diff -Naur awhttpd/proc.c axTLS/httpd/awhttpd/proc.c
  }
 diff -Naur awhttpd/socket.c axTLS/httpd/awhttpd/socket.c
 --- awhttpd/socket.c	2004-04-25 13:03:05.000000000 +1000
-+++ axTLS/httpd/awhttpd/socket.c	2006-08-12 19:16:59.718750000 +1000
++++ axTLS/httpd/awhttpd/socket.c	2006-11-15 15:09:14.415015200 +1000
 @@ -8,61 +8,17 @@
  
  
@@ -2350,7 +2350,7 @@ diff -Naur awhttpd/socket.c axTLS/httpd/awhttpd/socket.c
    memset(&(my_addr.sin_zero), 0, 8);    // zero the rest of the struct
 diff -Naur awhttpd/urlencode.c axTLS/httpd/awhttpd/urlencode.c
 --- awhttpd/urlencode.c	2004-05-14 10:53:47.000000000 +1000
-+++ axTLS/httpd/awhttpd/urlencode.c	2006-08-12 19:16:59.718750000 +1000
++++ axTLS/httpd/awhttpd/urlencode.c	2006-11-15 15:09:14.430640700 +1000
 @@ -13,7 +13,7 @@
  
  #include <ctype.h>
