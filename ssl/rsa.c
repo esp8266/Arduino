@@ -1,5 +1,5 @@
 /*
- *  Copyright(C) 2006
+ *  Copyright(C) 2006 Cameron Rich
  *
  *  This library is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -17,8 +17,6 @@
  */
 
 /**
- * @file rsa.c
- *
  * Implements the RSA public encryption algorithm. Uses the bigint library to
  * perform its calculations.
  */
@@ -68,8 +66,6 @@ void RSA_priv_key_new(RSA_CTX **ctx,
 #endif
 }
 
-/**
- */
 void RSA_pub_key_new(RSA_CTX **ctx, 
         const uint8_t *modulus, int mod_len,
         const uint8_t *pub_exp, int pub_len)
@@ -122,7 +118,6 @@ void RSA_free(RSA_CTX *rsa_ctx)
 }
 
 /**
- * @fn int RSA_decrypt(RSA_CTX *ctx, const uint8_t *in_data, uint8_t *out_data)
  * @brief Use PKCS1.5 for decryption/verification.
  * @param ctx [in] The context
  * @param in_data [in] The data to encrypt (must be < modulus size-11)
@@ -145,7 +140,7 @@ int RSA_decrypt(RSA_CTX *ctx, const uint8_t *in_data, uint8_t *out_data,
     dat_bi = bi_import(ctx->bi_ctx, in_data, byte_size);
 #ifdef CONFIG_SSL_CERT_VERIFICATION
     decrypted_bi = is_decryption ?  /* decrypt or verify? */
-        RSA_private(ctx, dat_bi) : RSA_public(ctx, dat_bi);
+            RSA_private(ctx, dat_bi) : RSA_public(ctx, dat_bi);
 #else   /* always a decryption */
     decrypted_bi = RSA_private(ctx, dat_bi);
 #endif
@@ -183,7 +178,6 @@ int RSA_decrypt(RSA_CTX *ctx, const uint8_t *in_data, uint8_t *out_data,
 }
 
 /**
- * @fn bigint *RSA_private(RSA_CTX *c, bigint *bi_msg)
  * Performs m = c^d mod n
  */
 bigint *RSA_private(RSA_CTX *c, bigint *bi_msg)

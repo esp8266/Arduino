@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-#  Copyright(C) 2006
+#  Copyright(C) 2006 Cameron Rich
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,8 +17,6 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-#
-# axssl.pl
 #
 # Demonstrate the use of the axTLS library in Perl with a set of 
 # command-line parameters similar to openssl. In fact, openssl clients 

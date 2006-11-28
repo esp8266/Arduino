@@ -1,5 +1,5 @@
 /*
- *  Copyright(C) 2006
+ *  Copyright(C) 2006 Cameron Rich
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,8 +17,6 @@
  */
 
 /*
- * axssl.java
- *
  * Demonstrate the use of the axTLS library in Java with a set of 
  * command-line parameters similar to openssl. In fact, openssl clients 
  * should be able to communicate with axTLS servers and visa-versa.  *

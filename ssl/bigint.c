@@ -1,5 +1,5 @@
 /*
- *  Copyright(C) 2006
+ *  Copyright(C) 2006 Cameron Rich
  *
  *  This library is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -423,7 +423,7 @@ bigint *bi_divide(BI_CTX *ctx, bigint *u, bigint *v, int is_mod)
 
         if (v->size > 1 && V2)
         {
-            /* we are implementing the following
+            /* we are implementing the following:
             if (V2*q_dash > (((U(0)*COMP_RADIX + U(1) - 
                     q_dash*V1)*COMP_RADIX) + U(2))) ... */
             comp inner = (comp)((long_comp)COMP_RADIX*U(0) + U(1) - 
@@ -449,6 +449,7 @@ bigint *bi_divide(BI_CTX *ctx, bigint *u, bigint *v, int is_mod)
             {
                 Q(j)--;
                 tmp_u = bi_add(ctx, tmp_u, bi_copy(v));
+
                 /* lop off the carry */
                 tmp_u->size--;
                 v->size--;
@@ -478,7 +479,7 @@ bigint *bi_divide(BI_CTX *ctx, bigint *u, bigint *v, int is_mod)
     }
 }
 
-/**
+/*
  * Perform an integer divide on a bigint.
  */
 static bigint *bi_int_divide(BI_CTX *ctx, bigint *biR, comp denom)
@@ -715,7 +716,7 @@ void bi_export(BI_CTX *ctx, bigint *x, uint8_t *data, int size)
  * @param ctx [in]  The bigint session context.
  * @param bim [in]  The bigint modulus that will be used.
  * @param mod_offset [in] There are three moduluii that can be stored - the
- * standard modulus, and it's two primes p and q. This offset refers to which
+ * standard modulus, and its two primes p and q. This offset refers to which
  * modulus we are referring to.
  * @see bi_free_mod(), bi_mod_power().
  */
@@ -898,7 +899,7 @@ bigint *bi_multiply(BI_CTX *ctx, bigint *bia, bigint *bib)
 
 #ifdef CONFIG_BIGINT_SQUARE
 /*
- * Perform the actual square operion. It takes into account overflow 
+ * Perform the actual square operion. It takes into account overflow.
  */
 static bigint *regular_square(BI_CTX *ctx, bigint *bi)
 {
@@ -940,6 +941,7 @@ static bigint *regular_square(BI_CTX *ctx, bigint *bi)
         }
 
         w[i+t] += carry;
+
         if (u)
         {
             w[i+t+1] = 1;   /* add carry */
@@ -1018,7 +1020,7 @@ int bi_compare(bigint *bia, bigint *bib)
     return r;
 }
 
-/**
+/*
  * Allocate and zero more components.  Does not consume bi. 
  */
 static void more_comps(bigint *bi, int n)
@@ -1051,6 +1053,7 @@ static bigint *alloc(BI_CTX *ctx, int size)
         biR = ctx->free_list;
         ctx->free_list = biR->next;
         ctx->free_count--;
+
         if (biR->refs != 0)
         {
 #ifdef CONFIG_SSL_FULL_MODE
@@ -1338,8 +1341,7 @@ bigint *bi_barrett(BI_CTX *ctx, bigint *bi)
  */
 static void precompute_slide_window(BI_CTX *ctx, int window, bigint *g1)
 {
-    int k = 1;
-    int i;
+    int k = 1, i;
     bigint *g2;
 
     for (i = 0; i < window-1; i++)   /* compute 2^(window-1) */
@@ -1354,8 +1356,7 @@ static void precompute_slide_window(BI_CTX *ctx, int window, bigint *g1)
 
     for (i = 1; i < k; i++)
     {
-        ctx->g[i] = bi_residue(ctx, bi_multiply(ctx, ctx->g[i-1], 
-                    bi_copy(g2)));
+        ctx->g[i] = bi_residue(ctx, bi_multiply(ctx, ctx->g[i-1], bi_copy(g2)));
         bi_permanent(ctx->g[i]);
     }
 
@@ -1442,8 +1443,7 @@ bigint *bi_mod_power(BI_CTX *ctx, bigint *bi, bigint *biexp)
             }
 
             part_exp = (part_exp-1)/2;  /* adjust for array */
-            biR = bi_residue(ctx, 
-                    bi_multiply(ctx, biR, ctx->g[part_exp]));
+            biR = bi_residue(ctx, bi_multiply(ctx, biR, ctx->g[part_exp]));
             i = l-1;
         }
         else    /* square it */

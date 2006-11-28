@@ -1,5 +1,5 @@
 /*
- *  Copyright(C) 2006
+ *  Copyright(C) 2006 Cameron Rich
  *
  *  This license is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published by
@@ -17,8 +17,6 @@
  */
 
 /*
- * ssltest.c
- *
  * The testing of the crypto and ssl stuff goes here. Keeps the individual code
  * modules from being uncluttered with test code.
  *
