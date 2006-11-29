@@ -41,7 +41,13 @@ void attachInterrupt(uint8_t interruptNum, void (*userFunc)(void), int mode) {
     intFunc[interruptNum] = userFunc;
     
     if (interruptNum == 0) {
+      // Configure the interrupt mode (trigger on low input, any change, rising
+      // edge, or falling edge).  The mode constants were chosen to correspond
+      // to the configuration bits in the hardware register, so we simply shift
+      // the mode into place.
       MCUCR = (MCUCR & ~((1 << ISC00) | (1 << ISC01))) | (mode << ISC00);
+      
+      // Enable the interrupt.
       GICR |= (1 << INT0);
     } else {
       MCUCR = (MCUCR & ~((1 << ISC10) | (1 << ISC11))) | (mode << ISC10);
@@ -53,6 +59,7 @@ void attachInterrupt(uint8_t interruptNum, void (*userFunc)(void), int mode) {
 void detachInterrupt(uint8_t interruptNum) {
   if(interruptNum < EXTERNAL_NUM_INTERRUPTS) {
     if (interruptNum == 0)
+      // Disable the interrupt.
       GICR &= ~(1 << INT0);
     else
       GICR &= ~(1 << INT1);

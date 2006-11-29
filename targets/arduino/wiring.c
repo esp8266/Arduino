@@ -41,7 +41,7 @@
 // Define constants and variables for buffering incoming serial data.  We're
 // using a ring buffer (I think), in which rx_buffer_head is the index of the
 // location to which to write the next incoming character and rx_buffer_tail
-// is the index of the location from which to read
+// is the index of the location from which to read.
 #define RX_BUFFER_SIZE 128
 
 unsigned char rx_buffer[RX_BUFFER_SIZE];
