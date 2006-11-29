@@ -10,7 +10,7 @@ config CONFIG_BINDINGS
     help
         axTLS supports language bindings in C#, VB.NET, Java and Perl.
 
-        Select Y here if you want to build the various bindings.
+        Select Y here if you want to build the various language bindings.
 
 config CONFIG_CSHARP_BINDINGS
     bool "Create C# bindings"
@@ -78,8 +78,8 @@ config CONFIG_PERL_CORE
     string "Location of Perl CORE"
     default "c:\\perl\\lib\\CORE"
     help:
-        I'm testing with:
-        "http://www.activestate.com/Products/ActivePerl" at the moment.
+        works with ActiveState
+        "http://www.activestate.com/Products/ActivePerl"
 
 config CONFIG_PERL_LIB
     string "Name of Perl Library"

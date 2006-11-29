@@ -200,7 +200,7 @@ sub parseFile
 
 #===============================================================
 
-# Determine which module to build from cammand-line options
+# Determine which module to build from command-line options
 use strict;
 use Getopt::Std;
 

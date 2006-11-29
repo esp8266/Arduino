@@ -424,11 +424,7 @@ sub do_client
             $res = axtlsp::ssl_handshake_status($ssl);
             if ($res != $axtlsp::SSL_OK)
             {
-                if (!$quiet)
-                {
-                    axtlsp::ssl_display_error($res);
-                }
-
+                axtlsp::ssl_display_error($res) if !$quiet;
                 axtlsp::ssl_free($ssl);
                 exit 1;
             }
@@ -456,11 +452,7 @@ sub do_client
     $res = axtlsp::ssl_handshake_status($ssl);
     if ($res != $axtlsp::SSL_OK)
     {
-        if (!$quiet)
-        {
-            axtlsp::ssl_display_error($res);
-        }
-
+        axtlsp::ssl_display_error($res) if not $quiet;
         exit 1;
     }
 

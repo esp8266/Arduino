@@ -268,7 +268,9 @@ int pkcs12_decode(SSLCTX *ssl_ctx, SSLObjLoader *ssl_obj, const char *password)
     /* work out the MAC start/end points (done on AuthSafes) */
     auth_safes_start = offset;
     auth_safes_end = offset;
-    asn1_skip_obj(buf, &auth_safes_end, ASN1_SEQUENCE);
+    if (asn1_skip_obj(buf, &auth_safes_end, ASN1_SEQUENCE) < 0)
+        goto error;
+
     auth_safes_len = auth_safes_end - auth_safes_start;
     auth_safes = malloc(auth_safes_len);
     memcpy(auth_safes, &buf[auth_safes_start], auth_safes_len);
@@ -315,9 +317,8 @@ int pkcs12_decode(SSLCTX *ssl_ctx, SSLObjLoader *ssl_obj, const char *password)
     {
         int cert_offset = key_offset;
 
-        asn1_skip_obj(cert, &cert_offset, ASN1_SEQUENCE);
-
-        if (asn1_next_obj(cert, &key_offset, ASN1_SEQUENCE) < 0 ||
+        if (asn1_skip_obj(cert, &cert_offset, ASN1_SEQUENCE) < 0 ||
+                asn1_next_obj(cert, &key_offset, ASN1_SEQUENCE) < 0 ||
                 asn1_skip_obj(cert, &key_offset, ASN1_OID) < 0 ||
                 asn1_next_obj(cert, &key_offset, ASN1_EXPLICIT_TAG) < 0 ||
                 asn1_next_obj(cert, &key_offset, ASN1_SEQUENCE) < 0 ||
@@ -421,8 +422,9 @@ static int get_pbe_params(uint8_t *buf, int *offset,
     static const uint8_t pbeSH1RC4[] = /* pbeWithSHAAnd128BitRC4  */
             { 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x0c, 0x01, 0x01 };
 
-    int i, len, ret = SSL_NOT_OK;
+    int i, len;
     uint8_t *iter = NULL;
+    int error_code = SSL_ERROR_NOT_SUPPORTED;
 
     /* Get the PBE type */
     if (asn1_next_obj(buf, offset, ASN1_SEQUENCE) < 0 ||
@@ -437,7 +439,6 @@ static int get_pbe_params(uint8_t *buf, int *offset,
 #ifdef CONFIG_SSL_FULL_MODE
         printf("Error: pkcs8/pkcs12 must use \"PBE-SHA1-RC4-128\"\n");
 #endif
-        ret = SSL_ERROR_NOT_SUPPORTED;
         goto error;
     }
 
@@ -462,10 +463,10 @@ static int get_pbe_params(uint8_t *buf, int *offset,
     }
 
     free(iter);
-    ret = SSL_OK;       /* got here - we are ok */
+    error_code = SSL_OK;       /* got here - we are ok */
 
 error:
-    return ret;
+    return error_code;
 }
 
 #endif
