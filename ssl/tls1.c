@@ -1168,17 +1168,12 @@ int basic_read(SSL *ssl, uint8_t **in_data)
         version = (buf[1] << 4) + buf[2];
         ssl->need_bytes = (buf[3] << 8) + buf[4];
 
-        /* should be 3.1 (TLSv1) */
-        if (version != 0x31) 
+        /* should be v3.1 (TLSv1) or better - we'll send in v3.1 mode anyway */
+        if (version < 0x31) 
         {
-            /* if we are talking to a client that talks v3.2, then we'll wear
-             * it - we'll respond in v3.1 mode anyway. */
-            if (version < 0x31 || !IS_SET_SSL_FLAG(SSL_IS_CLIENT))
-            {
-                ret = SSL_ERROR_INVALID_VERSION;
-                ssl_display_error(ret);
-                goto error;
-            }
+            ret = SSL_ERROR_INVALID_VERSION;
+            ssl_display_error(ret);
+            goto error;
         }
 
         CLR_SSL_FLAG(SSL_NEED_RECORD);
