@@ -1150,7 +1150,7 @@ int basic_read(SSL *ssl, uint8_t **in_data)
 
     if (IS_SET_SSL_FLAG(SSL_NEED_RECORD))
     {
-        /* check for sslv2 "client hello" TODO: this shouldn't be here. */
+        /* check for sslv2 "client hello" */
         if (buf[0] & 0x80 && buf[2] == 1 && buf[3] == 0x03)
         {
 #ifdef CONFIG_SSL_ENABLE_V23_HANDSHAKE

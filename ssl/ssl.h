@@ -300,7 +300,7 @@ EXP_FUNC uint8_t STDCALL ssl_get_cipher_id(SSL *ssl);
 EXP_FUNC int STDCALL ssl_handshake_status(SSL *ssl);
 
 /**
- * @brief Retrieve various parameters about the TLS engine.
+ * @brief Retrieve various parameters about the axTLS engine.
  * @param offset [in] The configuration offset. It will be one of the following:
  * - SSL_BUILD_MODE The build mode. This will be one of the following:
  *   - SSL_BUILD_SERVER_ONLY            (basic server mode)

@@ -168,6 +168,8 @@ public class SSLCTX
      *
      * For a client this involves sending another "client hello" message.
      * For the server is means sending a "hello request" message.
+     *
+     * This is a blocking call on the client (until the handshake completes).
      * @param ssl [in] An SSL object reference.
      * @return SSL_OK if renegotiation instantiation was ok
      */

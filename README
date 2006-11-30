@@ -111,6 +111,15 @@ ActiveState's version works ok).
 # Known Issues
 ########################################################################
 
+* Firefox doesn't handle legacy SSLv2 at all well. Disabling SSLv2 still 
+  initiates a SSLv23 handshake (v1.5). And continuous pressing of the 
+  "Reload" page instigates a change to SSLv3 for some reason (even though the 
+  TLS 1.0 option is selected). This will cause a "Firefox and <server> cannot 
+  communicate securely because they have no common encryption 
+  algorithms" (v1.5), or "Firefox can't connect to <server> because the site 
+  uses a security protocol which isn't enabled" (v2.0). See bugzilla issues 
+  343543 and 359484 (Comment #7).  It's all broken (hopefully fixed soon).
+
 * Perl/Java bindings don't work on 64 bit Linux machines. I can't even compile
   the latest version of Perl on an AMD64 box (using FC3).
 
