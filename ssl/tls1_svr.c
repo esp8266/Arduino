@@ -108,10 +108,20 @@ int do_svr_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len)
 static int process_client_hello(SSL *ssl)
 {
     uint8_t *buf = ssl->bm_buf.data;
+    uint8_t *record_buf = ssl->record_buf;
     int pkt_size = ssl->bm_buf.index;
     int i, j, cs_len, id_len, offset = 6 + SSL_RANDOM_SIZE;
+    int version = (record_buf[1] << 4) + record_buf[2];
     int ret = SSL_OK;
     
+    /* should be v3.1 (TLSv1) or better - we'll send in v3.1 mode anyway */
+    if (version < 0x31) 
+    {
+        ret = SSL_ERROR_INVALID_VERSION;
+        ssl_display_error(ret);
+        goto error;
+    }
+
     memcpy(ssl->client_random, &buf[6], SSL_RANDOM_SIZE);
 
     /* process the session id */
@@ -174,8 +184,8 @@ int process_sslv23_client_hello(SSL *ssl)
 
     DISPLAY_BYTES(ssl, "received %d bytes", buf, read_len, read_len);
     
-    /* must be 3.1 (TLSv1) */
-    if (version != 0x31)
+    /* should be v3.1 (TLSv1) or better - we'll send in v3.1 mode anyway */
+    if (version < 0x31)
     {
         return SSL_ERROR_INVALID_VERSION;
     }

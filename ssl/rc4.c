@@ -17,11 +17,8 @@
  */
 
 /**
- * @file rc4.c
- *
- * An implementation of the RC4/ARC4 algorithm
- *
- * Originally written by Christophe Devine
+ * An implementation of the RC4/ARC4 algorithm.
+ * Originally written by Christophe Devine.
  */
 
 #include <string.h>
@@ -47,7 +44,8 @@ void RC4_setup(RC4_CTX *ctx, const uint8_t *key, int length)
     {
         a = m[i];
         j = (uint8_t)(j + a + key[k]);
-        m[i] = m[j]; m[j] = a;
+        m[i] = m[j]; 
+        m[j] = a;
 
         if (++k >= length) 
         {

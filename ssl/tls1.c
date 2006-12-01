@@ -596,7 +596,8 @@ static void increment_write_sequence(SSL *ssl)
         if (++ssl->write_sequence[i])
             break;
     }                       
-}                           
+}
+
 /**
  * Work out the HMAC digest in a packet.
  */
@@ -674,7 +675,6 @@ static int verify_digest(SSL *ssl, int mode, const uint8_t *buf, int read_len)
 
     ssl->record_buf[3] = hmac_offset >> 8;      /* insert size */
     ssl->record_buf[4] = hmac_offset & 0xff;
-
     add_hmac_digest(ssl, mode, buf, hmac_offset, hmac_buf);
 
     if (memcmp(hmac_buf, &buf[hmac_offset], ssl->cipher_info->digest_size))
@@ -974,7 +974,6 @@ int send_packet(SSL *ssl, uint8_t protocol, const uint8_t *in, int length)
         /* add the packet digest */
         msg_length += ssl->cipher_info->digest_size;
         ssl->bm_buf.index = msg_length;
-
         add_hmac_digest(ssl, mode, ssl->bm_buf.data, length, 
                                                 &ssl->bm_buf.data[length]);
 
@@ -1066,8 +1065,8 @@ static void set_key_block(SSL *ssl, int is_write)
     memcpy(server_key, q, ciph_info->key_size);
     q += ciph_info->key_size;
 
-#ifndef CONFIG_SSL_SKELETON_MODE /* RC4 has no IV */
-    if (ciph_info->iv_size)    
+#ifndef CONFIG_SSL_SKELETON_MODE 
+    if (ciph_info->iv_size)    /* RC4 has no IV, AES does */
     {
         memcpy(client_iv, q, ciph_info->iv_size);
         q += ciph_info->iv_size;
@@ -1118,7 +1117,7 @@ static void set_key_block(SSL *ssl, int is_write)
  */
 int basic_read(SSL *ssl, uint8_t **in_data)
 {
-    int ret = SSL_OK, version = -1;
+    int ret = SSL_OK;
     int read_len, is_record;
     uint8_t *buf = ssl->bm_buf.data;
     int is_client = IS_SET_SSL_FLAG(SSL_IS_CLIENT);
@@ -1165,17 +1164,7 @@ int basic_read(SSL *ssl, uint8_t **in_data)
             goto error; /* not an error - just get out of here */
         }
 
-        version = (buf[1] << 4) + buf[2];
         ssl->need_bytes = (buf[3] << 8) + buf[4];
-
-        /* should be v3.1 (TLSv1) or better - we'll send in v3.1 mode anyway */
-        if (version < 0x31) 
-        {
-            ret = SSL_ERROR_INVALID_VERSION;
-            ssl_display_error(ret);
-            goto error;
-        }
-
         CLR_SSL_FLAG(SSL_NEED_RECORD);
         memcpy(ssl->record_buf, buf, 3);    /* store for hmac */
         is_record = 1;
@@ -1286,8 +1275,7 @@ static int do_handshake(SSL *ssl, uint8_t *buf, int read_len)
     ssl->bm_buf.index = hs_len; /* store the size and check later */
     DISPLAY_STATE(ssl, 0, handshake_type, 0);
 
-    if (handshake_type != HS_CERT_VERIFY &&
-            handshake_type != HS_HELLO_REQUEST)
+    if (handshake_type != HS_CERT_VERIFY && handshake_type != HS_HELLO_REQUEST)
     {
         add_packet(ssl, buf, hs_len); 
     }
@@ -1338,19 +1326,19 @@ int send_finished(SSL *ssl)
 
     /* now add the finished digest mac (12 bytes) */
     finished_digest(ssl, 
-        IS_SET_SSL_FLAG(SSL_IS_CLIENT) ? 
+        IS_SET_SSL_FLAG(SSL_IS_CLIENT) ?
                     client_finished : server_finished, &buf[4]);
 
 #ifndef CONFIG_SSL_SKELETON_MODE
     /* store in the session cache */
     if (!IS_SET_SSL_FLAG(SSL_SESSION_RESUME) && ssl->ssl_ctx->num_sessions)
     {
-        memcpy(ssl->session->master_secret, 
+        memcpy(ssl->session->master_secret,
                 ssl->master_secret, SSL_SECRET_SIZE);
     }
 #endif
 
-    return send_packet(ssl, PT_HANDSHAKE_PROTOCOL, 
+    return send_packet(ssl, PT_HANDSHAKE_PROTOCOL,
                                 NULL, SSL_FINISHED_HASH_SIZE+4);
 }
 
@@ -1421,7 +1409,6 @@ int send_alert(SSL *ssl, int error_code)
 
     buf[0] = is_warning ? 1 : 2;
     buf[1] = alert_num;
-
     send_packet(ssl, PT_ALERT_PROTOCOL, buf, sizeof(buf));
     DISPLAY_ALERT(ssl, alert_num);
     return is_warning ? 0 : 1;
@@ -1505,7 +1492,6 @@ int send_certificate(SSL *ssl)
     chain_length += 3;
     buf[2] = chain_length >> 8;        /* handshake length */
     buf[3] = chain_length & 0xff;
-
     ssl->bm_buf.index = offset;
     return send_packet(ssl, PT_HANDSHAKE_PROTOCOL, NULL, offset);
 }
@@ -1516,8 +1502,7 @@ int send_certificate(SSL *ssl)
  * master secret from this session for session resumption.
  */
 SSL_SESS *ssl_session_update(int max_sessions, 
-        SSL_SESS *ssl_sessions[], SSL *ssl,
-        const uint8_t *session_id)
+        SSL_SESS *ssl_sessions[], SSL *ssl, const uint8_t *session_id)
 {
     time_t tm = time(NULL);
     time_t oldest_sess_time = tm;

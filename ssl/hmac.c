@@ -17,8 +17,6 @@
  */
 
 /**
- * @file hmac.c
- *
  * HMAC implementation - This code was originally taken from RFC2104
  */
 

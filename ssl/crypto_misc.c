@@ -17,8 +17,6 @@
  */
 
 /**
- * @file misc.c
- *
  * Some misc. routines to help things out
  */
 
@@ -310,4 +308,3 @@ void print_blob(const char *format,
 void print_blob(const char *format, const unsigned char *data,
         int size, ...) {}
 #endif
-

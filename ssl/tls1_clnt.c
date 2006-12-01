@@ -211,11 +211,12 @@ static int process_server_hello(SSL *ssl)
     uint8_t *buf = ssl->bm_buf.data;
     int pkt_size = ssl->bm_buf.index;
     int offset;
-    int ret = SSL_OK;
+    int version = (buf[4] << 4) + buf[5];
     int num_sessions = ssl->ssl_ctx->num_sessions;
+    int ret = SSL_OK;
 
     /* check that we are talking to a TLSv1 server */
-    if (buf[4] != 0x03 || buf[5] != 0x01)
+    if (version != 0x31)
     {
         return SSL_ERROR_INVALID_VERSION;
     }

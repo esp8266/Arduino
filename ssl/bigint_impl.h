@@ -81,7 +81,6 @@ typedef struct /**< A big integer "session" context. */
     bigint *bi_normalised_mod[BIGINT_NUM_MODS]; /**< Normalised mod storage. */
     bigint **g;                 /**< Used by sliding-window. */
     int window;                 /**< The size of the sliding window */
-
     int active_count;           /**< Number of active bigints. */
     int free_count;             /**< Number of free bigints. */
 

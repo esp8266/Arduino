@@ -17,8 +17,6 @@
  */
 
 /**
- * @file sha1.c
- * 
  * SHA1 implementation - as defined in FIPS PUB 180-1 published April 17, 1995.
  * This code was originally taken from RFC3174
  */
@@ -179,7 +177,6 @@ static void SHA1ProcessMessageBlock(SHA1_CTX *ctx)
     ctx->Intermediate_Hash[2] += C;
     ctx->Intermediate_Hash[3] += D;
     ctx->Intermediate_Hash[4] += E;
-
     ctx->Message_Block_Index = 0;
 }
 
@@ -239,6 +236,5 @@ static void SHA1PadMessage(SHA1_CTX *ctx)
     ctx->Message_Block[61] = ctx->Length_Low >> 16;
     ctx->Message_Block[62] = ctx->Length_Low >> 8;
     ctx->Message_Block[63] = ctx->Length_Low;
-
     SHA1ProcessMessageBlock(ctx);
 }
