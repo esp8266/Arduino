@@ -50,7 +50,7 @@ const char * const unsupported_str = "Error: feature not supported\n";
 BUF_MEM buf_new()
 {
     BUF_MEM bm;
-    bm.pre_data = (uint8_t *)malloc(2048); /* should be enough to start with */
+    bm.pre_data = (uint8_t *)calloc(1, 2048); /* start with this */
     bm.data = bm.pre_data+BM_RECORD_OFFSET; /* some space at the start */
     bm.max_len = 2048-BM_RECORD_OFFSET;
     bm.index = 0;

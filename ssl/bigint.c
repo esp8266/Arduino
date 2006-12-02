@@ -1068,7 +1068,7 @@ static bigint *alloc(BI_CTX *ctx, int size)
     {
         /* No free bigints available - create a new one. */
         biR = (bigint *)malloc(sizeof(bigint));
-        biR->comps = (comp*) malloc(size * COMP_BYTE_SIZE);
+        biR->comps = (comp*)malloc(size * COMP_BYTE_SIZE);
         biR->max_comps = size;  /* give some space to spare */
     }
 
