@@ -7,6 +7,8 @@
 
 // Created 29 March 2006
 
+#include <Wire.h>
+
 void setup()
 {
   Wire.begin(4);                // join i2c bus with address #4
