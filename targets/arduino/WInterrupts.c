@@ -35,6 +35,10 @@
 volatile static voidFuncPtr intFunc[EXTERNAL_NUM_INTERRUPTS];
 // volatile static voidFuncPtr twiIntFunc;
 
+#if defined(__AVR_ATmega168__)
+#define MCUCR EICRA
+#define GICR EIMSK
+#endif
 
 void attachInterrupt(uint8_t interruptNum, void (*userFunc)(void), int mode) {
   if(interruptNum < EXTERNAL_NUM_INTERRUPTS) {
