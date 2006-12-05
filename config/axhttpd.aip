@@ -37,7 +37,7 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
     <ROW Component="New_Folder" ComponentId="{2AD064CD-A20E-40FD-9233-CF8732C8F54D}" Directory_="New_Folder_2_DIR" Attributes="0"/>
-    <ROW Component="awhttpd.exe" ComponentId="{0AEFFA20-29FA-4304-8227-F9ED0E6B8A0A}" Directory_="APPDIR" Attributes="0" KeyPath="awhttpd.exe" FullKeyPath="APPDIR\awhttpd.exe"/>
+    <ROW Component="axhttpd.exe" ComponentId="{0AEFFA20-29FA-4304-8227-F9ED0E6B8A0A}" Directory_="APPDIR" Attributes="0" KeyPath="axhttpd.exe" FullKeyPath="APPDIR\axhttpd.exe"/>
     <ROW Component="axssl.csharp.exe" ComponentId="{B9373428-79F5-4D77-8924-48D23EF3870E}" Directory_="APPDIR" Attributes="0" KeyPath="axssl.csharp.exe" FullKeyPath="APPDIR\axssl.csharp.exe"/>
     <ROW Component="axssl.exe" ComponentId="{E1E96774-7BFC-45B9-BA33-FC0C631921FD}" Directory_="APPDIR" Attributes="0" KeyPath="axssl.exe" FullKeyPath="APPDIR\axssl.exe"/>
     <ROW Component="axssl.vbnet.exe" ComponentId="{31F03DA9-E099-4BBD-88B7-4ABBC9F77EFB}" Directory_="APPDIR" Attributes="0" KeyPath="axssl.vbnet.exe" FullKeyPath="APPDIR\axssl.vbnet.exe"/>
@@ -59,12 +59,12 @@
     <ROW Component="wcprops" ComponentId="{4106AB01-565E-4281-97AE-96EC1F865899}" Directory_="wcprops_DIR" Attributes="0"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
-    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0" Components="awhttpd.exe axssl.csharp.exe axssl.exe axssl.vbnet.exe axtls.dll axtls.jar axtlsj.dll favicon.ico bigint.h test_cgi.php New_Folder dir_wcprops crypto_2600des.gif.svn_base crypto_2600des.gif.svn_work crypto_2600des.gif.svn_base_1 prop_base props text_base wcprops crypto_2600des.gif.svn_work_1 crypto_2600des.gif"/>
+    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0" Components="axhttpd.exe axssl.csharp.exe axssl.exe axssl.vbnet.exe axtls.dll axtls.jar axtlsj.dll favicon.ico bigint.h test_cgi.php New_Folder dir_wcprops crypto_2600des.gif.svn_base crypto_2600des.gif.svn_work crypto_2600des.gif.svn_base_1 prop_base props text_base wcprops crypto_2600des.gif.svn_work_1 crypto_2600des.gif"/>
     <ATTRIBUTE name="CurrentFeature" value="MainFeature"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
     <ROW File="README.txt" Component_="dir_wcprops" FileName="README.txt" Attributes="1" SourcePath="..\www\crypto_files\.svn\README.txt" SelfReg="false" Sequence="43"/>
-    <ROW File="awhttpd.exe" Component_="awhttpd.exe" FileName="awhttpd.exe" Attributes="0" SourcePath="..\_stage\awhttpd.exe" SelfReg="false" Sequence="1"/>
+    <ROW File="axhttpd.exe" Component_="axhttpd.exe" FileName="axhttpd.exe" Attributes="0" SourcePath="..\_stage\axhttpd.exe" SelfReg="false" Sequence="1"/>
     <ROW File="axssl.csharp.exe" Component_="axssl.csharp.exe" FileName="axsslc~1.exe|axssl.csharp.exe" Attributes="0" SourcePath="..\_stage\axssl.csharp.exe" SelfReg="false" Sequence="2"/>
     <ROW File="axssl.exe" Component_="axssl.exe" FileName="axssl.exe" Attributes="0" SourcePath="..\_stage\axssl.exe" SelfReg="false" Sequence="3"/>
     <ROW File="axssl.vbnet.exe" Component_="axssl.vbnet.exe" FileName="axsslv~1.exe|axssl.vbnet.exe" Attributes="0" SourcePath="..\_stage\axssl.vbnet.exe" SelfReg="false" Sequence="4"/>
@@ -199,7 +199,7 @@
     <ATTRIBUTE name="Package" value="1"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiShortsComponent">
-    <ROW Shortcut="awhttpd.exe" Directory_="SHORTCUTDIR" Name="awhttpd" Component_="awhttpd.exe" Target="[#awhttpd.exe]" Description="awhttpd.exe" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>
+    <ROW Shortcut="axhttpd.exe" Directory_="SHORTCUTDIR" Name="axhttpd" Component_="axhttpd.exe" Target="[#axhttpd.exe]" Description="axhttpd.exe" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>
     <ROW Shortcut="axssl_client" Directory_="SHORTCUTDIR" Name="axsslc~1|axssl client" Component_="axssl.exe" Target="[#axssl.exe]" Arguments="s_client" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>
     <ROW Shortcut="axssl_server" Directory_="SHORTCUTDIR" Name="axssls~1|axssl server" Component_="axssl.exe" Target="[#axssl.exe]" Arguments="s_server" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>
   </COMPONENT>

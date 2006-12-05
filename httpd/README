@@ -1,0 +1,6 @@
+
+axhttpd is a small embedded web server using the axTLS library. 
+
+It is based quite closely on the web server written by Doug Currie (original
+version is here: http://www.hcsw.org/awhttpd).
+

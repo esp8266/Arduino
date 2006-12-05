@@ -1,6 +1,6 @@
 <jmeterTestPlan version="1.2" properties="1.8">
   <hashTree>
-    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="awhttpd Test Plan" enabled="true">
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="axhttpd Test Plan" enabled="true">
       <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
         <collectionProp name="Arguments.arguments"/>
       </elementProp>

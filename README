@@ -9,7 +9,7 @@ This is a guide to get a small SSL web-server up and running quickly.
 ########################################################################
 The axTLS project is an SSL client/server library using the TLSv1 protocol. 
 It is designed to be small and fast, and is suited to embedded projects. A web
-server is included (called Anti-Web).
+server is included.
 
 The web server + SSL library is around 50-60kB and is configurable for
 features or size.
@@ -32,8 +32,8 @@ the extracted directory and typing:
 Select your platform type, save the configuration, exit, and then 
 type "make" again.
 
-If all goes well, you should end up with an executable called "awhttpd" (or
-awhttpd.exe) in the _stage directory.
+If all goes well, you should end up with an executable called "axhttpd" (or
+axhttpd.exe) in the _stage directory.
 
 To play with all the various axTLS options, type:
 
@@ -47,7 +47,7 @@ Save the new configuration and rebuild.
 
 To run it, go to the _stage directory, and type (as superuser):
 
-> awhttpd
+> axhttpd
 
 And then point your browser at:
 
@@ -60,9 +60,6 @@ or type:
 http://127.0.0.1
 
 to see the same page unencrypted.
-
-See the README in the httpd directory from more configuration information on
-Anti-Web.
 
 ########################################################################
 # The axssl utilities

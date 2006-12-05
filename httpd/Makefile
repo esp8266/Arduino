@@ -24,9 +24,9 @@ include ../config/makefile.conf
 ifndef CONFIG_PLATFORM_WIN32
 
 ifdef CONFIG_PLATFORM_CYGWIN
-TARGET=../$(STAGE)/awhttpd.exe
+TARGET=../$(STAGE)/axhttpd.exe
 else
-TARGET=../$(STAGE)/awhttpd
+TARGET=../$(STAGE)/axhttpd
 endif
 
 ifdef CONFIG_HTTP_STATIC_BUILD
@@ -38,7 +38,7 @@ endif
 CFLAGS += -I../ssl
 
 else # win32 build
-TARGET=../$(STAGE)/awhttpd.exe
+TARGET=../$(STAGE)/axhttpd.exe
 
 ifdef CONFIG_HTTP_STATIC_BUILD
 LIBS=../$(STAGE)/axtls.static.lib ..\\config\\axtls.res
@@ -51,31 +51,16 @@ ifndef CONFIG_AWHTTPD
 web_server:
 else
 
-untar_web_server: awhttpd/Makefile
-
-awhttpd/Makefile:
-	tar xvf awhttpd-3.0.7.tar
-	cat awhttpd.patch | patch -p0
-
 web_server : $(TARGET)
 
 OBJ= \
-    cgi.o \
 	conn.o \
 	main.o \
 	net.o \
 	proc.o \
 	socket.o \
-	errors.o \
 	misc.o \
-	urldecode.o \
-	mime_types.o \
-	index.o \
-	urlencode.o \
-    permcheck.o
-
-%.o : awhttpd/%.c ../config/.config
-	$(CC) -c $(CFLAGS) $< 
+	mime_types.o
 
 ifndef CONFIG_PLATFORM_WIN32
 
@@ -91,10 +76,6 @@ endif
 endif
 else    # Win32
 
-OBJ:=$(OBJ:.o=.obj)
-%.obj : awhttpd/%.c
-	$(CC) $(CFLAGS) $< 
-
 $(TARGET): $(OBJ)
 ifdef CONFIG_HTTP_NO_SSL
 	$(LD) $(LDFLAGS) /out:$@ $(OBJ)
@@ -106,5 +87,4 @@ endif       # CONFIG_AWHTTPD
 
 clean::
 	-@rm -f $(TARGET)*
-	-@rm -fr awhttpd
 

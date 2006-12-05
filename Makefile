@@ -34,8 +34,7 @@ RELEASE=axTLS-$(VERSION)
 # standard version
 target:
 	$(MAKE) -C ssl
-ifdef CONFIG_AWHTTPD
-	$(MAKE) -C httpd untar_web_server
+ifdef CONFIG_AXHTTPD
 	$(MAKE) -C httpd
 endif
 ifdef CONFIG_BINDINGS
@@ -72,12 +71,12 @@ install: $(PREFIX) all
 	chmod 755 $(PREFIX)/lib/libax* 
 	-@install -m 755 $(STAGE)/ax* $(PREFIX)/bin > /dev/null 2>&1
 	-@install -m 755 $(STAGE)/axtlsp.pm `perl -e 'use Config; print $$Config{installarchlib};'` > /dev/null 2>&1
-	-@install -m 755 $(STAGE)/awhttpd* $(PREFIX)/bin > /dev/null 2>&1
+	-@install -m 755 $(STAGE)/axhttpd* $(PREFIX)/bin > /dev/null 2>&1
 
 installclean:
 	-@rm $(PREFIX)/lib/libax* > /dev/null 2>&1
 	-@rm $(PREFIX)/bin/ax* > /dev/null 2>&1
-	-@rm $(PREFIX)/bin/awhttpd* > /dev/null 2>&1
+	-@rm $(PREFIX)/bin/axhttpd* > /dev/null 2>&1
 	-@rm `perl -e 'use Config; print $$Config{installarchlib};'`/axtlsp.pm > /dev/null 2>&1
 
 test:

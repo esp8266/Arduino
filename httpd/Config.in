@@ -3,26 +3,19 @@
 # see scripts/config/Kconfig-language.txt
 #
 
-menu "Awhttpd Configuration"
-depends on CONFIG_AWHTTPD
+menu "Axhttpd Configuration"
+depends on CONFIG_AXHTTPD
 
 config CONFIG_HTTP_STATIC_BUILD
     bool "Static Build"
     default n
     help
-        Select y if you want awhttp to be a static build (i.e. don't use the
+        Select y if you want axhttp to be a static build (i.e. don't use the
         axtls shared library or dll).
         
-config CONFIG_HTTP_HAS_SSL
-    bool "Use SSL"
-    default y
-    help
-        Build the HTTP server with SSL capability
-
 config CONFIG_HTTP_HTTPS_PORT
     int "HTTPS port"
     default 443
-    depends on CONFIG_HTTP_HAS_SSL
     help
         The port number of the HTTPS server.
 
@@ -31,7 +24,6 @@ config CONFIG_HTTP_HTTPS_PORT
 config CONFIG_HTTP_SESSION_CACHE_SIZE
     int "SSL session cache size"
     default 5
-    depends on CONFIG_HTTP_HAS_SSL
     help
         The size of the SSL session cache.
         
@@ -44,7 +36,7 @@ config CONFIG_HTTP_WEBROOT
     default "../www" if !CONFIG_PLATFORM_WIN32
     default "..\\www" if CONFIG_PLATFORM_WIN32
     help
-        The location of the web root in relation to awhttpd. This is 
+        The location of the web root in relation to axhttpd. This is 
         the directory where index.html lives.
 
 config CONFIG_HTTP_PORT
@@ -72,7 +64,7 @@ config CONFIG_HTTP_CGI_EXTENSION
     default ".php"
     depends on CONFIG_HTTP_HAS_CGI
     help
-        Tell awhhtp what file extension is used for CGI
+        Tell axhhtp what file extension is used for CGI
 
 config CONFIG_HTTP_DIRECTORIES
     bool "Enable Directory Listing"
@@ -101,14 +93,14 @@ config CONFIG_HTTP_VERBOSE
     default y if CONFIG_SSL_FULL_MODE
     default n if !CONFIG_SSL_FULL_MODE
     help
-        Enable extra statements used when using awhttpd.
+        Enable extra statements used when using axhttpd.
 
 config CONFIG_HTTP_IS_DAEMON
     bool "Run as a daemon"
     default n
     depends on !CONFIG_PLATFORM_WIN32
     help 
-        Run awhttpd as a background process.
+        Run axhttpd as a background process.
 
         Does not work under Win32
 

@@ -107,11 +107,11 @@ config CONFIG_EXTRA_LDFLAGS_OPTIONS
 endmenu
 
 source ssl/Config.in
-config CONFIG_AWHTTPD
+config CONFIG_AXHTTPD
     bool "Enable HTTP/HTTPS Web Server"
     default y
     help
-        Build the AWHTTPD web server
+        Build the AXHTTPD web server
 
 source httpd/Config.in
 source bindings/Config.in
