@@ -88,7 +88,7 @@ namespace axTLS
         /**
          * @brief Get the session id for a handshake. 
          * 
-         * This will be a 32 byte sequence and is availabile after the first
+         * This will be a 32 byte sequence and is available after the first
          * handshaking messages are sent.
          * @return The session id as a 32 byte sequence.
          * @note A SSLv23 handshake may have only 16 valid bytes.

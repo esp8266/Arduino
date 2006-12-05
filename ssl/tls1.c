@@ -28,7 +28,9 @@
 
 /* Don't import the default key/certificate if not used */
 #if defined(CONFIG_SSL_USE_DEFAULT_KEY) || defined(CONFIG_SSL_SKELETON_MODE)
+static const    /* saves a few bytes and RAM */
 #include "cert.h"
+static const    /* saves a few more bytes */
 #include "private_key.h"
 #endif
          

@@ -165,7 +165,7 @@ extern "C" {
  * call to ssl_verify_cert().
  * - SSL_CLIENT_AUTHENTICATION (server only): Enforce client authentication
  * i.e. each handshake will include a "certificate request" message from the
- * server. Only availabile if verification has been enabled.
+ * server. Only available if verification has been enabled.
  * - SSL_NO_DEFAULT_KEY: Don't use the default key/certificate. The user will
  * load the key/certificate explicitly.
  * - SSL_DISPLAY_BYTES (full mode build only): Display the byte sequences
@@ -272,7 +272,7 @@ EXP_FUNC SSL * STDCALL ssl_find(SSLCTX *ssl_ctx, int client_fd);
 /**
  * @brief Get the session id for a handshake. 
  * 
- * This will be a 32 byte sequence and is availabile after the first
+ * This will be a 32 byte sequence and is available after the first
  * handshaking messages are sent.
  * @param ssl [in] An SSL object reference.
  * @return The session id as a 32 byte sequence.

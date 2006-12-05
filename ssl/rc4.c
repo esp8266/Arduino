@@ -69,8 +69,9 @@ void RC4_crypt(RC4_CTX *ctx, const uint8_t *msg, uint8_t *out, int length)
 
     for (i = 0; i < length; i++)
     {
-        x =(uint8_t)(x + 1); a = m[x];
-        y =(uint8_t)(y + a);
+        x = (uint8_t)(x + 1); 
+        a = m[x];
+        y = (uint8_t)(y + a);
         m[x] = b = m[y];
         m[y] = a;
         out[i] ^= m[(uint8_t)(a + b)];

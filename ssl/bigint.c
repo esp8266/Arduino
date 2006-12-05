@@ -134,7 +134,7 @@ void bi_terminate(BI_CTX *ctx)
  * @brief Increment the number of references to this object. 
  * It does not do a full copy.
  * @param bi [in]   The bigint to copy.
- * @return A referent to the same bigint.
+ * @return A reference to the same bigint.
  */
 bigint *bi_copy(bigint *bi)
 {
