@@ -47,9 +47,8 @@
 
 PORT = /dev/tty.usbserial*
 TARGET = foo
-ARDUINO = /Applications/arduino-0005/lib/targets/arduino
-SRC = $(ARDUINO)/buffer.c $(ARDUINO)/pins_arduino.c \
-  $(ARDUINO)/Serial.c $(ARDUINO)/uart.c $(ARDUINO)/wiring.c
+ARDUINO = /Applications/arduino-0007/lib/targets/arduino
+SRC = $(ARDUINO)/pins_arduino.c $(ARDUINO)/wiring.c $(ARDUINO)/WInterrupts.c
 CXXSRC = $(TARGET).cpp $(ARDUINO)/HardwareSerial.cpp $(ARDUINO)/WRandom.cpp
 MCU = atmega8
 F_CPU = 16000000
@@ -125,7 +124,7 @@ ALL_ASFLAGS = -mmcu=$(MCU) -I. -x assembler-with-cpp $(ASFLAGS)
 # Default target.
 all: build
 
-build: elf hex eep
+build: elf hex
 
 elf: $(TARGET).elf
 hex: $(TARGET).hex
@@ -134,7 +133,7 @@ lss: $(TARGET).lss
 sym: $(TARGET).sym
 
 # Program the device.  
-upload: $(TARGET).hex $(TARGET).eep
+upload: $(TARGET).hex
 	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH)
 
 
