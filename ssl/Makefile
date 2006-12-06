@@ -31,7 +31,9 @@ endif
 ifndef CONFIG_PLATFORM_WIN32
 TARGET1=../$(STAGE)/libaxtls.a
 BASETARGET=libaxtls.so
-TARGET2=../$(STAGE)/$(BASETARGET)
+ifdef CONFIG_PLATFORM_CYGWIN
+TARGET2=../$(STAGE)/libaxtls.dll.a
+endif
 
 # shared library major/minor numbers
 LIBMAJOR=$(BASETARGET).1
@@ -72,8 +74,15 @@ $(TARGET1) : $(OBJ)
 	$(AR) -r $@ $(OBJ)
 
 $(TARGET2) : $(OBJ)
-	$(LD) $(LDFLAGS) -Wl,-soname,$(LIBMAJOR) $(LDSHARED) -o ../$(STAGE)/$(LIBMINOR) $(OBJ)
+ifndef CONFIG_PLATFORM_CYGWIN
+	$(LD) $(LDFLAGS) $(LDSHARED) -Wl,-soname,$(LIBMAJOR) -o ../$(STAGE)/$(LIBMINOR) $(OBJ)
 	cd ../$(STAGE); ln -sf $(LIBMINOR) $(LIBMAJOR); ln -sf $(LIBMAJOR) $(BASETARGET); cd -
+else
+	$(LD) $(LDFLAGS) $(LDSHARED) -o ../$(STAGE)/cygaxtls.dll \
+    -Wl,--out-implib=../$(STAGE)/libaxtls.dll.a \
+    -Wl,--export-all-symbols \
+    -Wl,--enable-auto-import $(OBJ)
+endif
 
 else  # Win32
 

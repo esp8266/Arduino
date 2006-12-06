@@ -31,9 +31,11 @@ static void send301(struct connstruct *cn);
 static void send404(struct connstruct *cn);
 static int procindex(struct connstruct *cn, struct stat *stp);
 static int hexit(char c);
-static void urlencode(unsigned char *s, unsigned char *t);
 static void urldecode(char *buf);
 
+#if defined(CONFIG_HTTP_DIRECTORIES)
+static void urlencode(unsigned char *s, unsigned char *t);
+#endif
 #if defined(CONFIG_HTTP_HAS_CGI)
 static void proccgi(struct connstruct *cn, int has_pathinfo);
 #endif
@@ -206,6 +208,35 @@ void procdodir(struct connstruct *cn)
     } 
     while (issockwriteable(cn->networkdesc));
 }
+
+/* Encode funny chars -> %xx in newly allocated storage */
+/* (preserves '/' !) */
+static void urlencode(unsigned char *s, unsigned char *t) 
+{
+    uint8_t *p, *tp;
+
+    tp =t ;
+
+    for (p=s; *p; p++) 
+    {
+        if ((*p > 0x00 && *p < ',') ||
+                (*p > '9' && *p < 'A') ||
+                (*p > 'Z' && *p < '_') ||
+                (*p > '_' && *p < 'a') ||
+                (*p > 'z' && *p < 0xA1)) {
+            sprintf((char *)tp, "%%%02X", *p);
+            tp += 3; 
+        } 
+        else 
+        {
+            *tp = *p;
+            tp++;
+        }
+    }
+
+    *tp='\0';
+}
+
 #endif
 
 void procreadhead(struct connstruct *cn) 
@@ -529,20 +560,6 @@ static int special_read(struct connstruct *cn, void *buf, size_t count)
     return res;
 }
 
-static void send301(struct connstruct *cn)
-{
-    char buf[2048];
-    sprintf(buf, "HTTP/1.1 301 Moved Permanently\nLocation: %s/\n\n<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<HTML><HEAD>\n<TITLE>301 Moved Permanently</TITLE>\n</HEAD><BODY>\n<H1>Moved Permanently</H1>\nThe document has moved <A HREF=\"%s/\">here</A>.<P>\n<HR>\n</BODY></HTML>\n", cn->filereq, cn->filereq);
-    special_write(cn, buf, strlen(buf));
-}
-
-static void send404(struct connstruct *cn)
-{
-    char buf[1024];
-    sprintf(buf, "HTTP/1.0 404 Not Found\nContent-Type: text/html\n\n<HTML><BODY>\n<TITLE>404 Not Found</TITLE><H1>It ain't there my friend. (404 Not Found)</H1>\n</BODY></HTML>\n");
-    special_write(cn, buf, strlen(buf));
-}
-
 // Returns 0 if no index was found and doesn't modify cn->actualfile
 // Returns 1 if an index was found and puts the index in cn->actualfile
 //              and puts its stat info into stp
@@ -701,34 +718,6 @@ static void proccgi(struct connstruct *cn, int has_pathinfo)
 }
 #endif  /* CONFIG_HTTP_HAS_CGI */
 
-/* Encode funny chars -> %xx in newly allocated storage */
-/* (preserves '/' !) */
-static void urlencode(unsigned char *s, unsigned char *t) 
-{
-    uint8_t *p, *tp;
-
-    tp =t ;
-
-    for (p=s; *p; p++) 
-    {
-        if ((*p > 0x00 && *p < ',') ||
-                (*p > '9' && *p < 'A') ||
-                (*p > 'Z' && *p < '_') ||
-                (*p > '_' && *p < 'a') ||
-                (*p > 'z' && *p < 0xA1)) {
-            sprintf((char *)tp, "%%%02X", *p);
-            tp += 3; 
-        } 
-        else 
-        {
-            *tp = *p;
-            tp++;
-        }
-    }
-
-    *tp='\0';
-}
-
 /* Decode string %xx -> char (in place) */
 static void urldecode(char *buf) 
 {
@@ -776,5 +765,19 @@ static int hexit(char c)
         return c - 'A' + 10;
 
     return 0;
+}
+
+static void send301(struct connstruct *cn)
+{
+    char buf[2048];
+    snprintf(buf, sizeof(buf), "HTTP/1.1 301 Moved Permanently\nLocation: %s/\n\n<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<HTML><HEAD>\n<TITLE>301 Moved Permanently</TITLE>\n</HEAD><BODY>\n<H1>Moved Permanently</H1>\nThe document has moved <A HREF=\"%s/\">here</A>.<P>\n<HR>\n</BODY></HTML>\n", cn->filereq, cn->filereq);
+    special_write(cn, buf, strlen(buf));
+}
+
+static void send404(struct connstruct *cn)
+{
+    char buf[1024];
+    sprintf(buf, "HTTP/1.0 404 Not Found\nContent-Type: text/html\n\n<HTML><BODY>\n<TITLE>404 Not Found</TITLE><H1>It ain't there my friend. (404 Not Found)</H1>\n</BODY></HTML>\n");
+    special_write(cn, buf, strlen(buf));
 }
 

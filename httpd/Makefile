@@ -47,7 +47,7 @@ LIBS=../$(STAGE)/axtls.lib ..\\config\\axtls.res
 endif
 endif
 
-ifndef CONFIG_AWHTTPD
+ifndef CONFIG_AXHTTPD
 web_server:
 else
 
@@ -56,18 +56,13 @@ web_server : $(TARGET)
 OBJ= \
 	conn.o \
 	main.o \
-	net.o \
 	proc.o \
-	socket.o \
 	misc.o \
 	mime_types.o
 
 ifndef CONFIG_PLATFORM_WIN32
 
-$(TARGET): $(OBJ)
-ifdef CONFIG_HTTP_NO_SSL
-	$(LD) $(LDFLAGS) -o $@ $(OBJ)
-endif
+$(TARGET): $(OBJ) ../$(STAGE)/libaxtls.a
 	$(LD) $(LDFLAGS) -o $@ $(OBJ) $(LIBS)
 ifndef CONFIG_DEBUG
 ifndef CONFIG_PLATFORM_SOLARIS
@@ -77,13 +72,10 @@ endif
 else    # Win32
 
 $(TARGET): $(OBJ)
-ifdef CONFIG_HTTP_NO_SSL
-	$(LD) $(LDFLAGS) /out:$@ $(OBJ)
-endif
 	$(LD) $(LDFLAGS) $(LIBS) /out:$@ $(OBJ)
 endif
 
-endif       # CONFIG_AWHTTPD
+endif       # CONFIG_AXHTTPD
 
 clean::
 	-@rm -f $(TARGET)*

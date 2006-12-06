@@ -33,7 +33,12 @@ struct cgiextstruct *cgiexts;
 struct indexstruct *indexlist;
 
 char *webroot = CONFIG_HTTP_WEBROOT;
+
 static void addindex(char *tp);
+static void addtoservers(int sd);
+static void selectloop(void);
+static int openlistener(int port);
+static void handlenewconnection(int listenfd, int is_ssl);
 #if defined(CONFIG_HTTP_PERM_CHECK)
 static void procpermcheck(char *pathtocheck);
 #endif
@@ -123,7 +128,7 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    if ((tp=openlistener(CONFIG_HTTP_PORT)) == -1) 
+    if ((tp = openlistener(CONFIG_HTTP_PORT)) == -1) 
     {
 #ifdef CONFIG_HTTP_VERBOSE
         fprintf(stderr, "ERR: Couldn't bind to port %d (IPv4)\n",
@@ -143,7 +148,7 @@ int main(int argc, char *argv[])
     }
 #endif
 
-    if ((tp=openlistener(CONFIG_HTTP_HTTPS_PORT)) == -1) 
+    if ((tp = openlistener(CONFIG_HTTP_HTTPS_PORT)) == -1) 
     {
 #ifdef CONFIG_HTTP_VERBOSE
         fprintf(stderr, "ERR: Couldn't bind to port %d (IPv4)\n", 
@@ -321,3 +326,260 @@ static void addcgiext(char *tp)
 }
 #endif
 
+static void addtoservers(int sd) 
+{
+    struct serverstruct *tp = (struct serverstruct *)
+                            calloc(1, sizeof(struct serverstruct));
+    tp->next = servers;
+    tp->sd = sd;
+    servers = tp;
+}
+
+static void selectloop(void) 
+{
+    fd_set rfds, wfds;
+    struct connstruct *tp, *to;
+    struct serverstruct *sp;
+    int rnum, wnum, active;
+    int currtime;
+
+    while (1)
+    {   
+        // MAIN SELECT LOOP
+        FD_ZERO(&rfds);
+        FD_ZERO(&wfds);
+        rnum = wnum = -1;
+
+        // Add the listening sockets
+        sp = servers;
+        while (sp != NULL) 
+        {
+            FD_SET(sp->sd, &rfds);
+            if (sp->sd > rnum) rnum = sp->sd;
+            sp = sp->next;
+        }
+
+        // Add the established sockets
+        tp = usedconns;
+        currtime = time(NULL);
+
+        while (tp != NULL) 
+        {
+            if (currtime > tp->timeout) 
+            {
+                to = tp;
+                tp = tp->next;
+                removeconnection(to);
+                continue;
+            }
+
+            if (tp->state == STATE_WANT_TO_READ_HEAD) 
+            {
+                FD_SET(tp->networkdesc, &rfds);
+                if (tp->networkdesc > rnum) 
+                    rnum = tp->networkdesc;
+            }
+
+            if (tp->state == STATE_WANT_TO_SEND_HEAD) 
+            {
+                FD_SET(tp->networkdesc, &wfds);
+                if (tp->networkdesc > wnum) 
+                    wnum = tp->networkdesc;
+            }
+
+            if (tp->state == STATE_WANT_TO_READ_FILE) 
+            {
+                FD_SET(tp->filedesc, &rfds);
+                if (tp->filedesc > rnum) 
+                    rnum = tp->filedesc;
+            }
+
+            if (tp->state == STATE_WANT_TO_SEND_FILE) 
+            {
+                FD_SET(tp->networkdesc, &wfds);
+                if (tp->networkdesc > wnum) 
+                    wnum = tp->networkdesc;
+            }
+
+#if defined(CONFIG_HTTP_DIRECTORIES)
+            if (tp->state == STATE_DOING_DIR) 
+            {
+                FD_SET(tp->networkdesc, &wfds);
+                if (tp->networkdesc > wnum) 
+                    wnum = tp->networkdesc;
+            }
+#endif
+            tp = tp->next;
+        }
+
+        active = select(wnum > rnum ? wnum+1 : rnum+1,
+                rnum != -1 ? &rfds : NULL,
+                wnum != -1 ? &wfds : NULL,
+                NULL, NULL);
+
+        // Handle the listening sockets
+        sp = servers;
+        while (active > 0 && sp != NULL) 
+        {
+            if (FD_ISSET(sp->sd, &rfds)) 
+            {
+                handlenewconnection(sp->sd, sp->is_ssl);
+                active--;
+            }
+
+            sp = sp->next;
+        }
+
+        // Handle the established sockets
+        tp = usedconns;
+
+        while (active > 0 && tp != NULL) 
+        {
+            to = tp;
+            tp = tp->next;
+
+            if (to->state == STATE_WANT_TO_READ_HEAD)
+                if (FD_ISSET(to->networkdesc, &rfds)) 
+                {
+                    active--;
+                    procreadhead(to);
+                } 
+
+            if (to->state == STATE_WANT_TO_SEND_HEAD)
+                if (FD_ISSET(to->networkdesc, &wfds)) 
+                {
+                    active--;
+                    procsendhead(to);
+                } 
+
+            if (to->state == STATE_WANT_TO_READ_FILE)
+                if (FD_ISSET(to->filedesc, &rfds)) 
+                {
+                    active--;
+                    procreadfile(to);
+                } 
+
+            if (to->state == STATE_WANT_TO_SEND_FILE)
+                if (FD_ISSET(to->networkdesc, &wfds)) 
+                {
+                    active--;
+                    procsendfile(to);
+                }
+
+#if defined(CONFIG_HTTP_DIRECTORIES)
+            if (to->state == STATE_DOING_DIR)
+                if (FD_ISSET(to->networkdesc, &wfds)) 
+                {
+                    active--;
+                    procdodir(to);
+                }
+#endif
+        }
+    }  // MAIN SELECT LOOP
+}
+
+#ifdef HAVE_IPV6
+static void handlenewconnection(int listenfd, int is_ssl) 
+{
+    struct sockaddr_in6 their_addr;
+    int tp = sizeof(their_addr);
+    char ipbuf[100];
+    int connfd = accept(listenfd, (struct sockaddr *)&their_addr, &tp);
+
+    if (connfd == -1) 
+        return;
+
+    if (tp == sizeof(struct sockaddr_in6)) 
+    {
+        inet_ntop(AF_INET6, &their_addr.sin6_addr, ipbuf, sizeof(ipbuf));
+    } 
+    else if (tp == sizeof(struct sockaddr_in)) 
+    {
+        inet_ntop(AF_INET, &(((struct sockaddr_in *)&their_addr)->sin_addr),
+                ipbuf, sizeof(ipbuf));
+    } 
+    else 
+    {
+        *ipbuf = '\0';
+    }
+
+    addconnection(connfd, ipbuf, is_ssl);
+}
+
+#else
+static void handlenewconnection(int listenfd, int is_ssl) 
+{
+    struct sockaddr_in their_addr;
+    int tp = sizeof(struct sockaddr_in);
+    int connfd = accept(listenfd, (struct sockaddr *)&their_addr, &tp);
+
+    if (connfd == -1) 
+        return;
+
+    addconnection(connfd, inet_ntoa(their_addr.sin_addr), is_ssl);
+}
+#endif
+
+static int openlistener(int port) 
+{
+    int sd;
+#ifdef WIN32
+    char tp=1;
+#else
+    int tp=1;
+#endif
+    struct sockaddr_in my_addr;
+
+    if ((sd = socket(AF_INET, SOCK_STREAM, 0)) == -1) 
+        return -1;
+
+    setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &tp, sizeof(tp));
+    my_addr.sin_family = AF_INET;         // host byte order
+    my_addr.sin_port = htons((short)port);       // short, network byte order
+    my_addr.sin_addr.s_addr = INADDR_ANY; // automatically fill with my IP
+    memset(&(my_addr.sin_zero), 0, 8);    // zero the rest of the struct
+
+    if (bind(sd, (struct sockaddr *)&my_addr, sizeof(struct sockaddr)) == -1) 
+    {
+        close(sd);
+        return -1;
+    }
+
+    if (listen(sd, BACKLOG) == -1) 
+    {
+        close(sd);
+        return -1;
+    }
+
+    return sd;
+}
+
+#ifdef HAVE_IPV6
+static int openlistener6(int port) 
+{
+    int sd,tp;
+    struct sockaddr_in6 my_addr;
+
+    if ((sd = socket(AF_INET6, SOCK_STREAM, 0)) == -1) 
+        return -1;
+
+    setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &tp, sizeof(tp));
+    memset(&my_addr, 0, sizeof(my_addr));
+    my_addr.sin6_family = AF_INET6;
+    my_addr.sin6_port = htons(port);
+
+    if (bind(sd, (struct sockaddr *)&my_addr, sizeof(my_addr)) == -1) 
+    {
+        close(sd);
+        return -1;
+    }
+
+    if (listen(sd, BACKLOG) == -1)
+    {
+        close(sd);
+        return -1;
+    }
+
+    return sd;
+}
+#endif

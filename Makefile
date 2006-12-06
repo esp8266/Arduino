@@ -69,9 +69,10 @@ win32_demo:
 install: $(PREFIX) all
 	cp --no-dereference $(STAGE)/libax* $(PREFIX)/lib
 	chmod 755 $(PREFIX)/lib/libax* 
-	-@install -m 755 $(STAGE)/ax* $(PREFIX)/bin > /dev/null 2>&1
-	-@install -m 755 $(STAGE)/axtlsp.pm `perl -e 'use Config; print $$Config{installarchlib};'` > /dev/null 2>&1
-	-@install -m 755 $(STAGE)/axhttpd* $(PREFIX)/bin > /dev/null 2>&1
+	-install -m 755 $(STAGE)/ax* $(PREFIX)/bin > /dev/null 2>&1
+ifdef CONFIG_PERL_BINDINGS 
+	-install -m 755 $(STAGE)/axtlsp.pm `perl -e 'use Config; print $$Config{installarchlib};'` > /dev/null 2>&1
+endif
 
 installclean:
 	-@rm $(PREFIX)/lib/libax* > /dev/null 2>&1

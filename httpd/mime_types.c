@@ -35,19 +35,23 @@ static mime_table_t mime_table[] =
     // Fundamentals
     { ".html", "text/html" },
     { ".htm", "text/html" },
-    { ".txt", "text/plain" },
+    { ".css", "text/css" },
 
-    // Others
+    // Basic graphics
+    { ".jpg", "image/jpeg" },
+    { ".gif", "image/gif" },
+    { ".png", "image/png" },
+
+#ifdef CONFIG_HTTP_ALL_MIME_TYPES
+    // This list is a bit expensive to maintain normally, so it's an option.
+    { ".txt", "text/plain" },
     { ".rtx", "text/richtext" },
     { ".etx", "text/x-setext" },
     { ".tsv", "text/tab-separated-values" },
-    { ".css", "text/css" },
     { ".xml", "text/xml" },
     { ".dtd", "text/xml" },
-    { ".gif", "image/gif" },
-    { ".jpg", "image/jpeg" },
-    { ".jpeg", "image/jpeg" },
     { ".jpe", "image/jpeg" },
+    { ".jpeg", "image/jpeg" },
     { ".jfif", "image/jpeg" },
     { ".tif", "image/tiff" },
     { ".tiff", "image/tiff" },
@@ -59,7 +63,6 @@ static mime_table_t mime_table[] =
     { ".xpm", "image/x-xpixmap" },
     { ".xwd", "image/x-xwindowdump" },
     { ".ief", "image/ief" },
-    { ".png", "image/png" },
     { ".au", "audio/basic" },
     { ".snd", "audio/basic" },
     { ".aif", "audio/x-aiff" },
@@ -159,6 +162,7 @@ static mime_table_t mime_table[] =
     { ".tar.gz", "application/x-gzip" },
     { ".bz2", "application/x-bzip2" },
     { ".zip", "application/zip" }
+#endif
 };
 
 static int mime_cmp(const mime_table_t *t1, const mime_table_t *t2)

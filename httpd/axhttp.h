@@ -20,7 +20,7 @@
 #include "ssl.h"
 
 #define BACKLOG 15
-#define VERSION "3.0.7"
+#define VERSION "1.0.0"
 #ifdef CONFIG_HTTP_HAS_IPV6
 #define HAVE_IPV6
 #endif
@@ -47,10 +47,8 @@
 struct connstruct 
 {
     struct connstruct *next;
-
     int state;
     int reqtype;
-
     int networkdesc;
     int filedesc;
 
@@ -73,7 +71,6 @@ struct connstruct
     char cgipathinfo[MAXREQUESTLENGTH];
 #endif
     char virtualhostreq[MAXREQUESTLENGTH];
-
     int numbytes;
     char databuf[BLOCKSIZE];
 
@@ -90,11 +87,13 @@ struct serverstruct
     SSLCTX *ssl_ctx;
 };
 
+#if defined(CONFIG_HTTP_HAS_CGI)
 struct cgiextstruct 
 {
     struct cgiextstruct *next;
     char *ext;
 };
+#endif
 
 struct indexstruct 
 {
@@ -106,7 +105,9 @@ struct indexstruct
 extern struct serverstruct *servers;
 extern struct connstruct *usedconns;
 extern struct connstruct *freeconns;
+#if defined(CONFIG_HTTP_HAS_CGI)
 extern struct cgiextstruct *cgiexts;
+#endif
 extern struct indexstruct *indexlist;
 
 // Conf global prototypes
@@ -128,15 +129,6 @@ void procsendhead(struct connstruct *cn);
 void procreadfile(struct connstruct *cn);
 void procsendfile(struct connstruct *cn);
 int special_write(struct connstruct *cn, const uint8_t *buf, size_t count);
-
-// net.c prototypes
-void addtoservers(int sd);
-void selectloop(void);
-
-// socket.c prototypes
-void handlenewconnection(int listenfd, int is_ssl);
-int openlistener(int port);
-int openlistener6(int port);
 
 // misc.c prototypes
 void nada(int sigtype);
