@@ -27,21 +27,31 @@
 #include "axhttp.h"
 
 static int special_read(struct connstruct *cn, void *buf, size_t count);
+static int special_write(struct connstruct *cn, 
+                                        const uint8_t *buf, size_t count);
 static void send301(struct connstruct *cn);
 static void send404(struct connstruct *cn);
 static int procindex(struct connstruct *cn, struct stat *stp);
 static int hexit(char c);
 static void urldecode(char *buf);
+static void buildactualfile(struct connstruct *cn);
+static int sanitizefile(const char *buf);
+static int sanitizehost(char *buf);
 
 #if defined(CONFIG_HTTP_DIRECTORIES)
-static void urlencode(unsigned char *s, unsigned char *t);
+static void urlencode(const uint8_t *s, uint8_t *t);
+static void procdirlisting(struct connstruct *cn);
+static int issockwriteable(int sd);
 #endif
 #if defined(CONFIG_HTTP_HAS_CGI)
 static void proccgi(struct connstruct *cn, int has_pathinfo);
+static int trycgi_withpathinfo(struct connstruct *cn);
+static void split(char *tp, char *sp[], int maxwords, char sc);
+static int iscgi(const char *fn);
 #endif
 
 // Returns 1 if elems should continue being read, 0 otherwise
-int procheadelem(struct connstruct *cn, char *buf) 
+static int procheadelem(struct connstruct *cn, char *buf) 
 {
     char *delim, *value;
 #if defined(CONFIG_HTTP_HAS_CGI)
@@ -98,7 +108,8 @@ int procheadelem(struct connstruct *cn, char *buf)
         my_strncpy(cn->virtualhostreq, value, MAXREQUESTLENGTH);
     } 
     else if (strcmp(buf, "Connection:")==0 &&
-            strcmp(value, "close")==0) {
+            strcmp(value, "close")==0) 
+    {
         cn->close_when_done = 1;
     } 
     else if (strcmp(buf, "If-Modified-Since:") ==0 ) 
@@ -111,33 +122,26 @@ int procheadelem(struct connstruct *cn, char *buf)
 }
 
 #if defined(CONFIG_HTTP_DIRECTORIES)
-void procdirlisting(struct connstruct *cn) 
+static void procdirlisting(struct connstruct *cn)
 {
     char buf[MAXREQUESTLENGTH];
     char actualfile[1024];
 
-#ifndef CONFIG_HTTP_DIRECTORIES
-    if (allowdirectorylisting == 0) 
-    {
-        send404(cn);
-        removeconnection(cn);
-        return;
-    }
-#endif
-
     if (cn->reqtype == TYPE_HEAD) 
     {
-        snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nContent-Type: text/html\n\n");
+        snprintf(buf, sizeof(buf), 
+                "HTTP/1.1 200 OK\nContent-Type: text/html\n\n");
         write(cn->networkdesc, buf, strlen(buf));
-
         removeconnection(cn);
         return;
     }
 
     strcpy(actualfile, cn->actualfile);
+
 #ifdef WIN32
     strcat(actualfile, "*");
     cn->dirp = FindFirstFile(actualfile, &cn->file_data);
+
     if (cn->dirp == INVALID_HANDLE_VALUE) 
     {
         send404(cn);
@@ -145,10 +149,7 @@ void procdirlisting(struct connstruct *cn)
         return;
     }
 #else
-
-    cn->dirp = opendir(actualfile);
-
-    if (cn->dirp == NULL) 
+    if ((cn->dirp = opendir(actualfile)) == NULL) 
     {
         send404(cn);
         removeconnection(cn);
@@ -159,7 +160,10 @@ void procdirlisting(struct connstruct *cn)
     readdir(cn->dirp);
 #endif
 
-    sprintf(buf, "HTTP/1.1 200 OK\nContent-Type: text/html\n\n<HTML><BODY>\n<TITLE>Directory Listing</TITLE>\n<H2>Directory listing of %s://%s%s</H2><BR>\n", cn->is_ssl ? "https" : "http", cn->virtualhostreq, cn->filereq);
+    snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nContent-Type: text/html\n\n"
+            "<HTML><BODY>\n<TITLE>Directory Listing</TITLE>\n"
+            "<H2>Directory listing of %s://%s%s</H2><BR>\n", 
+            cn->is_ssl ? "https" : "http", cn->virtualhostreq, cn->filereq);
     special_write(cn, buf, strlen(buf));
     cn->state = STATE_DOING_DIR;
 }
@@ -179,14 +183,14 @@ void procdodir(struct connstruct *cn)
 #ifdef WIN32
         if (!FindNextFile(cn->dirp, &cn->file_data)) 
 #else
-            if ((dp = readdir(cn->dirp)) == NULL)  
+        if ((dp = readdir(cn->dirp)) == NULL)  
 #endif
-            {
-                snprintf(buf, sizeof(buf), "</BODY></HTML>\n");
-                special_write(cn, buf, strlen(buf));
-                removeconnection(cn);
-                return;
-            }
+        {
+            snprintf(buf, sizeof(buf), "</BODY></HTML>\n");
+            special_write(cn, buf, strlen(buf));
+            removeconnection(cn);
+            return;
+        }
 
 #ifdef WIN32
         file = cn->file_data.cFileName;
@@ -199,31 +203,45 @@ void procdodir(struct connstruct *cn)
 
         snprintf(buf, sizeof(buf), "%s%s", cn->actualfile, file);
         putslash = isdir(buf);
-
         urlencode(file, encbuf);
         snprintf(buf, sizeof(buf), "<A HREF=\"%s%s\">%s%s</A><BR>\n",
                 encbuf, putslash ? "/" : "", file, putslash ? "/" : "");
         special_write(cn, buf, strlen(buf));
+    } while (issockwriteable(cn->networkdesc));
+}
 
-    } 
-    while (issockwriteable(cn->networkdesc));
+static int issockwriteable(int sd)
+{
+    fd_set wfds;
+    struct timeval tv;
+
+    tv.tv_sec = 0;
+    tv.tv_usec = 0;
+
+    FD_ZERO(&wfds);
+    FD_SET(sd, &wfds);
+
+    select(FD_SETSIZE, NULL, &wfds, NULL, &tv);
+    return FD_ISSET(sd, &wfds);
 }
 
 /* Encode funny chars -> %xx in newly allocated storage */
 /* (preserves '/' !) */
-static void urlencode(unsigned char *s, unsigned char *t) 
+static void urlencode(const uint8_t *s, uint8_t *t) 
 {
-    uint8_t *p, *tp;
+    const uint8_t *p = s;
+    uint8_t *tp;
 
-    tp =t ;
+    tp = t;
 
-    for (p=s; *p; p++) 
+    for (; *p; p++) 
     {
         if ((*p > 0x00 && *p < ',') ||
                 (*p > '9' && *p < 'A') ||
                 (*p > 'Z' && *p < '_') ||
                 (*p > '_' && *p < 'a') ||
-                (*p > 'z' && *p < 0xA1)) {
+                (*p > 'z' && *p < 0xA1)) 
+        {
             sprintf((char *)tp, "%%%02X", *p);
             tp += 3; 
         } 
@@ -245,24 +263,23 @@ void procreadhead(struct connstruct *cn)
     int rv;
 
     rv = special_read(cn, buf, sizeof(buf)-1);
-    if (rv <= 0) {
-        if (rv < 0)
+    if (rv <= 0) 
+    {
+        if (rv < 0) // really dead?
             removeconnection(cn);
         return;
     }
 
     buf[rv] = '\0';
-
     next = tp = buf;
 
     // Split up lines and send to procheadelem()
-    while(*next != '\0') 
+    while (*next != '\0') 
     {
         // If we have a blank line, advance to next stage!
         if (*next == '\r' || *next == '\n') 
         {
             buildactualfile(cn);
-
             cn->state = STATE_WANT_TO_SEND_HEAD;
             return;
         }
@@ -273,7 +290,7 @@ void procreadhead(struct connstruct *cn)
         if (*next == '\r') 
         {
             *next = '\0';
-            next+=2;
+            next += 2;
         }
         else if (*next == '\n') 
             *next++ = '\0';
@@ -295,8 +312,8 @@ void procsendhead(struct connstruct *cn)
     struct stat stbuf;
     time_t now = cn->timeout - CONFIG_HTTP_TIMEOUT;
     char date[32];
-    strcpy(date, ctime(&now));
 
+    strcpy(date, ctime(&now));
     strcpy(actualfile, cn->actualfile);
 
 #ifdef WIN32
@@ -309,8 +326,9 @@ void procsendhead(struct connstruct *cn)
     {
 #if defined(CONFIG_HTTP_HAS_CGI)
         if (trycgi_withpathinfo(cn) == 0) 
-        { // We Try To Find A CGI
-            proccgi(cn,1);
+        { 
+            // We Try To Find A CGI
+            proccgi(cn, 1);
             return;
         }
 #endif
@@ -321,7 +339,7 @@ void procsendhead(struct connstruct *cn)
     }
 
 #if defined(CONFIG_HTTP_HAS_CGI)
-    if (iscgi(cn->actualfile)) 
+    if (iscgi(cn->actualfile))
     {
 #ifndef WIN32
         // Set up CGI script
@@ -333,7 +351,7 @@ void procsendhead(struct connstruct *cn)
         }
 #endif
 
-        proccgi(cn,0);
+        proccgi(cn, 0);
         return;
     }
 #endif
@@ -362,7 +380,7 @@ void procsendhead(struct connstruct *cn)
 
 #if defined(CONFIG_HTTP_HAS_CGI)
         // If the index is a CGI file, handle it like any other CGI
-        if (iscgi(cn->actualfile)) 
+        if (iscgi(cn->actualfile))
         {
             // Set up CGI script
             if ((stbuf.st_mode & S_IEXEC) == 0 || isdir(cn->actualfile)) 
@@ -372,45 +390,7 @@ void procsendhead(struct connstruct *cn)
                 return;
             }
 
-            proccgi(cn,0);
-            return;
-        }
-#endif
-        // If the index isn't a CGI, we continue on with the index file
-    }
-
-    if ((stbuf.st_mode & S_IFMT) == S_IFDIR) 
-    {
-        if (cn->filereq[strlen(cn->filereq)-1] != '/') 
-        {
-            send301(cn);
-            removeconnection(cn);
-            return;
-        }
-
-        // Check to see if this dir has an index file
-        if (procindex(cn, &stbuf) == 0) 
-        {
-#if defined(CONFIG_HTTP_DIRECTORIES)
-            // If not, we do a directory listing of it
-            procdirlisting(cn);
-#endif
-            return;
-        }
-
-#if defined(CONFIG_HTTP_HAS_CGI)
-        // If the index is a CGI file, handle it like any other CGI
-        if (iscgi(cn->actualfile)) 
-        {
-            // Set up CGI script
-            if ((stbuf.st_mode & S_IEXEC) == 0 || isdir(cn->actualfile)) 
-            {
-                send404(cn);
-                removeconnection(cn);
-                return;
-            }
-
-            proccgi(cn,0);
+            proccgi(cn, 0);
             return;
         }
 #endif
@@ -419,7 +399,8 @@ void procsendhead(struct connstruct *cn)
 
     if (cn->modified_since) 
     {
-        snprintf(buf, sizeof(buf), "HTTP/1.1 304 Not Modified\nServer: axhttpd V%s\nDate: %s\n", VERSION, date);
+        snprintf(buf, sizeof(buf), "HTTP/1.1 304 Not Modified\nServer: "
+                "axhttpd V%s\nDate: %s\n", VERSION, date);
         special_write(cn, buf, strlen(buf));
         cn->modified_since = 0;
         cn->state = STATE_WANT_TO_READ_HEAD;
@@ -433,12 +414,11 @@ void procsendhead(struct connstruct *cn)
         TTY_FLUSH();
 #endif
 
-        snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nServer: axhttpd V%s\nContent-Type: %s\nContent-Length: %ld\nDate: %sLast-Modified: %s\n",
-                VERSION,
-                getmimetype(cn->actualfile),
-                (long) stbuf.st_size,
-                date,
-                ctime(&(stbuf.st_mtime))); // ctime() has a \n on the end
+        snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nServer: axhttpd V%s\n"
+                "Content-Type: %s\nContent-Length: %ld\n"
+                "Date: %sLast-Modified: %s\n", VERSION,
+                getmimetype(cn->actualfile), (long) stbuf.st_size,
+                date, ctime(&(stbuf.st_mtime))); // ctime() has a \n on the end
     }
 
     special_write(cn, buf, strlen(buf));
@@ -478,7 +458,6 @@ void procsendhead(struct connstruct *cn)
 #else
         cn->state = STATE_WANT_TO_READ_FILE;
 #endif
-        return;
     }
 }
 
@@ -490,10 +469,11 @@ void procreadfile(struct connstruct *cn)
     {
         close(cn->filedesc);
         cn->filedesc = -1;
-        if (cn->close_when_done)      /* close immediately */
+
+        if (cn->close_when_done)        /* close immediately */
             removeconnection(cn);
         else 
-        {                        /* keep socket open - HTTP 1.1 */
+        {                               /* keep socket open - HTTP 1.1 */
             cn->state = STATE_WANT_TO_READ_HEAD;
             cn->numbytes = 0;
         }
@@ -514,7 +494,9 @@ void procsendfile(struct connstruct *cn)
     else if (rv == cn->numbytes)
         cn->state = STATE_WANT_TO_READ_FILE;
     else if (rv == 0)
-    { /* Do nothing */ }
+    { 
+        /* Do nothing */ 
+    }
     else 
     {
         memmove(cn->databuf, cn->databuf + rv, cn->numbytes - rv);
@@ -522,24 +504,16 @@ void procsendfile(struct connstruct *cn)
     }
 }
 
-int special_write(struct connstruct *cn, const uint8_t *buf, size_t count)
+static int special_write(struct connstruct *cn, 
+                                        const uint8_t *buf, size_t count)
 {
-    int res;
-
     if (cn->is_ssl)
     {
         SSL *ssl = ssl_find(servers->ssl_ctx, cn->networkdesc);
-        if (ssl)
-        {
-            res = ssl_write(ssl, (unsigned char *)buf, count);
-        }
-        else
-            return -1;
+        return ssl ? ssl_write(ssl, (uint8_t *)buf, count) : -1;
     }
     else
-        res = SOCKET_WRITE(cn->networkdesc, buf, count);
-
-    return res;
+        return SOCKET_WRITE(cn->networkdesc, buf, count);
 }
 
 static int special_read(struct connstruct *cn, void *buf, size_t count)
@@ -549,7 +523,7 @@ static int special_read(struct connstruct *cn, void *buf, size_t count)
     if (cn->is_ssl)
     {
         SSL *ssl = ssl_find(servers->ssl_ctx, cn->networkdesc);
-        unsigned char *read_buf;
+        uint8_t *read_buf;
 
         if ((res = ssl_read(ssl, &read_buf)) > SSL_OK)
             memcpy(buf, read_buf, res > (int)count ? count : res);
@@ -566,26 +540,12 @@ static int special_read(struct connstruct *cn, void *buf, size_t count)
 static int procindex(struct connstruct *cn, struct stat *stp) 
 {
     char tbuf[MAXREQUESTLENGTH];
-    struct indexstruct *tp;
 
-    tp = indexlist;
-
-    while(tp != NULL) {
-        sprintf(tbuf, "%s%s%s", cn->actualfile, 
-#ifdef WIN32
-                "\\",
-#else
-                "/",
-#endif
-                tp->name);
-
-        if (stat(tbuf, stp) != -1) 
-        {
-            my_strncpy(cn->actualfile, tbuf, MAXREQUESTLENGTH);
-            return 1;
-        }
-
-        tp = tp->next;
+    sprintf(tbuf, "%s%s", cn->actualfile, "index.html");
+    if (stat(tbuf, stp) != -1) 
+    {
+        my_strncpy(cn->actualfile, tbuf, MAXREQUESTLENGTH);
+        return 1;
     }
 
     return 0;
@@ -599,8 +559,6 @@ static void proccgi(struct connstruct *cn, int has_pathinfo)
     char buf[MAXREQUESTLENGTH];
 #ifdef WIN32
     int tmp_stdout;
-#else
-    int fv;
 #endif
 
     snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nServer: axhttpd V%s\n%s",
@@ -614,28 +572,15 @@ static void proccgi(struct connstruct *cn, int has_pathinfo)
     }
 
 #ifndef WIN32
-    if (pipe(tpipe) == -1) 
-    {
-        removeconnection(cn);
-        return;
-    }
+    pipe(tpipe);
 
-    fv = fork();
-
-    if (fv == -1) 
-    {
-        close(tpipe[0]);
-        close(tpipe[1]);
-        removeconnection(cn);
-        return;
-    }
-
-    if (fv != 0) 
+    if (fork() > 0)  // parent
     {
         // Close the write descriptor
         close(tpipe[1]);
         cn->filedesc = tpipe[0];
         cn->state = STATE_WANT_TO_READ_FILE;
+        cn->close_when_done = 1;
         return;
     }
 
@@ -653,7 +598,6 @@ static void proccgi(struct connstruct *cn, int has_pathinfo)
 
     close(tpipe[0]);
     close(tpipe[1]);
-
     myargs[0] = cn->actualfile;
     myargs[1] = cn->cgiargs;
     myargs[2] = NULL;
@@ -666,11 +610,7 @@ static void proccgi(struct connstruct *cn, int has_pathinfo)
 
     execv(cn->actualfile, myargs);
 #else /* WIN32 */
-    if (_pipe(tpipe, 4096, O_BINARY| O_NOINHERIT) == -1) 
-    {
-        removeconnection(cn);
-        return;
-    }
+    _pipe(tpipe, 4096, O_BINARY| O_NOINHERIT);
 
     myargs[0] = "sh";
     myargs[1] = "-c";
@@ -703,6 +643,7 @@ static void proccgi(struct connstruct *cn, int has_pathinfo)
     close(tmp_stdout);
     cn->filedesc = tpipe[0];
     cn->state = STATE_WANT_TO_READ_FILE;
+    cn->close_when_done = 1;
 
     for (;;)
     {
@@ -715,6 +656,97 @@ static void proccgi(struct connstruct *cn, int has_pathinfo)
         usleep(200000); /* don't know why this delay makes it work (yet) */
     }
 #endif
+}
+
+static int trycgi_withpathinfo(struct connstruct *cn)
+{
+    char tpfile[MAXREQUESTLENGTH];
+    char fr_str[MAXREQUESTLENGTH];
+    char *fr_rs[MAXCGIARGS]; // filereq splitted
+    int i = 0, offset;
+
+    my_strncpy(fr_str, cn->filereq, MAXREQUESTLENGTH);
+    split(fr_str, fr_rs, MAXCGIARGS, '/');
+
+    while (fr_rs[i] != NULL) 
+    {
+        snprintf(tpfile, sizeof(tpfile), "%s/%s%s", 
+                            webroot, cn->virtualhostreq, fr_str);
+
+        if (iscgi(tpfile) && isdir(tpfile) == 0)
+        {
+            /* We've found our CGI file! */
+            my_strncpy(cn->actualfile, tpfile, MAXREQUESTLENGTH);
+            my_strncpy(cn->cgiscriptinfo, fr_str, MAXREQUESTLENGTH);
+
+            offset = (fr_rs[i] + strlen(fr_rs[i])) - fr_str;
+            my_strncpy(cn->cgipathinfo, cn->filereq+offset, MAXREQUESTLENGTH);
+
+            return 0;
+        }
+
+        *(fr_rs[i]+strlen(fr_rs[i])) = '/';
+        i++;
+    }
+
+    /* Couldn't find any CGIs :( */
+    *(cn->cgiscriptinfo) = '\0';
+    *(cn->cgipathinfo) = '\0';
+    return -1;
+}
+
+static int iscgi(const char *fn)
+{
+    struct cgiextstruct *tp;
+    int fnlen, extlen;
+
+    fnlen = strlen(fn);
+    tp = cgiexts;
+
+    while (tp != NULL) 
+    {
+        extlen = strlen(tp->ext);
+
+        if (strcasecmp(fn+(fnlen-extlen), tp->ext) == 0)
+            return 1;
+
+        tp = tp->next;
+    }
+
+    return 0;
+}
+
+static void split(char *tp, char *sp[], int maxwords, char sc)
+{
+    int i = 0;
+
+    while(1) 
+    {
+        /* Skip leading whitespace */
+        while (*tp == sc) tp++;
+
+        if (*tp == '\0') 
+        {
+            sp[i] = NULL;
+            break;
+        }
+
+        if (i==maxwords-2) 
+        {
+            sp[maxwords-2] = NULL;
+            break;
+        }
+
+        sp[i] = tp;
+
+        while(*tp != sc && *tp != '\0') 
+            tp++;
+
+        if (*tp == sc) 
+            *tp++ = '\0';
+
+        i++;
+    }
 }
 #endif  /* CONFIG_HTTP_HAS_CGI */
 
@@ -730,26 +762,28 @@ static void urldecode(char *buf)
     {
         v = 0;
 
-        if (*p=='%') 
+        if (*p == '%') 
         {
             s = p;
             s++;
 
             if (isxdigit((int) s[0]) && isxdigit((int) s[1]))
             {
-                v = hexit(s[0])*16+hexit(s[1]);
+                v = hexit(s[0])*16 + hexit(s[1]);
+
                 if (v) 
-                { /* do not decode %00 to null char */
-                    *w=(char)v;
-                    p=&s[1];
+                { 
+                    /* do not decode %00 to null char */
+                    *w = (char)v;
+                    p = &s[1];
                 }
             }
 
         }
 
-        if (!v) 
-            *w=*p;
-        p++; w++;
+        if (!v) *w=*p;
+        p++; 
+        w++;
     }
 
     *w='\0';
@@ -757,27 +791,98 @@ static void urldecode(char *buf)
 
 static int hexit(char c) 
 {
-    if ( c >= '0' && c <= '9' )
+    if (c >= '0' && c <= '9')
         return c - '0';
-    if ( c >= 'a' && c <= 'f' )
+    else if (c >= 'a' && c <= 'f')
         return c - 'a' + 10;
-    if ( c >= 'A' && c <= 'F' )
+    else if (c >= 'A' && c <= 'F')
         return c - 'A' + 10;
-
-    return 0;
+    else
+        return 0;
 }
 
 static void send301(struct connstruct *cn)
 {
     char buf[2048];
-    snprintf(buf, sizeof(buf), "HTTP/1.1 301 Moved Permanently\nLocation: %s/\n\n<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<HTML><HEAD>\n<TITLE>301 Moved Permanently</TITLE>\n</HEAD><BODY>\n<H1>Moved Permanently</H1>\nThe document has moved <A HREF=\"%s/\">here</A>.<P>\n<HR>\n</BODY></HTML>\n", cn->filereq, cn->filereq);
+    snprintf(buf, sizeof(buf), 
+            "HTTP/1.1 301 Moved Permanently\nLocation: %s/\n\n"
+            "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n"
+            "<HTML><HEAD>\n<TITLE>301 Moved Permanently</TITLE>\n"
+            "</HEAD><BODY>\n<H1>Moved Permanently</H1>\n"
+            "The document has moved <A HREF=\"%s/\">here</A>.<P>\n"
+            "<HR>\n</BODY></HTML>\n", cn->filereq, cn->filereq);
     special_write(cn, buf, strlen(buf));
 }
 
 static void send404(struct connstruct *cn)
 {
     char buf[1024];
-    sprintf(buf, "HTTP/1.0 404 Not Found\nContent-Type: text/html\n\n<HTML><BODY>\n<TITLE>404 Not Found</TITLE><H1>It ain't there my friend. (404 Not Found)</H1>\n</BODY></HTML>\n");
+    strcpy(buf, "HTTP/1.0 404 Not Found\nContent-Type: text/html\n\n"
+            "<HTML><BODY>\n<TITLE>404 Not Found</TITLE><H1>"
+            "404 Not Found</H1>\n</BODY></HTML>\n");
     special_write(cn, buf, strlen(buf));
+}
+
+static void buildactualfile(struct connstruct *cn)
+{
+    snprintf(cn->actualfile, MAXREQUESTLENGTH, "%s%s", webroot, cn->filereq);
+
+    /* Add directory slash if not there */
+    if (isdir(cn->actualfile) && 
+            cn->actualfile[strlen(cn->actualfile)-1] != '/')
+        strcat(cn->actualfile, "/");
+
+#ifdef WIN32
+    /* convert all the forward slashes to back slashes */
+    {
+        char *t = cn->actualfile;
+        while ((t = strchr(t, '/')))
+        {
+            *t++ = '\\';
+        }
+    }
+#endif
+}
+
+static int sanitizefile(const char *buf) 
+{
+    int len, i;
+
+    // Don't accept anything not starting with a /
+    if (*buf != '/') 
+        return 0;
+
+    len = strlen(buf);
+    for (i = 0; i < len; i++) 
+    {
+        // Check for "/." : In other words, don't send files starting with a .
+        // Notice, GOBBLES, that this includes ".."
+        if (buf[i] == '/' && buf[i+1] == '.') 
+            return 0;
+    }
+
+    return 1;
+}
+
+static int sanitizehost(char *buf)
+{
+    while (*buf != '\0') 
+    {
+        // Handle the port
+        if (*buf == ':') 
+        {
+            *buf = '\0';
+            return 1;
+        }
+
+        // Enforce some basic URL rules...
+        if (isalnum(*buf)==0 && *buf != '-' && *buf != '.') return 0;
+        if (*buf == '.' && *(buf+1) == '.') return 0;
+        if (*buf == '.' && *(buf+1) == '-') return 0;
+        if (*buf == '-' && *(buf+1) == '.') return 0;
+        buf++;
+    }
+
+    return 1;
 }
 

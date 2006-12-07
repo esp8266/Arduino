@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo "Content-type: text/html"
+echo "Content-Type: text/html"
 echo
 echo "<html><title>System Health</title><body>"
 echo "<h1>System Health for '`hostname`'</h1>"

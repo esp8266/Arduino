@@ -1,7 +1,7 @@
 <html><head><title>An Overview of Cryptography</title>
 
 
-<meta name="keywords" content="crypto tutorial, cryptography tutorial, DES tutorial, RSA tutorial, Diffie-Hellman tutorial, IPsec tutorial, PGP tutorial, SSL tutorial, ECC tutorial, elliptic curve cryptography tutorial, AES tutorial, Rijndael tutorial"></head><body bgcolor="#ffffff">
+<meta name="keywords" content="crypto tutorial, cryptography tutorial, DES tutorial, RSA tutorial, Diffie-Hellman tutorial, IPsec tutorial, PGP tutorial, SSL tutorial, ECC tutorial, elliptic curve cryptography tutorial, AES tutorial, Rijndael tutorial, secret key cryptography, public key cryptography, hash functions"></head><body bgcolor="#ffffff">
 <font size="3">
 </font><center>
 <h1>
@@ -12,7 +12,7 @@ An Overview of Cryptography
 <h3>
 <font size="3"><i><a href="mailto:kumquat@sover.net">Gary C. Kessler</a></i><br>
 May 1998<br>
-(26 September 2005)
+(1 August 2006)
 </font></h3>
 <font size="3"><br>
 </font><blockquote>
@@ -193,7 +193,7 @@ algorithms that will be discussed are (Figure 1):
 </li></font></ul>
 <font size="3"><a name="fig01"></a><br>
 </font><center><table border="1"><tbody><tr><td>
-<img src="crypto_files/crypto_types.gif">
+<img src="index_files/crypto_types.gif">
 <br><br>
 <h4>FIGURE 1: Three types of cryptography: secret-key, public key, and hash function.</h4>
 </td></tr></tbody></table>
@@ -366,7 +366,7 @@ Telegraph and Telephone (NTT) Corp. and Mitsubishi Electric Corporation
 and suitability for both software and hardware implementations on
 common 32-bit processors as well as 8-bit processors (e.g., smart
 cards, cryptographic hardware, and embedded systems). Also described in
-<a href="http://www.rfc-editor.org/rfc/rfc3713.txt"> RFC 3713</a>.</p></li>
+<a href="http://www.rfc-editor.org/rfc/rfc3713.txt"> RFC 3713</a>. Camellia's application in IPsec is described in <a href="http://www.rfc-editor.org/rfc/rfc4312.txt"> RFC 4312</a>.</p></li>
 
 <li> <p><i>MISTY1:</i> Developed at Mitsubishi Electric Corp., a block
 cipher using a 128-bit key and 64-bit blocks, and a variable number of
@@ -385,7 +385,7 @@ signaling data for emerging mobile communications systems.</p></li>
 <li> <p><i><a href="http://www.kisa.or.kr/seed/seed_eng.html">SEED</a>:</i>
 A block cipher using 128-bit blocks and 128-bit keys. Developed by the
 Korea Information Security Agency (KISA) and adopted as a national
-standard encryption algorithm in South Korea. Also described in <a href="http://www.rfc-editor.org/rfc/rfc4009.txt">RFC 4009</a>.</p></li>
+standard encryption algorithm in South Korea. Also described in <a href="http://www.rfc-editor.org/rfc/rfc4269.txt">RFC 4269</a>.</p></li>
 
 <li> <p><i><a href="http://csrc.nist.gov/CryptoToolkit/skipjack/skipjack.pdf">Skipjack</a>:</i>
 SKC scheme proposed for Capstone. Although the details of the algorithm
@@ -463,11 +463,16 @@ large prime numbers. In fact, large prime numbers, like small prime
 numbers, only have two factors!) The ability for computers to factor
 large numbers, and therefore attack schemes such as RSA, is rapidly
 improving and systems today can find the prime factors of numbers with
-more than 140 digits. The presumed protection of RSA, however, is that
-users can easily increase the key size to always stay ahead of the
-computer processing curve. As an aside, the patent for RSA expired in
-September 2000 which does not appear to have affected RSA's popularity
-one way or the other. A detailed example of RSA is presented below in <a href="#rsamath">Section 5.3</a>.</p></li>
+more than 200 digits. Nevertheless, if a large number is created from
+two prime factors that are roughly the same size, there is no known
+factorization algorithm that will solve the problem in a reasonable
+amount of time; a 2005 test to factor a 200-digit number took 1.5 years
+and over 50 years of compute time (see the Wikipedia article on <a href="http://en.wikipedia.org/wiki/Integer_factorization"> integer factorization</a>.)
+Regardless, one presumed protection of RSA is that users can easily
+increase the key size to always stay ahead of the computer processing
+curve. As an aside, the patent for RSA expired in September 2000 which
+does not appear to have affected RSA's popularity one way or the other.
+A detailed example of RSA is presented below in <a href="#rsamath">Section 5.3</a>.</p></li>
 
 <li> <p><i><a href="http://www.rsasecurity.com/rsalabs/faq/3-6-1.html">Diffie-Hellman</a>:</i>
 After the RSA algorithm was published, Diffie and Hellman came up with
@@ -590,17 +595,7 @@ recovered. Hash algorithms are typically used to provide a <i>digital fingerprin
 of a file's contents, often used to ensure that the file has not been
 altered by an intruder or virus. Hash functions are also commonly
 employed by many operating systems to encrypt passwords. Hash
-functions, then, help preserve the integrity of a file.</font></p>
-<p>
-<font size="3">Hash functions are sometimes misunderstood and some
-sources claim that no two files can have the same hash value. This
-isn't true, strictly speaking. Consider a hash function that provides a
-128-bit hash value. There are, obviously, 2<sup>128</sup> possible hash values. But there are a lot more than 2<sup>128</sup> <i>possible</i>
-files. Therefore, there have to be multiple files &#8212; in fact, there have
-to be an infinite number of files! &#8212; that can have the same 128-bit
-hash value. The difficulty is <i>finding</i> two files with the same
-hash! What is, indeed, very hard to do is to try to create a file that
-has a given hash value so as to force a hash value collision.</font></p>
+functions, then, provide a measure of the integrity of a file.</font></p>
 
 <p>
 <font size="3">Hash algorithms that are in common use today include:</font></p>
@@ -616,27 +611,60 @@ manipulation is made to the original data. MD5 has been implemented in
 a large number of products although several weaknesses in the algorithm
 were demonstrated by German cryptographer Hans Dobbertin in 1996.</p></li>
 </ul>
-
 </li><li> <p><i>Secure Hash Algorithm (SHA):</i> Algorithm for NIST's
 Secure Hash Standard (SHS). SHA-1 produces a 160-bit hash value and was
-originally published as FIPS 180-1 and <a href="ftp://ftp.rfc-editor.org/in-notes/rfc3174.txt"> RFC 3174</a>. <a href="http://csrc.nist.gov/publications/fips/fips180-2/fips180-2withchangenotice.pdf"> FIPS 180-2</a>
+originally published as FIPS 180-1 and <a href="http://www.rfc-editor.org/rfc/rfc3174.txt"> RFC 3174</a>. <a href="http://csrc.nist.gov/publications/fips/fips180-2/fips180-2withchangenotice.pdf"> FIPS 180-2</a>
 describes five algorithms in the SHS: SHA-1 plus SHA-224, SHA-256,
 SHA-384, and SHA-512 which can produce hash values that are 224, 256,
-384, or 512 bits in length, respectively.</p></li>
-
+384, or 512 bits in length, respectively. SHA-224, -256, -384, and -52
+are also described in <a href="http://www.rfc-editor.org/rfc/rfc4634.txt"> RFC 4634</a>.</p></li>
 <li> <p><i><a href="http://www.esat.kuleuven.ac.be/%7Ebosselae/ripemd160.html">RIPEMD</a>:</i> A series of message digests that initially came from the RIPE (RACE Integrity Primitives Evaluation) project. <a href="http://www.esat.kuleuven.ac.be/%7Ecosicart/pdf/AB-9601/AB-9601.pdf">RIPEMD-160</a>
 was designed by Hans Dobbertin, Antoon Bosselaers, and Bart Preneel,
 and optimized for 32-bit processors to replace the then-current 128-bit
 hash functions. Other versions include RIPEMD-256, RIPEMD-320, and
 RIPEMD-128.</p></li>
-
 <li> <p><i><a href="http://www.calyptix.com/technology/haval.php">HAVAL (HAsh of VAriable Length)</a>:</i>
 Designed by Y. Zheng, J. Pieprzyk and J. Seberry, a hash algorithm with
 many levels of security. HAVAL can create hash values that are 128,
 160, 192, 224, or 256 bits in length.</p></li>
+<li> <p><i><a href="http://paginas.terra.com.br/informatica/paulobarreto/WhirlpoolPage.html"> Whirlpool</a>:</i> A relatively new hash function, designed by V. Rijmen and P.S.L.M. Barreto. Whirlpool operates on messages less than 2<sup>256</sup>
+bits in length, and produces a message digest of 512 bits. The design
+of this has function is very different than that of MD5 and SHA-1,
+making it immune to the same attacks as on those hashes (see below).</p></li>
 </font></ul>
+
 <p>
-<font size="3">For additional information, see David Hopwood's <a href="http://www.users.zetnet.co.uk/hopwood/crypto/scan/md.html"> MessageDigest Algorithms</a> page.</font></p>
+<font size="3">Hash functions are sometimes misunderstood and some
+sources claim that no two files can have the same hash value. This is,
+in fact, not correct. Consider a hash function that provides a 128-bit
+hash value. There are, obviously, 2<sup>128</sup> possible hash values. But there are a lot more than 2<sup>128</sup> <i>possible</i>
+files. Therefore, there have to be multiple files &#8212; in fact, there have
+to be an infinite number of files! &#8212; that can have the same 128-bit
+hash value.</font></p>
+<p>
+<font size="3">The difficulty is <i>finding</i> two files with the same
+hash! What is, indeed, very hard to do is to try to create a file that
+has a given hash value so as to force a hash value collision &#8212; which is
+the reason that hash functions are used extensively for information
+security and computer forensics applications. Alas, researchers in 2004
+found that <i>practical</i> collision attacks could be launched on
+MD5, SHA-1, and other hash algorithms. At this time, there is no
+obvious successor to MD5 and SHA-1 that could be put into use quickly;
+there are so many products using these hash functions that it could
+take many years to flush out all use of 128- and 160-bit hashes.
+Readers interested in this problem should read the following:</font></p>
+
+<ul>
+<font size="3"><li>Burr, W. (2006, Match/April). Cryptographic hash standards: Where do we go from here? <i>IEEE Security &amp; Privacy</i>, <i>4</i>(2), 88-91.</li>
+<li>Gutman, P., Naccache, D., &amp; Palmer, C.C. (2005, May/June). When hashes collide. <i>IEEE Security &amp; Privacy</i>, <i>3</i>(3), 68-71.</li>
+<li>Klima, V. (March 2005) <a href="http://cryptography.hyperlink.cz/md5/MD5_collisions.pdf">"Finding MD5 Collisions - a Toy For a Notebook."</a></li>
+<li>Thompson, E. (2005, February). MD5 collisions and the impact on computer forensics. <i>Digital Investigation</i>, <i>2</i>(1), 36-40.</li>
+<li>Wang, X., Feng, D., Lai, X., &amp; Yu, H. (August 2004). <a href="http://eprint.iacr.org/2004/199">"Collisions for Hash Functions MD4, MD5, HAVAL-128 and RIPEMD."</a></li>
+<li>Wang, X., Yin, Y.L., &amp; Yu, H. (February 2005). <a href="http://theory.csail.mit.edu/%7Eyiqun/shanote.pdf">"Collision Search Attacks on SHA1."</a></li>
+</font></ul>
+
+<p>
+<font size="3">An excellent review of the situation with hash collisions can be found in <a href="http://www.rfc-editor.org/rfc/rfc4270.txt">RFC 4270</a> (by P. Hoffman and B. Schneier, November 2005). And for additional information on hash functions, see David Hopwood's <a href="http://www.users.zetnet.co.uk/hopwood/crypto/scan/md.html"> MessageDigest Algorithms</a> page.</font></p>
 
 <font size="3"><a name="why3"><h3>3.4. Why Three Encryption Techniques?</h3></a>
 </font><p>
@@ -663,7 +691,7 @@ public-key cryptography.
 </font></p>
 <font size="3"><a name="fig02"></a><br>
 </font><center><table border="1"><tbody><tr><td>
-<img src="crypto_files/crypto_3ways.gif">
+<img src="index_files/crypto_3ways.gif">
 <br><br>
 <h4>FIGURE 2: Sample application of the three cryptographic techniques for secure communication.</h4>
 </td></tr></tbody></table>
@@ -972,7 +1000,7 @@ other secure means.
 <br>
 <a name="fig03"><br>
 </a></font></p><center><table border="3" cellpadding="4"><tbody><tr><td>
-<img src="crypto_files/kerberos.gif">
+<img src="index_files/kerberos.gif">
 <br><br>
 <h4>FIGURE 3: Kerberos architecture.</h4>
 </td></tr></tbody></table>
@@ -1065,7 +1093,7 @@ signature of the certificate issuer, and perhaps other information.
 <br>
 <a name="fig04"><br>
 </a></font></p><center><table border="3" cellpadding="4"><tbody><tr><td>
-<img src="crypto_files/crypto_cert.gif">
+<img src="index_files/crypto_cert.gif">
 <br><br>
 <h4>FIGURE 4: GTE Cybertrust Global Root-issued certificate as viewed<br>by Netscape Navigator V4.</h4>
 </td></tr></tbody></table>
@@ -1238,6 +1266,11 @@ Standards and Technology (NIST) as standards for the U.S. Government.
 </td><td valign="top" width="60%">A PCMCIA card developed by NSA that
 implements the Capstone algorithms, intended for use with the Defense
 Messaging Service (DMS).
+</td></tr><tr><td valign="top" width="20%">GOST
+</td><td valign="top" width="60%">GOST is a family of algorithms that
+is defined in the Russian cryptographic standards. Although most of the
+specifications are written in Russian, <a href="http://www.rfc-editor.org/rfc/rfc4357.txt">RFC 4357</a> provides supplemental information and specifications so that the algorithms can be used effectively in Internet applications.
+
 <a name="tab03-ipsec"></a>
 </td></tr><tr><td valign="top" width="20%"><a href="http://www.ietf.org/html.charters/ipsec-charter.html">IP Security Protocol (IPsec)</a>
 </td><td valign="top" width="60%">The IPsec protocol suite is used to
@@ -1245,24 +1278,37 @@ provide privacy and authentication services at the IP layer. An
 overview of the protocol suite and of the documents comprising IPsec
 can be found in <a href="http://www.rfc-editor.org/rfc/rfc2411.txt">RFC 2411</a>. Other documents include:
 <ul>
-<li><a href="http://www.rfc-editor.org/rfc/rfc2401.txt">RFC 2401</a>: IP security architecture.
-</li><li><a href="http://www.rfc-editor.org/rfc/rfc2402.txt">RFC 2402</a>:
+<li><a href="http://www.rfc-editor.org/rfc/rfc4301.txt">RFC 4301</a>: IP security architecture.
+</li><li><a href="http://www.rfc-editor.org/rfc/rfc4302.txt">RFC 4302</a>:
 IP Authentication Header (AH), one of the two primary IPsec functions;
 AH provides connectionless integrity and data origin authentication for
 IP datagrams and protects against replay attacks.
-</li><li><a href="http://www.rfc-editor.org/rfc/rfc2403.txt">RFC 2403</a>: Describes use of the HMAC with MD5 algorithm for data origin authentication and integrity protection in both AH and ESP.
-</li><li><a href="http://www.rfc-editor.org/rfc/rfc2404.txt">RFC 2404</a>: Describes use of the HMAC with SHA-1 algorithm for data origin authentication and integrity protection in both AH and ESP.
-</li><li><a href="http://www.rfc-editor.org/rfc/rfc2405.txt">RFC 2405</a>: Describes use of DES-CBC (DES in Cipher Block Chaining Mode) for confidentiality in ESP.
-</li><li><a href="http://www.rfc-editor.org/rfc/rfc2406.txt">RFC 2406</a>:
+</li><li><a href="http://www.rfc-editor.org/rfc/rfc4303.txt">RFC 4303</a>:
 IP Encapsulating Security Payload (ESP), the other primary IPsec
 function; ESP provides a variety of security services within IPsec.
-</li><li><a href="http://www.rfc-editor.org/rfc/rfc2407.txt">RFC 2407</a>: Describes the application of ISAKMP to IPsec.
-</li><li><a href="http://www.rfc-editor.org/rfc/rfc2408.txt">RFC 2408</a>: Describes ISAKMP, a framework for key management and security associations.
-</li><li><a href="http://www.rfc-editor.org/rfc/rfc2409.txt">RFC 2409</a>:
-The Internet Key Exchange (IKE) algorithm, using part of Oakley and
-part of SKEME in conjunction with ISAKMP to obtain authenticated keying
-material for use with ISAKMP, and for other security associations such
-as AH and ESP.
+</li><li><a href="http://www.rfc-editor.org/rfc/rfc4304.txt">RFC 4304</a>:
+Extended Sequence Number (ESN) Addendum, allows for negotiation of a
+32- or 64- bit sequence number, used to detect replay attacks.</li>
+<li><a href="http://www.rfc-editor.org/rfc/rfc4305.txt">RFC 4305</a>: Cryptographic algorithm implementation requirements for ESP and AH.</li>
+<li><a href="http://www.rfc-editor.org/rfc/rfc4306.txt">RFC 4306</a>:
+The Internet Key Exchange (IKE) protocol, version 2, providing for
+mutual authentication and establishing and maintaining security
+associations.</li>
+<ul>
+<li> IKE v1 was described in three separate documents, <a href="http://www.rfc-editor.org/rfc/rfc2407.txt">RFC 2407</a> (application of ISAKMP to IPsec), <a href="http://www.rfc-editor.org/rfc/rfc2408.txt">RFC 2408</a> (ISAKMP, a framework for key management and security associations), and <a href="http://www.rfc-editor.org/rfc/rfc2409.txt">RFC 2409</a>
+(IKE, using part of Oakley and part of SKEME in conjunction with ISAKMP
+to obtain authenticated keying material for use with ISAKMP, and for
+other security associations such as AH and ESP). IKE v1 is obsoleted
+with the introdcution of IKEv2.</li>
+</ul>
+<li><a href="http://www.rfc-editor.org/rfc/rfc4307.txt"> RFC 4307</a>: Cryptographic algoritms used with IKEv2.</li>
+<li><a href="http://www.rfc-editor.org/rfc/rfc4308.txt">RFC 4308</a>: Crypto suites for IPsec, IKE, and IKEv2.</li>
+<li><a href="http://www.rfc-editor.org/rfc/rfc4309.txt"> RFC 4309</a>: The use of AES in CBC-MAC mode with IPsec ESP.</li>
+<li><a href="http://www.rfc-editor.org/rfc/rfc4312.txt"> RFC 4312</a>: The use of the Camellia cipher algorithm in IPsec.</li>
+<li><a href="http://www.rfc-editor.org/rfc/rfc4359.txt"> RFC 4359</a>: The Use of RSA/SHA-1 Signatures within Encapsulating Security Payload (ESP) and Authentication Header (AH).</li>
+<li><a href="http://www.rfc-editor.org/rfc/rfc4434.txt"> RFC 4434</a>: Describes AES-XCBC-PRF-128, a pseudo-random function derived from the AES for use with IKE.</li>
+<li><a href="http://www.rfc-editor.org/rfc/rfc2403.txt">RFC 2403</a>: Describes use of the HMAC with MD5 algorithm for data origin authentication and integrity protection in both AH and ESP.
+</li><li><a href="http://www.rfc-editor.org/rfc/rfc2405.txt">RFC 2405</a>: Describes use of DES-CBC (DES in Cipher Block Chaining Mode) for confidentiality in ESP.
 </li><li><a href="http://www.rfc-editor.org/rfc/rfc2410.txt">RFC 2410</a>: Defines use of the NULL encryption algorithm (i.e., provides authentication and integrity without confidentiality) in ESP.
 </li><li><a href="http://www.rfc-editor.org/rfc/rfc2412.txt">RFC 2412</a>: Describes OAKLEY, a key determination and distribution protocol.
 </li><li><a href="http://www.rfc-editor.org/rfc/rfc2451.txt">RFC 2451</a>: Describes use of Cipher Block Chaining (CBC) mode cipher algorithms with ESP.
@@ -1374,7 +1420,19 @@ Windows NT Server running Internet Information Server (IIS) 4.0 with a
 valid SGC certificate. SGC is available in 32-bit Windows versions of
 Internet Explorer (IE) 4.0, and support for Mac, Unix, and 16-bit
 Windows versions of IE is expected in the future.
-</td></tr><tr><td valign="top" width="20%"><a href="http://skip.incog.com/">Simple Key-Management for Internet Protocol (SKIP)</a>
+</td></tr><tr><td valign="top" width="20%"><a href="http://www.rfc-editor.org/rfc/rfc4422.txt">Simple Authentication and Security Layer (SASL)</a>
+</td><td valign="top" width="60%">(SASL) is a framework for providing
+authentication and data security services in connection-oriented
+protocols (a la TCP). It provides a structured interface and allows new
+protocols to reuse existing authentication mechanisms and allows old
+protocols to make use of new mechanisms.
+<p>It has been common practice on the Internet to permit anonymous
+access to various services, employing a plain-text password using a
+user name of "anonymous" and a password of an email address or some
+other identifying information. New IETF protocols disallow plain-text
+logins. The Anonymous SASL Mechanism (<a href="http://www.rfc-editor.org/rfc/rfc4505.txt">RFC 4505</a>) provides a method for anonymous logins within the SASL framework.
+
+</p></td></tr><tr><td valign="top" width="20%"><a href="http://skip.incog.com/">Simple Key-Management for Internet Protocol (SKIP)</a>
 </td><td valign="top" width="60%">Key management scheme for secure IP
 communication, specifically for IPsec, and designed by Aziz and Diffie.
 SKIP essentially defines a public key infrastructure for the Internet
@@ -1739,10 +1797,13 @@ Cipher Block Chaining (CBC), Cipher Feedback (CFB), and Output Feedback
 (OFB). Despite all of these options, ECB is the most commonly deployed
 mode of operation.</font></p>
 <p>
-<font size="3">Although other block ciphers will replace DES, it is
-still interesting to see how DES encryption is performed. Not only is
-it sort of interesting, but DES remains in many products and we will
-continue to see DES for some years to come.</font></p>
+<font size="3">NIST finally declared DES obsolete in 2004, and withdrew FIPS 46-3, 74, and 81 (<a href="http://csrc.nist.gov/Federal-register/July26-2004-FR-DES-Notice.pdf" target="_blank"><i>Federal Register</i>, July 26, 2004, <i>69</i>(142), 44509-44510</a>).
+Although other block ciphers will replace DES, it is still interesting
+to see how DES encryption is performed; not only is it sort of neat,
+but DES was the first crypto scheme commonly seen in non-govermental
+applications and was the catalyst for modern "public" cryptography. DES
+remains in many products &#8212; and cryptography students and cryptographers
+will continue to study DES for years to come.</font></p>
 
 <p><font size="3"><b>DES Operational Overview</b></font></p>
 <p>
@@ -1756,7 +1817,7 @@ of randomness, or <i>entropy</i>).</font></p>
 
 <font size="3"><a name="fig06"><br>
 </a></font><center><table border="1"><tbody><tr><td>
-<img src="crypto_files/crypto_des.gif">
+<img src="index_files/crypto_des.gif">
 <br><br>
 <h4>FIGURE 6: DES enciphering algorithm.</h4>
 </td></tr></tbody></table>
@@ -2148,7 +2209,7 @@ nonrepudiation for the classic Internet Protocol (IP). Although
 intended primarily for IP version 6 (IPv6), IPsec can also be employed
 by the current version of IP, namely IP version 4 (IPv4).</font></p>
 <p>
-<font size="3">As shown in <a href="#tab03-ipsec">Table 3</a>, IPsec is described in nearly a dozen RFCs. <a href="http://www.rfc-editor.org/rfc/rfc2401.txt"> RFC 2401</a>, in particular, describes the overall IP security architecture and <a href="http://www.rfc-editor.org/rfc/rfc2411.txt">RFC 2411</a> provides an overview of the IPsec protocol suite and the documents describing it.</font></p>
+<font size="3">As shown in <a href="#tab03-ipsec">Table 3</a>, IPsec is described in nearly a dozen RFCs. <a href="http://www.rfc-editor.org/rfc/rfc4301.txt"> RFC 4301</a>, in particular, describes the overall IP security architecture and <a href="http://www.rfc-editor.org/rfc/rfc2411.txt">RFC 2411</a> provides an overview of the IPsec protocol suite and the documents describing it.</font></p>
 <p>
 <font size="3">IPsec can provide either message authentication and/or
 encryption. The latter requires more processing than the former, but
@@ -2173,7 +2234,7 @@ endpoints requires the establishment of two SAs (one in each direction).</font><
 <li>security protocol (AH or ESP) identifier</li>
 </font></ul>
 <p>
-<font size="3">The IP Authentication Header (AH), described in <a href="http://www.rfc-editor.org/rfc/rfc2402.txt">RFC 2402</a>, provides a mechanism for data integrity and data origin authentication for IP packets using HMAC with MD5 (<a href="http://www.rfc-editor.org/rfc/rfc2403.txt">RFC 2403</a>), HMAC with SHA-1 (<a href="http://www.rfc-editor.org/rfc/rfc2404.txt">RFC 2404</a>), or HMAC with RIPEMD (<a href="http://www.rfc-editor.org/rfc/rfc2857.txt">RFC 2857</a>).</font></p>
+<font size="3">The IP Authentication Header (AH), described in <a href="http://www.rfc-editor.org/rfc/rfc4302.txt">RFC 4302</a>, provides a mechanism for data integrity and data origin authentication for IP packets using HMAC with MD5 (<a href="http://www.rfc-editor.org/rfc/rfc2403.txt">RFC 2403</a>), HMAC with SHA-1 (<a href="http://www.rfc-editor.org/rfc/rfc2404.txt">RFC 2404</a>), or HMAC with RIPEMD (<a href="http://www.rfc-editor.org/rfc/rfc2857.txt">RFC 2857</a>). See also <a href="http://www.rfc-editor.org/rfc/rfc4305.txt">RFC 4305</a>.</font></p>
 
 <font size="3"><a name="fig10"></a><br>
 </font><center>
@@ -2190,12 +2251,12 @@ endpoints requires the establishment of two SAs (one in each direction).</font><
    |                    Sequence Number Field                      |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
    |                                                               |
-   +                Authentication Data (variable)                 |
+   +                Integrity Check Value-ICV (variable)           |
    |                                                               |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 </pre>
 <p>
-</p><h4>FIGURE 10: IPsec Authentication Header format. <i>(From RFC 2402)</i></h4>
+</p><h4>FIGURE 10: IPsec Authentication Header format. <i>(From RFC 4302)</i></h4>
 </td></tr></tbody></table>
 </center>
 <font size="3"><br><br>
@@ -2242,38 +2303,44 @@ algorithm specified by the SA, such as DES, MD5, or SHA-1. Other
 algorithms <i>may</i> also be supported.</li>
 </font></ul>
 <p>
-<font size="3">The IP Encapsulating Security Payload (ESP), described in <a href="http://www.rfc-editor.org/rfc/rfc2406.txt">RFC 2406</a>,
+<font size="3">The IP Encapsulating Security Payload (ESP), described in <a href="http://www.rfc-editor.org/rfc/rfc4303.txt">RFC 4303</a>,
 provides message integrity and privacy mechanisms in addition to
 authentication. As in AH, ESP uses HMAC with MD5, SHA-1, or RIPEMD
-authentication (<a href="http://www.rfc-editor.org/rfc/rfc2403.txt">RFC 2403</a>/<a href="http://www.rfc-editor.org/rfc/rfc2404.txt">RFC 2404</a>/<a href="http://www.rfc-editor.org/rfc/rfc2857.txt">RFC 2857</a>); privacy is provided using DES-CBC encryption (<a href="http://www.rfc-editor.org/rfc/rfc2405.txt">RFC 2405</a>), NULL encryption (<a href="http://www.rfc-editor.org/rfc/rfc2410.txt">RFC 2410</a>), other CBC-mode algorithms (<a href="http://www.rfc-editor.org/rfc/rfc2451.txt">RFC 2451</a>), or AES (<a href="http://www.rfc-editor.org/rfc/rfc3686.txt">RFC 3686</a>).</font></p>
+authentication (<a href="http://www.rfc-editor.org/rfc/rfc2403.txt">RFC 2403</a>/<a href="http://www.rfc-editor.org/rfc/rfc2404.txt">RFC 2404</a>/<a href="http://www.rfc-editor.org/rfc/rfc2857.txt">RFC 2857</a>); privacy is provided using DES-CBC encryption (<a href="http://www.rfc-editor.org/rfc/rfc2405.txt">RFC 2405</a>), NULL encryption (<a href="http://www.rfc-editor.org/rfc/rfc2410.txt">RFC 2410</a>), other CBC-mode algorithms (<a href="http://www.rfc-editor.org/rfc/rfc2451.txt">RFC 2451</a>), or AES (<a href="http://www.rfc-editor.org/rfc/rfc3686.txt">RFC 3686</a>). See also <a href="http://www.rfc-editor.org/rfc/rfc4305.txt">RFC 4305</a> and <a href="http://www.rfc-editor.org/rfc/rfc4308.txt">RFC 4308</a>.</font></p>
 
 <font size="3"><a name="fig11"></a><br>
 </font><center>
 <table border="3" cellpadding="4">
-<tbody><tr><td width="600">
+<tbody><tr><td width="675">
 <pre>
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |               Security Parameters Index (SPI)                 |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                      Sequence Number                          |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                    Payload Data (variable)                    |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ ----
+   |               Security Parameters Index (SPI)                 | ^Int.
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ |Cov-
+   |                      Sequence Number                          | |ered
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ | ----  
+   |                    Payload Data* (variable)                   | |   ^
+   ~                                                               ~ |   |
+   |                                                               | |Conf.
+   +               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ |Cov-
+   |               |     Padding (0-255 bytes)                     | |ered*
+   +-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ |   |
+   |                               |  Pad Length   | Next Header   | v   v
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ ------
+   |         Integrity Check Value-ICV   (variable)                |
    ~                                                               ~
    |                                                               |
-   +               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |               |     Padding (0-255 bytes)                     |
-   +-+-+-+-+-+-+-+-+               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                               |  Pad Length   | Next Header   |
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                 Authentication Data (variable)                |
-   ~                                                               ~
-   |                                                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+       * If included in the Payload field, cryptographic synchronization
+         data, e.g., an Initialization Vector (IV), usually is not
+         encrypted per se, although it often is referred to as being
+         being part of the ciphertext.
+
 </pre>
 <p>
-</p><h4>FIGURE 11: IPsec Encapsulating Security Payload format. <i>(From RFC 2406)</i></h4>
+</p><h4>FIGURE 11: IPsec Encapsulating Security Payload format. <i>(From RFC 4303)</i></h4>
 </td></tr></tbody></table>
 </center>
 <font size="3"><br><br>
@@ -2322,60 +2389,62 @@ This mode of operation is supported by both hosts and security gateways.</font><
 <font size="3"><a name="fig12"></a><br>
 </font><center>
 <table border="3" cellpadding="4">
-<tbody><tr><td width="600">
+<tbody><tr><td width="675">
 <pre>
-    <b>ORIGINAL PACKET BEFORE APPLYING AH</b>
+  <b>ORIGINAL PACKET BEFORE APPLYING AH</b>
 
-            ----------------------------
-      <b>IPv4</b>  |orig IP hdr  |     |      |
-            |(any options)| TCP | Data |
-            ----------------------------
+         ----------------------------
+   <b>IPv4</b>  |orig IP hdr  |     |      |
+         |(any options)| TCP | Data |
+         ----------------------------
 
-            ---------------------------------------
-      <b>IPv6</b>  |             | ext hdrs |     |      |
-            | orig IP hdr |if present| TCP | Data |
-            ---------------------------------------
+         ---------------------------------------
+   <b>IPv6</b>  |             | ext hdrs |     |      |
+         | orig IP hdr |if present| TCP | Data |
+         ---------------------------------------
+
+  <b>AFTER APPLYING AH (TRANSPORT MODE)</b>
+
+          -------------------------------------------------------
+    <b>IPv4</b>  |original IP hdr (any options) | AH | TCP |    Data   |
+          -------------------------------------------------------
+          |&lt;- mutable field processing -&gt;|&lt;- immutable fields -&gt;|
+          |&lt;----- authenticated except for mutable fields -----&gt;|
+
+         ------------------------------------------------------------
+   <b>IPv6</b>  |             |hop-by-hop, dest*, |    | dest |     |      |
+         |orig IP hdr  |routing, fragment. | AH | opt* | TCP | Data |
+         ------------------------------------------------------------
+         |&lt;--- mutable field processing --&gt;|&lt;-- immutable fields --&gt;|
+         |&lt;---- authenticated except for mutable fields -----------&gt;|
+
+               * = if present, could be before AH, after AH, or both
 
 
-    <b>AFTER APPLYING AH (TRANSPORT MODE)</b>
+  <b>AFTER APPLYING AH (TUNNEL MODE)</b>
 
-            ---------------------------------
-      <b>IPv4</b>  |orig IP hdr  |    |     |      |
-            |(any options)| AH | TCP | Data |
-            ---------------------------------
-            |&lt;------- authenticated -------&gt;|
-                 except for mutable fields
+        ----------------------------------------------------------------
+   <b>IPv4</b> |                              |    | orig IP hdr*  |   |      |
+        |new IP header * (any options) | AH | (any options) |TCP| Data |
+        ----------------------------------------------------------------
+        |&lt;- mutable field processing -&gt;|&lt;------ immutable fields -----&gt;|
+        |&lt;- authenticated except for mutable fields in the new IP hdr-&gt;|
 
-            ------------------------------------------------------------
-      <b>IPv6</b>  |             |hop-by-hop, dest*, |    | dest |     |      |
-            |orig IP hdr  |routing, fragment. | AH | opt* | TCP | Data |
-            ------------------------------------------------------------
-            |&lt;---- authenticated except for mutable fields -----------&gt;|
+        --------------------------------------------------------------
+   <b>IPv6</b> |           | ext hdrs*|    |            | ext hdrs*|   |    |
+        |new IP hdr*|if present| AH |orig IP hdr*|if present|TCP|Data|
+        --------------------------------------------------------------
+        |&lt;--- mutable field --&gt;|&lt;--------- immutable fields --------&gt;|
+        |       processing     |
+        |&lt;-- authenticated except for mutable fields in new IP hdr -&gt;|
 
-                 * = if present, could be before AH, after AH, or both
+          * = if present, construction of outer IP hdr/extensions and
+              modification of inner IP hdr/extensions is discussed in
+              the Security Architecture document.
 
-
-    <b>AFTER APPLYING AH (TUNNEL MODE)</b>
-
-          ------------------------------------------------
-    <b>IPv4</b>  | new IP hdr* |    | orig IP hdr*  |    |      |
-          |(any options)| AH | (any options) |TCP | Data |
-          ------------------------------------------------
-          |&lt;- authenticated except for mutable fields --&gt;|
-
-          |           in the new IP hdr                  |
-
-          --------------------------------------------------------------
-    <b>IPv6</b>  |           | ext hdrs*|    |            | ext hdrs*|   |    |
-          |new IP hdr*|if present| AH |orig IP hdr*|if present|TCP|Data|
-          --------------------------------------------------------------
-          |&lt;-- authenticated except for mutable fields in new IP hdr -&gt;|
-
-           * = construction of outer IP hdr/extensions and modification
-               of inner IP hdr/extensions is discussed below.
 </pre>
 <p>
-</p><h4>FIGURE 12: IPsec tunnel and transport modes for AH. <i>(Adapted from RFC 2402)</i></h4>
+</p><h4>FIGURE 12: IPsec tunnel and transport modes for AH. <i>(Adapted from RFC 4302)</i></h4>
 </td></tr></tbody></table>
 </center>
 <font size="3"><br><br>
@@ -2397,7 +2466,7 @@ Note, in particular, that the address fields are <i>not</i> mutable.</font></p>
 <a name="fig13"></a><br>
 </font><center>
 <table border="3" cellpadding="4">
-<tbody><tr><td width="600">
+<tbody><tr><td width="675">
 <pre>
     <b>ORIGINAL PACKET BEFORE APPLYING ESP</b>
 
@@ -2416,17 +2485,17 @@ Note, in particular, that the address fields are <i>not</i> mutable.</font></p>
 
             -------------------------------------------------
       <b>IPv4</b>  |orig IP hdr  | ESP |     |      |   ESP   | ESP|
-            |(any options)| Hdr | TCP | Data | Trailer |Auth|
+            |(any options)| Hdr | TCP | Data | Trailer | ICV|
             -------------------------------------------------
-                                |&lt;----- encrypted ----&gt;|
-                          |&lt;------ authenticated -----&gt;|
+                                |&lt;---- encryption ----&gt;|
+                          |&lt;-------- integrity -------&gt;|
 
             ---------------------------------------------------------
-      <b>IPv6</b>  | orig |hop-by-hop,dest*,|ESP|dest|   |    | ESP   | ESP|
-            |IP hdr|routing,fragment.|hdr|opt*|TCP|Data|Trailer|Auth|
+      <b>IPv6</b>  | orig |hop-by-hop,dest*,|   |dest|   |    | ESP   | ESP|
+            |IP hdr|routing,fragment.|ESP|opt*|TCP|Data|Trailer| ICV|
             ---------------------------------------------------------
-                                         |&lt;---- encrypted ----&gt;|
-                                     |&lt;---- authenticated ----&gt;|
+                                         |&lt;--- encryption ----&gt;|
+                                     |&lt;------ integrity ------&gt;|
 
                 * = if present, could be before ESP, after ESP, or both
 
@@ -2434,24 +2503,27 @@ Note, in particular, that the address fields are <i>not</i> mutable.</font></p>
     <b>AFTER APPLYING ESP (TUNNEL MODE)</b>
 
             -----------------------------------------------------------
-      <b>IPv4</b>  | new IP hdr  | ESP | orig IP hdr   |   |    | ESP   | ESP|
-            |(any options)| hdr | (any options) |TCP|Data|Trailer|Auth|
+      <b>IPv4</b>  | new IP hdr+ |     | orig IP hdr+  |   |    | ESP   | ESP|
+            |(any options)| ESP | (any options) |TCP|Data|Trailer| ICV|
 
             -----------------------------------------------------------
-                                |&lt;--------- encrypted ----------&gt;|
-                          |&lt;----------- authenticated ----------&gt;|
+                                |&lt;--------- encryption ---------&gt;|
+                          |&lt;------------- integrity ------------&gt;|
 
             ------------------------------------------------------------
-      <b>IPv6</b>  | new+ |new ext |ESP| orig+|orig ext |   |    | ESP   | ESP|
-            |IP hdr| hdrs+  |hdr|IP hdr| hdrs+   |TCP|Data|Trailer|Auth|
+      <b>IPv6</b>  | new+ |new ext |   | orig+|orig ext |   |    | ESP   | ESP|
+            |IP hdr| hdrs+  |ESP|IP hdr| hdrs+   |TCP|Data|Trailer| ICV|
             ------------------------------------------------------------
-                                |&lt;--------- encrypted -----------&gt;|
-                            |&lt;---------- authenticated ----------&gt;|
+                                |&lt;--------- encryption ----------&gt;|
+                            |&lt;------------ integrity ------------&gt;|
 
-               + = if present
+            + = if present, construction of outer IP hdr/extensions and
+                modification of inner IP hdr/extensions is discussed in
+                the Security Architecture document.
+
 </pre>
 <p>
-</p><h4>FIGURE 13: IPsec tunnel and transport modes for ESP. <i>(Adapted from RFC 2406)</i></h4>
+</p><h4>FIGURE 13: IPsec tunnel and transport modes for ESP. <i>(Adapted from RFC 4303)</i></h4>
 </td></tr></tbody></table>
 </center>
 <font size="3"><br><br>
@@ -2563,7 +2635,7 @@ found; both are supported by most common browsers (Figure 14).</font></p>
 
 <font size="3"><a name="fig14"></a><br>
 </font><center><table border="1"><tbody><tr><td>
-<img src="crypto_files/crypto_sslv3.gif">
+<img src="index_files/crypto_sslv3.gif">
 <br><br>
 <h4>FIGURE 14: SSL v3 configuration screen (Netscape Navigator).</h4>
 </td></tr></tbody></table>
@@ -2573,10 +2645,9 @@ found; both are supported by most common browsers (Figure 14).</font></p>
 <font size="3">In 1997, SSL v3 was found to be breakable. By this time,
 the Internet Engineering Task Force (IETF) had already started work on
 a new, non-proprietary protocol called Transport Layer Security (TLS),
-described in <a href="http://www.rfc-editor.org/rfc/rfc2246.txt">RFC 2246</a>.
-TLS extends SSL and supports additional crypto schemes, such as
-Diffie-Hellman key exchange and DSS digital signatures. TLS is backward
-compatible with SSL (and, in fact, is recognized as SSL v3.1).</font></p>
+described in <a href="http://www.rfc-editor.org/rfc/rfc2246.txt">RFC 2246</a>. TLS extends SSL and supports additional crypto schemes, such as Diffie-Hellman key exchange and DSS digital signatures; <a href="http://www.rfc-editor.org/rfc/rfc4279.txt">RFC 4279</a>
+describes the pre-shared key crypto schemes supported by TLS. TLS is
+backward compatible with SSL (and, in fact, is recognized as SSL v3.1).</font></p>
 
 <font size="3"><a name="fig15"></a><br>
 </font><center><table border="1"><tbody><tr><td>
@@ -2773,7 +2844,7 @@ changes the shape of the curve, and small changes in these parameters
 can result in major changes in the set of (x,y) solutions.</p>
 <a name="fig16"></a><br>
 <center><table border="1"><tbody><tr><td>
-<img src="crypto_files/crypto_ecc.gif">
+<img src="index_files/crypto_ecc.gif">
 <br><br>
 <h4>FIGURE 16: Elliptic curve addition.</h4>
 </td></tr></tbody></table>
@@ -3545,6 +3616,7 @@ New York: Macmillan, 1983.
 </li><li>Stallings, W. <i>Cryptography and Network Security: Principles and Practice</i>, 4th ed. Englewood Cliffs (NJ): Prentice Hall, 2006.
 </li><li>_____, (ed.) <i>Practical Cryptography for Data Internetworks.</i> Los Alamitos (CA): IEEE Computer Society Press, 1996.
 </li><li>Trappe, W. &amp; Washington, L.C. <i>Introduction to Cryptography with Codin Theory</i>, 2nd ed. Upper Saddle River (NJ): Pearson Prentice Hall, 2006.
+</li><li>Young, A. &amp; Yung, M. <i>Malicious Cryptography: Exposing Cryptovirology</i>. New York: John Wiley &amp; Sons, 2004.
 <br><br>
 </li><li>On the Web:
 <ul>
@@ -3600,14 +3672,14 @@ jokers...) called the <a href="http://www.counterpane.com/solitaire.html">Solita
 
 <table align="center" border="0">
 <tbody><tr>
-<td><img src="crypto_files/crypto_2600des.gif">
+<td><img src="index_files/crypto_2600des.gif">
 </td><td>
 <p>
 Finally, I am not in the clothing business although I do have an
 impressive t-shirt collection (over 350 and counting!). If you want to
 proudly wear the DES (well, actually the IDEA) encryption algorithm, be
 sure to see <i>2600 Magazine</i>'s DES Encryption Shirt, found at <a href="http://store.yahoo.com/2600hacker/desenshir.html"> <i>http://store.yahoo.com/2600hacker/desenshir.html</i></a> (left). A t-shirt with Adam Back's RSA Perl code can be found at <a href="http://www.cypherspace.org/%7Eadam/uk-shirt.html"> <i>http://www.cypherspace.org/~adam/uk-shirt.html</i></a> (right).</p>
-</td><td><img src="crypto_files/crypto_backrsa.jpg">
+</td><td><img src="index_files/crypto_backrsa.jpg">
 </td></tr></tbody></table>
 
 <br>

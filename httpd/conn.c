@@ -27,9 +27,7 @@ void addconnection(int sd, char *ip, int is_ssl)
 
     // Get ourselves a connstruct
     if (freeconns == NULL) 
-    {
-        tp = (struct connstruct *) malloc(sizeof(struct connstruct));
-    } 
+        tp = (struct connstruct *)malloc(sizeof(struct connstruct));
     else 
     {
         tp = freeconns;
@@ -39,23 +37,21 @@ void addconnection(int sd, char *ip, int is_ssl)
     // Attach it to the used list
     tp->next = usedconns;
     usedconns = tp;
-
     tp->networkdesc = sd;
+
     if (is_ssl)
         ssl_server_new(servers->ssl_ctx, sd);
+    tp->is_ssl = is_ssl;
     tp->filedesc = -1;
 #if defined(CONFIG_HTTP_HAS_DIRECTORIES)
     tp->dirp = NULL;
 #endif
-    tp->is_ssl = is_ssl;
-
     *(tp->actualfile) = '\0';
     *(tp->filereq) = '\0';
 #if defined(CONFIG_HTTP_HAS_CGI)
     *(tp->cgiargs) = '\0';
 #endif
     *(tp->virtualhostreq) = '\0';
-
     tp->state = STATE_WANT_TO_READ_HEAD;
     tp->reqtype = TYPE_GET;
     my_strncpy(tp->ip, ip, MAXIPLEN);
@@ -67,27 +63,27 @@ void addconnection(int sd, char *ip, int is_ssl)
 void removeconnection(struct connstruct *cn) 
 {
     struct connstruct *tp;
-    int shouldret=0;
+    int shouldret = 0;
 
     tp = usedconns;
 
     if (tp == NULL || cn == NULL) 
-        shouldret=1;
+        shouldret = 1;
     else if (tp == cn) 
         usedconns = tp->next;
     else 
     {
-        while(tp != NULL) 
+        while (tp != NULL) 
         {
             if (tp->next == cn) 
             {
                 tp->next = (tp->next)->next;
-                shouldret=0;
+                shouldret = 0;
                 break;
             }
 
             tp = tp->next;
-            shouldret=1;
+            shouldret = 1;
         }
     }
 
@@ -102,14 +98,14 @@ void removeconnection(struct connstruct *cn)
     if (cn->networkdesc != -1) 
     {
         if (cn->is_ssl) 
-        {
             ssl_free(ssl_find(servers->ssl_ctx, cn->networkdesc));
-        }
 
         SOCKET_CLOSE(cn->networkdesc);
     }
 
-    if (cn->filedesc != -1) close(cn->filedesc);
+    if (cn->filedesc != -1) 
+        close(cn->filedesc);
+
 #if defined(CONFIG_HTTP_HAS_DIRECTORIES)
     if (cn->dirp != NULL) 
 #ifdef WIN32

@@ -27,23 +27,25 @@
 struct serverstruct *servers;
 struct connstruct *usedconns;
 struct connstruct *freeconns;
-#if defined(CONFIG_HTTP_HAS_CGI)
-struct cgiextstruct *cgiexts;
-#endif
-struct indexstruct *indexlist;
-
 char *webroot = CONFIG_HTTP_WEBROOT;
 
-static void addindex(char *tp);
 static void addtoservers(int sd);
-static void selectloop(void);
 static int openlistener(int port);
 static void handlenewconnection(int listenfd, int is_ssl);
 #if defined(CONFIG_HTTP_PERM_CHECK)
-static void procpermcheck(char *pathtocheck);
+static void procpermcheck(const char *pathtocheck);
 #endif
+
 #if defined(CONFIG_HTTP_HAS_CGI)
+struct cgiextstruct *cgiexts;
 static void addcgiext(char *tp);
+
+#if !defined(WIN32)
+static void reaper(int sigtype) 
+{
+    wait3(NULL, WNOHANG, NULL);
+}
+#endif
 #endif
 
 /* clean up memory for valgrind */
@@ -53,7 +55,7 @@ static void sigint_cleanup(int sig)
     struct connstruct *tp;
     int i;
 
-    while(servers != NULL) 
+    while (servers != NULL) 
     {
         if (servers->is_ssl)
             ssl_ctx_free(servers->ssl_ctx);
@@ -62,9 +64,6 @@ static void sigint_cleanup(int sig)
         free(servers);
         servers = sp;
     }
-
-    free(indexlist->name);
-    free(indexlist);
 
     for (i = 0; i < INITIAL_CONNECTION_SLOTS; i++) 
     {
@@ -79,46 +78,52 @@ static void sigint_cleanup(int sig)
     exit(0);
 }
 
-void initlists() 
+static void die(int sigtype) 
 {
-    int i;
-    struct connstruct *tp;
-
-    servers = NULL;
-    usedconns = NULL;
-    freeconns = NULL;
-#if defined(CONFIG_HTTP_HAS_CGI)
-    cgiexts = NULL;
-#endif
-    indexlist = NULL;
-
-    for (i=0; i<INITIAL_CONNECTION_SLOTS; i++) 
-    {
-        tp = freeconns;
-        freeconns = (struct connstruct *) calloc(1, sizeof(struct connstruct));
-        freeconns->next = tp;
-    }
+    exit(0);
 }
 
 int main(int argc, char *argv[]) 
 {
-    int tp;
-#if defined(CONFIG_HTTP_IS_DAEMON)
-    int pid;
-#endif
+    fd_set rfds, wfds;
+    struct connstruct *tp, *to;
+    struct serverstruct *sp;
+    int rnum, wnum, active;
+    int webrootlen, i;
+    time_t currtime;
 
 #ifdef WIN32
-    WORD wVersionRequested = MAKEWORD(2,2);
+    WORD wVersionRequested = MAKEWORD(2, 2);
     WSADATA wsaData;
     WSAStartup(wVersionRequested,&wsaData);
+#else
+    if (getuid() == 0)  // change our uid if we are root
+    {
+        setgid(32767);
+        setuid(32767);
+    }
+
+    signal(SIGQUIT, die);
+    signal(SIGPIPE, SIG_IGN);
+#if defined(CONFIG_HTTP_HAS_CGI)
+    signal(SIGCHLD, reaper);
 #endif
-
+#endif
+    signal(SIGINT, sigint_cleanup);
+    signal(SIGTERM, die);
     mime_init();
-    initlists();
-    tp = strlen(webroot);
 
-    if (webroot[tp-1] == '/') 
-        webroot[tp-1] = '\0';
+    for (i = 0; i < INITIAL_CONNECTION_SLOTS; i++) 
+    {
+        tp = freeconns;
+        freeconns = (struct connstruct *)calloc(1, sizeof(struct connstruct));
+        freeconns->next = tp;
+    }
+
+    webrootlen = strlen(webroot);
+
+    if (webroot[webrootlen-1] == '/') 
+        webroot[webrootlen-1] = '\0';
 
     if (isdir(webroot) == 0) 
     {
@@ -128,38 +133,29 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    if ((tp = openlistener(CONFIG_HTTP_PORT)) == -1) 
+    if ((active = openlistener(CONFIG_HTTP_PORT)) == -1) 
     {
 #ifdef CONFIG_HTTP_VERBOSE
-        fprintf(stderr, "ERR: Couldn't bind to port %d (IPv4)\n",
+        fprintf(stderr, "ERR: Couldn't bind to port %d\n",
                 CONFIG_HTTP_PORT);
 #endif
         exit(1);
     }
 
-    addindex("index.html");
-    addtoservers(tp);
+    addtoservers(active);
 
-#ifndef WIN32
-    if (getuid() == 0)
-    {
-        setgid(32767);
-        setuid(32767);
-    }
-#endif
-
-    if ((tp = openlistener(CONFIG_HTTP_HTTPS_PORT)) == -1) 
+    if ((active = openlistener(CONFIG_HTTP_HTTPS_PORT)) == -1) 
     {
 #ifdef CONFIG_HTTP_VERBOSE
-        fprintf(stderr, "ERR: Couldn't bind to port %d (IPv4)\n", 
+        fprintf(stderr, "ERR: Couldn't bind to port %d\n", 
                 CONFIG_HTTP_HTTPS_PORT);
 #endif
         exit(1);
     }
 
-    addtoservers(tp);
+    addtoservers(active);
     servers->ssl_ctx = ssl_ctx_new(CONFIG_HTTP_DEFAULT_SSL_OPTIONS, 
-            CONFIG_HTTP_SESSION_CACHE_SIZE);
+                                CONFIG_HTTP_SESSION_CACHE_SIZE);
     servers->is_ssl = 1;
 
 #if defined(CONFIG_HTTP_PERM_CHECK) 
@@ -173,53 +169,152 @@ int main(int argc, char *argv[])
             CONFIG_HTTP_PORT, CONFIG_HTTP_HTTPS_PORT);
     TTY_FLUSH();
 #endif
-
 #if defined(CONFIG_HTTP_IS_DAEMON)
-    pid = fork();
-
-    if (pid > 0) 
-    {
+    if (fork() > 0)  /* parent will die */
         exit(0);
-    } 
-    else if(pid == -1) 
-    {
-#ifdef CONFIG_HTTP_VERBOSE
-        fprintf(stderr,"axhttpd: Sorry, fork failed... Tough dice.\n");
-#endif
-        exit(1);
-    }
 
     setsid();
 #endif
 
-    /* SIGNALS */
-    signal(SIGINT, sigint_cleanup);
-    signal(SIGTERM, die);
-#if defined(CONFIG_HTTP_HAS_CGI)
-#ifndef WIN32
-    signal(SIGCHLD, reaper);
-#endif
-#endif
-#ifndef WIN32
-    signal(SIGQUIT, die);
-    signal(SIGPIPE, SIG_IGN);
-#endif
+    // main loop
+    while (1)
+    {
+        FD_ZERO(&rfds);
+        FD_ZERO(&wfds);
+        rnum = wnum = -1;
+        sp = servers;
 
-    selectloop();
+        while (sp != NULL)  // read each server port
+        {
+            FD_SET(sp->sd, &rfds);
+
+            if (sp->sd > rnum) 
+                rnum = sp->sd;
+            sp = sp->next;
+        }
+
+        // Add the established sockets
+        tp = usedconns;
+        currtime = time(NULL);
+
+        while (tp != NULL) 
+        {
+            if (currtime > tp->timeout)     // timed out? Kill it.
+            {
+                to = tp;
+                tp = tp->next;
+                removeconnection(to);
+                continue;
+            }
+
+            if (tp->state == STATE_WANT_TO_READ_HEAD) 
+            {
+                FD_SET(tp->networkdesc, &rfds);
+                if (tp->networkdesc > rnum) 
+                    rnum = tp->networkdesc;
+            }
+
+            if (tp->state == STATE_WANT_TO_SEND_HEAD) 
+            {
+                FD_SET(tp->networkdesc, &wfds);
+                if (tp->networkdesc > wnum) 
+                    wnum = tp->networkdesc;
+            }
+
+            if (tp->state == STATE_WANT_TO_READ_FILE) 
+            {
+                FD_SET(tp->filedesc, &rfds);
+                if (tp->filedesc > rnum) 
+                    rnum = tp->filedesc;
+            }
+
+            if (tp->state == STATE_WANT_TO_SEND_FILE) 
+            {
+                FD_SET(tp->networkdesc, &wfds);
+                if (tp->networkdesc > wnum) 
+                    wnum = tp->networkdesc;
+            }
+
+#if defined(CONFIG_HTTP_DIRECTORIES)
+            if (tp->state == STATE_DOING_DIR) 
+            {
+                FD_SET(tp->networkdesc, &wfds);
+                if (tp->networkdesc > wnum) 
+                    wnum = tp->networkdesc;
+            }
+#endif
+            tp = tp->next;
+        }
+
+        active = select(wnum > rnum ? wnum+1 : rnum+1,
+                rnum != -1 ? &rfds : NULL, wnum != -1 ? &wfds : NULL,
+                NULL, NULL);
+
+        // New connection?
+        sp = servers;
+        while (active > 0 && sp != NULL) 
+        {
+            if (FD_ISSET(sp->sd, &rfds)) 
+            {
+                handlenewconnection(sp->sd, sp->is_ssl);
+                active--;
+            }
+
+            sp = sp->next;
+        }
+
+        // Handle the established sockets
+        tp = usedconns;
+
+        while (active > 0 && tp != NULL) 
+        {
+            to = tp;
+            tp = tp->next;
+
+            if (to->state == STATE_WANT_TO_READ_HEAD)
+                if (FD_ISSET(to->networkdesc, &rfds)) 
+                {
+                    active--;
+                    procreadhead(to);
+                } 
+
+            if (to->state == STATE_WANT_TO_SEND_HEAD)
+                if (FD_ISSET(to->networkdesc, &wfds)) 
+                {
+                    active--;
+                    procsendhead(to);
+                } 
+
+            if (to->state == STATE_WANT_TO_READ_FILE)
+                if (FD_ISSET(to->filedesc, &rfds)) 
+                {
+                    active--;
+                    procreadfile(to);
+                } 
+
+            if (to->state == STATE_WANT_TO_SEND_FILE)
+                if (FD_ISSET(to->networkdesc, &wfds)) 
+                {
+                    active--;
+                    procsendfile(to);
+                }
+
+#if defined(CONFIG_HTTP_DIRECTORIES)
+            if (to->state == STATE_DOING_DIR)
+                if (FD_ISSET(to->networkdesc, &wfds)) 
+                {
+                    active--;
+                    procdodir(to);
+                }
+#endif
+        }
+    } 
+
     return 0;
 }
 
-static void addindex(char *tp) 
-{
-    struct indexstruct *ex = (struct indexstruct *)
-                        malloc(sizeof(struct indexstruct));
-    ex->name = strdup(tp);
-    ex->next = indexlist;
-    indexlist = ex;
-}
-
 #if defined(CONFIG_HTTP_PERM_CHECK)
-static void procpermcheck(char *pathtocheck) 
+static void procpermcheck(const char *pathtocheck) 
 {
     char thepath[MAXREQUESTLENGTH];
 #ifndef WIN32
@@ -232,31 +327,35 @@ static void procpermcheck(char *pathtocheck)
     {
         printf("WARNING: UID (%d) is unable to read %s\n", 
                 (int)getuid(), pathtocheck);
+        TTY_FLUSH();
         return;
     }
 
-    while ((dp=readdir(tpdir))) 
+    while ((dp = readdir(tpdir))) 
     {
-        if (strcmp(dp->d_name, "..")==0) 
+        if (strcmp(dp->d_name, "..") == 0)
             continue;
 
-        if (strcmp(dp->d_name, ".")==0) 
+        if (strcmp(dp->d_name, ".") == 0)
             continue;
 
         snprintf(thepath, sizeof(thepath), "%s/%s", pathtocheck, dp->d_name);
 
-        if (isdir(thepath)) 
+        if (isdir(thepath))
         {
             procpermcheck(thepath);
             continue;
         }
 
         if (access(thepath, R_OK) != 0)
-            printf("WARNING: UID (%d) is unable to read %s\n", 
+            printf("WARNING: UID (%d) is unable to read %s\n",
                                 (int)getuid(), thepath);
+
         if (access(thepath, W_OK) == 0)
-            printf("SECURITY: UID (%d) is ABLE TO WRITE TO %s\n", 
+            printf("SECURITY: UID (%d) is ABLE TO WRITE TO %s\n",
                                 (int)getuid(), thepath);
+
+        TTY_FLUSH();
     }
 
     closedir(tpdir);
@@ -335,149 +434,6 @@ static void addtoservers(int sd)
     servers = tp;
 }
 
-static void selectloop(void) 
-{
-    fd_set rfds, wfds;
-    struct connstruct *tp, *to;
-    struct serverstruct *sp;
-    int rnum, wnum, active;
-    int currtime;
-
-    while (1)
-    {   
-        // MAIN SELECT LOOP
-        FD_ZERO(&rfds);
-        FD_ZERO(&wfds);
-        rnum = wnum = -1;
-
-        // Add the listening sockets
-        sp = servers;
-        while (sp != NULL) 
-        {
-            FD_SET(sp->sd, &rfds);
-            if (sp->sd > rnum) rnum = sp->sd;
-            sp = sp->next;
-        }
-
-        // Add the established sockets
-        tp = usedconns;
-        currtime = time(NULL);
-
-        while (tp != NULL) 
-        {
-            if (currtime > tp->timeout) 
-            {
-                to = tp;
-                tp = tp->next;
-                removeconnection(to);
-                continue;
-            }
-
-            if (tp->state == STATE_WANT_TO_READ_HEAD) 
-            {
-                FD_SET(tp->networkdesc, &rfds);
-                if (tp->networkdesc > rnum) 
-                    rnum = tp->networkdesc;
-            }
-
-            if (tp->state == STATE_WANT_TO_SEND_HEAD) 
-            {
-                FD_SET(tp->networkdesc, &wfds);
-                if (tp->networkdesc > wnum) 
-                    wnum = tp->networkdesc;
-            }
-
-            if (tp->state == STATE_WANT_TO_READ_FILE) 
-            {
-                FD_SET(tp->filedesc, &rfds);
-                if (tp->filedesc > rnum) 
-                    rnum = tp->filedesc;
-            }
-
-            if (tp->state == STATE_WANT_TO_SEND_FILE) 
-            {
-                FD_SET(tp->networkdesc, &wfds);
-                if (tp->networkdesc > wnum) 
-                    wnum = tp->networkdesc;
-            }
-
-#if defined(CONFIG_HTTP_DIRECTORIES)
-            if (tp->state == STATE_DOING_DIR) 
-            {
-                FD_SET(tp->networkdesc, &wfds);
-                if (tp->networkdesc > wnum) 
-                    wnum = tp->networkdesc;
-            }
-#endif
-            tp = tp->next;
-        }
-
-        active = select(wnum > rnum ? wnum+1 : rnum+1,
-                rnum != -1 ? &rfds : NULL,
-                wnum != -1 ? &wfds : NULL,
-                NULL, NULL);
-
-        // Handle the listening sockets
-        sp = servers;
-        while (active > 0 && sp != NULL) 
-        {
-            if (FD_ISSET(sp->sd, &rfds)) 
-            {
-                handlenewconnection(sp->sd, sp->is_ssl);
-                active--;
-            }
-
-            sp = sp->next;
-        }
-
-        // Handle the established sockets
-        tp = usedconns;
-
-        while (active > 0 && tp != NULL) 
-        {
-            to = tp;
-            tp = tp->next;
-
-            if (to->state == STATE_WANT_TO_READ_HEAD)
-                if (FD_ISSET(to->networkdesc, &rfds)) 
-                {
-                    active--;
-                    procreadhead(to);
-                } 
-
-            if (to->state == STATE_WANT_TO_SEND_HEAD)
-                if (FD_ISSET(to->networkdesc, &wfds)) 
-                {
-                    active--;
-                    procsendhead(to);
-                } 
-
-            if (to->state == STATE_WANT_TO_READ_FILE)
-                if (FD_ISSET(to->filedesc, &rfds)) 
-                {
-                    active--;
-                    procreadfile(to);
-                } 
-
-            if (to->state == STATE_WANT_TO_SEND_FILE)
-                if (FD_ISSET(to->networkdesc, &wfds)) 
-                {
-                    active--;
-                    procsendfile(to);
-                }
-
-#if defined(CONFIG_HTTP_DIRECTORIES)
-            if (to->state == STATE_DOING_DIR)
-                if (FD_ISSET(to->networkdesc, &wfds)) 
-                {
-                    active--;
-                    procdodir(to);
-                }
-#endif
-        }
-    }  // MAIN SELECT LOOP
-}
-
 #ifdef HAVE_IPV6
 static void handlenewconnection(int listenfd, int is_ssl) 
 {
@@ -485,9 +441,6 @@ static void handlenewconnection(int listenfd, int is_ssl)
     int tp = sizeof(their_addr);
     char ipbuf[100];
     int connfd = accept(listenfd, (struct sockaddr *)&their_addr, &tp);
-
-    if (connfd == -1) 
-        return;
 
     if (tp == sizeof(struct sockaddr_in6)) 
     {
@@ -512,10 +465,6 @@ static void handlenewconnection(int listenfd, int is_ssl)
     struct sockaddr_in their_addr;
     int tp = sizeof(struct sockaddr_in);
     int connfd = accept(listenfd, (struct sockaddr *)&their_addr, &tp);
-
-    if (connfd == -1) 
-        return;
-
     addconnection(connfd, inet_ntoa(their_addr.sin_addr), is_ssl);
 }
 #endif
@@ -524,62 +473,60 @@ static int openlistener(int port)
 {
     int sd;
 #ifdef WIN32
-    char tp=1;
+    char tp = 1;
 #else
-    int tp=1;
+    int tp = 1;
 #endif
+#ifndef HAVE_IPV6
     struct sockaddr_in my_addr;
 
     if ((sd = socket(AF_INET, SOCK_STREAM, 0)) == -1) 
         return -1;
 
-    setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &tp, sizeof(tp));
-    my_addr.sin_family = AF_INET;         // host byte order
-    my_addr.sin_port = htons((short)port);       // short, network byte order
-    my_addr.sin_addr.s_addr = INADDR_ANY; // automatically fill with my IP
-    memset(&(my_addr.sin_zero), 0, 8);    // zero the rest of the struct
-
-    if (bind(sd, (struct sockaddr *)&my_addr, sizeof(struct sockaddr)) == -1) 
-    {
-        close(sd);
-        return -1;
-    }
-
-    if (listen(sd, BACKLOG) == -1) 
-    {
-        close(sd);
-        return -1;
-    }
-
-    return sd;
-}
-
-#ifdef HAVE_IPV6
-static int openlistener6(int port) 
-{
-    int sd,tp;
+    memset(&my_addr, 0, sizeof(my_addr));
+    my_addr.sin_family = AF_INET;
+    my_addr.sin_port = htons((short)port);
+    my_addr.sin_addr.s_addr = INADDR_ANY;
+#else
     struct sockaddr_in6 my_addr;
 
     if ((sd = socket(AF_INET6, SOCK_STREAM, 0)) == -1) 
         return -1;
 
-    setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &tp, sizeof(tp));
     memset(&my_addr, 0, sizeof(my_addr));
     my_addr.sin6_family = AF_INET6;
     my_addr.sin6_port = htons(port);
+    my_addr.sin6_addr.s_addr = INADDR_ANY;
+#endif
 
-    if (bind(sd, (struct sockaddr *)&my_addr, sizeof(my_addr)) == -1) 
-    {
-        close(sd);
-        return -1;
-    }
-
-    if (listen(sd, BACKLOG) == -1)
-    {
-        close(sd);
-        return -1;
-    }
+    setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &tp, sizeof(tp));
+    bind(sd, (struct sockaddr *)&my_addr, sizeof(struct sockaddr));
+    listen(sd, BACKLOG);
 
     return sd;
 }
-#endif
+
+/* Wrapper function for strncpy() that guarantees
+   a null-terminated string. This is to avoid any possible
+   issues due to strncpy()'s behaviour.
+ */
+char *my_strncpy(char *dest, const char *src, size_t n) 
+{
+    strncpy(dest, src, n);
+    dest[n-1] = '\0';
+    return dest;
+}
+
+int isdir(const char *tpbuf) 
+{
+    struct stat st;
+
+    if (stat(tpbuf, &st) == -1) 
+        return 0;
+
+    if ((st.st_mode & S_IFMT) == S_IFDIR) 
+        return 1;
+
+    return 0;
+}
+

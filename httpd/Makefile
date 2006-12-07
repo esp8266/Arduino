@@ -57,7 +57,6 @@ OBJ= \
 	conn.o \
 	main.o \
 	proc.o \
-	misc.o \
 	mime_types.o
 
 ifndef CONFIG_PLATFORM_WIN32
@@ -70,6 +69,10 @@ ifndef CONFIG_PLATFORM_SOLARIS
 endif
 endif
 else    # Win32
+
+OBJ:=$(OBJ:.o=.obj)
+%.obj : %.c
+	$(CC) $(CFLAGS) $< 
 
 $(TARGET): $(OBJ)
 	$(LD) $(LDFLAGS) $(LIBS) /out:$@ $(OBJ)
