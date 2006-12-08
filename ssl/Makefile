@@ -33,6 +33,8 @@ TARGET1=../$(STAGE)/libaxtls.a
 BASETARGET=libaxtls.so
 ifdef CONFIG_PLATFORM_CYGWIN
 TARGET2=../$(STAGE)/libaxtls.dll.a
+else
+TARGET2=../$(STAGE)/$(LIBMINOR)
 endif
 
 # shared library major/minor numbers
@@ -47,7 +49,7 @@ endif
 libs: $(TARGET1) $(TARGET2)
 
 OBJ=\
-    aes.o \
+  aes.o \
 	asn1.o \
 	bigint.o \
 	crypto_misc.o \

@@ -21,6 +21,7 @@
 #include <sys/types.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 #include "axhttp.h"
 
 // GLOBALS
@@ -247,7 +248,8 @@ int main(int argc, char *argv[])
         }
 
         active = select(wnum > rnum ? wnum+1 : rnum+1,
-                rnum != -1 ? &rfds : NULL, wnum != -1 ? &wfds : NULL,
+                rnum != -1 ? &rfds : NULL, 
+                wnum != -1 ? &wfds : NULL,
                 NULL, NULL);
 
         // New connection?
@@ -271,44 +273,44 @@ int main(int argc, char *argv[])
             to = tp;
             tp = tp->next;
 
-            if (to->state == STATE_WANT_TO_READ_HEAD)
-                if (FD_ISSET(to->networkdesc, &rfds)) 
-                {
-                    active--;
-                    procreadhead(to);
-                } 
+            if (to->state == STATE_WANT_TO_READ_HEAD &&
+                        FD_ISSET(to->networkdesc, &rfds)) 
+            {
+                active--;
+                procreadhead(to);
+            } 
 
-            if (to->state == STATE_WANT_TO_SEND_HEAD)
-                if (FD_ISSET(to->networkdesc, &wfds)) 
-                {
-                    active--;
-                    procsendhead(to);
-                } 
+            if (to->state == STATE_WANT_TO_SEND_HEAD &&
+                        FD_ISSET(to->networkdesc, &wfds)) 
+            {
+                active--;
+                procsendhead(to);
+            } 
 
-            if (to->state == STATE_WANT_TO_READ_FILE)
-                if (FD_ISSET(to->filedesc, &rfds)) 
-                {
-                    active--;
-                    procreadfile(to);
-                } 
+            if (to->state == STATE_WANT_TO_READ_FILE && 
+                        FD_ISSET(to->filedesc, &rfds)) 
+            {
+                active--;
+                procreadfile(to);
+            } 
 
-            if (to->state == STATE_WANT_TO_SEND_FILE)
-                if (FD_ISSET(to->networkdesc, &wfds)) 
-                {
-                    active--;
-                    procsendfile(to);
-                }
+            if (to->state == STATE_WANT_TO_SEND_FILE && 
+                        FD_ISSET(to->networkdesc, &wfds)) 
+            {
+                active--;
+                procsendfile(to);
+            }
 
 #if defined(CONFIG_HTTP_DIRECTORIES)
-            if (to->state == STATE_DOING_DIR)
-                if (FD_ISSET(to->networkdesc, &wfds)) 
-                {
-                    active--;
-                    procdodir(to);
-                }
+            if (to->state == STATE_DOING_DIR &&
+                        FD_ISSET(to->networkdesc, &wfds)) 
+            {
+                active--;
+                procdodir(to);
+            }
 #endif
         }
-    } 
+    }
 
     return 0;
 }
@@ -452,9 +454,7 @@ static void handlenewconnection(int listenfd, int is_ssl)
                 ipbuf, sizeof(ipbuf));
     } 
     else 
-    {
         *ipbuf = '\0';
-    }
 
     addconnection(connfd, ipbuf, is_ssl);
 }
@@ -500,9 +500,13 @@ static int openlistener(int port)
 #endif
 
     setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &tp, sizeof(tp));
-    bind(sd, (struct sockaddr *)&my_addr, sizeof(struct sockaddr));
-    listen(sd, BACKLOG);
+    if (bind(sd, (struct sockaddr *)&my_addr, sizeof(struct sockaddr)) == -1)
+    {
+        close(sd);
+        return -1;
+    }
 
+    listen(sd, BACKLOG);
     return sd;
 }
 

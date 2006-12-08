@@ -284,7 +284,7 @@ void procreadhead(struct connstruct *cn)
             return;
         }
 
-        while(*next != '\r' && *next != '\n' && *next != '\0') 
+        while (*next != '\r' && *next != '\n' && *next != '\0') 
             next++;
 
         if (*next == '\r') 
