@@ -168,7 +168,6 @@
 /* End PBXApplicationTarget section */
 
 /* Begin PBXBuildFile section */
-		330B21540968180400345666 /* librxtxSerial.jnilib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 330B21530968180400345666 /* librxtxSerial.jnilib */; };
 		332D4DB609CF147F00BF81F6 /* Sizer.java in Sources */ = {isa = PBXBuildFile; fileRef = 332D4DB509CF147F00BF81F6 /* Sizer.java */; };
 		336EA55B09FF87F60052D765 /* examples in CopyFiles */ = {isa = PBXBuildFile; fileRef = 336EA4DB09FF87E30052D765 /* examples */; };
 		338C478A0AA204BE008F2C0D /* FTDIUSBSerialDriver_v2_1_6.dmg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 338C47870AA204B0008F2C0D /* FTDIUSBSerialDriver_v2_1_6.dmg */; };
@@ -411,16 +410,13 @@
 				339514FA097AEB8000193C89 /* license.txt in CopyFiles */,
 				339514FB097AEB8000193C89 /* readme.txt in CopyFiles */,
 				33FF07050965BEE60016AC38 /* macosx_setup.command in CopyFiles */,
-				330B21540968180400345666 /* librxtxSerial.jnilib in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		330B21530968180400345666 /* librxtxSerial.jnilib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = librxtxSerial.jnilib; sourceTree = "<group>"; };
 		332D4DB509CF147F00BF81F6 /* Sizer.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Sizer.java; sourceTree = "<group>"; };
-		333269E1099BB1FC007D3AE2 /* tools.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = tools.zip; sourceTree = "<group>"; };
 		336EA4DB09FF87E30052D765 /* examples */ = {isa = PBXFileReference; lastKnownFileType = folder; path = examples; sourceTree = "<group>"; };
 		337CD3F309EFC183002B890C /* fetch.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = fetch.sh; sourceTree = "<group>"; };
 		338C47870AA204B0008F2C0D /* FTDIUSBSerialDriver_v2_1_6.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = FTDIUSBSerialDriver_v2_1_6.dmg; sourceTree = "<group>"; };
@@ -987,8 +983,6 @@
 		33FFFEAC0965BD110016AC38 /* dist */ = {
 			isa = PBXGroup;
 			children = (
-				333269E1099BB1FC007D3AE2 /* tools.zip */,
-				330B21530968180400345666 /* librxtxSerial.jnilib */,
 				33FFFEAE0965BD110016AC38 /* bootloader */,
 				33FFFEB20965BD110016AC38 /* drivers */,
 				33FFFEB50965BD110016AC38 /* DS_Store */,
@@ -1078,7 +1072,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "unzip -od $BUILT_PRODUCTS_DIR dist/tools-ppc.zip";
+			shellScript = "unzip -od $BUILT_PRODUCTS_DIR dist/tools-ppc.zip\ncp dist/librxtxSerial-ppc.jnilib $BUILT_PRODUCTS_DIR/librxtxSerial.jnilib";
 		};
 		3318B11A0AD6CE9F00FE1A05 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1091,7 +1085,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "unzip -od $BUILT_PRODUCTS_DIR dist/tools-intel.zip";
+			shellScript = "unzip -od $BUILT_PRODUCTS_DIR dist/tools-intel.zip\ncp dist/librxtxSerial-intel.jnilib $BUILT_PRODUCTS_DIR/librxtxSerial.jnilib";
 		};
 		3318B1520AD6D1EB00FE1A05 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
