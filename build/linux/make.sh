@@ -27,9 +27,12 @@ else
   mkdir -p work/classes/processing/app/syntax
   mkdir -p work/classes/processing/app/tools
   mkdir -p work/lib/build
-  mkdir -p work/examples
+  #mkdir -p work/examples
 
   #need to replace this with the linux native library for RXTX
+  echo Unzipping reference...
+  unzip -q -d work ../shared/reference.zip
+
   cp dist/librxtxSerial.so work/
 
   cp dist/arduino work/
@@ -47,10 +50,13 @@ fi
 
 echo Copying shared and core files...
 cp -r ../shared/* work
+rm -rf work/dist
 cp -r ../../targets work/lib
+rm work/reference.zip
 
-echo Extracting examples...
-unzip -d work/examples ../shared/dist/examples.zip
+echo Copying examples...
+#unzip -d work/examples ../shared/dist/examples.zip
+cp -r ../shared/dist/examples work/
 
 echo Copying dist files...
 cp -r dist/lib work/
@@ -65,9 +71,11 @@ cd ../..
 ### -- BUILD GCC ------------------------------------------------
 # in the future we will build avr-gcc and tools (if they don't exist)
 
-### -- BUILD BOOTLOADER  ----------------------------------------
+### -- COPY BOOTLOADER  -----------------------------------------
 cd bootloader
-make
+# don't make the bootloader, since it rarely changes and requires
+# installation of make.
+# make
 cp ATmegaBOOT.hex ../build/linux/work/bootloader
 cd ..
 
@@ -96,7 +104,8 @@ echo Building the PDE...
 # compile the code as java 1.3, so that the application will run and
 # show the user an error, rather than crapping out with some strange
 # "class not found" crap
-jikes -classpath ../build/linux/work/classes:../build/linux/work/lib/antlr.jar:../build/linux/work/lib/oro.jar:../build/linux/work/lib/registry.jar:../build/linux/work/lib/RXTXcomm.jar:../build/linux/work/lib/mrj.jar:$CLASSPATH -d ../build/linux/work/classes tools/*.java preproc/*.java syntax/*.java *.java 
+#jikes -classpath ../build/linux/work/classes:../build/linux/work/lib/antlr.jar:../build/linux/work/lib/oro.jar:../build/linux/work/lib/registry.jar:../build/linux/work/lib/RXTXcomm.jar:../build/linux/work/lib/mrj.jar:$CLASSPATH -d ../build/linux/work/classes tools/*.java preproc/*.java syntax/*.java *.java 
+javac -classpath ../build/linux/work/class:../build/linux/work/lib/antlr.jar:../build/linux/work/lib/oro.jar:../build/linux/work/lib/registry.jar:../build/linux/work/lib/RXTXcomm.jar:../build/linux/work/lib/mrj.jar:$CLASSPATH -d ../build/linux/work/classes tools/*.java preproc/*.java syntax/*java *.java
 
 cd ../build/linux/work/classes
 rm -f ../lib/pde.jar
