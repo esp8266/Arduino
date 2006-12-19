@@ -33,8 +33,6 @@ else
   echo Unzipping reference...
   unzip -q -d work ../shared/reference.zip
 
-  cp dist/librxtxSerial.so work/
-
   cp dist/arduino work/
  
   # copy the avr-gcc distribution
