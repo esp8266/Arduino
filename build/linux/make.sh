@@ -60,6 +60,7 @@ echo Copying dist files...
 cp -r dist/lib work/
 #cp -r dist/core work/
 cp -r dist/bootloader work/
+cp -r dist/tools work/
 
 ### -- START BUILDING -------------------------------------------
 
