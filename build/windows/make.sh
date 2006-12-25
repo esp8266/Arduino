@@ -59,7 +59,7 @@ else
   mkdir work/bootloader
   cp dist/bootloader/*.* work/bootloader
   mkdir work/drivers
-  cp dist/drivers/*.* work/drivers/
+  cp -r dist/drivers/* work/drivers/
   mkdir work/tools
   cp dist/avr_tools.zip .
   echo Extracting avr tools ...
