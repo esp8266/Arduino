@@ -66,6 +66,8 @@ public class RunnerException extends Exception {
    * in each of the constructors above.
    */
   static public final String massage(String msg) {
+    if (msg == null)
+      return "";
     if (msg.indexOf("java.lang.") == 0) {
       //int dot = msg.lastIndexOf('.');
       msg = msg.substring("java.lang.".length());

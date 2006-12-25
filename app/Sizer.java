@@ -72,7 +72,11 @@ public class Sizer implements MessageConsumer {
         } catch (InterruptedException intExc) { }
       }
     } catch (Exception e) {
-      exception = new RunnerException(e.toString());
+      // The default Throwable.toString() never returns null, but apparently
+      // some sub-class has overridden it to do so, thus we need to check for
+      // it.  See: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1166589459
+      exception = new RunnerException(
+        (e.toString() == null) ? e.getClass().getName() : e.toString());
     }
     
     if (exception != null)
