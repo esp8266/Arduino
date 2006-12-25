@@ -265,7 +265,6 @@
 		33FF07320965C1E30016AC38 /* tab-unsel-mid.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02870965BD160016AC38 /* tab-unsel-mid.gif */; };
 		33FF07330965C1E30016AC38 /* tab-unsel-right.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02880965BD160016AC38 /* tab-unsel-right.gif */; };
 		33FF07360965C2590016AC38 /* ATmegaBOOT.hex in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FFFE790965BD110016AC38 /* ATmegaBOOT.hex */; };
-		33FF07D30965C2B10016AC38 /* avrlib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF07370965C2B10016AC38 /* avrlib */; };
 		33FF07FD0965C3560016AC38 /* targets in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF07D50965C3560016AC38 /* targets */; };
 /* End PBXBuildFile section */
 
@@ -382,7 +381,6 @@
 			dstSubfolderSpec = 16;
 			files = (
 				33FF07FD0965C3560016AC38 /* targets in CopyFiles */,
-				33FF07D30965C2B10016AC38 /* avrlib in CopyFiles */,
 				33FF071F0965C1E30016AC38 /* about.jpg in CopyFiles */,
 				33FF07220965C1E30016AC38 /* buttons.gif in CopyFiles */,
 				33FF07230965C1E30016AC38 /* icon.gif in CopyFiles */,
@@ -474,7 +472,6 @@
 		33FF02B60965BD170016AC38 /* license.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = license.txt; path = ../../license.txt; sourceTree = SOURCE_ROOT; };
 		33FF02B70965BD170016AC38 /* readme.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = readme.txt; path = ../../readme.txt; sourceTree = SOURCE_ROOT; };
 		33FF02DC0965BD170016AC38 /* todo.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = todo.txt; path = ../../todo.txt; sourceTree = SOURCE_ROOT; };
-		33FF07370965C2B10016AC38 /* avrlib */ = {isa = PBXFileReference; lastKnownFileType = folder; path = avrlib; sourceTree = "<group>"; };
 		33FF07D50965C3560016AC38 /* targets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = targets; path = ../../targets; sourceTree = SOURCE_ROOT; };
 		33FFFE240965BD100016AC38 /* Base.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = Base.java; sourceTree = "<group>"; };
 		33FFFE260965BD100016AC38 /* Compiler.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = Compiler.java; sourceTree = "<group>"; };
@@ -618,7 +615,6 @@
 				33AF620D0965D67900B514A9 /* oro.jar */,
 				33AF620E0965D67A00B514A9 /* registry.jar */,
 				33AF620F0965D67A00B514A9 /* RXTXcomm.jar */,
-				33FF07370965C2B10016AC38 /* avrlib */,
 				33FF01DE0965BD160016AC38 /* about.jpg */,
 				33FF02770965BD160016AC38 /* buttons.gif */,
 				33FF02780965BD160016AC38 /* icon.gif */,
