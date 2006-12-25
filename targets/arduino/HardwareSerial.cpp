@@ -54,6 +54,11 @@ int HardwareSerial::read(void)
   return serialRead();
 }
 
+void HardwareSerial::flush()
+{
+  serialFlush();
+}
+
 void HardwareSerial::print(char c)
 {
   printByte(c);

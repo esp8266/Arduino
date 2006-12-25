@@ -38,6 +38,7 @@ class HardwareSerial
     void begin(long);
     uint8_t available(void);
     int read(void);
+    void flush(void);
     void print(char);
     void print(char[]);
     void print(uint8_t);

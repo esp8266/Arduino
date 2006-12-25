@@ -76,6 +76,7 @@ void beginSerial(long);
 void serialWrite(unsigned char);
 int serialAvailable();
 int serialRead();
+void serialFlush();
 void printMode(int);
 void printByte(unsigned char c);
 void printNewline();
