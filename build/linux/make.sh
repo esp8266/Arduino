@@ -104,7 +104,7 @@ echo Building the PDE...
 # show the user an error, rather than crapping out with some strange
 # "class not found" crap
 #jikes -classpath ../build/linux/work/classes:../build/linux/work/lib/antlr.jar:../build/linux/work/lib/oro.jar:../build/linux/work/lib/registry.jar:../build/linux/work/lib/RXTXcomm.jar:../build/linux/work/lib/mrj.jar:$CLASSPATH -d ../build/linux/work/classes tools/*.java preproc/*.java syntax/*.java *.java 
-javac -classpath ../build/linux/work/class:../build/linux/work/lib/antlr.jar:../build/linux/work/lib/oro.jar:../build/linux/work/lib/registry.jar:../build/linux/work/lib/RXTXcomm.jar:../build/linux/work/lib/mrj.jar:$CLASSPATH -d ../build/linux/work/classes tools/*.java preproc/*.java syntax/*java *.java
+javac -source 1.4 -target 1.4 -classpath ../build/linux/work/class:../build/linux/work/lib/antlr.jar:../build/linux/work/lib/oro.jar:../build/linux/work/lib/registry.jar:../build/linux/work/lib/RXTXcomm.jar:../build/linux/work/lib/mrj.jar:$CLASSPATH -d ../build/linux/work/classes tools/*.java preproc/*.java syntax/*java *.java
 
 cd ../build/linux/work/classes
 rm -f ../lib/pde.jar
