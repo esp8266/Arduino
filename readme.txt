@@ -63,6 +63,8 @@ UPDATES
 * Defining binary constants: e.g. B1010 is 6.
 * Mac versions no longer require running of the macosx_setup.command script.
 * Windows version comes with the FTDI USB drivers already unzipped.
+* New Linux binary distribution (still requires some programs to be
+  pre-installed).
 
 0006 - 2006.10.21
 
