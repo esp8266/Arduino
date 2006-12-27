@@ -247,7 +247,6 @@
 		33CF03CE09662DC000F2C9A9 /* antlr.jar in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33AF620A0965D67800B514A9 /* antlr.jar */; settings = {JAVA_ARCHIVE_SUBDIR = ../shared/lib; }; };
 		33CF03CF09662DC000F2C9A9 /* registry.jar in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33AF620E0965D67A00B514A9 /* registry.jar */; settings = {JAVA_ARCHIVE_SUBDIR = ../shared/lib; }; };
 		33CF03D009662DC000F2C9A9 /* oro.jar in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33AF620D0965D67900B514A9 /* oro.jar */; settings = {JAVA_ARCHIVE_SUBDIR = ../shared/lib; }; };
-		33FF07050965BEE60016AC38 /* macosx_setup.command in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FFFEB90965BD110016AC38 /* macosx_setup.command */; };
 		33FF07100965BF8A0016AC38 /* burn.command in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FFFEAF0965BD110016AC38 /* burn.command */; };
 		33FF071F0965C1E30016AC38 /* about.jpg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF01DE0965BD160016AC38 /* about.jpg */; };
 		33FF07220965C1E30016AC38 /* buttons.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02770965BD160016AC38 /* buttons.gif */; };
@@ -407,7 +406,6 @@
 			files = (
 				339514FA097AEB8000193C89 /* license.txt in CopyFiles */,
 				339514FB097AEB8000193C89 /* readme.txt in CopyFiles */,
-				33FF07050965BEE60016AC38 /* macosx_setup.command in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -446,29 +444,6 @@
 		33FF02860965BD160016AC38 /* tab-unsel-menu.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "tab-unsel-menu.gif"; sourceTree = "<group>"; };
 		33FF02870965BD160016AC38 /* tab-unsel-mid.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "tab-unsel-mid.gif"; sourceTree = "<group>"; };
 		33FF02880965BD160016AC38 /* tab-unsel-right.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "tab-unsel-right.gif"; sourceTree = "<group>"; };
-		33FF02900965BD160016AC38 /* .cvsignore */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = .cvsignore; sourceTree = "<group>"; };
-		33FF02920965BD160016AC38 /* avr_tools.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = avr_tools.zip; sourceTree = "<group>"; };
-		33FF02940965BD160016AC38 /* burn.bat */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = burn.bat; sourceTree = "<group>"; };
-		33FF02960965BD160016AC38 /* makefile.w2k */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = makefile.w2k; sourceTree = "<group>"; };
-		33FF02970965BD160016AC38 /* makefile.win */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = makefile.win; sourceTree = "<group>"; };
-		33FF02990965BD160016AC38 /* FTDI USB Drivers.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = "FTDI USB Drivers.zip"; sourceTree = "<group>"; };
-		33FF029B0965BD160016AC38 /* ICE_JNIRegistry.dll */ = {isa = PBXFileReference; lastKnownFileType = file; path = ICE_JNIRegistry.dll; sourceTree = "<group>"; };
-		33FF029C0965BD160016AC38 /* jikes.exe */ = {isa = PBXFileReference; lastKnownFileType = file; path = jikes.exe; sourceTree = "<group>"; };
-		33FF029E0965BD170016AC38 /* makefile.w2k */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = makefile.w2k; sourceTree = "<group>"; };
-		33FF029F0965BD170016AC38 /* makefile.win */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = makefile.win; sourceTree = "<group>"; };
-		33FF02A10965BD170016AC38 /* run.bat */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = run.bat; sourceTree = "<group>"; };
-		33FF02A20965BD170016AC38 /* rxtxSerial.dll */ = {isa = PBXFileReference; lastKnownFileType = file; path = rxtxSerial.dll; sourceTree = "<group>"; };
-		33FF02A40965BD170016AC38 /* dist.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = dist.sh; sourceTree = "<group>"; };
-		33FF02A50965BD170016AC38 /* jre.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; path = jre.zip; sourceTree = "<group>"; };
-		33FF02A70965BD170016AC38 /* .cvsignore */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = .cvsignore; sourceTree = "<group>"; };
-		33FF02A80965BD170016AC38 /* application.ico */ = {isa = PBXFileReference; lastKnownFileType = image.ico; path = application.ico; sourceTree = "<group>"; };
-		33FF02A90965BD170016AC38 /* document.ico */ = {isa = PBXFileReference; lastKnownFileType = image.ico; path = document.ico; sourceTree = "<group>"; };
-		33FF02AA0965BD170016AC38 /* launcher.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = launcher.cpp; sourceTree = "<group>"; };
-		33FF02AB0965BD170016AC38 /* launcher.rc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = launcher.rc; sourceTree = "<group>"; };
-		33FF02AC0965BD170016AC38 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
-		33FF02AE0965BD170016AC38 /* make.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = make.sh; sourceTree = "<group>"; };
-		33FF02AF0965BD170016AC38 /* run.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = run.sh; sourceTree = "<group>"; };
-		33FF02B00965BD170016AC38 /* srun.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = srun.sh; sourceTree = "<group>"; };
 		33FF02B60965BD170016AC38 /* license.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = license.txt; path = ../../license.txt; sourceTree = SOURCE_ROOT; };
 		33FF02B70965BD170016AC38 /* readme.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = readme.txt; path = ../../readme.txt; sourceTree = SOURCE_ROOT; };
 		33FF02DC0965BD170016AC38 /* todo.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = todo.txt; path = ../../todo.txt; sourceTree = SOURCE_ROOT; };
@@ -553,24 +528,11 @@
 		33FFFE790965BD110016AC38 /* ATmegaBOOT.hex */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = ATmegaBOOT.hex; sourceTree = "<group>"; };
 		33FFFE7F0965BD110016AC38 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		33FFFE810965BD110016AC38 /* howto.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = howto.txt; sourceTree = "<group>"; };
-		33FFFE830965BD110016AC38 /* .cvsignore */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = .cvsignore; sourceTree = "<group>"; };
-		33FFFE850965BD110016AC38 /* .cvsignore */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = .cvsignore; sourceTree = "<group>"; };
-		33FFFE860965BD110016AC38 /* arduino */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = arduino; sourceTree = "<group>"; };
-		33FFFE880965BD110016AC38 /* burn */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = burn; sourceTree = "<group>"; };
-		33FFFE8A0965BD110016AC38 /* librxtxI2C.so */ = {isa = PBXFileReference; lastKnownFileType = file; path = librxtxI2C.so; sourceTree = "<group>"; };
-		33FFFE8B0965BD110016AC38 /* librxtxParallel.so */ = {isa = PBXFileReference; lastKnownFileType = file; path = librxtxParallel.so; sourceTree = "<group>"; };
-		33FFFE8C0965BD110016AC38 /* librxtxRaw.so */ = {isa = PBXFileReference; lastKnownFileType = file; path = librxtxRaw.so; sourceTree = "<group>"; };
-		33FFFE8D0965BD110016AC38 /* librxtxRS485.so */ = {isa = PBXFileReference; lastKnownFileType = file; path = librxtxRS485.so; sourceTree = "<group>"; };
-		33FFFE8E0965BD110016AC38 /* librxtxSerial.so */ = {isa = PBXFileReference; lastKnownFileType = file; path = librxtxSerial.so; sourceTree = "<group>"; };
-		33FFFE8F0965BD110016AC38 /* dist.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = dist.sh; sourceTree = "<group>"; };
-		33FFFE900965BD110016AC38 /* make.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = make.sh; sourceTree = "<group>"; };
-		33FFFE910965BD110016AC38 /* run.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = run.sh; sourceTree = "<group>"; };
 		33FFFE930965BD110016AC38 /* .cvsignore */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = .cvsignore; sourceTree = "<group>"; };
 		33FFFE940965BD110016AC38 /* Arduino.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Arduino.xcodeproj; sourceTree = "<group>"; };
 		33FFFEAF0965BD110016AC38 /* burn.command */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = burn.command; sourceTree = "<group>"; };
 		33FFFEB50965BD110016AC38 /* DS_Store */ = {isa = PBXFileReference; lastKnownFileType = file; path = DS_Store; sourceTree = "<group>"; };
 		33FFFEB60965BD110016AC38 /* jikes */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = jikes; sourceTree = "<group>"; };
-		33FFFEB90965BD110016AC38 /* macosx_setup.command */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = macosx_setup.command; sourceTree = "<group>"; };
 		33FFFEBD0965BD110016AC38 /* dist.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = dist.sh; sourceTree = "<group>"; };
 		33FFFEBE0965BD110016AC38 /* make.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = make.sh; sourceTree = "<group>"; };
 		33FFFEBF0965BD110016AC38 /* mkdmg */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = mkdmg; sourceTree = "<group>"; };
@@ -655,100 +617,6 @@
 			children = (
 			);
 			path = examples;
-			sourceTree = "<group>";
-		};
-		33FF028F0965BD160016AC38 /* windows */ = {
-			isa = PBXGroup;
-			children = (
-				33FF02900965BD160016AC38 /* .cvsignore */,
-				33FF02910965BD160016AC38 /* dist */,
-				33FF02A40965BD170016AC38 /* dist.sh */,
-				33FF02A50965BD170016AC38 /* jre.zip */,
-				33FF02A60965BD170016AC38 /* launcher */,
-				33FF02AE0965BD170016AC38 /* make.sh */,
-				33FF02AF0965BD170016AC38 /* run.sh */,
-				33FF02B00965BD170016AC38 /* srun.sh */,
-			);
-			path = windows;
-			sourceTree = "<group>";
-		};
-		33FF02910965BD160016AC38 /* dist */ = {
-			isa = PBXGroup;
-			children = (
-				33FF02920965BD160016AC38 /* avr_tools.zip */,
-				33FF02930965BD160016AC38 /* bootloader */,
-				33FF02950965BD160016AC38 /* core */,
-				33FF02980965BD160016AC38 /* drivers */,
-				33FF029B0965BD160016AC38 /* ICE_JNIRegistry.dll */,
-				33FF029C0965BD160016AC38 /* jikes.exe */,
-				33FF029D0965BD160016AC38 /* lib */,
-				33FF02A10965BD170016AC38 /* run.bat */,
-				33FF02A20965BD170016AC38 /* rxtxSerial.dll */,
-				33FF02A30965BD170016AC38 /* serial */,
-			);
-			path = dist;
-			sourceTree = "<group>";
-		};
-		33FF02930965BD160016AC38 /* bootloader */ = {
-			isa = PBXGroup;
-			children = (
-				33FF02940965BD160016AC38 /* burn.bat */,
-			);
-			path = bootloader;
-			sourceTree = "<group>";
-		};
-		33FF02950965BD160016AC38 /* core */ = {
-			isa = PBXGroup;
-			children = (
-				33FF02960965BD160016AC38 /* makefile.w2k */,
-				33FF02970965BD160016AC38 /* makefile.win */,
-			);
-			path = core;
-			sourceTree = "<group>";
-		};
-		33FF02980965BD160016AC38 /* drivers */ = {
-			isa = PBXGroup;
-			children = (
-				33FF02990965BD160016AC38 /* FTDI USB Drivers.zip */,
-			);
-			path = drivers;
-			sourceTree = "<group>";
-		};
-		33FF029D0965BD160016AC38 /* lib */ = {
-			isa = PBXGroup;
-			children = (
-				33FF029E0965BD170016AC38 /* makefile.w2k */,
-				33FF029F0965BD170016AC38 /* makefile.win */,
-			);
-			path = lib;
-			sourceTree = "<group>";
-		};
-		33FF02A30965BD170016AC38 /* serial */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = serial;
-			sourceTree = "<group>";
-		};
-		33FF02A60965BD170016AC38 /* launcher */ = {
-			isa = PBXGroup;
-			children = (
-				33FF02A70965BD170016AC38 /* .cvsignore */,
-				33FF02A80965BD170016AC38 /* application.ico */,
-				33FF02A90965BD170016AC38 /* document.ico */,
-				33FF02AA0965BD170016AC38 /* launcher.cpp */,
-				33FF02AB0965BD170016AC38 /* launcher.rc */,
-				33FF02AC0965BD170016AC38 /* Makefile */,
-				33FF02AD0965BD170016AC38 /* res */,
-			);
-			path = launcher;
-			sourceTree = "<group>";
-		};
-		33FF02AD0965BD170016AC38 /* res */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = res;
 			sourceTree = "<group>";
 		};
 		33FFFD3D0965B1E40016AC38 = {
@@ -903,57 +771,12 @@
 			children = (
 				337CD3F309EFC183002B890C /* fetch.sh */,
 				33FFFE810965BD110016AC38 /* howto.txt */,
-				33FFFE820965BD110016AC38 /* linux */,
 				33FFFE920965BD110016AC38 /* macosx */,
 				33FF01DA0965BD160016AC38 /* shared */,
-				33FF028F0965BD160016AC38 /* windows */,
 			);
 			name = build;
 			path = ..;
 			sourceTree = SOURCE_ROOT;
-		};
-		33FFFE820965BD110016AC38 /* linux */ = {
-			isa = PBXGroup;
-			children = (
-				33FFFE830965BD110016AC38 /* .cvsignore */,
-				33FFFE840965BD110016AC38 /* dist */,
-				33FFFE8F0965BD110016AC38 /* dist.sh */,
-				33FFFE900965BD110016AC38 /* make.sh */,
-				33FFFE910965BD110016AC38 /* run.sh */,
-			);
-			path = linux;
-			sourceTree = "<group>";
-		};
-		33FFFE840965BD110016AC38 /* dist */ = {
-			isa = PBXGroup;
-			children = (
-				33FFFE850965BD110016AC38 /* .cvsignore */,
-				33FFFE860965BD110016AC38 /* arduino */,
-				33FFFE870965BD110016AC38 /* bootloader */,
-				33FFFE890965BD110016AC38 /* lib */,
-			);
-			path = dist;
-			sourceTree = "<group>";
-		};
-		33FFFE870965BD110016AC38 /* bootloader */ = {
-			isa = PBXGroup;
-			children = (
-				33FFFE880965BD110016AC38 /* burn */,
-			);
-			path = bootloader;
-			sourceTree = "<group>";
-		};
-		33FFFE890965BD110016AC38 /* lib */ = {
-			isa = PBXGroup;
-			children = (
-				33FFFE8A0965BD110016AC38 /* librxtxI2C.so */,
-				33FFFE8B0965BD110016AC38 /* librxtxParallel.so */,
-				33FFFE8C0965BD110016AC38 /* librxtxRaw.so */,
-				33FFFE8D0965BD110016AC38 /* librxtxRS485.so */,
-				33FFFE8E0965BD110016AC38 /* librxtxSerial.so */,
-			);
-			path = lib;
-			sourceTree = "<group>";
 		};
 		33FFFE920965BD110016AC38 /* macosx */ = {
 			isa = PBXGroup;
@@ -983,7 +806,6 @@
 				33FFFEB20965BD110016AC38 /* drivers */,
 				33FFFEB50965BD110016AC38 /* DS_Store */,
 				33FFFEB60965BD110016AC38 /* jikes */,
-				33FFFEB90965BD110016AC38 /* macosx_setup.command */,
 			);
 			path = dist;
 			sourceTree = "<group>";
