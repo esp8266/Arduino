@@ -53,7 +53,7 @@ import com.ice.jni.registry.*;
  */
 public class Base {
   static final int VERSION = 3;
-  static final String VERSION_NAME = "0007 Alpha";
+  static final String VERSION_NAME = "0008 Alpha";
   
   // platform IDs for PApplet.platform
 
