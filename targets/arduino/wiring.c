@@ -291,7 +291,7 @@ void serialWrite(unsigned char c)
 
 int serialAvailable()
 {
-	return (rx_buffer_head - rx_buffer_tail) % RX_BUFFER_SIZE;
+	return (RX_BUFFER_SIZE + rx_buffer_head - rx_buffer_tail) % RX_BUFFER_SIZE;
 }
 
 int serialRead()
