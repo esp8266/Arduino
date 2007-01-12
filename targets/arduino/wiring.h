@@ -66,6 +66,8 @@ extern "C"{
 typedef uint8_t boolean;
 typedef uint8_t byte;
 
+void init(void);
+
 void pinMode(int, int);
 void digitalWrite(int, int);
 int digitalRead(int);
@@ -74,9 +76,9 @@ void analogWrite(int, int);
 
 void beginSerial(long);
 void serialWrite(unsigned char);
-int serialAvailable();
-int serialRead();
-void serialFlush();
+int serialAvailable(void);
+int serialRead(void);
+void serialFlush(void);
 void printMode(int);
 void printByte(unsigned char c);
 void printNewline();

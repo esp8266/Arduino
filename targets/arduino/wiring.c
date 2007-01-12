@@ -549,7 +549,7 @@ void shiftOut(int dataPin, int clockPin, int bitOrder, byte val) {
 	}
 }
 
-int main(void)
+void init()
 {
 	// this needs to be called before setup() or some functions won't
 	// work there
@@ -626,11 +626,4 @@ int main(void)
 #else
 	UCSRB = 0;
 #endif
-
-	setup();
-	
-	for (;;)
-		loop();
-		
-	return 0;
 }

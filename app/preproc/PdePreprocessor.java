@@ -104,7 +104,8 @@ public class PdePreprocessor {
   //public String write(String program, String buildPath, String name,
   //                  String extraImports[]) throws java.lang.Exception {
   public String write(String program, String buildPath,
-                      String name, String codeFolderPackages[])
+                      String name, String codeFolderPackages[],
+		      Target target)
     throws java.lang.Exception {
     // if the program ends with no CR or LF an OutOfMemoryError will happen.
     // not gonna track down the bug now, so here's a hack for it:
@@ -344,7 +345,7 @@ public class PdePreprocessor {
     //emitter.print(rootNode);
     //emitter.translationUnit(parser.getAST());
 
-    writeFooter(stream);
+    writeFooter(stream, target);
     stream.close();
 
     // if desired, serialize the parse tree to an XML file.  can
@@ -457,20 +458,23 @@ public class PdePreprocessor {
    *
    * @param out         PrintStream to write it to.
    */
-  void writeFooter(PrintStream out) {
-    //out.print("}");
+  void writeFooter(PrintStream out, Target target) throws java.lang.Exception {
+    // Open the file main.cxx and copy its entire contents to the bottom of the
+    // generated sketch .cpp file...
 
-/*    if (programType == STATIC) {
-      // close off draw() definition
-      out.print("noLoop(); ");
-      out.print("}");
+    String mainFileName = target.getPath() + File.separator + "main.cxx";
+    FileReader reader = null;
+    reader = new FileReader(mainFileName);
+
+    LineNumberReader mainfile = new LineNumberReader(reader);
+
+    String line;
+    while ((line = mainfile.readLine()) != null) {
+        out.print(line + "\n");
     }
 
-    if (programType < JAVA) {
-      // close off the class definition
-      out.print("}");
-    }
-*/  }
+    mainfile.close();
+  }
 
 
   static String advClassName = "";
