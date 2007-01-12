@@ -325,161 +325,39 @@ public class Compiler implements MessageConsumer {
         baseCommandCompiler[baseCommandCompiler.length - 2] = sourceNames[i];
         baseCommandCompiler[baseCommandCompiler.length - 1] = "-o"+ objectNames[i];
         //System.arraycopy(baseCommandCompiler.length
-        if (Preferences.getBoolean("build.verbose")) {
-          for(int j = 0; j < baseCommandCompiler.length; j++) {
-            System.out.print(baseCommandCompiler[j] + " ");
-          }
-          System.out.println();
-        }
-        process = Runtime.getRuntime().exec(baseCommandCompiler);
-        new MessageSiphon(process.getInputStream(), this);
-        new MessageSiphon(process.getErrorStream(), this);
-
-        // wait for the process to finish.  if interrupted
-        // before waitFor returns, continue waiting
-        //
-        compiling = true;
-        while (compiling) {
-          try {
-            result = process.waitFor();
-            //System.out.println("result is " + result);
-            compiling = false;
-          } catch (InterruptedException ignored) { }
-        }
-        if (exception != null)  {
-          exception.hideStackTrace = true;
-          throw exception;
-        }
-        if(result!=0)
+        result = execAsynchronously(baseCommandCompiler);
+        if (result!=0)
           return false;
       }
 
       for(int i = 0; i < fileCountCPP; i++) {
         baseCommandCompilerCPP[baseCommandCompilerCPP.length - 2] = sourceNamesCPP[i];
         baseCommandCompilerCPP[baseCommandCompilerCPP.length - 1] = "-o"+ objectNamesCPP[i];
-        if (Preferences.getBoolean("build.verbose")) {
-          for(int j = 0; j < baseCommandCompilerCPP.length; j++) {
-            System.out.print(baseCommandCompilerCPP[j] + " ");
-          }
-          System.out.println();
-        }
-        process = Runtime.getRuntime().exec(baseCommandCompilerCPP);
-        new MessageSiphon(process.getInputStream(), this);
-        new MessageSiphon(process.getErrorStream(), this);
-
-        // wait for the process to finish.  if interrupted
-        // before waitFor returns, continue waiting
-        //
-        compiling = true;
-        while (compiling) {
-          try {
-            result = process.waitFor();
-            //System.out.println("result is " + result);
-            compiling = false;
-          } catch (InterruptedException ignored) { }
-        }
-        if (exception != null)  {
-          exception.hideStackTrace = true;
-          throw exception;
-        }
-        if(result!=0)
+        result = execAsynchronously(baseCommandCompilerCPP);
+        if (result!=0)
           return false;
       }
 
 
-      if (Preferences.getBoolean("build.verbose")) {
-        for(int j = 0; j < commandLinker.length; j++) {
-          System.out.print(commandLinker[j] + " ");
-        }
-        System.out.println();
-      }
-      process = Runtime.getRuntime().exec(commandLinker);
-      new MessageSiphon(process.getInputStream(), this);
-      new MessageSiphon(process.getErrorStream(), this);
-      compiling = true;
-      while(compiling) {
-        try {
-          result = process.waitFor();
-          compiling = false;
-        } catch (InterruptedException intExc) { }
-      }
-      if (exception != null) {
-        exception.hideStackTrace = true;
-        throw exception;
-      }
-      if(result!=0)
+      result = execAsynchronously(commandLinker);
+      if (result!=0)
         return false;
 
       baseCommandObjcopy[2] = "srec";
       baseCommandObjcopy[4] = ".eeprom";
       baseCommandObjcopy[5] = buildPath + File.separator + sketch.name + ".elf";
       baseCommandObjcopy[6] = buildPath + File.separator + sketch.name + ".rom";
-      if (Preferences.getBoolean("build.verbose")) {
-        for(int j = 0; j < baseCommandObjcopy.length; j++) {
-          System.out.print(baseCommandObjcopy[j] + " ");
-        }
-        System.out.println();
-      }
-      process = Runtime.getRuntime().exec(baseCommandObjcopy);
-      new MessageSiphon(process.getInputStream(), this);
-      new MessageSiphon(process.getErrorStream(), this);
-      compiling = true;
-      while(compiling) {
-        try {
-          result = process.waitFor();
-          compiling = false;
-        } catch (InterruptedException intExc) { }
-      }
-      if (exception != null) {
-        exception.hideStackTrace = true;
-        throw exception;
-      }
-      if(result!=0)
+      result = execAsynchronously(baseCommandObjcopy);
+      if (result!=0)
         return false;
 
       baseCommandObjcopy[2] = "ihex";
       baseCommandObjcopy[4] = ".flash";
       baseCommandObjcopy[5] = buildPath + File.separator + sketch.name + ".elf";
       baseCommandObjcopy[6] = buildPath + File.separator + sketch.name + ".hex";
-      if (Preferences.getBoolean("build.verbose")) {
-        for(int j = 0; j < baseCommandObjcopy.length; j++) {
-          System.out.print(baseCommandObjcopy[j] + " ");
-        }
-        System.out.println();
-      }
-      process = Runtime.getRuntime().exec(baseCommandObjcopy);
-      new MessageSiphon(process.getInputStream(), this);
-      new MessageSiphon(process.getErrorStream(), this);
-      compiling = true;
-      while(compiling) {
-        try {
-          result = process.waitFor();
-          compiling = false;
-        } catch (InterruptedException intExc) { }
-      }
-      if (exception != null) {
-        exception.hideStackTrace = true;
-        throw exception;
-      }
-      if(result!=0)
+      result = execAsynchronously(baseCommandObjcopy);
+      if (result!=0)
         return false;
-
-      /*Process process = Runtime.getRuntime().exec(command);
-      new MessageSiphon(process.getInputStream(), this);
-      new MessageSiphon(process.getErrorStream(), this);
-
-      // wait for the process to finish.  if interrupted
-      // before waitFor returns, continue waiting
-      //
-      boolean compiling = true;
-      while (compiling) {
-        try {
-          result = process.waitFor();
-          //System.out.println("result is " + result);
-          compiling = false;
-        } catch (InterruptedException ignored) { }
-      }*/
-
     } catch (Exception e) {
       String msg = e.getMessage();
       if ((msg != null) && (msg.indexOf("avr-gcc: not found") != -1)) {
@@ -516,6 +394,41 @@ public class Compiler implements MessageConsumer {
 
     // success would mean that 'result' is set to zero
     return (result == 0); // ? true : false;
+  }
+  
+  public int execAsynchronously(String[] command)
+    throws RunnerException, IOException {
+    int result = 0;
+    
+    if (Preferences.getBoolean("build.verbose")) {
+      for(int j = 0; j < command.length; j++) {
+        System.out.print(command[j] + " ");
+      }
+      System.out.println();
+    }
+
+    Process process = Runtime.getRuntime().exec(command);
+    
+    new MessageSiphon(process.getInputStream(), this);
+    new MessageSiphon(process.getErrorStream(), this);
+
+    // wait for the process to finish.  if interrupted
+    // before waitFor returns, continue waiting
+    boolean compiling = true;
+    while (compiling) {
+      try {
+        result = process.waitFor();
+        //System.out.println("result is " + result);
+        compiling = false;
+      } catch (InterruptedException ignored) { }
+    }
+    
+    if (exception != null)  {
+      exception.hideStackTrace = true;
+      throw exception;
+    }
+    
+    return result;
   }
 
 
