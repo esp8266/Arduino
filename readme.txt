@@ -46,6 +46,12 @@ from Processing and Wiring.
 
 UPDATES
 
+0008
+* Added an EEPROM library.
+* Patched to reduce binary sketch sizes by building the Arduino core as
+  a library (.a) file.  Originally written by Nicolas Roland, revised by
+  Don Cross.
+
 0007 - 2006.12.25
 
 * Smaller core (about 3.5 KB instead of 4.5 KB).
