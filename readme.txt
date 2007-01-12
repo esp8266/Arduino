@@ -51,6 +51,7 @@ UPDATES
 * Patched to reduce binary sketch sizes by building the Arduino core as
   a library (.a) file.  Originally written by Nicolas Roland, revised by
   Don Cross.
+* Fixed bug in Serial.available().  Report and fix by Don Cross.
 
 0007 - 2006.12.25
 
