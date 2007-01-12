@@ -242,13 +242,14 @@ public class Compiler implements MessageConsumer {
     int sketchCount = 0;
     for (int i = 0; i < sketch.codeCount; i++) {
       if (sketch.code[i].preprocName != null) {
-        sketchObjectNames[sketchCount++] = buildPath + File.separator + sketch.code[i].preprocName + ".o";
         if (sketch.code[i].preprocName.endsWith(".c")) {
           sourceNames[fileCount] = buildPath + File.separator + sketch.code[i].preprocName;
           objectNames[fileCount++] = buildPath + File.separator + sketch.code[i].preprocName + ".o";
+          sketchObjectNames[sketchCount++] = buildPath + File.separator + sketch.code[i].preprocName + ".o";
         } else if (sketch.code[i].preprocName.endsWith(".cpp")) {
           sourceNamesCPP[fileCountCPP] = buildPath + File.separator + sketch.code[i].preprocName;
           objectNamesCPP[fileCountCPP++] = buildPath + File.separator + sketch.code[i].preprocName + ".o";
+          sketchObjectNames[sketchCount++] = buildPath + File.separator + sketch.code[i].preprocName + ".o";
         } 
       }
     }
