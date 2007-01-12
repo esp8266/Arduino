@@ -2,7 +2,9 @@
 
 /*
   Compiler - default compiler class that connects to avr-gcc 
-  Part of the Arduino project - http://arduino.berlios.de/
+  Part of the Arduino project - http://www.arduino.cc/
+
+  Modified by David A. Mellis
 
   Copyright (c) 2004-05 Hernando Barragan
 
@@ -147,6 +149,15 @@ public class Compiler implements MessageConsumer {
       "-o",
       " ",
     };
+    
+    String runtimeLibraryName = buildPath + File.separator + "core.a";
+
+    String baseCommandAR[] = new String[] {
+      avrBasePath + "avr-ar",
+      "rcs",
+      runtimeLibraryName,
+      " "
+    };
 
     // use lib object files during include
     //String[] libObjectFiles = libraryManager.getObjectFiles();
@@ -223,10 +234,15 @@ public class Compiler implements MessageConsumer {
     String sourceNamesCPP[] = new String[sketch.codeCount + target.getSourceFilenames().size()];
     String objectNames[] = new String[sketch.codeCount + target.getSourceFilenames().size()];
     String objectNamesCPP[] = new String[sketch.codeCount + target.getSourceFilenames().size()];
+    String targetObjectNames[] = new String[target.getSourceFilenames().size()];
+    String sketchObjectNames[] = new String[sketch.codeCount];
     int fileCount = 0;
     int fileCountCPP = 0;
+    int targetCount = 0;
+    int sketchCount = 0;
     for (int i = 0; i < sketch.codeCount; i++) {
       if (sketch.code[i].preprocName != null) {
+        sketchObjectNames[sketchCount++] = buildPath + File.separator + sketch.code[i].preprocName + ".o";
         if (sketch.code[i].preprocName.endsWith(".c")) {
           sourceNames[fileCount] = buildPath + File.separator + sketch.code[i].preprocName;
           objectNames[fileCount++] = buildPath + File.separator + sketch.code[i].preprocName + ".o";
@@ -239,6 +255,7 @@ public class Compiler implements MessageConsumer {
     for (Iterator iter = target.getSourceFilenames().iterator(); iter.hasNext(); ) {
       String filename = (String) iter.next();
       if (filename != null) {
+        targetObjectNames[targetCount++] = buildPath + File.separator + filename + ".o";
         if (filename.endsWith(".c")) {
           sourceNames[fileCount] = target.getPath() + File.separator + filename;
           objectNames[fileCount++] = buildPath + File.separator + filename + ".o";
@@ -273,19 +290,15 @@ public class Compiler implements MessageConsumer {
        + File.separator + sketch.name + ".map,--cref";
     baseCommandLinker[4] = ((!Base.isMacOS()) ? buildPath 
       : buildPath) + File.separator + sketch.name + ".elf";
-    String commandLinker[] = new String[baseCommandLinker.length + fileCount +
-      fileCountCPP + target.getObjectFilenames().size()];
+    String commandLinker[] = new String[baseCommandLinker.length + sketchCount + 2];
     System.arraycopy(baseCommandLinker, 0, commandLinker, 0, baseCommandLinker.length);
     int idx = 0;
-    for(int i = 0; i < fileCount; i++, idx++) {
-      commandLinker[baseCommandLinker.length + idx] = objectNames[i];
+    for(int i = 0; i < sketchCount; i++, idx++) {
+      commandLinker[baseCommandLinker.length + idx] = sketchObjectNames[i];
     }
-    for(int i = 0; i < fileCountCPP; i++, idx++) {
-      commandLinker[baseCommandLinker.length + idx] = objectNamesCPP[i];
-    }
-    for(Iterator iter = target.getObjectFilenames().iterator(); iter.hasNext(); idx++) {
-      commandLinker[baseCommandLinker.length + idx] = target.getPath() + File.separator + iter.next(); //already ends in ".o"
-    }
+
+    commandLinker[baseCommandLinker.length + idx++] = runtimeLibraryName;
+    commandLinker[baseCommandLinker.length + idx] = "-L" + buildPath;
       
     /*String command[] = new String[baseCommand.length + preprocCount];
     System.arraycopy(baseCommand, 0, command, 0, baseCommand.length);
@@ -338,6 +351,12 @@ public class Compiler implements MessageConsumer {
           return false;
       }
 
+      for(int i = 0; i < targetCount; i++) {
+        baseCommandAR[baseCommandAR.length - 1] = targetObjectNames[i];
+        result = execAsynchronously(baseCommandAR);
+        if(result!=0)
+          return false;
+      }
 
       result = execAsynchronously(commandLinker);
       if (result!=0)
