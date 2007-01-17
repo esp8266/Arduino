@@ -50,7 +50,12 @@
 
 #define NUM_DIGITAL_PINS 14
 #define NUM_ANALOG_OUT_PINS 11
+#if defined(__AVR_ATmega168__)
+#define NUM_ANALOG_IN_PINS 8
+#else
 #define NUM_ANALOG_IN_PINS 6
+#endif
+
 #define NUM_PORTS 4
 
 #define PB 2
