@@ -769,7 +769,7 @@ static void prf(const uint8_t *sec, int sec_len, uint8_t *seed, int seed_len,
     len = sec_len/2;
     S1 = sec;
     S2 = &sec[len];
-    len += (sec_len&1); /* add for odd, make longer */
+    len += (sec_len & 1); /* add for odd, make longer */
 
     p_hash_md5(S1, len, seed, seed_len, xbuf, olen);
     p_hash_sha1(S2, len, seed, seed_len, ybuf, olen);
@@ -842,6 +842,7 @@ void finished_digest(SSL *ssl, const char *label, uint8_t *digest)
     {
         memcpy(digest, mac_buf, MD5_SIZE + SHA1_SIZE);
     }
+
 #if 0
     printf("label: %s\n", label);
     print_blob("master secret", ssl->master_secret, 48);
@@ -1121,9 +1122,11 @@ int basic_read(SSL *ssl, uint8_t **in_data)
 {
     int ret = SSL_OK;
     int read_len, is_record;
-    uint8_t *buf = ssl->bm_buf.data;
     int is_client = IS_SET_SSL_FLAG(SSL_IS_CLIENT);
+    uint8_t *buf;
 
+    buf_grow(&ssl->bm_buf, ssl->need_bytes);
+    buf = ssl->bm_buf.data;
     read_len = SOCKET_READ(ssl->client_fd, &buf[ssl->bm_buf.index], 
                             ssl->need_bytes-ssl->got_bytes);
 

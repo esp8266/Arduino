@@ -285,7 +285,7 @@ bigint *bi_add(BI_CTX *ctx, bigint *bia, bigint *bib)
  * @param bia [in]  A bigint.
  * @param bib [in]  Another bigint.
  * @param is_negative [out] If defined, indicates that the result was negative.
- * is_negative may be NULL.
+ * is_negative may be null.
  * @return The result of the subtraction. The result is always positive.
  */
 bigint *bi_subtract(BI_CTX *ctx, 
@@ -1059,7 +1059,7 @@ static bigint *alloc(BI_CTX *ctx, int size)
 #ifdef CONFIG_SSL_FULL_MODE
             printf("alloc: refs was not 0\n");
 #endif
-            abort();
+            abort();    /* create a stack trace from a core dump */
         }
 
         more_comps(biR, size);
@@ -1220,7 +1220,7 @@ static bigint *comp_mod(bigint *bi, int mod)
 /*
  * Barrett reduction has no need for some parts of the product, so ignore bits
  * of the multiply. This routine gives Barrett its big performance
- * improvements over classical/Montgomery reduction methods. 
+ * improvements over Classical/Montgomery reduction methods. 
  */
 static bigint *partial_multiply(BI_CTX *ctx, bigint *bia, bigint *bib, 
         int inner_partial, int outer_partial)
@@ -1293,10 +1293,10 @@ static bigint *partial_multiply(BI_CTX *ctx, bigint *bia, bigint *bib,
 }
 
 /**
- * @brief Perform a single barrett reduction.
+ * @brief Perform a single Barrett reduction.
  * @param ctx [in]  The bigint session context.
  * @param bi [in]  A bigint.
- * @return The result of the barrett reduction.
+ * @return The result of the Barrett reduction.
  */
 bigint *bi_barrett(BI_CTX *ctx, bigint *bi)
 {
@@ -1308,7 +1308,7 @@ bigint *bi_barrett(BI_CTX *ctx, bigint *bi)
     check(bi);
     check(bim);
 
-    /* use classical method instead  - Barrett cannot help here */
+    /* use Classical method instead  - Barrett cannot help here */
     if (bi->size > k*2)
     {
         return bi_mod(ctx, bi);

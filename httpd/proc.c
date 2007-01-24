@@ -1,5 +1,5 @@
 /*
- *  Copyright(C) 2006 Cameron Rich
+ *  Copyright(C) 2007 Cameron Rich
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@
 static int special_read(struct connstruct *cn, void *buf, size_t count);
 static int special_write(struct connstruct *cn, 
                                         const uint8_t *buf, size_t count);
-static void send301(struct connstruct *cn);
 static void send404(struct connstruct *cn);
 static int procindex(struct connstruct *cn, struct stat *stp);
 static int hexit(char c);
@@ -41,7 +40,6 @@ static int sanitizehost(char *buf);
 #if defined(CONFIG_HTTP_DIRECTORIES)
 static void urlencode(const uint8_t *s, uint8_t *t);
 static void procdirlisting(struct connstruct *cn);
-static int issockwriteable(int sd);
 #endif
 #if defined(CONFIG_HTTP_HAS_CGI)
 static void proccgi(struct connstruct *cn, int has_pathinfo);
@@ -81,6 +79,8 @@ static int procheadelem(struct connstruct *cn, char *buf)
 
         if (sanitizefile(value) == 0) 
         {
+printf("#3\n");
+TTY_FLUSH();
             send404(cn);
             removeconnection(cn);
             return 0;
@@ -96,7 +96,7 @@ static int procheadelem(struct connstruct *cn, char *buf)
 #endif
 
     } 
-    else if (strcmp(buf, "Host:")==0) 
+    else if (strcmp(buf, "Host:") == 0) 
     {
         if (sanitizehost(value) == 0) 
         {
@@ -107,12 +107,11 @@ static int procheadelem(struct connstruct *cn, char *buf)
 
         my_strncpy(cn->virtualhostreq, value, MAXREQUESTLENGTH);
     } 
-    else if (strcmp(buf, "Connection:")==0 &&
-            strcmp(value, "close")==0) 
+    else if (strcmp(buf, "Connection:") == 0 && strcmp(value, "close") == 0) 
     {
         cn->close_when_done = 1;
     } 
-    else if (strcmp(buf, "If-Modified-Since:") ==0 ) 
+    else if (strcmp(buf, "If-Modified-Since:") == 0) 
     {
         /* TODO: parse this date properly with getdate() or similar */
         cn->modified_since = 1;
@@ -161,8 +160,8 @@ static void procdirlisting(struct connstruct *cn)
 #endif
 
     snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nContent-Type: text/html\n\n"
-            "<HTML><BODY>\n<TITLE>Directory Listing</TITLE>\n"
-            "<H2>Directory listing of %s://%s%s</H2><BR>\n", 
+            "<html><body>\n<title>Directory Listing</title>\n"
+            "<h3>Directory listing of %s://%s%s</h3><br />\n", 
             cn->is_ssl ? "https" : "http", cn->virtualhostreq, cn->filereq);
     special_write(cn, buf, strlen(buf));
     cn->state = STATE_DOING_DIR;
@@ -175,18 +174,19 @@ void procdodir(struct connstruct *cn)
 #endif
     char buf[MAXREQUESTLENGTH];
     char encbuf[1024];
-    int putslash;
     char *file;
 
     do 
     {
+       buf[0] = 0;
+
 #ifdef WIN32
         if (!FindNextFile(cn->dirp, &cn->file_data)) 
 #else
         if ((dp = readdir(cn->dirp)) == NULL)  
 #endif
         {
-            snprintf(buf, sizeof(buf), "</BODY></HTML>\n");
+            snprintf(buf, sizeof(buf), "</body></html>\n");
             special_write(cn, buf, strlen(buf));
             removeconnection(cn);
             return;
@@ -198,31 +198,23 @@ void procdodir(struct connstruct *cn)
         file = dp->d_name;
 #endif
 
+        // if no index file, don't display the ".." directory
         if (cn->filereq[0] == '/' && cn->filereq[1] == '\0' &&
-                strcmp(file, "..") == 0) continue;
+                strcmp(file, "..") == 0) 
+            continue;
+
+        // don't display files beginning with "."
+        if (file[0] == '.' && file[1] != '.')
+            continue;
 
         snprintf(buf, sizeof(buf), "%s%s", cn->actualfile, file);
-        putslash = isdir(buf);
+        if (isdir(buf))
+            strcat(file, "/");
         urlencode(file, encbuf);
-        snprintf(buf, sizeof(buf), "<A HREF=\"%s%s\">%s%s</A><BR>\n",
-                encbuf, putslash ? "/" : "", file, putslash ? "/" : "");
-        special_write(cn, buf, strlen(buf));
-    } while (issockwriteable(cn->networkdesc));
-}
 
-static int issockwriteable(int sd)
-{
-    fd_set wfds;
-    struct timeval tv;
-
-    tv.tv_sec = 0;
-    tv.tv_usec = 0;
-
-    FD_ZERO(&wfds);
-    FD_SET(sd, &wfds);
-
-    select(FD_SETSIZE, NULL, &wfds, NULL, &tv);
-    return FD_ISSET(sd, &wfds);
+        snprintf(buf, sizeof(buf), "<a href=\"%s%s\">%s</a><br />\n",
+                cn->filereq, encbuf, file);
+    } while (special_write(cn, buf, strlen(buf)));
 }
 
 /* Encode funny chars -> %xx in newly allocated storage */
@@ -358,13 +350,6 @@ void procsendhead(struct connstruct *cn)
 
     if ((stbuf.st_mode & S_IFMT) == S_IFDIR) 
     {
-        if (cn->filereq[strlen(cn->filereq)-1] != '/') 
-        {
-            send301(cn);
-            removeconnection(cn);
-            return;
-        }
-
         // Check to see if this dir has an index file
         if (procindex(cn, &stbuf) == 0) 
         {
@@ -394,11 +379,11 @@ void procsendhead(struct connstruct *cn)
             return;
         }
 #endif
-        // If the index isn't a CGI, we continue on with the index file
     }
 
     if (cn->modified_since) 
     {
+        // file has already been read before
         snprintf(buf, sizeof(buf), "HTTP/1.1 304 Not Modified\nServer: "
                 "axhttpd V%s\nDate: %s\n", VERSION, date);
         special_write(cn, buf, strlen(buf));
@@ -406,20 +391,18 @@ void procsendhead(struct connstruct *cn)
         cn->state = STATE_WANT_TO_READ_HEAD;
         return;
     }
-    else 
-    {
+
 #ifdef CONFIG_HTTP_VERBOSE
-        printf("axhttpd: %s send %s\n", 
-                cn->is_ssl ? "https" : "http", cn->actualfile);
-        TTY_FLUSH();
+    printf("axhttpd: %s send %s\n", 
+            cn->is_ssl ? "https" : "http", cn->actualfile);
+    TTY_FLUSH();
 #endif
 
-        snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nServer: axhttpd V%s\n"
-                "Content-Type: %s\nContent-Length: %ld\n"
-                "Date: %sLast-Modified: %s\n", VERSION,
-                getmimetype(cn->actualfile), (long) stbuf.st_size,
-                date, ctime(&(stbuf.st_mtime))); // ctime() has a \n on the end
-    }
+    snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nServer: axhttpd V%s\n"
+            "Content-Type: %s\nContent-Length: %ld\n"
+            "Date: %sLast-Modified: %s\n", VERSION,
+            getmimetype(cn->actualfile), (long) stbuf.st_size,
+            date, ctime(&(stbuf.st_mtime))); // ctime() has a \n on the end
 
     special_write(cn, buf, strlen(buf));
 
@@ -801,25 +784,12 @@ static int hexit(char c)
         return 0;
 }
 
-static void send301(struct connstruct *cn)
-{
-    char buf[2048];
-    snprintf(buf, sizeof(buf), 
-            "HTTP/1.1 301 Moved Permanently\nLocation: %s/\n\n"
-            "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n"
-            "<HTML><HEAD>\n<TITLE>301 Moved Permanently</TITLE>\n"
-            "</HEAD><BODY>\n<H1>Moved Permanently</H1>\n"
-            "The document has moved <A HREF=\"%s/\">here</A>.<P>\n"
-            "<HR>\n</BODY></HTML>\n", cn->filereq, cn->filereq);
-    special_write(cn, buf, strlen(buf));
-}
-
 static void send404(struct connstruct *cn)
 {
     char buf[1024];
     strcpy(buf, "HTTP/1.0 404 Not Found\nContent-Type: text/html\n\n"
-            "<HTML><BODY>\n<TITLE>404 Not Found</TITLE><H1>"
-            "404 Not Found</H1>\n</BODY></HTML>\n");
+            "<html><body>\n<title>404 Not Found</title><h1>"
+            "404 Not Found</h1>\n</body></html>\n");
     special_write(cn, buf, strlen(buf));
 }
 
@@ -856,7 +826,6 @@ static int sanitizefile(const char *buf)
     for (i = 0; i < len; i++) 
     {
         // Check for "/." : In other words, don't send files starting with a .
-        // Notice, GOBBLES, that this includes ".."
         if (buf[i] == '/' && buf[i+1] == '.') 
             return 0;
     }
@@ -876,10 +845,12 @@ static int sanitizehost(char *buf)
         }
 
         // Enforce some basic URL rules...
-        if (isalnum(*buf)==0 && *buf != '-' && *buf != '.') return 0;
-        if (*buf == '.' && *(buf+1) == '.') return 0;
-        if (*buf == '.' && *(buf+1) == '-') return 0;
-        if (*buf == '-' && *(buf+1) == '.') return 0;
+        if ((isalnum(*buf) == 0 && *buf != '-' && *buf != '.') ||
+                (*buf == '.' && *(buf+1) == '.') ||
+                (*buf == '.' && *(buf+1) == '-') ||
+                (*buf == '-' && *(buf+1) == '.'))
+            return 0;
+
         buf++;
     }
 

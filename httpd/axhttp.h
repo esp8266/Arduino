@@ -1,5 +1,5 @@
 /*
- *  Copyright(C) 2006 Cameron Rich
+ *  Copyright(C) 2007 Cameron Rich
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -107,7 +107,6 @@ extern struct cgiextstruct *cgiexts;
 extern char *webroot;
 
 // conn.c prototypes
-void addconnection(int sd, char *ip, int is_ssl);
 void removeconnection(struct connstruct *cn);
 
 // proc.c prototypes

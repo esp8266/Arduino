@@ -70,7 +70,7 @@ void buf_grow(BUF_MEM *bm, int len)
     /* add 1kB just to be sure */
     bm->pre_data = (uint8_t *)realloc(bm->pre_data, len+1024+BM_RECORD_OFFSET); 
     bm->data = bm->pre_data+BM_RECORD_OFFSET;
-    bm->max_len = len+1024;
+    bm->max_len = len + 1024;
 }
 
 /**

@@ -1,5 +1,5 @@
 #
-#  Copyright(C) 2006 Cameron Rich
+#  Copyright(C) 2007 Cameron Rich
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -54,7 +54,6 @@ else
 web_server : $(TARGET)
 
 OBJ= \
-	conn.o \
 	main.o \
 	proc.o \
 	mime_types.o
