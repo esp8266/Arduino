@@ -781,7 +781,9 @@ void bi_free_mod(BI_CTX *ctx, int mod_offset)
  */
 static bigint *regular_multiply(BI_CTX *ctx, bigint *bia, bigint *bib)
 {
-    int i, j, i_plus_j, n = bia->size, t = bib->size;
+    int i, j, i_plus_j;
+    int n = bia->size; 
+    int t = bib->size;
     bigint *biR = alloc(ctx, n + t);
     comp *sr = biR->comps;
     comp *sa = bia->comps;
@@ -1397,9 +1399,7 @@ bigint *bi_mod_power(BI_CTX *ctx, bigint *bi, bigint *biexp)
 
 #ifdef CONFIG_BIGINT_SLIDING_WINDOW
     for (j = i; j > 32; j /= 5) /* work out an optimum size */
-    {
         window_size++;
-    }
 
     /* work out the slide constants */
     precompute_slide_window(ctx, window_size, bi);
@@ -1420,15 +1420,11 @@ bigint *bi_mod_power(BI_CTX *ctx, bigint *bi, bigint *biexp)
             int part_exp = 0;
 
             if (l < 0)  /* LSB of exponent will always be 1 */
-            {
                 l = 0;
-            }
             else
             {
                 while (exp_bit_is_one(biexp, l) == 0)
-                {
                     l++;    /* go back up */
-                }
             }
 
             /* build up the section of the exponent */

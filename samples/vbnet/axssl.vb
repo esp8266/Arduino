@@ -98,7 +98,8 @@ Public Class axssl
                     If args(i) = "-verify" Then
                         options = options Or axtls.SSL_CLIENT_AUTHENTICATION
                     ElseIf args(i) = "-CAfile"
-                        If i >= args.Length-1 Or ca_cert_index >= ca_cert_size Then
+                        If i >= args.Length-1 Or _
+                                    ca_cert_index >= ca_cert_size Then
                             print_server_options(build_mode, args(i))
                         End If
 
@@ -553,7 +554,8 @@ Public Class axssl
     Public Sub print_options(ByVal options As String)
         Console.WriteLine("axssl: Error: '" & options & _
                 "' is an invalid command.")
-        Console.WriteLine("usage: axssl.vb.exe [s_server|s_client] [args ...]")
+        Console.WriteLine("usage: axssl.vbnet [s_server|s_client|" & _
+                "version] [args ...]")
         Environment.Exit(1)
     End Sub
 
@@ -662,6 +664,11 @@ End Class
 Public Module MyMain
     Function Main(ByVal args() As String) As Integer
         Dim runner As axssl = New axssl()
+
+        If args.Length = 1 And args(0) = "version" Then
+           Console.WriteLine("axssl.vbnet " & SSLUtil.Version())
+            Environment.Exit(0)
+        End If
 
         If args.Length < 1 
             runner.print_options("")

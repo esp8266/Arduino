@@ -28,6 +28,31 @@
 extern "C" {
 #endif
 
+#include "version.h"
+
+/* Mutexing definitions */
+#if defined(CONFIG_SSLCTX_MUTEXING)
+#if defined(WIN32)
+#define SSL_CTX_MUTEX_TYPE          HANDLE
+#define SSL_CTX_MUTEX_INIT(A)       A=CreateMutex(0, FALSE, 0)
+#define SSL_CTX_MUTEX_DESTROY(A)    CloseHandle(A)
+#define SSL_CTX_LOCK(A)             WaitForSingleObject(A, INFINITE)
+#define SSL_CTX_UNLOCK(A)           ReleaseMutex(A)
+#else 
+#include <pthread.h>
+#define SSL_CTX_MUTEX_TYPE          pthread_mutex_t
+#define SSL_CTX_MUTEX_INIT(A)       pthread_mutex_init(&A, NULL)
+#define SSL_CTX_MUTEX_DESTROY(A)    pthread_mutex_destroy(&A)
+#define SSL_CTX_LOCK(A)             pthread_mutex_lock(&A)
+#define SSL_CTX_UNLOCK(A)           pthread_mutex_unlock(&A)
+#endif
+#else   /* no mutexing */
+#define SSL_CTX_MUTEX_INIT(A)
+#define SSL_CTX_MUTEX_DESTROY(A)
+#define SSL_CTX_LOCK(A)
+#define SSL_CTX_UNLOCK(A)
+#endif
+
 #define SSL_RANDOM_SIZE             32
 #define SSL_SECRET_SIZE             48
 #define SSL_FINISHED_HASH_SIZE      12
@@ -52,6 +77,9 @@ extern "C" {
 #define IS_SET_SSL_FLAG(A)          (ssl->flag & A)
 
 #define MAX_KEY_BYTE_SIZE           512     /* for a 4096 bit key */
+#define RT_MAX_PLAIN_LENGTH         16384
+#define RT_EXTRA                    1024
+#define BM_RECORD_OFFSET            5
 
 #ifdef CONFIG_SSL_SKELETON_MODE
 #define NUM_PROTOCOLS               1
@@ -138,11 +166,13 @@ struct _SSL
     uint8_t *key_block;
     void *encrypt_ctx;
     void *decrypt_ctx;
-    BUF_MEM bm_buf;
+    uint8_t bm_all_data[RT_MAX_PLAIN_LENGTH+RT_EXTRA];
+    uint8_t *bm_data;
+    int bm_index;
     struct _SSL *next;                  /* doubly linked list */
     struct _SSL *prev;
     SSL_CERT *certs;
-    struct _SSLCTX *ssl_ctx;           /* back reference to a clnt/svr ctx */
+    struct _SSLCTX *ssl_ctx;            /* back reference to a clnt/svr ctx */
 #ifndef CONFIG_SSL_SKELETON_MODE
     uint16_t session_index;
     SSL_SESS *session;
@@ -172,12 +202,15 @@ struct _SSLCTX
 #ifdef CONFIG_SSL_CERT_VERIFICATION
     CA_CERT_CTX *ca_cert_ctx;
 #endif
-    SSL *sess_head;
-    SSL *sess_tail;
+    SSL *head;
+    SSL *tail;
     SSL_CERT certs[CONFIG_SSL_MAX_CERTS];
 #ifndef CONFIG_SSL_SKELETON_MODE
     uint16_t num_sessions;
     SSL_SESS **ssl_sessions;
+#endif
+#ifdef CONFIG_SSLCTX_MUTEXING
+    SSL_CTX_MUTEX_TYPE mutex;
 #endif
 };
 

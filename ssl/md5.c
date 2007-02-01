@@ -47,7 +47,7 @@ static void MD5Transform(uint32_t state[4], const uint8_t block[64]);
 static void Encode(uint8_t *output, uint32_t *input, uint32_t len);
 static void Decode(uint32_t *output, const uint8_t *input, uint32_t len);
 
-static uint8_t PADDING[64] = 
+static const uint8_t PADDING[64] = 
 {
     0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -114,8 +114,7 @@ void MD5Update(MD5_CTX *ctx, const uint8_t * msg, int len)
     x = (uint32_t)((ctx->count[0] >> 3) & 0x3F);
 
     /* Update number of bits */
-    if ((ctx->count[0] += ((uint32_t)len << 3))
-            < ((uint32_t)len << 3))
+    if ((ctx->count[0] += ((uint32_t)len << 3)) < ((uint32_t)len << 3))
         ctx->count[1]++;
     ctx->count[1] += ((uint32_t)len >> 29);
 

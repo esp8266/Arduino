@@ -57,17 +57,13 @@ void SHA1Update(SHA1_CTX *ctx, const uint8_t *msg, int len)
     while (len--)
     {
         ctx->Message_Block[ctx->Message_Block_Index++] = (*msg & 0xFF);
-
         ctx->Length_Low += 8;
+
         if (ctx->Length_Low == 0)
-        {
             ctx->Length_High++;
-        }
 
         if (ctx->Message_Block_Index == 64)
-        {
             SHA1ProcessMessageBlock(ctx);
-        }
 
         msg++;
     }

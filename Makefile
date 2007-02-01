@@ -44,8 +44,12 @@ ifdef CONFIG_SAMPLES
 	$(MAKE) -C samples
 endif
 
-$(STAGE) :
+$(STAGE) : ssl/version.h
 	@mkdir -p $(STAGE)
+
+# create a version file with something in it.
+ssl/version.h:
+	@echo "#define AXTLS_VERSION    \"(no version)\"" > ssl/version.h
 
 $(PREFIX) :
 	@mkdir -p $(PREFIX)/lib
@@ -56,6 +60,7 @@ release:
 	-$(MAKE) clean
 	-@rm config/*.msi config/*.back.aip config/config.h config/.config*
 	@rm -fr $(STAGE)
+	@echo "#define AXTLS_VERSION    \"$(VERSION)\"" > ssl/version.h
 	cd ../; tar cvfz $(RELEASE).tar.gz --wildcards-match-slash --exclude .svn axTLS; cd -;
 
 docs:

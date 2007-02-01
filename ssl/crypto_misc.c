@@ -29,8 +29,6 @@
 #include "wincrypt.h"
 #endif
 
-#define BM_RECORD_OFFSET 	5	/* same as SSL_RECORD_SIZE */
-
 #ifndef WIN32
 static int rng_fd = -1;
 #elif defined(CONFIG_WIN32_USE_CRYPTO_LIB)
@@ -43,45 +41,6 @@ static uint64_t rng_num;
 
 static int rng_ref_count;
 const char * const unsupported_str = "Error: feature not supported\n";
-
-/**
- * Allocate a new memory buffer 
- */
-BUF_MEM buf_new()
-{
-    BUF_MEM bm;
-    bm.pre_data = (uint8_t *)calloc(1, 2048); /* start with this */
-    bm.data = bm.pre_data+BM_RECORD_OFFSET; /* some space at the start */
-    bm.max_len = 2048-BM_RECORD_OFFSET;
-    bm.index = 0;
-    return bm;
-}
-
-/**
- * Grow a buffer if necessary
- */
-void buf_grow(BUF_MEM *bm, int len)
-{
-    if (len <= bm->max_len)
-    {
-        return;
-    }
-
-    /* add 1kB just to be sure */
-    bm->pre_data = (uint8_t *)realloc(bm->pre_data, len+1024+BM_RECORD_OFFSET); 
-    bm->data = bm->pre_data+BM_RECORD_OFFSET;
-    bm->max_len = len + 1024;
-}
-
-/**
- * Free a buffer
- */
-void buf_free(BUF_MEM *bm)
-{
-    free(bm->pre_data);
-    bm->pre_data = NULL;
-    bm->data = NULL;
-}
 
 #ifndef CONFIG_SSL_SKELETON_MODE
 /** 

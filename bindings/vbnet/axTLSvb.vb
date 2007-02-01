@@ -83,6 +83,10 @@ Namespace axTLSvb
         Public Shared Sub DisplayError(ByVal error_code As Integer)
             axtls.ssl_display_error(error_code)
         End Sub
+
+        Public Shared Function Version() As String
+            Return axtls.ssl_version()
+        End Function
     End Class
 
     Public Class SSLCTX

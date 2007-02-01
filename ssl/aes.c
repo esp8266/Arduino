@@ -400,7 +400,6 @@ static void AES_encrypt(const AES_CTX *ctx, uint32_t *data)
                 a1 ^= tmp1 ^ AES_xtime(a1 ^ a2);
                 a2 ^= tmp1 ^ AES_xtime(a2 ^ a3);
                 a3 ^= tmp1 ^ AES_xtime(a3 ^ old_a0);
-
             }
 
             tmp[row] = ((a0 << 24) | (a1 << 16) | (a2 << 8) | a3);

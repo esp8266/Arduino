@@ -74,14 +74,14 @@ bigint *bi_str_import(BI_CTX *ctx, const char *data);
  * appropriate reduction technique (which is bi_mod() when doing classical
  * reduction).
  */
-#if defined(CONFIG_BIGINT_CLASSICAL)
-#define bi_residue(A, B)         bi_mod(A, B)
+#if defined(CONFIG_BIGINT_MONTGOMERY)
+#define bi_residue(A, B)         bi_mont(A, B)
+bigint *bi_mont(BI_CTX *ctx, bigint *bixy);
 #elif defined(CONFIG_BIGINT_BARRETT)
 #define bi_residue(A, B)         bi_barrett(A, B)
 bigint *bi_barrett(BI_CTX *ctx, bigint *bi);
-#else   /* CONFIG_BIGINT_MONTGOMERY */
-#define bi_residue(A, B)         bi_mont(A, B)
-bigint *bi_mont(BI_CTX *ctx, bigint *bixy);
+#else /* if defined(CONFIG_BIGINT_CLASSICAL) */
+#define bi_residue(A, B)         bi_mod(A, B)
 #endif
 
 #ifdef CONFIG_BIGINT_SQUARE

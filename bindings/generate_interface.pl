@@ -59,6 +59,7 @@ sub transformSignature
             $line =~ s/SSLCTX \* ?/IntPtr /g;
             $line =~ s/SSLObjLoader \* ?/IntPtr /g;
             $line =~ s/SSL \* ?/IntPtr /g;
+            $line =~ s/\(void\)/()/g;
         }
         elsif ($binding == $VBNET)
         {

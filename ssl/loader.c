@@ -76,9 +76,7 @@ EXP_FUNC int STDCALL ssl_obj_load(SSLCTX *ssl_ctx, int obj_type,
 #endif
     }
     else
-    {
         ret = do_obj(ssl_ctx, obj_type, ssl_obj, password);
-    }
 
 error:
     ssl_obj_free(ssl_obj);
@@ -149,15 +147,18 @@ static int do_obj(SSLCTX *ssl_ctx, int obj_type,
 }
 
 /*
- * Release things.
+ * Clean up our mess.
  */
 void ssl_obj_free(SSLObjLoader *ssl_obj)
 {
-    free(ssl_obj->buf);
-    free(ssl_obj);
+    if (ssl_obj)
+    {
+        free(ssl_obj->buf);
+        free(ssl_obj);
+    }
 }
 
-/**
+/*
  * Support for PEM encoded keys/certificates.
  */
 #ifdef CONFIG_SSL_HAS_PEM
@@ -214,7 +215,7 @@ static int base64_decode(const uint8_t *in,  int len,
     g = 3;
     for (x = y = z = t = 0; x < len; x++) 
     {
-        if ((c = map[in[x]&0x7F]) == 0xff)
+        if ((c = map[in[x] & 0x7F]) == 0xff)
             continue;
 
         if (c == 254)   /* this is the end... */
@@ -234,14 +235,10 @@ static int base64_decode(const uint8_t *in,  int len,
             out[z++] = (uint8_t)((t>>16)&255);
 
             if (g > 1) 
-            {
                 out[z++] = (uint8_t)((t>>8)&255);
-            }
 
             if (g > 2) 
-            {
                 out[z++] = (uint8_t)(t&255);
-            }
 
             y = t = 0;
         }
@@ -256,9 +253,7 @@ static int base64_decode(const uint8_t *in,  int len,
 error:
 #ifdef CONFIG_SSL_FULL_MODE
     if (ret < 0)
-    {
         printf("Error: Invalid base64 file\n");
-    }
 #endif
     return ret;
 }
@@ -312,7 +307,7 @@ static int pem_decrypt(const uint8_t *where, const uint8_t *end,
         uint8_t c = *start++ - '0';
         iv[i] = (c > 9 ? c + '0' - 'A' + 10 : c) << 4;
         c = *start++ - '0';
-        iv[i] +=(c > 9 ? c + '0' - 'A' + 10 : c);
+        iv[i] += (c > 9 ? c + '0' - 'A' + 10 : c);
     }
 
     while (*start == '\r' || *start == '\n')
@@ -402,10 +397,7 @@ static int new_pem_obj(SSLCTX *ssl_ctx, int is_cacert, uint8_t *where,
 
             /* In a format we can now understand - so process it */
             if ((ret = do_obj(ssl_ctx, obj_type, ssl_obj, password)))
-            {
-                ssl_obj_free(ssl_obj);
                 goto error;
-            }
 
             end += strlen(ends[i]);
             remain -= strlen(ends[i]);
@@ -415,7 +407,6 @@ static int new_pem_obj(SSLCTX *ssl_ctx, int is_cacert, uint8_t *where,
                 remain--;
             }
 
-            ssl_obj_free(ssl_obj);
             break;
         }
     }
@@ -428,6 +419,7 @@ static int new_pem_obj(SSLCTX *ssl_ctx, int is_cacert, uint8_t *where,
         ret = new_pem_obj(ssl_ctx, is_cacert, end, remain, password);
 
 error:
+    ssl_obj_free(ssl_obj);
     return ret;
 }
 

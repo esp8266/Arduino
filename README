@@ -115,7 +115,7 @@ ActiveState's version works ok).
   communicate securely because they have no common encryption 
   algorithms" (v1.5), or "Firefox can't connect to <server> because the site 
   uses a security protocol which isn't enabled" (v2.0). See bugzilla issues 
-  343543 and 359484 (Comment #7).  It's all broken (hopefully fixed soon).
+  343543 and 359484 (Comment #7). It's all broken (hopefully fixed soon).
 
 * Perl/Java bindings don't work on 64 bit Linux machines. I can't even compile
   the latest version of Perl on an AMD64 box (using FC3).
@@ -148,7 +148,7 @@ Solaris issues
 ==============
 * mconf doesn't work well - some manual tweaking is required for string values.
 
-* GNU make and GNU patch are required and need to be in $PATH.
+* GNU make is required and needs to be in $PATH.
 
 * To get swig's library dependencies to work (and for the C library to be
   found), I needed to type:

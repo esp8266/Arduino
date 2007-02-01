@@ -62,6 +62,12 @@ sub get_native_sock
 # Main entry point. Doesn't do much except works out whether we are a client
 # or a server.
 #
+if ($#ARGV == 0 && $ARGV[0] eq "version")
+{
+    printf("axssl.pl ".axtlsp::ssl_version()."\n");
+    exit 0;
+}
+
 print_options($#ARGV > -1 ? $ARGV[0] : "")
         if ($#ARGV < 0 || ($ARGV[0] ne "s_server" && $ARGV[0] ne "s_client"));
 
@@ -87,7 +93,7 @@ sub do_server
     my $private_key_file = undef;
     my $cert_size = axtlsp::ssl_get_config($axtlsp::SSL_MAX_CERT_CFG_OFFSET);
     my $ca_cert_size = axtlsp::ssl_get_config(
-            $axtlsp::SSL_MAX_CA_CERT_CFG_OFFSET);
+                        $axtlsp::SSL_MAX_CA_CERT_CFG_OFFSET);
     my @cert;
     my @ca_cert;
 

@@ -39,28 +39,28 @@ using axTLS;
 
 public class axssl
 {
-   /*
+    /*
      * Main()
      */
     public static void Main(string[] args)
     {
+        if (args.Length == 1 && args[0] == "version")
+        {
+            Console.WriteLine("axssl.csharp " + SSLUtil.Version());
+            Environment.Exit(0); 
+        }
+
         axssl runner = new axssl();
 
         if (args.Length < 1 || (args[0] != "s_server" && args[0] != "s_client"))
-        {
             runner.print_options(args.Length > 0 ? args[0] : "");
-        }
 
         int build_mode = SSLUtil.BuildMode();
 
         if (args[0] == "s_server")
-        {
             runner.do_server(build_mode, args);
-        }
         else 
-        {
             runner.do_client(build_mode, args);
-        }
     }
 
     /*
@@ -603,7 +603,8 @@ public class axssl
     {
         Console.WriteLine("axssl: Error: '" + option + 
                 "' is an invalid command.");
-        Console.WriteLine("usage: axssl.cs.exe [s_server|s_client] [args ...]");
+        Console.WriteLine("usage: axssl.csharp [s_server|" +
+                            "s_client|version] [args ...]");
         Environment.Exit(1);
     }
 

@@ -39,7 +39,7 @@ endif
 
 # shared library major/minor numbers
 LIBMAJOR=$(BASETARGET).1
-LIBMINOR=$(BASETARGET).1.0
+LIBMINOR=$(BASETARGET).1.1
 else
 TARGET1=axtls.lib
 TARGET2=../$(STAGE)/axtls.dll
@@ -49,7 +49,7 @@ endif
 libs: $(TARGET1) $(TARGET2)
 
 OBJ=\
-  aes.o \
+	aes.o \
 	asn1.o \
 	bigint.o \
 	crypto_misc.o \

@@ -30,6 +30,7 @@ sub transformSignature
         # make API Java more 'byte' friendly
         $line =~ s/uint32_t/int/g;
         $line =~ s/const uint8_t \* /const unsigned char \* /g;
+        $line =~ s/\(void\)/()/g;
         if ($ARGV[0] eq "-java")
         {
             $line =~ s/.*ssl_read.*//g;

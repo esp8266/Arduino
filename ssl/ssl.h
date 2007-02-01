@@ -150,13 +150,16 @@ extern "C" {
  * @brief Establish a new client/server context.
  *
  * This function is called before any client/server SSL connections are made. 
- * If multiple threads are used, then each thread will have its own SSLCTX
- * context. Any number of connections may be made with a single 
- * context. 
  *
  * Each new connection will use the this context's private key and 
  * certificate chain. If a different certificate chain is required, then a 
  * different context needs to be be used.
+ *
+ * There are two threading models supported - a single thread with one
+ * SSLCTX can support any number of SSL connections - and multiple threads can 
+ * support one SSLCTX object each (the default). But if a single SSLCTX 
+ * object uses many SSL objects in individual threads, then the 
+ * CONFIG_SSLCTX_MUTEXING option needs to be configured.
  *
  * @param options [in]  Any particular options. At present the options
  * supported are:
@@ -233,6 +236,7 @@ EXP_FUNC void STDCALL ssl_free(SSL *ssl);
 
 /**
  * @brief Read the SSL data stream.
+ * The socket must be in blocking mode.
  * @param ssl [in] An SSL object reference.
  * @param in_data [out] If the read was successful, a pointer to the read
  * buffer will be here. Do NOT ever free this memory as this buffer is used in
@@ -248,7 +252,8 @@ EXP_FUNC void STDCALL ssl_free(SSL *ssl);
 EXP_FUNC int STDCALL ssl_read(SSL *ssl, uint8_t **in_data);
 
 /**
- * @brief Write to the SSL data stream.
+ * @brief Write to the SSL data stream. 
+ * The socket must be in blocking mode.
  * @param ssl [in] An SSL obect reference.
  * @param out_data [in] The data to be written
  * @param out_len [in] The number of bytes to be written.
@@ -406,6 +411,12 @@ EXP_FUNC int STDCALL ssl_obj_load(SSLCTX *ssl_ctx, int obj_type, const char *fil
  * @see ssl_obj_load for more details on obj_type.
  */
 EXP_FUNC int STDCALL ssl_obj_memory_load(SSLCTX *ssl_ctx, int obj_type, const uint8_t *data, int len, const char *password);
+
+/**
+ * @brief Return the axTLS library version as a string.
+ * @note New API function for v1.1
+ */
+EXP_FUNC const char * STDCALL ssl_version(void);
 
 /** @} */
 

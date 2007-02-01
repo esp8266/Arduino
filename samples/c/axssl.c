@@ -63,11 +63,15 @@ int main(int argc, char *argv[])
     signal(SIGPIPE, SIG_IGN);           /* ignore pipe errors */
 #endif
 
+    if (argc == 2 && strcmp(argv[1], "version") == 0)
+    {
+        printf("axssl %s\n", ssl_version());
+        exit(0);
+    }
+
     if (argc < 2 || (
                 strcmp(argv[1], "s_server") && strcmp(argv[1], "s_client")))
-    {
         print_options(argc > 1 ? argv[1] : "");
-    }
 
     strcmp(argv[1], "s_server") ? 
         do_client(argc, argv) : do_server(argc, argv);
@@ -733,7 +737,7 @@ static void do_client(int argc, char *argv[])
 static void print_options(char *option)
 {
     printf("axssl: Error: '%s' is an invalid command.\n", option);
-    printf("usage: axssl [s_server|s_client] [args ...]\n");
+    printf("usage: axssl [s_server|s_client|version] [args ...]\n");
     exit(1);
 }
 

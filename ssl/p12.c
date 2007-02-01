@@ -389,6 +389,7 @@ int pkcs12_decode(SSLCTX *ssl_ctx, SSLObjLoader *ssl_obj, const char *password)
     /* get the salt */
     if ((len = asn1_next_obj(buf, &offset, ASN1_OCTET_STRING)) < 0 || len != 8)
         goto error;
+
     salt = &buf[offset];
 
     /* work out what the mac should be */

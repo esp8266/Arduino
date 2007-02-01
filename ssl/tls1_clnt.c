@@ -117,7 +117,7 @@ int do_client_connect(SSL *ssl)
     int ret = SSL_OK;
 
     send_client_hello(ssl);                 /* send the client hello */
-    ssl->bm_buf.index = 0;
+    ssl->bm_index = 0;
     ssl->next_state = HS_SERVER_HELLO;
     ssl->hs_status = SSL_NOT_OK;            /* not connected */
 
@@ -151,7 +151,7 @@ int do_client_connect(SSL *ssl)
  */
 static int send_client_hello(SSL *ssl)
 {
-    uint8_t *buf = ssl->bm_buf.data;
+    uint8_t *buf = ssl->bm_data;
     time_t tm = time(NULL);
     uint8_t *tm_ptr = &buf[6]; /* time will go here */
     int i, offset;
@@ -186,19 +186,19 @@ static int send_client_hello(SSL *ssl)
         buf[offset++] = 0;
     }
 
-    buf[offset++] = 0;   /* number of ciphers */
-    buf[offset++] = NUM_PROTOCOLS*2;   /* number of ciphers */
+    buf[offset++] = 0;              /* number of ciphers */
+    buf[offset++] = NUM_PROTOCOLS*2;/* number of ciphers */
 
     /* put all our supported protocols in our request */
     for (i = 0; i < NUM_PROTOCOLS; i++)
     {
-        buf[offset++] = 0;      /* cipher we are using */
+        buf[offset++] = 0;          /* cipher we are using */
         buf[offset++] = ssl_prot_prefs[i];
     }
 
-    buf[offset++] = 1;      /* no compression */
+    buf[offset++] = 1;              /* no compression */
     buf[offset++] = 0;
-    buf[3] = offset - 4;    /* handshake size */
+    buf[3] = offset - 4;            /* handshake size */
 
     return send_packet(ssl, PT_HANDSHAKE_PROTOCOL, NULL, offset);
 }
@@ -208,8 +208,8 @@ static int send_client_hello(SSL *ssl)
  */
 static int process_server_hello(SSL *ssl)
 {
-    uint8_t *buf = ssl->bm_buf.data;
-    int pkt_size = ssl->bm_buf.index;
+    uint8_t *buf = ssl->bm_data;
+    int pkt_size = ssl->bm_index;
     int offset;
     int version = (buf[4] << 4) + buf[5];
     int num_sessions = ssl->ssl_ctx->num_sessions;
@@ -217,9 +217,7 @@ static int process_server_hello(SSL *ssl)
 
     /* check that we are talking to a TLSv1 server */
     if (version != 0x31)
-    {
         return SSL_ERROR_INVALID_VERSION;
-    }
 
     /* get the server random value */
     memcpy(ssl->server_random, &buf[6], SSL_RANDOM_SIZE);
@@ -260,7 +258,7 @@ static int process_server_hello_done(SSL *ssl)
  */
 static int send_client_key_xchg(SSL *ssl)
 {
-    uint8_t *buf = ssl->bm_buf.data;
+    uint8_t *buf = ssl->bm_data;
     uint8_t premaster_secret[SSL_SECRET_SIZE];
     int enc_secret_size = -1;
 
@@ -271,8 +269,13 @@ static int send_client_key_xchg(SSL *ssl)
     premaster_secret[1] = 0x01;
     get_random(SSL_SECRET_SIZE-2, &premaster_secret[2]);
     DISPLAY_RSA(ssl, "send_client_key_xchg", ssl->x509_ctx->rsa_ctx);
+
+    /* rsa_ctx->bi_ctx is not thread-safe */
+    SSL_CTX_LOCK(ssl->ssl_ctx->mutex);
     enc_secret_size = RSA_encrypt(ssl->x509_ctx->rsa_ctx, premaster_secret,
             SSL_SECRET_SIZE, &buf[6], 0);
+    SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
+
     buf[2] = (enc_secret_size + 2) >> 8;
     buf[3] = (enc_secret_size + 2) & 0xff;
     buf[4] = enc_secret_size >> 8;
@@ -298,7 +301,7 @@ static int process_cert_req(SSL *ssl)
  */
 static int send_cert_verify(SSL *ssl)
 {
-    uint8_t *buf = ssl->bm_buf.data;
+    uint8_t *buf = ssl->bm_data;
     uint8_t dgst[MD5_SIZE+SHA1_SIZE];
     RSA_CTX *rsa_ctx = ssl->ssl_ctx->rsa_ctx;
     int n, ret;
@@ -309,7 +312,11 @@ static int send_cert_verify(SSL *ssl)
     buf[1] = 0;
 
     finished_digest(ssl, NULL, dgst);   /* calculate the digest */
+
+    /* rsa_ctx->bi_ctx is not thread-safe */
+    SSL_CTX_LOCK(ssl->ssl_ctx->mutex);
     n = RSA_encrypt(rsa_ctx, dgst, sizeof(dgst), &buf[6], 1);
+    SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
 
     if (n == 0)
     {

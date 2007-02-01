@@ -185,6 +185,14 @@ namespace axTLS
         {
             axtls.ssl_display_error(error_code);
         }
+
+        /**
+         * @brief Return the version of the axTLS project.
+         */
+        public static string Version()
+        {
+            return axtls.ssl_version();
+        }
     }
 
     /**

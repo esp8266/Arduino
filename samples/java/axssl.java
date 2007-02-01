@@ -43,6 +43,12 @@ public class axssl
      */
     public static void main(String[] args)
     {
+        if (args.length == 1 && args[0].equals("version"))
+        {
+            System.out.println("axtls.jar " + SSLUtil.version());
+            System.exit(0);
+        }
+
         axssl runner = new axssl();
 
         try
@@ -57,13 +63,9 @@ public class axssl
             int build_mode = SSLUtil.buildMode();
 
             if (args[0].equals("s_server"))
-            {
                 runner.do_server(build_mode, args);
-            }
             else 
-            {
                 runner.do_client(build_mode, args);
-            }
         }
         catch (Exception e) 
         {
@@ -193,9 +195,7 @@ public class axssl
                                     axtlsj.SSL_DEFAULT_SVR_SESS);
 
         if (ssl_ctx == null)
-        {
             throw new Exception("Error: Server context is invalid");
-        }
 
         if (private_key_file != null)
         {
@@ -316,9 +316,7 @@ public class axssl
                     throws Exception
     {
         if (build_mode < axtlsj.SSL_BUILD_ENABLE_CLIENT)
-        {
             print_client_options(build_mode, args[1]);
-        }
 
         int i = 1, res;
         int port = 4433;
@@ -599,7 +597,7 @@ public class axssl
     {
         System.out.println("axssl: Error: '" + option + 
                 "' is an invalid command.");
-        System.out.println("usage: axtlsj.jar [s_server|s_client] " + 
+        System.out.println("usage: axtlsj.jar [s_server|s_client|version] " + 
                 "[args ...]");
         System.exit(1);
     }
@@ -701,25 +699,15 @@ public class axssl
         byte ciph_id = ssl.getCipherId();
 
         if (ciph_id == axtlsj.SSL_AES128_SHA)
-        {
             System.out.println("AES128-SHA");
-        }
         else if (ciph_id == axtlsj.SSL_AES256_SHA)
-        {
             System.out.println("AES256-SHA");
-        }
         else if (ciph_id == axtlsj.SSL_RC4_128_SHA)
-        {
             System.out.println("RC4-SHA");
-        }
         else if (ciph_id == axtlsj.SSL_RC4_128_MD5)
-        {
             System.out.println("RC4-MD5");
-        }
         else
-        {
             System.out.println("Unknown - " + ssl.getCipherId());
-        }
     }
 
     public char toHexChar(int i)

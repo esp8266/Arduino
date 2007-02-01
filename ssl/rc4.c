@@ -36,9 +36,7 @@ void RC4_setup(RC4_CTX *ctx, const uint8_t *key, int length)
     m = ctx->m;
 
     for (i = 0; i < 256; i++)
-    {
         m[i] = i;
-    }
 
     for (i = 0; i < 256; i++)
     {
@@ -48,9 +46,7 @@ void RC4_setup(RC4_CTX *ctx, const uint8_t *key, int length)
         m[j] = a;
 
         if (++k >= length) 
-        {
             k = 0;
-        }
     }
 }
 

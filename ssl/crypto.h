@@ -143,7 +143,6 @@ typedef struct
     bigint *qInv;           /* q^-1 mod p */
 #endif
     int num_octets;
-    bigint *sig_m;         /* signature modulus */
     BI_CTX *bi_ctx;
 } RSA_CTX;
 
@@ -163,15 +162,14 @@ void RSA_pub_key_new(RSA_CTX **rsa_ctx,
         const uint8_t *modulus, int mod_len,
         const uint8_t *pub_exp, int pub_len);
 void RSA_free(RSA_CTX *ctx);
-int RSA_decrypt(RSA_CTX *ctx, const uint8_t *in_data, uint8_t *out_data,
+int RSA_decrypt(const RSA_CTX *ctx, const uint8_t *in_data, uint8_t *out_data,
         int is_decryption);
-bigint *RSA_private(RSA_CTX *c, bigint *bi_msg);
+bigint *RSA_private(const RSA_CTX *c, bigint *bi_msg);
 #ifdef CONFIG_SSL_CERT_VERIFICATION
-bigint *RSA_raw_sign_verify(RSA_CTX *c, bigint *bi_msg);
 bigint *RSA_sign_verify(BI_CTX *ctx, const uint8_t *sig, int sig_len,
         bigint *modulus, bigint *pub_exp);
-bigint *RSA_public(RSA_CTX *c, bigint *bi_msg);
-int RSA_encrypt(RSA_CTX *ctx, const uint8_t *in_data, uint16_t in_len, 
+bigint *RSA_public(const RSA_CTX * c, bigint *bi_msg);
+int RSA_encrypt(const RSA_CTX *ctx, const uint8_t *in_data, uint16_t in_len, 
         uint8_t *out_data, int is_signing);
 void RSA_print(const RSA_CTX *ctx);
 #endif
@@ -267,17 +265,6 @@ typedef void (*crypt_func)(void *, const uint8_t *, uint8_t *, int);
 typedef void (*hmac_func)(const uint8_t *msg, int length, const uint8_t *key, 
         int key_len, uint8_t *digest);
 
-typedef struct
-{
-    uint8_t *pre_data;	/* include the ssl record bytes */
-    uint8_t *data;	/* the regular ssl data */
-    int max_len;
-    int index;
-} BUF_MEM;
-
-BUF_MEM buf_new(void);
-void buf_grow(BUF_MEM *bm, int len);
-void buf_free(BUF_MEM *bm);
 int get_file(const char *filename, uint8_t **buf);
 
 #if defined(CONFIG_SSL_FULL_MODE) || defined(WIN32) || defined(CONFIG_DEBUG)

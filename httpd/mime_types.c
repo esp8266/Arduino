@@ -32,18 +32,18 @@ typedef struct
 
 static mime_table_t mime_table[] = 
 {
-    // Fundamentals
+    /* Fundamental types */
     { ".html", "text/html" },
     { ".htm", "text/html" },
     { ".css", "text/css" },
 
-    // Basic graphics
+    /* Basic graphics */
     { ".jpg", "image/jpeg" },
     { ".gif", "image/gif" },
     { ".png", "image/png" },
 
 #ifdef CONFIG_HTTP_ALL_MIME_TYPES
-    // This list is a bit expensive to maintain normally, so it's an option.
+    /* This list is a bit expensive to maintain normally, so it's an option. */
     { ".txt", "text/plain" },
     { ".rtx", "text/richtext" },
     { ".etx", "text/x-setext" },

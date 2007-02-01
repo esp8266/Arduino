@@ -48,7 +48,7 @@ static void split(char *tp, char *sp[], int maxwords, char sc);
 static int iscgi(const char *fn);
 #endif
 
-// Returns 1 if elems should continue being read, 0 otherwise
+/* Returns 1 if elems should continue being read, 0 otherwise */
 static int procheadelem(struct connstruct *cn, char *buf) 
 {
     char *delim, *value;
@@ -79,8 +79,6 @@ static int procheadelem(struct connstruct *cn, char *buf)
 
         if (sanitizefile(value) == 0) 
         {
-printf("#3\n");
-TTY_FLUSH();
             send404(cn);
             removeconnection(cn);
             return 0;
@@ -155,7 +153,7 @@ static void procdirlisting(struct connstruct *cn)
         return;
     }
 
-    // Get rid of the "."
+    /* Get rid of the "." */
     readdir(cn->dirp);
 #endif
 
@@ -198,12 +196,12 @@ void procdodir(struct connstruct *cn)
         file = dp->d_name;
 #endif
 
-        // if no index file, don't display the ".." directory
+        /* if no index file, don't display the ".." directory */
         if (cn->filereq[0] == '/' && cn->filereq[1] == '\0' &&
                 strcmp(file, "..") == 0) 
             continue;
 
-        // don't display files beginning with "."
+        /* don't display files beginning with "." */
         if (file[0] == '.' && file[1] != '.')
             continue;
 
@@ -257,7 +255,7 @@ void procreadhead(struct connstruct *cn)
     rv = special_read(cn, buf, sizeof(buf)-1);
     if (rv <= 0) 
     {
-        if (rv < 0) // really dead?
+        if (rv < 0) /* really dead? */
             removeconnection(cn);
         return;
     }
@@ -265,10 +263,10 @@ void procreadhead(struct connstruct *cn)
     buf[rv] = '\0';
     next = tp = buf;
 
-    // Split up lines and send to procheadelem()
+    /* Split up lines and send to procheadelem() */
     while (*next != '\0') 
     {
-        // If we have a blank line, advance to next stage!
+        /* If we have a blank line, advance to next stage! */
         if (*next == '\r' || *next == '\n') 
         {
             buildactualfile(cn);
@@ -319,7 +317,7 @@ void procsendhead(struct connstruct *cn)
 #if defined(CONFIG_HTTP_HAS_CGI)
         if (trycgi_withpathinfo(cn) == 0) 
         { 
-            // We Try To Find A CGI
+            /* We Try To Find A CGI */
             proccgi(cn, 1);
             return;
         }
@@ -334,7 +332,7 @@ void procsendhead(struct connstruct *cn)
     if (iscgi(cn->actualfile))
     {
 #ifndef WIN32
-        // Set up CGI script
+        /* Set up CGI script */
         if ((stbuf.st_mode & S_IEXEC) == 0 || isdir(cn->actualfile)) 
         {
             send404(cn);
@@ -350,11 +348,11 @@ void procsendhead(struct connstruct *cn)
 
     if ((stbuf.st_mode & S_IFMT) == S_IFDIR) 
     {
-        // Check to see if this dir has an index file
+        /* Check to see if this dir has an index file */
         if (procindex(cn, &stbuf) == 0) 
         {
 #if defined(CONFIG_HTTP_DIRECTORIES)
-            // If not, we do a directory listing of it
+            /* If not, we do a directory listing of it */
             procdirlisting(cn);
 #else
             send404(cn);
@@ -364,10 +362,10 @@ void procsendhead(struct connstruct *cn)
         }
 
 #if defined(CONFIG_HTTP_HAS_CGI)
-        // If the index is a CGI file, handle it like any other CGI
+        /* If the index is a CGI file, handle it like any other CGI */
         if (iscgi(cn->actualfile))
         {
-            // Set up CGI script
+            /* Set up CGI script */
             if ((stbuf.st_mode & S_IEXEC) == 0 || isdir(cn->actualfile)) 
             {
                 send404(cn);
@@ -383,7 +381,7 @@ void procsendhead(struct connstruct *cn)
 
     if (cn->modified_since) 
     {
-        // file has already been read before
+        /* file has already been read before */
         snprintf(buf, sizeof(buf), "HTTP/1.1 304 Not Modified\nServer: "
                 "axhttpd V%s\nDate: %s\n", VERSION, date);
         special_write(cn, buf, strlen(buf));
@@ -402,7 +400,7 @@ void procsendhead(struct connstruct *cn)
             "Content-Type: %s\nContent-Length: %ld\n"
             "Date: %sLast-Modified: %s\n", VERSION,
             getmimetype(cn->actualfile), (long) stbuf.st_size,
-            date, ctime(&(stbuf.st_mtime))); // ctime() has a \n on the end
+            date, ctime(&(stbuf.st_mtime))); /* ctime() has a \n on the end */
 
     special_write(cn, buf, strlen(buf));
 
@@ -505,8 +503,8 @@ static int special_read(struct connstruct *cn, void *buf, size_t count)
 
     if (cn->is_ssl)
     {
-        SSL *ssl = ssl_find(servers->ssl_ctx, cn->networkdesc);
         uint8_t *read_buf;
+        SSL *ssl = ssl_find(servers->ssl_ctx, cn->networkdesc);
 
         if ((res = ssl_read(ssl, &read_buf)) > SSL_OK)
             memcpy(buf, read_buf, res > (int)count ? count : res);
@@ -517,9 +515,9 @@ static int special_read(struct connstruct *cn, void *buf, size_t count)
     return res;
 }
 
-// Returns 0 if no index was found and doesn't modify cn->actualfile
-// Returns 1 if an index was found and puts the index in cn->actualfile
-//              and puts its stat info into stp
+/* Returns 0 if no index was found and doesn't modify cn->actualfile
+   Returns 1 if an index was found and puts the index in cn->actualfile
+              and puts its stat info into stp */
 static int procindex(struct connstruct *cn, struct stat *stp) 
 {
     char tbuf[MAXREQUESTLENGTH];
@@ -557,9 +555,9 @@ static void proccgi(struct connstruct *cn, int has_pathinfo)
 #ifndef WIN32
     pipe(tpipe);
 
-    if (fork() > 0)  // parent
+    if (fork() > 0)  /* parent */
     {
-        // Close the write descriptor
+        /* Close the write descriptor */
         close(tpipe[1]);
         cn->filedesc = tpipe[0];
         cn->state = STATE_WANT_TO_READ_FILE;
@@ -567,16 +565,16 @@ static void proccgi(struct connstruct *cn, int has_pathinfo)
         return;
     }
 
-    // The problem child...
+    /* The problem child... */
 
-    // Our stdout/stderr goes to the socket
+    /* Our stdout/stderr goes to the socket */
     dup2(tpipe[1], 1);
     dup2(tpipe[1], 2);
 
-    // If it was a POST request, send the socket data to our stdin
+    /* If it was a POST request, send the socket data to our stdin */
     if (cn->reqtype == TYPE_POST) 
         dup2(cn->networkdesc, 0);
-    else // Otherwise we can shutdown the read side of the sock
+    else    /* Otherwise we can shutdown the read side of the sock */
         shutdown(cn->networkdesc, 0);
 
     close(tpipe[0]);
@@ -645,7 +643,7 @@ static int trycgi_withpathinfo(struct connstruct *cn)
 {
     char tpfile[MAXREQUESTLENGTH];
     char fr_str[MAXREQUESTLENGTH];
-    char *fr_rs[MAXCGIARGS]; // filereq splitted
+    char *fr_rs[MAXCGIARGS]; /* filereq splitted */
     int i = 0, offset;
 
     my_strncpy(fr_str, cn->filereq, MAXREQUESTLENGTH);
@@ -818,14 +816,14 @@ static int sanitizefile(const char *buf)
 {
     int len, i;
 
-    // Don't accept anything not starting with a /
+    /* Don't accept anything not starting with a / */
     if (*buf != '/') 
         return 0;
 
     len = strlen(buf);
     for (i = 0; i < len; i++) 
     {
-        // Check for "/." : In other words, don't send files starting with a .
+        /* Check for "/." i.e. don't send files starting with a . */
         if (buf[i] == '/' && buf[i+1] == '.') 
             return 0;
     }
@@ -837,14 +835,14 @@ static int sanitizehost(char *buf)
 {
     while (*buf != '\0') 
     {
-        // Handle the port
+        /* Handle the port */
         if (*buf == ':') 
         {
             *buf = '\0';
             return 1;
         }
 
-        // Enforce some basic URL rules...
+        /* Enforce some basic URL rules... */
         if ((isalnum(*buf) == 0 && *buf != '-' && *buf != '.') ||
                 (*buf == '.' && *(buf+1) == '.') ||
                 (*buf == '.' && *(buf+1) == '-') ||

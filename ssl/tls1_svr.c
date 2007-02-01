@@ -45,10 +45,7 @@ EXP_FUNC SSL * STDCALL ssl_server_new(SSLCTX *ssl_ctx, int client_fd)
 
 #ifdef CONFIG_SSL_FULL_MODE
     if (ssl_ctx->chain_length == 0)
-    {
-        printf("Warning - no server certificate defined\n");
-        TTY_FLUSH();
-    }
+        printf("Warning - no server certificate defined\n"); TTY_FLUSH();
 #endif
 
     return ssl;
@@ -67,9 +64,7 @@ int do_svr_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len)
     {
         case HS_CLIENT_HELLO:
             if ((ret = process_client_hello(ssl)) == SSL_OK)
-            {
                 ret = send_server_hello_sequence(ssl);
-            }
             break;
 
 #ifdef CONFIG_SSL_CERT_VERIFICATION
@@ -107,9 +102,9 @@ int do_svr_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len)
  */
 static int process_client_hello(SSL *ssl)
 {
-    uint8_t *buf = ssl->bm_buf.data;
+    uint8_t *buf = ssl->bm_data;
     uint8_t *record_buf = ssl->record_buf;
-    int pkt_size = ssl->bm_buf.index;
+    int pkt_size = ssl->bm_index;
     int i, j, cs_len, id_len, offset = 6 + SSL_RANDOM_SIZE;
     int version = (record_buf[1] << 4) + record_buf[2];
     int ret = SSL_OK;
@@ -169,7 +164,7 @@ error:
  */
 int process_sslv23_client_hello(SSL *ssl)
 {
-    uint8_t *buf = ssl->bm_buf.data;
+    uint8_t *buf = ssl->bm_data;
     int bytes_needed = ((buf[0] & 0x7f) << 8) + buf[1];
     int version = (buf[3] << 4) + buf[4];
     int ret = SSL_OK;
@@ -291,7 +286,7 @@ static int send_server_hello_sequence(SSL *ssl)
  */
 static int send_server_hello(SSL *ssl)
 {
-    uint8_t *buf = ssl->bm_buf.data;
+    uint8_t *buf = ssl->bm_data;
     int offset = 0;
 
     buf[0] = HS_SERVER_HELLO;
@@ -358,8 +353,8 @@ static int send_server_hello_done(SSL *ssl)
  */
 static int process_client_key_xchg(SSL *ssl)
 {
-    uint8_t *buf = ssl->bm_buf.data;
-    int pkt_size = ssl->bm_buf.index;
+    uint8_t *buf = ssl->bm_data;
+    int pkt_size = ssl->bm_index;
     int premaster_size, secret_length = (buf[2] << 8) + buf[3];
     uint8_t premaster_secret[MAX_KEY_BYTE_SIZE];
     RSA_CTX *rsa_ctx = ssl->ssl_ctx->rsa_ctx;
@@ -370,12 +365,14 @@ static int process_client_key_xchg(SSL *ssl)
 
     /* is there an extra size field? */
     if ((secret_length - 2) == rsa_ctx->num_octets)
-    {
         offset += 2;
-    }
 
     PARANOIA_CHECK(pkt_size, rsa_ctx->num_octets+offset);
+
+    /* rsa_ctx->bi_ctx is not thread-safe */
+    SSL_CTX_LOCK(ssl->ssl_ctx->mutex);
     premaster_size = RSA_decrypt(rsa_ctx, &buf[offset], premaster_secret, 1);
+    SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
 
     if (premaster_size != SSL_SECRET_SIZE || 
             premaster_secret[0] != 0x03 ||  /* check version is 3.1 (TLS) */
@@ -420,8 +417,8 @@ static int send_certificate_request(SSL *ssl)
  */
 static int process_cert_verify(SSL *ssl)
 {
-    uint8_t *buf = ssl->bm_buf.data;
-    int pkt_size = ssl->bm_buf.index;
+    uint8_t *buf = ssl->bm_data;
+    int pkt_size = ssl->bm_index;
     uint8_t dgst_buf[MAX_KEY_BYTE_SIZE];
     uint8_t dgst[MD5_SIZE+SHA1_SIZE];
     X509_CTX *x509_ctx = ssl->x509_ctx;

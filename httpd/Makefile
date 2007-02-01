@@ -58,6 +58,8 @@ OBJ= \
 	proc.o \
 	mime_types.o
 
+include ../config/makefile.post
+
 ifndef CONFIG_PLATFORM_WIN32
 
 $(TARGET): $(OBJ) ../$(STAGE)/libaxtls.a

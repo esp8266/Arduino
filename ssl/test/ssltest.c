@@ -1445,179 +1445,269 @@ cleanup:
     return ret;
 }
 
-#if 0
+/**************************************************************************
+ * SSL Basic Testing (test a big packet handshake)
+ *
+ **************************************************************************/
+static uint8_t basic_buf[256*1024];
+
+static void do_basic(void)
+{
+    int client_fd;
+    SSL *ssl_clnt;
+    SSLCTX *ssl_clnt_ctx = ssl_ctx_new(
+                            DEFAULT_CLNT_OPTION, SSL_DEFAULT_CLNT_SESS);
+    usleep(200000);           /* allow server to start */
+
+    if ((client_fd = client_socket_init(g_port)) < 0)
+        goto error;
+
+    if (ssl_obj_load(ssl_clnt_ctx, SSL_OBJ_X509_CACERT, 
+                                        "../ssl/test/axTLS.ca_x509.cer", NULL))
+        goto error;
+
+    ssl_clnt = ssl_client_new(ssl_clnt_ctx, client_fd, NULL);
+
+    /* check the return status */
+    if (ssl_handshake_status(ssl_clnt))
+    {
+        printf("Client ");
+        ssl_display_error(ssl_handshake_status(ssl_clnt));
+        goto error;
+    }
+
+    ssl_write(ssl_clnt, basic_buf, sizeof(basic_buf));
+    ssl_free(ssl_clnt);
+
+error:
+    ssl_ctx_free(ssl_clnt_ctx);
+    close(client_fd);
+
+    /* exit this thread */
+}
+
+static int SSL_basic_test(void)
+{
+    int server_fd, client_fd, ret = 0, size = 0, offset = 0;
+    SSLCTX *ssl_svr_ctx = NULL;
+    struct sockaddr_in client_addr;
+    uint8_t *read_buf;
+    int clnt_len = sizeof(client_addr);
+    SSL *ssl_svr;
+#ifndef WIN32
+    pthread_t thread;
+#endif
+    memset(basic_buf, 0xA5, sizeof(basic_buf)/2);
+    memset(&basic_buf[sizeof(basic_buf)/2], 0x5A, sizeof(basic_buf)/2);
+
+    if ((server_fd = server_socket_init(&g_port)) < 0)
+        goto error;
+
+    ssl_svr_ctx = ssl_ctx_new(DEFAULT_SVR_OPTION, SSL_DEFAULT_SVR_SESS);
+
+#ifndef WIN32
+    pthread_create(&thread, NULL, 
+                (void *(*)(void *))do_basic, NULL);
+    pthread_detach(thread);
+#else
+    CreateThread(NULL, 1024, (LPTHREAD_START_ROUTINE)do_basic, NULL, 0, NULL);
+#endif
+
+    /* Wait for a client to connect */
+    if ((client_fd = accept(server_fd, 
+                    (struct sockaddr *) &client_addr, &clnt_len)) < 0)
+    {
+        ret = SSL_ERROR_SOCK_SETUP_FAILURE;
+        goto error;
+    }
+    
+    /* we are ready to go */
+    ssl_svr = ssl_server_new(ssl_svr_ctx, client_fd);
+    
+    do
+    {
+        while ((size = ssl_read(ssl_svr, &read_buf)) == SSL_OK);
+
+        if (size < SSL_OK) /* got some alert or something nasty */
+        {
+            printf("Server ");
+            ssl_display_error(size);
+            ret = size;
+            break;
+        }
+        else /* looks more promising */
+        {
+            if (memcmp(read_buf, &basic_buf[offset], size) != 0)
+            {
+                ret = SSL_NOT_OK;
+                break;
+            }
+        }
+
+        offset += size;
+    } while (offset < sizeof(basic_buf));
+
+    printf(ret == SSL_OK && offset == sizeof(basic_buf) ? 
+                            "SSL basic test passed\n" :
+                            "SSL basic test failed\n");
+    TTY_FLUSH();
+
+    ssl_free(ssl_svr);
+    close(server_fd);
+    close(client_fd);
+
+error:
+    ssl_ctx_free(ssl_svr_ctx);
+    return ret;
+}
+
+#if !defined(WIN32) && defined(CONFIG_SSL_CTX_MUTEXING)
 /**************************************************************************
  * Multi-Threading Tests
  *
  **************************************************************************/
-#define NUM_THREADS         1
-#define NUM_THREADS_STR     "1"
-
-static SSL *my_ssls[NUM_THREADS*3];      /* enough for all client fds */
+#define NUM_THREADS         200
 
 typedef struct
 {
-    SSLCTX *ssl_ctx;
+    SSLCTX *ssl_clnt_ctx;
     int port;
     int thread_id;
 } multi_t;
 
-int do_connect(multi_t *multi_data)
+void do_multi_clnt(multi_t *multi_data)
 {
     int res = 1, client_fd, i;
     SSL *ssl = NULL;
     char tmp[5];
 
-    /* make sure other threads work before this one */
-    if (multi_data->thread_id == NUM_THREADS)
-    {
-        sleep(2);      /* sets the maximum time this test will run */
-    }
-
     if ((client_fd = client_socket_init(multi_data->port)) < 0)
         goto client_test_exit;
-    sleep(0);
 
-    ssl = ssl_client_new(multi_data->ssl_ctx, client_fd, NULL);
+    sleep(1);
+    ssl = ssl_client_new(multi_data->ssl_clnt_ctx, client_fd, NULL);
 
     if ((res = ssl_handshake_status(ssl)))
-        goto client_test_exit;
-
-    sprintf(tmp, "%d\n", multi_data->thread_id);
-    for (i = 0; i < 100; i++)
     {
-        ssl_write(ssl, (uint8_t *)tmp, strlen(tmp)+1);
+        printf("Client ");
+        ssl_display_error(res);
+        goto client_test_exit;
     }
 
-    res = 0;
+    sprintf(tmp, "%d\n", multi_data->thread_id);
+    for (i = 0; i < 10; i++)
+        ssl_write(ssl, (uint8_t *)tmp, strlen(tmp)+1);
+
 client_test_exit:
     ssl_free(ssl);
     close(client_fd);
     free(multi_data);
-    return 0;
+}
+
+void do_multi_svr(SSL *ssl)
+{
+    uint8_t *read_buf;
+    int *res_ptr = malloc(sizeof(int));
+    int res;
+
+    for (;;)
+    {
+        res = ssl_read(ssl, &read_buf);
+
+        /* kill the client */
+        if (res != SSL_OK)
+        {
+            if (res == SSL_ERROR_CONN_LOST)
+            {
+                close(ssl->client_fd);
+                ssl_free(ssl);
+                break;
+            }
+            else if (res > 0)
+            {
+                /* do nothing */
+            }
+            else /* some problem */
+            {
+                printf("Server ");
+                ssl_display_error(res);
+                goto error;
+            }
+        }
+    }
+
+    res = SSL_OK;
+error:
+    *res_ptr = res;
+    pthread_exit(res_ptr);
 }
 
 int multi_thread_test(void)
 {
     int server_fd;
-    SSLCTX *ssl_server_ctx = NULL;
-    uint8_t buf[1024];
-    pthread_t threads[NUM_THREADS];
-    int i, res = 1;
+    SSLCTX *ssl_server_ctx;
+    SSLCTX *ssl_clnt_ctx;
+    pthread_t clnt_threads[NUM_THREADS];
+    pthread_t svr_threads[NUM_THREADS];
+    int i, res = 0;
     struct sockaddr_in client_addr;
     int clnt_len = sizeof(client_addr);
-    fd_set read_set;
-    int max_fd;
-    int death_total = 0;
-    SSLCTX *ssl_client_ctx = ssl_ctx_new(DEFAULT_CLNT_OPTION, 
-            SSL_DEFAULT_CLNT_SESS, NULL);
 
     printf("Do multi-threading test (takes a minute)\n");
 
-    FD_ZERO(&read_set);
+    ssl_server_ctx = ssl_ctx_new(DEFAULT_SVR_OPTION, SSL_DEFAULT_SVR_SESS);
+    ssl_clnt_ctx = ssl_ctx_new(DEFAULT_CLNT_OPTION, SSL_DEFAULT_CLNT_SESS);
+
+    if (ssl_obj_load(ssl_clnt_ctx, SSL_OBJ_X509_CACERT, 
+                                        "../ssl/test/axTLS.ca_x509.cer", NULL))
+        goto error;
 
     if ((server_fd = server_socket_init(&g_port)) < 0)
         goto error;
 
-    FD_SET(server_fd, &read_set);
-    max_fd = server_fd;
-
-    ssl_server_ctx = ssl_ctx_new(DEFAULT_SVR_OPTION|SSL_SERVER_VERIFY_LATER, 
-                                    SSL_DEFAULT_SVR_SESS, NULL);
-
     for (i = 0; i < NUM_THREADS; i++)
     {
         multi_t *multi_data = (multi_t *)malloc(sizeof(multi_t));
-        multi_data->ssl_ctx = ssl_server_ctx;
+        multi_data->ssl_clnt_ctx = ssl_clnt_ctx;
         multi_data->port = g_port;
         multi_data->thread_id = i+1;
-        if (pthread_create(&threads[i], NULL, 
-                (void *(*)(void *))do_connect, (void *)multi_data) < 0)
-            goto error;
+        pthread_create(&clnt_threads[i], NULL, 
+                (void *(*)(void *))do_multi_clnt, (void *)multi_data);
+        pthread_detach(clnt_threads[i]);
     }
 
-    sleep(1);
-
-    for (;;)
+    for (i = 0; i < NUM_THREADS; i++)
     {
-        fd_set rdfs = read_set;
-        int n;
+        SSL *ssl_svr;
+        int client_fd = accept(server_fd, 
+                      (struct sockaddr *)&client_addr, &clnt_len);
 
-        if ((n = select(max_fd+1, &rdfs, NULL, NULL, 0)) > 0)
-        {
-            while (n)
-            {
-                /* check for server */
-                if (FD_ISSET(server_fd, &rdfs))
-                {
-                    int client_fd = accept(server_fd, 
-                                  (struct sockaddr *)&client_addr, &clnt_len);
+        if (client_fd < 0)
+            goto error;
 
-                    if (client_fd < 0)
-                        goto error;
+        ssl_svr = ssl_server_new(ssl_server_ctx, client_fd);
 
-                    if (client_fd > max_fd)     /* set max fd */
-                    {
-                        max_fd = client_fd;
-                    }
-
-                    my_ssls[client_fd] = ssl_server_new(
-                                    ssl_server_ctx, client_fd);
-                    FD_SET(client_fd, &read_set);
-
-                    if (--n == 0)
-                        continue;
-                }
-
-                i = server_fd;
-
-                while (++i <= max_fd && n)
-                {
-                    if (FD_ISSET(i, &rdfs))
-                    {
-                        SSL *ssl;
-                        ssl = my_ssls[i];
-                        res = ssl_read(ssl, &read_buf);
-                        n--;
-
-                        /* kill the client */
-                        if (res != SSL_OK)
-                        {
-                            if (res == SSL_ERROR_CONN_LOST)
-                            {
-                                ssl_free(ssl);
-                                my_ssls[i] = NULL;
-                                close(i);
-                                FD_CLR(i, &read_set);
-                                death_total++;
-                            }
-                            else if (res > 0)
-                            {
-                                if (strcmp(NUM_THREADS_STR "\n", 
-                                            (const char *)buf) == 0)
-                                {
-                                    sleep(1);   /* allow rest of data */
-                                    goto all_ok;
-                                }
-                            }
-                            else /* some problem */
-                            {
-                                printf("Got some problem %d\n", res);
-                                goto error;
-                            }
-                        } /* if */
-                    } /* if */
-                } /* for */
-            }
-        }
+        pthread_create(&svr_threads[i], NULL, 
+                        (void *(*)(void *))do_multi_svr, (void *)ssl_svr);
     }
 
-all_ok:
-    printf("Multi-thread test passed (%d)\n", death_total);
-    res = 0;
+    /* make sure we've run all of the threads */
+    for (i = 0; i < NUM_THREADS; i++)
+    {
+        void *thread_res;
+        pthread_join(svr_threads[i], &thread_res);
+        if (*((int *)thread_res) != 0)
+            res = 1;
+        free(thread_res);
+    }
+
+    if (res) 
+        goto error;
+
+    printf("Multi-thread test passed (%d)\n", NUM_THREADS);
 error:
     ssl_ctx_free(ssl_server_ctx);
-    ssl_ctx_free(ssl_client_ctx);
+    ssl_ctx_free(ssl_clnt_ctx);
     close(server_fd);
     return res;
 }
@@ -1704,6 +1794,14 @@ int main(int argc, char *argv[])
         goto cleanup;
     }
     TTY_FLUSH();
+
+#if !defined(WIN32) && defined(CONFIG_SSL_CTX_MUTEXING)
+    if (multi_thread_test())
+        goto cleanup;
+#endif
+
+    if (SSL_basic_test())
+        goto cleanup;
 
     system("sh ../ssl/test/killopenssl.sh");
 

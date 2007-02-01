@@ -210,6 +210,19 @@ config CONFIG_SSL_MAX_CERTS
         The default is to allow one certificate + 1 certificate in the chain
         (which may be the certificate authority certificate).
 
+config CONFIG_SSLCTX_MUTEXING
+    bool "Enable SSLCTX mutexing"
+    default n
+    help
+        Normally mutexing is not required - each SSLCTX object can deal with
+        many SSL objects (as long as each SSLCTX object is using a single
+        thread).
+
+        If the SSLCTX object is not thread safe e.g. the case where a 
+        new thread is created for each SSL object, then mutexing is required. 
+
+        Select y when a mutex on the SSLCTX object is required.
+
 config CONFIG_USE_DEV_URANDOM
     bool "Use /dev/urandom"
     default y

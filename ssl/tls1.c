@@ -165,6 +165,8 @@ EXP_FUNC SSLCTX *STDCALL ssl_ctx_new(uint32_t options, int num_sessions)
     ssl_ctx->num_sessions = num_sessions;
 #endif
 
+    SSL_CTX_MUTEX_INIT(ssl_ctx->mutex);
+
 #if defined(CONFIG_SSL_USE_DEFAULT_KEY) || defined(CONFIG_SSL_SKELETON_MODE)
     if (~options & SSL_NO_DEFAULT_KEY)
     {
@@ -201,7 +203,7 @@ EXP_FUNC void STDCALL ssl_ctx_free(SSLCTX *ssl_ctx)
     if (ssl_ctx == NULL)
         return;
 
-    ssl = ssl_ctx->sess_head;
+    ssl = ssl_ctx->head;
 
     /* clear out all the ssl entries */
     while (ssl)
@@ -214,9 +216,7 @@ EXP_FUNC void STDCALL ssl_ctx_free(SSLCTX *ssl_ctx)
 #ifndef CONFIG_SSL_SKELETON_MODE
     /* clear out all the sessions */
     for (i = 0; i < ssl_ctx->num_sessions; i++)
-    {
         session_free(ssl_ctx->ssl_sessions, i);
-    }
 
     free(ssl_ctx->ssl_sessions);
 #endif
@@ -232,6 +232,7 @@ EXP_FUNC void STDCALL ssl_ctx_free(SSLCTX *ssl_ctx)
     remove_ca_certs(ssl_ctx->ca_cert_ctx);
 #endif
     ssl_ctx->chain_length = 0;
+    SSL_CTX_MUTEX_DESTROY(ssl_ctx->mutex);
     RSA_free(ssl_ctx->rsa_ctx);
     RNG_terminate();
     free(ssl_ctx);
@@ -252,24 +253,20 @@ EXP_FUNC void STDCALL ssl_free(SSL *ssl)
 
     ssl_ctx = ssl->ssl_ctx;
 
+    SSL_CTX_LOCK(ssl_ctx->mutex);
+
     /* adjust the server SSL list */
     if (ssl->prev)
-    {
         ssl->prev->next = ssl->next;
-    }
     else
-    {
-        ssl_ctx->sess_head = ssl->next;
-    }
+        ssl_ctx->head = ssl->next;
 
     if (ssl->next)
-    {
         ssl->next->prev = ssl->prev;
-    }
     else
-    {
-        ssl_ctx->sess_tail = ssl->prev;
-    }
+        ssl_ctx->tail = ssl->prev;
+
+    SSL_CTX_UNLOCK(ssl_ctx->mutex);
 
     /* may already be free - but be sure */
     free(ssl->all_pkts);
@@ -278,7 +275,6 @@ EXP_FUNC void STDCALL ssl_free(SSL *ssl)
     free(ssl->encrypt_ctx);
     free(ssl->decrypt_ctx);
     free(ssl->master_secret);
-    buf_free(&ssl->bm_buf);
 #ifdef CONFIG_SSL_CERT_VERIFICATION
     x509_free(ssl->x509_ctx);
 #endif
@@ -315,15 +311,28 @@ EXP_FUNC int STDCALL ssl_read(SSL *ssl, uint8_t **in_data)
 EXP_FUNC int STDCALL ssl_write(SSL *ssl, const uint8_t *out_data, int out_len)
 {
 
-    int ret = send_packet(ssl, PT_APP_PROTOCOL_DATA, out_data, out_len);
+    int n = out_len, nw, i, tot = 0;
 
-    /* make sure there is no problem with overflow due to padding etc */
-    if (ret > out_len)
+    /* maximum size of a TLS packet is around 16kB, so fragment */
+    do 
     {
-        ret = out_len;
-    }
+        nw = n;
 
-    return ret;
+        if (nw > RT_MAX_PLAIN_LENGTH)    /* fragment if necessary */
+            nw = RT_MAX_PLAIN_LENGTH;
+
+        if ((i = send_packet(ssl, PT_APP_PROTOCOL_DATA, 
+                                            &out_data[tot], nw)) <= 0)
+        {
+            out_len = i;    /* an error */
+            break;
+        }
+
+        tot += i;
+        n -= i;
+    } while (n > 0);
+
+    return out_len;
 }
 
 /**
@@ -411,9 +420,7 @@ int add_cert_auth(SSLCTX *ssl_ctx, const uint8_t *buf, int len)
 
     /* recurse? */
     if (len > 0)
-    {
         ret = add_cert_auth(ssl_ctx, &buf[offset], len);
-    }
 
 error:
     return ret;
@@ -459,17 +466,24 @@ EXP_FUNC const char * STDCALL ssl_get_cert_dn(SSL *ssl, int component)
  */
 EXP_FUNC SSL * STDCALL ssl_find(SSLCTX *ssl_ctx, int client_fd)
 {
-    SSL *ssl = ssl_ctx->sess_head;
+    SSL *ssl;
+
+    SSL_CTX_LOCK(ssl_ctx->mutex);
+    ssl = ssl_ctx->head;
 
     /* search through all the ssl entries */
     while (ssl)
     {
         if (ssl->client_fd == client_fd)
+        {
+            SSL_CTX_UNLOCK(ssl_ctx->mutex);
             return ssl;
+        }
 
         ssl = ssl->next;
     }
 
+    SSL_CTX_UNLOCK(ssl_ctx->mutex);
     return NULL;
 }
 
@@ -526,30 +540,32 @@ SSL *ssl_new(SSLCTX *ssl_ctx, int client_fd)
     SSL *ssl = (SSL *)calloc(1, sizeof(SSL));
     ssl->ssl_ctx = ssl_ctx;
     ssl->need_bytes = SSL_RECORD_SIZE;      /* need a record */
-    ssl->bm_buf = buf_new();
     ssl->client_fd = client_fd;
     ssl->flag = SSL_NEED_RECORD;
     ssl->certs = ssl_ctx->certs;
     ssl->chain_length = ssl_ctx->chain_length;
+    ssl->bm_data = ssl->bm_all_data+BM_RECORD_OFFSET; /* space at the start */
 #ifdef CONFIG_ENABLE_VERIFICATION
     ssl->ca_cert_ctx = ssl_ctx->ca_cert_ctx;
 #endif
 
     /* a bit hacky but saves a few bytes of memory */
     ssl->flag |= ssl_ctx->options;
+    SSL_CTX_LOCK(ssl_ctx->mutex);
 
-    /* build up a linked list, so we can remove it all later */
-    if (ssl_ctx->sess_head == NULL)
+    if (ssl_ctx->head == NULL)
     {
-        ssl_ctx->sess_head = ssl;
-        ssl_ctx->sess_tail = ssl;
+        ssl_ctx->head = ssl;
+        ssl_ctx->tail = ssl;
     }
     else
     {
-        ssl->prev = ssl_ctx->sess_tail;
-        ssl_ctx->sess_tail->next = ssl;
-        ssl_ctx->sess_tail = ssl;
+        ssl->prev = ssl_ctx->tail;
+        ssl_ctx->tail->next = ssl;
+        ssl_ctx->tail = ssl;
     }
+
+    SSL_CTX_UNLOCK(ssl_ctx->mutex);
 
     return ssl;
 }
@@ -905,32 +921,30 @@ static void *crypt_new(SSL *ssl, uint8_t *key, uint8_t *iv, int is_decrypt)
  */
 static int send_raw_packet(SSL *ssl, uint8_t protocol)
 {
-    uint8_t *rec_buf = ssl->bm_buf.pre_data;
-    int pkt_size = SSL_RECORD_SIZE+ssl->bm_buf.index;
+    uint8_t *rec_buf = ssl->bm_all_data;
+    int pkt_size = SSL_RECORD_SIZE+ssl->bm_index;
     int ret;
 
     rec_buf[0] = protocol;
     rec_buf[1] = 0x03;      /* version = 3.1 (TLS) */
     rec_buf[2] = 0x01;
-    rec_buf[3] = ssl->bm_buf.index >> 8;
-    rec_buf[4] = ssl->bm_buf.index & 0xff;
+    rec_buf[3] = ssl->bm_index >> 8;
+    rec_buf[4] = ssl->bm_index & 0xff;
 
-    DISPLAY_BYTES(ssl, "sending %d bytes", ssl->bm_buf.pre_data, 
+    DISPLAY_BYTES(ssl, "sending %d bytes", ssl->bm_all_data, 
                             pkt_size, pkt_size);
 
-    ret = SOCKET_WRITE(ssl->client_fd, ssl->bm_buf.pre_data, pkt_size);
+    if ((ret = SOCKET_WRITE(ssl->client_fd, 
+                    ssl->bm_all_data, pkt_size)) < 0)
+        ret = SSL_ERROR_CONN_LOST;
 
     SET_SSL_FLAG(SSL_NEED_RECORD);  /* reset for next time */
-    ssl->bm_buf.index = 0;
+    ssl->bm_index = 0;
 
-    if (ret < 0)
-    {
-        ret = SSL_ERROR_CONN_LOST;
-    }
-    else if (protocol != PT_APP_PROTOCOL_DATA)  
+    if (protocol != PT_APP_PROTOCOL_DATA)  
     {
         /* always return SSL_OK during handshake */   
-        return ret = SSL_OK;
+        ret = SSL_OK;
     }
 
     return ret;
@@ -942,18 +956,16 @@ static int send_raw_packet(SSL *ssl, uint8_t protocol)
 int send_packet(SSL *ssl, uint8_t protocol, const uint8_t *in, int length)
 {
     int msg_length = length;
-    ssl->bm_buf.index = msg_length;
-    buf_grow(&ssl->bm_buf, msg_length+32);
+    int ret, pad_bytes = 0;
+    ssl->bm_index = msg_length;
 
     /* if our state is bad, don't bother */
     if (ssl->hs_status == SSL_ERROR_DEAD)
-    {
         return SSL_ERROR_CONN_LOST;
-    }
 
     if (in) /* has the buffer already been initialised? */
     {
-        memcpy(ssl->bm_buf.data, in, length);
+        memcpy(ssl->bm_data, in, length);
     }
 
     if (IS_SET_SSL_FLAG(SSL_TX_ENCRYPTED))
@@ -966,55 +978,56 @@ int send_packet(SSL *ssl, uint8_t protocol, const uint8_t *in, int length)
 
         if (protocol == PT_HANDSHAKE_PROTOCOL)
         {
-            DISPLAY_STATE(ssl, 1, ssl->bm_buf.data[0], 0);
+            DISPLAY_STATE(ssl, 1, ssl->bm_data[0], 0);
 
-            if (ssl->bm_buf.data[0] != HS_HELLO_REQUEST)
+            if (ssl->bm_data[0] != HS_HELLO_REQUEST)
             {
-                add_packet(ssl, ssl->bm_buf.data, ssl->bm_buf.index);
+                add_packet(ssl, ssl->bm_data, ssl->bm_index);
             }
         }
 
         /* add the packet digest */
         msg_length += ssl->cipher_info->digest_size;
-        ssl->bm_buf.index = msg_length;
-        add_hmac_digest(ssl, mode, ssl->bm_buf.data, length, 
-                                                &ssl->bm_buf.data[length]);
+        ssl->bm_index = msg_length;
+        add_hmac_digest(ssl, mode, ssl->bm_data, length, 
+                                                &ssl->bm_data[length]);
 
         /* add padding? */
         if (ssl->cipher_info->padding_size)
         {
             int last_blk_size = msg_length%ssl->cipher_info->padding_size;
-            int pad_bytes = ssl->cipher_info->padding_size - last_blk_size;
+            pad_bytes = ssl->cipher_info->padding_size - last_blk_size;
 
             /* ensure we always have at least 1 padding byte */
             if (pad_bytes == 0)
-            {
                 pad_bytes += ssl->cipher_info->padding_size;
-            }
 
-            memset(&ssl->bm_buf.data[msg_length], pad_bytes-1, pad_bytes);
+            memset(&ssl->bm_data[msg_length], pad_bytes-1, pad_bytes);
             msg_length += pad_bytes;
-            ssl->bm_buf.index = msg_length;
+            ssl->bm_index = msg_length;
         }
 
-        DISPLAY_BYTES(ssl, "unencrypted write", ssl->bm_buf.data, msg_length);
+        DISPLAY_BYTES(ssl, "unencrypted write", ssl->bm_data, msg_length);
         increment_write_sequence(ssl);
 
         /* now encrypt the packet */
-        ssl->cipher_info->encrypt(ssl->encrypt_ctx, ssl->bm_buf.data, 
-                                            ssl->bm_buf.data, msg_length);
+        ssl->cipher_info->encrypt(ssl->encrypt_ctx, ssl->bm_data, 
+                                            ssl->bm_data, msg_length);
     }
     else if (protocol == PT_HANDSHAKE_PROTOCOL)
     {
-        DISPLAY_STATE(ssl, 1, ssl->bm_buf.data[0], 0);
+        DISPLAY_STATE(ssl, 1, ssl->bm_data[0], 0);
 
-        if (ssl->bm_buf.data[0] != HS_HELLO_REQUEST)
+        if (ssl->bm_data[0] != HS_HELLO_REQUEST)
         {
-            add_packet(ssl, ssl->bm_buf.data, ssl->bm_buf.index);
+            add_packet(ssl, ssl->bm_data, ssl->bm_index);
         }
     }
 
-    return send_raw_packet(ssl, protocol);
+    if ((ret = send_raw_packet(ssl, protocol)) <= 0)
+        return ret;
+
+    return length;  /* just return what we wanted to send */
 }
 
 /**
@@ -1125,9 +1138,8 @@ int basic_read(SSL *ssl, uint8_t **in_data)
     int is_client = IS_SET_SSL_FLAG(SSL_IS_CLIENT);
     uint8_t *buf;
 
-    buf_grow(&ssl->bm_buf, ssl->need_bytes);
-    buf = ssl->bm_buf.data;
-    read_len = SOCKET_READ(ssl->client_fd, &buf[ssl->bm_buf.index], 
+    buf = ssl->bm_data;
+    read_len = SOCKET_READ(ssl->client_fd, &buf[ssl->bm_index], 
                             ssl->need_bytes-ssl->got_bytes);
 
     /* connection has gone, so die */
@@ -1139,17 +1151,16 @@ int basic_read(SSL *ssl, uint8_t **in_data)
     }
 
     DISPLAY_BYTES(ssl, "received %d bytes", 
-            &ssl->bm_buf.data[ssl->bm_buf.index], read_len, read_len);
+            &ssl->bm_data[ssl->bm_index], read_len, read_len);
 
     ssl->got_bytes += read_len;
-    ssl->bm_buf.index += read_len;
+    ssl->bm_index += read_len;
 
     /* haven't quite got what we want, so try again later */
     if (ssl->got_bytes < ssl->need_bytes)
-    {
         return SSL_OK;
-    }
 
+    read_len = ssl->got_bytes;
     ssl->got_bytes = 0;
 
     if (IS_SET_SSL_FLAG(SSL_NEED_RECORD))
@@ -1162,14 +1173,21 @@ int basic_read(SSL *ssl, uint8_t **in_data)
             add_packet(ssl, &buf[2], 3);
             ret = process_sslv23_client_hello(ssl); 
 #else
-            printf("Error: no SSLv23 handshaking allowed\n");
-            TTY_FLUSH();
+            printf("Error: no SSLv23 handshaking allowed\n"); TTY_FLUSH();
             ret = SSL_ERROR_NOT_SUPPORTED;
 #endif
             goto error; /* not an error - just get out of here */
         }
 
         ssl->need_bytes = (buf[3] << 8) + buf[4];
+
+        /* do we violate the spec with the message size?  */
+        if (ssl->need_bytes > RT_MAX_PLAIN_LENGTH+RT_EXTRA-BM_RECORD_OFFSET)
+        {
+            ret = SSL_ERROR_INVALID_PROT_MSG;              
+            goto error;
+        }
+
         CLR_SSL_FLAG(SSL_NEED_RECORD);
         memcpy(ssl->record_buf, buf, 3);    /* store for hmac */
         is_record = 1;
@@ -1182,9 +1200,7 @@ int basic_read(SSL *ssl, uint8_t **in_data)
     }
 
     if (is_record)
-    {
         ssl->record_type = buf[0];
-    }
     else if (IS_SET_SSL_FLAG(SSL_RX_ENCRYPTED))
     {
         ssl->cipher_info->decrypt(ssl->decrypt_ctx, buf, buf, read_len);
@@ -1224,8 +1240,8 @@ int basic_read(SSL *ssl, uint8_t **in_data)
                 break;
 
             case PT_APP_PROTOCOL_DATA:
-                *in_data = ssl->bm_buf.data;  /* point to the work buffer */
-                (*in_data)[read_len] = 0;     /* null terminate just in case */
+                *in_data = ssl->bm_data;    /* point to the work buffer */
+                (*in_data)[read_len] = 0;   /* null terminate just in case */
                 ret = read_len;
                 break;
 
@@ -1242,12 +1258,10 @@ int basic_read(SSL *ssl, uint8_t **in_data)
     }
 
 error:
-    ssl->bm_buf.index = 0;        /* reset to go again */
+    ssl->bm_index = 0;          /* reset to go again */
 
     if (ret < SSL_OK && in_data)  /* if all wrong, then clear this buffer ptr */
-    {
         *in_data = NULL;
-    }
 
     return ret;
 }
@@ -1277,13 +1291,11 @@ static int do_handshake(SSL *ssl, uint8_t *buf, int read_len)
     }
 
     hs_len += SSL_HS_HDR_SIZE;  /* adjust for when adding packets */
-    ssl->bm_buf.index = hs_len; /* store the size and check later */
+    ssl->bm_index = hs_len;     /* store the size and check later */
     DISPLAY_STATE(ssl, 0, handshake_type, 0);
 
     if (handshake_type != HS_CERT_VERIFY && handshake_type != HS_HELLO_REQUEST)
-    {
         add_packet(ssl, buf, hs_len); 
-    }
 
 #if defined(CONFIG_SSL_ENABLE_CLIENT)
     ret = is_client ? 
@@ -1295,9 +1307,7 @@ static int do_handshake(SSL *ssl, uint8_t *buf, int read_len)
 
     /* just use recursion to get the rest */
     if (hs_len < read_len && ret == SSL_OK)
-    {
         ret = do_handshake(ssl, &buf[hs_len], read_len-hs_len);
-    }
 
 error:
     return ret;
@@ -1322,7 +1332,7 @@ int send_change_cipher_spec(SSL *ssl)
  */
 int send_finished(SSL *ssl)
 {
-    uint8_t *buf = ssl->bm_buf.data;
+    uint8_t *buf = ssl->bm_data;
 
     buf[0] = HS_FINISHED;
     buf[1] = 0;
@@ -1365,9 +1375,7 @@ int send_alert(SSL *ssl, int error_code)
 
 #ifdef CONFIG_SSL_FULL_MODE
     if (IS_SET_SSL_FLAG(SSL_DISPLAY_STATES))
-    {
         ssl_display_error(error_code);
-    }
 #endif
 
     switch (error_code)
@@ -1424,25 +1432,21 @@ int send_alert(SSL *ssl, int error_code)
  */
 int process_finished(SSL *ssl, int hs_len)
 {
-    uint8_t *buf = ssl->bm_buf.data;
+    uint8_t *buf = ssl->bm_data;
     int ret = SSL_OK;
     int is_client = IS_SET_SSL_FLAG(SSL_IS_CLIENT);
     int resume = IS_SET_SSL_FLAG(SSL_SESSION_RESUME);
 
-    PARANOIA_CHECK(ssl->bm_buf.index, SSL_FINISHED_HASH_SIZE+4);
+    PARANOIA_CHECK(ssl->bm_index, SSL_FINISHED_HASH_SIZE+4);
 
     /* check that we all work before we continue */
     if (memcmp(ssl->final_finish_mac, &buf[4], SSL_FINISHED_HASH_SIZE))
-    {
         return SSL_ERROR_FINISHED_INVALID;
-    }
 
     if ((!is_client && !resume) || (is_client && resume))
     {
         if ((ret = send_change_cipher_spec(ssl)) == SSL_OK)
-        {
             ret = send_finished(ssl);
-        }
     }
 
     /* Don't need this stuff anymore */
@@ -1470,7 +1474,7 @@ error:
 int send_certificate(SSL *ssl)
 {
     int i = 0;
-    uint8_t *buf = ssl->bm_buf.data;
+    uint8_t *buf = ssl->bm_data;
     int offset = 7;
     int chain_length;
 
@@ -1485,7 +1489,6 @@ int send_certificate(SSL *ssl)
         buf[offset++] = 0;        
         buf[offset++] = cert->size >> 8;        /* cert 1 length */
         buf[offset++] = cert->size & 0xff;
-        buf_grow(&ssl->bm_buf, offset + cert->size);
         memcpy(&buf[offset], cert->buf, cert->size);
         offset += cert->size;
         i++;
@@ -1497,7 +1500,7 @@ int send_certificate(SSL *ssl)
     chain_length += 3;
     buf[2] = chain_length >> 8;        /* handshake length */
     buf[3] = chain_length & 0xff;
-    ssl->bm_buf.index = offset;
+    ssl->bm_index = offset;
     return send_packet(ssl, PT_HANDSHAKE_PROTOCOL, NULL, offset);
 }
 
@@ -1516,10 +1519,9 @@ SSL_SESS *ssl_session_update(int max_sessions,
 
     /* no sessions? Then bail */
     if (max_sessions == 0)
-    {
         return NULL;
-    }
 
+    SSL_CTX_LOCK(ssl->ssl_ctx->mutex);
     if (session_id)
     {
         for (i = 0; i < max_sessions; i++)
@@ -1543,6 +1545,7 @@ SSL_SESS *ssl_session_update(int max_sessions,
                     memcpy(ssl->master_secret, 
                             ssl_sessions[i]->master_secret, SSL_SECRET_SIZE);
                     SET_SSL_FLAG(SSL_SESSION_RESUME);
+                    SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
                     return ssl_sessions[i];  /* a session was found */
                 }
             }
@@ -1558,6 +1561,7 @@ SSL_SESS *ssl_session_update(int max_sessions,
             ssl_sessions[i] = (SSL_SESS *)calloc(1, sizeof(SSL_SESS));
             ssl_sessions[i]->conn_time = tm;
             ssl->session_index = i;
+            SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
             return ssl_sessions[i]; /* return the session object */
         }
         else if (ssl_sessions[i]->conn_time <= oldest_sess_time)
@@ -1573,6 +1577,7 @@ SSL_SESS *ssl_session_update(int max_sessions,
     oldest_sess->conn_time = tm;
     memset(oldest_sess->session_id, 0, sizeof(SSL_SESSION_ID_SIZE));
     memset(oldest_sess->master_secret, 0, sizeof(SSL_SECRET_SIZE));
+    SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
     return oldest_sess;
 }
 
@@ -1593,11 +1598,15 @@ static void session_free(SSL_SESS *ssl_sessions[], int sess_index)
  */
 void kill_ssl_session(SSL_SESS **ssl_sessions, SSL *ssl)
 {
+    SSL_CTX_LOCK(ssl->ssl_ctx->mutex);
+
     if (ssl->ssl_ctx->num_sessions)
     {
         session_free(ssl_sessions, ssl->session_index);
         ssl->session = NULL;
     }
+
+    SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
 }
 #endif /* CONFIG_SSL_SKELETON_MODE */
 
@@ -1684,10 +1693,10 @@ EXP_FUNC int STDCALL ssl_verify_cert(SSL *ssl)
 int process_certificate(SSL *ssl, X509_CTX **x509_ctx)
 {
     int ret = SSL_OK;
-    int pkt_size = ssl->bm_buf.index;
+    int pkt_size = ssl->bm_index;
     int cert_size, offset = 5;
-    int total_cert_size = (ssl->bm_buf.data[offset]<<8) + 
-                ssl->bm_buf.data[offset+1];
+    int total_cert_size = (ssl->bm_data[offset]<<8) + 
+                ssl->bm_data[offset+1];
     int is_client = IS_SET_SSL_FLAG(SSL_IS_CLIENT);
     X509_CTX **chain = x509_ctx;
     offset += 2;
@@ -1697,10 +1706,10 @@ int process_certificate(SSL *ssl, X509_CTX **x509_ctx)
     while (offset < total_cert_size)
     {
         offset++;       /* skip empty char */
-        cert_size = (ssl->bm_buf.data[offset]<<8) + ssl->bm_buf.data[offset+1];
+        cert_size = (ssl->bm_data[offset]<<8) + ssl->bm_data[offset+1];
         offset += 2;
         
-        if (x509_new(&ssl->bm_buf.data[offset], NULL, chain))
+        if (x509_new(&ssl->bm_data[offset], NULL, chain))
         {
             ret = SSL_ERROR_BAD_CERTIFICATE;
             goto error;
@@ -1982,6 +1991,15 @@ void DISPLAY_ALERT(SSL *ssl, int alert)
 }
 
 #endif /* CONFIG_SSL_FULL_MODE */
+
+/**
+ * Return the version of this library.
+ */
+EXP_FUNC const char  * STDCALL ssl_version()
+{
+    static const char * axtls_version = AXTLS_VERSION " " __DATE__;
+    return axtls_version;
+}
 
 /**
  * Enable the various language bindings to work regardless of the

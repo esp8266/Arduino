@@ -24,7 +24,6 @@
 #include <sys/stat.h>
 #include "axhttp.h"
 
-// GLOBALS
 struct serverstruct *servers;
 struct connstruct *usedconns;
 struct connstruct *freeconns;
@@ -99,7 +98,7 @@ int main(int argc, char *argv[])
     WSADATA wsaData;
     WSAStartup(wVersionRequested,&wsaData);
 #else
-    if (getuid() == 0)  // change our uid if we are root
+    if (getuid() == 0)  /* change our uid if we are root */
     {
         setgid(32767);
         setuid(32767);
@@ -111,6 +110,7 @@ int main(int argc, char *argv[])
     signal(SIGCHLD, reaper);
 #endif
 #endif
+
     signal(SIGINT, sigint_cleanup);
     signal(SIGTERM, die);
     mime_init();
@@ -167,8 +167,8 @@ int main(int argc, char *argv[])
     addcgiext(CONFIG_HTTP_CGI_EXTENSION);
 #endif
 #if defined(CONFIG_HTTP_VERBOSE)
-    printf("axhttpd: listening on ports http:%d and https:%d\n", 
-            CONFIG_HTTP_PORT, CONFIG_HTTP_HTTPS_PORT);
+    printf("axhttpd (%s): listening on ports %d (http) and %d (https)\n", 
+            ssl_version(), CONFIG_HTTP_PORT, CONFIG_HTTP_HTTPS_PORT);
     TTY_FLUSH();
 #endif
 #if defined(CONFIG_HTTP_IS_DAEMON)
@@ -178,7 +178,7 @@ int main(int argc, char *argv[])
     setsid();
 #endif
 
-    // main loop
+    /* main loop */
     while (1)
     {
         FD_ZERO(&rfds);
@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
         rnum = wnum = -1;
         sp = servers;
 
-        while (sp != NULL)  // read each server port
+        while (sp != NULL)  /* read each server port */
         {
             FD_SET(sp->sd, &rfds);
 
@@ -195,13 +195,13 @@ int main(int argc, char *argv[])
             sp = sp->next;
         }
 
-        // Add the established sockets
+        /* Add the established sockets */
         tp = usedconns;
         currtime = time(NULL);
 
         while (tp != NULL) 
         {
-            if (currtime > tp->timeout)     // timed out? Kill it.
+            if (currtime > tp->timeout)     /* timed out? Kill it. */
             {
                 to = tp;
                 tp = tp->next;
@@ -253,7 +253,7 @@ int main(int argc, char *argv[])
                 wnum != -1 ? &wfds : NULL,
                 NULL, NULL);
 
-        // New connection?
+        /* New connection? */
         sp = servers;
         while (active > 0 && sp != NULL) 
         {
@@ -266,7 +266,7 @@ int main(int argc, char *argv[])
             sp = sp->next;
         }
 
-        // Handle the established sockets
+        /* Handle the established sockets */
         tp = usedconns;
 
         while (active > 0 && tp != NULL) 
@@ -446,14 +446,10 @@ static void handlenewconnection(int listenfd, int is_ssl)
     int connfd = accept(listenfd, (struct sockaddr *)&their_addr, &tp);
 
     if (tp == sizeof(struct sockaddr_in6)) 
-    {
         inet_ntop(AF_INET6, &their_addr.sin6_addr, ipbuf, sizeof(ipbuf));
-    } 
     else if (tp == sizeof(struct sockaddr_in)) 
-    {
         inet_ntop(AF_INET, &(((struct sockaddr_in *)&their_addr)->sin_addr),
                 ipbuf, sizeof(ipbuf));
-    } 
     else 
         *ipbuf = '\0';
 
@@ -539,7 +535,7 @@ static void addconnection(int sd, char *ip, int is_ssl)
 {
     struct connstruct *tp;
 
-    // Get ourselves a connstruct
+    /* Get ourselves a connstruct */
     if (freeconns == NULL) 
         tp = (struct connstruct *)malloc(sizeof(struct connstruct));
     else 
@@ -548,7 +544,7 @@ static void addconnection(int sd, char *ip, int is_ssl)
         freeconns = tp->next;
     }
 
-    // Attach it to the used list
+    /* Attach it to the used list */
     tp->next = usedconns;
     usedconns = tp;
     tp->networkdesc = sd;
@@ -605,11 +601,11 @@ void removeconnection(struct connstruct *cn)
     if (shouldret) 
         return;
 
-    // If we did, add it to the free list
+    /* If we did, add it to the free list */
     cn->next = freeconns;
     freeconns = cn;
 
-    // Close it all down
+    /* Close it all down */
     if (cn->networkdesc != -1) 
     {
         if (cn->is_ssl) 
@@ -626,7 +622,7 @@ void removeconnection(struct connstruct *cn)
 #ifdef WIN32
         FindClose(cn->dirp);
 #else
-    closedir(cn->dirp);
+        closedir(cn->dirp);
 #endif
 #endif
 }
