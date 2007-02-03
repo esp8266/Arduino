@@ -171,7 +171,7 @@ int analogRead(int pin)
 	ADMUX = (ADMUX & (unsigned int) 0xf0) | (ch & (unsigned int) 0x0f);
 
 	// without a delay, we seem to read from the wrong channel
-	delay(1);
+	//delay(1);
 
 	// start the conversion
 	sbi(ADCSRA, ADSC);
