@@ -819,6 +819,16 @@ public class Editor extends JFrame
       burnBootloaderItem.setEnabled(bootloadingEnabled);
       if (burnBootloaderParallelItem != null)
         burnBootloaderParallelItem.setEnabled(bootloadingEnabled);
+
+      try {
+        LibraryManager libraryManager = new LibraryManager();
+        libraryManager.rebuildAllBuilt();
+      } catch (IOException e) {
+        e.printStackTrace();
+      } catch (RunnerException e) {
+        message("Error rebuilding libraries...");
+        error(e);
+      }
     }
   }
   

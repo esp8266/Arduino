@@ -1,6 +1,6 @@
 /*
   LibraryManager.java - Library System for Wiring
-  Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
+  Copyright (c) 2006-07 Nicholas Zambetti.  All right reserved.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -118,6 +118,33 @@ public class LibraryManager {
       }
     }
     return Collections.unmodifiableList(buildableLibraries);
+  }
+  
+ /*
+   * Rebuilds built libraries
+   * @return Number of libraries built as int, -1 & exception on error
+   */
+  public int rebuildAllBuilt() throws RunnerException {
+    Collection builtLibraries = getBuiltLibraries();
+    Library library;
+    Iterator libIterator = builtLibraries.iterator();
+    int countBuilt = 0;
+    while(libIterator.hasNext()){
+      library = (Library)libIterator.next();
+      //System.out.println("Building library \"" + library.getName() + "\"");
+      try {
+        if(library.build()){
+          ++countBuilt;
+        }else{
+          return -1;
+        }
+      }catch (RunnerException re) {
+        throw new RunnerException(re.getMessage());
+      } catch (Exception ex) {
+        throw new RunnerException(ex.toString());
+      }
+    }
+    return countBuilt;
   }
 
   /*
