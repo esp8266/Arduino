@@ -54,7 +54,7 @@ else
 web_server : $(TARGET)
 
 OBJ= \
-	main.o \
+	axhttpd.o \
 	proc.o \
 	mime_types.o
 

@@ -1,0 +1,12 @@
+Changes since 1.0.0
+
+* AES should now work on 16bit processors (there was an alignment problem)
+* Various freed objects are cleared before freeing.
+* Header files now installed in /usr/local/include/axTLS
+* -DCYGWIN replaced with -DCONFIG_PLATFORM_CYGWIN (and the same for solaris)
+
+axhttpd Changes
+* Header file issue fixed (in mime_types.c)
+* chroot() now used for better security
+* Authentication implemented
+* 

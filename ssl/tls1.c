@@ -1123,6 +1123,7 @@ static void set_key_block(SSL *ssl, int is_write)
     /* clean up if possible */
     if (key_block_existed)
     {
+        memset(ssl->key_block, 0, ciph_info->key_block_size);
         free(ssl->key_block);
         ssl->key_block = NULL;
     }
@@ -1454,9 +1455,11 @@ int process_finished(SSL *ssl, int hs_len)
     ssl->all_pkts = NULL;
     ssl->all_pkts_len = 0;
 
+    memset(ssl->master_secret, 0, SSL_SECRET_SIZE);
     free(ssl->master_secret);
     ssl->master_secret = NULL;
 
+    memset(ssl->final_finish_mac, 0, SSL_FINISHED_HASH_SIZE);
     free(ssl->final_finish_mac);
     ssl->final_finish_mac = NULL;
 

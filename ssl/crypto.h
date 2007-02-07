@@ -34,13 +34,15 @@ extern "C" {
  **************************************************************************/
 
 #define AES_MAXROUNDS			14
+#define AES_BLOCKSIZE           16
+#define AES_IV_SIZE             16
 
 typedef struct aes_key_st 
 {
     uint16_t rounds;
     uint16_t key_size;
     uint32_t ks[(AES_MAXROUNDS+1)*8];
-    uint8_t iv[16];
+    uint8_t iv[AES_IV_SIZE];
 } AES_CTX;
 
 typedef enum
@@ -106,9 +108,9 @@ typedef struct
   uint8_t buffer[64];       /* input buffer */
 } MD5_CTX;
 
-void MD5Init(MD5_CTX *);
-void MD5Update(MD5_CTX *, const uint8_t *msg, int len);
-void MD5Final(MD5_CTX *, uint8_t *digest);
+EXP_FUNC void STDCALL MD5Init(MD5_CTX *);
+EXP_FUNC void STDCALL MD5Update(MD5_CTX *, const uint8_t *msg, int len);
+EXP_FUNC void STDCALL MD5Final(MD5_CTX *, uint8_t *digest);
 
 /**************************************************************************
  * HMAC declarations 
@@ -272,6 +274,9 @@ void print_blob(const char *format, const uint8_t *data, int size, ...);
 #else
     #define print_blob(...)
 #endif
+
+EXP_FUNC int STDCALL base64_decode(const char *in,  int len,
+                    uint8_t *out, int *outlen);
 
 #ifdef __cplusplus
 }

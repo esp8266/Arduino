@@ -267,3 +267,78 @@ void print_blob(const char *format,
 void print_blob(const char *format, const unsigned char *data,
         int size, ...) {}
 #endif
+
+#if defined(CONFIG_SSL_HAS_PEM) || defined(CONFIG_HTTP_HAS_AUTHORIZATION)
+/* base64 to binary lookup table */
+static const uint8_t map[128] =
+{
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255,  62, 255, 255, 255,  63,
+    52,  53,  54,  55,  56,  57,  58,  59,  60,  61, 255, 255,
+    255, 254, 255, 255, 255,   0,   1,   2,   3,   4,   5,   6,
+    7,   8,   9,  10,  11,  12,  13,  14,  15,  16,  17,  18,
+    19,  20,  21,  22,  23,  24,  25, 255, 255, 255, 255, 255,
+    255,  26,  27,  28,  29,  30,  31,  32,  33,  34,  35,  36,
+    37,  38,  39,  40,  41,  42,  43,  44,  45,  46,  47,  48,
+    49,  50,  51, 255, 255, 255, 255, 255
+};
+
+EXP_FUNC int STDCALL base64_decode(const char *in, int len,
+                    uint8_t *out, int *outlen)
+{
+    int g, t, x, y, z;
+    uint8_t c;
+    int ret = -1;
+
+    g = 3;
+    for (x = y = z = t = 0; x < len; x++)
+    {
+        if ((c = map[in[x]&0x7F]) == 0xff)
+            continue;
+
+        if (c == 254)   /* this is the end... */
+        {
+            c = 0;
+
+            if (--g < 0)
+                goto error;
+        }
+        else if (g != 3) /* only allow = at end */
+            goto error;
+
+        t = (t<<6) | c;
+
+        if (++y == 4)
+        {
+            out[z++] = (uint8_t)((t>>16)&255);
+
+            if (g > 1)
+                out[z++] = (uint8_t)((t>>8)&255);
+
+            if (g > 2)
+                out[z++] = (uint8_t)(t&255);
+
+            y = t = 0;
+        }
+    }
+
+    if (y != 0)
+        goto error;
+
+    if (outlen)
+        *outlen = z;
+    ret = 0;
+
+error:
+#ifdef CONFIG_SSL_FULL_MODE
+    if (ret < 0)
+        printf("Error: Invalid base64\n"); TTY_FLUSH();
+#endif
+    TTY_FLUSH();
+    return ret;
+
+}
+#endif
+

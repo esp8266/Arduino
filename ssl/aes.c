@@ -62,10 +62,6 @@
 			(f8)^=rot2(f4), \
 			(f8)^rot1(f9))
 
-/* some macros to do endian independent byte extraction */
-#define n2l(c,l) l=ntohl(*c); c++
-#define l2n(l,c) *c++=htonl(l)
-
 /*
  * AES S-box
  */
@@ -249,7 +245,7 @@ void AES_convert_key(AES_CTX *ctx)
     k = ctx->ks;
     k += 4;
 
-    for (i=ctx->rounds*4; i>4; i--)
+    for (i= ctx->rounds*4; i > 4; i--)
     {
         w= *k;
         w = inv_mix_col(w,t1,t2,t3,t4);
@@ -262,46 +258,38 @@ void AES_convert_key(AES_CTX *ctx)
  */
 void AES_cbc_encrypt(AES_CTX *ctx, const uint8_t *msg, uint8_t *out, int length)
 {
-    uint32_t tin0, tin1, tin2, tin3;
-    uint32_t tout0, tout1, tout2, tout3;
-    uint32_t tin[4];
-    uint32_t *iv = (uint32_t *)ctx->iv;
-    uint32_t *msg_32 = (uint32_t *)msg;
-    uint32_t *out_32 = (uint32_t *)out;
+    int i;
+    uint32_t tin[4], tout[4], iv[4];
 
-    n2l(iv, tout0);
-    n2l(iv, tout1);
-    n2l(iv, tout2);
-    n2l(iv, tout3);
-    iv -= 4;
+    memcpy(iv, ctx->iv, AES_IV_SIZE);
+    for (i = 0; i < 4; i++)
+        tout[i] = ntohl(iv[i]);
 
-    for (length -= 16; length >= 0; length -= 16)
+    for (length -= AES_BLOCKSIZE; length >= 0; length -= AES_BLOCKSIZE)
     {
-        n2l(msg_32, tin0);
-        n2l(msg_32, tin1);
-        n2l(msg_32, tin2);
-        n2l(msg_32, tin3);
-        tin[0] = tin0^tout0;
-        tin[1] = tin1^tout1;
-        tin[2] = tin2^tout2;
-        tin[3] = tin3^tout3;
+        uint32_t msg_32[4];
+        uint32_t out_32[4];
+        memcpy(msg_32, msg, AES_BLOCKSIZE);
+        msg += AES_BLOCKSIZE;
+
+        for (i = 0; i < 4; i++)
+            tin[i] = ntohl(msg_32[i])^tout[i];
 
         AES_encrypt(ctx, tin);
 
-        tout0 = tin[0]; 
-        l2n(tout0, out_32);
-        tout1 = tin[1]; 
-        l2n(tout1, out_32);
-        tout2 = tin[2]; 
-        l2n(tout2, out_32);
-        tout3 = tin[3]; 
-        l2n(tout3, out_32);
+        for (i = 0; i < 4; i++)
+        {
+            tout[i] = tin[i]; 
+            out_32[i] = htonl(tout[i]);
+        }
+
+        memcpy(out, out_32, AES_BLOCKSIZE);
+        out += AES_BLOCKSIZE;
     }
 
-    l2n(tout0, iv);
-    l2n(tout1, iv);
-    l2n(tout2, iv);
-    l2n(tout3, iv);
+    for (i = 0; i < 4; i++)
+        iv[i] = htonl(tout[i]);
+    memcpy(ctx->iv, iv, AES_IV_SIZE);
 }
 
 /**
@@ -309,54 +297,42 @@ void AES_cbc_encrypt(AES_CTX *ctx, const uint8_t *msg, uint8_t *out, int length)
  */
 void AES_cbc_decrypt(AES_CTX *ctx, const uint8_t *msg, uint8_t *out, int length)
 {
-    uint32_t tin0, tin1, tin2, tin3;
-    uint32_t xor0,xor1,xor2,xor3;
-    uint32_t tout0,tout1,tout2,tout3;
-    uint32_t data[4];
-    uint32_t *iv = (uint32_t *)ctx->iv;
-    uint32_t *msg_32 = (uint32_t *)msg;
-    uint32_t *out_32 = (uint32_t *)out;
+    int i;
+    uint32_t tin[4], xor[4], tout[4], data[4], iv[4];
 
-    n2l(iv ,xor0);
-    n2l(iv, xor1);
-    n2l(iv, xor2);
-    n2l(iv, xor3);
-    iv -= 4;
+    memcpy(iv, ctx->iv, AES_IV_SIZE);
+    for (i = 0; i < 4; i++)
+        xor[i] = ntohl(iv[i]);
 
-    for (length-=16; length >= 0; length -= 16)
+    for (length -= 16; length >= 0; length -= 16)
     {
-        n2l(msg_32, tin0);
-        n2l(msg_32, tin1);
-        n2l(msg_32, tin2);
-        n2l(msg_32, tin3);
+        uint32_t msg_32[4];
+        uint32_t out_32[4];
+        memcpy(msg_32, msg, AES_BLOCKSIZE);
+        msg += AES_BLOCKSIZE;
 
-        data[0] = tin0;
-        data[1] = tin1;
-        data[2] = tin2;
-        data[3] = tin3;
+        for (i = 0; i < 4; i++)
+        {
+            tin[i] = ntohl(msg_32[i]);
+            data[i] = tin[i];
+        }
 
         AES_decrypt(ctx, data);
 
-        tout0 = data[0]^xor0;
-        tout1 = data[1]^xor1;
-        tout2 = data[2]^xor2;
-        tout3 = data[3]^xor3;
+        for (i = 0; i < 4; i++)
+        {
+            tout[i] = data[i]^xor[i];
+            xor[i] = tin[i];
+            out_32[i] = htonl(tout[i]);
+        }
 
-        xor0 = tin0;
-        xor1 = tin1;
-        xor2 = tin2;
-        xor3 = tin3;
-
-        l2n(tout0, out_32);
-        l2n(tout1, out_32);
-        l2n(tout2, out_32);
-        l2n(tout3, out_32);
+        memcpy(out, out_32, AES_BLOCKSIZE);
+        out += AES_BLOCKSIZE;
     }
 
-    l2n(xor0, iv);
-    l2n(xor1, iv);
-    l2n(xor2, iv);
-    l2n(xor3, iv);
+    for (i = 0; i < 4; i++)
+        iv[i] = htonl(xor[i]);
+    memcpy(ctx->iv, iv, AES_IV_SIZE);
 }
 
 /**
@@ -375,9 +351,7 @@ static void AES_encrypt(const AES_CTX *ctx, uint32_t *data)
 
     /* Pre-round key addition */
     for (row = 0; row < 4; row++)
-    {
         data[row] ^= *(k++);
-    }
 
     /* Encrypt one block. */
     for (curr_rnd = 0; curr_rnd < rounds; curr_rnd++)
@@ -395,7 +369,6 @@ static void AES_encrypt(const AES_CTX *ctx, uint32_t *data)
             {
                 tmp1 = a0 ^ a1 ^ a2 ^ a3;
                 old_a0 = a0;
-
                 a0 ^= tmp1 ^ AES_xtime(a0 ^ a1);
                 a1 ^= tmp1 ^ AES_xtime(a1 ^ a2);
                 a2 ^= tmp1 ^ AES_xtime(a2 ^ a3);
@@ -408,9 +381,7 @@ static void AES_encrypt(const AES_CTX *ctx, uint32_t *data)
         /* KeyAddition - note that it is vital that this loop is separate from
            the MixColumn operation, which must be atomic...*/ 
         for (row = 0; row < 4; row++)
-        {
             data[row] = tmp[row] ^ *(k++);
-        }
     }
 }
 
@@ -424,16 +395,14 @@ static void AES_decrypt(const AES_CTX *ctx, uint32_t *data)
     uint32_t a0, a1, a2, a3, row;
     int curr_rnd;
     int rounds = ctx->rounds;
-    uint32_t *k = (uint32_t*)ctx->ks + ((rounds+1)*4);
+    const uint32_t *k = ctx->ks + ((rounds+1)*4);
 
     /* pre-round key addition */
     for (row=4; row > 0;row--)
-    {
         data[row-1] ^= *(--k);
-    }
 
     /* Decrypt one block */
-    for (curr_rnd=0; curr_rnd < rounds; curr_rnd++)
+    for (curr_rnd = 0; curr_rnd < rounds; curr_rnd++)
     {
         /* Perform ByteSub and ShiftRow operations together */
         for (row = 4; row > 0; row--)
@@ -468,9 +437,7 @@ static void AES_decrypt(const AES_CTX *ctx, uint32_t *data)
         }
 
         for (row = 4; row > 0; row--)
-        {
             data[row-1] = tmp[row-1] ^ *(--k);
-        }
     }
 }
 

@@ -74,10 +74,20 @@ win32_demo:
 install: $(PREFIX) all
 	cp --no-dereference $(STAGE)/libax* $(PREFIX)/lib
 	chmod 755 $(PREFIX)/lib/libax* 
-	-install -m 755 $(STAGE)/ax* $(PREFIX)/bin > /dev/null 2>&1
+	-install -m 755 $(STAGE)/ax* $(PREFIX)/bin 
 ifdef CONFIG_PERL_BINDINGS 
-	-install -m 755 $(STAGE)/axtlsp.pm `perl -e 'use Config; print $$Config{installarchlib};'` > /dev/null 2>&1
+	-install -m 755 $(STAGE)/axtlsp.pm `perl -e 'use Config; print $$Config{installarchlib};'`
 endif
+	@mkdir -p -m 755 $(PREFIX)/include/axTLS
+	-install -m 644 ssl/bigint.h $(PREFIX)/include/axTLS
+	-install -m 644 ssl/bigint_impl.h $(PREFIX)/include/axTLS
+	-install -m 644 ssl/crypto.h $(PREFIX)/include/axTLS
+	-install -m 644 ssl/os_port.h $(PREFIX)/include/axTLS
+	-install -m 644 ssl/bigint.h $(PREFIX)/include/axTLS
+	-install -m 644 ssl/ssl.h $(PREFIX)/include/axTLS
+	-install -m 644 ssl/tls1.h $(PREFIX)/include/axTLS
+	-install -m 644 ssl/version.h $(PREFIX)/include/axTLS
+	-install -m 644 config/config.h $(PREFIX)/include/axTLS
 
 installclean:
 	-@rm $(PREFIX)/lib/libax* > /dev/null 2>&1

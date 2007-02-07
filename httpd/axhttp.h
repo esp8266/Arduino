@@ -77,6 +77,9 @@ struct connstruct
     uint8_t is_ssl;
     uint8_t close_when_done;
     uint8_t modified_since;
+#if defined(CONFIG_HTTP_HAS_AUTHORIZATION)
+    char authorization[MAXREQUESTLENGTH];
+#endif
 };
 
 struct serverstruct 
@@ -102,9 +105,6 @@ extern struct connstruct *freeconns;
 #if defined(CONFIG_HTTP_HAS_CGI)
 extern struct cgiextstruct *cgiexts;
 #endif
-
-// Conf global prototypes
-extern char *webroot;
 
 // conn.c prototypes
 void removeconnection(struct connstruct *cn);

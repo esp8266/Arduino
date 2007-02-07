@@ -29,8 +29,7 @@
 static int special_read(struct connstruct *cn, void *buf, size_t count);
 static int special_write(struct connstruct *cn, 
                                         const uint8_t *buf, size_t count);
-static void send404(struct connstruct *cn);
-static int procindex(struct connstruct *cn, struct stat *stp);
+static void send_error(struct connstruct *cn, int err);
 static int hexit(char c);
 static void urldecode(char *buf);
 static void buildactualfile(struct connstruct *cn);
@@ -47,6 +46,9 @@ static int trycgi_withpathinfo(struct connstruct *cn);
 static void split(char *tp, char *sp[], int maxwords, char sc);
 static int iscgi(const char *fn);
 #endif
+#ifdef CONFIG_HTTP_HAS_AUTHORIZATION
+static int auth_check(struct connstruct *cn);
+#endif
 
 /* Returns 1 if elems should continue being read, 0 otherwise */
 static int procheadelem(struct connstruct *cn, char *buf) 
@@ -61,10 +63,11 @@ static int procheadelem(struct connstruct *cn, char *buf)
 
     *delim = 0;
     value = delim+1;
+    printf("BUF %s - value %s\n", buf, value);
 
-    if (strcmp(buf, "GET")==0 ||
-            strcmp(buf, "HEAD")==0 ||
-            strcmp(buf, "POST")==0) 
+    if (strcmp(buf, "GET") == 0 ||
+            strcmp(buf, "HEAD") == 0 ||
+            strcmp(buf, "POST") == 0) 
     {
         if (buf[0] == 'H') 
             cn->reqtype = TYPE_HEAD;
@@ -79,8 +82,7 @@ static int procheadelem(struct connstruct *cn, char *buf)
 
         if (sanitizefile(value) == 0) 
         {
-            send404(cn);
-            removeconnection(cn);
+            send_error(cn, 404);
             return 0;
         }
 
@@ -98,7 +100,6 @@ static int procheadelem(struct connstruct *cn, char *buf)
     {
         if (sanitizehost(value) == 0) 
         {
-            send404(cn);
             removeconnection(cn);
             return 0;
         }
@@ -114,6 +115,15 @@ static int procheadelem(struct connstruct *cn, char *buf)
         /* TODO: parse this date properly with getdate() or similar */
         cn->modified_since = 1;
     }
+#ifdef CONFIG_HTTP_HAS_AUTHORIZATION
+    else if (strcmp(buf, "Authorization:") == 0 &&
+                            strncmp(value, "Basic ", 6) == 0)
+    {
+        if (base64_decode(&value[6], strlen(&value[6]), 
+                                        cn->authorization, NULL))
+            cn->authorization[0] = 0;   /* error */
+    }
+#endif
 
     return 1;
 }
@@ -141,15 +151,13 @@ static void procdirlisting(struct connstruct *cn)
 
     if (cn->dirp == INVALID_HANDLE_VALUE) 
     {
-        send404(cn);
-        removeconnection(cn);
+        send_error(cn, 404);
         return;
     }
 #else
     if ((cn->dirp = opendir(actualfile)) == NULL) 
     {
-        send404(cn);
-        removeconnection(cn);
+        send_error(cn, 404);
         return;
     }
 
@@ -205,11 +213,16 @@ void procdodir(struct connstruct *cn)
         if (file[0] == '.' && file[1] != '.')
             continue;
 
+        /* make sure a '/' is at the end of a directory */
+        if (cn->filereq[strlen(cn->filereq)-1] != '/')
+            strcat(cn->filereq, "/");
+
+        /* see if the dir + file is another directory */
         snprintf(buf, sizeof(buf), "%s%s", cn->actualfile, file);
         if (isdir(buf))
             strcat(file, "/");
-        urlencode(file, encbuf);
 
+        urlencode(file, encbuf);
         snprintf(buf, sizeof(buf), "<a href=\"%s%s\">%s</a><br />\n",
                 cn->filereq, encbuf, file);
     } while (special_write(cn, buf, strlen(buf)));
@@ -263,6 +276,10 @@ void procreadhead(struct connstruct *cn)
     buf[rv] = '\0';
     next = tp = buf;
 
+#ifdef CONFIG_HTTP_HAS_AUTHORIZATION
+    cn->authorization[0] = 0;
+#endif
+
     /* Split up lines and send to procheadelem() */
     while (*next != '\0') 
     {
@@ -297,22 +314,22 @@ void procreadhead(struct connstruct *cn)
  */
 void procsendhead(struct connstruct *cn) 
 {
-    char buf[1024];
-    char actualfile[1024];
+    char buf[MAXREQUESTLENGTH];
     struct stat stbuf;
     time_t now = cn->timeout - CONFIG_HTTP_TIMEOUT;
     char date[32];
 
-    strcpy(date, ctime(&now));
-    strcpy(actualfile, cn->actualfile);
-
-#ifdef WIN32
-    /* stat() under win32 can't deal with trail slash */
-    if (actualfile[strlen(actualfile)-1] == '\\')
-        actualfile[strlen(actualfile)-1] = 0;
+#ifdef CONFIG_HTTP_HAS_AUTHORIZATION
+    if (auth_check(cn))
+    {
+        removeconnection(cn);
+        return;
+    }
 #endif
 
-    if (stat(actualfile, &stbuf) == -1) 
+    strcpy(date, ctime(&now));
+
+    if (stat(cn->actualfile, &stbuf) == -1) 
     {
 #if defined(CONFIG_HTTP_HAS_CGI)
         if (trycgi_withpathinfo(cn) == 0) 
@@ -323,8 +340,7 @@ void procsendhead(struct connstruct *cn)
         }
 #endif
 
-        send404(cn);
-        removeconnection(cn);
+        send_error(cn, 404);
         return;
     }
 
@@ -335,8 +351,7 @@ void procsendhead(struct connstruct *cn)
         /* Set up CGI script */
         if ((stbuf.st_mode & S_IEXEC) == 0 || isdir(cn->actualfile)) 
         {
-            send404(cn);
-            removeconnection(cn);
+            send_error(cn, 404);
             return;
         }
 #endif
@@ -346,17 +361,20 @@ void procsendhead(struct connstruct *cn)
     }
 #endif
 
+    /* look for "index.html"? */
     if ((stbuf.st_mode & S_IFMT) == S_IFDIR) 
     {
-        /* Check to see if this dir has an index file */
-        if (procindex(cn, &stbuf) == 0) 
+        char tbuf[MAXREQUESTLENGTH];
+        sprintf(tbuf, "%s%s", cn->actualfile, "index.html");
+        if (stat(tbuf, &stbuf) != -1) 
+            strcat(cn->actualfile, "index.html");
+        else
         {
 #if defined(CONFIG_HTTP_DIRECTORIES)
             /* If not, we do a directory listing of it */
             procdirlisting(cn);
 #else
-            send404(cn);
-            removeconnection(cn);
+            send_error(cn, 404);
 #endif
             return;
         }
@@ -368,8 +386,7 @@ void procsendhead(struct connstruct *cn)
             /* Set up CGI script */
             if ((stbuf.st_mode & S_IEXEC) == 0 || isdir(cn->actualfile)) 
             {
-                send404(cn);
-                removeconnection(cn);
+                send_error(cn, 404);
                 return;
             }
 
@@ -412,14 +429,14 @@ void procsendhead(struct connstruct *cn)
     else 
     {
         int flags = O_RDONLY;
-#if defined(WIN32) || defined(CYGWIN)
+#if defined(WIN32) || defined(CONFIG_PLATFORM_CYGWIN)
         flags |= O_BINARY;
 #endif
 
         cn->filedesc = open(cn->actualfile, flags);
         if (cn->filedesc == -1) 
         {
-            send404(cn);
+            send_error(cn, 404);
             removeconnection(cn);
             return;
         }
@@ -513,23 +530,6 @@ static int special_read(struct connstruct *cn, void *buf, size_t count)
         res = SOCKET_READ(cn->networkdesc, buf, count);
 
     return res;
-}
-
-/* Returns 0 if no index was found and doesn't modify cn->actualfile
-   Returns 1 if an index was found and puts the index in cn->actualfile
-              and puts its stat info into stp */
-static int procindex(struct connstruct *cn, struct stat *stp) 
-{
-    char tbuf[MAXREQUESTLENGTH];
-
-    sprintf(tbuf, "%s%s", cn->actualfile, "index.html");
-    if (stat(tbuf, stp) != -1) 
-    {
-        my_strncpy(cn->actualfile, tbuf, MAXREQUESTLENGTH);
-        return 1;
-    }
-
-    return 0;
 }
 
 #if defined(CONFIG_HTTP_HAS_CGI)
@@ -651,8 +651,8 @@ static int trycgi_withpathinfo(struct connstruct *cn)
 
     while (fr_rs[i] != NULL) 
     {
-        snprintf(tpfile, sizeof(tpfile), "%s/%s%s", 
-                            webroot, cn->virtualhostreq, fr_str);
+        snprintf(tpfile, sizeof(tpfile), "/%s%s", 
+                            cn->virtualhostreq, fr_str);
 
         if (iscgi(tpfile) && isdir(tpfile) == 0)
         {
@@ -782,18 +782,9 @@ static int hexit(char c)
         return 0;
 }
 
-static void send404(struct connstruct *cn)
-{
-    char buf[1024];
-    strcpy(buf, "HTTP/1.0 404 Not Found\nContent-Type: text/html\n\n"
-            "<html><body>\n<title>404 Not Found</title><h1>"
-            "404 Not Found</h1>\n</body></html>\n");
-    special_write(cn, buf, strlen(buf));
-}
-
 static void buildactualfile(struct connstruct *cn)
 {
-    snprintf(cn->actualfile, MAXREQUESTLENGTH, "%s%s", webroot, cn->filereq);
+    snprintf(cn->actualfile, MAXREQUESTLENGTH, "%s", cn->filereq);
 
     /* Add directory slash if not there */
     if (isdir(cn->actualfile) && 
@@ -805,9 +796,7 @@ static void buildactualfile(struct connstruct *cn)
     {
         char *t = cn->actualfile;
         while ((t = strchr(t, '/')))
-        {
             *t++ = '\\';
-        }
     }
 #endif
 }
@@ -853,5 +842,148 @@ static int sanitizehost(char *buf)
     }
 
     return 1;
+}
+
+#ifdef CONFIG_HTTP_HAS_AUTHORIZATION
+#define AUTH_FILE       ".htpasswd"
+
+static void send_authenticate(struct connstruct *cn, const char *realm)
+{
+    char buf[1024];
+
+    snprintf(buf, sizeof(buf), "HTTP/1.1 401 Unauthorized\n"
+         "WWW-Authenticate: Basic\n"
+                 "realm=\"%s\"\n", realm);
+    special_write(cn, buf, strlen(buf));
+}
+
+static int check_digest(char *b64_file_passwd, const char *msg_passwd)
+{
+    uint8_t real_salt[MAXREQUESTLENGTH];
+    uint8_t real_passwd[MAXREQUESTLENGTH];
+    int real_passwd_size, real_salt_size;
+    char *b64_pwd;
+    uint8_t md5_result[MD5_SIZE];
+    MD5_CTX ctx;
+
+    /* retrieve the salt */
+    if ((b64_pwd = strchr(b64_file_passwd, '$')) == NULL)
+        return -1;
+
+    *b64_pwd++ = 0;
+    if (base64_decode(b64_file_passwd, strlen(b64_file_passwd), 
+                                            real_salt, &real_salt_size))
+        return -1;
+
+    if (base64_decode(b64_pwd, strlen(b64_pwd), real_passwd, &real_passwd_size))
+        return -1;
+
+    /* very simple MD5 crypt algorithm, but then the salt we use is large */
+    MD5Init(&ctx);
+    MD5Update(&ctx, real_salt, real_salt_size);     /* process the salt */
+    MD5Update(&ctx, msg_passwd, strlen(msg_passwd)); /* process the password */
+    MD5Final(&ctx, md5_result);
+    return memcmp(md5_result, real_passwd, MD5_SIZE);/* 0 = ok */
+}
+
+static int auth_check(struct connstruct *cn)
+{
+    char dirname[MAXREQUESTLENGTH];
+    char authpath[MAXREQUESTLENGTH];
+    char line[MAXREQUESTLENGTH];
+    char *cp;
+    FILE *fp = NULL;
+    struct stat auth_stat;
+
+    strncpy(dirname, cn->actualfile, MAXREQUESTLENGTH);
+    cp = strrchr(dirname, '/');
+    if (cp == NULL)
+        dirname[0] = 0;
+    else
+        *cp = 0;
+
+    /* check that the file is not the AUTH_FILE itself */
+    if (strcmp(cn->actualfile, AUTH_FILE) == 0)
+    {
+        send_error(cn, 403);
+        goto error;
+    }
+
+    snprintf(authpath, MAXREQUESTLENGTH, "%s/%s", dirname, AUTH_FILE);
+    if (stat(authpath, &auth_stat) < 0)    /* no auth file, so let though */
+        return 0;
+
+    if (cn->authorization[0] == 0)
+    {
+        send_authenticate(cn, dirname);
+        return -1;
+    }
+
+    /* cn->authorization is in form "username:password" */
+    if ((cp = strchr(cn->authorization, ':')) == NULL)
+        goto error;
+    else
+        *cp++ = 0;  /* cp becomes the password */
+
+    fp = fopen(authpath, "r");
+
+    while (fgets(line, sizeof(line), fp) != NULL)
+    {
+        char *b64_file_passwd;
+        int l = strlen(line);
+
+        /* nuke newline */
+        if (line[l-1] == '\n')
+            line[l-1] = 0;
+
+        /* line is form "username:salt(b64)$password(b64)" */
+        if ((b64_file_passwd = strchr(line, ':')) == NULL)
+            continue;
+
+        *b64_file_passwd++ = 0;
+
+        if (strcmp(line, cn->authorization)) /* our user? */
+            continue;
+
+        if (check_digest(b64_file_passwd, cp) == 0)
+        {
+            fclose(fp);
+            return 0;
+        }
+    }
+
+    fclose(fp);
+
+error:
+    send_authenticate(cn, dirname);
+    return -1;
+}
+#endif
+
+static void send_error(struct connstruct *cn, int err)
+{
+    char buf[1024];
+    char *title;
+    char *text;
+
+    switch (err)
+    {
+        case 403:
+            title = "Forbidden";
+            text = "File is protected";
+            break;
+
+        case 404:
+            title = "Not Found";
+            text = title;
+            break;
+    }
+
+    sprintf(buf, "HTTP/1.1 %d %s\nContent-Type: text/html\n"
+            "<html><body>\n<title>%d %s</title>"
+            "<h1>%d %s</h1>\n</body></html>\n", 
+            err, title, err, title, err, text);
+    special_write(cn, buf, strlen(buf));
+    removeconnection(cn);
 }
 

@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
     WSADATA wsaData;
     WORD wVersionRequested = MAKEWORD(2, 2);
     WSAStartup(wVersionRequested, &wsaData);
-#elif !defined(SOLARIS)
+#elif !defined(CONFIG_PLATFORM_SOLARIS)
     signal(SIGPIPE, SIG_IGN);           /* ignore pipe errors */
 #endif
 

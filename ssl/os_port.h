@@ -29,7 +29,7 @@
 extern "C" {
 #endif
 
-#if defined(WIN32) || defined(CYGWIN)
+#if defined(WIN32) || defined(CONFIG_PLATFORM_CYGWIN)
 #define STDCALL                 __stdcall
 #define EXP_FUNC                __declspec(dllexport)
 #else
@@ -56,6 +56,7 @@ extern "C" {
 #endif      /* _WIN32_WCE */
 
 #include <winsock.h>
+#include <direct.h>
 #undef getpid
 #undef open
 #undef close
@@ -81,6 +82,7 @@ extern "C" {
 #define usleep(A)               Sleep(A/1000)
 #define lseek(A,B,C)            _lseek(A,B,C)
 #define strdup(A)               _strdup(A)
+#define chroot(A)               _chdir(A)
 
 /* This fix gets around a problem where a win32 application on a cygwin xterm
    doesn't display regular output (until a certain buffer limit) - but it works
@@ -113,7 +115,7 @@ extern EXP_FUNC int strcasecmp(const char *s1, const char *s2);
 
 #else   /* Not Win32 */
 
-#ifdef SOLARIS
+#ifdef CONFIG_PLATFORM_SOLARIS
 #include <inttypes.h>
 #else
 #include <stdint.h>

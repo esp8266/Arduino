@@ -27,7 +27,6 @@
 struct serverstruct *servers;
 struct connstruct *usedconns;
 struct connstruct *freeconns;
-char *webroot = CONFIG_HTTP_WEBROOT;
 
 static void addtoservers(int sd);
 static int openlistener(int port);
@@ -86,11 +85,12 @@ static void die(int sigtype)
 
 int main(int argc, char *argv[]) 
 {
+    static char *webroot = CONFIG_HTTP_WEBROOT;
     fd_set rfds, wfds;
     struct connstruct *tp, *to;
     struct serverstruct *sp;
     int rnum, wnum, active;
-    int webrootlen, i;
+    int i;
     time_t currtime;
 
 #ifdef WIN32
@@ -98,12 +98,6 @@ int main(int argc, char *argv[])
     WSADATA wsaData;
     WSAStartup(wVersionRequested,&wsaData);
 #else
-    if (getuid() == 0)  /* change our uid if we are root */
-    {
-        setgid(32767);
-        setuid(32767);
-    }
-
     signal(SIGQUIT, die);
     signal(SIGPIPE, SIG_IGN);
 #if defined(CONFIG_HTTP_HAS_CGI)
@@ -122,18 +116,19 @@ int main(int argc, char *argv[])
         freeconns->next = tp;
     }
 
-    webrootlen = strlen(webroot);
-
-    if (webroot[webrootlen-1] == '/') 
-        webroot[webrootlen-1] = '\0';
-
-    if (isdir(webroot) == 0) 
+    /* change to webroot for better security */
+    if (chroot(webroot))
     {
 #ifdef CONFIG_HTTP_VERBOSE
         fprintf(stderr, "'%s' is not a directory\n", webroot);
 #endif
         exit(1);
     }
+
+#ifndef WIN32
+    setgid(32767);
+    setuid(32767);
+#endif
 
     if ((active = openlistener(CONFIG_HTTP_PORT)) == -1) 
     {
