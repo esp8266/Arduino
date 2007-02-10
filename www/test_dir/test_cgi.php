@@ -1,4 +1,4 @@
-#!/usr/bin/php
+#!/bin/php
 
 <?
 phpinfo();

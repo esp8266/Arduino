@@ -8,5 +8,7 @@ Changes since 1.0.0
 axhttpd Changes
 * Header file issue fixed (in mime_types.c)
 * chroot() now used for better security
-* Authentication implemented
-* 
+* Basic authentication implemented (with .htpasswd)
+* HTTP Port protection implemented (with .htaccess)
+* Directory access protection implemented (with .htaccess)
+

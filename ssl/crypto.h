@@ -123,9 +123,9 @@ void hmac_sha1(const uint8_t *msg, int length, const uint8_t *key,
 /**************************************************************************
  * RNG declarations 
  **************************************************************************/
-void RNG_initialize(const uint8_t *seed_buf, int size);
-void RNG_terminate(void);
-void get_random(int num_rand_bytes, uint8_t *rand_data);
+EXP_FUNC void STDCALL RNG_initialize(const uint8_t *seed_buf, int size);
+EXP_FUNC void STDCALL RNG_terminate(void);
+EXP_FUNC void STDCALL get_random(int num_rand_bytes, uint8_t *rand_data);
 void get_random_NZ(int num_rand_bytes, uint8_t *rand_data);
 
 /**************************************************************************
@@ -270,7 +270,7 @@ typedef void (*hmac_func)(const uint8_t *msg, int length, const uint8_t *key,
 int get_file(const char *filename, uint8_t **buf);
 
 #if defined(CONFIG_SSL_FULL_MODE) || defined(WIN32) || defined(CONFIG_DEBUG)
-void print_blob(const char *format, const uint8_t *data, int size, ...);
+EXP_FUNC void STDCALL print_blob(const char *format, const uint8_t *data, int size, ...);
 #else
     #define print_blob(...)
 #endif

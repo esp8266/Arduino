@@ -38,7 +38,7 @@ static void procpermcheck(const char *pathtocheck);
 
 #if defined(CONFIG_HTTP_HAS_CGI)
 struct cgiextstruct *cgiexts;
-static void addcgiext(char *tp);
+static void addcgiext(const char *tp);
 
 #if !defined(WIN32)
 static void reaper(int sigtype) 
@@ -54,6 +54,7 @@ static void sigint_cleanup(int sig)
     struct serverstruct *sp;
     struct connstruct *tp;
     int i;
+
 
     while (servers != NULL) 
     {
@@ -74,6 +75,17 @@ static void sigint_cleanup(int sig)
         free(freeconns);
         freeconns = tp;
     }
+
+#if defined(CONFIG_HTTP_HAS_CGI)
+    while (cgiexts)
+    {
+        struct cgiextstruct *cp = cgiexts->next;
+        if (cp == NULL) /* last entry */
+            free(cgiexts->ext);
+        free(cgiexts);
+        cgiexts = cp;
+    }
+#endif
 
     exit(0);
 }
@@ -159,7 +171,7 @@ int main(int argc, char *argv[])
     procpermcheck(webroot);
 #endif
 #if defined(CONFIG_HTTP_HAS_CGI)
-    addcgiext(CONFIG_HTTP_CGI_EXTENSION);
+    addcgiext(CONFIG_HTTP_CGI_EXTENSIONS);
 #endif
 #if defined(CONFIG_HTTP_VERBOSE)
     printf("axhttpd (%s): listening on ports %d (http) and %d (https)\n", 
@@ -413,13 +425,21 @@ static void procpermcheck(const char *pathtocheck)
 #endif  /* CONFIG_HTTP_PERM_CHECK */
 
 #if defined(CONFIG_HTTP_HAS_CGI)
-static void addcgiext(char *tp)
+static void addcgiext(const char *cgi_exts)
 {
-    struct cgiextstruct *ex = (struct cgiextstruct *)
-                        malloc(sizeof(struct cgiextstruct));
-    ex->ext = strdup(tp);
-    ex->next = cgiexts;
-    cgiexts = ex;
+    char *cp = strdup(cgi_exts);
+
+    /* extenstions are comma separated */
+    do 
+    {
+        struct cgiextstruct *ex = (struct cgiextstruct *)
+                            malloc(sizeof(struct cgiextstruct));
+        ex->ext = cp;
+        ex->next = cgiexts;
+        cgiexts = ex;
+        if ((cp = strchr(cp, ',')) != NULL)
+            *cp++ = 0;
+    } while (cp != NULL);
 }
 #endif
 
@@ -557,10 +577,8 @@ static void addconnection(int sd, char *ip, int is_ssl)
 #if defined(CONFIG_HTTP_HAS_CGI)
     *(tp->cgiargs) = '\0';
 #endif
-    *(tp->virtualhostreq) = '\0';
     tp->state = STATE_WANT_TO_READ_HEAD;
     tp->reqtype = TYPE_GET;
-    my_strncpy(tp->ip, ip, MAXIPLEN);
     tp->close_when_done = 0;
     tp->modified_since = 0;
     tp->timeout = time(NULL) + CONFIG_HTTP_TIMEOUT;

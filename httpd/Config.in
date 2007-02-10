@@ -10,7 +10,7 @@ config CONFIG_HTTP_STATIC_BUILD
     bool "Static Build"
     default n
     help
-        Select y if you want axhttp to be a static build (i.e. don't use the
+        Select y if you want axhttpd to be a static build (i.e. don't use the
         axtls shared library or dll).
         
 config CONFIG_HTTP_PORT
@@ -59,12 +59,14 @@ config CONFIG_HTTP_HAS_CGI
     help
         Enable the CGI capability.
 
-config CONFIG_HTTP_CGI_EXTENSION
-    string "CGI File Extension"
-    default ".php"
+config CONFIG_HTTP_CGI_EXTENSIONS
+    string "CGI File Extension(s)"
+    default ".php,.sh"
     depends on CONFIG_HTTP_HAS_CGI
     help
-        Tell axhhtp what file extension is used for CGI
+        Tell axhhtpd what file extension(s) are used for CGI.
+
+        This is a comma separated list.
 
 config CONFIG_HTTP_DIRECTORIES
     bool "Enable Directory Listing"

@@ -82,7 +82,7 @@ int get_file(const char *filename, uint8_t **buf)
  * - On Linux use /dev/urandom
  * - If none of these work then use a custom RNG.
  */
-void RNG_initialize(const uint8_t *seed_buf, int size)
+EXP_FUNC void STDCALL RNG_initialize(const uint8_t *seed_buf, int size)
 {
     if (rng_ref_count == 0)
     {
@@ -106,9 +106,7 @@ void RNG_initialize(const uint8_t *seed_buf, int size)
         int i;  
 
         for (i = 0; i < size/(int)sizeof(uint64_t); i++)
-        {
             rng_num ^= *((uint64_t *)&seed_buf[i*sizeof(uint64_t)]);
-        }
 
         srand((long)seed_buf);  /* use the stack ptr as another rnd seed */
 #endif
@@ -120,7 +118,7 @@ void RNG_initialize(const uint8_t *seed_buf, int size)
 /**
  * Terminate the RNG engine.
  */
-void RNG_terminate(void)
+EXP_FUNC void STDCALL RNG_terminate(void)
 {
     if (--rng_ref_count == 0)
     {
@@ -135,7 +133,7 @@ void RNG_terminate(void)
 /**
  * Set a series of bytes with a random number. Individual bytes can be 0
  */
-void get_random(int num_rand_bytes, uint8_t *rand_data)
+EXP_FUNC void STDCALL get_random(int num_rand_bytes, uint8_t *rand_data)
 {   
 #if !defined(WIN32) && defined(CONFIG_USE_DEV_URANDOM)
     /* use the Linux default */
@@ -160,9 +158,7 @@ void get_random(int num_rand_bytes, uint8_t *rand_data)
 
     memcpy(rand_data, &big_num1, sizeof(uint64_t));
     if (num_rand_bytes > sizeof(uint64_t))
-    {
         memcpy(&rand_data[8], &big_num2, sizeof(uint64_t));
-    }
 
     if (num_rand_bytes > 16)
     {
@@ -189,9 +185,7 @@ void get_random_NZ(int num_rand_bytes, uint8_t *rand_data)
     for (i = 0; i < num_rand_bytes; i++)
     {
         while (rand_data[i] == 0)  /* can't be 0 */
-        {
             rand_data[i] = (uint8_t)(rand());
-        }
     }
 }
 
@@ -243,7 +237,7 @@ static void print_hex(uint8_t hex)
  * @param data     [in]    The start of data to use
  * @param ...      [in]    Any additional arguments
  */
-void print_blob(const char *format, 
+EXP_FUNC void STDCALL print_blob(const char *format, 
         const uint8_t *data, int size, ...)
 {
     int i;
@@ -264,7 +258,7 @@ void print_blob(const char *format,
 }
 #elif defined(WIN32)
 /* VC6.0 doesn't handle variadic macros */
-void print_blob(const char *format, const unsigned char *data,
+EXP_FUNC void STDCALL print_blob(const char *format, const unsigned char *data,
         int size, ...) {}
 #endif
 

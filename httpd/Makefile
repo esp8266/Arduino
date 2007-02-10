@@ -25,8 +25,10 @@ ifndef CONFIG_PLATFORM_WIN32
 
 ifdef CONFIG_PLATFORM_CYGWIN
 TARGET=../$(STAGE)/axhttpd.exe
+TARGET2=../$(STAGE)/htpasswd.exe
 else
 TARGET=../$(STAGE)/axhttpd
+TARGET2=../$(STAGE)/htpasswd
 endif
 
 ifdef CONFIG_HTTP_STATIC_BUILD
@@ -39,6 +41,7 @@ CFLAGS += -I../ssl
 
 else # win32 build
 TARGET=../$(STAGE)/axhttpd.exe
+TARGET2=../$(STAGE)/htpasswd.exe
 
 ifdef CONFIG_HTTP_STATIC_BUILD
 LIBS=../$(STAGE)/axtls.static.lib ..\\config\\axtls.res
@@ -51,7 +54,11 @@ ifndef CONFIG_AXHTTPD
 web_server:
 else
 
-web_server : $(TARGET)
+web_server :: $(TARGET)
+
+ifdef CONFIG_HTTP_HAS_AUTHORIZATION
+web_server :: $(TARGET2)
+endif
 
 OBJ= \
 	axhttpd.o \
@@ -69,13 +76,23 @@ ifndef CONFIG_PLATFORM_SOLARIS
 	strip --remove-section=.comment $(TARGET)
 endif
 endif
+
+$(TARGET2): htpasswd.o ../$(STAGE)/libaxtls.a
+	$(LD) $(LDFLAGS) -o $@ htpasswd.o $(LIBS)
+
 else    # Win32
 
 OBJ:=$(OBJ:.o=.obj)
 %.obj : %.c
 	$(CC) $(CFLAGS) $< 
 
+htpasswd.obj : htpasswd.c
+	$(CC) $(CFLAGS) $< 
+	
 $(TARGET): $(OBJ)
+	$(LD) $(LDFLAGS) $(LIBS) /out:$@ $(OBJ)
+
+$(TARGET2): htpasswd.obj
 	$(LD) $(LDFLAGS) $(LIBS) /out:$@ $(OBJ)
 endif
 

@@ -99,5 +99,5 @@ endif
 
 clean::
 	$(MAKE) -C test clean
-	-@rm -f ../$(STAGE)/*.pch ../$(STAGE)/*.so* ../$(STAGE)/*.a ../$(STAGE)/*.dll ../$(STAGE)/*.lib ../$(STAGE)/*.exp ../$(STAGE)/*.pdb ../$(STAGE)/*.ilk
+	-@rm -f ../$(STAGE)/* *.a *.lib
 

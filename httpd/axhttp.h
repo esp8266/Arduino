@@ -25,9 +25,7 @@
 #define HAVE_IPV6
 #endif
 
-#define MAXFILEPATH 1024
-#define MAXIPLEN 45
-#define MAXREQUESTLENGTH 1024
+#define MAXREQUESTLENGTH 256
 #define MAXCGIARGS 100
 #define BLOCKSIZE 4096
 
@@ -40,9 +38,12 @@
 #define STATE_WANT_TO_SEND_FILE  4
 #define STATE_DOING_DIR          5
 
-#define TYPE_GET 0
-#define TYPE_HEAD 1
-#define TYPE_POST 2
+enum
+{
+    TYPE_GET,
+    TYPE_HEAD,
+    TYPE_POST
+};
 
 struct connstruct 
 {
@@ -62,21 +63,21 @@ struct connstruct
 #endif
 
     time_t timeout;
-    char ip[MAXIPLEN];
     char actualfile[MAXREQUESTLENGTH];
     char filereq[MAXREQUESTLENGTH];
+    char dirname[MAXREQUESTLENGTH];
+    char virtualhostreq[MAXREQUESTLENGTH];
+    int numbytes;
+    char databuf[BLOCKSIZE];
+    uint8_t is_ssl;
+    uint8_t close_when_done;
+    uint8_t modified_since;
+
 #if defined(CONFIG_HTTP_HAS_CGI)
     char cgiargs[MAXREQUESTLENGTH];
     char cgiscriptinfo[MAXREQUESTLENGTH];
     char cgipathinfo[MAXREQUESTLENGTH];
 #endif
-    char virtualhostreq[MAXREQUESTLENGTH];
-    int numbytes;
-    char databuf[BLOCKSIZE];
-
-    uint8_t is_ssl;
-    uint8_t close_when_done;
-    uint8_t modified_since;
 #if defined(CONFIG_HTTP_HAS_AUTHORIZATION)
     char authorization[MAXREQUESTLENGTH];
 #endif
