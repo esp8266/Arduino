@@ -536,8 +536,15 @@ char *my_strncpy(char *dest, const char *src, size_t n)
 int isdir(const char *tpbuf) 
 {
     struct stat st;
+    char path[MAXREQUESTLENGTH];
+    strcpy(path, tpbuf);
 
-    if (stat(tpbuf, &st) == -1) 
+#ifdef WIN32        /* win32 stat() can't handle trailing '\' */
+    if (path[strlen(path)-1] == '\\')
+        path[strlen(path)-1] = 0;
+#endif
+
+    if (stat(path, &st) == -1) 
         return 0;
 
     if ((st.st_mode & S_IFMT) == S_IFDIR) 

@@ -26,6 +26,8 @@
 #include <string.h>
 #include "axhttp.h"
 
+static const char * index_file = "index.html";
+
 static int special_read(struct connstruct *cn, void *buf, size_t count);
 static int special_write(struct connstruct *cn, 
                                         const uint8_t *buf, size_t count);
@@ -333,7 +335,7 @@ void procsendhead(struct connstruct *cn)
     if (auth_check(cn))     /* see if there is a '.htpasswd' file */
     {
 #ifdef CONFIG_HTTP_VERBOSE
-        printf("axhttpd: access to %s denied\n", cn->actualfile); TTY_FLUSH();
+        printf("axhttpd: access to %s denied\n", cn->filereq); TTY_FLUSH();
 #endif
         removeconnection(cn);
         return;
@@ -370,12 +372,12 @@ void procsendhead(struct connstruct *cn)
 #endif
 
     /* look for "index.html"? */
-    if ((stbuf.st_mode & S_IFMT) == S_IFDIR) 
+    if (isdir(cn->actualfile))
     {
         char tbuf[MAXREQUESTLENGTH];
-        sprintf(tbuf, "%s%s", cn->actualfile, "index.html");
+        sprintf(tbuf, "%s%s", cn->actualfile, index_file);
         if (stat(tbuf, &stbuf) != -1) 
-            strcat(cn->actualfile, "index.html");
+            strcat(cn->actualfile, index_file);
         else
         {
 #if defined(CONFIG_HTTP_DIRECTORIES)
@@ -445,8 +447,7 @@ void procsendhead(struct connstruct *cn)
         special_write(cn, buf, strlen(buf));
 
 #ifdef CONFIG_HTTP_VERBOSE
-        printf("axhttpd: %s send %s\n", 
-                cn->is_ssl ? "https" : "http", cn->actualfile);
+        printf("axhttpd: %s:/%s\n", cn->is_ssl ? "https" : "http", cn->filereq);
         TTY_FLUSH();
 #endif
 
@@ -600,22 +601,13 @@ static void proccgi(struct connstruct *cn, int has_pathinfo)
 
     execv(cn->actualfile, myargs);
 #else /* WIN32 */
-    _pipe(tpipe, 4096, O_BINARY| O_NOINHERIT);
+    _pipe(tpipe, 8192, O_BINARY| O_NOINHERIT);
 
     myargs[0] = "sh";
     myargs[1] = "-c";
-    myargs[2] = cn->actualfile;
+    myargs[2] = &cn->filereq[1];    /* ignore the inital "/" */
     myargs[3] = cn->cgiargs;
     myargs[4] = NULL;
-
-    /* convert all the forward slashes to back slashes */
-    {
-        char *t = myargs[2];
-        while ((t = strchr(t, '\\')))
-        {
-            *t++ = '/';
-        }
-    }
 
     tmp_stdout = _dup(_fileno(stdout));
     _dup2(tpipe[1], _fileno(stdout));
@@ -793,6 +785,7 @@ static void buildactualfile(struct connstruct *cn)
     char *cp;
     snprintf(cn->actualfile, MAXREQUESTLENGTH, "%s", cn->filereq);
 
+#ifndef WIN32
     /* Add directory slash if not there */
     if (isdir(cn->actualfile) && 
             cn->actualfile[strlen(cn->actualfile)-1] != '/')
@@ -804,17 +797,32 @@ static void buildactualfile(struct connstruct *cn)
         cn->dirname[0] = 0;
     else
         *cp = 0;
-
-#ifdef WIN32
-    /* convert all the forward slashes to back slashes */
+#else
     {
+        char curr_dir[MAXREQUESTLENGTH];
+        char path[MAXREQUESTLENGTH];
         char *t = cn->actualfile;
+
+        GetCurrentDirectory(MAXREQUESTLENGTH, curr_dir);
+
+        /* convert all the forward slashes to back slashes */
         while ((t = strchr(t, '/')))
             *t++ = '\\';
 
-        t = cn->dirname;
-        while ((t = strchr(t, '/')))
-            *t++ = '\\';
+        snprintf(path, MAXREQUESTLENGTH, "%s%s", curr_dir, cn->actualfile);
+        memcpy(cn->actualfile, path, MAXREQUESTLENGTH);
+
+        /* Add directory slash if not there */
+        if (isdir(cn->actualfile) && 
+                    cn->actualfile[strlen(cn->actualfile)-1] != '\\')
+            strcat(cn->actualfile, "\\");
+
+        /* work out the directory name */
+        strncpy(cn->dirname, cn->actualfile, MAXREQUESTLENGTH);
+        if ((cp = strrchr(cn->dirname, '\\')) == NULL)
+            cn->dirname[0] = 0;
+        else
+            *cp = 0;
     }
 #endif
 }
@@ -998,8 +1006,7 @@ static void send_error(struct connstruct *cn, int err)
             title = "Forbidden";
             text = "File is protected";
 #ifdef CONFIG_HTTP_VERBOSE
-            printf("axhttpd: access to %s:/%s denied\n", 
-                    cn->is_ssl ? "https" : "http", cn->actualfile); TTY_FLUSH();
+            printf("axhttpd: access to %s denied\n", cn->filereq); TTY_FLUSH();
 #endif
             break;
 

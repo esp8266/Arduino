@@ -93,7 +93,7 @@ $(TARGET): $(OBJ)
 	$(LD) $(LDFLAGS) $(LIBS) /out:$@ $(OBJ)
 
 $(TARGET2): htpasswd.obj
-	$(LD) $(LDFLAGS) $(LIBS) /out:$@ $(OBJ)
+	$(LD) $(LDFLAGS) $(LIBS) /out:$@ $<
 endif
 
 endif       # CONFIG_AXHTTPD

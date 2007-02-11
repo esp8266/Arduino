@@ -64,6 +64,32 @@ static void usage(void)
     exit(1);
 }
 
+#ifdef WIN32
+static char * getpass(const char *prompt)
+{
+    static char buf[127];
+    FILE *fp = stdin;
+
+    printf(prompt); TTY_FLUSH();
+#if 0
+    fp = fopen("/dev/tty", "w");
+    if (fp == NULL) 
+    {
+        printf("null\n"); TTY_FLUSH();
+        fp = stdin;
+    }
+#endif
+
+    fgets(buf, sizeof(buf), fp);
+    while (buf[strlen(buf)-1] < ' ') 
+        buf[strlen(buf)-1] = '\0';
+
+    //if (fp != stdin) 
+    //    fclose(fp);
+    return buf;
+}
+#endif
+
 int main(int argc, char *argv[]) 
 {
     char* pw;

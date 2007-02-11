@@ -6,6 +6,7 @@ Changes since 1.0.0
 * -DCYGWIN replaced with -DCONFIG_PLATFORM_CYGWIN (and the same for solaris)
 
 axhttpd Changes
+* main.c now becomes axhttpd.c
 * Header file issue fixed (in mime_types.c)
 * chroot() now used for better security
 * Basic authentication implemented (with .htpasswd)

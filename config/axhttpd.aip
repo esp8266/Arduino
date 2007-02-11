@@ -22,40 +22,22 @@
     <ROW Directory="TARGETDIR" DefaultDir="SourceDir"/>
     <ROW Directory="another_dir_DIR" Directory_Parent="test_dir_DIR" DefaultDir="anothe~1|another_dir"/>
     <ROW Directory="index_files_DIR" Directory_Parent="www_DIR" DefaultDir="index_~1|index_files"/>
-    <ROW Directory="prop_base_1_DIR" Directory_Parent="tmp_DIR" DefaultDir="prop-b~1|prop-base"/>
-    <ROW Directory="prop_base_2_DIR" Directory_Parent="svn_1_DIR" DefaultDir="prop-b~1|prop-base"/>
-    <ROW Directory="prop_base_3_DIR" Directory_Parent="tmp_1_DIR" DefaultDir="prop-b~1|prop-base"/>
     <ROW Directory="prop_base_4_DIR" Directory_Parent="svn_2_DIR" DefaultDir="prop-b~1|prop-base"/>
     <ROW Directory="prop_base_5_DIR" Directory_Parent="tmp_2_DIR" DefaultDir="prop-b~1|prop-base"/>
-    <ROW Directory="prop_base_DIR" Directory_Parent="svn_DIR" DefaultDir="prop-b~1|prop-base"/>
-    <ROW Directory="props_1_DIR" Directory_Parent="tmp_DIR" DefaultDir="props"/>
-    <ROW Directory="props_2_DIR" Directory_Parent="svn_1_DIR" DefaultDir="props"/>
-    <ROW Directory="props_3_DIR" Directory_Parent="tmp_1_DIR" DefaultDir="props"/>
     <ROW Directory="props_4_DIR" Directory_Parent="svn_2_DIR" DefaultDir="props"/>
     <ROW Directory="props_5_DIR" Directory_Parent="tmp_2_DIR" DefaultDir="props"/>
-    <ROW Directory="props_DIR" Directory_Parent="svn_DIR" DefaultDir="props"/>
-    <ROW Directory="svn_1_DIR" Directory_Parent="test_dir_DIR" DefaultDir="svn~1|.svn"/>
+    <ROW Directory="prot_DIR" Directory_Parent="test_dir_DIR" DefaultDir="prot"/>
     <ROW Directory="svn_2_DIR" Directory_Parent="another_dir_DIR" DefaultDir="svn~1|.svn"/>
-    <ROW Directory="svn_DIR" Directory_Parent="index_files_DIR" DefaultDir="svn~1|.svn"/>
     <ROW Directory="test_dir_DIR" Directory_Parent="www_DIR" DefaultDir="test_dir"/>
-    <ROW Directory="text_base_1_DIR" Directory_Parent="tmp_DIR" DefaultDir="text-b~1|text-base"/>
-    <ROW Directory="text_base_2_DIR" Directory_Parent="svn_1_DIR" DefaultDir="text-b~1|text-base"/>
-    <ROW Directory="text_base_3_DIR" Directory_Parent="tmp_1_DIR" DefaultDir="text-b~1|text-base"/>
     <ROW Directory="text_base_4_DIR" Directory_Parent="svn_2_DIR" DefaultDir="text-b~1|text-base"/>
     <ROW Directory="text_base_5_DIR" Directory_Parent="tmp_2_DIR" DefaultDir="text-b~1|text-base"/>
-    <ROW Directory="text_base_DIR" Directory_Parent="svn_DIR" DefaultDir="text-b~1|text-base"/>
-    <ROW Directory="tmp_1_DIR" Directory_Parent="svn_1_DIR" DefaultDir="tmp"/>
     <ROW Directory="tmp_2_DIR" Directory_Parent="svn_2_DIR" DefaultDir="tmp"/>
-    <ROW Directory="tmp_DIR" Directory_Parent="svn_DIR" DefaultDir="tmp"/>
-    <ROW Directory="wcprops_1_DIR" Directory_Parent="svn_DIR" DefaultDir="wcprops"/>
-    <ROW Directory="wcprops_2_DIR" Directory_Parent="tmp_1_DIR" DefaultDir="wcprops"/>
-    <ROW Directory="wcprops_3_DIR" Directory_Parent="svn_1_DIR" DefaultDir="wcprops"/>
     <ROW Directory="wcprops_4_DIR" Directory_Parent="tmp_2_DIR" DefaultDir="wcprops"/>
     <ROW Directory="wcprops_5_DIR" Directory_Parent="svn_2_DIR" DefaultDir="wcprops"/>
-    <ROW Directory="wcprops_DIR" Directory_Parent="tmp_DIR" DefaultDir="wcprops"/>
     <ROW Directory="www_DIR" Directory_Parent="APPDIR" DefaultDir="www"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
+    <ROW Component="another_dir" ComponentId="{3F073789-DB33-40BC-BF88-922C6DF252EC}" Directory_="another_dir_DIR" Attributes="0"/>
     <ROW Component="axhttpd.exe" ComponentId="{0AEFFA20-29FA-4304-8227-F9ED0E6B8A0A}" Directory_="APPDIR" Attributes="0" KeyPath="axhttpd.exe" FullKeyPath="APPDIR\axhttpd.exe"/>
     <ROW Component="axssl.csharp.exe" ComponentId="{B9373428-79F5-4D77-8924-48D23EF3870E}" Directory_="APPDIR" Attributes="0" KeyPath="axssl.csharp.exe" FullKeyPath="APPDIR\axssl.csharp.exe"/>
     <ROW Component="axssl.exe" ComponentId="{E1E96774-7BFC-45B9-BA33-FC0C631921FD}" Directory_="APPDIR" Attributes="0" KeyPath="axssl.exe" FullKeyPath="APPDIR\axssl.exe"/>
@@ -64,45 +46,25 @@
     <ROW Component="axtls.jar" ComponentId="{796CB0A9-6214-4531-A330-9B37420B7799}" Directory_="APPDIR" Attributes="0" KeyPath="axtls.jar" FullKeyPath="APPDIR"/>
     <ROW Component="axtlsj.dll" ComponentId="{AB8043C7-8291-4898-B34A-561335956DC1}" Directory_="APPDIR" Attributes="0" KeyPath="axtlsj.dll" FullKeyPath="APPDIR\axtlsj.dll"/>
     <ROW Component="bigint.h" ComponentId="{FC3E492B-D4F0-41FB-A977-76F6E9FE9FFE}" Directory_="New_Folder_DIR" Attributes="0" KeyPath="bigint.h" FullKeyPath="APPDIR\include"/>
-    <ROW Component="crypto_2600des.gif.svn_base" ComponentId="{CD5BA3C0-11B1-4991-8F89-8D2F79CB9F40}" Directory_="prop_base_DIR" Attributes="0" KeyPath="crypto_2600des.gif.svn_base" FullKeyPath="APPDIR\www\index_files\.svn\prop-base"/>
-    <ROW Component="crypto_2600des.gif.svn_base_1" ComponentId="{2D9375F3-AD2A-47F2-98C2-36959C3C2745}" Directory_="text_base_DIR" Attributes="0" KeyPath="crypto_2600des.gif.svn_base_1" FullKeyPath="APPDIR\www\index_files\.svn\text-base"/>
-    <ROW Component="crypto_2600des.gif.svn_work" ComponentId="{2A7C4FF1-153E-4CF8-A3B4-69D72C2EE48D}" Directory_="props_DIR" Attributes="0" KeyPath="crypto_2600des.gif.svn_work" FullKeyPath="APPDIR\www\index_files\.svn\props"/>
-    <ROW Component="crypto_2600des.gif.svn_work_1" ComponentId="{80DA84A9-77FD-47AA-99A7-C8A3BBFE352F}" Directory_="wcprops_1_DIR" Attributes="0" KeyPath="crypto_2600des.gif.svn_work_1" FullKeyPath="APPDIR\www\index_files\.svn\wcprops"/>
     <ROW Component="crypto_2600des.gif_1" ComponentId="{F3B3E37C-D940-4899-B312-0E244D6AF720}" Directory_="index_files_DIR" Attributes="0" KeyPath="crypto_2600des.gif_1" FullKeyPath="APPDIR\www\index_files"/>
-    <ROW Component="dir_wcprops" ComponentId="{CE7FD33B-9472-4AA5-A185-10A93A832A95}" Directory_="svn_DIR" Attributes="0" KeyPath="dir_wcprops" FullKeyPath="APPDIR\www\index_files\.svn"/>
-    <ROW Component="dir_wcprops_1" ComponentId="{D90F9ED6-AECA-47BB-8B91-EF42489D127D}" Directory_="svn_1_DIR" Attributes="0" KeyPath="dir_wcprops_1" FullKeyPath="APPDIR\www\test_dir\.svn"/>
-    <ROW Component="dir_wcprops_2" ComponentId="{C032AA32-3956-4684-86BF-2EFF2CA4B425}" Directory_="svn_2_DIR" Attributes="0" KeyPath="dir_wcprops_2" FullKeyPath="APPDIR\www\test_dir\another_dir\.svn"/>
     <ROW Component="favicon.ico" ComponentId="{9A1AB507-100A-470D-A002-CD8262CA4913}" Directory_="www_DIR" Attributes="0" KeyPath="favicon.ico" FullKeyPath="APPDIR\www"/>
     <ROW Component="health.sh" ComponentId="{173D7469-C57C-481E-A315-19DA527BA1A5}" Directory_="test_dir_DIR" Attributes="0" KeyPath="health.sh" FullKeyPath="APPDIR\www\test_dir"/>
-    <ROW Component="health.sh.svn_base" ComponentId="{01F12E83-3FEA-4F76-B490-440C94403C9B}" Directory_="prop_base_2_DIR" Attributes="0" KeyPath="health.sh.svn_base" FullKeyPath="APPDIR\www\test_dir\.svn\prop-base"/>
-    <ROW Component="health.sh.svn_base_1" ComponentId="{65301911-BF34-49C0-9702-11A561AFFC50}" Directory_="text_base_2_DIR" Attributes="0" KeyPath="health.sh.svn_base_1" FullKeyPath="APPDIR\www\test_dir\.svn\text-base"/>
-    <ROW Component="health.sh.svn_work" ComponentId="{28B54A87-690B-4E1C-9B46-EA7481EF9218}" Directory_="props_2_DIR" Attributes="0" KeyPath="health.sh.svn_work" FullKeyPath="APPDIR\www\test_dir\.svn\props"/>
-    <ROW Component="health.sh.svn_work_1" ComponentId="{E9968BAF-D707-46E8-813F-C2313CA521C8}" Directory_="wcprops_3_DIR" Attributes="0" KeyPath="health.sh.svn_work_1" FullKeyPath="APPDIR\www\test_dir\.svn\wcprops"/>
-    <ROW Component="prop_base" ComponentId="{8C6DB0CF-A719-48C3-BBBF-02599249163E}" Directory_="prop_base_1_DIR" Attributes="0"/>
-    <ROW Component="prop_base_1" ComponentId="{2CEE7EA7-BFB2-4154-9F41-DEE4A66CDF18}" Directory_="prop_base_3_DIR" Attributes="0"/>
+    <ROW Component="htaccess" ComponentId="{A21FC953-B7B4-42EA-8F21-422969557D40}" Directory_="prot_DIR" Attributes="0" KeyPath="htaccess" FullKeyPath="APPDIR\www\test_dir\prot"/>
+    <ROW Component="htpasswd.exe" ComponentId="{9FE1AAD2-4E35-443A-AAE5-3A7D03A52AAA}" Directory_="APPDIR" Attributes="0" KeyPath="htpasswd.exe" FullKeyPath="APPDIR\htpasswd.exe"/>
     <ROW Component="prop_base_2" ComponentId="{A3E2975E-C55F-458E-8443-23556A498DE8}" Directory_="prop_base_4_DIR" Attributes="0"/>
     <ROW Component="prop_base_3" ComponentId="{84D4F8F9-D8C8-40A2-AC98-0D18C7ACC15D}" Directory_="prop_base_5_DIR" Attributes="0"/>
-    <ROW Component="props" ComponentId="{3A6D991B-1ECF-481D-94C1-E48F6B5B3929}" Directory_="props_1_DIR" Attributes="0"/>
-    <ROW Component="props_1" ComponentId="{E844B3DF-C536-439B-B599-77B73C5B2213}" Directory_="props_3_DIR" Attributes="0"/>
     <ROW Component="props_2" ComponentId="{1EC8919C-173D-4A2E-8356-E054BD661F2B}" Directory_="props_4_DIR" Attributes="0"/>
     <ROW Component="props_3" ComponentId="{1FA958FF-6FF6-4128-9424-4036DC68CE9F}" Directory_="props_5_DIR" Attributes="0"/>
-    <ROW Component="text_base" ComponentId="{B4978EC3-2697-4E91-A38F-A0E184FBF592}" Directory_="text_base_1_DIR" Attributes="0"/>
-    <ROW Component="text_base_1" ComponentId="{0AB5A835-B2CC-4BEF-85B8-C4073738FEF2}" Directory_="text_base_3_DIR" Attributes="0"/>
     <ROW Component="text_base_2" ComponentId="{C99C78FE-D567-463B-84AC-F09280EC233A}" Directory_="text_base_4_DIR" Attributes="0"/>
     <ROW Component="text_base_3" ComponentId="{C7C7D550-84BA-4B7E-83ED-526D903CD774}" Directory_="text_base_5_DIR" Attributes="0"/>
-    <ROW Component="wcprops" ComponentId="{E67C1A2D-BAE8-4E1E-AC15-B016D2C0FB5D}" Directory_="wcprops_DIR" Attributes="0"/>
-    <ROW Component="wcprops_1" ComponentId="{F6775505-3540-4D45-B774-6AEE523D2DEE}" Directory_="wcprops_2_DIR" Attributes="0"/>
     <ROW Component="wcprops_2" ComponentId="{3974F3F6-9377-4343-9230-782F1DD91BFF}" Directory_="wcprops_4_DIR" Attributes="0"/>
     <ROW Component="wcprops_3" ComponentId="{0A686253-B608-4CB2-A709-3A1E124C42CB}" Directory_="wcprops_5_DIR" Attributes="0"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
-    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0" Components="axhttpd.exe axssl.csharp.exe axssl.exe axssl.vbnet.exe axtls.dll axtls.jar axtlsj.dll favicon.ico bigint.h dir_wcprops crypto_2600des.gif.svn_base crypto_2600des.gif.svn_work crypto_2600des.gif.svn_base_1 prop_base props text_base wcprops crypto_2600des.gif.svn_work_1 crypto_2600des.gif_1 dir_wcprops_1 health.sh.svn_base health.sh.svn_work health.sh.svn_base_1 prop_base_1 props_1 text_base_1 wcprops_1 health.sh.svn_work_1 dir_wcprops_2 prop_base_2 props_2 text_base_2 prop_base_3 props_3 text_base_3 wcprops_2 wcprops_3 health.sh"/>
+    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0" Components="axhttpd.exe axssl.csharp.exe axssl.exe axssl.vbnet.exe axtls.dll axtls.jar axtlsj.dll favicon.ico bigint.h crypto_2600des.gif_1 prop_base_2 props_2 text_base_2 prop_base_3 props_3 text_base_3 wcprops_2 wcprops_3 health.sh htpasswd.exe another_dir htaccess"/>
     <ATTRIBUTE name="CurrentFeature" value="MainFeature"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
-    <ROW File="README.txt" Component_="dir_wcprops" FileName="README.txt" Attributes="1" SourcePath="..\www\index_files\.svn\README.txt" SelfReg="false" Sequence="40"/>
-    <ROW File="README.txt_1" Component_="dir_wcprops_1" FileName="README.txt" Attributes="1" SourcePath="..\www\test_dir\.svn\README.txt" SelfReg="false" Sequence="78"/>
-    <ROW File="README.txt_2" Component_="dir_wcprops_2" FileName="README.txt" Attributes="1" SourcePath="..\www\test_dir\another_dir\.svn\README.txt" SelfReg="false" Sequence="89"/>
     <ROW File="axhttpd.exe" Component_="axhttpd.exe" FileName="axhttpd.exe" Attributes="0" SourcePath="..\_stage\axhttpd.exe" SelfReg="false" Sequence="1"/>
     <ROW File="axssl.csharp.exe" Component_="axssl.csharp.exe" FileName="axsslc~1.exe|axssl.csharp.exe" Attributes="0" SourcePath="..\_stage\axssl.csharp.exe" SelfReg="false" Sequence="2"/>
     <ROW File="axssl.exe" Component_="axssl.exe" FileName="axssl.exe" Attributes="0" SourcePath="..\_stage\axssl.exe" SelfReg="false" Sequence="3"/>
@@ -115,82 +77,26 @@
     <ROW File="bigint.h" Component_="bigint.h" FileName="bigint.h" Attributes="0" SourcePath="..\ssl\bigint.h" SelfReg="false" Sequence="16"/>
     <ROW File="bigint_impl.h" Component_="bigint.h" FileName="bigint~1.h|bigint_impl.h" Attributes="0" SourcePath="..\ssl\bigint_impl.h" SelfReg="false" Sequence="13"/>
     <ROW File="crypto.h" Component_="bigint.h" FileName="crypto.h" Attributes="0" SourcePath="..\ssl\crypto.h" SelfReg="false" Sequence="14"/>
-    <ROW File="crypto_2600des.gif.svn_base" Component_="crypto_2600des.gif.svn_base" FileName="crypto~1.svn|crypto_2600des.gif.svn-base" Attributes="1" SourcePath="..\www\index_files\.svn\prop-base\crypto_2600des.gif.svn-base" SelfReg="false" Sequence="22"/>
-    <ROW File="crypto_2600des.gif.svn_base_1" Component_="crypto_2600des.gif.svn_base_1" FileName="crypto~1.svn|crypto_2600des.gif.svn-base" Attributes="1" SourcePath="..\www\index_files\.svn\text-base\crypto_2600des.gif.svn-base" SelfReg="false" Sequence="41"/>
-    <ROW File="crypto_2600des.gif.svn_work" Component_="crypto_2600des.gif.svn_work" FileName="crypto~1.svn|crypto_2600des.gif.svn-work" Attributes="1" SourcePath="..\www\index_files\.svn\props\crypto_2600des.gif.svn-work" SelfReg="false" Sequence="31"/>
-    <ROW File="crypto_2600des.gif.svn_work_1" Component_="crypto_2600des.gif.svn_work_1" FileName="crypto~1.svn|crypto_2600des.gif.svn-work" Attributes="1" SourcePath="..\www\index_files\.svn\wcprops\crypto_2600des.gif.svn-work" SelfReg="false" Sequence="50"/>
-    <ROW File="crypto_2600des.gif_1" Component_="crypto_2600des.gif_1" FileName="crypto~1.gif|crypto_2600des.gif" Attributes="0" SourcePath="..\www\index_files\crypto_2600des.gif" SelfReg="false" Sequence="59"/>
-    <ROW File="crypto_3ways.gif.svn_base" Component_="crypto_2600des.gif.svn_base" FileName="crypto~2.svn|crypto_3ways.gif.svn-base" Attributes="1" SourcePath="..\www\index_files\.svn\prop-base\crypto_3ways.gif.svn-base" SelfReg="false" Sequence="23"/>
-    <ROW File="crypto_3ways.gif.svn_base_1" Component_="crypto_2600des.gif.svn_base_1" FileName="crypto~2.svn|crypto_3ways.gif.svn-base" Attributes="1" SourcePath="..\www\index_files\.svn\text-base\crypto_3ways.gif.svn-base" SelfReg="false" Sequence="42"/>
-    <ROW File="crypto_3ways.gif.svn_work" Component_="crypto_2600des.gif.svn_work" FileName="crypto~2.svn|crypto_3ways.gif.svn-work" Attributes="1" SourcePath="..\www\index_files\.svn\props\crypto_3ways.gif.svn-work" SelfReg="false" Sequence="32"/>
-    <ROW File="crypto_3ways.gif.svn_work_1" Component_="crypto_2600des.gif.svn_work_1" FileName="crypto~2.svn|crypto_3ways.gif.svn-work" Attributes="1" SourcePath="..\www\index_files\.svn\wcprops\crypto_3ways.gif.svn-work" SelfReg="false" Sequence="51"/>
-    <ROW File="crypto_3ways.gif_1" Component_="crypto_2600des.gif_1" FileName="crypto~2.gif|crypto_3ways.gif" Attributes="0" SourcePath="..\www\index_files\crypto_3ways.gif" SelfReg="false" Sequence="60"/>
-    <ROW File="crypto_backrsa.jpg.svn_base" Component_="crypto_2600des.gif.svn_base" FileName="crypto~3.svn|crypto_backrsa.jpg.svn-base" Attributes="1" SourcePath="..\www\index_files\.svn\prop-base\crypto_backrsa.jpg.svn-base" SelfReg="false" Sequence="24"/>
-    <ROW File="crypto_backrsa.jpg.svn_base_1" Component_="crypto_2600des.gif.svn_base_1" FileName="crypto~3.svn|crypto_backrsa.jpg.svn-base" Attributes="1" SourcePath="..\www\index_files\.svn\text-base\crypto_backrsa.jpg.svn-base" SelfReg="false" Sequence="43"/>
-    <ROW File="crypto_backrsa.jpg.svn_work" Component_="crypto_2600des.gif.svn_work" FileName="crypto~3.svn|crypto_backrsa.jpg.svn-work" Attributes="1" SourcePath="..\www\index_files\.svn\props\crypto_backrsa.jpg.svn-work" SelfReg="false" Sequence="33"/>
-    <ROW File="crypto_backrsa.jpg.svn_work_1" Component_="crypto_2600des.gif.svn_work_1" FileName="crypto~3.svn|crypto_backrsa.jpg.svn-work" Attributes="1" SourcePath="..\www\index_files\.svn\wcprops\crypto_backrsa.jpg.svn-work" SelfReg="false" Sequence="52"/>
-    <ROW File="crypto_backrsa.jpg_1" Component_="crypto_2600des.gif_1" FileName="crypto~1.jpg|crypto_backrsa.jpg" Attributes="0" SourcePath="..\www\index_files\crypto_backrsa.jpg" SelfReg="false" Sequence="61"/>
-    <ROW File="crypto_cert.gif.svn_base" Component_="crypto_2600des.gif.svn_base" FileName="crypto~4.svn|crypto_cert.gif.svn-base" Attributes="1" SourcePath="..\www\index_files\.svn\prop-base\crypto_cert.gif.svn-base" SelfReg="false" Sequence="25"/>
-    <ROW File="crypto_cert.gif.svn_base_1" Component_="crypto_2600des.gif.svn_base_1" FileName="crypto~4.svn|crypto_cert.gif.svn-base" Attributes="1" SourcePath="..\www\index_files\.svn\text-base\crypto_cert.gif.svn-base" SelfReg="false" Sequence="44"/>
-    <ROW File="crypto_cert.gif.svn_work" Component_="crypto_2600des.gif.svn_work" FileName="crypto~4.svn|crypto_cert.gif.svn-work" Attributes="1" SourcePath="..\www\index_files\.svn\props\crypto_cert.gif.svn-work" SelfReg="false" Sequence="34"/>
-    <ROW File="crypto_cert.gif.svn_work_1" Component_="crypto_2600des.gif.svn_work_1" FileName="crypto~4.svn|crypto_cert.gif.svn-work" Attributes="1" SourcePath="..\www\index_files\.svn\wcprops\crypto_cert.gif.svn-work" SelfReg="false" Sequence="53"/>
-    <ROW File="crypto_cert.gif_1" Component_="crypto_2600des.gif_1" FileName="crypto~3.gif|crypto_cert.gif" Attributes="0" SourcePath="..\www\index_files\crypto_cert.gif" SelfReg="false" Sequence="62"/>
-    <ROW File="crypto_des.gif.svn_base" Component_="crypto_2600des.gif.svn_base" FileName="crypto~5.svn|crypto_des.gif.svn-base" Attributes="1" SourcePath="..\www\index_files\.svn\prop-base\crypto_des.gif.svn-base" SelfReg="false" Sequence="26"/>
-    <ROW File="crypto_des.gif.svn_base_1" Component_="crypto_2600des.gif.svn_base_1" FileName="crypto~5.svn|crypto_des.gif.svn-base" Attributes="1" SourcePath="..\www\index_files\.svn\text-base\crypto_des.gif.svn-base" SelfReg="false" Sequence="45"/>
-    <ROW File="crypto_des.gif.svn_work" Component_="crypto_2600des.gif.svn_work" FileName="crypto~5.svn|crypto_des.gif.svn-work" Attributes="1" SourcePath="..\www\index_files\.svn\props\crypto_des.gif.svn-work" SelfReg="false" Sequence="35"/>
-    <ROW File="crypto_des.gif.svn_work_1" Component_="crypto_2600des.gif.svn_work_1" FileName="crypto~5.svn|crypto_des.gif.svn-work" Attributes="1" SourcePath="..\www\index_files\.svn\wcprops\crypto_des.gif.svn-work" SelfReg="false" Sequence="54"/>
-    <ROW File="crypto_des.gif_1" Component_="crypto_2600des.gif_1" FileName="crypto~4.gif|crypto_des.gif" Attributes="0" SourcePath="..\www\index_files\crypto_des.gif" SelfReg="false" Sequence="63"/>
-    <ROW File="crypto_ecc.gif.svn_base" Component_="crypto_2600des.gif.svn_base" FileName="crypto~6.svn|crypto_ecc.gif.svn-base" Attributes="1" SourcePath="..\www\index_files\.svn\prop-base\crypto_ecc.gif.svn-base" SelfReg="false" Sequence="27"/>
-    <ROW File="crypto_ecc.gif.svn_base_1" Component_="crypto_2600des.gif.svn_base_1" FileName="crypto~6.svn|crypto_ecc.gif.svn-base" Attributes="1" SourcePath="..\www\index_files\.svn\text-base\crypto_ecc.gif.svn-base" SelfReg="false" Sequence="46"/>
-    <ROW File="crypto_ecc.gif.svn_work" Component_="crypto_2600des.gif.svn_work" FileName="crypto~6.svn|crypto_ecc.gif.svn-work" Attributes="1" SourcePath="..\www\index_files\.svn\props\crypto_ecc.gif.svn-work" SelfReg="false" Sequence="36"/>
-    <ROW File="crypto_ecc.gif.svn_work_1" Component_="crypto_2600des.gif.svn_work_1" FileName="crypto~6.svn|crypto_ecc.gif.svn-work" Attributes="1" SourcePath="..\www\index_files\.svn\wcprops\crypto_ecc.gif.svn-work" SelfReg="false" Sequence="55"/>
-    <ROW File="crypto_ecc.gif_1" Component_="crypto_2600des.gif_1" FileName="crypto~5.gif|crypto_ecc.gif" Attributes="0" SourcePath="..\www\index_files\crypto_ecc.gif" SelfReg="false" Sequence="64"/>
-    <ROW File="crypto_sslv3.gif.svn_base" Component_="crypto_2600des.gif.svn_base" FileName="crypto~7.svn|crypto_sslv3.gif.svn-base" Attributes="1" SourcePath="..\www\index_files\.svn\prop-base\crypto_sslv3.gif.svn-base" SelfReg="false" Sequence="28"/>
-    <ROW File="crypto_sslv3.gif.svn_base_1" Component_="crypto_2600des.gif.svn_base_1" FileName="crypto~7.svn|crypto_sslv3.gif.svn-base" Attributes="1" SourcePath="..\www\index_files\.svn\text-base\crypto_sslv3.gif.svn-base" SelfReg="false" Sequence="47"/>
-    <ROW File="crypto_sslv3.gif.svn_work" Component_="crypto_2600des.gif.svn_work" FileName="crypto~7.svn|crypto_sslv3.gif.svn-work" Attributes="1" SourcePath="..\www\index_files\.svn\props\crypto_sslv3.gif.svn-work" SelfReg="false" Sequence="37"/>
-    <ROW File="crypto_sslv3.gif.svn_work_1" Component_="crypto_2600des.gif.svn_work_1" FileName="crypto~7.svn|crypto_sslv3.gif.svn-work" Attributes="1" SourcePath="..\www\index_files\.svn\wcprops\crypto_sslv3.gif.svn-work" SelfReg="false" Sequence="56"/>
-    <ROW File="crypto_sslv3.gif_1" Component_="crypto_2600des.gif_1" FileName="crypto~6.gif|crypto_sslv3.gif" Attributes="0" SourcePath="..\www\index_files\crypto_sslv3.gif" SelfReg="false" Sequence="65"/>
-    <ROW File="crypto_types.gif.svn_base" Component_="crypto_2600des.gif.svn_base" FileName="crypto~8.svn|crypto_types.gif.svn-base" Attributes="1" SourcePath="..\www\index_files\.svn\prop-base\crypto_types.gif.svn-base" SelfReg="false" Sequence="29"/>
-    <ROW File="crypto_types.gif.svn_base_1" Component_="crypto_2600des.gif.svn_base_1" FileName="crypto~8.svn|crypto_types.gif.svn-base" Attributes="1" SourcePath="..\www\index_files\.svn\text-base\crypto_types.gif.svn-base" SelfReg="false" Sequence="48"/>
-    <ROW File="crypto_types.gif.svn_work" Component_="crypto_2600des.gif.svn_work" FileName="crypto~8.svn|crypto_types.gif.svn-work" Attributes="1" SourcePath="..\www\index_files\.svn\props\crypto_types.gif.svn-work" SelfReg="false" Sequence="38"/>
-    <ROW File="crypto_types.gif.svn_work_1" Component_="crypto_2600des.gif.svn_work_1" FileName="crypto~8.svn|crypto_types.gif.svn-work" Attributes="1" SourcePath="..\www\index_files\.svn\wcprops\crypto_types.gif.svn-work" SelfReg="false" Sequence="57"/>
-    <ROW File="crypto_types.gif_1" Component_="crypto_2600des.gif_1" FileName="crypto~7.gif|crypto_types.gif" Attributes="0" SourcePath="..\www\index_files\crypto_types.gif" SelfReg="false" Sequence="66"/>
-    <ROW File="dir_wcprops" Component_="dir_wcprops" FileName="dir-wc~1|dir-wcprops" Attributes="1" SourcePath="..\www\index_files\.svn\dir-wcprops" SelfReg="false" Sequence="18"/>
-    <ROW File="dir_wcprops_1" Component_="dir_wcprops_1" FileName="dir-wc~1|dir-wcprops" Attributes="1" SourcePath="..\www\test_dir\.svn\dir-wcprops" SelfReg="false" Sequence="68"/>
-    <ROW File="dir_wcprops_2" Component_="dir_wcprops_2" FileName="dir-wc~1|dir-wcprops" Attributes="1" SourcePath="..\www\test_dir\another_dir\.svn\dir-wcprops" SelfReg="false" Sequence="85"/>
-    <ROW File="empty_file" Component_="dir_wcprops" FileName="empty-~1|empty-file" Attributes="1" SourcePath="..\www\index_files\.svn\empty-file" SelfReg="false" Sequence="19"/>
-    <ROW File="empty_file_1" Component_="dir_wcprops_1" FileName="empty-~1|empty-file" Attributes="1" SourcePath="..\www\test_dir\.svn\empty-file" SelfReg="false" Sequence="69"/>
-    <ROW File="empty_file_2" Component_="dir_wcprops_2" FileName="empty-~1|empty-file" Attributes="1" SourcePath="..\www\test_dir\another_dir\.svn\empty-file" SelfReg="false" Sequence="86"/>
-    <ROW File="entries" Component_="dir_wcprops" FileName="entries" Attributes="1" SourcePath="..\www\index_files\.svn\entries" SelfReg="false" Sequence="20"/>
-    <ROW File="entries_1" Component_="dir_wcprops_1" FileName="entries" Attributes="1" SourcePath="..\www\test_dir\.svn\entries" SelfReg="false" Sequence="70"/>
-    <ROW File="entries_2" Component_="dir_wcprops_2" FileName="entries" Attributes="1" SourcePath="..\www\test_dir\another_dir\.svn\entries" SelfReg="false" Sequence="87"/>
+    <ROW File="crypto_2600des.gif_1" Component_="crypto_2600des.gif_1" FileName="crypto~1.gif|crypto_2600des.gif" Attributes="0" SourcePath="..\www\index_files\crypto_2600des.gif" SelfReg="false" Sequence="18"/>
+    <ROW File="crypto_3ways.gif_1" Component_="crypto_2600des.gif_1" FileName="crypto~2.gif|crypto_3ways.gif" Attributes="0" SourcePath="..\www\index_files\crypto_3ways.gif" SelfReg="false" Sequence="19"/>
+    <ROW File="crypto_backrsa.jpg_1" Component_="crypto_2600des.gif_1" FileName="crypto~1.jpg|crypto_backrsa.jpg" Attributes="0" SourcePath="..\www\index_files\crypto_backrsa.jpg" SelfReg="false" Sequence="20"/>
+    <ROW File="crypto_cert.gif_1" Component_="crypto_2600des.gif_1" FileName="crypto~3.gif|crypto_cert.gif" Attributes="0" SourcePath="..\www\index_files\crypto_cert.gif" SelfReg="false" Sequence="21"/>
+    <ROW File="crypto_des.gif_1" Component_="crypto_2600des.gif_1" FileName="crypto~4.gif|crypto_des.gif" Attributes="0" SourcePath="..\www\index_files\crypto_des.gif" SelfReg="false" Sequence="22"/>
+    <ROW File="crypto_ecc.gif_1" Component_="crypto_2600des.gif_1" FileName="crypto~5.gif|crypto_ecc.gif" Attributes="0" SourcePath="..\www\index_files\crypto_ecc.gif" SelfReg="false" Sequence="23"/>
+    <ROW File="crypto_sslv3.gif_1" Component_="crypto_2600des.gif_1" FileName="crypto~6.gif|crypto_sslv3.gif" Attributes="0" SourcePath="..\www\index_files\crypto_sslv3.gif" SelfReg="false" Sequence="24"/>
+    <ROW File="crypto_types.gif_1" Component_="crypto_2600des.gif_1" FileName="crypto~7.gif|crypto_types.gif" Attributes="0" SourcePath="..\www\index_files\crypto_types.gif" SelfReg="false" Sequence="25"/>
     <ROW File="favicon.ico" Component_="favicon.ico" FileName="favicon.ico" Attributes="0" SourcePath="..\www\favicon.ico" SelfReg="false" Sequence="10"/>
-    <ROW File="format" Component_="dir_wcprops" FileName="format" Attributes="1" SourcePath="..\www\index_files\.svn\format" SelfReg="false" Sequence="21"/>
-    <ROW File="format_1" Component_="dir_wcprops_1" FileName="format" Attributes="1" SourcePath="..\www\test_dir\.svn\format" SelfReg="false" Sequence="71"/>
-    <ROW File="format_2" Component_="dir_wcprops_2" FileName="format" Attributes="1" SourcePath="..\www\test_dir\another_dir\.svn\format" SelfReg="false" Sequence="88"/>
-    <ROW File="health.sh" Component_="health.sh" FileName="health.sh" Attributes="0" SourcePath="..\www\test_dir\health.sh" SelfReg="false" Sequence="90"/>
-    <ROW File="health.sh.svn_base" Component_="health.sh.svn_base" FileName="health~1.svn|health.sh.svn-base" Attributes="1" SourcePath="..\www\test_dir\.svn\prop-base\health.sh.svn-base" SelfReg="false" Sequence="72"/>
-    <ROW File="health.sh.svn_base_1" Component_="health.sh.svn_base_1" FileName="health~1.svn|health.sh.svn-base" Attributes="1" SourcePath="..\www\test_dir\.svn\text-base\health.sh.svn-base" SelfReg="false" Sequence="79"/>
-    <ROW File="health.sh.svn_work" Component_="health.sh.svn_work" FileName="health~1.svn|health.sh.svn-work" Attributes="1" SourcePath="..\www\test_dir\.svn\props\health.sh.svn-work" SelfReg="false" Sequence="75"/>
-    <ROW File="health.sh.svn_work_1" Component_="health.sh.svn_work_1" FileName="health~1.svn|health.sh.svn-work" Attributes="1" SourcePath="..\www\test_dir\.svn\wcprops\health.sh.svn-work" SelfReg="false" Sequence="82"/>
+    <ROW File="health.sh" Component_="health.sh" FileName="health.sh" Attributes="0" SourcePath="..\www\test_dir\health.sh" SelfReg="false" Sequence="27"/>
+    <ROW File="htaccess" Component_="htaccess" FileName="htacce~1|.htaccess" Attributes="0" SourcePath="..\www\test_dir\prot\.htaccess" SelfReg="false" Sequence="31"/>
+    <ROW File="htpasswd" Component_="htaccess" FileName="htpass~1|.htpasswd" Attributes="0" SourcePath="..\www\test_dir\prot\.htpasswd" SelfReg="false" Sequence="32"/>
+    <ROW File="htpasswd.exe" Component_="htpasswd.exe" FileName="htpasswd.exe" Attributes="0" SourcePath="..\_stage\htpasswd.exe" SelfReg="false" Sequence="30"/>
     <ROW File="index.html" Component_="favicon.ico" FileName="index~1.htm|index.html" Attributes="0" SourcePath="..\www\index.html" SelfReg="false" Sequence="11"/>
-    <ROW File="kerberos.gif.svn_base" Component_="crypto_2600des.gif.svn_base" FileName="kerber~1.svn|kerberos.gif.svn-base" Attributes="1" SourcePath="..\www\index_files\.svn\prop-base\kerberos.gif.svn-base" SelfReg="false" Sequence="30"/>
-    <ROW File="kerberos.gif.svn_base_1" Component_="crypto_2600des.gif.svn_base_1" FileName="kerber~1.svn|kerberos.gif.svn-base" Attributes="1" SourcePath="..\www\index_files\.svn\text-base\kerberos.gif.svn-base" SelfReg="false" Sequence="49"/>
-    <ROW File="kerberos.gif.svn_work" Component_="crypto_2600des.gif.svn_work" FileName="kerber~1.svn|kerberos.gif.svn-work" Attributes="1" SourcePath="..\www\index_files\.svn\props\kerberos.gif.svn-work" SelfReg="false" Sequence="39"/>
-    <ROW File="kerberos.gif.svn_work_1" Component_="crypto_2600des.gif.svn_work_1" FileName="kerber~1.svn|kerberos.gif.svn-work" Attributes="1" SourcePath="..\www\index_files\.svn\wcprops\kerberos.gif.svn-work" SelfReg="false" Sequence="58"/>
-    <ROW File="kerberos.gif_1" Component_="crypto_2600des.gif_1" FileName="kerberos.gif" Attributes="0" SourcePath="..\www\index_files\kerberos.gif" SelfReg="false" Sequence="67"/>
+    <ROW File="index.html_1" Component_="htaccess" FileName="index~1.htm|index.html" Attributes="0" SourcePath="..\www\test_dir\prot\index.html" SelfReg="false" Sequence="33"/>
+    <ROW File="kerberos.gif_1" Component_="crypto_2600des.gif_1" FileName="kerberos.gif" Attributes="0" SourcePath="..\www\index_files\kerberos.gif" SelfReg="false" Sequence="26"/>
     <ROW File="os_port.h" Component_="bigint.h" FileName="os_port.h" Attributes="0" SourcePath="..\ssl\os_port.h" SelfReg="false" Sequence="17"/>
-    <ROW File="some_text.txt" Component_="health.sh" FileName="some_t~1.txt|some_text.txt" Attributes="0" SourcePath="..\www\test_dir\some_text.txt" SelfReg="false" Sequence="91"/>
-    <ROW File="some_text.txt.svn_base" Component_="health.sh.svn_base" FileName="some_t~1.svn|some_text.txt.svn-base" Attributes="1" SourcePath="..\www\test_dir\.svn\prop-base\some_text.txt.svn-base" SelfReg="false" Sequence="73"/>
-    <ROW File="some_text.txt.svn_base_1" Component_="health.sh.svn_base_1" FileName="some_t~1.svn|some_text.txt.svn-base" Attributes="1" SourcePath="..\www\test_dir\.svn\text-base\some_text.txt.svn-base" SelfReg="false" Sequence="80"/>
-    <ROW File="some_text.txt.svn_work" Component_="health.sh.svn_work" FileName="some_t~1.svn|some_text.txt.svn-work" Attributes="1" SourcePath="..\www\test_dir\.svn\props\some_text.txt.svn-work" SelfReg="false" Sequence="76"/>
-    <ROW File="some_text.txt.svn_work_1" Component_="health.sh.svn_work_1" FileName="some_t~1.svn|some_text.txt.svn-work" Attributes="1" SourcePath="..\www\test_dir\.svn\wcprops\some_text.txt.svn-work" SelfReg="false" Sequence="83"/>
+    <ROW File="some_text.txt" Component_="health.sh" FileName="some_t~1.txt|some_text.txt" Attributes="0" SourcePath="..\www\test_dir\some_text.txt" SelfReg="false" Sequence="28"/>
     <ROW File="ssl.h" Component_="bigint.h" FileName="ssl.h" Attributes="0" SourcePath="..\ssl\ssl.h" SelfReg="false" Sequence="12"/>
-    <ROW File="test_cgi.php" Component_="health.sh" FileName="test_cgi.php" Attributes="0" SourcePath="..\www\test_dir\test_cgi.php" SelfReg="false" Sequence="92"/>
-    <ROW File="test_cgi.php.svn_base" Component_="health.sh.svn_base" FileName="test_c~1.svn|test_cgi.php.svn-base" Attributes="1" SourcePath="..\www\test_dir\.svn\prop-base\test_cgi.php.svn-base" SelfReg="false" Sequence="74"/>
-    <ROW File="test_cgi.php.svn_base_1" Component_="health.sh.svn_base_1" FileName="test_c~1.svn|test_cgi.php.svn-base" Attributes="1" SourcePath="..\www\test_dir\.svn\text-base\test_cgi.php.svn-base" SelfReg="false" Sequence="81"/>
-    <ROW File="test_cgi.php.svn_work" Component_="health.sh.svn_work" FileName="test_c~1.svn|test_cgi.php.svn-work" Attributes="1" SourcePath="..\www\test_dir\.svn\props\test_cgi.php.svn-work" SelfReg="false" Sequence="77"/>
-    <ROW File="test_cgi.php.svn_work_1" Component_="health.sh.svn_work_1" FileName="test_c~1.svn|test_cgi.php.svn-work" Attributes="1" SourcePath="..\www\test_dir\.svn\wcprops\test_cgi.php.svn-work" SelfReg="false" Sequence="84"/>
+    <ROW File="test_cgi.php" Component_="health.sh" FileName="test_cgi.php" Attributes="0" SourcePath="..\www\test_dir\test_cgi.php" SelfReg="false" Sequence="29"/>
     <ROW File="tls1.h" Component_="bigint.h" FileName="tls1.h" Attributes="0" SourcePath="..\ssl\tls1.h" SelfReg="false" Sequence="15"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
@@ -221,14 +127,6 @@
     <ROW Dialog_="PatchWelcomeDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_PATCH" Ordering="2"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCreateFolderComponent">
-    <ROW Directory_="prop_base_3_DIR" Component_="prop_base_1"/>
-    <ROW Directory_="prop_base_1_DIR" Component_="prop_base"/>
-    <ROW Directory_="props_1_DIR" Component_="props"/>
-    <ROW Directory_="text_base_1_DIR" Component_="text_base"/>
-    <ROW Directory_="wcprops_DIR" Component_="wcprops"/>
-    <ROW Directory_="props_3_DIR" Component_="props_1"/>
-    <ROW Directory_="text_base_3_DIR" Component_="text_base_1"/>
-    <ROW Directory_="wcprops_2_DIR" Component_="wcprops_1"/>
     <ROW Directory_="prop_base_4_DIR" Component_="prop_base_2"/>
     <ROW Directory_="props_4_DIR" Component_="props_2"/>
     <ROW Directory_="text_base_4_DIR" Component_="text_base_2"/>
@@ -237,6 +135,7 @@
     <ROW Directory_="text_base_5_DIR" Component_="text_base_3"/>
     <ROW Directory_="wcprops_4_DIR" Component_="wcprops_2"/>
     <ROW Directory_="wcprops_5_DIR" Component_="wcprops_3"/>
+    <ROW Directory_="another_dir_DIR" Component_="another_dir"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCustActComponent">
     <ROW Action="AI_DOWNGRADE" Type="19" Target="4010"/>

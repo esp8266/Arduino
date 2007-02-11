@@ -68,13 +68,15 @@ docs:
 
 # build the Win32 demo release version
 win32_demo:
-	-@rm -fr ../axTLS.release_test > /dev/null 2>&1
 	$(MAKE) win32releaseconf
 
 install: $(PREFIX) all
 	cp --no-dereference $(STAGE)/libax* $(PREFIX)/lib
 	chmod 755 $(PREFIX)/lib/libax* 
 	-install -m 755 $(STAGE)/ax* $(PREFIX)/bin 
+ifdef CONFIG_AXHTTPD
+	-install -m 755 $(STAGE)/htpasswd $(PREFIX)/bin 
+endif
 ifdef CONFIG_PERL_BINDINGS 
 	-install -m 755 $(STAGE)/axtlsp.pm `perl -e 'use Config; print $$Config{installarchlib};'`
 endif
