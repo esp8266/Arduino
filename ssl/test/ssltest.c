@@ -528,7 +528,7 @@ static int cert_tests(void)
 {
     int res = -1, len;
     X509_CTX *x509_ctx;
-    SSLCTX *ssl_ctx;
+    SSL_CTX *ssl_ctx;
     uint8_t *buf;
 
     /* check a bunch of 3rd party certificates */
@@ -728,7 +728,7 @@ static int SSL_server_test(
         int axolotls_option)
 {
     int server_fd, ret = 0;
-    SSLCTX *ssl_ctx = NULL;
+    SSL_CTX *ssl_ctx = NULL;
     struct sockaddr_in client_addr;
     uint8_t *read_buf;
     int clnt_len = sizeof(client_addr);
@@ -1151,7 +1151,7 @@ static void do_server(server_t *svr)
 
 static int SSL_client_test(
         const char *test,
-        SSLCTX **ssl_ctx,
+        SSL_CTX **ssl_ctx,
         const char *openssl_option, 
         CLNT_SESSION_RESUME_CTX *sess_resume,
         uint32_t client_options,
@@ -1332,7 +1332,7 @@ client_test_exit:
 int SSL_client_tests(void)
 {
     int ret =  -1;
-    SSLCTX *ssl_ctx = NULL;
+    SSL_CTX *ssl_ctx = NULL;
     CLNT_SESSION_RESUME_CTX sess_resume;
     memset(&sess_resume, 0, sizeof(CLNT_SESSION_RESUME_CTX));
 
@@ -1455,7 +1455,7 @@ static void do_basic(void)
 {
     int client_fd;
     SSL *ssl_clnt;
-    SSLCTX *ssl_clnt_ctx = ssl_ctx_new(
+    SSL_CTX *ssl_clnt_ctx = ssl_ctx_new(
                             DEFAULT_CLNT_OPTION, SSL_DEFAULT_CLNT_SESS);
     usleep(200000);           /* allow server to start */
 
@@ -1489,7 +1489,7 @@ error:
 static int SSL_basic_test(void)
 {
     int server_fd, client_fd, ret = 0, size = 0, offset = 0;
-    SSLCTX *ssl_svr_ctx = NULL;
+    SSL_CTX *ssl_svr_ctx = NULL;
     struct sockaddr_in client_addr;
     uint8_t *read_buf;
     int clnt_len = sizeof(client_addr);
@@ -1570,7 +1570,7 @@ error:
 
 typedef struct
 {
-    SSLCTX *ssl_clnt_ctx;
+    SSL_CTX *ssl_clnt_ctx;
     int port;
     int thread_id;
 } multi_t;
@@ -1645,8 +1645,8 @@ error:
 int multi_thread_test(void)
 {
     int server_fd;
-    SSLCTX *ssl_server_ctx;
-    SSLCTX *ssl_clnt_ctx;
+    SSL_CTX *ssl_server_ctx;
+    SSL_CTX *ssl_clnt_ctx;
     pthread_t clnt_threads[NUM_THREADS];
     pthread_t svr_threads[NUM_THREADS];
     int i, res = 0;

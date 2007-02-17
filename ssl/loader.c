@@ -32,17 +32,17 @@
 
 #include "ssl.h"
 
-static int do_obj(SSLCTX *ssl_ctx, int obj_type, 
+static int do_obj(SSL_CTX *ssl_ctx, int obj_type, 
                     SSLObjLoader *ssl_obj, const char *password);
 #ifdef CONFIG_SSL_HAS_PEM
-static int ssl_obj_PEM_load(SSLCTX *ssl_ctx, int obj_type, 
+static int ssl_obj_PEM_load(SSL_CTX *ssl_ctx, int obj_type, 
                         SSLObjLoader *ssl_obj, const char *password);
 #endif
 
 /*
  * Load a file into memory that is in binary DER (or ascii PEM) format.
  */
-EXP_FUNC int STDCALL ssl_obj_load(SSLCTX *ssl_ctx, int obj_type, 
+EXP_FUNC int STDCALL ssl_obj_load(SSL_CTX *ssl_ctx, int obj_type, 
                             const char *filename, const char *password)
 {
 #ifndef CONFIG_SSL_SKELETON_MODE
@@ -57,6 +57,7 @@ EXP_FUNC int STDCALL ssl_obj_load(SSLCTX *ssl_ctx, int obj_type,
     }
 
     ssl_obj = (SSLObjLoader *)calloc(1, sizeof(SSLObjLoader));
+
     ssl_obj->len = get_file(filename, &ssl_obj->buf);
 
     if (ssl_obj->len <= 0)
@@ -90,12 +91,13 @@ error:
 /*
  * Transfer binary data into the object loader.
  */
-EXP_FUNC int STDCALL ssl_obj_memory_load(SSLCTX *ssl_ctx, int mem_type, 
+EXP_FUNC int STDCALL ssl_obj_memory_load(SSL_CTX *ssl_ctx, int mem_type, 
         const uint8_t *data, int len, const char *password)
 {
     int ret;
 
-    SSLObjLoader *ssl_obj = (SSLObjLoader *)calloc(1, sizeof(SSLObjLoader));
+    SSLObjLoader *ssl_obj;
+    ssl_obj = (SSLObjLoader *)calloc(1, sizeof(SSLObjLoader));
     ssl_obj->buf = (uint8_t *)malloc(len);
     memcpy(ssl_obj->buf, data, len);
     ssl_obj->len = len;
@@ -107,7 +109,7 @@ EXP_FUNC int STDCALL ssl_obj_memory_load(SSLCTX *ssl_ctx, int mem_type,
 /*
  * Actually work out what we are doing 
  */
-static int do_obj(SSLCTX *ssl_ctx, int obj_type, 
+static int do_obj(SSL_CTX *ssl_ctx, int obj_type, 
                     SSLObjLoader *ssl_obj, const char *password)
 {
     int ret = SSL_OK;
@@ -277,7 +279,7 @@ error:
 /**
  * Take a base64 blob of data and turn it into its proper ASN.1 form.
  */
-static int new_pem_obj(SSLCTX *ssl_ctx, int is_cacert, uint8_t *where, 
+static int new_pem_obj(SSL_CTX *ssl_ctx, int is_cacert, uint8_t *where, 
         int remain, const char *password)
 {
     int ret = SSL_OK;
@@ -293,6 +295,7 @@ static int new_pem_obj(SSLCTX *ssl_ctx, int is_cacert, uint8_t *where,
             remain -= (int)(end-start);
             start += strlen(begins[i]);
             pem_size = (int)(end-start);
+
             ssl_obj = (SSLObjLoader *)calloc(1, sizeof(SSLObjLoader));
 
             /* 4/3 bigger than what we need but so what */
@@ -357,7 +360,7 @@ error:
 /*
  * Load a file into memory that is in ASCII PEM format.
  */
-static int ssl_obj_PEM_load(SSLCTX *ssl_ctx, int obj_type, 
+static int ssl_obj_PEM_load(SSL_CTX *ssl_ctx, int obj_type, 
                         SSLObjLoader *ssl_obj, const char *password)
 {
     uint8_t *start;

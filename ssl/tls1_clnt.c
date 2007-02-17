@@ -35,7 +35,7 @@ static int send_cert_verify(SSL *ssl);
 /*
  * Establish a new SSL connection to an SSL server.
  */
-EXP_FUNC SSL * STDCALL ssl_client_new(SSLCTX *ssl_ctx, int client_fd, const uint8_t *session_id)
+EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const uint8_t *session_id)
 {
     int ret;
     SSL *ssl = ssl_new(ssl_ctx, client_fd);

@@ -65,14 +65,14 @@ static char *make_uni_pass(const char *password, int *uni_pass_len);
 static int p8_decrypt(const char *uni_pass, int uni_pass_len, 
                         const uint8_t *salt, int iter, 
                         uint8_t *priv_key, int priv_key_len, int id);
-static int p8_add_key(SSLCTX *ssl_ctx, uint8_t *priv_key);
+static int p8_add_key(SSL_CTX *ssl_ctx, uint8_t *priv_key);
 static int get_pbe_params(uint8_t *buf, int *offset, 
         const uint8_t **salt, int *iterations);
 
 /*
  * Take a raw pkcs8 block and then decrypt it and turn it into a normal key.
  */
-int pkcs8_decode(SSLCTX *ssl_ctx, SSLObjLoader *ssl_obj, const char *password)
+int pkcs8_decode(SSL_CTX *ssl_ctx, SSLObjLoader *ssl_obj, const char *password)
 {
     uint8_t *buf = ssl_obj->buf;
     int len, offset = 0;
@@ -120,7 +120,7 @@ error:
 /*
  * Take the unencrypted pkcs8 and turn it into a private key 
  */
-static int p8_add_key(SSLCTX *ssl_ctx, uint8_t *priv_key)
+static int p8_add_key(SSL_CTX *ssl_ctx, uint8_t *priv_key)
 {
     uint8_t *buf = priv_key;
     int len, offset = 0;
@@ -218,7 +218,7 @@ static int p8_decrypt(const char *uni_pass, int uni_pass_len,
  * Take a raw pkcs12 block and the decrypt it and turn it into a certificate(s)
  * and keys.
  */
-int pkcs12_decode(SSLCTX *ssl_ctx, SSLObjLoader *ssl_obj, const char *password)
+int pkcs12_decode(SSL_CTX *ssl_ctx, SSLObjLoader *ssl_obj, const char *password)
 {
     uint8_t *buf = ssl_obj->buf;
     int all_ok = 0, len, iterations, auth_safes_start, 
@@ -273,6 +273,7 @@ int pkcs12_decode(SSLCTX *ssl_ctx, SSLObjLoader *ssl_obj, const char *password)
 
     auth_safes_len = auth_safes_end - auth_safes_start;
     auth_safes = malloc(auth_safes_len);
+
     memcpy(auth_safes, &buf[auth_safes_start], auth_safes_len);
 
     if (asn1_next_obj(buf, &offset, ASN1_SEQUENCE) < 0 ||

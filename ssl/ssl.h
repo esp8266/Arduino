@@ -156,10 +156,10 @@ extern "C" {
  * different context needs to be be used.
  *
  * There are two threading models supported - a single thread with one
- * SSLCTX can support any number of SSL connections - and multiple threads can 
- * support one SSLCTX object each (the default). But if a single SSLCTX 
+ * SSL_CTX can support any number of SSL connections - and multiple threads can 
+ * support one SSL_CTX object each (the default). But if a single SSL_CTX 
  * object uses many SSL objects in individual threads, then the 
- * CONFIG_SSLCTX_MUTEXING option needs to be configured.
+ * CONFIG_SSL_CTX_MUTEXING option needs to be configured.
  *
  * @param options [in]  Any particular options. At present the options
  * supported are:
@@ -185,7 +185,7 @@ extern "C" {
  * is not used in skeleton mode.
  * @return A client/server context.
  */
-EXP_FUNC SSLCTX * STDCALL ssl_ctx_new(uint32_t options, int num_sessions);
+EXP_FUNC SSL_CTX * STDCALL ssl_ctx_new(uint32_t options, int num_sessions);
 
 /**
  * @brief Remove a client/server context.
@@ -194,7 +194,7 @@ EXP_FUNC SSLCTX * STDCALL ssl_ctx_new(uint32_t options, int num_sessions);
  * sent a "Close Notify" alert (if possible).
  * @param ssl_ctx [in] The client/server context.
  */
-EXP_FUNC void STDCALL ssl_ctx_free(SSLCTX *ssl_ctx);
+EXP_FUNC void STDCALL ssl_ctx_free(SSL_CTX *ssl_ctx);
 
 /**
  * @brief (server only) Establish a new SSL connection to an SSL client.
@@ -205,7 +205,7 @@ EXP_FUNC void STDCALL ssl_ctx_free(SSLCTX *ssl_ctx);
  * @param client_fd [in] The client's file descriptor. 
  * @return An SSL object reference.
  */
-EXP_FUNC SSL * STDCALL ssl_server_new(SSLCTX *ssl_ctx, int client_fd);
+EXP_FUNC SSL * STDCALL ssl_server_new(SSL_CTX *ssl_ctx, int client_fd);
 
 /**
  * @brief (client only) Establish a new SSL connection to an SSL server.
@@ -223,7 +223,7 @@ EXP_FUNC SSL * STDCALL ssl_server_new(SSLCTX *ssl_ctx, int client_fd);
  * @return An SSL object reference. Use ssl_handshake_status() to check 
  * if a handshake succeeded.
  */
-EXP_FUNC SSL * STDCALL ssl_client_new(SSLCTX *ssl_ctx, int client_fd, const uint8_t *session_id);
+EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const uint8_t *session_id);
 
 /**
  * @brief Free any used resources on this connection. 
@@ -272,7 +272,7 @@ EXP_FUNC int STDCALL ssl_write(SSL *ssl, const uint8_t *out_data, int out_len);
  * @return A reference to the SSL object. Returns null if the object could not 
  * be found.
  */
-EXP_FUNC SSL * STDCALL ssl_find(SSLCTX *ssl_ctx, int client_fd);
+EXP_FUNC SSL * STDCALL ssl_find(SSL_CTX *ssl_ctx, int client_fd);
 
 /**
  * @brief Get the session id for a handshake. 
@@ -395,7 +395,7 @@ EXP_FUNC int STDCALL ssl_renegotiate(SSL *ssl);
  * @return SSL_OK if all ok
  * @note Not available in skeleton build mode.
  */
-EXP_FUNC int STDCALL ssl_obj_load(SSLCTX *ssl_ctx, int obj_type, const char *filename, const char *password);
+EXP_FUNC int STDCALL ssl_obj_load(SSL_CTX *ssl_ctx, int obj_type, const char *filename, const char *password);
 
 /**
  * @brief Process binary data.
@@ -410,7 +410,7 @@ EXP_FUNC int STDCALL ssl_obj_load(SSLCTX *ssl_ctx, int obj_type, const char *fil
  * @return SSL_OK if all ok
  * @see ssl_obj_load for more details on obj_type.
  */
-EXP_FUNC int STDCALL ssl_obj_memory_load(SSLCTX *ssl_ctx, int obj_type, const uint8_t *data, int len, const char *password);
+EXP_FUNC int STDCALL ssl_obj_memory_load(SSL_CTX *ssl_ctx, int obj_type, const uint8_t *data, int len, const char *password);
 
 /**
  * @brief Return the axTLS library version as a string.

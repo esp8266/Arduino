@@ -21,15 +21,15 @@
  *
  * OS specific functions.
  */
-#ifdef WIN32
-
 #include <time.h>
+#include <stdlib.h>
 #include "os_port.h"
 
+#ifdef WIN32
 /**
  * gettimeofday() not in Win32 
  */
-EXP_FUNC void gettimeofday(struct timeval* t, void* timezone)
+EXP_FUNC void STDCALL gettimeofday(struct timeval* t, void* timezone)
 {       
 #if defined(_WIN32_WCE)
     t->tv_sec = time(NULL);
@@ -45,7 +45,7 @@ EXP_FUNC void gettimeofday(struct timeval* t, void* timezone)
 /**
  * strcasecmp() not in Win32
  */
-EXP_FUNC int strcasecmp(const char *s1, const char *s2)
+EXP_FUNC int STDCALL strcasecmp(const char *s1, const char *s2)
 {
     while (tolower(*s1) == tolower(*s2++))
     {
@@ -59,3 +59,61 @@ EXP_FUNC int strcasecmp(const char *s1, const char *s2)
 }
 
 #endif
+
+#undef malloc
+#undef realloc
+#undef calloc
+#undef open
+#undef fopen
+
+/* some functions that call abort() on failure */
+EXP_FUNC void * STDCALL ax_malloc(size_t s)
+{
+    void *x;
+
+    if ((x = malloc(s)) == NULL)
+        abort();
+
+    return x;
+}
+
+EXP_FUNC void * STDCALL ax_realloc(void *y, size_t s)
+{
+    void *x;
+
+    if ((x = realloc(y, s)) == NULL)
+        abort();
+
+    return x;
+}
+
+EXP_FUNC void * STDCALL ax_calloc(size_t n, size_t s)
+{
+    void *x;
+
+    if ((x = calloc(n, s)) == NULL)
+        abort();
+
+    return x;
+}
+
+EXP_FUNC FILE * STDCALL ax_fopen(const char *name, const char *type)
+{
+    FILE *f; 
+
+    if ((f = fopen(name, type)) == NULL)
+        abort();
+
+    return  f;
+}
+
+EXP_FUNC int STDCALL ax_open(const char *pathname, int flags)
+{
+    int x;
+
+    if ((x = open(pathname, flags)) < 0)
+        abort();
+
+    return x;
+}
+

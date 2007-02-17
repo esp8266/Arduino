@@ -31,7 +31,7 @@ extern "C" {
 #include "version.h"
 
 /* Mutexing definitions */
-#if defined(CONFIG_SSLCTX_MUTEXING)
+#if defined(CONFIG_SSL_CTX_MUTEXING)
 #if defined(WIN32)
 #define SSL_CTX_MUTEX_TYPE          HANDLE
 #define SSL_CTX_MUTEX_INIT(A)       A=CreateMutex(0, FALSE, 0)
@@ -172,7 +172,7 @@ struct _SSL
     struct _SSL *next;                  /* doubly linked list */
     struct _SSL *prev;
     SSL_CERT *certs;
-    struct _SSLCTX *ssl_ctx;            /* back reference to a clnt/svr ctx */
+    struct _SSL_CTX *ssl_ctx;            /* back reference to a clnt/svr ctx */
 #ifndef CONFIG_SSL_SKELETON_MODE
     uint16_t session_index;
     SSL_SESS *session;
@@ -194,7 +194,7 @@ struct _SSL
 
 typedef struct _SSL SSL;
 
-struct _SSLCTX
+struct _SSL_CTX
 {
     uint32_t options;
     uint8_t chain_length;
@@ -209,16 +209,19 @@ struct _SSLCTX
     uint16_t num_sessions;
     SSL_SESS **ssl_sessions;
 #endif
-#ifdef CONFIG_SSLCTX_MUTEXING
+#ifdef CONFIG_SSL_CTX_MUTEXING
     SSL_CTX_MUTEX_TYPE mutex;
 #endif
 };
 
-typedef struct _SSLCTX SSLCTX;
+typedef struct _SSL_CTX SSL_CTX;
+
+/* backwards compatibility */
+typedef struct _SSL_CTX SSLCTX;
 
 extern const uint8_t ssl_prot_prefs[NUM_PROTOCOLS];
 
-SSL *ssl_new(SSLCTX *ssl_ctx, int client_fd);
+SSL *ssl_new(SSL_CTX *ssl_ctx, int client_fd);
 int send_packet(SSL *ssl, uint8_t protocol, 
         const uint8_t *in, int length);
 int do_svr_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len);
@@ -233,13 +236,13 @@ int send_change_cipher_spec(SSL *ssl);
 void finished_digest(SSL *ssl, const char *label, uint8_t *digest);
 void generate_master_secret(SSL *ssl, const uint8_t *premaster_secret);
 void add_packet(SSL *ssl, const uint8_t *pkt, int len);
-int add_cert(SSLCTX *ssl_ctx, const uint8_t *buf, int len);
-int add_private_key(SSLCTX *ssl_ctx, SSLObjLoader *ssl_obj);
+int add_cert(SSL_CTX *ssl_ctx, const uint8_t *buf, int len);
+int add_private_key(SSL_CTX *ssl_ctx, SSLObjLoader *ssl_obj);
 void ssl_obj_free(SSLObjLoader *ssl_obj);
-int pkcs8_decode(SSLCTX *ssl_ctx, SSLObjLoader *ssl_obj, const char *password);
-int pkcs12_decode(SSLCTX *ssl_ctx, SSLObjLoader *ssl_obj, const char *password);
+int pkcs8_decode(SSL_CTX *ssl_ctx, SSLObjLoader *ssl_obj, const char *password);
+int pkcs12_decode(SSL_CTX *ssl_ctx, SSLObjLoader *ssl_obj, const char *password);
 #ifdef CONFIG_SSL_CERT_VERIFICATION
-int add_cert_auth(SSLCTX *ssl_ctx, const uint8_t *buf, int len);
+int add_cert_auth(SSL_CTX *ssl_ctx, const uint8_t *buf, int len);
 void remove_ca_certs(CA_CERT_CTX *ca_cert_ctx);
 #endif
 #ifdef CONFIG_SSL_ENABLE_CLIENT

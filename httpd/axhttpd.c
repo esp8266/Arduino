@@ -120,6 +120,7 @@ int main(int argc, char *argv[])
     signal(SIGINT, sigint_cleanup);
     signal(SIGTERM, die);
     mime_init();
+    tdate_init();
 
     for (i = 0; i < INITIAL_CONNECTION_SLOTS; i++) 
     {
@@ -587,7 +588,6 @@ static void addconnection(int sd, char *ip, int is_ssl)
     tp->state = STATE_WANT_TO_READ_HEAD;
     tp->reqtype = TYPE_GET;
     tp->close_when_done = 0;
-    tp->modified_since = 0;
     tp->timeout = time(NULL) + CONFIG_HTTP_TIMEOUT;
 }
 

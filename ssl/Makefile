@@ -54,6 +54,7 @@ OBJ=\
 	bigint.o \
 	crypto_misc.o \
 	hmac.o \
+	os_port.o \
 	loader.o \
 	md5.o \
 	p12.o \
@@ -63,10 +64,6 @@ OBJ=\
 	tls1.o \
 	tls1_svr.o \
 	tls1_clnt.o
-
-ifdef CONFIG_PLATFORM_WIN32
-OBJ+=os_port.o
-endif
 
 include ../config/makefile.post
 

@@ -157,9 +157,9 @@ void DISPLAY_BYTES(SSL *ssl, const char *format,
 /**
  * Establish a new client/server context.
  */
-EXP_FUNC SSLCTX *STDCALL ssl_ctx_new(uint32_t options, int num_sessions)
+EXP_FUNC SSL_CTX *STDCALL ssl_ctx_new(uint32_t options, int num_sessions)
 {
-    SSLCTX *ssl_ctx = (SSLCTX *)calloc(1, sizeof (SSLCTX));
+    SSL_CTX *ssl_ctx = (SSL_CTX *)calloc(1, sizeof (SSL_CTX));
     ssl_ctx->options = options;
 #ifndef CONFIG_SSL_SKELETON_MODE
     ssl_ctx->num_sessions = num_sessions;
@@ -195,7 +195,7 @@ EXP_FUNC SSLCTX *STDCALL ssl_ctx_new(uint32_t options, int num_sessions)
 /*
  * Remove a client/server context.
  */
-EXP_FUNC void STDCALL ssl_ctx_free(SSLCTX *ssl_ctx)
+EXP_FUNC void STDCALL ssl_ctx_free(SSL_CTX *ssl_ctx)
 {
     SSL *ssl;
     int i;
@@ -243,7 +243,7 @@ EXP_FUNC void STDCALL ssl_ctx_free(SSLCTX *ssl_ctx)
  */
 EXP_FUNC void STDCALL ssl_free(SSL *ssl)
 {
-    SSLCTX *ssl_ctx;
+    SSL_CTX *ssl_ctx;
 
     if (ssl == NULL)        /* just ignore null pointers */
         return;
@@ -338,7 +338,7 @@ EXP_FUNC int STDCALL ssl_write(SSL *ssl, const uint8_t *out_data, int out_len)
 /**
  * Add a certificate to the certificate chain.
  */
-int add_cert(SSLCTX *ssl_ctx, const uint8_t *buf, int len)
+int add_cert(SSL_CTX *ssl_ctx, const uint8_t *buf, int len)
 {
     int ret = SSL_ERROR_NO_CERT_DEFINED, i = 0;
     SSL_CERT *ssl_cert;
@@ -383,7 +383,7 @@ error:
 /**
  * Add a certificate authority.
  */
-int add_cert_auth(SSLCTX *ssl_ctx, const uint8_t *buf, int len)
+int add_cert_auth(SSL_CTX *ssl_ctx, const uint8_t *buf, int len)
 {
     int ret = SSL_ERROR_NO_CERT_DEFINED;
     int i = 0;
@@ -464,7 +464,7 @@ EXP_FUNC const char * STDCALL ssl_get_cert_dn(SSL *ssl, int component)
 /*
  * Find an ssl object based on the client's file descriptor.
  */
-EXP_FUNC SSL * STDCALL ssl_find(SSLCTX *ssl_ctx, int client_fd)
+EXP_FUNC SSL * STDCALL ssl_find(SSL_CTX *ssl_ctx, int client_fd)
 {
     SSL *ssl;
 
@@ -535,7 +535,7 @@ static const cipher_info_t *get_cipher_info(uint8_t cipher)
 /*
  * Get a new ssl context for a new connection.
  */
-SSL *ssl_new(SSLCTX *ssl_ctx, int client_fd)
+SSL *ssl_new(SSL_CTX *ssl_ctx, int client_fd)
 {
     SSL *ssl = (SSL *)calloc(1, sizeof(SSL));
     ssl->ssl_ctx = ssl_ctx;
@@ -573,7 +573,7 @@ SSL *ssl_new(SSLCTX *ssl_ctx, int client_fd)
 /*
  * Add a private key to a context.
  */
-int add_private_key(SSLCTX *ssl_ctx, SSLObjLoader *ssl_obj)
+int add_private_key(SSL_CTX *ssl_ctx, SSLObjLoader *ssl_obj)
 {
     int ret = SSL_OK;
 
@@ -2014,7 +2014,7 @@ EXP_FUNC void STDCALL ssl_display_error(int error_code) {}
 
 #ifdef CONFIG_BINDINGS
 #if !defined(CONFIG_SSL_ENABLE_CLIENT)
-EXP_FUNC SSL * STDCALL ssl_client_new(SSLCTX *ssl_ctx, 
+EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, 
                         int client_fd, const uint8_t *session_id)
 {
     printf(unsupported_str);

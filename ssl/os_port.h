@@ -29,6 +29,8 @@
 extern "C" {
 #endif
 
+#include <stdio.h>
+
 #if defined(WIN32) || defined(CONFIG_PLATFORM_CYGWIN)
 #define STDCALL                 __stdcall
 #define EXP_FUNC                __declspec(dllexport)
@@ -72,7 +74,7 @@ extern "C" {
 #define random()                rand()
 #define getpid()                _getpid()
 #define snprintf                _snprintf
-#define open(A,B)               _open(A,B)
+//#define open(A,B)               _open(A,B)
 #define dup2(A,B)               _dup2(A,B)
 #define unlink(A)               _unlink(A)
 #define close(A)                _close(A)
@@ -80,9 +82,11 @@ extern "C" {
 #define write(A,B,C)            _write(A,B,C)
 #define sleep(A)                Sleep(A*1000)
 #define usleep(A)               Sleep(A/1000)
-#define lseek(A,B,C)            _lseek(A,B,C)
 #define strdup(A)               _strdup(A)
 #define chroot(A)               _chdir(A)
+#ifndef lseek
+#define lseek(A,B,C)            _lseek(A,B,C)
+#endif
 
 /* This fix gets around a problem where a win32 application on a cygwin xterm
    doesn't display regular output (until a certain buffer limit) - but it works
@@ -99,19 +103,17 @@ extern "C" {
 #pragma comment(lib, "AdvAPI32.lib")
 #endif
 
-#define uint8_t unsigned char
-#define uint16_t unsigned short
-#ifndef INT16
-typedef signed short INT16;
-#endif
+typedef UINT8 uint8_t;
+typedef INT8 int8_t;
+typedef UINT16 uint16_t;
+typedef INT16 int16_t;
+typedef UINT32 uint32_t;
+typedef INT32 int32_t;
+typedef UINT64 uint64_t;
+typedef INT64 int64_t;
 
-#define int16_t INT16
-#define uint32_t UINT32
-#define uint64_t UINT64
-#define int64_t INT64
-
-extern EXP_FUNC void gettimeofday(struct timeval* t,void* timezone);
-extern EXP_FUNC int strcasecmp(const char *s1, const char *s2);
+EXP_FUNC void STDCALL gettimeofday(struct timeval* t,void* timezone);
+EXP_FUNC int STDCALL strcasecmp(const char *s1, const char *s2);
 
 #else   /* Not Win32 */
 
@@ -139,6 +141,19 @@ extern EXP_FUNC int strcasecmp(const char *s1, const char *s2);
 #define TTY_FLUSH()
 
 #endif  /* Not Win32 */
+
+/* some functions to mutate the way these work */
+#define malloc(A)       ax_malloc(A)
+#define realloc(A,B)    ax_realloc(A,B)
+#define calloc(A,B)     ax_calloc(A,B)
+#define fopen(A,B)      ax_fopen(A,B)
+#define open(A,B)       ax_open(A,B)
+
+EXP_FUNC void * STDCALL ax_malloc(size_t s);
+EXP_FUNC void * STDCALL ax_realloc(void *y, size_t s);
+EXP_FUNC void * STDCALL ax_calloc(size_t n, size_t s);
+EXP_FUNC FILE * STDCALL fopen(const char *name, const char *type);
+EXP_FUNC int STDCALL open(const char *pathname, int flags); 
 
 #ifdef __cplusplus
 }

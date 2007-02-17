@@ -270,9 +270,9 @@ static int asn1_get_printable_str(const uint8_t *buf, int *offset, char **str)
 
     (*offset)++;
     len = get_asn1_length(buf, offset);
-    *str = (char *)malloc(len+1);       /* allow for null */
+    *str = (char *)malloc(len+1);                   /* allow for null */
     memcpy(*str, &buf[*offset], len);
-    (*str)[len] = 0;                    /* null terminate */
+    (*str)[len] = 0;                                /* null terminate */
     *offset += len;
 end_pnt_str:
     return len;

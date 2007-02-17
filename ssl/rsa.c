@@ -72,7 +72,7 @@ void RSA_pub_key_new(RSA_CTX **ctx,
 {
     RSA_CTX *rsa_ctx;
     BI_CTX *bi_ctx = bi_initialize();
-    *ctx = (RSA_CTX *)calloc(1, sizeof(RSA_CTX));   /* reset to all 0 */
+    *ctx = (RSA_CTX *)calloc(1, sizeof(RSA_CTX));
     rsa_ctx = *ctx;
     rsa_ctx->bi_ctx = bi_ctx;
     rsa_ctx->num_octets = (mod_len & 0xFFF0);
@@ -290,10 +290,12 @@ int RSA_encrypt(const RSA_CTX *ctx, const uint8_t *in_data, uint16_t in_len,
 bigint *RSA_sign_verify(BI_CTX *ctx, const uint8_t *sig, int sig_len,
         bigint *modulus, bigint *pub_exp)
 {
-    uint8_t *block = (uint8_t *)malloc(sig_len);
+    uint8_t *block;
     int i, size;
     bigint *decrypted_bi, *dat_bi;
     bigint *bir = NULL;
+
+    block = (uint8_t *)malloc(sig_len);
 
     /* decrypt */
     dat_bi = bi_import(ctx, sig, sig_len);

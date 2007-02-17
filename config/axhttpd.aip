@@ -22,18 +22,9 @@
     <ROW Directory="TARGETDIR" DefaultDir="SourceDir"/>
     <ROW Directory="another_dir_DIR" Directory_Parent="test_dir_DIR" DefaultDir="anothe~1|another_dir"/>
     <ROW Directory="index_files_DIR" Directory_Parent="www_DIR" DefaultDir="index_~1|index_files"/>
-    <ROW Directory="prop_base_4_DIR" Directory_Parent="svn_2_DIR" DefaultDir="prop-b~1|prop-base"/>
-    <ROW Directory="prop_base_5_DIR" Directory_Parent="tmp_2_DIR" DefaultDir="prop-b~1|prop-base"/>
-    <ROW Directory="props_4_DIR" Directory_Parent="svn_2_DIR" DefaultDir="props"/>
-    <ROW Directory="props_5_DIR" Directory_Parent="tmp_2_DIR" DefaultDir="props"/>
-    <ROW Directory="prot_DIR" Directory_Parent="test_dir_DIR" DefaultDir="prot"/>
-    <ROW Directory="svn_2_DIR" Directory_Parent="another_dir_DIR" DefaultDir="svn~1|.svn"/>
+    <ROW Directory="no_ssl_DIR" Directory_Parent="test_dir_DIR" DefaultDir="no_ssl"/>
+    <ROW Directory="ssl_only_DIR" Directory_Parent="test_dir_DIR" DefaultDir="ssl_only"/>
     <ROW Directory="test_dir_DIR" Directory_Parent="www_DIR" DefaultDir="test_dir"/>
-    <ROW Directory="text_base_4_DIR" Directory_Parent="svn_2_DIR" DefaultDir="text-b~1|text-base"/>
-    <ROW Directory="text_base_5_DIR" Directory_Parent="tmp_2_DIR" DefaultDir="text-b~1|text-base"/>
-    <ROW Directory="tmp_2_DIR" Directory_Parent="svn_2_DIR" DefaultDir="tmp"/>
-    <ROW Directory="wcprops_4_DIR" Directory_Parent="tmp_2_DIR" DefaultDir="wcprops"/>
-    <ROW Directory="wcprops_5_DIR" Directory_Parent="svn_2_DIR" DefaultDir="wcprops"/>
     <ROW Directory="www_DIR" Directory_Parent="APPDIR" DefaultDir="www"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
@@ -49,19 +40,12 @@
     <ROW Component="crypto_2600des.gif_1" ComponentId="{F3B3E37C-D940-4899-B312-0E244D6AF720}" Directory_="index_files_DIR" Attributes="0" KeyPath="crypto_2600des.gif_1" FullKeyPath="APPDIR\www\index_files"/>
     <ROW Component="favicon.ico" ComponentId="{9A1AB507-100A-470D-A002-CD8262CA4913}" Directory_="www_DIR" Attributes="0" KeyPath="favicon.ico" FullKeyPath="APPDIR\www"/>
     <ROW Component="health.sh" ComponentId="{173D7469-C57C-481E-A315-19DA527BA1A5}" Directory_="test_dir_DIR" Attributes="0" KeyPath="health.sh" FullKeyPath="APPDIR\www\test_dir"/>
-    <ROW Component="htaccess" ComponentId="{A21FC953-B7B4-42EA-8F21-422969557D40}" Directory_="prot_DIR" Attributes="0" KeyPath="htaccess" FullKeyPath="APPDIR\www\test_dir\prot"/>
+    <ROW Component="htaccess" ComponentId="{F53CB1D5-A3B9-4401-B0BA-B6AB1DA860B7}" Directory_="no_ssl_DIR" Attributes="0" KeyPath="htaccess" FullKeyPath="APPDIR\www\test_dir\no_ssl"/>
+    <ROW Component="htaccess_1" ComponentId="{83B45D66-AD6D-4E9B-8DC8-7910708E1F3A}" Directory_="ssl_only_DIR" Attributes="0" KeyPath="htaccess_1" FullKeyPath="APPDIR\www\test_dir\ssl_only"/>
     <ROW Component="htpasswd.exe" ComponentId="{9FE1AAD2-4E35-443A-AAE5-3A7D03A52AAA}" Directory_="APPDIR" Attributes="0" KeyPath="htpasswd.exe" FullKeyPath="APPDIR\htpasswd.exe"/>
-    <ROW Component="prop_base_2" ComponentId="{A3E2975E-C55F-458E-8443-23556A498DE8}" Directory_="prop_base_4_DIR" Attributes="0"/>
-    <ROW Component="prop_base_3" ComponentId="{84D4F8F9-D8C8-40A2-AC98-0D18C7ACC15D}" Directory_="prop_base_5_DIR" Attributes="0"/>
-    <ROW Component="props_2" ComponentId="{1EC8919C-173D-4A2E-8356-E054BD661F2B}" Directory_="props_4_DIR" Attributes="0"/>
-    <ROW Component="props_3" ComponentId="{1FA958FF-6FF6-4128-9424-4036DC68CE9F}" Directory_="props_5_DIR" Attributes="0"/>
-    <ROW Component="text_base_2" ComponentId="{C99C78FE-D567-463B-84AC-F09280EC233A}" Directory_="text_base_4_DIR" Attributes="0"/>
-    <ROW Component="text_base_3" ComponentId="{C7C7D550-84BA-4B7E-83ED-526D903CD774}" Directory_="text_base_5_DIR" Attributes="0"/>
-    <ROW Component="wcprops_2" ComponentId="{3974F3F6-9377-4343-9230-782F1DD91BFF}" Directory_="wcprops_4_DIR" Attributes="0"/>
-    <ROW Component="wcprops_3" ComponentId="{0A686253-B608-4CB2-A709-3A1E124C42CB}" Directory_="wcprops_5_DIR" Attributes="0"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
-    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0" Components="axhttpd.exe axssl.csharp.exe axssl.exe axssl.vbnet.exe axtls.dll axtls.jar axtlsj.dll favicon.ico bigint.h crypto_2600des.gif_1 prop_base_2 props_2 text_base_2 prop_base_3 props_3 text_base_3 wcprops_2 wcprops_3 health.sh htpasswd.exe another_dir htaccess"/>
+    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0" Components="axhttpd.exe axssl.csharp.exe axssl.exe axssl.vbnet.exe axtls.dll axtls.jar axtlsj.dll favicon.ico bigint.h crypto_2600des.gif_1 health.sh htpasswd.exe another_dir htaccess htaccess_1"/>
     <ATTRIBUTE name="CurrentFeature" value="MainFeature"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
@@ -87,11 +71,13 @@
     <ROW File="crypto_types.gif_1" Component_="crypto_2600des.gif_1" FileName="crypto~7.gif|crypto_types.gif" Attributes="0" SourcePath="..\www\index_files\crypto_types.gif" SelfReg="false" Sequence="25"/>
     <ROW File="favicon.ico" Component_="favicon.ico" FileName="favicon.ico" Attributes="0" SourcePath="..\www\favicon.ico" SelfReg="false" Sequence="10"/>
     <ROW File="health.sh" Component_="health.sh" FileName="health.sh" Attributes="0" SourcePath="..\www\test_dir\health.sh" SelfReg="false" Sequence="27"/>
-    <ROW File="htaccess" Component_="htaccess" FileName="htacce~1|.htaccess" Attributes="0" SourcePath="..\www\test_dir\prot\.htaccess" SelfReg="false" Sequence="31"/>
-    <ROW File="htpasswd" Component_="htaccess" FileName="htpass~1|.htpasswd" Attributes="0" SourcePath="..\www\test_dir\prot\.htpasswd" SelfReg="false" Sequence="32"/>
+    <ROW File="htaccess" Component_="htaccess" FileName="htacce~1|.htaccess" Attributes="0" SourcePath="..\www\test_dir\no_ssl\.htaccess" SelfReg="false" Sequence="31"/>
+    <ROW File="htaccess_1" Component_="htaccess_1" FileName="htacce~1|.htaccess" Attributes="0" SourcePath="..\www\test_dir\ssl_only\.htaccess" SelfReg="false" Sequence="33"/>
+    <ROW File="htpasswd" Component_="htaccess_1" FileName="htpass~1|.htpasswd" Attributes="0" SourcePath="..\www\test_dir\ssl_only\.htpasswd" SelfReg="false" Sequence="34"/>
     <ROW File="htpasswd.exe" Component_="htpasswd.exe" FileName="htpasswd.exe" Attributes="0" SourcePath="..\_stage\htpasswd.exe" SelfReg="false" Sequence="30"/>
     <ROW File="index.html" Component_="favicon.ico" FileName="index~1.htm|index.html" Attributes="0" SourcePath="..\www\index.html" SelfReg="false" Sequence="11"/>
-    <ROW File="index.html_1" Component_="htaccess" FileName="index~1.htm|index.html" Attributes="0" SourcePath="..\www\test_dir\prot\index.html" SelfReg="false" Sequence="33"/>
+    <ROW File="index.html_1" Component_="htaccess" FileName="index~1.htm|index.html" Attributes="0" SourcePath="..\www\test_dir\no_ssl\index.html" SelfReg="false" Sequence="32"/>
+    <ROW File="index.html_2" Component_="htaccess_1" FileName="index~1.htm|index.html" Attributes="0" SourcePath="..\www\test_dir\ssl_only\index.html" SelfReg="false" Sequence="35"/>
     <ROW File="kerberos.gif_1" Component_="crypto_2600des.gif_1" FileName="kerberos.gif" Attributes="0" SourcePath="..\www\index_files\kerberos.gif" SelfReg="false" Sequence="26"/>
     <ROW File="os_port.h" Component_="bigint.h" FileName="os_port.h" Attributes="0" SourcePath="..\ssl\os_port.h" SelfReg="false" Sequence="17"/>
     <ROW File="some_text.txt" Component_="health.sh" FileName="some_t~1.txt|some_text.txt" Attributes="0" SourcePath="..\www\test_dir\some_text.txt" SelfReg="false" Sequence="28"/>
@@ -127,14 +113,6 @@
     <ROW Dialog_="PatchWelcomeDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_PATCH" Ordering="2"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCreateFolderComponent">
-    <ROW Directory_="prop_base_4_DIR" Component_="prop_base_2"/>
-    <ROW Directory_="props_4_DIR" Component_="props_2"/>
-    <ROW Directory_="text_base_4_DIR" Component_="text_base_2"/>
-    <ROW Directory_="prop_base_5_DIR" Component_="prop_base_3"/>
-    <ROW Directory_="props_5_DIR" Component_="props_3"/>
-    <ROW Directory_="text_base_5_DIR" Component_="text_base_3"/>
-    <ROW Directory_="wcprops_4_DIR" Component_="wcprops_2"/>
-    <ROW Directory_="wcprops_5_DIR" Component_="wcprops_3"/>
     <ROW Directory_="another_dir_DIR" Component_="another_dir"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCustActComponent">

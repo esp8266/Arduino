@@ -1,15 +1,18 @@
 Changes since 1.0.0
 
-* AES should now work on 16bit processors (there was an alignment problem)
+* AES should now work on 16bit processors (there was an alignment problem).
 * Various freed objects are cleared before freeing.
-* Header files now installed in /usr/local/include/axTLS
-* -DCYGWIN replaced with -DCONFIG_PLATFORM_CYGWIN (and the same for solaris)
+* Header files now installed in /usr/local/include/axTLS.
+* -DCYGWIN replaced with -DCONFIG_PLATFORM_CYGWIN (and the same for solaris).
+* removed "-noextern" option in Swig. Fixed some other warnings in Win32.
+* SSLCTX changed to SSL_CTX (to be consistent with openssl).
 
 axhttpd Changes
-* main.c now becomes axhttpd.c
-* Header file issue fixed (in mime_types.c)
-* chroot() now used for better security
-* Basic authentication implemented (with .htpasswd)
-* HTTP Port protection implemented (with .htaccess)
-* Directory access protection implemented (with .htaccess)
-
+* main.c now becomes axhttpd.c.
+* Header file issue fixed (in mime_types.c).
+* chroot() now used for better security.
+* Basic authentication implemented (with .htpasswd).
+* SSL access/denial protection implemented (with .htaccess).
+* Directory access protection implemented (with .htaccess).
+* Can now have more than one CGI file extension in mconf.
+* "If-Modified-Since" request now handled properly.

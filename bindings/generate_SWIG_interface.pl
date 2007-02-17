@@ -154,7 +154,7 @@ print DATA_OUT << "END";
 #ifdef SWIGJAVA
 
 %apply long { SSL * };
-%apply long { SSLCTX * };
+%apply long { SSL_CTX * };
 %apply long { SSLObjLoader * };
 
 /* allow "unsigned char []" to become "byte[]" */

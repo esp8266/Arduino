@@ -47,13 +47,13 @@ java/axTLSj.i: ../ssl/ssl.h
 	@perl ./generate_SWIG_interface.pl -java
 
 java/axtlsj.java: java/axTLSj.i $(wildcard java/SSL*.java)
-	@cd java; swig -java -package axTLSj -noextern axTLSj.i; $(MAKE)
+	@cd java; swig -java -package axTLSj axTLSj.i; $(MAKE)
 
 perl/axTLSp.i: ../ssl/ssl.h
 	@perl ./generate_SWIG_interface.pl -perl
 
 perl/axTLSp_wrap.c: perl/axTLSp.i
-	@cd perl; swig -perl5 -noextern axTLSp.i; $(MAKE)
+	@cd perl; swig -perl5 axTLSp.i; $(MAKE)
 
 clean::
 	$(MAKE) -C csharp clean

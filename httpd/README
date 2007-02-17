@@ -4,6 +4,10 @@ axhttpd is a small embedded web server using the axTLS library.
 It is based originally on the web server written by Doug Currie which is at:
 http://www.hcsw.org/awhttpd.
 
+*****************************************************************************
+*                       axhttpd Features                                    *
+*****************************************************************************
+
 Basic Authentication
 ====================
 
@@ -16,30 +20,49 @@ utility program htpasswd is included to help manually edit .htpasswd files.
 The encryption of this password uses a proprietary algorithm due to the 
 dependency of many crypt libraries on DES.
 
-An example is in /test_dir/prot (username 'abcd', password is '1234').
+An example is in /test_dir/ssl_only (username 'abcd', password is '1234').
 
 Note: This is an mconf configuration option.
 
-HTTP Port Protection
+SSL Protection
 ====================
 
 Directories/files can be accessed using the 'http' or 'https' uri prefix. If
 normal http access for a directory needs to be disabled, then put
 "SSLRequireSSL" into a '.htaccess' file in the directory to be protected.
 
-An example is in /test_dir/prot.
+Conversely, use "SSLDenySSL" to deny access to directories via SSL.
+
+An example is in /test_dir/ssl_only and /test_dir/no_ssl.
+
+Entire directories can be denied access with a "Deny all" directive
+(regardless of SSL or authentication).
 
 CGI
 ===
 
 chroot() is now used for added security. However this has the impact of
 removing the regular filesystem, so any CGI applications no longer have the 
-usual access.
+usual access (to things like /bin, /lib etc).
 
-So any executables and libraries need to be copied into webroot (under /bin
-and /lib).
+So any executables and libraries need to be copied into webroot.
 
 Failure to do so will result in mystical blank screens (and probably hundreds
 of axhttpd instances being created...).
 
+Directory Listing
+=================
+
+An mconf option. Allow the files in directories to be displayed.
+
+Permissions Checking
+=====================
+
+An mconf option. This will display the various file permissions to standard
+output of files in web root.
+
+Other Features
+==============
+
+Check the help options in mconf for all the other features used.
 

@@ -87,7 +87,7 @@ static void do_server(int argc, char *argv[])
     uint16_t port = 4433;
     uint32_t options = SSL_DISPLAY_CERTS;
     int client_fd;
-    SSLCTX *ssl_ctx;
+    SSL_CTX *ssl_ctx;
     int server_fd, client_len, res = 0;
 #ifndef CONFIG_SSL_SKELETON_MODE
     char *private_key_file = NULL;
@@ -416,7 +416,7 @@ static void do_client(int argc, char *argv[])
     struct hostent *hostent;
     int reconnect = 0;
     uint32_t sin_addr;
-    SSLCTX *ssl_ctx;
+    SSL_CTX *ssl_ctx;
     SSL *ssl = NULL;
     int quiet = 0;
     int cert_index = 0, ca_cert_index = 0;

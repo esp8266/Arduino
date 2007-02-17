@@ -71,7 +71,7 @@ struct connstruct
     char databuf[BLOCKSIZE];
     uint8_t is_ssl;
     uint8_t close_when_done;
-    uint8_t modified_since;
+    time_t if_modified_since;
 
 #if defined(CONFIG_HTTP_HAS_CGI)
     char cgiargs[MAXREQUESTLENGTH];
@@ -88,7 +88,7 @@ struct serverstruct
     struct serverstruct *next;
     int sd;
     int is_ssl;
-    SSLCTX *ssl_ctx;
+    SSL_CTX *ssl_ctx;
 };
 
 #if defined(CONFIG_HTTP_HAS_CGI)
@@ -99,7 +99,7 @@ struct cgiextstruct
 };
 #endif
 
-// Global prototypes
+/* global prototypes */
 extern struct serverstruct *servers;
 extern struct connstruct *usedconns;
 extern struct connstruct *freeconns;
@@ -107,20 +107,26 @@ extern struct connstruct *freeconns;
 extern struct cgiextstruct *cgiexts;
 #endif
 
-// conn.c prototypes
+/* conn.c prototypes */
 void removeconnection(struct connstruct *cn);
 
-// proc.c prototypes
+/* proc.c prototypes */
 void procdodir(struct connstruct *cn);
 void procreadhead(struct connstruct *cn);
 void procsendhead(struct connstruct *cn);
 void procreadfile(struct connstruct *cn);
 void procsendfile(struct connstruct *cn);
 
-// misc.c prototypes
+
+/* misc.c prototypes */
 char *my_strncpy(char *dest, const char *src, size_t n);
 int isdir(const char *name);
 
-// mime_types.c prototypes
+/* mime_types.c prototypes */
 void mime_init(void);
 const char *getmimetype(const char *fn);
+
+/* tdate prototypes */
+void tdate_init(void);
+time_t tdate_parse(const char* str);
+

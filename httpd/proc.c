@@ -67,7 +67,6 @@ static int procheadelem(struct connstruct *cn, char *buf)
     *delim = 0;
     value = delim+1;
 
-    /* printf("name: %s, value: %s\n", buf, value); */
     if (strcmp(buf, "GET") == 0 || strcmp(buf, "HEAD") == 0 ||
                                             strcmp(buf, "POST") == 0) 
     {
@@ -89,6 +88,7 @@ static int procheadelem(struct connstruct *cn, char *buf)
         }
 
         my_strncpy(cn->filereq, value, MAXREQUESTLENGTH);
+        cn->if_modified_since = -1;
 #if defined(CONFIG_HTTP_HAS_CGI)
         if ((cgi_delim = strchr(value, '?')))
         {
@@ -113,8 +113,7 @@ static int procheadelem(struct connstruct *cn, char *buf)
     } 
     else if (strcmp(buf, "If-Modified-Since:") == 0) 
     {
-        /* TODO: parse this date properly with getdate() or similar */
-        cn->modified_since = 1;
+        cn->if_modified_since = tdate_parse(value);
     }
 #ifdef CONFIG_HTTP_HAS_AUTHORIZATION
     else if (strcmp(buf, "Authorization:") == 0 &&
@@ -408,13 +407,13 @@ void procsendhead(struct connstruct *cn)
 
     strcpy(date, ctime(&now));
 
-    if (cn->modified_since) 
+    /* has the file been read before? */
+    if (cn->if_modified_since != -1 && (cn->if_modified_since == 0 || 
+                                       cn->if_modified_since >= stbuf.st_mtime))
     {
-        /* file has already been read before */
         snprintf(buf, sizeof(buf), "HTTP/1.1 304 Not Modified\nServer: "
                 "axhttpd V%s\nDate: %s\n", VERSION, date);
         special_write(cn, buf, strlen(buf));
-        cn->modified_since = 0;
         cn->state = STATE_WANT_TO_READ_HEAD;
         return;
     }
@@ -442,7 +441,7 @@ void procsendhead(struct connstruct *cn)
             "Content-Type: %s\nContent-Length: %ld\n"
             "Date: %sLast-Modified: %s\n", VERSION,
             getmimetype(cn->actualfile), (long) stbuf.st_size,
-            date, ctime(&(stbuf.st_mtime))); /* ctime() has a \n on the end */
+            date, ctime(&stbuf.st_mtime)); /* ctime() has a \n on the end */
 
         special_write(cn, buf, strlen(buf));
 
@@ -977,15 +976,13 @@ static int htaccess_check(struct connstruct *cn)
 
     while (fgets(line, sizeof(line), fp) != NULL)
     {
-        if (!cn->is_ssl && strstr(line, "SSLRequireSSL"))
+        if (strstr(line, "Deny all") || /* access to this dir denied */
+                    /* Access will be denied unless SSL is active */
+                    (!cn->is_ssl && strstr(line, "SSLRequireSSL")) ||
+                    /* Access will be denied if SSL is active */
+                    (cn->is_ssl && strstr(line, "SSLDenySSL")))
         {
-            ret = -1;       /* SSL port access required */
-            break;
-        }
-
-        if (strstr(line, "Deny all"))  
-        {
-            ret = -1;       /* access to this dir denied */
+            ret = -1;
             break;
         }
     }
@@ -996,7 +993,7 @@ static int htaccess_check(struct connstruct *cn)
 
 static void send_error(struct connstruct *cn, int err)
 {
-    char buf[1024];
+    char buf[MAXREQUESTLENGTH];
     char *title;
     char *text;
 
@@ -1016,7 +1013,7 @@ static void send_error(struct connstruct *cn, int err)
             break;
     }
 
-    sprintf(buf, "HTTP/1.1 %d %s\n"
+    snprintf(buf, MAXREQUESTLENGTH, "HTTP/1.1 %d %s\n"
             "Content-Type: text/html\n"
             "Cache-Control: no-cache,no-store\n"
             "Connection: close\n\n"
@@ -1026,4 +1023,3 @@ static void send_error(struct connstruct *cn, int err)
     special_write(cn, buf, strlen(buf));
     removeconnection(cn);
 }
-

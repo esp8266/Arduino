@@ -77,8 +77,9 @@ static void check(const bigint *bi);
  */
 BI_CTX *bi_initialize(void)
 {
-    BI_CTX *ctx = (BI_CTX *)calloc(1, sizeof(BI_CTX));
-
+    BI_CTX *ctx;
+   
+    ctx = (BI_CTX *)calloc(1, sizeof(BI_CTX));
     ctx->active_list = NULL;
     ctx->active_count = 0;
     ctx->free_list = NULL;

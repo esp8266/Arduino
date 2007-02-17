@@ -74,18 +74,18 @@ config CONFIG_HTTP_DIRECTORIES
     help
         Enable directory listing.
     
+config CONFIG_HTTP_HAS_AUTHORIZATION
+    bool "Enable authorization"
+    default n
+    help
+        Pages/directories can have passwords associated with them.
+
 config CONFIG_HTTP_PERM_CHECK
     bool "Permissions Check"
     default n
     help
         Enable permissions checking on the directories before reading the
         files in them.
-
-config CONFIG_HTTP_HAS_AUTHORIZATION
-    bool "Enable authorization"
-    default n
-    help
-        Pages/directories can have passwords associated with them.
 
 config CONFIG_HTTP_HAS_IPV6
     bool "Enable IPv6"
@@ -98,8 +98,6 @@ config CONFIG_HTTP_HAS_IPV6
 
 config CONFIG_HTTP_ALL_MIME_TYPES
     bool "Use all mime types"
-    default y if CONFIG_SSL_FULL_MODE
-    default n if !CONFIG_SSL_FULL_MODE
     help
         Use the full list of supported mime types.
 
