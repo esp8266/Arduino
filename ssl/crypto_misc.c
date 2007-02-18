@@ -52,13 +52,8 @@ int get_file(const char *filename, uint8_t **buf)
     int total_bytes = 0;
     int bytes_read = 0; 
     int filesize;
-    FILE *stream = fopen(filename, "rb");
+    FILE *stream = ax_fopen(filename, "rb");
 
-    if (stream == NULL)
-    {
-        return -1;
-    }
-    
     /* Win CE doesn't support stat() */
     fseek(stream, 0, SEEK_END);
     filesize = ftell(stream);
@@ -87,11 +82,7 @@ EXP_FUNC void STDCALL RNG_initialize(const uint8_t *seed_buf, int size)
     if (rng_ref_count == 0)
     {
 #if !defined(WIN32) && defined(CONFIG_USE_DEV_URANDOM)
-        if ((rng_fd = open("/dev/urandom", O_RDONLY)) < 0)
-        {
-            printf(unsupported_str);
-            exit(1);
-        }
+        rng_fd = ax_open("/dev/urandom", O_RDONLY);
 #elif defined(WIN32) && defined(CONFIG_WIN32_USE_CRYPTO_LIB)
         if (!CryptAcquireContext(&gCryptProv, 
                           NULL, NULL, PROV_RSA_FULL, 0))

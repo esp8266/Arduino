@@ -23,6 +23,8 @@
  */
 #include <time.h>
 #include <stdlib.h>
+#include <errno.h>
+#include <stdarg.h>
 #include "os_port.h"
 
 #ifdef WIN32
@@ -66,13 +68,20 @@ EXP_FUNC int STDCALL strcasecmp(const char *s1, const char *s2)
 #undef open
 #undef fopen
 
-/* some functions that call abort() on failure */
+static const char * out_of_mem_str = "out of memory";
+static const char * file_open_str = "Could not open file \"%s\"";
+
+/* 
+ * Some functions that call display some error trace and then call abort().
+ * This just makes life much easier on embedded systems, since we're 
+ * suffering major trauma...
+ */
 EXP_FUNC void * STDCALL ax_malloc(size_t s)
 {
     void *x;
 
     if ((x = malloc(s)) == NULL)
-        abort();
+        exit_now(out_of_mem_str);
 
     return x;
 }
@@ -82,7 +91,7 @@ EXP_FUNC void * STDCALL ax_realloc(void *y, size_t s)
     void *x;
 
     if ((x = realloc(y, s)) == NULL)
-        abort();
+        exit_now(out_of_mem_str);
 
     return x;
 }
@@ -92,17 +101,20 @@ EXP_FUNC void * STDCALL ax_calloc(size_t n, size_t s)
     void *x;
 
     if ((x = calloc(n, s)) == NULL)
-        abort();
+        exit_now(out_of_mem_str);
 
     return x;
 }
 
-EXP_FUNC FILE * STDCALL ax_fopen(const char *name, const char *type)
+EXP_FUNC FILE * STDCALL ax_fopen(const char *pathname, const char *type)
 {
     FILE *f; 
 
-    if ((f = fopen(name, type)) == NULL)
-        abort();
+    if ((f = fopen(pathname, type)) == NULL)
+    {
+        perror("open: ");
+        exit_now(file_open_str, pathname);
+    }
 
     return  f;
 }
@@ -112,8 +124,25 @@ EXP_FUNC int STDCALL ax_open(const char *pathname, int flags)
     int x;
 
     if ((x = open(pathname, flags)) < 0)
-        abort();
+    {
+        perror("open: ");
+        exit_now(file_open_str, pathname);
+    }
 
     return x;
+}
+
+/**
+ * This is a call which will deliberately exit an application, but will
+ * display some information before dying.
+ */
+void exit_now(const char *format, ...)
+{
+    va_list argp;
+
+    va_start(argp, format);
+    vsprintf(stderr, format, argp);
+    va_end(argp);
+    abort();
 }
 

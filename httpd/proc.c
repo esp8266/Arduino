@@ -163,9 +163,6 @@ static void procdirlisting(struct connstruct *cn)
         send_error(cn, 404);
         return;
     }
-
-    /* Get rid of the "." */
-    readdir(cn->dirp);
 #endif
 
     snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nContent-Type: text/html\n\n"
@@ -198,6 +195,9 @@ void procdodir(struct connstruct *cn)
             snprintf(buf, sizeof(buf), "</body></html>\n");
             special_write(cn, buf, strlen(buf));
             removeconnection(cn);
+#ifndef WIN32
+            closedir(cn->dirp);
+#endif
             return;
         }
 
@@ -430,7 +430,7 @@ void procsendhead(struct connstruct *cn)
         flags |= O_BINARY;
 #endif
 
-        cn->filedesc = open(cn->actualfile, flags);
+        cn->filedesc = ax_open(cn->actualfile, flags);
         if (cn->filedesc == -1) 
         {
             send_error(cn, 404);
@@ -1010,6 +1010,11 @@ static void send_error(struct connstruct *cn, int err)
         case 404:
             title = "Not Found";
             text = title;
+            break;
+
+        default:
+            title = "Unknown";
+            text = "Unknown";
             break;
     }
 

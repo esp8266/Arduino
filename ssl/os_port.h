@@ -74,7 +74,7 @@ extern "C" {
 #define random()                rand()
 #define getpid()                _getpid()
 #define snprintf                _snprintf
-//#define open(A,B)               _open(A,B)
+#define open(A,B)               _open(A,B)
 #define dup2(A,B)               _dup2(A,B)
 #define unlink(A)               _unlink(A)
 #define close(A)                _close(A)
@@ -146,14 +146,18 @@ EXP_FUNC int STDCALL strcasecmp(const char *s1, const char *s2);
 #define malloc(A)       ax_malloc(A)
 #define realloc(A,B)    ax_realloc(A,B)
 #define calloc(A,B)     ax_calloc(A,B)
-#define fopen(A,B)      ax_fopen(A,B)
-#define open(A,B)       ax_open(A,B)
 
 EXP_FUNC void * STDCALL ax_malloc(size_t s);
 EXP_FUNC void * STDCALL ax_realloc(void *y, size_t s);
 EXP_FUNC void * STDCALL ax_calloc(size_t n, size_t s);
-EXP_FUNC FILE * STDCALL fopen(const char *name, const char *type);
-EXP_FUNC int STDCALL open(const char *pathname, int flags); 
+EXP_FUNC FILE * STDCALL ax_fopen(const char *name, const char *type);
+EXP_FUNC int STDCALL ax_open(const char *pathname, int flags); 
+
+#ifdef CONFIG_PLATFORM_LINUX
+void exit_now(const char *format, ...) __attribute((noreturn));
+#else
+void exit_now(const char *format, ...);
+#endif
 
 #ifdef __cplusplus
 }

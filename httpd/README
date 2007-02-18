@@ -33,7 +33,7 @@ normal http access for a directory needs to be disabled, then put
 
 Conversely, use "SSLDenySSL" to deny access to directories via SSL.
 
-An example is in /test_dir/ssl_only and /test_dir/no_ssl.
+An example is in /test_dir/no_http and /test_dir/no_ssl.
 
 Entire directories can be denied access with a "Deny all" directive
 (regardless of SSL or authentication).

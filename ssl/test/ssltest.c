@@ -996,27 +996,6 @@ int SSL_server_tests(void)
     printf("SSL server test \"%s\" passed\n", "Bad After Cert");
     TTY_FLUSH();
 
-    /* this test should fail */
-    if ((ret = SSL_server_test(NULL, "Bogus cert", "-cipher RC4-SHA", 
-                    "../ssl/test/axTLS.x509_crud.cer", NULL,
-                    "../ssl/test/axTLS.key_512", NULL,
-                    NULL, DEFAULT_SVR_OPTION)) != SSL_ERROR_INVALID_KEY)
-        goto cleanup;
-
-    printf("SSL server test \"%s\" passed\n", "Bogus cert");
-    TTY_FLUSH();
-
-    /* this test should fail */
-    if ((ret = SSL_server_test(NULL, "Bogus private key",
-                    "-cipher RC4-SHA", 
-                    "../ssl/test/axTLS.x509_device.cer", NULL,
-                    "../ssl/test/axTLS.crud", NULL,
-                    NULL, DEFAULT_SVR_OPTION)) != SSL_ERROR_INVALID_KEY)
-        goto cleanup;
-
-    printf("SSL server test \"%s\" passed\n", "Bogus private key");
-    TTY_FLUSH();
-
     /* 
      * Key in PEM format
      */
@@ -1734,7 +1713,7 @@ int main(int argc, char *argv[])
     signal(SIGPIPE, SIG_IGN);           /* ignore pipe errors */
     dup2(fd, 2);
 #endif
-    
+
     bi_ctx = bi_initialize();
 
     if (AES_test(bi_ctx))

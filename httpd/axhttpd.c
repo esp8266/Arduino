@@ -53,8 +53,6 @@ static void sigint_cleanup(int sig)
 {
     struct serverstruct *sp;
     struct connstruct *tp;
-    int i;
-
 
     while (servers != NULL) 
     {
@@ -66,14 +64,18 @@ static void sigint_cleanup(int sig)
         servers = sp;
     }
 
-    for (i = 0; i < INITIAL_CONNECTION_SLOTS; i++) 
+    while (freeconns != NULL)
     {
-        if (freeconns == NULL)
-            break;
-
         tp = freeconns->next;
         free(freeconns);
         freeconns = tp;
+    }
+
+    while (usedconns != NULL)
+    {
+        tp = usedconns->next;
+        free(usedconns);
+        usedconns = tp;
     }
 
 #if defined(CONFIG_HTTP_HAS_CGI)
@@ -129,20 +131,6 @@ int main(int argc, char *argv[])
         freeconns->next = tp;
     }
 
-    /* change to webroot for better security */
-    if (chroot(webroot))
-    {
-#ifdef CONFIG_HTTP_VERBOSE
-        fprintf(stderr, "'%s' is not a directory\n", webroot);
-#endif
-        exit(1);
-    }
-
-#ifndef WIN32
-    setgid(32767);
-    setuid(32767);
-#endif
-
     if ((active = openlistener(CONFIG_HTTP_PORT)) == -1) 
     {
 #ifdef CONFIG_HTTP_VERBOSE
@@ -179,6 +167,21 @@ int main(int argc, char *argv[])
             ssl_version(), CONFIG_HTTP_PORT, CONFIG_HTTP_HTTPS_PORT);
     TTY_FLUSH();
 #endif
+
+    /* change to webroot for better security */
+    if (chroot(webroot))
+    {
+#ifdef CONFIG_HTTP_VERBOSE
+        fprintf(stderr, "'%s' is not a directory\n", webroot);
+#endif
+        exit(1);
+    }
+
+#ifndef WIN32
+    setgid(32767);
+    setuid(32767);
+#endif
+
 #if defined(CONFIG_HTTP_IS_DAEMON)
     if (fork() > 0)  /* parent will die */
         exit(0);
@@ -560,7 +563,7 @@ static void addconnection(int sd, char *ip, int is_ssl)
 
     /* Get ourselves a connstruct */
     if (freeconns == NULL) 
-        tp = (struct connstruct *)malloc(sizeof(struct connstruct));
+        tp = (struct connstruct *)calloc(1, sizeof(struct connstruct));
     else 
     {
         tp = freeconns;
