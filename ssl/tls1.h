@@ -212,6 +212,9 @@ struct _SSL_CTX
 #ifdef CONFIG_SSL_CTX_MUTEXING
     SSL_CTX_MUTEX_TYPE mutex;
 #endif
+#ifdef CONFIG_OPENSSL_COMPATIBLE
+    void *bonus_attr;
+#endif
 };
 
 typedef struct _SSL_CTX SSL_CTX;

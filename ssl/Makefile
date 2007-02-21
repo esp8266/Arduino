@@ -57,6 +57,7 @@ OBJ=\
 	os_port.o \
 	loader.o \
 	md5.o \
+	openssl.o \
 	p12.o \
 	rsa.o \
 	rc4.o \

@@ -375,6 +375,7 @@ void procsendhead(struct connstruct *cn)
     {
         char tbuf[MAXREQUESTLENGTH];
         sprintf(tbuf, "%s%s", cn->actualfile, index_file);
+
         if (stat(tbuf, &stbuf) != -1) 
             strcat(cn->actualfile, index_file);
         else
@@ -429,9 +430,9 @@ void procsendhead(struct connstruct *cn)
 #if defined(WIN32) || defined(CONFIG_PLATFORM_CYGWIN)
         flags |= O_BINARY;
 #endif
+        cn->filedesc = open(cn->actualfile, flags);
 
-        cn->filedesc = ax_open(cn->actualfile, flags);
-        if (cn->filedesc == -1) 
+        if (cn->filedesc < 0) 
         {
             send_error(cn, 404);
             return;
@@ -472,7 +473,7 @@ void procreadfile(struct connstruct *cn)
 {
     int rv = read(cn->filedesc, cn->databuf, BLOCKSIZE);
 
-    if (rv == 0 || rv == -1) 
+    if (rv <= 0) 
     {
         close(cn->filedesc);
         cn->filedesc = -1;
@@ -516,7 +517,7 @@ static int special_write(struct connstruct *cn,
 {
     if (cn->is_ssl)
     {
-        SSL *ssl = ssl_find(servers->ssl_ctx, cn->networkdesc);
+        SSL *ssl = cn->ssl;
         return ssl ? ssl_write(ssl, (uint8_t *)buf, count) : -1;
     }
     else
@@ -530,10 +531,10 @@ static int special_read(struct connstruct *cn, void *buf, size_t count)
     if (cn->is_ssl)
     {
         uint8_t *read_buf;
-        SSL *ssl = ssl_find(servers->ssl_ctx, cn->networkdesc);
-
-        if ((res = ssl_read(ssl, &read_buf)) > SSL_OK)
+        if ((res = ssl_read(cn->ssl, &read_buf)) > SSL_OK)
+        {
             memcpy(buf, read_buf, res > (int)count ? count : res);
+        }
     }
     else
         res = SOCKET_READ(cn->networkdesc, buf, count);

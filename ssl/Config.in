@@ -244,6 +244,16 @@ config CONFIG_WIN32_USE_CRYPTO_LIB
         This will be the default on most Win32 systems. If using Visual Studio
         6.0, then the SDK containing the crypto libraries must be used.
 
+config CONFIG_OPENSSL_COMPATIBLE
+    bool "Enable openssl API compatibility"
+    default n
+    help 
+        To ease the porting of openssl applications, a subset of the openssl
+        API is wrapped around the axTLS API.
+
+        Note: not all the API is implemented, so parts may still break. And
+        it's definitely not 100% compatible.
+
 config CONFIG_PERFORMANCE_TESTING
     bool "Build the bigint performance test tool"
     default n

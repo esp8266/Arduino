@@ -52,7 +52,15 @@ int get_file(const char *filename, uint8_t **buf)
     int total_bytes = 0;
     int bytes_read = 0; 
     int filesize;
-    FILE *stream = ax_fopen(filename, "rb");
+    FILE *stream = fopen(filename, "rb");
+
+    if (stream == NULL)
+    {
+#ifdef CONFIG_SSL_FULL_MODE         
+        printf("file '%s' does not exist\n", filename); TTY_FLUSH();
+#endif
+        return -1;
+    }
 
     /* Win CE doesn't support stat() */
     fseek(stream, 0, SEEK_END);

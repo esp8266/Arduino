@@ -56,8 +56,10 @@ sub transformSignature
             $line =~ s/uint8_t \* ?/byte[] /g;
             $line =~ s/uint8_t ?/byte /g;
             $line =~ s/const char \* ?/string /g;
+            $line =~ s/const SSL_CTX \* ?/IntPtr /g;
             $line =~ s/SSL_CTX \* ?/IntPtr /g;
             $line =~ s/SSLObjLoader \* ?/IntPtr /g;
+            $line =~ s/const SSL \* ?/IntPtr /g;
             $line =~ s/SSL \* ?/IntPtr /g;
             $line =~ s/\(void\)/()/g;
         }
@@ -89,8 +91,10 @@ sub transformSignature
             $line =~ s/const uint8_t \* ?(\w+)/ByVal $1() As Byte/g;
             $line =~ s/uint8_t \* ?(\w+)/ByVal $1() As Byte/g;
             $line =~ s/const char \* ?(\w+)/ByVal $1 As String/g;
+            $line =~ s/const SSL_CTX \* ?(\w+)/ByVal $1 As IntPtr/g;
             $line =~ s/SSL_CTX \* ?(\w+)/ByVal $1 As IntPtr/g;
             $line =~ s/SSLObjLoader \* ?(\w+)/ByVal $1 As IntPtr/g;
+            $line =~ s/const SSL \* ?(\w+)/ByVal $1 As IntPtr/g;
             $line =~ s/SSL \* ?(\w+)/ByVal $1 As IntPtr/g;
             $line =~ s/void \* ?(\w+)/Byval $1 As IntPtr/g;
             $line =~ s/\(void\)/()/g;

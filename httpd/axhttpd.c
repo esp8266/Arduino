@@ -48,6 +48,7 @@ static void reaper(int sigtype)
 #endif
 #endif
 
+#ifdef CONFIG_HTTP_VERBOSE  /* should really be in debug mode or something */
 /* clean up memory for valgrind */
 static void sigint_cleanup(int sig)
 {
@@ -96,6 +97,7 @@ static void die(int sigtype)
 {
     exit(0);
 }
+#endif
 
 int main(int argc, char *argv[]) 
 {
@@ -112,15 +114,19 @@ int main(int argc, char *argv[])
     WSADATA wsaData;
     WSAStartup(wVersionRequested,&wsaData);
 #else
-    signal(SIGQUIT, die);
     signal(SIGPIPE, SIG_IGN);
 #if defined(CONFIG_HTTP_HAS_CGI)
     signal(SIGCHLD, reaper);
 #endif
+#ifdef CONFIG_HTTP_VERBOSE
+    signal(SIGQUIT, die);
+#endif
 #endif
 
-    signal(SIGINT, sigint_cleanup);
+#ifdef CONFIG_HTTP_VERBOSE
     signal(SIGTERM, die);
+    signal(SIGINT, sigint_cleanup);
+#endif
     mime_init();
     tdate_init();
 
@@ -576,7 +582,7 @@ static void addconnection(int sd, char *ip, int is_ssl)
     tp->networkdesc = sd;
 
     if (is_ssl)
-        ssl_server_new(servers->ssl_ctx, sd);
+        tp->ssl = ssl_server_new(servers->ssl_ctx, sd);
 
     tp->is_ssl = is_ssl;
     tp->filedesc = -1;
@@ -632,7 +638,10 @@ void removeconnection(struct connstruct *cn)
     if (cn->networkdesc != -1) 
     {
         if (cn->is_ssl) 
-            ssl_free(ssl_find(servers->ssl_ctx, cn->networkdesc));
+        {
+            ssl_free(cn->ssl);
+            cn->ssl = NULL;
+        }
 
         SOCKET_CLOSE(cn->networkdesc);
     }

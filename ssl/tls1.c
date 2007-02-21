@@ -429,7 +429,7 @@ error:
 /*
  * Retrieve an X.509 distinguished name component
  */
-EXP_FUNC const char * STDCALL ssl_get_cert_dn(SSL *ssl, int component)
+EXP_FUNC const char * STDCALL ssl_get_cert_dn(const SSL *ssl, int component)
 {
     if (ssl->x509_ctx == NULL)
         return NULL;
@@ -545,6 +545,7 @@ SSL *ssl_new(SSL_CTX *ssl_ctx, int client_fd)
     ssl->certs = ssl_ctx->certs;
     ssl->chain_length = ssl_ctx->chain_length;
     ssl->bm_data = ssl->bm_all_data+BM_RECORD_OFFSET; /* space at the start */
+    ssl->hs_status = SSL_NOT_OK;            /* not connected */
 #ifdef CONFIG_ENABLE_VERIFICATION
     ssl->ca_cert_ctx = ssl_ctx->ca_cert_ctx;
 #endif
@@ -566,7 +567,6 @@ SSL *ssl_new(SSL_CTX *ssl_ctx, int client_fd)
     }
 
     SSL_CTX_UNLOCK(ssl_ctx->mutex);
-
     return ssl;
 }
 
@@ -1241,8 +1241,11 @@ int basic_read(SSL *ssl, uint8_t **in_data)
                 break;
 
             case PT_APP_PROTOCOL_DATA:
-                *in_data = ssl->bm_data;    /* point to the work buffer */
-                (*in_data)[read_len] = 0;   /* null terminate just in case */
+                if (in_data)
+                {
+                    *in_data = ssl->bm_data;   /* point to the work buffer */
+                    (*in_data)[read_len] = 0;  /* null terminate just in case */
+                }
                 ret = read_len;
                 break;
 
@@ -1616,7 +1619,7 @@ void kill_ssl_session(SSL_SESS **ssl_sessions, SSL *ssl)
 /*
  * Get the session id for a handshake. This will be a 32 byte sequence.
  */
-EXP_FUNC const uint8_t * STDCALL ssl_get_session_id(SSL *ssl)
+EXP_FUNC const uint8_t * STDCALL ssl_get_session_id(const SSL *ssl)
 {
     return ssl->session_id;
 }
@@ -1624,7 +1627,7 @@ EXP_FUNC const uint8_t * STDCALL ssl_get_session_id(SSL *ssl)
 /*
  * Return the cipher id (in the SSL form).
  */
-EXP_FUNC uint8_t STDCALL ssl_get_cipher_id(SSL *ssl)
+EXP_FUNC uint8_t STDCALL ssl_get_cipher_id(const SSL *ssl)
 {
     return ssl->cipher;
 }
@@ -1632,7 +1635,7 @@ EXP_FUNC uint8_t STDCALL ssl_get_cipher_id(SSL *ssl)
 /*
  * Return the status of the handshake.
  */
-EXP_FUNC int STDCALL ssl_handshake_status(SSL *ssl)
+EXP_FUNC int STDCALL ssl_handshake_status(const SSL *ssl)
 {
     return ssl->hs_status;
 }
@@ -1678,7 +1681,7 @@ EXP_FUNC int STDCALL ssl_get_config(int offset)
 /**
  * Authenticate a received certificate.
  */
-EXP_FUNC int STDCALL ssl_verify_cert(SSL *ssl)
+EXP_FUNC int STDCALL ssl_verify_cert(const SSL *ssl)
 {
     int ret = x509_verify(ssl->ssl_ctx->ca_cert_ctx, ssl->x509_ctx);
 
@@ -2029,7 +2032,7 @@ EXP_FUNC int STDCALL ssl_verify_cert(SSL *ssl)
     return -1;
 }
 
-EXP_FUNC const char * STDCALL ssl_get_cert_dn(SSL *ssl, int component)
+EXP_FUNC const char * STDCALL ssl_get_cert_dn(const SSL *ssl, int component)
 {
     printf(unsupported_str);
     return NULL;

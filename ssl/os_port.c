@@ -111,10 +111,7 @@ EXP_FUNC FILE * STDCALL ax_fopen(const char *pathname, const char *type)
     FILE *f; 
 
     if ((f = fopen(pathname, type)) == NULL)
-    {
-        perror("open: ");
         exit_now(file_open_str, pathname);
-    }
 
     return  f;
 }
@@ -124,10 +121,7 @@ EXP_FUNC int STDCALL ax_open(const char *pathname, int flags)
     int x;
 
     if ((x = open(pathname, flags)) < 0)
-    {
-        perror("open: ");
         exit_now(file_open_str, pathname);
-    }
 
     return x;
 }
@@ -141,7 +135,7 @@ void exit_now(const char *format, ...)
     va_list argp;
 
     va_start(argp, format);
-    vsprintf(stderr, format, argp);
+    vfprintf(stderr, format, argp);
     va_end(argp);
     abort();
 }

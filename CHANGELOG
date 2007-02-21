@@ -8,6 +8,8 @@ Changes since 1.0.0
 * SSLCTX changed to SSL_CTX (to be consistent with openssl).
 * malloc()/open() etc call abort() on failure.
 * Fixed a memory leak in directory listings.
+* Added openssl() compatibility functions.
+* Fixed cygwin 'make install' issue.
 
 axhttpd Changes
 * main.c now becomes axhttpd.c.
@@ -18,4 +20,5 @@ axhttpd Changes
 * Directory access protection implemented (via .htaccess).
 * Can now have more than one CGI file extension in mconf.
 * "If-Modified-Since" request now handled properly.
+* Performance tweaks to remove ssl_find() 
 

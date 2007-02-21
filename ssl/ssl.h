@@ -283,7 +283,7 @@ EXP_FUNC SSL * STDCALL ssl_find(SSL_CTX *ssl_ctx, int client_fd);
  * @return The session id as a 32 byte sequence.
  * @note A SSLv23 handshake may have only 16 valid bytes.
  */
-EXP_FUNC const uint8_t * STDCALL ssl_get_session_id(SSL *ssl);
+EXP_FUNC const uint8_t * STDCALL ssl_get_session_id(const SSL *ssl);
 
 /**
  * @brief Return the cipher id (in the SSL form).
@@ -294,7 +294,7 @@ EXP_FUNC const uint8_t * STDCALL ssl_get_session_id(SSL *ssl);
  * - SSL_RC4_128_SHA (0x05)
  * - SSL_RC4_128_MD5 (0x04)
  */
-EXP_FUNC uint8_t STDCALL ssl_get_cipher_id(SSL *ssl);
+EXP_FUNC uint8_t STDCALL ssl_get_cipher_id(const SSL *ssl);
 
 /**
  * @brief Return the status of the handshake.
@@ -302,7 +302,7 @@ EXP_FUNC uint8_t STDCALL ssl_get_cipher_id(SSL *ssl);
  * @return SSL_OK if the handshake is complete and ok. 
  * @see ssl.h for the error code list.
  */
-EXP_FUNC int STDCALL ssl_handshake_status(SSL *ssl);
+EXP_FUNC int STDCALL ssl_handshake_status(const SSL *ssl);
 
 /**
  * @brief Retrieve various parameters about the axTLS engine.
@@ -337,7 +337,7 @@ EXP_FUNC void STDCALL ssl_display_error(int error_code);
  * @param ssl [in] An SSL object reference.
  * @return SSL_OK if the certificate is verified.
  */
-EXP_FUNC int STDCALL ssl_verify_cert(SSL *ssl);
+EXP_FUNC int STDCALL ssl_verify_cert(const SSL *ssl);
 
 /**
  * @brief Retrieve an X.509 distinguished name component.
@@ -361,7 +361,7 @@ EXP_FUNC int STDCALL ssl_verify_cert(SSL *ssl);
  * @return The appropriate string (or null if not defined)
  * @note Verification build mode must be enabled.
  */
-EXP_FUNC const char * STDCALL ssl_get_cert_dn(SSL *ssl, int component);
+EXP_FUNC const char * STDCALL ssl_get_cert_dn(const SSL *ssl, int component);
 
 /**
  * @brief Force the client to perform its handshake again.
@@ -389,7 +389,8 @@ EXP_FUNC int STDCALL ssl_renegotiate(SSL *ssl);
  * - SSL_OBJ_PKCS8 (RC4-128 encrypted data supported)
  * - SSL_OBJ_PKCS12 (RC4-128 encrypted data supported)
  *
- * PEM files are automatically detected (if supported).
+ * PEM files are automatically detected (if supported). The object type is
+ * also detected, and so is not relevant for these types of files.
  * @param filename [in] The location of a file in DER/PEM format.
  * @param password [in] The password used. Can be null if not required.
  * @return SSL_OK if all ok

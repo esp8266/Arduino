@@ -31,7 +31,7 @@ extern "C" {
 
 #include <stdio.h>
 
-#if defined(WIN32) || defined(CONFIG_PLATFORM_CYGWIN)
+#if defined(WIN32)
 #define STDCALL                 __stdcall
 #define EXP_FUNC                __declspec(dllexport)
 #else
