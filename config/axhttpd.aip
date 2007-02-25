@@ -21,9 +21,9 @@
     <ROW Directory="SHORTCUTDIR" Directory_Parent="TARGETDIR" DefaultDir="SHORTC~1|SHORTCUTDIR" IsPseudoRoot="1"/>
     <ROW Directory="TARGETDIR" DefaultDir="SourceDir"/>
     <ROW Directory="another_dir_DIR" Directory_Parent="test_dir_DIR" DefaultDir="anothe~1|another_dir"/>
-    <ROW Directory="index_files_DIR" Directory_Parent="www_DIR" DefaultDir="index_~1|index_files"/>
+    <ROW Directory="bin_DIR" Directory_Parent="test_dir_DIR" DefaultDir="bin"/>
+    <ROW Directory="no_http_DIR" Directory_Parent="test_dir_DIR" DefaultDir="no_http"/>
     <ROW Directory="no_ssl_DIR" Directory_Parent="test_dir_DIR" DefaultDir="no_ssl"/>
-    <ROW Directory="ssl_only_DIR" Directory_Parent="test_dir_DIR" DefaultDir="ssl_only"/>
     <ROW Directory="test_dir_DIR" Directory_Parent="www_DIR" DefaultDir="test_dir"/>
     <ROW Directory="www_DIR" Directory_Parent="APPDIR" DefaultDir="www"/>
   </COMPONENT>
@@ -37,15 +37,15 @@
     <ROW Component="axtls.jar" ComponentId="{796CB0A9-6214-4531-A330-9B37420B7799}" Directory_="APPDIR" Attributes="0" KeyPath="axtls.jar" FullKeyPath="APPDIR"/>
     <ROW Component="axtlsj.dll" ComponentId="{AB8043C7-8291-4898-B34A-561335956DC1}" Directory_="APPDIR" Attributes="0" KeyPath="axtlsj.dll" FullKeyPath="APPDIR\axtlsj.dll"/>
     <ROW Component="bigint.h" ComponentId="{FC3E492B-D4F0-41FB-A977-76F6E9FE9FFE}" Directory_="New_Folder_DIR" Attributes="0" KeyPath="bigint.h" FullKeyPath="APPDIR\include"/>
-    <ROW Component="crypto_2600des.gif_1" ComponentId="{F3B3E37C-D940-4899-B312-0E244D6AF720}" Directory_="index_files_DIR" Attributes="0" KeyPath="crypto_2600des.gif_1" FullKeyPath="APPDIR\www\index_files"/>
     <ROW Component="favicon.ico" ComponentId="{9A1AB507-100A-470D-A002-CD8262CA4913}" Directory_="www_DIR" Attributes="0" KeyPath="favicon.ico" FullKeyPath="APPDIR\www"/>
     <ROW Component="health.sh" ComponentId="{173D7469-C57C-481E-A315-19DA527BA1A5}" Directory_="test_dir_DIR" Attributes="0" KeyPath="health.sh" FullKeyPath="APPDIR\www\test_dir"/>
     <ROW Component="htaccess" ComponentId="{F53CB1D5-A3B9-4401-B0BA-B6AB1DA860B7}" Directory_="no_ssl_DIR" Attributes="0" KeyPath="htaccess" FullKeyPath="APPDIR\www\test_dir\no_ssl"/>
-    <ROW Component="htaccess_1" ComponentId="{83B45D66-AD6D-4E9B-8DC8-7910708E1F3A}" Directory_="ssl_only_DIR" Attributes="0" KeyPath="htaccess_1" FullKeyPath="APPDIR\www\test_dir\ssl_only"/>
+    <ROW Component="htaccess_1" ComponentId="{953D1999-CC00-4F85-9B48-2CD83ACAE2F9}" Directory_="no_http_DIR" Attributes="0" KeyPath="htaccess_1" FullKeyPath="APPDIR\www\test_dir\no_http"/>
+    <ROW Component="htaccess_2" ComponentId="{6F181A8B-B313-47E2-AF79-AABFDBD353D8}" Directory_="bin_DIR" Attributes="0" KeyPath="htaccess_2" FullKeyPath="APPDIR\www\test_dir\bin"/>
     <ROW Component="htpasswd.exe" ComponentId="{9FE1AAD2-4E35-443A-AAE5-3A7D03A52AAA}" Directory_="APPDIR" Attributes="0" KeyPath="htpasswd.exe" FullKeyPath="APPDIR\htpasswd.exe"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
-    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0" Components="axhttpd.exe axssl.csharp.exe axssl.exe axssl.vbnet.exe axtls.dll axtls.jar axtlsj.dll favicon.ico bigint.h crypto_2600des.gif_1 health.sh htpasswd.exe another_dir htaccess htaccess_1"/>
+    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0" Components="axhttpd.exe axssl.csharp.exe axssl.exe axssl.vbnet.exe axtls.dll axtls.jar axtlsj.dll favicon.ico bigint.h health.sh htpasswd.exe another_dir htaccess htaccess_2 htaccess_1"/>
     <ATTRIBUTE name="CurrentFeature" value="MainFeature"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
@@ -61,28 +61,20 @@
     <ROW File="bigint.h" Component_="bigint.h" FileName="bigint.h" Attributes="0" SourcePath="..\ssl\bigint.h" SelfReg="false" Sequence="16"/>
     <ROW File="bigint_impl.h" Component_="bigint.h" FileName="bigint~1.h|bigint_impl.h" Attributes="0" SourcePath="..\ssl\bigint_impl.h" SelfReg="false" Sequence="13"/>
     <ROW File="crypto.h" Component_="bigint.h" FileName="crypto.h" Attributes="0" SourcePath="..\ssl\crypto.h" SelfReg="false" Sequence="14"/>
-    <ROW File="crypto_2600des.gif_1" Component_="crypto_2600des.gif_1" FileName="crypto~1.gif|crypto_2600des.gif" Attributes="0" SourcePath="..\www\index_files\crypto_2600des.gif" SelfReg="false" Sequence="18"/>
-    <ROW File="crypto_3ways.gif_1" Component_="crypto_2600des.gif_1" FileName="crypto~2.gif|crypto_3ways.gif" Attributes="0" SourcePath="..\www\index_files\crypto_3ways.gif" SelfReg="false" Sequence="19"/>
-    <ROW File="crypto_backrsa.jpg_1" Component_="crypto_2600des.gif_1" FileName="crypto~1.jpg|crypto_backrsa.jpg" Attributes="0" SourcePath="..\www\index_files\crypto_backrsa.jpg" SelfReg="false" Sequence="20"/>
-    <ROW File="crypto_cert.gif_1" Component_="crypto_2600des.gif_1" FileName="crypto~3.gif|crypto_cert.gif" Attributes="0" SourcePath="..\www\index_files\crypto_cert.gif" SelfReg="false" Sequence="21"/>
-    <ROW File="crypto_des.gif_1" Component_="crypto_2600des.gif_1" FileName="crypto~4.gif|crypto_des.gif" Attributes="0" SourcePath="..\www\index_files\crypto_des.gif" SelfReg="false" Sequence="22"/>
-    <ROW File="crypto_ecc.gif_1" Component_="crypto_2600des.gif_1" FileName="crypto~5.gif|crypto_ecc.gif" Attributes="0" SourcePath="..\www\index_files\crypto_ecc.gif" SelfReg="false" Sequence="23"/>
-    <ROW File="crypto_sslv3.gif_1" Component_="crypto_2600des.gif_1" FileName="crypto~6.gif|crypto_sslv3.gif" Attributes="0" SourcePath="..\www\index_files\crypto_sslv3.gif" SelfReg="false" Sequence="24"/>
-    <ROW File="crypto_types.gif_1" Component_="crypto_2600des.gif_1" FileName="crypto~7.gif|crypto_types.gif" Attributes="0" SourcePath="..\www\index_files\crypto_types.gif" SelfReg="false" Sequence="25"/>
     <ROW File="favicon.ico" Component_="favicon.ico" FileName="favicon.ico" Attributes="0" SourcePath="..\www\favicon.ico" SelfReg="false" Sequence="10"/>
-    <ROW File="health.sh" Component_="health.sh" FileName="health.sh" Attributes="0" SourcePath="..\www\test_dir\health.sh" SelfReg="false" Sequence="27"/>
-    <ROW File="htaccess" Component_="htaccess" FileName="htacce~1|.htaccess" Attributes="0" SourcePath="..\www\test_dir\no_ssl\.htaccess" SelfReg="false" Sequence="31"/>
-    <ROW File="htaccess_1" Component_="htaccess_1" FileName="htacce~1|.htaccess" Attributes="0" SourcePath="..\www\test_dir\ssl_only\.htaccess" SelfReg="false" Sequence="33"/>
-    <ROW File="htpasswd" Component_="htaccess_1" FileName="htpass~1|.htpasswd" Attributes="0" SourcePath="..\www\test_dir\ssl_only\.htpasswd" SelfReg="false" Sequence="34"/>
-    <ROW File="htpasswd.exe" Component_="htpasswd.exe" FileName="htpasswd.exe" Attributes="0" SourcePath="..\_stage\htpasswd.exe" SelfReg="false" Sequence="30"/>
+    <ROW File="health.sh" Component_="health.sh" FileName="health.sh" Attributes="0" SourcePath="..\www\test_dir\health.sh" SelfReg="false" Sequence="18"/>
+    <ROW File="htaccess" Component_="htaccess" FileName="htacce~1|.htaccess" Attributes="0" SourcePath="..\www\test_dir\no_ssl\.htaccess" SelfReg="false" Sequence="22"/>
+    <ROW File="htaccess_1" Component_="htaccess_1" FileName="htacce~1|.htaccess" Attributes="0" SourcePath="..\www\test_dir\no_http\.htaccess" SelfReg="false" Sequence="25"/>
+    <ROW File="htaccess_2" Component_="htaccess_2" FileName="htacce~1|.htaccess" Attributes="0" SourcePath="..\www\test_dir\bin\.htaccess" SelfReg="false" Sequence="24"/>
+    <ROW File="htpasswd" Component_="htaccess_1" FileName="htpass~1|.htpasswd" Attributes="0" SourcePath="..\www\test_dir\no_http\.htpasswd" SelfReg="false" Sequence="26"/>
+    <ROW File="htpasswd.exe" Component_="htpasswd.exe" FileName="htpasswd.exe" Attributes="0" SourcePath="..\_stage\htpasswd.exe" SelfReg="false" Sequence="21"/>
     <ROW File="index.html" Component_="favicon.ico" FileName="index~1.htm|index.html" Attributes="0" SourcePath="..\www\index.html" SelfReg="false" Sequence="11"/>
-    <ROW File="index.html_1" Component_="htaccess" FileName="index~1.htm|index.html" Attributes="0" SourcePath="..\www\test_dir\no_ssl\index.html" SelfReg="false" Sequence="32"/>
-    <ROW File="index.html_2" Component_="htaccess_1" FileName="index~1.htm|index.html" Attributes="0" SourcePath="..\www\test_dir\ssl_only\index.html" SelfReg="false" Sequence="35"/>
-    <ROW File="kerberos.gif_1" Component_="crypto_2600des.gif_1" FileName="kerberos.gif" Attributes="0" SourcePath="..\www\index_files\kerberos.gif" SelfReg="false" Sequence="26"/>
+    <ROW File="index.html_1" Component_="htaccess" FileName="index~1.htm|index.html" Attributes="0" SourcePath="..\www\test_dir\no_ssl\index.html" SelfReg="false" Sequence="23"/>
+    <ROW File="index.html_2" Component_="htaccess_1" FileName="index~1.htm|index.html" Attributes="0" SourcePath="..\www\test_dir\no_http\index.html" SelfReg="false" Sequence="27"/>
     <ROW File="os_port.h" Component_="bigint.h" FileName="os_port.h" Attributes="0" SourcePath="..\ssl\os_port.h" SelfReg="false" Sequence="17"/>
-    <ROW File="some_text.txt" Component_="health.sh" FileName="some_t~1.txt|some_text.txt" Attributes="0" SourcePath="..\www\test_dir\some_text.txt" SelfReg="false" Sequence="28"/>
+    <ROW File="some_text.txt" Component_="health.sh" FileName="some_t~1.txt|some_text.txt" Attributes="0" SourcePath="..\www\test_dir\some_text.txt" SelfReg="false" Sequence="19"/>
     <ROW File="ssl.h" Component_="bigint.h" FileName="ssl.h" Attributes="0" SourcePath="..\ssl\ssl.h" SelfReg="false" Sequence="12"/>
-    <ROW File="test_cgi.php" Component_="health.sh" FileName="test_cgi.php" Attributes="0" SourcePath="..\www\test_dir\test_cgi.php" SelfReg="false" Sequence="29"/>
+    <ROW File="test_cgi.php" Component_="health.sh" FileName="test_cgi.php" Attributes="0" SourcePath="..\www\test_dir\test_cgi.php" SelfReg="false" Sequence="20"/>
     <ROW File="tls1.h" Component_="bigint.h" FileName="tls1.h" Attributes="0" SourcePath="..\ssl\tls1.h" SelfReg="false" Sequence="15"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">

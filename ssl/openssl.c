@@ -17,8 +17,11 @@
  */
 
 /*
- * Enable some openssl compatible functions. We don't aim to be 100%
+ * Enable a subset of openssl compatible functions. We don't aim to be 100%
  * compatible - just to be able to do basic ports etc.
+ *
+ * Only really tested on mini_httpd, so I'm not too sure how extensive this
+ * port is.
  */
 
 #include "config.h"
@@ -26,9 +29,11 @@
 #ifdef CONFIG_OPENSSL_COMPATIBLE
 #include <stdlib.h>
 #include <strings.h>
+#include <stdarg.h>
 #include "ssl.h"
 
 #define OPENSSL_CTX_ATTR  ((OPENSSL_CTX *)ssl_ctx->bonus_attr)
+
 void *SSLv23_server_method(void) { return NULL; }
 void *SSLv3_server_method(void) { return NULL; }
 void *TLSv1_server_method(void) { return NULL; }
@@ -37,6 +42,7 @@ void *SSLv3_client_method(void) { return NULL; }
 void *TLSv1_client_method(void) { return NULL; }
 
 typedef void * (*ssl_func_type_t)(void);
+typedef void * (*bio_func_type_t)(void);
 
 typedef struct
 {
@@ -170,6 +176,7 @@ int SSL_get_error(const SSL *ssl, int ret)
     return 0;   /* TODO: return proper return code */
 }
 
+void SSL_CTX_set_options(SSL_CTX *ssl_ctx, int option) {}
 int SSL_library_init(void ) { return 1; }
 void SSL_load_error_strings(void ) {}
 void ERR_print_errors_fp(FILE *fp) {}
@@ -177,4 +184,24 @@ long SSL_CTX_get_timeout(const SSL_CTX *ssl_ctx) {
                             return CONFIG_SSL_EXPIRY_TIME*3600; }
 long SSL_CTX_set_timeout(SSL_CTX *ssl_ctx, long t) { 
                             return SSL_CTX_get_timeout(ssl_ctx); }
+void BIO_printf(FILE *f, const char *format, ...)
+{
+    va_list(ap);
+    va_start(ap, format);
+    vfprintf(f, format, ap);
+    va_end(ap);
+}
+
+void* BIO_s_null(void) {}
+FILE *BIO_new(bio_func_type_t func)
+{
+    if (func == BIO_s_null)
+        return fopen("/dev/null", "r");
+}
+
+FILE *BIO_new_fp(FILE *stream, int close_flag) { return stream; }
+int BIO_free(FILE *a) { if (a != stdout && a != stderr) fclose(a); return 1; }
+
+
+
 #endif

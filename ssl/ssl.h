@@ -32,7 +32,8 @@
  * - Highly configurable compile time options.
  * - Portable across many platforms (written in ANSI C), and has language
  * bindings in C, C#, VB.NET, Java and Perl.
- * - A very small footprint for a HTTPS server (around 50-60kB in 'server-only'
+ * - Partial openssl API compatibility (via a wrapper).
+ * - A very small footprint for a HTTPS server (around 60-70kB in 'server-only'
  * mode).
  * - No dependencies on sockets - can use serial connections for example.
  * - A very simple API - ~ 20 functions/methods.

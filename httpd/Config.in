@@ -49,7 +49,7 @@ config CONFIG_HTTP_WEBROOT
 
 config CONFIG_HTTP_TIMEOUT
     int "Timeout"
-    default 5
+    default 300
     help
         Set the timeout of a connection in seconds.
 
