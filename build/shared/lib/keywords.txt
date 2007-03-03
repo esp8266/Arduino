@@ -139,13 +139,14 @@ print	KEYWORD2
 write	KEYWORD2
 println	KEYWORD2
 available	KEYWORD2
+flush	KEYWORD2
 digitalWrite	KEYWORD2
 digitalRead	KEYWORD2
 pinMode	KEYWORD2
 analogRead	KEYWORD2
 analogWrite	KEYWORD2
-attachInterrupts	KEYWORD2
-detachInterrupts	KEYWORD2
+attachInterrupt	KEYWORD2
+detachInterrupt	KEYWORD2
 beginSerial	KEYWORD2
 serialWrite	KEYWORD2
 serialRead	KEYWORD2
@@ -159,3 +160,5 @@ printBinary	KEYWORD2
 printNewline	KEYWORD2
 pulseIn	KEYWORD2
 shiftOut	KEYWORD2
+random	KEYWORD2
+randomSeed	KEYWORD2
