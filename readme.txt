@@ -47,11 +47,15 @@ from Processing and Wiring.
 UPDATES
 
 0008
-* Added an EEPROM library.
+
+* Added an EEPROM library (see reference for details).
 * Patched to reduce binary sketch sizes by building the Arduino core as
   a library (.a) file.  Originally written by Nicolas Roland, revised by
   Don Cross.
 * Fixed bug in Serial.available().  Report and fix by Don Cross.
+* Now recompiling libraries when switching microcontrollers.  Reported by
+  Julian Bleecker; fixed by Nicholas Zambetti.
+* Removed the delay from analogRead().
 
 0007 - 2006.12.25
 
