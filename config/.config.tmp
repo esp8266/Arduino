@@ -1,0 +1,11 @@
+deps_config := \
+	ssl/BigIntConfig.in \
+	samples/Config.in \
+	bindings/Config.in \
+	httpd/Config.in \
+	ssl/Config.in \
+	config/Config.in
+
+.config include/config.h: $(deps_config)
+
+$(deps_config):
