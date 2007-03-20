@@ -731,7 +731,7 @@ static int SSL_server_test(
     SSL_CTX *ssl_ctx = NULL;
     struct sockaddr_in client_addr;
     uint8_t *read_buf;
-    int clnt_len = sizeof(client_addr);
+    socklen_t clnt_len = sizeof(client_addr);
     client_t client_data;
 #ifndef WIN32
     pthread_t thread;
@@ -808,7 +808,7 @@ static int SSL_server_test(
 
         /* Wait for a client to connect */
         if ((client_fd = accept(server_fd, 
-                        (struct sockaddr *) &client_addr, &clnt_len)) < 0)
+                        (struct sockaddr *)&client_addr, &clnt_len)) < 0)
         {
             ret = SSL_ERROR_SOCK_SETUP_FAILURE;
             goto error;
@@ -833,7 +833,7 @@ static int SSL_server_test(
         }
         else /* looks more promising */
         {
-            if (strstr("hello client", read_buf) == NULL)
+            if (strstr("hello client", (char *)read_buf) == NULL)
             {
                 printf("SSL server test \"%s\" passed\n", testname);
                 TTY_FLUSH();
@@ -1471,7 +1471,7 @@ static int SSL_basic_test(void)
     SSL_CTX *ssl_svr_ctx = NULL;
     struct sockaddr_in client_addr;
     uint8_t *read_buf;
-    int clnt_len = sizeof(client_addr);
+    socklen_t clnt_len = sizeof(client_addr);
     SSL *ssl_svr;
 #ifndef WIN32
     pthread_t thread;
@@ -1545,7 +1545,7 @@ error:
  * Multi-Threading Tests
  *
  **************************************************************************/
-#define NUM_THREADS         200
+#define NUM_THREADS         100
 
 typedef struct
 {
@@ -1630,7 +1630,7 @@ int multi_thread_test(void)
     pthread_t svr_threads[NUM_THREADS];
     int i, res = 0;
     struct sockaddr_in client_addr;
-    int clnt_len = sizeof(client_addr);
+    socklen_t clnt_len = sizeof(client_addr);
 
     printf("Do multi-threading test (takes a minute)\n");
 
@@ -1656,7 +1656,7 @@ int multi_thread_test(void)
     }
 
     for (i = 0; i < NUM_THREADS; i++)
-    {
+    { 
         SSL *ssl_svr;
         int client_fd = accept(server_fd, 
                       (struct sockaddr *)&client_addr, &clnt_len);
@@ -1675,10 +1675,12 @@ int multi_thread_test(void)
     {
         void *thread_res;
         pthread_join(svr_threads[i], &thread_res);
+
         if (*((int *)thread_res) != 0)
             res = 1;
+
         free(thread_res);
-    }
+    } 
 
     if (res) 
         goto error;
@@ -1793,12 +1795,6 @@ int main(int argc, char *argv[])
         goto cleanup;
 
     system("sh ../ssl/test/killopenssl.sh");
-
-#if 0
-    if (multi_thread_test())
-        goto cleanup;
-
-#endif
 
     ret = 0;        /* all ok */
 cleanup:

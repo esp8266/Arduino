@@ -111,6 +111,7 @@ typedef UINT32 uint32_t;
 typedef INT32 int32_t;
 typedef UINT64 uint64_t;
 typedef INT64 int64_t;
+typedef int socklen_t;
 
 EXP_FUNC void STDCALL gettimeofday(struct timeval* t,void* timezone);
 EXP_FUNC int STDCALL strcasecmp(const char *s1, const char *s2);
