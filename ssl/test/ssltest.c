@@ -580,13 +580,37 @@ static int cert_tests(void)
     ssl_ctx_free(ssl_ctx);
     free(buf);
 
+    ssl_ctx = ssl_ctx_new(0, 0);
+    len = get_file("../ssl/test/gnutls.cer", &buf);
+    if ((res = add_cert(ssl_ctx, buf, len)) < 0)
+    {
+        printf("Cert #5\n");
+        ssl_display_error(res);
+        goto bad_cert;
+    }
+
+    ssl_ctx_free(ssl_ctx);
+    free(buf);
+
+    ssl_ctx = ssl_ctx_new(0, 0);
+    len = get_file("../ssl/test/socgen.cer", &buf);
+    if ((res = add_cert(ssl_ctx, buf, len)) < 0)
+    {
+        printf("Cert #6\n");
+        ssl_display_error(res);
+        goto bad_cert;
+    }
+
+    ssl_ctx_free(ssl_ctx);
+    free(buf);
+
     /* Verisign use MD2 which is not supported */
     ssl_ctx = ssl_ctx_new(0, 0);
     len = get_file("../ssl/test/verisign.x509_ca", &buf);
     if ((res = add_cert_auth(ssl_ctx, buf, len)) != 
                                     X509_VFY_ERROR_UNSUPPORTED_DIGEST)
     {
-        printf("Cert #5\n");
+        printf("Cert #7\n");
         ssl_display_error(res);
         goto bad_cert;
     }
@@ -597,7 +621,7 @@ static int cert_tests(void)
     if (get_file("../ssl/test/verisign.x509_my_cert", &buf) < 0 ||
                                     x509_new(buf, &len, &x509_ctx))
     {
-        printf("Cert #6\n");
+        printf("Cert #8\n");
         ssl_display_error(res);
         goto bad_cert;
     }
@@ -1023,7 +1047,7 @@ int SSL_server_tests(void)
                     "-cipher RC4-SHA", 
                     "../ssl/test/axTLS.x509_device.pem", 
                     NULL, "../ssl/test/axTLS.device_key.pem",
-                    NULL, NULL, DEFAULT_SVR_OPTION)))
+                    "../ssl/test/axTLS.ca_x509.pem", NULL, DEFAULT_SVR_OPTION)))
         goto cleanup;
 
     /* 

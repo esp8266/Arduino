@@ -145,7 +145,7 @@ static void prf(const uint8_t *sec, int sec_len, uint8_t *seed, int seed_len,
 static const cipher_info_t *get_cipher_info(uint8_t cipher);
 static void increment_read_sequence(SSL *ssl);
 static void increment_write_sequence(SSL *ssl);
-static void add_hmac_digest(SSL *ssl, int snd,
+static void add_hmac_digest(SSL *ssl, int snd, uint8_t *hmac_header,
         const uint8_t *buf, int buf_len, uint8_t *hmac_buf);
 
 /* win32 VC6.0 doesn't have variadic macros */
@@ -619,29 +619,24 @@ static void increment_write_sequence(SSL *ssl)
 /**
  * Work out the HMAC digest in a packet.
  */
-static void add_hmac_digest(SSL *ssl, int mode,
+static void add_hmac_digest(SSL *ssl, int mode, uint8_t *hmac_header,
         const uint8_t *buf, int buf_len, uint8_t *hmac_buf)
 {
     int hmac_len = buf_len + 8 + SSL_RECORD_SIZE;
-    uint8_t *t_buf = (uint8_t *)malloc(hmac_len);
-    uint8_t *t_ptr = t_buf;
+    uint8_t *t_buf = (uint8_t *)malloc(hmac_len+10);
 
     memcpy(t_buf, (mode == SSL_SERVER_WRITE || mode == SSL_CLIENT_WRITE) ? 
-            ssl->write_sequence : ssl->read_sequence, 8);
-    t_buf += 8;
+                    ssl->write_sequence : ssl->read_sequence, 8);
+    memcpy(&t_buf[8], hmac_header, SSL_RECORD_SIZE);
+    memcpy(&t_buf[8+SSL_RECORD_SIZE], buf, buf_len);
 
-    memcpy(t_buf, ssl->record_buf, SSL_RECORD_SIZE);
-    t_buf += SSL_RECORD_SIZE;
-
-    memcpy(t_buf, buf, buf_len);
-
-    ssl->cipher_info->hmac(t_ptr, hmac_len, 
+    ssl->cipher_info->hmac(t_buf, hmac_len, 
             (mode == SSL_SERVER_WRITE || mode == SSL_CLIENT_READ) ? 
                 ssl->server_mac : ssl->client_mac, 
             ssl->cipher_info->digest_size, hmac_buf);
 
 #if 0
-    print_blob("record", ssl->record_buf, SSL_RECORD_SIZE);
+    print_blob("record", ssl->hmac_tx, SSL_RECORD_SIZE);
     print_blob("buf", buf, buf_len);
     if (mode == SSL_SERVER_WRITE || mode == SSL_CLIENT_WRITE)
     {
@@ -665,7 +660,7 @@ static void add_hmac_digest(SSL *ssl, int mode,
     print_blob("hmac", hmac_buf, SHA1_SIZE);
 #endif
 
-    free(t_ptr);
+    free(t_buf);
 }
 
 /**
@@ -691,9 +686,9 @@ static int verify_digest(SSL *ssl, int mode, const uint8_t *buf, int read_len)
         return SSL_ERROR_INVALID_HMAC;
     }
 
-    ssl->record_buf[3] = hmac_offset >> 8;      /* insert size */
-    ssl->record_buf[4] = hmac_offset & 0xff;
-    add_hmac_digest(ssl, mode, buf, hmac_offset, hmac_buf);
+    ssl->hmac_header[3] = hmac_offset >> 8;      /* insert size */
+    ssl->hmac_header[4] = hmac_offset & 0xff;
+    add_hmac_digest(ssl, mode, ssl->hmac_header, buf, hmac_offset, hmac_buf);
 
     if (memcmp(hmac_buf, &buf[hmac_offset], ssl->cipher_info->digest_size))
     {
@@ -972,9 +967,13 @@ int send_packet(SSL *ssl, uint8_t protocol, const uint8_t *in, int length)
     {
         int mode = IS_SET_SSL_FLAG(SSL_IS_CLIENT) ? 
                             SSL_CLIENT_WRITE : SSL_SERVER_WRITE;
-        ssl->record_buf[0] = protocol;
-        ssl->record_buf[3] = length >> 8; 
-        ssl->record_buf[4] = length & 0xff;
+        uint8_t hmac_header[SSL_RECORD_SIZE];
+
+        hmac_header[0] = protocol;
+        hmac_header[1] = 0x03;
+        hmac_header[2] = 0x01;
+        hmac_header[3] = length >> 8; 
+        hmac_header[4] = length & 0xff;
 
         if (protocol == PT_HANDSHAKE_PROTOCOL)
         {
@@ -989,7 +988,7 @@ int send_packet(SSL *ssl, uint8_t protocol, const uint8_t *in, int length)
         /* add the packet digest */
         msg_length += ssl->cipher_info->digest_size;
         ssl->bm_index = msg_length;
-        add_hmac_digest(ssl, mode, ssl->bm_data, length, 
+        add_hmac_digest(ssl, mode, hmac_header, ssl->bm_data, length, 
                                                 &ssl->bm_data[length]);
 
         /* add padding? */
@@ -1135,12 +1134,10 @@ static void set_key_block(SSL *ssl, int is_write)
 int basic_read(SSL *ssl, uint8_t **in_data)
 {
     int ret = SSL_OK;
-    int read_len, is_record;
-    int is_client = IS_SET_SSL_FLAG(SSL_IS_CLIENT);
-    uint8_t *buf;
+    int read_len, is_client = IS_SET_SSL_FLAG(SSL_IS_CLIENT);
+    uint8_t *buf = ssl->bm_data;
 
-    buf = ssl->bm_data;
-    read_len = SOCKET_READ(ssl->client_fd, &buf[ssl->bm_index], 
+    read_len = SOCKET_READ(ssl->client_fd, &buf[ssl->bm_read_index], 
                             ssl->need_bytes-ssl->got_bytes);
 
     /* connection has gone, so die */
@@ -1152,10 +1149,10 @@ int basic_read(SSL *ssl, uint8_t **in_data)
     }
 
     DISPLAY_BYTES(ssl, "received %d bytes", 
-            &ssl->bm_data[ssl->bm_index], read_len, read_len);
+            &ssl->bm_data[ssl->bm_read_index], read_len, read_len);
 
     ssl->got_bytes += read_len;
-    ssl->bm_index += read_len;
+    ssl->bm_read_index += read_len;
 
     /* haven't quite got what we want, so try again later */
     if (ssl->got_bytes < ssl->need_bytes)
@@ -1190,19 +1187,17 @@ int basic_read(SSL *ssl, uint8_t **in_data)
         }
 
         CLR_SSL_FLAG(SSL_NEED_RECORD);
-        memcpy(ssl->record_buf, buf, 3);    /* store for hmac */
-        is_record = 1;
-    }
-    else
-    {
-        SET_SSL_FLAG(SSL_NEED_RECORD);
-        ssl->need_bytes = SSL_RECORD_SIZE;
-        is_record = 0;
+        memcpy(ssl->hmac_header, buf, 3);       /* store for hmac */
+        ssl->record_type = buf[0];
+        goto error;                         /* no error, we're done */
     }
 
-    if (is_record)
-        ssl->record_type = buf[0];
-    else if (IS_SET_SSL_FLAG(SSL_RX_ENCRYPTED))
+    /* for next time - just do it now in case of an error */
+    SET_SSL_FLAG(SSL_NEED_RECORD);
+    ssl->need_bytes = SSL_RECORD_SIZE;
+
+    /* decrypt if we need to */
+    if (IS_SET_SSL_FLAG(SSL_RX_ENCRYPTED))
     {
         ssl->cipher_info->decrypt(ssl->decrypt_ctx, buf, buf, read_len);
         read_len = verify_digest(ssl, 
@@ -1220,52 +1215,50 @@ int basic_read(SSL *ssl, uint8_t **in_data)
     }
 
     /* The main part of the SSL packet */
-    if (!is_record)
+    switch (ssl->record_type)
     {
-        switch (ssl->record_type)
-        {
-            case PT_HANDSHAKE_PROTOCOL:
-                ret = do_handshake(ssl, buf, read_len);
-                break;
+        case PT_HANDSHAKE_PROTOCOL:
+            ret = do_handshake(ssl, buf, read_len);
+            break;
 
-            case PT_CHANGE_CIPHER_SPEC:
-                if (ssl->next_state != HS_FINISHED)
-                {
-                    ret = SSL_ERROR_INVALID_HANDSHAKE;
-                    goto error;
-                }
+        case PT_CHANGE_CIPHER_SPEC:
+            if (ssl->next_state != HS_FINISHED)
+            {
+                ret = SSL_ERROR_INVALID_HANDSHAKE;
+                goto error;
+            }
 
-                SET_SSL_FLAG(SSL_RX_ENCRYPTED);
-                set_key_block(ssl, 0);
-                memset(ssl->read_sequence, 0, 8);
-                break;
+            /* all encrypted from now on */
+            SET_SSL_FLAG(SSL_RX_ENCRYPTED);
+            set_key_block(ssl, 0);
+            memset(ssl->read_sequence, 0, 8);
+            break;
 
-            case PT_APP_PROTOCOL_DATA:
-                if (in_data)
-                {
-                    *in_data = ssl->bm_data;   /* point to the work buffer */
-                    (*in_data)[read_len] = 0;  /* null terminate just in case */
-                }
+        case PT_APP_PROTOCOL_DATA:
+            if (in_data)
+            {
+                *in_data = ssl->bm_data;   /* point to the work buffer */
+                (*in_data)[read_len] = 0;  /* null terminate just in case */
+            }
 
-                ret = read_len;
-                break;
+            ret = read_len;
+            break;
 
-            case PT_ALERT_PROTOCOL:
-                /* return the alert # with alert bit set */
-                ret = -buf[1]; 
-                DISPLAY_ALERT(ssl, buf[1]);
-                break;
+        case PT_ALERT_PROTOCOL:
+            /* return the alert # with alert bit set */
+            ret = -buf[1]; 
+            DISPLAY_ALERT(ssl, buf[1]);
+            break;
 
-            default:
-                ret = SSL_ERROR_INVALID_PROT_MSG;
-                break;
-        }
+        default:
+            ret = SSL_ERROR_INVALID_PROT_MSG;
+            break;
     }
 
 error:
-    ssl->bm_index = 0;          /* reset to go again */
+    ssl->bm_read_index = 0;          /* reset to go again */
 
-    if (ret < SSL_OK && in_data)  /* if all wrong, then clear this buffer ptr */
+    if (ret < SSL_OK && in_data)/* if all wrong, then clear this buffer ptr */
         *in_data = NULL;
 
     return ret;

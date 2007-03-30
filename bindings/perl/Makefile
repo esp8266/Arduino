@@ -66,7 +66,7 @@ ifdef CONFIG_PLATFORM_CYGWIN
 endif
 	@install axtlsp.pm ../../$(STAGE)
 
-CFLAGS += -D__USE_GNU -I$(CONFIG_HOME) -I$(SSL_HOME) -I$(PERL5_CORE)
+CFLAGS += -D_GNU_SOURCE -I$(CONFIG_HOME) -I$(SSL_HOME) -I$(PERL5_CORE)
 else
 CFLAGS += /I"`cygpath -w $(CONFIG_HOME)`" /I"`cygpath -w $(SSL_HOME)`"
 CFLAGS += /I"$(PERL5_CORE)"

@@ -37,7 +37,7 @@ else
         KILL_AXSSL="killall axssl"
         KILL_PERL="killall /usr/bin/perl"
     else     # Linux
-        JAVA_BIN=/usr/lib/java/bin
+        JAVA_BIN=/usr/java/default/bin
         PERL_BIN=/usr/bin/perl
         KILL_AXSSL="killall axssl"
         KILL_CSHARP="killall mono"
@@ -81,7 +81,7 @@ sleep 1
 "$JAVA_BIN/java" -jar ./axtls.jar $SERVER_PEM_ARGS &
 echo "Java Test passed" | "$JAVA_BIN/java" -jar ./axtls.jar $CLIENT_PEM_ARGS
 $KILL_JAVA
-sleep 1
+sleep 2
 
 echo "### Java tests complete"
 fi

@@ -475,8 +475,7 @@ static int asn1_signature_type(const uint8_t *cert,
     x509_ctx->sig_type = cert[*offset + SIG_OID_PREFIX_SIZE];
 
     *offset += len;
-    if (asn1_skip_obj(cert, offset, ASN1_NULL))
-        goto end_check_sig;
+    asn1_skip_obj(cert, offset, ASN1_NULL); /* if it's there */
     ret = X509_OK;
 
 end_check_sig:

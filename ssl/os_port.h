@@ -145,7 +145,9 @@ EXP_FUNC int STDCALL strcasecmp(const char *s1, const char *s2);
 
 /* some functions to mutate the way these work */
 #define malloc(A)       ax_malloc(A)
+#ifndef realloc
 #define realloc(A,B)    ax_realloc(A,B)
+#endif
 #define calloc(A,B)     ax_calloc(A,B)
 
 EXP_FUNC void * STDCALL ax_malloc(size_t s);

@@ -117,7 +117,7 @@ int do_client_connect(SSL *ssl)
     int ret = SSL_OK;
 
     send_client_hello(ssl);                 /* send the client hello */
-    ssl->bm_index = 0;
+    ssl->bm_read_index = 0;
     ssl->next_state = HS_SERVER_HELLO;
     ssl->hs_status = SSL_NOT_OK;            /* not connected */
 

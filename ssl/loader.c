@@ -35,8 +35,8 @@
 static int do_obj(SSL_CTX *ssl_ctx, int obj_type, 
                     SSLObjLoader *ssl_obj, const char *password);
 #ifdef CONFIG_SSL_HAS_PEM
-static int ssl_obj_PEM_load(SSL_CTX *ssl_ctx, SSLObjLoader *ssl_obj, 
-                    const char *password);
+static int ssl_obj_PEM_load(SSL_CTX *ssl_ctx, int obj_type, 
+                        SSLObjLoader *ssl_obj, const char *password);
 #endif
 
 /*
@@ -70,7 +70,7 @@ EXP_FUNC int STDCALL ssl_obj_load(SSL_CTX *ssl_ctx, int obj_type,
     if (strncmp((char *)ssl_obj->buf, begin, strlen(begin)) == 0)
     {
 #ifdef CONFIG_SSL_HAS_PEM
-        ret = ssl_obj_PEM_load(ssl_ctx, ssl_obj, password);
+        ret = ssl_obj_PEM_load(ssl_ctx, obj_type, ssl_obj, password);
 #else
         printf(unsupported_str);
         ret = SSL_ERROR_NOT_SUPPORTED;
@@ -277,7 +277,7 @@ error:
 /**
  * Take a base64 blob of data and turn it into its proper ASN.1 form.
  */
-static int new_pem_obj(SSL_CTX *ssl_ctx, char *where, 
+static int new_pem_obj(SSL_CTX *ssl_ctx, int is_cacert, char *where, 
                     int remain, const char *password)
 {
     int ret = SSL_OK;
@@ -322,7 +322,8 @@ static int new_pem_obj(SSL_CTX *ssl_ctx, char *where,
                     break;
 
                 case IS_CERTIFICATE:
-                    obj_type = SSL_OBJ_X509_CERT;
+                    obj_type = is_cacert ?
+                                    SSL_OBJ_X509_CACERT : SSL_OBJ_X509_CERT;
                     break;
 
                 default:
@@ -350,7 +351,7 @@ static int new_pem_obj(SSL_CTX *ssl_ctx, char *where,
 
     /* more PEM stuff to process? */
     if (remain)
-        ret = new_pem_obj(ssl_ctx, end, remain, password);
+        ret = new_pem_obj(ssl_ctx, is_cacert, end, remain, password);
 
 error:
     ssl_obj_free(ssl_obj);
@@ -360,8 +361,8 @@ error:
 /*
  * Load a file into memory that is in ASCII PEM format.
  */
-static int ssl_obj_PEM_load(SSL_CTX *ssl_ctx, SSLObjLoader *ssl_obj, 
-                                        const char *password)
+static int ssl_obj_PEM_load(SSL_CTX *ssl_ctx, int obj_type, 
+                        SSLObjLoader *ssl_obj, const char *password)
 {
     char *start;
 
@@ -370,6 +371,7 @@ static int ssl_obj_PEM_load(SSL_CTX *ssl_ctx, SSLObjLoader *ssl_obj,
     ssl_obj->buf = (uint8_t *)realloc(ssl_obj->buf, ssl_obj->len);
     ssl_obj->buf[ssl_obj->len-1] = 0;
     start = (char *)ssl_obj->buf;
-    return new_pem_obj(ssl_ctx, start, ssl_obj->len, password);
+    return new_pem_obj(ssl_ctx, obj_type == SSL_OBJ_X509_CACERT,
+                                start, ssl_obj->len, password);
 }
 #endif /* CONFIG_SSL_HAS_PEM */
