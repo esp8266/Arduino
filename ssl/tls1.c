@@ -2020,7 +2020,7 @@ EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx,
 #endif
 
 #if !defined(CONFIG_SSL_CERT_VERIFICATION)
-EXP_FUNC int STDCALL ssl_verify_cert(SSL *ssl)
+EXP_FUNC int STDCALL ssl_verify_cert(const SSL *ssl)
 {
     printf(unsupported_str);
     return -1;
