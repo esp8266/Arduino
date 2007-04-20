@@ -45,9 +45,6 @@ extern "C"{
 #define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
 #endif
 
-#define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
-#define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )
-
 #define EXTERNAL_INT_0 0
 #define EXTERNAL_INT_1 1
 
