@@ -143,7 +143,7 @@ void printNewline()
 	printByte('\n');
 }
 
-void printString(char *s)
+void printString(const char *s)
 {
 	while (*s)
 		printByte(*s++);

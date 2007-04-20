@@ -24,7 +24,8 @@
 
 #include "wiring_private.h"
 
-void shiftOut(int dataPin, int clockPin, int bitOrder, byte val) {
+void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, byte val)
+{
 	int i;
 
 	for (i = 0; i < 8; i++)  {

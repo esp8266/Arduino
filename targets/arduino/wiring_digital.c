@@ -23,113 +23,77 @@
 */
 
 #include "wiring_private.h"
+#include "pins_arduino.h"
 
-// Get the hardware port of the given virtual pin number.  This comes from
-// the pins_*.c file for the active board configuration.
-int digitalPinToPort(int pin)
+void pinMode(uint8_t pin, uint8_t mode)
 {
-	return digital_pin_to_port[pin].port;
+	uint8_t bit = digitalPinToBitMask(pin);
+	uint8_t port = digitalPinToPort(pin);
+	volatile uint8_t *reg;
+
+	if (port == NOT_A_PIN) return;
+
+	// JWS: can I let the optimizer do this?
+	reg = portModeRegister(port);
+
+	if (mode == INPUT) *reg &= ~bit;
+	else *reg |= bit;
 }
 
-// Get the bit location within the hardware port of the given virtual pin.
-// This comes from the pins_*.c file for the active board configuration.
-int digitalPinToBit(int pin)
+// Forcing this inline keeps the callers from having to push their own stuff
+// on the stack. It is a good performance win and only takes 1 more byte per
+// user than calling. (It will take more bytes on the 168.)
+//
+// But shouldn't this be moved into pinMode? Seems silly to check and do on
+// each digitalread or write.
+//
+static inline void turnOffPWM(uint8_t timer) __attribute__ ((always_inline));
+static inline void turnOffPWM(uint8_t timer)
 {
-	return digital_pin_to_port[pin].bit;
-}
+	if (timer == TIMER1A) cbi(TCCR1A, COM1A1);
+	if (timer == TIMER1B) cbi(TCCR1A, COM1B1);
 
-int analogOutPinToTimer(int pin)
-{
-	return analog_out_pin_to_timer[pin];
-}
-
-int analogInPinToBit(int pin)
-{
-	return analog_in_pin_to_port[pin].bit;
-}
-
-void pinMode(int pin, int mode)
-{
-	if (digitalPinToPort(pin) != NOT_A_PIN) {
-		if (mode == INPUT)
-			cbi(_SFR_IO8(port_to_mode[digitalPinToPort(pin)]),
-				digitalPinToBit(pin));
-		else
-			sbi(_SFR_IO8(port_to_mode[digitalPinToPort(pin)]),
-				digitalPinToBit(pin));
-	}
-}
-
-void digitalWrite(int pin, int val)
-{
-	if (digitalPinToPort(pin) != NOT_A_PIN) {
-		// If the pin that support PWM output, we need to turn it off
-		// before doing a digital write.
-
-		if (analogOutPinToTimer(pin) == TIMER1A)
-			cbi(TCCR1A, COM1A1);
-
-		if (analogOutPinToTimer(pin) == TIMER1B)
-			cbi(TCCR1A, COM1B1);
-			
 #if defined(__AVR_ATmega168__)
-		if (analogOutPinToTimer(pin) == TIMER0A)
-			cbi(TCCR0A, COM0A1);
-			
-		if (analogOutPinToTimer(pin) == TIMER0B)
-			cbi(TCCR0A, COM0B1);
-
-		if (analogOutPinToTimer(pin) == TIMER2A)
-			cbi(TCCR2A, COM2A1);
-			
-		if (analogOutPinToTimer(pin) == TIMER2B)
-			cbi(TCCR2A, COM2B1);
+	if (timer == TIMER0A) cbi(TCCR0A, COM0A1);
+	if (timer == TIMER0B) cbi(TCCR0A, COM0B1);
+	if (timer == TIMER2A) cbi(TCCR2A, COM2A1);
+	if (timer == TIMER2B) cbi(TCCR2A, COM2B1);
 #else
-		if (analogOutPinToTimer(pin) == TIMER2)
-			cbi(TCCR2, COM21);
+	if (timer == TIMER2) cbi(TCCR2, COM21);
 #endif
-
-		if (val == LOW)
-			cbi(_SFR_IO8(port_to_output[digitalPinToPort(pin)]),
-				digitalPinToBit(pin));
-		else
-			sbi(_SFR_IO8(port_to_output[digitalPinToPort(pin)]),
-				digitalPinToBit(pin));
-	}
 }
 
-int digitalRead(int pin)
+void digitalWrite(uint8_t pin, uint8_t val)
 {
-	if (digitalPinToPort(pin) != NOT_A_PIN) {
-		// If the pin that support PWM output, we need to turn it off
-		// before getting a digital reading.
+	uint8_t timer = digitalPinToTimer(pin);
+	uint8_t bit = digitalPinToBitMask(pin);
+	uint8_t port = digitalPinToPort(pin);
+	volatile uint8_t *out;
 
-		if (analogOutPinToTimer(pin) == TIMER1A)
-			cbi(TCCR1A, COM1A1);
+	if (port == NOT_A_PIN) return;
 
-		if (analogOutPinToTimer(pin) == TIMER1B)
-			cbi(TCCR1A, COM1B1);
-			
-#if defined(__AVR_ATmega168__)
-		if (analogOutPinToTimer(pin) == TIMER0A)
-			cbi(TCCR0A, COM0A1);
-			
-		if (analogOutPinToTimer(pin) == TIMER0B)
-			cbi(TCCR0A, COM0B1);
+	// If the pin that support PWM output, we need to turn it off
+	// before doing a digital write.
+	if (timer != NOT_ON_TIMER) turnOffPWM(timer);
 
-		if (analogOutPinToTimer(pin) == TIMER2A)
-			cbi(TCCR2A, COM2A1);
-			
-		if (analogOutPinToTimer(pin) == TIMER2B)
-			cbi(TCCR2A, COM2B1);
-#else
-		if (analogOutPinToTimer(pin) == TIMER2)
-			cbi(TCCR2, COM21);
-#endif
+	out = portOutputRegister(port);
 
-		return (_SFR_IO8(port_to_input[digitalPinToPort(pin)]) >>
-			digitalPinToBit(pin)) & 0x01;
-	}
-	
+	if (val == LOW) *out &= ~bit;
+	else *out |= bit;
+}
+
+int digitalRead(uint8_t pin)
+{
+	uint8_t timer = digitalPinToTimer(pin);
+	uint8_t bit = digitalPinToBitMask(pin);
+	uint8_t port = digitalPinToPort(pin);
+
+	if (port == NOT_A_PIN) return LOW;
+
+	// If the pin that support PWM output, we need to turn it off
+	// before getting a digital reading.
+	if (timer != NOT_ON_TIMER) turnOffPWM(timer);
+
+	if (*portInputRegister(port) & bit) return HIGH;
 	return LOW;
 }

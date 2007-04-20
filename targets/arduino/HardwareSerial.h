@@ -40,7 +40,7 @@ class HardwareSerial
     int read(void);
     void flush(void);
     void print(char);
-    void print(char[]);
+    void print(const char[]);
     void print(uint8_t);
     void print(int);
     void print(unsigned int);
@@ -49,7 +49,7 @@ class HardwareSerial
     void print(long, int);
     void println(void);
     void println(char);
-    void println(char[]);
+    void println(const char[]);
     void println(uint8_t);
     void println(int);
     void println(long);

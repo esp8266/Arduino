@@ -64,7 +64,7 @@ void HardwareSerial::print(char c)
   printByte(c);
 }
 
-void HardwareSerial::print(char c[])
+void HardwareSerial::print(const char c[])
 {
   printString(c);
 }
@@ -120,7 +120,7 @@ void HardwareSerial::println(char c)
   println();  
 }
 
-void HardwareSerial::println(char c[])
+void HardwareSerial::println(const char c[])
 {
   print(c);
   println();

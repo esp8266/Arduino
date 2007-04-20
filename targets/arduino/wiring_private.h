@@ -45,29 +45,8 @@ extern "C"{
 #define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
 #endif
 
-#define NOT_A_PIN 0
-#define NOT_A_PORT -1
-
-#define NOT_ON_TIMER -1
-#define TIMER0A 0
-#define TIMER0B 1
-#define TIMER1A 2
-#define TIMER1B 3
-#define TIMER2  4
-#define TIMER2A 5
-#define TIMER2B 6
-
-typedef struct {
-	int port;
-	int bit;
-} pin_t;
-
-extern int port_to_mode[];
-extern int port_to_input[];
-extern int port_to_output[];
-extern pin_t *digital_pin_to_port;
-extern pin_t *analog_in_pin_to_port;
-extern int *analog_out_pin_to_timer;
+#define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
+#define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )
 
 #define EXTERNAL_INT_0 0
 #define EXTERNAL_INT_1 1

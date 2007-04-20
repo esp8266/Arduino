@@ -23,53 +23,33 @@
 */
 
 #include "wiring_private.h"
-
-/*
-unsigned long pulseIn(int pin, int state)
-{
-	unsigned long width = 0;
-
-	while (digitalRead(pin) == !state)
-		;
-		
-	while (digitalRead(pin) != !state)
-		width++;
-		
-	return width * 17 / 2; // convert to microseconds
-}
-*/
+#include "pins_arduino.h"
 
 /* Measures the length (in microseconds) of a pulse on the pin; state is HIGH
  * or LOW, the type of pulse to measure.  Works on pulses from 10 microseconds
  * to 3 minutes in length, but must be called at least N microseconds before
  * the start of the pulse. */
-unsigned long pulseIn(int pin, int state)
+unsigned long pulseIn(uint8_t pin, uint8_t state)
 {
 	// cache the port and bit of the pin in order to speed up the
 	// pulse width measuring loop and achieve finer resolution.  calling
 	// digitalRead() instead yields much coarser resolution.
-	int r = port_to_input[digitalPinToPort(pin)];
-	int bit = digitalPinToBit(pin);
-	int mask = 1 << bit;
-	unsigned long width = 0;
-
-	// compute the desired bit pattern for the port reading (e.g. set or
-	// clear the bit corresponding to the pin being read).  the !!state
-	// ensures that the function treats any non-zero value of state as HIGH.
-	state = (!!state) << bit;
-
+	uint8_t bit = digitalPinToBitMask(pin);
+	uint8_t port = digitalPinToPort(pin);
+	uint8_t stateMask = (state ? bit : 0);
+	unsigned long width = 0; // keep initialization out of time critical area
+	
 	// wait for the pulse to start
-	while ((_SFR_IO8(r) & mask) != state)
+	while ((*portInputRegister(port) & bit) != stateMask)
 		;
 	
 	// wait for the pulse to stop
-	while ((_SFR_IO8(r) & mask) == state)
+	while ((*portInputRegister(port) & bit) == stateMask)
 		width++;
-	
-	// convert the reading to microseconds.  the slower the CPU speed, the
-	// proportionally fewer iterations of the loop will occur (e.g. a 
-	// 4 MHz clock will yield a width that is one-fourth of that read with
-	// a 16 MHz clock).  each loop was empirically determined to take
-	// approximately 23/20 of a microsecond with a 16 MHz clock.
-	return width * (16000000UL / F_CPU) * 20 / 23;
+
+	// convert the reading to microseconds. The loop has been determined
+	// to be 10 clock cycles long and have about 12 clocks between the edge
+	// and the start of the loop. There will be some error introduced by
+	// the interrupt handlers.
+	return clockCyclesToMicroseconds(width * 10 + 12); 
 }

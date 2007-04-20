@@ -23,10 +23,11 @@
 */
 
 #include "wiring_private.h"
+#include "pins_arduino.h"
 
-int analogRead(int pin)
+int analogRead(uint8_t pin)
 {
-	unsigned int low, high, ch = analogInPinToBit(pin);
+	uint8_t low, high, ch = analogInPinToBit(pin);
 
 	// the low 4 bits of ADMUX select the ADC channel
 	ADMUX = (ADMUX & (unsigned int) 0xf0) | (ch & (unsigned int) 0x0f);
@@ -55,7 +56,7 @@ int analogRead(int pin)
 // hardware support.  These are defined in the appropriate
 // pins_*.c file.  For the rest of the pins, we default
 // to digital output.
-void analogWrite(int pin, int val)
+void analogWrite(uint8_t pin, int val)
 {
 	// We need to make sure the PWM output is enabled for those pins
 	// that support it, as we turn it off when digitally reading or
@@ -64,39 +65,39 @@ void analogWrite(int pin, int val)
 	// call for the analog output pins.
 	pinMode(pin, OUTPUT);
 	
-	if (analogOutPinToTimer(pin) == TIMER1A) {
+	if (digitalPinToTimer(pin) == TIMER1A) {
 		// connect pwm to pin on timer 1, channel A
 		sbi(TCCR1A, COM1A1);
 		// set pwm duty
 		OCR1A = val;
-	} else if (analogOutPinToTimer(pin) == TIMER1B) {
+	} else if (digitalPinToTimer(pin) == TIMER1B) {
 		// connect pwm to pin on timer 1, channel B
 		sbi(TCCR1A, COM1B1);
 		// set pwm duty
 		OCR1B = val;
 #if defined(__AVR_ATmega168__)
-	} else if (analogOutPinToTimer(pin) == TIMER0A) {
+	} else if (digitalPinToTimer(pin) == TIMER0A) {
 		// connect pwm to pin on timer 0, channel A
 		sbi(TCCR0A, COM0A1);
 		// set pwm duty
 		OCR0A = val;	
-	} else if (analogOutPinToTimer(pin) == TIMER0B) {
+	} else if (digitalPinToTimer(pin) == TIMER0B) {
 		// connect pwm to pin on timer 0, channel B
 		sbi(TCCR0A, COM0B1);
 		// set pwm duty
 		OCR0B = val;
-	} else if (analogOutPinToTimer(pin) == TIMER2A) {
+	} else if (digitalPinToTimer(pin) == TIMER2A) {
 		// connect pwm to pin on timer 2, channel A
 		sbi(TCCR2A, COM2A1);
 		// set pwm duty
 		OCR2A = val;	
-	} else if (analogOutPinToTimer(pin) == TIMER2B) {
+	} else if (digitalPinToTimer(pin) == TIMER2B) {
 		// connect pwm to pin on timer 2, channel B
 		sbi(TCCR2A, COM2B1);
 		// set pwm duty
 		OCR2B = val;
 #else
-	} else if (analogOutPinToTimer(pin) == TIMER2) {
+	} else if (digitalPinToTimer(pin) == TIMER2) {
 		// connect pwm to pin on timer 2, channel B
 		sbi(TCCR2, COM21);
 		// set pwm duty

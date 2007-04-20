@@ -59,6 +59,8 @@ void delay(unsigned long ms)
  * too frequently. */
 void delayMicroseconds(unsigned int us)
 {
+	uint8_t oldSREG;
+
 	// calling avrlib's delay_us() function with low values (e.g. 1 or
 	// 2 microseconds) gives delays longer than desired.
 	//delay_us(us);
@@ -78,6 +80,7 @@ void delayMicroseconds(unsigned int us)
 
 	// disable interrupts, otherwise the timer 0 overflow interrupt that
 	// tracks milliseconds will make us delay longer than we want.
+	oldSREG = SREG;
 	cli();
 
 	// busy wait
@@ -87,71 +90,7 @@ void delayMicroseconds(unsigned int us)
 	);
 
 	// reenable interrupts.
-	sei();
-}
-
-/*
-unsigned long pulseIn(int pin, int state)
-{
-	unsigned long width = 0;
-
-	while (digitalRead(pin) == !state)
-		;
-		
-	while (digitalRead(pin) != !state)
-		width++;
-		
-	return width * 17 / 2; // convert to microseconds
-}
-*/
-
-/* Measures the length (in microseconds) of a pulse on the pin; state is HIGH
- * or LOW, the type of pulse to measure.  Works on pulses from 10 microseconds
- * to 3 minutes in length, but must be called at least N microseconds before
- * the start of the pulse. */
-unsigned long pulseIn(int pin, int state)
-{
-	// cache the port and bit of the pin in order to speed up the
-	// pulse width measuring loop and achieve finer resolution.  calling
-	// digitalRead() instead yields much coarser resolution.
-	int r = port_to_input[digitalPinToPort(pin)];
-	int bit = digitalPinToBit(pin);
-	int mask = 1 << bit;
-	unsigned long width = 0;
-
-	// compute the desired bit pattern for the port reading (e.g. set or
-	// clear the bit corresponding to the pin being read).  the !!state
-	// ensures that the function treats any non-zero value of state as HIGH.
-	state = (!!state) << bit;
-
-	// wait for the pulse to start
-	while ((_SFR_IO8(r) & mask) != state)
-		;
-	
-	// wait for the pulse to stop
-	while ((_SFR_IO8(r) & mask) == state)
-		width++;
-	
-	// convert the reading to microseconds.  the slower the CPU speed, the
-	// proportionally fewer iterations of the loop will occur (e.g. a 
-	// 4 MHz clock will yield a width that is one-fourth of that read with
-	// a 16 MHz clock).  each loop was empirically determined to take
-	// approximately 23/20 of a microsecond with a 16 MHz clock.
-	return width * (16000000UL / F_CPU) * 20 / 23;
-}
-
-void shiftOut(int dataPin, int clockPin, int bitOrder, byte val) {
-	int i;
-
-	for (i = 0; i < 8; i++)  {
-		if (bitOrder == LSBFIRST)
-			digitalWrite(dataPin, !!(val & (1 << i)));
-		else	
-			digitalWrite(dataPin, !!(val & (1 << (7 - i))));
-			
-		digitalWrite(clockPin, HIGH);
-		digitalWrite(clockPin, LOW);		
-	}
+	SREG = oldSREG;
 }
 
 void init()

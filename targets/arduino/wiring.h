@@ -63,16 +63,19 @@ extern "C"{
 #define degrees(rad) ((rad)*RAD_TO_DEG)
 #define sq(x) ((x)*(x))
 
+#define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
+#define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )
+
 typedef uint8_t boolean;
 typedef uint8_t byte;
 
 void init(void);
 
-void pinMode(int, int);
-void digitalWrite(int, int);
-int digitalRead(int);
-int analogRead(int);
-void analogWrite(int, int);
+void pinMode(uint8_t, uint8_t);
+void digitalWrite(uint8_t, uint8_t);
+int digitalRead(uint8_t);
+int analogRead(uint8_t);
+void analogWrite(uint8_t, int);
 
 void beginSerial(long);
 void serialWrite(unsigned char);
@@ -81,8 +84,8 @@ int serialRead(void);
 void serialFlush(void);
 void printMode(int);
 void printByte(unsigned char c);
-void printNewline();
-void printString(char *s);
+void printNewline(void);
+void printString(const char *s);
 void printInteger(long n);
 void printHex(unsigned long n);
 void printOctal(unsigned long n);
@@ -92,9 +95,9 @@ void printIntegerInBase(unsigned long n, unsigned long base);
 unsigned long millis(void);
 void delay(unsigned long);
 void delayMicroseconds(unsigned int us);
-unsigned long pulseIn(int pin, int state);
+unsigned long pulseIn(uint8_t pin, uint8_t state);
 
-void shiftOut(int dataPin, int clockPin, int endianness, byte val);
+void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, byte val);
 
 void attachInterrupt(uint8_t, void (*)(void), int mode);
 void detachInterrupt(uint8_t);
