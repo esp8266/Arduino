@@ -46,14 +46,16 @@ SoftwareSerial::SoftwareSerial(uint8_t receivePin, uint8_t transmitPin)
 void SoftwareSerial::begin(long speed)
 {
   _baudRate = speed;
+  _bitPeriod = 1000000 / _baudRate;
+
+  digitalWrite(_transmitPin, HIGH);
+  delayMicroseconds( _bitPeriod); // if we were low this establishes the end
 }
 
 int SoftwareSerial::read()
 {
   int val = 0;
-  int width = 1000000 / _baudRate;
-  int fudge = -8;  
-  //int fudge = -16;
+  int bitDelay = _bitPeriod - clockCyclesToMicroseconds(50);
   
   // one byte of serial data (LSB first)
   // ...--\    /--\/--\/--\/--\/--\/--\/--\/--\/--...
@@ -66,18 +68,18 @@ int SoftwareSerial::read()
   if (digitalRead(_receivePin) == LOW) {
     // frame start indicated by a falling edge and low start bit
     // jump to the middle of the low start bit
-    delayMicroseconds(width / 2);
+    delayMicroseconds(bitDelay / 2 - clockCyclesToMicroseconds(50));
 	
     // offset of the bit in the byte: from 0 (LSB) to 7 (MSB)
     for (int offset = 0; offset < 8; offset++) {
 	// jump to middle of next bit
-	delayMicroseconds(width + fudge);
+	delayMicroseconds(bitDelay);
 	
 	// read bit
 	val |= digitalRead(_receivePin) << offset;
     }
 	
-    delayMicroseconds(width + fudge);
+    delayMicroseconds(_bitPeriod);
     
     return val;
   }
@@ -90,7 +92,7 @@ void SoftwareSerial::print(uint8_t b)
   if (_baudRate == 0)
     return;
     
-  int bitDelay = 1000000 / _baudRate - 15;
+  int bitDelay = _bitPeriod - clockCyclesToMicroseconds(50); // a digitalWrite is about 50 cycles
   byte mask;
 
   digitalWrite(_transmitPin, LOW);
@@ -110,7 +112,7 @@ void SoftwareSerial::print(uint8_t b)
   delayMicroseconds(bitDelay);
 }
 
-void SoftwareSerial::print(char *s)
+void SoftwareSerial::print(const char *s)
 {
   while (*s)
     print(*s++);
@@ -167,7 +169,7 @@ void SoftwareSerial::println(char c)
   println();  
 }
 
-void SoftwareSerial::println(char c[])
+void SoftwareSerial::println(const char c[])
 {
   print(c);
   println();

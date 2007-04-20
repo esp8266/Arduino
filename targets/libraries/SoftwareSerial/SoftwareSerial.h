@@ -28,13 +28,14 @@ class SoftwareSerial
     uint8_t _receivePin;
     uint8_t _transmitPin;
     long _baudRate;
+    int _bitPeriod;
     void printNumber(unsigned long, uint8_t);
   public:
     SoftwareSerial(uint8_t, uint8_t);
     void begin(long);
     int read();
     void print(char);
-    void print(char[]);
+    void print(const char[]);
     void print(uint8_t);
     void print(int);
     void print(unsigned int);
@@ -43,7 +44,7 @@ class SoftwareSerial
     void print(long, int);
     void println(void);
     void println(char);
-    void println(char[]);
+    void println(const char[]);
     void println(uint8_t);
     void println(int);
     void println(long);
