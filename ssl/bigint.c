@@ -77,24 +77,14 @@ static void check(const bigint *bi);
  */
 BI_CTX *bi_initialize(void)
 {
-    BI_CTX *ctx;
+    /* calloc() sets everything to zero */
+    BI_CTX *ctx = (BI_CTX *)calloc(1, sizeof(BI_CTX));
    
-    ctx = (BI_CTX *)calloc(1, sizeof(BI_CTX));
-    ctx->active_list = NULL;
-    ctx->active_count = 0;
-    ctx->free_list = NULL;
-    ctx->free_count = 0;
-    ctx->mod_offset = 0;
-#ifdef CONFIG_BIGINT_MONTGOMERY
-    ctx->use_classical = 0;
-#endif
-
     /* the radix */
     ctx->bi_radix = alloc(ctx, 2); 
     ctx->bi_radix->comps[0] = 0;
     ctx->bi_radix->comps[1] = 1;
     bi_permanent(ctx->bi_radix);
-
     return ctx;
 }
 

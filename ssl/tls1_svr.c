@@ -307,8 +307,7 @@ static int send_server_hello(SSL *ssl)
     if (IS_SET_SSL_FLAG(SSL_SESSION_RESUME))
     {
         /* retrieve id from session cache */
-        memcpy(&buf[offset], ssl->session->session_id, 
-                SSL_SESSION_ID_SIZE);
+        memcpy(&buf[offset], ssl->session->session_id, SSL_SESSION_ID_SIZE);
         memcpy(ssl->session_id, ssl->session->session_id, SSL_SESSION_ID_SIZE);
     }
     else    /* generate our own session id */

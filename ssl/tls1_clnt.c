@@ -213,6 +213,7 @@ static int process_server_hello(SSL *ssl)
     int offset;
     int version = (buf[4] << 4) + buf[5];
     int num_sessions = ssl->ssl_ctx->num_sessions;
+    uint8_t session_id_length;
     int ret = SSL_OK;
 
     /* check that we are talking to a TLSv1 server */
@@ -221,17 +222,18 @@ static int process_server_hello(SSL *ssl)
 
     /* get the server random value */
     memcpy(ssl->server_random, &buf[6], SSL_RANDOM_SIZE);
-    offset = 7 + SSL_RANDOM_SIZE; /* skip of session id size */
+    offset = 6 + SSL_RANDOM_SIZE; /* skip of session id size */
+    session_id_length = buf[offset++];
 
     if (num_sessions)
     {
         ssl->session = ssl_session_update(num_sessions,
                 ssl->ssl_ctx->ssl_sessions, ssl, &buf[offset]);
-        memcpy(ssl->session->session_id, &buf[offset], SSL_SESSION_ID_SIZE);
+        memcpy(ssl->session->session_id, &buf[offset], session_id_length);
     }
 
-    memcpy(ssl->session_id, &buf[offset], SSL_SESSION_ID_SIZE);
-    offset += SSL_SESSION_ID_SIZE;
+    memcpy(ssl->session_id, &buf[offset], session_id_length);
+    offset += session_id_length;
 
     /* get the real cipher we are using */
     ssl->cipher = buf[++offset];
@@ -304,7 +306,7 @@ static int send_cert_verify(SSL *ssl)
     uint8_t *buf = ssl->bm_data;
     uint8_t dgst[MD5_SIZE+SHA1_SIZE];
     RSA_CTX *rsa_ctx = ssl->ssl_ctx->rsa_ctx;
-    int n, ret;
+    int n = 0, ret;
 
     DISPLAY_RSA(ssl, "send_cert_verify", rsa_ctx);
 
@@ -314,14 +316,17 @@ static int send_cert_verify(SSL *ssl)
     finished_digest(ssl, NULL, dgst);   /* calculate the digest */
 
     /* rsa_ctx->bi_ctx is not thread-safe */
-    SSL_CTX_LOCK(ssl->ssl_ctx->mutex);
-    n = RSA_encrypt(rsa_ctx, dgst, sizeof(dgst), &buf[6], 1);
-    SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
-
-    if (n == 0)
+    if (rsa_ctx)
     {
-        ret = SSL_ERROR_INVALID_KEY;
-        goto error;
+        SSL_CTX_LOCK(ssl->ssl_ctx->mutex);
+        n = RSA_encrypt(rsa_ctx, dgst, sizeof(dgst), &buf[6], 1);
+        SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
+
+        if (n == 0)
+        {
+            ret = SSL_ERROR_INVALID_KEY;
+            goto error;
+        }
     }
     
     buf[4] = n >> 8;        /* add the RSA size (not officially documented) */
