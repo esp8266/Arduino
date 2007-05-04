@@ -286,12 +286,10 @@ public class Compiler implements MessageConsumer {
     */
     //PApplet.printarr(command);
 
-    baseCommandLinker[1] = "-Os -Wl,-u,vfprintf -lprintf_flt -lm,-Map=" +
-      ((!Base.isMacOS()) ? buildPath : userdir + buildPath)
-       + File.separator + sketch.name + ".map,--cref";
+    baseCommandLinker[1] = "-Os";
     baseCommandLinker[4] = ((!Base.isMacOS()) ? buildPath 
       : buildPath) + File.separator + sketch.name + ".elf";
-    String commandLinker[] = new String[baseCommandLinker.length + sketchCount + 2];
+    String commandLinker[] = new String[baseCommandLinker.length + sketchCount + 3];
     System.arraycopy(baseCommandLinker, 0, commandLinker, 0, baseCommandLinker.length);
     int idx = 0;
     for(int i = 0; i < sketchCount; i++, idx++) {
@@ -299,7 +297,8 @@ public class Compiler implements MessageConsumer {
     }
 
     commandLinker[baseCommandLinker.length + idx++] = runtimeLibraryName;
-    commandLinker[baseCommandLinker.length + idx] = "-L" + buildPath;
+    commandLinker[baseCommandLinker.length + idx++] = "-L" + buildPath;
+    commandLinker[baseCommandLinker.length + idx] = "-lm";
       
     /*String command[] = new String[baseCommand.length + preprocCount];
     System.arraycopy(baseCommand, 0, command, 0, baseCommand.length);
