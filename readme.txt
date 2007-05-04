@@ -41,8 +41,8 @@ Nicholas Zambetti has contributed from the beginning.
 Yaniv Steiner and Giorgio Olivero have been supporting the project and are
 working at using it with the Instant Soup platform.
 
-Arduino uses the GNU avr-gcc toolchain, uisp, avr-libc, avrlib, and code
-from Processing and Wiring.
+Arduino uses the GNU avr-gcc toolchain, uisp, avr-libc, and code from
+Processing and Wiring.
 
 UPDATES
 
@@ -50,11 +50,15 @@ UPDATES
 
 * Added an EEPROM library (see reference for details).
 * Patched to reduce binary sketch sizes by building the Arduino core as
-  a library (.a) file.  Originally written by Nicolas Roland, revised by
-  Don Cross.
+  a library (.a) file - now only the needed parts of the core are linked into
+  a sketch.  Originally written by Nicolas Roland, revised by Don Cross.
 * Fixed bug in Serial.available().  Report and fix by Don Cross.
-* Now recompiling libraries when switching microcontrollers.  Reported by
-  Julian Bleecker; fixed by Nicholas Zambetti.
+* Now recompiling libraries when switching microcontrollers.  Report by
+  Julian Bleecker; fix by Nicholas Zambetti.
+* Cleaned up core functions: moved pin definitions into program space to save
+  RAM, and other minor improvements.  Contributed by Jim Studt.
+* Lots of reference additions and fixes from Paul Badger.
+* Changed default microcontroller to ATmega168 from ATmega8.
 * Removed the delay from analogRead().
 
 0007 - 2006.12.25
