@@ -19,6 +19,21 @@
 #     the function, with a semi-colon at the end.  For example:
 #     int digitalRead(int pin);
 #
+#   - Write a main() function for your program that returns an int, calls
+#     init() and setup() once (in that order), and then calls loop()
+#     repeatedly():
+#
+#	int main()
+#	{
+#		init();
+#		setup();
+#
+#		for (;;)
+#			loop();
+#
+#		return 0;
+#	}
+#
 # Instructions for using the makefile:
 #
 #  1. Copy this file into the folder with your sketch.
@@ -47,10 +62,13 @@
 
 PORT = /dev/tty.usbserial*
 TARGET = foo
-ARDUINO = /Applications/arduino-0007/lib/targets/arduino
-SRC = $(ARDUINO)/pins_arduino.c $(ARDUINO)/wiring.c $(ARDUINO)/WInterrupts.c
-CXXSRC = $(TARGET).cpp $(ARDUINO)/HardwareSerial.cpp $(ARDUINO)/WRandom.cpp
-MCU = atmega8
+ARDUINO = arduino
+SRC = $(ARDUINO)/pins_arduino.c $(ARDUINO)/wiring.c \
+$(ARDUINO)/wiring_analog.c $(ARDUINO)/wiring_digital.c \
+$(ARDUINO)/wiring_pulse.c $(ARDUINO)/wiring_serial.c \
+$(ARDUINO)/wiring_shift.c $(ARDUINO)/WInterrupts.c
+CXXSRC = $(ARDUINO)/HardwareSerial.cpp $(ARDUINO)/WRandom.cpp 
+MCU = atmega168
 F_CPU = 16000000
 FORMAT = ihex
 UPLOAD_RATE = 19200
@@ -87,7 +105,7 @@ CTUNING = -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
 CFLAGS = $(CDEBUG) $(CDEFS) $(CINCS) -O$(OPT) $(CWARN) $(CSTANDARD) $(CEXTRA)
 CXXFLAGS = $(CDEFS) $(CINCS) -O$(OPT)
 #ASFLAGS = -Wa,-adhlns=$(<:.S=.lst),-gstabs 
-LDFLAGS = 
+LDFLAGS = -lm
 
 
 # Programming support using avrdude. Settings and variables.
@@ -102,6 +120,7 @@ CC = avr-gcc
 CXX = avr-g++
 OBJCOPY = avr-objcopy
 OBJDUMP = avr-objdump
+AR  = avr-ar
 SIZE = avr-size
 NM = avr-nm
 AVRDUDE = avrdude
@@ -173,11 +192,12 @@ extcoff: $(TARGET).elf
 	$(NM) -n $< > $@
 
 
+core.a: $(OBJ)
+	@for i in $(OBJ); do echo $(AR) rcs core.a $$i; $(AR) rcs core.a $$i; done
 
-# Link: create ELF output file from object files.
-$(TARGET).elf: $(OBJ)
-	$(CC) $(ALL_CFLAGS) $(OBJ) --output $@ $(LDFLAGS)
-
+# Link: create ELF output file from library.
+$(TARGET).elf: core.a
+	$(CC) $(ALL_CFLAGS) -o $@ $(TARGET).cpp -L. core.a $(LDFLAGS)
 
 # Compile: create object files from C++ source files.
 .cpp.o:
@@ -202,7 +222,7 @@ $(TARGET).elf: $(OBJ)
 # Target: clean project.
 clean:
 	$(REMOVE) $(TARGET).hex $(TARGET).eep $(TARGET).cof $(TARGET).elf \
-	$(TARGET).map $(TARGET).sym $(TARGET).lss \
+	$(TARGET).map $(TARGET).sym $(TARGET).lss core.a \
 	$(OBJ) $(LST) $(SRC:.c=.s) $(SRC:.c=.d) $(CXXSRC:.cpp=.s) $(CXXSRC:.cpp=.d)
 
 depend:
