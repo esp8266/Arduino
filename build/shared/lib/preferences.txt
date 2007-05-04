@@ -295,7 +295,7 @@ bootloader.lock_bits=0xCF
 bootloader.programmer=stk500
 
 # set the build defaults
-build.mcu=atmega8
+build.mcu=atmega168
 build.f_cpu=16000000L
 build.extension=c
 build.target=arduino
