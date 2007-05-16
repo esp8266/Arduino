@@ -1997,7 +1997,7 @@ void DISPLAY_ALERT(SSL *ssl, int alert)
  */
 EXP_FUNC const char  * STDCALL ssl_version()
 {
-    static const char * axtls_version = AXTLS_VERSION " " __DATE__;
+    static const char * axtls_version = AXTLS_VERSION;
     return axtls_version;
 }
 
