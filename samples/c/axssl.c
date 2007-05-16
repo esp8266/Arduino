@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
 
     if (argc == 2 && strcmp(argv[1], "version") == 0)
     {
-        printf("axssl %s\n", ssl_version());
+        printf("axssl %s %s\n", ssl_version(), __DATE__);
         exit(0);
     }
 
