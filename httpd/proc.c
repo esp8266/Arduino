@@ -42,6 +42,7 @@ static int htaccess_check(struct connstruct *cn);
 #if defined(CONFIG_HTTP_DIRECTORIES)
 static void urlencode(const uint8_t *s, char *t);
 static void procdirlisting(struct connstruct *cn);
+static const char *getmimetype(const char *name);
 #endif
 #if defined(CONFIG_HTTP_HAS_CGI)
 static void proccgi(struct connstruct *cn, int has_pathinfo);
@@ -87,15 +88,15 @@ static int procheadelem(struct connstruct *cn, char *buf)
             return 0;
         }
 
-        my_strncpy(cn->filereq, value, MAXREQUESTLENGTH);
-        cn->if_modified_since = -1;
 #if defined(CONFIG_HTTP_HAS_CGI)
         if ((cgi_delim = strchr(value, '?')))
         {
             *cgi_delim = 0;
-            my_strncpy(cn->cgiargs, value+1, MAXREQUESTLENGTH);
+            my_strncpy(cn->cgiargs, cgi_delim+1, MAXREQUESTLENGTH);
         }
 #endif
+        my_strncpy(cn->filereq, value, MAXREQUESTLENGTH);
+        cn->if_modified_since = -1;
     } 
     else if (strcmp(buf, "Host:") == 0) 
     {
@@ -284,7 +285,7 @@ void procreadhead(struct connstruct *cn)
     /* Split up lines and send to procheadelem() */
     while (*next != '\0') 
     {
-        /* If we have a blank line, advance to next stage! */
+        /* If we have a blank line, advance to next stage */
         if (*next == '\r' || *next == '\n') 
         {
             buildactualfile(cn);
@@ -411,7 +412,7 @@ void procsendhead(struct connstruct *cn)
                                        cn->if_modified_since >= stbuf.st_mtime))
     {
         snprintf(buf, sizeof(buf), "HTTP/1.1 304 Not Modified\nServer: "
-                "axhttpd V%s\nDate: %s\n", VERSION, date);
+                "axhttpd V%s\nDate: %s\n", ssl_version(), date);
         special_write(cn, buf, strlen(buf));
         cn->state = STATE_WANT_TO_READ_HEAD;
         return;
@@ -438,7 +439,7 @@ void procsendhead(struct connstruct *cn)
 
         snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nServer: axhttpd V%s\n"
             "Content-Type: %s\nContent-Length: %ld\n"
-            "Date: %sLast-Modified: %s\n", VERSION,
+            "Date: %sLast-Modified: %s\n", ssl_version(),
             getmimetype(cn->actualfile), (long) stbuf.st_size,
             date, ctime(&stbuf.st_mtime)); /* ctime() has a \n on the end */
 
@@ -498,7 +499,9 @@ void procsendfile(struct connstruct *cn)
     if (rv < 0)
         removeconnection(cn);
     else if (rv == cn->numbytes)
+    {
         cn->state = STATE_WANT_TO_READ_FILE;
+    }
     else if (rv == 0)
     { 
         /* Do nothing */ 
@@ -508,36 +511,6 @@ void procsendfile(struct connstruct *cn)
         memmove(cn->databuf, cn->databuf + rv, cn->numbytes - rv);
         cn->numbytes -= rv;
     }
-}
-
-static int special_write(struct connstruct *cn, 
-                                        const char *buf, size_t count)
-{
-    if (cn->is_ssl)
-    {
-        SSL *ssl = cn->ssl;
-        return ssl ? ssl_write(ssl, (uint8_t *)buf, count) : -1;
-    }
-    else
-        return SOCKET_WRITE(cn->networkdesc, buf, count);
-}
-
-static int special_read(struct connstruct *cn, void *buf, size_t count)
-{
-    int res;
-
-    if (cn->is_ssl)
-    {
-        uint8_t *read_buf;
-        if ((res = ssl_read(cn->ssl, &read_buf)) > SSL_OK)
-        {
-            memcpy(buf, read_buf, res > (int)count ? count : res);
-        }
-    }
-    else
-        res = SOCKET_READ(cn->networkdesc, buf, count);
-
-    return res;
 }
 
 #if defined(CONFIG_HTTP_HAS_CGI)
@@ -551,7 +524,7 @@ static void proccgi(struct connstruct *cn, int has_pathinfo)
 #endif
 
     snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nServer: axhttpd V%s\n%s",
-            VERSION, (cn->reqtype == TYPE_HEAD) ? "\n" : "");
+            ssl_version(), (cn->reqtype == TYPE_HEAD) ? "\n" : "");
     special_write(cn, buf, strlen(buf));
 
     if (cn->reqtype == TYPE_HEAD) 
@@ -1032,3 +1005,40 @@ static void send_error(struct connstruct *cn, int err)
     special_write(cn, buf, strlen(buf));
     removeconnection(cn);
 }
+
+static const char *getmimetype(const char *name)
+{
+    /* only bother with two types - let the browser/OS figure the rest out */
+    return strstr(name, ".htm") ? "text/html" : "application/octet-stream";
+}
+
+static int special_write(struct connstruct *cn, 
+                                        const char *buf, size_t count)
+{
+    if (cn->is_ssl)
+    {
+        SSL *ssl = cn->ssl;
+        return ssl ? ssl_write(ssl, (uint8_t *)buf, count) : -1;
+    }
+    else
+        return SOCKET_WRITE(cn->networkdesc, buf, count);
+}
+
+static int special_read(struct connstruct *cn, void *buf, size_t count)
+{
+    int res;
+
+    if (cn->is_ssl)
+    {
+        uint8_t *read_buf;
+        if ((res = ssl_read(cn->ssl, &read_buf)) > SSL_OK)
+        {
+            memcpy(buf, read_buf, res > (int)count ? count : res);
+        }
+    }
+    else
+        res = SOCKET_READ(cn->networkdesc, buf, count);
+
+    return res;
+}
+

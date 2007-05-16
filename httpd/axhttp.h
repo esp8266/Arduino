@@ -123,10 +123,6 @@ void procsendfile(struct connstruct *cn);
 char *my_strncpy(char *dest, const char *src, size_t n);
 int isdir(const char *name);
 
-/* mime_types.c prototypes */
-void mime_init(void);
-const char *getmimetype(const char *fn);
-
 /* tdate prototypes */
 void tdate_init(void);
 time_t tdate_parse(const char* str);

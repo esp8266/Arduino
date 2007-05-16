@@ -63,7 +63,6 @@ endif
 OBJ= \
 	axhttpd.o \
 	proc.o \
-	mime_types.o \
 	tdate_parse.o
 
 include ../config/makefile.post

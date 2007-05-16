@@ -109,15 +109,6 @@ config CONFIG_HTTP_HAS_IPV6
     
         Does not work under Win32
 
-config CONFIG_HTTP_ALL_MIME_TYPES
-    bool "Use all mime types"
-    help
-        Use the full list of supported mime types.
-
-        Use this option if a "generic" webserver is used. However if it is
-        using only web pages (html, jpg, gif, png, css) then select this
-        option.
-
 config CONFIG_HTTP_VERBOSE
     bool "Verbose Mode"
     default y if CONFIG_SSL_FULL_MODE

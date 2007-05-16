@@ -124,7 +124,6 @@ int main(int argc, char *argv[])
     signal(SIGTERM, die);
     signal(SIGINT, sigint_cleanup);
 #endif
-    mime_init();
     tdate_init();
 
     for (i = 0; i < INITIAL_CONNECTION_SLOTS; i++) 
