@@ -48,7 +48,9 @@ UPDATES
 
 0008
 
+* Updated examples (in distribution and on the website).
 * Added an EEPROM library (see reference for details).
+* Added a Stepper motor library (see reference).
 * Patched to reduce binary sketch sizes by building the Arduino core as
   a library (.a) file - now only the needed parts of the core are linked into
   a sketch.  Originally written by Nicolas Roland, revised by Don Cross.
@@ -60,6 +62,8 @@ UPDATES
 * Lots of reference additions and fixes from Paul Badger.
 * Changed default microcontroller to ATmega168 from ATmega8.
 * Removed the delay from analogRead().
+* Activating TWI/I2C pullup resistors on the ATmega168 (in addition to the 
+  ATmega8).
 
 0007 - 2006.12.25
 
