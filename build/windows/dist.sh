@@ -46,6 +46,7 @@ cd ..
 unzip -q -d arduino jre.zip
 
 # copy stuff from work/
+cp work/readme.txt arduino
 cp -r work/tools arduino
 cp -r work/bootloader arduino
 cp -r work/drivers arduino

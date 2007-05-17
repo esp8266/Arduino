@@ -16,6 +16,8 @@ else
   cp dist/*.dll work
   cp dist/run.bat work
   chmod 755 work/run.bat
+  cp ../../readme.txt work
+  unix2dos work/readme.txt
   
   # needs to make the dir because of packaging goofiness
   mkdir -p work/classes/arduino/app/preproc
