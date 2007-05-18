@@ -918,7 +918,8 @@ static int send_raw_packet(SSL *ssl, uint8_t protocol)
 {
     uint8_t *rec_buf = ssl->bm_all_data;
     int pkt_size = SSL_RECORD_SIZE+ssl->bm_index;
-    int ret;
+    int sent = 0;
+    int ret = SSL_OK;
 
     rec_buf[0] = protocol;
     rec_buf[1] = 0x03;      /* version = 3.1 (TLS) */
@@ -927,11 +928,33 @@ static int send_raw_packet(SSL *ssl, uint8_t protocol)
     rec_buf[4] = ssl->bm_index & 0xff;
 
     DISPLAY_BYTES(ssl, "sending %d bytes", ssl->bm_all_data, 
-                            pkt_size, pkt_size);
+                             pkt_size, pkt_size);
 
-    if ((ret = SOCKET_WRITE(ssl->client_fd, 
-                    ssl->bm_all_data, pkt_size)) < 0)
-        ret = SSL_ERROR_CONN_LOST;
+    while (sent < pkt_size)
+    {
+        if ((ret = SOCKET_WRITE(ssl->client_fd, 
+                        &ssl->bm_all_data[sent], pkt_size)) < 0)
+        {
+            ret = SSL_ERROR_CONN_LOST;
+            break;
+        }
+
+        sent += ret;
+
+        /* keep going until the write buffer has some space */
+        if (sent != pkt_size)
+        {
+            fd_set wfds;
+            FD_ZERO(&wfds);
+            FD_SET(ssl->client_fd, &wfds);
+
+            if (select(ssl->client_fd + 1, NULL, &wfds, NULL, NULL) < 0)
+            {
+                ret = SSL_ERROR_CONN_LOST;
+                break;
+            }
+        }
+    }
 
     SET_SSL_FLAG(SSL_NEED_RECORD);  /* reset for next time */
     ssl->bm_index = 0;
