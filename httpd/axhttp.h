@@ -75,12 +75,15 @@ struct connstruct
 
 #if defined(CONFIG_HTTP_HAS_CGI)
     uint8_t is_cgi;
+#ifdef CONFIG_HTTP_ENABLE_LUA
     uint8_t is_lua;
+#endif
     int content_length;
     char remote_addr[MAXREQUESTLENGTH];
     char uri_request[MAXREQUESTLENGTH];
     char uri_path_info[MAXREQUESTLENGTH];
     char uri_query[MAXREQUESTLENGTH];
+    char cookie[MAXREQUESTLENGTH];
 #endif
 #if defined(CONFIG_HTTP_HAS_AUTHORIZATION)
     char authorization[MAXREQUESTLENGTH];

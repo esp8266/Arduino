@@ -16,7 +16,7 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-all : web_server
+all : web_server lua
 
 include ../config/.config
 include ../config/makefile.conf
@@ -38,6 +38,17 @@ LIBS=-L../$(STAGE) -laxtls
 endif
 
 CFLAGS += -I../ssl
+
+ifdef CONFIG_HTTP_BUILD_LUA
+lua: kepler-1.1
+
+kepler-1.1:
+	@tar xvfz  kepler-1.1-snapshot-20070420-1741.tar.gz
+	@cat kepler.patch | patch -p0
+	cd kepler-1.1; ./configure --prefix=$(CONFIG_HTTP_LUA_PREFIX) --launcher=cgi --lua-suffix= ; make install
+else
+lua:
+endif
 
 else # win32 build
 TARGET=../$(STAGE)/axhttpd.exe
@@ -100,4 +111,5 @@ endif       # CONFIG_AXHTTPD
 
 clean::
 	-@rm -f $(TARGET)*
+	-@rm -fr kepler-1.1
 

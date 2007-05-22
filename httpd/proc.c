@@ -26,6 +26,8 @@
 #include <string.h>
 #include "axhttp.h"
 
+#define HTTP_VERSION        "HTTP/1.1"
+
 static const char * index_file = "index.html";
 
 static int special_read(struct connstruct *cn, void *buf, size_t count);
@@ -125,6 +127,10 @@ static int procheadelem(struct connstruct *cn, char *buf)
     {
         sscanf(value, "%d", &cn->content_length);
     }
+    else if (strcmp(buf, "Cookie:") == 0)
+    {
+        my_strncpy(cn->cookie, value, MAXREQUESTLENGTH);
+    }
 #endif
 
     return 1;
@@ -138,8 +144,8 @@ static void procdirlisting(struct connstruct *cn)
 
     if (cn->reqtype == TYPE_HEAD) 
     {
-        snprintf(buf, sizeof(buf), 
-                "HTTP/1.1 200 OK\nContent-Type: text/html\n\n");
+        snprintf(buf, sizeof(buf), HTTP_VERSION
+                " 200 OK\nContent-Type: text/html\n\n");
         write(cn->networkdesc, buf, strlen(buf));
         removeconnection(cn);
         return;
@@ -164,7 +170,8 @@ static void procdirlisting(struct connstruct *cn)
     }
 #endif
 
-    snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nContent-Type: text/html\n\n"
+    snprintf(buf, sizeof(buf), HTTP_VERSION
+            " 200 OK\nContent-Type: text/html\n\n"
             "<html><body>\n<title>Directory Listing</title>\n"
             "<h3>Directory listing of %s://%s%s</h3><br />\n", 
             cn->is_ssl ? "https" : "http", cn->server_name, cn->filereq);
@@ -347,7 +354,7 @@ void procsendhead(struct connstruct *cn)
         if ((stbuf.st_mode & S_IEXEC) == 0 || isdir(cn->actualfile))
         {
             /* A non-executable file, or directory? */
-            send_error(cn, 404);
+            send_error(cn, 403);
         }
         else
             proccgi(cn);
@@ -388,7 +395,7 @@ void procsendhead(struct connstruct *cn)
     if (cn->if_modified_since != -1 && (cn->if_modified_since == 0 || 
                                        cn->if_modified_since >= stbuf.st_mtime))
     {
-        snprintf(buf, sizeof(buf), "HTTP/1.1 304 Not Modified\nServer: "
+        snprintf(buf, sizeof(buf), HTTP_VERSION" 304 Not Modified\nServer: "
                 "%s\nDate: %s\n", server_version, date);
         special_write(cn, buf, strlen(buf));
         cn->state = STATE_WANT_TO_READ_HEAD;
@@ -414,7 +421,7 @@ void procsendhead(struct connstruct *cn)
             return;
         }
 
-        snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nServer: %s\n"
+        snprintf(buf, sizeof(buf), HTTP_VERSION" 200 OK\nServer: %s\n"
             "Content-Type: %s\nContent-Length: %ld\n"
             "Date: %sLast-Modified: %s\n", server_version,
             getmimetype(cn->actualfile), (long) stbuf.st_size,
@@ -491,14 +498,15 @@ void procsendfile(struct connstruct *cn)
 }
 
 #if defined(CONFIG_HTTP_HAS_CGI)
-#define CGI_ARG_SIZE        14
+/* Should this be a bit more dynamic? It would mean more calls to malloc etc */
+#define CGI_ARG_SIZE        16
 
 static void proccgi(struct connstruct *cn) 
 {
     int tpipe[2];
     char *myargs[2];
     char cgienv[CGI_ARG_SIZE][MAXREQUESTLENGTH];
-    char * cgiptr[CGI_ARG_SIZE+1];
+    char * cgiptr[CGI_ARG_SIZE+4];
     const char *type = "HEAD";
     int cgi_index = 0, i;
 #ifdef WIN32
@@ -506,7 +514,7 @@ static void proccgi(struct connstruct *cn)
 #endif
 
     snprintf(cgienv[0], MAXREQUESTLENGTH, 
-            "HTTP/1.1 200 OK\nServer: %s\n%s",
+            HTTP_VERSION" 200 OK\nServer: %s\n%s",
             server_version, (cn->reqtype == TYPE_HEAD) ? "\n" : "");
     special_write(cn, cgienv[0], strlen(cgienv[0]));
 
@@ -574,6 +582,12 @@ static void proccgi(struct connstruct *cn)
             "QUERY_STRING=%s", cn->uri_query);
     snprintf(cgienv[cgi_index++], MAXREQUESTLENGTH,
             "REMOTE_ADDR=%s", cn->remote_addr);
+    snprintf(cgienv[cgi_index++], MAXREQUESTLENGTH,
+            "HTTP_COOKIE=%s", cn->cookie);  /* note: small size */
+#if defined(CONFIG_HTTP_HAS_AUTHORIZATION)
+    snprintf(cgienv[cgi_index++], MAXREQUESTLENGTH,
+            "REMOTE_USER=%s", cn->authorization);
+#endif
 
     switch (cn->reqtype)
     {
@@ -585,7 +599,7 @@ static void proccgi(struct connstruct *cn)
             type = "POST";
             sprintf(cgienv[cgi_index++], 
                         "CONTENT_LENGTH=%d", cn->content_length);
-            strcpy(cgienv[cgi_index++], 
+            strcpy(cgienv[cgi_index++],     /* hard-code? */
                         "CONTENT_TYPE=application/x-www-form-urlencoded");
             break;
     }
@@ -610,7 +624,11 @@ static void proccgi(struct connstruct *cn)
     for (i = 0; i < cgi_index; i++)
         cgiptr[i] = cgienv[i];
 
+    cgiptr[i++] = "AUTH_TYPE=Basic";
+    cgiptr[i++] = "GATEWAY_INTERFACE=CGI/1.1";
+    cgiptr[i++] = "SERVER_PROTOCOL="HTTP_VERSION;
     cgiptr[i] = NULL;
+
     execve(myargs[0], myargs, cgiptr);
     printf("Content-type: text/plain\n\nshouldn't get here\n");
 #endif
@@ -626,13 +644,14 @@ static char * cgi_filetype_match(struct connstruct *cn, const char *fn)
 
         if ((t = strstr(fn, tp->ext)) != NULL)
         {
-
             t += strlen(tp->ext);
 
             if (*t == '/' || *t == '\0')
             {
+#ifdef CONFIG_HTTP_ENABLE_LUA
                 if (strcmp(tp->ext, ".lua") == 0 || strcmp(tp->ext, ".lp") == 0)
                     cn->is_lua = 1;
+#endif
 
                 return t;
             }
@@ -652,7 +671,9 @@ static void decode_path_info(struct connstruct *cn, char *path_info)
     char *cgi_delim;
 
     cn->is_cgi = 0;
+#ifdef CONFIG_HTTP_ENABLE_LUA
     cn->is_lua = 0;
+#endif
     *cn->uri_request = '\0';
     *cn->uri_path_info = '\0';
     *cn->uri_query = '\0';
@@ -739,15 +760,6 @@ static void buildactualfile(struct connstruct *cn)
 {
     char *cp;
 
-#if defined(CONFIG_HTTP_HAS_CGI)
-    /* use the lua launcher if this file has a lua extension */
-    if (cn->is_lua)
-    {
-        strcpy(cn->actualfile, CONFIG_HTTP_LUA_LAUNCHER);
-        return;
-    }
-#endif
-
 #ifdef CONFIG_HTTP_USE_CHROOT
     snprintf(cn->actualfile, MAXREQUESTLENGTH, "%s", cn->filereq);
 #else
@@ -793,6 +805,19 @@ static void buildactualfile(struct connstruct *cn)
         else
             *cp = 0;
     }
+#endif
+
+#if defined(CONFIG_HTTP_ENABLE_LUA)
+    /* 
+     * Use the lua launcher if this file has a lua extension. Put this at the
+     * end as we need the directory name.
+     */
+    if (cn->is_lua)
+#ifdef CONFIG_PLATFORM_CYGWIN
+        sprintf(cn->actualfile, "%s/bin/cgi.exe", CONFIG_HTTP_LUA_PREFIX);
+#else
+        sprintf(cn->actualfile, "%s/bin/cgi", CONFIG_HTTP_LUA_PREFIX);
+#endif
 #endif
 }
 
@@ -851,7 +876,7 @@ static void send_authenticate(struct connstruct *cn, const char *realm)
 {
     char buf[1024];
 
-    snprintf(buf, sizeof(buf), "HTTP/1.1 401 Unauthorized\n"
+    snprintf(buf, sizeof(buf), HTTP_VERSION" 401 Unauthorized\n"
          "WWW-Authenticate: Basic\n"
                  "realm=\"%s\"\n", realm);
     special_write(cn, buf, strlen(buf));

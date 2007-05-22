@@ -71,15 +71,31 @@ config CONFIG_HTTP_CGI_EXTENSIONS
 
         This is a comma separated list - e.g. ".php,.pl" etc
 
-config CONFIG_HTTP_LUA_LAUNCHER
-    string "Lua's CGI Launcher"
-    default "/usr/local/bin/cgi" if CONFIG_PLATFORM_LINUX
-    default "/usr/local/bin/cgi.exe" if CONFIG_PLATFORM_CYGWIN
+config CONFIG_HTTP_ENABLE_LUA
+    bool "Enable Lua"
+    default y
     depends on CONFIG_HTTP_HAS_CGI
+    help
+        Lua is a powerful, fast, light-weight, embeddable scripting language.
+
+        See http://www.lua.org for details.
+
+config CONFIG_HTTP_LUA_PREFIX
+    string "Lua's Installation Prefix"
+    default "/usr/local"
+    depends on CONFIG_HTTP_ENABLE_LUA
 
     help
-        Lua has a special launcher application to run kepler/lua scripts.
-        ".lua and .lp" extensions must be defined in CONFIG_HTTP_CGI_EXTENSIONS.
+        The location of Lua's installation prefix. This is also necessary for
+        Lua's cgi launcher application.
+
+config CONFIG_HTTP_BUILD_LUA
+    bool "Build Lua"
+    default n
+    depends on CONFIG_HTTP_ENABLE_LUA
+    help
+        Build Lua and install in /usr/local/bin
+
 endmenu
 
 config CONFIG_HTTP_DIRECTORIES
