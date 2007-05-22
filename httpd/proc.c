@@ -38,17 +38,15 @@ static void buildactualfile(struct connstruct *cn);
 static int sanitizefile(const char *buf);
 static int sanitizehost(char *buf);
 static int htaccess_check(struct connstruct *cn);
+static const char *getmimetype(const char *name);
 
 #if defined(CONFIG_HTTP_DIRECTORIES)
 static void urlencode(const uint8_t *s, char *t);
 static void procdirlisting(struct connstruct *cn);
-static const char *getmimetype(const char *name);
 #endif
 #if defined(CONFIG_HTTP_HAS_CGI)
-static void proccgi(struct connstruct *cn, int has_pathinfo);
-static int trycgi_withpathinfo(struct connstruct *cn);
-static void split(char *tp, char *sp[], int maxwords, char sc);
-static int iscgi(const char *fn);
+static void proccgi(struct connstruct *cn);
+static void decode_path_info(struct connstruct *cn, char *path_info);
 #endif
 #ifdef CONFIG_HTTP_HAS_AUTHORIZATION
 static int auth_check(struct connstruct *cn);
@@ -58,9 +56,6 @@ static int auth_check(struct connstruct *cn);
 static int procheadelem(struct connstruct *cn, char *buf) 
 {
     char *delim, *value;
-#if defined(CONFIG_HTTP_HAS_CGI)
-    char *cgi_delim;
-#endif
 
     if ((delim = strchr(buf, ' ')) == NULL)
         return 0;
@@ -89,13 +84,10 @@ static int procheadelem(struct connstruct *cn, char *buf)
         }
 
 #if defined(CONFIG_HTTP_HAS_CGI)
-        if ((cgi_delim = strchr(value, '?')))
-        {
-            *cgi_delim = 0;
-            my_strncpy(cn->cgiargs, cgi_delim+1, MAXREQUESTLENGTH);
-        }
-#endif
+        decode_path_info(cn, value);
+#else
         my_strncpy(cn->filereq, value, MAXREQUESTLENGTH);
+#endif
         cn->if_modified_since = -1;
     } 
     else if (strcmp(buf, "Host:") == 0) 
@@ -106,7 +98,7 @@ static int procheadelem(struct connstruct *cn, char *buf)
             return 0;
         }
 
-        my_strncpy(cn->virtualhostreq, value, MAXREQUESTLENGTH);
+        my_strncpy(cn->server_name, value, MAXREQUESTLENGTH);
     } 
     else if (strcmp(buf, "Connection:") == 0 && strcmp(value, "close") == 0) 
     {
@@ -126,6 +118,12 @@ static int procheadelem(struct connstruct *cn, char *buf)
             cn->authorization[0] = 0;   /* error */
         else
             cn->authorization[size] = 0;
+    }
+#endif
+#if defined(CONFIG_HTTP_HAS_CGI)
+    else if (strcmp(buf, "Content-Length:") == 0)
+    {
+        sscanf(value, "%d", &cn->content_length);
     }
 #endif
 
@@ -169,7 +167,7 @@ static void procdirlisting(struct connstruct *cn)
     snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nContent-Type: text/html\n\n"
             "<html><body>\n<title>Directory Listing</title>\n"
             "<h3>Directory listing of %s://%s%s</h3><br />\n", 
-            cn->is_ssl ? "https" : "http", cn->virtualhostreq, cn->filereq);
+            cn->is_ssl ? "https" : "http", cn->server_name, cn->filereq);
     special_write(cn, buf, strlen(buf));
     cn->state = STATE_DOING_DIR;
 }
@@ -320,6 +318,7 @@ void procsendhead(struct connstruct *cn)
     struct stat stbuf;
     time_t now = cn->timeout - CONFIG_HTTP_TIMEOUT;
     char date[32];
+    int file_exists;
 
     /* are we trying to access a file over the HTTP connection instead of a
      * HTTPS connection? Or is this directory disabled? */
@@ -340,31 +339,19 @@ void procsendhead(struct connstruct *cn)
     }
 #endif
 
-    if (stat(cn->actualfile, &stbuf) == -1)
-    {
-#if defined(CONFIG_HTTP_HAS_CGI)
-        if (stat(cn->actualfile, &stbuf) == -1 && trycgi_withpathinfo(cn) == 0) 
-        { 
-            /* We Try To Find A CGI */
-            proccgi(cn, 1);
-            return;
-        }
-#endif
-    }
+    file_exists = stat(cn->actualfile, &stbuf);
 
 #if defined(CONFIG_HTTP_HAS_CGI)
-    if (iscgi(cn->actualfile))
+    if (file_exists != -1 && cn->is_cgi)
     {
-#ifndef WIN32
-        /* An executable file? */
-        if ((stbuf.st_mode & S_IEXEC) == 0 || isdir(cn->actualfile)) 
+        if ((stbuf.st_mode & S_IEXEC) == 0 || isdir(cn->actualfile))
         {
+            /* A non-executable file, or directory? */
             send_error(cn, 404);
-            return;
         }
-#endif
+        else
+            proccgi(cn);
 
-        proccgi(cn, 0);
         return;
     }
 #endif
@@ -373,10 +360,10 @@ void procsendhead(struct connstruct *cn)
     if (isdir(cn->actualfile))
     {
         char tbuf[MAXREQUESTLENGTH];
-        sprintf(tbuf, "%s%s", cn->actualfile, index_file);
+        snprintf(tbuf, MAXREQUESTLENGTH, "%s%s", cn->actualfile, index_file);
 
-        if (stat(tbuf, &stbuf) != -1) 
-            strcat(cn->actualfile, index_file);
+        if ((file_exists = stat(tbuf, &stbuf)) != -1) 
+            my_strncpy(cn->actualfile, tbuf, MAXREQUESTLENGTH);
         else
         {
 #if defined(CONFIG_HTTP_DIRECTORIES)
@@ -387,22 +374,12 @@ void procsendhead(struct connstruct *cn)
 #endif
             return;
         }
+    }
 
-#if defined(CONFIG_HTTP_HAS_CGI)
-        /* If the index is a CGI file, handle it like any other CGI */
-        if (iscgi(cn->actualfile))
-        {
-            /* Set up CGI script */
-            if ((stbuf.st_mode & S_IEXEC) == 0 || isdir(cn->actualfile)) 
-            {
-                send_error(cn, 404);
-                return;
-            }
-
-            proccgi(cn, 0);
-            return;
-        }
-#endif
+    if (file_exists == -1)
+    {
+        send_error(cn, 404);
+        return;
     }
 
     strcpy(date, ctime(&now));
@@ -412,7 +389,7 @@ void procsendhead(struct connstruct *cn)
                                        cn->if_modified_since >= stbuf.st_mtime))
     {
         snprintf(buf, sizeof(buf), "HTTP/1.1 304 Not Modified\nServer: "
-                "axhttpd V%s\nDate: %s\n", ssl_version(), date);
+                "%s\nDate: %s\n", server_version, date);
         special_write(cn, buf, strlen(buf));
         cn->state = STATE_WANT_TO_READ_HEAD;
         return;
@@ -437,9 +414,9 @@ void procsendhead(struct connstruct *cn)
             return;
         }
 
-        snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nServer: axhttpd V%s\n"
+        snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nServer: %s\n"
             "Content-Type: %s\nContent-Length: %ld\n"
-            "Date: %sLast-Modified: %s\n", ssl_version(),
+            "Date: %sLast-Modified: %s\n", server_version,
             getmimetype(cn->actualfile), (long) stbuf.st_size,
             date, ctime(&stbuf.st_mtime)); /* ctime() has a \n on the end */
 
@@ -514,18 +491,24 @@ void procsendfile(struct connstruct *cn)
 }
 
 #if defined(CONFIG_HTTP_HAS_CGI)
-static void proccgi(struct connstruct *cn, int has_pathinfo) 
+#define CGI_ARG_SIZE        14
+
+static void proccgi(struct connstruct *cn) 
 {
     int tpipe[2];
-    char *myargs[5];
-    char buf[MAXREQUESTLENGTH];
+    char *myargs[2];
+    char cgienv[CGI_ARG_SIZE][MAXREQUESTLENGTH];
+    char * cgiptr[CGI_ARG_SIZE+1];
+    const char *type = "HEAD";
+    int cgi_index = 0, i;
 #ifdef WIN32
     int tmp_stdout;
 #endif
 
-    snprintf(buf, sizeof(buf), "HTTP/1.1 200 OK\nServer: axhttpd V%s\n%s",
-            ssl_version(), (cn->reqtype == TYPE_HEAD) ? "\n" : "");
-    special_write(cn, buf, strlen(buf));
+    snprintf(cgienv[0], MAXREQUESTLENGTH, 
+            "HTTP/1.1 200 OK\nServer: %s\n%s",
+            server_version, (cn->reqtype == TYPE_HEAD) ? "\n" : "");
+    special_write(cn, cgienv[0], strlen(cgienv[0]));
 
     if (cn->reqtype == TYPE_HEAD) 
     {
@@ -533,6 +516,12 @@ static void proccgi(struct connstruct *cn, int has_pathinfo)
         return;
     }
 
+#ifdef CONFIG_HTTP_VERBOSE
+        printf("[CGI]: %s:/%s\n", cn->is_ssl ? "https" : "http", cn->filereq);
+        TTY_FLUSH();
+#endif
+
+    /* win32 cgi is a bit too painful */
 #ifndef WIN32
     pipe(tpipe);
 
@@ -560,144 +549,139 @@ static void proccgi(struct connstruct *cn, int has_pathinfo)
 
     close(tpipe[0]);
     close(tpipe[1]);
-    myargs[0] = cn->actualfile;
-    myargs[1] = cn->cgiargs;
-    myargs[2] = NULL;
 
-    if (!has_pathinfo) 
+    myargs[0] = cn->actualfile;
+    myargs[1] = NULL;
+
+    /* 
+     * set the cgi args. A url is defined by:
+     * http://$SERVER_NAME:$SERVER_PORT$SCRIPT_NAME$PATH_INFO?$QUERY_STRING
+     * TODO: other CGI parameters?
+     */
+    sprintf(cgienv[cgi_index++], "SERVER_SOFTWARE=%s", server_version);
+    strcpy(cgienv[cgi_index++], "DOCUMENT_ROOT=" CONFIG_HTTP_WEBROOT);
+    snprintf(cgienv[cgi_index++], MAXREQUESTLENGTH,
+            "SERVER_NAME=%s", cn->server_name);
+    sprintf(cgienv[cgi_index++], "SERVER_PORT=%d", 
+            cn->is_ssl ? CONFIG_HTTP_HTTPS_PORT : CONFIG_HTTP_PORT);
+    snprintf(cgienv[cgi_index++], MAXREQUESTLENGTH,
+            "REQUEST_URI=%s", cn->uri_request);
+    snprintf(cgienv[cgi_index++], MAXREQUESTLENGTH,
+            "SCRIPT_NAME=%s", cn->filereq);
+    snprintf(cgienv[cgi_index++], MAXREQUESTLENGTH,
+            "PATH_INFO=%s", cn->uri_path_info);
+    snprintf(cgienv[cgi_index++], MAXREQUESTLENGTH,
+            "QUERY_STRING=%s", cn->uri_query);
+    snprintf(cgienv[cgi_index++], MAXREQUESTLENGTH,
+            "REMOTE_ADDR=%s", cn->remote_addr);
+
+    switch (cn->reqtype)
     {
-        my_strncpy(cn->cgipathinfo, "/", MAXREQUESTLENGTH);
-        my_strncpy(cn->cgiscriptinfo, cn->filereq, MAXREQUESTLENGTH);
+        case TYPE_GET: 
+            type = "GET";
+            break;
+
+        case TYPE_POST:
+            type = "POST";
+            sprintf(cgienv[cgi_index++], 
+                        "CONTENT_LENGTH=%d", cn->content_length);
+            strcpy(cgienv[cgi_index++], 
+                        "CONTENT_TYPE=application/x-www-form-urlencoded");
+            break;
     }
 
-    execv(cn->actualfile, myargs);
-#else /* WIN32 */
-    _pipe(tpipe, 8192, O_BINARY| O_NOINHERIT);
+    sprintf(cgienv[cgi_index++], "REQUEST_METHOD=%s", type);
 
-    myargs[0] = "sh";
-    myargs[1] = "-c";
-    myargs[2] = &cn->filereq[1];    /* ignore the inital "/" */
-    myargs[3] = cn->cgiargs;
-    myargs[4] = NULL;
+    if (cn->is_ssl)
+        strcpy(cgienv[cgi_index++], "HTTPS=on");
 
-    tmp_stdout = _dup(_fileno(stdout));
-    _dup2(tpipe[1], _fileno(stdout));
-    close(tpipe[1]);
+#ifdef CONFIG_PLATFORM_CYGWIN
+    /* TODO: find out why Lua needs this */
+    strcpy(cgienv[cgi_index++], "PATH=/usr/bin");
+#endif
 
-    /* change to suit execution method */
-    if (spawnl(P_NOWAIT, "c:\\Program Files\\cygwin\\bin\\sh.exe", 
-                myargs[0], myargs[1], myargs[2], myargs[3], myargs[4]) == -1) 
+    if (cgi_index >= CGI_ARG_SIZE)
     {
-        removeconnection(cn);
+        printf("Content-type: text/plain\n\nToo many CGI args\n");
         return;
     }
 
-    _dup2(tmp_stdout, _fileno(stdout));
-    close(tmp_stdout);
-    cn->filedesc = tpipe[0];
-    cn->state = STATE_WANT_TO_READ_FILE;
-    cn->close_when_done = 1;
+    /* copy across the pointer indexes */
+    for (i = 0; i < cgi_index; i++)
+        cgiptr[i] = cgienv[i];
 
-    for (;;)
-    {
-        procreadfile(cn);
-
-        if (cn->filedesc == -1)
-            break;
-
-        procsendfile(cn);
-        usleep(200000); /* don't know why this delay makes it work (yet) */
-    }
+    cgiptr[i] = NULL;
+    execve(myargs[0], myargs, cgiptr);
+    printf("Content-type: text/plain\n\nshouldn't get here\n");
 #endif
 }
 
-static int trycgi_withpathinfo(struct connstruct *cn)
-{
-    char tpfile[MAXREQUESTLENGTH];
-    char fr_str[MAXREQUESTLENGTH];
-    char *fr_rs[MAXCGIARGS]; /* filereq splitted */
-    int i = 0, offset;
-
-    my_strncpy(fr_str, cn->filereq, MAXREQUESTLENGTH);
-    split(fr_str, fr_rs, MAXCGIARGS, '/');
-
-    while (fr_rs[i] != NULL) 
-    {
-        snprintf(tpfile, sizeof(tpfile), "/%s%s", 
-                            cn->virtualhostreq, fr_str);
-
-        if (iscgi(tpfile) && isdir(tpfile) == 0)
-        {
-            /* We've found our CGI file! */
-            my_strncpy(cn->actualfile, tpfile, MAXREQUESTLENGTH);
-            my_strncpy(cn->cgiscriptinfo, fr_str, MAXREQUESTLENGTH);
-            offset = (fr_rs[i] + strlen(fr_rs[i])) - fr_str;
-            my_strncpy(cn->cgipathinfo, cn->filereq+offset, MAXREQUESTLENGTH);
-            return 0;
-        }
-
-        *(fr_rs[i]+strlen(fr_rs[i])) = '/';
-        i++;
-    }
-
-    /* Couldn't find any CGIs :( */
-    *(cn->cgiscriptinfo) = '\0';
-    *(cn->cgipathinfo) = '\0';
-    return -1;
-}
-
-static int iscgi(const char *fn)
+static char * cgi_filetype_match(struct connstruct *cn, const char *fn)
 {
     struct cgiextstruct *tp = cgiexts;
-    int fnlen, extlen;
-
-    fnlen = strlen(fn);
 
     while (tp != NULL) 
     {
-        extlen = strlen(tp->ext);
+        char *t;
 
-        if (strcasecmp(fn+(fnlen-extlen), tp->ext) == 0)
-            return 1;
+        if ((t = strstr(fn, tp->ext)) != NULL)
+        {
+
+            t += strlen(tp->ext);
+
+            if (*t == '/' || *t == '\0')
+            {
+                if (strcmp(tp->ext, ".lua") == 0 || strcmp(tp->ext, ".lp") == 0)
+                    cn->is_lua = 1;
+
+                return t;
+            }
+            else
+                return NULL;
+
+        }
 
         tp = tp->next;
     }
 
-    return 0;
+    return NULL;
 }
 
-static void split(char *tp, char *sp[], int maxwords, char sc)
+static void decode_path_info(struct connstruct *cn, char *path_info)
 {
-    int i = 0;
+    char *cgi_delim;
 
-    while(1) 
+    cn->is_cgi = 0;
+    cn->is_lua = 0;
+    *cn->uri_request = '\0';
+    *cn->uri_path_info = '\0';
+    *cn->uri_query = '\0';
+
+    my_strncpy(cn->uri_request, path_info, MAXREQUESTLENGTH);
+
+    /* query info? */
+    if ((cgi_delim = strchr(path_info, '?')))
     {
-        /* Skip leading whitespace */
-        while (*tp == sc) tp++;
-
-        if (*tp == '\0') 
-        {
-            sp[i] = NULL;
-            break;
-        }
-
-        if (i==maxwords-2) 
-        {
-            sp[maxwords-2] = NULL;
-            break;
-        }
-
-        sp[i] = tp;
-
-        while(*tp != sc && *tp != '\0') 
-            tp++;
-
-        if (*tp == sc) 
-            *tp++ = '\0';
-
-        i++;
+        *cgi_delim = '\0';
+        my_strncpy(cn->uri_query, cgi_delim+1, MAXREQUESTLENGTH);
     }
+
+    if ((cgi_delim = cgi_filetype_match(cn, path_info)) != NULL)
+    {
+        cn->is_cgi = 1;     /* definitely a CGI script */
+
+        /* path info? */
+        if (*cgi_delim != '\0')
+        {
+            my_strncpy(cn->uri_path_info, cgi_delim, MAXREQUESTLENGTH);
+            *cgi_delim = '\0';
+        }
+    }
+
+    /* the bit at the start must be the script name */
+    my_strncpy(cn->filereq, path_info, MAXREQUESTLENGTH);
 }
+
 #endif  /* CONFIG_HTTP_HAS_CGI */
 
 /* Decode string %xx -> char (in place) */
@@ -754,6 +738,15 @@ static int hexit(char c)
 static void buildactualfile(struct connstruct *cn)
 {
     char *cp;
+
+#if defined(CONFIG_HTTP_HAS_CGI)
+    /* use the lua launcher if this file has a lua extension */
+    if (cn->is_lua)
+    {
+        strcpy(cn->actualfile, CONFIG_HTTP_LUA_LAUNCHER);
+        return;
+    }
+#endif
 
 #ifdef CONFIG_HTTP_USE_CHROOT
     snprintf(cn->actualfile, MAXREQUESTLENGTH, "%s", cn->filereq);
@@ -937,7 +930,7 @@ static int auth_check(struct connstruct *cn)
 
 error:
     fclose(fp);
-    send_authenticate(cn, cn->virtualhostreq);
+    send_authenticate(cn, cn->server_name);
     return -1;
 }
 #endif

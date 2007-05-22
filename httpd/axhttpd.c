@@ -27,6 +27,7 @@
 struct serverstruct *servers;
 struct connstruct *usedconns;
 struct connstruct *freeconns;
+const char * const server_version = "axhttpd/"AXTLS_VERSION;
 
 static void addtoservers(int sd);
 static int openlistener(int port);
@@ -162,8 +163,8 @@ int main(int argc, char *argv[])
     addcgiext(CONFIG_HTTP_CGI_EXTENSIONS);
 #endif
 #if defined(CONFIG_HTTP_VERBOSE)
-    printf("axhttpd (%s): listening on ports %d (http) and %d (https)\n", 
-            ssl_version(), CONFIG_HTTP_PORT, CONFIG_HTTP_HTTPS_PORT);
+    printf("%s: listening on ports %d (http) and %d (https)\n", 
+            server_version, CONFIG_HTTP_PORT, CONFIG_HTTP_HTTPS_PORT);
     TTY_FLUSH();
 #endif
 
@@ -475,15 +476,15 @@ static void addconnection(int sd, char *ip, int is_ssl)
 #if defined(CONFIG_HTTP_HAS_DIRECTORIES)
     tp->dirp = NULL;
 #endif
-    *(tp->actualfile) = '\0';
-    *(tp->filereq) = '\0';
-#if defined(CONFIG_HTTP_HAS_CGI)
-    *(tp->cgiargs) = '\0';
-#endif
+    *tp->actualfile = '\0';
+    *tp->filereq = '\0';
     tp->state = STATE_WANT_TO_READ_HEAD;
     tp->reqtype = TYPE_GET;
     tp->close_when_done = 0;
     tp->timeout = time(NULL) + CONFIG_HTTP_TIMEOUT;
+#if defined(CONFIG_HTTP_HAS_CGI)
+    strcpy(tp->remote_addr, ip);
+#endif
 }
 
 void removeconnection(struct connstruct *cn) 
@@ -564,3 +565,4 @@ static void ax_chdir(void)
         exit(1);
     }
 }
+

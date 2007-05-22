@@ -53,20 +53,34 @@ config CONFIG_HTTP_TIMEOUT
     help
         Set the timeout of a connection in seconds.
 
+menu "CGI"
+
 config CONFIG_HTTP_HAS_CGI
     bool "Enable CGI"
     default n
+    depends on !CONFIG_PLATFORM_WIN32
     help
-        Enable the CGI capability.
+        Enable the CGI capability. Not available on Win32 platforms.
 
 config CONFIG_HTTP_CGI_EXTENSIONS
     string "CGI File Extension(s)"
-    default ".php,.sh"
+    default ".lua,.lp"
     depends on CONFIG_HTTP_HAS_CGI
     help
         Tell axhhtpd what file extension(s) are used for CGI.
 
-        This is a comma separated list.
+        This is a comma separated list - e.g. ".php,.pl" etc
+
+config CONFIG_HTTP_LUA_LAUNCHER
+    string "Lua's CGI Launcher"
+    default "/usr/local/bin/cgi" if CONFIG_PLATFORM_LINUX
+    default "/usr/local/bin/cgi.exe" if CONFIG_PLATFORM_CYGWIN
+    depends on CONFIG_HTTP_HAS_CGI
+
+    help
+        Lua has a special launcher application to run kepler/lua scripts.
+        ".lua and .lp" extensions must be defined in CONFIG_HTTP_CGI_EXTENSIONS.
+endmenu
 
 config CONFIG_HTTP_DIRECTORIES
     bool "Enable Directory Listing"

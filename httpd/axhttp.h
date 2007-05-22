@@ -26,17 +26,16 @@
 #endif
 
 #define MAXREQUESTLENGTH                    256
-#define MAXCGIARGS                          100
 #define BLOCKSIZE                           4096
 
 #define INITIAL_CONNECTION_SLOTS            10
 #define CONFIG_HTTP_DEFAULT_SSL_OPTIONS     0
 
-#define STATE_WANT_TO_READ_HEAD  1
-#define STATE_WANT_TO_SEND_HEAD  2
-#define STATE_WANT_TO_READ_FILE  3
-#define STATE_WANT_TO_SEND_FILE  4
-#define STATE_DOING_DIR          5
+#define STATE_WANT_TO_READ_HEAD             1
+#define STATE_WANT_TO_SEND_HEAD             2
+#define STATE_WANT_TO_READ_FILE             3
+#define STATE_WANT_TO_SEND_FILE             4
+#define STATE_DOING_DIR                     5
 
 enum
 {
@@ -67,7 +66,7 @@ struct connstruct
     char actualfile[MAXREQUESTLENGTH];
     char filereq[MAXREQUESTLENGTH];
     char dirname[MAXREQUESTLENGTH];
-    char virtualhostreq[MAXREQUESTLENGTH];
+    char server_name[MAXREQUESTLENGTH];
     int numbytes;
     char databuf[BLOCKSIZE];
     uint8_t is_ssl;
@@ -75,9 +74,13 @@ struct connstruct
     time_t if_modified_since;
 
 #if defined(CONFIG_HTTP_HAS_CGI)
-    char cgiargs[MAXREQUESTLENGTH];
-    char cgiscriptinfo[MAXREQUESTLENGTH];
-    char cgipathinfo[MAXREQUESTLENGTH];
+    uint8_t is_cgi;
+    uint8_t is_lua;
+    int content_length;
+    char remote_addr[MAXREQUESTLENGTH];
+    char uri_request[MAXREQUESTLENGTH];
+    char uri_path_info[MAXREQUESTLENGTH];
+    char uri_query[MAXREQUESTLENGTH];
 #endif
 #if defined(CONFIG_HTTP_HAS_AUTHORIZATION)
     char authorization[MAXREQUESTLENGTH];
@@ -104,6 +107,8 @@ struct cgiextstruct
 extern struct serverstruct *servers;
 extern struct connstruct *usedconns;
 extern struct connstruct *freeconns;
+extern const char * const server_version;
+
 #if defined(CONFIG_HTTP_HAS_CGI)
 extern struct cgiextstruct *cgiexts;
 #endif
