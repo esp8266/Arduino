@@ -37,6 +37,10 @@ ifdef CONFIG_PERL_BINDINGS
 all: perl/axTLSp_wrap.c
 endif
 
+ifdef CONFIG_LUA_BINDINGS
+all: lua/axTLSl_wrap.c
+endif
+
 csharp/axInterface.cs: ../ssl/ssl.h
 	@perl ./generate_interface.pl -csharp
 
@@ -55,9 +59,16 @@ perl/axTLSp.i: ../ssl/ssl.h
 perl/axTLSp_wrap.c: perl/axTLSp.i
 	@cd perl; swig -perl5 axTLSp.i; $(MAKE)
 
+lua/axTLSl.i: ../ssl/ssl.h
+	@perl ./generate_SWIG_interface.pl -lua
+
+lua/axTLSl_wrap.c: lua/axTLSl.i
+	@cd lua; swig -lua axTLSl.i; $(MAKE)
+
 clean::
 	$(MAKE) -C csharp clean
 	$(MAKE) -C vbnet clean
 	$(MAKE) -C java clean
 	$(MAKE) -C perl clean
+	$(MAKE) -C lua clean
 

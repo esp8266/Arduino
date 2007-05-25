@@ -86,4 +86,20 @@ config CONFIG_PERL_LIB
     default "perl58.lib"
 endmenu
 
+config CONFIG_LUA_BINDINGS
+    bool "Create Lua bindings"
+    default n
+    depends on CONFIG_BINDINGS && !CONFIG_PLATFORM_WIN32
+    help
+        Build Lua bindings (see www.lua.org).
+
+menu "Lua Home"
+depends on CONFIG_LUA_BINDINGS 
+config CONFIG_LUA_CORE
+    string "Location of Lua CORE"
+    default "/usr/local"
+    help:
+        If the Lua exists on another directory then this needs to be changed
+endmenu
+
 endmenu

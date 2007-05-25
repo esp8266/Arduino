@@ -121,10 +121,16 @@ elsif ($ARGV[0] eq "-perl")
     $module = "axtlsp";
     $interfaceFile = "perl/axTLSp.i";
 }
+elsif ($ARGV[0] eq "-lua")
+{
+    print "Generating lua interface file\n";
+    $module = "axtlsl";
+    $interfaceFile = "lua/axTLSl.i";
+}
 else
 {
 ouch:
-    die "Usage: $0 [-java | -perl]\n";
+    die "Usage: $0 [-java | -perl | -lua]\n";
 }
 
 # Input file required to generate SWIG interface file.
@@ -311,6 +317,10 @@ JNIEXPORT jint JNICALL Java_axTLSj_axtlsjJNI_getFd(JNIEnv *env, jclass jcls, job
         \$1 = NULL;
 }
 
+#endif
+
+/* Some SWIG magic to make the API a bit more Lua friendly */
+#ifdef SWIGLUA
 #endif
 
 END
