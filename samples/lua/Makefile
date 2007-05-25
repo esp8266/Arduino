@@ -1,5 +1,5 @@
 #
-#  Copyright(C) 2006 Cameron Rich
+#  Copyright(C) 2007 Cameron Rich
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,35 +16,16 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-all:
+include ../../config/.config
+include ../../config/makefile.conf
 
-include ../config/.config
-include ../config/makefile.conf
+all: samples
+TARGET=../../$(STAGE)/axssl.lua
+samples: $(TARGET)
 
-all:
-ifdef CONFIG_C_SAMPLES
-	$(MAKE) -C c
-endif
-ifdef CONFIG_CSHARP_SAMPLES
-	$(MAKE) -C csharp
-endif
-ifdef CONFIG_VBNET_SAMPLES
-	$(MAKE) -C vbnet
-endif
-ifdef CONFIG_JAVA_SAMPLES
-	$(MAKE) -C java
-endif
-ifdef CONFIG_PERL_SAMPLES
-	$(MAKE) -C perl
-endif
-ifdef CONFIG_LUA_SAMPLES
-	$(MAKE) -C lua
-endif
+$(TARGET): axssl.lua
+	install $< $@
 
 clean::
-	$(MAKE) -C c clean
-	$(MAKE) -C csharp clean
-	$(MAKE) -C vbnet clean
-	$(MAKE) -C java clean
-	$(MAKE) -C perl clean
-	$(MAKE) -C lua clean
+	-@rm -f $(TARGET)
+

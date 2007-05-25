@@ -58,16 +58,17 @@ sub get_native_sock
     return $is_win32 ? FdGetOsFHandle($sock) : $sock;
 }
 
-#
-# Main entry point. Doesn't do much except works out whether we are a client
-# or a server.
-#
+# print version?
 if ($#ARGV == 0 && $ARGV[0] eq "version")
 {
     printf("axssl.pl ".axtlsp::ssl_version()."\n");
     exit 0;
 }
 
+#
+# Main entry point. Doesn't do much except works out whether we are a client
+# or a server.
+#
 print_options($#ARGV > -1 ? $ARGV[0] : "")
         if ($#ARGV < 0 || ($ARGV[0] ne "s_server" && $ARGV[0] ne "s_client"));
 
@@ -494,7 +495,7 @@ sub print_options
 {
     my ($option) = @_;
     printf("axssl: Error: '%s' is an invalid command.\n", $option);
-    printf("usage: axssl [s_server|s_client] [args ...]\n");
+    printf("usage: axssl [s_server|s_client|version] [args ...]\n");
     exit 1;
 }
 
