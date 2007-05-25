@@ -51,6 +51,8 @@ lua:
 endif
 
 else # win32 build
+lua:
+
 TARGET=../$(STAGE)/axhttpd.exe
 TARGET2=../$(STAGE)/htpasswd.exe
 
