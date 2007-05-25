@@ -24,7 +24,7 @@
 #
 
 if grep "CONFIG_PLATFORM_WIN32=y" "../config/.config"  > /dev/null; then
-    JAVA_BIN="/cygdrive/c/Program Files/Java/jdk1.5.0_06/bin"
+    JAVA_EXE="/cygdrive/c/Program Files/Java/jdk1.5.0_06/bin/java.exe"
     PERL_BIN="/cygdrive/c/Perl/bin/perl"
     KILL_AXSSL="kill %1"
     KILL_CSHARP="kill %1"
@@ -37,13 +37,13 @@ else
         KILL_AXSSL="killall axssl"
         KILL_PERL="killall /usr/bin/perl"
     else     # Linux
-        JAVA_BIN=/usr/java/default/bin
+        JAVA_EXE=/usr/java/default/bin/java
         PERL_BIN=/usr/bin/perl
         KILL_AXSSL="killall axssl"
         KILL_CSHARP="killall mono"
         KILL_PERL="killall /usr/bin/perl"
         RUN_CSHARP="mono"
-        KILL_JAVA="killall $JAVA_BIN/java"
+        KILL_JAVA="killall $JAVA_EXE"
     fi
 fi
 
@@ -67,21 +67,21 @@ sleep 1
 ./axssl $SERVER_PEM_ARGS &
 echo "C Test passed" | ./axssl $CLIENT_PEM_ARGS
 $KILL_AXSSL
-sleep 2
+sleep 1
 echo "### C tests complete"
 fi
 
 if [ -f ./axtls.jar ]; then
 echo "########################## JAVA SAMPLE ###########################"
-"$JAVA_BIN/java" -jar ./axtls.jar $SERVER_ARGS &
-echo "Java Test passed" | "$JAVA_BIN/java" -jar ./axtls.jar $CLIENT_ARGS
+"$JAVA_EXE" -jar ./axtls.jar $SERVER_ARGS &
+echo "Java Test passed" | "$JAVA_EXE" -jar ./axtls.jar $CLIENT_ARGS
 $KILL_JAVA
 sleep 1
 
-"$JAVA_BIN/java" -jar ./axtls.jar $SERVER_PEM_ARGS &
-echo "Java Test passed" | "$JAVA_BIN/java" -jar ./axtls.jar $CLIENT_PEM_ARGS
+"$JAVA_EXE" -jar ./axtls.jar $SERVER_PEM_ARGS &
+echo "Java Test passed" | "$JAVA_EXE" -jar ./axtls.jar $CLIENT_PEM_ARGS
 $KILL_JAVA
-sleep 2
+sleep 1
 
 echo "### Java tests complete"
 fi
@@ -90,13 +90,11 @@ if [ -x ./axssl.csharp.exe ]; then
 echo "############################ C# SAMPLE ###########################"
 $RUN_CSHARP ./axssl.csharp.exe $SERVER_ARGS &
 echo "C# Test passed" | $RUN_CSHARP ./axssl.csharp.exe $CLIENT_ARGS
-sleep 1
 $KILL_CSHARP
 sleep 1
 
 $RUN_CSHARP ./axssl.csharp.exe $SERVER_PEM_ARGS &
 echo "C# Test passed" | $RUN_CSHARP ./axssl.csharp.exe $CLIENT_PEM_ARGS
-sleep 1
 $KILL_CSHARP
 sleep 1
 
@@ -106,13 +104,11 @@ fi
 if [ -x ./axssl.vbnet.exe ]; then
 echo "######################## VB.NET SAMPLE ###########################"
 ./axssl.vbnet $SERVER_ARGS &
-sleep 1
 echo "VB.NET Test passed" | ./axssl.vbnet.exe $CLIENT_ARGS
 kill %1
 sleep 1
 
 ./axssl.vbnet $SERVER_PEM_ARGS &
-sleep 1
 echo "VB.NET Test passed" | ./axssl.vbnet.exe $CLIENT_PEM_ARGS
 kill %1
 sleep 1
