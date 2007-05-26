@@ -35,20 +35,20 @@ axTLSj_wrap.o : axTLSj_wrap.c
 
 JAVA_FILES= \
 	axtlsjJNI.java \
-    axtlsjConstants.java \
-    axtlsj.java \
-    SSLReadHolder.java \
-    SSL.java \
-    SSLUtil.java \
-    SSLCTX.java \
-    SSLServer.java \
-    SSLClient.java
+	axtlsjConstants.java \
+	axtlsj.java \
+	SSLReadHolder.java \
+	SSL.java \
+	SSLUtil.java \
+	SSLCTX.java \
+	SSLServer.java \
+	SSLClient.java
 
 OBJ=axTLSj_wrap.o
 
-AXOLOTLS_HOME=../..
-SSL_HOME=$(AXOLOTLS_HOME)/ssl
-CONFIG_HOME=$(AXOLOTLS_HOME)/config
+AXTLS_HOME=../..
+SSL_HOME=$(AXTLS_HOME)/ssl
+CONFIG_HOME=$(AXTLS_HOME)/config
 JAVA_CLASSES:=$(JAVA_FILES:%.java=classes/axTLSj/%.class)
 
 ifdef CONFIG_PLATFORM_WIN32

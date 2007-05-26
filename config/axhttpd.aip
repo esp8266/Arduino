@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DOCUMENT type="Advanced Installer" CreateVersion="3.9" version="4.8.1" modules="freeware" RootPath="." Language="en">
+<DOCUMENT type="Advanced Installer" CreateVersion="3.9" version="4.9.2" modules="freeware" RootPath="." Language="en">
   <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
     <ROW Property="ALLUSERS" Value="2"/>
     <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install &lt;product name&gt;." ValueLocId="*"/>
@@ -8,10 +8,10 @@
     <ROW Property="BannerBitmap" Value="default_banner.bmp" Type="1"/>
     <ROW Property="DialogBitmap" Value="default_dialog.bmp" Type="1"/>
     <ROW Property="Manufacturer" Value="axTLS" ValueLocId="*"/>
-    <ROW Property="ProductCode" Value="1033:{85E11EB1-374E-43DF-B561-213DA3D47B87} "/>
+    <ROW Property="ProductCode" Value="1033:{A03ABCF7-73F5-483D-8F3D-64B822A1ED64} "/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Axhttpd" ValueLocId="*"/>
-    <ROW Property="ProductVersion" Value="1.1.4"/>
+    <ROW Property="ProductVersion" Value="1.1.5"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{93E5623E-740C-449C-9770-EDABD392868D}"/>
   </COMPONENT>
@@ -63,18 +63,17 @@
     <ROW File="crypto.h" Component_="bigint.h" FileName="crypto.h" Attributes="0" SourcePath="..\ssl\crypto.h" SelfReg="false" Sequence="14"/>
     <ROW File="favicon.ico" Component_="favicon.ico" FileName="favicon.ico" Attributes="0" SourcePath="..\www\favicon.ico" SelfReg="false" Sequence="10"/>
     <ROW File="health.sh" Component_="health.sh" FileName="health.sh" Attributes="0" SourcePath="..\www\test_dir\health.sh" SelfReg="false" Sequence="18"/>
-    <ROW File="htaccess" Component_="htaccess" FileName="htacce~1|.htaccess" Attributes="0" SourcePath="..\www\test_dir\no_ssl\.htaccess" SelfReg="false" Sequence="22"/>
-    <ROW File="htaccess_1" Component_="htaccess_1" FileName="htacce~1|.htaccess" Attributes="0" SourcePath="..\www\test_dir\no_http\.htaccess" SelfReg="false" Sequence="25"/>
-    <ROW File="htaccess_2" Component_="htaccess_2" FileName="htacce~1|.htaccess" Attributes="0" SourcePath="..\www\test_dir\bin\.htaccess" SelfReg="false" Sequence="24"/>
-    <ROW File="htpasswd" Component_="htaccess_1" FileName="htpass~1|.htpasswd" Attributes="0" SourcePath="..\www\test_dir\no_http\.htpasswd" SelfReg="false" Sequence="26"/>
-    <ROW File="htpasswd.exe" Component_="htpasswd.exe" FileName="htpasswd.exe" Attributes="0" SourcePath="..\_stage\htpasswd.exe" SelfReg="false" Sequence="21"/>
+    <ROW File="htaccess" Component_="htaccess" FileName="htacce~1|.htaccess" Attributes="0" SourcePath="..\www\test_dir\no_ssl\.htaccess" SelfReg="false" Sequence="21"/>
+    <ROW File="htaccess_1" Component_="htaccess_1" FileName="htacce~1|.htaccess" Attributes="0" SourcePath="..\www\test_dir\no_http\.htaccess" SelfReg="false" Sequence="24"/>
+    <ROW File="htaccess_2" Component_="htaccess_2" FileName="htacce~1|.htaccess" Attributes="0" SourcePath="..\www\test_dir\bin\.htaccess" SelfReg="false" Sequence="23"/>
+    <ROW File="htpasswd" Component_="htaccess_1" FileName="htpass~1|.htpasswd" Attributes="0" SourcePath="..\www\test_dir\no_http\.htpasswd" SelfReg="false" Sequence="25"/>
+    <ROW File="htpasswd.exe" Component_="htpasswd.exe" FileName="htpasswd.exe" Attributes="0" SourcePath="..\_stage\htpasswd.exe" SelfReg="false" Sequence="20"/>
     <ROW File="index.html" Component_="favicon.ico" FileName="index~1.htm|index.html" Attributes="0" SourcePath="..\www\index.html" SelfReg="false" Sequence="11"/>
-    <ROW File="index.html_1" Component_="htaccess" FileName="index~1.htm|index.html" Attributes="0" SourcePath="..\www\test_dir\no_ssl\index.html" SelfReg="false" Sequence="23"/>
-    <ROW File="index.html_2" Component_="htaccess_1" FileName="index~1.htm|index.html" Attributes="0" SourcePath="..\www\test_dir\no_http\index.html" SelfReg="false" Sequence="27"/>
+    <ROW File="index.html_1" Component_="htaccess" FileName="index~1.htm|index.html" Attributes="0" SourcePath="..\www\test_dir\no_ssl\index.html" SelfReg="false" Sequence="22"/>
+    <ROW File="index.html_2" Component_="htaccess_1" FileName="index~1.htm|index.html" Attributes="0" SourcePath="..\www\test_dir\no_http\index.html" SelfReg="false" Sequence="26"/>
     <ROW File="os_port.h" Component_="bigint.h" FileName="os_port.h" Attributes="0" SourcePath="..\ssl\os_port.h" SelfReg="false" Sequence="17"/>
-    <ROW File="some_text.txt" Component_="health.sh" FileName="some_t~1.txt|some_text.txt" Attributes="0" SourcePath="..\www\test_dir\some_text.txt" SelfReg="false" Sequence="19"/>
     <ROW File="ssl.h" Component_="bigint.h" FileName="ssl.h" Attributes="0" SourcePath="..\ssl\ssl.h" SelfReg="false" Sequence="12"/>
-    <ROW File="test_cgi.php" Component_="health.sh" FileName="test_cgi.php" Attributes="0" SourcePath="..\www\test_dir\test_cgi.php" SelfReg="false" Sequence="20"/>
+    <ROW File="test_cgi.php" Component_="health.sh" FileName="test_cgi.php" Attributes="0" SourcePath="..\www\test_dir\test_cgi.php" SelfReg="false" Sequence="19"/>
     <ROW File="tls1.h" Component_="bigint.h" FileName="tls1.h" Attributes="0" SourcePath="..\ssl\tls1.h" SelfReg="false" Sequence="15"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
@@ -140,7 +139,7 @@
     <ROW Shortcut="axssl_server" Directory_="SHORTCUTDIR" Name="axssls~1|axssl server" Component_="axssl.exe" Target="[#axssl.exe]" Arguments="s_server" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiUpgradeComponent">
-    <ROW UpgradeCode="UpgradeCode" VersionMax="ProductVersion" Attributes="1025"/>
-    <ROW UpgradeCode="UpgradeCode" VersionMin="ProductVersion" Attributes="2"/>
+    <ROW UpgradeCode="[|UpgradeCode]" VersionMax="[|ProductVersion]" Attributes="1025" ActionProperty="OLDPRODUCTS"/>
+    <ROW UpgradeCode="[|UpgradeCode]" VersionMin="[|ProductVersion]" Attributes="2" ActionProperty="AI_NEWERPRODUCTFOUND"/>
   </COMPONENT>
 </DOCUMENT>

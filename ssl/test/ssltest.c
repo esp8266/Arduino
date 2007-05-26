@@ -1647,7 +1647,7 @@ error:
 
 int multi_thread_test(void)
 {
-    int server_fd;
+    int server_fd = -1;
     SSL_CTX *ssl_server_ctx;
     SSL_CTX *ssl_clnt_ctx;
     pthread_t clnt_threads[NUM_THREADS];

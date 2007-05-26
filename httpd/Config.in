@@ -57,7 +57,7 @@ menu "CGI"
 
 config CONFIG_HTTP_HAS_CGI
     bool "Enable CGI"
-    default n
+    default y
     depends on !CONFIG_PLATFORM_WIN32
     help
         Enable the CGI capability. Not available on Win32 platforms.
@@ -100,13 +100,13 @@ endmenu
 
 config CONFIG_HTTP_DIRECTORIES
     bool "Enable Directory Listing"
-    default n
+    default y
     help
         Enable directory listing.
     
 config CONFIG_HTTP_HAS_AUTHORIZATION
     bool "Enable authorization"
-    default n
+    default y
     help
         Pages/directories can have passwords associated with them.
 
