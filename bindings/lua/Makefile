@@ -24,7 +24,7 @@ all: lib
 ifdef CONFIG_PLATFORM_WIN32
 TARGET=../../$(STAGE)/axtlsl.dll
 else
-TARGET=../../$(STAGE)/libaxtlsl.so
+TARGET=../../$(STAGE)/axtlsl.so
 endif
 
 ifneq ($(MAKECMDGOALS), clean)
@@ -36,11 +36,9 @@ CONFIG_HOME=$(AXTLS_HOME)/config
 OBJ:=axTLSl_wrap.o
 include ../../config/makefile.post
 
+# libaxtls has to be linked in as a single object for this (TODO: see if this is completely necessary)
 $(TARGET) : $(OBJ)
-	$(LD) $(LDFLAGS) -L ../../$(STAGE) -L $(CONFIG_LUA_CORE)/lib $(LDSHARED) -o $@ $(OBJ) -laxtls -llua
-ifdef CONFIG_PLATFORM_CYGWIN
-	cd ../../$(STAGE); ln -sf $(notdir $@) axtlsl.dll
-endif
+	$(LD) $(LDFLAGS) -L$(CONFIG_LUA_CORE)/lib $(LDSHARED) -o $@ $(OBJ) ../../$(STAGE)/libaxtls.a -llua
 
 CFLAGS += -I$(CONFIG_HOME) -I$(SSL_HOME) -I $(CONFIG_LUA_CORE)/include
 else

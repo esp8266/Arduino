@@ -300,10 +300,6 @@ JNIEXPORT jint JNICALL Java_axTLSj_axtlsjJNI_getFd(JNIEnv *env, jclass jcls, job
     }
 }
 
-%typemap(freearg) unsigned char *in_data {
-    free(buf\$argnum);
-}
-
 /* for ssl_client_new() */
 %typemap(in) const unsigned char session_id[] {
     /* check for a reference */
@@ -321,6 +317,32 @@ JNIEXPORT jint JNICALL Java_axTLSj_axtlsjJNI_getFd(JNIEnv *env, jclass jcls, job
 
 /* Some SWIG magic to make the API a bit more Lua friendly */
 #ifdef SWIGLUA
+/* for ssl_session_id() */
+%typemap(out) const unsigned char * {
+    int i;
+    lua_newtable(L);
+    for (i = 0; i < SSL_SESSION_ID_SIZE; i++){
+        lua_pushnumber(L,(lua_Number)result[i]);
+        lua_rawseti(L,-2,i+1); /* -1 is the number, -2 is the table */
+    }
+    SWIG_arg++;
+}
+
+%typemap(in) unsigned char **in_data (unsigned char *buf) {
+    \$1 = &buf;
+}
+
+%typemap(argout) unsigned char **in_data { 
+    if (result > SSL_OK) {
+		int i;
+		lua_newtable(L);
+		for (i = 0; i < result; i++){
+			lua_pushnumber(L,(lua_Number)buf2[i]);
+			lua_rawseti(L,-2,i+1); /* -1 is the number, -2 is the table */
+		}
+        SWIG_arg++;
+    }
+}
 #endif
 
 END
