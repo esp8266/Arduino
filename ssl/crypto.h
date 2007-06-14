@@ -64,7 +64,7 @@ void AES_convert_key(AES_CTX *ctx);
 
 typedef struct 
 {
-    int x, y, m[256];
+    uint8_t x, y, m[256];
 } RC4_CTX;
 
 void RC4_setup(RC4_CTX *s, const uint8_t *key, int length);

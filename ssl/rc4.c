@@ -29,7 +29,8 @@
  */
 void RC4_setup(RC4_CTX *ctx, const uint8_t *key, int length)
 {
-    int i, j = 0, k = 0, *m, a;
+    int i, j = 0, k = 0, a;
+    uint8_t *m;
 
     ctx->x = 0;
     ctx->y = 0;
@@ -56,7 +57,8 @@ void RC4_setup(RC4_CTX *ctx, const uint8_t *key, int length)
  */
 void RC4_crypt(RC4_CTX *ctx, const uint8_t *msg, uint8_t *out, int length)
 { 
-    int i, x, y, *m, a, b;
+    int i;
+    uint8_t *m, x, y, a, b;
     out = (uint8_t *)msg; 
 
     x = ctx->x;
@@ -65,9 +67,8 @@ void RC4_crypt(RC4_CTX *ctx, const uint8_t *msg, uint8_t *out, int length)
 
     for (i = 0; i < length; i++)
     {
-        x = (uint8_t)(x + 1); 
-        a = m[x];
-        y = (uint8_t)(y + a);
+        a = m[++x];
+        y += a;
         m[x] = b = m[y];
         m[y] = a;
         out[i] ^= m[(uint8_t)(a + b)];
