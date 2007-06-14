@@ -199,40 +199,6 @@ static void do_server(int argc, char *argv[])
         i++;
     }
 
-    /* Create socket for incoming connections */
-    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-    {
-        perror("socket");
-        return;
-    }
-      
-    setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
-
-    /* Construct local address structure */
-    memset(&serv_addr, 0, sizeof(serv_addr));      /* Zero out structure */
-    serv_addr.sin_family = AF_INET;                /* Internet address family */
-    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY); /* Any incoming interface */
-    serv_addr.sin_port = htons(port);              /* Local port */
-
-    /* Bind to the local address */
-    if (bind(server_fd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
-    {
-        perror("bind");
-        exit(1);
-    }
-
-    if (listen(server_fd, 5) < 0)
-    {
-        perror("listen");
-        exit(1);
-    }
-
-    client_len = sizeof(client_addr);
-
-    /*************************************************************************
-     * This is where the interesting stuff happens. Up until now we've
-     * just been setting up sockets etc. Now we do the SSL handshake.
-     *************************************************************************/
     if ((ssl_ctx = ssl_ctx_new(options, SSL_DEFAULT_SVR_SESS)) == NULL)
     {
         fprintf(stderr, "Error: Server context is invalid\n");
@@ -284,6 +250,40 @@ static void do_server(int argc, char *argv[])
     free(cert);
 #endif
 
+    /* Create socket for incoming connections */
+    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+    {
+        perror("socket");
+        return;
+    }
+      
+    setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
+
+    /* Construct local address structure */
+    memset(&serv_addr, 0, sizeof(serv_addr));      /* Zero out structure */
+    serv_addr.sin_family = AF_INET;                /* Internet address family */
+    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY); /* Any incoming interface */
+    serv_addr.sin_port = htons(port);              /* Local port */
+
+    /* Bind to the local address */
+    if (bind(server_fd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
+    {
+        perror("bind");
+        exit(1);
+    }
+
+    if (listen(server_fd, 5) < 0)
+    {
+        perror("listen");
+        exit(1);
+    }
+
+    client_len = sizeof(client_addr);
+
+    /*************************************************************************
+     * This is where the interesting stuff happens. Up until now we've
+     * just been setting up sockets etc. Now we do the SSL handshake.
+     *************************************************************************/
     for (;;)
     {
         SSL *ssl;
@@ -368,12 +368,12 @@ static void do_server(int argc, char *argv[])
                         }
                     }
 
-                    if (res > 0)    /* display our interesting output */
+                    if (res > SSL_OK)    /* display our interesting output */
                     {
                         printf("%s", read_buf);
                         TTY_FLUSH();
                     }
-                    else if (res < 0 && !quiet)
+                    else if (res < SSL_OK && !quiet)
                     {
                         ssl_display_error(res);
                     }
@@ -534,29 +534,6 @@ static void do_client(int argc, char *argv[])
         i++;
     }
 
-    client_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    memset(&client_addr, 0, sizeof(client_addr));
-    client_addr.sin_family = AF_INET;
-    client_addr.sin_port = htons(port);
-    client_addr.sin_addr.s_addr = sin_addr;
-
-    if (connect(client_fd, (struct sockaddr *)&client_addr, 
-                sizeof(client_addr)) < 0)
-    {
-        perror("connect");
-        exit(1);
-    }
-
-    if (!quiet)
-    {
-        printf("CONNECTED\n");
-        TTY_FLUSH();
-    }
-
-    /*************************************************************************
-     * This is where the interesting stuff happens. Up until now we've
-     * just been setting up sockets etc. Now we do the SSL handshake.
-     *************************************************************************/
     if ((ssl_ctx = ssl_ctx_new(options, SSL_DEFAULT_CLNT_SESS)) == NULL)
     {
         fprintf(stderr, "Error: Client context is invalid\n");
@@ -601,6 +578,29 @@ static void do_client(int argc, char *argv[])
 
     free(cert);
     free(ca_cert);
+
+    /*************************************************************************
+     * This is where the interesting stuff happens. Up until now we've
+     * just been setting up sockets etc. Now we do the SSL handshake.
+     *************************************************************************/
+    client_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    memset(&client_addr, 0, sizeof(client_addr));
+    client_addr.sin_family = AF_INET;
+    client_addr.sin_port = htons(port);
+    client_addr.sin_addr.s_addr = sin_addr;
+
+    if (connect(client_fd, (struct sockaddr *)&client_addr, 
+                sizeof(client_addr)) < 0)
+    {
+        perror("connect");
+        exit(1);
+    }
+
+    if (!quiet)
+    {
+        printf("CONNECTED\n");
+        TTY_FLUSH();
+    }
 
     /* Try session resumption? */
     if (reconnect)

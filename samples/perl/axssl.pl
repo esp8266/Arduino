@@ -230,53 +230,40 @@ sub do_server
         # do the actual SSL handshake
         my $res;
         my $buf;
+        my $connected = 0;
 
         while (1)
         {
             ($res, $buf) = axtlsp::ssl_read($ssl, undef);
             last if $res != $axtlsp::SSL_OK;
 
-            # check when the connection has been established
-            last if axtlsp::ssl_handshake_status($ssl) == $axtlsp::SSL_OK;
-
-            # could do something else here
-        }
-
-        if ($res == $axtlsp::SSL_OK) # connection established and ok
-        {
-            if (!$quiet)
+            if ($res == $axtlsp::SSL_OK) # connection established and ok
             {
-                display_session_id($ssl);
-                display_cipher($ssl);
+                if (axtlsp::ssl_handshake_status($ssl) == $axtlsp::SSL_OK)
+                {
+                    if (!$quiet && !$connected)
+                    {
+                        display_session_id($ssl);
+                        display_cipher($ssl);
+                    }
+
+                    $connected = 1;
+                }
             }
 
-            # now read (and display) whatever the client sends us
-            for (;;)
+            if ($res > $axtlsp::SSL_OK)
             {
-                # keep reading until we get something interesting
-                while (1)
-                {
-                    ($res, $buf) = axtlsp::ssl_read($ssl, undef);
-                    last if $res != $axtlsp::SSL_OK;
-
-                    # could do something else here
-                }
-
-                if ($res < $axtlsp::SSL_OK)
-                {
-                    printf("CONNECTION CLOSED\n") if not $quiet;
-                    last;
-                }
-
                 printf($$buf);
             }
-        }
-        elsif (!$quiet)
-        {
-            axtlsp::ssl_display_error($res);
+            else if ($res < $axtlsp::SSL_OK)
+            {
+                axtlsp::ssl_display_error($res) if not $quiet;
+                last;
+            }
         }
 
         # client was disconnected or the handshake failed.
+        printf("CONNECTION CLOSED\n") if not $quiet;
         axtlsp::ssl_free($ssl);
         $client_sock->close;
     }
@@ -518,7 +505,7 @@ sub print_server_options
     {
         printf(" -cert arg\t- certificate file to add (in addition to default)".
                                         " to chain -\n".
-          "\t\t  default DER format. Can repeat up to %d times\n", $cert_size);
+          "\t\t  Can repeat up to %d times\n", $cert_size);
         printf(" -key arg\t- Private key file to use - default DER format\n");
         printf(" -pass\t\t- private key file pass phrase source\n");
     }
