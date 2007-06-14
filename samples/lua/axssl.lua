@@ -248,7 +248,6 @@ function do_server(build_mode)
 
     -- Create socket for incoming connections
     local server_sock = socket.try(socket.bind("*", port))
-    local connected = false
 
     while true do
         if not quiet then print("ACCEPT") end
@@ -256,16 +255,15 @@ function do_server(build_mode)
         local ssl = axtlsl.ssl_server_new(ssl_ctx, client_sock:getfd())
 
         -- do the actual SSL handshake
+        local connected = false
         local res
         local buf
 
         while true do
-
             socket.select({client_sock}, nil)
             res, buf = axtlsl.ssl_read(ssl)
 
             if res == axtlsl.SSL_OK then -- connection established and ok
-                -- check when the connection has been established
                 if axtlsl.ssl_handshake_status(ssl) == axtlsl.SSL_OK then
                     if not quiet and not connected then
                         display_session_id(ssl)
@@ -282,14 +280,13 @@ function do_server(build_mode)
             elseif res < axtlsl.SSL_OK then 
                 if not quiet then
                     axtlsl.ssl_display_error(res)
-                    print("CONNECTION CLOSED")
                 end
                 break
             end
         end
 
         -- client was disconnected or the handshake failed.
-
+        print("CONNECTION CLOSED")
         axtlsl.ssl_free(ssl)
         client_sock:close()
     end
@@ -304,7 +301,8 @@ function do_client(build_mode)
     local i = 2
     local v
     local port = 4433
-    local options = bit.bor(axtlsl.SSL_SERVER_VERIFY_LATER, SSL_DISPLAY_CERTS)
+    local options = 
+            bit.bor(axtlsl.SSL_SERVER_VERIFY_LATER, axtlsl.SSL_DISPLAY_CERTS)
     local private_key_file = nil
     local reconnect = 0
     local quiet = false
@@ -324,10 +322,11 @@ function do_client(build_mode)
             end
 
             i = i + 1
-            -- TODO
-            --(host, port) = split(':', arg[i])
+            local t = string.find(arg[i], ":")
+            host = string.sub(arg[i], 1, t-1)
+            port = string.sub(arg[i], t+1)
         elseif arg[i] == "-cert" then
-            if i >= #arg >= cert_size-1 then
+            if i >= #arg or #cert >= cert_size then
                 print_client_options(build_mode, arg[i]) 
             end
 
@@ -342,7 +341,7 @@ function do_client(build_mode)
             private_key_file = arg[i]
             options = bit.bor(options, axtlsl.SSL_NO_DEFAULT_KEY)
         elseif arg[i] == "-CAfile" then
-            if i >= #arg >= ca_cert_size-1 then
+            if i >= #arg or #ca_cert >= ca_cert_size then
                 print_client_options(build_mode, arg[i]) 
             end
 
@@ -380,16 +379,6 @@ function do_client(build_mode)
         i = i + 1
     end
 
-    local client_sock = assert(socket.connect(host, port))
-    local ssl
-    local res
-
-    if not quiet then print("CONNECTED") end
-
-    ---------------------------------------------------------------------------
-    -- This is where the interesting stuff happens. Up until now we've
-    -- just been setting up sockets etc. Now we do the SSL handshake.
-    ---------------------------------------------------------------------------
     local ssl_ctx = axtlsl.ssl_ctx_new(options, axtlsl.SSL_DEFAULT_CLNT_SESS)
 
     if ssl_ctx == nil then 
@@ -427,12 +416,23 @@ function do_client(build_mode)
         end
     end
 
+    ---------------------------------------------------------------------------
+    -- This is where the interesting stuff happens. Up until now we've
+    -- just been setting up sockets etc. Now we do the SSL handshake.
+    ---------------------------------------------------------------------------
+    local client_sock = assert(socket.connect(host, port))
+    local ssl
+    local res
+
+    if not quiet then print("CONNECTED") end
+
     -- Try session resumption?
-    if reconnect then
+    if reconnect > 0 then
         local session_id = nil
         while reconnect do
             reconnect = reconnect - 1
-            ssl = axtlsl.ssl_client_new(ssl_ctx, client_sock:getfd(), session_id)
+            ssl = axtlsl.ssl_client_new(ssl_ctx, 
+                    client_sock:getfd(), session_id)
 
             res = ssl_handshake_status(ssl)
             if res ~= axtlsl.SSL_OK then
@@ -456,6 +456,7 @@ function do_client(build_mode)
 
     -- check the return status
     res = axtlsl.ssl_handshake_status(ssl)
+print("RES: "..res)
     if res ~= axtlsl.SSL_OK then
         if not quiet then axtlsl.ssl_display_error(res) end
         os.exit(1)
@@ -473,10 +474,10 @@ function do_client(build_mode)
         display_cipher(ssl)
     end
 
-    -- while <STDIN> do
     while true do
-        local cstring = pack("a*x", _)   -- add null terminator
-        res = axtlsl.ssl_write(ssl, cstring, length(cstring))
+        local x = { 65, 66, 67, 10, 0 }
+        local line = io.read()
+        res = axtlsl.ssl_write(ssl, x, #x)
         if res < axtlsl.SSL_OK then
             if not quiet then axtlsl.ssl_display_error(res) end
             break
