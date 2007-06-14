@@ -36,6 +36,9 @@ CONFIG_HOME=$(AXTLS_HOME)/config
 OBJ:=axTLSl_wrap.o
 include ../../config/makefile.post
 
+# there are a few static functions that aren't used
+CFLAGS += -funit-at-a-time
+
 # libaxtls has to be linked in as a single object for this (TODO: see if this is completely necessary)
 $(TARGET) : $(OBJ)
 	$(LD) $(LDFLAGS) -L$(CONFIG_LUA_CORE)/lib $(LDSHARED) -o $@ $(OBJ) ../../$(STAGE)/libaxtls.a -llua

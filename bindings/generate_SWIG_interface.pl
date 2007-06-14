@@ -37,9 +37,15 @@ sub transformSignature
             $line =~ s/const uint8_t \*(\w+)/const signed char $1\[\]/g;
             $line =~ s/uint8_t/signed char/g;
         }
-        else
+        elsif ($ARGV[0] eq "-perl")
         {
             $line =~ s/const uint8_t \*(\w+)/const unsigned char $1\[\]/g;
+            $line =~ s/uint8_t/unsigned char/g;
+        }
+        else # lua
+        {
+            $line =~ s/const uint8_t \*session_id/const unsigned char session_id\[\]/g;
+            $line =~ s/const uint8_t \*\w+/unsigned char *INPUT/g;
             $line =~ s/uint8_t/unsigned char/g;
         }
     }
@@ -144,8 +150,8 @@ open(DATA_IN, $data_file) || die("Could not open file ($data_file)!");
 open(DATA_OUT, ">$interfaceFile") || die("Cannot Open File");
 
 #
-# I wish I could say it was easy to generate the Perl/Java bindings, but each
-# had their own set of challenges... :-(.
+# I wish I could say it was easy to generate the Perl/Java/Lua bindings, 
+# but each had their own set of challenges... :-(.
 #
 print DATA_OUT << "END";
 %module $module\n
@@ -317,6 +323,9 @@ JNIEXPORT jint JNICALL Java_axTLSj_axtlsjJNI_getFd(JNIEnv *env, jclass jcls, job
 
 /* Some SWIG magic to make the API a bit more Lua friendly */
 #ifdef SWIGLUA
+SWIG_NUMBER_TYPEMAP(unsigned char);
+SWIG_TYPEMAP_NUM_ARR(uchar,unsigned char);
+
 /* for ssl_session_id() */
 %typemap(out) const unsigned char * {
     int i;
@@ -328,6 +337,7 @@ JNIEXPORT jint JNICALL Java_axTLSj_axtlsjJNI_getFd(JNIEnv *env, jclass jcls, job
     SWIG_arg++;
 }
 
+/* for ssl_read() */
 %typemap(in) unsigned char **in_data (unsigned char *buf) {
     \$1 = &buf;
 }
@@ -343,6 +353,15 @@ JNIEXPORT jint JNICALL Java_axTLSj_axtlsjJNI_getFd(JNIEnv *env, jclass jcls, job
         SWIG_arg++;
     }
 }
+
+/* for ssl_client_new() */
+%typemap(in) const unsigned char session_id[] {
+    if(!lua_isnumber(L,\$input))
+        \$1 = NULL;
+    else
+        \$1 = SWIG_get_uint_num_array_fixed(L,\$input, SSL_SESSION_ID_SIZE);
+}
+
 #endif
 
 END
