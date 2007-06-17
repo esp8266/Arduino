@@ -133,7 +133,7 @@ function do_server(build_mode)
     local port = 4433
     local options = axtlsl.SSL_DISPLAY_CERTS
     local quiet = false
-    local password = nil
+    local password = ""
     local private_key_file = nil
     local cert_size = axtlsl.ssl_get_config(axtlsl.SSL_MAX_CERT_CFG_OFFSET)
     local ca_cert_size = axtlsl.
@@ -208,6 +208,9 @@ function do_server(build_mode)
         i = i + 1
     end
 
+    -- Create socket for incoming connections
+    local server_sock = socket.try(socket.bind("*", port))
+
     ---------------------------------------------------------------------------
     -- This is where the interesting stuff happens. Up until now we've
     -- just been setting up sockets etc. Now we do the SSL handshake.
@@ -226,28 +229,25 @@ function do_server(build_mode)
             obj_type = axtlsl.SSL_OBJ_PKCS12 
         end
 
-        if axtlsl.ssl_obj_load(ssl_ctx, obj_type, 
-                                        private_key_file, password) then
+        if axtlsl.ssl_obj_load(ssl_ctx, obj_type, private_key_file, 
+                                        password) ~= axtlsl.SSL_OK then
             error("Private key '" .. private_key_file .. "' is undefined.")
         end
     end
 
     for _, v in ipairs(cert) do
-        if axtlsl.ssl_obj_load(ssl_ctx, axtlsl.SSL_OBJ_X509_CERT, v, "") 
-                                        ~= axtlsl.SSL_OK then
+        if axtlsl.ssl_obj_load(ssl_ctx, axtlsl.SSL_OBJ_X509_CERT, v, "") ~= 
+                                        axtlsl.SSL_OK then
             error("Certificate '"..v .. "' is undefined.")
         end
     end
 
     for _, v in ipairs(ca_cert) do
-        if axtlsl.ssl_obj_load(ssl_ctx, axtlsl.SSL_OBJ_X509_CACERT, v, "") 
-                                        ~= axtlsl.SSL_OK then
+        if axtlsl.ssl_obj_load(ssl_ctx, axtlsl.SSL_OBJ_X509_CACERT, v, "") ~= 
+                                        axtlsl.SSL_OK then
             error("Certificate '"..v .."' is undefined.")
         end
     end
-
-    -- Create socket for incoming connections
-    local server_sock = socket.try(socket.bind("*", port))
 
     while true do
         if not quiet then print("ACCEPT") end
@@ -306,7 +306,7 @@ function do_client(build_mode)
     local private_key_file = nil
     local reconnect = 0
     local quiet = false
-    local password = nil
+    local password = ""
     local session_id = {}
     local host = "127.0.0.1"
     local cert_size = axtlsl.ssl_get_config(axtlsl.SSL_MAX_CERT_CFG_OFFSET)
@@ -379,6 +379,16 @@ function do_client(build_mode)
         i = i + 1
     end
 
+    local client_sock = socket.try(socket.connect(host, port))
+    local ssl
+    local res
+
+    if not quiet then print("CONNECTED") end
+
+    ---------------------------------------------------------------------------
+    -- This is where the interesting stuff happens. Up until now we've
+    -- just been setting up sockets etc. Now we do the SSL handshake.
+    ---------------------------------------------------------------------------
     local ssl_ctx = axtlsl.ssl_ctx_new(options, axtlsl.SSL_DEFAULT_CLNT_SESS)
 
     if ssl_ctx == nil then 
@@ -396,45 +406,35 @@ function do_client(build_mode)
             obj_type = axtlsl.SSL_OBJ_PKCS12 
         end
 
-        if axtlsl.ssl_obj_load(ssl_ctx, obj_type, 
-                                    private_key_file, password) then
+        if axtlsl.ssl_obj_load(ssl_ctx, obj_type, private_key_file, 
+                                        password) ~= axtlsl.SSL_OK then
             error("Private key '"..private_key_file.."' is undefined.")
         end
     end
 
     for _, v in ipairs(cert) do
-        if axtlsl.ssl_obj_load(ssl_ctx, axtlsl.SSL_OBJ_X509_CERT, v, "") 
-                                        ~= axtlsl.SSL_OK then
+        if axtlsl.ssl_obj_load(ssl_ctx, axtlsl.SSL_OBJ_X509_CERT, v, "") ~= 
+                                        axtlsl.SSL_OK then
             error("Certificate '"..v .. "' is undefined.")
         end
     end
 
     for _, v in ipairs(ca_cert) do
-        if axtlsl.ssl_obj_load(ssl_ctx, axtlsl.SSL_OBJ_X509_CACERT, v, "") 
-                                        ~= axtlsl.SSL_OK then
+        if axtlsl.ssl_obj_load(ssl_ctx, axtlsl.SSL_OBJ_X509_CACERT, v, "") ~= 
+                                        axtlsl.SSL_OK then
             error("Certificate '"..v .."' is undefined.")
         end
     end
 
-    ---------------------------------------------------------------------------
-    -- This is where the interesting stuff happens. Up until now we've
-    -- just been setting up sockets etc. Now we do the SSL handshake.
-    ---------------------------------------------------------------------------
-    local client_sock = assert(socket.connect(host, port))
-    local ssl
-    local res
-
-    if not quiet then print("CONNECTED") end
-
     -- Try session resumption?
-    if reconnect > 0 then
+    if reconnect ~= 0 then
         local session_id = nil
-        while reconnect do
+        while reconnect > 0 do
             reconnect = reconnect - 1
             ssl = axtlsl.ssl_client_new(ssl_ctx, 
                     client_sock:getfd(), session_id)
 
-            res = ssl_handshake_status(ssl)
+            res = axtlsl.ssl_handshake_status(ssl)
             if res ~= axtlsl.SSL_OK then
                 if not quiet then axtlsl.ssl_display_error(res) end
                 axtlsl.ssl_free(ssl)
@@ -444,11 +444,12 @@ function do_client(build_mode)
             display_session_id(ssl)
             session_id = axtlsl.ssl_get_session_id(ssl)
 
-            if reconnect then
-                ssl_free(ssl)
+            if reconnect > 0 then
+                axtlsl.ssl_free(ssl)
                 client_sock:close()
-                client_sock = assert(socket.connect(host, port))
+                client_sock = socket.try(socket.connect(host, port))
             end
+
         end
     else
         ssl = axtlsl.ssl_client_new(ssl_ctx, client_sock:getfd(), nil)
@@ -456,7 +457,6 @@ function do_client(build_mode)
 
     -- check the return status
     res = axtlsl.ssl_handshake_status(ssl)
-print("RES: "..res)
     if res ~= axtlsl.SSL_OK then
         if not quiet then axtlsl.ssl_display_error(res) end
         os.exit(1)
@@ -475,9 +475,18 @@ print("RES: "..res)
     end
 
     while true do
-        local x = { 65, 66, 67, 10, 0 }
         local line = io.read()
-        res = axtlsl.ssl_write(ssl, x, #x)
+    if line == nil then break end
+        local bytes = {}
+
+        for i = 1, #line do
+            bytes[i] = line.byte(line, i)
+        end
+
+        bytes[#line+1] = 10      -- add carriage return, null
+        bytes[#line+2] = 0
+
+        res = axtlsl.ssl_write(ssl, bytes, #bytes)
         if res < axtlsl.SSL_OK then
             if not quiet then axtlsl.ssl_display_error(res) end
             break
@@ -513,7 +522,7 @@ end
 --
 function display_session_id(ssl)
     local session_id = axtlsl.ssl_get_session_id(ssl)
-    local i, v
+    local v
 
     print("-----BEGIN SSL SESSION PARAMETERS-----")
     for _, v in ipairs(session_id) do
@@ -532,4 +541,5 @@ end
 
 local build_mode = axtlsl.ssl_get_config(axtlsl.SSL_BUILD_MODE)
 _ = arg[1] == "s_server" and do_server(build_mode) or do_client(build_mode)
+os.exit(0)
 

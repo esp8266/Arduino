@@ -52,5 +52,12 @@ config CONFIG_PERL_SAMPLES
         Build the "Perl" version of axssl. The features enabled are very
         dependent on the build mode ('full' mode will give all features).
 
+config CONFIG_LUA_SAMPLES
+    bool "axssl - Lua version"
+    default y
+    depends on CONFIG_SAMPLES && CONFIG_LUA_BINDINGS
+    help
+        Build the "Lua" version of axssl. The features enabled are very
+        dependent on the build mode ('full' mode will give all features).
 endmenu
 

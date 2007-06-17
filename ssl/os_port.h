@@ -70,6 +70,8 @@ extern "C" {
 #define SOCKET_READ(A,B,C)      recv(A,B,C,0)
 #define SOCKET_WRITE(A,B,C)     send(A,B,C,0)
 #define SOCKET_CLOSE(A)         closesocket(A)
+#define SOCKET_BLOCK(A)         u_long argp = 0; \
+                                ioctlsocket(A, FIONBIO, &argp)
 #define srandom(A)              srand(A)
 #define random()                rand()
 #define getpid()                _getpid()
@@ -139,6 +141,8 @@ EXP_FUNC int STDCALL strcasecmp(const char *s1, const char *s2);
 #define SOCKET_READ(A,B,C)      read(A,B,C)
 #define SOCKET_WRITE(A,B,C)     write(A,B,C)
 #define SOCKET_CLOSE(A)         close(A)
+#define SOCKET_BLOCK(A)         int fd = fcntl(A, F_GETFL, NULL); \
+                                fcntl(A, F_SETFL, fd & ~O_NONBLOCK)
 #define TTY_FLUSH()
 
 #endif  /* Not Win32 */

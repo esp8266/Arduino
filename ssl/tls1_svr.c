@@ -39,7 +39,9 @@ static int process_cert_verify(SSL *ssl);
  */
 EXP_FUNC SSL * STDCALL ssl_server_new(SSL_CTX *ssl_ctx, int client_fd)
 {
-    SSL *ssl = ssl_new(ssl_ctx, client_fd);
+    SSL *ssl;
+
+    ssl = ssl_new(ssl_ctx, client_fd);
     ssl->next_state = HS_CLIENT_HELLO;
 
 #ifdef CONFIG_SSL_FULL_MODE

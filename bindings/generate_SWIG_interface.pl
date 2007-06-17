@@ -356,10 +356,10 @@ SWIG_TYPEMAP_NUM_ARR(uchar,unsigned char);
 
 /* for ssl_client_new() */
 %typemap(in) const unsigned char session_id[] {
-    if(!lua_isnumber(L,\$input))
+    if (lua_isnil(L,\$input))
         \$1 = NULL;
     else
-        \$1 = SWIG_get_uint_num_array_fixed(L,\$input, SSL_SESSION_ID_SIZE);
+        \$1 = SWIG_get_uchar_num_array_fixed(L,\$input, SSL_SESSION_ID_SIZE);
 }
 
 #endif

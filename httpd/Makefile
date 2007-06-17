@@ -43,7 +43,7 @@ ifdef CONFIG_HTTP_BUILD_LUA
 lua: kepler-1.1
 
 kepler-1.1:
-	@tar xvfz  kepler-1.1-snapshot-20070420-1741.tar.gz
+	@tar xvfz   kepler-1.1-snapshot-20070521-1825.tar.gz
 	@cat kepler.patch | patch -p0
 	cd kepler-1.1; ./configure --prefix=$(CONFIG_HTTP_LUA_PREFIX) --launcher=cgi --lua-suffix= ; make install
 else

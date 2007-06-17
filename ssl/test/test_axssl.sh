@@ -30,12 +30,14 @@ if grep "CONFIG_PLATFORM_WIN32=y" "../config/.config"  > /dev/null; then
     KILL_CSHARP="kill %1"
     KILL_PERL="kill %1"
     KILL_JAVA="kill %1"
+    KILL_LUA="kill %1"
 else
     if grep "CONFIG_PLATFORM_CYGWIN=y" "../config/.config"  > /dev/null; then
         # no .net or java on cygwin
         PERL_BIN=/usr/bin/perl
         KILL_AXSSL="killall axssl"
         KILL_PERL="killall /usr/bin/perl"
+        KILL_LUA="killall /usr/local/bin/lua"
     else     # Linux
         JAVA_EXE=/usr/java/default/bin/java
         PERL_BIN=/usr/bin/perl
@@ -44,6 +46,7 @@ else
         KILL_PERL="killall /usr/bin/perl"
         RUN_CSHARP="mono"
         KILL_JAVA="killall $JAVA_EXE"
+        KILL_LUA="killall /usr/local/bin/lua"
     fi
 fi
 
@@ -127,6 +130,20 @@ echo "Perl Test passed" | "$PERL_BIN" ./axssl.pl $CLIENT_PEM_ARGS
 $KILL_PERL
 sleep 1
 echo "### Perl tests complete"
+fi
+
+if [ -f ./axssl.lua ]; then
+echo "########################## LUA SAMPLE ###########################"
+./axssl.lua $SERVER_ARGS &
+echo "Lua Test passed" | ./axssl.lua $CLIENT_ARGS
+$KILL_LUA
+sleep 1
+
+./axssl.lua $SERVER_PEM_ARGS &
+echo "Lua Test passed" | ./axssl.lua $CLIENT_PEM_ARGS
+$KILL_LUA
+sleep 1
+echo "### Lua tests complete"
 fi
 
 echo "########################## ALL TESTS COMPLETE ###########################"
