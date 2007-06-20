@@ -40,7 +40,7 @@ include ../../config/makefile.post
 CFLAGS += -funit-at-a-time
 
 $(TARGET) : $(OBJ)
-	$(LD) $(LDFLAGS) -L../../$(STAGE) -L$(CONFIG_LUA_CORE)/lib $(LDSHARED) -o $@ $(OBJ) -laxtls -llua
+	$(LD) $(LDFLAGS) $(LDSHARED) -o $^ -L../../$(STAGE) -L$(CONFIG_LUA_CORE)/lib -laxtls -llua
 
 CFLAGS += -I$(CONFIG_HOME) -I$(SSL_HOME) -I $(CONFIG_LUA_CORE)/include
 else

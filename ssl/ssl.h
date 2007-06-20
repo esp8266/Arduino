@@ -31,10 +31,10 @@
  * - ASN.1, X.509, PKCS#8, PKCS#12 keys/certificates with DER/PEM encoding.
  * - Highly configurable compile time options.
  * - Portable across many platforms (written in ANSI C), and has language
- * bindings in C, C#, VB.NET, Java and Perl.
+ * bindings in C, C#, VB.NET, Java, Perl and Lua.
  * - Partial openssl API compatibility (via a wrapper).
- * - A very small footprint for a HTTPS server (around 60-70kB in 'server-only'
- * mode).
+ * - A very small footprint (around 50-60kB for the library in 'server-only' 
+ *   mode).
  * - No dependencies on sockets - can use serial connections for example.
  * - A very simple API - ~ 20 functions/methods.
  *
