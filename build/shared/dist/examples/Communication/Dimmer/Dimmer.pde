@@ -72,3 +72,20 @@ void draw()
   port.write(mouseX);
 }
 */
+
+/* Max/MSP patch for this example
+
+max v2;
+#N vpatcher 10 59 610 459;
+#P user uslider 286 66 18 128 255 1 0 0;
+#P window setfont "Sans Serif" 9.;
+#P window linecount 1;
+#P message 212 192 32 196617 print;
+#P newex 286 217 71 196617 serial a 9600;
+#P window linecount 2;
+#P comment 316 148 100 196617 Slide the fader to dim the LED;
+#P comment 69 192 125 196617 Click here to get a list of serial ports;
+#P fasten 4 0 2 0 291 215 291 215;
+#P fasten 3 0 2 0 217 212 291 212;
+#P pop;
+*/

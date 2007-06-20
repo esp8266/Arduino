@@ -88,3 +88,33 @@ void draw()
   rect(50, 50, 100, 100);  // draw square 
 } 
 */
+
+/* Max/MSP patch for this example. 
+
+max v2;
+#N vpatcher 140 160 740 560;
+#P window setfont "Sans Serif" 9.;
+#P window linecount 1;
+#P comment 333 191 100 196617 Converts to integer;
+#P window linecount 2;
+#P comment 333 127 100 196617 bangs H for on \, L for off;
+#P window linecount 1;
+#P newex 263 127 41 196617 sel 1 0;
+#P toggle 263 54 60 0;
+#P message 278 151 14 196617 L;
+#P newex 263 191 40 196617 atoi;
+#P message 263 151 14 196617 H;
+#P message 224 191 32 196617 print;
+#P newex 263 217 71 196617 serial a 9600;
+#P window linecount 2;
+#P comment 333 75 100 196617 Click here to turn on or off the LED;
+#P comment 121 191 98 196617 Click to get a list of the serial ports;
+#P connect 7 0 8 0;
+#P connect 8 0 4 0;
+#P fasten 4 0 5 0 268 178 268 178;
+#P fasten 6 0 5 0 283 178 268 178;
+#P fasten 3 0 2 0 229 212 268 212;
+#P fasten 5 0 2 0 268 212 268 212;
+#P connect 8 1 6 0;
+#P pop;
+*/
