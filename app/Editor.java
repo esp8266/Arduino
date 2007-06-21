@@ -2013,7 +2013,7 @@ public class Editor extends JFrame
         try {
           //boolean success = sketch.isLibrary() ?
           //sketch.exportLibrary() : sketch.exportApplet();
-          Uploader uploader = new Uploader();
+          Uploader uploader = new UispUploader();
           boolean success = parallel ? 
             uploader.burnBootloaderParallel() :
             uploader.burnBootloaderAVRISP();

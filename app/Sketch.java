@@ -1675,7 +1675,7 @@ public class Sketch {
 
     // download the program
     //
-    Uploader uploader = new Uploader();
+    Uploader uploader = new UispUploader();
     // macos9 now officially broken.. see PdeCompilerJavac
     //PdeCompiler compiler =
     //  ((PdeBase.platform == PdeBase.MACOS9) ?

@@ -1,7 +1,7 @@
 /* -*- mode: jde; c-basic-offset: 2; indent-tabs-mode: nil -*- */
 
 /*
-  Uploader - default downloader class that connects to uisp
+  Uploader - abstract uploading baseclass (common to both uisp and avrdude)
   Part of the Arduino project - http://www.arduino.cc/
 
   Copyright (c) 2004-05
@@ -38,7 +38,7 @@ import gnu.io.*;
 //#endif
 
 
-public class Uploader implements MessageConsumer  {
+public abstract class Uploader implements MessageConsumer  {
   static final String BUGS_URL =
     "https://developer.berlios.de/bugs/?group_id=3590";
   static final String SUPER_BADNESS =
@@ -55,85 +55,40 @@ public class Uploader implements MessageConsumer  {
   public Uploader() {
   }
 
-  public boolean uploadUsingPreferences(String buildPath, String className)
-    throws RunnerException {
-    List commandDownloader = new ArrayList();
-    commandDownloader.add("-dprog=" + Preferences.get("upload.programmer"));
-    if (Preferences.get("upload.programmer").equals("dapa"))
-      commandDownloader.add("-dlpt=" + Preferences.get("parallel.port"));
-    else {
-      commandDownloader.add(
-        "-dserial=" + (Base.isWindows() ?
-          "/dev/" + Preferences.get("serial.port").toLowerCase() :
-          Preferences.get("serial.port")));
-      commandDownloader.add(
-        "-dspeed=" + Preferences.getInteger("serial.download_rate"));
+  public abstract boolean uploadUsingPreferences(String buildPath, String className)
+    throws RunnerException;
+
+  public abstract boolean burnBootloaderAVRISP() throws RunnerException;
+  
+  public abstract boolean burnBootloaderParallel() throws RunnerException;
+  
+  protected void flushSerialBuffer() {
+    // Cleanup the serial buffer
+    Serial serialPort = new Serial();
+    byte[] readBuffer;
+    while(serialPort.available() > 0) {
+      readBuffer = serialPort.readBytes();
+      try {
+        Thread.sleep(100);
+      } catch (InterruptedException e) {}
     }
-    if (Preferences.getBoolean("upload.erase"))
-      commandDownloader.add("--erase");
-    commandDownloader.add("--upload");
-    if (Preferences.getBoolean("upload.verify"))
-      commandDownloader.add("--verify");
-    commandDownloader.add("if=" + buildPath + File.separator + className + ".hex");
-    return uisp(commandDownloader);
+    serialPort.dispose();
   }
 
-  public boolean burnBootloaderAVRISP() throws RunnerException {
-    List commandDownloader = new ArrayList();
-    commandDownloader.add("-dprog=" + Preferences.get("bootloader.programmer"));
-    commandDownloader.add(
-      "-dserial=" + (Base.isWindows() ?
-        "/dev/" + Preferences.get("serial.port").toLowerCase() :
-        Preferences.get("serial.port")));
-    commandDownloader.add("-dspeed=" + Preferences.get("serial.burn_rate"));
-    return burnBootloader(commandDownloader);
-  }
-  
-  public boolean burnBootloaderParallel() throws RunnerException {
-    List commandDownloader = new ArrayList();
-    commandDownloader.add("-dprog=dapa");
-    commandDownloader.add("-dlpt=" + Preferences.get("parallel.port"));
-    return burnBootloader(commandDownloader);
-  }
-  
-  protected boolean burnBootloader(Collection params) throws RunnerException {
-    // I know this is ugly; apologies - that's what happens when you try to
-    // write Lisp-style code in Java.
-    return
-      // unlock bootloader segment of flash memory
-      uisp(params, Arrays.asList(new String[] {
-        "--wr_lock=" + Preferences.get("bootloader.unlock_bits") })) &&
-      // write fuses:
-      // bootloader size of 512 words; from 0xE00-0xFFF
-      // clock speed of 16 MHz, external quartz
-      uisp(params, Arrays.asList(new String[] {
-          "--wr_fuse_l=" + Preferences.get("bootloader.low_fuses"),
-          "--wr_fuse_h=" + Preferences.get("bootloader.high_fuses") })) &&
-      // upload bootloader
-      uisp(params, Arrays.asList(new String[] {
-          "--erase", "--upload", "--verify",
-          "if=" + Preferences.get("bootloader.path") + File.separator +
-          Preferences.get("bootloader.file") })) &&
-      // lock bootloader segment
-      uisp(params, Arrays.asList(new String[] {
-        "--wr_lock=" + Preferences.get("bootloader.lock_bits") }));
-  }
-  
-  public boolean uisp(Collection p1, Collection p2) throws RunnerException {
-    ArrayList p = new ArrayList(p1);
-    p.addAll(p2);
-    return uisp(p);
-  }
-  
-  public boolean uisp(Collection params) throws RunnerException {
-    String userdir = System.getProperty("user.dir") + File.separator;
-
+  protected boolean executeUploadCommand(Collection commandDownloader) 
+    throws RunnerException
+  {
     firstErrorFound = false;  // haven't found any errors yet
     secondErrorFound = false;
     notFoundError = false;
     int result=0; // pre-initialized to quiet a bogus warning from jikes
+    
+    String userdir = System.getProperty("user.dir") + File.separator;
+
     try {
-      List commandDownloader = new ArrayList();
+      String[] commandArray = new String[commandDownloader.size()];
+      commandDownloader.toArray(commandArray);
+      
       String avrBasePath;
       if(Base.isMacOS()) {
         avrBasePath = new String("tools/avr/bin/"); 
@@ -144,25 +99,9 @@ public class Uploader implements MessageConsumer  {
       else {
         avrBasePath = new String(userdir + "tools/avr/bin/"); 
       }
-      commandDownloader.add(avrBasePath + "uisp");
-      //commandDownloader.add((!Base.isMacOS() ? "" : userdir) + "tools/avr/bin/uisp");
-      if (Preferences.getBoolean("upload.verbose"))
-        commandDownloader.add("-v=4");
-      commandDownloader.add("-dpart=" + Preferences.get("build.mcu"));
-      commandDownloader.addAll(params);
-  	  //commandDownloader.add("-v=4"); // extra verbosity for help debugging.
-
-      // Cleanup the serial buffer
-      Serial serialPort = new Serial();
-      byte[] readBuffer;
-      while(serialPort.available() > 0) {
-        readBuffer = serialPort.readBytes();
-        Thread.sleep(100);
-      }
-      serialPort.dispose();
-
-      String[] commandArray = new String[commandDownloader.size()];
-      commandDownloader.toArray(commandArray);
+      
+      commandArray[0] = avrBasePath + commandArray[0];
+      
       if (Preferences.getBoolean("upload.verbose")) {
         for(int i = 0; i < commandArray.length; i++) {
           System.out.print(commandArray[i] + " ");
