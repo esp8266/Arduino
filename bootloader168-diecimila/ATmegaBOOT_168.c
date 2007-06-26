@@ -6,6 +6,9 @@
 /*                                                        */
 /* ATmegaBOOT.c                                           */
 /*                                                        */
+/* 20070626: hacked for Arduino Diecimila (which auto-    */
+/*           resets when a USB connection is made to it)  */
+/*           by D. Mellis                                 */
 /* 20060802: hacked for Arduino by D. Cuartielles         */
 /*           based on a previous hack by D. Mellis        */
 /*           and D. Cuartielles                           */
@@ -50,9 +53,7 @@
 /* m8515,m8535. ATmega161 has a very small boot block so  */
 /* isn't supported.                                       */
 /*                                                        */
-/* Tested with m128,m8,m163 - feel free to let me know    */
-/* how/if it works for you.                               */
-/*                                                        */
+/* Tested with m168                                       */
 /**********************************************************/
 
 /* $Id$ */
