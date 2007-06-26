@@ -118,24 +118,37 @@ public class AvrdudeUploader extends Uploader  {
   }
   
   public boolean uisp(Collection params) throws RunnerException {
-      flushSerialBuffer();
+    flushSerialBuffer();
 
-      List commandDownloader = new ArrayList();
-      commandDownloader.add("avrdude");
-      if (Preferences.getBoolean("upload.verbose")) {
-        commandDownloader.add("-v");
-        commandDownloader.add("-v");
-        commandDownloader.add("-v");
-        commandDownloader.add("-v");
-      } else {
-        commandDownloader.add("-q");
-        commandDownloader.add("-q");
-      }
-      // XXX: quick hack to chop the "atmega" off of "atmega8" and "atmega168",
-      // then shove an "m" at the beginning.  won't work for attiny's, etc.
-      commandDownloader.add("-pm" + Preferences.get("build.mcu").substring(6));
-      commandDownloader.addAll(params);
+    String userdir = System.getProperty("user.dir") + File.separator;
+    String avrBasePath;
+    if(Base.isMacOS()) {
+      avrBasePath = new String("tools/avr/etc/"); 
+    }
+    else if(Base.isLinux()) {
+      avrBasePath = new String("");     	
+    }
+    else {
+      avrBasePath = new String(userdir + "tools/avr/etc/"); 
+    }
 
-      return executeUploadCommand(commandDownloader);
+    List commandDownloader = new ArrayList();
+    commandDownloader.add("avrdude");
+    commandDownloader.add("-C" + avrBasePath + File.separator + "avrdude.conf");
+    if (Preferences.getBoolean("upload.verbose")) {
+      commandDownloader.add("-v");
+      commandDownloader.add("-v");
+      commandDownloader.add("-v");
+      commandDownloader.add("-v");
+    } else {
+      commandDownloader.add("-q");
+      commandDownloader.add("-q");
+    }
+    // XXX: quick hack to chop the "atmega" off of "atmega8" and "atmega168",
+    // then shove an "m" at the beginning.  won't work for attiny's, etc.
+    commandDownloader.add("-pm" + Preferences.get("build.mcu").substring(6));
+    commandDownloader.addAll(params);
+
+    return executeUploadCommand(commandDownloader);
   }
 }
