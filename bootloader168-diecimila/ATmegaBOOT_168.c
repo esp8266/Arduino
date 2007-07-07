@@ -78,7 +78,10 @@
 /* 20060803: hacked by DojoCorp */
 /* 20070626: hacked by David A. Mellis to decrease waiting time for auto-reset */
 /* set the waiting time for the bootloader */
-#define MAX_TIME_COUNT (F_CPU>>5)
+#define MAX_TIME_COUNT (F_CPU>>4)
+
+/* 20070707: hacked by David A. Mellis - after this many errors give up and launch application */
+#define MAX_ERROR_COUNT 5
 
 /* set the UART baud rate */
 /* 20060803: hacked by DojoCorp */
@@ -236,6 +239,8 @@ uint8_t pagesz=0x80;
 uint8_t i;
 uint8_t bootuart = 0;
 
+uint8_t error_count = 0;
+
 void (*app_start)(void) = 0x0000;
 
 
@@ -387,6 +392,9 @@ int main(void)
 		putch('S');
 		putch('P');
 		putch(0x10);
+	    } else {
+		if (++error_count == MAX_ERROR_COUNT)
+		    app_start();
 	    }
 	}
 
@@ -600,6 +608,9 @@ int main(void)
 		}
 		putch(0x14);
 		putch(0x10);
+	    } else {
+		if (++error_count == MAX_ERROR_COUNT)
+		    app_start();
 	    }		
 	}
     
@@ -654,6 +665,9 @@ int main(void)
 		putch(SIG2);
 		putch(SIG3);
 		putch(0x10);
+	    } else {
+		if (++error_count == MAX_ERROR_COUNT)
+		    app_start();
 	    }
 	}
 
@@ -777,8 +791,9 @@ int main(void)
 	}
 	/* end of monitor */
 #endif
-
-
+	else if (++error_count == MAX_ERROR_COUNT) {
+	    app_start();
+	}
     }
     /* end of forever loop */
 
@@ -919,6 +934,9 @@ void byte_response(uint8_t val)
 	putch(0x14);
 	putch(val);
 	putch(0x10);
+    } else {
+	if (++error_count == MAX_ERROR_COUNT)
+	    app_start();
     }
 }
 
@@ -928,6 +946,9 @@ void nothing_response(void)
     if (getch() == ' ') {
 	putch(0x14);
 	putch(0x10);
+    } else {
+	if (++error_count == MAX_ERROR_COUNT)
+	    app_start();
     }
 }
 
