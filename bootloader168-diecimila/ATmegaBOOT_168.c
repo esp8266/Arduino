@@ -260,8 +260,11 @@ int main(void)
     BL_PORT |= _BV(BL0);
     BL_PORT |= _BV(BL1);
 #else
+    /* We run the bootloader regardless of the state of this pin.  Thus, don't
+    put it in a different state than the other pins.  --DAM, 070709
     BL_DDR &= ~_BV(BL);
     BL_PORT |= _BV(BL);
+    */
 #endif
 
 
