@@ -46,6 +46,12 @@ Processing and Wiring.
 
 UPDATES
 
+0009
+
+* Fixed a bug in SoftwareSerial (a hardware serial function was being called
+  instead of the software serial equivalent).  Thanks to brianbr for the
+  report and fix.
+
 0008
 
 * Updated examples (in distribution and on the website).

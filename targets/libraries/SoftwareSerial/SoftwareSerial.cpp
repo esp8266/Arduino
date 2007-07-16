@@ -213,7 +213,7 @@ void SoftwareSerial::printNumber(unsigned long n, uint8_t base)
   unsigned long i = 0;
 
   if (n == 0) {
-    printByte('0');
+    print('0');
     return;
   } 
 
