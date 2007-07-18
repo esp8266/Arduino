@@ -286,13 +286,34 @@ serial.download_rate=19200
 serial.debug_rate=9600
 serial.burn_rate=115200
 
-bootloader.low_fuses=0xdf
-bootloader.high_fuses=0xca
-bootloader.path=bootloader
-bootloader.file=ATmegaBOOT.hex
-bootloader.unlock_bits=0xFF
-bootloader.lock_bits=0xCF
-bootloader.programmer=stk500
+bootloader.atmega8.low_fuses=0xdf
+bootloader.atmega8.high_fuses=0xca
+bootloader.atmega8.path=bootloader
+bootloader.atmega8.file=ATmegaBOOT.hex
+bootloader.atmega8.unlock_bits=0xFF
+bootloader.atmega8.lock_bits=0xCF
+bootloader.atmega8.programmer=stk500
+bootloader.atmega8.communication=serial
+
+bootloader.atmega168-ng.low_fuses=0xff
+bootloader.atmega168-ng.high_fuses=0xdf
+bootloader.atmega168-ng.extended_fuses=0x00
+bootloader.atmega168-ng.path=bootloader168-ng
+bootloader.atmega168-ng.file=ATmegaBOOT.hex
+bootloader.atmega168-ng.unlock_bits=0x3F
+bootloader.atmega168-ng.lock_bits=0x0F
+bootloader.atmega168-ng.programmer=avrispmkii
+bootloader.atmega168-ng.communication=usb
+
+bootloader.atmega168-diecimila.low_fuses=0xff
+bootloader.atmega168-diecimila.high_fuses=0xdf
+bootloader.atmega168-diecimila.extended_fuses=0x00
+bootloader.atmega168-diecimila.path=bootloader168-diecimila
+bootloader.atmega168-diecimila.file=ATmegaBOOT.hex
+bootloader.atmega168-diecimila.unlock_bits=0x3F
+bootloader.atmega168-diecimila.lock_bits=0x0F
+bootloader.atmega168-diecimila.programmer=avrispmkii
+bootloader.atmega168-diecimila.communication=usb
 
 # set the build defaults
 build.mcu=atmega168
