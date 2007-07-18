@@ -2,6 +2,18 @@
 # E.Lins, 18.7.2005
 # $Id$
 
+# Instructions
+#
+# To build the bootloader for the Diecimila:
+# make diecimila
+#
+# To build the bootloader for the NG/Mini:
+# make ng
+#
+# To burn the bootloader:
+# make TARGET=diecimila isp
+# make TARGET=ng isp
+
 # program name should not be changed...
 PROGRAM    = ATmegaBOOT_168
 
@@ -26,13 +38,13 @@ LDSECTION  = --section-start=.text=0x3800
 # lock it), but since the high two bits of the lock byte are
 # unused, avrdude would get confused.
 ISPFUSES    = avrdude -c $(ISPTOOL) -p m168 -P $(ISPPORT) $(ISPSPEED) -e -u -U lock:w:0x3f:m -U efuse:w:0x00:m -U hfuse:w:0xdf:m -U lfuse:w:0xff:m
-ISPFLASH    = avrdude -c $(ISPTOOL) -p m168 -P $(ISPPORT) $(ISPSPEED) -U flash:w:$(PROGRAM).hex -U lock:w:0x0f:m
+ISPFLASH    = avrdude -c $(ISPTOOL) -p m168 -P $(ISPPORT) $(ISPSPEED) -U flash:w:$(PROGRAM)_$(TARGET).hex -U lock:w:0x0f:m
 
 
 OBJ        = $(PROGRAM).o
 OPTIMIZE   = -O2
 
-DEFS       =
+DEFS       = 
 LIBS       =
 
 CC         = avr-gcc
@@ -41,36 +53,34 @@ CC         = avr-gcc
 # Override is only needed by avr-lib build system.
 
 override CFLAGS        = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) -DF_CPU=$(AVR_FREQ) $(DEFS)
-override LDFLAGS       = -Wl,-Map,$(PROGRAM).map,$(LDSECTION)
+override LDFLAGS       = -Wl,$(LDSECTION)
+#override LDFLAGS       = -Wl,-Map,$(PROGRAM).map,$(LDSECTION)
 
 OBJCOPY        = avr-objcopy
 OBJDUMP        = avr-objdump
 
-all: $(PROGRAM).elf lst text
+all:
 
-isp: $(PROGRAM).hex
+diecimila: TARGET = diecimila
+diecimila: CFLAGS += '-DMAX_TIME_COUNT=F_CPU>>4' '-DNUM_LED_FLASHES=1'
+diecimila: $(PROGRAM)_diecimila.hex
+
+ng: TARGET = ng
+ng: CFLAGS += '-DMAX_TIME_COUNT=F_CPU>>1' '-DNUM_LED_FLASHES=3'
+ng: $(PROGRAM)_ng.hex
+
+isp: $(PROGRAM)_$(TARGET).hex
 	$(ISPFUSES)
 	$(ISPFLASH)
 
-$(PROGRAM).elf: $(OBJ)
+%.elf: $(OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
 
 clean:
-	rm -rf *.o *.elf *.lst *.map *.sym *.lss *.eep
-	rm -rf $(PROGRAM).hex $(PROGRAM).srec $(PROGRAM).bin
-
-lst:  $(PROGRAM).lst
+	rm -rf *.o *.elf *.lst *.map *.sym *.lss *.eep *.srec *.bin *.hex
 
 %.lst: %.elf
 	$(OBJDUMP) -h -S $< > $@
-
-# Rules for building the .text rom images
-
-text: hex bin srec
-
-hex:  $(PROGRAM).hex
-bin:  $(PROGRAM).bin
-srec: $(PROGRAM).srec
 
 %.hex: %.elf
 	$(OBJCOPY) -j .text -j .data -O ihex $< $@
