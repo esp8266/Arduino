@@ -120,21 +120,22 @@ public class AvrdudeUploader extends Uploader  {
   public boolean uisp(Collection params) throws RunnerException {
     flushSerialBuffer();
 
-    String userdir = System.getProperty("user.dir") + File.separator;
-    String avrBasePath;
-    if(Base.isMacOS()) {
-      avrBasePath = new String("tools/avr/etc/"); 
-    }
-    else if(Base.isLinux()) {
-      avrBasePath = new String("");     	
-    }
-    else {
-      avrBasePath = new String(userdir + "tools/avr/etc/"); 
-    }
-
     List commandDownloader = new ArrayList();
     commandDownloader.add("avrdude");
-    commandDownloader.add("-C" + avrBasePath + File.separator + "avrdude.conf");
+
+    // On Windows and the Mac, we need to point avrdude at its config file
+    // since it's getting installed in an unexpected location (i.e. a
+    // sub-directory of wherever the user happens to stick Arduino).  On Linux,
+    // avrdude will have been properly installed by the distribution's package
+    // manager and should be able to find its config file.
+    if(Base.isMacOS()) {
+      commandDownloader.add("-C" + "tools/avr/etc/avrdude.conf");
+    }
+    else if(Base.isWindows()) {
+      String userdir = System.getProperty("user.dir") + File.separator;
+      commandDownloader.add("-C" + userdir + "tools/avr/etc/avrdude.conf");
+    }
+
     if (Preferences.getBoolean("upload.verbose")) {
       commandDownloader.add("-v");
       commandDownloader.add("-v");
