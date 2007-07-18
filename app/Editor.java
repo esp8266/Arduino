@@ -104,8 +104,13 @@ public class Editor extends JFrame
   //Runner runtime;
 
 
-  JMenuItem burnBootloaderItem = null;
-  JMenuItem burnBootloaderParallelItem = null;
+  JMenuItem burnBootloader8Item = null;
+  JMenuItem burnBootloader8ParallelItem = null;
+  JMenuItem burnBootloader168DiecimilaItem = null;
+  JMenuItem burnBootloader168DiecimilaParallelItem = null;
+  JMenuItem burnBootloader168NGItem = null;
+  JMenuItem burnBootloader168NGParallelItem = null;
+  
   JMenuItem exportAppItem;
   JMenuItem saveMenuItem;
   JMenuItem saveAsMenuItem;
@@ -732,30 +737,64 @@ public class Editor extends JFrame
 	  
     menu.addSeparator();
     
-    burnBootloaderItem = new JMenuItem("Burn Bootloader");
-    burnBootloaderItem.addActionListener(new ActionListener() {
+    burnBootloader8Item = new JMenuItem("Burn Bootloader");
+    burnBootloader8Item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          handleBurnBootloader(false);
+          handleBurnBootloader("atmega8", false);
         }
       });
-    menu.add(burnBootloaderItem);
+    menu.add(burnBootloader8Item);
     
-    if (!Preferences.get("build.mcu").equals("atmega8"))
-      burnBootloaderItem.setEnabled(false);
-      
     if (!Base.isMacOS()) {
-      burnBootloaderParallelItem =
+      burnBootloader8ParallelItem =
         new JMenuItem("Burn Bootloader (parallel port)");
-      burnBootloaderParallelItem.addActionListener(new ActionListener() {
+      burnBootloader8ParallelItem.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            handleBurnBootloader(true);
+            handleBurnBootloader("atmega8", true);
           }
         });
-      menu.add(burnBootloaderParallelItem);
-    
-      if (!Preferences.get("build.mcu").equals("atmega8"))
-        burnBootloaderParallelItem.setEnabled(false);
+      menu.add(burnBootloader8ParallelItem);
     }
+    
+    burnBootloader168DiecimilaItem = new JMenuItem("Burn Diecimila Bootloader");
+    burnBootloader168DiecimilaItem.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          handleBurnBootloader("atmega168-diecimila", false);
+        }
+      });
+    menu.add(burnBootloader168DiecimilaItem);
+    
+    if (!Base.isMacOS()) {
+      burnBootloader168DiecimilaParallelItem =
+        new JMenuItem("Burn Diecimila Bootloader (parallel port)");
+      burnBootloader168DiecimilaParallelItem.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            handleBurnBootloader("atmega168-diecimila", true);
+          }
+        });
+      menu.add(burnBootloader168DiecimilaParallelItem);
+    }
+    
+    burnBootloader168NGItem = new JMenuItem("Burn NG/Mini Bootloader");
+    burnBootloader168NGItem.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          handleBurnBootloader("atmega168-ng", false);
+        }
+      });
+    menu.add(burnBootloader168NGItem);
+    
+    if (!Base.isMacOS()) {
+      burnBootloader168NGParallelItem =
+        new JMenuItem("Burn NG/Mini Bootloader (parallel port)");
+      burnBootloader168NGParallelItem.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            handleBurnBootloader("atmega168-ng", true);
+          }
+        });
+      menu.add(burnBootloader168NGParallelItem);
+    }
+    
+    showBootloaderMenuItemsForCurrentMCU();
     
     menu.addMenuListener(new MenuListener() {
       public void menuCanceled(MenuEvent e) {}
@@ -801,6 +840,22 @@ public class Editor extends JFrame
     }
     */
   }
+  
+  protected void showBootloaderMenuItemsForCurrentMCU() {
+    boolean onATmega8 =
+      Preferences.get("build.mcu").equals("atmega8");
+      
+    burnBootloader8Item.setEnabled(onATmega8);
+    if (burnBootloader8ParallelItem != null)
+      burnBootloader8ParallelItem.setEnabled(onATmega8);
+      
+    burnBootloader168DiecimilaItem.setEnabled(!onATmega8);
+    if (burnBootloader168DiecimilaParallelItem != null)
+      burnBootloader168DiecimilaParallelItem.setEnabled(!onATmega8);
+    burnBootloader168NGItem.setEnabled(!onATmega8);
+    if (burnBootloader168NGParallelItem != null)
+      burnBootloader168NGParallelItem.setEnabled(!onATmega8);
+  }
 
   class McuMenuListener implements ActionListener {
     McuMenuListener() {}
@@ -813,13 +868,9 @@ public class Editor extends JFrame
       ((JCheckBoxMenuItem) actionevent.getSource()).setState(true);
       Preferences.set("build.mcu",
         ((JCheckBoxMenuItem) actionevent.getSource()).getLabel());
-
-      boolean bootloadingEnabled =
-        Preferences.get("build.mcu").equals("atmega8");
-      burnBootloaderItem.setEnabled(bootloadingEnabled);
-      if (burnBootloaderParallelItem != null)
-        burnBootloaderParallelItem.setEnabled(bootloadingEnabled);
-
+        
+      showBootloaderMenuItemsForCurrentMCU();
+      
       try {
         LibraryManager libraryManager = new LibraryManager();
         libraryManager.rebuildAllBuilt();
@@ -1997,14 +2048,10 @@ public class Editor extends JFrame
     System.exit(0);
   }
 
-  protected void handleBurnBootloader(final boolean parallel) {
+  protected void handleBurnBootloader(final String target, final boolean parallel) {
     if(debugging)
       doStop();
     console.clear();
-    if (!Preferences.get("build.mcu").equals("atmega8")) {
-      error("Burn bootloader only works on ATmega8s.  See the Arduino FAQ for more info.");
-      return;
-    }
     //String what = sketch.isLibrary() ? "Applet" : "Library";
     //message("Exporting " + what + "...");
     message("Burning bootloader to I/O Board (this may take a minute)...");
@@ -2013,10 +2060,10 @@ public class Editor extends JFrame
         try {
           //boolean success = sketch.isLibrary() ?
           //sketch.exportLibrary() : sketch.exportApplet();
-          Uploader uploader = new UispUploader();
+          Uploader uploader = new AvrdudeUploader();
           boolean success = parallel ? 
-            uploader.burnBootloaderParallel() :
-            uploader.burnBootloaderAVRISP();
+            uploader.burnBootloaderParallel(target) :
+            uploader.burnBootloaderAVRISP(target);
           
           if (success) {
             message("Done burning bootloader.");

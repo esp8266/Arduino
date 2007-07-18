@@ -39,15 +39,16 @@ public class AvrdudeUploader extends Uploader  {
   public boolean uploadUsingPreferences(String buildPath, String className)
     throws RunnerException {
     List commandDownloader = new ArrayList();
+      
+    // avrdude doesn't want to read device signatures (it always gets
+    // 0x000000); force it to continue uploading anyway
+    commandDownloader.add("-F");
+
     String programmer = Preferences.get("upload.programmer");
     
     // avrdude wants "stk500v1" to distinguish it from stk500v2
     if (programmer.equals("stk500"))
       programmer = "stk500v1";
-      
-    // avrdude doesn't want to read device signatures (it always gets
-    // 0x000000); force it to continue uploading anyway
-    commandDownloader.add("-F");
     commandDownloader.add("-c" + programmer);
     if (Preferences.get("upload.programmer").equals("dapa")) {
       // avrdude doesn't need to be told the address of the parallel port
@@ -70,45 +71,48 @@ public class AvrdudeUploader extends Uploader  {
     return uisp(commandDownloader);
   }
 
-  public boolean burnBootloaderAVRISP() throws RunnerException {
+  public boolean burnBootloaderAVRISP(String target) throws RunnerException {
     List commandDownloader = new ArrayList();
-    commandDownloader.add("-dprog=" + Preferences.get("bootloader.programmer"));
-    commandDownloader.add(
-      "-dserial=" + (Base.isWindows() ?
-        "/dev/" + Preferences.get("serial.port").toLowerCase() :
-        Preferences.get("serial.port")));
-    commandDownloader.add("-dspeed=" + Preferences.get("serial.burn_rate"));
-    return burnBootloader(commandDownloader);
+    commandDownloader.add("-c" +
+      Preferences.get("bootloader." + target + ".programmer"));
+
+    if (Preferences.get("bootloader." + target + ".communication").equals("usb")) {
+      commandDownloader.add("-Pusb");
+    } else {
+      commandDownloader.add(
+        "-P" + (Base.isWindows() ?
+          "/dev/" + Preferences.get("serial.port").toLowerCase() :
+          Preferences.get("serial.port")));
+    }
+    commandDownloader.add("-b" + Preferences.get("serial.burn_rate"));
+    return burnBootloader(target, commandDownloader);
   }
   
-  public boolean burnBootloaderParallel() throws RunnerException {
+  public boolean burnBootloaderParallel(String target) throws RunnerException {
     List commandDownloader = new ArrayList();
     commandDownloader.add("-dprog=dapa");
     commandDownloader.add("-dlpt=" + Preferences.get("parallel.port"));
-    return burnBootloader(commandDownloader);
+    return burnBootloader(target, commandDownloader);
   }
   
-  protected boolean burnBootloader(Collection params) throws RunnerException {
-    // I know this is ugly; apologies - that's what happens when you try to
-    // write Lisp-style code in Java.
+  protected boolean burnBootloader(String target, Collection params)
+    throws RunnerException
+  {
     return
-      // unlock bootloader segment of flash memory
+      // unlock bootloader segment of flash memory and write fuses
       uisp(params, Arrays.asList(new String[] {
-        "--wr_lock=" + Preferences.get("bootloader.unlock_bits") })) &&
-      // write fuses:
-      // bootloader size of 512 words; from 0xE00-0xFFF
-      // clock speed of 16 MHz, external quartz
+        "-e",
+        "-Ulock:w:" + Preferences.get("bootloader." + target + ".unlock_bits") + ":m",
+        "-Uefuse:w:" + Preferences.get("bootloader." + target + ".extended_fuses") + ":m",
+        "-Uhfuse:w:" + Preferences.get("bootloader." + target + ".high_fuses") + ":m",
+        "-Ulfuse:w:" + Preferences.get("bootloader." + target + ".low_fuses") + ":m",
+      })) &&
+      // upload bootloader and lock bootloader segment
       uisp(params, Arrays.asList(new String[] {
-          "--wr_fuse_l=" + Preferences.get("bootloader.low_fuses"),
-          "--wr_fuse_h=" + Preferences.get("bootloader.high_fuses") })) &&
-      // upload bootloader
-      uisp(params, Arrays.asList(new String[] {
-          "--erase", "--upload", "--verify",
-          "if=" + Preferences.get("bootloader.path") + File.separator +
-          Preferences.get("bootloader.file") })) &&
-      // lock bootloader segment
-      uisp(params, Arrays.asList(new String[] {
-        "--wr_lock=" + Preferences.get("bootloader.lock_bits") }));
+          "-Uflash:w:" + Preferences.get("bootloader." + target + ".path") +
+            File.separator + Preferences.get("bootloader." + target + ".file") + ":i",
+          "-Ulock:w:" + Preferences.get("bootloader." + target + ".lock_bits") + ":m"
+      }));
   }
   
   public boolean uisp(Collection p1, Collection p2) throws RunnerException {

@@ -72,7 +72,7 @@ public class UispUploader extends Uploader  {
     return uisp(commandDownloader);
   }
 
-  public boolean burnBootloaderAVRISP() throws RunnerException {
+  public boolean burnBootloaderAVRISP(String target) throws RunnerException {
     List commandDownloader = new ArrayList();
     commandDownloader.add("-dprog=" + Preferences.get("bootloader.programmer"));
     commandDownloader.add(
@@ -83,7 +83,7 @@ public class UispUploader extends Uploader  {
     return burnBootloader(commandDownloader);
   }
   
-  public boolean burnBootloaderParallel() throws RunnerException {
+  public boolean burnBootloaderParallel(String target) throws RunnerException {
     List commandDownloader = new ArrayList();
     commandDownloader.add("-dprog=dapa");
     commandDownloader.add("-dlpt=" + Preferences.get("parallel.port"));
