@@ -67,7 +67,7 @@ public class AvrdudeUploader extends Uploader  {
       commandDownloader.add("-D");
     if (!Preferences.getBoolean("upload.verify"))
       commandDownloader.add("-V");
-    commandDownloader.add("-Uflash:w:" + buildPath + File.separator + className + ".hex");
+    commandDownloader.add("-Uflash:w:" + buildPath + File.separator + className + ".hex:i");
     return uisp(commandDownloader);
   }
 
