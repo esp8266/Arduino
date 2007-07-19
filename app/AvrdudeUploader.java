@@ -54,10 +54,7 @@ public class AvrdudeUploader extends Uploader  {
       // avrdude doesn't need to be told the address of the parallel port
       //commandDownloader.add("-dlpt=" + Preferences.get("parallel.port"));
     } else {
-      commandDownloader.add(
-        "-P" + (Base.isWindows() ?
-          "/dev/" + Preferences.get("serial.port").toLowerCase() :
-          Preferences.get("serial.port")));
+      commandDownloader.add("-P" + Preferences.get("serial.port"));
       commandDownloader.add(
         "-b" + Preferences.getInteger("serial.download_rate"));
     }
