@@ -84,6 +84,7 @@
 			buildConfigurationList = 33FFFE1F0965BC300016AC38 /* Build configuration list for PBXAggregateTarget "Setup" */;
 			buildPhases = (
 				33FFFE1D0965BC050016AC38 /* CopyFiles */,
+				335D3AF30C4EE06F0065B27E /* CopyFiles */,
 				33FF070C0965BF760016AC38 /* CopyFiles */,
 				33FF07130965BFA80016AC38 /* CopyFiles */,
 				336EA3E309FF84FA0052D765 /* CopyFiles */,
@@ -169,6 +170,10 @@
 
 /* Begin PBXBuildFile section */
 		332D4DB609CF147F00BF81F6 /* Sizer.java in Sources */ = {isa = PBXBuildFile; fileRef = 332D4DB509CF147F00BF81F6 /* Sizer.java */; };
+		335D3B010C4EE1B80065B27E /* ATmegaBOOT_168.c in CopyFiles */ = {isa = PBXBuildFile; fileRef = 335D3AFD0C4EE19D0065B27E /* ATmegaBOOT_168.c */; };
+		335D3B020C4EE1B80065B27E /* ATmegaBOOT_168_diecimila.hex in CopyFiles */ = {isa = PBXBuildFile; fileRef = 335D3AFE0C4EE19D0065B27E /* ATmegaBOOT_168_diecimila.hex */; };
+		335D3B030C4EE1B80065B27E /* ATmegaBOOT_168_ng.hex in CopyFiles */ = {isa = PBXBuildFile; fileRef = 335D3AFF0C4EE19D0065B27E /* ATmegaBOOT_168_ng.hex */; };
+		335D3B040C4EE1B80065B27E /* Makefile in CopyFiles */ = {isa = PBXBuildFile; fileRef = 335D3B000C4EE19D0065B27E /* Makefile */; };
 		336EA55B09FF87F60052D765 /* examples in CopyFiles */ = {isa = PBXBuildFile; fileRef = 336EA4DB09FF87E30052D765 /* examples */; };
 		338C478A0AA204BE008F2C0D /* FTDIUSBSerialDriver_v2_1_6.dmg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 338C47870AA204B0008F2C0D /* FTDIUSBSerialDriver_v2_1_6.dmg */; };
 		338C478B0AA204BE008F2C0D /* FTDIUSBSerialDriver_v2_2_6_Intel.dmg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 338C47880AA204B0008F2C0D /* FTDIUSBSerialDriver_v2_2_6_Intel.dmg */; };
@@ -329,6 +334,19 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		335D3AF30C4EE06F0065B27E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = bootloader168;
+			dstSubfolderSpec = 16;
+			files = (
+				335D3B010C4EE1B80065B27E /* ATmegaBOOT_168.c in CopyFiles */,
+				335D3B020C4EE1B80065B27E /* ATmegaBOOT_168_diecimila.hex in CopyFiles */,
+				335D3B030C4EE1B80065B27E /* ATmegaBOOT_168_ng.hex in CopyFiles */,
+				335D3B040C4EE1B80065B27E /* Makefile in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		336EA3E309FF84FA0052D765 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -415,6 +433,10 @@
 
 /* Begin PBXFileReference section */
 		332D4DB509CF147F00BF81F6 /* Sizer.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Sizer.java; sourceTree = "<group>"; };
+		335D3AFD0C4EE19D0065B27E /* ATmegaBOOT_168.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = ATmegaBOOT_168.c; sourceTree = "<group>"; };
+		335D3AFE0C4EE19D0065B27E /* ATmegaBOOT_168_diecimila.hex */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = ATmegaBOOT_168_diecimila.hex; sourceTree = "<group>"; };
+		335D3AFF0C4EE19D0065B27E /* ATmegaBOOT_168_ng.hex */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = ATmegaBOOT_168_ng.hex; sourceTree = "<group>"; };
+		335D3B000C4EE19D0065B27E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		336EA4DB09FF87E30052D765 /* examples */ = {isa = PBXFileReference; lastKnownFileType = folder; path = examples; sourceTree = "<group>"; };
 		337CD3F309EFC183002B890C /* fetch.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = fetch.sh; sourceTree = "<group>"; };
 		338C47870AA204B0008F2C0D /* FTDIUSBSerialDriver_v2_1_6.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = FTDIUSBSerialDriver_v2_1_6.dmg; sourceTree = "<group>"; };
@@ -554,6 +576,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		335D3AFC0C4EE19D0065B27E /* bootloader168 */ = {
+			isa = PBXGroup;
+			children = (
+				335D3AFD0C4EE19D0065B27E /* ATmegaBOOT_168.c */,
+				335D3AFE0C4EE19D0065B27E /* ATmegaBOOT_168_diecimila.hex */,
+				335D3AFF0C4EE19D0065B27E /* ATmegaBOOT_168_ng.hex */,
+				335D3B000C4EE19D0065B27E /* Makefile */,
+			);
+			name = bootloader168;
+			path = ../../bootloader168;
+			sourceTree = SOURCE_ROOT;
+		};
 		33FF01DA0965BD160016AC38 /* shared */ = {
 			isa = PBXGroup;
 			children = (
@@ -630,6 +664,7 @@
 				33FF07D50965C3560016AC38 /* targets */,
 				33FFFE220965BD100016AC38 /* app */,
 				33FFFE750965BD110016AC38 /* bootloader */,
+				335D3AFC0C4EE19D0065B27E /* bootloader168 */,
 				33FFFE800965BD110016AC38 /* build */,
 				33FF02B60965BD170016AC38 /* license.txt */,
 				33FF02B70965BD170016AC38 /* readme.txt */,
