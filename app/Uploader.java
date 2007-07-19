@@ -72,6 +72,15 @@ public abstract class Uploader implements MessageConsumer  {
         Thread.sleep(100);
       } catch (InterruptedException e) {}
     }
+
+    serialPort.setDTR(false);
+
+    try {
+      Thread.sleep(100);
+    } catch (InterruptedException e) {}
+
+    serialPort.setDTR(true);
+    
     serialPort.dispose();
   }
 

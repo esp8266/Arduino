@@ -476,6 +476,9 @@ public class Serial implements SerialPortEventListener {
     write(what.getBytes());
   }
 
+  public void setDTR(boolean state) {
+    port.setDTR(state);
+  }
 
   /**
    * If this just hangs and never completes on Windows, 
