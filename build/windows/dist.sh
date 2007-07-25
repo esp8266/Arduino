@@ -67,10 +67,10 @@ cp work/java/lib/rt.jar arduino/lib/
 cp dist/jikes.exe arduino/
 chmod +x arduino/jikes.exe
 
-cp dist/ICE_JNIRegistry.dll arduino/
-chmod +x arduino/ICE_JNIRegistry.dll
-cp work/rxtxSerial.dll arduino/
-chmod +x arduino/rxtxSerial.dll
+#cp dist/ICE_JNIRegistry.dll arduino/
+#chmod +x arduino/ICE_JNIRegistry.dll
+#cp work/rxtxSerial.dll arduino/
+#chmod +x arduino/rxtxSerial.dll
 cp work/*.dll arduino
 chmod +x arduino/*.dll
 
