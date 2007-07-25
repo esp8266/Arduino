@@ -60,6 +60,8 @@ else
   cp dist/ICE_JNIRegistry.dll work/
   mkdir work/bootloader
   cp dist/bootloader/*.* work/bootloader
+  mkdir work/bootloader168
+  cp dist/bootloader168/*.* work/bootloader168
   mkdir work/drivers
   cp -r dist/drivers/* work/drivers/
   mkdir work/tools
