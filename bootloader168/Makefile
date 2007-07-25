@@ -37,7 +37,7 @@ LDSECTION  = --section-start=.text=0x3800
 # unlock the bootloader section) and 0xcf instead of 0x0f (to
 # lock it), but since the high two bits of the lock byte are
 # unused, avrdude would get confused.
-ISPFUSES    = avrdude -c $(ISPTOOL) -p m168 -P $(ISPPORT) $(ISPSPEED) -e -u -U lock:w:0x3f:m -U efuse:w:0x00:m -U hfuse:w:0xdf:m -U lfuse:w:0xff:m
+ISPFUSES    = avrdude -c $(ISPTOOL) -p m168 -P $(ISPPORT) $(ISPSPEED) -e -u -U lock:w:0x3f:m -U efuse:w:0x00:m -U hfuse:w:0xdd:m -U lfuse:w:0xff:m
 ISPFLASH    = avrdude -c $(ISPTOOL) -p m168 -P $(ISPPORT) $(ISPSPEED) -U flash:w:$(PROGRAM)_$(TARGET).hex -U lock:w:0x0f:m
 
 
