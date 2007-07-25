@@ -764,16 +764,16 @@ public class Editor extends JFrame
       });
     menu.add(burnBootloader168DiecimilaItem);
     
-    if (!Base.isMacOS()) {
-      burnBootloader168DiecimilaParallelItem =
-        new JMenuItem("Burn Diecimila Bootloader (parallel port)");
-      burnBootloader168DiecimilaParallelItem.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-            handleBurnBootloader("atmega168-diecimila", true);
-          }
-        });
-      menu.add(burnBootloader168DiecimilaParallelItem);
-    }
+//    if (!Base.isMacOS()) {
+//      burnBootloader168DiecimilaParallelItem =
+//        new JMenuItem("Burn Diecimila Bootloader (parallel port)");
+//      burnBootloader168DiecimilaParallelItem.addActionListener(new ActionListener() {
+//          public void actionPerformed(ActionEvent e) {
+//            handleBurnBootloader("atmega168-diecimila", true);
+//          }
+//        });
+//      menu.add(burnBootloader168DiecimilaParallelItem);
+//    }
     
     burnBootloader168NGItem = new JMenuItem("Burn NG/Mini Bootloader");
     burnBootloader168NGItem.addActionListener(new ActionListener() {
@@ -783,16 +783,16 @@ public class Editor extends JFrame
       });
     menu.add(burnBootloader168NGItem);
     
-    if (!Base.isMacOS()) {
-      burnBootloader168NGParallelItem =
-        new JMenuItem("Burn NG/Mini Bootloader (parallel port)");
-      burnBootloader168NGParallelItem.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-            handleBurnBootloader("atmega168-ng", true);
-          }
-        });
-      menu.add(burnBootloader168NGParallelItem);
-    }
+//    if (!Base.isMacOS()) {
+//      burnBootloader168NGParallelItem =
+//        new JMenuItem("Burn NG/Mini Bootloader (parallel port)");
+//      burnBootloader168NGParallelItem.addActionListener(new ActionListener() {
+//          public void actionPerformed(ActionEvent e) {
+//            handleBurnBootloader("atmega168-ng", true);
+//          }
+//        });
+//      menu.add(burnBootloader168NGParallelItem);
+//    }
     
     showBootloaderMenuItemsForCurrentMCU();
     

@@ -69,6 +69,9 @@ public class UispUploader extends Uploader  {
     if (Preferences.getBoolean("upload.verify"))
       commandDownloader.add("--verify");
     commandDownloader.add("if=" + buildPath + File.separator + className + ".hex");
+    
+    flushSerialBuffer();
+
     return uisp(commandDownloader);
   }
 
@@ -120,8 +123,6 @@ public class UispUploader extends Uploader  {
   }
   
   public boolean uisp(Collection params) throws RunnerException {
-      flushSerialBuffer();
-
       List commandDownloader = new ArrayList();
       commandDownloader.add("uisp");
       if (Preferences.getBoolean("upload.verbose"))

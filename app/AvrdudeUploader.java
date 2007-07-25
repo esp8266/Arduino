@@ -65,6 +65,9 @@ public class AvrdudeUploader extends Uploader  {
     if (!Preferences.getBoolean("upload.verify"))
       commandDownloader.add("-V");
     commandDownloader.add("-Uflash:w:" + buildPath + File.separator + className + ".hex:i");
+
+    flushSerialBuffer();
+
     return uisp(commandDownloader);
   }
 
@@ -119,8 +122,6 @@ public class AvrdudeUploader extends Uploader  {
   }
   
   public boolean uisp(Collection params) throws RunnerException {
-    flushSerialBuffer();
-
     List commandDownloader = new ArrayList();
     commandDownloader.add("avrdude");
 

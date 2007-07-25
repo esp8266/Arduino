@@ -1672,10 +1672,16 @@ public class Sketch {
 
   protected String upload(String buildPath, String suggestedClassName)
     throws RunnerException {
+    
+    Uploader uploader;
 
     // download the program
     //
-    Uploader uploader = new AvrdudeUploader();
+    if ("uisp".equals(Preferences.get("upload.application"))) {
+      uploader = new UispUploader();
+    } else {
+      uploader = new AvrdudeUploader();
+    }
     // macos9 now officially broken.. see PdeCompilerJavac
     //PdeCompiler compiler =
     //  ((PdeBase.platform == PdeBase.MACOS9) ?
