@@ -50,6 +50,7 @@ echo Copying shared and core files...
 cp -r ../shared/* work
 rm -rf work/dist
 cp -r ../../targets work/lib
+cp -r ../../bootloader168 work
 rm work/reference.zip
 
 echo Copying examples...
