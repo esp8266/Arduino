@@ -136,6 +136,8 @@ public class AvrdudeUploader extends Uploader  {
     else if(Base.isWindows()) {
       String userdir = System.getProperty("user.dir") + File.separator;
       commandDownloader.add("-C" + userdir + "tools/avr/etc/avrdude.conf");
+    } else {
+      commandDownloader.add("-C" + "tools/avrdude.conf");
     }
 
     if (Preferences.getBoolean("upload.verbose")) {
