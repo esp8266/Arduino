@@ -104,6 +104,10 @@ public class Editor extends JFrame
   //Runner runtime;
 
 
+  JMenuItem exportAppItem;
+  JMenuItem saveMenuItem;
+  JMenuItem saveAsMenuItem;
+  
   JMenuItem burnBootloader8Item = null;
   JMenuItem burnBootloader8ParallelItem = null;
   JMenuItem burnBootloader168DiecimilaItem = null;
@@ -111,12 +115,10 @@ public class Editor extends JFrame
   JMenuItem burnBootloader168NGItem = null;
   JMenuItem burnBootloader168NGParallelItem = null;
   
-  JMenuItem exportAppItem;
-  JMenuItem saveMenuItem;
-  JMenuItem saveAsMenuItem;
   JMenu serialMenu;
   JMenu serialRateMenu;
   JMenu mcuMenu;
+  
   SerialMenuListener serialMenuListener;
 
   boolean running;
@@ -845,16 +847,16 @@ public class Editor extends JFrame
     boolean onATmega8 =
       Preferences.get("build.mcu").equals("atmega8");
       
-    burnBootloader8Item.setEnabled(onATmega8);
+    burnBootloader8Item.setVisible(onATmega8);
     if (burnBootloader8ParallelItem != null)
-      burnBootloader8ParallelItem.setEnabled(onATmega8);
+      burnBootloader8ParallelItem.setVisible(onATmega8);
       
-    burnBootloader168DiecimilaItem.setEnabled(!onATmega8);
+    burnBootloader168DiecimilaItem.setVisible(!onATmega8);
     if (burnBootloader168DiecimilaParallelItem != null)
-      burnBootloader168DiecimilaParallelItem.setEnabled(!onATmega8);
-    burnBootloader168NGItem.setEnabled(!onATmega8);
+      burnBootloader168DiecimilaParallelItem.setVisible(!onATmega8);
+    burnBootloader168NGItem.setVisible(!onATmega8);
     if (burnBootloader168NGParallelItem != null)
-      burnBootloader168NGParallelItem.setEnabled(!onATmega8);
+      burnBootloader168NGParallelItem.setVisible(!onATmega8);
   }
 
   class McuMenuListener implements ActionListener {
