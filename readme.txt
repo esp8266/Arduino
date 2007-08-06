@@ -46,13 +46,16 @@ Processing and Wiring.
 
 UPDATES
 
-0009
+0009 - 2007.08.06
 
+* Added support for the Arduino Diecimila.
+* Switched to using avrdude (instead of uisp) for uploading sketches.
+* Added the ability to burn NG and Diecimila bootlaoders (with an AVRISPmkII).
 * Fixed a bug in SoftwareSerial (a hardware serial function was being called
   instead of the software serial equivalent).  Thanks to brianbr for the
   report and fix.
 
-0008
+0008 - 2007.06.09
 
 * Updated examples (in distribution and on the website).
 * Added an EEPROM library (see reference for details).
