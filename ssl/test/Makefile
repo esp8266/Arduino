@@ -18,8 +18,10 @@
 
 all:
 
-include ../../config/.config
-include ../../config/makefile.conf
+AXTLS_HOME=../..
+
+include $(AXTLS_HOME)/config/.config
+include $(AXTLS_HOME)/config/makefile.conf
 
 ifdef CONFIG_PERFORMANCE_TESTING
 all: performance
@@ -29,37 +31,53 @@ ifdef CONFIG_SSL_TEST
 all: ssltesting
 endif
 
-ifndef CONFIG_PLATFORM_WIN32
-performance: ../../$(STAGE)/perf_bigint
-ssltesting: ../../$(STAGE)/ssltest
-LIBS=../../$(STAGE)
-CFLAGS += -I../../ssl -I../../config -I../../crypto
+include $(AXTLS_HOME)/config/makefile.post
 
-../../$(STAGE)/perf_bigint: perf_bigint.o $(LIBS)/libaxtls.a
+ifndef CONFIG_PLATFORM_WIN32
+performance: $(AXTLS_HOME)/$(STAGE)/perf_bigint
+ssltesting: $(AXTLS_HOME)/$(STAGE)/ssltest
+LIBS=$(AXTLS_HOME)/$(STAGE)
+
+$(AXTLS_HOME)/$(STAGE)/perf_bigint: perf_bigint.o $(LIBS)/libaxtls.a
 	$(CC) $(LDFLAGS) -o $@ $^ -L $(LIBS) -laxtls
 
-../../$(STAGE)/ssltest: ssltest.o $(LIBS)/libaxtls.a
+$(AXTLS_HOME)/$(STAGE)/ssltest: ssltest.o $(LIBS)/libaxtls.a
 	$(CC) $(LDFLAGS) -o $@ $^ -lpthread -L $(LIBS) -laxtls
 else
-performance: ../../$(STAGE)/perf_bigint.exe
-ssltesting: ../../$(STAGE)/ssltest.exe
-CFLAGS += /I".." /I"../../config"
+performance: $(AXTLS_HOME)/$(STAGE)/perf_bigint.exe
+ssltesting: $(AXTLS_HOME)/$(STAGE)/ssltest.exe
 
-%.obj : %.c
-	$(CC) $(CFLAGS) $< 
+CRYPTO_PATH="$(AXTLS_INCLUDE)crypto\\"
+AXTLS_SSL_PATH="$(AXTLS_INCLUDE)ssl\\"
 
-OBJLIST=..\aes.obj ..\asn1.obj ..\bigint.obj ..\crypto_misc.obj ..\hmac.obj \
-        ..\md5.obj ..\loader.obj ..\p12.obj ..\os_port.obj ..\rc4.obj \
-        ..\rsa.obj ..\sha1.obj ..\tls1.obj ..\tls1_clnt.obj ..\tls1_svr.obj
+CRYPTO_OBJ=\
+	$(CRYPTO_PATH)aes.obj \
+	$(CRYPTO_PATH)hmac.obj \
+	$(CRYPTO_PATH)md5.obj \
+	$(CRYPTO_PATH)rc4.obj \
+	$(CRYPTO_PATH)sha1.obj
 
-../../$(STAGE)/perf_bigint.exe: perf_bigint.obj $(OBJLIST)
-	$(LD) $(LDFLAGS) /out:$@ $^
+OBJ=\
+	$(AXTLS_SSL_PATH)asn1.obj \
+	$(AXTLS_SSL_PATH)x509.obj \
+	$(AXTLS_SSL_PATH)bigint.obj \
+	$(AXTLS_SSL_PATH)crypto_misc.obj \
+	$(AXTLS_SSL_PATH)os_port.obj \
+	$(AXTLS_SSL_PATH)loader.obj \
+	$(AXTLS_SSL_PATH)openssl.obj \
+	$(AXTLS_SSL_PATH)p12.obj \
+	$(AXTLS_SSL_PATH)rsa.obj \
+	$(AXTLS_SSL_PATH)tls1.obj \
+	$(AXTLS_SSL_PATH)tls1_svr.obj \
+	$(AXTLS_SSL_PATH)tls1_clnt.obj
 
-../../$(STAGE)/ssltest.exe: ssltest.obj $(OBJLIST)
-	$(LD) $(LDFLAGS) /out:$@ $^
+$(AXTLS_HOME)/$(STAGE)/perf_bigint.exe: perf_bigint.obj
+	$(LD) $(LDFLAGS) /out:$@ $? $(CRYPTO_OBJ) $(OBJ)
+
+$(AXTLS_HOME)/$(STAGE)/ssltest.exe: ssltest.obj
+	$(LD) $(LDFLAGS) /out:$@ $? $(CRYPTO_OBJ) $(OBJ)
 endif
 
 clean::
-	-@rm -f ../../$(STAGE)/perf_bigint* ../../$(STAGE)/ssltest*
+	-@rm -f $(AXTLS_HOME)/$(STAGE)/perf_bigint* $(AXTLS_HOME)/$(STAGE)/ssltest*
 
-include ../../config/makefile.post

@@ -106,6 +106,8 @@ fi
 
 if [ -x ./axssl.vbnet.exe ]; then
 echo "######################## VB.NET SAMPLE ###########################"
+echo $SERVER_ARGS
+echo $CLIENT_ARGS
 ./axssl.vbnet $SERVER_ARGS &
 echo "VB.NET Test passed" | ./axssl.vbnet.exe $CLIENT_ARGS
 kill %1

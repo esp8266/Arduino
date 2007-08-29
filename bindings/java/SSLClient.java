@@ -61,6 +61,9 @@ public class SSLClient extends SSLCTX
     public SSL connect(Socket s, byte[] session_id)
     {
         int client_fd = axtlsj.getFd(s);
-        return new SSL(axtlsj.ssl_client_new(m_ctx, client_fd, session_id));
+        byte sess_id_size = (byte)(session_id != null ? 
+                                session_id.length : 0);
+        return new SSL(axtlsj.ssl_client_new(m_ctx, client_fd, session_id,
+                        sess_id_size));
     }
 }

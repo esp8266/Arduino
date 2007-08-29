@@ -177,13 +177,13 @@ print DATA_OUT << "END";
 %apply signed char[] {signed char *};
 
 /* allow ssl_get_session_id() to return "byte[]" */
-%typemap(out) unsigned char * ssl_get_session_id \"if (result) jresult = SWIG_JavaArrayOutSchar(jenv, result, SSL_SESSION_ID_SIZE);\"
+%typemap(out) unsigned char * ssl_get_session_id \"if (result) jresult = SWIG_JavaArrayOutSchar(jenv, result, ssl_get_session_id_size((SSL const *)arg1));\"
 
 /* allow ssl_client_new() to have a null session_id input */
 %typemap(in) const signed char session_id[] (jbyte *jarr) {
     if (jarg3 == NULL)
     {
-        jresult = (jint)ssl_client_new(arg1,arg2,NULL);
+        jresult = (jint)ssl_client_new(arg1,arg2,NULL,0);
         return jresult;
     }
     
@@ -275,7 +275,7 @@ JNIEXPORT jint JNICALL Java_axTLSj_axtlsjJNI_getFd(JNIEnv *env, jclass jcls, job
 
 /* for ssl_session_id() */
 %typemap(out) const unsigned char * {
-    SV *svs = newSVpv((const char *)\$1, SSL_SESSION_ID_SIZE);
+    SV *svs = newSVpv((unsigned char *)\$1, (int)ssl_get_session_id((SSL const *)arg1));
     \$result = newRV(svs);
     sv_2mortal(\$result);
     argvi++;
@@ -330,7 +330,7 @@ SWIG_TYPEMAP_NUM_ARR(uchar,unsigned char);
 %typemap(out) const unsigned char * {
     int i;
     lua_newtable(L);
-    for (i = 0; i < SSL_SESSION_ID_SIZE; i++){
+    for (i = 0; i < ssl_get_session_id((SSL const *)\$1); i++){
         lua_pushnumber(L,(lua_Number)result[i]);
         lua_rawseti(L,-2,i+1); /* -1 is the number, -2 is the table */
     }
@@ -359,7 +359,7 @@ SWIG_TYPEMAP_NUM_ARR(uchar,unsigned char);
     if (lua_isnil(L,\$input))
         \$1 = NULL;
     else
-        \$1 = SWIG_get_uchar_num_array_fixed(L,\$input, SSL_SESSION_ID_SIZE);
+        \$1 = SWIG_get_uchar_num_array_fixed(L,\$input, ssl_get_session_id((SSL const *)\$1));
 }
 
 #endif

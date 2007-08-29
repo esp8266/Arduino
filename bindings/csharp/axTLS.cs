@@ -471,8 +471,10 @@ namespace axTLS
         public SSL Connect(Socket s, byte[] session_id)
         {
             int client_fd = s.Handle.ToInt32();
-            return new SSL(axtls. ssl_client_new(m_ctx, client_fd, session_id,
-                        session_id ? null : session_id.Length));
+            byte sess_id_size = (byte)(session_id != null ? 
+                                session_id.Length : 0);
+            return new SSL(axtls.ssl_client_new(m_ctx, client_fd, session_id,
+                        sess_id_size));
         }
     }
 }

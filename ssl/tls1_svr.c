@@ -302,35 +302,37 @@ static int send_server_hello(SSL *ssl)
     memcpy(ssl->server_random, &buf[6], SSL_RANDOM_SIZE);
     offset = 6 + SSL_RANDOM_SIZE;
 
-    /* send a session id - and put it into the cache */
-    buf[offset++] = SSL_SESSION_ID_SIZE;
-
 #ifndef CONFIG_SSL_SKELETON_MODE
     if (IS_SET_SSL_FLAG(SSL_SESSION_RESUME))
     {
         /* retrieve id from session cache */
+        buf[offset++] = SSL_SESSION_ID_SIZE;
         memcpy(&buf[offset], ssl->session->session_id, SSL_SESSION_ID_SIZE);
         memcpy(ssl->session_id, ssl->session->session_id, SSL_SESSION_ID_SIZE);
         ssl->sess_id_size = SSL_SESSION_ID_SIZE;
+        offset += SSL_SESSION_ID_SIZE;
     }
     else    /* generate our own session id */
 #endif
     {
+#ifndef CONFIG_SSL_SKELETON_MODE
+        buf[offset++] = SSL_SESSION_ID_SIZE;
         get_random(SSL_SESSION_ID_SIZE, &buf[offset]);
         memcpy(ssl->session_id, &buf[offset], SSL_SESSION_ID_SIZE);
         ssl->sess_id_size = SSL_SESSION_ID_SIZE;
 
-#ifndef CONFIG_SSL_SKELETON_MODE
         /* store id in session cache */
         if (ssl->ssl_ctx->num_sessions)
         {
             memcpy(ssl->session->session_id, 
                     ssl->session_id, SSL_SESSION_ID_SIZE);
         }
+
+        offset += SSL_SESSION_ID_SIZE;
+#else
+        buf[offset++] = 0;  /* don't bother with session id in skelton mode */
 #endif
     }
-
-    offset += SSL_SESSION_ID_SIZE;
 
     buf[offset++] = 0;      /* cipher we are using */
     buf[offset++] = ssl->cipher;

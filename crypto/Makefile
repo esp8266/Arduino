@@ -28,6 +28,7 @@ OBJ=\
 	rc4.o \
 	sha1.o
 
+include ../config/makefile.post
+
 all: $(OBJ)
 
-include ../config/makefile.post

@@ -18,26 +18,26 @@
 
 all : web_server lua
 
-include ../config/.config
-include ../config/makefile.conf
+AXTLS_HOME=..
+
+include $(AXTLS_HOME)/config/.config
+include $(AXTLS_HOME)/config/makefile.conf
 
 ifndef CONFIG_PLATFORM_WIN32
 
 ifdef CONFIG_PLATFORM_CYGWIN
-TARGET=../$(STAGE)/axhttpd.exe
-TARGET2=../$(STAGE)/htpasswd.exe
+TARGET=$(AXTLS_HOME)/$(STAGE)/axhttpd.exe
+TARGET2=$(AXTLS_HOME)/$(STAGE)/htpasswd.exe
 else
-TARGET=../$(STAGE)/axhttpd
-TARGET2=../$(STAGE)/htpasswd
+TARGET=$(AXTLS_HOME)/$(STAGE)/axhttpd
+TARGET2=$(AXTLS_HOME)/$(STAGE)/htpasswd
 endif
 
 ifdef CONFIG_HTTP_STATIC_BUILD
-LIBS=../$(STAGE)/libaxtls.a
+LIBS=$(AXTLS_HOME)/$(STAGE)/libaxtls.a
 else
-LIBS=-L../$(STAGE) -laxtls
+LIBS=-L$(AXTLS_HOME)/$(STAGE) -laxtls
 endif
-
-AXTLS_HOME=..
 
 ifdef CONFIG_HTTP_BUILD_LUA
 lua: kepler-1.1
@@ -53,13 +53,13 @@ endif
 else # win32 build
 lua:
 
-TARGET=../$(STAGE)/axhttpd.exe
-TARGET2=../$(STAGE)/htpasswd.exe
+TARGET=$(AXTLS_HOME)/$(STAGE)/axhttpd.exe
+TARGET2=$(AXTLS_HOME)/$(STAGE)/htpasswd.exe
 
 ifdef CONFIG_HTTP_STATIC_BUILD
-LIBS=../$(STAGE)/axtls.static.lib ..\\config\\axtls.res
+LIBS=$(AXTLS_HOME)/$(STAGE)/axtls.static.lib $(AXTLS_HOME)\\config\\axtls.res
 else
-LIBS=../$(STAGE)/axtls.lib ..\\config\\axtls.res
+LIBS=$(AXTLS_HOME)/$(STAGE)/axtls.lib $(AXTLS_HOME)\\config\\axtls.res
 endif
 endif
 
@@ -78,11 +78,11 @@ OBJ= \
 	proc.o \
 	tdate_parse.o
 
-include ../config/makefile.post
+include $(AXTLS_HOME)/config/makefile.post
 
 ifndef CONFIG_PLATFORM_WIN32
 
-$(TARGET): $(OBJ) ../$(STAGE)/libaxtls.a
+$(TARGET): $(OBJ) $(AXTLS_HOME)/$(STAGE)/libaxtls.a
 	$(LD) $(LDFLAGS) -o $@ $(OBJ) $(LIBS)
 ifndef CONFIG_DEBUG
 ifndef CONFIG_PLATFORM_SOLARIS
@@ -90,7 +90,7 @@ ifndef CONFIG_PLATFORM_SOLARIS
 endif
 endif
 
-$(TARGET2): htpasswd.o ../$(STAGE)/libaxtls.a
+$(TARGET2): htpasswd.o $(AXTLS_HOME)/$(STAGE)/libaxtls.a
 	$(LD) $(LDFLAGS) -o $@ htpasswd.o $(LIBS)
 
 else    # Win32
@@ -100,13 +100,13 @@ OBJ:=$(OBJ:.o=.obj)
 	$(CC) $(CFLAGS) $< 
 
 htpasswd.obj : htpasswd.c
-	$(CC) $(CFLAGS) $< 
+	$(CC) $(CFLAGS) $? 
 	
 $(TARGET): $(OBJ)
-	$(LD) $(LDFLAGS) $(LIBS) /out:$@ $(OBJ)
+	$(LD) $(LDFLAGS) /out:$@ $(LIBS) $?
 
 $(TARGET2): htpasswd.obj
-	$(LD) $(LDFLAGS) $(LIBS) /out:$@ $<
+	$(LD) $(LDFLAGS) /out:$@ $(LIBS) $?
 endif
 
 endif       # CONFIG_AXHTTPD

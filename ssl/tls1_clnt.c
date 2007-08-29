@@ -88,7 +88,9 @@ int do_clnt_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len)
                     if ((ret = send_certificate(ssl)) == SSL_OK &&
                         (ret = send_client_key_xchg(ssl)) == SSL_OK)
                     {
-                        ret = send_cert_verify(ssl);
+                        ret = (ssl->chain_length == 0) ? 
+                            SSL_ERROR_INVALID_HANDSHAKE : 
+                            send_cert_verify(ssl);
                     }
                 }
                 else

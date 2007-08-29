@@ -18,22 +18,22 @@
 
 all : sample
 
-include ../../config/.config
-include ../../config/makefile.conf
+AXTLS_HOME=../..
+
+include $(AXTLS_HOME)/config/.config
+include $(AXTLS_HOME)/config/makefile.conf
 
 ifndef CONFIG_PLATFORM_WIN32
 
 ifdef CONFIG_PLATFORM_CYGWIN
-TARGET=../../$(STAGE)/axssl.exe
+TARGET=$(AXTLS_HOME)/$(STAGE)/axssl.exe
 else
-TARGET=../../$(STAGE)/axssl
+TARGET=$(AXTLS_HOME)/$(STAGE)/axssl
 endif   # cygwin
 
-LIBS=../../$(STAGE)
-CFLAGS += -I../../crypto -I../../ssl -I../../config
+LIBS=$(AXTLS_HOME)/$(STAGE)
 else
-TARGET=../../$(STAGE)/axssl.exe
-CFLAGS += /I"..\..\ssl" /I"..\..\config"
+TARGET=$(AXTLS_HOME)/$(STAGE)/axssl.exe
 endif
 
 ifndef CONFIG_C_SAMPLES
@@ -42,12 +42,12 @@ sample:
 else
 sample : $(TARGET)
 OBJ= axssl.o
-include ../../config/makefile.post
+include $(AXTLS_HOME)/config/makefile.post
 
 ifndef CONFIG_PLATFORM_WIN32
 
 $(TARGET): $(OBJ) $(LIBS)/libaxtls.a
-	$(LD) $(LDFLAGS) -o $@ $< -L$(LIBS) -laxtls 
+	$(LD) $(LDFLAGS) -o $@ $(OBJ) -L$(LIBS) -laxtls 
 ifndef CONFIG_DEBUG
 ifndef CONFIG_PLATFORM_SOLARIS
 	strip --remove-section=.comment $(TARGET)
@@ -56,11 +56,11 @@ endif   # CONFIG_DEBUG
 else    # Win32
 
 $(TARGET): $(OBJ)
-	$(LD) $(LDFLAGS) ..\\..\\config\\axtls.res /out:$@ $^ /libpath:"../../$(STAGE)" axtls.lib
+	$(LD) $(LDFLAGS) $(AXTLS_HOME)/config/axtls.res /out:$@ $^ /libpath:"$(AXTLS_HOME)/$(STAGE)" axtls.lib
 endif
 
 endif    # CONFIG_C_SAMPLES
 
 clean::
-	-@rm -f ../../$(STAGE)/axssl*
+	-@rm -f $(AXTLS_HOME)/$(STAGE)/axssl*
 

@@ -90,6 +90,7 @@ sub transformSignature
             $line =~ s/uint8_t \*\* ?(\w+)/ByRef $1 As IntPtr/g;
             $line =~ s/const uint8_t \* ?(\w+)/ByVal $1() As Byte/g;
             $line =~ s/uint8_t \* ?(\w+)/ByVal $1() As Byte/g;
+            $line =~ s/uint8_t ?(\w+)/ByVal $1 As Byte/g;
             $line =~ s/const char \* ?(\w+)/ByVal $1 As String/g;
             $line =~ s/const SSL_CTX \* ?(\w+)/ByVal $1 As IntPtr/g;
             $line =~ s/SSL_CTX \* ?(\w+)/ByVal $1 As IntPtr/g;

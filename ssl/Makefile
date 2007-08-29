@@ -16,8 +16,10 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-include ../config/.config
-include ../config/makefile.conf
+AXTLS_HOME=..
+
+include $(AXTLS_HOME)/config/.config
+include $(AXTLS_HOME)/config/makefile.conf
 
 all: libs
 ifdef CONFIG_PERFORMANCE_TESTING
@@ -29,76 +31,79 @@ endif
 endif
 
 ifndef CONFIG_PLATFORM_WIN32
-TARGET1=../$(STAGE)/libaxtls.a
+TARGET1=$(AXTLS_HOME)/$(STAGE)/libaxtls.a
 BASETARGET=libaxtls.so
+CRYPTO_PATH=$(AXTLS_HOME)/crypto/
 ifdef CONFIG_PLATFORM_CYGWIN
-TARGET2=../$(STAGE)/libaxtls.dll.a
+TARGET2=$(AXTLS_HOME)/$(STAGE)/libaxtls.dll.a
 else
-TARGET2=../$(STAGE)/$(LIBMINOR)
+TARGET2=$(AXTLS_HOME)/$(STAGE)/$(LIBMINOR)
 endif
 
 # shared library major/minor numbers
 LIBMAJOR=$(BASETARGET).1
 LIBMINOR=$(BASETARGET).1.1
 else
-TARGET1=axtls.lib
-TARGET2=../$(STAGE)/axtls.dll
-STATIC_LIB=../$(STAGE)/axtls.static.lib
+TARGET1=$(AXTLS_HOME)/axtls.lib
+TARGET2=$(AXTLS_HOME)/$(STAGE)/axtls.dll
+STATIC_LIB=$(AXTLS_HOME)/$(STAGE)/axtls.static.lib
+CRYPTO_PATH=$(AXTLS_HOME)\\crypto\\
 endif
 
 libs: $(TARGET1) $(TARGET2)
 
-AXTLS_HOME=..
+CRYPTO_OBJ=\
+	$(CRYPTO_PATH)aes.o \
+	$(CRYPTO_PATH)hmac.o \
+	$(CRYPTO_PATH)md5.o \
+	$(CRYPTO_PATH)rc4.o \
+	$(CRYPTO_PATH)sha1.o
 
 OBJ=\
-	../crypto/aes.o \
 	asn1.o \
 	x509.o \
 	bigint.o \
 	crypto_misc.o \
-	../crypto/hmac.o \
 	os_port.o \
 	loader.o \
-	../crypto/md5.o \
 	openssl.o \
 	p12.o \
 	rsa.o \
-	../crypto/rc4.o \
-	../crypto/sha1.o \
 	tls1.o \
 	tls1_svr.o \
 	tls1_clnt.o
 
-include ../config/makefile.post
+include $(AXTLS_HOME)/config/makefile.post
 
 ifndef CONFIG_PLATFORM_WIN32     # Linux/Unix/Cygwin
 
 $(TARGET1) : $(OBJ)
-	$(AR) -r $@ $(OBJ)
+	$(AR) -r $@ $(CRYPTO_OBJ) $(OBJ)
 
 $(TARGET2) : $(OBJ)
 ifndef CONFIG_PLATFORM_CYGWIN
-	$(LD) $(LDFLAGS) $(LDSHARED) -Wl,-soname,$(LIBMAJOR) -o ../$(STAGE)/$(LIBMINOR) $(OBJ)
-	cd ../$(STAGE); ln -sf $(LIBMINOR) $(LIBMAJOR); ln -sf $(LIBMAJOR) $(BASETARGET); cd -
+	$(LD) $(LDFLAGS) $(LDSHARED) -Wl,-soname,$(LIBMAJOR) -o $(AXTLS_HOME)/$(STAGE)/$(LIBMINOR) $(CRYPTO_OBJ) $(OBJ)
+	cd $(AXTLS_HOME)/$(STAGE); ln -sf $(LIBMINOR) $(LIBMAJOR); ln -sf $(LIBMAJOR) $(BASETARGET); cd -
 else
-	$(LD) $(LDFLAGS) $(LDSHARED) -o ../$(STAGE)/cygaxtls.dll \
-    -Wl,--out-implib=../$(STAGE)/libaxtls.dll.a \
+	$(LD) $(LDFLAGS) $(LDSHARED) -o $(AXTLS_HOME)/$(STAGE)/cygaxtls.dll \
+    -Wl,--out-implib=$(AXTLS_HOME)/$(STAGE)/libaxtls.dll.a \
     -Wl,--export-all-symbols \
-    -Wl,--enable-auto-import $(OBJ)
+    -Wl,--enable-auto-import $(CRYPTO_OBJ) $(OBJ)
 endif
 
 else  # Win32
+CRYPTO_OBJ:=$(CRYPTO_OBJ:.o=.obj)
 
 $(TARGET1) : $(OBJ)
-	$(AR) /out:$@ $(OBJ)
+	$(AR) /out:$@ $(CRYPTO_OBJ) $(OBJ)
 
 $(TARGET2) : $(OBJ)
 	cp $(TARGET1) $(STATIC_LIB)
-	$(LD) $(LDFLAGS) $(LDSHARED) /out:$@ $(OBJ)
+	$(LD) $(LDFLAGS) $(LDSHARED) /out:$@ $(CRYPTO_OBJ) $(OBJ)
 
 endif    
 
 clean::
 	$(MAKE) -C test clean
-	-@rm -f ../$(STAGE)/* *.a *.lib
+	-@rm -f $(AXTLS_HOME)/$(STAGE)/* *.a $(TARGET1) $(TARGET2)
 
