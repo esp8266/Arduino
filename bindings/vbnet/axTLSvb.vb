@@ -46,9 +46,11 @@ Namespace axTLSvb
         End Function
 
         Public Function GetSessionId() As Byte()
-            Dim result(axtls.SSL_SESSION_ID_SIZE) As Byte
             Dim ptr As IntPtr = axtls.ssl_get_session_id(m_ssl)
-            Marshal.Copy(ptr, result, 0, axtls.SSL_SESSION_ID_SIZE)
+            Dim sess_id_size As Integer = axtls.ssl_get_session_id_size(m_ssl)
+            
+            Dim result(sess_id_size) As Byte
+            Marshal.Copy(ptr, result, 0, sess_id_size)
             Return result
         End Function
 
@@ -170,9 +172,11 @@ Namespace axTLSvb
         End Sub
 
         Public Function Connect(ByVal s As Socket, _
-                                ByVal session_id As Byte()) As SSL
+                                ByVal session_id As Byte(), _
+                                ByVal sess_id_size As Integer) As SSL
             Dim client_fd As Integer = s.Handle.ToInt32()
-            Return New SSL( axtls.ssl_client_new(m_ctx, client_fd, session_id))
+            Return New SSL( axtls.ssl_client_new(m_ctx, client_fd, session_id, _
+                       sess_id_size))
         End Function
 
     End Class

@@ -311,12 +311,14 @@ static int send_server_hello(SSL *ssl)
         /* retrieve id from session cache */
         memcpy(&buf[offset], ssl->session->session_id, SSL_SESSION_ID_SIZE);
         memcpy(ssl->session_id, ssl->session->session_id, SSL_SESSION_ID_SIZE);
+        ssl->sess_id_size = SSL_SESSION_ID_SIZE;
     }
     else    /* generate our own session id */
 #endif
     {
         get_random(SSL_SESSION_ID_SIZE, &buf[offset]);
         memcpy(ssl->session_id, &buf[offset], SSL_SESSION_ID_SIZE);
+        ssl->sess_id_size = SSL_SESSION_ID_SIZE;
 
 #ifndef CONFIG_SSL_SKELETON_MODE
         /* store id in session cache */

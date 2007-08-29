@@ -45,14 +45,14 @@ void hmac_md5(const uint8_t *msg, int length, const uint8_t *key,
         k_opad[i] ^= 0x5c;
     }
 
-    MD5Init(&context);
-    MD5Update(&context, k_ipad, 64);
-    MD5Update(&context, msg, length);
-    MD5Final(&context, digest);
-    MD5Init(&context);
-    MD5Update(&context, k_opad, 64);
-    MD5Update(&context, digest, MD5_SIZE);
-    MD5Final(&context, digest);
+    MD5_Init(&context);
+    MD5_Update(&context, k_ipad, 64);
+    MD5_Update(&context, msg, length);
+    MD5_Final(digest, &context);
+    MD5_Init(&context);
+    MD5_Update(&context, k_opad, 64);
+    MD5_Update(&context, digest, MD5_SIZE);
+    MD5_Final(digest, &context);
 }
 
 /**
@@ -77,12 +77,12 @@ void hmac_sha1(const uint8_t *msg, int length, const uint8_t *key,
         k_opad[i] ^= 0x5c;
     }
 
-    SHA1Init(&context);
-    SHA1Update(&context, k_ipad, 64);
-    SHA1Update(&context, msg, length);
-    SHA1Final(&context, digest);
-    SHA1Init(&context);
-    SHA1Update(&context, k_opad, 64);
-    SHA1Update(&context, digest, SHA1_SIZE);
-    SHA1Final(&context, digest);
+    SHA1_Init(&context);
+    SHA1_Update(&context, k_ipad, 64);
+    SHA1_Update(&context, msg, length);
+    SHA1_Final(digest, &context);
+    SHA1_Init(&context);
+    SHA1_Update(&context, k_opad, 64);
+    SHA1_Update(&context, digest, SHA1_SIZE);
+    SHA1_Final(digest, &context);
 }

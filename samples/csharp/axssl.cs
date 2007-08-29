@@ -508,7 +508,8 @@ public class axssl
         {
             while (reconnect-- > 0)
             {
-                ssl = ssl_ctx.Connect(client_sock, session_id);
+                ssl = ssl_ctx.Connect(client_sock, session_id,
+                        axtls.SSL_SESSION_ID_SIZE);
 
                 if ((res = ssl.HandshakeStatus()) != axtls.SSL_OK)
                 {

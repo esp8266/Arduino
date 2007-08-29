@@ -90,4 +90,11 @@ bigint *bi_square(BI_CTX *ctx, bigint *bi);
 #define bi_square(A, B)     bi_multiply(A, bi_copy(B), B)
 #endif
 
+#ifdef CONFIG_BIGINT_CRT
+bigint *bi_crt(BI_CTX *ctx, bigint *bi,
+        bigint *dP, bigint *dQ,
+        bigint *p, bigint *q,
+        bigint *qInv);
+#endif
+
 #endif

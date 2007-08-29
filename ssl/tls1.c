@@ -834,14 +834,14 @@ void finished_digest(SSL *ssl, const char *label, uint8_t *digest)
         q += strlen(label);
     }
 
-    MD5Init(&md5_ctx);
-    MD5Update(&md5_ctx, ssl->all_pkts, ssl->all_pkts_len);
-    MD5Final(&md5_ctx, q);
+    MD5_Init(&md5_ctx);
+    MD5_Update(&md5_ctx, ssl->all_pkts, ssl->all_pkts_len);
+    MD5_Final(q, &md5_ctx);
     q += MD5_SIZE;
     
-    SHA1Init(&sha1_ctx);
-    SHA1Update(&sha1_ctx, ssl->all_pkts, ssl->all_pkts_len);
-    SHA1Final(&sha1_ctx, q);
+    SHA1_Init(&sha1_ctx);
+    SHA1_Update(&sha1_ctx, ssl->all_pkts, ssl->all_pkts_len);
+    SHA1_Final(q, &sha1_ctx);
     q += SHA1_SIZE;
 
     if (label)
@@ -1532,8 +1532,8 @@ int send_certificate(SSL *ssl)
  * Find if an existing session has the same session id. If so, use the
  * master secret from this session for session resumption.
  */
-SSL_SESS *ssl_session_update(int max_sessions, 
-        SSL_SESS *ssl_sessions[], SSL *ssl, const uint8_t *session_id)
+SSL_SESS *ssl_session_update(int max_sessions, SSL_SESS *ssl_sessions[], 
+        SSL *ssl, const uint8_t *session_id)
 {
     time_t tm = time(NULL);
     time_t oldest_sess_time = tm;
@@ -1639,6 +1639,14 @@ void kill_ssl_session(SSL_SESS **ssl_sessions, SSL *ssl)
 EXP_FUNC const uint8_t * STDCALL ssl_get_session_id(const SSL *ssl)
 {
     return ssl->session_id;
+}
+
+/*
+ * Get the session id size for a handshake. 
+ */
+EXP_FUNC uint8_t STDCALL ssl_get_session_id_size(const SSL *ssl)
+{
+    return ssl->sess_id_size;
 }
 
 /*

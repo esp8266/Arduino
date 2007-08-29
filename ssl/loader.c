@@ -250,18 +250,18 @@ static int pem_decrypt(const char *where, const char *end,
         goto error;
 
     /* work out the key */
-    MD5Init(&md5_ctx);
-    MD5Update(&md5_ctx, (const uint8_t *)password, strlen(password));
-    MD5Update(&md5_ctx, iv, SALT_SIZE);
-    MD5Final(&md5_ctx, key);
+    MD5_Init(&md5_ctx);
+    MD5_Update(&md5_ctx, (const uint8_t *)password, strlen(password));
+    MD5_Update(&md5_ctx, iv, SALT_SIZE);
+    MD5_Final(key, &md5_ctx);
 
     if (is_aes_256)
     {
-        MD5Init(&md5_ctx);
-        MD5Update(&md5_ctx, key, MD5_SIZE);
-        MD5Update(&md5_ctx, (const uint8_t *)password, strlen(password));
-        MD5Update(&md5_ctx, iv, SALT_SIZE);
-        MD5Final(&md5_ctx, &key[MD5_SIZE]);
+        MD5_Init(&md5_ctx);
+        MD5_Update(&md5_ctx, key, MD5_SIZE);
+        MD5_Update(&md5_ctx, (const uint8_t *)password, strlen(password));
+        MD5_Update(&md5_ctx, iv, SALT_SIZE);
+        MD5_Final(&key[MD5_SIZE], &md5_ctx);
     }
 
     /* decrypt using the key/iv */

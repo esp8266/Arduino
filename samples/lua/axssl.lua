@@ -429,10 +429,12 @@ function do_client(build_mode)
     -- Try session resumption?
     if reconnect ~= 0 then
         local session_id = nil
+        local sess_id_size = 0
+
         while reconnect > 0 do
             reconnect = reconnect - 1
             ssl = axtlsl.ssl_client_new(ssl_ctx, 
-                    client_sock:getfd(), session_id)
+                    client_sock:getfd(), session_id, sess_id_size)
 
             res = axtlsl.ssl_handshake_status(ssl)
             if res ~= axtlsl.SSL_OK then
@@ -443,6 +445,7 @@ function do_client(build_mode)
 
             display_session_id(ssl)
             session_id = axtlsl.ssl_get_session_id(ssl)
+            sess_id_size = axtlsl.ssl_get_session_id_size(ssl)
 
             if reconnect > 0 then
                 axtlsl.ssl_free(ssl)
@@ -452,7 +455,7 @@ function do_client(build_mode)
 
         end
     else
-        ssl = axtlsl.ssl_client_new(ssl_ctx, client_sock:getfd(), nil)
+        ssl = axtlsl.ssl_client_new(ssl_ctx, client_sock:getfd(), nil, 0)
     end
 
     -- check the return status

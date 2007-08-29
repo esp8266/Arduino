@@ -16,36 +16,36 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-include ../../config/.config
-include ../../config/makefile.conf
+AXTLS_HOME=../..
+
+include $(AXTLS_HOME)/config/.config
+include $(AXTLS_HOME)/config/makefile.conf
 
 all: lib
 
+
 ifdef CONFIG_PLATFORM_WIN32
-TARGET=../../$(STAGE)/axtlsl.dll
+TARGET=$(AXTLS_HOME)/$(STAGE)/axtlsl.dll
 else
-TARGET=../../$(STAGE)/axtlsl.so
+TARGET=$(AXTLS_HOME)/$(STAGE)/axtlsl.so
 endif
 
 ifneq ($(MAKECMDGOALS), clean)
 
 lib: $(TARGET)
-AXTLS_HOME=../..
-SSL_HOME=$(AXTLS_HOME)/ssl
-CONFIG_HOME=$(AXTLS_HOME)/config
 OBJ:=axTLSl_wrap.o
-include ../../config/makefile.post
+include $(AXTLS_HOME)/config/makefile.post
 
 # there are a few static functions that aren't used
 CFLAGS += -funit-at-a-time
 
 $(TARGET) : $(OBJ)
-	$(LD) $(LDFLAGS) $(LDSHARED) -o $@ $^ -L../../$(STAGE) -L$(CONFIG_LUA_CORE)/lib -laxtls -llua
+	$(LD) $(LDFLAGS) $(LDSHARED) -o $@ $^ -L$(AXTLS_HOME)/$(STAGE) -L$(CONFIG_LUA_CORE)/lib -laxtls -llua
 
-CFLAGS += -I$(CONFIG_HOME) -I$(SSL_HOME) -I $(CONFIG_LUA_CORE)/include
+CFLAGS += -I $(CONFIG_LUA_CORE)/include
 else
-CFLAGS += /I"`cygpath -w $(CONFIG_HOME)`" /I"`cygpath -w $(SSL_HOME)`" /I"`cygpath -w $(CONFIG_LUA_CORE)/include`"
-LDFLAGS += axtls.lib /libpath:"../../$(STAGE)"
+CFLAGS += /I"`cygpath -w $(CONFIG_LUA_CORE)/include`"
+LDFLAGS += axtls.lib /libpath:"$(AXTLS_HOME)/$(STAGE)"
 
 $(TARGET) : $(OBJ)
 	$(LD) $(LDFLAGS) $(LDSHARED) /out:$@ $(OBJ)

@@ -16,18 +16,20 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-include ../../config/.config
-include ../../config/makefile.conf
-include ../../config/makefile.java.conf
+AXTLS_HOME=../..
+
+include $(AXTLS_HOME)/config/.config
+include $(AXTLS_HOME)/config/makefile.conf
+include $(AXTLS_HOME)/config/makefile.java.conf
 
 all: lib jar
 
-JAR=../../$(STAGE)/axtls.jar
+JAR=$(AXTLS_HOME)/$(STAGE)/axtls.jar
 
 ifdef CONFIG_PLATFORM_WIN32
-TARGET=../../$(STAGE)/axtlsj.dll
+TARGET=$(AXTLS_HOME)/$(STAGE)/axtlsj.dll
 else
-TARGET=../../$(STAGE)/libaxtlsj.so
+TARGET=$(AXTLS_HOME)/$(STAGE)/libaxtlsj.so
 endif
 
 lib: $(TARGET)
@@ -46,32 +48,19 @@ JAVA_FILES= \
 
 OBJ=axTLSj_wrap.o
 
-AXTLS_HOME=../..
-SSL_HOME=$(AXTLS_HOME)/ssl
-CONFIG_HOME=$(AXTLS_HOME)/config
 JAVA_CLASSES:=$(JAVA_FILES:%.java=classes/axTLSj/%.class)
 
 ifdef CONFIG_PLATFORM_WIN32
-CFLAGS += /I"$(shell cygpath -w $(SSL_HOME))"
-CFLAGS += /I"$(shell cygpath -w $(CONFIG_HOME))"
-LDFLAGS += axtls.lib /libpath:"../../$(STAGE)"
+LDFLAGS += axtls.lib /libpath:"$(AXTLS_HOME)/$(STAGE)"
 
-include ../../config/makefile.post
+include $(AXTLS_HOME)/config/makefile.post
 
 $(TARGET) : $(OBJ)
 	$(LD) $(LDFLAGS) $(LDSHARED) /out:$@ $(OBJ)
 else    # Not Win32
 
-ifdef CONFIG_PLATFORM_CYGWIN
-SSL_HOME:=$(shell cygpath -u $(SSL_HOME))
-CONFIG_HOME:=$(shell cygpath -u $(CONFIG_HOME))
-endif
-
-CFLAGS += -I$(SSL_HOME)
-CFLAGS += -I$(CONFIG_HOME)
-
 $(TARGET) : $(OBJ)
-	$(LD) $(LDFLAGS) -L ../../$(STAGE) $(LDSHARED) -o $@ $(OBJ) -laxtls 
+	$(LD) $(LDFLAGS) -L $(AXTLS_HOME)/$(STAGE) $(LDSHARED) -o $@ $(OBJ) -laxtls 
 endif
 
 jar: $(OBJ) $(JAR)

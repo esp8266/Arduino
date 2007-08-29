@@ -30,7 +30,7 @@ TARGET=../../$(STAGE)/axssl
 endif   # cygwin
 
 LIBS=../../$(STAGE)
-CFLAGS += -I../../ssl -I../../config
+CFLAGS += -I../../crypto -I../../ssl -I../../config
 else
 TARGET=../../$(STAGE)/axssl.exe
 CFLAGS += /I"..\..\ssl" /I"..\..\config"

@@ -37,7 +37,7 @@ else
 LIBS=-L../$(STAGE) -laxtls
 endif
 
-CFLAGS += -I../ssl
+AXTLS_HOME=..
 
 ifdef CONFIG_HTTP_BUILD_LUA
 lua: kepler-1.1

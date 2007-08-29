@@ -411,9 +411,12 @@ sub do_client
     if ($reconnect)
     {
         my $session_id = undef;
+        my $sess_id_size = 0;
+
         while ($reconnect--)
         {
-            $ssl = axtlsp::ssl_client_new($ssl_ctx, $native_sock, $session_id);
+            $ssl = axtlsp::ssl_client_new($ssl_ctx, $native_sock, 
+                            $session_id, $sess_id_size);
 
             $res = axtlsp::ssl_handshake_status($ssl);
             if ($res != $axtlsp::SSL_OK)
@@ -439,7 +442,7 @@ sub do_client
     }
     else
     {
-        $ssl = axtlsp::ssl_client_new($ssl_ctx, $native_sock, undef);
+        $ssl = axtlsp::ssl_client_new($ssl_ctx, $native_sock, undef, 0);
     }
 
     # check the return status

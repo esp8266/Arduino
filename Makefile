@@ -33,6 +33,7 @@ RELEASE=axTLS-$(VERSION)
 
 # standard version
 target:
+	$(MAKE) -C crypto
 	$(MAKE) -C ssl
 ifdef CONFIG_AXHTTPD
 	$(MAKE) -C httpd
@@ -100,6 +101,7 @@ test:
 
 # tidy up things
 clean::
+	@cd crypto; $(MAKE) clean
 	@cd ssl; $(MAKE) clean
 	@cd httpd; $(MAKE) clean
 	@cd samples; $(MAKE) clean

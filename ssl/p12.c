@@ -190,16 +190,16 @@ static int p8_decrypt(const char *uni_pass, int uni_pass_len,
     }
 
     /* get the key - no IV since we are using RC4 */
-    SHA1Init(&sha_ctx);
-    SHA1Update(&sha_ctx, d, sizeof(d));
-    SHA1Update(&sha_ctx, p, sizeof(p));
-    SHA1Final(&sha_ctx, Ai);
+    SHA1_Init(&sha_ctx);
+    SHA1_Update(&sha_ctx, d, sizeof(d));
+    SHA1_Update(&sha_ctx, p, sizeof(p));
+    SHA1_Final(Ai, &sha_ctx);
 
     for (i = 1; i < iter; i++)
     {
-        SHA1Init(&sha_ctx);
-        SHA1Update(&sha_ctx, Ai, SHA1_SIZE);
-        SHA1Final(&sha_ctx, Ai);
+        SHA1_Init(&sha_ctx);
+        SHA1_Update(&sha_ctx, Ai, SHA1_SIZE);
+        SHA1_Final(Ai, &sha_ctx);
     }
 
     /* do the decryption */

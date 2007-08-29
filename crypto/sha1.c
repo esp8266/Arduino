@@ -37,7 +37,7 @@ static void SHA1ProcessMessageBlock(SHA1_CTX *ctx);
 /**
  * Initialize the SHA1 context 
  */
-void SHA1Init(SHA1_CTX *ctx)
+void SHA1_Init(SHA1_CTX *ctx)
 {
     ctx->Length_Low             = 0;
     ctx->Length_High            = 0;
@@ -52,7 +52,7 @@ void SHA1Init(SHA1_CTX *ctx)
 /**
  * Accepts an array of octets as the next portion of the message.
  */
-void SHA1Update(SHA1_CTX *ctx, const uint8_t *msg, int len)
+void SHA1_Update(SHA1_CTX *ctx, const uint8_t *msg, int len)
 {
     while (len--)
     {
@@ -72,7 +72,7 @@ void SHA1Update(SHA1_CTX *ctx, const uint8_t *msg, int len)
 /**
  * Return the 160-bit message digest into the user's array
  */
-void SHA1Final(SHA1_CTX *ctx, uint8_t *digest)
+void SHA1_Final(uint8_t *digest, SHA1_CTX *ctx)
 {
     int i;
 

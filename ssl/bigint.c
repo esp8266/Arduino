@@ -54,7 +54,6 @@
 #include <stdio.h>
 #include <time.h>
 #include "bigint.h"
-#include "crypto.h"
 
 static bigint *bi_int_multiply(BI_CTX *ctx, bigint *bi, comp i);
 static bigint *bi_int_divide(BI_CTX *ctx, bigint *biR, comp denom);
@@ -1366,6 +1365,7 @@ static void precompute_slide_window(BI_CTX *ctx, int window, bigint *g1)
  * @param ctx [in]  The bigint session context.
  * @param bi  [in]  The bigint on which to perform the mod power operation.
  * @param biexp [in] The bigint exponent.
+ * @return The result of the mod exponentiation operation
  * @see bi_set_mod().
  */
 bigint *bi_mod_power(BI_CTX *ctx, bigint *bi, bigint *biexp)
@@ -1467,6 +1467,7 @@ bigint *bi_mod_power(BI_CTX *ctx, bigint *bi, bigint *biexp)
  * @param bi  [in]  The bigint to perform the exp/mod.
  * @param bim [in]  The temporary modulus.
  * @param biexp [in] The bigint exponent.
+ * @return The result of the mod exponentiation operation
  * @see bi_set_mod().
  */
 bigint *bi_mod_power2(BI_CTX *ctx, bigint *bi, bigint *bim, bigint *biexp)
@@ -1491,6 +1492,47 @@ bigint *bi_mod_power2(BI_CTX *ctx, bigint *bi, bigint *bim, bigint *biexp)
     bi_free(ctx, bim);
     bi_free(ctx, biexp);
     return biR;
+}
+#endif
+
+#ifdef CONFIG_BIGINT_CRT
+/**
+ * @Use the Chinese Remainder Theorem to quickly perform RSA decrypts.
+ *
+ * @param ctx [in]  The bigint session context.
+ * @param bi  [in]  The bigint to perform the exp/mod.
+ * @param dP [in] CRT's dP bigint
+ * @param dQ [in] CRT's dQ bigint
+ * @param p [in] CRT's p bigint
+ * @param q [in] CRT's q bigint
+ * @param qInv [in] CRT's qInv bigint
+ * @return The result of the CRT operation
+ */
+bigint *bi_crt(BI_CTX *ctx, bigint *bi,
+        bigint *dP, bigint *dQ,
+        bigint *p, bigint *q, bigint *qInv)
+{
+    bigint *m1, *m2, *h;
+
+    /* Montgomery has a condition the 0 < x, y < m and these products violate
+     * that condition. So disable Montgomery when using CRT */
+#if defined(CONFIG_BIGINT_MONTGOMERY)
+    ctx->use_classical = 1;
+#endif
+    ctx->mod_offset = BIGINT_P_OFFSET;
+    m1 = bi_mod_power(ctx, bi_copy(bi), dP);
+
+    ctx->mod_offset = BIGINT_Q_OFFSET;
+    m2 = bi_mod_power(ctx, bi, dQ);
+
+    h = bi_subtract(ctx, bi_add(ctx, m1, p), bi_copy(m2), NULL);
+    h = bi_multiply(ctx, h, qInv);
+    ctx->mod_offset = BIGINT_P_OFFSET;
+    h = bi_residue(ctx, h);
+#if defined(CONFIG_BIGINT_MONTGOMERY)
+    ctx->use_classical = 0;         /* reset for any further operation */
+#endif
+    return bi_add(ctx, m2, bi_multiply(ctx, q, h));
 }
 #endif
 /** @} */

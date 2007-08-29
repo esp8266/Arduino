@@ -48,20 +48,23 @@ endif
 
 libs: $(TARGET1) $(TARGET2)
 
+AXTLS_HOME=..
+
 OBJ=\
-	aes.o \
+	../crypto/aes.o \
 	asn1.o \
+	x509.o \
 	bigint.o \
 	crypto_misc.o \
-	hmac.o \
+	../crypto/hmac.o \
 	os_port.o \
 	loader.o \
-	md5.o \
+	../crypto/md5.o \
 	openssl.o \
 	p12.o \
 	rsa.o \
-	rc4.o \
-	sha1.o \
+	../crypto/rc4.o \
+	../crypto/sha1.o \
 	tls1.o \
 	tls1_svr.o \
 	tls1_clnt.o

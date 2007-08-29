@@ -25,11 +25,7 @@
 #include <string.h>
 #include <time.h>
 #include <stdlib.h>
-#include "crypto.h"
-
-#ifdef CONFIG_BIGINT_CRT
-static bigint *bi_crt(const RSA_CTX *rsa, bigint *bi);
-#endif
+#include "crypto_misc.h"
 
 void RSA_priv_key_new(RSA_CTX **ctx, 
         const uint8_t *modulus, int mod_len,
@@ -180,46 +176,13 @@ int RSA_decrypt(const RSA_CTX *ctx, const uint8_t *in_data,
 bigint *RSA_private(const RSA_CTX *c, bigint *bi_msg)
 {
 #ifdef CONFIG_BIGINT_CRT
-    return bi_crt(c, bi_msg);
+    return bi_crt(c->bi_ctx, bi_msg, c->dP, c->dQ, c->p, c->q, c->qInv);
 #else
     BI_CTX *ctx = c->bi_ctx;
     ctx->mod_offset = BIGINT_M_OFFSET;
     return bi_mod_power(ctx, bi_msg, c->d);
 #endif
 }
-
-#ifdef CONFIG_BIGINT_CRT
-/**
- * Use the Chinese Remainder Theorem to quickly perform RSA decrypts.
- * This should really be in bigint.c (and was at one stage), but needs 
- * access to the RSA_CTX context...
- */
-static bigint *bi_crt(const RSA_CTX *rsa, bigint *bi)
-{
-    BI_CTX *ctx = rsa->bi_ctx;
-    bigint *m1, *m2, *h;
-
-    /* Montgomery has a condition the 0 < x, y < m and these products violate
-     * that condition. So disable Montgomery when using CRT */
-#if defined(CONFIG_BIGINT_MONTGOMERY)
-    ctx->use_classical = 1;
-#endif
-    ctx->mod_offset = BIGINT_P_OFFSET;
-    m1 = bi_mod_power(ctx, bi_copy(bi), rsa->dP);
-
-    ctx->mod_offset = BIGINT_Q_OFFSET;
-    m2 = bi_mod_power(ctx, bi, rsa->dQ);
-
-    h = bi_subtract(ctx, bi_add(ctx, m1, rsa->p), bi_copy(m2), NULL);
-    h = bi_multiply(ctx, h, rsa->qInv);
-    ctx->mod_offset = BIGINT_P_OFFSET;
-    h = bi_residue(ctx, h);
-#if defined(CONFIG_BIGINT_MONTGOMERY)
-    ctx->use_classical = 0;         /* reset for any further operation */
-#endif
-    return bi_add(ctx, m2, bi_multiply(ctx, rsa->q, h));
-}
-#endif
 
 #ifdef CONFIG_SSL_FULL_MODE
 /**
@@ -294,7 +257,6 @@ bigint *RSA_sign_verify(BI_CTX *ctx, const uint8_t *sig, int sig_len,
     int i, size;
     bigint *decrypted_bi, *dat_bi;
     bigint *bir = NULL;
-
     block = (uint8_t *)malloc(sig_len);
 
     /* decrypt */

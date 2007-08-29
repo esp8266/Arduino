@@ -95,9 +95,10 @@ namespace axTLS
          */
         public byte[] GetSessionId()
         {
-            byte[] result = new byte[axtls.SSL_SESSION_ID_SIZE];
             IntPtr ptr = axtls.ssl_get_session_id(m_ssl);
-            Marshal.Copy(ptr, result, 0, axtls.SSL_SESSION_ID_SIZE);
+            byte sess_id_size = axtls.ssl_get_session_id_size(m_ssl);
+            byte[] result = new byte[sess_id_size];
+            Marshal.Copy(ptr, result, 0, sess_id_size);
             return result;
         }
 
@@ -470,7 +471,8 @@ namespace axTLS
         public SSL Connect(Socket s, byte[] session_id)
         {
             int client_fd = s.Handle.ToInt32();
-            return new SSL(axtls. ssl_client_new(m_ctx, client_fd, session_id));
+            return new SSL(axtls. ssl_client_new(m_ctx, client_fd, session_id,
+                        session_id ? null : session_id.Length));
         }
     }
 }

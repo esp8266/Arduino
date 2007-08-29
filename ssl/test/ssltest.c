@@ -250,9 +250,9 @@ static int SHA1_test(BI_CTX *bi_ctx)
                 "A9993E364706816ABA3E25717850C26C9CD0D89D");
         bi_export(bi_ctx, ct_bi, ct, SHA1_SIZE);
 
-        SHA1Init(&ctx);
-        SHA1Update(&ctx, (const uint8_t *)in_str, strlen(in_str));
-        SHA1Final(&ctx, digest);
+        SHA1_Init(&ctx);
+        SHA1_Update(&ctx, (const uint8_t *)in_str, strlen(in_str));
+        SHA1_Final(digest, &ctx);
 
         if (memcmp(digest, ct, sizeof(ct)))
         {
@@ -268,9 +268,9 @@ static int SHA1_test(BI_CTX *bi_ctx)
                 "84983E441C3BD26EBAAE4AA1F95129E5E54670F1");
         bi_export(bi_ctx, ct_bi, ct, SHA1_SIZE);
 
-        SHA1Init(&ctx);
-        SHA1Update(&ctx, (const uint8_t *)in_str, strlen(in_str));
-        SHA1Final(&ctx, digest);
+        SHA1_Init(&ctx);
+        SHA1_Update(&ctx, (const uint8_t *)in_str, strlen(in_str));
+        SHA1_Final(digest, &ctx);
 
         if (memcmp(digest, ct, sizeof(ct)))
         {
@@ -304,9 +304,9 @@ static int MD5_test(BI_CTX *bi_ctx)
                 "900150983CD24FB0D6963F7D28E17F72");
         bi_export(bi_ctx, ct_bi, ct, MD5_SIZE);
 
-        MD5Init(&ctx);
-        MD5Update(&ctx, (const uint8_t *)in_str, strlen(in_str));
-        MD5Final(&ctx, digest);
+        MD5_Init(&ctx);
+        MD5_Update(&ctx, (const uint8_t *)in_str, strlen(in_str));
+        MD5_Final(digest, &ctx);
 
         if (memcmp(digest, ct, sizeof(ct)))
         {
@@ -322,9 +322,9 @@ static int MD5_test(BI_CTX *bi_ctx)
                 bi_ctx, "D174AB98D277D9F5A5611C2C9F419D9F");
         bi_export(bi_ctx, ct_bi, ct, MD5_SIZE);
 
-        MD5Init(&ctx);
-        MD5Update(&ctx, (const uint8_t *)in_str, strlen(in_str));
-        MD5Final(&ctx, digest);
+        MD5_Init(&ctx);
+        MD5_Update(&ctx, (const uint8_t *)in_str, strlen(in_str));
+        MD5_Final(digest, &ctx);
 
         if (memcmp(digest, ct, sizeof(ct)))
         {
@@ -1250,7 +1250,7 @@ static int SSL_client_test(
         goto client_test_exit;
     }
 
-    ssl = ssl_client_new(*ssl_ctx, client_fd, session_id);
+    ssl = ssl_client_new(*ssl_ctx, client_fd, session_id, sizeof(session_id));
 
     /* check the return status */
     if ((ret = ssl_handshake_status(ssl)))
@@ -1469,7 +1469,7 @@ static void do_basic(void)
                                         "../ssl/test/axTLS.ca_x509.cer", NULL))
         goto error;
 
-    ssl_clnt = ssl_client_new(ssl_clnt_ctx, client_fd, NULL);
+    ssl_clnt = ssl_client_new(ssl_clnt_ctx, client_fd, NULL, 0);
 
     /* check the return status */
     if (ssl_handshake_status(ssl_clnt))
@@ -1588,7 +1588,7 @@ void do_multi_clnt(multi_t *multi_data)
         goto client_test_exit;
 
     sleep(1);
-    ssl = ssl_client_new(multi_data->ssl_clnt_ctx, client_fd, NULL);
+    ssl = ssl_client_new(multi_data->ssl_clnt_ctx, client_fd, NULL, 0);
 
     if ((res = ssl_handshake_status(ssl)))
     {

@@ -56,7 +56,7 @@ extern "C" {
 #endif
 
 #include <time.h>
-#include "crypto.h"
+//#include "crypto.h"
 
 /* need to predefine before ssl_lib.h gets to it */
 #define SSL_SESSION_ID_SIZE                     32
@@ -221,10 +221,11 @@ EXP_FUNC SSL * STDCALL ssl_server_new(SSL_CTX *ssl_ctx, int client_fd);
  * @param session_id [in] A 32 byte session id for session resumption. This 
  * can be null if no session resumption is being used or required. This option
  * is not used in skeleton mode.
+ * @param sess_id_size The size of the session id (max 32)
  * @return An SSL object reference. Use ssl_handshake_status() to check 
  * if a handshake succeeded.
  */
-EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const uint8_t *session_id);
+EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const uint8_t *session_id, uint8_t sess_id_size);
 
 /**
  * @brief Free any used resources on this connection. 
@@ -285,6 +286,15 @@ EXP_FUNC SSL * STDCALL ssl_find(SSL_CTX *ssl_ctx, int client_fd);
  * @note A SSLv23 handshake may have only 16 valid bytes.
  */
 EXP_FUNC const uint8_t * STDCALL ssl_get_session_id(const SSL *ssl);
+
+/**
+ * @brief Get the session id size for a handshake. 
+ * 
+ * This will be 32 for a ssl server and may be something else for a ssl client.
+ * @param ssl [in] An SSL object reference.
+ * @return The number of valid bytes in a handshaking sequence
+ */
+EXP_FUNC uint8_t STDCALL ssl_get_session_id_size(const SSL *ssl);
 
 /**
  * @brief Return the cipher id (in the SSL form).

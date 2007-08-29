@@ -607,7 +607,8 @@ static void do_client(int argc, char *argv[])
     {
         while (reconnect--)
         {
-            ssl = ssl_client_new(ssl_ctx, client_fd, session_id);
+            ssl = ssl_client_new(ssl_ctx, client_fd, session_id,
+                    sizeof(session_id));
             if ((res = ssl_handshake_status(ssl)) != SSL_OK)
             {
                 if (!quiet)
@@ -635,7 +636,7 @@ static void do_client(int argc, char *argv[])
     }
     else
     {
-        ssl = ssl_client_new(ssl_ctx, client_fd, NULL);
+        ssl = ssl_client_new(ssl_ctx, client_fd, NULL, 0);
     }
 
     /* check the return status */
@@ -854,9 +855,10 @@ static void display_session_id(SSL *ssl)
 {    
     int i;
     const uint8_t *session_id = ssl_get_session_id(ssl);
+    int sess_id_size = ssl_get_session_id_size(ssl);
 
     printf("-----BEGIN SSL SESSION PARAMETERS-----\n");
-    for (i = 0; i < SSL_SESSION_ID_SIZE; i++)
+    for (i = 0; i < sess_id_size; i++)
     {
         printf("%02x", session_id[i]);
     }

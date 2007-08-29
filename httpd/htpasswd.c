@@ -112,10 +112,10 @@ int main(int argc, char *argv[])
     RNG_terminate();
     base64_encode(md5_salt, MD5_SIZE, b64_salt, sizeof(b64_salt));
 
-    MD5Init(&ctx);
-    MD5Update(&ctx, md5_salt, MD5_SIZE);
-    MD5Update(&ctx, (uint8_t *)pw, strlen(pw));
-    MD5Final(&ctx, md5_pass);
+    MD5_Init(&ctx);
+    MD5_Update(&ctx, md5_salt, MD5_SIZE);
+    MD5_Update(&ctx, (uint8_t *)pw, strlen(pw));
+    MD5_Final(md5_pass, &ctx);
     base64_encode(md5_pass, MD5_SIZE, b64_pass, sizeof(b64_pass));
 
     printf("Add the following to your '.htpasswd' file\n");

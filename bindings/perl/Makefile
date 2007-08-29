@@ -16,15 +16,17 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 
-include ../../config/.config
-include ../../config/makefile.conf
+AXTLS_HOME=../..
+
+include $(AXTLS_HOME)/config/.config
+include $(AXTLS_HOME)/config/makefile.conf
 
 all: lib
 
 ifdef CONFIG_PLATFORM_WIN32
-TARGET=../../$(STAGE)/axtlsp.dll
+TARGET=$(AXTLS_HOME)/$(STAGE)/axtlsp.dll
 else
-TARGET=../../$(STAGE)/libaxtlsp.so
+TARGET=$(AXTLS_HOME)/$(STAGE)/libaxtlsp.so
 endif
 
 ifneq ($(MAKECMDGOALS), clean)
@@ -46,11 +48,8 @@ test_perl:
 endif
 
 lib: $(TARGET)
-AXTLS_HOME=../..
-SSL_HOME=$(AXTLS_HOME)/ssl
-CONFIG_HOME=$(AXTLS_HOME)/config
 OBJ:=axTLSp_wrap.o
-include ../../config/makefile.post
+include $(AXTLS_HOME)/config/makefile.post
 
 ifndef CONFIG_PLATFORM_WIN32        # Linux/Unix/Cygwin
 
@@ -60,22 +59,21 @@ ifndef CONFIG_PLATFORM_WIN32        # Linux/Unix/Cygwin
 # work.
 #
 $(TARGET) : $(OBJ)
-	$(LD) $(LDFLAGS) -L ../../$(STAGE) -L$(PERL5_CORE) $(LDSHARED) -o $@ $(OBJ) -laxtls -lperl
+	$(LD) $(LDFLAGS) -L$(AXTLS_HOME)/$(STAGE) -L$(PERL5_CORE) $(LDSHARED) -o $@ $(OBJ) -laxtls -lperl
 ifdef CONFIG_PLATFORM_CYGWIN
-	cd ../../$(STAGE); ln -sf $(notdir $@) axtlsp.dll
+	cd $(AXTLS_HOME)/$(STAGE); ln -sf $(notdir $@) axtlsp.dll
 endif
-	@install axtlsp.pm ../../$(STAGE)
+	@install axtlsp.pm $(AXTLS_HOME)/$(STAGE)
 
-CFLAGS += -D_GNU_SOURCE -I$(CONFIG_HOME) -I$(SSL_HOME) -I$(PERL5_CORE)
+CFLAGS += -D_GNU_SOURCE -I$(PERL5_CORE)
 else
-CFLAGS += /I"`cygpath -w $(CONFIG_HOME)`" /I"`cygpath -w $(SSL_HOME)`"
 CFLAGS += /I"$(PERL5_CORE)"
-LDFLAGS += $(CONFIG_PERL_LIB) /libpath:"$(PERL5_CORE)" axtls.lib /libpath:"../../$(STAGE)"
+LDFLAGS += $(CONFIG_PERL_LIB) /libpath:"$(PERL5_CORE)" axtls.lib /libpath:"$(AXTLS_HOME)/$(STAGE)"
 
 $(TARGET) : $(OBJ)
 	$(LD) $(LDFLAGS) $(LDSHARED) /out:$@ $(OBJ)
-	install axtlsp.pm ../../$(STAGE)
+	install axtlsp.pm $(AXTLS_HOME)/$(STAGE)
 endif # WIN32
 
 clean::
-	@rm -f $(TARGET) axtls* *.i axTLSp* *.c .depend ../../$(STAGE)/axtlsp.pm
+	@rm -f $(TARGET) axtls* *.i axTLSp* *.c .depend $(AXTLS_HOME)/$(STAGE)/axtlsp.pm

@@ -903,10 +903,10 @@ static int check_digest(char *salt, const char *msg_passwd)
         return -1;
 
     /* very simple MD5 crypt algorithm, but then the salt we use is large */
-    MD5Init(&ctx);
-    MD5Update(&ctx, b256_salt, salt_size);           /* process the salt */
-    MD5Update(&ctx, (uint8_t *)msg_passwd, strlen(msg_passwd)); 
-    MD5Final(&ctx, md5_result);
+    MD5_Init(&ctx);
+    MD5_Update(&ctx, b256_salt, salt_size);           /* process the salt */
+    MD5_Update(&ctx, (uint8_t *)msg_passwd, strlen(msg_passwd)); 
+    MD5_Final(md5_result, &ctx);
     return memcmp(md5_result, real_passwd, MD5_SIZE);/* 0 = ok */
 }
 

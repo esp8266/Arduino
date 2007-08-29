@@ -33,7 +33,7 @@ ifndef CONFIG_PLATFORM_WIN32
 performance: ../../$(STAGE)/perf_bigint
 ssltesting: ../../$(STAGE)/ssltest
 LIBS=../../$(STAGE)
-CFLAGS += -I../../ssl -I../../config
+CFLAGS += -I../../ssl -I../../config -I../../crypto
 
 ../../$(STAGE)/perf_bigint: perf_bigint.o $(LIBS)/libaxtls.a
 	$(CC) $(LDFLAGS) -o $@ $^ -L $(LIBS) -laxtls

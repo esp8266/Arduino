@@ -35,7 +35,8 @@ static int send_cert_verify(SSL *ssl);
 /*
  * Establish a new SSL connection to an SSL server.
  */
-EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const uint8_t *session_id)
+EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const
+        uint8_t *session_id, uint8_t sess_id_size)
 {
     SSL *ssl;
     int ret;
@@ -45,7 +46,14 @@ EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const uin
 
     if (session_id && ssl_ctx->num_sessions)
     {
-        memcpy(ssl->session_id, session_id, SSL_SESSION_ID_SIZE);
+        if (sess_id_size > SSL_SESSION_ID_SIZE) /* validity check */
+        {
+            ssl_free(ssl);
+            return NULL;
+        }
+
+        memcpy(ssl->session_id, session_id, sess_id_size);
+        ssl->sess_id_size = sess_id_size;
         SET_SSL_FLAG(SSL_SESSION_RESUME);   /* just flag for later */
     }
 
@@ -176,11 +184,11 @@ static int send_client_hello(SSL *ssl)
     offset = 6 + SSL_RANDOM_SIZE;
 
     /* give session resumption a go */
-    if (IS_SET_SSL_FLAG(SSL_SESSION_RESUME))    /* set initially bu user */
+    if (IS_SET_SSL_FLAG(SSL_SESSION_RESUME))    /* set initially by user */
     {
-        buf[offset++] = SSL_SESSION_ID_SIZE;
-        memcpy(&buf[offset], ssl->session_id, SSL_SESSION_ID_SIZE);
-        offset += SSL_SESSION_ID_SIZE;
+        buf[offset++] = ssl->sess_id_size;
+        memcpy(&buf[offset], ssl->session_id, ssl->sess_id_size);
+        offset += ssl->sess_id_size;
         CLR_SSL_FLAG(SSL_SESSION_RESUME);       /* clear so we can set later */
     }
     else
@@ -216,7 +224,7 @@ static int process_server_hello(SSL *ssl)
     int offset;
     int version = (buf[4] << 4) + buf[5];
     int num_sessions = ssl->ssl_ctx->num_sessions;
-    uint8_t session_id_length;
+    uint8_t sess_id_size;
     int ret = SSL_OK;
 
     /* check that we are talking to a TLSv1 server */
@@ -226,17 +234,25 @@ static int process_server_hello(SSL *ssl)
     /* get the server random value */
     memcpy(ssl->server_random, &buf[6], SSL_RANDOM_SIZE);
     offset = 6 + SSL_RANDOM_SIZE; /* skip of session id size */
-    session_id_length = buf[offset++];
+    sess_id_size = buf[offset++];
 
     if (num_sessions)
     {
         ssl->session = ssl_session_update(num_sessions,
                 ssl->ssl_ctx->ssl_sessions, ssl, &buf[offset]);
-        memcpy(ssl->session->session_id, &buf[offset], session_id_length);
+        memcpy(ssl->session->session_id, &buf[offset], sess_id_size);
+
+        /* pad the rest with 0's */
+        if (sess_id_size < SSL_SESSION_ID_SIZE)
+        {
+            memset(&ssl->session->session_id[sess_id_size], 0,
+                SSL_SESSION_ID_SIZE-sess_id_size);
+        }
     }
 
-    memcpy(ssl->session_id, &buf[offset], session_id_length);
-    offset += session_id_length;
+    memcpy(ssl->session_id, &buf[offset], sess_id_size);
+    ssl->sess_id_size = sess_id_size;
+    offset += sess_id_size;
 
     /* get the real cipher we are using */
     ssl->cipher = buf[++offset];

@@ -29,6 +29,8 @@ extern "C" {
 #endif
 
 #include "version.h"
+#include "crypto.h"
+#include "crypto_misc.h"
 
 /* Mutexing definitions */
 #if defined(CONFIG_SSL_CTX_MUTEXING)
@@ -156,6 +158,7 @@ struct _SSL
     uint8_t record_type;
     uint8_t chain_length;
     uint8_t cipher;
+    uint8_t sess_id_size;
     int16_t next_state;
     int16_t hs_status;
     uint8_t *all_pkts; 
