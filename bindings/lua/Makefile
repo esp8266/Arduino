@@ -27,7 +27,7 @@ all: lib
 ifdef CONFIG_PLATFORM_WIN32
 TARGET=$(AXTLS_HOME)/$(STAGE)/axtlsl.dll
 else
-TARGET=$(AXTLS_HOME)/$(STAGE)/axtlsl.so
+TARGET=$(CONFIG_LUA_CORE)/lib/lua/5.1/axtlsl.so
 endif
 
 ifneq ($(MAKECMDGOALS), clean)

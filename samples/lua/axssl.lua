@@ -527,11 +527,13 @@ function display_session_id(ssl)
     local session_id = axtlsl.ssl_get_session_id(ssl)
     local v
 
-    print("-----BEGIN SSL SESSION PARAMETERS-----")
-    for _, v in ipairs(session_id) do
-        io.write(string.format("%02x", v))
+    if #session_id > 0 then
+        print("-----BEGIN SSL SESSION PARAMETERS-----")
+        for _, v in ipairs(session_id) do
+            io.write(string.format("%02x", v))
+        end
+        print("\n-----END SSL SESSION PARAMETERS-----")
     end
-    print("\n-----END SSL SESSION PARAMETERS-----")
 end
 
 --

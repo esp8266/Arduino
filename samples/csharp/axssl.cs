@@ -732,12 +732,15 @@ public class axssl
     {    
         byte[] session_id = ssl.GetSessionId();
 
-        Console.WriteLine("-----BEGIN SSL SESSION PARAMETERS-----");
-        foreach (byte b in session_id)
+        if (session_id.Length > 0)
         {
-            Console.Write("{0:x02}", b);
-        }
+            Console.WriteLine("-----BEGIN SSL SESSION PARAMETERS-----");
+            foreach (byte b in session_id)
+            {
+                Console.Write("{0:x02}", b);
+            }
 
-        Console.WriteLine("\n-----END SSL SESSION PARAMETERS-----");
+            Console.WriteLine("\n-----END SSL SESSION PARAMETERS-----");
+        }
     }
 }

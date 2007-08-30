@@ -85,6 +85,7 @@ ifdef CONFIG_PERL_BINDINGS
 	install -m 755 $(STAGE)/axtlsp.pm `perl -e 'use Config; print $$Config{installarchlib};'`
 endif
 	@mkdir -p -m 755 $(PREFIX)/include/axTLS
+	install -m 644 crypto/*.h $(PREFIX)/include/axTLS
 	install -m 644 ssl/*.h $(PREFIX)/include/axTLS
 	-rm $(PREFIX)/include/axTLS/cert.h
 	-rm $(PREFIX)/include/axTLS/private_key.h

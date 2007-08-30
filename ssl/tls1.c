@@ -1504,7 +1504,6 @@ int send_certificate(SSL *ssl)
     buf[0] = HS_CERTIFICATE;
     buf[1] = 0;
     buf[4] = 0;
-    buf[7] = 0;
 
     while (i < ssl->chain_length)
     {

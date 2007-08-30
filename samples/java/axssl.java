@@ -737,10 +737,12 @@ public class axssl
     private void display_session_id(SSL ssl)
     {    
         byte[] session_id = ssl.getSessionId();
-        int i;
 
-        System.out.println("-----BEGIN SSL SESSION PARAMETERS-----");
-        bytesToHex(session_id);
-        System.out.println("-----END SSL SESSION PARAMETERS-----");
+        if (session_id.length > 0)
+        {
+            System.out.println("-----BEGIN SSL SESSION PARAMETERS-----");
+            bytesToHex(session_id);
+            System.out.println("-----END SSL SESSION PARAMETERS-----");
+        }
     }
 }

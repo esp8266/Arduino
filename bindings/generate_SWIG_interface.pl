@@ -275,7 +275,7 @@ JNIEXPORT jint JNICALL Java_axTLSj_axtlsjJNI_getFd(JNIEnv *env, jclass jcls, job
 
 /* for ssl_session_id() */
 %typemap(out) const unsigned char * {
-    SV *svs = newSVpv((unsigned char *)\$1, (int)ssl_get_session_id((SSL const *)arg1));
+    SV *svs = newSVpv((unsigned char *)\$1, ssl_get_session_id_size((SSL const *)arg1));
     \$result = newRV(svs);
     sv_2mortal(\$result);
     argvi++;
@@ -330,7 +330,7 @@ SWIG_TYPEMAP_NUM_ARR(uchar,unsigned char);
 %typemap(out) const unsigned char * {
     int i;
     lua_newtable(L);
-    for (i = 0; i < ssl_get_session_id((SSL const *)\$1); i++){
+    for (i = 0; i < ssl_get_session_id_size((SSL const *)arg1); i++){
         lua_pushnumber(L,(lua_Number)result[i]);
         lua_rawseti(L,-2,i+1); /* -1 is the number, -2 is the table */
     }

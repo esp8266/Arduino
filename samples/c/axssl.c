@@ -857,11 +857,15 @@ static void display_session_id(SSL *ssl)
     const uint8_t *session_id = ssl_get_session_id(ssl);
     int sess_id_size = ssl_get_session_id_size(ssl);
 
-    printf("-----BEGIN SSL SESSION PARAMETERS-----\n");
-    for (i = 0; i < sess_id_size; i++)
+    if (sess_id_size > 0)
     {
-        printf("%02x", session_id[i]);
+        printf("-----BEGIN SSL SESSION PARAMETERS-----\n");
+        for (i = 0; i < sess_id_size; i++)
+        {
+            printf("%02x", session_id[i]);
+        }
+
+        printf("\n-----END SSL SESSION PARAMETERS-----\n");
+        TTY_FLUSH();
     }
-    printf("\n-----END SSL SESSION PARAMETERS-----\n");
-    TTY_FLUSH();
 }

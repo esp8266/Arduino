@@ -235,7 +235,7 @@ sub do_server
         while (1)
         {
             ($res, $buf) = axtlsp::ssl_read($ssl, undef);
-            last if $res != $axtlsp::SSL_OK;
+            last if $res < $axtlsp::SSL_OK;
 
             if ($res == $axtlsp::SSL_OK) # connection established and ok
             {
@@ -255,11 +255,11 @@ sub do_server
             {
                 printf($$buf);
             }
-            else if ($res < $axtlsp::SSL_OK)
+            elsif ($res < $axtlsp::SSL_OK)
             {
                 axtlsp::ssl_display_error($res) if not $quiet;
                 last;
-            }
+            } 
         }
 
         # client was disconnected or the handshake failed.
@@ -613,8 +613,10 @@ sub display_session_id
 {    
     my ($ssl) = @_;
     my $session_id = axtlsp::ssl_get_session_id($ssl);
-
-    printf("-----BEGIN SSL SESSION PARAMETERS-----\n");
-    printf(unpack("H*", $$session_id));
-    printf("\n-----END SSL SESSION PARAMETERS-----\n");
+    if (length($$session_id) > 0)
+    {
+        printf("-----BEGIN SSL SESSION PARAMETERS-----\n");
+        printf(unpack("H*", $$session_id));
+        printf("\n-----END SSL SESSION PARAMETERS-----\n");
+    }
 }

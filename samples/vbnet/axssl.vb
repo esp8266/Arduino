@@ -538,14 +538,16 @@ Public Class axssl
     Private Sub display_session_id(ByVal ssl As SSL)
         Dim session_id As Byte() = ssl.GetSessionId()
 
-        Console.WriteLine("-----BEGIN SSL SESSION PARAMETERS-----")
-        Dim b As Byte
-        For Each b In session_id
-            Console.Write("{0:x02}", b)
-        Next
+        If session_id.Length > 0 Then
+            Console.WriteLine("-----BEGIN SSL SESSION PARAMETERS-----")
+            Dim b As Byte
+            For Each b In session_id
+                Console.Write("{0:x02}", b)
+            Next
 
-        Console.WriteLine()
-        Console.WriteLine("-----END SSL SESSION PARAMETERS-----")
+            Console.WriteLine()
+            Console.WriteLine("-----END SSL SESSION PARAMETERS-----")
+        End If
     End Sub
 
     ' 
