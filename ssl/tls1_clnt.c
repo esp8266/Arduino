@@ -221,11 +221,10 @@ static int process_server_hello(SSL *ssl)
 {
     uint8_t *buf = ssl->bm_data;
     int pkt_size = ssl->bm_index;
-    int offset;
     int version = (buf[4] << 4) + buf[5];
     int num_sessions = ssl->ssl_ctx->num_sessions;
     uint8_t sess_id_size;
-    int ret = SSL_OK;
+    int offset, ret = SSL_OK;
 
     /* check that we are talking to a TLSv1 server */
     if (version != 0x31)
@@ -259,7 +258,9 @@ static int process_server_hello(SSL *ssl)
     ssl->next_state = IS_SET_SSL_FLAG(SSL_SESSION_RESUME) ? 
                                         HS_FINISHED : HS_CERTIFICATE;
 
+    offset++;   // skip the compr
     PARANOIA_CHECK(pkt_size, offset);
+    ssl->bm_proc_index = offset+1; 
 
 error:
     return ret;
@@ -311,10 +312,18 @@ static int send_client_key_xchg(SSL *ssl)
  */
 static int process_cert_req(SSL *ssl)
 {
+    uint8_t *buf = &ssl->bm_data[ssl->bm_proc_index];
+    int ret = SSL_OK;
+    int offset = (buf[2] << 4) + buf[3];
+    int pkt_size = ssl->bm_index;
+
     /* don't do any processing - we will send back an RSA certificate anyway */
     ssl->next_state = HS_SERVER_HELLO_DONE;
     SET_SSL_FLAG(SSL_HAS_CERT_REQ);
-    return SSL_OK;
+    ssl->bm_proc_index += offset;
+    PARANOIA_CHECK(pkt_size, offset);
+error:
+    return ret;
 }
 
 /*

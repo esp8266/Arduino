@@ -1241,6 +1241,7 @@ int basic_read(SSL *ssl, uint8_t **in_data)
     switch (ssl->record_type)
     {
         case PT_HANDSHAKE_PROTOCOL:
+            ssl->bm_proc_index = 0;
             ret = do_handshake(ssl, buf, read_len);
             break;
 
@@ -1723,10 +1724,10 @@ EXP_FUNC int STDCALL ssl_verify_cert(const SSL *ssl)
 int process_certificate(SSL *ssl, X509_CTX **x509_ctx)
 {
     int ret = SSL_OK;
+    uint8_t *buf = &ssl->bm_data[ssl->bm_proc_index];
     int pkt_size = ssl->bm_index;
     int cert_size, offset = 5;
-    int total_cert_size = (ssl->bm_data[offset]<<8) + 
-                ssl->bm_data[offset+1];
+    int total_cert_size = (buf[offset]<<8) + buf[offset+1];
     int is_client = IS_SET_SSL_FLAG(SSL_IS_CLIENT);
     X509_CTX **chain = x509_ctx;
     offset += 2;
@@ -1736,10 +1737,10 @@ int process_certificate(SSL *ssl, X509_CTX **x509_ctx)
     while (offset < total_cert_size)
     {
         offset++;       /* skip empty char */
-        cert_size = (ssl->bm_data[offset]<<8) + ssl->bm_data[offset+1];
+        cert_size = (buf[offset]<<8) + buf[offset+1];
         offset += 2;
         
-        if (x509_new(&ssl->bm_data[offset], NULL, chain))
+        if (x509_new(&buf[offset], NULL, chain))
         {
             ret = SSL_ERROR_BAD_CERTIFICATE;
             goto error;
@@ -1759,6 +1760,7 @@ int process_certificate(SSL *ssl, X509_CTX **x509_ctx)
 
     DISPLAY_CERT(ssl, "process_certificate", *x509_ctx);
     ssl->next_state = is_client ? HS_SERVER_HELLO_DONE : HS_CLIENT_KEY_XCHG;
+    ssl->bm_proc_index += offset;
 error:
     return ret;
 }

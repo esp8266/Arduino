@@ -173,6 +173,7 @@ struct _SSL
     uint8_t *bm_data;
     uint16_t bm_index;
     uint16_t bm_read_index;
+    uint16_t bm_proc_index;
     struct _SSL *next;                  /* doubly linked list */
     struct _SSL *prev;
     SSL_CERT *certs;

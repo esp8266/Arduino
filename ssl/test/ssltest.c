@@ -1719,6 +1719,64 @@ error:
 #endif
 
 /**************************************************************************
+ * Header issue
+ *
+ **************************************************************************/
+static void do_header_issue(void)
+{
+    uint8_t axtls_buf[2048];
+#ifndef WIN32
+    pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+#endif
+    sprintf(axtls_buf, "./axssl s_client -connect localhost:%d", g_port);
+    system(axtls_buf);
+}
+
+static int header_issue(void)
+{
+    FILE *f = fopen("../ssl/test/header_issue.dat", "r");
+    int server_fd, client_fd, ret = 1;
+    uint8_t buf[2048];
+    int size = 0;
+    struct sockaddr_in client_addr;
+    socklen_t clnt_len = sizeof(client_addr);
+#ifndef WIN32
+    pthread_t thread;
+#endif
+
+    if (f == NULL || (server_fd = server_socket_init(&g_port)) < 0)
+        goto error;
+
+#ifndef WIN32
+    pthread_create(&thread, NULL, 
+                (void *(*)(void *))do_header_issue, NULL);
+    pthread_detach(thread);
+#else
+    CreateThread(NULL, 1024, (LPTHREAD_START_ROUTINE)do_header_issue, 
+                NULL, 0, NULL);
+#endif
+    if ((client_fd = accept(server_fd, 
+                    (struct sockaddr *) &client_addr, &clnt_len)) < 0)
+    {
+        ret = SSL_ERROR_SOCK_SETUP_FAILURE;
+        goto error;
+    }
+
+    size = fread(buf, 1, sizeof(buf), f);
+    SOCKET_WRITE(client_fd, buf, size);
+    usleep(200000);
+
+    ret = 0;
+error:
+    fclose(f);
+    SOCKET_CLOSE(client_fd);
+    SOCKET_CLOSE(server_fd);
+    TTY_FLUSH();
+    system("killall axssl");
+    return ret;
+}
+
+/**************************************************************************
  * main()
  *
  **************************************************************************/
@@ -1820,7 +1878,14 @@ int main(int argc, char *argv[])
 
     system("sh ../ssl/test/killopenssl.sh");
 
+    if (header_issue())
+    {
+        printf("Header tests failed\n");
+        goto cleanup;
+    }
+
     ret = 0;        /* all ok */
+    printf("**** ALL TESTS PASSED ****\n"); TTY_FLUSH();
 cleanup:
 
     if (ret)
