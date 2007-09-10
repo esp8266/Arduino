@@ -125,10 +125,14 @@ void RSA_free(RSA_CTX *rsa_ctx)
 int RSA_decrypt(const RSA_CTX *ctx, const uint8_t *in_data, 
                             uint8_t *out_data, int is_decryption)
 {
-    int byte_size = ctx->num_octets;
-    uint8_t *block;
+    const int byte_size = ctx->num_octets;
     int i, size;
     bigint *decrypted_bi, *dat_bi;
+#ifndef WIN32
+    uint8_t block[byte_size];
+#else
+    uint8_t *block = (uint8_t *)malloc(byte_size);
+#endif
 
     memset(out_data, 0, byte_size); /* initialise */
 
@@ -142,7 +146,6 @@ int RSA_decrypt(const RSA_CTX *ctx, const uint8_t *in_data,
 #endif
 
     /* convert to a normal block */
-    block = (uint8_t *)malloc(byte_size);
     bi_export(ctx->bi_ctx, decrypted_bi, block, byte_size);
 
     i = 10; /* start at the first possible non-padded byte */
@@ -166,7 +169,9 @@ int RSA_decrypt(const RSA_CTX *ctx, const uint8_t *in_data,
     if (size > 0)
         memcpy(out_data, &block[i], size);
     
+#ifdef WIN32
     free(block);
+#endif
     return size ? size : -1;
 }
 
@@ -253,11 +258,14 @@ int RSA_encrypt(const RSA_CTX *ctx, const uint8_t *in_data, uint16_t in_len,
 bigint *RSA_sign_verify(BI_CTX *ctx, const uint8_t *sig, int sig_len,
         bigint *modulus, bigint *pub_exp)
 {
-    uint8_t *block;
     int i, size;
     bigint *decrypted_bi, *dat_bi;
     bigint *bir = NULL;
-    block = (uint8_t *)malloc(sig_len);
+#ifndef WIN32
+    uint8_t block[sig_len];
+#else
+    uint8_t *block = (uint8_t *)malloc(sig_len);
+#endif
 
     /* decrypt */
     dat_bi = bi_import(ctx, sig, sig_len);
@@ -285,7 +293,9 @@ bigint *RSA_sign_verify(BI_CTX *ctx, const uint8_t *sig, int sig_len,
         }
     }
 
+#ifdef WIN32
     free(block);
+#endif
     return bir;
 }
 
