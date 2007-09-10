@@ -1497,7 +1497,7 @@ bigint *bi_mod_power2(BI_CTX *ctx, bigint *bi, bigint *bim, bigint *biexp)
 
 #ifdef CONFIG_BIGINT_CRT
 /**
- * @Use the Chinese Remainder Theorem to quickly perform RSA decrypts.
+ * @brief Use the Chinese Remainder Theorem to quickly perform RSA decrypts.
  *
  * @param ctx [in]  The bigint session context.
  * @param bi  [in]  The bigint to perform the exp/mod.

@@ -689,7 +689,7 @@ static int client_socket_init(uint16_t port)
     if (connect(client_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
     {
         perror("socket");
-        close(client_fd);
+        SOCKET_CLOSE(client_fd);
         client_fd = -1;
     }
 
@@ -841,7 +841,7 @@ static int SSL_server_test(
         /* we are ready to go */
         ssl = ssl_server_new(ssl_ctx, client_fd);
         while ((size = ssl_read(ssl, &read_buf)) == SSL_OK);
-        close(client_fd);
+        SOCKET_CLOSE(client_fd);
         
         if (size < SSL_OK) /* got some alert or something nasty */
         {
@@ -869,7 +869,7 @@ static int SSL_server_test(
         ssl_free(ssl);
     }
 
-    close(server_fd);
+    SOCKET_CLOSE(server_fd);
 
 error:
     ssl_ctx_free(ssl_ctx);
@@ -1294,7 +1294,7 @@ static int SSL_client_test(
 
 client_test_exit:
     ssl_free(ssl);
-    close(client_fd);
+    SOCKET_CLOSE(client_fd);
     usleep(200000);           /* allow openssl to say something */
 
     if (sess_resume)
@@ -1484,7 +1484,7 @@ static void do_basic(void)
 
 error:
     ssl_ctx_free(ssl_clnt_ctx);
-    close(client_fd);
+    SOCKET_CLOSE(client_fd);
 
     /* exit this thread */
 }
@@ -1556,8 +1556,8 @@ static int SSL_basic_test(void)
     TTY_FLUSH();
 
     ssl_free(ssl_svr);
-    close(server_fd);
-    close(client_fd);
+    SOCKET_CLOSE(server_fd);
+    SOCKET_CLOSE(client_fd);
 
 error:
     ssl_ctx_free(ssl_svr_ctx);
@@ -1603,7 +1603,7 @@ void do_multi_clnt(multi_t *multi_data)
 
 client_test_exit:
     ssl_free(ssl);
-    close(client_fd);
+    SOCKET_CLOSE(client_fd);
     free(multi_data);
 }
 
@@ -1622,7 +1622,7 @@ void do_multi_svr(SSL *ssl)
         {
             if (res == SSL_ERROR_CONN_LOST)
             {
-                close(ssl->client_fd);
+                SOCKET_CLOSE(ssl->client_fd);
                 ssl_free(ssl);
                 break;
             }
@@ -1713,7 +1713,7 @@ int multi_thread_test(void)
 error:
     ssl_ctx_free(ssl_server_ctx);
     ssl_ctx_free(ssl_clnt_ctx);
-    close(server_fd);
+    SOCKET_CLOSE(server_fd);
     return res;
 }
 #endif

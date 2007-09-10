@@ -24,7 +24,7 @@
 #
 
 if grep "CONFIG_PLATFORM_WIN32=y" "../config/.config"  > /dev/null; then
-    JAVA_EXE="/cygdrive/c/Program Files/Java/jdk1.5.0_06/bin/java.exe"
+    JAVA_EXE="$JAVA_HOME/bin/java.exe"
     PERL_BIN="/cygdrive/c/Perl/bin/perl"
     KILL_AXSSL="kill %1"
     KILL_CSHARP="kill %1"

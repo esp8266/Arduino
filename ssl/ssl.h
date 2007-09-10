@@ -290,9 +290,9 @@ EXP_FUNC const uint8_t * STDCALL ssl_get_session_id(const SSL *ssl);
 /**
  * @brief Get the session id size for a handshake. 
  * 
- * This will be 32 for a ssl server and may be something else for a ssl client.
+ * This will normally be 32 but could be 0 (no session id) or something else.
  * @param ssl [in] An SSL object reference.
- * @return The number of valid bytes in a handshaking sequence
+ * @return The size of the session id.
  */
 EXP_FUNC uint8_t STDCALL ssl_get_session_id_size(const SSL *ssl);
 
