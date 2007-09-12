@@ -48,11 +48,9 @@ ifndef CONFIG_PLATFORM_WIN32
 
 $(TARGET): $(OBJ) $(LIBS)/libaxtls.a
 	$(LD) $(LDFLAGS) -o $@ $(OBJ) -L$(LIBS) -laxtls 
-ifndef CONFIG_DEBUG
-ifndef CONFIG_PLATFORM_SOLARIS
+ifdef CONFIG_STRIP_UNWANTED_SECTIONS
 	strip --remove-section=.comment $(TARGET)
-endif   # SOLARIS
-endif   # CONFIG_DEBUG
+endif   # use strip
 else    # Win32
 
 $(TARGET): $(OBJ)

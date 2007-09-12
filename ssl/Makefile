@@ -42,7 +42,7 @@ endif
 
 # shared library major/minor numbers
 LIBMAJOR=$(BASETARGET).1
-LIBMINOR=$(BASETARGET).1.1
+LIBMINOR=$(BASETARGET).1.2
 else
 TARGET1=$(AXTLS_HOME)/axtls.lib
 TARGET2=$(AXTLS_HOME)/$(STAGE)/axtls.dll

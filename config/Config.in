@@ -48,6 +48,13 @@ config CONFIG_DEBUG
 
       Most people should answer N.
 
+config CONFIG_STRIP_UNWANTED_SECTIONS
+    depends on !CONFIG_PLATFORM_WIN32 && !CONFIG_DEBUG
+    bool "Strip unwanted sections from elf binaries"
+    default y
+    help
+        Strip unwanted sections from the resulting binaries
+
 menu "Microsoft Compiler Options"
 depends on CONFIG_PLATFORM_WIN32
 

@@ -1026,8 +1026,13 @@ static void send_error(struct connstruct *cn, int err)
 
 static const char *getmimetype(const char *name)
 {
-    /* only bother with two types - let the browser/OS figure the rest out */
-    return strstr(name, ".htm") ? "text/html" : "application/octet-stream";
+    /* only bother with a few mime types - let the browser figure the rest out */
+    if (strstr(name, ".htm"))
+        return "text/html";
+    else if (strstr(name, ".css"))
+        return "text/css"; 
+    else
+        return "application/octet-stream";
 }
 
 static int special_write(struct connstruct *cn, 

@@ -84,10 +84,8 @@ ifndef CONFIG_PLATFORM_WIN32
 
 $(TARGET): $(OBJ) $(AXTLS_HOME)/$(STAGE)/libaxtls.a
 	$(LD) $(LDFLAGS) -o $@ $(OBJ) $(LIBS)
-ifndef CONFIG_DEBUG
-ifndef CONFIG_PLATFORM_SOLARIS
+ifdef CONFIG_STRIP_UNWANTED_SECTIONS
 	strip --remove-section=.comment $(TARGET)
-endif
 endif
 
 $(TARGET2): htpasswd.o $(AXTLS_HOME)/$(STAGE)/libaxtls.a

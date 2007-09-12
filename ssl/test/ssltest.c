@@ -1735,7 +1735,7 @@ static void do_header_issue(void)
 static int header_issue(void)
 {
     FILE *f = fopen("../ssl/test/header_issue.dat", "r");
-    int server_fd, client_fd, ret = 1;
+    int server_fd = -1, client_fd = -1, ret = 1;
     uint8_t buf[2048];
     int size = 0;
     struct sockaddr_in client_addr;
