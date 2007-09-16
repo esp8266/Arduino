@@ -604,11 +604,9 @@ static int cert_tests(void)
     ssl_ctx_free(ssl_ctx);
     free(buf);
 
-    /* Verisign use MD2 which is not supported */
     ssl_ctx = ssl_ctx_new(0, 0);
     len = get_file("../ssl/test/verisign.x509_ca", &buf);
-    if ((res = add_cert_auth(ssl_ctx, buf, len)) != 
-                                    X509_VFY_ERROR_UNSUPPORTED_DIGEST)
+    if ((res = add_cert_auth(ssl_ctx, buf, len)) <0)
     {
         printf("Cert #7\n");
         ssl_display_error(res);

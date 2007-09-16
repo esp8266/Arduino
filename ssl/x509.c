@@ -126,6 +126,15 @@ int x509_new(const uint8_t *cert, int *len, X509_CTX **ctx)
         SHA1_Final(sha_dgst, &sha_ctx);
         x509_ctx->digest = bi_import(bi_ctx, sha_dgst, SHA1_SIZE);
     }
+    else if (x509_ctx->sig_type == SIG_TYPE_MD2)
+    {
+        MD2_CTX md2_ctx;
+        uint8_t md2_dgst[MD2_SIZE];
+        MD2_Init(&md2_ctx);
+        MD2_Update(&md2_ctx, &cert[begin_tbs], end_tbs-begin_tbs);
+        MD2_Final(md2_dgst, &md2_ctx);
+        x509_ctx->digest = bi_import(bi_ctx, md2_dgst, MD2_SIZE);
+    }
 
     offset = end_tbs;   /* skip the v3 data */
     if (asn1_skip_obj(cert, &offset, ASN1_SEQUENCE) || 

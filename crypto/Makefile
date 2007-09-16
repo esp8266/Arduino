@@ -24,6 +24,7 @@ AXTLS_HOME=..
 OBJ=\
 	aes.o \
 	hmac.o \
+	md2.o \
 	md5.o \
 	rc4.o \
 	sha1.o

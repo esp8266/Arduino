@@ -55,6 +55,7 @@ libs: $(TARGET1) $(TARGET2)
 CRYPTO_OBJ=\
 	$(CRYPTO_PATH)aes.o \
 	$(CRYPTO_PATH)hmac.o \
+	$(CRYPTO_PATH)md2.o \
 	$(CRYPTO_PATH)md5.o \
 	$(CRYPTO_PATH)rc4.o \
 	$(CRYPTO_PATH)sha1.o

@@ -82,11 +82,11 @@ void RC4_crypt(RC4_CTX *s, const uint8_t *msg, uint8_t *data, int length);
  */
 typedef struct 
 {
-    uint32_t Intermediate_Hash[SHA1_SIZE/4]; /* Message Digest  */
-    uint32_t Length_Low;            /* Message length in bits      */
-    uint32_t Length_High;           /* Message length in bits      */
+    uint32_t Intermediate_Hash[SHA1_SIZE/4]; /* Message Digest */
+    uint32_t Length_Low;            /* Message length in bits */
+    uint32_t Length_High;           /* Message length in bits */
     uint16_t Message_Block_Index;   /* Index into message block array   */
-    uint8_t Message_Block[64];      /* 512-bit message blocks      */
+    uint8_t Message_Block[64];      /* 512-bit message blocks */
 } SHA1_CTX;
 
 void SHA1_Init(SHA1_CTX *);
@@ -94,10 +94,26 @@ void SHA1_Update(SHA1_CTX *, const uint8_t * msg, int len);
 void SHA1_Final(uint8_t *digest, SHA1_CTX *);
 
 /**************************************************************************
- * MD5 declarations 
+ * MD2 declarations 
  **************************************************************************/
 
-/* MD5 context. */
+#define MD2_SIZE 16
+
+typedef struct
+{
+    unsigned char cksum[16];    /* checksum of the data block */
+    unsigned char state[48];    /* intermediate digest state */
+    unsigned char buffer[16];   /* data block being processed */
+    int left;                   /* amount of data in buffer */
+} MD2_CTX;
+
+EXP_FUNC void STDCALL MD2_Init(MD2_CTX *ctx);
+EXP_FUNC void STDCALL MD2_Update(MD2_CTX *ctx, const uint8_t *input, int ilen);
+EXP_FUNC void STDCALL MD2_Final(uint8_t *digest, MD2_CTX *ctx);
+
+/**************************************************************************
+ * MD5 declarations 
+ **************************************************************************/
 
 #define MD5_SIZE    16
 
