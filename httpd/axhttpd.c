@@ -175,9 +175,12 @@ int main(int argc, char *argv[])
 
 #if defined(CONFIG_HTTP_HAS_CGI)
     addcgiext(CONFIG_HTTP_CGI_EXTENSIONS);
-    printf("addcgiext %s\n",CONFIG_HTTP_CGI_EXTENSIONS); 
 #endif
+
 #if defined(CONFIG_HTTP_VERBOSE)
+#if defined(CONFIG_HTTP_HAS_CGI)
+    printf("addcgiext %s\n", CONFIG_HTTP_CGI_EXTENSIONS); 
+#endif
     printf("%s: listening on ports %d (http) and %d (https)\n", 
             server_version, CONFIG_HTTP_PORT, CONFIG_HTTP_HTTPS_PORT);
     TTY_FLUSH();
@@ -191,7 +194,6 @@ int main(int argc, char *argv[])
     setuid(32767);
 #endif
 #ifdef CONFIG_HTTP_IS_DAEMON
-    fprintf(stderr, "ERR: fork is not working on uclinux\n");
     if (fork() > 0)  /* parent will die */
         exit(0);
 

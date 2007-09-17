@@ -672,11 +672,11 @@ static void proccgi(struct connstruct *cn)
         TTY_FLUSH();
         return;
     }
-#ifdef EMBED
+
+    /*
+     * use vfork() instead of fork() for performance 
+     */
     if ((pid = vfork()) > 0)  /* parent */
-#else
-    if ((pid = fork()) > 0)  /* parent */
-#endif
     {
         /* Send POST query data to CGI script */
         if ((cn->reqtype == TYPE_POST) && (cn->content_length > 0)) 
@@ -698,7 +698,7 @@ static void proccgi(struct connstruct *cn)
         return;
     }
 
-    if (pid < 0) /* fork failed */
+    if (pid < 0) /* vfork failed */
         exit(1);
 
     /* The problem child... */
@@ -772,7 +772,7 @@ static void proccgi(struct connstruct *cn)
     if (cgi_index >= CGI_ARG_SIZE)
     {
         printf("Content-type: text/plain\n\nToo many CGI args\n");
-        exit(1);
+        _exit(1);
     }
 
     /* copy across the pointer indexes */
@@ -786,7 +786,7 @@ static void proccgi(struct connstruct *cn)
 
     execve(myargs[0], myargs, cgiptr);
     printf("Content-type: text/plain\n\nshouldn't get here\n");
-    exit(1);
+    _exit(1);
 #endif
 }
 
@@ -969,15 +969,8 @@ static void buildactualfile(struct connstruct *cn)
      * end as we need the directory name.
      */
     if (cn->is_lua)
-#ifdef CONFIG_PLATFORM_CYGWIN
-        sprintf(cn->actualfile, "%s/bin/cgi.exe", CONFIG_HTTP_LUA_PREFIX);
-#else
-#ifdef EMBED
-        sprintf(cn->actualfile, "%s", CONFIG_HTTP_LUA_PREFIX);
-#else
-        sprintf(cn->actualfile, "%s/bin/cgi", CONFIG_HTTP_LUA_PREFIX);
-#endif
-#endif
+        sprintf(cn->actualfile, "%s%s", CONFIG_HTTP_LUA_PREFIX, 
+                CONFIG_HTTP_LUA_CGI_LAUNCHER);
 #endif
 }
 

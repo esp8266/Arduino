@@ -89,6 +89,15 @@ config CONFIG_HTTP_LUA_PREFIX
         The location of Lua's installation prefix. This is also necessary for
         Lua's cgi launcher application.
 
+config CONFIG_HTTP_LUA_CGI_LAUNCHER
+    string "CGI launcher location"
+    default "/bin/cgi.exe" if CONFIG_PLATFORM_CYGWIN
+    default "/bin/cgi" if !CONFIG_PLATFORM_CYGWIN
+    depends on CONFIG_HTTP_ENABLE_LUA
+    help
+        The location of LUA's CGI launcher application (after
+        the CONFIG_HTTP_LUA_PREFIX)
+
 config CONFIG_HTTP_BUILD_LUA
     bool "Build Lua"
     default n

@@ -24,6 +24,7 @@
 #ifdef CONFIG_HTTP_HAS_IPV6
 #define HAVE_IPV6
 #endif
+
 #define MAXPOSTDATASIZE                     30000
 #define MAXREQUESTLENGTH                    256
 #define BLOCKSIZE                           4096
