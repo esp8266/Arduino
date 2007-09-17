@@ -60,7 +60,8 @@ release:
 	$(MAKE) -C config/scripts/config clean
 	-$(MAKE) clean
 	-@rm config/*.msi config/*.back.aip config/config.h config/.config*
-	@rm -fr $(STAGE)
+	-@rm www/index.20*
+	-@rm -fr $(STAGE)
 	@echo "#define AXTLS_VERSION    \"$(VERSION)\"" > ssl/version.h
 	cd ../; tar cvfz $(RELEASE).tar.gz --wildcards-match-slash --exclude .svn axTLS; cd -;
 

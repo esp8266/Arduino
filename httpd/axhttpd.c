@@ -24,6 +24,20 @@
 #include <sys/stat.h>
 #include "axhttp.h"
 
+#if AXDEBUG
+#define AXDEBUGSTART \
+	{ \
+		FILE *dout; \
+		dout = fopen("/var/log/axdebug", "a"); \
+	
+#define AXDEBUGEND \
+		fclose(dout); \
+	}
+#else /* AXDEBUG */
+#define AXDEBUGSTART
+#define AXDEBUGEND
+#endif /* AXDEBUG */
+
 struct serverstruct *servers;
 struct connstruct *usedconns;
 struct connstruct *freeconns;
@@ -161,6 +175,7 @@ int main(int argc, char *argv[])
 
 #if defined(CONFIG_HTTP_HAS_CGI)
     addcgiext(CONFIG_HTTP_CGI_EXTENSIONS);
+    printf("addcgiext %s\n",CONFIG_HTTP_CGI_EXTENSIONS); 
 #endif
 #if defined(CONFIG_HTTP_VERBOSE)
     printf("%s: listening on ports %d (http) and %d (https)\n", 
@@ -176,6 +191,7 @@ int main(int argc, char *argv[])
     setuid(32767);
 #endif
 #ifdef CONFIG_HTTP_IS_DAEMON
+    fprintf(stderr, "ERR: fork is not working on uclinux\n");
     if (fork() > 0)  /* parent will die */
         exit(0);
 
@@ -283,6 +299,9 @@ int main(int argc, char *argv[])
                         FD_ISSET(to->networkdesc, &rfds)) 
             {
                 active--;
+		if (to->post_state)
+		  read_post_data(to);
+		else
                 procreadhead(to);
             } 
 

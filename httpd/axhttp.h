@@ -24,7 +24,7 @@
 #ifdef CONFIG_HTTP_HAS_IPV6
 #define HAVE_IPV6
 #endif
-
+#define MAXPOSTDATASIZE                     30000
 #define MAXREQUESTLENGTH                    256
 #define BLOCKSIZE                           4096
 
@@ -88,6 +88,9 @@ struct connstruct
 #if defined(CONFIG_HTTP_HAS_AUTHORIZATION)
     char authorization[MAXREQUESTLENGTH];
 #endif
+  int post_read;
+  int post_state;
+  char *post_data;
 };
 
 struct serverstruct 
@@ -125,7 +128,7 @@ void procreadhead(struct connstruct *cn);
 void procsendhead(struct connstruct *cn);
 void procreadfile(struct connstruct *cn);
 void procsendfile(struct connstruct *cn);
-
+void read_post_data(struct connstruct *cn);
 
 /* misc.c prototypes */
 char *my_strncpy(char *dest, const char *src, size_t n);

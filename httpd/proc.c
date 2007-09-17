@@ -54,6 +54,20 @@ static void decode_path_info(struct connstruct *cn, char *path_info);
 static int auth_check(struct connstruct *cn);
 #endif
 
+#if AXDEBUG
+#define AXDEBUGSTART \
+	{ \
+		FILE *axdout; \
+		axdout = fopen("/var/log/axdebug", "a"); \
+	
+#define AXDEBUGEND \
+		fclose(axdout); \
+	}
+#else /* AXDEBUG */
+#define AXDEBUGSTART
+#define AXDEBUGEND
+#endif /* AXDEBUG */
+
 /* Returns 1 if elems should continue being read, 0 otherwise */
 static int procheadelem(struct connstruct *cn, char *buf) 
 {
@@ -267,11 +281,113 @@ static void urlencode(const uint8_t *s, char *t)
 
 #endif
 
+int init_read_post_data(char *buf, char *data, struct connstruct *cn, int old_rv)
+{
+   char *next;
+   int rv;
+   char *post_data;
+
+   rv=old_rv;
+   next=data;
+
+    /* Too much Post data to send. MAXPOSTDATASIZE should be 
+       configured (now it can be chaged in the header file) */
+   if (cn->content_length > MAXPOSTDATASIZE) 
+     {
+       send_error(cn, 418);
+       return 0;
+     }
+   
+   /* remove CRLF */
+   while ((*next == '\r' || *next == '\n') && (next < &buf[rv])) 
+       next++;
+   
+   if (cn->post_data == NULL)
+   {
+       cn->post_data = (char *) calloc(1, (cn->content_length + 1)); 
+       /* Allocate buffer for the POST data that will be used by proccgi 
+          to send POST data to the CGI script */
+
+       if (cn->post_data == NULL)
+       {
+           printf("axhttpd: could not allocate memory for POST data\n"); 
+           TTY_FLUSH();
+           send_error(cn, 599);
+           return 0;
+       }
+   }
+
+   cn->post_state = 0;
+   cn->post_read = 0;
+   post_data = cn->post_data;
+
+   while (next < &buf[rv])
+   { 
+       /*copy POST data to buffer*/
+       *post_data = *next;
+       post_data++;
+       next++;
+       cn->post_read++;
+       if (cn->post_read == cn->content_length)
+       { 
+           /* No more POST data to be copied */
+           *post_data = '\0';
+           return 1;
+       }
+   }
+
+   /* More POST data has to be read. read_post_data will continue with that */
+   cn->post_state = 1;
+   return 0;
+}
+
+void read_post_data(struct connstruct *cn)
+{
+    char buf[MAXREQUESTLENGTH*4], *next;
+    char *post_data;
+    int rv;
+
+    bzero(buf,MAXREQUESTLENGTH*4);
+    rv = special_read(cn, buf, sizeof(buf)-1);
+    if (rv <= 0) 
+    {
+        if (rv < 0) /* really dead? */
+            removeconnection(cn);
+        return;
+    }
+
+    buf[rv] = '\0';
+    next = buf;
+
+    post_data = &cn->post_data[cn->post_read];
+
+    while (next < &buf[rv])
+    {
+        *post_data = *next;
+        post_data++;
+        next++;
+        cn->post_read++;
+        if (cn->post_read == cn->content_length)
+        {  
+            /* No more POST data to be copied */
+            *post_data='\0';
+            cn->post_state = 0;
+            buildactualfile(cn);
+            cn->state = STATE_WANT_TO_SEND_HEAD;
+            return;
+        }
+    }
+
+    /* More POST data to read */
+}
+
+
 void procreadhead(struct connstruct *cn) 
 {
     char buf[MAXREQUESTLENGTH*4], *tp, *next;
     int rv;
 
+    bzero(buf,MAXREQUESTLENGTH*4);
     rv = special_read(cn, buf, sizeof(buf)-1);
     if (rv <= 0) 
     {
@@ -293,6 +409,12 @@ void procreadhead(struct connstruct *cn)
         /* If we have a blank line, advance to next stage */
         if (*next == '\r' || *next == '\n') 
         {
+	    if ((cn->reqtype == TYPE_POST)&&(cn->content_length > 0))
+	      {
+		if (init_read_post_data(buf,next,cn,rv) == 0)
+		  return;
+	      }
+		
             buildactualfile(cn);
             cn->state = STATE_WANT_TO_SEND_HEAD;
             return;
@@ -349,6 +471,7 @@ void procsendhead(struct connstruct *cn)
     file_exists = stat(cn->actualfile, &stbuf);
 
 #if defined(CONFIG_HTTP_HAS_CGI)
+
     if (file_exists != -1 && cn->is_cgi)
     {
         if ((stbuf.st_mode & S_IEXEC) == 0 || isdir(cn->actualfile))
@@ -503,12 +626,13 @@ void procsendfile(struct connstruct *cn)
 
 static void proccgi(struct connstruct *cn) 
 {
-    int tpipe[2];
+    int tpipe[2], spipe[2];
     char *myargs[2];
     char cgienv[CGI_ARG_SIZE][MAXREQUESTLENGTH];
     char * cgiptr[CGI_ARG_SIZE+4];
     const char *type = "HEAD";
     int cgi_index = 0, i;
+    pid_t pid;
 #ifdef WIN32
     int tmp_stdout;
 #endif
@@ -531,10 +655,41 @@ static void proccgi(struct connstruct *cn)
 
     /* win32 cgi is a bit too painful */
 #ifndef WIN32
-    pipe(tpipe);
-
-    if (fork() > 0)  /* parent */
+	/* set up pipe that is used for sending POST query data to CGI script*/
+    if (cn->reqtype == TYPE_POST) 
     {
+        if (pipe(spipe) == -1)
+        {
+            printf("[CGI]: could not create pipe");
+            TTY_FLUSH();
+            return;
+        }
+    }
+
+	if (pipe(tpipe) == -1)
+    {
+        printf("[CGI]: could not create pipe");
+        TTY_FLUSH();
+        return;
+    }
+#ifdef EMBED
+    if ((pid = vfork()) > 0)  /* parent */
+#else
+    if ((pid = fork()) > 0)  /* parent */
+#endif
+    {
+        /* Send POST query data to CGI script */
+        if ((cn->reqtype == TYPE_POST) && (cn->content_length > 0)) 
+        {
+            write(spipe[1], cn->post_data, cn->content_length);
+            close(spipe[0]);	 
+            close(spipe[1]);
+
+            /* free the memory that is allocated in read_post_data() */
+            free(cn->post_data); 
+            cn->post_data = NULL;
+        }
+
         /* Close the write descriptor */
         close(tpipe[1]);
         cn->filedesc = tpipe[0];
@@ -542,6 +697,9 @@ static void proccgi(struct connstruct *cn)
         cn->close_when_done = 1;
         return;
     }
+
+    if (pid < 0) /* fork failed */
+        exit(1);
 
     /* The problem child... */
 
@@ -551,12 +709,9 @@ static void proccgi(struct connstruct *cn)
 
     /* If it was a POST request, send the socket data to our stdin */
     if (cn->reqtype == TYPE_POST) 
-        dup2(cn->networkdesc, 0);
+        dup2(spipe[0], 0);  
     else    /* Otherwise we can shutdown the read side of the sock */
         shutdown(cn->networkdesc, 0);
-
-    close(tpipe[0]);
-    close(tpipe[1]);
 
     myargs[0] = cn->actualfile;
     myargs[1] = NULL;
@@ -617,7 +772,7 @@ static void proccgi(struct connstruct *cn)
     if (cgi_index >= CGI_ARG_SIZE)
     {
         printf("Content-type: text/plain\n\nToo many CGI args\n");
-        return;
+        exit(1);
     }
 
     /* copy across the pointer indexes */
@@ -631,6 +786,7 @@ static void proccgi(struct connstruct *cn)
 
     execve(myargs[0], myargs, cgiptr);
     printf("Content-type: text/plain\n\nshouldn't get here\n");
+    exit(1);
 #endif
 }
 
@@ -816,7 +972,11 @@ static void buildactualfile(struct connstruct *cn)
 #ifdef CONFIG_PLATFORM_CYGWIN
         sprintf(cn->actualfile, "%s/bin/cgi.exe", CONFIG_HTTP_LUA_PREFIX);
 #else
+#ifdef EMBED
+        sprintf(cn->actualfile, "%s", CONFIG_HTTP_LUA_PREFIX);
+#else
         sprintf(cn->actualfile, "%s/bin/cgi", CONFIG_HTTP_LUA_PREFIX);
+#endif
 #endif
 #endif
 }
@@ -1004,6 +1164,11 @@ static void send_error(struct connstruct *cn, int err)
 
         case 404:
             title = "Not Found";
+            text = title;
+            break;
+
+        case 418:
+            title = "POST data size is to large";
             text = title;
             break;
 
