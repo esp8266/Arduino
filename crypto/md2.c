@@ -29,7 +29,13 @@
 
 #include "crypto.h"
 
-static const unsigned char PI_SUBST[256] =
+/**
+ * This code is only here to enable the verification of Verisign root
+ * certificates. So only enable it for verification mode.
+ */
+#ifdef CONFIG_SSL_CERT_VERIFICATION
+
+static const uint8_t PI_SUBST[256] =
 {
     0x29, 0x2E, 0x43, 0xC9, 0xA2, 0xD8, 0x7C, 0x01, 0x3D, 0x36,
     0x54, 0xA1, 0xEC, 0xF0, 0x06, 0x13, 0x62, 0xA7, 0x05, 0xF3,
@@ -70,7 +76,7 @@ EXP_FUNC void STDCALL MD2_Init(MD2_CTX *ctx)
 static void md2_process(MD2_CTX *ctx)
 {
     int i, j;
-    unsigned char t = 0;
+    uint8_t t = 0;
 
     for (i = 0; i < 16; i++)
     {
@@ -140,3 +146,5 @@ EXP_FUNC void STDCALL MD2_Final(uint8_t *output, MD2_CTX *ctx)
 
     memcpy(output, ctx->state, 16);
 }
+
+#endif

@@ -622,7 +622,7 @@ void procsendfile(struct connstruct *cn)
 
 #if defined(CONFIG_HTTP_HAS_CGI)
 /* Should this be a bit more dynamic? It would mean more calls to malloc etc */
-#define CGI_ARG_SIZE        16
+#define CGI_ARG_SIZE        17
 
 static void proccgi(struct connstruct *cn) 
 {
@@ -771,7 +771,8 @@ static void proccgi(struct connstruct *cn)
 
     if (cgi_index >= CGI_ARG_SIZE)
     {
-        printf("Content-type: text/plain\n\nToo many CGI args\n");
+        printf("Content-type: text/plain\n\nToo many CGI args (%d, %d)\n",
+                cgi_index, CGI_ARG_SIZE);
         _exit(1);
     }
 

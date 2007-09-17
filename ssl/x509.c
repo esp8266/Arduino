@@ -27,7 +27,6 @@
 #include <string.h>
 #include <time.h>
 #include "os_port.h"
-#include "crypto.h"
 #include "crypto_misc.h"
 
 #ifdef CONFIG_SSL_CERT_VERIFICATION
