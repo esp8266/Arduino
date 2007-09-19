@@ -65,8 +65,6 @@ EXP_FUNC int STDCALL strcasecmp(const char *s1, const char *s2)
 #undef malloc
 #undef realloc
 #undef calloc
-#undef open
-#undef fopen
 
 static const char * out_of_mem_str = "out of memory";
 static const char * file_open_str = "Could not open file \"%s\"";
@@ -104,16 +102,6 @@ EXP_FUNC void * STDCALL ax_calloc(size_t n, size_t s)
         exit_now(out_of_mem_str);
 
     return x;
-}
-
-EXP_FUNC FILE * STDCALL ax_fopen(const char *pathname, const char *type)
-{
-    FILE *f; 
-
-    if ((f = fopen(pathname, type)) == NULL)
-        exit_now(file_open_str, pathname);
-
-    return  f;
 }
 
 EXP_FUNC int STDCALL ax_open(const char *pathname, int flags)

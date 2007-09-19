@@ -301,10 +301,12 @@ int main(int argc, char *argv[])
                         FD_ISSET(to->networkdesc, &rfds)) 
             {
                 active--;
-		if (to->post_state)
-		  read_post_data(to);
-		else
-                procreadhead(to);
+#if defined(CONFIG_HTTP_HAS_CGI)
+                if (to->post_state)
+                    read_post_data(to);
+                else
+#endif
+                    procreadhead(to);
             } 
 
             if (to->state == STATE_WANT_TO_SEND_HEAD &&

@@ -86,6 +86,7 @@ extern "C" {
 #define usleep(A)               Sleep(A/1000)
 #define strdup(A)               _strdup(A)
 #define chroot(A)               _chdir(A)
+#define chdir(A)                _chdir(A)
 #ifndef lseek
 #define lseek(A,B,C)            _lseek(A,B,C)
 #endif
@@ -157,7 +158,6 @@ EXP_FUNC int STDCALL strcasecmp(const char *s1, const char *s2);
 EXP_FUNC void * STDCALL ax_malloc(size_t s);
 EXP_FUNC void * STDCALL ax_realloc(void *y, size_t s);
 EXP_FUNC void * STDCALL ax_calloc(size_t n, size_t s);
-EXP_FUNC FILE * STDCALL ax_fopen(const char *name, const char *type);
 EXP_FUNC int STDCALL ax_open(const char *pathname, int flags); 
 
 #ifdef CONFIG_PLATFORM_LINUX

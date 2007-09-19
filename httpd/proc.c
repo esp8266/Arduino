@@ -49,6 +49,7 @@ static void procdirlisting(struct connstruct *cn);
 #if defined(CONFIG_HTTP_HAS_CGI)
 static void proccgi(struct connstruct *cn);
 static void decode_path_info(struct connstruct *cn, char *path_info);
+static int init_read_post_data(char *buf, char *data, struct connstruct *cn, int old_rv);
 #endif
 #ifdef CONFIG_HTTP_HAS_AUTHORIZATION
 static int auth_check(struct connstruct *cn);
@@ -281,113 +282,12 @@ static void urlencode(const uint8_t *s, char *t)
 
 #endif
 
-int init_read_post_data(char *buf, char *data, struct connstruct *cn, int old_rv)
-{
-   char *next;
-   int rv;
-   char *post_data;
-
-   rv=old_rv;
-   next=data;
-
-    /* Too much Post data to send. MAXPOSTDATASIZE should be 
-       configured (now it can be chaged in the header file) */
-   if (cn->content_length > MAXPOSTDATASIZE) 
-     {
-       send_error(cn, 418);
-       return 0;
-     }
-   
-   /* remove CRLF */
-   while ((*next == '\r' || *next == '\n') && (next < &buf[rv])) 
-       next++;
-   
-   if (cn->post_data == NULL)
-   {
-       cn->post_data = (char *) calloc(1, (cn->content_length + 1)); 
-       /* Allocate buffer for the POST data that will be used by proccgi 
-          to send POST data to the CGI script */
-
-       if (cn->post_data == NULL)
-       {
-           printf("axhttpd: could not allocate memory for POST data\n"); 
-           TTY_FLUSH();
-           send_error(cn, 599);
-           return 0;
-       }
-   }
-
-   cn->post_state = 0;
-   cn->post_read = 0;
-   post_data = cn->post_data;
-
-   while (next < &buf[rv])
-   { 
-       /*copy POST data to buffer*/
-       *post_data = *next;
-       post_data++;
-       next++;
-       cn->post_read++;
-       if (cn->post_read == cn->content_length)
-       { 
-           /* No more POST data to be copied */
-           *post_data = '\0';
-           return 1;
-       }
-   }
-
-   /* More POST data has to be read. read_post_data will continue with that */
-   cn->post_state = 1;
-   return 0;
-}
-
-void read_post_data(struct connstruct *cn)
-{
-    char buf[MAXREQUESTLENGTH*4], *next;
-    char *post_data;
-    int rv;
-
-    bzero(buf,MAXREQUESTLENGTH*4);
-    rv = special_read(cn, buf, sizeof(buf)-1);
-    if (rv <= 0) 
-    {
-        if (rv < 0) /* really dead? */
-            removeconnection(cn);
-        return;
-    }
-
-    buf[rv] = '\0';
-    next = buf;
-
-    post_data = &cn->post_data[cn->post_read];
-
-    while (next < &buf[rv])
-    {
-        *post_data = *next;
-        post_data++;
-        next++;
-        cn->post_read++;
-        if (cn->post_read == cn->content_length)
-        {  
-            /* No more POST data to be copied */
-            *post_data='\0';
-            cn->post_state = 0;
-            buildactualfile(cn);
-            cn->state = STATE_WANT_TO_SEND_HEAD;
-            return;
-        }
-    }
-
-    /* More POST data to read */
-}
-
-
 void procreadhead(struct connstruct *cn) 
 {
     char buf[MAXREQUESTLENGTH*4], *tp, *next;
     int rv;
 
-    bzero(buf,MAXREQUESTLENGTH*4);
+    memset(buf, 0, MAXREQUESTLENGTH*4);
     rv = special_read(cn, buf, sizeof(buf)-1);
     if (rv <= 0) 
     {
@@ -409,12 +309,14 @@ void procreadhead(struct connstruct *cn)
         /* If we have a blank line, advance to next stage */
         if (*next == '\r' || *next == '\n') 
         {
-	    if ((cn->reqtype == TYPE_POST)&&(cn->content_length > 0))
-	      {
-		if (init_read_post_data(buf,next,cn,rv) == 0)
-		  return;
-	      }
-		
+#ifndef WIN32
+            if (cn->reqtype == TYPE_POST && cn->content_length > 0)
+            {
+                if (init_read_post_data(buf,next,cn,rv) == 0)
+                    return;
+            }
+#endif
+
             buildactualfile(cn);
             cn->state = STATE_WANT_TO_SEND_HEAD;
             return;
@@ -858,6 +760,104 @@ static void decode_path_info(struct connstruct *cn, char *path_info)
 
     /* the bit at the start must be the script name */
     my_strncpy(cn->filereq, path_info, MAXREQUESTLENGTH);
+}
+
+static int init_read_post_data(char *buf, char *data, 
+                                struct connstruct *cn, int old_rv)
+{
+   char *next = data;
+   int rv = old_rv;
+   char *post_data;
+
+    /* Too much Post data to send. MAXPOSTDATASIZE should be 
+       configured (now it can be chaged in the header file) */
+   if (cn->content_length > MAXPOSTDATASIZE) 
+   {
+       send_error(cn, 418);
+       return 0;
+   }
+   
+   /* remove CRLF */
+   while ((*next == '\r' || *next == '\n') && (next < &buf[rv])) 
+       next++;
+   
+   if (cn->post_data == NULL)
+   {
+       cn->post_data = (char *) calloc(1, (cn->content_length + 1)); 
+       /* Allocate buffer for the POST data that will be used by proccgi 
+          to send POST data to the CGI script */
+
+       if (cn->post_data == NULL)
+       {
+           printf("axhttpd: could not allocate memory for POST data\n"); 
+           TTY_FLUSH();
+           send_error(cn, 599);
+           return 0;
+       }
+   }
+
+   cn->post_state = 0;
+   cn->post_read = 0;
+   post_data = cn->post_data;
+
+   while (next < &buf[rv])
+   { 
+       /*copy POST data to buffer*/
+       *post_data = *next;
+       post_data++;
+       next++;
+       cn->post_read++;
+       if (cn->post_read == cn->content_length)
+       { 
+           /* No more POST data to be copied */
+           *post_data = '\0';
+           return 1;
+       }
+   }
+
+   /* More POST data has to be read. read_post_data will continue with that */
+   cn->post_state = 1;
+   return 0;
+}
+
+void read_post_data(struct connstruct *cn)
+{
+    char buf[MAXREQUESTLENGTH*4], *next;
+    char *post_data;
+    int rv;
+
+    bzero(buf,MAXREQUESTLENGTH*4);
+    rv = special_read(cn, buf, sizeof(buf)-1);
+    if (rv <= 0) 
+    {
+        if (rv < 0) /* really dead? */
+            removeconnection(cn);
+        return;
+    }
+
+    buf[rv] = '\0';
+    next = buf;
+
+    post_data = &cn->post_data[cn->post_read];
+
+    while (next < &buf[rv])
+    {
+        *post_data = *next;
+        post_data++;
+        next++;
+        cn->post_read++;
+        if (cn->post_read == cn->content_length)
+        {  
+            /* No more POST data to be copied */
+            *post_data='\0';
+            cn->post_state = 0;
+            buildactualfile(cn);
+            cn->state = STATE_WANT_TO_SEND_HEAD;
+            return;
+        }
+    }
+
+    /* More POST data to read */
 }
 
 #endif  /* CONFIG_HTTP_HAS_CGI */

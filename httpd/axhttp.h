@@ -129,7 +129,9 @@ void procreadhead(struct connstruct *cn);
 void procsendhead(struct connstruct *cn);
 void procreadfile(struct connstruct *cn);
 void procsendfile(struct connstruct *cn);
+#if defined(CONFIG_HTTP_HAS_CGI)
 void read_post_data(struct connstruct *cn);
+#endif
 
 /* misc.c prototypes */
 char *my_strncpy(char *dest, const char *src, size_t n);
