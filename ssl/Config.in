@@ -234,15 +234,12 @@ config CONFIG_USE_DEV_URANDOM
 
 config CONFIG_WIN32_USE_CRYPTO_LIB
     bool "Use Win32 Crypto Library"
-    default y if !CONFIG_VISUAL_STUDIO_6_0
-    default n if CONFIG_VISUAL_STUDIO_6_0
     depends on CONFIG_PLATFORM_WIN32
     help 
         Microsoft produce a Crypto API which requires the Platform SDK to be
         installed. It's used for the RNG.
 
-        This will be the default on most Win32 systems. If using Visual Studio
-        6.0, then the SDK containing the crypto libraries must be used.
+        This will be the default on most Win32 systems.
 
 config CONFIG_OPENSSL_COMPATIBLE
     bool "Enable openssl API compatibility"

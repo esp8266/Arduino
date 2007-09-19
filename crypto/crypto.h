@@ -27,8 +27,8 @@
 extern "C" {
 #endif
 
-#include "os_port.h"
 #include "config.h"
+#include "os_port.h"
 
 /* enable features based on a 'super-set' capbaility. */
 #if defined(CONFIG_SSL_FULL_MODE) 

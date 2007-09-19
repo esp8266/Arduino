@@ -63,11 +63,6 @@ choice
     depends on CONFIG_PLATFORM_WIN32
     default CONFIG_VISUAL_STUDIO_7_0
 
-config CONFIG_VISUAL_STUDIO_6_0
-    bool "Visual Studio 6.0 (VC98)"
-    help
-        Use Microsoft's Visual Studio 6.0 platform.
-
 config CONFIG_VISUAL_STUDIO_7_0
     bool "Visual Studio 7.0 (2003)"
     help 
@@ -79,11 +74,6 @@ config CONFIG_VISUAL_STUDIO_8_0
         Use Microsoft's Visual Studio 2005 platform.
 
 endchoice
-
-config CONFIG_VISUAL_STUDIO_6_0_BASE
-    string "Base"
-    depends on CONFIG_VISUAL_STUDIO_6_0
-    default "c:\\Program Files\\Microsoft Visual Studio"
 
 config CONFIG_VISUAL_STUDIO_7_0_BASE
     string "Base"

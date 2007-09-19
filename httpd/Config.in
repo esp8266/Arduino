@@ -54,11 +54,11 @@ config CONFIG_HTTP_TIMEOUT
         Set the timeout of a connection in seconds.
 
 menu "CGI"
+depends on !CONFIG_PLATFORM_WIN32
 
 config CONFIG_HTTP_HAS_CGI
     bool "Enable CGI"
     default y
-    depends on !CONFIG_PLATFORM_WIN32
     help
         Enable the CGI capability. Not available on Win32 platforms.
 

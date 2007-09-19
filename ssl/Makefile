@@ -44,7 +44,7 @@ endif
 LIBMAJOR=$(BASETARGET).1
 LIBMINOR=$(BASETARGET).1.2
 else
-TARGET1=$(AXTLS_HOME)/axtls.lib
+TARGET1=$(AXTLS_HOME)/$(STAGE)/axtls.lib
 TARGET2=$(AXTLS_HOME)/$(STAGE)/axtls.dll
 STATIC_LIB=$(AXTLS_HOME)/$(STAGE)/axtls.static.lib
 CRYPTO_PATH=$(AXTLS_HOME)\\crypto\\
