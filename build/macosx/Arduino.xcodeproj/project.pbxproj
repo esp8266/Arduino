@@ -452,7 +452,7 @@
 		33BEDDD409D6E8D800430D5B /* ExportFolder.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = ExportFolder.java; sourceTree = "<group>"; };
 		33BEE0CD09D7446100430D5B /* Library.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = Library.java; sourceTree = "<group>"; };
 		33CF03B009662CA800F2C9A9 /* arduino.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = arduino.icns; path = dist/arduino.icns; sourceTree = "<group>"; };
-		33DD8FB6096AC8DA0013AF8F /* Arduino.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Arduino.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		33DD8FB6096AC8DA0013AF8F /* Arduino.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Arduino.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		33F9446B0C2B2F6F0093EB9C /* UispUploader.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = UispUploader.java; sourceTree = "<group>"; };
 		33F944E00C2B33560093EB9C /* AvrdudeUploader.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = AvrdudeUploader.java; sourceTree = "<group>"; };
 		33FF01DE0965BD160016AC38 /* about.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = about.jpg; sourceTree = "<group>"; };
