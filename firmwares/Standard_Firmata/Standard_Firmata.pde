@@ -248,7 +248,7 @@ void outputDigitalBytes(byte pin0_6, byte pin7_13) {
   for(i=2; i<TOTAL_DIGITAL_PINS; ++i) { // ignore Rx,Tx pins (0 and 1)
     mask = 1 << i;
     if( (digitalPinStatus & mask) && !(pwmStatus & mask) ) {
-      digitalWrite(i, twoBytesForPorts & mask);
+      digitalWrite(i, twoBytesForPorts & mask ? HIGH : LOW);
     } 
   }
 }
@@ -259,8 +259,8 @@ void outputDigitalBytes(byte pin0_6, byte pin7_13) {
 void checkDigitalInputs(void) {
   if(digitalInputsEnabled) {
 	previousDigitalInputs = digitalInputs;
-	digitalInputs = _SFR_IO8(port_to_input[PB]) << 8;  // get pins 8-13
-	digitalInputs += _SFR_IO8(port_to_input[PD]);      // get pins 0-7
+	digitalInputs = PINB << 8;  // get pins 8-13
+	digitalInputs += PIND;      // get pins 0-7
 	digitalInputs = digitalInputs &~ digitalPinStatus; // ignore pins set OUTPUT
 	if(digitalInputs != previousDigitalInputs) {
 	  // TODO: implement more ports as channels for more than 16 digital pins
