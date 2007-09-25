@@ -76,7 +76,7 @@ public class PdeKeywords extends CTokenMarker {
             }
           }
 
-          String pieces[] = Base.split(line, '\t');
+          String pieces[] = processing.core.PApplet.split(line, '\t');
           if (pieces.length >= 2) {
             //int tab = line.indexOf('\t');
             // any line with no tab is ignored

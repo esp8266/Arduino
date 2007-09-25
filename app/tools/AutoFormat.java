@@ -24,7 +24,7 @@
 package processing.app.tools;
 
 import processing.app.*;
-//import processing.core.*;
+import processing.core.*;
 
 import java.io.*;
 import java.util.StringTokenizer;
@@ -915,26 +915,25 @@ public class AutoFormat {
       if (formattedText.equals(originalText)) {
         editor.message("No changes necessary for Auto Format.");
 
-      } else {
-        // replace with new bootiful text
-        // selectionEnd hopefully at least in the neighborhood
-        editor.setText(formattedText, selectionEnd, selectionEnd);
-        editor.sketch.setModified(true);
-
+      } else if (paren != 0) {
         // warn user if there are too many parens in either direction
-        if (paren != 0) {
-          editor.error("Warning: Too many " +
+        editor.error("Auto Format Canceled: Too many " +
                        ((paren < 0) ? "right" : "left") +
                        " parentheses.");
 
         } else if (c_level != 0) {  // check braces only if parens are ok
-          editor.error("Warning: Too many " +
+        editor.error("Auto Format Canceled: Too many " +
                        ((c_level < 0) ? "right" : "left") +
                        " curly braces.");
+
         } else {
+        // replace with new bootiful text
+        // selectionEnd hopefully at least in the neighborhood
+        editor.setText(formattedText, selectionEnd, selectionEnd);
+        editor.sketch.setModified(true);
+        // mark as finished
           editor.message("Auto Format finished.");
         }
-      }
 
     } catch (Exception e) {
       editor.error(e);

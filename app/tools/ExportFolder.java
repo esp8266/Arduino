@@ -99,6 +99,8 @@ public class ExportFolder {
     // skip .DS_Store files, etc
     if (!folder.isDirectory()) return; // false;
 
+    System.out.println(folder.getAbsolutePath());
+
     String list[] = folder.list();
     // if a bad folder or something like that, this might come back null
     if (list == null) return; // false;

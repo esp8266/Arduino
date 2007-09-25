@@ -151,6 +151,7 @@
 			<string>$JAVAROOT/mrj.jar</string>
 			<string>$JAVAROOT/registry.jar</string>
 			<string>$JAVAROOT/RXTXcomm.jar</string>
+			<string>$JAVAROOT/quaqua.jar</string>
 		</array>
 		<key>JVMVersion</key>
 		<string>1.4+</string>
@@ -170,6 +171,22 @@
 
 /* Begin PBXBuildFile section */
 		332D4DB609CF147F00BF81F6 /* Sizer.java in Sources */ = {isa = PBXBuildFile; fileRef = 332D4DB509CF147F00BF81F6 /* Sizer.java */; };
+		335A28F50C8CCB0A00D8A7F4 /* quaqua.jar in CopyFiles */ = {isa = PBXBuildFile; fileRef = 335A28F30C8CCAF700D8A7F4 /* quaqua.jar */; };
+		335A28FE0C8CCB4000D8A7F4 /* libquaqua.jnilib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 335A28F20C8CCAF700D8A7F4 /* libquaqua.jnilib */; };
+		335A29140C8CCC0900D8A7F4 /* PApplet.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A29070C8CCC0900D8A7F4 /* PApplet.java */; };
+		335A29150C8CCC0900D8A7F4 /* PConstants.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A29080C8CCC0900D8A7F4 /* PConstants.java */; };
+		335A29160C8CCC0900D8A7F4 /* PFont.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A29090C8CCC0900D8A7F4 /* PFont.java */; };
+		335A29170C8CCC0900D8A7F4 /* PGraphics.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A290A0C8CCC0900D8A7F4 /* PGraphics.java */; };
+		335A29180C8CCC0900D8A7F4 /* PGraphics2D.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A290B0C8CCC0900D8A7F4 /* PGraphics2D.java */; };
+		335A29190C8CCC0900D8A7F4 /* PGraphics3D.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A290C0C8CCC0900D8A7F4 /* PGraphics3D.java */; };
+		335A291A0C8CCC0900D8A7F4 /* PGraphicsJava2D.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A290D0C8CCC0900D8A7F4 /* PGraphicsJava2D.java */; };
+		335A291B0C8CCC0900D8A7F4 /* PImage.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A290E0C8CCC0900D8A7F4 /* PImage.java */; };
+		335A291C0C8CCC0900D8A7F4 /* PLine.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A290F0C8CCC0900D8A7F4 /* PLine.java */; };
+		335A291D0C8CCC0900D8A7F4 /* PMatrix.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A29100C8CCC0900D8A7F4 /* PMatrix.java */; };
+		335A291E0C8CCC0900D8A7F4 /* PPolygon.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A29110C8CCC0900D8A7F4 /* PPolygon.java */; };
+		335A291F0C8CCC0900D8A7F4 /* PShape.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A29120C8CCC0900D8A7F4 /* PShape.java */; };
+		335A29200C8CCC0900D8A7F4 /* PTriangle.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A29130C8CCC0900D8A7F4 /* PTriangle.java */; };
+		335A29240C8CCC5E00D8A7F4 /* DiscourseFormat.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A29230C8CCC5E00D8A7F4 /* DiscourseFormat.java */; };
 		335D3B010C4EE1B80065B27E /* ATmegaBOOT_168.c in CopyFiles */ = {isa = PBXBuildFile; fileRef = 335D3AFD0C4EE19D0065B27E /* ATmegaBOOT_168.c */; };
 		335D3B020C4EE1B80065B27E /* ATmegaBOOT_168_diecimila.hex in CopyFiles */ = {isa = PBXBuildFile; fileRef = 335D3AFE0C4EE19D0065B27E /* ATmegaBOOT_168_diecimila.hex */; };
 		335D3B030C4EE1B80065B27E /* ATmegaBOOT_168_ng.hex in CopyFiles */ = {isa = PBXBuildFile; fileRef = 335D3AFF0C4EE19D0065B27E /* ATmegaBOOT_168_ng.hex */; };
@@ -363,6 +380,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 15;
 			files = (
+				335A28F50C8CCB0A00D8A7F4 /* quaqua.jar in CopyFiles */,
 				33CF03CC09662DC000F2C9A9 /* mrj.jar in CopyFiles */,
 				33CF03CD09662DC000F2C9A9 /* RXTXcomm.jar in CopyFiles */,
 				33CF03CE09662DC000F2C9A9 /* antlr.jar in CopyFiles */,
@@ -424,6 +442,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
+				335A28FE0C8CCB4000D8A7F4 /* libquaqua.jnilib in CopyFiles */,
 				339514FA097AEB8000193C89 /* license.txt in CopyFiles */,
 				339514FB097AEB8000193C89 /* readme.txt in CopyFiles */,
 			);
@@ -433,6 +452,22 @@
 
 /* Begin PBXFileReference section */
 		332D4DB509CF147F00BF81F6 /* Sizer.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Sizer.java; sourceTree = "<group>"; };
+		335A28F20C8CCAF700D8A7F4 /* libquaqua.jnilib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libquaqua.jnilib; sourceTree = "<group>"; };
+		335A28F30C8CCAF700D8A7F4 /* quaqua.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = quaqua.jar; sourceTree = "<group>"; };
+		335A29070C8CCC0900D8A7F4 /* PApplet.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = PApplet.java; sourceTree = "<group>"; };
+		335A29080C8CCC0900D8A7F4 /* PConstants.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = PConstants.java; sourceTree = "<group>"; };
+		335A29090C8CCC0900D8A7F4 /* PFont.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = PFont.java; sourceTree = "<group>"; };
+		335A290A0C8CCC0900D8A7F4 /* PGraphics.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = PGraphics.java; sourceTree = "<group>"; };
+		335A290B0C8CCC0900D8A7F4 /* PGraphics2D.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = PGraphics2D.java; sourceTree = "<group>"; };
+		335A290C0C8CCC0900D8A7F4 /* PGraphics3D.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = PGraphics3D.java; sourceTree = "<group>"; };
+		335A290D0C8CCC0900D8A7F4 /* PGraphicsJava2D.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = PGraphicsJava2D.java; sourceTree = "<group>"; };
+		335A290E0C8CCC0900D8A7F4 /* PImage.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = PImage.java; sourceTree = "<group>"; };
+		335A290F0C8CCC0900D8A7F4 /* PLine.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = PLine.java; sourceTree = "<group>"; };
+		335A29100C8CCC0900D8A7F4 /* PMatrix.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = PMatrix.java; sourceTree = "<group>"; };
+		335A29110C8CCC0900D8A7F4 /* PPolygon.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = PPolygon.java; sourceTree = "<group>"; };
+		335A29120C8CCC0900D8A7F4 /* PShape.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = PShape.java; sourceTree = "<group>"; };
+		335A29130C8CCC0900D8A7F4 /* PTriangle.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = PTriangle.java; sourceTree = "<group>"; };
+		335A29230C8CCC5E00D8A7F4 /* DiscourseFormat.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = DiscourseFormat.java; sourceTree = "<group>"; };
 		335D3AFD0C4EE19D0065B27E /* ATmegaBOOT_168.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = ATmegaBOOT_168.c; sourceTree = "<group>"; };
 		335D3AFE0C4EE19D0065B27E /* ATmegaBOOT_168_diecimila.hex */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = ATmegaBOOT_168_diecimila.hex; sourceTree = "<group>"; };
 		335D3AFF0C4EE19D0065B27E /* ATmegaBOOT_168_ng.hex */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = ATmegaBOOT_168_ng.hex; sourceTree = "<group>"; };
@@ -576,6 +611,27 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		335A29060C8CCC0800D8A7F4 /* core */ = {
+			isa = PBXGroup;
+			children = (
+				335A29070C8CCC0900D8A7F4 /* PApplet.java */,
+				335A29080C8CCC0900D8A7F4 /* PConstants.java */,
+				335A29090C8CCC0900D8A7F4 /* PFont.java */,
+				335A290A0C8CCC0900D8A7F4 /* PGraphics.java */,
+				335A290B0C8CCC0900D8A7F4 /* PGraphics2D.java */,
+				335A290C0C8CCC0900D8A7F4 /* PGraphics3D.java */,
+				335A290D0C8CCC0900D8A7F4 /* PGraphicsJava2D.java */,
+				335A290E0C8CCC0900D8A7F4 /* PImage.java */,
+				335A290F0C8CCC0900D8A7F4 /* PLine.java */,
+				335A29100C8CCC0900D8A7F4 /* PMatrix.java */,
+				335A29110C8CCC0900D8A7F4 /* PPolygon.java */,
+				335A29120C8CCC0900D8A7F4 /* PShape.java */,
+				335A29130C8CCC0900D8A7F4 /* PTriangle.java */,
+			);
+			name = core;
+			path = ../../core;
+			sourceTree = SOURCE_ROOT;
+		};
 		335D3AFC0C4EE19D0065B27E /* bootloader168 */ = {
 			isa = PBXGroup;
 			children = (
@@ -660,6 +716,7 @@
 		33FFFD3D0965B1E40016AC38 = {
 			isa = PBXGroup;
 			children = (
+				335A29060C8CCC0800D8A7F4 /* core */,
 				33CF03B009662CA800F2C9A9 /* arduino.icns */,
 				33FF07D50965C3560016AC38 /* targets */,
 				33FFFE220965BD100016AC38 /* app */,
@@ -789,6 +846,7 @@
 		33FFFE710965BD110016AC38 /* tools */ = {
 			isa = PBXGroup;
 			children = (
+				335A29230C8CCC5E00D8A7F4 /* DiscourseFormat.java */,
 				33BEDDD309D6E8D800430D5B /* Archiver.java */,
 				33BEDDD409D6E8D800430D5B /* ExportFolder.java */,
 				33FFFE720965BD110016AC38 /* AutoFormat.java */,
@@ -843,6 +901,8 @@
 		33FFFEAC0965BD110016AC38 /* dist */ = {
 			isa = PBXGroup;
 			children = (
+				335A28F20C8CCAF700D8A7F4 /* libquaqua.jnilib */,
+				335A28F30C8CCAF700D8A7F4 /* quaqua.jar */,
 				33FFFEAE0965BD110016AC38 /* bootloader */,
 				33FFFEB20965BD110016AC38 /* drivers */,
 				33FFFEB50965BD110016AC38 /* DS_Store */,
@@ -1065,6 +1125,20 @@
 				33BEE0CE09D7446100430D5B /* Library.java in Sources */,
 				33F9446D0C2B2F6F0093EB9C /* UispUploader.java in Sources */,
 				33F944E10C2B33560093EB9C /* AvrdudeUploader.java in Sources */,
+				335A29140C8CCC0900D8A7F4 /* PApplet.java in Sources */,
+				335A29150C8CCC0900D8A7F4 /* PConstants.java in Sources */,
+				335A29160C8CCC0900D8A7F4 /* PFont.java in Sources */,
+				335A29170C8CCC0900D8A7F4 /* PGraphics.java in Sources */,
+				335A29180C8CCC0900D8A7F4 /* PGraphics2D.java in Sources */,
+				335A29190C8CCC0900D8A7F4 /* PGraphics3D.java in Sources */,
+				335A291A0C8CCC0900D8A7F4 /* PGraphicsJava2D.java in Sources */,
+				335A291B0C8CCC0900D8A7F4 /* PImage.java in Sources */,
+				335A291C0C8CCC0900D8A7F4 /* PLine.java in Sources */,
+				335A291D0C8CCC0900D8A7F4 /* PMatrix.java in Sources */,
+				335A291E0C8CCC0900D8A7F4 /* PPolygon.java in Sources */,
+				335A291F0C8CCC0900D8A7F4 /* PShape.java in Sources */,
+				335A29200C8CCC0900D8A7F4 /* PTriangle.java in Sources */,
+				335A29240C8CCC5E00D8A7F4 /* DiscourseFormat.java in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

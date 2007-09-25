@@ -31,6 +31,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import processing.core.*;
+
 /*
  * Provides information about and builds a library
  */
@@ -552,7 +554,7 @@ public class Library implements MessageConsumer{
           continue;
         }
   
-        String pieces[] = Base.split(line, '\t');
+        String pieces[] = PApplet.split(line, '\t');
   
         if (pieces.length >= 2) {
           String keyword = pieces[0].trim();

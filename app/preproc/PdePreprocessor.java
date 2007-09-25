@@ -30,7 +30,7 @@
 package processing.app.preproc;
 
 import processing.app.*;
-//import processing.core.*;
+import processing.core.*;
 
 import java.io.*;
 
@@ -99,6 +99,7 @@ public class PdePreprocessor {
 
   /**
    * preprocesses a pde file and write out a java file
+   * @param pretty true if should also space out/indent lines
    * @return the classname of the exported Java
    */
   //public String write(String program, String buildPath, String name,
@@ -109,10 +110,19 @@ public class PdePreprocessor {
     throws java.lang.Exception {
     // if the program ends with no CR or LF an OutOfMemoryError will happen.
     // not gonna track down the bug now, so here's a hack for it:
-    if ((program.length() > 0) &&
-        program.charAt(program.length()-1) != '\n') {
+    // bug filed at http://dev.processing.org/bugs/show_bug.cgi?id=5
+    //if ((program.length() > 0) &&
+    //program.charAt(program.length()-1) != '\n') {
       program += "\n";
-    }
+    //}
+
+    // if the program ends with an unterminated multiline comment,
+    // an OutOfMemoryError or NullPointerException will happen.
+    // again, not gonna bother tracking this down, but here's a hack.
+    // http://dev.processing.org/bugs/show_bug.cgi?id=16
+    Sketch.scrubComments(program);
+    // this returns the scrubbed version, but more important for this
+    // function, it'll check to see if there are errors with the comments.
 
     if (Preferences.getBoolean("preproc.substitute_unicode")) {
       // check for non-ascii chars (these will be/must be in unicode format)
@@ -192,26 +202,6 @@ public class PdePreprocessor {
 
     extraImports = new String[imports.size()];
     imports.copyInto(extraImports);
-
-    // if using opengl, add it to the special imports
-    /*
-    if (Preferences.get("renderer").equals("opengl")) {
-      extraImports = new String[imports.size() + 1];
-      imports.copyInto(extraImports);
-      extraImports[extraImports.length - 1] = "processing.opengl.*";
-    }
-    */
-
-    /*
-    if (codeFolderPackages != null) {
-      extraImports = new String[importsCount + codeFolderPackages.length];
-      imports.copyInto(extraImports);
-      for (int i = 0; i < codeFolderPackages.length; i++) {
-        extraImports[importsCount + i] = codeFolderPackages[i] + ".*";
-      }
-      codeFolderImports = null;
-    }
-    */
 
     if (codeFolderPackages != null) {
       codeFolderImports = new String[codeFolderPackages.length];

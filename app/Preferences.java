@@ -41,7 +41,12 @@ import javax.swing.filechooser.*;
 import javax.swing.text.*;
 import javax.swing.undo.*;
 
-//import processing.core.PApplet;
+import processing.core.PApplet;
+
+
+// TODO change this to use the Java Preferences API
+// http://www.onjava.com/pub/a/onjava/synd/2001/10/17/j2se.html
+// http://www.particle.kth.se/~lindsey/JavaCourse/Book/Part1/Java/Chapter10/Preferences.html
 
 
 /**
@@ -50,6 +55,10 @@ import javax.swing.undo.*;
  * This class no longer uses the Properties class, since
  * properties files are iso8859-1, which is highly likely to
  * be a problem when trying to save sketch folders and locations.
+ * <p>
+ * This is very poorly put together, that the prefs panel and the
+ * actual prefs i/o is part of the same code. But there hasn't yet
+ * been a compelling reason to bother with the separation.
  */
 public class Preferences {
 
@@ -88,9 +97,12 @@ public class Preferences {
    * inside a static block.
    */
   static public int BUTTON_HEIGHT = 24;
+  /*
+  // remove this for 0121, because quaqua takes care of it
   static {
     if (Base.isMacOS()) BUTTON_HEIGHT = 29;
   }
+  */
 
   // value for the size bars, buttons, etc
 
@@ -107,15 +119,18 @@ public class Preferences {
 
   // gui elements
 
-  JDialog dialog;
+  //JDialog dialog;
+  JFrame dialog;
   int wide, high;
 
   JTextField sketchbookLocationField;
+  JCheckBox exportSeparateBox;
   JCheckBox sketchPromptBox;
   JCheckBox sketchCleanBox;
   JCheckBox externalEditorBox;
+  JCheckBox memoryOverrideBox;
+  JTextField memoryField;
   JCheckBox checkUpdatesBox;
-
   JTextField fontSizeField;
 
 
@@ -145,7 +160,7 @@ public class Preferences {
     // check for platform-specific properties in the defaults
 
     String platformExtension = "." +
-      platforms[Base.platform];
+      platforms[processing.core.PApplet.platform];
     int extensionLength = platformExtension.length();
 
     Enumeration e = table.keys(); //properties.propertyNames();
@@ -195,7 +210,8 @@ public class Preferences {
 
     // setup dialog for the prefs
 
-    dialog = new JDialog(editor, "Preferences", true);
+    //dialog = new JDialog(editor, "Preferences", true);
+    dialog = new JFrame("Preferences");
     dialog.setResizable(false);
 
     Container pain = dialog.getContentPane();
@@ -249,6 +265,7 @@ public class Preferences {
     button = new JButton(PROMPT_BROWSE);
     button.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
+          /*
           JFileChooser fc = new JFileChooser();
           fc.setSelectedFile(new File(sketchbookLocationField.getText()));
           fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -256,6 +273,13 @@ public class Preferences {
           int returned = fc.showOpenDialog(new JDialog());
           if (returned == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
+            sketchbookLocationField.setText(file.getAbsolutePath());
+          }
+          */
+          File dflt = new File(sketchbookLocationField.getText());
+          File file =
+            Base.selectFolder("Select new sketchbook location", dflt, dialog);
+          if (file != null) {
             sketchbookLocationField.setText(file.getAbsolutePath());
           }
         }
@@ -286,6 +310,8 @@ public class Preferences {
     box.add(label);
     fontSizeField = new JTextField(4);
     box.add(fontSizeField);
+    label = new JLabel("  (requires restart of Arduino)");
+    box.add(label);
     pain.add(box);
     d = box.getPreferredSize();
     box.setBounds(left, top, d.width, d.height);
@@ -468,9 +494,9 @@ public class Preferences {
     String newSizeText = fontSizeField.getText();
     try {
       int newSize = Integer.parseInt(newSizeText.trim());
-      String pieces[] = Base.split(get("editor.font"), ',');
+      String pieces[] = PApplet.split(get("editor.font"), ',');
       pieces[2] = String.valueOf(newSize);
-      set("editor.font", Base.join(pieces, ','));
+      set("editor.font", PApplet.join(pieces, ','));
 
     } catch (Exception e) {
       System.err.println("ignoring invalid font size " + newSizeText);

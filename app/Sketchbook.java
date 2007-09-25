@@ -130,6 +130,7 @@ public class Sketchbook {
 
       //System.out.println("resetting sketchbook path");
       File sketchbookFolder = Base.getDefaultSketchbookFolder();
+      //System.out.println("default is " + sketchbookFolder);
       Preferences.set("sketchbook.path",
                       sketchbookFolder.getAbsolutePath());
 
@@ -170,11 +171,8 @@ public class Sketchbook {
     if (noPrompt) prompt = false;
 
     if (prompt) {
-    //if (!startup) {
       // prompt for the filename and location for the new sketch
-
-      FileDialog fd = new FileDialog(editor, //new Frame(),
-                                     //"Create new sketch named",
+      FileDialog fd = new FileDialog(editor,
                                      "Create sketch folder named:",
                                      FileDialog.SAVE);
       fd.setDirectory(getSketchbookPath());
@@ -228,7 +226,7 @@ public class Sketchbook {
     }
 
     // make a note of a newly added sketch in the sketchbook menu
-    rebuildMenus();
+    rebuildMenusAsync();
 
     // now open it up
     //handleOpen(newbieName, newbieFile, newbieDir);
@@ -257,10 +255,25 @@ public class Sketchbook {
 
 
   /**
-   * Java classes are pretty limited about what you can use
-   * for their naming. This helper function replaces everything
-   * but A-Z, a-z, and 0-9 with underscores. Also disallows
-   * starting the sketch name with a digit.
+   * Return true if the name is valid for a Processing sketch.
+   */
+  static public boolean isSanitary(String name) {
+    return sanitizedName(name).equals(name);
+  }
+
+
+  /**
+   * Produce a sanitized name that fits our standards for likely to work.
+   * <p/>
+   * Java classes have a wider range of names that are technically allowed
+   * (supposedly any Unicode name) than what we support. The reason for
+   * going more narrow is to avoid situations with text encodings and
+   * converting during the process of moving files between operating
+   * systems, i.e. uploading from a Windows machine to a Linux server,
+   * or reading a FAT32 partition in OS X and using a thumb drive.
+   * <p/>
+   * This helper function replaces everything but A-Z, a-z, and 0-9 with
+   * underscores. Also disallows starting the sketch name with a digit.
    */
   static public String sanitizedName(String origName) {
     char c[] = origName.toCharArray();
@@ -280,7 +293,12 @@ public class Sketchbook {
         buffer.append('_');
       }
     }
-    // let's not be ridiculous about the length of filenames
+    // let's not be ridiculous about the length of filenames.
+    // in fact, Mac OS 9 can handle 255 chars, though it can't really
+    // deal with filenames longer than 31 chars in the Finder.
+    // but limiting to that for sketches would mean setting the
+    // upper-bound on the character limit here to 25 characters
+    // (to handle the base name + ".class")
     if (buffer.length() > 63) {
       buffer.setLength(63);
     }
@@ -290,12 +308,12 @@ public class Sketchbook {
 
   public String handleOpen() {
     // swing's file choosers are ass ugly, so we use the
-    // native (awt peered) dialogs instead
+    // native (awt peered) dialogs where possible
     FileDialog fd = new FileDialog(editor, //new Frame(),
                                    "Open a Processing sketch...",
                                    FileDialog.LOAD);
     //fd.setDirectory(Preferences.get("sketchbook.path"));
-    fd.setDirectory(getSketchbookPath());
+    //fd.setDirectory(getSketchbookPath());
 
     // only show .pde files as eligible bachelors
     // TODO this doesn't seem to ever be used. AWESOME.
@@ -325,6 +343,23 @@ public class Sketchbook {
 
 
   /**
+   * Asynchronous version of menu rebuild to be used on 'new' and 'save',
+   * to prevent the interface from locking up until the menus are done.
+   */
+  public void rebuildMenusAsync() {
+    // disabling the async option for actual release, this hasn't been tested
+    /*
+    SwingUtilities.invokeLater(new Runnable() {
+        public void run() {
+          rebuildMenus();
+        }
+      });
+    */
+    rebuildMenus();
+  }
+
+
+  /**
    * Rebuild the menu full of sketches based on the
    * contents of the sketchbook.
    *
@@ -333,6 +368,7 @@ public class Sketchbook {
    * the menu will disappear from its original location.
    */
   public void rebuildMenus() {
+    //EditorConsole.systemOut.println("rebuilding menus");
     try {
       // rebuild file/open and the toolbar popup menus
       buildMenu(openMenu);
@@ -359,6 +395,7 @@ public class Sketchbook {
                           "sketchbook menu. Things might get a little\n" +
                           "kooky around here.", e);
     }
+    //EditorConsole.systemOut.println("done rebuilding menus");
   }
 
 
@@ -444,25 +481,8 @@ public class Sketchbook {
     if (list == null) return false;
 
     // alphabetize list, since it's not always alpha order
-    // use cheapie bubble-style sort which should be fine
-    // since not a tone of files, and things will mostly be sorted
-    // or may be completely sorted already by the os
-    for (int i = 0; i < list.length; i++) {
-      int who = i;
-      for (int j = i+1; j < list.length; j++) {
-        if (list[j].compareToIgnoreCase(list[who]) < 0) {
-          who = j;  // this guy is earlier in the alphabet
-        }
-      }
-      if (who != i) {  // swap with someone if changes made
-        String temp = list[who];
-        list[who] = list[i];
-        list[i] = temp;
-      }
-    }
-
-    //SketchbookMenuListener listener =
-    //new SketchbookMenuListener(folder.getAbsolutePath());
+    // replaced hella slow bubble sort with this feller for 0093
+    Arrays.sort(list, String.CASE_INSENSITIVE_ORDER);
 
     ActionListener listener = new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -477,18 +497,23 @@ public class Sketchbook {
           list[i].equals("CVS")) continue;
 
       File subfolder = new File(folder, list[i]);
-      File lib = new File(subfolder, "library");
+      if (!subfolder.isDirectory()) continue;
+
       File entry = new File(subfolder, list[i] + ".pde");
       // if a .pde file of the same prefix as the folder exists..
       if (entry.exists()) {
-        String sanityCheck = sanitizedName(list[i]);
-        if (!sanityCheck.equals(list[i])) {
+        //String sanityCheck = sanitizedName(list[i]);
+        //if (!sanityCheck.equals(list[i])) {
+        if (!Sketchbook.isSanitary(list[i])) {
           if (!builtOnce) {
-            String mess =
+            String complaining =
               "The sketch \"" + list[i] + "\" cannot be used.\n" +
-              "Sketch names must contain only basic letters and numbers.\n" +
-              "(ascii only and no spaces, and it cannot start with a number)";
-            Base.showMessage("Ignoring bad sketch name", mess);
+              "Sketch names must contain only basic letters and numbers\n" +
+              "(ASCII-only with no spaces, " +
+              "and it cannot start with a number).\n" +
+              "To get rid of this message, remove the sketch from\n" +
+              entry.getAbsolutePath();
+            Base.showMessage("Ignoring sketch with bad name", complaining);
           }
           continue;
         }
@@ -499,7 +524,8 @@ public class Sketchbook {
         menu.add(item);
         ifound = true;
 
-      } else {  // might contain other dirs, get recursive
+      } else {
+        // not a sketch folder, but maybe a subfolder containing sketches
         JMenu submenu = new JMenu(list[i]);
         // needs to be separate var
         // otherwise would set ifound to false
@@ -523,22 +549,8 @@ public class Sketchbook {
     if (list == null) return false;
 
     // alphabetize list, since it's not always alpha order
-    // use cheapie bubble-style sort which should be fine
-    // since not a tone of files, and things will mostly be sorted
-    // or may be completely sorted already by the os
-    for (int i = 0; i < list.length; i++) {
-      int who = i;
-      for (int j = i+1; j < list.length; j++) {
-        if (list[j].compareToIgnoreCase(list[who]) < 0) {
-          who = j;  // this guy is earlier in the alphabet
-        }
-      }
-      if (who != i) {  // swap with someone if changes made
-        String temp = list[who];
-        list[who] = list[i];
-        list[i] = temp;
-      }
-    }
+    // replaced hella slow bubble sort with this feller for 0093
+    Arrays.sort(list, String.CASE_INSENSITIVE_ORDER);
 
     ActionListener listener = new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -591,6 +603,8 @@ public class Sketchbook {
         String packages[] =
           Compiler.packageListFromClassPath(libraryClassPath);
         for (int k = 0; k < packages.length; k++) {
+          //System.out.println(packages[k] + " -> " + exported);
+          //String already = (String) importToLibraryTable.get(packages[k]);
           importToLibraryTable.put(packages[k], exported);
         }
 */
@@ -600,11 +614,10 @@ public class Sketchbook {
         menu.add(item);
         ifound = true;
 
-      } else {  // might contain other dirs, get recursive
+      } else {  // not a library, but is still a folder, so recurse
         JMenu submenu = new JMenu(list[i]);
-        // needs to be separate var
-        // otherwise would set ifound to false
-        boolean found = addLibraries(submenu, subfolder); //, false);
+        // needs to be separate var, otherwise would set ifound to false
+        boolean found = addLibraries(submenu, subfolder);
         if (found) {
           menu.add(submenu);
           ifound = true;

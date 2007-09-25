@@ -30,8 +30,8 @@ void loop()
     digitalWrite(pins[i], LOW);    // and turning it off.
   }
   for (i = num_pins - 1; i >= 0; i--) { 
-    digitalWrite(i, HIGH);
+    digitalWrite(pins[i], HIGH);
     delay(timer);
-    digitalWrite(i, LOW);
+    digitalWrite(pins[i], LOW);
   }
 }

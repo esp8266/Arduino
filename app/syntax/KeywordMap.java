@@ -76,7 +76,7 @@ public class KeywordMap
         /**
          * Adds a key-value mapping.
          * @param keyword The key
-         * @Param id The value
+         * @param id The value
          */
         public void add(String keyword, byte id)
         {

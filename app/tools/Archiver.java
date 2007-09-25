@@ -25,6 +25,7 @@ package processing.app.tools;
 
 import processing.app.*;
 
+import java.awt.FileDialog;
 import java.io.*;
 import java.text.*;
 import java.util.*;
@@ -35,7 +36,7 @@ public class Archiver {
   Editor editor;
 
   // someday these will be settable
-  boolean useDate = true; //false;
+  boolean useDate;
   int digits = 3;
 
   NumberFormat numberFormat;
@@ -79,6 +80,9 @@ public class Archiver {
     String namely = null;
     int index = 0;
     do {
+      // only use the date if the sketch name isn't the default name
+      useDate = !name.startsWith("sketch_");
+
       if (useDate) {
         String purty = dateFormat.format(new Date());
         String stamp = purty + ((char) ('a' + index));
@@ -92,6 +96,20 @@ public class Archiver {
       }
       index++;
     } while (newbie.exists());
+
+    // open up a prompt for where to save this fella
+    FileDialog fd =
+      new FileDialog(editor, "Archive sketch as:", FileDialog.SAVE);
+    fd.setDirectory(parent.getAbsolutePath());
+    fd.setFile(newbie.getName());
+    fd.show();
+
+    String directory = fd.getDirectory();
+    String filename = fd.getFile();
+
+    // only write the file if not canceled
+    if (filename != null) {
+      newbie = new File(directory, filename);
 
     try {
       //System.out.println(newbie);
@@ -109,6 +127,9 @@ public class Archiver {
 
     } catch (IOException e) {
       e.printStackTrace();
+    }
+    } else {
+      editor.message("Archive sketch canceled.");
     }
   }
 

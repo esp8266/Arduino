@@ -60,6 +60,10 @@ public class EditorListener {
   int selectionStart, selectionEnd;
   int position;
 
+  /** ctrl-alt on windows and linux, cmd-alt on mac os x */
+  static final int CTRL_ALT = ActionEvent.ALT_MASK |
+    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+
 
   public EditorListener(Editor editor, JEditTextArea textarea) {
     this.editor = editor;
@@ -104,6 +108,16 @@ public class EditorListener {
 
     //System.out.println(c + " " + code + " " + event);
     //System.out.println();
+
+    if ((event.getModifiers() & CTRL_ALT) == CTRL_ALT) {
+      if (code == KeyEvent.VK_LEFT) {
+        editor.sketch.prevCode();
+        return true;
+      } else if (code == KeyEvent.VK_RIGHT) {
+        editor.sketch.nextCode();
+        return true;
+      }
+    }
 
     if ((event.getModifiers() & KeyEvent.META_MASK) != 0) {
       //event.consume();  // does nothing
@@ -195,8 +209,8 @@ public class EditorListener {
 
     switch ((int) c) {
 
-    case 9:  // expand tabs
-      if (tabsExpand) {
+    case 9:
+      if (tabsExpand) {  // expand tabs
         textarea.setSelectedText(tabString);
         event.consume();
         return true;
@@ -286,12 +300,40 @@ public class EditorListener {
         origIndex += offset; // ARGH!#(* WINDOWS#@($*
         */
 
+        // if the previous thing is a brace (whether prev line or
+        // up farther) then the correct indent is the number of spaces
+        // on that line + 'indent'.
+        // if the previous line is not a brace, then just use the
+        // identical indentation to the previous line
+
+        // calculate the amount of indent on the previous line
+        // this will be used *only if the prev line is not an indent*
         int spaceCount = calcSpaceCount(origIndex, contents);
-        //int origCount = spaceCount;
+
+        // If the last character was a left curly brace, then indent.
+        // For 0122, walk backwards a bit to make sure that the there
+        // isn't a curly brace several spaces (or lines) back. Also
+        // moved this before calculating extraCount, since it'll affect
+        // that as well.
+        int index2 = origIndex;
+        while ((index2 >= 0) &&
+               Character.isWhitespace(contents[index2])) {
+          index2--;
+        }
+        if (index2 != -1) {
+          // still won't catch a case where prev stuff is a comment
+          if (contents[index2] == '{') {
+            // intermediate lines be damned,
+            // use the indent for this line instead
+            spaceCount = calcSpaceCount(index2, contents);
+            spaceCount += tabSize;
+          }
+        }
+        //System.out.println("spaceCount should be " + spaceCount);
 
         // now before inserting this many spaces, walk forward from
-        // the caret position, so that the number of spaces aren't
-        // just being duplicated again
+        // the caret position and count the number of spaces,
+        // so that the number of spaces aren't duplicated again
         int index = origIndex + 1;
         int extraCount = 0;
         while ((index < contents.length) &&
@@ -300,23 +342,58 @@ public class EditorListener {
           extraCount++;
           index++;
         }
+        int braceCount = 0;
+        while ((index < contents.length) && (contents[index] != '\n')) {
+          if (contents[index] == '}') {
+            braceCount++;
+          }
+          index++;
+        }
 
         // hitting return on a line with spaces *after* the caret
-        // can cause trouble. for simplicity's sake, just ignore this case.
-        //if (spaceCount < 0) spaceCount = origCount;
+        // can cause trouble. for 0099, was ignoring the case, but this is
+        // annoying, so in 0122 we're trying to fix that.
+        /*
         if (spaceCount - extraCount > 0) {
           spaceCount -= extraCount;
         }
+        */
+        spaceCount -= extraCount;
+        //if (spaceCount < 0) spaceCount = 0;
+        //System.out.println("extraCount is " + extraCount);
 
-        // if the last character was a left curly brace, then indent
-        if (origIndex != -1) {
-          if (contents[origIndex] == '{') {
-            spaceCount += tabSize;
-          }
-        }
+        // now, check to see if the current line contains a } and if so,
+        // outdent again by indent
+        //if (braceCount > 0) {
+        //spaceCount -= 2;
+        //}
 
+        if (spaceCount < 0) {
+          // for rev 0122, actually delete extra space
+          //textarea.setSelectionStart(origIndex + 1);
+          textarea.setSelectionEnd(textarea.getSelectionEnd() - spaceCount);
+          textarea.setSelectedText("\n");
+        } else {
         String insertion = "\n" + Editor.EMPTY.substring(0, spaceCount);
         textarea.setSelectedText(insertion);
+        }
+
+        // not gonna bother handling more than one brace
+        if (braceCount > 0) {
+          int sel = textarea.getSelectionStart();
+          // sel - tabSize will be -1 if start/end parens on the same line
+          // http://dev.processing.org/bugs/show_bug.cgi?id=484
+          if (sel - tabSize >= 0) {
+            textarea.select(sel - tabSize, sel);
+            String s = Editor.EMPTY.substring(0, tabSize);
+            // if these are spaces that we can delete
+            if (textarea.getSelectedText().equals(s)) {
+              textarea.setSelectedText("");
+            } else {
+              textarea.select(sel, sel);
+            }
+          }
+        }
 
         // mark this event as already handled
         event.consume();
@@ -422,6 +499,34 @@ public class EditorListener {
     }
     return false;
   }
+
+
+  /** Cmd-Shift or Ctrl-Shift depending on the platform */
+  //static final int CMD_SHIFT = ActionEvent.SHIFT_MASK |
+  //  Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+  /** ctrl-alt on windows and linux, cmd-alt on mac os x */
+  //static final int CTRL_ALT = ActionEvent.ALT_MASK |
+  //  Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+
+  /*
+  public boolean keyTyped(KeyEvent event) {
+    char c = event.getKeyChar();
+    int code = event.getKeyCode();
+
+    if ((event.getModifiers() & CMD_ALT) == CMD_ALT) {
+      if (code == KeyEvent.VK_LEFT) {
+      //if (c == '[') {
+        editor.sketch.prevCode();
+        return true;
+      } else if (code == KeyEvent.VK_RIGHT) {
+        //} else if (c == ']') {
+        editor.sketch.nextCode();
+        return true;
+      }
+    }
+    return false;
+  }
+  */
 
 
   /**

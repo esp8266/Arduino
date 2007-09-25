@@ -57,6 +57,7 @@ public class FindReplace extends JFrame implements ActionListener {
 
   JButton replaceButton;
   JButton replaceAllButton;
+  JButton replaceFindButton;
   JButton findButton;
 
   JCheckBox ignoreCaseBox;
@@ -132,12 +133,14 @@ public class FindReplace extends JFrame implements ActionListener {
 
     // ordering is different on mac versus pc
     if (Base.isMacOS()) {
-      buttons.add(replaceButton = new JButton("Replace"));
       buttons.add(replaceAllButton = new JButton("Replace All"));
+      buttons.add(replaceButton = new JButton("Replace"));
+      buttons.add(replaceFindButton = new JButton("Replace & Find"));
       buttons.add(findButton = new JButton("Find"));
 
     } else {
       buttons.add(findButton = new JButton("Find"));
+      buttons.add(replaceFindButton = new JButton("Replace & Find"));
       buttons.add(replaceButton = new JButton("Replace"));
       buttons.add(replaceAllButton = new JButton("Replace All"));
     }
@@ -169,10 +172,12 @@ public class FindReplace extends JFrame implements ActionListener {
 
     replaceButton.addActionListener(this);
     replaceAllButton.addActionListener(this);
+    replaceFindButton.addActionListener(this);
     findButton.addActionListener(this);
 
     // you mustn't replace what you haven't found, my son
     replaceButton.setEnabled(false);
+    replaceFindButton.setEnabled(false);
 
     // so that typing will go straight to this field
     //findField.requestFocus();
@@ -189,44 +194,28 @@ public class FindReplace extends JFrame implements ActionListener {
     setBounds((screen.width - wide) / 2,
               (screen.height - high) / 2, wide, high);
 
-    // add key listener to trap esc and ctrl/cmd-w
-    /*
-    KeyListener listener = new KeyAdapter() {
-        public void keyPressed(KeyEvent e) {
-          if (Base.isCloseWindowEvent(e)) hide();
-        }
-      };
-    findField.addKeyListener(listener);
-    replaceField.addKeyListener(listener);
-    addKeyListener(listener);
-    */
-    ActionListener disposer = new ActionListener() {
-        public void actionPerformed(ActionEvent actionEvent) {
-          //hide();
-          handleClose();
-        }
-      };
-
     setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     addWindowListener(new WindowAdapter() {
         public void windowClosing(WindowEvent e) {
           handleClose();
         }
       });
-    Base.registerWindowCloseKeys(getRootPane(), disposer);
+    Base.registerWindowCloseKeys(getRootPane(), new ActionListener() {
+        public void actionPerformed(ActionEvent actionEvent) {
+          //hide();
+          handleClose();
+        }
+      });
 
-    /*
     // hack to to get first field to focus properly on osx
-    // though this still doesn't seem to work
     addWindowListener(new WindowAdapter() {
         public void windowActivated(WindowEvent e) {
           //System.out.println("activating");
-          //boolean ok = findField.requestFocusInWindow();
+          boolean ok = findField.requestFocusInWindow();
           //System.out.println("got " + ok);
-          //findField.selectAll();
+          findField.selectAll();
         }
       });
-    */
   }
 
 
@@ -256,6 +245,10 @@ public class FindReplace extends JFrame implements ActionListener {
     if (source == findButton) {
       find(true);
 
+    } else if (source == replaceFindButton) {
+      replace();
+      find(true);
+
     } else if (source == replaceButton) {
       replace();
 
@@ -276,6 +269,7 @@ public class FindReplace extends JFrame implements ActionListener {
     found = false;
 
     String search = findField.getText();
+    //System.out.println("finding for " + search + " " + findString);
     // this will catch "find next" being called when no search yet
     if (search.length() == 0) return;
 
@@ -299,12 +293,14 @@ public class FindReplace extends JFrame implements ActionListener {
       if (nextIndex == -1) {
         found = false;
         replaceButton.setEnabled(false);
+        replaceFindButton.setEnabled(false);
         //Toolkit.getDefaultToolkit().beep();
         return;
       }
     }
     found = true;
     replaceButton.setEnabled(true);
+    replaceFindButton.setEnabled(true);
     editor.textarea.select(nextIndex, nextIndex + search.length());
   }
 
@@ -322,6 +318,7 @@ public class FindReplace extends JFrame implements ActionListener {
     if (sel.equals(replaceField.getText())) {
       found = false;
       replaceButton.setEnabled(false);
+      replaceFindButton.setEnabled(false);
       return;
     }
 
@@ -332,6 +329,7 @@ public class FindReplace extends JFrame implements ActionListener {
 
     // don't allow a double replace
     replaceButton.setEnabled(false);
+    replaceFindButton.setEnabled(false);
   }
 
 

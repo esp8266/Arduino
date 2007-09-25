@@ -2,9 +2,9 @@
 
 /*
   PdeTextAreaDefaults - grabs font/color settings for the editor
-  Part of the Processing project - http://Proce55ing.net
+  Part of the Processing project - http://processing.org
 
-  Except where noted, code is written by Ben Fry
+  Copyright (c) 2004-06 Ben Fry and Casey Reas
   Copyright (c) 2001-03 Massachusetts Institute of Technology
 
   This program is free software; you can redistribute it and/or modify
@@ -32,40 +32,64 @@ public class PdeTextAreaDefaults extends TextAreaDefaults {
   public PdeTextAreaDefaults() {
 
     inputHandler = new DefaultInputHandler();
-    inputHandler.addDefaultKeyBindings();
+    //inputHandler.addDefaultKeyBindings();  // 0122
 
     // use option on mac for things that are ctrl on windows/linux
     String mod = Base.isMacOS() ? "A" : "C";
 
-    inputHandler.addKeyBinding("S+BACK_SPACE", InputHandler.BACKSPACE);
-    inputHandler.addKeyBinding("S+DELETE", InputHandler.DELETE);
+    // right now, ctrl-up/down is select up/down, but mod should be
+    // used instead, because the mac expects it to be option(alt)
 
     inputHandler.addKeyBinding("BACK_SPACE", InputHandler.BACKSPACE);
-    inputHandler.addKeyBinding("C+BACK_SPACE", InputHandler.BACKSPACE_WORD);
     inputHandler.addKeyBinding("DELETE", InputHandler.DELETE);
-    inputHandler.addKeyBinding("C+DELETE", InputHandler.DELETE_WORD);
 
-    inputHandler.addKeyBinding("ENTER", InputHandler.INSERT_BREAK);
-    inputHandler.addKeyBinding("TAB", InputHandler.INSERT_TAB);
+    //inputHandler.addKeyBinding("S+BACK_SPACE", InputHandler.BACKSPACE);
+    // for 0122, shift-backspace is delete
+    inputHandler.addKeyBinding("S+BACK_SPACE", InputHandler.DELETE);
+    inputHandler.addKeyBinding("S+DELETE", InputHandler.DELETE);
+
+    // the following two were changing for 0122 for better mac/pc compatability
+    inputHandler.addKeyBinding(mod+"+BACK_SPACE", InputHandler.BACKSPACE_WORD);
+    inputHandler.addKeyBinding(mod+"+DELETE", InputHandler.DELETE_WORD);
+
+    // handled by listener, don't bother here
+    //inputHandler.addKeyBinding("ENTER", InputHandler.INSERT_BREAK);
+    //inputHandler.addKeyBinding("TAB", InputHandler.INSERT_TAB);
 
     inputHandler.addKeyBinding("INSERT", InputHandler.OVERWRITE);
-    inputHandler.addKeyBinding("C+\\", InputHandler.TOGGLE_RECT);
+    // disabling for 0122, not sure what this does
+    //inputHandler.addKeyBinding("C+\\", InputHandler.TOGGLE_RECT);
 
-    // beginning and ending of the current line
+    // for 0122, these have been changed for better compatability
+    // HOME and END now mean the beginning/end of the document
+    if (Base.isMacOS()) {
+      inputHandler.addKeyBinding("HOME", InputHandler.DOCUMENT_HOME);
+      inputHandler.addKeyBinding("END", InputHandler.DOCUMENT_END);
+      inputHandler.addKeyBinding("S+HOME", InputHandler.SELECT_DOC_HOME);
+      inputHandler.addKeyBinding("S+END", InputHandler.SELECT_DOC_END);
+    } else {
+      // for 0123 added the proper windows defaults
     inputHandler.addKeyBinding("HOME", InputHandler.HOME);
     inputHandler.addKeyBinding("END", InputHandler.END);
+      inputHandler.addKeyBinding("S+HOME", InputHandler.SELECT_HOME);
+      inputHandler.addKeyBinding("S+END", InputHandler.SELECT_END);
+      inputHandler.addKeyBinding("C+HOME", InputHandler.DOCUMENT_HOME);
+      inputHandler.addKeyBinding("C+END", InputHandler.DOCUMENT_END);
+      inputHandler.addKeyBinding("CS+HOME", InputHandler.SELECT_DOC_HOME);
+      inputHandler.addKeyBinding("CS+END", InputHandler.SELECT_DOC_END);
+    }
 
     if (Base.isMacOS()) {
       inputHandler.addKeyBinding("M+LEFT", InputHandler.HOME);
       inputHandler.addKeyBinding("M+RIGHT", InputHandler.END);
+      inputHandler.addKeyBinding("MS+LEFT", InputHandler.SELECT_HOME); // 0122
+      inputHandler.addKeyBinding("MS+RIGHT", InputHandler.SELECT_END);  // 0122
+    } else {
+      inputHandler.addKeyBinding("C+LEFT", InputHandler.HOME);  // 0122
+      inputHandler.addKeyBinding("C+RIGHT", InputHandler.END);  // 0122
+      inputHandler.addKeyBinding("CS+HOME", InputHandler.SELECT_HOME); // 0122
+      inputHandler.addKeyBinding("CS+END", InputHandler.SELECT_END);  // 0122
     }
-
-    inputHandler.addKeyBinding("S+HOME", InputHandler.SELECT_HOME);
-    inputHandler.addKeyBinding("S+END", InputHandler.SELECT_END);
-    inputHandler.addKeyBinding(mod + "+HOME", InputHandler.DOCUMENT_HOME);
-    inputHandler.addKeyBinding(mod + "+END", InputHandler.DOCUMENT_END);
-    inputHandler.addKeyBinding(mod + "S+HOME", InputHandler.SELECT_DOC_HOME);
-    inputHandler.addKeyBinding(mod + "S+END", InputHandler.SELECT_DOC_END);
 
     inputHandler.addKeyBinding("PAGE_UP", InputHandler.PREV_PAGE);
     inputHandler.addKeyBinding("PAGE_DOWN", InputHandler.NEXT_PAGE);
@@ -80,12 +104,18 @@ public class PdeTextAreaDefaults extends TextAreaDefaults {
     inputHandler.addKeyBinding("S+RIGHT", InputHandler.SELECT_NEXT_CHAR);
     inputHandler.addKeyBinding(mod + "+RIGHT", InputHandler.NEXT_WORD);
     inputHandler.addKeyBinding(mod + "S+RIGHT", InputHandler.SELECT_NEXT_WORD);
+
     inputHandler.addKeyBinding("UP", InputHandler.PREV_LINE);
     inputHandler.addKeyBinding(mod + "+UP", InputHandler.PREV_LINE);  // p5
     inputHandler.addKeyBinding("S+UP", InputHandler.SELECT_PREV_LINE);
     inputHandler.addKeyBinding("DOWN", InputHandler.NEXT_LINE);
     inputHandler.addKeyBinding(mod + "+DOWN", InputHandler.NEXT_LINE);  // p5
     inputHandler.addKeyBinding("S+DOWN", InputHandler.SELECT_NEXT_LINE);
+
+    inputHandler.addKeyBinding("MS+UP", InputHandler.SELECT_DOC_HOME);
+    inputHandler.addKeyBinding("CS+UP", InputHandler.SELECT_DOC_HOME);
+    inputHandler.addKeyBinding("MS+DOWN", InputHandler.SELECT_DOC_END);
+    inputHandler.addKeyBinding("CS+DOWN", InputHandler.SELECT_DOC_END);
 
     inputHandler.addKeyBinding(mod + "+ENTER", InputHandler.REPEAT);
 

@@ -136,8 +136,9 @@ public abstract class InputHandler extends KeyAdapter
                 {
                         String name = (String)en.nextElement();
                         ActionListener _listener = getAction(name);
-                        if(_listener == listener)
+                        if(_listener == listener) {
                                 return name;
+                }
                 }
                 return null;
         }
@@ -180,7 +181,6 @@ public abstract class InputHandler extends KeyAdapter
         /**
          * Grabs the next key typed event and invokes the specified
          * action with the key as a the action command.
-         * @param action The action
          */
         public void grabNextKeyStroke(ActionListener listener)
         {
@@ -743,17 +743,30 @@ public abstract class InputHandler extends KeyAdapter
                 {
                         JEditTextArea textArea = getTextArea(evt);
                         int caret = textArea.getCaretPosition();
+
                         if(caret == textArea.getDocumentLength())
                         {
+                          if (textArea.getSelectionStart() !=
+                              textArea.getSelectionEnd()) {
+                            // just move to the end of the selection
+                            textArea.select(caret, caret);
+                          } else {
+                            // beep at the user for being annoying
                                 textArea.getToolkit().beep();
-                                return;
                         }
 
-                        if(select)
-                                textArea.select(textArea.getMarkPosition(),
-                                        caret + 1);
-                        else
+                        } else if (select) {
+                          textArea.select(textArea.getMarkPosition(), caret+1);
+
+                        } else {
+                          int start = textArea.getSelectionStart();
+                          int end = textArea.getSelectionEnd();
+                          if (start != end) {
+                            textArea.select(end, end);
+                          } else {
                                 textArea.setCaretPosition(caret + 1);
+                }
+        }
                 }
         }
 
@@ -774,7 +787,13 @@ public abstract class InputHandler extends KeyAdapter
 
                         if(line == textArea.getLineCount() - 1)
                         {
-                                textArea.getToolkit().beep();
+                          //textArea.getToolkit().beep();
+                          int doc = textArea.getDocumentLength();
+                          if (select) {
+                            textArea.select(textArea.getMarkPosition(), doc);
+                          } else {
+                            textArea.setCaretPosition(doc);
+                          }
                                 return;
                         }
 
@@ -901,11 +920,17 @@ public abstract class InputHandler extends KeyAdapter
                                 return;
                         }
 
-                        if(select)
-                                textArea.select(textArea.getMarkPosition(),
-                                        caret - 1);
-                        else
+                        if (select) {
+                          textArea.select(textArea.getMarkPosition(), caret-1);
+                        } else {
+                          int start = textArea.getSelectionStart();
+                          int end = textArea.getSelectionEnd();
+                          if (start != end) {
+                            textArea.select(start, start);
+                          } else {
                                 textArea.setCaretPosition(caret - 1);
+                }
+        }
                 }
         }
 
@@ -926,7 +951,14 @@ public abstract class InputHandler extends KeyAdapter
 
                         if(line == 0)
                         {
-                                textArea.getToolkit().beep();
+                          if (select) {
+                            if (textArea.getSelectionStart() != 0) {
+                              textArea.select(textArea.getMarkPosition(), 0);
+                            }
+                          } else {
+                            textArea.setCaretPosition(0);
+                          }
+                          //textArea.getToolkit().beep();
                                 return;
                         }
 

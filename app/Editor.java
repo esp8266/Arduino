@@ -28,11 +28,13 @@ package processing.app;
 
 import processing.app.syntax.*;
 import processing.app.tools.*;
+import processing.core.*;
 
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.dnd.*;
 import java.awt.event.*;
+import java.awt.print.*;
 import java.io.*;
 import java.lang.reflect.*;
 import java.net.*;
@@ -45,7 +47,9 @@ import javax.swing.event.*;
 import javax.swing.text.*;
 import javax.swing.undo.*;
 
+import com.apple.mrj.*;
 import com.oroinc.text.regex.*;
+//import de.hunsicker.jalopy.*;
 
 import com.apple.mrj.*;
 import gnu.io.*;
@@ -77,6 +81,9 @@ public class Editor extends JFrame
   String handleOpenPath;
   boolean handleNewShift;
   boolean handleNewLibrary;
+
+  PageFormat pageFormat;
+  PrinterJob printerJob;
 
   EditorButtons buttons;
   EditorHeader header;
@@ -133,14 +140,12 @@ public class Editor extends JFrame
   // used internally, and only briefly
   CompoundEdit compoundEdit;
 
-  //static public UndoManager undo = new UndoManager(); // editor needs this guy
-
   //
 
   //SketchHistory history;  // TODO re-enable history
   Sketchbook sketchbook;
   //Preferences preferences;
-  //FindReplace find;
+  FindReplace find;
 
   //static Properties keywords; // keyword -> reference html lookup
 
@@ -167,9 +172,13 @@ public class Editor extends JFrame
     // add listener to handle window close box hit event
     addWindowListener(new WindowAdapter() {
         public void windowClosing(WindowEvent e) {
-          handleQuit();
+          handleQuitInternal();
         }
       });
+    // don't close the window when clicked, the app will take care
+    // of that via the handleQuitInternal() methods
+    // http://dev.processing.org/bugs/show_bug.cgi?id=440
+    setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
     PdeKeywords keywords = new PdeKeywords();
     sketchbook = new Sketchbook(this);
@@ -188,8 +197,14 @@ public class Editor extends JFrame
     // doesn't matter when this is created, just make it happen at some point
     //find = new FindReplace(Editor.this);
 
-    Container pain = getContentPane();
+    //Container pain = getContentPane();
+    //pain.setLayout(new BorderLayout());
+    // for rev 0120, placing things inside a JPanel because
+    Container contentPain = getContentPane();
+    contentPain.setLayout(new BorderLayout());
+    JPanel pain = new JPanel();
     pain.setLayout(new BorderLayout());
+    contentPain.add(pain, BorderLayout.CENTER);
 
     Box box = Box.createVerticalBox();
     Box upper = Box.createVerticalBox();
@@ -251,6 +266,17 @@ public class Editor extends JFrame
     listener = new EditorListener(this, textarea);
     pain.add(box);
 
+    pain.setTransferHandler(new TransferHandler() {
+
+        public boolean canImport(JComponent dest, DataFlavor[] flavors) {
+          // claim that we can import everything
+          return true;
+        }
+
+        public boolean importData(JComponent src, Transferable transferable) {
+          DataFlavor[] flavors = transferable.getTransferDataFlavors();
+
+    /*
     DropTarget dt = new DropTarget(this, new DropTargetListener() {
 
         public void dragEnter(DropTargetDragEvent event) {
@@ -278,14 +304,17 @@ public class Editor extends JFrame
 
           Transferable transferable = event.getTransferable();
           DataFlavor flavors[] = transferable.getTransferDataFlavors();
+    */
           int successful = 0;
 
           for (int i = 0; i < flavors.length; i++) {
             try {
               //System.out.println(flavors[i]);
               //System.out.println(transferable.getTransferData(flavors[i]));
-              java.util.List list =
-                (java.util.List) transferable.getTransferData(flavors[i]);
+              Object stuff = transferable.getTransferData(flavors[i]);
+              if (!(stuff instanceof java.util.List)) continue;
+              java.util.List list = (java.util.List) stuff;
+
               for (int j = 0; j < list.size(); j++) {
                 Object item = list.get(j);
                 if (item instanceof File) {
@@ -298,7 +327,7 @@ public class Editor extends JFrame
                     File parent = file.getParentFile();
                     if (name.equals(parent.getName())) {
                       handleOpenFile(file);
-                      return;
+                      return true;
                     }
                   }
 
@@ -310,6 +339,7 @@ public class Editor extends JFrame
 
             } catch (Exception e) {
               e.printStackTrace();
+              return false;
             }
           }
 
@@ -322,6 +352,7 @@ public class Editor extends JFrame
           } else {
             message(successful + " files added to the sketch.");
           }
+          return true;
         }
       });
   }
@@ -488,7 +519,9 @@ public class Editor extends JFrame
     listener.applyPreferences();
 
     // in case moved to a new location
-    sketchbook.rebuildMenus();
+    // For 0125, changing to async version (to be implemented later)
+    //sketchbook.rebuildMenus();
+    sketchbook.rebuildMenusAsync();
   }
 
 
@@ -576,11 +609,19 @@ public class Editor extends JFrame
     menu.addSeparator();
 
     item = newJMenuItem("Page Setup", 'P', true);
-    item.setEnabled(false);
+    item.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          handlePageSetup();
+        }
+      });
     menu.add(item);
 
     item = newJMenuItem("Print", 'P');
-    item.setEnabled(false);
+    item.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          handlePrint();
+        }
+      });
     menu.add(item);
 
     // macosx already has its own preferences and quit menu
@@ -600,7 +641,7 @@ public class Editor extends JFrame
       item = newJMenuItem("Quit", 'Q');
       item.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
-            handleQuit();
+            handleQuitInternal();
           }
         });
       menu.add(item);
@@ -639,17 +680,9 @@ public class Editor extends JFrame
 
     menu.addSeparator();
 
-    item = new JMenuItem("Add File...");
-    item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          sketch.addFile();
-        }
-      });
-    menu.add(item);
-
     menu.add(sketchbook.getImportMenu());
 
-    if (Base.isWindows() || Base.isMacOS()) {
+    //if (Base.isWindows() || Base.isMacOS()) {
       // no way to do an 'open in file browser' on other platforms
       // since there isn't any sort of standard
       item = newJMenuItem("Show Sketch Folder", 'K', false);
@@ -660,7 +693,19 @@ public class Editor extends JFrame
         }
       });
       menu.add(item);
+    if (!Base.openFolderAvailable()) {
+      item.setEnabled(false);
     }
+
+    //menu.addSeparator();
+
+    item = new JMenuItem("Add File...");
+    item.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          sketch.addFile();
+        }
+      });
+    menu.add(item);
 
     // TODO re-enable history
     //history.attachMenu(menu);
@@ -681,20 +726,39 @@ public class Editor extends JFrame
     item.addActionListener(new ActionListener() {
         synchronized public void actionPerformed(ActionEvent e) {
           new AutoFormat(Editor.this).show();
-          //handleBeautify();
+
+          /*
+          Jalopy jalopy = new Jalopy();
+          jalopy.setInput(getText(), sketch.current.file.getAbsolutePath());
+          StringBuffer buffer = new StringBuffer();
+          jalopy.setOutput(buffer);
+          jalopy.setInspect(false);
+          jalopy.format();
+          setText(buffer.toString(), 0, 0);
+
+          if (jalopy.getState() == Jalopy.State.OK)
+            System.out.println("successfully formatted");
+          else if (jalopy.getState() == Jalopy.State.WARN)
+            System.out.println(" formatted with warnings");
+          else if (jalopy.getState() == Jalopy.State.ERROR)
+            System.out.println(" could not be formatted");
+          */
         }
       });
     menu.add(item);
 
-    /*item = new JMenuItem("Create Font...");
+    item = new JMenuItem("Copy for Discourse");
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          //new CreateFont().show(sketch.dataFolder);
-          new CreateFont(Editor.this).show();
+          SwingUtilities.invokeLater(new Runnable() {
+              public void run() {
+                new DiscourseFormat(Editor.this).show();
+              }
+            });
         }
       });
     menu.add(item);
-    */
+
     item = new JMenuItem("Archive Sketch");
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
@@ -706,13 +770,17 @@ public class Editor extends JFrame
       });
     menu.add(item);
 
+    /*
     item = new JMenuItem("Export Folder...");
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
+          SwingUtilities.invokeLater(new Runnable() {
+              public void run() {
           new ExportFolder(Editor.this).show();
         }
       });
     menu.add(item);
+    */
     menu.addSeparator();
     
     mcuMenu = new JMenu("Microcontroller (MCU)");
@@ -946,21 +1014,18 @@ public class Editor extends JFrame
       menu.add(item);
     }
 
-    item = new JMenuItem("Troubleshooting");
+    item = new JMenuItem("Environment");
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          Base.openURL(System.getProperty("user.dir") + File.separator +
-                       "reference" + File.separator +
-                       "Guide_Troubleshooting.html");
+          Base.showEnvironment();
         }
       });
     menu.add(item);
 
-    item = new JMenuItem("Environment");
+    item = new JMenuItem("Troubleshooting");
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          Base.openURL(System.getProperty("user.dir") + File.separator +
-                       "reference" + File.separator + "Guide_Environment.html");
+          Base.showTroubleshooting();
         }
       });
     menu.add(item);
@@ -968,8 +1033,17 @@ public class Editor extends JFrame
     item = new JMenuItem("Reference");
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          Base.openURL(System.getProperty("user.dir") + File.separator +
-                       "reference" + File.separator + "index.html");
+          Base.showReference();
+        }
+      });
+    menu.add(item);
+
+    item = newJMenuItem("Find in Reference", 'F', true);
+    item.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          if (textarea.isSelectionActive()) {
+            handleReference();
+          }
         }
       });
     menu.add(item);
@@ -977,32 +1051,10 @@ public class Editor extends JFrame
     item = new JMenuItem("Frequently Asked Questions");
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          Base.openURL(System.getProperty("user.dir") + File.separator +
-                       "reference" + File.separator + "FAQ.html");
+          Base.showFAQ();
         }
       });
     menu.add(item);
-
-//    item = newJMenuItem("Find in Reference", 'F', true);
-//    item.addActionListener(new ActionListener() {
-//        public void actionPerformed(ActionEvent e) {
-//          if (textarea.isSelectionActive()) {
-//            String text = textarea.getSelectedText();
-//            if (text.length() == 0) {
-//              message("First select a word to find in the reference.");
-//
-//            } else {
-//              String referenceFile = PdeKeywords.getReference(text);
-//              if (referenceFile == null) {
-//                message("No reference available for \"" + text + "\"");
-//              } else {
-//                Base.showReference(referenceFile);
-//              }
-//            }
-//          }
-//        }
-//      });
-//    menu.add(item);
 
     item = newJMenuItem("Visit www.arduino.cc", '5');
     item.addActionListener(new ActionListener() {
@@ -1083,21 +1135,26 @@ public class Editor extends JFrame
     item = newJMenuItem("Find...", 'F');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          new FindReplace(Editor.this).show();
-          //find.show();
+          if (find == null) {
+            find = new FindReplace(Editor.this);
+          }
+          //new FindReplace(Editor.this).show();
+          find.show();
           //find.setVisible(true);
         }
       });
     menu.add(item);
 
+    // TODO find next should only be enabled after a
+    // search has actually taken place
     item = newJMenuItem("Find Next", 'G');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          // TODO find next should only be enabled after a
-          // search has actually taken place
+          if (find != null) {
           //find.find(true);
-          FindReplace find = new FindReplace(Editor.this); //.show();
+            //FindReplace find = new FindReplace(Editor.this); //.show();
           find.find(true);
+        }
         }
       });
     menu.add(item);
@@ -1116,9 +1173,9 @@ public class Editor extends JFrame
 
   /**
    * A software engineer, somewhere, needs to have his abstraction
-   * taken away. In some countries they jail people for writing the
-   * sort of crappy api that would require a four line helper function
-   * to set the command key for a menu item.
+   * taken away. In some countries they jail or beat people for writing
+   * the sort of API that would require a five line helper function
+   * just to set the command key for a menu item.
    */
   static public JMenuItem newJMenuItem(String title,
                                        int what, boolean shift) {
@@ -1191,7 +1248,6 @@ public class Editor extends JFrame
 
     protected void updateRedoState() {
       if (undo.canRedo()) {
-        //this.setEnabled(true);
         redoItem.setEnabled(true);
         redoItem.setText(undo.getRedoPresentationName());
         putValue(Action.NAME, undo.getRedoPresentationName());
@@ -1339,9 +1395,11 @@ public class Editor extends JFrame
     redoAction.updateRedoState();
   }
 
+
   public void beginCompoundEdit() {
     compoundEdit = new CompoundEdit();
   }
+
 
   public void endCompoundEdit() {
     compoundEdit.end();
@@ -1351,6 +1409,8 @@ public class Editor extends JFrame
     compoundEdit = null;
   }
 
+
+  // ...................................................................
 
 
   public void handleRun(final boolean present) {
@@ -1576,42 +1636,71 @@ public class Editor extends JFrame
     String prompt = "Save changes to " + sketch.name + "?  ";
 
     if (checkModifiedMode != HANDLE_QUIT) {
-      // if the user is not quitting, then use the nicer
+      // if the user is not quitting, then use simpler nicer
       // dialog that's actually inside the p5 window.
       status.prompt(prompt);
 
     } else {
-      // if the user selected quit, then this has to be done with
-      // a JOptionPane instead of internally in the editor.
-      // TODO this is actually just a bug to be fixed.
-
-      // macosx java kills the app even though cancel might get hit
-      // so the cancel button is (temporarily) left off
-      // this may be treated differently in macosx java 1.4,
-      // but 1.4 isn't currently stable enough to use.
-
-      // turns out windows has the same problem (sometimes)
-      // disable cancel for now until a fix can be found.
-
-      Object[] options = { "Yes", "No" };
-      int result = JOptionPane.showOptionDialog(this,
-                                                prompt,
-                                                "Quit",
-                                                JOptionPane.YES_NO_OPTION,
-                                                JOptionPane.QUESTION_MESSAGE,
-                                                null,
-                                                options,
-                                                options[0]);
+      if (!Base.isMacOS() || PApplet.javaVersion < 1.5f) {
+        int result =
+          JOptionPane.showConfirmDialog(this, prompt, "Quit",
+                                        JOptionPane.YES_NO_CANCEL_OPTION,
+                                        JOptionPane.QUESTION_MESSAGE);
 
       if (result == JOptionPane.YES_OPTION) {
         handleSave(true);
         checkModified2();
 
       } else if (result == JOptionPane.NO_OPTION) {
-        checkModified2();  // though this may just quit
+          checkModified2();
+        }
+        // cancel is ignored altogether
 
-      } else if (result == JOptionPane.CANCEL_OPTION) {
-        // ignored
+      } else {
+        // This code is disabled unless Java 1.5 is being used on Mac OS X
+        // because of a Java bug that prevents the initial value of the
+        // dialog from being set properly (at least on my MacBook Pro).
+        // The bug causes the "Don't Save" option to be the highlighted,
+        // blinking, default. This sucks. But I'll tell you what doesn't
+        // suck--workarounds for the Mac and Apple's snobby attitude about it!
+
+        // adapted from the quaqua guide
+        // http://www.randelshofer.ch/quaqua/guide/joptionpane.html
+        JOptionPane pane =
+          new JOptionPane("<html> " +
+                          "<head> <style type=\"text/css\">"+
+                          "b { font: 13pt \"Lucida Grande\" }"+
+                          "p { font: 11pt \"Lucida Grande\"; margin-top: 8px }"+
+                          "</style> </head>" +
+                          "<b>Do you want to save changes to this sketch<BR>" +
+                          " before closing?</b>" +
+                          "<p>If you don't save, your changes will be lost.",
+                          JOptionPane.QUESTION_MESSAGE);
+
+        String[] options = new String[] {
+          "Save", "Cancel", "Don't Save"
+        };
+        pane.setOptions(options);
+
+        // highlight the safest option ala apple hig
+        pane.setInitialValue(options[0]);
+
+        // on macosx, setting the destructive property places this option
+        // away from the others at the lefthand side
+        pane.putClientProperty("Quaqua.OptionPane.destructiveOption",
+                               new Integer(2));
+
+        JDialog dialog = pane.createDialog(this, null);
+        dialog.show();
+
+        Object result = pane.getValue();
+        if (result == options[0]) {  // save (and quit)
+          handleSave(true);
+          checkModified2();
+
+        } else if (result == options[2]) {  // don't save (still quit)
+          checkModified2();
+        }
       }
     }
   }
@@ -1739,9 +1828,15 @@ public class Editor extends JFrame
    * Open a sketch from a particular path, but don't check to save changes.
    * Used by Sketch.saveAs() to re-open a sketch after the "Save As"
    */
-  public void handleOpenUnchecked(String path) {
+  public void handleOpenUnchecked(String path, int codeIndex,
+                                  int selStart, int selStop, int scrollPos) {
     doClose();
     handleOpen2(path);
+
+    sketch.setCurrent(codeIndex);
+    textarea.select(selStart, selStop);
+    //textarea.updateScrollBars();
+    textarea.setScrollPosition(scrollPos);
   }
 
 
@@ -1761,7 +1856,8 @@ public class Editor extends JFrame
         if (!oldPath.equals(newPath)) {
           if (Base.calcFolderSize(sketch.folder) == 0) {
             Base.removeDir(sketch.folder);
-            sketchbook.rebuildMenus();
+            //sketchbook.rebuildMenus();
+            sketchbook.rebuildMenusAsync();
           }
         }
       } catch (Exception e) { }   // oh well
@@ -1893,7 +1989,11 @@ public class Editor extends JFrame
         message(EMPTY);
       }
       // rebuild sketch menu in case a save-as was forced
-      sketchbook.rebuildMenus();
+      // Disabling this for 0125, instead rebuild the menu inside
+      // the Save As method of the Sketch object, since that's the
+      // only one who knows whether something was renamed.
+      //sketchbook.rebuildMenus();
+      //sketchbook.rebuildMenusAsync();
 
     } catch (Exception e) {
       // show the error as a message in the window
@@ -1918,7 +2018,10 @@ public class Editor extends JFrame
           try {
             if (sketch.saveAs()) {
               message("Done Saving.");
-              sketchbook.rebuildMenus();
+              // Disabling this for 0125, instead rebuild the menu inside
+              // the Save As method of the Sketch object, since that's the
+              // only one who knows whether something was renamed.
+              //sketchbook.rebuildMenusAsync();
             } else {
               message("Save Cancelled.");
             }
@@ -2007,6 +2110,7 @@ public class Editor extends JFrame
                                               null,
                                               options,
                                               options[0]);
+
     if (result == JOptionPane.OK_OPTION) {
       handleSave(true);
 
@@ -2021,18 +2125,83 @@ public class Editor extends JFrame
     return true;
   }
 
-  
+
+  public void handlePageSetup() {
+    //printerJob = null;
+    if (printerJob == null) {
+      printerJob = PrinterJob.getPrinterJob();
+    }
+    if (pageFormat == null) {
+      pageFormat = printerJob.defaultPage();
+    }
+    pageFormat = printerJob.pageDialog(pageFormat);
+    //System.out.println("page format is " + pageFormat);
+  }
+
+
+  public void handlePrint() {
+    message("Printing...");
+    //printerJob = null;
+    if (printerJob == null) {
+      printerJob = PrinterJob.getPrinterJob();
+    }
+    if (pageFormat != null) {
+      //System.out.println("setting page format " + pageFormat);
+      printerJob.setPrintable(textarea.getPainter(), pageFormat);
+    } else {
+      printerJob.setPrintable(textarea.getPainter());
+    }
+    // set the name of the job to the code name
+    printerJob.setJobName(sketch.current.name);
+
+    if (printerJob.printDialog()) {
+      try {
+        printerJob.print();
+        message("Done printing.");
+
+      } catch (PrinterException pe) {
+        error("Error while printing.");
+        pe.printStackTrace();
+      }
+    } else {
+      message("Printing canceled.");
+    }
+    //printerJob = null;  // clear this out?
+  }
+
+
   /**
    * Quit, but first ask user if it's ok. Also store preferences
    * to disk just in case they want to quit. Final exit() happens
    * in Editor since it has the callback from EditorStatus.
    */
-  public void handleQuit() {
+  public void handleQuitInternal() {
     // doStop() isn't sufficient with external vm & quit
     // instead use doClose() which will kill the external vm
     doClose();
 
     checkModified(HANDLE_QUIT);
+  }
+
+
+  /**
+   * Method for the MRJQuitHandler, needs to be dealt with differently
+   * than the regular handler because OS X has an annoying implementation
+   * <A HREF="http://developer.apple.com/qa/qa2001/qa1187.html">quirk</A>
+   * that requires an exception to be thrown in order to properly cancel
+   * a quit message.
+   */
+  public void handleQuit() {
+    SwingUtilities.invokeLater(new Runnable() {
+        public void run() {
+          handleQuitInternal();
+        }
+      });
+
+    // Throw IllegalStateException so new thread can execute.
+    // If showing dialog on this thread in 10.2, we would throw
+    // upon JOptionPane.NO_OPTION
+    throw new IllegalStateException("Quit Pending User Confirmation");
   }
 
 
@@ -2049,6 +2218,26 @@ public class Editor extends JFrame
     //System.out.println("exiting here");
     System.exit(0);
   }
+
+
+
+  protected void handleReference() {
+    String text = textarea.getSelectedText().trim();
+
+    if (text.length() == 0) {
+      message("First select a word to find in the reference.");
+
+    } else {
+      String referenceFile = PdeKeywords.getReference(text);
+      //System.out.println("reference file is " + referenceFile);
+      if (referenceFile == null) {
+        message("No reference available for \"" + text + "\"");
+      } else {
+        Base.showReference(referenceFile + ".html");
+      }
+    }
+  }
+
 
   protected void handleBurnBootloader(final String target, final boolean parallel) {
     if(debugging)
@@ -2082,6 +2271,7 @@ public class Editor extends JFrame
         buttons.clear();
       }});
   }
+
 
   public void highlightLine(int lnum) {
     if (lnum < 0) {
@@ -2169,7 +2359,7 @@ public class Editor extends JFrame
 
 
   public void error(RunnerException e) {
-    //System.out.println("ERORROOROROR 2");
+    //System.out.println("file and line is " + e.file + " " + e.line);
     if (e.file >= 0) sketch.setCurrent(e.file);
     if (e.line >= 0) highlightLine(e.line);
 
@@ -2205,7 +2395,7 @@ public class Editor extends JFrame
    * Returns the edit popup menu.
    */
   class TextAreaPopup extends JPopupMenu {
-    String currentDir = System.getProperty("user.dir");
+    //String currentDir = System.getProperty("user.dir");
     String referenceFile = null;
 
     JMenuItem cutItem, copyItem;
@@ -2251,13 +2441,14 @@ public class Editor extends JFrame
 
       this.addSeparator();
 
-//      referenceItem = new JMenuItem("Find in Reference");
-//      referenceItem.addActionListener(new ActionListener() {
-//          public void actionPerformed(ActionEvent e) {
-//            Base.showReference(referenceFile);
-//          }
-//        });
-//      this.add(referenceItem);
+      referenceItem = new JMenuItem("Find in Reference");
+      referenceItem.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            //Base.showReference(referenceFile + ".html");
+            handleReference(); //textarea.getSelectedText());
+          }
+        });
+      this.add(referenceItem);
     }
 
     // if no text is selected, disable copy and cut menu items
@@ -2266,14 +2457,14 @@ public class Editor extends JFrame
         cutItem.setEnabled(true);
         copyItem.setEnabled(true);
 
-        //referenceFile = PdeKeywords.getReference(textarea.getSelectedText());
-        //if (referenceFile != null) {
-          //referenceItem.setEnabled(true);
-        //}
+        String sel = textarea.getSelectedText().trim();
+        referenceFile = PdeKeywords.getReference(sel);
+        referenceItem.setEnabled(referenceFile != null);
+
       } else {
         cutItem.setEnabled(false);
         copyItem.setEnabled(false);
-        //referenceItem.setEnabled(false);
+        referenceItem.setEnabled(false);
       }
       super.show(component, x, y);
     }

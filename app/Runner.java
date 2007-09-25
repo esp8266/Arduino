@@ -23,7 +23,7 @@
 
 package processing.app;
 
-//import processing.core.*;
+import processing.core.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -40,7 +40,7 @@ import com.oroinc.text.regex.*;
  */
 public class Runner implements MessageConsumer {
 
-  //PApplet applet;
+  PApplet applet;
   RunnerException exception;
   Window window;
   PrintStream leechErr;
@@ -497,6 +497,7 @@ java.lang.NullPointerException
             }
 
             if (codeIndex != -1) {
+              //System.out.println("got line num " + lineNumber);
               // in case this was a tab that got embedded into the main .java
               lineNumber -= sketch.code[codeIndex].preprocOffset;
 

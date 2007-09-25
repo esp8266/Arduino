@@ -42,6 +42,7 @@ import javax.swing.undo.*;
 import com.apple.mrj.*;
 import com.ice.jni.registry.*;
 
+import processing.core.*;
 
 
 /**
@@ -52,21 +53,8 @@ import com.ice.jni.registry.*;
  * files and images, etc) that comes from that.
  */
 public class Base {
-  static final int VERSION = 3;
+  static final int VERSION = 10;
   static final String VERSION_NAME = "0010 Alpha";
-  
-  // platform IDs for PApplet.platform
-
-  static final int WINDOWS = 1;
-  static final int MACOS9  = 2;
-  static final int MACOSX  = 3;
-  static final int LINUX   = 4;
-  static final int OTHER   = 0;
-
-  // used by split, all the standard whitespace chars
-  // (uncludes unicode nbsp, that little bostage)
-
-  static final String WHITESPACE = " \t\n\r\f\u00A0";
 
   /**
    * Path of filename opened on the command line,
@@ -76,79 +64,18 @@ public class Base {
 
   Editor editor;
 
-  /**
-   * "1.3" or "1.1" or whatever (just the first three chars)
-   */
-  public static final String javaVersionName =
-    System.getProperty("java.version").substring(0,3);
-
-  /**
-   * Version of Java that's in use, whether 1.1 or 1.3 or whatever,
-   * stored as a float.
-   * <P>
-   * Note that because this is stored as a float, the values may
-   * not be <EM>exactly</EM> 1.3 or 1.4. Instead, make sure you're
-   * comparing against 1.3f or 1.4f, which will have the same amount
-   * of error (i.e. 1.40000001). This could just be a double, but
-   * since Processing only uses floats, it's safer to do this,
-   * because there's no good way to specify a double with the preproc.
-   */
-  public static final float javaVersion =
-    new Float(javaVersionName).floatValue();
-
-  /**
-   * Current platform in use, one of the
-   * PConstants WINDOWS, MACOSX, MACOS9, LINUX or OTHER.
-   */
-  static public int platform;
-
-  /**
-   * Current platform in use.
-   * <P>
-   * Equivalent to System.getProperty("os.name"), just used internally.
-   */
-  static public String platformName =
-    System.getProperty("os.name");
-
-  static {
-    // figure out which operating system
-    // this has to be first, since editor needs to know
-
-    if (platformName.toLowerCase().indexOf("mac") != -1) {
-      // can only check this property if running on a mac
-      // on a pc it throws a security exception and kills the applet
-      // (but on the mac it does just fine)
-      if (System.getProperty("mrj.version") != null) {  // running on a mac
-        platform = (platformName.equals("Mac OS X")) ?
-          MACOSX : MACOS9;
-      }
-
-    } else {
-      String osname = System.getProperty("os.name");
-
-      if (osname.indexOf("Windows") != -1) {
-        platform = WINDOWS;
-
-      } else if (osname.equals("Linux")) {  // true for the ibm vm
-        platform = LINUX;
-
-      } else {
-        platform = OTHER;
-      }
-    }
-  }
 
   static public void main(String args[]) {
 
     // make sure that this is running on java 1.4
 
-    //if (PApplet.javaVersion < 1.4f) {
+    if (PApplet.javaVersion < 1.4f) {
       //System.err.println("no way man");
-    //  Base.showError("Need to install Java 1.4",
-    //                 "This version of Arduino requires    \n" +
-    //                 "Java 1.4 or later to run properly.\n" +
-    //                 "Please visit java.com to upgrade.", null);
-   // }
+      Base.showError("Need to install Java 1.4",
+                     "This version of Processing requires    \n" +
+                     "Java 1.4 or later to run properly.\n" +
+                     "Please visit java.com to upgrade.", null);
+    }
 
 
     // grab any opened file from the command line
@@ -183,14 +110,34 @@ public class Base {
     // set the look and feel before opening the window
 
     try {
-      if (Base.isLinux()) {
-        // linux is by default (motif?) even uglier than metal
-        // actually, i'm using native menus, so they're ugly and
-        // motif-looking. ick. need to fix this.
-        UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+      if (Base.isMacOS()) {
+        // Use the Quaqua L & F on OS X to make JFileChooser less awful
+        UIManager.setLookAndFeel("ch.randelshofer.quaqua.QuaquaLookAndFeel");
+        // undo quaqua trying to fix the margins, since we've already
+        // hacked that in, bit by bit, over the years
+        UIManager.put("Component.visualMargin", new Insets(1, 1, 1, 1));
+
+      } else if (Base.isLinux()) {
+        // Linux is by default even uglier than metal (Motif?).
+        // Actually, i'm using native menus, so they're even uglier
+        // and Motif-looking (Lesstif?). Ick. Need to fix this.
+        //String lfname = UIManager.getCrossPlatformLookAndFeelClassName();
+        //UIManager.setLookAndFeel(lfname);
+
+        // For 0120, trying out the gtk+ look and feel as the default.
+        // This is available in Java 1.4.2 and later, and it can't possibly
+        // be any worse than Metal. (Ocean might also work, but that's for
+        // Java 1.5, and we aren't going there yet)
+        UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+
       } else {
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
       }
+    //} catch (ClassNotFoundException cnfe) {
+      // just default to the native look and feel for this platform
+      // i.e. appears that some linux systems don't have the gtk l&f
+      //UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -228,7 +175,7 @@ public class Base {
    * specifically a Mac OS X machine because it doesn't un on OS 9 anymore.
    */
   static public boolean isMacOS() {
-    return platform == MACOSX;
+    return PApplet.platform == PConstants.MACOSX;
   }
 
 
@@ -236,7 +183,7 @@ public class Base {
    * returns true if running on windows.
    */
   static public boolean isWindows() {
-    return platform == WINDOWS;
+    return PApplet.platform == PConstants.WINDOWS;
   }
 
 
@@ -244,7 +191,7 @@ public class Base {
    * true if running on linux.
    */
   static public boolean isLinux() {
-    return platform == LINUX;
+    return PApplet.platform == PConstants.LINUX;
   }
 
 
@@ -472,8 +419,9 @@ public class Base {
         sketchbookFolder = new File(documentsFolder, "Arduino");
 
       } catch (Exception e) {
-        showError("sketch folder problem",
-                  "Could not locate default sketch folder location.", e);
+        //showError("Could not find folder",
+        //          "Could not locate the Documents folder.", e);
+        sketchbookFolder = promptSketchbookLocation();
       }
 
     } else if (isWindows()) {
@@ -502,11 +450,15 @@ public class Base {
         sketchbookFolder = new File(personalPath, "Arduino");
 
       } catch (Exception e) {
-        showError("Problem getting documents folder",
-                  "Error getting the Arduino sketchbook folder.", e);
+        //showError("Problem getting folder",
+        //          "Could not locate the Documents folder.", e);
+        sketchbookFolder = promptSketchbookLocation();
       }
 
     } else {
+      sketchbookFolder = promptSketchbookLocation();
+
+      /*
       // on linux (or elsewhere?) prompt the user for the location
       JFileChooser fc = new JFileChooser();
       fc.setDialogTitle("Select the folder where " +
@@ -523,6 +475,7 @@ public class Base {
       } else {
         System.exit(0);
       }
+      */
     }
 
     // create the folder if it doesn't exist already
@@ -548,6 +501,68 @@ public class Base {
     }
 
     return sketchbookFolder;
+  }
+
+
+  /**
+   * Check for a new sketchbook location.
+   */
+  static protected File promptSketchbookLocation() {
+    File folder = null;
+
+    folder = new File(System.getProperty("user.home"), "sketchbook");
+    if (!folder.exists()) {
+      folder.mkdirs();
+      return folder;
+    }
+
+    folder = Base.selectFolder("Select (or create new) folder for sketches...",
+                               null, null);
+    if (folder == null) {
+      System.exit(0);
+    }
+    return folder;
+  }
+
+
+  /**
+   * Implementation for choosing directories that handles both the
+   * Mac OS X hack to allow the native AWT file dialog, or uses
+   * the JFileChooser on other platforms. Mac AWT trick obtained from
+   * <A HREF="http://lists.apple.com/archives/java-dev/2003/Jul/msg00243.html">this post</A>
+   * on the OS X Java dev archive which explains the cryptic note in
+   * Apple's Java 1.4 release docs about the special System property.
+   */
+  static public File selectFolder(String prompt, File folder, Frame frame) {
+    if (Base.isMacOS()) {
+      if (frame == null) frame = new Frame(); //.pack();
+      FileDialog fd = new FileDialog(frame, prompt, FileDialog.LOAD);
+      if (folder != null) {
+        fd.setDirectory(folder.getParent());
+        //fd.setFile(folder.getName());
+      }
+      System.setProperty("apple.awt.fileDialogForDirectories", "true");
+      fd.show();
+      System.setProperty("apple.awt.fileDialogForDirectories", "false");
+      if (fd.getFile() == null) {
+        return null;
+      }
+      return new File(fd.getDirectory(), fd.getFile());
+
+    } else {
+      JFileChooser fc = new JFileChooser();
+      fc.setDialogTitle(prompt);
+      if (folder != null) {
+        fc.setSelectedFile(folder);
+      }
+      fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+      int returned = fc.showOpenDialog(new JDialog());
+      if (returned == JFileChooser.APPROVE_OPTION) {
+        return fc.getSelectedFile();
+      }
+    }
+    return null;
   }
 
 
@@ -631,20 +646,44 @@ public class Base {
   // .................................................................
 
 
-  /**
-   * Given the reference filename from the keywords list,
-   * builds a URL and passes it to openURL.
-   */
   static public void showReference(String referenceFile) {
-    String currentDir = System.getProperty("user.dir");
-    openURL(currentDir + File.separator +
-            "reference" + File.separator +
-            referenceFile + ".html");
+    openURL(Base.getContents("reference" + File.separator + referenceFile));
+  }
+
+
+  static public void showReference() {
+    showReference("index.html");
+  }
+
+
+  static public void showEnvironment() {
+    showReference("Guide_Environment.html");
+  }
+
+
+  static public void showTroubleshooting() {
+    showReference("Guide_Troubleshooting.html");
   }
 
 
   /**
+   * Opens the local copy of the FAQ that's included
+   * with the Processing download.
+   */
+  static public void showFAQ() {
+    showReference("faq.html");
+  }
+
+
+  // .................................................................
+
+
+  /**
    * Implements the cross-platform headache of opening URLs
+   * TODO This code should be replaced by PApplet.link(),
+   * however that's not a static method (because it requires
+   * an AppletContext when used as an applet), so it's mildly
+   * trickier than just removing this method.
    */
   static public void openURL(String url) {
     //System.out.println("opening url " + url);
@@ -707,17 +746,55 @@ public class Base {
       } else if (Base.isLinux()) {
         // how's mozilla sound to ya, laddie?
         //Runtime.getRuntime().exec(new String[] { "mozilla", url });
-        String browser = Preferences.get("browser");
-        Runtime.getRuntime().exec(new String[] { browser, url });
-
+        //String browser = Preferences.get("browser");
+        //Runtime.getRuntime().exec(new String[] { browser, url });
+        String launcher = Preferences.get("launcher.linux");
+        if (launcher != null) {
+          Runtime.getRuntime().exec(new String[] { launcher, url });
+        }
       } else {
-        System.err.println("unspecified platform");
+        String launcher = Preferences.get("launcher");
+        if (launcher != null) {
+          Runtime.getRuntime().exec(new String[] { launcher, url });
+      } else {
+          System.err.println("Unspecified platform, no launcher available.");
+        }
       }
 
     } catch (IOException e) {
       Base.showWarning("Could not open URL",
                           "An error occurred while trying to open\n" + url, e);
     }
+  }
+
+
+  static boolean openFolderAvailable() {
+    if (Base.isWindows() || Base.isMacOS()) return true;
+
+    if (Base.isLinux()) {
+      // Assume that this is set to something valid
+      if (Preferences.get("launcher.linux") != null) {
+        return true;
+      }
+
+      // Attempt to use gnome-open
+      try {
+        Process p = Runtime.getRuntime().exec(new String[] { "gnome-open" });
+        int result = p.waitFor();
+        // Not installed will throw an IOException (JDK 1.4.2, Ubuntu 7.04)
+        Preferences.set("launcher.linux", "gnome-open");
+        return true;
+      } catch (Exception e) { }
+
+      // Attempt with kde-open
+      try {
+        Process p = Runtime.getRuntime().exec(new String[] { "kde-open" });
+        int result = p.waitFor();
+        Preferences.set("launcher.linux", "kde-open");
+        return true;
+      } catch (Exception e) { }
+    }
+    return false;
   }
 
 
@@ -742,6 +819,11 @@ public class Base {
       } else if (Base.isMacOS()) {
         openURL(folder);  // handles char replacement, etc
 
+      } else if (Base.isLinux()) {
+        String launcher = Preferences.get("launcher.linux");
+        if (launcher != null) {
+          Runtime.getRuntime().exec(new String[] { launcher, folder });
+        }
       }
     } catch (IOException e) {
       e.printStackTrace();
@@ -780,7 +862,7 @@ public class Base {
    * for errors that allow P5 to continue running.
    */
   static public void showError(String title, String message,
-                               Exception e) {
+                               Throwable e) {
     if (title == null) title = "Error";
     JOptionPane.showMessageDialog(new Frame(), message, title,
                                   JOptionPane.ERROR_MESSAGE);
@@ -793,23 +875,29 @@ public class Base {
   // ...................................................................
 
 
+  static public String getContents(String what) {
+    String basePath = System.getProperty("user.dir");
+    /*
+      // do this later, when moving to .app package
+    if (PApplet.platform == PConstants.MACOSX) {
+      basePath = System.getProperty("processing.contents");
+    }
+    */
+    return basePath + File.separator + what;
+  }
+
+
+  static public String getLibContents(String what) {
+    return getContents("lib" + File.separator + what);
+  }
+
+
   static public Image getImage(String name, Component who) {
     Image image = null;
     Toolkit tk = Toolkit.getDefaultToolkit();
 
-    //if ((Base.platform == Base.MACOSX) ||
-    //(Base.platform == Base.MACOS9)) {
-    image = tk.getImage("lib/" + name);
-    //} else {
-    //image = tk.getImage(who.getClass().getResource(name));
-    //}
-
-    //image =  tk.getImage("lib/" + name);
-    //URL url = PdeApplet.class.getResource(name);
-    //image = tk.getImage(url);
-    //}
-    //MediaTracker tracker = new MediaTracker(applet);
-    MediaTracker tracker = new MediaTracker(who); //frame);
+    image = tk.getImage(getLibContents(name));
+    MediaTracker tracker = new MediaTracker(who);
     tracker.addImage(image, 0);
     try {
       tracker.waitForAll();
@@ -819,17 +907,7 @@ public class Base {
 
 
   static public InputStream getStream(String filename) throws IOException {
-    //if (Base.platform == Base.MACOSX) {
-    // macos doesn't seem to think that files in the lib folder
-    // are part of the resources, unlike windows or linux.
-    // actually, this is only the case when running as a .app,
-    // since it works fine from run.sh, but not Arduino.app
-    return new FileInputStream("lib/" + filename);
-    //}
-
-    // all other, more reasonable operating systems
-    //return cls.getResource(filename).openStream();
-    //return Base.class.getResource(filename).openStream();
+    return new FileInputStream(getLibContents(filename));
   }
 
 
@@ -965,7 +1043,7 @@ public class Base {
         if (!Preferences.getBoolean("compiler.save_build_files")) {
           if (!dead.delete()) {
             // temporarily disabled
-            //System.err.println("couldn't delete " + dead);
+            System.err.println("Could not delete " + dead);
           }
         }
       } else {
@@ -1040,197 +1118,4 @@ public class Base {
       }
     }
   }
-
-
-  /**
-   * Equivalent to the one in PApplet, but static (die() is removed)
-   */
-  static public String[] loadStrings(File file) {
-    try {
-      FileInputStream input = new FileInputStream(file);
-      BufferedReader reader =
-        new BufferedReader(new InputStreamReader(input));
-
-      String lines[] = new String[100];
-      int lineCount = 0;
-      String line = null;
-      while ((line = reader.readLine()) != null) {
-        if (lineCount == lines.length) {
-          String temp[] = new String[lineCount << 1];
-          System.arraycopy(lines, 0, temp, 0, lineCount);
-          lines = temp;
-        }
-        lines[lineCount++] = line;
-      }
-      reader.close();
-
-      if (lineCount == lines.length) {
-        return lines;
-      }
-
-      // resize array to appropraite amount for these lines
-      String output[] = new String[lineCount];
-      System.arraycopy(lines, 0, output, 0, lineCount);
-      return output;
-
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return null;
-  }
-
-
-  //////////////////////////////////////////////////////////////
-
-  // STRINGS
-
-
-  /**
-   * Remove whitespace characters from the beginning and ending
-   * of a String. Works like String.trim() but includes the
-   * unicode nbsp character as well.
-   */
-  static public String trim(String str) {
-    return str.replace('\u00A0', ' ').trim();
-
-    /*
-    int left = 0;
-    int right = str.length() - 1;
-
-    while ((left <= right) &&
-           (WHITESPACE.indexOf(str.charAt(left)) != -1)) left++;
-    if (left == right) return "";
-
-    while (WHITESPACE.indexOf(str.charAt(right)) != -1) --right;
-
-    return str.substring(left, right-left+1);
-    */
-  }
-
-  /**
-   * Join an array of Strings together as a single String,
-   * separated by the whatever's passed in for the separator.
-   */
-  static public String join(String str[], char separator) {
-    return join(str, String.valueOf(separator));
-  }
-
-
-  /**
-   * Join an array of Strings together as a single String,
-   * separated by the whatever's passed in for the separator.
-   * <P>
-   * To use this on numbers, first pass the array to nf() or nfs()
-   * to get a list of String objects, then use join on that.
-   * <PRE>
-   * e.g. String stuff[] = { "apple", "bear", "cat" };
-   *      String list = join(stuff, ", ");
-   *      // list is now "apple, bear, cat"</PRE>
-   */
-  static public String join(String str[], String separator) {
-    StringBuffer buffer = new StringBuffer();
-    for (int i = 0; i < str.length; i++) {
-      if (i != 0) buffer.append(separator);
-      buffer.append(str[i]);
-    }
-    return buffer.toString();
-  }
-
-
-  /**
-   * Split the provided String at wherever whitespace occurs.
-   * Multiple whitespace (extra spaces or tabs or whatever)
-   * between items will count as a single break.
-   * <P>
-   * The whitespace characters are "\t\n\r\f", which are the defaults
-   * for java.util.StringTokenizer, plus the unicode non-breaking space
-   * character, which is found commonly on files created by or used
-   * in conjunction with Mac OS X (character 160, or 0x00A0 in hex).
-   * <PRE>
-   * i.e. split("a b") -> { "a", "b" }
-   *      split("a    b") -> { "a", "b" }
-   *      split("a\tb") -> { "a", "b" }
-   *      split("a \t  b  ") -> { "a", "b" }</PRE>
-   */
-  static public String[] split(String what) {
-    return split(what, WHITESPACE);
-  }
-
-
-  /**
-   * Splits a string into pieces, using any of the chars in the
-   * String 'delim' as separator characters. For instance,
-   * in addition to white space, you might want to treat commas
-   * as a separator. The delimeter characters won't appear in
-   * the returned String array.
-   * <PRE>
-   * i.e. split("a, b", " ,") -> { "a", "b" }
-   * </PRE>
-   * To include all the whitespace possibilities, use the variable
-   * WHITESPACE, found in PConstants:
-   * <PRE>
-   * i.e. split("a   | b", WHITESPACE + "|");  ->  { "a", "b" }</PRE>
-   */
-  static public String[] split(String what, String delim) {
-    StringTokenizer toker = new StringTokenizer(what, delim);
-    String pieces[] = new String[toker.countTokens()];
-
-    int index = 0;
-    while (toker.hasMoreTokens()) {
-      pieces[index++] = toker.nextToken();
-    }
-    return pieces;
-  }
-
-
-  /**
-   * Split a string into pieces along a specific character.
-   * Most commonly used to break up a String along tab characters.
-   * <P>
-   * This operates differently than the others, where the
-   * single delimeter is the only breaking point, and consecutive
-   * delimeters will produce an empty string (""). This way,
-   * one can split on tab characters, but maintain the column
-   * alignments (of say an excel file) where there are empty columns.
-   */
-  static public String[] split(String what, char delim) {
-    // do this so that the exception occurs inside the user's
-    // program, rather than appearing to be a bug inside split()
-    if (what == null) return null;
-    //return split(what, String.valueOf(delim));  // huh
-
-    char chars[] = what.toCharArray();
-    int splitCount = 0; //1;
-    for (int i = 0; i < chars.length; i++) {
-      if (chars[i] == delim) splitCount++;
-    }
-    // make sure that there is something in the input string
-    //if (chars.length > 0) {
-      // if the last char is a delimeter, get rid of it..
-      //if (chars[chars.length-1] == delim) splitCount--;
-      // on second thought, i don't agree with this, will disable
-    //}
-    if (splitCount == 0) {
-      String splits[] = new String[1];
-      splits[0] = new String(what);
-      return splits;
-    }
-    //int pieceCount = splitCount + 1;
-    String splits[] = new String[splitCount + 1];
-    int splitIndex = 0;
-    int startIndex = 0;
-    for (int i = 0; i < chars.length; i++) {
-      if (chars[i] == delim) {
-        splits[splitIndex++] =
-          new String(chars, startIndex, i-startIndex);
-        startIndex = i + 1;
-      }
-    }
-    //if (startIndex != chars.length) {
-      splits[splitIndex] =
-        new String(chars, startIndex, chars.length-startIndex);
-    //}
-    return splits;
-  }
-
 }

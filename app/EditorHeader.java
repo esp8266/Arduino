@@ -241,6 +241,7 @@ public class EditorHeader extends JComponent {
 
 
   public void rebuildMenu() {
+    //System.out.println("rebuilding");
     if (menu != null) {
       menu.removeAll();
 
@@ -248,6 +249,9 @@ public class EditorHeader extends JComponent {
       menu = new JMenu();
       popup = menu.getPopupMenu();
       add(popup);
+      popup.setLightWeightPopupEnabled(true);
+
+      /*
       popup.addPopupMenuListener(new PopupMenuListener() {
           public void popupMenuCanceled(PopupMenuEvent e) {
             // on redraw, the isVisible() will get checked.
@@ -259,6 +263,7 @@ public class EditorHeader extends JComponent {
           public void popupMenuWillBecomeInvisible(PopupMenuEvent e) { }
           public void popupMenuWillBecomeVisible(PopupMenuEvent e) { }
         });
+      */
     }
     JMenuItem item;
 
@@ -352,6 +357,43 @@ public class EditorHeader extends JComponent {
     }
 
     menu.add(unhide);
+    menu.addSeparator();
+
+    //  KeyEvent.VK_LEFT and VK_RIGHT will make Windows beep
+
+    int ctrlAlt = ActionEvent.ALT_MASK |
+      Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+
+    //item = Editor.newJMenuItem("Previous Tab", '[', true);
+    item = new JMenuItem("Previous Tab");
+    //int shortcut = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+    KeyStroke ctrlAltLeft = KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ctrlAlt);
+    item.setAccelerator(ctrlAltLeft);
+    //int modifiers = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+    //KeyStroke tabby = KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, modifiers);
+
+    // this didn't want to work consistently
+    /*
+    item.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          editor.sketch.prevCode();
+        }
+      });
+    */
+    menu.add(item);
+
+    //item = Editor.newJMenuItem("Next Tab", ']', true);
+    item = new JMenuItem("Next Tab");
+    KeyStroke ctrlAltRight = KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, ctrlAlt);
+    item.setAccelerator(ctrlAltRight);
+    /*
+    item.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          editor.sketch.nextCode();
+        }
+      });
+    */
+    menu.add(item);
 
     if (sketch != null) {
       menu.addSeparator();

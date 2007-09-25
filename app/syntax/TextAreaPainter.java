@@ -18,6 +18,7 @@ import javax.swing.text.*;
 import javax.swing.JComponent;
 import java.awt.event.MouseEvent;
 import java.awt.*;
+import java.awt.print.*;
 
 /**
  * The text area repaint manager. It performs double buffering and paints
@@ -25,8 +26,12 @@ import java.awt.*;
  * @author Slava Pestov
  * @version $Id$
  */
-public class TextAreaPainter extends JComponent implements TabExpander
+public class TextAreaPainter extends JComponent
+implements TabExpander, Printable
 {
+  /** True if inside printing, will handle disabling the highlight */
+  boolean printing;
+
   /**
    * Creates a new repaint manager. This should be not be called
    * directly.
@@ -405,6 +410,32 @@ public class TextAreaPainter extends JComponent implements TabExpander
     }
   }
 
+
+  public int print(Graphics g, PageFormat pageFormat, int pageIndex) {
+    int lineHeight = fm.getHeight();
+    int linesPerPage = (int) (pageFormat.getImageableHeight() / lineHeight);
+    int lineCount = textArea.getLineCount();
+    int lastPage = lineCount / linesPerPage;
+
+    if (pageIndex > lastPage) {
+      return NO_SUCH_PAGE;
+
+    } else {
+      Graphics2D g2d = (Graphics2D)g;
+      TokenMarker tokenMarker = textArea.getDocument().getTokenMarker();
+      int firstLine = pageIndex*linesPerPage;
+      g2d.translate(Math.max(54, pageFormat.getImageableX()),
+                    pageFormat.getImageableY() - firstLine*lineHeight);
+      printing = true;
+      for (int line = firstLine; line < firstLine + linesPerPage; line++) {
+        paintLine(g2d, tokenMarker, line, 0);
+      }
+      printing = false;
+      return PAGE_EXISTS;
+    }
+  }
+
+
   /**
    * Marks a line as needing a repaint.
    * @param line The line to invalidate
@@ -600,6 +631,7 @@ public class TextAreaPainter extends JComponent implements TabExpander
 
   protected void paintHighlight(Graphics gfx, int line, int y)
   {
+    if (!printing) {
     if (line >= textArea.getSelectionStartLine()
         && line <= textArea.getSelectionEndLine())
       paintLineHighlight(gfx,line,y);
@@ -612,6 +644,7 @@ public class TextAreaPainter extends JComponent implements TabExpander
 
     if (line == textArea.getCaretLine())
       paintCaret(gfx,line,y);
+  }
   }
 
   protected void paintLineHighlight(Graphics gfx, int line, int y)

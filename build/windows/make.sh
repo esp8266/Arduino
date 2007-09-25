@@ -145,8 +145,8 @@ CLASSPATH="..\\build\\windows\\work\\lib\\RXTXcomm.jar;..\\build\\windows\\work\
 # show the user an error, rather than crapping out with some strange
 # "class not found" crap
 # need to do this twice because otherwise dependencies aren't resolved right.
-../build/windows/work/jikes -target 1.3 +D -classpath "$CLASSPATH;..\\build\\windows\\work\\classes" -d ..\\build\\windows\\work\\classes preproc/*.java syntax/*.java tools/*.java *.java
-../build/windows/work/jikes -target 1.3 +D -classpath "$CLASSPATH;..\\build\\windows\\work\\classes" -d ..\\build\\windows\\work\\classes preproc/*.java syntax/*.java tools/*.java *.java
+../build/windows/work/jikes -target 1.3 +D -classpath "$CLASSPATH;..\\build\\windows\\work\\classes" -d ..\\build\\windows\\work\\classes ../core/*.java preproc/*.java syntax/*.java tools/*.java *.java
+../build/windows/work/jikes -target 1.3 +D -classpath "$CLASSPATH;..\\build\\windows\\work\\classes" -d ..\\build\\windows\\work\\classes ../core/*.java preproc/*.java syntax/*.java tools/*.java *.java
 
 cd ../build/windows/work/classes
 rm -f ../lib/pde.jar
