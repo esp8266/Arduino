@@ -30,6 +30,7 @@ BI_CTX *bi_initialize(void);
 void bi_terminate(BI_CTX *ctx);
 void bi_permanent(bigint *bi);
 void bi_depermanent(bigint *bi);
+void bi_clear_cache(BI_CTX *ctx);
 void bi_free(BI_CTX *ctx, bigint *bi);
 bigint *bi_copy(bigint *bi);
 bigint *bi_clone(BI_CTX *ctx, const bigint *bi);

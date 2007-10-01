@@ -249,6 +249,9 @@ int RSA_encrypt(const RSA_CTX *ctx, const uint8_t *in_data, uint16_t in_len,
     encrypt_bi = is_signing ? RSA_private(ctx, dat_bi) : 
         RSA_public(ctx, dat_bi);
     bi_export(ctx->bi_ctx, encrypt_bi, out_data, byte_size);
+
+    /* save a few bytes of memory */
+    bi_clear_cache(ctx->bi_ctx);
     return byte_size;
 }
 
@@ -296,6 +299,9 @@ bigint *RSA_sign_verify(BI_CTX *ctx, const uint8_t *sig, int sig_len,
 #ifdef WIN32
     free(block);
 #endif
+
+    /* save a few bytes of memory */
+    bi_clear_cache(ctx);
     return bir;
 }
 

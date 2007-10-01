@@ -432,7 +432,11 @@ static int process_cert_verify(SSL *ssl)
     PARANOIA_CHECK(pkt_size, x509_ctx->rsa_ctx->num_octets+6);
 
     DISPLAY_RSA(ssl, "process_cert_verify", x509_ctx->rsa_ctx);
+
+    /* rsa_ctx->bi_ctx is not thread-safe */
+    SSL_CTX_LOCK(ssl->ssl_ctx->mutex);
     n = RSA_decrypt(x509_ctx->rsa_ctx, &buf[6], dgst_buf, 0);
+    SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
 
     if (n != SHA1_SIZE + MD5_SIZE)
     {

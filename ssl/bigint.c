@@ -96,8 +96,6 @@ BI_CTX *bi_initialize(void)
  */
 void bi_terminate(BI_CTX *ctx)
 {
-    bigint *p, *pn;
-
     bi_depermanent(ctx->bi_radix); 
     bi_free(ctx, ctx->bi_radix);
 
@@ -110,6 +108,20 @@ void bi_terminate(BI_CTX *ctx)
         abort();
     }
 
+    bi_clear_cache(ctx);
+    free(ctx);
+}
+
+/**
+ *@brief Clear the memory cache.
+ */
+void bi_clear_cache(BI_CTX *ctx)
+{
+    bigint *p, *pn;
+
+    if (ctx->free_list == NULL)
+        return;
+    
     for (p = ctx->free_list; p != NULL; p = pn)
     {
         pn = p->next;
@@ -117,7 +129,8 @@ void bi_terminate(BI_CTX *ctx)
         free(p);
     }
 
-    free(ctx);
+    ctx->free_count = 0;
+    ctx->free_list = NULL;
 }
 
 /**

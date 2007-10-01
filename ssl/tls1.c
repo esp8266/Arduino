@@ -269,7 +269,6 @@ EXP_FUNC void STDCALL ssl_free(SSL *ssl)
     SSL_CTX_UNLOCK(ssl_ctx->mutex);
 
     /* may already be free - but be sure */
-    free(ssl->all_pkts);
     free(ssl->final_finish_mac);
     free(ssl->key_block);
     free(ssl->encrypt_ctx);
@@ -408,13 +407,17 @@ int add_cert_auth(SSL_CTX *ssl_ctx, const uint8_t *buf, int len)
 
     /* make sure the cert is valid */
     cert = ca_cert_ctx->cert[i];
+    SSL_CTX_LOCK(ssl_ctx->mutex);
+
     if ((ret = x509_verify(ca_cert_ctx, cert)))
     {
+        SSL_CTX_UNLOCK(ssl_ctx->mutex);
         x509_free(cert);        /* get rid of it */
         ca_cert_ctx->cert[i] = NULL;
         goto error;
     }
 
+    SSL_CTX_UNLOCK(ssl_ctx->mutex);
     len -= offset;
     ret = SSL_OK;           /* ok so far */
 
@@ -549,6 +552,8 @@ SSL *ssl_new(SSL_CTX *ssl_ctx, int client_fd)
 #ifdef CONFIG_ENABLE_VERIFICATION
     ssl->ca_cert_ctx = ssl_ctx->ca_cert_ctx;
 #endif
+    MD5_Init(&ssl->md5_ctx);
+    SHA1_Init(&ssl->sha1_ctx);
 
     /* a bit hacky but saves a few bytes of memory */
     ssl->flag |= ssl_ctx->options;
@@ -673,7 +678,7 @@ static void add_hmac_digest(SSL *ssl, int mode, uint8_t *hmac_header,
  */
 static int verify_digest(SSL *ssl, int mode, const uint8_t *buf, int read_len)
 {   
-    unsigned char hmac_buf[SHA1_SIZE];
+    uint8_t hmac_buf[SHA1_SIZE];
     int hmac_offset;
    
     if (ssl->cipher_info->padding_size)
@@ -709,10 +714,8 @@ static int verify_digest(SSL *ssl, int mode, const uint8_t *buf, int read_len)
  */
 void add_packet(SSL *ssl, const uint8_t *pkt, int len)
 {
-    int new_len = ssl->all_pkts_len + len;
-    ssl->all_pkts = (uint8_t *)realloc(ssl->all_pkts, new_len);
-    memcpy(&ssl->all_pkts[ssl->all_pkts_len], pkt, len);
-    ssl->all_pkts_len = new_len;
+    MD5_Update(&ssl->md5_ctx, pkt, len);
+    SHA1_Update(&ssl->sha1_ctx, pkt, len);
 }
 
 /**
@@ -790,7 +793,7 @@ static void prf(const uint8_t *sec, int sec_len, uint8_t *seed, int seed_len,
     p_hash_md5(S1, len, seed, seed_len, xbuf, olen);
     p_hash_sha1(S2, len, seed, seed_len, ybuf, olen);
 
-    for (i=0; i < olen; i++)
+    for (i = 0; i < olen; i++)
         out[i] = xbuf[i] ^ ybuf[i];
 }
 
@@ -828,10 +831,10 @@ static void generate_key_block(uint8_t *client_random, uint8_t *server_random,
  */
 void finished_digest(SSL *ssl, const char *label, uint8_t *digest)
 {
-    unsigned char mac_buf[128]; 
-    unsigned char *q = mac_buf;
-    MD5_CTX md5_ctx;
-    SHA1_CTX sha1_ctx;
+    uint8_t mac_buf[128]; 
+    uint8_t *q = mac_buf;
+    MD5_CTX md5_ctx = ssl->md5_ctx;
+    SHA1_CTX sha1_ctx = ssl->sha1_ctx;
 
     if (label)
     {
@@ -839,13 +842,9 @@ void finished_digest(SSL *ssl, const char *label, uint8_t *digest)
         q += strlen(label);
     }
 
-    MD5_Init(&md5_ctx);
-    MD5_Update(&md5_ctx, ssl->all_pkts, ssl->all_pkts_len);
     MD5_Final(q, &md5_ctx);
     q += MD5_SIZE;
     
-    SHA1_Init(&sha1_ctx);
-    SHA1_Update(&sha1_ctx, ssl->all_pkts, ssl->all_pkts_len);
     SHA1_Final(q, &sha1_ctx);
     q += SHA1_SIZE;
 
@@ -1476,11 +1475,6 @@ int process_finished(SSL *ssl, int hs_len)
             ret = send_finished(ssl);
     }
 
-    /* Don't need this stuff anymore */
-    free(ssl->all_pkts);
-    ssl->all_pkts = NULL;
-    ssl->all_pkts_len = 0;
-
     memset(ssl->master_secret, 0, SSL_SECRET_SIZE);
     free(ssl->master_secret);
     ssl->master_secret = NULL;
@@ -1713,7 +1707,10 @@ EXP_FUNC int STDCALL ssl_get_config(int offset)
  */
 EXP_FUNC int STDCALL ssl_verify_cert(const SSL *ssl)
 {
-    int ret = x509_verify(ssl->ssl_ctx->ca_cert_ctx, ssl->x509_ctx);
+    int ret;
+    SSL_CTX_LOCK(ssl->ssl_ctx->mutex);
+    ret = x509_verify(ssl->ssl_ctx->ca_cert_ctx, ssl->x509_ctx);
+    SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
 
     if (ret)        /* modify into an SSL error type */
     {
