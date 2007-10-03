@@ -131,6 +131,7 @@ int do_client_connect(SSL *ssl)
     ssl->bm_read_index = 0;
     ssl->next_state = HS_SERVER_HELLO;
     ssl->hs_status = SSL_NOT_OK;            /* not connected */
+    x509_free(ssl->x509_ctx);
 
     /* sit in a loop until it all looks good */
     while (ssl->hs_status != SSL_OK)
