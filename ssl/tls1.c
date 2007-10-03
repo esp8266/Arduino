@@ -274,6 +274,8 @@ EXP_FUNC void STDCALL ssl_free(SSL *ssl)
     free(ssl->encrypt_ctx);
     free(ssl->decrypt_ctx);
     free(ssl->master_secret);
+    free(ssl->md5_ctx);
+    free(ssl->sha1_ctx);
 #ifdef CONFIG_SSL_CERT_VERIFICATION
     x509_free(ssl->x509_ctx);
 #endif
@@ -552,8 +554,10 @@ SSL *ssl_new(SSL_CTX *ssl_ctx, int client_fd)
 #ifdef CONFIG_ENABLE_VERIFICATION
     ssl->ca_cert_ctx = ssl_ctx->ca_cert_ctx;
 #endif
-    MD5_Init(&ssl->md5_ctx);
-    SHA1_Init(&ssl->sha1_ctx);
+    ssl->md5_ctx = (MD5_CTX *)malloc(sizeof(MD5_CTX));
+    ssl->sha1_ctx = (SHA1_CTX *)malloc(sizeof(SHA1_CTX));
+    MD5_Init(ssl->md5_ctx);
+    SHA1_Init(ssl->sha1_ctx);
 
     /* a bit hacky but saves a few bytes of memory */
     ssl->flag |= ssl_ctx->options;
@@ -714,8 +718,8 @@ static int verify_digest(SSL *ssl, int mode, const uint8_t *buf, int read_len)
  */
 void add_packet(SSL *ssl, const uint8_t *pkt, int len)
 {
-    MD5_Update(&ssl->md5_ctx, pkt, len);
-    SHA1_Update(&ssl->sha1_ctx, pkt, len);
+    MD5_Update(ssl->md5_ctx, pkt, len);
+    SHA1_Update(ssl->sha1_ctx, pkt, len);
 }
 
 /**
@@ -833,8 +837,8 @@ void finished_digest(SSL *ssl, const char *label, uint8_t *digest)
 {
     uint8_t mac_buf[128]; 
     uint8_t *q = mac_buf;
-    MD5_CTX md5_ctx = ssl->md5_ctx;
-    SHA1_CTX sha1_ctx = ssl->sha1_ctx;
+    MD5_CTX md5_ctx = *ssl->md5_ctx;
+    SHA1_CTX sha1_ctx = *ssl->sha1_ctx;
 
     if (label)
     {

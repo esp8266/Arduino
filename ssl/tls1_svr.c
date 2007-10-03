@@ -92,6 +92,10 @@ int do_svr_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len)
 
         case HS_FINISHED:
             ret = process_finished(ssl, hs_len);
+            free(ssl->md5_ctx);
+            free(ssl->sha1_ctx);
+            ssl->md5_ctx = NULL;
+            ssl->sha1_ctx = NULL;
             break;
     }
 

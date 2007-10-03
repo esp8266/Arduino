@@ -163,8 +163,8 @@ struct _SSL
     int16_t hs_status;
     uint8_t *all_pkts; 
     int all_pkts_len;
-    MD5_CTX md5_ctx;
-    SHA1_CTX sha1_ctx;
+    MD5_CTX *md5_ctx;
+    SHA1_CTX *sha1_ctx;
     int client_fd;
     const cipher_info_t *cipher_info;
     uint8_t *final_finish_mac;
