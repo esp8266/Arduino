@@ -150,35 +150,39 @@ typedef struct
     int size;
 } SSL_CERT;
 
+typedef struct
+{
+    MD5_CTX md5_ctx;
+    SHA1_CTX sha1_ctx;
+    uint8_t final_finish_mac[SSL_FINISHED_HASH_SIZE];
+    uint8_t *key_block;
+    uint8_t master_secret[SSL_SECRET_SIZE];
+    uint8_t client_random[SSL_RANDOM_SIZE]; /* client's random sequence */
+    uint8_t server_random[SSL_RANDOM_SIZE]; /* server's random sequence */
+    uint16_t bm_proc_index;
+} DISPOSABLE_CTX;
+
 struct _SSL
 {
     uint32_t flag;
     uint16_t need_bytes;
     uint16_t got_bytes;
     uint8_t record_type;
-    uint8_t chain_length;
     uint8_t cipher;
     uint8_t sess_id_size;
     int16_t next_state;
     int16_t hs_status;
-    uint8_t *all_pkts; 
-    int all_pkts_len;
-    MD5_CTX *md5_ctx;
-    SHA1_CTX *sha1_ctx;
+    DISPOSABLE_CTX *dc;         /* temporary data which we'll get rid of soon */
     int client_fd;
     const cipher_info_t *cipher_info;
-    uint8_t *final_finish_mac;
-    uint8_t *key_block;
     void *encrypt_ctx;
     void *decrypt_ctx;
     uint8_t bm_all_data[RT_MAX_PLAIN_LENGTH+RT_EXTRA];
     uint8_t *bm_data;
     uint16_t bm_index;
     uint16_t bm_read_index;
-    uint16_t bm_proc_index;
     struct _SSL *next;                  /* doubly linked list */
     struct _SSL *prev;
-    SSL_CERT *certs;
     struct _SSL_CTX *ssl_ctx;            /* back reference to a clnt/svr ctx */
 #ifndef CONFIG_SSL_SKELETON_MODE
     uint16_t session_index;
@@ -191,9 +195,6 @@ struct _SSL
     uint8_t session_id[SSL_SESSION_ID_SIZE]; 
     uint8_t client_mac[SHA1_SIZE];  /* for HMAC verification */
     uint8_t server_mac[SHA1_SIZE];  /* for HMAC verification */
-    uint8_t client_random[SSL_RANDOM_SIZE]; /* client's random sequence */
-    uint8_t server_random[SSL_RANDOM_SIZE]; /* server's random sequence */
-    uint8_t *master_secret;
     uint8_t read_sequence[8];       /* 64 bit sequence number */
     uint8_t write_sequence[8];      /* 64 bit sequence number */
     uint8_t hmac_header[SSL_RECORD_SIZE];    /* rx hmac */
@@ -232,6 +233,8 @@ typedef struct _SSL_CTX SSLCTX;
 extern const uint8_t ssl_prot_prefs[NUM_PROTOCOLS];
 
 SSL *ssl_new(SSL_CTX *ssl_ctx, int client_fd);
+void disposable_new(SSL *ssl);
+void disposable_free(SSL *ssl);
 int send_packet(SSL *ssl, uint8_t protocol, 
         const uint8_t *in, int length);
 int do_svr_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len);

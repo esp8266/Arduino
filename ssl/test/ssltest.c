@@ -1470,9 +1470,8 @@ static void do_basic(void)
     ssl_clnt = ssl_client_new(ssl_clnt_ctx, client_fd, NULL, 0);
 
     /* check the return status */
-    if (ssl_handshake_status(ssl_clnt))
+    if (ssl_handshake_status(ssl_clnt) < 0)
     {
-        printf("Client ");
         ssl_display_error(ssl_handshake_status(ssl_clnt));
         goto error;
     }
@@ -1722,7 +1721,7 @@ error:
  **************************************************************************/
 static void do_header_issue(void)
 {
-    uint8_t axtls_buf[2048];
+    char axtls_buf[2048];
 #ifndef WIN32
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 #endif

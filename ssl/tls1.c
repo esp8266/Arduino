@@ -269,13 +269,9 @@ EXP_FUNC void STDCALL ssl_free(SSL *ssl)
     SSL_CTX_UNLOCK(ssl_ctx->mutex);
 
     /* may already be free - but be sure */
-    free(ssl->final_finish_mac);
-    free(ssl->key_block);
     free(ssl->encrypt_ctx);
     free(ssl->decrypt_ctx);
-    free(ssl->master_secret);
-    free(ssl->md5_ctx);
-    free(ssl->sha1_ctx);
+    disposable_free(ssl);
 #ifdef CONFIG_SSL_CERT_VERIFICATION
     x509_free(ssl->x509_ctx);
 #endif
@@ -499,6 +495,7 @@ EXP_FUNC int STDCALL ssl_renegotiate(SSL *ssl)
 {
     int ret = SSL_OK;
 
+    disposable_new(ssl);
 #ifdef CONFIG_SSL_ENABLE_CLIENT
     if (IS_SET_SSL_FLAG(SSL_IS_CLIENT))
     {
@@ -547,17 +544,12 @@ SSL *ssl_new(SSL_CTX *ssl_ctx, int client_fd)
     ssl->need_bytes = SSL_RECORD_SIZE;      /* need a record */
     ssl->client_fd = client_fd;
     ssl->flag = SSL_NEED_RECORD;
-    ssl->certs = ssl_ctx->certs;
-    ssl->chain_length = ssl_ctx->chain_length;
     ssl->bm_data = ssl->bm_all_data+BM_RECORD_OFFSET; /* space at the start */
     ssl->hs_status = SSL_NOT_OK;            /* not connected */
 #ifdef CONFIG_ENABLE_VERIFICATION
     ssl->ca_cert_ctx = ssl_ctx->ca_cert_ctx;
 #endif
-    ssl->md5_ctx = (MD5_CTX *)malloc(sizeof(MD5_CTX));
-    ssl->sha1_ctx = (SHA1_CTX *)malloc(sizeof(SHA1_CTX));
-    MD5_Init(ssl->md5_ctx);
-    SHA1_Init(ssl->sha1_ctx);
+    disposable_new(ssl);
 
     /* a bit hacky but saves a few bytes of memory */
     ssl->flag |= ssl_ctx->options;
@@ -718,8 +710,8 @@ static int verify_digest(SSL *ssl, int mode, const uint8_t *buf, int read_len)
  */
 void add_packet(SSL *ssl, const uint8_t *pkt, int len)
 {
-    MD5_Update(ssl->md5_ctx, pkt, len);
-    SHA1_Update(ssl->sha1_ctx, pkt, len);
+    MD5_Update(&ssl->dc->md5_ctx, pkt, len);
+    SHA1_Update(&ssl->dc->sha1_ctx, pkt, len);
 }
 
 /**
@@ -809,10 +801,9 @@ void generate_master_secret(SSL *ssl, const uint8_t *premaster_secret)
 {
     uint8_t buf[128];   /* needs to be > 13+32+32 in size */
     strcpy((char *)buf, "master secret");
-    memcpy(&buf[13], ssl->client_random, SSL_RANDOM_SIZE);
-    memcpy(&buf[45], ssl->server_random, SSL_RANDOM_SIZE);
-    ssl->master_secret = (uint8_t *)malloc(SSL_SECRET_SIZE);
-    prf(premaster_secret, SSL_SECRET_SIZE, buf, 77, ssl->master_secret,
+    memcpy(&buf[13], ssl->dc->client_random, SSL_RANDOM_SIZE);
+    memcpy(&buf[45], ssl->dc->server_random, SSL_RANDOM_SIZE);
+    prf(premaster_secret, SSL_SECRET_SIZE, buf, 77, ssl->dc->master_secret,
             SSL_SECRET_SIZE);
 }
 
@@ -837,8 +828,8 @@ void finished_digest(SSL *ssl, const char *label, uint8_t *digest)
 {
     uint8_t mac_buf[128]; 
     uint8_t *q = mac_buf;
-    MD5_CTX md5_ctx = *ssl->md5_ctx;
-    SHA1_CTX sha1_ctx = *ssl->sha1_ctx;
+    MD5_CTX md5_ctx = ssl->dc->md5_ctx;
+    SHA1_CTX sha1_ctx = ssl->dc->sha1_ctx;
 
     if (label)
     {
@@ -854,7 +845,7 @@ void finished_digest(SSL *ssl, const char *label, uint8_t *digest)
 
     if (label)
     {
-        prf(ssl->master_secret, SSL_SECRET_SIZE, mac_buf, (int)(q-mac_buf),
+        prf(ssl->dc->master_secret, SSL_SECRET_SIZE, mac_buf, (int)(q-mac_buf),
             digest, SSL_FINISHED_HASH_SIZE);
     }
     else    /* for use in a certificate verify */
@@ -864,7 +855,7 @@ void finished_digest(SSL *ssl, const char *label, uint8_t *digest)
 
 #if 0
     printf("label: %s\n", label);
-    print_blob("master secret", ssl->master_secret, 48);
+    print_blob("master secret", ssl->dc->master_secret, 48);
     print_blob("mac_buf", mac_buf, q-mac_buf);
     print_blob("finished digest", digest, SSL_FINISHED_HASH_SIZE);
 #endif
@@ -1071,27 +1062,26 @@ static void set_key_block(SSL *ssl, int is_write)
     uint8_t client_key[32], server_key[32]; /* big enough for AES256 */
     uint8_t client_iv[16], server_iv[16];   /* big enough for AES128/256 */
     int is_client = IS_SET_SSL_FLAG(SSL_IS_CLIENT);
-    int key_block_existed = 1;
 
     /* only do once in a handshake */
-    if (ssl->key_block == NULL)
+    if (ssl->dc->key_block == NULL)
     {
-        ssl->key_block = (uint8_t *)malloc(ciph_info->key_block_size);
+        ssl->dc->key_block = (uint8_t *)malloc(ciph_info->key_block_size);
 
 #if 0
-        print_blob("client", ssl->client_random, 32);
-        print_blob("server", ssl->server_random, 32);
-        print_blob("master", ssl->master_secret, SSL_SECRET_SIZE);
+        print_blob("client", ssl->dc->client_random, 32);
+        print_blob("server", ssl->dc->server_random, 32);
+        print_blob("master", ssl->dc->master_secret, SSL_SECRET_SIZE);
 #endif
-        generate_key_block(ssl->client_random, ssl->server_random,
-            ssl->master_secret, ssl->key_block, ciph_info->key_block_size);
+        generate_key_block(ssl->dc->client_random, ssl->dc->server_random,
+            ssl->dc->master_secret, ssl->dc->key_block, 
+            ciph_info->key_block_size);
 #if 0
         print_blob("keyblock", ssl->key_block, ciph_info->key_block_size);
 #endif
-        key_block_existed = 0;
     }
 
-    q = ssl->key_block;
+    q = ssl->dc->key_block;
 
     if ((is_client && is_write) || (!is_client && !is_write))
     {
@@ -1123,15 +1113,10 @@ static void set_key_block(SSL *ssl, int is_write)
 
     free(is_write ? ssl->encrypt_ctx : ssl->decrypt_ctx);
 
-    if (ssl->final_finish_mac == NULL)
-    {
-        ssl->final_finish_mac = (uint8_t *)malloc(SSL_FINISHED_HASH_SIZE);
-    }
-
     /* now initialise the ciphers */
     if (is_client)
     {
-        finished_digest(ssl, server_finished, ssl->final_finish_mac);
+        finished_digest(ssl, server_finished, ssl->dc->final_finish_mac);
 
         if (is_write)
             ssl->encrypt_ctx = crypt_new(ssl, client_key, client_iv, 0);
@@ -1140,7 +1125,7 @@ static void set_key_block(SSL *ssl, int is_write)
     }
     else
     {
-        finished_digest(ssl, client_finished, ssl->final_finish_mac);
+        finished_digest(ssl, client_finished, ssl->dc->final_finish_mac);
 
         if (is_write)
             ssl->encrypt_ctx = crypt_new(ssl, server_key, server_iv, 0);
@@ -1149,14 +1134,6 @@ static void set_key_block(SSL *ssl, int is_write)
     }
 
     ssl->cipher_info = ciph_info;
-
-    /* clean up if possible */
-    if (key_block_existed)
-    {
-        memset(ssl->key_block, 0, ciph_info->key_block_size);
-        free(ssl->key_block);
-        ssl->key_block = NULL;
-    }
 }
 
 /**
@@ -1249,7 +1226,7 @@ int basic_read(SSL *ssl, uint8_t **in_data)
     switch (ssl->record_type)
     {
         case PT_HANDSHAKE_PROTOCOL:
-            ssl->bm_proc_index = 0;
+            ssl->dc->bm_proc_index = 0;
             ret = do_handshake(ssl, buf, read_len);
             break;
 
@@ -1379,7 +1356,7 @@ int send_finished(SSL *ssl)
     if (!IS_SET_SSL_FLAG(SSL_SESSION_RESUME) && ssl->ssl_ctx->num_sessions)
     {
         memcpy(ssl->session->master_secret,
-                ssl->master_secret, SSL_SECRET_SIZE);
+                ssl->dc->master_secret, SSL_SECRET_SIZE);
     }
 #endif
 
@@ -1470,7 +1447,7 @@ int process_finished(SSL *ssl, int hs_len)
     PARANOIA_CHECK(ssl->bm_index, SSL_FINISHED_HASH_SIZE+4);
 
     /* check that we all work before we continue */
-    if (memcmp(ssl->final_finish_mac, &buf[4], SSL_FINISHED_HASH_SIZE))
+    if (memcmp(ssl->dc->final_finish_mac, &buf[4], SSL_FINISHED_HASH_SIZE))
         return SSL_ERROR_FINISHED_INVALID;
 
     if ((!is_client && !resume) || (is_client && resume))
@@ -1478,14 +1455,6 @@ int process_finished(SSL *ssl, int hs_len)
         if ((ret = send_change_cipher_spec(ssl)) == SSL_OK)
             ret = send_finished(ssl);
     }
-
-    memset(ssl->master_secret, 0, SSL_SECRET_SIZE);
-    free(ssl->master_secret);
-    ssl->master_secret = NULL;
-
-    memset(ssl->final_finish_mac, 0, SSL_FINISHED_HASH_SIZE);
-    free(ssl->final_finish_mac);
-    ssl->final_finish_mac = NULL;
 
     /* if we ever renegotiate */
     ssl->next_state = is_client ? HS_HELLO_REQUEST : HS_CLIENT_HELLO;  
@@ -1509,9 +1478,9 @@ int send_certificate(SSL *ssl)
     buf[1] = 0;
     buf[4] = 0;
 
-    while (i < ssl->chain_length)
+    while (i < ssl->ssl_ctx->chain_length)
     {
-        SSL_CERT *cert = &ssl->certs[i];
+        SSL_CERT *cert = &ssl->ssl_ctx->certs[i];
         buf[offset++] = 0;        
         buf[offset++] = cert->size >> 8;        /* cert 1 length */
         buf[offset++] = cert->size & 0xff;
@@ -1528,6 +1497,35 @@ int send_certificate(SSL *ssl)
     buf[3] = chain_length & 0xff;
     ssl->bm_index = offset;
     return send_packet(ssl, PT_HANDSHAKE_PROTOCOL, NULL, offset);
+}
+
+/**
+ * Create a blob of memory that we'll get rid of once the handshake is
+ * complete.
+ */
+void disposable_new(SSL *ssl)
+{
+    if (ssl->dc == NULL)
+    {
+        ssl->dc = (DISPOSABLE_CTX *)calloc(1, sizeof(DISPOSABLE_CTX));
+        MD5_Init(&ssl->dc->md5_ctx);
+        SHA1_Init(&ssl->dc->sha1_ctx);
+    }
+}
+
+/**
+ * Remove the temporary blob of memory.
+ */
+void disposable_free(SSL *ssl)
+{
+    if (ssl->dc)
+    {
+	free(ssl->dc->key_block);
+        memset(ssl->dc, 0, sizeof(DISPOSABLE_CTX));
+        free(ssl->dc);
+        ssl->dc = NULL;
+    }
+
 }
 
 #ifndef CONFIG_SSL_SKELETON_MODE     /* no session resumption in this mode */
@@ -1566,9 +1564,8 @@ SSL_SESS *ssl_session_update(int max_sessions, SSL_SESS *ssl_sessions[],
                 if (memcmp(ssl_sessions[i]->session_id, session_id,
                                                 SSL_SESSION_ID_SIZE) == 0)
                 {
-                    ssl->master_secret = (uint8_t *)malloc(SSL_SECRET_SIZE);
                     ssl->session_index = i;
-                    memcpy(ssl->master_secret, 
+                    memcpy(ssl->dc->master_secret, 
                             ssl_sessions[i]->master_secret, SSL_SECRET_SIZE);
                     SET_SSL_FLAG(SSL_SESSION_RESUME);
                     SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
@@ -1730,7 +1727,7 @@ EXP_FUNC int STDCALL ssl_verify_cert(const SSL *ssl)
 int process_certificate(SSL *ssl, X509_CTX **x509_ctx)
 {
     int ret = SSL_OK;
-    uint8_t *buf = &ssl->bm_data[ssl->bm_proc_index];
+    uint8_t *buf = &ssl->bm_data[ssl->dc->bm_proc_index];
     int pkt_size = ssl->bm_index;
     int cert_size, offset = 5;
     int total_cert_size = (buf[offset]<<8) + buf[offset+1];
@@ -1766,7 +1763,7 @@ int process_certificate(SSL *ssl, X509_CTX **x509_ctx)
 
     DISPLAY_CERT(ssl, "process_certificate", *x509_ctx);
     ssl->next_state = is_client ? HS_SERVER_HELLO_DONE : HS_CLIENT_KEY_XCHG;
-    ssl->bm_proc_index += offset;
+    ssl->dc->bm_proc_index += offset;
 error:
     return ret;
 }

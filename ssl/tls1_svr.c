@@ -92,10 +92,7 @@ int do_svr_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len)
 
         case HS_FINISHED:
             ret = process_finished(ssl, hs_len);
-            free(ssl->md5_ctx);
-            free(ssl->sha1_ctx);
-            ssl->md5_ctx = NULL;
-            ssl->sha1_ctx = NULL;
+            disposable_free(ssl);   /* free up some memory */
             break;
     }
 
@@ -122,7 +119,7 @@ static int process_client_hello(SSL *ssl)
         goto error;
     }
 
-    memcpy(ssl->client_random, &buf[6], SSL_RANDOM_SIZE);
+    memcpy(ssl->dc->client_random, &buf[6], SSL_RANDOM_SIZE);
 
     /* process the session id */
     id_len = buf[offset++];
@@ -233,7 +230,7 @@ server_hello:
         random_offset += 0x10;
     }
 
-    memcpy(&ssl->client_random[random_offset], &buf[offset], ch_len);
+    memcpy(&ssl->dc->client_random[random_offset], &buf[offset], ch_len);
     ret = send_server_hello_sequence(ssl);
 
 error:
@@ -303,7 +300,7 @@ static int send_server_hello(SSL *ssl)
 
     /* server random value */
     get_random(SSL_RANDOM_SIZE, &buf[6]);
-    memcpy(ssl->server_random, &buf[6], SSL_RANDOM_SIZE);
+    memcpy(ssl->dc->server_random, &buf[6], SSL_RANDOM_SIZE);
     offset = 6 + SSL_RANDOM_SIZE;
 
 #ifndef CONFIG_SSL_SKELETON_MODE

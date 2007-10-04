@@ -110,13 +110,11 @@ int do_clnt_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len)
 
         case HS_FINISHED:
             ret = process_finished(ssl, hs_len);
-            free(ssl->md5_ctx);
-            free(ssl->sha1_ctx);
-            ssl->md5_ctx = NULL;
-            ssl->sha1_ctx = NULL;
+            disposable_free(ssl);   /* free up some memory */
             break;
 
         case HS_HELLO_REQUEST:
+            disposable_new(ssl);
             ret = do_client_connect(ssl);
             break;
     }
@@ -185,7 +183,7 @@ static int send_client_hello(SSL *ssl)
     *tm_ptr++ = (uint8_t)(((long)tm & 0x0000ff00) >> 8);
     *tm_ptr++ = (uint8_t)(((long)tm & 0x000000ff));
     get_random(SSL_RANDOM_SIZE-4, &buf[10]);
-    memcpy(ssl->client_random, &buf[6], SSL_RANDOM_SIZE);
+    memcpy(ssl->dc->client_random, &buf[6], SSL_RANDOM_SIZE);
     offset = 6 + SSL_RANDOM_SIZE;
 
     /* give session resumption a go */
@@ -236,7 +234,7 @@ static int process_server_hello(SSL *ssl)
         return SSL_ERROR_INVALID_VERSION;
 
     /* get the server random value */
-    memcpy(ssl->server_random, &buf[6], SSL_RANDOM_SIZE);
+    memcpy(ssl->dc->server_random, &buf[6], SSL_RANDOM_SIZE);
     offset = 6 + SSL_RANDOM_SIZE; /* skip of session id size */
     sess_id_size = buf[offset++];
 
@@ -265,7 +263,7 @@ static int process_server_hello(SSL *ssl)
 
     offset++;   // skip the compr
     PARANOIA_CHECK(pkt_size, offset);
-    ssl->bm_proc_index = offset+1; 
+    ssl->dc->bm_proc_index = offset+1; 
 
 error:
     return ret;
@@ -317,7 +315,7 @@ static int send_client_key_xchg(SSL *ssl)
  */
 static int process_cert_req(SSL *ssl)
 {
-    uint8_t *buf = &ssl->bm_data[ssl->bm_proc_index];
+    uint8_t *buf = &ssl->bm_data[ssl->dc->bm_proc_index];
     int ret = SSL_OK;
     int offset = (buf[2] << 4) + buf[3];
     int pkt_size = ssl->bm_index;
@@ -325,7 +323,7 @@ static int process_cert_req(SSL *ssl)
     /* don't do any processing - we will send back an RSA certificate anyway */
     ssl->next_state = HS_SERVER_HELLO_DONE;
     SET_SSL_FLAG(SSL_HAS_CERT_REQ);
-    ssl->bm_proc_index += offset;
+    ssl->dc->bm_proc_index += offset;
     PARANOIA_CHECK(pkt_size, offset);
 error:
     return ret;
