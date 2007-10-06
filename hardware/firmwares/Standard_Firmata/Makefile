@@ -48,12 +48,12 @@
 PORT = /dev/tty.usbserial-*
 TARGET = Pd_firmware
 ARDUINO = /Applications/arduino-0007
-ARDUINO_SRC = $(ARDUINO)/lib/targets/arduino
-ARDUINO_LIB_SRC = $(ARDUINO)/lib/targets/libraries
-INCLUDE = -I$(ARDUINO_SRC) -I$(ARDUINO)/tools/avr/avr/include \
-	-I$(ARDUINO)/lib/targets/libraries/EEPROM \
-	-I$(ARDUINO)/lib/targets/libraries/Firmata \
-	-I$(ARDUINO)/lib/targets/libraries
+ARDUINO_SRC = $(ARDUINO)/hardware/targets/arduino
+ARDUINO_LIB_SRC = $(ARDUINO)/hardware/libraries
+INCLUDE = -I$(ARDUINO_SRC) -I$(ARDUINO)/hardware/tools/avr/avr/include \
+	-I$(ARDUINO_LIB_SRC)/EEPROM \
+	-I$(ARDUINO_LIB_SRC)/Firmata \
+	-I$(ARDUINO_LIB_SRC)
 SRC = $(ARDUINO_SRC)/pins_arduino.c $(ARDUINO_SRC)/wiring.c \
 	$(ARDUINO_SRC)/WInterrupts.c
 CXXSRC = applet/$(TARGET).cpp $(ARDUINO_SRC)/HardwareSerial.cpp \
@@ -242,10 +242,10 @@ etags:
 	etags *.pde \
 		$(ARDUINO_SRC)/*.[ch] \
 		$(ARDUINO_SRC)/*.cpp \
-		$(ARDUINO)/lib/targets/libraries/*/*.[ch] \
-		$(ARDUINO)/lib/targets/libraries/*/*.cpp \
-		$(ARDUINO)/tools/avr/avr/include/avr/*.[ch] \
-		$(ARDUINO)/tools/avr/avr/include/*.[ch]
+		$(ARDUINO_LIB_SRC)/*/*.[ch] \
+		$(ARDUINO_LIB_SRC)/*/*.cpp \
+		$(ARDUINO)/hardware/tools/avr/avr/include/avr/*.[ch] \
+		$(ARDUINO)/hardware/tools/avr/avr/include/*.[ch]
 
 etags_Darwin:
 #	etags -a 
