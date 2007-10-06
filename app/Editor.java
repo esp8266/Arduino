@@ -951,6 +951,7 @@ public class Editor extends JFrame
     //System.out.println("Clearing serial port menu.");
 	
     serialMenu.removeAll();
+    boolean empty = true;
 
     try
     {
@@ -966,7 +967,12 @@ public class Editor extends JFrame
           rbMenuItem.addActionListener(serialMenuListener);
           //serialGroup.add(rbMenuItem);
           serialMenu.add(rbMenuItem);
+          empty = false;
         }
+      }
+      if (!empty) {
+        //System.out.println("enabling the serialMenu");
+        serialMenu.setEnabled(true);
       }
 
     }
