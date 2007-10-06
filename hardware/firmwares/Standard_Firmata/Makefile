@@ -28,7 +28,7 @@
 #
 #  3. Modify the line containg "ARDUINO" to point the directory that
 #     contains the Arduino core (for normal Arduino installations, this
-#     is the lib/targets/arduino sub-directory).
+#     is the hardware/cores/arduino sub-directory).
 #
 #  4. Modify the line containing "PORT" to refer to the filename
 #     representing the USB or serial connection to your Arduino board
@@ -48,7 +48,7 @@
 PORT = /dev/tty.usbserial-*
 TARGET = Pd_firmware
 ARDUINO = /Applications/arduino-0007
-ARDUINO_SRC = $(ARDUINO)/hardware/targets/arduino
+ARDUINO_SRC = $(ARDUINO)/hardware/cores/arduino
 ARDUINO_LIB_SRC = $(ARDUINO)/hardware/libraries
 INCLUDE = -I$(ARDUINO_SRC) -I$(ARDUINO)/hardware/tools/avr/avr/include \
 	-I$(ARDUINO_LIB_SRC)/EEPROM \

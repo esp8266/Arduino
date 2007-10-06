@@ -43,7 +43,7 @@
 #
 #  3. Modify the line containg "ARDUINO" to point the directory that
 #     contains the Arduino core (for normal Arduino installations, this
-#     is the lib/targets/arduino sub-directory).
+#     is the hardware/cores/arduino sub-directory).
 #
 #  4. Modify the line containing "PORT" to refer to the filename
 #     representing the USB or serial connection to your Arduino board

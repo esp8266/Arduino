@@ -49,7 +49,7 @@ public class LibraryManager {
       "libraries");
     target = new Target(
       System.getProperty("user.dir") + File.separator + "hardware" +
-      File.separator + "targets", Preferences.get("build.target"));
+      File.separator + "cores", Preferences.get("build.target"));
     refreshLibraries();
   }
   

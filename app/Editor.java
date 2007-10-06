@@ -1448,7 +1448,7 @@ public class Editor extends JFrame
         try {
           if (!sketch.handleRun(new Target(
               System.getProperty("user.dir") + File.separator + "hardware" +
-              File.separator + "targets", Preferences.get("build.target"))))
+              File.separator + "cores", Preferences.get("build.target"))))
             return;
     
           //runtime = new Runner(sketch, Editor.this);
@@ -2057,7 +2057,7 @@ public class Editor extends JFrame
             //sketch.exportLibrary() : sketch.exportApplet();
             boolean success = sketch.exportApplet(new Target(
                 System.getProperty("user.dir") + File.separator + "hardware" +
-                File.separator + "targets", Preferences.get("build.target")));
+                File.separator + "cores", Preferences.get("build.target")));
             if (success) {
               message("Done uploading.");
             } else {
