@@ -42,7 +42,7 @@ public class AvrdudeUploader extends Uploader  {
       
     // avrdude doesn't want to read device signatures (it always gets
     // 0x000000); force it to continue uploading anyway
-    commandDownloader.add("-F");
+    //commandDownloader.add("-F");
 
     String protocol = Preferences.get("boards." + Preferences.get("board") + ".upload.protocol");
     

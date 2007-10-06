@@ -145,7 +145,7 @@ public abstract class Uploader implements MessageConsumer  {
         return false;
     } catch (Exception e) {
       String msg = e.getMessage();
-      if ((msg != null) && (msg.indexOf("uisp: not found") != -1)) {
+      if ((msg != null) && (msg.indexOf("uisp: not found") != -1) && (msg.indexOf("avrdude: not found") != -1)) {
         //System.err.println("uisp is missing");
         //JOptionPane.showMessageDialog(editor.base,
         //                              "Could not find the compiler.\n" +
@@ -199,16 +199,18 @@ public abstract class Uploader implements MessageConsumer  {
       exception = new RunnerException("the selected serial port "+s+" does not exist or your board is not connected");
       return;
     }
-    // jikes always uses a forward slash character as its separator, so
-    // we need to replace any platform-specific separator characters before
-    // attemping to compare
-    //
     if (s.indexOf("Device is not responding") != -1 ) {
       exception =  new RunnerException("Device is not responding, check the right serial port is selected or RESET the board right before exporting");
       return;
     }
-    if (s.indexOf("Programmer is not responding") != -1) {
-      exception = new RunnerException("Programmer is not responding, RESET the board right before exporting");
+    if (s.indexOf("Programmer is not responding") != -1 ||
+        s.indexOf("programmer is not responding") != -1 ||
+        s.indexOf("protocol error") != -1) {
+      exception = new RunnerException("Problem uploading to board.  See http://www.arduino.cc/en/Guide/Troubleshooting#upload for suggestions.");
+      return;
+    }
+    if (s.indexOf("Expected signature") != -1) {
+      exception = new RunnerException("Wrong microcontroller found.  Did you select the right board from the Tools > Board menu?");
       return;
     }
   }
