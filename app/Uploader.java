@@ -62,26 +62,31 @@ public abstract class Uploader implements MessageConsumer  {
   
   public abstract boolean burnBootloaderParallel(String target) throws RunnerException;
   
-  protected void flushSerialBuffer() {
+  protected void flushSerialBuffer() throws RunnerException {
     // Cleanup the serial buffer
-    Serial serialPort = new Serial();
-    byte[] readBuffer;
-    while(serialPort.available() > 0) {
-      readBuffer = serialPort.readBytes();
+    try {
+      Serial serialPort = new Serial();
+      byte[] readBuffer;
+      while(serialPort.available() > 0) {
+        readBuffer = serialPort.readBytes();
+        try {
+          Thread.sleep(100);
+        } catch (InterruptedException e) {}
+      }
+
+      serialPort.setDTR(false);
+
       try {
         Thread.sleep(100);
       } catch (InterruptedException e) {}
+
+      serialPort.setDTR(true);
+      
+      serialPort.dispose();
+    } catch(Exception e) {
+      e.printStackTrace();
+      throw new RunnerException(e.getMessage());
     }
-
-    serialPort.setDTR(false);
-
-    try {
-      Thread.sleep(100);
-    } catch (InterruptedException e) {}
-
-    serialPort.setDTR(true);
-    
-    serialPort.dispose();
   }
 
   protected boolean executeUploadCommand(Collection commandDownloader) 

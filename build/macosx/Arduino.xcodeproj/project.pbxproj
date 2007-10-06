@@ -170,6 +170,7 @@
 /* End PBXApplicationTarget section */
 
 /* Begin PBXBuildFile section */
+		33055EFF0CB8187700824CD9 /* SerialException.java in Sources */ = {isa = PBXBuildFile; fileRef = 33055EFE0CB8187600824CD9 /* SerialException.java */; };
 		332D4DB609CF147F00BF81F6 /* Sizer.java in Sources */ = {isa = PBXBuildFile; fileRef = 332D4DB509CF147F00BF81F6 /* Sizer.java */; };
 		335A28F50C8CCB0A00D8A7F4 /* quaqua.jar in CopyFiles */ = {isa = PBXBuildFile; fileRef = 335A28F30C8CCAF700D8A7F4 /* quaqua.jar */; };
 		335A28FE0C8CCB4000D8A7F4 /* libquaqua.jnilib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 335A28F20C8CCAF700D8A7F4 /* libquaqua.jnilib */; };
@@ -441,6 +442,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		33055EFE0CB8187600824CD9 /* SerialException.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = SerialException.java; sourceTree = "<group>"; };
 		332D4DB509CF147F00BF81F6 /* Sizer.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Sizer.java; sourceTree = "<group>"; };
 		335A28F20C8CCAF700D8A7F4 /* libquaqua.jnilib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libquaqua.jnilib; sourceTree = "<group>"; };
 		335A28F30C8CCAF700D8A7F4 /* quaqua.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = quaqua.jar; sourceTree = "<group>"; };
@@ -702,6 +704,7 @@
 		33FFFE220965BD100016AC38 /* app */ = {
 			isa = PBXGroup;
 			children = (
+				33055EFE0CB8187600824CD9 /* SerialException.java */,
 				33F944E00C2B33560093EB9C /* AvrdudeUploader.java */,
 				33F9446B0C2B2F6F0093EB9C /* UispUploader.java */,
 				33BEE0CD09D7446100430D5B /* Library.java */,
@@ -739,6 +742,7 @@
 				33FFFE740965BD110016AC38 /* Uploader.java */,
 				332D4DB509CF147F00BF81F6 /* Sizer.java */,
 			);
+			includeInIndex = 0;
 			name = app;
 			path = ../../app;
 			sourceTree = SOURCE_ROOT;
@@ -1097,6 +1101,7 @@
 				335A291F0C8CCC0900D8A7F4 /* PShape.java in Sources */,
 				335A29200C8CCC0900D8A7F4 /* PTriangle.java in Sources */,
 				335A29240C8CCC5E00D8A7F4 /* DiscourseFormat.java in Sources */,
+				33055EFF0CB8187700824CD9 /* SerialException.java in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

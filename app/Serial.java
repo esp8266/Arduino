@@ -59,7 +59,7 @@ public class Serial implements SerialPortEventListener {
   int bufferIndex;
   int bufferLast;
 
-  public Serial(boolean monitor) {
+  public Serial(boolean monitor) throws SerialException {
     this(Preferences.get("serial.port"),
       Preferences.getInteger("serial.debug_rate"),
       Preferences.get("serial.parity").charAt(0),
@@ -68,7 +68,7 @@ public class Serial implements SerialPortEventListener {
     this.monitor = monitor;
   }
     
-  public Serial() {
+  public Serial() throws SerialException {
     this(Preferences.get("serial.port"),
       Preferences.getInteger("serial.debug_rate"),
       Preferences.get("serial.parity").charAt(0),
@@ -76,20 +76,20 @@ public class Serial implements SerialPortEventListener {
       new Float(Preferences.get("serial.stopbits")).floatValue());
   }
 
-  public Serial(int irate) {
+  public Serial(int irate) throws SerialException {
     this(Preferences.get("serial.port"), irate,
       Preferences.get("serial.parity").charAt(0),
       Preferences.getInteger("serial.databits"), 
       new Float(Preferences.get("serial.stopbits")).floatValue());
   }
 
-  public Serial(String iname, int irate) {
+  public Serial(String iname, int irate) throws SerialException {
     this(iname, irate, Preferences.get("serial.parity").charAt(0),
     Preferences.getInteger("serial.databits"), 
     new Float(Preferences.get("serial.stopbits")).floatValue());
   }
 
-  public Serial(String iname) {
+  public Serial(String iname) throws SerialException {
     this(iname, Preferences.getInteger("serial.debug_rate"),
       Preferences.get("serial.parity").charAt(0),
       Preferences.getInteger("serial.databits"),
@@ -97,7 +97,8 @@ public class Serial implements SerialPortEventListener {
   }
 
   public Serial(String iname, int irate,
-                 char iparity, int idatabits, float istopbits) {
+                 char iparity, int idatabits, float istopbits)
+  throws SerialException {
     //if (port != null) port.close();
     //this.parent = parent;
     //parent.attach(this);
@@ -115,6 +116,7 @@ public class Serial implements SerialPortEventListener {
     if (istopbits == 2) stopbits = SerialPort.STOPBITS_2;
 
     try {
+      port = null;
       Enumeration portList = CommPortIdentifier.getPortIdentifiers();
       while (portList.hasMoreElements()) {
         CommPortIdentifier portId =
@@ -134,14 +136,17 @@ public class Serial implements SerialPortEventListener {
           }
         }
       }
-
+    } catch (PortInUseException e) {
+      throw new SerialException("Serial port '" + iname + "' already in use.  Try quiting any programs that may be using it.");
     } catch (Exception e) {
-      errorMessage("<init>", e);
-      //exception = e;
-      //e.printStackTrace();
-      port = null;
-      input = null;
-      output = null;
+      throw new SerialException("Error opening serial port '" + iname + "'.", e);
+//      //errorMessage("<init>", e);
+//      //exception = e;
+//      //e.printStackTrace();
+    }
+    
+    if (port == null) {
+      throw new SerialException("Serial port '" + iname + "' not found.  Did you select the right one from the Tools > Serial Port menu?");
     }
   }
 

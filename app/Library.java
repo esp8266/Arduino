@@ -335,8 +335,8 @@ public class Library implements MessageConsumer{
       "-g",
       "-Os",
       "-Wall",
-      "-mmcu=" + Preferences.get("build.mcu"),
-      "-DF_CPU=" + Preferences.get("build.f_cpu"),
+      "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
+      "-DF_CPU=" + Preferences.get("boards." + Preferences.get("board") + ".build.f_cpu"),
       "-I" + libManager.getTarget().getPath(),
       "-I" + getFolder(),
     };
@@ -348,8 +348,8 @@ public class Library implements MessageConsumer{
       "-Os",
       "-Wall",
       "-fno-exceptions",
-      "-mmcu=" + Preferences.get("build.mcu"),
-      "-DF_CPU=" + Preferences.get("build.f_cpu"),
+      "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
+      "-DF_CPU=" + Preferences.get("boards." + Preferences.get("board") + ".build.f_cpu"),
       "-I" + libManager.getTarget().getPath(),
       "-I" + getFolder(),
     };

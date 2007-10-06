@@ -104,8 +104,8 @@ public class Compiler implements MessageConsumer {
       "-Os", // optimize for size
       "-I" + target.getPath(),
       "-w", // surpress all warnings
-      "-mmcu=" + Preferences.get("build.mcu"),
-      "-DF_CPU=" + Preferences.get("build.f_cpu"),
+      "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
+      "-DF_CPU=" + Preferences.get("boards." + Preferences.get("board") + ".build.f_cpu"),
     };
 
     // use lib directories as include paths
@@ -130,8 +130,8 @@ public class Compiler implements MessageConsumer {
       "-I" + target.getPath(),
       "-w", // surpress all warnings
       "-fno-exceptions",
-      "-mmcu=" + Preferences.get("build.mcu"),
-      "-DF_CPU=" + Preferences.get("build.f_cpu"),
+      "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
+      "-DF_CPU=" + Preferences.get("boards." + Preferences.get("board") + ".build.f_cpu"),
     };
 
     // use lib directories as include paths
@@ -145,7 +145,7 @@ public class Compiler implements MessageConsumer {
     String preCommandLinker[] = new String[] {
       avrBasePath + "avr-gcc",
       " ",
-      "-mmcu=" + Preferences.get("build.mcu"),
+      "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
       "-o",
       " ",
     };

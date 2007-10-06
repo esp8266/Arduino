@@ -2,8 +2,9 @@
 
 atmega8.name=Arduino NG or older w/ ATmega8
 
-atmega8.upload.programmer=stk500
+atmega8.upload.protocol=stk500
 atmega8.upload.maximum_size=7168
+atmega8.upload.speed=19200
 
 atmega8.bootloader.low_fuses=0xdf
 atmega8.bootloader.high_fuses=0xca
@@ -20,8 +21,9 @@ atmega8.build.core=arduino
 
 atmega168.name=Arduino Mini or NG w/ ATmega168
 
-atmega168.upload.programmer=stk500
+atmega168.upload.protocol=stk500
 atmega168.upload.maximum_size=14336
+atmega168.upload.speed=19200
 
 atmega168.bootloader.low_fuses=0xff
 atmega168.bootloader.high_fuses=0xdd
@@ -39,8 +41,9 @@ atmega168.build.core=arduino
 
 diecimila.name=Arduino Diecimila
 
-diecimila.upload.programmer=stk500
+diecimila.upload.protocol=stk500
 diecimila.upload.maximum_size=14336
+diecimila.upload.speed=19200
 
 diecimila.bootloader.low_fuses=0xff
 diecimila.bootloader.high_fuses=0xdd

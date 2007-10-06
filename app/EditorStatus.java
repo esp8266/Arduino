@@ -526,7 +526,11 @@ public class EditorStatus extends JPanel implements ActionListener {
       int rate = Integer.parseInt(rateString);
       Preferences.set("serial.debug_rate", rateString);
       editor.serialPort.dispose();
-      editor.serialPort = new Serial(true);
+      try {
+        editor.serialPort = new Serial(true);
+      } catch (SerialException err) {
+        editor.error(err);
+      }
     }
   }
 }

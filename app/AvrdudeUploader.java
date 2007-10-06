@@ -44,19 +44,19 @@ public class AvrdudeUploader extends Uploader  {
     // 0x000000); force it to continue uploading anyway
     commandDownloader.add("-F");
 
-    String programmer = Preferences.get("upload.programmer");
+    String protocol = Preferences.get("boards." + Preferences.get("board") + ".upload.protocol");
     
     // avrdude wants "stk500v1" to distinguish it from stk500v2
-    if (programmer.equals("stk500"))
-      programmer = "stk500v1";
-    commandDownloader.add("-c" + programmer);
-    if (Preferences.get("upload.programmer").equals("dapa")) {
+    if (protocol.equals("stk500"))
+      protocol = "stk500v1";
+    commandDownloader.add("-c" + protocol);
+    if (protocol.equals("dapa")) {
       // avrdude doesn't need to be told the address of the parallel port
       //commandDownloader.add("-dlpt=" + Preferences.get("parallel.port"));
     } else {
       commandDownloader.add("-P" + Preferences.get("serial.port"));
       commandDownloader.add(
-        "-b" + Preferences.getInteger("serial.download_rate"));
+        "-b" + Preferences.getInteger("boards." + Preferences.get("board") + ".upload.speed"));
     }
     if (Preferences.getBoolean("upload.erase"))
       commandDownloader.add("-e");
@@ -151,7 +151,8 @@ public class AvrdudeUploader extends Uploader  {
     }
     // XXX: quick hack to chop the "atmega" off of "atmega8" and "atmega168",
     // then shove an "m" at the beginning.  won't work for attiny's, etc.
-    commandDownloader.add("-pm" + Preferences.get("build.mcu").substring(6));
+    commandDownloader.add("-pm" + 
+      Preferences.get("boards." + Preferences.get("board") + ".build.mcu").substring(6));
     commandDownloader.addAll(params);
 
     return executeUploadCommand(commandDownloader);

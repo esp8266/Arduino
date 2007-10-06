@@ -783,24 +783,19 @@ public class Editor extends JFrame
     */
     menu.addSeparator();
     
-    mcuMenu = new JMenu("Microcontroller (MCU)");
-    String curr_mcu = Preferences.get("build.mcu");
-    ButtonGroup mcuGroup = new ButtonGroup();
-    McuMenuListener mml = new McuMenuListener();
+    JMenu boardsMenu = new JMenu("Board");
+    ButtonGroup boardGroup = new ButtonGroup();
+    for (Iterator i = Preferences.getSubKeys("boards"); i.hasNext(); ) {
+      String board = (String) i.next();
+      Action action = new BoardMenuAction(board);
+      item = new JRadioButtonMenuItem(action);
+      if (board.equals(Preferences.get("board")))
+        item.setSelected(true);
+      boardGroup.add(item);
+      boardsMenu.add(item);
+    }
+    menu.add(boardsMenu);
     
-    item = new JCheckBoxMenuItem("atmega8", "atmega8".equals(curr_mcu));
-    item.addActionListener(mml);
-    mcuGroup.add(item);
-    mcuMenu.add(item);
-	
-    item = new JCheckBoxMenuItem("atmega168", "atmega168".equals(curr_mcu));
-    item.addActionListener(mml);
-    mcuGroup.add(item);
-    mcuMenu.add(item);
-
-    
-    menu.add(mcuMenu);
-	
     serialMenu = new JMenu("Serial Port");
     populateSerialMenu();
     menu.add(serialMenu);
@@ -913,7 +908,7 @@ public class Editor extends JFrame
   
   protected void showBootloaderMenuItemsForCurrentMCU() {
     boolean onATmega8 =
-      Preferences.get("build.mcu").equals("atmega8");
+      Preferences.get("boards." + Preferences.get("board") + ".build.mcu").equals("atmega8");
       
     burnBootloader8Item.setVisible(onATmega8);
     if (burnBootloader8ParallelItem != null)
@@ -926,21 +921,16 @@ public class Editor extends JFrame
     if (burnBootloader168NGParallelItem != null)
       burnBootloader168NGParallelItem.setVisible(!onATmega8);
   }
-
-  class McuMenuListener implements ActionListener {
-    McuMenuListener() {}
   
+  class BoardMenuAction extends AbstractAction {
+    private String board;
+    public BoardMenuAction(String board) {
+      super(Preferences.get("boards." + board + ".name"));
+      this.board = board;
+    }
     public void actionPerformed(ActionEvent actionevent) {
-      for (int i = 0; i < mcuMenu.getItemCount(); i++)
-        if (mcuMenu.getItem(i) instanceof JCheckBoxMenuItem)
-          ((JCheckBoxMenuItem) mcuMenu.getItem(i)).setState(false);
-      
-      ((JCheckBoxMenuItem) actionevent.getSource()).setState(true);
-      Preferences.set("build.mcu",
-        ((JCheckBoxMenuItem) actionevent.getSource()).getLabel());
-        
-      showBootloaderMenuItemsForCurrentMCU();
-      
+      //System.out.println("Switching to " + board);
+      Preferences.set("board", board);
       try {
         LibraryManager libraryManager = new LibraryManager();
         libraryManager.rebuildAllBuilt();
@@ -1448,7 +1438,8 @@ public class Editor extends JFrame
         try {
           if (!sketch.handleRun(new Target(
               System.getProperty("user.dir") + File.separator + "hardware" +
-              File.separator + "cores", Preferences.get("build.target"))))
+              File.separator + "cores",
+              Preferences.get("boards." + Preferences.get("board") + ".build.core"))))
             return;
     
           //runtime = new Runner(sketch, Editor.this);
@@ -1539,11 +1530,15 @@ public class Editor extends JFrame
 
   public void handleSerial() {
     if (!debugging) {
-      console.clear();
-      buttons.activate(EditorButtons.SERIAL);
-      serialPort = new Serial(true);
-      debugging = true;
-      status.serial();
+      try {
+        serialPort = new Serial(true);
+        console.clear();
+        buttons.activate(EditorButtons.SERIAL);
+        debugging = true;
+        status.serial();
+      } catch(SerialException e) {
+        error(e);
+      }
     } else {
       doStop();
     }
@@ -2057,7 +2052,8 @@ public class Editor extends JFrame
             //sketch.exportLibrary() : sketch.exportApplet();
             boolean success = sketch.exportApplet(new Target(
                 System.getProperty("user.dir") + File.separator + "hardware" +
-                File.separator + "cores", Preferences.get("build.target")));
+                File.separator + "cores",
+                Preferences.get("boards." + Preferences.get("board") + ".build.core")));
             if (success) {
               message("Done uploading.");
             } else {

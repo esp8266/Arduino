@@ -1592,9 +1592,7 @@ public class Sketch {
   protected void size(String buildPath, String suggestedClassName)
     throws RunnerException {
     long size = 0;
-    long maxsize = Preferences.getInteger("upload.maximum_size");
-    if (Preferences.get("build.mcu").equals("atmega168"))
-      maxsize *= 2;
+    long maxsize = Preferences.getInteger("boards." + Preferences.get("board") + ".upload.maximum_size");
     Sizer sizer = new Sizer(buildPath, suggestedClassName);
     try {
       size = sizer.computeSize();
@@ -1606,8 +1604,7 @@ public class Sketch {
 
     if (size > maxsize)
       throw new RunnerException(
-        "Sketch too big; try deleting code, removing floats, or see " +
-        "http://www.arduino.cc/en/Main/FAQ for more advice.");
+        "Sketch too big; see http://www.arduino.cc/en/Guide/Troubleshooting#size for tips on reducing it.");
   }
 
   protected String upload(String buildPath, String suggestedClassName)
@@ -1617,11 +1614,7 @@ public class Sketch {
 
     // download the program
     //
-    if ("uisp".equals(Preferences.get("upload.application"))) {
-      uploader = new UispUploader();
-    } else {
-      uploader = new AvrdudeUploader();
-    }
+    uploader = new AvrdudeUploader();
     // macos9 now officially broken.. see PdeCompilerJavac
     //PdeCompiler compiler =
     //  ((PdeBase.platform == PdeBase.MACOS9) ?
@@ -1691,6 +1684,8 @@ public class Sketch {
     if (Preferences.getBoolean("editor.external")) {
       // nuke previous files and settings
       load();
+    } else {
+      current.program = editor.getText();
     }
 
     zipFileContents = new Hashtable();

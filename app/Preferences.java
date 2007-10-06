@@ -139,8 +139,13 @@ public class Preferences {
 
 
   // data model
-
-  static Hashtable table = new Hashtable();;
+  // we have multiple preference files, one main one and a few subsidiary
+  // ones with prefixes.  the preferences from the main file go in table
+  // and are saved back to the main file.  the preferences from the
+  // subsidiary files are stored in prefixes (which maps a prefix string to
+  // a Hashtable mapping unprefixed keys to values) and are not saved.
+  static Hashtable table = new Hashtable();
+  static Hashtable prefixes = new Hashtable();
   static File preferencesFile;
 
 
@@ -202,6 +207,18 @@ public class Preferences {
                        preferencesFile.getAbsolutePath() +
                        " and restart Arduino.", ex);
       }
+    }
+    
+    try {
+      load(new FileInputStream(new File(
+        System.getProperty("user.dir") +
+        File.separator + "hardware" +
+        File.separator + "boards.txt")),
+        "boards");
+    } catch (Exception ex) {
+        Base.showError("Error reading board definitions",
+                       "Error reading the board definitions file. " +
+                       "Please re-download or re-unzip Arduino.\n", ex);
     }
   }
 
@@ -521,10 +538,19 @@ public class Preferences {
 
   // .................................................................
 
-
   static public void load(InputStream input) throws IOException {
+    load(input, null);
+  }
+
+  static public void load(InputStream input, String prefix) throws IOException {
     BufferedReader reader =
       new BufferedReader(new InputStreamReader(input));
+    Hashtable table = Preferences.table;
+      
+    if (prefix != null) {
+      table = new Hashtable();
+      prefixes.put(prefix, table);
+    }
 
     //table = new Hashtable();
     String line = null;
@@ -633,6 +659,18 @@ public class Preferences {
   //}
 
   static public String get(String attribute /*, String defaultValue */) {
+    // if the attribute starts with a prefix used by one of our subsidiary
+    // preference files, look up the attribute in that file's Hashtable
+    // (don't override with or fallback to the main file).  otherwise,
+    // look up the attribute in the main file's Hashtable. 
+    Hashtable table = Preferences.table;
+    if (attribute.indexOf('.') != -1) {
+      String prefix = attribute.substring(0, attribute.indexOf('.'));
+      if (prefixes.containsKey(prefix)) {
+        table = (Hashtable) prefixes.get(prefix);
+        attribute = attribute.substring(attribute.indexOf('.') + 1);
+      }
+    }
     return (String) table.get(attribute);
     /*
     //String value = (properties != null) ?
@@ -642,6 +680,27 @@ public class Preferences {
     return (value == null) ?
       defaultValue : value;
     */
+  }
+  
+  /**
+   * Get the top-level key prefixes defined in the subsidiary file loaded with
+   * the given prefix.  For example, if the file contains:
+   *  foo.count=1
+   *  bar.count=2
+   *  baz.count=3
+   * this will return { "foo", "bar", "baz" }.
+   */
+  static public Iterator getSubKeys(String prefix) {
+    if (!prefixes.containsKey(prefix))
+      return null;
+    Set subkeys = new HashSet();
+    for (Enumeration e = ((Hashtable) prefixes.get(prefix)).keys(); e.hasMoreElements(); ) {
+      String subkey = (String) e.nextElement();
+      if (subkey.indexOf('.') != -1)
+        subkey = subkey.substring(0, subkey.indexOf('.'));
+      subkeys.add(subkey);
+    }
+    return subkeys.iterator();
   }
 
 
