@@ -10,7 +10,6 @@ else
   echo Setting up directories to build arduino...
   BUILD_PREPROC=true
   cp -r ../shared work
-  rm -rf work/CVS
   rm -f work/.DS_Store 
   #cp ../../lib/*.dll work
   cp dist/*.dll work
@@ -58,34 +57,20 @@ else
   #chmod +x work/jikes.exe
 
   cp dist/ICE_JNIRegistry.dll work/
+
+  cp -r ../../hardware work/
   mkdir work/bootloader
-  cp dist/bootloader/*.* work/bootloader
-  mkdir work/bootloader168
-  cp ../../bootloader168/* work/bootloader168
+  cp dist/bootloader/*.* work/hardware/bootloaders/atmega8
   mkdir work/drivers
   cp -r dist/drivers/* work/drivers/
-  mkdir work/tools
+
   cp dist/avr_tools.zip .
   echo Extracting avr tools ...
-  unzip -q  -d work avr_tools.zip
+  unzip -q  -d work/hardware avr_tools.zip
   rm -f avr_tools.zip
-
-  # core/ has been replaced by targets/ and we no longer use makefiles
-  #cp dist/lib/makefile.win work/Makefile
-  #mkdir work/core
-  #cp ../../../core/*.* work/core
-  #cp dist/core/makefile.win work/core/Makefile
-  cp -r ../../targets work/lib/
 
   # take care of the examples
   cp -r ../shared/dist/examples work/
-  #mkdir work/examples
-  #cd work/examples
-  #cp ../../../shared/dist/examples.zip .
-  #echo Extracting examples ...
-  #unzip -q  -d . examples.zip
-  #rm -f examples.zip
-  #cd ../..
 
   # chmod +x the crew
   find work -name "*.dll" -exec chmod +x {} ';'
@@ -129,11 +114,11 @@ fi
 
 ### -- BUILD BOOTLOADER -----------------------------------------
 
-cd bootloader
-export DIRAVR=../build/windows/work/tools/avr
-make 
-cp ATmegaBOOT.hex ../build/windows/work/bootloader
-cd ..
+#cd bootloader
+#export DIRAVR=../build/windows/work/tools/avr
+#make 
+#cp ATmegaBOOT.hex ../build/windows/work/bootloader
+#cd ..
 
 ### -- BUILD PDE ------------------------------------------------
 
