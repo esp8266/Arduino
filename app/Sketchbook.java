@@ -87,7 +87,7 @@ public class Sketchbook {
     examplesPath = examplesFolder.getAbsolutePath();
 
     librariesFolder = new File(System.getProperty("user.dir"),
-      "lib" + File.separator + "targets" + File.separator + "libraries");
+      "hardware" + File.separator + "libraries");
     librariesPath = librariesFolder.getAbsolutePath();
 
     String sketchbookPath = Preferences.get("sketchbook.path");

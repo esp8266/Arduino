@@ -77,7 +77,7 @@ public class ExportFolder {
         editor.handleOpen(path);
         // success may not be that useful, usually an ex is thrown
         success = editor.sketch.exportApplet(new Target(
-                System.getProperty("user.dir") + File.separator + "lib" +
+                System.getProperty("user.dir") + File.separator + "hardware" +
                 File.separator + "targets", Preferences.get("build.target")));
         if (!success) break;
         //System.out.println("success was " + success);

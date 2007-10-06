@@ -83,8 +83,8 @@
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 33FFFE1F0965BC300016AC38 /* Build configuration list for PBXAggregateTarget "Setup" */;
 			buildPhases = (
-				33FFFE1D0965BC050016AC38 /* CopyFiles */,
 				335D3AF30C4EE06F0065B27E /* CopyFiles */,
+				33FFFE1D0965BC050016AC38 /* CopyFiles */,
 				33FF070C0965BF760016AC38 /* CopyFiles */,
 				33FF07130965BFA80016AC38 /* CopyFiles */,
 				336EA3E309FF84FA0052D765 /* CopyFiles */,
@@ -187,11 +187,8 @@
 		335A291F0C8CCC0900D8A7F4 /* PShape.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A29120C8CCC0900D8A7F4 /* PShape.java */; };
 		335A29200C8CCC0900D8A7F4 /* PTriangle.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A29130C8CCC0900D8A7F4 /* PTriangle.java */; };
 		335A29240C8CCC5E00D8A7F4 /* DiscourseFormat.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A29230C8CCC5E00D8A7F4 /* DiscourseFormat.java */; };
-		335D3B010C4EE1B80065B27E /* ATmegaBOOT_168.c in CopyFiles */ = {isa = PBXBuildFile; fileRef = 335D3AFD0C4EE19D0065B27E /* ATmegaBOOT_168.c */; };
-		335D3B020C4EE1B80065B27E /* ATmegaBOOT_168_diecimila.hex in CopyFiles */ = {isa = PBXBuildFile; fileRef = 335D3AFE0C4EE19D0065B27E /* ATmegaBOOT_168_diecimila.hex */; };
-		335D3B030C4EE1B80065B27E /* ATmegaBOOT_168_ng.hex in CopyFiles */ = {isa = PBXBuildFile; fileRef = 335D3AFF0C4EE19D0065B27E /* ATmegaBOOT_168_ng.hex */; };
-		335D3B040C4EE1B80065B27E /* Makefile in CopyFiles */ = {isa = PBXBuildFile; fileRef = 335D3B000C4EE19D0065B27E /* Makefile */; };
 		336EA55B09FF87F60052D765 /* examples in CopyFiles */ = {isa = PBXBuildFile; fileRef = 336EA4DB09FF87E30052D765 /* examples */; };
+		3383C03B0CB7CAF400A8FB57 /* hardware in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3383BF8B0CB7C71200A8FB57 /* hardware */; };
 		338C478A0AA204BE008F2C0D /* FTDIUSBSerialDriver_v2_1_6.dmg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 338C47870AA204B0008F2C0D /* FTDIUSBSerialDriver_v2_1_6.dmg */; };
 		338C478B0AA204BE008F2C0D /* FTDIUSBSerialDriver_v2_2_6_Intel.dmg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 338C47880AA204B0008F2C0D /* FTDIUSBSerialDriver_v2_2_6_Intel.dmg */; };
 		339514EE097AEB5900193C89 /* STDCTokenTypes.txt in Resources */ = {isa = PBXBuildFile; fileRef = 33FFFE420965BD110016AC38 /* STDCTokenTypes.txt */; };
@@ -287,8 +284,6 @@
 		33FF07310965C1E30016AC38 /* tab-unsel-menu.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02860965BD160016AC38 /* tab-unsel-menu.gif */; };
 		33FF07320965C1E30016AC38 /* tab-unsel-mid.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02870965BD160016AC38 /* tab-unsel-mid.gif */; };
 		33FF07330965C1E30016AC38 /* tab-unsel-right.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02880965BD160016AC38 /* tab-unsel-right.gif */; };
-		33FF07360965C2590016AC38 /* ATmegaBOOT.hex in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FFFE790965BD110016AC38 /* ATmegaBOOT.hex */; };
-		33FF07FD0965C3560016AC38 /* targets in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF07D50965C3560016AC38 /* targets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -354,13 +349,10 @@
 		335D3AF30C4EE06F0065B27E /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = bootloader168;
+			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
-				335D3B010C4EE1B80065B27E /* ATmegaBOOT_168.c in CopyFiles */,
-				335D3B020C4EE1B80065B27E /* ATmegaBOOT_168_diecimila.hex in CopyFiles */,
-				335D3B030C4EE1B80065B27E /* ATmegaBOOT_168_ng.hex in CopyFiles */,
-				335D3B040C4EE1B80065B27E /* Makefile in CopyFiles */,
+				3383C03B0CB7CAF400A8FB57 /* hardware in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -392,10 +384,9 @@
 		33FF070C0965BF760016AC38 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = bootloader;
+			dstPath = hardware/bootloaders/atmega8;
 			dstSubfolderSpec = 16;
 			files = (
-				33FF07360965C2590016AC38 /* ATmegaBOOT.hex in CopyFiles */,
 				33FF07100965BF8A0016AC38 /* burn.command in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -417,7 +408,6 @@
 			dstPath = lib;
 			dstSubfolderSpec = 16;
 			files = (
-				33FF07FD0965C3560016AC38 /* targets in CopyFiles */,
 				33FF071F0965C1E30016AC38 /* about.jpg in CopyFiles */,
 				33FF07220965C1E30016AC38 /* buttons.gif in CopyFiles */,
 				33FF07230965C1E30016AC38 /* icon.gif in CopyFiles */,
@@ -468,12 +458,9 @@
 		335A29120C8CCC0900D8A7F4 /* PShape.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = PShape.java; sourceTree = "<group>"; };
 		335A29130C8CCC0900D8A7F4 /* PTriangle.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = PTriangle.java; sourceTree = "<group>"; };
 		335A29230C8CCC5E00D8A7F4 /* DiscourseFormat.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = DiscourseFormat.java; sourceTree = "<group>"; };
-		335D3AFD0C4EE19D0065B27E /* ATmegaBOOT_168.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = ATmegaBOOT_168.c; sourceTree = "<group>"; };
-		335D3AFE0C4EE19D0065B27E /* ATmegaBOOT_168_diecimila.hex */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = ATmegaBOOT_168_diecimila.hex; sourceTree = "<group>"; };
-		335D3AFF0C4EE19D0065B27E /* ATmegaBOOT_168_ng.hex */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = ATmegaBOOT_168_ng.hex; sourceTree = "<group>"; };
-		335D3B000C4EE19D0065B27E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		336EA4DB09FF87E30052D765 /* examples */ = {isa = PBXFileReference; lastKnownFileType = folder; path = examples; sourceTree = "<group>"; };
 		337CD3F309EFC183002B890C /* fetch.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = fetch.sh; sourceTree = "<group>"; };
+		3383BF8B0CB7C71200A8FB57 /* hardware */ = {isa = PBXFileReference; lastKnownFileType = folder; name = hardware; path = ../../hardware; sourceTree = SOURCE_ROOT; };
 		338C47870AA204B0008F2C0D /* FTDIUSBSerialDriver_v2_1_6.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = FTDIUSBSerialDriver_v2_1_6.dmg; sourceTree = "<group>"; };
 		338C47880AA204B0008F2C0D /* FTDIUSBSerialDriver_v2_2_6_Intel.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = FTDIUSBSerialDriver_v2_2_6_Intel.dmg; sourceTree = "<group>"; };
 		33AF620A0965D67800B514A9 /* antlr.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = antlr.jar; sourceTree = "<group>"; };
@@ -508,7 +495,6 @@
 		33FF02B60965BD170016AC38 /* license.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = license.txt; path = ../../license.txt; sourceTree = SOURCE_ROOT; };
 		33FF02B70965BD170016AC38 /* readme.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = readme.txt; path = ../../readme.txt; sourceTree = SOURCE_ROOT; };
 		33FF02DC0965BD170016AC38 /* todo.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; name = todo.txt; path = ../../todo.txt; sourceTree = SOURCE_ROOT; };
-		33FF07D50965C3560016AC38 /* targets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = targets; path = ../../targets; sourceTree = SOURCE_ROOT; };
 		33FFFE240965BD100016AC38 /* Base.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = Base.java; sourceTree = "<group>"; };
 		33FFFE260965BD100016AC38 /* Compiler.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = Compiler.java; sourceTree = "<group>"; };
 		33FFFE270965BD100016AC38 /* Editor.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = Editor.java; sourceTree = "<group>"; };
@@ -585,9 +571,6 @@
 		33FFFE720965BD110016AC38 /* AutoFormat.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = AutoFormat.java; sourceTree = "<group>"; };
 		33FFFE730965BD110016AC38 /* UpdateCheck.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = UpdateCheck.java; sourceTree = "<group>"; };
 		33FFFE740965BD110016AC38 /* Uploader.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = Uploader.java; sourceTree = "<group>"; };
-		33FFFE770965BD110016AC38 /* ATmegaBOOT.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = ATmegaBOOT.c; sourceTree = "<group>"; };
-		33FFFE790965BD110016AC38 /* ATmegaBOOT.hex */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = ATmegaBOOT.hex; sourceTree = "<group>"; };
-		33FFFE7F0965BD110016AC38 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		33FFFE810965BD110016AC38 /* howto.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = howto.txt; sourceTree = "<group>"; };
 		33FFFE930965BD110016AC38 /* .cvsignore */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = .cvsignore; sourceTree = "<group>"; };
 		33FFFE940965BD110016AC38 /* Arduino.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Arduino.xcodeproj; sourceTree = "<group>"; };
@@ -630,18 +613,6 @@
 			);
 			name = core;
 			path = ../../core;
-			sourceTree = SOURCE_ROOT;
-		};
-		335D3AFC0C4EE19D0065B27E /* bootloader168 */ = {
-			isa = PBXGroup;
-			children = (
-				335D3AFD0C4EE19D0065B27E /* ATmegaBOOT_168.c */,
-				335D3AFE0C4EE19D0065B27E /* ATmegaBOOT_168_diecimila.hex */,
-				335D3AFF0C4EE19D0065B27E /* ATmegaBOOT_168_ng.hex */,
-				335D3B000C4EE19D0065B27E /* Makefile */,
-			);
-			name = bootloader168;
-			path = ../../bootloader168;
 			sourceTree = SOURCE_ROOT;
 		};
 		33FF01DA0965BD160016AC38 /* shared */ = {
@@ -716,13 +687,11 @@
 		33FFFD3D0965B1E40016AC38 = {
 			isa = PBXGroup;
 			children = (
-				335A29060C8CCC0800D8A7F4 /* core */,
 				33CF03B009662CA800F2C9A9 /* arduino.icns */,
-				33FF07D50965C3560016AC38 /* targets */,
 				33FFFE220965BD100016AC38 /* app */,
-				33FFFE750965BD110016AC38 /* bootloader */,
-				335D3AFC0C4EE19D0065B27E /* bootloader168 */,
+				335A29060C8CCC0800D8A7F4 /* core */,
 				33FFFE800965BD110016AC38 /* build */,
+				3383BF8B0CB7C71200A8FB57 /* hardware */,
 				33FF02B60965BD170016AC38 /* license.txt */,
 				33FF02B70965BD170016AC38 /* readme.txt */,
 				33FF02DC0965BD170016AC38 /* todo.txt */,
@@ -854,17 +823,6 @@
 			path = tools;
 			sourceTree = "<group>";
 		};
-		33FFFE750965BD110016AC38 /* bootloader */ = {
-			isa = PBXGroup;
-			children = (
-				33FFFE770965BD110016AC38 /* ATmegaBOOT.c */,
-				33FFFE790965BD110016AC38 /* ATmegaBOOT.hex */,
-				33FFFE7F0965BD110016AC38 /* Makefile */,
-			);
-			name = bootloader;
-			path = ../../bootloader;
-			sourceTree = SOURCE_ROOT;
-		};
 		33FFFE800965BD110016AC38 /* build */ = {
 			isa = PBXGroup;
 			children = (
@@ -991,7 +949,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "unzip -od $BUILT_PRODUCTS_DIR dist/tools-ppc.zip\ncp dist/librxtxSerial-ppc.jnilib $BUILT_PRODUCTS_DIR/librxtxSerial.jnilib";
+			shellScript = "unzip -od $BUILT_PRODUCTS_DIR/hardware dist/tools-ppc.zip\ncp dist/librxtxSerial-ppc.jnilib $BUILT_PRODUCTS_DIR/librxtxSerial.jnilib";
 		};
 		3318B11A0AD6CE9F00FE1A05 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1004,7 +962,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "unzip -od $BUILT_PRODUCTS_DIR dist/tools-intel.zip\ncp dist/librxtxSerial-intel.jnilib $BUILT_PRODUCTS_DIR/librxtxSerial.jnilib";
+			shellScript = "unzip -od $BUILT_PRODUCTS_DIR/hardware dist/tools-intel.zip\ncp dist/librxtxSerial-intel.jnilib $BUILT_PRODUCTS_DIR/librxtxSerial.jnilib";
 		};
 		3318B1520AD6D1EB00FE1A05 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;

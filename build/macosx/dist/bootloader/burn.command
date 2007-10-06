@@ -17,7 +17,7 @@
 # parametre
 # 
 
-BINDIR=../tools/avr/bin
+BINDIR=../../tools/avr/bin
 PORT=/dev/tty.USA19QW1b1P1.1
 
 # unlock bootloader segment

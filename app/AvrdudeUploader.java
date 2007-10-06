@@ -131,13 +131,13 @@ public class AvrdudeUploader extends Uploader  {
     // avrdude will have been properly installed by the distribution's package
     // manager and should be able to find its config file.
     if(Base.isMacOS()) {
-      commandDownloader.add("-C" + "tools/avr/etc/avrdude.conf");
+      commandDownloader.add("-C" + "hardware/tools/avr/etc/avrdude.conf");
     }
     else if(Base.isWindows()) {
       String userdir = System.getProperty("user.dir") + File.separator;
-      commandDownloader.add("-C" + userdir + "tools/avr/etc/avrdude.conf");
+      commandDownloader.add("-C" + userdir + "hardware/tools/avr/etc/avrdude.conf");
     } else {
-      commandDownloader.add("-C" + "tools/avrdude.conf");
+      commandDownloader.add("-C" + "hardware/tools/avrdude.conf");
     }
 
     if (Preferences.getBoolean("upload.verbose")) {

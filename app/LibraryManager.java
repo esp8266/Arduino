@@ -45,10 +45,10 @@ public class LibraryManager {
   {
     String userDir = System.getProperty("user.dir") + File.separator;
     libDir = new File(
-      ((!Base.isMacOS()) ? "" : userDir) + "lib" + File.separator +
-      "targets" + File.separator + "libraries");
+      ((!Base.isMacOS()) ? "" : userDir) + "hardware" + File.separator +
+      "libraries");
     target = new Target(
-      System.getProperty("user.dir") + File.separator + "lib" +
+      System.getProperty("user.dir") + File.separator + "hardware" +
       File.separator + "targets", Preferences.get("build.target"));
     refreshLibraries();
   }
