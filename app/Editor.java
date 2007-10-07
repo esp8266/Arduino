@@ -810,66 +810,7 @@ public class Editor extends JFrame
       bootloaderMenu.add(item);
     }
     menu.add(bootloaderMenu);
-    
-//    burnBootloader8Item = new JMenuItem("Burn Bootloader");
-//    burnBootloader8Item.addActionListener(new ActionListener() {
-//        public void actionPerformed(ActionEvent e) {
-//          handleBurnBootloader("atmega8", false);
-//        }
-//      });
-//    menu.add(burnBootloader8Item);
-//    
-//    if (!Base.isMacOS()) {
-//      burnBootloader8ParallelItem =
-//        new JMenuItem("Burn Bootloader (parallel port)");
-//      burnBootloader8ParallelItem.addActionListener(new ActionListener() {
-//          public void actionPerformed(ActionEvent e) {
-//            handleBurnBootloader("atmega8", true);
-//          }
-//        });
-//      menu.add(burnBootloader8ParallelItem);
-//    }
-//    
-//    burnBootloader168DiecimilaItem = new JMenuItem("Burn Diecimila Bootloader");
-//    burnBootloader168DiecimilaItem.addActionListener(new ActionListener() {
-//        public void actionPerformed(ActionEvent e) {
-//          handleBurnBootloader("atmega168-diecimila", false);
-//        }
-//      });
-//    menu.add(burnBootloader168DiecimilaItem);
-//    
-////    if (!Base.isMacOS()) {
-////      burnBootloader168DiecimilaParallelItem =
-////        new JMenuItem("Burn Diecimila Bootloader (parallel port)");
-////      burnBootloader168DiecimilaParallelItem.addActionListener(new ActionListener() {
-////          public void actionPerformed(ActionEvent e) {
-////            handleBurnBootloader("atmega168-diecimila", true);
-////          }
-////        });
-////      menu.add(burnBootloader168DiecimilaParallelItem);
-////    }
-//    
-//    burnBootloader168NGItem = new JMenuItem("Burn NG/Mini Bootloader");
-//    burnBootloader168NGItem.addActionListener(new ActionListener() {
-//        public void actionPerformed(ActionEvent e) {
-//          handleBurnBootloader("atmega168-ng", false);
-//        }
-//      });
-//    menu.add(burnBootloader168NGItem);
-//    
-////    if (!Base.isMacOS()) {
-////      burnBootloader168NGParallelItem =
-////        new JMenuItem("Burn NG/Mini Bootloader (parallel port)");
-////      burnBootloader168NGParallelItem.addActionListener(new ActionListener() {
-////          public void actionPerformed(ActionEvent e) {
-////            handleBurnBootloader("atmega168-ng", true);
-////          }
-////        });
-////      menu.add(burnBootloader168NGParallelItem);
-////    }
-//    
-//    showBootloaderMenuItemsForCurrentMCU();
-    
+        
     menu.addMenuListener(new MenuListener() {
       public void menuCanceled(MenuEvent e) {}
       public void menuDeselected(MenuEvent e) {}
@@ -913,22 +854,6 @@ public class Editor extends JFrame
       // need to push "serial.port" into PdeBase.properties
     }
     */
-  }
-  
-  protected void showBootloaderMenuItemsForCurrentMCU() {
-    boolean onATmega8 =
-      Preferences.get("boards." + Preferences.get("board") + ".build.mcu").equals("atmega8");
-      
-    burnBootloader8Item.setVisible(onATmega8);
-    if (burnBootloader8ParallelItem != null)
-      burnBootloader8ParallelItem.setVisible(onATmega8);
-      
-    burnBootloader168DiecimilaItem.setVisible(!onATmega8);
-    if (burnBootloader168DiecimilaParallelItem != null)
-      burnBootloader168DiecimilaParallelItem.setVisible(!onATmega8);
-    burnBootloader168NGItem.setVisible(!onATmega8);
-    if (burnBootloader168NGParallelItem != null)
-      burnBootloader168NGParallelItem.setVisible(!onATmega8);
   }
   
   class BoardMenuAction extends AbstractAction {
