@@ -36,100 +36,79 @@ public class AvrdudeUploader extends Uploader  {
   public AvrdudeUploader() {
   }
 
+  // XXX: add support for uploading sketches using a programmer
   public boolean uploadUsingPreferences(String buildPath, String className)
-    throws RunnerException {
+  throws RunnerException {
     List commandDownloader = new ArrayList();
-      
-    // avrdude doesn't want to read device signatures (it always gets
-    // 0x000000); force it to continue uploading anyway
-    //commandDownloader.add("-F");
-
     String protocol = Preferences.get("boards." + Preferences.get("board") + ".upload.protocol");
     
     // avrdude wants "stk500v1" to distinguish it from stk500v2
     if (protocol.equals("stk500"))
       protocol = "stk500v1";
     commandDownloader.add("-c" + protocol);
-    if (protocol.equals("dapa")) {
-      // avrdude doesn't need to be told the address of the parallel port
-      //commandDownloader.add("-dlpt=" + Preferences.get("parallel.port"));
-    } else {
-      commandDownloader.add("-P" + (Base.isWindows() ? "\\\\.\\" : "") + Preferences.get("serial.port"));
-      commandDownloader.add(
-        "-b" + Preferences.getInteger("boards." + Preferences.get("board") + ".upload.speed"));
-    }
-    if (Preferences.getBoolean("upload.erase"))
-      commandDownloader.add("-e");
-    else
-      commandDownloader.add("-D");
-    if (!Preferences.getBoolean("upload.verify"))
-      commandDownloader.add("-V");
+    commandDownloader.add("-P" + (Base.isWindows() ? "\\\\.\\" : "") + Preferences.get("serial.port"));
+    commandDownloader.add(
+      "-b" + Preferences.getInteger("boards." + Preferences.get("board") + ".upload.speed"));
+    commandDownloader.add("-D"); // don't erase
     commandDownloader.add("-Uflash:w:" + buildPath + File.separator + className + ".hex:i");
 
     flushSerialBuffer();
 
-    return uisp(commandDownloader);
+    return avrdude(commandDownloader);
   }
-
-  public boolean burnBootloaderAVRISP(String target) throws RunnerException {
-    List commandDownloader = new ArrayList();
-    commandDownloader.add("-c" +
-      Preferences.get("bootloader." + target + ".programmer"));
-
-    if (Preferences.get("bootloader." + target + ".communication").equals("usb")) {
-      commandDownloader.add("-Pusb");
-    } else {
-      commandDownloader.add(
-        "-P" + (Base.isWindows() ?
-          "/dev/" + Preferences.get("serial.port").toLowerCase() :
-          Preferences.get("serial.port")));
+  
+  public boolean burnBootloader(String programmer) throws RunnerException {
+    List params = new ArrayList();
+    params.add("-c" + Preferences.get("programmers." + programmer + ".protocol"));
+    
+    if ("usb".equals(Preferences.get("programmers." + programmer + ".communication"))) {
+      params.add("-Pusb");
+    } else if ("serial".equals(Preferences.get("programmers." + programmer + ".communication"))) {
+      params.add("-P" + (Base.isWindows() ? "\\\\.\\" : "") + Preferences.get("serial.port"));
+      // XXX: add support for specifying the baud rate for serial programmers.
     }
-    commandDownloader.add("-b" + Preferences.get("serial.burn_rate"));
-    return burnBootloader(target, commandDownloader);
+    // XXX: add support for specifying the port address for parallel
+    // programmers, although avrdude has a default that works in most cases.
+    
+    if (Preferences.get("programmers." + programmer + ".delay") != null)
+      params.add("-i" + Preferences.get("programmers." + programmer + ".delay"));
+    
+    return burnBootloader(params);
   }
   
-  public boolean burnBootloaderParallel(String target) throws RunnerException {
-    List commandDownloader = new ArrayList();
-    commandDownloader.add("-dprog=dapa");
-    commandDownloader.add("-dlpt=" + Preferences.get("parallel.port"));
-    return burnBootloader(target, commandDownloader);
+  protected boolean burnBootloader(Collection params)
+  throws RunnerException {
+    List fuses = new ArrayList();
+    fuses.add("-e"); // erase the chip
+    fuses.add("-Ulock:w:" + Preferences.get("boards." + Preferences.get("board") + ".bootloader.unlock_bits") + ":m");
+    if (Preferences.get("boards." + Preferences.get("board") + ".bootloader.extended_fuses") != null)
+      fuses.add("-Uefuse:w:" + Preferences.get("boards." + Preferences.get("board") + ".bootloader.extended_fuses") + ":m");
+    fuses.add("-Uhfuse:w:" + Preferences.get("boards." + Preferences.get("board") + ".bootloader.high_fuses") + ":m");
+    fuses.add("-Ulfuse:w:" + Preferences.get("boards." + Preferences.get("board") + ".bootloader.low_fuses") + ":m");
+
+    if (!avrdude(params, fuses))
+      return false;
+      
+    List bootloader = new ArrayList();
+    bootloader.add("-Uflash:w:" + "hardware" + File.separator + "bootloaders" + File.separator +
+            Preferences.get("boards." + Preferences.get("board") + ".bootloader.path") +
+            File.separator + Preferences.get("boards." + Preferences.get("board") + ".bootloader.file") + ":i");
+    bootloader.add("-Ulock:w:" + Preferences.get("boards." + Preferences.get("board") + ".bootloader.lock_bits") + ":m");
+
+    return avrdude(params, bootloader);
   }
   
-  protected boolean burnBootloader(String target, Collection params)
-    throws RunnerException
-  {
-    return
-      // unlock bootloader segment of flash memory and write fuses
-      uisp(params, Arrays.asList(new String[] {
-        "-e",
-        "-Ulock:w:" + Preferences.get("bootloader." + target + ".unlock_bits") + ":m",
-        "-Uefuse:w:" + Preferences.get("bootloader." + target + ".extended_fuses") + ":m",
-        "-Uhfuse:w:" + Preferences.get("bootloader." + target + ".high_fuses") + ":m",
-        "-Ulfuse:w:" + Preferences.get("bootloader." + target + ".low_fuses") + ":m",
-      })) &&
-      // upload bootloader and lock bootloader segment
-      uisp(params, Arrays.asList(new String[] {
-          "-Uflash:w:" + Preferences.get("bootloader." + target + ".path") +
-            File.separator + Preferences.get("bootloader." + target + ".file") + ":i",
-          "-Ulock:w:" + Preferences.get("bootloader." + target + ".lock_bits") + ":m"
-      }));
-  }
-  
-  public boolean uisp(Collection p1, Collection p2) throws RunnerException {
+  public boolean avrdude(Collection p1, Collection p2) throws RunnerException {
     ArrayList p = new ArrayList(p1);
     p.addAll(p2);
-    return uisp(p);
+    return avrdude(p);
   }
   
-  public boolean uisp(Collection params) throws RunnerException {
+  public boolean avrdude(Collection params) throws RunnerException {
     List commandDownloader = new ArrayList();
     commandDownloader.add("avrdude");
 
-    // On Windows and the Mac, we need to point avrdude at its config file
-    // since it's getting installed in an unexpected location (i.e. a
-    // sub-directory of wherever the user happens to stick Arduino).  On Linux,
-    // avrdude will have been properly installed by the distribution's package
-    // manager and should be able to find its config file.
+    // Point avrdude at its config file since it's in a non-standard location.
     if(Base.isMacOS()) {
       commandDownloader.add("-C" + "hardware/tools/avr/etc/avrdude.conf");
     }
@@ -137,6 +116,8 @@ public class AvrdudeUploader extends Uploader  {
       String userdir = System.getProperty("user.dir") + File.separator;
       commandDownloader.add("-C" + userdir + "hardware/tools/avr/etc/avrdude.conf");
     } else {
+      // ???: is it better to have Linux users install avrdude themselves, in
+      // a way that it can find its own configuration file?
       commandDownloader.add("-C" + "hardware/tools/avrdude.conf");
     }
 

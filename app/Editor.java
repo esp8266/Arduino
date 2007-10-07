@@ -802,64 +802,73 @@ public class Editor extends JFrame
 	  
     menu.addSeparator();
     
-    burnBootloader8Item = new JMenuItem("Burn Bootloader");
-    burnBootloader8Item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          handleBurnBootloader("atmega8", false);
-        }
-      });
-    menu.add(burnBootloader8Item);
-    
-    if (!Base.isMacOS()) {
-      burnBootloader8ParallelItem =
-        new JMenuItem("Burn Bootloader (parallel port)");
-      burnBootloader8ParallelItem.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-            handleBurnBootloader("atmega8", true);
-          }
-        });
-      menu.add(burnBootloader8ParallelItem);
+    JMenu bootloaderMenu = new JMenu("Burn Bootloader");
+    for (Iterator i = Preferences.getSubKeys("programmers"); i.hasNext(); ) {
+      String programmer = (String) i.next();
+      Action action = new BootloaderMenuAction(programmer);
+      item = new JMenuItem(action);
+      bootloaderMenu.add(item);
     }
+    menu.add(bootloaderMenu);
     
-    burnBootloader168DiecimilaItem = new JMenuItem("Burn Diecimila Bootloader");
-    burnBootloader168DiecimilaItem.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          handleBurnBootloader("atmega168-diecimila", false);
-        }
-      });
-    menu.add(burnBootloader168DiecimilaItem);
-    
+//    burnBootloader8Item = new JMenuItem("Burn Bootloader");
+//    burnBootloader8Item.addActionListener(new ActionListener() {
+//        public void actionPerformed(ActionEvent e) {
+//          handleBurnBootloader("atmega8", false);
+//        }
+//      });
+//    menu.add(burnBootloader8Item);
+//    
 //    if (!Base.isMacOS()) {
-//      burnBootloader168DiecimilaParallelItem =
-//        new JMenuItem("Burn Diecimila Bootloader (parallel port)");
-//      burnBootloader168DiecimilaParallelItem.addActionListener(new ActionListener() {
+//      burnBootloader8ParallelItem =
+//        new JMenuItem("Burn Bootloader (parallel port)");
+//      burnBootloader8ParallelItem.addActionListener(new ActionListener() {
 //          public void actionPerformed(ActionEvent e) {
-//            handleBurnBootloader("atmega168-diecimila", true);
+//            handleBurnBootloader("atmega8", true);
 //          }
 //        });
-//      menu.add(burnBootloader168DiecimilaParallelItem);
+//      menu.add(burnBootloader8ParallelItem);
 //    }
-    
-    burnBootloader168NGItem = new JMenuItem("Burn NG/Mini Bootloader");
-    burnBootloader168NGItem.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          handleBurnBootloader("atmega168-ng", false);
-        }
-      });
-    menu.add(burnBootloader168NGItem);
-    
-//    if (!Base.isMacOS()) {
-//      burnBootloader168NGParallelItem =
-//        new JMenuItem("Burn NG/Mini Bootloader (parallel port)");
-//      burnBootloader168NGParallelItem.addActionListener(new ActionListener() {
-//          public void actionPerformed(ActionEvent e) {
-//            handleBurnBootloader("atmega168-ng", true);
-//          }
-//        });
-//      menu.add(burnBootloader168NGParallelItem);
-//    }
-    
-    showBootloaderMenuItemsForCurrentMCU();
+//    
+//    burnBootloader168DiecimilaItem = new JMenuItem("Burn Diecimila Bootloader");
+//    burnBootloader168DiecimilaItem.addActionListener(new ActionListener() {
+//        public void actionPerformed(ActionEvent e) {
+//          handleBurnBootloader("atmega168-diecimila", false);
+//        }
+//      });
+//    menu.add(burnBootloader168DiecimilaItem);
+//    
+////    if (!Base.isMacOS()) {
+////      burnBootloader168DiecimilaParallelItem =
+////        new JMenuItem("Burn Diecimila Bootloader (parallel port)");
+////      burnBootloader168DiecimilaParallelItem.addActionListener(new ActionListener() {
+////          public void actionPerformed(ActionEvent e) {
+////            handleBurnBootloader("atmega168-diecimila", true);
+////          }
+////        });
+////      menu.add(burnBootloader168DiecimilaParallelItem);
+////    }
+//    
+//    burnBootloader168NGItem = new JMenuItem("Burn NG/Mini Bootloader");
+//    burnBootloader168NGItem.addActionListener(new ActionListener() {
+//        public void actionPerformed(ActionEvent e) {
+//          handleBurnBootloader("atmega168-ng", false);
+//        }
+//      });
+//    menu.add(burnBootloader168NGItem);
+//    
+////    if (!Base.isMacOS()) {
+////      burnBootloader168NGParallelItem =
+////        new JMenuItem("Burn NG/Mini Bootloader (parallel port)");
+////      burnBootloader168NGParallelItem.addActionListener(new ActionListener() {
+////          public void actionPerformed(ActionEvent e) {
+////            handleBurnBootloader("atmega168-ng", true);
+////          }
+////        });
+////      menu.add(burnBootloader168NGParallelItem);
+////    }
+//    
+//    showBootloaderMenuItemsForCurrentMCU();
     
     menu.addMenuListener(new MenuListener() {
       public void menuCanceled(MenuEvent e) {}
@@ -940,6 +949,17 @@ public class Editor extends JFrame
         message("Error rebuilding libraries...");
         error(e);
       }
+    }
+  }
+  
+  class BootloaderMenuAction extends AbstractAction {
+    private String programmer;
+    public BootloaderMenuAction(String programmer) {
+      super("w/ " + Preferences.get("programmers." + programmer + ".name"));
+      this.programmer = programmer;
+    }
+    public void actionPerformed(ActionEvent actionevent) {
+      handleBurnBootloader(programmer);
     }
   }
   
@@ -2240,25 +2260,16 @@ public class Editor extends JFrame
     }
   }
 
-
-  protected void handleBurnBootloader(final String target, final boolean parallel) {
+  protected void handleBurnBootloader(final String programmer) {
     if(debugging)
       doStop();
     console.clear();
-    //String what = sketch.isLibrary() ? "Applet" : "Library";
-    //message("Exporting " + what + "...");
     message("Burning bootloader to I/O Board (this may take a minute)...");
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         try {
-          //boolean success = sketch.isLibrary() ?
-          //sketch.exportLibrary() : sketch.exportApplet();
           Uploader uploader = new AvrdudeUploader();
-          boolean success = parallel ? 
-            uploader.burnBootloaderParallel(target) :
-            uploader.burnBootloaderAVRISP(target);
-          
-          if (success) {
+          if (uploader.burnBootloader(programmer)) {
             message("Done burning bootloader.");
           } else {
             // error message will already be visible
@@ -2273,7 +2284,6 @@ public class Editor extends JFrame
         buttons.clear();
       }});
   }
-
 
   public void highlightLine(int lnum) {
     if (lnum < 0) {

@@ -267,7 +267,6 @@
 		33CF03CE09662DC000F2C9A9 /* antlr.jar in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33AF620A0965D67800B514A9 /* antlr.jar */; settings = {JAVA_ARCHIVE_SUBDIR = ../shared/lib; }; };
 		33CF03CF09662DC000F2C9A9 /* registry.jar in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33AF620E0965D67A00B514A9 /* registry.jar */; settings = {JAVA_ARCHIVE_SUBDIR = ../shared/lib; }; };
 		33CF03D009662DC000F2C9A9 /* oro.jar in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33AF620D0965D67900B514A9 /* oro.jar */; settings = {JAVA_ARCHIVE_SUBDIR = ../shared/lib; }; };
-		33F9446D0C2B2F6F0093EB9C /* UispUploader.java in Sources */ = {isa = PBXBuildFile; fileRef = 33F9446B0C2B2F6F0093EB9C /* UispUploader.java */; };
 		33F944E10C2B33560093EB9C /* AvrdudeUploader.java in Sources */ = {isa = PBXBuildFile; fileRef = 33F944E00C2B33560093EB9C /* AvrdudeUploader.java */; };
 		33FF07100965BF8A0016AC38 /* burn.command in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FFFEAF0965BD110016AC38 /* burn.command */; };
 		33FF071F0965C1E30016AC38 /* about.jpg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF01DE0965BD160016AC38 /* about.jpg */; };
@@ -477,7 +476,6 @@
 		33BEE0CD09D7446100430D5B /* Library.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = Library.java; sourceTree = "<group>"; };
 		33CF03B009662CA800F2C9A9 /* arduino.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = arduino.icns; path = dist/arduino.icns; sourceTree = "<group>"; };
 		33DD8FB6096AC8DA0013AF8F /* Arduino.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Arduino.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		33F9446B0C2B2F6F0093EB9C /* UispUploader.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = UispUploader.java; sourceTree = "<group>"; };
 		33F944E00C2B33560093EB9C /* AvrdudeUploader.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = AvrdudeUploader.java; sourceTree = "<group>"; };
 		33FF01DE0965BD160016AC38 /* about.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = about.jpg; sourceTree = "<group>"; };
 		33FF02770965BD160016AC38 /* buttons.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = buttons.gif; sourceTree = "<group>"; };
@@ -706,7 +704,6 @@
 			children = (
 				33055EFE0CB8187600824CD9 /* SerialException.java */,
 				33F944E00C2B33560093EB9C /* AvrdudeUploader.java */,
-				33F9446B0C2B2F6F0093EB9C /* UispUploader.java */,
 				33BEE0CD09D7446100430D5B /* Library.java */,
 				33BEDDB009D6DC1300430D5B /* LibraryManager.java */,
 				33FFFE240965BD100016AC38 /* Base.java */,
@@ -1085,7 +1082,6 @@
 				33BEDDD509D6E8D800430D5B /* Archiver.java in Sources */,
 				33BEDDD609D6E8D800430D5B /* ExportFolder.java in Sources */,
 				33BEE0CE09D7446100430D5B /* Library.java in Sources */,
-				33F9446D0C2B2F6F0093EB9C /* UispUploader.java in Sources */,
 				33F944E10C2B33560093EB9C /* AvrdudeUploader.java in Sources */,
 				335A29140C8CCC0900D8A7F4 /* PApplet.java in Sources */,
 				335A29150C8CCC0900D8A7F4 /* PConstants.java in Sources */,

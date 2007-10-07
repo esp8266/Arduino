@@ -220,6 +220,18 @@ public class Preferences {
                        "Error reading the board definitions file. " +
                        "Please re-download or re-unzip Arduino.\n", ex);
     }
+    
+    try {
+      load(new FileInputStream(new File(
+        System.getProperty("user.dir") +
+        File.separator + "hardware" +
+        File.separator + "programmers.txt")),
+        "programmers");
+    } catch (Exception ex) {
+        Base.showError("Error reading programmers definitions",
+                       "Error reading the programmers definitions file. " +
+                       "Please re-download or re-unzip Arduino.\n", ex);
+    }
   }
 
 

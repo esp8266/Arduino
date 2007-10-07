@@ -10,8 +10,8 @@ atmega8.bootloader.low_fuses=0xdf
 atmega8.bootloader.high_fuses=0xca
 atmega8.bootloader.path=atmega8
 atmega8.bootloader.file=ATmegaBOOT.hex
-atmega8.bootloader.unlock_bits=0xFF
-atmega8.bootloader.lock_bits=0xCF
+atmega8.bootloader.unlock_bits=0x3F
+atmega8.bootloader.lock_bits=0x0F
 
 atmega8.build.mcu=atmega8
 atmega8.build.f_cpu=16000000L
@@ -30,8 +30,8 @@ atmega168.bootloader.high_fuses=0xdd
 atmega168.bootloader.extended_fuses=0x00
 atmega168.bootloader.path=atmega168
 atmega168.bootloader.file=ATmegaBOOT_168_ng.hex
-atmega168.bootloader.unlock_bits=0xFF
-atmega168.bootloader.lock_bits=0xCF
+atmega168.bootloader.unlock_bits=0x3F
+atmega168.bootloader.lock_bits=0x0F
 
 atmega168.build.mcu=atmega168
 atmega168.build.f_cpu=16000000L
@@ -50,8 +50,8 @@ diecimila.bootloader.high_fuses=0xdd
 diecimila.bootloader.extended_fuses=0x00
 diecimila.bootloader.path=atmega168
 diecimila.bootloader.file=ATmegaBOOT_168_diecimila.hex
-diecimila.bootloader.unlock_bits=0xFF
-diecimila.bootloader.lock_bits=0xCF
+diecimila.bootloader.unlock_bits=0x3F
+diecimila.bootloader.lock_bits=0x0F
 
 diecimila.build.mcu=atmega168
 diecimila.build.f_cpu=16000000L
