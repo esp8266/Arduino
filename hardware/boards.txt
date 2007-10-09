@@ -56,3 +56,23 @@ diecimila.bootloader.lock_bits=0x0F
 diecimila.build.mcu=atmega168
 diecimila.build.f_cpu=16000000L
 diecimila.build.core=arduino
+
+##############################################################
+
+lilypad.name=LilyPad Arduino
+
+lilypad.upload.protocol=stk500
+lilypad.upload.maximum_size=14336
+lilypad.upload.speed=19200
+
+lilypad.bootloader.low_fuses=0xe2
+lilypad.bootloader.high_fuses=0xdd
+lilypad.bootloader.extended_fuses=0x00
+lilypad.bootloader.path=lilypad
+lilypad.bootloader.file=LilyPadBOOT_168.hex
+lilypad.bootloader.unlock_bits=0x3F
+lilypad.bootloader.lock_bits=0x0F
+
+lilypad.build.mcu=atmega168
+lilypad.build.f_cpu=8000000L
+lilypad.build.core=arduino

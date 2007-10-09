@@ -46,6 +46,20 @@ Processing and Wiring.
 
 UPDATES
 
+0010
+
+* Printing!
+* Copy for discourse.
+* New and improved keyboard shortcuts.
+* Fixed some find/replace bugs.
+* Better auto-format.
+* Quaqua look-and-feel on Mac OS X.
+* Support for COM10 and higher on Windows.
+* Improved error messages when uploading.
+* Fixed automatic refresh of the Serial Port menu under Windows.
+* New Board menu replaces the Microcontroller menu.
+* Reorganization of the Arduino application directory.
+
 0009 - 2007.08.06
 
 * Added support for the Arduino Diecimila.
