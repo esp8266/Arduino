@@ -950,7 +950,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "unzip -od $BUILT_PRODUCTS_DIR/hardware dist/tools-ppc.zip\ncp dist/librxtxSerial-ppc.jnilib $BUILT_PRODUCTS_DIR/librxtxSerial.jnilib";
+			shellScript = "unzip -od $BUILT_PRODUCTS_DIR/hardware dist/tools-universal.zip\ncp dist/librxtxSerial.jnilib $BUILT_PRODUCTS_DIR/librxtxSerial.jnilib";
 		};
 		3318B11A0AD6CE9F00FE1A05 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -963,7 +963,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "unzip -od $BUILT_PRODUCTS_DIR/hardware dist/tools-intel.zip\ncp dist/librxtxSerial-intel.jnilib $BUILT_PRODUCTS_DIR/librxtxSerial.jnilib";
+			shellScript = "unzip -od $BUILT_PRODUCTS_DIR/hardware dist/tools-universal.zip\ncp dist/librxtxSerial.jnilib $BUILT_PRODUCTS_DIR/librxtxSerial.jnilib";
 		};
 		3318B1520AD6D1EB00FE1A05 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
