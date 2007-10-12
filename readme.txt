@@ -41,23 +41,27 @@ Nicholas Zambetti has contributed from the beginning.
 Yaniv Steiner and Giorgio Olivero have been supporting the project and are
 working at using it with the Instant Soup platform.
 
-Arduino uses the GNU avr-gcc toolchain, uisp, avr-libc, and code from
+Arduino uses the GNU avr-gcc toolchain, avrdude, avr-libc, and code from
 Processing and Wiring.
 
 UPDATES
 
-0010
+0010 - 2007.10.11
 
+* Support for the LilyPad Arduino.
+* Vista support.
+* Mac OS X universal distribution.
 * Printing!
 * Copy for discourse.
+* New Board menu replaces the Microcontroller menu.
+* New Burn Bootloader menu offers a choice of programmers.
 * New and improved keyboard shortcuts.
 * Fixed some find/replace bugs.
 * Better auto-format.
-* Quaqua look-and-feel on Mac OS X.
-* Support for COM10 and higher on Windows.
 * Improved error messages when uploading.
+* Support for COM10 and higher on Windows.
 * Fixed automatic refresh of the Serial Port menu under Windows.
-* New Board menu replaces the Microcontroller menu.
+* Quaqua look-and-feel on Mac OS X.
 * Reorganization of the Arduino application directory.
 
 0009 - 2007.08.06
