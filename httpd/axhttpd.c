@@ -576,11 +576,7 @@ static void ax_chdir(void)
 {
     static char *webroot = CONFIG_HTTP_WEBROOT;
 
-#if defined(WIN32) || !defined(CONFIG_HTTP_USE_CHROOT)
     if (chdir(webroot))
-#else   /* use chroot() instead */
-    if (chroot(webroot))
-#endif
     {
 #ifdef CONFIG_HTTP_VERBOSE
         fprintf(stderr, "'%s' is not a directory\n", webroot);

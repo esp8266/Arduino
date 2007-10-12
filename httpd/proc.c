@@ -916,12 +916,7 @@ static int hexit(char c)
 static void buildactualfile(struct connstruct *cn)
 {
     char *cp;
-
-#ifdef CONFIG_HTTP_USE_CHROOT
-    snprintf(cn->actualfile, MAXREQUESTLENGTH, "%s", cn->filereq);
-#else
     snprintf(cn->actualfile, MAXREQUESTLENGTH, ".%s", cn->filereq);
-#endif
 
 #ifndef WIN32
     /* Add directory slash if not there */
