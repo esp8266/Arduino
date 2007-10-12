@@ -59,7 +59,6 @@ else
   cp dist/ICE_JNIRegistry.dll work/
 
   cp -r ../../hardware work/
-  mkdir work/bootloader
   cp dist/bootloader/*.* work/hardware/bootloaders/atmega8
   mkdir work/drivers
   cp -r dist/drivers/* work/drivers/
