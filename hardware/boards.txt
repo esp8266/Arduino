@@ -19,7 +19,7 @@ atmega8.build.core=arduino
 
 ##############################################################
 
-atmega168.name=Arduino Mini or NG w/ ATmega168
+atmega168.name=Arduino NG or older w/ ATmega168
 
 atmega168.upload.protocol=stk500
 atmega168.upload.maximum_size=14336
@@ -36,6 +36,46 @@ atmega168.bootloader.lock_bits=0x0F
 atmega168.build.mcu=atmega168
 atmega168.build.f_cpu=16000000L
 atmega168.build.core=arduino
+
+##############################################################
+
+mini.name=Arduino Mini
+
+mini.upload.protocol=stk500
+mini.upload.maximum_size=14336
+mini.upload.speed=19200
+
+mini.bootloader.low_fuses=0xff
+mini.bootloader.high_fuses=0xdd
+mini.bootloader.extended_fuses=0x00
+mini.bootloader.path=atmega168
+mini.bootloader.file=ATmegaBOOT_168_ng.hex
+mini.bootloader.unlock_bits=0x3F
+mini.bootloader.lock_bits=0x0F
+
+mini.build.mcu=atmega168
+mini.build.f_cpu=16000000L
+mini.build.core=arduino
+
+##############################################################
+
+bt.name=Arduino BT
+
+bt.upload.protocol=stk500
+bt.upload.maximum_size=14336
+bt.upload.speed=19200
+
+bt.bootloader.low_fuses=0xff
+bt.bootloader.high_fuses=0xdd
+bt.bootloader.extended_fuses=0x00
+bt.bootloader.path=bt
+bt.bootloader.file=ATmegaBOOT_168.hex
+bt.bootloader.unlock_bits=0x3F
+bt.bootloader.lock_bits=0x0F
+
+bt.build.mcu=atmega168
+bt.build.f_cpu=16000000L
+bt.build.core=arduino
 
 ##############################################################
 
