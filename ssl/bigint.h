@@ -19,8 +19,8 @@
 #ifndef BIGINT_HEADER
 #define BIGINT_HEADER
 
-#include "os_port.h"
 #include "crypto.h"
+#include "os_port.h"
 #include "bigint_impl.h"
 
 #ifndef CONFIG_BIGINT_CHECK_ON

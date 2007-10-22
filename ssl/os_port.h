@@ -87,6 +87,7 @@ extern "C" {
 #define strdup(A)               _strdup(A)
 #define chroot(A)               _chdir(A)
 #define chdir(A)                _chdir(A)
+#define alloca(A)                _alloca(A)
 #ifndef lseek
 #define lseek(A,B,C)            _lseek(A,B,C)
 #endif
@@ -164,6 +165,29 @@ EXP_FUNC int STDCALL ax_open(const char *pathname, int flags);
 void exit_now(const char *format, ...) __attribute((noreturn));
 #else
 void exit_now(const char *format, ...);
+#endif
+
+/* Mutexing definitions */
+#if defined(CONFIG_SSL_CTX_MUTEXING)
+#if defined(WIN32)
+#define SSL_CTX_MUTEX_TYPE          HANDLE
+#define SSL_CTX_MUTEX_INIT(A)       A=CreateMutex(0, FALSE, 0)
+#define SSL_CTX_MUTEX_DESTROY(A)    CloseHandle(A)
+#define SSL_CTX_LOCK(A)             WaitForSingleObject(A, INFINITE)
+#define SSL_CTX_UNLOCK(A)           ReleaseMutex(A)
+#else 
+#include <pthread.h>
+#define SSL_CTX_MUTEX_TYPE          pthread_mutex_t
+#define SSL_CTX_MUTEX_INIT(A)       pthread_mutex_init(&A, NULL)
+#define SSL_CTX_MUTEX_DESTROY(A)    pthread_mutex_destroy(&A)
+#define SSL_CTX_LOCK(A)             pthread_mutex_lock(&A)
+#define SSL_CTX_UNLOCK(A)           pthread_mutex_unlock(&A)
+#endif
+#else   /* no mutexing */
+#define SSL_CTX_MUTEX_INIT(A)
+#define SSL_CTX_MUTEX_DESTROY(A)
+#define SSL_CTX_LOCK(A)
+#define SSL_CTX_UNLOCK(A)
 #endif
 
 #ifdef __cplusplus

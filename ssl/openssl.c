@@ -180,10 +180,12 @@ void SSL_CTX_set_options(SSL_CTX *ssl_ctx, int option) {}
 int SSL_library_init(void ) { return 1; }
 void SSL_load_error_strings(void ) {}
 void ERR_print_errors_fp(FILE *fp) {}
+#ifndef CONFIG_SSL_SKELETON_MODE
 long SSL_CTX_get_timeout(const SSL_CTX *ssl_ctx) { 
                             return CONFIG_SSL_EXPIRY_TIME*3600; }
 long SSL_CTX_set_timeout(SSL_CTX *ssl_ctx, long t) { 
                             return SSL_CTX_get_timeout(ssl_ctx); }
+#endif
 void BIO_printf(FILE *f, const char *format, ...)
 {
     va_list(ap);

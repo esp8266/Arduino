@@ -128,11 +128,7 @@ int RSA_decrypt(const RSA_CTX *ctx, const uint8_t *in_data,
     const int byte_size = ctx->num_octets;
     int i, size;
     bigint *decrypted_bi, *dat_bi;
-#ifndef WIN32
-    uint8_t block[byte_size];
-#else
-    uint8_t *block = (uint8_t *)malloc(byte_size);
-#endif
+    uint8_t *block = (uint8_t *)alloca(byte_size);
 
     memset(out_data, 0, byte_size); /* initialise */
 
@@ -169,9 +165,6 @@ int RSA_decrypt(const RSA_CTX *ctx, const uint8_t *in_data,
     if (size > 0)
         memcpy(out_data, &block[i], size);
     
-#ifdef WIN32
-    free(block);
-#endif
     return size ? size : -1;
 }
 
@@ -264,11 +257,7 @@ bigint *RSA_sign_verify(BI_CTX *ctx, const uint8_t *sig, int sig_len,
     int i, size;
     bigint *decrypted_bi, *dat_bi;
     bigint *bir = NULL;
-#ifndef WIN32
-    uint8_t block[sig_len];
-#else
-    uint8_t *block = (uint8_t *)malloc(sig_len);
-#endif
+    uint8_t *block = (uint8_t *)alloca(sig_len);
 
     /* decrypt */
     dat_bi = bi_import(ctx, sig, sig_len);
@@ -295,10 +284,6 @@ bigint *RSA_sign_verify(BI_CTX *ctx, const uint8_t *sig, int sig_len,
             bir = bi_import(ctx, sig_ptr, len);
         }
     }
-
-#ifdef WIN32
-    free(block);
-#endif
 
     /* save a few bytes of memory */
     bi_clear_cache(ctx);

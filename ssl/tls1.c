@@ -307,7 +307,6 @@ EXP_FUNC int STDCALL ssl_read(SSL *ssl, uint8_t **in_data)
  */
 EXP_FUNC int STDCALL ssl_write(SSL *ssl, const uint8_t *out_data, int out_len)
 {
-
     int n = out_len, nw, i, tot = 0;
 
     /* maximum size of a TLS packet is around 16kB, so fragment */
@@ -624,11 +623,7 @@ static void add_hmac_digest(SSL *ssl, int mode, uint8_t *hmac_header,
         const uint8_t *buf, int buf_len, uint8_t *hmac_buf)
 {
     int hmac_len = buf_len + 8 + SSL_RECORD_SIZE;
-#ifndef WIN32
-    uint8_t t_buf[hmac_len+10];
-#else
-    uint8_t *t_buf = (uint8_t *)malloc(hmac_len+10);
-#endif
+    uint8_t *t_buf = (uint8_t *)alloca(hmac_len+10);
 
     memcpy(t_buf, (mode == SSL_SERVER_WRITE || mode == SSL_CLIENT_WRITE) ? 
                     ssl->write_sequence : ssl->read_sequence, 8);
@@ -663,9 +658,6 @@ static void add_hmac_digest(SSL *ssl, int mode, uint8_t *hmac_header,
                 ssl->client_mac, ssl->cipher_info->digest_size);
     }
     print_blob("hmac", hmac_buf, SHA1_SIZE);
-#endif
-#ifdef WIN32
-    free(t_buf);
 #endif
 }
 
@@ -1520,7 +1512,7 @@ void disposable_free(SSL *ssl)
 {
     if (ssl->dc)
     {
-	free(ssl->dc->key_block);
+	    free(ssl->dc->key_block);
         memset(ssl->dc, 0, sizeof(DISPOSABLE_CTX));
         free(ssl->dc);
         ssl->dc = NULL;
