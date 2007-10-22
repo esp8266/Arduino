@@ -49,8 +49,7 @@ fi
 echo Copying shared and core files...
 cp -r ../shared/* work
 rm -rf work/dist
-cp -r ../../targets work/lib
-cp -r ../../bootloader168 work
+cp -r ../../hardware work
 rm work/reference.zip
 
 echo Copying examples...
@@ -60,8 +59,7 @@ cp -r ../shared/dist/examples work/
 echo Copying dist files...
 cp -r dist/lib work/
 #cp -r dist/core work/
-cp -r dist/bootloader work/
-cp -r dist/tools work/
+cp -r dist/tools work/hardware/
 
 ### -- START BUILDING -------------------------------------------
 
@@ -70,14 +68,6 @@ cd ../..
 
 ### -- BUILD GCC ------------------------------------------------
 # in the future we will build avr-gcc and tools (if they don't exist)
-
-### -- COPY BOOTLOADER  -----------------------------------------
-cd bootloader
-# don't make the bootloader, since it rarely changes and requires
-# installation of make.
-# make
-cp ATmegaBOOT.hex ../build/linux/work/bootloader
-cd ..
 
 ### -- BUILD PARSER ---------------------------------------------
 
@@ -105,7 +95,7 @@ echo Building the PDE...
 # show the user an error, rather than crapping out with some strange
 # "class not found" crap
 #jikes -classpath ../build/linux/work/classes:../build/linux/work/lib/antlr.jar:../build/linux/work/lib/oro.jar:../build/linux/work/lib/registry.jar:../build/linux/work/lib/RXTXcomm.jar:../build/linux/work/lib/mrj.jar:$CLASSPATH -d ../build/linux/work/classes tools/*.java preproc/*.java syntax/*.java *.java 
-javac -source 1.4 -target 1.4 -classpath ../build/linux/work/class:../build/linux/work/lib/antlr.jar:../build/linux/work/lib/oro.jar:../build/linux/work/lib/registry.jar:../build/linux/work/lib/RXTXcomm.jar:../build/linux/work/lib/mrj.jar:$CLASSPATH -d ../build/linux/work/classes tools/*.java preproc/*.java syntax/*java *.java
+javac -source 1.4 -target 1.4 -classpath ../build/linux/work/class:../build/linux/work/lib/antlr.jar:../build/linux/work/lib/oro.jar:../build/linux/work/lib/registry.jar:../build/linux/work/lib/RXTXcomm.jar:../build/linux/work/lib/mrj.jar:$CLASSPATH -d ../build/linux/work/classes ../core/*.java tools/*.java preproc/*.java syntax/*java *.java
 
 cd ../build/linux/work/classes
 rm -f ../lib/pde.jar
