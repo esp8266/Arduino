@@ -106,7 +106,7 @@ public abstract class Uploader implements MessageConsumer  {
         avrBasePath = new String("hardware/tools/avr/bin/"); 
       }
       else if(Base.isLinux()) {
-        avrBasePath = new String("");     	
+        avrBasePath = new String("hardware/tools/");     	
       }
       else {
         avrBasePath = new String(userdir + "hardware/tools/avr/bin/"); 
