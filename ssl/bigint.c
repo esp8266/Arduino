@@ -55,6 +55,11 @@
 #include <time.h>
 #include "bigint.h"
 
+#define V1      v->comps[v->size-1]                 /**< v1 for division */
+#define V2      v->comps[v->size-2]                 /**< v2 for division */
+#define U(j)    tmp_u->comps[tmp_u->size-j-1]       /**< uj for division */
+#define Q(j)    quotient->comps[quotient->size-j-1] /**< qj for division */
+
 static bigint *bi_int_multiply(BI_CTX *ctx, bigint *bi, comp i);
 static bigint *bi_int_divide(BI_CTX *ctx, bigint *biR, comp denom);
 static bigint *alloc(BI_CTX *ctx, int size);
@@ -68,7 +73,10 @@ static bigint *comp_left_shift(bigint *biR, int num_shifts);
 
 #ifdef CONFIG_BIGINT_CHECK_ON
 static void check(const bigint *bi);
+#else
+#define check(A)                /**< disappears in normal production mode */
 #endif
+
 
 /**
  * @brief Start a new bigint context.

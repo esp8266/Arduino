@@ -75,7 +75,9 @@ win32_demo:
 install: $(PREFIX) all
 	cp --no-dereference $(STAGE)/libax* $(PREFIX)/lib
 	chmod 755 $(PREFIX)/lib/libax* 
+ifdef CONFIG_SAMPLES
 	install -m 755 $(STAGE)/ax* $(PREFIX)/bin 
+endif
 ifdef CONFIG_HTTP_HAS_AUTHORIZATION
 	install -m 755 $(STAGE)/htpasswd $(PREFIX)/bin 
 endif

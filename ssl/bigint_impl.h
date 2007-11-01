@@ -97,9 +97,4 @@ typedef struct /**< A big integer "session" context. */
 
 #define PERMANENT           0x7FFF55AA  /**< A magic number for permanents. */
 
-#define V1      v->comps[v->size-1]                 /**< v1 for division */
-#define V2      v->comps[v->size-2]                 /**< v2 for division */
-#define U(j)    tmp_u->comps[tmp_u->size-j-1]       /**< uj for division */
-#define Q(j)    quotient->comps[quotient->size-j-1] /**< qj for division */
-
 #endif

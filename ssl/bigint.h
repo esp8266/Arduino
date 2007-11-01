@@ -23,9 +23,6 @@
 #include "os_port.h"
 #include "bigint_impl.h"
 
-#ifndef CONFIG_BIGINT_CHECK_ON
-#define check(A)                /**< disappears in normal production mode */
-#endif
 BI_CTX *bi_initialize(void);
 void bi_terminate(BI_CTX *ctx);
 void bi_permanent(bigint *bi);
