@@ -1,3 +1,6 @@
+#include <Sprite.h>
+#include <Matrix.h>
+
 // Sprite Animation
 // by Nicholas Zambetti <http://www.zambetti.com>
 

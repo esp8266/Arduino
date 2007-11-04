@@ -1,3 +1,5 @@
+#include <Matrix.h>
+
 // Hello Matrix
 // by Nicholas Zambetti <http://www.zambetti.com>
 
