@@ -29,8 +29,6 @@
  */
 
 /**
- * @file asn1.c
- * 
  * Some primitive asn methods for extraction ASN.1 data.
  */
 
@@ -61,7 +59,7 @@ int get_asn1_length(const uint8_t *buf, int *offset)
     {
         len = buf[(*offset)++];
     }
-    else    /* long form */
+    else  /* long form */
     {
         int length_bytes = buf[(*offset)++]&0x7f;
         len = 0;

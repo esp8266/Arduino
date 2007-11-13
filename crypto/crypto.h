@@ -41,6 +41,8 @@ extern "C" {
 
 #include "config.h"
 #include "os_port.h"
+#include "bigint_impl.h"
+#include "bigint.h"
 
 /* enable features based on a 'super-set' capbaility. */
 #if defined(CONFIG_SSL_FULL_MODE) 
@@ -157,7 +159,61 @@ void hmac_md5(const uint8_t *msg, int length, const uint8_t *key,
 void hmac_sha1(const uint8_t *msg, int length, const uint8_t *key, 
         int key_len, uint8_t *digest);
 
+/**************************************************************************
+ * RSA declarations 
+ **************************************************************************/
 
+typedef struct 
+{
+    bigint *m;              /* modulus */
+    bigint *e;              /* public exponent */
+    bigint *d;              /* private exponent */
+#ifdef CONFIG_BIGINT_CRT
+    bigint *p;              /* p as in m = pq */
+    bigint *q;              /* q as in m = pq */
+    bigint *dP;             /* d mod (p-1) */
+    bigint *dQ;             /* d mod (q-1) */
+    bigint *qInv;           /* q^-1 mod p */
+#endif
+    int num_octets;
+    BI_CTX *bi_ctx;
+} RSA_CTX;
+
+void RSA_priv_key_new(RSA_CTX **rsa_ctx, 
+        const uint8_t *modulus, int mod_len,
+        const uint8_t *pub_exp, int pub_len,
+        const uint8_t *priv_exp, int priv_len
+#ifdef CONFIG_BIGINT_CRT
+      , const uint8_t *p, int p_len,
+        const uint8_t *q, int q_len,
+        const uint8_t *dP, int dP_len,
+        const uint8_t *dQ, int dQ_len,
+        const uint8_t *qInv, int qInv_len
+#endif
+        );
+void RSA_pub_key_new(RSA_CTX **rsa_ctx, 
+        const uint8_t *modulus, int mod_len,
+        const uint8_t *pub_exp, int pub_len);
+void RSA_free(RSA_CTX *ctx);
+int RSA_decrypt(const RSA_CTX *ctx, const uint8_t *in_data, uint8_t *out_data,
+        int is_decryption);
+bigint *RSA_private(const RSA_CTX *c, bigint *bi_msg);
+#ifdef CONFIG_SSL_CERT_VERIFICATION
+bigint *RSA_sign_verify(BI_CTX *ctx, const uint8_t *sig, int sig_len,
+        bigint *modulus, bigint *pub_exp);
+bigint *RSA_public(const RSA_CTX * c, bigint *bi_msg);
+int RSA_encrypt(const RSA_CTX *ctx, const uint8_t *in_data, uint16_t in_len, 
+        uint8_t *out_data, int is_signing);
+void RSA_print(const RSA_CTX *ctx);
+#endif
+
+/**************************************************************************
+ * RNG declarations 
+ **************************************************************************/
+EXP_FUNC void STDCALL RNG_initialize(const uint8_t *seed_buf, int size);
+EXP_FUNC void STDCALL RNG_terminate(void);
+EXP_FUNC void STDCALL get_random(int num_rand_bytes, uint8_t *rand_data);
+void get_random_NZ(int num_rand_bytes, uint8_t *rand_data);
 
 #ifdef __cplusplus
 }

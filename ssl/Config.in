@@ -251,6 +251,13 @@ config CONFIG_OPENSSL_COMPATIBLE
         Note: not all the API is implemented, so parts may still break. And
         it's definitely not 100% compatible.
 
+config CONFIG_GEN_CERTIFICATES
+    bool "Enable the generation of certificates"
+    default n
+    depends on CONFIG_SSL_CERT_VERIFICATION
+    help 
+        A primitive self-signed certificate generator.
+
 config CONFIG_PERFORMANCE_TESTING
     bool "Build the bigint performance test tool"
     default n

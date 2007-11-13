@@ -32,8 +32,6 @@
 #define BIGINT_HEADER
 
 #include "crypto.h"
-#include "os_port.h"
-#include "bigint_impl.h"
 
 BI_CTX *bi_initialize(void);
 void bi_terminate(BI_CTX *ctx);

@@ -206,6 +206,48 @@ void x509_free(X509_CTX *x509_ctx)
 
 #ifdef CONFIG_SSL_CERT_VERIFICATION
 /**
+ * Take a signature and decrypt it.
+ */
+static bigint *sig_verify(BI_CTX *ctx, const uint8_t *sig, int sig_len,
+        bigint *modulus, bigint *pub_exp)
+{
+    int i, size;
+    bigint *decrypted_bi, *dat_bi;
+    bigint *bir = NULL;
+    uint8_t *block = (uint8_t *)alloca(sig_len);
+
+    /* decrypt */
+    dat_bi = bi_import(ctx, sig, sig_len);
+    ctx->mod_offset = BIGINT_M_OFFSET;
+
+    /* convert to a normal block */
+    decrypted_bi = bi_mod_power2(ctx, dat_bi, modulus, pub_exp);
+
+    bi_export(ctx, decrypted_bi, block, sig_len);
+    ctx->mod_offset = BIGINT_M_OFFSET;
+
+    i = 10; /* start at the first possible non-padded byte */
+    while (block[i++] && i < sig_len);
+    size = sig_len - i;
+
+    /* get only the bit we want */
+    if (size > 0)
+    {
+        int len;
+        const uint8_t *sig_ptr = x509_get_signature(&block[i], &len);
+
+        if (sig_ptr)
+        {
+            bir = bi_import(ctx, sig_ptr, len);
+        }
+    }
+
+    /* save a few bytes of memory */
+    bi_clear_cache(ctx);
+    return bir;
+}
+
+/**
  * Do some basic checks on the certificate chain.
  *
  * Certificate verification consists of a number of checks:
@@ -296,7 +338,7 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert)
     ctx = cert->rsa_ctx->bi_ctx;
     mod = next_cert->rsa_ctx->m;
     expn = next_cert->rsa_ctx->e;
-    cert_sig = RSA_sign_verify(ctx, cert->signature, cert->sig_len, 
+    cert_sig = sig_verify(ctx, cert->signature, cert->sig_len, 
             bi_clone(ctx, mod), bi_clone(ctx, expn));
 
     if (cert_sig)

@@ -48,8 +48,10 @@ BASETARGET=libaxtls.so
 CRYPTO_PATH=$(AXTLS_HOME)/crypto/
 ifdef CONFIG_PLATFORM_CYGWIN
 TARGET2=$(AXTLS_HOME)/$(STAGE)/libaxtls.dll.a
+TARGET3=$(AXTLS_HOME)/$(STAGE)/gen_cert.exe
 else
 TARGET2=$(AXTLS_HOME)/$(STAGE)/$(LIBMINOR)
+TARGET3=$(AXTLS_HOME)/$(STAGE)/gen_cert
 endif
 
 # shared library major/minor numbers
@@ -62,26 +64,26 @@ STATIC_LIB=$(AXTLS_HOME)/$(STAGE)/axtls.static.lib
 CRYPTO_PATH=$(AXTLS_HOME)\\crypto\\
 endif
 
-libs: $(TARGET1) $(TARGET2)
+libs: $(TARGET1) $(TARGET2) $(TARGET3)
 
 CRYPTO_OBJ=\
 	$(CRYPTO_PATH)aes.o \
+	$(CRYPTO_PATH)bigint.o \
+	$(CRYPTO_PATH)crypto_misc.o \
 	$(CRYPTO_PATH)hmac.o \
 	$(CRYPTO_PATH)md2.o \
 	$(CRYPTO_PATH)md5.o \
 	$(CRYPTO_PATH)rc4.o \
+	$(CRYPTO_PATH)rsa.o \
 	$(CRYPTO_PATH)sha1.o
 
 OBJ=\
 	asn1.o \
 	x509.o \
-	bigint.o \
-	crypto_misc.o \
 	os_port.o \
 	loader.o \
 	openssl.o \
 	p12.o \
-	rsa.o \
 	tls1.o \
 	tls1_svr.o \
 	tls1_clnt.o
@@ -103,6 +105,9 @@ else
     -Wl,--export-all-symbols \
     -Wl,--enable-auto-import $(CRYPTO_OBJ) $(OBJ)
 endif
+
+$(TARGET3): gen_cert.o
+	$(LD) $(LDFLAGS) -o $@ $< -L$(AXTLS_HOME)/$(STAGE) -laxtls 
 
 else  # Win32
 CRYPTO_OBJ:=$(CRYPTO_OBJ:.o=.obj)
