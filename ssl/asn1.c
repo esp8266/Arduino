@@ -113,6 +113,15 @@ int asn1_get_int(const uint8_t *buf, int *offset, uint8_t **object)
         goto end_int_array;
 
     *object = (uint8_t *)malloc(len);
+    /* TODO */
+#if 0
+    if (*object == 0x00)    /* ignore the negative byte */
+    {
+        len--;
+        (*object)++;
+    }
+#endif
+
     memcpy(*object, &buf[*offset], len);
     *offset += len;
 
@@ -349,7 +358,7 @@ int asn1_public_key(const uint8_t *cert, int *offset, X509_CTX *x509_ctx)
             asn1_next_obj(cert, offset, ASN1_BIT_STRING) < 0)
         goto end_pub_key;
 
-    (*offset)++;
+    (*offset)++;        /* ignore the padding bit field */
 
     if (asn1_next_obj(cert, offset, ASN1_SEQUENCE) < 0)
         goto end_pub_key;
@@ -378,7 +387,8 @@ int asn1_signature(const uint8_t *cert, int *offset, X509_CTX *x509_ctx)
     if (cert[(*offset)++] != ASN1_BIT_STRING)
         goto end_sig;
 
-    x509_ctx->sig_len = get_asn1_length(cert, offset);
+    x509_ctx->sig_len = get_asn1_length(cert, offset)-1;
+    (*offset)++;            /* ignore bit string padding bits */
     x509_ctx->signature = (uint8_t *)malloc(x509_ctx->sig_len);
     memcpy(x509_ctx->signature, &cert[*offset], x509_ctx->sig_len);
     *offset += x509_ctx->sig_len;

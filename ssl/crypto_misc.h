@@ -96,7 +96,6 @@ int x509_new(const uint8_t *cert, int *len, X509_CTX **ctx);
 void x509_free(X509_CTX *x509_ctx);
 #ifdef CONFIG_SSL_CERT_VERIFICATION
 int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert);
-const uint8_t *x509_get_signature(const uint8_t *asn1_signature, int *len);
 #endif
 #ifdef CONFIG_SSL_FULL_MODE
 void x509_print(CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert);

@@ -51,9 +51,22 @@ static const uint8_t rsa_enc_oid[] =
     0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01
 };
 
+/* INTEGER 65537 */
 static const uint8_t pub_key_seq[] = 
 {
     0x02, 0x03, 0x01, 0x00, 0x01
+};
+
+/* 0x00 + SEQUENCE {
+     SEQUENCE {
+       OBJECT IDENTIFIER sha1 (1 3 14 3 2 26)
+       NULL
+       }
+     OCTET STRING */
+static const uint8_t asn1_sig[] = 
+{
+    0x30,  0x21, 0x30, 0x09, 0x06, 0x05, 0x2b, 0x0e, 0x03, 0x02,
+    0x1a, 0x05, 0x00, 0x04, 0x14 
 };
 
 static uint8_t set_gen_length(int len, uint8_t *buf, int *offset)
@@ -133,15 +146,16 @@ static void gen_signature_alg(uint8_t *buf, int *offset)
     buf[(*offset)++] = 0;
 }
 
-static void gen_dn(const char *name, uint8_t dn_type, 
+static int gen_dn(const char *name, uint8_t dn_type, 
                         uint8_t *buf, int *offset)
 {
+    int ret = X509_OK;
     int name_size = strlen(name);
 
     if (name_size > 0x70)    /* just too big */
     {
-        printf(unsupported_str);
-        return;
+        ret = X509_NOT_OK;
+        goto error;
     }
 
     buf[(*offset)++] = ASN1_SET;
@@ -157,25 +171,45 @@ static void gen_dn(const char *name, uint8_t dn_type,
     buf[(*offset)++] = name_size;
     strcpy(&buf[*offset], name);
     *offset += name_size;
+
+error:
+    return ret;
 }
 
-static void gen_issuer(const char *cn, const char *o, const char *ou,
+static int gen_issuer(const char *cn, const char *o, const char *ou,
                     uint8_t *buf, int *offset)
 {
+    int ret = X509_OK;
     int seq_offset;
     int seq_size = pre_adjust_with_size(
                             ASN1_SEQUENCE, &seq_offset, buf, offset);
 
-    if (cn != NULL)
-        gen_dn(cn, 3, buf, offset);
+    /* we need the common name at a minimum */
+    if (cn == NULL)
+    {
+        ret = X509_NOT_OK;
+        goto error;
+    }
+
+    if ((ret = gen_dn(cn, 3, buf, offset)))
+            goto error;
 
     if (o != NULL)
-        gen_dn(o, 10, buf, offset);
+    {
+        if ((ret = gen_dn(o, 10, buf, offset)))
+            goto error;
+    }
 
     if (ou != NULL)
-        gen_dn(o, 11, buf, offset);
+    {
+        if ((ret = gen_dn(o, 11, buf, offset)))
+            goto error;
+    }
 
     adjust_with_size(seq_size, seq_offset, buf, offset);
+
+error:
+    return ret;
 }
 
 static void gen_utc_time(uint8_t *buf, int *offset)
@@ -206,32 +240,39 @@ static void gen_utc_time(uint8_t *buf, int *offset)
     *offset += 15;
 }
 
-static void gen_pub_key2(const uint8_t *key, int key_size,
-                                uint8_t *buf, int *offset)
+static void gen_pub_key2(const RSA_CTX *rsa_ctx, uint8_t *buf, int *offset)
 {
     int seq_offset;
+    int pub_key_size = rsa_ctx->num_octets;
+    uint8_t *block = (uint8_t *)alloca(pub_key_size);
     int seq_size = pre_adjust_with_size(
                             ASN1_SEQUENCE, &seq_offset, buf, offset);
     buf[(*offset)++] = ASN1_INTEGER;
-    buf[(*offset)++] = key_size;
-    memcpy(&buf[*offset], key, key_size);
-    *offset += key_size;
+    bi_export(rsa_ctx->bi_ctx, rsa_ctx->m, block, pub_key_size);
+    if (*block & 0x80)  /* make integer positive */
+    {
+        set_gen_length(pub_key_size+1, buf, offset);
+        buf[(*offset)++] = 0;
+    }
+    else
+        set_gen_length(pub_key_size, buf, offset);
+
+    memcpy(&buf[*offset], block, pub_key_size);
+    *offset += pub_key_size;
     adjust_with_size(seq_size, seq_offset, buf, offset);
 }
 
-static void gen_pub_key1(const uint8_t *key, int key_size,
-                                uint8_t *buf, int *offset)
+static void gen_pub_key1(const RSA_CTX *rsa_ctx, uint8_t *buf, int *offset)
 {
     int seq_offset;
     int seq_size = pre_adjust_with_size(
                             ASN1_BIT_STRING, &seq_offset, buf, offset);
     buf[(*offset)++] = 0;   /* bit string is multiple of 8 */
-    gen_pub_key2(key, key_size, buf, offset);
+    gen_pub_key2(rsa_ctx, buf, offset);
     adjust_with_size(seq_size, seq_offset, buf, offset);
 }
 
-static void gen_pub_key(const uint8_t *key, int key_size,
-                                uint8_t *buf, int *offset)
+static void gen_pub_key(const RSA_CTX *rsa_ctx, uint8_t *buf, int *offset)
 {
     int seq_offset;
     int seq_size = pre_adjust_with_size(
@@ -245,71 +286,113 @@ static void gen_pub_key(const uint8_t *key, int key_size,
     *offset += sizeof(rsa_enc_oid);
     buf[(*offset)++] = ASN1_NULL;
     buf[(*offset)++] = 0;
-    gen_pub_key1(key, key_size, buf, offset);
+    gen_pub_key1(rsa_ctx, buf, offset);
     memcpy(&buf[*offset], pub_key_seq, sizeof(pub_key_seq));
     *offset += sizeof(pub_key_seq);
     adjust_with_size(seq_size, seq_offset, buf, offset);
 }
 
-static void gen_signature(const uint8_t *sig, int sig_size,
-                                uint8_t *buf, int *offset)
+static void gen_signature(const RSA_CTX *rsa_ctx, const uint8_t *sha_dgst, 
+                        uint8_t *buf, int *offset)
 {
+    uint8_t *enc_block = (uint8_t *)alloca(rsa_ctx->num_octets);
+    uint8_t *block = (uint8_t *)alloca(sizeof(asn1_sig) + SHA1_SIZE);
+    int sig_size;
+
+    /* add the digest as an embedded asn.1 sequence */
+    memcpy(block, asn1_sig, sizeof(asn1_sig));
+    memcpy(&block[sizeof(asn1_sig)], sha_dgst, SHA1_SIZE);
+
+    sig_size = RSA_encrypt(rsa_ctx, block, 
+                            sizeof(asn1_sig) + SHA1_SIZE, enc_block, 1);
+
     buf[(*offset)++] = ASN1_BIT_STRING;
     set_gen_length(sig_size+1, buf, offset);
     buf[(*offset)++] = 0;   /* bit string is multiple of 8 */
-    memcpy(&buf[*offset], sig, sig_size);
+    memcpy(&buf[*offset], enc_block, sig_size);
     *offset += sig_size;
 }
 
-static void gen_tbs_cert(const char *cn, const char *o, const char *ou,
-                    const uint8_t *key, int key_size, uint8_t *buf, int *offset)
+static int gen_tbs_cert(const char *cn, const char *o, const char *ou,
+                    const RSA_CTX *rsa_ctx, uint8_t *buf, int *offset,
+                    uint8_t *sha_dgst)
 {
+    int ret = X509_OK;
+    SHA1_CTX sha_ctx;
     int seq_offset;
     int seq_size = pre_adjust_with_size(
-                            ASN1_SEQUENCE, &seq_offset, buf, offset);
+                        ASN1_SEQUENCE, &seq_offset, buf, offset);
+    int begin_tbs = *offset;
+
     gen_serial_number(buf, offset);
     gen_signature_alg(buf, offset);
-    gen_issuer(cn, o, ou, buf, offset);
+    if ((ret = gen_issuer(cn, o, ou, buf, offset)))
+        goto error;
+
     gen_utc_time(buf, offset);
-    gen_issuer(cn, o, ou, buf, offset);
-    gen_pub_key(key, key_size, buf, offset);
+    if ((ret = gen_issuer(cn, o, ou, buf, offset)))
+        goto error;
+
+    gen_pub_key(rsa_ctx, buf, offset);
+
+    SHA1_Init(&sha_ctx);
+    SHA1_Update(&sha_ctx, &buf[begin_tbs], *offset-begin_tbs);
+    SHA1_Final(sha_dgst, &sha_ctx);
     adjust_with_size(seq_size, seq_offset, buf, offset);
+
+error:
+    return ret;
 }
 
 int gen_cert(const char *cn, const char *o, const char *ou,
-                    const uint8_t *key, int key_size, uint8_t *buf)
+                    const RSA_CTX *rsa_ctx, uint8_t *buf, int *cert_size)
 {
+    int ret = X509_OK;
     int offset = 0;
     int seq_offset;
+    uint8_t sha_dgst[SHA1_SIZE];
     int seq_size = pre_adjust_with_size(
                             ASN1_SEQUENCE, &seq_offset, buf, &offset);
-    uint8_t sig[128];
-    memset(sig, 0, sizeof(sig));
 
-    gen_tbs_cert(cn, o, ou, key, key_size, buf, &offset);
+    if ((ret = gen_tbs_cert(cn, o, ou, rsa_ctx, buf, &offset, sha_dgst)))
+        goto error;
+
     gen_signature_alg(buf, &offset);
-    gen_signature(sig, sizeof(sig), buf, &offset);
+    gen_signature(rsa_ctx, sha_dgst, buf, &offset);
 
     adjust_with_size(seq_size, seq_offset, buf, &offset);
-    print_blob("GA", buf, offset);
-    return offset;     /* the size of the certificate */
+    *cert_size = offset;
+error:
+    return ret;
 }
 
 int main(int argc, char *argv[])
 {
-    uint8_t key[16];
+    int ret = X509_OK;
+    uint8_t *key_buf = NULL;
+    RSA_CTX *rsa_ctx = NULL;
     uint8_t buf[2048];
-    int offset = 0;
-    memset(key, 0, sizeof(key));
-    memset(buf, 0, sizeof(buf));
+    int cert_size;
+    FILE *f;
 
-    //gen_tbs_cert("abc", "def", "ghi", key, sizeof(key), buf, &offset);
-    offset = gen_cert("abc", "def", "ghi", "blah", 5, buf);
-    FILE *f = fopen("blah.dat", "w");
-    fwrite(buf, offset, 1, f);
+    int len = get_file("../ssl/test/axTLS.key_512", &key_buf);
+    if ((ret = asn1_get_private_key(key_buf, len, &rsa_ctx)))
+        goto error;
+
+    if ((ret = gen_cert("abc", "def", "ghi", rsa_ctx, buf, &cert_size)))
+        goto error;
+
+    f = fopen("blah.dat", "w");
+    fwrite(buf, cert_size, 1, f);
     fclose(f);
+error:
+    free(key_buf);
+    RSA_free(rsa_ctx);
 
-    return 0;
+    if (ret)
+        printf("Some cert generation issue\n");
+
+    return ret;
 }
 
 #endif

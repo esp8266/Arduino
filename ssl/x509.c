@@ -45,7 +45,7 @@
 /**
  * Retrieve the signature from a certificate.
  */
-const uint8_t *x509_get_signature(const uint8_t *asn1_sig, int *len)
+static const uint8_t *get_signature(const uint8_t *asn1_sig, int *len)
 {
     int offset = 0;
     const uint8_t *ptr = NULL;
@@ -224,6 +224,7 @@ static bigint *sig_verify(BI_CTX *ctx, const uint8_t *sig, int sig_len,
     decrypted_bi = bi_mod_power2(ctx, dat_bi, modulus, pub_exp);
 
     bi_export(ctx, decrypted_bi, block, sig_len);
+    print_blob("SIGNATURE", block, sig_len);
     ctx->mod_offset = BIGINT_M_OFFSET;
 
     i = 10; /* start at the first possible non-padded byte */
@@ -233,8 +234,11 @@ static bigint *sig_verify(BI_CTX *ctx, const uint8_t *sig, int sig_len,
     /* get only the bit we want */
     if (size > 0)
     {
+        FILE *f = fopen("blah.dat", "w");
+        fwrite(&block[i], sig_len-i, 1, f);
+        fclose(f);
         int len;
-        const uint8_t *sig_ptr = x509_get_signature(&block[i], &len);
+        const uint8_t *sig_ptr = get_signature(&block[i], &len);
 
         if (sig_ptr)
         {
