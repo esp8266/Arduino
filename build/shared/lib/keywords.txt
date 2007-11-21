@@ -165,5 +165,6 @@ printBinary	KEYWORD2
 printNewline	KEYWORD2
 pulseIn	KEYWORD2
 shiftOut	KEYWORD2
+map	KEYWORD2
 random	KEYWORD2
 randomSeed	KEYWORD2

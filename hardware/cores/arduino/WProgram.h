@@ -10,8 +10,9 @@
 #ifdef __cplusplus
 #include "HardwareSerial.h"
 
-// random prototypes
+// WMath prototypes
 long random(long);
 long random(long, long);
 void randomSeed(unsigned int);
+long map(long, long, long, long, long);
 #endif
