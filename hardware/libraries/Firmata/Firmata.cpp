@@ -27,9 +27,13 @@ extern "C" {
   #include <inttypes.h>
   #include <stdlib.h>
 
+  // use the abs in WConstants.h, not the one in stdlib.h
+  #undef abs
+  
   // Wiring Core Includes
   #include "WConstants.h"
 }
+
 
 #include "Firmata.h"
 #include "EEPROM.h"
@@ -66,6 +70,7 @@ void FirmataClass::systemReset(void)
 // output type of message that is next on the queue
 int FirmataClass::available(void)
 {
+	return -1;
 	// TODO output next available message type, or -1 if nothing
 }
 
