@@ -80,6 +80,10 @@ void RSA_pub_key_new(RSA_CTX **ctx,
 {
     RSA_CTX *rsa_ctx;
     BI_CTX *bi_ctx = bi_initialize();
+
+    if (*ctx)   /* if we load multiple certs, dump the old one */
+        RSA_free(*ctx);
+
     *ctx = (RSA_CTX *)calloc(1, sizeof(RSA_CTX));
     rsa_ctx = *ctx;
     rsa_ctx->bi_ctx = bi_ctx;
@@ -211,7 +215,7 @@ void RSA_print(const RSA_CTX *rsa_ctx)
 }
 #endif
 
-#ifdef CONFIG_SSL_CERT_VERIFICATION
+#if defined(CONFIG_SSL_CERT_VERIFICATION) || defined(CONFIG_SSL_GENERATE_X509_CERT)
 /**
  * Performs c = m^e mod n
  */

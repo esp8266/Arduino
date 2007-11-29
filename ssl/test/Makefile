@@ -64,21 +64,22 @@ AXTLS_SSL_PATH="$(AXTLS_INCLUDE)ssl\\"
 
 CRYPTO_OBJ=\
 	$(CRYPTO_PATH)aes.obj \
+	$(CRYPTO_PATH)bigint.obj \
+	$(CRYPTO_PATH)crypto_misc.obj \
 	$(CRYPTO_PATH)hmac.obj \
+	$(CRYPTO_PATH)md2.obj \
 	$(CRYPTO_PATH)md5.obj \
 	$(CRYPTO_PATH)rc4.obj \
+	$(CRYPTO_PATH)rsa.obj \
 	$(CRYPTO_PATH)sha1.obj
 
 OBJ=\
 	$(AXTLS_SSL_PATH)asn1.obj \
 	$(AXTLS_SSL_PATH)x509.obj \
-	$(AXTLS_SSL_PATH)bigint.obj \
-	$(AXTLS_SSL_PATH)crypto_misc.obj \
 	$(AXTLS_SSL_PATH)os_port.obj \
 	$(AXTLS_SSL_PATH)loader.obj \
 	$(AXTLS_SSL_PATH)openssl.obj \
 	$(AXTLS_SSL_PATH)p12.obj \
-	$(AXTLS_SSL_PATH)rsa.obj \
 	$(AXTLS_SSL_PATH)tls1.obj \
 	$(AXTLS_SSL_PATH)tls1_svr.obj \
 	$(AXTLS_SSL_PATH)tls1_clnt.obj

@@ -52,7 +52,7 @@ static uint64_t rng_num;
 #endif
 
 static int rng_ref_count;
-const char * const unsupported_str = "Error: feature not supported\n";
+const char * const unsupported_str = "Error: Feature not supported\n";
 
 #ifndef CONFIG_SSL_SKELETON_MODE
 /** 

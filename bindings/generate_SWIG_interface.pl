@@ -70,6 +70,8 @@ sub parseFile
 {
     foreach $line (@_)
     {
+        next if $line =~ /ssl_x509_create/; # ignore for now
+
         # test for a #define
         if (!$skip && $line =~ m/^#define/)
         {

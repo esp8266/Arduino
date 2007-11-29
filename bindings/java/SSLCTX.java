@@ -68,8 +68,6 @@ public class SSLCTX
      * - SSL_CLIENT_AUTHENTICATION (server only): Enforce client authentication
      * i.e. each handshake will include a "certificate request" message from 
      * the server.
-     * - SSL_NO_DEFAULT_KEY: Don't use the default key/certificate. The user 
-     * will load the key/certificate explicitly.
      * - SSL_DISPLAY_BYTES (full mode build only): Display the byte sequences
      * during the handshake.
      * - SSL_DISPLAY_STATES (full mode build only): Display the state changes

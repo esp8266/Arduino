@@ -68,13 +68,8 @@ struct _x509_ctx
 {
     char *ca_cert_dn[X509_NUM_DN_TYPES];
     char *cert_dn[X509_NUM_DN_TYPES];
-#if defined(_WIN32_WCE)
-    long not_before;
-    long not_after;
-#else
     time_t not_before;
     time_t not_after;
-#endif
     uint8_t *signature;
     uint16_t sig_len;
     uint8_t sig_type;
@@ -98,8 +93,8 @@ void x509_free(X509_CTX *x509_ctx);
 int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert);
 #endif
 #ifdef CONFIG_SSL_FULL_MODE
-void x509_print(CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert);
-void x509_display_error(int error);
+void x509_print(const X509_CTX *cert, CA_CERT_CTX *ca_cert_ctx);
+const char * x509_display_error(int error);
 #endif
 
 /**************************************************************************

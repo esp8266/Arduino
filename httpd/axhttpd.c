@@ -36,20 +36,6 @@
 #include <sys/stat.h>
 #include "axhttp.h"
 
-#if AXDEBUG
-#define AXDEBUGSTART \
-	{ \
-		FILE *dout; \
-		dout = fopen("/var/log/axdebug", "a"); \
-	
-#define AXDEBUGEND \
-		fclose(dout); \
-	}
-#else /* AXDEBUG */
-#define AXDEBUGSTART
-#define AXDEBUGEND
-#endif /* AXDEBUG */
-
 struct serverstruct *servers;
 struct connstruct *usedconns;
 struct connstruct *freeconns;

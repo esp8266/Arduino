@@ -133,6 +133,8 @@ sub parseFile
 
     foreach $line (@file)
     {
+        next if $line =~ /sl_x509_create/;  # ignore for now
+
         # test for a #define
         if (!$skip && $line =~ m/^#define/)
         {

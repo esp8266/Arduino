@@ -116,14 +116,74 @@ config CONFIG_SSL_USE_DEFAULT_KEY
         that is built in. This is one way to save on a couple of kB's if an
         external private key/certificate is used.
 
+        The private key is in ssl/private_key.h and the certificate is in
+        ssl/cert.h.
+
         The advantage of a built-in private key/certificate is that no file
-        system is required for access. 
+        system is required for access. Both the certificate and the private
+        key will be automatically loaded on a ssl_ctx_new().
         
         However this private key/certificate can never be changed (without a
         code update).
 
         This mode is enabled by default. Disable this mode if the 
         built-in key/certificate is not used.
+
+config CONFIG_SSL_PRIVATE_KEY_LOCATION
+    string "Private key file location"
+    depends on !CONFIG_SSL_USE_DEFAULT_KEY && !CONFIG_SSL_SKELETON_MODE
+    help
+        The file location of the private key which will be automatically
+        loaded on a ssl_ctx_new().
+
+config CONFIG_SSL_PRIVATE_KEY_PASSWORD
+    string "Private key password"
+    depends on !CONFIG_SSL_USE_DEFAULT_KEY && CONFIG_SSL_HAS_PEM
+    help
+        The password required to decrypt a PEM-encoded password file.
+
+config CONFIG_SSL_X509_CERT_LOCATION
+    string "X.509 certificate file location"
+    depends on !CONFIG_SSL_GENERATE_X509_CERT && !CONFIG_SSL_SKELETON_MODE
+    help
+        The file location of the X.509 certificate which will be automatically
+        loaded on a ssl_ctx_new().
+
+config CONFIG_SSL_GENERATE_X509_CERT
+    bool "Generate X.509 Certificate"
+    default n
+    help
+        An X.509 certificate can be automatically generated on a
+        ssl_ctx_new(). A private key still needs to be provided (the private
+        key in ss/private_key.h will be used unless 
+        CONFIG_SSL_PRIVATE_KEY_LOCATION is set.
+
+        The certificate is generated on the fly, and so a minor start-up time
+        penalty is to be expected.
+
+config CONFIG_SSL_X509_COMMON_NAME
+    string "X.509 Common Name"
+    depends on CONFIG_SSL_GENERATE_X509_CERT
+    help
+        The common name for the X.509 certificate. This should in theory be
+        the URL for server.
+
+        If this is blank, then the hostname is used.
+
+config CONFIG_SSL_X509_ORGANIZATION_NAME
+    string "X.509 Organization Name"
+    depends on CONFIG_SSL_GENERATE_X509_CERT
+    help
+        The organization name for the generated X.509 certificate. 
+
+        If this is blank, then $USERNAME will be used.
+
+config CONFIG_SSL_X509_ORGANIZATION_UNIT_NAME
+    string "X.509 Organization Unit Name"
+    depends on CONFIG_SSL_GENERATE_X509_CERT
+    help
+        The organization unit name for the generated X.509 certificate. This
+        field is optional.
 
 config CONFIG_SSL_ENABLE_V23_HANDSHAKE
     bool "Enable v23 Handshake"
@@ -250,13 +310,6 @@ config CONFIG_OPENSSL_COMPATIBLE
 
         Note: not all the API is implemented, so parts may still break. And
         it's definitely not 100% compatible.
-
-config CONFIG_GEN_CERTIFICATES
-    bool "Enable the generation of certificates"
-    default n
-    depends on CONFIG_SSL_CERT_VERIFICATION
-    help 
-        A primitive self-signed certificate generator.
 
 config CONFIG_PERFORMANCE_TESTING
     bool "Build the bigint performance test tool"

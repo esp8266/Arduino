@@ -118,7 +118,7 @@ int x509_new(const uint8_t *cert, int *len, X509_CTX **ctx)
     bi_ctx = x509_ctx->rsa_ctx->bi_ctx;
 
 #ifdef CONFIG_SSL_CERT_VERIFICATION /* only care if doing verification */
-    /* use the appropriate signature algorithm (either SHA1 or MD5) */
+    /* use the appropriate signature algorithm (SHA1/MD5/MD2) */
     if (x509_ctx->sig_type == SIG_TYPE_MD5)
     {
         MD5_CTX md5_ctx;
@@ -224,7 +224,6 @@ static bigint *sig_verify(BI_CTX *ctx, const uint8_t *sig, int sig_len,
     decrypted_bi = bi_mod_power2(ctx, dat_bi, modulus, pub_exp);
 
     bi_export(ctx, decrypted_bi, block, sig_len);
-    print_blob("SIGNATURE", block, sig_len);
     ctx->mod_offset = BIGINT_M_OFFSET;
 
     i = 10; /* start at the first possible non-padded byte */
@@ -234,9 +233,6 @@ static bigint *sig_verify(BI_CTX *ctx, const uint8_t *sig, int sig_len,
     /* get only the bit we want */
     if (size > 0)
     {
-        FILE *f = fopen("blah.dat", "w");
-        fwrite(&block[i], sig_len-i, 1, f);
-        fclose(f);
         int len;
         const uint8_t *sig_ptr = get_signature(&block[i], &len);
 
@@ -271,6 +267,7 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert)
     bigint *mod, *expn;
     struct timeval tv;
     int match_ca_cert = 0;
+    uint8_t is_self_signed = 0;
 
     if (cert == NULL || ca_cert_ctx == NULL)
     {
@@ -279,7 +276,7 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert)
     }
 
     /* last cert in the chain - look for a trusted cert */
-    if (cert->next == NULL)
+    if (cert->next == NULL && ca_cert_ctx)
     {
         while (i < CONFIG_X509_MAX_CA_CERTS && ca_cert_ctx->cert[i])
         {
@@ -287,17 +284,15 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert)
                                         ca_cert_ctx->cert[i]->cert_dn) == 0)
             {
                 match_ca_cert = 1;
+                next_cert = ca_cert_ctx->cert[i];
                 break;
             }
 
             i++;
         }
 
-        if (i < CONFIG_X509_MAX_CA_CERTS && ca_cert_ctx->cert[i])
-        {
-            next_cert = ca_cert_ctx->cert[i];
-        }
-        else    /* trusted cert not found */
+        /* trusted cert not found */
+        if (i >= CONFIG_X509_MAX_CA_CERTS)
         {
             ret = X509_VFY_ERROR_NO_TRUSTED_CERT;       
             goto end_verify;
@@ -325,31 +320,37 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert)
     }
 
     /* check the chain integrity */
-    if (asn1_compare_dn(cert->ca_cert_dn, next_cert->cert_dn))
+    if (next_cert && !match_ca_cert &&
+               asn1_compare_dn(cert->ca_cert_dn, next_cert->cert_dn) == 0)
     {
         ret = X509_VFY_ERROR_INVALID_CHAIN;
         goto end_verify;
     }
 
+    ctx = cert->rsa_ctx->bi_ctx;
+
     /* check for self-signing */
-    if (!match_ca_cert && asn1_compare_dn(cert->ca_cert_dn, cert->cert_dn) == 0)
+    if (asn1_compare_dn(cert->ca_cert_dn, cert->cert_dn) == 0)
     {
-        ret = X509_VFY_ERROR_SELF_SIGNED;
-        goto end_verify;
+        is_self_signed = 1;
+        mod = cert->rsa_ctx->m;
+        expn = cert->rsa_ctx->e;
+    }
+    else
+    {
+        mod = next_cert->rsa_ctx->m;
+        expn = next_cert->rsa_ctx->e;
     }
 
     /* check the signature */
-    ctx = cert->rsa_ctx->bi_ctx;
-    mod = next_cert->rsa_ctx->m;
-    expn = next_cert->rsa_ctx->e;
     cert_sig = sig_verify(ctx, cert->signature, cert->sig_len, 
             bi_clone(ctx, mod), bi_clone(ctx, expn));
 
-    if (cert_sig)
+    if (cert_sig && cert->digest)
     {
-        ret = cert->digest ?    /* check the signature */
-            bi_compare(cert_sig, cert->digest) :
-            X509_VFY_ERROR_UNSUPPORTED_DIGEST;
+        if (bi_compare(cert_sig, cert->digest))
+            ret = X509_VFY_ERROR_BAD_SIGNATURE;
+
         bi_free(ctx, cert_sig);
 
         if (ret)
@@ -358,6 +359,12 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert)
     else
     {
         ret = X509_VFY_ERROR_BAD_SIGNATURE;
+        goto end_verify;
+    }
+
+    if (is_self_signed)
+    {
+        ret = X509_VFY_ERROR_SELF_SIGNED;
         goto end_verify;
     }
 
@@ -376,7 +383,7 @@ end_verify:
 /**
  * Used for diagnostics.
  */
-void x509_print(CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert) 
+void x509_print(const X509_CTX *cert, CA_CERT_CTX *ca_cert_ctx) 
 {
     if (cert == NULL)
         return;
@@ -436,14 +443,12 @@ void x509_print(CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert)
             break;
     }
 
-    printf("Verify:\t\t\t");
-
     if (ca_cert_ctx)
     {
-        x509_display_error(x509_verify(ca_cert_ctx, cert));
+        printf("Verify:\t\t\t%s\n",
+                x509_display_error(x509_verify(ca_cert_ctx, cert)));
     }
 
-    printf("\n");
 #if 0
     print_blob("Signature", cert->signature, cert->sig_len);
     bi_print("Modulus", cert->rsa_ctx->m);
@@ -452,48 +457,52 @@ void x509_print(CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert)
 
     if (ca_cert_ctx)
     {
-        x509_print(ca_cert_ctx, cert->next);
+        x509_print(cert->next, ca_cert_ctx);
     }
 }
 
-void x509_display_error(int error)
+const char * x509_display_error(int error)
 {
     switch (error)
     {
         case X509_NOT_OK:
-            printf("X509 not ok");
+            return "X509 not ok";
             break;
 
         case X509_VFY_ERROR_NO_TRUSTED_CERT:
-            printf("No trusted cert is available");
+            return "No trusted cert is available";
             break;
 
         case X509_VFY_ERROR_BAD_SIGNATURE:
-            printf("Bad signature");
+            return "Bad signature";
             break;
 
         case X509_VFY_ERROR_NOT_YET_VALID:
-            printf("Cert is not yet valid");
+            return "Cert is not yet valid";
             break;
 
         case X509_VFY_ERROR_EXPIRED:
-            printf("Cert has expired");
+            return "Cert has expired";
             break;
 
         case X509_VFY_ERROR_SELF_SIGNED:
-            printf("Cert is self-signed");
+            return "Cert is self-signed";
             break;
 
         case X509_VFY_ERROR_INVALID_CHAIN:
-            printf("Chain is invalid (check order of certs)");
+            return "Chain is invalid (check order of certs)";
             break;
 
         case X509_VFY_ERROR_UNSUPPORTED_DIGEST:
-            printf("Unsupported digest");
+            return "Unsupported digest";
             break;
 
         case X509_INVALID_PRIV_KEY:
-            printf("Invalid private key");
+            return "Invalid private key";
+            break;
+
+        default:
+            return "Unknown";
             break;
     }
 }

@@ -172,7 +172,7 @@ struct _SSL
     uint16_t bm_read_index;
     struct _SSL *next;                  /* doubly linked list */
     struct _SSL *prev;
-    struct _SSL_CTX *ssl_ctx;            /* back reference to a clnt/svr ctx */
+    struct _SSL_CTX *ssl_ctx;           /* back reference to a clnt/svr ctx */
 #ifndef CONFIG_SSL_SKELETON_MODE
     uint16_t session_index;
     SSL_SESS *session;
@@ -243,6 +243,7 @@ int add_private_key(SSL_CTX *ssl_ctx, SSLObjLoader *ssl_obj);
 void ssl_obj_free(SSLObjLoader *ssl_obj);
 int pkcs8_decode(SSL_CTX *ssl_ctx, SSLObjLoader *ssl_obj, const char *password);
 int pkcs12_decode(SSL_CTX *ssl_ctx, SSLObjLoader *ssl_obj, const char *password);
+int load_key_certs(SSL_CTX *ssl_ctx);
 #ifdef CONFIG_SSL_CERT_VERIFICATION
 int add_cert_auth(SSL_CTX *ssl_ctx, const uint8_t *buf, int len);
 void remove_ca_certs(CA_CERT_CTX *ca_cert_ctx);
@@ -255,8 +256,8 @@ int do_client_connect(SSL *ssl);
 void DISPLAY_STATE(SSL *ssl, int is_send, uint8_t state, int not_ok);
 void DISPLAY_BYTES(SSL *ssl, const char *format, 
         const uint8_t *data, int size, ...);
-void DISPLAY_CERT(SSL *ssl, const char *label, const X509_CTX *x509_ctx);
-void DISPLAY_RSA(SSL *ssl, const char *label, const RSA_CTX *rsa_ctx);
+void DISPLAY_CERT(SSL *ssl, const X509_CTX *x509_ctx);
+void DISPLAY_RSA(SSL *ssl,  const RSA_CTX *rsa_ctx);
 void DISPLAY_ALERT(SSL *ssl, int alert);
 #else
 #define DISPLAY_STATE(A,B,C,D)

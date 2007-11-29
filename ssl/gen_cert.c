@@ -30,13 +30,13 @@
 
 #include "config.h"
 
-#ifdef CONFIG_GEN_CERTIFICATES
+#ifdef CONFIG_SSL_GENERATE_X509_CERT
 #include <string.h>
 #include <stdlib.h>
-#include "crypto_misc.h"
+#include "ssl.h"
 
 /**
- * This file is not completed.
+ * Generate a basic X.509 certificate
  */
 
 /* OBJECT IDENTIFIER sha1withRSAEncryption (1 2 840 113549 1 1 5) */
@@ -176,33 +176,35 @@ error:
     return ret;
 }
 
-static int gen_issuer(const char *cn, const char *o, const char *ou,
-                    uint8_t *buf, int *offset)
+static int gen_issuer(const char * dn[], uint8_t *buf, int *offset)
 {
     int ret = X509_OK;
     int seq_offset;
     int seq_size = pre_adjust_with_size(
                             ASN1_SEQUENCE, &seq_offset, buf, offset);
+    char hostname[128];
 
-    /* we need the common name at a minimum */
-    if (cn == NULL)
+    /* we need the common name, so if not configured, use the hostname */
+    if (dn[X509_COMMON_NAME] == NULL || strlen(dn[X509_COMMON_NAME]) == 0)
     {
-        ret = X509_NOT_OK;
+        gethostname(hostname, sizeof(hostname));
+        dn[X509_COMMON_NAME] = hostname;
+    }
+
+    if ((ret = gen_dn(dn[X509_COMMON_NAME], 3, buf, offset)))
         goto error;
-    }
 
-    if ((ret = gen_dn(cn, 3, buf, offset)))
-            goto error;
+    if (dn[X509_ORGANIZATION] == NULL || strlen(dn[X509_ORGANIZATION]) == 0)
+        dn[X509_ORGANIZATION] = getenv("USERNAME");
 
-    if (o != NULL)
+    if (dn[X509_ORGANIZATION] != NULL && 
+            ((ret = gen_dn(dn[X509_ORGANIZATION], 10, buf, offset))))
+        goto error;
+
+    if (dn[X509_ORGANIZATIONAL_TYPE] != NULL &&
+                                strlen(dn[X509_ORGANIZATIONAL_TYPE]) != 0)
     {
-        if ((ret = gen_dn(o, 10, buf, offset)))
-            goto error;
-    }
-
-    if (ou != NULL)
-    {
-        if ((ret = gen_dn(o, 11, buf, offset)))
+        if ((ret = gen_dn(dn[X509_ORGANIZATIONAL_TYPE], 11, buf, offset)))
             goto error;
     }
 
@@ -212,32 +214,20 @@ error:
     return ret;
 }
 
+static const uint8_t time_seq[] = 
+{
+    ASN1_SEQUENCE, 30, 
+    ASN1_UTC_TIME, 13, 
+    '0', '7', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', 'Z', 
+    ASN1_UTC_TIME, 13,  /* make it good for 40 or so years */
+    '4', '9', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', 'Z'
+};
+
 static void gen_utc_time(uint8_t *buf, int *offset)
 {
-    time_t curr_time = time(NULL);
-    struct tm *now_tm = gmtime(&curr_time);
-
-    buf[(*offset)++] = ASN1_SEQUENCE;
-    set_gen_length(30, buf, offset);
-
-    now_tm->tm_year -= 100;
-    now_tm->tm_mon++;
-    buf[(*offset)++] = ASN1_UTC_TIME;
-    buf[(*offset)++] = 13;
-    buf[(*offset)++] = now_tm->tm_year/10 + '0';
-    buf[(*offset)++] = now_tm->tm_year%10 + '0';
-    buf[(*offset)++] = now_tm->tm_mon/10 + '0';
-    buf[(*offset)++] = now_tm->tm_mon%10 + '0';
-    buf[(*offset)++] = now_tm->tm_mday/10 + '0';
-    buf[(*offset)++] = now_tm->tm_mday%10 + '0';
-    memset(&buf[*offset], '0', 6);
-    *offset += 6;
-    buf[(*offset)++] = 'Z';
-    now_tm->tm_year += 30; /* add 30 years */
-    memcpy(&buf[*offset], &buf[*offset-15], 15);
-    buf[*offset + 2] = now_tm->tm_year/10 + '0';
-    buf[*offset + 3] = now_tm->tm_year%10 + '0';
-    *offset += 15;
+    /* fixed time */
+    memcpy(&buf[*offset], time_seq, sizeof(time_seq));
+    *offset += sizeof(time_seq);
 }
 
 static void gen_pub_key2(const RSA_CTX *rsa_ctx, uint8_t *buf, int *offset)
@@ -249,6 +239,7 @@ static void gen_pub_key2(const RSA_CTX *rsa_ctx, uint8_t *buf, int *offset)
                             ASN1_SEQUENCE, &seq_offset, buf, offset);
     buf[(*offset)++] = ASN1_INTEGER;
     bi_export(rsa_ctx->bi_ctx, rsa_ctx->m, block, pub_key_size);
+
     if (*block & 0x80)  /* make integer positive */
     {
         set_gen_length(pub_key_size+1, buf, offset);
@@ -259,6 +250,8 @@ static void gen_pub_key2(const RSA_CTX *rsa_ctx, uint8_t *buf, int *offset)
 
     memcpy(&buf[*offset], block, pub_key_size);
     *offset += pub_key_size;
+    memcpy(&buf[*offset], pub_key_seq, sizeof(pub_key_seq));
+    *offset += sizeof(pub_key_seq);
     adjust_with_size(seq_size, seq_offset, buf, offset);
 }
 
@@ -287,8 +280,6 @@ static void gen_pub_key(const RSA_CTX *rsa_ctx, uint8_t *buf, int *offset)
     buf[(*offset)++] = ASN1_NULL;
     buf[(*offset)++] = 0;
     gen_pub_key1(rsa_ctx, buf, offset);
-    memcpy(&buf[*offset], pub_key_seq, sizeof(pub_key_seq));
-    *offset += sizeof(pub_key_seq);
     adjust_with_size(seq_size, seq_offset, buf, offset);
 }
 
@@ -313,86 +304,64 @@ static void gen_signature(const RSA_CTX *rsa_ctx, const uint8_t *sha_dgst,
     *offset += sig_size;
 }
 
-static int gen_tbs_cert(const char *cn, const char *o, const char *ou,
+static int gen_tbs_cert(const char * dn[],
                     const RSA_CTX *rsa_ctx, uint8_t *buf, int *offset,
                     uint8_t *sha_dgst)
 {
     int ret = X509_OK;
     SHA1_CTX sha_ctx;
     int seq_offset;
+    int begin_tbs = *offset;
     int seq_size = pre_adjust_with_size(
                         ASN1_SEQUENCE, &seq_offset, buf, offset);
-    int begin_tbs = *offset;
 
     gen_serial_number(buf, offset);
     gen_signature_alg(buf, offset);
-    if ((ret = gen_issuer(cn, o, ou, buf, offset)))
+
+    /* CA certicate issuer */
+    if ((ret = gen_issuer(dn, buf, offset)))
         goto error;
 
     gen_utc_time(buf, offset);
-    if ((ret = gen_issuer(cn, o, ou, buf, offset)))
+
+    /* certificate issuer */
+    if ((ret = gen_issuer(dn, buf, offset)))
         goto error;
 
     gen_pub_key(rsa_ctx, buf, offset);
+    adjust_with_size(seq_size, seq_offset, buf, offset);
 
     SHA1_Init(&sha_ctx);
     SHA1_Update(&sha_ctx, &buf[begin_tbs], *offset-begin_tbs);
     SHA1_Final(sha_dgst, &sha_ctx);
-    adjust_with_size(seq_size, seq_offset, buf, offset);
 
 error:
     return ret;
 }
 
-int gen_cert(const char *cn, const char *o, const char *ou,
-                    const RSA_CTX *rsa_ctx, uint8_t *buf, int *cert_size)
+/**
+ * Create a new certificate.
+ */
+EXP_FUNC int STDCALL ssl_x509_create(SSL_CTX *ssl_ctx, const char * dn[], uint32_t options, uint8_t **cert_data)
 {
-    int ret = X509_OK;
-    int offset = 0;
-    int seq_offset;
+    int ret = X509_OK, offset = 0, seq_offset;
+    /* allocate enough space to load a new certificate */
+    uint8_t *buf = (uint8_t *)alloca(ssl_ctx->rsa_ctx->num_octets*2 + 512);
     uint8_t sha_dgst[SHA1_SIZE];
-    int seq_size = pre_adjust_with_size(
-                            ASN1_SEQUENCE, &seq_offset, buf, &offset);
+    int seq_size = pre_adjust_with_size(ASN1_SEQUENCE, 
+                                    &seq_offset, buf, &offset);
 
-    if ((ret = gen_tbs_cert(cn, o, ou, rsa_ctx, buf, &offset, sha_dgst)))
+    if ((ret = gen_tbs_cert(dn, ssl_ctx->rsa_ctx, buf, &offset, sha_dgst)) < 0)
         goto error;
 
     gen_signature_alg(buf, &offset);
-    gen_signature(rsa_ctx, sha_dgst, buf, &offset);
-
+    gen_signature(ssl_ctx->rsa_ctx, sha_dgst, buf, &offset);
     adjust_with_size(seq_size, seq_offset, buf, &offset);
-    *cert_size = offset;
+    *cert_data = (uint8_t *)malloc(offset); /* create the exact memory for it */
+    memcpy(*cert_data, buf, offset);
+
 error:
-    return ret;
-}
-
-int main(int argc, char *argv[])
-{
-    int ret = X509_OK;
-    uint8_t *key_buf = NULL;
-    RSA_CTX *rsa_ctx = NULL;
-    uint8_t buf[2048];
-    int cert_size;
-    FILE *f;
-
-    int len = get_file("../ssl/test/axTLS.key_512", &key_buf);
-    if ((ret = asn1_get_private_key(key_buf, len, &rsa_ctx)))
-        goto error;
-
-    if ((ret = gen_cert("abc", "def", "ghi", rsa_ctx, buf, &cert_size)))
-        goto error;
-
-    f = fopen("blah.dat", "w");
-    fwrite(buf, cert_size, 1, f);
-    fclose(f);
-error:
-    free(key_buf);
-    RSA_free(rsa_ctx);
-
-    if (ret)
-        printf("Some cert generation issue\n");
-
-    return ret;
+    return ret < 0 ? ret : offset;
 }
 
 #endif

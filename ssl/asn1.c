@@ -112,16 +112,13 @@ int asn1_get_int(const uint8_t *buf, int *offset, uint8_t **object)
     if ((len = asn1_next_obj(buf, offset, ASN1_INTEGER)) < 0)
         goto end_int_array;
 
-    *object = (uint8_t *)malloc(len);
-    /* TODO */
-#if 0
-    if (*object == 0x00)    /* ignore the negative byte */
+    if (buf[*offset] == 0x00)    /* ignore the negative byte */
     {
         len--;
-        (*object)++;
+        (*offset)++;
     }
-#endif
 
+    *object = (uint8_t *)malloc(len);
     memcpy(*object, &buf[*offset], len);
     *offset += len;
 
@@ -421,10 +418,13 @@ void remove_ca_certs(CA_CERT_CTX *ca_cert_ctx)
 {
     int i = 0;
 
+    if (ca_cert_ctx == NULL)
+        return;
+
     while (i < CONFIG_X509_MAX_CA_CERTS && ca_cert_ctx->cert[i])
     {
         x509_free(ca_cert_ctx->cert[i]);
-        ca_cert_ctx->cert[i++] = NULL;
+        ca_cert_ctx->cert[i] = NULL;
     }
 
     free(ca_cert_ctx);
@@ -441,9 +441,7 @@ int asn1_compare_dn(char * const dn1[], char * const dn2[])
     for (i = 0; i < X509_NUM_DN_TYPES; i++)
     {
         if (asn1_compare_dn_comp(dn1[i], dn2[i]))
-        {
             return 1;
-        }
     }
 
     return 0;       /* all good */

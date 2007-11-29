@@ -69,7 +69,6 @@ EXP_FUNC int STDCALL ssl_obj_load(SSL_CTX *ssl_ctx, int obj_type,
     }
 
     ssl_obj = (SSLObjLoader *)calloc(1, sizeof(SSLObjLoader));
-
     ssl_obj->len = get_file(filename, &ssl_obj->buf);
 
     if (ssl_obj->len <= 0)
@@ -107,8 +106,8 @@ EXP_FUNC int STDCALL ssl_obj_memory_load(SSL_CTX *ssl_ctx, int mem_type,
         const uint8_t *data, int len, const char *password)
 {
     int ret;
-
     SSLObjLoader *ssl_obj;
+
     ssl_obj = (SSLObjLoader *)calloc(1, sizeof(SSLObjLoader));
     ssl_obj->buf = (uint8_t *)malloc(len);
     memcpy(ssl_obj->buf, data, len);
@@ -219,10 +218,10 @@ static int pem_decrypt(const char *where, const char *end,
     AES_CTX aes_ctx;
     uint8_t key[32];        /* AES256 size */
 
-    if (password == NULL)
+    if (password == NULL || strlen(password) == 0)
     {
 #ifdef CONFIG_SSL_FULL_MODE
-        printf("Error: need a password for this PEM file\n");
+        printf("Error: Need a password for this PEM file\n"); TTY_FLUSH();
 #endif
         goto error;
     }
@@ -239,7 +238,7 @@ static int pem_decrypt(const char *where, const char *end,
     else 
     {
 #ifdef CONFIG_SSL_FULL_MODE
-        printf("Error: Unsupported password cipher\n");
+        printf("Error: Unsupported password cipher\n"); TTY_FLUSH();
 #endif
         goto error;
     }
@@ -387,3 +386,80 @@ static int ssl_obj_PEM_load(SSL_CTX *ssl_ctx, int obj_type,
                                 start, ssl_obj->len, password);
 }
 #endif /* CONFIG_SSL_HAS_PEM */
+
+/**
+ * Load the key/certificates in memory depending on compile-time and user
+ * options. 
+ */
+int load_key_certs(SSL_CTX *ssl_ctx)
+{
+    int ret = SSL_OK;
+    uint32_t options = ssl_ctx->options;
+
+    /* do the private key first */
+    if (strlen(CONFIG_SSL_PRIVATE_KEY_LOCATION) > 0)
+    {
+        if ((ret = ssl_obj_load(ssl_ctx, SSL_OBJ_RSA_KEY, 
+                                CONFIG_SSL_PRIVATE_KEY_LOCATION,
+                                CONFIG_SSL_PRIVATE_KEY_PASSWORD)) < 0)
+            goto error;
+    }
+    else if (!(options & SSL_NO_DEFAULT_KEY))
+    {
+#if defined(CONFIG_SSL_USE_DEFAULT_KEY) || defined(CONFIG_SSL_SKELETON_MODE)
+        static const    /* saves a few more bytes */
+#include "private_key.h"
+
+        ssl_obj_memory_load(ssl_ctx, SSL_OBJ_RSA_KEY, default_private_key,
+                default_private_key_len, NULL); 
+#endif
+    }
+
+    /* now load the certificate */
+#ifdef CONFIG_SSL_GENERATE_X509_CERT 
+    uint8_t *cert_data;
+    int cert_size;
+    static const char *dn[] = 
+    {
+        CONFIG_SSL_X509_COMMON_NAME,
+        CONFIG_SSL_X509_ORGANIZATION_NAME,
+        CONFIG_SSL_X509_ORGANIZATION_UNIT_NAME
+    };
+
+    if ((cert_size = ssl_x509_create(ssl_ctx, dn, &cert_data)) < 0)
+    {
+        ret = cert_size;
+        goto error;
+    }
+
+    ssl_obj_memory_load(ssl_ctx, SSL_OBJ_X509_CERT, cert_data, cert_size, NULL);
+    free(cert_data);
+#else
+    if (strlen(CONFIG_SSL_X509_CERT_LOCATION))
+    {
+        if ((ret = ssl_obj_load(ssl_ctx, SSL_OBJ_X509_CERT, 
+                                CONFIG_SSL_X509_CERT_LOCATION, NULL)) < 0)
+            goto error;
+    }
+    else if (!(options & SSL_NO_DEFAULT_KEY))
+    {
+#if defined(CONFIG_SSL_USE_DEFAULT_KEY) || defined(CONFIG_SSL_SKELETON_MODE)
+        static const    /* saves a few bytes and RAM */
+#include "cert.h"
+        ssl_obj_memory_load(ssl_ctx, SSL_OBJ_X509_CERT, 
+                    default_certificate, default_certificate_len, NULL);
+#endif
+    }
+#endif
+
+error:
+#ifdef CONFIG_SSL_FULL_MODE
+    if (ret)
+    {
+        printf("Error: Certificate or key not loaded\n"); TTY_FLUSH();
+    }
+#endif
+
+    return ret;
+
+}

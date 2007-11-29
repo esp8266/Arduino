@@ -182,8 +182,6 @@ extern "C" {
  * - SSL_CLIENT_AUTHENTICATION (server only): Enforce client authentication
  * i.e. each handshake will include a "certificate request" message from the
  * server. Only available if verification has been enabled.
- * - SSL_NO_DEFAULT_KEY: Don't use the default key/certificate. The user will
- * load the key/certificate explicitly.
  * - SSL_DISPLAY_BYTES (full mode build only): Display the byte sequences
  * during the handshake.
  * - SSL_DISPLAY_STATES (full mode build only): Display the state changes
@@ -436,9 +434,34 @@ EXP_FUNC int STDCALL ssl_obj_load(SSL_CTX *ssl_ctx, int obj_type, const char *fi
  */
 EXP_FUNC int STDCALL ssl_obj_memory_load(SSL_CTX *ssl_ctx, int obj_type, const uint8_t *data, int len, const char *password);
 
+#ifdef CONFIG_SSL_GENERATE_X509_CERT
+/**
+ * @brief Create an X.509 certificate. 
+ * 
+ * This certificate is a self-signed v1 cert with a fixed start/stop validity 
+ * times. It is also signed with the private key in ssl_ctx->rsa_ctx.
+ *
+ * @param ssl_ctx [in] The client/server context.
+ * @param dn [in] An array of distinguished name strings. The array is defined
+ * by:
+ * - SSL_X509_CERT_COMMON_NAME (0)
+ *      - If SSL_X509_CERT_COMMON_NAME is empty or not defined, then the 
+ *        hostname will be used.
+ * - SSL_X509_CERT_ORGANIZATION (1)
+ *      - If SSL_X509_CERT_ORGANIZATION is empty or not defined, then $USERNAME 
+ *        will be used.
+ * - SSL_X509_CERT_ORGANIZATIONAL_NAME (2)
+ *      - SSL_X509_CERT_ORGANIZATIONAL_NAME is optional.
+ * @param options [in] Not used yet.
+ * @param cert_data [out] The certificate as a sequence of bytes.
+ * @return < 0 if an error, or the size of the certificate in bytes.
+ * @note cert_data must be freed when there is no more need for it.
+ */
+EXP_FUNC int STDCALL ssl_x509_create(SSL_CTX *ssl_ctx, const char * dn[], uint32_t options, uint8_t **cert_data);
+#endif
+
 /**
  * @brief Return the axTLS library version as a string.
- * @note New API function for v1.1
  */
 EXP_FUNC const char * STDCALL ssl_version(void);
 

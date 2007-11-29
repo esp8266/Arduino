@@ -38,14 +38,6 @@
 #include <stdarg.h>
 #include "ssl.h"
 
-/* Don't import the default key/certificate if not used */
-#if defined(CONFIG_SSL_USE_DEFAULT_KEY) || defined(CONFIG_SSL_SKELETON_MODE)
-static const    /* saves a few bytes and RAM */
-#include "cert.h"
-static const    /* saves a few more bytes */
-#include "private_key.h"
-#endif
-         
 /* The session expiry time */
 #define SSL_EXPIRY_TIME     (CONFIG_SSL_EXPIRY_TIME*3600)
 
@@ -173,21 +165,18 @@ EXP_FUNC SSL_CTX *STDCALL ssl_ctx_new(uint32_t options, int num_sessions)
 {
     SSL_CTX *ssl_ctx = (SSL_CTX *)calloc(1, sizeof (SSL_CTX));
     ssl_ctx->options = options;
+
+    if (load_key_certs(ssl_ctx) < 0)
+    {
+        free(ssl_ctx);  /* can't load our key/certificate pair, so die */
+        return NULL;
+    }
+
 #ifndef CONFIG_SSL_SKELETON_MODE
     ssl_ctx->num_sessions = num_sessions;
 #endif
 
     SSL_CTX_MUTEX_INIT(ssl_ctx->mutex);
-
-#if defined(CONFIG_SSL_USE_DEFAULT_KEY) || defined(CONFIG_SSL_SKELETON_MODE)
-    if (~options & SSL_NO_DEFAULT_KEY)
-    {
-        ssl_obj_memory_load(ssl_ctx, SSL_OBJ_RSA_KEY, default_private_key, 
-                default_private_key_len, NULL);
-        ssl_obj_memory_load(ssl_ctx, SSL_OBJ_X509_CERT, 
-                    default_certificate, default_certificate_len, NULL);
-    }
-#endif
 
 #ifndef CONFIG_SSL_SKELETON_MODE
     if (num_sessions)
@@ -195,10 +184,6 @@ EXP_FUNC SSL_CTX *STDCALL ssl_ctx_new(uint32_t options, int num_sessions)
         ssl_ctx->ssl_sessions = (SSL_SESS **)
                         calloc(1, num_sessions*sizeof(SSL_SESS *));
     }
-#endif
-
-#ifdef CONFIG_SSL_CERT_VERIFICATION
-    ssl_ctx->ca_cert_ctx = (CA_CERT_CTX *)calloc(1, sizeof(CA_CERT_CTX));
 #endif
 
     return ssl_ctx;
@@ -397,7 +382,12 @@ int add_cert_auth(SSL_CTX *ssl_ctx, const uint8_t *buf, int len)
     int i = 0;
     int offset;
     X509_CTX *cert = NULL;
-    CA_CERT_CTX *ca_cert_ctx = ssl_ctx->ca_cert_ctx;
+    CA_CERT_CTX *ca_cert_ctx;
+
+    if (ssl_ctx->ca_cert_ctx == NULL)
+        ssl_ctx->ca_cert_ctx = (CA_CERT_CTX *)calloc(1, sizeof(CA_CERT_CTX));
+
+    ca_cert_ctx = ssl_ctx->ca_cert_ctx;
 
     while (i < CONFIG_X509_MAX_CA_CERTS && ca_cert_ctx->cert[i]) 
         i++;
@@ -418,11 +408,14 @@ int add_cert_auth(SSL_CTX *ssl_ctx, const uint8_t *buf, int len)
     cert = ca_cert_ctx->cert[i];
     SSL_CTX_LOCK(ssl_ctx->mutex);
 
-    if ((ret = x509_verify(ca_cert_ctx, cert)))
+    if ((ret = x509_verify(ca_cert_ctx, cert)) != X509_VFY_ERROR_SELF_SIGNED)
     {
         SSL_CTX_UNLOCK(ssl_ctx->mutex);
         x509_free(cert);        /* get rid of it */
         ca_cert_ctx->cert[i] = NULL;
+#ifdef CONFIG_SSL_FULL_MODE
+        printf("Error: %s\n", x509_display_error(ret));
+#endif
         goto error;
     }
 
@@ -1484,6 +1477,7 @@ int send_certificate(SSL *ssl)
 
     while (i < ssl->ssl_ctx->chain_length)
     {
+        X509_CTX *cert_ctx;
         SSL_CERT *cert = &ssl->ssl_ctx->certs[i];
         buf[offset++] = 0;        
         buf[offset++] = cert->size >> 8;        /* cert 1 length */
@@ -1491,6 +1485,10 @@ int send_certificate(SSL *ssl)
         memcpy(&buf[offset], cert->buf, cert->size);
         offset += cert->size;
         i++;
+        // TODO: get rid of these
+        x509_new(cert->buf, &cert->size, &cert_ctx);
+        x509_print(cert_ctx, NULL);
+        x509_free(cert_ctx);
     }
 
     chain_length = offset - 7;
@@ -1765,7 +1763,7 @@ int process_certificate(SSL *ssl, X509_CTX **x509_ctx)
         ret = ssl_verify_cert(ssl);
     }
 
-    DISPLAY_CERT(ssl, "process_certificate", *x509_ctx);
+    DISPLAY_CERT(ssl, *x509_ctx);
     ssl->next_state = is_client ? HS_SERVER_HELLO_DONE : HS_CLIENT_KEY_XCHG;
     ssl->dc->bm_proc_index += offset;
 error:
@@ -1846,19 +1844,19 @@ void DISPLAY_STATE(SSL *ssl, int is_send, uint8_t state, int not_ok)
 /**
  * Debugging routine to display X509 certificates.
  */
-void DISPLAY_CERT(SSL *ssl, const char *label, const X509_CTX *x509_ctx)
+void DISPLAY_CERT(SSL *ssl, const X509_CTX *x509_ctx)
 {
     if (!IS_SET_SSL_FLAG(SSL_DISPLAY_CERTS))
         return;
 
-    x509_print(ssl->ssl_ctx->ca_cert_ctx, x509_ctx);
+    x509_print(x509_ctx, ssl->ssl_ctx->ca_cert_ctx);
     TTY_FLUSH();
 }
 
 /**
  * Debugging routine to display RSA objects
  */
-void DISPLAY_RSA(SSL *ssl, const char *label, const RSA_CTX *rsa_ctx)
+void DISPLAY_RSA(SSL *ssl, const RSA_CTX *rsa_ctx)
 {
     if (!IS_SET_SSL_FLAG(SSL_DISPLAY_RSA))
         return;
@@ -1897,8 +1895,7 @@ EXP_FUNC void STDCALL ssl_display_error(int error_code)
     /* X509 error? */
     if (error_code < SSL_X509_OFFSET)
     {
-        x509_display_error(error_code - SSL_X509_OFFSET);
-        printf("\n");
+        printf("%s\n", x509_display_error(error_code - SSL_X509_OFFSET));
         return;
     }
 
