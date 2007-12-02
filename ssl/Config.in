@@ -168,10 +168,11 @@ config CONFIG_SSL_X509_COMMON_NAME
     string "X.509 Common Name"
     depends on CONFIG_SSL_GENERATE_X509_CERT
     help
-        The common name for the X.509 certificate. This should in theory be
-        the URL for server.
+        The common name for the X.509 certificate. This should be the fully 
+        qualified domain name (FQDN), e.g. www.foo.com.
 
-        If this is blank, then this will be value from gethostname().
+        If this is blank, then this will be value from gethostname() and
+        getdomainname().
 
 config CONFIG_SSL_X509_ORGANIZATION_NAME
     string "X.509 Organization Name"

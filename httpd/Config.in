@@ -59,6 +59,7 @@ depends on !CONFIG_PLATFORM_WIN32
 config CONFIG_HTTP_HAS_CGI
     bool "Enable CGI"
     default y
+    depends on !CONFIG_PLATFORM_WIN32
     help
         Enable the CGI capability. Not available on Win32 platforms.
 
@@ -118,15 +119,6 @@ config CONFIG_HTTP_HAS_AUTHORIZATION
     default y
     help
         Pages/directories can have passwords associated with them.
-
-config CONFIG_HTTP_CHANGE_UID
-    bool "Change UID"
-    default n
-    depends on !CONFIG_PLATFORM_WIN32
-    help
-        Call setgid()/setuid() to disable access to protected files.
-        
-        This feature is normally disabled.
 
 config CONFIG_HTTP_HAS_IPV6
     bool "Enable IPv6"

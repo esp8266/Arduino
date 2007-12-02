@@ -79,11 +79,12 @@ void RSA_pub_key_new(RSA_CTX **ctx,
         const uint8_t *pub_exp, int pub_len)
 {
     RSA_CTX *rsa_ctx;
-    BI_CTX *bi_ctx = bi_initialize();
+    BI_CTX *bi_ctx;
 
     if (*ctx)   /* if we load multiple certs, dump the old one */
         RSA_free(*ctx);
 
+    bi_ctx = bi_initialize();
     *ctx = (RSA_CTX *)calloc(1, sizeof(RSA_CTX));
     rsa_ctx = *ctx;
     rsa_ctx->bi_ctx = bi_ctx;

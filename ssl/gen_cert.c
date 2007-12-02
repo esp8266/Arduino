@@ -182,13 +182,18 @@ static int gen_issuer(const char * dn[], uint8_t *buf, int *offset)
     int seq_offset;
     int seq_size = pre_adjust_with_size(
                             ASN1_SEQUENCE, &seq_offset, buf, offset);
-    char hostname[128];
+    char fqdn[128]; 
 
-    /* we need the common name, so if not configured, use the hostname */
+    /* we need the common name, so if not configured, work out the fully
+     * qualified domain name */
     if (dn[X509_COMMON_NAME] == NULL || strlen(dn[X509_COMMON_NAME]) == 0)
     {
-        gethostname(hostname, sizeof(hostname));
-        dn[X509_COMMON_NAME] = hostname;
+        int fqdn_len;
+        gethostname(fqdn, sizeof(fqdn));
+        fqdn_len = strlen(fqdn);
+        fqdn[fqdn_len++] = '.';
+        getdomainname(&fqdn[fqdn_len], sizeof(fqdn)-fqdn_len);
+        dn[X509_COMMON_NAME] = fqdn;
     }
 
     if ((ret = gen_dn(dn[X509_COMMON_NAME], 3, buf, offset)))
@@ -201,10 +206,10 @@ static int gen_issuer(const char * dn[], uint8_t *buf, int *offset)
             ((ret = gen_dn(dn[X509_ORGANIZATION], 10, buf, offset))))
         goto error;
 
-    if (dn[X509_ORGANIZATIONAL_TYPE] != NULL &&
-                                strlen(dn[X509_ORGANIZATIONAL_TYPE]) > 0)
+    if (dn[X509_ORGANIZATIONAL_UNIT] != NULL &&
+                                strlen(dn[X509_ORGANIZATIONAL_UNIT]) > 0)
     {
-        if ((ret = gen_dn(dn[X509_ORGANIZATIONAL_TYPE], 11, buf, offset)))
+        if ((ret = gen_dn(dn[X509_ORGANIZATIONAL_UNIT], 11, buf, offset)))
             goto error;
     }
 

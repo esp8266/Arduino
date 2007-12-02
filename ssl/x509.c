@@ -387,50 +387,42 @@ end_verify:
 /**
  * Used for diagnostics.
  */
+static const char *not_part_of_cert = "<Not Part Of Certificate>";
 void x509_print(const X509_CTX *cert, CA_CERT_CTX *ca_cert_ctx) 
 {
     if (cert == NULL)
         return;
 
-    printf("----------------   CERT DEBUG   ----------------\n");
-    printf("* CA Cert Distinguished Name\n");
-    if (cert->ca_cert_dn[X509_COMMON_NAME])
-    {
-        printf("Common Name (CN):\t%s\n", cert->ca_cert_dn[X509_COMMON_NAME]);
-    }
+    printf("=== CERTIFICATE ISSUED TO ===\n");
+    printf("Common Name (CN):\t\t");
+    printf("%s\n", cert->cert_dn[X509_COMMON_NAME] ?
+                    cert->cert_dn[X509_COMMON_NAME] : not_part_of_cert);
 
-    if (cert->ca_cert_dn[X509_ORGANIZATION])
-    {
-        printf("Organization (O):\t%s\n", cert->ca_cert_dn[X509_ORGANIZATION]);
-    }
+    printf("Organization (O):\t\t");
+    printf("%s\n", cert->cert_dn[X509_ORGANIZATION] ?
+        cert->cert_dn[X509_ORGANIZATION] : not_part_of_cert);
 
-    if (cert->ca_cert_dn[X509_ORGANIZATIONAL_TYPE])
-    {
-        printf("Organizational Unit (OU): %s\n", 
-                cert->ca_cert_dn[X509_ORGANIZATIONAL_TYPE]);
-    }
+    printf("Organizational Unit (OU):\t");
+    printf("%s\n", cert->cert_dn[X509_ORGANIZATIONAL_UNIT] ?
+        cert->cert_dn[X509_ORGANIZATIONAL_UNIT] : not_part_of_cert);
 
-    printf("* Cert Distinguished Name\n");
-    if (cert->cert_dn[X509_COMMON_NAME])
-    {
-        printf("Common Name (CN):\t%s\n", cert->cert_dn[X509_COMMON_NAME]);
-    }
+    printf("=== CERTIFICATE ISSUED BY ===\n");
+    printf("Common Name (CN):\t\t");
+    printf("%s\n", cert->ca_cert_dn[X509_COMMON_NAME] ?
+                    cert->ca_cert_dn[X509_COMMON_NAME] : not_part_of_cert);
 
-    if (cert->cert_dn[X509_ORGANIZATION])
-    {
-        printf("Organization (O):\t%s\n", cert->cert_dn[X509_ORGANIZATION]);
-    }
+    printf("Organization (O):\t\t");
+    printf("%s\n", cert->ca_cert_dn[X509_ORGANIZATION] ?
+        cert->ca_cert_dn[X509_ORGANIZATION] : not_part_of_cert);
 
-    if (cert->cert_dn[X509_ORGANIZATIONAL_TYPE])
-    {
-        printf("Organizational Unit (OU): %s\n", 
-                cert->cert_dn[X509_ORGANIZATIONAL_TYPE]);
-    }
+    printf("Organizational Unit (OU):\t");
+    printf("%s\n", cert->ca_cert_dn[X509_ORGANIZATIONAL_UNIT] ?
+        cert->ca_cert_dn[X509_ORGANIZATIONAL_UNIT] : not_part_of_cert);
 
-    printf("Not Before:\t\t%s", ctime(&cert->not_before));
-    printf("Not After:\t\t%s", ctime(&cert->not_after));
-    printf("RSA bitsize:\t\t%d\n", cert->rsa_ctx->num_octets*8);
-    printf("Sig Type:\t\t");
+    printf("Not Before:\t\t\t%s", ctime(&cert->not_before));
+    printf("Not After:\t\t\t%s", ctime(&cert->not_after));
+    printf("RSA bitsize:\t\t\t%d\n", cert->rsa_ctx->num_octets*8);
+    printf("Sig Type:\t\t\t");
     switch (cert->sig_type)
     {
         case SIG_TYPE_MD5:

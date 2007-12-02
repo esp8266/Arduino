@@ -1248,6 +1248,13 @@ static int SSL_client_test(
                 goto client_test_exit;
             }
         }
+
+	if (ssl_obj_load(*ssl_ctx, SSL_OBJ_X509_CACERT, 
+				"../ssl/test/axTLS.ca_x509.cer", NULL))
+        {
+            printf("could not add cert auth\n"); TTY_FLUSH();
+            goto client_test_exit;
+        }
     }
     
     if (sess_resume && !sess_resume->start_server) 
@@ -1257,16 +1264,7 @@ static int SSL_client_test(
 
     if ((client_fd = client_socket_init(g_port)) < 0)
     {
-        printf("could not start socket on %d\n", g_port);
-        TTY_FLUSH();
-        goto client_test_exit;
-    }
-
-    if (ssl_obj_load(*ssl_ctx, SSL_OBJ_X509_CACERT, 
-                                        "../ssl/test/axTLS.ca_x509.cer", NULL))
-    {
-        printf("could not add cert auth\n");
-        TTY_FLUSH();
+        printf("could not start socket on %d\n", g_port); TTY_FLUSH();
         goto client_test_exit;
     }
 

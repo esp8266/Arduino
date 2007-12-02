@@ -353,6 +353,11 @@ int add_cert(SSL_CTX *ssl_ctx, const uint8_t *buf, int len)
     if ((ret = x509_new(buf, &offset, &cert)))
         goto error;
 
+#if defined (CONFIG_SSL_FULL_MODE)
+    if (ssl_ctx->options & SSL_DISPLAY_CERTS)
+        x509_print(cert, NULL);
+#endif
+
     ssl_cert = &ssl_ctx->certs[i];
     ssl_cert->size = len;
     ssl_cert->buf = (uint8_t *)malloc(len);
@@ -448,7 +453,7 @@ EXP_FUNC const char * STDCALL ssl_get_cert_dn(const SSL *ssl, int component)
             return ssl->x509_ctx->cert_dn[X509_ORGANIZATION];
 
         case SSL_X509_CERT_ORGANIZATIONAL_NAME:       
-            return ssl->x509_ctx->cert_dn[X509_ORGANIZATIONAL_TYPE];
+            return ssl->x509_ctx->cert_dn[X509_ORGANIZATIONAL_UNIT];
 
         case SSL_X509_CA_CERT_COMMON_NAME:
             return ssl->x509_ctx->ca_cert_dn[X509_COMMON_NAME];
@@ -457,7 +462,7 @@ EXP_FUNC const char * STDCALL ssl_get_cert_dn(const SSL *ssl, int component)
             return ssl->x509_ctx->ca_cert_dn[X509_ORGANIZATION];
 
         case SSL_X509_CA_CERT_ORGANIZATIONAL_NAME:       
-            return ssl->x509_ctx->ca_cert_dn[X509_ORGANIZATIONAL_TYPE];
+            return ssl->x509_ctx->ca_cert_dn[X509_ORGANIZATIONAL_UNIT];
 
         default:
             return NULL;

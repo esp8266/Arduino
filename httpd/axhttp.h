@@ -41,7 +41,7 @@
 #define BLOCKSIZE                           4096
 
 #define INITIAL_CONNECTION_SLOTS            10
-#define CONFIG_HTTP_DEFAULT_SSL_OPTIONS     0 
+#define CONFIG_HTTP_DEFAULT_SSL_OPTIONS     SSL_DISPLAY_CERTS
 
 #define STATE_WANT_TO_READ_HEAD             1
 #define STATE_WANT_TO_SEND_HEAD             2

@@ -19,9 +19,6 @@ config CONFIG_PLATFORM_LINUX
 config CONFIG_PLATFORM_CYGWIN
     bool "Cygwin"
 
-config CONFIG_PLATFORM_SOLARIS
-    bool "Solaris"
-
 config CONFIG_PLATFORM_WIN32
     bool "Win32"
 

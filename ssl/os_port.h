@@ -114,10 +114,7 @@ extern "C" {
  * automatically build some library dependencies.
  */
 #pragma comment(lib, "WS2_32.lib")
-
-#ifdef CONFIG_WIN32_USE_CRYPTO_LIB
 #pragma comment(lib, "AdvAPI32.lib")
-#endif
 
 typedef UINT8 uint8_t;
 typedef INT8 int8_t;
@@ -131,6 +128,7 @@ typedef int socklen_t;
 
 EXP_FUNC void STDCALL gettimeofday(struct timeval* t,void* timezone);
 EXP_FUNC int STDCALL strcasecmp(const char *s1, const char *s2);
+EXP_FUNC int STDCALL getdomainname(char *buf, int buf_size);
 
 #else   /* Not Win32 */
 

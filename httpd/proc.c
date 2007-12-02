@@ -321,7 +321,7 @@ void procreadhead(struct connstruct *cn)
         /* If we have a blank line, advance to next stage */
         if (*next == '\r' || *next == '\n') 
         {
-#ifndef WIN32
+#if defined(CONFIG_HTTP_HAS_CGI)
             if (cn->reqtype == TYPE_POST && cn->content_length > 0)
             {
                 if (init_read_post_data(buf,next,cn,rv) == 0)

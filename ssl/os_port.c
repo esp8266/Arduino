@@ -72,6 +72,22 @@ EXP_FUNC int STDCALL strcasecmp(const char *s1, const char *s2)
     return *(unsigned char *)s1 - *(unsigned char *)(s2 - 1);
 }
 
+
+EXP_FUNC int STDCALL getdomainname(char *buf, int buf_size)
+{
+    HKEY hKey;
+    unsigned long datatype;
+    unsigned long bufferlength = buf_size;
+
+    if (RegOpenKeyEx(HKEY_LOCAL_MACHINE,
+            TEXT("SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters"),
+                        0, KEY_QUERY_VALUE, &hKey) != ERROR_SUCCESS)
+        return -1;
+
+    RegQueryValueEx(hKey, "Domain", NULL, &datatype, buf, &bufferlength);
+    RegCloseKey(hKey);
+    return 0; 
+}
 #endif
 
 #undef malloc

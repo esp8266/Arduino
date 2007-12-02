@@ -187,10 +187,6 @@ int main(int argc, char *argv[])
     ax_chdir();
 
 #ifndef WIN32 
-#ifdef CONFIG_HTTP_CHANGE_UID
-    setgid(32767);
-    setuid(32767);
-#endif
 #ifdef CONFIG_HTTP_IS_DAEMON
     if (fork() > 0)  /* parent will die */
         exit(0);

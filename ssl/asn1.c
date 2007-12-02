@@ -132,10 +132,10 @@ end_int_array:
 int asn1_get_private_key(const uint8_t *buf, int len, RSA_CTX **rsa_ctx)
 {
     int offset = 7;
-    uint8_t *modulus, *priv_exp, *pub_exp;
+    uint8_t *modulus = NULL, *priv_exp = NULL, *pub_exp = NULL;
     int mod_len, priv_len, pub_len;
 #ifdef CONFIG_BIGINT_CRT
-    uint8_t *p, *q, *dP, *dQ, *qInv;
+    uint8_t *p = NULL, *q = NULL, *dP = NULL, *dQ = NULL, *qInv = NULL;
     int p_len, q_len, dP_len, dQ_len, qInv_len;
 #endif
 
@@ -348,7 +348,7 @@ end_name:
 int asn1_public_key(const uint8_t *cert, int *offset, X509_CTX *x509_ctx)
 {
     int ret = X509_NOT_OK, mod_len, pub_len;
-    uint8_t *modulus, *pub_exp;
+    uint8_t *modulus = NULL, *pub_exp = NULL;
 
     if (asn1_next_obj(cert, offset, ASN1_SEQUENCE) < 0 ||
             asn1_skip_obj(cert, offset, ASN1_SEQUENCE) ||
