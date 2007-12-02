@@ -264,7 +264,7 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert)
     bigint *cert_sig;
     X509_CTX *next_cert = NULL;
     BI_CTX *ctx;
-    bigint *mod, *expn;
+    bigint *mod = NULL, *expn = NULL;
     struct timeval tv;
     int match_ca_cert = 0;
     uint8_t is_self_signed = 0;
@@ -319,14 +319,6 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert)
         goto end_verify;
     }
 
-    /* check the chain integrity */
-    if (next_cert && !match_ca_cert &&
-               asn1_compare_dn(cert->ca_cert_dn, next_cert->cert_dn) == 0)
-    {
-        ret = X509_VFY_ERROR_INVALID_CHAIN;
-        goto end_verify;
-    }
-
     ctx = cert->rsa_ctx->bi_ctx;
 
     /* check for self-signing */
@@ -336,30 +328,42 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert)
         mod = cert->rsa_ctx->m;
         expn = cert->rsa_ctx->e;
     }
-    else
+    else if (next_cert != NULL)
     {
         mod = next_cert->rsa_ctx->m;
         expn = next_cert->rsa_ctx->e;
+
+        /* check the chain integrity */
+        if (asn1_compare_dn(cert->ca_cert_dn, next_cert->cert_dn) != 0)
+        {
+            ret = X509_VFY_ERROR_INVALID_CHAIN;
+            goto end_verify;
+        }
     }
 
     /* check the signature */
-    cert_sig = sig_verify(ctx, cert->signature, cert->sig_len, 
-            bi_clone(ctx, mod), bi_clone(ctx, expn));
-
-    if (cert_sig && cert->digest)
+    if (mod != NULL)
     {
-        if (bi_compare(cert_sig, cert->digest))
+        cert_sig = sig_verify(ctx, cert->signature, cert->sig_len, 
+                bi_clone(ctx, mod), bi_clone(ctx, expn));
+
+        if (cert_sig && cert->digest)
+        {
+            if (bi_compare(cert_sig, cert->digest))
+            {
+                ret = X509_VFY_ERROR_BAD_SIGNATURE;
+            }
+
+            bi_free(ctx, cert_sig);
+
+            if (ret)
+                goto end_verify;
+        }
+        else
+        {
             ret = X509_VFY_ERROR_BAD_SIGNATURE;
-
-        bi_free(ctx, cert_sig);
-
-        if (ret)
             goto end_verify;
-    }
-    else
-    {
-        ret = X509_VFY_ERROR_BAD_SIGNATURE;
-        goto end_verify;
+        }
     }
 
     if (is_self_signed)

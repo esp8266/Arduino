@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DOCUMENT type="Advanced Installer" CreateVersion="3.9" version="5.2.2" modules="freeware" RootPath="." Language="en">
+<DOCUMENT type="Advanced Installer" CreateVersion="3.9" version="6.0.1" modules="freeware" RootPath="." Language="en">
   <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
     <ROW Property="ALLUSERS" Value="2"/>
     <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install &lt;product name&gt;." ValueLocId="*"/>
@@ -8,10 +8,10 @@
     <ROW Property="BannerBitmap" Value="default_banner.bmp" Type="1"/>
     <ROW Property="DialogBitmap" Value="default_dialog.bmp" Type="1"/>
     <ROW Property="Manufacturer" Value="axTLS" ValueLocId="*"/>
-    <ROW Property="ProductCode" Value="1033:{E8FE72D8-1458-4F35-9759-EEBE44D96732} "/>
+    <ROW Property="ProductCode" Value="1033:{F49FFA19-C243-4627-BE13-7DEDA4E700D0} "/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Axhttpd" ValueLocId="*"/>
-    <ROW Property="ProductVersion" Value="1.1.7"/>
+    <ROW Property="ProductVersion" Value="1.1.8"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{93E5623E-740C-449C-9770-EDABD392868D}"/>
   </COMPONENT>
@@ -51,8 +51,8 @@
     <ROW File="axtls.dll" Component_="axtls.dll" FileName="axtls.dll" Attributes="0" SourcePath="..\_stage\axtls.dll" SelfReg="false" Sequence="3"/>
     <ROW File="axtls.lib" Component_="axtls.jar" FileName="axtls.lib" Attributes="0" SourcePath="..\_stage\axtls.lib" SelfReg="false" Sequence="4"/>
     <ROW File="axtls.static.lib" Component_="axtls.jar" FileName="axtlss~1.lib|axtls.static.lib" Attributes="0" SourcePath="..\_stage\axtls.static.lib" SelfReg="false" Sequence="5"/>
-    <ROW File="bigint.h" Component_="bigint.h" FileName="bigint.h" Attributes="0" SourcePath="..\ssl\bigint.h" SelfReg="false" Sequence="12"/>
-    <ROW File="bigint_impl.h" Component_="bigint.h" FileName="bigint~1.h|bigint_impl.h" Attributes="0" SourcePath="..\ssl\bigint_impl.h" SelfReg="false" Sequence="9"/>
+    <ROW File="bigint.h" Component_="bigint.h" FileName="bigint.h" Attributes="0" SourcePath="..\crypto\bigint.h" SelfReg="false" Sequence="12"/>
+    <ROW File="bigint_impl.h" Component_="bigint.h" FileName="bigint~1.h|bigint_impl.h" Attributes="0" SourcePath="..\crypto\bigint_impl.h" SelfReg="false" Sequence="9"/>
     <ROW File="crypto.h" Component_="bigint.h" FileName="crypto.h" Attributes="0" SourcePath="..\crypto\crypto.h" SelfReg="false" Sequence="10"/>
     <ROW File="crypto_misc.h" Component_="bigint.h" FileName="crypto~1.h|crypto_misc.h" Attributes="0" SourcePath="..\ssl\crypto_misc.h" SelfReg="false" Sequence="21"/>
     <ROW File="favicon.ico" Component_="favicon.ico" FileName="favicon.ico" Attributes="0" SourcePath="..\www\favicon.ico" SelfReg="false" Sequence="6"/>
@@ -69,7 +69,7 @@
     <ROW File="tls1.h" Component_="bigint.h" FileName="tls1.h" Attributes="0" SourcePath="..\ssl\tls1.h" SelfReg="false" Sequence="11"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
-    <ROW BuildName="DefaultBuild" BuildOrder="1" BuildType="0" InstallationType="4"/>
+    <ROW BuildKey="DefaultBuild" BuildName="DefaultBuild" BuildOrder="1" BuildType="0" InstallationType="4"/>
     <ATTRIBUTE name="CurrentBuild" value="DefaultBuild"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
@@ -105,15 +105,15 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCustActComponent">
     <ROW Action="AI_DOWNGRADE" Type="19" Target="4010"/>
-    <ROW Action="AI_PREPARE_UPGRADE" Type="1" Source="aicustact.dll" Target="PrepareUpgrade"/>
-    <ROW Action="AI_RESTORE_LOCATION" Type="1" Source="aicustact.dll" Target="RestoreLocation"/>
+    <ROW Action="AI_PREPARE_UPGRADE" Type="65" Source="aicustact.dll" Target="PrepareUpgrade"/>
+    <ROW Action="AI_RESTORE_LOCATION" Type="65" Source="aicustact.dll" Target="RestoreLocation"/>
     <ROW Action="AI_STORE_LOCATION" Type="51" Source="ARPINSTALLLOCATION" Target="[APPDIR]"/>
     <ROW Action="SET_APPDIR" Type="307" Source="APPDIR" Target="[ProgramFilesFolder][Manufacturer]\[ProductName]" MultiBuildTarget="DefaultBuild:[ProgramFilesFolder][ProductName]"/>
     <ROW Action="SET_SHORTCUTDIR" Type="307" Source="SHORTCUTDIR" Target="[ProgramMenuFolder][ProductName]"/>
     <ROW Action="SET_TARGETDIR_TO_APPDIR" Type="51" Source="TARGETDIR" Target="[APPDIR]"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
-    <ROW Name="controlPanelIcon.exe" SourcePath="..\www\favicon.ico" Index="0"/>
+    <ROW Name="controlPanelIcon.exe" SourcePath="..\..\axhttpd\www\favicon.ico" Index="0"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
     <ROW Action="AI_DOWNGRADE" Condition="AI_NEWERPRODUCTFOUND AND (UILevel &lt;&gt; 5)" Sequence="210"/>

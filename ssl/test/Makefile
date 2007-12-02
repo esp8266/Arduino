@@ -75,11 +75,12 @@ CRYPTO_OBJ=\
 
 OBJ=\
 	$(AXTLS_SSL_PATH)asn1.obj \
-	$(AXTLS_SSL_PATH)x509.obj \
-	$(AXTLS_SSL_PATH)os_port.obj \
+	$(AXTLS_SSL_PATH)gen_cert.obj \
 	$(AXTLS_SSL_PATH)loader.obj \
 	$(AXTLS_SSL_PATH)openssl.obj \
+	$(AXTLS_SSL_PATH)os_port.obj \
 	$(AXTLS_SSL_PATH)p12.obj \
+	$(AXTLS_SSL_PATH)x509.obj \
 	$(AXTLS_SSL_PATH)tls1.obj \
 	$(AXTLS_SSL_PATH)tls1_svr.obj \
 	$(AXTLS_SSL_PATH)tls1_clnt.obj

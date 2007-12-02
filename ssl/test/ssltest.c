@@ -58,7 +58,6 @@
 
 static int g_port = 19001;
 
-#if 0
 /**************************************************************************
  * AES tests 
  * 
@@ -647,7 +646,6 @@ bad_cert:
         printf("Error: A certificate test failed\n");
     return res;
 }
-#endif
 
 /**
  * init a server socket.
@@ -781,6 +779,11 @@ static int SSL_server_test(
     if ((server_fd = server_socket_init(&g_port)) < 0)
         goto error;
 
+    if (private_key)
+    {
+        axolotls_option |= SSL_NO_DEFAULT_KEY;
+    }
+
     if ((ssl_ctx = ssl_ctx_new(axolotls_option, SSL_DEFAULT_SVR_SESS)) == NULL)
     {
         ret = SSL_ERROR_INVALID_KEY;
@@ -881,7 +884,6 @@ static int SSL_server_test(
 
 error:
     ssl_ctx_free(ssl_ctx);
-printf("RES %d\n", ret); TTY_FLUSH();
     return ret;
 }
 
@@ -1126,8 +1128,13 @@ int SSL_server_tests(void)
 cleanup:
     if (ret)
     {
-        printf("Error: A server test failed\n"); TTY_FLUSH();
+        printf("Error: A server test failed\n");
+        ssl_display_error(ret);
         exit(1);
+    }
+    else
+    {
+        printf("All server tests passed\n"); TTY_FLUSH();
     }
 
     return ret;
@@ -1203,6 +1210,11 @@ static int SSL_client_test(
 
     if (*ssl_ctx == NULL)
     {
+        if (private_key)
+        {
+            client_options |= SSL_NO_DEFAULT_KEY;
+        }
+
         if ((*ssl_ctx = ssl_ctx_new(
                             client_options, SSL_DEFAULT_CLNT_SESS)) == NULL)
         {
@@ -1402,7 +1414,7 @@ int SSL_client_tests(void)
                     &ssl_ctx,
                     "-cert ../ssl/test/axTLS.x509_device.pem "
                     "-key ../ssl/test/axTLS.device_key.pem "
-                    "-CAfile ../ssl/test/axTLS.x509_512.pem", NULL,
+                    "-CAfile ../ssl/test/axTLS.x509_512.pem ", NULL,
                     DEFAULT_CLNT_OPTION, NULL, NULL, NULL)))
         goto cleanup;
 
@@ -1414,7 +1426,8 @@ int SSL_client_tests(void)
                     "-CAfile ../ssl/test/axTLS.ca_x509.pem "
                     "-verify 1 ", NULL, DEFAULT_CLNT_OPTION, 
                     "../ssl/test/axTLS.key_1024", NULL,
-                    "../ssl/test/axTLS.x509_1024.cer")))
+                    "../ssl/test/axTLS.x509_1024.cer")) 
+                        != SSL_X509_ERROR(X509_VFY_ERROR_SELF_SIGNED))
         goto cleanup;
 
     /* Should get an "ERROR" from openssl (as the handshake fails as soon as
@@ -1451,7 +1464,15 @@ int SSL_client_tests(void)
 
 cleanup:
     if (ret)
+    {
+        ssl_display_error(ret);
         printf("Error: A client test failed\n");
+        exit(1);
+    }
+    else
+    {
+        printf("All client tests passed\n"); TTY_FLUSH();
+    }
 
     return ret;
 }
@@ -1460,7 +1481,6 @@ cleanup:
  * SSL Basic Testing (test a big packet handshake)
  *
  **************************************************************************/
-#if 0
 static uint8_t basic_buf[256*1024];
 
 static void do_basic(void)
@@ -1483,6 +1503,7 @@ static void do_basic(void)
     /* check the return status */
     if (ssl_handshake_status(ssl_clnt) < 0)
     {
+        printf("YA YA\n");
         ssl_display_error(ssl_handshake_status(ssl_clnt));
         goto error;
     }
@@ -1571,7 +1592,6 @@ error:
     ssl_ctx_free(ssl_svr_ctx);
     return ret;
 }
-#endif
 
 #if !defined(WIN32) && defined(CONFIG_SSL_CTX_MUTEXING)
 /**************************************************************************
@@ -1725,7 +1745,7 @@ error:
     SOCKET_CLOSE(server_fd);
     return res;
 }
-#endif
+#endif /* !defined(WIN32) && defined(CONFIG_SSL_CTX_MUTEXING) */ 
 
 /**************************************************************************
  * Header issue
@@ -1792,7 +1812,7 @@ error:
 int main(int argc, char *argv[])
 {
     int ret = 1;
-    //BI_CTX *bi_ctx;
+    BI_CTX *bi_ctx;
     int fd;
 
 #ifdef WIN32
@@ -1807,7 +1827,12 @@ int main(int argc, char *argv[])
     dup2(fd, 2);
 #endif
 
-#if 0
+    /* can't do testing in this mode */
+#if defined CONFIG_SSL_GENERATE_X509_CERT
+    printf("Error: Must compile with default key/certificates\n");
+    exit(1);
+#endif
+
     bi_ctx = bi_initialize();
 
     if (AES_test(bi_ctx))
@@ -1882,7 +1907,6 @@ int main(int argc, char *argv[])
         goto cleanup;
 
     system("sh ../ssl/test/killopenssl.sh");
-#endif
 
     if (SSL_server_tests())
         goto cleanup;
@@ -1891,7 +1915,7 @@ int main(int argc, char *argv[])
 
     if (header_issue())
     {
-        printf("Header tests failed\n");
+        printf("Header tests failed\n"); TTY_FLUSH();
         goto cleanup;
     }
 

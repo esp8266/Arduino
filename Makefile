@@ -82,6 +82,7 @@ docs:
 
 # build the Win32 demo release version
 win32_demo:
+	@echo "#define AXTLS_VERSION    \"$(VERSION)\"" > ssl/version.h
 	$(MAKE) win32releaseconf
 
 install: $(PREFIX) all

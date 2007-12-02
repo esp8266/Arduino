@@ -305,7 +305,7 @@ static int send_client_key_xchg(SSL *ssl)
     premaster_secret[0] = 0x03; /* encode the version number */
     premaster_secret[1] = 0x01;
     get_random(SSL_SECRET_SIZE-2, &premaster_secret[2]);
-    DISPLAY_RSA(ssl, "send_client_key_xchg", ssl->x509_ctx->rsa_ctx);
+    DISPLAY_RSA(ssl, ssl->x509_ctx->rsa_ctx);
 
     /* rsa_ctx->bi_ctx is not thread-safe */
     SSL_CTX_LOCK(ssl->ssl_ctx->mutex);
@@ -351,7 +351,7 @@ static int send_cert_verify(SSL *ssl)
     RSA_CTX *rsa_ctx = ssl->ssl_ctx->rsa_ctx;
     int n = 0, ret;
 
-    DISPLAY_RSA(ssl, "send_cert_verify", rsa_ctx);
+    DISPLAY_RSA(ssl, rsa_ctx);
 
     buf[0] = HS_CERT_VERIFY;
     buf[1] = 0;

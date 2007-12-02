@@ -144,7 +144,7 @@ config CONFIG_SSL_PRIVATE_KEY_PASSWORD
 
 config CONFIG_SSL_X509_CERT_LOCATION
     string "X.509 certificate file location"
-    depends on !CONFIG_SSL_GENERATE_X509_CERT && !CONFIG_SSL_SKELETON_MODE
+    depends on !CONFIG_SSL_GENERATE_X509_CERT && !CONFIG_SSL_USE_DEFAULT_KEY && !CONFIG_SSL_SKELETON_MODE
     help
         The file location of the X.509 certificate which will be automatically
         loaded on a ssl_ctx_new().
@@ -156,10 +156,13 @@ config CONFIG_SSL_GENERATE_X509_CERT
         An X.509 certificate can be automatically generated on a
         ssl_ctx_new(). A private key still needs to be provided (the private
         key in ss/private_key.h will be used unless 
-        CONFIG_SSL_PRIVATE_KEY_LOCATION is set.
+        CONFIG_SSL_PRIVATE_KEY_LOCATION is set).
 
         The certificate is generated on the fly, and so a minor start-up time
-        penalty is to be expected.
+        penalty is to be expected. This feature adds around 5kB to the
+        library.
+
+        This feature is disabled by default.
 
 config CONFIG_SSL_X509_COMMON_NAME
     string "X.509 Common Name"
@@ -168,7 +171,7 @@ config CONFIG_SSL_X509_COMMON_NAME
         The common name for the X.509 certificate. This should in theory be
         the URL for server.
 
-        If this is blank, then the hostname is used.
+        If this is blank, then this will be value from gethostname().
 
 config CONFIG_SSL_X509_ORGANIZATION_NAME
     string "X.509 Organization Name"
@@ -176,14 +179,15 @@ config CONFIG_SSL_X509_ORGANIZATION_NAME
     help
         The organization name for the generated X.509 certificate. 
 
-        If this is blank, then $USERNAME will be used.
+        If this is blank, then $USERDOMAIN will be used.
 
 config CONFIG_SSL_X509_ORGANIZATION_UNIT_NAME
     string "X.509 Organization Unit Name"
     depends on CONFIG_SSL_GENERATE_X509_CERT
     help
-        The organization unit name for the generated X.509 certificate. This
-        field is optional.
+        The organization unit name for the generated X.509 certificate. 
+
+        This field is optional.
 
 config CONFIG_SSL_ENABLE_V23_HANDSHAKE
     bool "Enable v23 Handshake"
@@ -322,7 +326,7 @@ config CONFIG_PERFORMANCE_TESTING
 config CONFIG_SSL_TEST
     bool "Build the SSL testing tool"
     default n
-    depends on CONFIG_SSL_FULL_MODE
+    depends on CONFIG_SSL_FULL_MODE && !CONFIG_SSL_GENERATE_X509_CERT 
     help
         Used for sanity checking the SSL handshaking.
 

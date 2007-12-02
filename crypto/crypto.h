@@ -198,7 +198,7 @@ void RSA_free(RSA_CTX *ctx);
 int RSA_decrypt(const RSA_CTX *ctx, const uint8_t *in_data, uint8_t *out_data,
         int is_decryption);
 bigint *RSA_private(const RSA_CTX *c, bigint *bi_msg);
-#ifdef CONFIG_SSL_CERT_VERIFICATION
+#if defined(CONFIG_SSL_CERT_VERIFICATION) || defined(CONFIG_SSL_GENERATE_X509_CERT)
 bigint *RSA_sign_verify(BI_CTX *ctx, const uint8_t *sig, int sig_len,
         bigint *modulus, bigint *pub_exp);
 bigint *RSA_public(const RSA_CTX * c, bigint *bi_msg);

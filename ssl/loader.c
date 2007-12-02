@@ -395,6 +395,16 @@ int load_key_certs(SSL_CTX *ssl_ctx)
 {
     int ret = SSL_OK;
     uint32_t options = ssl_ctx->options;
+#ifdef CONFIG_SSL_GENERATE_X509_CERT 
+    uint8_t *cert_data = NULL;
+    int cert_size;
+    static const char *dn[] = 
+    {
+        CONFIG_SSL_X509_COMMON_NAME,
+        CONFIG_SSL_X509_ORGANIZATION_NAME,
+        CONFIG_SSL_X509_ORGANIZATION_UNIT_NAME
+    };
+#endif
 
     /* do the private key first */
     if (strlen(CONFIG_SSL_PRIVATE_KEY_LOCATION) > 0)
@@ -417,16 +427,7 @@ int load_key_certs(SSL_CTX *ssl_ctx)
 
     /* now load the certificate */
 #ifdef CONFIG_SSL_GENERATE_X509_CERT 
-    uint8_t *cert_data;
-    int cert_size;
-    static const char *dn[] = 
-    {
-        CONFIG_SSL_X509_COMMON_NAME,
-        CONFIG_SSL_X509_ORGANIZATION_NAME,
-        CONFIG_SSL_X509_ORGANIZATION_UNIT_NAME
-    };
-
-    if ((cert_size = ssl_x509_create(ssl_ctx, dn, &cert_data)) < 0)
+    if ((cert_size = ssl_x509_create(ssl_ctx, 0, dn, &cert_data)) < 0)
     {
         ret = cert_size;
         goto error;

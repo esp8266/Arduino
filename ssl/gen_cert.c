@@ -195,14 +195,14 @@ static int gen_issuer(const char * dn[], uint8_t *buf, int *offset)
         goto error;
 
     if (dn[X509_ORGANIZATION] == NULL || strlen(dn[X509_ORGANIZATION]) == 0)
-        dn[X509_ORGANIZATION] = getenv("USERNAME");
+        dn[X509_ORGANIZATION] = getenv("USERDOMAIN");
 
     if (dn[X509_ORGANIZATION] != NULL && 
             ((ret = gen_dn(dn[X509_ORGANIZATION], 10, buf, offset))))
         goto error;
 
     if (dn[X509_ORGANIZATIONAL_TYPE] != NULL &&
-                                strlen(dn[X509_ORGANIZATIONAL_TYPE]) != 0)
+                                strlen(dn[X509_ORGANIZATIONAL_TYPE]) > 0)
     {
         if ((ret = gen_dn(dn[X509_ORGANIZATIONAL_TYPE], 11, buf, offset)))
             goto error;
@@ -219,8 +219,8 @@ static const uint8_t time_seq[] =
     ASN1_SEQUENCE, 30, 
     ASN1_UTC_TIME, 13, 
     '0', '7', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', 'Z', 
-    ASN1_UTC_TIME, 13,  /* make it good for 40 or so years */
-    '4', '9', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', 'Z'
+    ASN1_UTC_TIME, 13,  /* make it good for 30 or so years */
+    '3', '8', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', 'Z'
 };
 
 static void gen_utc_time(uint8_t *buf, int *offset)
@@ -342,7 +342,7 @@ error:
 /**
  * Create a new certificate.
  */
-EXP_FUNC int STDCALL ssl_x509_create(SSL_CTX *ssl_ctx, const char * dn[], uint32_t options, uint8_t **cert_data)
+EXP_FUNC int STDCALL ssl_x509_create(SSL_CTX *ssl_ctx, uint32_t options, const char * dn[], uint8_t **cert_data)
 {
     int ret = X509_OK, offset = 0, seq_offset;
     /* allocate enough space to load a new certificate */

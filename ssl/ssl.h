@@ -439,9 +439,10 @@ EXP_FUNC int STDCALL ssl_obj_memory_load(SSL_CTX *ssl_ctx, int obj_type, const u
  * @brief Create an X.509 certificate. 
  * 
  * This certificate is a self-signed v1 cert with a fixed start/stop validity 
- * times. It is also signed with the private key in ssl_ctx->rsa_ctx.
+ * times. It is signed with an internal private key in ssl_ctx.
  *
  * @param ssl_ctx [in] The client/server context.
+ * @param options [in] Not used yet.
  * @param dn [in] An array of distinguished name strings. The array is defined
  * by:
  * - SSL_X509_CERT_COMMON_NAME (0)
@@ -452,12 +453,11 @@ EXP_FUNC int STDCALL ssl_obj_memory_load(SSL_CTX *ssl_ctx, int obj_type, const u
  *        will be used.
  * - SSL_X509_CERT_ORGANIZATIONAL_NAME (2)
  *      - SSL_X509_CERT_ORGANIZATIONAL_NAME is optional.
- * @param options [in] Not used yet.
  * @param cert_data [out] The certificate as a sequence of bytes.
  * @return < 0 if an error, or the size of the certificate in bytes.
  * @note cert_data must be freed when there is no more need for it.
  */
-EXP_FUNC int STDCALL ssl_x509_create(SSL_CTX *ssl_ctx, const char * dn[], uint32_t options, uint8_t **cert_data);
+EXP_FUNC int STDCALL ssl_x509_create(SSL_CTX *ssl_ctx, uint32_t options, const char * dn[], uint8_t **cert_data);
 #endif
 
 /**

@@ -112,7 +112,7 @@ int asn1_get_int(const uint8_t *buf, int *offset, uint8_t **object)
     if ((len = asn1_next_obj(buf, offset, ASN1_INTEGER)) < 0)
         goto end_int_array;
 
-    if (buf[*offset] == 0x00)    /* ignore the negative byte */
+    if (len > 1 && buf[*offset] == 0x00)    /* ignore the negative byte */
     {
         len--;
         (*offset)++;

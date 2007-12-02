@@ -414,7 +414,7 @@ int add_cert_auth(SSL_CTX *ssl_ctx, const uint8_t *buf, int len)
         x509_free(cert);        /* get rid of it */
         ca_cert_ctx->cert[i] = NULL;
 #ifdef CONFIG_SSL_FULL_MODE
-        printf("Error: %s\n", x509_display_error(ret));
+        printf("Error: %s\n", x509_display_error(ret)); TTY_FLUSH();
 #endif
         goto error;
     }
@@ -1477,7 +1477,6 @@ int send_certificate(SSL *ssl)
 
     while (i < ssl->ssl_ctx->chain_length)
     {
-        X509_CTX *cert_ctx;
         SSL_CERT *cert = &ssl->ssl_ctx->certs[i];
         buf[offset++] = 0;        
         buf[offset++] = cert->size >> 8;        /* cert 1 length */
@@ -1485,10 +1484,6 @@ int send_certificate(SSL *ssl)
         memcpy(&buf[offset], cert->buf, cert->size);
         offset += cert->size;
         i++;
-        // TODO: get rid of these
-        x509_new(cert->buf, &cert->size, &cert_ctx);
-        x509_print(cert_ctx, NULL);
-        x509_free(cert_ctx);
     }
 
     chain_length = offset - 7;

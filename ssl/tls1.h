@@ -42,6 +42,7 @@ extern "C" {
 
 #include "version.h"
 #include "crypto.h"
+#include "os_port.h"
 #include "crypto_misc.h"
 
 #define SSL_RANDOM_SIZE             32
@@ -261,8 +262,8 @@ void DISPLAY_RSA(SSL *ssl,  const RSA_CTX *rsa_ctx);
 void DISPLAY_ALERT(SSL *ssl, int alert);
 #else
 #define DISPLAY_STATE(A,B,C,D)
-#define DISPLAY_CERT(A,B,C)
-#define DISPLAY_RSA(A,B,C)
+#define DISPLAY_CERT(A,B)
+#define DISPLAY_RSA(A,B)
 #define DISPLAY_ALERT(A, B)
 #ifdef WIN32
 void DISPLAY_BYTES(SSL *ssl, const char *format,/* win32 has no variadic macros */

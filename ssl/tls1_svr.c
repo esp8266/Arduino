@@ -378,7 +378,7 @@ static int process_client_key_xchg(SSL *ssl)
     int offset = 4;
     int ret = SSL_OK;
     
-    DISPLAY_RSA(ssl, "process_client_key_xchg", rsa_ctx);
+    DISPLAY_RSA(ssl, rsa_ctx);
 
     /* is there an extra size field? */
     if ((secret_length - 2) == rsa_ctx->num_octets)
@@ -444,7 +444,7 @@ static int process_cert_verify(SSL *ssl)
 
     PARANOIA_CHECK(pkt_size, x509_ctx->rsa_ctx->num_octets+6);
 
-    DISPLAY_RSA(ssl, "process_cert_verify", x509_ctx->rsa_ctx);
+    DISPLAY_RSA(ssl, x509_ctx->rsa_ctx);
 
     /* rsa_ctx->bi_ctx is not thread-safe */
     SSL_CTX_LOCK(ssl->ssl_ctx->mutex);
