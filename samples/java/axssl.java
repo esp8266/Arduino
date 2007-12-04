@@ -562,7 +562,7 @@ public class axssl
 
             if (common_name != null)
             {
-                System.out.println("Common Name:\t\t" + common_name);
+                System.out.println("Common Name:\t\t\t" + common_name);
             }
 
             display_session_id(ssl);

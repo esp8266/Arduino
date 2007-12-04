@@ -668,7 +668,7 @@ static void do_client(int argc, char *argv[])
                 SSL_X509_CERT_COMMON_NAME);
         if (common_name)
         {
-            printf("Common Name:\t\t%s\n", common_name);
+            printf("Common Name:\t\t\t%s\n", common_name);
         }
 
         display_session_id(ssl);

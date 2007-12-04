@@ -455,6 +455,8 @@ void x509_print(const X509_CTX *cert, CA_CERT_CTX *ca_cert_ctx)
     {
         x509_print(cert->next, ca_cert_ctx);
     }
+
+    TTY_FLUSH();
 }
 
 const char * x509_display_error(int error)
@@ -463,43 +465,33 @@ const char * x509_display_error(int error)
     {
         case X509_NOT_OK:
             return "X509 not ok";
-            break;
 
         case X509_VFY_ERROR_NO_TRUSTED_CERT:
             return "No trusted cert is available";
-            break;
 
         case X509_VFY_ERROR_BAD_SIGNATURE:
             return "Bad signature";
-            break;
 
         case X509_VFY_ERROR_NOT_YET_VALID:
             return "Cert is not yet valid";
-            break;
 
         case X509_VFY_ERROR_EXPIRED:
             return "Cert has expired";
-            break;
 
         case X509_VFY_ERROR_SELF_SIGNED:
             return "Cert is self-signed";
-            break;
 
         case X509_VFY_ERROR_INVALID_CHAIN:
             return "Chain is invalid (check order of certs)";
-            break;
 
         case X509_VFY_ERROR_UNSUPPORTED_DIGEST:
             return "Unsupported digest";
-            break;
 
         case X509_INVALID_PRIV_KEY:
             return "Invalid private key";
-            break;
 
         default:
             return "Unknown";
-            break;
     }
 }
 #endif      /* CONFIG_SSL_FULL_MODE */

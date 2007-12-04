@@ -39,36 +39,6 @@
  * Generate a basic X.509 certificate
  */
 
-/* OBJECT IDENTIFIER sha1withRSAEncryption (1 2 840 113549 1 1 5) */
-static const uint8_t sig_oid[] = 
-{
-    0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x05
-};
-
-/*  OBJECT IDENTIFIER rsaEncryption (1 2 840 113549 1 1 1) */
-static const uint8_t rsa_enc_oid[] =
-{
-    0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01
-};
-
-/* INTEGER 65537 */
-static const uint8_t pub_key_seq[] = 
-{
-    0x02, 0x03, 0x01, 0x00, 0x01
-};
-
-/* 0x00 + SEQUENCE {
-     SEQUENCE {
-       OBJECT IDENTIFIER sha1 (1 3 14 3 2 26)
-       NULL
-       }
-     OCTET STRING */
-static const uint8_t asn1_sig[] = 
-{
-    0x30,  0x21, 0x30, 0x09, 0x06, 0x05, 0x2b, 0x0e, 0x03, 0x02,
-    0x1a, 0x05, 0x00, 0x04, 0x14 
-};
-
 static uint8_t set_gen_length(int len, uint8_t *buf, int *offset)
 {
     if (len < 0x80) /* short form */
@@ -129,21 +99,23 @@ static void adjust_with_size(int seq_size, int seq_start,
 
 static void gen_serial_number(uint8_t *buf, int *offset)
 {
-    buf[(*offset)++] = ASN1_INTEGER;
-    buf[(*offset)++] = 1;
-    buf[(*offset)++] = 0x7F;
+    static const uint8_t ser_oid[] = { ASN1_INTEGER, 1, 0x7F };
+    memcpy(&buf[*offset], ser_oid , sizeof(ser_oid));
+    *offset += sizeof(ser_oid);
 }
 
 static void gen_signature_alg(uint8_t *buf, int *offset)
 {
-    buf[(*offset)++] = ASN1_SEQUENCE;
-    set_gen_length(13, buf, offset);
-    buf[(*offset)++] = ASN1_OID;
-    set_gen_length(sizeof(sig_oid), buf, offset);
+    /* OBJECT IDENTIFIER sha1withRSAEncryption (1 2 840 113549 1 1 5) */
+    static const uint8_t sig_oid[] = 
+    {
+        ASN1_SEQUENCE, 0x0d, ASN1_OID, 0x09, 
+        0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x05,
+        ASN1_NULL, 0x00
+    };
+
     memcpy(&buf[*offset], sig_oid, sizeof(sig_oid));
     *offset += sizeof(sig_oid);
-    buf[(*offset)++] = ASN1_NULL;
-    buf[(*offset)++] = 0;
 }
 
 static int gen_dn(const char *name, uint8_t dn_type, 
@@ -193,18 +165,22 @@ static int gen_issuer(const char * dn[], uint8_t *buf, int *offset)
         fqdn_len = strlen(fqdn);
         fqdn[fqdn_len++] = '.';
         getdomainname(&fqdn[fqdn_len], sizeof(fqdn)-fqdn_len);
+        fqdn_len = strlen(fqdn);
+
+        if (fqdn[fqdn_len-1] == '.')    /* ensure '.' is not last char */
+            fqdn[fqdn_len-1] = 0;
+
         dn[X509_COMMON_NAME] = fqdn;
     }
 
     if ((ret = gen_dn(dn[X509_COMMON_NAME], 3, buf, offset)))
         goto error;
 
-    if (dn[X509_ORGANIZATION] == NULL || strlen(dn[X509_ORGANIZATION]) == 0)
-        dn[X509_ORGANIZATION] = getenv("USERDOMAIN");
-
-    if (dn[X509_ORGANIZATION] != NULL && 
-            ((ret = gen_dn(dn[X509_ORGANIZATION], 10, buf, offset))))
-        goto error;
+    if (dn[X509_ORGANIZATION] != NULL && strlen(dn[X509_ORGANIZATION]) > 0)
+    {
+        if ((ret = gen_dn(dn[X509_ORGANIZATIONAL_UNIT], 10, buf, offset)))
+            goto error;
+    }
 
     if (dn[X509_ORGANIZATIONAL_UNIT] != NULL &&
                                 strlen(dn[X509_ORGANIZATIONAL_UNIT]) > 0)
@@ -219,17 +195,17 @@ error:
     return ret;
 }
 
-static const uint8_t time_seq[] = 
-{
-    ASN1_SEQUENCE, 30, 
-    ASN1_UTC_TIME, 13, 
-    '0', '7', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', 'Z', 
-    ASN1_UTC_TIME, 13,  /* make it good for 30 or so years */
-    '3', '8', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', 'Z'
-};
-
 static void gen_utc_time(uint8_t *buf, int *offset)
 {
+    static const uint8_t time_seq[] = 
+    {
+        ASN1_SEQUENCE, 30, 
+        ASN1_UTC_TIME, 13, 
+        '0', '7', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', 'Z', 
+        ASN1_UTC_TIME, 13,  /* make it good for 30 or so years */
+        '3', '8', '0', '1', '0', '1', '0', '0', '0', '0', '0', '0', 'Z'
+    };
+
     /* fixed time */
     memcpy(&buf[*offset], time_seq, sizeof(time_seq));
     *offset += sizeof(time_seq);
@@ -237,6 +213,11 @@ static void gen_utc_time(uint8_t *buf, int *offset)
 
 static void gen_pub_key2(const RSA_CTX *rsa_ctx, uint8_t *buf, int *offset)
 {
+    static const uint8_t pub_key_seq[] = 
+    {
+        ASN1_INTEGER, 0x03, 0x01, 0x00, 0x01 /* INTEGER 65537 */
+    };
+
     int seq_offset;
     int pub_key_size = rsa_ctx->num_octets;
     uint8_t *block = (uint8_t *)alloca(pub_key_size);
@@ -272,18 +253,20 @@ static void gen_pub_key1(const RSA_CTX *rsa_ctx, uint8_t *buf, int *offset)
 
 static void gen_pub_key(const RSA_CTX *rsa_ctx, uint8_t *buf, int *offset)
 {
+    /*  OBJECT IDENTIFIER rsaEncryption (1 2 840 113549 1 1 1) */
+    static const uint8_t rsa_enc_oid[] =
+    {
+        ASN1_SEQUENCE, 0x0d, ASN1_OID, 0x09,
+        0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01,
+        ASN1_NULL, 0x00
+    };
+
     int seq_offset;
     int seq_size = pre_adjust_with_size(
                             ASN1_SEQUENCE, &seq_offset, buf, offset);
 
-    buf[(*offset)++] = ASN1_SEQUENCE;
-    set_gen_length(13, buf, offset);
-    buf[(*offset)++] = ASN1_OID;
-    set_gen_length(sizeof(rsa_enc_oid), buf, offset);
     memcpy(&buf[*offset], rsa_enc_oid, sizeof(rsa_enc_oid));
     *offset += sizeof(rsa_enc_oid);
-    buf[(*offset)++] = ASN1_NULL;
-    buf[(*offset)++] = 0;
     gen_pub_key1(rsa_ctx, buf, offset);
     adjust_with_size(seq_size, seq_offset, buf, offset);
 }
@@ -291,6 +274,13 @@ static void gen_pub_key(const RSA_CTX *rsa_ctx, uint8_t *buf, int *offset)
 static void gen_signature(const RSA_CTX *rsa_ctx, const uint8_t *sha_dgst, 
                         uint8_t *buf, int *offset)
 {
+    static const uint8_t asn1_sig[] = 
+    {
+        ASN1_SEQUENCE,  0x21, ASN1_SEQUENCE, 0x09, ASN1_OID, 0x05, 
+        0x2b, 0x0e, 0x03, 0x02, 0x1a, /* sha1 (1 3 14 3 2 26) */
+        ASN1_NULL, 0x00, ASN1_OCTET_STRING, 0x14 
+    };
+
     uint8_t *enc_block = (uint8_t *)alloca(rsa_ctx->num_octets);
     uint8_t *block = (uint8_t *)alloca(sizeof(asn1_sig) + SHA1_SIZE);
     int sig_size;

@@ -470,7 +470,7 @@ sub do_client
         my $common_name = axtlsp::ssl_get_cert_dn($ssl, 
                     $axtlsp::SSL_X509_CERT_COMMON_NAME);
 
-        printf("Common Name:\t\t%s\n", $common_name) if defined $common_name;
+        printf("Common Name:\t\t\t%s\n", $common_name) if defined $common_name;
         display_session_id($ssl);
         display_cipher($ssl);
     }

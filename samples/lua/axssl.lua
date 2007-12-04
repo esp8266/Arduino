@@ -482,7 +482,7 @@ function do_client(build_mode)
                             axtlsl.SSL_X509_CERT_COMMON_NAME)
 
         if common_name ~= nil then 
-            print("Common Name:\t\t"..common_name)
+            print("Common Name:\t\t\t"..common_name)
         end
 
         display_session_id(ssl)

@@ -180,7 +180,7 @@ config CONFIG_SSL_X509_ORGANIZATION_NAME
     help
         The organization name for the generated X.509 certificate. 
 
-        If this is blank, then $USERDOMAIN will be used.
+        This field is optional.
 
 config CONFIG_SSL_X509_ORGANIZATION_UNIT_NAME
     string "X.509 Organization Unit Name"

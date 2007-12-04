@@ -571,7 +571,7 @@ public class axssl
 
             if (common_name != null)
             {
-                Console.WriteLine("Common Name:\t\t" + common_name);
+                Console.WriteLine("Common Name:\t\t\t" + common_name);
             }
 
             display_session_id(ssl);

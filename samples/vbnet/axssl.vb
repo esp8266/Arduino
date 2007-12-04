@@ -485,7 +485,8 @@ Public Class axssl
 
             If common_name <> Nothing
                 Console.WriteLine("Common Name:" & _
-                        ControlChars.Tab & ControlChars.Tab & common_name)
+                        ControlChars.Tab & ControlChars.Tab & _
+                        ControlChars.Tab & common_name)
             End If
 
             display_session_id(ssl)
