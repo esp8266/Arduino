@@ -57,6 +57,10 @@ extern "C"{
 #define FALLING 2
 #define RISING 3
 
+#define INTERNAL 3
+#define DEFAULT 1
+#define EXTERNAL 0
+
 // undefine stdlib's abs if encountered
 #ifdef abs
 #undef abs
@@ -93,6 +97,7 @@ void pinMode(uint8_t, uint8_t);
 void digitalWrite(uint8_t, uint8_t);
 int digitalRead(uint8_t);
 int analogRead(uint8_t);
+void analogReference(uint8_t mode);
 void analogWrite(uint8_t, int);
 
 void beginSerial(long);

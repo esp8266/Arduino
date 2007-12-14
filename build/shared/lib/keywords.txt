@@ -79,6 +79,7 @@ constrain	KEYWORD2	constrain_
 cos	KEYWORD2	cos_
 {}		curlybraces
 --		decrement
+DEFAULT	KEYWORD1	DEFAULT
 default	KEYWORD1	default
 delay	KEYWORD2	delay_
 delayMicroseconds	KEYWORD2
@@ -88,6 +89,7 @@ delayMicroseconds	KEYWORD2
 else	KEYWORD1	else
 ==		equality
 exp	KEYWORD2	exp_
+EXTERNAL	KEYWORD1	EXTERNAL
 false	KEYWORD1	false
 float	KEYWORD1	float
 float	KEYWORD2	float_
@@ -101,6 +103,7 @@ if	KEYWORD1	if_
 !=		inequality
 int	KEYWORD1	int
 int	KEYWORD2	int_
+INTERNAL	KEYWORD1	INTERNAL
 <<		leftshift
 <		lessthan
 <=		lessthanorequalto
@@ -148,6 +151,7 @@ flush	KEYWORD2
 digitalWrite	KEYWORD2
 digitalRead	KEYWORD2
 pinMode	KEYWORD2
+analogReference	KEYWORD2
 analogRead	KEYWORD2
 analogWrite	KEYWORD2
 attachInterrupt	KEYWORD2

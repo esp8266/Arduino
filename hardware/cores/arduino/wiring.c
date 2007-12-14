@@ -170,10 +170,6 @@ void init()
 	sbi(TCCR2, WGM20);
 #endif
 
-	// set a2d reference to AVCC (5 volts)
-	cbi(ADMUX, REFS1);
-	sbi(ADMUX, REFS0);
-
 	// set a2d prescale factor to 128
 	// 16 MHz / 128 = 125 KHz, inside the desired 50-200 KHz range.
 	// XXX: this will not work properly for other clock speeds, and

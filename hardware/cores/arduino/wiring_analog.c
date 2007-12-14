@@ -25,12 +25,24 @@
 #include "wiring_private.h"
 #include "pins_arduino.h"
 
+uint8_t analog_reference = DEFAULT;
+
+void analogReference(uint8_t mode)
+{
+	// can't actually set the register here because the default setting
+	// will connect AVCC and the AREF pin, which would cause a short if
+	// there's something connected to AREF.
+	analog_reference = mode;
+}
+
 int analogRead(uint8_t pin)
 {
 	uint8_t low, high, ch = analogInPinToBit(pin);
 
-	// the low 4 bits of ADMUX select the ADC channel
-	ADMUX = (ADMUX & (unsigned int) 0xf0) | (ch & (unsigned int) 0x0f);
+	// set the analog reference (high two bits of ADMUX) and select the
+	// channel (low 4 bits).  this also sets ADLAR (left-adjust result)
+	// to 0 (the default).
+	ADMUX = (analog_reference << 6) | (pin & 0x0f);
 
 	// without a delay, we seem to read from the wrong channel
 	//delay(1);
