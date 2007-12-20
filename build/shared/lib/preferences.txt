@@ -269,8 +269,7 @@ linestatus.height  = 20
 
 # set the upload defaults
 upload.verbose=false
-upload.erase=false
-upload.verify=false
+upload.using=bootloader
 
 # set the parallel port defaults (used if upload.programmer=dapa)
 parallel.port=0x378

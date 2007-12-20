@@ -39,6 +39,17 @@ public class AvrdudeUploader extends Uploader  {
   // XXX: add support for uploading sketches using a programmer
   public boolean uploadUsingPreferences(String buildPath, String className)
   throws RunnerException {
+    if (Preferences.get("upload.using").equals("bootloader")) {
+      return uploadViaBootloader(buildPath, className);
+    } else {
+      Collection params = getProgrammerCommands(Preferences.get("upload.using"));
+      params.add("-Uflash:w:" + buildPath + File.separator + className + ".hex:i");
+      return avrdude(params);
+    }
+  }
+  
+  private boolean uploadViaBootloader(String buildPath, String className)
+  throws RunnerException {
     List commandDownloader = new ArrayList();
     String protocol = Preferences.get("boards." + Preferences.get("board") + ".upload.protocol");
     
@@ -58,6 +69,10 @@ public class AvrdudeUploader extends Uploader  {
   }
   
   public boolean burnBootloader(String programmer) throws RunnerException {
+    return burnBootloader(getProgrammerCommands(programmer));
+  }
+  
+  private Collection getProgrammerCommands(String programmer) {
     List params = new ArrayList();
     params.add("-c" + Preferences.get("programmers." + programmer + ".protocol"));
     
@@ -73,7 +88,7 @@ public class AvrdudeUploader extends Uploader  {
     if (Preferences.get("programmers." + programmer + ".delay") != null)
       params.add("-i" + Preferences.get("programmers." + programmer + ".delay"));
     
-    return burnBootloader(params);
+    return params;
   }
   
   protected boolean burnBootloader(Collection params)
