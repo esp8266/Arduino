@@ -838,7 +838,7 @@ public class Editor extends JFrame
       }
       JCheckBoxMenuItem item = (JCheckBoxMenuItem)e.getSource();
       item.setState(true);
-      String name = item.getLabel();
+      String name = item.getText();
       //System.out.println(item.getLabel());
       Preferences.set("serial.port", name);
       //System.out.println("set to " + get("serial.port"));

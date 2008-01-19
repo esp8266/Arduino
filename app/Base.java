@@ -54,7 +54,7 @@ import processing.core.*;
  */
 public class Base {
   static final int VERSION = 10;
-  static final String VERSION_NAME = "0010 Alpha";
+  static final String VERSION_NAME = "0011 Alpha";
 
   /**
    * Path of filename opened on the command line,
@@ -172,7 +172,7 @@ public class Base {
 
   /**
    * returns true if the Arduino is running on a Mac OS machine,
-   * specifically a Mac OS X machine because it doesn't un on OS 9 anymore.
+   * specifically a Mac OS X machine because it doesn't run on OS 9 anymore.
    */
   static public boolean isMacOS() {
     return PApplet.platform == PConstants.MACOSX;
@@ -877,18 +877,20 @@ public class Base {
 
   static public String getContents(String what) {
     String basePath = System.getProperty("user.dir");
-    /*
-      // do this later, when moving to .app package
-    if (PApplet.platform == PConstants.MACOSX) {
-      basePath = System.getProperty("processing.contents");
-    }
-    */
     return basePath + File.separator + what;
   }
 
-
   static public String getLibContents(String what) {
-    return getContents("lib" + File.separator + what);
+      /* On MacOSX, the arduino.app-resources property points to the
+       * resources directory inside the app bundle. On other platforms
+       * it's not set.
+       */
+      String appResources = System.getProperty("arduino.app-resources");
+      if (appResources != null) {
+          return appResources + File.separator + what;
+      } else {
+          return getContents("lib" + File.separator + what);
+      }
   }
 
 

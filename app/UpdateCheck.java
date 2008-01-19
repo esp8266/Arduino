@@ -82,17 +82,16 @@ public class UpdateCheck implements Runnable {
       Preferences.set("update.id", String.valueOf(id));
     }
 
-    String info =
-      URLEncoder.encode(id + "\t" +
+    String info = id + "\t" +
                         Base.VERSION+ "\t" +
                         System.getProperty("java.version") + "\t" +
                         System.getProperty("java.vendor") + "\t" +
                         System.getProperty("os.name") + "\t" +
                         System.getProperty("os.version") + "\t" +
-                        System.getProperty("os.arch"));
-
+                        System.getProperty("os.arch");
+                        
     try {
-      int latest = readInt(downloadURL + "?" + info);
+      int latest = readInt(downloadURL + "?" + URLEncoder.encode(info, "UTF-8"));
 
       String lastString = Preferences.get("update.last");
       long now = System.currentTimeMillis();

@@ -155,7 +155,7 @@ public class EditorButtons extends JComponent implements MouseInputListener {
         setState(i, INACTIVE, false);
       }
     }
-    Dimension size = size();
+    Dimension size = getSize();
     if ((offscreen == null) ||
         (size.width != width) || (size.height != height)) {
       offscreen = createImage(size.width, size.height);

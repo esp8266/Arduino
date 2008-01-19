@@ -85,7 +85,7 @@ public class Compiler implements MessageConsumer {
 //    } catch (IOException e) {
 //      throw new RunnerException(e.getMessage());
 //    }
-	String avrBasePath;
+    String avrBasePath;
     if(Base.isMacOS()) {
     	avrBasePath = new String("hardware/tools/avr/bin/"); 
     }
@@ -97,7 +97,7 @@ public class Compiler implements MessageConsumer {
     }
 
 
-    String preCommandCompiler[] = new String[] {
+    List baseCommandCompiler = new ArrayList(Arrays.asList(new String[] {
       avrBasePath + "avr-gcc",
       "-c", // compile, don't link
       "-g", // include debugging info (so errors include line numbers)
@@ -106,23 +106,14 @@ public class Compiler implements MessageConsumer {
       "-w", // surpress all warnings
       "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
       "-DF_CPU=" + Preferences.get("boards." + Preferences.get("board") + ".build.f_cpu"),
-    };
+    }));
 
     // use lib directories as include paths
-    //String[] libDirs = libraryManager.getFolderPaths();
-    String[] libDirs = new String[sketch.importedLibraries.size()];
-    
-    for (int i = 0; i < sketch.importedLibraries.size(); i++)
-      libDirs[i] = ((Library) sketch.importedLibraries.get(i)).getFolder().getPath();
-    
-    // Last two arguments will specify the file being compiled and the output file.
-    String[] baseCommandCompiler = new String[preCommandCompiler.length + libDirs.length + 2];
-    System.arraycopy(preCommandCompiler, 0, baseCommandCompiler, 0, preCommandCompiler.length);
-    for (int i = 0; i < libDirs.length; ++i) {
-      baseCommandCompiler[preCommandCompiler.length + i] = "-I" + libDirs[i];
+    for (int i = 0; i < sketch.importedLibraries.size(); i++) {
+      baseCommandCompiler.add("-I" + ((Library) sketch.importedLibraries.get(i)).getFolder().getPath());
     }
-
-    String preCommandCompilerCPP[] = new String[] {
+    
+    List baseCommandCompilerCPP = new ArrayList(Arrays.asList(new String[] {
       avrBasePath + "avr-g++",
       "-c", // compile, don't link
       "-g", // include debugging info (so errors include line numbers)
@@ -132,196 +123,83 @@ public class Compiler implements MessageConsumer {
       "-fno-exceptions",
       "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
       "-DF_CPU=" + Preferences.get("boards." + Preferences.get("board") + ".build.f_cpu"),
-    };
+    }));
 
     // use lib directories as include paths
-    // Last two arguments will specify the file being compiled and the output file.
-    String[] baseCommandCompilerCPP = new String[preCommandCompilerCPP.length + libDirs.length + 2];
-    System.arraycopy(preCommandCompilerCPP, 0, baseCommandCompilerCPP, 0, preCommandCompilerCPP.length);
-    for (int i = 0; i < libDirs.length; ++i) {
-      baseCommandCompilerCPP[preCommandCompilerCPP.length + i] = "-I" + libDirs[i];
+    for (int i = 0; i < sketch.importedLibraries.size(); ++i) {
+      baseCommandCompilerCPP.add("-I" + ((Library) sketch.importedLibraries.get(i)).getFolder().getPath());
     }
 
-    String preCommandLinker[] = new String[] {
+    List baseCommandLinker = new ArrayList(Arrays.asList(new String[] {
       avrBasePath + "avr-gcc",
-      " ",
+      "-Os",
       "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
       "-o",
-      " ",
-    };
+      ((!Base.isMacOS()) ? buildPath : buildPath) + File.separator + sketch.name + ".elf"
+    }));
     
     String runtimeLibraryName = buildPath + File.separator + "core.a";
 
-    String baseCommandAR[] = new String[] {
+    List baseCommandAR = new ArrayList(Arrays.asList(new String[] {
       avrBasePath + "avr-ar",
       "rcs",
-      runtimeLibraryName,
-      " "
-    };
+      runtimeLibraryName
+    }));
 
-    // use lib object files during include
-    //String[] libObjectFiles = libraryManager.getObjectFiles();
-    
-    Vector libObjectFilesVec = new Vector();
-    
+    // use lib object files
     for (Iterator i = sketch.importedLibraries.iterator(); i.hasNext(); ) {
       Library library = (Library) i.next();
       File[] objectFiles = library.getObjectFiles();
       for (int j = 0; j < objectFiles.length; j++)
-        libObjectFilesVec.add(objectFiles[j].getPath());
+        baseCommandLinker.add(objectFiles[j].getPath());
     }
     
-    String[] libObjectFiles = new String[libObjectFilesVec.size()];
-    libObjectFiles = (String[]) libObjectFilesVec.toArray(libObjectFiles);
-    
-    String[] baseCommandLinker = new String[preCommandLinker.length + libObjectFiles.length];
-    System.arraycopy(preCommandLinker, 0, baseCommandLinker, 0, preCommandLinker.length);
-    for (int i = 0; i < libObjectFiles.length; ++i) {
-      baseCommandLinker[preCommandLinker.length + i] = libObjectFiles[i];
-    }
-
-    String baseCommandObjcopy[] = new String[] {
+    List baseCommandObjcopy = new ArrayList(Arrays.asList(new String[] {
       avrBasePath + "avr-objcopy",
       "-O",
-      " ",
       "-R",
-      " ",
-      " ",
-      " "
-    };
-
-    /*String baseCommand[] = new String[] {
-      // user.dir is folder containing P5 (and therefore jikes)
-      // macosx needs the extra path info. linux doesn't like it, though
-      // windows doesn't seem to care. write once, headache anywhere.
-      ((!Base.isMacOS()) ? "jikes" :
-       System.getProperty("user.dir") + File.separator + "jikes"),
-
-      // this doesn't help much.. also java 1.4 seems to not support
-      // -source 1.1 for javac, and jikes seems to also have dropped it.
-      // for versions of jikes that don't complain, "final int" inside
-      // a function doesn't throw an error, so it could just be a
-      // ms jvm error that this sort of thing doesn't work. blech.
-      //"-source",
-      //"1.1",
-
-      // necessary to make output classes compatible with 1.1
-      // i.e. so that exported applets can work with ms jvm on the web
-      "-target",
-      Preferences.get("preproc.jdk_version"),  //"1.1",
-      // let the incompatability headache begin
-
-      // used when run without a vm ("expert" mode)
-      "-bootclasspath",
-      calcBootClassPath(),
-
-      // needed for macosx so that the classpath is set properly
-      // also for windows because qtjava will most likely be here
-      // and for linux, it just doesn't hurt
-      "-classpath",
-      sketch.classPath, //calcClassPath(includeFolder),
-
-      "-nowarn", // we're not currently interested in warnings
-      "+E", // output errors in machine-parsable format
-      "-d", buildPath // output the classes in the buildPath
-      //buildPath + File.separator + className + ".java" // file to compile
-    };*/
+    }));
 
     // make list of code files that need to be compiled and the object files
     // that they will be compiled to (includes code from the sketch and the
     // library for the target platform)
-    String sourceNames[] = new String[sketch.codeCount + target.getSourceFilenames().size()];
-    String sourceNamesCPP[] = new String[sketch.codeCount + target.getSourceFilenames().size()];
-    String objectNames[] = new String[sketch.codeCount + target.getSourceFilenames().size()];
-    String objectNamesCPP[] = new String[sketch.codeCount + target.getSourceFilenames().size()];
-    String targetObjectNames[] = new String[target.getSourceFilenames().size()];
-    String sketchObjectNames[] = new String[sketch.codeCount];
-    int fileCount = 0;
-    int fileCountCPP = 0;
-    int targetCount = 0;
-    int sketchCount = 0;
+    List sourceNames = new ArrayList();
+    List sourceNamesCPP = new ArrayList();
+    List objectNames = new ArrayList();
+    List objectNamesCPP = new ArrayList();
+    List targetObjectNames = new ArrayList();
+    List sketchObjectNames = new ArrayList();
     for (int i = 0; i < sketch.codeCount; i++) {
       if (sketch.code[i].preprocName != null) {
         if (sketch.code[i].preprocName.endsWith(".c")) {
-          sourceNames[fileCount] = buildPath + File.separator + sketch.code[i].preprocName;
-          objectNames[fileCount++] = buildPath + File.separator + sketch.code[i].preprocName + ".o";
-          sketchObjectNames[sketchCount++] = buildPath + File.separator + sketch.code[i].preprocName + ".o";
+          sourceNames.add(buildPath + File.separator + sketch.code[i].preprocName);
+          objectNames.add(buildPath + File.separator + sketch.code[i].preprocName + ".o");
+          sketchObjectNames.add(buildPath + File.separator + sketch.code[i].preprocName + ".o");
         } else if (sketch.code[i].preprocName.endsWith(".cpp")) {
-          sourceNamesCPP[fileCountCPP] = buildPath + File.separator + sketch.code[i].preprocName;
-          objectNamesCPP[fileCountCPP++] = buildPath + File.separator + sketch.code[i].preprocName + ".o";
-          sketchObjectNames[sketchCount++] = buildPath + File.separator + sketch.code[i].preprocName + ".o";
+          sourceNamesCPP.add(buildPath + File.separator + sketch.code[i].preprocName);
+          objectNamesCPP.add(buildPath + File.separator + sketch.code[i].preprocName + ".o");
+          sketchObjectNames.add(buildPath + File.separator + sketch.code[i].preprocName + ".o");
         } 
       }
     }
     for (Iterator iter = target.getSourceFilenames().iterator(); iter.hasNext(); ) {
       String filename = (String) iter.next();
       if (filename != null) {
-        targetObjectNames[targetCount++] = buildPath + File.separator + filename + ".o";
+        targetObjectNames.add(buildPath + File.separator + filename + ".o");
         if (filename.endsWith(".c")) {
-          sourceNames[fileCount] = target.getPath() + File.separator + filename;
-          objectNames[fileCount++] = buildPath + File.separator + filename + ".o";
+          sourceNames.add(target.getPath() + File.separator + filename);
+          objectNames.add(buildPath + File.separator + filename + ".o");
         } else if (filename.endsWith(".cpp")) {
-          sourceNamesCPP[fileCountCPP] = target.getPath() + File.separator + filename;
-          objectNamesCPP[fileCountCPP++] = buildPath + File.separator + filename + ".o";
+          sourceNamesCPP.add(target.getPath() + File.separator + filename);
+          objectNamesCPP.add(buildPath + File.separator + filename + ".o");
         } 
       }
     }
     
-    
-    /*
-    String commandCompiler[] = new String[baseCommandCompiler.length + preprocCount];
-    System.arraycopy(baseCommandCompiler, 0, commandCompiler, 0, baseCommandCompiler.length);
-    // append each of the files to the command string
-    for (int i = 0; i < preprocCount; i++) {
-      commandCompiler[baseCommandCompiler.length + i] =
-        buildPath + File.separator + preprocNames[i];
-    }
-
-    String commandCompilerCPP[] = new String[baseCommandCompilerCPP.length + preprocCountCPP];
-    System.arraycopy(baseCommandCompilerCPP, 0, commandCompilerCPP, 0, baseCommandCompilerCPP.length);
-    for (int i = 0; i < preprocCountCPP; i++) {
-      commandCompilerCPP[baseCommandCompilerCPP.length + i] = 
-        buildPath + File.separator + preprocNamesCPP[i];
-    }
-    */
-    //PApplet.printarr(command);
-
-    baseCommandLinker[1] = "-Os";
-    baseCommandLinker[4] = ((!Base.isMacOS()) ? buildPath 
-      : buildPath) + File.separator + sketch.name + ".elf";
-    String commandLinker[] = new String[baseCommandLinker.length + sketchCount + 3];
-    System.arraycopy(baseCommandLinker, 0, commandLinker, 0, baseCommandLinker.length);
-    int idx = 0;
-    for(int i = 0; i < sketchCount; i++, idx++) {
-      commandLinker[baseCommandLinker.length + idx] = sketchObjectNames[i];
-    }
-
-    commandLinker[baseCommandLinker.length + idx++] = runtimeLibraryName;
-    commandLinker[baseCommandLinker.length + idx++] = "-L" + buildPath;
-    commandLinker[baseCommandLinker.length + idx] = "-lm";
-      
-    /*String command[] = new String[baseCommand.length + preprocCount];
-    System.arraycopy(baseCommand, 0, command, 0, baseCommand.length);
-    // append each of the files to the command string
-    for (int i = 0; i < preprocCount; i++) {
-      command[baseCommand.length + i] =
-        buildPath + File.separator + preprocNames[i];
-    }
-    //PApplet.printarr(command);
-    */
-    /*
-    String command[] = new String[baseCommand.length + sketch.codeCount];
-    System.arraycopy(baseCommand, 0, command, 0, baseCommand.length);
-    // append each of the files to the command string
-    for (int i = 0; i < sketch.codeCount; i++) {
-      command[baseCommand.length + i] =
-        buildPath + File.separator + sketch.code[i].preprocName;
-    }
-    */
-
-    //for (int i = 0; i < command.length; i++) {
-      //System.out.println("cmd " + i + "  " + command[i]);
-    //}
+    baseCommandLinker.addAll(sketchObjectNames);
+    baseCommandLinker.add(runtimeLibraryName);
+    baseCommandLinker.add("-L" + buildPath);
+    baseCommandLinker.add("-lm");
 
     firstErrorFound = false;  // haven't found any errors yet
     secondErrorFound = false;
@@ -334,48 +212,48 @@ public class Compiler implements MessageConsumer {
 
       Process process;
       boolean compiling = true;
-      for(int i = 0; i < fileCount; i++) {
-        baseCommandCompiler[baseCommandCompiler.length - 2] = sourceNames[i];
-        baseCommandCompiler[baseCommandCompiler.length - 1] = "-o"+ objectNames[i];
-        //System.arraycopy(baseCommandCompiler.length
-        result = execAsynchronously(baseCommandCompiler);
-        if (result!=0)
+      for(int i = 0; i < sourceNames.size(); i++) {
+        List commandCompiler = new ArrayList(baseCommandCompiler);
+        commandCompiler.add(sourceNames.get(i));
+        commandCompiler.add("-o"+ objectNames.get(i));
+        if (execAsynchronously(commandCompiler) != 0)
           return false;
       }
 
-      for(int i = 0; i < fileCountCPP; i++) {
-        baseCommandCompilerCPP[baseCommandCompilerCPP.length - 2] = sourceNamesCPP[i];
-        baseCommandCompilerCPP[baseCommandCompilerCPP.length - 1] = "-o"+ objectNamesCPP[i];
-        result = execAsynchronously(baseCommandCompilerCPP);
-        if (result!=0)
+      for(int i = 0; i < sourceNamesCPP.size(); i++) {
+        List commandCompilerCPP = new ArrayList(baseCommandCompilerCPP);
+        commandCompilerCPP.add(sourceNamesCPP.get(i));
+        commandCompilerCPP.add("-o"+ objectNamesCPP.get(i));
+        if (execAsynchronously(commandCompilerCPP) != 0)
           return false;
       }
 
-      for(int i = 0; i < targetCount; i++) {
-        baseCommandAR[baseCommandAR.length - 1] = targetObjectNames[i];
-        result = execAsynchronously(baseCommandAR);
-        if(result!=0)
+      for(int i = 0; i < targetObjectNames.size(); i++) {
+        List commandAR = new ArrayList(baseCommandAR);
+        commandAR.add(targetObjectNames.get(i));
+        if (execAsynchronously(commandAR) != 0)
           return false;
       }
 
-      result = execAsynchronously(commandLinker);
-      if (result!=0)
+      if (execAsynchronously(baseCommandLinker) != 0)
         return false;
 
-      baseCommandObjcopy[2] = "srec";
-      baseCommandObjcopy[4] = ".eeprom";
-      baseCommandObjcopy[5] = buildPath + File.separator + sketch.name + ".elf";
-      baseCommandObjcopy[6] = buildPath + File.separator + sketch.name + ".rom";
-      result = execAsynchronously(baseCommandObjcopy);
-      if (result!=0)
+      List commandObjcopy;
+      
+      commandObjcopy = new ArrayList(baseCommandObjcopy);
+      commandObjcopy.add(2, "srec");
+      commandObjcopy.add(".eeprom");
+      commandObjcopy.add(buildPath + File.separator + sketch.name + ".elf");
+      commandObjcopy.add(buildPath + File.separator + sketch.name + ".rom");
+      if (execAsynchronously(commandObjcopy) != 0)
         return false;
 
-      baseCommandObjcopy[2] = "ihex";
-      baseCommandObjcopy[4] = ".flash";
-      baseCommandObjcopy[5] = buildPath + File.separator + sketch.name + ".elf";
-      baseCommandObjcopy[6] = buildPath + File.separator + sketch.name + ".hex";
-      result = execAsynchronously(baseCommandObjcopy);
-      if (result!=0)
+      commandObjcopy = new ArrayList(baseCommandObjcopy);
+      commandObjcopy.add(2, "ihex");
+      commandObjcopy.add(".flash");
+      commandObjcopy.add(buildPath + File.separator + sketch.name + ".elf");
+      commandObjcopy.add(buildPath + File.separator + sketch.name + ".hex");
+      if (execAsynchronously(commandObjcopy) != 0)
         return false;
     } catch (Exception e) {
       String msg = e.getMessage();
@@ -383,8 +261,7 @@ public class Compiler implements MessageConsumer {
         //System.err.println("jikes is missing");
         Base.showWarning("Compiler error",
                             "Could not find the compiler.\n" +
-                            "avr-gcc is missing from your PATH,\n" +
-                            "see readme.txt for help.", null);
+                            "avr-gcc is missing from your PATH.", null);
         return false;
 
       } else {
@@ -415,8 +292,10 @@ public class Compiler implements MessageConsumer {
     return (result == 0); // ? true : false;
   }
   
-  public int execAsynchronously(String[] command)
+  public int execAsynchronously(List commandList)
     throws RunnerException, IOException {
+    String[] command = new String[commandList.size()];
+    commandList.toArray(command);
     int result = 0;
     
     if (Preferences.getBoolean("build.verbose")) {

@@ -256,10 +256,10 @@ public class PdePreprocessor {
     // match those that will be highlighted in the PDE IDE
     //
     //System.out.println(program);
-    WLexer lexer  = new WLexer(programReader);
+    // DAM:WTF? WLexer lexer  = new WLexer(programReader);
     //lexer.setTokenObjectClass("antlr.CommonHiddenStreamToken");
-    lexer.setTokenObjectClass("processing.app.preproc.CToken");
-    lexer.initialize();
+    // DAM:WTF? lexer.setTokenObjectClass("processing.app.preproc.CToken");
+    // DAM:WTF? lexer.initialize();
 
     // create the filter for hidden tokens and specify which tokens to
     // hide and which to copy to the hidden text
@@ -281,13 +281,13 @@ public class PdePreprocessor {
     // create a parser and set what sort of AST should be generated
     //
     //PdeRecognizer parser = new PdeRecognizer(filter);
-    WParser parser = new WParser(lexer);
+    // DAM:WTF? WParser parser = new WParser(lexer);
 
     // use our extended AST class
     //
     //parser.setASTNodeClass("antlr.ExtendedCommonASTWithHiddenTokens");
-    parser.setASTNodeType(TNode.class.getName());
-    TNode.setTokenVocabulary("processing.app.preproc.WTokenTypes");
+    // DAM:WTF? parser.setASTNodeType(TNode.class.getName());
+    // DAM:WTF? TNode.setTokenVocabulary("processing.app.preproc.WTokenTypes");
 
     // start parsing at the compilationUnit non-terminal
     //
@@ -296,23 +296,23 @@ public class PdePreprocessor {
 
     // set up the AST for traversal by PdeEmitter
     //
-    ASTFactory factory = new ASTFactory();
-    AST parserAST = parser.getAST();
-    AST rootNode = factory.create(ROOT_ID, "AST ROOT");
-    rootNode.setFirstChild(parserAST);
+    // DAM:WTF? ASTFactory factory = new ASTFactory();
+    // DAM:WTF? AST parserAST = parser.getAST();
+    // DAM:WTF? AST rootNode = factory.create(ROOT_ID, "AST ROOT");
+    // DAM:WTF? rootNode.setFirstChild(parserAST);
 
     // unclear if this actually works, but it's worth a shot
     //
     //((CommonAST)parserAST).setVerboseStringConversion(
     //  true, parser.getTokenNames());
     // (made to use the static version because of jikes 1.22 warning)
-    CommonAST.setVerboseStringConversion(true, parser.getTokenNames());
+    // DAM:WTF? CommonAST.setVerboseStringConversion(true, parser.getTokenNames());
 
     // if this is an advanced program, the classname is already defined.
     //
-    if (programType == JAVA) {
-      name = getFirstClassName(parserAST);
-    }
+    // DAM:WTF? if (programType == JAVA) {
+    // DAM:WTF?   name = getFirstClassName(parserAST);
+    // DAM:WTF? }
 
     // if 'null' was passed in for the name, but this isn't
     // a 'java' mode class, then there's a problem, so punt.
@@ -321,7 +321,7 @@ public class PdePreprocessor {
 
     // output the code
     //
-    WEmitter emitter = new WEmitter(lexer.getPreprocessorInfoChannel());
+    // DAM:WTF? WEmitter emitter = new WEmitter(lexer.getPreprocessorInfoChannel());
     File streamFile = new File(buildPath, name + ".cpp");
     PrintStream stream = new PrintStream(new FileOutputStream(streamFile));
 
@@ -329,8 +329,8 @@ public class PdePreprocessor {
     writeHeader(stream, name, prototypes);
     //added to write the pde code to the cpp file
     writeProgram(stream, name, program);
-    emitter.setASTNodeType(TNode.class.getName());
-    emitter.setOut(stream);
+    // DAM:WTF? emitter.setASTNodeType(TNode.class.getName());
+    // DAM:WTF? emitter.setOut(stream);
     //emitter.printDeclarations(rootNode);
     //emitter.print(rootNode);
     //emitter.translationUnit(parser.getAST());
@@ -340,7 +340,7 @@ public class PdePreprocessor {
 
     // if desired, serialize the parse tree to an XML file.  can
     // be viewed usefully with Mozilla or IE
-
+    /* DAM:WTF?
     if (Preferences.getBoolean("preproc.output_parse_tree")) {
 
       stream = new PrintStream(new FileOutputStream("parseTree.xml"));
@@ -354,6 +354,7 @@ public class PdePreprocessor {
       stream.println("</document>");
       writer.close();
     }
+    */
 
     return name;
   }
