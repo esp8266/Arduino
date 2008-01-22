@@ -650,7 +650,6 @@
 				33FFFE2C0965BD110016AC38 /* EditorListener.java */,
 				33FFFE2D0965BD110016AC38 /* EditorStatus.java */,
 				33FFFE2E0965BD110016AC38 /* FindReplace.java */,
-				33FFFE2F0965BD110016AC38 /* language */,
 				33FFFE300965BD110016AC38 /* MessageConsumer.java */,
 				33FFFE310965BD110016AC38 /* MessageSiphon.java */,
 				33FFFE320965BD110016AC38 /* MessageStream.java */,
@@ -677,13 +676,6 @@
 			name = app;
 			path = ../../app;
 			sourceTree = SOURCE_ROOT;
-		};
-		33FFFE2F0965BD110016AC38 /* language */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = language;
-			sourceTree = "<group>";
 		};
 		33FFFE340965BD110016AC38 /* preproc */ = {
 			isa = PBXGroup;

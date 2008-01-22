@@ -46,6 +46,17 @@ Processing and Wiring.
 
 UPDATES
 
+0011
+
+* Fixed Find in Reference.
+* Added map() function for mapping values from one range to another.
+* Added analogReference() function.
+* Added interrupts() and noInterrupts() functions.
+* Added degrees() and radians() functions.
+* Support for uploading sketch using a programmer (upload.using preference).
+* New script for downloading the reference from Tom Pollard.  Thanks Tom!
+* Miscellaneous Mac OS X and other patches from Wim Lewis.  Thanks Wim!
+
 0010 - 2007.10.11
 
 * Support for the LilyPad Arduino.
