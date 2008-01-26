@@ -40,10 +40,7 @@ it again, and select the items above. it's also useful to run the
 installer every few months to keep things fresh.
 
 
-1b. On Mac OS X, install Apple's Developer Tools. Should work with 
-    everything from the December 2002 Tools for Jaguar on OS X 10.2, 
-    up through the more recent Xcode stuff. 
-
+1b. On Mac OS X, install Apple's Developer Tools. 
 
 1c. On Linux, you're pretty much on your own.. You need jikes (or
     edit make.sh to use a different compiler), java, avr-gcc, make,
@@ -62,14 +59,15 @@ svn co svn://svn.berlios.de/arduino/trunk
 
 3. BUILD IT
 
-# now to build for the first time:
+3a. On the Mac, use the Xcode project to build the Arduino software.
+
+3b. On Windows or Linux, use the command line.
+
+# on Windows
 cd /path/to/arduino/build/windows
 
 # or if you're on linux
 cd /path/to/arduino/build/linux
-
-# for the followers of goatee man
-cd /path/to/arduino/build/macosx
 
 # and then..
 ./make.sh
@@ -89,7 +87,7 @@ cd /path/to/arduino/build/macosx
 //// Updating to the Latest Version
 
 
-4a. Each time you want to update to latest version from cvs:
+4a. Each time you want to update to latest version from svn:
 
 cd /path/to/arduino
 svn update
@@ -99,26 +97,5 @@ svn update
 
 # remove the work directory
 rm -rf work
-
-
-////////////////////////////////////////////////////////////////////
-
-//// Frequently Asked Questions
-
-- What about eclipse? What about ant? The command line is frightening
-  and gives me nightmares!
-
-In a basic sense, the command line stuff isn't as scary as it might 
-seem. Hopefully it's just a matter of following the instructions 
-above (and being patient). If not, let us know where you have trouble
-so we can fix things.
-
-Conceivably, it wouldn't take much to make Arduino build under
-Eclipse or any other IDE, but we don't do it by default. Same goes for 
-ANT. We don't use it, but if someone were to make build scripts that 
-emulated everything that the current build scripts do (not just build
-the code, but all the other annoying crap that the build scripts do) 
-then maybe we could switch to it. It's all about reaching some kind 
-of critical mass. 
 
 $Id$
