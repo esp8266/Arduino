@@ -33,6 +33,8 @@ import processing.app.*;
 import processing.core.*;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import antlr.*;
 import antlr.collections.*;
@@ -47,17 +49,13 @@ public class PdePreprocessor {
   static final int JDK13 = 1;
   static final int JDK14 = 2;
 
-  static String defaultImports[][] = new String[3][];
+  //static String defaultImports[][] = new String[3][];
 
   // these ones have the .* at the end, since a class name
   // might be at the end instead of .* whcih would make trouble
   // other classes using this can lop of the . and anything after
   // it to produce a package name consistently.
   public String extraImports[];
-
-  // imports just from the code folder, treated differently
-  // than the others, since the imports are auto-generated.
-  public String codeFolderImports[];
 
   static public final int STATIC = 0;  // formerly BEGINNER
   static public final int ACTIVE = 1;  // formerly INTERMEDIATE
@@ -68,9 +66,6 @@ public class PdePreprocessor {
   Reader programReader;
   String buildPath;
 
-  // used for calling the ASTFactory to get the root node
-  private static final int ROOT_ID = 0;
-  
   // stores number of built user-defined function prototypes
   public int prototypeCount = 0;
 
@@ -81,20 +76,96 @@ public class PdePreprocessor {
    * These may change in-between (if the prefs panel adds this option)
    * so grab them here on construction.
    */
-  public PdePreprocessor() {
-/*    defaultImports[JDK11] =
-      Base.split(Preferences.get("preproc.imports.jdk11"), ',');
-    defaultImports[JDK13] =
-      Base.split(Preferences.get("preproc.imports.jdk13"), ',');
-    defaultImports[JDK14] =
-      Base.split(Preferences.get("preproc.imports.jdk14"), ',');
-*/  }
-
+  public PdePreprocessor() {}
 
   /**
    * Used by PdeEmitter.dumpHiddenTokens()
    */
   //public static TokenStreamCopyingHiddenTokenFilter filter;
+  
+  /**
+   * Strips comments, pre-processor directives, single- and double-quoted
+   * strings from a string.
+   * @param in the String to strip
+   * @return the stripped String
+   */
+  public String strip(String in) throws MalformedPatternException {
+    PatternCompiler compiler = new Perl5Compiler();
+    PatternMatcher matcher = new Perl5Matcher();
+    Pattern pattern = compiler.compile(
+      // XXX: doesn't properly handle special single-quoted characters
+      // single-quoted character
+      "('.')" + "|" +
+      // double-quoted string
+      "(\"(?:[^\"\\\\]|\\\\.)*\")" + "|" +
+      // multi-line comment
+      "(/\\*(?:.|\\n)*?\\*/)" + "|" + 
+      // single-line comment
+      "(//.*?$)" + "|" +
+      // pre-processor directive
+      "(^\\s*#.*?$)",
+      Perl5Compiler.MULTILINE_MASK);
+      
+    while (matcher.contains(in, pattern)) {
+      MatchResult result = matcher.getMatch();
+      // XXX: should preserve newlines in the result so that line numbers of
+      // the stripped string correspond to those in the original source.
+      in = in.substring(0, result.beginOffset(0)) + " " + in.substring(result.endOffset(0));
+    }
+    
+    return in;
+  }
+  
+  /**
+   * Removes the contents of all top-level curly brace pairs {}.
+   * @param in the String to collapse
+   * @return the collapsed String
+   */
+  private String collapseBraces(String in) {
+    StringBuffer buffer = new StringBuffer();
+    int nesting = 0;
+    int start = 0;
+    
+    // XXX: need to keep newlines inside braces so we can determine the line
+    // number of a prototype
+    for (int i = 0; i < in.length(); i++) {
+      if (in.charAt(i) == '{') {
+        if (nesting == 0) {
+          buffer.append(in.substring(start, i + 1));  // include the '{'
+        }
+        nesting++;
+      }
+      if (in.charAt(i) == '}') {
+        nesting--;
+        if (nesting == 0) {
+          start = i; // include the '}'
+        }
+      }
+    }
+    
+    buffer.append(in.substring(start));
+    
+    return buffer.toString();
+  }
+  
+  private List prototypes(String in) throws MalformedPatternException {
+    in = collapseBraces(strip(in));
+    
+    PatternMatcherInput input = new PatternMatcherInput(in);
+    PatternCompiler compiler = new Perl5Compiler();
+    PatternMatcher matcher = new Perl5Matcher();
+    // XXX: doesn't handle ... varargs
+    // XXX: doesn't handle function pointers
+    Pattern pattern = compiler.compile(
+      "[\\w\\[\\]\\*]+\\s+[\\[\\]\\*\\w\\s]+\\([,\\[\\]\\*\\w\\s]*\\)(?=\\s*\\{)");
+    List matches = new ArrayList();
+    
+    while (matcher.contains(input, pattern)) {
+      matches.add(matcher.getMatch().group(0) + ";");
+    }
+    
+    return matches;
+  }
 
 
   /**
@@ -106,7 +177,7 @@ public class PdePreprocessor {
   //                  String extraImports[]) throws java.lang.Exception {
   public String write(String program, String buildPath,
                       String name, String codeFolderPackages[],
-		      Target target)
+                      Target target)
     throws java.lang.Exception {
     // if the program ends with no CR or LF an OutOfMemoryError will happen.
     // not gonna track down the bug now, so here's a hack for it:
@@ -160,14 +231,14 @@ public class PdePreprocessor {
         program = new String(p2, 0, index);
       }
     }
-
+    
     // if this guy has his own imports, need to remove them
     // just in case it's not an advanced mode sketch
     PatternMatcher matcher = new Perl5Matcher();
     PatternCompiler compiler = new Perl5Compiler();
     //String mess = "^\\s*(import\\s+\\S+\\s*;)";
     //String mess = "^\\s*(import\\s+)(\\S+)(\\s*;)";
-    String mess = "^\\s*(#include\\s+[<\"])(\\S+)([\">]\\s*)";
+    String mess = "^\\s*#include\\s+[<\"](\\S+)[\">]";
     java.util.Vector imports = new java.util.Vector();
 
     Pattern pattern = null;
@@ -178,183 +249,34 @@ public class PdePreprocessor {
       return null;
     }
 
-    do {
-      PatternMatcherInput input = new PatternMatcherInput(program);
-      if (!matcher.contains(input, pattern)) break;
-
-      MatchResult result = matcher.getMatch();
-      String piece1 = result.group(1).toString();
-      String piece2 = result.group(2).toString();  // the header file name w/o quotes
-      String piece3 = result.group(3).toString();
-      String piece = piece1 + piece2 + piece3;
-      int len = piece.length();
-
-      //imports.add(piece);
-      imports.add(piece2);
-      int idx = program.indexOf(piece);
-      // just remove altogether?
-      program = program.substring(0, idx) + program.substring(idx + len);
-
-      //System.out.println("removing " + piece);
-
-    } while (true);
-    
+    PatternMatcherInput input = new PatternMatcherInput(program);    
+    while (matcher.contains(input, pattern)) {
+      imports.add(matcher.getMatch().group(1));
+    }    
 
     extraImports = new String[imports.size()];
     imports.copyInto(extraImports);
-
-    if (codeFolderPackages != null) {
-      codeFolderImports = new String[codeFolderPackages.length];
-      for (int i = 0; i < codeFolderPackages.length; i++) {
-        codeFolderImports[i] = codeFolderPackages[i] + ".*";
-      }
-    } else {
-      codeFolderImports = null;
-    }
 
     // do this after the program gets re-combobulated
     this.programReader = new StringReader(program);
     this.buildPath = buildPath;
     
-    // create function prototypes
-    mess = "^(\\w+)\\s+(\\w+)\\s*\\(([^)]*)\\)\\s*{";
-    pattern = null;
-    try {
-      pattern = compiler.compile(mess);
-    } catch (MalformedPatternException e) {
-      e.printStackTrace();
-      return null;
-    }
-    PatternMatcherInput input = new PatternMatcherInput(program);
-    MatchResult result;
-    String returntype, functioname, parameterlist, prototype;
-    java.util.LinkedList prototypes = new java.util.LinkedList();
-    //System.out.println("prototypes:");
-    while(matcher.contains(input, pattern)){
-      result = matcher.getMatch();
-      //System.out.println(result);
-      returntype = result.group(1).toString();
-      functioname = result.group(2).toString();
-      parameterlist = result.group(3).toString().replace('\n', ' ');
-      prototype = returntype + " " + functioname + "(" + parameterlist + ");";
-      if(0 == functioname.compareTo("setup")){
-        continue;
-      }
-      if(0 == functioname.compareTo("loop")){
-        continue;
-      }
-      prototypes.add(prototype);
-      //System.out.println(prototype);
-    }
+    List prototypes = prototypes(program);
+    
     // store # of prototypes so that line number reporting can be adjusted
     prototypeCount = prototypes.size();
   
-
-    // create a lexer with the stream reader, and tell it to handle
-    // hidden tokens (eg whitespace, comments) since we want to pass these
-    // through so that the line numbers when the compiler reports errors
-    // match those that will be highlighted in the PDE IDE
-    //
-    //System.out.println(program);
-    // DAM:WTF? WLexer lexer  = new WLexer(programReader);
-    //lexer.setTokenObjectClass("antlr.CommonHiddenStreamToken");
-    // DAM:WTF? lexer.setTokenObjectClass("processing.app.preproc.CToken");
-    // DAM:WTF? lexer.initialize();
-
-    // create the filter for hidden tokens and specify which tokens to
-    // hide and which to copy to the hidden text
-    //
-    /*filter = new TokenStreamCopyingHiddenTokenFilter(lexer);
-    filter.hide(WParser.CPPComment);
-    filter.hide(WParser.Comment);
-    filter.hide(WParser.Whitespace);
-    filter.copy(WParser.SEMI);
-    filter.copy(WParser.LPAREN);
-    filter.copy(WParser.RPAREN);
-    filter.copy(WParser.LCURLY);
-    filter.copy(WParser.RCURLY);
-    filter.copy(WParser.COMMA);
-    filter.copy(WParser.RBRACK);
-    filter.copy(WParser.LBRACK);
-    filter.copy(WParser.COLON);
-    */
-    // create a parser and set what sort of AST should be generated
-    //
-    //PdeRecognizer parser = new PdeRecognizer(filter);
-    // DAM:WTF? WParser parser = new WParser(lexer);
-
-    // use our extended AST class
-    //
-    //parser.setASTNodeClass("antlr.ExtendedCommonASTWithHiddenTokens");
-    // DAM:WTF? parser.setASTNodeType(TNode.class.getName());
-    // DAM:WTF? TNode.setTokenVocabulary("processing.app.preproc.WTokenTypes");
-
-    // start parsing at the compilationUnit non-terminal
-    //
-    //parser.pdeProgram();
-    //parser.translationUnit();
-
-    // set up the AST for traversal by PdeEmitter
-    //
-    // DAM:WTF? ASTFactory factory = new ASTFactory();
-    // DAM:WTF? AST parserAST = parser.getAST();
-    // DAM:WTF? AST rootNode = factory.create(ROOT_ID, "AST ROOT");
-    // DAM:WTF? rootNode.setFirstChild(parserAST);
-
-    // unclear if this actually works, but it's worth a shot
-    //
-    //((CommonAST)parserAST).setVerboseStringConversion(
-    //  true, parser.getTokenNames());
-    // (made to use the static version because of jikes 1.22 warning)
-    // DAM:WTF? CommonAST.setVerboseStringConversion(true, parser.getTokenNames());
-
-    // if this is an advanced program, the classname is already defined.
-    //
-    // DAM:WTF? if (programType == JAVA) {
-    // DAM:WTF?   name = getFirstClassName(parserAST);
-    // DAM:WTF? }
-
-    // if 'null' was passed in for the name, but this isn't
-    // a 'java' mode class, then there's a problem, so punt.
-    //
     if (name == null) return null;
 
     // output the code
-    //
-    // DAM:WTF? WEmitter emitter = new WEmitter(lexer.getPreprocessorInfoChannel());
     File streamFile = new File(buildPath, name + ".cpp");
     PrintStream stream = new PrintStream(new FileOutputStream(streamFile));
 
-    //writeHeader(stream, extraImports, name);
     writeHeader(stream, name, prototypes);
     //added to write the pde code to the cpp file
     writeProgram(stream, name, program);
-    // DAM:WTF? emitter.setASTNodeType(TNode.class.getName());
-    // DAM:WTF? emitter.setOut(stream);
-    //emitter.printDeclarations(rootNode);
-    //emitter.print(rootNode);
-    //emitter.translationUnit(parser.getAST());
-
     writeFooter(stream, target);
     stream.close();
-
-    // if desired, serialize the parse tree to an XML file.  can
-    // be viewed usefully with Mozilla or IE
-    /* DAM:WTF?
-    if (Preferences.getBoolean("preproc.output_parse_tree")) {
-
-      stream = new PrintStream(new FileOutputStream("parseTree.xml"));
-      stream.println("<?xml version=\"1.0\"?>");
-      stream.println("<document>");
-      OutputStreamWriter writer = new OutputStreamWriter(stream);
-      if (parserAST != null) {
-        ((CommonAST)parserAST).xmlSerialize(writer);
-      }
-      writer.flush();
-      stream.println("</document>");
-      writer.close();
-    }
-    */
 
     return name;
   }
@@ -372,77 +294,22 @@ public class PdePreprocessor {
    * @param exporting           Is this being exported from PDE?
    * @param name                Name of the class being created.
    */
-  void writeHeader(PrintStream out, String className, java.util.LinkedList prototypes)
+  void writeHeader(PrintStream out, String className, List prototypes)
     throws IOException {
     out.print("#include \"WProgram.h\"\n");
-    /* Arduino doesn't automatically use all available libraries.
-    // print library headers
-    LibraryManager libraryManager = new LibraryManager();
-    String[] headerFiles = libraryManager.getHeaderFiles();
-    for(int i = 0; i < headerFiles.length; ++i){
-      out.print("#include \"" + headerFiles[i] + "\"\n");
-    }
-
-    // record number of header lines written for error line adjustment
-    headerCount = headerFiles.length;
-    */
+    
     // print user defined prototypes
-    while(0 < prototypes.size()){
-      out.print(prototypes.removeFirst() + "\n");
+    for (int i = 0; i < prototypes.size(); i++) {
+      out.print(prototypes.get(i) + "\n");
     }
 
-    // emit emports that are needed for classes from the code folder
-    if (extraImports != null) {
-      for (int i = 0; i < extraImports.length; i++) {
-        out.print("#include \"" + extraImports[i] + "\"\n");
-      }
-    }
-
-    if (codeFolderImports != null) {
-      for (int i = 0; i < codeFolderImports.length; i++) {
-        out.print("import " + codeFolderImports[i] + "; ");
-      }
-    }
-
-    // emit standard imports (read from pde.properties)
-    // for each language level that's being used.
-/*    String jdkVersionStr = Preferences.get("preproc.jdk_version");
-
-    int jdkVersion = JDK11;  // default
-    if (jdkVersionStr.equals("1.3")) { jdkVersion = JDK13; };
-    if (jdkVersionStr.equals("1.4")) { jdkVersion = JDK14; };
-
-    for (int i = 0; i <= jdkVersion; i++) {
-      for (int j = 0; j < defaultImports[i].length; j++) {
-        out.print("import " + defaultImports[i][j] + ".*; ");
-      }
-    }
-
-    //boolean opengl = Preferences.get("renderer").equals("opengl");
-    //if (opengl) {
-    //out.println("import processing.opengl.*; ");
-    //}
-*/
-/*    if (programType < JAVA) {
-      // open the class definition
-      out.print("public class " + className + " extends ");
-      //if (opengl) {
-      //out.print("PAppletGL");
-      //} else {
-      out.print("PApplet");
-      //}
-      out.print(" {");
-
-      if (programType == STATIC) {
-        // now that size() and background() can go inside of draw()
-        // actually, use setup(), because when running externally
-        // the applet size needs to be set before the window is drawn,
-        // meaning that after setup() things need to be ducky.
-        //out.print("public void draw() {");
-        out.print("public void setup() {");
-      }
-    }
-*/  }
+//    // emit emports that are needed for classes from the code folder
+//    if (extraImports != null) {
+//      for (int i = 0; i < extraImports.length; i++) {
+//        out.print("#include \"" + extraImports[i] + "\"\n");
+//      }
+//    }
+  }
 
   /**
    * Write any necessary closing text.

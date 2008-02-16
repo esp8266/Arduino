@@ -1,1 +1,81 @@
 0011 arduino
+
+0011
+
+Improve preprocessing of sketches:
+ - Don't move #include statements.
+ - Insert prototypes as a better spot in the code (after pre-processor directives).
+ - Better determine which header files are included (not commented out).
+ - Remember the original locations of function prototypes to highlight the correct line on error.
+ - [done] Better determine which functions need prototypes
+Update version of the FTDI drivers.
+Floating point support in the map() function.
+Modify parallel port programmer burning (add -F, lower or remove delay).
+Incorporate ladyada's new SoftwareSerial library.
+Add timeout parameter to pulseIn().
+[done] Allow uploading using a hardware programmer.
+[done] Add analogReference() function.
+[done] Add miscellaneous #defines (interrupts(), int(), etc.)
+[done] Add map() function.
+[done] Fix find in reference.
+[done] Include stable version of Firmata in hardware/firmwares.
+
+AVR
+
+Add support for ATmega1280 (e.g. timers, external interrupts, multiple serial ports).
+Good way to receive multiple values / complex messages over the serial port.
+Add pulseOut(), etc. functions from Wiring.
+Add String library.
+Create Encoder library (but don't include in the distribution).
+Create Ping library (but don't include in the distribution).
+Include Arduino as AVR-ISP sketch in hardware/firmwares.
+
+COMPUTER
+
+Easier library discovery and installation.
+Easier board installation.
+Clean up Library and LibraryManager.
+Byte-based serial monitor.
+Investigate method for auto-detecting serial port on Windows.
+Guess serial port on the Mac and Linux.
+Automatic detection of baud rate for serial monitor (based on the call to Serial.begin() in the current sketch).
+Improve, generally, the upload experience (e.g. faster program start after upload, keep-alive messages to bootloader from IDE, shorter bootloader timeout if possible, progress bar)
+Enable drag-and-drop of .pde files to Arduino dock icon.
+Allow uploading of .hex files.
+Allow for arbitrary compilation command line arguments.
+Find in reference should give same message for missing page as for missing page association.
+Test find in reference on libraries.
+
+DEVELOPMENT
+
+Include newer version of avr-gcc (one that supports the ATmega1280).
+Revise fetch.sh to look for version specific pages (names suffixed with, e.g., "-0007")
+If possible, install bug tracking and svn on arduino.cc.
+Move to ant for build process (limitations: can't build bootloader, can't build Windows arduino.exe, etc.)
+
+DOCUMENTATION
+
+Electronics reference a la Wiring.
+Documentation for moving from Arduino to custom PCBs.
+Examples should demonstrate use of functions.
+Add examples using specific hardware.
+Programming tutorial for Arduino.
+Write advanced library tutorial.
+Work on opening up website to public editing.
+Document optocoupler.
+Replace rainbow diagram on the guide to the board page.
+Upload photo of single sided Arduino board.
+Update pictures to use Arduino Diecimila: Guide/Board, tutorials, 
+Create an example for using a simple analog sensor like an LDR, PWM.
+Create diagrams and schematics for the examples.
+Create community section of site.
+Create form for submitting workshops.
+Create form for submitting projects.
+Create community to do list.
+
+Getting Started:
+Consider deleting many of the pictures in the howto's as they just make it harder to see the instructions without adding much (e.g. the pictures of files in folders).
+Tell people not to put the board on a Powerbook.
+People don't know what a jumper is.
+Add picture of the RX/TX LEDs flashing.
+Show a picture of the LED flashing.

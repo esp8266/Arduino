@@ -54,6 +54,7 @@ UPDATES
 * Added interrupts() and noInterrupts() functions.
 * Added degrees() and radians() functions.
 * Support for uploading sketch using a programmer (upload.using preference).
+* Including a working version of the Firmata firmware.
 * New script for downloading the reference from Tom Pollard.  Thanks Tom!
 * Miscellaneous Mac OS X and other patches from Wim Lewis.  Thanks Wim!
 
