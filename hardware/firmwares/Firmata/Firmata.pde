@@ -408,7 +408,7 @@ void pin13strobe(int count, int onInterval, int offInterval) {
 void setup() {
   byte i;
 
-  Serial.begin(57600); // 9600, 14400, 38400, 57600, 115200
+  Serial.begin(115200); // 9600, 14400, 38400, 57600, 115200
 
   // flash the pin 13 with the protocol version
   pinMode(13,OUTPUT);
