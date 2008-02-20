@@ -151,6 +151,7 @@
 			<string>$JAVAROOT/registry.jar</string>
 			<string>$JAVAROOT/RXTXcomm.jar</string>
 			<string>$JAVAROOT/quaqua.jar</string>
+			<string>/System/Library/Java</string>
 		</array>
 		<key>JVMVersion</key>
 		<string>1.4+</string>

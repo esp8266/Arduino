@@ -11,4 +11,5 @@ usbtinyisp.protocol=usbtiny
 
 parallel.name=Parallel Programmer
 parallel.protocol=dapa
-parallel.delay=800
+parallel.force=true
+# parallel.delay=200

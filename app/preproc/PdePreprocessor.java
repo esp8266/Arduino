@@ -84,6 +84,41 @@ public class PdePreprocessor {
   //public static TokenStreamCopyingHiddenTokenFilter filter;
   
   /**
+   * Returns the index of the first character that's not whitespace, a comment
+   * or a pre-processor directive.
+   */
+  public int firstStatement(String in) {
+    PatternMatcherInput input = new PatternMatcherInput(in);
+    PatternCompiler compiler = new Perl5Compiler();
+    PatternMatcher matcher = new Perl5Matcher();
+    Pattern pattern = null;
+    
+    try {
+      pattern = compiler.compile(
+        // XXX: doesn't properly handle special single-quoted characters
+        // whitespace
+        "\\s+" + "|" +
+        // multi-line comment
+        "(/\\*(?:.|\\n)*?\\*/)" + "|" + 
+        // single-line comment
+        "(//.*?$)" + "|" +
+        // pre-processor directive
+        "(#(?:\\\\\\n|.)*)",
+        Perl5Compiler.MULTILINE_MASK);
+    } catch (MalformedPatternException e) {
+      throw new RuntimeException("Internal error in firstStatement()", e);
+    }
+      
+    int i = 0;
+    while (matcher.matchesPrefix(input, pattern)) {
+      i = matcher.getMatch().endOffset(0);
+      input.setCurrentOffset(i);
+    }
+    
+    return i;
+  }
+  
+  /**
    * Strips comments, pre-processor directives, single- and double-quoted
    * strings from a string.
    * @param in the String to strip
@@ -272,9 +307,9 @@ public class PdePreprocessor {
     File streamFile = new File(buildPath, name + ".cpp");
     PrintStream stream = new PrintStream(new FileOutputStream(streamFile));
 
-    writeHeader(stream, name, prototypes);
+    writeHeader(stream);
     //added to write the pde code to the cpp file
-    writeProgram(stream, name, program);
+    writeProgram(stream, program, prototypes);
     writeFooter(stream, target);
     stream.close();
 
@@ -282,8 +317,17 @@ public class PdePreprocessor {
   }
 
   // Write the pde program to the cpp file
-  void writeProgram(PrintStream out, String className, String program) {
-    out.print(program);
+  void writeProgram(PrintStream out, String program, List prototypes) {
+    int prototypeInsertionPoint = firstStatement(program);
+  
+    out.print(program.substring(0, prototypeInsertionPoint));
+    
+    // print user defined prototypes
+    for (int i = 0; i < prototypes.size(); i++) {
+      out.print(prototypes.get(i) + "\n");
+    }
+    
+    out.print(program.substring(prototypeInsertionPoint));
   }
 
 
@@ -291,24 +335,10 @@ public class PdePreprocessor {
    * Write any required header material (eg imports, class decl stuff)
    *
    * @param out                 PrintStream to write it to.
-   * @param exporting           Is this being exported from PDE?
-   * @param name                Name of the class being created.
    */
-  void writeHeader(PrintStream out, String className, List prototypes)
+  void writeHeader(PrintStream out)
     throws IOException {
-    out.print("#include \"WProgram.h\"\n");
-    
-    // print user defined prototypes
-    for (int i = 0; i < prototypes.size(); i++) {
-      out.print(prototypes.get(i) + "\n");
-    }
-
-//    // emit emports that are needed for classes from the code folder
-//    if (extraImports != null) {
-//      for (int i = 0; i < extraImports.length; i++) {
-//        out.print("#include \"" + extraImports[i] + "\"\n");
-//      }
-//    }
+    out.print("#include \"WProgram.h\"\n");    
   }
 
   /**

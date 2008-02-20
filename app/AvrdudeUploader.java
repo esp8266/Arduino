@@ -85,6 +85,10 @@ public class AvrdudeUploader extends Uploader  {
     // XXX: add support for specifying the port address for parallel
     // programmers, although avrdude has a default that works in most cases.
     
+    if (Preferences.get("programmers." + programmer + ".force") != null &&
+        Preferences.getBoolean("programmers." + programmer + ".force"))
+      params.add("-F");
+    
     if (Preferences.get("programmers." + programmer + ".delay") != null)
       params.add("-i" + Preferences.get("programmers." + programmer + ".delay"));
     

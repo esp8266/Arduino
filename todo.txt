@@ -3,16 +3,16 @@
 0011
 
 Improve preprocessing of sketches:
- - Don't move #include statements.
- - Insert prototypes as a better spot in the code (after pre-processor directives).
  - Better determine which header files are included (not commented out).
  - Remember the original locations of function prototypes to highlight the correct line on error.
+ - [done] Insert prototypes at a better spot in the code (after pre-processor directives).
+ - [done] Don't move #include statements.
  - [done] Better determine which functions need prototypes
 Update version of the FTDI drivers.
 Floating point support in the map() function.
-Modify parallel port programmer burning (add -F, lower or remove delay).
 Incorporate ladyada's new SoftwareSerial library.
 Add timeout parameter to pulseIn().
+[done] Modify parallel port programmer burning (add -F, lower or remove delay).
 [done] Allow uploading using a hardware programmer.
 [done] Add analogReference() function.
 [done] Add miscellaneous #defines (interrupts(), int(), etc.)
@@ -28,6 +28,8 @@ Add pulseOut(), etc. functions from Wiring.
 Add String library.
 Create Encoder library (but don't include in the distribution).
 Create Ping library (but don't include in the distribution).
+Add highByte(), lowByte(), and word(high, low) functions.
+Add bitRead() and bitWrite() functions.
 Include Arduino as AVR-ISP sketch in hardware/firmwares.
 
 COMPUTER
