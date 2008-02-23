@@ -138,6 +138,12 @@ void HardwareSerial::println(int n)
   println();
 }
 
+void HardwareSerial::println(unsigned int n)
+{
+  print(n);
+  println();
+}
+
 void HardwareSerial::println(long n)
 {
   print(n);

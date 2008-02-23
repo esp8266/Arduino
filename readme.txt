@@ -58,6 +58,7 @@ UPDATES
 * Placing function prototypes after #include's and #define's.
 * No longer moving #include statements to the top of the sketch.
 * Including a working version of the Firmata firmware.
+* Can now drag .pde files onto the Arduino dock icon.
 * New script for downloading the reference from Tom Pollard.  Thanks Tom!
 * Miscellaneous Mac OS X and other patches from Wim Lewis.  Thanks Wim!
 

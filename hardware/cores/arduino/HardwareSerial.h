@@ -52,6 +52,7 @@ class HardwareSerial
     void println(const char[]);
     void println(uint8_t);
     void println(int);
+    void println(unsigned int);
     void println(long);
     void println(unsigned long);
     void println(long, int);

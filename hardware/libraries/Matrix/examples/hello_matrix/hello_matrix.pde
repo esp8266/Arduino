@@ -1,3 +1,4 @@
+#include <Sprite.h>
 #include <Matrix.h>
 
 // Hello Matrix

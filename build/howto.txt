@@ -1,7 +1,5 @@
 HOW TO BUILD ARDUINO ON YOUR FAVORITE PLATFORM
 
-With frequently asked questions, scroll to the end of the file.
-
 
 ////////////////////////////////////////////////////////////////////
 
@@ -40,7 +38,7 @@ it again, and select the items above. it's also useful to run the
 installer every few months to keep things fresh.
 
 
-1b. On Mac OS X, install Apple's Developer Tools. 
+1b. On Mac OS X, install Apple's Developer Tools and subversion.
 
 1c. On Linux, you're pretty much on your own.. You need jikes (or
     edit make.sh to use a different compiler), java, avr-gcc, make,
@@ -60,6 +58,8 @@ svn co svn://svn.berlios.de/arduino/trunk
 3. BUILD IT
 
 3a. On the Mac, use the Xcode project to build the Arduino software.
+    Set the active target to App to run Arduino, or to Distribute to
+    create a .zip file.
 
 3b. On Windows or Linux, use the command line.
 

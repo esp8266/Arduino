@@ -7,76 +7,16 @@
 	objects = {
 
 /* Begin PBXAggregateTarget section */
-		3318B1140AD6CE7B00FE1A05 /* Setup PPC */ = {
+		33269DE20D6E7A67006BB2E3 /* Distribute */ = {
 			isa = PBXAggregateTarget;
-			buildConfigurationList = 3318B1170AD6CE9F00FE1A05 /* Build configuration list for PBXAggregateTarget "Setup PPC" */;
+			buildConfigurationList = 33269DED0D6E7A7E006BB2E3 /* Build configuration list for PBXAggregateTarget "Distribute" */;
 			buildPhases = (
-				3318B1150AD6CE8800FE1A05 /* ShellScript */,
+				33269DE50D6E7A6F006BB2E3 /* ShellScript */,
 			);
 			dependencies = (
-				3318B1250AD6CF3500FE1A05 /* PBXTargetDependency */,
+				33269DF80D6E7AD4006BB2E3 /* PBXTargetDependency */,
 			);
-			name = "Setup PPC";
-			productName = "Setup-PPC";
-		};
-		3318B1190AD6CE9F00FE1A05 /* Setup Intel */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = 3318B11B0AD6CE9F00FE1A05 /* Build configuration list for PBXAggregateTarget "Setup Intel" */;
-			buildPhases = (
-				3318B11A0AD6CE9F00FE1A05 /* ShellScript */,
-			);
-			dependencies = (
-				3318B1270AD6CF3900FE1A05 /* PBXTargetDependency */,
-			);
-			name = "Setup Intel";
-			productName = "Setup-PPC";
-		};
-		3318B1280AD6CF4F00FE1A05 /* App PPC */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = 3318B12D0AD6CF7A00FE1A05 /* Build configuration list for PBXAggregateTarget "App PPC" */;
-			buildPhases = (
-			);
-			dependencies = (
-				3318B12C0AD6CF6100FE1A05 /* PBXTargetDependency */,
-				3318B12A0AD6CF5E00FE1A05 /* PBXTargetDependency */,
-			);
-			name = "App PPC";
-			productName = "App PPC";
-		};
-		3318B12F0AD6CF7A00FE1A05 /* App Intel */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = 3318B1340AD6CF7A00FE1A05 /* Build configuration list for PBXAggregateTarget "App Intel" */;
-			buildPhases = (
-			);
-			dependencies = (
-				3318B1390AD6CF8900FE1A05 /* PBXTargetDependency */,
-				3318B1320AD6CF7A00FE1A05 /* PBXTargetDependency */,
-			);
-			name = "App Intel";
-			productName = "App PPC";
-		};
-		3318B14C0AD6D1EB00FE1A05 /* Distribute PPC */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = 3318B1530AD6D1EB00FE1A05 /* Build configuration list for PBXAggregateTarget "Distribute PPC" */;
-			buildPhases = (
-				3318B1520AD6D1EB00FE1A05 /* ShellScript */,
-			);
-			dependencies = (
-				3318B14D0AD6D1EB00FE1A05 /* PBXTargetDependency */,
-			);
-			name = "Distribute PPC";
-			productName = Distribute;
-		};
-		3318B1580AD6D1FC00FE1A05 /* Distribute Intel */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = 3318B15F0AD6D1FC00FE1A05 /* Build configuration list for PBXAggregateTarget "Distribute Intel" */;
-			buildPhases = (
-				3318B15E0AD6D1FC00FE1A05 /* ShellScript */,
-			);
-			dependencies = (
-				3318B15B0AD6D1FC00FE1A05 /* PBXTargetDependency */,
-			);
-			name = "Distribute Intel";
+			name = Distribute;
 			productName = Distribute;
 		};
 		33FFFE1C0965BBEF0016AC38 /* Setup */ = {
@@ -85,10 +25,10 @@
 			buildPhases = (
 				335D3AF30C4EE06F0065B27E /* CopyFiles */,
 				33FFFE1D0965BC050016AC38 /* CopyFiles */,
-				33FF070C0965BF760016AC38 /* CopyFiles */,
 				33FF07130965BFA80016AC38 /* CopyFiles */,
 				336EA3E309FF84FA0052D765 /* CopyFiles */,
 				33FF07170965BFFE0016AC38 /* ShellScript */,
+				33269DCF0D6E79D9006BB2E3 /* ShellScript */,
 			);
 			dependencies = (
 			);
@@ -109,6 +49,7 @@
 				33CF03C809662DA200F2C9A9 /* Copy Java Resources */,
 			);
 			dependencies = (
+				33269DF10D6E7A97006BB2E3 /* PBXTargetDependency */,
 			);
 			name = App;
 			productInstallPath = "$(USER_APPS_DIR)";
@@ -120,6 +61,29 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>pde</string>
+			</array>
+			<key>CFBundleTypeIconFile</key>
+			<string>arduino.icns</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>text/plain</string>
+			</array>
+			<key>CFBundleTypeName</key>
+			<string>Arduino Source File</string>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>TEXT</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+		</dict>
+	</array>
 	<key>CFBundleExecutable</key>
 	<string>Arduino</string>
 	<key>CFBundleGetInfoString</key>
@@ -251,7 +215,6 @@
 		33CF03CF09662DC000F2C9A9 /* registry.jar in Copy Java Resources */ = {isa = PBXBuildFile; fileRef = 33AF620E0965D67A00B514A9 /* registry.jar */; settings = {JAVA_ARCHIVE_SUBDIR = ../shared/lib; }; };
 		33CF03D009662DC000F2C9A9 /* oro.jar in Copy Java Resources */ = {isa = PBXBuildFile; fileRef = 33AF620D0965D67900B514A9 /* oro.jar */; settings = {JAVA_ARCHIVE_SUBDIR = ../shared/lib; }; };
 		33F944E10C2B33560093EB9C /* AvrdudeUploader.java in Sources */ = {isa = PBXBuildFile; fileRef = 33F944E00C2B33560093EB9C /* AvrdudeUploader.java */; };
-		33FF07100965BF8A0016AC38 /* burn.command in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FFFEAF0965BD110016AC38 /* burn.command */; };
 		33FF071F0965C1E30016AC38 /* about.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 33FF01DE0965BD160016AC38 /* about.jpg */; };
 		33FF07220965C1E30016AC38 /* buttons.gif in Resources */ = {isa = PBXBuildFile; fileRef = 33FF02770965BD160016AC38 /* buttons.gif */; };
 		33FF07230965C1E30016AC38 /* icon.gif in Resources */ = {isa = PBXBuildFile; fileRef = 33FF02780965BD160016AC38 /* icon.gif */; };
@@ -272,61 +235,19 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		3318B1240AD6CF3500FE1A05 /* PBXContainerItemProxy */ = {
+		33269DF00D6E7A97006BB2E3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 33FFFD3F0965B1E40016AC38 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 33FFFE1C0965BBEF0016AC38;
+			remoteGlobalIDString = 33FFFE1C0965BBEF0016AC38 /* Setup */;
 			remoteInfo = Setup;
 		};
-		3318B1260AD6CF3900FE1A05 /* PBXContainerItemProxy */ = {
+		33269DF70D6E7AD4006BB2E3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 33FFFD3F0965B1E40016AC38 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 33FFFE1C0965BBEF0016AC38;
-			remoteInfo = Setup;
-		};
-		3318B1290AD6CF5E00FE1A05 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 33FFFD3F0965B1E40016AC38 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 33AF61680965C4C600B514A9;
+			remoteGlobalIDString = 33AF61680965C4C600B514A9 /* App */;
 			remoteInfo = App;
-		};
-		3318B12B0AD6CF6100FE1A05 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 33FFFD3F0965B1E40016AC38 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 3318B1140AD6CE7B00FE1A05;
-			remoteInfo = "Setup PPC";
-		};
-		3318B1330AD6CF7A00FE1A05 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 33FFFD3F0965B1E40016AC38 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 33AF61680965C4C600B514A9;
-			remoteInfo = App;
-		};
-		3318B1380AD6CF8900FE1A05 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 33FFFD3F0965B1E40016AC38 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 3318B1190AD6CE9F00FE1A05;
-			remoteInfo = "Setup Intel";
-		};
-		3318B14E0AD6D1EB00FE1A05 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 33FFFD3F0965B1E40016AC38 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 3318B1280AD6CF4F00FE1A05;
-			remoteInfo = "App PPC";
-		};
-		3318B15C0AD6D1FC00FE1A05 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 33FFFD3F0965B1E40016AC38 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 3318B12F0AD6CF7A00FE1A05;
-			remoteInfo = "App Intel";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -367,16 +288,6 @@
 				A337296F0D22505C00E82412 /* librxtxSerial.jnilib in Copy Java Resources */,
 			);
 			name = "Copy Java Resources";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		33FF070C0965BF760016AC38 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = hardware/bootloaders/atmega8;
-			dstSubfolderSpec = 16;
-			files = (
-				33FF07100965BF8A0016AC38 /* burn.command in CopyFiles */,
-			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		33FF07130965BFA80016AC38 /* CopyFiles */ = {
@@ -506,15 +417,6 @@
 		33FFFE810965BD110016AC38 /* howto.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = howto.txt; sourceTree = "<group>"; };
 		33FFFE930965BD110016AC38 /* .cvsignore */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = .cvsignore; sourceTree = "<group>"; };
 		33FFFE940965BD110016AC38 /* Arduino.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = Arduino.xcodeproj; sourceTree = "<group>"; };
-		33FFFEAF0965BD110016AC38 /* burn.command */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = burn.command; sourceTree = "<group>"; };
-		33FFFEB50965BD110016AC38 /* DS_Store */ = {isa = PBXFileReference; lastKnownFileType = file; path = DS_Store; sourceTree = "<group>"; };
-		33FFFEB60965BD110016AC38 /* jikes */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = jikes; sourceTree = "<group>"; };
-		33FFFEBD0965BD110016AC38 /* dist.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = dist.sh; sourceTree = "<group>"; };
-		33FFFEBE0965BD110016AC38 /* make.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = make.sh; sourceTree = "<group>"; };
-		33FFFEBF0965BD110016AC38 /* mkdmg */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = mkdmg; sourceTree = "<group>"; };
-		33FFFEC00965BD110016AC38 /* run.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = run.sh; sourceTree = "<group>"; };
-		A33729610D224FA700E82412 /* librxtxSerial-intel.jnilib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = "librxtxSerial-intel.jnilib"; sourceTree = "<group>"; };
-		A33729620D224FA700E82412 /* librxtxSerial-ppc.jnilib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = "librxtxSerial-ppc.jnilib"; sourceTree = "<group>"; };
 		A33729630D224FA700E82412 /* librxtxSerial.jnilib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.bundle"; path = librxtxSerial.jnilib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -738,10 +640,6 @@
 				33FFFE930965BD110016AC38 /* .cvsignore */,
 				33FFFE940965BD110016AC38 /* Arduino.xcodeproj */,
 				33FFFEAC0965BD110016AC38 /* dist */,
-				33FFFEBD0965BD110016AC38 /* dist.sh */,
-				33FFFEBE0965BD110016AC38 /* make.sh */,
-				33FFFEBF0965BD110016AC38 /* mkdmg */,
-				33FFFEC00965BD110016AC38 /* run.sh */,
 			);
 			path = macosx;
 			sourceTree = "<group>";
@@ -757,24 +655,11 @@
 			isa = PBXGroup;
 			children = (
 				335A28F20C8CCAF700D8A7F4 /* libquaqua.jnilib */,
-				A33729610D224FA700E82412 /* librxtxSerial-intel.jnilib */,
-				A33729620D224FA700E82412 /* librxtxSerial-ppc.jnilib */,
 				A33729630D224FA700E82412 /* librxtxSerial.jnilib */,
 				335A28F30C8CCAF700D8A7F4 /* quaqua.jar */,
-				33FFFEAE0965BD110016AC38 /* bootloader */,
 				33FFFEB20965BD110016AC38 /* drivers */,
-				33FFFEB50965BD110016AC38 /* DS_Store */,
-				33FFFEB60965BD110016AC38 /* jikes */,
 			);
 			path = dist;
-			sourceTree = "<group>";
-		};
-		33FFFEAE0965BD110016AC38 /* bootloader */ = {
-			isa = PBXGroup;
-			children = (
-				33FFFEAF0965BD110016AC38 /* burn.command */,
-			);
-			path = bootloader;
 			sourceTree = "<group>";
 		};
 		33FFFEB20965BD110016AC38 /* drivers */ = {
@@ -816,12 +701,7 @@
 			targets = (
 				33FFFE1C0965BBEF0016AC38 /* Setup */,
 				33AF61680965C4C600B514A9 /* App */,
-				3318B1140AD6CE7B00FE1A05 /* Setup PPC */,
-				3318B1190AD6CE9F00FE1A05 /* Setup Intel */,
-				3318B1280AD6CF4F00FE1A05 /* App PPC */,
-				3318B12F0AD6CF7A00FE1A05 /* App Intel */,
-				3318B14C0AD6D1EB00FE1A05 /* Distribute PPC */,
-				3318B1580AD6D1FC00FE1A05 /* Distribute Intel */,
+				33269DE20D6E7A67006BB2E3 /* Distribute */,
 			);
 		};
 /* End PBXProject section */
@@ -854,7 +734,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		3318B1150AD6CE8800FE1A05 /* ShellScript */ = {
+		33269DCF0D6E79D9006BB2E3 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -867,7 +747,7 @@
 			shellPath = /bin/sh;
 			shellScript = "unzip -od $BUILT_PRODUCTS_DIR/hardware dist/tools-universal.zip\n";
 		};
-		3318B11A0AD6CE9F00FE1A05 /* ShellScript */ = {
+		33269DE50D6E7A6F006BB2E3 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -878,33 +758,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "unzip -od $BUILT_PRODUCTS_DIR/hardware dist/tools-universal.zip\n";
-		};
-		3318B1520AD6D1EB00FE1A05 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "REVISION=`head -1 $SRCROOT/../../todo.txt | cut -c 1-4`\nSHORT_REVISION=`head -1 $SRCROOT/../../todo.txt | cut -c 3-4`\nVERSIONED=`cat $SRCROOT/../../app/Base.java | grep $REVISION`\n\nif [ -z \"$VERSIONED\" ]\nthen\n  echo Fix the revision number in Base.java\n  exit\nfi\n\ncd \"$SRCROOT\"\n\nrm -rf arduino\nrm -rf arduino-*\n\nmv $BUILT_PRODUCTS_DIR arduino\n\nfind arduino -name \"*~\" -exec rm -f {} ';'\n# need to leave ds store stuff cuz one of those is important\n#find arduino -name \".DS_Store\" -exec rm -f {} ';'\nfind arduino -name \"._*\" -exec rm -f {} ';'\nfind arduino -name \"Thumbs.db\" -exec rm -f {} ';'\n\n# clean out the cvs entries\nfind arduino -name \"CVS\" -exec rm -rf {} ';' 2> /dev/null\nfind arduino -name \".cvsignore\" -exec rm -rf {} ';'\n\n# clean out the svn entries\nfind arduino -name \".svn\" -exec rm -rf {} ';' 2> /dev/null\n\n#mv arduino/Arduino.app/Contents/MacOS/Arduino \"arduino/Arduino.app/Contents/MacOS/Arduino $SHORT_REVISION\"\nmv arduino/Arduino.app \"arduino/Arduino $SHORT_REVISION.app\"\nmv arduino arduino-$REVISION\nzip -r arduino-$REVISION-mac-ppc.zip arduino-$REVISION\n";
-		};
-		3318B15E0AD6D1FC00FE1A05 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "cd $BUILT_PRODUCTS_DIR/../../\n\nREVISION=`head -1 ../../todo.txt | cut -c 1-4`\nSHORT_REVISION=`head -1 ../../todo.txt | cut -c 3-4`\nVERSIONED=`cat ../../app/Base.java | grep $REVISION`\n\nif [ -z \"$VERSIONED\" ]\nthen\n  echo Fix the revision number in Base.java\n  exit\nfi\n\nrm -rf arduino\nrm -rf arduino-*\n\nmv $BUILT_PRODUCTS_DIR arduino\n\nfind arduino -name \"*~\" -exec rm -f {} ';'\n# need to leave ds store stuff cuz one of those is important\n#find arduino -name \".DS_Store\" -exec rm -f {} ';'\nfind arduino -name \"._*\" -exec rm -f {} ';'\nfind arduino -name \"Thumbs.db\" -exec rm -f {} ';'\n\n# clean out the cvs entries\nfind arduino -name \"CVS\" -exec rm -rf {} ';' 2> /dev/null\nfind arduino -name \".cvsignore\" -exec rm -rf {} ';'\n\n# clean out the svn entries\nfind arduino -name \".svn\" -exec rm -rf {} ';' 2> /dev/null\n\n#mv arduino/Arduino.app/Contents/MacOS/Arduino \"arduino/Arduino.app/Contents/MacOS/Arduino $SHORT_REVISION\"\nmv arduino/Arduino.app \"arduino/Arduino $SHORT_REVISION.app\"\nmv arduino arduino-$REVISION\nzip -r arduino-$REVISION-mac-intel.zip arduino-$REVISION\n";
+			shellScript = "cd $BUILT_PRODUCTS_DIR/../../\n\nREVISION=`head -1 ../../todo.txt | cut -c 1-4`\nSHORT_REVISION=`head -1 ../../todo.txt | cut -c 3-4`\nVERSIONED=`cat ../../app/Base.java | grep $REVISION`\n\nif [ -z \"$VERSIONED\" ]\nthen\n  echo Fix the revision number in Base.java\n  exit\nfi\n\nrm -rf arduino\nrm -rf arduino-*\n\nmv $BUILT_PRODUCTS_DIR arduino\n\nfind arduino -name \"*~\" -exec rm -f {} ';'\n# need to leave ds store stuff cuz one of those is important\n#find arduino -name \".DS_Store\" -exec rm -f {} ';'\nfind arduino -name \"._*\" -exec rm -f {} ';'\nfind arduino -name \"Thumbs.db\" -exec rm -f {} ';'\n\n# clean out the cvs entries\nfind arduino -name \"CVS\" -exec rm -rf {} ';' 2> /dev/null\nfind arduino -name \".cvsignore\" -exec rm -rf {} ';'\n\n# clean out the svn entries\nfind arduino -name \".svn\" -exec rm -rf {} ';' 2> /dev/null\n\n#mv arduino/Arduino.app/Contents/MacOS/Arduino \"arduino/Arduino.app/Contents/MacOS/Arduino $SHORT_REVISION\"\nmv arduino/Arduino.app \"arduino/Arduino $SHORT_REVISION.app\"\nmv arduino arduino-$REVISION\nzip -r arduino-$REVISION-mac.zip arduino-$REVISION\n";
 		};
 		33FF07170965BFFE0016AC38 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1001,108 +855,23 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		3318B1250AD6CF3500FE1A05 /* PBXTargetDependency */ = {
+		33269DF10D6E7A97006BB2E3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 33FFFE1C0965BBEF0016AC38 /* Setup */;
-			targetProxy = 3318B1240AD6CF3500FE1A05 /* PBXContainerItemProxy */;
+			targetProxy = 33269DF00D6E7A97006BB2E3 /* PBXContainerItemProxy */;
 		};
-		3318B1270AD6CF3900FE1A05 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 33FFFE1C0965BBEF0016AC38 /* Setup */;
-			targetProxy = 3318B1260AD6CF3900FE1A05 /* PBXContainerItemProxy */;
-		};
-		3318B12A0AD6CF5E00FE1A05 /* PBXTargetDependency */ = {
+		33269DF80D6E7AD4006BB2E3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 33AF61680965C4C600B514A9 /* App */;
-			targetProxy = 3318B1290AD6CF5E00FE1A05 /* PBXContainerItemProxy */;
-		};
-		3318B12C0AD6CF6100FE1A05 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 3318B1140AD6CE7B00FE1A05 /* Setup PPC */;
-			targetProxy = 3318B12B0AD6CF6100FE1A05 /* PBXContainerItemProxy */;
-		};
-		3318B1320AD6CF7A00FE1A05 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 33AF61680965C4C600B514A9 /* App */;
-			targetProxy = 3318B1330AD6CF7A00FE1A05 /* PBXContainerItemProxy */;
-		};
-		3318B1390AD6CF8900FE1A05 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 3318B1190AD6CE9F00FE1A05 /* Setup Intel */;
-			targetProxy = 3318B1380AD6CF8900FE1A05 /* PBXContainerItemProxy */;
-		};
-		3318B14D0AD6D1EB00FE1A05 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 3318B1280AD6CF4F00FE1A05 /* App PPC */;
-			targetProxy = 3318B14E0AD6D1EB00FE1A05 /* PBXContainerItemProxy */;
-		};
-		3318B15B0AD6D1FC00FE1A05 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 3318B12F0AD6CF7A00FE1A05 /* App Intel */;
-			targetProxy = 3318B15C0AD6D1FC00FE1A05 /* PBXContainerItemProxy */;
+			targetProxy = 33269DF70D6E7AD4006BB2E3 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		3318B1180AD6CE9F00FE1A05 /* work */ = {
+		33269DEE0D6E7A7E006BB2E3 /* work */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				PRODUCT_NAME = "Setup-PPC";
-			};
-			name = work;
-		};
-		3318B11C0AD6CE9F00FE1A05 /* work */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "Setup-PPC";
-			};
-			name = work;
-		};
-		3318B12E0AD6CF7A00FE1A05 /* work */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "App PPC";
-			};
-			name = work;
-		};
-		3318B1350AD6CF7A00FE1A05 /* work */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				PRODUCT_NAME = "App PPC";
-			};
-			name = work;
-		};
-		3318B1540AD6D1EB00FE1A05 /* work */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				OPTIMIZATION_CFLAGS = "-O0";
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = Distribute;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
-			};
-			name = work;
-		};
-		3318B1600AD6D1FC00FE1A05 /* work */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				OPTIMIZATION_CFLAGS = "-O0";
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = Distribute;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
 			};
 			name = work;
 		};
@@ -1160,50 +929,10 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		3318B1170AD6CE9F00FE1A05 /* Build configuration list for PBXAggregateTarget "Setup PPC" */ = {
+		33269DED0D6E7A7E006BB2E3 /* Build configuration list for PBXAggregateTarget "Distribute" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				3318B1180AD6CE9F00FE1A05 /* work */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = work;
-		};
-		3318B11B0AD6CE9F00FE1A05 /* Build configuration list for PBXAggregateTarget "Setup Intel" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				3318B11C0AD6CE9F00FE1A05 /* work */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = work;
-		};
-		3318B12D0AD6CF7A00FE1A05 /* Build configuration list for PBXAggregateTarget "App PPC" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				3318B12E0AD6CF7A00FE1A05 /* work */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = work;
-		};
-		3318B1340AD6CF7A00FE1A05 /* Build configuration list for PBXAggregateTarget "App Intel" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				3318B1350AD6CF7A00FE1A05 /* work */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = work;
-		};
-		3318B1530AD6D1EB00FE1A05 /* Build configuration list for PBXAggregateTarget "Distribute PPC" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				3318B1540AD6D1EB00FE1A05 /* work */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = work;
-		};
-		3318B15F0AD6D1FC00FE1A05 /* Build configuration list for PBXAggregateTarget "Distribute Intel" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				3318B1600AD6D1FC00FE1A05 /* work */,
+				33269DEE0D6E7A7E006BB2E3 /* work */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = work;

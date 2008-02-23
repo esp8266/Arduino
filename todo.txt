@@ -2,6 +2,7 @@
 
 0011
 
+Allow disabling of serial flushing before upload (for the Arduino BT).
 Improve preprocessing of sketches:
  - Better determine which header files are included (not commented out).
  - Remember the original locations of function prototypes to highlight the correct line on error.
@@ -9,7 +10,6 @@ Improve preprocessing of sketches:
  - [done] Don't move #include statements.
  - [done] Better determine which functions need prototypes
 Update version of the FTDI drivers.
-Floating point support in the map() function.
 Incorporate ladyada's new SoftwareSerial library.
 Add timeout parameter to pulseIn().
 [done] Modify parallel port programmer burning (add -F, lower or remove delay).
@@ -23,7 +23,12 @@ Add timeout parameter to pulseIn().
 AVR
 
 Add support for ATmega1280 (e.g. timers, external interrupts, multiple serial ports).
+Add weak attribute to signal handlers (http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1203798214)
 Good way to receive multiple values / complex messages over the serial port.
+Floating point support in the map() function.
+Consider moving millis() to timer 1, and configuring it so the interrupt is generated once a millisecond.
+Add sleep function(s).
+Add SPI library.
 Add pulseOut(), etc. functions from Wiring.
 Add String library.
 Create Encoder library (but don't include in the distribution).
