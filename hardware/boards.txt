@@ -64,6 +64,7 @@ bt.name=Arduino BT
 bt.upload.protocol=stk500
 bt.upload.maximum_size=14336
 bt.upload.speed=19200
+bt.upload.disable_flushing=true
 
 bt.bootloader.low_fuses=0xff
 bt.bootloader.high_fuses=0xdd

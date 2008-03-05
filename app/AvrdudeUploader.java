@@ -63,7 +63,10 @@ public class AvrdudeUploader extends Uploader  {
     commandDownloader.add("-D"); // don't erase
     commandDownloader.add("-Uflash:w:" + buildPath + File.separator + className + ".hex:i");
 
-    flushSerialBuffer();
+    if (Preferences.get("boards." + Preferences.get("board") + ".upload.disable_flushing") == null ||
+        Preferences.getBoolean("boards." + Preferences.get("board") + ".upload.disable_flushing") == false) {
+      flushSerialBuffer();
+    }
 
     return avrdude(commandDownloader);
   }
