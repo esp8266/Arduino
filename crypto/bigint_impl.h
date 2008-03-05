@@ -44,10 +44,10 @@
 /* Architecture specific functions for big ints */
 #ifdef WIN32
 #define COMP_RADIX          4294967296i64         
-#define COMP_BIG_MSB        0x8000000000000000i64 
+#define COMP_MAX            0xFFFFFFFFFFFFFFFFi64
 #else
 #define COMP_RADIX          4294967296ULL         /**< Max component + 1 */
-#define COMP_BIG_MSB        0x8000000000000000ULL /**< (Max dbl comp + 1)/ 2 */
+#define COMP_MAX            0xFFFFFFFFFFFFFFFFULL/**< (Max dbl comp -1) */
 #endif
 #define COMP_BIT_SIZE       32  /**< Number of bits in a component. */
 #define COMP_BYTE_SIZE      4   /**< Number of bytes in a component. */

@@ -517,7 +517,7 @@ static bigint *bi_int_divide(BI_CTX *ctx, bigint *biR, comp denom)
         r = (r<<COMP_BIT_SIZE) + biR->comps[i];
         biR->comps[i] = (comp)(r / denom);
         r %= denom;
-    } while (--i != 0);
+    } while (--i >= 0);
 
     return trim(biR);
 }
@@ -947,6 +947,7 @@ static bigint *regular_square(BI_CTX *ctx, bigint *bi)
         for (j = i+1; j < t; j++)
         {
             long_comp xx = (long_comp)x[i]*x[j];
+            long_comp xx2 = 2*xx;
             long_comp blob = (long_comp)w[i+j]+carry;
 
             if (u)                  /* previous overflow */
@@ -954,13 +955,16 @@ static bigint *regular_square(BI_CTX *ctx, bigint *bi)
                 blob += COMP_RADIX;
             }
 
+
             u = 0;
-            if (xx & COMP_BIG_MSB)  /* check for overflow */
+            tmp = xx2 + blob;
+
+            /* check for overflow */
+            if ((COMP_MAX-xx) < xx  || (COMP_MAX-xx2) < blob)
             {
                 u = 1;
             }
 
-            tmp = 2*xx + blob;
             w[i+j] = (comp)tmp;
             carry = (comp)(tmp >> COMP_BIT_SIZE);
         }
