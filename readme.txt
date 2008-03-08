@@ -53,12 +53,14 @@ UPDATES
 * Added analogReference() function.
 * Added interrupts() and noInterrupts() functions.
 * Added degrees() and radians() functions.
+* Added timeout parameter (in microseconds) to pulseIn(); default is 1 second.
 * Support for uploading sketch using a programmer (upload.using preference).
 * Improved detection of functions that need prototyping.
 * Placing function prototypes after #include's and #define's.
 * No longer moving #include statements to the top of the sketch.
 * Including a working version of the Firmata firmware.
-* Can now drag .pde files onto the Arduino dock icon.
+* Can now drag .pde files onto the Arduino dock icon on Mac OS X.
+  Thanks to Peter Sgouros.
 * New script for downloading the reference from Tom Pollard.  Thanks Tom!
 * Miscellaneous Mac OS X and other patches from Wim Lewis.  Thanks Wim!
 

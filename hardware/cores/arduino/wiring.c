@@ -66,7 +66,7 @@ void delayMicroseconds(unsigned int us)
 	//delay_us(us);
 
 #if F_CPU >= 16000000L
-    // for the 16 MHz clock on most Arduino boards
+	// for the 16 MHz clock on most Arduino boards
 
 	// for a one-microsecond delay, simply return.  the overhead
 	// of the function call yields a delay of approximately 1 1/8 us.
@@ -81,11 +81,11 @@ void delayMicroseconds(unsigned int us)
 	// account for the time taken in the preceeding commands.
 	us -= 2;
 #else
-    // for the 8 MHz internal clock on the ATmega168
+	// for the 8 MHz internal clock on the ATmega168
 
-    // for a one- or two-microsecond delay, simply return.  the overhead of
-    // the function calls takes more than two microseconds.  can't just
-    // subtract two, since us is unsigned; we'd overflow.
+	// for a one- or two-microsecond delay, simply return.  the overhead of
+	// the function calls takes more than two microseconds.  can't just
+	// subtract two, since us is unsigned; we'd overflow.
 	if (--us == 0)
 		return;
 	if (--us == 0)
@@ -96,9 +96,9 @@ void delayMicroseconds(unsigned int us)
 	// delay requested.
 	us <<= 1;
     
-    // partially compensate for the time taken by the preceeding commands.
-    // we can't subtract any more than this or we'd overflow w/ small delays.
-    us--;
+	// partially compensate for the time taken by the preceeding commands.
+	// we can't subtract any more than this or we'd overflow w/ small delays.
+	us--;
 #endif
 
 	// disable interrupts, otherwise the timer 0 overflow interrupt that

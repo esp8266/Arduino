@@ -9,7 +9,10 @@ Improve preprocessing of sketches:
  - [done] Don't move #include statements.
  - [done] Better determine which functions need prototypes
 Update version of the FTDI drivers (Windows).
-Add timeout parameter to pulseIn().
+Move AVR ISP and giveio drivers elsewhere (Windows).
+Add #defines for the analog input pins.
+Deal with shorter screens (e.g. ASUS EEPC).
+[done] Add timeout parameter to pulseIn().
 [done] Update version of the FTDI drivers (Mac).
 [done] Allow disabling of serial flushing before upload (for the Arduino BT).
 [done] Modify parallel port programmer burning (add -F, lower or remove delay).
@@ -30,6 +33,8 @@ Incorporate ladyada's new SoftwareSerial library.
 Good way to receive multiple values / complex messages over the serial port.
 Floating point support in the map() function.
 Consider moving millis() to timer 1, and configuring it so the interrupt is generated once a millisecond.
+Fix millis() so it overflows on a nice variable-size boundary.
+Fix delayMicroseconds(0).
 Add sleep function(s).
 Add SPI library.
 Add pulseOut(), etc. functions from Wiring.
@@ -44,6 +49,7 @@ Include Arduino as AVR-ISP sketch in hardware/firmwares.
 
 COMPUTER
 
+Multiple sketch windows.
 Easier library discovery and installation.
 Easier board installation.
 Clean up Library and LibraryManager.
