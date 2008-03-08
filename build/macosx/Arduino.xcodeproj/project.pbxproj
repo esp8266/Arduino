@@ -155,9 +155,9 @@
 		335A29200C8CCC0900D8A7F4 /* PTriangle.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A29130C8CCC0900D8A7F4 /* PTriangle.java */; };
 		335A29240C8CCC5E00D8A7F4 /* DiscourseFormat.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A29230C8CCC5E00D8A7F4 /* DiscourseFormat.java */; };
 		336EA55B09FF87F60052D765 /* examples in CopyFiles */ = {isa = PBXBuildFile; fileRef = 336EA4DB09FF87E30052D765 /* examples */; };
+		3378B7620D82FDEF00FE72F7 /* FTDIUSBSerialDriver_v2_1_9.dmg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3378B75E0D82FDE900FE72F7 /* FTDIUSBSerialDriver_v2_1_9.dmg */; };
+		3378B7630D82FDEF00FE72F7 /* FTDIUSBSerialDriver_v2_2_9_Intel.dmg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3378B75F0D82FDE900FE72F7 /* FTDIUSBSerialDriver_v2_2_9_Intel.dmg */; };
 		3383C03B0CB7CAF400A8FB57 /* hardware in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3383BF8B0CB7C71200A8FB57 /* hardware */; };
-		338C478A0AA204BE008F2C0D /* FTDIUSBSerialDriver_v2_1_6.dmg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 338C47870AA204B0008F2C0D /* FTDIUSBSerialDriver_v2_1_6.dmg */; };
-		338C478B0AA204BE008F2C0D /* FTDIUSBSerialDriver_v2_2_6_Intel.dmg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 338C47880AA204B0008F2C0D /* FTDIUSBSerialDriver_v2_2_6_Intel.dmg */; };
 		339514FA097AEB8000193C89 /* license.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02B60965BD170016AC38 /* license.txt */; };
 		339514FB097AEB8000193C89 /* readme.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 33FF02B70965BD170016AC38 /* readme.txt */; };
 		33AF61770965C54B00B514A9 /* EditorListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE2C0965BD110016AC38 /* EditorListener.java */; };
@@ -239,14 +239,14 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 33FFFD3F0965B1E40016AC38 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 33FFFE1C0965BBEF0016AC38 /* Setup */;
+			remoteGlobalIDString = 33FFFE1C0965BBEF0016AC38;
 			remoteInfo = Setup;
 		};
 		33269DF70D6E7AD4006BB2E3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 33FFFD3F0965B1E40016AC38 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 33AF61680965C4C600B514A9 /* App */;
+			remoteGlobalIDString = 33AF61680965C4C600B514A9;
 			remoteInfo = App;
 		};
 /* End PBXContainerItemProxy section */
@@ -296,8 +296,8 @@
 			dstPath = drivers;
 			dstSubfolderSpec = 16;
 			files = (
-				338C478A0AA204BE008F2C0D /* FTDIUSBSerialDriver_v2_1_6.dmg in CopyFiles */,
-				338C478B0AA204BE008F2C0D /* FTDIUSBSerialDriver_v2_2_6_Intel.dmg in CopyFiles */,
+				3378B7620D82FDEF00FE72F7 /* FTDIUSBSerialDriver_v2_1_9.dmg in CopyFiles */,
+				3378B7630D82FDEF00FE72F7 /* FTDIUSBSerialDriver_v2_2_9_Intel.dmg in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -334,10 +334,10 @@
 		335A29130C8CCC0900D8A7F4 /* PTriangle.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = PTriangle.java; sourceTree = "<group>"; };
 		335A29230C8CCC5E00D8A7F4 /* DiscourseFormat.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = DiscourseFormat.java; sourceTree = "<group>"; };
 		336EA4DB09FF87E30052D765 /* examples */ = {isa = PBXFileReference; lastKnownFileType = folder; path = examples; sourceTree = "<group>"; };
+		3378B75E0D82FDE900FE72F7 /* FTDIUSBSerialDriver_v2_1_9.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = FTDIUSBSerialDriver_v2_1_9.dmg; sourceTree = "<group>"; };
+		3378B75F0D82FDE900FE72F7 /* FTDIUSBSerialDriver_v2_2_9_Intel.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = FTDIUSBSerialDriver_v2_2_9_Intel.dmg; sourceTree = "<group>"; };
 		337CD3F309EFC183002B890C /* fetch.sh */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.script.sh; path = fetch.sh; sourceTree = "<group>"; };
 		3383BF8B0CB7C71200A8FB57 /* hardware */ = {isa = PBXFileReference; lastKnownFileType = folder; name = hardware; path = ../../hardware; sourceTree = SOURCE_ROOT; };
-		338C47870AA204B0008F2C0D /* FTDIUSBSerialDriver_v2_1_6.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = FTDIUSBSerialDriver_v2_1_6.dmg; sourceTree = "<group>"; };
-		338C47880AA204B0008F2C0D /* FTDIUSBSerialDriver_v2_2_6_Intel.dmg */ = {isa = PBXFileReference; lastKnownFileType = file; path = FTDIUSBSerialDriver_v2_2_6_Intel.dmg; sourceTree = "<group>"; };
 		33AF620A0965D67800B514A9 /* antlr.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = antlr.jar; sourceTree = "<group>"; };
 		33AF620B0965D67900B514A9 /* applet.html */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.html; path = applet.html; sourceTree = "<group>"; };
 		33AF620C0965D67900B514A9 /* mrj.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = mrj.jar; sourceTree = "<group>"; };
@@ -665,8 +665,8 @@
 		33FFFEB20965BD110016AC38 /* drivers */ = {
 			isa = PBXGroup;
 			children = (
-				338C47870AA204B0008F2C0D /* FTDIUSBSerialDriver_v2_1_6.dmg */,
-				338C47880AA204B0008F2C0D /* FTDIUSBSerialDriver_v2_2_6_Intel.dmg */,
+				3378B75E0D82FDE900FE72F7 /* FTDIUSBSerialDriver_v2_1_9.dmg */,
+				3378B75F0D82FDE900FE72F7 /* FTDIUSBSerialDriver_v2_2_9_Intel.dmg */,
 			);
 			path = drivers;
 			sourceTree = "<group>";

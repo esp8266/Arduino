@@ -2,7 +2,6 @@
 
 0011
 
-Allow disabling of serial flushing before upload (for the Arduino BT).
 Improve preprocessing of sketches:
  - Better determine which header files are included (not commented out).
  - Remember the original locations of function prototypes to highlight the correct line on error.
@@ -12,6 +11,7 @@ Improve preprocessing of sketches:
 Update version of the FTDI drivers.
 Incorporate ladyada's new SoftwareSerial library.
 Add timeout parameter to pulseIn().
+[done] Allow disabling of serial flushing before upload (for the Arduino BT).
 [done] Modify parallel port programmer burning (add -F, lower or remove delay).
 [done] Allow uploading using a hardware programmer.
 [done] Add analogReference() function.
@@ -31,6 +31,8 @@ Add sleep function(s).
 Add SPI library.
 Add pulseOut(), etc. functions from Wiring.
 Add String library.
+Add LCD library.
+Add Servo library.
 Create Encoder library (but don't include in the distribution).
 Create Ping library (but don't include in the distribution).
 Add highByte(), lowByte(), and word(high, low) functions.
