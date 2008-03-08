@@ -10,6 +10,8 @@
 #ifdef __cplusplus
 #include "HardwareSerial.h"
 
+unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout = 1000000L);
+
 // WMath prototypes
 long random(long);
 long random(long, long);

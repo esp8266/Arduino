@@ -87,6 +87,7 @@ extern "C"{
 
 #define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
 #define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )
+#define microsecondsToClockCycles(a) ( (a) * clockCyclesPerMicrosecond() )
 
 typedef uint8_t boolean;
 typedef uint8_t byte;
@@ -118,7 +119,7 @@ void printIntegerInBase(unsigned long n, unsigned long base);
 unsigned long millis(void);
 void delay(unsigned long);
 void delayMicroseconds(unsigned int us);
-unsigned long pulseIn(uint8_t pin, uint8_t state);
+unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout);
 
 void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, byte val);
 

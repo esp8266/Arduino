@@ -8,9 +8,9 @@ Improve preprocessing of sketches:
  - [done] Insert prototypes at a better spot in the code (after pre-processor directives).
  - [done] Don't move #include statements.
  - [done] Better determine which functions need prototypes
-Update version of the FTDI drivers.
-Incorporate ladyada's new SoftwareSerial library.
+Update version of the FTDI drivers (Windows).
 Add timeout parameter to pulseIn().
+[done] Update version of the FTDI drivers (Mac).
 [done] Allow disabling of serial flushing before upload (for the Arduino BT).
 [done] Modify parallel port programmer burning (add -F, lower or remove delay).
 [done] Allow uploading using a hardware programmer.
@@ -22,8 +22,11 @@ Add timeout parameter to pulseIn().
 
 AVR
 
+Add parameter to shiftOut() for specifying a number of bits.
+Add parameter to Serial.print[ln](x, BYTE) for specifying number of bits.
 Add support for ATmega1280 (e.g. timers, external interrupts, multiple serial ports).
 Add weak attribute to signal handlers (http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1203798214)
+Incorporate ladyada's new SoftwareSerial library.
 Good way to receive multiple values / complex messages over the serial port.
 Floating point support in the map() function.
 Consider moving millis() to timer 1, and configuring it so the interrupt is generated once a millisecond.
@@ -64,6 +67,7 @@ Move to ant for build process (limitations: can't build bootloader, can't build 
 
 DOCUMENTATION
 
+Get good top-down, well-lit, plain-white-background photos of the Arduino boards.
 Electronics reference a la Wiring.
 Documentation for moving from Arduino to custom PCBs.
 Examples should demonstrate use of functions.
