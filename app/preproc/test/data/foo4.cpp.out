@@ -1,0 +1,4 @@
+void setup();
+void loop();
+void OneWireReset(int _1W_Pin);
+void OneWireOutByte(int _1W_Pin, byte d, byte strong);

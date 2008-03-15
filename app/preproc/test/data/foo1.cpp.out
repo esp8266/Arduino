@@ -1,0 +1,3 @@
+void setup();
+void loop();
+unsigned long getspeed();

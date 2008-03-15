@@ -1,0 +1,2 @@
+void playMessage(prog_uchar* message);
+void loop();
