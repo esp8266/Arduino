@@ -99,7 +99,7 @@ public class PdePreprocessor {
         // whitespace
         "\\s+" + "|" +
         // multi-line comment
-        "(/\\*(?:.|\\n)*?\\*/)" + "|" + 
+        "(/\\*[^*]*(?:\\*(?!/)[^*]*)*\\*/)" + "|" +
         // single-line comment
         "(//.*?$)" + "|" +
         // pre-processor directive
@@ -134,7 +134,7 @@ public class PdePreprocessor {
       // double-quoted string
       "(\"(?:[^\"\\\\]|\\\\.)*\")" + "|" +
       // multi-line comment
-      "(/\\*(?:.|\\n)*?\\*/)" + "|" + 
+      "(/\\*[^*]*(?:\\*(?!/)[^*]*)*\\*/)" + "|" +
       // single-line comment
       "(//.*?$)" + "|" +
       // pre-processor directive
@@ -183,7 +183,7 @@ public class PdePreprocessor {
     return buffer.toString();
   }
   
-  private List prototypes(String in) throws MalformedPatternException {
+  public List prototypes(String in) throws MalformedPatternException {
     in = collapseBraces(strip(in));
     
     PatternMatcherInput input = new PatternMatcherInput(in);
