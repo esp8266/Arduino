@@ -27,23 +27,11 @@ else
   mkdir -p work/classes/processing/app/syntax
   mkdir -p work/classes/processing/app/tools
   mkdir -p work/lib/build
-  #mkdir -p work/examples
 
-  #need to replace this with the linux native library for RXTX
   echo Unzipping reference...
   unzip -q -d work ../shared/reference.zip
 
   cp dist/arduino work/
- 
-  # copy the avr-gcc distribution
-  #echo Copying tools \(this may take a minute\)...
-
-  # for now, require all linux users to install avr-gcc themselves
-  #cp -pR dist/tools.zip work/
-  #cd work
-  #unzip -oq tools.zip
-  #rm tools.zip
-  #cd ..
 fi
 
 echo Copying shared and core files...
@@ -53,12 +41,10 @@ cp -r ../../hardware work
 rm work/reference.zip
 
 echo Copying examples...
-#unzip -d work/examples ../shared/dist/examples.zip
 cp -r ../shared/dist/examples work/
 
 echo Copying dist files...
 cp -r dist/lib work/
-#cp -r dist/core work/
 cp -r dist/tools work/hardware/
 
 ### -- START BUILDING -------------------------------------------
@@ -66,28 +52,9 @@ cp -r dist/tools work/hardware/
 # move to root 'arduino' directory
 cd ../..
 
-### -- BUILD GCC ------------------------------------------------
-# in the future we will build avr-gcc and tools (if they don't exist)
-
-### -- BUILD PARSER ---------------------------------------------
+### -- BUILD PDE ------------------------------------------------
 
 cd app
-
-if $BUILD_PREPROC
-then
-  cd preproc
-  # build classes/grammar for preprocessor
-  echo Building antlr grammar code...
-  # first build the default java goop
-  java -cp ../../build/linux/work/lib/antlr.jar antlr.Tool StdCParser.g
-  # now build the pde stuff that extends the java classes
-  java -cp ../../build/linux/work/lib/antlr.jar antlr.Tool -glib StdCParser.g WParser.g
-  java -cp ../../build/linux/work/lib/antlr.jar antlr.Tool WTreeParser.g
-  java -cp ../../build/linux/work/lib/antlr.jar antlr.Tool -glib WTreeParser.g WEmitter.g
-  cd ..
-fi
-
-### -- BUILD PDE ------------------------------------------------
 
 echo Building the PDE...
 
