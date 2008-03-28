@@ -24,8 +24,8 @@ FTDI chip on the board. These can be found in the drivers/ directory.
   wizard to the drivers/FTDI USB Drivers sub-directory of the Arduino
   application directory.
 
-* On the Mac, mount the FTDIUSBSerialDriver_v2_1_6.dmg (on PPC Macs) or the
-  FTDIUSBSerialDriver_v2_2_6_Intel.dmg (on Intel Macs) disk image and run the
+* On the Mac, mount the FTDIUSBSerialDriver_v2_1_9.dmg (on PPC Macs) or the
+  FTDIUSBSerialDriver_v2_2_9_Intel.dmg (on Intel Macs) disk image and run the
   included FTDIUSBSerialDriver.pkg.  You will need to restart your computer.
   
 * On Linux, drivers are included in kernel versions 2.4.20 or greater.
@@ -46,7 +46,7 @@ Processing and Wiring.
 
 UPDATES
 
-0011
+0011 - 2008.03.28
 
 * Fixed Find in Reference.
 * Added map() function for mapping values from one range to another.
@@ -54,15 +54,15 @@ UPDATES
 * Added interrupts() and noInterrupts() functions.
 * Added degrees() and radians() functions.
 * Added timeout parameter (in microseconds) to pulseIn(); default is 1 second.
-* Support for uploading sketch using a programmer (upload.using preference).
+* Support for uploading sketch using a programmer.
 * Improved detection of functions that need prototyping.
 * Placing function prototypes after #include's and #define's.
 * No longer moving #include statements to the top of the sketch.
-* Including a working version of the Firmata firmware.
 * Can now drag .pde files onto the Arduino dock icon on Mac OS X.
   Thanks to Peter Sgouros.
 * New script for downloading the reference from Tom Pollard.  Thanks Tom!
 * Miscellaneous Mac OS X and other patches from Wim Lewis.  Thanks Wim!
+* Updated Mac OS X FTDI drivers.
 
 0010 - 2007.10.11
 

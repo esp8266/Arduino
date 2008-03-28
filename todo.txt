@@ -32,8 +32,8 @@ Add weak attribute to signal handlers (http://www.arduino.cc/cgi-bin/yabb2/YaBB.
 Incorporate ladyada's new SoftwareSerial library.
 Good way to receive multiple values / complex messages over the serial port.
 Floating point support in the map() function.
+Fix millis() so it overflows on a nice variable-size boundary; see: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1205949448
 Consider moving millis() to timer 1, and configuring it so the interrupt is generated once a millisecond.
-Fix millis() so it overflows on a nice variable-size boundary.
 Fix delayMicroseconds(0).
 Add sleep function(s).
 Add SPI library.
@@ -60,6 +60,7 @@ Automatic detection of baud rate for serial monitor (based on the call to Serial
 Improve, generally, the upload experience (e.g. faster program start after upload, keep-alive messages to bootloader from IDE, shorter bootloader timeout if possible, progress bar)
 Enable drag-and-drop of .pde files to Arduino dock icon.
 Allow uploading of .hex files.
+Per-board upload.using preference.
 Allow for arbitrary compilation command line arguments.
 Find in reference should give same message for missing page as for missing page association.
 Test find in reference on libraries.
