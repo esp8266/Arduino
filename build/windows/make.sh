@@ -19,7 +19,6 @@ else
   unix2dos work/readme.txt
   
   # needs to make the dir because of packaging goofiness
-  mkdir -p work/classes/arduino/app/preproc
   mkdir -p work/classes/arduino/app/syntax
   mkdir -p work/classes/arduino/app/tools
 
@@ -78,46 +77,6 @@ else
 fi
 
 cd ../..
-
-
-### -- BUILD PREPROC ---------------------------------------------
-
-# i suck at shell scripting
-#if [ $1 = "preproc" ] 
-#then 
-#BUILD_PREPROC=true
-#fi
-
-if $BUILD_PREPROC
-then
-
-echo Building PDE for JDK 1.4
-
-cd app/preproc
-
-# first build the default java goop
-../../build/windows/work/java/bin/java \
-    -cp "..\\..\\build\\windows\\work\\lib\\antlr.jar" antlr.Tool StdCParser.g
-# now build the pde stuff that extends the java classes
-../../build/windows/work/java/bin/java \
-    -cp "..\\..\\build\\windows\\work\\lib\\antlr.jar" antlr.Tool -glib StdCParser.g WParser.g
-../../build/windows/work/java/bin/java \
-    -cp "..\\..\\build\\windows\\work\\lib\\antlr.jar" antlr.Tool WTreeParser.g
-../../build/windows/work/java/bin/java \
-    -cp "..\\..\\build\\windows\\work\\lib\\antlr.jar" antlr.Tool -glib WTreeParser.g WEmitter.g
-
-# back to base arduino dir
-cd ../..
-
-fi
-
-### -- BUILD BOOTLOADER -----------------------------------------
-
-#cd bootloader
-#export DIRAVR=../build/windows/work/tools/avr
-#make 
-#cp ATmegaBOOT.hex ../build/windows/work/bootloader
-#cd ..
 
 ### -- BUILD PDE ------------------------------------------------
 
