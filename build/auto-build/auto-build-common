@@ -1,0 +1,29 @@
+# these are common variables for the auto-build scripts
+
+HOSTNAME=`hostname | sed 's|\([a-zA-Z0-9-]\)\..*|\1|' | sed 'y|ABCDEFGHIJKLMNOPQRSTUVWXYZ|abcdefghijklmnopqrstuvwxyz|'`
+SYSTEM=`uname -s | sed 'y|ABCDEFGHIJKLMNOPQRSTUVWXYZ|abcdefghijklmnopqrstuvwxyz|'`
+DATE=`date +%Y-%m-%d`
+TIME=`date +%H.%M.%S`
+
+## the following creates a spam-bot that sends emails to an address that has not asked for it
+## because of the spam-problem, i (jmz) have disabled it
+# recipient of any emails set from the scripts
+#RECIPIENT=pd-cvs@iem.at
+
+
+## if you want to send emails about the success of your build,
+## please create a file "auto-build-common.local" in this directory
+## and set the "RECIPIENT" address to some valid email-address
+#
+## please do NOT check your auto-build-common.local into the CVS
+#
+## another possibility is to set the "RECIPIENT" environmental variable before running
+## the autobuilder
+
+if [ -e ${SCRIPT_DIR}/auto-build-common.local ]; then
+  . ${SCRIPT_DIR}/auto-build-common.local
+else
+  echo "Could not find local configuration in \"${SCRIPT_DIR}/auto-build-common.local\""
+  echo "Skipping... (see ${SCRIPT_DIR}/auto-build-common for instructions)"
+  echo
+fi
