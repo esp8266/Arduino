@@ -11,19 +11,19 @@ SCRIPT=`echo $0| sed 's|.*/\(.*\)|\1|g'`
 BUILD_DIR=.
 case $SYSTEM in 
 	linux)
-		BUILD_DIR=linux_make
+		BUILD_DIR=linux
 		echo "Configuring to use $BUILD_DIR on GNU/Linux"
 		;;
 	darwin)
-		BUILD_DIR=darwin_app
+		BUILD_DIR=macosx
 		echo "Configuring to use $BUILD_DIR on Darwin/Mac OS X"
 		;;
 	mingw*)
-		BUILD_DIR=win32_inno
+		BUILD_DIR=windows
 		echo "Configuring to use $BUILD_DIR on MinGW/Windows"
 		;;
 	cygwin*)
-		BUILD_DIR=win32_inno
+		BUILD_DIR=windows
 		echo "Configuring to use $BUILD_DIR on Cygwin/Windows"
 		;;
 	*)
@@ -52,15 +52,13 @@ esac
 cd "${auto_build_root_dir}/build/$BUILD_DIR"
 ./dist.sh
 
-exit
-
 upload_build ()
 {
     platform_folder=$1
     build_folder=$2
     archive_format=$3
-	
-	archive="${auto_build_root_dir}/packages/${platform_folder}/${build_folder}/Pd*.${archive_format}"
+	 
+	 archive="${auto_build_root_dir}/build/${platform_folder}/${build_folder}/arduino*.${archive_format}"
     
     echo "upload specs $1 $2 $3"
     echo "Uploading $archive"
@@ -90,20 +88,16 @@ upload_build ()
 
 case $SYSTEM in 
 	linux)
-		if [ -x /usr/bin/dpkg-deb ]; then
-			upload_build linux_make . deb
-		else
-			upload_build linux_make build tar.bz2
-		fi
+		  upload_build linux . tgz
 		;;
 	darwin)
-		upload_build darwin_app . dmg
+		upload_build macosx . zip
 		;;
 	mingw*)
-		upload_build win32_inno Output exe
+		upload_build windows . zip
 		;;
 	cygwin*)
-		upload_build win32_inno Output exe
+		upload_build windows . zip
 		;;
 esac
 
