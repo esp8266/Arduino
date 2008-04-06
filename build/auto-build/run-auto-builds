@@ -1,0 +1,50 @@
+#!/bin/sh
+
+cd /
+
+# On Mac OS X, there are some handy things in Fink, but don't override the
+# built-in tools
+PATH="${PATH}:/sw/bin:/sw/sbin"
+export PATH
+
+# the source dir where this script is
+SCRIPT_DIR=`echo $0 | sed 's|\(.*\)/.*$|\1|'`
+. $SCRIPT_DIR/auto-build-common
+
+# the name of this script
+SCRIPT=`echo $0| sed 's|.*/\(.*\)|\1|g'`
+
+run_build_script ()
+{
+	distro=$1
+	
+	LOGFILE=/home/arduino/logs/${DATE}_${TIME}_${SYSTEM}_${HOSTNAME}_${distro}_${SCRIPT}.txt
+	touch ${LOGFILE} 
+	
+	sh /home/arduino/auto-build/${distro}/build/auto-build/${distro}-auto-build >> $LOGFILE 2>&1
+	
+	case $SYSTEM in 
+		mingw*)
+			/c/cygwin/bin/sh --login -c \
+				"rsync -a ${LOGFILE} rsync://128.238.56.50/arduinoupload/${DATE}/logs/"
+			;;
+		*)
+			rsync -a ${LOGFILE} rsync://128.238.56.50/arduinoupload/${DATE}/logs/
+			;;
+	 esac
+	
+# send status report if something failed
+	completion_test=`tail -1 ${LOGFILE}`
+	if [ "x${completion_test}" != "xSUCCESS" ]; then
+		if [ "x${RECIPIENT}" != "x" ]; then
+			SUBJECT="autobuild: $distro $HOSTNAME $DATE $TIME"
+			tail -20 ${LOGFILE} | mail -s "${SUBJECT}" ${RECIPIENT}
+		fi
+	fi
+}
+
+for dir in /home/arduino/auto-build/*; do 
+	dirname=`echo $dir | sed 's|.*/\(.*\)|\1|'`
+	test -e $dir/build/auto-build/${dirname}-auto-build && \
+		run_build_script $dirname
+done
