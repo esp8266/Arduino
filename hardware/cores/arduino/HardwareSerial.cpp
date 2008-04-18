@@ -26,16 +26,13 @@
 
 #include "HardwareSerial.h"
 
+void HardwareSerialWrite(uint8_t value, void *instance) {
+  ((HardwareSerial *) instance)->write(value);
+}
+
 // Constructors ////////////////////////////////////////////////////////////////
 
-HardwareSerial::HardwareSerial(uint8_t uart)
-{
-  //if(uart == 0){
-  //  _uart = 0;
-  //}else{
-  //  _uart = 1;
-  //}
-}
+HardwareSerial::HardwareSerial() : Print(HardwareSerialWrite) {}
 
 // Public Methods //////////////////////////////////////////////////////////////
 
@@ -59,118 +56,11 @@ void HardwareSerial::flush()
   serialFlush();
 }
 
-void HardwareSerial::print(char c)
-{
-  printByte(c);
-}
-
-void HardwareSerial::print(const char c[])
-{
-  printString(c);
-}
-
-void HardwareSerial::print(uint8_t b)
-{
-  printByte(b);
-}
-
-void HardwareSerial::print(int n)
-{
-  print((long) n);
-}
-
-void HardwareSerial::print(unsigned int n)
-{
-  print((unsigned long) n);
-}
-
-void HardwareSerial::print(long n)
-{
-  if (n < 0) {
-    print('-');
-    n = -n;
-  }
-  printNumber(n, 10);
-}
-
-void HardwareSerial::print(unsigned long n)
-{
-  printNumber(n, 10);
-}
-
-void HardwareSerial::print(long n, int base)
-{
-  if (base == 0)
-    print((char) n);
-  else if (base == 10)
-    print(n);
-  else
-    printNumber(n, base);
-}
-
-void HardwareSerial::println(void)
-{
-  print('\r');
-  print('\n');  
-}
-
-void HardwareSerial::println(char c)
-{
-  print(c);
-  println();  
-}
-
-void HardwareSerial::println(const char c[])
-{
-  print(c);
-  println();
-}
-
-void HardwareSerial::println(uint8_t b)
-{
-  print(b);
-  println();
-}
-
-void HardwareSerial::println(int n)
-{
-  print(n);
-  println();
-}
-
-void HardwareSerial::println(unsigned int n)
-{
-  print(n);
-  println();
-}
-
-void HardwareSerial::println(long n)
-{
-  print(n);
-  println();  
-}
-
-void HardwareSerial::println(unsigned long n)
-{
-  print(n);
-  println();  
-}
-
-void HardwareSerial::println(long n, int base)
-{
-  print(n, base);
-  println();
-}
-
-// Private Methods /////////////////////////////////////////////////////////////
-
-void HardwareSerial::printNumber(unsigned long n, uint8_t base)
-{
-  printIntegerInBase(n, base);
+void HardwareSerial::write(uint8_t b) {
+  serialWrite(b);
 }
 
 // Preinstantiate Objects //////////////////////////////////////////////////////
 
-HardwareSerial Serial = HardwareSerial(0);
-//HardwareSerial Serial1 = HardwareSerial(1);
+HardwareSerial Serial = HardwareSerial();
 

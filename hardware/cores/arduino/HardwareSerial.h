@@ -22,44 +22,20 @@
 
 #include <inttypes.h>
 
-#define DEC 10
-#define HEX 16
-#define OCT 8
-#define BIN 2
-#define BYTE 0
+#include "Print.h"
 
-class HardwareSerial
+class HardwareSerial : public Print
 {
-  private:
-    //uint8_t _uart;
-    void printNumber(unsigned long, uint8_t);
   public:
-    HardwareSerial(uint8_t);
+    HardwareSerial();
     void begin(long);
     uint8_t available(void);
     int read(void);
     void flush(void);
-    void print(char);
-    void print(const char[]);
-    void print(uint8_t);
-    void print(int);
-    void print(unsigned int);
-    void print(long);
-    void print(unsigned long);
-    void print(long, int);
-    void println(void);
-    void println(char);
-    void println(const char[]);
-    void println(uint8_t);
-    void println(int);
-    void println(unsigned int);
-    void println(long);
-    void println(unsigned long);
-    void println(long, int);
+    void write(uint8_t);
 };
 
 extern HardwareSerial Serial;
-//extern HardwareSerial Serial1;
 
 #endif
 
