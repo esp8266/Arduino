@@ -24,26 +24,29 @@
 
 #include "wiring_private.h"
 
-// The number of times timer 0 has overflowed since the program started.
-// Must be volatile or gcc will optimize away some uses of it.
-volatile unsigned long timer0_overflow_count;
+volatile unsigned long timer0_clock_cycles = 0;
+volatile unsigned long timer0_millis = 0;
 
 SIGNAL(SIG_OVERFLOW0)
 {
-	timer0_overflow_count++;
+	// timer 0 prescale factor is 64 and the timer overflows at 256
+	timer0_clock_cycles += 64UL * 256UL;
+	while (timer0_clock_cycles > clockCyclesPerMicrosecond() * 1000UL) {
+		timer0_clock_cycles -= clockCyclesPerMicrosecond() * 1000UL;
+		timer0_millis++;
+	}
 }
 
 unsigned long millis()
 {
-	// timer 0 increments every 64 cycles, and overflows when it reaches
-	// 256.  we would calculate the total number of clock cycles, then
-	// divide by the number of clock cycles per millisecond, but this
-	// overflows too often.
-	//return timer0_overflow_count * 64UL * 256UL / (F_CPU / 1000UL);
+	unsigned long m;
+	uint8_t oldSREG = SREG;
 	
-	// instead find 1/128th the number of clock cycles and divide by
-	// 1/128th the number of clock cycles per millisecond
-	return timer0_overflow_count * 64UL * 2UL / (F_CPU / 128000UL);
+	cli();
+	m = timer0_millis;
+	SREG = oldSREG;
+	
+	return m;
 }
 
 void delay(unsigned long ms)
@@ -122,8 +125,6 @@ void init()
 	// work there
 	sei();
 	
-	// timer 0 is used for millis() and delay()
-	timer0_overflow_count = 0;
 	// on the ATmega168, timer 0 is also used for fast hardware pwm
 	// (using phase-correct PWM would mean that timer 0 overflowed half as often
 	// resulting in different millis() behavior on the ATmega8 and ATmega168)

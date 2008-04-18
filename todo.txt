@@ -1,14 +1,24 @@
 0012 arduino
 
+0012
+
+Add highByte(), lowByte(), and word(high, low) functions.
+Add bitRead() and bitWrite() functions (and bitSet() and bitClear()?)
+Add Encoder library.
+Add String library.
+Add Servo library.
+Add LiquidCrystal library.
+Fix millis() so it overflows on a nice variable-size boundary; see: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1205949448
+Move #include <WProgram.h> after other #include's?  (prevent it from interfering with standard libraries)
+[done] Factor out print statements into a common base class for Serial, LiquidCrystal, etc.
+
 AVR
 
-Fix millis() so it overflows on a nice variable-size boundary; see: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1205949448
 Consider moving millis() to timer 1, and configuring it so the interrupt is generated once a millisecond.
 Problems including WProgram.h twice?
 Add #defines for the analog input pins.
 Add parameter to shiftOut() for specifying a number of bits.
 Add parameter to Serial.print[ln](x, BIN) for specifying number of bits.
-Factor out print statements into a common base class for Serial, LiquidCrystal, etc.
 Add support for ATmega1280 (e.g. timers, external interrupts, multiple serial ports).
 Add weak attribute to signal handlers: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1203798214
 Incorporate ladyada's new SoftwareSerial library.
@@ -20,13 +30,7 @@ Fix delayMicroseconds(0).
 Add sleep function(s).
 Add SPI library.
 Add pulseOut(), etc. functions from Wiring.
-Add String library.
-Add LiquidCrystal library.
-Add Servo library.
-Add Encoder library.
 Add Ping example.
-Add highByte(), lowByte(), and word(high, low) functions.
-Add bitRead() and bitWrite() functions (and bitSet() and bitClear()?)
 Include Arduino as AVR-ISP sketch in hardware/firmwares.
 Move type definitions into WConstants.h.
 Change core to use Arduino types (e.g. byte, boolean).
