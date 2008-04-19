@@ -1,0 +1,23 @@
+#######################################
+# Syntax Coloring Map For LiquidCrystal
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+LiquidCrystal	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+clear	KEYWORD2
+home	KEYWORD2
+print	KEYWORD2
+setCursor	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
