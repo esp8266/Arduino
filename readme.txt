@@ -46,6 +46,11 @@ Processing and Wiring.
 
 UPDATES
 
+0012
+
+* Added a LiquidCrystal library based on the work in the playground.
+* Improved millis(): it now overflows after 49 days instead of 9 hours.
+
 0011 - 2008.03.28
 
 * Fixed Find in Reference.

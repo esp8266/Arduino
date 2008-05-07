@@ -2,19 +2,22 @@
 
 0012
 
-Add highByte(), lowByte(), and word(high, low) functions.
+Add highByte(), lowByte(), and makeWord(high, low) functions.
 Add bitRead() and bitWrite() functions (and bitSet() and bitClear()?)
 Add Encoder library.
 Add String library.
 Add Servo library.
-Add LiquidCrystal library.
-Fix millis() so it overflows on a nice variable-size boundary; see: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1205949448
-Move #include <WProgram.h> after other #include's?  (prevent it from interfering with standard libraries)
+Comment LiquidCrystal examples.
+Write LiquidCrystal documentation.
+Wire library patch: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1206621511
+[done] Move #include <WProgram.h> after other #include's?  (prevent it from interfering with standard libraries)
+[done] Add LiquidCrystal library.
+[done] Fix millis() so it overflows on a nice variable-size boundary; see: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1205949448
 [done] Factor out print statements into a common base class for Serial, LiquidCrystal, etc.
 
 AVR
 
-Consider moving millis() to timer 1, and configuring it so the interrupt is generated once a millisecond.
+Fix interference between millis() / timer 0 overflow interrupt and pwm output on pins 5 and 6.
 Problems including WProgram.h twice?
 Add #defines for the analog input pins.
 Add parameter to shiftOut() for specifying a number of bits.
@@ -25,12 +28,12 @@ Incorporate ladyada's new SoftwareSerial library.
 Good way to receive multiple values / complex messages over the serial port (Firmata?)
 Floating point support in the map() function.
 Way to print floats.
-Wire library patch: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1206621511
 Fix delayMicroseconds(0).
 Add sleep function(s).
 Add SPI library.
 Add pulseOut(), etc. functions from Wiring.
 Add Ping example.
+Supporting EEMEM directive by changing compiler command line: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1202157667
 Include Arduino as AVR-ISP sketch in hardware/firmwares.
 Move type definitions into WConstants.h.
 Change core to use Arduino types (e.g. byte, boolean).
@@ -44,7 +47,9 @@ Multiple sketch windows.
 Easier library discovery and installation.
 Easier board installation.
 Clean up Library and LibraryManager.
+Detect dependencies between libraries.
 Byte-based serial monitor.
+Line termination options in the serial monitor.
 Clear character should clear serial monitor.
 Incorporate serial-net proxy.
 Changing font size should change serial monitor font size.
@@ -98,6 +103,8 @@ Examples should demonstrate use of functions.
 Arduino feature list (in Getting Started > Introduction).
 Programming tutorial for Arduino.
 Write advanced library tutorial.
+Better documentation of the Arduino BT.
+Tutorial about serial communication.
 
 DOCUMENTATION / IMAGES
 
