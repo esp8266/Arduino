@@ -27,12 +27,11 @@
 class HardwareSerial : public Print
 {
   public:
-    HardwareSerial();
     void begin(long);
     uint8_t available(void);
     int read(void);
     void flush(void);
-    void write(uint8_t);
+    virtual void write(uint8_t);
 };
 
 extern HardwareSerial Serial;

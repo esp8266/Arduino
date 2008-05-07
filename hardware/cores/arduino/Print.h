@@ -32,9 +32,8 @@ class Print
 {
   private:
     void printNumber(unsigned long, uint8_t);
-    void (*write)(uint8_t, void *);
   public:
-    Print(void (*)(uint8_t, void *));
+    virtual void write(uint8_t);
     void print(char);
     void print(const char[]);
     void print(uint8_t);

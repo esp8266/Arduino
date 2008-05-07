@@ -26,14 +26,6 @@
 
 #include "HardwareSerial.h"
 
-void HardwareSerialWrite(uint8_t value, void *instance) {
-  ((HardwareSerial *) instance)->write(value);
-}
-
-// Constructors ////////////////////////////////////////////////////////////////
-
-HardwareSerial::HardwareSerial() : Print(HardwareSerialWrite) {}
-
 // Public Methods //////////////////////////////////////////////////////////////
 
 void HardwareSerial::begin(long speed)

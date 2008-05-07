@@ -26,7 +26,7 @@
 
 LiquidCrystal::LiquidCrystal(uint8_t rs, uint8_t rw, uint8_t enable,
   uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3,
-  uint8_t d4, uint8_t d5, uint8_t d6, uint8_t d7) : Print(baseWrite),
+  uint8_t d4, uint8_t d5, uint8_t d6, uint8_t d7) :
   _four_bit_mode(0), _rs_pin(rs), _rw_pin(rw), _enable_pin(enable)
 {
   _data_pins[0] = d0;
@@ -52,7 +52,7 @@ LiquidCrystal::LiquidCrystal(uint8_t rs, uint8_t rw, uint8_t enable,
 }
 
 LiquidCrystal::LiquidCrystal(uint8_t rs, uint8_t rw, uint8_t enable,
-  uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3) : Print(baseWrite),
+  uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3) :
   _four_bit_mode(1), _rs_pin(rs), _rw_pin(rw), _enable_pin(enable)
 {
   _data_pins[0] = d0;
@@ -91,11 +91,15 @@ void LiquidCrystal::setCursor(int col, int row)
   command(0x80 | (col + row_offsets[row]));
 }
 
-void LiquidCrystal::command(int value) {
-  write(value, LOW);
+void LiquidCrystal::command(uint8_t value) {
+  send(value, LOW);
 }
 
-void LiquidCrystal::write(int value, int mode) {
+void LiquidCrystal::write(uint8_t value) {
+  send(value, HIGH);
+}
+
+void LiquidCrystal::send(uint8_t value, uint8_t mode) {
   digitalWrite(_rs_pin, mode);
   digitalWrite(_rw_pin, LOW);
 
@@ -121,8 +125,4 @@ void LiquidCrystal::write(int value, int mode) {
     digitalWrite(_enable_pin, HIGH);
     digitalWrite(_enable_pin, LOW);
   }
-}
-
-void baseWrite(uint8_t value, void *instance) {
-  ((LiquidCrystal *) instance)->write(value);
 }

@@ -26,17 +26,11 @@
 
 #include "Print.h"
 
-// Constructors ////////////////////////////////////////////////////////////////
-
-Print::Print(void (*write)(uint8_t, void *)) {
-  this->write = write;
-}
-
 // Public Methods //////////////////////////////////////////////////////////////
 
 void Print::print(uint8_t b)
 {
-  write(b, this);
+  write(b);
 }
 
 void Print::print(char c)
