@@ -321,6 +321,7 @@ public class PdePreprocessor {
     int prototypeInsertionPoint = firstStatement(program);
   
     out.print(program.substring(0, prototypeInsertionPoint));
+    out.print("#include \"WProgram.h\"\n");    
     
     // print user defined prototypes
     for (int i = 0; i < prototypes.size(); i++) {
@@ -336,10 +337,7 @@ public class PdePreprocessor {
    *
    * @param out                 PrintStream to write it to.
    */
-  void writeHeader(PrintStream out)
-    throws IOException {
-    out.print("#include \"WProgram.h\"\n");    
-  }
+  void writeHeader(PrintStream out) throws IOException {}
 
   /**
    * Write any necessary closing text.
