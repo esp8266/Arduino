@@ -17,6 +17,7 @@ Wire library patch: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1206621511
 
 AVR
 
+Support pin change interrupts.
 Fix interference between millis() / timer 0 overflow interrupt and pwm output on pins 5 and 6.
 Problems including WProgram.h twice?
 Add #defines for the analog input pins.
@@ -90,12 +91,14 @@ Style guide for examples, references, and foundations.
 
 DOCUMENTATION / NAVIGATION
 
-Move navigation to a toolbar at the top of the page.
-Reorganize sub-menus (create sub-sections).
-Not clear where some things go: foundations, environment, etc.
+Move Hacking section into Learning (and rename?).
+Create About section.
+Move Board into the Hardware section.
+Move Environment into the Reference section (which should be renamed Programming).
 
 DOCUMENTATION / CONTENTS
 
+Document Matrix, Sprite, and Wire libraries on the Arduino site.
 Add examples using specific hardware (simple analog sensors, optocouplers, etc.)
 Get good top-down, well-lit, plain-white-background photos of the Arduino boards.
 Documentation for moving from Arduino to custom PCBs.
