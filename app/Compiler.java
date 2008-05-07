@@ -95,47 +95,21 @@ public class Compiler implements MessageConsumer {
     else {
     	avrBasePath = new String(userdir + "hardware/tools/avr/bin/"); 
     }
-
-
-    List baseCommandCompiler = new ArrayList(Arrays.asList(new String[] {
-      avrBasePath + "avr-gcc",
-      "-c", // compile, don't link
-      "-g", // include debugging info (so errors include line numbers)
-      "-Os", // optimize for size
-      "-I" + target.getPath(),
-      "-w", // surpress all warnings
-      "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
-      "-DF_CPU=" + Preferences.get("boards." + Preferences.get("board") + ".build.f_cpu"),
-    }));
-
+    
+    List includePaths = new ArrayList();
+    includePaths.add(target.getPath());
     // use lib directories as include paths
     for (int i = 0; i < sketch.importedLibraries.size(); i++) {
-      baseCommandCompiler.add("-I" + ((Library) sketch.importedLibraries.get(i)).getFolder().getPath());
+      includePaths.add(
+        ((Library) sketch.importedLibraries.get(i)).getFolder().getPath());
     }
     
-    List baseCommandCompilerCPP = new ArrayList(Arrays.asList(new String[] {
-      avrBasePath + "avr-g++",
-      "-c", // compile, don't link
-      "-g", // include debugging info (so errors include line numbers)
-      "-Os", // optimize for size
-      "-I" + target.getPath(),
-      "-w", // surpress all warnings
-      "-fno-exceptions",
-      "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
-      "-DF_CPU=" + Preferences.get("boards." + Preferences.get("board") + ".build.f_cpu"),
-    }));
-
-    // use lib directories as include paths
-    for (int i = 0; i < sketch.importedLibraries.size(); ++i) {
-      baseCommandCompilerCPP.add("-I" + ((Library) sketch.importedLibraries.get(i)).getFolder().getPath());
-    }
-
     List baseCommandLinker = new ArrayList(Arrays.asList(new String[] {
       avrBasePath + "avr-gcc",
       "-Os",
       "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
       "-o",
-      ((!Base.isMacOS()) ? buildPath : buildPath) + File.separator + sketch.name + ".elf"
+      buildPath + File.separator + sketch.name + ".elf"
     }));
     
     String runtimeLibraryName = buildPath + File.separator + "core.a";
@@ -213,18 +187,14 @@ public class Compiler implements MessageConsumer {
       Process process;
       boolean compiling = true;
       for(int i = 0; i < sourceNames.size(); i++) {
-        List commandCompiler = new ArrayList(baseCommandCompiler);
-        commandCompiler.add(sourceNames.get(i));
-        commandCompiler.add("-o"+ objectNames.get(i));
-        if (execAsynchronously(commandCompiler) != 0)
+        if (execAsynchronously(getCommandCompilerC(avrBasePath, includePaths,
+          (String) sourceNames.get(i), (String) objectNames.get(i))) != 0)
           return false;
       }
 
       for(int i = 0; i < sourceNamesCPP.size(); i++) {
-        List commandCompilerCPP = new ArrayList(baseCommandCompilerCPP);
-        commandCompilerCPP.add(sourceNamesCPP.get(i));
-        commandCompilerCPP.add("-o"+ objectNamesCPP.get(i));
-        if (execAsynchronously(commandCompilerCPP) != 0)
+        if (execAsynchronously(getCommandCompilerCPP(avrBasePath, includePaths,
+          (String) sourceNamesCPP.get(i), (String) objectNamesCPP.get(i))) != 0)
           return false;
       }
 
@@ -503,6 +473,55 @@ public class Compiler implements MessageConsumer {
       }
     }
   }
+  
+  static private List getCommandCompilerC(String avrBasePath, List includePaths,
+    String sourceName, String objectName) {
+    List baseCommandCompiler = new ArrayList(Arrays.asList(new String[] {
+      avrBasePath + "avr-gcc",
+      "-c", // compile, don't link
+      "-g", // include debugging info (so errors include line numbers)
+      "-Os", // optimize for size
+      "-w", // surpress all warnings
+      "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
+      "-DF_CPU=" + Preferences.get("boards." + Preferences.get("board") + ".build.f_cpu"),
+    }));
+
+    for (int i = 0; i < includePaths.size(); i++) {
+      baseCommandCompiler.add("-I" + (String) includePaths.get(i));
+    }
+    
+    baseCommandCompiler.add(sourceName);
+    baseCommandCompiler.add("-o"+ objectName);
+    
+    return baseCommandCompiler;
+  }
+  
+  
+  static private List getCommandCompilerCPP(String avrBasePath,
+    List includePaths, String sourceName, String objectName) {
+      List baseCommandCompilerCPP = new ArrayList(Arrays.asList(new String[] {
+      avrBasePath + "avr-g++",
+      "-c", // compile, don't link
+      "-g", // include debugging info (so errors include line numbers)
+      "-Os", // optimize for size
+      "-w", // surpress all warnings
+      "-fno-exceptions",
+      "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
+      "-DF_CPU=" + Preferences.get("boards." + Preferences.get("board") + ".build.f_cpu"),
+    }));
+
+    for (int i = 0; i < includePaths.size(); i++) {
+      baseCommandCompilerCPP.add("-I" + (String) includePaths.get(i));
+    }
+    
+    baseCommandCompilerCPP.add(sourceName);
+    baseCommandCompilerCPP.add("-o"+ objectName);
+    
+    return baseCommandCompilerCPP;
+  }
+
+  
+  
 
 
   static String bootClassPath;
@@ -566,139 +585,4 @@ public class Compiler implements MessageConsumer {
     //packageListFromClassPath(abuffer.toString());  // WHY?
     return abuffer.toString();
   }
-
-
-  /**
-   * A classpath, separated by the path separator, will contain
-   * a series of .jar/.zip files or directories containing .class
-   * files, or containing subdirectories that have .class files.
-   *
-   * @param path the input classpath
-   * @return array of possible package names
-   */
-/*  static public String[] packageListFromClassPath(String path) {
-    Hashtable table = new Hashtable();
-    String pieces[] =
-      Base.split(path, File.pathSeparatorChar);
-
-    for (int i = 0; i < pieces.length; i++) {
-      //System.out.println("checking piece '" + pieces[i] + "'");
-      if (pieces[i].length() == 0) continue;
-
-      if (pieces[i].toLowerCase().endsWith(".o") ||
-          pieces[i].toLowerCase().endsWith(".a")) {
-        packageListFromZip(pieces[i], table);
-
-      } else {  // it's another type of file or directory
-        File dir = new File(pieces[i]);
-        if (dir.exists() && dir.isDirectory()) {
-          packageListFromFolder(dir, null, table);
-          //importCount = magicImportsRecursive(dir, null,
-          //                                  table);
-                                              //imports, importCount);
-        }
-      }
-    }
-    int tableCount = table.size();
-    String output[] = new String[tableCount];
-    int index = 0;
-    Enumeration e = table.keys();
-    while (e.hasMoreElements()) {
-      output[index++] = ((String) e.nextElement()).replace('/', '.');
-    }
-    //System.arraycopy(imports, 0, output, 0, importCount);
-    //PApplet.printarr(output);
-    return output;
-  }
-*/
-
-  static private void packageListFromZip(String filename, Hashtable table) {
-    try {
-      ZipFile file = new ZipFile(filename);
-      Enumeration entries = file.entries();
-      while (entries.hasMoreElements()) {
-        ZipEntry entry = (ZipEntry) entries.nextElement();
-
-        if (!entry.isDirectory()) {
-          String name = entry.getName();
-
-          if (name.endsWith(".class")) {
-            int slash = name.lastIndexOf('/');
-            if (slash == -1) continue;
-
-            String pname = name.substring(0, slash);
-            if (table.get(pname) == null) {
-              table.put(pname, new Object());
-            }
-          }
-        }
-      }
-    } catch (IOException e) {
-      System.err.println("Ignoring " + filename + " (" + e.getMessage() + ")");
-      //e.printStackTrace();
-    }
-  }
-
-
-  /**
-   * Make list of package names by traversing a directory hierarchy.
-   * Each time a class is found in a folder, add its containing set
-   * of folders to the package list. If another folder is found,
-   * walk down into that folder and continue.
-   */
-  static private void packageListFromFolder(File dir, String sofar,
-                                            Hashtable table) {
-                                          //String imports[],
-                                          //int importCount) {
-    //System.err.println("checking dir '" + dir + "'");
-    boolean foundClass = false;
-    String files[] = dir.list();
-
-    for (int i = 0; i < files.length; i++) {
-      if (files[i].equals(".") || files[i].equals("..")) continue;
-
-      File sub = new File(dir, files[i]);
-      if (sub.isDirectory()) {
-        String nowfar =
-          (sofar == null) ? files[i] : (sofar + "." + files[i]);
-        packageListFromFolder(sub, nowfar, table);
-        //System.out.println(nowfar);
-        //imports[importCount++] = nowfar;
-        //importCount = magicImportsRecursive(sub, nowfar,
-        //                                  imports, importCount);
-      } else if (!foundClass) {  // if no classes found in this folder yet
-        if (files[i].endsWith(".class")) {
-          //System.out.println("unique class: " + files[i] + " for " + sofar);
-          table.put(sofar, new Object());
-          foundClass = true;
-        }
-      }
-    }
-    //return importCount;
-  }
-
-  /*
-  static public int magicImportsRecursive(File dir, String sofar,
-                                          Hashtable table) {
-                                          //String imports[],
-                                          //int importCount) {
-    System.err.println("checking dir '" + dir + "'");
-    String files[] = dir.list();
-    for (int i = 0; i < files.length; i++) {
-      if (files[i].equals(".") || files[i].equals("..")) continue;
-
-      File sub = new File(dir, files[i]);
-      if (sub.isDirectory()) {
-        String nowfar = (sofar == null) ?
-          files[i] : (sofar + "." + files[i]);
-        //System.out.println(nowfar);
-        imports[importCount++] = nowfar;
-
-        importCount = magicImportsRecursive(sub, nowfar,
-                                            imports, importCount);
-      }
-    }
-    return importCount;
-  }
-  */
 }
