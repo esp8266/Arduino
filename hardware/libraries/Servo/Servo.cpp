@@ -1,5 +1,6 @@
-#include <Servo.h>
 #include <avr/interrupt.h>
+#include <wiring.h>
+#include <Servo.h>
 
 /*
   Servo.h - Hardware Servo Timer Library

@@ -22,7 +22,6 @@
 */
 
 #include <inttypes.h>
-#include <wiring.h>
 
 class Servo
 {
