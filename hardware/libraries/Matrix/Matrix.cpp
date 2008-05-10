@@ -116,13 +116,13 @@ void Matrix::putByte(uint8_t data)
 // sets register to a byte value for all screens
 void Matrix::setRegister(uint8_t reg, uint8_t data)
 {
-  digitalWrite(_pinLoad, HIGH); // begin
+  digitalWrite(_pinLoad, LOW); // begin
   for(uint8_t i = 0; i < _screens; ++i){
     putByte(reg);  // specify register
     putByte(data); // send data
   }
-  digitalWrite(_pinLoad, LOW);  // latch in data
-  digitalWrite(_pinLoad, HIGH); // end
+  digitalWrite(_pinLoad, HIGH);  // latch in data
+  digitalWrite(_pinLoad, LOW); // end
 }
 
 // syncs row of display with buffer
@@ -132,13 +132,13 @@ void Matrix::syncRow(uint8_t row)
   
   // uint8_t's can't be negative, so don't test for negative row
   if (row >= 8) return;
-  digitalWrite(_pinLoad, HIGH); // begin
+  digitalWrite(_pinLoad, LOW); // begin
   for(uint8_t i = 0; i < _screens; ++i){
     putByte(8 - row);                // specify register
     putByte(_buffer[row + (8 * i)]); // send data
   }
-  digitalWrite(_pinLoad, LOW);  // latch in data
-  digitalWrite(_pinLoad, HIGH); // end
+  digitalWrite(_pinLoad, HIGH);  // latch in data
+  digitalWrite(_pinLoad, LOW); // end
 }
 
 /******************************************************************************
