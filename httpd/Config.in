@@ -129,6 +129,20 @@ config CONFIG_HTTP_HAS_IPV6
     
         Does not work under Win32
 
+config CONFIG_HTTP_ENABLE_DIFFERENT_USER
+    bool "Enable different user"
+    default n
+    depends on !CONFIG_PLATFORM_WIN32
+    help
+        Allow the web server to be run as a different user
+    
+config CONFIG_HTTP_USER
+    string "As User"
+    default "nobody"
+    depends on CONFIG_HTTP_ENABLE_DIFFERENT_USER
+    help
+        The user name that will be used to run axhttpd.
+
 config CONFIG_HTTP_VERBOSE
     bool "Verbose Mode"
     default y if CONFIG_SSL_FULL_MODE

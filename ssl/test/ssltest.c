@@ -638,6 +638,16 @@ static int cert_tests(void)
 
     x509_free(x509_ctx);
     free(buf);
+
+    ssl_ctx = ssl_ctx_new(0, 0);
+    if ((res = ssl_obj_load(ssl_ctx, 
+              SSL_OBJ_X509_CERT, "../ssl/test/ms_iis.cer", NULL)) != SSL_OK)
+    {
+        ssl_display_error(res);
+        goto bad_cert;
+    }
+
+    ssl_ctx_free(ssl_ctx);
     res = 0;        /* all ok */
     printf("All Certificate tests passed\n");
 

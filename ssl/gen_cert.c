@@ -178,7 +178,7 @@ static int gen_issuer(const char * dn[], uint8_t *buf, int *offset)
 
     if (dn[X509_ORGANIZATION] != NULL && strlen(dn[X509_ORGANIZATION]) > 0)
     {
-        if ((ret = gen_dn(dn[X509_ORGANIZATIONAL_UNIT], 10, buf, offset)))
+        if ((ret = gen_dn(dn[X509_ORGANIZATION], 10, buf, offset)))
             goto error;
     }
 

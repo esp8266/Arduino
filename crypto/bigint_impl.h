@@ -44,7 +44,7 @@
 /* Architecture specific functions for big ints */
 #ifdef WIN32
 #define COMP_RADIX          4294967296i64         
-#define COMP_MAX            0xFFFFFFFFFFFFFFFFi64
+#define COMP_MAX            0xFFFFFFFFFFFFFFFFui64
 #else
 #define COMP_RADIX          4294967296ULL         /**< Max component + 1 */
 #define COMP_MAX            0xFFFFFFFFFFFFFFFFULL/**< (Max dbl comp -1) */

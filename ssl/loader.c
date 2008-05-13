@@ -69,8 +69,7 @@ EXP_FUNC int STDCALL ssl_obj_load(SSL_CTX *ssl_ctx, int obj_type,
     }
 
     ssl_obj = (SSLObjLoader *)calloc(1, sizeof(SSLObjLoader));
-    ssl_obj->len = get_file(filename, &ssl_obj->buf);
-
+    ssl_obj->len = get_file(filename, &ssl_obj->buf); 
     if (ssl_obj->len <= 0)
     {
         ret = SSL_ERROR_INVALID_KEY;

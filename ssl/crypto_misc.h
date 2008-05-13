@@ -109,6 +109,7 @@ const char * x509_display_error(int error);
 #define ASN1_TELETEX_STR        0x14
 #define ASN1_IA5_STR            0x16
 #define ASN1_UTC_TIME           0x17
+#define ASN1_UNICODE_STR        0x1e
 #define ASN1_SEQUENCE           0x30
 #define ASN1_SET                0x31
 #define ASN1_IMPLICIT_TAG       0x80

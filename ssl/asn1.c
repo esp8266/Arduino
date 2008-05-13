@@ -40,12 +40,18 @@
 #include "crypto.h"
 #include "crypto_misc.h"
 
-#define SIG_OID_PREFIX_SIZE     8
+#define SIG_OID_PREFIX_SIZE 8
+#define SIG_IIS6_OID_SIZE   5
 
 /* Must be an RSA algorithm with either SHA1 or MD5 for verifying to work */
 static const uint8_t sig_oid_prefix[SIG_OID_PREFIX_SIZE] = 
 {
     0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01
+};
+
+static const uint8_t sig_iis6_oid[SIG_IIS6_OID_SIZE] =
+{
+    0x2b, 0x0e, 0x03, 0x02, 0x1d
 };
 
 /* CN, O, OU */
@@ -277,16 +283,34 @@ static int asn1_get_printable_str(const uint8_t *buf, int *offset, char **str)
     int len = X509_NOT_OK;
 
     /* some certs have this awful crud in them for some reason */
-    if (buf[*offset] != ASN1_PRINTABLE_STR && 
-            buf[*offset] != ASN1_TELETEX_STR && buf[*offset] != ASN1_IA5_STR)
+    if (buf[*offset] != ASN1_PRINTABLE_STR &&  
+            buf[*offset] != ASN1_TELETEX_STR &&  
+            buf[*offset] != ASN1_IA5_STR &&  
+            buf[*offset] != ASN1_UNICODE_STR)
         goto end_pnt_str;
 
-    (*offset)++;
-    len = get_asn1_length(buf, offset);
-    *str = (char *)malloc(len+1);                   /* allow for null */
-    memcpy(*str, &buf[*offset], len);
-    (*str)[len] = 0;                                /* null terminate */
-    *offset += len;
+        (*offset)++;
+        len = get_asn1_length(buf, offset);
+
+        if (buf[*offset - 1] == ASN1_UNICODE_STR)
+        {
+            int i;
+            *str = (char *)malloc(len/2+1);     /* allow for null */
+
+            for (i = 0; i < len; i += 2)
+                (*str)[i/2] = buf[*offset + i + 1];
+
+            (*str)[len/2] = 0;                  /* null terminate */
+        }
+        else
+        {
+            *str = (char *)malloc(len+1);       /* allow for null */
+            memcpy(*str, &buf[*offset], len);
+            (*str)[len] = 0;                    /* null terminate */
+        }
+
+        *offset += len;
+
 end_pnt_str:
     return len;
 }
@@ -424,7 +448,7 @@ void remove_ca_certs(CA_CERT_CTX *ca_cert_ctx)
     while (i < CONFIG_X509_MAX_CA_CERTS && ca_cert_ctx->cert[i])
     {
         x509_free(ca_cert_ctx->cert[i]);
-        ca_cert_ctx->cert[i] = NULL;
+        ca_cert_ctx->cert[i++] = NULL;
     }
 
     free(ca_cert_ctx);
@@ -463,10 +487,18 @@ int asn1_signature_type(const uint8_t *cert,
 
     len = get_asn1_length(cert, offset);
 
-    if (memcmp(sig_oid_prefix, &cert[*offset], SIG_OID_PREFIX_SIZE))
-        goto end_check_sig;     /* unrecognised cert type */
+    if (len == 5 && memcmp(sig_iis6_oid, &cert[*offset], 
+                                    SIG_IIS6_OID_SIZE) == 0)
+    {
+        x509_ctx->sig_type = SIG_TYPE_SHA1;
+    }
+    else
+    {
+        if (memcmp(sig_oid_prefix, &cert[*offset], SIG_OID_PREFIX_SIZE))
+            goto end_check_sig;     /* unrecognised cert type */
 
-    x509_ctx->sig_type = cert[*offset + SIG_OID_PREFIX_SIZE];
+        x509_ctx->sig_type = cert[*offset + SIG_OID_PREFIX_SIZE];
+    }
 
     *offset += len;
     asn1_skip_obj(cert, offset, ASN1_NULL); /* if it's there */

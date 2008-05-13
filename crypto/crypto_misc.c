@@ -127,7 +127,7 @@ EXP_FUNC void STDCALL RNG_initialize(const uint8_t *seed_buf, int size)
         for (i = 0; i < size/(int)sizeof(uint64_t); i++)
             rng_num ^= *((uint64_t *)&seed_buf[i*sizeof(uint64_t)]);
 
-        srand((long)seed_buf);  /* use the stack ptr as another rnd seed */
+        srand((long)&seed_buf);  /* use the stack ptr as another rnd seed */
 #endif
     }
 

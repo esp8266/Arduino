@@ -292,7 +292,7 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert)
         }
 
         /* trusted cert not found */
-        if (i >= CONFIG_X509_MAX_CA_CERTS)
+        if (match_ca_cert == 0)
         {
             ret = X509_VFY_ERROR_NO_TRUSTED_CERT;       
             goto end_verify;

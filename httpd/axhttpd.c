@@ -34,6 +34,7 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <pwd.h>
 #include "axhttp.h"
 
 struct serverstruct *servers;
@@ -185,6 +186,28 @@ int main(int argc, char *argv[])
 #endif
 
     ax_chdir();
+
+#ifdef CONFIG_HTTP_ENABLE_DIFFERENT_USER
+    {
+        struct passwd *pd = getpwnam(CONFIG_HTTP_USER);
+
+        if (pd != NULL)
+        {
+            int res = setuid(pd->pw_uid);
+            res |= setgid(pd->pw_gid);
+
+#if defined(CONFIG_HTTP_VERBOSE)
+            if (res == 0)
+            {
+                printf("change to '%s' successful\n", CONFIG_HTTP_USER); 
+                TTY_FLUSH();
+            }
+#endif
+        }
+
+    }
+#endif
+
 
 #ifndef WIN32 
 #ifdef CONFIG_HTTP_IS_DAEMON
