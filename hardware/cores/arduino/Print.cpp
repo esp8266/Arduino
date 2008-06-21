@@ -30,7 +30,7 @@
 
 void Print::print(uint8_t b)
 {
-  write(b);
+  this->write(b);
 }
 
 void Print::print(char c)

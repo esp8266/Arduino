@@ -9,7 +9,6 @@ Add String library.
 Add Servo library.
 Comment LiquidCrystal examples.
 Write LiquidCrystal documentation.
-Wire library patch: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1206621511
 [done] Move #include <WProgram.h> after other #include's?  (prevent it from interfering with standard libraries)
 [done] Add LiquidCrystal library.
 [done] Fix millis() so it overflows on a nice variable-size boundary; see: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1205949448
@@ -18,7 +17,7 @@ Wire library patch: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1206621511
 AVR
 
 Support pin change interrupts.
-Fix interference between millis() / timer 0 overflow interrupt and pwm output on pins 5 and 6.
+Switch pwm output on pins 5 and 6 to phase-correct mode, if possible.
 Problems including WProgram.h twice?
 Add #defines for the analog input pins.
 Add parameter to shiftOut() for specifying a number of bits.
@@ -32,6 +31,7 @@ Way to print floats.
 Fix delayMicroseconds(0).
 Add sleep function(s).
 Add SPI library.
+Add OneWire library.
 Add pulseOut(), etc. functions from Wiring.
 Add Ping example.
 Supporting EEMEM directive by changing compiler command line: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1202157667
@@ -84,7 +84,6 @@ Create form for submitting projects.
 
 DOCUMENTATION / META
 
-Create community to do list.
 Create community section of site.
 List of examples we'd like to have.
 Style guide for examples, references, and foundations.
@@ -99,18 +98,22 @@ Move Environment into the Reference section (which should be renamed Programming
 DOCUMENTATION / CONTENTS
 
 Document Matrix, Sprite, and Wire libraries on the Arduino site.
-Add examples using specific hardware (simple analog sensors, optocouplers, etc.)
-Get good top-down, well-lit, plain-white-background photos of the Arduino boards.
 Documentation for moving from Arduino to custom PCBs.
-Examples should demonstrate use of functions.
 Arduino feature list (in Getting Started > Introduction).
 Programming tutorial for Arduino.
 Write advanced library tutorial.
 Better documentation of the Arduino BT.
 Tutorial about serial communication.
 
+DOCUMENTATION / EXAMPLES
+
+Add examples using specific hardware (simple analog sensors, optocouplers, etc.)
+Examples should demonstrate use of functions.
+Add I2C EEPROM example using Wire library.
+
 DOCUMENTATION / IMAGES
 
+Get good top-down, well-lit, plain-white-background photos of the Arduino boards.
 Replace rainbow diagram on the guide to the board page.
 Update pictures to use Arduino Diecimila: Guide/Board, tutorials, 
 Create diagrams and schematics for the examples.
@@ -122,3 +125,7 @@ Tell people not to put the board on a Powerbook.
 People don't know what a jumper is.
 Add picture of the RX/TX LEDs flashing.
 Show a picture of the LED flashing.
+
+DOCUMENTATION / TROUBLESHOOTING
+
+Add explanation of how to work around auto-reset.

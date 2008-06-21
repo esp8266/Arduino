@@ -48,9 +48,9 @@ class TwoWire
     void begin(int);
     void beginTransmission(uint8_t);
     void beginTransmission(int);
-    void endTransmission(void);
-    void requestFrom(uint8_t, uint8_t);
-    void requestFrom(int, int);
+    uint8_t endTransmission(void);
+    uint8_t requestFrom(uint8_t, uint8_t);
+    uint8_t requestFrom(int, int);
     void send(uint8_t);
     void send(uint8_t*, uint8_t);
     void send(int);
