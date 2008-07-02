@@ -2,12 +2,13 @@
 
 0012
 
+Add String library.
 Add highByte(), lowByte(), and makeWord(high, low) functions.
 Add bitRead() and bitWrite() functions (and bitSet() and bitClear()?)
 Add Encoder library.
-Add String library.
 Comment LiquidCrystal examples.
 Write LiquidCrystal documentation.
+[done] Add Servo library.
 [done] Move #include <WProgram.h> after other #include's?  (prevent it from interfering with standard libraries)
 [done] Add LiquidCrystal library.
 [done] Add Servo library.
