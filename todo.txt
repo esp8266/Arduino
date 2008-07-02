@@ -6,11 +6,11 @@ Add highByte(), lowByte(), and makeWord(high, low) functions.
 Add bitRead() and bitWrite() functions (and bitSet() and bitClear()?)
 Add Encoder library.
 Add String library.
-Add Servo library.
 Comment LiquidCrystal examples.
 Write LiquidCrystal documentation.
 [done] Move #include <WProgram.h> after other #include's?  (prevent it from interfering with standard libraries)
 [done] Add LiquidCrystal library.
+[done] Add Servo library.
 [done] Fix millis() so it overflows on a nice variable-size boundary; see: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1205949448
 [done] Factor out print statements into a common base class for Serial, LiquidCrystal, etc.
 
@@ -38,6 +38,8 @@ Supporting EEMEM directive by changing compiler command line: http://www.arduino
 Include Arduino as AVR-ISP sketch in hardware/firmwares.
 Move type definitions into WConstants.h.
 Change core to use Arduino types (e.g. byte, boolean).
+Fix millis() so it never increments by two.
+Consider moving millis() to timer 1, and configuring it so the interrupt is generated once a millisecond.
 
 COMPUTER
 

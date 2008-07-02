@@ -42,6 +42,8 @@ unsigned long millis()
 	unsigned long m;
 	uint8_t oldSREG = SREG;
 	
+	// disable interrupts while we read timer0_millis or we might get an
+	// inconsistent value (e.g. in the middle of the timer0_millis++)
 	cli();
 	m = timer0_millis;
 	SREG = oldSREG;
@@ -57,7 +59,7 @@ void delay(unsigned long ms)
 		;
 }
 
-/* Delay for the given number of microseconds.  Assumes a 16 MHz clock. 
+/* Delay for the given number of microseconds.  Assumes a 8 or 16 MHz clock. 
  * Disables interrupts, which will disrupt the millis() function if used
  * too frequently. */
 void delayMicroseconds(unsigned int us)
