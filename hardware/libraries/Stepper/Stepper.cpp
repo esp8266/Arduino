@@ -132,8 +132,6 @@ void Stepper::step(int steps_to_move)
   while(steps_left > 0) {
   // move only if the appropriate delay has passed:
   if (millis() - this->last_step_time >= this->step_delay) {
-      // step the motor to step number 0, 1, 2, or 3:
-      stepMotor(this->step_number % 4);
       // get the timeStamp of when you stepped:
       this->last_step_time = millis();
       // increment or decrement the step number,
@@ -152,6 +150,8 @@ void Stepper::step(int steps_to_move)
       }
       // decrement the steps left:
       steps_left--;
+      // step the motor to step number 0, 1, 2, or 3:
+      stepMotor(this->step_number % 4);
     }
   }
 }
