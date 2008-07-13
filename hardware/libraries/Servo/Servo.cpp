@@ -69,12 +69,12 @@ uint8_t Servo::attach(int pinArg)
 
   if (pin == 9) {
     attached9 = 1;
-    TCCR1A = TCCR1A & ~_BV(COM1A0) | _BV(COM1A1);
+    TCCR1A = (TCCR1A & ~_BV(COM1A0)) | _BV(COM1A1);
   }
   
   if (pin == 10) {
     attached10 = 1;
-    TCCR1A = TCCR1A & ~_BV(COM1B0) | _BV(COM1B1);
+    TCCR1A = (TCCR1A & ~_BV(COM1B0)) | _BV(COM1B1);
   }
   return 1;
 }
