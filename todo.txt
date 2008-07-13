@@ -2,13 +2,14 @@
 
 0012
 
+Update Windows avr-libc to 1.6 and avr-gcc to 4.3 (to match Mac).
 Add String library.
 Add highByte(), lowByte(), and makeWord(high, low) functions.
 Add bitRead() and bitWrite() functions (and bitSet() and bitClear()?)
 Add Encoder library.
 Comment LiquidCrystal examples.
 Write LiquidCrystal documentation.
-[done] Add Servo library.
+[done] Update version of avr-gcc, etc. to support ATmega644, ATmega328, etc.
 [done] Move #include <WProgram.h> after other #include's?  (prevent it from interfering with standard libraries)
 [done] Add LiquidCrystal library.
 [done] Add Servo library.
@@ -38,7 +39,7 @@ Add Ping example.
 Supporting EEMEM directive by changing compiler command line: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1202157667
 Include Arduino as AVR-ISP sketch in hardware/firmwares.
 Move type definitions into WConstants.h.
-Change core to use Arduino types (e.g. byte, boolean).
+Change core and libraries to use Arduino types (e.g. byte, boolean).
 Fix millis() so it never increments by two.
 Consider moving millis() to timer 1, and configuring it so the interrupt is generated once a millisecond.
 
@@ -95,12 +96,12 @@ DOCUMENTATION / NAVIGATION
 
 Move Hacking section into Learning (and rename?).
 Create About section.
-Move Board into the Hardware section.
+Remove Board page.
 Move Environment into the Reference section (which should be renamed Programming).
 
 DOCUMENTATION / CONTENTS
 
-Document Matrix, Sprite, and Wire libraries on the Arduino site.
+Document Matrix and Sprite libraries on the Arduino site.
 Documentation for moving from Arduino to custom PCBs.
 Arduino feature list (in Getting Started > Introduction).
 Programming tutorial for Arduino.
@@ -108,18 +109,21 @@ Write advanced library tutorial.
 Better documentation of the Arduino BT.
 Tutorial about serial communication.
 
+DOCUMENTATION / REFERENCE
+
+Remove parameters from the function links on the reference page.
+
 DOCUMENTATION / EXAMPLES
 
 Add examples using specific hardware (simple analog sensors, optocouplers, etc.)
 Examples should demonstrate use of functions.
 Add I2C EEPROM example using Wire library.
+Update pictures to use Arduino Diecimila.
+Create diagrams and schematics for the examples.
 
-DOCUMENTATION / IMAGES
+DOCUMENTATION / HARDWARE
 
 Get good top-down, well-lit, plain-white-background photos of the Arduino boards.
-Replace rainbow diagram on the guide to the board page.
-Update pictures to use Arduino Diecimila: Guide/Board, tutorials, 
-Create diagrams and schematics for the examples.
 
 DOCUMENTATION / GETTING STARTED
 

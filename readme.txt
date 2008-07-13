@@ -50,6 +50,7 @@ UPDATES
 
 * Added a LiquidCrystal library based on the work in the playground.
 * Improved millis(): it now overflows after 49 days instead of 9 hours.
+* Fixed reversing direction bug in Stepper library.  (Thanks to Wayne Holder.)
 
 0011 - 2008.03.28
 
