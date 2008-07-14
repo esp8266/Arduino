@@ -39,10 +39,15 @@ public class AvrdudeUploader extends Uploader  {
   // XXX: add support for uploading sketches using a programmer
   public boolean uploadUsingPreferences(String buildPath, String className)
   throws RunnerException {
-    if (Preferences.get("upload.using").equals("bootloader")) {
+    String uploadUsing = Preferences.get("boards." + Preferences.get("board") + ".upload.using");
+    if (uploadUsing == null) {
+      // fall back on global preference
+      uploadUsing = Preferences.get("upload.using");
+    }
+    if (uploadUsing.equals("bootloader")) {
       return uploadViaBootloader(buildPath, className);
     } else {
-      Collection params = getProgrammerCommands(Preferences.get("upload.using"));
+      Collection params = getProgrammerCommands(uploadUsing);
       params.add("-Uflash:w:" + buildPath + File.separator + className + ".hex:i");
       return avrdude(params);
     }
