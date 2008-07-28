@@ -3,6 +3,7 @@
 0012
 
 Update Windows avr-libc to 1.6 and avr-gcc to 4.3 (to match Mac).
+Improve shiftOut() performance: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1216659239/0
 Add String library.
 Add highByte(), lowByte(), and makeWord(high, low) functions.
 Add bitRead() and bitWrite() functions (and bitSet() and bitClear()?)
@@ -18,6 +19,10 @@ Write LiquidCrystal documentation.
 
 AVR
 
+Bootloader:
+ - disable watch dog timer
+ - fix eeprom writing: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1202157667/15
+Support atmega328: http://spiffie.org/know/arduino_328/
 Support pin change interrupts.
 Switch pwm output on pins 5 and 6 to phase-correct mode, if possible.
 Problems including WProgram.h twice?
@@ -136,3 +141,7 @@ Show a picture of the LED flashing.
 DOCUMENTATION / TROUBLESHOOTING
 
 Add explanation of how to work around auto-reset.
+
+DOCUMENTATION / HACKING
+
+Burning bootloader without an AVRISP: http://www.geocities.jp/arduino_diecimila/bootloader/index_en.html
