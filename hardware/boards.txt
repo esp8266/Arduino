@@ -100,6 +100,26 @@ diecimila.build.core=arduino
 
 ##############################################################
 
+nano.name=Arduino Nano
+
+nano.upload.protocol=stk500
+nano.upload.maximum_size=14336
+nano.upload.speed=19200
+
+nano.bootloader.low_fuses=0xff
+nano.bootloader.high_fuses=0xdd
+nano.bootloader.extended_fuses=0x00
+nano.bootloader.path=atmega168
+nano.bootloader.file=ATmegaBOOT_168_diecimila.hex
+nano.bootloader.unlock_bits=0x3F
+nano.bootloader.lock_bits=0x0F
+
+nano.build.mcu=atmega168
+nano.build.f_cpu=16000000L
+nano.build.core=arduino
+
+##############################################################
+
 lilypad.name=LilyPad Arduino
 
 lilypad.upload.protocol=stk500
@@ -117,3 +137,23 @@ lilypad.bootloader.lock_bits=0x0F
 lilypad.build.mcu=atmega168
 lilypad.build.f_cpu=8000000L
 lilypad.build.core=arduino
+
+##############################################################
+
+pro.name=Arduino Pro (8 MHz)
+
+pro.upload.protocol=stk500
+pro.upload.maximum_size=14336
+pro.upload.speed=19200
+
+pro.bootloader.low_fuses=0xc6
+pro.bootloader.high_fuses=0xdd
+pro.bootloader.extended_fuses=0x00
+pro.bootloader.path=atmega168
+pro.bootloader.file=ATmegaBOOT_168_pro_8MHz.hex
+pro.bootloader.unlock_bits=0x3F
+pro.bootloader.lock_bits=0x0F
+
+pro.build.mcu=atmega168
+pro.build.f_cpu=8000000L
+pro.build.core=arduino

@@ -31,7 +31,7 @@ FTDI chip on the board. These can be found in the drivers/ directory.
 * On Linux, drivers are included in kernel versions 2.4.20 or greater.
 
 CREDITS
-Arduino is an open source project, owned by nobody and supported by many.
+Arduino is an open source project, supported by many.
 
 The Arduino team is composed of Massimo Banzi, David Cuartielles, Tom Igoe,
 Gianluca Martino, and David A. Mellis.
@@ -48,9 +48,11 @@ UPDATES
 
 0012
 
+* Added Arduino Nano and Arduino Pro (8 MHz) to the boards menu.
 * Added a LiquidCrystal library based on the work in the playground.
 * Improved millis(): it now overflows after 49 days instead of 9 hours.
 * Fixed reversing direction bug in Stepper library.  (Thanks to Wayne Holder.)
+* Moved insertion of #include <WProgram.h> so #include <stdlib.h> works.
 
 0011 - 2008.03.28
 

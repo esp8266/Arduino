@@ -56,7 +56,7 @@
 			productName = App;
 			productReference = 33DD8FB6096AC8DA0013AF8F /* Arduino.app */;
 			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
 <plist version=\"1.0\">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
@@ -687,7 +687,6 @@
 		33FFFD3F0965B1E40016AC38 /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 33FFFD400965B1E40016AC38 /* Build configuration list for PBXProject "Arduino" */;
-			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 0;
 			mainGroup = 33FFFD3D0965B1E40016AC38;
 			productRefGroup = 33FFFD3D0965B1E40016AC38;

@@ -3,13 +3,14 @@
 0012
 
 Update Windows avr-libc to 1.6 and avr-gcc to 4.3 (to match Mac).
+Move Servo min/max parameters to attach() function from constructor.
 Improve shiftOut() performance: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1216659239/0
 Add String library.
-Add highByte(), lowByte(), and makeWord(high, low) functions.
-Add bitRead() and bitWrite() functions (and bitSet() and bitClear()?)
-Add Encoder library.
 Comment LiquidCrystal examples.
 Write LiquidCrystal documentation.
+Add Arduino Nano to boards menu.
+Add Arduino Pro to boards menu.
+[done] Per-board upload.using preference.
 [done] Update version of avr-gcc, etc. to support ATmega644, ATmega328, etc.
 [done] Move #include <WProgram.h> after other #include's?  (prevent it from interfering with standard libraries)
 [done] Add LiquidCrystal library.
@@ -19,6 +20,9 @@ Write LiquidCrystal documentation.
 
 AVR
 
+Add Encoder library.
+Add highByte(), lowByte(), and makeWord(high, low) functions.
+Add bitRead() and bitWrite() functions (and bitSet() and bitClear()?)
 Bootloader:
  - disable watch dog timer
  - fix eeprom writing: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1202157667/15
@@ -41,6 +45,7 @@ Add SPI library.
 Add OneWire library.
 Add pulseOut(), etc. functions from Wiring.
 Add Ping example.
+Add ContinuousServo library that inherits from Servo?
 Supporting EEMEM directive by changing compiler command line: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1202157667
 Include Arduino as AVR-ISP sketch in hardware/firmwares.
 Move type definitions into WConstants.h.
@@ -55,7 +60,11 @@ Improve preprocessing of sketches:
  - Remember the original locations of function prototypes to highlight the correct line on error.
 Multiple sketch windows.
 Easier library discovery and installation.
-Easier board installation.
+Easier board installation ("Add board..." menu item)
+Comprehensive board management:
+ - Enabled and disabled boards.
+ - Dialog for enabling, disabling, adding, and deleting boards.
+ - Board descriptions (e.g. explaining differences between boards).
 Clean up Library and LibraryManager.
 Detect dependencies between libraries.
 Byte-based serial monitor.
@@ -64,12 +73,11 @@ Clear character should clear serial monitor.
 Incorporate serial-net proxy.
 Changing font size should change serial monitor font size.
 Deal with shorter screens (e.g. ASUS EEPC).
-Investigate method for auto-detecting serial port on Windows.
+Investigate method for auto-detecting serial port on Windows (javax.usb?)
 Guess serial port on the Mac and Linux.
 Automatic detection of baud rate for serial monitor (based on the call to Serial.begin() in the current sketch).
 Improve, generally, the upload experience (e.g. faster program start after upload, keep-alive messages to bootloader from IDE, shorter bootloader timeout if possible, progress bar)
 Allow uploading of .hex files.
-Per-board upload.using preference.
 Allow for arbitrary compilation command line arguments.
 Find in reference should give same message for missing page as for missing page association.
 Test find in reference on libraries.
@@ -132,6 +140,7 @@ Get good top-down, well-lit, plain-white-background photos of the Arduino boards
 
 DOCUMENTATION / GETTING STARTED
 
+Main "getting started" link should automatically load page for the user's operating system.
 Consider deleting many of the pictures in the howto's as they just make it harder to see the instructions without adding much (e.g. the pictures of files in folders).
 Tell people not to put the board on a Powerbook.
 People don't know what a jumper is.
