@@ -8,8 +8,8 @@ Improve shiftOut() performance: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=
 Add String library.
 Comment LiquidCrystal examples.
 Write LiquidCrystal documentation.
-Add Arduino Nano to boards menu.
-Add Arduino Pro to boards menu.
+[done] Add Arduino Nano to boards menu.
+[done] Add Arduino Pro to boards menu.
 [done] Per-board upload.using preference.
 [done] Update version of avr-gcc, etc. to support ATmega644, ATmega328, etc.
 [done] Move #include <WProgram.h> after other #include's?  (prevent it from interfering with standard libraries)

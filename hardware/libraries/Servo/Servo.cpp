@@ -53,12 +53,19 @@ void Servo::releaseTimer1() {}
 
 #define NO_ANGLE (0xff)
 
-Servo::Servo() : pin(0), angle(NO_ANGLE), min16(34), max16(150) {}
-Servo::Servo(int min, int max) : pin(0), angle(NO_ANGLE), min16(min / 16), max16(max / 16) {}
+Servo::Servo() : pin(0), angle(NO_ANGLE) {}
 
 uint8_t Servo::attach(int pinArg)
 {
+  return attach(pinArg, 544, 2400);
+}
+
+uint8_t Servo::attach(int pinArg, int min, int max)
+{
   if (pinArg != 9 && pinArg != 10) return 0;
+  
+  min16 = min / 16;
+  max16 = max / 16;
 
   pin = pinArg;
   angle = NO_ANGLE;
