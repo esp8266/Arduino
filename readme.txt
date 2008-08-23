@@ -49,6 +49,7 @@ UPDATES
 0012
 
 * Added Arduino Nano and Arduino Pro (8 MHz) to the boards menu.
+* Added a Servo library based on the work of Jim Studt.
 * Added a LiquidCrystal library based on the work in the playground.
 * Improved millis(): it now overflows after 49 days instead of 9 hours.
 * Fixed reversing direction bug in Stepper library.  (Thanks to Wayne Holder.)

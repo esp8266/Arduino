@@ -3,11 +3,12 @@
 0012
 
 Update Windows avr-libc to 1.6 and avr-gcc to 4.3 (to match Mac).
-Move Servo min/max parameters to attach() function from constructor.
 Improve shiftOut() performance: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1216659239/0
 Add String library.
 Comment LiquidCrystal examples.
 Write LiquidCrystal documentation.
+Document Servo library.
+[done] Move Servo min/max parameters to attach() function from constructor.
 [done] Add Arduino Nano to boards menu.
 [done] Add Arduino Pro to boards menu.
 [done] Per-board upload.using preference.
