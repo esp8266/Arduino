@@ -251,7 +251,19 @@ int main(void)
     uint8_t ch,ch2;
     uint16_t w;
 
+#ifdef WATCHDOG_MODS
+    ch = MCUSR;
+    MCUSR = 0;
+
+    WDTCSR |= _BV(WDCE) | _BV(WDE);
+    WDTCSR = 0;
+
+    // Check if the WDT was used to reset, in which case we dont bootload and skip straight to the code. woot.
+    if (! (ch &  _BV(EXTRF))) // if its a not an external reset...
+      app_start();  // skip bootloader
+#else
     asm volatile("nop\n\t");
+#endif
 
     /* set pin direction for bootloader pin and enable pullup */
     /* for ATmega128, two pins need to be initialized */
@@ -445,6 +457,11 @@ int main(void)
 	/* Leave programming mode  */
 	else if(ch=='Q') {
 	    nothing_response();
+#ifdef WATCHDOG_MODS
+	    // autoreset via watchdog (sneaky!)
+	    WDTCSR = _BV(WDE);
+	    while (1); // 16 ms
+#endif
 	}
 
 
