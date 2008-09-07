@@ -140,7 +140,7 @@ lilypad.build.core=arduino
 
 ##############################################################
 
-pro.name=Arduino Pro (8 MHz)
+pro.name=Arduino Pro or Pro Mini (8 MHz)
 
 pro.upload.protocol=stk500
 pro.upload.maximum_size=14336

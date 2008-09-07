@@ -3,11 +3,13 @@
 0012
 
 Update Windows avr-libc to 1.6 and avr-gcc to 4.3 (to match Mac).
-Improve shiftOut() performance: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1216659239/0
-Add String library.
 Comment LiquidCrystal examples.
-Write LiquidCrystal documentation.
-Document Servo library.
+Add Firmata library.
+Update reference.
+[done] Document LiquidCrystal library.
+[done] Document Servo library.
+[done] Include actual bootloader burned on the Pro and Pro Mini.
+[done] Document Ethernet library.
 [done] Move Servo min/max parameters to attach() function from constructor.
 [done] Add Arduino Nano to boards menu.
 [done] Add Arduino Pro to boards menu.
@@ -21,6 +23,8 @@ Document Servo library.
 
 AVR
 
+Improve shiftOut() performance: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1216659239/0
+Add String library.
 Add Encoder library.
 Add highByte(), lowByte(), and makeWord(high, low) functions.
 Add bitRead() and bitWrite() functions (and bitSet() and bitClear()?)
@@ -40,6 +44,8 @@ Incorporate ladyada's new SoftwareSerial library.
 Good way to receive multiple values / complex messages over the serial port (Firmata?)
 Floating point support in the map() function.
 Way to print floats.
+Should Serial.print(b) send the ASCII digits of the byte?
+Add Serial.write().  (Should this support strings?)
 Fix delayMicroseconds(0).
 Add sleep function(s).
 Add SPI library.
@@ -47,6 +53,12 @@ Add OneWire library.
 Add pulseOut(), etc. functions from Wiring.
 Add Ping example.
 Add ContinuousServo library that inherits from Servo?
+LiquidCrystal library: support going to the next line with println().
+Ethernet library:
+ - call Server.begin() from Ethernet.begin() instead of in user's sketch?
+ - add method for receiving notification of new client connections to a server
+ - add method for receiving notification of data written to a client
+ - add method for receiving notification of client disconnections
 Supporting EEMEM directive by changing compiler command line: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1202157667
 Include Arduino as AVR-ISP sketch in hardware/firmwares.
 Move type definitions into WConstants.h.

@@ -24,11 +24,21 @@ my $css = create_page('arduino.css', "$ARDUINO/pub/skins/arduino/arduino.css");
 my $eeprom = create_page('EEPROM.html', "$ARDUINO/Reference/EEPROM");
 my $stepper = create_page('Stepper.html', "$ARDUINO/Reference/Stepper");
 my $softser = create_page('SoftwareSerial.html', "$ARDUINO/Reference/SoftwareSerial");
+my $wire = create_page('Wire.html', "$ARDUINO/Reference/Wire");
+my $servo = create_page('Servo.html', "$ARDUINO/Reference/Servo");
+my $lcd = create_page('LiquidCrystal.html', "$ARDUINO/Reference/LiquidCrystal");
+my $ethernet = create_page('Ethernet.html', "$ARDUINO/Reference/Ethernet");
 
 create_linked_pages($guide,   qr!$ARDUINO/Guide/(\w+)!,             'Guide_%%.html');
 create_linked_pages($softser, qr!$ARDUINO/Reference/(SoftwareSerial\w+)!, '%%.html');
 create_linked_pages($eeprom,  qr!$ARDUINO/Reference/(EEPROM\w+)!,         '%%.html');
 create_linked_pages($stepper, qr!$ARDUINO/Reference/(Stepper\w+)!,        '%%.html');
+create_linked_pages($wire, qr!$ARDUINO/Reference/(Wire\w+)!,        '%%.html');
+create_linked_pages($servo, qr!$ARDUINO/Reference/(Servo\w+)!,        '%%.html');
+create_linked_pages($lcd, qr!$ARDUINO/Reference/(LiquidCrystal\w+)!,        '%%.html');
+create_linked_pages($ethernet, qr!$ARDUINO/Reference/(Ethernet\w+)!,        '%%.html');
+create_linked_pages($ethernet, qr!$ARDUINO/Reference/(Server\w+)!,        '%%.html');
+create_linked_pages($ethernet, qr!$ARDUINO/Reference/(Client\w+)!,        '%%.html');
 
 my $index = create_page('index.html', "$ARDUINO/Reference/HomePage");
 

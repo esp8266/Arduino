@@ -316,6 +316,7 @@
 
 /* Begin PBXFileReference section */
 		33055EFE0CB8187600824CD9 /* SerialException.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = SerialException.java; sourceTree = "<group>"; };
+		3329219A0E73DFAA00E81989 /* create_reference.pl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.perl; path = create_reference.pl; sourceTree = "<group>"; };
 		332D4DB509CF147F00BF81F6 /* Sizer.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Sizer.java; sourceTree = "<group>"; };
 		335A28F20C8CCAF700D8A7F4 /* libquaqua.jnilib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libquaqua.jnilib; sourceTree = "<group>"; };
 		335A28F30C8CCAF700D8A7F4 /* quaqua.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = quaqua.jar; sourceTree = "<group>"; };
@@ -625,6 +626,7 @@
 		33FFFE800965BD110016AC38 /* build */ = {
 			isa = PBXGroup;
 			children = (
+				3329219A0E73DFAA00E81989 /* create_reference.pl */,
 				337CD3F309EFC183002B890C /* fetch.sh */,
 				33FFFE810965BD110016AC38 /* howto.txt */,
 				33FFFE920965BD110016AC38 /* macosx */,
