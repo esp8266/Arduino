@@ -49,11 +49,13 @@ UPDATES
 0012
 
 * Added Arduino Nano and Arduino Pro (8 MHz) to the boards menu.
+* Added an Ethernet library for use with the Arduino Ethernet Shield.
 * Added a Servo library based on the work of Jim Studt.
 * Added a LiquidCrystal library based on the work in the playground.
 * Improved millis(): it now overflows after 49 days instead of 9 hours.
 * Fixed reversing direction bug in Stepper library.  (Thanks to Wayne Holder.)
 * Moved insertion of #include <WProgram.h> so #include <stdlib.h> works.
+* Upgraded to newer versions of avr-gcc (4.3.0) and avr-libc (1.6).
 
 0011 - 2008.03.28
 
