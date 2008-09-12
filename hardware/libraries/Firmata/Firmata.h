@@ -13,6 +13,7 @@
 #ifndef Firmata_h
 #define Firmata_h
 
+#include <WProgram.h>
 #include <inttypes.h>
 
 
@@ -66,7 +67,7 @@ extern "C" {
 
 
 // TODO make it a subclass of HardwareSerial
-class FirmataClass
+class FirmataClass : public Print
 {
 public:
 	FirmataClass();
