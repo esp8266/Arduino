@@ -32,8 +32,8 @@ byte pinStatus[TOTAL_DIGITAL_PINS]; // store pin status, default OUTPUT
 byte portStatus[TOTAL_PORTS];
 
 /* timer variables */
-extern volatile unsigned long timer0_overflow_count; // timer0 from wiring.c
-unsigned long nextExecuteTime; // for comparison with timer0_overflow_count
+unsigned long currentMillis;     // store the current value from millis()
+unsigned long nextExecuteMillis; // for comparison with currentMillis
 
 
 /*==============================================================================
@@ -204,8 +204,9 @@ void loop()
 /* DIGITALREAD - as fast as possible, check for changes and output them to the
  * FTDI buffer using Serial.print()  */
     checkDigitalInputs();  
-    if(timer0_overflow_count > nextExecuteTime) {  
-        nextExecuteTime = timer0_overflow_count + 19; // run this every 20ms
+    currentMillis = millis();
+    if(currentMillis > nextExecuteMillis) {  
+        nextExecuteMillis = currentMillis + 19; // run this every 20ms
         /* SERIALREAD - Serial.read() uses a 128 byte circular buffer, so handle
          * all serialReads at once, i.e. empty the buffer */
         while(Firmata.available())
