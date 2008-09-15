@@ -1,3 +1,6 @@
+#ifndef WProgram_h
+#define WProgram_h
+
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
@@ -16,4 +19,6 @@ long random(long);
 long random(long, long);
 void randomSeed(unsigned int);
 long map(long, long, long, long, long);
+#endif
+
 #endif

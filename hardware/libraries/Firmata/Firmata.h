@@ -67,7 +67,7 @@ extern "C" {
 
 
 // TODO make it a subclass of HardwareSerial
-class FirmataClass : public Print
+class FirmataClass
 {
 public:
 	FirmataClass();
