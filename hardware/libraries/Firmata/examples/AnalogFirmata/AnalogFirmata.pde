@@ -16,8 +16,8 @@ Servo servo9, servo10; // one instance per pin
 int analogInputsToReport = 0; // bitwise array to store pin reporting
 int analogPin = 0; // counter for reading analog pins
 /* timer variables */
-extern volatile unsigned long timer0_overflow_count; // timer0 from wiring.c
-unsigned long nextExecuteTime; // for comparison with timer0_overflow_count
+unsigned long currentMillis;     // store the current value from millis()
+unsigned long nextExecuteMillis; // for comparison with currentMillis
 
 
 /*==============================================================================
@@ -71,9 +71,9 @@ void loop()
 {
     while(Firmata.available())
         Firmata.processInput();
-	
-    if(timer0_overflow_count > nextExecuteTime) {  
-        nextExecuteTime = timer0_overflow_count + 19; // run this every 20ms
+    currentMillis = millis();
+    if(currentMillis > nextExecuteMillis) {  
+        nextExecuteMillis = currentMillis + 19; // run this every 20ms
         for(analogPin=0;analogPin<TOTAL_ANALOG_PINS;analogPin++) {
             if( analogInputsToReport & (1 << analogPin) ) 
                 Firmata.sendAnalog(analogPin, analogRead(analogPin));
