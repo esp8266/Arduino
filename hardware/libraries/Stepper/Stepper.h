@@ -45,9 +45,6 @@
 #ifndef Stepper_h
 #define Stepper_h
 
-// include types & constants of Wiring core API
-#include "WConstants.h"
-
 // library interface description
 class Stepper {
   public:

@@ -46,16 +46,35 @@ Processing and Wiring.
 
 UPDATES
 
-0012
+0012 - 2008.09.17
 
-* Added Arduino Nano and Arduino Pro (8 MHz) to the boards menu.
+* Added Arduino Nano to the boards menu.
+* Arduino Pro or Pro Mini (8 MHz) to the boards menu.
+* Added Firmata library by Hans Steiner and others.  This provides a standard
+  protocol for communicating with software on the computer.
 * Added an Ethernet library for use with the Arduino Ethernet Shield.
 * Added a Servo library based on the work of Jim Studt.
-* Added a LiquidCrystal library based on the work in the playground.
-* Improved millis(): it now overflows after 49 days instead of 9 hours.
+* Added a LiquidCrystal library based on the work in the playground.  It
+  supports both 4- and 8-bit modes.
+* Improved millis(): it now overflows after 49 days instead of 9 hours, but
+  now uses slightly more processing power.
 * Fixed reversing direction bug in Stepper library.  (Thanks to Wayne Holder.)
-* Moved insertion of #include <WProgram.h> so #include <stdlib.h> works.
-* Upgraded to newer versions of avr-gcc (4.3.0) and avr-libc (1.6).
+* Moved insertion of #include <WProgram.h> to after any comments and #include
+  statements in the main sketch file.  This means that an #include <stdlib.h>
+  now works.
+* Upgraded to newer versions of avr-gcc (4.3.0) and avr-libc (1.6).  This
+  provides support for newer Atmel chips, but may increase the size
+  of sketches.
+* Allowing per-board specification of the upload.using preference, allowing
+  upload via bootloader to some boards and via a programmer to others.
+* Added return values to some functions in the Wire library to allow for
+  better error handling.
+* Fixed random() to work with long values.
+* Creation of an abstract Print base-class to allow Serial, SoftwareSerial,
+  and LiquidCrystal to share code for print() and println().
+* Incorporated ladyada's watchdog timer mods to the bootloader source, but
+  only compiling them in for the Pro and Pro Mini (because they are included
+  in the bootloader being burned on the boards by SparkFun).
 
 0011 - 2008.03.28
 
