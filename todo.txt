@@ -2,8 +2,8 @@
 
 0012
 
-Update Windows avr-libc to 1.6 and avr-gcc to 4.3 (to match Mac).
-Add Firmata library.
+[done] Update Windows avr-libc to 1.6 and avr-gcc to 4.3 (to match Mac).
+[done] Add Firmata library.
 [done] Comment LiquidCrystal examples.
 [done] Update reference.
 [done] Document LiquidCrystal library.

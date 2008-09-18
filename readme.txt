@@ -46,7 +46,7 @@ Processing and Wiring.
 
 UPDATES
 
-0012 - 2008.09.17
+0012 - 2008.09.18
 
 * Added Arduino Nano to the boards menu.
 * Arduino Pro or Pro Mini (8 MHz) to the boards menu.
