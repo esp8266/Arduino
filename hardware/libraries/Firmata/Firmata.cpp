@@ -10,14 +10,6 @@
   See file LICENSE.txt for further informations on licensing terms.
 */
 
-/*
- * TODO generalized SysEx support
- * TODO firmware name/version reporting (i.e. some firmwares will use the Firmata
- *       protocol, but will only support specific devices, like ultrasound 
- *       rangefinders or servos)
- * TODO implement v2 protocol using digital ports
- */
-
 //******************************************************************************
 //* Includes
 //******************************************************************************

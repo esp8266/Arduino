@@ -1,0 +1,14 @@
+
+- make Firmata a subclass of HardwareSerial
+
+- per-pin digital callback, since the per-port callback is a bit complicated
+  for beginners (maybe Firmata is not for beginners...)
+
+- simplify SimpleDigitalFirmata, take out the code that checks to see if the
+  data has changed, since it is a bit complicated for this example.  Ideally
+  this example would be based on a call
+
+- turn current SimpleDigitalFirmata into DigitalPortFirmata for a more complex
+  example using the code which checks for changes before doing anything
+
+- test integration with Wiring
