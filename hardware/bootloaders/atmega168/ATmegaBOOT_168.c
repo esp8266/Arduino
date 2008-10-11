@@ -65,7 +65,7 @@
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
 #include <avr/wdt.h>
-
+#include <util/delay.h>
 
 /* the current avr-libc eeprom functions do not support the ATmega168 */
 /* own eeprom write/read functions are used instead */
@@ -448,8 +448,9 @@ int main(void)
 	}
 
 
-	/* Enter programming mode  */
-	else if(ch=='P') {
+	/* P: Enter programming mode  */
+	/* R: Erase device, don't care as we will erase one page at a time anyway.  */
+	else if(ch=='P' || ch=='R') {
 		nothing_response();
 	}
 
@@ -465,12 +466,6 @@ int main(void)
 	}
 
 
-	/* Erase device, don't care as we will erase one page at a time anyway.  */
-	else if(ch=='R') {
-		nothing_response();
-	}
-
-
 	/* Set address, little endian. EEPROM in bytes, FLASH in words  */
 	/* Perhaps extra address bytes may be added in future to support > 128kB FLASH.  */
 	/* This might explain why little endian was used here, big endian used everywhere else.  */
@@ -483,8 +478,21 @@ int main(void)
 
 	/* Universal SPI programming command, disabled.  Would be used for fuses and lock bits.  */
 	else if(ch=='V') {
-		getNch(4);
-		byte_response(0x00);
+		if (getch() == 0x30) {
+			getch();
+			ch = getch();
+			getch();
+			if (ch == 0) {
+				byte_response(SIG1);
+			} else if (ch == 1) {
+				byte_response(SIG2); 
+			} else {
+				byte_response(SIG3);
+			} 
+		} else {
+			getNch(3);
+			byte_response(0x00);
+		}
 	}
 
 
@@ -499,6 +507,7 @@ int main(void)
 		}
 		if (getch() == ' ') {
 			if (flags.eeprom) {		                //Write to EEPROM one byte at a time
+				address.word <<= 1;
 				for(w=0;w<length.word;w++) {
 #ifdef __AVR_ATmega168__
 					while(EECR & (1<<EEPE));
@@ -644,11 +653,9 @@ int main(void)
 		if (address.word>0x7FFF) flags.rampz = 1;		// No go with m256, FIXME
 		else flags.rampz = 0;
 #endif
+		address.word = address.word << 1;	        // address * 2 -> byte location
 		if (getch() == 'E') flags.eeprom = 1;
-		else {
-			flags.eeprom = 0;
-			address.word = address.word << 1;	        // address * 2 -> byte location
-		}
+		else flags.eeprom = 0;
 		if (getch() == ' ') {		                // Command terminator
 			putch(0x14);
 			for (w=0;w < length.word;w++) {		        // Can handle odd and even lengths okay
@@ -817,42 +824,42 @@ int main(void)
 }
 
 
-char gethex(void) {
-	char ah,al;
+char gethexnib(void) {
+	char a;
+	a = getch(); putch(a);
+	if(a >= 'a') {
+		return (a - 'a' + 0x0a);
+	} else if(a >= '0') {
+		return(a - '0');
+	}
+	return a;
+}
 
-	ah = getch(); putch(ah);
-	al = getch(); putch(al);
-	if(ah >= 'a') {
-		ah = ah - 'a' + 0x0a;
-	} else if(ah >= '0') {
-		ah -= '0';
-	}
-	if(al >= 'a') {
-		al = al - 'a' + 0x0a;
-	} else if(al >= '0') {
-		al -= '0';
-	}
-	return (ah << 4) + al;
+
+char gethex(void) {
+	return (gethexnib() << 4) + gethexnib();
 }
 
 
 void puthex(char ch) {
-	char ah,al;
+	char ah;
 
-	ah = (ch & 0xf0) >> 4;
+	ah = ch >> 4;
 	if(ah >= 0x0a) {
 		ah = ah - 0x0a + 'a';
 	} else {
 		ah += '0';
 	}
-	al = (ch & 0x0f);
-	if(al >= 0x0a) {
-		al = al - 0x0a + 'a';
+	
+	ch &= 0x0f;
+	if(ch >= 0x0a) {
+		ch = ch - 0x0a + 'a';
 	} else {
-		al += '0';
+		ch += '0';
 	}
+	
 	putch(ah);
-	putch(al);
+	putch(ch);
 }
 
 
@@ -917,8 +924,7 @@ char getch(void)
 
 void getNch(uint8_t count)
 {
-	uint8_t i;
-	for(i=0;i<count;i++) {
+	while(count--) {
 #ifdef __AVR_ATmega128__
 		if(bootuart == 1) {
 			while(!(UCSR0A & _BV(RXC0)));
@@ -929,17 +935,13 @@ void getNch(uint8_t count)
 			UDR1;
 		}
 #elif defined __AVR_ATmega168__
-		while(!(UCSR0A & _BV(RXC0)));
-		UDR0;
+		getch();
 #else
 		/* m8,16,32,169,8515,8535,163 */
 		/* 20060803 DojoCorp:: Addon coming from the previous Bootloader*/               
 		//while(!(UCSRA & _BV(RXC)));
 		//UDR;
-		uint8_t i;
-		for(i=0;i<count;i++) {
-			getch(); // need to handle time out
-		}
+		getch(); // need to handle time out
 #endif		
 	}
 }
@@ -971,20 +973,11 @@ void nothing_response(void)
 
 void flash_led(uint8_t count)
 {
-	/* flash onboard LED three times to signal entering of bootloader */
-	/* l needs to be volatile or the delay loops below might get
-	optimized away if compiling with optimizations (DAM). */
-	volatile uint32_t l;
-
-	if (count == 0) {
-		count = 3;
-	}
-
 	for (i = 0; i < count; ++i) {
 		LED_PORT |= _BV(LED);
-		for(l = 0; l < (F_CPU / 1000); ++l);
+		_delay_ms(100);
 		LED_PORT &= ~_BV(LED);
-		for(l = 0; l < (F_CPU / 1000); ++l);
+		_delay_ms(100);
 	}
 }
 

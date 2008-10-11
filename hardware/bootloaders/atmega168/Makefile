@@ -105,11 +105,15 @@ diecimila: TARGET = diecimila
 diecimila: CFLAGS += '-DMAX_TIME_COUNT=F_CPU>>4' '-DNUM_LED_FLASHES=1'
 diecimila: $(PROGRAM)_diecimila.hex
 diecimila: AVR_FREQ = 16000000L 
+diecimila: HFUSE = DD
+diecimila: LFUSE = FF
 
 ng: TARGET = ng
 ng: CFLAGS += '-DMAX_TIME_COUNT=F_CPU>>1' '-DNUM_LED_FLASHES=3'
 ng: $(PROGRAM)_ng.hex
 ng: AVR_FREQ = 16000000L
+ng: HFUSE = DD
+ng: LFUSE = FF
 
 isp: $(PROGRAM)_$(TARGET).hex
 	$(ISPFUSES)

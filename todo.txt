@@ -1,28 +1,10 @@
-0012 arduino
-
-0012
-
-[done] Update Windows avr-libc to 1.6 and avr-gcc to 4.3 (to match Mac).
-[done] Add Firmata library.
-[done] Comment LiquidCrystal examples.
-[done] Update reference.
-[done] Document LiquidCrystal library.
-[done] Document Servo library.
-[done] Include actual bootloader burned on the Pro and Pro Mini.
-[done] Document Ethernet library.
-[done] Move Servo min/max parameters to attach() function from constructor.
-[done] Add Arduino Nano to boards menu.
-[done] Add Arduino Pro to boards menu.
-[done] Per-board upload.using preference.
-[done] Update version of avr-gcc, etc. to support ATmega644, ATmega328, etc.
-[done] Move #include <WProgram.h> after other #include's?  (prevent it from interfering with standard libraries)
-[done] Add LiquidCrystal library.
-[done] Add Servo library.
-[done] Fix millis() so it overflows on a nice variable-size boundary; see: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1205949448
-[done] Factor out print statements into a common base class for Serial, LiquidCrystal, etc.
+0013 arduino
 
 AVR
 
+Use stdlib random() function: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1211798802
+Remove cast macros for built-in types.
+Allow hardcoding of R/W line to ground with LiquidCrystal library.
 Improve shiftOut() performance: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1216659239/0
 Add String library.
 Add Encoder library.
@@ -52,6 +34,7 @@ Add SPI library.
 Add OneWire library.
 Add pulseOut(), etc. functions from Wiring.
 Add Ping example.
+Switch to ServoTimer2 library?  http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1222201226/0#5
 Add ContinuousServo library that inherits from Servo?
 LiquidCrystal library: support going to the next line with println().
 Ethernet library:

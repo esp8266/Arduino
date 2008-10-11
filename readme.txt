@@ -46,6 +46,14 @@ Processing and Wiring.
 
 UPDATES
 
+0013
+
+* Updating ATmega168 bootloader to work with standard distributions of avrdude
+  (responding to signature requests made with the universal SPI command) and
+  correctly store EEPROM data.  Thanks to ladyada.
+* Changing compilation process to generate .eep file and allow for use of
+  EEMEM directive (although not yet uploading EEPROM data).
+
 0012 - 2008.09.18
 
 * Added Arduino Nano to the boards menu.
