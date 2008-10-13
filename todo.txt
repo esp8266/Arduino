@@ -73,6 +73,7 @@ Investigate method for auto-detecting serial port on Windows (javax.usb?)
 Guess serial port on the Mac and Linux.
 Automatic detection of baud rate for serial monitor (based on the call to Serial.begin() in the current sketch).
 Improve, generally, the upload experience (e.g. faster program start after upload, keep-alive messages to bootloader from IDE, shorter bootloader timeout if possible, progress bar)
+Generate .eep files for EEPROM variables (without warning when the EEMEM directive isn't used).
 Allow uploading of .hex files.
 Allow for arbitrary compilation command line arguments.
 Find in reference should give same message for missing page as for missing page association.

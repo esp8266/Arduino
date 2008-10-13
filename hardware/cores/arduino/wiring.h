@@ -66,12 +66,12 @@ extern "C"{
 #undef abs
 #endif
 
-#define int(x)     ((int)(x))
-#define char(x)    ((char)(x))
-#define long(x)    ((long)(x))
-#define byte(x)    ((uint8_t)(x))
-#define float(x)   ((float)(x))
-#define boolean(x) ((uint8_t)((x)==0?0:1))
+//#define int(x)     ((int)(x))
+//#define char(x)    ((char)(x))
+//#define long(x)    ((long)(x))
+//#define byte(x)    ((uint8_t)(x))
+//#define float(x)   ((float)(x))
+//#define boolean(x) ((uint8_t)((x)==0?0:1))
 
 #define min(a,b) ((a)<(b)?(a):(b))
 #define max(a,b) ((a)>(b)?(a):(b))

@@ -29,23 +29,22 @@ extern "C" {
 
 void randomSeed(unsigned int seed)
 {
-  if(seed != 0){
-    srand(seed);
+  if (seed != 0) {
+    srandom(seed);
   }
 }
 
 long random(long howbig)
 {
-  long value;
-  if (howbig == 0){
+  if (howbig == 0) {
     return 0;
   }
-  return (rand() * 0x10000L + rand()) % howbig;
+  return random() % howbig;
 }
 
 long random(long howsmall, long howbig)
 {
-  if(howsmall >= howbig){
+  if (howsmall >= howbig) {
     return howsmall;
   }
   long diff = howbig - howsmall;

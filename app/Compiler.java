@@ -209,7 +209,10 @@ public class Compiler implements MessageConsumer {
         return false;
 
       List commandObjcopy;
-      
+
+      /*
+      // Extract EEPROM data (from EEMEM directive) to .eep file.
+      // Commented out because it generates a warning if EEMEM isn't used.
       commandObjcopy = new ArrayList(baseCommandObjcopy);
       commandObjcopy.add(2, "ihex");
       commandObjcopy.set(3, "-j");
@@ -221,10 +224,11 @@ public class Compiler implements MessageConsumer {
       commandObjcopy.add(buildPath + File.separator + sketch.name + ".eep");
       if (execAsynchronously(commandObjcopy) != 0)
         return false;
+      */
 
       commandObjcopy = new ArrayList(baseCommandObjcopy);
       commandObjcopy.add(2, "ihex");
-      commandObjcopy.add(".eeprom");
+      commandObjcopy.add(".eeprom"); // remove eeprom data
       commandObjcopy.add(buildPath + File.separator + sketch.name + ".elf");
       commandObjcopy.add(buildPath + File.separator + sketch.name + ".hex");
       if (execAsynchronously(commandObjcopy) != 0)
