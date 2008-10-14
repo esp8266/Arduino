@@ -48,6 +48,8 @@ UPDATES
 
 0013
 
+* Working around problem that caused PWM output on pins 5 and 6 to never go
+  to 0 (causing, for example, an LED to continue to glow faintly).
 * Removing cast macros, since function-style casts are a feature of C++.
 * Fixing bug in random() that limited the ranges of values generated.  Thanks
   to Mikal Hart.

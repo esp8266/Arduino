@@ -210,21 +210,19 @@ public class Compiler implements MessageConsumer {
 
       List commandObjcopy;
 
-      /*
       // Extract EEPROM data (from EEMEM directive) to .eep file.
-      // Commented out because it generates a warning if EEMEM isn't used.
       commandObjcopy = new ArrayList(baseCommandObjcopy);
       commandObjcopy.add(2, "ihex");
       commandObjcopy.set(3, "-j");
       commandObjcopy.add(".eeprom");
       commandObjcopy.add("--set-section-flags=.eeprom=alloc,load");
+      commandObjcopy.add("--no-change-warnings");
       commandObjcopy.add("--change-section-lma");
       commandObjcopy.add(".eeprom=0");
       commandObjcopy.add(buildPath + File.separator + sketch.name + ".elf");
       commandObjcopy.add(buildPath + File.separator + sketch.name + ".eep");
       if (execAsynchronously(commandObjcopy) != 0)
         return false;
-      */
 
       commandObjcopy = new ArrayList(baseCommandObjcopy);
       commandObjcopy.add(2, "ihex");
