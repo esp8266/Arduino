@@ -49,6 +49,7 @@ Consider moving millis() to timer 1, and configuring it so the interrupt is gene
 
 COMPUTER
 
+Check RAM usage of sketches: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1224729260/0#0
 Improve preprocessing of sketches:
  - Better determine which header files are included (not commented out).
  - Remember the original locations of function prototypes to highlight the correct line on error.
@@ -79,6 +80,7 @@ Test find in reference on libraries.
 
 DEVELOPMENT
 
+Make run.bat not open a command line window: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1223883872
 Update version of the FTDI drivers (Windows).
 Remove AVR ISP and giveio drivers (Windows).
 Include the executable installer for the FTDI drivers (Windows).
@@ -99,6 +101,8 @@ DOCUMENTATION / META
 Create community section of site.
 List of examples we'd like to have.
 Style guide for examples, references, and foundations.
+Add a Nordic board to the forum.
+Add a German board to the forum.
 
 DOCUMENTATION / NAVIGATION
 
