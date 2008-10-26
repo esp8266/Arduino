@@ -107,6 +107,7 @@ public class Compiler implements MessageConsumer {
     List baseCommandLinker = new ArrayList(Arrays.asList(new String[] {
       avrBasePath + "avr-gcc",
       "-Os",
+      "-Wl,--gc-sections",
       "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
       "-o",
       buildPath + File.separator + sketch.name + ".elf"
@@ -171,8 +172,9 @@ public class Compiler implements MessageConsumer {
     }
     
     baseCommandLinker.addAll(sketchObjectNames);
-    baseCommandLinker.add(runtimeLibraryName);
-    baseCommandLinker.add("-L" + buildPath);
+    baseCommandLinker.addAll(targetObjectNames);
+    //baseCommandLinker.add(runtimeLibraryName);
+    //baseCommandLinker.add("-L" + buildPath);
     baseCommandLinker.add("-lm");
 
     firstErrorFound = false;  // haven't found any errors yet
@@ -198,12 +200,12 @@ public class Compiler implements MessageConsumer {
           return false;
       }
 
-      for(int i = 0; i < targetObjectNames.size(); i++) {
-        List commandAR = new ArrayList(baseCommandAR);
-        commandAR.add(targetObjectNames.get(i));
-        if (execAsynchronously(commandAR) != 0)
-          return false;
-      }
+//      for(int i = 0; i < targetObjectNames.size(); i++) {
+//        List commandAR = new ArrayList(baseCommandAR);
+//        commandAR.add(targetObjectNames.get(i));
+//        if (execAsynchronously(commandAR) != 0)
+//          return false;
+//      }
 
       if (execAsynchronously(baseCommandLinker) != 0)
         return false;
@@ -488,6 +490,8 @@ public class Compiler implements MessageConsumer {
       "-g", // include debugging info (so errors include line numbers)
       "-Os", // optimize for size
       "-w", // surpress all warnings
+      "-ffunction-sections", // place each function in its own section
+      "-fdata-sections",
       "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
       "-DF_CPU=" + Preferences.get("boards." + Preferences.get("board") + ".build.f_cpu"),
     }));
@@ -512,6 +516,8 @@ public class Compiler implements MessageConsumer {
       "-Os", // optimize for size
       "-w", // surpress all warnings
       "-fno-exceptions",
+      "-ffunction-sections", // place each function in its own section
+      "-fdata-sections",
       "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
       "-DF_CPU=" + Preferences.get("boards." + Preferences.get("board") + ".build.f_cpu"),
     }));

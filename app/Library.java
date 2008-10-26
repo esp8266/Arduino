@@ -335,6 +335,8 @@ public class Library implements MessageConsumer{
       "-g",
       "-Os",
       "-Wall",
+      "-ffunction-sections", // place each function in its own section
+      "-fdata-sections",
       "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
       "-DF_CPU=" + Preferences.get("boards." + Preferences.get("board") + ".build.f_cpu"),
       "-I" + libManager.getTarget().getPath(),
@@ -348,6 +350,8 @@ public class Library implements MessageConsumer{
       "-Os",
       "-Wall",
       "-fno-exceptions",
+      "-ffunction-sections", // place each function in its own section
+      "-fdata-sections",
       "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
       "-DF_CPU=" + Preferences.get("boards." + Preferences.get("board") + ".build.f_cpu"),
       "-I" + libManager.getTarget().getPath(),
