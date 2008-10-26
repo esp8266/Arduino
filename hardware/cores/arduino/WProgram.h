@@ -12,8 +12,8 @@
 #ifdef __cplusplus
 #include "HardwareSerial.h"
 
-uint16_t makeWord(uint16_t w) { return w; }
-uint16_t makeWord(byte h, byte l) { return (h << 8) | l; }
+uint16_t makeWord(uint16_t w);
+uint16_t makeWord(byte h, byte l);
 
 #define word(...) makeWord(__VA_ARGS__)
 
