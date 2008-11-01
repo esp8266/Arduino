@@ -53,13 +53,13 @@ static inline void turnOffPWM(uint8_t timer)
 	if (timer == TIMER1A) cbi(TCCR1A, COM1A1);
 	if (timer == TIMER1B) cbi(TCCR1A, COM1B1);
 
-#if defined(__AVR_ATmega168__)
+#if defined(__AVR_ATmega8__)
+	if (timer == TIMER2) cbi(TCCR2, COM21);
+#else
 	if (timer == TIMER0A) cbi(TCCR0A, COM0A1);
 	if (timer == TIMER0B) cbi(TCCR0A, COM0B1);
 	if (timer == TIMER2A) cbi(TCCR2A, COM2A1);
 	if (timer == TIMER2B) cbi(TCCR2A, COM2B1);
-#else
-	if (timer == TIMER2) cbi(TCCR2, COM21);
 #endif
 }
 

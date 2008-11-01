@@ -35,9 +35,9 @@
 volatile static voidFuncPtr intFunc[EXTERNAL_NUM_INTERRUPTS];
 // volatile static voidFuncPtr twiIntFunc;
 
-#if defined(__AVR_ATmega168__)
-#define MCUCR EICRA
-#define GICR EIMSK
+#if defined(__AVR_ATmega8__)
+#define EICRA MCUCR
+#define EIMSK GICR
 #endif
 
 void attachInterrupt(uint8_t interruptNum, void (*userFunc)(void), int mode) {
@@ -49,13 +49,13 @@ void attachInterrupt(uint8_t interruptNum, void (*userFunc)(void), int mode) {
       // edge, or falling edge).  The mode constants were chosen to correspond
       // to the configuration bits in the hardware register, so we simply shift
       // the mode into place.
-      MCUCR = (MCUCR & ~((1 << ISC00) | (1 << ISC01))) | (mode << ISC00);
+      EICRA = (EICRA & ~((1 << ISC00) | (1 << ISC01))) | (mode << ISC00);
       
       // Enable the interrupt.
-      GICR |= (1 << INT0);
+      EIMSK |= (1 << INT0);
     } else {
-      MCUCR = (MCUCR & ~((1 << ISC10) | (1 << ISC11))) | (mode << ISC10);
-      GICR |= (1 << INT1);
+      EICRA = (EICRA & ~((1 << ISC10) | (1 << ISC11))) | (mode << ISC10);
+      EIMSK |= (1 << INT1);
     }
   }
 }
@@ -64,9 +64,9 @@ void detachInterrupt(uint8_t interruptNum) {
   if(interruptNum < EXTERNAL_NUM_INTERRUPTS) {
     if (interruptNum == 0)
       // Disable the interrupt.
-      GICR &= ~(1 << INT0);
+      EIMSK &= ~(1 << INT0);
     else
-      GICR &= ~(1 << INT1);
+      EIMSK &= ~(1 << INT1);
       
     intFunc[interruptNum] = 0;
   }

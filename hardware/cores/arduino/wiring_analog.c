@@ -87,7 +87,13 @@ void analogWrite(uint8_t pin, int val)
 		sbi(TCCR1A, COM1B1);
 		// set pwm duty
 		OCR1B = val;
-#if defined(__AVR_ATmega168__)
+#if defined(__AVR_ATmega8__)
+	} else if (digitalPinToTimer(pin) == TIMER2) {
+		// connect pwm to pin on timer 2, channel B
+		sbi(TCCR2, COM21);
+		// set pwm duty
+		OCR2 = val;
+#else
 	} else if (digitalPinToTimer(pin) == TIMER0A) {
     if (val == 0) {
       digitalWrite(pin, LOW);
@@ -116,12 +122,6 @@ void analogWrite(uint8_t pin, int val)
 		sbi(TCCR2A, COM2B1);
 		// set pwm duty
 		OCR2B = val;
-#else
-	} else if (digitalPinToTimer(pin) == TIMER2) {
-		// connect pwm to pin on timer 2, channel B
-		sbi(TCCR2, COM21);
-		// set pwm duty
-		OCR2 = val;
 #endif
 	} else if (val < 128)
 		digitalWrite(pin, LOW);

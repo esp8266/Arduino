@@ -134,28 +134,28 @@ const uint8_t PROGMEM digital_pin_to_timer_PGM[] = {
 	NOT_ON_TIMER,
 	NOT_ON_TIMER,
 	// on the ATmega168, digital pin 3 has hardware pwm
-#if defined(__AVR_ATmega168__)
-	TIMER2B,
-#else
+#if defined(__AVR_ATmega8__)
 	NOT_ON_TIMER,
+#else
+	TIMER2B,
 #endif
 	NOT_ON_TIMER,
 	// on the ATmega168, digital pins 5 and 6 have hardware pwm
-#if defined(__AVR_ATmega168__)
+#if defined(__AVR_ATmega8__)
+	NOT_ON_TIMER,
+	NOT_ON_TIMER,
+#else
 	TIMER0B,
 	TIMER0A,
-#else
-	NOT_ON_TIMER,
-	NOT_ON_TIMER,
 #endif
 	NOT_ON_TIMER,
 	NOT_ON_TIMER, /* 8 - port B */
 	TIMER1A,
 	TIMER1B,
-#if defined(__AVR_ATmega168__)
-	TIMER2A,
-#else
+#if defined(__AVR_ATmega8__)
 	TIMER2,
+#else
+	TIMER2A,
 #endif
 	NOT_ON_TIMER,
 	NOT_ON_TIMER,
