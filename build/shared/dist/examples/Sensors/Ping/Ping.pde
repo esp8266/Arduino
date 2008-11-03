@@ -1,9 +1,8 @@
 int pingPin = 7;
-int ledPin = 13;
 
 void setup()
 {
-  pinMode(13, OUTPUT);
+  Serial.begin(9600);
 }
 
 void loop()
@@ -28,12 +27,14 @@ void loop()
   // convert the time into a distance
   inches = microsecondsToInches(duration);
   cm = microsecondsToCentimeters(duration);
-
-  // the closer an object is, the faster the led will blink
-  digitalWrite(ledPin, HIGH);
-  delay(cm);
-  digitalWrite(ledPin, LOW);
-  delay(cm);
+  
+  Serial.print(inches);
+  Serial.print("in, ");
+  Serial.print(cm);
+  Serial.print("cm");
+  Serial.println();
+  
+  delay(100);
 }
 
 long microsecondsToInches(long microseconds)
