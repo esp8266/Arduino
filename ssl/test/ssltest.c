@@ -770,7 +770,7 @@ static int SSL_server_test(
         const char *private_key,
         const char *ca_cert,
         const char *password,
-        int axolotls_option)
+        int axtls_option)
 {
     int server_fd, ret = 0;
     SSL_CTX *ssl_ctx = NULL;
@@ -791,10 +791,10 @@ static int SSL_server_test(
 
     if (private_key)
     {
-        axolotls_option |= SSL_NO_DEFAULT_KEY;
+        axtls_option |= SSL_NO_DEFAULT_KEY;
     }
 
-    if ((ssl_ctx = ssl_ctx_new(axolotls_option, SSL_DEFAULT_SVR_SESS)) == NULL)
+    if ((ssl_ctx = ssl_ctx_new(axtls_option, SSL_DEFAULT_SVR_SESS)) == NULL)
     {
         ret = SSL_ERROR_INVALID_KEY;
         goto error;
@@ -1012,7 +1012,7 @@ int SSL_server_tests(void)
     /* this test should fail */
     if (stat("../ssl/test/axTLS.x509_bad_before.pem", &stat_buf) >= 0)
     {
-        if ((ret = SSL_server_test("Bad Before Cert", 
+        if ((ret = SSL_server_test("Error: Bad Before Cert", 
                     "-cipher RC4-SHA -tls1 "
                     "-cert ../ssl/test/axTLS.x509_bad_before.pem "
                     "-key ../ssl/test/axTLS.key_512.pem ",
@@ -1028,7 +1028,7 @@ int SSL_server_tests(void)
     }
 
     /* this test should fail */
-    if ((ret = SSL_server_test("Bad After Cert", 
+    if ((ret = SSL_server_test("Error: Bad After Cert", 
                     "-cipher RC4-SHA -tls1 "
                     "-cert ../ssl/test/axTLS.x509_bad_after.pem "
                     "-key ../ssl/test/axTLS.key_512.pem ",
@@ -1040,6 +1040,53 @@ int SSL_server_tests(void)
 
     printf("SSL server test \"%s\" passed\n", "Bad After Cert");
     TTY_FLUSH();
+
+    /*
+     * No trusted cert
+     */
+    if ((ret = SSL_server_test("Error: No trusted certificate", 
+                    "-cipher RC4-SHA -tls1 "
+                    "-cert ../ssl/test/axTLS.x509_512.pem "
+                    "-key ../ssl/test/axTLS.key_512.pem ",
+                    NULL, NULL, NULL, 
+                    NULL, NULL,
+                    DEFAULT_SVR_OPTION|SSL_CLIENT_AUTHENTICATION)) !=
+                            SSL_X509_ERROR(X509_VFY_ERROR_NO_TRUSTED_CERT))
+        goto cleanup;
+
+    printf("SSL server test \"%s\" passed\n", "No trusted certificate");
+    TTY_FLUSH();
+
+    /*
+     * Self-signed (from the server)
+     */
+    if ((ret = SSL_server_test("Error: Self-signed certificate (from server)", 
+                    "-cipher RC4-SHA -tls1 "
+                    "-cert ../ssl/test/axTLS.x509_512.pem "
+                    "-key ../ssl/test/axTLS.key_512.pem "
+                    "-CAfile ../ssl/test/axTLS.ca_x509.pem ",
+                    NULL, NULL, NULL, 
+                    NULL, NULL,
+                    DEFAULT_SVR_OPTION|SSL_CLIENT_AUTHENTICATION)) !=
+                            SSL_X509_ERROR(X509_VFY_ERROR_SELF_SIGNED))
+        goto cleanup;
+
+    printf("SSL server test \"%s\" passed\n", 
+                            "Self-signed certificate (from server)");
+    TTY_FLUSH();
+
+    /*
+     * Self-signed (from the client)
+     */
+    if ((ret = SSL_server_test("Self-signed certificate (from client)", 
+                    "-cipher RC4-SHA -tls1 "
+                    "-cert ../ssl/test/axTLS.x509_512.pem "
+                    "-key ../ssl/test/axTLS.key_512.pem ",
+                    NULL, NULL, NULL, 
+                    "../ssl/test/axTLS.ca_x509.cer",
+                    NULL,
+                    DEFAULT_SVR_OPTION|SSL_CLIENT_AUTHENTICATION)))
+        goto cleanup;
 
     /* 
      * Key in PEM format
@@ -1434,13 +1481,12 @@ int SSL_client_tests(void)
                     "-CAfile ../ssl/test/axTLS.ca_x509.pem "
                     "-verify 1 ", NULL, DEFAULT_CLNT_OPTION, 
                     "../ssl/test/axTLS.key_1024", NULL,
-                    "../ssl/test/axTLS.x509_1024.cer")) 
-                        != SSL_X509_ERROR(X509_VFY_ERROR_SELF_SIGNED))
+                    "../ssl/test/axTLS.x509_1024.cer")))
         goto cleanup;
 
     /* Should get an "ERROR" from openssl (as the handshake fails as soon as
      * the certificate verification fails) */
-    if ((ret = SSL_client_test("Expired cert (verify now) should fail!",
+    if ((ret = SSL_client_test("Error: Expired cert (verify now)",
                     &ssl_ctx,
                     "-cert ../ssl/test/axTLS.x509_bad_after.pem "
                     "-key ../ssl/test/axTLS.key_512.pem", NULL,
@@ -1452,10 +1498,9 @@ int SSL_client_tests(void)
     }
 
     printf("SSL client test \"Expired cert (verify now)\" passed\n");
-    ret = 0;
 
     /* There is no "ERROR" from openssl */
-    if ((ret = SSL_client_test("Expired cert (verify later) should fail!", 
+    if ((ret = SSL_client_test("Error: Expired cert (verify later)", 
                     &ssl_ctx,
                     "-cert ../ssl/test/axTLS.x509_bad_after.pem "
                     "-key ../ssl/test/axTLS.key_512.pem", NULL,
@@ -1467,7 +1512,6 @@ int SSL_client_tests(void)
     }
 
     printf("SSL client test \"Expired cert (verify later)\" passed\n");
-
     ret = 0;
 
 cleanup:

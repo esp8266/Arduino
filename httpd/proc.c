@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Cameron Rich
+ * Copyright (c) 2007-2008, Cameron Rich
  * 
  * All rights reserved.
  * 
@@ -136,6 +136,11 @@ static int procheadelem(struct connstruct *cn, char *buf)
     else if (strcmp(buf, "If-Modified-Since:") == 0) 
     {
         cn->if_modified_since = tdate_parse(value);
+    }
+    else if (strcmp(buf, "Expect:") == 0)
+    {
+        send_error(cn, 417); /* expectation failed */
+        return 0;
     }
 #ifdef CONFIG_HTTP_HAS_AUTHORIZATION
     else if (strcmp(buf, "Authorization:") == 0 &&

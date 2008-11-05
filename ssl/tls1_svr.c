@@ -378,6 +378,12 @@ static int process_client_key_xchg(SSL *ssl)
     int offset = 4;
     int ret = SSL_OK;
     
+    if (rsa_ctx == NULL)
+    {
+        ret = SSL_ERROR_NO_CERT_DEFINED;
+        goto error;
+    }
+
     DISPLAY_RSA(ssl, rsa_ctx);
 
     /* is there an extra size field? */

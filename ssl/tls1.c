@@ -386,7 +386,6 @@ int add_cert_auth(SSL_CTX *ssl_ctx, const uint8_t *buf, int len)
     int ret = SSL_ERROR_NO_CERT_DEFINED;
     int i = 0;
     int offset;
-    X509_CTX *cert = NULL;
     CA_CERT_CTX *ca_cert_ctx;
 
     if (ssl_ctx->ca_cert_ctx == NULL)
@@ -409,22 +408,6 @@ int add_cert_auth(SSL_CTX *ssl_ctx, const uint8_t *buf, int len)
     if ((ret = x509_new(buf, &offset, &ca_cert_ctx->cert[i])))
         goto error;
 
-    /* make sure the cert is valid */
-    cert = ca_cert_ctx->cert[i];
-    SSL_CTX_LOCK(ssl_ctx->mutex);
-
-    if ((ret = x509_verify(ca_cert_ctx, cert)) != X509_VFY_ERROR_SELF_SIGNED)
-    {
-        SSL_CTX_UNLOCK(ssl_ctx->mutex);
-        x509_free(cert);        /* get rid of it */
-        ca_cert_ctx->cert[i] = NULL;
-#ifdef CONFIG_SSL_FULL_MODE
-        printf("Error: %s\n", x509_display_error(ret)); TTY_FLUSH();
-#endif
-        goto error;
-    }
-
-    SSL_CTX_UNLOCK(ssl_ctx->mutex);
     len -= offset;
     ret = SSL_OK;           /* ok so far */
 
@@ -1751,6 +1734,7 @@ int process_certificate(SSL *ssl, X509_CTX **x509_ctx)
             goto error;
         }
 
+        DISPLAY_CERT(ssl, *chain);
         chain = &((*chain)->next);
         offset += cert_size;
     }
@@ -1763,7 +1747,6 @@ int process_certificate(SSL *ssl, X509_CTX **x509_ctx)
         ret = ssl_verify_cert(ssl);
     }
 
-    DISPLAY_CERT(ssl, *x509_ctx);
     ssl->next_state = is_client ? HS_SERVER_HELLO_DONE : HS_CLIENT_KEY_XCHG;
     ssl->dc->bm_proc_index += offset;
 error:

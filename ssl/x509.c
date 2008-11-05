@@ -251,11 +251,11 @@ static bigint *sig_verify(BI_CTX *ctx, const uint8_t *sig, int sig_len,
  * Do some basic checks on the certificate chain.
  *
  * Certificate verification consists of a number of checks:
- * - A root certificate exists in the certificate store.
  * - The date of the certificate is after the start date.
  * - The date of the certificate is before the finish date.
- * - The certificate chain is valid.
+ * - A root certificate exists in the certificate store.
  * - That the certificate(s) are not self-signed.
+ * - The certificate chain is valid.
  * - The signature of the certificate is valid.
  */
 int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert) 
@@ -263,44 +263,26 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert)
     int ret = X509_OK, i = 0;
     bigint *cert_sig;
     X509_CTX *next_cert = NULL;
-    BI_CTX *ctx;
+    BI_CTX *ctx = NULL;
     bigint *mod = NULL, *expn = NULL;
-    struct timeval tv;
     int match_ca_cert = 0;
+    struct timeval tv;
     uint8_t is_self_signed = 0;
 
-    if (cert == NULL || ca_cert_ctx == NULL)
+    if (cert == NULL)
     {
         ret = X509_VFY_ERROR_NO_TRUSTED_CERT;       
         goto end_verify;
     }
 
-    /* last cert in the chain - look for a trusted cert */
-    if (cert->next == NULL && ca_cert_ctx)
+    /* a self-signed certificate that is not in the CA store - use this 
+       to check the signature */
+    if (asn1_compare_dn(cert->ca_cert_dn, cert->cert_dn) == 0)
     {
-        while (i < CONFIG_X509_MAX_CA_CERTS && ca_cert_ctx->cert[i])
-        {
-            if (asn1_compare_dn(cert->ca_cert_dn,
-                                        ca_cert_ctx->cert[i]->cert_dn) == 0)
-            {
-                match_ca_cert = 1;
-                next_cert = ca_cert_ctx->cert[i];
-                break;
-            }
-
-            i++;
-        }
-
-        /* trusted cert not found */
-        if (match_ca_cert == 0)
-        {
-            ret = X509_VFY_ERROR_NO_TRUSTED_CERT;       
-            goto end_verify;
-        }
-    }
-    else
-    {
-        next_cert = cert->next;
+        is_self_signed = 1;
+        ctx = cert->rsa_ctx->bi_ctx;
+        mod = cert->rsa_ctx->m;
+        expn = cert->rsa_ctx->e;
     }
 
     gettimeofday(&tv, NULL);
@@ -319,61 +301,76 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert)
         goto end_verify;
     }
 
-    ctx = cert->rsa_ctx->bi_ctx;
+    next_cert = cert->next;
 
-    /* check for self-signing */
-    if (asn1_compare_dn(cert->ca_cert_dn, cert->cert_dn) == 0)
+    /* last cert in the chain - look for a trusted cert */
+    if (next_cert == NULL)
     {
-        is_self_signed = 1;
-        mod = cert->rsa_ctx->m;
-        expn = cert->rsa_ctx->e;
+       if (ca_cert_ctx != NULL) 
+       {
+            /* go thu the CA store */
+           while (i < CONFIG_X509_MAX_CA_CERTS && ca_cert_ctx->cert[i])
+            {
+                if (asn1_compare_dn(cert->ca_cert_dn,
+                                            ca_cert_ctx->cert[i]->cert_dn) == 0)
+                {
+                    /* use this CA certificate for signature verification */
+                    match_ca_cert = 1;
+                    ctx = ca_cert_ctx->cert[i]->rsa_ctx->bi_ctx;
+                    mod = ca_cert_ctx->cert[i]->rsa_ctx->m;
+                    expn = ca_cert_ctx->cert[i]->rsa_ctx->e;
+                    break;
+                }
+
+                i++;
+            }
+        }
+
+       /* couldn't find a trusted cert (& let self-signed errors be returned) */
+        if (!match_ca_cert && !is_self_signed)
+        {
+            ret = X509_VFY_ERROR_NO_TRUSTED_CERT;       
+            goto end_verify;
+        }
     }
-    else if (next_cert != NULL)
+    else if (asn1_compare_dn(cert->ca_cert_dn, next_cert->cert_dn) != 0)
     {
+        /* check the chain */
+        ret = X509_VFY_ERROR_INVALID_CHAIN;
+        goto end_verify;
+    }
+    else /* use the next certificate in the chain for signature verify */
+    {
+        ctx = next_cert->rsa_ctx->bi_ctx;
         mod = next_cert->rsa_ctx->m;
         expn = next_cert->rsa_ctx->e;
-
-        /* check the chain integrity */
-        if (asn1_compare_dn(cert->ca_cert_dn, next_cert->cert_dn) != 0)
-        {
-            ret = X509_VFY_ERROR_INVALID_CHAIN;
-            goto end_verify;
-        }
     }
 
-    /* check the signature */
-    if (mod != NULL)
-    {
-        cert_sig = sig_verify(ctx, cert->signature, cert->sig_len, 
-                bi_clone(ctx, mod), bi_clone(ctx, expn));
-
-        if (cert_sig && cert->digest)
-        {
-            if (bi_compare(cert_sig, cert->digest))
-            {
-                ret = X509_VFY_ERROR_BAD_SIGNATURE;
-            }
-
-            bi_free(ctx, cert_sig);
-
-            if (ret)
-                goto end_verify;
-        }
-        else
-        {
-            ret = X509_VFY_ERROR_BAD_SIGNATURE;
-            goto end_verify;
-        }
-    }
-
-    if (is_self_signed)
+    /* cert is self signed */
+    if (!match_ca_cert && is_self_signed)
     {
         ret = X509_VFY_ERROR_SELF_SIGNED;
         goto end_verify;
     }
 
+    /* check the signature */
+    cert_sig = sig_verify(ctx, cert->signature, cert->sig_len, 
+                        bi_clone(ctx, mod), bi_clone(ctx, expn));
+
+    if (cert_sig && cert->digest)
+    {
+        if (bi_compare(cert_sig, cert->digest) != 0)
+            ret = X509_VFY_ERROR_BAD_SIGNATURE;
+
+
+        bi_free(ctx, cert_sig);
+    }
+
+    if (ret)
+        goto end_verify;
+
     /* go down the certificate chain using recursion. */
-    if (ret == 0 && cert->next)
+    if (next_cert != NULL)
     {
         ret = x509_verify(ca_cert_ctx, next_cert);
     }
@@ -441,7 +438,7 @@ void x509_print(const X509_CTX *cert, CA_CERT_CTX *ca_cert_ctx)
 
     if (ca_cert_ctx)
     {
-        printf("Verify:\t\t\t%s\n",
+        printf("Verify:\t\t\t\t%s\n",
                 x509_display_error(x509_verify(ca_cert_ctx, cert)));
     }
 
@@ -463,6 +460,9 @@ const char * x509_display_error(int error)
 {
     switch (error)
     {
+        case X509_OK:
+            return "Certificate verify successful";
+
         case X509_NOT_OK:
             return "X509 not ok";
 
