@@ -107,7 +107,7 @@ void serialFlush()
 #if defined(__AVR_ATmega8__)
 SIGNAL(SIG_UART_RECV)
 #else
-SIGNAL(SIG_USART_RECV)
+SIGNAL(USART_RX_vect)
 #endif
 {
 #if defined(__AVR_ATmega8__)

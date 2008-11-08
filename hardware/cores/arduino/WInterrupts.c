@@ -78,12 +78,12 @@ void attachInterruptTwi(void (*userFunc)(void) ) {
 }
 */
 
-SIGNAL(SIG_INTERRUPT0) {
+SIGNAL(INT0_vect) {
   if(intFunc[EXTERNAL_INT_0])
     intFunc[EXTERNAL_INT_0]();
 }
 
-SIGNAL(SIG_INTERRUPT1) {
+SIGNAL(INT1_vect) {
   if(intFunc[EXTERNAL_INT_1])
     intFunc[EXTERNAL_INT_1]();
 }

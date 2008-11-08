@@ -27,7 +27,7 @@
 volatile unsigned long timer0_clock_cycles = 0;
 volatile unsigned long timer0_millis = 0;
 
-SIGNAL(SIG_OVERFLOW0)
+SIGNAL(TIMER0_OVF_vect)
 {
 	// timer 0 prescale factor is 64 and the timer overflows at 256
 	timer0_clock_cycles += 64UL * 256UL;
