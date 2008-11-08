@@ -1,16 +1,22 @@
-// Memsic2125
+/*
+ * Memsic2125
+ * 
+ * Read the Memsic 2125 two-axis accelerometer.  Converts the
+ * pulses output by the 2125 into milli-g's (1/1000 of earth's
+ * gravity) and prints them over the serial connection to the
+ * computer.
+ *
+ * http://www.arduino.cc/en/Tutorial/Memsic2125
+ */
 
-#define X 2
-#define Y 3
-
-int dx = 0;
-int dy = 0;
+int xpin = 2;
+int ypin = 3;
 
 void setup()
 {
   Serial.begin(9600);
-  pinMode(X, INPUT);
-  pinMode(Y, INPUT);
+  pinMode(xpin, INPUT);
+  pinMode(ypin, INPUT);
 }
 
 void loop()
@@ -18,21 +24,16 @@ void loop()
   int pulseX, pulseY;
   int accX, accY;
   
-  // wait for previous pulse to end
-  while (digitalRead(X) == HIGH) {}
-  // read pulse from x-axis
-  pulseX = pulseIn(X,HIGH);
-  
-  // wait for previous pulse to end
-  while (digitalRead(Y) == HIGH) {}
-  // read pulse from y-axis
-  pulseY = pulseIn(Y,HIGH);
+  // read pulse from x- and y-axes
+  pulseX = pulseIn(xpin,HIGH);  
+  pulseY = pulseIn(ypin,HIGH);
   
   // convert the pulse width into acceleration
   // accX and accY are in milli-g's: earth's gravity is 1000.
   accX = ((pulseX / 10) - 500) * 8;
   accY = ((pulseY / 10) - 500) * 8;
-  
+
+  // print the acceleration
   Serial.print(accX);
   Serial.print(" ");
   Serial.print(accY);
