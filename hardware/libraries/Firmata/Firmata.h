@@ -141,7 +141,7 @@ extern FirmataClass Firmata;
 #define setFirmwareVersion(x, y)   setFirmwareNameAndVersion(__FILE__, x, y)
 
 // total number of pins currently supported
-#if defined(__AVR_ATmega168__)  // Arduino NG and Diecimila
+#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) // Arduino NG and Diecimila
 #define TOTAL_ANALOG_PINS       8
 #define TOTAL_DIGITAL_PINS      22 // 14 digital + 8 analog
 #define TOTAL_PORTS             3 // total number of ports for the board

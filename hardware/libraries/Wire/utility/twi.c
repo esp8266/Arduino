@@ -64,7 +64,7 @@ void twi_init(void)
   // initialize state
   twi_state = TWI_READY;
 
-  #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega8__)
+  #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega8__) || defined(__AVR_ATmega328P__)
     // activate internal pull-ups for twi
     // as per note from atmega8 manual pg167
     sbi(PORTC, 4);
@@ -329,7 +329,7 @@ void twi_releaseBus(void)
   twi_state = TWI_READY;
 }
 
-SIGNAL(SIG_2WIRE_SERIAL)
+SIGNAL(TWI_vect)
 {
   switch(TW_STATUS){
     // All Master
