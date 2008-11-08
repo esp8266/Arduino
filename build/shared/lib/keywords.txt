@@ -57,6 +57,7 @@ true	KEYWORD1
 unsigned	KEYWORD1
 void	KEYWORD1	Void
 while	KEYWORD1	While
+word KEYWORD1 Word
 
 # operators aren't highlighted, but may have documentation
 
@@ -101,6 +102,7 @@ char	KEYWORD2	char_
 float	KEYWORD2	float_
 int	KEYWORD2	int_
 long	KEYWORD2	long_
+word KEYWORD2  word_
 
 # KEYWORD2 specifies methods and functions
 
@@ -127,6 +129,14 @@ sin	KEYWORD2	Sin
 sq	KEYWORD2	Sq
 sqrt	KEYWORD2	Sqrt
 tan	KEYWORD2	Tan
+
+bitRead KEYWORD2 BitRead
+bitWrite KEYWORD2 BitWrite
+bitSet KEYWORD2 BitSet
+bitClear KEYWORD2 BitClear
+bit KEYWORD2 Bit
+highByte KEYWORD2 HighByte
+lowByte KEYWORD2 LowByte
 
 analogReference	KEYWORD2	AnalogReference
 analogRead	KEYWORD2	AnalogRead
