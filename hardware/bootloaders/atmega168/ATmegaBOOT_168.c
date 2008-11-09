@@ -69,7 +69,7 @@
 
 /* the current avr-libc eeprom functions do not support the ATmega168 */
 /* own eeprom write/read functions are used instead */
-#ifndef __AVR_ATmega168__
+#if !defined(__AVR_ATmega168__) || !defined(__AVR_ATmega328P__)
 #include <avr/eeprom.h>
 #endif
 
@@ -177,6 +177,11 @@
 #elif defined __AVR_ATmega168__
 #define SIG2	0x94
 #define SIG3	0x06
+#define PAGE_SIZE	0x40U	//64 words
+
+#elif defined __AVR_ATmega328P__
+#define SIG2	0x95
+#define SIG3	0x0F
 #define PAGE_SIZE	0x40U	//64 words
 
 #elif defined __AVR_ATmega162__
@@ -337,7 +342,7 @@ int main(void)
 	UBRRHI = (F_CPU/(BAUD_RATE*16L)-1) >> 8;
 	UCSRA = 0x00;
 	UCSRB = _BV(TXEN)|_BV(RXEN);	
-#elif defined __AVR_ATmega168__
+#elif defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__)
 	UBRR0L = (uint8_t)(F_CPU/(BAUD_RATE*16L)-1);
 	UBRR0H = (F_CPU/(BAUD_RATE*16L)-1) >> 8;
 	UCSR0B = (1<<RXEN0) | (1<<TXEN0);
@@ -509,7 +514,7 @@ int main(void)
 			if (flags.eeprom) {		                //Write to EEPROM one byte at a time
 				address.word <<= 1;
 				for(w=0;w<length.word;w++) {
-#ifdef __AVR_ATmega168__
+#if defined(__AVR_ATmega168__)  || defined(__AVR_ATmega328P__)
 					while(EECR & (1<<EEPE));
 					EEAR = (uint16_t)(void *)address.word;
 					EEDR = buff[w];
@@ -627,7 +632,7 @@ int main(void)
 					 "rjmp	write_page	\n\t"
 					 "block_done:		\n\t"
 					 "clr	__zero_reg__	\n\t"	//restore zero register
-#if defined __AVR_ATmega168__
+#if defined(__AVR_ATmega168__)  || defined(__AVR_ATmega328P__)
 					 : "=m" (SPMCSR) : "M" (PAGE_SIZE) : "r0","r16","r17","r24","r25","r28","r29","r30","r31"
 #else
 					 : "=m" (SPMCR) : "M" (PAGE_SIZE) : "r0","r16","r17","r24","r25","r28","r29","r30","r31"
@@ -660,7 +665,7 @@ int main(void)
 			putch(0x14);
 			for (w=0;w < length.word;w++) {		        // Can handle odd and even lengths okay
 				if (flags.eeprom) {	                        // Byte access EEPROM read
-#ifdef __AVR_ATmega168__
+#if defined(__AVR_ATmega168__)  || defined(__AVR_ATmega328P__)
 					while(EECR & (1<<EEPE));
 					EEAR = (uint16_t)(void *)address.word;
 					EECR |= (1<<EERE);
@@ -874,7 +879,7 @@ void putch(char ch)
 		while (!(UCSR1A & _BV(UDRE1)));
 		UDR1 = ch;
 	}
-#elif defined __AVR_ATmega168__
+#elif defined(__AVR_ATmega168__)  || defined(__AVR_ATmega328P__)
 	while (!(UCSR0A & _BV(UDRE0)));
 	UDR0 = ch;
 #else
@@ -897,7 +902,7 @@ char getch(void)
 		return UDR1;
 	}
 	return 0;
-#elif defined __AVR_ATmega168__
+#elif defined(__AVR_ATmega168__)  || defined(__AVR_ATmega328P__)
 	uint32_t count = 0;
 	while(!(UCSR0A & _BV(RXC0))){
 		/* 20060803 DojoCorp:: Addon coming from the previous Bootloader*/               
@@ -934,7 +939,7 @@ void getNch(uint8_t count)
 			while(!(UCSR1A & _BV(RXC1)));
 			UDR1;
 		}
-#elif defined __AVR_ATmega168__
+#elif defined(__AVR_ATmega168__)  || defined(__AVR_ATmega328P__)
 		getch();
 #else
 		/* m8,16,32,169,8515,8535,163 */
@@ -973,7 +978,7 @@ void nothing_response(void)
 
 void flash_led(uint8_t count)
 {
-	for (i = 0; i < count; ++i) {
+	while (count--) {
 		LED_PORT |= _BV(LED);
 		_delay_ms(100);
 		LED_PORT &= ~_BV(LED);

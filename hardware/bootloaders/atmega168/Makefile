@@ -115,6 +115,13 @@ ng: AVR_FREQ = 16000000L
 ng: HFUSE = DD
 ng: LFUSE = FF
 
+atmega328: TARGET = atmega328
+atmega328: CFLAGS += '-DMAX_TIME_COUNT=F_CPU>>4' '-DNUM_LED_FLASHES=1'
+atmega328: $(PROGRAM)_atmega328.hex
+atmega328: AVR_FREQ = 16000000L 
+atmega328: MCU_TARGET = atmega328p
+atmega328: LDSECTION  = --section-start=.text=0x7800
+
 isp: $(PROGRAM)_$(TARGET).hex
 	$(ISPFUSES)
 	$(ISPFLASH)
