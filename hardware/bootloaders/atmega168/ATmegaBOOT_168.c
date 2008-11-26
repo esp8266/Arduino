@@ -87,7 +87,9 @@
 /* set the UART baud rate */
 /* 20060803: hacked by DojoCorp */
 //#define BAUD_RATE   115200
+#ifndef BAUD_RATE
 #define BAUD_RATE   19200
+#endif
 
 
 /* SW_MAJOR and MINOR needs to be updated from time to time to avoid warning message from AVR Studio */
