@@ -24,11 +24,13 @@
 
 #include "wiring_private.h"
 
+volatile unsigned long timer0_overflow_count = 0;
 volatile unsigned long timer0_clock_cycles = 0;
 volatile unsigned long timer0_millis = 0;
 
 SIGNAL(TIMER0_OVF_vect)
 {
+	timer0_overflow_count++;
 	// timer 0 prescale factor is 64 and the timer overflows at 256
 	timer0_clock_cycles += 64UL * 256UL;
 	while (timer0_clock_cycles > clockCyclesPerMicrosecond() * 1000UL) {
@@ -49,6 +51,21 @@ unsigned long millis()
 	SREG = oldSREG;
 	
 	return m;
+}
+
+unsigned long micros() {
+	unsigned long m, t;
+	uint8_t oldSREG = SREG;
+	
+	cli();	
+	t = TCNT0;
+	if ((TIFR0 & _BV(TOV0)) && (t == 0))
+		t = 256;
+
+	m = timer0_overflow_count;
+	SREG = oldSREG;
+	
+	return ((m << 8) + t) * (64 / clockCyclesPerMicrosecond());
 }
 
 void delay(unsigned long ms)
