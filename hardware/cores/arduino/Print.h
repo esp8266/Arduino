@@ -32,6 +32,7 @@ class Print
 {
   private:
     void printNumber(unsigned long, uint8_t);
+    void printFloat(double, uint8_t);
   public:
     virtual void write(uint8_t);
     void print(char);
@@ -42,6 +43,7 @@ class Print
     void print(long);
     void print(unsigned long);
     void print(long, int);
+    void print(double);
     void println(void);
     void println(char);
     void println(const char[]);
@@ -51,6 +53,7 @@ class Print
     void println(long);
     void println(unsigned long);
     void println(long, int);
+    void println(double);
 };
 
 #endif
