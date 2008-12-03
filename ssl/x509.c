@@ -365,6 +365,10 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert)
 
         bi_free(ctx, cert_sig);
     }
+    else
+    {
+        ret = X509_VFY_ERROR_BAD_SIGNATURE;
+    }
 
     if (ret)
         goto end_verify;

@@ -1734,7 +1734,7 @@ int process_certificate(SSL *ssl, X509_CTX **x509_ctx)
             goto error;
         }
 
-        DISPLAY_CERT(ssl, *chain);
+        /* DISPLAY_CERT(ssl, *chain); */
         chain = &((*chain)->next);
         offset += cert_size;
     }
