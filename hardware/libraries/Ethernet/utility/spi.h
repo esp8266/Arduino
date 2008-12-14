@@ -37,7 +37,7 @@
 
 // PB4(MISO), PB3(MOSI), PB5(SCK), PB2(/SS)         // CS=1, waiting for SPI start // SPI mode 0, 4MHz
 #define SPI0_Init()						DDRB  |= SPI0_SS_BIT|SPI0_SCLK_BIT|SPI0_MOSI_BIT;\
-										PORTB = SPI0_SS_BIT;\
+										PORTB |= SPI0_SS_BIT; PORTB &= ~(SPI0_SCLK_BIT|SPI0_MOSI_BIT);\
 										SPCR  = 0x50  
 //-----------------------------------------------------------------------------
 
