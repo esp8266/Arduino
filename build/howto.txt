@@ -40,10 +40,7 @@ installer every few months to keep things fresh.
 
 1b. On Mac OS X, install Apple's Developer Tools and subversion.
 
-1c. On Linux, you're pretty much on your own.. You need jikes (or
-    edit make.sh to use a different compiler), java, avr-gcc, make,
-    and subversion.  You'll also have to set some environment
-    variables (see make.sh for details).
+1c. On Linux, you need the Sun Java SDK, avr-gcc, make, and subversion.
 
 
 2. GRAB THE CODE FROM BERLIOS
@@ -51,7 +48,7 @@ installer every few months to keep things fresh.
 * this grabs the code as an anonymous user. 
 
 # grab the code, it'll take a while
-svn co svn://svn.berlios.de/arduino/trunk
+svn co svn://svn.berlios.de/arduino/trunk arduino
 # (maybe even a long while for you dialup and international folks)
 
 
