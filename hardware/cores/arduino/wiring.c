@@ -59,8 +59,14 @@ unsigned long micros() {
 	
 	cli();	
 	t = TCNT0;
+  
+#ifdef TIFR0
 	if ((TIFR0 & _BV(TOV0)) && (t == 0))
 		t = 256;
+#else
+	if ((TIFR & _BV(TOV0)) && (t == 0))
+		t = 256;
+#endif
 
 	m = timer0_overflow_count;
 	SREG = oldSREG;
@@ -72,7 +78,7 @@ void delay(unsigned long ms)
 {
 	unsigned long start = millis();
 	
-	while (millis() - start < ms)
+	while (millis() - start <= ms)
 		;
 }
 
