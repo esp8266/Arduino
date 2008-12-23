@@ -48,14 +48,32 @@ UPDATES
 
 0013
 
+[documentation / examples]
+* Adding examples for Parallax Ping Sensor and Memsic 2125 accelerometer.
+
+[core / libraries]
+* Adding support for printing floats to Print class (meaning that it works
+  in the Serial, Ethernet, and LiquidCrystal classes too).  Includes two
+  decimal places.
+* Added word, word(), bitRead(), bitWrite(), bitSet(), bitClear(), bit(),
+  lowByte(), and highByte(); see reference for details.
 * Working around problem that caused PWM output on pins 5 and 6 to never go
   to 0 (causing, for example, an LED to continue to glow faintly).
-* Removing cast macros, since function-style casts are a feature of C++.
+* Removing cast macros, since function-style casts are a feature of C++.  This
+  should fix contributed libraries that broke in Arduino 0012.
+* Modifying pulseIn() to wait for a transition to start timing (i.e. ignoring
+  any pulse that had already started when the function was called).
 * Fixing bug in random() that limited the ranges of values generated.  Thanks
   to Mikal Hart.
+* Fixing bug in Ethernet library that interfered with use of pins 8 and 9.
+* Modifying the core, libraries, and bootloader source to support the
+  ATmega328, but not yet including it in boards menu.
 * Updating ATmega168 bootloader to work with standard distributions of avrdude
   (responding to signature requests made with the universal SPI command) and
   correctly store EEPROM data.  Thanks to ladyada.
+  
+[environment]
+* Omitting unused functions from compiled sketches, reducing their size.
 * Changing compilation process to allow for use of EEMEM directive (although
   not yet uploading EEPROM data).
 
