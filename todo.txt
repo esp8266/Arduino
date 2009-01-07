@@ -1,12 +1,10 @@
 0013 arduino
 
-Ethernet library should use a different source port for each outgoing Client connection: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1227978344
 Support atmega328: http://spiffie.org/know/arduino_328/
  - add atmega328 to avrdude.conf (on Windows)
 
 AVR
 
-Make Client::_srcport static?  http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1227735530
 Allow hardcoding of R/W line to ground with LiquidCrystal library.
 Improve shiftOut() performance: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1216659239/0
 Add String library.
