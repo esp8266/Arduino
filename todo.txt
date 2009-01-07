@@ -1,7 +1,5 @@
 0013 arduino
 
-Support atmega328: http://spiffie.org/know/arduino_328/
- - add atmega328 to avrdude.conf (on Windows)
 
 AVR
 
