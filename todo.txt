@@ -1,13 +1,12 @@
 0013 arduino
 
-Fix TICR0 for ATmega8.
-Fix delay() comparison to use <= not <.
 Ethernet library should use a different source port for each outgoing Client connection: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1227978344
 Support atmega328: http://spiffie.org/know/arduino_328/
  - add atmega328 to avrdude.conf (on Windows)
 
 AVR
 
+Make Client::_srcport static?  http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1227735530
 Allow hardcoding of R/W line to ground with LiquidCrystal library.
 Improve shiftOut() performance: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1216659239/0
 Add String library.
@@ -123,6 +122,16 @@ Document Wire.endTransmission() return values: http://www.arduino.cc/cgi-bin/yab
 
 DOCUMENTATION / EXAMPLES
 
+Photos:
+ - Loop
+ - Analog Input (potentiometer and LDR on analog input 0)
+Consistency:
+ - ledpin vs. ledPin
+ - value vs. val
+Add a Brightness example where an analog input controls the analog output.
+Graph example should use an intermediate variable.
+Button example says pin 7 but uses pin 2.
+Split Loop example in two (one that does loops, another that does arrays).
 Add LiquidCrystal library examples.
 Add Ethernet library examples.
 Add Wire library examples.

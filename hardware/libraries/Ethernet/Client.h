@@ -5,6 +5,7 @@
 
 class Client : public Print {
 private:
+  static uint16_t _srcport;
   uint8_t _sock;
   uint8_t *_ip;
   uint16_t _port;
