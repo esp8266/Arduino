@@ -97,7 +97,7 @@ ifndef CONFIG_PLATFORM_WIN32
 $(TARGET): $(OBJ) $(AXTLS_HOME)/$(STAGE)/libaxtls.a
 	$(LD) $(LDFLAGS) -o $@ $(OBJ) $(LIBS)
 ifdef CONFIG_STRIP_UNWANTED_SECTIONS
-	strip --remove-section=.comment $(TARGET)
+	$(STRIP) --remove-section=.comment $(TARGET)
 endif
 
 $(TARGET2): htpasswd.o $(AXTLS_HOME)/$(STAGE)/libaxtls.a

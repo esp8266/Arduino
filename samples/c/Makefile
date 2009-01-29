@@ -61,7 +61,7 @@ ifndef CONFIG_PLATFORM_WIN32
 $(TARGET): $(OBJ) $(LIBS)/libaxtls.a
 	$(LD) $(LDFLAGS) -o $@ $(OBJ) -L$(LIBS) -laxtls 
 ifdef CONFIG_STRIP_UNWANTED_SECTIONS
-	strip --remove-section=.comment $(TARGET)
+	$(STRIP) --remove-section=.comment $(TARGET)
 endif   # use strip
 else    # Win32
 
