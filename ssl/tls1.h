@@ -132,7 +132,7 @@ typedef struct
     time_t conn_time;
     uint8_t session_id[SSL_SESSION_ID_SIZE];
     uint8_t master_secret[SSL_SECRET_SIZE];
-} SSL_SESS;
+} SSL_SESSION;
 
 typedef struct
 {
@@ -176,7 +176,7 @@ struct _SSL
     struct _SSL_CTX *ssl_ctx;           /* back reference to a clnt/svr ctx */
 #ifndef CONFIG_SSL_SKELETON_MODE
     uint16_t session_index;
-    SSL_SESS *session;
+    SSL_SESSION *session;
 #endif
 #ifdef CONFIG_SSL_CERT_VERIFICATION
     X509_CTX *x509_ctx;
@@ -205,7 +205,7 @@ struct _SSL_CTX
     SSL_CERT certs[CONFIG_SSL_MAX_CERTS];
 #ifndef CONFIG_SSL_SKELETON_MODE
     uint16_t num_sessions;
-    SSL_SESS **ssl_sessions;
+    SSL_SESSION **ssl_sessions;
 #endif
 #ifdef CONFIG_SSL_CTX_MUTEXING
     SSL_CTX_MUTEX_TYPE mutex;
@@ -277,10 +277,10 @@ void DISPLAY_BYTES(SSL *ssl, const char *format,/* win32 has no variadic macros 
 int process_certificate(SSL *ssl, X509_CTX **x509_ctx);
 #endif
 
-SSL_SESS *ssl_session_update(int max_sessions, 
-        SSL_SESS *ssl_sessions[], SSL *ssl,
+SSL_SESSION *ssl_session_update(int max_sessions, 
+        SSL_SESSION *ssl_sessions[], SSL *ssl,
         const uint8_t *session_id);
-void kill_ssl_session(SSL_SESS **ssl_sessions, SSL *ssl);
+void kill_ssl_session(SSL_SESSION **ssl_sessions, SSL *ssl);
 
 #ifdef __cplusplus
 }

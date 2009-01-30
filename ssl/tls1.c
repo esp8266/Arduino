@@ -60,7 +60,7 @@ static int send_raw_packet(SSL *ssl, uint8_t protocol);
 const uint8_t ssl_prot_prefs[NUM_PROTOCOLS] = 
 { SSL_RC4_128_SHA };
 #else
-static void session_free(SSL_SESS *ssl_sessions[], int sess_index);
+static void session_free(SSL_SESSION *ssl_sessions[], int sess_index);
 
 const uint8_t ssl_prot_prefs[NUM_PROTOCOLS] = 
 #ifdef CONFIG_SSL_PROT_LOW                  /* low security, fast speed */
@@ -181,8 +181,8 @@ EXP_FUNC SSL_CTX *STDCALL ssl_ctx_new(uint32_t options, int num_sessions)
 #ifndef CONFIG_SSL_SKELETON_MODE
     if (num_sessions)
     {
-        ssl_ctx->ssl_sessions = (SSL_SESS **)
-                        calloc(1, num_sessions*sizeof(SSL_SESS *));
+        ssl_ctx->ssl_sessions = (SSL_SESSION **)
+                        calloc(1, num_sessions*sizeof(SSL_SESSION *));
     }
 #endif
 
@@ -1518,12 +1518,12 @@ void disposable_free(SSL *ssl)
  * Find if an existing session has the same session id. If so, use the
  * master secret from this session for session resumption.
  */
-SSL_SESS *ssl_session_update(int max_sessions, SSL_SESS *ssl_sessions[], 
+SSL_SESSION *ssl_session_update(int max_sessions, SSL_SESSION *ssl_sessions[], 
         SSL *ssl, const uint8_t *session_id)
 {
     time_t tm = time(NULL);
     time_t oldest_sess_time = tm;
-    SSL_SESS *oldest_sess = NULL;
+    SSL_SESSION *oldest_sess = NULL;
     int i;
 
     /* no sessions? Then bail */
@@ -1566,7 +1566,7 @@ SSL_SESS *ssl_session_update(int max_sessions, SSL_SESS *ssl_sessions[],
         if (ssl_sessions[i] == NULL)
         {
             /* perfect, this will do */
-            ssl_sessions[i] = (SSL_SESS *)calloc(1, sizeof(SSL_SESS));
+            ssl_sessions[i] = (SSL_SESSION *)calloc(1, sizeof(SSL_SESSION));
             ssl_sessions[i]->conn_time = tm;
             ssl->session_index = i;
             SSL_CTX_UNLOCK(ssl->ssl_ctx->mutex);
@@ -1592,7 +1592,7 @@ SSL_SESS *ssl_session_update(int max_sessions, SSL_SESS *ssl_sessions[],
 /**
  * Free an existing session.
  */
-static void session_free(SSL_SESS *ssl_sessions[], int sess_index)
+static void session_free(SSL_SESSION *ssl_sessions[], int sess_index)
 {
     if (ssl_sessions[sess_index])
     {
@@ -1604,7 +1604,7 @@ static void session_free(SSL_SESS *ssl_sessions[], int sess_index)
 /**
  * This ssl object doesn't want this session anymore.
  */
-void kill_ssl_session(SSL_SESS **ssl_sessions, SSL *ssl)
+void kill_ssl_session(SSL_SESSION **ssl_sessions, SSL *ssl)
 {
     SSL_CTX_LOCK(ssl->ssl_ctx->mutex);
 

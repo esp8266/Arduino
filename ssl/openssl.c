@@ -46,6 +46,8 @@
 
 #define OPENSSL_CTX_ATTR  ((OPENSSL_CTX *)ssl_ctx->bonus_attr)
 
+static char *key_password = NULL;
+
 void *SSLv23_server_method(void) { return NULL; }
 void *SSLv3_server_method(void) { return NULL; }
 void *TLSv1_server_method(void) { return NULL; }
@@ -155,7 +157,7 @@ int SSL_CTX_use_certificate_file(SSL_CTX *ssl_ctx, const char *file, int type)
 
 int SSL_CTX_use_PrivateKey_file(SSL_CTX *ssl_ctx, const char *file, int type)
 {
-    return (ssl_obj_load(ssl_ctx, SSL_OBJ_RSA_KEY, file, NULL) == SSL_OK);
+    return (ssl_obj_load(ssl_ctx, SSL_OBJ_RSA_KEY, file, key_password) == SSL_OK);
 }
 
 int SSL_CTX_use_certificate_ASN1(SSL_CTX *ssl_ctx, int len, const uint8_t *d)
@@ -164,13 +166,109 @@ int SSL_CTX_use_certificate_ASN1(SSL_CTX *ssl_ctx, int len, const uint8_t *d)
                         SSL_OBJ_X509_CERT, d, len, NULL) == SSL_OK);
 }
 
-#if 0
-const uint8_t *SSL_get_session(const SSL *ssl)
+int SSL_CTX_set_session_id_context(SSL_CTX *ctx, const unsigned char *sid_ctx,
+                                            unsigned int sid_ctx_len)
 {
-    /* TODO: return SSL_SESSION type */
-    return ssl_get_session_id(ssl);
+    return 1;
 }
-#endif
+
+int SSL_CTX_set_default_verify_paths(SSL_CTX *ctx)
+{
+    return 1;
+}
+
+int SSL_CTX_use_certificate_chain_file(SSL_CTX *ssl_ctx, const char *file)
+{
+    return (ssl_obj_load(ssl_ctx, 
+                        SSL_OBJ_X509_CERT, file, NULL) == SSL_OK);
+}
+
+int SSL_shutdown(SSL *ssl)
+{
+    return 1;
+}
+
+/*** get/set session ***/
+SSL_SESSION *SSL_get1_session(SSL *ssl)
+{
+    return (SSL_SESSION *)ssl_get_session_id(ssl); /* note: wrong cast */
+}
+
+int SSL_set_session(SSL *ssl, SSL_SESSION *session)
+{
+    memcpy(ssl->session_id, (uint8_t *)session, SSL_SESSION_ID_SIZE);
+    return 1;
+}
+
+void SSL_SESSION_free(SSL_SESSION *session) { }
+/*** end get/set session ***/
+
+long SSL_CTX_ctrl(SSL_CTX *ctx, int cmd, long larg, void *parg)
+{
+    return 0;
+}
+
+void SSL_CTX_set_verify(SSL_CTX *ctx, int mode,
+                                 int (*verify_callback)(int, void *)) { }
+
+void SSL_CTX_set_verify_depth(SSL_CTX *ctx,int depth) { }
+
+int SSL_CTX_load_verify_locations(SSL_CTX *ctx, const char *CAfile,
+                                           const char *CApath)
+{
+    return 1;
+}
+
+void *SSL_load_client_CA_file(const char *file)
+{
+    return (void *)file;
+}
+
+void SSL_CTX_set_client_CA_list(SSL_CTX *ssl_ctx, void *file) 
+{ 
+
+    ssl_obj_load(ssl_ctx, SSL_OBJ_X509_CERT, (const char *)file, NULL);
+}
+
+void SSLv23_method(void) { }
+
+void SSL_CTX_set_default_passwd_cb(SSL_CTX *ctx, void *cb) { }
+
+void SSL_CTX_set_default_passwd_cb_userdata(SSL_CTX *ctx, void *u) 
+{ 
+    key_password = (char *)u;
+}
+
+int SSL_peek(SSL *ssl, void *buf, int num)
+{
+    memcpy(buf, ssl->bm_data, num);
+    return num;
+}
+
+void SSL_set_bio(SSL *ssl, void *rbio, void *wbio) { }
+
+long SSL_get_verify_result(const SSL *ssl)
+{
+    return ssl_handshake_status(ssl);
+}
+
+int SSL_state(SSL *ssl)
+{
+    return 0x03; // ok state
+}
+
+/** end of could do better list */
+
+void *SSL_get_peer_certificate(const SSL *ssl)
+{
+    return &ssl->ssl_ctx->certs[0];
+}
+
+int SSL_clear(SSL *ssl)
+{
+    return 1;
+}
+
 
 int SSL_CTX_check_private_key(const SSL_CTX *ctx)
 {
@@ -192,6 +290,7 @@ void SSL_CTX_set_options(SSL_CTX *ssl_ctx, int option) {}
 int SSL_library_init(void ) { return 1; }
 void SSL_load_error_strings(void ) {}
 void ERR_print_errors_fp(FILE *fp) {}
+
 #ifndef CONFIG_SSL_SKELETON_MODE
 long SSL_CTX_get_timeout(const SSL_CTX *ssl_ctx) { 
                             return CONFIG_SSL_EXPIRY_TIME*3600; }
