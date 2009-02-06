@@ -46,12 +46,15 @@ Processing and Wiring.
 
 UPDATES
 
-0013
+0013 - 2009.02.06
 
 [documentation / examples]
 * Adding examples for Parallax Ping Sensor and Memsic 2125 accelerometer.
 
 [core / libraries]
+* Adding support for the ATmega328.  The upload speed is 57600 baud, so you
+  may need to edit boards.txt or reburn your bootloader if you bought an 
+  ATmega328 w/ bootloader from adafruit or other supplier.
 * Adding support for printing floats to Print class (meaning that it works
   in the Serial, Ethernet, and LiquidCrystal classes too).  Includes two
   decimal places.
@@ -69,8 +72,6 @@ UPDATES
 * Fixing bug in Ethernet library that interfered with use of pins 8 and 9.
 * Originating each outgoing network connection from a different port (in the
   Client class of the Ethernet library).  Thanks to Paul and joquer.
-* Modifying the core, libraries, and bootloader source to support the
-  ATmega328, but not yet including it in boards menu.
 * Updating ATmega168 bootloader to work with standard distributions of avrdude
   (responding to signature requests made with the universal SPI command) and
   correctly store EEPROM data.  Thanks to ladyada.
