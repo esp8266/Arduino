@@ -46,6 +46,17 @@ Processing and Wiring.
 
 UPDATES
 
+0014
+
+[core / libraries]
+* Fixing bug that prevented multiple outgoing Client connections with the
+  ethernet library.
+
+[tools]
+* Updating the Mac OS X AVR tools to AVR MacPack 20081213.  This includes
+  avr-gcc 4.3.2, which should fix problems with functions called from 
+  within interrupts.
+
 0013 - 2009.02.06
 
 [documentation / examples]

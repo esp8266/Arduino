@@ -3,6 +3,8 @@
 
 AVR
 
+Change delayMicroseconds(2000) to delay(2) in LiquidCrystal library: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1234577802
+Consider making abs() not a macro.  See: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1234908504
 Allow hardcoding of R/W line to ground with LiquidCrystal library.
 Improve shiftOut() performance: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1216659239/0
 Add String library.
@@ -75,6 +77,9 @@ Change background color while using external editor: http://www.arduino.cc/cgi-b
 
 DEVELOPMENT
 
+Upgrade AVR tools to latest AVR MacPack - includes avr-gcc 4.3.2, which should fix interrupt problems.
+Upgrade AVR tools to latest WinAVR - includes avr-gcc 4.3.2.
+Add licenses for included open source libraries: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1234595391
 Make run.bat not open a command line window: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1223883872
 Update version of the FTDI drivers (Windows).
 Remove AVR ISP and giveio drivers (Windows).
