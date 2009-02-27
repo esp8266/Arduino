@@ -36,8 +36,10 @@
 #define HAVE_IPV6
 #endif
 
-#define MAXPOSTDATASIZE                     30000
+#define MAXPOSTDATASIZE                     30000 /* adjust for file upload
+                                                     size*/
 #define MAXREQUESTLENGTH                    256
+#define MAXREADLENGTH                       8800  /* FF3=4096, IE7=8760 */
 #define BLOCKSIZE                           4096
 
 #define INITIAL_CONNECTION_SLOTS            10
@@ -87,6 +89,7 @@ struct connstruct
 
 #if defined(CONFIG_HTTP_HAS_CGI)
     uint8_t is_cgi;
+    char cgicontenttype[MAXREQUESTLENGTH];
 #ifdef CONFIG_HTTP_ENABLE_LUA
     uint8_t is_lua;
 #endif

@@ -159,6 +159,10 @@ static int procheadelem(struct connstruct *cn, char *buf)
     {
         sscanf(value, "%d", &cn->content_length);
     }
+    else if (strcmp(buf, "Content-Type:") == 0)
+    {
+        my_strncpy(cn->cgicontenttype, value, MAXREQUESTLENGTH);
+    }
     else if (strcmp(buf, "Cookie:") == 0)
     {
         my_strncpy(cn->cookie, value, MAXREQUESTLENGTH);
@@ -301,10 +305,10 @@ static void urlencode(const uint8_t *s, char *t)
 
 void procreadhead(struct connstruct *cn) 
 {
-    char buf[MAXREQUESTLENGTH*4], *tp, *next;
+    char buf[MAXREADLENGTH], *tp, *next;
     int rv;
 
-    memset(buf, 0, MAXREQUESTLENGTH*4);
+    memset(buf, 0, sizeof(buf));
     rv = special_read(cn, buf, sizeof(buf)-1);
     if (rv <= 0) 
     {
@@ -329,7 +333,7 @@ void procreadhead(struct connstruct *cn)
 #if defined(CONFIG_HTTP_HAS_CGI)
             if (cn->reqtype == TYPE_POST && cn->content_length > 0)
             {
-                if (init_read_post_data(buf,next,cn,rv) == 0)
+                if (init_read_post_data(buf, next, cn, rv) == 0)
                     return;
             }
 #endif
@@ -390,7 +394,6 @@ void procsendhead(struct connstruct *cn)
     file_exists = stat(cn->actualfile, &stbuf);
 
 #if defined(CONFIG_HTTP_HAS_CGI)
-
     if (file_exists != -1 && cn->is_cgi)
     {
         if ((stbuf.st_mode & S_IEXEC) == 0 || isdir(cn->actualfile))
@@ -669,13 +672,15 @@ static void proccgi(struct connstruct *cn)
             type = "GET";
             break;
 
+#if defined(CONFIG_HTTP_HAS_CGI)
         case TYPE_POST:
             type = "POST";
             sprintf(cgienv[cgi_index++], 
                         "CONTENT_LENGTH=%d", cn->content_length);
-            strcpy(cgienv[cgi_index++],     /* hard-code? */
-                        "CONTENT_TYPE=application/x-www-form-urlencoded");
+            snprintf(cgienv[cgi_index++], MAXREQUESTLENGTH,
+                        "CONTENT_TYPE=%s", cn->cgicontenttype);
             break;
+#endif
     }
 
     sprintf(cgienv[cgi_index++], "REQUEST_METHOD=%s", type);
@@ -746,7 +751,9 @@ static void decode_path_info(struct connstruct *cn, char *path_info)
 {
     char *cgi_delim;
 
+#if defined(CONFIG_HTTP_HAS_CGI)
     cn->is_cgi = 0;
+#endif
 #ifdef CONFIG_HTTP_ENABLE_LUA
     cn->is_lua = 0;
 #endif
@@ -763,6 +770,7 @@ static void decode_path_info(struct connstruct *cn, char *path_info)
         my_strncpy(cn->uri_query, cgi_delim+1, MAXREQUESTLENGTH);
     }
 
+#if defined(CONFIG_HTTP_HAS_CGI)
     if ((cgi_delim = cgi_filetype_match(cn, path_info)) != NULL)
     {
         cn->is_cgi = 1;     /* definitely a CGI script */
@@ -774,6 +782,7 @@ static void decode_path_info(struct connstruct *cn, char *path_info)
             *cgi_delim = '\0';
         }
     }
+#endif
 
     /* the bit at the start must be the script name */
     my_strncpy(cn->filereq, path_info, MAXREQUESTLENGTH);
@@ -787,7 +796,7 @@ static int init_read_post_data(char *buf, char *data,
    char *post_data;
 
     /* Too much Post data to send. MAXPOSTDATASIZE should be 
-       configured (now it can be chaged in the header file) */
+       configured (now it can be changed in the header file) */
    if (cn->content_length > MAXPOSTDATASIZE) 
    {
        send_error(cn, 418);
@@ -800,17 +809,9 @@ static int init_read_post_data(char *buf, char *data,
    
    if (cn->post_data == NULL)
    {
-       cn->post_data = (char *) calloc(1, (cn->content_length + 1)); 
        /* Allocate buffer for the POST data that will be used by proccgi 
           to send POST data to the CGI script */
-
-       if (cn->post_data == NULL)
-       {
-           printf("axhttpd: could not allocate memory for POST data\n"); 
-           TTY_FLUSH();
-           send_error(cn, 599);
-           return 0;
-       }
+       cn->post_data = (char *)ax_calloc(1, (cn->content_length + 1)); 
    }
 
    cn->post_state = 0;
@@ -819,10 +820,8 @@ static int init_read_post_data(char *buf, char *data,
 
    while (next < &buf[rv])
    { 
-       /*copy POST data to buffer*/
-       *post_data = *next;
-       post_data++;
-       next++;
+       /* copy POST data to buffer */
+       *post_data++ = *next++;
        cn->post_read++;
        if (cn->post_read == cn->content_length)
        { 
@@ -839,11 +838,11 @@ static int init_read_post_data(char *buf, char *data,
 
 void read_post_data(struct connstruct *cn)
 {
-    char buf[MAXREQUESTLENGTH*4], *next;
+    char buf[MAXREADLENGTH], *next;
     char *post_data;
     int rv;
 
-    bzero(buf,MAXREQUESTLENGTH*4);
+    memset(buf, 0, sizeof(buf));
     rv = special_read(cn, buf, sizeof(buf)-1);
     if (rv <= 0) 
     {
@@ -854,15 +853,13 @@ void read_post_data(struct connstruct *cn)
 
     buf[rv] = '\0';
     next = buf;
-
     post_data = &cn->post_data[cn->post_read];
 
     while (next < &buf[rv])
     {
-        *post_data = *next;
-        post_data++;
-        next++;
+        *post_data++ = *next++;
         cn->post_read++;
+
         if (cn->post_read == cn->content_length)
         {  
             /* No more POST data to be copied */
@@ -1174,7 +1171,7 @@ static void send_error(struct connstruct *cn, int err)
             break;
 
         case 418:
-            title = "POST data size is to large";
+            title = "POST data size is too large";
             text = title;
             break;
 
@@ -1191,6 +1188,9 @@ static void send_error(struct connstruct *cn, int err)
             "<html>\n<head>\n<title>%d %s</title></head>\n"
             "<body><h1>%d %s</h1>\n</body></html>\n", 
             err, title, err, title, err, text);
+#ifdef CONFIG_HTTP_VERBOSE
+    printf("axhttpd: http error: %s [%d]\n", title, err); TTY_FLUSH();
+#endif
     special_write(cn, buf, strlen(buf));
     removeconnection(cn);
 }
