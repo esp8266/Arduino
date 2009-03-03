@@ -1,4 +1,4 @@
-0013 arduino
+0014 arduino
 
 
 AVR
@@ -49,14 +49,19 @@ Improve preprocessing of sketches:
  - Better determine which header files are included (not commented out).
  - Remember the original locations of function prototypes to highlight the correct line on error.
 Multiple sketch windows.
-Easier library discovery and installation.
+Avoid library conflicts by only linking in the library whose name matches that of the #included header file.
+Easier library discovery and installation ("Add library..." menu item).
 Easier board installation ("Add board..." menu item)
 Comprehensive board management:
  - Enabled and disabled boards.
- - Dialog for enabling, disabling, adding, and deleting boards.
+ - Dialog for enabling, disabling, adding, deleting, and possibly editing boards.
  - Board descriptions (e.g. explaining differences between boards).
 Allow for libraries in <SKETCHBOOK>/libraries.
+Allow for boards in <SKETCHBOOK>/boards.
+Divide boards.txt into multiple text files.
+Allow for core in <SKETCHBOOK>/cores.
 Clean up Library and LibraryManager.
+Compile libraries dynamically (with compilation of sketch and core files).
 Detect dependencies between libraries.
 Byte-based serial monitor.
 Line termination options in the serial monitor.
