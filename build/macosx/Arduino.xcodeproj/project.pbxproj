@@ -700,7 +700,7 @@
 					ProjectRef = 33FFFE940965BD110016AC38 /* Arduino.xcodeproj */;
 				},
 			);
-			projectRoot = "";
+			projectRoot = ../..;
 			targets = (
 				33FFFE1C0965BBEF0016AC38 /* Setup */,
 				33AF61680965C4C600B514A9 /* App */,
