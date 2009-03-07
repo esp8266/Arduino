@@ -62,6 +62,7 @@ Divide boards.txt into multiple text files.
 Allow for core in <SKETCHBOOK>/cores.
 Clean up Library and LibraryManager.
 Compile libraries dynamically (with compilation of sketch and core files).
+Library builds should respect build.verbose.
 Detect dependencies between libraries.
 Byte-based serial monitor.
 Line termination options in the serial monitor.

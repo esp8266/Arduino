@@ -46,11 +46,14 @@ Processing and Wiring.
 
 UPDATES
 
-0014
+0014 - 2009.03.07
 
 [core / libraries]
 * Fixing bug that prevented multiple outgoing Client connections with the
   ethernet library.
+  
+[environment]
+* Clarifying ATmega168 vs. ATmega328 in the Tools > Boards menu.
 
 [tools]
 * Updating the Mac OS X AVR tools to AVR MacPack 20081213.  This includes

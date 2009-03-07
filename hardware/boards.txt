@@ -80,7 +80,7 @@ bt.build.core=arduino
 
 ##############################################################
 
-diecimila.name=Arduino Diecimila or Duemilanove
+diecimila.name=Arduino Diecimila or Duemilanove w/ ATmega168
 
 diecimila.upload.protocol=stk500
 diecimila.upload.maximum_size=14336
@@ -160,7 +160,7 @@ pro.build.core=arduino
 
 ##############################################################
 
-atmega328.name=Arduino w/ ATmega328
+atmega328.name=Arduino Duemilanove w/ ATmega328
 
 atmega328.upload.protocol=stk500
 atmega328.upload.maximum_size=30720
