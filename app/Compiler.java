@@ -172,9 +172,9 @@ public class Compiler implements MessageConsumer {
     }
     
     baseCommandLinker.addAll(sketchObjectNames);
-    baseCommandLinker.addAll(targetObjectNames);
-    //baseCommandLinker.add(runtimeLibraryName);
-    //baseCommandLinker.add("-L" + buildPath);
+    //baseCommandLinker.addAll(targetObjectNames);
+    baseCommandLinker.add(runtimeLibraryName);
+    baseCommandLinker.add("-L" + buildPath);
     baseCommandLinker.add("-lm");
 
     firstErrorFound = false;  // haven't found any errors yet
@@ -200,12 +200,12 @@ public class Compiler implements MessageConsumer {
           return false;
       }
 
-//      for(int i = 0; i < targetObjectNames.size(); i++) {
-//        List commandAR = new ArrayList(baseCommandAR);
-//        commandAR.add(targetObjectNames.get(i));
-//        if (execAsynchronously(commandAR) != 0)
-//          return false;
-//      }
+      for(int i = 0; i < targetObjectNames.size(); i++) {
+		List commandAR = new ArrayList(baseCommandAR);
+        commandAR.add(targetObjectNames.get(i));
+        if (execAsynchronously(commandAR) != 0)
+          return false;
+      }
 
       if (execAsynchronously(baseCommandLinker) != 0)
         return false;

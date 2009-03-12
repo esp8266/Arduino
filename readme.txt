@@ -46,6 +46,12 @@ Processing and Wiring.
 
 UPDATES
 
+0015
+
+[environment]
+* Reinstating use of core.a library in the build process, slightly shrinking
+  compiled sketch sizes.
+
 0014 - 2009.03.07
 
 [core / libraries]
