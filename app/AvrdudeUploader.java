@@ -115,6 +115,10 @@ public class AvrdudeUploader extends Uploader  {
 
     if (!avrdude(params, fuses))
       return false;
+
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {}
       
     List bootloader = new ArrayList();
     bootloader.add("-Uflash:w:" + "hardware" + File.separator + "bootloaders" + File.separator +
