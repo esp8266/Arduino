@@ -201,9 +201,8 @@ public class DiscourseFormat {
       for (;;) {
         byte id = tokens.id;
         if (id == Token.END) {
-          char c = segmentArray[segmentOffset + offset];
           if (segmentOffset + offset < limit) {
-            cf.append(c);
+            cf.append(segmentArray[segmentOffset + offset]);
           } else {
             cf.append('\n');
           }

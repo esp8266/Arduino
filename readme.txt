@@ -50,7 +50,8 @@ UPDATES
 
 [environment]
 * Reinstating use of core.a library in the build process, slightly shrinking
-  compiled sketch sizes.
+  compiled sketch sizes.  (Thanks to William Westfield.)
+* Fixing bug in copy for forum (thanks to eried).
 
 0014 - 2009.03.07
 
