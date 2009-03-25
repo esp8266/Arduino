@@ -46,7 +46,10 @@ Processing and Wiring.
 
 UPDATES
 
-0015
+0015 - 2009.03.26
+
+[core / libraries]
+* Adding support for the Arduino Mega (ATmega1280).
 
 [environment]
 * Reinstating use of core.a library in the build process, slightly shrinking
