@@ -6,6 +6,12 @@
 /*                                                        */
 /* ATmegaBOOT.c                                           */
 /*                                                        */
+/*                                                        */
+/* 20090308: integrated Mega changes into main bootloader */
+/*           source by D. Mellis                          */
+/* 20080930: hacked for Arduino Mega (with the 1280       */
+/*           processor, backwards compatible)             */
+/*           by D. Cuartielles                            */
 /* 20070626: hacked for Arduino Diecimila (which auto-    */
 /*           resets when a USB connection is made to it)  */
 /*           by D. Mellis                                 */
@@ -101,6 +107,7 @@
 
 /* Adjust to suit whatever pin your hardware uses to enter the bootloader */
 /* ATmega128 has two UARTS so two pins are used to enter bootloader and select UART */
+/* ATmega1280 has four UARTS, but for Arduino Mega, we will only use RXD0 to get code */
 /* BL0... means UART0, BL1... means UART1 */
 #ifdef __AVR_ATmega128__
 #define BL_DDR  DDRF
@@ -108,6 +115,8 @@
 #define BL_PIN  PINF
 #define BL0     PINF7
 #define BL1     PINF6
+#elif defined __AVR_ATmega1280__ 
+/* we just don't do anything for the MEGA and enter bootloader on reset anyway*/
 #else
 /* other ATmegas have only one UART, so only one pin is defined to enter bootloader */
 #define BL_DDR  DDRD
@@ -119,26 +128,25 @@
 
 /* onboard LED is used to indicate, that the bootloader was entered (3x flashing) */
 /* if monitor functions are included, LED goes on after monitor was entered */
-#ifdef __AVR_ATmega128__
-/* Onboard LED is connected to pin PB7 (e.g. Crumb128, PROBOmega128, Savvy128) */
+#if defined __AVR_ATmega128__ || defined __AVR_ATmega1280__
+/* Onboard LED is connected to pin PB7 (e.g. Crumb128, PROBOmega128, Savvy128, Arduino Mega) */
 #define LED_DDR  DDRB
 #define LED_PORT PORTB
 #define LED_PIN  PINB
 #define LED      PINB7
 #else
-/* Onboard LED is connected to pin PB2 (e.g. Crumb8, Crumb168) */
+/* Onboard LED is connected to pin PB5 in Arduino NG, Diecimila, and Duomilanuove */ 
+/* other boards like e.g. Crumb8, Crumb168 are using PB2 */
 #define LED_DDR  DDRB
 #define LED_PORT PORTB
 #define LED_PIN  PINB
-/* 20060803: hacked by DojoCorp, LED pin is B5 in Arduino */
-/* #define LED      PINB2 */
 #define LED      PINB5
 #endif
 
 
 /* monitor functions will only be compiled when using ATmega128, due to bootblock size constraints */
-#ifdef __AVR_ATmega128__
-#define MONITOR
+#if defined(__AVR_ATmega128__) || defined(__AVR_ATmega1280__)
+#define MONITOR 1
 #endif
 
 
@@ -146,7 +154,17 @@
 /* manufacturer byte is always the same */
 #define SIG1	0x1E	// Yep, Atmel is the only manufacturer of AVR micros.  Single source :(
 
-#if defined __AVR_ATmega128__
+#if defined __AVR_ATmega1280__
+#define SIG2	0x97
+#define SIG3	0x03
+#define PAGE_SIZE	0x80U	//128 words
+
+#elif defined __AVR_ATmega1281__
+#define SIG2	0x97
+#define SIG3	0x04
+#define PAGE_SIZE	0x80U	//128 words
+
+#elif defined __AVR_ATmega128__
 #define SIG2	0x97
 #define SIG3	0x02
 #define PAGE_SIZE	0x80U	//128 words
@@ -282,6 +300,7 @@ int main(void)
 #else
 	/* We run the bootloader regardless of the state of this pin.  Thus, don't
 	put it in a different state than the other pins.  --DAM, 070709
+	This also applies to Arduino Mega -- DC, 080930
 	BL_DDR &= ~_BV(BL);
 	BL_PORT |= _BV(BL);
 	*/
@@ -298,24 +317,30 @@ int main(void)
 	}
 #endif
 
+#if defined __AVR_ATmega1280__
+	/* the mega1280 chip has four serial ports ... we could eventually use any of them, or not? */
+	/* however, we don't wanna confuse people, to avoid making a mess, we will stick to RXD0, TXD0 */
+	bootuart = 1;
+#endif
+
 	/* check if flash is programmed already, if not start bootloader anyway */
 	if(pgm_read_byte_near(0x0000) != 0xFF) {
 
 #ifdef __AVR_ATmega128__
-		/* no UART was selected, start application */
-		if(!bootuart) {
-			app_start();
-		}
+	/* no UART was selected, start application */
+	if(!bootuart) {
+		app_start();
+	}
 #else
-		/* check if bootloader pin is set low */
-		/* we don't start this part neither for the m8, nor m168 */
-		//if(bit_is_set(BL_PIN, BL)) {
-		//	app_start();
-		//}
+	/* check if bootloader pin is set low */
+	/* we don't start this part neither for the m8, nor m168 */
+	//if(bit_is_set(BL_PIN, BL)) {
+	//      app_start();
+	//    }
 #endif
 	}
 
-#ifdef __AVR_ATmega128__
+#ifdef __AVR_ATmega128__    
 	/* no bootuart was selected, default to uart 0 */
 	if(!bootuart) {
 		bootuart = 1;
@@ -324,7 +349,7 @@ int main(void)
 
 
 	/* initialize UART(s) depending on CPU defined */
-#ifdef __AVR_ATmega128__
+#if defined(__AVR_ATmega128__) || defined(__AVR_ATmega1280__)
 	if(bootuart == 1) {
 		UBRR0L = (uint8_t)(F_CPU/(BAUD_RATE*16L)-1);
 		UBRR0H = (F_CPU/(BAUD_RATE*16L)-1) >> 8;
@@ -370,12 +395,22 @@ int main(void)
 	UCSRB = _BV(TXEN)|_BV(RXEN);
 #endif
 
+#if defined __AVR_ATmega1280__
+	/* Enable internal pull-up resistor on pin D0 (RX), in order
+	to supress line noise that prevents the bootloader from
+	timing out (DAM: 20070509) */
+	/* feature added to the Arduino Mega --DC: 080930 */
+	DDRE &= ~_BV(PINE0);
+	PORTE |= _BV(PINE0);
+#endif
+
+
 	/* set LED pin as output */
 	LED_DDR |= _BV(LED);
 
 
 	/* flash onboard LED to signal entering of bootloader */
-#ifdef __AVR_ATmega128__
+#if defined(__AVR_ATmega128__) || defined(__AVR_ATmega1280__)
 	// 4x for UART0, 5x for UART1
 	flash_led(NUM_LED_FLASHES + bootuart);
 #else
@@ -383,9 +418,8 @@ int main(void)
 #endif
 
 	/* 20050803: by DojoCorp, this is one of the parts provoking the
-	system to stop listening, cancelled from the original */
+		 system to stop listening, cancelled from the original */
 	//putch('\0');
-
 
 	/* forever loop */
 	for (;;) {
@@ -531,15 +565,18 @@ int main(void)
 			else {					        //Write to FLASH one page at a time
 				if (address.byte[1]>127) address_high = 0x01;	//Only possible with m128, m256 will need 3rd address byte. FIXME
 				else address_high = 0x00;
-#ifdef __AVR_ATmega128__
+#if defined(__AVR_ATmega128__) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega1281__)
 				RAMPZ = address_high;
 #endif
 				address.word = address.word << 1;	        //address * 2 -> byte location
 				/* if ((length.byte[0] & 0x01) == 0x01) length.word++;	//Even up an odd number of bytes */
 				if ((length.byte[0] & 0x01)) length.word++;	//Even up an odd number of bytes
 				cli();					//Disable interrupts, just to be sure
-				// HACKME: EEPE used to be EEWE
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega1281__)
 				while(bit_is_set(EECR,EEPE));			//Wait for previous EEPROM writes to complete
+#else
+				while(bit_is_set(EECR,EEWE));			//Wait for previous EEPROM writes to complete
+#endif
 				asm volatile(
 					 "clr	r17		\n\t"	//page_word_count
 					 "lds	r30,address	\n\t"	//Address of FLASH location (in bytes)
@@ -634,7 +671,7 @@ int main(void)
 					 "rjmp	write_page	\n\t"
 					 "block_done:		\n\t"
 					 "clr	__zero_reg__	\n\t"	//restore zero register
-#if defined(__AVR_ATmega168__)  || defined(__AVR_ATmega328P__)
+#if defined __AVR_ATmega168__  || __AVR_ATmega328P__ || __AVR_ATmega128__ || __AVR_ATmega1280__ || __AVR_ATmega1281__ 
 					 : "=m" (SPMCSR) : "M" (PAGE_SIZE) : "r0","r16","r17","r24","r25","r28","r29","r30","r31"
 #else
 					 : "=m" (SPMCR) : "M" (PAGE_SIZE) : "r0","r16","r17","r24","r25","r28","r29","r30","r31"
@@ -656,7 +693,7 @@ int main(void)
 	else if(ch=='t') {
 		length.byte[1] = getch();
 		length.byte[0] = getch();
-#if defined __AVR_ATmega128__
+#if defined(__AVR_ATmega128__) || defined(__AVR_ATmega1280__)
 		if (address.word>0x7FFF) flags.rampz = 1;		// No go with m256, FIXME
 		else flags.rampz = 0;
 #endif
@@ -680,7 +717,7 @@ int main(void)
 				else {
 
 					if (!flags.rampz) putch(pgm_read_byte_near(address.word));
-#if defined __AVR_ATmega128__
+#if defined(__AVR_ATmega128__) || defined(__AVR_ATmega1280__)
 					else putch(pgm_read_byte_far(address.word + 0x10000));
 					// Hmmmm, yuck  FIXME when m256 arrvies
 #endif
@@ -702,7 +739,7 @@ int main(void)
 			putch(0x10);
 		} else {
 			if (++error_count == MAX_ERROR_COUNT)
-			app_start();
+				app_start();
 		}
 	}
 
@@ -713,7 +750,7 @@ int main(void)
 	}
 
 
-#ifdef MONITOR
+#if defined MONITOR 
 
 	/* here come the extended monitor commands by Erik Lins */
 
@@ -723,18 +760,20 @@ int main(void)
 		if(ch=='!') {
 		ch = getch();
 		if(ch=='!') {
-
-#ifdef __AVR_ATmega128__
+			PGM_P welcome = "";
+#if defined(__AVR_ATmega128__) || defined(__AVR_ATmega1280__)
 			uint16_t extaddr;
 #endif
 			uint8_t addrl, addrh;
 
 #ifdef CRUMB128
-			PGM_P welcome = {"ATmegaBOOT / Crumb128 - (C) J.P.Kyle, E.Lins - 050815\n\r"};
+			welcome = "ATmegaBOOT / Crumb128 - (C) J.P.Kyle, E.Lins - 050815\n\r";
 #elif defined PROBOMEGA128
-			PGM_P welcome = {"ATmegaBOOT / PROBOmega128 - (C) J.P.Kyle, E.Lins - 050815\n\r"};
+			welcome = "ATmegaBOOT / PROBOmega128 - (C) J.P.Kyle, E.Lins - 050815\n\r";
 #elif defined SAVVY128
-			PGM_P welcome = {"ATmegaBOOT / Savvy128 - (C) J.P.Kyle, E.Lins - 050815\n\r"};
+			welcome = "ATmegaBOOT / Savvy128 - (C) J.P.Kyle, E.Lins - 050815\n\r";
+#elif defined __AVR_ATmega1280__ 
+			welcome = "ATmegaBOOT / Arduino Mega - (C) Arduino LLC - 090930\n\r";
 #endif
 
 			/* turn on LED */
@@ -793,7 +832,7 @@ int main(void)
 						putch(getch());
 					}
 				}
-#ifdef __AVR_ATmega128__
+#if defined(__AVR_ATmega128__) || defined(__AVR_ATmega1280__)
 				/* external bus loop  */
 				else if(ch == 'b') {
 					putch('b');
@@ -872,7 +911,7 @@ void puthex(char ch) {
 
 void putch(char ch)
 {
-#ifdef __AVR_ATmega128__
+#if defined(__AVR_ATmega128__) || defined(__AVR_ATmega1280__)
 	if(bootuart == 1) {
 		while (!(UCSR0A & _BV(UDRE0)));
 		UDR0 = ch;
@@ -894,13 +933,28 @@ void putch(char ch)
 
 char getch(void)
 {
-#ifdef __AVR_ATmega128__
+#if defined(__AVR_ATmega128__) || defined(__AVR_ATmega1280__)
+	uint32_t count = 0;
 	if(bootuart == 1) {
-		while(!(UCSR0A & _BV(RXC0)));
-		return UDR0;
-	}
+		while(!(UCSR0A & _BV(RXC0))) {
+			/* 20060803 DojoCorp:: Addon coming from the previous Bootloader*/               
+			/* HACKME:: here is a good place to count times*/
+			count++;
+			if (count > MAX_TIME_COUNT)
+				app_start();
+			}
+
+			return UDR0;
+		}
 	else if(bootuart == 2) {
-		while(!(UCSR1A & _BV(RXC1)));
+		while(!(UCSR1A & _BV(RXC1))) {
+			/* 20060803 DojoCorp:: Addon coming from the previous Bootloader*/               
+			/* HACKME:: here is a good place to count times*/
+			count++;
+			if (count > MAX_TIME_COUNT)
+				app_start();
+		}
+
 		return UDR1;
 	}
 	return 0;
@@ -932,7 +986,7 @@ char getch(void)
 void getNch(uint8_t count)
 {
 	while(count--) {
-#ifdef __AVR_ATmega128__
+#if defined(__AVR_ATmega128__) || defined(__AVR_ATmega1280__)
 		if(bootuart == 1) {
 			while(!(UCSR0A & _BV(RXC0)));
 			UDR0;

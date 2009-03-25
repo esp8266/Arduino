@@ -61,6 +61,18 @@ static inline void turnOffPWM(uint8_t timer)
 	if (timer == TIMER2A) cbi(TCCR2A, COM2A1);
 	if (timer == TIMER2B) cbi(TCCR2A, COM2B1);
 #endif
+
+#if defined(__AVR_ATmega1280__)
+	if (timer == TIMER3A) cbi(TCCR3A, COM3A1);
+	if (timer == TIMER3B) cbi(TCCR3A, COM3B1);
+	if (timer == TIMER3C) cbi(TCCR3A, COM3C1);
+	if (timer == TIMER4A) cbi(TCCR4A, COM4A1);
+	if (timer == TIMER4B) cbi(TCCR4A, COM4B1);
+	if (timer == TIMER4C) cbi(TCCR4A, COM4C1);
+	if (timer == TIMER5A) cbi(TCCR5A, COM5A1);
+	if (timer == TIMER5B) cbi(TCCR5A, COM5B1);
+	if (timer == TIMER5C) cbi(TCCR5A, COM5C1);
+#endif
 }
 
 void digitalWrite(uint8_t pin, uint8_t val)

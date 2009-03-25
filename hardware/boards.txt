@@ -177,3 +177,23 @@ atmega328.bootloader.lock_bits=0x0F
 atmega328.build.mcu=atmega328p
 atmega328.build.f_cpu=16000000L
 atmega328.build.core=arduino
+
+##############################################################
+
+mega.name=Arduino Mega
+
+mega.upload.protocol=stk500
+mega.upload.maximum_size=126976
+mega.upload.speed=57600
+
+mega.bootloader.low_fuses=0xFF
+mega.bootloader.high_fuses=0xDA
+mega.bootloader.extended_fuses=0xF5
+mega.bootloader.path=atmega
+mega.bootloader.file=ATmegaBOOT_168_atmega1280.hex
+mega.bootloader.unlock_bits=0x3F
+mega.bootloader.lock_bits=0x0F
+
+mega.build.mcu=atmega1280
+mega.build.f_cpu=16000000L
+mega.build.core=arduino

@@ -166,6 +166,21 @@ atmega328_isp: LFUSE = FF
 atmega328_isp: EFUSE = 05
 atmega328_isp: isp
 
+mega: TARGET = atmega1280
+mega: MCU_TARGET = atmega1280
+mega: CFLAGS += '-DMAX_TIME_COUNT=F_CPU>>4' '-DNUM_LED_FLASHES=0' -DBAUD_RATE=57600
+mega: AVR_FREQ = 16000000L 
+mega: LDSECTION  = --section-start=.text=0x1F000
+mega: $(PROGRAM)_atmega1280.hex
+
+mega_isp: mega
+mega_isp: TARGET = atmega1280
+mega_isp: MCU_TARGET = atmega1280
+mega_isp: HFUSE = DA
+mega_isp: LFUSE = FF
+mega_isp: EFUSE = F5
+mega_isp: isp
+
 isp: $(TARGET)
 	$(ISPFUSES)
 	$(ISPFLASH)
