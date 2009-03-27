@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, Cameron Rich
+ * Copyright (c) Cameron Rich
  * 
  * All rights reserved.
  * 

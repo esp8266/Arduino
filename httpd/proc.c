@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2008, Cameron Rich
+ * Copyright (c) Cameron Rich
  * 
  * All rights reserved.
  * 
@@ -571,8 +571,8 @@ static void proccgi(struct connstruct *cn)
     }
 
 #ifdef CONFIG_HTTP_VERBOSE
-        printf("[CGI]: %s:/%s\n", cn->is_ssl ? "https" : "http", cn->filereq);
-        TTY_FLUSH();
+    printf("[CGI]: %s:/%s\n", cn->is_ssl ? "https" : "http", cn->filereq);
+    TTY_FLUSH();
 #endif
 
     /* win32 cgi is a bit too painful */
@@ -1181,17 +1181,16 @@ static void send_error(struct connstruct *cn, int err)
             break;
     }
 
-    snprintf(buf, MAXREQUESTLENGTH, "HTTP/1.1 %d %s\n"
-            "Content-Type: text/html\n"
-            "Cache-Control: no-cache,no-store\n"
-            "Connection: close\n\n"
-            "<html>\n<head>\n<title>%d %s</title></head>\n"
-            "<body><h1>%d %s</h1>\n</body></html>\n", 
-            err, title, err, title, err, text);
+    snprintf(buf, sizeof(buf), HTTP_VERSION" 200 OK\n"
+            "Content-Type: text/html\n\n"
+            "<html><body>\n<title>%s</title>\n"
+            "<h1>Error %d - %s</h1>\n</body></html>\n", 
+            title, err, text);
+    special_write(cn, buf, strlen(buf));
+
 #ifdef CONFIG_HTTP_VERBOSE
     printf("axhttpd: http error: %s [%d]\n", title, err); TTY_FLUSH();
 #endif
-    special_write(cn, buf, strlen(buf));
     removeconnection(cn);
 }
 
