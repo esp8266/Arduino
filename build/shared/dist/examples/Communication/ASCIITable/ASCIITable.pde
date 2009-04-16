@@ -1,46 +1,73 @@
-// ASCII Table 
-// by Nicholas Zambetti <http://www.zambetti.com> 
-
+/*
+  ASCII table
+ 
+ Prints out byte values in all possible formats:  
+ * as raw binary values
+ * as ASCII-encoded decimal, hex, octal, and binary values
+ 
+ For more on ASCII, see http://www.asciitable.com and http://en.wikipedia.org/wiki/ASCII
+ 
+ The circuit:  No external hardware needed.
+ 
+ created 2006
+ by Nicholas Zambetti 
+ modified 18 Jan 2009
+ by Tom Igoe
+ 
+ <http://www.zambetti.com> 
+ */
 void setup() 
 { 
   Serial.begin(9600); 
-  
+
   // prints title with ending line break 
   Serial.println("ASCII Table ~ Character Map"); 
- 
-  // wait for the long string to be sent 
-  delay(100); 
 } 
- 
-int number = 33; // first visible character '!' is #33 
- 
+
+// first visible ASCIIcharacter '!' is number 33:
+int thisByte = 33; 
+// you can also write ASCII characters in single quotes.
+// for example. '!' is the same as 33, so you could also use this:
+//int thisByte = '!';  
+
 void loop() 
 { 
-  Serial.print(number, BYTE);    // prints value unaltered, first will be '!' 
-  
+  // prints value unaltered, i.e. the raw binary version of the 
+  // byte. The serial monitor interprets all bytes as 
+  // ASCII, so 33, the first number,  will show up as '!' 
+  Serial.print(thisByte, BYTE);    
+
   Serial.print(", dec: "); 
-  Serial.print(number);          // prints value as string in decimal (base 10) 
-  // Serial.print(number, DEC);  // this also works 
-  
+  // prints value as string as an ASCII-encoded decimal (base 10).
+  // Decimal is the  default format for Serial.print() and Serial.println(),
+  // so no modifier is needed:
+  Serial.print(thisByte);      
+  // But you can declare the modifier for decimal if you want to.
+  //this also works if you uncomment it:
+
+  // Serial.print(thisByte, DEC);  
+
+
   Serial.print(", hex: "); 
-  Serial.print(number, HEX);     // prints value as string in hexadecimal (base 16) 
-  
+  // prints value as string in hexadecimal (base 16):
+  Serial.print(thisByte, HEX);     
+
   Serial.print(", oct: "); 
-  Serial.print(number, OCT);     // prints value as string in octal (base 8) 
-  
+  // prints value as string in octal (base 8);
+  Serial.print(thisByte, OCT);     
+
   Serial.print(", bin: "); 
-  Serial.println(number, BIN);   // prints value as string in binary (base 2) 
-                                 // also prints ending line break 
- 
-  // if printed last visible character '~' #126 ... 
-  if(number == 126) { 
-    // loop forever 
+  // prints value as string in binary (base 2) 
+  // also prints ending line break:
+  Serial.println(thisByte, BIN);   
+
+  // if printed last visible character '~' or 126, stop: 
+  if(thisByte == 126) {     // you could also use if (thisByte == '~') {
+    // This loop loops forever and does nothing
     while(true) { 
       continue; 
     } 
   } 
- 
-  number++; // to the next character 
-  
-  delay(100); // allow some time for the Serial data to be sent 
+  // go on to the next character
+  thisByte++;  
 } 
