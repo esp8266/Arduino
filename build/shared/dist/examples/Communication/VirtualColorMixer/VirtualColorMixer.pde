@@ -15,9 +15,9 @@
  
  */
 
-#define redPin 0
-#define greenPin 1
-#define bluePin 2
+const int redPin = 0;		// sensor to control red color
+const int greenPin = 1;		// sensor to control green color
+const int bluePin = 2;		// sensor to control blue color
 
 void setup()
 {
