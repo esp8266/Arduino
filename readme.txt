@@ -46,6 +46,16 @@ Processing and Wiring.
 
 UPDATES
 
+0016
+
+[core / libraries]
+* Adding write(str) and write(buf, size) methods to Print, Serial, and the
+  Ethernet library Client and Server classes.  This allows for more efficient
+  (fewer packet) Ethernet communication.  (Thanks to mikalhart.)
+* Improvements to the way the Ethernet library Client class connects and
+  disconnects.  Should reduce or eliminate failed connections and long
+  timeouts.  (Thanks to Bruce Luckcuck.)
+
 0015 - 2009.03.26
 
 [core / libraries]

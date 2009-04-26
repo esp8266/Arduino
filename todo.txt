@@ -1,4 +1,4 @@
-0015 arduino
+0016 arduino
 
 
 AVR
@@ -29,8 +29,11 @@ Add OneWire library.
 Add pulseOut(), etc. functions from Wiring.
 Switch to ServoTimer2 library?  http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1222201226/0#5
 Add ContinuousServo library that inherits from Servo?
-LiquidCrystal library: support going to the next line with println().
+LiquidCrystal library:
+ - support going to the next line with println().
+ - proper software initialization of the LCD: http://web.alfredstate.edu/weimandn/arduino/liquidCrystal_library/liquidCrystal.cpp
 Ethernet library:
+ - client.connect() returns 0 when connection is successful?  http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1238295170
  - call Server.begin() from Ethernet.begin() instead of in user's sketch?
  - add method for receiving notification of new client connections to a server
  - add method for receiving notification of data written to a client
@@ -44,6 +47,7 @@ Consider moving millis() to timer 1, and configuring it so the interrupt is gene
 
 COMPUTER
 
+Move selection of Linux look and feel from Base.java to arduino.sh script.
 Check RAM usage of sketches: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1224729260/0#0
 Improve preprocessing of sketches:
  - Better determine which header files are included (not commented out).
