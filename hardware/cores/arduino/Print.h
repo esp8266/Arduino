@@ -21,6 +21,7 @@
 #define Print_h
 
 #include <inttypes.h>
+#include <stdio.h> // for size_t
 
 #define DEC 10
 #define HEX 16
@@ -34,7 +35,9 @@ class Print
     void printNumber(unsigned long, uint8_t);
     void printFloat(double, uint8_t);
   public:
-    virtual void write(uint8_t);
+    virtual void write(uint8_t) = 0;
+    virtual void write(const char *str);
+    virtual void write(const uint8_t *buffer, size_t size);
     void print(char);
     void print(const char[]);
     void print(uint8_t);

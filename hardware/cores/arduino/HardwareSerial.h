@@ -50,6 +50,7 @@ class HardwareSerial : public Print
     int read(void);
     void flush(void);
     virtual void write(uint8_t);
+    using Print::write; // pull in write(str) and write(buf, size) from Print
 };
 
 extern HardwareSerial Serial;

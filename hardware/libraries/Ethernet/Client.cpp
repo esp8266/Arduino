@@ -2,6 +2,7 @@ extern "C" {
   #include "types.h"
   #include "w5100.h"
   #include "socket.h"
+  #include "string.h"
 }
 
 #include "Ethernet.h"
@@ -48,6 +49,14 @@ uint8_t Client::connect() {
 
 void Client::write(uint8_t b) {
   send(_sock, &b, 1);
+}
+
+void Client::write(const char *str) {
+  send(_sock, (const uint8_t *)str, strlen(str));
+}
+
+void Client::write(const uint8_t *buf, size_t size) {
+  send(_sock, buf, size);
 }
 
 int Client::available() {

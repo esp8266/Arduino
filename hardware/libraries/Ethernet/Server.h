@@ -18,6 +18,8 @@ public:
   Client available();
   void begin();
   virtual void write(uint8_t);
+  virtual void write(const char *str);
+  virtual void write(const uint8_t *buf, size_t size);
 };
 
 #endif

@@ -21,13 +21,26 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <inttypes.h>
 #include <math.h>
 #include "wiring.h"
 
 #include "Print.h"
 
 // Public Methods //////////////////////////////////////////////////////////////
+
+/* default implementation: may be overridden */
+void Print::write(const char *str)
+{
+  while (*str)
+    write(*str++);
+}
+
+/* default implementation: may be overridden */
+void Print::write(const uint8_t *buffer, size_t size)
+{
+  while (size--)
+    write(*buffer++);
+}
 
 void Print::print(uint8_t b)
 {
@@ -39,10 +52,9 @@ void Print::print(char c)
   print((byte) c);
 }
 
-void Print::print(const char c[])
+void Print::print(const char str[])
 {
-  while (*c)
-    print(*c++);
+  write(str);
 }
 
 void Print::print(int n)

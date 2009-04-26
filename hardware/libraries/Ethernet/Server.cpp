@@ -2,6 +2,7 @@ extern "C" {
   #include "types.h"
   #include "w5100.h"
   #include "socket.h"
+  #include "string.h"
 }
 
 #include "Ethernet.h"
@@ -67,6 +68,16 @@ Client Server::available()
 
 void Server::write(uint8_t b) 
 {
+  write(&b, 1);
+}
+
+void Server::write(const char *str) 
+{
+  write((const uint8_t *)str, strlen(str));
+}
+
+void Server::write(const uint8_t *buffer, size_t size) 
+{
   accept();
   
   for (int sock = 0; sock < MAX_SOCK_NUM; sock++) {
@@ -74,7 +85,7 @@ void Server::write(uint8_t b)
     
     if (EthernetClass::_server_port[sock] == _port &&
         client.status() == SOCK_ESTABLISHED) {
-      client.write(b);
+      client.write(buffer, size);
     }
   }
 }
