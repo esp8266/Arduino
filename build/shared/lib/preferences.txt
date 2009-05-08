@@ -284,4 +284,4 @@ serial.burn_rate=115200
 
 build.verbose=false
 
-board=diecimila
+board=atmega328

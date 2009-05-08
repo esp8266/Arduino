@@ -17,7 +17,6 @@ Switch pwm output on pins 5 and 6 to phase-correct mode, if possible.
 Add parameter to shiftOut() for specifying a number of bits.
 Add parameter to Serial.print[ln](x, BIN) for specifying number of bits.
 Support PROGMEM strings in Serial.print(): http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1227919972
-Add support for ATmega1280 (e.g. timers, external interrupts, multiple serial ports).
 Add weak attribute to signal handlers: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1203798214
 Incorporate ladyada's new SoftwareSerial library.
 Floating point support in the map() function.
@@ -87,16 +86,12 @@ Change background color while using external editor: http://www.arduino.cc/cgi-b
 
 DEVELOPMENT
 
-Upgrade AVR tools to latest AVR MacPack - includes avr-gcc 4.3.2, which should fix interrupt problems.
-Upgrade AVR tools to latest WinAVR - includes avr-gcc 4.3.2.
 Add licenses for included open source libraries: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1234595391
 Make run.bat not open a command line window: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1223883872
 Update version of the FTDI drivers (Windows).
 Remove AVR ISP and giveio drivers (Windows).
 Include the executable installer for the FTDI drivers (Windows).
-Include newer version of avr-gcc (one that supports the ATmega1280).
 Revise fetch.sh to look for version specific pages (names suffixed with, e.g., "-0007")
-If possible, install bug tracking and svn on arduino.cc.
 Move to ant for build process.
 
 DOCUMENTATION / SITE CONFIGURATION

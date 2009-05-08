@@ -140,7 +140,7 @@ lilypad.build.core=arduino
 
 ##############################################################
 
-pro.name=Arduino Pro or Pro Mini (8 MHz)
+pro.name=Arduino Pro or Pro Mini (8 MHz) w/ ATmega168
 
 pro.upload.protocol=stk500
 pro.upload.maximum_size=14336
@@ -157,6 +157,26 @@ pro.bootloader.lock_bits=0x0F
 pro.build.mcu=atmega168
 pro.build.f_cpu=8000000L
 pro.build.core=arduino
+
+##############################################################
+
+pro328.name=Arduino Pro or Pro Mini (8 MHz) w/ ATmega328
+
+pro328.upload.protocol=stk500
+pro328.upload.maximum_size=30720
+pro328.upload.speed=57600
+
+pro328.bootloader.low_fuses=0xFF
+pro328.bootloader.high_fuses=0xDA
+pro328.bootloader.extended_fuses=0x05
+pro328.bootloader.path=atmega
+pro328.bootloader.file=ATmegaBOOT_168_atmega328_pro_8MHz.hex
+pro328.bootloader.unlock_bits=0x3F
+pro328.bootloader.lock_bits=0x0F
+
+pro328.build.mcu=atmega328p
+pro328.build.f_cpu=8000000L
+pro328.build.core=arduino
 
 ##############################################################
 
