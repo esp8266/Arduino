@@ -166,6 +166,21 @@ atmega328_isp: LFUSE = FF
 atmega328_isp: EFUSE = 05
 atmega328_isp: isp
 
+atmega328_pro8: TARGET = atmega328_pro_8MHz
+atmega328_pro8: MCU_TARGET = atmega328p
+atmega328_pro8: CFLAGS += '-DMAX_TIME_COUNT=F_CPU>>4' '-DNUM_LED_FLASHES=1' -DBAUD_RATE=57600 -DDOUBLE_SPEED
+atmega328_pro8: AVR_FREQ = 8000000L 
+atmega328_pro8: LDSECTION  = --section-start=.text=0x7800
+atmega328_pro8: $(PROGRAM)_atmega328_pro_8MHz.hex
+
+atmega328_pro8_isp: atmega328_pro8
+atmega328_pro8_isp: TARGET = atmega328_pro_8MHz
+atmega328_pro8_isp: MCU_TARGET = atmega328p
+atmega328_pro8_isp: HFUSE = DA
+atmega328_pro8_isp: LFUSE = FF
+atmega328_pro8_isp: EFUSE = 05
+atmega328_pro8_isp: isp
+
 mega: TARGET = atmega1280
 mega: MCU_TARGET = atmega1280
 mega: CFLAGS += '-DMAX_TIME_COUNT=F_CPU>>4' '-DNUM_LED_FLASHES=0' -DBAUD_RATE=57600

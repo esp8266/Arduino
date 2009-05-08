@@ -370,8 +370,16 @@ int main(void)
 	UCSRA = 0x00;
 	UCSRB = _BV(TXEN)|_BV(RXEN);	
 #elif defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__)
+
+#ifdef DOUBLE_SPEED
+	UCSR0A = (1<<U2X0); //Double speed mode USART0
+	UBRR0L = (uint8_t)(F_CPU/(BAUD_RATE*8L)-1);
+	UBRR0H = (F_CPU/(BAUD_RATE*8L)-1) >> 8;
+#else
 	UBRR0L = (uint8_t)(F_CPU/(BAUD_RATE*16L)-1);
 	UBRR0H = (F_CPU/(BAUD_RATE*16L)-1) >> 8;
+#endif
+
 	UCSR0B = (1<<RXEN0) | (1<<TXEN0);
 	UCSR0C = (1<<UCSZ00) | (1<<UCSZ01);
 
