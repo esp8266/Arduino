@@ -42,13 +42,17 @@ uint8_t Client::connect() {
   if (_srcport + 1024 == 0) _srcport = 0;
   socket(_sock, Sn_MR_TCP, _srcport + 1024, 0);
   
-  if (!::connect(_sock, _ip, _port))
+  if (!::connect(_sock, _ip, _port)) {
+    _sock = 255;
     return 0;
+  }
     
   while (status() != SOCK_ESTABLISHED) {
     delay(1);
-    if (status() == SOCK_CLOSED)
+    if (status() == SOCK_CLOSED) {
+      _sock = 255;
       return 0;
+    }
   }
   
   return 1;
