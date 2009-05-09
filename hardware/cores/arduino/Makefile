@@ -1,4 +1,4 @@
-# Arduino 0011 Makefile
+# Arduino 0015 Makefile
 # Arduino adaptation by mellis, eighthave, oli.keller
 #
 # This makefile allows you to build sketches from the command line
@@ -35,7 +35,7 @@
 # $Id$
 
 TARGET = $(notdir $(CURDIR))
-INSTALL_DIR = /Users/dmellis/Source/arduino/trunk/build/macosx/build/work
+INSTALL_DIR = ../../..
 PORT = /dev/tty.usb*
 UPLOAD_RATE = 19200
 AVRDUDE_PROGRAMMER = stk500v1
@@ -223,6 +223,13 @@ applet/core.a: $(OBJ)
 	$(CC) -c $(ALL_ASFLAGS) $< -o $@
 
 
+# Automatic dependencies
+%.d: %.c
+	$(CC) -M $(ALL_CFLAGS) $< | sed "s;$(notdir $*).o:;$*.o $*.d:;" > $@
+
+%.d: %.cpp
+	$(CXX) -M $(ALL_CXXFLAGS) $< | sed "s;$(notdir $*).o:;$*.o $*.d:;" > $@
+
 
 # Target: clean project.
 clean:
@@ -230,15 +237,7 @@ clean:
 	applet/$(TARGET).map applet/$(TARGET).sym applet/$(TARGET).lss applet/core.a \
 	$(OBJ) $(LST) $(SRC:.c=.s) $(SRC:.c=.d) $(CXXSRC:.cpp=.s) $(CXXSRC:.cpp=.d)
 
-depend:
-	if grep '^# DO NOT DELETE' $(MAKEFILE) >/dev/null; \
-	then \
-		sed -e '/^# DO NOT DELETE/,$$d' $(MAKEFILE) > \
-			$(MAKEFILE).$$$$ && \
-		$(MV) $(MAKEFILE).$$$$ $(MAKEFILE); \
-	fi
-	echo '# DO NOT DELETE THIS LINE -- make depend depends on it.' \
-		>> $(MAKEFILE); \
-	$(CC) -M -mmcu=$(MCU) $(CDEFS) $(CINCS) $(SRC) $(ASRC) >> $(MAKEFILE)
+.PHONY:	all build elf hex eep lss sym program coff extcoff clean applet_files sizebefore sizeafter
 
-.PHONY:	all build elf hex eep lss sym program coff extcoff clean depend applet_files sizebefore sizeafter
+include $(SRC:.c=.d)
+include $(CXXSRC:.cpp=.d)
