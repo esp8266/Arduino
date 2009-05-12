@@ -48,13 +48,24 @@ UPDATES
 
 0016
 
+[documentation / examples]
+* New communication examples (w/ corresponding Processing and Max/MSP code) by
+  Tom Igoe.
+
 [core / libraries]
+* Adding support for the Arduino Pro and Pro Mini 3.3V / 8 MHz w/ ATmega328.
 * Adding write(str) and write(buf, size) methods to Print, Serial, and the
   Ethernet library Client and Server classes.  This allows for more efficient
   (fewer packet) Ethernet communication.  (Thanks to mikalhart.)
 * Improvements to the way the Ethernet library Client class connects and
   disconnects.  Should reduce or eliminate failed connections and long
   timeouts.  (Thanks to Bruce Luckcuck.)
+* Optimizing the timer0 overflow interrupt handler (used for millis() and
+  micros()).  Thanks to westfw and mikalhart.
+  
+[environment]
+* Eliminating (maybe) the occasional "Couldn't determine program size" errors.
+  Thanks to the Clever Monkey.
 
 0015 - 2009.03.26
 

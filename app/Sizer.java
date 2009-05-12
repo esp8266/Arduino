@@ -57,17 +57,24 @@ public class Sizer implements MessageConsumer {
     
     commandSize[1] = buildPath + File.separator + sketchName + ".hex";
 
+    int r = 0;
     try {
       exception = null;
       size = -1;
       firstLine = null;
       Process process = Runtime.getRuntime().exec(commandSize);
-      new MessageSiphon(process.getInputStream(), this);
-      new MessageSiphon(process.getErrorStream(), this);
+      MessageSiphon in = new MessageSiphon(process.getInputStream(), this);
+      MessageSiphon err = new MessageSiphon(process.getErrorStream(), this);
+
       boolean running = true;
+
       while(running) {
         try {
-          process.waitFor();
+          if (in.thread != null)
+            in.thread.join();
+          if (err.thread != null)
+            err.thread.join();
+          r = process.waitFor();
           running = false;
         } catch (InterruptedException intExc) { }
       }
@@ -76,7 +83,7 @@ public class Sizer implements MessageConsumer {
       // some sub-class has overridden it to do so, thus we need to check for
       // it.  See: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1166589459
       exception = new RunnerException(
-        (e.toString() == null) ? e.getClass().getName() : e.toString());
+        (e.toString() == null) ? e.getClass().getName() + r : e.toString() + r);
     }
     
     if (exception != null)
