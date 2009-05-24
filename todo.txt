@@ -3,6 +3,14 @@
 
 AVR
 
+Ethernet library:
+ - integrate DHCP support
+ - client.connect() returns 0 when connection is successful?  http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1238295170
+ - call Server.begin() from Ethernet.begin() instead of in user's sketch?
+ - add method for receiving notification of new client connections to a server
+ - add method for receiving notification of data written to a client
+ - add method for receiving notification of client disconnections
+Incorporate mikalhart's new SoftwareSerial library.
 Change delayMicroseconds(2000) to delay(2) in LiquidCrystal library: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1234577802
 Consider making abs() not a macro.  See: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1234908504
 Allow hardcoding of R/W line to ground with LiquidCrystal library.
@@ -18,7 +26,6 @@ Add parameter to shiftOut() for specifying a number of bits.
 Add parameter to Serial.print[ln](x, BIN) for specifying number of bits.
 Support PROGMEM strings in Serial.print(): http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1227919972
 Add weak attribute to signal handlers: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1203798214
-Incorporate ladyada's new SoftwareSerial library.
 Floating point support in the map() function.
 Should Serial.print(b) send the ASCII digits of the byte?
 Fix delayMicroseconds(0).
@@ -31,12 +38,6 @@ Add ContinuousServo library that inherits from Servo?
 LiquidCrystal library:
  - support going to the next line with println().
  - proper software initialization of the LCD: http://web.alfredstate.edu/weimandn/arduino/liquidCrystal_library/liquidCrystal.cpp
-Ethernet library:
- - client.connect() returns 0 when connection is successful?  http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1238295170
- - call Server.begin() from Ethernet.begin() instead of in user's sketch?
- - add method for receiving notification of new client connections to a server
- - add method for receiving notification of data written to a client
- - add method for receiving notification of client disconnections
 Supporting EEMEM directive by changing compiler command line: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1202157667
 Include Arduino as AVR-ISP sketch in hardware/firmwares.
 Move type definitions into WConstants.h.
@@ -46,6 +47,7 @@ Consider moving millis() to timer 1, and configuring it so the interrupt is gene
 
 COMPUTER
 
+Copy as HTML (a la Copy for Forum).
 Move selection of Linux look and feel from Base.java to arduino.sh script.
 Check RAM usage of sketches: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1224729260/0#0
 Improve preprocessing of sketches:

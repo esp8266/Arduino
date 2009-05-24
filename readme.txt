@@ -62,8 +62,12 @@ UPDATES
   timeouts.  (Thanks to Bruce Luckcuck.)
 * Optimizing the timer0 overflow interrupt handler (used for millis() and
   micros()).  Thanks to westfw and mikalhart.
+* Fixing bug that limited the bit() macro to 15 bits.  Thanks to Paul Badger.
   
 [environment]
+* Adding support for user libraries in the "libraries" sub-directory of the
+  Arduino sketchbook directory.
+* Adding "Copy as HTML" command to the Tools menu.
 * Eliminating (maybe) the occasional "Couldn't determine program size" errors.
   Thanks to the Clever Monkey.
 
