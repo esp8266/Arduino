@@ -34,7 +34,7 @@ import javax.swing.*;
  */
 public class LibraryManager {
 
-  private File libDir;
+  private File coreLibDir, userLibDir;
   private List libraries = new ArrayList();
   private Target target;
   
@@ -44,9 +44,11 @@ public class LibraryManager {
   public LibraryManager() throws IOException
   {
     String userDir = System.getProperty("user.dir") + File.separator;
-    libDir = new File(
+    coreLibDir = new File(
       ((!Base.isMacOS()) ? "" : userDir) + "hardware" + File.separator +
       "libraries");
+    userLibDir = 
+      new File(Sketchbook.getSketchbookPath() + File.separator + "libraries");
     target = new Target(
       System.getProperty("user.dir") + File.separator + "hardware" +
       File.separator + "cores",
@@ -70,9 +72,15 @@ public class LibraryManager {
       }
     };
     libraries.clear();
-    File[] libs = libDir.listFiles(onlyDirs);
-    for(int i = 0; i < libs.length; ++i){
-      libraries.add(new Library(this, libs[i]));
+    File[] userLibs = userLibDir.listFiles(onlyDirs);
+    if (userLibs != null) {
+      for(int i = 0; i < userLibs.length; ++i){
+	libraries.add(new Library(this, userLibs[i]));
+      }
+    }
+    File[] coreLibs = coreLibDir.listFiles(onlyDirs);
+    for(int i = 0; i < coreLibs.length; ++i){
+      libraries.add(new Library(this, coreLibs[i]));
     }
   }
 

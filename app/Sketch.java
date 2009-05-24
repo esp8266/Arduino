@@ -2238,6 +2238,7 @@ public class Sketch {
   public boolean isReadOnly() {
     String apath = folder.getAbsolutePath();
     if (apath.startsWith(Sketchbook.examplesPath) ||
+        apath.startsWith(Sketchbook.userLibrariesPath) ||
         apath.startsWith(Sketchbook.librariesPath)) {
       return true;
 
