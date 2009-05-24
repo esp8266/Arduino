@@ -752,7 +752,19 @@ public class Editor extends JFrame
         public void actionPerformed(ActionEvent e) {
           SwingUtilities.invokeLater(new Runnable() {
               public void run() {
-                new DiscourseFormat(Editor.this).show();
+                new DiscourseFormat(Editor.this, false).show();
+              }
+            });
+        }
+      });
+    menu.add(item);
+
+    item = new JMenuItem("Copy as HTML");
+    item.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          SwingUtilities.invokeLater(new Runnable() {
+              public void run() {
+                new DiscourseFormat(Editor.this, true).show();
               }
             });
         }

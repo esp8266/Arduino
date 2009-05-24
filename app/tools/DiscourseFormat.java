@@ -64,15 +64,18 @@ public class DiscourseFormat {
   JEditTextArea parent;
 
   //JFrame frame;
+  
+  boolean html;
 
   /**
    * Creates a new window with the formated (YaBB tags) sketchcode
    * from the actual Processing Tab ready to send to the processing discourse
    * web (copy & paste)
    */
-  public DiscourseFormat(Editor editor) {
+  public DiscourseFormat(Editor editor, boolean html) {
     this.editor = editor;
     this.parent = editor.textarea;
+    this.html = html;
 
     /*
     textarea = new JEditTextArea(new PdeTextAreaDefaults());
@@ -110,14 +113,14 @@ public class DiscourseFormat {
     // Format and render sketchcode
 
     // [code] tag cancels other tags, using [quote]
-    StringBuffer cf = new StringBuffer("[quote] \n \n");
+    StringBuffer cf = new StringBuffer(html ? "<pre> \n" : "[quote] \n");
 
     // Line by line
     for (int i = 0; i < parent.getLineCount(); i++) {
       cf.append(formatCode(i));
     }
 
-    cf.append("\n [/quote]");
+    cf.append(html ? "</pre>" : "[/quote]");
 
     /*
     // Send the text to the textarea
@@ -135,8 +138,8 @@ public class DiscourseFormat {
         }
       });
 
-    editor.message("Discourse-formatted code has been " +
-                   "copied to the clipboard.");
+    editor.message((html ? "HTML" : "Forum") + "-formatted code has " +
+                   "been copied to the clipboard.");
   }
 
 
@@ -213,12 +216,12 @@ public class DiscourseFormat {
         } else {
           // Place open tags []
           //cf.append("[color=" + color() + "]");
-          cf.append("[color=#");
+          cf.append(html ? "<span style=\"color: #" : "[color=#");
           cf.append(PApplet.hex(styles[id].getColor().getRGB() & 0xFFFFFF, 6));
-          cf.append("]");
+          cf.append(html ? ";\">" : "]");
 
           if (styles[id].isBold())
-            cf.append("[b]");
+            cf.append(html ? "<b>" : "[b]");
 
           fm = styles[id].getFontMetrics(defaultFont);
         }
@@ -229,9 +232,9 @@ public class DiscourseFormat {
           cf.append(c);
           // Place close tags [/]
           if (j == (length - 1) && id != Token.NULL && styles[id].isBold())
-            cf.append("[/b]");
+            cf.append(html ? "</b>" : "[/b]");
           if (j == (length - 1) && id != Token.NULL)
-            cf.append("[/color]");
+            cf.append(html ? "</span>" : "[/color]");
           int charWidth;
           if (c == '\t') {
             charWidth = (int) painter
