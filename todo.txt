@@ -47,7 +47,6 @@ Consider moving millis() to timer 1, and configuring it so the interrupt is gene
 
 COMPUTER
 
-Copy as HTML (a la Copy for Forum).
 Move selection of Linux look and feel from Base.java to arduino.sh script.
 Check RAM usage of sketches: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1224729260/0#0
 Improve preprocessing of sketches:

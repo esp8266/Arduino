@@ -46,7 +46,7 @@ Processing and Wiring.
 
 UPDATES
 
-0016
+0016 - 2009.05.24
 
 [documentation / examples]
 * New communication examples (w/ corresponding Processing and Max/MSP code) by
@@ -63,6 +63,7 @@ UPDATES
 * Optimizing the timer0 overflow interrupt handler (used for millis() and
   micros()).  Thanks to westfw and mikalhart.
 * Fixing bug that limited the bit() macro to 15 bits.  Thanks to Paul Badger.
+* Adding ARDUINO version constant (thanks to prodding from mikalhart).
   
 [environment]
 * Adding support for user libraries in the "libraries" sub-directory of the
@@ -70,6 +71,9 @@ UPDATES
 * Adding "Copy as HTML" command to the Tools menu.
 * Eliminating (maybe) the occasional "Couldn't determine program size" errors.
   Thanks to the Clever Monkey.
+  
+[tools]
+* Adding automatic dependency generation to the Makefile.  (Lars Immisch)
 
 0015 - 2009.03.26
 
