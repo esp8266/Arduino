@@ -68,9 +68,6 @@ public class Sketchbook {
 
   static File librariesFolder;
   static String librariesPath;
-  
-  static File userLibrariesFolder;
-  static String userLibrariesPath;
 
   // maps imported packages to their library folder
   static Hashtable importToLibraryTable = new Hashtable();
@@ -134,14 +131,11 @@ public class Sketchbook {
       //System.out.println("resetting sketchbook path");
       File sketchbookFolder = Base.getDefaultSketchbookFolder();
       //System.out.println("default is " + sketchbookFolder);
-      sketchbookPath = sketchbookFolder.getAbsolutePath();
-      Preferences.set("sketchbook.path", sketchbookPath);
+      Preferences.set("sketchbook.path",
+                      sketchbookFolder.getAbsolutePath());
 
       if (!sketchbookFolder.exists()) sketchbookFolder.mkdirs();
     }
-    userLibrariesFolder = new File(sketchbookPath, "libraries");
-    userLibrariesPath = userLibrariesFolder.getAbsolutePath();
-    
     openMenu = new JMenu("Sketchbook");
     popupMenu = new JMenu("Sketchbook");
     importMenu = new JMenu("Import Library");
@@ -392,7 +386,6 @@ public class Sketchbook {
       if (addLibraries(importMenu, examplesFolder)) {
         importMenu.addSeparator();
       }
-      addLibraries(importMenu, userLibrariesFolder);
       addLibraries(importMenu, librariesFolder);
       //System.out.println("libraries cp is now " + librariesClassPath);
 
