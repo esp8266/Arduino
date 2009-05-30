@@ -118,26 +118,14 @@ public class Base {
         UIManager.put("Component.visualMargin", new Insets(1, 1, 1, 1));
 
       } else if (Base.isLinux()) {
-        // Linux is by default even uglier than metal (Motif?).
-        // Actually, i'm using native menus, so they're even uglier
-        // and Motif-looking (Lesstif?). Ick. Need to fix this.
-        //String lfname = UIManager.getCrossPlatformLookAndFeelClassName();
-        //UIManager.setLookAndFeel(lfname);
-
-        // For 0120, trying out the gtk+ look and feel as the default.
-        // This is available in Java 1.4.2 and later, and it can't possibly
-        // be any worse than Metal. (Ocean might also work, but that's for
-        // Java 1.5, and we aren't going there yet)
-        UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
-
+        //Tweaks to the Linux LookAndFeel should go here 
+        //Currently the GTK-LnF is set as the default theme 
+        //in the arduino startup shell script
       } else {
+        //All other platforms (should be only Windows left) use the
+        //standard theme
         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
       }
-    //} catch (ClassNotFoundException cnfe) {
-      // just default to the native look and feel for this platform
-      // i.e. appears that some linux systems don't have the gtk l&f
-      //UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-
     } catch (Exception e) {
       e.printStackTrace();
     }

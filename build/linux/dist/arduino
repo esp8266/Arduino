@@ -13,4 +13,4 @@ export PATH
 LD_LIBRARY_PATH=`pwd`/lib:${LD_LIBRARY_PATH}
 export LD_LIBRARY_PATH
 
-java processing.app.Base
+java -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel processing.app.Base
