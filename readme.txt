@@ -46,7 +46,7 @@ Processing and Wiring.
 
 UPDATES
 
-0016 - 2009.05.24
+0016 - 2009.05.30
 
 [documentation / examples]
 * New communication examples (w/ corresponding Processing and Max/MSP code) by
@@ -54,6 +54,7 @@ UPDATES
 
 [core / libraries]
 * Adding support for the Arduino Pro and Pro Mini 3.3V / 8 MHz w/ ATmega328.
+* Adding support for the LilyPad Arduino w/ ATmega328.
 * Adding write(str) and write(buf, size) methods to Print, Serial, and the
   Ethernet library Client and Server classes.  This allows for more efficient
   (fewer packet) Ethernet communication.  (Thanks to mikalhart.)
@@ -66,6 +67,7 @@ UPDATES
 * Adding ARDUINO version constant (thanks to prodding from mikalhart).
   
 [environment]
+* Ordering the items in the Tools > Board menu.
 * Adding support for user libraries in the "libraries" sub-directory of the
   Arduino sketchbook directory.
 * Adding "Copy as HTML" command to the Tools menu.

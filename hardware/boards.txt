@@ -1,41 +1,62 @@
 ##############################################################
 
-atmega8.name=Arduino NG or older w/ ATmega8
+atmega328.name=Arduino Duemilanove w/ ATmega328
 
-atmega8.upload.protocol=stk500
-atmega8.upload.maximum_size=7168
-atmega8.upload.speed=19200
+atmega328.upload.protocol=stk500
+atmega328.upload.maximum_size=30720
+atmega328.upload.speed=57600
 
-atmega8.bootloader.low_fuses=0xdf
-atmega8.bootloader.high_fuses=0xca
-atmega8.bootloader.path=atmega8
-atmega8.bootloader.file=ATmegaBOOT.hex
-atmega8.bootloader.unlock_bits=0x3F
-atmega8.bootloader.lock_bits=0x0F
+atmega328.bootloader.low_fuses=0xFF
+atmega328.bootloader.high_fuses=0xDA
+atmega328.bootloader.extended_fuses=0x05
+atmega328.bootloader.path=atmega
+atmega328.bootloader.file=ATmegaBOOT_168_atmega328.hex
+atmega328.bootloader.unlock_bits=0x3F
+atmega328.bootloader.lock_bits=0x0F
 
-atmega8.build.mcu=atmega8
-atmega8.build.f_cpu=16000000L
-atmega8.build.core=arduino
+atmega328.build.mcu=atmega328p
+atmega328.build.f_cpu=16000000L
+atmega328.build.core=arduino
 
 ##############################################################
 
-atmega168.name=Arduino NG or older w/ ATmega168
+diecimila.name=Arduino Diecimila or Duemilanove w/ ATmega168
 
-atmega168.upload.protocol=stk500
-atmega168.upload.maximum_size=14336
-atmega168.upload.speed=19200
+diecimila.upload.protocol=stk500
+diecimila.upload.maximum_size=14336
+diecimila.upload.speed=19200
 
-atmega168.bootloader.low_fuses=0xff
-atmega168.bootloader.high_fuses=0xdd
-atmega168.bootloader.extended_fuses=0x00
-atmega168.bootloader.path=atmega
-atmega168.bootloader.file=ATmegaBOOT_168_ng.hex
-atmega168.bootloader.unlock_bits=0x3F
-atmega168.bootloader.lock_bits=0x0F
+diecimila.bootloader.low_fuses=0xff
+diecimila.bootloader.high_fuses=0xdd
+diecimila.bootloader.extended_fuses=0x00
+diecimila.bootloader.path=atmega
+diecimila.bootloader.file=ATmegaBOOT_168_diecimila.hex
+diecimila.bootloader.unlock_bits=0x3F
+diecimila.bootloader.lock_bits=0x0F
 
-atmega168.build.mcu=atmega168
-atmega168.build.f_cpu=16000000L
-atmega168.build.core=arduino
+diecimila.build.mcu=atmega168
+diecimila.build.f_cpu=16000000L
+diecimila.build.core=arduino
+
+##############################################################
+
+mega.name=Arduino Mega
+
+mega.upload.protocol=stk500
+mega.upload.maximum_size=126976
+mega.upload.speed=57600
+
+mega.bootloader.low_fuses=0xFF
+mega.bootloader.high_fuses=0xDA
+mega.bootloader.extended_fuses=0xF5
+mega.bootloader.path=atmega
+mega.bootloader.file=ATmegaBOOT_168_atmega1280.hex
+mega.bootloader.unlock_bits=0x3F
+mega.bootloader.lock_bits=0x0F
+
+mega.build.mcu=atmega1280
+mega.build.f_cpu=16000000L
+mega.build.core=arduino
 
 ##############################################################
 
@@ -56,6 +77,26 @@ mini.bootloader.lock_bits=0x0F
 mini.build.mcu=atmega168
 mini.build.f_cpu=16000000L
 mini.build.core=arduino
+
+##############################################################
+
+nano.name=Arduino Nano
+
+nano.upload.protocol=stk500
+nano.upload.maximum_size=14336
+nano.upload.speed=19200
+
+nano.bootloader.low_fuses=0xff
+nano.bootloader.high_fuses=0xdd
+nano.bootloader.extended_fuses=0x00
+nano.bootloader.path=atmega
+nano.bootloader.file=ATmegaBOOT_168_diecimila.hex
+nano.bootloader.unlock_bits=0x3F
+nano.bootloader.lock_bits=0x0F
+
+nano.build.mcu=atmega168
+nano.build.f_cpu=16000000L
+nano.build.core=arduino
 
 ##############################################################
 
@@ -80,47 +121,27 @@ bt.build.core=arduino
 
 ##############################################################
 
-diecimila.name=Arduino Diecimila or Duemilanove w/ ATmega168
+lilypad328.name=LilyPad Arduino w/ ATmega328
 
-diecimila.upload.protocol=stk500
-diecimila.upload.maximum_size=14336
-diecimila.upload.speed=19200
+lilypad328.upload.protocol=stk500
+lilypad328.upload.maximum_size=30720
+lilypad328.upload.speed=57600
 
-diecimila.bootloader.low_fuses=0xff
-diecimila.bootloader.high_fuses=0xdd
-diecimila.bootloader.extended_fuses=0x00
-diecimila.bootloader.path=atmega
-diecimila.bootloader.file=ATmegaBOOT_168_diecimila.hex
-diecimila.bootloader.unlock_bits=0x3F
-diecimila.bootloader.lock_bits=0x0F
+lilypad328.bootloader.low_fuses=0xFF
+lilypad328.bootloader.high_fuses=0xDA
+lilypad328.bootloader.extended_fuses=0x05
+lilypad328.bootloader.path=atmega
+lilypad328.bootloader.file=ATmegaBOOT_168_atmega328_pro_8MHz.hex
+lilypad328.bootloader.unlock_bits=0x3F
+lilypad328.bootloader.lock_bits=0x0F
 
-diecimila.build.mcu=atmega168
-diecimila.build.f_cpu=16000000L
-diecimila.build.core=arduino
-
-##############################################################
-
-nano.name=Arduino Nano
-
-nano.upload.protocol=stk500
-nano.upload.maximum_size=14336
-nano.upload.speed=19200
-
-nano.bootloader.low_fuses=0xff
-nano.bootloader.high_fuses=0xdd
-nano.bootloader.extended_fuses=0x00
-nano.bootloader.path=atmega
-nano.bootloader.file=ATmegaBOOT_168_diecimila.hex
-nano.bootloader.unlock_bits=0x3F
-nano.bootloader.lock_bits=0x0F
-
-nano.build.mcu=atmega168
-nano.build.f_cpu=16000000L
-nano.build.core=arduino
+lilypad328.build.mcu=atmega328p
+lilypad328.build.f_cpu=8000000L
+lilypad328.build.core=arduino
 
 ##############################################################
 
-lilypad.name=LilyPad Arduino
+lilypad.name=LilyPad Arduino w/ ATmega168
 
 lilypad.upload.protocol=stk500
 lilypad.upload.maximum_size=14336
@@ -140,27 +161,7 @@ lilypad.build.core=arduino
 
 ##############################################################
 
-pro.name=Arduino Pro or Pro Mini (8 MHz) w/ ATmega168
-
-pro.upload.protocol=stk500
-pro.upload.maximum_size=14336
-pro.upload.speed=19200
-
-pro.bootloader.low_fuses=0xc6
-pro.bootloader.high_fuses=0xdd
-pro.bootloader.extended_fuses=0x00
-pro.bootloader.path=atmega
-pro.bootloader.file=ATmegaBOOT_168_pro_8MHz.hex
-pro.bootloader.unlock_bits=0x3F
-pro.bootloader.lock_bits=0x0F
-
-pro.build.mcu=atmega168
-pro.build.f_cpu=8000000L
-pro.build.core=arduino
-
-##############################################################
-
-pro328.name=Arduino Pro or Pro Mini (8 MHz) w/ ATmega328
+pro328.name=Arduino Pro or Pro Mini (3.3V, 8 MHz) w/ ATmega328
 
 pro328.upload.protocol=stk500
 pro328.upload.maximum_size=30720
@@ -180,40 +181,60 @@ pro328.build.core=arduino
 
 ##############################################################
 
-atmega328.name=Arduino Duemilanove w/ ATmega328
+pro.name=Arduino Pro or Pro Mini (3.3V, 8 MHz) w/ ATmega168
 
-atmega328.upload.protocol=stk500
-atmega328.upload.maximum_size=30720
-atmega328.upload.speed=57600
+pro.upload.protocol=stk500
+pro.upload.maximum_size=14336
+pro.upload.speed=19200
 
-atmega328.bootloader.low_fuses=0xFF
-atmega328.bootloader.high_fuses=0xDA
-atmega328.bootloader.extended_fuses=0x05
-atmega328.bootloader.path=atmega
-atmega328.bootloader.file=ATmegaBOOT_168_atmega328.hex
-atmega328.bootloader.unlock_bits=0x3F
-atmega328.bootloader.lock_bits=0x0F
+pro.bootloader.low_fuses=0xc6
+pro.bootloader.high_fuses=0xdd
+pro.bootloader.extended_fuses=0x00
+pro.bootloader.path=atmega
+pro.bootloader.file=ATmegaBOOT_168_pro_8MHz.hex
+pro.bootloader.unlock_bits=0x3F
+pro.bootloader.lock_bits=0x0F
 
-atmega328.build.mcu=atmega328p
-atmega328.build.f_cpu=16000000L
-atmega328.build.core=arduino
+pro.build.mcu=atmega168
+pro.build.f_cpu=8000000L
+pro.build.core=arduino
 
 ##############################################################
 
-mega.name=Arduino Mega
+atmega168.name=Arduino NG or older w/ ATmega168
 
-mega.upload.protocol=stk500
-mega.upload.maximum_size=126976
-mega.upload.speed=57600
+atmega168.upload.protocol=stk500
+atmega168.upload.maximum_size=14336
+atmega168.upload.speed=19200
 
-mega.bootloader.low_fuses=0xFF
-mega.bootloader.high_fuses=0xDA
-mega.bootloader.extended_fuses=0xF5
-mega.bootloader.path=atmega
-mega.bootloader.file=ATmegaBOOT_168_atmega1280.hex
-mega.bootloader.unlock_bits=0x3F
-mega.bootloader.lock_bits=0x0F
+atmega168.bootloader.low_fuses=0xff
+atmega168.bootloader.high_fuses=0xdd
+atmega168.bootloader.extended_fuses=0x00
+atmega168.bootloader.path=atmega
+atmega168.bootloader.file=ATmegaBOOT_168_ng.hex
+atmega168.bootloader.unlock_bits=0x3F
+atmega168.bootloader.lock_bits=0x0F
 
-mega.build.mcu=atmega1280
-mega.build.f_cpu=16000000L
-mega.build.core=arduino
+atmega168.build.mcu=atmega168
+atmega168.build.f_cpu=16000000L
+atmega168.build.core=arduino
+
+##############################################################
+
+atmega8.name=Arduino NG or older w/ ATmega8
+
+atmega8.upload.protocol=stk500
+atmega8.upload.maximum_size=7168
+atmega8.upload.speed=19200
+
+atmega8.bootloader.low_fuses=0xdf
+atmega8.bootloader.high_fuses=0xca
+atmega8.bootloader.path=atmega8
+atmega8.bootloader.file=ATmegaBOOT.hex
+atmega8.bootloader.unlock_bits=0x3F
+atmega8.bootloader.lock_bits=0x0F
+
+atmega8.build.mcu=atmega8
+atmega8.build.f_cpu=16000000L
+atmega8.build.core=arduino
+

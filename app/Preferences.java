@@ -557,10 +557,10 @@ public class Preferences {
   static public void load(InputStream input, String prefix) throws IOException {
     BufferedReader reader =
       new BufferedReader(new InputStreamReader(input));
-    Hashtable table = Preferences.table;
+    Map table = Preferences.table;
       
     if (prefix != null) {
-      table = new Hashtable();
+      table = new LinkedHashMap();
       prefixes.put(prefix, table);
     }
 
@@ -675,11 +675,11 @@ public class Preferences {
     // preference files, look up the attribute in that file's Hashtable
     // (don't override with or fallback to the main file).  otherwise,
     // look up the attribute in the main file's Hashtable. 
-    Hashtable table = Preferences.table;
+    Map table = Preferences.table;
     if (attribute.indexOf('.') != -1) {
       String prefix = attribute.substring(0, attribute.indexOf('.'));
       if (prefixes.containsKey(prefix)) {
-        table = (Hashtable) prefixes.get(prefix);
+        table = (Map) prefixes.get(prefix);
         attribute = attribute.substring(attribute.indexOf('.') + 1);
       }
     }
@@ -705,9 +705,9 @@ public class Preferences {
   static public Iterator getSubKeys(String prefix) {
     if (!prefixes.containsKey(prefix))
       return null;
-    Set subkeys = new HashSet();
-    for (Enumeration e = ((Hashtable) prefixes.get(prefix)).keys(); e.hasMoreElements(); ) {
-      String subkey = (String) e.nextElement();
+    Set subkeys = new LinkedHashSet();
+    for (Iterator i = ((Map) prefixes.get(prefix)).keySet().iterator(); i.hasNext(); ) {
+      String subkey = (String) i.next();
       if (subkey.indexOf('.') != -1)
         subkey = subkey.substring(0, subkey.indexOf('.'));
       subkeys.add(subkey);
