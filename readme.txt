@@ -68,8 +68,6 @@ UPDATES
   
 [environment]
 * Ordering the items in the Tools > Board menu.
-* Adding support for user libraries in the "libraries" sub-directory of the
-  Arduino sketchbook directory.
 * Adding "Copy as HTML" command to the Tools menu.
 * Eliminating (maybe) the occasional "Couldn't determine program size" errors.
   Thanks to the Clever Monkey.
