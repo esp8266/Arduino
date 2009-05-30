@@ -71,6 +71,8 @@ UPDATES
 * Adding "Copy as HTML" command to the Tools menu.
 * Eliminating (maybe) the occasional "Couldn't determine program size" errors.
   Thanks to the Clever Monkey.
+* Moving selection of Linux look-and-feel into the arduino script so it can
+  be changed by users.  Thanks to Eberhard Fahle.
   
 [tools]
 * Adding automatic dependency generation to the Makefile.  (Lars Immisch)
