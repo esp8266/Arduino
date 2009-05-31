@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/core"/>
+	<classpathentry kind="lib" path="library/jogl.jar" sourcepath="jogl-src.zip">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="opengl/library"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="library/gluegen-rt.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

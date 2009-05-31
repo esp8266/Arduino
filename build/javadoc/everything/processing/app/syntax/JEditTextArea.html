@@ -1,0 +1,2310 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+JEditTextArea
+</TITLE>
+
+<META NAME="keywords" CONTENT="processing.app.syntax.JEditTextArea class">
+
+<LINK REL ="stylesheet" TYPE="text/css" HREF="../../../stylesheet.css" TITLE="Style">
+
+<SCRIPT type="text/javascript">
+function windowTitle()
+{
+    parent.document.title="JEditTextArea";
+}
+</SCRIPT>
+<NOSCRIPT>
+</NOSCRIPT>
+
+</HEAD>
+
+<BODY BGCOLOR="white" onload="windowTitle();">
+
+
+<!-- ========= START OF TOP NAVBAR ======= -->
+<A NAME="navbar_top"><!-- --></A>
+<A HREF="#skip-navbar_top" title="Skip navigation links"></A>
+<TABLE BORDER="0" WIDTH="100%" CELLPADDING="1" CELLSPACING="0" SUMMARY="">
+<TR>
+<TD COLSPAN=2 BGCOLOR="#EEEEFF" CLASS="NavBarCell1">
+<A NAME="navbar_top_firstrow"><!-- --></A>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="3" SUMMARY="">
+  <TR ALIGN="center" VALIGN="top">
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-summary.html"><FONT CLASS="NavBarFont1"><B>Package</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#FFFFFF" CLASS="NavBarCell1Rev"> &nbsp;<FONT CLASS="NavBarFont1Rev"><B>Class</B></FONT>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-tree.html"><FONT CLASS="NavBarFont1"><B>Tree</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../deprecated-list.html"><FONT CLASS="NavBarFont1"><B>Deprecated</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../index-all.html"><FONT CLASS="NavBarFont1"><B>Index</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../help-doc.html"><FONT CLASS="NavBarFont1"><B>Help</B></FONT></A>&nbsp;</TD>
+  </TR>
+</TABLE>
+</TD>
+<TD ALIGN="right" VALIGN="top" ROWSPAN=3><EM>
+</EM>
+</TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+&nbsp;<A HREF="../../../processing/app/syntax/InputHandler.Wrapper.html" title="interface in processing.app.syntax"><B>PREV CLASS</B></A>&nbsp;
+&nbsp;<A HREF="../../../processing/app/syntax/KeywordMap.html" title="class in processing.app.syntax"><B>NEXT CLASS</B></A></FONT></TD>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+  <A HREF="../../../index.html?processing/app/syntax/JEditTextArea.html" target="_top"><B>FRAMES</B></A>  &nbsp;
+&nbsp;<A HREF="JEditTextArea.html" target="_top"><B>NO FRAMES</B></A>  &nbsp;
+&nbsp;<SCRIPT type="text/javascript">
+  <!--
+  if(window==top) {
+    document.writeln('<A HREF="../../../allclasses-noframe.html"><B>All Classes</B></A>');
+  }
+  //-->
+</SCRIPT>
+<NOSCRIPT>
+  <A HREF="../../../allclasses-noframe.html"><B>All Classes</B></A>
+</NOSCRIPT>
+
+
+</FONT></TD>
+</TR>
+<TR>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+  SUMMARY:&nbsp;<A HREF="#nested_classes_inherited_from_class_javax.swing.JComponent">NESTED</A>&nbsp;|&nbsp;<A HREF="#field_summary">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor_summary">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_summary">METHOD</A></FONT></TD>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+DETAIL:&nbsp;<A HREF="#field_detail">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor_detail">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_detail">METHOD</A></FONT></TD>
+</TR>
+</TABLE>
+<A NAME="skip-navbar_top"></A>
+<!-- ========= END OF TOP NAVBAR ========= -->
+
+<HR>
+<!-- ======== START OF CLASS DATA ======== -->
+<H2>
+<FONT SIZE="-1">
+processing.app.syntax</FONT>
+<BR>
+Class JEditTextArea</H2>
+<PRE>
+java.lang.Object
+  <IMG SRC="../../../resources/inherit.gif" ALT="extended by ">java.awt.Component
+      <IMG SRC="../../../resources/inherit.gif" ALT="extended by ">java.awt.Container
+          <IMG SRC="../../../resources/inherit.gif" ALT="extended by ">javax.swing.JComponent
+              <IMG SRC="../../../resources/inherit.gif" ALT="extended by "><B>processing.app.syntax.JEditTextArea</B>
+</PRE>
+<DL>
+<DT><B>All Implemented Interfaces:</B> <DD>java.awt.image.ImageObserver, java.awt.MenuContainer, java.io.Serializable</DD>
+</DL>
+<HR>
+<DL>
+<DT><PRE>public class <B>JEditTextArea</B><DT>extends javax.swing.JComponent</DL>
+</PRE>
+
+<P>
+jEdit's text area component. It is more suited for editing program
+ source code than JEditorPane, because it drops the unnecessary features
+ (images, variable-width lines, and so on) and adds a whole bunch of
+ useful goodies such as:
+ <ul>
+ <li>More flexible key binding scheme
+ <li>Supports macro recorders
+ <li>Rectangular selection
+ <li>Bracket highlighting
+ <li>Syntax highlighting
+ <li>Command repetition
+ <li>Block caret can be enabled
+ </ul>
+ It is also faster and doesn't have as many problems. It can be used
+ in other applications; the only other part of jEdit it depends on is
+ the syntax package.<p>
+
+ To use it in your app, treat it like any other component, for example:
+ <pre>JEditTextArea ta = new JEditTextArea();
+ ta.setTokenMarker(new JavaTokenMarker());
+ ta.setText("public class Test {\n"
+     + "    public static void main(String[] args) {\n"
+     + "        System.out.println(\"Hello World\");\n"
+     + "    }\n"
+     + "}");</pre>
+<P>
+
+<P>
+<DL>
+<DT><B>See Also:</B><DD><A HREF="../../../serialized-form.html#processing.app.syntax.JEditTextArea">Serialized Form</A></DL>
+<HR>
+
+<P>
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+
+<A NAME="nested_class_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Nested Class Summary</B></FONT></TH>
+</TR>
+</TABLE>
+&nbsp;<A NAME="nested_classes_inherited_from_class_javax.swing.JComponent"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Nested classes/interfaces inherited from class javax.swing.JComponent</B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>javax.swing.JComponent.AccessibleJComponent</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;
+<!-- =========== FIELD SUMMARY =========== -->
+
+<A NAME="field_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Field Summary</B></FONT></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;<A HREF="../../../processing/app/EditorLineStatus.html" title="class in processing.app">EditorLineStatus</A></CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#editorLineStatus">editorLineStatus</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The component that tracks the current line number.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;<A HREF="../../../processing/app/EditorListener.html" title="class in processing.app">EditorListener</A></CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#editorListener">editorListener</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Forwards key events directly to the input handler.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;java.lang.String</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#LEFT_OF_SCROLLBAR">LEFT_OF_SCROLLBAR</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Adding components with this name to the text area will place
+ them left of the horizontal scroll bar.</TD>
+</TR>
+</TABLE>
+&nbsp;<A NAME="fields_inherited_from_class_javax.swing.JComponent"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Fields inherited from class javax.swing.JComponent</B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>TOOL_TIP_TEXT_KEY, UNDEFINED_CONDITION, WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, WHEN_FOCUSED, WHEN_IN_FOCUSED_WINDOW</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;<A NAME="fields_inherited_from_class_java.awt.Component"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Fields inherited from class java.awt.Component</B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>BOTTOM_ALIGNMENT, CENTER_ALIGNMENT, LEFT_ALIGNMENT, RIGHT_ALIGNMENT, TOP_ALIGNMENT</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;<A NAME="fields_inherited_from_class_java.awt.image.ImageObserver"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Fields inherited from interface java.awt.image.ImageObserver</B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>ABORT, ALLBITS, ERROR, FRAMEBITS, HEIGHT, PROPERTIES, SOMEBITS, WIDTH</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+
+<A NAME="constructor_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Constructor Summary</B></FONT></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#JEditTextArea(processing.app.syntax.TextAreaDefaults)">JEditTextArea</A></B>(<A HREF="../../../processing/app/syntax/TextAreaDefaults.html" title="class in processing.app.syntax">TextAreaDefaults</A>&nbsp;defaults)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Creates a new JEditTextArea with the specified settings.</TD>
+</TR>
+</TABLE>
+&nbsp;
+<!-- ========== METHOD SUMMARY =========== -->
+
+<A NAME="method_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Method Summary</B></FONT></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#_offsetToX(int, int)">_offsetToX</A></B>(int&nbsp;line,
+           int&nbsp;offset)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Converts an offset in a line into an x co-ordinate.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#addCaretListener(javax.swing.event.CaretListener)">addCaretListener</A></B>(javax.swing.event.CaretListener&nbsp;listener)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Adds a caret change listener to this text area.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#blinkCaret()">blinkCaret</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Blinks the caret.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#copy()">copy</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Places the selected text into the clipboard.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#cut()">cut</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Deletes the selected text from the text area and places it
+ into the clipboard.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getBracketLine()">getBracketLine</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the line of the highlighted bracket (the bracket
+ matching the one before the caret)</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getBracketPosition()">getBracketPosition</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the position of the highlighted bracket (the bracket
+ matching the one before the caret)</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getCaretLine()">getCaretLine</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the caret line.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getCaretPosition()">getCaretPosition</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the caret position.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;<A HREF="../../../processing/app/syntax/SyntaxDocument.html" title="class in processing.app.syntax">SyntaxDocument</A></CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getDocument()">getDocument</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the document this text area is editing.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getDocumentLength()">getDocumentLength</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the length of the document.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getElectricScroll()">getElectricScroll</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the number of lines from the top and button of the
+ text area that are always visible.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getFirstLine()">getFirstLine</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the line displayed at the text area's origin.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getHorizontalOffset()">getHorizontalOffset</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the horizontal offset of drawn lines.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;<A HREF="../../../processing/app/syntax/InputHandler.html" title="class in processing.app.syntax">InputHandler</A></CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getInputHandler()">getInputHandler</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the input handler.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getLineCount()">getLineCount</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the number of lines in the document.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getLineLength(int)">getLineLength</A></B>(int&nbsp;line)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the length of the specified line.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getLineOfOffset(int)">getLineOfOffset</A></B>(int&nbsp;offset)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the line containing the specified offset.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getLineStartOffset(int)">getLineStartOffset</A></B>(int&nbsp;line)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the start offset of the specified line.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getLineStopOffset(int)">getLineStopOffset</A></B>(int&nbsp;line)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the end offset of the specified line.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.lang.String</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getLineText(int)">getLineText</A></B>(int&nbsp;lineIndex)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the text on the specified line.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getLineText(int, javax.swing.text.Segment)">getLineText</A></B>(int&nbsp;lineIndex,
+            javax.swing.text.Segment&nbsp;segment)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Copies the text on the specified line into a segment.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getMagicCaretPosition()">getMagicCaretPosition</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the `magic' caret position.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getMarkLine()">getMarkLine</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the mark line.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getMarkPosition()">getMarkPosition</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the mark position.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;<A HREF="../../../processing/app/syntax/TextAreaPainter.html" title="class in processing.app.syntax">TextAreaPainter</A></CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getPainter()">getPainter</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the object responsible for painting this text area.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;javax.swing.JPopupMenu</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getRightClickPopup()">getRightClickPopup</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the right click popup menu.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getScrollPosition()">getScrollPosition</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get current position of the vertical scroll bar.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.lang.String</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getSelectedText()">getSelectedText</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the selected text, or null if no selection is active.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getSelectionStart()">getSelectionStart</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the selection start offset.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getSelectionStart(int)">getSelectionStart</A></B>(int&nbsp;line)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the offset where the selection starts on the specified
+ line.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getSelectionStartLine()">getSelectionStartLine</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the selection start line.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getSelectionStop()">getSelectionStop</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the selection end offset.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getSelectionStop(int)">getSelectionStop</A></B>(int&nbsp;line)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the offset where the selection ends on the specified
+ line.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getSelectionStopLine()">getSelectionStopLine</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the selection end line.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.lang.String</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getText()">getText</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the entire text of this text area.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.lang.String</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getText(int, int)">getText</A></B>(int&nbsp;start,
+        int&nbsp;len)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the specified substring of the document.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getText(int, int, javax.swing.text.Segment)">getText</A></B>(int&nbsp;start,
+        int&nbsp;len,
+        javax.swing.text.Segment&nbsp;segment)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Copies the specified substring of the document into a segment.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;<A HREF="../../../processing/app/syntax/TokenMarker.html" title="class in processing.app.syntax">TokenMarker</A></CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getTokenMarker()">getTokenMarker</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the document's token marker.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#getVisibleLines()">getVisibleLines</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the number of lines visible in this text area.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;boolean</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#isCaretBlinkEnabled()">isCaretBlinkEnabled</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns true if the caret is blinking, false otherwise.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;boolean</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#isCaretVisible()">isCaretVisible</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns true if the caret is visible, false otherwise.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;boolean</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#isEditable()">isEditable</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns true if this text area is editable, false otherwise.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;boolean</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#isManagingFocus()">isManagingFocus</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns if this component can be traversed by pressing
+ the Tab key.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;boolean</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#isOverwriteEnabled()">isOverwriteEnabled</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns true if overwrite mode is enabled, false otherwise.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;boolean</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#isSelectionActive()">isSelectionActive</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;boolean</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#isSelectionRectangular()">isSelectionRectangular</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns true if the selection is rectangular, false otherwise.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#lineToY(int)">lineToY</A></B>(int&nbsp;line)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Converts a line index to a y co-ordinate.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#offsetToX(int, int)">offsetToX</A></B>(int&nbsp;line,
+          int&nbsp;offset)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Converts an offset in a line into an x co-ordinate.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#overwriteSetSelectedText(java.lang.String)">overwriteSetSelectedText</A></B>(java.lang.String&nbsp;str)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Similar to <code>setSelectedText()</code>, but overstrikes the
+ appropriate number of characters if overwrite mode is enabled.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#paste()">paste</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Inserts the clipboard contents into the text.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#processKeyEvent(java.awt.event.KeyEvent)">processKeyEvent</A></B>(java.awt.event.KeyEvent&nbsp;evt)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#recalculateVisibleLines()">recalculateVisibleLines</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Recalculates the number of visible lines.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#removeCaretListener(javax.swing.event.CaretListener)">removeCaretListener</A></B>(javax.swing.event.CaretListener&nbsp;listener)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Removes a caret change listener from this text area.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#removeNotify()">removeNotify</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Called by the AWT when this component is removed from it's parent.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;boolean</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#scrollTo(int, int)">scrollTo</A></B>(int&nbsp;line,
+         int&nbsp;offset)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ensures that the specified line and offset is visible by scrolling
+ the text area if necessary.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;boolean</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#scrollToCaret()">scrollToCaret</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ensures that the caret is visible by scrolling the text area if
+ necessary.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#select(int, int)">select</A></B>(int&nbsp;start,
+       int&nbsp;end)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Selects from the start offset to the end offset.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#selectAll()">selectAll</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Selects all text in the document.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#selectNone()">selectNone</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Moves the mark to the caret position.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#setCaretBlinkEnabled(boolean)">setCaretBlinkEnabled</A></B>(boolean&nbsp;caretBlinks)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Toggles caret blinking.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#setCaretPosition(int)">setCaretPosition</A></B>(int&nbsp;caret)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sets the caret position.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#setCaretVisible(boolean)">setCaretVisible</A></B>(boolean&nbsp;caretVisible)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sets if the caret should be visible.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#setDocument(processing.app.syntax.SyntaxDocument)">setDocument</A></B>(<A HREF="../../../processing/app/syntax/SyntaxDocument.html" title="class in processing.app.syntax">SyntaxDocument</A>&nbsp;document)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sets the document this text area is editing.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#setDocument(processing.app.syntax.SyntaxDocument, int, int, int)">setDocument</A></B>(<A HREF="../../../processing/app/syntax/SyntaxDocument.html" title="class in processing.app.syntax">SyntaxDocument</A>&nbsp;document,
+            int&nbsp;start,
+            int&nbsp;stop,
+            int&nbsp;scroll)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Set document with a twist, includes the old caret
+ and scroll positions, added for p5.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#setEditable(boolean)">setEditable</A></B>(boolean&nbsp;editable)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sets if this component is editable.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#setElectricScroll(int)">setElectricScroll</A></B>(int&nbsp;electricScroll)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sets the number of lines from the top and bottom of the text
+ area that are always visible</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#setFirstLine(int)">setFirstLine</A></B>(int&nbsp;firstLine)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sets the line displayed at the text area's origin without
+ updating the scroll bars.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#setHorizontalOffset(int)">setHorizontalOffset</A></B>(int&nbsp;horizontalOffset)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sets the horizontal offset of drawn lines.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#setInputHandler(processing.app.syntax.InputHandler)">setInputHandler</A></B>(<A HREF="../../../processing/app/syntax/InputHandler.html" title="class in processing.app.syntax">InputHandler</A>&nbsp;inputHandler)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sets the input handler.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#setMagicCaretPosition(int)">setMagicCaretPosition</A></B>(int&nbsp;magicCaret)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sets the `magic' caret position.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;boolean</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#setOrigin(int, int)">setOrigin</A></B>(int&nbsp;firstLine,
+          int&nbsp;horizontalOffset)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A fast way of changing both the first line and horizontal
+ offset.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#setOverwriteEnabled(boolean)">setOverwriteEnabled</A></B>(boolean&nbsp;overwrite)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sets if overwrite mode should be enabled.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#setRightClickPopup(javax.swing.JPopupMenu)">setRightClickPopup</A></B>(javax.swing.JPopupMenu&nbsp;popup)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sets the right click popup menu.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#setScrollPosition(int)">setScrollPosition</A></B>(int&nbsp;what)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Set position of the vertical scroll bar.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#setSelectedText(java.lang.String)">setSelectedText</A></B>(java.lang.String&nbsp;selectedText)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Replaces the selection with the specified text.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#setSelectionEnd(int)">setSelectionEnd</A></B>(int&nbsp;selectionEnd)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sets the selection end.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#setSelectionRectangular(boolean)">setSelectionRectangular</A></B>(boolean&nbsp;rectSelect)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sets if the selection should be rectangular.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#setSelectionStart(int)">setSelectionStart</A></B>(int&nbsp;selectionStart)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sets the selection start.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#setText(java.lang.String)">setText</A></B>(java.lang.String&nbsp;text)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sets the entire text of this text area.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#setTokenMarker(processing.app.syntax.TokenMarker)">setTokenMarker</A></B>(<A HREF="../../../processing/app/syntax/TokenMarker.html" title="class in processing.app.syntax">TokenMarker</A>&nbsp;tokenMarker)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sets the document's token marker.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#updateScrollBars()">updateScrollBars</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Updates the state of the scroll bars.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#xToOffset(int, int)">xToOffset</A></B>(int&nbsp;line,
+          int&nbsp;x)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Converts an x co-ordinate to an offset within a line.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#xyToOffset(int, int)">xyToOffset</A></B>(int&nbsp;x,
+           int&nbsp;y)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Converts a point to an offset, from the start of the text.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/JEditTextArea.html#yToLine(int)">yToLine</A></B>(int&nbsp;y)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Converts a y co-ordinate to a line index.</TD>
+</TR>
+</TABLE>
+&nbsp;<A NAME="methods_inherited_from_class_javax.swing.JComponent"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Methods inherited from class javax.swing.JComponent</B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>addAncestorListener, addNotify, addVetoableChangeListener, computeVisibleRect, contains, createToolTip, disable, enable, firePropertyChange, firePropertyChange, firePropertyChange, getAccessibleContext, getActionForKeyStroke, getActionMap, getAlignmentX, getAlignmentY, getAncestorListeners, getAutoscrolls, getBorder, getBounds, getClientProperty, getComponentPopupMenu, getConditionForKeyStroke, getDebugGraphicsOptions, getDefaultLocale, getFontMetrics, getGraphics, getHeight, getInheritsPopupMenu, getInputMap, getInputMap, getInputVerifier, getInsets, getInsets, getListeners, getLocation, getMaximumSize, getMinimumSize, getNextFocusableComponent, getPopupLocation, getPreferredSize, getRegisteredKeyStrokes, getRootPane, getSize, getToolTipLocation, getToolTipText, getToolTipText, getTopLevelAncestor, getTransferHandler, getUIClassID, getVerifyInputWhenFocusTarget, getVetoableChangeListeners, getVisibleRect, getWidth, getX, getY, grabFocus, isDoubleBuffered, isLightweightComponent, isOpaque, isOptimizedDrawingEnabled, isPaintingTile, isRequestFocusEnabled, isValidateRoot, paint, paintImmediately, paintImmediately, print, printAll, putClientProperty, registerKeyboardAction, registerKeyboardAction, removeAncestorListener, removeVetoableChangeListener, repaint, repaint, requestDefaultFocus, requestFocus, requestFocus, requestFocusInWindow, resetKeyboardActions, reshape, revalidate, scrollRectToVisible, setActionMap, setAlignmentX, setAlignmentY, setAutoscrolls, setBackground, setBorder, setComponentPopupMenu, setDebugGraphicsOptions, setDefaultLocale, setDoubleBuffered, setEnabled, setFocusTraversalKeys, setFont, setForeground, setInheritsPopupMenu, setInputMap, setInputVerifier, setMaximumSize, setMinimumSize, setNextFocusableComponent, setOpaque, setPreferredSize, setRequestFocusEnabled, setToolTipText, setTransferHandler, setVerifyInputWhenFocusTarget, setVisible, unregisterKeyboardAction, update, updateUI</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;<A NAME="methods_inherited_from_class_java.awt.Container"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Methods inherited from class java.awt.Container</B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>add, add, add, add, add, addContainerListener, addPropertyChangeListener, addPropertyChangeListener, applyComponentOrientation, areFocusTraversalKeysSet, countComponents, deliverEvent, doLayout, findComponentAt, findComponentAt, getComponent, getComponentAt, getComponentAt, getComponentCount, getComponents, getComponentZOrder, getContainerListeners, getFocusTraversalKeys, getFocusTraversalPolicy, getLayout, getMousePosition, insets, invalidate, isAncestorOf, isFocusCycleRoot, isFocusCycleRoot, isFocusTraversalPolicyProvider, isFocusTraversalPolicySet, layout, list, list, locate, minimumSize, paintComponents, preferredSize, printComponents, remove, remove, removeAll, removeContainerListener, setComponentZOrder, setFocusCycleRoot, setFocusTraversalPolicy, setFocusTraversalPolicyProvider, setLayout, transferFocusBackward, transferFocusDownCycle, validate</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;<A NAME="methods_inherited_from_class_java.awt.Component"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Methods inherited from class java.awt.Component</B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>action, add, addComponentListener, addFocusListener, addHierarchyBoundsListener, addHierarchyListener, addInputMethodListener, addKeyListener, addMouseListener, addMouseMotionListener, addMouseWheelListener, bounds, checkImage, checkImage, contains, createImage, createImage, createVolatileImage, createVolatileImage, dispatchEvent, enable, enableInputMethods, firePropertyChange, firePropertyChange, firePropertyChange, firePropertyChange, firePropertyChange, getBackground, getBounds, getColorModel, getComponentListeners, getComponentOrientation, getCursor, getDropTarget, getFocusCycleRootAncestor, getFocusListeners, getFocusTraversalKeysEnabled, getFont, getForeground, getGraphicsConfiguration, getHierarchyBoundsListeners, getHierarchyListeners, getIgnoreRepaint, getInputContext, getInputMethodListeners, getInputMethodRequests, getKeyListeners, getLocale, getLocation, getLocationOnScreen, getMouseListeners, getMouseMotionListeners, getMousePosition, getMouseWheelListeners, getName, getParent, getPeer, getPropertyChangeListeners, getPropertyChangeListeners, getSize, getToolkit, getTreeLock, gotFocus, handleEvent, hasFocus, hide, imageUpdate, inside, isBackgroundSet, isCursorSet, isDisplayable, isEnabled, isFocusable, isFocusOwner, isFocusTraversable, isFontSet, isForegroundSet, isLightweight, isMaximumSizeSet, isMinimumSizeSet, isPreferredSizeSet, isShowing, isValid, isVisible, keyDown, keyUp, list, list, list, location, lostFocus, mouseDown, mouseDrag, mouseEnter, mouseExit, mouseMove, mouseUp, move, nextFocus, paintAll, postEvent, prepareImage, prepareImage, remove, removeComponentListener, removeFocusListener, removeHierarchyBoundsListener, removeHierarchyListener, removeInputMethodListener, removeKeyListener, removeMouseListener, removeMouseMotionListener, removeMouseWheelListener, removePropertyChangeListener, removePropertyChangeListener, repaint, repaint, repaint, resize, resize, setBounds, setBounds, setComponentOrientation, setCursor, setDropTarget, setFocusable, setFocusTraversalKeysEnabled, setIgnoreRepaint, setLocale, setLocation, setLocation, setName, setSize, setSize, show, show, size, toString, transferFocus, transferFocusUpCycle</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;<A NAME="methods_inherited_from_class_java.lang.Object"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Methods inherited from class java.lang.Object</B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>equals, getClass, hashCode, notify, notifyAll, wait, wait, wait</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;
+<P>
+
+<!-- ============ FIELD DETAIL =========== -->
+
+<A NAME="field_detail"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="1"><FONT SIZE="+2">
+<B>Field Detail</B></FONT></TH>
+</TR>
+</TABLE>
+
+<A NAME="LEFT_OF_SCROLLBAR"><!-- --></A><H3>
+LEFT_OF_SCROLLBAR</H3>
+<PRE>
+public static java.lang.String <B>LEFT_OF_SCROLLBAR</B></PRE>
+<DL>
+<DD>Adding components with this name to the text area will place
+ them left of the horizontal scroll bar. In jEdit, the status
+ bar is added this way.
+<P>
+<DL>
+</DL>
+</DL>
+<HR>
+
+<A NAME="editorListener"><!-- --></A><H3>
+editorListener</H3>
+<PRE>
+public <A HREF="../../../processing/app/EditorListener.html" title="class in processing.app">EditorListener</A> <B>editorListener</B></PRE>
+<DL>
+<DD>Forwards key events directly to the input handler.
+ This is slightly faster than using a KeyListener
+ because some Swing overhead is avoided.
+<P>
+<DL>
+</DL>
+</DL>
+<HR>
+
+<A NAME="editorLineStatus"><!-- --></A><H3>
+editorLineStatus</H3>
+<PRE>
+public <A HREF="../../../processing/app/EditorLineStatus.html" title="class in processing.app">EditorLineStatus</A> <B>editorLineStatus</B></PRE>
+<DL>
+<DD>The component that tracks the current line number.
+<P>
+<DL>
+</DL>
+</DL>
+
+<!-- ========= CONSTRUCTOR DETAIL ======== -->
+
+<A NAME="constructor_detail"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="1"><FONT SIZE="+2">
+<B>Constructor Detail</B></FONT></TH>
+</TR>
+</TABLE>
+
+<A NAME="JEditTextArea(processing.app.syntax.TextAreaDefaults)"><!-- --></A><H3>
+JEditTextArea</H3>
+<PRE>
+public <B>JEditTextArea</B>(<A HREF="../../../processing/app/syntax/TextAreaDefaults.html" title="class in processing.app.syntax">TextAreaDefaults</A>&nbsp;defaults)</PRE>
+<DL>
+<DD>Creates a new JEditTextArea with the specified settings.
+<P>
+<DL>
+<DT><B>Parameters:</B><DD><CODE>defaults</CODE> - The default settings</DL>
+</DL>
+
+<!-- ============ METHOD DETAIL ========== -->
+
+<A NAME="method_detail"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="1"><FONT SIZE="+2">
+<B>Method Detail</B></FONT></TH>
+</TR>
+</TABLE>
+
+<A NAME="getScrollPosition()"><!-- --></A><H3>
+getScrollPosition</H3>
+<PRE>
+public int <B>getScrollPosition</B>()</PRE>
+<DL>
+<DD>Get current position of the vertical scroll bar. [fry]
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="setScrollPosition(int)"><!-- --></A><H3>
+setScrollPosition</H3>
+<PRE>
+public void <B>setScrollPosition</B>(int&nbsp;what)</PRE>
+<DL>
+<DD>Set position of the vertical scroll bar. [fry]
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="isManagingFocus()"><!-- --></A><H3>
+isManagingFocus</H3>
+<PRE>
+public final boolean <B>isManagingFocus</B>()</PRE>
+<DL>
+<DD>Returns if this component can be traversed by pressing
+ the Tab key. This returns false.
+<P>
+<DD><DL>
+<DT><B>Overrides:</B><DD><CODE>isManagingFocus</CODE> in class <CODE>javax.swing.JComponent</CODE></DL>
+</DD>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getPainter()"><!-- --></A><H3>
+getPainter</H3>
+<PRE>
+public final <A HREF="../../../processing/app/syntax/TextAreaPainter.html" title="class in processing.app.syntax">TextAreaPainter</A> <B>getPainter</B>()</PRE>
+<DL>
+<DD>Returns the object responsible for painting this text area.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getInputHandler()"><!-- --></A><H3>
+getInputHandler</H3>
+<PRE>
+public final <A HREF="../../../processing/app/syntax/InputHandler.html" title="class in processing.app.syntax">InputHandler</A> <B>getInputHandler</B>()</PRE>
+<DL>
+<DD>Returns the input handler.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="setInputHandler(processing.app.syntax.InputHandler)"><!-- --></A><H3>
+setInputHandler</H3>
+<PRE>
+public void <B>setInputHandler</B>(<A HREF="../../../processing/app/syntax/InputHandler.html" title="class in processing.app.syntax">InputHandler</A>&nbsp;inputHandler)</PRE>
+<DL>
+<DD>Sets the input handler.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>inputHandler</CODE> - The new input handler</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="isCaretBlinkEnabled()"><!-- --></A><H3>
+isCaretBlinkEnabled</H3>
+<PRE>
+public final boolean <B>isCaretBlinkEnabled</B>()</PRE>
+<DL>
+<DD>Returns true if the caret is blinking, false otherwise.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="setCaretBlinkEnabled(boolean)"><!-- --></A><H3>
+setCaretBlinkEnabled</H3>
+<PRE>
+public void <B>setCaretBlinkEnabled</B>(boolean&nbsp;caretBlinks)</PRE>
+<DL>
+<DD>Toggles caret blinking.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>caretBlinks</CODE> - True if the caret should blink, false otherwise</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="isCaretVisible()"><!-- --></A><H3>
+isCaretVisible</H3>
+<PRE>
+public final boolean <B>isCaretVisible</B>()</PRE>
+<DL>
+<DD>Returns true if the caret is visible, false otherwise.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="setCaretVisible(boolean)"><!-- --></A><H3>
+setCaretVisible</H3>
+<PRE>
+public void <B>setCaretVisible</B>(boolean&nbsp;caretVisible)</PRE>
+<DL>
+<DD>Sets if the caret should be visible.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>caretVisible</CODE> - True if the caret should be visible, false
+ otherwise</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="blinkCaret()"><!-- --></A><H3>
+blinkCaret</H3>
+<PRE>
+public final void <B>blinkCaret</B>()</PRE>
+<DL>
+<DD>Blinks the caret.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getElectricScroll()"><!-- --></A><H3>
+getElectricScroll</H3>
+<PRE>
+public final int <B>getElectricScroll</B>()</PRE>
+<DL>
+<DD>Returns the number of lines from the top and button of the
+ text area that are always visible.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="setElectricScroll(int)"><!-- --></A><H3>
+setElectricScroll</H3>
+<PRE>
+public final void <B>setElectricScroll</B>(int&nbsp;electricScroll)</PRE>
+<DL>
+<DD>Sets the number of lines from the top and bottom of the text
+ area that are always visible
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>electricScroll</CODE> - The number of lines always visible from
+ the top or bottom</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="updateScrollBars()"><!-- --></A><H3>
+updateScrollBars</H3>
+<PRE>
+public void <B>updateScrollBars</B>()</PRE>
+<DL>
+<DD>Updates the state of the scroll bars. This should be called
+ if the number of lines in the document changes, or when the
+ size of the text are changes.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getFirstLine()"><!-- --></A><H3>
+getFirstLine</H3>
+<PRE>
+public final int <B>getFirstLine</B>()</PRE>
+<DL>
+<DD>Returns the line displayed at the text area's origin.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="setFirstLine(int)"><!-- --></A><H3>
+setFirstLine</H3>
+<PRE>
+public void <B>setFirstLine</B>(int&nbsp;firstLine)</PRE>
+<DL>
+<DD>Sets the line displayed at the text area's origin without
+ updating the scroll bars.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getVisibleLines()"><!-- --></A><H3>
+getVisibleLines</H3>
+<PRE>
+public final int <B>getVisibleLines</B>()</PRE>
+<DL>
+<DD>Returns the number of lines visible in this text area.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="recalculateVisibleLines()"><!-- --></A><H3>
+recalculateVisibleLines</H3>
+<PRE>
+public final void <B>recalculateVisibleLines</B>()</PRE>
+<DL>
+<DD>Recalculates the number of visible lines. This should not
+ be called directly.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getHorizontalOffset()"><!-- --></A><H3>
+getHorizontalOffset</H3>
+<PRE>
+public final int <B>getHorizontalOffset</B>()</PRE>
+<DL>
+<DD>Returns the horizontal offset of drawn lines.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="setHorizontalOffset(int)"><!-- --></A><H3>
+setHorizontalOffset</H3>
+<PRE>
+public void <B>setHorizontalOffset</B>(int&nbsp;horizontalOffset)</PRE>
+<DL>
+<DD>Sets the horizontal offset of drawn lines. This can be used to
+ implement horizontal scrolling.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>horizontalOffset</CODE> - offset The new horizontal offset</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="setOrigin(int, int)"><!-- --></A><H3>
+setOrigin</H3>
+<PRE>
+public boolean <B>setOrigin</B>(int&nbsp;firstLine,
+                         int&nbsp;horizontalOffset)</PRE>
+<DL>
+<DD>A fast way of changing both the first line and horizontal
+ offset.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>firstLine</CODE> - The new first line<DD><CODE>horizontalOffset</CODE> - The new horizontal offset
+<DT><B>Returns:</B><DD>True if any of the values were changed, false otherwise</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="scrollToCaret()"><!-- --></A><H3>
+scrollToCaret</H3>
+<PRE>
+public boolean <B>scrollToCaret</B>()</PRE>
+<DL>
+<DD>Ensures that the caret is visible by scrolling the text area if
+ necessary.
+<P>
+<DD><DL>
+
+<DT><B>Returns:</B><DD>True if scrolling was actually performed, false if the
+ caret was already visible</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="scrollTo(int, int)"><!-- --></A><H3>
+scrollTo</H3>
+<PRE>
+public boolean <B>scrollTo</B>(int&nbsp;line,
+                        int&nbsp;offset)</PRE>
+<DL>
+<DD>Ensures that the specified line and offset is visible by scrolling
+ the text area if necessary.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>line</CODE> - The line to scroll to<DD><CODE>offset</CODE> - The offset in the line to scroll to
+<DT><B>Returns:</B><DD>True if scrolling was actually performed, false if the
+ line and offset was already visible</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="lineToY(int)"><!-- --></A><H3>
+lineToY</H3>
+<PRE>
+public int <B>lineToY</B>(int&nbsp;line)</PRE>
+<DL>
+<DD>Converts a line index to a y co-ordinate.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>line</CODE> - The line</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="yToLine(int)"><!-- --></A><H3>
+yToLine</H3>
+<PRE>
+public int <B>yToLine</B>(int&nbsp;y)</PRE>
+<DL>
+<DD>Converts a y co-ordinate to a line index.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>y</CODE> - The y co-ordinate</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="offsetToX(int, int)"><!-- --></A><H3>
+offsetToX</H3>
+<PRE>
+public final int <B>offsetToX</B>(int&nbsp;line,
+                           int&nbsp;offset)</PRE>
+<DL>
+<DD>Converts an offset in a line into an x co-ordinate. This is a
+ slow version that can be used any time.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>line</CODE> - The line<DD><CODE>offset</CODE> - The offset, from the start of the line</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="_offsetToX(int, int)"><!-- --></A><H3>
+_offsetToX</H3>
+<PRE>
+public int <B>_offsetToX</B>(int&nbsp;line,
+                      int&nbsp;offset)</PRE>
+<DL>
+<DD>Converts an offset in a line into an x co-ordinate. This is a
+ fast version that should only be used if no changes were made
+ to the text since the last repaint.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>line</CODE> - The line<DD><CODE>offset</CODE> - The offset, from the start of the line</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="xToOffset(int, int)"><!-- --></A><H3>
+xToOffset</H3>
+<PRE>
+public int <B>xToOffset</B>(int&nbsp;line,
+                     int&nbsp;x)</PRE>
+<DL>
+<DD>Converts an x co-ordinate to an offset within a line.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>line</CODE> - The line<DD><CODE>x</CODE> - The x co-ordinate</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="xyToOffset(int, int)"><!-- --></A><H3>
+xyToOffset</H3>
+<PRE>
+public int <B>xyToOffset</B>(int&nbsp;x,
+                      int&nbsp;y)</PRE>
+<DL>
+<DD>Converts a point to an offset, from the start of the text.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>x</CODE> - The x co-ordinate of the point<DD><CODE>y</CODE> - The y co-ordinate of the point</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getDocument()"><!-- --></A><H3>
+getDocument</H3>
+<PRE>
+public final <A HREF="../../../processing/app/syntax/SyntaxDocument.html" title="class in processing.app.syntax">SyntaxDocument</A> <B>getDocument</B>()</PRE>
+<DL>
+<DD>Returns the document this text area is editing.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="setDocument(processing.app.syntax.SyntaxDocument)"><!-- --></A><H3>
+setDocument</H3>
+<PRE>
+public void <B>setDocument</B>(<A HREF="../../../processing/app/syntax/SyntaxDocument.html" title="class in processing.app.syntax">SyntaxDocument</A>&nbsp;document)</PRE>
+<DL>
+<DD>Sets the document this text area is editing.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>document</CODE> - The document</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="setDocument(processing.app.syntax.SyntaxDocument, int, int, int)"><!-- --></A><H3>
+setDocument</H3>
+<PRE>
+public void <B>setDocument</B>(<A HREF="../../../processing/app/syntax/SyntaxDocument.html" title="class in processing.app.syntax">SyntaxDocument</A>&nbsp;document,
+                        int&nbsp;start,
+                        int&nbsp;stop,
+                        int&nbsp;scroll)</PRE>
+<DL>
+<DD>Set document with a twist, includes the old caret
+ and scroll positions, added for p5. [fry]
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getTokenMarker()"><!-- --></A><H3>
+getTokenMarker</H3>
+<PRE>
+public final <A HREF="../../../processing/app/syntax/TokenMarker.html" title="class in processing.app.syntax">TokenMarker</A> <B>getTokenMarker</B>()</PRE>
+<DL>
+<DD>Returns the document's token marker. Equivalent to calling
+ <code>getDocument().getTokenMarker()</code>.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="setTokenMarker(processing.app.syntax.TokenMarker)"><!-- --></A><H3>
+setTokenMarker</H3>
+<PRE>
+public final void <B>setTokenMarker</B>(<A HREF="../../../processing/app/syntax/TokenMarker.html" title="class in processing.app.syntax">TokenMarker</A>&nbsp;tokenMarker)</PRE>
+<DL>
+<DD>Sets the document's token marker. Equivalent to caling
+ <code>getDocument().setTokenMarker()</code>.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>tokenMarker</CODE> - The token marker</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getDocumentLength()"><!-- --></A><H3>
+getDocumentLength</H3>
+<PRE>
+public final int <B>getDocumentLength</B>()</PRE>
+<DL>
+<DD>Returns the length of the document. Equivalent to calling
+ <code>getDocument().getLength()</code>.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getLineCount()"><!-- --></A><H3>
+getLineCount</H3>
+<PRE>
+public final int <B>getLineCount</B>()</PRE>
+<DL>
+<DD>Returns the number of lines in the document.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getLineOfOffset(int)"><!-- --></A><H3>
+getLineOfOffset</H3>
+<PRE>
+public final int <B>getLineOfOffset</B>(int&nbsp;offset)</PRE>
+<DL>
+<DD>Returns the line containing the specified offset.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>offset</CODE> - The offset</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getLineStartOffset(int)"><!-- --></A><H3>
+getLineStartOffset</H3>
+<PRE>
+public int <B>getLineStartOffset</B>(int&nbsp;line)</PRE>
+<DL>
+<DD>Returns the start offset of the specified line.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>line</CODE> - The line
+<DT><B>Returns:</B><DD>The start offset of the specified line, or -1 if the line is
+ invalid</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getLineStopOffset(int)"><!-- --></A><H3>
+getLineStopOffset</H3>
+<PRE>
+public int <B>getLineStopOffset</B>(int&nbsp;line)</PRE>
+<DL>
+<DD>Returns the end offset of the specified line.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>line</CODE> - The line
+<DT><B>Returns:</B><DD>The end offset of the specified line, or -1 if the line is
+ invalid.</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getLineLength(int)"><!-- --></A><H3>
+getLineLength</H3>
+<PRE>
+public int <B>getLineLength</B>(int&nbsp;line)</PRE>
+<DL>
+<DD>Returns the length of the specified line.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>line</CODE> - The line</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getText()"><!-- --></A><H3>
+getText</H3>
+<PRE>
+public java.lang.String <B>getText</B>()</PRE>
+<DL>
+<DD>Returns the entire text of this text area.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="setText(java.lang.String)"><!-- --></A><H3>
+setText</H3>
+<PRE>
+public void <B>setText</B>(java.lang.String&nbsp;text)</PRE>
+<DL>
+<DD>Sets the entire text of this text area.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getText(int, int)"><!-- --></A><H3>
+getText</H3>
+<PRE>
+public final java.lang.String <B>getText</B>(int&nbsp;start,
+                                      int&nbsp;len)</PRE>
+<DL>
+<DD>Returns the specified substring of the document.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>start</CODE> - The start offset<DD><CODE>len</CODE> - The length of the substring
+<DT><B>Returns:</B><DD>The substring, or null if the offsets are invalid</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getText(int, int, javax.swing.text.Segment)"><!-- --></A><H3>
+getText</H3>
+<PRE>
+public final void <B>getText</B>(int&nbsp;start,
+                          int&nbsp;len,
+                          javax.swing.text.Segment&nbsp;segment)</PRE>
+<DL>
+<DD>Copies the specified substring of the document into a segment.
+ If the offsets are invalid, the segment will contain a null string.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>start</CODE> - The start offset<DD><CODE>len</CODE> - The length of the substring<DD><CODE>segment</CODE> - The segment</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getLineText(int)"><!-- --></A><H3>
+getLineText</H3>
+<PRE>
+public final java.lang.String <B>getLineText</B>(int&nbsp;lineIndex)</PRE>
+<DL>
+<DD>Returns the text on the specified line.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>lineIndex</CODE> - The line
+<DT><B>Returns:</B><DD>The text, or null if the line is invalid</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getLineText(int, javax.swing.text.Segment)"><!-- --></A><H3>
+getLineText</H3>
+<PRE>
+public final void <B>getLineText</B>(int&nbsp;lineIndex,
+                              javax.swing.text.Segment&nbsp;segment)</PRE>
+<DL>
+<DD>Copies the text on the specified line into a segment. If the line
+ is invalid, the segment will contain a null string.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>lineIndex</CODE> - The line</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getSelectionStart()"><!-- --></A><H3>
+getSelectionStart</H3>
+<PRE>
+public final int <B>getSelectionStart</B>()</PRE>
+<DL>
+<DD>Returns the selection start offset.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getSelectionStart(int)"><!-- --></A><H3>
+getSelectionStart</H3>
+<PRE>
+public int <B>getSelectionStart</B>(int&nbsp;line)</PRE>
+<DL>
+<DD>Returns the offset where the selection starts on the specified
+ line.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getSelectionStartLine()"><!-- --></A><H3>
+getSelectionStartLine</H3>
+<PRE>
+public final int <B>getSelectionStartLine</B>()</PRE>
+<DL>
+<DD>Returns the selection start line.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="setSelectionStart(int)"><!-- --></A><H3>
+setSelectionStart</H3>
+<PRE>
+public final void <B>setSelectionStart</B>(int&nbsp;selectionStart)</PRE>
+<DL>
+<DD>Sets the selection start. The new selection will be the new
+ selection start and the old selection end.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>selectionStart</CODE> - The selection start<DT><B>See Also:</B><DD><A HREF="../../../processing/app/syntax/JEditTextArea.html#select(int, int)"><CODE>select(int,int)</CODE></A></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getSelectionStop()"><!-- --></A><H3>
+getSelectionStop</H3>
+<PRE>
+public final int <B>getSelectionStop</B>()</PRE>
+<DL>
+<DD>Returns the selection end offset.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getSelectionStop(int)"><!-- --></A><H3>
+getSelectionStop</H3>
+<PRE>
+public int <B>getSelectionStop</B>(int&nbsp;line)</PRE>
+<DL>
+<DD>Returns the offset where the selection ends on the specified
+ line.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getSelectionStopLine()"><!-- --></A><H3>
+getSelectionStopLine</H3>
+<PRE>
+public final int <B>getSelectionStopLine</B>()</PRE>
+<DL>
+<DD>Returns the selection end line.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="setSelectionEnd(int)"><!-- --></A><H3>
+setSelectionEnd</H3>
+<PRE>
+public final void <B>setSelectionEnd</B>(int&nbsp;selectionEnd)</PRE>
+<DL>
+<DD>Sets the selection end. The new selection will be the old
+ selection start and the bew selection end.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>selectionEnd</CODE> - The selection end<DT><B>See Also:</B><DD><A HREF="../../../processing/app/syntax/JEditTextArea.html#select(int, int)"><CODE>select(int,int)</CODE></A></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="isSelectionActive()"><!-- --></A><H3>
+isSelectionActive</H3>
+<PRE>
+public final boolean <B>isSelectionActive</B>()</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getCaretPosition()"><!-- --></A><H3>
+getCaretPosition</H3>
+<PRE>
+public final int <B>getCaretPosition</B>()</PRE>
+<DL>
+<DD>Returns the caret position. This will either be the selection
+ start or the selection end, depending on which direction the
+ selection was made in.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getCaretLine()"><!-- --></A><H3>
+getCaretLine</H3>
+<PRE>
+public final int <B>getCaretLine</B>()</PRE>
+<DL>
+<DD>Returns the caret line.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getMarkPosition()"><!-- --></A><H3>
+getMarkPosition</H3>
+<PRE>
+public final int <B>getMarkPosition</B>()</PRE>
+<DL>
+<DD>Returns the mark position. This will be the opposite selection
+ bound to the caret position.
+<P>
+<DD><DL>
+<DT><B>See Also:</B><DD><A HREF="../../../processing/app/syntax/JEditTextArea.html#getCaretPosition()"><CODE>getCaretPosition()</CODE></A></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getMarkLine()"><!-- --></A><H3>
+getMarkLine</H3>
+<PRE>
+public final int <B>getMarkLine</B>()</PRE>
+<DL>
+<DD>Returns the mark line.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="setCaretPosition(int)"><!-- --></A><H3>
+setCaretPosition</H3>
+<PRE>
+public final void <B>setCaretPosition</B>(int&nbsp;caret)</PRE>
+<DL>
+<DD>Sets the caret position. The new selection will consist of the
+ caret position only (hence no text will be selected)
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>caret</CODE> - The caret position<DT><B>See Also:</B><DD><A HREF="../../../processing/app/syntax/JEditTextArea.html#select(int, int)"><CODE>select(int,int)</CODE></A></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="selectAll()"><!-- --></A><H3>
+selectAll</H3>
+<PRE>
+public final void <B>selectAll</B>()</PRE>
+<DL>
+<DD>Selects all text in the document.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="selectNone()"><!-- --></A><H3>
+selectNone</H3>
+<PRE>
+public final void <B>selectNone</B>()</PRE>
+<DL>
+<DD>Moves the mark to the caret position.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="select(int, int)"><!-- --></A><H3>
+select</H3>
+<PRE>
+public void <B>select</B>(int&nbsp;start,
+                   int&nbsp;end)</PRE>
+<DL>
+<DD>Selects from the start offset to the end offset. This is the
+ general selection method used by all other selecting methods.
+ The caret position will be start if start &lt; end, and end
+ if end &gt; start.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>start</CODE> - The start offset<DD><CODE>end</CODE> - The end offset</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getSelectedText()"><!-- --></A><H3>
+getSelectedText</H3>
+<PRE>
+public final java.lang.String <B>getSelectedText</B>()</PRE>
+<DL>
+<DD>Returns the selected text, or null if no selection is active.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="setSelectedText(java.lang.String)"><!-- --></A><H3>
+setSelectedText</H3>
+<PRE>
+public void <B>setSelectedText</B>(java.lang.String&nbsp;selectedText)</PRE>
+<DL>
+<DD>Replaces the selection with the specified text.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>selectedText</CODE> - The replacement text for the selection</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="isEditable()"><!-- --></A><H3>
+isEditable</H3>
+<PRE>
+public final boolean <B>isEditable</B>()</PRE>
+<DL>
+<DD>Returns true if this text area is editable, false otherwise.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="setEditable(boolean)"><!-- --></A><H3>
+setEditable</H3>
+<PRE>
+public final void <B>setEditable</B>(boolean&nbsp;editable)</PRE>
+<DL>
+<DD>Sets if this component is editable.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>editable</CODE> - True if this text area should be editable,
+ false otherwise</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getRightClickPopup()"><!-- --></A><H3>
+getRightClickPopup</H3>
+<PRE>
+public final javax.swing.JPopupMenu <B>getRightClickPopup</B>()</PRE>
+<DL>
+<DD>Returns the right click popup menu.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="setRightClickPopup(javax.swing.JPopupMenu)"><!-- --></A><H3>
+setRightClickPopup</H3>
+<PRE>
+public final void <B>setRightClickPopup</B>(javax.swing.JPopupMenu&nbsp;popup)</PRE>
+<DL>
+<DD>Sets the right click popup menu.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>popup</CODE> - The popup</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getMagicCaretPosition()"><!-- --></A><H3>
+getMagicCaretPosition</H3>
+<PRE>
+public final int <B>getMagicCaretPosition</B>()</PRE>
+<DL>
+<DD>Returns the `magic' caret position. This can be used to preserve
+ the column position when moving up and down lines.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="setMagicCaretPosition(int)"><!-- --></A><H3>
+setMagicCaretPosition</H3>
+<PRE>
+public final void <B>setMagicCaretPosition</B>(int&nbsp;magicCaret)</PRE>
+<DL>
+<DD>Sets the `magic' caret position. This can be used to preserve
+ the column position when moving up and down lines.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>magicCaret</CODE> - The magic caret position</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="overwriteSetSelectedText(java.lang.String)"><!-- --></A><H3>
+overwriteSetSelectedText</H3>
+<PRE>
+public void <B>overwriteSetSelectedText</B>(java.lang.String&nbsp;str)</PRE>
+<DL>
+<DD>Similar to <code>setSelectedText()</code>, but overstrikes the
+ appropriate number of characters if overwrite mode is enabled.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>str</CODE> - The string<DT><B>See Also:</B><DD><A HREF="../../../processing/app/syntax/JEditTextArea.html#setSelectedText(java.lang.String)"><CODE>setSelectedText(String)</CODE></A>, 
+<A HREF="../../../processing/app/syntax/JEditTextArea.html#isOverwriteEnabled()"><CODE>isOverwriteEnabled()</CODE></A></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="isOverwriteEnabled()"><!-- --></A><H3>
+isOverwriteEnabled</H3>
+<PRE>
+public final boolean <B>isOverwriteEnabled</B>()</PRE>
+<DL>
+<DD>Returns true if overwrite mode is enabled, false otherwise.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="setOverwriteEnabled(boolean)"><!-- --></A><H3>
+setOverwriteEnabled</H3>
+<PRE>
+public final void <B>setOverwriteEnabled</B>(boolean&nbsp;overwrite)</PRE>
+<DL>
+<DD>Sets if overwrite mode should be enabled.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>overwrite</CODE> - True if overwrite mode should be enabled,
+ false otherwise.</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="isSelectionRectangular()"><!-- --></A><H3>
+isSelectionRectangular</H3>
+<PRE>
+public final boolean <B>isSelectionRectangular</B>()</PRE>
+<DL>
+<DD>Returns true if the selection is rectangular, false otherwise.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="setSelectionRectangular(boolean)"><!-- --></A><H3>
+setSelectionRectangular</H3>
+<PRE>
+public final void <B>setSelectionRectangular</B>(boolean&nbsp;rectSelect)</PRE>
+<DL>
+<DD>Sets if the selection should be rectangular.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>rectSelect</CODE> - True if the selection should be rectangular,
+ false otherwise.</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getBracketPosition()"><!-- --></A><H3>
+getBracketPosition</H3>
+<PRE>
+public final int <B>getBracketPosition</B>()</PRE>
+<DL>
+<DD>Returns the position of the highlighted bracket (the bracket
+ matching the one before the caret)
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getBracketLine()"><!-- --></A><H3>
+getBracketLine</H3>
+<PRE>
+public final int <B>getBracketLine</B>()</PRE>
+<DL>
+<DD>Returns the line of the highlighted bracket (the bracket
+ matching the one before the caret)
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="addCaretListener(javax.swing.event.CaretListener)"><!-- --></A><H3>
+addCaretListener</H3>
+<PRE>
+public final void <B>addCaretListener</B>(javax.swing.event.CaretListener&nbsp;listener)</PRE>
+<DL>
+<DD>Adds a caret change listener to this text area.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>listener</CODE> - The listener</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="removeCaretListener(javax.swing.event.CaretListener)"><!-- --></A><H3>
+removeCaretListener</H3>
+<PRE>
+public final void <B>removeCaretListener</B>(javax.swing.event.CaretListener&nbsp;listener)</PRE>
+<DL>
+<DD>Removes a caret change listener from this text area.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>listener</CODE> - The listener</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="cut()"><!-- --></A><H3>
+cut</H3>
+<PRE>
+public void <B>cut</B>()</PRE>
+<DL>
+<DD>Deletes the selected text from the text area and places it
+ into the clipboard.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="copy()"><!-- --></A><H3>
+copy</H3>
+<PRE>
+public void <B>copy</B>()</PRE>
+<DL>
+<DD>Places the selected text into the clipboard.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="paste()"><!-- --></A><H3>
+paste</H3>
+<PRE>
+public void <B>paste</B>()</PRE>
+<DL>
+<DD>Inserts the clipboard contents into the text.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="removeNotify()"><!-- --></A><H3>
+removeNotify</H3>
+<PRE>
+public void <B>removeNotify</B>()</PRE>
+<DL>
+<DD>Called by the AWT when this component is removed from it's parent.
+ This stops clears the currently focused component.
+<P>
+<DD><DL>
+<DT><B>Overrides:</B><DD><CODE>removeNotify</CODE> in class <CODE>javax.swing.JComponent</CODE></DL>
+</DD>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="processKeyEvent(java.awt.event.KeyEvent)"><!-- --></A><H3>
+processKeyEvent</H3>
+<PRE>
+public void <B>processKeyEvent</B>(java.awt.event.KeyEvent&nbsp;evt)</PRE>
+<DL>
+<DD><DL>
+<DT><B>Overrides:</B><DD><CODE>processKeyEvent</CODE> in class <CODE>javax.swing.JComponent</CODE></DL>
+</DD>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<!-- ========= END OF CLASS DATA ========= -->
+<HR>
+
+
+<!-- ======= START OF BOTTOM NAVBAR ====== -->
+<A NAME="navbar_bottom"><!-- --></A>
+<A HREF="#skip-navbar_bottom" title="Skip navigation links"></A>
+<TABLE BORDER="0" WIDTH="100%" CELLPADDING="1" CELLSPACING="0" SUMMARY="">
+<TR>
+<TD COLSPAN=2 BGCOLOR="#EEEEFF" CLASS="NavBarCell1">
+<A NAME="navbar_bottom_firstrow"><!-- --></A>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="3" SUMMARY="">
+  <TR ALIGN="center" VALIGN="top">
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-summary.html"><FONT CLASS="NavBarFont1"><B>Package</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#FFFFFF" CLASS="NavBarCell1Rev"> &nbsp;<FONT CLASS="NavBarFont1Rev"><B>Class</B></FONT>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-tree.html"><FONT CLASS="NavBarFont1"><B>Tree</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../deprecated-list.html"><FONT CLASS="NavBarFont1"><B>Deprecated</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../index-all.html"><FONT CLASS="NavBarFont1"><B>Index</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../help-doc.html"><FONT CLASS="NavBarFont1"><B>Help</B></FONT></A>&nbsp;</TD>
+  </TR>
+</TABLE>
+</TD>
+<TD ALIGN="right" VALIGN="top" ROWSPAN=3><EM>
+</EM>
+</TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+&nbsp;<A HREF="../../../processing/app/syntax/InputHandler.Wrapper.html" title="interface in processing.app.syntax"><B>PREV CLASS</B></A>&nbsp;
+&nbsp;<A HREF="../../../processing/app/syntax/KeywordMap.html" title="class in processing.app.syntax"><B>NEXT CLASS</B></A></FONT></TD>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+  <A HREF="../../../index.html?processing/app/syntax/JEditTextArea.html" target="_top"><B>FRAMES</B></A>  &nbsp;
+&nbsp;<A HREF="JEditTextArea.html" target="_top"><B>NO FRAMES</B></A>  &nbsp;
+&nbsp;<SCRIPT type="text/javascript">
+  <!--
+  if(window==top) {
+    document.writeln('<A HREF="../../../allclasses-noframe.html"><B>All Classes</B></A>');
+  }
+  //-->
+</SCRIPT>
+<NOSCRIPT>
+  <A HREF="../../../allclasses-noframe.html"><B>All Classes</B></A>
+</NOSCRIPT>
+
+
+</FONT></TD>
+</TR>
+<TR>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+  SUMMARY:&nbsp;<A HREF="#nested_classes_inherited_from_class_javax.swing.JComponent">NESTED</A>&nbsp;|&nbsp;<A HREF="#field_summary">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor_summary">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_summary">METHOD</A></FONT></TD>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+DETAIL:&nbsp;<A HREF="#field_detail">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor_detail">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_detail">METHOD</A></FONT></TD>
+</TR>
+</TABLE>
+<A NAME="skip-navbar_bottom"></A>
+<!-- ======== END OF BOTTOM NAVBAR ======= -->
+
+<HR>
+
+</BODY>
+</HTML>

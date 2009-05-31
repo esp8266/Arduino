@@ -1,0 +1,1251 @@
+0165 pde (1.0.3)
+X no changes in this release 
+
+
+_ add option to use full screen exclusive mode on present inside pde?
+_   override default setting of macosx (yes) and linux/win (no)
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1043
+_   linux present mode isn't working properly
+
+_ make better version of the windows launcher for debugging
+
+_ update to java 6u12
+
+X try adding a space to the name of the help menu for beachball problems
+_   this works, might be useful to make the switch
+_ disable sketchbook and examples menus on os x?
+
+_ after deleting a tab code still get's preprocessed, pde file is not forgotten
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1092
+
+_ proper libraries warning dialog
+_   check if libraries folder does not exist
+_   check to see if other libraries are installed
+_   warn user about moving libraries and restarting
+
+E2 _ Default wildcard imports are causing naming conflicts
+E2 _   http://dev.processing.org/bugs/show_bug.cgi?id=1103
+
+_ fix isManagingFocus error inside JEditTextArea
+
+_ windows exported exe problems (pcho)
+_   lib folder goes missing, give an error
+_   also any .jar files that are missing, give an error
+_   showing more debug messages (command line?)
+
+_ can't rename a .pde file as a .java file
+_ shift-tab with no selection should go back two spaces
+
+_ add general outline of 1.5 and 2.0 releases to the faq
+_   video is on its way out, no good/simple solution for fixing now
+_   andreas' library will do good things eventually
+
+_ move library examples to the examples menu
+_   do this once the library documentation has been fixed up
+
+_ need to do a better job of error handling inside main()
+
+4 _ mangled menu text with java 6u10
+4 _   need to try adding the d3d flag to the .exe
+4 _   http://dev.processing.org/bugs/show_bug.cgi?id=1065
+
+
+[ needs verification ] 
+
+_ export and export to application fail with umlauts in folder name
+_   http://dev.processing.org/bugs/show_bug.cgi?id=252
+_ stop button needs to update itself and work properly [1.0]
+_   also editor buttons to light up and clear properly 
+_   http://dev.processing.org/bugs/show_bug.cgi?id=396
+_   need someone to go out and test all scenarios of this
+
+
+[ known bugs ]
+
+_ command line support is currently broken
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1048
+_   some fixes can be found in the bug report
+_ video library threading problems with other libraries
+_   http://dev.processing.org/bugs/show_bug.cgi?id=882
+_   using Capture.list() before size() sometimes works
+_   also placing OpenGL inside the extensions directory
+_ serial.available() broken with video
+_   http://dev.processing.org/bugs/show_bug.cgi?id=829
+_ first few frames of OpenGL sketches on Windows run slowly
+_   http://dev.processing.org/bugs/show_bug.cgi?id=874
+_ Slow response or spinning wheel from the menu bar on Mac OS X
+_   http://dev.processing.org/bugs/show_bug.cgi?id=786
+_ sometimes not launching
+_   this seems to be a threading problem, like an NPE on load/open
+_   probaby related to the other load/save sync errors
+_ significant point() and set() slowdown on OS X
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1094
+
+
+with casey
+_ specifically add "eclipse" to integration description
+_ link books and sample chapters from the "getting started" portion of the faq
+_ keep examples.zip in a zip file? (5000 files @ 30 MB instead of 15 MB zip)
+_   mark examples as untitled (rather than read-only)
+_   maybe even pull these directly from the zip file?
+_ load examples from zip files
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1049
+_   disallow add file to sketch, export, export application
+_   pretty much anything inside the sketch?
+_   but don't do this with untitled, cuz it kinda stinks
+_   this is too weird--just put examples into individual zip files
+_   mark example files as untitled
+_   though will that require the sketch to be saved before export?
+_ find in reference issues
+_   if() and for() don't work, they look for for_.html instead of for.html
+_   XMLElement is not linked for find in ref
+_   the ? operator is not in find in ref (no ref page either?)
+_ update keywords generator script on the site
+_   perhaps move this closer to the dev process?
+_ move reference folder around so that it matches site organization
+_   otherwise several links break on the main faq page
+_ discuss i18n issues and proper system (?)
+_ look through 404 issues on the site
+_ TRIANGLE_STRIP not highlighted for "find in reference"
+_   nor is it listed on the reference page
+_   so students can't find the ref for it
+_   needs to link TRIANGLE_STRIP to the beginShape() reference
+
+
+libraries and classpaths [1.0]
+_ versioning info 
+_   http://java.sun.com/j2se/1.5.0/docs/guide/extensions/versioning.html
+_ java.ext.dirs for /System/Library/Java/Extensions
+_   http://java.sun.com/j2se/1.5.0/docs/guide/extensions/spec.html
+_   can set java.ext.dirs to something else 
+_   on osx, just ignore anything in /Library/Java/Extensions (but not others)?
+_ native lib stuff, use native.txt in lib folder, then:
+_   String osName = System.getProperty("os.name");
+_   String osArch = System.getProperty("os.arch");
+X update to jogl 1.1.1
+X   do this with enhanced library/platform support
+X see how platform is determined by jogl / use for lib import
+_ add control for dependencies (i.e. svg needs xml), needed for export
+_   http://dev.processing.org/bugs/show_bug.cgi?id=518
+_ add "pretty menu name" to the export.txt file
+_ move export.txt to xml? (nah, it's only flat information)
+_ need better platform designation setup for libs
+_ library installation should use the sketchbook folder, not the p5 folder
+_   actually enforce this, give users a warning about other libs
+_ need to deal with classpath conflicts
+_   avoid garbage that people have installed on their machines
+_   antlr.jar in the classpath will cause trouble.. 
+_     http://processing.org/discourse/yabb_beta/YaBB.cgi?board=SoftwareBugs;action=display;num=1138652326
+_   jogl jar files, or jogl install will cause trouble
+_     /System/Library/Java/Extensions or /Library/Java/Extensions
+_     the /System one contains qtjava
+_     the /Library one is empty (by default), maybe skip it?
+_ when a conflicting library is found, need to report it
+_   altho prolly only when it's actually different (md5hash it?)
+_   this seems to be causing a lot of trouble with recent releases
+_   (opengl changes and whatnot)
+_ jar files like the bad aiexport plugin will cause serious problems
+_   need to ignore processing.core classes showing up in other jar files
+_   tougher than it looks, because it all depends on what java wants to use
+_     i.e. even if not specified, the stuff will be in the classpath
+_   need to make classpath code be less promiscuous
+_   the order of adding libraries to classpath should be opposite
+_     the important local libraries should be first in cp, user contrib later
+_   http://dev.processing.org/bugs/show_bug.cgi?id=321
+_ java.extension.dirs has the library/extn stuff
+_   can probably set this blank
+_ the jar from which a class file has been loaded
+_   getClass().getProtectionDomain().getCodeSource().getLocation().getFile() 
+_ example from jsyn
+JSyn Installer build 011
+java.vm.version = 1.5.0_07-87
+java.library.path = .:/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java
+java.ext.dirs = /Library/Java/Extensions:/System/Library/Java/Extensions:/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Home/lib/ext
+Installing Native library JSynV142
+Copy: http://www.softsynth.com/jsyn/plugins/archives/libJSynV142.jnilib
+  to: /Users/fry/Library/Java/Extensions/libJSynV142.jnilib
+Native component JSynV142 downloaded successfully.
+Installing JAR file JSynClasses.jar
+Copy: http://www.softsynth.com/jsyn/plugins/archives/JSynClasses.jar
+  to: /Users/fry/Library/Java/Extensions/JSynClasses.jar
+JAR file JSynClasses.jar downloaded successfully.
+Note: you must restart your browser before running any JSyn Applets!
+Installation completed.
+_ set DYLD_LIBRARY_PATH to include .dylib and other framework stuff
+_   java.library.path will only handle .jnilib stuff
+_ need better error messages for broken api / library troubles
+_   e.g. ocd is broken in 0125 because of method signature changes
+_ could have library developers update compatability note
+_   so they would need to test library and say "compatible with 0110"
+_   before it would automatically update or show as an update
+_ tools -> get library
+_   library url: [ http://blahblah.org/something ]
+_   this would grab something.version, and something.zip
+_   maybe something.xml that would include a bunch of background
+_ tools -> update libraries
+_   this would check the something.version to see if it's newer
+_ document how to add libraries: put in sketchbook (not libraries folder)
+_ library/download.url and library/home.url
+_ if there's a reference subfolder, add that to the help menu
+o   and enable it for "find in reference"
+X   nice idea but too error-prone
+
+
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+
+
+DOC / Bugzilla 
+
+_ add bug voting to the bugs db before 1.0 release?
+_ remove LATER, REMIND, WORKSFORME as categories; add VERIFY
+_ set default reported bug priority to 4 or 5
+_ * disable changes to a bug (except by admin) after closed *
+_ fix "reply" garbage added
+_ fix "back to bug# 778"
+_ remove patch designation
+_ make severity a radio button (people aren't using it)
+_   change to just ( ) Problem ( ) Feature Request (remove 'severity') 
+_ remove 'platform' dropdown
+_ specify some versions? also add back a "target version" for fix?
+_ explanation of P1 through P5
+_ goes to bugs page
+_   longer description of "i found a bug"
+_   what was the unfinished bullet item?
+_   also something i forgot to add to the opengl faq stuff
+_ move the bugs section of the troubleshooting page to dev.processing.org/bugs
+_ search for ALL in the bugs db turns up:
+http://dev.processing.org/bugs/buglist.cgi?bug_status=UNCONFIRMED&bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&bug_status=RESOLVED&bug_status=VERIFIED&bug_status=CLOSED
+http://dev.processing.org/bugs/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED
+_ http://dev.processing.org/bugs/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&query_format=advanced&order=bugs.priority,bugs.priority%2Cbugs.resolution%2Cbugs.bug_id&query_based_on=
+_ add note to bugs db asking to please use archive sketch and attach
+_ make a web page that describes how to use the bugs db
+_   don't change the bug subject/summary text
+_   don't mess with priorities (i will)
+_ need to change what people can edit in the bug report
+_   do something about the bug summary field to not make it editable
+_   maybe just move it away from its current location?
+_   call it "bug title" instead of "summary"?
+_   http://dev.processing.org/bugs/show_bug.cgi?id=253
+_ layout problems with attachments page
+_   http://dev.processing.org/bugs/show_bug.cgi?id=254
+_ layout problems with logout page
+_   http://dev.processing.org/bugs/show_bug.cgi?id=255
+_ bug duplicate text field doesn't retain focus 
+_   http://dev.processing.org/bugs/show_bug.cgi?id=256
+_ finish putting all the bugs into bugzilla
+_   add a notation to the bugs site re: reading the faq and searching first
+X   move p5 site bug reporting to bugzilla
+_   do the same for suggestions
+_     and detail the suggestions policy on the dev site: diy
+_   post a page explaining the bug reporting system
+_ arrays (frequent questions)
+_   using arraylist (avoid vector)
+_   cannot use generics
+_   using mod to avoid shifting an array
+_   append is slow, arraycopy is fast
+_   whether arraycopy works to copy array to itself
+_   using expand and arrays to move quickly
+
+
+DOC / Write Me
+
+_ PDE locks up during setup() (since no window shown)
+_   http://dev.processing.org/bugs/show_bug.cgi?id=687
+_   maybe better to do an example of running code on another thread
+_   when it's done as a script
+_ stop() to shut down a sketch (but not quit/close window)
+_ MIN_FLOAT, MAX_FLOAT, also the difference from the Java functions
+_   also MIN_INT and MAX_INT, even though those are more similar
+_ update the reference to cover parseXxxx() stuff
+_   also add notes about parseInt/Float(blah, otherwise)
+_ also parseInt and parseFloat, how they can return another number or NaN
+_   should the default be NaN or 0?
+_ get/set are faster way draw screen space images, but no tint, no translations
+_ make sure the docs include "beginShape() cannot be nested"
+_   also add error messages to the renderers
+_   also note that ellipse() et al use beginShape()
+_   and that java2d should complain if people try it
+_ method to go from function name to the included examples where used?
+_ encourage use of set() instead of point() in the drawing api
+_   http://processing.org/discourse/yabb_beta/YaBB.cgi?board=SoftwareBugs;action=display;num=1114204116
+_ moviemaker video sizes / usability
+_   http://processing.org/discourse/yabb_beta/YaBB.cgi?board=Exhibition;action=display;num=1211318862
+_ other projects on which p5 is built 
+_   no longer oro matcher and jikes
+_   add: quaqua, jna, registry stuff, .. ?
+_ quicktime likes to crash (not just on windows)
+_   http://dev.processing.org/bugs/show_bug.cgi?id=791
+_ noLoop() isn't the same as "finished", though it's sometimes used that way
+_   to finish, use exit() (though that will make the window close)
+_   add this to ref once halt() is finished
+_ errors in pdf/index.html examples
+_   probably remove these, move the useful ones to the examples folder
+_   that way people will read the reference
+_ i can't fix these:
+An unexpected error has been detected by HotSpot Virtual Machine:
+# EXCEPTION_ACCESS_VIOLATION
+all i can do is find things that might trigger them, but it's more likely
+than not to be a java problem, and not something that can be fixed
+_ notes about getting best results from text in each renderer
+_   http://dev.processing.org/bugs/show_bug.cgi?id=466
+_ add to mac reference for present mode
+_   can make full screen work via Info.plist key
+_   http://processing.org/discourse/yabb_beta/YaBB.cgi?board=Syntax;action=display;num=1135921427;start=7#7
+_ add to troubleshooting
+_   problem with big floats:
+_   http://processing.org/discourse/yabb/YaBB.cgi?board=Syntax;action=display;num=1061302380
+_   problem with small floats:
+_   http://processing.org/discourse/yabb_beta/YaBB.cgi?board=Programs;action=display;num=1115500448
+_ fix syntax highlighting of focusGained and others
+_   http://dev.processing.org/bugs/show_bug.cgi?id=659
+_ verify (and document) public access members of PApplet
+_   http://dev.processing.org/bugs/show_bug.cgi?id=660
+_ some docs missing (therefore not syntax highlighting)
+_   http://dev.processing.org/bugs/show_bug.cgi?id=661
+_ constants that are not highlighting (WINDOWS the only one?)
+_   http://dev.processing.org/bugs/show_bug.cgi?id=662
+_ consoleXxxx and untitledXxxx folders in /tmp
+_   console may be useful for debugging
+_ untitled folders are stored in temp folder
+_ switching into present mode in info.plist
+        <key>LSUIPresentationMode</key>
+        <integer>4</integer> 
+_ PApplet.this doesn't work
+_   doesn't work in javac either--needs to be ClassName.this
+_   sketchname.this also doesn't work, because Temporary_NNNN used for name
+_   but since it's another tab/class, will run externally
+_   so should make the external version use the actual sketch name not temp
+_   can't use PApplet.this, doesn't seem to like that
+_   instead, must pass variable to inner class
+_ errors with serial and libraries
+Exception in thread "Thread-2" java.lang.NoClassDefFoundError:
+processing/core/PApplet
+    at processing.serial.Serial.<init>(Serial.java:156) 
+generally, that error means that something is missing from the
+CLASSPATH. the NoClassDefError gives erroneous feedback about *what*
+class is actually missing, as of java 1.3+ (yay!)
+so perhaps conflicting versions of a library in the sketchbook (solve
+this by setting to an empty sketchbook temporarily) or files might be
+installed in the CLASSPATH variable or something conflicting in
+/System/Library/Extensions. 
+
+
+DOC / Text
+
+_ how to use textMode(SHAPE) with opengl
+_   things will be extremely slow (fix later)
+_   things will also be very ugly on-screen
+_ text being nicer in java2d
+_   use createFont() to load the font or use a font from your machine
+_   note that createFont() is no good for applets/export to web
+_ textMode(SCREEN) for P2D and P3D for nice fast text in screen space
+_   currently slow in JAVA2D and OPENGL, but this will improve
+_ what is the vlw font file format?
+_ shapes from 3D type
+_   the way to do it (will improve later) is to use some undocumented features  
+_   1) you have to use the OPENGL renderer 
+_   2) use textMode(SHAPE); 
+_   3) use createFont() (which you already are) 
+_   this will convert all the shape data from the fonts for writing. 
+_   it will be *extremely* slow, which is part of why it's not documented yet. 
+_   but it will work with beginRaw().
+
+
+DOC / Discourse Board
+
+_ auto-close threads when not posted to for 30(?) days
+_ add basic guidelines for posting to the board
+_   0. be polite. going on about how much something "sucks" or is "stupid" will make you look like an eight-year-old.
+_   1. don't double (or triple) post
+_   2. if you're having trouble, first see the troubleshooting page
+_   3. if you have a bug, first search the bugs database
+_   4. first check the FAQ
+_   5. use the search bar at the top of every page
+_   6. read revisions.txt
+_ someone wrote up an initial version of this
+_ how to put [code] around blocks of code
+_   also mention contributed plugin for formatting
+_   also the reference page on the bb commands
+_ i don't answer to instant messages
+_ i don't answer email
+_ use the bugs db instead of the bugs board
+_ use the search box (not the forum search)
+_ read the faq, read the faq
+_ read the reference.. right-click on a word and choose "find in ref"
+_ non-processing posts will be deleted (not a java discussion board)
+_ no duplicate posts - find an area and post to
+_ explanation of what the areas are
+_ be sure to look at the reference, especially the extended reference
+_   questions like 'how do i do x' are often solved by looking at the api
+_   for instance, to get the framerate, use framerate()
+
+
+DOC / Other
+
+_ why adding .0001 to a float doesn't work
+_   and how they're imprecise in general (use nf)
+_   http://processing.org/discourse/yabb_beta/YaBB.cgi?board=Syntax;action=display;num=1130877990
+_ why strong typing? (link also to language thing on main page)
+_ we cannot commit to any sort of timeframe on releases
+_ under the hood - basic
+_   it's all java
+_   don't use awt
+_   most things are imported by default
+_ under the hood - complex 
+_   how to get started with coding
+_   everything subclasses PApplet
+_   if you need a particular name, add it with "extends PApplet"
+_   all code from tabs is joined to one sketch
+_   if you want it separate, then you have to make .java files
+_     in doing so, you'll lose access to 'g'
+_   add main() to your app to make it run on its own
+_   preproc stuff.. have to make setup() into public void setup()
+_     (same for key events and all that)
+_ performance 
+_   video stinks.. java2d stinks.. macs stink
+_   note in the 'drawing in 2d' section of faq
+_ fastest machine possible
+_   turn off hyperthreading in the bios
+_   nice gfx card only helps opengl
+_   dual processor not particularly useful, unless you make more threads
+_     but making more threads is often more work than is useful
+_ is there a way to do xxx?
+_   advanced users who are outgrowing the basic reference: 
+_   be sure to check the "complete" reference
+_ change bugs.html to issues.html
+_   and add a redirect in httpd.conf
+_ need to document how subclass of pgraphics works
+_   what are the necessary bits that need to be subclassed
+_   simple handling of colors, what fields are available
+_   how to get the matrices
+_   simple endshape handler
+
+
+DOC / Site
+
+_ also mention in keyPressed docs that ASCII key codes will not be coded
+_   it's just how java is (maybe this is already in there?)
+_ add note about adding libraries to the sketchbook to the reference
+_ add note in environment reference about how to add something to the sketch
+_   (code, .java files, etc)
+_ make sure that psound has been removed (from docs, ref, mentions)
+_ make source link on p5 site go direct to the source
+_   or at least explain how to navigate
+_ post releases on sourceforge so that international mirrors are better?
+_ start creating source tarball for each release?
+_ roll over the discourse board for 1.0?
+_ board stuff
+_   only allow moderators to delete posts
+_   set "no smileys" as the default (better for posting code)
+_ add stuff about the history into the people section
+_   descended from dbn, but not dbn, etc..
+_ remove the 'search' item from yabb.cgi
+
+
+DOC / Examples
+
+_ add to key reference a pointer to an example that tracks all keys
+_   write simple example that tracks all keys
+_ making things fast with pixel operations
+_ write a threading example
+_   show an example of how to handle callback into the app
+X   or handle this some more intelligent way, super.stop() is needed.
+X   registerDispose() does the trick
+_   http://processing.org/discourse/yabb/YaBB.cgi?board=Syntax;action=display;num=1083574943
+_   http://processing.org/discourse/yabb/YaBB.cgi?board=Syntax;action=display;num=1067383998
+_   scripts: how to make a long setup() sleep so that things don't lock way up
+_ write an example that uses HashMap (or Hashtable)
+_ write an example that uses ArrayList properly
+_ get xml library example in there
+_ simple method for having a clickable region or sprite with rollover
+
+
+DOC / Hacks
+
+_ clipboard implementation example
+_   http://dev.processing.org/bugs/show_bug.cgi?id=167
+_ JAI handles setting image size for png (check javax.imageio?) 
+_   PNGEncodeParam png = PNGEncodeParam.getDefaultEncodeParam(bufImage);
+_   png.setPhysicalDimension(round(dpi*39.370079), round(dpi*39.370079), 1);
+_   JAI.create("filestore", bufImage, filename+".png", "PNG");
+_ also an example of setting the jpeg compression (included in bug report)
+_   http://dev.processing.org/bugs/show_bug.cgi?id=342
+_ write a timer class/example library
+_ post to web example 
+_   particularly for uploading image data
+_   along with php script to handle receive
+_   this is in hacks, but 
+_   http://processing.org/discourse/yabb_beta/YaBB.cgi?board=VideoCamera;action=display;num=1117194066#7
+_ how do i add gui to a sketch?
+_   don't use awt components
+_   how to use swing and embed components inside p5
+_ explain how to integrate code with swing
+_   use a separate environment, call init(), use noLoop(), redraw()
+_   use JPopupMenu.setDefaultLightWeightPopupEnabled(false); for zorder
+_   http://processing.org/discourse/yabb_beta/YaBB.cgi?board=Integrate;action=display;num=1147670059
+_ write documentation on general use of processing.core
+_   note that applet is itself a Component
+_ eclipse
+_   document how to properly integrate with eclipse
+_   add runtime args to opengl library so that it sets path properly
+_   add explanation for using subclipse to get p5
+_     make a src folder, data folder location
+_   export to eclipse
+_     how to do this with subclipse instructions?
+
+
+
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+
+PDE - Processing Development Environment
+
+
+PDE / Warnings
+
+_ proper dialog support
+_   http://javagraphics.blogspot.com/2008/06/joptionpane-making-alternative.html
+_ two-tiered dialogs for everything - use big font/little font style throughout
+_ option to suppress warning dialogs
+_   starting with the one about modifying the sketch name for spaces
+_   http://processing.org/bugs/show_bug.cgi?id=3
+_ the first time someone hides a tab, put up a msg explaining what it does
+_   "don't warn me about this anymore"
+_ add "don't warn me about this" for sketch renaming
+_   make sure renamed version doesn't exist already
+_ prompt user before nuking applet or application folders
+_   along with a "don't ask me later"
+_ include a note that 'applet' folder will get emptied/rewritten
+_   or rename the old applet folder to something else? (too messy)
+_   http://dev.processing.org/bugs/show_bug.cgi?id=61
+
+
+PDE / Compiler & Preprocessor
+
+_ add local variables to PdeRecognizer
+_   remove static methods in PdePreprocessor, instead pull things from recog
+_ need better error messages in general
+_   some means to link out to further documentation (e.g. AIOOBE, NPE)
+_ add support for multiple errors from the compiler
+_   actual error may be 4th of 5
+_   maybe a dropdown list thing, with the first just shown?
+_   http://dev.processing.org/bugs/show_bug.cgi?id=58
+_ with additional .pde files, don't allow static mode in front tab
+_ don't allow "for (blah; blah; blah) ;"
+_   or if (blah blah blah) ;
+_   it's never useful. students can use { } if they want an empty block
+_ Update ANTLR grammar to support 1.5 syntax
+_   http://dev.processing.org/bugs/show_bug.cgi?id=598
+_ preproc cant handle labels to break/continue nested loops
+_   http://dev.processing.org/bugs/show_bug.cgi?id=631
+_ imports inside comments are being included
+_ toInt() needs to go away in time for the book.. fix parser bugs
+_ using a processing keyword as a variable name gives unhelpful error message
+_   http://dev.processing.org/bugs/show_bug.cgi?id=213
+_ casting problems in the parser
+_   straighten out int() -> toInt() conversions
+_   float u = float(x)/width; works.
+_   float u = (float(x)/width); doesn't work: "unexpected token: float".
+_   float u = (x/float(width)); works! 
+_   http://dev.processing.org/bugs/show_bug.cgi?id=4
+_   return (int(5.5)) causes an error
+_ random, single slash in the code doesn't throw an error
+_   (just gets removed by the preprocessor)
+_   http://processing.org/bugs/show_bug.cgi?id=6
+_ allow doubles in preproc
+_   (for casting, etc) particularly for Math.cos() et al
+_   http://processing.org/bugs/show_bug.cgi?id=7
+_ don't allow goofy case versions of reserved words
+_   keypressed should maybe throw an error
+_   http://dev.processing.org/bugs/show_bug.cgi?id=9
+_ missing brackets, unmatched brackets
+_   http://dev.processing.org/bugs/show_bug.cgi?id=13
+_ "unexpected token void" -> "You're mixing dynamic and static mode"
+_   http://dev.processing.org/bugs/show_bug.cgi?id=14
+_ expecting RPAREN messages are ugly
+_   http://dev.processing.org/bugs/show_bug.cgi?id=15
+_ not enough args for triangle (or args in general) 
+_   throws out bizarre message 
+_   http://dev.processing.org/bugs/show_bug.cgi?id=17
+_ if 'void' left out before loop or setup, cryptic message about
+_   'constructor loop must be named Temporary_23498_2343'
+_   add a better handler for this specific thing?
+_   http://dev.processing.org/bugs/show_bug.cgi?id=18
+_ using a keyword as a variable name gives unhelpful error message
+_   http://dev.processing.org/bugs/show_bug.cgi?id=212
+_ unspecified return type creates compile error
+_   or maybe not? followup said maybe not
+_   http://dev.processing.org/bugs/show_bug.cgi?id=379
+_ Blah.class will confuse the preproc
+_   http://dev.processing.org/bugs/show_bug.cgi?id=481
+_ non-matching curly brackets sometimes don't cause an error
+_   http://dev.processing.org/bugs/show_bug.cgi?id=507
+_ syntax highlighting error with // and /*
+_   http://dev.processing.org/bugs/show_bug.cgi?id=609
+_ "missing a /* from the end of a comment" message
+_   enter a bug for this, it's bound to be found
+_   "multipart/*" produces the error
+_   even though things are inside a quoted txt block
+_ copy running code from /tmp/buildXXxxx on crash of p5
+_   should probably make a way to save/recover code
+_   make the buildXxxx folders relate to time/date?
+_ NullPointerException on unterminated comment at end of code
+_   and OutOfMemoryError and weird lockup
+_   http://dev.processing.org/bugs/show_bug.cgi?id=16
+_ also OutOfMemoryError if a quote is not terminated
+_   http://dev.processing.org/bugs/show_bug.cgi?id=763
+_ preprocessor error if last line of code is a comment with no CR after it,
+_   an OutOfMemoryError wants to happen, 
+_   but right now there's a hack to add a CR in PdePreprocessor
+_   http://dev.processing.org/bugs/show_bug.cgi?id=5
+_ Parsing error when using char literals
+_   http://dev.processing.org/bugs/show_bug.cgi?id=281
+_ Improve detection and handling of missing semicolons
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1036
+
+
+PDE / Editor
+
+_ improve update check message "a new release (1.0.1) is available"
+_   be more descriptive, use a second line in latest.txt
+_   maybe just include the full text of the update message there?
+_ go through other sketch-opening menus to check for disappearing sketches
+_ deal with isManagingFocus() warning in the editor src
+_ should really be doing the 'right' thing with sketch file handling
+_   create temporary file when saving
+_   once done writing, use remove the original and rename the old
+_   some basic stuff like this..
+_   http://dev.processing.org/bugs/show_bug.cgi?id=968
+_ when disk is full, Processing zeroes files when it tries to save changes
+_   http://dev.processing.org/bugs/show_bug.cgi?id=967
+_ sketch marked as modified too aggressively
+_   http://dev.processing.org/bugs/show_bug.cgi?id=328
+_ Closing the last window doesn't cause PDE to save its position/contents/etc
+_   (when the pref for close last window = quit is set)
+_   http://dev.processing.org/bugs/show_bug.cgi?id=835
+_ not remembering window size/placement preferences
+_   http://dev.processing.org/bugs/show_bug.cgi?id=837
+_ saved window positions.. if displays has changed, becomes a problem
+_   record the display that it was on?
+_     GraphicsDevice gd = frame.getGraphicsConfiguration().getDevice();
+_   make sure that the application is within the bounds of the current display?
+_   (from 0, 0 to width, height)
+_   messy since some displays have negative coords
+_   http://dev.processing.org/bugs/show_bug.cgi?id=72
+_ [LaunchRunner Error] processing.app.Base.main(String[]) threw an exception
+_   http://dev.processing.org/bugs/show_bug.cgi?id=821
+_ file-save stops running sketch
+_   http://dev.processing.org/bugs/show_bug.cgi?id=810
+_ strange NullPointerException problem prevents launch
+_   some kind of NPE in handleOpenInternal and friends
+_   appears to be a synchronization problem with the loading
+_ when opening from double-click on the mac, doesn't replace untitled
+_   or in general, issues between opening new window and another launching
+_   probably need to synchronize the file open methods inside Base
+_   (could in fact cause nastiness with editors[] access)
+_ editors opening up at the same time on load?
+_   either synchronize the open (at a minimum)
+_   or wait for mac handlers to register an open event
+_   can also cause problems with opening multiple copies of same sketch
+_ after fixing name of sketch, ensure sketch of that name does not exist
+_ do quick fix for tab bar
+_   don't show tabs when there are too many
+_   maybe move the list of files to the top?
+_   or indicate which are visible somehow
+_   slightly longer.. rearrange?
+_     or just show tabs in (alpha?) order based on what's most recently used
+_   have some indicator that shows the tabs when they've disappeared
+_   or little mini tabs that expand/contract?
+_     and a way to control who's expanded and not
+_ add auto-save to the editor
+_   http://dev.processing.org/bugs/show_bug.cgi?id=739
+_ dragging title bar while sketch running causes strange selection behavior
+_   http://dev.processing.org/bugs/show_bug.cgi?id=504
+_ shortcuts not working after rename? (osx only?)
+_   http://dev.processing.org/bugs/show_bug.cgi?id=505
+_ convert tabs to spaces when pasting text
+_   http://dev.processing.org/bugs/show_bug.cgi?id=506
+_ add "recent files" list to open menu?
+_ unchecking 'use external editor' sketch should not set modified
+_   dangerous if a version that hasn't been re-loaded has possibility
+_   to overwrite. i.e. make a change and save in external editor,
+_   don't actually 
+_ when running with external editor, hide the editor text area
+_   http://dev.processing.org/bugs/show_bug.cgi?id=20
+_ horizontal scroller gets weird sometimes
+_   http://dev.processing.org/bugs/show_bug.cgi?id=23
+_ lock the minimum size for the main processing editor frame
+_   if it's made too small, stuff from the bottom disappears
+_   http://dev.processing.org/bugs/show_bug.cgi?id=25
+_ add mnemonics for menus (alt-f to open 'file')
+_   http://dev.processing.org/bugs/show_bug.cgi?id=26
+_ option to just print all code in project
+_   option to export all the code as colored html
+_   http://dev.processing.org/bugs/show_bug.cgi?id=28
+_ "page setup" sucks in java
+_   http://dev.processing.org/bugs/show_bug.cgi?id=435
+_ rename/saveas doesn't properly have its focus set
+_   under windows, immediately typing after rename doesn't select
+_   the whole thing is selected, but not directly editable
+_   http://dev.processing.org/bugs/show_bug.cgi?id=31
+_ dim edit menus as appropriate during selection/no selection/etc
+_   http://dev.processing.org/bugs/show_bug.cgi?id=33
+_ Ctrl-Z will undo, but not scroll to where the undo happens. 
+_   so user thinks nothing is happening and overundo. 
+_   http://dev.processing.org/bugs/show_bug.cgi?id=35
+_ undo has become sluggish
+_   http://processing.org/bugs/show_bug.cgi?id=36
+_ fonts smaller than 10 cause problems in the editor
+_   generally causes trouble on osx
+_   on windows and linux, changing the size throws things off
+_   http://processing.org/bugs/show_bug.cgi?id=51
+_ code coloring is imperfect because it's not based on a parser
+_   i.e. mousePressed() is red but mouseMoved() is brown
+_   http://dev.processing.org/bugs/show_bug.cgi?id=113
+_ clicking i-- ) between -- and ) will select "-- )"
+_   in eclipse, it looks to see which is closest and selects that
+_   need to check behavior for word and bbedit
+_   http://dev.processing.org/bugs/show_bug.cgi?id=348
+_ implement emacs keybindings (list is at the bug report)
+_   http://dev.processing.org/bugs/show_bug.cgi?id=401
+_ implement better method of showing curly brace closure
+_   http://dev.processing.org/bugs/show_bug.cgi?id=295
+_ sketches should only write to the console of their editor window
+_   http://dev.processing.org/bugs/show_bug.cgi?id=921
+
+
+PDE / Editor Buttons
+
+_ run button not properly unhighlighting
+_   does it unhighlight after compile or runtime errors?
+_   also when using draw() instead of loop()
+_     applet needs to notify runner that it has terminated
+_   http://dev.processing.org/bugs/show_bug.cgi?id=38
+_   check 'finished' via objectreference?
+_ make the run button highlight immediately
+_   or maybe show an animation for starting up
+_   rather than post-compile
+_   http://dev.processing.org/bugs/show_bug.cgi?id=776
+_ if export fails (compile error) need to un-highlight the export button
+_   http://dev.processing.org/bugs/show_bug.cgi?id=39
+_ when holding down shift, show the alternate behavior for EditorHeader
+_   http://dev.processing.org/bugs/show_bug.cgi?id=37
+
+
+PDE / Editor Header
+
+2 _ make some fancy extendo things because the tabs get too big
+2 _   either condense or popdown menu thingy
+2 _   http://dev.processing.org/bugs/show_bug.cgi?id=54
+5 _ key command for prev/next tab works, but not menu
+5 _   menu options are actually disabled because of inconsistency
+5 _   http://dev.processing.org/bugs/show_bug.cgi?id=1044
+
+
+PDE / Editor Status
+
+_ error messages run off the edge and go invisible
+_   http://dev.processing.org/bugs/show_bug.cgi?id=57
+_ move all prompts to modal dialog showError/Message/Warning/Prompt
+_   nicely design dialog boxes to go with visual of p5
+_   maybe something that shows stack trace?
+_   with an 'email this' button? (include source code too?)
+_   also need a "prompt" dialog for asking filenames, etc
+_   implement and remove PdeEditorStatus stuff
+_   http://dev.processing.org/bugs/show_bug.cgi?id=59
+
+
+PDE / Export
+
+1 _ replace applet.html and applet-opengl.html
+1 _   http://dev.processing.org/bugs/show_bug.cgi?id=1057
+1 _   update applet.html to point at java 6u10 with the new auto-update stuff
+1 _   also update applet on the home page to do the same
+4 _ failed export still copies random files
+4 _   Failed compile on Export or Export to Application 
+4 _   still creates folder and leaves mess behind
+4 _   http://dev.processing.org/bugs/show_bug.cgi?id=1050
+_ when exporting to application (or applet) don't copy .java files from folder
+_   (they'll be copied as source files later)
+_   make .java files and friends go to correct locations on export (app)
+_ warn on export when people call their sketches things like Server
+_ warn if someone extends PApplet but mis-names the sketch
+_   or don't allow it to be exported
+_   add bug reference to the faq once added to the db
+X   or at least add a note about this to the faq
+_ show error when no main() is included but class extends PApplet
+_   error can happen or be checked 
+_ errors during export don't show up properly (no red status bar)
+_   http://dev.processing.org/bugs/show_bug.cgi?id=194
+_ need to decide how to handle "stop" button in present mode
+_   http://dev.processing.org/bugs/show_bug.cgi?id=63
+_   when running externally, people need to write their own stop function
+_   just get export to application working so this can be supported
+_   for now, they're stuck w/ running in the env and getting the ugliness
+_ make export put a timestamp in the html code (hidden or visible)
+_   http://dev.processing.org/bugs/show_bug.cgi?id=66
+_ exporting application copies .java files 
+_   .java files are copied to the root folder as well as the source folder
+_ javadoc comment in a static mode app doesn't get moved to the top
+_   http://dev.processing.org/bugs/show_bug.cgi?id=924
+
+
+PDE / Find & Replace
+
+_ all around very ugly, fix it up
+_   http://dev.processing.org/bugs/show_bug.cgi?id=67
+_ several tweaks
+_   http://dev.processing.org/bugs/show_bug.cgi?id=68
+_   only enable "find next" in menu after a find has happened
+_ allowing to find & replace over multiple tabs 
+_   http://dev.processing.org/bugs/show_bug.cgi?id=69
+
+
+PDE / History
+
+_ implement new version of history
+_   http://dev.processing.org/bugs/show_bug.cgi?id=71
+_   make history folder, and a zip (not gz) file for each entry
+_   history causing trouble - super slow with a huge sketch
+_     could instead be gzipped and appended to history.dat
+_     along with another file that is actually a table of offsets
+_     no need to make the thing a gzip stream
+_     checkbox on menu for 'record history' ?
+_     history converter option?
+_   only first 20 entries visible?
+_   shortcut to walk through history, ala photoshop (ctrl-alt-z)
+_   zlib file becoming corrupt (not flushed after close?)
+_   make hooks to history api so others can write tools around it
+
+
+PDE / Preferences
+
+_ prefs window doesn't swap ok/cancel properly for mac vs. windows/linux
+_   don't bother having a "cancel" for the prefs window
+_ rewrite preferences window to use proper layout?
+_   is there already a bug for this?
+_ make prefs dialog modal?
+_ prefs window not visible on windows taskbar
+_   http://dev.processing.org/bugs/show_bug.cgi?id=438
+_ split Preferences and PreferencesFrame?
+_   http://dev.processing.org/bugs/show_bug.cgi?id=74
+_ preferences window has been hit with the ugly stick
+_   redo panel to use proper Box layout etc
+_   also needs to look good across all platforms
+_   http://dev.processing.org/bugs/show_bug.cgi?id=73
+_ make available the background colors for present mode, stop button color
+_   isolate color chooser into a simpler/smaller class outside tools
+_   then can also use from inside processing applications as well
+_   http://dev.processing.org/bugs/show_bug.cgi?id=75
+_   http://processing.org/discourse/yabb_beta/YaBB.cgi?board=Syntax;action=display;num=1130781367;start=2#2
+_ add ability to set the display where present mode makes things start
+_   code is already in, need to add window and test with multi-monitor setup
+_   some code already written in PresentMode.java
+_ option in preferences to set the jvm used to run? (osx only?)
+_   this would take care of nasty macosx 1.4 vs 1.5 issues
+_   /System/Library/Frameworks/JavaVM.framework/Versions/1.3.1/Commands/java
+_   /System/Library/Frameworks/JavaVM.framework/Versions/1.4.2/Commands/java
+_   /System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Commands/java
+_   canonical path for 
+_   /System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK
+_   will return 1.5.0 (or maybe 1.6 for others?)
+
+
+PDE / Runner 
+
+_ draw mode apps do not shut off the run button when finished
+_   need to talk to VM and read when 'finished' var is set
+_ does closing the window call stop()?
+_   need to make sure hitting stop button and closing window explicitly call
+_   set finished to true, then join() the animation thread
+_ stop() not working very well 
+_   as a result, dispose() methods aren't being called on libraries
+_   http://dev.processing.org/bugs/show_bug.cgi?id=77
+_ quitting from present mode doesn't kill run button
+_   http://dev.processing.org/bugs/show_bug.cgi?id=80
+X when running externally, set window frame title to the sketch name
+X   is this only a problem on macosx? 
+_ need to set dock icon title on osx
+
+
+PDE / Sketch & Sketchbook
+
+_ don't reload sketch on "save as"
+_   this can result in loss of data (undo is lost)
+_   http://dev.processing.org/bugs/show_bug.cgi?id=433
+_ ArticulatePrint-070103a.pde from ArticulatePrint-070103a loads ok
+_   but when opening the sketch, it leaves out the file
+_   because there's a dash in the name
+_   and instead only loads StemCell.pde
+_ show progress dialog during export and save
+_ slow save/new because of large sketchbook
+_   this is a total cluster, the rebuild is being called incessantly
+_   startup is very slow on g4
+_   show progress bar while rebuilding sketch menu?
+_   http://processing.org/discourse/yabb_beta/YaBB.cgi?board=SoftwareBugs;action=display;num=1162801212
+_   http://processing.org/discourse/yabb_beta/YaBB.cgi?board=SoftwareBugs;action=display;num=1141126582
+_   even more of a problem becase set modified set true all the time
+_   in 0125, only rebuilding on rename or save as, but still a problem
+_   don't re-scan all jar files whenever rebuilding sketch menu (cache)
+_   http://dev.processing.org/bugs/show_bug.cgi?id=579
+_ in rebuild sketch menu - disable subfolders working as libraries
+_   if a sketch, don't allow subfolders
+o   or maybe just that libraries must be in the root? 
+o   nah, cuz that would mean can't make subfolder called "libraries"
+_ is the 'hide' option for code dumb? i've never used it
+_   should it just hide the code, not actually remove it?
+_ do we finish the tabs thing for 1.0? yes
+_   could probably be done in a reasonable simple way.. ala eclipse
+_   show additional tabs in the dropdown list? show all?
+_ robert's tunnel example, why does tunnel not show up as leftmost tab?
+_ hitting ESC on "create this, move file, continue" opened anyway
+_ may need a progress bar for "save as"
+_   or just the file copy function in general
+_   since it may take a long time (i.e. 1000s of screen grabs)
+_   http://processing.org/bugs/show_bug.cgi?id=82
+_ "save as" shouldn't always show save as dialog
+_   unless that's the current mode that's being used
+_   http://processing.org/bugs/show_bug.cgi?id=83
+_ handle renaming with case changes (currently ignores case change)
+_   see notes/bitching in Sketch.nameCode()
+_   http://processing.org/bugs/show_bug.cgi?id=85
+_ setting sketchbook to a folder on a network mounted drive
+_   does this work? test on both on mac and pc.. 
+_   or if not, should recommend people against it 
+_   (i.e. folders disappearing if net has trouble)
+_   http://processing.org/bugs/show_bug.cgi?id=87
+_ some type of sketch archive format for posting examples (.psk?)
+_   would be nice to open a sketch directly from a zip file
+_   http://dev.processing.org/bugs/show_bug.cgi?id=88
+_   maybe just open from a zip file, since psk doesn't help anything
+_   also have a means of importing sketches
+
+
+
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+
+
+
+TOOLS / General
+
+_ need a proper means to handle command keys for tools (?)
+_   http://dev.processing.org/bugs/show_bug.cgi?id=140
+_ need method for showing prefs for the tools (?)
+_   i.e. add pref to handle date vs. increment on archive sketch
+_   tools that need prefs will show their own GUI anyway
+_   http://dev.processing.org/bugs/show_bug.cgi?id=883
+_ handle native code for tools menu (?)
+_   http://dev.processing.org/bugs/show_bug.cgi?id=884
+
+
+TOOLS / Ideas 
+
+_ add a command to launch an external editor
+_   http://dev.processing.org/bugs/show_bug.cgi?id=141
+_ add tool to "Add custom html to sketch"
+_   that copies applet.html, 
+_   opens sketch folder, 
+_   and gives info about what to do next (how to edit)
+_   http://dev.processing.org/bugs/show_bug.cgi?id=143
+_ tool to run in appletviewer? sun.applet.Main is appletviewer
+_ import sketch from url (takes a zip from archive sketch)
+_ ftp upload sketch
+_ archive sketch direct to bug report
+_ courseware
+_   export sketch as applet when uploading
+_   save sketch zip files
+_   have a means to load them from "teacher" version of p5
+_   figure out how to use the 
+_ shared code
+_   Integrator / FloatThing / CameraStuff -- Update
+_   to pull code from a local folder
+_   update will update classes from shared in the current folder
+
+
+TOOLS / Color Picker
+
+_ hitting ESC inside Color Selector will quit Processing
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1006
+_ pasting into color picker doesn't update the color values
+_   http://dev.processing.org/bugs/show_bug.cgi?id=503
+
+
+TOOLS / Copy for Discourse
+
+_ occasional exception in "copy for discourse"
+_   http://dev.processing.org/bugs/show_bug.cgi?id=729
+
+
+TOOLS / Auto Format
+
+_ autoformat fails when there's no newline
+_ Auto Format says "too many right parentheses" when last line is a comment
+_   http://dev.processing.org/bugs/show_bug.cgi?id=754
+_ install astyle formatter
+_   build on each platform, then "lipo -create astyle.* -output astyle"
+_ do a better job of maintaining cursor during beautify 
+_ only auto format a particular section of code
+_   set the 'tabs' var based on how many spaces on previous line
+_   http://processing.org/discourse/yabb/YaBB.cgi?board=Proce55ing_Software;action=display;num=1087227217
+_ removes code with extra parens or braces
+_   (an extra } brace deleting everything after it)
+_   http://dev.processing.org/bugs/show_bug.cgi?id=109
+_ progressively eats code w/ certain brace settings
+_   http://dev.processing.org/bugs/show_bug.cgi?id=235
+_ Auto Format hangs when a non-terminated ' is included
+_   http://dev.processing.org/bugs/show_bug.cgi?id=236
+_ hex colors don't get formatted
+_   http://dev.processing.org/bugs/show_bug.cgi?id=303
+_ another code example that crashes
+_   http://dev.processing.org/bugs/show_bug.cgi?id=363
+_ japanese characters in comments cause trouble with auto-format
+_   http://processing.org/discourse/yabb_beta/YaBB.cgi?board=SoftwareBugs;action=display;num=1153505384
+_ arrays are reformatted on each autoformat
+_   http://dev.processing.org/bugs/show_bug.cgi?id=259
+_ crash on particular string
+_   http://dev.processing.org/bugs/show_bug.cgi?id=363
+_ autoformat screws up with color arrays
+_   http://dev.processing.org/bugs/show_bug.cgi?id=760
+_ too many right parens error when there are not
+_   http://dev.processing.org/bugs/show_bug.cgi?id=867
+_ code without a new line at end crashes
+_   http://dev.processing.org/bugs/show_bug.cgi?id=880
+_ break out as its own plugin
+
+
+TOOLS / Create Font
+
+_ loading is very slow on the first time (getting all font names)
+_   create the tool object on startup, then use thread to getAllFonts()
+_   show a progress/status bar while it's happening?
+_   (would be useful to at least tell user that system not locked up)
+_ create font with user-specified charsets
+_   may help solve: http://dev.processing.org/bugs/show_bug.cgi?id=98
+_ when resizing window, only resize the text display area
+_   just a matter of moving around the panels and BorderLayout
+_ remember previous font selection when returning to the window
+
+
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+
+
+LIBRARIES / General
+
+_ need to unpack InvocationTargetException in xxxxxxEvent calls
+_   http://processing.org/discourse/yabb_beta/YaBB.cgi?board=VideoCamera;action=display;num=1116850328#3
+
+
+LIBRARIES / Video
+
+_ if read() hasn't been called, can cause an error with java2d
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1041
+_ threading problems with video
+_   http://dev.processing.org/bugs/show_bug.cgi?id=868
+_ audio stops working after two seconds
+_   http://dev.processing.org/bugs/show_bug.cgi?id=277
+_ add more information about multiple camera inputs
+_ add info about "access" errors being quicktime errors
+_ documented in faq, add something to the lib "camera not installed"
+_   quicktime.std.stdQTException(QTjava:6.1.3gl),-9405=couldntgetrequiredcomponent,qtversion:7108000 at quicktime.std.stdQTExceptionchekcerror
+_ need to add resize method to capture object
+_   http://processing.org/discourse/yabb_beta/YaBB.cgi?board=Syntax;action=display;num=1150227643
+_ figure out what's up with the qt error handler
+_   is this what's preventing the errors from being caught properly?
+_   shutting these off for 0116 so hopefully the messages improve
+_   (could this be a mac issue with errors not making it through?)
+_ need to prevent multiple QTSession open or close
+_   static method shared across the lib, or some such
+_ reading movie is really really slow (2-3 fps)
+_   possible improvement from qtjava list added
+_   http://dev.processing.org/bugs/show_bug.cgi?id=40
+_ Movie needs the crop() functions ala Capture
+_ tearing and incomplete updates on capture?
+_   putting read() inside draw() seems to eliminate this?
+_   http://dev.processing.org/bugs/show_bug.cgi?id=114
+_   when drawing large video, the two triangles for the rect are out of sync
+_     only shows up in P3D
+_ pause and frameRate aren't working
+_   framerate does set the frequency which movieEvent will be called, 
+_   but it is not setting the "available" field corrrectly. 
+_     in fact, speed() should be used to set the rate, not frameRate
+_   sketch .zip file in casey's email message
+_   http://dev.processing.org/bugs/show_bug.cgi?id=370
+_ wrong device name for video capture will cause a crash
+_ couldn't get req'd component also happens when the capture isn't ready
+_   may also mean that no camera is plugged in
+_   also, don't mention winvdig on the mac
+_ include a separate video class to handle just playback
+_   video playback can be much faster if not messing with pixels
+_   could instead use texsubimage in opengl, etc
+_   only supports tint() (to set alpha or color) and drawing? just drawing?
+_ stop button won't kill a video sketch (bug 150 example does this) 
+X   although ESC seems to work? (not sure, didn't test)
+_   or audio won't stop even after hitting stop
+_ when an exception comes through during cameraEvent, not printed
+_   need to show an actual stack trace (InvocationTargetEx) 
+_   because otherwise it's impossible to debug this stuff
+
+
+LIBRARIES / XML
+
+_ handle charset decoding in xml element parser?
+_   same with the other methods like loadStrings()
+_   could also be a way to handle gzip too?
+_   tho charset + gzip would be a problem
+_ need to handle how save() works inside xml lib
+_ need to handle <!ENTITY tags for svg documents
+_ vectors shouldn't be exposed, need to expose attr lists as arrays
+_   or also add a method for getting the vectors?
+
+
+LIBRARIES / Serial
+
+_ syslog issues on macosx
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1147
+_ port buffering not working properly
+_   may just be a problem with thread starvation
+_   bufferUntil() fires an event but continues to fill up the buffer
+_   bug report includes patch from mellis
+_   http://dev.processing.org/bugs/show_bug.cgi?id=96
+_ add prompt() method to Serial (simple dialog box that pops up)
+E4 _ Add Mark and Space parity to the Serial library
+E4 _   http://dev.processing.org/bugs/show_bug.cgi?id=1087
+
+
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+
+
+DIST
+
+How the environment gets packed up, downloaded, and installed.
+
+
+DIST / General 
+
+_ use macosx dialogs for all of the editor stuff
+_   see about doing the same on windows, linux?
+_   the others seem to respond ok to the lucida grande since they use defaults
+_   vista style dialogs
+_     http://msdn.microsoft.com/en-us/library/bb328626.aspx
+_   confirmation dialogs (save and don't save.. who'd a thunk it)
+_     http://msdn.microsoft.com/en-us/library/aa511273.aspx
+_     http://i.msdn.microsoft.com/Aa511273.Confirmations03(en-us,MSDN.10).png
+_   scrollable stack trace
+_     http://www.javalobby.org/java/forums/t19012.html
+_ shut off javac warnings
+_   http://dev.processing.org/bugs/show_bug.cgi?id=812
+_ use pack200/unpack200 to make p5 download smaller
+_   http://dev.processing.org/bugs/show_bug.cgi?id=765
+_ drag and drop
+_   including the number of items would be especially nice
+_ implement automatic update
+_   http://dev.processing.org/bugs/show_bug.cgi?id=374
+_ move build scripts to something better like ant
+_   too much to maintain the multiple versions, too much code
+_   http://dev.processing.org/bugs/show_bug.cgi?id=151
+_   also update build/howto.txt (of course) because it says no ant
+_ need .pde document icons
+_ need .psk file icon
+_ need exported application icons
+_ need more comprehensive list of 'known bugs'
+_ need more comprehensive list of 'known suggestions'
+_ javadoc "advanced" reference by beta
+_   and then finalizing it towards 1.0
+_ write notes about running p5 on another platforms 
+_   this was some feedback from running on bsd:
+_     /usr/local/jdk1.3.1/bin/java -cp lib:lib/build:lib/pde.jar:lib/kjc.jar:lib/oro.jar:java/lib/ext/comm.jar PdeBase 
+_   need to use the 1.3 vm, and get a fake platform name
+_   otherwise, goes looking for lib/pde_.properties or something
+o modify antlr stuff to conditionally recompile in make.sh
+_   compile antlr inside the initial setup of the work dir
+X     done for macosx
+_     fix this for windows and linux
+_ about box 
+_   bring up information about gpl, lgpl, and ibmpl
+_   jedit syntax is under mit license
+_     http://www.opensource.org/licenses/mit-license.php
+_ different name for 'lib' folder because of libraries folder?
+_   avoid some confusion for when describing the libraries folder to users
+_ remove jvm from cvs
+_   use wget to grab it if it doesn't exist
+_   and include an md5hash to see if the file is correct
+
+
+DIST / Windows
+
+2 _ Windows problem with some lab machines "Processing cannot run because 
+2 _   it could not create a folder to store your settings"
+2 _   http://dev.processing.org/bugs/show_bug.cgi?id=1016
+_ check to see whether this bug is fixed once 0140 is released
+_   properly handle non-ascii chars in p5 folder name
+_   http://dev.processing.org/bugs/show_bug.cgi?id=49
+_   (could also just warn user to install elsewhere)
+o   perhaps the get around this by building into sketch folder
+o     when non-ascii chars in use, just launch everything externally
+_ icon is skewed on vista 64
+_   http://dev.processing.org/bugs/show_bug.cgi?id=801
+_ "Fatal exception occurred. Program will exit." on startup
+_   seems to be font related, deleting prefs will fix it
+_   http://dev.processing.org/bugs/show_bug.cgi?id=688
+_ Processing IDE icon ALT + Tab low res in Windows XP
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1040
+
+
+DIST / Mac OS X
+
+_ setup() and draw() are not bold on osx (10.4)
+_   likely osx refuses to do monaco bold
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1047
+_ if someone has monaco disabled in font book, the app won't start
+_   http://dev.processing.org/bugs/show_bug.cgi?id=562
+_ we're breaking some mac human interface guidelines
+_   should be using a menu factory to create menubar for all sub-windows
+_   http://developer.apple.com/technotes/tn/tn2042.html
+_   and the general warning dialogs are just ass ugly
+_   (i.e. we really need those replacements for JOptionPane)
+_ track down error in PdeCompiler for message parsing
+_   was missing the error about a package being gone
+_   can comment out /System/Library/ as a test
+_ put stdout/stderr into ~/Library/Logs
+_   and have a .log extension so it can be browsed properly
+_ try LSMinimumSystemVersion in Info.plist
+5 _ Horizontal two finger scroll doesn't work in OS X
+5 _   also applies to horizontal scrolling on the mouse
+5 _   http://dev.processing.org/bugs/show_bug.cgi?id=1046
+5 _ Exiting a sketch with Command-Q or File > Quit doesn't call stop() on OS X
+5 _   http://dev.processing.org/bugs/show_bug.cgi?id=1069
+
+
+DIST / Linux
+
+_ finish up debian package support (see the processing.mess folder)
+_   http://dev.processing.org/bugs/show_bug.cgi?id=596
+_   these bits need to be checked to ensure that they work on other distros
+_ Editor stops receiving keyboard input after running a program
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1161
+_ not being able to make a link to the processing app
+_   argh.. more path and shell issues..
+_ computationally intensive stuff runs really slow inside p5
+_   http://processing.org/discourse/yabb_beta/YaBB.cgi?board=SoftwareBugs;action=display;num=1116872745
+_ some reports of it not quitting properly, but not confirmed
+_ splash screen
+_ can't launch from a symlink in /usr/bin
+_   http://dev.processing.org/bugs/show_bug.cgi?id=825
+
+
+LATER
+
+_ rename location is awkward, do it on the tab?
+_ method of including/excluding data files in the JAR
+_   or at least a boolean for the whole folder?
+_ should open() not return a Process object? (exec() instead?)
+_   pro: can write out error messages (or output)
+_   con: loses cross platform ability
+_   but: open() is platform specific anyway, ppl can use exec()

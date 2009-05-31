@@ -1,0 +1,8 @@
+The majority of the work in this library is done by iText.
+http://www.lowagie.com/iText/
+
+The version bundled in this release is 2.1.4.
+
+The files in the library must be named itext.jar because they're specifically
+included on the classpath as part of the build/platform/make.sh scripts. 
+

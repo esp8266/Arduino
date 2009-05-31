@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist SYSTEM "file://localhost/System/Library/DTDs/PropertyList.dtd">
+<plist version="0.9">
+<dict>
+	<key>CFBundleName</key>
+	<string>@@sketch@@</string>
+	<key>CFBundleVersion</key>
+	<string>10.2</string>
+	<key>CFBundleAllowMixedLocalizations</key>
+	<string>true</string>
+	<key>CFBundleExecutable</key>
+	<string>JavaApplicationStub</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleIconFile</key>
+	<string>sketch.icns</string>
+	<key>CFBundleIdentifier</key> 
+	<string>@@sketch@@</string>
+<!-- http://developer.apple.com/documentation/MacOSX/Conceptual/BPRuntimeConfig/Articles/PListKeys.html#//apple_ref/doc/uid/20001431-113616 -->
+        <key>LSUIPresentationMode</key>
+        <integer>@@lsuipresentationmode@@</integer>
+	<key>Java</key>
+	<dict>
+		<key>VMOptions</key>
+		<string>@@vmoptions@@</string>
+		<key>MainClass</key>
+		<string>@@sketch@@</string>
+		<key>JVMVersion</key>
+		<string>1.5*</string>
+		<key>ClassPath</key>
+		<string>@@classpath@@</string>
+
+		<key>Properties</key>
+		<!-- http://developer.apple.com/releasenotes/Java/java141/system_properties/chapter_4_section_1.html#//apple_ref/doc/uid/TP30000285 -->
+		<dict>
+			<key>apple.laf.useScreenMenuBar</key>
+			<string>true</string>
+			<key>apple.awt.showGrowBox</key>
+			<string>false</string>
+			<key>com.apple.smallTabs</key>
+			<string>true</string>
+			<key>apple.awt.Antialiasing</key>
+			<string>false</string>
+			<key>apple.awt.TextAntialiasing</key>
+			<string>true</string>
+			<key>com.apple.hwaccel</key>
+			<string>true</string>
+			<key>apple.awt.use-file-dialog-packages</key>
+			<string>false</string>
+		</dict>
+	</dict>
+</dict>
+</plist>

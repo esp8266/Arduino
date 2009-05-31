@@ -1,0 +1,1970 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+PdeLexer
+</TITLE>
+
+<META NAME="keywords" CONTENT="processing.app.preproc.PdeLexer class">
+
+<LINK REL ="stylesheet" TYPE="text/css" HREF="../../../stylesheet.css" TITLE="Style">
+
+<SCRIPT type="text/javascript">
+function windowTitle()
+{
+    parent.document.title="PdeLexer";
+}
+</SCRIPT>
+<NOSCRIPT>
+</NOSCRIPT>
+
+</HEAD>
+
+<BODY BGCOLOR="white" onload="windowTitle();">
+
+
+<!-- ========= START OF TOP NAVBAR ======= -->
+<A NAME="navbar_top"><!-- --></A>
+<A HREF="#skip-navbar_top" title="Skip navigation links"></A>
+<TABLE BORDER="0" WIDTH="100%" CELLPADDING="1" CELLSPACING="0" SUMMARY="">
+<TR>
+<TD COLSPAN=2 BGCOLOR="#EEEEFF" CLASS="NavBarCell1">
+<A NAME="navbar_top_firstrow"><!-- --></A>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="3" SUMMARY="">
+  <TR ALIGN="center" VALIGN="top">
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-summary.html"><FONT CLASS="NavBarFont1"><B>Package</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#FFFFFF" CLASS="NavBarCell1Rev"> &nbsp;<FONT CLASS="NavBarFont1Rev"><B>Class</B></FONT>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-tree.html"><FONT CLASS="NavBarFont1"><B>Tree</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../deprecated-list.html"><FONT CLASS="NavBarFont1"><B>Deprecated</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../index-all.html"><FONT CLASS="NavBarFont1"><B>Index</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../help-doc.html"><FONT CLASS="NavBarFont1"><B>Help</B></FONT></A>&nbsp;</TD>
+  </TR>
+</TABLE>
+</TD>
+<TD ALIGN="right" VALIGN="top" ROWSPAN=3><EM>
+</EM>
+</TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+&nbsp;<A HREF="../../../processing/app/preproc/PdeEmitter.html" title="class in processing.app.preproc"><B>PREV CLASS</B></A>&nbsp;
+&nbsp;<A HREF="../../../processing/app/preproc/PdePartialTokenTypes.html" title="interface in processing.app.preproc"><B>NEXT CLASS</B></A></FONT></TD>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+  <A HREF="../../../index.html?processing/app/preproc/PdeLexer.html" target="_top"><B>FRAMES</B></A>  &nbsp;
+&nbsp;<A HREF="PdeLexer.html" target="_top"><B>NO FRAMES</B></A>  &nbsp;
+&nbsp;<SCRIPT type="text/javascript">
+  <!--
+  if(window==top) {
+    document.writeln('<A HREF="../../../allclasses-noframe.html"><B>All Classes</B></A>');
+  }
+  //-->
+</SCRIPT>
+<NOSCRIPT>
+  <A HREF="../../../allclasses-noframe.html"><B>All Classes</B></A>
+</NOSCRIPT>
+
+
+</FONT></TD>
+</TR>
+<TR>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+  SUMMARY:&nbsp;NESTED&nbsp;|&nbsp;<A HREF="#field_summary">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor_summary">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_summary">METHOD</A></FONT></TD>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+DETAIL:&nbsp;<A HREF="#field_detail">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor_detail">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_detail">METHOD</A></FONT></TD>
+</TR>
+</TABLE>
+<A NAME="skip-navbar_top"></A>
+<!-- ========= END OF TOP NAVBAR ========= -->
+
+<HR>
+<!-- ======== START OF CLASS DATA ======== -->
+<H2>
+<FONT SIZE="-1">
+processing.app.preproc</FONT>
+<BR>
+Class PdeLexer</H2>
+<PRE>
+java.lang.Object
+  <IMG SRC="../../../resources/inherit.gif" ALT="extended by ">antlr.CharScanner
+      <IMG SRC="../../../resources/inherit.gif" ALT="extended by "><B>processing.app.preproc.PdeLexer</B>
+</PRE>
+<DL>
+<DT><B>All Implemented Interfaces:</B> <DD>antlr.TokenStream, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html" title="interface in processing.app.preproc">PdeTokenTypes</A></DD>
+</DL>
+<HR>
+<DL>
+<DT><PRE>public class <B>PdeLexer</B><DT>extends antlr.CharScanner<DT>implements <A HREF="../../../processing/app/preproc/PdeTokenTypes.html" title="interface in processing.app.preproc">PdeTokenTypes</A>, antlr.TokenStream</DL>
+</PRE>
+
+<P>
+<HR>
+
+<P>
+<!-- =========== FIELD SUMMARY =========== -->
+
+<A NAME="field_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Field Summary</B></FONT></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;antlr.collections.impl.BitSet</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#_tokenSet_0">_tokenSet_0</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;antlr.collections.impl.BitSet</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#_tokenSet_1">_tokenSet_1</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;antlr.collections.impl.BitSet</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#_tokenSet_2">_tokenSet_2</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;antlr.collections.impl.BitSet</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#_tokenSet_3">_tokenSet_3</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;antlr.collections.impl.BitSet</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#_tokenSet_4">_tokenSet_4</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+</TABLE>
+&nbsp;<A NAME="fields_inherited_from_class_antlr.CharScanner"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Fields inherited from class antlr.CharScanner</B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>EOF_CHAR</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;<A NAME="fields_inherited_from_class_processing.app.preproc.PdeTokenTypes"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Fields inherited from interface processing.app.preproc.<A HREF="../../../processing/app/preproc/PdeTokenTypes.html" title="interface in processing.app.preproc">PdeTokenTypes</A></B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><A HREF="../../../processing/app/preproc/PdeTokenTypes.html#ABSTRACT">ABSTRACT</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#ARRAY_DECLARATOR">ARRAY_DECLARATOR</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#ARRAY_INIT">ARRAY_INIT</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#ASSIGN">ASSIGN</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#BAND">BAND</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#BAND_ASSIGN">BAND_ASSIGN</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#BLOCK">BLOCK</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#BNOT">BNOT</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#BOR">BOR</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#BOR_ASSIGN">BOR_ASSIGN</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#BSR">BSR</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#BSR_ASSIGN">BSR_ASSIGN</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#BXOR">BXOR</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#BXOR_ASSIGN">BXOR_ASSIGN</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#CASE_GROUP">CASE_GROUP</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#CHAR_LITERAL">CHAR_LITERAL</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#CLASS_DEF">CLASS_DEF</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#COLON">COLON</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#COMMA">COMMA</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#CONSTRUCTOR_CAST">CONSTRUCTOR_CAST</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#CTOR_CALL">CTOR_CALL</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#CTOR_DEF">CTOR_DEF</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#DEC">DEC</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#DIV">DIV</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#DIV_ASSIGN">DIV_ASSIGN</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#DOT">DOT</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#ELIST">ELIST</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#EMPTY_FIELD">EMPTY_FIELD</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#EMPTY_STAT">EMPTY_STAT</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#EOF">EOF</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#EQUAL">EQUAL</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#ESC">ESC</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#EXPONENT">EXPONENT</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#EXPR">EXPR</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#EXTENDS_CLAUSE">EXTENDS_CLAUSE</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#FINAL">FINAL</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#FLOAT_SUFFIX">FLOAT_SUFFIX</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#FOR_CONDITION">FOR_CONDITION</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#FOR_INIT">FOR_INIT</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#FOR_ITERATOR">FOR_ITERATOR</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#GE">GE</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#GT">GT</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#HEX_DIGIT">HEX_DIGIT</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#IDENT">IDENT</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#IMPLEMENTS_CLAUSE">IMPLEMENTS_CLAUSE</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#IMPORT">IMPORT</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#INC">INC</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#INDEX_OP">INDEX_OP</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#INSTANCE_INIT">INSTANCE_INIT</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#INTERFACE_DEF">INTERFACE_DEF</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LABELED_STAT">LABELED_STAT</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LAND">LAND</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LBRACK">LBRACK</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LCURLY">LCURLY</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LE">LE</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_assert">LITERAL_assert</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_boolean">LITERAL_boolean</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_break">LITERAL_break</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_byte">LITERAL_byte</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_case">LITERAL_case</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_catch">LITERAL_catch</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_char">LITERAL_char</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_class">LITERAL_class</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_color">LITERAL_color</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_continue">LITERAL_continue</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_default">LITERAL_default</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_do">LITERAL_do</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_double">LITERAL_double</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_else">LITERAL_else</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_extends">LITERAL_extends</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_false">LITERAL_false</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_finally">LITERAL_finally</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_float">LITERAL_float</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_for">LITERAL_for</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_if">LITERAL_if</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_implements">LITERAL_implements</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_import">LITERAL_import</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_instanceof">LITERAL_instanceof</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_int">LITERAL_int</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_interface">LITERAL_interface</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_long">LITERAL_long</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_native">LITERAL_native</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_new">LITERAL_new</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_null">LITERAL_null</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_package">LITERAL_package</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_private">LITERAL_private</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_protected">LITERAL_protected</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_public">LITERAL_public</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_return">LITERAL_return</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_short">LITERAL_short</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_static">LITERAL_static</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_super">LITERAL_super</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_switch">LITERAL_switch</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_synchronized">LITERAL_synchronized</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_this">LITERAL_this</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_threadsafe">LITERAL_threadsafe</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_throw">LITERAL_throw</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_throws">LITERAL_throws</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_transient">LITERAL_transient</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_true">LITERAL_true</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_try">LITERAL_try</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_void">LITERAL_void</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_volatile">LITERAL_volatile</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LITERAL_while">LITERAL_while</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LNOT">LNOT</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LOR">LOR</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LPAREN">LPAREN</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#LT">LT</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#METHOD_CALL">METHOD_CALL</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#METHOD_DEF">METHOD_DEF</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#MINUS">MINUS</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#MINUS_ASSIGN">MINUS_ASSIGN</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#ML_COMMENT">ML_COMMENT</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#MOD">MOD</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#MOD_ASSIGN">MOD_ASSIGN</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#MODIFIERS">MODIFIERS</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#NOT_EQUAL">NOT_EQUAL</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#NULL_TREE_LOOKAHEAD">NULL_TREE_LOOKAHEAD</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#NUM_DOUBLE">NUM_DOUBLE</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#NUM_FLOAT">NUM_FLOAT</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#NUM_INT">NUM_INT</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#NUM_LONG">NUM_LONG</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#OBJBLOCK">OBJBLOCK</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#PACKAGE_DEF">PACKAGE_DEF</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#PARAMETER_DEF">PARAMETER_DEF</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#PARAMETERS">PARAMETERS</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#PLUS">PLUS</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#PLUS_ASSIGN">PLUS_ASSIGN</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#POST_DEC">POST_DEC</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#POST_INC">POST_INC</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#QUESTION">QUESTION</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#RBRACK">RBRACK</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#RCURLY">RCURLY</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#RPAREN">RPAREN</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#SEMI">SEMI</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#SL">SL</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#SL_ASSIGN">SL_ASSIGN</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#SL_COMMENT">SL_COMMENT</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#SLIST">SLIST</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#SR">SR</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#SR_ASSIGN">SR_ASSIGN</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#STAR">STAR</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#STAR_ASSIGN">STAR_ASSIGN</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#STATIC_INIT">STATIC_INIT</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#STRICTFP">STRICTFP</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#STRING_LITERAL">STRING_LITERAL</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#SUPER_CTOR_CALL">SUPER_CTOR_CALL</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#TYPE">TYPE</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#TYPECAST">TYPECAST</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#UNARY_MINUS">UNARY_MINUS</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#UNARY_PLUS">UNARY_PLUS</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#VARIABLE_DEF">VARIABLE_DEF</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#VOCAB">VOCAB</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#WEBCOLOR_LITERAL">WEBCOLOR_LITERAL</A>, <A HREF="../../../processing/app/preproc/PdeTokenTypes.html#WS">WS</A></CODE></TD>
+</TR>
+</TABLE>
+&nbsp;
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+
+<A NAME="constructor_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Constructor Summary</B></FONT></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#PdeLexer(antlr.InputBuffer)">PdeLexer</A></B>(antlr.InputBuffer&nbsp;ib)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#PdeLexer(java.io.InputStream)">PdeLexer</A></B>(java.io.InputStream&nbsp;in)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#PdeLexer(antlr.LexerSharedInputState)">PdeLexer</A></B>(antlr.LexerSharedInputState&nbsp;state)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#PdeLexer(java.io.Reader)">PdeLexer</A></B>(java.io.Reader&nbsp;in)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+</TABLE>
+&nbsp;
+<!-- ========== METHOD SUMMARY =========== -->
+
+<A NAME="method_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Method Summary</B></FONT></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mASSIGN(boolean)">mASSIGN</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mBAND_ASSIGN(boolean)">mBAND_ASSIGN</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mBAND(boolean)">mBAND</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mBNOT(boolean)">mBNOT</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mBOR_ASSIGN(boolean)">mBOR_ASSIGN</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mBOR(boolean)">mBOR</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mBSR_ASSIGN(boolean)">mBSR_ASSIGN</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mBSR(boolean)">mBSR</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mBXOR_ASSIGN(boolean)">mBXOR_ASSIGN</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mBXOR(boolean)">mBXOR</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mCHAR_LITERAL(boolean)">mCHAR_LITERAL</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mCOLON(boolean)">mCOLON</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mCOMMA(boolean)">mCOMMA</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mDEC(boolean)">mDEC</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mDIV_ASSIGN(boolean)">mDIV_ASSIGN</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mDIV(boolean)">mDIV</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mEQUAL(boolean)">mEQUAL</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mGE(boolean)">mGE</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mGT(boolean)">mGT</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mIDENT(boolean)">mIDENT</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mINC(boolean)">mINC</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mLAND(boolean)">mLAND</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mLBRACK(boolean)">mLBRACK</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mLCURLY(boolean)">mLCURLY</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mLE(boolean)">mLE</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mLNOT(boolean)">mLNOT</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mLOR(boolean)">mLOR</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mLPAREN(boolean)">mLPAREN</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mLT(boolean)">mLT</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mMINUS_ASSIGN(boolean)">mMINUS_ASSIGN</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mMINUS(boolean)">mMINUS</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mML_COMMENT(boolean)">mML_COMMENT</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mMOD_ASSIGN(boolean)">mMOD_ASSIGN</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mMOD(boolean)">mMOD</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mNOT_EQUAL(boolean)">mNOT_EQUAL</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mNUM_INT(boolean)">mNUM_INT</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mPLUS_ASSIGN(boolean)">mPLUS_ASSIGN</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mPLUS(boolean)">mPLUS</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mQUESTION(boolean)">mQUESTION</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mRBRACK(boolean)">mRBRACK</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mRCURLY(boolean)">mRCURLY</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mRPAREN(boolean)">mRPAREN</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mSEMI(boolean)">mSEMI</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mSL_ASSIGN(boolean)">mSL_ASSIGN</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mSL_COMMENT(boolean)">mSL_COMMENT</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mSL(boolean)">mSL</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mSR_ASSIGN(boolean)">mSR_ASSIGN</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mSR(boolean)">mSR</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mSTAR_ASSIGN(boolean)">mSTAR_ASSIGN</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mSTAR(boolean)">mSTAR</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mSTRING_LITERAL(boolean)">mSTRING_LITERAL</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mWEBCOLOR_LITERAL(boolean)">mWEBCOLOR_LITERAL</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#mWS(boolean)">mWS</A></B>(boolean&nbsp;_createToken)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;antlr.Token</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/preproc/PdeLexer.html#nextToken()">nextToken</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+</TABLE>
+&nbsp;<A NAME="methods_inherited_from_class_antlr.CharScanner"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Methods inherited from class antlr.CharScanner</B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>append, append, commit, consume, consumeUntil, consumeUntil, getCaseSensitive, getCaseSensitiveLiterals, getColumn, getCommitToPath, getFilename, getInputBuffer, getInputState, getLine, getTabSize, getText, getTokenObject, LA, mark, match, match, match, matchNot, matchRange, newline, panic, panic, reportError, reportError, reportWarning, resetText, rewind, setCaseSensitive, setColumn, setCommitToPath, setFilename, setInputState, setLine, setTabSize, setText, setTokenObjectClass, tab, testLiteralsTable, testLiteralsTable, toLower, traceIn, traceIndent, traceOut, uponEOF</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;<A NAME="methods_inherited_from_class_java.lang.Object"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Methods inherited from class java.lang.Object</B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>equals, getClass, hashCode, notify, notifyAll, toString, wait, wait, wait</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;
+<P>
+
+<!-- ============ FIELD DETAIL =========== -->
+
+<A NAME="field_detail"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="1"><FONT SIZE="+2">
+<B>Field Detail</B></FONT></TH>
+</TR>
+</TABLE>
+
+<A NAME="_tokenSet_0"><!-- --></A><H3>
+_tokenSet_0</H3>
+<PRE>
+public static final antlr.collections.impl.BitSet <B>_tokenSet_0</B></PRE>
+<DL>
+<DL>
+</DL>
+</DL>
+<HR>
+
+<A NAME="_tokenSet_1"><!-- --></A><H3>
+_tokenSet_1</H3>
+<PRE>
+public static final antlr.collections.impl.BitSet <B>_tokenSet_1</B></PRE>
+<DL>
+<DL>
+</DL>
+</DL>
+<HR>
+
+<A NAME="_tokenSet_2"><!-- --></A><H3>
+_tokenSet_2</H3>
+<PRE>
+public static final antlr.collections.impl.BitSet <B>_tokenSet_2</B></PRE>
+<DL>
+<DL>
+</DL>
+</DL>
+<HR>
+
+<A NAME="_tokenSet_3"><!-- --></A><H3>
+_tokenSet_3</H3>
+<PRE>
+public static final antlr.collections.impl.BitSet <B>_tokenSet_3</B></PRE>
+<DL>
+<DL>
+</DL>
+</DL>
+<HR>
+
+<A NAME="_tokenSet_4"><!-- --></A><H3>
+_tokenSet_4</H3>
+<PRE>
+public static final antlr.collections.impl.BitSet <B>_tokenSet_4</B></PRE>
+<DL>
+<DL>
+</DL>
+</DL>
+
+<!-- ========= CONSTRUCTOR DETAIL ======== -->
+
+<A NAME="constructor_detail"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="1"><FONT SIZE="+2">
+<B>Constructor Detail</B></FONT></TH>
+</TR>
+</TABLE>
+
+<A NAME="PdeLexer(java.io.InputStream)"><!-- --></A><H3>
+PdeLexer</H3>
+<PRE>
+public <B>PdeLexer</B>(java.io.InputStream&nbsp;in)</PRE>
+<DL>
+</DL>
+<HR>
+
+<A NAME="PdeLexer(java.io.Reader)"><!-- --></A><H3>
+PdeLexer</H3>
+<PRE>
+public <B>PdeLexer</B>(java.io.Reader&nbsp;in)</PRE>
+<DL>
+</DL>
+<HR>
+
+<A NAME="PdeLexer(antlr.InputBuffer)"><!-- --></A><H3>
+PdeLexer</H3>
+<PRE>
+public <B>PdeLexer</B>(antlr.InputBuffer&nbsp;ib)</PRE>
+<DL>
+</DL>
+<HR>
+
+<A NAME="PdeLexer(antlr.LexerSharedInputState)"><!-- --></A><H3>
+PdeLexer</H3>
+<PRE>
+public <B>PdeLexer</B>(antlr.LexerSharedInputState&nbsp;state)</PRE>
+<DL>
+</DL>
+
+<!-- ============ METHOD DETAIL ========== -->
+
+<A NAME="method_detail"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="1"><FONT SIZE="+2">
+<B>Method Detail</B></FONT></TH>
+</TR>
+</TABLE>
+
+<A NAME="nextToken()"><!-- --></A><H3>
+nextToken</H3>
+<PRE>
+public antlr.Token <B>nextToken</B>()
+                      throws antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+<DT><B>Specified by:</B><DD><CODE>nextToken</CODE> in interface <CODE>antlr.TokenStream</CODE></DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mWS(boolean)"><!-- --></A><H3>
+mWS</H3>
+<PRE>
+public final void <B>mWS</B>(boolean&nbsp;_createToken)
+               throws antlr.RecognitionException,
+                      antlr.CharStreamException,
+                      antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mSL_COMMENT(boolean)"><!-- --></A><H3>
+mSL_COMMENT</H3>
+<PRE>
+public final void <B>mSL_COMMENT</B>(boolean&nbsp;_createToken)
+                       throws antlr.RecognitionException,
+                              antlr.CharStreamException,
+                              antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mML_COMMENT(boolean)"><!-- --></A><H3>
+mML_COMMENT</H3>
+<PRE>
+public final void <B>mML_COMMENT</B>(boolean&nbsp;_createToken)
+                       throws antlr.RecognitionException,
+                              antlr.CharStreamException,
+                              antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mWEBCOLOR_LITERAL(boolean)"><!-- --></A><H3>
+mWEBCOLOR_LITERAL</H3>
+<PRE>
+public final void <B>mWEBCOLOR_LITERAL</B>(boolean&nbsp;_createToken)
+                             throws antlr.RecognitionException,
+                                    antlr.CharStreamException,
+                                    antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mQUESTION(boolean)"><!-- --></A><H3>
+mQUESTION</H3>
+<PRE>
+public final void <B>mQUESTION</B>(boolean&nbsp;_createToken)
+                     throws antlr.RecognitionException,
+                            antlr.CharStreamException,
+                            antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mLPAREN(boolean)"><!-- --></A><H3>
+mLPAREN</H3>
+<PRE>
+public final void <B>mLPAREN</B>(boolean&nbsp;_createToken)
+                   throws antlr.RecognitionException,
+                          antlr.CharStreamException,
+                          antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mRPAREN(boolean)"><!-- --></A><H3>
+mRPAREN</H3>
+<PRE>
+public final void <B>mRPAREN</B>(boolean&nbsp;_createToken)
+                   throws antlr.RecognitionException,
+                          antlr.CharStreamException,
+                          antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mLBRACK(boolean)"><!-- --></A><H3>
+mLBRACK</H3>
+<PRE>
+public final void <B>mLBRACK</B>(boolean&nbsp;_createToken)
+                   throws antlr.RecognitionException,
+                          antlr.CharStreamException,
+                          antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mRBRACK(boolean)"><!-- --></A><H3>
+mRBRACK</H3>
+<PRE>
+public final void <B>mRBRACK</B>(boolean&nbsp;_createToken)
+                   throws antlr.RecognitionException,
+                          antlr.CharStreamException,
+                          antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mLCURLY(boolean)"><!-- --></A><H3>
+mLCURLY</H3>
+<PRE>
+public final void <B>mLCURLY</B>(boolean&nbsp;_createToken)
+                   throws antlr.RecognitionException,
+                          antlr.CharStreamException,
+                          antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mRCURLY(boolean)"><!-- --></A><H3>
+mRCURLY</H3>
+<PRE>
+public final void <B>mRCURLY</B>(boolean&nbsp;_createToken)
+                   throws antlr.RecognitionException,
+                          antlr.CharStreamException,
+                          antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mCOLON(boolean)"><!-- --></A><H3>
+mCOLON</H3>
+<PRE>
+public final void <B>mCOLON</B>(boolean&nbsp;_createToken)
+                  throws antlr.RecognitionException,
+                         antlr.CharStreamException,
+                         antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mCOMMA(boolean)"><!-- --></A><H3>
+mCOMMA</H3>
+<PRE>
+public final void <B>mCOMMA</B>(boolean&nbsp;_createToken)
+                  throws antlr.RecognitionException,
+                         antlr.CharStreamException,
+                         antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mASSIGN(boolean)"><!-- --></A><H3>
+mASSIGN</H3>
+<PRE>
+public final void <B>mASSIGN</B>(boolean&nbsp;_createToken)
+                   throws antlr.RecognitionException,
+                          antlr.CharStreamException,
+                          antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mEQUAL(boolean)"><!-- --></A><H3>
+mEQUAL</H3>
+<PRE>
+public final void <B>mEQUAL</B>(boolean&nbsp;_createToken)
+                  throws antlr.RecognitionException,
+                         antlr.CharStreamException,
+                         antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mLNOT(boolean)"><!-- --></A><H3>
+mLNOT</H3>
+<PRE>
+public final void <B>mLNOT</B>(boolean&nbsp;_createToken)
+                 throws antlr.RecognitionException,
+                        antlr.CharStreamException,
+                        antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mBNOT(boolean)"><!-- --></A><H3>
+mBNOT</H3>
+<PRE>
+public final void <B>mBNOT</B>(boolean&nbsp;_createToken)
+                 throws antlr.RecognitionException,
+                        antlr.CharStreamException,
+                        antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mNOT_EQUAL(boolean)"><!-- --></A><H3>
+mNOT_EQUAL</H3>
+<PRE>
+public final void <B>mNOT_EQUAL</B>(boolean&nbsp;_createToken)
+                      throws antlr.RecognitionException,
+                             antlr.CharStreamException,
+                             antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mDIV(boolean)"><!-- --></A><H3>
+mDIV</H3>
+<PRE>
+public final void <B>mDIV</B>(boolean&nbsp;_createToken)
+                throws antlr.RecognitionException,
+                       antlr.CharStreamException,
+                       antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mDIV_ASSIGN(boolean)"><!-- --></A><H3>
+mDIV_ASSIGN</H3>
+<PRE>
+public final void <B>mDIV_ASSIGN</B>(boolean&nbsp;_createToken)
+                       throws antlr.RecognitionException,
+                              antlr.CharStreamException,
+                              antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mPLUS(boolean)"><!-- --></A><H3>
+mPLUS</H3>
+<PRE>
+public final void <B>mPLUS</B>(boolean&nbsp;_createToken)
+                 throws antlr.RecognitionException,
+                        antlr.CharStreamException,
+                        antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mPLUS_ASSIGN(boolean)"><!-- --></A><H3>
+mPLUS_ASSIGN</H3>
+<PRE>
+public final void <B>mPLUS_ASSIGN</B>(boolean&nbsp;_createToken)
+                        throws antlr.RecognitionException,
+                               antlr.CharStreamException,
+                               antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mINC(boolean)"><!-- --></A><H3>
+mINC</H3>
+<PRE>
+public final void <B>mINC</B>(boolean&nbsp;_createToken)
+                throws antlr.RecognitionException,
+                       antlr.CharStreamException,
+                       antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mMINUS(boolean)"><!-- --></A><H3>
+mMINUS</H3>
+<PRE>
+public final void <B>mMINUS</B>(boolean&nbsp;_createToken)
+                  throws antlr.RecognitionException,
+                         antlr.CharStreamException,
+                         antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mMINUS_ASSIGN(boolean)"><!-- --></A><H3>
+mMINUS_ASSIGN</H3>
+<PRE>
+public final void <B>mMINUS_ASSIGN</B>(boolean&nbsp;_createToken)
+                         throws antlr.RecognitionException,
+                                antlr.CharStreamException,
+                                antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mDEC(boolean)"><!-- --></A><H3>
+mDEC</H3>
+<PRE>
+public final void <B>mDEC</B>(boolean&nbsp;_createToken)
+                throws antlr.RecognitionException,
+                       antlr.CharStreamException,
+                       antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mSTAR(boolean)"><!-- --></A><H3>
+mSTAR</H3>
+<PRE>
+public final void <B>mSTAR</B>(boolean&nbsp;_createToken)
+                 throws antlr.RecognitionException,
+                        antlr.CharStreamException,
+                        antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mSTAR_ASSIGN(boolean)"><!-- --></A><H3>
+mSTAR_ASSIGN</H3>
+<PRE>
+public final void <B>mSTAR_ASSIGN</B>(boolean&nbsp;_createToken)
+                        throws antlr.RecognitionException,
+                               antlr.CharStreamException,
+                               antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mMOD(boolean)"><!-- --></A><H3>
+mMOD</H3>
+<PRE>
+public final void <B>mMOD</B>(boolean&nbsp;_createToken)
+                throws antlr.RecognitionException,
+                       antlr.CharStreamException,
+                       antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mMOD_ASSIGN(boolean)"><!-- --></A><H3>
+mMOD_ASSIGN</H3>
+<PRE>
+public final void <B>mMOD_ASSIGN</B>(boolean&nbsp;_createToken)
+                       throws antlr.RecognitionException,
+                              antlr.CharStreamException,
+                              antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mSR(boolean)"><!-- --></A><H3>
+mSR</H3>
+<PRE>
+public final void <B>mSR</B>(boolean&nbsp;_createToken)
+               throws antlr.RecognitionException,
+                      antlr.CharStreamException,
+                      antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mSR_ASSIGN(boolean)"><!-- --></A><H3>
+mSR_ASSIGN</H3>
+<PRE>
+public final void <B>mSR_ASSIGN</B>(boolean&nbsp;_createToken)
+                      throws antlr.RecognitionException,
+                             antlr.CharStreamException,
+                             antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mBSR(boolean)"><!-- --></A><H3>
+mBSR</H3>
+<PRE>
+public final void <B>mBSR</B>(boolean&nbsp;_createToken)
+                throws antlr.RecognitionException,
+                       antlr.CharStreamException,
+                       antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mBSR_ASSIGN(boolean)"><!-- --></A><H3>
+mBSR_ASSIGN</H3>
+<PRE>
+public final void <B>mBSR_ASSIGN</B>(boolean&nbsp;_createToken)
+                       throws antlr.RecognitionException,
+                              antlr.CharStreamException,
+                              antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mGE(boolean)"><!-- --></A><H3>
+mGE</H3>
+<PRE>
+public final void <B>mGE</B>(boolean&nbsp;_createToken)
+               throws antlr.RecognitionException,
+                      antlr.CharStreamException,
+                      antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mGT(boolean)"><!-- --></A><H3>
+mGT</H3>
+<PRE>
+public final void <B>mGT</B>(boolean&nbsp;_createToken)
+               throws antlr.RecognitionException,
+                      antlr.CharStreamException,
+                      antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mSL(boolean)"><!-- --></A><H3>
+mSL</H3>
+<PRE>
+public final void <B>mSL</B>(boolean&nbsp;_createToken)
+               throws antlr.RecognitionException,
+                      antlr.CharStreamException,
+                      antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mSL_ASSIGN(boolean)"><!-- --></A><H3>
+mSL_ASSIGN</H3>
+<PRE>
+public final void <B>mSL_ASSIGN</B>(boolean&nbsp;_createToken)
+                      throws antlr.RecognitionException,
+                             antlr.CharStreamException,
+                             antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mLE(boolean)"><!-- --></A><H3>
+mLE</H3>
+<PRE>
+public final void <B>mLE</B>(boolean&nbsp;_createToken)
+               throws antlr.RecognitionException,
+                      antlr.CharStreamException,
+                      antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mLT(boolean)"><!-- --></A><H3>
+mLT</H3>
+<PRE>
+public final void <B>mLT</B>(boolean&nbsp;_createToken)
+               throws antlr.RecognitionException,
+                      antlr.CharStreamException,
+                      antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mBXOR(boolean)"><!-- --></A><H3>
+mBXOR</H3>
+<PRE>
+public final void <B>mBXOR</B>(boolean&nbsp;_createToken)
+                 throws antlr.RecognitionException,
+                        antlr.CharStreamException,
+                        antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mBXOR_ASSIGN(boolean)"><!-- --></A><H3>
+mBXOR_ASSIGN</H3>
+<PRE>
+public final void <B>mBXOR_ASSIGN</B>(boolean&nbsp;_createToken)
+                        throws antlr.RecognitionException,
+                               antlr.CharStreamException,
+                               antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mBOR(boolean)"><!-- --></A><H3>
+mBOR</H3>
+<PRE>
+public final void <B>mBOR</B>(boolean&nbsp;_createToken)
+                throws antlr.RecognitionException,
+                       antlr.CharStreamException,
+                       antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mBOR_ASSIGN(boolean)"><!-- --></A><H3>
+mBOR_ASSIGN</H3>
+<PRE>
+public final void <B>mBOR_ASSIGN</B>(boolean&nbsp;_createToken)
+                       throws antlr.RecognitionException,
+                              antlr.CharStreamException,
+                              antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mLOR(boolean)"><!-- --></A><H3>
+mLOR</H3>
+<PRE>
+public final void <B>mLOR</B>(boolean&nbsp;_createToken)
+                throws antlr.RecognitionException,
+                       antlr.CharStreamException,
+                       antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mBAND(boolean)"><!-- --></A><H3>
+mBAND</H3>
+<PRE>
+public final void <B>mBAND</B>(boolean&nbsp;_createToken)
+                 throws antlr.RecognitionException,
+                        antlr.CharStreamException,
+                        antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mBAND_ASSIGN(boolean)"><!-- --></A><H3>
+mBAND_ASSIGN</H3>
+<PRE>
+public final void <B>mBAND_ASSIGN</B>(boolean&nbsp;_createToken)
+                        throws antlr.RecognitionException,
+                               antlr.CharStreamException,
+                               antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mLAND(boolean)"><!-- --></A><H3>
+mLAND</H3>
+<PRE>
+public final void <B>mLAND</B>(boolean&nbsp;_createToken)
+                 throws antlr.RecognitionException,
+                        antlr.CharStreamException,
+                        antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mSEMI(boolean)"><!-- --></A><H3>
+mSEMI</H3>
+<PRE>
+public final void <B>mSEMI</B>(boolean&nbsp;_createToken)
+                 throws antlr.RecognitionException,
+                        antlr.CharStreamException,
+                        antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mCHAR_LITERAL(boolean)"><!-- --></A><H3>
+mCHAR_LITERAL</H3>
+<PRE>
+public final void <B>mCHAR_LITERAL</B>(boolean&nbsp;_createToken)
+                         throws antlr.RecognitionException,
+                                antlr.CharStreamException,
+                                antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mSTRING_LITERAL(boolean)"><!-- --></A><H3>
+mSTRING_LITERAL</H3>
+<PRE>
+public final void <B>mSTRING_LITERAL</B>(boolean&nbsp;_createToken)
+                           throws antlr.RecognitionException,
+                                  antlr.CharStreamException,
+                                  antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mIDENT(boolean)"><!-- --></A><H3>
+mIDENT</H3>
+<PRE>
+public final void <B>mIDENT</B>(boolean&nbsp;_createToken)
+                  throws antlr.RecognitionException,
+                         antlr.CharStreamException,
+                         antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mNUM_INT(boolean)"><!-- --></A><H3>
+mNUM_INT</H3>
+<PRE>
+public final void <B>mNUM_INT</B>(boolean&nbsp;_createToken)
+                    throws antlr.RecognitionException,
+                           antlr.CharStreamException,
+                           antlr.TokenStreamException</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>antlr.RecognitionException</CODE>
+<DD><CODE>antlr.CharStreamException</CODE>
+<DD><CODE>antlr.TokenStreamException</CODE></DL>
+</DD>
+</DL>
+<!-- ========= END OF CLASS DATA ========= -->
+<HR>
+
+
+<!-- ======= START OF BOTTOM NAVBAR ====== -->
+<A NAME="navbar_bottom"><!-- --></A>
+<A HREF="#skip-navbar_bottom" title="Skip navigation links"></A>
+<TABLE BORDER="0" WIDTH="100%" CELLPADDING="1" CELLSPACING="0" SUMMARY="">
+<TR>
+<TD COLSPAN=2 BGCOLOR="#EEEEFF" CLASS="NavBarCell1">
+<A NAME="navbar_bottom_firstrow"><!-- --></A>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="3" SUMMARY="">
+  <TR ALIGN="center" VALIGN="top">
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-summary.html"><FONT CLASS="NavBarFont1"><B>Package</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#FFFFFF" CLASS="NavBarCell1Rev"> &nbsp;<FONT CLASS="NavBarFont1Rev"><B>Class</B></FONT>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-tree.html"><FONT CLASS="NavBarFont1"><B>Tree</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../deprecated-list.html"><FONT CLASS="NavBarFont1"><B>Deprecated</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../index-all.html"><FONT CLASS="NavBarFont1"><B>Index</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../help-doc.html"><FONT CLASS="NavBarFont1"><B>Help</B></FONT></A>&nbsp;</TD>
+  </TR>
+</TABLE>
+</TD>
+<TD ALIGN="right" VALIGN="top" ROWSPAN=3><EM>
+</EM>
+</TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+&nbsp;<A HREF="../../../processing/app/preproc/PdeEmitter.html" title="class in processing.app.preproc"><B>PREV CLASS</B></A>&nbsp;
+&nbsp;<A HREF="../../../processing/app/preproc/PdePartialTokenTypes.html" title="interface in processing.app.preproc"><B>NEXT CLASS</B></A></FONT></TD>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+  <A HREF="../../../index.html?processing/app/preproc/PdeLexer.html" target="_top"><B>FRAMES</B></A>  &nbsp;
+&nbsp;<A HREF="PdeLexer.html" target="_top"><B>NO FRAMES</B></A>  &nbsp;
+&nbsp;<SCRIPT type="text/javascript">
+  <!--
+  if(window==top) {
+    document.writeln('<A HREF="../../../allclasses-noframe.html"><B>All Classes</B></A>');
+  }
+  //-->
+</SCRIPT>
+<NOSCRIPT>
+  <A HREF="../../../allclasses-noframe.html"><B>All Classes</B></A>
+</NOSCRIPT>
+
+
+</FONT></TD>
+</TR>
+<TR>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+  SUMMARY:&nbsp;NESTED&nbsp;|&nbsp;<A HREF="#field_summary">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor_summary">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_summary">METHOD</A></FONT></TD>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+DETAIL:&nbsp;<A HREF="#field_detail">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor_detail">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_detail">METHOD</A></FONT></TD>
+</TR>
+</TABLE>
+<A NAME="skip-navbar_bottom"></A>
+<!-- ======== END OF BOTTOM NAVBAR ======= -->
+
+<HR>
+
+</BODY>
+</HTML>

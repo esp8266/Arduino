@@ -1,0 +1,18 @@
+<launch4jConfig>
+  <headerType>gui</headerType>
+  <jar>../SimpleApp.jar</jar>
+  <outfile>../SimpleApp.exe</outfile>
+  <errTitle>SimpleApp</errTitle>
+  <chdir>.</chdir>
+  <customProcName>true</customProcName>
+  <icon>SimpleApp.ico</icon>
+  <jre>
+    <minVersion>1.4.0</minVersion>
+  </jre>
+  <splash>
+    <file>splash.bmp</file>
+    <waitForWindow>true</waitForWindow>
+    <timeout>60</timeout>
+    <timeoutErr>true</timeoutErr>
+  </splash>
+</launch4jConfig>

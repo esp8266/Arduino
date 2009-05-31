@@ -1,0 +1,479 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+StdXMLBuilder
+</TITLE>
+
+<META NAME="keywords" CONTENT="processing.xml.StdXMLBuilder class">
+
+<LINK REL ="stylesheet" TYPE="text/css" HREF="../../stylesheet.css" TITLE="Style">
+
+<SCRIPT type="text/javascript">
+function windowTitle()
+{
+    parent.document.title="StdXMLBuilder";
+}
+</SCRIPT>
+<NOSCRIPT>
+</NOSCRIPT>
+
+</HEAD>
+
+<BODY BGCOLOR="white" onload="windowTitle();">
+
+
+<!-- ========= START OF TOP NAVBAR ======= -->
+<A NAME="navbar_top"><!-- --></A>
+<A HREF="#skip-navbar_top" title="Skip navigation links"></A>
+<TABLE BORDER="0" WIDTH="100%" CELLPADDING="1" CELLSPACING="0" SUMMARY="">
+<TR>
+<TD COLSPAN=2 BGCOLOR="#EEEEFF" CLASS="NavBarCell1">
+<A NAME="navbar_top_firstrow"><!-- --></A>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="3" SUMMARY="">
+  <TR ALIGN="center" VALIGN="top">
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-summary.html"><FONT CLASS="NavBarFont1"><B>Package</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#FFFFFF" CLASS="NavBarCell1Rev"> &nbsp;<FONT CLASS="NavBarFont1Rev"><B>Class</B></FONT>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-tree.html"><FONT CLASS="NavBarFont1"><B>Tree</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../deprecated-list.html"><FONT CLASS="NavBarFont1"><B>Deprecated</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../index-all.html"><FONT CLASS="NavBarFont1"><B>Index</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../help-doc.html"><FONT CLASS="NavBarFont1"><B>Help</B></FONT></A>&nbsp;</TD>
+  </TR>
+</TABLE>
+</TD>
+<TD ALIGN="right" VALIGN="top" ROWSPAN=3><EM>
+</EM>
+</TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+&nbsp;PREV CLASS&nbsp;
+&nbsp;<A HREF="../../processing/xml/StdXMLParser.html" title="class in processing.xml"><B>NEXT CLASS</B></A></FONT></TD>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+  <A HREF="../../index.html?processing/xml/StdXMLBuilder.html" target="_top"><B>FRAMES</B></A>  &nbsp;
+&nbsp;<A HREF="StdXMLBuilder.html" target="_top"><B>NO FRAMES</B></A>  &nbsp;
+&nbsp;<SCRIPT type="text/javascript">
+  <!--
+  if(window==top) {
+    document.writeln('<A HREF="../../allclasses-noframe.html"><B>All Classes</B></A>');
+  }
+  //-->
+</SCRIPT>
+<NOSCRIPT>
+  <A HREF="../../allclasses-noframe.html"><B>All Classes</B></A>
+</NOSCRIPT>
+
+
+</FONT></TD>
+</TR>
+<TR>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+  SUMMARY:&nbsp;NESTED&nbsp;|&nbsp;FIELD&nbsp;|&nbsp;<A HREF="#constructor_summary">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_summary">METHOD</A></FONT></TD>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+DETAIL:&nbsp;FIELD&nbsp;|&nbsp;<A HREF="#constructor_detail">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_detail">METHOD</A></FONT></TD>
+</TR>
+</TABLE>
+<A NAME="skip-navbar_top"></A>
+<!-- ========= END OF TOP NAVBAR ========= -->
+
+<HR>
+<!-- ======== START OF CLASS DATA ======== -->
+<H2>
+<FONT SIZE="-1">
+processing.xml</FONT>
+<BR>
+Class StdXMLBuilder</H2>
+<PRE>
+java.lang.Object
+  <IMG SRC="../../resources/inherit.gif" ALT="extended by "><B>processing.xml.StdXMLBuilder</B>
+</PRE>
+<HR>
+<DL>
+<DT><PRE>public class <B>StdXMLBuilder</B><DT>extends java.lang.Object</DL>
+</PRE>
+
+<P>
+StdXMLBuilder is a concrete implementation of IXMLBuilder which creates a
+ tree of IXMLElement from an XML data source.
+<P>
+
+<P>
+<DL>
+<DT><B>See Also:</B><DD><A HREF="../../processing/xml/XMLElement.html" title="class in processing.xml"><CODE>XMLElement</CODE></A></DL>
+<HR>
+
+<P>
+
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+
+<A NAME="constructor_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Constructor Summary</B></FONT></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><B><A HREF="../../processing/xml/StdXMLBuilder.html#StdXMLBuilder()">StdXMLBuilder</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Creates the builder.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><B><A HREF="../../processing/xml/StdXMLBuilder.html#StdXMLBuilder(processing.xml.XMLElement)">StdXMLBuilder</A></B>(<A HREF="../../processing/xml/XMLElement.html" title="class in processing.xml">XMLElement</A>&nbsp;parent)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+</TABLE>
+&nbsp;
+<!-- ========== METHOD SUMMARY =========== -->
+
+<A NAME="method_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Method Summary</B></FONT></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/xml/StdXMLBuilder.html#addAttribute(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)">addAttribute</A></B>(java.lang.String&nbsp;key,
+             java.lang.String&nbsp;nsPrefix,
+             java.lang.String&nbsp;nsURI,
+             java.lang.String&nbsp;value,
+             java.lang.String&nbsp;type)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This method is called when a new attribute of an XML element is
+ encountered.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/xml/StdXMLBuilder.html#addPCData(java.io.Reader, java.lang.String, int)">addPCData</A></B>(java.io.Reader&nbsp;reader,
+          java.lang.String&nbsp;systemID,
+          int&nbsp;lineNr)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This method is called when a PCDATA element is encountered.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/xml/StdXMLBuilder.html#elementAttributesProcessed(java.lang.String, java.lang.String, java.lang.String)">elementAttributesProcessed</A></B>(java.lang.String&nbsp;name,
+                           java.lang.String&nbsp;nsPrefix,
+                           java.lang.String&nbsp;nsURI)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This method is called when the attributes of an XML element have been
+ processed.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/xml/StdXMLBuilder.html#endElement(java.lang.String, java.lang.String, java.lang.String)">endElement</A></B>(java.lang.String&nbsp;name,
+           java.lang.String&nbsp;nsPrefix,
+           java.lang.String&nbsp;nsURI)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This method is called when the end of an XML elemnt is encountered.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.lang.Object</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/xml/StdXMLBuilder.html#getResult()">getResult</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the result of the building process.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/xml/StdXMLBuilder.html#newProcessingInstruction(java.lang.String, java.io.Reader)">newProcessingInstruction</A></B>(java.lang.String&nbsp;target,
+                         java.io.Reader&nbsp;reader)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This method is called when a processing instruction is encountered.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/xml/StdXMLBuilder.html#startBuilding(java.lang.String, int)">startBuilding</A></B>(java.lang.String&nbsp;systemID,
+              int&nbsp;lineNr)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This method is called before the parser starts processing its input.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/xml/StdXMLBuilder.html#startElement(java.lang.String, java.lang.String, java.lang.String, java.lang.String, int)">startElement</A></B>(java.lang.String&nbsp;name,
+             java.lang.String&nbsp;nsPrefix,
+             java.lang.String&nbsp;nsURI,
+             java.lang.String&nbsp;systemID,
+             int&nbsp;lineNr)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This method is called when a new XML element is encountered.</TD>
+</TR>
+</TABLE>
+&nbsp;<A NAME="methods_inherited_from_class_java.lang.Object"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Methods inherited from class java.lang.Object</B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>equals, getClass, hashCode, notify, notifyAll, toString, wait, wait, wait</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;
+<P>
+
+<!-- ========= CONSTRUCTOR DETAIL ======== -->
+
+<A NAME="constructor_detail"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="1"><FONT SIZE="+2">
+<B>Constructor Detail</B></FONT></TH>
+</TR>
+</TABLE>
+
+<A NAME="StdXMLBuilder()"><!-- --></A><H3>
+StdXMLBuilder</H3>
+<PRE>
+public <B>StdXMLBuilder</B>()</PRE>
+<DL>
+<DD>Creates the builder.
+<P>
+</DL>
+<HR>
+
+<A NAME="StdXMLBuilder(processing.xml.XMLElement)"><!-- --></A><H3>
+StdXMLBuilder</H3>
+<PRE>
+public <B>StdXMLBuilder</B>(<A HREF="../../processing/xml/XMLElement.html" title="class in processing.xml">XMLElement</A>&nbsp;parent)</PRE>
+<DL>
+</DL>
+
+<!-- ============ METHOD DETAIL ========== -->
+
+<A NAME="method_detail"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="1"><FONT SIZE="+2">
+<B>Method Detail</B></FONT></TH>
+</TR>
+</TABLE>
+
+<A NAME="startBuilding(java.lang.String, int)"><!-- --></A><H3>
+startBuilding</H3>
+<PRE>
+public void <B>startBuilding</B>(java.lang.String&nbsp;systemID,
+                          int&nbsp;lineNr)</PRE>
+<DL>
+<DD>This method is called before the parser starts processing its input.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>systemID</CODE> - the system ID of the XML data source.<DD><CODE>lineNr</CODE> - the line on which the parsing starts.</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="newProcessingInstruction(java.lang.String, java.io.Reader)"><!-- --></A><H3>
+newProcessingInstruction</H3>
+<PRE>
+public void <B>newProcessingInstruction</B>(java.lang.String&nbsp;target,
+                                     java.io.Reader&nbsp;reader)</PRE>
+<DL>
+<DD>This method is called when a processing instruction is encountered.
+ PIs with target "xml" are handled by the parser.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>target</CODE> - the PI target.<DD><CODE>reader</CODE> - to read the data from the PI.</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="startElement(java.lang.String, java.lang.String, java.lang.String, java.lang.String, int)"><!-- --></A><H3>
+startElement</H3>
+<PRE>
+public void <B>startElement</B>(java.lang.String&nbsp;name,
+                         java.lang.String&nbsp;nsPrefix,
+                         java.lang.String&nbsp;nsURI,
+                         java.lang.String&nbsp;systemID,
+                         int&nbsp;lineNr)</PRE>
+<DL>
+<DD>This method is called when a new XML element is encountered.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>name</CODE> - the name of the element.<DD><CODE>nsPrefix</CODE> - the prefix used to identify the namespace. If no
+                   namespace has been specified, this parameter is null.<DD><CODE>nsURI</CODE> - the URI associated with the namespace. If no
+                   namespace has been specified, or no URI is
+                   associated with nsPrefix, this parameter is null.<DD><CODE>systemID</CODE> - the system ID of the XML data source.<DD><CODE>lineNr</CODE> - the line in the source where the element starts.<DT><B>See Also:</B><DD><A HREF="../../processing/xml/StdXMLBuilder.html#endElement(java.lang.String, java.lang.String, java.lang.String)"><CODE>endElement(java.lang.String, java.lang.String, java.lang.String)</CODE></A></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="elementAttributesProcessed(java.lang.String, java.lang.String, java.lang.String)"><!-- --></A><H3>
+elementAttributesProcessed</H3>
+<PRE>
+public void <B>elementAttributesProcessed</B>(java.lang.String&nbsp;name,
+                                       java.lang.String&nbsp;nsPrefix,
+                                       java.lang.String&nbsp;nsURI)</PRE>
+<DL>
+<DD>This method is called when the attributes of an XML element have been
+ processed.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>name</CODE> - the name of the element.<DD><CODE>nsPrefix</CODE> - the prefix used to identify the namespace. If no
+                   namespace has been specified, this parameter is null.<DD><CODE>nsURI</CODE> - the URI associated with the namespace. If no
+                   namespace has been specified, or no URI is
+                   associated with nsPrefix, this parameter is null.<DT><B>See Also:</B><DD><A HREF="../../processing/xml/StdXMLBuilder.html#startElement(java.lang.String, java.lang.String, java.lang.String, java.lang.String, int)"><CODE>startElement(java.lang.String, java.lang.String, java.lang.String, java.lang.String, int)</CODE></A>, 
+<A HREF="../../processing/xml/StdXMLBuilder.html#addAttribute(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)"><CODE>addAttribute(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)</CODE></A></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="endElement(java.lang.String, java.lang.String, java.lang.String)"><!-- --></A><H3>
+endElement</H3>
+<PRE>
+public void <B>endElement</B>(java.lang.String&nbsp;name,
+                       java.lang.String&nbsp;nsPrefix,
+                       java.lang.String&nbsp;nsURI)</PRE>
+<DL>
+<DD>This method is called when the end of an XML elemnt is encountered.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>name</CODE> - the name of the element.<DD><CODE>nsPrefix</CODE> - the prefix used to identify the namespace. If no
+                   namespace has been specified, this parameter is null.<DD><CODE>nsURI</CODE> - the URI associated with the namespace. If no
+                   namespace has been specified, or no URI is
+                   associated with nsPrefix, this parameter is null.<DT><B>See Also:</B><DD><A HREF="../../processing/xml/StdXMLBuilder.html#startElement(java.lang.String, java.lang.String, java.lang.String, java.lang.String, int)"><CODE>startElement(java.lang.String, java.lang.String, java.lang.String, java.lang.String, int)</CODE></A></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="addAttribute(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)"><!-- --></A><H3>
+addAttribute</H3>
+<PRE>
+public void <B>addAttribute</B>(java.lang.String&nbsp;key,
+                         java.lang.String&nbsp;nsPrefix,
+                         java.lang.String&nbsp;nsURI,
+                         java.lang.String&nbsp;value,
+                         java.lang.String&nbsp;type)
+                  throws java.lang.Exception</PRE>
+<DL>
+<DD>This method is called when a new attribute of an XML element is
+ encountered.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>key</CODE> - the key (name) of the attribute.<DD><CODE>nsPrefix</CODE> - the prefix used to identify the namespace. If no
+                   namespace has been specified, this parameter is null.<DD><CODE>nsURI</CODE> - the URI associated with the namespace. If no
+                   namespace has been specified, or no URI is
+                   associated with nsPrefix, this parameter is null.<DD><CODE>value</CODE> - the value of the attribute.<DD><CODE>type</CODE> - the type of the attribute. If no type is known,
+                   "CDATA" is returned.
+<DT><B>Throws:</B>
+<DD><CODE>java.lang.Exception</CODE> - If an exception occurred while processing the event.</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="addPCData(java.io.Reader, java.lang.String, int)"><!-- --></A><H3>
+addPCData</H3>
+<PRE>
+public void <B>addPCData</B>(java.io.Reader&nbsp;reader,
+                      java.lang.String&nbsp;systemID,
+                      int&nbsp;lineNr)</PRE>
+<DL>
+<DD>This method is called when a PCDATA element is encountered. A Java
+ reader is supplied from which you can read the data. The reader will
+ only read the data of the element. You don't need to check for
+ boundaries. If you don't read the full element, the rest of the data
+ is skipped. You also don't have to care about entities; they are
+ resolved by the parser.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>reader</CODE> - the Java reader from which you can retrieve the data.<DD><CODE>systemID</CODE> - the system ID of the XML data source.<DD><CODE>lineNr</CODE> - the line in the source where the element starts.</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getResult()"><!-- --></A><H3>
+getResult</H3>
+<PRE>
+public java.lang.Object <B>getResult</B>()</PRE>
+<DL>
+<DD>Returns the result of the building process. This method is called just
+ before the <I>parse</I> method of StdXMLParser returns.
+<P>
+<DD><DL>
+
+<DT><B>Returns:</B><DD>the result of the building process.</DL>
+</DD>
+</DL>
+<!-- ========= END OF CLASS DATA ========= -->
+<HR>
+
+
+<!-- ======= START OF BOTTOM NAVBAR ====== -->
+<A NAME="navbar_bottom"><!-- --></A>
+<A HREF="#skip-navbar_bottom" title="Skip navigation links"></A>
+<TABLE BORDER="0" WIDTH="100%" CELLPADDING="1" CELLSPACING="0" SUMMARY="">
+<TR>
+<TD COLSPAN=2 BGCOLOR="#EEEEFF" CLASS="NavBarCell1">
+<A NAME="navbar_bottom_firstrow"><!-- --></A>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="3" SUMMARY="">
+  <TR ALIGN="center" VALIGN="top">
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-summary.html"><FONT CLASS="NavBarFont1"><B>Package</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#FFFFFF" CLASS="NavBarCell1Rev"> &nbsp;<FONT CLASS="NavBarFont1Rev"><B>Class</B></FONT>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-tree.html"><FONT CLASS="NavBarFont1"><B>Tree</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../deprecated-list.html"><FONT CLASS="NavBarFont1"><B>Deprecated</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../index-all.html"><FONT CLASS="NavBarFont1"><B>Index</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../help-doc.html"><FONT CLASS="NavBarFont1"><B>Help</B></FONT></A>&nbsp;</TD>
+  </TR>
+</TABLE>
+</TD>
+<TD ALIGN="right" VALIGN="top" ROWSPAN=3><EM>
+</EM>
+</TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+&nbsp;PREV CLASS&nbsp;
+&nbsp;<A HREF="../../processing/xml/StdXMLParser.html" title="class in processing.xml"><B>NEXT CLASS</B></A></FONT></TD>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+  <A HREF="../../index.html?processing/xml/StdXMLBuilder.html" target="_top"><B>FRAMES</B></A>  &nbsp;
+&nbsp;<A HREF="StdXMLBuilder.html" target="_top"><B>NO FRAMES</B></A>  &nbsp;
+&nbsp;<SCRIPT type="text/javascript">
+  <!--
+  if(window==top) {
+    document.writeln('<A HREF="../../allclasses-noframe.html"><B>All Classes</B></A>');
+  }
+  //-->
+</SCRIPT>
+<NOSCRIPT>
+  <A HREF="../../allclasses-noframe.html"><B>All Classes</B></A>
+</NOSCRIPT>
+
+
+</FONT></TD>
+</TR>
+<TR>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+  SUMMARY:&nbsp;NESTED&nbsp;|&nbsp;FIELD&nbsp;|&nbsp;<A HREF="#constructor_summary">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_summary">METHOD</A></FONT></TD>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+DETAIL:&nbsp;FIELD&nbsp;|&nbsp;<A HREF="#constructor_detail">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_detail">METHOD</A></FONT></TD>
+</TR>
+</TABLE>
+<A NAME="skip-navbar_bottom"></A>
+<!-- ======== END OF BOTTOM NAVBAR ======= -->
+
+<HR>
+
+</BODY>
+</HTML>

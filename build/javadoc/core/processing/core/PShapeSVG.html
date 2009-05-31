@@ -1,0 +1,460 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+PShapeSVG
+</TITLE>
+
+<META NAME="keywords" CONTENT="processing.core.PShapeSVG class">
+
+<LINK REL ="stylesheet" TYPE="text/css" HREF="../../stylesheet.css" TITLE="Style">
+
+<SCRIPT type="text/javascript">
+function windowTitle()
+{
+    parent.document.title="PShapeSVG";
+}
+</SCRIPT>
+<NOSCRIPT>
+</NOSCRIPT>
+
+</HEAD>
+
+<BODY BGCOLOR="white" onload="windowTitle();">
+
+
+<!-- ========= START OF TOP NAVBAR ======= -->
+<A NAME="navbar_top"><!-- --></A>
+<A HREF="#skip-navbar_top" title="Skip navigation links"></A>
+<TABLE BORDER="0" WIDTH="100%" CELLPADDING="1" CELLSPACING="0" SUMMARY="">
+<TR>
+<TD COLSPAN=2 BGCOLOR="#EEEEFF" CLASS="NavBarCell1">
+<A NAME="navbar_top_firstrow"><!-- --></A>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="3" SUMMARY="">
+  <TR ALIGN="center" VALIGN="top">
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-summary.html"><FONT CLASS="NavBarFont1"><B>Package</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#FFFFFF" CLASS="NavBarCell1Rev"> &nbsp;<FONT CLASS="NavBarFont1Rev"><B>Class</B></FONT>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-tree.html"><FONT CLASS="NavBarFont1"><B>Tree</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../deprecated-list.html"><FONT CLASS="NavBarFont1"><B>Deprecated</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../index-all.html"><FONT CLASS="NavBarFont1"><B>Index</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../help-doc.html"><FONT CLASS="NavBarFont1"><B>Help</B></FONT></A>&nbsp;</TD>
+  </TR>
+</TABLE>
+</TD>
+<TD ALIGN="right" VALIGN="top" ROWSPAN=3><EM>
+</EM>
+</TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+&nbsp;<A HREF="../../processing/core/PShape.html" title="class in processing.core"><B>PREV CLASS</B></A>&nbsp;
+&nbsp;<A HREF="../../processing/core/PSmoothTriangle.html" title="class in processing.core"><B>NEXT CLASS</B></A></FONT></TD>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+  <A HREF="../../index.html?processing/core/PShapeSVG.html" target="_top"><B>FRAMES</B></A>  &nbsp;
+&nbsp;<A HREF="PShapeSVG.html" target="_top"><B>NO FRAMES</B></A>  &nbsp;
+&nbsp;<SCRIPT type="text/javascript">
+  <!--
+  if(window==top) {
+    document.writeln('<A HREF="../../allclasses-noframe.html"><B>All Classes</B></A>');
+  }
+  //-->
+</SCRIPT>
+<NOSCRIPT>
+  <A HREF="../../allclasses-noframe.html"><B>All Classes</B></A>
+</NOSCRIPT>
+
+
+</FONT></TD>
+</TR>
+<TR>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+  SUMMARY:&nbsp;NESTED&nbsp;|&nbsp;<A HREF="#fields_inherited_from_class_processing.core.PShape">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor_summary">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_summary">METHOD</A></FONT></TD>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+DETAIL:&nbsp;FIELD&nbsp;|&nbsp;<A HREF="#constructor_detail">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_detail">METHOD</A></FONT></TD>
+</TR>
+</TABLE>
+<A NAME="skip-navbar_top"></A>
+<!-- ========= END OF TOP NAVBAR ========= -->
+
+<HR>
+<!-- ======== START OF CLASS DATA ======== -->
+<H2>
+<FONT SIZE="-1">
+processing.core</FONT>
+<BR>
+Class PShapeSVG</H2>
+<PRE>
+java.lang.Object
+  <IMG SRC="../../resources/inherit.gif" ALT="extended by "><A HREF="../../processing/core/PShape.html" title="class in processing.core">processing.core.PShape</A>
+      <IMG SRC="../../resources/inherit.gif" ALT="extended by "><B>processing.core.PShapeSVG</B>
+</PRE>
+<DL>
+<DT><B>All Implemented Interfaces:</B> <DD><A HREF="../../processing/core/PConstants.html" title="interface in processing.core">PConstants</A></DD>
+</DL>
+<HR>
+<DL>
+<DT><PRE>public class <B>PShapeSVG</B><DT>extends <A HREF="../../processing/core/PShape.html" title="class in processing.core">PShape</A></DL>
+</PRE>
+
+<P>
+SVG stands for Scalable Vector Graphics, a portable graphics format. It is
+ a vector format so it allows for infinite resolution and relatively small
+ file sizes. Most modern media software can view SVG files, including Adobe
+ products, Firefox, etc. Illustrator and Inkscape can edit SVG files.
+ <p>
+ We have no intention of turning this into a full-featured SVG library.
+ The goal of this project is a basic shape importer that is small enough
+ to be included with applets, meaning that its download size should be
+ in the neighborhood of 25-30k. Starting with release 0149, this library
+ has been incorporated into the core via the loadShape() command, because
+ vector shape data is just as important as the image data from loadImage().
+ <p>
+ For more sophisticated import/export, consider the
+ <A HREF="http://xmlgraphics.apache.org/batik/">Batik</A>
+ library from the Apache Software Foundation. Future improvements to this
+ library may focus on this properly supporting a specific subset of SVG,
+ for instance the simpler SVG profiles known as
+ <A HREF="http://www.w3.org/TR/SVGMobile/">SVG Tiny or Basic</A>,
+ although we still would not support the interactivity options.
+
+ <p> <hr noshade> <p>
+
+ A minimal example program using SVG:
+ (assuming a working moo.svg is in your data folder)
+
+ <PRE>
+ PShape moo;
+
+ void setup() {
+   size(400, 400);
+   moo = loadShape("moo.svg");
+ }
+ void draw() {
+   background(255);
+   shape(moo, mouseX, mouseY);
+ }
+ </PRE>
+
+ This code is based on the Candy library written by Michael Chang, which was
+ later revised and expanded for use as a Processing core library by Ben Fry.
+ Thanks to Ricard Marxer Pinon for help with better Inkscape support in 0154.
+
+ <p> <hr noshade> <p>
+
+ Late October 2008 revisions from ricardmp, incorporated by fry (0154)
+ <UL>
+ <LI>Better style attribute handling, enabling better Inkscape support.
+ </UL>
+
+ October 2008 revisions by fry (Processing 0149, pre-1.0)
+ <UL>
+ <LI> Candy is no longer a separate library, and is instead part of core.
+ <LI> Loading now works through loadShape()
+ <LI> Shapes are now drawn using the new PGraphics shape() method.
+ </UL>
+
+ August 2008 revisions by fry (Processing 0149)
+ <UL>
+ <LI> Major changes to rework around PShape.
+ <LI> Now implementing more of the "transform" attribute.
+ </UL>
+
+ February 2008 revisions by fry (Processing 0136)
+ <UL>
+ <LI> Added support for quadratic curves in paths (Q, q, T, and t operators)
+ <LI> Support for reading SVG font data (though not rendering it yet)
+ </UL>
+
+ Revisions for "Candy 2" November 2006 by fry
+ <UL>
+ <LI> Switch to the new processing.xml library
+ <LI> Several bug fixes for parsing of shape data
+ <LI> Support for linear and radial gradients
+ <LI> Support for additional types of shapes
+ <LI> Added compound shapes (shapes with interior points)
+ <LI> Added methods to get shapes from an internal table
+ </UL>
+
+ Revision 10/31/06 by flux
+ <UL>
+ <LI> Now properly supports Processing 0118
+ <LI> Fixed a bunch of things for Casey's students and general buggity.
+ <LI> Will now properly draw #FFFFFFFF colors (were being represented as -1)
+ <LI> SVGs without <g> tags are now properly caught and loaded
+ <LI> Added a method customStyle() for overriding SVG colors/styles
+ <LI> Added a method SVGStyle() to go back to using SVG colors/styles
+ </UL>
+
+ Some SVG objects and features may not yet be supported.
+ Here is a partial list of non-included features
+ <UL>
+ <LI> Rounded rectangles
+ <LI> Drop shadow objects
+ <LI> Typography
+ <LI> <STRIKE>Layers</STRIKE> added for Candy 2
+ <LI> Patterns
+ <LI> Embedded images
+ </UL>
+
+ For those interested, the SVG specification can be found
+ <A HREF="http://www.w3.org/TR/SVG">here</A>.
+<P>
+
+<P>
+<HR>
+
+<P>
+<!-- =========== FIELD SUMMARY =========== -->
+
+<A NAME="field_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Field Summary</B></FONT></TH>
+</TR>
+</TABLE>
+&nbsp;<A NAME="fields_inherited_from_class_processing.core.PShape"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Fields inherited from class processing.core.<A HREF="../../processing/core/PShape.html" title="class in processing.core">PShape</A></B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><A HREF="../../processing/core/PShape.html#BEZIER_VERTEX">BEZIER_VERTEX</A>, <A HREF="../../processing/core/PShape.html#BREAK">BREAK</A>, <A HREF="../../processing/core/PShape.html#CURVE_VERTEX">CURVE_VERTEX</A>, <A HREF="../../processing/core/PShape.html#GEOMETRY">GEOMETRY</A>, <A HREF="../../processing/core/PShape.html#GROUP">GROUP</A>, <A HREF="../../processing/core/PShape.html#height">height</A>, <A HREF="../../processing/core/PShape.html#PATH">PATH</A>, <A HREF="../../processing/core/PShape.html#PRIMITIVE">PRIMITIVE</A>, <A HREF="../../processing/core/PShape.html#VERTEX">VERTEX</A>, <A HREF="../../processing/core/PShape.html#width">width</A></CODE></TD>
+</TR>
+</TABLE>
+&nbsp;<A NAME="fields_inherited_from_class_processing.core.PConstants"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Fields inherited from interface processing.core.<A HREF="../../processing/core/PConstants.html" title="interface in processing.core">PConstants</A></B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><A HREF="../../processing/core/PConstants.html#A">A</A>, <A HREF="../../processing/core/PConstants.html#AB">AB</A>, <A HREF="../../processing/core/PConstants.html#ADD">ADD</A>, <A HREF="../../processing/core/PConstants.html#AG">AG</A>, <A HREF="../../processing/core/PConstants.html#ALPHA">ALPHA</A>, <A HREF="../../processing/core/PConstants.html#ALPHA_MASK">ALPHA_MASK</A>, <A HREF="../../processing/core/PConstants.html#ALT">ALT</A>, <A HREF="../../processing/core/PConstants.html#AMBIENT">AMBIENT</A>, <A HREF="../../processing/core/PConstants.html#AR">AR</A>, <A HREF="../../processing/core/PConstants.html#ARC">ARC</A>, <A HREF="../../processing/core/PConstants.html#ARGB">ARGB</A>, <A HREF="../../processing/core/PConstants.html#ARROW">ARROW</A>, <A HREF="../../processing/core/PConstants.html#B">B</A>, <A HREF="../../processing/core/PConstants.html#BACKSPACE">BACKSPACE</A>, <A HREF="../../processing/core/PConstants.html#BASELINE">BASELINE</A>, <A HREF="../../processing/core/PConstants.html#BEEN_LIT">BEEN_LIT</A>, <A HREF="../../processing/core/PConstants.html#BEVEL">BEVEL</A>, <A HREF="../../processing/core/PConstants.html#BLEND">BLEND</A>, <A HREF="../../processing/core/PConstants.html#BLUE_MASK">BLUE_MASK</A>, <A HREF="../../processing/core/PConstants.html#BLUR">BLUR</A>, <A HREF="../../processing/core/PConstants.html#BOTTOM">BOTTOM</A>, <A HREF="../../processing/core/PConstants.html#BOX">BOX</A>, <A HREF="../../processing/core/PConstants.html#BURN">BURN</A>, <A HREF="../../processing/core/PConstants.html#CENTER">CENTER</A>, <A HREF="../../processing/core/PConstants.html#CENTER_DIAMETER">CENTER_DIAMETER</A>, <A HREF="../../processing/core/PConstants.html#CENTER_RADIUS">CENTER_RADIUS</A>, <A HREF="../../processing/core/PConstants.html#CHATTER">CHATTER</A>, <A HREF="../../processing/core/PConstants.html#CLOSE">CLOSE</A>, <A HREF="../../processing/core/PConstants.html#CMYK">CMYK</A>, <A HREF="../../processing/core/PConstants.html#CODED">CODED</A>, <A HREF="../../processing/core/PConstants.html#COMPLAINT">COMPLAINT</A>, <A HREF="../../processing/core/PConstants.html#CONTROL">CONTROL</A>, <A HREF="../../processing/core/PConstants.html#CORNER">CORNER</A>, <A HREF="../../processing/core/PConstants.html#CORNERS">CORNERS</A>, <A HREF="../../processing/core/PConstants.html#CROSS">CROSS</A>, <A HREF="../../processing/core/PConstants.html#CUSTOM">CUSTOM</A>, <A HREF="../../processing/core/PConstants.html#DA">DA</A>, <A HREF="../../processing/core/PConstants.html#DARKEST">DARKEST</A>, <A HREF="../../processing/core/PConstants.html#DB">DB</A>, <A HREF="../../processing/core/PConstants.html#DEG_TO_RAD">DEG_TO_RAD</A>, <A HREF="../../processing/core/PConstants.html#DELETE">DELETE</A>, <A HREF="../../processing/core/PConstants.html#DG">DG</A>, <A HREF="../../processing/core/PConstants.html#DIAMETER">DIAMETER</A>, <A HREF="../../processing/core/PConstants.html#DIFFERENCE">DIFFERENCE</A>, <A HREF="../../processing/core/PConstants.html#DILATE">DILATE</A>, <A HREF="../../processing/core/PConstants.html#DIRECTIONAL">DIRECTIONAL</A>, <A HREF="../../processing/core/PConstants.html#DISABLE_ACCURATE_TEXTURES">DISABLE_ACCURATE_TEXTURES</A>, <A HREF="../../processing/core/PConstants.html#DISABLE_DEPTH_SORT">DISABLE_DEPTH_SORT</A>, <A HREF="../../processing/core/PConstants.html#DISABLE_DEPTH_TEST">DISABLE_DEPTH_TEST</A>, <A HREF="../../processing/core/PConstants.html#DISABLE_OPENGL_2X_SMOOTH">DISABLE_OPENGL_2X_SMOOTH</A>, <A HREF="../../processing/core/PConstants.html#DISABLE_OPENGL_ERROR_REPORT">DISABLE_OPENGL_ERROR_REPORT</A>, <A HREF="../../processing/core/PConstants.html#DODGE">DODGE</A>, <A HREF="../../processing/core/PConstants.html#DOWN">DOWN</A>, <A HREF="../../processing/core/PConstants.html#DR">DR</A>, <A HREF="../../processing/core/PConstants.html#DXF">DXF</A>, <A HREF="../../processing/core/PConstants.html#EB">EB</A>, <A HREF="../../processing/core/PConstants.html#EDGE">EDGE</A>, <A HREF="../../processing/core/PConstants.html#EG">EG</A>, <A HREF="../../processing/core/PConstants.html#ELLIPSE">ELLIPSE</A>, <A HREF="../../processing/core/PConstants.html#ENABLE_ACCURATE_TEXTURES">ENABLE_ACCURATE_TEXTURES</A>, <A HREF="../../processing/core/PConstants.html#ENABLE_DEPTH_SORT">ENABLE_DEPTH_SORT</A>, <A HREF="../../processing/core/PConstants.html#ENABLE_DEPTH_TEST">ENABLE_DEPTH_TEST</A>, <A HREF="../../processing/core/PConstants.html#ENABLE_NATIVE_FONTS">ENABLE_NATIVE_FONTS</A>, <A HREF="../../processing/core/PConstants.html#ENABLE_OPENGL_2X_SMOOTH">ENABLE_OPENGL_2X_SMOOTH</A>, <A HREF="../../processing/core/PConstants.html#ENABLE_OPENGL_4X_SMOOTH">ENABLE_OPENGL_4X_SMOOTH</A>, <A HREF="../../processing/core/PConstants.html#ENABLE_OPENGL_ERROR_REPORT">ENABLE_OPENGL_ERROR_REPORT</A>, <A HREF="../../processing/core/PConstants.html#ENTER">ENTER</A>, <A HREF="../../processing/core/PConstants.html#EPSILON">EPSILON</A>, <A HREF="../../processing/core/PConstants.html#ER">ER</A>, <A HREF="../../processing/core/PConstants.html#ERODE">ERODE</A>, <A HREF="../../processing/core/PConstants.html#ERROR_BACKGROUND_IMAGE_FORMAT">ERROR_BACKGROUND_IMAGE_FORMAT</A>, <A HREF="../../processing/core/PConstants.html#ERROR_BACKGROUND_IMAGE_SIZE">ERROR_BACKGROUND_IMAGE_SIZE</A>, <A HREF="../../processing/core/PConstants.html#ERROR_PUSHMATRIX_OVERFLOW">ERROR_PUSHMATRIX_OVERFLOW</A>, <A HREF="../../processing/core/PConstants.html#ERROR_PUSHMATRIX_UNDERFLOW">ERROR_PUSHMATRIX_UNDERFLOW</A>, <A HREF="../../processing/core/PConstants.html#ERROR_TEXTFONT_NULL_PFONT">ERROR_TEXTFONT_NULL_PFONT</A>, <A HREF="../../processing/core/PConstants.html#ESC">ESC</A>, <A HREF="../../processing/core/PConstants.html#EXCLUSION">EXCLUSION</A>, <A HREF="../../processing/core/PConstants.html#G">G</A>, <A HREF="../../processing/core/PConstants.html#GIF">GIF</A>, <A HREF="../../processing/core/PConstants.html#GRAY">GRAY</A>, <A HREF="../../processing/core/PConstants.html#GREEN_MASK">GREEN_MASK</A>, <A HREF="../../processing/core/PConstants.html#HALF_PI">HALF_PI</A>, <A HREF="../../processing/core/PConstants.html#HAND">HAND</A>, <A HREF="../../processing/core/PConstants.html#HARD_LIGHT">HARD_LIGHT</A>, <A HREF="../../processing/core/PConstants.html#HINT_COUNT">HINT_COUNT</A>, <A HREF="../../processing/core/PConstants.html#HSB">HSB</A>, <A HREF="../../processing/core/PConstants.html#IMAGE">IMAGE</A>, <A HREF="../../processing/core/PConstants.html#INVERT">INVERT</A>, <A HREF="../../processing/core/PConstants.html#JAVA2D">JAVA2D</A>, <A HREF="../../processing/core/PConstants.html#JPEG">JPEG</A>, <A HREF="../../processing/core/PConstants.html#LEFT">LEFT</A>, <A HREF="../../processing/core/PConstants.html#LIGHTEST">LIGHTEST</A>, <A HREF="../../processing/core/PConstants.html#LINE">LINE</A>, <A HREF="../../processing/core/PConstants.html#LINES">LINES</A>, <A HREF="../../processing/core/PConstants.html#LINUX">LINUX</A>, <A HREF="../../processing/core/PConstants.html#MACOSX">MACOSX</A>, <A HREF="../../processing/core/PConstants.html#MAX_FLOAT">MAX_FLOAT</A>, <A HREF="../../processing/core/PConstants.html#MAX_INT">MAX_INT</A>, <A HREF="../../processing/core/PConstants.html#MIN_FLOAT">MIN_FLOAT</A>, <A HREF="../../processing/core/PConstants.html#MIN_INT">MIN_INT</A>, <A HREF="../../processing/core/PConstants.html#MITER">MITER</A>, <A HREF="../../processing/core/PConstants.html#MODEL">MODEL</A>, <A HREF="../../processing/core/PConstants.html#MOVE">MOVE</A>, <A HREF="../../processing/core/PConstants.html#MULTIPLY">MULTIPLY</A>, <A HREF="../../processing/core/PConstants.html#NORMAL">NORMAL</A>, <A HREF="../../processing/core/PConstants.html#NORMALIZED">NORMALIZED</A>, <A HREF="../../processing/core/PConstants.html#NX">NX</A>, <A HREF="../../processing/core/PConstants.html#NY">NY</A>, <A HREF="../../processing/core/PConstants.html#NZ">NZ</A>, <A HREF="../../processing/core/PConstants.html#OPAQUE">OPAQUE</A>, <A HREF="../../processing/core/PConstants.html#OPEN">OPEN</A>, <A HREF="../../processing/core/PConstants.html#OPENGL">OPENGL</A>, <A HREF="../../processing/core/PConstants.html#ORTHOGRAPHIC">ORTHOGRAPHIC</A>, <A HREF="../../processing/core/PConstants.html#OTHER">OTHER</A>, <A HREF="../../processing/core/PConstants.html#OVERLAY">OVERLAY</A>, <A HREF="../../processing/core/PConstants.html#P2D">P2D</A>, <A HREF="../../processing/core/PConstants.html#P3D">P3D</A>, <A HREF="../../processing/core/PConstants.html#PDF">PDF</A>, <A HREF="../../processing/core/PConstants.html#PERSPECTIVE">PERSPECTIVE</A>, <A HREF="../../processing/core/PConstants.html#PI">PI</A>, <A HREF="../../processing/core/PConstants.html#platformNames">platformNames</A>, <A HREF="../../processing/core/PConstants.html#POINT">POINT</A>, <A HREF="../../processing/core/PConstants.html#POINTS">POINTS</A>, <A HREF="../../processing/core/PConstants.html#POLYGON">POLYGON</A>, <A HREF="../../processing/core/PConstants.html#POSTERIZE">POSTERIZE</A>, <A HREF="../../processing/core/PConstants.html#PROBLEM">PROBLEM</A>, <A HREF="../../processing/core/PConstants.html#PROJECT">PROJECT</A>, <A HREF="../../processing/core/PConstants.html#QUAD">QUAD</A>, <A HREF="../../processing/core/PConstants.html#QUAD_STRIP">QUAD_STRIP</A>, <A HREF="../../processing/core/PConstants.html#QUADS">QUADS</A>, <A HREF="../../processing/core/PConstants.html#QUARTER_PI">QUARTER_PI</A>, <A HREF="../../processing/core/PConstants.html#R">R</A>, <A HREF="../../processing/core/PConstants.html#RAD_TO_DEG">RAD_TO_DEG</A>, <A HREF="../../processing/core/PConstants.html#RADIUS">RADIUS</A>, <A HREF="../../processing/core/PConstants.html#RECT">RECT</A>, <A HREF="../../processing/core/PConstants.html#RED_MASK">RED_MASK</A>, <A HREF="../../processing/core/PConstants.html#REPLACE">REPLACE</A>, <A HREF="../../processing/core/PConstants.html#RETURN">RETURN</A>, <A HREF="../../processing/core/PConstants.html#RGB">RGB</A>, <A HREF="../../processing/core/PConstants.html#RIGHT">RIGHT</A>, <A HREF="../../processing/core/PConstants.html#ROUND">ROUND</A>, <A HREF="../../processing/core/PConstants.html#SA">SA</A>, <A HREF="../../processing/core/PConstants.html#SB">SB</A>, <A HREF="../../processing/core/PConstants.html#SCREEN">SCREEN</A>, <A HREF="../../processing/core/PConstants.html#SG">SG</A>, <A HREF="../../processing/core/PConstants.html#SHAPE">SHAPE</A>, <A HREF="../../processing/core/PConstants.html#SHIFT">SHIFT</A>, <A HREF="../../processing/core/PConstants.html#SHINE">SHINE</A>, <A HREF="../../processing/core/PConstants.html#SOFT_LIGHT">SOFT_LIGHT</A>, <A HREF="../../processing/core/PConstants.html#SPB">SPB</A>, <A HREF="../../processing/core/PConstants.html#SPG">SPG</A>, <A HREF="../../processing/core/PConstants.html#SPHERE">SPHERE</A>, <A HREF="../../processing/core/PConstants.html#SPOT">SPOT</A>, <A HREF="../../processing/core/PConstants.html#SPR">SPR</A>, <A HREF="../../processing/core/PConstants.html#SQUARE">SQUARE</A>, <A HREF="../../processing/core/PConstants.html#SR">SR</A>, <A HREF="../../processing/core/PConstants.html#SUBTRACT">SUBTRACT</A>, <A HREF="../../processing/core/PConstants.html#SW">SW</A>, <A HREF="../../processing/core/PConstants.html#TAB">TAB</A>, <A HREF="../../processing/core/PConstants.html#TARGA">TARGA</A>, <A HREF="../../processing/core/PConstants.html#TEXT">TEXT</A>, <A HREF="../../processing/core/PConstants.html#THIRD_PI">THIRD_PI</A>, <A HREF="../../processing/core/PConstants.html#THRESHOLD">THRESHOLD</A>, <A HREF="../../processing/core/PConstants.html#TIFF">TIFF</A>, <A HREF="../../processing/core/PConstants.html#TOP">TOP</A>, <A HREF="../../processing/core/PConstants.html#TRIANGLE">TRIANGLE</A>, <A HREF="../../processing/core/PConstants.html#TRIANGLE_FAN">TRIANGLE_FAN</A>, <A HREF="../../processing/core/PConstants.html#TRIANGLE_STRIP">TRIANGLE_STRIP</A>, <A HREF="../../processing/core/PConstants.html#TRIANGLES">TRIANGLES</A>, <A HREF="../../processing/core/PConstants.html#TWO_PI">TWO_PI</A>, <A HREF="../../processing/core/PConstants.html#TX">TX</A>, <A HREF="../../processing/core/PConstants.html#TY">TY</A>, <A HREF="../../processing/core/PConstants.html#TZ">TZ</A>, <A HREF="../../processing/core/PConstants.html#U">U</A>, <A HREF="../../processing/core/PConstants.html#UP">UP</A>, <A HREF="../../processing/core/PConstants.html#V">V</A>, <A HREF="../../processing/core/PConstants.html#VERTEX_FIELD_COUNT">VERTEX_FIELD_COUNT</A>, <A HREF="../../processing/core/PConstants.html#VW">VW</A>, <A HREF="../../processing/core/PConstants.html#VX">VX</A>, <A HREF="../../processing/core/PConstants.html#VY">VY</A>, <A HREF="../../processing/core/PConstants.html#VZ">VZ</A>, <A HREF="../../processing/core/PConstants.html#WAIT">WAIT</A>, <A HREF="../../processing/core/PConstants.html#WHITESPACE">WHITESPACE</A>, <A HREF="../../processing/core/PConstants.html#WINDOWS">WINDOWS</A>, <A HREF="../../processing/core/PConstants.html#X">X</A>, <A HREF="../../processing/core/PConstants.html#Y">Y</A>, <A HREF="../../processing/core/PConstants.html#Z">Z</A></CODE></TD>
+</TR>
+</TABLE>
+&nbsp;
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+
+<A NAME="constructor_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Constructor Summary</B></FONT></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><B><A HREF="../../processing/core/PShapeSVG.html#PShapeSVG(processing.core.PApplet, java.lang.String)">PShapeSVG</A></B>(<A HREF="../../processing/core/PApplet.html" title="class in processing.core">PApplet</A>&nbsp;parent,
+          java.lang.String&nbsp;filename)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Initializes a new SVG Object with the given filename.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><B><A HREF="../../processing/core/PShapeSVG.html#PShapeSVG(processing.core.PShapeSVG, processing.xml.XMLElement)">PShapeSVG</A></B>(<A HREF="../../processing/core/PShapeSVG.html" title="class in processing.core">PShapeSVG</A>&nbsp;parent,
+          <A HREF="../../processing/xml/XMLElement.html" title="class in processing.xml">XMLElement</A>&nbsp;properties)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><B><A HREF="../../processing/core/PShapeSVG.html#PShapeSVG(processing.xml.XMLElement)">PShapeSVG</A></B>(<A HREF="../../processing/xml/XMLElement.html" title="class in processing.xml">XMLElement</A>&nbsp;svg)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Initializes a new SVG Object from the given XMLElement.</TD>
+</TR>
+</TABLE>
+&nbsp;
+<!-- ========== METHOD SUMMARY =========== -->
+
+<A NAME="method_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Method Summary</B></FONT></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;<A HREF="../../processing/core/PShape.html" title="class in processing.core">PShape</A></CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PShapeSVG.html#getChild(java.lang.String)">getChild</A></B>(java.lang.String&nbsp;name)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get a particular element based on its SVG ID.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PShapeSVG.html#print()">print</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Prints out the SVG document.</TD>
+</TR>
+</TABLE>
+&nbsp;<A NAME="methods_inherited_from_class_processing.core.PShape"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Methods inherited from class processing.core.<A HREF="../../processing/core/PShape.html" title="class in processing.core">PShape</A></B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><A HREF="../../processing/core/PShape.html#addChild(processing.core.PShape)">addChild</A>, <A HREF="../../processing/core/PShape.html#apply(processing.core.PMatrix3D)">apply</A>, <A HREF="../../processing/core/PShape.html#applyMatrix(float, float, float, float, float, float)">applyMatrix</A>, <A HREF="../../processing/core/PShape.html#applyMatrix(float, float, float, float, float, float, float, float, float, float, float, float, float, float, float, float)">applyMatrix</A>, <A HREF="../../processing/core/PShape.html#applyMatrix(processing.core.PMatrix)">applyMatrix</A>, <A HREF="../../processing/core/PShape.html#applyMatrix(processing.core.PMatrix2D)">applyMatrix</A>, <A HREF="../../processing/core/PShape.html#disableStyle()">disableStyle</A>, <A HREF="../../processing/core/PShape.html#draw(processing.core.PGraphics)">draw</A>, <A HREF="../../processing/core/PShape.html#drawImpl(processing.core.PGraphics)">drawImpl</A>, <A HREF="../../processing/core/PShape.html#enableStyle()">enableStyle</A>, <A HREF="../../processing/core/PShape.html#findChild(java.lang.String)">findChild</A>, <A HREF="../../processing/core/PShape.html#getChild(int)">getChild</A>, <A HREF="../../processing/core/PShape.html#getChildCount()">getChildCount</A>, <A HREF="../../processing/core/PShape.html#getHeight()">getHeight</A>, <A HREF="../../processing/core/PShape.html#getName()">getName</A>, <A HREF="../../processing/core/PShape.html#getWidth()">getWidth</A>, <A HREF="../../processing/core/PShape.html#isVisible()">isVisible</A>, <A HREF="../../processing/core/PShape.html#post(processing.core.PGraphics)">post</A>, <A HREF="../../processing/core/PShape.html#resetMatrix()">resetMatrix</A>, <A HREF="../../processing/core/PShape.html#rotate(float)">rotate</A>, <A HREF="../../processing/core/PShape.html#rotate(float, float, float, float)">rotate</A>, <A HREF="../../processing/core/PShape.html#rotateX(float)">rotateX</A>, <A HREF="../../processing/core/PShape.html#rotateY(float)">rotateY</A>, <A HREF="../../processing/core/PShape.html#rotateZ(float)">rotateZ</A>, <A HREF="../../processing/core/PShape.html#scale(float)">scale</A>, <A HREF="../../processing/core/PShape.html#scale(float, float)">scale</A>, <A HREF="../../processing/core/PShape.html#scale(float, float, float)">scale</A>, <A HREF="../../processing/core/PShape.html#setName(java.lang.String)">setName</A>, <A HREF="../../processing/core/PShape.html#setVisible(boolean)">setVisible</A>, <A HREF="../../processing/core/PShape.html#translate(float, float)">translate</A>, <A HREF="../../processing/core/PShape.html#translate(float, float, float)">translate</A></CODE></TD>
+</TR>
+</TABLE>
+&nbsp;<A NAME="methods_inherited_from_class_java.lang.Object"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Methods inherited from class java.lang.Object</B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>equals, getClass, hashCode, notify, notifyAll, toString, wait, wait, wait</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;
+<P>
+
+<!-- ========= CONSTRUCTOR DETAIL ======== -->
+
+<A NAME="constructor_detail"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="1"><FONT SIZE="+2">
+<B>Constructor Detail</B></FONT></TH>
+</TR>
+</TABLE>
+
+<A NAME="PShapeSVG(processing.core.PApplet, java.lang.String)"><!-- --></A><H3>
+PShapeSVG</H3>
+<PRE>
+public <B>PShapeSVG</B>(<A HREF="../../processing/core/PApplet.html" title="class in processing.core">PApplet</A>&nbsp;parent,
+                 java.lang.String&nbsp;filename)</PRE>
+<DL>
+<DD>Initializes a new SVG Object with the given filename.
+<P>
+</DL>
+<HR>
+
+<A NAME="PShapeSVG(processing.xml.XMLElement)"><!-- --></A><H3>
+PShapeSVG</H3>
+<PRE>
+public <B>PShapeSVG</B>(<A HREF="../../processing/xml/XMLElement.html" title="class in processing.xml">XMLElement</A>&nbsp;svg)</PRE>
+<DL>
+<DD>Initializes a new SVG Object from the given XMLElement.
+<P>
+</DL>
+<HR>
+
+<A NAME="PShapeSVG(processing.core.PShapeSVG, processing.xml.XMLElement)"><!-- --></A><H3>
+PShapeSVG</H3>
+<PRE>
+public <B>PShapeSVG</B>(<A HREF="../../processing/core/PShapeSVG.html" title="class in processing.core">PShapeSVG</A>&nbsp;parent,
+                 <A HREF="../../processing/xml/XMLElement.html" title="class in processing.xml">XMLElement</A>&nbsp;properties)</PRE>
+<DL>
+</DL>
+
+<!-- ============ METHOD DETAIL ========== -->
+
+<A NAME="method_detail"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="1"><FONT SIZE="+2">
+<B>Method Detail</B></FONT></TH>
+</TR>
+</TABLE>
+
+<A NAME="getChild(java.lang.String)"><!-- --></A><H3>
+getChild</H3>
+<PRE>
+public <A HREF="../../processing/core/PShape.html" title="class in processing.core">PShape</A> <B>getChild</B>(java.lang.String&nbsp;name)</PRE>
+<DL>
+<DD>Get a particular element based on its SVG ID. When editing SVG by hand,
+ this is the id="" tag on any SVG element. When editing from Illustrator,
+ these IDs can be edited by expanding the layers palette. The names used
+ in the layers palette, both for the layers or the shapes and groups
+ beneath them can be used here.
+ <PRE>
+ // This code grabs "Layer 3" and the shapes beneath it.
+ SVG layer3 = svg.getChild("Layer 3");
+ </PRE>
+<P>
+<DD><DL>
+<DT><B>Overrides:</B><DD><CODE><A HREF="../../processing/core/PShape.html#getChild(java.lang.String)">getChild</A></CODE> in class <CODE><A HREF="../../processing/core/PShape.html" title="class in processing.core">PShape</A></CODE></DL>
+</DD>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="print()"><!-- --></A><H3>
+print</H3>
+<PRE>
+public void <B>print</B>()</PRE>
+<DL>
+<DD>Prints out the SVG document. Useful for parsing.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<!-- ========= END OF CLASS DATA ========= -->
+<HR>
+
+
+<!-- ======= START OF BOTTOM NAVBAR ====== -->
+<A NAME="navbar_bottom"><!-- --></A>
+<A HREF="#skip-navbar_bottom" title="Skip navigation links"></A>
+<TABLE BORDER="0" WIDTH="100%" CELLPADDING="1" CELLSPACING="0" SUMMARY="">
+<TR>
+<TD COLSPAN=2 BGCOLOR="#EEEEFF" CLASS="NavBarCell1">
+<A NAME="navbar_bottom_firstrow"><!-- --></A>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="3" SUMMARY="">
+  <TR ALIGN="center" VALIGN="top">
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-summary.html"><FONT CLASS="NavBarFont1"><B>Package</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#FFFFFF" CLASS="NavBarCell1Rev"> &nbsp;<FONT CLASS="NavBarFont1Rev"><B>Class</B></FONT>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-tree.html"><FONT CLASS="NavBarFont1"><B>Tree</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../deprecated-list.html"><FONT CLASS="NavBarFont1"><B>Deprecated</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../index-all.html"><FONT CLASS="NavBarFont1"><B>Index</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../help-doc.html"><FONT CLASS="NavBarFont1"><B>Help</B></FONT></A>&nbsp;</TD>
+  </TR>
+</TABLE>
+</TD>
+<TD ALIGN="right" VALIGN="top" ROWSPAN=3><EM>
+</EM>
+</TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+&nbsp;<A HREF="../../processing/core/PShape.html" title="class in processing.core"><B>PREV CLASS</B></A>&nbsp;
+&nbsp;<A HREF="../../processing/core/PSmoothTriangle.html" title="class in processing.core"><B>NEXT CLASS</B></A></FONT></TD>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+  <A HREF="../../index.html?processing/core/PShapeSVG.html" target="_top"><B>FRAMES</B></A>  &nbsp;
+&nbsp;<A HREF="PShapeSVG.html" target="_top"><B>NO FRAMES</B></A>  &nbsp;
+&nbsp;<SCRIPT type="text/javascript">
+  <!--
+  if(window==top) {
+    document.writeln('<A HREF="../../allclasses-noframe.html"><B>All Classes</B></A>');
+  }
+  //-->
+</SCRIPT>
+<NOSCRIPT>
+  <A HREF="../../allclasses-noframe.html"><B>All Classes</B></A>
+</NOSCRIPT>
+
+
+</FONT></TD>
+</TR>
+<TR>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+  SUMMARY:&nbsp;NESTED&nbsp;|&nbsp;<A HREF="#fields_inherited_from_class_processing.core.PShape">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor_summary">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_summary">METHOD</A></FONT></TD>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+DETAIL:&nbsp;FIELD&nbsp;|&nbsp;<A HREF="#constructor_detail">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_detail">METHOD</A></FONT></TD>
+</TR>
+</TABLE>
+<A NAME="skip-navbar_bottom"></A>
+<!-- ======== END OF BOTTOM NAVBAR ======= -->
+
+<HR>
+
+</BODY>
+</HTML>

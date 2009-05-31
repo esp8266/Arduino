@@ -1,0 +1,1264 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+Sketch
+</TITLE>
+
+<META NAME="keywords" CONTENT="processing.app.Sketch class">
+
+<LINK REL ="stylesheet" TYPE="text/css" HREF="../../stylesheet.css" TITLE="Style">
+
+<SCRIPT type="text/javascript">
+function windowTitle()
+{
+    parent.document.title="Sketch";
+}
+</SCRIPT>
+<NOSCRIPT>
+</NOSCRIPT>
+
+</HEAD>
+
+<BODY BGCOLOR="white" onload="windowTitle();">
+
+
+<!-- ========= START OF TOP NAVBAR ======= -->
+<A NAME="navbar_top"><!-- --></A>
+<A HREF="#skip-navbar_top" title="Skip navigation links"></A>
+<TABLE BORDER="0" WIDTH="100%" CELLPADDING="1" CELLSPACING="0" SUMMARY="">
+<TR>
+<TD COLSPAN=2 BGCOLOR="#EEEEFF" CLASS="NavBarCell1">
+<A NAME="navbar_top_firstrow"><!-- --></A>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="3" SUMMARY="">
+  <TR ALIGN="center" VALIGN="top">
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-summary.html"><FONT CLASS="NavBarFont1"><B>Package</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#FFFFFF" CLASS="NavBarCell1Rev"> &nbsp;<FONT CLASS="NavBarFont1Rev"><B>Class</B></FONT>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-tree.html"><FONT CLASS="NavBarFont1"><B>Tree</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../deprecated-list.html"><FONT CLASS="NavBarFont1"><B>Deprecated</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../index-all.html"><FONT CLASS="NavBarFont1"><B>Index</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../help-doc.html"><FONT CLASS="NavBarFont1"><B>Help</B></FONT></A>&nbsp;</TD>
+  </TR>
+</TABLE>
+</TD>
+<TD ALIGN="right" VALIGN="top" ROWSPAN=3><EM>
+</EM>
+</TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+&nbsp;<A HREF="../../processing/app/PresentMode.html" title="class in processing.app"><B>PREV CLASS</B></A>&nbsp;
+&nbsp;<A HREF="../../processing/app/SketchCode.html" title="class in processing.app"><B>NEXT CLASS</B></A></FONT></TD>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+  <A HREF="../../index.html?processing/app/Sketch.html" target="_top"><B>FRAMES</B></A>  &nbsp;
+&nbsp;<A HREF="Sketch.html" target="_top"><B>NO FRAMES</B></A>  &nbsp;
+&nbsp;<SCRIPT type="text/javascript">
+  <!--
+  if(window==top) {
+    document.writeln('<A HREF="../../allclasses-noframe.html"><B>All Classes</B></A>');
+  }
+  //-->
+</SCRIPT>
+<NOSCRIPT>
+  <A HREF="../../allclasses-noframe.html"><B>All Classes</B></A>
+</NOSCRIPT>
+
+
+</FONT></TD>
+</TR>
+<TR>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+  SUMMARY:&nbsp;NESTED&nbsp;|&nbsp;FIELD&nbsp;|&nbsp;<A HREF="#constructor_summary">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_summary">METHOD</A></FONT></TD>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+DETAIL:&nbsp;FIELD&nbsp;|&nbsp;<A HREF="#constructor_detail">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_detail">METHOD</A></FONT></TD>
+</TR>
+</TABLE>
+<A NAME="skip-navbar_top"></A>
+<!-- ========= END OF TOP NAVBAR ========= -->
+
+<HR>
+<!-- ======== START OF CLASS DATA ======== -->
+<H2>
+<FONT SIZE="-1">
+processing.app</FONT>
+<BR>
+Class Sketch</H2>
+<PRE>
+java.lang.Object
+  <IMG SRC="../../resources/inherit.gif" ALT="extended by "><B>processing.app.Sketch</B>
+</PRE>
+<HR>
+<DL>
+<DT><PRE>public class <B>Sketch</B><DT>extends java.lang.Object</DL>
+</PRE>
+
+<P>
+Stores information about files in the current sketch
+<P>
+
+<P>
+<HR>
+
+<P>
+
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+
+<A NAME="constructor_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Constructor Summary</B></FONT></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#Sketch(processing.app.Editor, java.lang.String)">Sketch</A></B>(<A HREF="../../processing/app/Editor.html" title="class in processing.app">Editor</A>&nbsp;editor,
+       java.lang.String&nbsp;path)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;path is location of the main .pde file, because this is also
+ simplest to use when opening the file from the finder/explorer.</TD>
+</TR>
+</TABLE>
+&nbsp;
+<!-- ========== METHOD SUMMARY =========== -->
+
+<A NAME="method_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Method Summary</B></FONT></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;boolean</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#addFile(java.io.File)">addFile</A></B>(java.io.File&nbsp;sourceFile)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Add a file to the sketch.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.lang.String</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#build(java.lang.String)">build</A></B>(java.lang.String&nbsp;buildPath)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Preprocess and compile all the code for this sketch.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;java.lang.String</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#checkName(java.lang.String)">checkName</A></B>(java.lang.String&nbsp;origName)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Convert to sanitized name and alert the user
+ if changes were made.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;boolean</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#exportApplet(java.lang.String)">exportApplet</A></B>(java.lang.String&nbsp;appletPath)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Handle export to applet.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;boolean</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#exportApplication(java.lang.String, int)">exportApplication</A></B>(java.lang.String&nbsp;destPath,
+                  int&nbsp;exportPlatform)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Export to application without GUI.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;boolean</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#exportApplicationPrompt()">exportApplicationPrompt</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.lang.String</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#getAppletClassName2()">getAppletClassName2</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.lang.String</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#getClassPath()">getClassPath</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;<A HREF="../../processing/app/SketchCode.html" title="class in processing.app">SketchCode</A>[]</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#getCode()">getCode</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;<A HREF="../../processing/app/SketchCode.html" title="class in processing.app">SketchCode</A></CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#getCode(int)">getCode</A></B>(int&nbsp;index)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#getCodeCount()">getCodeCount</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.io.File</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#getCodeFolder()">getCodeFolder</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the location of the sketch's code folder.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#getCodeIndex(processing.app.SketchCode)">getCodeIndex</A></B>(<A HREF="../../processing/app/SketchCode.html" title="class in processing.app">SketchCode</A>&nbsp;who)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;<A HREF="../../processing/app/SketchCode.html" title="class in processing.app">SketchCode</A></CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#getCurrentCode()">getCurrentCode</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.io.File</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#getDataFolder()">getDataFolder</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the location of the sketch's data folder.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.lang.String</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#getDefaultExtension()">getDefaultExtension</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the default extension for this editor setup.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.lang.String[]</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#getExtensions()">getExtensions</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns a String[] array of proper extensions.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.io.File</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#getFolder()">getFolder</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the sketch folder.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.lang.String</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#getLibraryPath()">getLibraryPath</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.lang.String</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#getMainFilePath()">getMainFilePath</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns path to the main .pde file for this sketch.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.lang.String</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#getName()">getName</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the name of this sketch.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.io.File</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#getPrimaryFile()">getPrimaryFile</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns a file object for the primary .pde of this sketch.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#handleAddFile()">handleAddFile</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Prompt the user for a new file to the sketch, then call the
+ other addFile() function to actually add it.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#handleDeleteCode()">handleDeleteCode</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Remove a piece of code from the sketch and from the disk.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#handleNewCode()">handleNewCode</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Handler for the New Code menu option.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#handleNextCode()">handleNextCode</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Move to the next tab.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#handlePrevCode()">handlePrevCode</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Move to the previous tab.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#handleRenameCode()">handleRenameCode</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Handler for the Rename Code menu option.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;boolean</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#hasDefaultExtension(processing.app.SketchCode)">hasDefaultExtension</A></B>(<A HREF="../../processing/app/SketchCode.html" title="class in processing.app">SketchCode</A>&nbsp;code)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;True if the specified code has the default file extension.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;boolean</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#hideExtension(java.lang.String)">hideExtension</A></B>(java.lang.String&nbsp;what)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;True if the specified extension should be hidden when shown on a tab.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#importLibrary(java.lang.String)">importLibrary</A></B>(java.lang.String&nbsp;jarPath)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Add import statements to the current tab for all of packages inside
+ the specified jar file.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;boolean</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#isDefaultExtension(java.lang.String)">isDefaultExtension</A></B>(java.lang.String&nbsp;what)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;True if the specified extension is the default file extension.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;boolean</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#isModified()">isModified</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;boolean</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#isReadOnly()">isReadOnly</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns true if this is a read-only sketch.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;boolean</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#isSanitaryName(java.lang.String)">isSanitaryName</A></B>(java.lang.String&nbsp;name)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Return true if the name is valid for a Processing sketch.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;boolean</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#isUntitled()">isUntitled</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.io.File</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#prepareCodeFolder()">prepareCodeFolder</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create the code folder if it does not exist already.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.io.File</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#prepareDataFolder()">prepareDataFolder</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create the data folder if it does not exist already.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.lang.String</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#preprocess(java.lang.String)">preprocess</A></B>(java.lang.String&nbsp;buildPath)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Build all the code for this sketch.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;java.lang.String</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#sanitizeName(java.lang.String)">sanitizeName</A></B>(java.lang.String&nbsp;origName)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Produce a sanitized name that fits our standards for likely to work.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;boolean</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#save()">save</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Save all code in the current sketch.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;java.lang.String</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#scrubComments(java.lang.String)">scrubComments</A></B>(java.lang.String&nbsp;what)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Replace all commented portions of a given String as spaces.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#setCurrentCode(int)">setCurrentCode</A></B>(int&nbsp;which)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Change what file is currently being edited.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#setModified(boolean)">setModified</A></B>(boolean&nbsp;state)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sets the modified value for the code in the frontmost tab.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#setUntitled(boolean)">setUntitled</A></B>(boolean&nbsp;u)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;boolean</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/app/Sketch.html#validExtension(java.lang.String)">validExtension</A></B>(java.lang.String&nbsp;what)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Check this extension (no dots, please) against the list of valid
+ extensions.</TD>
+</TR>
+</TABLE>
+&nbsp;<A NAME="methods_inherited_from_class_java.lang.Object"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Methods inherited from class java.lang.Object</B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>equals, getClass, hashCode, notify, notifyAll, toString, wait, wait, wait</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;
+<P>
+
+<!-- ========= CONSTRUCTOR DETAIL ======== -->
+
+<A NAME="constructor_detail"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="1"><FONT SIZE="+2">
+<B>Constructor Detail</B></FONT></TH>
+</TR>
+</TABLE>
+
+<A NAME="Sketch(processing.app.Editor, java.lang.String)"><!-- --></A><H3>
+Sketch</H3>
+<PRE>
+public <B>Sketch</B>(<A HREF="../../processing/app/Editor.html" title="class in processing.app">Editor</A>&nbsp;editor,
+              java.lang.String&nbsp;path)
+       throws java.io.IOException</PRE>
+<DL>
+<DD>path is location of the main .pde file, because this is also
+ simplest to use when opening the file from the finder/explorer.
+<P>
+<DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>java.io.IOException</CODE></DL>
+</DL>
+
+<!-- ============ METHOD DETAIL ========== -->
+
+<A NAME="method_detail"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="1"><FONT SIZE="+2">
+<B>Method Detail</B></FONT></TH>
+</TR>
+</TABLE>
+
+<A NAME="handleNewCode()"><!-- --></A><H3>
+handleNewCode</H3>
+<PRE>
+public void <B>handleNewCode</B>()</PRE>
+<DL>
+<DD>Handler for the New Code menu option.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="handleRenameCode()"><!-- --></A><H3>
+handleRenameCode</H3>
+<PRE>
+public void <B>handleRenameCode</B>()</PRE>
+<DL>
+<DD>Handler for the Rename Code menu option.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="handleDeleteCode()"><!-- --></A><H3>
+handleDeleteCode</H3>
+<PRE>
+public void <B>handleDeleteCode</B>()</PRE>
+<DL>
+<DD>Remove a piece of code from the sketch and from the disk.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="handlePrevCode()"><!-- --></A><H3>
+handlePrevCode</H3>
+<PRE>
+public void <B>handlePrevCode</B>()</PRE>
+<DL>
+<DD>Move to the previous tab.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="handleNextCode()"><!-- --></A><H3>
+handleNextCode</H3>
+<PRE>
+public void <B>handleNextCode</B>()</PRE>
+<DL>
+<DD>Move to the next tab.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="setModified(boolean)"><!-- --></A><H3>
+setModified</H3>
+<PRE>
+public void <B>setModified</B>(boolean&nbsp;state)</PRE>
+<DL>
+<DD>Sets the modified value for the code in the frontmost tab.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="isModified()"><!-- --></A><H3>
+isModified</H3>
+<PRE>
+public boolean <B>isModified</B>()</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="save()"><!-- --></A><H3>
+save</H3>
+<PRE>
+public boolean <B>save</B>()
+             throws java.io.IOException</PRE>
+<DL>
+<DD>Save all code in the current sketch.
+<P>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>java.io.IOException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="handleAddFile()"><!-- --></A><H3>
+handleAddFile</H3>
+<PRE>
+public void <B>handleAddFile</B>()</PRE>
+<DL>
+<DD>Prompt the user for a new file to the sketch, then call the
+ other addFile() function to actually add it.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="addFile(java.io.File)"><!-- --></A><H3>
+addFile</H3>
+<PRE>
+public boolean <B>addFile</B>(java.io.File&nbsp;sourceFile)</PRE>
+<DL>
+<DD>Add a file to the sketch.
+ <p/>
+ .pde or .java files will be added to the sketch folder. <br/>
+ .jar, .class, .dll, .jnilib, and .so files will all
+ be added to the "code" folder. <br/>
+ All other files will be added to the "data" folder.
+ <p/>
+ If they don't exist already, the "code" or "data" folder
+ will be created.
+ <p/>
+<P>
+<DD><DL>
+
+<DT><B>Returns:</B><DD>true if successful.</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="importLibrary(java.lang.String)"><!-- --></A><H3>
+importLibrary</H3>
+<PRE>
+public void <B>importLibrary</B>(java.lang.String&nbsp;jarPath)</PRE>
+<DL>
+<DD>Add import statements to the current tab for all of packages inside
+ the specified jar file.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="setCurrentCode(int)"><!-- --></A><H3>
+setCurrentCode</H3>
+<PRE>
+public void <B>setCurrentCode</B>(int&nbsp;which)</PRE>
+<DL>
+<DD>Change what file is currently being edited. Changes the current tab index.
+ <OL>
+ <LI> store the String for the text of the current file.
+ <LI> retrieve the String for the text of the new file.
+ <LI> change the text that's visible in the text area
+ </OL>
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="preprocess(java.lang.String)"><!-- --></A><H3>
+preprocess</H3>
+<PRE>
+public java.lang.String <B>preprocess</B>(java.lang.String&nbsp;buildPath)
+                            throws <A HREF="../../processing/app/debug/RunnerException.html" title="class in processing.app.debug">RunnerException</A></PRE>
+<DL>
+<DD>Build all the code for this sketch.
+
+ In an advanced program, the returned class name could be different,
+ which is why the className is set based on the return value.
+ A compilation error will burp up a RunnerException.
+
+ Setting purty to 'true' will cause exception line numbers to be incorrect.
+ Unless you know the code compiles, you should first run the preprocessor
+ with purty set to false to make sure there are no errors, then once
+ successful, re-export with purty set to true.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>buildPath</CODE> - Location to copy all the .java files
+<DT><B>Returns:</B><DD>null if compilation failed, main class name if not
+<DT><B>Throws:</B>
+<DD><CODE><A HREF="../../processing/app/debug/RunnerException.html" title="class in processing.app.debug">RunnerException</A></CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="build(java.lang.String)"><!-- --></A><H3>
+build</H3>
+<PRE>
+public java.lang.String <B>build</B>(java.lang.String&nbsp;buildPath)
+                       throws <A HREF="../../processing/app/debug/RunnerException.html" title="class in processing.app.debug">RunnerException</A></PRE>
+<DL>
+<DD>Preprocess and compile all the code for this sketch.
+
+ In an advanced program, the returned class name could be different,
+ which is why the className is set based on the return value.
+ A compilation error will burp up a RunnerException.
+<P>
+<DD><DL>
+
+<DT><B>Returns:</B><DD>null if compilation failed, main class name if not
+<DT><B>Throws:</B>
+<DD><CODE><A HREF="../../processing/app/debug/RunnerException.html" title="class in processing.app.debug">RunnerException</A></CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="exportApplet(java.lang.String)"><!-- --></A><H3>
+exportApplet</H3>
+<PRE>
+public boolean <B>exportApplet</B>(java.lang.String&nbsp;appletPath)
+                     throws <A HREF="../../processing/app/debug/RunnerException.html" title="class in processing.app.debug">RunnerException</A>,
+                            java.io.IOException</PRE>
+<DL>
+<DD>Handle export to applet.
+<P>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE><A HREF="../../processing/app/debug/RunnerException.html" title="class in processing.app.debug">RunnerException</A></CODE>
+<DD><CODE>java.io.IOException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="scrubComments(java.lang.String)"><!-- --></A><H3>
+scrubComments</H3>
+<PRE>
+public static java.lang.String <B>scrubComments</B>(java.lang.String&nbsp;what)</PRE>
+<DL>
+<DD>Replace all commented portions of a given String as spaces.
+ Utility function used here and in the preprocessor.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="exportApplicationPrompt()"><!-- --></A><H3>
+exportApplicationPrompt</H3>
+<PRE>
+public boolean <B>exportApplicationPrompt</B>()
+                                throws java.io.IOException,
+                                       <A HREF="../../processing/app/debug/RunnerException.html" title="class in processing.app.debug">RunnerException</A></PRE>
+<DL>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>java.io.IOException</CODE>
+<DD><CODE><A HREF="../../processing/app/debug/RunnerException.html" title="class in processing.app.debug">RunnerException</A></CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="exportApplication(java.lang.String, int)"><!-- --></A><H3>
+exportApplication</H3>
+<PRE>
+public boolean <B>exportApplication</B>(java.lang.String&nbsp;destPath,
+                                 int&nbsp;exportPlatform)
+                          throws java.io.IOException,
+                                 <A HREF="../../processing/app/debug/RunnerException.html" title="class in processing.app.debug">RunnerException</A></PRE>
+<DL>
+<DD>Export to application without GUI.
+<P>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>java.io.IOException</CODE>
+<DD><CODE><A HREF="../../processing/app/debug/RunnerException.html" title="class in processing.app.debug">RunnerException</A></CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="isReadOnly()"><!-- --></A><H3>
+isReadOnly</H3>
+<PRE>
+public boolean <B>isReadOnly</B>()</PRE>
+<DL>
+<DD>Returns true if this is a read-only sketch. Used for the
+ examples directory, or when sketches are loaded from read-only
+ volumes or folders without appropriate permissions.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="hideExtension(java.lang.String)"><!-- --></A><H3>
+hideExtension</H3>
+<PRE>
+public boolean <B>hideExtension</B>(java.lang.String&nbsp;what)</PRE>
+<DL>
+<DD>True if the specified extension should be hidden when shown on a tab.
+ For Processing, this is true for .pde files. (Broken out for subclasses.)
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="hasDefaultExtension(processing.app.SketchCode)"><!-- --></A><H3>
+hasDefaultExtension</H3>
+<PRE>
+public boolean <B>hasDefaultExtension</B>(<A HREF="../../processing/app/SketchCode.html" title="class in processing.app">SketchCode</A>&nbsp;code)</PRE>
+<DL>
+<DD>True if the specified code has the default file extension.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="isDefaultExtension(java.lang.String)"><!-- --></A><H3>
+isDefaultExtension</H3>
+<PRE>
+public boolean <B>isDefaultExtension</B>(java.lang.String&nbsp;what)</PRE>
+<DL>
+<DD>True if the specified extension is the default file extension.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="validExtension(java.lang.String)"><!-- --></A><H3>
+validExtension</H3>
+<PRE>
+public boolean <B>validExtension</B>(java.lang.String&nbsp;what)</PRE>
+<DL>
+<DD>Check this extension (no dots, please) against the list of valid
+ extensions.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getDefaultExtension()"><!-- --></A><H3>
+getDefaultExtension</H3>
+<PRE>
+public java.lang.String <B>getDefaultExtension</B>()</PRE>
+<DL>
+<DD>Returns the default extension for this editor setup.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getExtensions()"><!-- --></A><H3>
+getExtensions</H3>
+<PRE>
+public java.lang.String[] <B>getExtensions</B>()</PRE>
+<DL>
+<DD>Returns a String[] array of proper extensions.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getName()"><!-- --></A><H3>
+getName</H3>
+<PRE>
+public java.lang.String <B>getName</B>()</PRE>
+<DL>
+<DD>Returns the name of this sketch. (The pretty name of the main tab.)
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getPrimaryFile()"><!-- --></A><H3>
+getPrimaryFile</H3>
+<PRE>
+public java.io.File <B>getPrimaryFile</B>()</PRE>
+<DL>
+<DD>Returns a file object for the primary .pde of this sketch.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getMainFilePath()"><!-- --></A><H3>
+getMainFilePath</H3>
+<PRE>
+public java.lang.String <B>getMainFilePath</B>()</PRE>
+<DL>
+<DD>Returns path to the main .pde file for this sketch.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getFolder()"><!-- --></A><H3>
+getFolder</H3>
+<PRE>
+public java.io.File <B>getFolder</B>()</PRE>
+<DL>
+<DD>Returns the sketch folder.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getDataFolder()"><!-- --></A><H3>
+getDataFolder</H3>
+<PRE>
+public java.io.File <B>getDataFolder</B>()</PRE>
+<DL>
+<DD>Returns the location of the sketch's data folder. (It may not exist yet.)
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="prepareDataFolder()"><!-- --></A><H3>
+prepareDataFolder</H3>
+<PRE>
+public java.io.File <B>prepareDataFolder</B>()</PRE>
+<DL>
+<DD>Create the data folder if it does not exist already. As a convenience,
+ it also returns the data folder, since it's likely about to be used.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getCodeFolder()"><!-- --></A><H3>
+getCodeFolder</H3>
+<PRE>
+public java.io.File <B>getCodeFolder</B>()</PRE>
+<DL>
+<DD>Returns the location of the sketch's code folder. (It may not exist yet.)
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="prepareCodeFolder()"><!-- --></A><H3>
+prepareCodeFolder</H3>
+<PRE>
+public java.io.File <B>prepareCodeFolder</B>()</PRE>
+<DL>
+<DD>Create the code folder if it does not exist already. As a convenience,
+ it also returns the code folder, since it's likely about to be used.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getClassPath()"><!-- --></A><H3>
+getClassPath</H3>
+<PRE>
+public java.lang.String <B>getClassPath</B>()</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getLibraryPath()"><!-- --></A><H3>
+getLibraryPath</H3>
+<PRE>
+public java.lang.String <B>getLibraryPath</B>()</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getCode()"><!-- --></A><H3>
+getCode</H3>
+<PRE>
+public <A HREF="../../processing/app/SketchCode.html" title="class in processing.app">SketchCode</A>[] <B>getCode</B>()</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getCodeCount()"><!-- --></A><H3>
+getCodeCount</H3>
+<PRE>
+public int <B>getCodeCount</B>()</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getCode(int)"><!-- --></A><H3>
+getCode</H3>
+<PRE>
+public <A HREF="../../processing/app/SketchCode.html" title="class in processing.app">SketchCode</A> <B>getCode</B>(int&nbsp;index)</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getCodeIndex(processing.app.SketchCode)"><!-- --></A><H3>
+getCodeIndex</H3>
+<PRE>
+public int <B>getCodeIndex</B>(<A HREF="../../processing/app/SketchCode.html" title="class in processing.app">SketchCode</A>&nbsp;who)</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getCurrentCode()"><!-- --></A><H3>
+getCurrentCode</H3>
+<PRE>
+public <A HREF="../../processing/app/SketchCode.html" title="class in processing.app">SketchCode</A> <B>getCurrentCode</B>()</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="setUntitled(boolean)"><!-- --></A><H3>
+setUntitled</H3>
+<PRE>
+public void <B>setUntitled</B>(boolean&nbsp;u)</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="isUntitled()"><!-- --></A><H3>
+isUntitled</H3>
+<PRE>
+public boolean <B>isUntitled</B>()</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getAppletClassName2()"><!-- --></A><H3>
+getAppletClassName2</H3>
+<PRE>
+public java.lang.String <B>getAppletClassName2</B>()</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="checkName(java.lang.String)"><!-- --></A><H3>
+checkName</H3>
+<PRE>
+public static java.lang.String <B>checkName</B>(java.lang.String&nbsp;origName)</PRE>
+<DL>
+<DD>Convert to sanitized name and alert the user
+ if changes were made.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="isSanitaryName(java.lang.String)"><!-- --></A><H3>
+isSanitaryName</H3>
+<PRE>
+public static boolean <B>isSanitaryName</B>(java.lang.String&nbsp;name)</PRE>
+<DL>
+<DD>Return true if the name is valid for a Processing sketch.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="sanitizeName(java.lang.String)"><!-- --></A><H3>
+sanitizeName</H3>
+<PRE>
+public static java.lang.String <B>sanitizeName</B>(java.lang.String&nbsp;origName)</PRE>
+<DL>
+<DD>Produce a sanitized name that fits our standards for likely to work.
+ <p/>
+ Java classes have a wider range of names that are technically allowed
+ (supposedly any Unicode name) than what we support. The reason for
+ going more narrow is to avoid situations with text encodings and
+ converting during the process of moving files between operating
+ systems, i.e. uploading from a Windows machine to a Linux server,
+ or reading a FAT32 partition in OS X and using a thumb drive.
+ <p/>
+ This helper function replaces everything but A-Z, a-z, and 0-9 with
+ underscores. Also disallows starting the sketch name with a digit.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<!-- ========= END OF CLASS DATA ========= -->
+<HR>
+
+
+<!-- ======= START OF BOTTOM NAVBAR ====== -->
+<A NAME="navbar_bottom"><!-- --></A>
+<A HREF="#skip-navbar_bottom" title="Skip navigation links"></A>
+<TABLE BORDER="0" WIDTH="100%" CELLPADDING="1" CELLSPACING="0" SUMMARY="">
+<TR>
+<TD COLSPAN=2 BGCOLOR="#EEEEFF" CLASS="NavBarCell1">
+<A NAME="navbar_bottom_firstrow"><!-- --></A>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="3" SUMMARY="">
+  <TR ALIGN="center" VALIGN="top">
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-summary.html"><FONT CLASS="NavBarFont1"><B>Package</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#FFFFFF" CLASS="NavBarCell1Rev"> &nbsp;<FONT CLASS="NavBarFont1Rev"><B>Class</B></FONT>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-tree.html"><FONT CLASS="NavBarFont1"><B>Tree</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../deprecated-list.html"><FONT CLASS="NavBarFont1"><B>Deprecated</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../index-all.html"><FONT CLASS="NavBarFont1"><B>Index</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../help-doc.html"><FONT CLASS="NavBarFont1"><B>Help</B></FONT></A>&nbsp;</TD>
+  </TR>
+</TABLE>
+</TD>
+<TD ALIGN="right" VALIGN="top" ROWSPAN=3><EM>
+</EM>
+</TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+&nbsp;<A HREF="../../processing/app/PresentMode.html" title="class in processing.app"><B>PREV CLASS</B></A>&nbsp;
+&nbsp;<A HREF="../../processing/app/SketchCode.html" title="class in processing.app"><B>NEXT CLASS</B></A></FONT></TD>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+  <A HREF="../../index.html?processing/app/Sketch.html" target="_top"><B>FRAMES</B></A>  &nbsp;
+&nbsp;<A HREF="Sketch.html" target="_top"><B>NO FRAMES</B></A>  &nbsp;
+&nbsp;<SCRIPT type="text/javascript">
+  <!--
+  if(window==top) {
+    document.writeln('<A HREF="../../allclasses-noframe.html"><B>All Classes</B></A>');
+  }
+  //-->
+</SCRIPT>
+<NOSCRIPT>
+  <A HREF="../../allclasses-noframe.html"><B>All Classes</B></A>
+</NOSCRIPT>
+
+
+</FONT></TD>
+</TR>
+<TR>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+  SUMMARY:&nbsp;NESTED&nbsp;|&nbsp;FIELD&nbsp;|&nbsp;<A HREF="#constructor_summary">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_summary">METHOD</A></FONT></TD>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+DETAIL:&nbsp;FIELD&nbsp;|&nbsp;<A HREF="#constructor_detail">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_detail">METHOD</A></FONT></TD>
+</TR>
+</TABLE>
+<A NAME="skip-navbar_bottom"></A>
+<!-- ======== END OF BOTTOM NAVBAR ======= -->
+
+<HR>
+
+</BODY>
+</HTML>

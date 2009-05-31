@@ -1,0 +1,215 @@
+# !!!!!!!! UNLIKE PREVIOUS VERSIONS OF PROCESSING !!!!!!!!!!
+# DO NOT MODIFY THIS FILE, OR DELETE SETTINGS FROM THIS FILE
+
+# These are the default preferences. If you want to modify 
+# them directly, use the per-user local version of the file:
+
+# Documents and Settings -> [username] -> Application Data -> 
+#    Processing -> preferences.txt (on Windows XP)
+
+# Users -> [username] -> AppData -> Roaming -> 
+#    Processing -> preferences.txt (on Windows Vista)
+
+# ~/Library -> Processing -> preferences.txt (on Mac OS X)
+
+# ~/.processing -> preferences.txt (on Linux)
+
+# The exact location of your preferences file can be found at
+# the bottom of the Preferences window inside Processing.
+
+# Because AppData and Application Data may be considered 
+# hidden or system folders on Windows, you'll have to ensure
+# that they're visible in order to get at preferences.txt
+
+# You'll have problems running Processing if you incorrectly 
+# modify lines in this file.
+
+
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+# DEFAULT PATHS FOR SKETCHBOOK AND SETTINGS
+
+# relative paths will be relative to processing.exe or procesing.app.
+# absolute paths may also be used.
+
+# note that this path should use forward slashes (like unix)
+# instead of \ on windows or : on macos or whatever else
+
+# If you don't want users to have their sketchbook default to 
+# "My Documents/Processing" on Windows and "Documents/Processing" on OS X, 
+# set this to another path that will be used by default. 
+# Note that this path must exist already otherwise it won't see
+# the sketchbook folder, and will instead assume the sketchbook
+# has gone missing, and that it should instead use the default.
+#sketchbook.path=
+
+# if you don't want settings to go into "application data" on windows
+# and "library" on macosx, set this to the alternate location.
+#settings.path=data
+
+# temporary build path, normally this goes into the default
+# "temp" folder for that platform (as defined by java)
+# but this can be used to set a specific file in case of problems
+#build.path=build
+
+# By default, no sketches currently open
+last.sketch.count=0
+
+
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+# by default, check the processing server for any updates
+# (please avoid disabling, this also helps us know basic numbers 
+# on how many people are using Processing)
+update.check = true
+
+# on windows, automatically associate .pde files with processing.exe
+platform.auto_file_type_associations = true
+
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+# default size for the main window
+default.window.width = 500
+default.window.height = 600
+
+# font size for editor
+editor.font=Monospaced,plain,12
+# Monaco is nicer on Mac OS X, so use that explicitly
+editor.font.macosx = Monaco,plain,10
+
+# anti-aliased text, turned off by default
+editor.antialias=false
+
+# color to be used for background when 'external editor' enabled
+editor.external=false
+
+# caret blinking
+editor.caret.blink=true
+
+# area that's not in use by the text (replaced with tildes)
+editor.invalid=false
+
+console			 = true
+console.output.file      = stdout.txt
+console.error.file       = stderr.txt
+console.lines            = 4
+
+# set to false to disable automatically clearing the console
+# each time 'run' is hit
+console.auto_clear = true
+
+# set the maximum number of lines remembered by the console
+# the default is 500, lengthen at your own peril
+console.length = 500
+
+# convert tabs to spaces? how many spaces?
+editor.tabs.expand = true
+editor.tabs.size   = 2
+
+# automatically indent each line
+editor.indent = true
+
+# size of divider between editing area and the console
+editor.divider.size = 0
+# the larger divider on windows is ugly with the little arrows
+# this makes it large enough to see (mouse changes) and use, 
+# but keeps it from being annoyingly obtrusive
+editor.divider.size.windows = 2
+
+# any additional java options when running externally
+# (for applets that are run external to the environment...
+# those with a code folder, or using any libraries)
+# if you hose this and can't run things, it's your own durn fault 
+run.options = 
+
+# settings for the -XmsNNNm and -XmxNNNm command line option
+run.options.memory = false
+run.options.memory.initial = 64
+run.options.memory.maximum = 256
+
+# example of increasing the memory size for applets run externally
+#run.options = -Xms128m -Xmx1024m
+
+# index of the default display to use for present mode
+# (this setting not yet completely implemented)
+run.display = 1
+
+# set internally
+#run.window.bgcolor=
+
+# set to false to open a new untitled window when closing the last window
+# (otherwise, the environment will quit)
+# default to the relative norm for the different platforms, 
+# but the setting can be changed in the prefs dialog anyway
+#sketchbook.closing_last_window_quits = true
+#sketchbook.closing_last_window_quits.macosx = false
+
+
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+#history.recording = true
+
+# for advanced users, enable option to export a library
+#export.library = false
+
+# which platforms to export by default
+export.application.platform.windows = true
+export.application.platform.macosx = true
+export.application.platform.linux = true
+
+# whether or not to export as full screen (present) mode
+export.application.fullscreen = false
+
+# whether to show the stop button when exporting to application
+export.application.stop = true
+
+# false will place all exported files into a single .jar
+export.applet.separate_jar_files = false
+
+# set to false to no longer delete applet or application folders before export
+export.delete_target_folder = true
+
+# may be useful when attempting to debug the preprocessor
+preproc.save_build_files=false
+
+# allows various preprocessor features to be toggled 
+# in case they are causing problems
+
+# preprocessor: pde.g
+preproc.color_datatype = true
+preproc.web_colors = true
+preproc.enhanced_casting = true
+
+# preprocessor: PdeEmitter.java
+preproc.substitute_floats = true
+#preproc.substitute_image = false
+#preproc.substitute_font = false
+
+# auto-convert non-ascii chars to unicode escape sequences
+preproc.substitute_unicode = true
+
+# PdePreproc.java
+# writes out the parse tree as parseTree.xml, which can be usefully
+# viewed in (at least) Mozilla or IE.  useful when debugging the preprocessor.
+preproc.output_parse_tree = false
+
+# imports to use by default (changed for 0149, some imports removed)
+preproc.imports = java.applet,java.awt,java.awt.image,java.awt.event,java.io,java.net,java.text,java.util,java.util.zip,java.util.regex
+
+# set the browser to be used on linux
+browser.linux = mozilla
+
+# set to the program to be used for launching apps on linux
+#launcher.linux = gnome-open
+
+# FULL SCREEN (PRESENT MODE)
+run.present.bgcolor = #666666
+run.present.stop.color = #cccccc
+# starting in release 0159, don't use full screen exclusive anymore
+run.present.exclusive = false
+# use this by default to hide the menu bar and dock on osx
+run.present.exclusive.macosx = true

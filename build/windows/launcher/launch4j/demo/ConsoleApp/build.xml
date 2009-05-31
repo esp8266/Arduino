@@ -1,0 +1,57 @@
+<project name="ConsoleApp" default="exe" basedir=".">
+	<property name="src" location="src" />
+	<property name="lib" location="lib" />
+	<property name="build" location="build" />
+	<property name="launch4j.dir" location="../.." />
+
+	<path id="dist.classpath">
+		<pathelement path="${build}" />
+		<fileset dir="${lib}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<target name="init">
+		<tstamp />
+		<mkdir dir="${build}" />
+	</target>
+
+	<target name="compile" depends="init" description="compile the source">
+		<javac srcdir="${src}" destdir="${build}" classpathref="dist.classpath" source="1.4" debug="on" />
+	</target>
+
+	<target name="jar" depends="compile" description="create the jar">
+		<fileset dir="${lib}" id="lib.dist.fileset">
+			<include name="**/*.jar" />
+		</fileset>
+		<pathconvert pathsep=" " property="dist.classpath" refid="lib.dist.fileset">
+			<map from="${lib}" to=".\lib" />
+		</pathconvert>
+		<!-- Put everything in ${build} into a jar file -->
+		<jar jarfile="${ant.project.name}.jar">
+			<fileset dir="${build}" includes="**/*" />
+			<manifest>
+				<!-- SET YOUR MAIN CLASS HERE -->
+				<attribute name="Main-Class" value="net.sf.launch4j.example.ConsoleApp" />
+				<attribute name="Class-Path" value=". ${dist.classpath}" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="exe" depends="jar">
+		<taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask" classpath="${launch4j.dir}/launch4j.jar
+		    :${launch4j.dir}/lib/xstream.jar" />
+		<launch4j>
+			<config headerType="console" jar="ConsoleApp.jar" outfile="ConsoleApp.exe" errTitle="ConsoleApp" chdir="." customProcName="true" icon="l4j/ConsoleApp.ico">
+				<singleInstance mutexName="net.sf.launch4j.example.ConsoleApp" />
+				<jre minVersion="1.4.0" />
+			</config>
+		</launch4j>
+	</target>
+
+	<target name="clean" description="clean up">
+		<delete dir="${build}" />
+		<delete file="${ant.project.name}.jar" />
+		<delete file="${ant.project.name}.exe" />
+	</target>
+</project>

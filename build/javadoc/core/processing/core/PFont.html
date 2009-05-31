@@ -1,0 +1,990 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+PFont
+</TITLE>
+
+<META NAME="keywords" CONTENT="processing.core.PFont class">
+
+<LINK REL ="stylesheet" TYPE="text/css" HREF="../../stylesheet.css" TITLE="Style">
+
+<SCRIPT type="text/javascript">
+function windowTitle()
+{
+    parent.document.title="PFont";
+}
+</SCRIPT>
+<NOSCRIPT>
+</NOSCRIPT>
+
+</HEAD>
+
+<BODY BGCOLOR="white" onload="windowTitle();">
+
+
+<!-- ========= START OF TOP NAVBAR ======= -->
+<A NAME="navbar_top"><!-- --></A>
+<A HREF="#skip-navbar_top" title="Skip navigation links"></A>
+<TABLE BORDER="0" WIDTH="100%" CELLPADDING="1" CELLSPACING="0" SUMMARY="">
+<TR>
+<TD COLSPAN=2 BGCOLOR="#EEEEFF" CLASS="NavBarCell1">
+<A NAME="navbar_top_firstrow"><!-- --></A>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="3" SUMMARY="">
+  <TR ALIGN="center" VALIGN="top">
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-summary.html"><FONT CLASS="NavBarFont1"><B>Package</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#FFFFFF" CLASS="NavBarCell1Rev"> &nbsp;<FONT CLASS="NavBarFont1Rev"><B>Class</B></FONT>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-tree.html"><FONT CLASS="NavBarFont1"><B>Tree</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../deprecated-list.html"><FONT CLASS="NavBarFont1"><B>Deprecated</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../index-all.html"><FONT CLASS="NavBarFont1"><B>Index</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../help-doc.html"><FONT CLASS="NavBarFont1"><B>Help</B></FONT></A>&nbsp;</TD>
+  </TR>
+</TABLE>
+</TD>
+<TD ALIGN="right" VALIGN="top" ROWSPAN=3><EM>
+</EM>
+</TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+&nbsp;<A HREF="../../processing/core/PConstants.html" title="interface in processing.core"><B>PREV CLASS</B></A>&nbsp;
+&nbsp;<A HREF="../../processing/core/PGraphics.html" title="class in processing.core"><B>NEXT CLASS</B></A></FONT></TD>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+  <A HREF="../../index.html?processing/core/PFont.html" target="_top"><B>FRAMES</B></A>  &nbsp;
+&nbsp;<A HREF="PFont.html" target="_top"><B>NO FRAMES</B></A>  &nbsp;
+&nbsp;<SCRIPT type="text/javascript">
+  <!--
+  if(window==top) {
+    document.writeln('<A HREF="../../allclasses-noframe.html"><B>All Classes</B></A>');
+  }
+  //-->
+</SCRIPT>
+<NOSCRIPT>
+  <A HREF="../../allclasses-noframe.html"><B>All Classes</B></A>
+</NOSCRIPT>
+
+
+</FONT></TD>
+</TR>
+<TR>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+  SUMMARY:&nbsp;NESTED&nbsp;|&nbsp;<A HREF="#field_summary">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor_summary">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_summary">METHOD</A></FONT></TD>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+DETAIL:&nbsp;<A HREF="#field_detail">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor_detail">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_detail">METHOD</A></FONT></TD>
+</TR>
+</TABLE>
+<A NAME="skip-navbar_top"></A>
+<!-- ========= END OF TOP NAVBAR ========= -->
+
+<HR>
+<!-- ======== START OF CLASS DATA ======== -->
+<H2>
+<FONT SIZE="-1">
+processing.core</FONT>
+<BR>
+Class PFont</H2>
+<PRE>
+java.lang.Object
+  <IMG SRC="../../resources/inherit.gif" ALT="extended by "><B>processing.core.PFont</B>
+</PRE>
+<DL>
+<DT><B>All Implemented Interfaces:</B> <DD><A HREF="../../processing/core/PConstants.html" title="interface in processing.core">PConstants</A></DD>
+</DL>
+<HR>
+<DL>
+<DT><PRE>public class <B>PFont</B><DT>extends java.lang.Object<DT>implements <A HREF="../../processing/core/PConstants.html" title="interface in processing.core">PConstants</A></DL>
+</PRE>
+
+<P>
+Grayscale bitmap font class used by Processing.
+ <P>
+ Awful (and by that, I mean awesome) ascii (non)art for how this works:
+ <PRE>
+   |
+   |                   height is the full used height of the image
+   |
+   |   ..XX..       }
+   |   ..XX..       }
+   |   ......       }
+   |   XXXX..       }  topExtent (top y is baseline - topExtent)
+   |   ..XX..       }
+   |   ..XX..       }  dotted areas are where the image data
+   |   ..XX..       }  is actually located for the character
+   +---XXXXXX----   }  (it extends to the right and down
+   |                   for power of two texture sizes)
+   ^^^^ leftExtent (amount to move over before drawing the image
+
+   ^^^^^^^^^^^^^^ setWidth (width displaced by char)
+ </PRE>
+<P>
+
+<P>
+<HR>
+
+<P>
+<!-- =========== FIELD SUMMARY =========== -->
+
+<A NAME="field_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Field Summary</B></FONT></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#ascent">ascent</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#charCount">charCount</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;char[]</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#DEFAULT_CHARSET">DEFAULT_CHARSET</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The default Processing character set.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#descent">descent</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int[]</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#height">height</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;<A HREF="../../processing/core/PImage.html" title="class in processing.core">PImage</A>[]</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#images">images</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int[]</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#leftExtent">leftExtent</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#mbox2">mbox2</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;next power of 2 over the max image size (usually 64)</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.lang.String</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#name">name</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Name of the font as seen by Java when it was created.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.lang.String</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#psname">psname</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Postscript name of the font that this bitmap was created from.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int[]</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#setWidth">setWidth</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#size">size</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"natural" size of the font (most often 48)</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;boolean</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#smooth">smooth</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;true if smoothing was enabled for this font, used for native impl</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#theight">theight</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;texture height, same as mbox2, but reserved for future use</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int[]</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#topExtent">topExtent</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#twidth">twidth</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;texture width, same as mbox2, but reserved for future use</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int[]</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#value">value</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int[]</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#width">width</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+</TABLE>
+&nbsp;<A NAME="fields_inherited_from_class_processing.core.PConstants"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Fields inherited from interface processing.core.<A HREF="../../processing/core/PConstants.html" title="interface in processing.core">PConstants</A></B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><A HREF="../../processing/core/PConstants.html#A">A</A>, <A HREF="../../processing/core/PConstants.html#AB">AB</A>, <A HREF="../../processing/core/PConstants.html#ADD">ADD</A>, <A HREF="../../processing/core/PConstants.html#AG">AG</A>, <A HREF="../../processing/core/PConstants.html#ALPHA">ALPHA</A>, <A HREF="../../processing/core/PConstants.html#ALPHA_MASK">ALPHA_MASK</A>, <A HREF="../../processing/core/PConstants.html#ALT">ALT</A>, <A HREF="../../processing/core/PConstants.html#AMBIENT">AMBIENT</A>, <A HREF="../../processing/core/PConstants.html#AR">AR</A>, <A HREF="../../processing/core/PConstants.html#ARC">ARC</A>, <A HREF="../../processing/core/PConstants.html#ARGB">ARGB</A>, <A HREF="../../processing/core/PConstants.html#ARROW">ARROW</A>, <A HREF="../../processing/core/PConstants.html#B">B</A>, <A HREF="../../processing/core/PConstants.html#BACKSPACE">BACKSPACE</A>, <A HREF="../../processing/core/PConstants.html#BASELINE">BASELINE</A>, <A HREF="../../processing/core/PConstants.html#BEEN_LIT">BEEN_LIT</A>, <A HREF="../../processing/core/PConstants.html#BEVEL">BEVEL</A>, <A HREF="../../processing/core/PConstants.html#BLEND">BLEND</A>, <A HREF="../../processing/core/PConstants.html#BLUE_MASK">BLUE_MASK</A>, <A HREF="../../processing/core/PConstants.html#BLUR">BLUR</A>, <A HREF="../../processing/core/PConstants.html#BOTTOM">BOTTOM</A>, <A HREF="../../processing/core/PConstants.html#BOX">BOX</A>, <A HREF="../../processing/core/PConstants.html#BURN">BURN</A>, <A HREF="../../processing/core/PConstants.html#CENTER">CENTER</A>, <A HREF="../../processing/core/PConstants.html#CENTER_DIAMETER">CENTER_DIAMETER</A>, <A HREF="../../processing/core/PConstants.html#CENTER_RADIUS">CENTER_RADIUS</A>, <A HREF="../../processing/core/PConstants.html#CHATTER">CHATTER</A>, <A HREF="../../processing/core/PConstants.html#CLOSE">CLOSE</A>, <A HREF="../../processing/core/PConstants.html#CMYK">CMYK</A>, <A HREF="../../processing/core/PConstants.html#CODED">CODED</A>, <A HREF="../../processing/core/PConstants.html#COMPLAINT">COMPLAINT</A>, <A HREF="../../processing/core/PConstants.html#CONTROL">CONTROL</A>, <A HREF="../../processing/core/PConstants.html#CORNER">CORNER</A>, <A HREF="../../processing/core/PConstants.html#CORNERS">CORNERS</A>, <A HREF="../../processing/core/PConstants.html#CROSS">CROSS</A>, <A HREF="../../processing/core/PConstants.html#CUSTOM">CUSTOM</A>, <A HREF="../../processing/core/PConstants.html#DA">DA</A>, <A HREF="../../processing/core/PConstants.html#DARKEST">DARKEST</A>, <A HREF="../../processing/core/PConstants.html#DB">DB</A>, <A HREF="../../processing/core/PConstants.html#DEG_TO_RAD">DEG_TO_RAD</A>, <A HREF="../../processing/core/PConstants.html#DELETE">DELETE</A>, <A HREF="../../processing/core/PConstants.html#DG">DG</A>, <A HREF="../../processing/core/PConstants.html#DIAMETER">DIAMETER</A>, <A HREF="../../processing/core/PConstants.html#DIFFERENCE">DIFFERENCE</A>, <A HREF="../../processing/core/PConstants.html#DILATE">DILATE</A>, <A HREF="../../processing/core/PConstants.html#DIRECTIONAL">DIRECTIONAL</A>, <A HREF="../../processing/core/PConstants.html#DISABLE_ACCURATE_TEXTURES">DISABLE_ACCURATE_TEXTURES</A>, <A HREF="../../processing/core/PConstants.html#DISABLE_DEPTH_SORT">DISABLE_DEPTH_SORT</A>, <A HREF="../../processing/core/PConstants.html#DISABLE_DEPTH_TEST">DISABLE_DEPTH_TEST</A>, <A HREF="../../processing/core/PConstants.html#DISABLE_OPENGL_2X_SMOOTH">DISABLE_OPENGL_2X_SMOOTH</A>, <A HREF="../../processing/core/PConstants.html#DISABLE_OPENGL_ERROR_REPORT">DISABLE_OPENGL_ERROR_REPORT</A>, <A HREF="../../processing/core/PConstants.html#DODGE">DODGE</A>, <A HREF="../../processing/core/PConstants.html#DOWN">DOWN</A>, <A HREF="../../processing/core/PConstants.html#DR">DR</A>, <A HREF="../../processing/core/PConstants.html#DXF">DXF</A>, <A HREF="../../processing/core/PConstants.html#EB">EB</A>, <A HREF="../../processing/core/PConstants.html#EDGE">EDGE</A>, <A HREF="../../processing/core/PConstants.html#EG">EG</A>, <A HREF="../../processing/core/PConstants.html#ELLIPSE">ELLIPSE</A>, <A HREF="../../processing/core/PConstants.html#ENABLE_ACCURATE_TEXTURES">ENABLE_ACCURATE_TEXTURES</A>, <A HREF="../../processing/core/PConstants.html#ENABLE_DEPTH_SORT">ENABLE_DEPTH_SORT</A>, <A HREF="../../processing/core/PConstants.html#ENABLE_DEPTH_TEST">ENABLE_DEPTH_TEST</A>, <A HREF="../../processing/core/PConstants.html#ENABLE_NATIVE_FONTS">ENABLE_NATIVE_FONTS</A>, <A HREF="../../processing/core/PConstants.html#ENABLE_OPENGL_2X_SMOOTH">ENABLE_OPENGL_2X_SMOOTH</A>, <A HREF="../../processing/core/PConstants.html#ENABLE_OPENGL_4X_SMOOTH">ENABLE_OPENGL_4X_SMOOTH</A>, <A HREF="../../processing/core/PConstants.html#ENABLE_OPENGL_ERROR_REPORT">ENABLE_OPENGL_ERROR_REPORT</A>, <A HREF="../../processing/core/PConstants.html#ENTER">ENTER</A>, <A HREF="../../processing/core/PConstants.html#EPSILON">EPSILON</A>, <A HREF="../../processing/core/PConstants.html#ER">ER</A>, <A HREF="../../processing/core/PConstants.html#ERODE">ERODE</A>, <A HREF="../../processing/core/PConstants.html#ERROR_BACKGROUND_IMAGE_FORMAT">ERROR_BACKGROUND_IMAGE_FORMAT</A>, <A HREF="../../processing/core/PConstants.html#ERROR_BACKGROUND_IMAGE_SIZE">ERROR_BACKGROUND_IMAGE_SIZE</A>, <A HREF="../../processing/core/PConstants.html#ERROR_PUSHMATRIX_OVERFLOW">ERROR_PUSHMATRIX_OVERFLOW</A>, <A HREF="../../processing/core/PConstants.html#ERROR_PUSHMATRIX_UNDERFLOW">ERROR_PUSHMATRIX_UNDERFLOW</A>, <A HREF="../../processing/core/PConstants.html#ERROR_TEXTFONT_NULL_PFONT">ERROR_TEXTFONT_NULL_PFONT</A>, <A HREF="../../processing/core/PConstants.html#ESC">ESC</A>, <A HREF="../../processing/core/PConstants.html#EXCLUSION">EXCLUSION</A>, <A HREF="../../processing/core/PConstants.html#G">G</A>, <A HREF="../../processing/core/PConstants.html#GIF">GIF</A>, <A HREF="../../processing/core/PConstants.html#GRAY">GRAY</A>, <A HREF="../../processing/core/PConstants.html#GREEN_MASK">GREEN_MASK</A>, <A HREF="../../processing/core/PConstants.html#HALF_PI">HALF_PI</A>, <A HREF="../../processing/core/PConstants.html#HAND">HAND</A>, <A HREF="../../processing/core/PConstants.html#HARD_LIGHT">HARD_LIGHT</A>, <A HREF="../../processing/core/PConstants.html#HINT_COUNT">HINT_COUNT</A>, <A HREF="../../processing/core/PConstants.html#HSB">HSB</A>, <A HREF="../../processing/core/PConstants.html#IMAGE">IMAGE</A>, <A HREF="../../processing/core/PConstants.html#INVERT">INVERT</A>, <A HREF="../../processing/core/PConstants.html#JAVA2D">JAVA2D</A>, <A HREF="../../processing/core/PConstants.html#JPEG">JPEG</A>, <A HREF="../../processing/core/PConstants.html#LEFT">LEFT</A>, <A HREF="../../processing/core/PConstants.html#LIGHTEST">LIGHTEST</A>, <A HREF="../../processing/core/PConstants.html#LINE">LINE</A>, <A HREF="../../processing/core/PConstants.html#LINES">LINES</A>, <A HREF="../../processing/core/PConstants.html#LINUX">LINUX</A>, <A HREF="../../processing/core/PConstants.html#MACOSX">MACOSX</A>, <A HREF="../../processing/core/PConstants.html#MAX_FLOAT">MAX_FLOAT</A>, <A HREF="../../processing/core/PConstants.html#MAX_INT">MAX_INT</A>, <A HREF="../../processing/core/PConstants.html#MIN_FLOAT">MIN_FLOAT</A>, <A HREF="../../processing/core/PConstants.html#MIN_INT">MIN_INT</A>, <A HREF="../../processing/core/PConstants.html#MITER">MITER</A>, <A HREF="../../processing/core/PConstants.html#MODEL">MODEL</A>, <A HREF="../../processing/core/PConstants.html#MOVE">MOVE</A>, <A HREF="../../processing/core/PConstants.html#MULTIPLY">MULTIPLY</A>, <A HREF="../../processing/core/PConstants.html#NORMAL">NORMAL</A>, <A HREF="../../processing/core/PConstants.html#NORMALIZED">NORMALIZED</A>, <A HREF="../../processing/core/PConstants.html#NX">NX</A>, <A HREF="../../processing/core/PConstants.html#NY">NY</A>, <A HREF="../../processing/core/PConstants.html#NZ">NZ</A>, <A HREF="../../processing/core/PConstants.html#OPAQUE">OPAQUE</A>, <A HREF="../../processing/core/PConstants.html#OPEN">OPEN</A>, <A HREF="../../processing/core/PConstants.html#OPENGL">OPENGL</A>, <A HREF="../../processing/core/PConstants.html#ORTHOGRAPHIC">ORTHOGRAPHIC</A>, <A HREF="../../processing/core/PConstants.html#OTHER">OTHER</A>, <A HREF="../../processing/core/PConstants.html#OVERLAY">OVERLAY</A>, <A HREF="../../processing/core/PConstants.html#P2D">P2D</A>, <A HREF="../../processing/core/PConstants.html#P3D">P3D</A>, <A HREF="../../processing/core/PConstants.html#PATH">PATH</A>, <A HREF="../../processing/core/PConstants.html#PDF">PDF</A>, <A HREF="../../processing/core/PConstants.html#PERSPECTIVE">PERSPECTIVE</A>, <A HREF="../../processing/core/PConstants.html#PI">PI</A>, <A HREF="../../processing/core/PConstants.html#platformNames">platformNames</A>, <A HREF="../../processing/core/PConstants.html#POINT">POINT</A>, <A HREF="../../processing/core/PConstants.html#POINTS">POINTS</A>, <A HREF="../../processing/core/PConstants.html#POLYGON">POLYGON</A>, <A HREF="../../processing/core/PConstants.html#POSTERIZE">POSTERIZE</A>, <A HREF="../../processing/core/PConstants.html#PROBLEM">PROBLEM</A>, <A HREF="../../processing/core/PConstants.html#PROJECT">PROJECT</A>, <A HREF="../../processing/core/PConstants.html#QUAD">QUAD</A>, <A HREF="../../processing/core/PConstants.html#QUAD_STRIP">QUAD_STRIP</A>, <A HREF="../../processing/core/PConstants.html#QUADS">QUADS</A>, <A HREF="../../processing/core/PConstants.html#QUARTER_PI">QUARTER_PI</A>, <A HREF="../../processing/core/PConstants.html#R">R</A>, <A HREF="../../processing/core/PConstants.html#RAD_TO_DEG">RAD_TO_DEG</A>, <A HREF="../../processing/core/PConstants.html#RADIUS">RADIUS</A>, <A HREF="../../processing/core/PConstants.html#RECT">RECT</A>, <A HREF="../../processing/core/PConstants.html#RED_MASK">RED_MASK</A>, <A HREF="../../processing/core/PConstants.html#REPLACE">REPLACE</A>, <A HREF="../../processing/core/PConstants.html#RETURN">RETURN</A>, <A HREF="../../processing/core/PConstants.html#RGB">RGB</A>, <A HREF="../../processing/core/PConstants.html#RIGHT">RIGHT</A>, <A HREF="../../processing/core/PConstants.html#ROUND">ROUND</A>, <A HREF="../../processing/core/PConstants.html#SA">SA</A>, <A HREF="../../processing/core/PConstants.html#SB">SB</A>, <A HREF="../../processing/core/PConstants.html#SCREEN">SCREEN</A>, <A HREF="../../processing/core/PConstants.html#SG">SG</A>, <A HREF="../../processing/core/PConstants.html#SHAPE">SHAPE</A>, <A HREF="../../processing/core/PConstants.html#SHIFT">SHIFT</A>, <A HREF="../../processing/core/PConstants.html#SHINE">SHINE</A>, <A HREF="../../processing/core/PConstants.html#SOFT_LIGHT">SOFT_LIGHT</A>, <A HREF="../../processing/core/PConstants.html#SPB">SPB</A>, <A HREF="../../processing/core/PConstants.html#SPG">SPG</A>, <A HREF="../../processing/core/PConstants.html#SPHERE">SPHERE</A>, <A HREF="../../processing/core/PConstants.html#SPOT">SPOT</A>, <A HREF="../../processing/core/PConstants.html#SPR">SPR</A>, <A HREF="../../processing/core/PConstants.html#SQUARE">SQUARE</A>, <A HREF="../../processing/core/PConstants.html#SR">SR</A>, <A HREF="../../processing/core/PConstants.html#SUBTRACT">SUBTRACT</A>, <A HREF="../../processing/core/PConstants.html#SW">SW</A>, <A HREF="../../processing/core/PConstants.html#TAB">TAB</A>, <A HREF="../../processing/core/PConstants.html#TARGA">TARGA</A>, <A HREF="../../processing/core/PConstants.html#TEXT">TEXT</A>, <A HREF="../../processing/core/PConstants.html#THIRD_PI">THIRD_PI</A>, <A HREF="../../processing/core/PConstants.html#THRESHOLD">THRESHOLD</A>, <A HREF="../../processing/core/PConstants.html#TIFF">TIFF</A>, <A HREF="../../processing/core/PConstants.html#TOP">TOP</A>, <A HREF="../../processing/core/PConstants.html#TRIANGLE">TRIANGLE</A>, <A HREF="../../processing/core/PConstants.html#TRIANGLE_FAN">TRIANGLE_FAN</A>, <A HREF="../../processing/core/PConstants.html#TRIANGLE_STRIP">TRIANGLE_STRIP</A>, <A HREF="../../processing/core/PConstants.html#TRIANGLES">TRIANGLES</A>, <A HREF="../../processing/core/PConstants.html#TWO_PI">TWO_PI</A>, <A HREF="../../processing/core/PConstants.html#TX">TX</A>, <A HREF="../../processing/core/PConstants.html#TY">TY</A>, <A HREF="../../processing/core/PConstants.html#TZ">TZ</A>, <A HREF="../../processing/core/PConstants.html#U">U</A>, <A HREF="../../processing/core/PConstants.html#UP">UP</A>, <A HREF="../../processing/core/PConstants.html#V">V</A>, <A HREF="../../processing/core/PConstants.html#VERTEX_FIELD_COUNT">VERTEX_FIELD_COUNT</A>, <A HREF="../../processing/core/PConstants.html#VW">VW</A>, <A HREF="../../processing/core/PConstants.html#VX">VX</A>, <A HREF="../../processing/core/PConstants.html#VY">VY</A>, <A HREF="../../processing/core/PConstants.html#VZ">VZ</A>, <A HREF="../../processing/core/PConstants.html#WAIT">WAIT</A>, <A HREF="../../processing/core/PConstants.html#WHITESPACE">WHITESPACE</A>, <A HREF="../../processing/core/PConstants.html#WINDOWS">WINDOWS</A>, <A HREF="../../processing/core/PConstants.html#X">X</A>, <A HREF="../../processing/core/PConstants.html#Y">Y</A>, <A HREF="../../processing/core/PConstants.html#Z">Z</A></CODE></TD>
+</TR>
+</TABLE>
+&nbsp;
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+
+<A NAME="constructor_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Constructor Summary</B></FONT></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#PFont()">PFont</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#PFont(java.awt.Font, boolean, char[])">PFont</A></B>(java.awt.Font&nbsp;font,
+      boolean&nbsp;smooth,
+      char[]&nbsp;charset)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Create a new image-based font on the fly.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#PFont(java.io.InputStream)">PFont</A></B>(java.io.InputStream&nbsp;input)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+</TABLE>
+&nbsp;
+<!-- ========== METHOD SUMMARY =========== -->
+
+<A NAME="method_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Method Summary</B></FONT></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;float</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#ascent()">ascent</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the ascent of this font from the baseline.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;float</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#descent()">descent</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns how far this font descends from the baseline.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.awt.Font</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#findFont()">findFont</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Attempt to find the native version of this font.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;java.awt.Font</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#findFont(java.lang.String)">findFont</A></B>(java.lang.String&nbsp;name)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Starting with Java 1.5, Apple broke the ability to specify most fonts.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.awt.Font</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#getFont()">getFont</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Return the native java.awt.Font associated with this PFont (if any).</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#index(char)">index</A></B>(char&nbsp;c)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get index for the char (convert from unicode to bagel charset).</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;float</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#kern(char, char)">kern</A></B>(char&nbsp;a,
+     char&nbsp;b)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Currently un-implemented for .vlw fonts,
+ but honored for layout in case subclasses use it.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;java.lang.String[]</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#list()">list</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get a list of the fonts installed on the system that can be used
+ by Java.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#loadFonts()">loadFonts</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#save(java.io.OutputStream)">save</A></B>(java.io.OutputStream&nbsp;output)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Write this PFont to an OutputStream.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#setFont(java.awt.Font)">setFont</A></B>(java.awt.Font&nbsp;font)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Set the native complement of this font.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;float</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PFont.html#width(char)">width</A></B>(char&nbsp;c)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Width of this character for a font of size 1.</TD>
+</TR>
+</TABLE>
+&nbsp;<A NAME="methods_inherited_from_class_java.lang.Object"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Methods inherited from class java.lang.Object</B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>equals, getClass, hashCode, notify, notifyAll, toString, wait, wait, wait</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;
+<P>
+
+<!-- ============ FIELD DETAIL =========== -->
+
+<A NAME="field_detail"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="1"><FONT SIZE="+2">
+<B>Field Detail</B></FONT></TH>
+</TR>
+</TABLE>
+
+<A NAME="charCount"><!-- --></A><H3>
+charCount</H3>
+<PRE>
+public int <B>charCount</B></PRE>
+<DL>
+<DL>
+</DL>
+</DL>
+<HR>
+
+<A NAME="images"><!-- --></A><H3>
+images</H3>
+<PRE>
+public <A HREF="../../processing/core/PImage.html" title="class in processing.core">PImage</A>[] <B>images</B></PRE>
+<DL>
+<DL>
+</DL>
+</DL>
+<HR>
+
+<A NAME="name"><!-- --></A><H3>
+name</H3>
+<PRE>
+public java.lang.String <B>name</B></PRE>
+<DL>
+<DD>Name of the font as seen by Java when it was created.
+ If the font is available, the native version will be used.
+<P>
+<DL>
+</DL>
+</DL>
+<HR>
+
+<A NAME="psname"><!-- --></A><H3>
+psname</H3>
+<PRE>
+public java.lang.String <B>psname</B></PRE>
+<DL>
+<DD>Postscript name of the font that this bitmap was created from.
+<P>
+<DL>
+</DL>
+</DL>
+<HR>
+
+<A NAME="size"><!-- --></A><H3>
+size</H3>
+<PRE>
+public int <B>size</B></PRE>
+<DL>
+<DD>"natural" size of the font (most often 48)
+<P>
+<DL>
+</DL>
+</DL>
+<HR>
+
+<A NAME="smooth"><!-- --></A><H3>
+smooth</H3>
+<PRE>
+public boolean <B>smooth</B></PRE>
+<DL>
+<DD>true if smoothing was enabled for this font, used for native impl
+<P>
+<DL>
+</DL>
+</DL>
+<HR>
+
+<A NAME="mbox2"><!-- --></A><H3>
+mbox2</H3>
+<PRE>
+public int <B>mbox2</B></PRE>
+<DL>
+<DD>next power of 2 over the max image size (usually 64)
+<P>
+<DL>
+</DL>
+</DL>
+<HR>
+
+<A NAME="twidth"><!-- --></A><H3>
+twidth</H3>
+<PRE>
+public int <B>twidth</B></PRE>
+<DL>
+<DD>texture width, same as mbox2, but reserved for future use
+<P>
+<DL>
+</DL>
+</DL>
+<HR>
+
+<A NAME="theight"><!-- --></A><H3>
+theight</H3>
+<PRE>
+public int <B>theight</B></PRE>
+<DL>
+<DD>texture height, same as mbox2, but reserved for future use
+<P>
+<DL>
+</DL>
+</DL>
+<HR>
+
+<A NAME="value"><!-- --></A><H3>
+value</H3>
+<PRE>
+public int[] <B>value</B></PRE>
+<DL>
+<DL>
+</DL>
+</DL>
+<HR>
+
+<A NAME="height"><!-- --></A><H3>
+height</H3>
+<PRE>
+public int[] <B>height</B></PRE>
+<DL>
+<DL>
+</DL>
+</DL>
+<HR>
+
+<A NAME="width"><!-- --></A><H3>
+width</H3>
+<PRE>
+public int[] <B>width</B></PRE>
+<DL>
+<DL>
+</DL>
+</DL>
+<HR>
+
+<A NAME="setWidth"><!-- --></A><H3>
+setWidth</H3>
+<PRE>
+public int[] <B>setWidth</B></PRE>
+<DL>
+<DL>
+</DL>
+</DL>
+<HR>
+
+<A NAME="topExtent"><!-- --></A><H3>
+topExtent</H3>
+<PRE>
+public int[] <B>topExtent</B></PRE>
+<DL>
+<DL>
+</DL>
+</DL>
+<HR>
+
+<A NAME="leftExtent"><!-- --></A><H3>
+leftExtent</H3>
+<PRE>
+public int[] <B>leftExtent</B></PRE>
+<DL>
+<DL>
+</DL>
+</DL>
+<HR>
+
+<A NAME="ascent"><!-- --></A><H3>
+ascent</H3>
+<PRE>
+public int <B>ascent</B></PRE>
+<DL>
+<DL>
+</DL>
+</DL>
+<HR>
+
+<A NAME="descent"><!-- --></A><H3>
+descent</H3>
+<PRE>
+public int <B>descent</B></PRE>
+<DL>
+<DL>
+</DL>
+</DL>
+<HR>
+
+<A NAME="DEFAULT_CHARSET"><!-- --></A><H3>
+DEFAULT_CHARSET</H3>
+<PRE>
+public static char[] <B>DEFAULT_CHARSET</B></PRE>
+<DL>
+<DD>The default Processing character set.
+ <P>
+ This is the union of the Mac Roman and Windows ANSI (CP1250)
+ character sets. ISO 8859-1 Latin 1 is Unicode characters 0x80 -> 0xFF,
+ and would seem a good standard, but in practice, most P5 users would
+ rather have characters that they expect from their platform's fonts.
+ <P>
+ This is more of an interim solution until a much better
+ font solution can be determined. (i.e. create fonts on
+ the fly from some sort of vector format).
+ <P>
+ Not that I expect that to happen.
+<P>
+<DL>
+</DL>
+</DL>
+
+<!-- ========= CONSTRUCTOR DETAIL ======== -->
+
+<A NAME="constructor_detail"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="1"><FONT SIZE="+2">
+<B>Constructor Detail</B></FONT></TH>
+</TR>
+</TABLE>
+
+<A NAME="PFont()"><!-- --></A><H3>
+PFont</H3>
+<PRE>
+public <B>PFont</B>()</PRE>
+<DL>
+</DL>
+<HR>
+
+<A NAME="PFont(java.io.InputStream)"><!-- --></A><H3>
+PFont</H3>
+<PRE>
+public <B>PFont</B>(java.io.InputStream&nbsp;input)
+      throws java.io.IOException</PRE>
+<DL>
+<DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>java.io.IOException</CODE></DL>
+</DL>
+<HR>
+
+<A NAME="PFont(java.awt.Font, boolean, char[])"><!-- --></A><H3>
+PFont</H3>
+<PRE>
+public <B>PFont</B>(java.awt.Font&nbsp;font,
+             boolean&nbsp;smooth,
+             char[]&nbsp;charset)</PRE>
+<DL>
+<DD>Create a new image-based font on the fly.
+<P>
+<DL>
+<DT><B>Parameters:</B><DD><CODE>font</CODE> - the font object to create from<DD><CODE>charset</CODE> - array of all unicode chars that should be included<DD><CODE>smooth</CODE> - true to enable smoothing/anti-aliasing</DL>
+</DL>
+
+<!-- ============ METHOD DETAIL ========== -->
+
+<A NAME="method_detail"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="1"><FONT SIZE="+2">
+<B>Method Detail</B></FONT></TH>
+</TR>
+</TABLE>
+
+<A NAME="setFont(java.awt.Font)"><!-- --></A><H3>
+setFont</H3>
+<PRE>
+public void <B>setFont</B>(java.awt.Font&nbsp;font)</PRE>
+<DL>
+<DD>Set the native complement of this font.
+<P>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getFont()"><!-- --></A><H3>
+getFont</H3>
+<PRE>
+public java.awt.Font <B>getFont</B>()</PRE>
+<DL>
+<DD>Return the native java.awt.Font associated with this PFont (if any).
+<P>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="findFont()"><!-- --></A><H3>
+findFont</H3>
+<PRE>
+public java.awt.Font <B>findFont</B>()</PRE>
+<DL>
+<DD>Attempt to find the native version of this font.
+ (Public so that it can be used by OpenGL or other renderers.)
+<P>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="save(java.io.OutputStream)"><!-- --></A><H3>
+save</H3>
+<PRE>
+public void <B>save</B>(java.io.OutputStream&nbsp;output)
+          throws java.io.IOException</PRE>
+<DL>
+<DD>Write this PFont to an OutputStream.
+ <p>
+ This is used by the Create Font tool, or whatever anyone else dreams
+ up for messing with fonts themselves.
+ <p>
+ It is assumed that the calling class will handle closing
+ the stream when finished.
+<P>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Throws:</B>
+<DD><CODE>java.io.IOException</CODE></DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="index(char)"><!-- --></A><H3>
+index</H3>
+<PRE>
+public int <B>index</B>(char&nbsp;c)</PRE>
+<DL>
+<DD>Get index for the char (convert from unicode to bagel charset).
+<P>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+
+<DT><B>Returns:</B><DD>index into arrays or -1 if not found</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="kern(char, char)"><!-- --></A><H3>
+kern</H3>
+<PRE>
+public float <B>kern</B>(char&nbsp;a,
+                  char&nbsp;b)</PRE>
+<DL>
+<DD>Currently un-implemented for .vlw fonts,
+ but honored for layout in case subclasses use it.
+<P>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="ascent()"><!-- --></A><H3>
+ascent</H3>
+<PRE>
+public float <B>ascent</B>()</PRE>
+<DL>
+<DD>Returns the ascent of this font from the baseline.
+ The value is based on a font of size 1.
+<P>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="descent()"><!-- --></A><H3>
+descent</H3>
+<PRE>
+public float <B>descent</B>()</PRE>
+<DL>
+<DD>Returns how far this font descends from the baseline.
+ The value is based on a font size of 1.
+<P>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="width(char)"><!-- --></A><H3>
+width</H3>
+<PRE>
+public float <B>width</B>(char&nbsp;c)</PRE>
+<DL>
+<DD>Width of this character for a font of size 1.
+<P>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="list()"><!-- --></A><H3>
+list</H3>
+<PRE>
+public static java.lang.String[] <B>list</B>()</PRE>
+<DL>
+<DD>Get a list of the fonts installed on the system that can be used
+ by Java. Not all fonts can be used in Java, in fact it's mostly
+ only TrueType fonts. OpenType fonts with CFF data such as Adobe's
+ OpenType fonts seem to have trouble (even though they're sort of
+ TrueType fonts as well, or may have a .ttf extension). Regular
+ PostScript fonts seem to work OK, however.
+ <P>
+ Not recommended for use in applets, but this is implemented
+ in PFont because the Java methods to access this information
+ have changed between 1.1 and 1.4, and the 1.4 method is
+ typical of the sort of undergraduate-level over-abstraction
+ that the seems to have made its way into the Java API after 1.1.
+<P>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="loadFonts()"><!-- --></A><H3>
+loadFonts</H3>
+<PRE>
+public static void <B>loadFonts</B>()</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="findFont(java.lang.String)"><!-- --></A><H3>
+findFont</H3>
+<PRE>
+public static java.awt.Font <B>findFont</B>(java.lang.String&nbsp;name)</PRE>
+<DL>
+<DD>Starting with Java 1.5, Apple broke the ability to specify most fonts.
+ This has been filed as bug #4769141 at bugreporter.apple.com. More info at
+ <a href="http://dev.processing.org/bugs/show_bug.cgi?id=407">Bug 407</a>.
+<P>
+<DD><DL>
+</DL>
+</DD>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<!-- ========= END OF CLASS DATA ========= -->
+<HR>
+
+
+<!-- ======= START OF BOTTOM NAVBAR ====== -->
+<A NAME="navbar_bottom"><!-- --></A>
+<A HREF="#skip-navbar_bottom" title="Skip navigation links"></A>
+<TABLE BORDER="0" WIDTH="100%" CELLPADDING="1" CELLSPACING="0" SUMMARY="">
+<TR>
+<TD COLSPAN=2 BGCOLOR="#EEEEFF" CLASS="NavBarCell1">
+<A NAME="navbar_bottom_firstrow"><!-- --></A>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="3" SUMMARY="">
+  <TR ALIGN="center" VALIGN="top">
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-summary.html"><FONT CLASS="NavBarFont1"><B>Package</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#FFFFFF" CLASS="NavBarCell1Rev"> &nbsp;<FONT CLASS="NavBarFont1Rev"><B>Class</B></FONT>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-tree.html"><FONT CLASS="NavBarFont1"><B>Tree</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../deprecated-list.html"><FONT CLASS="NavBarFont1"><B>Deprecated</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../index-all.html"><FONT CLASS="NavBarFont1"><B>Index</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../help-doc.html"><FONT CLASS="NavBarFont1"><B>Help</B></FONT></A>&nbsp;</TD>
+  </TR>
+</TABLE>
+</TD>
+<TD ALIGN="right" VALIGN="top" ROWSPAN=3><EM>
+</EM>
+</TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+&nbsp;<A HREF="../../processing/core/PConstants.html" title="interface in processing.core"><B>PREV CLASS</B></A>&nbsp;
+&nbsp;<A HREF="../../processing/core/PGraphics.html" title="class in processing.core"><B>NEXT CLASS</B></A></FONT></TD>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+  <A HREF="../../index.html?processing/core/PFont.html" target="_top"><B>FRAMES</B></A>  &nbsp;
+&nbsp;<A HREF="PFont.html" target="_top"><B>NO FRAMES</B></A>  &nbsp;
+&nbsp;<SCRIPT type="text/javascript">
+  <!--
+  if(window==top) {
+    document.writeln('<A HREF="../../allclasses-noframe.html"><B>All Classes</B></A>');
+  }
+  //-->
+</SCRIPT>
+<NOSCRIPT>
+  <A HREF="../../allclasses-noframe.html"><B>All Classes</B></A>
+</NOSCRIPT>
+
+
+</FONT></TD>
+</TR>
+<TR>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+  SUMMARY:&nbsp;NESTED&nbsp;|&nbsp;<A HREF="#field_summary">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor_summary">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_summary">METHOD</A></FONT></TD>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+DETAIL:&nbsp;<A HREF="#field_detail">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor_detail">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_detail">METHOD</A></FONT></TD>
+</TR>
+</TABLE>
+<A NAME="skip-navbar_bottom"></A>
+<!-- ======== END OF BOTTOM NAVBAR ======= -->
+
+<HR>
+
+</BODY>
+</HTML>

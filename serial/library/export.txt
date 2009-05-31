@@ -1,0 +1,3 @@
+application.macosx = serial.jar, RXTXcomm.jar, librxtxSerial.jnilib
+application.windows = serial.jar, RXTXcomm.jar, rxtxSerial.dll
+application.linux = serial.jar, RXTXcomm.jar, librxtxSerial.so
