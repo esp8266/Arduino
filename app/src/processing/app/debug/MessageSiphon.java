@@ -44,7 +44,7 @@ class MessageSiphon implements Runnable {
     // bubble up in time (i.e. compile errors have a weird delay)
     //thread.setPriority(Thread.MIN_PRIORITY);
     thread.setPriority(Thread.MAX_PRIORITY-1);
-    //thread.start();
+    thread.start();
   }
 
 

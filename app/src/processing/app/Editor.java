@@ -1561,7 +1561,10 @@ public class Editor extends JFrame implements RunnerListener {
     presenting = present;
 
     try {
-      String appletClassName = sketch.compile();
+      // XXX: DAM: don't hardcode this to "arduino"
+      String appletClassName = sketch.compile(
+	  new Target(Base.getHardwarePath() + File.separator + "cores",
+	             "arduino"));
       if (appletClassName != null) {
         runtime = new Runner(sketch, appletClassName, presenting, Editor.this);
 

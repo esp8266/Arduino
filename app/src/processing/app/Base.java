@@ -74,6 +74,7 @@ public class Base {
   static private File examplesFolder;
   static private File librariesFolder;
   static private File toolsFolder;
+  static private File hardwareFolder;
 
   // maps imported packages to their library folder
   static HashMap<String, File> importToLibraryTable;
@@ -186,7 +187,7 @@ public class Base {
             "p { font: 11pt \"Lucida Grande\"; margin-top: 8px }"+
             "</style> </head> <body>" +
             "<b>The standard menu bar has been disabled.</b>" +
-            "<p>Due to an Apple bug, the Processing menu bar " +
+            "<p>Due to an Apple bug, the Arduino menu bar " +
             "is unusable on Mac OS X 10.5. <br>" +
             "As a workaround, the menu bar will be placed inside " +
             "the editor window. This <br>setting can be changed in the " +
@@ -224,7 +225,7 @@ public class Base {
       platform.setLookAndFeel();
     } catch (Exception e) {
       System.err.println("Non-fatal error while setting the Look & Feel.");
-      System.err.println("The error message follows, however Processing should run fine.");
+      System.err.println("The error message follows, however Arduino should run fine.");
       System.err.println(e.getMessage());
       //e.printStackTrace();
     }
@@ -272,7 +273,7 @@ public class Base {
     } catch (ClassNotFoundException cnfe) {
       Base.showPlatforms();
       Base.showError("Please install JDK 1.5 or later",
-                     "Processing requires a full JDK (not just a JRE)\n" +
+                     "Arduino requires a full JDK (not just a JRE)\n" +
                      "to run. Please install JDK 1.5 or later.\n" +
                      "More information can be found in the reference.", cnfe);
     }
@@ -298,9 +299,9 @@ public class Base {
       if (!skechbookFolder.exists()) {
         Base.showWarning("Sketchbook folder disappeared",
                          "The sketchbook folder no longer exists.\n" +
-                         "Processing will switch to the default sketchbook\n" +
+                         "Arduino will switch to the default sketchbook\n" +
                          "location, and create a new sketchbook folder if\n" +
-                         "necessary. Procesing will then stop talking about\n" +
+                         "necessary. Arduino will then stop talking about\n" +
                          "himself in the third person.", null);
         sketchbookPath = null;
       }
@@ -668,7 +669,7 @@ public class Base {
   public void handleOpenPrompt() {
     // get the frontmost window frame for placing file dialog
     FileDialog fd = new FileDialog(activeEditor,
-                                   "Open a Processing sketch...",
+                                   "Open an Arduino sketch...",
                                    FileDialog.LOAD);
     // This was annoying people, so disabled it in 0125.
     //fd.setDirectory(Preferences.get("sketchbook.path"));
@@ -792,7 +793,7 @@ public class Base {
           "p { font: 11pt \"Lucida Grande\"; margin-top: 8px }"+
           "</style> </head>" +
           "<b>Are you sure you want to Quit?</b>" +
-          "<p>Closing the last open sketch will quit Processing.";
+          "<p>Closing the last open sketch will quit Arduino.";
 
         int result = JOptionPane.showOptionDialog(editor,
                                                   prompt,
@@ -1022,7 +1023,7 @@ public class Base {
           } else {
             showWarning("Sketch Does Not Exist",
                         "The selected sketch no longer exists.\n" +
-                        "You may need to restart Processing to update\n" +
+                        "You may need to restart Arduino to update\n" +
                         "the sketchbook menu.", null);
           }
         }
@@ -1310,7 +1311,7 @@ public class Base {
         settingsFolder = platform.getSettingsFolder();
       } catch (Exception e) {
         showError("Problem getting data folder",
-                  "Error getting the Processing data folder.", e);
+                  "Error getting the Arduino data folder.", e);
       }
     }
 
@@ -1318,7 +1319,7 @@ public class Base {
     if (!settingsFolder.exists()) {
       if (!settingsFolder.mkdirs()) {
         showError("Settings issues",
-                  "Processing cannot run because it could not\n" +
+                  "Arduino cannot run because it could not\n" +
                   "create a folder to store your settings.", null);
       }
     }
@@ -1396,7 +1397,30 @@ public class Base {
   static public String getToolsPath() {
     return toolsFolder.getAbsolutePath();
   }
-
+  
+  
+  static public File getHardwareFolder() {
+    // calculate on the fly because it's needed by Preferences.init() to find
+    // the boards.txt and programmers.txt preferences files (which happens
+    // before the other folders / paths get cached).
+    return getContentFile("hardware");
+  }
+  
+  
+  static public String getHardwarePath() {
+    return getHardwareFolder().getAbsolutePath();
+  }
+  
+  
+  static public String getAvrBasePath() {
+    if(Base.isLinux()) {
+      return ""; // avr tools are installed system-wide and in the path
+    } else {
+      return getHardwarePath() + File.separator + "tools" +
+             File.separator + "avr" + File.separator + "bin" + File.separator;
+    }  
+  }
+  
 
   static public File getSketchbookFolder() {
     return new File(Preferences.get("sketchbook.path"));
@@ -1426,7 +1450,7 @@ public class Base {
 
     if (!result) {
       showError("You forgot your sketchbook",
-                "Processing cannot run because it could not\n" +
+                "Arduino cannot run because it could not\n" +
                 "create a folder to store your sketchbook.", null);
     }
 

@@ -1,0 +1,62 @@
+#######################################
+# Syntax Coloring Map For Firmata
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+Firmata	KEYWORD1
+callbackFunction	KEYWORD1
+systemResetCallbackFunction	KEYWORD1
+stringCallbackFunction	KEYWORD1
+sysexCallbackFunction	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+begin	KEYWORD2
+printVersion	KEYWORD2
+blinkVersion	KEYWORD2
+printFirmwareVersion	KEYWORD2
+setFirmwareVersion	KEYWORD2
+setFirmwareNameAndVersion	KEYWORD2
+available	KEYWORD2
+processInput	KEYWORD2
+sendAnalog	KEYWORD2
+sendDigital	KEYWORD2
+sendDigitalPortPair	KEYWORD2
+sendDigitalPort	KEYWORD2
+sendString	KEYWORD2
+sendString	KEYWORD2
+sendSysex	KEYWORD2
+attach	KEYWORD2
+detach	KEYWORD2
+flush	KEYWORD2
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+MAX_DATA_BYTES	LITERAL1
+
+DIGITAL_MESSAGE	LITERAL1
+ANALOG_MESSAGE	LITERAL1
+REPORT_ANALOG	LITERAL1
+REPORT_DIGITAL	LITERAL1
+REPORT_VERSION	LITERAL1
+SET_PIN_MODE	LITERAL1
+SYSTEM_RESET	LITERAL1
+
+START_SYSEX	LITERAL1
+END_SYSEX	LITERAL1
+
+PWM	LITERAL1
+
+TOTAL_ANALOG_PINS	LITERAL1
+TOTAL_DIGITAL_PINS	LITERAL1
+TOTAL_PORTS			LITERAL1
+ANALOG_PORT			LITERAL1
