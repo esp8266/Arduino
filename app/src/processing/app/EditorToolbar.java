@@ -337,11 +337,7 @@ public class EditorToolbar extends JComponent implements MouseInputListener {
       break;
 
     case EXPORT:
-      if (e.isShiftDown()) {
-        editor.handleExportApplication();
-      } else {
-        editor.handleExport();
-      }
+      editor.handleExport();
       break;
     }
   }

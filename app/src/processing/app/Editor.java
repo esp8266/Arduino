@@ -488,25 +488,13 @@ public class Editor extends JFrame implements RunnerListener {
       });
     fileMenu.add(saveAsMenuItem);
 
-    item = newJMenuItem("Export", 'E');
+    item = newJMenuItem("Upload to I/O Board", 'U');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           handleExport();
         }
       });
     fileMenu.add(item);
-
-    exportAppItem = newJMenuItemShift("Export Application", 'E');
-    exportAppItem.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          //buttons.activate(EditorButtons.EXPORT);
-          //SwingUtilities.invokeLater(new Runnable() {
-          //public void run() {
-          handleExportApplication();
-          //}});
-        }
-      });
-    fileMenu.add(exportAppItem);
 
     fileMenu.addSeparator();
 
@@ -556,7 +544,7 @@ public class Editor extends JFrame implements RunnerListener {
     JMenuItem item;
     sketchMenu = new JMenu("Sketch");
 
-    item = newJMenuItem("Run", 'R');
+    item = newJMenuItem("Verify / Compile", 'R');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           handleRun(false);
@@ -564,13 +552,13 @@ public class Editor extends JFrame implements RunnerListener {
       });
     sketchMenu.add(item);
 
-    item = newJMenuItemShift("Present", 'R');
-    item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          handleRun(true);
-        }
-      });
-    sketchMenu.add(item);
+//    item = newJMenuItemShift("Present", 'R');
+//    item.addActionListener(new ActionListener() {
+//        public void actionPerformed(ActionEvent e) {
+//          handleRun(true);
+//        }
+//      });
+//    sketchMenu.add(item);
 
     item = new JMenuItem("Stop");
     item.addActionListener(new ActionListener() {
@@ -2164,35 +2152,6 @@ public class Editor extends JFrame implements RunnerListener {
           toolbar.deactivate(EditorToolbar.EXPORT);
         }});
     t.start();
-  }
-
-
-  /**
-   * Handler for Sketch &rarr; Export Application
-   */
-  synchronized public void handleExportApplication() {
-    if (!handleExportCheckModified()) return;
-    toolbar.activate(EditorToolbar.EXPORT);
-
-    //SwingUtilities.invokeLater(new Runnable() {
-    SwingUtilities.invokeLater(new Runnable() {
-        public void run() {
-          statusNotice("Exporting application...");
-          try {
-            if (sketch.exportApplicationPrompt()) {
-              Base.openFolder(sketch.getFolder());
-              statusNotice("Done exporting.");
-            } else {
-              // error message will already be visible
-              // or there was no error, in which case it was canceled.
-            }
-          } catch (Exception e) {
-            statusNotice("Error during export.");
-            e.printStackTrace();
-          }
-          //toolbar.clear();
-          toolbar.deactivate(EditorToolbar.EXPORT);
-        }});
   }
 
 

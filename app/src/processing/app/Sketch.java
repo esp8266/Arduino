@@ -1315,7 +1315,7 @@ public class Sketch {
     for (String item : preprocessor.getExtraImports()) {
       File libFolder = (File) Base.importToLibraryTable.get(item);
 
-      if (libFolder != null) {
+      if (libFolder != null && !importedLibraries.contains(libFolder)) {
         importedLibraries.add(libFolder);
         classPath += Compiler.contentsToClassPath(libFolder);
         libraryPath += File.pathSeparator + libFolder.getAbsolutePath();

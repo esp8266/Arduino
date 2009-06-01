@@ -984,7 +984,11 @@ public class Base {
 
     try {
       menu.removeAll();
-      addSketches(menu, examplesFolder, false);
+      boolean found = addSketches(menu, examplesFolder, false);
+      if (found) menu.addSeparator();
+      found = addSketches(menu, getSketchbookLibrariesFolder(), false);
+      if (found) menu.addSeparator();
+      addSketches(menu, librariesFolder, false);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -1141,7 +1145,7 @@ public class Base {
 
         JMenuItem item = new JMenuItem(libraryName);
         item.addActionListener(listener);
-//        item.setActionCommand(libraryJar.getAbsolutePath());
+        item.setActionCommand(subfolder.getAbsolutePath());
         menu.add(item);
         ifound = true;
 

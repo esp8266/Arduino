@@ -76,6 +76,7 @@ public class Compiler implements MessageConsumer {
     // use lib directories as include paths
     for (File file : sketch.getImportedLibraries()) {
       includePaths.add(file.getPath());
+      includePaths.add(file.getPath() + File.separator + "utility");
     }
     
     List baseCommandLinker = new ArrayList(Arrays.asList(new String[] {
@@ -111,8 +112,10 @@ public class Compiler implements MessageConsumer {
     sourceFilesCPP.addAll(findFilesInPath(target.getPath(), "cpp", true));
     
     for (File file : sketch.getImportedLibraries()) {
-      sourceFiles.addAll(findFilesInFolder(file, "c", true));
-      sourceFilesCPP.addAll(findFilesInFolder(file, "cpp", true));
+      sourceFiles.addAll(findFilesInFolder(file, "c", false));
+      sourceFiles.addAll(findFilesInFolder(new File(file, "utility"), "c", false));
+      sourceFilesCPP.addAll(findFilesInFolder(file, "cpp", false));
+      sourceFilesCPP.addAll(findFilesInFolder(new File(file, "utility"), "cpp", false));
     }
     
     firstErrorFound = false;  // haven't found any errors yet
@@ -484,6 +487,8 @@ public class Compiler implements MessageConsumer {
   static public ArrayList<File> findFilesInFolder(File folder, String extension,
                                                   boolean recurse) {
     ArrayList<File> files = new ArrayList<File>();
+    
+    if (folder.listFiles() == null) return files;
     
     for (File file : folder.listFiles()) {
       if (file.getName().equals(".") || file.getName().equals("..")) continue;
