@@ -936,7 +936,11 @@ public class Base {
     //System.out.println("rebuilding examples menu");
     // Add each of the subfolders of examples directly to the menu
     try {
-      addSketches(menu, examplesFolder, true);
+      boolean found = addSketches(menu, examplesFolder, true);
+      if (found) menu.addSeparator();
+      found = addSketches(menu, getSketchbookLibrariesFolder(), true);
+      if (found) menu.addSeparator();
+      addSketches(menu, librariesFolder, true);
     } catch (IOException e) {
       e.printStackTrace();
     }
