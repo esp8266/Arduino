@@ -44,14 +44,6 @@ else
   
   echo Extracting avr tools...
   unzip -q -d "$RESOURCES/hardware" dist/tools-universal.zip
-
-  LIBRARIES=$RESOURCES/libraries/
-  cp -rX ../../net "$LIBRARIES"
-  cp -rX ../../opengl "$LIBRARIES"
-  cp -rX ../../serial "$LIBRARIES"
-  cp -rX ../../video "$LIBRARIES"
-  cp -rX ../../pdf "$LIBRARIES"
-  cp -rX ../../dxf "$LIBRARIES"
 fi
 
 
