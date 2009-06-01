@@ -26,6 +26,7 @@ package processing.app;
 import processing.app.debug.AvrdudeUploader;
 import processing.app.debug.Compiler;
 import processing.app.debug.RunnerException;
+import processing.app.debug.Sizer;
 import processing.app.debug.Target;
 import processing.app.debug.Uploader;
 import processing.app.preproc.*;
@@ -1140,6 +1141,8 @@ public class Sketch {
    * </PRE>
    */
   protected String compile(Target target) throws RunnerException {
+    String name;
+  
     // make sure the user didn't hide the sketch folder
     ensureExistence();
 
@@ -1170,7 +1173,10 @@ public class Sketch {
     cleanup();
 
     // handle preprocessing the main file's code
-    return build(tempBuildFolder.getAbsolutePath(), target);
+    name = build(tempBuildFolder.getAbsolutePath(), target);
+    size(tempBuildFolder.getAbsolutePath(), name);
+    
+    return name;
   }
 
 
@@ -1414,11 +1420,31 @@ public class Sketch {
 //      return false;
 //    }
 
-    //size(appletFolder.getPath(), name);
+    size(appletFolder.getPath(), foundName);
     upload(appletFolder.getPath(), foundName);
 
     return true;
   }
+
+
+  protected void size(String buildPath, String suggestedClassName)
+    throws RunnerException {
+    long size = 0;
+    long maxsize = Preferences.getInteger("boards." + Preferences.get("board") + ".upload.maximum_size");
+    Sizer sizer = new Sizer(buildPath, suggestedClassName);
+    try {
+      size = sizer.computeSize();
+      System.out.println("Binary sketch size: " + size + " bytes (of a " +
+        maxsize + " byte maximum)");      
+    } catch (RunnerException e) {
+      System.err.println("Couldn't determine program size: " + e.getMessage());
+    }
+
+    if (size > maxsize)
+      throw new RunnerException(
+        "Sketch too big; see http://www.arduino.cc/en/Guide/Troubleshooting#size for tips on reducing it.");
+  }
+
 
   protected String upload(String buildPath, String suggestedClassName)
     throws RunnerException {
