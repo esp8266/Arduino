@@ -126,7 +126,7 @@ public class AvrdudeUploader extends Uploader  {
     } catch (InterruptedException e) {}
       
     List bootloader = new ArrayList();
-    bootloader.add("-Uflash:w:" + "hardware" + File.separator + "bootloaders" + File.separator +
+    bootloader.add("-Uflash:w:" + Base.getHardwarePath() + File.separator + "bootloaders" + File.separator +
             Preferences.get("boards." + Preferences.get("board") + ".bootloader.path") +
             File.separator + Preferences.get("boards." + Preferences.get("board") + ".bootloader.file") + ":i");
     bootloader.add("-Ulock:w:" + Preferences.get("boards." + Preferences.get("board") + ".bootloader.lock_bits") + ":m");
@@ -148,7 +148,7 @@ public class AvrdudeUploader extends Uploader  {
     if (Base.isLinux()) {
       // ???: is it better to have Linux users install avrdude themselves, in
       // a way that it can find its own configuration file?
-      commandDownloader.add("-C" + "hardware/tools/avrdude.conf");
+      commandDownloader.add("-C" + Base.getHardwarePath() + "/tools/avrdude.conf");
     } else {
       commandDownloader.add("-C" + Base.getHardwarePath() + "/tools/avr/etc/avrdude.conf");
     }

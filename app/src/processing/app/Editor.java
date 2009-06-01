@@ -883,8 +883,7 @@ public class Editor extends JFrame implements RunnerListener {
       this.programmer = programmer;
     }
     public void actionPerformed(ActionEvent actionevent) {
-      // XXX: DAM: need to actually burn the bootloader here.
-      // handleBurnBootloader(programmer);
+      handleBurnBootloader(programmer);
     }
   }
   
@@ -1084,7 +1083,7 @@ public class Editor extends JFrame implements RunnerListener {
       });
     menu.add(item);
 
-    item = newJMenuItemShift("Copy for Discourse", 'C');
+    item = newJMenuItemShift("Copy for Forum", 'C');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
 //          SwingUtilities.invokeLater(new Runnable() {
@@ -2207,6 +2206,31 @@ public class Editor extends JFrame implements RunnerListener {
   }
 
 
+  protected void handleBurnBootloader(final String programmer) {
+    console.clear();
+    statusNotice("Burning bootloader to I/O Board (this may take a minute)...");
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        try {
+          Uploader uploader = new AvrdudeUploader();
+          if (uploader.burnBootloader(programmer)) {
+            statusNotice("Done burning bootloader.");
+          } else {
+            statusError("Error while burning bootloader.");
+            // error message will already be visible
+          }
+        } catch (RunnerException e) {
+          statusError("Error while burning bootloader.");
+          e.printStackTrace();
+          //statusError(e);
+        } catch (Exception e) {
+          statusError("Error while burning bootloader.");
+          e.printStackTrace();
+        }
+      }});
+  }
+
+
   /**
    * Handler for File &rarr; Page Setup.
    */
@@ -2376,7 +2400,7 @@ public class Editor extends JFrame implements RunnerListener {
         });
       this.add(copyItem);
 
-      discourseItem = new JMenuItem("Copy for Discourse");
+      discourseItem = new JMenuItem("Copy for Forum");
       discourseItem.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
             handleDiscourseCopy();
