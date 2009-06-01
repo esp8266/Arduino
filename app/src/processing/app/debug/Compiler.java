@@ -133,14 +133,14 @@ public class Compiler implements MessageConsumer {
     
     for (int i = 0; i < sketch.getCodeCount(); i++) {
       //if (sketch.getCode(i).preprocName != null) {
-        if (sketch.getCode(i).isExtension(".c")) {
-          sourceNames.add(buildPath + File.separator + sketch.getCode(i).getPrettyName());
-          objectNames.add(buildPath + File.separator + sketch.getCode(i).getPrettyName() + ".o");
-          sketchObjectNames.add(buildPath + File.separator + sketch.getCode(i).getPrettyName() + ".o");
-        } else if (sketch.getCode(i).isExtension(".cpp")) {
-          sourceNamesCPP.add(buildPath + File.separator + sketch.getCode(i).getPrettyName());
-          objectNamesCPP.add(buildPath + File.separator + sketch.getCode(i).getPrettyName() + ".o");
-          sketchObjectNames.add(buildPath + File.separator + sketch.getCode(i).getPrettyName() + ".o");
+        if (sketch.getCode(i).isExtension("c")) {
+          sourceNames.add(buildPath + File.separator + sketch.getCode(i).getFileName());
+          objectNames.add(buildPath + File.separator + sketch.getCode(i).getFileName() + ".o");
+          sketchObjectNames.add(buildPath + File.separator + sketch.getCode(i).getFileName() + ".o");
+        } else if (sketch.getCode(i).isExtension("cpp")) {
+          sourceNamesCPP.add(buildPath + File.separator + sketch.getCode(i).getFileName());
+          objectNamesCPP.add(buildPath + File.separator + sketch.getCode(i).getFileName() + ".o");
+          sketchObjectNames.add(buildPath + File.separator + sketch.getCode(i).getFileName() + ".o");
         } 
       //}
     }
@@ -280,10 +280,10 @@ public class Compiler implements MessageConsumer {
     boolean compiling = true;
     while (compiling) {
       try {
-	if (in.thread != null)
-	  in.thread.join();
-	if (err.thread != null)
-	  err.thread.join();
+        if (in.thread != null)
+          in.thread.join();
+        if (err.thread != null)
+          err.thread.join();
         result = process.waitFor();
         //System.out.println("result is " + result);
         compiling = false;
@@ -337,16 +337,16 @@ public class Compiler implements MessageConsumer {
       // wasn't there, check the other (non-pde) files in the sketch.
       // iterate through the project files to see who's causing the trouble
       for (int i = 0; i < sketch.getCodeCount(); i++) {
-	if (sketch.getCode(i).isExtension("pde")) continue;
+        if (sketch.getCode(i).isExtension("pde")) continue;
 
-	partialTempPath = buildPathSubst + sketch.getCode(i).getFileName();
-	System.out.println(partialTempPath);
-	partialStartIndex = s.indexOf(partialTempPath);
-	if (partialStartIndex != -1) {
-	  fileIndex = i;
-	  System.out.println("fileIndex is " + fileIndex);
-	  break;
-	}
+        partialTempPath = buildPathSubst + sketch.getCode(i).getFileName();
+        System.out.println(partialTempPath);
+        partialStartIndex = s.indexOf(partialTempPath);
+        if (partialStartIndex != -1) {
+          fileIndex = i;
+          System.out.println("fileIndex is " + fileIndex);
+          break;
+        }
       }
       //+ className + ".java";
     }
@@ -377,27 +377,23 @@ public class Compiler implements MessageConsumer {
         return;
       }
       
-      // the "1" corresponds to the amount of lines written to the main code
-      // file by PdePreprocessor's writeHeader() routine before prototypes
-      if (fileIndex == 0)
-        lineNumber -= 1;
-        
       //System.out.println("pde / line number: " + lineNumber);
       
       if (fileIndex == 0) {  // main class, figure out which tab
         for (int i = 1; i < sketch.getCodeCount(); i++) {
           if (sketch.getCode(i).isExtension("pde")) {
-            //System.out.println("preprocOffset "+ sketch.code[i].preprocOffset);
+            //System.out.println("preprocOffset "+ sketch.getCode(i).getPreprocOffset());
             if (sketch.getCode(i).getPreprocOffset() < lineNumber) {
               fileIndex = i;
               //System.out.println("i'm thinkin file " + i);
             }
           }
         }
-        if (fileIndex != 0) {  // if found another culprit
-          lineNumber -= sketch.getCode(fileIndex).getPreprocOffset();
-          //System.out.println("i'm sayin line " + lineNumber);
-        }
+        // XXX: DAM: if the lineNumber is less than sketch.getCode(0).getPreprocOffset()
+        // we shouldn't subtract anything from it, as the error is above the
+        // location where the function prototypes and #include "WProgram.h"
+        // were inserted.
+        lineNumber -= sketch.getCode(fileIndex).getPreprocOffset();
       }
 
       //String s2 = s1.substring(colon + 2);

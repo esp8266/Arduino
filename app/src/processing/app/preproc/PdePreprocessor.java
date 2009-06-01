@@ -72,7 +72,8 @@ public class PdePreprocessor {
   public int prototypeCount = 0;
 
   // stores number of included library headers written
-  public int headerCount = 0;
+  // we always write one header: WProgram.h
+  public int headerCount = 1;
 
   /**
    * These may change in-between (if the prefs panel adds this option)

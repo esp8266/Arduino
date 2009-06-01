@@ -1275,7 +1275,7 @@ public class Sketch {
                                             name,
 					    codeFolderPackages,
 					    target);
-      headerOffset = preprocessor.headerCount;
+      headerOffset = preprocessor.headerCount + preprocessor.prototypeCount;
 
       if (className == null) {
         throw new RunnerException("Could not find main class");
