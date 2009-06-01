@@ -1636,7 +1636,16 @@ public class Base {
     File referenceFile = new File(referenceFolder, filename);
     openURL(referenceFile.getAbsolutePath());
   }
-
+  
+  static public void showGettingStarted() {
+    if (Base.isMacOS()) {
+      Base.showReference("Guide_MacOSX.html");
+    } else if (Base.isWindows()) {
+      Base.showReference("Guide_Windows.html");
+    } else {
+      Base.openURL("http://www.arduino.cc/playground/Learning/Linux");
+    }
+  }
 
   static public void showReference() {
     showReference("index.html");
@@ -1644,7 +1653,7 @@ public class Base {
 
 
   static public void showEnvironment() {
-    showReference("environment" + File.separator + "index.html");
+    showReference("Guide_Environment.html");
   }
 
 
@@ -1654,9 +1663,14 @@ public class Base {
 
 
   static public void showTroubleshooting() {
-    showReference("troubleshooting" + File.separator + "index.html");
+    showReference("Guide_Troubleshooting.html");
   }
-
+  
+  
+  static public void showFAQ() {
+    showReference("faq.html");
+  }
+  
 
   // .................................................................
 

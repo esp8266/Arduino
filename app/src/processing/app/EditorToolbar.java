@@ -35,7 +35,7 @@ import javax.swing.event.*;
 public class EditorToolbar extends JComponent implements MouseInputListener {
 
   static final String title[] = {
-    "Run", "Stop", "New", "Open", "Save", "Export"
+    "Verify", "Stop", "New", "Open", "Save", "Upload"
   };
 
   static final int BUTTON_COUNT  = title.length;

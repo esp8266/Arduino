@@ -981,7 +981,7 @@ public class Editor extends JFrame implements RunnerListener {
     item = new JMenuItem("Getting Started");
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          Base.openURL("http://processing.org/learning/gettingstarted/");
+          Base.showGettingStarted();
         }
       });
     menu.add(item);
@@ -1023,15 +1023,15 @@ public class Editor extends JFrame implements RunnerListener {
     item = new JMenuItem("Frequently Asked Questions");
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          Base.openURL("http://processing.org/faq.html");
+          Base.showFAQ();
         }
       });
     menu.add(item);
 
-    item = newJMenuItem("Visit Processing.org", '5');
+    item = new JMenuItem("Visit Arduino.cc");
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          Base.openURL("http://processing.org/");
+          Base.openURL("http://arduino.cc/");
         }
       });
     menu.add(item);
@@ -1039,7 +1039,7 @@ public class Editor extends JFrame implements RunnerListener {
     // macosx already has its own about menu
     if (!Base.isMacOS()) {
       menu.addSeparator();
-      item = new JMenuItem("About Processing");
+      item = new JMenuItem("About Arduino");
       item.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
             base.handleAbout();
@@ -1089,7 +1089,19 @@ public class Editor extends JFrame implements RunnerListener {
         public void actionPerformed(ActionEvent e) {
 //          SwingUtilities.invokeLater(new Runnable() {
 //              public void run() {
-          new DiscourseFormat(Editor.this).show();
+          new DiscourseFormat(Editor.this, false).show();
+//              }
+//            });
+        }
+      });
+    menu.add(item);
+
+    item = newJMenuItemAlt("Copy as HTML", 'C');
+    item.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+//          SwingUtilities.invokeLater(new Runnable() {
+//              public void run() {
+          new DiscourseFormat(Editor.this, true).show();
 //              }
 //            });
         }
@@ -1560,7 +1572,12 @@ public class Editor extends JFrame implements RunnerListener {
 
 
   protected void handleDiscourseCopy() {
-    new DiscourseFormat(Editor.this).show();
+    new DiscourseFormat(Editor.this, false).show();
+  }
+
+
+  protected void handleHTMLCopy() {
+    new DiscourseFormat(Editor.this, true).show();
   }
 
 
@@ -2363,6 +2380,14 @@ public class Editor extends JFrame implements RunnerListener {
       discourseItem.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
             handleDiscourseCopy();
+          }
+        });
+      this.add(discourseItem);
+
+      discourseItem = new JMenuItem("Copy as HTML");
+      discourseItem.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            handleHTMLCopy();
           }
         });
       this.add(discourseItem);
