@@ -23,11 +23,11 @@
 
 package processing.app;
 
+import processing.app.debug.AvrdudeUploader;
 import processing.app.debug.Compiler;
-import processing.app.debug.Library;
-import processing.app.debug.LibraryManager;
 import processing.app.debug.RunnerException;
 import processing.app.debug.Target;
+import processing.app.debug.Uploader;
 import processing.app.preproc.*;
 import processing.core.*;
 
@@ -95,7 +95,7 @@ public class Sketch {
    * DLLs or JNILIBs.
    */
   private String libraryPath;
-  public Vector importedLibraries;
+  private ArrayList<File> importedLibraries;
 
   /**
    * path is location of the main .pde file, because this is also
@@ -1310,30 +1310,17 @@ public class Sketch {
 
     // grab the imports from the code just preproc'd
 
-    importedLibraries = new Vector();
-    ArrayList<String> imports = preprocessor.getExtraImports();
-    try {
-      LibraryManager libraryManager = new LibraryManager();
-      Collection libraries = libraryManager.getAll();
-      for (Iterator i = libraries.iterator(); i.hasNext(); ) {
-        Library library = (Library) i.next();
-        File[] headerFiles = library.getHeaderFiles();
-        
-        for (int j = 0; j < headerFiles.length; j++)
-          for (int k = 0; k < imports.size(); k++)
-            if (headerFiles[j].getName().equals(imports.get(k)) &&
-              !importedLibraries.contains(library)) {
-              importedLibraries.add(library);
-              //System.out.println("Adding library " + library.getName());
-            }
+    importedLibraries = new ArrayList<File>();
+
+    for (String item : preprocessor.getExtraImports()) {
+      File libFolder = (File) Base.importToLibraryTable.get(item);
+
+      if (libFolder != null) {
+        importedLibraries.add(libFolder);
+        classPath += Compiler.contentsToClassPath(libFolder);
+        libraryPath += File.pathSeparator + libFolder.getAbsolutePath();
       }
-    } catch (IOException e) {
-      System.err.println("Error finding libraries:");
-      e.printStackTrace();
-      throw new RunnerException(e.getMessage());
     }
-
-
 
     // 3. then loop over the code[] and save each .java file
 
@@ -1385,16 +1372,66 @@ public class Sketch {
   }
 
 
-  protected boolean exportApplet() throws Exception {
-    return exportApplet(new File(folder, "applet").getAbsolutePath());
+  protected boolean exportApplet(Target target) throws Exception {
+    return exportApplet(new File(folder, "applet").getAbsolutePath(), target);
   }
 
 
   /**
    * Handle export to applet.
    */
-  public boolean exportApplet(String appletPath) throws RunnerException, IOException {
-    return false;
+  public boolean exportApplet(String appletPath, Target target)
+    throws RunnerException, IOException {
+    
+    // Make sure the user didn't hide the sketch folder
+    ensureExistence();
+
+    // Reload the code when an external editor is being used
+    if (Preferences.getBoolean("editor.external")) {
+      // nuke previous files and settings
+      load();
+    }
+
+    File appletFolder = new File(appletPath);
+    // Nuke the old applet folder because it can cause trouble
+    if (Preferences.getBoolean("export.delete_target_folder")) {
+      Base.removeDir(appletFolder);
+    }
+    // Create a fresh applet folder (needed before preproc is run below)
+    appletFolder.mkdirs();
+
+    // build the sketch
+    String foundName = build(appletFolder.getPath(), target);
+    // (already reported) error during export, exit this function
+    if (foundName == null) return false;
+
+//    // If name != exportSketchName, then that's weirdness
+//    // BUG unfortunately, that can also be a bug in the preproc :(
+//    if (!name.equals(foundName)) {
+//      Base.showWarning("Error during export",
+//                       "Sketch name is " + name + " but the sketch\n" +
+//                       "name in the code was " + foundName, null);
+//      return false;
+//    }
+
+    //size(appletFolder.getPath(), name);
+    upload(appletFolder.getPath(), foundName);
+
+    return true;
+  }
+
+  protected String upload(String buildPath, String suggestedClassName)
+    throws RunnerException {
+    
+    Uploader uploader;
+
+    // download the program
+    //
+    uploader = new AvrdudeUploader();
+    boolean success = uploader.uploadUsingPreferences(buildPath,
+                                                      suggestedClassName);
+
+    return success ? suggestedClassName : null;
   }
 
   /**
@@ -1814,6 +1851,11 @@ public class Sketch {
       codeFolder.mkdirs();
     }
     return codeFolder;
+  }
+  
+  
+  public ArrayList<File> getImportedLibraries() {
+    return importedLibraries;
   }
 
 

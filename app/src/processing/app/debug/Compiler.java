@@ -49,10 +49,12 @@ public class Compiler implements MessageConsumer {
   public Compiler() { }
 
   /**
-   * Compile with ECJ.
+   * Compile with avr-gcc.
    *
    * @param sketch Sketch object to be compiled.
    * @param buildPath Where the temporary files live and will be built from.
+   * @param primaryClassName the name of the combined sketch file w/ extension
+   * @param target the target (core) to build against
    * @return true if successful.
    * @throws RunnerException Only if there's a problem. Only then.
    */
@@ -67,23 +69,13 @@ public class Compiler implements MessageConsumer {
     // the pms object isn't used for anything but storage
     MessageStream pms = new MessageStream(this);
 
-    String userdir = System.getProperty("user.dir") + File.separator;
-    
-//    LibraryManager libraryManager;
-//
-//    try {
-//      libraryManager = new LibraryManager();
-//    } catch (IOException e) {
-//      throw new RunnerException(e.getMessage());
-//    }
     String avrBasePath = Base.getAvrBasePath();
     
     List includePaths = new ArrayList();
     includePaths.add(target.getPath());
     // use lib directories as include paths
-    for (int i = 0; i < sketch.importedLibraries.size(); i++) {
-      includePaths.add(
-        ((Library) sketch.importedLibraries.get(i)).getFolder().getPath());
+    for (File file : sketch.getImportedLibraries()) {
+      includePaths.add(file.getPath());
     }
     
     List baseCommandLinker = new ArrayList(Arrays.asList(new String[] {
@@ -95,75 +87,34 @@ public class Compiler implements MessageConsumer {
       buildPath + File.separator + primaryClassName + ".elf"
     }));
     
-    String runtimeLibraryName = buildPath + File.separator + "core.a";
+//    String runtimeLibraryName = buildPath + File.separator + "core.a";
 
-    List baseCommandAR = new ArrayList(Arrays.asList(new String[] {
-      avrBasePath + "avr-ar",
-      "rcs",
-      runtimeLibraryName
-    }));
+//    List baseCommandAR = new ArrayList(Arrays.asList(new String[] {
+//      avrBasePath + "avr-ar",
+//      "rcs",
+//      runtimeLibraryName
+//    }));
 
-    // use lib object files
-    for (Iterator i = sketch.importedLibraries.iterator(); i.hasNext(); ) {
-      Library library = (Library) i.next();
-      File[] objectFiles = library.getObjectFiles();
-      for (int j = 0; j < objectFiles.length; j++)
-        baseCommandLinker.add(objectFiles[j].getPath());
-    }
-    
     List baseCommandObjcopy = new ArrayList(Arrays.asList(new String[] {
       avrBasePath + "avr-objcopy",
       "-O",
       "-R",
     }));
 
-    // make list of code files that need to be compiled and the object files
-    // that they will be compiled to (includes code from the sketch and the
-    // library for the target platform)
-    List sourceNames = new ArrayList();
-    List sourceNamesCPP = new ArrayList();
-    List objectNames = new ArrayList();
-    List objectNamesCPP = new ArrayList();
-    List targetObjectNames = new ArrayList();
-    List sketchObjectNames = new ArrayList();
-
-    sourceNamesCPP.add(buildPath + File.separator + primaryClassName);
-    objectNamesCPP.add(buildPath + File.separator + primaryClassName + ".o");
-    sketchObjectNames.add(buildPath + File.separator + primaryClassName + ".o");    
+    ArrayList<File> sourceFiles = new ArrayList<File>();
+    ArrayList<File> sourceFilesCPP = new ArrayList<File>();
     
-    for (int i = 0; i < sketch.getCodeCount(); i++) {
-      //if (sketch.getCode(i).preprocName != null) {
-        if (sketch.getCode(i).isExtension("c")) {
-          sourceNames.add(buildPath + File.separator + sketch.getCode(i).getFileName());
-          objectNames.add(buildPath + File.separator + sketch.getCode(i).getFileName() + ".o");
-          sketchObjectNames.add(buildPath + File.separator + sketch.getCode(i).getFileName() + ".o");
-        } else if (sketch.getCode(i).isExtension("cpp")) {
-          sourceNamesCPP.add(buildPath + File.separator + sketch.getCode(i).getFileName());
-          objectNamesCPP.add(buildPath + File.separator + sketch.getCode(i).getFileName() + ".o");
-          sketchObjectNames.add(buildPath + File.separator + sketch.getCode(i).getFileName() + ".o");
-        } 
-      //}
-    }
-    for (Iterator iter = target.getSourceFilenames().iterator(); iter.hasNext(); ) {
-      String filename = (String) iter.next();
-      if (filename != null) {
-        targetObjectNames.add(buildPath + File.separator + filename + ".o");
-        if (filename.endsWith(".c")) {
-          sourceNames.add(target.getPath() + File.separator + filename);
-          objectNames.add(buildPath + File.separator + filename + ".o");
-        } else if (filename.endsWith(".cpp")) {
-          sourceNamesCPP.add(target.getPath() + File.separator + filename);
-          objectNamesCPP.add(buildPath + File.separator + filename + ".o");
-        } 
-      }
+    sourceFiles.addAll(findFilesInPath(buildPath, "c", false));
+    sourceFilesCPP.addAll(findFilesInPath(buildPath, "cpp", false));
+    
+    sourceFiles.addAll(findFilesInPath(target.getPath(), "c", true));
+    sourceFilesCPP.addAll(findFilesInPath(target.getPath(), "cpp", true));
+    
+    for (File file : sketch.getImportedLibraries()) {
+      sourceFiles.addAll(findFilesInFolder(file, "c", true));
+      sourceFilesCPP.addAll(findFilesInFolder(file, "cpp", true));
     }
     
-    baseCommandLinker.addAll(sketchObjectNames);
-    //baseCommandLinker.addAll(targetObjectNames);
-    baseCommandLinker.add(runtimeLibraryName);
-    baseCommandLinker.add("-L" + buildPath);
-    baseCommandLinker.add("-lm");
-
     firstErrorFound = false;  // haven't found any errors yet
     secondErrorFound = false;
 
@@ -175,24 +126,36 @@ public class Compiler implements MessageConsumer {
 
       Process process;
       boolean compiling = true;
-      for(int i = 0; i < sourceNames.size(); i++) {
+      for(File file : sourceFiles) {
+        String objectPath = buildPath + File.separator + file.getName() + ".o";
+        baseCommandLinker.add(objectPath);
         if (execAsynchronously(getCommandCompilerC(avrBasePath, includePaths,
-          (String) sourceNames.get(i), (String) objectNames.get(i))) != 0)
+                                                   file.getAbsolutePath(),
+                                                   objectPath)) != 0)
           return false;
       }
 
-      for(int i = 0; i < sourceNamesCPP.size(); i++) {
+      for(File file : sourceFilesCPP) {
+        String objectPath = buildPath + File.separator + file.getName() + ".o";
+        baseCommandLinker.add(objectPath);
         if (execAsynchronously(getCommandCompilerCPP(avrBasePath, includePaths,
-          (String) sourceNamesCPP.get(i), (String) objectNamesCPP.get(i))) != 0)
+                                                     file.getAbsolutePath(),
+                                                     objectPath)) != 0)
           return false;
       }
 
-      for(int i = 0; i < targetObjectNames.size(); i++) {
-		List commandAR = new ArrayList(baseCommandAR);
-        commandAR.add(targetObjectNames.get(i));
-        if (execAsynchronously(commandAR) != 0)
-          return false;
-      }
+      // XXX: DAM: need to assemble the target files together into a library
+      // (.a file) before linking the sketch and libraries against it.
+//      for(File file : findFilesInPath(target.getPath())) {
+//        List commandAR = new ArrayList(baseCommandAR);
+//        commandAR.add(file.getAbsolutePath());
+//        if (execAsynchronously(commandAR) != 0)
+//          return false;
+//      }
+
+      //baseCommandLinker.add(runtimeLibraryName);
+      //baseCommandLinker.add("-L" + buildPath);
+      baseCommandLinker.add("-lm");
 
       if (execAsynchronously(baseCommandLinker) != 0)
         return false;
@@ -511,6 +474,29 @@ public class Compiler implements MessageConsumer {
     };
     
     return (new File(path)).list(onlyHFiles);
+  }
+  
+  static public ArrayList<File> findFilesInPath(String path, String extension,
+                                                boolean recurse) {
+    return findFilesInFolder(new File(path), extension, recurse);
+  }
+  
+  static public ArrayList<File> findFilesInFolder(File folder, String extension,
+                                                  boolean recurse) {
+    ArrayList<File> files = new ArrayList<File>();
+    
+    for (File file : folder.listFiles()) {
+      if (file.getName().equals(".") || file.getName().equals("..")) continue;
+      
+      if (file.getName().endsWith("." + extension))
+        files.add(file);
+        
+      if (recurse && file.isDirectory()) {
+        files.addAll(findFilesInFolder(file, extension, true));
+      }
+    }
+    
+    return files;
   }
   
   /**

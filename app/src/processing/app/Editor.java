@@ -42,6 +42,8 @@ import javax.swing.event.*;
 import javax.swing.text.*;
 import javax.swing.undo.*;
 
+import gnu.io.*;
+
 
 /**
  * Main editor panel for the Processing Development Environment.
@@ -75,9 +77,12 @@ public class Editor extends JFrame implements RunnerListener {
   PageFormat pageFormat;
   PrinterJob printerJob;
 
-  // file and sketch menus for re-inserting items
+  // file, sketch, and tools menus for re-inserting items
   JMenu fileMenu;
   JMenu sketchMenu;
+  JMenu toolsMenu;
+  
+  int numTools = 0;
 
   EditorToolbar toolbar;
   // these menus are shared so that they needn't be rebuilt for all windows
@@ -86,6 +91,14 @@ public class Editor extends JFrame implements RunnerListener {
   static JMenu sketchbookMenu;
   static JMenu examplesMenu;
   static JMenu importMenu;
+  
+  // these menus are shared so that the board and serial port selections
+  // are the same for all windows (since the board and serial port that are
+  // actually used are determined by the preferences, which are shared)
+  static JMenu boardsMenu;
+  static JMenu serialMenu;
+
+  static SerialMenuListener serialMenuListener;
 
   EditorHeader header;
   EditorStatus status;
@@ -152,6 +165,8 @@ public class Editor extends JFrame implements RunnerListener {
           fileMenu.insert(sketchbookMenu, 2);
           fileMenu.insert(examplesMenu, 3);
           sketchMenu.insert(importMenu, 4);
+          toolsMenu.insert(boardsMenu, numTools);
+          toolsMenu.insert(serialMenu, numTools + 1);
         }
       });
 
@@ -595,12 +610,63 @@ public class Editor extends JFrame implements RunnerListener {
 
 
   protected JMenu buildToolsMenu() {
-    JMenu menu = new JMenu("Tools");
+    toolsMenu = new JMenu("Tools");
+    JMenu menu = toolsMenu;
+    JMenuItem item;
 
     addInternalTools(menu);
     addTools(menu, Base.getToolsFolder());
     File sketchbookTools = new File(Base.getSketchbookFolder(), "tools");
     addTools(menu, sketchbookTools);
+
+    menu.addSeparator();
+    
+    numTools = menu.getItemCount();
+    
+    // XXX: DAM: these should probably be implemented using the Tools plugin
+    // API, if possible (i.e. if it supports custom actions, etc.)
+    
+    if (boardsMenu == null) {
+      boardsMenu = new JMenu("Board");
+      ButtonGroup boardGroup = new ButtonGroup();
+      for (Iterator i = Preferences.getSubKeys("boards"); i.hasNext(); ) {
+        String board = (String) i.next();
+        Action action = new BoardMenuAction(board);
+        item = new JRadioButtonMenuItem(action);
+        if (board.equals(Preferences.get("board")))
+          item.setSelected(true);
+        boardGroup.add(item);
+        boardsMenu.add(item);
+      }
+    }
+    menu.add(boardsMenu);
+    
+    if (serialMenuListener == null)
+      serialMenuListener  = new SerialMenuListener();
+    if (serialMenu == null)
+      serialMenu = new JMenu("Serial Port");
+    populateSerialMenu();
+    menu.add(serialMenu);
+	  
+    menu.addSeparator();
+    
+    JMenu bootloaderMenu = new JMenu("Burn Bootloader");
+    for (Iterator i = Preferences.getSubKeys("programmers"); i.hasNext(); ) {
+      String programmer = (String) i.next();
+      Action action = new BootloaderMenuAction(programmer);
+      item = new JMenuItem(action);
+      bootloaderMenu.add(item);
+    }
+    menu.add(bootloaderMenu);
+        
+    menu.addMenuListener(new MenuListener() {
+      public void menuCanceled(MenuEvent e) {}
+      public void menuDeselected(MenuEvent e) {}
+      public void menuSelected(MenuEvent e) {
+        //System.out.println("Tools menu selected.");
+        populateSerialMenu();
+      }
+    });
 
     return menu;
   }
@@ -774,6 +840,113 @@ public class Editor extends JFrame implements RunnerListener {
     menu.add(createToolMenuItem("processing.app.tools.FixEncoding"));
 
     return menu;
+  }
+
+
+  class SerialMenuListener implements ActionListener {
+    //public SerialMenuListener() { }
+
+    public void actionPerformed(ActionEvent e) {
+      if(serialMenu == null) {
+        System.out.println("serialMenu is null");
+        return;
+      }
+      int count = serialMenu.getItemCount();
+      for (int i = 0; i < count; i++) {
+        ((JCheckBoxMenuItem)serialMenu.getItem(i)).setState(false);
+      }
+      JCheckBoxMenuItem item = (JCheckBoxMenuItem)e.getSource();
+      item.setState(true);
+      String name = item.getText();
+      //System.out.println(item.getLabel());
+      Preferences.set("serial.port", name);
+      //System.out.println("set to " + get("serial.port"));
+    }
+
+    /*
+    public void actionPerformed(ActionEvent e) {
+      System.out.println(e.getSource());
+      String name = e.getActionCommand();
+      PdeBase.properties.put("serial.port", name);
+      System.out.println("set to " + get("serial.port"));
+      //editor.skOpen(path + File.separator + name, name);
+      // need to push "serial.port" into PdeBase.properties
+    }
+    */
+  }
+  
+  
+  class BoardMenuAction extends AbstractAction {
+    private String board;
+    public BoardMenuAction(String board) {
+      super(Preferences.get("boards." + board + ".name"));
+      this.board = board;
+    }
+    public void actionPerformed(ActionEvent actionevent) {
+      //System.out.println("Switching to " + board);
+      Preferences.set("board", board);
+    }
+  }
+  
+  class BootloaderMenuAction extends AbstractAction {
+    private String programmer;
+    public BootloaderMenuAction(String programmer) {
+      super("w/ " + Preferences.get("programmers." + programmer + ".name"));
+      this.programmer = programmer;
+    }
+    public void actionPerformed(ActionEvent actionevent) {
+      // XXX: DAM: need to actually burn the bootloader here.
+      // handleBurnBootloader(programmer);
+    }
+  }
+  
+  
+  protected void populateSerialMenu() {
+    // getting list of ports
+
+    JMenuItem rbMenuItem;
+    
+    //System.out.println("Clearing serial port menu.");
+	
+    serialMenu.removeAll();
+    boolean empty = true;
+
+    try
+    {
+      for (Enumeration enumeration = CommPortIdentifier.getPortIdentifiers(); enumeration.hasMoreElements();)
+      {
+        CommPortIdentifier commportidentifier = (CommPortIdentifier)enumeration.nextElement();
+        //System.out.println("Found communication port: " + commportidentifier);
+        if (commportidentifier.getPortType() == CommPortIdentifier.PORT_SERIAL)
+        {
+          //System.out.println("Adding port to serial port menu: " + commportidentifier);
+          String curr_port = commportidentifier.getName();
+          rbMenuItem = new JCheckBoxMenuItem(curr_port, curr_port.equals(Preferences.get("serial.port")));
+          rbMenuItem.addActionListener(serialMenuListener);
+          //serialGroup.add(rbMenuItem);
+          serialMenu.add(rbMenuItem);
+          empty = false;
+        }
+      }
+      if (!empty) {
+        //System.out.println("enabling the serialMenu");
+        serialMenu.setEnabled(true);
+      }
+
+    }
+
+    catch (Exception exception)
+    {
+      System.out.println("error retrieving port list");
+      exception.printStackTrace();
+    }
+	
+    if (serialMenu.getItemCount() == 0) {
+      serialMenu.setEnabled(false);
+    }
+
+    //serialMenu.addSeparator();
+    //serialMenu.add(item);
   }
 
 
@@ -1548,7 +1721,7 @@ public class Editor extends JFrame implements RunnerListener {
     internalCloseRunner();
     running = true;
     toolbar.activate(EditorToolbar.RUN);
-    statusEmpty();
+    statusNotice("Compiling...");
 
     // do this to advance/clear the terminal window / dos prompt / etc
     for (int i = 0; i < 10; i++) System.out.println();
@@ -1560,30 +1733,24 @@ public class Editor extends JFrame implements RunnerListener {
 
     presenting = present;
 
-    try {
-      // XXX: DAM: don't hardcode this to "arduino"
-      String appletClassName = sketch.compile(
-	  new Target(Base.getHardwarePath() + File.separator + "cores",
-	             "arduino"));
-      if (appletClassName != null) {
-        runtime = new Runner(sketch, appletClassName, presenting, Editor.this);
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        try {
+          sketch.compile(new Target(
+            Base.getHardwarePath() + File.separator + "cores",
+            Preferences.get("boards." + Preferences.get("board") + ".build.core")));    
+          statusNotice("Done compiling.");
+        } catch (RunnerException e) {
+          //statusError("Error compiling...");
+          statusError(e);
 
-        // Cannot use invokeLater() here, otherwise it gets
-        // placed on the event thread and causes a hang--bad idea all around.
-        Thread t = new Thread(new Runnable() {
-          public void run() {
-            runtime.launch();
-          }
-        });
-        t.start();
-        //runtime.start(appletLocation);
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+        
+        toolbar.deactivate(EditorToolbar.RUN);
       }
-
-    } catch (Exception e) {
-      //System.err.println("exception reached editor");
-      //e.printStackTrace();
-      statusError(e);
-    }
+    });
   }
 
 
@@ -1960,24 +2127,38 @@ public class Editor extends JFrame implements RunnerListener {
    * Made synchronized to (hopefully) avoid problems of people
    * hitting export twice, quickly, and horking things up.
    */
+  /**
+   * Handles calling the export() function on sketch, and
+   * queues all the gui status stuff that comes along with it.
+   *
+   * Made synchronized to (hopefully) avoid problems of people
+   * hitting export twice, quickly, and horking things up.
+   */
   synchronized public void handleExport() {
     if (!handleExportCheckModified()) return;
     toolbar.activate(EditorToolbar.EXPORT);
+
+    console.clear();
+    statusNotice("Uploading to I/O Board...");
 
     //SwingUtilities.invokeLater(new Runnable() {
     Thread t = new Thread(new Runnable() {
         public void run() {
           try {
-            boolean success = sketch.exportApplet();
+            boolean success = sketch.exportApplet(new Target(
+              Base.getHardwarePath() + File.separator + "cores",
+              Preferences.get("boards." + Preferences.get("board") + ".build.core")));
             if (success) {
-              File appletFolder = new File(sketch.getFolder(), "applet");
-              Base.openFolder(appletFolder);
-              statusNotice("Done exporting.");
+              statusNotice("Done uploading.");
             } else {
               // error message will already be visible
             }
-          } catch (Exception e) {
+          } catch (RunnerException e) {
+            //statusError("Error during upload.");
+            //e.printStackTrace();
             statusError(e);
+          } catch (Exception e) {
+            e.printStackTrace();
           }
           //toolbar.clear();
           toolbar.deactivate(EditorToolbar.EXPORT);

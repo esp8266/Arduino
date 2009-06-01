@@ -286,7 +286,7 @@ public class Base {
     // Get paths for the libraries and examples in the Processing folder
     //String workingDirectory = System.getProperty("user.dir");
     examplesFolder = getContentFile("examples");
-    librariesFolder = getContentFile("libraries");
+    librariesFolder = new File(getContentFile("hardware"), "libraries");
     toolsFolder = getContentFile("tools");
 
     // Get the sketchbook path, and make sure it's set properly
@@ -1109,11 +1109,11 @@ public class Base {
 
     for (String libraryName : list) {
       File subfolder = new File(folder, libraryName);
-      File libraryFolder = new File(subfolder, "library");
-      File libraryJar = new File(libraryFolder, libraryName + ".jar");
-      // If a .jar file of the same prefix as the folder exists
-      // inside the 'library' subfolder of the sketch
-      if (libraryJar.exists()) {
+//      File libraryFolder = new File(subfolder, "library");
+//      File libraryJar = new File(libraryFolder, libraryName + ".jar");
+//      // If a .jar file of the same prefix as the folder exists
+//      // inside the 'library' subfolder of the sketch
+//      if (libraryJar.exists()) {
         String sanityCheck = Sketch.sanitizeName(libraryName);
         if (!sanityCheck.equals(libraryName)) {
           String mess =
@@ -1124,35 +1124,37 @@ public class Base {
           continue;
         }
 
-        // get the path for all .jar files in this code folder
-        String libraryClassPath =
-          Compiler.contentsToClassPath(libraryFolder);
-        // grab all jars and classes from this folder,
-        // and append them to the library classpath
-        librariesClassPath +=
-          File.pathSeparatorChar + libraryClassPath;
-        // need to associate each import with a library folder
-        String packages[] =
-          Compiler.packageListFromClassPath(libraryClassPath);
+//        // get the path for all .jar files in this code folder
+//        String libraryClassPath =
+//          Compiler.contentsToClassPath(libraryFolder);
+//        // grab all jars and classes from this folder,
+//        // and append them to the library classpath
+//        librariesClassPath +=
+//          File.pathSeparatorChar + libraryClassPath;
+//        // need to associate each import with a library folder
+//        String packages[] =
+//          Compiler.packageListFromClassPath(libraryClassPath);
+        String packages[] = Compiler.headerListFromIncludePath(subfolder.getAbsolutePath());
         for (String pkg : packages) {
-          importToLibraryTable.put(pkg, libraryFolder);
+          importToLibraryTable.put(pkg, subfolder);
         }
 
         JMenuItem item = new JMenuItem(libraryName);
         item.addActionListener(listener);
-        item.setActionCommand(libraryJar.getAbsolutePath());
+//        item.setActionCommand(libraryJar.getAbsolutePath());
         menu.add(item);
         ifound = true;
 
-      } else {  // not a library, but is still a folder, so recurse
-        JMenu submenu = new JMenu(libraryName);
-        // needs to be separate var, otherwise would set ifound to false
-        boolean found = addLibraries(submenu, subfolder);
-        if (found) {
-          menu.add(submenu);
-          ifound = true;
-        }
-      }
+// XXX: DAM: should recurse here so that library folders can be nested
+//      } else {  // not a library, but is still a folder, so recurse
+//        JMenu submenu = new JMenu(libraryName);
+//        // needs to be separate var, otherwise would set ifound to false
+//        boolean found = addLibraries(submenu, subfolder);
+//        if (found) {
+//          menu.add(submenu);
+//          ifound = true;
+//        }
+//      }
     }
     return ifound;
   }

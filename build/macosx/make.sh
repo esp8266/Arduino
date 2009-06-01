@@ -34,6 +34,7 @@ else
   cp -X ../../app/lib/ecj.jar "$RESOURCES/"
   cp -X ../../app/lib/jna.jar "$RESOURCES/"
   cp -X ../../app/lib/oro.jar "$RESOURCES/"
+  cp -X ../../app/lib/RXTXcomm.jar "$RESOURCES/"
 
   echo Copying examples...
   cp -r ../shared/examples "$RESOURCES/"
@@ -102,7 +103,7 @@ mkdir ../build/macosx/work/classes
 javac \
     -Xlint:deprecation \
     -source 1.5 -target 1.5 \
-    -classpath "$RESOURCES/core.jar:$RESOURCES/antlr.jar:$RESOURCES/ecj.jar:$RESOURCES/jna.jar:$RESOURCES/oro.jar" \
+    -classpath "$RESOURCES/core.jar:$RESOURCES/antlr.jar:$RESOURCES/ecj.jar:$RESOURCES/jna.jar:$RESOURCES/oro.jar:$RESOURCES/RXTXcomm.jar" \
     -d ../build/macosx/work/classes \
     src/processing/app/*.java \
     src/processing/app/debug/*.java \
