@@ -41,8 +41,8 @@ import processing.core.*;
  * files and images, etc) that comes from that.
  */
 public class Base {
-  static final int REVISION = 165;
-  static String VERSION_NAME = "0165";
+  static final int REVISION = 17;
+  static String VERSION_NAME = "0017";
 
   static HashMap<Integer, String> platformNames = new HashMap();
   static {

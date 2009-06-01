@@ -213,3 +213,14 @@ run.present.stop.color = #cccccc
 run.present.exclusive = false
 # use this by default to hide the menu bar and dock on osx
 run.present.exclusive.macosx = true
+
+# ARDUINO PREFERENCES
+board = atmega328
+
+upload.using = bootloader
+
+serial.port=COM1
+serial.databits=8
+serial.stopbits=1
+serial.parity=N
+serial.debug_rate=9600

@@ -3,7 +3,7 @@
 
 ### -- SETUP WORK DIR -------------------------------------------
 
-RESOURCES=`pwd`/work/Processing.app/Contents/Resources/Java
+RESOURCES=`pwd`/work/Arduino.app/Contents/Resources/Java
 #echo $RESOURCES
 #exit
 
@@ -17,12 +17,12 @@ else
   mkdir work
 
   # to have a copy of this guy around for messing with
-  echo Copying Processing.app...
-  #cp -a dist/Processing.app work/   # #@$(* bsd switches
-  #/sw/bin/cp -a dist/Processing.app work/
-  cp -pRX dist/Processing.app work/
+  echo Copying Arduino.app...
+  #cp -a dist/Arduino.app work/   # #@$(* bsd switches
+  #/sw/bin/cp -a dist/Arduino.app work/
+  cp -pRX dist/Arduino.app work/
   # cvs doesn't seem to want to honor the +x bit 
-  chmod +x work/Processing.app/Contents/MacOS/JavaApplicationStub
+  chmod +x work/Arduino.app/Contents/MacOS/JavaApplicationStub
 
   cp -rX ../shared/lib "$RESOURCES/"
   cp -rX ../shared/libraries "$RESOURCES/"
@@ -118,8 +118,8 @@ zip -0rq "$RESOURCES/pde.jar" .
 cd ../..
 
 # get updated core.jar and pde.jar; also antlr.jar and others
-#mkdir -p work/Processing.app/Contents/Resources/Java/
-#cp work/lib/*.jar work/Processing.app/Contents/Resources/Java/
+#mkdir -p work/Arduino.app/Contents/Resources/Java/
+#cp work/lib/*.jar work/Arduino.app/Contents/Resources/Java/
 
 
 echo

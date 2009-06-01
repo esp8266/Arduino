@@ -3,7 +3,7 @@
 <plist version="0.9">
   <dict>
     <key>CFBundleName</key>
-    <string>Processing</string>
+    <string>Arduino</string>
 
     <!-- all these need to change for new releases -->
     <key>CFBundleGetInfoString</key>
@@ -28,7 +28,7 @@
     <key>CFBundleIconFile</key>
     <string>processing.icns</string>
     <key>CFBundleIdentifier</key> 
-    <string>org.processing.app</string>
+    <string>cc.arduino.Arduino</string>
     <key>CFBundleDocumentTypes</key>
     <array>
       <dict>

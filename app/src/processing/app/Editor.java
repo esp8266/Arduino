@@ -140,7 +140,7 @@ public class Editor extends JFrame implements RunnerListener {
 
 
   public Editor(Base ibase, String path, int[] location) {
-    super("Processing");
+    super("Arduino");
     this.base = ibase;
 
     Base.setIcon(this);
@@ -834,8 +834,8 @@ public class Editor extends JFrame implements RunnerListener {
     item.setAccelerator(KeyStroke.getKeyStroke('T', modifiers));
     menu.add(item);
 
-    menu.add(createToolMenuItem("processing.app.tools.CreateFont"));
-    menu.add(createToolMenuItem("processing.app.tools.ColorSelector"));
+    //menu.add(createToolMenuItem("processing.app.tools.CreateFont"));
+    //menu.add(createToolMenuItem("processing.app.tools.ColorSelector"));
     menu.add(createToolMenuItem("processing.app.tools.Archiver"));
     menu.add(createToolMenuItem("processing.app.tools.FixEncoding"));
 
@@ -2005,7 +2005,7 @@ public class Editor extends JFrame implements RunnerListener {
     }
     header.rebuild();
     // Set the title of the window to "sketch_070752a - Processing 0126"
-    setTitle(sketch.getName() + " | Processing " + Base.VERSION_NAME);
+    setTitle(sketch.getName() + " | Arduino " + Base.VERSION_NAME);
     // Disable untitled setting from previous document, if any
     untitled = false;
 

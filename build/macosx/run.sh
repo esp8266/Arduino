@@ -9,4 +9,4 @@
 #cd work && java -Dapple.laf.useScreenMenuBar=true -Dapple.awt.showGrowBox=false processing.app.Base
 
 # starting with work on release 0120, run directly from the .app
-cd work && ./Processing.app/Contents/MacOS/JavaApplicationStub
+cd work && ./Arduino.app/Contents/MacOS/JavaApplicationStub
