@@ -11,13 +11,7 @@ Add library keyword highlighting.
 
 Test the dist.sh.  (Revise the disk image and include the drivers.)
 
-Copy over Arduino todo.txt
-
-Add readme (at least to the source tree, even if it doesn't make sense in a distribution of a single .app file)
-
 Update reference.
-
-Remove the Processing libraries.
 
 Test bootloader burning w/ an AVRISP and a parallel programmer.
 
@@ -26,6 +20,8 @@ Add the Serial monitor.
 Change the colors.
 
 Revise the icon.
+
+Check that I'm not requiring the JDK (as opposed to JRE) unnecessarily.  
 
 Fix Windows make.sh, etc. scripts.
 
