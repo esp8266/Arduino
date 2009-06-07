@@ -1074,14 +1074,20 @@ public class Base {
         ifound = true;
 
       } else {
-        // not a sketch folder, but maybe a subfolder containing sketches
-        JMenu submenu = new JMenu(list[i]);
-        // needs to be separate var
-        // otherwise would set ifound to false
-        boolean found = addSketches(submenu, subfolder, openReplaces); //, false);
-        if (found) {
-          menu.add(submenu);
-          ifound = true;
+        // don't create an extra menu level for a folder named "examples"
+        if (subfolder.getName().equals("examples")) {
+          boolean found = addSketches(menu, subfolder, openReplaces); //, false);
+          if (found) ifound = true;
+        } else {
+          // not a sketch folder, but maybe a subfolder containing sketches
+          JMenu submenu = new JMenu(list[i]);
+          // needs to be separate var
+          // otherwise would set ifound to false
+          boolean found = addSketches(submenu, subfolder, openReplaces); //, false);
+          if (found) {
+            menu.add(submenu);
+            ifound = true;
+          }
         }
       }
     }

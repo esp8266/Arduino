@@ -3,13 +3,9 @@
 
 PROCESSING 5503 SYNC
 
-Move library examples from the library folders into the example folder.
-
-Don't explicitly add the built-in or user library examples to the examples menu.  Instead, the built-in library examples will be in the examples folder, and the user-library examples will appear in the sketchbook menu.
-
 Add library keyword highlighting.
 
-Test the dist.sh.  (Revise the disk image and include the drivers.)
+Test the FTDI drivers in the arduino.dmg.
 
 Update reference.
 
