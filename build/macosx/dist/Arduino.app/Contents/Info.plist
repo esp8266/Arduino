@@ -5,14 +5,6 @@
     <key>CFBundleName</key>
     <string>Arduino</string>
 
-    <!-- all these need to change for new releases -->
-    <key>CFBundleGetInfoString</key>
-    <string>1.0.1, Copyright © Ben Fry and Casey Reas</string>
-    <key>CFBundleVersion</key>
-    <string>1.0.1</string>
-    <key>CFBundleShortVersionString</key>
-    <string>1.0.1</string>
-
     <key>CFBundleAllowMixedLocalizations</key>
     <string>true</string>
     <key>CFBundleExecutable</key>

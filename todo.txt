@@ -5,7 +5,7 @@ PROCESSING 5503 SYNC
 
 Add library keyword highlighting.
 
-Fix the settings in the Info.plist file in the Arduino.app.
+Don't allow in-place modification of user-installed library examples.
 
 Test the FTDI drivers in the arduino.dmg.
 
@@ -18,6 +18,8 @@ Change the colors.
 Revise the icon.
 
 Check that I'm not requiring the JDK (as opposed to JRE) unnecessarily.  
+
+Don't recompile the Processing core if the work/ directory exists.
 
 Fix Windows make.sh, etc. scripts.
 
@@ -32,6 +34,8 @@ Add support for third-party boards in the user's sketchbook folder.
 Add support for third-party cores in the user's sketchbook folder.
 
 Test the upload.using parameter to upload with a programmer.
+
+Re-enable (and fix) the Commander.
 
 Compiler.java
  - Collect the target object files (.o) into a static library (.a) and link the other object files (from the sketch and libraries) against it.
