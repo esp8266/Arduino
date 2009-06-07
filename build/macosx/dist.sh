@@ -6,23 +6,23 @@ REVISION=`head -1 ../../todo.txt | awk '{print $1}'`
 if [ $1 ]
 then
   RELEASE=$1
-  echo Creating Processing release $RELEASE...
+  echo Creating Arduino release $RELEASE...
 else 
   RELEASE=$REVISION
-  echo Creating Processing distribution for revision $REVISION...
+  echo Creating Arduino distribution for revision $REVISION...
 fi
 
 VERSIONED=`cat ../../app/src/processing/app/Base.java | grep $REVISION`
 if [ -z "$VERSIONED" ]
 then
-  echo Fix the revision number in Base.java
+  echo Fix the revision number in Base.java or todo.txt
   exit
 fi
 
 # remove any unfinished builds or old builds
-rm -rf processing
-rm -rf Processing*
-rm -rf processing-*
+rm -rf arduino
+rm -rf Arduino*
+rm -rf arduino-*
 rm -rf work
 
 ./make.sh
@@ -30,7 +30,7 @@ rm -rf work
 if [ $1 ]
 then
   # write the release version number into the output directory
-  echo $1 > work/Processing.app/Contents/Resources/Java/lib/version.txt
+  echo $1 > work/Arduino.app/Contents/Resources/Java/lib/version.txt
 fi
 
 echo Cleaning file boogers...
@@ -54,8 +54,8 @@ find work -name ".svn" -exec rm -rf {} 2> /dev/null ';'
 echo Creating disk image...
 
 SOURCE_DIR="work"
-SOURCE_FILES="Processing.app"
-OUTPUT_DMG="processing-$RELEASE"
+SOURCE_FILES="Arduino.app"
+OUTPUT_DMG="arduino-$RELEASE"
 WORK_DMG="working.dmg"
 WORK_DIR="working_dir"
 

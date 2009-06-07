@@ -1,4 +1,4 @@
-0016 arduino
+0017 arduino
 
 
 PROCESSING 5503 SYNC
@@ -65,6 +65,8 @@ Preferences.java
 
 AVR
 
+Servo library:
+ - patch for the Mega (pins 11 and 12, not 9 and 10)
 Ethernet library:
  - integrate DHCP support
  - client.connect() returns 0 when connection is successful?  http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1238295170
