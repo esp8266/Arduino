@@ -5,10 +5,10 @@ REVISION=`head -1 ../../todo.txt | awk '{print $1}'`
 if [ $1 ]
 then
   RELEASE=$1
-  echo Creating Processing release $RELEASE...
+  echo Creating Arduino release $RELEASE...
 else 
   RELEASE=$REVISION
-  echo Creating Processing distribution for revision $REVISION...
+  echo Creating Arduino distribution for revision $REVISION...
 fi
 
 # check to see if the version number in the app is correct
@@ -23,79 +23,80 @@ fi
 ./make.sh
 
 # remove any old boogers
-rm -rf processing
-rm -rf processing-*
+rm -rf arduino
+rm -rf arduino-*
 
-mkdir processing
-cp -r ../shared/lib processing/
-cp -r ../shared/libraries processing/
-cp -r ../shared/tools processing/
+mkdir arduino
+cp -r ../shared/lib arduino/
+cp -r ../shared/tools arduino/
+
+cp dist/*.dll arduino/
+cp -r dist/drivers arduino/
+
+cp -r ../../hardware arduino/
+
 
 if [ $1 ]
 then
   # write the release version number into the output directory
-  echo $1 > processing/lib/version.txt
+  echo $1 > arduino/lib/version.txt
 fi
 
-cp ../../app/lib/antlr.jar processing/lib/
-cp ../../app/lib/ecj.jar processing/lib/
-cp ../../app/lib/jna.jar processing/lib/
+cp ../../app/lib/antlr.jar arduino/lib/
+cp ../../app/lib/ecj.jar arduino/lib/
+cp ../../app/lib/jna.jar arduino/lib/
+cp ../../app/lib/oro.jar arduino/lib/
+cp ../../app/lib/RXTXcomm.jar arduino/lib/
 
-cp ../shared/revisions.txt processing/
+cp ../../readme.txt arduino/
 
-echo Extracting examples...
-unzip -q -d processing/ ../shared/examples.zip
+echo Copying examples...
+cp -r ../shared/examples arduino/
 
 echo Extracting reference...
-unzip -q -d processing/ ../shared/reference.zip
+unzip -q -d arduino/ ../shared/reference.zip
 
-# add the libraries folder with source
-cp -r ../../net processing/libraries/
-cp -r ../../opengl processing/libraries/
-cp -r ../../serial processing/libraries/
-cp -r ../../video processing/libraries/
-cp -r ../../pdf processing/libraries/
-cp -r ../../dxf processing/libraries/
+unzip -q -d arduino/hardware avr_tools.zip
 
 # add java (jre) files
-unzip -q -d processing jre.zip
+unzip -q -d arduino jre.zip
 
 # get platform-specific goodies from the dist dir
-cp launcher/processing.exe processing/
+cp launcher/arduino.exe arduino/
 
 # grab pde.jar and export from the working dir
-cp work/lib/pde.jar processing/lib/
-cp work/lib/core.jar processing/lib/
+cp work/lib/pde.jar arduino/lib/
+cp work/lib/core.jar arduino/lib/
 
 # convert revisions.txt to windows LFs
 # the 2> is because the app is a little chatty
-unix2dos processing/revisions.txt 2> /dev/null
-unix2dos processing/lib/preferences.txt 2> /dev/null
-unix2dos processing/lib/keywords.txt 2> /dev/null
+unix2dos arduino/readme.txt 2> /dev/null
+unix2dos arduino/lib/preferences.txt 2> /dev/null
+unix2dos arduino/lib/keywords.txt 2> /dev/null
 
 # remove boogers
-find processing -name "*.bak" -exec rm -f {} ';'
-find processing -name "*~" -exec rm -f {} ';'
-find processing -name ".DS_Store" -exec rm -f {} ';'
-find processing -name "._*" -exec rm -f {} ';'
-find processing -name "Thumbs.db" -exec rm -f {} ';'
+find arduino -name "*.bak" -exec rm -f {} ';'
+find arduino -name "*~" -exec rm -f {} ';'
+find arduino -name ".DS_Store" -exec rm -f {} ';'
+find arduino -name "._*" -exec rm -f {} ';'
+find arduino -name "Thumbs.db" -exec rm -f {} ';'
 
 # chmod +x the crew
-find processing -name "*.html" -exec chmod +x {} ';'
-find processing -name "*.dll" -exec chmod +x {} ';'
-find processing -name "*.exe" -exec chmod +x {} ';'
-find processing -name "*.html" -exec chmod +x {} ';'
+find arduino -name "*.html" -exec chmod +x {} ';'
+find arduino -name "*.dll" -exec chmod +x {} ';'
+find arduino -name "*.exe" -exec chmod +x {} ';'
+find arduino -name "*.html" -exec chmod +x {} ';'
 
 # clean out the cvs entries
-find processing -name "CVS" -exec rm -rf {} ';' 2> /dev/null
-find processing -name ".cvsignore" -exec rm -rf {} ';'
-find processing -name ".svn" -exec rm -rf {} ';' 2> /dev/null
+find arduino -name "CVS" -exec rm -rf {} ';' 2> /dev/null
+find arduino -name ".cvsignore" -exec rm -rf {} ';'
+find arduino -name ".svn" -exec rm -rf {} ';' 2> /dev/null
 
 # zip it all up for release
 echo Packaging standard release...
 echo
-P5=processing-$RELEASE
-mv processing $P5
+P5=arduino-$RELEASE
+mv arduino $P5
 zip -rq $P5.zip $P5
 # nah, keep the new directory around
 #rm -rf $P5
