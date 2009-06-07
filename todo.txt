@@ -5,9 +5,9 @@ PROCESSING 5503 SYNC
 
 Add library keyword highlighting.
 
-Test the FTDI drivers in the arduino.dmg.
+Fix the settings in the Info.plist file in the Arduino.app.
 
-Update reference.
+Test the FTDI drivers in the arduino.dmg.
 
 Test bootloader burning w/ an AVRISP and a parallel programmer.
 
