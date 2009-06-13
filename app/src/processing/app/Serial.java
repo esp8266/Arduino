@@ -25,6 +25,8 @@
 package processing.app;
 //import processing.core.*;
 
+import processing.app.debug.MessageConsumer;
+
 import gnu.io.*;
 
 import java.io.*;
@@ -58,6 +60,8 @@ public class Serial implements SerialPortEventListener {
   byte buffer[] = new byte[32768];
   int bufferIndex;
   int bufferLast;
+  
+  MessageConsumer consumer;
 
   public Serial(boolean monitor) throws SerialException {
     this(Preferences.get("serial.port"),
@@ -189,6 +193,11 @@ public class Serial implements SerialPortEventListener {
     }
     port = null;
   }
+  
+  
+  public void addListener(MessageConsumer consumer) {
+    this.consumer = consumer;
+  }
 
 
   synchronized public void serialEvent(SerialPortEvent serialEvent) {
@@ -217,6 +226,8 @@ public class Serial implements SerialPortEventListener {
             //buffer[bufferLast++] = (byte) input.read();
             if(monitor == true)
               System.out.print((char) input.read());
+            if (this.consumer != null)
+              this.consumer.message("" + (char) input.read());
             
             /*
             System.err.println(input.available() + " " + 

@@ -35,7 +35,7 @@ import javax.swing.event.*;
 public class EditorToolbar extends JComponent implements MouseInputListener {
 
   static final String title[] = {
-    "Verify", "Stop", "New", "Open", "Save", "Upload"
+    "Verify", "Stop", "New", "Open", "Save", "Upload", "Serial Monitor"
   };
 
   static final int BUTTON_COUNT  = title.length;
@@ -53,6 +53,8 @@ public class EditorToolbar extends JComponent implements MouseInputListener {
   static final int OPEN     = 3;
   static final int SAVE     = 4;
   static final int EXPORT   = 5;
+  
+  static final int SERIAL   = 6;
 
   static final int INACTIVE = 0;
   static final int ROLLOVER = 1;
@@ -108,6 +110,7 @@ public class EditorToolbar extends JComponent implements MouseInputListener {
     which[buttonCount++] = OPEN;
     which[buttonCount++] = SAVE;
     which[buttonCount++] = EXPORT;
+    which[buttonCount++] = SERIAL;
 
     currentRollover = -1;
 
@@ -170,7 +173,7 @@ public class EditorToolbar extends JComponent implements MouseInputListener {
       int offsetX = 3;
       for (int i = 0; i < buttonCount; i++) {
         x1[i] = offsetX;
-        if (i == 2) x1[i] += BUTTON_GAP;
+        if (i == 2 || i == 6) x1[i] += BUTTON_GAP;
         x2[i] = x1[i] + BUTTON_WIDTH;
         offsetX = x2[i];
       }
@@ -338,6 +341,10 @@ public class EditorToolbar extends JComponent implements MouseInputListener {
 
     case EXPORT:
       editor.handleExport();
+      break;
+
+    case SERIAL:
+      editor.handleSerial(true);
       break;
     }
   }

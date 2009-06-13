@@ -99,6 +99,9 @@ public class Editor extends JFrame implements RunnerListener {
   static JMenu serialMenu;
 
   static SerialMenuListener serialMenuListener;
+  static SerialMonitor serialMonitor;
+  
+  static Editor activeEditor;
 
   EditorHeader header;
   EditorStatus status;
@@ -159,6 +162,8 @@ public class Editor extends JFrame implements RunnerListener {
     // When bringing a window to front, let the Base know
     addWindowListener(new WindowAdapter() {
         public void windowActivated(WindowEvent e) {
+          activeEditor = Editor.this;
+        
           base.handleActivated(Editor.this);
 
           // re-add the sub-menus that are shared by all windows
@@ -172,6 +177,8 @@ public class Editor extends JFrame implements RunnerListener {
 
     //PdeKeywords keywords = new PdeKeywords();
     //sketchbook = new Sketchbook(this);
+    
+    if (serialMonitor == null) serialMonitor = new SerialMonitor();
 
     buildMenuBar();
 
@@ -849,6 +856,7 @@ public class Editor extends JFrame implements RunnerListener {
       //System.out.println(item.getLabel());
       Preferences.set("serial.port", name);
       //System.out.println("set to " + get("serial.port"));
+      activeEditor.handleSerial(false);
     }
 
     /*
@@ -2203,6 +2211,21 @@ public class Editor extends JFrame implements RunnerListener {
       return false;
     }
     return true;
+  }
+  
+  
+  public void handleSerial(boolean showSerialMonitor) {
+    statusEmpty();
+  
+    if (!showSerialMonitor && !serialMonitor.isVisible()) return;
+  
+    try {
+      serialMonitor.openSerialPort(Preferences.get("serial.port"));
+      serialMonitor.setVisible(true);
+    } catch (SerialException e) {
+      statusError(e.getMessage());
+      serialMonitor.setVisible(false);
+    }
   }
 
 
