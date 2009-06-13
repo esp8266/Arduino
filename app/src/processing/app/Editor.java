@@ -99,7 +99,7 @@ public class Editor extends JFrame implements RunnerListener {
   static JMenu serialMenu;
 
   static SerialMenuListener serialMenuListener;
-  static Map serialMonitors;
+  static SerialMonitor serialMonitor;
   
   EditorHeader header;
   EditorStatus status;
@@ -174,7 +174,8 @@ public class Editor extends JFrame implements RunnerListener {
     //PdeKeywords keywords = new PdeKeywords();
     //sketchbook = new Sketchbook(this);
     
-    if (serialMonitors == null) serialMonitors = new HashMap();
+    if (serialMonitor == null)
+      serialMonitor = new SerialMonitor(Preferences.get("serial.port"));
     
     buildMenuBar();
 
@@ -851,6 +852,9 @@ public class Editor extends JFrame implements RunnerListener {
       String name = item.getText();
       //System.out.println(item.getLabel());
       Preferences.set("serial.port", name);
+      serialMonitor.closeSerialPort();
+      serialMonitor.setVisible(false);
+      serialMonitor = new SerialMonitor(Preferences.get("serial.port"));
       //System.out.println("set to " + get("serial.port"));
     }
 
@@ -2152,6 +2156,9 @@ public class Editor extends JFrame implements RunnerListener {
     Thread t = new Thread(new Runnable() {
         public void run() {
           try {
+            serialMonitor.closeSerialPort();
+            serialMonitor.setVisible(false);
+          
             boolean success = sketch.exportApplet(new Target(
               Base.getHardwarePath() + File.separator + "cores",
               Preferences.get("boards." + Preferences.get("board") + ".build.core")));
@@ -2210,13 +2217,8 @@ public class Editor extends JFrame implements RunnerListener {
   
   
   public void handleSerial() {
-    String port = Preferences.get("serial.port");
-    
-    if (!serialMonitors.containsKey(port))
-      serialMonitors.put(port, new SerialMonitor(port));
-      
-    ((SerialMonitor) serialMonitors.get(port)).setVisible(true);
-    ((SerialMonitor) serialMonitors.get(port)).openSerialPort();
+    serialMonitor.setVisible(true);
+    serialMonitor.openSerialPort();
   }
 
 

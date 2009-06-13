@@ -120,9 +120,12 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
   }
   
   public void openSerialPort() {
+    if (serial != null) return;
+  
     try {
       statusLabel.setText("opening...");
       serial = new Serial(port, serialRate);
+      while (serial.available() > 0) serial.read();
       serial.addListener(this);
       statusLabel.setText("");
     } catch (SerialException e) {
