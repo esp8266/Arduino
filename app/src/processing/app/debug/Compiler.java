@@ -296,6 +296,9 @@ public class Compiler implements MessageConsumer {
     // ignore cautions
     if (s.indexOf("warning") != -1) return;
 
+    // ignore this line; the real error is on the next one
+    if (s.indexOf("In file included from") != -1) return;
+
     // jikes always uses a forward slash character as its separator,
     // so replace any platform-specific separator characters before
     // attemping to compare
@@ -306,7 +309,7 @@ public class Compiler implements MessageConsumer {
     String partialTempPath = null;
     int partialStartIndex = -1; //s.indexOf(partialTempPath);
     int fileIndex = -1;  // use this to build a better exception
-
+    
     // check the main sketch file first.
     partialTempPath = buildPathSubst + primaryClassName;
     partialStartIndex = s.indexOf(partialTempPath);
@@ -324,7 +327,7 @@ public class Compiler implements MessageConsumer {
         partialStartIndex = s.indexOf(partialTempPath);
         if (partialStartIndex != -1) {
           fileIndex = i;
-          System.out.println("fileIndex is " + fileIndex);
+          //System.out.println("fileIndex is " + fileIndex);
           break;
         }
       }
