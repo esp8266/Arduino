@@ -3,21 +3,19 @@
 
 PROCESSING 5503 SYNC
 
-Modify the compilation process according the descriptions below.
+Serial monitor errors should appear in serial monitor.
 
-Test compilation when the avr-gcc or whatever isn't found.
-
-Add the Serial monitor.
+Don't require save before upload.
 
 Add library keyword highlighting.
+
+Get rid of unused preferences in the preferences dialog.
 
 Don't allow in-place modification of user-installed library examples.
 
 Test the FTDI drivers in the arduino.dmg.
 
 Test bootloader burning w/ an AVRISP and a parallel programmer.
-
-Change the colors.
 
 Revise the icon.
 
@@ -38,8 +36,6 @@ Test the upload.using parameter to upload with a programmer.
 Re-enable (and fix) the Commander.
 
 Compiler.java
- - Collect the target object files (.o) into a static library (.a) and link the other object files (from the sketch and libraries) against it.
- - Build each library separately, with its own include path and destination (for .o files) so they don't collide with each other.
  - Eliminate the need to pass a Target into the compiler by having the Compiler determine the current target (by checking the preferences directly)?
  - Delete the unneeded static functions (for classpath translation, etc.) from the bottom of the file. 
 
@@ -54,7 +50,6 @@ PreProcessor.java
 
 Base.java
  - add keywords from libraries to the syntax coloring
- - remove "examples" folder from the examples and toolbar menus for the libraries.
 
 Editor.java
  - allow the Board and Serial port to differ across editor windows.  This will require creating a separate instance of the menu for each window, and passing the selections into the sketch when compiling or uploading.

@@ -33,6 +33,7 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
   private JTextField textField;
   private JButton sendButton;
   private JComboBox serialRates;
+  private JLabel statusLabel;
 
   public SerialMonitor() {
     addWindowListener(new WindowAdapter() {
@@ -73,7 +74,12 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
     
     getContentPane().add(pane, BorderLayout.NORTH);
     
-    pane = new JPanel(new FlowLayout(FlowLayout.TRAILING, 4, 4));
+    pane = new JPanel(new BorderLayout(4, 0));
+    pane.setBorder(new EmptyBorder(4, 4, 4, 4));
+    
+    statusLabel = new JLabel();
+    
+    pane.add(statusLabel, BorderLayout.CENTER);
   
     String[] serialRateStrings = {
       "300","1200","2400","4800","9600","14400",
@@ -91,11 +97,12 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
         String rateString = wholeString.substring(0, wholeString.indexOf(' '));
         int rate = Integer.parseInt(rateString);
         Preferences.set("serial.debug_rate", rateString);
+        String port = SerialMonitor.this.port;
         closeSerialPort();
-        Editor.activeEditor.handleSerial(true);
+        openSerialPort(port);
       }});
     
-    pane.add(serialRates);
+    pane.add(serialRates, BorderLayout.EAST);
     
     getContentPane().add(pane, BorderLayout.SOUTH);
 
@@ -107,25 +114,32 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
       serial.write(s);
   }
   
-  public void openSerialPort(String port) throws SerialException {
+  public void openSerialPort(String port) {
     if (port.equals(this.port))
       return;
     
     closeSerialPort();
     
-    serial = new Serial(port);
-    serial.addListener(this);
-    setTitle(port);
-    this.port = port;
+    try {
+      statusLabel.setText("opening...");
+      serial = new Serial(port);
+      serial.addListener(this);
+      setTitle(port);
+      this.port = port;
+      statusLabel.setText("");
+    } catch (SerialException e) {
+      statusLabel.setText(e.getMessage());
+    }
   }
   
   public void closeSerialPort() {
     if (serial != null) {
-      setTitle("closing...");
+      statusLabel.setText("closing...");
       textArea.setText("");
       serial.dispose();
       serial = null;
       port = null;
+      statusLabel.setText("");
     }
   }
   
