@@ -71,13 +71,67 @@ public class Compiler implements MessageConsumer {
 
     String avrBasePath = Base.getAvrBasePath();
     
+    List<File> objectFiles = new ArrayList<File>();
+
     List includePaths = new ArrayList();
     includePaths.add(target.getPath());
-    // use lib directories as include paths
+    
+    String runtimeLibraryName = buildPath + File.separator + "core.a";
+
+    // 1. compile the target (core), outputting .o files to <buildPath> and
+    // then collecting them into the core.a library file.
+    
+    List<File> targetObjectFiles = 
+      compileFiles(avrBasePath, buildPath, includePaths,
+                   findFilesInPath(target.getPath(), "c", true),
+                   findFilesInPath(target.getPath(), "cpp", true));
+                   
+    List baseCommandAR = new ArrayList(Arrays.asList(new String[] {
+      avrBasePath + "avr-ar",
+      "rcs",
+      runtimeLibraryName
+    }));
+
+    for(File file : targetObjectFiles) {
+      List commandAR = new ArrayList(baseCommandAR);
+      commandAR.add(file.getAbsolutePath());
+      execAsynchronously(commandAR);
+    }
+
+    // 2. compile the libraries, outputting .o files to: <buildPath>/<library>/
+    
+    // use library directories as include paths for all libraries
     for (File file : sketch.getImportedLibraries()) {
       includePaths.add(file.getPath());
-      includePaths.add(file.getPath() + File.separator + "utility");
     }
+    
+    for (File libraryFolder : sketch.getImportedLibraries()) {
+      File outputFolder = new File(buildPath, libraryFolder.getName());
+      createFolder(outputFolder);
+      // this library can use includes in its utility/ folder
+      includePaths.add(libraryFolder.getPath() + File.separator + "utility");
+      objectFiles.addAll(
+        compileFiles(avrBasePath, outputFolder.getAbsolutePath(), includePaths,
+                     findFilesInFolder(libraryFolder, "c", false),
+                     findFilesInFolder(libraryFolder, "cpp", false)));
+      outputFolder = new File(outputFolder, "utility");
+      createFolder(outputFolder);
+      objectFiles.addAll(
+        compileFiles(avrBasePath, outputFolder.getAbsolutePath(), includePaths,
+                     findFilesInFolder(new File(libraryFolder, "utility"), "c", false),
+                     findFilesInFolder(new File(libraryFolder, "utility"), "cpp", false)));
+      // other libraries should not see this library's utility/ folder
+      includePaths.remove(includePaths.size() - 1);
+    }
+    
+    // 3. compile the sketch (already in the buildPath)
+    
+    objectFiles.addAll(
+      compileFiles(avrBasePath, buildPath, includePaths,
+                   findFilesInPath(buildPath, "c", false),
+                   findFilesInPath(buildPath, "cpp", false)));
+                   
+    // 4. link it all together into the .elf file
     
     List baseCommandLinker = new ArrayList(Arrays.asList(new String[] {
       avrBasePath + "avr-gcc",
@@ -88,143 +142,83 @@ public class Compiler implements MessageConsumer {
       buildPath + File.separator + primaryClassName + ".elf"
     }));
     
-//    String runtimeLibraryName = buildPath + File.separator + "core.a";
+    for (File file : objectFiles) {
+      baseCommandLinker.add(file.getAbsolutePath());
+    }
 
-//    List baseCommandAR = new ArrayList(Arrays.asList(new String[] {
-//      avrBasePath + "avr-ar",
-//      "rcs",
-//      runtimeLibraryName
-//    }));
+    baseCommandLinker.add(runtimeLibraryName);
+    baseCommandLinker.add("-L" + buildPath);
+    baseCommandLinker.add("-lm");
+
+    execAsynchronously(baseCommandLinker);
 
     List baseCommandObjcopy = new ArrayList(Arrays.asList(new String[] {
       avrBasePath + "avr-objcopy",
       "-O",
       "-R",
     }));
-
-    ArrayList<File> sourceFiles = new ArrayList<File>();
-    ArrayList<File> sourceFilesCPP = new ArrayList<File>();
     
-    sourceFiles.addAll(findFilesInPath(buildPath, "c", false));
-    sourceFilesCPP.addAll(findFilesInPath(buildPath, "cpp", false));
+    List commandObjcopy;
+
+    // 5. extract EEPROM data (from EEMEM directive) to .eep file.
+    commandObjcopy = new ArrayList(baseCommandObjcopy);
+    commandObjcopy.add(2, "ihex");
+    commandObjcopy.set(3, "-j");
+    commandObjcopy.add(".eeprom");
+    commandObjcopy.add("--set-section-flags=.eeprom=alloc,load");
+    commandObjcopy.add("--no-change-warnings");
+    commandObjcopy.add("--change-section-lma");
+    commandObjcopy.add(".eeprom=0");
+    commandObjcopy.add(buildPath + File.separator + primaryClassName + ".elf");
+    commandObjcopy.add(buildPath + File.separator + primaryClassName + ".eep");
+    execAsynchronously(commandObjcopy);
     
-    sourceFiles.addAll(findFilesInPath(target.getPath(), "c", true));
-    sourceFilesCPP.addAll(findFilesInPath(target.getPath(), "cpp", true));
+    // 6. build the .hex file
+    commandObjcopy = new ArrayList(baseCommandObjcopy);
+    commandObjcopy.add(2, "ihex");
+    commandObjcopy.add(".eeprom"); // remove eeprom data
+    commandObjcopy.add(buildPath + File.separator + primaryClassName + ".elf");
+    commandObjcopy.add(buildPath + File.separator + primaryClassName + ".hex");
+    execAsynchronously(commandObjcopy);
     
-    for (File file : sketch.getImportedLibraries()) {
-      sourceFiles.addAll(findFilesInFolder(file, "c", false));
-      sourceFiles.addAll(findFilesInFolder(new File(file, "utility"), "c", false));
-      sourceFilesCPP.addAll(findFilesInFolder(file, "cpp", false));
-      sourceFilesCPP.addAll(findFilesInFolder(new File(file, "utility"), "cpp", false));
-    }
-    
-    firstErrorFound = false;  // haven't found any errors yet
-    secondErrorFound = false;
-
-    int result = 0; // pre-initialized to quiet a bogus warning from jikes
-    try {
-      // execute the compiler, and create threads to deal
-      // with the input and error streams
-      //
-
-      Process process;
-      boolean compiling = true;
-      for(File file : sourceFiles) {
-        String objectPath = buildPath + File.separator + file.getName() + ".o";
-        baseCommandLinker.add(objectPath);
-        if (execAsynchronously(getCommandCompilerC(avrBasePath, includePaths,
-                                                   file.getAbsolutePath(),
-                                                   objectPath)) != 0)
-          return false;
-      }
-
-      for(File file : sourceFilesCPP) {
-        String objectPath = buildPath + File.separator + file.getName() + ".o";
-        baseCommandLinker.add(objectPath);
-        if (execAsynchronously(getCommandCompilerCPP(avrBasePath, includePaths,
-                                                     file.getAbsolutePath(),
-                                                     objectPath)) != 0)
-          return false;
-      }
-
-      // XXX: DAM: need to assemble the target files together into a library
-      // (.a file) before linking the sketch and libraries against it.
-//      for(File file : findFilesInPath(target.getPath())) {
-//        List commandAR = new ArrayList(baseCommandAR);
-//        commandAR.add(file.getAbsolutePath());
-//        if (execAsynchronously(commandAR) != 0)
-//          return false;
-//      }
-
-      //baseCommandLinker.add(runtimeLibraryName);
-      //baseCommandLinker.add("-L" + buildPath);
-      baseCommandLinker.add("-lm");
-
-      if (execAsynchronously(baseCommandLinker) != 0)
-        return false;
-
-      List commandObjcopy;
-
-      // Extract EEPROM data (from EEMEM directive) to .eep file.
-      commandObjcopy = new ArrayList(baseCommandObjcopy);
-      commandObjcopy.add(2, "ihex");
-      commandObjcopy.set(3, "-j");
-      commandObjcopy.add(".eeprom");
-      commandObjcopy.add("--set-section-flags=.eeprom=alloc,load");
-      commandObjcopy.add("--no-change-warnings");
-      commandObjcopy.add("--change-section-lma");
-      commandObjcopy.add(".eeprom=0");
-      commandObjcopy.add(buildPath + File.separator + primaryClassName + ".elf");
-      commandObjcopy.add(buildPath + File.separator + primaryClassName + ".eep");
-      if (execAsynchronously(commandObjcopy) != 0)
-        return false;
-
-      commandObjcopy = new ArrayList(baseCommandObjcopy);
-      commandObjcopy.add(2, "ihex");
-      commandObjcopy.add(".eeprom"); // remove eeprom data
-      commandObjcopy.add(buildPath + File.separator + primaryClassName + ".elf");
-      commandObjcopy.add(buildPath + File.separator + primaryClassName + ".hex");
-      if (execAsynchronously(commandObjcopy) != 0)
-        return false;
-    } catch (Exception e) {
-      String msg = e.getMessage();
-      if ((msg != null) && (msg.indexOf("avr-gcc: not found") != -1)) {
-        //System.err.println("jikes is missing");
-        Base.showWarning("Compiler error",
-                            "Could not find the compiler.\n" +
-                            "avr-gcc is missing from your PATH.", null);
-        return false;
-
-      } else {
-        e.printStackTrace();
-        result = -1;
-      }
-    }
-
-    // an error was queued up by message(), barf this back to build()
-    // which will barf it back to Editor. if you're having trouble
-    // discerning the imagery, consider how cows regurgitate their food
-    // to digest it, and the fact that they have five stomaches.
-    //
-    //System.out.println("throwing up " + exception);
-    if (exception != null) throw exception;
-
-    // if the result isn't a known, expected value it means that something
-    // is fairly wrong, one possibility is that jikes has crashed.
-    //
-    if (result != 0 && result != 1 ) {
-      //exception = new RunnerException(SUPER_BADNESS);
-      //editor.error(exception);  // this will instead be thrown
-      Base.openURL(BUGS_URL);
-      throw new RunnerException(SUPER_BADNESS);
-    }
-
-    // success would mean that 'result' is set to zero
-    return (result == 0); // ? true : false;
+    return true;
   }
   
-  public int execAsynchronously(List commandList)
-    throws RunnerException, IOException {
+  
+  private List<File> compileFiles(String avrBasePath,
+                                  String buildPath, List<File> includePaths,
+                                  List<File> cSources, List<File> cppSources)
+    throws RunnerException {
+    
+    List<File> objectPaths = new ArrayList<File>();
+    
+    for (File file : cSources) {
+        String objectPath = buildPath + File.separator + file.getName() + ".o";
+        objectPaths.add(new File(objectPath));
+        execAsynchronously(getCommandCompilerC(avrBasePath, includePaths,
+                                               file.getAbsolutePath(),
+                                               objectPath));
+    }
+    
+    for (File file : cppSources) {
+        String objectPath = buildPath + File.separator + file.getName() + ".o";
+        objectPaths.add(new File(objectPath));
+        execAsynchronously(getCommandCompilerCPP(avrBasePath, includePaths,
+                                                 file.getAbsolutePath(),
+                                                 objectPath));
+    }
+    
+    return objectPaths;
+  }
+  
+  
+  boolean firstErrorFound;
+  boolean secondErrorFound;
+
+  /**
+   * Either succeeds or throws a RunnerException fit for public consumption.
+   */
+  private void execAsynchronously(List commandList) throws RunnerException {
     String[] command = new String[commandList.size()];
     commandList.toArray(command);
     int result = 0;
@@ -236,7 +230,18 @@ public class Compiler implements MessageConsumer {
       System.out.println();
     }
 
-    Process process = Runtime.getRuntime().exec(command);
+    firstErrorFound = false;  // haven't found any errors yet
+    secondErrorFound = false;
+
+    Process process;
+    
+    try {
+      process = Runtime.getRuntime().exec(command);
+    } catch (IOException e) {
+      RunnerException re = new RunnerException(e.getMessage());
+      re.hideStackTrace();
+      throw re;
+    }
     
     MessageSiphon in = new MessageSiphon(process.getInputStream(), this);
     MessageSiphon err = new MessageSiphon(process.getErrorStream(), this);
@@ -256,17 +261,26 @@ public class Compiler implements MessageConsumer {
       } catch (InterruptedException ignored) { }
     }
     
-    if (exception != null)  {
-      exception.hideStackTrace();
-      throw exception;
+    // an error was queued up by message(), barf this back to compile(),
+    // which will barf it back to Editor. if you're having trouble
+    // discerning the imagery, consider how cows regurgitate their food
+    // to digest it, and the fact that they have five stomaches.
+    //
+    //System.out.println("throwing up " + exception);
+    if (exception != null) { throw exception; }
+    
+    if (result > 1) {
+      // a failure in the tool (e.g. unable to locate a sub-executable)
+      System.err.println(command[0] + " returned " + result);
     }
     
-    return result;
+    if (result != 0) {
+      RunnerException re = new RunnerException("Error compiling.");
+      re.hideStackTrace();
+      throw re;
+    }
   }
 
-
-  boolean firstErrorFound;
-  boolean secondErrorFound;
 
   /**
    * Part of the MessageConsumer interface, this is called
@@ -277,7 +291,7 @@ public class Compiler implements MessageConsumer {
   public void message(String s) {
     // This receives messages as full lines, so a newline needs
     // to be added as they're printed to the console.
-    System.err.print(s);
+    //System.err.print(s);
 
     // ignore cautions
     if (s.indexOf("warning") != -1) return;
@@ -306,7 +320,7 @@ public class Compiler implements MessageConsumer {
         if (sketch.getCode(i).isExtension("pde")) continue;
 
         partialTempPath = buildPathSubst + sketch.getCode(i).getFileName();
-        System.out.println(partialTempPath);
+        //System.out.println(partialTempPath);
         partialStartIndex = s.indexOf(partialTempPath);
         if (partialStartIndex != -1) {
           fileIndex = i;
@@ -383,7 +397,7 @@ public class Compiler implements MessageConsumer {
 
         //System.out.println("description = " + description);
         //System.out.println("creating exception " + exception);
-        exception = new RunnerException(description, fileIndex, lineNumber-1, -1);
+        exception = new RunnerException(description, fileIndex, lineNumber-1, -1, false);
 
         // NOTE!! major change here, this exception will be queued
         // here to be thrown by the compile() function
@@ -463,6 +477,11 @@ public class Compiler implements MessageConsumer {
   
 
   /////////////////////////////////////////////////////////////////////////////
+
+  static private void createFolder(File folder) throws RunnerException {
+    if (!folder.mkdir())
+      throw new RunnerException("Couldn't create: " + folder);
+  }
 
   /**
    * Given a folder, return a list of the header files in that folder (but

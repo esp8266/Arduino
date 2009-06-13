@@ -3,6 +3,12 @@
 
 PROCESSING 5503 SYNC
 
+Modify the compilation process according the descriptions below.
+
+Test compilation when the avr-gcc or whatever isn't found.
+
+Add the Serial monitor.
+
 Add library keyword highlighting.
 
 Don't allow in-place modification of user-installed library examples.
@@ -11,8 +17,6 @@ Test the FTDI drivers in the arduino.dmg.
 
 Test bootloader burning w/ an AVRISP and a parallel programmer.
 
-Add the Serial monitor.
-
 Change the colors.
 
 Revise the icon.
@@ -20,10 +24,6 @@ Revise the icon.
 Check that I'm not requiring the JDK (as opposed to JRE) unnecessarily.  
 
 Don't recompile the Processing core if the work/ directory exists.
-
-Fix Windows make.sh, etc. scripts.
-
-Test on Windows.
 
 Fix Linux make.sh, etc. scripts
 
@@ -65,8 +65,7 @@ Preferences.java
 
 AVR
 
-Servo library:
- - patch for the Mega (pins 11 and 12, not 9 and 10)
+Switch to the MegaServo library.
 Ethernet library:
  - integrate DHCP support
  - client.connect() returns 0 when connection is successful?  http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1238295170
@@ -151,6 +150,7 @@ Change background color while using external editor: http://www.arduino.cc/cgi-b
 
 DEVELOPMENT
 
+RXTX version patched to not hang with bluetooth serial ports: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1237179908
 Add licenses for included open source libraries: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1234595391
 Make run.bat not open a command line window: http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1223883872
 Update version of the FTDI drivers (Windows).
