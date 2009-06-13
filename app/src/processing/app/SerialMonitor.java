@@ -34,8 +34,13 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
   private JButton sendButton;
   private JComboBox serialRates;
   private JLabel statusLabel;
+  private int serialRate;
 
-  public SerialMonitor() {
+  public SerialMonitor(String port) {
+    super(port);
+  
+    this.port = port;
+  
     addWindowListener(new WindowAdapter() {
         public void windowClosing(WindowEvent e) {
           closeSerialPort();
@@ -90,16 +95,16 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
     for (int i = 0; i < serialRateStrings.length; i++)
       serialRates.addItem(serialRateStrings[i] + " baud");
 
-    serialRates.setSelectedItem(Preferences.get("serial.debug_rate") + " baud");
+    serialRate = Preferences.getInteger("serial.debug_rate");
+    serialRates.setSelectedItem(serialRate + " baud");
     serialRates.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         String wholeString = (String) serialRates.getSelectedItem();
         String rateString = wholeString.substring(0, wholeString.indexOf(' '));
-        int rate = Integer.parseInt(rateString);
+        serialRate = Integer.parseInt(rateString);
         Preferences.set("serial.debug_rate", rateString);
-        String port = SerialMonitor.this.port;
         closeSerialPort();
-        openSerialPort(port);
+        openSerialPort();
       }});
     
     pane.add(serialRates, BorderLayout.EAST);
@@ -114,18 +119,11 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
       serial.write(s);
   }
   
-  public void openSerialPort(String port) {
-    if (port.equals(this.port))
-      return;
-    
-    closeSerialPort();
-    
+  public void openSerialPort() {
     try {
       statusLabel.setText("opening...");
-      serial = new Serial(port);
+      serial = new Serial(port, serialRate);
       serial.addListener(this);
-      setTitle(port);
-      this.port = port;
       statusLabel.setText("");
     } catch (SerialException e) {
       statusLabel.setText(e.getMessage());
@@ -138,7 +136,6 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
       textArea.setText("");
       serial.dispose();
       serial = null;
-      port = null;
       statusLabel.setText("");
     }
   }

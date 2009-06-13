@@ -99,7 +99,7 @@ public class Editor extends JFrame implements RunnerListener {
   static JMenu serialMenu;
 
   static SerialMenuListener serialMenuListener;
-  static SerialMonitor serialMonitor;
+  static Map serialMonitors;
   
   EditorHeader header;
   EditorStatus status;
@@ -174,8 +174,8 @@ public class Editor extends JFrame implements RunnerListener {
     //PdeKeywords keywords = new PdeKeywords();
     //sketchbook = new Sketchbook(this);
     
-    if (serialMonitor == null) serialMonitor = new SerialMonitor();
-
+    if (serialMonitors == null) serialMonitors = new HashMap();
+    
     buildMenuBar();
 
     // For rev 0120, placing things inside a JPanel
@@ -852,7 +852,6 @@ public class Editor extends JFrame implements RunnerListener {
       //System.out.println(item.getLabel());
       Preferences.set("serial.port", name);
       //System.out.println("set to " + get("serial.port"));
-      handleSerial(false);
     }
 
     /*
@@ -2210,11 +2209,14 @@ public class Editor extends JFrame implements RunnerListener {
   }
   
   
-  public void handleSerial(boolean showSerialMonitor) {
-    if (!showSerialMonitor && !serialMonitor.isVisible()) return;
-  
-    serialMonitor.setVisible(true);
-    serialMonitor.openSerialPort(Preferences.get("serial.port"));
+  public void handleSerial() {
+    String port = Preferences.get("serial.port");
+    
+    if (!serialMonitors.containsKey(port))
+      serialMonitors.put(port, new SerialMonitor(port));
+      
+    ((SerialMonitor) serialMonitors.get(port)).setVisible(true);
+    ((SerialMonitor) serialMonitors.get(port)).openSerialPort();
   }
 
 

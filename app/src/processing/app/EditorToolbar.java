@@ -344,7 +344,7 @@ public class EditorToolbar extends JComponent implements MouseInputListener {
       break;
 
     case SERIAL:
-      editor.handleSerial(true);
+      editor.handleSerial();
       break;
     }
   }
