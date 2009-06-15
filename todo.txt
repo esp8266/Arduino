@@ -3,11 +3,13 @@
 
 PROCESSING 5503 SYNC
 
-Serial monitor errors should appear in serial monitor.
-
 Don't require save before upload.
 
 Add library keyword highlighting.
+
+Allow closing of the serial monitor with keyboard short cuts.
+
+Support libraries in the SKETCH/code folder?
 
 Get rid of unused preferences in the preferences dialog.
 
