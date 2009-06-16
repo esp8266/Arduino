@@ -3,8 +3,6 @@
 
 PROCESSING 5503 SYNC
 
-Don't require save before upload.
-
 Add library keyword highlighting.
 
 Allow closing of the serial monitor with keyboard short cuts.

@@ -46,6 +46,15 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
           closeSerialPort();
         }
       });  
+      
+    // obvious, no?
+    KeyStroke wc = Editor.WINDOW_CLOSE_KEYSTROKE;
+    getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(wc, "close");
+    getRootPane().getActionMap().put("close", new AbstractAction() {
+      public void actionPerformed(ActionEvent e) {
+        closeSerialPort();
+        setVisible(false);
+      }});
   
     getContentPane().setLayout(new BorderLayout());
     
