@@ -1392,8 +1392,11 @@ public class Sketch {
     // Make sure the user didn't hide the sketch folder
     ensureExistence();
 
+    current.setProgram(editor.getText());
+
     // Reload the code when an external editor is being used
     if (Preferences.getBoolean("editor.external")) {
+      current = null;
       // nuke previous files and settings
       load();
     }

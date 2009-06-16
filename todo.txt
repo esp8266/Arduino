@@ -9,6 +9,8 @@ Add library keyword highlighting.
 
 Allow closing of the serial monitor with keyboard short cuts.
 
+Clear serial monitor button when the serial monitor opens.
+
 Support libraries in the SKETCH/code folder?
 
 Get rid of unused preferences in the preferences dialog.
@@ -44,6 +46,7 @@ Compiler.java
 Sketch.java
  - add system-wide include path in preprocess()?
  - should find libraries in the code/ sub-folder of the sketch folder
+ - do sketches really need to get built in the applet/ sub-folder when uploading?
 
 PreProcessor.java
  - split write() into writeHeader() and write() as in Processing?

@@ -2146,7 +2146,7 @@ public class Editor extends JFrame implements RunnerListener {
    * hitting export twice, quickly, and horking things up.
    */
   synchronized public void handleExport() {
-    if (!handleExportCheckModified()) return;
+    //if (!handleExportCheckModified()) return;
     toolbar.activate(EditorToolbar.EXPORT);
 
     console.clear();
