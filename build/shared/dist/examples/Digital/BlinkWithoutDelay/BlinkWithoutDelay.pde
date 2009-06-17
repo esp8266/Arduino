@@ -1,20 +1,38 @@
 /* Blink without Delay
- *
- * Turns on and off a light emitting diode(LED) connected to a digital  
- * pin, without using the delay() function.  This means that other code
- * can run at the same time without being interrupted by the LED code.
- *
- * http://www.arduino.cc/en/Tutorial/BlinkWithoutDelay
+ 
+ Turns on and off a light emitting diode(LED) connected to a digital  
+ pin, without using the delay() function.  This means that other code
+ can run at the same time without being interrupted by the LED code.
+ 
+  The circuit:
+ * LED attached from pin 13 to ground.
+ * Note: on most Arduinos, there is already an LED on the board
+ that's attached to pin 13, so no hardware is needed for this example.
+ 
+ 
+ created 2005
+ by David A. Mellis
+ modified 17 Jun 2009
+ by Tom Igoe
+ 
+ http://www.arduino.cc/en/Tutorial/BlinkWithoutDelay
  */
 
-int ledPin = 13;                // LED connected to digital pin 13
-int value = LOW;                // previous value of the LED
+// constants won't change. Used here to 
+// set pin numbers:
+const int ledPin =  13;      // the number of the LED pin
+
+// Variables will change:
+int ledState = LOW;             // ledState used to set the LED
 long previousMillis = 0;        // will store last time LED was updated
+
+// the follow variables is a long because the time, measured in miliseconds,
+// will quickly become a bigger number than can be stored in an int.
 long interval = 1000;           // interval at which to blink (milliseconds)
 
-void setup()
-{
-  pinMode(ledPin, OUTPUT);      // sets the digital pin as output
+void setup() {
+  // set the digital pin as output:
+  pinMode(ledPin, OUTPUT);      
 }
 
 void loop()
@@ -25,14 +43,16 @@ void loop()
   // between the current time and last time we blinked the LED bigger than
   // the interval at which we want to blink the LED.
   if (millis() - previousMillis > interval) {
-    previousMillis = millis();   // remember the last time we blinked the LED
+    // save the last time you blinked the LED 
+    previousMillis = millis();   
 
-    // if the LED is off turn it on and vice-versa.
-    if (value == LOW)
-      value = HIGH;
+    // if the LED is off turn it on and vice-versa:
+    if (ledState == LOW)
+      ledState = HIGH;
     else
-      value = LOW;
-
-    digitalWrite(ledPin, value);
+      ledState = LOW;
+      
+    // set the LED with the ledState of the variable:
+    digitalWrite(ledPin, ledState);
   }
 }
