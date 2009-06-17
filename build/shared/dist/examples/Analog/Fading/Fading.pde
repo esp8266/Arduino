@@ -1,24 +1,43 @@
-// Fading LED 
-// by BARRAGAN <http://people.interaction-ivrea.it/h.barragan> 
+/*
+ Fading
+ 
+ This example shows how to fade an LED using the analogWrite() function.
+ 
+ The circuit:
+ * LED attached from digital pin 9 to ground.
+ 
+ Created 1 Nov 2008
+ By David A. Mellis
+ Modified 17 June 2009
+ By Tom Igoe
+ 
+ http://arduino.cc/en/Tutorial/Fading
+ 
+ */
 
-int value = 0;                            // variable to keep the actual value 
-int ledpin = 9;                           // light connected to digital pin 9
- 
-void setup() 
-{ 
-  // nothing for setup 
+
+int ledPin = 9;    // LED connected to digital pin 9
+
+void setup()  { 
+  // nothing happens in setup 
 } 
- 
-void loop() 
-{ 
-  for(value = 0 ; value <= 255; value+=5) // fade in (from min to max) 
-  { 
-    analogWrite(ledpin, value);           // sets the value (range from 0 to 255) 
-    delay(30);                            // waits for 30 milli seconds to see the dimming effect 
+
+void loop()  { 
+  // fade in from min to max in increments of 5 points:
+  for(int fadeValue = 0 ; fadeValue <= 255; fadeValue +=5) { 
+    // sets the value (range from 0 to 255):
+    analogWrite(ledPin, fadeValue);         
+    // wait for 30 milliseconds to see the dimming effect    
+    delay(30);                            
   } 
-  for(value = 255; value >=0; value-=5)   // fade out (from max to min) 
-  { 
-    analogWrite(ledpin, value); 
-    delay(30); 
-  }  
-} 
+
+  // fade out from max to min in increments of 5 points:
+  for(int fadeValue = 255 ; fadeValue >= 0; fadeValue -=5) { 
+    // sets the value (range from 0 to 255):
+    analogWrite(ledPin, fadeValue);         
+    // wait for 30 milliseconds to see the dimming effect    
+    delay(30);                            
+  } 
+}
+
+
