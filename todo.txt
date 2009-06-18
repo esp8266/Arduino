@@ -3,17 +3,23 @@
 
 PROCESSING 5503 SYNC
 
+Get rid of unused preferences in the preferences dialog.
+
 Add library keyword highlighting.
 
-Allow closing of the serial monitor with keyboard short cuts.
+Fix document icon on Windows.
+
+Don't allow in-place modification of user-installed library examples.
+
+Escape characters with copy as html.
+
+Enable verbose output if shift (or alt?) is held down when pressing run or upload.
+
+Add keyboard shortcut for opening the serial monitor.
 
 Clear serial monitor button when the serial monitor opens.
 
 Support libraries in the SKETCH/code folder?
-
-Get rid of unused preferences in the preferences dialog.
-
-Don't allow in-place modification of user-installed library examples.
 
 Test the FTDI drivers in the arduino.dmg.
 

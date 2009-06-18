@@ -128,6 +128,7 @@ public class Editor extends JFrame implements RunnerListener {
 
   boolean running;
   boolean presenting;
+  boolean uploading;
 
   // undo fellers
   JMenuItem undoItem, redoItem;
@@ -2158,6 +2159,8 @@ public class Editor extends JFrame implements RunnerListener {
           try {
             serialMonitor.closeSerialPort();
             serialMonitor.setVisible(false);
+            
+            uploading = true;
           
             boolean success = sketch.exportApplet(new Target(
               Base.getHardwarePath() + File.separator + "cores",
@@ -2174,6 +2177,7 @@ public class Editor extends JFrame implements RunnerListener {
           } catch (Exception e) {
             e.printStackTrace();
           }
+          uploading = false;
           //toolbar.clear();
           toolbar.deactivate(EditorToolbar.EXPORT);
         }});
@@ -2217,6 +2221,7 @@ public class Editor extends JFrame implements RunnerListener {
   
   
   public void handleSerial() {
+    if (uploading) return;
     serialMonitor.setVisible(true);
     serialMonitor.openSerialPort();
   }
