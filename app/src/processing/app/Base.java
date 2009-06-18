@@ -1446,6 +1446,11 @@ public class Base {
   static public File getSketchbookLibrariesFolder() {
     return new File(getSketchbookFolder(), "libraries");
   }
+  
+  
+  static public String getSketchbookLibrariesPath() {
+    return getSketchbookLibrariesFolder().getAbsolutePath();
+  }
 
 
   protected File getDefaultSketchbookFolder() {

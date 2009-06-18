@@ -482,6 +482,7 @@ public class Compiler implements MessageConsumer {
   /////////////////////////////////////////////////////////////////////////////
 
   static private void createFolder(File folder) throws RunnerException {
+    if (folder.isDirectory()) return;
     if (!folder.mkdir())
       throw new RunnerException("Couldn't create: " + folder);
   }

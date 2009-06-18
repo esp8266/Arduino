@@ -1723,7 +1723,8 @@ public class Sketch {
   public boolean isReadOnly() {
     String apath = folder.getAbsolutePath();
     if (apath.startsWith(Base.getExamplesPath()) ||
-        apath.startsWith(Base.getLibrariesPath())) {
+        apath.startsWith(Base.getLibrariesPath()) ||
+        apath.startsWith(Base.getSketchbookLibrariesPath())) {
       return true;
 
       // canWrite() doesn't work on directories

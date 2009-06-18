@@ -158,7 +158,7 @@ public class Preferences {
       load(Base.getLibStream("preferences.txt"));
     } catch (Exception e) {
       Base.showError(null, "Could not read default settings.\n" +
-                           "You'll need to reinstall Processing.", e);
+                           "You'll need to reinstall Arduino.", e);
     }
 
     // check for platform-specific properties in the defaults
@@ -210,7 +210,7 @@ public class Preferences {
                          "Error reading the preferences file. " +
                          "Please delete (or move)\n" +
                          preferencesFile.getAbsolutePath() +
-                         " and restart Processing.", ex);
+                         " and restart Arduino.", ex);
         }
       }
 
@@ -364,40 +364,13 @@ public class Preferences {
     box.add(label);
     fontSizeField = new JTextField(4);
     box.add(fontSizeField);
-    label = new JLabel("  (requires restart of Processing)");
+    label = new JLabel("  (requires restart of Arduino)");
     box.add(label);
     pain.add(box);
     d = box.getPreferredSize();
     box.setBounds(left, top, d.width, d.height);
     Font editorFont = Preferences.getFont("editor.font");
     fontSizeField.setText(String.valueOf(editorFont.getSize()));
-    top += d.height + GUI_BETWEEN;
-
-
-    // [ ] Increase maximum available memory to [______] MB
-
-    Container memoryBox = Box.createHorizontalBox();
-    memoryOverrideBox = new JCheckBox("Increase maximum available memory to ");
-    memoryBox.add(memoryOverrideBox);
-    memoryField = new JTextField(4);
-    memoryBox.add(memoryField);
-    memoryBox.add(new JLabel(" MB"));
-    pain.add(memoryBox);
-    d = memoryBox.getPreferredSize();
-    memoryBox.setBounds(left, top, d.width, d.height);
-    top += d.height + GUI_BETWEEN;
-
-
-    // [ ] Use multiple .jar files when exporting applets
-
-    exportSeparateBox =
-      new JCheckBox("Use multiple .jar files when exporting applets " +
-                    "(ignored when using libraries)");
-    pain.add(exportSeparateBox);
-    d = exportSeparateBox.getPreferredSize();
-    // adding +10 because ubuntu + jre 1.5 truncating items
-    exportSeparateBox.setBounds(left, top, d.width + 10, d.height);
-    right = Math.max(right, left + d.width);
     top += d.height + GUI_BETWEEN;
 
 
@@ -436,7 +409,7 @@ public class Preferences {
 
     if (Base.isWindows()) {
       autoAssociateBox =
-        new JCheckBox("Automatically associate .pde files with Processing");
+        new JCheckBox("Automatically associate .pde files with Arduino");
       pain.add(autoAssociateBox);
       d = autoAssociateBox.getPreferredSize();
       autoAssociateBox.setBounds(left, top, d.width + 10, d.height);
@@ -478,7 +451,7 @@ public class Preferences {
     right = Math.max(right, left + d.width);
     top += d.height;
 
-    label = new JLabel("(edit only when Processing is not running)");
+    label = new JLabel("(edit only when Arduino is not running)");
     pain.add(label);
     d = label.getPreferredSize();
     label.setForeground(Color.gray);
@@ -606,8 +579,6 @@ public class Preferences {
    */
   protected void applyFrame() {
     // put each of the settings into the table
-    setBoolean("export.applet.separate_jar_files",
-               exportSeparateBox.isSelected());
     setBoolean("export.delete_target_folder",
                deletePreviousBox.isSelected());
 
@@ -626,18 +597,6 @@ public class Preferences {
 
     setBoolean("editor.external", externalEditorBox.isSelected());
     setBoolean("update.check", checkUpdatesBox.isSelected());
-
-    setBoolean("run.options.memory", memoryOverrideBox.isSelected());
-    int memoryMin = Preferences.getInteger("run.options.memory.initial");
-    int memoryMax = Preferences.getInteger("run.options.memory.maximum");
-    try {
-      memoryMax = Integer.parseInt(memoryField.getText().trim());
-      // make sure memory setting isn't too small
-      if (memoryMax < memoryMin) memoryMax = memoryMin;
-      setInteger("run.options.memory.maximum", memoryMax);
-    } catch (NumberFormatException e) {
-      System.err.println("Ignoring bad memory setting");
-    }
 
     /*
       // was gonna use this to check memory settings,
@@ -680,8 +639,6 @@ public class Preferences {
     this.editor = editor;
 
     // set all settings entry boxes to their actual status
-    exportSeparateBox.
-      setSelected(getBoolean("export.applet.separate_jar_files"));
     deletePreviousBox.
       setSelected(getBoolean("export.delete_target_folder"));
 
@@ -698,10 +655,6 @@ public class Preferences {
       setSelected(getBoolean("editor.external"));
     checkUpdatesBox.
       setSelected(getBoolean("update.check"));
-    memoryOverrideBox.
-      setSelected(getBoolean("run.options.memory"));
-    memoryField.
-      setText(get("run.options.memory.maximum"));
 
     if (autoAssociateBox != null) {
       autoAssociateBox.

@@ -3,13 +3,11 @@
 
 PROCESSING 5503 SYNC
 
-Get rid of unused preferences in the preferences dialog.
+Disable checking for updates.
 
 Add library keyword highlighting.
 
 Fix document icon on Windows.
-
-Don't allow in-place modification of user-installed library examples.
 
 Escape characters with copy as html.
 
@@ -63,6 +61,7 @@ Base.java
 Editor.java
  - allow the Board and Serial port to differ across editor windows.  This will require creating a separate instance of the menu for each window, and passing the selections into the sketch when compiling or uploading.
  - send the current board and serial port selections to the sketch (which will forward them to the compiler) when compiling or uploading (this should eliminate the need for the Target class, since the compiler will be able to find the target path and its source files itself)
+ - remove references to the Runner and runtime
 
 Preferences.java
  - get rid of unused preferences in the dialog box
