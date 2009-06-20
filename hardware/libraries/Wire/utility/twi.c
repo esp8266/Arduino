@@ -87,9 +87,9 @@ void twi_init(void)
   It is 72 for a 16mhz Wiring board with 100kHz TWI */
 
   // enable twi module, acks, and twi interrupt
-	TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
+  TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA);
 	
-	// allocate buffers
+  // allocate buffers
   twi_masterBuffer = (uint8_t*) calloc(TWI_BUFFER_LENGTH, sizeof(uint8_t));
   twi_txBuffer = (uint8_t*) calloc(TWI_BUFFER_LENGTH, sizeof(uint8_t));
   twi_rxBuffer = (uint8_t*) calloc(TWI_BUFFER_LENGTH, sizeof(uint8_t));
@@ -144,25 +144,25 @@ uint8_t twi_readFrom(uint8_t address, uint8_t* data, uint8_t length)
 
   // build sla+w, slave device address + w bit
   twi_slarw = TW_READ;
-	twi_slarw |= address << 1;
+  twi_slarw |= address << 1;
 
   // send start condition
-	TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWINT) | _BV(TWSTA);
+  TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWINT) | _BV(TWSTA);
 
-	// wait for read operation to complete
-	while(TWI_MRX == twi_state){
-	  continue;
-	}
+  // wait for read operation to complete
+  while(TWI_MRX == twi_state){
+    continue;
+  }
 
   if (twi_masterBufferIndex < length)
-	length = twi_masterBufferIndex;
+    length = twi_masterBufferIndex;
 
   // copy twi buffer to data
   for(i = 0; i < length; ++i){
     data[i] = twi_masterBuffer[i];
   }
 	
-	return length;
+  return length;
 }
 
 /* 
@@ -207,24 +207,24 @@ uint8_t twi_writeTo(uint8_t address, uint8_t* data, uint8_t length, uint8_t wait
   
   // build sla+w, slave device address + w bit
   twi_slarw = TW_WRITE;
-	twi_slarw |= address << 1;
+  twi_slarw |= address << 1;
   
   // send start condition
-	TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWINT) | _BV(TWSTA);
+  TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWEA) | _BV(TWINT) | _BV(TWSTA);
 
-	// wait for write operation to complete
-	while(wait && (TWI_MTX == twi_state)){
-	  continue;
-	}
-	
-	if (twi_error == 0xFF)
-		return 0;	// success
-	else if (twi_error == TW_MT_SLA_NACK)
-		return 2;	// error: address send, nack received
-	else if (twi_error == TW_MT_DATA_NACK)
-		return 3;	// error: data send, nack received
-	else
-		return 4;	// other twi error
+  // wait for write operation to complete
+  while(wait && (TWI_MTX == twi_state)){
+    continue;
+  }
+  
+  if (twi_error == 0xFF)
+    return 0;	// success
+  else if (twi_error == TW_MT_SLA_NACK)
+    return 2;	// error: address send, nack received
+  else if (twi_error == TW_MT_DATA_NACK)
+    return 3;	// error: data send, nack received
+  else
+    return 4;	// other twi error
 }
 
 /* 
@@ -290,9 +290,9 @@ void twi_attachSlaveTxEvent( void (*function)(void) )
  */
 void twi_reply(uint8_t ack)
 {
-	// transmit master read ready signal, with or without ack
-	if(ack){
-	  TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWINT) | _BV(TWEA);
+  // transmit master read ready signal, with or without ack
+  if(ack){
+    TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWINT) | _BV(TWEA);
   }else{
 	  TWCR = _BV(TWEN) | _BV(TWIE) | _BV(TWINT);
   }
