@@ -135,7 +135,12 @@ uint8_t twi_readFrom(uint8_t address, uint8_t* data, uint8_t length)
 
   // initialize buffer iteration vars
   twi_masterBufferIndex = 0;
-  twi_masterBufferLength = length;
+  twi_masterBufferLength = length-1;  // This is not intuitive, read on...
+  // On receive, the previously configured ACK/NACK setting is transmitted in
+  // response to the received byte before the interrupt is signalled. 
+  // Therefor we must actually set NACK when the _next_ to last byte is
+  // received, causing that NACK to be sent in response to receiving the last
+  // expected byte of data.
 
   // build sla+w, slave device address + w bit
   twi_slarw = TW_READ;
