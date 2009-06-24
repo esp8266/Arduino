@@ -9,7 +9,7 @@
  * LEDs attached from pin 2 through 7 to ground
  
   
- created  27 Sep 2005
+ created  23 Sep 2007
  by David A. Mellis
  modified 17 Jun 2009
  by Tom Igoe
