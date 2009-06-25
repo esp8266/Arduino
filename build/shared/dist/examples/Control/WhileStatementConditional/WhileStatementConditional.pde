@@ -3,73 +3,82 @@
  
  This example demonstrates the use of  while() statements.
  
- It reads the state of a potentiometer (an analog input) and blinks an LED
- while the LED remains above a certain threshold level. It prints the analog value
- only if it's below the threshold.
+ While the pushbutton is pressed, the sketch runs the calibration routine.
+ The  sensor readings during the while loop define the minimum and maximum 
+ of expected values from the photo resistor.
  
- This example uses principles explained in the BlinkWithoutDelay  example as well.
+ This is a variation on the calibrate example.
  
  The circuit:
- * potentiometer connected to analog pin 0.
- Center pin of the potentiometer goes to the analog pin.
- side pins of the potentiometer go to +5V and ground
- * LED connected from digital pin 13 to ground
- 
- * Note: On most Arduino boards, there is already an LED on the board
- connected to pin 13, so you don't need any extra components for this example.
+ * photo resistor connected from +5V to analog in pin 0
+ * 10K resistor connected from ground to analog in pin 0
+ * LED connected from digital pin 9 to ground through 220 ohm resistor
+ * pushbutton attached from pin 2 to +5V
+ * 10K resistor attached from pin 2 to ground
  
  created 17 Jan 2009
+ modified 25 Jun 2009
  by Tom Igoe
  
  */
 
-// These constants won't change:
-const int analogPin = 0;     // pin that the sensor is attached to
-const int ledPin = 13;       // pin that the LED is attached to
-const int threshold = 400;   // an arbitrary threshold level that's in the range of the analog input
-const int blinkDelay = 500;  // how long to hold between changes of the LED
 
-// these variables will change:
-int ledState = LOW;          // the state of the LED
-int lastBlinkTime = 0;       // last time the LED changed
-int analogValue;             // variable to hold the value of the analog input
+// These constants won't change:
+const int sensorPin = 2;     // pin that the sensor is attached to
+const int ledPin = 9;        // pin that the LED is attached to
+const int indicatorLedPin = 13;  // pin that the built-in LED is attached to
+const int buttonPin = 2;      // pin that the button is attached to
+
+
+// These variables will change:
+int sensorMin = 1023;  // minimum sensor value
+int sensorMax = 0;     // maximum sensor value
+int sensorValue = 0;         // the sensor value
 
 
 void setup() {
-  // initialize the LED pin as an output:
-  pinMode(ledPin, OUTPUT);
-  // initialize serial communications:
-  Serial.begin(9600);
+  // set the LED pins as outputs and the switch pin as input:
+  pinMode(indicatorLedPin, OUTPUT);
+  pinMode (ledPin, OUTPUT);
+  pinMode (buttonPin, INPUT);
 }
 
 void loop() {
-  // read the value of the potentiometer:
-  analogValue = analogRead(analogPin);
+  // while the button is pressed, take calibration readings:
+  while (digitalRead(buttonPin) == HIGH) {
+    calibrate(); 
+  }
+  // signal the end of the calibration period
+  digitalWrite(indicatorLedPin, LOW);  
 
-  // if the analog value is high enough, turn on the LED:
-  while (analogValue > threshold) {
-    // if enough time has passed since the last change of the LED,
-    // then change it.  Note you're using the technique from BlinkWithoutDelay
-    // here so that the while loop doesn't delay the rest of the program:
+  // read the sensor:
+  sensorValue = analogRead(sensorPin);
 
-    if (millis() - lastBlinkTime > blinkDelay) {
-      // if the ledState is high, this makes it low, and vice versa:
-      ledState = !ledState;
-      digitalWrite(ledPin, ledState);
+  // apply the calibration to the sensor reading
+  sensorValue = map(sensorValue, sensorMin, sensorMax, 0, 255);
 
-      // save the last time the LED changed in a variable:
-      lastBlinkTime = millis();
-    }
-    // while you're in the while loop, you have to read the 
-    // input again:
-    analogValue = analogRead(analogPin);
+  // in case the sensor value is outside the range seen during calibration
+  sensorValue = constrain(sensorValue, 0, 255);
+
+  // fade the LED using the calibrated value:
+  analogWrite(ledPin, sensorValue);
+}
+
+void calibrate() {
+  // turn on the indicator LED to indicate that calibration is happening:
+  digitalWrite(indicatorLedPin, HIGH);
+  // read the sensor:
+  sensorValue = analogRead(sensorPin);
+
+  // record the maximum sensor value
+  if (sensorValue > sensorMax) {
+    sensorMax = sensorValue;
   }
 
-  // if you're below the threshold, print the analog value:
-  Serial.println(analogValue, DEC);
-  // turn the LED off:
-  digitalWrite(ledPin, LOW);
-
+  // record the minimum sensor value
+  if (sensorValue < sensorMin) {
+    sensorMin = sensorValue;
+  }
 }
 
 
