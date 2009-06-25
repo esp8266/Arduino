@@ -46,11 +46,25 @@ Processing and Wiring.
 
 UPDATES
 
+<<<<<<< .mine
+0016 - 
+[documentation / examples]
+* Updating Analog, Digital, and Communication examples to make style consistent
+* Adding digital input State Change Detection example
+* Adding stubs examples, some basic code snippets that get used constantly
+* Adding Control Structure examples: For Loop, While Loop, If Statement
+
+
+=======
 0016 - 2009.05.30
 
 [documentation / examples]
-* New communication examples (w/ corresponding Processing and Max/MSP code) by
-  Tom Igoe.
+* New communication examples (w/ corresponding Processing and Max/MSP code)
+* Updating Analog, Digital, and Communication examples to make style consistent
+* Adding digital input State Change Detection example
+* Adding stubs examples, some basic code snippets that get used constantly
+* Adding Control Structure examples: For Loop, While Loop, If Statement
+
 
 [core / libraries]
 * Adding support for the Arduino Pro and Pro Mini 3.3V / 8 MHz w/ ATmega328.
@@ -77,6 +91,7 @@ UPDATES
 [tools]
 * Adding automatic dependency generation to the Makefile.  (Lars Immisch)
 
+>>>>>>> .r660
 0015 - 2009.03.26
 
 [core / libraries]
