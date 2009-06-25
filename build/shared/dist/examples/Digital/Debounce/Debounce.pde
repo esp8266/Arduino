@@ -8,8 +8,8 @@
  
  The circuit:
  * LED attached from pin 13 to ground
- * pushbutton attached from pin 7 to +5V
- * 10K resistor attached from pin 7 to ground
+ * pushbutton attached from pin 2 to +5V
+ * 10K resistor attached from pin 2 to ground
  
  * Note: On most Arduino boards, there is already an LED on the board
  connected to pin 13, so you don't need any extra components for this example.
@@ -26,7 +26,7 @@
 
 // constants won't change. They're used here to 
 // set pin numbers:
-const int buttonPin = 7;     // the number of the pushbutton pin
+const int buttonPin = 2;     // the number of the pushbutton pin
 const int ledPin =  13;      // the number of the LED pin
 
 // Variables will change:
