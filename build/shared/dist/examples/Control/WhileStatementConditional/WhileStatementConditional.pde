@@ -20,6 +20,8 @@
  modified 25 Jun 2009
  by Tom Igoe
  
+ http://arduino.cc/en/Tutorial/WhileLoop
+ 
  */
 
 
