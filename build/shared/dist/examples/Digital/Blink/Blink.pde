@@ -11,8 +11,9 @@
  
  
  Created 1 June 2005
- By DojoDave <http://www.0j0.org>
- http://arduino.berlios.de
+ By David Cuartielles
+ 
+ http://arduino.cc/en/Tutorial/Blink
  
  based on an orginal by H. Barragan for the Wiring i/o board
  
