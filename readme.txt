@@ -49,11 +49,12 @@ UPDATES
 <<<<<<< .mine
 0016 - 
 [documentation / examples]
-* Updating Analog, Digital, and Communication examples to make style consistent
-* Adding digital input State Change Detection example
-* Adding stubs examples, some basic code snippets that get used constantly
-* Adding Control Structure examples: For Loop, While Loop, If Statement
-
+* Updated Analog, Digital, and Communication examples to make style consistent
+Added Tutorials:
+	*  digital input State Change Detection example
+	*  stubs examples, some basic code snippets that get used constantly
+	*  Control Structure examples: For Loop, While Loop, If Statement
+	*  Displays -- simple display methods:  BarGraph tutorial
 
 =======
 0016 - 2009.05.30
