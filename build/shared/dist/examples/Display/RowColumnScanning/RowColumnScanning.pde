@@ -22,12 +22,13 @@
  Matrix:
  * Digital pins 2 through 13,
  * analog pins 2 through 5 used as digital 16 through 19
- Accelerometer: 
- * X and Y axes attached to analog in 0 and 1
+ Potentiometers:
+ * center pins are attached to analog pins 0 and 1, respectively
+ * side pins attached to +5V and ground, respectively.
  
   http://www.arduino.cc/en/Tutorial/RowColumnScanning
   
- see http://www.tigoe.net/pcomp/code/category/arduinowiring/514 for more
+ see also http://www.tigoe.net/pcomp/code/category/arduinowiring/514 for more
  */
 
 // max and min values from the accelerometer, 
