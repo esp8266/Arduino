@@ -1,21 +1,34 @@
 /* Knock Sensor
- * by DojoDave <http://www.0j0.org>
- *
- * Program using a Piezo element as if it was a knock sensor.
- *
- * We have to basically listen to an analog pin and detect 
- * if the signal goes over a certain threshold. It writes
- * "knock" to the serial port if the Threshold is crossed,
- * and toggles the LED on pin 13.
- *
- * http://www.arduino.cc/en/Tutorial/Knock
- */
+  
+   This sketch reads a piezo element to detect a knocking sound. 
+   It reads an analog pin and compares the result to a set threshold. 
+   If the result is greater than the threshold, it writes
+   "knock" to the serial port, and toggles the LED on pin 13.
+  
+   The circuit:
+	* + connection of the piezo attached to analog in 0
+	* - connection of the piezo attached to ground
+	* 1-megohm resistor attached from analog in 0 to ground
 
-int ledPin = 13;      // led connected to control pin 13
-int knockSensor = 0;  // the knock sensor will be plugged at analog pin 0
-byte val = 0;         // variable to store the value read from the sensor pin
-int statePin = LOW;   // variable used to store the last LED status, to toggle the light
-int THRESHOLD = 100;  // threshold value to decide when the detected sound is a knock or not
+   http://www.arduino.cc/en/Tutorial/Knock
+   
+   created 25 Mar 2007
+   by David Cuartielles <http://www.0j0.org>
+   modified 30 Jun 2009
+   by Tom Igoe
+
+ */
+ 
+
+// these constants won't change:
+const int ledPin = 13;      // led connected to digital pin 13
+const int knockSensor = 0;  // the piezo is connected to analog pin 0
+const int threshold = 100;  // threshold value to decide when the detected sound is a knock or not
+
+
+// these variables will change:
+int sensorReading = 0;      // variable to store the value read from the sensor pin
+int ledState = LOW;         // variable used to store the last LED status, to toggle the light
 
 void setup() {
  pinMode(ledPin, OUTPUT); // declare the ledPin as as OUTPUT
@@ -23,12 +36,18 @@ void setup() {
 }
 
 void loop() {
-  val = analogRead(knockSensor);    // read the sensor and store it in the variable "val"
-  if (val >= THRESHOLD) {
-    statePin = !statePin;           // toggle the status of the ledPin (this trick doesn't use time cycles)
-    digitalWrite(ledPin, statePin); // turn the led on or off
-    Serial.println("Knock!");          // send the string "Knock!" back to the computer, followed by newline
+  // read the sensor and store it in the variable sensorReading:
+  sensorReading = analogRead(knockSensor);    
+  
+  // if the sensor reading is greater than the threshold:
+  if (sensorReading >= threshold) {
+    // toggle the status of the ledPin:
+    ledState = !ledState;   
+    // update the LED pin itself:        
+    digitalWrite(ledPin, ledState);
+    // send the string "Knock!" back to the computer, followed by newline
+    Serial.println("Knock!");         
   }
-  delay(100);  // we have to make a delay to avoid overloading the serial port
+  delay(100);  // delay to avoid overloading the serial port buffer
 }
 
