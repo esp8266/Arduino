@@ -11,9 +11,9 @@
  http://sigma.octopart.com/140413/datasheet/Lumex-LDM-24488NI.pdf
  for the pin connections
  
-  For other LED cathode column matrixes, you should only need to change 
-  the pin numbers in the row[] and column[] arrays
-
+ For other LED cathode column matrixes, you should only need to change 
+ the pin numbers in the row[] and column[] arrays
+ 
  rows are the anodes
  cols are the cathodes
  ---------
@@ -26,19 +26,15 @@
  * center pins are attached to analog pins 0 and 1, respectively
  * side pins attached to +5V and ground, respectively.
  
-  http://www.arduino.cc/en/Tutorial/RowColumnScanning
-  
+ http://www.arduino.cc/en/Tutorial/RowColumnScanning
+ 
  see also http://www.tigoe.net/pcomp/code/category/arduinowiring/514 for more
  */
 
-// max and min values from the accelerometer, 
-// found by experiment:
-const int sensorMin = 380;
-const int sensorMax = 620;
 
 // 2-dimensional array of row pin numbers:
 const int row[8] = {
-   2,7,19,5,18,12,16 };
+  2,7,19,5,18,12,16 };
 
 // 2-dimensional array of column pin numbers:
 const int col[8] = {
@@ -85,8 +81,10 @@ void readSensors() {
   // turn off the last position:
   pixels[x][y] = HIGH;
   // read the sensors for X and Y values:
-  x = 7 - map(analogRead(0), sensorMin, sensorMax, 0, 7);
-  y = map(analogRead(1), sensorMin, sensorMax, 0, 7);
+  x = 7 - map(analogRead(0), 0, 1023, 0, 7);
+  y = map(analogRead(1), 0, 1023, 0, 7);
+  // set the new pixel position low so that the LED will turn on
+  // in the next screen refresh:
   pixels[x][y] = LOW;
 
 }
@@ -112,4 +110,3 @@ void refreshScreen() {
     digitalWrite(row[thisRow], LOW);
   }
 }
-
