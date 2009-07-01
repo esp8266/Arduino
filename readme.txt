@@ -49,7 +49,7 @@ UPDATES
 <<<<<<< .mine
 0016 - 
 [documentation / examples]
-* Updated Analog, Digital, and Communication examples to make style consistent
+* Updated Analog, Digital, Sensor, and Communication examples to make style consistent
 Added Tutorials:
 	*  digital input State Change Detection example
 	*  stubs examples, some basic code snippets that get used constantly
