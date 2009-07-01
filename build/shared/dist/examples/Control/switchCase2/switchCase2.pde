@@ -10,7 +10,7 @@
  the LEDs off.
  
  The circuit:
- * 5 LEDs attached to digital pins 2 through 6
+ * 5 LEDs attached to digital pins 2 through 6 through 220-ohm resistors
  
  created 1 Jul 2009
  by Tom Igoe 
@@ -18,41 +18,47 @@
  http://www.arduino.cc/en/Tutorial/SwitchCase2
  */
 
-// these constants won't change:
-const int sensorMin = 0;      // sensor minimum, discovered through experiment
-const int sensorMax = 600;    // sensor maximum, discovered through experiment
-
 void setup() {
   // initialize serial communication:
-  Serial.begin(9600);  
+  Serial.begin(9600); 
+   // initialize the LED pins:
+      for (int thisPin = 2; thisPin < 7; thisPin++) {
+        pinMode(thisPin, OUTPUT);
+      } 
 }
 
 void loop() {
   // read the sensor:
-  int sensorReading = analogRead(0);
-  // map the sensor range to a range of four options:
-  int range = map(sensorReading, sensorMin, sensorMax, 0, 3);
+  if (Serial.available() > 0) {
+    int inByte = Serial.read();
+    // do something different depending on the character received.  
+    // The switch statement expects single number values for each case;
+    // in this exmaple, though, you're using single quotes to tell
+    // the controller to get the ASCII value for the character.  For 
+    // example 'a' = 97, 'b' = 98, and so forth:
 
-  // do something different depending on the 
-  // range value:
-  switch (range) {
-  case 0:    // your hand is on the sensor
-    Serial.println("dark");
-    break;
-  case 1:    // your hand is close to the sensor
-    Serial.println("dim");
-    break;
-  case 2:    // your hand is a few inches from the sensor
-    Serial.println("medium");
-    break;
-  case 3:    // your hand is nowhere near the sensor
-    Serial.println("bright");
-    break;
-  } 
-
+    switch (inByte) {
+    case 'a':    
+      digitalWrite(2, HIGH);
+      break;
+    case 'b':    
+      digitalWrite(3, HIGH);
+      break;
+    case 'c':    
+      digitalWrite(4, HIGH);
+      break;
+    case 'd':    
+      digitalWrite(5, HIGH);
+      break;
+    case 'e':    
+      digitalWrite(6, HIGH);
+      break;
+    default:
+      // turn all the LEDs off:
+      for (int thisPin = 2; thisPin < 7; thisPin++) {
+        digitalWrite(thisPin, LOW);
+      }
+    } 
+  }
 }
-
-
-
-
 
