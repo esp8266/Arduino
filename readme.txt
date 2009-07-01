@@ -53,7 +53,7 @@ UPDATES
 Added Tutorials:
 	*  digital input State Change Detection example
 	*  stubs examples, some basic code snippets that get used constantly
-	*  Control Structure examples: For Loop, While Loop, If Statement
+	*  Control Structure examples: For Loop, While Loop, If Statement, Switch Statement
 	*  Displays -- simple display methods:  BarGraph tutorial, row-column scanning tutorial
 
 =======
