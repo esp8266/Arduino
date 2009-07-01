@@ -16,7 +16,7 @@
  created 1 Jul 2009
  by Tom Igoe 
  
- http://www.arduino.cc/en/Tutorial/Loop
+ http://www.arduino.cc/en/Tutorial/SwitchCase
  */
 
 // these constants won't change:
