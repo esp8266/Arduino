@@ -16,7 +16,7 @@
  modified 2 Jul 2009
  by Tom Igoe 
  
- http://www.arduino.cc/en/Tutorial/PIRSensor
+ http://www.arduino.cc/en/Tutorial/MIDI
  
  */
 
