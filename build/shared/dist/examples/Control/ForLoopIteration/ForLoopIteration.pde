@@ -26,7 +26,7 @@ void setup() {
 
 void loop() {
   // loop from the lowest pin to the highest:
-  for (int thisPin = 0; i < 8; thisPin++) { 
+  for (int thisPin = 0; thisPin < 8; thisPin++) { 
     // turn the pin on:
     digitalWrite(thisPin, HIGH);   
     delay(timer);                  
@@ -35,7 +35,7 @@ void loop() {
   }
 
   // loop from the highest pin to the lowest:
-  for (thisPin = 7; thisPin >= 2; thisPin--) { 
+  for (int thisPin = 7; thisPin >= 2; thisPin--) { 
     // turn the pin on:
     digitalWrite(thisPin, HIGH);
     delay(timer);
