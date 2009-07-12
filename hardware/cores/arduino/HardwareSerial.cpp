@@ -128,11 +128,38 @@ HardwareSerial::HardwareSerial(ring_buffer *rx_buffer,
 
 // Public Methods //////////////////////////////////////////////////////////////
 
-void HardwareSerial::begin(long speed)
+void HardwareSerial::begin(long baud)
 {
-  *_ubrrh = ((F_CPU / 16 + speed / 2) / speed - 1) >> 8;
-  *_ubrrl = ((F_CPU / 16 + speed / 2) / speed - 1);
-  cbi(*_ucsra, _u2x);
+  uint16_t baud_setting;
+  bool use_u2x;
+
+  // U2X mode is needed for baud rates higher than (CPU Hz / 16)
+  if (baud > F_CPU / 16) {
+    use_u2x = true;
+  } else {
+    // figure out if U2X mode would allow for a better connection
+    
+    // calculate the percent difference between the baud-rate specified and
+    // the real baud rate for both U2X and non-U2X mode (0-255 error percent)
+    uint8_t nonu2x_baud_error = abs((int)(255-((F_CPU/(16*(((F_CPU/8/baud-1)/2)+1))*255)/baud)));
+    uint8_t u2x_baud_error = abs((int)(255-((F_CPU/(8*(((F_CPU/4/baud-1)/2)+1))*255)/baud)));
+    
+    // prefer non-U2X mode because it handles clock skew better
+    use_u2x = (nonu2x_baud_error > u2x_baud_error);
+  }
+  
+  if (use_u2x) {
+    *_ucsra = 1 << _u2x;
+    baud_setting = (F_CPU / 4 / baud - 1) / 2;
+  } else {
+    *_ucsra = 0;
+    baud_setting = (F_CPU / 8 / baud - 1) / 2;
+  }
+
+  // assign the baud_setting, a.k.a. ubbr (USART Baud Rate Register)
+  *_ubrrh = baud_setting >> 8;
+  *_ubrrl = baud_setting;
+
   sbi(*_ucsrb, _rxen);
   sbi(*_ucsrb, _txen);
   sbi(*_ucsrb, _rxcie);
