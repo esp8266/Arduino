@@ -6,16 +6,18 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-Servo  KEYWORD1
+Servo	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
-attach KEYWORD2
-detach KEYWORD2
-write KEYWORD2
-read KEYWORD2
-attached KEYWORD2
+attach	KEYWORD2
+detach	KEYWORD2
+write	KEYWORD2
+read	KEYWORD2
+attached	KEYWORD2
+writeMicroseconds	KEYWORD2
+readMicroseconds	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
