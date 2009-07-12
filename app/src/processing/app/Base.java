@@ -75,7 +75,9 @@ public class Base {
   static private File librariesFolder;
   static private File toolsFolder;
   static private File hardwareFolder;
-
+  
+  static HashSet<File> libraries;
+  
   // maps imported packages to their library folder
   static HashMap<String, File> importToLibraryTable;
 
@@ -962,6 +964,9 @@ public class Base {
   public void rebuildImportMenu(JMenu importMenu) {
     //System.out.println("rebuilding import menu");
     importMenu.removeAll();
+    
+    // reset the set of libraries
+    libraries = new HashSet<File>();
 
     // reset the table mapping imports to libraries
     importToLibraryTable = new HashMap<String, File>();
@@ -1148,6 +1153,7 @@ public class Base {
 //        // need to associate each import with a library folder
 //        String packages[] =
 //          Compiler.packageListFromClassPath(libraryClassPath);
+        libraries.add(subfolder);
         String packages[] = Compiler.headerListFromIncludePath(subfolder.getAbsolutePath());
         for (String pkg : packages) {
           importToLibraryTable.put(pkg, subfolder);
@@ -1392,6 +1398,11 @@ public class Base {
       e.printStackTrace();
     }
     return null;
+  }
+  
+  
+  static public Set<File> getLibraries() {
+    return libraries;
   }
 
 
