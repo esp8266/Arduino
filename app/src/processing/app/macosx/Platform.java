@@ -92,7 +92,7 @@ public class Platform extends processing.app.Platform {
       Class clazz = Class.forName("processing.app.BaseMacOS");
       Method m = clazz.getMethod("getDocumentsFolder", new Class[] { });
       String documentsPath = (String) m.invoke(null, new Object[] { });
-      sketchbookFolder = new File(documentsPath, "Processing");
+      sketchbookFolder = new File(documentsPath, "Arduino");
 
     } catch (Exception e) {
       sketchbookFolder = promptSketchbookLocation();

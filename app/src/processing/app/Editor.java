@@ -145,7 +145,7 @@ public class Editor extends JFrame implements RunnerListener {
     super("Arduino");
     this.base = ibase;
 
-    Base.setIcon(this);
+    //Base.setIcon(this);
 
     // add listener to handle window close box hit event
     addWindowListener(new WindowAdapter() {
