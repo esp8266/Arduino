@@ -50,14 +50,20 @@ TARGET := $(shell pwd | sed 's|.*/\(.*\)|\1|')
 ARDUINO = /Applications/arduino
 ARDUINO_SRC = $(ARDUINO)/hardware/cores/arduino
 ARDUINO_LIB_SRC = $(ARDUINO)/hardware/libraries
+ARDUINO_TOOLS = $(ARDUINO)/hardware/tools
 INCLUDE = -I$(ARDUINO_SRC) -I$(ARDUINO)/hardware/tools/avr/avr/include \
 	-I$(ARDUINO_LIB_SRC)/EEPROM \
 	-I$(ARDUINO_LIB_SRC)/Firmata \
+	-I$(ARDUINO_LIB_SRC)/Matrix \
+	-I$(ARDUINO_LIB_SRC)/Servo \
+	-I$(ARDUINO_LIB_SRC)/Wire \
 	-I$(ARDUINO_LIB_SRC)
 SRC = $(wildcard $(ARDUINO_SRC)/*.c)
 CXXSRC = applet/$(TARGET).cpp $(ARDUINO_SRC)/HardwareSerial.cpp \
 	$(ARDUINO_LIB_SRC)/EEPROM/EEPROM.cpp \
 	$(ARDUINO_LIB_SRC)/Firmata/Firmata.cpp \
+	$(ARDUINO_LIB_SRC)/Servo/Servo.cpp \
+	$(ARDUINO_SRC)/Print.cpp \
 	$(ARDUINO_SRC)/WMath.cpp
 HEADERS = $(wildcard $(ARDUINO_SRC)/*.h) $(wildcard $(ARDUINO_LIB_SRC)/*/*.h)
 
@@ -106,12 +112,14 @@ AVRDUDE_FLAGS = -F -p $(MCU) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER) \
   -b $(UPLOAD_RATE) -q -V
 
 # Program settings
-CC = avr-gcc
-CXX = avr-g++
-OBJCOPY = avr-objcopy
-OBJDUMP = avr-objdump
-SIZE = avr-size
-NM = avr-nm
+ARDUINO_AVR_BIN = $(ARDUINO_TOOLS)/avr/bin
+CC = $(ARDUINO_AVR_BIN)/avr-gcc 
+CXX = $(ARDUINO_AVR_BIN)/avr-g++
+OBJCOPY = $(ARDUINO_AVR_BIN)/avr-objcopy
+OBJDUMP = $(ARDUINO_AVR_BIN)/avr-objdump
+SIZE = $(ARDUINO_AVR_BIN)/avr-size
+NM = $(ARDUINO_AVR_BIN)/avr-nm
+#AVRDUDE = $(ARDUINO_AVR_BIN)/avrdude
 AVRDUDE = avrdude
 REMOVE = rm -f
 MV = mv -f
@@ -204,7 +212,8 @@ applet/$(TARGET).cpp: $(TARGET).pde
 
 # Link: create ELF output file from object files.
 applet/$(TARGET).elf: applet/$(TARGET).cpp $(OBJ)
-	$(CC) $(ALL_CFLAGS) $(OBJ) --output $@ $(LDFLAGS)
+	$(CC) $(ALL_CFLAGS) $(OBJ) -lm --output $@ $(LDFLAGS)
+#	$(CC) $(ALL_CFLAGS) $(OBJ) $(ARDUINO_TOOLS)/avr/avr/lib/avr5/crtm168.o --output $@ $(LDFLAGS)
 
 pd_close_serial:
 	echo 'close;' | /Applications/Pd-extended.app/Contents/Resources/bin/pdsend 34567 || true
@@ -258,4 +267,7 @@ etags_MINGW:
 #	etags -a /usr/include/*.h /usr/include/sys/*.h 
 
 
+path:
+	echo $(PATH)
+	echo $$PATH
 

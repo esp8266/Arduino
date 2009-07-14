@@ -45,7 +45,7 @@ void setup()
     Firmata.setFirmwareVersion(0, 1);
     Firmata.attach(DIGITAL_MESSAGE, digitalWriteCallback);
     Firmata.attach(SET_PIN_MODE, setPinModeCallback);
-    Firmata.begin();
+    Firmata.begin(57600);
 }
 
 void loop()
