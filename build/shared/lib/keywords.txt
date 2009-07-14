@@ -130,13 +130,13 @@ sq	KEYWORD2	Sq
 sqrt	KEYWORD2	Sqrt
 tan	KEYWORD2	Tan
 
-bitRead KEYWORD2 BitRead
-bitWrite KEYWORD2 BitWrite
-bitSet KEYWORD2 BitSet
-bitClear KEYWORD2 BitClear
-bit KEYWORD2 Bit
-highByte KEYWORD2 HighByte
-lowByte KEYWORD2 LowByte
+bitRead	KEYWORD2	BitRead
+bitWrite	KEYWORD2	BitWrite
+bitSet	KEYWORD2	BitSet
+bitClear	KEYWORD2	BitClear
+bit	KEYWORD2	Bit
+highByte	KEYWORD2	HighByte
+lowByte	KEYWORD2	LowByte
 
 analogReference	KEYWORD2	AnalogReference
 analogRead	KEYWORD2	AnalogRead
@@ -155,7 +155,7 @@ pinMode	KEYWORD2	PinMode
 pulseIn	KEYWORD2	PulseIn
 shiftOut	KEYWORD2	ShiftOut
 
-Serial  KEYWORD3
+Serial	KEYWORD3
 Serial	KEYWORD2
 begin	KEYWORD2	Serial_Begin
 read	KEYWORD2	Serial_Read
