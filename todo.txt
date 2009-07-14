@@ -1,10 +1,9 @@
 0017 arduino
 
 Test new Servo library on ATmega8.
-Include examples for the new LiquidCrystal library.
 New version of Firmata.
-Fix the baud rate calculation (and double speed bit setting).
 Updated icons?
+Arduino Nano w/ ATmega328 board option.
 Test the FTDI drivers in the arduino.dmg.
 Fix Linux make.sh, etc. scripts
 Test on Linux.
