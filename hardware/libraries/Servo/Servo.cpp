@@ -128,11 +128,11 @@ static void initISR(servoTimer_t timer)
     TCCR1B = _BV(CS11);     // set prescaler of 8 
     TCNT1 = 0;              // clear the timer count 
 #if defined(__AVR_ATmega8__)
-    TIFR = _BV(OCF1A);      // clear any pending interrupts; 
-    TIMSK =  _BV(OCIE1A) ;  // enable the output compare interrupt    
+    TIFR |= _BV(OCF1A);      // clear any pending interrupts; 
+    TIMSK |=  _BV(OCIE1A) ;  // enable the output compare interrupt    
 #else
-    TIFR1 = _BV(OCF1A);     // clear any pending interrupts; 
-    TIMSK1 =  _BV(OCIE1A) ; // enable the output compare interrupt 
+    TIFR1 |= _BV(OCF1A);     // clear any pending interrupts; 
+    TIMSK1 |=  _BV(OCIE1A) ; // enable the output compare interrupt 
 #endif
   } 
 #if defined(__AVR_ATmega1280__)
