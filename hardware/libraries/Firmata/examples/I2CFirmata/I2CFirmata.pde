@@ -149,7 +149,7 @@ void sysexCallback(byte command, byte argc, byte *argv)
     delayTime = (delayTime << 8) + (argv[2] + (argv[3] << 7));     // add LSB
 
     if((argv[0] + (argv[1] << 7)) > 0) {
-      enablePowerPins(PC3, PC2);
+      enablePowerPins(PORTC3, PORTC2);
     }
 
     if(delayTime > 0) {
