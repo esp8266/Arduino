@@ -1,9 +1,6 @@
 0017 arduino
 
-Test new Servo library on ATmega8.
-New version of Firmata.
 Updated icons?
-Arduino Nano w/ ATmega328 board option.
 Test the FTDI drivers in the arduino.dmg.
 Fix Linux make.sh, etc. scripts
 Test on Linux.
