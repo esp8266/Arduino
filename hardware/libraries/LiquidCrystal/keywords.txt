@@ -21,6 +21,15 @@ cursor	KEYWORD2
 noCursor	KEYWORD2
 blink	KEYWORD2
 noBlink	KEYWORD2
+display	KEYWORD2
+noDisplay	KEYWORD2
+autoscroll	KEYWORD2
+noAutoscroll	KEYWORD2
+leftToRight	KEYWORD2
+rightToLeft	KEYWORD2
+scrollDisplayLeft	KEYWORD2
+scrollDisplayRight	KEYWORD2
+createChar	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
