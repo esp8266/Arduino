@@ -45,12 +45,12 @@ void setup() {
 }
 
 void loop() {
-  // Turn off the display:
+  // Turn off the blinking cursor:
   lcd.noBlink();
-  delay(500);
-  // Turn on the display:
+  delay(3000);
+   // Turn on the blinking cursor:
   lcd.blink();
-  delay(500);
+  delay(3000);
 }
 
 

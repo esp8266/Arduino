@@ -1,13 +1,13 @@
 /*
-  LiquidCrystal Library - Increment/Decrement
+  LiquidCrystal Library - Autoscroll
  
  Demonstrates the use a 16x2 LCD display.  The LiquidCrystal
  library works with all LCD displays that are compatible with the 
  Hitachi HD44780 driver. There are many of them out there, and you
  can usually tell them by the 16-pin interface.
  
- This sketch demonstrates the use of the shiftIncrement()
- and shifDecrement() functions.
+ This sketch demonstrates the use of the autoscroll()
+ and noAutoscroll() functions.
  
  The circuit:
  * LCD RS pin to digital pin 12
@@ -37,29 +37,30 @@
 LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
 void setup() {
-  // set up the LCD's number of rows and columns: 
+  // set up the LCD's number of columns and rows: 
   lcd.begin(2, 16);
 }
 
 void loop() {
-     // set the cursor to (0,0):
+  // set the cursor to (0,0):
   lcd.setCursor(0, 0);
-  // set the display to left justify:
-  lcd.shiftDecrement();
   // print from 0 to 9:
   for (int thisChar = 0; thisChar < 10; thisChar++) {
    lcd.print(thisChar);
    delay(500);
   }
-  // set the cursor to (16,0):
+
+  // set the cursor to (16,1):
   lcd.setCursor(16,1);
-  // set the display to left justify:
-  lcd.shiftIncrement();
+  // set the display to automatically scroll:
+  lcd.autoscroll();
   // print from 0 to 9:
   for (int thisChar = 0; thisChar < 10; thisChar++) {
     lcd.print(thisChar);
     delay(500);
   }
+  // turn off automatic scrolling
+  lcd.noAutoscroll();
   
   // clear screen for the next loop:
   lcd.clear();

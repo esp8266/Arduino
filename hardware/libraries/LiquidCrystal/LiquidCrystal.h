@@ -72,12 +72,10 @@ public:
   void cursor();
   void scrollDisplayLeft();
   void scrollDisplayRight();
-  void printLeft();
-  void printRight();
-  void shiftLeft();
-  void shiftRight();
-  void shiftIncrement();
-  void shiftDecrement();
+  void leftToRight();
+  void rightToLeft();
+  void autoscroll();
+  void noAutoscroll();
 
   void createChar(uint8_t, uint8_t[]);
   void setCursor(uint8_t, uint8_t); 

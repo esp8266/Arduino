@@ -45,10 +45,10 @@ void setup() {
 }
 
 void loop() {
-  // Turn off the display:
+  // Turn off the cursor:
   lcd.noCursor();
   delay(500);
-   // Turn on the display:
+   // Turn on the cursor:
   lcd.cursor();
   delay(500);
 }

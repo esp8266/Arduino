@@ -12,10 +12,15 @@ LiquidCrystal	KEYWORD1
 # Methods and Functions (KEYWORD2)
 #######################################
 
+begin	KEYWORD2
 clear	KEYWORD2
 home	KEYWORD2
 print	KEYWORD2
 setCursor	KEYWORD2
+cursor	KEYWORD2
+noCursor	KEYWORD2
+blink	KEYWORD2
+noBlink	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)

@@ -1,12 +1,12 @@
   /*
-  LiquidCrystal Library - Shift
+  LiquidCrystal Library - TextDirection
  
  Demonstrates the use a 16x2 LCD display.  The LiquidCrystal
  library works with all LCD displays that are compatible with the 
  Hitachi HD44780 driver. There are many of them out there, and you
  can usually tell them by the 16-pin interface.
  
- This sketch demonstrates how to use shiftLeft() and shiftRight()
+ This sketch demonstrates how to use leftToRight() and rightToLeft()
  to move the cursor.
  
  The circuit:
@@ -51,12 +51,12 @@ void loop() {
   // reverse directions at 'm':
   if (thisChar == 'm') {
     // go right for the next letter
-    lcd.shiftRight(); 
+    lcd.rightToLeft(); 
   }
   // reverse again at 's':
   if (thisChar == 's') {
     // go left for the next letter
-    lcd.shiftLeft(); 
+    lcd.leftToRight(); 
   }
   // reset at 'z':
   if (thisChar > 'z') {
