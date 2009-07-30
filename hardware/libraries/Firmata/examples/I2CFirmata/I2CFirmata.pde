@@ -196,10 +196,7 @@ void setup()
     pinMode(i, OUTPUT);
   }
 
-  /* I2C data is not reliable at higher baud rates, you'll need to change the
-   baud rate on the host computer as well.  To get a firmware running with
-   minimal effort, you can try using the default baud rate (115200) */
-  Firmata.begin(38400);  
+  Firmata.begin(57600);  
   Wire.begin();
 }
 

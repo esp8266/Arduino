@@ -99,7 +99,8 @@ void setPinModeCallback(byte pin, int mode) {
   }
   
   if(pin > 1) { // ignore RxTx (pins 0 and 1)
-    reportAnalogCallback(pin - 14, mode == ANALOG ? 1 : 0); // turn on/off reporting
+    if(pin > 13) 
+      reportAnalogCallback(pin - 14, mode == ANALOG ? 1 : 0); // turn on/off reporting
     switch(mode) {
     case ANALOG:
       digitalWrite(pin, LOW); // disable internal pull-ups and fall thru to 'case INPUT:'
