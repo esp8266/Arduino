@@ -147,6 +147,7 @@ run.display = 1
 #sketchbook.closing_last_window_quits = true
 #sketchbook.closing_last_window_quits.macosx = false
 
+apple.laf.useScreenMenuBar=true
 
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
