@@ -65,6 +65,7 @@ UPDATES
 [environment]
 * Synchronized with the Processing 1.0.3 code base (rev. 5503), bringing
   many improvements (listed below).
+* New icons and about image by Thomas Glaser (envis precisely).
 * Support for multiple sketch windows.
 * The serial monitor now has its own window.
 * Comment / Uncomment menu item (in Edit) and keyboard shortcut.
