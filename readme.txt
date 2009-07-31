@@ -44,6 +44,8 @@ working at using it with the Instant Soup platform.
 Arduino uses the GNU avr-gcc toolchain, avrdude, avr-libc, and code from
 Processing and Wiring.
 
+Icon Design and Artwork created by Thomas Glaser (envis precisely).
+
 UPDATES
 
 0017 - 2009.07.25
