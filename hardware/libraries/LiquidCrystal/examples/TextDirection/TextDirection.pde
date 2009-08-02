@@ -41,7 +41,7 @@ int thisChar = 'a';
 
 void setup() {
   // set up the LCD's number of rows and columns: 
-  lcd.begin(2, 16);
+  lcd.begin(16, 2);
   // turn on the cursor:
   lcd.cursor();
   Serial.begin(9600);
