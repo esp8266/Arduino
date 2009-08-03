@@ -157,7 +157,7 @@ public class Base {
     // because the platform has to be inited properly first.
 
     // Make sure a full JDK is installed
-    initRequirements();
+    //initRequirements();
 
     // run static initialization that grabs all the prefs
     Preferences.init(null);
