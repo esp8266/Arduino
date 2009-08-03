@@ -15,24 +15,24 @@ else
   cp -r ../shared/libraries work/
   cp -r ../shared/tools work/
 
+  cp -r ../../hardware work/
+
   cp ../../app/lib/antlr.jar work/lib/
   cp ../../app/lib/ecj.jar work/lib/
   cp ../../app/lib/jna.jar work/lib/
+  cp ../../app/lib/oro.jar work/lib/
+  cp ../../app/lib/RXTXcomm.jar work/lib/
 
-  echo Extracting examples...
-  unzip -q -d work/ ../shared/examples.zip
+  echo Copying examples...
+  cp -r ../shared/examples work/
 
   echo Extracting reference...
   unzip -q -d work/ ../shared/reference.zip
 
-  cp -r ../../net work/libraries/
-  cp -r ../../opengl work/libraries/
-  cp -r ../../serial work/libraries/
-  cp -r ../../video work/libraries/
-  cp -r ../../pdf work/libraries/
-  cp -r ../../dxf work/libraries/
+  cp -r dist/tools work/hardware/
+  cp dist/lib/librxtxSerial.so work/lib/
 
-  install -m 755 dist/processing work/processing
+  install -m 755 dist/arduino work/arduino
 
   ARCH=`uname -m`
   if [ $ARCH = "i686" ]
@@ -84,41 +84,6 @@ cd bin && zip -rq ../../build/linux/work/lib/core.jar \
 cd ..
 
 
-### -- BUILD PREPROC ------------------------------------------------
-
-echo Building PDE for JDK 1.5...
-
-cd app
-
-# long path is to avoid requiring java to be in your PATH
-  echo Building antlr grammar code...
-
-  # first build the default java goop
-../build/linux/work/java/bin/java \
-  -cp ../build/linux/work/lib/antlr.jar antlr.Tool \
-  -o src/antlr/java \
-  src/antlr/java/java.g
-
-  # hack to get around path mess
-  cp src/antlr/java/JavaTokenTypes.txt src/processing/app/preproc/
-
-# now build the pde stuff that extends the java classes
-# this is totally ugly and needs to be fixed
-# the problem is that -glib doesn't set the main path properly, 
-# so it's necessary to cd into the antlr/java folder, otherwise
-# the JavaTokenTypes.txt file won't be found
-cd src/antlr/java
-../../../../build/linux/work/java/bin/java \
-  -cp ../../../../build/linux/work/lib/antlr.jar antlr.Tool \
-  -o ../../processing/app/preproc \
-  -glib java.g \
-  ../../processing/app/preproc/pde.g
-cd ../../..
-
-# return to the root of the p5 folder
-cd ..
-
-
 ### -- BUILD PDE ------------------------------------------------
 
 cd app
@@ -130,104 +95,19 @@ mkdir ../build/linux/work/classes
     -cp ../build/linux/work/java/lib/tools.jar \
     com.sun.tools.javac.Main \
     -source 1.5 -target 1.5 \
-    -classpath ../build/linux/work/lib/core.jar:../build/linux/work/lib/antlr.jar:../build/linux/work/lib/ecj.jar:../build/linux/work/lib/jna.jar:../build/linux/work/java/lib/tools.jar \
+    -classpath ../build/linux/work/lib/core.jar:../build/linux/work/lib/antlr.jar:../build/linux/work/lib/ecj.jar:../build/linux/work/lib/jna.jar:../build/linux/work/lib/oro.jar:../build/linux/work/lib/RXTXcomm.jar:../build/linux/work/java/lib/tools.jar \
     -d ../build/linux/work/classes \
     src/processing/app/*.java \
     src/processing/app/debug/*.java \
     src/processing/app/linux/*.java \
     src/processing/app/preproc/*.java \
     src/processing/app/syntax/*.java \
-    src/processing/app/tools/*.java \
-    src/antlr/*.java \
-    src/antlr/java/*.java 
+    src/processing/app/tools/*.java
 
 cd ../build/linux/work/classes
 rm -f ../lib/pde.jar
 zip -0rq ../lib/pde.jar .
 cd ../../../..
-
-
-### -- BUILD LIBRARIES ------------------------------------------------
-
-cd build/linux
-
-PLATFORM=linux
-
-JAVAC="../build/linux/work/java/bin/java -cp ../build/linux/work/java/lib/tools.jar com.sun.tools.javac.Main -source 1.5 -target 1.5"
-CORE=../build/$PLATFORM/work/lib/core.jar
-LIBRARIES=../build/$PLATFORM/work/libraries
-
-# move to processing/build 
-cd ..
-
-# SERIAL LIBRARY
-echo Building serial library...
-cd ../serial
-mkdir -p bin
-$JAVAC \
-    -classpath "library/RXTXcomm.jar:$CORE" \
-    -d bin src/processing/serial/*.java 
-rm -f library/serial.jar
-find bin -name "*~" -exec rm -f {} ';'
-cd bin && zip -rq ../library/serial.jar processing/serial/*.class && cd ..
-mkdir -p $LIBRARIES/serial/library/
-cp library/serial.jar $LIBRARIES/serial/library/
-
-
-# NET LIBRARY
-echo Building net library...
-cd ../net
-mkdir -p bin
-$JAVAC \
-    -classpath "$CORE" \
-    -d bin src/processing/net/*.java 
-rm -f library/net.jar
-find bin -name "*~" -exec rm -f {} ';'
-cd bin && zip -rq ../library/net.jar processing/net/*.class && cd ..
-mkdir -p $LIBRARIES/net/library/
-cp library/net.jar $LIBRARIES/net/library/
-
-
-# OPENGL LIBRARY
-echo Building OpenGL library...
-cd ../opengl
-mkdir -p bin
-$JAVAC \
-    -classpath "library/jogl.jar:$CORE" \
-    -d bin src/processing/opengl/*.java 
-rm -f library/opengl.jar
-find bin -name "*~" -exec rm -f {} ';'
-cd bin && zip -rq ../library/opengl.jar processing/opengl/*.class && cd ..
-mkdir -p $LIBRARIES/opengl/library/
-cp library/opengl.jar $LIBRARIES/opengl/library/
-
-
-# PDF LIBRARY
-echo Building PDF library...
-cd ../pdf
-mkdir -p bin
-$JAVAC \
-    -classpath "library/itext.jar:$CORE" \
-    -d bin src/processing/pdf/*.java 
-rm -f library/pdf.jar
-find bin -name "*~" -exec rm -f {} ';'
-cd bin && zip -rq ../library/pdf.jar processing/pdf/*.class && cd ..
-mkdir -p $LIBRARIES/pdf/library/
-cp library/pdf.jar $LIBRARIES/pdf/library/
-
-
-# DXF LIBRARY
-echo Building DXF library...
-cd ../dxf
-mkdir -p bin
-$JAVAC \
-    -classpath "$CORE" \
-    -d bin src/processing/dxf/*.java 
-rm -f library/dxf.jar
-find bin -name "*~" -exec rm -f {} ';'
-cd bin && zip -rq ../library/dxf.jar processing/dxf/*.class && cd ..
-mkdir -p $LIBRARIES/dxf/library/
-cp library/dxf.jar $LIBRARIES/dxf/library/
 
 
 echo

@@ -6,10 +6,10 @@ REVISION=`head -1 ../../todo.txt | awk '{print $1}'`
 if [ $1 ]
 then
   RELEASE=$1
-  echo Creating Processing release $RELEASE...
+  echo Creating Arduino release $RELEASE...
 else 
   RELEASE=$REVISION
-  echo Creating Processing distribution for revision $REVISION...
+  echo Creating Arduino distribution for revision $REVISION...
 fi
 
 ARCH=`uname -m`
@@ -22,67 +22,67 @@ fi
 ./make.sh
 
 # remove any old boogers
-rm -rf processing
-rm -rf processing-*
+rm -rf arduino
+rm -rf arduino-*
 
-mkdir processing
-cp -r ../shared/lib processing/
-cp -r ../shared/libraries processing/
-cp -r ../shared/tools processing/
-cp ../../app/lib/antlr.jar processing/lib/
-cp ../../app/lib/ecj.jar processing/lib/
-cp ../../app/lib/jna.jar processing/lib/
-cp ../shared/revisions.txt processing/
+mkdir arduino
+cp -r ../shared/lib arduino/
+cp -r ../shared/libraries arduino/
+cp -r ../shared/tools arduino/
+cp ../../app/lib/antlr.jar arduino/lib/
+cp ../../app/lib/ecj.jar arduino/lib/
+cp ../../app/lib/jna.jar arduino/lib/
+cp ../../app/lib/oro.jar arduino/lib/
+cp ../../app/lib/RXTXcomm.jar arduino/lib/
+cp ../../readme.txt arduino/
+
+cp -r ../../hardware arduino/
+
+cp -r dist/tools arduino/hardware
+cp dist/lib/librxtxSerial.so arduino/lib
 
 if [ $1 ]
 then
   # write the release version number into the output directory
-  echo $1 > processing/lib/version.txt
+  echo $1 > arduino/lib/version.txt
 fi
 
-echo Extracting examples...
-unzip -q -d processing/ ../shared/examples.zip
+echo Copying examples...
+cp -r ../shared/examples arduino/
 
 echo Extracting reference...
-unzip -q -d processing/ ../shared/reference.zip
-
-# add the libraries folder with source
-cp -r ../../net processing/libraries/
-cp -r ../../opengl processing/libraries/
-cp -r ../../serial processing/libraries/
-cp -r ../../pdf processing/libraries/
-cp -r ../../dxf processing/libraries/
+unzip -q -d arduino/ ../shared/reference.zip
 
 # add java (jre) files
-tar --extract --file=jre.tgz --ungzip --directory=processing
+#tar --extract --file=jre.tgz --ungzip --directory=arduino
 
 # grab pde.jar and export from the working dir
-cp work/lib/pde.jar processing/lib/
-cp work/lib/core.jar processing/lib/
+cp work/lib/pde.jar arduino/lib/
+cp work/lib/core.jar arduino/lib/
 
 # get platform-specific goodies from the dist dir
-install -m 755 dist/processing processing/processing
+install -m 755 dist/arduino arduino/arduino
 
 # make sure notes.txt is unix LFs
 # the 2> is because the app is a little chatty
-dos2unix processing/revisions.txt 2> /dev/null
-dos2unix processing/lib/preferences.txt 2> /dev/null
+dos2unix arduino/readme.txt 2> /dev/null
+dos2unix arduino/lib/preferences.txt 2> /dev/null
 
 # remove boogers
-find processing -name "*~" -exec rm -f {} ';'
-find processing -name ".DS_Store" -exec rm -f {} ';'
-find processing -name "._*" -exec rm -f {} ';'
-find processing -name "Thumbs.db" -exec rm -f {} ';'
+find arduino -name "*~" -exec rm -f {} ';'
+find arduino -name ".DS_Store" -exec rm -f {} ';'
+find arduino -name "._*" -exec rm -f {} ';'
+find arduino -name "Thumbs.db" -exec rm -f {} ';'
 
 # clean out the cvs entries
-find processing -name "CVS" -exec rm -rf {} ';' 2> /dev/null
-find processing -name ".cvsignore" -exec rm -rf {} ';'
-find processing -name ".svn" -exec rm -rf {} 2> /dev/null ';'
+find arduino -name "CVS" -exec rm -rf {} ';' 2> /dev/null
+find arduino -name ".cvsignore" -exec rm -rf {} ';'
+find arduino -name ".svn" -exec rm -rf {} 2> /dev/null ';'
 
 # zip it all up for release
 echo Creating tarball and finishing...
-P5=processing-$RELEASE
-mv processing $P5
+P5=arduino-$RELEASE
+mv arduino $P5
 
 tar cfz $P5.tgz $P5
 # nah, keep the new directory around
