@@ -7,7 +7,7 @@
  can usually tell them by the 16-pin interface.
  
  This sketch demonstrates the use of the autoscroll()
- and noAutoscroll() functions.
+ and noAutoscroll() functions to make new text scroll or not.
  
  The circuit:
  * LCD RS pin to digital pin 12
@@ -26,6 +26,8 @@
  by Limor Fried (http://www.ladyada.net)
  example added 9 Jul 2009
  by Tom Igoe 
+ modified 25 July 2009
+ by David A. Mellis
  
  http://www.arduino.cc/en/Tutorial/LiquidCrystal
  */
