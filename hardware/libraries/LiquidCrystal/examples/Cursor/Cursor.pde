@@ -27,6 +27,9 @@
  by Limor Fried (http://www.ladyada.net)
  example added 9 Jul 2009
  by Tom Igoe 
+ modified 25 July 2009
+ by David A. Mellis
+
  
  http://www.arduino.cc/en/Tutorial/LiquidCrystal
  */
