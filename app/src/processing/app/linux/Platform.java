@@ -48,7 +48,7 @@ public class Platform extends processing.app.Platform {
     // This is available in Java 1.4.2 and later, and it can't possibly
     // be any worse than Metal. (Ocean might also work, but that's for
     // Java 1.5, and we aren't going there yet)
-    UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+    //UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
   }
 
 
