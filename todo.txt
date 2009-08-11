@@ -1,7 +1,5 @@
 0017 arduino
 
-Updated icons?
-Test the FTDI drivers in the arduino.dmg.
 Fix Linux make.sh, etc. scripts
 Test on Linux.
 
