@@ -1,0 +1,499 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+DefaultInputHandler
+</TITLE>
+
+<META NAME="keywords" CONTENT="processing.app.syntax.DefaultInputHandler class">
+
+<LINK REL ="stylesheet" TYPE="text/css" HREF="../../../stylesheet.css" TITLE="Style">
+
+<SCRIPT type="text/javascript">
+function windowTitle()
+{
+    parent.document.title="DefaultInputHandler";
+}
+</SCRIPT>
+<NOSCRIPT>
+</NOSCRIPT>
+
+</HEAD>
+
+<BODY BGCOLOR="white" onload="windowTitle();">
+
+
+<!-- ========= START OF TOP NAVBAR ======= -->
+<A NAME="navbar_top"><!-- --></A>
+<A HREF="#skip-navbar_top" title="Skip navigation links"></A>
+<TABLE BORDER="0" WIDTH="100%" CELLPADDING="1" CELLSPACING="0" SUMMARY="">
+<TR>
+<TD COLSPAN=2 BGCOLOR="#EEEEFF" CLASS="NavBarCell1">
+<A NAME="navbar_top_firstrow"><!-- --></A>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="3" SUMMARY="">
+  <TR ALIGN="center" VALIGN="top">
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-summary.html"><FONT CLASS="NavBarFont1"><B>Package</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#FFFFFF" CLASS="NavBarCell1Rev"> &nbsp;<FONT CLASS="NavBarFont1Rev"><B>Class</B></FONT>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-tree.html"><FONT CLASS="NavBarFont1"><B>Tree</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../deprecated-list.html"><FONT CLASS="NavBarFont1"><B>Deprecated</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../index-all.html"><FONT CLASS="NavBarFont1"><B>Index</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../help-doc.html"><FONT CLASS="NavBarFont1"><B>Help</B></FONT></A>&nbsp;</TD>
+  </TR>
+</TABLE>
+</TD>
+<TD ALIGN="right" VALIGN="top" ROWSPAN=3><EM>
+</EM>
+</TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+&nbsp;<A HREF="../../../processing/app/syntax/CTokenMarker.html" title="class in processing.app.syntax"><B>PREV CLASS</B></A>&nbsp;
+&nbsp;<A HREF="../../../processing/app/syntax/InputHandler.html" title="class in processing.app.syntax"><B>NEXT CLASS</B></A></FONT></TD>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+  <A HREF="../../../index.html?processing/app/syntax/DefaultInputHandler.html" target="_top"><B>FRAMES</B></A>  &nbsp;
+&nbsp;<A HREF="DefaultInputHandler.html" target="_top"><B>NO FRAMES</B></A>  &nbsp;
+&nbsp;<SCRIPT type="text/javascript">
+  <!--
+  if(window==top) {
+    document.writeln('<A HREF="../../../allclasses-noframe.html"><B>All Classes</B></A>');
+  }
+  //-->
+</SCRIPT>
+<NOSCRIPT>
+  <A HREF="../../../allclasses-noframe.html"><B>All Classes</B></A>
+</NOSCRIPT>
+
+
+</FONT></TD>
+</TR>
+<TR>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+  SUMMARY:&nbsp;<A HREF="#nested_classes_inherited_from_class_processing.app.syntax.InputHandler">NESTED</A>&nbsp;|&nbsp;<A HREF="#fields_inherited_from_class_processing.app.syntax.InputHandler">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor_summary">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_summary">METHOD</A></FONT></TD>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+DETAIL:&nbsp;FIELD&nbsp;|&nbsp;<A HREF="#constructor_detail">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_detail">METHOD</A></FONT></TD>
+</TR>
+</TABLE>
+<A NAME="skip-navbar_top"></A>
+<!-- ========= END OF TOP NAVBAR ========= -->
+
+<HR>
+<!-- ======== START OF CLASS DATA ======== -->
+<H2>
+<FONT SIZE="-1">
+processing.app.syntax</FONT>
+<BR>
+Class DefaultInputHandler</H2>
+<PRE>
+java.lang.Object
+  <IMG SRC="../../../resources/inherit.gif" ALT="extended by ">java.awt.event.KeyAdapter
+      <IMG SRC="../../../resources/inherit.gif" ALT="extended by "><A HREF="../../../processing/app/syntax/InputHandler.html" title="class in processing.app.syntax">processing.app.syntax.InputHandler</A>
+          <IMG SRC="../../../resources/inherit.gif" ALT="extended by "><B>processing.app.syntax.DefaultInputHandler</B>
+</PRE>
+<DL>
+<DT><B>All Implemented Interfaces:</B> <DD>java.awt.event.KeyListener, java.util.EventListener</DD>
+</DL>
+<HR>
+<DL>
+<DT><PRE>public class <B>DefaultInputHandler</B><DT>extends <A HREF="../../../processing/app/syntax/InputHandler.html" title="class in processing.app.syntax">InputHandler</A></DL>
+</PRE>
+
+<P>
+The default input handler. It maps sequences of keystrokes into actions
+ and inserts key typed events into the text area.
+<P>
+
+<P>
+<HR>
+
+<P>
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+
+<A NAME="nested_class_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Nested Class Summary</B></FONT></TH>
+</TR>
+</TABLE>
+&nbsp;<A NAME="nested_classes_inherited_from_class_processing.app.syntax.InputHandler"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Nested classes/interfaces inherited from class processing.app.syntax.<A HREF="../../../processing/app/syntax/InputHandler.html" title="class in processing.app.syntax">InputHandler</A></B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><A HREF="../../../processing/app/syntax/InputHandler.backspace.html" title="class in processing.app.syntax">InputHandler.backspace</A>, <A HREF="../../../processing/app/syntax/InputHandler.backspace_word.html" title="class in processing.app.syntax">InputHandler.backspace_word</A>, <A HREF="../../../processing/app/syntax/InputHandler.delete.html" title="class in processing.app.syntax">InputHandler.delete</A>, <A HREF="../../../processing/app/syntax/InputHandler.delete_word.html" title="class in processing.app.syntax">InputHandler.delete_word</A>, <A HREF="../../../processing/app/syntax/InputHandler.document_end.html" title="class in processing.app.syntax">InputHandler.document_end</A>, <A HREF="../../../processing/app/syntax/InputHandler.document_home.html" title="class in processing.app.syntax">InputHandler.document_home</A>, <A HREF="../../../processing/app/syntax/InputHandler.end.html" title="class in processing.app.syntax">InputHandler.end</A>, <A HREF="../../../processing/app/syntax/InputHandler.home.html" title="class in processing.app.syntax">InputHandler.home</A>, <A HREF="../../../processing/app/syntax/InputHandler.insert_break.html" title="class in processing.app.syntax">InputHandler.insert_break</A>, <A HREF="../../../processing/app/syntax/InputHandler.insert_char.html" title="class in processing.app.syntax">InputHandler.insert_char</A>, <A HREF="../../../processing/app/syntax/InputHandler.insert_tab.html" title="class in processing.app.syntax">InputHandler.insert_tab</A>, <A HREF="../../../processing/app/syntax/InputHandler.MacroRecorder.html" title="interface in processing.app.syntax">InputHandler.MacroRecorder</A>, <A HREF="../../../processing/app/syntax/InputHandler.next_char.html" title="class in processing.app.syntax">InputHandler.next_char</A>, <A HREF="../../../processing/app/syntax/InputHandler.next_line.html" title="class in processing.app.syntax">InputHandler.next_line</A>, <A HREF="../../../processing/app/syntax/InputHandler.next_page.html" title="class in processing.app.syntax">InputHandler.next_page</A>, <A HREF="../../../processing/app/syntax/InputHandler.next_word.html" title="class in processing.app.syntax">InputHandler.next_word</A>, <A HREF="../../../processing/app/syntax/InputHandler.NonRecordable.html" title="interface in processing.app.syntax">InputHandler.NonRecordable</A>, <A HREF="../../../processing/app/syntax/InputHandler.NonRepeatable.html" title="interface in processing.app.syntax">InputHandler.NonRepeatable</A>, <A HREF="../../../processing/app/syntax/InputHandler.overwrite.html" title="class in processing.app.syntax">InputHandler.overwrite</A>, <A HREF="../../../processing/app/syntax/InputHandler.prev_char.html" title="class in processing.app.syntax">InputHandler.prev_char</A>, <A HREF="../../../processing/app/syntax/InputHandler.prev_line.html" title="class in processing.app.syntax">InputHandler.prev_line</A>, <A HREF="../../../processing/app/syntax/InputHandler.prev_page.html" title="class in processing.app.syntax">InputHandler.prev_page</A>, <A HREF="../../../processing/app/syntax/InputHandler.prev_word.html" title="class in processing.app.syntax">InputHandler.prev_word</A>, <A HREF="../../../processing/app/syntax/InputHandler.repeat.html" title="class in processing.app.syntax">InputHandler.repeat</A>, <A HREF="../../../processing/app/syntax/InputHandler.toggle_rect.html" title="class in processing.app.syntax">InputHandler.toggle_rect</A>, <A HREF="../../../processing/app/syntax/InputHandler.Wrapper.html" title="interface in processing.app.syntax">InputHandler.Wrapper</A></CODE></TD>
+</TR>
+</TABLE>
+&nbsp;
+<!-- =========== FIELD SUMMARY =========== -->
+
+<A NAME="field_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Field Summary</B></FONT></TH>
+</TR>
+</TABLE>
+&nbsp;<A NAME="fields_inherited_from_class_processing.app.syntax.InputHandler"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Fields inherited from class processing.app.syntax.<A HREF="../../../processing/app/syntax/InputHandler.html" title="class in processing.app.syntax">InputHandler</A></B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><A HREF="../../../processing/app/syntax/InputHandler.html#BACKSPACE">BACKSPACE</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#BACKSPACE_WORD">BACKSPACE_WORD</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#DELETE">DELETE</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#DELETE_WORD">DELETE_WORD</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#DOCUMENT_END">DOCUMENT_END</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#DOCUMENT_HOME">DOCUMENT_HOME</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#END">END</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#HOME">HOME</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#INSERT_BREAK">INSERT_BREAK</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#INSERT_CHAR">INSERT_CHAR</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#INSERT_TAB">INSERT_TAB</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#NEXT_CHAR">NEXT_CHAR</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#NEXT_LINE">NEXT_LINE</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#NEXT_PAGE">NEXT_PAGE</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#NEXT_WORD">NEXT_WORD</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#OVERWRITE">OVERWRITE</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#PREV_CHAR">PREV_CHAR</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#PREV_LINE">PREV_LINE</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#PREV_PAGE">PREV_PAGE</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#PREV_WORD">PREV_WORD</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#REPEAT">REPEAT</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#SELECT_DOC_END">SELECT_DOC_END</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#SELECT_DOC_HOME">SELECT_DOC_HOME</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#SELECT_END">SELECT_END</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#SELECT_HOME">SELECT_HOME</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#SELECT_NEXT_CHAR">SELECT_NEXT_CHAR</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#SELECT_NEXT_LINE">SELECT_NEXT_LINE</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#SELECT_NEXT_PAGE">SELECT_NEXT_PAGE</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#SELECT_NEXT_WORD">SELECT_NEXT_WORD</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#SELECT_PREV_CHAR">SELECT_PREV_CHAR</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#SELECT_PREV_LINE">SELECT_PREV_LINE</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#SELECT_PREV_PAGE">SELECT_PREV_PAGE</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#SELECT_PREV_WORD">SELECT_PREV_WORD</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#SMART_HOME_END_PROPERTY">SMART_HOME_END_PROPERTY</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#TOGGLE_RECT">TOGGLE_RECT</A></CODE></TD>
+</TR>
+</TABLE>
+&nbsp;
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+
+<A NAME="constructor_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Constructor Summary</B></FONT></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><B><A HREF="../../../processing/app/syntax/DefaultInputHandler.html#DefaultInputHandler()">DefaultInputHandler</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Creates a new input handler with no key bindings defined.</TD>
+</TR>
+</TABLE>
+&nbsp;
+<!-- ========== METHOD SUMMARY =========== -->
+
+<A NAME="method_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Method Summary</B></FONT></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/DefaultInputHandler.html#addDefaultKeyBindings()">addDefaultKeyBindings</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sets up the default key bindings.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/DefaultInputHandler.html#addKeyBinding(java.lang.String, java.awt.event.ActionListener)">addKeyBinding</A></B>(java.lang.String&nbsp;keyBinding,
+              java.awt.event.ActionListener&nbsp;action)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Adds a key binding to this input handler.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;<A HREF="../../../processing/app/syntax/InputHandler.html" title="class in processing.app.syntax">InputHandler</A></CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/DefaultInputHandler.html#copy()">copy</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns a copy of this input handler that shares the same
+ key bindings.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/DefaultInputHandler.html#keyPressed(java.awt.event.KeyEvent)">keyPressed</A></B>(java.awt.event.KeyEvent&nbsp;evt)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Handle a key pressed event.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/DefaultInputHandler.html#keyTyped(java.awt.event.KeyEvent)">keyTyped</A></B>(java.awt.event.KeyEvent&nbsp;evt)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Handle a key typed event.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;javax.swing.KeyStroke</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/DefaultInputHandler.html#parseKeyStroke(java.lang.String)">parseKeyStroke</A></B>(java.lang.String&nbsp;keyStroke)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Converts a string to a keystroke.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/DefaultInputHandler.html#removeAllKeyBindings()">removeAllKeyBindings</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Removes all key bindings from this input handler.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/DefaultInputHandler.html#removeKeyBinding(java.lang.String)">removeKeyBinding</A></B>(java.lang.String&nbsp;keyBinding)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Removes a key binding from this input handler.</TD>
+</TR>
+</TABLE>
+&nbsp;<A NAME="methods_inherited_from_class_processing.app.syntax.InputHandler"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Methods inherited from class processing.app.syntax.<A HREF="../../../processing/app/syntax/InputHandler.html" title="class in processing.app.syntax">InputHandler</A></B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><A HREF="../../../processing/app/syntax/InputHandler.html#executeAction(java.awt.event.ActionListener, java.lang.Object, java.lang.String)">executeAction</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#getAction(java.lang.String)">getAction</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#getActionName(java.awt.event.ActionListener)">getActionName</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#getActions()">getActions</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#getMacroRecorder()">getMacroRecorder</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#getRepeatCount()">getRepeatCount</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#getTextArea(java.util.EventObject)">getTextArea</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#grabNextKeyStroke(java.awt.event.ActionListener)">grabNextKeyStroke</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#isRepeatEnabled()">isRepeatEnabled</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#setMacroRecorder(processing.app.syntax.InputHandler.MacroRecorder)">setMacroRecorder</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#setRepeatCount(int)">setRepeatCount</A>, <A HREF="../../../processing/app/syntax/InputHandler.html#setRepeatEnabled(boolean)">setRepeatEnabled</A></CODE></TD>
+</TR>
+</TABLE>
+&nbsp;<A NAME="methods_inherited_from_class_java.awt.event.KeyAdapter"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Methods inherited from class java.awt.event.KeyAdapter</B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>keyReleased</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;<A NAME="methods_inherited_from_class_java.lang.Object"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Methods inherited from class java.lang.Object</B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>equals, getClass, hashCode, notify, notifyAll, toString, wait, wait, wait</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;
+<P>
+
+<!-- ========= CONSTRUCTOR DETAIL ======== -->
+
+<A NAME="constructor_detail"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="1"><FONT SIZE="+2">
+<B>Constructor Detail</B></FONT></TH>
+</TR>
+</TABLE>
+
+<A NAME="DefaultInputHandler()"><!-- --></A><H3>
+DefaultInputHandler</H3>
+<PRE>
+public <B>DefaultInputHandler</B>()</PRE>
+<DL>
+<DD>Creates a new input handler with no key bindings defined.
+<P>
+</DL>
+
+<!-- ============ METHOD DETAIL ========== -->
+
+<A NAME="method_detail"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="1"><FONT SIZE="+2">
+<B>Method Detail</B></FONT></TH>
+</TR>
+</TABLE>
+
+<A NAME="addDefaultKeyBindings()"><!-- --></A><H3>
+addDefaultKeyBindings</H3>
+<PRE>
+public void <B>addDefaultKeyBindings</B>()</PRE>
+<DL>
+<DD>Sets up the default key bindings.
+<P>
+<DD><DL>
+<DT><B>Specified by:</B><DD><CODE><A HREF="../../../processing/app/syntax/InputHandler.html#addDefaultKeyBindings()">addDefaultKeyBindings</A></CODE> in class <CODE><A HREF="../../../processing/app/syntax/InputHandler.html" title="class in processing.app.syntax">InputHandler</A></CODE></DL>
+</DD>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="addKeyBinding(java.lang.String, java.awt.event.ActionListener)"><!-- --></A><H3>
+addKeyBinding</H3>
+<PRE>
+public void <B>addKeyBinding</B>(java.lang.String&nbsp;keyBinding,
+                          java.awt.event.ActionListener&nbsp;action)</PRE>
+<DL>
+<DD>Adds a key binding to this input handler. The key binding is
+ a list of white space separated key strokes of the form
+ <i>[modifiers+]key</i> where modifier is C for Control, A for Alt,
+ or S for Shift, and key is either a character (a-z) or a field
+ name in the KeyEvent class prefixed with VK_ (e.g., BACK_SPACE)
+<P>
+<DD><DL>
+<DT><B>Specified by:</B><DD><CODE><A HREF="../../../processing/app/syntax/InputHandler.html#addKeyBinding(java.lang.String, java.awt.event.ActionListener)">addKeyBinding</A></CODE> in class <CODE><A HREF="../../../processing/app/syntax/InputHandler.html" title="class in processing.app.syntax">InputHandler</A></CODE></DL>
+</DD>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>keyBinding</CODE> - The key binding<DD><CODE>action</CODE> - The action</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="removeKeyBinding(java.lang.String)"><!-- --></A><H3>
+removeKeyBinding</H3>
+<PRE>
+public void <B>removeKeyBinding</B>(java.lang.String&nbsp;keyBinding)</PRE>
+<DL>
+<DD>Removes a key binding from this input handler. This is not yet
+ implemented.
+<P>
+<DD><DL>
+<DT><B>Specified by:</B><DD><CODE><A HREF="../../../processing/app/syntax/InputHandler.html#removeKeyBinding(java.lang.String)">removeKeyBinding</A></CODE> in class <CODE><A HREF="../../../processing/app/syntax/InputHandler.html" title="class in processing.app.syntax">InputHandler</A></CODE></DL>
+</DD>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>keyBinding</CODE> - The key binding</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="removeAllKeyBindings()"><!-- --></A><H3>
+removeAllKeyBindings</H3>
+<PRE>
+public void <B>removeAllKeyBindings</B>()</PRE>
+<DL>
+<DD>Removes all key bindings from this input handler.
+<P>
+<DD><DL>
+<DT><B>Specified by:</B><DD><CODE><A HREF="../../../processing/app/syntax/InputHandler.html#removeAllKeyBindings()">removeAllKeyBindings</A></CODE> in class <CODE><A HREF="../../../processing/app/syntax/InputHandler.html" title="class in processing.app.syntax">InputHandler</A></CODE></DL>
+</DD>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="copy()"><!-- --></A><H3>
+copy</H3>
+<PRE>
+public <A HREF="../../../processing/app/syntax/InputHandler.html" title="class in processing.app.syntax">InputHandler</A> <B>copy</B>()</PRE>
+<DL>
+<DD>Returns a copy of this input handler that shares the same
+ key bindings. Setting key bindings in the copy will also
+ set them in the original.
+<P>
+<DD><DL>
+<DT><B>Specified by:</B><DD><CODE><A HREF="../../../processing/app/syntax/InputHandler.html#copy()">copy</A></CODE> in class <CODE><A HREF="../../../processing/app/syntax/InputHandler.html" title="class in processing.app.syntax">InputHandler</A></CODE></DL>
+</DD>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="keyPressed(java.awt.event.KeyEvent)"><!-- --></A><H3>
+keyPressed</H3>
+<PRE>
+public void <B>keyPressed</B>(java.awt.event.KeyEvent&nbsp;evt)</PRE>
+<DL>
+<DD>Handle a key pressed event. This will look up the binding for
+ the key stroke and execute it.
+<P>
+<DD><DL>
+<DT><B>Specified by:</B><DD><CODE>keyPressed</CODE> in interface <CODE>java.awt.event.KeyListener</CODE><DT><B>Overrides:</B><DD><CODE>keyPressed</CODE> in class <CODE>java.awt.event.KeyAdapter</CODE></DL>
+</DD>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="keyTyped(java.awt.event.KeyEvent)"><!-- --></A><H3>
+keyTyped</H3>
+<PRE>
+public void <B>keyTyped</B>(java.awt.event.KeyEvent&nbsp;evt)</PRE>
+<DL>
+<DD>Handle a key typed event. This inserts the key into the text area.
+<P>
+<DD><DL>
+<DT><B>Specified by:</B><DD><CODE>keyTyped</CODE> in interface <CODE>java.awt.event.KeyListener</CODE><DT><B>Overrides:</B><DD><CODE>keyTyped</CODE> in class <CODE>java.awt.event.KeyAdapter</CODE></DL>
+</DD>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="parseKeyStroke(java.lang.String)"><!-- --></A><H3>
+parseKeyStroke</H3>
+<PRE>
+public static javax.swing.KeyStroke <B>parseKeyStroke</B>(java.lang.String&nbsp;keyStroke)</PRE>
+<DL>
+<DD>Converts a string to a keystroke. The string should be of the
+ form <i>modifiers</i>+<i>shortcut</i> where <i>modifiers</i>
+ is any combination of A for Alt, C for Control, S for Shift
+ or M for Meta, and <i>shortcut</i> is either a single character,
+ or a keycode name from the <code>KeyEvent</code> class, without
+ the <code>VK_</code> prefix.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>keyStroke</CODE> - A string description of the key stroke</DL>
+</DD>
+</DL>
+<!-- ========= END OF CLASS DATA ========= -->
+<HR>
+
+
+<!-- ======= START OF BOTTOM NAVBAR ====== -->
+<A NAME="navbar_bottom"><!-- --></A>
+<A HREF="#skip-navbar_bottom" title="Skip navigation links"></A>
+<TABLE BORDER="0" WIDTH="100%" CELLPADDING="1" CELLSPACING="0" SUMMARY="">
+<TR>
+<TD COLSPAN=2 BGCOLOR="#EEEEFF" CLASS="NavBarCell1">
+<A NAME="navbar_bottom_firstrow"><!-- --></A>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="3" SUMMARY="">
+  <TR ALIGN="center" VALIGN="top">
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-summary.html"><FONT CLASS="NavBarFont1"><B>Package</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#FFFFFF" CLASS="NavBarCell1Rev"> &nbsp;<FONT CLASS="NavBarFont1Rev"><B>Class</B></FONT>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-tree.html"><FONT CLASS="NavBarFont1"><B>Tree</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../deprecated-list.html"><FONT CLASS="NavBarFont1"><B>Deprecated</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../index-all.html"><FONT CLASS="NavBarFont1"><B>Index</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../help-doc.html"><FONT CLASS="NavBarFont1"><B>Help</B></FONT></A>&nbsp;</TD>
+  </TR>
+</TABLE>
+</TD>
+<TD ALIGN="right" VALIGN="top" ROWSPAN=3><EM>
+</EM>
+</TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+&nbsp;<A HREF="../../../processing/app/syntax/CTokenMarker.html" title="class in processing.app.syntax"><B>PREV CLASS</B></A>&nbsp;
+&nbsp;<A HREF="../../../processing/app/syntax/InputHandler.html" title="class in processing.app.syntax"><B>NEXT CLASS</B></A></FONT></TD>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+  <A HREF="../../../index.html?processing/app/syntax/DefaultInputHandler.html" target="_top"><B>FRAMES</B></A>  &nbsp;
+&nbsp;<A HREF="DefaultInputHandler.html" target="_top"><B>NO FRAMES</B></A>  &nbsp;
+&nbsp;<SCRIPT type="text/javascript">
+  <!--
+  if(window==top) {
+    document.writeln('<A HREF="../../../allclasses-noframe.html"><B>All Classes</B></A>');
+  }
+  //-->
+</SCRIPT>
+<NOSCRIPT>
+  <A HREF="../../../allclasses-noframe.html"><B>All Classes</B></A>
+</NOSCRIPT>
+
+
+</FONT></TD>
+</TR>
+<TR>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+  SUMMARY:&nbsp;<A HREF="#nested_classes_inherited_from_class_processing.app.syntax.InputHandler">NESTED</A>&nbsp;|&nbsp;<A HREF="#fields_inherited_from_class_processing.app.syntax.InputHandler">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor_summary">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_summary">METHOD</A></FONT></TD>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+DETAIL:&nbsp;FIELD&nbsp;|&nbsp;<A HREF="#constructor_detail">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_detail">METHOD</A></FONT></TD>
+</TR>
+</TABLE>
+<A NAME="skip-navbar_bottom"></A>
+<!-- ======== END OF BOTTOM NAVBAR ======= -->
+
+<HR>
+
+</BODY>
+</HTML>

@@ -1,0 +1,241 @@
+PROCESSING 1.0.3 (REV 0165) - 24 February 2009
+
+Bug fix release to repair a couple of regressions caused by changes in 1.0.2, 
+as well as a couple other new problems encountered since.
+
+[ bug fixes ]
+
++ endRecord or endRaw produces a RuntimeException with the PDF library
+  http://dev.processing.org/bugs/show_bug.cgi?id=1169
+
++ Problem with beginRaw/endRaw and OpenGL
+  http://dev.processing.org/bugs/show_bug.cgi?id=1171
+
++ Set strokeWeight on points and lines with begin/endRaw
+  http://dev.processing.org/bugs/show_bug.cgi?id=1172
+
++ Fix strokeWeight quirks with P3D when used with points and lines
+
++ ArrayIndexOutOfBoundsException with point()
+  http://dev.processing.org/bugs/show_bug.cgi?id=1168
+
+[ changes ] 
+
++ Update to iText 2.1.4 for the PDF library
+
+
+PROCESSING 1.0.2 (REV 0164) - 21 February 2009
+
+This release fixes many bugs and adds two minor functions to the XML library.
+
+[ bug fixes ] 
+
++ Empty "code" folder causing problems with Export
+  http://dev.processing.org/bugs/show_bug.cgi?id=1084
+
++ Sketches not loading when .pde file is opened from the Windows Explorer 
+  on Asian Windows systems. 
+  http://dev.processing.org/bugs/show_bug.cgi?id=1089
+
++ Disable copying of metadata and resource forks in OS X build
+  http://dev.processing.org/bugs/show_bug.cgi?id=1098
+
++ Suppress goofy Apple error message about JVMArchs 
+
++ StringIndexOutOfBoundsException caused by import statements with no dots
+  http://dev.processing.org/bugs/show_bug.cgi?id=1145
+
++ Pressing <Esc> in "Are you sure you want to Quit?" dialog causes quit
+  http://dev.processing.org/bugs/show_bug.cgi?id=1134
+
++ Fix QUADS and QUAD_STRIP with P2D
+  http://dev.processing.org/bugs/show_bug.cgi?id=1162
+
++ ArrayIndexOutOfBoundsException when drawing curves in P3D and OPENGL
+  http://dev.processing.org/bugs/show_bug.cgi?id=1153
+
++ Problems with negatve arc() angles in OpenGL, P3D, other inconsistencies
+  http://dev.processing.org/bugs/show_bug.cgi?id=1095
+
++ requestImage() causing problems with JAVA2D
+
++ Fix minor strokeWeight bug with OpenGL
+
++ Minor bug fix to SVG files that weren't being resized properly
+
++ OpenGL is rendering darker in 0149+
+  http://dev.processing.org/bugs/show_bug.cgi?id=958
+  Thanks to Dave Bollinger for tracking this down and providing a solution
+
++ OutOfMemoryError with ellipse() in P3D and OPENGL
+  http://dev.processing.org/bugs/show_bug.cgi?id=1086
+
++ ArrayIndexOutOfBoundsException with P3D and OPENGL
+  http://dev.processing.org/bugs/show_bug.cgi?id=1117
+
++ point(x,y) ignores noStroke() in some renderers
+  http://dev.processing.org/bugs/show_bug.cgi?id=1090
+
++ Fix Windows startup problem when scheme coloring was odd
+  http://dev.processing.org/bugs/show_bug.cgi?id=1109
+  Changes to the system theme could cause Processing to not launch
+
++ Fix several point() problems with P3D
+  http://dev.processing.org/bugs/show_bug.cgi?id=1110
+
++ nextPage() not working properly with PDF as the renderer
+  http://dev.processing.org/bugs/show_bug.cgi?id=1131
+
++ Save style information when nextPage() is called in PDF renderer
+
++ beginRaw() broken (no DXF, etc working)
+  http://dev.processing.org/bugs/show_bug.cgi?id=1099
+  http://dev.processing.org/bugs/show_bug.cgi?id=1144
+
++ Fix algorithm for quadratic to cubic curve conversion 
+  http://dev.processing.org/bugs/show_bug.cgi?id=1122
+  Thanks to user bits.in.shambles for providing a fix.
+
++ tint() not working in P2D
+  http://dev.processing.org/bugs/show_bug.cgi?id=1132
+
++ blend() y coordinates inverted when using OpenGL
+  http://dev.processing.org/bugs/show_bug.cgi?id=1137
+
++ Fix for getChild() and getChildren() with XML elements that have null names
+
+[ additions ] 
+
++ Added listChildren() method to XMLElement
+
++ Added optional toString(boolean) parameter to enable/disable indents
+  in XMLElement
+
+
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+
+
+PROCESSING 1.0.1 (REV 0163) - 29 November 2008
+
+Processing 1.0 has arrived! You can read an overview of changes introduced
+in the last few months here: http://processing.org/reference/changes.html
+
+Also see the "known issues" section of the troubleshooting page:
+http://processing.org/reference/troubleshooting/#known
+
+This release (1.0.1) fixes a handful of issues that only showed up once we 
+had more testing, particularly with the wider audience we've received in the
+past week following the announcement.
+
+[ bug fixes ] 
+
++ ArrayIndexOutOfBoundsException with File > New
+  http://dev.processing.org/bugs/show_bug.cgi?id=1067
+
++ "CallStaticVoidMethod() threw an exception" on some Mac OS X machines
+  http://dev.processing.org/bugs/show_bug.cgi?id=1063
+  http://dev.processing.org/bugs/show_bug.cgi?id=1078
+
++ "editor.indent" preference setting does not work properly
+  http://dev.processing.org/bugs/show_bug.cgi?id=1073
+
++ Fixed some "An error occurred while starting the application" problems
+
++ Added a note about the Minim library to the changes page.
+
++ Disable parsing of regexps with the split() command
+  http://dev.processing.org/bugs/show_bug.cgi?id=1060
+
++ Fixed ArrayIndexOutOfBoundsException in ellipseImpl().
+  http://dev.processing.org/bugs/show_bug.cgi?id=1068
+
++ Fixed problem where small ellipses weren't showing up.
+
+[ changes ] 
+
++ Implement multi-line tab via tab key (also outdent)
+  http://dev.processing.org/bugs/show_bug.cgi?id=1075
+
++ Code with 'import' and a space incorrectly parsed as an import statement
+  http://dev.processing.org/bugs/show_bug.cgi?id=1064
+
+
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+
+
+PROCESSING 1.0 (REV 0162) - 24 November 2008
+
+Processing 1.0 has arrived! You can read an overview of changes introduced
+in the last few months here: http://processing.org/reference/changes.html
+
+[ known issues ] 
+
++ Sketches that size(w, h, OPENGL) and do not clear the background on each 
+  frame can cause major flickering or problems when the screen clears anyway.
+  There are several possible solutions:
+
+  1. You may need to disable the default 2x smoothing by using
+     hint(DISABLE_OPENGL_2X_SMOOTH).
+  
+  2. Update the drivers for your graphics card.
+
+  3. Get a decent graphics card -- the OpenGL renderer is for advanced
+     use, we don't support using it with cheaper built-in graphics hardware 
+     like the Intel GMA 950. 
+
+  4. If you're running Windows Vista, try disabling the Aero theme. 
+
+  This flickering issue is being tracked here:
+  http://dev.processing.org/bugs/show_bug.cgi?id=1056
+
++ "An error occurred while starting the application" when launching
+  Processing.exe on Windows. This is a high priority however we cannot
+  reproduce it on any of our test machines, which has delayed a fix.
+  http://dev.processing.org/bugs/show_bug.cgi?id=986
+
++ With P2D, P3D, and OPENGL, series of connected lines (such as the stroke 
+  around a polygon, triangle, or ellipse) produce unattractive results when 
+  strokeWeight is set.
+  http://dev.processing.org/bugs/show_bug.cgi?id=955
+
++ Unlike most applications, the menu bar is inside the editor window when
+  Processing is used with Mac OS X 10.5. This is a workaround for an Apple 
+  bug in Java 1.5 and 1.6 on Mac OS X 10.5 that causes the menu bar to be 
+  so excessively slow that the application appears to have crashed.
+  http://dev.processing.org/bugs/show_bug.cgi?id=786
+
+  Please file a bug report with Apple at bugreporter.apple.com if you want
+  this fixed. The problem has existed since the spring, and we first filed 
+  a bug  with them in June, and we have received no indication that it when 
+  it will be fixed, or if it will ever be fixed.
+
+  Or if you want to take your chances with the slow menu bar, 
+  you can change the default setting in the Preferences window.
+
++ Sketches that use the video library plus OpenGL have a problem on some
+  OS X machines. The workaround is listed in Comment #16 of this bug:
+  http://dev.processing.org/bugs/show_bug.cgi?id=882#c16
+
++ Command line support arrived in a recent release, but is not working yet.
+  http://dev.processing.org/bugs/show_bug.cgi?id=1048
+
++ OpenGL rendering is more dim/darker in release 0149 and later.
+  http://dev.processing.org/bugs/show_bug.cgi?id=958
+  Any help tracking this down would be most appreciated.
+
++ The first few frames of OpenGL sketches on Windows run slowly.
+  http://dev.processing.org/bugs/show_bug.cgi?id=874
+
++ When used with P3D, strokeWeight does not interpolate the Z-coordinates 
+  of the lines, which means that when rotated, these flat lines may 
+  disappear. (Since, uh, lines are, you know, flat.) The OPENGL renderer 
+  setting does not share this problem because it always draws lines 
+  perpendicular to the screen (which we hope to do in a future release).
+  http://dev.processing.org/bugs/show_bug.cgi?id=956
+
+
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+
+
+in spite of their historical feel good campiness, i've removed the
+notes from earlier releases because this file was getting out of hand. 

@@ -16,7 +16,7 @@ void setup()
 {
     Firmata.setFirmwareVersion(0, 1);
     Firmata.attach(ANALOG_MESSAGE, analogWriteCallback);
-    Firmata.begin();
+    Firmata.begin(57600);
 }
 
 void loop()

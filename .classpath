@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="processing/app/tools/format/|processing/app/tools/format/src/|processing/app/Trace.java|processing/app/RunnerClassLoader.java" kind="src" path="app/src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/core"/>
+	<classpathentry kind="lib" path="build/shared/lib/antlr.jar"/>
+	<classpathentry kind="lib" path="build/shared/lib/registry.jar"/>
+	<classpathentry kind="lib" path="build/shared/lib/apple.jar"/>
+	<classpathentry kind="output" path="app/bin"/>
+</classpath>

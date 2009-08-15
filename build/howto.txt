@@ -1,4 +1,8 @@
-HOW TO BUILD ARDUINO ON YOUR FAVORITE PLATFORM
+HOW TO BUILD PROCESSING ON YOUR FAVORITE PLATFORM
+
+If you have questions about the contents of this document, 
+ask questions at the discourse section of the site:
+http://processing.org/discourse/yabb_beta/YaBB.cgi?board=os_core_pde
 
 
 ////////////////////////////////////////////////////////////////////
@@ -13,21 +17,21 @@ HOW TO BUILD ARDUINO ON YOUR FAVORITE PLATFORM
 
 ** of the packages, begin with the defaults, and add:
 
-+ svn - used for version control
++ subversion - used for version control
 
-+ make, gcc-mingw, and g++ - used to build arduino.exe
++ make, gcc-mingw, and g++ - used to build processing.exe
   (this will also pull in gcc-core)
 
-+ perl - use this version, activestate or other distros have trouble
-  
++ perl - use this version from cygwin, activestate or other windows 
+         perl distributions have trouble
+
 + unzip, zip - for dealing with archives
 
-+ included in the defaults, but make sure:
-  coreutils (or textutils), gzip, tar
++ included in the defaults, but make sure: coreutils, gzip, tar
 
 + not required but useful: 
   openssh - command line ssh client
-  nano - handy/simple text editor
+  nano - handy/simple text editor (gnu pico ripoff)
 
 ** and be sure to leave the option selected for 'unix line endings' 
 
@@ -38,33 +42,55 @@ it again, and select the items above. it's also useful to run the
 installer every few months to keep things fresh.
 
 
-1b. On Mac OS X, install Apple's Developer Tools and subversion.
+1b. On Mac OS X, install Apple's Developer Tools (Xcode).
 
-1c. On Linux, you need the Sun Java SDK, avr-gcc, make, and subversion.
-
-
-2. GRAB THE CODE FROM BERLIOS
-
-* this grabs the code as an anonymous user. 
-
-# grab the code, it'll take a while
-svn co svn://svn.berlios.de/arduino/trunk arduino
-# (maybe even a long while for you dialup and international folks)
+    You'll also need subversion: http://subversion.tigris.org/
+    Install it from Fink, Darwinports, or download as a package:
+    http://metissian.com/projects/macosx/subversion/
 
 
-3. BUILD IT
+1c. On Linux, you're pretty much on your own.. You need a pretty 
+    standard development setup along with Subversion.
 
-3a. On the Mac, use the Xcode project to build the Arduino software.
-    Set the active target to App to run Arduino, or to Distribute to
-    create a .zip file.
 
-3b. On Windows or Linux, use the command line.
+2. GRAB THE CODE FROM DEV.PROCESSING.ORG
 
-# on Windows
-cd /path/to/arduino/build/windows
+As of August 12, 2005, we're no longer using CVS and have moved on to
+the brave new world of Subversion. This is scary but hopefully will
+alleviate some of the CVS annoyances. 
+
+To get the code, type this from a prompt:
+svn co svn://processing.org/trunk/processing
+
+That part may take a while, especially for people outside the US or
+who have a slow internet connection. (The JRE binaries are stored in 
+SVN so that we can properly test on the exact platform/runtime setup
+that we'll be releasing.)
+
+
+3. INSTALL QUICKTIME FOR JAVA (Windows users only)
+
+* You'll also need to install QuickTime for Java. Grab the QuickTime
+  (and iTunes) installer from: http://www.apple.com/quicktime/download/
+  or a version that doesn't include iTunes from here:
+  http://www.apple.com/quicktime/download/standalone.html
+  As of QuickTime 7 (iTunes 6), QuickTime for Java is mercifully
+  included by default. 
+
+* QuickTime 6 is no longer supported. QuickTime Alternative has 
+  never been supported. Just use QuickTime 7.
+
+
+4. BUILD IT
+
+# now to build for the first time:
+cd /path/to/processing/build/windows
 
 # or if you're on linux
-cd /path/to/arduino/build/linux
+cd /path/to/processing/build/linux
+
+# let's say you're into black turtlenecks and jeans
+cd /path/to/processing/build/macosx
 
 # and then..
 ./make.sh
@@ -84,15 +110,58 @@ cd /path/to/arduino/build/linux
 //// Updating to the Latest Version
 
 
-4a. Each time you want to update to latest version from svn:
+5a. Each time you want to update to latest version:
 
-cd /path/to/arduino
+cd /path/to/processing
 svn update
 
 
-4b. If new folders have been added, or you're gettin odd errors, use:
+5b. If you're getting strange errors when you try to build, especially
+    if new folders have been added to the Processing repository, remove
+    your 'work' folder and rebuild. Generally, this is a good idea to 
+    do whenever a new release has been made, since that will involve
+    files that may have been changed (or folders that have been moved).
+
+# get to the processing folder
+cd /path/to/processing
 
 # remove the work directory
+cd build/yourplatform
 rm -rf work
 
-$Id$
+# and try again
+./make.sh
+
+Unfortunately there isn't a way to know if new folders have
+since been added. but if you're getting "class not found" errors
+while building, then that's a good indicator that something is
+missing from a subfolder.
+
+
+////////////////////////////////////////////////////////////////////
+
+//// The Frequently Asked Question
+
+- What about Eclipse? What about Ant? Command line sucks.
+
+The command line stuff isn't as scary as it might initially
+seem. Hopefully it's just a matter of following the instructions above
+(and being patient). If not, let us know (via the discourse board)
+where you have trouble so we can fix things.
+
+We're slowly moving development over to Eclipse, which will probably
+include Ant because of cross-platform dependencies. As of release 0140,
+major changes are being implemented to simplify the build process, 
+which should mean that we're pretty close. The environment and all
+the libraries build properly with Eclipse, however we won't be 
+documenting it until the dust has settled.
+
+Some progress has been made by John Houck to get the scripts working
+under ANT, progress can be tracked here:
+http://dev.processing.org/bugs/show_bug.cgi?id=151
+
+
+////////////////////////////////////////////////////////////////////
+
+
+Ben Fry - Updated 10 June 2008

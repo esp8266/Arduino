@@ -12,7 +12,7 @@ use warnings;
 my $verbose = 1;
 my $CURL_OPTIONS = '--silent --show-error';
 
-my $ARDUINO = 'http://www.arduino.cc/en'; # base url for arduino site
+my $ARDUINO = 'http://arduino.cc/en'; # base url for arduino site
 
 my %downloaded = ();  # keep track of the pages we download
 
@@ -28,6 +28,7 @@ my $wire = create_page('Wire.html', "$ARDUINO/Reference/Wire");
 my $servo = create_page('Servo.html', "$ARDUINO/Reference/Servo");
 my $lcd = create_page('LiquidCrystal.html', "$ARDUINO/Reference/LiquidCrystal");
 my $ethernet = create_page('Ethernet.html', "$ARDUINO/Reference/Ethernet");
+my $serial = create_page('Serial.html', "$ARDUINO/Reference/Serial");
 
 create_linked_pages($guide,   qr!$ARDUINO/Guide/(\w+)!,             'Guide_%%.html');
 create_linked_pages($softser, qr!$ARDUINO/Reference/(SoftwareSerial\w+)!, '%%.html');
@@ -39,10 +40,10 @@ create_linked_pages($lcd, qr!$ARDUINO/Reference/(LiquidCrystal\w+)!,        '%%.
 create_linked_pages($ethernet, qr!$ARDUINO/Reference/(Ethernet\w+)!,        '%%.html');
 create_linked_pages($ethernet, qr!$ARDUINO/Reference/(Server\w+)!,        '%%.html');
 create_linked_pages($ethernet, qr!$ARDUINO/Reference/(Client\w+)!,        '%%.html');
+create_linked_pages($serial, qr!$ARDUINO/Serial/(\w+)!,    'Serial_%%.html');
 
 my $index = create_page('index.html', "$ARDUINO/Reference/HomePage");
 
-create_linked_pages($index, qr!$ARDUINO/Serial/(\w+)!,    'Serial_%%.html');
 create_linked_pages($index, qr!$ARDUINO/Reference/(\w+)!,        '%%.html');
 
 my $ext = create_page('Extended.html', "$ARDUINO/Reference/Extended");

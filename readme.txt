@@ -44,28 +44,44 @@ working at using it with the Instant Soup platform.
 Arduino uses the GNU avr-gcc toolchain, avrdude, avr-libc, and code from
 Processing and Wiring.
 
+Icon Design and Artwork created by Thomas Glaser (envis precisely).
+
 UPDATES
 
-<<<<<<< .mine
-0016 - 
-[documentation / examples]
-* Updated Analog, Digital, Sensor, and Communication examples to make style consistent
-Added Tutorials:
-	*  digital input State Change Detection example
-	*  stubs examples, some basic code snippets that get used constantly
-	*  Control Structure examples: For Loop, While Loop, If Statement, Switch Statement
-	*  Displays -- simple display methods:  BarGraph tutorial, row-column scanning tutorial
+0017 - 2009.07.25
 
-=======
+[documentation / examples]
+* Many new and revised examples from Tom Igoe.
+
+[core / libraries]
+* Updated LiquidCrystal library by Limor Fried.  See reference for details.
+* Updated Firmata library to version 2.1 (rev. 25).
+* Replaced the Servo library with one (MegaServo) by Michael Margolis.
+  Supports up to 12 servos on most Arduino boards and 48 on the Mega.
+* Improving the accuracy of the baud rate calculations for serial
+  communication (fixing double-speed problems on 8 MHz Arduino boards).
+  Thanks to gabebear.
+
+[environment]
+* Synchronized with the Processing 1.0.3 code base (rev. 5503), bringing
+  many improvements (listed below).
+* New icons and about image by Thomas Glaser (envis precisely).
+* Support for multiple sketch windows.
+* The serial monitor now has its own window.
+* Comment / Uncomment menu item (in Edit) and keyboard shortcut.
+* Increase and Decrease Indent menu items (in Edit) and keyboard shortcuts.
+* Support for third-party libraries in the SKETCHBOOK/libraries folder.
+* Libraries are now compiled with the sketch, eliminating the delay when
+  switching boards and the need to delete .o files when changing library
+  source code.
+* Arduino now comes as an app file (in a dmg) on the Mac.
+* Adding the Arduino Nano w/ ATmega328 to the Tools > Board menu.
+
 0016 - 2009.05.30
 
 [documentation / examples]
-* New communication examples (w/ corresponding Processing and Max/MSP code)
-* Updating Analog, Digital, and Communication examples to make style consistent
-* Adding digital input State Change Detection example
-* Adding stubs examples, some basic code snippets that get used constantly
-* Adding Control Structure examples: For Loop, While Loop, If Statement
-
+* New communication examples (w/ corresponding Processing and Max/MSP code) by
+  Tom Igoe.
 
 [core / libraries]
 * Adding support for the Arduino Pro and Pro Mini 3.3V / 8 MHz w/ ATmega328.
@@ -92,7 +108,6 @@ Added Tutorials:
 [tools]
 * Adding automatic dependency generation to the Makefile.  (Lars Immisch)
 
->>>>>>> .r660
 0015 - 2009.03.26
 
 [core / libraries]

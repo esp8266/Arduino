@@ -113,13 +113,21 @@ void Client::stop() {
 }
 
 uint8_t Client::connected() {
-  uint8_t s = status();
-  return !(s == SOCK_LISTEN || s == SOCK_CLOSED || s == SOCK_FIN_WAIT ||
-    (s == SOCK_CLOSE_WAIT && !available()));
+  if (_sock == 255) {
+    return 0;
+  } else {
+    uint8_t s = status();
+    return !(s == SOCK_LISTEN || s == SOCK_CLOSED || s == SOCK_FIN_WAIT ||
+      (s == SOCK_CLOSE_WAIT && !available()));
+  }
 }
 
 uint8_t Client::status() {
-  return getSn_SR(_sock);
+  if (_sock == 255) {
+    return SOCK_CLOSED;
+  } else {
+    return getSn_SR(_sock);
+  }
 }
 
 // the next three functions are a hack so we can compare the client returned

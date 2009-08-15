@@ -22,8 +22,7 @@
  * software can test whether it will be compatible with the currently
  * installed firmware. */
 #define FIRMATA_MAJOR_VERSION   2 // for non-compatible changes
-#define FIRMATA_MINOR_VERSION   0 // for backwards compatible changes
-#define VERSION_BLINK_PIN       13 // digital pin to blink version on
+#define FIRMATA_MINOR_VERSION   1 // for backwards compatible changes
 
 #define MAX_DATA_BYTES 32 // max number of data bytes in non-Sysex messages
 
@@ -42,12 +41,22 @@
 #define END_SYSEX               0xF7 // end a MIDI Sysex message
 
 // extended command set using sysex (0-127/0x00-0x7F)
-/* 0x00-0x0F reserved for custom commands */
+/* 0x00-0x0F reserved for user-defined commands */
 #define SERVO_CONFIG            0x70 // set max angle, minPulse, maxPulse, freq
-#define FIRMATA_STRING          0x71 // a string message with 14-bits per char
+#define STRING_DATA             0x71 // a string message with 14-bits per char
+#define SHIFT_DATA              0x75 // a bitstream to/from a shift register
+#define I2C_REQUEST             0x76 // send an I2C read/write request
+#define I2C_REPLY               0x77 // a reply to an I2C read request
+#define I2C_CONFIG				0x78 // config I2C settings such as delay times and power pins
 #define REPORT_FIRMWARE         0x79 // report name and version of the firmware
+#define SAMPLING_INTERVAL       0x7A // set the poll rate of the main loop
 #define SYSEX_NON_REALTIME      0x7E // MIDI Reserved for non-realtime messages
 #define SYSEX_REALTIME          0x7F // MIDI Reserved for realtime messages
+// these are DEPRECATED to make the naming more consistent
+#define FIRMATA_STRING          0x71 // same as STRING_DATA
+#define SYSEX_I2C_REQUEST       0x76 // same as I2C_REQUEST
+#define SYSEX_I2C_REPLY         0x77 // same as I2C_REPLY
+#define SYSEX_SAMPLING_INTERVAL 0x7A // same as SAMPLING_INTERVAL
 
 // pin modes
 //#define INPUT                 0x00 // defined in wiring.h
@@ -55,7 +64,8 @@
 #define ANALOG                  0x02 // analog pin in analogInput mode
 #define PWM                     0x03 // digital pin in PWM output mode
 #define SERVO                   0x04 // digital pin in Servo output mode
-
+#define SHIFT                   0x05 // shiftIn/shiftOut mode
+#define I2C                     0x06 // pin included in I2C setup
 
 extern "C" {
 // callback function types
@@ -146,21 +156,71 @@ extern FirmataClass Firmata;
 #define TOTAL_DIGITAL_PINS      22 // 14 digital + 8 analog
 #define TOTAL_PORTS             3 // total number of ports for the board
 #define ANALOG_PORT             2 // port# of analog used as digital
+#define FIRST_ANALOG_PIN        14 // pin# corresponding to analog 0
+#define VERSION_BLINK_PIN       13 // digital pin to blink version on
 #elif defined(__AVR_ATmega8__)  // old Arduinos
 #define TOTAL_ANALOG_PINS       6
 #define TOTAL_DIGITAL_PINS      20 // 14 digital + 6 analog
 #define TOTAL_PORTS             3  // total number of ports for the board
 #define ANALOG_PORT             2  // port# of analog used as digital
+#define FIRST_ANALOG_PIN        14 // pin# corresponding to analog 0
+#define VERSION_BLINK_PIN       13 // digital pin to blink version on
+#elif defined(__AVR_ATmega1280__)// Arduino Mega
+#define TOTAL_ANALOG_PINS       16
+#define TOTAL_DIGITAL_PINS      70 // 54 digital + 16 analog
+#define TOTAL_PORTS             9 // total number of ports for the board
+#define ANALOG_PORT             8 // port# of analog used as digital
+#define FIRST_ANALOG_PIN        54 // pin# corresponding to analog 0
+#define VERSION_BLINK_PIN       13 // digital pin to blink version on
 #elif defined(__AVR_ATmega128__)// Wiring
 #define TOTAL_ANALOG_PINS       8
 #define TOTAL_DIGITAL_PINS      51
+#define TOTAL_PORTS             7 // total number of ports for the board
+#define ANALOG_PORT             5 // port# of analog used as digital
+#define FIRST_ANALOG_PIN        40 // pin# corresponding to analog 0
+#define VERSION_BLINK_PIN       13 // digital pin to blink version on
+#elif defined(__AVR_AT90USB162__) // Teensy
+#define TOTAL_ANALOG_PINS       0
+#define TOTAL_DIGITAL_PINS      21 // 21 digital + no analog
+#define TOTAL_PORTS             4 // total number of ports for the board
+#define ANALOG_PORT             3 // port# of analog used as digital
+#define FIRST_ANALOG_PIN        21 // pin# corresponding to analog 0
+#define VERSION_BLINK_PIN       6 // digital pin to blink version on
+#elif defined(__AVR_ATmega32U4__) // Teensy
+#define TOTAL_ANALOG_PINS       12
+#define TOTAL_DIGITAL_PINS      25 // 11 digital + 12 analog
+#define TOTAL_PORTS             4 // total number of ports for the board
+#define ANALOG_PORT             3 // port# of analog used as digital
+#define FIRST_ANALOG_PIN        11 // pin# corresponding to analog 0
+#define VERSION_BLINK_PIN       11 // digital pin to blink version on
+#elif defined(__AVR_AT90USB646__) || defined(__AVR_AT90USB1286__) // Teensy++
+#define TOTAL_ANALOG_PINS       8
+#define TOTAL_DIGITAL_PINS      46 // 38 digital + 8 analog
 #define TOTAL_PORTS             6 // total number of ports for the board
-#define ANALOG_PORT             2 // port# of analog used as digital
+#define ANALOG_PORT             5 // port# of analog used as digital
+#define FIRST_ANALOG_PIN        38 // pin# corresponding to analog 0
+#define VERSION_BLINK_PIN       6 // digital pin to blink version on
+#elif defined(__AVR_ATmega644P__) || defined(__AVR_ATmega644__)  // Sanguino
+#define TOTAL_ANALOG_PINS       8
+#define TOTAL_DIGITAL_PINS      32 // 24 digital + 8 analog
+#define TOTAL_PORTS             4 // total number of ports for the board
+#define ANALOG_PORT             3 // port# of analog used as digital
+#define FIRST_ANALOG_PIN        24 // pin# corresponding to analog 0
+#define VERSION_BLINK_PIN       0 // digital pin to blink version on
+#elif defined(__AVR_ATmega645__)  // Illuminato
+#define TOTAL_ANALOG_PINS       6
+#define TOTAL_DIGITAL_PINS      42 // 36 digital + 6 analog
+#define TOTAL_PORTS             6 // total number of ports for the board
+#define ANALOG_PORT             4 // port# of analog used as digital
+#define FIRST_ANALOG_PIN        36 // pin# corresponding to analog 0
+#define VERSION_BLINK_PIN       13 // digital pin to blink version on
 #else // anything else
 #define TOTAL_ANALOG_PINS       6
 #define TOTAL_DIGITAL_PINS      14
 #define TOTAL_PORTS             3 // total number of ports for the board
 #define ANALOG_PORT             2 // port# of analog used as digital
+#define FIRST_ANALOG_PIN        14 // pin# corresponding to analog 0
+#define VERSION_BLINK_PIN       13 // digital pin to blink version on
 #endif
 
 

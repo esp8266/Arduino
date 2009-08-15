@@ -7,70 +7,51 @@ if test -d work
 then
   BUILD_PREPROC=false
 else
-  echo Setting up directories to build arduino...
+  echo Setting up directories to build P5...
   BUILD_PREPROC=true
-  cp -r ../shared work
-  rm -f work/.DS_Store 
-  #cp ../../lib/*.dll work
-  cp dist/*.dll work
-  cp dist/run.bat work
-  chmod 755 work/run.bat
-  cp ../../readme.txt work
-  unix2dos work/readme.txt
-  
-  # needs to make the dir because of packaging goofiness
-  mkdir -p work/classes/arduino/app/syntax
-  mkdir -p work/classes/arduino/app/tools
 
-  echo Extracting reference...
-  cd work
-  unzip reference.zip
-  # necessary for launching reference from shell/command prompt
-  # which is done internally to view reference
-  #chmod +x reference/*.html
-  # needed by 'help' menu
-  #chmod +x reference/environment/*.html
-  # chmod -R +x *.html doesn't seem to work
-  rm reference.zip
-  cd ..
+  mkdir work
+  cp -r ../shared/lib work/
+  cp -r ../shared/tools work/
 
-  echo Extracting enormous JRE...
-  unzip -q  -d work jre.zip
-  # cygwin requires this because of unknown weirdness
-  # it was not formerly this anal retentive
-  cd work/java/bin/
-  #chmod +x *.exe *.dll 
-  #chmod +x client/*.dll
-  cd ../../..
-
-  mkdir work/lib/build
-  #mkdir work/classes
-
-  echo Compiling arduino.exe
-  cd launcher
-  make && cp arduino.exe ../work/
-  cd ..
-
-  # get jikes and depedencies
-  cp dist/jikes.exe work/
-  #chmod +x work/jikes.exe
-
-  cp dist/ICE_JNIRegistry.dll work/
+  cp dist/*.dll work/
+  cp -r dist/drivers work/
 
   cp -r ../../hardware work/
-  cp dist/bootloader/*.* work/hardware/bootloaders/atmega8
-  mkdir work/drivers
-  cp -r dist/drivers/* work/drivers/
 
-  cp dist/avr_tools.zip .
-  echo Extracting avr tools ...
-  unzip -q  -d work/hardware avr_tools.zip
-  rm -f avr_tools.zip
+  cp ../../app/lib/antlr.jar work/lib/
+  cp ../../app/lib/ecj.jar work/lib/
+  cp ../../app/lib/jna.jar work/lib/
+  cp ../../app/lib/oro.jar work/lib/
+  cp ../../app/lib/RXTXcomm.jar work/lib/
 
-  # take care of the examples
-  cp -r ../shared/dist/examples work/
+  echo Copying examples...
+  cp -r ../shared/examples work/
+
+  echo Extracting reference...
+  unzip -q -d work/ ../shared/reference.zip
+
+  echo Extracting avr tools...
+  unzip -q -d work/hardware/ avr_tools.zip
+
+  echo Extracting enormous JRE...
+  unzip -q -d work/ jre.zip
+
+  # build the processing.exe bundle
+  # there are a few hacks in the source to launch4j-3.0.1
+  # to build them, use the following:
+  # cd head_src/gui_head && make -f Makefile.win
+  cd launcher
+  ./launch4j/launch4jc.exe config.xml
+  cp arduino.exe ../work/
+  cd ..
 
   # chmod +x the crew
+  # cygwin requires this because of unknown weirdness
+  # it was not formerly this anal retentive
+  # with the html, it's necessary on windows for launching reference 
+  # from shell/command prompt, which is done internally to view reference
+  find work -name "*.html" -exec chmod +x {} ';'
   find work -name "*.dll" -exec chmod +x {} ';'
   find work -name "*.exe" -exec chmod +x {} ';'
   find work -name "*.html" -exec chmod +x {} ';'
@@ -78,26 +59,64 @@ fi
 
 cd ../..
 
+
+### -- BUILD CORE ----------------------------------------------
+
+echo Building processing.core...
+
+cd core
+
+#CLASSPATH="..\\build\\windows\\work\\java\\lib\\rt.jar;..\\build\\windows\\work\\java\\lib\\tools.jar"
+#CLASSPATH="..\\build\\windows\\work\\java\\lib\\tools.jar"
+#export CLASSPATH
+
+perl preproc.pl
+
+mkdir -p bin
+../build/windows/work/java/bin/java \
+    -classpath "..\\build\\windows\\work\\java\\lib\\tools.jar" \
+    com.sun.tools.javac.Main \
+    -source 1.5 -target 1.5 -d bin \
+    src/processing/core/*.java src/processing/xml/*.java
+
+rm -f ../build/windows/work/lib/core.jar
+
+# package this folder into core.jar
+cd bin && zip -rq ../../build/windows/work/lib/core.jar \
+  processing/core/*.class processing/xml/*.class && cd ..
+
+# back to base processing dir
+cd ..
+
+
+
 ### -- BUILD PDE ------------------------------------------------
+
+echo Building the PDE...
 
 cd app
 
-CLASSPATH="..\\build\\windows\\work\\lib\\RXTXcomm.jar;..\\build\\windows\\work\\lib\\mrj.jar;..\\build\\windows\\work\\lib\antlr.jar;..\\build\\windows\\work\\lib\\oro.jar;..\\build\\windows\\work\\lib\\registry.jar;..\\build\\windows\\work\\java\\lib\\rt.jar"
+# has to be present, otherwise javac will complain of file writing errors
+rm -rf ../build/windows/work/classes
+mkdir ../build/windows/work/classes
 
-# compile the code as java 1.3, so that the application will run and
-# show the user an error, rather than crapping out with some strange
-# "class not found" crap
-# need to do this twice because otherwise dependencies aren't resolved right.
-../build/windows/work/jikes -target 1.3 +D -classpath "$CLASSPATH;..\\build\\windows\\work\\classes" -d ..\\build\\windows\\work\\classes ../core/*.java preproc/*.java syntax/*.java tools/*.java *.java
-../build/windows/work/jikes -target 1.3 +D -classpath "$CLASSPATH;..\\build\\windows\\work\\classes" -d ..\\build\\windows\\work\\classes ../core/*.java preproc/*.java syntax/*.java tools/*.java *.java
+../build/windows/work/java/bin/java \
+    -classpath "..\\build\\windows\\work\\java\\lib\\tools.jar" \
+    com.sun.tools.javac.Main \
+    -source 1.5 -target 1.5 \
+    -classpath "..\\build\\windows\\work\\lib\\core.jar;..\\build\\windows\\work\\lib\antlr.jar;..\\build\\windows\\work\\lib\\ecj.jar;..\\build\\windows\\work\\lib\\jna.jar;..\\build\\windows\\work\\lib\\oro.jar;..\\build\\windows\\work\\lib\\RXTXcomm.jar;..\\build\\windows\\work\\java\\lib\\tools.jar" \
+    -d ..\\build\\windows\\work\\classes \
+    src/processing/app/*.java \
+    src/processing/app/debug/*.java \
+    src/processing/app/syntax/*.java \
+    src/processing/app/preproc/*.java \
+    src/processing/app/tools/*.java \
+    src/processing/app/windows/*.java
 
 cd ../build/windows/work/classes
 rm -f ../lib/pde.jar
-zip -0rq ../lib/pde.jar .
-
-# back to build/windows
+zip -rq ../lib/pde.jar .
 cd ../..
-
 
 
 echo

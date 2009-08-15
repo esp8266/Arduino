@@ -1,2 +1,0 @@
-void setup();
-void loop();

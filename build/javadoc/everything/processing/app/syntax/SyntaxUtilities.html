@@ -1,0 +1,316 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+SyntaxUtilities
+</TITLE>
+
+<META NAME="keywords" CONTENT="processing.app.syntax.SyntaxUtilities class">
+
+<LINK REL ="stylesheet" TYPE="text/css" HREF="../../../stylesheet.css" TITLE="Style">
+
+<SCRIPT type="text/javascript">
+function windowTitle()
+{
+    parent.document.title="SyntaxUtilities";
+}
+</SCRIPT>
+<NOSCRIPT>
+</NOSCRIPT>
+
+</HEAD>
+
+<BODY BGCOLOR="white" onload="windowTitle();">
+
+
+<!-- ========= START OF TOP NAVBAR ======= -->
+<A NAME="navbar_top"><!-- --></A>
+<A HREF="#skip-navbar_top" title="Skip navigation links"></A>
+<TABLE BORDER="0" WIDTH="100%" CELLPADDING="1" CELLSPACING="0" SUMMARY="">
+<TR>
+<TD COLSPAN=2 BGCOLOR="#EEEEFF" CLASS="NavBarCell1">
+<A NAME="navbar_top_firstrow"><!-- --></A>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="3" SUMMARY="">
+  <TR ALIGN="center" VALIGN="top">
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-summary.html"><FONT CLASS="NavBarFont1"><B>Package</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#FFFFFF" CLASS="NavBarCell1Rev"> &nbsp;<FONT CLASS="NavBarFont1Rev"><B>Class</B></FONT>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-tree.html"><FONT CLASS="NavBarFont1"><B>Tree</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../deprecated-list.html"><FONT CLASS="NavBarFont1"><B>Deprecated</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../index-all.html"><FONT CLASS="NavBarFont1"><B>Index</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../help-doc.html"><FONT CLASS="NavBarFont1"><B>Help</B></FONT></A>&nbsp;</TD>
+  </TR>
+</TABLE>
+</TD>
+<TD ALIGN="right" VALIGN="top" ROWSPAN=3><EM>
+</EM>
+</TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+&nbsp;<A HREF="../../../processing/app/syntax/SyntaxStyle.html" title="class in processing.app.syntax"><B>PREV CLASS</B></A>&nbsp;
+&nbsp;<A HREF="../../../processing/app/syntax/TextAreaDefaults.html" title="class in processing.app.syntax"><B>NEXT CLASS</B></A></FONT></TD>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+  <A HREF="../../../index.html?processing/app/syntax/SyntaxUtilities.html" target="_top"><B>FRAMES</B></A>  &nbsp;
+&nbsp;<A HREF="SyntaxUtilities.html" target="_top"><B>NO FRAMES</B></A>  &nbsp;
+&nbsp;<SCRIPT type="text/javascript">
+  <!--
+  if(window==top) {
+    document.writeln('<A HREF="../../../allclasses-noframe.html"><B>All Classes</B></A>');
+  }
+  //-->
+</SCRIPT>
+<NOSCRIPT>
+  <A HREF="../../../allclasses-noframe.html"><B>All Classes</B></A>
+</NOSCRIPT>
+
+
+</FONT></TD>
+</TR>
+<TR>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+  SUMMARY:&nbsp;NESTED&nbsp;|&nbsp;FIELD&nbsp;|&nbsp;CONSTR&nbsp;|&nbsp;<A HREF="#method_summary">METHOD</A></FONT></TD>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+DETAIL:&nbsp;FIELD&nbsp;|&nbsp;CONSTR&nbsp;|&nbsp;<A HREF="#method_detail">METHOD</A></FONT></TD>
+</TR>
+</TABLE>
+<A NAME="skip-navbar_top"></A>
+<!-- ========= END OF TOP NAVBAR ========= -->
+
+<HR>
+<!-- ======== START OF CLASS DATA ======== -->
+<H2>
+<FONT SIZE="-1">
+processing.app.syntax</FONT>
+<BR>
+Class SyntaxUtilities</H2>
+<PRE>
+java.lang.Object
+  <IMG SRC="../../../resources/inherit.gif" ALT="extended by "><B>processing.app.syntax.SyntaxUtilities</B>
+</PRE>
+<HR>
+<DL>
+<DT><PRE>public class <B>SyntaxUtilities</B><DT>extends java.lang.Object</DL>
+</PRE>
+
+<P>
+Class with several utility functions used by jEdit's syntax colorizing
+ subsystem.
+<P>
+
+<P>
+<HR>
+
+<P>
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<A NAME="method_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Method Summary</B></FONT></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;<A HREF="../../../processing/app/syntax/SyntaxStyle.html" title="class in processing.app.syntax">SyntaxStyle</A>[]</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/SyntaxUtilities.html#getDefaultSyntaxStyles()">getDefaultSyntaxStyles</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the default style table.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/SyntaxUtilities.html#paintSyntaxLine(javax.swing.text.Segment, processing.app.syntax.Token, processing.app.syntax.SyntaxStyle[], javax.swing.text.TabExpander, java.awt.Graphics, int, int)">paintSyntaxLine</A></B>(javax.swing.text.Segment&nbsp;line,
+                <A HREF="../../../processing/app/syntax/Token.html" title="class in processing.app.syntax">Token</A>&nbsp;tokens,
+                <A HREF="../../../processing/app/syntax/SyntaxStyle.html" title="class in processing.app.syntax">SyntaxStyle</A>[]&nbsp;styles,
+                javax.swing.text.TabExpander&nbsp;expander,
+                java.awt.Graphics&nbsp;gfx,
+                int&nbsp;x,
+                int&nbsp;y)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Paints the specified line onto the graphics context.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;boolean</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/SyntaxUtilities.html#regionMatches(boolean, javax.swing.text.Segment, int, char[])">regionMatches</A></B>(boolean&nbsp;ignoreCase,
+              javax.swing.text.Segment&nbsp;text,
+              int&nbsp;offset,
+              char[]&nbsp;match)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Checks if a subregion of a <code>Segment</code> is equal to a
+ character array.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;boolean</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../../processing/app/syntax/SyntaxUtilities.html#regionMatches(boolean, javax.swing.text.Segment, int, java.lang.String)">regionMatches</A></B>(boolean&nbsp;ignoreCase,
+              javax.swing.text.Segment&nbsp;text,
+              int&nbsp;offset,
+              java.lang.String&nbsp;match)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Checks if a subregion of a <code>Segment</code> is equal to a
+ string.</TD>
+</TR>
+</TABLE>
+&nbsp;<A NAME="methods_inherited_from_class_java.lang.Object"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Methods inherited from class java.lang.Object</B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>equals, getClass, hashCode, notify, notifyAll, toString, wait, wait, wait</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;
+<P>
+
+<!-- ============ METHOD DETAIL ========== -->
+
+<A NAME="method_detail"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="1"><FONT SIZE="+2">
+<B>Method Detail</B></FONT></TH>
+</TR>
+</TABLE>
+
+<A NAME="regionMatches(boolean, javax.swing.text.Segment, int, java.lang.String)"><!-- --></A><H3>
+regionMatches</H3>
+<PRE>
+public static boolean <B>regionMatches</B>(boolean&nbsp;ignoreCase,
+                                    javax.swing.text.Segment&nbsp;text,
+                                    int&nbsp;offset,
+                                    java.lang.String&nbsp;match)</PRE>
+<DL>
+<DD>Checks if a subregion of a <code>Segment</code> is equal to a
+ string.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>ignoreCase</CODE> - True if case should be ignored, false otherwise<DD><CODE>text</CODE> - The segment<DD><CODE>offset</CODE> - The offset into the segment<DD><CODE>match</CODE> - The string to match</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="regionMatches(boolean, javax.swing.text.Segment, int, char[])"><!-- --></A><H3>
+regionMatches</H3>
+<PRE>
+public static boolean <B>regionMatches</B>(boolean&nbsp;ignoreCase,
+                                    javax.swing.text.Segment&nbsp;text,
+                                    int&nbsp;offset,
+                                    char[]&nbsp;match)</PRE>
+<DL>
+<DD>Checks if a subregion of a <code>Segment</code> is equal to a
+ character array.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>ignoreCase</CODE> - True if case should be ignored, false otherwise<DD><CODE>text</CODE> - The segment<DD><CODE>offset</CODE> - The offset into the segment<DD><CODE>match</CODE> - The character array to match</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getDefaultSyntaxStyles()"><!-- --></A><H3>
+getDefaultSyntaxStyles</H3>
+<PRE>
+public static <A HREF="../../../processing/app/syntax/SyntaxStyle.html" title="class in processing.app.syntax">SyntaxStyle</A>[] <B>getDefaultSyntaxStyles</B>()</PRE>
+<DL>
+<DD>Returns the default style table. This can be passed to the
+ <code>setStyles()</code> method of <code>SyntaxDocument</code>
+ to use the default syntax styles.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="paintSyntaxLine(javax.swing.text.Segment, processing.app.syntax.Token, processing.app.syntax.SyntaxStyle[], javax.swing.text.TabExpander, java.awt.Graphics, int, int)"><!-- --></A><H3>
+paintSyntaxLine</H3>
+<PRE>
+public static int <B>paintSyntaxLine</B>(javax.swing.text.Segment&nbsp;line,
+                                  <A HREF="../../../processing/app/syntax/Token.html" title="class in processing.app.syntax">Token</A>&nbsp;tokens,
+                                  <A HREF="../../../processing/app/syntax/SyntaxStyle.html" title="class in processing.app.syntax">SyntaxStyle</A>[]&nbsp;styles,
+                                  javax.swing.text.TabExpander&nbsp;expander,
+                                  java.awt.Graphics&nbsp;gfx,
+                                  int&nbsp;x,
+                                  int&nbsp;y)</PRE>
+<DL>
+<DD>Paints the specified line onto the graphics context. Note that this
+ method munges the offset and count values of the segment.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>line</CODE> - The line segment<DD><CODE>tokens</CODE> - The token list for the line<DD><CODE>styles</CODE> - The syntax style list<DD><CODE>expander</CODE> - The tab expander used to determine tab stops. May
+ be null<DD><CODE>gfx</CODE> - The graphics context<DD><CODE>x</CODE> - The x co-ordinate<DD><CODE>y</CODE> - The y co-ordinate
+<DT><B>Returns:</B><DD>The x co-ordinate, plus the width of the painted string</DL>
+</DD>
+</DL>
+<!-- ========= END OF CLASS DATA ========= -->
+<HR>
+
+
+<!-- ======= START OF BOTTOM NAVBAR ====== -->
+<A NAME="navbar_bottom"><!-- --></A>
+<A HREF="#skip-navbar_bottom" title="Skip navigation links"></A>
+<TABLE BORDER="0" WIDTH="100%" CELLPADDING="1" CELLSPACING="0" SUMMARY="">
+<TR>
+<TD COLSPAN=2 BGCOLOR="#EEEEFF" CLASS="NavBarCell1">
+<A NAME="navbar_bottom_firstrow"><!-- --></A>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="3" SUMMARY="">
+  <TR ALIGN="center" VALIGN="top">
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-summary.html"><FONT CLASS="NavBarFont1"><B>Package</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#FFFFFF" CLASS="NavBarCell1Rev"> &nbsp;<FONT CLASS="NavBarFont1Rev"><B>Class</B></FONT>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-tree.html"><FONT CLASS="NavBarFont1"><B>Tree</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../deprecated-list.html"><FONT CLASS="NavBarFont1"><B>Deprecated</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../index-all.html"><FONT CLASS="NavBarFont1"><B>Index</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../../help-doc.html"><FONT CLASS="NavBarFont1"><B>Help</B></FONT></A>&nbsp;</TD>
+  </TR>
+</TABLE>
+</TD>
+<TD ALIGN="right" VALIGN="top" ROWSPAN=3><EM>
+</EM>
+</TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+&nbsp;<A HREF="../../../processing/app/syntax/SyntaxStyle.html" title="class in processing.app.syntax"><B>PREV CLASS</B></A>&nbsp;
+&nbsp;<A HREF="../../../processing/app/syntax/TextAreaDefaults.html" title="class in processing.app.syntax"><B>NEXT CLASS</B></A></FONT></TD>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+  <A HREF="../../../index.html?processing/app/syntax/SyntaxUtilities.html" target="_top"><B>FRAMES</B></A>  &nbsp;
+&nbsp;<A HREF="SyntaxUtilities.html" target="_top"><B>NO FRAMES</B></A>  &nbsp;
+&nbsp;<SCRIPT type="text/javascript">
+  <!--
+  if(window==top) {
+    document.writeln('<A HREF="../../../allclasses-noframe.html"><B>All Classes</B></A>');
+  }
+  //-->
+</SCRIPT>
+<NOSCRIPT>
+  <A HREF="../../../allclasses-noframe.html"><B>All Classes</B></A>
+</NOSCRIPT>
+
+
+</FONT></TD>
+</TR>
+<TR>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+  SUMMARY:&nbsp;NESTED&nbsp;|&nbsp;FIELD&nbsp;|&nbsp;CONSTR&nbsp;|&nbsp;<A HREF="#method_summary">METHOD</A></FONT></TD>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+DETAIL:&nbsp;FIELD&nbsp;|&nbsp;CONSTR&nbsp;|&nbsp;<A HREF="#method_detail">METHOD</A></FONT></TD>
+</TR>
+</TABLE>
+<A NAME="skip-navbar_bottom"></A>
+<!-- ======== END OF BOTTOM NAVBAR ======= -->
+
+<HR>
+
+</BODY>
+</HTML>

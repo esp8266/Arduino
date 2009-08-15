@@ -28,7 +28,7 @@ void setup()
     servo9.attach(9);
     servo10.attach(10);
    
-    Firmata.begin();
+    Firmata.begin(57600);
 }
 
 void loop() 

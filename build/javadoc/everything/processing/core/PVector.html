@@ -1,0 +1,1278 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+PVector
+</TITLE>
+
+<META NAME="keywords" CONTENT="processing.core.PVector class">
+
+<LINK REL ="stylesheet" TYPE="text/css" HREF="../../stylesheet.css" TITLE="Style">
+
+<SCRIPT type="text/javascript">
+function windowTitle()
+{
+    parent.document.title="PVector";
+}
+</SCRIPT>
+<NOSCRIPT>
+</NOSCRIPT>
+
+</HEAD>
+
+<BODY BGCOLOR="white" onload="windowTitle();">
+
+
+<!-- ========= START OF TOP NAVBAR ======= -->
+<A NAME="navbar_top"><!-- --></A>
+<A HREF="#skip-navbar_top" title="Skip navigation links"></A>
+<TABLE BORDER="0" WIDTH="100%" CELLPADDING="1" CELLSPACING="0" SUMMARY="">
+<TR>
+<TD COLSPAN=2 BGCOLOR="#EEEEFF" CLASS="NavBarCell1">
+<A NAME="navbar_top_firstrow"><!-- --></A>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="3" SUMMARY="">
+  <TR ALIGN="center" VALIGN="top">
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-summary.html"><FONT CLASS="NavBarFont1"><B>Package</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#FFFFFF" CLASS="NavBarCell1Rev"> &nbsp;<FONT CLASS="NavBarFont1Rev"><B>Class</B></FONT>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-tree.html"><FONT CLASS="NavBarFont1"><B>Tree</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../deprecated-list.html"><FONT CLASS="NavBarFont1"><B>Deprecated</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../index-all.html"><FONT CLASS="NavBarFont1"><B>Index</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../help-doc.html"><FONT CLASS="NavBarFont1"><B>Help</B></FONT></A>&nbsp;</TD>
+  </TR>
+</TABLE>
+</TD>
+<TD ALIGN="right" VALIGN="top" ROWSPAN=3><EM>
+</EM>
+</TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+&nbsp;<A HREF="../../processing/core/PTriangle.html" title="class in processing.core"><B>PREV CLASS</B></A>&nbsp;
+&nbsp;NEXT CLASS</FONT></TD>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+  <A HREF="../../index.html?processing/core/PVector.html" target="_top"><B>FRAMES</B></A>  &nbsp;
+&nbsp;<A HREF="PVector.html" target="_top"><B>NO FRAMES</B></A>  &nbsp;
+&nbsp;<SCRIPT type="text/javascript">
+  <!--
+  if(window==top) {
+    document.writeln('<A HREF="../../allclasses-noframe.html"><B>All Classes</B></A>');
+  }
+  //-->
+</SCRIPT>
+<NOSCRIPT>
+  <A HREF="../../allclasses-noframe.html"><B>All Classes</B></A>
+</NOSCRIPT>
+
+
+</FONT></TD>
+</TR>
+<TR>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+  SUMMARY:&nbsp;NESTED&nbsp;|&nbsp;<A HREF="#field_summary">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor_summary">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_summary">METHOD</A></FONT></TD>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+DETAIL:&nbsp;<A HREF="#field_detail">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor_detail">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_detail">METHOD</A></FONT></TD>
+</TR>
+</TABLE>
+<A NAME="skip-navbar_top"></A>
+<!-- ========= END OF TOP NAVBAR ========= -->
+
+<HR>
+<!-- ======== START OF CLASS DATA ======== -->
+<H2>
+<FONT SIZE="-1">
+processing.core</FONT>
+<BR>
+Class PVector</H2>
+<PRE>
+java.lang.Object
+  <IMG SRC="../../resources/inherit.gif" ALT="extended by "><B>processing.core.PVector</B>
+</PRE>
+<HR>
+<DL>
+<DT><PRE>public class <B>PVector</B><DT>extends java.lang.Object</DL>
+</PRE>
+
+<P>
+A class to describe a two or three dimensional vector.
+ <p>
+ The result of all functions are applied to the vector itself, with the
+ exception of cross(), which returns a new PVector (or writes to a specified
+ 'target' PVector). That is, add() will add the contents of one vector to
+ this one. Using add() with additional parameters allows you to put the
+ result into a new PVector. Functions that act on multiple vectors also
+ include static versions. Because creating new objects can be computationally
+ expensive, most functions include an optional 'target' PVector, so that a
+ new PVector object is not created with each operation.
+ <p>
+ Initially based on the Vector3D class by <a href="http://www.shiffman.net">Dan Shiffman</a>.
+<P>
+
+<P>
+<HR>
+
+<P>
+<!-- =========== FIELD SUMMARY =========== -->
+
+<A NAME="field_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Field Summary</B></FONT></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;float</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#x">x</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The x component of the vector.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;float</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#y">y</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The y component of the vector.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;float</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#z">z</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The z component of the vector.</TD>
+</TR>
+</TABLE>
+&nbsp;
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+
+<A NAME="constructor_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Constructor Summary</B></FONT></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#PVector()">PVector</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Constructor for an empty vector: x, y, and z are set to 0.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#PVector(float, float)">PVector</A></B>(float&nbsp;x,
+        float&nbsp;y)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Constructor for a 2D vector: z coordinate is set to 0.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#PVector(float, float, float)">PVector</A></B>(float&nbsp;x,
+        float&nbsp;y,
+        float&nbsp;z)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Constructor for a 3D vector.</TD>
+</TR>
+</TABLE>
+&nbsp;
+<!-- ========== METHOD SUMMARY =========== -->
+
+<A NAME="method_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Method Summary</B></FONT></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#add(float, float, float)">add</A></B>(float&nbsp;x,
+    float&nbsp;y,
+    float&nbsp;z)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#add(processing.core.PVector)">add</A></B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Add a vector to this vector</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A></CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#add(processing.core.PVector, processing.core.PVector)">add</A></B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v1,
+    <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v2)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Add two vectors</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A></CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#add(processing.core.PVector, processing.core.PVector, processing.core.PVector)">add</A></B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v1,
+    <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v2,
+    <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;target)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Add two vectors into a target vector</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;float</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#angleBetween(processing.core.PVector, processing.core.PVector)">angleBetween</A></B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v1,
+             <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v2)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Calculate the angle between two vectors, using the dot product</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;float[]</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#array()">array</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Return a representation of this vector as a float array.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A></CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#cross(processing.core.PVector)">cross</A></B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Return a vector composed of the cross product between this and another.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A></CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#cross(processing.core.PVector, processing.core.PVector)">cross</A></B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v,
+      <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;target)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Perform cross product between this and another vector, and store the
+ result in 'target'.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A></CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#cross(processing.core.PVector, processing.core.PVector, processing.core.PVector)">cross</A></B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v1,
+      <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v2,
+      <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;target)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;float</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#dist(processing.core.PVector)">dist</A></B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Calculate the Euclidean distance between two points (considering a point as a vector object)</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;float</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#dist(processing.core.PVector, processing.core.PVector)">dist</A></B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v1,
+     <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v2)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Calculate the Euclidean distance between two points (considering a point as a vector object)</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#div(float)">div</A></B>(float&nbsp;n)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Divide this vector by a scalar</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#div(processing.core.PVector)">div</A></B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Divide each element of one vector by the elements of another vector.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A></CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#div(processing.core.PVector, float)">div</A></B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v,
+    float&nbsp;n)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Divide a vector by a scalar and return the result in a new vector.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A></CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#div(processing.core.PVector, float, processing.core.PVector)">div</A></B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v,
+    float&nbsp;n,
+    <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;target)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A></CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#div(processing.core.PVector, processing.core.PVector)">div</A></B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v1,
+    <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v2)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Multiply each element of one vector by the individual elements of another
+ vector, and return the result as a new PVector.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A></CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#div(processing.core.PVector, processing.core.PVector, processing.core.PVector)">div</A></B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v1,
+    <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v2,
+    <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;target)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Divide each element of one vector by the individual elements of another
+ vector, and write the result into a target vector.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;float</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#dot(float, float, float)">dot</A></B>(float&nbsp;x,
+    float&nbsp;y,
+    float&nbsp;z)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;float</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#dot(processing.core.PVector)">dot</A></B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Calculate the dot product with another vector</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A></CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#get()">get</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get a copy of this vector.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;float[]</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#get(float[])">get</A></B>(float[]&nbsp;target)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;float</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#heading2D()">heading2D</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Calculate the angle of rotation for this vector (only 2D vectors)</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#limit(float)">limit</A></B>(float&nbsp;max)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Limit the magnitude of this vector</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;float</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#mag()">mag</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Calculate the magnitude (length) of the vector</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#mult(float)">mult</A></B>(float&nbsp;n)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Multiply this vector by a scalar</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#mult(processing.core.PVector)">mult</A></B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Multiply each element of one vector by the elements of another vector.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A></CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#mult(processing.core.PVector, float)">mult</A></B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v,
+     float&nbsp;n)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Multiply a vector by a scalar</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A></CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#mult(processing.core.PVector, float, processing.core.PVector)">mult</A></B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v,
+     float&nbsp;n,
+     <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;target)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Multiply a vector by a scalar, and write the result into a target PVector.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A></CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#mult(processing.core.PVector, processing.core.PVector)">mult</A></B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v1,
+     <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v2)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Multiply each element of one vector by the individual elements of another
+ vector, and return the result as a new PVector.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A></CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#mult(processing.core.PVector, processing.core.PVector, processing.core.PVector)">mult</A></B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v1,
+     <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v2,
+     <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;target)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Multiply each element of one vector by the individual elements of another
+ vector, and write the result into a target vector.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#normalize()">normalize</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Normalize the vector to length 1 (make it a unit vector)</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A></CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#normalize(processing.core.PVector)">normalize</A></B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;target)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Normalize this vector, storing the result in another vector.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#set(float[])">set</A></B>(float[]&nbsp;source)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Set the x, y (and maybe z) coordinates using a float[] array as the source.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#set(float, float, float)">set</A></B>(float&nbsp;x,
+    float&nbsp;y,
+    float&nbsp;z)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Set x, y, and z coordinates.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#set(processing.core.PVector)">set</A></B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Set x, y, and z coordinates from a Vector3D object.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#sub(float, float, float)">sub</A></B>(float&nbsp;x,
+    float&nbsp;y,
+    float&nbsp;z)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;void</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#sub(processing.core.PVector)">sub</A></B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Subtract a vector from this vector</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A></CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#sub(processing.core.PVector, processing.core.PVector)">sub</A></B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v1,
+    <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v2)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Subtract one vector from another</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A></CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#sub(processing.core.PVector, processing.core.PVector, processing.core.PVector)">sub</A></B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v1,
+    <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v2,
+    <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;target)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.lang.String</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/core/PVector.html#toString()">toString</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+</TR>
+</TABLE>
+&nbsp;<A NAME="methods_inherited_from_class_java.lang.Object"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Methods inherited from class java.lang.Object</B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>equals, getClass, hashCode, notify, notifyAll, wait, wait, wait</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;
+<P>
+
+<!-- ============ FIELD DETAIL =========== -->
+
+<A NAME="field_detail"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="1"><FONT SIZE="+2">
+<B>Field Detail</B></FONT></TH>
+</TR>
+</TABLE>
+
+<A NAME="x"><!-- --></A><H3>
+x</H3>
+<PRE>
+public float <B>x</B></PRE>
+<DL>
+<DD>The x component of the vector.
+<P>
+<DL>
+</DL>
+</DL>
+<HR>
+
+<A NAME="y"><!-- --></A><H3>
+y</H3>
+<PRE>
+public float <B>y</B></PRE>
+<DL>
+<DD>The y component of the vector.
+<P>
+<DL>
+</DL>
+</DL>
+<HR>
+
+<A NAME="z"><!-- --></A><H3>
+z</H3>
+<PRE>
+public float <B>z</B></PRE>
+<DL>
+<DD>The z component of the vector.
+<P>
+<DL>
+</DL>
+</DL>
+
+<!-- ========= CONSTRUCTOR DETAIL ======== -->
+
+<A NAME="constructor_detail"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="1"><FONT SIZE="+2">
+<B>Constructor Detail</B></FONT></TH>
+</TR>
+</TABLE>
+
+<A NAME="PVector()"><!-- --></A><H3>
+PVector</H3>
+<PRE>
+public <B>PVector</B>()</PRE>
+<DL>
+<DD>Constructor for an empty vector: x, y, and z are set to 0.
+<P>
+</DL>
+<HR>
+
+<A NAME="PVector(float, float, float)"><!-- --></A><H3>
+PVector</H3>
+<PRE>
+public <B>PVector</B>(float&nbsp;x,
+               float&nbsp;y,
+               float&nbsp;z)</PRE>
+<DL>
+<DD>Constructor for a 3D vector.
+<P>
+<DL>
+<DT><B>Parameters:</B><DD><CODE>x</CODE> - the x coordinate.<DD><CODE>y</CODE> - the y coordinate.<DD><CODE>z</CODE> - the y coordinate.</DL>
+</DL>
+<HR>
+
+<A NAME="PVector(float, float)"><!-- --></A><H3>
+PVector</H3>
+<PRE>
+public <B>PVector</B>(float&nbsp;x,
+               float&nbsp;y)</PRE>
+<DL>
+<DD>Constructor for a 2D vector: z coordinate is set to 0.
+<P>
+<DL>
+<DT><B>Parameters:</B><DD><CODE>x</CODE> - the x coordinate.<DD><CODE>y</CODE> - the y coordinate.</DL>
+</DL>
+
+<!-- ============ METHOD DETAIL ========== -->
+
+<A NAME="method_detail"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="1"><FONT SIZE="+2">
+<B>Method Detail</B></FONT></TH>
+</TR>
+</TABLE>
+
+<A NAME="set(float, float, float)"><!-- --></A><H3>
+set</H3>
+<PRE>
+public void <B>set</B>(float&nbsp;x,
+                float&nbsp;y,
+                float&nbsp;z)</PRE>
+<DL>
+<DD>Set x, y, and z coordinates.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>x</CODE> - the x coordinate.<DD><CODE>y</CODE> - the y coordinate.<DD><CODE>z</CODE> - the z coordinate.</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="set(processing.core.PVector)"><!-- --></A><H3>
+set</H3>
+<PRE>
+public void <B>set</B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v)</PRE>
+<DL>
+<DD>Set x, y, and z coordinates from a Vector3D object.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>v</CODE> - the PVector object to be copied</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="set(float[])"><!-- --></A><H3>
+set</H3>
+<PRE>
+public void <B>set</B>(float[]&nbsp;source)</PRE>
+<DL>
+<DD>Set the x, y (and maybe z) coordinates using a float[] array as the source.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>source</CODE> - array to copy from</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="get()"><!-- --></A><H3>
+get</H3>
+<PRE>
+public <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A> <B>get</B>()</PRE>
+<DL>
+<DD>Get a copy of this vector.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="get(float[])"><!-- --></A><H3>
+get</H3>
+<PRE>
+public float[] <B>get</B>(float[]&nbsp;target)</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mag()"><!-- --></A><H3>
+mag</H3>
+<PRE>
+public float <B>mag</B>()</PRE>
+<DL>
+<DD>Calculate the magnitude (length) of the vector
+<P>
+<DD><DL>
+
+<DT><B>Returns:</B><DD>the magnitude of the vector</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="add(processing.core.PVector)"><!-- --></A><H3>
+add</H3>
+<PRE>
+public void <B>add</B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v)</PRE>
+<DL>
+<DD>Add a vector to this vector
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>v</CODE> - the vector to be added</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="add(float, float, float)"><!-- --></A><H3>
+add</H3>
+<PRE>
+public void <B>add</B>(float&nbsp;x,
+                float&nbsp;y,
+                float&nbsp;z)</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="add(processing.core.PVector, processing.core.PVector)"><!-- --></A><H3>
+add</H3>
+<PRE>
+public static <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A> <B>add</B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v1,
+                          <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v2)</PRE>
+<DL>
+<DD>Add two vectors
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>v1</CODE> - a vector<DD><CODE>v2</CODE> - another vector
+<DT><B>Returns:</B><DD>a new vector that is the sum of v1 and v2</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="add(processing.core.PVector, processing.core.PVector, processing.core.PVector)"><!-- --></A><H3>
+add</H3>
+<PRE>
+public static <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A> <B>add</B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v1,
+                          <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v2,
+                          <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;target)</PRE>
+<DL>
+<DD>Add two vectors into a target vector
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>v1</CODE> - a vector<DD><CODE>v2</CODE> - another vector<DD><CODE>target</CODE> - the target vector (if null, a new vector will be created)
+<DT><B>Returns:</B><DD>a new vector that is the sum of v1 and v2</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="sub(processing.core.PVector)"><!-- --></A><H3>
+sub</H3>
+<PRE>
+public void <B>sub</B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v)</PRE>
+<DL>
+<DD>Subtract a vector from this vector
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>v</CODE> - the vector to be subtracted</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="sub(float, float, float)"><!-- --></A><H3>
+sub</H3>
+<PRE>
+public void <B>sub</B>(float&nbsp;x,
+                float&nbsp;y,
+                float&nbsp;z)</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="sub(processing.core.PVector, processing.core.PVector)"><!-- --></A><H3>
+sub</H3>
+<PRE>
+public static <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A> <B>sub</B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v1,
+                          <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v2)</PRE>
+<DL>
+<DD>Subtract one vector from another
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>v1</CODE> - a vector<DD><CODE>v2</CODE> - another vector
+<DT><B>Returns:</B><DD>a new vector that is v1 - v2</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="sub(processing.core.PVector, processing.core.PVector, processing.core.PVector)"><!-- --></A><H3>
+sub</H3>
+<PRE>
+public static <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A> <B>sub</B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v1,
+                          <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v2,
+                          <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;target)</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mult(float)"><!-- --></A><H3>
+mult</H3>
+<PRE>
+public void <B>mult</B>(float&nbsp;n)</PRE>
+<DL>
+<DD>Multiply this vector by a scalar
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>n</CODE> - the value to multiply by</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mult(processing.core.PVector, float)"><!-- --></A><H3>
+mult</H3>
+<PRE>
+public static <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A> <B>mult</B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v,
+                           float&nbsp;n)</PRE>
+<DL>
+<DD>Multiply a vector by a scalar
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>v</CODE> - a vector<DD><CODE>n</CODE> - scalar
+<DT><B>Returns:</B><DD>a new vector that is v1 * n</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mult(processing.core.PVector, float, processing.core.PVector)"><!-- --></A><H3>
+mult</H3>
+<PRE>
+public static <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A> <B>mult</B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v,
+                           float&nbsp;n,
+                           <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;target)</PRE>
+<DL>
+<DD>Multiply a vector by a scalar, and write the result into a target PVector.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>v</CODE> - a vector<DD><CODE>n</CODE> - scalar<DD><CODE>target</CODE> - PVector to store the result
+<DT><B>Returns:</B><DD>the target vector, now set to v1 * n</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mult(processing.core.PVector)"><!-- --></A><H3>
+mult</H3>
+<PRE>
+public void <B>mult</B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v)</PRE>
+<DL>
+<DD>Multiply each element of one vector by the elements of another vector.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>v</CODE> - the vector to multiply by</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mult(processing.core.PVector, processing.core.PVector)"><!-- --></A><H3>
+mult</H3>
+<PRE>
+public static <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A> <B>mult</B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v1,
+                           <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v2)</PRE>
+<DL>
+<DD>Multiply each element of one vector by the individual elements of another
+ vector, and return the result as a new PVector.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="mult(processing.core.PVector, processing.core.PVector, processing.core.PVector)"><!-- --></A><H3>
+mult</H3>
+<PRE>
+public static <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A> <B>mult</B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v1,
+                           <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v2,
+                           <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;target)</PRE>
+<DL>
+<DD>Multiply each element of one vector by the individual elements of another
+ vector, and write the result into a target vector.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>v1</CODE> - the first vector<DD><CODE>v2</CODE> - the second vector<DD><CODE>target</CODE> - PVector to store the result</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="div(float)"><!-- --></A><H3>
+div</H3>
+<PRE>
+public void <B>div</B>(float&nbsp;n)</PRE>
+<DL>
+<DD>Divide this vector by a scalar
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>n</CODE> - the value to divide by</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="div(processing.core.PVector, float)"><!-- --></A><H3>
+div</H3>
+<PRE>
+public static <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A> <B>div</B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v,
+                          float&nbsp;n)</PRE>
+<DL>
+<DD>Divide a vector by a scalar and return the result in a new vector.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>v</CODE> - a vector<DD><CODE>n</CODE> - scalar
+<DT><B>Returns:</B><DD>a new vector that is v1 / n</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="div(processing.core.PVector, float, processing.core.PVector)"><!-- --></A><H3>
+div</H3>
+<PRE>
+public static <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A> <B>div</B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v,
+                          float&nbsp;n,
+                          <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;target)</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="div(processing.core.PVector)"><!-- --></A><H3>
+div</H3>
+<PRE>
+public void <B>div</B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v)</PRE>
+<DL>
+<DD>Divide each element of one vector by the elements of another vector.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="div(processing.core.PVector, processing.core.PVector)"><!-- --></A><H3>
+div</H3>
+<PRE>
+public static <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A> <B>div</B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v1,
+                          <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v2)</PRE>
+<DL>
+<DD>Multiply each element of one vector by the individual elements of another
+ vector, and return the result as a new PVector.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="div(processing.core.PVector, processing.core.PVector, processing.core.PVector)"><!-- --></A><H3>
+div</H3>
+<PRE>
+public static <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A> <B>div</B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v1,
+                          <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v2,
+                          <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;target)</PRE>
+<DL>
+<DD>Divide each element of one vector by the individual elements of another
+ vector, and write the result into a target vector.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>v1</CODE> - the first vector<DD><CODE>v2</CODE> - the second vector<DD><CODE>target</CODE> - PVector to store the result</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="dist(processing.core.PVector)"><!-- --></A><H3>
+dist</H3>
+<PRE>
+public float <B>dist</B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v)</PRE>
+<DL>
+<DD>Calculate the Euclidean distance between two points (considering a point as a vector object)
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>v</CODE> - another vector
+<DT><B>Returns:</B><DD>the Euclidean distance between</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="dist(processing.core.PVector, processing.core.PVector)"><!-- --></A><H3>
+dist</H3>
+<PRE>
+public static float <B>dist</B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v1,
+                         <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v2)</PRE>
+<DL>
+<DD>Calculate the Euclidean distance between two points (considering a point as a vector object)
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>v1</CODE> - a vector<DD><CODE>v2</CODE> - another vector
+<DT><B>Returns:</B><DD>the Euclidean distance between v1 and v2</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="dot(processing.core.PVector)"><!-- --></A><H3>
+dot</H3>
+<PRE>
+public float <B>dot</B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v)</PRE>
+<DL>
+<DD>Calculate the dot product with another vector
+<P>
+<DD><DL>
+
+<DT><B>Returns:</B><DD>the dot product</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="dot(float, float, float)"><!-- --></A><H3>
+dot</H3>
+<PRE>
+public float <B>dot</B>(float&nbsp;x,
+                 float&nbsp;y,
+                 float&nbsp;z)</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="cross(processing.core.PVector)"><!-- --></A><H3>
+cross</H3>
+<PRE>
+public <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A> <B>cross</B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v)</PRE>
+<DL>
+<DD>Return a vector composed of the cross product between this and another.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="cross(processing.core.PVector, processing.core.PVector)"><!-- --></A><H3>
+cross</H3>
+<PRE>
+public <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A> <B>cross</B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v,
+                     <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;target)</PRE>
+<DL>
+<DD>Perform cross product between this and another vector, and store the
+ result in 'target'. If target is null, a new vector is created.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="cross(processing.core.PVector, processing.core.PVector, processing.core.PVector)"><!-- --></A><H3>
+cross</H3>
+<PRE>
+public static <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A> <B>cross</B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v1,
+                            <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v2,
+                            <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;target)</PRE>
+<DL>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="normalize()"><!-- --></A><H3>
+normalize</H3>
+<PRE>
+public void <B>normalize</B>()</PRE>
+<DL>
+<DD>Normalize the vector to length 1 (make it a unit vector)
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="normalize(processing.core.PVector)"><!-- --></A><H3>
+normalize</H3>
+<PRE>
+public <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A> <B>normalize</B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;target)</PRE>
+<DL>
+<DD>Normalize this vector, storing the result in another vector.
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>target</CODE> - Set to null to create a new vector
+<DT><B>Returns:</B><DD>a new vector (if target was null), or target</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="limit(float)"><!-- --></A><H3>
+limit</H3>
+<PRE>
+public void <B>limit</B>(float&nbsp;max)</PRE>
+<DL>
+<DD>Limit the magnitude of this vector
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>max</CODE> - the maximum length to limit this vector</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="heading2D()"><!-- --></A><H3>
+heading2D</H3>
+<PRE>
+public float <B>heading2D</B>()</PRE>
+<DL>
+<DD>Calculate the angle of rotation for this vector (only 2D vectors)
+<P>
+<DD><DL>
+
+<DT><B>Returns:</B><DD>the angle of rotation</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="angleBetween(processing.core.PVector, processing.core.PVector)"><!-- --></A><H3>
+angleBetween</H3>
+<PRE>
+public static float <B>angleBetween</B>(<A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v1,
+                                 <A HREF="../../processing/core/PVector.html" title="class in processing.core">PVector</A>&nbsp;v2)</PRE>
+<DL>
+<DD>Calculate the angle between two vectors, using the dot product
+<P>
+<DD><DL>
+<DT><B>Parameters:</B><DD><CODE>v1</CODE> - a vector<DD><CODE>v2</CODE> - another vector
+<DT><B>Returns:</B><DD>the angle between the vectors</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="toString()"><!-- --></A><H3>
+toString</H3>
+<PRE>
+public java.lang.String <B>toString</B>()</PRE>
+<DL>
+<DD><DL>
+<DT><B>Overrides:</B><DD><CODE>toString</CODE> in class <CODE>java.lang.Object</CODE></DL>
+</DD>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="array()"><!-- --></A><H3>
+array</H3>
+<PRE>
+public float[] <B>array</B>()</PRE>
+<DL>
+<DD>Return a representation of this vector as a float array. This is only for
+ temporary use. If used in any other fashion, the contents should be copied
+ by using the get() command to copy into your own array.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<!-- ========= END OF CLASS DATA ========= -->
+<HR>
+
+
+<!-- ======= START OF BOTTOM NAVBAR ====== -->
+<A NAME="navbar_bottom"><!-- --></A>
+<A HREF="#skip-navbar_bottom" title="Skip navigation links"></A>
+<TABLE BORDER="0" WIDTH="100%" CELLPADDING="1" CELLSPACING="0" SUMMARY="">
+<TR>
+<TD COLSPAN=2 BGCOLOR="#EEEEFF" CLASS="NavBarCell1">
+<A NAME="navbar_bottom_firstrow"><!-- --></A>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="3" SUMMARY="">
+  <TR ALIGN="center" VALIGN="top">
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-summary.html"><FONT CLASS="NavBarFont1"><B>Package</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#FFFFFF" CLASS="NavBarCell1Rev"> &nbsp;<FONT CLASS="NavBarFont1Rev"><B>Class</B></FONT>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-tree.html"><FONT CLASS="NavBarFont1"><B>Tree</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../deprecated-list.html"><FONT CLASS="NavBarFont1"><B>Deprecated</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../index-all.html"><FONT CLASS="NavBarFont1"><B>Index</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../help-doc.html"><FONT CLASS="NavBarFont1"><B>Help</B></FONT></A>&nbsp;</TD>
+  </TR>
+</TABLE>
+</TD>
+<TD ALIGN="right" VALIGN="top" ROWSPAN=3><EM>
+</EM>
+</TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+&nbsp;<A HREF="../../processing/core/PTriangle.html" title="class in processing.core"><B>PREV CLASS</B></A>&nbsp;
+&nbsp;NEXT CLASS</FONT></TD>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+  <A HREF="../../index.html?processing/core/PVector.html" target="_top"><B>FRAMES</B></A>  &nbsp;
+&nbsp;<A HREF="PVector.html" target="_top"><B>NO FRAMES</B></A>  &nbsp;
+&nbsp;<SCRIPT type="text/javascript">
+  <!--
+  if(window==top) {
+    document.writeln('<A HREF="../../allclasses-noframe.html"><B>All Classes</B></A>');
+  }
+  //-->
+</SCRIPT>
+<NOSCRIPT>
+  <A HREF="../../allclasses-noframe.html"><B>All Classes</B></A>
+</NOSCRIPT>
+
+
+</FONT></TD>
+</TR>
+<TR>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+  SUMMARY:&nbsp;NESTED&nbsp;|&nbsp;<A HREF="#field_summary">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor_summary">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_summary">METHOD</A></FONT></TD>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+DETAIL:&nbsp;<A HREF="#field_detail">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor_detail">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_detail">METHOD</A></FONT></TD>
+</TR>
+</TABLE>
+<A NAME="skip-navbar_bottom"></A>
+<!-- ======== END OF BOTTOM NAVBAR ======= -->
+
+<HR>
+
+</BODY>
+</HTML>

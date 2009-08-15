@@ -1,6 +1,6 @@
 ##############################################################
 
-atmega328.name=Arduino Duemilanove w/ ATmega328
+atmega328.name=Arduino Duemilanove or Nano w/ ATmega328
 
 atmega328.upload.protocol=stk500
 atmega328.upload.maximum_size=30720
@@ -20,7 +20,7 @@ atmega328.build.core=arduino
 
 ##############################################################
 
-diecimila.name=Arduino Diecimila or Duemilanove w/ ATmega168
+diecimila.name=Arduino Diecimila, Duemilanove, or Nano w/ ATmega168
 
 diecimila.upload.protocol=stk500
 diecimila.upload.maximum_size=14336
@@ -77,26 +77,6 @@ mini.bootloader.lock_bits=0x0F
 mini.build.mcu=atmega168
 mini.build.f_cpu=16000000L
 mini.build.core=arduino
-
-##############################################################
-
-nano.name=Arduino Nano
-
-nano.upload.protocol=stk500
-nano.upload.maximum_size=14336
-nano.upload.speed=19200
-
-nano.bootloader.low_fuses=0xff
-nano.bootloader.high_fuses=0xdd
-nano.bootloader.extended_fuses=0x00
-nano.bootloader.path=atmega
-nano.bootloader.file=ATmegaBOOT_168_diecimila.hex
-nano.bootloader.unlock_bits=0x3F
-nano.bootloader.lock_bits=0x0F
-
-nano.build.mcu=atmega168
-nano.build.f_cpu=16000000L
-nano.build.core=arduino
 
 ##############################################################
 

@@ -1,26 +1,32 @@
+# !!!!!!!! UNLIKE PREVIOUS VERSIONS OF PROCESSING !!!!!!!!!!
 # DO NOT MODIFY THIS FILE, OR DELETE SETTINGS FROM THIS FILE
 
 # These are the default preferences. If you want to modify 
 # them directly, use the per-user local version of the file:
 
-# Documents and Settings -> Application Data -> 
-#    Arduino -> preferences.txt (on windows)
+# Documents and Settings -> [username] -> Application Data -> 
+#    Processing -> preferences.txt (on Windows XP)
 
-# ~/Library -> Arduino -> preferences.txt (on macosx)
+# Users -> [username] -> AppData -> Roaming -> 
+#    Processing -> preferences.txt (on Windows Vista)
 
-# ~/.processing -> preferences.txt (on linux)
+# ~/Library -> Processing -> preferences.txt (on Mac OS X)
 
-# You'll have problems running Arduino if you incorrectly 
+# ~/.processing -> preferences.txt (on Linux)
+
+# The exact location of your preferences file can be found at
+# the bottom of the Preferences window inside Processing.
+
+# Because AppData and Application Data may be considered 
+# hidden or system folders on Windows, you'll have to ensure
+# that they're visible in order to get at preferences.txt
+
+# You'll have problems running Processing if you incorrectly 
 # modify lines in this file.
 
 
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-# Some colors have been hardcoded into the source in app/ in order to ensure
-# consistency with the images distributed and stored with the application.
-# They have been commented out below so that users who install an old
-# version of the software will not get incorrect colors left-over from this
-# config file.
 
 # DEFAULT PATHS FOR SKETCHBOOK AND SETTINGS
 
@@ -30,33 +36,40 @@
 # note that this path should use forward slashes (like unix)
 # instead of \ on windows or : on macos or whatever else
 
-# the .fallback locations are used in case the default location 
-# cannot be written (and the line above it is not customized)
-
-# if you don't want users to have their sketchbook default to 
-# "my documents/processing" on windows and "documents/processing" on osx, 
-# set this to another path that will be used by default
-#sketchbook.path=sketchbook
-sketchbook.path.fallback=sketchbook
+# If you don't want users to have their sketchbook default to 
+# "My Documents/Processing" on Windows and "Documents/Processing" on OS X, 
+# set this to another path that will be used by default. 
+# Note that this path must exist already otherwise it won't see
+# the sketchbook folder, and will instead assume the sketchbook
+# has gone missing, and that it should instead use the default.
+#sketchbook.path=
 
 # if you don't want settings to go into "application data" on windows
 # and "library" on macosx, set this to the alternate location.
 #settings.path=data
-settings.path.fallback=data
 
 # temporary build path, normally this goes into the default
 # "temp" folder for that platform (as defined by java)
 # but this can be used to set a specific file in case of problems
 #build.path=build
 
+# By default, no sketches currently open
+last.sketch.count=0
+
+
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 
 # by default, check the processing server for any updates
 # (please avoid disabling, this also helps us know basic numbers 
-# on how many people are using Arduino)
+# on how many people are using Processing)
 update.check = true
 
+# on windows, automatically associate .pde files with processing.exe
+platform.auto_file_type_associations = true
+
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 
 # default size for the main window
 default.window.width = 500
@@ -64,91 +77,24 @@ default.window.height = 600
 
 # font size for editor
 editor.font=Monospaced,plain,12
-
-# monospaced on java 1.3 was monaco, but on 1.4 it has changed
-# to courier, which actually matches other platforms better.
-# (and removes the 12 point being too large issue)
-# monaco is nicer on macosx, so use that explicitly
+# Monaco is nicer on Mac OS X, so use that explicitly
 editor.font.macosx = Monaco,plain,10
 
 # anti-aliased text, turned off by default
 editor.antialias=false
 
-# foreground and background colors
-editor.fgcolor=#000000
-editor.bgcolor=#ffffff
-
 # color to be used for background when 'external editor' enabled
 editor.external=false
-editor.external.bgcolor=#168299
 
-# styles for various types of text
-
-# comments
-editor.comment1.style=#777755,plain
-editor.comment2.style=#777755,plain
-
-# e.g abstract, final, private
-editor.keyword1.style=#cc6600,plain
-# e.g. beginShape, point, line
-editor.keyword2.style=#996600,plain
-# e.g. byte, char, short, color
-editor.keyword3.style=#993300,bold
-
-# constants: e.g. null, true, this, RGB, TWO_PI
-editor.literal1.style=#cc0000,plain
-# p5 built in variables: e.g. mouseX, width, pixels
-editor.literal2.style=#cc0000,plain
-
-# ?? maybe this is for words followed by a colon
-# like in case statements or goto
-editor.label.style=#7E7E00,bold
-
-# e.g. + - = /
-editor.operator.style=#000000,plain
-
-# caret blinking and caret color
+# caret blinking
 editor.caret.blink=true
-editor.caret.color=#333300
-
-# selection color
-editor.selection.color=#ffcc00
-
-# highlight for the current line
-editor.linehighlight=true
-editor.linehighlight.color=#ddddbb
-
-# bracket/brace highlighting
-editor.brackethighlight=true
-editor.brackethighlight.color=#000000
-
-# little pooties at the end of lines that show where they finish
-editor.eolmarkers=false
-editor.eolmarkers.color=#99991A
 
 # area that's not in use by the text (replaced with tildes)
 editor.invalid=false
-editor.invalid.style=#7E7E00,bold
 
-#buttons.bgcolor      = #044F6F
-buttons.status.font  = SansSerif,plain,12
-buttons.status.color = #FFFFFF
-
-# settings for the tabs at the top
-# actual tab images are stored in the lib/ folder
-#header.bgcolor               = #216886
-header.text.selected.color   = #1A1A00
-header.text.unselected.color = #ffffff
-header.text.font             = SansSerif,plain,12
-
-console                  = true
-console.color            = #000000
-console.output.color     = #ccccbb
+console			 = true
 console.output.file      = stdout.txt
-console.error.color      = #ff3000
 console.error.file       = stderr.txt
-console.font             = Monospaced,plain,11
-console.font.macosx      = Monaco,plain,10
 console.lines            = 4
 
 # set to false to disable automatically clearing the console
@@ -158,14 +104,6 @@ console.auto_clear = true
 # set the maximum number of lines remembered by the console
 # the default is 500, lengthen at your own peril
 console.length = 500
-
-status.notice.fgcolor = #ffffff
-#status.notice.bgcolor = #54919E
-status.error.fgcolor  = #ffffff 
-status.error.bgcolor  = #662000
-status.prompt.fgcolor = #000000
-status.prompt.bgcolor = #cc9900
-status.font           = SansSerif,plain,12
 
 # convert tabs to spaces? how many spaces?
 editor.tabs.expand = true
@@ -181,20 +119,19 @@ editor.divider.size = 0
 # but keeps it from being annoyingly obtrusive
 editor.divider.size.windows = 2
 
-# background color for full-screen presentation mode
-run.present.bgcolor = #666666
-
 # any additional java options when running externally
 # (for applets that are run external to the environment...
 # those with a code folder, or using any libraries)
 # if you hose this and can't run things, it's your own durn fault 
 run.options = 
 
+# settings for the -XmsNNNm and -XmxNNNm command line option
+run.options.memory = false
+run.options.memory.initial = 64
+run.options.memory.maximum = 256
+
 # example of increasing the memory size for applets run externally
 #run.options = -Xms128m -Xmx1024m
-
-# color of the stop button when running in present mode
-run.present.stop.color = #cccccc
 
 # index of the default display to use for present mode
 # (this setting not yet completely implemented)
@@ -203,24 +140,39 @@ run.display = 1
 # set internally
 #run.window.bgcolor=
 
-# minimum size for the run window. windows can't go much smaller.
-# macosx can, though it's sorta nice to have the border.
-run.window.width.minimum = 120
-run.window.height.minimum = 120
+# set to false to open a new untitled window when closing the last window
+# (otherwise, the environment will quit)
+# default to the relative norm for the different platforms, 
+# but the setting can be changed in the prefs dialog anyway
+#sketchbook.closing_last_window_quits = true
+#sketchbook.closing_last_window_quits.macosx = false
 
-# prompt for sketch location when 'new' is hit
-sketchbook.prompt = false
-
-# true if empty sketches should be removed automatically
-sketchbook.auto_clean = true
+apple.laf.useScreenMenuBar=true
 
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
-history.recording = true
+#history.recording = true
 
 # for advanced users, enable option to export a library
-export.library = false
+#export.library = false
+
+# which platforms to export by default
+export.application.platform.windows = true
+export.application.platform.macosx = true
+export.application.platform.linux = true
+
+# whether or not to export as full screen (present) mode
+export.application.fullscreen = false
+
+# whether to show the stop button when exporting to application
+export.application.stop = true
+
+# false will place all exported files into a single .jar
+export.applet.separate_jar_files = false
+
+# set to false to no longer delete applet or application folders before export
+export.delete_target_folder = true
 
 # may be useful when attempting to debug the preprocessor
 preproc.save_build_files=false
@@ -246,42 +198,30 @@ preproc.substitute_unicode = true
 # viewed in (at least) Mozilla or IE.  useful when debugging the preprocessor.
 preproc.output_parse_tree = false
 
-# jdk version to use.. 
-preproc.jdk_version = 1.1
-
-# base imports to include for java 1.1 (or higher)
-preproc.imports.jdk11 = java.applet,java.awt,java.awt.image,java.awt.event,java.io,java.net,java.text,java.util,java.util.zip
-
-# additional imports when exporting to java 1.3 or higher
-preproc.imports.jdk13 = javax.sound.midi,javax.sound.midi.spi,javax.sound.sampled,javax.sound.sampled.spi
-
-# additional imports when exporting to java 1.4 or higher
-preproc.imports.jdk14 = javax.xml.parsers,javax.xml.transform,javax.xml.transform.dom,javax.xml.transform.sax,javax.xml.transform.stream,org.xml.sax,org.xml.sax.ext,org.xml.sax.helpers
+# imports to use by default (changed for 0149, some imports removed)
+preproc.imports = java.applet,java.awt,java.awt.image,java.awt.event,java.io,java.net,java.text,java.util,java.util.zip,java.util.regex
 
 # set the browser to be used on linux
 browser.linux = mozilla
 
-# coloring for the editor line number status bar at the bottom of the screen
-#linestatus.bgcolor = #044F6F
-linestatus.font	   = SansSerif,plain,10
-linestatus.color   = #ffffff
-linestatus.height  = 20
+# set to the program to be used for launching apps on linux
+#launcher.linux = gnome-open
 
-# set the upload defaults
-upload.verbose=false
-upload.using=bootloader
+# FULL SCREEN (PRESENT MODE)
+run.present.bgcolor = #666666
+run.present.stop.color = #cccccc
+# starting in release 0159, don't use full screen exclusive anymore
+run.present.exclusive = false
+# use this by default to hide the menu bar and dock on osx
+run.present.exclusive.macosx = true
 
-# set the parallel port defaults (used if upload.programmer=dapa)
-parallel.port=0x378
+# ARDUINO PREFERENCES
+board = atmega328
 
-# set the serial port defaults
+upload.using = bootloader
+
 serial.port=COM1
 serial.databits=8
 serial.stopbits=1
 serial.parity=N
 serial.debug_rate=9600
-serial.burn_rate=115200
-
-build.verbose=false
-
-board=atmega328

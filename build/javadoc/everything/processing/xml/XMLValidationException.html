@@ -1,0 +1,519 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--NewPage-->
+<HTML>
+<HEAD>
+<TITLE>
+XMLValidationException
+</TITLE>
+
+<META NAME="keywords" CONTENT="processing.xml.XMLValidationException class">
+
+<LINK REL ="stylesheet" TYPE="text/css" HREF="../../stylesheet.css" TITLE="Style">
+
+<SCRIPT type="text/javascript">
+function windowTitle()
+{
+    parent.document.title="XMLValidationException";
+}
+</SCRIPT>
+<NOSCRIPT>
+</NOSCRIPT>
+
+</HEAD>
+
+<BODY BGCOLOR="white" onload="windowTitle();">
+
+
+<!-- ========= START OF TOP NAVBAR ======= -->
+<A NAME="navbar_top"><!-- --></A>
+<A HREF="#skip-navbar_top" title="Skip navigation links"></A>
+<TABLE BORDER="0" WIDTH="100%" CELLPADDING="1" CELLSPACING="0" SUMMARY="">
+<TR>
+<TD COLSPAN=2 BGCOLOR="#EEEEFF" CLASS="NavBarCell1">
+<A NAME="navbar_top_firstrow"><!-- --></A>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="3" SUMMARY="">
+  <TR ALIGN="center" VALIGN="top">
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-summary.html"><FONT CLASS="NavBarFont1"><B>Package</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#FFFFFF" CLASS="NavBarCell1Rev"> &nbsp;<FONT CLASS="NavBarFont1Rev"><B>Class</B></FONT>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-tree.html"><FONT CLASS="NavBarFont1"><B>Tree</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../deprecated-list.html"><FONT CLASS="NavBarFont1"><B>Deprecated</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../index-all.html"><FONT CLASS="NavBarFont1"><B>Index</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../help-doc.html"><FONT CLASS="NavBarFont1"><B>Help</B></FONT></A>&nbsp;</TD>
+  </TR>
+</TABLE>
+</TD>
+<TD ALIGN="right" VALIGN="top" ROWSPAN=3><EM>
+</EM>
+</TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+&nbsp;<A HREF="../../processing/xml/XMLParseException.html" title="class in processing.xml"><B>PREV CLASS</B></A>&nbsp;
+&nbsp;<A HREF="../../processing/xml/XMLValidator.html" title="class in processing.xml"><B>NEXT CLASS</B></A></FONT></TD>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+  <A HREF="../../index.html?processing/xml/XMLValidationException.html" target="_top"><B>FRAMES</B></A>  &nbsp;
+&nbsp;<A HREF="XMLValidationException.html" target="_top"><B>NO FRAMES</B></A>  &nbsp;
+&nbsp;<SCRIPT type="text/javascript">
+  <!--
+  if(window==top) {
+    document.writeln('<A HREF="../../allclasses-noframe.html"><B>All Classes</B></A>');
+  }
+  //-->
+</SCRIPT>
+<NOSCRIPT>
+  <A HREF="../../allclasses-noframe.html"><B>All Classes</B></A>
+</NOSCRIPT>
+
+
+</FONT></TD>
+</TR>
+<TR>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+  SUMMARY:&nbsp;NESTED&nbsp;|&nbsp;<A HREF="#field_summary">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor_summary">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_summary">METHOD</A></FONT></TD>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+DETAIL:&nbsp;<A HREF="#field_detail">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor_detail">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_detail">METHOD</A></FONT></TD>
+</TR>
+</TABLE>
+<A NAME="skip-navbar_top"></A>
+<!-- ========= END OF TOP NAVBAR ========= -->
+
+<HR>
+<!-- ======== START OF CLASS DATA ======== -->
+<H2>
+<FONT SIZE="-1">
+processing.xml</FONT>
+<BR>
+Class XMLValidationException</H2>
+<PRE>
+java.lang.Object
+  <IMG SRC="../../resources/inherit.gif" ALT="extended by ">java.lang.Throwable
+      <IMG SRC="../../resources/inherit.gif" ALT="extended by ">java.lang.Exception
+          <IMG SRC="../../resources/inherit.gif" ALT="extended by "><A HREF="../../processing/xml/XMLException.html" title="class in processing.xml">processing.xml.XMLException</A>
+              <IMG SRC="../../resources/inherit.gif" ALT="extended by "><B>processing.xml.XMLValidationException</B>
+</PRE>
+<DL>
+<DT><B>All Implemented Interfaces:</B> <DD>java.io.Serializable</DD>
+</DL>
+<HR>
+<DL>
+<DT><PRE>public class <B>XMLValidationException</B><DT>extends <A HREF="../../processing/xml/XMLException.html" title="class in processing.xml">XMLException</A></DL>
+</PRE>
+
+<P>
+An XMLValidationException is thrown when the XML passed to the XML parser is
+ well-formed but not valid.
+<P>
+
+<P>
+<DL>
+<DT><B>See Also:</B><DD><A HREF="../../serialized-form.html#processing.xml.XMLValidationException">Serialized Form</A></DL>
+<HR>
+
+<P>
+<!-- =========== FIELD SUMMARY =========== -->
+
+<A NAME="field_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Field Summary</B></FONT></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/xml/XMLValidationException.html#ATTRIBUTE_WITH_INVALID_VALUE">ATTRIBUTE_WITH_INVALID_VALUE</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;An attribute has an invalid value.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/xml/XMLValidationException.html#MISC_ERROR">MISC_ERROR</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Another error than those specified in this class was encountered.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/xml/XMLValidationException.html#MISSING_ATTRIBUTE">MISSING_ATTRIBUTE</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;An attribute was missing.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/xml/XMLValidationException.html#MISSING_ELEMENT">MISSING_ELEMENT</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;An element was missing.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/xml/XMLValidationException.html#MISSING_PCDATA">MISSING_PCDATA</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A PCDATA element was missing.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/xml/XMLValidationException.html#UNEXPECTED_ATTRIBUTE">UNEXPECTED_ATTRIBUTE</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;An unexpected attribute was encountered.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/xml/XMLValidationException.html#UNEXPECTED_ELEMENT">UNEXPECTED_ELEMENT</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;An unexpected element was encountered.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>static&nbsp;int</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/xml/XMLValidationException.html#UNEXPECTED_PCDATA">UNEXPECTED_PCDATA</A></B></CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;An unexpected PCDATA element was encountered.</TD>
+</TR>
+</TABLE>
+&nbsp;
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+
+<A NAME="constructor_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Constructor Summary</B></FONT></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><B><A HREF="../../processing/xml/XMLValidationException.html#XMLValidationException(int, java.lang.String, int, java.lang.String, java.lang.String, java.lang.String, java.lang.String)">XMLValidationException</A></B>(int&nbsp;errorType,
+                       java.lang.String&nbsp;systemID,
+                       int&nbsp;lineNr,
+                       java.lang.String&nbsp;elementName,
+                       java.lang.String&nbsp;attributeName,
+                       java.lang.String&nbsp;attributeValue,
+                       java.lang.String&nbsp;msg)</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Creates a new exception.</TD>
+</TR>
+</TABLE>
+&nbsp;
+<!-- ========== METHOD SUMMARY =========== -->
+
+<A NAME="method_summary"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="2"><FONT SIZE="+2">
+<B>Method Summary</B></FONT></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.lang.String</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/xml/XMLValidationException.html#getAttributeName()">getAttributeName</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the name of the attribute in which the validation is violated.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.lang.String</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/xml/XMLValidationException.html#getAttributeValue()">getAttributeValue</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the value of the attribute in which the validation is violated.</TD>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD ALIGN="right" VALIGN="top" WIDTH="1%"><FONT SIZE="-1">
+<CODE>&nbsp;java.lang.String</CODE></FONT></TD>
+<TD><CODE><B><A HREF="../../processing/xml/XMLValidationException.html#getElementName()">getElementName</A></B>()</CODE>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the name of the element in which the validation is violated.</TD>
+</TR>
+</TABLE>
+&nbsp;<A NAME="methods_inherited_from_class_processing.xml.XMLException"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Methods inherited from class processing.xml.<A HREF="../../processing/xml/XMLException.html" title="class in processing.xml">XMLException</A></B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE><A HREF="../../processing/xml/XMLException.html#getException()">getException</A>, <A HREF="../../processing/xml/XMLException.html#getLineNr()">getLineNr</A>, <A HREF="../../processing/xml/XMLException.html#getSystemID()">getSystemID</A>, <A HREF="../../processing/xml/XMLException.html#printStackTrace()">printStackTrace</A>, <A HREF="../../processing/xml/XMLException.html#printStackTrace(java.io.PrintStream)">printStackTrace</A>, <A HREF="../../processing/xml/XMLException.html#printStackTrace(java.io.PrintWriter)">printStackTrace</A>, <A HREF="../../processing/xml/XMLException.html#toString()">toString</A></CODE></TD>
+</TR>
+</TABLE>
+&nbsp;<A NAME="methods_inherited_from_class_java.lang.Throwable"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Methods inherited from class java.lang.Throwable</B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>fillInStackTrace, getCause, getLocalizedMessage, getMessage, getStackTrace, initCause, setStackTrace</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;<A NAME="methods_inherited_from_class_java.lang.Object"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#EEEEFF" CLASS="TableSubHeadingColor">
+<TH ALIGN="left"><B>Methods inherited from class java.lang.Object</B></TH>
+</TR>
+<TR BGCOLOR="white" CLASS="TableRowColor">
+<TD><CODE>equals, getClass, hashCode, notify, notifyAll, wait, wait, wait</CODE></TD>
+</TR>
+</TABLE>
+&nbsp;
+<P>
+
+<!-- ============ FIELD DETAIL =========== -->
+
+<A NAME="field_detail"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="1"><FONT SIZE="+2">
+<B>Field Detail</B></FONT></TH>
+</TR>
+</TABLE>
+
+<A NAME="MISSING_ELEMENT"><!-- --></A><H3>
+MISSING_ELEMENT</H3>
+<PRE>
+public static final int <B>MISSING_ELEMENT</B></PRE>
+<DL>
+<DD>An element was missing.
+<P>
+<DL>
+<DT><B>See Also:</B><DD><A HREF="../../constant-values.html#processing.xml.XMLValidationException.MISSING_ELEMENT">Constant Field Values</A></DL>
+</DL>
+<HR>
+
+<A NAME="UNEXPECTED_ELEMENT"><!-- --></A><H3>
+UNEXPECTED_ELEMENT</H3>
+<PRE>
+public static final int <B>UNEXPECTED_ELEMENT</B></PRE>
+<DL>
+<DD>An unexpected element was encountered.
+<P>
+<DL>
+<DT><B>See Also:</B><DD><A HREF="../../constant-values.html#processing.xml.XMLValidationException.UNEXPECTED_ELEMENT">Constant Field Values</A></DL>
+</DL>
+<HR>
+
+<A NAME="MISSING_ATTRIBUTE"><!-- --></A><H3>
+MISSING_ATTRIBUTE</H3>
+<PRE>
+public static final int <B>MISSING_ATTRIBUTE</B></PRE>
+<DL>
+<DD>An attribute was missing.
+<P>
+<DL>
+<DT><B>See Also:</B><DD><A HREF="../../constant-values.html#processing.xml.XMLValidationException.MISSING_ATTRIBUTE">Constant Field Values</A></DL>
+</DL>
+<HR>
+
+<A NAME="UNEXPECTED_ATTRIBUTE"><!-- --></A><H3>
+UNEXPECTED_ATTRIBUTE</H3>
+<PRE>
+public static final int <B>UNEXPECTED_ATTRIBUTE</B></PRE>
+<DL>
+<DD>An unexpected attribute was encountered.
+<P>
+<DL>
+<DT><B>See Also:</B><DD><A HREF="../../constant-values.html#processing.xml.XMLValidationException.UNEXPECTED_ATTRIBUTE">Constant Field Values</A></DL>
+</DL>
+<HR>
+
+<A NAME="ATTRIBUTE_WITH_INVALID_VALUE"><!-- --></A><H3>
+ATTRIBUTE_WITH_INVALID_VALUE</H3>
+<PRE>
+public static final int <B>ATTRIBUTE_WITH_INVALID_VALUE</B></PRE>
+<DL>
+<DD>An attribute has an invalid value.
+<P>
+<DL>
+<DT><B>See Also:</B><DD><A HREF="../../constant-values.html#processing.xml.XMLValidationException.ATTRIBUTE_WITH_INVALID_VALUE">Constant Field Values</A></DL>
+</DL>
+<HR>
+
+<A NAME="MISSING_PCDATA"><!-- --></A><H3>
+MISSING_PCDATA</H3>
+<PRE>
+public static final int <B>MISSING_PCDATA</B></PRE>
+<DL>
+<DD>A PCDATA element was missing.
+<P>
+<DL>
+<DT><B>See Also:</B><DD><A HREF="../../constant-values.html#processing.xml.XMLValidationException.MISSING_PCDATA">Constant Field Values</A></DL>
+</DL>
+<HR>
+
+<A NAME="UNEXPECTED_PCDATA"><!-- --></A><H3>
+UNEXPECTED_PCDATA</H3>
+<PRE>
+public static final int <B>UNEXPECTED_PCDATA</B></PRE>
+<DL>
+<DD>An unexpected PCDATA element was encountered.
+<P>
+<DL>
+<DT><B>See Also:</B><DD><A HREF="../../constant-values.html#processing.xml.XMLValidationException.UNEXPECTED_PCDATA">Constant Field Values</A></DL>
+</DL>
+<HR>
+
+<A NAME="MISC_ERROR"><!-- --></A><H3>
+MISC_ERROR</H3>
+<PRE>
+public static final int <B>MISC_ERROR</B></PRE>
+<DL>
+<DD>Another error than those specified in this class was encountered.
+<P>
+<DL>
+<DT><B>See Also:</B><DD><A HREF="../../constant-values.html#processing.xml.XMLValidationException.MISC_ERROR">Constant Field Values</A></DL>
+</DL>
+
+<!-- ========= CONSTRUCTOR DETAIL ======== -->
+
+<A NAME="constructor_detail"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="1"><FONT SIZE="+2">
+<B>Constructor Detail</B></FONT></TH>
+</TR>
+</TABLE>
+
+<A NAME="XMLValidationException(int, java.lang.String, int, java.lang.String, java.lang.String, java.lang.String, java.lang.String)"><!-- --></A><H3>
+XMLValidationException</H3>
+<PRE>
+public <B>XMLValidationException</B>(int&nbsp;errorType,
+                              java.lang.String&nbsp;systemID,
+                              int&nbsp;lineNr,
+                              java.lang.String&nbsp;elementName,
+                              java.lang.String&nbsp;attributeName,
+                              java.lang.String&nbsp;attributeValue,
+                              java.lang.String&nbsp;msg)</PRE>
+<DL>
+<DD>Creates a new exception.
+<P>
+<DL>
+<DT><B>Parameters:</B><DD><CODE>errorType</CODE> - the type of validity error<DD><CODE>systemID</CODE> - the system ID from where the data came<DD><CODE>lineNr</CODE> - the line number in the XML data where the
+                       exception occurred.<DD><CODE>elementName</CODE> - the name of the offending element<DD><CODE>attributeName</CODE> - the name of the offending attribute<DD><CODE>attributeValue</CODE> - the value of the offending attribute<DD><CODE>msg</CODE> - the message of the exception.</DL>
+</DL>
+
+<!-- ============ METHOD DETAIL ========== -->
+
+<A NAME="method_detail"><!-- --></A>
+<TABLE BORDER="1" WIDTH="100%" CELLPADDING="3" CELLSPACING="0" SUMMARY="">
+<TR BGCOLOR="#CCCCFF" CLASS="TableHeadingColor">
+<TH ALIGN="left" COLSPAN="1"><FONT SIZE="+2">
+<B>Method Detail</B></FONT></TH>
+</TR>
+</TABLE>
+
+<A NAME="getElementName()"><!-- --></A><H3>
+getElementName</H3>
+<PRE>
+public java.lang.String <B>getElementName</B>()</PRE>
+<DL>
+<DD>Returns the name of the element in which the validation is violated.
+ If there is no current element, null is returned.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getAttributeName()"><!-- --></A><H3>
+getAttributeName</H3>
+<PRE>
+public java.lang.String <B>getAttributeName</B>()</PRE>
+<DL>
+<DD>Returns the name of the attribute in which the validation is violated.
+ If there is no current attribute, null is returned.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<HR>
+
+<A NAME="getAttributeValue()"><!-- --></A><H3>
+getAttributeValue</H3>
+<PRE>
+public java.lang.String <B>getAttributeValue</B>()</PRE>
+<DL>
+<DD>Returns the value of the attribute in which the validation is violated.
+ If there is no current attribute, null is returned.
+<P>
+<DD><DL>
+</DL>
+</DD>
+</DL>
+<!-- ========= END OF CLASS DATA ========= -->
+<HR>
+
+
+<!-- ======= START OF BOTTOM NAVBAR ====== -->
+<A NAME="navbar_bottom"><!-- --></A>
+<A HREF="#skip-navbar_bottom" title="Skip navigation links"></A>
+<TABLE BORDER="0" WIDTH="100%" CELLPADDING="1" CELLSPACING="0" SUMMARY="">
+<TR>
+<TD COLSPAN=2 BGCOLOR="#EEEEFF" CLASS="NavBarCell1">
+<A NAME="navbar_bottom_firstrow"><!-- --></A>
+<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="3" SUMMARY="">
+  <TR ALIGN="center" VALIGN="top">
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../overview-summary.html"><FONT CLASS="NavBarFont1"><B>Overview</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-summary.html"><FONT CLASS="NavBarFont1"><B>Package</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#FFFFFF" CLASS="NavBarCell1Rev"> &nbsp;<FONT CLASS="NavBarFont1Rev"><B>Class</B></FONT>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="package-tree.html"><FONT CLASS="NavBarFont1"><B>Tree</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../deprecated-list.html"><FONT CLASS="NavBarFont1"><B>Deprecated</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../index-all.html"><FONT CLASS="NavBarFont1"><B>Index</B></FONT></A>&nbsp;</TD>
+  <TD BGCOLOR="#EEEEFF" CLASS="NavBarCell1">    <A HREF="../../help-doc.html"><FONT CLASS="NavBarFont1"><B>Help</B></FONT></A>&nbsp;</TD>
+  </TR>
+</TABLE>
+</TD>
+<TD ALIGN="right" VALIGN="top" ROWSPAN=3><EM>
+</EM>
+</TD>
+</TR>
+
+<TR>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+&nbsp;<A HREF="../../processing/xml/XMLParseException.html" title="class in processing.xml"><B>PREV CLASS</B></A>&nbsp;
+&nbsp;<A HREF="../../processing/xml/XMLValidator.html" title="class in processing.xml"><B>NEXT CLASS</B></A></FONT></TD>
+<TD BGCOLOR="white" CLASS="NavBarCell2"><FONT SIZE="-2">
+  <A HREF="../../index.html?processing/xml/XMLValidationException.html" target="_top"><B>FRAMES</B></A>  &nbsp;
+&nbsp;<A HREF="XMLValidationException.html" target="_top"><B>NO FRAMES</B></A>  &nbsp;
+&nbsp;<SCRIPT type="text/javascript">
+  <!--
+  if(window==top) {
+    document.writeln('<A HREF="../../allclasses-noframe.html"><B>All Classes</B></A>');
+  }
+  //-->
+</SCRIPT>
+<NOSCRIPT>
+  <A HREF="../../allclasses-noframe.html"><B>All Classes</B></A>
+</NOSCRIPT>
+
+
+</FONT></TD>
+</TR>
+<TR>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+  SUMMARY:&nbsp;NESTED&nbsp;|&nbsp;<A HREF="#field_summary">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor_summary">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_summary">METHOD</A></FONT></TD>
+<TD VALIGN="top" CLASS="NavBarCell3"><FONT SIZE="-2">
+DETAIL:&nbsp;<A HREF="#field_detail">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor_detail">CONSTR</A>&nbsp;|&nbsp;<A HREF="#method_detail">METHOD</A></FONT></TD>
+</TR>
+</TABLE>
+<A NAME="skip-navbar_bottom"></A>
+<!-- ======== END OF BOTTOM NAVBAR ======= -->
+
+<HR>
+
+</BODY>
+</HTML>
