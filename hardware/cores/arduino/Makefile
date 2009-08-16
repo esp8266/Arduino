@@ -1,4 +1,4 @@
-# Arduino 0015 Makefile
+# Arduino Makefile
 # Arduino adaptation by mellis, eighthave, oli.keller
 #
 # This makefile allows you to build sketches from the command line
@@ -47,10 +47,10 @@ F_CPU = 16000000
 
 ARDUINO = $(INSTALL_DIR)/hardware/cores/arduino
 AVR_TOOLS_PATH = $(INSTALL_DIR)/hardware/tools/avr/bin
-SRC =  $(ARDUINO)/pins_arduino.c $(ARDUINO)/wiring.c \
+SRC = $(ARDUINO)/pins_arduino.c $(ARDUINO)/wiring.c \
 $(ARDUINO)/wiring_analog.c $(ARDUINO)/wiring_digital.c \
-$(ARDUINO)/wiring_pulse.c $(ARDUINO)/wiring_serial.c \
-$(ARDUINO)/wiring_shift.c $(ARDUINO)/WInterrupts.c
+$(ARDUINO)/wiring_pulse.c $(ARDUINO)/wiring_shift.c \
+$(ARDUINO)/WInterrupts.c
 CXXSRC = $(ARDUINO)/HardwareSerial.cpp $(ARDUINO)/WMath.cpp \
 $(ARDUINO)/Print.cpp
 FORMAT = ihex
@@ -239,5 +239,5 @@ clean:
 
 .PHONY:	all build elf hex eep lss sym program coff extcoff clean applet_files sizebefore sizeafter
 
-include $(SRC:.c=.d)
-include $(CXXSRC:.cpp=.d)
+-include $(SRC:.c=.d)
+-include $(CXXSRC:.cpp=.d)
