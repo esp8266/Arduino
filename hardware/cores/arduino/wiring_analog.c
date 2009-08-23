@@ -42,7 +42,7 @@ int analogRead(uint8_t pin)
 	// set the analog reference (high two bits of ADMUX) and select the
 	// channel (low 4 bits).  this also sets ADLAR (left-adjust result)
 	// to 0 (the default).
-	ADMUX = (analog_reference << 6) | (pin & 0x0f);
+	ADMUX = (analog_reference << 6) | (pin & 0x07);
   
 #if defined(__AVR_ATmega1280__)
 	// the MUX5 bit of ADCSRB selects whether we're reading from channels
