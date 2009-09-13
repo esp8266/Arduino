@@ -33,7 +33,7 @@ extern "C"{
 #endif
 
 #ifndef ARDUINO
-#define ARDUINO 16
+#define ARDUINO 18
 #endif
 
 #define HIGH 0x1
