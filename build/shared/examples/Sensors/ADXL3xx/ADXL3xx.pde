@@ -25,11 +25,11 @@
 */
 
 // these constants describe the pins. They won't change:
-const int groundPin = 18;             // analog input pin 4 -- ground
-const int powerPin = 19;              // analog input pin 5 -- voltage
-const int xPin = 3;                   // x-axis of the accelerometer
-const int yPin = 2;                   // y-axis
-const int zPin = 1;                   // z-axis (only on 3-axis models)
+const int groundpin = 18;             // analog input pin 4 -- ground
+const int powerpin = 19;              // analog input pin 5 -- voltage
+const int pin = 3;                   // x-axis of the accelerometer
+const int ypin = 2;                   // y-axis
+const int zpin = 1;                   // z-axis (only on 3-axis models)
 
 void setup()
 {
