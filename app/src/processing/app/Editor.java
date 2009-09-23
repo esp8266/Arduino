@@ -608,6 +608,15 @@ public class Editor extends JFrame implements RunnerListener {
     JMenuItem item;
 
     addInternalTools(menu);
+    
+    item = newJMenuItemShift("Serial Monitor", 'M');
+    item.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          handleSerial();
+        }
+      });
+    menu.add(item);
+    
     addTools(menu, Base.getToolsFolder());
     File sketchbookTools = new File(Base.getSketchbookFolder(), "tools");
     addTools(menu, sketchbookTools);
