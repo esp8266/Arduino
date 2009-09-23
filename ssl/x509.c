@@ -147,7 +147,53 @@ int x509_new(const uint8_t *cert, int *len, X509_CTX **ctx)
         x509_ctx->digest = bi_import(bi_ctx, md2_dgst, MD2_SIZE);
     }
 
-    offset = end_tbs;   /* skip the v3 data */
+    if (cert[offset] == ASN1_V3_DATA)
+    {
+        int suboffset;
+
+        ++offset;
+        get_asn1_length(cert, &offset);
+
+        if ((suboffset = asn1_find_subjectaltname(cert, offset)) > 0)
+        {
+            if (asn1_next_obj(cert, &suboffset, ASN1_OCTET_STRING) > 0)
+            {
+                int altlen;
+
+                if ((altlen = asn1_next_obj(cert, 
+                                            &suboffset, ASN1_SEQUENCE)) > 0)
+                {
+                    int endalt = suboffset + altlen;
+                    int totalnames = 0;
+
+                    while (suboffset < endalt)
+                    {
+                        int type = cert[suboffset++];
+                        int dnslen = get_asn1_length(cert, &suboffset);
+
+                        if (type == ASN1_CONTEXT_DNSNAME)
+                        {
+                            x509_ctx->subject_alt_dnsnames = (char**)
+                                    realloc(x509_ctx->subject_alt_dnsnames, 
+                                       (totalnames + 2) * sizeof(char*));
+                            x509_ctx->subject_alt_dnsnames[totalnames] = 
+                                    (char*)malloc(dnslen + 1);
+                            x509_ctx->subject_alt_dnsnames[totalnames+1] = NULL;
+                            memcpy(x509_ctx->subject_alt_dnsnames[totalnames], 
+                                    cert + suboffset, dnslen);
+                            x509_ctx->subject_alt_dnsnames[
+                                    totalnames][dnslen] = 0;
+                            ++totalnames;
+                        }
+
+                        suboffset += dnslen;
+                    }
+                }
+            }
+        }
+    }
+
+    offset = end_tbs;   /* skip the rest of v3 data */
     if (asn1_skip_obj(cert, &offset, ASN1_SEQUENCE) || 
             asn1_signature(cert, &offset, x509_ctx))
         goto end_cert;
@@ -188,12 +234,21 @@ void x509_free(X509_CTX *x509_ctx)
         free(x509_ctx->cert_dn[i]);
     }
 
+
     free(x509_ctx->signature);
 
 #ifdef CONFIG_SSL_CERT_VERIFICATION 
     if (x509_ctx->digest)
     {
         bi_free(x509_ctx->rsa_ctx->bi_ctx, x509_ctx->digest);
+    }
+
+    if (x509_ctx->subject_alt_dnsnames)
+    {
+        for (i = 0; x509_ctx->subject_alt_dnsnames[i]; ++i)
+            free(x509_ctx->subject_alt_dnsnames[i]);
+
+        free(x509_ctx->subject_alt_dnsnames);
     }
 #endif
 
