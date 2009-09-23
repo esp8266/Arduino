@@ -43,6 +43,7 @@ public class Compiler implements MessageConsumer {
   Sketch sketch;
   String buildPath;
   String primaryClassName;
+  boolean verbose;
 
   RunnerException exception;
 
@@ -61,10 +62,12 @@ public class Compiler implements MessageConsumer {
   public boolean compile(Sketch sketch,
                          String buildPath,
                          String primaryClassName,
-			 Target target) throws RunnerException {
+			 Target target,
+                         boolean verbose) throws RunnerException {
     this.sketch = sketch;
     this.buildPath = buildPath;
     this.primaryClassName = primaryClassName;
+    this.verbose = verbose;
 
     // the pms object isn't used for anything but storage
     MessageStream pms = new MessageStream(this);
@@ -223,7 +226,7 @@ public class Compiler implements MessageConsumer {
     commandList.toArray(command);
     int result = 0;
     
-    if (Preferences.getBoolean("build.verbose")) {
+    if (verbose || Preferences.getBoolean("build.verbose")) {
       for(int j = 0; j < command.length; j++) {
         System.out.print(command[j] + " ");
       }

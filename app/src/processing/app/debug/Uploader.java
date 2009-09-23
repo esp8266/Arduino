@@ -56,11 +56,13 @@ public abstract class Uploader implements MessageConsumer  {
   static InputStream serialInput;
   static OutputStream serialOutput;
   //int serial; // last byte of data received
+  
+  boolean verbose;
 
   public Uploader() {
   }
 
-  public abstract boolean uploadUsingPreferences(String buildPath, String className)
+  public abstract boolean uploadUsingPreferences(String buildPath, String className, boolean verbose)
     throws RunnerException;
   
   public abstract boolean burnBootloader(String programmer) throws RunnerException;
@@ -117,7 +119,7 @@ public abstract class Uploader implements MessageConsumer  {
       
       commandArray[0] = avrBasePath + commandArray[0];
       
-      if (Preferences.getBoolean("upload.verbose")) {
+      if (verbose || Preferences.getBoolean("upload.verbose")) {
         for(int i = 0; i < commandArray.length; i++) {
           System.out.print(commandArray[i] + " ");
         }

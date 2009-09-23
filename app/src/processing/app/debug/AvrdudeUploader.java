@@ -42,8 +42,9 @@ public class AvrdudeUploader extends Uploader  {
   }
 
   // XXX: add support for uploading sketches using a programmer
-  public boolean uploadUsingPreferences(String buildPath, String className)
+  public boolean uploadUsingPreferences(String buildPath, String className, boolean verbose)
   throws RunnerException {
+    this.verbose = verbose;
     String uploadUsing = Preferences.get("boards." + Preferences.get("board") + ".upload.using");
     if (uploadUsing == null) {
       // fall back on global preference
@@ -153,7 +154,7 @@ public class AvrdudeUploader extends Uploader  {
       commandDownloader.add("-C" + Base.getHardwarePath() + "/tools/avr/etc/avrdude.conf");
     }
 
-    if (Preferences.getBoolean("upload.verbose")) {
+    if (verbose || Preferences.getBoolean("upload.verbose")) {
       commandDownloader.add("-v");
       commandDownloader.add("-v");
       commandDownloader.add("-v");

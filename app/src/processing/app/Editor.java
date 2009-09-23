@@ -496,10 +496,18 @@ public class Editor extends JFrame implements RunnerListener {
     item = newJMenuItem("Upload to I/O Board", 'U');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          handleExport();
+          handleExport(false);
         }
       });
     fileMenu.add(item);
+
+//    item = newJMenuItemShift("Upload to I/O Board (verbose)", 'U');
+//    item.addActionListener(new ActionListener() {
+//        public void actionPerformed(ActionEvent e) {
+//          handleExport(true);
+//        }
+//      });
+//    fileMenu.add(item);
 
     fileMenu.addSeparator();
 
@@ -557,7 +565,7 @@ public class Editor extends JFrame implements RunnerListener {
       });
     sketchMenu.add(item);
 
-//    item = newJMenuItemShift("Present", 'R');
+//    item = newJMenuItemShift("Verify / Compile (verbose)", 'R');
 //    item.addActionListener(new ActionListener() {
 //        public void actionPerformed(ActionEvent e) {
 //          handleRun(true);
@@ -1736,9 +1744,9 @@ public class Editor extends JFrame implements RunnerListener {
 
   /**
    * Implements Sketch &rarr; Run.
-   * @param present Set true to run in full screen (present mode).
+   * @param verbose Set true to run with verbose output.
    */
-  public void handleRun(boolean present) {
+  public void handleRun(final boolean verbose) {
     internalCloseRunner();
     running = true;
     toolbar.activate(EditorToolbar.RUN);
@@ -1752,14 +1760,15 @@ public class Editor extends JFrame implements RunnerListener {
       console.clear();
     }
 
-    presenting = present;
+    //presenting = present;
 
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         try {
           sketch.compile(new Target(
             Base.getHardwarePath() + File.separator + "cores",
-            Preferences.get("boards." + Preferences.get("board") + ".build.core")));    
+            Preferences.get("boards." + Preferences.get("board") + ".build.core")),
+            verbose);    
           statusNotice("Done compiling.");
         } catch (RunnerException e) {
           //statusError("Error compiling...");
@@ -2155,7 +2164,7 @@ public class Editor extends JFrame implements RunnerListener {
    * Made synchronized to (hopefully) avoid problems of people
    * hitting export twice, quickly, and horking things up.
    */
-  synchronized public void handleExport() {
+  synchronized public void handleExport(final boolean verbose) {
     //if (!handleExportCheckModified()) return;
     toolbar.activate(EditorToolbar.EXPORT);
 
@@ -2173,7 +2182,8 @@ public class Editor extends JFrame implements RunnerListener {
           
             boolean success = sketch.exportApplet(new Target(
               Base.getHardwarePath() + File.separator + "cores",
-              Preferences.get("boards." + Preferences.get("board") + ".build.core")));
+              Preferences.get("boards." + Preferences.get("board") + ".build.core")),
+              verbose);
             if (success) {
               statusNotice("Done uploading.");
             } else {
