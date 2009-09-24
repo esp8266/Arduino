@@ -648,6 +648,24 @@ static int cert_tests(void)
     }
 
     ssl_ctx_free(ssl_ctx);
+
+    if (get_file("../ssl/test/qualityssl.com.der", &buf) < 0 ||
+                                    x509_new(buf, &len, &x509_ctx))
+    {
+        printf("Cert #9\n");
+        res = -1;
+        goto bad_cert;
+    }
+
+    if (strcmp(x509_ctx->subject_alt_dnsnames[1], "qualityssl.com"))
+    {
+        printf("Cert #9 (2)\n");
+        res = -1;
+        goto bad_cert;
+    }
+    x509_free(x509_ctx);
+    free(buf);
+
     res = 0;        /* all ok */
     printf("All Certificate tests passed\n");
 
