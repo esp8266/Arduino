@@ -40,31 +40,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.sun.jdi.Field;
-import com.sun.jdi.IncompatibleThreadStateException;
-import com.sun.jdi.ThreadReference;
-import com.sun.jdi.VMDisconnectedException;
-import com.sun.jdi.Value;
-import com.sun.jdi.VirtualMachine;
-import com.sun.jdi.event.ClassPrepareEvent;
-import com.sun.jdi.event.Event;
-import com.sun.jdi.event.EventIterator;
-import com.sun.jdi.event.EventQueue;
-import com.sun.jdi.event.EventSet;
-import com.sun.jdi.event.ExceptionEvent;
-import com.sun.jdi.event.MethodEntryEvent;
-import com.sun.jdi.event.MethodExitEvent;
-import com.sun.jdi.event.ModificationWatchpointEvent;
-import com.sun.jdi.event.StepEvent;
-import com.sun.jdi.event.ThreadDeathEvent;
-import com.sun.jdi.event.VMDeathEvent;
-import com.sun.jdi.event.VMDisconnectEvent;
-import com.sun.jdi.event.VMStartEvent;
-import com.sun.jdi.request.EventRequest;
-import com.sun.jdi.request.EventRequestManager;
-import com.sun.jdi.request.ExceptionRequest;
-import com.sun.jdi.request.ModificationWatchpointRequest;
-import com.sun.jdi.request.StepRequest;
+import com.sun.jdi.*;
+import com.sun.jdi.event.*;
+import com.sun.jdi.request.*;
 
 /**
  * This class processes incoming JDI events and displays them
@@ -132,8 +110,9 @@ public class EventThread extends Thread {
 //    deathReq.setSuspendPolicy(EventRequest.SUSPEND_ALL);
 //    deathReq.enable();
     
-    // want all exceptions
+    // get only the uncaught exceptions
     ExceptionRequest excReq = mgr.createExceptionRequest(null, false, true);
+    // this version reports all exceptions, caught or uncaught
     //ExceptionRequest excReq = mgr.createExceptionRequest(null, true, true);
     // suspend so we can step
     excReq.setSuspendPolicy(EventRequest.SUSPEND_ALL);
@@ -380,7 +359,7 @@ public class EventThread extends Thread {
   }
 
   private void exceptionEvent(ExceptionEvent event) {
-//    ObjectReference or = event.exception();
+//    com.sun.jdi.ObjectReference or = event.exception();
 //    System.out.println("exceptionEvent() fired " + or);
 //    System.out.println("catch location " + event.catchLocation());
     

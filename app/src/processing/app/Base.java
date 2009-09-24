@@ -3,13 +3,12 @@
 /*
   Part of the Processing project - http://processing.org
 
-  Copyright (c) 2004-08 Ben Fry and Casey Reas
+  Copyright (c) 2004-09 Ben Fry and Casey Reas
   Copyright (c) 2001-04 Massachusetts Institute of Technology
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
+  it under the terms of the GNU General Public License version 2
+  as published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -44,14 +43,14 @@ public class Base {
   static final int REVISION = 18;
   static String VERSION_NAME = "0018";
 
-  static HashMap<Integer, String> platformNames = new HashMap();
+  static HashMap<Integer, String> platformNames = new HashMap<Integer, String>();
   static {
     platformNames.put(PConstants.WINDOWS, "windows");
     platformNames.put(PConstants.MACOSX, "macosx");
     platformNames.put(PConstants.LINUX, "linux");
   }
 
-  static HashMap<String, Integer> platformIndices = new HashMap();
+  static HashMap<String, Integer> platformIndices = new HashMap<String, Integer>();
   static {
     platformIndices.put("windows", PConstants.WINDOWS);
     platformIndices.put("macosx", PConstants.MACOSX);
@@ -75,7 +74,7 @@ public class Base {
   static private File librariesFolder;
   static private File toolsFolder;
   static private File hardwareFolder;
-  
+
   static HashSet<File> libraries;
   
   // maps imported packages to their library folder
@@ -90,7 +89,7 @@ public class Base {
   static File untitledFolder;
 
   // p5 icon for the window
-  static Image icon;
+//  static Image icon;
 
 //  int editorCount;
 //  Editor[] editors;
@@ -102,8 +101,24 @@ public class Base {
 //  int nextEditorX;
 //  int nextEditorY;
 
+//  import com.sun.jna.Library;
+//  import com.sun.jna.Native;
+
+//  public interface CLibrary extends Library {
+//    CLibrary INSTANCE = (CLibrary)Native.loadLibrary("c", CLibrary.class);
+//      int setenv(String name, String value, int overwrite);
+//    String getenv(String name);
+//    int unsetenv(String name);
+//    int putenv(String string);
+//  }
+
 
   static public void main(String args[]) {
+//    /Users/fry/coconut/sketchbook/libraries/gsvideo/library
+//    CLibrary clib = CLibrary.INSTANCE;
+//    clib.setenv("DYLD_LIBRARY_PATH", "/Users/fry/coconut/sketchbook/libraries/gsvideo/library", 1);
+//    System.out.println("env is now " + clib.getenv("DYLD_LIBRARY_PATH"));
+
     try {
       File versionFile = getContentFile("lib/version.txt");
       if (versionFile.exists()) {
@@ -188,12 +203,14 @@ public class Base {
             "b { font: 13pt \"Lucida Grande\" }"+
             "p { font: 11pt \"Lucida Grande\"; margin-top: 8px }"+
             "</style> </head> <body>" +
-            "<b>The standard menu bar has been disabled.</b>" +
-            "<p>Due to an Apple bug, the Arduino menu bar " +
-            "is unusable on Mac OS X 10.5. <br>" +
-            "As a workaround, the menu bar will be placed inside " +
-            "the editor window. This <br>setting can be changed in the " +
-            "Preferences window. If this bug makes you sad, <br>" +
+            "<b>Some menus have been disabled.</b>" +
+            "<p>Due to an Apple bug, the Sketchbook and Example menus " +
+            "are unusable. <br>" +
+            "As a workaround, these items will be disabled from the " +
+            "standard menu bar, <br>" +
+            "but you can use the Open button on " +
+            "the toolbar to access the same items. <br>" +
+            "If this bug makes you sad, " +
             "please contact Apple via bugreporter.apple.com.</p>" +
             "</body> </html>";
           Object[] options = { "OK", "More Info" };
@@ -210,13 +227,18 @@ public class Base {
             // But don't bother setting the preference in the file
           } else {
             // Shut off in the preferences for next time
-            Preferences.set(properMenuBar, "false");
+            //Preferences.set(properMenuBar, "false");
+            // For 1.0.4, we'll stick with the Apple menu bar,
+            // and just disable the sketchbook and examples sub-menus.
+            Preferences.set(properMenuBar, "true");
             if (result == 1) {  // More Info
               Base.openURL("http://dev.processing.org/bugs/show_bug.cgi?id=786");
             }
           }
           // Whether or not canceled, set to false (right now) if we're on 10.5
-          System.setProperty(properMenuBar, "false");
+          //System.setProperty(properMenuBar, "false");
+          // Changing this behavior for 1.0.4
+          System.setProperty(properMenuBar, "true");
         }
       }
     }
@@ -711,13 +733,17 @@ public class Base {
 
 
   protected Editor handleOpen(String path, int[] location) {
+//    System.err.println("entering handleOpen " + path);
+
     File file = new File(path);
     if (!file.exists()) return null;
 
+//    System.err.println("  editors: " + editors);
     // Cycle through open windows to make sure that it's not already open.
     for (Editor editor : editors) {
       if (editor.getSketch().getMainFilePath().equals(path)) {
         editor.toFront();
+//        System.err.println("  handleOpen: already opened");
         return editor;
       }
     }
@@ -736,10 +762,23 @@ public class Base {
 //      }
 //    }
 
+//    System.err.println("  creating new editor");
     Editor editor = new Editor(this, path, location);
+//    Editor editor = null;
+//    try {
+//      editor = new Editor(this, path, location);
+//    } catch (Exception e) {
+//      e.printStackTrace();
+//      System.err.flush();
+//      System.out.flush();
+//      System.exit(1);
+//    }
+//    System.err.println("  done creating new editor");
+//    EditorConsole.systemErr.println("  done creating new editor");
 
     // Make sure that the sketch actually loaded
     if (editor.getSketch() == null) {
+//      System.err.println("sketch was null, getting out of handleOpen");
       return null;  // Just walk away quietly
     }
 
@@ -762,6 +801,8 @@ public class Base {
     // now that we're ready, show the window
     // (don't do earlier, cuz we might move it based on a window being closed)
     editor.setVisible(true);
+
+//    System.err.println("exiting handleOpen");
 
     return editor;
   }
@@ -952,9 +993,16 @@ public class Base {
   protected void rebuildSketchbookMenu(JMenu menu) {
     //System.out.println("rebuilding sketchbook menu");
     //new Exception().printStackTrace();
+    boolean nativeButBroken = Base.isMacOS() ?
+      Preferences.getBoolean("apple.laf.useScreenMenuBar") : false;
+
     try {
-      menu.removeAll();
-      addSketches(menu, getSketchbookFolder(), false);
+      if (nativeButBroken) {  // osx workaround
+        menu.setEnabled(false);
+      } else {
+        menu.removeAll();
+        addSketches(menu, getSketchbookFolder(), false);
+      }
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -964,24 +1012,30 @@ public class Base {
   public void rebuildImportMenu(JMenu importMenu) {
     //System.out.println("rebuilding import menu");
     importMenu.removeAll();
-    
+
     // reset the set of libraries
     libraries = new HashSet<File>();
 
     // reset the table mapping imports to libraries
     importToLibraryTable = new HashMap<String, File>();
 
-    // Add libraries found in the sketchbook folder
-    try {
-      File sketchbookLibraries = getSketchbookLibrariesFolder();
-      boolean found = addLibraries(importMenu, sketchbookLibraries);
-      if (found) importMenu.addSeparator();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
     // Add from the "libraries" subfolder in the Processing directory
     try {
       addLibraries(importMenu, librariesFolder);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    // Add libraries found in the sketchbook folder
+    int separatorIndex = importMenu.getItemCount();
+    try {
+      File sketchbookLibraries = getSketchbookLibrariesFolder();
+      boolean found = addLibraries(importMenu, sketchbookLibraries);
+      if (found) {
+        JMenuItem contrib = new JMenuItem("Contributed");
+        contrib.setEnabled(false);
+        importMenu.insert(contrib, separatorIndex);
+        importMenu.insertSeparator(separatorIndex);
+      }
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -990,14 +1044,20 @@ public class Base {
 
   public void rebuildExamplesMenu(JMenu menu) {
     //System.out.println("rebuilding examples menu");
+    boolean nativeButBroken = Base.isMacOS() ?
+      Preferences.getBoolean("apple.laf.useScreenMenuBar") : false;
 
     try {
-      menu.removeAll();
-      boolean found = addSketches(menu, examplesFolder, false);
-      if (found) menu.addSeparator();
-      found = addSketches(menu, getSketchbookLibrariesFolder(), false);
-      if (found) menu.addSeparator();
-      addSketches(menu, librariesFolder, false);
+      if (nativeButBroken) {  // osx workaround
+        menu.setEnabled(false);
+      } else {
+        menu.removeAll();
+        boolean found = addSketches(menu, examplesFolder, false);
+        if (found) menu.addSeparator();
+        found = addSketches(menu, getSketchbookLibrariesFolder(), false);
+        if (found) menu.addSeparator();
+        addSketches(menu, librariesFolder, false);
+      }
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -1084,17 +1144,17 @@ public class Base {
           boolean found = addSketches(menu, subfolder, openReplaces); //, false);
           if (found) ifound = true;
         } else {
-          // not a sketch folder, but maybe a subfolder containing sketches
-          JMenu submenu = new JMenu(list[i]);
-          // needs to be separate var
-          // otherwise would set ifound to false
-          boolean found = addSketches(submenu, subfolder, openReplaces); //, false);
-          if (found) {
-            menu.add(submenu);
-            ifound = true;
-          }
+        // not a sketch folder, but maybe a subfolder containing sketches
+        JMenu submenu = new JMenu(list[i]);
+        // needs to be separate var
+        // otherwise would set ifound to false
+        boolean found = addSketches(submenu, subfolder, openReplaces); //, false);
+        if (found) {
+          menu.add(submenu);
+          ifound = true;
         }
       }
+    }
     }
     return ifound;  // actually ignored, but..
   }
@@ -1126,23 +1186,24 @@ public class Base {
 
     boolean ifound = false;
 
-    for (String libraryName : list) {
-      File subfolder = new File(folder, libraryName);
+    for (String potentialName : list) {
+      File subfolder = new File(folder, potentialName);
 //      File libraryFolder = new File(subfolder, "library");
-//      File libraryJar = new File(libraryFolder, libraryName + ".jar");
+//      File libraryJar = new File(libraryFolder, potentialName + ".jar");
 //      // If a .jar file of the same prefix as the folder exists
 //      // inside the 'library' subfolder of the sketch
 //      if (libraryJar.exists()) {
-        String sanityCheck = Sketch.sanitizeName(libraryName);
-        if (!sanityCheck.equals(libraryName)) {
+        String sanityCheck = Sketch.sanitizeName(potentialName);
+        if (!sanityCheck.equals(potentialName)) {
           String mess =
-            "The library \"" + libraryName + "\" cannot be used.\n" +
+            "The library \"" + potentialName + "\" cannot be used.\n" +
             "Library names must contain only basic letters and numbers.\n" +
-            "(ascii only and no spaces, and it cannot start with a number)";
+            "(ASCII only and no spaces, and it cannot start with a number)";
           Base.showMessage("Ignoring bad library name", mess);
           continue;
         }
 
+        String libraryName = potentialName;
 //        // get the path for all .jar files in this code folder
 //        String libraryClassPath =
 //          Compiler.contentsToClassPath(libraryFolder);
@@ -1399,8 +1460,8 @@ public class Base {
     }
     return null;
   }
-  
-  
+
+
   static public Set<File> getLibraries() {
     return libraries;
   }
@@ -1424,8 +1485,8 @@ public class Base {
   static public String getToolsPath() {
     return toolsFolder.getAbsolutePath();
   }
-  
-  
+
+
   static public File getHardwareFolder() {
     // calculate on the fly because it's needed by Preferences.init() to find
     // the boards.txt and programmers.txt preferences files (which happens
@@ -1457,8 +1518,8 @@ public class Base {
   static public File getSketchbookLibrariesFolder() {
     return new File(getSketchbookFolder(), "libraries");
   }
-  
-  
+
+
   static public String getSketchbookLibrariesPath() {
     return getSketchbookLibrariesFolder().getAbsolutePath();
   }
@@ -1658,7 +1719,7 @@ public class Base {
     File referenceFile = new File(referenceFolder, filename);
     openURL(referenceFile.getAbsolutePath());
   }
-  
+
   static public void showGettingStarted() {
     if (Base.isMacOS()) {
       Base.showReference("Guide_MacOSX.html");
@@ -1687,8 +1748,8 @@ public class Base {
   static public void showTroubleshooting() {
     showReference("Guide_Troubleshooting.html");
   }
-  
-  
+
+
   static public void showFAQ() {
     showReference("faq.html");
   }

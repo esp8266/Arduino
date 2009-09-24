@@ -90,13 +90,13 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
 
   public PGraphicsJava2D() { }
 
-  
+
   //public void setParent(PApplet parent)
-  
-  
+
+
   //public void setPrimary(boolean primary)
-  
-  
+
+
   //public void setPath(String path)
 
 
@@ -131,9 +131,9 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
     //reapplySettings = true;
   }
 
-  
+
   //public void dispose()
-  
+
 
 
   //////////////////////////////////////////////////////////////
@@ -144,11 +144,11 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
   public boolean canDraw() {
     return true;
   }
-  
-  
+
+
   public void beginDraw() {
     checkSettings();
-    
+
     resetMatrix(); // reset model matrix
 
     // reset vertices
@@ -171,37 +171,37 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
 
 
   //////////////////////////////////////////////////////////////
-  
+
   // SETTINGS
-  
-  
+
+
   //protected void checkSettings()
-  
-  
+
+
   //protected void defaultSettings()
-  
-  
+
+
   //protected void reapplySettings()
 
-  
+
 
   //////////////////////////////////////////////////////////////
 
   // HINT
-  
-  
+
+
   //public void hint(int which)
-  
-  
-  
+
+
+
   //////////////////////////////////////////////////////////////
 
   // SHAPES
 
 
   //public void beginShape(int kind)
-  
-  
+
+
   public void beginShape(int kind) {
     //super.beginShape(kind);
     shape = kind;
@@ -215,14 +215,14 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
     // then just use it to continue the shape.
     gpath = null;
   }
-  
-  
+
+
   //public boolean edge(boolean e)
 
 
   //public void normal(float nx, float ny, float nz) {
 
-  
+
   //public void textureMode(int mode)
 
 
@@ -355,7 +355,7 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
     showDepthWarningXYZ("vertex");
   }
 
-  
+
   public void breakShape() {
     breakShape = true;
   }
@@ -374,16 +374,16 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
   }
 
 
-  
+
   //////////////////////////////////////////////////////////////
 
   // BEZIER VERTICES
-  
-  
+
+
   public void bezierVertex(float x1, float y1,
                            float x2, float y2,
                            float x3, float y3) {
-    bezierVertexCheck();    
+    bezierVertexCheck();
     gpath.curveTo(x1, y1, x2, y2, x3, y3);
   }
 
@@ -394,13 +394,13 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
     showDepthWarningXYZ("bezierVertex");
   }
 
-  
+
 
   //////////////////////////////////////////////////////////////
 
   // CURVE VERTICES
-  
-  
+
+
   protected void curveVertexCheck() {
     super.curveVertexCheck();
 
@@ -413,9 +413,9 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
   }
 
 
-  protected void curveVertexSegment(float x1, float y1,  
-                                    float x2, float y2, 
-                                    float x3, float y3, 
+  protected void curveVertexSegment(float x1, float y1,
+                                    float x2, float y2,
+                                    float x3, float y3,
                                     float x4, float y4) {
     curveCoordX[0] = x1;
     curveCoordY[0] = y1;
@@ -443,8 +443,8 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
                   curveDrawX[2], curveDrawY[2],
                   curveDrawX[3], curveDrawY[3]);
   }
-  
-  
+
+
   public void curveVertex(float x, float y, float z) {
     showDepthWarningXYZ("curveVertex");
   }
@@ -454,24 +454,24 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
   //////////////////////////////////////////////////////////////
 
   // RENDERER
-  
-  
+
+
   //public void flush()
-  
-    
-  
+
+
+
   //////////////////////////////////////////////////////////////
 
   // POINT, LINE, TRIANGLE, QUAD
 
-  
+
   public void point(float x, float y) {
     if (stroke) {
-      if (strokeWeight > 1) {
-        line(x, y, x + EPSILON, y + EPSILON);
-      } else {
-        set((int) screenX(x, y), (int) screenY(x, y), strokeColor);
-      }
+//      if (strokeWeight > 1) {
+      line(x, y, x + EPSILON, y + EPSILON);
+//      } else {
+//        set((int) screenX(x, y), (int) screenY(x, y), strokeColor);
+//      }
     }
   }
 
@@ -504,43 +504,43 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
     drawShape(gp);
   }
 
-  
+
 
   //////////////////////////////////////////////////////////////
 
   // RECT
 
-  
+
   //public void rectMode(int mode)
-  
-  
+
+
   //public void rect(float a, float b, float c, float d)
 
-  
+
   protected void rectImpl(float x1, float y1, float x2, float y2) {
     rect.setFrame(x1, y1, x2-x1, y2-y1);
     drawShape(rect);
   }
 
-  
+
 
   //////////////////////////////////////////////////////////////
 
   // ELLIPSE
 
-  
+
   //public void ellipseMode(int mode)
-  
-  
+
+
   //public void ellipse(float a, float b, float c, float d)
 
-  
+
   protected void ellipseImpl(float x, float y, float w, float h) {
     ellipse.setFrame(x, y, w, h);
     drawShape(ellipse);
   }
 
-  
+
 
   //////////////////////////////////////////////////////////////
 
@@ -550,7 +550,7 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
   //public void arc(float a, float b, float c, float d,
   //                float start, float stop)
 
-  
+
   protected void arcImpl(float x, float y, float w, float h,
                          float start, float stop) {
     // 0 to 90 in java would be 0 to -90 for p5 renderer
@@ -584,13 +584,13 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
     }
   }
 
-  
-  
+
+
   //////////////////////////////////////////////////////////////
 
   // JAVA2D SHAPE/PATH HANDLING
 
-  
+
   protected void fillShape(Shape s) {
     if (fillGradient) {
       g2.setPaint(fillGradientObject);
@@ -601,7 +601,7 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
     }
   }
 
-  
+
   protected void strokeShape(Shape s) {
     if (strokeGradient) {
       g2.setPaint(strokeGradientObject);
@@ -612,7 +612,7 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
     }
   }
 
-  
+
   protected void drawShape(Shape s) {
     if (fillGradient) {
       g2.setPaint(fillGradientObject);
@@ -630,121 +630,122 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
     }
   }
 
-  
+
 
   //////////////////////////////////////////////////////////////
-  
+
   // BOX
 
-  
+
   //public void box(float size)
-  
-  
+
+
   public void box(float w, float h, float d) {
     showMethodWarning("box");
   }
 
-  
-  
+
+
   //////////////////////////////////////////////////////////////
-  
+
   // SPHERE
 
-  
+
   //public void sphereDetail(int res)
-  
-  
+
+
   //public void sphereDetail(int ures, int vres)
-  
-  
+
+
   public void sphere(float r) {
     showMethodWarning("sphere");
   }
 
-  
+
 
   //////////////////////////////////////////////////////////////
 
   // BEZIER
 
-  
+
   //public float bezierPoint(float a, float b, float c, float d, float t)
-  
-  
+
+
   //public float bezierTangent(float a, float b, float c, float d, float t)
-  
-  
+
+
   //protected void bezierInitCheck()
-  
-  
+
+
   //protected void bezierInit()
-  
-  
+
+
   /** Ignored (not needed) in Java 2D. */
   public void bezierDetail(int detail) {
   }
-  
-  
+
+
   //public void bezier(float x1, float y1,
   //                   float x2, float y2,
   //                   float x3, float y3,
   //                   float x4, float y4)
-  
-  
+
+
   //public void bezier(float x1, float y1, float z1,
   //                   float x2, float y2, float z2,
   //                   float x3, float y3, float z3,
   //                   float x4, float y4, float z4)
 
 
-  
+
   //////////////////////////////////////////////////////////////
 
   // CURVE
 
-  
+
   //public float curvePoint(float a, float b, float c, float d, float t)
-  
-  
+
+
   //public float curveTangent(float a, float b, float c, float d, float t)
 
-  
+
   /** Ignored (not needed) in Java 2D. */
   public void curveDetail(int detail) {
   }
-  
+
   //public void curveTightness(float tightness)
-  
-  
+
+
   //protected void curveInitCheck()
-  
-  
+
+
   //protected void curveInit()
-  
-  
+
+
   //public void curve(float x1, float y1,
   //                  float x2, float y2,
   //                  float x3, float y3,
   //                  float x4, float y4)
-  
-  
+
+
   //public void curve(float x1, float y1, float z1,
   //                  float x2, float y2, float z2,
   //                  float x3, float y3, float z3,
   //                  float x4, float y4, float z4)
 
 
-  
+
   //////////////////////////////////////////////////////////////
-  
+
   // SMOOTH
-  
+
 
   public void smooth() {
     smooth = true;
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                         RenderingHints.VALUE_ANTIALIAS_ON);
     g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+//                        RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                         RenderingHints.VALUE_INTERPOLATION_BICUBIC);
   }
 
@@ -758,21 +759,21 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
   }
 
 
-  
+
   //////////////////////////////////////////////////////////////
 
   // IMAGE
-  
-  
+
+
   //public void imageMode(int mode)
-  
-  
+
+
   //public void image(PImage image, float x, float y)
-  
-  
+
+
   //public void image(PImage image, float x, float y, float c, float d)
-  
-  
+
+
   //public void image(PImage image,
   //                  float a, float b, float c, float d,
   //                  int u1, int v1, int u2, int v2)
@@ -786,7 +787,7 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
                            int u1, int v1, int u2, int v2) {
     // Image not ready yet, or an error
     if (who.width <= 0 || who.height <= 0) return;
-    
+
     if (who.getCache(this) == null) {
       //System.out.println("making new image cache");
       who.setCache(this, new ImageCache(who));
@@ -934,39 +935,39 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
     }
   }
 
-  
+
 
   //////////////////////////////////////////////////////////////
 
   // SHAPE
 
-  
+
   //public void shapeMode(int mode)
-  
-  
+
+
   //public void shape(PShape shape)
-  
-  
+
+
   //public void shape(PShape shape, float x, float y)
-  
-  
+
+
   //public void shape(PShape shape, float x, float y, float c, float d)
 
 
-  
+
   //////////////////////////////////////////////////////////////
 
   // TEXT ATTRIBTUES
 
-  
+
   //public void textAlign(int align)
-  
-  
+
+
   //public void textAlign(int alignX, int alignY)
-  
+
 
   public float textAscent() {
-    Font font = textFont.getFont();    
+    Font font = textFont.getFont();
     if (font == null) {
       return super.textAscent();
     }
@@ -976,7 +977,7 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
 
 
   public float textDescent() {
-    Font font = textFont.getFont();    
+    Font font = textFont.getFont();
     if (font == null) {
       return super.textDescent();
     }
@@ -986,21 +987,21 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
 
 
   //public void textFont(PFont which)
-  
-  
+
+
   //public void textFont(PFont which, float size)
-  
-  
+
+
   //public void textLeading(float leading)
-  
-  
+
+
   //public void textMode(int mode)
-  
-  
+
+
   protected boolean textModeCheck(int mode) {
     return (mode == MODEL) || (mode == SCREEN);
   }
-  
+
 
   /**
    * Same as parent, but override for native version of the font.
@@ -1030,10 +1031,10 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
 
 
   //public float textWidth(char c)
-  
-  
+
+
   //public float textWidth(String str)
-  
+
 
   protected float textWidthImpl(char buffer[], int start, int stop) {
     Font font = textFont.getFont();
@@ -1051,20 +1052,20 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
   //////////////////////////////////////////////////////////////
 
   // TEXT
-  
+
   // None of the variations of text() are overridden from PGraphics.
-  
-  
-  
+
+
+
   //////////////////////////////////////////////////////////////
 
   // TEXT IMPL
-  
-  
+
+
   //protected void textLineAlignImpl(char buffer[], int start, int stop,
   //                                 float x, float y)
 
-  
+
   protected void textLineImpl(char buffer[], int start, int stop,
                               float x, float y) {
     Font font = textFont.getFont();
@@ -1118,7 +1119,7 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
     // and creates garbage because of the new temporary object
     //java.awt.font.GlyphVector gv = textFontNative.createGlyphVector(g2.getFontRenderContext(), new String(buffer, start, stop));
     //g2.drawGlyphVector(gv, x, y);
-    
+
 //    System.out.println("text() " + new String(buffer, start, stop));
 
     // return to previous smoothing state if it was changed
@@ -1131,11 +1132,11 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
   }
 
 
-  
+
   //////////////////////////////////////////////////////////////
 
   // MATRIX STACK
-  
+
 
   public void pushMatrix() {
     if (transformCount == transformStack.length) {
@@ -1157,11 +1158,11 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
   }
 
 
-  
+
   //////////////////////////////////////////////////////////////
 
   // MATRIX TRANSFORMS
-  
+
 
   public void translate(float tx, float ty) {
     g2.translate(tx, ty);
@@ -1169,28 +1170,28 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
 
 
   //public void translate(float tx, float ty, float tz)
-  
+
 
   public void rotate(float angle) {
     g2.rotate(angle);
   }
 
-  
+
   public void rotateX(float angle) {
     showDepthWarning("rotateX");
   }
-  
-  
+
+
   public void rotateY(float angle) {
     showDepthWarning("rotateY");
   }
-  
-  
+
+
   public void rotateZ(float angle) {
     showDepthWarning("rotateZ");
   }
-  
-  
+
+
   public void rotate(float angle, float vx, float vy, float vz) {
     showVariationWarning("rotate");
   }
@@ -1205,25 +1206,25 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
     g2.scale(sx, sy);
   }
 
-  
+
   public void scale(float sx, float sy, float sz) {
     showDepthWarningXYZ("scale");
   }
 
-  
+
 
   //////////////////////////////////////////////////////////////
 
   // MATRIX MORE
 
-  
+
   public void resetMatrix() {
     g2.setTransform(new AffineTransform());
   }
 
 
   //public void applyMatrix(PMatrix2D source)
-  
+
 
   public void applyMatrix(float n00, float n01, float n02,
                           float n10, float n11, float n12) {
@@ -1232,10 +1233,10 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
     g2.transform(new AffineTransform(n00, n10, n01, n11, n02, n12));
     //g2.transform(new AffineTransform(n00, n01, n02, n10, n11, n12));
   }
-  
-  
+
+
   //public void applyMatrix(PMatrix3D source)
-  
+
 
   public void applyMatrix(float n00, float n01, float n02, float n03,
                           float n10, float n11, float n12, float n13,
@@ -1244,7 +1245,7 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
     showVariationWarning("applyMatrix");
   }
 
-  
+
 
   //////////////////////////////////////////////////////////////
 
@@ -1254,53 +1255,53 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
   public PMatrix getMatrix() {
     return getMatrix((PMatrix2D) null);
   }
-  
-  
+
+
   public PMatrix2D getMatrix(PMatrix2D target) {
     if (target == null) {
       target = new PMatrix2D();
     }
     g2.getTransform().getMatrix(transform);
-    target.set((float) transform[0], (float) transform[2], (float) transform[4], 
+    target.set((float) transform[0], (float) transform[2], (float) transform[4],
                (float) transform[1], (float) transform[3], (float) transform[5]);
     return target;
   }
 
-  
+
   public PMatrix3D getMatrix(PMatrix3D target) {
     showVariationWarning("getMatrix");
     return target;
   }
 
-  
+
   //public void setMatrix(PMatrix source)
 
-  
+
   public void setMatrix(PMatrix2D source) {
-    g2.setTransform(new AffineTransform(source.m00, source.m10, 
+    g2.setTransform(new AffineTransform(source.m00, source.m10,
                                         source.m01, source.m11,
                                         source.m02, source.m12));
   }
-  
+
 
   public void setMatrix(PMatrix3D source) {
     showVariationWarning("setMatrix");
   }
-  
-  
+
+
   public void printMatrix() {
     getMatrix((PMatrix2D) null).print();
   }
 
-  
+
 
   //////////////////////////////////////////////////////////////
-  
+
   // CAMERA and PROJECTION
-  
-  // Inherit the plaintive warnings from PGraphics  
-  
-  
+
+  // Inherit the plaintive warnings from PGraphics
+
+
   //public void beginCamera()
   //public void endCamera()
   //public void camera()
@@ -1315,12 +1316,12 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
   //                  float near, float far)
   //public void perspective()
   //public void perspective(float fov, float aspect, float near, float far)
-  //public void frustum(float left, float right, 
-  //                    float bottom, float top, 
+  //public void frustum(float left, float right,
+  //                    float bottom, float top,
   //                    float near, float far)
   //public void printProjection()
 
-  
+
 
   //////////////////////////////////////////////////////////////
 
@@ -1338,47 +1339,47 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
     return (float)transform[1]*x + (float)transform[3]*y + (float)transform[5];
   }
 
-  
+
   public float screenX(float x, float y, float z) {
     showDepthWarningXYZ("screenX");
     return 0;
   }
-  
-  
+
+
   public float screenY(float x, float y, float z) {
     showDepthWarningXYZ("screenY");
     return 0;
   }
-  
-  
+
+
   public float screenZ(float x, float y, float z) {
     showDepthWarningXYZ("screenZ");
     return 0;
   }
-  
-  
+
+
   //public float modelX(float x, float y, float z)
-  
-  
+
+
   //public float modelY(float x, float y, float z)
-  
-  
+
+
   //public float modelZ(float x, float y, float z)
 
 
-  
+
   //////////////////////////////////////////////////////////////
-  
+
   // STYLE
-  
-  // pushStyle(), popStyle(), style() and getStyle() inherited. 
+
+  // pushStyle(), popStyle(), style() and getStyle() inherited.
 
 
-  
+
   //////////////////////////////////////////////////////////////
 
   // STROKE CAP/JOIN/WEIGHT
-  
+
 
   public void strokeCap(int cap) {
     super.strokeCap(cap);
@@ -1423,7 +1424,7 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
   // STROKE
 
   // noStroke() and stroke() inherited from PGraphics.
-  
+
 
   protected void strokeFromCalc() {
     super.strokeFromCalc();
@@ -1431,14 +1432,14 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
     strokeGradient = false;
   }
 
-  
-  
+
+
   //////////////////////////////////////////////////////////////
 
   // TINT
 
   // noTint() and tint() inherited from PGraphics.
-  
+
 
   protected void tintFromCalc() {
     super.tintFromCalc();
@@ -1446,14 +1447,14 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
     tintColorObject = new Color(tintColor, true);
   }
 
-  
-  
+
+
   //////////////////////////////////////////////////////////////
 
   // FILL
 
   // noFill() and fill() inherited from PGraphics.
-  
+
 
   protected void fillFromCalc() {
     super.fillFromCalc();
@@ -1466,8 +1467,8 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
   //////////////////////////////////////////////////////////////
 
   // MATERIAL PROPERTIES
-  
-  
+
+
   //public void ambient(int rgb)
   //public void ambient(float gray)
   //public void ambient(float x, float y, float z)
@@ -1482,12 +1483,12 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
   //public void emissive(float x, float y, float z )
   //protected void emissiveFromCalc()
 
-  
+
 
   //////////////////////////////////////////////////////////////
 
   // LIGHTS
-  
+
 
   //public void lights()
   //public void noLights()
@@ -1507,34 +1508,34 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
   //protected void lightPosition(int num, float x, float y, float z)
   //protected void lightDirection(int num, float x, float y, float z)
 
-  
+
 
   //////////////////////////////////////////////////////////////
 
   // BACKGROUND
 
-  // background() methods inherited from PGraphics, along with the 
+  // background() methods inherited from PGraphics, along with the
   // PImage version of backgroundImpl(), since it just calls set().
 
-  
+
   //public void backgroundImpl(PImage image)
-  
-  
+
+
   int[] clearPixels;
 
   public void backgroundImpl() {
     if (backgroundAlpha) {
-      // Create a small array that can be used to set the pixels several times. 
-      // Using a single-pixel line of length 'width' is a tradeoff between 
-      // speed (setting each pixel individually is too slow) and memory 
-      // (an array for width*height would waste lots of memory if it stayed 
-      // resident, and would terrify the gc if it were re-created on each trip 
+      // Create a small array that can be used to set the pixels several times.
+      // Using a single-pixel line of length 'width' is a tradeoff between
+      // speed (setting each pixel individually is too slow) and memory
+      // (an array for width*height would waste lots of memory if it stayed
+      // resident, and would terrify the gc if it were re-created on each trip
       // to background().
       WritableRaster raster = ((BufferedImage) image).getRaster();
       if ((clearPixels == null) || (clearPixels.length < width)) {
         clearPixels = new int[width];
       }
-      java.util.Arrays.fill(clearPixels, backgroundColor);      
+      java.util.Arrays.fill(clearPixels, backgroundColor);
       for (int i = 0; i < height; i++) {
         raster.setDataElements(0, i, width, 1, clearPixels);
       }
@@ -1553,51 +1554,51 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
 
 
   //////////////////////////////////////////////////////////////
-  
+
   // COLOR MODE
-  
+
   // All colorMode() variations are inherited from PGraphics.
 
-  
+
 
   //////////////////////////////////////////////////////////////
-  
+
   // COLOR CALC
-  
+
   // colorCalc() and colorCalcARGB() inherited from PGraphics.
 
-  
+
 
   //////////////////////////////////////////////////////////////
 
   // COLOR DATATYPE STUFFING
-  
+
   // final color() variations inherited.
 
-  
-  
+
+
   //////////////////////////////////////////////////////////////
 
   // COLOR DATATYPE EXTRACTION
-  
-  // final methods alpha, red, green, blue,  
+
+  // final methods alpha, red, green, blue,
   // hue, saturation, and brightness all inherited.
 
 
-  
+
   //////////////////////////////////////////////////////////////
 
   // COLOR DATATYPE INTERPOLATION
-  
+
   // both lerpColor variants inherited.
-  
-  
-  
+
+
+
   //////////////////////////////////////////////////////////////
 
   // BEGIN/END RAW
 
-  
+
   public void beginRaw(PGraphics recorderRaw) {
     showMethodWarning("beginRaw");
   }
@@ -1608,35 +1609,35 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
   }
 
 
-  
+
   //////////////////////////////////////////////////////////////
 
   // WARNINGS and EXCEPTIONS
-  
+
   // showWarning and showException inherited.
-  
+
 
 
   //////////////////////////////////////////////////////////////
 
   // RENDERER SUPPORT QUERIES
-  
-  
+
+
   //public boolean displayable()  // true
-  
-  
+
+
   //public boolean is2D()  // true
-  
-  
+
+
   //public boolean is3D()  // false
 
-  
+
 
   //////////////////////////////////////////////////////////////
-  
+
   // PIMAGE METHODS
 
-  
+
   // getImage, setCache, getCache, removeCache, isModified, setModified
 
 
@@ -1677,18 +1678,18 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
     }
     updatePixels();
   }
-  
-  
+
+
   public void resize(int wide, int high) {
     showMethodWarning("resize");
   }
 
-  
+
 
   //////////////////////////////////////////////////////////////
 
   // GET/SET
-  
+
 
   static int getset[] = new int[1];
 
@@ -1704,7 +1705,7 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
 
   //public PImage get(int x, int y, int w, int h)
 
-  
+
   public PImage getImpl(int x, int y, int w, int h) {
     PImage output = new PImage(w, h);
     output.parent = parent;
@@ -1743,13 +1744,13 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
       raster.setDataElements(dx, dy, temp.width, temp.height, temp.pixels);
     }
   }
-  
+
 
 
   //////////////////////////////////////////////////////////////
 
   // MASK
-  
+
 
   public void mask(int alpha[]) {
     showMethodWarning("mask");
@@ -1761,26 +1762,26 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
   }
 
 
-  
+
   //////////////////////////////////////////////////////////////
 
   // FILTER
-  
-  // Because the PImage versions call loadPixels() and 
+
+  // Because the PImage versions call loadPixels() and
   // updatePixels(), no need to override anything here.
 
-  
+
   //public void filter(int kind)
 
 
   //public void filter(int kind, float param)
-  
+
 
 
   //////////////////////////////////////////////////////////////
 
   // COPY
-  
+
 
   public void copy(int sx, int sy, int sw, int sh,
                    int dx, int dy, int dw, int dh) {
@@ -1805,30 +1806,30 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
 //  }
 
 
-  
+
   //////////////////////////////////////////////////////////////
 
   // BLEND
-  
+
 
 //  static public int blendColor(int c1, int c2, int mode)
-  
-  
+
+
 //  public void blend(int sx, int sy, int sw, int sh,
 //                    int dx, int dy, int dw, int dh, int mode)
-  
-  
+
+
 //  public void blend(PImage src,
 //                    int sx, int sy, int sw, int sh,
 //                    int dx, int dy, int dw, int dh, int mode)
 
 
-  
+
   //////////////////////////////////////////////////////////////
 
   // SAVE
 
-  
+
 //  public void save(String filename) {
 //    loadPixels();
 //    super.save(filename);

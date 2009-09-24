@@ -1,5 +1,22 @@
 #!/bin/sh
 
+# http://dev.processing.org/bugs/show_bug.cgi?id=1179
+OSX_VERSION=`sw_vers | grep ProductVersion | awk '{print $2}' | awk '{print substr($0,1,4)}'`
+if [ "$OSX_VERSION" = "10.4" ]
+then
+  echo "This script uses the -X option for cp (to disable resource forks),"
+  echo "which is not supported on OS X 10.4. Please either upgrade to 10.5,"
+  echo "or modify this script to remove use of the -X switch to continue."
+  # and you will also need to remove this error message
+  exit
+else
+  if [ "$OSX_VERSION" != "10.6" ] 
+  then
+    echo "Note: This script has not been tested on this "
+    echo "release of Mac OS and may cause errors."
+  fi
+fi
+
 
 ### -- SETUP WORK DIR -------------------------------------------
 
@@ -27,7 +44,7 @@ else
   cp -rX ../shared/lib "$RESOURCES/"
   cp -rX ../shared/libraries "$RESOURCES/"
   cp -rX ../shared/tools "$RESOURCES/"
-  
+
   cp -rX ../../hardware "$RESOURCES/"
 
   cp -X ../../app/lib/antlr.jar "$RESOURCES/"
@@ -41,7 +58,7 @@ else
 
   echo Extracting reference...
   unzip -q -d "$RESOURCES/" ../shared/reference.zip
-  
+
   echo Extracting avr tools...
   unzip -q -d "$RESOURCES/hardware" dist/tools-universal.zip
 fi

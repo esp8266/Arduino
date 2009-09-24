@@ -3,7 +3,7 @@
 /*
   Part of the Processing project - http://processing.org
 
-  Copyright (c) 2004-06 Ben Fry and Casey Reas
+  Copyright (c) 2004-09 Ben Fry and Casey Reas
   Copyright (c) 2001-04 Massachusetts Institute of Technology
 
   This program is free software; you can redistribute it and/or modify
@@ -32,8 +32,6 @@ import javax.swing.*;
 
 import processing.app.syntax.*;
 import processing.core.*;
-
-
 
 
 /**
@@ -144,9 +142,9 @@ public class Preferences {
 
   // data model
 
-  static Hashtable defaults;
-  static Hashtable table = new Hashtable();;
-  static Hashtable prefixes = new Hashtable();
+  static HashMap<String,String> defaults;
+  static HashMap<String,String> table = new HashMap<String,String>();;
+  static HashMap<String,HashMap<String,String>> prefixes = new HashMap<String,HashMap<String,String>>();
   static File preferencesFile;
 
 
@@ -161,22 +159,8 @@ public class Preferences {
                            "You'll need to reinstall Arduino.", e);
     }
 
-    // check for platform-specific properties in the defaults
-    String platformExt = "." + PConstants.platformNames[PApplet.platform];
-    int platformExtLength = platformExt.length();
-    Enumeration e = table.keys();
-    while (e.hasMoreElements()) {
-      String key = (String) e.nextElement();
-      if (key.endsWith(platformExt)) {
-        // this is a key specific to a particular platform
-        String actualKey = key.substring(0, key.length() - platformExtLength);
-        String value = get(key);
-        table.put(actualKey, value);
-      }
-    }
-
     // clone the hash table
-    defaults = (Hashtable) table.clone();
+    defaults = (HashMap<String, String>) table.clone();
 
     // other things that have to be set explicitly for the defaults
     setColor("run.window.bgcolor", SystemColor.control);
@@ -231,8 +215,8 @@ public class Preferences {
                        "Error reading the board definitions file (" +
 		       new File(Base.getHardwareFolder(), "boards.txt").getAbsolutePath() + "). " +
                        "Please re-download or re-unzip Arduino.\n", ex);
-    }
-    
+  }
+
     try {
       load(new FileInputStream(new File(Base.getHardwareFolder(), "programmers.txt")),
         "programmers");
@@ -445,6 +429,20 @@ public class Preferences {
     top += d.height; // + GUI_SMALL;
 
     label = new JLabel(preferencesFile.getAbsolutePath());
+    final JLabel clickable = label;
+    label.addMouseListener(new MouseAdapter() {
+        public void mousePressed(MouseEvent e) {
+          Base.openFolder(Base.getSettingsFolder());
+        }
+        
+        public void mouseEntered(MouseEvent e) {
+          clickable.setForeground(new Color(0, 0, 140));
+        }
+
+        public void mouseExited(MouseEvent e) {
+          clickable.setForeground(Color.BLACK);
+        }
+      });
     pain.add(label);
     d = label.getPreferredSize();
     label.setBounds(left, top, d.width, d.height);
@@ -678,12 +676,16 @@ public class Preferences {
   }
   
   static protected void load(InputStream input, String prefix) throws IOException {
-    Map table = new LinkedHashMap();
+    LinkedHashMap<String,String> table = new LinkedHashMap<String,String>();
     prefixes.put(prefix, table);
     load(input, table);
   }
   
   static protected void load(InputStream input, Map table) throws IOException {  
+    // check for platform-specific properties in the defaults
+    String platformExt = "." + PConstants.platformNames[PApplet.platform];
+    int platformExtLength = platformExt.length();
+    
     String[] lines = PApplet.loadStrings(input);  // Reads as UTF-8
     for (String line : lines) {
       if ((line.length() == 0) ||
@@ -693,6 +695,12 @@ public class Preferences {
       int equals = line.indexOf('=');
       if (equals != -1) {
         String key = line.substring(0, equals).trim();
+        
+        // check if this is a platform-specific key, and if so, shave things
+        if (key.endsWith(platformExt)) {
+          // this is a key specific to this platform
+          key = key.substring(0, key.length() - platformExtLength);
+        }
         String value = line.substring(equals + 1).trim();
         table.put(key, value);
       }
@@ -713,10 +721,8 @@ public class Preferences {
     // Fix for 0163 to properly use Unicode when writing preferences.txt
     PrintWriter writer = PApplet.createWriter(preferencesFile);
 
-    Enumeration e = table.keys(); //properties.propertyNames();
-    while (e.hasMoreElements()) {
-      String key = (String) e.nextElement();
-      writer.println(key + "=" + ((String) table.get(key)));
+    for (String key : table.keySet()) {
+      writer.println(key + "=" + table.get(key));
     }
 
     writer.flush();
@@ -742,15 +748,15 @@ public class Preferences {
     // preference files, look up the attribute in that file's Hashtable
     // (don't override with or fallback to the main file).  otherwise,
     // look up the attribute in the main file's Hashtable. 
-    Map table = Preferences.table;
+    HashMap<String,String> table = Preferences.table;
     if (attribute.indexOf('.') != -1) {
       String prefix = attribute.substring(0, attribute.indexOf('.'));
       if (prefixes.containsKey(prefix)) {
-        table = (Map) prefixes.get(prefix);
+        table = prefixes.get(prefix);
         attribute = attribute.substring(attribute.indexOf('.') + 1);
       }
     }
-    return (String) table.get(attribute);
+    return table.get(attribute);
     /*
     //String value = (properties != null) ?
     //properties.getProperty(attribute) : applet.getParameter(attribute);
@@ -785,7 +791,7 @@ public class Preferences {
 
 
   static public String getDefault(String attribute) {
-    return (String) defaults.get(attribute);
+    return defaults.get(attribute);
   }
 
 
@@ -845,7 +851,7 @@ public class Preferences {
 
 
   static public Color getColor(String name) {
-    Color parsed = Color.GRAY;  // set a default  
+    Color parsed = Color.GRAY;  // set a default
     String s = get(name);
     if ((s != null) && (s.indexOf("#") == 0)) {
       try {
@@ -857,11 +863,6 @@ public class Preferences {
 
 
   static public void setColor(String attr, Color what) {
-//    String r = Integer.toHexString(what.getRed());
-//    String g = Integer.toHexString(what.getGreen());
-//    String b = Integer.toHexString(what.getBlue());
-//    set(attr, "#" + r.substring(r.length() - 2) +
-//        g.substring(g.length() - 2) + b.substring(b.length() - 2));
     set(attr, "#" + PApplet.hex(what.getRGB() & 0xffffff, 6));
   }
 
@@ -911,7 +912,7 @@ public class Preferences {
 
     String s = st.nextToken();
     if (s.indexOf("#") == 0) s = s.substring(1);
-    Color color = Color.DARK_GRAY; 
+    Color color = Color.DARK_GRAY;
     try {
       color = new Color(Integer.parseInt(s, 16));
     } catch (Exception e) { }

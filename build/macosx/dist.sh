@@ -7,6 +7,13 @@ if [ $1 ]
 then
   RELEASE=$1
   echo Creating Arduino release $RELEASE...
+  INFO_SOUGHT="<string>$RELEASE,"
+  INFO_FOUND=`cat ./dist/Arduino.app/Contents/Info.plist | grep $INFO_SOUGHT`
+  if [ -z "$INFO_FOUND" ]
+  then 
+    echo Fix the version number in Info.plist
+    exit
+  fi
 else 
   RELEASE=$REVISION
   echo Creating Arduino distribution for revision $REVISION...

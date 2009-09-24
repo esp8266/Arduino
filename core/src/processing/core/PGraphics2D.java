@@ -283,9 +283,9 @@ public class PGraphics2D extends PGraphics {
     case TRIANGLE_FAN:
       // do fill and stroke separately because otherwise
       // the lines will be stroked more than necessary
-      if (fill) {
+      if (fill || textureImage != null) {
         fpolygon.vertexCount = 3;
-        
+
         for (int i = 1; i < vertexCount-1; i++) {
 //          System.out.println(i + " of " + vertexCount);
 
@@ -311,7 +311,7 @@ public class PGraphics2D extends PGraphics {
 
             fpolygon.vertices[j][TX] = vertices[i+j][TX];
             fpolygon.vertices[j][TY] = vertices[i+j][TY];
-            
+
 //            System.out.println(fpolygon.vertices[j][TX] + " " + fpolygon.vertices[j][TY]);
 
             if (textureImage != null) {
@@ -342,7 +342,7 @@ public class PGraphics2D extends PGraphics {
       increment = (shape == TRIANGLES) ? 3 : 1;
       // do fill and stroke separately because otherwise
       // the lines will be stroked more than necessary
-      if (fill) {
+      if (fill || textureImage != null) {
         fpolygon.vertexCount = 3;
         for (int i = 0; i < vertexCount-2; i += increment) {
           for (int j = 0; j < 3; j++) {
@@ -379,7 +379,7 @@ public class PGraphics2D extends PGraphics {
       break;
 
     case QUADS:
-      if (fill) {
+      if (fill || textureImage != null) {
         fpolygon.vertexCount = 4;
         for (int i = 0; i < vertexCount-3; i += 4) {
           for (int j = 0; j < 4; j++) {
@@ -412,14 +412,14 @@ public class PGraphics2D extends PGraphics {
       break;
 
     case QUAD_STRIP:
-      if (fill) {
+      if (fill || textureImage != null) {
         fpolygon.vertexCount = 4;
         for (int i = 0; i < vertexCount-3; i += 2) {
           for (int j = 0; j < 4; j++) {
             int jj = i+j;
             if (j == 2) jj = i+3;  // swap 2nd and 3rd vertex
             if (j == 3) jj = i+2;
-            
+
             fpolygon.vertices[j][R] = vertices[jj][R];
             fpolygon.vertices[j][G] = vertices[jj][G];
             fpolygon.vertices[j][B] = vertices[jj][B];
@@ -445,7 +445,7 @@ public class PGraphics2D extends PGraphics {
 
     case POLYGON:
       if (isConvex()) {
-        if (fill) {
+        if (fill || textureImage != null) {
           //System.out.println("convex");
           fpolygon.renderPolygon(vertices, vertexCount);
           //if (stroke) polygon.unexpand();
@@ -463,7 +463,7 @@ public class PGraphics2D extends PGraphics {
         }
       } else {  // not convex
         //System.out.println("concave");
-        if (fill) {
+        if (fill || textureImage != null) {
           // the triangulator produces polygons that don't align
           // when smoothing is enabled. but if there is a stroke around
           // the polygon, then smoothing can be temporarily disabled.
@@ -1041,14 +1041,14 @@ public class PGraphics2D extends PGraphics {
   protected void ellipseImpl(float x, float y, float w, float h) {
     if (smooth || (strokeWeight != 1) ||
         fillAlpha || strokeAlpha || ctm.isWarped()) {
-      // identical to PGraphics version, but uses POLYGON 
+      // identical to PGraphics version, but uses POLYGON
       // for the fill instead of a TRIANGLE_FAN
       float radiusH = w / 2;
       float radiusV = h / 2;
 
       float centerX = x + radiusH;
       float centerY = y + radiusV;
-      
+
       float sx1 = screenX(x, y);
       float sy1 = screenY(x, y);
       float sx2 = screenX(x+w, y+h);
@@ -1423,11 +1423,6 @@ public class PGraphics2D extends PGraphics {
    */
   private void simple_image(PImage image, int sx1, int sy1,
                             int ix1, int iy1, int ix2, int iy2) {
-    if (imageMode == CENTER) {
-      sx1 -= image.width / 2;
-      sy1 -= image.height / 2;
-    }
-
     int sx2 = sx1 + image.width;
     int sy2 = sy1 + image.height;
 
@@ -1703,7 +1698,7 @@ public class PGraphics2D extends PGraphics {
       float len = (float) Math.sqrt(dX*dX + dY*dY);
 
       // TODO stroke width should be transformed!
-      float rh = strokeWeight / len;
+      float rh = (strokeWeight / len) / 2;
 
       float dx0 = rh * dY;
       float dy0 = rh * dX;
@@ -1765,7 +1760,7 @@ public class PGraphics2D extends PGraphics {
       }
     }
 
-    
+
     /**
      * @param max is what to count to
      * @param offset is offset to the 'next' vertex
@@ -2018,7 +2013,7 @@ public class PGraphics2D extends PGraphics {
     public float screenY(float x, float y) {
       return ctm.m10 * x + ctm.m11 * y + ctm.m12;
     }
-    
+
 
 
     //////////////////////////////////////////////////////////////

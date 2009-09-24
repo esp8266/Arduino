@@ -1335,6 +1335,11 @@ public class XMLElement implements Serializable {
     }
 
 
+    public String toString() {
+      return toString(true);
+    }
+    
+    
     public String toString(boolean pretty) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         OutputStreamWriter osw = new OutputStreamWriter(baos);

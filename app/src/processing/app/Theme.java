@@ -39,9 +39,9 @@ import processing.core.*;
 public class Theme {
 
   /** Copy of the defaults in case the user mangles a preference. */
-  static Hashtable defaults;
+  static HashMap<String,String> defaults;
   /** Table of attributes/values for the theme. */
-  static Hashtable table = new Hashtable();;
+  static HashMap<String,String> table = new HashMap<String,String>();;
 
 
   static protected void init() {
@@ -55,9 +55,7 @@ public class Theme {
     // check for platform-specific properties in the defaults
     String platformExt = "." + Base.getPlatformName();
     int platformExtLength = platformExt.length();
-    Enumeration e = table.keys();
-    while (e.hasMoreElements()) {
-      String key = (String) e.nextElement();
+    for (String key : table.keySet()) {
       if (key.endsWith(platformExt)) {
         // this is a key specific to a particular platform
         String actualKey = key.substring(0, key.length() - platformExtLength);
@@ -70,7 +68,7 @@ public class Theme {
     setColor("run.window.bgcolor", SystemColor.control);
 
     // clone the hash table
-    defaults = (Hashtable) table.clone();
+    defaults = (HashMap<String, String>) table.clone();
   }
 
 
@@ -142,11 +140,7 @@ public class Theme {
 
 
   static public void setColor(String attr, Color what) {
-    String r = Integer.toHexString(what.getRed());
-    String g = Integer.toHexString(what.getGreen());
-    String b = Integer.toHexString(what.getBlue());
-    set(attr, "#" + r.substring(r.length() - 2) +
-        g.substring(g.length() - 2) + b.substring(b.length() - 2));
+    set(attr, "#" + PApplet.hex(what.getRGB() & 0xffffff, 6));
   }
 
 

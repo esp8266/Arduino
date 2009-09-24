@@ -203,7 +203,7 @@ public class PImage implements PConstants, Cloneable {
   public java.awt.Image getImage() {
     loadPixels();
     int type = (format == RGB) ?
-      BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB;
+      BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
     BufferedImage image = new BufferedImage(width, height, type);
     WritableRaster wr = image.getRaster();
     wr.setDataElements(0, 0, width, height, pixels);
@@ -499,7 +499,11 @@ public class PImage implements PConstants, Cloneable {
    */
   public PImage get() {
     try {
-      return (PImage) clone();
+      PImage clone = (PImage) clone();
+      // don't want to pass this down to the others
+      // http://dev.processing.org/bugs/show_bug.cgi?id=1245
+      clone.cacheMap = null;
+      return clone;
     } catch (CloneNotSupportedException e) {
       return null;
     }

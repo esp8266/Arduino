@@ -1,24 +1,58 @@
-0165 core (1.0.3)
-X update to itext 2.1.4
-X endRecord or endRaw produces RuntimeException with PDF library
-X   http://dev.processing.org/bugs/show_bug.cgi?id=1169
-X problem with beginRaw/endRaw and OpenGL
-X   http://dev.processing.org/bugs/show_bug.cgi?id=1171
-X set strokeWeight with begin/endRaw
-X   http://dev.processing.org/bugs/show_bug.cgi?id=1172
-X fix strokeWeight with P3D (better version of line hack)
-X make P3D use proper weights
-X ArrayIndexOutOfBoundsException with point()
-X   http://dev.processing.org/bugs/show_bug.cgi?id=1168
+0169 core
+X remove major try/catch block from PApplet.main()
+X   hopefully will allow some exception stuff to come through properly
+X PVector.angleDistance() returns NaN
+X   http://dev.processing.org/bugs/show_bug.cgi?id=1316
+
+_ make the index lookup use numbers up to 256?
+
+_ decide whether to keep:
+_   public float textWidth(char[] chars, int start, int length)
+
+_ textAlign(JUSTIFY) (with implementation)
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1309
+
+_ create characters on the fly when createFont() is used
+
+_ Semitransparent rect drawn over image not rendered correctly
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1280
+
+_ should map() actually constrain to the low and high values?
+
+_ file chooser fails with opengl on linux
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1221
+
+_ resizing opengl destroys context and textures
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1176
+_ what's the difference with ascent on loadFont vs. createFont?
+_ noCursor() doesn't work in present mode
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1177
+_ modelx/y/z broken when aiming a camera
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1074
+_ in P2D, two vertex() line calls with fill() causes duplicate output
+_   works fine in other renderers, has to do with tesselation
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1191
+_ extra triangles being seen in P2D
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1192
+_ noloop ref even says that redraw will be called on resize, make sure it is
+_ public PImage(java.awt.Image) sets format to RGB (but could be ARGB)
 
 
+[ features ] 
+
+_ add version of math functions that use doubles?
+_   what other methods should work with doubles? all math functions?
+_   seems like internal (mostly static) things, but not graphics api
+_ look into replacing nanoxml
+_   http://www.exampledepot.com/egs/javax.xml.parsers/pkg.html
 _ if no draw() method, and renderer is not displayable, then exit
 _   static mode PDFs shouldn't just hang
-_ public PImage(java.awt.Image) sets format to RGB (but could be ARGB)
 
 
 [ known problems ]
 
+_ memory leak problem with fonts in JAVA2D
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1252
 _ OPENGL sketches flicker w/ Vista when background() not used inside draw()
 _   http://dev.processing.org/bugs/show_bug.cgi?id=930
 _   Disabling Aero scheme sometimes prevents the problem

@@ -86,13 +86,14 @@ public class ThinkDifferent implements ApplicationListener {
       throw new IllegalStateException("handlePreferences: Base instance detached from listener");
     }
   }
-  
-  
+
+
   public void handleOpenApplication(ApplicationEvent ae) {
   }
 
 
   public void handleOpenFile(ApplicationEvent ae) {
+//    System.out.println("got open file event " + ae.getFilename());
     String filename = ae.getFilename();
     base.handleOpen(filename);
     ae.setHandled(true);

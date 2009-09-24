@@ -53,7 +53,7 @@ public class EditorToolbar extends JComponent implements MouseInputListener {
   static final int OPEN     = 3;
   static final int SAVE     = 4;
   static final int EXPORT   = 5;
-  
+
   static final int SERIAL   = 6;
 
   static final int INACTIVE = 0;

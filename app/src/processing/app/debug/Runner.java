@@ -3,7 +3,7 @@
 /*
   Part of the Processing project - http://processing.org
 
-  Copyright (c) 2004-08 Ben Fry and Casey Reas
+  Copyright (c) 2004-09 Ben Fry and Casey Reas
   Copyright (c) 2001-04 Massachusetts Institute of Technology
 
   This program is free software; you can redistribute it and/or modify
@@ -379,11 +379,16 @@ public class Runner implements MessageConsumer {
     //String addr = "localhost:" + (8000 + (int) (Math.random() * 1000));
     //String addr = "" + (8000 + (int) (Math.random() * 1000));
 
-    String commandArgs = Base.isWindows() ?
-      "java -Xrunjdwp:transport=dt_shmem,address=" + addr + ",suspend=y " :
+    String commandArgs =
       "java -Xrunjdwp:transport=dt_socket,address=" + addr + ",suspend=y ";
-    //String commandArgs = "java -agentlib:jdwp=transport=dt_socket,address=" + addr + ",suspend=y ";
-    //String commandArgs = "java -agentlib:jdwp=transport=dt_socket,address=" + addr + ",server=n,suspend=y ";
+    if (Base.isWindows()) {
+      commandArgs =
+        "java -Xrunjdwp:transport=dt_shmem,address=" + addr + ",suspend=y ";
+    } else if (Base.isMacOS()) {
+      commandArgs =
+        "java -d32 -Xrunjdwp:transport=dt_socket,address=" + addr + ",suspend=y ";
+    }
+
     for (int i = 0; i < vmParams.length; i++) {
       commandArgs = addArgument(commandArgs, vmParams[i], ' ');
     }
@@ -519,11 +524,13 @@ public class Runner implements MessageConsumer {
     // Shutdown begins when event thread terminates
     try {
       if (eventThread != null) eventThread.join();
+//      System.out.println("in here");
       // Bug #852 tracked to this next line in the code.
       // http://dev.processing.org/bugs/show_bug.cgi?id=852
       errThread.join(); // Make sure output is forwarded
+//      System.out.println("and then");
       outThread.join(); // before we exit
-      //System.out.println("out of it");
+//      System.out.println("out of it");
 
       // At this point, disable the run button.
       // This happens when the sketch is exited by hitting ESC,
@@ -573,6 +580,7 @@ public class Runner implements MessageConsumer {
 
 
   public void exception(ExceptionEvent event) {
+//    System.out.println(event);
     ObjectReference or = event.exception();
     ReferenceType rt = or.referenceType();
     String exceptionName = rt.name();
@@ -644,7 +652,7 @@ public class Runner implements MessageConsumer {
       // message to the console.
       List<StackFrame> frames = thread.frames();
       for (StackFrame frame : frames) {
-        //System.out.println("frame: " + frame);
+//        System.out.println("frame: " + frame);
         Location location = frame.location();
         String filename = null;
         filename = location.sourceName();

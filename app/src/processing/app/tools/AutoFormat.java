@@ -3,13 +3,14 @@
 /*
   Part of the Processing project - http://processing.org
 
-  Copyright (c) 2005-06 Ben Fry and Casey Reas
-  Copyright (c) 2003 Martin Gomez, Ateneo de Manila University
+  Original Copyright (c) 1997, 1998 Van Di-Han HO. All Rights Reserved.
+  Updates Copyright (c) 2001 Jason Pell.
+  Further updates Copyright (c) 2003 Martin Gomez, Ateneo de Manila University
+  Bug fixes Copyright (c) 2005-09 Ben Fry and Casey Reas
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
+  the Free Software Foundation, version 2.
 
   This program is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,13 +25,21 @@
 package processing.app.tools;
 
 import processing.app.*;
+import processing.core.PApplet;
 
 import java.io.*;
 
 
 /**
- * Alternate handler for dealing with auto format.
+ * Handler for dealing with auto format.
  * Contributed by Martin Gomez, additional bug fixes by Ben Fry.
+ * 
+ * After some further digging, this code in fact appears to be a modified 
+ * version of Jason Pell's GPLed "Java Beautifier" class found here:
+ * http://www.geocities.com/jasonpell/programs.html
+ * Which is itself based on code from Van Di-Han Ho:
+ * http://www.geocities.com/~starkville/vancbj_idx.html
+ * [Ben Fry, August 2009]
  */
 public class AutoFormat implements Tool {
   Editor editor;
@@ -38,15 +47,12 @@ public class AutoFormat implements Tool {
   static final int BLOCK_MAXLEN = 1024;
 
   StringBuffer strOut;
-  //String formattedText;
   int indentValue;
   String indentChar;
-  //String uhOh = null;
-  //String theStuff;
   int EOF;
-  BufferedInputStream bin = null;
-  int nBytesRead, indexBlock, lineLength, lineNumber;
-  byte bArray[];
+  CharArrayReader reader;
+  int readCount, indexBlock, lineLength, lineNumber;
+  char chars[];
   String strBlock;
   int s_level[];
   int c_level;
@@ -64,23 +70,17 @@ public class AutoFormat implements Tool {
   String w_if_, w_else, w_for, w_ds, w_case, w_cpp_comment, w_jdoc;
   int jdoc, j;
   char string[];
-  byte bstring[];
-  byte bblank;
   char cc;
-  int s_flg, b_flg;
+  int s_flg;
   int peek;
   char peekc;
   int tabs;
-  char next_char, last_char;
-  char lastc0, lastc1;
-  char c, c0;
-  char w_kptr;
+  char last_char;
+  char c;
 
   String line_feed;
 
-  //static int outfil;  // temporary
-
-
+  
   public void init(Editor editor) {
     this.editor = editor;
   }
@@ -236,6 +236,7 @@ public class AutoFormat implements Tool {
     }
   }
 
+
   public void cpp_comment() throws IOException
   {
     c = getchr();
@@ -283,32 +284,26 @@ public class AutoFormat implements Tool {
       indexBlock++;
       if (indexBlock >= lineLength)
       {
-        for (int ib=0; ib<nBytesRead; ib++) bArray[ib] = '\0';
+        for (int ib=0; ib<readCount; ib++) chars[ib] = '\0';
 
-        lineLength = nBytesRead = 0;
-        //try /* to get the next block */
-        //{
-          if (bin.available() > 0)
-          {
-            nBytesRead = bin.read(bArray);
-            lineLength = nBytesRead;
-            strBlock = new String(bArray);
-            indexBlock = 0;
-            last_char = strBlock.charAt(indexBlock);
-            peek = -1;
-            peekc = '`';
-          }
-          else
-          {
-            //System.out.println("eof a");
-            EOF = 1;
-            peekc  = '\0';
-          }
-          //}
-          //catch(IOException ioe)
-          //{
-          //System.out.println(ioe.toString());
-          //}
+        lineLength = readCount = 0;
+        reader.mark(1);
+        if (reader.read() != -1)
+        {
+          reader.reset();  // back to the mark
+          readCount = reader.read(chars);
+          lineLength = readCount;
+          strBlock = new String(chars);
+          indexBlock = 0;
+          last_char = strBlock.charAt(indexBlock);
+          peek = -1;
+          peekc = '`';
+        }
+        else
+        {
+          EOF = 1;
+          peekc  = '\0';
+        }
       }
       else
       {
@@ -446,13 +441,11 @@ public class AutoFormat implements Tool {
     indentChar = new String(" ");
 
     lineNumber = 0;
-    //BLOCK_MAXLEN = 256;
     c_level = if_lev = level = e_flg = paren = 0;
-    a_flg = q_flg = j = b_flg = tabs = 0;
+    a_flg = q_flg = j = tabs = 0;
     if_flg = peek = -1;
     peekc = '`';
     s_flg = 1;
-    bblank = ' ';
     jdoc = 0;
 
     s_level  = new int[10];
@@ -476,24 +469,23 @@ public class AutoFormat implements Tool {
     // read as long as there is something to read
     EOF = 0;  // = 1 set in getchr when EOF
 
-    bArray = new byte[BLOCK_MAXLEN];
+    chars = new char[BLOCK_MAXLEN];
     string = new char[BLOCK_MAXLEN];
     try {  // the whole process
       // open for input
-      ByteArrayInputStream in =
-        new ByteArrayInputStream(originalText.getBytes());
+      reader = new CharArrayReader(originalText.toCharArray());
 
       // add buffering to that InputStream
-      bin = new BufferedInputStream(in);
+//      bin = new BufferedInputStream(in);
 
-      for (int ib = 0; ib < BLOCK_MAXLEN; ib++) bArray[ib] = '\0';
+      for (int ib = 0; ib < BLOCK_MAXLEN; ib++) chars[ib] = '\0';
 
-      lineLength = nBytesRead = 0;
+      lineLength = readCount = 0;
       // read up a block - remember how many bytes read
-      nBytesRead = bin.read(bArray);
-      strBlock = new String(bArray);
+      readCount = reader.read(chars);
+      strBlock = new String(chars);
 
-      lineLength = nBytesRead;
+      lineLength = readCount;
       lineNumber  = 1;
       indexBlock = -1;
       j = 0;
@@ -561,6 +553,10 @@ public class AutoFormat implements Tool {
 
         case '{':
           if(lookup(w_else) == 1)gotelse();
+          if (s_if_lev.length == c_level) {
+            s_if_lev = PApplet.expand(s_if_lev);
+            s_if_flg = PApplet.expand(s_if_flg);
+          }
           s_if_lev[c_level] = if_lev;
           s_if_flg[c_level] = if_flg;
           if_lev = if_flg = 0;
@@ -736,7 +732,6 @@ public class AutoFormat implements Tool {
           peekc = getchr();
           if(peekc == ';')
           {
-            //fprintf(outfil,";");
             fprintf(";");
             peek = -1;
             peekc = '`';
@@ -747,13 +742,11 @@ public class AutoFormat implements Tool {
           }
           getnl();
           indent_puts();
-          //fprintf(outfil,"\n");
           fprintf("\n");
           s_flg = 1;
           break;
 
         case '/':
-          c0 = string[j];
           string[j++] = c;
           peekc = getchr();
 
@@ -912,7 +905,7 @@ public class AutoFormat implements Tool {
         selectionEnd = strOut.length() - 1;
       }
 
-      bin.close(); // close buff
+      reader.close(); // close buff
 
       String formattedText = strOut.toString();
       if (formattedText.equals(originalText)) {

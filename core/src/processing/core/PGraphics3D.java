@@ -608,7 +608,7 @@ public class PGraphics3D extends PGraphics {
       endShapeStroke(mode);
     }
 
-    if (fill) {
+    if (fill || textureImage != null) {
       endShapeFill();
     }
 
@@ -622,7 +622,7 @@ public class PGraphics3D extends PGraphics {
     // render shape and fill here if not saving the shapes for later
     // if true, the shapes will be rendered on endDraw
     if (!hints[ENABLE_DEPTH_SORT]) {
-      if (fill) {
+      if (fill || textureImage != null) {
         if (triangleCount > 0) {
           renderTriangles(0, triangleCount);
           if (raw != null) {
@@ -957,8 +957,8 @@ public class PGraphics3D extends PGraphics {
   protected void addPoint(int a) {
     if (pointCount == points.length) {
       int[][] temp = new int[pointCount << 1][LINE_FIELD_COUNT];
-      System.arraycopy(lines, 0, temp, 0, lineCount);
-      lines = temp;
+      System.arraycopy(points, 0, temp, 0, lineCount);
+      points = temp;
     }
     points[pointCount][VERTEX1] = a;
     //points[pointCount][STROKE_MODE] = strokeCap | strokeJoin;
@@ -1135,12 +1135,12 @@ public class PGraphics3D extends PGraphics {
 
   protected void renderLines(int start, int stop) {
     for (int i = start; i < stop; i++) {
-      renderLineVertices(vertices[lines[i][VERTEX1]], 
+      renderLineVertices(vertices[lines[i][VERTEX1]],
                          vertices[lines[i][VERTEX2]]);
     }
   }
-  
-  
+
+
   protected void renderLineVertices(float[] a, float[] b) {
     // 2D hack added by ewjordan 6/13/07
     // Offset coordinates by a little bit if drawing 2D graphics.
@@ -1181,7 +1181,7 @@ public class PGraphics3D extends PGraphics {
       float oy2 = b[TY];
 
       // TODO strokeWeight should be transformed!
-      float weight = a[SW] / 2; 
+      float weight = a[SW] / 2;
 
       // when drawing points with stroke weight, need to extend a bit
       if (ox1 == ox2 && oy1 == oy2) {
@@ -2615,8 +2615,8 @@ public class PGraphics3D extends PGraphics {
 
 
   //public void ellipse(float a, float b, float c, float d)
-  
-  
+
+
   protected void ellipseImpl(float x, float y, float w, float h) {
     float radiusH = w / 2;
     float radiusV = h / 2;
@@ -2632,7 +2632,7 @@ public class PGraphics3D extends PGraphics {
     // returning to pre-1.0 version of algorithm because of problems
     int rough = (int)(4+Math.sqrt(w+h)*3);
     int accuracy = PApplet.constrain(rough, 6, 100);
-    
+
     if (fill) {
       // returning to pre-1.0 version of algorithm because of problems
 //      int rough = (int)(4+Math.sqrt(w+h)*3);
@@ -2755,7 +2755,7 @@ public class PGraphics3D extends PGraphics {
     }
   }
 
-  
+
 
   //////////////////////////////////////////////////////////////
 

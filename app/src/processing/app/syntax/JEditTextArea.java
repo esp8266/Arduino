@@ -51,7 +51,7 @@ import java.util.Vector;
  *     + "}");</pre>
  *
  * @author Slava Pestov
- * @version $Id: JEditTextArea.java 5343 2008-11-29 17:22:59Z fry $
+ * @version $Id: JEditTextArea.java 5625 2009-06-07 21:08:59Z fry $
  */
 public class JEditTextArea extends JComponent
 {
@@ -103,6 +103,9 @@ public class JEditTextArea extends JComponent
     painter.addMouseListener(new MouseHandler());
     painter.addMouseMotionListener(new DragHandler());
     addFocusListener(new FocusHandler());
+    // send tab keys through to the text area
+    // http://dev.processing.org/bugs/show_bug.cgi?id=1267
+    setFocusTraversalKeysEnabled(false);
 
     // Load the defaults
     setInputHandler(defaults.inputHandler);
@@ -145,9 +148,9 @@ public class JEditTextArea extends JComponent
    * Returns if this component can be traversed by pressing
    * the Tab key. This returns false.
    */
-  public final boolean isManagingFocus() {
-    return true;
-  }
+//  public final boolean isManagingFocus() {
+//    return true;
+//  }
 
   /**
    * Returns the object responsible for painting this text area.
@@ -1028,8 +1031,8 @@ public class JEditTextArea extends JComponent
   {
     select(selectionStart,selectionEnd);
   }
-  
-  
+
+
   public final boolean isSelectionActive()
   {
     return(selectionStart != selectionEnd);

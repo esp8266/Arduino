@@ -1,3 +1,188 @@
+PROCESSING 1.0.7 (REV 0169) - 4 September 2009
+
+Bug fixes and updates, also some tweaks for Mac OS X Snow Leopard. 
+
+[ changes ] 
+
++ Tweaks for Mac OS X Snow Leopard, to force it to run in 32-bit mode.
+  This should bring back the video library (if temporarily), and hopefully
+  fix serial as well, though I didn't have a serial device handy to test. 
+
++ Fix problem where line highlighting was off in 'static' mode.
+  http://dev.processing.org/bugs/show_bug.cgi?id=1263
+
++ Auto-format was killing Unicode characters (how did this last so long?)
+  http://dev.processing.org/bugs/show_bug.cgi?id=1312
+
++ PVector.angleDistance() returning NaN due to precision errors
+  http://dev.processing.org/bugs/show_bug.cgi?id=1316
+
++ Removed a major try/catch block from PApplet.main(), hopefully 
+  this will allow some exception stuff to come through properly.
+
+
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+
+
+PROCESSING 1.0.6 (REV 0168) - 12 August 2009
+
+Bug fixes and minor changes. Most important are replacement JOGL libraries
+so that OpenGL applets won't present an "expired certificate" error.
+
+[ bug fixes ] 
+
++ Replaced the faulty JOGL library that had expired certificates (Sun bug).
+  http://dev.processing.org/bugs/show_bug.cgi?id=1271
+  https://jogl.dev.java.net/servlets/ProjectDocumentList?folderID=9260&expandFolder=9260&folderID=0
+
++ Updated the Linux launcher script that enables Processing to be run
+  from other directories, symlinks, or from launch items.
+  http://dev.processing.org/bugs/show_bug.cgi?id=825
+  Thanks to Ferdinand Kasper for the fix!
+
++ strokeWeight() was making lines 2x too thick with P2D
+  http://dev.processing.org/bugs/show_bug.cgi?id=1283
+
++ PImage.getImage() setting the wrong image type
+  http://dev.processing.org/bugs/show_bug.cgi?id=1282
+
++ image() not working with P2D, P3D, and OPENGL when noFill() used
+  http://dev.processing.org/bugs/show_bug.cgi?id=1299
+  http://dev.processing.org/bugs/show_bug.cgi?id=1222
+
++ Auto format problem with program deeper then 10 levels
+  http://dev.processing.org/bugs/show_bug.cgi?id=1297
+
++ Fixed a crash on startup problem (console being null)
+
++ Recursive subfolder copy of library folders when exporting application
+  http://dev.processing.org/bugs/show_bug.cgi?id=1295
+
+[ changes ]
+
++ PDF member functions set protected instead of private
+  http://dev.processing.org/bugs/show_bug.cgi?id=1276
+
++ On OS X, update Info.plist to be 32/64 explicit and also updated 
+  JavaApplicationStub for update 4.
+
++ Clicking the preferences location in the Preferences window will 
+  now open the parent folder for the preferences file. 
+  http://dev.processing.org/bugs/show_bug.cgi?id=1279
+
++ Update to Java 6 update 15 for the Windows and Linux releases.
+
+[ fixed earlier ] 
+
++ Mangled menu text with Java 6u10.
+  http://dev.processing.org/bugs/show_bug.cgi?id=1065
+
+
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+
+
+PROCESSING 1.0.5 (REV 0167) - 7 June 2009
+
+Bug fix release, mostly dealing with regressions from 1.0.4.
+
+[ bug fixes ] 
+
++ Make the tab key work again inside the editor
+  http://dev.processing.org/bugs/show_bug.cgi?id=1267
+
++ Deal with duplicate entries for sketchbook in the file menu
+  http://dev.processing.org/bugs/show_bug.cgi?id=1260
+
+[ changes ]
+
++ Support for smooth text in the PDE editor. Set editor.antialias=true
+  inside preferences.txt to enable smooth text.
+  http://dev.processing.org/bugs/show_bug.cgi?id=1266
+
++ Updated reference files.
+
+
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+
+
+PROCESSING 1.0.4 (REV 0166) - 31 May 2009
+
+Bug fix release. 
+
+[ changes ] 
+
++ Changed the workaround for Apple's Java bug related to the menus in OS X.
+  Rather than placing the menubar inside the sketch window, File > Sketchbook
+  and File > Examples are simply dimmed out. Instead, use the Open button
+  on the toolbar, which provides access to the same items. The preference
+  to place the menu bar inside the window is still available, in case you 
+  prefer the previous workaround.
+  http://dev.processing.org/bugs/show_bug.cgi?id=786
+
++ Also updated the included runtime on Windows and Linux to Java 6u14.
+
+[ bug fixes ]
+
++ Fixed IDE crash when changing color scheme on windows 
+  http://dev.processing.org/bugs/show_bug.cgi?id=1237
+
++ Typo in the Linux shell script was preventing it from running
+  http://dev.processing.org/bugs/show_bug.cgi?id=1250
+
++ OS X finder info on application updated to say 1.0.4
+  http://dev.processing.org/bugs/show_bug.cgi?id=1226
+
++ Removed warning message "Non-String for 8 value in 'Properties' 
+  sub-dictionary in 'Java' sub-dictionary of Info.plist" on OS X
+
++ Added warning to build script for users on OS X 10.4
+  http://dev.processing.org/bugs/show_bug.cgi?id=1179
+
++ Disable point() going to set() from PGraphicsJava2D. The set() command 
+  doesn't honor alpha consistently, and it also causes problems with PDF
+
++ PImage cacheMap problem when using PImage.get() 
+  http://dev.processing.org/bugs/show_bug.cgi?id=1245
+
++ Fix problems with > 512 points and P3D/OPENGL
+  http://dev.processing.org/bugs/show_bug.cgi?id=1255
+  Thanks to user DopeShow for the patch
+
++ imageMode(CENTER) doesn't work properly with P2D
+  http://dev.processing.org/bugs/show_bug.cgi?id=1232
+
++ Reset matrices when using beginRecord() with PDF
+  http://dev.processing.org/bugs/show_bug.cgi?id=1227
+
++ Resizing window no longer distorts OpenGL graphics
+  http://dev.processing.org/bugs/show_bug.cgi?id=1176
+  Many thanks to Pablo Funes for the patch
+
++ Fix significant point() and set() slowdown on OS X
+  http://dev.processing.org/bugs/show_bug.cgi?id=1094
+
+[ known issues ] 
+
++ Currently no 64-bit support for any platforms. On some platforms, you'll 
+  simply need to replace the Java folder with the distribution with something
+  more suitable for your operating system. 
+
++ Command line support is currently broken
+  http://dev.processing.org/bugs/show_bug.cgi?id=1048
+
++ Text of menus/interface elements sometimes mangled (e.g. toolbar repeats
+  several times, other oddness). See bug report for a workaround
+  http://dev.processing.org/bugs/show_bug.cgi?id=1065
+
++ Video library threading problems with other libraries
+  http://dev.processing.org/bugs/show_bug.cgi?id=882
+
++ See dev.processing.org/bugs for much, much more!
+
+
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+
+
 PROCESSING 1.0.3 (REV 0165) - 24 February 2009
 
 Bug fix release to repair a couple of regressions caused by changes in 1.0.2, 
@@ -22,6 +207,9 @@ as well as a couple other new problems encountered since.
 [ changes ] 
 
 + Update to iText 2.1.4 for the PDF library
+
+
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
 
 
 PROCESSING 1.0.2 (REV 0164) - 21 February 2009

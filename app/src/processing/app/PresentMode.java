@@ -3,7 +3,7 @@
 /*
   Part of the Processing project - http://processing.org
 
-  Copyright (c) 2005-06 Ben Fry and Casey Reas
+  Copyright (c) 2005-09 Ben Fry and Casey Reas
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ public class PresentMode {
     devices = environment.getScreenDevices();
     GraphicsDevice defaultDevice = environment.getDefaultScreenDevice();
 
-    Vector names = new Vector();
+    Vector<String> names = new Vector<String>();
     for (int i = 0; i < devices.length; i++) {
       String name = String.valueOf(i + 1);
       if (devices[i] == defaultDevice) {

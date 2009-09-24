@@ -2604,6 +2604,14 @@ public class PGraphics extends PImage implements PConstants {
   }
 
 
+  /** 
+   * TODO not sure if this stays...
+   */
+  public float textWidth(char[] chars, int start, int length) {
+    return textWidthImpl(chars, start, start + length);
+  }
+  
+  
   /**
    * Implementation of returning the text width of
    * the chars [start, stop) in the buffer.
@@ -2914,8 +2922,8 @@ public class PGraphics extends PImage implements PConstants {
    * Emit a sentence of text, defined as a chunk of text without any newlines.
    * @param stop non-inclusive, the end of the text in question
    */
-  private boolean textSentence(char[] buffer, int start, int stop,
-                               float boxWidth, float spaceWidth) {
+  protected boolean textSentence(char[] buffer, int start, int stop,
+                                 float boxWidth, float spaceWidth) {
     float runningX = 0;
 
     // Keep track of this separately from index, since we'll need to back up
@@ -2980,7 +2988,7 @@ public class PGraphics extends PImage implements PConstants {
   }
 
 
-  private void textSentenceBreak(int start, int stop) {
+  protected void textSentenceBreak(int start, int stop) {
     if (textBreakCount == textBreakStart.length) {
       textBreakStart = PApplet.expand(textBreakStart);
       textBreakStop = PApplet.expand(textBreakStop);

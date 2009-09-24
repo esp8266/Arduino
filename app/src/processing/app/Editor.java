@@ -3,13 +3,12 @@
 /*
   Part of the Processing project - http://processing.org
 
-  Copyright (c) 2004-08 Ben Fry and Casey Reas
+  Copyright (c) 2004-09 Ben Fry and Casey Reas
   Copyright (c) 2001-04 Massachusetts Institute of Technology
 
   This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
+  it under the terms of the GNU General Public License version 2
+  as published by the Free Software Foundation.
 
   This program is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -81,7 +80,7 @@ public class Editor extends JFrame implements RunnerListener {
   JMenu fileMenu;
   JMenu sketchMenu;
   JMenu toolsMenu;
-  
+
   int numTools = 0;
 
   EditorToolbar toolbar;
@@ -91,7 +90,7 @@ public class Editor extends JFrame implements RunnerListener {
   static JMenu sketchbookMenu;
   static JMenu examplesMenu;
   static JMenu importMenu;
-  
+
   // these menus are shared so that the board and serial port selections
   // are the same for all windows (since the board and serial port that are
   // actually used are determined by the preferences, which are shared)
@@ -161,8 +160,8 @@ public class Editor extends JFrame implements RunnerListener {
     // When bringing a window to front, let the Base know
     addWindowListener(new WindowAdapter() {
         public void windowActivated(WindowEvent e) {
+//          System.err.println("activate");  // not coming through
           base.handleActivated(Editor.this);
-
           // re-add the sub-menus that are shared by all windows
           fileMenu.insert(sketchbookMenu, 2);
           fileMenu.insert(examplesMenu, 3);
@@ -170,11 +169,22 @@ public class Editor extends JFrame implements RunnerListener {
           toolsMenu.insert(boardsMenu, numTools);
           toolsMenu.insert(serialMenu, numTools + 1);
         }
+
+        // added for 1.0.5
+        // http://dev.processing.org/bugs/show_bug.cgi?id=1260
+        public void windowDeactivated(WindowEvent e) {
+//          System.err.println("deactivate");  // not coming through
+          fileMenu.remove(sketchbookMenu);
+          fileMenu.remove(examplesMenu);
+          sketchMenu.remove(importMenu);
+          toolsMenu.remove(boardsMenu);
+          toolsMenu.remove(serialMenu);
+        }
       });
 
     //PdeKeywords keywords = new PdeKeywords();
     //sketchbook = new Sketchbook(this);
-    
+
     if (serialMonitor == null)
       serialMonitor = new SerialMonitor(Preferences.get("serial.port"));
     
@@ -717,7 +727,7 @@ public class Editor extends JFrame implements RunnerListener {
 
         URL[] urlList = new URL[archives.length];
         for (int j = 0; j < urlList.length; j++) {
-          urlList[j] = archives[j].toURL();
+          urlList[j] = archives[j].toURI().toURL();
         }
         URLClassLoader loader = new URLClassLoader(urlList);
 
@@ -819,7 +829,7 @@ public class Editor extends JFrame implements RunnerListener {
       final Tool tool = (Tool) toolClass.newInstance();
 
       JMenuItem item = new JMenuItem(tool.getMenuTitle());
-      
+
       tool.init(Editor.this);
 
       item.addActionListener(new ActionListener() {
@@ -828,14 +838,14 @@ public class Editor extends JFrame implements RunnerListener {
         }
       });
       return item;
-      
+
     } catch (Exception e) {
       e.printStackTrace();
       return null;
     }
   }
-  
-  
+
+
   protected JMenu addInternalTools(JMenu menu) {
     JMenuItem item;
 
@@ -963,7 +973,9 @@ public class Editor extends JFrame implements RunnerListener {
 
 
   protected JMenu buildHelpMenu() {
-    JMenu menu = new JMenu("Help");
+    // To deal with a Mac OS X 10.5 bug, add an extra space after the name
+    // so that the OS doesn't try to insert its slow help menu.
+    JMenu menu = new JMenu("Help ");
     JMenuItem item;
 
     /*
@@ -1764,7 +1776,7 @@ public class Editor extends JFrame implements RunnerListener {
 
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        try {
+    try {
           sketch.compile(new Target(
             Base.getHardwarePath() + File.separator + "cores",
             Preferences.get("boards." + Preferences.get("board") + ".build.core")),
@@ -1776,10 +1788,10 @@ public class Editor extends JFrame implements RunnerListener {
 
         } catch (Exception e) {
           e.printStackTrace();
-        }
-        
+          }
+
         toolbar.deactivate(EditorToolbar.RUN);
-      }
+    }
     });
   }
 
@@ -2237,8 +2249,8 @@ public class Editor extends JFrame implements RunnerListener {
     }
     return true;
   }
-  
-  
+
+
   public void handleSerial() {
     if (uploading) return;
     serialMonitor.setVisible(true);

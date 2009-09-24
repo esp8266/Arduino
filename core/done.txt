@@ -1,3 +1,53 @@
+0168 core (1.0.6)
+X getImage() setting the wrong image type
+X   http://dev.processing.org/bugs/show_bug.cgi?id=1282
+X strokeWeight() makes lines 2x too thick with P2D
+X   http://dev.processing.org/bugs/show_bug.cgi?id=1283
+X image() doesn't work with P2D, P3D, and OPENGL with noFill()
+X   http://dev.processing.org/bugs/show_bug.cgi?id=1299
+o   maybe using rgb instead of tint inside drawing loops?
+X   http://dev.processing.org/bugs/show_bug.cgi?id=1222
+
+
+0167 core (1.0.5)
+X changed text layout methods from private to protected
+
+
+0166 core (1.0.4)
+X disable point() going to set() from PGraphicsJava2D
+X   set() doesn't honor alpha consistently
+X   also causes problems with PDF
+X preliminary thread() implementation
+X double param version of map()
+X PImage cacheMap problem when using PImage.get() 
+X   http://dev.processing.org/bugs/show_bug.cgi?id=1245
+X problems with > 512 points and P3D/OPENGL (thx DopeShow)
+X   http://dev.processing.org/bugs/show_bug.cgi?id=1255
+X imageMode(CENTER) doesn't work properly with P2D
+X   http://dev.processing.org/bugs/show_bug.cgi?id=1232
+X reset matrices when using beginRecord() with PDF
+X   http://dev.processing.org/bugs/show_bug.cgi?id=1227
+X resizing window distorts gl graphics
+X   patch from Pablo Funes
+X   http://dev.processing.org/bugs/show_bug.cgi?id=1176
+X significant point() and set() slowdown on OS X
+X   http://dev.processing.org/bugs/show_bug.cgi?id=1094
+
+
+0165 core (1.0.3)
+X update to itext 2.1.4
+X endRecord or endRaw produces RuntimeException with PDF library
+X   http://dev.processing.org/bugs/show_bug.cgi?id=1169
+X problem with beginRaw/endRaw and OpenGL
+X   http://dev.processing.org/bugs/show_bug.cgi?id=1171
+X set strokeWeight with begin/endRaw
+X   http://dev.processing.org/bugs/show_bug.cgi?id=1172
+X fix strokeWeight with P3D (better version of line hack)
+X make P3D use proper weights
+X ArrayIndexOutOfBoundsException with point()
+X   http://dev.processing.org/bugs/show_bug.cgi?id=1168
+
+
 0164 core (1.0.2)
 X requestImage() causing problems with JAVA2D
 X fix minor strokeWeight bug with OpenGL
