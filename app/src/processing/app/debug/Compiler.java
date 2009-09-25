@@ -86,6 +86,7 @@ public class Compiler implements MessageConsumer {
     
     List<File> targetObjectFiles = 
       compileFiles(avrBasePath, buildPath, includePaths,
+                   findFilesInPath(target.getPath(), "S", true),
                    findFilesInPath(target.getPath(), "c", true),
                    findFilesInPath(target.getPath(), "cpp", true));
                    
@@ -115,12 +116,14 @@ public class Compiler implements MessageConsumer {
       includePaths.add(libraryFolder.getPath() + File.separator + "utility");
       objectFiles.addAll(
         compileFiles(avrBasePath, outputFolder.getAbsolutePath(), includePaths,
+                     findFilesInFolder(libraryFolder, "S", false),
                      findFilesInFolder(libraryFolder, "c", false),
                      findFilesInFolder(libraryFolder, "cpp", false)));
       outputFolder = new File(outputFolder, "utility");
       createFolder(outputFolder);
       objectFiles.addAll(
         compileFiles(avrBasePath, outputFolder.getAbsolutePath(), includePaths,
+                     findFilesInFolder(new File(libraryFolder, "utility"), "S", false),
                      findFilesInFolder(new File(libraryFolder, "utility"), "c", false),
                      findFilesInFolder(new File(libraryFolder, "utility"), "cpp", false)));
       // other libraries should not see this library's utility/ folder
@@ -131,6 +134,7 @@ public class Compiler implements MessageConsumer {
 
     objectFiles.addAll(
       compileFiles(avrBasePath, buildPath, includePaths,
+                   findFilesInPath(buildPath, "S", false),
                    findFilesInPath(buildPath, "c", false),
                    findFilesInPath(buildPath, "cpp", false)));
 
@@ -190,11 +194,20 @@ public class Compiler implements MessageConsumer {
 
   private List<File> compileFiles(String avrBasePath,
                                   String buildPath, List<File> includePaths,
+                                  List<File> sSources, 
                                   List<File> cSources, List<File> cppSources)
     throws RunnerException {
 
     List<File> objectPaths = new ArrayList<File>();
     
+    for (File file : sSources) {
+      String objectPath = buildPath + File.separator + file.getName() + ".o";
+      objectPaths.add(new File(objectPath));
+      execAsynchronously(getCommandCompilerS(avrBasePath, includePaths,
+                                             file.getAbsolutePath(),
+                                             objectPath));
+    }
+ 		
     for (File file : cSources) {
         String objectPath = buildPath + File.separator + file.getName() + ".o";
         objectPaths.add(new File(objectPath));
@@ -202,7 +215,7 @@ public class Compiler implements MessageConsumer {
                                                file.getAbsolutePath(),
                                                objectPath));
     }
-    
+
     for (File file : cppSources) {
         String objectPath = buildPath + File.separator + file.getName() + ".o";
         objectPaths.add(new File(objectPath));
@@ -430,16 +443,13 @@ public class Compiler implements MessageConsumer {
 
   /////////////////////////////////////////////////////////////////////////////
 
-  static private List getCommandCompilerC(String avrBasePath, List includePaths,
+  static private List getCommandCompilerS(String avrBasePath, List includePaths,
     String sourceName, String objectName) {
     List baseCommandCompiler = new ArrayList(Arrays.asList(new String[] {
       avrBasePath + "avr-gcc",
       "-c", // compile, don't link
       "-g", // include debugging info (so errors include line numbers)
-      "-Os", // optimize for size
-      "-w", // surpress all warnings
-      "-ffunction-sections", // place each function in its own section
-      "-fdata-sections",
+      "-assembler-with-cpp",
       "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
       "-DF_CPU=" + Preferences.get("boards." + Preferences.get("board") + ".build.f_cpu"),
     }));
@@ -455,9 +465,36 @@ public class Compiler implements MessageConsumer {
   }
 
   
+  static private List getCommandCompilerC(String avrBasePath, List includePaths,
+    String sourceName, String objectName) {
+
+    List baseCommandCompiler = new ArrayList(Arrays.asList(new String[] {
+      avrBasePath + "avr-gcc",
+      "-c", // compile, don't link
+      "-g", // include debugging info (so errors include line numbers)
+      "-Os", // optimize for size
+      "-w", // surpress all warnings
+      "-ffunction-sections", // place each function in its own section
+      "-fdata-sections",
+      "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
+      "-DF_CPU=" + Preferences.get("boards." + Preferences.get("board") + ".build.f_cpu"),
+    }));
+		
+    for (int i = 0; i < includePaths.size(); i++) {
+      baseCommandCompiler.add("-I" + (String) includePaths.get(i));
+    }
+
+    baseCommandCompiler.add(sourceName);
+    baseCommandCompiler.add("-o"+ objectName);
+
+    return baseCommandCompiler;
+  }
+	
+	
   static private List getCommandCompilerCPP(String avrBasePath,
     List includePaths, String sourceName, String objectName) {
-      List baseCommandCompilerCPP = new ArrayList(Arrays.asList(new String[] {
+    
+    List baseCommandCompilerCPP = new ArrayList(Arrays.asList(new String[] {
       avrBasePath + "avr-g++",
       "-c", // compile, don't link
       "-g", // include debugging info (so errors include line numbers)
