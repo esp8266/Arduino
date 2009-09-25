@@ -381,7 +381,8 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert)
             }
         }
 
-       /* couldn't find a trusted cert (& let self-signed errors be returned) */
+        /* couldn't find a trusted cert (& let self-signed errors 
+           be returned) */
         if (!match_ca_cert && !is_self_signed)
         {
             ret = X509_VFY_ERROR_NO_TRUSTED_CERT;       

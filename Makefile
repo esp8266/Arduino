@@ -50,6 +50,9 @@ target:
 ifdef CONFIG_AXHTTPD
 	$(MAKE) -C httpd
 endif
+ifdef CONFIG_AXTLSWRAP
+	$(MAKE) -C axtlswrap
+endif
 ifdef CONFIG_BINDINGS
 	$(MAKE) -C bindings
 endif
@@ -121,6 +124,7 @@ clean::
 	@cd crypto; $(MAKE) clean
 	@cd ssl; $(MAKE) clean
 	@cd httpd; $(MAKE) clean
+	@cd axtlswrap; $(MAKE) clean
 	@cd samples; $(MAKE) clean
 	@cd docsrc; $(MAKE) clean
 	@cd bindings; $(MAKE) clean

@@ -107,6 +107,14 @@ config CONFIG_AXHTTPD
     help
         Build the AXHTTPD web server
 
+config CONFIG_AXTLSWRAP
+    depends on !CONFIG_PLATFORM_WIN32
+    bool "Enable axtlswrap"
+    default n
+    help
+        axtlswrap is similar to sslwrap - http://www.rickk.com/sslwrap. 
+        It enables SSL for processes that don't have native SSL support.
+
 source httpd/Config.in
 source bindings/Config.in
 source samples/Config.in

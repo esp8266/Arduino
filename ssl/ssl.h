@@ -369,8 +369,6 @@ EXP_FUNC int STDCALL ssl_verify_cert(const SSL *ssl);
  * This will usually be used by a client to check that the server's common 
  * name matches the URL.
  *
- * A full handshake needs to occur for this call to work properly.
- *
  * @param ssl [in] An SSL object reference.
  * @param component [in] one of:
  * - SSL_X509_CERT_COMMON_NAME
@@ -384,18 +382,17 @@ EXP_FUNC int STDCALL ssl_verify_cert(const SSL *ssl);
  */
 EXP_FUNC const char * STDCALL ssl_get_cert_dn(const SSL *ssl, int component);
 
-
 /**
  * @brief Retrieve a Subject Alternative DNSName
  *
  * When a handshake is complete and a certificate has been exchanged, then the
  * details of the remote certificate can be retrieved.
  *
- * This will usually be used by a client to check that the server's common 
+ * This will usually be used by a client to check that the server's DNS  
  * name matches the URL.
  *
  * @param ssl [in] An SSL object reference.
- * @param index [in] The index of the DNS name to retrieve.
+ * @param dnsindex [in] The index of the DNS name to retrieve.
  * @return The appropriate string (or null if not defined)
  * @note Verification build mode must be enabled.
  */

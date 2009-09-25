@@ -102,6 +102,9 @@ endif
 
 $(TARGET2): htpasswd.o $(AXTLS_HOME)/$(STAGE)/libaxtls.a
 	$(LD) $(LDFLAGS) -o $@ htpasswd.o $(LIBS)
+ifdef CONFIG_STRIP_UNWANTED_SECTIONS
+	$(STRIP) --remove-section=.comment $(TARGET2)
+endif
 
 else    # Win32
 

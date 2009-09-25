@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2007, Cameron Rich
+# Copyright (c) 2009, Cameron Rich
 #
 # All rights reserved.
 #
@@ -28,70 +28,41 @@
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-all:
+all : sslwrap
 
-AXTLS_HOME=../..
+AXTLS_HOME=..
 
 include $(AXTLS_HOME)/config/.config
 include $(AXTLS_HOME)/config/makefile.conf
 
-ifdef CONFIG_PERFORMANCE_TESTING
-all: performance
+ifdef CONFIG_PLATFORM_CYGWIN
+TARGET=$(AXTLS_HOME)/$(STAGE)/axtlswrap.exe
+else # linux
+TARGET=$(AXTLS_HOME)/$(STAGE)/axtlswrap
 endif
 
-ifdef CONFIG_SSL_TEST
-all: ssltesting
+ifdef CONFIG_HTTP_STATIC_BUILD
+LIBS=$(AXTLS_HOME)/$(STAGE)/libaxtls.a
+else
+LIBS=-L$(AXTLS_HOME)/$(STAGE) -laxtls
 endif
 
+ifndef CONFIG_AXTLSWRAP
+sslwrap:
+else
+sslwrap : $(TARGET)
+
+OBJ= axtlswrap.o
 include $(AXTLS_HOME)/config/makefile.post
 
-ifndef CONFIG_PLATFORM_WIN32
-performance: $(AXTLS_HOME)/$(STAGE)/perf_bigint
-ssltesting: $(AXTLS_HOME)/$(STAGE)/ssltest
-LIBS=$(AXTLS_HOME)/$(STAGE)
-
-$(AXTLS_HOME)/$(STAGE)/perf_bigint: perf_bigint.o $(LIBS)/libaxtls.a
-	$(LD) $(LDFLAGS) -o $@ $^ -L $(LIBS) -laxtls
-
-$(AXTLS_HOME)/$(STAGE)/ssltest: ssltest.o $(LIBS)/libaxtls.a
-	$(LD) $(LDFLAGS) -o $@ $^ -lpthread -L $(LIBS) -laxtls
-else
-performance: $(AXTLS_HOME)/$(STAGE)/perf_bigint.exe
-ssltesting: $(AXTLS_HOME)/$(STAGE)/ssltest.exe
-
-CRYPTO_PATH="$(AXTLS_INCLUDE)crypto\\"
-AXTLS_SSL_PATH="$(AXTLS_INCLUDE)ssl\\"
-
-CRYPTO_OBJ=\
-	$(CRYPTO_PATH)aes.obj \
-	$(CRYPTO_PATH)bigint.obj \
-	$(CRYPTO_PATH)crypto_misc.obj \
-	$(CRYPTO_PATH)hmac.obj \
-	$(CRYPTO_PATH)md2.obj \
-	$(CRYPTO_PATH)md5.obj \
-	$(CRYPTO_PATH)rc4.obj \
-	$(CRYPTO_PATH)rsa.obj \
-	$(CRYPTO_PATH)sha1.obj
-
-OBJ=\
-	$(AXTLS_SSL_PATH)asn1.obj \
-	$(AXTLS_SSL_PATH)gen_cert.obj \
-	$(AXTLS_SSL_PATH)loader.obj \
-	$(AXTLS_SSL_PATH)openssl.obj \
-	$(AXTLS_SSL_PATH)os_port.obj \
-	$(AXTLS_SSL_PATH)p12.obj \
-	$(AXTLS_SSL_PATH)x509.obj \
-	$(AXTLS_SSL_PATH)tls1.obj \
-	$(AXTLS_SSL_PATH)tls1_svr.obj \
-	$(AXTLS_SSL_PATH)tls1_clnt.obj
-
-$(AXTLS_HOME)/$(STAGE)/perf_bigint.exe: perf_bigint.obj
-	$(LD) $(LDFLAGS) /out:$@ $? $(CRYPTO_OBJ) $(OBJ)
-
-$(AXTLS_HOME)/$(STAGE)/ssltest.exe: ssltest.obj
-	$(LD) $(LDFLAGS) /out:$@ $? $(CRYPTO_OBJ) $(OBJ)
+$(TARGET): $(OBJ) $(AXTLS_HOME)/$(STAGE)/libaxtls.a
+	$(LD) $(LDFLAGS) -o $@ $(OBJ) $(LIBS)
+ifdef CONFIG_STRIP_UNWANTED_SECTIONS
+	$(STRIP) --remove-section=.comment $(TARGET)
 endif
 
+endif   # CONFIG_AXTLSWRAP
+
 clean::
-	-@rm -f $(AXTLS_HOME)/$(STAGE)/perf_bigint* $(AXTLS_HOME)/$(STAGE)/ssltest*
+	-@rm -f $(TARGET)*
 
