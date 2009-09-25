@@ -99,7 +99,7 @@ public class Compiler implements MessageConsumer {
       List commandAR = new ArrayList(baseCommandAR);
       commandAR.add(file.getAbsolutePath());
       execAsynchronously(commandAR);
-      }
+    }
 
     // 2. compile the libraries, outputting .o files to: <buildPath>/<library>/
 
@@ -125,7 +125,7 @@ public class Compiler implements MessageConsumer {
                      findFilesInFolder(new File(libraryFolder, "utility"), "cpp", false)));
       // other libraries should not see this library's utility/ folder
       includePaths.remove(includePaths.size() - 1);
-          }
+    }
 
     // 3. compile the sketch (already in the buildPath)
 
@@ -185,7 +185,7 @@ public class Compiler implements MessageConsumer {
     execAsynchronously(commandObjcopy);
     
     return true;
-          }
+  }
 
 
   private List<File> compileFiles(String avrBasePath,
@@ -201,7 +201,7 @@ public class Compiler implements MessageConsumer {
         execAsynchronously(getCommandCompilerC(avrBasePath, includePaths,
                                                file.getAbsolutePath(),
                                                objectPath));
-            }
+    }
     
     for (File file : cppSources) {
         String objectPath = buildPath + File.separator + file.getName() + ".o";
@@ -209,10 +209,10 @@ public class Compiler implements MessageConsumer {
         execAsynchronously(getCommandCompilerCPP(avrBasePath, includePaths,
                                                  file.getAbsolutePath(),
                                                  objectPath));
-          }
+    }
     
     return objectPaths;
-        }
+  }
 
 
   boolean firstErrorFound;
@@ -229,9 +229,9 @@ public class Compiler implements MessageConsumer {
     if (verbose || Preferences.getBoolean("build.verbose")) {
       for(int j = 0; j < command.length; j++) {
         System.out.print(command[j] + " ");
-              }
+      }
       System.out.println();
-            }
+    }
 
     firstErrorFound = false;  // haven't found any errors yet
     secondErrorFound = false;
@@ -244,7 +244,7 @@ public class Compiler implements MessageConsumer {
       RunnerException re = new RunnerException(e.getMessage());
       re.hideStackTrace();
       throw re;
-        }
+    }
 
     MessageSiphon in = new MessageSiphon(process.getInputStream(), this);
     MessageSiphon err = new MessageSiphon(process.getErrorStream(), this);
@@ -275,14 +275,14 @@ public class Compiler implements MessageConsumer {
     if (result > 1) {
       // a failure in the tool (e.g. unable to locate a sub-executable)
       System.err.println(command[0] + " returned " + result);
-        }
+    }
 
     if (result != 0) {
       RunnerException re = new RunnerException("Error compiling.");
       re.hideStackTrace();
       throw re;
-            }
-          }
+    }
+  }
 
 
   /**
@@ -319,7 +319,7 @@ public class Compiler implements MessageConsumer {
 
     if (partialStartIndex != -1) {
       fileIndex = 0;
-          } else {
+    } else {
       // wasn't there, check the other (non-pde) files in the sketch.
       // iterate through the project files to see who's causing the trouble
       for (int i = 0; i < sketch.getCodeCount(); i++) {
@@ -332,7 +332,7 @@ public class Compiler implements MessageConsumer {
           fileIndex = i;
           //System.out.println("fileIndex is " + fileIndex);
           break;
-          }
+        }
       }
       //+ className + ".java";
     }
@@ -353,7 +353,7 @@ public class Compiler implements MessageConsumer {
         System.err.print(s1);
         //firstErrorFound = true;
         return;
-            }
+      }
 
       int lineNumber;
       try {
@@ -361,7 +361,7 @@ public class Compiler implements MessageConsumer {
       } catch (NumberFormatException e) {
         System.err.print(s1);
         return;
-          }
+      }
       
       //System.out.println("pde / line number: " + lineNumber);
       
@@ -372,15 +372,15 @@ public class Compiler implements MessageConsumer {
             if (sketch.getCode(i).getPreprocOffset() < lineNumber) {
               fileIndex = i;
               //System.out.println("i'm thinkin file " + i);
+            }
+          }
         }
-        }
-      }
         // XXX: DAM: if the lineNumber is less than sketch.getCode(0).getPreprocOffset()
         // we shouldn't subtract anything from it, as the error is above the
         // location where the function prototypes and #include "WProgram.h"
         // were inserted.
         lineNumber -= sketch.getCode(fileIndex).getPreprocOffset();
-    }
+      }
 
       //String s2 = s1.substring(colon + 2);
       int err = s1.indexOf(":");
@@ -391,7 +391,7 @@ public class Compiler implements MessageConsumer {
         if (firstErrorFound) {
           secondErrorFound = true;
           return;
-  }
+        }
 
         // if executing at this point, this is *at least* the first error
         firstErrorFound = true;
@@ -472,7 +472,7 @@ public class Compiler implements MessageConsumer {
 
     for (int i = 0; i < includePaths.size(); i++) {
       baseCommandCompilerCPP.add("-I" + (String) includePaths.get(i));
-  }
+    }
 
     baseCommandCompilerCPP.add(sourceName);
     baseCommandCompilerCPP.add("-o"+ objectName);
