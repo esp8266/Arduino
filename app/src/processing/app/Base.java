@@ -993,8 +993,9 @@ public class Base {
   protected void rebuildSketchbookMenu(JMenu menu) {
     //System.out.println("rebuilding sketchbook menu");
     //new Exception().printStackTrace();
-    boolean nativeButBroken = Base.isMacOS() ?
-      Preferences.getBoolean("apple.laf.useScreenMenuBar") : false;
+    //boolean nativeButBroken = Base.isMacOS() ?
+      //Preferences.getBoolean("apple.laf.useScreenMenuBar") : false;
+    boolean nativeButBroken = false;
 
     try {
       if (nativeButBroken) {  // osx workaround
@@ -1044,8 +1045,9 @@ public class Base {
 
   public void rebuildExamplesMenu(JMenu menu) {
     //System.out.println("rebuilding examples menu");
-    boolean nativeButBroken = Base.isMacOS() ?
-      Preferences.getBoolean("apple.laf.useScreenMenuBar") : false;
+    //boolean nativeButBroken = Base.isMacOS() ?
+      //Preferences.getBoolean("apple.laf.useScreenMenuBar") : false;
+    boolean nativeButBroken = false;
 
     try {
       if (nativeButBroken) {  // osx workaround
