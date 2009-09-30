@@ -43,7 +43,7 @@ struct connstruct *freeconns;
 const char * const server_version = "axhttpd/"AXTLS_VERSION;
 
 static void addtoservers(int sd);
-static int openlistener(int port);
+static int openlistener(char *address, int port);
 static void handlenewconnection(int listenfd, int is_ssl);
 static void addconnection(int sd, char *ip, int is_ssl);
 static void ax_chdir(void);
@@ -117,8 +117,13 @@ int main(int argc, char *argv[])
     struct connstruct *tp, *to;
     struct serverstruct *sp;
     int rnum, wnum, active;
-    int i;
+    int i = 1;
     time_t currtime;
+    char *httpAddress = NULL;
+    int httpPort = CONFIG_HTTP_PORT;
+    char *httpsAddress = NULL;
+    int httpsPort = CONFIG_HTTP_HTTPS_PORT;
+    char *portStr;
 
 #ifdef WIN32
     WORD wVersionRequested = MAKEWORD(2, 2);
@@ -140,6 +145,44 @@ int main(int argc, char *argv[])
 #endif
     tdate_init();
 
+    /* get some command-line parameters */
+    while (argv[i] != NULL)
+    {
+        if (strcmp(argv[i], "-p") == 0 && argv[i+1] != NULL)
+        {
+            if ((portStr = strchr(argv[i+1], ':')) != NULL)
+            {
+                httpAddress = argv[i+1];
+                *portStr = 0;
+                httpPort = atoi(portStr + 1);
+            }
+            else
+                httpPort = atoi(argv[i+1]);
+
+            i += 2;
+            continue;
+        }
+
+        if (strcmp(argv[i], "-s") == 0 && argv[i+1] != NULL)
+        {
+            if ((portStr = strchr(argv[i+1], ':')) != NULL)
+            {
+                httpsAddress = argv[i+1];
+                *portStr = 0;
+                httpsPort = atoi(portStr + 1);
+            }
+            else
+                httpsPort = atoi(argv[i+1]);
+
+            i += 2;
+            continue;
+        }
+
+        printf("%s: [-p [address:]httpport] [-s [address:]httpsport]\n", 
+                                                        argv[0]);
+        exit(0);
+    }
+
     for (i = 0; i < INITIAL_CONNECTION_SLOTS; i++) 
     {
         tp = freeconns;
@@ -147,22 +190,20 @@ int main(int argc, char *argv[])
         freeconns->next = tp;
     }
 
-    if ((active = openlistener(CONFIG_HTTP_PORT)) == -1) 
+    if ((active = openlistener(httpAddress, httpPort)) == -1) 
     {
 #ifdef CONFIG_HTTP_VERBOSE
-        fprintf(stderr, "ERR: Couldn't bind to port %d\n",
-                CONFIG_HTTP_PORT);
+        fprintf(stderr, "ERR: Couldn't bind to port %d\n", httpPort);
 #endif
         exit(1);
     }
 
     addtoservers(active);
 
-    if ((active = openlistener(CONFIG_HTTP_HTTPS_PORT)) == -1) 
+    if ((active = openlistener(httpsAddress, httpsPort)) == -1) 
     {
 #ifdef CONFIG_HTTP_VERBOSE
-        fprintf(stderr, "ERR: Couldn't bind to port %d\n", 
-                CONFIG_HTTP_HTTPS_PORT);
+        fprintf(stderr, "ERR: Couldn't bind to port %d\n", httpsPort);
 #endif
         exit(1);
     }
@@ -181,7 +222,7 @@ int main(int argc, char *argv[])
     printf("addcgiext %s\n", CONFIG_HTTP_CGI_EXTENSIONS); 
 #endif
     printf("%s: listening on ports %d (http) and %d (https)\n", 
-            server_version, CONFIG_HTTP_PORT, CONFIG_HTTP_HTTPS_PORT);
+            server_version, httpPort, httpsPort);
     TTY_FLUSH();
 #endif
 
@@ -418,7 +459,7 @@ static void handlenewconnection(int listenfd, int is_ssl)
 }
 #endif
 
-static int openlistener(int port) 
+static int openlistener(char *address, int port) 
 {
     int sd;
 #ifdef WIN32
@@ -435,17 +476,18 @@ static int openlistener(int port)
     memset(&my_addr, 0, sizeof(my_addr));
     my_addr.sin_family = AF_INET;
     my_addr.sin_port = htons((short)port);
-    my_addr.sin_addr.s_addr = INADDR_ANY;
+    my_addr.sin_addr.s_addr = address == NULL ? 
+                        INADDR_ANY : inet_addr(address);
 #else
     struct sockaddr_in6 my_addr;
 
     if ((sd = socket(AF_INET6, SOCK_STREAM, 0)) == -1) 
         return -1;
 
-    memset(&my_addr, 0, sizeof(my_addr));
     my_addr.sin6_family = AF_INET6;
     my_addr.sin6_port = htons(port);
-    my_addr.sin6_addr.s_addr = INADDR_ANY;
+    my_addr.sin6_addr.s_addr = address == NULL ? 
+                        INADDR_ANY : iinet_addr(address);
 #endif
 
     setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &tp, sizeof(tp));
