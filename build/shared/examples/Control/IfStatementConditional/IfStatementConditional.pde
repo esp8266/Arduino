@@ -29,7 +29,7 @@ const int threshold = 400;   // an arbitrary threshold level that's in the range
 
 void setup() {
   // initialize the LED pin as an output:
-  pinMode(LED, OUTPUT);
+  pinMode(ledPin, OUTPUT);
   // initialize serial communications:
   Serial.begin(9600);
 }
