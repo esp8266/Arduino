@@ -1,3 +1,29 @@
+0170 core (1.0.8)
+X added some min/max functions that work with doubles
+X   not sure if those are staying in or not
+X filter(RGB) supposed to be filter(OPAQUE) 
+X   http://dev.processing.org/bugs/show_bug.cgi?id=1346
+X implement non-power-of-2 textures
+X fix get() when used with save() in OpenGL mode
+X immediately update projection with OpenGL 
+X   in the past, projection updates required a new frame
+X   also prevents camera/project from being reset with setSize() (regression?)
+X     which was a problem anyway because it made GL calls outside draw()
+X partial fix for texture edge problems with opengl
+o   http://dev.processing.org/bugs/show_bug.cgi?id=602
+X some camera problems may be coming from "cameraNear = -8" line
+X   this may cause other problems with drawing/clipping however
+X opengl camera does not update on current frame (has to do a second frame)
+X remove methods from PApplet that use doubles
+
+
+0169 core (1.0.7)
+X remove major try/catch block from PApplet.main()
+X   hopefully will allow some exception stuff to come through properly
+X PVector.angleDistance() returns NaN
+X   http://dev.processing.org/bugs/show_bug.cgi?id=1316
+
+
 0168 core (1.0.6)
 X getImage() setting the wrong image type
 X   http://dev.processing.org/bugs/show_bug.cgi?id=1282

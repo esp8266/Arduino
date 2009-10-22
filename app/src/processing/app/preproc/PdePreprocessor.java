@@ -34,58 +34,222 @@ import processing.app.debug.Target;
 import processing.core.*;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-
-import antlr.*;
-import antlr.collections.*;
-import antlr.collections.impl.*;
+import java.util.*;
 
 import com.oroinc.text.regex.*;
 
 
+/**
+ * Class that orchestrates preprocessing p5 syntax into straight Java.
+ */
 public class PdePreprocessor {
-
-  static final int JDK11 = 0;
-  static final int JDK13 = 1;
-  static final int JDK14 = 2;
-
-  //static String defaultImports[][] = new String[3][];
-
-  // these ones have the .* at the end, since a class name
-  // might be at the end instead of .* whcih would make trouble
-  // other classes using this can lop of the . and anything after
-  // it to produce a package name consistently.
-  //public String extraImports[];
-  ArrayList<String> programImports;
-
-  static public final int STATIC = 0;  // formerly BEGINNER
-  static public final int ACTIVE = 1;  // formerly INTERMEDIATE
-  static public final int JAVA   = 2;  // formerly ADVANCED
-  // static to make it easier for the antlr preproc to get at it
-  static public int programType = -1;
-
-  Reader programReader;
-  String buildPath;
-
   // stores number of built user-defined function prototypes
   public int prototypeCount = 0;
 
   // stores number of included library headers written
   // we always write one header: WProgram.h
   public int headerCount = 1;
-
-  /**
-   * These may change in-between (if the prefs panel adds this option)
-   * so grab them here on construction.
-   */
-  public PdePreprocessor() {}
-
-  /**
-   * Used by PdeEmitter.dumpHiddenTokens()
-   */
-  //public static TokenStreamCopyingHiddenTokenFilter filter;
   
+  Target target;
+  List prototypes;
+
+
+
+
+  String[] defaultImports;
+
+  // these ones have the .* at the end, since a class name might be at the end
+  // instead of .* which would make trouble other classes using this can lop
+  // off the . and anything after it to produce a package name consistently.
+  //public String extraImports[];
+  ArrayList<String> programImports;
+
+  // imports just from the code folder, treated differently
+  // than the others, since the imports are auto-generated.
+  ArrayList<String> codeFolderImports;
+
+  String indent;
+
+  PrintStream stream;
+  String program;
+  String buildPath;
+  String name;
+
+
+  /**
+   * Setup a new preprocessor.
+   */
+  public PdePreprocessor() { }
+
+  public int writePrefix(String program, String buildPath,
+                         String name, String codeFolderPackages[],
+                         Target target)
+    throws FileNotFoundException {
+    this.buildPath = buildPath;
+    this.name = name;
+    this.target = target;
+
+    int tabSize = Preferences.getInteger("editor.tabs.size");
+    char[] indentChars = new char[tabSize];
+    Arrays.fill(indentChars, ' ');
+    indent = new String(indentChars);
+
+    // if the program ends with no CR or LF an OutOfMemoryError will happen.
+    // not gonna track down the bug now, so here's a hack for it:
+    // http://dev.processing.org/bugs/show_bug.cgi?id=5
+    program += "\n";
+
+    // if the program ends with an unterminated multi-line comment,
+    // an OutOfMemoryError or NullPointerException will happen.
+    // again, not gonna bother tracking this down, but here's a hack.
+    // http://dev.processing.org/bugs/show_bug.cgi?id=16
+    Sketch.scrubComments(program);
+    // this returns the scrubbed version, but more important for this
+    // function, it'll check to see if there are errors with the comments.
+
+    if (Preferences.getBoolean("preproc.substitute_unicode")) {
+      // check for non-ascii chars (these will be/must be in unicode format)
+      char p[] = program.toCharArray();
+      int unicodeCount = 0;
+      for (int i = 0; i < p.length; i++) {
+        if (p[i] > 127) unicodeCount++;
+      }
+      // if non-ascii chars are in there, convert to unicode escapes
+      if (unicodeCount != 0) {
+        // add unicodeCount * 5.. replacing each unicode char
+        // with six digit uXXXX sequence (xxxx is in hex)
+        // (except for nbsp chars which will be a replaced with a space)
+        int index = 0;
+        char p2[] = new char[p.length + unicodeCount*5];
+        for (int i = 0; i < p.length; i++) {
+          if (p[i] < 128) {
+            p2[index++] = p[i];
+
+          } else if (p[i] == 160) {  // unicode for non-breaking space
+            p2[index++] = ' ';
+
+          } else {
+            int c = p[i];
+            p2[index++] = '\\';
+            p2[index++] = 'u';
+            char str[] = Integer.toHexString(c).toCharArray();
+            // add leading zeros, so that the length is 4
+            //for (int i = 0; i < 4 - str.length; i++) p2[index++] = '0';
+            for (int m = 0; m < 4 - str.length; m++) p2[index++] = '0';
+            System.arraycopy(str, 0, p2, index, str.length);
+            index += str.length;
+          }
+        }
+        program = new String(p2, 0, index);
+      }
+    }
+
+    // These may change in-between (if the prefs panel adds this option)
+    // so grab them here on construction.
+    String prefsLine = Preferences.get("preproc.imports");
+    defaultImports = PApplet.splitTokens(prefsLine, ", ");
+
+    //String importRegexp = "(?:^|\\s|;)(import\\s+)(\\S+)(\\s*;)";
+    String importRegexp = "^\\s*#include\\s+[<\"](\\S+)[\">]";
+    programImports = new ArrayList<String>();
+
+    String[][] pieces = PApplet.matchAll(program, importRegexp);
+
+    if (pieces != null)
+      for (int i = 0; i < pieces.length; i++)
+        programImports.add(pieces[i][1]);  // the package name
+
+    codeFolderImports = new ArrayList<String>();
+//    if (codeFolderPackages != null) {
+//      for (String item : codeFolderPackages) {
+//        codeFolderImports.add(item + ".*");
+//      }
+//    }
+
+    prototypes = new ArrayList();
+    
+    try {
+      prototypes = prototypes(program);
+    } catch (MalformedPatternException e) {
+      System.out.println("Internal error while pre-processing; " +
+        "not generating function prototypes.\n\n" + e);
+    }
+    
+    // store # of prototypes so that line number reporting can be adjusted
+    prototypeCount = prototypes.size();
+  
+    // do this after the program gets re-combobulated
+    this.program = program;
+    
+    // output the code
+    File streamFile = new File(buildPath, name + ".cpp");
+    stream = new PrintStream(new FileOutputStream(streamFile));
+    
+    return headerCount + prototypeCount;
+  }
+
+  /**
+   * preprocesses a pde file and write out a java file
+   * @return the classname of the exported Java
+   */
+  //public String write(String program, String buildPath, String name,
+  //                  String extraImports[]) throws java.lang.Exception {
+  public String write() throws java.lang.Exception {
+    writeProgram(stream, program, prototypes);
+    writeFooter(stream, target);
+    stream.close();
+    
+    return name;
+  }
+
+  // Write the pde program to the cpp file
+  protected void writeProgram(PrintStream out, String program, List prototypes) {
+    int prototypeInsertionPoint = firstStatement(program);
+  
+    out.print(program.substring(0, prototypeInsertionPoint));
+    out.print("#include \"WProgram.h\"\n");    
+    
+    // print user defined prototypes
+    for (int i = 0; i < prototypes.size(); i++) {
+      out.print(prototypes.get(i) + "\n");
+    }
+    
+    out.print(program.substring(prototypeInsertionPoint));
+  }
+
+
+  /**
+   * Write any necessary closing text.
+   *
+   * @param out         PrintStream to write it to.
+   */
+  protected void writeFooter(PrintStream out, Target target) throws java.lang.Exception {
+    // Open the file main.cxx and copy its entire contents to the bottom of the
+    // generated sketch .cpp file...
+
+    String mainFileName = target.getPath() + File.separator + "main.cxx";
+    FileReader reader = null;
+    reader = new FileReader(mainFileName);
+
+    LineNumberReader mainfile = new LineNumberReader(reader);
+
+    String line;
+    while ((line = mainfile.readLine()) != null) {
+        out.print(line + "\n");
+    }
+
+    mainfile.close();
+  }
+
+
+  public ArrayList<String> getExtraImports() {
+    return programImports;
+  }
+
+
+
+
+
   /**
    * Returns the index of the first character that's not whitespace, a comment
    * or a pre-processor directive.
@@ -204,185 +368,4 @@ public class PdePreprocessor {
     
     return matches;
   }
-
-
-  /**
-   * preprocesses a pde file and write out a java file
-   * @param pretty true if should also space out/indent lines
-   * @return the classname of the exported Java
-   */
-  //public String write(String program, String buildPath, String name,
-  //                  String extraImports[]) throws java.lang.Exception {
-  public String write(String program, String buildPath,
-                      String name, String codeFolderPackages[],
-                      Target target)
-    throws java.lang.Exception {
-    // if the program ends with no CR or LF an OutOfMemoryError will happen.
-    // not gonna track down the bug now, so here's a hack for it:
-    // bug filed at http://dev.processing.org/bugs/show_bug.cgi?id=5
-    //if ((program.length() > 0) &&
-    //program.charAt(program.length()-1) != '\n') {
-      program += "\n";
-    //}
-
-    // if the program ends with an unterminated multiline comment,
-    // an OutOfMemoryError or NullPointerException will happen.
-    // again, not gonna bother tracking this down, but here's a hack.
-    // http://dev.processing.org/bugs/show_bug.cgi?id=16
-    Sketch.scrubComments(program);
-    // this returns the scrubbed version, but more important for this
-    // function, it'll check to see if there are errors with the comments.
-
-    if (Preferences.getBoolean("preproc.substitute_unicode")) {
-      // check for non-ascii chars (these will be/must be in unicode format)
-      char p[] = program.toCharArray();
-      int unicodeCount = 0;
-      for (int i = 0; i < p.length; i++) {
-        if (p[i] > 127) unicodeCount++;
-      }
-      // if non-ascii chars are in there, convert to unicode escapes
-      if (unicodeCount != 0) {
-        // add unicodeCount * 5.. replacing each unicode char
-        // with six digit uXXXX sequence (xxxx is in hex)
-        // (except for nbsp chars which will be a replaced with a space)
-        int index = 0;
-        char p2[] = new char[p.length + unicodeCount*5];
-        for (int i = 0; i < p.length; i++) {
-          if (p[i] < 128) {
-            p2[index++] = p[i];
-
-          } else if (p[i] == 160) {  // unicode for non-breaking space
-            p2[index++] = ' ';
-
-          } else {
-            int c = p[i];
-            p2[index++] = '\\';
-            p2[index++] = 'u';
-            char str[] = Integer.toHexString(c).toCharArray();
-            // add leading zeros, so that the length is 4
-            //for (int i = 0; i < 4 - str.length; i++) p2[index++] = '0';
-            for (int m = 0; m < 4 - str.length; m++) p2[index++] = '0';
-            System.arraycopy(str, 0, p2, index, str.length);
-            index += str.length;
-          }
-        }
-        program = new String(p2, 0, index);
-      }
-    }
-    
-    // if this guy has his own imports, need to remove them
-    // just in case it's not an advanced mode sketch
-    PatternMatcher matcher = new Perl5Matcher();
-    PatternCompiler compiler = new Perl5Compiler();
-    //String mess = "^\\s*(import\\s+\\S+\\s*;)";
-    //String mess = "^\\s*(import\\s+)(\\S+)(\\s*;)";
-    String mess = "^\\s*#include\\s+[<\"](\\S+)[\">]";
-    programImports = new ArrayList<String>();
-
-    Pattern pattern = null;
-    try {
-      pattern = compiler.compile(mess);
-    } catch (MalformedPatternException e) {
-      e.printStackTrace();
-      return null;
-    }
-
-    PatternMatcherInput input = new PatternMatcherInput(program);    
-    while (matcher.contains(input, pattern)) {
-      programImports.add(matcher.getMatch().group(1));
-    }    
-
-    // do this after the program gets re-combobulated
-    this.programReader = new StringReader(program);
-    this.buildPath = buildPath;
-    
-    List prototypes = prototypes(program);
-    
-    // store # of prototypes so that line number reporting can be adjusted
-    prototypeCount = prototypes.size();
-  
-    if (name == null) return null;
-
-    // output the code
-    File streamFile = new File(buildPath, name + ".cpp");
-    PrintStream stream = new PrintStream(new FileOutputStream(streamFile));
-
-    writeHeader(stream);
-    //added to write the pde code to the cpp file
-    writeProgram(stream, program, prototypes);
-    writeFooter(stream, target);
-    stream.close();
-
-    return name;
-  }
-
-  // Write the pde program to the cpp file
-  void writeProgram(PrintStream out, String program, List prototypes) {
-    int prototypeInsertionPoint = firstStatement(program);
-  
-    out.print(program.substring(0, prototypeInsertionPoint));
-    out.print("#include \"WProgram.h\"\n");    
-    
-    // print user defined prototypes
-    for (int i = 0; i < prototypes.size(); i++) {
-      out.print(prototypes.get(i) + "\n");
-    }
-    
-    out.print(program.substring(prototypeInsertionPoint));
-  }
-
-
-  /**
-   * Write any required header material (eg imports, class decl stuff)
-   *
-   * @param out                 PrintStream to write it to.
-   */
-  void writeHeader(PrintStream out) throws IOException {}
-
-  /**
-   * Write any necessary closing text.
-   *
-   * @param out         PrintStream to write it to.
-   */
-  void writeFooter(PrintStream out, Target target) throws java.lang.Exception {
-    // Open the file main.cxx and copy its entire contents to the bottom of the
-    // generated sketch .cpp file...
-
-    String mainFileName = target.getPath() + File.separator + "main.cxx";
-    FileReader reader = null;
-    reader = new FileReader(mainFileName);
-
-    LineNumberReader mainfile = new LineNumberReader(reader);
-
-    String line;
-    while ((line = mainfile.readLine()) != null) {
-        out.print(line + "\n");
-    }
-
-    mainfile.close();
-  }
-
-
-  public ArrayList<String> getExtraImports() {
-    return programImports;
-  }
-
-
-  static String advClassName = "";
-
-  /**
-   * Find the first CLASS_DEF node in the tree, and return the name of the
-   * class in question.
-   *
-   * XXXdmose right now, we're using a little hack to the grammar to get
-   * this info.  In fact, we should be descending the AST passed in.
-   */
-  String getFirstClassName(AST ast) {
-
-    String t = advClassName;
-    advClassName = "";
-
-    return t;
-  }
-
 }

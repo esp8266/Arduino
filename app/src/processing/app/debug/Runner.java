@@ -385,8 +385,14 @@ public class Runner implements MessageConsumer {
       commandArgs =
         "java -Xrunjdwp:transport=dt_shmem,address=" + addr + ",suspend=y ";
     } else if (Base.isMacOS()) {
+      if (System.getProperty("os.version").startsWith("10.4")) {
+        // -d32 not understood by 10.4 (and not needed)
       commandArgs =
+          "java -Xrunjdwp:transport=dt_socket,address=" + addr + ",suspend=y ";
+      } else {
+        commandArgs =
         "java -d32 -Xrunjdwp:transport=dt_socket,address=" + addr + ",suspend=y ";
+    }
     }
 
     for (int i = 0; i < vmParams.length; i++) {

@@ -1,3 +1,92 @@
+PROCESSING 1.0.9 (REV 0171) - 20 October 2009
+
++ Removed NPOT texture support until further testing, because it was 
+  resulting in blurring images in OPENGL sketches.
+  http://dev.processing.org/bugs/show_bug.cgi?id=1352
+
++ Complete the excision of the Apple menu bug code.
+  http://dev.processing.org/bugs/show_bug.cgi?id=786
+
+
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+
+
+PROCESSING 1.0.8 (REV 0170) - 18 October 2009
+
+A bonfire of bug fixes. 
+
+[ environment ]
+
++ Fix bug causing preferences to not save correctly.
+  http://dev.processing.org/bugs/show_bug.cgi?id=1320
+  http://dev.processing.org/bugs/show_bug.cgi?id=1322
+  http://dev.processing.org/bugs/show_bug.cgi?id=1325
+  http://dev.processing.org/bugs/show_bug.cgi?id=1329
+  http://dev.processing.org/bugs/show_bug.cgi?id=1336
+  http://dev.processing.org/bugs/show_bug.cgi?id=1337
+  http://dev.processing.org/bugs/show_bug.cgi?id=1344
+
++ Remove menu dimming code, in-frame menu bar, and warning message on OS X.
+  A year later, Apple fixed the spinning wheel w/ the menu bar problem.
+  http://dev.processing.org/bugs/show_bug.cgi?id=786
+
++ Fix "Unrecognized option: -d32" on OS X 10.4
+  http://dev.processing.org/bugs/show_bug.cgi?id=1324
+
++ Update the outdated "Get the latest Java Plug-in here" in exported applets.
+  http://dev.processing.org/bugs/show_bug.cgi?id=1331
+
++ Use temporary files when saving files inside the PDE. Prevents problems
+  when the save goes badly (e.g. disk is full).
+  http://dev.processing.org/bugs/show_bug.cgi?id=967
+
++ Fix problem with "Save changes before closing?" was being ignored.
+  http://dev.processing.org/bugs/show_bug.cgi?id=1193
+
++ Fix problems with adding/deleting tabs.
+  http://dev.processing.org/bugs/show_bug.cgi?id=1332
+  http://dev.processing.org/bugs/show_bug.cgi?id=1092
+
++ Saving the project with the same name (but different case) 
+  as an existing tab was deleting code on Windows and OS X.
+  http://dev.processing.org/bugs/show_bug.cgi?id=1102
+
+[ core ] 
+
++ filter(RGB) supposed to be filter(OPAQUE) 
+  http://dev.processing.org/bugs/show_bug.cgi?id=1346
+
++ Implement non-power-of-2 textures for OpenGL (on cards where available). 
+  This is a partial fix for texture edge problems:
+  http://dev.processing.org/bugs/show_bug.cgi?id=602
+
++ Fix get() when used with save() in OpenGL mode
+
++ Immediately update projection with OpenGL. In the past, projection 
+  updates required a new frame. This also prevents camera/project from 
+  being reset when the drawing size is changed.
+
++ Removed an error that caused the cameraNear value to be set to -8. 
+  This may cause other problems with drawing/clipping however.
+
++ Removed methods from PApplet that use doubles. These were only temporarily
+  available in SVN, but that's that.
+
++ Use temporary file with saveStrings(File) and saveBytes(File).
+
+[ updates ]
+
++ Updated to Minim 2.0.2. (Thanks Damien!)
+  http://code.compartmental.net/tools/minim
+
++ Updated Java on Linux and Windows to 6u16.
+
++ Updated Quaqua to 6.2 on Mac OS X.
+
+
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+
+
 PROCESSING 1.0.7 (REV 0169) - 4 September 2009
 
 Bug fixes and updates, also some tweaks for Mac OS X Snow Leopard. 

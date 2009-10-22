@@ -182,7 +182,6 @@ public class PImage implements PConstants, Cloneable {
       raster.getDataElements(0, 0, width, height, pixels);
 
     } else {  // go the old school java 1.0 route
-//        System.out.println(img.getClass().getName());
       width = img.getWidth(null);
       height = img.getHeight(null);
       pixels = new int[width * height];
@@ -691,7 +690,7 @@ public class PImage implements PConstants, Cloneable {
         throw new RuntimeException("Use filter(POSTERIZE, int levels) " +
         "instead of filter(POSTERIZE)");
 
-      case OPAQUE:
+      case RGB:
         for (int i = 0; i < pixels.length; i++) {
           pixels[i] |= 0xff000000;
         }

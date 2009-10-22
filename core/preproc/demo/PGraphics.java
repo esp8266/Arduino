@@ -3,7 +3,7 @@
 /*
   Part of the Processing project - http://processing.org
 
-  Copyright (c) 2004-09 Ben Fry and Casey Reas
+  Copyright (c) 2004-08 Ben Fry and Casey Reas
   Copyright (c) 2001-04 Massachusetts Institute of Technology
 
   This library is free software; you can redistribute it and/or
@@ -2604,14 +2604,6 @@ public class PGraphics extends PImage implements PConstants {
   }
 
 
-  /** 
-   * TODO not sure if this stays...
-   */
-  public float textWidth(char[] chars, int start, int length) {
-    return textWidthImpl(chars, start, start + length);
-  }
-  
-  
   /**
    * Implementation of returning the text width of
    * the chars [start, stop) in the buffer.

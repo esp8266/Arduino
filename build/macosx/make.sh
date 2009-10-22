@@ -9,12 +9,6 @@ then
   echo "or modify this script to remove use of the -X switch to continue."
   # and you will also need to remove this error message
   exit
-else
-  if [ "$OSX_VERSION" != "10.6" ] 
-  then
-    echo "Note: This script has not been tested on this "
-    echo "release of Mac OS and may cause errors."
-  fi
 fi
 
 

@@ -1,8 +1,30 @@
-0169 core
-X remove major try/catch block from PApplet.main()
-X   hopefully will allow some exception stuff to come through properly
-X PVector.angleDistance() returns NaN
-X   http://dev.processing.org/bugs/show_bug.cgi?id=1316
+0171 core
+X Blurred PImages in OPENGL sketches
+X   removed NPOT texture support (for further testing)
+X   http://dev.processing.org/bugs/show_bug.cgi?id=1352
+
+_ open up the pdf library more (philho)
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1343
+_ changing vertex alpha in P3D in a QUAD_STRIP is ignored
+_   with smoothing, it works fine, but with PTriangle, it's not
+_ smooth() not working with applets an createGraphics(JAVA2D)
+_   but works fine with applications
+_ get() with OPENGL is grabbing the wrong coords
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1349
+
+_ No textures render with hint(ENABLE_ACCURATE_TEXTURES)
+_   http://dev.processing.org/bugs/show_bug.cgi?id=985
+_   need to remove the hint from the reference
+_   need to throw an error when it's used
+_ deal with issue of single pixel seam at the edge of textures
+_   http://dev.processing.org/bugs/show_bug.cgi?id=602
+_   should vertexTexture() divide by width/height or width-1/height-1?
+
+_ key and mouse events delivered out of order
+_   http://dev.processing.org/bugs/show_bug.cgi?id=638
+_ key/mouse events have concurrency problems with noLoop()
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1323
+_   need to say "no drawing inside mouse/key events w/ noLoop"
 
 _ make the index lookup use numbers up to 256?
 
@@ -170,12 +192,6 @@ _ smooth in P3D has zbuffer glitches
 _   http://dev.processing.org/bugs/show_bug.cgi?id=1000
 _ smoothing is slow
 _   http://dev.processing.org/bugs/show_bug.cgi?id=1001
-_ No textures render with hint(ENABLE_ACCURATE_TEXTURES)
-_   http://dev.processing.org/bugs/show_bug.cgi?id=985
-_   need to remove the hint from the reference
-_   need to throw an error when it's used
-_ deal with issue of single pixel seam at the edge of textures
-_   ??? what is the bug # for this one?
 _ textured sphere example needs to set normals
 _   also needs fix for last edge and the seam
 
@@ -235,8 +251,6 @@ _ PApplet.main(new String[] { "classname" }) won't pass in args
 _   this means that no args are after passed to the class
 _   the fix would be to use the following as the call to main()
 _   PApplet.main(append(new String[] { "classname }, args));
-_ key and mouse events delivered out of order
-_   http://dev.processing.org/bugs/show_bug.cgi?id=638
 _ figure out why 1024x768 image takes 3.5 seconds to load
 _   would using a BufferedImage work better?
 _   is the image actually a BufferedImage so PixelGrabber is a waste?

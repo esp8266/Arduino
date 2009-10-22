@@ -1,5 +1,0 @@
-This file has been replaced by an entire section of dev.processing.org
-dedicated to libraries, people who make libraries, and people who 
-love library development trivia. The new page can be found here:
-
-http://dev.processing.org/libraries/

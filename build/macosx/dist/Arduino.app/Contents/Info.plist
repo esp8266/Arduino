@@ -48,7 +48,10 @@
     <key>Java</key>
     <dict>
       <key>VMOptions</key>
-      <string>-Xms128M -Xmx256M</string>
+      <array>
+        <string>-Xms128M</string>
+        <string>-Xmx256M</string>
+      </array>
 
       <key>MainClass</key>
       <string>processing.app.Base</string>
@@ -62,26 +65,23 @@
            http://dev.processing.org/bugs/show_bug.cgi?id=1045 -->
       <string>$JAVAROOT/pde.jar:$JAVAROOT/core.jar:$JAVAROOT/antlr.jar:$JAVAROOT/ecj.jar:$JAVAROOT/registry.jar:$JAVAROOT/quaqua.jar:$JAVAROOT/oro.jar:$JAVAROOT/RXTXcomm.jar</string>
 
+      <key>JVMArchs</key>  
+      <array>  
+	<!--<string>x86_64</string>--> <!-- currently no 64 bit support -->
+	<string>i386</string>  
+        <string>ppc</string>  
+      </array>
+
+      <!-- More properties can be found in http://developer.apple.com/releasenotes/Java/java141/system_properties/chapter_4_section_1.html#//apple_ref/doc/uid/TP30000285 -->
       <key>Properties</key>
       <dict>
 	<!-- Pass the full path of Contents/Resources/Java to the PDE -->
 	<key>javaroot</key>
 	<string>$JAVAROOT</string>
 
-	<!-- More properties can be found in http://developer.apple.com/releasenotes/Java/java141/system_properties/chapter_4_section_1.html#//apple_ref/doc/uid/TP30000285 -->
-
-	<!-- 
-        In release 0158, removed the menubar option from the .app and instead controlling it from the preferences window. By default, the menu bar is inside the editor window because of the Apple Java bug.
-	<key>apple.laf.useScreenMenuBar</key>
-	<string>true</string>
-        -->
-
-	<key>JVMArchs</key>  
-	<array>  
-	  <!--<string>x86_64</string>--> <!-- currently no 64 bit support -->
-	  <string>i386</string>  
-	  <string>ppc</string>  
-	</array>
+	<!-- as of 1.0.8, it's safe to use this option again -->
+        <key>apple.laf.useScreenMenuBar</key>
+        <string>true</string>
 
 	<key>apple.awt.showGrowBox</key>
 	<string>false</string>

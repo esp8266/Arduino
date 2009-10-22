@@ -48,6 +48,7 @@ public class Platform extends processing.app.Platform {
 
 
   public void init(Base base) {
+    System.setProperty("apple.laf.useScreenMenuBar", "true");
     ThinkDifferent.init(base);
     /*
     try {
@@ -129,6 +130,7 @@ public class Platform extends processing.app.Platform {
       }
       */
     }
+    // for Java 1.6, replace with java.awt.Desktop.browse() and java.awt.Desktop.open()
     com.apple.eio.FileManager.openURL(url);
   }
 

@@ -1,6 +1,0 @@
-# don't actually export anything.. this is only to link against
-# inside of the p5 environment
-applet=
-
-# for an application, export to prevent from breaking
-application=javascript.jar

@@ -8,7 +8,8 @@
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation, version 2.1.
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -824,7 +825,7 @@ public class PApplet extends Applet
       meth.add(o, method);
 
     } catch (NoSuchMethodException nsme) {
-      die("There is no public " + name + "() method in the class " +
+      die("There is no " + name + "() method in the class " +
           o.getClass().getName());
 
     } catch (Exception e) {
@@ -841,7 +842,7 @@ public class PApplet extends Applet
       meth.add(o, method);
 
     } catch (NoSuchMethodException nsme) {
-      die("There is no public " + name + "() method in the class " +
+      die("There is no " + name + "() method in the class " +
           o.getClass().getName());
 
     } catch (Exception e) {
@@ -2256,7 +2257,7 @@ public class PApplet extends Applet
     } catch (InvocationTargetException e) {
       e.getTargetException().printStackTrace();
     } catch (NoSuchMethodException nsme) {
-      System.err.println("There is no public " + name + "() method " +
+      System.err.println("There is no " + name + "() method " +
                          "in the class " + getClass().getName());
     } catch (Exception e) {
       e.printStackTrace();
@@ -2687,12 +2688,6 @@ public class PApplet extends Applet
     return (a > b) ? a : b;
   }
 
-  /*
-  static public final double max(double a, double b) {
-    return (a > b) ? a : b;
-  }
-  */
-
 
   static public final int max(int a, int b, int c) {
     return (a > b) ? ((a > c) ? a : c) : ((b > c) ? b : c);
@@ -2738,26 +2733,6 @@ public class PApplet extends Applet
   }
 
 
-  /**
-   * Find the maximum value in an array.
-   * Throws an ArrayIndexOutOfBoundsException if the array is length 0.
-   * @param list the source array
-   * @return The maximum value
-   */
-  /*
-  static public final double max(double[] list) {
-    if (list.length == 0) {
-      throw new ArrayIndexOutOfBoundsException(ERROR_MIN_MAX);
-    }
-    double max = list[0];
-    for (int i = 1; i < list.length; i++) {
-      if (list[i] > max) max = list[i];
-    }
-    return max;
-  }
-  */
-
-
   static public final int min(int a, int b) {
     return (a < b) ? a : b;
   }
@@ -2765,12 +2740,6 @@ public class PApplet extends Applet
   static public final float min(float a, float b) {
     return (a < b) ? a : b;
   }
-
-  /*
-  static public final double min(double a, double b) {
-    return (a < b) ? a : b;
-  }
-  */
 
 
   static public final int min(int a, int b, int c) {
@@ -2780,12 +2749,6 @@ public class PApplet extends Applet
   static public final float min(float a, float b, float c) {
     return (a < b) ? ((a < c) ? a : c) : ((b < c) ? b : c);
   }
-
-  /*
-  static public final double min(double a, double b, double c) {
-    return (a < b) ? ((a < c) ? a : c) : ((b < c) ? b : c);
-  }
-  */
 
 
   /**
@@ -2804,8 +2767,6 @@ public class PApplet extends Applet
     }
     return min;
   }
-
-
   /**
    * Find the minimum value in an array.
    * Throws an ArrayIndexOutOfBoundsException if the array is length 0.
@@ -2823,25 +2784,6 @@ public class PApplet extends Applet
     return min;
   }
 
-
-  /**
-   * Find the minimum value in an array.
-   * Throws an ArrayIndexOutOfBoundsException if the array is length 0.
-   * @param list the source array
-   * @return The minimum value
-   */
-  /*
-  static public final double min(double[] list) {
-    if (list.length == 0) {
-      throw new ArrayIndexOutOfBoundsException(ERROR_MIN_MAX);
-    }
-    double min = list[0];
-    for (int i = 1; i < list.length; i++) {
-      if (list[i] < min) min = list[i];
-    }
-    return min;
-  }
-  */
 
   static public final int constrain(int amt, int low, int high) {
     return (amt < low) ? low : ((amt > high) ? high : amt);
@@ -2947,13 +2889,11 @@ public class PApplet extends Applet
   }
 
 
-  /*
   static public final double map(double value,
                                  double istart, double istop,
                                  double ostart, double ostop) {
     return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
   }
-  */
 
 
 
@@ -4416,34 +4356,18 @@ public class PApplet extends Applet
    * Saves bytes to a specific File location specified by the user.
    */
   static public void saveBytes(File file, byte buffer[]) {
-    File tempFile = null;
     try {
-      File parentDir = file.getParentFile();
-      tempFile = File.createTempFile(file.getName(), null, parentDir);
-
-      /*
       String filename = file.getAbsolutePath();
       createPath(filename);
       OutputStream output = new FileOutputStream(file);
       if (file.getName().toLowerCase().endsWith(".gz")) {
         output = new GZIPOutputStream(output);
       }
-      */
-      OutputStream output = createOutput(tempFile);
       saveBytes(output, buffer);
       output.close();
-      output = null;
-
-      if (!tempFile.renameTo(file)) {
-        System.err.println("Could not rename temporary file " +
-                           tempFile.getAbsolutePath());
-      }
 
     } catch (IOException e) {
       System.err.println("error saving bytes to " + file);
-      if (tempFile != null) {
-        tempFile.delete();
-      }
       e.printStackTrace();
     }
   }
@@ -4470,8 +4394,6 @@ public class PApplet extends Applet
 
 
   static public void saveStrings(File file, String strings[]) {
-    saveStrings(createOutput(file), strings);
-    /*
     try {
       String location = file.getAbsolutePath();
       createPath(location);
@@ -4485,17 +4407,18 @@ public class PApplet extends Applet
     } catch (IOException e) {
       e.printStackTrace();
     }
-    */
   }
 
 
   static public void saveStrings(OutputStream output, String strings[]) {
-    PrintWriter writer = createWriter(output);
+    try {
+      OutputStreamWriter osw = new OutputStreamWriter(output, "UTF-8");
+      PrintWriter writer = new PrintWriter(osw);
       for (int i = 0; i < strings.length; i++) {
         writer.println(strings[i]);
       }
       writer.flush();
-    writer.close();
+    } catch (UnsupportedEncodingException e) { }  // will not happen
   }
 
 
@@ -7378,11 +7301,6 @@ public class PApplet extends Applet
 
   public float textWidth(String str) {
     return g.textWidth(str);
-  }
-
-
-  public float textWidth(char[] chars, int start, int length) {
-    return g.textWidth(chars, start, length);
   }
 
 

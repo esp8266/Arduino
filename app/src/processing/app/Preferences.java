@@ -34,6 +34,8 @@ import processing.app.syntax.*;
 import processing.core.*;
 
 
+
+
 /**
  * Storage class for user preferences and environment settings.
  * <P>
@@ -68,13 +70,6 @@ public class Preferences {
   static final String PREFS_FILE = "preferences.txt";
 
 
-  // platform strings (used to get settings for specific platforms)
-
-  //static final String platforms[] = {
-  //  "other", "windows", "macosx", "linux"
-  //};
-
-
   // prompt text stuff
 
   static final String PROMPT_YES     = "Yes";
@@ -97,12 +92,6 @@ public class Preferences {
    * inside a static block.
    */
   static public int BUTTON_HEIGHT = 24;
-  /*
-  // remove this for 0121, because quaqua takes care of it
-  static {
-    if (Base.isMacOS()) BUTTON_HEIGHT = 29;
-  }
-  */
 
   // value for the size bars, buttons, etc
 
@@ -125,14 +114,12 @@ public class Preferences {
   JTextField sketchbookLocationField;
   JCheckBox exportSeparateBox;
   JCheckBox deletePreviousBox;
-//  JCheckBox closingLastQuitsBox;
   JCheckBox externalEditorBox;
   JCheckBox memoryOverrideBox;
   JTextField memoryField;
   JCheckBox checkUpdatesBox;
   JTextField fontSizeField;
   JCheckBox autoAssociateBox;
-  JCheckBox menubarWorkaroundBox;
 
 
   // the calling editor, so updates can be applied
@@ -142,9 +129,9 @@ public class Preferences {
 
   // data model
 
-  static HashMap<String,String> defaults;
-  static HashMap<String,String> table = new HashMap<String,String>();;
-  static HashMap<String,HashMap<String,String>> prefixes = new HashMap<String,HashMap<String,String>>();
+  static Hashtable defaults;
+  static Hashtable table = new Hashtable();;
+  static Hashtable prefixes = new Hashtable();
   static File preferencesFile;
 
 
@@ -159,8 +146,22 @@ public class Preferences {
                            "You'll need to reinstall Arduino.", e);
     }
 
+    // check for platform-specific properties in the defaults
+    String platformExt = "." + PConstants.platformNames[PApplet.platform];
+    int platformExtLength = platformExt.length();
+    Enumeration e = table.keys();
+    while (e.hasMoreElements()) {
+      String key = (String) e.nextElement();
+      if (key.endsWith(platformExt)) {
+        // this is a key specific to a particular platform
+        String actualKey = key.substring(0, key.length() - platformExtLength);
+        String value = get(key);
+        table.put(actualKey, value);
+      }
+    }
+
     // clone the hash table
-    defaults = (HashMap<String, String>) table.clone();
+    defaults = (Hashtable) table.clone();
 
     // other things that have to be set explicitly for the defaults
     setColor("run.window.bgcolor", SystemColor.control);
@@ -197,14 +198,6 @@ public class Preferences {
                          " and restart Arduino.", ex);
         }
       }
-
-      // Theme settings always override preferences
-//      try {
-//        load(Base.getStream("theme/theme.txt"));
-//      } catch (Exception te) {
-//        Base.showError(null, "Could not read color theme settings.\n" +
-//                             "You'll need to reinstall Processing.", te);
-//      }
     }
     
     try {
@@ -250,43 +243,6 @@ public class Preferences {
     int h, vmax;
 
 
-    // [ ] Quit after closing last sketch window
-    /*
-    closingLastQuitsBox =
-      new JCheckBox("Quit after closing last sketch window");
-    pain.add(closingLastQuitsBox);
-    d = closingLastQuitsBox.getPreferredSize();
-    closingLastQuitsBox.setBounds(left, top, d.width + 10, d.height);
-    right = Math.max(right, left + d.width);
-    top += d.height + GUI_BETWEEN;
-    */
-
-
-    /*
-    // [ ] Prompt for name and folder when creating new sketch
-
-    sketchPromptBox =
-      new JCheckBox("Prompt for name when opening or creating a sketch");
-    pain.add(sketchPromptBox);
-    d = sketchPromptBox.getPreferredSize();
-    sketchPromptBox.setBounds(left, top, d.width + 10, d.height);
-    right = Math.max(right, left + d.width);
-    top += d.height + GUI_BETWEEN;
-    */
-
-
-    // [ ] Delete empty sketches on Quit
-
-    /*
-    sketchCleanBox = new JCheckBox("Delete empty sketches on Quit");
-    pain.add(sketchCleanBox);
-    d = sketchCleanBox.getPreferredSize();
-    sketchCleanBox.setBounds(left, top, d.width + 10, d.height);
-    right = Math.max(right, left + d.width);
-    top += d.height + GUI_BETWEEN;
-    */
-
-
     // Sketchbook location:
     // [...............................]  [ Browse ]
 
@@ -303,17 +259,6 @@ public class Preferences {
     button = new JButton(PROMPT_BROWSE);
     button.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          /*
-          JFileChooser fc = new JFileChooser();
-          fc.setSelectedFile(new File(sketchbookLocationField.getText()));
-          fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
-          int returned = fc.showOpenDialog(new JDialog());
-          if (returned == JFileChooser.APPROVE_OPTION) {
-            File file = fc.getSelectedFile();
-            sketchbookLocationField.setText(file.getAbsolutePath());
-          }
-          */
           File dflt = new File(sketchbookLocationField.getText());
           File file =
             Base.selectFolder("Select new sketchbook location", dflt, dialog);
@@ -327,13 +272,9 @@ public class Preferences {
 
     // take max height of all components to vertically align em
     vmax = Math.max(d.height, d2.height);
-    //label.setBounds(left, top + (vmax-d.height)/2,
-    //              d.width, d.height);
-
-    //h = left + d.width + GUI_BETWEEN;
     sketchbookLocationField.setBounds(left, top + (vmax-d.height)/2,
                                       d.width, d.height);
-    h = left + d.width + GUI_SMALL; //GUI_BETWEEN;
+    h = left + d.width + GUI_SMALL;
     button.setBounds(h, top + (vmax-d2.height)/2,
                      d2.width, d2.height);
 
@@ -399,22 +340,6 @@ public class Preferences {
       autoAssociateBox.setBounds(left, top, d.width + 10, d.height);
       right = Math.max(right, left + d.width);
       top += d.height + GUI_BETWEEN;
-    }
-
-
-    // [ ] Place menu bar inside
-
-    if (Base.isMacOS()) {
-      if (System.getProperty("os.version").startsWith("10.5")) {
-        menubarWorkaroundBox =
-          new JCheckBox("Place menus inside editor window to avoid " +
-                        "Apple Java bug (requires restart)");
-        pain.add(menubarWorkaroundBox);
-        d = menubarWorkaroundBox.getPreferredSize();
-        menubarWorkaroundBox.setBounds(left, top, d.width + 10, d.height);
-        right = Math.max(right, left + d.width);
-        top += d.height + GUI_BETWEEN;
-      }
     }
 
 
@@ -491,7 +416,6 @@ public class Preferences {
 
     wide = right + GUI_BIG;
     high = top + GUI_SMALL;
-    //setSize(wide, high);
 
 
     // closing the window is same as hitting cancel button
@@ -533,26 +457,6 @@ public class Preferences {
         }
       });
   }
-
-
-  /*
-  protected JRootPane createRootPane() {
-    System.out.println("creating root pane esc received");
-
-    ActionListener actionListener = new ActionListener() {
-        public void actionPerformed(ActionEvent actionEvent) {
-          //setVisible(false);
-          System.out.println("esc received");
-        }
-      };
-
-    JRootPane rootPane = new JRootPane();
-    KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
-    rootPane.registerKeyboardAction(actionListener, stroke,
-                                    JComponent.WHEN_IN_FOCUSED_WINDOW);
-    return rootPane;
-  }
-  */
 
 
   public Dimension getPreferredSize() {
@@ -624,11 +528,6 @@ public class Preferences {
                  autoAssociateBox.isSelected());
     }
 
-    if (menubarWorkaroundBox != null) {
-      setBoolean("apple.laf.useScreenMenuBar",
-                 !menubarWorkaroundBox.isSelected());
-    }
-
     editor.applyPreferences();
   }
 
@@ -659,11 +558,6 @@ public class Preferences {
         setSelected(getBoolean("platform.auto_file_type_associations"));
     }
 
-    if (menubarWorkaroundBox != null) {
-      menubarWorkaroundBox.
-        setSelected(!getBoolean("apple.laf.useScreenMenuBar"));
-    }
-
     dialog.setVisible(true);
   }
 
@@ -676,16 +570,12 @@ public class Preferences {
   }
   
   static protected void load(InputStream input, String prefix) throws IOException {
-    LinkedHashMap<String,String> table = new LinkedHashMap<String,String>();
+    LinkedHashMap table = new LinkedHashMap();
     prefixes.put(prefix, table);
     load(input, table);
   }
   
   static protected void load(InputStream input, Map table) throws IOException {  
-    // check for platform-specific properties in the defaults
-    String platformExt = "." + PConstants.platformNames[PApplet.platform];
-    int platformExtLength = platformExt.length();
-    
     String[] lines = PApplet.loadStrings(input);  // Reads as UTF-8
     for (String line : lines) {
       if ((line.length() == 0) ||
@@ -695,12 +585,6 @@ public class Preferences {
       int equals = line.indexOf('=');
       if (equals != -1) {
         String key = line.substring(0, equals).trim();
-        
-        // check if this is a platform-specific key, and if so, shave things
-        if (key.endsWith(platformExt)) {
-          // this is a key specific to this platform
-          key = key.substring(0, key.length() - platformExtLength);
-        }
         String value = line.substring(equals + 1).trim();
         table.put(key, value);
       }
@@ -721,8 +605,10 @@ public class Preferences {
     // Fix for 0163 to properly use Unicode when writing preferences.txt
     PrintWriter writer = PApplet.createWriter(preferencesFile);
 
-    for (String key : table.keySet()) {
-      writer.println(key + "=" + table.get(key));
+    Enumeration e = table.keys(); //properties.propertyNames();
+    while (e.hasMoreElements()) {
+      String key = (String) e.nextElement();
+      writer.println(key + "=" + ((String) table.get(key)));
     }
 
     writer.flush();
@@ -748,15 +634,15 @@ public class Preferences {
     // preference files, look up the attribute in that file's Hashtable
     // (don't override with or fallback to the main file).  otherwise,
     // look up the attribute in the main file's Hashtable. 
-    HashMap<String,String> table = Preferences.table;
+    Map table = Preferences.table;
     if (attribute.indexOf('.') != -1) {
       String prefix = attribute.substring(0, attribute.indexOf('.'));
       if (prefixes.containsKey(prefix)) {
-        table = prefixes.get(prefix);
+        table = (Map) prefixes.get(prefix);
         attribute = attribute.substring(attribute.indexOf('.') + 1);
       }
     }
-    return table.get(attribute);
+    return (String) table.get(attribute);
     /*
     //String value = (properties != null) ?
     //properties.getProperty(attribute) : applet.getParameter(attribute);
@@ -791,7 +677,7 @@ public class Preferences {
 
 
   static public String getDefault(String attribute) {
-    return defaults.get(attribute);
+    return (String) defaults.get(attribute);
   }
 
 

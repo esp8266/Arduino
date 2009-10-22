@@ -233,11 +233,12 @@ public class Sketch {
     ensureExistence();
 
     // add file to the code/codeCount list, resort the list
-    if (codeCount == code.length) {
+    //if (codeCount == code.length) {
       code = (SketchCode[]) PApplet.append(code, newCode);
+    codeCount++;
+    //}
+    //code[codeCount++] = newCode;
     }
-    code[codeCount++] = newCode;
-  }
 
 
   protected void sortCode() {
@@ -390,7 +391,7 @@ public class Sketch {
     // Make sure no .pde *and* no .java files with the same name already exist
     // http://dev.processing.org/bugs/show_bug.cgi?id=543
     for (SketchCode c : code) {
-      if (sanitaryName.equals(c.getPrettyName())) {
+      if (sanitaryName.equalsIgnoreCase(c.getPrettyName())) {
         Base.showMessage("Nope",
                          "A file named \"" + c.getFileName() + "\" already exists\n" +
                          "in \"" + folder.getAbsolutePath() + "\"");
@@ -599,6 +600,7 @@ public class Sketch {
           code[j] = code[j+1];
         }
         codeCount--;
+        code = (SketchCode[]) PApplet.shorten(code);
         return;
       }
     }
@@ -759,7 +761,7 @@ public class Sketch {
     // but ignore this situation for the first tab, since it's probably being
     // resaved (with the same name) to another location/folder.
     for (int i = 1; i < codeCount; i++) {
-      if (newName.equals(code[i].getPrettyName())) {
+      if (newName.equalsIgnoreCase(code[i].getPrettyName())) {
         Base.showMessage("Nope",
                          "You can't save the sketch as \"" + newName + "\"\n" +
                          "because the sketch already has a tab with that name.");
@@ -1198,6 +1200,10 @@ public class Sketch {
    * @return null if compilation failed, main class name if not
    */
   public String preprocess(String buildPath, Target target) throws RunnerException {
+    return preprocess(buildPath, new PdePreprocessor(), target);
+  }
+
+  public String preprocess(String buildPath, PdePreprocessor preprocessor, Target target) throws RunnerException {
     // make sure the user didn't hide the sketch folder
     ensureExistence();
 
@@ -1268,7 +1274,18 @@ public class Sketch {
     // Note that the headerOffset isn't applied until compile and run, because
     // it only applies to the code after it's been written to the .java file.
     int headerOffset = 0;
-    PdePreprocessor preprocessor = new PdePreprocessor();
+    //PdePreprocessor preprocessor = new PdePreprocessor();
+    try {
+      headerOffset = preprocessor.writePrefix(bigCode.toString(),
+                                              buildPath,
+                                              name,
+                                              codeFolderPackages,
+                                              target);
+    } catch (FileNotFoundException fnfe) {
+      fnfe.printStackTrace();
+      String msg = "Build folder disappeared or could not be written";
+      throw new RunnerException(msg);
+    }
 
     // 2. run preproc on that code using the sugg class name
     //    to create a single .java file and write to buildpath
@@ -1278,12 +1295,7 @@ public class Sketch {
     try {
       // if (i != 0) preproc will fail if a pde file is not
       // java mode, since that's required
-      String className = preprocessor.write(bigCode.toString(),
-                                            buildPath,
-                                            name,
-					    codeFolderPackages,
-					    target);
-      headerOffset = preprocessor.headerCount + preprocessor.prototypeCount;
+      String className = preprocessor.write();
 
       if (className == null) {
         throw new RunnerException("Could not find main class");

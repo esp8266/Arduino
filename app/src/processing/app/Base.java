@@ -180,71 +180,7 @@ public class Base {
     // setup the theme coloring fun
     Theme.init();
 
-    if (Base.isMacOS()) {
-      String properMenuBar = "apple.laf.useScreenMenuBar";
-      String menubar = Preferences.get(properMenuBar);
-      if (menubar != null) {
-        // Get the current menu bar setting and use it
-        System.setProperty(properMenuBar, menubar);
-
-      } else {
-        // 10.4 is not affected, 10.5 (and prolly 10.6) are
-        if (System.getProperty("os.version").startsWith("10.4")) {
-          // Don't bother checking next time
-          Preferences.set(properMenuBar, "true");
-          // Also set the menubar now
-          System.setProperty(properMenuBar, "true");
-
-        } else {
-          // Running 10.5 or 10.6 or whatever, give 'em the business
-          String warning =
-            "<html>" +
-            "<head> <style type=\"text/css\">"+
-            "b { font: 13pt \"Lucida Grande\" }"+
-            "p { font: 11pt \"Lucida Grande\"; margin-top: 8px }"+
-            "</style> </head> <body>" +
-            "<b>Some menus have been disabled.</b>" +
-            "<p>Due to an Apple bug, the Sketchbook and Example menus " +
-            "are unusable. <br>" +
-            "As a workaround, these items will be disabled from the " +
-            "standard menu bar, <br>" +
-            "but you can use the Open button on " +
-            "the toolbar to access the same items. <br>" +
-            "If this bug makes you sad, " +
-            "please contact Apple via bugreporter.apple.com.</p>" +
-            "</body> </html>";
-          Object[] options = { "OK", "More Info" };
-          int result = JOptionPane.showOptionDialog(new Frame(),
-                                                    warning,
-                                                    "Menu Bar Problem",
-                                                    JOptionPane.YES_NO_OPTION,
-                                                    JOptionPane.WARNING_MESSAGE,
-                                                    null,
-                                                    options,
-                                                    options[0]);
-          if (result == -1) {
-            // They hit ESC or closed the window, so just hide it for now
-            // But don't bother setting the preference in the file
-          } else {
-            // Shut off in the preferences for next time
-            //Preferences.set(properMenuBar, "false");
-            // For 1.0.4, we'll stick with the Apple menu bar,
-            // and just disable the sketchbook and examples sub-menus.
-            Preferences.set(properMenuBar, "true");
-            if (result == 1) {  // More Info
-              Base.openURL("http://dev.processing.org/bugs/show_bug.cgi?id=786");
-            }
-          }
-          // Whether or not canceled, set to false (right now) if we're on 10.5
-          //System.setProperty(properMenuBar, "false");
-          // Changing this behavior for 1.0.4
-          System.setProperty(properMenuBar, "true");
-        }
-      }
-    }
-
     // Set the look and feel before opening the window
-    // For 0158, moving it lower so that the apple.laf.useScreenMenuBar stuff works
     try {
       platform.setLookAndFeel();
     } catch (Exception e) {
@@ -815,7 +751,8 @@ public class Base {
    */
   public boolean handleClose(Editor editor) {
     // Check if modified
-    if (!editor.checkModified(false)) {
+    boolean immediate = editors.size() == 1;
+    if (!editor.checkModified(immediate)) {
       return false;
     }
 
@@ -993,17 +930,9 @@ public class Base {
   protected void rebuildSketchbookMenu(JMenu menu) {
     //System.out.println("rebuilding sketchbook menu");
     //new Exception().printStackTrace();
-    //boolean nativeButBroken = Base.isMacOS() ?
-      //Preferences.getBoolean("apple.laf.useScreenMenuBar") : false;
-    boolean nativeButBroken = false;
-
     try {
-      if (nativeButBroken) {  // osx workaround
-        menu.setEnabled(false);
-      } else {
         menu.removeAll();
         addSketches(menu, getSketchbookFolder(), false);
-      }
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -1045,21 +974,13 @@ public class Base {
 
   public void rebuildExamplesMenu(JMenu menu) {
     //System.out.println("rebuilding examples menu");
-    //boolean nativeButBroken = Base.isMacOS() ?
-      //Preferences.getBoolean("apple.laf.useScreenMenuBar") : false;
-    boolean nativeButBroken = false;
-
     try {
-      if (nativeButBroken) {  // osx workaround
-        menu.setEnabled(false);
-      } else {
-        menu.removeAll();
-        boolean found = addSketches(menu, examplesFolder, false);
-        if (found) menu.addSeparator();
-        found = addSketches(menu, getSketchbookLibrariesFolder(), false);
-        if (found) menu.addSeparator();
-        addSketches(menu, librariesFolder, false);
-      }
+      menu.removeAll();
+      boolean found = addSketches(menu, examplesFolder, false);
+      if (found) menu.addSeparator();
+      found = addSketches(menu, getSketchbookLibrariesFolder(), false);
+      if (found) menu.addSeparator();
+      addSketches(menu, librariesFolder, false);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -1965,56 +1886,30 @@ public class Base {
    * Grab the contents of a file as a string.
    */
   static public String loadFile(File file) throws IOException {
-    return PApplet.join(PApplet.loadStrings(file), "\n");
-
-    /*
-    // empty code file.. no worries, might be getting filled up later
-    if (file.length() == 0) return "";
-
-    //FileInputStream fis = new FileInputStream(file);
-    //InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
-    //BufferedReader reader = new BufferedReader(isr);
-    BufferedReader reader = PApplet.createReader(file);
-
-    StringBuffer buffer = new StringBuffer();
-    String line = null;
-    while ((line = reader.readLine()) != null) {
-//      char[] cc = line.toCharArray();
-//      for (int i = 0; i < cc.length; i++) {
-//        char c = cc[i];
-//        if (c < 32 || c > 126) System.out.println("found " + c + " " + ((int) c));
-//      }
-//
-      buffer.append(line);
-      buffer.append('\n');
+    String[] contents = PApplet.loadStrings(file);
+    if (contents == null) return null;
+    return PApplet.join(contents, "\n");
     }
-    reader.close();
-    return buffer.toString();
-    */
-  }
 
 
   /**
    * Spew the contents of a String object out to a file.
    */
   static public void saveFile(String str, File file) throws IOException {
-    PApplet.saveStrings(file, new String[] { str });
-    /*
-    ByteArrayInputStream bis = new ByteArrayInputStream(str.getBytes());
-    InputStreamReader isr = new InputStreamReader(bis);
-    BufferedReader reader = new BufferedReader(isr);
-
-    FileOutputStream fos = new FileOutputStream(file);
-    OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
-    PrintWriter writer = new PrintWriter(osw);
-
-    String line = null;
-    while ((line = reader.readLine()) != null) {
-      writer.println(line);
+    File temp = File.createTempFile(file.getName(), null, file.getParentFile());
+    PApplet.saveStrings(temp, new String[] { str });
+    if (file.exists()) {
+      boolean result = file.delete();
+      if (!result) {
+        throw new IOException("Could not remove old version of " +
+                              file.getAbsolutePath());
     }
-    writer.flush();
-    writer.close();
-    */
+  }
+    boolean result = temp.renameTo(file);
+    if (!result) {
+      throw new IOException("Could not replace " +
+                            file.getAbsolutePath());
+    }
   }
 
 

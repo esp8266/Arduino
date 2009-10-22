@@ -358,12 +358,12 @@ public class PGraphics3D extends PGraphics {
     cameraInv = new PMatrix3D();
 
     // set up the default camera
-    camera();
+//    camera();
 
     // defaults to perspective, if the user has setup up their
     // own projection, they'll need to fix it after resize anyway.
     // this helps the people who haven't set up their own projection.
-    perspective();
+//    perspective();
   }
 
 
@@ -478,6 +478,12 @@ public class PGraphics3D extends PGraphics {
     forwardTransform = modelview;
     reverseTransform = modelviewInv;
 
+    // set up the default camera
+    camera();
+
+    // defaults to perspective, if the user has setup up their
+    // own projection, they'll need to fix it after resize anyway.
+    // this helps the people who haven't set up their own projection.
     perspective();
 
     // easiest for beginners
@@ -1344,7 +1350,7 @@ public class PGraphics3D extends PGraphics {
     boolean bClipped = false;
     int clippedCount = 0;
 
-    cameraNear = -8;
+//    cameraNear = -8;
     if (vertices[a][VZ] > cameraNear) {
       aClipped = true;
       clippedCount++;
@@ -1358,8 +1364,15 @@ public class PGraphics3D extends PGraphics {
       clippedCount++;
     }
     if (clippedCount == 0) {
+//        if (vertices[a][VZ] < cameraFar && 
+//                vertices[b][VZ] < cameraFar && 
+//                vertices[c][VZ] < cameraFar) {
       addTriangleWithoutClip(a, b, c);
+//        }
 
+//    } else if (true) {
+//        return;
+        
     } else if (clippedCount == 3) {
       // In this case there is only one visible point.            |/|
       // So we'll have to make two new points on the clip line   <| |
@@ -3502,6 +3515,7 @@ public class PGraphics3D extends PGraphics {
                    0, y, 0, ty,
                    0, 0, z, tz,
                    0, 0, 0, 1);
+    updateProjection();
 
     frustumMode = false;
   }
@@ -3569,6 +3583,12 @@ public class PGraphics3D extends PGraphics {
                    0, (2*znear)/(top-bottom), (top+bottom)/(top-bottom), 0,
                    0, 0, -(zfar+znear)/(zfar-znear),-(2*zfar*znear)/(zfar-znear),
                    0, 0, -1, 0);
+    updateProjection();
+  }
+
+
+  /** Called after the 'projection' PMatrix3D has changed. */
+  protected void updateProjection() {
   }
 
 
