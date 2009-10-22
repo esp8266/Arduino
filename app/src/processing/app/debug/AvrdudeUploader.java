@@ -94,7 +94,9 @@ public class AvrdudeUploader extends Uploader  {
       params.add("-Pusb");
     } else if ("serial".equals(Preferences.get("programmers." + programmer + ".communication"))) {
       params.add("-P" + (Base.isWindows() ? "\\\\.\\" : "") + Preferences.get("serial.port"));
-      // XXX: add support for specifying the baud rate for serial programmers.
+      if (Preferences.get("programmers." + programmer + ".speed") != null) {
+	params.add("-b" + Preferences.getInteger("programmers." + programmer + ".speed"));
+      }
     }
     // XXX: add support for specifying the port address for parallel
     // programmers, although avrdude has a default that works in most cases.
