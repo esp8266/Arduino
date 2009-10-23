@@ -165,10 +165,7 @@ public class AvrdudeUploader extends Uploader  {
       commandDownloader.add("-q");
       commandDownloader.add("-q");
     }
-    // XXX: quick hack to chop the "atmega" off of "atmega8" and "atmega168",
-    // then shove an "m" at the beginning.  won't work for attiny's, etc.
-    commandDownloader.add("-pm" + 
-      Preferences.get("boards." + Preferences.get("board") + ".build.mcu").substring(6));
+    commandDownloader.add("-p" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"));
     commandDownloader.addAll(params);
 
     return executeUploadCommand(commandDownloader);
