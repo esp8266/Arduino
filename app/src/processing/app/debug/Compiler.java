@@ -452,6 +452,7 @@ public class Compiler implements MessageConsumer {
       "-assembler-with-cpp",
       "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
       "-DF_CPU=" + Preferences.get("boards." + Preferences.get("board") + ".build.f_cpu"),
+      "-DARDUINO=" + Base.REVISION,
     }));
 
     for (int i = 0; i < includePaths.size(); i++) {
@@ -478,6 +479,7 @@ public class Compiler implements MessageConsumer {
       "-fdata-sections",
       "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
       "-DF_CPU=" + Preferences.get("boards." + Preferences.get("board") + ".build.f_cpu"),
+      "-DARDUINO=" + Base.REVISION,
     }));
 		
     for (int i = 0; i < includePaths.size(); i++) {
@@ -505,6 +507,7 @@ public class Compiler implements MessageConsumer {
       "-fdata-sections",
       "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
       "-DF_CPU=" + Preferences.get("boards." + Preferences.get("board") + ".build.f_cpu"),
+      "-DARDUINO=" + Base.REVISION,
     }));
 
     for (int i = 0; i < includePaths.size(); i++) {
