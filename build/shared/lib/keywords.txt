@@ -26,10 +26,12 @@ INTERAL	LITERAL1	AnalogReference
 # KEYWORD1 specifies datatypes and C/C++ keywords
 
 boolean	KEYWORD1	BooleanVariables
+break	KEYWORD1	Break
 byte	KEYWORD1	Byte
 case	KEYWORD1	SwitchCase
 char	KEYWORD1	Char
 class	KEYWORD1
+continue	KEYWORD1	Continue
 default	KEYWORD1	SwitchCase	
 do	KEYWORD1	DoWhile
 double	KEYWORD1	Double
