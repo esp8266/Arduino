@@ -55,14 +55,12 @@ public class Compiler implements MessageConsumer {
    * @param sketch Sketch object to be compiled.
    * @param buildPath Where the temporary files live and will be built from.
    * @param primaryClassName the name of the combined sketch file w/ extension
-   * @param target the target (core) to build against
    * @return true if successful.
    * @throws RunnerException Only if there's a problem. Only then.
    */
   public boolean compile(Sketch sketch,
                          String buildPath,
                          String primaryClassName,
-			 Target target,
                          boolean verbose) throws RunnerException {
     this.sketch = sketch;
     this.buildPath = buildPath;
@@ -73,6 +71,7 @@ public class Compiler implements MessageConsumer {
     MessageStream pms = new MessageStream(this);
 
     String avrBasePath = Base.getAvrBasePath();
+    String corePath = Preferences.get("boards", "board", "build.core");
 
     List<File> objectFiles = new ArrayList<File>();
 

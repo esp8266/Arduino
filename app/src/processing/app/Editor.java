@@ -1842,10 +1842,7 @@ public class Editor extends JFrame implements RunnerListener {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
     try {
-          sketch.compile(new Target(
-            Base.getHardwarePath() + File.separator + "cores",
-            Preferences.get("boards." + Preferences.get("board") + ".build.core")),
-            verbose);    
+          sketch.compile(verbose);    
           statusNotice("Done compiling.");
         } catch (RunnerException e) {
           //statusError("Error compiling...");
@@ -2257,10 +2254,7 @@ public class Editor extends JFrame implements RunnerListener {
             
             uploading = true;
           
-            boolean success = sketch.exportApplet(new Target(
-              Base.getHardwarePath() + File.separator + "cores",
-              Preferences.get("boards." + Preferences.get("board") + ".build.core")),
-              verbose);
+            boolean success = sketch.exportApplet(verbose);
             if (success) {
               statusNotice("Done uploading.");
             } else {

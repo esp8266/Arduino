@@ -27,7 +27,6 @@ import processing.app.debug.AvrdudeUploader;
 import processing.app.debug.Compiler;
 import processing.app.debug.RunnerException;
 import processing.app.debug.Sizer;
-import processing.app.debug.Target;
 import processing.app.debug.Uploader;
 import processing.app.preproc.*;
 import processing.core.*;
@@ -1142,7 +1141,7 @@ public class Sketch {
    *    X. afterwards, some of these steps need a cleanup function
    * </PRE>
    */
-  protected String compile(Target target, boolean verbose)
+  protected String compile(boolean verbose)
     throws RunnerException {
     
     String name;
@@ -1177,7 +1176,7 @@ public class Sketch {
     cleanup();
 
     // handle preprocessing the main file's code
-    name = build(tempBuildFolder.getAbsolutePath(), target, verbose);
+    name = build(tempBuildFolder.getAbsolutePath(), verbose);
     size(tempBuildFolder.getAbsolutePath(), name);
     
     return name;
@@ -1199,11 +1198,11 @@ public class Sketch {
    * @param buildPath Location to copy all the .java files
    * @return null if compilation failed, main class name if not
    */
-  public String preprocess(String buildPath, Target target) throws RunnerException {
-    return preprocess(buildPath, new PdePreprocessor(), target);
+  public String preprocess(String buildPath) throws RunnerException {
+    return preprocess(buildPath, new PdePreprocessor());
   }
 
-  public String preprocess(String buildPath, PdePreprocessor preprocessor, Target target) throws RunnerException {
+  public String preprocess(String buildPath, PdePreprocessor preprocessor) throws RunnerException {
     // make sure the user didn't hide the sketch folder
     ensureExistence();
 
@@ -1279,8 +1278,7 @@ public class Sketch {
       headerOffset = preprocessor.writePrefix(bigCode.toString(),
                                               buildPath,
                                               name,
-                                              codeFolderPackages,
-                                              target);
+                                              codeFolderPackages);
     } catch (FileNotFoundException fnfe) {
       fnfe.printStackTrace();
       String msg = "Build folder disappeared or could not be written";
@@ -1378,31 +1376,31 @@ public class Sketch {
    *
    * @return null if compilation failed, main class name if not
    */
-  public String build(String buildPath, Target target, boolean verbose)
+  public String build(String buildPath, boolean verbose)
     throws RunnerException {
     
     // run the preprocessor
-    String primaryClassName = preprocess(buildPath, target);
+    String primaryClassName = preprocess(buildPath);
 
     // compile the program. errors will happen as a RunnerException
     // that will bubble up to whomever called build().
     Compiler compiler = new Compiler();
-    if (compiler.compile(this, buildPath, primaryClassName, target, verbose)) {
+    if (compiler.compile(this, buildPath, primaryClassName, verbose)) {
       return primaryClassName;
     }
     return null;
   }
 
 
-  protected boolean exportApplet(Target target, boolean verbose) throws Exception {
-    return exportApplet(new File(folder, "applet").getAbsolutePath(), target, verbose);
+  protected boolean exportApplet(boolean verbose) throws Exception {
+    return exportApplet(new File(folder, "applet").getAbsolutePath(), verbose);
   }
 
 
   /**
    * Handle export to applet.
    */
-  public boolean exportApplet(String appletPath, Target target, boolean verbose)
+  public boolean exportApplet(String appletPath, boolean verbose)
     throws RunnerException, IOException {
     
     // Make sure the user didn't hide the sketch folder
@@ -1426,7 +1424,7 @@ public class Sketch {
     appletFolder.mkdirs();
 
     // build the sketch
-    String foundName = build(appletFolder.getPath(), target, false);
+    String foundName = build(appletFolder.getPath(), false);
     // (already reported) error during export, exit this function
     if (foundName == null) return false;
 

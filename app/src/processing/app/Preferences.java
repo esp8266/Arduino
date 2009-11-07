@@ -198,25 +198,6 @@ public class Preferences {
                          " and restart Arduino.", ex);
         }
       }
-    }
-    
-    try {
-      load(new FileInputStream(new File(Base.getHardwareFolder(), "boards.txt")),
-           "boards");
-    } catch (Exception ex) {
-        Base.showError("Error reading board definitions",
-                       "Error reading the board definitions file (" +
-		       new File(Base.getHardwareFolder(), "boards.txt").getAbsolutePath() + "). " +
-                       "Please re-download or re-unzip Arduino.\n", ex);
-  }
-
-    try {
-      load(new FileInputStream(new File(Base.getHardwareFolder(), "programmers.txt")),
-        "programmers");
-    } catch (Exception ex) {
-        Base.showError("Error reading programmers definitions",
-                       "Error reading the programmers definitions file. " +
-                       "Please re-download or re-unzip Arduino.\n", ex);
     }    
   }
 
@@ -570,9 +551,8 @@ public class Preferences {
   }
   
   static protected void load(InputStream input, String prefix) throws IOException {
-    LinkedHashMap table = new LinkedHashMap();
-    prefixes.put(prefix, table);
-    load(input, table);
+    if (!prefixes.containsKey(prefix)) prefixes.put(prefix, new LinkedHashMap());
+    load(input, (Map) prefixes.get(prefix));
   }
   
   static protected void load(InputStream input, Map table) throws IOException {  
@@ -628,6 +608,11 @@ public class Preferences {
   //static public String get(String attribute) {
   //return get(attribute, null);
   //}
+  
+  static public String get(String prefix, String selector, String suffix) {
+    if (get(selector) == null) return null;
+    return get(prefix + "." + get(selector) + "." + suffix);
+  }
 
   static public String get(String attribute /*, String defaultValue */) {
     // if the attribute starts with a prefix used by one of our subsidiary

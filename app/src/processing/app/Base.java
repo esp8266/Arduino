@@ -84,6 +84,8 @@ public class Base {
   // (both those in the p5/libs folder and those with lib subfolders
   // found in the sketchbook)
   static public String librariesClassPath;
+  
+  static HashMap<String, File> platformsTable;
 
   // Location for untitled items
   static File untitledFolder;
@@ -275,6 +277,9 @@ public class Base {
         defaultFolder.mkdirs();
       }
     }
+    
+    loadHardware(getHardwareFolder());
+    loadHardware(getSketchbookHardwareFolder());
 
     // Check if there were previously opened sketches to be restored
     boolean opened = restoreSketches();
@@ -985,6 +990,31 @@ public class Base {
       e.printStackTrace();
     }
   }
+  
+  
+  public void rebuildBoardsMenu(JMenu menu) {
+    //System.out.println("rebuilding boards menu");
+    try {
+      menu.removeAll();      
+      ButtonGroup group = new ButtonGroup();
+      for (String board : Preferences.getSubKeys("boards")) {
+        JMenu item =
+          new JRadioButtonMenuItem(
+            new AbstractAction(Preferences.get("boards", "board", "name")) {
+              { putValue("board", board); }
+              public void actionPerformed(ActionEvent actionevent) {
+                //System.out.println("Switching to " + board);
+                Preferences.set("board", getValue("board"));
+              }
+            }));
+        if (board.equals(Preferences.get("board"))) item.setSelected(true);
+        group.add(item);
+        menu.add(item);
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 
 
   /**
@@ -1138,7 +1168,8 @@ public class Base {
 //        String packages[] =
 //          Compiler.packageListFromClassPath(libraryClassPath);
         libraries.add(subfolder);
-        String packages[] = Compiler.headerListFromIncludePath(subfolder.getAbsolutePath());
+        String packages[] =
+          Compiler.headerListFromIncludePath(subfolder.getAbsolutePath());
         for (String pkg : packages) {
           importToLibraryTable.put(pkg, subfolder);
         }
@@ -1161,6 +1192,42 @@ public class Base {
 //      }
     }
     return ifound;
+  }
+  
+  
+  protected boolean loadHardware(File folder) {
+    if (!folder.isDirectory()) return false;
+    
+    String list[] = folder.list(new FilenameFilter() {
+      public boolean accept(File dir, String name) {
+        // skip .DS_Store files, .svn folders, etc
+        if (name.charAt(0) == '.') return false;
+        if (name.equals("CVS")) return false;
+        return (new File(dir, name).isDirectory());
+      }
+    });
+    // if a bad folder or something like that, this might come back null
+    if (list == null) return false;
+
+    // alphabetize list, since it's not always alpha order
+    // replaced hella slow bubble sort with this feller for 0093
+    Arrays.sort(list, String.CASE_INSENSITIVE_ORDER);
+    
+    for (String platform : list) {
+      File subfolder = new File(folder, platform);
+      
+      File boardsFile = new File(subfolder, "boards.txt");
+      if (boardsFile.exists()) {
+        Preferences.load(new FileInputStream(boardsFile), "boards");
+      }
+      
+      File programmersFile = new File(subfolder, "programmers.txt");
+      if (programmersFile.exists()) {
+      	Preferences.load(new FileInputStream(programmersFile), "programmers");
+      }
+      
+      platformsTable.put(platform, subfolder);
+    }
   }
 
 
