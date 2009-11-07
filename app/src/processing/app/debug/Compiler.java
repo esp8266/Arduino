@@ -71,23 +71,25 @@ public class Compiler implements MessageConsumer {
     MessageStream pms = new MessageStream(this);
 
     String avrBasePath = Base.getAvrBasePath();
-    String corePath = Preferences.get("boards", "board", "build.core");
+    String platform = Preferences.get("boards", "board", "build.core");
+    File platformFile = Base.platformsTable.get(platform);
+    String corePath = new File(platformFile, "core").getAbsolutePath();
 
     List<File> objectFiles = new ArrayList<File>();
 
     List includePaths = new ArrayList();
-    includePaths.add(target.getPath());
+    includePaths.add(corePath);
     
     String runtimeLibraryName = buildPath + File.separator + "core.a";
 
-    // 1. compile the target (core), outputting .o files to <buildPath> and
-    // then collecting them into the core.a library file.
+    // 1. compile the core, outputting .o files to <buildPath> and then
+    // collecting them into the core.a library file.
     
-    List<File> targetObjectFiles = 
+    List<File> coreObjectFiles = 
       compileFiles(avrBasePath, buildPath, includePaths,
-                   findFilesInPath(target.getPath(), "S", true),
-                   findFilesInPath(target.getPath(), "c", true),
-                   findFilesInPath(target.getPath(), "cpp", true));
+                   findFilesInPath(corePath, "S", true),
+                   findFilesInPath(corePath, "c", true),
+                   findFilesInPath(corePath, "cpp", true));
                    
     List baseCommandAR = new ArrayList(Arrays.asList(new String[] {
       avrBasePath + "avr-ar",
@@ -95,7 +97,7 @@ public class Compiler implements MessageConsumer {
       runtimeLibraryName
     }));
 
-    for(File file : targetObjectFiles) {
+    for(File file : coreObjectFiles) {
       List commandAR = new ArrayList(baseCommandAR);
       commandAR.add(file.getAbsolutePath());
       execAsynchronously(commandAR);

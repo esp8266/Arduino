@@ -647,7 +647,7 @@ public class Preferences {
    *  baz.count=3
    * this will return { "foo", "bar", "baz" }.
    */
-  static public Iterator getSubKeys(String prefix) {
+  static public Set<String> getSubKeys(String prefix) {
     if (!prefixes.containsKey(prefix))
       return null;
     Set subkeys = new LinkedHashSet();
@@ -657,7 +657,7 @@ public class Preferences {
         subkey = subkey.substring(0, subkey.indexOf('.'));
       subkeys.add(subkey);
     }
-    return subkeys.iterator();
+    return subkeys;
   }
 
 

@@ -706,16 +706,7 @@ public class Editor extends JFrame implements RunnerListener {
     
     if (boardsMenu == null) {
       boardsMenu = new JMenu("Board");
-      ButtonGroup boardGroup = new ButtonGroup();
-      for (Iterator i = Preferences.getSubKeys("boards"); i.hasNext(); ) {
-        String board = (String) i.next();
-        Action action = new BoardMenuAction(board);
-        item = new JRadioButtonMenuItem(action);
-        if (board.equals(Preferences.get("board")))
-          item.setSelected(true);
-        boardGroup.add(item);
-        boardsMenu.add(item);
-      }
+      base.rebuildBoardsMenu(boardsMenu);
     }
     menu.add(boardsMenu);
     
@@ -727,14 +718,9 @@ public class Editor extends JFrame implements RunnerListener {
     menu.add(serialMenu);
 	  
     menu.addSeparator();
-    
+
     JMenu bootloaderMenu = new JMenu("Burn Bootloader");
-    for (Iterator i = Preferences.getSubKeys("programmers"); i.hasNext(); ) {
-      String programmer = (String) i.next();
-      Action action = new BootloaderMenuAction(programmer);
-      item = new JMenuItem(action);
-      bootloaderMenu.add(item);
-    }
+    base.rebuildBurnBootloaderMenu(bootloaderMenu);
     menu.add(bootloaderMenu);
         
     menu.addMenuListener(new MenuListener() {
@@ -961,30 +947,6 @@ public class Editor extends JFrame implements RunnerListener {
       // need to push "serial.port" into PdeBase.properties
     }
     */
-  }
-  
-  
-  class BoardMenuAction extends AbstractAction {
-    private String board;
-    public BoardMenuAction(String board) {
-      super(Preferences.get("boards." + board + ".name"));
-      this.board = board;
-    }
-    public void actionPerformed(ActionEvent actionevent) {
-      //System.out.println("Switching to " + board);
-      Preferences.set("board", board);
-    }
-  }
-  
-  class BootloaderMenuAction extends AbstractAction {
-    private String programmer;
-    public BootloaderMenuAction(String programmer) {
-      super("w/ " + Preferences.get("programmers." + programmer + ".name"));
-      this.programmer = programmer;
-    }
-    public void actionPerformed(ActionEvent actionevent) {
-      handleBurnBootloader(programmer);
-    }
   }
   
   
