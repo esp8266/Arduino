@@ -45,7 +45,8 @@ public class AvrdudeUploader extends Uploader  {
   public boolean uploadUsingPreferences(String buildPath, String className, boolean verbose)
   throws RunnerException {
     this.verbose = verbose;
-    String uploadUsing = Preferences.get("boards." + Preferences.get("board") + ".upload.using");
+    String uploadUsing =
+      Preferences.get("boards." + Preferences.get("board") + ".upload.using");
     if (uploadUsing == null) {
       // fall back on global preference
       uploadUsing = Preferences.get("upload.using");
@@ -62,19 +63,21 @@ public class AvrdudeUploader extends Uploader  {
   private boolean uploadViaBootloader(String buildPath, String className)
   throws RunnerException {
     List commandDownloader = new ArrayList();
-    String protocol = Preferences.get("boards." + Preferences.get("board") + ".upload.protocol");
+    String protocol =
+      Preferences.get("boards." + Preferences.get("board") + ".upload.protocol");
     
     // avrdude wants "stk500v1" to distinguish it from stk500v2
     if (protocol.equals("stk500"))
       protocol = "stk500v1";
     commandDownloader.add("-c" + protocol);
-    commandDownloader.add("-P" + (Base.isWindows() ? "\\\\.\\" : "") + Preferences.get("serial.port"));
+    commandDownloader.add(
+      "-P" + (Base.isWindows() ? "\\\\.\\" : "") + Preferences.get("serial.port"));
     commandDownloader.add(
       "-b" + Preferences.getInteger("boards." + Preferences.get("board") + ".upload.speed"));
     commandDownloader.add("-D"); // don't erase
     commandDownloader.add("-Uflash:w:" + buildPath + File.separator + className + ".hex:i");
 
-    if (Preferences.get("boards." + Preferences.get("board") + ".upload.disable_flushing") == null ||
+    if (Preferences.get("boards", "board", "upload.disable_flushing") == null ||
         Preferences.getBoolean("boards." + Preferences.get("board") + ".upload.disable_flushing") == false) {
       flushSerialBuffer();
     }
@@ -115,11 +118,11 @@ public class AvrdudeUploader extends Uploader  {
   throws RunnerException {
     List fuses = new ArrayList();
     fuses.add("-e"); // erase the chip
-    fuses.add("-Ulock:w:" + Preferences.get("boards." + Preferences.get("board") + ".bootloader.unlock_bits") + ":m");
-    if (Preferences.get("boards." + Preferences.get("board") + ".bootloader.extended_fuses") != null)
-      fuses.add("-Uefuse:w:" + Preferences.get("boards." + Preferences.get("board") + ".bootloader.extended_fuses") + ":m");
-    fuses.add("-Uhfuse:w:" + Preferences.get("boards." + Preferences.get("board") + ".bootloader.high_fuses") + ":m");
-    fuses.add("-Ulfuse:w:" + Preferences.get("boards." + Preferences.get("board") + ".bootloader.low_fuses") + ":m");
+    fuses.add("-Ulock:w:" + Preferences.get("boards", "board", "bootloader.unlock_bits") + ":m");
+    if (Preferences.get("boards", "board", "bootloader.extended_fuses") != null)
+      fuses.add("-Uefuse:w:" + Preferences.get("boards", "board", "bootloader.extended_fuses") + ":m");
+    fuses.add("-Uhfuse:w:" + Preferences.get("boards", "board", "bootloader.high_fuses") + ":m");
+    fuses.add("-Ulfuse:w:" + Preferences.get("boards", "board", "bootloader.low_fuses") + ":m");
 
     if (!avrdude(params, fuses))
       return false;
@@ -128,11 +131,15 @@ public class AvrdudeUploader extends Uploader  {
       Thread.sleep(1000);
     } catch (InterruptedException e) {}
       
+    String platform = Preferences.get("boards", "board", "build.core");
+    File platformFile = Base.platformsTable.get(platform);
+    String bootloadersPath = new File(platformFile, "bootloaders").getAbsolutePath();
+
     List bootloader = new ArrayList();
-    bootloader.add("-Uflash:w:" + Base.getHardwarePath() + File.separator + "bootloaders" + File.separator +
-            Preferences.get("boards." + Preferences.get("board") + ".bootloader.path") +
-            File.separator + Preferences.get("boards." + Preferences.get("board") + ".bootloader.file") + ":i");
-    bootloader.add("-Ulock:w:" + Preferences.get("boards." + Preferences.get("board") + ".bootloader.lock_bits") + ":m");
+    bootloader.add("-Uflash:w:" + bootloadersPath + File.separator +
+                   Preferences.get("boards", "board", "bootloader.path") + File.separator +
+                   Preferences.get("boards", "board", "bootloader.file") + ":i");
+    bootloader.add("-Ulock:w:" + Preferences.get("boards", "board", "bootloader.lock_bits") + ":m");
 
     return avrdude(params, bootloader);
   }
@@ -165,7 +172,7 @@ public class AvrdudeUploader extends Uploader  {
       commandDownloader.add("-q");
       commandDownloader.add("-q");
     }
-    commandDownloader.add("-p" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"));
+    commandDownloader.add("-p" + Preferences.get("boards", "board", "build.mcu"));
     commandDownloader.addAll(params);
 
     return executeUploadCommand(commandDownloader);

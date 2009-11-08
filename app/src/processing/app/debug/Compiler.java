@@ -36,7 +36,7 @@ import java.util.zip.*;
 
 public class Compiler implements MessageConsumer {
   static final String BUGS_URL =
-    "https://developer.berlios.de/bugs/?group_id=3590";
+    "http://code.google.com/p/arduino/issues/list";
   static final String SUPER_BADNESS =
     "Compiler error, please submit this code to " + BUGS_URL;
 
@@ -112,9 +112,10 @@ public class Compiler implements MessageConsumer {
 
     for (File libraryFolder : sketch.getImportedLibraries()) {
       File outputFolder = new File(buildPath, libraryFolder.getName());
+      File utilityFolder = new File(libraryFolder, "utility");
       createFolder(outputFolder);
       // this library can use includes in its utility/ folder
-      includePaths.add(libraryFolder.getPath() + File.separator + "utility");
+      includePaths.add(utilityFolder.getAbsolutePath());
       objectFiles.addAll(
         compileFiles(avrBasePath, outputFolder.getAbsolutePath(), includePaths,
                      findFilesInFolder(libraryFolder, "S", false),
@@ -124,9 +125,9 @@ public class Compiler implements MessageConsumer {
       createFolder(outputFolder);
       objectFiles.addAll(
         compileFiles(avrBasePath, outputFolder.getAbsolutePath(), includePaths,
-                     findFilesInFolder(new File(libraryFolder, "utility"), "S", false),
-                     findFilesInFolder(new File(libraryFolder, "utility"), "c", false),
-                     findFilesInFolder(new File(libraryFolder, "utility"), "cpp", false)));
+                     findFilesInFolder(utilityFolder, "S", false),
+                     findFilesInFolder(utilityFolder, "c", false),
+                     findFilesInFolder(utilityFolder, "cpp", false)));
       // other libraries should not see this library's utility/ folder
       includePaths.remove(includePaths.size() - 1);
     }
@@ -145,7 +146,7 @@ public class Compiler implements MessageConsumer {
       avrBasePath + "avr-gcc",
       "-Os",
       "-Wl,--gc-sections",
-      "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
+      "-mmcu=" + Preferences.get("boards", "board", "build.mcu"),
       "-o",
       buildPath + File.separator + primaryClassName + ".elf"
     }));
@@ -321,7 +322,9 @@ public class Compiler implements MessageConsumer {
     // attemping to compare
     //
     //String buildPathSubst = buildPath.replace(File.separatorChar, '/') + "/";
-    String buildPathSubst = buildPath.replace(File.separatorChar,File.separatorChar) + File.separatorChar;
+    String buildPathSubst =
+      buildPath.replace(File.separatorChar,File.separatorChar) +
+      File.separatorChar;
 
     String partialTempPath = null;
     int partialStartIndex = -1; //s.indexOf(partialTempPath);
@@ -451,8 +454,8 @@ public class Compiler implements MessageConsumer {
       "-c", // compile, don't link
       "-g", // include debugging info (so errors include line numbers)
       "-assembler-with-cpp",
-      "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
-      "-DF_CPU=" + Preferences.get("boards." + Preferences.get("board") + ".build.f_cpu"),
+      "-mmcu=" + Preferences.get("boards", "board", "build.mcu"),
+      "-DF_CPU=" + Preferences.get("boards", "board", "build.f_cpu"),
       "-DARDUINO=" + Base.REVISION,
     }));
 
@@ -478,8 +481,8 @@ public class Compiler implements MessageConsumer {
       "-w", // surpress all warnings
       "-ffunction-sections", // place each function in its own section
       "-fdata-sections",
-      "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
-      "-DF_CPU=" + Preferences.get("boards." + Preferences.get("board") + ".build.f_cpu"),
+      "-mmcu=" + Preferences.get("boards", "board", "build.mcu"),
+      "-DF_CPU=" + Preferences.get("boards", "board", "build.f_cpu"),
       "-DARDUINO=" + Base.REVISION,
     }));
 		
@@ -506,8 +509,8 @@ public class Compiler implements MessageConsumer {
       "-fno-exceptions",
       "-ffunction-sections", // place each function in its own section
       "-fdata-sections",
-      "-mmcu=" + Preferences.get("boards." + Preferences.get("board") + ".build.mcu"),
-      "-DF_CPU=" + Preferences.get("boards." + Preferences.get("board") + ".build.f_cpu"),
+      "-mmcu=" + Preferences.get("boards", "board", "build.mcu"),
+      "-DF_CPU=" + Preferences.get("boards", "board", "build.f_cpu"),
       "-DARDUINO=" + Base.REVISION,
     }));
 
