@@ -612,6 +612,7 @@ void removeconnection(struct connstruct *cn)
             cn->ssl = NULL;
         }
 
+        shutdown(cn->networkdesc, SHUT_WR);
         SOCKET_CLOSE(cn->networkdesc);
     }
 
