@@ -45,8 +45,8 @@ public class AvrdudeUploader extends Uploader  {
   public boolean uploadUsingPreferences(String buildPath, String className, boolean verbose)
   throws RunnerException {
     this.verbose = verbose;
-    String uploadUsing =
-      Preferences.get("boards." + Preferences.get("board") + ".upload.using");
+    Map<String, String> boardPreferences = Base.getBoardPreferences();
+    String uploadUsing = boardPreferences.get("upload.using");
     if (uploadUsing == null) {
       // fall back on global preference
       uploadUsing = Preferences.get("upload.using");
@@ -54,7 +54,8 @@ public class AvrdudeUploader extends Uploader  {
     if (uploadUsing.equals("bootloader")) {
       return uploadViaBootloader(buildPath, className);
     } else {
-      Collection params = getProgrammerCommands(uploadUsing);
+      // XXX: this needs to handle programmers in other targets.
+      Collection params = getProgrammerCommands(Base.getTarget().getName(), uploadUsing);
       params.add("-Uflash:w:" + buildPath + File.separator + className + ".hex:i");
       return avrdude(params);
     }
@@ -62,9 +63,9 @@ public class AvrdudeUploader extends Uploader  {
   
   private boolean uploadViaBootloader(String buildPath, String className)
   throws RunnerException {
+    Map<String, String> boardPreferences = Base.getBoardPreferences();
     List commandDownloader = new ArrayList();
-    String protocol =
-      Preferences.get("boards." + Preferences.get("board") + ".upload.protocol");
+    String protocol = boardPreferences.get("upload.protocol");
     
     // avrdude wants "stk500v1" to distinguish it from stk500v2
     if (protocol.equals("stk500"))
@@ -73,56 +74,59 @@ public class AvrdudeUploader extends Uploader  {
     commandDownloader.add(
       "-P" + (Base.isWindows() ? "\\\\.\\" : "") + Preferences.get("serial.port"));
     commandDownloader.add(
-      "-b" + Preferences.getInteger("boards." + Preferences.get("board") + ".upload.speed"));
+      "-b" + Integer.parseInt(boardPreferences.get("upload.speed")));
     commandDownloader.add("-D"); // don't erase
     commandDownloader.add("-Uflash:w:" + buildPath + File.separator + className + ".hex:i");
 
-    if (Preferences.get("boards", "board", "upload.disable_flushing") == null ||
-        Preferences.getBoolean("boards." + Preferences.get("board") + ".upload.disable_flushing") == false) {
+    if (boardPreferences.get("upload.disable_flushing") == null ||
+        boardPreferences.get("upload.disable_flushing").toLowerCase().equals("false")) {
       flushSerialBuffer();
     }
 
     return avrdude(commandDownloader);
   }
   
-  public boolean burnBootloader(String programmer) throws RunnerException {
-    return burnBootloader(getProgrammerCommands(programmer));
+  public boolean burnBootloader(String target, String programmer) throws RunnerException {
+    return burnBootloader(getProgrammerCommands(target, programmer));
   }
   
-  private Collection getProgrammerCommands(String programmer) {
+  private Collection getProgrammerCommands(String targetName, String programmer) {
+    Target target = Base.targetsTable.get(targetName);
+    Map<String, String> programmerPreferences = target.getProgrammers().get(programmer);
     List params = new ArrayList();
-    params.add("-c" + Preferences.get("programmers." + programmer + ".protocol"));
+    params.add("-c" + programmerPreferences.get("protocol"));
     
-    if ("usb".equals(Preferences.get("programmers." + programmer + ".communication"))) {
+    if ("usb".equals(programmerPreferences.get("communication"))) {
       params.add("-Pusb");
-    } else if ("serial".equals(Preferences.get("programmers." + programmer + ".communication"))) {
+    } else if ("serial".equals(programmerPreferences.get("communication"))) {
       params.add("-P" + (Base.isWindows() ? "\\\\.\\" : "") + Preferences.get("serial.port"));
-      if (Preferences.get("programmers." + programmer + ".speed") != null) {
-	params.add("-b" + Preferences.getInteger("programmers." + programmer + ".speed"));
+      if (programmerPreferences.get("speed") != null) {
+	params.add("-b" + Integer.parseInt(programmerPreferences.get("speed")));
       }
     }
     // XXX: add support for specifying the port address for parallel
     // programmers, although avrdude has a default that works in most cases.
     
-    if (Preferences.get("programmers." + programmer + ".force") != null &&
-        Preferences.getBoolean("programmers." + programmer + ".force"))
+    if (programmerPreferences.get("force") != null &&
+        programmerPreferences.get("force").toLowerCase().equals("true"))
       params.add("-F");
     
-    if (Preferences.get("programmers." + programmer + ".delay") != null)
-      params.add("-i" + Preferences.get("programmers." + programmer + ".delay"));
+    if (programmerPreferences.get("delay") != null)
+      params.add("-i" + programmerPreferences.get("delay"));
     
     return params;
   }
   
   protected boolean burnBootloader(Collection params)
   throws RunnerException {
+    Map<String, String> boardPreferences = Base.getBoardPreferences();
     List fuses = new ArrayList();
     fuses.add("-e"); // erase the chip
-    fuses.add("-Ulock:w:" + Preferences.get("boards", "board", "bootloader.unlock_bits") + ":m");
-    if (Preferences.get("boards", "board", "bootloader.extended_fuses") != null)
-      fuses.add("-Uefuse:w:" + Preferences.get("boards", "board", "bootloader.extended_fuses") + ":m");
-    fuses.add("-Uhfuse:w:" + Preferences.get("boards", "board", "bootloader.high_fuses") + ":m");
-    fuses.add("-Ulfuse:w:" + Preferences.get("boards", "board", "bootloader.low_fuses") + ":m");
+    fuses.add("-Ulock:w:" + boardPreferences.get("bootloader.unlock_bits") + ":m");
+    if (boardPreferences.get("bootloader.extended_fuses") != null)
+      fuses.add("-Uefuse:w:" + boardPreferences.get("bootloader.extended_fuses") + ":m");
+    fuses.add("-Uhfuse:w:" + boardPreferences.get("bootloader.high_fuses") + ":m");
+    fuses.add("-Ulfuse:w:" + boardPreferences.get("bootloader.low_fuses") + ":m");
 
     if (!avrdude(params, fuses))
       return false;
@@ -130,16 +134,26 @@ public class AvrdudeUploader extends Uploader  {
     try {
       Thread.sleep(1000);
     } catch (InterruptedException e) {}
-      
-    String platform = Preferences.get("boards", "board", "build.core");
-    File platformFile = Base.platformsTable.get(platform);
-    String bootloadersPath = new File(platformFile, "bootloaders").getAbsolutePath();
-
+    
+    Target t;
+    String bootloaderPath = boardPreferences.get("bootloader.path");
+    
+    if (bootloaderPath.indexOf(':') == -1) {
+      t = Base.getTarget(); // the current target (associated with the board)
+    } else {
+      String targetName = bootloaderPath.substring(0, bootloaderPath.indexOf(':'));
+      t = Base.targetsTable.get(targetName);
+      bootloaderPath = bootloaderPath.substring(bootloaderPath.indexOf(':') + 1);
+    }
+    
+    File bootloadersFile = new File(t.getFolder(), "bootloaders");
+    File bootloaderFile = new File(bootloadersFile, bootloaderPath);
+    bootloaderPath = bootloaderFile.getAbsolutePath();
+    
     List bootloader = new ArrayList();
-    bootloader.add("-Uflash:w:" + bootloadersPath + File.separator +
-                   Preferences.get("boards", "board", "bootloader.path") + File.separator +
-                   Preferences.get("boards", "board", "bootloader.file") + ":i");
-    bootloader.add("-Ulock:w:" + Preferences.get("boards", "board", "bootloader.lock_bits") + ":m");
+    bootloader.add("-Uflash:w:" + bootloaderPath + File.separator +
+                   boardPreferences.get("bootloader.file") + ":i");
+    bootloader.add("-Ulock:w:" + boardPreferences.get("bootloader.lock_bits") + ":m");
 
     return avrdude(params, bootloader);
   }
@@ -172,7 +186,7 @@ public class AvrdudeUploader extends Uploader  {
       commandDownloader.add("-q");
       commandDownloader.add("-q");
     }
-    commandDownloader.add("-p" + Preferences.get("boards", "board", "build.mcu"));
+    commandDownloader.add("-p" + Base.getBoardPreferences().get("build.mcu"));
     commandDownloader.addAll(params);
 
     return executeUploadCommand(commandDownloader);

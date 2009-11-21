@@ -30,6 +30,7 @@ import java.util.*;
 import javax.swing.*;
 
 import processing.app.debug.Compiler;
+import processing.app.debug.Target;
 import processing.core.*;
 
 
@@ -85,7 +86,7 @@ public class Base {
   // found in the sketchbook)
   static public String librariesClassPath;
   
-  static public HashMap<String, File> platformsTable;
+  static public HashMap<String, Target> targetsTable;
 
   // Location for untitled items
   static File untitledFolder;
@@ -278,7 +279,7 @@ public class Base {
       }
     }
     
-    platformsTable = new HashMap<String, File>();
+    targetsTable = new HashMap<String, Target>();
     loadHardware(getHardwareFolder());
     loadHardware(getSketchbookHardwareFolder());
 
@@ -997,19 +998,26 @@ public class Base {
     //System.out.println("rebuilding boards menu");
     menu.removeAll();      
     ButtonGroup group = new ButtonGroup();
-    for (String board : Preferences.getSubKeys("boards")) {
-      AbstractAction action = 
-        new AbstractAction(Preferences.get("boards." + board + ".name")) {
-          public void actionPerformed(ActionEvent actionevent) {
-            //System.out.println("Switching to " + board);
-            Preferences.set("board", (String) getValue("board"));
-          }
-        };
-      action.putValue("board", board);
-      JMenuItem item = new JRadioButtonMenuItem(action);
-      if (board.equals(Preferences.get("board"))) item.setSelected(true);
-      group.add(item);
-      menu.add(item);
+    for (Target target : targetsTable.values()) {
+      for (String board : target.getBoards().keySet()) {
+        AbstractAction action = 
+          new AbstractAction(target.getBoards().get(board).get("name")) {
+            public void actionPerformed(ActionEvent actionevent) {
+              //System.out.println("Switching to " + target + ":" + board);
+              Preferences.set("target", (String) getValue("target"));
+              Preferences.set("board", (String) getValue("board"));
+            }
+          };
+        action.putValue("target", target.getName());
+        action.putValue("board", board);
+        JMenuItem item = new JRadioButtonMenuItem(action);
+        if (target.getName().equals(Preferences.get("target")) &&
+            board.equals(Preferences.get("board"))) {
+          item.setSelected(true);
+        }
+        group.add(item);
+        menu.add(item);
+      }
     }
   }
   
@@ -1017,17 +1025,21 @@ public class Base {
   public void rebuildBurnBootloaderMenu(JMenu menu) {
     //System.out.println("rebuilding burn bootloader menu");
     menu.removeAll();      
-    for (String programmer : Preferences.getSubKeys("programmers")) {
-      AbstractAction action = 
-        new AbstractAction(
-          "w/ " + Preferences.get("programmers." + programmer + ".name")) {
-          public void actionPerformed(ActionEvent actionevent) {
-            activeEditor.handleBurnBootloader((String) getValue("programmer"));
-          }
-        };
-      action.putValue("programmer", programmer);
-      JMenuItem item = new JMenuItem(action);
-      menu.add(item);
+    for (Target target : targetsTable.values()) {
+      for (String programmer : target.getProgrammers().keySet()) {
+        AbstractAction action = 
+          new AbstractAction(
+            "w/ " + target.getProgrammers().get(programmer).get("name")) {
+            public void actionPerformed(ActionEvent actionevent) {
+              activeEditor.handleBurnBootloader((String) getValue("target"),
+                                                (String) getValue("programmer"));
+            }
+          };
+        action.putValue("target", target.getName());
+        action.putValue("programmer", programmer);
+        JMenuItem item = new JMenuItem(action);
+        menu.add(item);
+      }
     }
   }
 
@@ -1228,30 +1240,9 @@ public class Base {
     // replaced hella slow bubble sort with this feller for 0093
     Arrays.sort(list, String.CASE_INSENSITIVE_ORDER);
     
-    for (String platform : list) {
-      File subfolder = new File(folder, platform);
-      
-      File boardsFile = new File(subfolder, "boards.txt");
-      try {
-        if (boardsFile.exists()) {
-          Preferences.load(new FileInputStream(boardsFile), "boards");
-        }
-      } catch (Exception e) {
-        System.err.println("Error loading boards from " +
-                           boardsFile + ": " + e);
-      }
-
-      File programmersFile = new File(subfolder, "programmers.txt");
-      try {
-        if (programmersFile.exists()) {
-          Preferences.load(new FileInputStream(programmersFile), "programmers");
-        }
-      } catch (Exception e) {
-        System.err.println("Error loading programmers from " + 
-                           programmersFile + ": " + e);
-      }
-      
-      platformsTable.put(platform, subfolder);
+    for (String target : list) {
+      File subfolder = new File(folder, target);
+      targetsTable.put(target, new Target(target, subfolder));
     }
   }
 
@@ -1522,6 +1513,16 @@ public class Base {
       return getHardwarePath() + File.separator + "tools" +
              File.separator + "avr" + File.separator + "bin" + File.separator;
     }  
+  }
+  
+  
+  static public Target getTarget() {
+    return Base.targetsTable.get(Preferences.get("target"));
+  }
+  
+  
+  static public Map<String, String> getBoardPreferences() {
+    return getTarget().getBoards().get(Preferences.get("board"));
   }
   
 

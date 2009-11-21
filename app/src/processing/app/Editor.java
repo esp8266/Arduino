@@ -2279,14 +2279,14 @@ public class Editor extends JFrame implements RunnerListener {
   }
 
 
-  protected void handleBurnBootloader(final String programmer) {
+  protected void handleBurnBootloader(final String target, final String programmer) {
     console.clear();
     statusNotice("Burning bootloader to I/O Board (this may take a minute)...");
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         try {
           Uploader uploader = new AvrdudeUploader();
-          if (uploader.burnBootloader(programmer)) {
+          if (uploader.burnBootloader(target, programmer)) {
             statusNotice("Done burning bootloader.");
           } else {
             statusError("Error while burning bootloader.");

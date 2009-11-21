@@ -71,9 +71,20 @@ public class Compiler implements MessageConsumer {
     MessageStream pms = new MessageStream(this);
 
     String avrBasePath = Base.getAvrBasePath();
-    String platform = Preferences.get("boards", "board", "build.core");
-    File platformFile = Base.platformsTable.get(platform);
-    String corePath = new File(platformFile, "core").getAbsolutePath();
+    Map<String, String> boardPreferences = Base.getBoardPreferences();
+    String core = boardPreferences.get("build.core");
+    String corePath;
+    
+    if (core.indexOf(':') == -1) {
+      Target t = Base.getTarget();
+      File coreFolder = new File(new File(t.getFolder(), "cores"), core);
+      corePath = coreFolder.getAbsolutePath();
+    } else {
+      Target t = Base.targetsTable.get(core.substring(0, core.indexOf(':')));
+      File coresFolder = new File(t.getFolder(), "cores");
+      File coreFolder = new File(coresFolder, core.substring(core.indexOf(':') + 1));
+      corePath = coreFolder.getAbsolutePath();
+    }
 
     List<File> objectFiles = new ArrayList<File>();
 
@@ -89,7 +100,8 @@ public class Compiler implements MessageConsumer {
       compileFiles(avrBasePath, buildPath, includePaths,
                    findFilesInPath(corePath, "S", true),
                    findFilesInPath(corePath, "c", true),
-                   findFilesInPath(corePath, "cpp", true));
+                   findFilesInPath(corePath, "cpp", true),
+                   boardPreferences);
                    
     List baseCommandAR = new ArrayList(Arrays.asList(new String[] {
       avrBasePath + "avr-ar",
@@ -120,14 +132,16 @@ public class Compiler implements MessageConsumer {
         compileFiles(avrBasePath, outputFolder.getAbsolutePath(), includePaths,
                      findFilesInFolder(libraryFolder, "S", false),
                      findFilesInFolder(libraryFolder, "c", false),
-                     findFilesInFolder(libraryFolder, "cpp", false)));
+                     findFilesInFolder(libraryFolder, "cpp", false),
+                     boardPreferences));
       outputFolder = new File(outputFolder, "utility");
       createFolder(outputFolder);
       objectFiles.addAll(
         compileFiles(avrBasePath, outputFolder.getAbsolutePath(), includePaths,
                      findFilesInFolder(utilityFolder, "S", false),
                      findFilesInFolder(utilityFolder, "c", false),
-                     findFilesInFolder(utilityFolder, "cpp", false)));
+                     findFilesInFolder(utilityFolder, "cpp", false),
+                     boardPreferences));
       // other libraries should not see this library's utility/ folder
       includePaths.remove(includePaths.size() - 1);
     }
@@ -138,7 +152,8 @@ public class Compiler implements MessageConsumer {
       compileFiles(avrBasePath, buildPath, includePaths,
                    findFilesInPath(buildPath, "S", false),
                    findFilesInPath(buildPath, "c", false),
-                   findFilesInPath(buildPath, "cpp", false)));
+                   findFilesInPath(buildPath, "cpp", false),
+                   boardPreferences));
 
     // 4. link it all together into the .elf file
 
@@ -146,7 +161,7 @@ public class Compiler implements MessageConsumer {
       avrBasePath + "avr-gcc",
       "-Os",
       "-Wl,--gc-sections",
-      "-mmcu=" + Preferences.get("boards", "board", "build.mcu"),
+      "-mmcu=" + boardPreferences.get("build.mcu"),
       "-o",
       buildPath + File.separator + primaryClassName + ".elf"
     }));
@@ -197,7 +212,8 @@ public class Compiler implements MessageConsumer {
   private List<File> compileFiles(String avrBasePath,
                                   String buildPath, List<File> includePaths,
                                   List<File> sSources, 
-                                  List<File> cSources, List<File> cppSources)
+                                  List<File> cSources, List<File> cppSources,
+                                  Map<String, String> boardPreferences)
     throws RunnerException {
 
     List<File> objectPaths = new ArrayList<File>();
@@ -207,7 +223,8 @@ public class Compiler implements MessageConsumer {
       objectPaths.add(new File(objectPath));
       execAsynchronously(getCommandCompilerS(avrBasePath, includePaths,
                                              file.getAbsolutePath(),
-                                             objectPath));
+                                             objectPath,
+                                             boardPreferences));
     }
  		
     for (File file : cSources) {
@@ -215,7 +232,8 @@ public class Compiler implements MessageConsumer {
         objectPaths.add(new File(objectPath));
         execAsynchronously(getCommandCompilerC(avrBasePath, includePaths,
                                                file.getAbsolutePath(),
-                                               objectPath));
+                                               objectPath,
+                                               boardPreferences));
     }
 
     for (File file : cppSources) {
@@ -223,7 +241,8 @@ public class Compiler implements MessageConsumer {
         objectPaths.add(new File(objectPath));
         execAsynchronously(getCommandCompilerCPP(avrBasePath, includePaths,
                                                  file.getAbsolutePath(),
-                                                 objectPath));
+                                                 objectPath,
+                                                 boardPreferences));
     }
     
     return objectPaths;
@@ -448,14 +467,14 @@ public class Compiler implements MessageConsumer {
   /////////////////////////////////////////////////////////////////////////////
 
   static private List getCommandCompilerS(String avrBasePath, List includePaths,
-    String sourceName, String objectName) {
+    String sourceName, String objectName, Map<String, String> boardPreferences) {
     List baseCommandCompiler = new ArrayList(Arrays.asList(new String[] {
       avrBasePath + "avr-gcc",
       "-c", // compile, don't link
       "-g", // include debugging info (so errors include line numbers)
       "-assembler-with-cpp",
-      "-mmcu=" + Preferences.get("boards", "board", "build.mcu"),
-      "-DF_CPU=" + Preferences.get("boards", "board", "build.f_cpu"),
+      "-mmcu=" + boardPreferences.get("build.mcu"),
+      "-DF_CPU=" + boardPreferences.get("build.f_cpu"),
       "-DARDUINO=" + Base.REVISION,
     }));
 
@@ -471,7 +490,7 @@ public class Compiler implements MessageConsumer {
 
   
   static private List getCommandCompilerC(String avrBasePath, List includePaths,
-    String sourceName, String objectName) {
+    String sourceName, String objectName, Map<String, String> boardPreferences) {
 
     List baseCommandCompiler = new ArrayList(Arrays.asList(new String[] {
       avrBasePath + "avr-gcc",
@@ -481,8 +500,8 @@ public class Compiler implements MessageConsumer {
       "-w", // surpress all warnings
       "-ffunction-sections", // place each function in its own section
       "-fdata-sections",
-      "-mmcu=" + Preferences.get("boards", "board", "build.mcu"),
-      "-DF_CPU=" + Preferences.get("boards", "board", "build.f_cpu"),
+      "-mmcu=" + boardPreferences.get("build.mcu"),
+      "-DF_CPU=" + boardPreferences.get("build.f_cpu"),
       "-DARDUINO=" + Base.REVISION,
     }));
 		
@@ -498,7 +517,8 @@ public class Compiler implements MessageConsumer {
 	
 	
   static private List getCommandCompilerCPP(String avrBasePath,
-    List includePaths, String sourceName, String objectName) {
+    List includePaths, String sourceName, String objectName,
+    Map<String, String> boardPreferences) {
     
     List baseCommandCompilerCPP = new ArrayList(Arrays.asList(new String[] {
       avrBasePath + "avr-g++",
@@ -509,8 +529,8 @@ public class Compiler implements MessageConsumer {
       "-fno-exceptions",
       "-ffunction-sections", // place each function in its own section
       "-fdata-sections",
-      "-mmcu=" + Preferences.get("boards", "board", "build.mcu"),
-      "-DF_CPU=" + Preferences.get("boards", "board", "build.f_cpu"),
+      "-mmcu=" + boardPreferences.get("build.mcu"),
+      "-DF_CPU=" + boardPreferences.get("build.f_cpu"),
       "-DARDUINO=" + Base.REVISION,
     }));
 

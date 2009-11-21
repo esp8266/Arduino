@@ -65,7 +65,7 @@ public abstract class Uploader implements MessageConsumer  {
   public abstract boolean uploadUsingPreferences(String buildPath, String className, boolean verbose)
     throws RunnerException;
   
-  public abstract boolean burnBootloader(String programmer) throws RunnerException;
+  public abstract boolean burnBootloader(String target, String programmer) throws RunnerException;
   
   protected void flushSerialBuffer() throws RunnerException {
     // Cleanup the serial buffer

@@ -1447,7 +1447,7 @@ public class Sketch {
   protected void size(String buildPath, String suggestedClassName)
     throws RunnerException {
     long size = 0;
-    long maxsize = Preferences.getInteger("boards." + Preferences.get("board") + ".upload.maximum_size");
+    long maxsize = Integer.parseInt(Base.getBoardPreferences().get("upload.maximum_size"));
     Sizer sizer = new Sizer(buildPath, suggestedClassName);
       try {
       size = sizer.computeSize();
