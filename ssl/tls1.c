@@ -1230,8 +1230,16 @@ int basic_read(SSL *ssl, uint8_t **in_data)
     switch (ssl->record_type)
     {
         case PT_HANDSHAKE_PROTOCOL:
-            ssl->dc->bm_proc_index = 0;
-            ret = do_handshake(ssl, buf, read_len);
+            if (ssl->dc != NULL)
+            {
+                ssl->dc->bm_proc_index = 0;
+                ret = do_handshake(ssl, buf, read_len);
+            }
+            else /* no client renogiation allowed */
+            {
+                ret = SSL_ERROR_NO_CLIENT_RENOG;              
+                goto error;
+            }
             break;
 
         case PT_CHANGE_CIPHER_SPEC:
@@ -1402,6 +1410,7 @@ int send_alert(SSL *ssl, int error_code)
 
         case SSL_ERROR_INVALID_HANDSHAKE:
         case SSL_ERROR_INVALID_PROT_MSG:
+        case SSL_ERROR_NO_CLIENT_RENOG:
             alert_num = SSL_ALERT_HANDSHAKE_FAILURE;
             break;
 
@@ -1958,6 +1967,10 @@ EXP_FUNC void STDCALL ssl_display_error(int error_code)
             printf("no certificate defined");
             break;
 
+        case SSL_ERROR_NO_CLIENT_RENOG:
+            printf("client renegotiation not supported");
+            break;
+            
         case SSL_ERROR_NOT_SUPPORTED:
             printf("Option not supported");
             break;

@@ -100,6 +100,7 @@ extern "C" {
 #define SSL_ERROR_INVALID_KEY                   -269
 #define SSL_ERROR_FINISHED_INVALID              -271
 #define SSL_ERROR_NO_CERT_DEFINED               -272
+#define SSL_ERROR_NO_CLIENT_RENOG               -273
 #define SSL_ERROR_NOT_SUPPORTED                 -274
 #define SSL_X509_OFFSET                         -512
 #define SSL_X509_ERROR(A)                       (SSL_X509_OFFSET+A)

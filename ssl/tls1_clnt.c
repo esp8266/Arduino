@@ -123,6 +123,7 @@ int do_clnt_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len)
         case HS_FINISHED:
             ret = process_finished(ssl, hs_len);
             disposable_free(ssl);   /* free up some memory */
+            /* note: client renogiation is not allowed after this */
             break;
 
         case HS_HELLO_REQUEST:
