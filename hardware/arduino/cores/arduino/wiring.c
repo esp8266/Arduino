@@ -75,21 +75,21 @@ unsigned long millis()
 }
 
 unsigned long micros() {
-	unsigned long m, t;
-	uint8_t oldSREG = SREG;
+	unsigned long m;
+	uint8_t oldSREG = SREG, t;
 	
-	cli();	
+	cli();
+	m = timer0_overflow_count;
 	t = TCNT0;
   
 #ifdef TIFR0
-	if ((TIFR0 & _BV(TOV0)) && (t == 0))
-		t = 256;
+	if ((TIFR0 & _BV(TOV0)) && (t < 255))
+		m++;
 #else
-	if ((TIFR & _BV(TOV0)) && (t == 0))
-		t = 256;
+	if ((TIFR & _BV(TOV0)) && (t < 255))
+		m++;
 #endif
 
-	m = timer0_overflow_count;
 	SREG = oldSREG;
 	
 	return ((m << 8) + t) * (64 / clockCyclesPerMicrosecond());
