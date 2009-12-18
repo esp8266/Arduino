@@ -216,6 +216,7 @@ run.present.exclusive.macosx = true
 
 # ARDUINO PREFERENCES
 board = atmega328
+target = arduino
 
 upload.using = bootloader
 
