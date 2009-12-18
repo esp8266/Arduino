@@ -4,8 +4,6 @@ HIGH	LITERAL1	Constants
 LOW	LITERAL1	Constants
 INPUT	LITERAL1	Constants
 OUTPUT	LITERAL1	Constants
-SERIAL	LITERAL1
-DISPLAY	LITERAL1
 DEC	LITERAL1	Serial_Print
 BIN	LITERAL1	Serial_Print
 HEX	LITERAL1	Serial_Print
@@ -157,8 +155,10 @@ pinMode	KEYWORD2	PinMode
 pulseIn	KEYWORD2	PulseIn
 shiftOut	KEYWORD2	ShiftOut
 
-Serial	KEYWORD3
-Serial	KEYWORD2
+Serial	KEYWORD3	Serial
+Serial1	KEYWORD3	Serial
+Serial2	KEYWORD3	Serial
+Serial3	KEYWORD3	Serial
 begin	KEYWORD2	Serial_Begin
 read	KEYWORD2	Serial_Read
 print	KEYWORD2	Serial_Print
