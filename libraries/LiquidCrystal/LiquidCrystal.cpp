@@ -35,7 +35,7 @@ LiquidCrystal::LiquidCrystal(uint8_t rs, uint8_t enable,
 			     uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3,
 			     uint8_t d4, uint8_t d5, uint8_t d6, uint8_t d7)
 {
-  init(0, rs, -1, enable, d0, d1, d2, d3, d4, d5, d6, d7);
+  init(0, rs, 255, enable, d0, d1, d2, d3, d4, d5, d6, d7);
 }
 
 LiquidCrystal::LiquidCrystal(uint8_t rs, uint8_t rw, uint8_t enable,
@@ -47,7 +47,7 @@ LiquidCrystal::LiquidCrystal(uint8_t rs, uint8_t rw, uint8_t enable,
 LiquidCrystal::LiquidCrystal(uint8_t rs,  uint8_t enable,
 			     uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3)
 {
-  init(1, rs, -1, enable, d0, d1, d2, d3, 0, 0, 0, 0);
+  init(1, rs, 255, enable, d0, d1, d2, d3, 0, 0, 0, 0);
 }
 
 void LiquidCrystal::init(uint8_t fourbitmode, uint8_t rs, uint8_t rw, uint8_t enable,
@@ -68,8 +68,8 @@ void LiquidCrystal::init(uint8_t fourbitmode, uint8_t rs, uint8_t rw, uint8_t en
   _data_pins[7] = d7; 
 
   pinMode(_rs_pin, OUTPUT);
-  // we can save 1 pin by not using RW. Indicate by passing -1 instead of pin#
-  if (_rw_pin != -1) { 
+  // we can save 1 pin by not using RW. Indicate by passing 255 instead of pin#
+  if (_rw_pin != 255) { 
     pinMode(_rw_pin, OUTPUT);
   }
   pinMode(_enable_pin, OUTPUT);
@@ -101,7 +101,7 @@ void LiquidCrystal::begin(uint8_t cols, uint8_t lines, uint8_t dotsize) {
   // Now we pull both RS and R/W low to begin commands
   digitalWrite(_rs_pin, LOW);
   digitalWrite(_enable_pin, LOW);
-  if (_rw_pin != -1) { 
+  if (_rw_pin != 255) { 
     digitalWrite(_rw_pin, LOW);
   }
   
@@ -269,7 +269,7 @@ void LiquidCrystal::send(uint8_t value, uint8_t mode) {
   digitalWrite(_rs_pin, mode);
 
   // if there is a RW pin indicated, set it low to Write
-  if (_rw_pin != -1) { 
+  if (_rw_pin != 255) { 
     digitalWrite(_rw_pin, LOW);
   }
   
