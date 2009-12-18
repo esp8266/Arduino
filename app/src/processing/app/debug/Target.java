@@ -1,11 +1,10 @@
 /* -*- mode: jde; c-basic-offset: 2; indent-tabs-mode: nil -*- */
 
 /*
-  Target - represents a target platform
-  Part of the Arduino project - http://arduino.berlios.de/
+  Target - represents a hardware platform
+  Part of the Arduino project - http://www.arduino.cc/
 
-  Copyright (c) 2005
-  David A. Mellis
+  Copyright (c) 2009 David A. Mellis
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,59 +20,72 @@
   along with this program; if not, write to the Free Software Foundation,
   Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
   
-  $Id: Target.java 85 2006-01-12 23:24:12Z mellis $
+  $Id$
 */
 
 package processing.app.debug;
+
 import java.io.*;
 import java.util.*;
 
-/**
- * Represents a target platform (e.g. Wiring board, Arduino board).
- */
-public class Target {
-  String path;
-  List sources = new ArrayList();
-  List objects = new ArrayList();
+import processing.app.Preferences;
 
-  /**
-   * Create a Target.
-   * @param path the directory containing config, source, and object files for
-   * the target platform.
-   */
-  public Target(String base, String target) throws IOException {
-    path = base + File.separator + target;
-    String[] files = (new File(path)).list();
+public class Target {
+  private String name;
+  private File folder;
+  private Map boards;
+  private Map programmers;
+  
+  public Target(String name, File folder) {
+    this.name = name;
+    this.folder = folder;
+    this.boards = new LinkedHashMap();
+    this.programmers = new LinkedHashMap();
     
-    if (files == null)
-      throw new IOException("Target platform: \"" + target + "\" not found.\n" +
-                            "Make sure that \"build.target\" in the \n" +
-                            "preferences file points to a subdirectory of \n" +
-                            base);
-    
-    for (int i = 0; i < files.length; i++) {
-      if (files[i].endsWith(".S") || files[i].endsWith(".c") || files[i].endsWith(".cpp"))
-        sources.add(files[i]);
-      if (files[i].endsWith(".o"))
-        objects.add(files[i]);
+    File boardsFile = new File(folder, "boards.txt");
+    try {
+      if (boardsFile.exists()) {
+        Map boardPreferences = new LinkedHashMap();
+        Preferences.load(new FileInputStream(boardsFile), boardPreferences);
+        for (Object k : boardPreferences.keySet()) {
+          String key = (String) k;
+          String board = key.substring(0, key.indexOf('.'));
+          if (!boards.containsKey(board)) boards.put(board, new HashMap());
+          ((Map) boards.get(board)).put(
+            key.substring(key.indexOf('.') + 1),
+            boardPreferences.get(key));
+        }
+      }
+    } catch (Exception e) {
+      System.err.println("Error loading boards from " + boardsFile + ": " + e);
     }
+
+    File programmersFile = new File(folder, "programmers.txt");
+    try {
+      if (programmersFile.exists()) {
+        Map programmerPreferences = new LinkedHashMap();
+        Preferences.load(new FileInputStream(programmersFile), programmerPreferences);
+        for (Object k : programmerPreferences.keySet()) {
+          String key = (String) k;
+          String programmer = key.substring(0, key.indexOf('.'));
+          if (!programmers.containsKey(programmer)) programmers.put(programmer, new HashMap());
+          ((Map) programmers.get(programmer)).put(
+            key.substring(key.indexOf('.') + 1),
+            programmerPreferences.get(key));
+        }
+      }
+    } catch (Exception e) {
+      System.err.println("Error loading programmers from " + 
+                         programmersFile + ": " + e);
+    }    
   }
   
-  public String getPath() { return path; }
-  
-  /**
-   * The source files in the library for the target platform.
-   * @return A read-only collection of strings containing the name of each source file.
-   */
-  public Collection getSourceFilenames() {
-    return Collections.unmodifiableList(sources);
+  public String getName() { return name; }
+  public File getFolder() { return folder; }
+  public Map<String, Map<String, String>> getBoards() {
+    return boards;
   }
-  
-  /**
-   * The object files in the library for the target platform.
-   * @return A read-only collection of strings containing the name of each object file.
-   */
-  public Collection getObjectFilenames() {
-    return Collections.unmodifiableList(objects);
+  public Map<String, Map<String, String>> getProgrammers() {
+    return programmers;
   }
 }

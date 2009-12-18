@@ -36,7 +36,7 @@ else
   chmod +x work/Arduino.app/Contents/MacOS/JavaApplicationStub
 
   cp -rX ../shared/lib "$RESOURCES/"
-  cp -rX ../shared/libraries "$RESOURCES/"
+  cp -rX ../../libraries "$RESOURCES/"
   cp -rX ../shared/tools "$RESOURCES/"
 
   cp -rX ../../hardware "$RESOURCES/"

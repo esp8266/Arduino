@@ -706,16 +706,7 @@ public class Editor extends JFrame implements RunnerListener {
     
     if (boardsMenu == null) {
       boardsMenu = new JMenu("Board");
-      ButtonGroup boardGroup = new ButtonGroup();
-      for (Iterator i = Preferences.getSubKeys("boards"); i.hasNext(); ) {
-        String board = (String) i.next();
-        Action action = new BoardMenuAction(board);
-        item = new JRadioButtonMenuItem(action);
-        if (board.equals(Preferences.get("board")))
-          item.setSelected(true);
-        boardGroup.add(item);
-        boardsMenu.add(item);
-      }
+      base.rebuildBoardsMenu(boardsMenu);
     }
     menu.add(boardsMenu);
     
@@ -727,14 +718,9 @@ public class Editor extends JFrame implements RunnerListener {
     menu.add(serialMenu);
 	  
     menu.addSeparator();
-    
+
     JMenu bootloaderMenu = new JMenu("Burn Bootloader");
-    for (Iterator i = Preferences.getSubKeys("programmers"); i.hasNext(); ) {
-      String programmer = (String) i.next();
-      Action action = new BootloaderMenuAction(programmer);
-      item = new JMenuItem(action);
-      bootloaderMenu.add(item);
-    }
+    base.rebuildBurnBootloaderMenu(bootloaderMenu);
     menu.add(bootloaderMenu);
         
     menu.addMenuListener(new MenuListener() {
@@ -961,30 +947,6 @@ public class Editor extends JFrame implements RunnerListener {
       // need to push "serial.port" into PdeBase.properties
     }
     */
-  }
-  
-  
-  class BoardMenuAction extends AbstractAction {
-    private String board;
-    public BoardMenuAction(String board) {
-      super(Preferences.get("boards." + board + ".name"));
-      this.board = board;
-    }
-    public void actionPerformed(ActionEvent actionevent) {
-      //System.out.println("Switching to " + board);
-      Preferences.set("board", board);
-    }
-  }
-  
-  class BootloaderMenuAction extends AbstractAction {
-    private String programmer;
-    public BootloaderMenuAction(String programmer) {
-      super("w/ " + Preferences.get("programmers." + programmer + ".name"));
-      this.programmer = programmer;
-    }
-    public void actionPerformed(ActionEvent actionevent) {
-      handleBurnBootloader(programmer);
-    }
   }
   
   
@@ -1842,10 +1804,7 @@ public class Editor extends JFrame implements RunnerListener {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
     try {
-          sketch.compile(new Target(
-            Base.getHardwarePath() + File.separator + "cores",
-            Preferences.get("boards." + Preferences.get("board") + ".build.core")),
-            verbose);    
+          sketch.compile(verbose);    
           statusNotice("Done compiling.");
         } catch (RunnerException e) {
           //statusError("Error compiling...");
@@ -2257,10 +2216,7 @@ public class Editor extends JFrame implements RunnerListener {
             
             uploading = true;
           
-            boolean success = sketch.exportApplet(new Target(
-              Base.getHardwarePath() + File.separator + "cores",
-              Preferences.get("boards." + Preferences.get("board") + ".build.core")),
-              verbose);
+            boolean success = sketch.exportApplet(verbose);
             if (success) {
               statusNotice("Done uploading.");
             } else {
@@ -2323,14 +2279,14 @@ public class Editor extends JFrame implements RunnerListener {
   }
 
 
-  protected void handleBurnBootloader(final String programmer) {
+  protected void handleBurnBootloader(final String target, final String programmer) {
     console.clear();
     statusNotice("Burning bootloader to I/O Board (this may take a minute)...");
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         try {
           Uploader uploader = new AvrdudeUploader();
-          if (uploader.burnBootloader(programmer)) {
+          if (uploader.burnBootloader(target, programmer)) {
             statusNotice("Done burning bootloader.");
           } else {
             statusError("Error while burning bootloader.");

@@ -131,7 +131,6 @@ public class Preferences {
 
   static Hashtable defaults;
   static Hashtable table = new Hashtable();;
-  static Hashtable prefixes = new Hashtable();
   static File preferencesFile;
 
 
@@ -198,25 +197,6 @@ public class Preferences {
                          " and restart Arduino.", ex);
         }
       }
-    }
-    
-    try {
-      load(new FileInputStream(new File(Base.getHardwareFolder(), "boards.txt")),
-           "boards");
-    } catch (Exception ex) {
-        Base.showError("Error reading board definitions",
-                       "Error reading the board definitions file (" +
-		       new File(Base.getHardwareFolder(), "boards.txt").getAbsolutePath() + "). " +
-                       "Please re-download or re-unzip Arduino.\n", ex);
-  }
-
-    try {
-      load(new FileInputStream(new File(Base.getHardwareFolder(), "programmers.txt")),
-        "programmers");
-    } catch (Exception ex) {
-        Base.showError("Error reading programmers definitions",
-                       "Error reading the programmers definitions file. " +
-                       "Please re-download or re-unzip Arduino.\n", ex);
     }    
   }
 
@@ -569,13 +549,7 @@ public class Preferences {
     load(input, table);
   }
   
-  static protected void load(InputStream input, String prefix) throws IOException {
-    LinkedHashMap table = new LinkedHashMap();
-    prefixes.put(prefix, table);
-    load(input, table);
-  }
-  
-  static protected void load(InputStream input, Map table) throws IOException {  
+  static public void load(InputStream input, Map table) throws IOException {  
     String[] lines = PApplet.loadStrings(input);  // Reads as UTF-8
     for (String line : lines) {
       if ((line.length() == 0) ||
@@ -628,20 +602,8 @@ public class Preferences {
   //static public String get(String attribute) {
   //return get(attribute, null);
   //}
-
+  
   static public String get(String attribute /*, String defaultValue */) {
-    // if the attribute starts with a prefix used by one of our subsidiary
-    // preference files, look up the attribute in that file's Hashtable
-    // (don't override with or fallback to the main file).  otherwise,
-    // look up the attribute in the main file's Hashtable. 
-    Map table = Preferences.table;
-    if (attribute.indexOf('.') != -1) {
-      String prefix = attribute.substring(0, attribute.indexOf('.'));
-      if (prefixes.containsKey(prefix)) {
-        table = (Map) prefixes.get(prefix);
-        attribute = attribute.substring(attribute.indexOf('.') + 1);
-      }
-    }
     return (String) table.get(attribute);
     /*
     //String value = (properties != null) ?
@@ -651,28 +613,6 @@ public class Preferences {
     return (value == null) ?
       defaultValue : value;
     */
-  }
-
-
-  /**
-   * Get the top-level key prefixes defined in the subsidiary file loaded with
-   * the given prefix.  For example, if the file contains:
-   *  foo.count=1
-   *  bar.count=2
-   *  baz.count=3
-   * this will return { "foo", "bar", "baz" }.
-   */
-  static public Iterator getSubKeys(String prefix) {
-    if (!prefixes.containsKey(prefix))
-      return null;
-    Set subkeys = new LinkedHashSet();
-    for (Iterator i = ((Map) prefixes.get(prefix)).keySet().iterator(); i.hasNext(); ) {
-      String subkey = (String) i.next();
-      if (subkey.indexOf('.') != -1)
-        subkey = subkey.substring(0, subkey.indexOf('.'));
-      subkeys.add(subkey);
-    }
-    return subkeys.iterator();
   }
 
 

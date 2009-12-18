@@ -30,6 +30,7 @@ import java.util.*;
 import javax.swing.*;
 
 import processing.app.debug.Compiler;
+import processing.app.debug.Target;
 import processing.core.*;
 
 
@@ -84,6 +85,8 @@ public class Base {
   // (both those in the p5/libs folder and those with lib subfolders
   // found in the sketchbook)
   static public String librariesClassPath;
+  
+  static public HashMap<String, Target> targetsTable;
 
   // Location for untitled items
   static File untitledFolder;
@@ -246,7 +249,7 @@ public class Base {
     // Get paths for the libraries and examples in the Processing folder
     //String workingDirectory = System.getProperty("user.dir");
     examplesFolder = getContentFile("examples");
-    librariesFolder = new File(getContentFile("hardware"), "libraries");
+    librariesFolder = getContentFile("libraries");
     toolsFolder = getContentFile("tools");
 
     // Get the sketchbook path, and make sure it's set properly
@@ -275,6 +278,10 @@ public class Base {
         defaultFolder.mkdirs();
       }
     }
+    
+    targetsTable = new HashMap<String, Target>();
+    loadHardware(getHardwareFolder());
+    loadHardware(getSketchbookHardwareFolder());
 
     // Check if there were previously opened sketches to be restored
     boolean opened = restoreSketches();
@@ -985,6 +992,56 @@ public class Base {
       e.printStackTrace();
     }
   }
+  
+  
+  public void rebuildBoardsMenu(JMenu menu) {
+    //System.out.println("rebuilding boards menu");
+    menu.removeAll();      
+    ButtonGroup group = new ButtonGroup();
+    for (Target target : targetsTable.values()) {
+      for (String board : target.getBoards().keySet()) {
+        AbstractAction action = 
+          new AbstractAction(target.getBoards().get(board).get("name")) {
+            public void actionPerformed(ActionEvent actionevent) {
+              //System.out.println("Switching to " + target + ":" + board);
+              Preferences.set("target", (String) getValue("target"));
+              Preferences.set("board", (String) getValue("board"));
+            }
+          };
+        action.putValue("target", target.getName());
+        action.putValue("board", board);
+        JMenuItem item = new JRadioButtonMenuItem(action);
+        if (target.getName().equals(Preferences.get("target")) &&
+            board.equals(Preferences.get("board"))) {
+          item.setSelected(true);
+        }
+        group.add(item);
+        menu.add(item);
+      }
+    }
+  }
+  
+  
+  public void rebuildBurnBootloaderMenu(JMenu menu) {
+    //System.out.println("rebuilding burn bootloader menu");
+    menu.removeAll();      
+    for (Target target : targetsTable.values()) {
+      for (String programmer : target.getProgrammers().keySet()) {
+        AbstractAction action = 
+          new AbstractAction(
+            "w/ " + target.getProgrammers().get(programmer).get("name")) {
+            public void actionPerformed(ActionEvent actionevent) {
+              activeEditor.handleBurnBootloader((String) getValue("target"),
+                                                (String) getValue("programmer"));
+            }
+          };
+        action.putValue("target", target.getName());
+        action.putValue("programmer", programmer);
+        JMenuItem item = new JMenuItem(action);
+        menu.add(item);
+      }
+    }
+  }
 
 
   /**
@@ -1138,7 +1195,8 @@ public class Base {
 //        String packages[] =
 //          Compiler.packageListFromClassPath(libraryClassPath);
         libraries.add(subfolder);
-        String packages[] = Compiler.headerListFromIncludePath(subfolder.getAbsolutePath());
+        String packages[] =
+          Compiler.headerListFromIncludePath(subfolder.getAbsolutePath());
         for (String pkg : packages) {
           importToLibraryTable.put(pkg, subfolder);
         }
@@ -1161,6 +1219,31 @@ public class Base {
 //      }
     }
     return ifound;
+  }
+  
+  
+  protected void loadHardware(File folder) {
+    if (!folder.isDirectory()) return;
+    
+    String list[] = folder.list(new FilenameFilter() {
+      public boolean accept(File dir, String name) {
+        // skip .DS_Store files, .svn folders, etc
+        if (name.charAt(0) == '.') return false;
+        if (name.equals("CVS")) return false;
+        return (new File(dir, name).isDirectory());
+      }
+    });
+    // if a bad folder or something like that, this might come back null
+    if (list == null) return;
+
+    // alphabetize list, since it's not always alpha order
+    // replaced hella slow bubble sort with this feller for 0093
+    Arrays.sort(list, String.CASE_INSENSITIVE_ORDER);
+    
+    for (String target : list) {
+      File subfolder = new File(folder, target);
+      targetsTable.put(target, new Target(target, subfolder));
+    }
   }
 
 
@@ -1432,6 +1515,16 @@ public class Base {
     }  
   }
   
+  
+  static public Target getTarget() {
+    return Base.targetsTable.get(Preferences.get("target"));
+  }
+  
+  
+  static public Map<String, String> getBoardPreferences() {
+    return getTarget().getBoards().get(Preferences.get("board"));
+  }
+  
 
   static public File getSketchbookFolder() {
     return new File(Preferences.get("sketchbook.path"));
@@ -1445,6 +1538,11 @@ public class Base {
 
   static public String getSketchbookLibrariesPath() {
     return getSketchbookLibrariesFolder().getAbsolutePath();
+  }
+  
+  
+  static public File getSketchbookHardwareFolder() {
+    return new File(getSketchbookFolder(), "hardware");
   }
 
 

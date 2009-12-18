@@ -30,7 +30,6 @@
 package processing.app.preproc;
 
 import processing.app.*;
-import processing.app.debug.Target;
 import processing.core.*;
 
 import java.io.*;
@@ -50,7 +49,6 @@ public class PdePreprocessor {
   // we always write one header: WProgram.h
   public int headerCount = 1;
   
-  Target target;
   List prototypes;
 
 
@@ -82,12 +80,10 @@ public class PdePreprocessor {
   public PdePreprocessor() { }
 
   public int writePrefix(String program, String buildPath,
-                         String name, String codeFolderPackages[],
-                         Target target)
+                         String name, String codeFolderPackages[])
     throws FileNotFoundException {
     this.buildPath = buildPath;
     this.name = name;
-    this.target = target;
 
     int tabSize = Preferences.getInteger("editor.tabs.size");
     char[] indentChars = new char[tabSize];
@@ -196,7 +192,7 @@ public class PdePreprocessor {
   //                  String extraImports[]) throws java.lang.Exception {
   public String write() throws java.lang.Exception {
     writeProgram(stream, program, prototypes);
-    writeFooter(stream, target);
+    writeFooter(stream);
     stream.close();
     
     return name;
@@ -223,23 +219,7 @@ public class PdePreprocessor {
    *
    * @param out         PrintStream to write it to.
    */
-  protected void writeFooter(PrintStream out, Target target) throws java.lang.Exception {
-    // Open the file main.cxx and copy its entire contents to the bottom of the
-    // generated sketch .cpp file...
-
-    String mainFileName = target.getPath() + File.separator + "main.cxx";
-    FileReader reader = null;
-    reader = new FileReader(mainFileName);
-
-    LineNumberReader mainfile = new LineNumberReader(reader);
-
-    String line;
-    while ((line = mainfile.readLine()) != null) {
-        out.print(line + "\n");
-    }
-
-    mainfile.close();
-  }
+  protected void writeFooter(PrintStream out) throws java.lang.Exception {}
 
 
   public ArrayList<String> getExtraImports() {
