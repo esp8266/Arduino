@@ -103,13 +103,9 @@ void delay(unsigned long ms)
 		;
 }
 
-/* Delay for the given number of microseconds.  Assumes a 8 or 16 MHz clock. 
- * Disables interrupts, which will disrupt the millis() function if used
- * too frequently. */
+/* Delay for the given number of microseconds.  Assumes a 8 or 16 MHz clock. */
 void delayMicroseconds(unsigned int us)
 {
-	uint8_t oldSREG;
-
 	// calling avrlib's delay_us() function with low values (e.g. 1 or
 	// 2 microseconds) gives delays longer than desired.
 	//delay_us(us);
@@ -150,19 +146,11 @@ void delayMicroseconds(unsigned int us)
 	us--;
 #endif
 
-	// disable interrupts, otherwise the timer 0 overflow interrupt that
-	// tracks milliseconds will make us delay longer than we want.
-	oldSREG = SREG;
-	cli();
-
 	// busy wait
 	__asm__ __volatile__ (
 		"1: sbiw %0,1" "\n\t" // 2 cycles
 		"brne 1b" : "=w" (us) : "0" (us) // 2 cycles
 	);
-
-	// reenable interrupts.
-	SREG = oldSREG;
 }
 
 void init()
