@@ -160,6 +160,7 @@ Serial1	KEYWORD3	Serial
 Serial2	KEYWORD3	Serial
 Serial3	KEYWORD3	Serial
 begin	KEYWORD2	Serial_Begin
+end	KEYWORD2	Serial_End
 read	KEYWORD2	Serial_Read
 print	KEYWORD2	Serial_Print
 println	KEYWORD2	Serial_Println
