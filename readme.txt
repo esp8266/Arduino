@@ -36,17 +36,30 @@ Arduino is an open source project, supported by many.
 The Arduino team is composed of Massimo Banzi, David Cuartielles, Tom Igoe,
 Gianluca Martino, and David A. Mellis.
 
-Nicholas Zambetti has contributed from the beginning.
-
-Yaniv Steiner and Giorgio Olivero have been supporting the project and are
-working at using it with the Instant Soup platform.
-
 Arduino uses the GNU avr-gcc toolchain, avrdude, avr-libc, and code from
 Processing and Wiring.
 
 Icon Design and Artwork created by Thomas Glaser (envis precisely).
 
 UPDATES
+
+0018
+
+[core / libraries]
+* Fixed bug w/ disabling use of the RW pin in the LiquidCrystal library. 
+* No longer disabling interrupts in delayMicroseconds().
+* Fixed bug w/ micros() returning incorrect values from within an interrupt.
+* Added Serial.end() command.
+
+[environment]
+* Synchronized with the Processing 1.0.9 code base, bringing various fixes,
+  including a bug causing saving to fail when closing the last sketch.
+* Added support for third-party hardware in the SKETCHBOOK/hardware folder.
+  It mirrors the current structure of the hardware folder in Arduino.
+* Hold down shift when pressing the Verify / Compile or Upload toolbar 
+  buttons to generate verbose output (including command lines).
+* Moving build (on upload) from the applet/ sub-folder of the sketch
+  to a temporary directory.
 
 0017 - 2009.07.25
 
