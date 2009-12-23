@@ -1393,7 +1393,7 @@ public class Sketch {
 
 
   protected boolean exportApplet(boolean verbose) throws Exception {
-    return exportApplet(new File(folder, "applet").getAbsolutePath(), verbose);
+    return exportApplet(tempBuildFolder.getAbsolutePath(), verbose);
   }
 
 
@@ -1441,7 +1441,7 @@ public class Sketch {
     upload(appletFolder.getPath(), foundName, verbose);
 
     return true;
-      }
+  }
 
 
   protected void size(String buildPath, String suggestedClassName)
@@ -1455,12 +1455,12 @@ public class Sketch {
         maxsize + " byte maximum)");      
     } catch (RunnerException e) {
       System.err.println("Couldn't determine program size: " + e.getMessage());
-      }
+    }
 
     if (size > maxsize)
       throw new RunnerException(
         "Sketch too big; see http://www.arduino.cc/en/Guide/Troubleshooting#size for tips on reducing it.");
-    }
+  }
 
 
   protected String upload(String buildPath, String suggestedClassName, boolean verbose)
