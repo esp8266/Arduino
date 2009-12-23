@@ -47,6 +47,7 @@ class HardwareSerial : public Print
       volatile uint8_t *udr,
       uint8_t rxen, uint8_t txen, uint8_t rxcie, uint8_t udre, uint8_t u2x);
     void begin(long);
+    void end();
     uint8_t available(void);
     int read(void);
     void flush(void);
