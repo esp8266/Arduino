@@ -387,15 +387,25 @@ public class Sketch {
       newName = sanitaryName + "." + newExtension;
     }
 
-    // Make sure no .pde *and* no .java files with the same name already exist
-    // http://dev.processing.org/bugs/show_bug.cgi?id=543
+    // In Arduino, we want to allow files with the same name but different
+    // extensions, so compare the full names (including extensions).  This
+    // might cause problems: http://dev.processing.org/bugs/show_bug.cgi?id=543
     for (SketchCode c : code) {
-      if (sanitaryName.equalsIgnoreCase(c.getPrettyName())) {
+      if (newName.equalsIgnoreCase(c.getFileName())) {
         Base.showMessage("Nope",
                          "A file named \"" + c.getFileName() + "\" already exists\n" +
                          "in \"" + folder.getAbsolutePath() + "\"");
         return;
       }
+    }
+    
+    // In Arduino, don't allow a .cpp file with the same name as the sketch,
+    // because the sketch is concatenated into a file with that name as part
+    // of the build process.  
+    if (newName.equals(getName() + ".cpp")) {
+      Base.showMessage("Nope",
+                       "You can't have a .cpp file with the same name as the sketch.");
+      return;
     }
 
     File newFile = new File(folder, newName);
@@ -756,14 +766,15 @@ public class Sketch {
 //      return false;  // Can't save a sketch over itself
 //    }
 
-    // make sure there doesn't exist a tab with that name already
+    // make sure there doesn't exist a .cpp file with that name already
     // but ignore this situation for the first tab, since it's probably being
     // resaved (with the same name) to another location/folder.
     for (int i = 1; i < codeCount; i++) {
-      if (newName.equalsIgnoreCase(code[i].getPrettyName())) {
+      if (newName.equalsIgnoreCase(code[i].getPrettyName()) &&
+        code[i].getExtension().equalsIgnoreCase("cpp")) {
         Base.showMessage("Nope",
                          "You can't save the sketch as \"" + newName + "\"\n" +
-                         "because the sketch already has a tab with that name.");
+                         "because the sketch already has a .cpp file with that name.");
         return false;
       }
     }
