@@ -50,12 +50,15 @@ UPDATES
 * No longer disabling interrupts in delayMicroseconds().
 * Fixed bug w/ micros() returning incorrect values from within an interrupt.
 * Added Serial.end() command.
+* Added precision parameter for printing of floats / doubles.
+* Fixed bug that broke use of analog inputs 8-15 on the Mega.
 
 [environment]
 * Synchronized with the Processing 1.0.9 code base, bringing various fixes,
-  including a bug causing saving to fail when closing the last sketch.
-* Added support for third-party hardware in the SKETCHBOOK/hardware folder.
-  It mirrors the current structure of the hardware folder in Arduino.
+  including to a bug causing saving to fail when closing the last sketch.
+* Added support for third-party hardware in the SKETCHBOOK/hardware folder,
+  mirroring the current structure of the hardware folder in Arduino.
+* Added Ctrl-Shift-M / Command-Shift-M shortcut for serial monitor.
 * Hold down shift when pressing the Verify / Compile or Upload toolbar 
   buttons to generate verbose output (including command lines).
 * Moving build (on upload) from the applet/ sub-folder of the sketch
