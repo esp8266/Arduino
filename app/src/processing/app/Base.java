@@ -584,7 +584,7 @@ public class Base {
    * Replace the sketch in the current window with a new untitled document.
    */
   public void handleNewReplace() {
-    if (!activeEditor.checkModified(false)) {
+    if (!activeEditor.checkModified(true)) {
       return;  // sketch was modified, and user canceled
     }
     // Close the running window, avoid window boogers with multiple sketches
@@ -616,7 +616,7 @@ public class Base {
    * @param path Location of the primary pde file for the sketch.
    */
   public void handleOpenReplace(String path) {
-    if (!activeEditor.checkModified(false)) {
+    if (!activeEditor.checkModified(true)) {
       return;  // sketch was modified, and user canceled
     }
     // Close the running window, avoid window boogers with multiple sketches
