@@ -11,9 +11,7 @@
   formatted using the GNU C formatting and indenting
 */
 
-
 /* 
- * TODO: add Servo support using setPinModeCallback(pin, SERVO);
  * TODO: use Program Control to load stored profiles from EEPROM
  */
 
@@ -39,7 +37,7 @@ unsigned long currentMillis;     // store the current value from millis()
 unsigned long nextExecuteMillis; // for comparison with currentMillis
 int samplingInterval = 19;      // how often to run the main loop (in ms)
 
-Servo servos[2]; // the servo library can control servos on pins 9 and 10 only
+Servo servos[MAX_SERVOS];
 
 /*==============================================================================
  * FUNCTIONS
@@ -99,6 +97,9 @@ void setPinModeCallback(byte pin, int mode) {
   }
   
   if(pin > 1) { // ignore RxTx (pins 0 and 1)
+    if (isServoSupportedPin(pin) && mode != SERVO)
+      if (servos[pin - FIRST_SERVO_PIN].attached())
+        servos[pin - FIRST_SERVO_PIN].detach();
     if(pin > 13) 
       reportAnalogCallback(pin - 14, mode == ANALOG ? 1 : 0); // turn on/off reporting
     switch(mode) {
@@ -117,10 +118,13 @@ void setPinModeCallback(byte pin, int mode) {
       portStatus[port] = portStatus[port] | (1 << (pin - offset));
       break;
     case SERVO:
-      if((pin == 9 || pin == 10))
+      // TODO: Support Arduino Mega
+      if (isServoSupportedPin(pin)) {
         pinStatus[pin] = mode;
-      else
-        Firmata.sendString("Servo only on pins 9 and 10");
+        if (!servos[pin - FIRST_SERVO_PIN].attached())
+          servos[pin - FIRST_SERVO_PIN].attach(pin);
+      } else
+        Firmata.sendString("Servo only on pins from 2 to 13");
       break;
     case I2C:
       pinStatus[pin] = mode;
@@ -137,8 +141,8 @@ void analogWriteCallback(byte pin, int value)
 {
   switch(pinStatus[pin]) {
   case SERVO:
-    if(pin == 9)  servos[0].write(value);
-    if(pin == 10) servos[1].write(value);
+    if (isServoSupportedPin(pin))
+      servos[pin - FIRST_SERVO_PIN].write(value);
     break;
   case PWM:
     analogWrite(pin, value);
@@ -179,7 +183,6 @@ void reportAnalogCallback(byte pin, int value)
   }
   else { // everything but 0 enables reporting of that pin
     analogInputsToReport = analogInputsToReport | (1 << pin);
-    setPinModeCallback(pin, ANALOG);
   }
   // TODO: save status to EEPROM here, if changed
 }
@@ -201,12 +204,17 @@ void sysexCallback(byte command, byte argc, byte *argv)
   case SERVO_CONFIG:
     if(argc > 4) {
       // these vars are here for clarity, they'll optimized away by the compiler
-      byte pin = argv[0] - 9; // servos are pins 9 and 10, so offset for array
+      byte pin = argv[0];
       int minPulse = argv[1] + (argv[2] << 7);
       int maxPulse = argv[3] + (argv[4] << 7);
-      servos[pin].attach(argv[0], minPulse, maxPulse);
-      // TODO does the Servo have to be detach()ed before reconfiguring?
-      setPinModeCallback(pin, SERVO);
+
+      if (isServoSupportedPin(pin)) {
+        // servos are pins from 2 to 13, so offset for array
+        if (servos[pin - FIRST_SERVO_PIN].attached())
+          servos[pin - FIRST_SERVO_PIN].detach();
+        servos[pin - FIRST_SERVO_PIN].attach(pin, minPulse, maxPulse);
+        setPinModeCallback(pin, SERVO);
+      }
     }
     break;
   case SAMPLING_INTERVAL:
@@ -218,6 +226,10 @@ void sysexCallback(byte command, byte argc, byte *argv)
   }
 }
 
+boolean isServoSupportedPin(byte pin)
+{
+  return ((FIRST_SERVO_PIN <= pin) && (pin <= (FIRST_SERVO_PIN + MAX_SERVOS)));
+}
 
 /*==============================================================================
  * SETUP()
@@ -239,7 +251,7 @@ void setup()
   portStatus[1] = B11000000;  // ignore 14/15 pins 
   portStatus[2] = B00000000;
 
-  for(i=0; i<TOTAL_DIGITAL_PINS; ++i) { // TODO make this work with analogs
+  for(i=0; i < FIRST_ANALOG_PIN; ++i) {
     setPinModeCallback(i,OUTPUT);
   }
   // set all outputs to 0 to make sure internal pull-up resistors are off

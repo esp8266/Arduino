@@ -60,21 +60,18 @@ FirmataClass::FirmataClass(void)
 /* begin method for overriding default serial bitrate */
 void FirmataClass::begin(void)
 {
-  Serial.begin(57600);
-  blinkVersion();
-  delay(300);
-  printVersion();
+  begin(57600);
 }
 
 /* begin method for overriding default serial bitrate */
 void FirmataClass::begin(long speed)
 {
-  blinkVersion();
 #if defined(__AVR_ATmega128__)  // Wiring
   Serial.begin((uint32_t)speed);
 #else
   Serial.begin(speed);
 #endif
+  blinkVersion();
   delay(300);
   printVersion();
   printFirmwareVersion();
