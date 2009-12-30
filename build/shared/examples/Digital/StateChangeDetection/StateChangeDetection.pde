@@ -16,7 +16,7 @@
    most Arduino boards)
  
  created  27 Sep 2005
- modified 17 Jun 2009
+ modified 30 Dec 2009
  by Tom Igoe
  	
  http://arduino.cc/en/Tutorial/ButtonStateChange
@@ -35,6 +35,8 @@ int lastButtonState = 0;     // previous state of the button
 void setup() {
   // initialize the button pin as a input:
   pinMode(buttonPin, INPUT);
+  // initialize the LED as an output:
+  pinMode(ledPin, OUTPUT);
   // initialize serial communication:
   Serial.begin(9600);
 }
