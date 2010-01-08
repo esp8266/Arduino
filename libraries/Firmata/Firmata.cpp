@@ -299,7 +299,7 @@ void FirmataClass::sendDigital(byte pin, int value)
 void FirmataClass::sendDigitalPort(byte portNumber, int portData)
 {
   Serial.print(DIGITAL_MESSAGE | (portNumber & 0xF),BYTE);
-  Serial.print(portData % 128, BYTE); // Tx bits 0-6
+  Serial.print((byte)portData % 128, BYTE); // Tx bits 0-6
   Serial.print(portData >> 7, BYTE);  // Tx bits 7-13
 }
 

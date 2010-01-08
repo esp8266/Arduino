@@ -49,7 +49,6 @@ void outputPort(byte portNumber, byte portValue)
   if(previousPINs[portNumber] != portValue) {
     Firmata.sendDigitalPort(portNumber, portValue);
     previousPINs[portNumber] = portValue;
-    Firmata.sendDigitalPort(portNumber, portValue);
   }
 }
 
@@ -280,8 +279,7 @@ void setup()
  *============================================================================*/
 void loop() 
 {
-  /* DIGITALREAD - as fast as possible, check for changes and output them to the
-   * FTDI buffer using Serial.print()  */
+  /* DIGITALREAD - as fast as possible, check for changes and output them */
   checkDigitalInputs();  
   currentMillis = millis();
   if(currentMillis > nextExecuteMillis) {  
@@ -291,11 +289,10 @@ void loop()
     while(Firmata.available())
       Firmata.processInput();
     /* SEND FTDI WRITE BUFFER - make sure that the FTDI buffer doesn't go over
-     * 60 bytes. use a timer to sending an event character every 4 ms to
+     * 60 bytes. Ideally this could send an "event character" every 4 ms to
      * trigger the buffer to dump. */
 	
-    /* ANALOGREAD - right after the event character, do all of the
-     * analogReads().  These only need to be done every 4ms. */
+    /* ANALOGREAD - do all of the analogReads() once per poll cycle */
     for(analogPin=0;analogPin<TOTAL_ANALOG_PINS;analogPin++) {
       if( analogInputsToReport & (1 << analogPin) ) {
         Firmata.sendAnalog(analogPin, analogRead(analogPin));

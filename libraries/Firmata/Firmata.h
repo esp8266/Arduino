@@ -76,7 +76,7 @@ extern "C" {
 }
 
 
-// TODO make it a subclass of HardwareSerial
+// TODO make it a subclass of a generic Serial/Stream base class
 class FirmataClass
 {
 public:
@@ -88,27 +88,24 @@ public:
 	void printVersion(void);
     void blinkVersion(void);
     void printFirmwareVersion(void);
-//  void setFirmwareVersion(byte major, byte minor);  // see macro below
+  //void setFirmwareVersion(byte major, byte minor);  // see macro below
     void setFirmwareNameAndVersion(const char *name, byte major, byte minor);
 /* serial receive handling */
     int available(void);
     void processInput(void);
 /* serial send handling */
 	void sendAnalog(byte pin, int value);
-	void sendDigital(byte pin, int value);
+	void sendDigital(byte pin, int value); // TODO implement this
 	void sendDigitalPort(byte portNumber, int portData);
     void sendString(const char* string);
     void sendString(byte command, const char* string);
 	void sendSysex(byte command, byte bytec, byte* bytev);
-//    void print();  // TODO implement so it's compatible to Serial
-//    void println();  // TODO implement so it's compatible to Serial
 /* attach & detach callback functions to messages */
     void attach(byte command, callbackFunction newFunction);
     void attach(byte command, systemResetCallbackFunction newFunction);
     void attach(byte command, stringCallbackFunction newFunction);
     void attach(byte command, sysexCallbackFunction newFunction);
     void detach(byte command);
-// void flush();  // TODO implement flush, probably by subclassing
 
 private:
 /* firmware name and version */
