@@ -23,7 +23,8 @@
   The servos are pulsed in the background using the value most recently written using the write() method
 
   Note that analogWrite of PWM on pins associated with the timer are disabled when the first servo is attached.
-  Timers are siezed as needed in groups of 12 servos - 24 servos use two timers, 48 servos will use four.
+  Timers are seized as needed in groups of 12 servos - 24 servos use two timers, 48 servos will use four.
+  The sequence used to sieze timers is defined in timers.h
 
   The methods are:
 
@@ -46,6 +47,43 @@
 
 #include <inttypes.h>
 
+/* 
+ * Defines for 16 bit timers used with  Servo library 
+ *
+ * If _useTimerX is defined then TimerX is a 16 bit timer on the curent board
+ * timer16_Sequence_t enumerates the sequence that the timers should be allocated
+ * _Nbr_16timers indicates how many 16 bit timers are available.
+ *
+ */
+
+// Say which 16 bit timers can be used and in what order
+#if defined(__AVR_ATmega1280__)
+#define _useTimer5
+#define _useTimer1 
+#define _useTimer3
+#define _useTimer4 
+typedef enum { _timer5, _timer1, _timer3, _timer4, _Nbr_16timers } timer16_Sequence_t ;
+
+#elif defined(__AVR_ATmega32U4__)  
+#define _useTimer3
+#define _useTimer1 
+typedef enum { _timer3, _timer1, _Nbr_16timers } timer16_Sequence_t ;
+
+#elif defined(__AVR_AT90USB646__) || defined(__AVR_AT90USB1286__)
+#define _useTimer3
+#define _useTimer1
+typedef enum { _timer3, _timer1, _Nbr_16timers } timer16_Sequence_t ;
+
+#elif defined(__AVR_ATmega128__) ||defined(__AVR_ATmega1281__)||defined(__AVR_ATmega2561__)
+#define _useTimer3
+#define _useTimer1
+typedef enum { _timer3, _timer1, _Nbr_16timers } timer16_Sequence_t ;
+
+#else  // everything else
+#define _useTimer1
+typedef enum { _timer1, _Nbr_16timers } timer16_Sequence_t ;                  
+#endif
+
 #define Servo_VERSION           2      // software version of this library
 
 #define MIN_PULSE_WIDTH       544     // the shortest pulse sent to a servo  
@@ -53,11 +91,8 @@
 #define DEFAULT_PULSE_WIDTH  1500     // default pulse width when servo is attached
 #define REFRESH_INTERVAL    20000     // minumim time to refresh servos in microseconds 
 
-#if defined(__AVR_ATmega1280__)
-#define MAX_SERVOS             48     // the maximum number of servos  (valid range is from 1 to 48)
-#else
-#define MAX_SERVOS             12     // this library supports up to 12 on a standard Arduino
-#endif
+#define SERVOS_PER_TIMER       12     // the maximum number of servos controlled by one timer 
+#define MAX_SERVOS   (_Nbr_16timers  * SERVOS_PER_TIMER)
 
 #define INVALID_SERVO         255     // flag indicating an invalid servo index
 
