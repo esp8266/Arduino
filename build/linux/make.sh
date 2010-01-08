@@ -12,7 +12,7 @@ else
 
   mkdir work
   cp -r ../shared/lib work/
-  cp -r ../shared/libraries work/
+  cp -r ../../libraries work/
   cp -r ../shared/tools work/
 
   cp -r ../../hardware work/
