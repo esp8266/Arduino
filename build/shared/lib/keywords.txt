@@ -150,10 +150,12 @@ digitalRead	KEYWORD2	DigitalRead
 interrupts	KEYWORD2
 millis	KEYWORD2	Millis
 micros	KEYWORD2	Micros
-noInterrupts	KEYWORD2
+noInterrupts	KEYWORD2	NoInterrupts
+noTone	KEYWORD2	NoTone
 pinMode	KEYWORD2	PinMode
 pulseIn	KEYWORD2	PulseIn
 shiftOut	KEYWORD2	ShiftOut
+tone	KEYWORD2	Tone
 
 Serial	KEYWORD3	Serial
 Serial1	KEYWORD3	Serial
