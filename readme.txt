@@ -24,9 +24,7 @@ FTDI chip on the board. These can be found in the drivers/ directory.
   wizard to the drivers/FTDI USB Drivers sub-directory of the Arduino
   application directory.
 
-* On the Mac, mount the FTDIUSBSerialDriver_v2_1_9.dmg (on PPC Macs) or the
-  FTDIUSBSerialDriver_v2_2_9_Intel.dmg (on Intel Macs) disk image and run the
-  included FTDIUSBSerialDriver.pkg.  You will need to restart your computer.
+* On the Mac, install the FTDIUSBSerialDriver_10_4_10_5_10_6.mpkg package.
   
 * On Linux, drivers are included in kernel versions 2.4.20 or greater.
 
@@ -46,23 +44,38 @@ UPDATES
 0018
 
 [core / libraries]
+
+* Added tone() and noTone() functions for frequency generation.
+* Added Serial.end() command.
+* Added precision parameter for printing of floats / doubles.
+* Incorporated latest version of Firmata.
 * Fixed bug w/ disabling use of the RW pin in the LiquidCrystal library. 
 * No longer disabling interrupts in delayMicroseconds().
 * Fixed bug w/ micros() returning incorrect values from within an interrupt.
-* Added Serial.end() command.
-* Added precision parameter for printing of floats / doubles.
 * Fixed bug that broke use of analog inputs 8-15 on the Mega.
 
 [environment]
+
 * Synchronized with the Processing 1.0.9 code base, bringing various fixes,
   including to a bug causing saving to fail when closing the last sketch.
+
 * Added support for third-party hardware in the SKETCHBOOK/hardware folder,
   mirroring the current structure of the hardware folder in Arduino.
+
 * Added Ctrl-Shift-M / Command-Shift-M shortcut for serial monitor.
+
 * Hold down shift when pressing the Verify / Compile or Upload toolbar 
   buttons to generate verbose output (including command lines).
+
 * Moving build (on upload) from the applet/ sub-folder of the sketch
-  to a temporary directory.
+  to a temporary directory (fixing problems with uploading examples from
+  within the Mac OS X disk image or a Linux application directory).
+
+* Fixed bug the prevented the inclusion of .cpp and .h (or .c and .h) files
+  of the same name in a sketch.
+
+* Improved the Mac OS X disk image (.dmg): added a shortcut to the
+  Applications folder, a background image with arrow, and new FTDI drivers.
 
 0017 - 2009.07.25
 
