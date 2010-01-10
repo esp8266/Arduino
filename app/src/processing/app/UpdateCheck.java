@@ -49,13 +49,14 @@ import processing.core.PApplet;
  */
 public class UpdateCheck implements Runnable {
   Base base;
-  String downloadURL = "http://processing.org/download/latest.txt";
+  String downloadURL = "http://www.arduino.cc/latest.txt";
 
   static final long ONE_DAY = 24 * 60 * 60 * 1000;
 
 
   public UpdateCheck(Base base) {
     Thread thread = new Thread(this);
+    this.base = base;
     thread.start();
   }
 
@@ -98,9 +99,9 @@ public class UpdateCheck implements Runnable {
       Preferences.set("update.last", String.valueOf(now));
 
       String prompt =
-        "A new version of Processing is available,\n" +
-        "would you like to visit the Processing download page?";
-
+        "A new version of Arduino is available,\n" +
+        "would you like to visit the Arduino download page?";
+        
       if (base.activeEditor != null) {
         if (latest > Base.REVISION) {
           Object[] options = { "Yes", "No" };
@@ -113,7 +114,7 @@ public class UpdateCheck implements Runnable {
                                                     options,
                                                     options[0]);
           if (result == JOptionPane.YES_OPTION) {
-            Base.openURL("http://processing.org/download/");
+            Base.openURL("http://www.arduino.cc/en/Main/Software");
           }
         }
       }
