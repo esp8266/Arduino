@@ -1,4 +1,18 @@
-#include "pitches.h"
+/*
+  Melody
+ 
+ Plays a melody 
+ 
+ circuit:
+ * 8-ohm speaker on digital pin 8
+ 
+ created 21 Jan 2010
+ by Tom Igoe 
+ 
+ http://arduino.cc/en/Tutorial/Tone
+ 
+ */
+ #include "pitches.h"
 
 // notes in the melody:
 int melody[] = {
