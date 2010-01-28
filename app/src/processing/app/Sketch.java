@@ -407,6 +407,19 @@ public class Sketch {
                        "You can't have a .cpp file with the same name as the sketch.");
       return;
     }
+    
+    if (currentIndex == 0) {
+      for (int i = 1; i < codeCount; i++) {
+        if (sanitaryName.equalsIgnoreCase(code[i].getPrettyName()) &&
+          code[i].getExtension().equalsIgnoreCase("cpp")) {
+          Base.showMessage("Nope",
+                           "You can't rename the sketch to \"" + sanitaryName + "\"\n" +
+                           "because the sketch already has a .cpp file with that name.");
+          return;
+        }
+      }
+    }
+
 
     File newFile = new File(folder, newName);
 //    if (newFile.exists()) {  // yay! users will try anything
