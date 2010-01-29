@@ -34,6 +34,7 @@ cp dist/*.dll arduino/
 cp -r dist/drivers arduino/
 
 cp -r ../../hardware arduino/
+cp -r ../../libraries arduino/
 
 
 if [ $1 ]

@@ -18,6 +18,7 @@ else
   cp -r dist/drivers work/
 
   cp -r ../../hardware work/
+  cp -r ../../libraries work/
 
   cp ../../app/lib/antlr.jar work/lib/
   cp ../../app/lib/ecj.jar work/lib/
