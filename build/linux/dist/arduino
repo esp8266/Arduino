@@ -1,6 +1,8 @@
  #!/bin/sh
  
 APPDIR="$(dirname -- "${0}")"
+
+cd $APPDIR
  
 for LIB in \
     java/lib/rt.jar \

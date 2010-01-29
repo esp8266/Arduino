@@ -27,7 +27,6 @@ rm -rf arduino-*
 
 mkdir arduino
 cp -r ../shared/lib arduino/
-cp -r ../shared/libraries arduino/
 cp -r ../shared/tools arduino/
 cp ../../app/lib/antlr.jar arduino/lib/
 cp ../../app/lib/ecj.jar arduino/lib/
@@ -37,6 +36,7 @@ cp ../../app/lib/RXTXcomm.jar arduino/lib/
 cp ../../readme.txt arduino/
 
 cp -r ../../hardware arduino/
+cp -r ../../libraries arduino/
 
 cp -r dist/tools arduino/hardware
 cp dist/lib/librxtxSerial.so arduino/lib
