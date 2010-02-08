@@ -42,7 +42,7 @@ LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 int thisChar = 'a';
 
 void setup() {
-  // set up the LCD's number of rows and columns: 
+  // set up the LCD's number of columns and rows: 
   lcd.begin(16, 2);
   // turn on the cursor:
   lcd.cursor();
