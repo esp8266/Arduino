@@ -40,10 +40,3 @@ void loop() {
   }
   Serial.println();
 }
-
-
-
-
-
-
-
