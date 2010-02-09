@@ -4,7 +4,7 @@
  pin, without using the delay() function.  This means that other code
  can run at the same time without being interrupted by the LED code.
  
-  The circuit:
+ The circuit:
  * LED attached from pin 13 to ground.
  * Note: on most Arduinos, there is already an LED on the board
  that's attached to pin 13, so no hardware is needed for this example.
@@ -12,8 +12,8 @@
  
  created 2005
  by David A. Mellis
- modified 17 Jun 2009
- by Tom Igoe
+ modified 8 Feb 2010
+ by Paul Stoffregen
  
  http://www.arduino.cc/en/Tutorial/BlinkWithoutDelay
  */
@@ -42,17 +42,20 @@ void loop()
   // check to see if it's time to blink the LED; that is, is the difference
   // between the current time and last time we blinked the LED bigger than
   // the interval at which we want to blink the LED.
-  if (millis() - previousMillis > interval) {
+  unsigned long currentMillis = millis();
+ 
+  if(currentMillis - previousMillis > interval) {
     // save the last time you blinked the LED 
-    previousMillis = millis();   
+    previousMillis = currentMillis;   
 
     // if the LED is off turn it on and vice-versa:
     if (ledState == LOW)
       ledState = HIGH;
     else
       ledState = LOW;
-      
+
     // set the LED with the ledState of the variable:
     digitalWrite(ledPin, ledState);
   }
 }
+
