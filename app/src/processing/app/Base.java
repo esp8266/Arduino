@@ -1772,7 +1772,7 @@ public class Base {
 
 
   static public void showFAQ() {
-    showReference("faq.html");
+    showReference("FAQ.html");
   }
   
 
