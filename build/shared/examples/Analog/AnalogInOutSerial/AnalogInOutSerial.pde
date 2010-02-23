@@ -14,6 +14,8 @@
  created 29 Dec. 2008
  by Tom Igoe
  
+ This example code is in the public domain.
+ 
  */
 
 // These constants won't change.  They're used to give names
