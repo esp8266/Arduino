@@ -22,6 +22,8 @@
  
  http://arduino.cc/en/Tutorial/Calibration
  
+ This example code is in the public domain.
+ 
  */
 
 // These constants won't change:
