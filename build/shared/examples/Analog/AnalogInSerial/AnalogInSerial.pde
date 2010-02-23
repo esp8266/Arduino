@@ -12,6 +12,8 @@
  created over and over again
  by Tom Igoe and everyone who's ever used Arduino
  
+ This example code is in the public domain. It's practically in the collective unconscious by now too.
+ 
  */
  
  void setup() {
