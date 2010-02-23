@@ -15,14 +15,14 @@
  
  The circuit:
  Any analog input sensor is attached to analog in pin 0.
- 
- http://www.arduino.cc/en/Tutorial/Graph
- 
+  
  created 2006
  by David A. Mellis
  modified 14 Apr 2009
  by Tom Igoe and Scott Fitzgerald
  
+ This example code is in the public domain.
+
  http://www.arduino.cc/en/Tutorial/Graph
  */
 
@@ -51,6 +51,7 @@ void loop() {
  // Created 20 Apr 2005
  // Updated 18 Jan 2008
  // by Tom Igoe
+ // This example code is in the public domain.
  
  import processing.serial.*;
  
