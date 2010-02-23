@@ -13,6 +13,8 @@
   By David A. Mellis  <dam@mellis.org>
 
   http://www.arduino.cc/en/Tutorial/Smoothing
+  
+  This example code is in the public domain.
 
 
 */
