@@ -13,13 +13,15 @@
  * potentiometers attached to analog inputs 0 and 1 
  * pushbutton attached to digital I/O 2
  
- 
- http://www.arduino.cc/en/Tutorial/SerialCallResponse
-
  Created 26 Sept. 2005
  by Tom Igoe
  Modified 14 April 2009
  by Tom Igoe and Scott Fitzgerald
+
+ This example code is in the public domain.
+
+ http://www.arduino.cc/en/Tutorial/SerialCallResponse
+
  */
 
 int firstSensor = 0;    // first analog sensor
@@ -65,6 +67,8 @@ void establishContact() {
 
 /*
 Processing sketch to run with this example:
+
+// This example code is in the public domain.
 
 import processing.serial.*;
 
