@@ -9,6 +9,9 @@
 
   created 8 Feb 2009
   by Tom Igoe
+  
+  This example code is in the public domain.
+  
  */
 // These constants won't change.  They're used to give names
 // to the pins used:
