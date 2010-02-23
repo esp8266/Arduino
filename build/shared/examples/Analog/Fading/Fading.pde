@@ -13,6 +13,8 @@
  
  http://arduino.cc/en/Tutorial/Fading
  
+ This example code is in the public domain.
+ 
  */
 
 
