@@ -15,7 +15,10 @@
  modified 14 Apr 2009
  by Tom Igoe and Scott Fitzgerald
  
+ This example code is in the public domain.
+ 
  http://www.arduino.cc/en/Tutorial/Dimmer
+ 
  */
 
 const int ledPin = 9;      // the pin that the LED is attached to
@@ -43,6 +46,7 @@ void loop() {
 /* Processing code for this example
  // Dimmer - sends bytes over a serial port
  // by David A. Mellis
+ //This example code is in the public domain.
  
  import processing.serial.*;
  Serial port;
