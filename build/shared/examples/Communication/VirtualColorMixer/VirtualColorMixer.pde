@@ -13,6 +13,7 @@
  modified 14 Apr 2009 
  by Tom Igoe and Scott Fitzgerald
  
+  This example code is in the public domain.
  */
 
 const int redPin = 0;		// sensor to control red color
@@ -35,6 +36,7 @@ void loop()
 
 /* Processing code for this example
  
+//  This example code is in the public domain.
  
  import processing.serial.*;
  
