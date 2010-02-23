@@ -15,6 +15,8 @@
  created 13 Jun 2006
  modified 2 Jul 2009
  by Tom Igoe 
+
+ This example code is in the public domain.
  
  http://www.arduino.cc/en/Tutorial/MIDI
  
