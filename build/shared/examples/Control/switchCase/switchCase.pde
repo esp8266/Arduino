@@ -16,6 +16,8 @@
  created 1 Jul 2009
  by Tom Igoe 
  
+ This example code is in the public domain.
+ 
  http://www.arduino.cc/en/Tutorial/SwitchCase
  */
 
