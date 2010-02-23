@@ -21,6 +21,8 @@
  Modified 16 Jun 2009
  By Tom Igoe
  
+ This example code is in the public domain.
+ 
  http://arduino.cc/en/Tutorial/AnalogInput
  
  */
