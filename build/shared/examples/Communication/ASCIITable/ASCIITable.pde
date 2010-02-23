@@ -14,7 +14,10 @@
  modified 18 Jan 2009
  by Tom Igoe
  
+ This example code is in the public domain.
+
  <http://www.zambetti.com> 
+ 
  */
 void setup() 
 { 
