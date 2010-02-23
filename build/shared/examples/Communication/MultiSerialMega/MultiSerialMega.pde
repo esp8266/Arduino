@@ -13,6 +13,8 @@
  created 30 Dec. 2008
  by Tom Igoe
  
+ This example code is in the public domain.
+ 
  */
 
 
