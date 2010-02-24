@@ -2,6 +2,8 @@
  * EEPROM Clear
  *
  * Sets all of the bytes of the EEPROM to 0.
+ * This example code is in the public domain.
+
  */
 
 #include <EEPROM.h>
