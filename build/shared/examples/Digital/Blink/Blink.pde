@@ -17,6 +17,9 @@
  
  based on an orginal by H. Barragan for the Wiring i/o board
  
+This example code is in the public domain.
+
+ 
  */
 
 int ledPin =  13;    // LED connected to digital pin 13
