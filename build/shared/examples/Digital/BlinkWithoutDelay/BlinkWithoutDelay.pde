@@ -15,6 +15,9 @@
  modified 8 Feb 2010
  by Paul Stoffregen
  
+ This example code is in the public domain.
+
+ 
  http://www.arduino.cc/en/Tutorial/BlinkWithoutDelay
  */
 
