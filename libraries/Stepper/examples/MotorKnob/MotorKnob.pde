@@ -5,6 +5,7 @@
  * (or other sensor) on analog input 0.
  *
  * http://www.arduino.cc/en/Reference/Stepper
+ * This example code is in the public domain.
  */
 
 #include <Stepper.h>
