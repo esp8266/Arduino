@@ -15,6 +15,8 @@
  by David A. Mellis
  modified 5 Jul 2009
  by Tom Igoe 
+
+This example code is in the public domain.
  
  http://www.arduino.cc/en/Tutorial/Array
  */
