@@ -29,6 +29,8 @@
  modified 25 July 2009
  by David A. Mellis
  
+ This example code is in the public domain.
+ 
  http://www.arduino.cc/en/Tutorial/LiquidCrystal
  
  */
