@@ -14,6 +14,8 @@
  
  created 26 Jun 2009
  by Tom Igoe 
+
+ This example code is in the public domain.
  
  http://www.arduino.cc/en/Tutorial/BarGraph
  */
