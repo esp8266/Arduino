@@ -26,6 +26,8 @@
  * center pins are attached to analog pins 0 and 1, respectively
  * side pins attached to +5V and ground, respectively.
  
+ This example code is in the public domain.
+ 
  http://www.arduino.cc/en/Tutorial/RowColumnScanning
  
  see also http://www.tigoe.net/pcomp/code/category/arduinowiring/514 for more
