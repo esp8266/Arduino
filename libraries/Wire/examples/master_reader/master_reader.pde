@@ -7,6 +7,9 @@
 
 // Created 29 March 2006
 
+// This example code is in the public domain.
+
+
 #include <Wire.h>
 
 void setup()
