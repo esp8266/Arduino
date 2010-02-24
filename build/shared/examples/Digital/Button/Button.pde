@@ -19,7 +19,9 @@
  modified 17 Jun 2009
  by Tom Igoe
  
-  http://www.arduino.cc/en/Tutorial/Button
+ This example code is in the public domain.
+ 
+ http://www.arduino.cc/en/Tutorial/Button
  */
 
 // constants won't change. They're used here to 
