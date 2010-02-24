@@ -20,6 +20,7 @@
  modified 3 Jul 2009
  by Limor Fried
  
+This example code is in the public domain.
  
  http://www.arduino.cc/en/Tutorial/Debounce
  */
