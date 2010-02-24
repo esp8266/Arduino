@@ -17,6 +17,8 @@
    by David A. Mellis
    modified 30 Jun 2009
    by Tom Igoe
+ 
+   This example code is in the public domain.
 
  */
 
