@@ -17,8 +17,10 @@
  
  created 17 Jan 2009
  by Tom Igoe
+
+This example code is in the public domain.
  
-  http://arduino.cc/en/Tutorial/
+http://arduino.cc/en/Tutorial/IfStatement
  
  */
  
