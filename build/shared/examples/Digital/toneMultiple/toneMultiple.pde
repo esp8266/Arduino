@@ -21,23 +21,21 @@ void setup() {
 }
 
 void loop() {
-	// turn off tone function for pin 11:
+   // turn off tone function for pin 11:
    noTone(11);			
-   // play a note on pin 6 for 200 ms:
+  // play a note on pin 6 for 200 ms:
   tone(6, 440, 200);
   delay(200);
 
-	// turn off tone function for pin 6:
+  // turn off tone function for pin 6:
   noTone(6);
-   // play a note on pin 7 for 500 ms:
-
+  // play a note on pin 7 for 500 ms:
   tone(7, 494, 500);
   delay(500);
-	// turn off tone function for pin 7:
   
-  noTone(7);
-     // play a note on pin 11 for 500 ms:
-
+  // turn off tone function for pin 7:
+  noTone(7);  
+  // play a note on pin 11 for 500 ms:
   tone(11, 523, 300);
   delay(300);
 
