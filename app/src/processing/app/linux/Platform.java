@@ -67,10 +67,18 @@ public class Platform extends processing.app.Platform {
       return true;
     }
 
+    // Attempt to use xdg-open
+    try {
+      Process p = Runtime.getRuntime().exec(new String[] { "xdg-open" });
+      p.waitFor();
+      Preferences.set("launcher", "xdg-open");
+      return true;
+    } catch (Exception e) { }
+
     // Attempt to use gnome-open
     try {
       Process p = Runtime.getRuntime().exec(new String[] { "gnome-open" });
-      /*int result =*/ p.waitFor();
+      p.waitFor();
       // Not installed will throw an IOException (JDK 1.4.2, Ubuntu 7.04)
       Preferences.set("launcher", "gnome-open");
       return true;
@@ -79,7 +87,7 @@ public class Platform extends processing.app.Platform {
     // Attempt with kde-open
     try {
       Process p = Runtime.getRuntime().exec(new String[] { "kde-open" });
-      /*int result =*/ p.waitFor();
+      p.waitFor();
       Preferences.set("launcher", "kde-open");
       return true;
     } catch (Exception e) { }
@@ -100,7 +108,8 @@ public class Platform extends processing.app.Platform {
         e.printStackTrace();
       }
     } else {
-      System.out.println("not available");
+      System.out.println("No launcher set, cannot open " +
+                         file.getAbsolutePath());
     }
   }
 }

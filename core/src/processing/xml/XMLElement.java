@@ -31,6 +31,10 @@ import processing.core.PApplet;
 
 
 /**
+ * XMLElement is a representation of an XML object. The object is able to parse XML code. The methods described here are the most basic. More are documented in the Developer's Reference.
+ * <br><br>
+ * The encoding parameter inside XML files is ignored, only UTF-8 (or plain ASCII) are parsed properly.
+ * =advanced
  * XMLElement is an XML element. This is the base class used for the 
  * Processing XML library, representing a single node of an XML tree.
  * 
@@ -38,6 +42,10 @@ import processing.core.PApplet;
  *
  * @author Marc De Scheemaecker
  * @author processing.org
+ * 
+ * @webref data:composite
+ * @usage Web &amp; Application
+ * @instanceName xml any variable of type XMLElement
  */
 public class XMLElement implements Serializable {
 
@@ -103,6 +111,7 @@ public class XMLElement implements Serializable {
 
     /**
      * Creates an empty element to be used for #PCDATA content.
+     * @nowebref
      */
     public XMLElement() {
         this(null, null, null, NO_LINE);
@@ -173,6 +182,7 @@ public class XMLElement implements Serializable {
      * @param namespace the namespace URI.
      * @param systemID  the system ID of the XML data where the element starts.
      * @param lineNr    the line in the XML data where the element starts.
+     * @nowebref
      */
     public XMLElement(String fullName,
                       String namespace,
@@ -204,21 +214,25 @@ public class XMLElement implements Serializable {
      * wraps exception handling, for more advanced exception handling,
      * use the constructor that takes a Reader or InputStream.
      * @author processing.org
-     * @param filename
-     * @param parent
+     * @param filename name of the XML file to load
+     * @param parent typically use "this"
      */
     public XMLElement(PApplet parent, String filename) {
         this();
         parseFromReader(parent.createReader(filename));
     }
 
-
+    /**
+     * @nowebref
+     */
     public XMLElement(Reader r) {
         this();
         parseFromReader(r);
     }
 
-
+    /**
+     * @nowebref
+     */
     public XMLElement(String xml) {
         this();
         parseFromReader(new StringReader(xml));
@@ -348,6 +362,8 @@ public class XMLElement implements Serializable {
      * Returns the full name (i.e. the name including an eventual namespace
      * prefix) of the element.
      *
+     * @webref
+     * @brief  	Returns the name of the element.
      * @return the name, or null if the element only contains #PCDATA.
      */
     public String getName() {
@@ -507,9 +523,12 @@ public class XMLElement implements Serializable {
 
 
     /**
-     * Returns the number of children.
+     * Returns the number of children for the element.
      *
      * @return the count.
+     * @webref
+     * @see processing.xml.XMLElement#getChild(int)
+     * @see processing.xml.XMLElement#getChildren(String)
      */
     public int getChildCount() {
         return this.children.size();
@@ -554,27 +573,35 @@ public class XMLElement implements Serializable {
     /**
      * Quick accessor for an element at a particular index.
      * @author processing.org
+     * @param index the element
      */
-    public XMLElement getChild(int which) {
-        return (XMLElement) children.elementAt(which);
+    public XMLElement getChild(int index) {
+        return (XMLElement) children.elementAt(index);
     }
 
 
     /**
-     * Get a child by its name or path.
-     * @param name element name or path/to/element
+     * Returns the child XMLElement as specified by the <b>index</b> parameter. The value of the <b>index</b> parameter must be less than the total number of children to avoid going out of the array storing the child elements.
+     * When the <b>path</b> parameter is specified, then it will return all children that match that path. The path is a series of elements and sub-elements, separated by slashes.
+     * 
      * @return the element
      * @author processing.org
+     * 
+     * @webref
+     * @see processing.xml.XMLElement#getChildCount()
+     * @see processing.xml.XMLElement#getChildren(String)
+     * @brief Get a child by its name or path.
+     * @param path path to a particular element
      */
-    public XMLElement getChild(String name) {
-        if (name.indexOf('/') != -1) {
-            return getChildRecursive(PApplet.split(name, '/'), 0);
+    public XMLElement getChild(String path) {
+        if (path.indexOf('/') != -1) {
+            return getChildRecursive(PApplet.split(path, '/'), 0);
         }
         int childCount = getChildCount();
         for (int i = 0; i < childCount; i++) {
             XMLElement kid = getChild(i);
             String kidName = kid.getName();
-            if (kidName != null && kidName.equals(name)) {
+            if (kidName != null && kidName.equals(path)) {
                 return kid;
             }
         }
@@ -681,20 +708,27 @@ public class XMLElement implements Serializable {
 
 
     /**
-     * Get any children that match this name or path. Similar to getChild(),
-     * but will grab multiple matches rather than only the first.
-     * @param name element name or path/to/element
+     * Returns all of the children as an XMLElement array.
+     * When the <b>path</b> parameter is specified, then it will return all children that match that path.
+     * The path is a series of elements and sub-elements, separated by slashes.
+     * 
+     * @param path element name or path/to/element
      * @return array of child elements that match
      * @author processing.org
+     * 
+     * @webref
+     * @brief Returns all of the children as an XMLElement array.
+     * @see processing.xml.XMLElement#getChildCount()
+     * @see processing.xml.XMLElement#getChild(int)
      */
-    public XMLElement[] getChildren(String name) {
-        if (name.indexOf('/') != -1) {
-        	return getChildrenRecursive(PApplet.split(name, '/'), 0);
+    public XMLElement[] getChildren(String path) {
+        if (path.indexOf('/') != -1) {
+        	return getChildrenRecursive(PApplet.split(path, '/'), 0);
         }
         // if it's a number, do an index instead
         // (returns a single element array, since this will be a single match
-        if (Character.isDigit(name.charAt(0))) {
-        	return new XMLElement[] { getChild(Integer.parseInt(name)) };
+        if (Character.isDigit(path.charAt(0))) {
+        	return new XMLElement[] { getChild(Integer.parseInt(path)) };
         }
         int childCount = getChildCount();
         XMLElement[] matches = new XMLElement[childCount];
@@ -702,7 +736,7 @@ public class XMLElement implements Serializable {
         for (int i = 0; i < childCount; i++) {
         	XMLElement kid = getChild(i);
         	String kidName = kid.getName();
-        	if (kidName != null && kidName.equals(name)) {
+        	if (kidName != null && kidName.equals(path)) {
         		matches[matchCount++] = kid;
         	}
         }
@@ -882,12 +916,22 @@ public class XMLElement implements Serializable {
         }
     }
 
-
+    
     public String getStringAttribute(String name) {
         return getAttribute(name);
     }
 
-
+    /**
+     * Returns a String attribute of the element.
+     * If the <b>default</b> parameter is used and the attribute doesn't exist, the <b>default</b> value is returned.
+     * When using the version of the method without the <b>default</b> parameter, if the attribute doesn't exist, the value 0 is returned.
+     * 
+     * @webref
+     * @param name the name of the attribute
+     * @param default Value value returned if the attribute is not found
+     * 
+     * @brief Returns a String attribute of the element.
+     */
     public String getStringAttribute(String name, String defaultValue) {
         return getAttribute(name, defaultValue);
     }
@@ -899,18 +943,24 @@ public class XMLElement implements Serializable {
         return getAttribute(name, namespace, defaultValue);
     }
 
-
+    /**
+     * Returns an integer attribute of the element.
+     */
     public int getIntAttribute(String name) {
         return getIntAttribute(name, 0);
     }
 
 
     /**
-     * Returns the value of an attribute.
+     * Returns an integer attribute of the element.
+     * If the <b>default</b> parameter is used and the attribute doesn't exist, the <b>default</b> value is returned.
+     * When using the version of the method without the <b>default</b> parameter, if the attribute doesn't exist, the value 0 is returned.
      *
-     * @param name the non-null full name of the attribute.
-     * @param defaultValue the default value of the attribute.
+     * @param name the name of the attribute
+     * @param defaultValue value returned if the attribute is not found
      *
+     * @webref
+     * @brief Returns an integer attribute of the element.
      * @return the value, or defaultValue if the attribute does not exist.
      */
     public int getIntAttribute(String name,
@@ -944,12 +994,17 @@ public class XMLElement implements Serializable {
 
 
     /**
-     * Returns the value of an attribute.
+     * Returns a float attribute of the element.
+     * If the <b>default</b> parameter is used and the attribute doesn't exist, the <b>default</b> value is returned.
+     * When using the version of the method without the <b>default</b> parameter, if the attribute doesn't exist, the value 0 is returned.
      *
-     * @param name the non-null full name of the attribute.
-     * @param defaultValue the default value of the attribute.
+     * @param name the name of the attribute
+     * @param defaultValue value returned if the attribute is not found
      *
      * @return the value, or defaultValue if the attribute does not exist.
+     * 
+     * @webref
+     * @brief Returns a float attribute of the element.
      */
     public float getFloatAttribute(String name,
                                    float defaultValue) {
@@ -966,6 +1021,7 @@ public class XMLElement implements Serializable {
      * @param defaultValue the default value of the attribute.
      *
      * @return the value, or defaultValue if the attribute does not exist.
+     * @nowebref
      */
     public float getFloatAttribute(String name,
                                    String namespace,
@@ -1253,11 +1309,15 @@ public class XMLElement implements Serializable {
 
 
     /**
+     * Returns the content of an element. If there is no such content, <b>null</b> is returned.
+     * =advanced
      * Return the #PCDATA content of the element. If the element has a
      * combination of #PCDATA content and child elements, the #PCDATA
      * sections can be retrieved as unnamed child objects. In this case,
      * this method returns null.
      *
+     * @webref 
+     * @brief  	Returns the content of an element
      * @return the content.
      */
     public String getContent() {

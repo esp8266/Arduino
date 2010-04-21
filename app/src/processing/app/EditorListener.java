@@ -103,6 +103,10 @@ public class EditorListener {
     char c = event.getKeyChar();
     int code = event.getKeyCode();
 
+//    if (code == KeyEvent.VK_SHIFT) {
+//      editor.toolbar.setShiftPressed(true);
+//    }
+
     //System.out.println((int)c + " " + code + " " + event);
     //System.out.println();
 
@@ -455,6 +459,13 @@ public class EditorListener {
     }
     return false;
   }
+
+
+//  public boolean keyReleased(KeyEvent event) {
+//    if (code == KeyEvent.VK_SHIFT) {
+//      editor.toolbar.setShiftPressed(false);
+//    }
+//  }
 
 
   public boolean keyTyped(KeyEvent event) {

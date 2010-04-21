@@ -24,7 +24,7 @@ import java.util.*;
  * to the implementations of this class to do so.
  *
  * @author Slava Pestov
- * @version $Id: InputHandler.java 4168 2008-08-09 17:24:37Z fry $
+ * @version $Id: InputHandler.java 6126 2010-02-16 23:43:53Z fry $
  */
 public abstract class InputHandler extends KeyAdapter
 {
@@ -70,6 +70,9 @@ public abstract class InputHandler extends KeyAdapter
         public static final ActionListener SELECT_PREV_WORD = new prev_word(true);
         public static final ActionListener REPEAT = new repeat();
         public static final ActionListener TOGGLE_RECT = new toggle_rect();
+        public static final ActionListener CLIPBOARD_CUT = new clipboard_cut();  // [fry]
+        public static final ActionListener CLIPBOARD_COPY = new clipboard_copy();
+        public static final ActionListener CLIPBOARD_PASTE = new clipboard_paste();
 
         // Default action
         public static final ActionListener INSERT_CHAR = new insert_char();
@@ -113,6 +116,9 @@ public abstract class InputHandler extends KeyAdapter
                 actions.put("repeat",REPEAT);
                 actions.put("toggle-rect",TOGGLE_RECT);
                 actions.put("insert-char",INSERT_CHAR);
+                actions.put("clipboard-cut",CLIPBOARD_CUT);
+                actions.put("clipboard-copy",CLIPBOARD_COPY);
+                actions.put("clipboard-paste",CLIPBOARD_PASTE);
         }
 
         /**
@@ -1076,6 +1082,34 @@ public abstract class InputHandler extends KeyAdapter
                                 !textArea.isSelectionRectangular());
                 }
         }
+
+        
+        public static class clipboard_cut implements ActionListener
+        {
+                public void actionPerformed(ActionEvent evt)
+                {
+                        getTextArea(evt).cut();
+                }
+        }
+
+        
+        public static class clipboard_copy implements ActionListener
+        {
+                public void actionPerformed(ActionEvent evt)
+                {
+                        getTextArea(evt).copy();
+                }
+        }
+        
+        
+        public static class clipboard_paste implements ActionListener
+        {
+                public void actionPerformed(ActionEvent evt)
+                {
+                        getTextArea(evt).paste();
+                }
+        }
+
 
         public static class insert_char implements ActionListener,
                 InputHandler.NonRepeatable

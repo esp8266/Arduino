@@ -22,6 +22,9 @@ import java.awt.event.*;
 import java.awt.*;
 import java.util.Enumeration;
 import java.util.Vector;
+import java.awt.im.InputMethodRequests;
+
+import processing.app.syntax.im.InputMethodSupport;
 
 /**
  * jEdit's text area component. It is more suited for editing program
@@ -51,7 +54,7 @@ import java.util.Vector;
  *     + "}");</pre>
  *
  * @author Slava Pestov
- * @version $Id: JEditTextArea.java 5625 2009-06-07 21:08:59Z fry $
+ * @version $Id: JEditTextArea.java 6123 2010-02-16 21:43:44Z fry $
  */
 public class JEditTextArea extends JComponent
 {
@@ -127,6 +130,16 @@ public class JEditTextArea extends JComponent
       });
   }
 
+  /**
+  * Inline Input Method Support for Japanese.
+  */
+  private InputMethodSupport inputMethodSupport = null;
+  public InputMethodRequests getInputMethodRequests() {
+		if (inputMethodSupport == null) {
+			inputMethodSupport = new InputMethodSupport(this);
+		}
+		return inputMethodSupport;
+  }
 
   /**
    * Get current position of the vertical scroll bar. [fry]

@@ -65,7 +65,8 @@ public class EventThread extends Thread {
   // Maps ThreadReference to ThreadTrace instances
   private Map traceMap = new HashMap();
 
-  EventThread(Runner parent, VirtualMachine vm, String[] excludes, PrintWriter writer) {
+  
+  public EventThread(Runner parent, VirtualMachine vm, String[] excludes, PrintWriter writer) {
     super("event-handler");
     this.parent = parent;
     this.vm = vm;
@@ -103,7 +104,7 @@ public class EventThread extends Thread {
    * @param excludes     Class patterns for which we don't want events
    * @param watchFields  Do we want to watch assignments to fields
    */
-  void setEventRequests(boolean watchFields) {
+  public void setEventRequests(boolean watchFields) {
     EventRequestManager mgr = vm.eventRequestManager();
 
 //    VMDeathRequest deathReq = mgr.createVMDeathRequest();

@@ -38,23 +38,23 @@ import javax.imageio.ImageIO;
  * Before an image is used, it must be loaded with the <b>loadImage()</b> function.
  * The <b>PImage</b> object contains fields for the <b>width</b> and <b>height</b> of the image,
  * as well as an array called <b>pixels[]</b> which contains the values for every pixel in the image.
- * A group of methods, described below, allow easy access to the image's pixels and alpha channel and simplify the process of compositing.
+ * A group of methods, described below, allow easy access to the image's pixels and alpha channel and simplify the process of compositing. 
  * <br><br>Before using the <b>pixels[]</b> array, be sure to use the <b>loadPixels()</b> method on the image to make sure that the pixel data is properly loaded.
  * <br><br>To create a new image, use the <b>createImage()</b> function (do not use <b>new PImage()</b>).
  * =advanced
- *
+ * 
  * Storage class for pixel data. This is the base class for most image and
  * pixel information, such as PGraphics and the video library classes.
  * <P>
  * Code for copying, resizing, scaling, and blending contributed
  * by <A HREF="http://www.toxi.co.uk">toxi</A>.
  * <P>
- *
+ * 
  * @webref image
  * @usage Web &amp; Application
  * @instanceName img any variable of type PImage
  * @see processing.core.PApplet#loadImage(String)
- * @see processing.core.PGraphics#imageMode(int)
+ * @see processing.core.PApplet#imageMode(int)
  * @see processing.core.PApplet#createImage(int, int)
  */
 public class PImage implements PConstants, Cloneable {
@@ -76,20 +76,20 @@ public class PImage implements PConstants, Cloneable {
    * After the array data has been modified, the <b>updatePixels()</b> method must be run to update the changes.
    * Without <b>loadPixels()</b>, running the code may (or will in future releases) result in a NullPointerException.
    * @webref
-   * @brief     Array containing the color of every pixel in the image
+   * @brief  	Array containing the color of every pixel in the image
    */
   public int[] pixels;
-
+  
   /**
    * The width of the image in units of pixels.
    * @webref
-   * @brief     Image width
+   * @brief  	Image width
    */
   public int width;
   /**
    * The height of the image in units of pixels.
    * @webref
-   * @brief     Image height
+   * @brief  	Image height
    */
   public int height;
 
@@ -168,7 +168,7 @@ public class PImage implements PConstants, Cloneable {
   }
 
   /**
-   *
+   * 
    * @param width image width
    * @param height image height
    * @param format Either RGB, ARGB, ALPHA (grayscale alpha channel)
@@ -218,7 +218,7 @@ public class PImage implements PConstants, Cloneable {
    * Construct a new PImage from a java.awt.Image. This constructor assumes
    * that you've done the work of making sure a MediaTracker has been used
    * to fully download the data and that the img is valid.
-   *
+   * 
    * @param img assumes a MediaTracker has been used to fully download the data and the img is valid
    */
   public PImage(java.awt.Image img) {
@@ -331,7 +331,7 @@ public class PImage implements PConstants, Cloneable {
    * <p/>
    * For subclasses where the pixels[] buffer isn't set by default,
    * this should copy all data into the pixels[] array
-   *
+   * 
    * @webref
    * @brief Loads the pixel data for the image into its pixels[] array
    */
@@ -427,12 +427,12 @@ public class PImage implements PConstants, Cloneable {
 
   /**
    * Resize the image to a new width and height. To make the image scale proportionally, use 0 as the value for the <b>wide</b> or <b>high</b> parameter.
-   *
+   * 
    * @webref
    * @brief Changes the size of an image to a new width and height
    * @param wide the resized image width
    * @param high the resized image height
-   *
+   * 
    * @see processing.core.PImage#get(int, int, int, int)
    */
   public void resize(int wide, int high) {  // ignore
@@ -508,14 +508,14 @@ public class PImage implements PConstants, Cloneable {
    * Reads the color of any pixel or grabs a group of pixels. If no parameters are specified, the entire image is returned. Get the value of one pixel by specifying an x,y coordinate. Get a section of the display window by specifing an additional <b>width</b> and <b>height</b> parameter. If the pixel requested is outside of the image window, black is returned. The numbers returned are scaled according to the current color ranges, but only RGB values are returned by this function. Even though you may have drawn a shape with <b>colorMode(HSB)</b>, the numbers returned will be in RGB.
    * <br><br>Getting the color of a single pixel with <b>get(x, y)</b> is easy, but not as fast as grabbing the data directly from <b>pixels[]</b>. The equivalent statement to "get(x, y)" using <b>pixels[]</b> is "pixels[y*width+x]". Processing requires calling <b>loadPixels()</b> to load the display window data into the <b>pixels[]</b> array before getting the values.
    * <br><br>As of release 0149, this function ignores <b>imageMode()</b>.
-   *
+   * 
    * @webref
-   * @brief Reads the color of any pixel or grabs a rectangle of pixels
+   * @brief  	Reads the color of any pixel or grabs a rectangle of pixels
    * @param x x-coordinate of the pixel
    * @param y y-coordinate of the pixel
    * @param w width of pixel rectangle to get
    * @param h height of pixel rectangle to get
-   *
+   * 
    * @see processing.core.PImage#set(int, int, int)
    * @see processing.core.PImage#pixels
    * @see processing.core.PImage#copy(PImage, int, int, int, int, int, int, int, int)
@@ -585,19 +585,19 @@ public class PImage implements PConstants, Cloneable {
     }
   }
 
-
   /**
-   * Changes the color of any pixel or writes an image directly into the display window. The <b>x</b> and <b>y</b> parameters specify the pixel to change and the <b>color</b> parameter specifies the color value. The color parameter is affected by the current color mode (the default is RGB values from 0 to 255). When setting an image, the x and y parameters define the coordinates for the upper-left corner of the image.
-   * <br><br>Setting the color of a single pixel with <b>set(x, y)</b> is easy, but not as fast as putting the data directly into <b>pixels[]</b>. The equivalent statement to "set(x, y, #000000)" using <b>pixels[]</b> is "pixels[y*width+x] = #000000". You must call <b>loadPixels()</b> to load the display window data into the <b>pixels[]</b> array before setting the values and calling <b>updatePixels()</b> to update the window with any changes.
-   * <br><br>As of release 1.0, this function ignores <b>imageMode()</b>.
-   * <br><br>Due to what appears to be a bug in Apple's Java implementation, the point() and set() methods are extremely slow in some circumstances when used with the default renderer. Using P2D or P3D will fix the problem. Grouping many calls to point() or set() together can also help. (<a href="http://dev.processing.org/bugs/show_bug.cgi?id=1094">Bug 1094</a>)
-   * =advanced
+   * Changes the color of any pixel or writes an image directly into the image. The <b>x</b> and <b>y</b> parameter specify the pixel or the upper-left corner of the image. The <b>color</b> parameter specifies the color value.<br><br>Setting the color of a single pixel with <b>set(x, y)</b> is easy, but not as fast as putting the data directly into <b>pixels[]</b>. The equivalent statement to "set(x, y, #000000)" using <b>pixels[]</b> is "pixels[y*width+x] = #000000". Processing requires calling <b>loadPixels()</b> to load the display window data into the <b>pixels[]</b> array before getting the values and calling <b>updatePixels()</b> to update the window.
    * <br><br>As of release 0149, this function ignores <b>imageMode()</b>.
-   *
-   * @webref image:pixels
-   * @param x x-coordinate of the pixel
-   * @param y y-coordinate of the pixel
+   * 
+   * @webref
+   * @brief  	Writes a color to any pixel or writes an image into another
+   * @param x x-coordinate of the pixel or upper-left corner of the image
+   * @param y y-coordinate of the pixel or upper-left corner of the image
    * @param c any value of the color datatype
+   * 
+   * @see processing.core.PImage#get(int, int, int, int)
+   * @see processing.core.PImage#pixels
+   * @see processing.core.PImage#copy(PImage, int, int, int, int, int, int, int, int)
    */
   public void set(int x, int y, int c) {
     if ((x < 0) || (y < 0) || (x >= width) || (y >= height)) return;
@@ -681,7 +681,7 @@ public class PImage implements PConstants, Cloneable {
    * For a more accurate conversion, first use filter(GRAY)
    * which will make the image into a "correct" grayscale by
    * performing a proper luminance-based conversion.
-   *
+   * 
    * @param maskArray any array of Integer numbers used as the alpha channel, needs to be same length as the image's pixel array
    */
   public void mask(int maskArray[]) {
@@ -707,11 +707,10 @@ public class PImage implements PConstants, Cloneable {
    *  This method is useful for creating dynamically generated alpha masks.
    *  This array must be of the same length as the target image's pixels array and should contain only grayscale data of values between 0-255.
    * @webref
-   * @brief     Masks part of the image from displaying
+   * @brief  	Masks part of the image from displaying
    * @param maskImg any PImage object used as the alpha channel for "img", needs to be same size as "img"
    */
   public void mask(PImage maskImg) {
-    maskImg.loadPixels();
     mask(maskImg.pixels);
   }
 
@@ -810,7 +809,7 @@ public class PImage implements PConstants, Cloneable {
    * <P/>
    * Gaussian blur code contributed by
    * <A HREF="http://incubator.quasimondo.com">Mario Klingemann</A>
-   *
+   * 
    * @webref
    * @brief Converts the image to grayscale or black and white
    * @param kind Either THRESHOLD, GRAY, INVERT, POSTERIZE, BLUR, OPAQUE, ERODE, or DILATE
@@ -1178,7 +1177,7 @@ public class PImage implements PConstants, Cloneable {
           if (idxRight>=maxRowIdx)
             idxRight=currIdx;
           if (idxUp<0)
-            idxUp=currIdx;
+            idxUp=0;
           if (idxDown>=maxIdx)
             idxDown=currIdx;
 
@@ -1235,7 +1234,7 @@ public class PImage implements PConstants, Cloneable {
           if (idxRight>=maxRowIdx)
             idxRight=currIdx;
           if (idxUp<0)
-            idxUp=currIdx;
+            idxUp=0;
           if (idxDown>=maxIdx)
             idxDown=currIdx;
 
@@ -1299,9 +1298,9 @@ public class PImage implements PConstants, Cloneable {
   /**
    * Copies a region of pixels from one image into another. If the source and destination regions aren't the same size, it will automatically resize source pixels to fit the specified target region. No alpha information is used in the process, however if the source image has an alpha channel set, it will be copied as well.
    * <br><br>As of release 0149, this function ignores <b>imageMode()</b>.
-   *
+   * 
    * @webref
-   * @brief     Copies the entire image
+   * @brief  	Copies the entire image
    * @param sx X coordinate of the source's upper left corner
    * @param sy Y coordinate of the source's upper left corner
    * @param sw source image width
@@ -1311,9 +1310,9 @@ public class PImage implements PConstants, Cloneable {
    * @param dw destination image width
    * @param dh destination image height
    * @param src an image variable referring to the source image.
-   *
-   * @see processing.core.PGraphics#alpha(int)
-   * @see processing.core.PImage#blend(PImage, int, int, int, int, int, int, int, int, int)
+   * 
+   * @see processing.core.PApplet#alpha(int)
+   * @see processing.core.PApplet#blend(PImage, int, int, int, int, int, int, int, int, int)
    */
   public void copy(PImage src,
                    int sx, int sy, int sw, int sh,
@@ -1422,7 +1421,8 @@ public class PImage implements PConstants, Cloneable {
 
   /**
    * Blends one area of this image to another area.
-   *
+   * 
+   * 
    * @see processing.core.PImage#blendColor(int,int,int)
    */
   public void blend(int sx, int sy, int sw, int sh,
@@ -1449,7 +1449,7 @@ public class PImage implements PConstants, Cloneable {
    * BURN - Darker areas are applied, increasing contrast, ignores lights. Called "Color Burn" in Illustrator and Photoshop.<br><br>
    * All modes use the alpha information (highest byte) of source image pixels as the blending factor. If the source and destination regions are different sizes, the image will be automatically resized to match the destination size. If the <b>srcImg</b> parameter is not used, the display window is used as the source image.<br><br>
    * As of release 0149, this function ignores <b>imageMode()</b>.
-   *
+   * 
    * @webref
    * @brief  Copies a pixel or rectangle of pixels using different blending modes
    * @param src an image variable referring to the source image
@@ -1462,9 +1462,9 @@ public class PImage implements PConstants, Cloneable {
    * @param dw destination image width
    * @param dh destination image height
    * @param mode Either BLEND, ADD, SUBTRACT, LIGHTEST, DARKEST, DIFFERENCE, EXCLUSION, MULTIPLY, SCREEN, OVERLAY, HARD_LIGHT, SOFT_LIGHT, DODGE, BURN
-   *
-   * @see processing.core.PGraphics#alpha(int)
-   * @see processing.core.PGraphics#copy(PImage, int, int, int, int, int, int, int, int)
+   * 
+   * @see processing.core.PApplet#alpha(int)
+   * @see processing.core.PApplet#copy(PImage, int, int, int, int, int, int, int, int)
    * @see processing.core.PImage#blendColor(int,int,int)
    */
   public void blend(PImage src,
@@ -2770,7 +2770,7 @@ public class PImage implements PConstants, Cloneable {
    * To save an image created within the code, rather than through loading, it's necessary to make the image with the <b>createImage()</b>
    * function so it is aware of the location of the program and can therefore save the file to the right place.
    * See the <b>createImage()</b> reference for more information.
-   *
+   * 
    * =advanced
    * Save this image to disk.
    * <p>
@@ -2795,7 +2795,7 @@ public class PImage implements PConstants, Cloneable {
    * The ImageIO API claims to support wbmp files, however they probably
    * require a black and white image. Basic testing produced a zero-length
    * file with no error.
-   *
+   * 
    * @webref
    * @brief Saves the image to a TIFF, TARGA, PNG, or JPEG file
    * @param filename a sequence of letters and numbers

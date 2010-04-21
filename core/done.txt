@@ -1,3 +1,58 @@
+0178 core (private)
+X filter(DILATE/ERODE)
+X   dilate(boolean) has bug in clamping of top kernel coordinate
+X   http://dev.processing.org/bugs/show_bug.cgi?id=1477
+X deprecated 'screen', adding screenW and screenH
+X write implementation for get/set methods inside PImage (w/o pixels[])
+
+
+0177 core (private)
+X no changes
+
+
+0176 core (private)
+X opengl sketches run at 30fps in present mode on OS X
+o   still having problems w/ full screen non-FSEM
+X   http://dev.processing.org/bugs/show_bug.cgi?id=1425
+X PFont not working well with lots of characters
+X   only create bitmap chars on the fly when needed (in createFont)
+X Implement better caching mechanism when creating large fonts
+X   http://dev.processing.org/bugs/show_bug.cgi?id=1111
+X fix problem with "create font" still showing anti-aliased text
+X don't make fonts power of 2
+X PGraphics3D: beginDraw does not release old textures
+X   http://dev.processing.org/bugs/show_bug.cgi?id=1423
+X   fix from taifun_browser
+X removing camera() and perspective() from setSize() trashes resize
+X   probably regression b/c camera/perspective can't be called then
+X   http://dev.processing.org/bugs/show_bug.cgi?id=1391
+
+
+0175 core (private) 
+X changed createInputRaw() to only bother checking URLs if : present
+
+
+0174 core (private)
+X svg paths that use 'e' (exponent) not handled properly
+X   http://dev.processing.org/bugs/show_bug.cgi?id=1408
+
+
+0173 core (private)
+X Re-enabled hack for temporary clipping. 
+X   Clipping still needs to be implemented properly, however. Please help!
+X   http://dev.processing.org/bugs/show_bug.cgi?id=1393
+
+
+0172 core (private)
+X no changes to the core (or were there?) 
+
+
+0171 core (1.0.9)
+X Blurred PImages in OPENGL sketches
+X   removed NPOT texture support (for further testing)
+X   http://dev.processing.org/bugs/show_bug.cgi?id=1352
+
+
 0170 core (1.0.8)
 X added some min/max functions that work with doubles
 X   not sure if those are staying in or not

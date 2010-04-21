@@ -12,6 +12,7 @@
 package processing.app.syntax;
 
 import processing.app.*;
+import processing.app.syntax.im.CompositionTextPainter;
 
 import javax.swing.ToolTipManager;
 import javax.swing.text.*;
@@ -32,6 +33,9 @@ implements TabExpander, Printable
   boolean printing;
   /** Current setting for editor.antialias preference */
   boolean antialias;
+
+  /** A specific painter composed by the InputMethod.*/
+  protected CompositionTextPainter compositionTextPainter;
 
   /**
    * Creates a new repaint manager. This should be not be called
@@ -72,6 +76,16 @@ implements TabExpander, Printable
     eolMarkerColor = defaults.eolMarkerColor;
     eolMarkers = defaults.eolMarkers;
   }
+
+  /**
+   * Get CompositionTextPainter. if CompositionTextPainter is not created, create it.
+   */
+   public CompositionTextPainter getCompositionTextpainter(){
+     if(compositionTextPainter == null){
+       compositionTextPainter = new CompositionTextPainter(textArea);
+     }
+     return compositionTextPainter;
+   }
 
   /**
    * Returns if this component can be traversed by pressing the
@@ -602,7 +616,12 @@ implements TabExpander, Printable
 
     y += fm.getHeight();
     x = Utilities.drawTabbedText(currentLine,x,y,gfx,this,0);
-
+    /*
+     * Draw characters via input method. 
+     */
+    if (compositionTextPainter != null && compositionTextPainter.hasComposedTextLayout()) {
+      compositionTextPainter.draw(gfx, lineHighlightColor);
+    }
     if (eolMarkers) {
       gfx.setColor(eolMarkerColor);
       gfx.drawString(".",x,y);
@@ -625,7 +644,12 @@ implements TabExpander, Printable
     x = SyntaxUtilities.paintSyntaxLine(currentLine,
                                         currentLineTokens,
                                         styles, this, gfx, x, y);
-
+    /*
+     * Draw characters via input method. 
+     */
+    if (compositionTextPainter != null && compositionTextPainter.hasComposedTextLayout()) {
+      compositionTextPainter.draw(gfx, lineHighlightColor);
+    }
     if (eolMarkers) {
       gfx.setColor(eolMarkerColor);
       gfx.drawString(".",x,y);

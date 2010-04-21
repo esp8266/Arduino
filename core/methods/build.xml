@@ -1,0 +1,28 @@
+<project name="methods" default="task-lib">
+
+  <target name="compile">
+    <mkdir dir="bin" />
+    <!--		<javac target="1.5" srcdir="src" destdir="bin" classpath="../ant/ant.jar" debug="true"/>-->
+<!--    <javac target="1.5" srcdir="src" destdir="bin" classpath="/usr/share/ant/ant.jar" debug="true"/>-->
+    <javac target="1.5" 
+	   srcdir="src" destdir="bin" 
+	   debug="true" 
+	   includeantruntime="true" />
+  </target>
+  
+  <target name="task-lib" depends="compile">
+    <jar basedir="bin" destfile="methods.jar" />
+  </target>
+  
+  <target name="demo">
+    <taskdef name="methods" 
+	     classname="PAppletMethods" 
+	     classpath="methods.jar" />
+    <preproc dir="demo"/>
+  </target>
+  
+  <target name="clean">
+    <delete dir="bin" />
+    <delete file="methods.jar" />
+  </target>
+</project>

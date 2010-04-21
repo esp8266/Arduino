@@ -25,12 +25,15 @@ package processing.app.macosx;
 import java.awt.Insets;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.lang.reflect.Method;
+import java.net.URI;
 
 import javax.swing.UIManager;
 
 import com.apple.eio.FileManager;
 
 import processing.app.Base;
+import processing.core.PApplet;
 
 
 /**
@@ -103,36 +106,45 @@ public class Platform extends processing.app.Platform {
 
 
   public void openURL(String url) throws Exception {
-    if (!url.startsWith("http://")) {
+    if (PApplet.javaVersion < 1.6f) {
+      if (url.startsWith("http://")) {
+        // formerly com.apple.eio.FileManager.openURL(url);
+        // but due to deprecation, instead loading dynamically
+        try {
+          Class<?> eieio = Class.forName("com.apple.eio.FileManager");
+          Method openMethod =
+            eieio.getMethod("openURL", new Class[] { String.class });
+          openMethod.invoke(null, new Object[] { url });
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      } else {
       // Assume this is a file instead, and just open it.
       // Extension of http://dev.processing.org/bugs/show_bug.cgi?id=1010
       processing.core.PApplet.open(url);
-
-      /*
-      // prepend file:// on this guy since it's a file
-      url = "file://" + url;
-
-      // replace spaces with %20 for the file url
-      // otherwise the mac doesn't like to open it
-      // can't just use URLEncoder, since that makes slashes into
-      // %2F characters, which is no good. some might say "useless"
-      if (url.indexOf(' ') != -1) {
-        StringBuffer sb = new StringBuffer();
-        char c[] = url.toCharArray();
-        for (int i = 0; i < c.length; i++) {
-          if (c[i] == ' ') {
-            sb.append("%20");
-          } else {
-            sb.append(c[i]);
-          }
-        }
-        url = sb.toString();
       }
-      */
+    } else {
+      try {
+        Class<?> desktopClass = Class.forName("java.awt.Desktop");
+        Method getMethod = desktopClass.getMethod("getDesktop");
+        Object desktop = getMethod.invoke(null, new Object[] { });
+
+        // for Java 1.6, replacing with java.awt.Desktop.browse() 
+        // and java.awt.Desktop.open()
+        if (url.startsWith("http://")) {  // browse to a location
+          Method browseMethod =
+            desktopClass.getMethod("browse", new Class[] { URI.class });
+          browseMethod.invoke(desktop, new Object[] { new URI(url) });
+        } else {  // open a file
+          Method openMethod =
+            desktopClass.getMethod("open", new Class[] { File.class });
+          openMethod.invoke(desktop, new Object[] { new File(url) });
+          }
+      } catch (Exception e) {
+        e.printStackTrace();
+        }
+      }
     }
-    // for Java 1.6, replace with java.awt.Desktop.browse() and java.awt.Desktop.open()
-    com.apple.eio.FileManager.openURL(url);
-  }
 
 
   public boolean openFolderAvailable() {

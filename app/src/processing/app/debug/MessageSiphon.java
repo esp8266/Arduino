@@ -29,7 +29,7 @@ import java.io.*;
 /**
  * Slurps up messages from compiler.
  */
-class MessageSiphon implements Runnable {
+public class MessageSiphon implements Runnable {
   BufferedReader streamReader;
   Thread thread;
   MessageConsumer consumer;
@@ -84,4 +84,9 @@ class MessageSiphon implements Runnable {
       thread = null;
     }
   }
+  
+  
+  public Thread getThread() {
+    return thread;
+}
 }

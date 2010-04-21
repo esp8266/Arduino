@@ -1,16 +1,94 @@
-0171 core
-X Blurred PImages in OPENGL sketches
-X   removed NPOT texture support (for further testing)
-X   http://dev.processing.org/bugs/show_bug.cgi?id=1352
+0179 core
+X screenWidth/Height instead of screenW/H
+X open up the pdf library more (philho)
+X   http://dev.processing.org/bugs/show_bug.cgi?id=1343
+X cache font information for the PDF library to improve setup time
+X when using createFont("xxxx.ttf"), should use textMode(SHAPE) with PDF
+X   because ttf files will not be installed on the system when opening pdf
+X   added error messages for users
+X bring back old-style textAscent() 
+X   needs to just quickly run characters d and p
+X   only takes a couple ms, so no problem
+X pdf library
+X   throw an error with the black boxes
+X   throw an error if loading fonts from a file, and not using mode(SHAPE)
+X implement default font
+X   this can be done to replace the exception handler in PGraphics
+o   however it needs to be a legit font, so that it works w/ pdf
+o   or maybe pdf just has its own default?
+X create characters on the fly when createFont() is used
+o memory leak problem with fonts in JAVA2D
+X   can't get this to crash anymore
+o   http://dev.processing.org/bugs/show_bug.cgi?id=1252
 
-_ open up the pdf library more (philho)
-_   http://dev.processing.org/bugs/show_bug.cgi?id=1343
+earlier
+X if no draw() method, and renderer is not displayable, then exit
+X   static mode PDFs shouldn't just hang
+
+
+big ones
+_ ortho() behaving differently in P3D vs OPENGL
+_   http://dev.processing.org/bugs/show_bug.cgi?id=100
+_   shows a blank canvas
+_   (was only happening once b/c was drawing first in perspective)
+_   seems to be mapping to 0, 0 - width/2, height/2
+_   fix 3D > OrthoVsPerspective example once ortho works properly
+_     there's a depth problem in addition to the ortho weirdness
+_ modelx/y/z broken when aiming a camera
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1074
+_ opengl + resize window => window content garbled
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1360
+_ modify PVector to include better methods for chaining operations
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1415
+
+quickies
+_ img.get() weirdness
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1198
+_ copy and blend scale when unnecessary
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1482
+_ add a limit to pushStyle() to catch unmatched sets?
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1368
+_ P2D transformation bug from ira
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1175
+_ resize not working in revision 5707
+_   camera() and perspective() were commented out in setSize()
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1391
+_ chopping out triangles in OpenGL (though it's only 2D drawing)
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1359
+_ make sure that get() and set() (for pixels and subsets) work w/ loaded images
+_ make sure that get() and set() (for pixels and subsets) work w/ P2D
+_ make sure that get() and set() (for pixels and subsets) work w/ P3D
+_ consider adding skewX/Y
+_   do them as shearX/Y
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1448
+
+_ add setOutput() method across other renderers?
+
+_ opengl applet problems
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1364
+
+_ method of threading but queue an event to be run when safe
+_   e.g. queueing items like mouse/keybd, but generic fxns
+
+_ inconsistent anti-aliasing with OpenGL
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1413
+_ modify PVector to include better methods for chaining operations
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1415
+
+_ selectInput() fails when called from within keyPressed()
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1220
+
+_ add java.io.Reader (and Writer?) to imports
+
 _ changing vertex alpha in P3D in a QUAD_STRIP is ignored
 _   with smoothing, it works fine, but with PTriangle, it's not
 _ smooth() not working with applets an createGraphics(JAVA2D)
 _   but works fine with applications
 _ get() with OPENGL is grabbing the wrong coords
 _   http://dev.processing.org/bugs/show_bug.cgi?id=1349
+
+_ gl power of 2 with textures
+_   P3D also seems to have trouble w/ textures edges.. bad math?
 
 _ No textures render with hint(ENABLE_ACCURATE_TEXTURES)
 _   http://dev.processing.org/bugs/show_bug.cgi?id=985
@@ -20,11 +98,14 @@ _ deal with issue of single pixel seam at the edge of textures
 _   http://dev.processing.org/bugs/show_bug.cgi?id=602
 _   should vertexTexture() divide by width/height or width-1/height-1?
 
+looping/events
 _ key and mouse events delivered out of order
 _   http://dev.processing.org/bugs/show_bug.cgi?id=638
 _ key/mouse events have concurrency problems with noLoop()
 _   http://dev.processing.org/bugs/show_bug.cgi?id=1323
 _   need to say "no drawing inside mouse/key events w/ noLoop"
+_ redraw() doesn't work from within draw()
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1363
 
 _ make the index lookup use numbers up to 256?
 
@@ -33,8 +114,6 @@ _   public float textWidth(char[] chars, int start, int length)
 
 _ textAlign(JUSTIFY) (with implementation)
 _   http://dev.processing.org/bugs/show_bug.cgi?id=1309
-
-_ create characters on the fly when createFont() is used
 
 _ Semitransparent rect drawn over image not rendered correctly
 _   http://dev.processing.org/bugs/show_bug.cgi?id=1280
@@ -49,8 +128,6 @@ _   http://dev.processing.org/bugs/show_bug.cgi?id=1176
 _ what's the difference with ascent on loadFont vs. createFont?
 _ noCursor() doesn't work in present mode
 _   http://dev.processing.org/bugs/show_bug.cgi?id=1177
-_ modelx/y/z broken when aiming a camera
-_   http://dev.processing.org/bugs/show_bug.cgi?id=1074
 _ in P2D, two vertex() line calls with fill() causes duplicate output
 _   works fine in other renderers, has to do with tesselation
 _   http://dev.processing.org/bugs/show_bug.cgi?id=1191
@@ -67,14 +144,10 @@ _   what other methods should work with doubles? all math functions?
 _   seems like internal (mostly static) things, but not graphics api
 _ look into replacing nanoxml
 _   http://www.exampledepot.com/egs/javax.xml.parsers/pkg.html
-_ if no draw() method, and renderer is not displayable, then exit
-_   static mode PDFs shouldn't just hang
 
 
 [ known problems ]
 
-_ memory leak problem with fonts in JAVA2D
-_   http://dev.processing.org/bugs/show_bug.cgi?id=1252
 _ OPENGL sketches flicker w/ Vista when background() not used inside draw()
 _   http://dev.processing.org/bugs/show_bug.cgi?id=930
 _   Disabling Aero scheme sometimes prevents the problem
@@ -142,16 +215,11 @@ _   make sure that filter, blend, copy, etc say that no loadPixels necessary
 
 
 rework some text/font code [1.0]
-_ PFont not working well with lots of characters
-_   only create bitmap chars on the fly when needed (in createFont)
 _ text placement is ugly, seems like fractional metrics problem
 _   http://dev.processing.org/bugs/show_bug.cgi?id=866
 _ text(char c) with char 0 and undefined should print nothing
 _   perhaps also DEL or other nonprintables?
 _   book example 25-03
-_ when using createFont("xxxx.ttf"), should use textMode(SHAPE) with PDF
-_   because ttf files will not be installed on the system when opening pdf
-_   maybe just add this to the reference so that people know
 _ text position is quantized in JAVA2D
 _   http://dev.processing.org/bugs/show_bug.cgi?id=806
 _ accessors inside PFont need a lot of work
@@ -159,8 +227,6 @@ _ osx 10.5 (not 10.4) performing text width calculation differently
 _   http://dev.processing.org/bugs/show_bug.cgi?id=972
 _ Automatically use textMode(SCREEN) with text() when possible
 _   http://dev.processing.org/bugs/show_bug.cgi?id=1020
-_ Implement better caching mechanism when creating large fonts
-_   http://dev.processing.org/bugs/show_bug.cgi?id=1111
 
 
 P2D, P3D, PPolygon [1.0]
@@ -200,19 +266,12 @@ _   also needs fix for last edge and the seam
 
 
 threading and exiting
-_ pdf sketches exiting before writing has finished
 _ writing image file (missing a flush() call?) on exit() fails
 _   lots of zero length files
 _ saveFrame() at the end of a draw mode program is problematic
 _   app might exit before the file has finished writing to disk
 _   need to block other activity inside screenGrab until finished
 _   http://processing.org/discourse/yabb/YaBB.cgi?board=Proce55ing_software_bugs;action=display;num=1081706752
-_ what's up with stop() vs exit()?
-_   need to get this straightened for p5 (i.e. bc has this problem)
-_   make sure the main() doesn't exit until the applet has finished
-_   i.e. problem with main calling itself multiple times in Alpheus
-_   if exit() (or stop) is called, then System.exit() gets called,
-_   even though the main() wants to keep going
 
 _ for begin/endRecord, use a piggyback mechanism
 _   that way won't have to pass a PApplet around
@@ -220,24 +279,32 @@ _   this has a big impact on the SVG library
 _   in fact, this maybe should be a library that does it
 _     so that the file size can be much smaller
 
-_ when closing a sketch via the close box, make sure stop() getting called
-X   found a problem for release 0133
-_   test to see if it's working
-
 _ STROKE_WEIGHT field in PGraphics3 is a disaster, because it's an int
 _   use the SW from vertex instead.. why set stroke in triangle vars at all?
 _   currently truncating to an int inside add_line_no_clip
 _   need to clean all this crap up
 
+stop() mess
+_ double stop() called with noLoop()
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1270
 _ stop() not getting called
 _   http://dev.processing.org/bugs/show_bug.cgi?id=183
 _   major problem for libraries
 _   and start() is supposedly called by the applet viewer
 _   http://java.sun.com/j2se/1.4.2/docs/api/java/applet/Applet.html#start()
 _   need to track this stuff down a bit
+_ when closing a sketch via the close box, make sure stop() getting called
+X   found a problem for release 0133
+_   test to see if it's working
+_ what's up with stop() vs exit()?
+_   need to get this straightened for p5 (i.e. bc has this problem)
+_   make sure the main() doesn't exit until the applet has finished
+_   i.e. problem with main calling itself multiple times in Alpheus
+_   if exit() (or stop) is called, then System.exit() gets called,
+_   even though the main() wants to keep going
+_ more chatter with this
+_   http://dev.processing.org/bugs/show_bug.cgi?id=131
 
-_ method of threading but queue an event to be run when safe
-_   e.g. queueing items like mouse/keybd, but generic fxns
 
 
 ////////////////////////////////////////////////////////////////////
@@ -280,6 +347,8 @@ _   don't bother using a buffering stream, just handle internally. gah!
 _ remove some of the bloat, how can we make things more compact?
 _   i.e. if not using 3D, can leave out PGraphics3, PTriangle, PLine
 _   http://dev.processing.org/bugs/show_bug.cgi?id=127
+E4 _ add shuffle methods for arrays
+E4 _   http://dev.processing.org/bugs/show_bug.cgi?id=1462
 
 
 CORE / PApplet - main()
@@ -309,7 +378,8 @@ _     or if the sketch window is foremost
 _     maybe a hack where a new menubar is added? 
 _ --display not working on osx
 _   http://dev.processing.org/bugs/show_bug.cgi?id=531
-
+_ "Target VM failed to initialize" when using Present mode on Mac OS X
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1257
 
 CORE / PFont and text()
 
@@ -412,13 +482,6 @@ CORE / PGraphics3D
 _ make thick lines draw perpendicular to the screen with P3D
 _   http://dev.processing.org/bugs/show_bug.cgi?id=956
 _   ewjordan suggests building the quad in screen coords after perspective
-_ ortho() behaving differently in P3D vs OPENGL
-_   http://dev.processing.org/bugs/show_bug.cgi?id=100
-_   shows a blank canvas
-_   (was only happening once b/c was drawing first in perspective)
-_   seems to be mapping to 0, 0 - width/2, height/2
-_   fix 3D > OrthoVsPerspective example once ortho works properly
-_     there's a depth problem in addition to the ortho weirdness
 _ improve hint(ENABLE_DEPTH_SORT) to use proper painter's algo
 _   http://dev.processing.org/bugs/show_bug.cgi?id=176
 _   polygon z-order depth sorting with alpha in opengl
@@ -433,11 +496,9 @@ _ images are losing pixels at the edges
 _   http://dev.processing.org/bugs/show_bug.cgi?id=102
 _ odd error with some pixels from images not drawing properly
 _   http://processing.org/discourse/yabb_beta/YaBB.cgi?board=SoftwareBugs;action=display;num=1115681453
-_ clipping not yet completely implemented
+_ clipping not implemented
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1393
 _   http://processing.org/discourse/yabb_beta/YaBB.cgi?board=SoftwareBugs;action=display;num=1114184516
-_ Stroking a rect() leaves off the upper right pixel
-_   http://dev.processing.org/bugs/show_bug.cgi?id=501
-_ clipping planes
 _   http://processing.org/discourse/yabb/YaBB.cgi?board=Proce55ing_software_bugs;action=display;num=1058491568;start=0
 _   http://processing.org/discourse/yabb/YaBB.cgi?board=Proce55ing_software_bugs;action=display;num=1052313604;start=0
 _   http://processing.org/discourse/yabb/YaBB.cgi?board=Proce55ing_Software;action=display;num=1095170607;start=0
@@ -449,6 +510,8 @@ _     or at least that things get ridiculously slow
 _     clipping issues here.. but also something in scan converter
 _     not clipping areas from offscreen
 _       huge geometry slows things way down
+_ Stroking a rect() leaves off the upper right pixel
+_   http://dev.processing.org/bugs/show_bug.cgi?id=501
 _ box is not opaque
 _   problem is that lines are drawn second
 _   one pixel lines have no z value.. argh
@@ -462,6 +525,8 @@ _   box(40);
 
 CORE / PImage
 
+_ accuracy problems make alpha channel go to FE with image.copy()
+_   http://dev.processing.org/bugs/show_bug.cgi?id=1420
 _ improve blend() accuracy when using ADD
 _   http://dev.processing.org/bugs/show_bug.cgi?id=1008
 _   includes code for a slow but more accurate mode
@@ -603,6 +668,10 @@ LIBRARIES / PGraphicsPDF
 
 _ pdf not rendering unicode with beginRecord()
 _   http://dev.processing.org/bugs/show_bug.cgi?id=727
+_ pdf sketches exiting before writing has finished
+_   people have to call exit() (so that dispose() is called in particular)
+_ when using noLoop() and the PDF renderer, sketch should exit gracefully
+_   because isDisplayable() returns false, there's no coming back from noLoop
 
 
 
@@ -710,3 +779,4 @@ _ exactly how should pixel filling work with single pixel strokes?
 _   http://dev.processing.org/bugs/show_bug.cgi?id=1025
 _ Writing XML files (clean up the API)
 _   http://dev.processing.org/bugs/show_bug.cgi?id=964
+_ consider bringing back text/image using cache/names

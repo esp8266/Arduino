@@ -25,8 +25,17 @@ package processing.core;
 
 import java.util.HashMap;
 
+import processing.core.PApplet;
+
 
 /**
+ * Datatype for storing shapes. Processing can currently load and display SVG (Scalable Vector Graphics) shapes.
+ * Before a shape is used, it must be loaded with the <b>loadShape()</b> function. The <b>shape()</b> function is used to draw the shape to the display window.
+ * The <b>PShape</b> object contain a group of methods, linked below, that can operate on the shape data. 
+ * <br><br>The <b>loadShape()</b> method supports SVG files created with Inkscape and Adobe Illustrator.
+ * It is not a full SVG implementation, but offers some straightforward support for handling vector data.
+ * =advanced
+ * 
  * In-progress class to handle shape data, currently to be considered of
  * alpha or beta quality. Major structural work may be performed on this class
  * after the release of Processing 1.0. Such changes may include:
@@ -51,6 +60,13 @@ import java.util.HashMap;
  * <p>Library developers are encouraged to create PShape objects when loading
  * shape data, so that they can eventually hook into the bounty that will be
  * the PShape interface, and the ease of loadShape() and shape().</p>
+ * 
+ * @webref Shape
+ * @usage Web &amp; Application
+ * @see PApplet#shape(PShape)
+ * @see PApplet#loadShape(String)
+ * @see PApplet#shapeMode(int)
+ * @instanceName sh any variable of type PShape
  */
 public class PShape implements PConstants {
 
@@ -81,7 +97,17 @@ public class PShape implements PConstants {
   //protected float y;
   //protected float width;
   //protected float height;
+  /**
+   * The width of the PShape document.
+   * @webref
+   * @brief  	Shape document width
+   */
   public float width;
+  /**
+   * The width of the PShape document.
+   * @webref
+   * @brief  	Shape document height
+   */
   public float height;
 
   // set to false if the object is hidden in the layers palette
@@ -178,21 +204,39 @@ public class PShape implements PConstants {
     return name;
   }
 
-
+  /**
+   * Returns a boolean value "true" if the image is set to be visible, "false" if not. This is modified with the <b>setVisible()</b> parameter.
+   * <br><br>The visibility of a shape is usually controlled by whatever program created the SVG file.
+   * For instance, this parameter is controlled by showing or hiding the shape in the layers palette in Adobe Illustrator.
+   * 
+   * @webref
+   * @brief Returns a boolean value "true" if the image is set to be visible, "false" if not
+   */
   public boolean isVisible() {
     return visible;
   }
 
-
+  /**
+   * Sets the shape to be visible or invisible. This is determined by the value of the <b>visible</b> parameter.
+   * <br><br>The visibility of a shape is usually controlled by whatever program created the SVG file.
+   * For instance, this parameter is controlled by showing or hiding the shape in the layers palette in Adobe Illustrator.
+   * @param visible "false" makes the shape invisible and "true" makes it visible
+   * @webref
+   * @brief Sets the shape to be visible or invisible
+   */
   public void setVisible(boolean visible) {
     this.visible = visible;
   }
 
 
   /**
+   * Disables the shape's style data and uses Processing's current styles. Styles include attributes such as colors, stroke weight, and stroke joints.
+   *  =advanced
    * Overrides this shape's style information and uses PGraphics styles and
    * colors. Identical to ignoreStyles(true). Also disables styles for all
    * child shapes.
+   * @webref
+   * @brief  	Disables the shape's style data and uses Processing styles
    */
   public void disableStyle() {
     style = false;
@@ -204,7 +248,9 @@ public class PShape implements PConstants {
 
 
   /**
-   * Re-enables style information (fill and stroke) set in the shape.
+   * Enables the shape's style data and ignores Processing's current styles. Styles include attributes such as colors, stroke weight, and stroke joints.
+   * @webref
+   * @brief Enables the shape's style data and ignores the Processing styles
    */
   public void enableStyle() {
     style = true;
@@ -591,12 +637,21 @@ public class PShape implements PConstants {
     return childCount;
   }
 
-
+  /**
+   * 
+   * @param index the layer position of the shape to get
+   */
   public PShape getChild(int index) {
     return children[index];
   }
 
-
+  /**
+   * Extracts a child shape from a parent shape. Specify the name of the shape with the <b>target</b> parameter.
+   * The shape is returned as a <b>PShape</b> object, or <b>null</b> is returned if there is an error.
+   * @param target the name of the shape to get
+   * @webref
+   * @brief Returns a child element of a shape as a PShape object
+   */
   public PShape getChild(String target) {
     if (name != null && name.equals(target)) {
       return this;
@@ -675,34 +730,78 @@ public class PShape implements PConstants {
   // if matrix is null when one is called,
   //   it is created and set to identity
 
-
   public void translate(float tx, float ty) {
     checkMatrix(2);
     matrix.translate(tx, ty);
   }
 
-
+  /**
+   * Specifies an amount to displace the shape. The <b>x</b> parameter specifies left/right translation, the <b>y</b> parameter specifies up/down translation, and the <b>z</b> parameter specifies translations toward/away from the screen. Subsequent calls to the method accumulates the effect. For example, calling <b>translate(50, 0)</b> and then <b>translate(20, 0)</b> is the same as <b>translate(70, 0)</b>. This transformation is applied directly to the shape, it's not refreshed each time <b>draw()</b> is run. 
+   * <br><br>Using this method with the <b>z</b> parameter requires using the P3D or OPENGL parameter in combination with size.
+   * @webref
+   * @param tx left/right translation
+   * @param ty up/down translation
+   * @param tz forward/back translation
+   * @brief Displaces the shape
+   */
   public void translate(float tx, float ty, float tz) {
     checkMatrix(3);
     matrix.translate(tx, ty, 0);
   }
-
-
+  
+  /**
+   * Rotates a shape around the x-axis the amount specified by the <b>angle</b> parameter. Angles should be specified in radians (values from 0 to TWO_PI) or converted to radians with the <b>radians()</b> method.
+   * <br><br>Shapes are always rotated around the upper-left corner of their bounding box. Positive numbers rotate objects in a clockwise direction.
+   * Subsequent calls to the method accumulates the effect. For example, calling <b>rotateX(HALF_PI)</b> and then <b>rotateX(HALF_PI)</b> is the same as <b>rotateX(PI)</b>.
+   * This transformation is applied directly to the shape, it's not refreshed each time <b>draw()</b> is run.  
+   * <br><br>This method requires a 3D renderer. You need to pass P3D or OPENGL as a third parameter into the <b>size()</b> method as shown in the example above.
+   * @param angle angle of rotation specified in radians
+   * @webref
+   * @brief Rotates the shape around the x-axis
+   */
   public void rotateX(float angle) {
     rotate(angle, 1, 0, 0);
   }
 
-
+  /**
+   * Rotates a shape around the y-axis the amount specified by the <b>angle</b> parameter. Angles should be specified in radians (values from 0 to TWO_PI) or converted to radians with the <b>radians()</b> method.
+   * <br><br>Shapes are always rotated around the upper-left corner of their bounding box. Positive numbers rotate objects in a clockwise direction.
+   * Subsequent calls to the method accumulates the effect. For example, calling <b>rotateY(HALF_PI)</b> and then <b>rotateY(HALF_PI)</b> is the same as <b>rotateY(PI)</b>.
+   * This transformation is applied directly to the shape, it's not refreshed each time <b>draw()</b> is run. 
+   * <br><br>This method requires a 3D renderer. You need to pass P3D or OPENGL as a third parameter into the <b>size()</b> method as shown in the example above.
+   * @param angle angle of rotation specified in radians
+   * @webref
+   * @brief Rotates the shape around the y-axis
+   */
   public void rotateY(float angle) {
     rotate(angle, 0, 1, 0);
   }
 
 
+  /**
+   * Rotates a shape around the z-axis the amount specified by the <b>angle</b> parameter. Angles should be specified in radians (values from 0 to TWO_PI) or converted to radians with the <b>radians()</b> method.
+   * <br><br>Shapes are always rotated around the upper-left corner of their bounding box. Positive numbers rotate objects in a clockwise direction.
+   * Subsequent calls to the method accumulates the effect. For example, calling <b>rotateZ(HALF_PI)</b> and then <b>rotateZ(HALF_PI)</b> is the same as <b>rotateZ(PI)</b>.
+   * This transformation is applied directly to the shape, it's not refreshed each time <b>draw()</b> is run. 
+   * <br><br>This method requires a 3D renderer. You need to pass P3D or OPENGL as a third parameter into the <b>size()</b> method as shown in the example above.
+   * @param angle angle of rotation specified in radians
+   * @webref
+   * @brief Rotates the shape around the z-axis
+   */
   public void rotateZ(float angle) {
     rotate(angle, 0, 0, 1);
   }
-
-
+  
+  /**
+   * Rotates a shape the amount specified by the <b>angle</b> parameter. Angles should be specified in radians (values from 0 to TWO_PI) or converted to radians with the <b>radians()</b> method.
+   * <br><br>Shapes are always rotated around the upper-left corner of their bounding box. Positive numbers rotate objects in a clockwise direction.
+   * Transformations apply to everything that happens after and subsequent calls to the method accumulates the effect.
+   * For example, calling <b>rotate(HALF_PI)</b> and then <b>rotate(HALF_PI)</b> is the same as <b>rotate(PI)</b>.
+   * This transformation is applied directly to the shape, it's not refreshed each time <b>draw()</b> is run.
+   * @param angle angle of rotation specified in radians 
+   * @webref
+   * @brief Rotates the shape
+   */
   public void rotate(float angle) {
     checkMatrix(2);  // at least 2...
     matrix.rotate(angle);
@@ -716,20 +815,34 @@ public class PShape implements PConstants {
 
 
   //
-
-
+  
+  /**
+   * @param s percentage to scale the object
+   */
   public void scale(float s) {
     checkMatrix(2);  // at least 2...
     matrix.scale(s);
   }
 
 
-  public void scale(float sx, float sy) {
+  public void scale(float x, float y) {
     checkMatrix(2);
-    matrix.scale(sx, sy);
+    matrix.scale(x, y);
   }
 
 
+  /**
+   * Increases or decreases the size of a shape by expanding and contracting vertices. Shapes always scale from the relative origin of their bounding box.
+   * Scale values are specified as decimal percentages. For example, the method call <b>scale(2.0)</b> increases the dimension of a shape by 200%.
+   * Subsequent calls to the method multiply the effect. For example, calling <b>scale(2.0)</b> and then <b>scale(1.5)</b> is the same as <b>scale(3.0)</b>.
+   * This transformation is applied directly to the shape, it's not refreshed each time <b>draw()</b> is run. 
+   * <br><br>Using this fuction with the <b>z</b> parameter requires passing P3D or OPENGL into the size() parameter.
+   * @param x percentage to scale the object in the x-axis
+   * @param y percentage to scale the object in the y-axis
+   * @param z percentage to scale the object in the z-axis
+   * @webref
+   * @brief Increases and decreases the size of a shape
+   */
   public void scale(float x, float y, float z) {
     checkMatrix(3);
     matrix.scale(x, y, z);
