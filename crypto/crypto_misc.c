@@ -196,7 +196,8 @@ EXP_FUNC void STDCALL get_random(int num_rand_bytes, uint8_t *rand_data)
 
     /* come up with the random sequence */
     RC4_setup(&rng_ctx, digest, MD5_SIZE); /* use as a key */
-    memcpy(rand_data, entropy_pool, ENTROPY_POOL_SIZE);
+    memcpy(rand_data, entropy_pool, num_rand_bytes < ENTROPY_POOL_SIZE ?
+				num_rand_bytes : ENTROPY_POOL_SIZE);
     RC4_crypt(&rng_ctx, rand_data, rand_data, num_rand_bytes);
 
     /* move things along */
