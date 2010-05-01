@@ -53,7 +53,6 @@ static HCRYPTPROV gCryptProv;
 #define ENTROPY_COUNTER1 (uint32_t)((tv.tv_sec<<16) + tv.tv_usec)
 #define ENTROPY_COUNTER2 (uint32_t)rand()
 static uint8_t entropy_pool[ENTROPY_POOL_SIZE];
-static MD5_CTX rng_digest_ctx;
 #endif
 
 static int rng_ref_count;
@@ -127,22 +126,16 @@ EXP_FUNC void STDCALL RNG_initialize(const uint8_t *seed_buf, int size)
         int i;
         uint32_t seed_addr_val = (uint32_t)&seed_buf;
         uint32_t *ep = (uint32_t *)entropy_pool;
-printf("blah %08x\n", seed_addr_val);
 
         /* help start the entropy with the user's private key - this is 
            a number that should be hard to find, due to the fact that it 
            relies on knowing the private key */
         memcpy(entropy_pool, seed_buf, ENTROPY_POOL_SIZE);
-print_blob("entropy 1", entropy_pool, ENTROPY_POOL_SIZE);
+
         /* mix it up a little with a stack address */
         for (i = 0; i < ENTROPY_POOL_SIZE/4; i++)
-{
-printf("YA: %08x\n", ep[i]);
             ep[i] ^= seed_addr_val;
-}
-print_blob("entropy 2", entropy_pool, ENTROPY_POOL_SIZE);
 
-        MD5_Init(&rng_digest_ctx);
         srand((long)entropy_pool); 
 #endif
     }
@@ -181,6 +174,7 @@ EXP_FUNC void STDCALL get_random(int num_rand_bytes, uint8_t *rand_data)
        and a couple of random seeds to generate a random sequence */
     RC4_CTX rng_ctx;
     struct timeval tv;
+    MD5_CTX rng_digest_ctx;
     uint8_t digest[MD5_SIZE];
     int i;
 
@@ -191,6 +185,7 @@ EXP_FUNC void STDCALL get_random(int num_rand_bytes, uint8_t *rand_data)
     ep[1] ^= (uint64_t)ENTROPY_COUNTER2; 
 
     /* use a digested version of the entropy pool as a key */
+    MD5_Init(&rng_digest_ctx);
     MD5_Update(&rng_digest_ctx, entropy_pool, ENTROPY_POOL_SIZE);
     MD5_Final(digest, &rng_digest_ctx);
 
