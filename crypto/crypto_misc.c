@@ -48,7 +48,12 @@ static HCRYPTPROV gCryptProv;
 #endif
 
 #if (!defined(CONFIG_USE_DEV_URANDOM) && !defined(CONFIG_WIN32_USE_CRYPTO_LIB))
-static uint64_t rng_num;
+/* change to 32bit processor registers as appropriate */
+#define ENTROPY_POOL_SIZE 32
+#define ENTROPY_COUNTER1 (uint32_t)((tv.tv_sec<<16) + tv.tv_usec)
+#define ENTROPY_COUNTER2 (uint32_t)rand()
+static uint8_t entropy_pool[ENTROPY_POOL_SIZE];
+static MD5_CTX rng_digest_ctx;
 #endif
 
 static int rng_ref_count;
@@ -119,15 +124,26 @@ EXP_FUNC void STDCALL RNG_initialize(const uint8_t *seed_buf, int size)
             }
         }
 #else   
-        /* help seed with the user's private key - this is a number that 
-           should be hard to find, due to the fact that it relies on knowing 
-           the private key */
-        int i;  
+        int i;
+        uint32_t seed_addr_val = (uint32_t)&seed_buf;
+        uint32_t *ep = (uint32_t *)entropy_pool;
+printf("blah %08x\n", seed_addr_val);
 
-        for (i = 0; i < size/(int)sizeof(uint64_t); i++)
-            rng_num ^= *((uint64_t *)&seed_buf[i*sizeof(uint64_t)]);
+        /* help start the entropy with the user's private key - this is 
+           a number that should be hard to find, due to the fact that it 
+           relies on knowing the private key */
+        memcpy(entropy_pool, seed_buf, ENTROPY_POOL_SIZE);
+print_blob("entropy 1", entropy_pool, ENTROPY_POOL_SIZE);
+        /* mix it up a little with a stack address */
+        for (i = 0; i < ENTROPY_POOL_SIZE/4; i++)
+{
+printf("YA: %08x\n", ep[i]);
+            ep[i] ^= seed_addr_val;
+}
+print_blob("entropy 2", entropy_pool, ENTROPY_POOL_SIZE);
 
-        srand((long)&seed_buf);  /* use the stack ptr as another rnd seed */
+        MD5_Init(&rng_digest_ctx);
+        srand((long)entropy_pool); 
 #endif
     }
 
@@ -165,31 +181,30 @@ EXP_FUNC void STDCALL get_random(int num_rand_bytes, uint8_t *rand_data)
        and a couple of random seeds to generate a random sequence */
     RC4_CTX rng_ctx;
     struct timeval tv;
-    uint64_t big_num1, big_num2;
+    uint8_t digest[MD5_SIZE];
+    int i;
 
-    gettimeofday(&tv, NULL);    /* yes I know we shouldn't do this */
+    /* A proper implementation would use counters etc for entropy */
+    gettimeofday(&tv, NULL);    
+    uint64_t *ep = (uint64_t *)entropy_pool;
+    ep[0] ^= (uint64_t)ENTROPY_COUNTER1;
+    ep[1] ^= (uint64_t)ENTROPY_COUNTER2; 
 
-    /* all numbers by themselves are pretty simple, but combined should 
-     * be a challenge */
-    big_num1 = (uint64_t)tv.tv_sec*(tv.tv_usec+1); 
-    big_num2 = (uint64_t)rand()*big_num1;
-    big_num1 ^= rng_num;
+    /* use a digested version of the entropy pool as a key */
+    MD5_Update(&rng_digest_ctx, entropy_pool, ENTROPY_POOL_SIZE);
+    MD5_Final(digest, &rng_digest_ctx);
 
-    memcpy(rand_data, &big_num1, sizeof(uint64_t));
-    if (num_rand_bytes > sizeof(uint64_t))
-        memcpy(&rand_data[8], &big_num2, sizeof(uint64_t));
-
-    if (num_rand_bytes > 16)
-    {
-        /* clear rest of data */
-        memset(&rand_data[16], 0, num_rand_bytes-16); 
-    }
-
-    RC4_setup(&rng_ctx, rand_data, 16); /* use as a key */
+    /* come up with the random sequence */
+    RC4_setup(&rng_ctx, digest, MD5_SIZE); /* use as a key */
+    memcpy(rand_data, entropy_pool, ENTROPY_POOL_SIZE);
     RC4_crypt(&rng_ctx, rand_data, rand_data, num_rand_bytes);
-    
-    /* use last 8 bytes for next time */
-    memcpy(&rng_num, &rand_data[num_rand_bytes-8], sizeof(uint64_t));    
+
+    /* move things along */
+    for (i = ENTROPY_POOL_SIZE-1; i >= MD5_SIZE ; i--)
+        entropy_pool[i] = entropy_pool[i-MD5_SIZE];
+
+    /* insert the digest at the start of the entropy pool */
+    memcpy(entropy_pool, digest, MD5_SIZE);
 #endif
 }
 
