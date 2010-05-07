@@ -1022,7 +1022,7 @@ static int sanitizehost(char *buf)
         }
 
         /* Enforce some basic URL rules... */
-        if ((isalnum(*buf) == 0 && *buf != '-' && *buf != '.') ||
+        if ((isalnum((int)(*buf)) == 0 && *buf != '-' && *buf != '.') ||
                 (*buf == '.' && *(buf+1) == '.') ||
                 (*buf == '.' && *(buf+1) == '-') ||
                 (*buf == '-' && *(buf+1) == '.'))
