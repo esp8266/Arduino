@@ -119,7 +119,7 @@ static int procheadelem(struct connstruct *cn, char *buf)
 #endif
         cn->if_modified_since = -1;
     } 
-    else if (strcmp(buf, "Host:") == 0) 
+    else if (strcasecmp(buf, "Host:") == 0) 
     {
         if (sanitizehost(value) == 0) 
         {
@@ -129,21 +129,24 @@ static int procheadelem(struct connstruct *cn, char *buf)
 
         my_strncpy(cn->server_name, value, MAXREQUESTLENGTH);
     } 
-    else if (strcmp(buf, "Connection:") == 0 && strcmp(value, "close") == 0) 
+    else if (strcasecmp(buf, "Connection:") == 0 && strcmp(value, "close") == 0) 
     {
         cn->close_when_done = 1;
     } 
-    else if (strcmp(buf, "If-Modified-Since:") == 0) 
+    else if (strcasecmp(buf, "If-Modified-Since:") == 0) 
     {
         cn->if_modified_since = tdate_parse(value);
     }
-    else if (strcmp(buf, "Expect:") == 0)
+    else if (strcasecmp(buf, "Expect:") == 0)
     {
-        send_error(cn, 417); /* expectation failed */
-        return 0;
+		/* supposed to be safe to ignore 100-continue */
+		if (strcasecmp(value, "100-continue") != 0) {
+			send_error(cn, 417); /* expectation failed */
+			return 0;
+		}
     }
 #ifdef CONFIG_HTTP_HAS_AUTHORIZATION
-    else if (strcmp(buf, "Authorization:") == 0 &&
+    else if (strcasecmp(buf, "Authorization:") == 0 &&
                                     strncmp(value, "Basic ", 6) == 0)
     {
         int size;
@@ -155,15 +158,15 @@ static int procheadelem(struct connstruct *cn, char *buf)
     }
 #endif
 #if defined(CONFIG_HTTP_HAS_CGI)
-    else if (strcmp(buf, "Content-Length:") == 0)
+    else if (strcasecmp(buf, "Content-Length:") == 0)
     {
         sscanf(value, "%d", &cn->content_length);
     }
-    else if (strcmp(buf, "Content-Type:") == 0)
+    else if (strcasecmp(buf, "Content-Type:") == 0)
     {
         my_strncpy(cn->cgicontenttype, value, MAXREQUESTLENGTH);
     }
-    else if (strcmp(buf, "Cookie:") == 0)
+    else if (strcasecmp(buf, "Cookie:") == 0)
     {
         my_strncpy(cn->cookie, value, MAXREQUESTLENGTH);
     }
@@ -628,11 +631,15 @@ static void proccgi(struct connstruct *cn)
     /* Our stdout/stderr goes to the socket */
     dup2(tpipe[1], 1);
     dup2(tpipe[1], 2);
+    close(tpipe[0]);
+    close(tpipe[1]);
 
     /* If it was a POST request, send the socket data to our stdin */
-    if (cn->reqtype == TYPE_POST) 
+    if (cn->reqtype == TYPE_POST)  {
         dup2(spipe[0], 0);  
-    else    /* Otherwise we can shutdown the read side of the sock */
+        close(spipe[0]);
+        close(spipe[1]);
+    } else    /* Otherwise we can shutdown the read side of the sock */
         shutdown(cn->networkdesc, 0);
 
     myargs[0] = cn->actualfile;

@@ -131,12 +131,12 @@ EXP_FUNC void STDCALL RNG_initialize(const uint8_t *seed_buf, int size)
            a number that should be hard to find, due to the fact that it 
            relies on knowing the private key */
         memcpy(entropy_pool, seed_buf, ENTROPY_POOL_SIZE);
+        srand((long)entropy_pool); 
 
         /* mix it up a little with a stack address */
         for (i = 0; i < ENTROPY_POOL_SIZE/4; i++)
             ep[i] ^= seed_addr_val;
 
-        srand((long)entropy_pool); 
 #endif
     }
 

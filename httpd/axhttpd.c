@@ -55,7 +55,8 @@ static void addcgiext(const char *tp);
 #if !defined(WIN32)
 static void reaper(int sigtype) 
 {
-    wait3(NULL, WNOHANG, NULL);
+    while (wait3(NULL, WNOHANG, NULL) > 0)
+        continue;
 }
 #endif
 #endif
@@ -446,7 +447,8 @@ static void handlenewconnection(int listenfd, int is_ssl)
     else 
         *ipbuf = '\0';
 
-    addconnection(connfd, ipbuf, is_ssl);
+    if (connfd != -1) /* check for error condition */
+        addconnection(connfd, ipbuf, is_ssl);
 }
 
 #else
