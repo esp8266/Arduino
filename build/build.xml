@@ -190,18 +190,19 @@
 
     <!-- Unzip AVR tools -->
     <!-- <unzip dest="macosx/work/Arduino.app/Contents/Resources/Java/hardware" src="macosx/dist/tools-universal.zip" overwrite="false"/> -->
+
     <exec executable="unzip">
       <arg value="-q" />
       <arg value="-d" />
       <arg value="macosx/work/Arduino.app/Contents/Resources/Java/hardware" />
       <arg value="macosx/dist/tools-universal.zip" />
     </exec>
-    
+
     <antcall target="assemble">
       <param name="target.path" value="macosx/work/Arduino.app/Contents/Resources/Java" />
     </antcall>
   </target>
-  
+
   <target name="macosx-run" depends="macosx-build" description="Run Mac OS X version">
     <exec executable="macosx/work/Arduino.app/Contents/MacOS/JavaApplicationStub" spawn="true"/>
   </target>
