@@ -326,142 +326,42 @@ public class Compiler implements MessageConsumer {
    * and line number, which is then reported back to Editor.
    */
   public void message(String s) {
-    // This receives messages as full lines, so a newline needs
-    // to be added as they're printed to the console.
-    //System.err.print(s);
+    int i;
 
-    // ignore cautions
-    if (s.indexOf("warning") != -1) return;
-
-    // ignore this line; the real error is on the next one
-    if (s.indexOf("In file included from") != -1) return;
-
-    // jikes always uses a forward slash character as its separator,
-    // so replace any platform-specific separator characters before
-    // attemping to compare
-    //
-    //String buildPathSubst = buildPath.replace(File.separatorChar, '/') + "/";
-    String buildPathSubst =
-      buildPath.replace(File.separatorChar,File.separatorChar) +
-      File.separatorChar;
-
-    String partialTempPath = null;
-    int partialStartIndex = -1; //s.indexOf(partialTempPath);
-    int fileIndex = -1;  // use this to build a better exception
-
-    // check the main sketch file first.
-    partialTempPath = buildPathSubst + primaryClassName;
-    partialStartIndex = s.indexOf(partialTempPath);
-
-    if (partialStartIndex != -1) {
-      fileIndex = 0;
-    } else {
-      // wasn't there, check the other (non-pde) files in the sketch.
-      // iterate through the project files to see who's causing the trouble
-      for (int i = 0; i < sketch.getCodeCount(); i++) {
-        if (sketch.getCode(i).isExtension("pde")) continue;
-
-        partialTempPath = buildPathSubst + sketch.getCode(i).getFileName();
-        //System.out.println(partialTempPath);
-        partialStartIndex = s.indexOf(partialTempPath);
-        if (partialStartIndex != -1) {
-          fileIndex = i;
-          //System.out.println("fileIndex is " + fileIndex);
-          break;
-        }
-      }
-      //+ className + ".java";
-    }
-
-    // if the partial temp path appears in the error message...
-    //
-    //int partialStartIndex = s.indexOf(partialTempPath);
-    if (partialStartIndex != -1) {
-
-      // skip past the path and parse the int after the first colon
-      //
-      String s1 = s.substring(partialStartIndex +
-                              partialTempPath.length() + 1);
-      //System.out.println(s1);
-      int colon = s1.indexOf(':');
-
-      if (s1.indexOf("In function") != -1 || colon == -1) {
-        System.err.print(s1);
-        //firstErrorFound = true;
-        return;
-      }
-
-      int lineNumber;
-      try {
-        lineNumber = Integer.parseInt(s1.substring(0, colon));
-      } catch (NumberFormatException e) {
-        System.err.print(s1);
-        return;
-      }
-      
-      //System.out.println("pde / line number: " + lineNumber);
-      
-      if (fileIndex == 0) {  // main class, figure out which tab
-        for (int i = 1; i < sketch.getCodeCount(); i++) {
-          if (sketch.getCode(i).isExtension("pde")) {
-            //System.out.println("preprocOffset "+ sketch.getCode(i).getPreprocOffset());
-            if (sketch.getCode(i).getPreprocOffset() < lineNumber) {
-              fileIndex = i;
-              //System.out.println("i'm thinkin file " + i);
-            }
-          }
-        }
-        // XXX: DAM: if the lineNumber is less than sketch.getCode(0).getPreprocOffset()
-        // we shouldn't subtract anything from it, as the error is above the
-        // location where the function prototypes and #include "WProgram.h"
-        // were inserted.
-        lineNumber -= sketch.getCode(fileIndex).getPreprocOffset();
-      }
-
-      //String s2 = s1.substring(colon + 2);
-      int err = s1.indexOf(":");
-      if (err != -1) {
-
-        // if the first error has already been found, then this must be
-        // (at least) the second error found
-        if (firstErrorFound) {
-          secondErrorFound = true;
-          return;
-        }
-
-        // if executing at this point, this is *at least* the first error
-        firstErrorFound = true;
-
-        err += ":".length();
-        String description = s1.substring(err);
-        description = description.trim();
-        System.err.print(description);
-
-        //System.out.println("description = " + description);
-        //System.out.println("creating exception " + exception);
-        exception = new RunnerException(description, fileIndex, lineNumber-1, -1, false);
-
-        // NOTE!! major change here, this exception will be queued
-        // here to be thrown by the compile() function
-        //editor.error(exception);
-
-      } else {
-        System.err.println("i suck: " + s);
-      }
-
-    } else {
-      // this isn't the start of an error line, so don't attempt to parse
-      // a line number out of it.
-
-      // if the second error hasn't been discovered yet, these lines
-      // are probably associated with the first error message,
-      // which is already in the status bar, and are likely to be
-      // of interest to the user, so spit them to the console.
-//
-      if (!secondErrorFound) {
-        System.err.println(s);
+    // remove the build path so people only see the filename
+    // can't use replaceAll() because the path may have characters in it which
+    // have meaning in a regular expression.
+    if (!verbose) {
+      while ((i = s.indexOf(buildPath + File.separator)) != -1) {
+        s = s.substring(0, i) + s.substring(i + (buildPath + File.separator).length());
       }
     }
+  
+    // look for error line, which contains file name, line number,
+    // and at least the first line of the error message
+    String errorFormat = "([\\w\\d_]+.\\w+):(\\d+):\\s*error:\\s*(.*)\\s*";
+    String[] pieces = PApplet.match(s, errorFormat);
+
+//    if (pieces != null && exception == null) {
+//      exception = sketch.placeException(pieces[3], pieces[1], PApplet.parseInt(pieces[2]) - 1);
+//      if (exception != null) exception.hideStackTrace();
+//    }
+    
+    if (pieces != null) {
+      RunnerException e = sketch.placeException(pieces[3], pieces[1], PApplet.parseInt(pieces[2]) - 1);
+      
+      if (e != null) {
+        SketchCode code = sketch.getCode(e.getCodeIndex());
+        String fileName = code.isExtension(sketch.getDefaultExtension()) ? code.getPrettyName() : code.getFileName();
+        if (!verbose) s = fileName + ":" + e.getCodeLine() + ": error: " + e.getMessage();
+        if (exception == null) {
+          exception = e;
+          exception.hideStackTrace();
+        }
+      }
+    }
+    
+    System.err.print(s);
   }
 
   /////////////////////////////////////////////////////////////////////////////

@@ -1442,7 +1442,7 @@ public class Sketch {
     // first check to see if it's a .java file
     for (int i = 0; i < getCodeCount(); i++) {
       SketchCode code = getCode(i);
-      if (code.isExtension("java")) {
+      if (!code.isExtension(getDefaultExtension())) {
         if (dotJavaFilename.equals(code.getFileName())) {
           codeIndex = i;
           codeLine = dotJavaLine;
@@ -1452,7 +1452,7 @@ public class Sketch {
     }
 
     // If not the preprocessed file at this point, then need to get out
-    if (!dotJavaFilename.equals(name + ".java")) {
+    if (!dotJavaFilename.equals(name + ".cpp")) {
       return null;
     }
 
@@ -1462,7 +1462,7 @@ public class Sketch {
     for (int i = 0; i < getCodeCount(); i++) {
       SketchCode code = getCode(i);
 
-      if (code.isExtension("pde")) {
+      if (code.isExtension(getDefaultExtension())) {
 //        System.out.println("preproc offset is " + code.getPreprocOffset());
 //        System.out.println("looking for line " + dotJavaLine);
         if (code.getPreprocOffset() <= dotJavaLine) {
