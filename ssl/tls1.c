@@ -1410,7 +1410,6 @@ int send_alert(SSL *ssl, int error_code)
 
         case SSL_ERROR_INVALID_HANDSHAKE:
         case SSL_ERROR_INVALID_PROT_MSG:
-        case SSL_ERROR_NO_CLIENT_RENOG:
             alert_num = SSL_ALERT_HANDSHAKE_FAILURE;
             break;
 
@@ -1431,6 +1430,10 @@ int send_alert(SSL *ssl, int error_code)
 
         case SSL_ERROR_BAD_CERTIFICATE:
             alert_num = SSL_ALERT_BAD_CERTIFICATE;
+            break;
+
+        case SSL_ERROR_NO_CLIENT_RENOG:
+            alert_num = SSL_ALERT_NO_RENEGOTIATION;
             break;
 
         default:
@@ -2030,6 +2033,10 @@ void DISPLAY_ALERT(SSL *ssl, int alert)
 
         case SSL_ALERT_DECRYPT_ERROR:
             printf("decrypt error");
+            break;
+
+        case SSL_ALERT_NO_RENEGOTIATION:
+            printf("no renegotiation");
             break;
 
         default:

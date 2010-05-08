@@ -115,6 +115,7 @@ extern "C" {
 #define SSL_ALERT_DECODE_ERROR                  50
 #define SSL_ALERT_DECRYPT_ERROR                 51
 #define SSL_ALERT_INVALID_VERSION               70
+#define SSL_ALERT_NO_RENEGOTIATION              100
 
 /* The ciphers that are supported */
 #define SSL_AES128_SHA                          0x2f
