@@ -340,7 +340,7 @@
   <target name="windows-checkos" unless="windows">
     <echo>
       =======================================================
-      Processing for Windows can only be built on windows.
+      Arduino for Windows can only be built on windows.
       
       Bye. 
       =======================================================
@@ -365,6 +365,17 @@
       <fileset file="shared/revisions.txt" />
     </copy>
     
+    <copy todir="windows/work">
+      <fileset dir="windows/dist" includes="*.dll" />
+    </copy>
+    
+    <copy todir="windows/work">
+      <fileset dir="windows/dist" includes="drivers/**" />
+    </copy>
+    
+    <!-- Unzip AVR tools -->
+    <unzip dest="windows/work/hardware" src="windows/avr_tools.zip" overwrite="false"/>
+
     <antcall target="assemble">
       <param name="target.path" value="windows/work" />
     </antcall>
@@ -390,7 +401,7 @@
   
   <target name="windows-run" depends="windows-build" 
 	  description="Run windows version">
-    <exec executable="windows/work/processing.exe" 
+    <exec executable="windows/work/arduino.exe" 
 	  dir="windows/work" spawn="true"/>
   </target>
 
@@ -405,31 +416,31 @@
 
     <!--
     <zip basedir="windows/work" 
-	 prefix="processing-${version}"
-	 destfile="windows/processing-${version}.zip" />
+	 prefix="arduino-${version}"
+	 destfile="windows/arduino-${version}.zip" />
     <zip basedir="windows/work" 
-	 prefix="processing-${version}"
-	 destfile="windows/processing-${version}-expert.zip" 
+	 prefix="arduino-${version}"
+	 destfile="windows/arduino-${version}-expert.zip" 
 	 excludes="java/**" />
     -->
 
-    <zip destfile="windows/processing-${version}.zip">
+    <zip destfile="windows/arduino-${version}.zip">
       <zipfileset dir="windows/work" 
-		  prefix="processing-${version}" />
+		  prefix="arduino-${version}" />
     </zip>
 
-    <zip destfile="windows/processing-${version}-expert.zip">
+    <zip destfile="windows/arduino-${version}-expert.zip">
       <zipfileset dir="windows/work" 
-		  prefix="processing-${version}" 
+		  prefix="arduino-${version}" 
 		  excludes="java/**" />
     </zip>
     
     <echo>
       =======================================================
-      Processing for Windows was built. Grab the archive from   
+      Arduino for Windows was built. Grab the archive from   
       
-      windows/processing-${version}.zip
-      windows/processing-${version}-expert.zip
+      windows/arduino-${version}.zip
+      windows/arduino-${version}-expert.zip
       =======================================================
     </echo>
   </target>
