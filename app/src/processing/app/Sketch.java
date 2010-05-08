@@ -1334,7 +1334,7 @@ public class Sketch {
 
       if (libFolder != null && !importedLibraries.contains(libFolder)) {
         importedLibraries.add(libFolder);
-        classPath += Compiler.contentsToClassPath(libFolder);
+        //classPath += Compiler.contentsToClassPath(libFolder);
         libraryPath += File.pathSeparator + libFolder.getAbsolutePath();
       }
     }
@@ -1565,7 +1565,6 @@ public class Sketch {
 //      return false;
 //    }
 
-    size(appletFolder.getPath(), foundName);
     upload(appletFolder.getPath(), foundName, verbose);
 
     return true;
@@ -1677,124 +1676,6 @@ public class Sketch {
   public boolean exportApplication(String destPath,
                                    int exportPlatform) throws IOException, RunnerException {
     return false;
-  }
-
-
-  protected void addManifest(ZipOutputStream zos) throws IOException {
-    ZipEntry entry = new ZipEntry("META-INF/MANIFEST.MF");
-    zos.putNextEntry(entry);
-
-    String contents =
-      "Manifest-Version: 1.0\n" +
-      "Created-By: Processing " + Base.VERSION_NAME + "\n" +
-      "Main-Class: " + name + "\n";  // TODO not package friendly
-    zos.write(contents.getBytes());
-    zos.closeEntry();
-  }
-
-
-  /**
-   * Slurps up .class files from a colon (or semicolon on windows)
-   * separated list of paths and adds them to a ZipOutputStream.
-   */
-  protected void packClassPathIntoZipFile(String path,
-                                          ZipOutputStream zos,
-                                          HashMap<String,Object> zipFileContents)
-    throws IOException {
-    String[] pieces = PApplet.split(path, File.pathSeparatorChar);
-
-    for (int i = 0; i < pieces.length; i++) {
-      if (pieces[i].length() == 0) continue;
-
-      // is it a jar file or directory?
-      if (pieces[i].toLowerCase().endsWith(".jar") ||
-          pieces[i].toLowerCase().endsWith(".zip")) {
-        try {
-          ZipFile file = new ZipFile(pieces[i]);
-          Enumeration<?> entries = file.entries();
-          while (entries.hasMoreElements()) {
-            ZipEntry entry = (ZipEntry) entries.nextElement();
-            if (entry.isDirectory()) {
-              // actually 'continue's for all dir entries
-
-            } else {
-              String entryName = entry.getName();
-              // ignore contents of the META-INF folders
-              if (entryName.indexOf("META-INF") == 0) continue;
-
-              // don't allow duplicate entries
-              if (zipFileContents.get(entryName) != null) continue;
-              zipFileContents.put(entryName, new Object());
-
-              ZipEntry entree = new ZipEntry(entryName);
-
-              zos.putNextEntry(entree);
-              byte buffer[] = new byte[(int) entry.getSize()];
-              InputStream is = file.getInputStream(entry);
-
-              int offset = 0;
-              int remaining = buffer.length;
-              while (remaining > 0) {
-                int count = is.read(buffer, offset, remaining);
-                offset += count;
-                remaining -= count;
-              }
-
-              zos.write(buffer);
-              zos.flush();
-              zos.closeEntry();
-            }
-          }
-        } catch (IOException e) {
-          System.err.println("Error in file " + pieces[i]);
-          e.printStackTrace();
-        }
-      } else {  // not a .jar or .zip, prolly a directory
-        File dir = new File(pieces[i]);
-        // but must be a dir, since it's one of several paths
-        // just need to check if it exists
-        if (dir.exists()) {
-          packClassPathIntoZipFileRecursive(dir, null, zos);
-        }
-      }
-    }
-  }
-
-
-  /**
-   * Continue the process of magical exporting. This function
-   * can be called recursively to walk through folders looking
-   * for more goodies that will be added to the ZipOutputStream.
-   */
-  static protected void packClassPathIntoZipFileRecursive(File dir,
-                                                          String sofar,
-                                                          ZipOutputStream zos)
-    throws IOException {
-    String files[] = dir.list();
-    for (int i = 0; i < files.length; i++) {
-      // ignore . .. and .DS_Store
-      if (files[i].charAt(0) == '.') continue;
-
-      File sub = new File(dir, files[i]);
-      String nowfar = (sofar == null) ?
-        files[i] : (sofar + "/" + files[i]);
-
-      if (sub.isDirectory()) {
-        packClassPathIntoZipFileRecursive(sub, nowfar, zos);
-
-      } else {
-        // don't add .jar and .zip files, since they only work
-        // inside the root, and they're unpacked
-        if (!files[i].toLowerCase().endsWith(".jar") &&
-            !files[i].toLowerCase().endsWith(".zip") &&
-            files[i].charAt(0) != '.') {
-          ZipEntry entry = new ZipEntry(nowfar);
-          zos.putNextEntry(entry);
-          zos.write(Base.loadBytesRaw(sub));
-          zos.closeEntry();
-        }
-      }
-    }
   }
 
 
