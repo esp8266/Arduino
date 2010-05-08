@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<project name="Arduino PDE" default="build">
+  
+  <target name="clean" description="Clean the build directories">
+    <delete dir="bin" />
+    <delete file="pde.jar" />
+  </target>
+
+  <target name="compile" description="Compile sources">
+    <condition property="core-built">
+      <available file="../core/core.jar" />
+    </condition>
+    <fail unless="core-built" message="Please build the core library first and make sure it sits in ../core/core.jar" />
+
+    <mkdir dir="bin" />
+
+    <!-- ant seems to nuke ${java.home} for some reason, pointing at the JRE
+	 subfolder instead of the actual JDK found at JAVA_HOME. 
+	 To avoid this, we grab the actual JAVA_HOME environment variable 
+	 and use that to specify the location of tools.jar. -->
+
+    <!-- if someone is better with ant please help clean this up -->
+    <property environment="env" />
+    <property name="java_home" value="${env.JAVA_HOME}" />
+
+    <condition property="linux"><os family="unix" /></condition>
+    <fail if="linux" unless="java_home" 
+	  message="The JAVA_HOME variable must be set to the location of a full JDK. For instance, on Ubuntu Linux, this might be /usr/lib/jvm/java-6-sun." />
+
+    <condition property="windows"><os family="windows" /></condition>
+    <fail if="windows" unless="java_home" 
+	  message="The JAVA_HOME variable must be set to the location of a full JDK. For instance, on Windows, this might be c:\jdk1.6.0_18." />
+
+<!--
+    <dirname property="blah" file="${java.home}" />
+    <echo message="here! ${java.home}/lib/tools.jar or there: ${blah}" />
+    <echo message="override ${env.JAVA_HOME}/lib/tools.jar" />
+    <fail />
+-->
+    <javac target="1.5" 
+	   srcdir="src" 
+	   destdir="bin" 
+	   excludes="**/tools/format/**" 
+	   encoding="UTF-8"
+	   includeAntRuntime="false"
+	   classpath="../core/core.jar; ${env.JAVA_HOME}/lib/tools.jar; lib/ant.jar; lib/ant-launcher.jar; lib/apple.jar; lib/ecj.jar; lib/jna.jar; lib/oro.jar; lib/RXTXcomm.jar" />
+  </target>
+  
+  <target name="build" depends="compile" description="Build PDE">
+    <jar basedir="bin" destfile="pde.jar" />
+  </target>
+</project>
