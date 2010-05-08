@@ -282,6 +282,10 @@
       <fileset file="shared/revisions.txt" />
     </copy>
     
+    <copy todir="linux/work">
+      <fileset dir="linux/dist" includes="lib/**" />
+    </copy>
+
     <copy todir="linux/work/lib" flatten="true">
       <fileset refid="runtime.jars" />
     </copy>
@@ -290,13 +294,19 @@
       <param name="target.path" value="linux/work" />
     </antcall>
 
-    <copy todir="linux/work" file="linux/arduino" />
+    <copy todir="linux/work/hardware">
+      <fileset dir="linux/dist" includes="tools/**" />
+    </copy>
+
+    <chmod perm="755" file="linux/work/hardware/tools/avrdude" />
+
+    <copy todir="linux/work" file="linux/dist/arduino" />
     <chmod perm="755" file="linux/work/arduino" />
   </target>
   
   <target name="linux-run" depends="linux-build" 
 	  description="Run Linux version">
-    <exec executable="./arduino" dir="linux/work" spawn="true"/>
+    <exec executable="linux/work/arduino" dir="linux/work" spawn="false"/>
   </target>
   
   <target name="linux-dist" depends="linux-build" 
