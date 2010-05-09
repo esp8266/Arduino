@@ -1352,7 +1352,7 @@ static int SSL_client_test(
     /* renegotiate client */
     if (sess_resume && sess_resume->do_reneg) 
     {
-        if (ssl_renegotiate(ssl) < 0)
+        if ((ret = ssl_renegotiate(ssl)) < 0)
             goto client_test_exit;
     }
 
@@ -1451,12 +1451,16 @@ int SSL_client_tests(void)
 
 // no client renegotiation
 // TODO: this was causing a lock-up on x509_free()
-//    sess_resume.do_reneg = 1;
-//    if ((ret = SSL_client_test("Client renegotiation", 
-//                    &ssl_ctx, NULL, &sess_resume, 
-//                    DEFAULT_CLNT_OPTION, NULL, NULL, NULL)))
-//        goto cleanup;
-//    sess_resume.do_reneg = 0;
+    sess_resume.do_reneg = 1;
+    if ((ret = SSL_client_test("Client renegotiation", 
+                    &ssl_ctx, NULL, &sess_resume, 
+                    DEFAULT_CLNT_OPTION, NULL, NULL, NULL)) !=
+           -SSL_ALERT_NO_RENEGOTIATION)
+    {
+        printf("*** Error: %d\n", ret); TTY_FLUSH();
+        goto cleanup;
+    }
+    sess_resume.do_reneg = 0;
 
     sess_resume.stop_server = 1;
     if ((ret = SSL_client_test("Client session resumption #2", 
@@ -1527,7 +1531,7 @@ int SSL_client_tests(void)
                     DEFAULT_CLNT_OPTION|SSL_SERVER_VERIFY_LATER, NULL, 
                     NULL, NULL)) != SSL_X509_ERROR(X509_VFY_ERROR_EXPIRED))
     {
-        printf("*** Error: %d\n", ret);
+        printf("*** Error: %d\n", ret); TTY_FLUSH();
         goto cleanup;
     }
 

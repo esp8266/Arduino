@@ -252,7 +252,6 @@ void x509_free(X509_CTX *x509_ctx)
 #endif
 
     RSA_free(x509_ctx->rsa_ctx);
-
     next = x509_ctx->next;
     free(x509_ctx);
     x509_free(next);        /* clear the chain */
