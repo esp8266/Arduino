@@ -193,6 +193,7 @@
 
     <exec executable="unzip">
       <arg value="-q" />
+      <arg value="-n" />
       <arg value="-d" />
       <arg value="macosx/work/Arduino.app/Contents/Resources/Java/hardware" />
       <arg value="macosx/dist/tools-universal.zip" />
