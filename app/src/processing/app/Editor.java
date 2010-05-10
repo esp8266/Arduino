@@ -43,7 +43,6 @@ import javax.swing.undo.*;
 
 import gnu.io.*;
 
-
 /**
  * Main editor panel for the Processing Development Environment.
  */
@@ -114,7 +113,6 @@ public class Editor extends JFrame implements RunnerListener {
 
   EditorLineStatus lineStatus;
 
-  boolean newEditor = true;
   JEditorPane editorPane;
   
   JEditTextArea textarea;
@@ -122,14 +120,14 @@ public class Editor extends JFrame implements RunnerListener {
 
   // runtime information and window placement
   Point sketchWindowLocation;
-  Runner runtime;
+  //Runner runtime;
 
   JMenuItem exportAppItem;
   JMenuItem saveMenuItem;
   JMenuItem saveAsMenuItem;
 
   boolean running;
-  boolean presenting;
+  //boolean presenting;
   boolean uploading;
 
   // undo fellers
@@ -142,12 +140,21 @@ public class Editor extends JFrame implements RunnerListener {
 
   FindReplace find;
 
+  Runnable runHandler;
+  Runnable presentHandler;
+  Runnable stopHandler;
+  Runnable exportHandler;
+  Runnable exportAppHandler;
+
 
   public Editor(Base ibase, String path, int[] location) {
     super("Arduino");
     this.base = ibase;
 
     //Base.setIcon(this);
+
+    // Install default actions for Run, Present, etc.
+    resetHandlers();
 
     // add listener to handle window close box hit event
     addWindowListener(new WindowAdapter() {
@@ -232,22 +239,7 @@ public class Editor extends JFrame implements RunnerListener {
     lineStatus = new EditorLineStatus(textarea);
     consolePanel.add(lineStatus, BorderLayout.SOUTH);
 
-//    if (newEditor) {
-//      try {
-//        setupEditorPane();
-//        upper.add(editorPane);
-//      } catch (Exception e1) {
-//        PrintWriter w = PApplet.createWriter(new File("/Users/fry/Desktop/blah.txt"));
-//        w.println(e1.getMessage());
-//        e1.printStackTrace(w);
-//        w.flush();
-//        w.close();
-////        e1.printStackTrace());
-////        e1.printStackTrace(System.out);
-//      }
-//    } else {
     upper.add(textarea);
-//    }
     splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                                upper, consolePanel);
 
@@ -276,64 +268,10 @@ public class Editor extends JFrame implements RunnerListener {
     listener = new EditorListener(this, textarea);
     pain.add(box);
 
-    pain.setTransferHandler(new TransferHandler() {
+    // get shift down/up events so we can show the alt version of toolbar buttons
+    textarea.addKeyListener(toolbar);
 
-        public boolean canImport(JComponent dest, DataFlavor[] flavors) {
-          return true;
-        }
-
-        public boolean importData(JComponent src, Transferable transferable) {
-          int successful = 0;
-
-          try {
-            DataFlavor uriListFlavor =
-              new DataFlavor("text/uri-list;class=java.lang.String");
-
-            if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-              java.util.List list = (java.util.List)
-                transferable.getTransferData(DataFlavor.javaFileListFlavor);
-              for (int i = 0; i < list.size(); i++) {
-                File file = (File) list.get(i);
-                if (sketch.addFile(file)) {
-                  successful++;
-                }
-              }
-            } else if (transferable.isDataFlavorSupported(uriListFlavor)) {
-              //System.out.println("uri list");
-              String data = (String)transferable.getTransferData(uriListFlavor);
-              String[] pieces = PApplet.splitTokens(data, "\r\n");
-              //PApplet.println(pieces);
-              for (int i = 0; i < pieces.length; i++) {
-                if (pieces[i].startsWith("#")) continue;
-
-                String path = null;
-                if (pieces[i].startsWith("file:///")) {
-                  path = pieces[i].substring(7);
-                } else if (pieces[i].startsWith("file:/")) {
-                  path = pieces[i].substring(5);
-                }
-                if (sketch.addFile(new File(path))) {
-                  successful++;
-                }
-              }
-            }
-          } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-          }
-
-          if (successful == 0) {
-            statusError("No files were added to the sketch.");
-
-          } else if (successful == 1) {
-            statusNotice("One file added to the sketch.");
-
-          } else {
-            statusNotice(successful + " files added to the sketch.");
-          }
-          return true;
-        }
-      });
+    pain.setTransferHandler(new FileDropHandler());
 
 //    System.out.println("t1");
 
@@ -344,6 +282,20 @@ public class Editor extends JFrame implements RunnerListener {
 
     // Set the window bounds and the divider location before setting it visible
     setPlacement(location);
+
+
+    // If the window is resized too small this will resize it again to the
+    // minimums. Adapted by Chris Lonnen from comments here:
+    // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4320050
+    // as a fix for http://dev.processing.org/bugs/show_bug.cgi?id=25
+    final int minW = Preferences.getInteger("editor.window.width.min");
+    final int minH = Preferences.getInteger("editor.window.height.min");
+    addComponentListener(new java.awt.event.ComponentAdapter() {
+        public void componentResized(ComponentEvent event) {
+          setSize((getWidth() < minW) ? minW : getWidth(),
+                  (getHeight() < minH) ? minH : getHeight());
+        }
+      });
 
 //    System.out.println("t3");
 
@@ -363,46 +315,71 @@ public class Editor extends JFrame implements RunnerListener {
   }
 
 
-  /*
-  // http://wiki.netbeans.org/DevFaqEditorCodeCompletionAnyJEditorPane
-  void setupEditorPane() throws IOException {
-    editorPane = new JEditorPane();
+  /**
+   * Handles files dragged & dropped from the desktop and into the editor
+   * window. Dragging files into the editor window is the same as using
+   * "Sketch &rarr; Add File" for each file.
+   */
+  class FileDropHandler extends TransferHandler {
+    public boolean canImport(JComponent dest, DataFlavor[] flavors) {
+      return true;
+    }
 
-    // This will find the Java editor kit and associate it with
-    // our editor pane. But that does not give us code completion 
-    // just yet because we have no Java context (i.e. no class path, etc.).
-    // However, this does give us syntax coloring.
-    EditorKit kit = CloneableEditorSupport.getEditorKit("text/x-java");
-    editorPane.setEditorKit(kit);
-    
-    // You can specify any ".java" file.
-    // If the file does not exist, it will be created.
-    // The contents of the file does not matter.
-    // The extension must be ".java", however.
-//    String newSourcePath = "/Users/fry/Desktop/tmp.java";
+    @SuppressWarnings("unchecked")
+    public boolean importData(JComponent src, Transferable transferable) {
+      int successful = 0;
 
-//    File tmpFile = new File(newSourcePath);
-//    System.out.println(tmpFile.getParent() + " " + tmpFile.getName());
-//  FileObject fob = FileUtil.createData(tmpFile);
-    File tmpFile = File.createTempFile("temp", ".java");
-    FileObject fob = FileUtil.toFileObject(FileUtil.normalizeFile(tmpFile));
+      try {
+        DataFlavor uriListFlavor =
+          new DataFlavor("text/uri-list;class=java.lang.String");
 
-    DataObject dob = DataObject.find(fob);
-    editorPane.getDocument().putProperty(Document.StreamDescriptionProperty, dob);
+        if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+          java.util.List list = (java.util.List)
+            transferable.getTransferData(DataFlavor.javaFileListFlavor);
+          for (int i = 0; i < list.size(); i++) {
+            File file = (File) list.get(i);
+            if (sketch.addFile(file)) {
+              successful++;
+            }
+          }
+        } else if (transferable.isDataFlavorSupported(uriListFlavor)) {
+          // Some platforms (Mac OS X and Linux, when this began) preferred
+          // this method of moving files.
+          String data = (String)transferable.getTransferData(uriListFlavor);
+          String[] pieces = PApplet.splitTokens(data, "\r\n");
+          for (int i = 0; i < pieces.length; i++) {
+            if (pieces[i].startsWith("#")) continue;
 
-    // This sets up a default class path for us so that
-    // we can find all the JDK classes via code completion.
-    DialogBinding.bindComponentToFile(fob, 0, 0, editorPane);
+            String path = null;
+            if (pieces[i].startsWith("file:///")) {
+              path = pieces[i].substring(7);
+            } else if (pieces[i].startsWith("file:/")) {
+              path = pieces[i].substring(5);
+            }
+            if (sketch.addFile(new File(path))) {
+              successful++;
+            }
+          }
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+        return false;
+      }
 
-    // Last but not least, we need to fill the editor pane with
-    // some initial dummy code - as it seems somehow required to
-    // kick-start code completion.
-    // A simple dummy package declaration will do.
-    editorPane.setText("package dummy;");
+      if (successful == 0) {
+        statusError("No files were added to the sketch.");
+
+      } else if (successful == 1) {
+        statusNotice("One file added to the sketch.");
+
+      } else {
+        statusNotice(successful + " files added to the sketch.");
+      }
+      return true;
+    }
   }
-  */
-  
-  
+
+
   protected void setPlacement(int[] location) {
     setBounds(location[0], location[1], location[2], location[3]);
     if (location[4] != 0) {
@@ -434,10 +411,10 @@ public class Editor extends JFrame implements RunnerListener {
    * This appears to only be required on OS X 10.2, and is not
    * even being called on later versions of OS X or Windows.
    */
-  public Dimension getMinimumSize() {
-    //System.out.println("getting minimum size");
-    return new Dimension(500, 550);
-  }
+//  public Dimension getMinimumSize() {
+//    //System.out.println("getting minimum size");
+//    return new Dimension(500, 550);
+//  }
 
 
   // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -737,7 +714,7 @@ public class Editor extends JFrame implements RunnerListener {
 
 
   protected void addTools(JMenu menu, File sourceFolder) {
-    HashMap toolItems = new HashMap();
+    HashMap<String, JMenuItem> toolItems = new HashMap<String, JMenuItem>();
 
     File[] folders = sourceFolder.listFiles(new FileFilter() {
       public boolean accept(File folder) {
@@ -807,7 +784,7 @@ public class Editor extends JFrame implements RunnerListener {
         // If no class name found, just move on.
         if (className == null) continue;
 
-        Class toolClass = Class.forName(className, true, loader);
+        Class<?> toolClass = Class.forName(className, true, loader);
         final Tool tool = (Tool) toolClass.newInstance();
 
         tool.init(Editor.this);
@@ -817,6 +794,7 @@ public class Editor extends JFrame implements RunnerListener {
         item.addActionListener(new ActionListener() {
           public void actionPerformed(ActionEvent e) {
             SwingUtilities.invokeLater(tool);
+            //new Thread(tool).start();
           }
         });
         //menu.add(item);
@@ -826,7 +804,7 @@ public class Editor extends JFrame implements RunnerListener {
         e.printStackTrace();
       }
     }
-    ArrayList<String> toolList = new ArrayList(toolItems.keySet());
+    ArrayList<String> toolList = new ArrayList<String>(toolItems.keySet());
     if (toolList.size() == 0) return;
 
     menu.addSeparator();
@@ -843,7 +821,7 @@ public class Editor extends JFrame implements RunnerListener {
 
     try {
       ZipFile zipFile = new ZipFile(file);
-      Enumeration entries = zipFile.entries();
+      Enumeration<?> entries = zipFile.entries();
       while (entries.hasMoreElements()) {
         ZipEntry entry = (ZipEntry) entries.nextElement();
 
@@ -869,7 +847,7 @@ public class Editor extends JFrame implements RunnerListener {
 
   protected JMenuItem createToolMenuItem(String className) {
     try {
-      Class toolClass = Class.forName(className);
+      Class<?> toolClass = Class.forName(className);
       final Tool tool = (Tool) toolClass.newInstance();
 
       JMenuItem item = new JMenuItem(tool.getMenuTitle());
@@ -903,12 +881,14 @@ public class Editor extends JFrame implements RunnerListener {
     menu.add(createToolMenuItem("processing.app.tools.Archiver"));
     menu.add(createToolMenuItem("processing.app.tools.FixEncoding"));
 
-    /*
-    //menu.add(createToolMenuItem("processing.app.tools.android.Build"));
-    item = createToolMenuItem("processing.app.tools.android.Build");
-    item.setAccelerator(KeyStroke.getKeyStroke('D', modifiers));
-    menu.add(item);
-    */
+//    // These are temporary entries while Android mode is being worked out.
+//    // The mode will not be in the tools menu, and won't involve a cmd-key
+//    if (!Base.RELEASE) {
+//      item = createToolMenuItem("processing.app.tools.android.AndroidTool");
+//    item.setAccelerator(KeyStroke.getKeyStroke('D', modifiers));
+//    menu.add(item);
+//      menu.add(createToolMenuItem("processing.app.tools.android.Reset"));
+//    }
 
     return menu;
   }
@@ -1363,6 +1343,35 @@ public class Editor extends JFrame implements RunnerListener {
   // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 
+  // these will be done in a more generic way soon, more like:
+  // setHandler("action name", Runnable);
+  // but for the time being, working out the kinks of how many things to
+  // abstract from the editor in this fashion.
+
+
+  public void setHandlers(Runnable runHandler, Runnable presentHandler,
+                          Runnable stopHandler,
+                          Runnable exportHandler, Runnable exportAppHandler) {
+    this.runHandler = runHandler;
+    this.presentHandler = presentHandler;
+    this.stopHandler = stopHandler;
+    this.exportHandler = exportHandler;
+    this.exportAppHandler = exportAppHandler;
+  }
+
+
+  public void resetHandlers() {
+    runHandler = new DefaultRunHandler();
+    presentHandler = new DefaultPresentHandler();
+    stopHandler = new DefaultStopHandler();
+    exportHandler = new DefaultExportHandler();
+    exportAppHandler = new DefaultExportAppHandler();
+  }
+
+
+  // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+
   /**
    * Gets the current sketch object.
    */
@@ -1799,26 +1808,50 @@ public class Editor extends JFrame implements RunnerListener {
       console.clear();
     }
 
-    //presenting = present;
-
-    SwingUtilities.invokeLater(new Runnable() {
-      public void run() {
-    try {
-          sketch.compile(verbose);    
-          statusNotice("Done compiling.");
-        } catch (RunnerException e) {
-          //statusError("Error compiling...");
-          statusError(e);
-
-        } catch (Exception e) {
-          e.printStackTrace();
-          }
-
-        toolbar.deactivate(EditorToolbar.RUN);
-    }
-    });
+    // Cannot use invokeLater() here, otherwise it gets
+    // placed on the event thread and causes a hang--bad idea all around.
+    new Thread(verbose ? presentHandler : runHandler).start();
   }
 
+  // DAM: in Arduino, this is compile
+  class DefaultRunHandler implements Runnable {
+    public void run() {
+      try {
+        sketch.prepare();
+        String appletClassName = sketch.build(false);
+        statusNotice("Done compiling.");
+      } catch (Exception e) {
+        statusError(e);
+      }
+
+      toolbar.deactivate(EditorToolbar.RUN);
+    }
+  }
+
+  // DAM: in Arduino, this is compile (with verbose output)
+  class DefaultPresentHandler implements Runnable {
+    public void run() {
+      try {
+        sketch.prepare();
+        String appletClassName = sketch.build(true);
+        statusNotice("Done compiling.");
+      } catch (Exception e) {
+        statusError(e);
+      }
+
+      toolbar.deactivate(EditorToolbar.RUN);
+    }
+  }
+
+  class DefaultStopHandler implements Runnable {
+    public void run() {
+      try {
+        // DAM: we should try to kill the compilation or upload process here.
+      } catch (Exception e) {
+        statusError(e);
+      }
+    }
+  }
 
   /**
    * Set the location of the sketch run window. Used by Runner to update the
@@ -1855,8 +1888,10 @@ public class Editor extends JFrame implements RunnerListener {
 
 
   /**
-   * Called by Runner to notify that the sketch has stopped running.
-   * Tools should not call this function, use handleStop() instead.
+   * Deactivate the Run button. This is called by Runner to notify that the
+   * sketch has stopped running, usually in response to an error (or maybe
+   * the sketch completing and exiting?) Tools should not call this function.
+   * To initiate a "stop" action, call handleStop() instead.
    */
   public void internalRunnerClosed() {
     running = false;
@@ -1870,11 +1905,9 @@ public class Editor extends JFrame implements RunnerListener {
   public void internalCloseRunner() {
     running = false;
 
+    if (stopHandler != null)
     try {
-      if (runtime != null) {
-        runtime.close();  // kills the window
-        runtime = null; // will this help?
-      }
+      stopHandler.run();
     } catch (Exception e) { }
 
     sketch.cleanup();
@@ -1883,12 +1916,13 @@ public class Editor extends JFrame implements RunnerListener {
 
   /**
    * Check if the sketch is modified and ask user to save changes.
-   * Immediately should be set true when quitting, or when the save should
-   * not happen asynchronously. Come to think of it, that's always now?
    * @return false if canceling the close/quit operation
    */
-  protected boolean checkModified(boolean immediately) {
+  protected boolean checkModified() {
     if (!sketch.isModified()) return true;
+
+    // As of Processing 1.0.10, this always happens immediately.
+    // http://dev.processing.org/bugs/show_bug.cgi?id=1456
 
     String prompt = "Save changes to " + sketch.getName() + "?  ";
 
@@ -1899,13 +1933,14 @@ public class Editor extends JFrame implements RunnerListener {
                                       JOptionPane.QUESTION_MESSAGE);
 
       if (result == JOptionPane.YES_OPTION) {
-        return handleSave(immediately);
+        return handleSave(true);
 
       } else if (result == JOptionPane.NO_OPTION) {
         return true;  // ok to continue
 
       } else if (result == JOptionPane.CANCEL_OPTION) {
         return false;
+
       } else {
         throw new IllegalStateException();
       }
@@ -1950,7 +1985,7 @@ public class Editor extends JFrame implements RunnerListener {
 
       Object result = pane.getValue();
       if (result == options[0]) {  // save (and close/quit)
-        return handleSave(immediately);
+        return handleSave(true);
 
       } else if (result == options[2]) {  // don't save (still close/quit)
         return true;
@@ -2203,39 +2238,69 @@ public class Editor extends JFrame implements RunnerListener {
   synchronized public void handleExport(final boolean verbose) {
     //if (!handleExportCheckModified()) return;
     toolbar.activate(EditorToolbar.EXPORT);
-
     console.clear();
     statusNotice("Uploading to I/O Board...");
 
-    //SwingUtilities.invokeLater(new Runnable() {
-    Thread t = new Thread(new Runnable() {
-        public void run() {
-          try {
-            serialMonitor.closeSerialPort();
-            serialMonitor.setVisible(false);
-            
-            uploading = true;
-          
-            boolean success = sketch.exportApplet(verbose);
-            if (success) {
-              statusNotice("Done uploading.");
-            } else {
-              // error message will already be visible
-            }
-          } catch (RunnerException e) {
-            //statusError("Error during upload.");
-            //e.printStackTrace();
-            statusError(e);
-          } catch (Exception e) {
-            e.printStackTrace();
-          }
-          uploading = false;
-          //toolbar.clear();
-          toolbar.deactivate(EditorToolbar.EXPORT);
-        }});
-    t.start();
+    new Thread(verbose ? exportAppHandler : exportHandler).start();
   }
 
+  // DAM: in Arduino, this is upload
+  class DefaultExportHandler implements Runnable {
+    public void run() {
+
+      try {
+        serialMonitor.closeSerialPort();
+        serialMonitor.setVisible(false);
+            
+        uploading = true;
+          
+        boolean success = sketch.exportApplet(false);
+        if (success) {
+          statusNotice("Done uploading.");
+        } else {
+          // error message will already be visible
+        }
+      } catch (RunnerException e) {
+        //statusError("Error during upload.");
+        //e.printStackTrace();
+        statusError(e);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+      uploading = false;
+      //toolbar.clear();
+      toolbar.deactivate(EditorToolbar.EXPORT);
+    }
+  }
+
+  // DAM: in Arduino, this is upload (with verbose output)
+  class DefaultExportAppHandler implements Runnable {
+    public void run() {
+
+      try {
+        serialMonitor.closeSerialPort();
+        serialMonitor.setVisible(false);
+            
+        uploading = true;
+          
+        boolean success = sketch.exportApplet(true);
+        if (success) {
+          statusNotice("Done uploading.");
+        } else {
+          // error message will already be visible
+        }
+      } catch (RunnerException e) {
+        //statusError("Error during upload.");
+        //e.printStackTrace();
+        statusError(e);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+      uploading = false;
+      //toolbar.clear();
+      toolbar.deactivate(EditorToolbar.EXPORT);
+    }
+  }
 
   /**
    * Checks to see if the sketch has been modified, and if so,
@@ -2418,7 +2483,7 @@ public class Editor extends JFrame implements RunnerListener {
       }
       statusError(mess);
     }
-    e.printStackTrace();
+//    e.printStackTrace();
   }
 
 
@@ -2563,4 +2628,3 @@ public class Editor extends JFrame implements RunnerListener {
     }
   }
 }
-

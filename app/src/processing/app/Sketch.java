@@ -3,7 +3,7 @@
 /*
   Part of the Processing project - http://processing.org
 
-  Copyright (c) 2004-09 Ben Fry and Casey Reas
+  Copyright (c) 2004-10 Ben Fry and Casey Reas
   Copyright (c) 2001-04 Massachusetts Institute of Technology
 
   This program is free software; you can redistribute it and/or modify
@@ -95,6 +95,9 @@ public class Sketch {
    * DLLs or JNILIBs.
    */
   private String libraryPath;
+  /**
+   * List of library folders. 
+   */
   private ArrayList<File> importedLibraries;
 
   /**
@@ -1165,11 +1168,14 @@ public class Sketch {
    *    X. afterwards, some of these steps need a cleanup function
    * </PRE>
    */
-  protected String compile(boolean verbose)
-    throws RunnerException {
-    
-    String name;
-  
+  //protected String compile() throws RunnerException {
+
+
+  /**
+   * When running from the editor, take care of preparations before running 
+   * the build. 
+   */
+  public void prepare() {
     // make sure the user didn't hide the sketch folder
     ensureExistence();
 
@@ -1199,11 +1205,8 @@ public class Sketch {
     // better connected to the dataFolder stuff below.
     cleanup();
 
-    // handle preprocessing the main file's code
-    name = build(tempBuildFolder.getAbsolutePath(), verbose);
-    size(tempBuildFolder.getAbsolutePath(), name);
-    
-    return name;
+//    // handle preprocessing the main file's code
+//    return build(tempBuildFolder.getAbsolutePath());
   }
 
 
@@ -1255,14 +1258,6 @@ public class Sketch {
     // 1. concatenate all .pde files to the 'main' pde
     //    store line number for starting point of each code bit
 
-    // Unfortunately, the header has to be written on a single line, because
-    // there's no way to determine how long it will be until the code has
-    // already been preprocessed. The header will vary in length based on
-    // the programming mode (STATIC, ACTIVE, or JAVA), which is determined
-    // by the preprocessor. So the preprocOffset for the primary class remains
-    // zero, even though it'd be nice to have a legitimate offset, and be able
-    // to remove the 'pretty' boolean for preproc.write().
-
     StringBuffer bigCode = new StringBuffer();
     int bigCount = 0;
     for (SketchCode sc : code) {
@@ -1271,28 +1266,8 @@ public class Sketch {
         bigCode.append(sc.getProgram());
         bigCode.append('\n');
         bigCount += sc.getLineCount();
-//        if (sc != code[0]) {
-//          sc.setPreprocName(null);  // don't compile me
-//        }
       }
     }
-
-    /*
-    String program = code[0].getProgram();
-    StringBuffer bigCode = new StringBuffer(program);
-    int bigCount = code[0].getLineCount();
-    bigCode.append('\n');
-
-    for (int i = 1; i < codeCount; i++) {
-      if (code[i].isExtension("pde")) {
-        code[i].setPreprocOffset(bigCount);
-        bigCode.append(code[i].getProgram());
-        bigCode.append('\n');
-        bigCount += code[i].getLineCount();
-        code[i].setPreprocName(null);  // don't compile me
-      }
-    }
-    */
 
     // Note that the headerOffset isn't applied until compile and run, because
     // it only applies to the code after it's been written to the .java file.
@@ -1359,7 +1334,7 @@ public class Sketch {
 
       if (libFolder != null && !importedLibraries.contains(libFolder)) {
         importedLibraries.add(libFolder);
-        classPath += Compiler.contentsToClassPath(libFolder);
+        //classPath += Compiler.contentsToClassPath(libFolder);
         libraryPath += File.pathSeparator + libFolder.getAbsolutePath();
       }
     }
@@ -1391,6 +1366,134 @@ public class Sketch {
   }
 
 
+  public ArrayList<File> getImportedLibraries() {
+    return importedLibraries;
+  }
+
+  
+  /**
+   * Map an error from a set of processed .java files back to its location
+   * in the actual sketch.
+   * @param message The error message.
+   * @param filename The .java file where the exception was found.
+   * @param line Line number of the .java file for the exception (1-indexed)
+   * @return A RunnerException to be sent to the editor, or null if it wasn't
+   *         possible to place the exception to the sketch code.
+   */
+//  public RunnerException placeExceptionAlt(String message, 
+//                                        String filename, int line) {
+//    String appletJavaFile = appletClassName + ".java";
+//    SketchCode errorCode = null;
+//    if (filename.equals(appletJavaFile)) {
+//      for (SketchCode code : getCode()) {
+//        if (code.isExtension("pde")) {
+//          if (line >= code.getPreprocOffset()) {
+//            errorCode = code;
+//          }
+//        }
+//      }
+//    } else {
+//      for (SketchCode code : getCode()) {
+//        if (code.isExtension("java")) {
+//          if (filename.equals(code.getFileName())) {
+//            errorCode = code;
+//          }
+//        }
+//      }
+//    }
+//    int codeIndex = getCodeIndex(errorCode);
+//
+//    if (codeIndex != -1) {
+//      //System.out.println("got line num " + lineNumber);
+//      // in case this was a tab that got embedded into the main .java
+//      line -= getCode(codeIndex).getPreprocOffset();
+//
+//      // lineNumber is 1-indexed, but editor wants zero-indexed
+//      line--;
+//
+//      // getMessage() will be what's shown in the editor
+//      RunnerException exception = 
+//        new RunnerException(message, codeIndex, line, -1);
+//      exception.hideStackTrace();
+//      return exception;
+//    }
+//    return null;
+//  }
+  
+
+  /**
+   * Map an error from a set of processed .java files back to its location
+   * in the actual sketch.
+   * @param message The error message.
+   * @param filename The .java file where the exception was found.
+   * @param line Line number of the .java file for the exception (0-indexed!)
+   * @return A RunnerException to be sent to the editor, or null if it wasn't
+   *         possible to place the exception to the sketch code.
+   */
+  public RunnerException placeException(String message, 
+                                        String dotJavaFilename, 
+                                        int dotJavaLine) {
+    int codeIndex = 0; //-1;
+    int codeLine = -1;
+
+//    System.out.println("placing " + dotJavaFilename + " " + dotJavaLine);
+//    System.out.println("code count is " + getCodeCount());
+
+    // first check to see if it's a .java file
+    for (int i = 0; i < getCodeCount(); i++) {
+      SketchCode code = getCode(i);
+      if (!code.isExtension(getDefaultExtension())) {
+        if (dotJavaFilename.equals(code.getFileName())) {
+          codeIndex = i;
+          codeLine = dotJavaLine;
+          return new RunnerException(message, codeIndex, codeLine);
+        }
+      }
+    }
+
+    // If not the preprocessed file at this point, then need to get out
+    if (!dotJavaFilename.equals(name + ".cpp")) {
+      return null;
+    }
+
+    // if it's not a .java file, codeIndex will still be 0
+    // this section searches through the list of .pde files
+    codeIndex = 0;
+    for (int i = 0; i < getCodeCount(); i++) {
+      SketchCode code = getCode(i);
+
+      if (code.isExtension(getDefaultExtension())) {
+//        System.out.println("preproc offset is " + code.getPreprocOffset());
+//        System.out.println("looking for line " + dotJavaLine);
+        if (code.getPreprocOffset() <= dotJavaLine) {
+          codeIndex = i;
+//          System.out.println("i'm thinkin file " + i);
+          codeLine = dotJavaLine - code.getPreprocOffset();
+        }
+      }
+    }
+    // could not find a proper line number, so deal with this differently.
+    // but if it was in fact the .java file we're looking for, though, 
+    // send the error message through.
+    // this is necessary because 'import' statements will be at a line
+    // that has a lower number than the preproc offset, for instance.
+//    if (codeLine == -1 && !dotJavaFilename.equals(name + ".java")) {
+//      return null;
+//    }
+    return new RunnerException(message, codeIndex, codeLine);
+  }
+
+
+  /**
+   * Run the build inside the temporary build folder.
+   * @return null if compilation failed, main class name if not
+   * @throws RunnerException
+   */
+  public String build(boolean verbose) throws RunnerException {
+    return build(tempBuildFolder.getAbsolutePath(), verbose);
+  }
+
+
   /**
    * Preprocess and compile all the code for this sketch.
    *
@@ -1410,6 +1513,7 @@ public class Sketch {
     // that will bubble up to whomever called build().
     Compiler compiler = new Compiler();
     if (compiler.compile(this, buildPath, primaryClassName, verbose)) {
+      size(buildPath, primaryClassName);
       return primaryClassName;
     }
     return null;
@@ -1461,7 +1565,6 @@ public class Sketch {
 //      return false;
 //    }
 
-    size(appletFolder.getPath(), foundName);
     upload(appletFolder.getPath(), foundName, verbose);
 
     return true;
@@ -1500,7 +1603,7 @@ public class Sketch {
                                                       verbose);
 
     return success ? suggestedClassName : null;
-    }
+  }
 
   /**
    * Replace all commented portions of a given String as spaces.
@@ -1538,7 +1641,8 @@ public class Sketch {
             break;
 
           } else {
-            index++;
+            // continue blanking this area
+            p[index++] = ' ';
           }
         }
         if (!endOfRainbow) {
@@ -1562,8 +1666,8 @@ public class Sketch {
    * Export to application via GUI. 
    */
   protected boolean exportApplication() throws IOException, RunnerException {
-        return false;
-      }
+    return false;
+  }
 
 
   /**
@@ -1571,154 +1675,7 @@ public class Sketch {
    */
   public boolean exportApplication(String destPath,
                                    int exportPlatform) throws IOException, RunnerException {
-      return false;
-    }
-
-
-  protected void addManifest(ZipOutputStream zos) throws IOException {
-    ZipEntry entry = new ZipEntry("META-INF/MANIFEST.MF");
-    zos.putNextEntry(entry);
-
-    String contents =
-      "Manifest-Version: 1.0\n" +
-      "Created-By: Processing " + Base.VERSION_NAME + "\n" +
-      "Main-Class: " + name + "\n";  // TODO not package friendly
-    zos.write(contents.getBytes());
-    zos.closeEntry();
-  }
-
-
-  /**
-   * Read from a file with a bunch of attribute/value pairs
-   * that are separated by = and ignore comments with #.
-   */
-  protected HashMap<String,String> readSettings(File inputFile) {
-    HashMap<String,String> outgoing = new HashMap<String,String>();
-    if (!inputFile.exists()) return outgoing;  // return empty hash
-
-    String lines[] = PApplet.loadStrings(inputFile);
-    for (int i = 0; i < lines.length; i++) {
-      int hash = lines[i].indexOf('#');
-      String line = (hash == -1) ?
-        lines[i].trim() : lines[i].substring(0, hash).trim();
-      if (line.length() == 0) continue;
-
-      int equals = line.indexOf('=');
-      if (equals == -1) {
-        System.err.println("ignoring illegal line in " + inputFile);
-        System.err.println("  " + line);
-        continue;
-      }
-      String attr = line.substring(0, equals).trim();
-      String valu = line.substring(equals + 1).trim();
-      outgoing.put(attr, valu);
-    }
-    return outgoing;
-  }
-
-
-  /**
-   * Slurps up .class files from a colon (or semicolon on windows)
-   * separated list of paths and adds them to a ZipOutputStream.
-   */
-  protected void packClassPathIntoZipFile(String path,
-                                          ZipOutputStream zos,
-                                          HashMap<String,Object> zipFileContents)
-    throws IOException {
-    String[] pieces = PApplet.split(path, File.pathSeparatorChar);
-
-    for (int i = 0; i < pieces.length; i++) {
-      if (pieces[i].length() == 0) continue;
-
-      // is it a jar file or directory?
-      if (pieces[i].toLowerCase().endsWith(".jar") ||
-          pieces[i].toLowerCase().endsWith(".zip")) {
-        try {
-          ZipFile file = new ZipFile(pieces[i]);
-          Enumeration<?> entries = file.entries();
-          while (entries.hasMoreElements()) {
-            ZipEntry entry = (ZipEntry) entries.nextElement();
-            if (entry.isDirectory()) {
-              // actually 'continue's for all dir entries
-
-            } else {
-              String entryName = entry.getName();
-              // ignore contents of the META-INF folders
-              if (entryName.indexOf("META-INF") == 0) continue;
-
-              // don't allow duplicate entries
-              if (zipFileContents.get(entryName) != null) continue;
-              zipFileContents.put(entryName, new Object());
-
-              ZipEntry entree = new ZipEntry(entryName);
-
-              zos.putNextEntry(entree);
-              byte buffer[] = new byte[(int) entry.getSize()];
-              InputStream is = file.getInputStream(entry);
-
-              int offset = 0;
-              int remaining = buffer.length;
-              while (remaining > 0) {
-                int count = is.read(buffer, offset, remaining);
-                offset += count;
-                remaining -= count;
-              }
-
-              zos.write(buffer);
-              zos.flush();
-              zos.closeEntry();
-            }
-          }
-        } catch (IOException e) {
-          System.err.println("Error in file " + pieces[i]);
-          e.printStackTrace();
-        }
-      } else {  // not a .jar or .zip, prolly a directory
-        File dir = new File(pieces[i]);
-        // but must be a dir, since it's one of several paths
-        // just need to check if it exists
-        if (dir.exists()) {
-          packClassPathIntoZipFileRecursive(dir, null, zos);
-        }
-      }
-    }
-  }
-
-
-  /**
-   * Continue the process of magical exporting. This function
-   * can be called recursively to walk through folders looking
-   * for more goodies that will be added to the ZipOutputStream.
-   */
-  static protected void packClassPathIntoZipFileRecursive(File dir,
-                                                          String sofar,
-                                                          ZipOutputStream zos)
-    throws IOException {
-    String files[] = dir.list();
-    for (int i = 0; i < files.length; i++) {
-      // ignore . .. and .DS_Store
-      if (files[i].charAt(0) == '.') continue;
-
-      File sub = new File(dir, files[i]);
-      String nowfar = (sofar == null) ?
-        files[i] : (sofar + "/" + files[i]);
-
-      if (sub.isDirectory()) {
-        packClassPathIntoZipFileRecursive(sub, nowfar, zos);
-
-      } else {
-        // don't add .jar and .zip files, since they only work
-        // inside the root, and they're unpacked
-        if (!files[i].toLowerCase().endsWith(".jar") &&
-            !files[i].toLowerCase().endsWith(".zip") &&
-            files[i].charAt(0) != '.') {
-          ZipEntry entry = new ZipEntry(nowfar);
-          zos.putNextEntry(entry);
-          zos.write(Base.loadBytesRaw(sub));
-          zos.closeEntry();
-        }
-      }
-    }
+    return false;
   }
 
 
@@ -1920,11 +1877,6 @@ public class Sketch {
       codeFolder.mkdirs();
     }
     return codeFolder;
-  }
-
-
-  public ArrayList<File> getImportedLibraries() {
-    return importedLibraries;
   }
 
 

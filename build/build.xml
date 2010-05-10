@@ -1,0 +1,468 @@
+<?xml version="1.0"?>
+<project name="Arduino" default="build">
+  
+  <!-- Sets properties for macosx/windows/linux depending on current system -->
+  <condition property="macosx"><os family="mac" /></condition>
+  <condition property="windows"><os family="windows" /></condition>
+  <condition property="linux"><os family="unix" /></condition>
+  
+  <condition property="platform" 
+	     value="macosx"><os family="mac" /></condition>
+  <condition property="platform" 
+	     value="windows"><os family="windows" /></condition>
+  <condition property="platform" 
+	     value="linux"><os family="unix" /></condition>
+
+  <!-- Libraries required for running arduino -->
+  <fileset dir=".." id="runtime.jars">
+    <include name="core/core.jar" />
+    <include name="app/pde.jar" />
+    <include name="app/lib/ecj.jar" />
+    <include name="app/lib/jna.jar" />
+    <include name="app/lib/oro.jar" />
+    <include name="app/lib/RXTXcomm.jar" />
+    <include name="app/lib/ant.jar" />
+    <include name="app/lib/ant-launcher.jar" />
+  </fileset>
+
+  <target name="build" description="Build Arduino.">
+    <antcall target="${platform}-build" />
+  </target>
+
+  <target name="run" description="Run Arduino.">
+    <antcall target="${platform}-run" />
+  </target>
+
+  <target name="dist" depends="revision-check"
+	  description="Build Arduino for distribution.">
+    <input message="Enter version number:" 
+	   addproperty="version"
+	   defaultvalue="${revision}" />
+    <antcall target="${platform}-dist" />
+  </target>
+
+  <!-- "§$§$&, ant doesn't have a built-in help target :(  -->
+  <target name="help" description="Show project help">
+    <java classname="org.apache.tools.ant.Main">
+      <arg value="-p" />
+    </java>
+  </target>
+  
+  <!-- - - - - - - - - - - - - - - - - - -->
+  <!-- Subprojects: Core, App, Libraries -->
+  <!-- - - - - - - - - - - - - - - - - - -->
+  
+  <target name="subprojects-clean">
+    <subant buildpath="../core" target="clean"/>
+    <subant buildpath="../app" target="clean"/>
+  </target>
+  
+  <target name="subprojects-build">
+    <subant buildpath="../core" target="build"/>
+    <subant buildpath="../app" target="build"/>
+  </target>
+  
+
+  <!-- - - - - - - - - -->
+  <!-- Basic Assembly  -->
+  <!-- - - - - - - - - -->
+  
+  <target name="assemble">
+    <fail unless="target.path" 
+	  message="Do not call assemble from the command line." />
+    
+    <!-- copy shared tools folder -->
+    <copy todir="${target.path}/tools">
+      <fileset dir="shared/tools" />
+    </copy>
+    
+    <!-- copy library folder -->
+    <copy todir="${target.path}/libraries">
+      <fileset dir="../libraries" />
+    </copy>
+    
+    <!-- copy hardware folder -->
+    <copy todir="${target.path}/hardware">
+      <fileset dir="../hardware" />
+    </copy>
+    
+    <!-- copy shared examples folder -->
+    <copy todir="${target.path}/examples">
+      <fileset dir="shared/examples" />
+    </copy>
+    
+    <!-- Unzip documentation -->
+    <unzip dest="${target.path}" src="shared/reference.zip" overwrite="false"/>
+    
+    <!-- Write the revision file! -->
+    <echo file="${target.path}/lib/version.txt" message="${version}" />
+  </target>
+
+  
+  <!-- - - - - - - - - -->
+  <!-- Revision check  -->
+  <!-- - - - - - - - - -->
+  <target name="revision-check">
+    <!-- figure out the revision number -->
+    <loadfile srcfile="../todo.txt" property="revision">
+      <filterchain>
+	<headfilter lines="1"/>
+	<tokenfilter>
+	  <stringtokenizer suppressdelims="true"/>
+	  <!-- grab the thing from the first line that's 4 digits -->
+	  <containsregex pattern="(\d\d\d\d)" />
+	</tokenfilter>
+      </filterchain>
+    </loadfile>
+    <!-- <echo message="revision is ${revision}." /> -->
+    
+    <!-- figure out the revision number in base.java -->
+    <loadfile srcfile="../app/src/processing/app/Base.java" 
+	      property="revision.base">
+      <filterchain>
+	<tokenfilter>
+	  <linetokenizer />
+	  <containsregex pattern="String VERSION_NAME = "/>
+	  <replaceregex pattern="[^0-9]*" flags="g" replace=""/>
+	</tokenfilter>
+      </filterchain>
+    </loadfile>
+    <!-- <echo message="base revision is ${revision.base}." /> -->
+    
+    <condition property="revision.correct">
+      <!-- Using contains because I can't figure out how to get rid of the
+	   LF in revision.base. Please file a bug if you have a fix. -->
+      <contains string="${revision.base}" substring="${revision}"/>
+    </condition>
+    
+    <!-- the revision.base property won't be set
+	 if $revision wasn't found... -->
+    <fail unless="revision.correct" 
+	  message="Fix revision number in Base.java" />
+  </target>
+  
+  
+  <!-- - - - - - - - -->
+  <!-- Mac OS X      -->
+  <!-- - - - - - - - -->
+
+  <target name="macosx-clean" depends="subprojects-clean" description="Clean Mac OS X build">
+    <delete dir="macosx/work" />
+    <delete dir="macosx/working_dir" />
+    <delete dir="macosx/working.dmg" />
+    <delete file="macosx/arduino-*.dmg" />
+  </target>
+  
+  <target name="macosx-checkos" unless="macosx">
+    <echo>
+      =======================================================
+      Arduino for Mac OS X can only be built on Mac OS X.
+      
+      Bye. 
+      =======================================================
+    </echo>
+    <fail message="wrong platform (${os.name})" />
+  </target>
+  
+  <target name="macosx-build" if="macosx" depends="revision-check, macosx-checkos, subprojects-build" description="Build Mac OS X version">
+    <mkdir dir="macosx/work" />
+    
+    <!-- assemble the pde -->
+    <copy todir="macosx/work">
+      <fileset dir="macosx/" includes="template.app/**"/>
+    </copy>
+    
+<!--    <rename src="macosx/work/template.app" 
+	    dest="macosx/work/Arduino.app" />-->
+    <move file="macosx/work/template.app" 
+	  tofile="macosx/work/Arduino.app" />
+
+    <chmod file="macosx/work/Arduino.app/Contents/MacOS/JavaApplicationStub" perm="755" />
+    
+    <copy todir="macosx/work/Arduino.app/Contents/Resources/Java" flatten="true">
+      <fileset refid="runtime.jars"/>
+    </copy>
+    
+    <copy todir="macosx/work/Arduino.app/Contents/Resources/Java">
+      <fileset dir="shared" includes="lib/**" />
+      <fileset file="shared/revisions.txt" />
+    </copy>
+
+    <!-- Unzip AVR tools -->
+    <!-- <unzip dest="macosx/work/Arduino.app/Contents/Resources/Java/hardware" src="macosx/dist/tools-universal.zip" overwrite="false"/> -->
+
+    <exec executable="unzip">
+      <arg value="-q" />
+      <arg value="-n" />
+      <arg value="-d" />
+      <arg value="macosx/work/Arduino.app/Contents/Resources/Java/hardware" />
+      <arg value="macosx/dist/tools-universal.zip" />
+    </exec>
+
+    <antcall target="assemble">
+      <param name="target.path" value="macosx/work/Arduino.app/Contents/Resources/Java" />
+    </antcall>
+  </target>
+
+  <target name="macosx-run" depends="macosx-build" description="Run Mac OS X version">
+    <exec executable="macosx/work/Arduino.app/Contents/MacOS/JavaApplicationStub" spawn="true"/>
+  </target>
+
+  <target name="macosx-dist" if="macosx" depends="macosx-build" description="Create a .dmg of the Mac OS X version">
+    <!-- now build the dmg -->
+    <gunzip src="macosx/template.dmg.gz" dest="macosx/working.dmg" />
+    
+    <mkdir dir="macosx/working_dir" />
+    <exec executable="hdiutil">
+      <arg line="attach macosx/working.dmg -noautoopen -mountpoint macosx/working_dir" />
+      <!--<arg line="attach macosx/working.dmg -noautoopen -quiet -mountpoint macosx/working_dir" />-->
+    </exec>
+    
+    <copy todir="macosx/working_dir">
+      <fileset dir="macosx/work" />
+    </copy>
+
+    <!-- The ant copy command does not preserve permissions. -->
+    <chmod file="macosx/working_dir/Arduino.app/Contents/MacOS/JavaApplicationStub" perm="+x" />
+
+    <!-- Pause briefly for the OS to catch up with the DMG changes. 
+	 This prevents "hdiutil: couldn't eject "disk3" - Resource busy"
+	 errors when ejecting the disk in the next step.
+         You may need to set this value higher for your system. -->
+    <sleep seconds="3" />
+    
+    <exec executable="hdiutil">
+      <!--<arg line="detach macosx/working_dir -quiet -force" />-->
+      <arg line="detach macosx/working_dir" />
+    </exec>
+  
+    <delete file="macosx/arduino-*.dmg" />
+    <exec executable="hdiutil">
+      <arg line="convert macosx/working.dmg -quiet -format UDZO -imagekey zlib-level=9 -o macosx/arduino-${version}.dmg" />
+    </exec>
+
+    <!-- Clean up the interim files. -->
+    <delete file="macosx/working.dmg" />
+    <delete dir="macosx/working_dir" />
+    
+    <echo>
+      =======================================================
+      Arduino for Mac OS X was built. Grab the image from   
+      
+      macosx/arduino-${version}.dmg
+      =======================================================
+    </echo>
+  </target>
+
+  
+  <!-- - - - - - - - -->
+  <!-- Linux         -->
+  <!-- - - - - - - - -->
+  
+  <target name="linux-clean" depends="subprojects-clean" description="Clean linux version">
+    <delete dir="linux/work" />
+  </target>
+  
+  <target name="linux-checkos" unless="linux">
+    <echo>
+      =======================================================
+      Arduino for Linux can only be built on on unix systems.
+      
+      Bye. 
+      =======================================================
+    </echo>
+    
+    <fail message="wrong platform (${os.name})" />
+  </target>
+  
+  <target name="linux-build" depends="revision-check, linux-checkos, subprojects-build" description="Build linux version">
+    <mkdir dir="linux/work" />
+    
+    <copy todir="linux/work">
+      <fileset dir="shared" includes="lib/**" />
+      <fileset file="shared/revisions.txt" />
+    </copy>
+    
+    <copy todir="linux/work">
+      <fileset dir="linux/dist" includes="lib/**" />
+    </copy>
+
+    <copy todir="linux/work/lib" flatten="true">
+      <fileset refid="runtime.jars" />
+    </copy>
+    
+    <antcall target="assemble">
+      <param name="target.path" value="linux/work" />
+    </antcall>
+
+    <copy todir="linux/work/hardware">
+      <fileset dir="linux/dist" includes="tools/**" />
+    </copy>
+
+    <chmod perm="755" file="linux/work/hardware/tools/avrdude" />
+
+    <copy todir="linux/work" file="linux/dist/arduino" />
+    <chmod perm="755" file="linux/work/arduino" />
+  </target>
+  
+  <target name="linux-run" depends="linux-build" 
+	  description="Run Linux version">
+    <exec executable="linux/work/arduino" dir="linux/work" spawn="false"/>
+  </target>
+  
+  <target name="linux-dist" depends="linux-build" 
+	  description="Build .tar.gz of linux version">
+
+    <get src="http://dev.processing.org/build/jre-tools-6u18-linux-i586.tgz" 
+	 dest="linux/jre.tgz" 
+	 usetimestamp="true" />    
+    <untar compression="gzip" 
+	   dest="linux/work" 
+	   src="linux/jre.tgz" 
+	   overwrite="false"/>
+
+<!--
+    <tar compression="gzip" basedir="linux/work" 
+	 destfile="linux/arduino-${version}.tgz" />
+-->
+    <tar compression="gzip" destfile="linux/arduino-${version}.tgz">
+      <tarfileset dir="linux/work" prefix="arduino-${version}" />
+    </tar>
+
+    <echo>
+      =======================================================
+      Arduino for Linux was built. Grab the archive from   
+      
+      build/linux/arduino-${version}.tgz
+      =======================================================
+    </echo>
+  </target>
+  
+  
+  <!-- - - - - - - - -->
+  <!-- Windows       -->
+  <!-- - - - - - - - -->
+  
+  <target name="windows-clean" depends="subprojects-clean"
+	  description="Clean windows version">
+    <delete dir="windows/work" />
+  </target>
+  
+  <target name="windows-checkos" unless="windows">
+    <echo>
+      =======================================================
+      Arduino for Windows can only be built on windows.
+      
+      Bye. 
+      =======================================================
+    </echo>
+    
+    <fail message="wrong platform (${os.name})" />
+  </target>
+  
+  <target name="windows-build" 
+	  depends="revision-check, windows-checkos, subprojects-build" 
+	  description="Build windows version">
+    <mkdir dir="windows/work" />
+    
+    <!-- assemble the pde -->
+    <mkdir dir="windows/work/lib" />
+    <copy todir="windows/work/lib" flatten="true">
+      <fileset refid="runtime.jars" />
+    </copy>
+    
+    <copy todir="windows/work">
+      <fileset dir="shared" includes="lib/**" />
+      <fileset file="shared/revisions.txt" />
+    </copy>
+    
+    <copy todir="windows/work">
+      <fileset dir="windows/dist" includes="*.dll" />
+    </copy>
+    
+    <copy todir="windows/work">
+      <fileset dir="windows/dist" includes="drivers/**" />
+    </copy>
+    
+    <!-- Unzip AVR tools -->
+    <unzip dest="windows/work/hardware" src="windows/avr_tools.zip" overwrite="false"/>
+
+    <antcall target="assemble">
+      <param name="target.path" value="windows/work" />
+    </antcall>
+    
+    <property name="launch4j.dir" value="windows/launcher/launch4j/" />
+    <taskdef name="launch4j" 
+	     classname="net.sf.launch4j.ant.Launch4jTask" 
+	     classpath="${launch4j.dir}/launch4j.jar; ${launch4j.dir}/lib/xstream.jar" />
+
+    <copy todir="windows/work">
+      <fileset dir="windows/launcher" 
+	       includes="about.bmp, application.ico, config.xml"/>
+    </copy>
+    <launch4j configFile="windows/work/config.xml" />
+    <delete dir="windows/work" 
+	    includes="about.bmp, application.ico, config.xml" />
+
+    <!-- cygwin requires html, dll, and exe to have the +x flag -->
+    <chmod perm="755">
+      <fileset dir="windows/work" includes="**/*.html, **/*.dll, **/*.exe" />
+    </chmod>
+  </target>
+  
+  <target name="windows-run" depends="windows-build" 
+	  description="Run windows version">
+    <exec executable="windows/work/arduino.exe" 
+	  dir="windows/work" spawn="true"/>
+  </target>
+
+  <target name="windows-dist" depends="windows-build" 
+	  description="Create .zip files of windows version">
+
+    <get src="http://dev.processing.org/build/jre-tools-6u18-windows-i586.zip" 
+	 dest="windows/jre.zip" 
+	 usetimestamp="true" />
+
+    <unzip dest="windows/work" src="windows/jre.zip" overwrite="false"/>
+
+    <!--
+    <zip basedir="windows/work" 
+	 prefix="arduino-${version}"
+	 destfile="windows/arduino-${version}.zip" />
+    <zip basedir="windows/work" 
+	 prefix="arduino-${version}"
+	 destfile="windows/arduino-${version}-expert.zip" 
+	 excludes="java/**" />
+    -->
+
+    <zip destfile="windows/arduino-${version}.zip">
+      <zipfileset dir="windows/work" 
+		  prefix="arduino-${version}" />
+    </zip>
+
+    <zip destfile="windows/arduino-${version}-expert.zip">
+      <zipfileset dir="windows/work" 
+		  prefix="arduino-${version}" 
+		  excludes="java/**" />
+    </zip>
+    
+    <echo>
+      =======================================================
+      Arduino for Windows was built. Grab the archive from   
+      
+      windows/arduino-${version}.zip
+      windows/arduino-${version}-expert.zip
+      =======================================================
+    </echo>
+  </target>
+  
+  
+  <!-- - - - - - - - -->
+  <!-- Run It!       -->
+  <!-- - - - - - - - -->
+  
+  <target name="clean" description="Perform a spring cleaning" 
+	  depends="linux-clean, windows-clean, macosx-clean, subprojects-clean">
+  </target>
+
+</project>

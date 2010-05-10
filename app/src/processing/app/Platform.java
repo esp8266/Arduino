@@ -26,6 +26,9 @@ import java.io.File;
 
 import javax.swing.UIManager;
 
+import com.sun.jna.Library;
+import com.sun.jna.Native;
+
 
 /**
  * Used by Base for platform-specific tweaking, for instance finding the
@@ -128,6 +131,36 @@ public class Platform {
   
   // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  
   
+
+  public interface CLibrary extends Library {
+    CLibrary INSTANCE = (CLibrary)Native.loadLibrary("c", CLibrary.class);
+    int setenv(String name, String value, int overwrite);
+    String getenv(String name);
+    int unsetenv(String name);
+    int putenv(String string);
+  }
+
+  
+  public void setenv(String variable, String value) {
+    CLibrary clib = CLibrary.INSTANCE;
+    clib.setenv(variable, value, 1);
+  }
+
+  
+  public String getenv(String variable) {
+    CLibrary clib = CLibrary.INSTANCE;
+    return clib.getenv(variable);
+  }
+
+
+  public int unsetenv(String variable) {
+    CLibrary clib = CLibrary.INSTANCE;
+    return clib.unsetenv(variable);
+  }
+
+  
+  // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  
+
 
   protected void showLauncherWarning() {
     Base.showWarning("No launcher available", 

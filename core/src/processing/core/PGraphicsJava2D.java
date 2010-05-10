@@ -967,6 +967,9 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
 
 
   public float textAscent() {
+    if (textFont == null) {
+      defaultFontOrDeath("textAscent");
+    }
     Font font = textFont.getFont();
     if (font == null) {
       return super.textAscent();
@@ -977,6 +980,9 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
 
 
   public float textDescent() {
+    if (textFont == null) {
+      defaultFontOrDeath("textAscent");
+    }
     Font font = textFont.getFont();
     if (font == null) {
       return super.textDescent();
@@ -1010,6 +1016,10 @@ public class PGraphicsJava2D extends PGraphics /*PGraphics2D*/ {
    * will get recorded properly.
    */
   public void textSize(float size) {
+    if (textFont == null) {
+      defaultFontOrDeath("textAscent", size);
+    }
+
     // if a native version available, derive this font
 //    if (textFontNative != null) {
 //      textFontNative = textFontNative.deriveFont(size);

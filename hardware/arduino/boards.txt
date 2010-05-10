@@ -101,6 +101,26 @@ bt.build.core=arduino
 
 ##############################################################
 
+fio.name=Arduino Fio
+
+fio.upload.protocol=stk500
+fio.upload.maximum_size=30720
+fio.upload.speed=57600
+
+fio.bootloader.low_fuses=0xFF
+fio.bootloader.high_fuses=0xDA
+fio.bootloader.extended_fuses=0x05
+fio.bootloader.path=arduino:atmega
+fio.bootloader.file=ATmegaBOOT_168_atmega328_pro_8MHz.hex
+fio.bootloader.unlock_bits=0x3F
+fio.bootloader.lock_bits=0x0F
+
+fio.build.mcu=atmega328p
+fio.build.f_cpu=8000000L
+fio.build.core=arduino:arduino
+
+##############################################################
+
 lilypad328.name=LilyPad Arduino w/ ATmega328
 
 lilypad328.upload.protocol=stk500
@@ -178,27 +198,6 @@ pro.bootloader.lock_bits=0x0F
 pro.build.mcu=atmega168
 pro.build.f_cpu=8000000L
 pro.build.core=arduino
-
-##############################################################
-
-fio.name=Arduino Fio
-
-fio.upload.protocol=stk500
-fio.upload.maximum_size=30720
-fio.upload.speed=57600
-
-fio.bootloader.low_fuses=0xFF
-fio.bootloader.high_fuses=0xDA
-fio.bootloader.extended_fuses=0x05
-fio.bootloader.path=arduino:atmega
-fio.bootloader.file=ATmegaBOOT_168_atmega328_pro_8MHz.hex
-fio.bootloader.unlock_bits=0x3F
-fio.bootloader.lock_bits=0x0F
-
-fio.build.mcu=atmega328p
-fio.build.f_cpu=8000000L
-fio.build.core=arduino:arduino
-
 
 ##############################################################
 

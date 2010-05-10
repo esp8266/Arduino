@@ -72,8 +72,15 @@ platform.auto_file_type_associations = true
 
 
 # default size for the main window
-default.window.width = 500
-default.window.height = 600
+editor.window.width.default = 500
+editor.window.height.default = 600
+
+editor.window.width.min = 400
+editor.window.height.min = 500
+# tested as approx 440 on OS X
+editor.window.height.min.macosx = 450
+# tested to be 515 on Windows XP, this leaves some room
+editor.window.height.min.windows = 530
 
 # font size for editor
 editor.font=Monospaced,plain,12
@@ -91,6 +98,21 @@ editor.caret.blink=true
 
 # area that's not in use by the text (replaced with tildes)
 editor.invalid=false
+
+# enable ctrl-ins, shift-ins, shift-delete for cut/copy/paste
+# on windows and linux, but disable on the mac
+editor.keys.alternative_cut_copy_paste = true
+editor.keys.alternative_cut_copy_paste.macosx = false
+
+# true if shift-backspace sends the delete character, 
+# false if shift-backspace just means backspace
+editor.keys.shift_backspace_is_delete = true
+
+# home and end keys should only travel to the start/end of the current line
+editor.keys.home_and_end_travel_far = false
+# the OS X HI Guidelines say that home/end are relative to the document
+# if you don't like it, this is the preference to change
+editor.keys.home_and_end_travel_far.macosx = true
 
 console			 = true
 console.output.file      = stdout.txt
@@ -197,14 +219,14 @@ preproc.substitute_unicode = true
 # viewed in (at least) Mozilla or IE.  useful when debugging the preprocessor.
 preproc.output_parse_tree = false
 
-# imports to use by default (changed for 0149, some imports removed)
-preproc.imports = java.applet,java.awt,java.awt.image,java.awt.event,java.io,java.net,java.text,java.util,java.util.zip,java.util.regex
+# Changed after 1.0.9 to a new name, and also includes the specific entries
+preproc.imports.list = java.applet.*,java.awt.Dimension,java.awt.Frame,java.awt.event.MouseEvent,java.awt.event.KeyEvent,java.awt.event.FocusEvent,java.awt.Image,java.io.*,java.net.*,java.text.*,java.util.*,java.util.zip.*,java.util.regex.*
 
 # set the browser to be used on linux
 browser.linux = mozilla
 
 # set to the program to be used for launching apps on linux
-#launcher.linux = gnome-open
+#launcher.linux = xdg-open
 
 # FULL SCREEN (PRESENT MODE)
 run.present.bgcolor = #666666

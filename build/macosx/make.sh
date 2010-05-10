@@ -113,6 +113,7 @@ javac \
     src/processing/app/macosx/*.java \
     src/processing/app/preproc/*.java \
     src/processing/app/syntax/*.java \
+    src/processing/app/syntax/im/*.java \
     src/processing/app/tools/*.java
 
 cd ../build/macosx/work/classes

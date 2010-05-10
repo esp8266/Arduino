@@ -3,7 +3,7 @@
 /*
   Part of the Processing project - http://processing.org
 
-  Copyright (c) 2008 Ben Fry and Casey Reas
+  Copyright (c) 2008-2009 Ben Fry and Casey Reas
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -24,6 +24,9 @@ package processing.app.windows;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+
+import com.sun.jna.Library;
+import com.sun.jna.Native;
 
 import processing.app.Base;
 import processing.app.Preferences;
@@ -264,5 +267,39 @@ public class Platform extends processing.app.Platform {
 
     // not tested
     //Runtime.getRuntime().exec("start explorer \"" + folder + "\"");
+  }
+
+
+  // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+
+  // Code partially thanks to Richard Quirk from:
+  // http://quirkygba.blogspot.com/2009/11/setting-environment-variables-in-java.html
+
+  static WinLibC clib = (WinLibC) Native.loadLibrary("msvcrt", WinLibC.class);
+
+  public interface WinLibC extends Library {
+    //WinLibC INSTANCE = (WinLibC) Native.loadLibrary("msvcrt", WinLibC.class);
+    //libc = Native.loadLibrary("msvcrt", WinLibC.class);
+    public int _putenv(String name);
+}
+
+
+  public void setenv(String variable, String value) {
+    //WinLibC clib = WinLibC.INSTANCE;
+    clib._putenv(variable + "=" + value);
+  }
+
+
+  public String getenv(String variable) {
+    return System.getenv(variable);
+  }
+
+
+  public int unsetenv(String variable) {
+    //WinLibC clib = WinLibC.INSTANCE;
+    //clib._putenv(variable + "=");
+    //return 0;
+    return clib._putenv(variable + "=");
   }
 }

@@ -3,7 +3,7 @@
 /*
   Part of the Processing project - http://processing.org
 
-  Copyright (c) 2004-09 Ben Fry and Casey Reas
+  Copyright (c) 2004-10 Ben Fry and Casey Reas
   Copyright (c) 2001-04 Massachusetts Institute of Technology
 
   This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,10 @@ import processing.core.*;
  */
 public class Base {
   public static final int REVISION = 18;
+  /** This might be replaced by main() if there's a lib/version.txt file. */
   static String VERSION_NAME = "0018";
+  /** Set true if this a proper release rather than a numbered revision. */
+  static public boolean RELEASE = false;
 
   static HashMap<Integer, String> platformNames = new HashMap<Integer, String>();
   static {
@@ -101,31 +104,16 @@ public class Base {
 //  ArrayList editors = Collections.synchronizedList(new ArrayList<Editor>());
   Editor activeEditor;
 
-//  int nextEditorX;
-//  int nextEditorY;
-
-//  import com.sun.jna.Library;
-//  import com.sun.jna.Native;
-
-//  public interface CLibrary extends Library {
-//    CLibrary INSTANCE = (CLibrary)Native.loadLibrary("c", CLibrary.class);
-//      int setenv(String name, String value, int overwrite);
-//    String getenv(String name);
-//    int unsetenv(String name);
-//    int putenv(String string);
-//  }
-
 
   static public void main(String args[]) {
-//    /Users/fry/coconut/sketchbook/libraries/gsvideo/library
-//    CLibrary clib = CLibrary.INSTANCE;
-//    clib.setenv("DYLD_LIBRARY_PATH", "/Users/fry/coconut/sketchbook/libraries/gsvideo/library", 1);
-//    System.out.println("env is now " + clib.getenv("DYLD_LIBRARY_PATH"));
-
     try {
       File versionFile = getContentFile("lib/version.txt");
       if (versionFile.exists()) {
-        VERSION_NAME = PApplet.loadStrings(versionFile)[0];
+        String version = PApplet.loadStrings(versionFile)[0];
+        if (!version.equals(VERSION_NAME)) {
+          VERSION_NAME = version;
+          RELEASE = true;
+        }
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -187,10 +175,12 @@ public class Base {
     try {
       platform.setLookAndFeel();
     } catch (Exception e) {
-      System.err.println("Non-fatal error while setting the Look & Feel.");
-      System.err.println("The error message follows, however Arduino should run fine.");
-      System.err.println(e.getMessage());
-      //e.printStackTrace();
+      String mess = e.getMessage();
+      if (mess.indexOf("ch.randelshofer.quaqua.QuaquaLookAndFeel") == -1) {
+        System.err.println("Non-fatal error while setting the Look & Feel.");
+        System.err.println("The error message follows, however Arduino should run fine.");
+        System.err.println(mess);
+      }
     }
 
     // Create a location for untitled sketches
@@ -213,7 +203,7 @@ public class Base {
 
   static protected void initPlatform() {
     try {
-      Class platformClass = Class.forName("processing.app.Platform");
+      Class<?> platformClass = Class.forName("processing.app.Platform");
       if (Base.isMacOS()) {
         platformClass = Class.forName("processing.app.macosx.Platform");
       } else if (Base.isWindows()) {
@@ -270,7 +260,7 @@ public class Base {
       }
     }
 
-    // If not path is set, get the default sketchbook folder for this platform
+    // If no path is set, get the default sketchbook folder for this platform
     if (sketchbookPath == null) {
       File defaultFolder = getDefaultSketchbookFolder();
       Preferences.set("sketchbook.path", defaultFolder.getAbsolutePath());
@@ -456,8 +446,8 @@ public class Base {
 
   protected int[] nextEditorLocation() {
     Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-    int defaultWidth = Preferences.getInteger("default.window.width");
-    int defaultHeight = Preferences.getInteger("default.window.height");
+    int defaultWidth = Preferences.getInteger("editor.window.width.default");
+    int defaultHeight = Preferences.getInteger("editor.window.height.default");
 
     if (activeEditor == null) {
       // If no current active editor, use default placement
@@ -584,7 +574,7 @@ public class Base {
    * Replace the sketch in the current window with a new untitled document.
    */
   public void handleNewReplace() {
-    if (!activeEditor.checkModified(true)) {
+    if (!activeEditor.checkModified()) {
       return;  // sketch was modified, and user canceled
     }
     // Close the running window, avoid window boogers with multiple sketches
@@ -616,7 +606,7 @@ public class Base {
    * @param path Location of the primary pde file for the sketch.
    */
   public void handleOpenReplace(String path) {
-    if (!activeEditor.checkModified(true)) {
+    if (!activeEditor.checkModified()) {
       return;  // sketch was modified, and user canceled
     }
     // Close the running window, avoid window boogers with multiple sketches
@@ -758,8 +748,8 @@ public class Base {
    */
   public boolean handleClose(Editor editor) {
     // Check if modified
-    boolean immediate = editors.size() == 1;
-    if (!editor.checkModified(immediate)) {
+//    boolean immediate = editors.size() == 1;
+    if (!editor.checkModified()) {
       return false;
     }
 
@@ -862,7 +852,7 @@ public class Base {
   protected boolean handleQuitEach() {
     int index = 0;
     for (Editor editor : editors) {
-      if (editor.checkModified(true)) {
+      if (editor.checkModified()) {
         // Update to the new/final sketch path for this fella
         storeSketchPath(editor, index);
         index++;
@@ -914,7 +904,8 @@ public class Base {
 
     // Add a list of all sketches and subfolders
     try {
-      boolean sketches = addSketches(menu, getSketchbookFolder(), true);
+      //boolean sketches = addSketches(menu, getSketchbookFolder(), true);
+      boolean sketches = addSketches(menu, getSketchbookFolder());
       if (sketches) menu.addSeparator();
     } catch (IOException e) {
       e.printStackTrace();
@@ -923,11 +914,11 @@ public class Base {
     //System.out.println("rebuilding examples menu");
     // Add each of the subfolders of examples directly to the menu
     try {
-      boolean found = addSketches(menu, examplesFolder, true);
+      boolean found = addSketches(menu, examplesFolder);
       if (found) menu.addSeparator();
-      found = addSketches(menu, getSketchbookLibrariesFolder(), true);
+      found = addSketches(menu, getSketchbookLibrariesFolder());
       if (found) menu.addSeparator();
-      addSketches(menu, librariesFolder, true);
+      addSketches(menu, librariesFolder);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -939,7 +930,8 @@ public class Base {
     //new Exception().printStackTrace();
     try {
         menu.removeAll();
-        addSketches(menu, getSketchbookFolder(), false);
+      //addSketches(menu, getSketchbookFolder(), false);
+      addSketches(menu, getSketchbookFolder());
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -983,11 +975,11 @@ public class Base {
     //System.out.println("rebuilding examples menu");
     try {
       menu.removeAll();
-      boolean found = addSketches(menu, examplesFolder, false);
+      boolean found = addSketches(menu, examplesFolder);
       if (found) menu.addSeparator();
-      found = addSketches(menu, getSketchbookLibrariesFolder(), false);
+      found = addSketches(menu, getSketchbookLibrariesFolder());
       if (found) menu.addSeparator();
-      addSketches(menu, librariesFolder, false);
+      addSketches(menu, librariesFolder);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -1050,8 +1042,7 @@ public class Base {
    * should replace the sketch in the current window, or false when the
    * sketch should open in a new window.
    */
-  protected boolean addSketches(JMenu menu, File folder,
-                                final boolean openReplaces) throws IOException {
+  protected boolean addSketches(JMenu menu, File folder) throws IOException {
     // skip .DS_Store files, etc (this shouldn't actually be necessary)
     if (!folder.isDirectory()) return false;
 
@@ -1068,7 +1059,8 @@ public class Base {
         public void actionPerformed(ActionEvent e) {
           String path = e.getActionCommand();
           if (new File(path).exists()) {
-            if (openReplaces) {
+//            if (openReplaces) {
+            if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 0) {
               handleOpenReplace(path);
             } else {
               handleOpen(path);
@@ -1121,14 +1113,15 @@ public class Base {
       } else {
         // don't create an extra menu level for a folder named "examples"
         if (subfolder.getName().equals("examples")) {
-          boolean found = addSketches(menu, subfolder, openReplaces); //, false);
+          boolean found = addSketches(menu, subfolder);
           if (found) ifound = true;
         } else {
         // not a sketch folder, but maybe a subfolder containing sketches
         JMenu submenu = new JMenu(list[i]);
         // needs to be separate var
         // otherwise would set ifound to false
-        boolean found = addSketches(submenu, subfolder, openReplaces); //, false);
+        //boolean found = addSketches(submenu, subfolder, openReplaces); //, false);
+        boolean found = addSketches(submenu, subfolder); //, false);
         if (found) {
           menu.add(submenu);
           ifound = true;
@@ -1317,6 +1310,11 @@ public class Base {
 //      return PConstants.OTHER;
 //    }
 //  }
+
+
+  static public Platform getPlatform() {
+    return platform;
+  }
 
 
   static public String getPlatformName() {
@@ -1714,12 +1712,11 @@ public class Base {
   }
   */
 
-
   /**
    * Registers key events for a Ctrl-W and ESC with an ActionListener
    * that will take care of disposing the window.
    */
-  static public void registerWindowCloseKeys(JRootPane root, //Window window,
+  static public void registerWindowCloseKeys(JRootPane root,
                                              ActionListener disposer) {
     KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
     root.registerKeyboardAction(disposer, stroke,
@@ -1834,6 +1831,129 @@ public class Base {
 
 
   // ...................................................................
+
+
+
+  // incomplete
+  static public int showYesNoCancelQuestion(Editor editor, String title,
+                                            String primary, String secondary) {
+    if (!Base.isMacOS()) {
+      int result =
+        JOptionPane.showConfirmDialog(null, primary + "\n" + secondary, title,
+                                      JOptionPane.YES_NO_CANCEL_OPTION,
+                                      JOptionPane.QUESTION_MESSAGE);
+      return result;
+//    if (result == JOptionPane.YES_OPTION) {
+//
+//    } else if (result == JOptionPane.NO_OPTION) {
+//      return true;  // ok to continue
+//
+//    } else if (result == JOptionPane.CANCEL_OPTION) {
+//      return false;
+//
+//    } else {
+//      throw new IllegalStateException();
+//    }
+
+    } else {
+      // Pane formatting adapted from the Quaqua guide
+      // http://www.randelshofer.ch/quaqua/guide/joptionpane.html
+      JOptionPane pane =
+        new JOptionPane("<html> " +
+                        "<head> <style type=\"text/css\">"+
+                        "b { font: 13pt \"Lucida Grande\" }"+
+                        "p { font: 11pt \"Lucida Grande\"; margin-top: 8px }"+
+                        "</style> </head>" +
+                        "<b>Do you want to save changes to this sketch<BR>" +
+                        " before closing?</b>" +
+                        "<p>If you don't save, your changes will be lost.",
+                        JOptionPane.QUESTION_MESSAGE);
+
+      String[] options = new String[] {
+          "Save", "Cancel", "Don't Save"
+      };
+      pane.setOptions(options);
+
+      // highlight the safest option ala apple hig
+      pane.setInitialValue(options[0]);
+
+      // on macosx, setting the destructive property places this option
+      // away from the others at the lefthand side
+      pane.putClientProperty("Quaqua.OptionPane.destructiveOption",
+                             new Integer(2));
+
+      JDialog dialog = pane.createDialog(editor, null);
+      dialog.setVisible(true);
+
+      Object result = pane.getValue();
+      if (result == options[0]) {
+        return JOptionPane.YES_OPTION;
+      } else if (result == options[1]) {
+        return JOptionPane.CANCEL_OPTION;
+      } else if (result == options[2]) {
+        return JOptionPane.NO_OPTION;
+      } else {
+        return JOptionPane.CLOSED_OPTION;
+      }
+    }
+  }
+
+
+//if (result == JOptionPane.YES_OPTION) {
+  //
+//      } else if (result == JOptionPane.NO_OPTION) {
+//        return true;  // ok to continue
+  //
+//      } else if (result == JOptionPane.CANCEL_OPTION) {
+//        return false;
+  //
+//      } else {
+//        throw new IllegalStateException();
+//      }
+
+  static public int showYesNoQuestion(Frame editor, String title,
+                                            String primary, String secondary) {
+    if (!Base.isMacOS()) {
+      return JOptionPane.showConfirmDialog(editor,
+                                           "<html><body>" +
+                                           "<b>" + primary + "</b>" +
+                                           "<br>" + secondary, title,
+                                           JOptionPane.YES_NO_OPTION,
+                                           JOptionPane.QUESTION_MESSAGE);
+    } else {
+      // Pane formatting adapted from the Quaqua guide
+      // http://www.randelshofer.ch/quaqua/guide/joptionpane.html
+      JOptionPane pane =
+        new JOptionPane("<html> " +
+                        "<head> <style type=\"text/css\">"+
+                        "b { font: 13pt \"Lucida Grande\" }"+
+                        "p { font: 11pt \"Lucida Grande\"; margin-top: 8px }"+
+                        "</style> </head>" +
+                        "<b>" + primary + "</b>" +
+                        "<p>" + secondary + "</p>",
+                        JOptionPane.QUESTION_MESSAGE);
+
+      String[] options = new String[] {
+          "Yes", "No"
+      };
+      pane.setOptions(options);
+
+      // highlight the safest option ala apple hig
+      pane.setInitialValue(options[0]);
+
+      JDialog dialog = pane.createDialog(editor, null);
+      dialog.setVisible(true);
+
+      Object result = pane.getValue();
+      if (result == options[0]) {
+        return JOptionPane.YES_OPTION;
+      } else if (result == options[1]) {
+        return JOptionPane.NO_OPTION;
+      } else {
+        return JOptionPane.CLOSED_OPTION;
+      }
+    }
+  }
 
 
   /**
@@ -1956,6 +2076,36 @@ public class Base {
     input.close();  // weren't properly being closed
     input = null;
     return buffer;
+  }
+
+
+
+  /**
+   * Read from a file with a bunch of attribute/value pairs
+   * that are separated by = and ignore comments with #.
+   */
+  static public HashMap<String,String> readSettings(File inputFile) {
+    HashMap<String,String> outgoing = new HashMap<String,String>();
+    if (!inputFile.exists()) return outgoing;  // return empty hash
+
+    String lines[] = PApplet.loadStrings(inputFile);
+    for (int i = 0; i < lines.length; i++) {
+      int hash = lines[i].indexOf('#');
+      String line = (hash == -1) ?
+        lines[i].trim() : lines[i].substring(0, hash).trim();
+      if (line.length() == 0) continue;
+
+      int equals = line.indexOf('=');
+      if (equals == -1) {
+        System.err.println("ignoring illegal line in " + inputFile);
+        System.err.println("  " + line);
+        continue;
+      }
+      String attr = line.substring(0, equals).trim();
+      String valu = line.substring(equals + 1).trim();
+      outgoing.put(attr, valu);
+    }
+    return outgoing;
   }
 
 
@@ -2116,7 +2266,7 @@ public class Base {
 
   static public String[] listFiles(File folder, boolean relative) {
     String path = folder.getAbsolutePath();
-    Vector vector = new Vector();
+    Vector<String> vector = new Vector<String>();
     listFiles(relative ? (path + File.separator) : "", path, vector);
     String outgoing[] = new String[vector.size()];
     vector.copyInto(outgoing);
@@ -2125,7 +2275,7 @@ public class Base {
 
 
   static protected void listFiles(String basePath,
-                                  String path, Vector vector) {
+                                  String path, Vector<String> vector) {
     File folder = new File(path);
     String list[] = folder.list();
     if (list == null) return;

@@ -37,10 +37,18 @@ public class RunnerException extends Exception /*RuntimeException*/ {
 
   
   public RunnerException(String message) {
-    this(message, -1, -1, -1, true);
+    this(message, true);
   }
 
+  public RunnerException(String message, boolean showStackTrace) {
+    this(message, -1, -1, -1, showStackTrace);
+  }
 
+  public RunnerException(String message, int file, int line) {
+    this(message, file, line, -1, true);
+  }
+
+  
   public RunnerException(String message, int file, int line, int column) {
     this(message, file, line, column, true);
   }

@@ -51,15 +51,9 @@ public class PdePreprocessor {
   
   List prototypes;
 
-
-
-
-  String[] defaultImports;
-
   // these ones have the .* at the end, since a class name might be at the end
   // instead of .* which would make trouble other classes using this can lop
   // off the . and anything after it to produce a package name consistently.
-  //public String extraImports[];
   ArrayList<String> programImports;
 
   // imports just from the code folder, treated differently
@@ -71,24 +65,24 @@ public class PdePreprocessor {
   PrintStream stream;
   String program;
   String buildPath;
+  // starts as sketch name, ends as main class name
   String name;
 
 
   /**
    * Setup a new preprocessor.
    */
-  public PdePreprocessor() { }
-
-  public int writePrefix(String program, String buildPath,
-                         String name, String codeFolderPackages[])
-    throws FileNotFoundException {
-    this.buildPath = buildPath;
-    this.name = name;
-
+  public PdePreprocessor() { 
     int tabSize = Preferences.getInteger("editor.tabs.size");
     char[] indentChars = new char[tabSize];
     Arrays.fill(indentChars, ' ');
     indent = new String(indentChars);
+  }
+
+  public int writePrefix(String program, String buildPath,
+                         String sketchName, String codeFolderPackages[]) throws FileNotFoundException {
+    this.buildPath = buildPath;
+    this.name = sketchName;
 
     // if the program ends with no CR or LF an OutOfMemoryError will happen.
     // not gonna track down the bug now, so here's a hack for it:
@@ -99,51 +93,12 @@ public class PdePreprocessor {
     // an OutOfMemoryError or NullPointerException will happen.
     // again, not gonna bother tracking this down, but here's a hack.
     // http://dev.processing.org/bugs/show_bug.cgi?id=16
-    Sketch.scrubComments(program);
-    // this returns the scrubbed version, but more important for this
-    // function, it'll check to see if there are errors with the comments.
+    String scrubbed = Sketch.scrubComments(program);
+    // If there are errors, an exception is thrown and this fxn exits.
 
     if (Preferences.getBoolean("preproc.substitute_unicode")) {
-      // check for non-ascii chars (these will be/must be in unicode format)
-      char p[] = program.toCharArray();
-      int unicodeCount = 0;
-      for (int i = 0; i < p.length; i++) {
-        if (p[i] > 127) unicodeCount++;
-      }
-      // if non-ascii chars are in there, convert to unicode escapes
-      if (unicodeCount != 0) {
-        // add unicodeCount * 5.. replacing each unicode char
-        // with six digit uXXXX sequence (xxxx is in hex)
-        // (except for nbsp chars which will be a replaced with a space)
-        int index = 0;
-        char p2[] = new char[p.length + unicodeCount*5];
-        for (int i = 0; i < p.length; i++) {
-          if (p[i] < 128) {
-            p2[index++] = p[i];
-
-          } else if (p[i] == 160) {  // unicode for non-breaking space
-            p2[index++] = ' ';
-
-          } else {
-            int c = p[i];
-            p2[index++] = '\\';
-            p2[index++] = 'u';
-            char str[] = Integer.toHexString(c).toCharArray();
-            // add leading zeros, so that the length is 4
-            //for (int i = 0; i < 4 - str.length; i++) p2[index++] = '0';
-            for (int m = 0; m < 4 - str.length; m++) p2[index++] = '0';
-            System.arraycopy(str, 0, p2, index, str.length);
-            index += str.length;
-          }
-        }
-        program = new String(p2, 0, index);
-      }
+      program = substituteUnicode(program);
     }
-
-    // These may change in-between (if the prefs panel adds this option)
-    // so grab them here on construction.
-    String prefsLine = Preferences.get("preproc.imports");
-    defaultImports = PApplet.splitTokens(prefsLine, ", ");
 
     //String importRegexp = "(?:^|\\s|;)(import\\s+)(\\S+)(\\s*;)";
     String importRegexp = "^\\s*#include\\s+[<\"](\\S+)[\">]";
@@ -184,8 +139,47 @@ public class PdePreprocessor {
     return headerCount + prototypeCount;
   }
 
+
+  static String substituteUnicode(String program) {
+    // check for non-ascii chars (these will be/must be in unicode format)
+    char p[] = program.toCharArray();
+    int unicodeCount = 0;
+    for (int i = 0; i < p.length; i++) {
+      if (p[i] > 127) unicodeCount++;
+    }
+    // if non-ascii chars are in there, convert to unicode escapes
+    if (unicodeCount != 0) {
+      // add unicodeCount * 5.. replacing each unicode char
+      // with six digit uXXXX sequence (xxxx is in hex)
+      // (except for nbsp chars which will be a replaced with a space)
+      int index = 0;
+      char p2[] = new char[p.length + unicodeCount*5];
+      for (int i = 0; i < p.length; i++) {
+        if (p[i] < 128) {
+          p2[index++] = p[i];
+
+        } else if (p[i] == 160) {  // unicode for non-breaking space
+          p2[index++] = ' ';
+
+        } else {
+          int c = p[i];
+          p2[index++] = '\\';
+          p2[index++] = 'u';
+          char str[] = Integer.toHexString(c).toCharArray();
+          // add leading zeros, so that the length is 4
+          //for (int i = 0; i < 4 - str.length; i++) p2[index++] = '0';
+          for (int m = 0; m < 4 - str.length; m++) p2[index++] = '0';
+          System.arraycopy(str, 0, p2, index, str.length);
+          index += str.length;
+        }
+      }
+      program = new String(p2, 0, index);
+    }
+    return program;
+  }
+
   /**
-   * preprocesses a pde file and write out a java file
+   * preprocesses a pde file and writes out a java file
    * @return the classname of the exported Java
    */
   //public String write(String program, String buildPath, String name,

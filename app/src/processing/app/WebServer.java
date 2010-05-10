@@ -8,8 +8,12 @@ import java.util.zip.*;
 //import javax.swing.SwingUtilities;
 
 /**
- * An example of a very simple, multi-threaded HTTP server.
- * Taken from <a href="http://java.sun.com/developer/technicalArticles/Networking/Webserver/">this</a> article on java.sun.com.
+ * This code is placed here in anticipation of running the reference from an
+ * internal web server that reads the docs from a zip file, instead of using
+ * thousands of .html files on the disk, which is really inefficient.
+ * <p/>
+ * This is a very simple, multi-threaded HTTP server, originally based on 
+ * <a href="http://j.mp/6BQwpI">this</a> article on java.sun.com.
  */
 public class WebServer implements HttpConstants {
 

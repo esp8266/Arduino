@@ -626,6 +626,11 @@ public class Preferences {
   }
 
 
+  static public void unset(String attribute) {
+    table.remove(attribute);
+  }
+
+
   static public boolean getBoolean(String attribute) {
     String value = get(attribute); //, null);
     return (new Boolean(value)).booleanValue();

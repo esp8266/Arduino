@@ -419,7 +419,7 @@ public class PPolygon implements PConstants {
     int tr, tg, tb, ta;
 
 //    System.out.println("P2D interp uv " + interpUV + " " + 
-//                       vertices[2][U] + " " + vertices[2][V]);    
+//                       vertices[2][U] + " " + vertices[2][V]);
     for (int x = lx; x <= rx; x++) {
       // map texture based on U, V coords in sp[U] and sp[V]
       if (interpUV) {
