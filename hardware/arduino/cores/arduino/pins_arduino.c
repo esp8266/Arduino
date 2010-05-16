@@ -77,10 +77,6 @@
 #define PK 11
 #define PL 12
 
-#define REPEAT8(x) x, x, x, x, x, x, x, x
-#define BV0TO7 _BV(0), _BV(1), _BV(2), _BV(3), _BV(4), _BV(5), _BV(6), _BV(7)
-#define BV7TO0 _BV(7), _BV(6), _BV(5), _BV(4), _BV(3), _BV(2), _BV(1), _BV(0)
-
 
 #if defined(__AVR_ATmega1280__)
 const uint16_t PROGMEM port_to_mode_PGM[] = {

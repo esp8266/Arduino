@@ -106,12 +106,6 @@ int analogRead(uint8_t);
 void analogReference(uint8_t mode);
 void analogWrite(uint8_t, int);
 
-void beginSerial(long);
-void serialWrite(unsigned char);
-int serialAvailable(void);
-int serialRead(void);
-void serialFlush(void);
-
 unsigned long millis(void);
 unsigned long micros(void);
 void delay(unsigned long);
