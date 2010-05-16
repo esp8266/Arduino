@@ -161,6 +161,46 @@ lilypad.build.core=arduino
 
 ##############################################################
 
+pro5v328.name=Arduino Pro or Pro Mini (5V, 16 MHz) w/ ATmega328
+
+pro5v328.upload.protocol=stk500
+pro5v328.upload.maximum_size=30720
+pro5v328.upload.speed=57600
+
+pro5v328.bootloader.low_fuses=0xFF
+pro5v328.bootloader.high_fuses=0xDA
+pro5v328.bootloader.extended_fuses=0x05
+pro5v328.bootloader.path=atmega
+pro5v328.bootloader.file=ATmegaBOOT_168_atmega328.hex
+pro5v328.bootloader.unlock_bits=0x3F
+pro5v328.bootloader.lock_bits=0x0F
+
+pro5v328.build.mcu=atmega328p
+pro5v328.build.f_cpu=16000000L
+pro5v328.build.core=arduino
+
+##############################################################
+
+pro5v.name=Arduino Pro or Pro Mini (5V, 16 MHz) w/ ATmega168
+
+pro5v.upload.protocol=stk500
+pro5v.upload.maximum_size=14336
+pro5v.upload.speed=19200
+
+pro5v.bootloader.low_fuses=0xff
+pro5v.bootloader.high_fuses=0xdd
+pro5v.bootloader.extended_fuses=0x00
+pro5v.bootloader.path=atmega
+pro5v.bootloader.file=ATmegaBOOT_168_diecimila.hex
+pro5v.bootloader.unlock_bits=0x3F
+pro5v.bootloader.lock_bits=0x0F
+
+pro5v.build.mcu=atmega168
+pro5v.build.f_cpu=16000000L
+pro5v.build.core=arduino
+
+##############################################################
+
 pro328.name=Arduino Pro or Pro Mini (3.3V, 8 MHz) w/ ATmega328
 
 pro328.upload.protocol=stk500
