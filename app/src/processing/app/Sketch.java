@@ -411,7 +411,7 @@ public class Sketch {
       return;
     }
     
-    if (currentIndex == 0) {
+    if (renamingCode && currentIndex == 0) {
       for (int i = 1; i < codeCount; i++) {
         if (sanitaryName.equalsIgnoreCase(code[i].getPrettyName()) &&
           code[i].getExtension().equalsIgnoreCase("cpp")) {
