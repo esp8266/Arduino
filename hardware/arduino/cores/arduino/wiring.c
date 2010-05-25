@@ -97,10 +97,14 @@ unsigned long micros() {
 
 void delay(unsigned long ms)
 {
-	unsigned long start = millis();
-	
-	while (millis() - start <= ms)
-		;
+	uint16_t start = (uint16_t)micros();
+
+	while (ms > 0) {
+		if (((uint16_t)micros() - start) >= 1000) {
+			ms--;
+			start += 1000;
+		}
+	}
 }
 
 /* Delay for the given number of microseconds.  Assumes a 8 or 16 MHz clock. */
