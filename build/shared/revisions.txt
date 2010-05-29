@@ -1,3 +1,14 @@
+ARDUINO 0019
+
+[core / libraries]
+
+* More accurate delay() function from BenF.
+
+[environment]
+
+* Synchronized with the Processing 1.1 code base, bringing various changes.
+* Adding control over scrolling in serial monitor.
+
 ARDUINO 0018 - 2010.01.29
 
 [core / libraries]
