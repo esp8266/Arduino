@@ -25,15 +25,17 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
+import javax.swing.text.*;
 
 public class SerialMonitor extends JFrame implements MessageConsumer {
   private Serial serial;
   private String port;
   private JTextArea textArea;
+  private JScrollPane scrollPane;
   private JTextField textField;
   private JButton sendButton;
+  private JCheckBox autoscrollBox;
   private JComboBox serialRates;
-  private JLabel statusLabel;
   private int serialRate;
 
   public SerialMonitor(String port) {
@@ -64,7 +66,13 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
     textArea.setEditable(false);    
     textArea.setFont(font);
     
-    getContentPane().add(new JScrollPane(textArea), BorderLayout.CENTER);
+    // don't automatically update the caret.  that way we can manually decide
+    // whether or not to do so based on the autoscroll checkbox.
+    ((DefaultCaret)textArea.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+    
+    scrollPane = new JScrollPane(textArea);
+    
+    getContentPane().add(scrollPane, BorderLayout.CENTER);
     
     JPanel pane = new JPanel(new BorderLayout(4, 0));
     pane.setBorder(new EmptyBorder(4, 4, 4, 4));
@@ -91,9 +99,8 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
     pane = new JPanel(new BorderLayout(4, 0));
     pane.setBorder(new EmptyBorder(4, 4, 4, 4));
     
-    statusLabel = new JLabel();
-    
-    pane.add(statusLabel, BorderLayout.CENTER);
+    autoscrollBox = new JCheckBox("Automatically scroll when new data is received.", true);
+    pane.add(autoscrollBox, BorderLayout.CENTER);
   
     String[] serialRateStrings = {
       "300","1200","2400","4800","9600","14400",
@@ -107,13 +114,17 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
     serialRate = Preferences.getInteger("serial.debug_rate");
     serialRates.setSelectedItem(serialRate + " baud");
     serialRates.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
+      public void actionPerformed(ActionEvent event) {
         String wholeString = (String) serialRates.getSelectedItem();
         String rateString = wholeString.substring(0, wholeString.indexOf(' '));
         serialRate = Integer.parseInt(rateString);
         Preferences.set("serial.debug_rate", rateString);
         closeSerialPort();
-        openSerialPort();
+        try {
+	        openSerialPort();
+        } catch (SerialException e) {
+          System.err.println(e);
+        }
       }});
     
     pane.add(serialRates, BorderLayout.EAST);
@@ -128,26 +139,18 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
       serial.write(s);
   }
   
-  public void openSerialPort() {
+  public void openSerialPort() throws SerialException {
     if (serial != null) return;
   
-    try {
-      statusLabel.setText("opening...");
-      serial = new Serial(port, serialRate);
-      serial.addListener(this);
-      statusLabel.setText("");
-    } catch (SerialException e) {
-      statusLabel.setText(e.getMessage());
-    }
+    serial = new Serial(port, serialRate);
+    serial.addListener(this);
   }
   
   public void closeSerialPort() {
     if (serial != null) {
-      statusLabel.setText("closing...");
       textArea.setText("");
       serial.dispose();
       serial = null;
-      statusLabel.setText("");
     }
   }
   
@@ -155,6 +158,9 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         textArea.append(s);
+        if (autoscrollBox.isSelected()) {
+        	textArea.setCaretPosition(textArea.getDocument().getLength());
+        }
       }});
   }
 }

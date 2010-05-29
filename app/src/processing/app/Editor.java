@@ -2339,8 +2339,13 @@ public class Editor extends JFrame implements RunnerListener {
 
   public void handleSerial() {
     if (uploading) return;
-    serialMonitor.setVisible(true);
-    serialMonitor.openSerialPort();
+    
+    try {
+	    serialMonitor.openSerialPort();
+      serialMonitor.setVisible(true);
+    } catch (SerialException e) {
+    	statusError(e);
+    }
   }
 
 
