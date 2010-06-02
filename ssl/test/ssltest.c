@@ -1550,6 +1550,7 @@ cleanup:
         printf("All client tests passed\n"); TTY_FLUSH();
     }
 
+    ssl_ctx_free(ssl_ctx);
     return ret;
 }
 
