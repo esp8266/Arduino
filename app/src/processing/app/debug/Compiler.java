@@ -73,6 +73,11 @@ public class Compiler implements MessageConsumer {
     String avrBasePath = Base.getAvrBasePath();
     Map<String, String> boardPreferences = Base.getBoardPreferences();
     String core = boardPreferences.get("build.core");
+    if (core == null) {
+    	RunnerException re = new RunnerException("No board selected; please choose a board from the Tools > Board menu.");
+      re.hideStackTrace();
+      throw re;
+    }
     String corePath;
     
     if (core.indexOf(':') == -1) {

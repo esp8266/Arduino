@@ -1520,7 +1520,13 @@ public class Base {
   
   
   static public Map<String, String> getBoardPreferences() {
-    return getTarget().getBoards().get(Preferences.get("board"));
+    Target target = getTarget();
+    if (target == null) return new LinkedHashMap();
+    Map map = target.getBoards();
+    if (map == null) return new LinkedHashMap();
+    map = (Map) map.get(Preferences.get("board"));
+    if (map == null) return new LinkedHashMap();
+    return map;
   }
   
 
