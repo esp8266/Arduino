@@ -3,6 +3,7 @@ ARDUINO 0019
 [core / libraries]
 
 * More accurate delay() function from BenF.
+* Re-enabling PWM after tone() ends.
 
 [environment]
 

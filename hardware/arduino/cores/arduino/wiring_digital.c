@@ -36,8 +36,17 @@ void pinMode(uint8_t pin, uint8_t mode)
 	// JWS: can I let the optimizer do this?
 	reg = portModeRegister(port);
 
-	if (mode == INPUT) *reg &= ~bit;
-	else *reg |= bit;
+	if (mode == INPUT) { 
+		uint8_t oldSREG = SREG;
+                cli();
+		*reg &= ~bit;
+		SREG = oldSREG;
+	} else {
+		uint8_t oldSREG = SREG;
+                cli();
+		*reg |= bit;
+		SREG = oldSREG;
+	}
 }
 
 // Forcing this inline keeps the callers from having to push their own stuff
@@ -90,8 +99,17 @@ void digitalWrite(uint8_t pin, uint8_t val)
 
 	out = portOutputRegister(port);
 
-	if (val == LOW) *out &= ~bit;
-	else *out |= bit;
+	if (val == LOW) {
+		uint8_t oldSREG = SREG;
+                cli();
+		*out &= ~bit;
+		SREG = oldSREG;
+	} else {
+		uint8_t oldSREG = SREG;
+                cli();
+		*out |= bit;
+		SREG = oldSREG;
+	}
 }
 
 int digitalRead(uint8_t pin)
