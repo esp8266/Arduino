@@ -486,7 +486,7 @@ public class Compiler implements MessageConsumer {
     if (folder.listFiles() == null) return files;
     
     for (File file : folder.listFiles()) {
-      if (file.getName().equals(".") || file.getName().equals("..")) continue;
+      if (file.getName().startsWith(".")) continue; // skip hidden files
       
       if (file.getName().endsWith("." + extension))
         files.add(file);
