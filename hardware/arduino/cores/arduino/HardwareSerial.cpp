@@ -178,6 +178,15 @@ uint8_t HardwareSerial::available(void)
   return (RX_BUFFER_SIZE + _rx_buffer->head - _rx_buffer->tail) % RX_BUFFER_SIZE;
 }
 
+int HardwareSerial::peek(void)
+{
+  if (_rx_buffer->head == _rx_buffer->tail) {
+    return -1;
+  } else {
+    return _rx_buffer->buffer[_rx_buffer->tail];
+  }
+}
+
 int HardwareSerial::read(void)
 {
   // if the head isn't ahead of the tail, we don't have any characters

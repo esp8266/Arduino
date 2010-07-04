@@ -49,6 +49,7 @@ class HardwareSerial : public Stream
     void begin(long);
     void end();
     virtual uint8_t available(void);
+    virtual int peek(void);
     virtual int read(void);
     virtual void flush(void);
     virtual void write(uint8_t);

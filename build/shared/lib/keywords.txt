@@ -163,6 +163,7 @@ Serial2	KEYWORD3	Serial
 Serial3	KEYWORD3	Serial
 begin	KEYWORD2	Serial_Begin
 end	KEYWORD2	Serial_End
+peek	KEYWORD2	Serial_Peek
 read	KEYWORD2	Serial_Read
 print	KEYWORD2	Serial_Print
 println	KEYWORD2	Serial_Println
