@@ -36,7 +36,7 @@ class String
     explicit String( const unsigned int, const int base=10 );
     explicit String( const long, const int base=10 );
     explicit String( const unsigned long, const int base=10 );
-    virtual ~String() { delete [] _buffer; }
+    ~String() { free(_buffer); }
 
     // operators
     const String & operator = ( const String &rhs );
@@ -50,7 +50,7 @@ class String
     int	operator >=( const String &rhs ) const;
     char operator []( unsigned int index ) const;
     char& operator []( unsigned int index );
-//    operator const char *() const { return _buffer; }
+    //operator const char *() const { return _buffer; }
 
     // general methods
     char charAt( unsigned int index ) const;
@@ -84,8 +84,8 @@ class String
 
   protected:
     char *_buffer;	     // the actual char array
-    unsigned int _capacity;  // the array length
-    unsigned int _length;    // the String length
+    unsigned int _capacity;  // the array length minus one (for the '\0')
+    unsigned int _length;    // the String length (not counting the '\0')
 
     void getBuffer(unsigned int maxStrLen);
     void doubleBuffer( );
@@ -98,7 +98,7 @@ class String
 inline void String::getBuffer(unsigned int maxStrLen)
 {
   _capacity = maxStrLen;
-  _buffer = new char[_capacity + 1];
+  _buffer = (char *) malloc(_capacity + 1);
 }
 
 // double the buffer size
@@ -107,7 +107,7 @@ inline void String::doubleBuffer( )
   char *temp = _buffer;
   getBuffer( ++_capacity * 2 );
   strcpy( _buffer, temp );
-  delete [] temp;
+  free(temp);
 }
 
 inline String operator+( String lhs, const String &rhs )

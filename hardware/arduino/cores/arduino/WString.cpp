@@ -113,7 +113,7 @@ const String & String::operator=( const String &rhs )
 
   if ( rhs._length > _length )
   {
-    delete [] _buffer;
+    free(_buffer);
     getBuffer( rhs._length );
   }
   _length = rhs._length;
@@ -139,7 +139,7 @@ const String & String::operator+=( const String &other )
     char *temp = _buffer;
     getBuffer( _length );
     strcpy( _buffer, temp );
-    delete [] temp;
+    free(temp);
   }
   strcat( _buffer, other._buffer );
   return *this;

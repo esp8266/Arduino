@@ -2,6 +2,7 @@ ARDUINO 0019
 
 [core / libraries]
 
+* Added aliases for the analog input pins: A0, A1, etc.
 * More accurate delay() function from BenF.
 * Re-enabling PWM after tone() ends.
 
