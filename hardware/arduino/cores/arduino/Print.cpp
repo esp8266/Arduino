@@ -19,6 +19,7 @@
  Modified 23 November 2006 by David A. Mellis
  */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -40,6 +41,11 @@ void Print::write(const uint8_t *buffer, size_t size)
 {
   while (size--)
     write(*buffer++);
+}
+
+void Print::print(const String &s)
+{
+  print(s.toCharArray());
 }
 
 void Print::print(const char str[])
@@ -97,6 +103,12 @@ void Print::println(void)
 {
   print('\r');
   print('\n');  
+}
+
+void Print::println(const String &s)
+{
+  print(s);
+  println();
 }
 
 void Print::println(const char c[])

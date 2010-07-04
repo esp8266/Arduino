@@ -20,7 +20,8 @@
 #ifndef String_h
 #define String_h
 
-#include "WProgram.h"
+//#include "WProgram.h"
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 
