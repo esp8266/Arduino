@@ -86,7 +86,7 @@ String::String( const unsigned long value, const int base )
 
 char String::charAt( unsigned int loc ) const
 {
-	return operator[]( loc );
+  return operator[]( loc );
 }
 
 void String::setCharAt( unsigned int loc, const char aChar ) 
