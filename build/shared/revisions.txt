@@ -3,13 +3,38 @@ ARDUINO 0019
 [core / libraries]
 
 * Added aliases for the analog input pins: A0, A1, etc.
-* More accurate delay() function from BenF.
-* Re-enabling PWM after tone() ends.
+  http://code.google.com/p/arduino/issues/detail?id=244
 
+* More accurate delay() function from BenF.
+  http://code.google.com/p/arduino/issues/detail?id=237
+
+* Re-enabling PWM after tone() ends.
+  http://code.google.com/p/arduino/issues/detail?id=228
+
+* Added Serial.peek() method.
+  http://code.google.com/p/arduino/issues/detail?id=270
+
+* Added Stream base class to Serial object (w/ available(), peek(), read()
+  and the write(), print(), and println() functions from the Print class).
+  http://code.google.com/p/arduino/issues/detail?id=60
+
+* Disabling interrupts while digitalWrite() and pinMode() write to pins.
+  http://code.google.com/p/arduino/issues/detail?id=146
+ 
 [environment]
 
+* Added Arduino Fio to the boards menu.
+
+* Added Arduino Pro and Pro Mini (5V / 16 MHz) to the boards menu.
+  http://code.google.com/p/arduino/issues/detail?id=81
+
 * Synchronized with the Processing 1.1 code base, bringing various changes.
+
 * Adding control over scrolling in serial monitor.
+  http://code.google.com/p/arduino/issues/detail?id=97
+
+* Fixed problem with tabs of the same name but different extensions.
+  http://code.google.com/p/arduino/issues/detail?id=191
 
 ARDUINO 0018 - 2010.01.29
 
