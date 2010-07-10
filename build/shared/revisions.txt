@@ -20,6 +20,9 @@ ARDUINO 0019
 
 * Disabling interrupts while digitalWrite() and pinMode() write to pins.
   http://code.google.com/p/arduino/issues/detail?id=146
+
+* Replacing INTERNAL analog reference with INTERNAL1V1 AND INTERNAL2V56 on
+  the Arduino Mega.  http://code.google.com/p/arduino/issues/detail?id=194
  
 [environment]
 
@@ -29,6 +32,8 @@ ARDUINO 0019
   http://code.google.com/p/arduino/issues/detail?id=81
 
 * Synchronized with the Processing 1.1 code base, bringing various changes.
+
+* Modified the parsing of avr-gcc / avr-g++ output and error messages.
 
 * Adding control over scrolling in serial monitor.
   http://code.google.com/p/arduino/issues/detail?id=97

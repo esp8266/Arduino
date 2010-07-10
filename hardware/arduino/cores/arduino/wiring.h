@@ -57,7 +57,12 @@ extern "C"{
 #define FALLING 2
 #define RISING 3
 
+#if defined(__AVR_ATmega1280__)
+#define INTERNAL1V1 2
+#define INTERNAL2V56 3
+#else
 #define INTERNAL 3
+#endif
 #define DEFAULT 1
 #define EXTERNAL 0
 

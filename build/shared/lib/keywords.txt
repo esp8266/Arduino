@@ -19,7 +19,9 @@ FALLING	LITERAL1	AttachInterrupt
 RISING	LITERAL1	AttachInterrupt
 DEFAULT	LITERAL1	AnalogReference
 EXTERNAL	LITERAL1	AnalogReference
-INTERAL	LITERAL1	AnalogReference
+INTERNAL	LITERAL1	AnalogReference
+INTERNAL1V1	LITERAL1	AnalogReference
+INTERNAL2V56	LITERAL1	AnalogReference
 
 # KEYWORD1 specifies datatypes and C/C++ keywords
 
