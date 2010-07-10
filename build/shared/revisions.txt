@@ -41,6 +41,9 @@ ARDUINO 0019
 * Fixed problem with tabs of the same name but different extensions.
   http://code.google.com/p/arduino/issues/detail?id=191
 
+* Allowing third-party hardware platforms to reference programmers defined
+  in other platforms.  http://code.google.com/p/arduino/issues/detail?id=283
+
 ARDUINO 0018 - 2010.01.29
 
 [core / libraries]

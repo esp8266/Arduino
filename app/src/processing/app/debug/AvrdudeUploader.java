@@ -54,8 +54,17 @@ public class AvrdudeUploader extends Uploader  {
     if (uploadUsing.equals("bootloader")) {
       return uploadViaBootloader(buildPath, className);
     } else {
-      // XXX: this needs to handle programmers in other targets.
-      Collection params = getProgrammerCommands(Base.getTarget().getName(), uploadUsing);
+      Target t;
+
+      if (uploadUsing.indexOf(':') == -1) {
+        t = Base.getTarget(); // the current target (associated with the board)
+      } else {
+        String targetName = uploadUsing.substring(0, uploadUsing.indexOf(':'));
+        t = Base.targetsTable.get(targetName);
+        uploadUsing = uploadUsing.substring(uploadUsing.indexOf(':') + 1);
+      }
+
+      Collection params = getProgrammerCommands(t, uploadUsing);
       params.add("-Uflash:w:" + buildPath + File.separator + className + ".hex:i");
       return avrdude(params);
     }
@@ -86,12 +95,11 @@ public class AvrdudeUploader extends Uploader  {
     return avrdude(commandDownloader);
   }
   
-  public boolean burnBootloader(String target, String programmer) throws RunnerException {
-    return burnBootloader(getProgrammerCommands(target, programmer));
+  public boolean burnBootloader(String targetName, String programmer) throws RunnerException {
+    return burnBootloader(getProgrammerCommands(Base.targetsTable.get(targetName), programmer));
   }
   
-  private Collection getProgrammerCommands(String targetName, String programmer) {
-    Target target = Base.targetsTable.get(targetName);
+  private Collection getProgrammerCommands(Target target, String programmer) {
     Map<String, String> programmerPreferences = target.getProgrammers().get(programmer);
     List params = new ArrayList();
     params.add("-c" + programmerPreferences.get("protocol"));
