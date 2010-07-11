@@ -38,6 +38,9 @@ ARDUINO 0019
 * Adding control over scrolling in serial monitor.
   http://code.google.com/p/arduino/issues/detail?id=97
 
+* Added drop-down for selecting line endings to the serial monitor.
+  http://code.google.com/p/arduino/issues/detail?id=119
+
 * Fixed problem with tabs of the same name but different extensions.
   http://code.google.com/p/arduino/issues/detail?id=191
 

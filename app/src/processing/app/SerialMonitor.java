@@ -35,6 +35,7 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
   private JTextField textField;
   private JButton sendButton;
   private JCheckBox autoscrollBox;
+  private JComboBox lineEndings;
   private JComboBox serialRates;
   private int serialRate;
 
@@ -74,7 +75,8 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
     
     getContentPane().add(scrollPane, BorderLayout.CENTER);
     
-    JPanel pane = new JPanel(new BorderLayout(4, 0));
+    JPanel pane = new JPanel();
+    pane.setLayout(new BoxLayout(pane, BoxLayout.X_AXIS));
     pane.setBorder(new EmptyBorder(4, 4, 4, 4));
 
     textField = new JTextField(40);
@@ -91,17 +93,25 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
         textField.setText("");
       }});
     
-    pane.add(textField, BorderLayout.CENTER);
-    pane.add(sendButton, BorderLayout.EAST);
+    lineEndings = new JComboBox(new String[] { "No line ending", "Newline", "Carriage return", "Both" });
+    lineEndings.setMaximumSize(lineEndings.getMinimumSize());
+  
+    pane.add(textField);
+    pane.add(Box.createRigidArea(new Dimension(4, 0)));
+    pane.add(sendButton);
+    pane.add(Box.createRigidArea(new Dimension(8, 0)));
+    pane.add(lineEndings);
     
     getContentPane().add(pane, BorderLayout.NORTH);
     
-    pane = new JPanel(new BorderLayout(4, 0));
+    pane = new JPanel();
+    pane.setLayout(new BoxLayout(pane, BoxLayout.X_AXIS));
     pane.setBorder(new EmptyBorder(4, 4, 4, 4));
     
     autoscrollBox = new JCheckBox("Automatically scroll when new data is received.", true);
-    pane.add(autoscrollBox, BorderLayout.CENTER);
-  
+    pane.add(autoscrollBox);
+    pane.add(Box.createHorizontalGlue());
+    
     String[] serialRateStrings = {
       "300","1200","2400","4800","9600","14400",
       "19200","28800","38400","57600","115200"
@@ -126,8 +136,10 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
           System.err.println(e);
         }
       }});
+      
+    serialRates.setMaximumSize(serialRates.getMinimumSize());
     
-    pane.add(serialRates, BorderLayout.EAST);
+    pane.add(serialRates);
     
     getContentPane().add(pane, BorderLayout.SOUTH);
 
@@ -135,8 +147,14 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
   }
   
   private void send(String s) {
-    if (serial != null)
+    if (serial != null) {
+      switch (lineEndings.getSelectedIndex()) {
+        case 1: s += "\n"; break;
+        case 2: s += "\r"; break;
+        case 3: s += "\r\n"; break;
+      }
       serial.write(s);
+    }
   }
   
   public void openSerialPort() throws SerialException {
