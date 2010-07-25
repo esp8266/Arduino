@@ -1,34 +1,54 @@
 /*
- * Chat Server
- *
- * A simple server that distributes any incoming messages to all
- * connected clients.  To use telnet to 10.0.0.177 and type!
+  Web  Server
+ 
+ A simple server that distributes any incoming messages to all
+ connected clients.  To use telnet to  your device's IP address and type.
+ You can see the client's input in the serial monitor as well.
+ Using an Arduino Wiznet Ethernet shield. 
+ 
+ Circuit:
+ * Ethernet shield attached to pins 10, 11, 12, 13
+ * Analog inputs attached to pins A0 through A5 (optional)
+ 
+ created 18 Dec 2009
+ by David A. Mellis
+ modified 25 July 2010
+ by Tom Igoe
+ 
  */
 
 #include <Ethernet.h>
 
-// network configuration.  gateway and subnet are optional.
+// Enter a MAC address and IP address for your controller below.
+// The IP address will be dependent on your local network.
+// gateway and subnet are optional:
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-byte ip[] = { 10, 0, 0, 177 };
-byte gateway[] = { 10, 0, 0, 1 };
+byte ip[] = { 192,168,1, 177 };
+byte gateway[] = { 192,168,1, 1 };
 byte subnet[] = { 255, 255, 0, 0 };
 
 // telnet defaults to port 23
 Server server(23);
 
-void setup()
-{
+void setup() {
   // initialize the ethernet device
   Ethernet.begin(mac, ip, gateway, subnet);
-  
   // start listening for clients
   server.begin();
+  // open the serial port
+  Serial.begin(9600);
 }
 
-void loop()
-{
+void loop() {
+  // wait for a new client:
   Client client = server.available();
   if (client) {
-    server.write(client.read());
+    // read the bytes incoming from the client:
+    char thisChar = client.read();
+    // echo the bytes back to the client:
+    server.write(thisChar);
+    // echo the bytes to the server as well:
+    Serial.print(thisChar);
   }
 }
+
