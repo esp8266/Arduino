@@ -50,7 +50,8 @@ public	KEYWORD1
 return	KEYWORD1	Return	
 short	KEYWORD1
 signed	KEYWORD1
-static	KEYWORD1	Static	
+static	KEYWORD1	Static
+String	KEYWORD1	String	
 switch	KEYWORD1	SwitchCase
 this	KEYWORD1	
 throw	KEYWORD1	
