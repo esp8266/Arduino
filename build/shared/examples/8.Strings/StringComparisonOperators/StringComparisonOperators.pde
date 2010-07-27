@@ -52,7 +52,7 @@ void loop() {
     Serial.println(stringOne + " >= " + stringTwo);
   }
 
-// comparison operators can be used to compare strings for alphabetic sorting too:
+  // comparison operators can be used to compare strings for alphabetic sorting too:
   stringOne = String("Brown");
   if (stringOne < "Charles") {
     Serial.println(stringOne + " < Charles"); 
@@ -71,9 +71,43 @@ void loop() {
     Serial.println(stringOne + " >= Brow"); 
   }
 
-  // do nothing while true:
-  while(true);
+  // the compareTo() operator also allows you to compare strings
+  // it evaluates on the first character that's different.
+  // if the first character of the string you're comparing to
+  // comes first in alphanumeric order, then compareTo() is greater than 0:
+  stringOne = "Cucumber";
+  stringTwo = "Cucuracha";
+  if (stringOne.compareTo(stringTwo) < 0 ) {
+    Serial.println(stringOne + " comes before " + stringTwo); 
+  } 
+  else {
+    Serial.println(stringOne + " comes after " + stringTwo);    
+  }
+
+  delay(10000);  // because the next part is a loop:
+
+  // compareTo() is handy when you've got strings with numbers in them too:
+
+  while (true) {
+    stringOne = "Sensor: ";
+    stringTwo= "Sensor: ";
+
+    stringOne += analogRead(0); 
+    stringTwo += analogRead(5);
+
+    if (stringOne.compareTo(stringTwo) < 0 ) {
+      Serial.println(stringOne + " comes after " + stringTwo); 
+    } 
+    else {
+      Serial.println(stringOne + " comes before " + stringTwo); 
+
+    }
+  }
 }
+
+
+
+
 
 
 
