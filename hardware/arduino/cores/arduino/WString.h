@@ -1,6 +1,8 @@
 /*
  WString.h - String library for Wiring & Arduino
  Copyright (c) 2009-10 Hernando Barragan.  All right reserved.
+ Changes for version 1.0 by Xiaoyang Feng
+
  
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public
