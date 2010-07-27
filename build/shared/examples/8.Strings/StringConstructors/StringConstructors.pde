@@ -3,13 +3,10 @@
  
  Examples of how  to create strings from other data types
  
- The circuit:  No external hardware needed.
- 
  created 27 July 2010
  by Tom Igoe
  
  This example code is in the public domain.
- 
  */
 
 void setup() {

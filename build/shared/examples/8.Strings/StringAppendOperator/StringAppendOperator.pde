@@ -2,13 +2,11 @@
   Appending to Strings using the += operator and concat()
  
  Examples of how to append different data types to strings
- The circuit:  No external hardware needed.
  
  created 27 July 2010
  by Tom Igoe
  
  This example code is in the public domain.
- 
  */
 String stringOne, stringTwo;
 

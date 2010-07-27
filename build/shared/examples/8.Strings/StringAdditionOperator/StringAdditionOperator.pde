@@ -4,13 +4,10 @@
  Examples of how to add strings together
  You can also add several different data types to string, as shown here:
  
- The circuit:  No external hardware needed.
- 
  created 27 July 2010
  by Tom Igoe
  
- This example code is in the public domain.
- 
+ This example code is in the public domain. 
  */
 
 // declare three strings:
