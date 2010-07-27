@@ -37,6 +37,21 @@ void loop() {
   if (stringOne != stringTwo) {
     Serial.println(stringOne + " =! " + stringTwo);
   }
+  // you can also use equals() to see if two strings are the same:
+  if (stringOne.equals(stringTwo)) {
+    Serial.println(stringOne + " equals " + stringTwo);
+  } 
+  else {
+    Serial.println(stringOne + " does not equal " + stringTwo);
+  }
+
+  // or perhaps you want to ignore case:
+  if (stringOne.equalsIgnoreCase(stringTwo)) {
+    Serial.println(stringOne + " equals (ignoring case) " + stringTwo);
+  } 
+  else {
+    Serial.println(stringOne + " does not equal (ignoring case) " + stringTwo);
+  }
 
   // a numeric string compared to the number it represents:
   stringOne = "1";
@@ -44,6 +59,8 @@ void loop() {
   if (stringOne == numberOne) {
     Serial.println(stringOne + " = " + numberOne);
   }
+
+
 
   // two numeric strings compared:
   stringOne = "2";
@@ -104,6 +121,8 @@ void loop() {
     }
   }
 }
+
+
 
 
 
