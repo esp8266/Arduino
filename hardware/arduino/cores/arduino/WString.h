@@ -75,8 +75,6 @@ public:
     String replace( const String& match, const String& replace );
     String substring( unsigned int beginIndex ) const;
     String substring( unsigned int beginIndex, unsigned int endIndex ) const;
-    const String& append( const String &str );
-	const String& append( const char );
     
 	int	compareTo( const String &str ) const;
 	int	compareTo( const char* str ) const;			//added

@@ -410,15 +410,6 @@ String String::substring( unsigned int beginIndex, unsigned int endIndex ) const
 	return outPut;
 }
 
-const String & String::append( const String &str )
-{
-	return (*this) += str;
-}
-
-const String & String::append( const char ch)
-{
-	return (*this) += ch;
-}
 
 int String::compareTo( const String &str ) const
 {
