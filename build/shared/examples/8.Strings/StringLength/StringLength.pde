@@ -38,8 +38,4 @@ void loop() {
     // note the length for next time through the loop:
     lastStringLength = txtMsg.length();
   }
-
 }
-
-
-
