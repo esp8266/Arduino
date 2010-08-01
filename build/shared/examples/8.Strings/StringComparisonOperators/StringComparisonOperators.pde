@@ -15,7 +15,7 @@ void setup() {
   Serial.begin(9600);
   stringOne = String("this");
   stringTwo = String("that");
-  Serial.println("\n\nAdding strings together (concatenation):");
+  Serial.println("\n\nComparing Strings:");
 
 }
 

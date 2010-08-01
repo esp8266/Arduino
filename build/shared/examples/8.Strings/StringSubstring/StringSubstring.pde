@@ -15,7 +15,7 @@ void setup() {
 }
 
 void loop() {
-  // startsWith() checks to see if a String starts with a particular substring:
+  // Set up a String:
   String stringOne = "Content-Type: text/html";
   Serial.println(stringOne);
   
