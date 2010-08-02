@@ -1,299 +1,381 @@
 /*
-@file		w5100.h
+ * Copyright (c) 2010 by Cristian Maglie <c.maglie@bug.st>
+ *
+ * This file is free software; you can redistribute it and/or modify
+ * it under the terms of either the GNU General Public License version 2
+ * or the GNU Lesser General Public License version 2.1, both as
+ * published by the Free Software Foundation.
+ */
+
+#ifndef	W5100_H_INCLUDED
+#define	W5100_H_INCLUDED
+
+#include <avr/pgmspace.h>
+#include <SPI.h>
+
+#define MAX_SOCK_NUM 4
+
+typedef uint8_t SOCKET;
+
+#define IDM_OR  0x8000
+#define IDM_AR0 0x8001
+#define IDM_AR1 0x8002
+#define IDM_DR  0x8003
+/*
+class MR {
+public:
+  static const uint8_t RST   = 0x80;
+  static const uint8_t PB    = 0x10;
+  static const uint8_t PPPOE = 0x08;
+  static const uint8_t LB    = 0x04;
+  static const uint8_t AI    = 0x02;
+  static const uint8_t IND   = 0x01;
+};
+*/
+/*
+class IR {
+public:
+  static const uint8_t CONFLICT = 0x80;
+  static const uint8_t UNREACH  = 0x40;
+  static const uint8_t PPPoE    = 0x20;
+  static const uint8_t SOCK0    = 0x01;
+  static const uint8_t SOCK1    = 0x02;
+  static const uint8_t SOCK2    = 0x04;
+  static const uint8_t SOCK3    = 0x08;
+  static inline uint8_t SOCK(SOCKET ch) { return (0x01 << ch); };
+};
 */
 
-#ifndef	_W5100_H_
-#define	_W5100_H_
+class SnMR {
+public:
+  static const uint8_t CLOSE  = 0x00;
+  static const uint8_t TCP    = 0x01;
+  static const uint8_t UDP    = 0x02;
+  static const uint8_t IPRAW  = 0x03;
+  static const uint8_t MACRAW = 0x04;
+  static const uint8_t PPPOE  = 0x05;
+  static const uint8_t ND     = 0x20;
+  static const uint8_t MULTI  = 0x80;
+};
 
+enum SockCMD {
+  Sock_OPEN      = 0x01,
+  Sock_LISTEN    = 0x02,
+  Sock_CONNECT   = 0x04,
+  Sock_DISCON    = 0x08,
+  Sock_CLOSE     = 0x10,
+  Sock_SEND      = 0x20,
+  Sock_SEND_MAC  = 0x21,
+  Sock_SEND_KEEP = 0x22,
+  Sock_RECV      = 0x40
+};
 
-#define MR __DEF_IINCHIP_MAP_BASE__
-#define IDM_OR ((__DEF_IINCHIP_MAP_BASE__ + 0x00))
-#define IDM_AR0 ((__DEF_IINCHIP_MAP_BASE__ + 0x01))
-#define IDM_AR1 ((__DEF_IINCHIP_MAP_BASE__ + 0x02))
-#define IDM_DR ((__DEF_IINCHIP_MAP_BASE__ + 0x03))
-
-
-/**
- @brief Gateway IP Register address
- */
-#define GAR0				(COMMON_BASE + 0x0001)
-/**
- @brief Subnet mask Register address
- */
-#define SUBR0			(COMMON_BASE + 0x0005)
-/**
- @brief Source MAC Register address
- */
-#define SHAR0				(COMMON_BASE + 0x0009)
-/**
- @brief Source IP Register address
- */
-#define SIPR0				(COMMON_BASE + 0x000F)
-/**
- @brief Interrupt Register
- */
-#define IR					(COMMON_BASE + 0x0015)
-/**
- @brief Interrupt mask register
- */
-#define IMR					(COMMON_BASE + 0x0016)
-/**
- @brief Timeout register address( 1 is 100us )
- */
-#define RTR0				(COMMON_BASE + 0x0017)
-/**
- @brief Retry count reigster
- */
-#define RCR						(COMMON_BASE + 0x0019)
-/**
- @brief Receive memory size reigster
- */
-#define RMSR			(COMMON_BASE + 0x001A)
-/**
- @brief Transmit memory size reigster
- */
-#define TMSR			(COMMON_BASE + 0x001B)
-/**
- @brief Authentication type register address in PPPoE mode
- */
-#define PATR0					(COMMON_BASE + 0x001C)
-//#define PPPALGO (COMMON_BASE + 0x001D)
-#define PTIMER (COMMON_BASE + 0x0028)
-#define PMAGIC (COMMON_BASE + 0x0029)
-
-/**
- @brief Unreachable IP register address in UDP mode
- */
-#define UIPR0				(COMMON_BASE + 0x002A)
-/**
- @brief Unreachable Port register address in UDP mode
- */
-#define UPORT0			(COMMON_BASE + 0x002E)
-
-/**
- @brief socket register
+/*class SnCmd {
+public:
+  static const uint8_t OPEN      = 0x01;
+  static const uint8_t LISTEN    = 0x02;
+  static const uint8_t CONNECT   = 0x04;
+  static const uint8_t DISCON    = 0x08;
+  static const uint8_t CLOSE     = 0x10;
+  static const uint8_t SEND      = 0x20;
+  static const uint8_t SEND_MAC  = 0x21;
+  static const uint8_t SEND_KEEP = 0x22;
+  static const uint8_t RECV      = 0x40;
+};
 */
-#define CH_BASE (COMMON_BASE + 0x0400)
-/**
- @brief	size of each channel register map
- */
-#define CH_SIZE		0x0100
-/**
- @brief socket Mode register
- */
-#define Sn_MR(ch)		(CH_BASE + ch * CH_SIZE + 0x0000)
-/**
- @brief channel Sn_CR register
- */
-#define Sn_CR(ch)				(CH_BASE + ch * CH_SIZE + 0x0001)
-/**
- @brief channel interrupt register
- */
-#define Sn_IR(ch)			(CH_BASE + ch * CH_SIZE + 0x0002)
-/**
- @brief channel status register
- */
-#define Sn_SR(ch)			(CH_BASE + ch * CH_SIZE + 0x0003)
-/**
- @brief source port register
- */
-#define Sn_PORT0(ch)		(CH_BASE + ch * CH_SIZE + 0x0004)
-/**
- @brief Peer MAC register address
- */
-#define Sn_DHAR0(ch)			(CH_BASE + ch * CH_SIZE + 0x0006)
-/**
- @brief Peer IP register address
- */
-#define Sn_DIPR0(ch)			(CH_BASE + ch * CH_SIZE + 0x000C)
-/**
- @brief Peer port register address
- */
-#define Sn_DPORT0(ch)		(CH_BASE + ch * CH_SIZE + 0x0010)
-/**
- @brief Maximum Segment Size(Sn_MSSR0) register address
- */
-#define Sn_MSSR0(ch)					(CH_BASE + ch * CH_SIZE + 0x0012)
-/**
- @brief Protocol of IP Header field register in IP raw mode
- */
-#define Sn_PROTO(ch)			(CH_BASE + ch * CH_SIZE + 0x0014)
 
-/** 
- @brief IP Type of Service(TOS) Register 
- */
-#define Sn_TOS(ch)						(CH_BASE + ch * CH_SIZE + 0x0015)
-/**
- @brief IP Time to live(TTL) Register 
- */
-#define Sn_TTL(ch)						(CH_BASE + ch * CH_SIZE + 0x0016)
+class SnIR {
+public:
+  static const uint8_t SEND_OK = 0x10;
+  static const uint8_t TIMEOUT = 0x08;
+  static const uint8_t RECV    = 0x04;
+  static const uint8_t DISCON  = 0x02;
+  static const uint8_t CON     = 0x01;
+};
 
-/**
- @brief Transmit free memory size register
- */
-#define Sn_TX_FSR0(ch)	(CH_BASE + ch * CH_SIZE + 0x0020)
-/**
- @brief Transmit memory read pointer register address
- */
-#define Sn_TX_RD0(ch)			(CH_BASE + ch * CH_SIZE + 0x0022)
-/**
- @brief Transmit memory write pointer register address
- */
-#define Sn_TX_WR0(ch)			(CH_BASE + ch * CH_SIZE + 0x0024)
-/**
- @brief Received data size register
- */
-#define Sn_RX_RSR0(ch)	(CH_BASE + ch * CH_SIZE + 0x0026)
-/**
- @brief Read point of Receive memory
- */
-#define Sn_RX_RD0(ch)			(CH_BASE + ch * CH_SIZE + 0x0028)
-/**
- @brief Write point of Receive memory
- */
-#define Sn_RX_WR0(ch)			(CH_BASE + ch * CH_SIZE + 0x002A)
+class SnSR {
+public:
+  static const uint8_t CLOSED      = 0x00;
+  static const uint8_t INIT        = 0x13;
+  static const uint8_t LISTEN      = 0x14;
+  static const uint8_t SYNSENT     = 0x15;
+  static const uint8_t SYNRECV     = 0x16;
+  static const uint8_t ESTABLISHED = 0x17;
+  static const uint8_t FIN_WAIT    = 0x18;
+  static const uint8_t CLOSING     = 0x1A;
+  static const uint8_t TIME_WAIT   = 0x1B;
+  static const uint8_t CLOSE_WAIT  = 0x1C;
+  static const uint8_t LAST_ACK    = 0x1D;
+  static const uint8_t UDP         = 0x22;
+  static const uint8_t IPRAW       = 0x32;
+  static const uint8_t MACRAW      = 0x42;
+  static const uint8_t PPPOE       = 0x5F;
+};
+
+class IPPROTO {
+public:
+  static const uint8_t IP   = 0;
+  static const uint8_t ICMP = 1;
+  static const uint8_t IGMP = 2;
+  static const uint8_t GGP  = 3;
+  static const uint8_t TCP  = 6;
+  static const uint8_t PUP  = 12;
+  static const uint8_t UDP  = 17;
+  static const uint8_t IDP  = 22;
+  static const uint8_t ND   = 77;
+  static const uint8_t RAW  = 255;
+};
+
+class W5100Class {
+
+public:
+  void init();
+
+  /**
+   * @brief	This function is being used for copy the data form Receive buffer of the chip to application buffer.
+   * 
+   * It calculate the actual physical address where one has to read
+   * the data from Receive buffer. Here also take care of the condition while it exceed
+   * the Rx memory uper-bound of socket.
+   */
+  void read_data(SOCKET s, volatile uint8_t * src, volatile uint8_t * dst, uint16_t len);
+  
+  /**
+   * @brief	 This function is being called by send() and sendto() function also. 
+   * 
+   * This function read the Tx write pointer register and after copy the data in buffer update the Tx write pointer
+   * register. User should read upper byte first and lower byte later to get proper value.
+   */
+  void send_data_processing(SOCKET s, uint8_t *data, uint16_t len);
+
+  /**
+   * @brief	This function is being called by recv() also.
+   * 
+   * This function read the Rx read pointer register
+   * and after copy the data from receive buffer update the Rx write pointer register.
+   * User should read upper byte first and lower byte later to get proper value.
+   */
+  void recv_data_processing(SOCKET s, uint8_t *data, uint16_t len);
+
+  inline void setGatewayIp(uint8_t *_addr);
+  inline void getGatewayIp(uint8_t *_addr);
+
+  inline void setSubnetMask(uint8_t *_addr);
+  inline void getSubnetMask(uint8_t *_addr);
+
+  inline void setMACAddress(uint8_t * addr);
+  inline void getMACAddress(uint8_t * addr);
+
+  inline void setIPAddress(uint8_t * addr);
+  inline void getIPAddress(uint8_t * addr);
+
+  inline void setRetransmissionTime(uint16_t timeout);
+  inline void setRetransmissionCount(uint8_t _retry);
+
+  void execCmdSn(SOCKET s, SockCMD _cmd);
+  
+  uint16_t getTXFreeSize(SOCKET s);
+  uint16_t getRXReceivedSize(SOCKET s);
+  
+
+  // W5100 Registers
+  // ---------------
+private:
+  static uint8_t write(uint16_t _addr, uint8_t _data);
+  static uint16_t write(uint16_t addr, uint8_t *buf, uint16_t len);
+  static uint8_t read(uint16_t addr);
+  static uint16_t read(uint16_t addr, uint8_t *buf, uint16_t len);
+  
+#define __GP_REGISTER8(name, address)             \
+  static inline void write##name(uint8_t _data) { \
+    write(address, _data);                        \
+  }                                               \
+  static inline uint8_t read##name() {            \
+    return read(address);                         \
+  }
+#define __GP_REGISTER16(name, address)            \
+  static void write##name(uint16_t _data) {       \
+    write(address,   _data >> 8);                 \
+    write(address+1, _data & 0xFF);               \
+  }                                               \
+  static uint16_t read##name() {                  \
+    uint16_t res = read(address);                 \
+    res = (res << 8) + read(address + 1);         \
+    return res;                                   \
+  }
+#define __GP_REGISTER_N(name, address, size)      \
+  static uint16_t write##name(uint8_t *_buff) {   \
+    return write(address, _buff, size);           \
+  }                                               \
+  static uint16_t read##name(uint8_t *_buff) {    \
+    return read(address, _buff, size);            \
+  }
+
+public:
+  __GP_REGISTER8 (MR,     0x0000);    // Mode
+  __GP_REGISTER_N(GAR,    0x0001, 4); // Gateway IP address
+  __GP_REGISTER_N(SUBR,   0x0005, 4); // Subnet mask address
+  __GP_REGISTER_N(SHAR,   0x0009, 6); // Source MAC address
+  __GP_REGISTER_N(SIPR,   0x000F, 4); // Source IP address
+  __GP_REGISTER8 (IR,     0x0015);    // Interrupt
+  __GP_REGISTER8 (IMR,    0x0016);    // Interrupt Mask
+  __GP_REGISTER16(RTR,    0x0017);    // Timeout address
+  __GP_REGISTER8 (RCR,    0x0019);    // Retry count
+  __GP_REGISTER8 (RMSR,   0x001A);    // Receive memory size
+  __GP_REGISTER8 (TMSR,   0x001B);    // Transmit memory size
+  __GP_REGISTER8 (PATR,   0x001C);    // Authentication type address in PPPoE mode
+  __GP_REGISTER8 (PTIMER, 0x0028);    // PPP LCP Request Timer
+  __GP_REGISTER8 (PMAGIC, 0x0029);    // PPP LCP Magic Number
+  __GP_REGISTER_N(UIPR,   0x002A, 4); // Unreachable IP address in UDP mode
+  __GP_REGISTER16(UPORT,  0x002E);    // Unreachable Port address in UDP mode
+  
+#undef __GP_REGISTER8
+#undef __GP_REGISTER16
+#undef __GP_REGISTER_N
+
+  // W5100 Socket registers
+  // ----------------------
+private:
+  static inline uint8_t readSn(SOCKET _s, uint16_t _addr);
+  static inline uint8_t writeSn(SOCKET _s, uint16_t _addr, uint8_t _data);
+  static inline uint16_t readSn(SOCKET _s, uint16_t _addr, uint8_t *_buf, uint16_t len);
+  static inline uint16_t writeSn(SOCKET _s, uint16_t _addr, uint8_t *_buf, uint16_t len);
+
+  static const uint16_t CH_BASE = 0x0400;
+  static const uint16_t CH_SIZE = 0x0100;
+
+#define __SOCKET_REGISTER8(name, address)                    \
+  static inline void write##name(SOCKET _s, uint8_t _data) { \
+    writeSn(_s, address, _data);                             \
+  }                                                          \
+  static inline uint8_t read##name(SOCKET _s) {              \
+    return readSn(_s, address);                              \
+  }
+#define __SOCKET_REGISTER16(name, address)                   \
+  static void write##name(SOCKET _s, uint16_t _data) {       \
+    writeSn(_s, address,   _data >> 8);                      \
+    writeSn(_s, address+1, _data & 0xFF);                    \
+  }                                                          \
+  static uint16_t read##name(SOCKET _s) {                    \
+    uint16_t res = readSn(_s, address);                      \
+    res = (res << 8) + readSn(_s, address + 1);              \
+    return res;                                              \
+  }
+#define __SOCKET_REGISTER_N(name, address, size)             \
+  static uint16_t write##name(SOCKET _s, uint8_t *_buff) {   \
+    return writeSn(_s, address, _buff, size);                \
+  }                                                          \
+  static uint16_t read##name(SOCKET _s, uint8_t *_buff) {    \
+    return readSn(_s, address, _buff, size);                 \
+  }
+  
+public:
+  __SOCKET_REGISTER8(SnMR,        0x0000)        // Mode
+  __SOCKET_REGISTER8(SnCR,        0x0001)        // Command
+  __SOCKET_REGISTER8(SnIR,        0x0002)        // Interrupt
+  __SOCKET_REGISTER8(SnSR,        0x0003)        // Status
+  __SOCKET_REGISTER16(SnPORT,     0x0004)        // Source Port
+  __SOCKET_REGISTER_N(SnDHAR,     0x0006, 6)     // Destination Hardw Addr
+  __SOCKET_REGISTER_N(SnDIPR,     0x000C, 4)     // Destination IP Addr
+  __SOCKET_REGISTER16(SnDPORT,    0x0010)        // Destination Port
+  __SOCKET_REGISTER16(SnMSSR,     0x0012)        // Max Segment Size
+  __SOCKET_REGISTER8(SnPROTO,     0x0014)        // Protocol in IP RAW Mode
+  __SOCKET_REGISTER8(SnTOS,       0x0015)        // IP TOS
+  __SOCKET_REGISTER8(SnTTL,       0x0016)        // IP TTL
+  __SOCKET_REGISTER16(SnTX_FSR,   0x0020)        // TX Free Size
+  __SOCKET_REGISTER16(SnTX_RD,    0x0022)        // TX Read Pointer
+  __SOCKET_REGISTER16(SnTX_WR,    0x0024)        // TX Write Pointer
+  __SOCKET_REGISTER16(SnRX_RSR,   0x0026)        // RX Free Size
+  __SOCKET_REGISTER16(SnRX_RD,    0x0028)        // RX Read Pointer
+  __SOCKET_REGISTER16(SnRX_WR,    0x002A)        // RX Write Pointer (supported?)
+  
+#undef __SOCKET_REGISTER8
+#undef __SOCKET_REGISTER16
+#undef __SOCKET_REGISTER_N
 
 
+private:
+  static const uint8_t  RST = 7; // Reset BIT
 
-/* MODE register values */
-#define MR_RST			0x80 /**< reset */
-#define MR_PB			0x10 /**< ping block */
-#define MR_PPPOE		0x08 /**< enable pppoe */
-#define MR_LB  		0x04 /**< little or big endian selector in indirect mode */
-#define MR_AI			0x02 /**< auto-increment in indirect mode */
-#define MR_IND			0x01 /**< enable indirect mode */
+  static const int SOCKETS = 4;
+  static const uint16_t SMASK = 0x07FF; // Tx buffer MASK
+  static const uint16_t RMASK = 0x07FF; // Rx buffer MASK
+public:
+  static const uint16_t SSIZE = 2048; // Max Tx buffer size
+private:
+  static const uint16_t RSIZE = 2048; // Max Rx buffer size
+  uint16_t SBASE[SOCKETS]; // Tx buffer base address
+  uint16_t RBASE[SOCKETS]; // Rx buffer base address
 
-/* IR register values */
-#define IR_CONFLICT	0x80 /**< check ip confict */
-#define IR_UNREACH	0x40 /**< get the destination unreachable message in UDP sending */
-#define IR_PPPoE		0x20 /**< get the PPPoE close message */
-#define IR_SOCK(ch)	(0x01 << ch) /**< check socket interrupt */
-
-/* Sn_MR values */
-#define Sn_MR_CLOSE		0x00		/**< unused socket */
-#define Sn_MR_TCP		0x01		/**< TCP */
-#define Sn_MR_UDP		0x02		/**< UDP */
-#define Sn_MR_IPRAW	0x03		/**< IP LAYER RAW SOCK */
-#define Sn_MR_MACRAW	0x04		/**< MAC LAYER RAW SOCK */
-#define Sn_MR_PPPOE		0x05		/**< PPPoE */
-#define Sn_MR_ND		0x20		/**< No Delayed Ack(TCP) flag */
-#define Sn_MR_MULTI		0x80		/**< support multicating */
-
-
-/* Sn_CR values */
-#define Sn_CR_OPEN		0x01		/**< initialize or open socket */
-#define Sn_CR_LISTEN		0x02		/**< wait connection request in tcp mode(Server mode) */
-#define Sn_CR_CONNECT	0x04		/**< send connection request in tcp mode(Client mode) */
-#define Sn_CR_DISCON		0x08		/**< send closing reqeuset in tcp mode */
-#define Sn_CR_CLOSE		0x10		/**< close socket */
-#define Sn_CR_SEND		0x20		/**< updata txbuf pointer, send data */
-#define Sn_CR_SEND_MAC	0x21		/**< send data with MAC address, so without ARP process */
-#define Sn_CR_SEND_KEEP	0x22		/**<  send keep alive message */
-#define Sn_CR_RECV		0x40		/**< update rxbuf pointer, recv data */
-
-#ifdef __DEF_IINCHIP_PPP__
-	#define Sn_CR_PCON				0x23		 
-	#define Sn_CR_PDISCON			0x24		 
-	#define Sn_CR_PCR					0x25		 
-	#define Sn_CR_PCN					0x26		
-	#define Sn_CR_PCJ					0x27		
+private:
+#if defined(__AVR_ATmega1280__)
+  inline static void initSS()    { DDRB  |=  _BV(4); };
+  inline static void setSS()     { PORTB &= ~_BV(4); };
+  inline static void resetSS()   { PORTB |=  _BV(4); };
+#else
+  inline static void initSS()    { DDRB  |=  _BV(2); };
+  inline static void setSS()     { PORTB &= ~_BV(2); };
+  inline static void resetSS()   { PORTB |=  _BV(2); };
 #endif
 
-/* Sn_IR values */
-#ifdef __DEF_IINCHIP_PPP__
-	#define Sn_IR_PRECV			0x80		
-	#define Sn_IR_PFAIL			0x40		
-	#define Sn_IR_PNEXT			0x20		
-#endif
-#define Sn_IR_SEND_OK			0x10		/**< complete sending */
-#define Sn_IR_TIMEOUT			0x08		/**< assert timeout */
-#define Sn_IR_RECV				0x04		/**< receiving data */
-#define Sn_IR_DISCON				0x02		/**< closed socket */
-#define Sn_IR_CON					0x01		/**< established connection */
+};
 
-/* Sn_SR values */
-#define SOCK_CLOSED				0x00		/**< closed */
-#define SOCK_INIT 				0x13		/**< init state */
-#define SOCK_LISTEN				0x14		/**< listen state */
-#define SOCK_SYNSENT	   		0x15		/**< connection state */
-#define SOCK_SYNRECV		   	0x16		/**< connection state */
-#define SOCK_ESTABLISHED		0x17		/**< success to connect */
-#define SOCK_FIN_WAIT			0x18		/**< closing state */
-#define SOCK_CLOSING		   	0x1A		/**< closing state */
-#define SOCK_TIME_WAIT			0x1B		/**< closing state */
-#define SOCK_CLOSE_WAIT			0x1C		/**< closing state */
-#define SOCK_LAST_ACK			0x1D		/**< closing state */
-#define SOCK_UDP				   0x22		/**< udp socket */
-#define SOCK_IPRAW			   0x32		/**< ip raw mode socket */
-#define SOCK_MACRAW			   0x42		/**< mac raw mode socket */
-#define SOCK_PPPOE				0x5F		/**< pppoe socket */
+extern W5100Class W5100;
 
-/* IP PROTOCOL */
-#define IPPROTO_IP              0           /**< Dummy for IP */
-#define IPPROTO_ICMP            1           /**< Control message protocol */
-#define IPPROTO_IGMP            2           /**< Internet group management protocol */
-#define IPPROTO_GGP             3           /**< Gateway^2 (deprecated) */
-#define IPPROTO_TCP             6           /**< TCP */
-#define IPPROTO_PUP             12          /**< PUP */
-#define IPPROTO_UDP             17          /**< UDP */
-#define IPPROTO_IDP             22          /**< XNS idp */
-#define IPPROTO_ND              77          /**< UNOFFICIAL net disk protocol */
-#define IPPROTO_RAW             255         /**< Raw IP packet */
+uint8_t W5100Class::readSn(SOCKET _s, uint16_t _addr) {
+  return read(CH_BASE + _s * CH_SIZE + _addr);
+}
 
+uint8_t W5100Class::writeSn(SOCKET _s, uint16_t _addr, uint8_t _data) {
+  return write(CH_BASE + _s * CH_SIZE + _addr, _data);
+}
 
-/*********************************************************
-* iinchip access function
-*********************************************************/
-extern uint8 IINCHIP_READ(uint16 addr);
-extern uint8 IINCHIP_WRITE(uint16 addr,uint8 data);
-extern uint16 wiz_read_buf(uint16 addr, uint8* buf,uint16 len);
-extern uint16 wiz_write_buf(uint16 addr,uint8* buf,uint16 len);
+uint16_t W5100Class::readSn(SOCKET _s, uint16_t _addr, uint8_t *_buf, uint16_t _len) {
+  return read(CH_BASE + _s * CH_SIZE + _addr, _buf, _len);
+}
 
-extern void iinchip_init(void); // reset iinchip
-extern void sysinit(uint8 tx_size, uint8 rx_size); // setting tx/rx buf size
-extern uint8 getISR(uint8 s);
-extern void putISR(uint8 s, uint8 val);
-extern uint16 getIINCHIP_RxMAX(uint8 s);
-extern uint16 getIINCHIP_TxMAX(uint8 s);
-extern uint16 getIINCHIP_RxMASK(uint8 s);
-extern uint16 getIINCHIP_TxMASK(uint8 s);
-extern uint16 getIINCHIP_RxBASE(uint8 s);
-extern uint16 getIINCHIP_TxBASE(uint8 s);
-extern void setGAR(uint8 * addr); // set gateway address
-extern void setSUBR(uint8 * addr); // set subnet mask address
-extern void setSHAR(uint8 * addr); // set local MAC address
-extern void setSIPR(uint8 * addr); // set local IP address
-extern void setRTR(uint16 timeout); // set retry duration for data transmission, connection, closing ...
-extern void setRCR(uint8 retry); // set retry count (above the value, assert timeout interrupt)
-extern void setIMR(uint8 mask); // set interrupt mask. 
-extern void getGAR(uint8 * addr);
-extern void getSUBR(uint8 * addr);
-extern void getSHAR(uint8 * addr);
-extern void getSIPR(uint8 * addr);
-extern uint8 getIR( void );
-extern void setSn_MSS(SOCKET s, uint16 Sn_MSSR0); // set maximum segment size
-extern void setSn_PROTO(SOCKET s, uint8 proto); // set IP Protocol value using IP-Raw mode
-extern uint8 getSn_IR(SOCKET s); // get socket interrupt status
-extern uint8 getSn_SR(SOCKET s); // get socket status
-extern uint16 getSn_TX_FSR(SOCKET s); // get socket TX free buf size
-extern uint16 getSn_RX_RSR(SOCKET s); // get socket RX recv buf size
-extern void setSn_DHAR(SOCKET s, uint8 * addr);
-extern void setSn_DIPR(SOCKET s, uint8 * addr);
-extern void setSn_DPORT(SOCKET s, uint8 * addr);
-extern void getSn_DHAR(SOCKET s, uint8 * addr);
-extern void getSn_DIPR(SOCKET s, uint8 * addr);
-extern void getSn_DPORT(SOCKET s, uint8 * addr);
-extern void setSn_TTL(SOCKET s, uint8 ttl);
-extern void setMR(uint8 val);
+uint16_t W5100Class::writeSn(SOCKET _s, uint16_t _addr, uint8_t *_buf, uint16_t _len) {
+  return write(CH_BASE + _s * CH_SIZE + _addr, _buf, _len);
+}
 
-#ifdef __DEF_IINCHIP_PPP__
-extern uint8 pppinit(uint8 *id, uint8 idlen, uint8 *passwd, uint8 passwdlen);
-extern uint8 pppterm(uint8 *mac,uint8 *sessionid);
-#endif
+void W5100Class::getGatewayIp(uint8_t *_addr) {
+  readGAR(_addr);
+}
 
-extern void send_data_processing(SOCKET s, uint8 *data, uint16 len);
-extern void recv_data_processing(SOCKET s, uint8 *data, uint16 len);
-extern void read_data(SOCKET s, vuint8 * src, vuint8 * dst, uint16 len);
-extern void write_data(SOCKET s, vuint8 * src, vuint8 * dst, uint16 len);
+void W5100Class::setGatewayIp(uint8_t *_addr) {
+  writeGAR(_addr);
+}
+
+void W5100Class::getSubnetMask(uint8_t *_addr) {
+  readSUBR(_addr);
+}
+
+void W5100Class::setSubnetMask(uint8_t *_addr) {
+  writeSUBR(_addr);
+}
+
+void W5100Class::getMACAddress(uint8_t *_addr) {
+  readSHAR(_addr);
+}
+
+void W5100Class::setMACAddress(uint8_t *_addr) {
+  writeSHAR(_addr);
+}
+
+void W5100Class::getIPAddress(uint8_t *_addr) {
+  readSIPR(_addr);
+}
+
+void W5100Class::setIPAddress(uint8_t *_addr) {
+  writeSIPR(_addr);
+}
+
+void W5100Class::setRetransmissionTime(uint16_t _timeout) {
+  writeRTR(_timeout);
+}
+
+void W5100Class::setRetransmissionCount(uint8_t _retry) {
+  writeRCR(_retry);
+}
 
 #endif

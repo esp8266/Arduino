@@ -19,7 +19,7 @@
  
  */
 
-// include the Ethernet library
+#include <SPI.h>
 #include <Ethernet.h>
 
 // pin that the pushButton is connected to:

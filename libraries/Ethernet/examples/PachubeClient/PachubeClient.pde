@@ -19,7 +19,7 @@
  
  */
 
-// include the Ethernet library
+#include <SPI.h>
 #include <Ethernet.h>
 
 // assign a MAC address for the ethernet controller.

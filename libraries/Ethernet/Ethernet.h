@@ -1,9 +1,12 @@
-#ifndef Ethernet_h
-#define Ethernet_h
+#ifndef ethernet_h
+#define ethernet_h
 
 #include <inttypes.h>
-#include "Client.h"
-#include "Server.h"
+//#include "w5100.h"
+#include "client.h"
+#include "server.h"
+
+#define MAX_SOCK_NUM 4
 
 class EthernetClass {
 private:
