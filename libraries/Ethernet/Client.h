@@ -1,6 +1,6 @@
 #ifndef client_h
 #define client_h
-
+#include "WProgram.h"	
 #include "Print.h"
 
 class Client : public Print {
