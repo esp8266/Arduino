@@ -8,34 +8,27 @@
  * published by the Free Software Foundation.
  */
 
+#include "pins_arduino.h"
 #include "SPI.h"
 
 SPIClass SPI;
 
 SPIClass::SPIClass()
 {
-#if defined(__AVR_ATmega1280__)
-  // PBx
-  const static byte SS   = 0;
-  const static byte MOSI = 2;
-  const static byte MISO = 3;
-  const static byte SCK  = 1;
-#else
-  // PBx
-  const static byte SS   = 2;
-  const static byte MOSI = 3;
-  const static byte MISO = 4;
-  const static byte SCK  = 5;
-#endif
-
   // Set direction register for SCK and MOSI pin.
   // MISO pin automatically overrides to INPUT.
   // When the SS pin is set as OUTPUT, it can be used as
   // a general purpose output port (it doesn't influence
   // SPI operations).
 
-  DDRB  |= _BV(SCK) | _BV(MOSI) | _BV(SS);
-  PORTB &= ~(_BV(SCK) | _BV(MOSI) | _BV(SS));
+  pinMode(SCK, OUTPUT);
+  pinMode(MOSI, OUTPUT);
+  pinMode(SS, OUTPUT);
+  
+  digitalWrite(SCK, LOW);
+  digitalWrite(MOSI, LOW);
+  digitalWrite(SS, LOW);
+
   SPCR  = _BV(SPE) | _BV(MSTR);
   
   // Warning: if the SS pin ever becomes a LOW INPUT then SPI 

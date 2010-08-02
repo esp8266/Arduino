@@ -49,6 +49,18 @@
 #define TIMER5B 15
 #define TIMER5C 16
 
+#if defined(__AVR_ATmega1280__)
+const static uint8_t SS   = 53;
+const static uint8_t MOSI = 51;
+const static uint8_t MISO = 50;
+const static uint8_t SCK  = 52;
+#else
+const static uint8_t SS   = 10;
+const static uint8_t MOSI = 11;
+const static uint8_t MISO = 12;
+const static uint8_t SCK  = 13;
+#endif
+
 // On the ATmega1280, the addresses of some of the port registers are
 // greater than 255, so we can't store them in uint8_t's.
 extern const uint16_t PROGMEM port_to_mode_PGM[];
