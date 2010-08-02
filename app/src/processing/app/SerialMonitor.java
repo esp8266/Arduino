@@ -93,14 +93,9 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
         textField.setText("");
       }});
     
-    lineEndings = new JComboBox(new String[] { "No line ending", "Newline", "Carriage return", "Both" });
-    lineEndings.setMaximumSize(lineEndings.getMinimumSize());
-  
     pane.add(textField);
     pane.add(Box.createRigidArea(new Dimension(4, 0)));
     pane.add(sendButton);
-    pane.add(Box.createRigidArea(new Dimension(8, 0)));
-    pane.add(lineEndings);
     
     getContentPane().add(pane, BorderLayout.NORTH);
     
@@ -108,10 +103,11 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
     pane.setLayout(new BoxLayout(pane, BoxLayout.X_AXIS));
     pane.setBorder(new EmptyBorder(4, 4, 4, 4));
     
-    autoscrollBox = new JCheckBox("Automatically scroll when new data is received.", true);
-    pane.add(autoscrollBox);
-    pane.add(Box.createHorizontalGlue());
+    autoscrollBox = new JCheckBox("Autoscroll", true);
     
+    lineEndings = new JComboBox(new String[] { "No line ending", "Newline", "Carriage return", "Both NL & CR" });
+    lineEndings.setMaximumSize(lineEndings.getMinimumSize());
+      
     String[] serialRateStrings = {
       "300","1200","2400","4800","9600","14400",
       "19200","28800","38400","57600","115200"
@@ -138,7 +134,11 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
       }});
       
     serialRates.setMaximumSize(serialRates.getMinimumSize());
-    
+
+    pane.add(autoscrollBox);
+    pane.add(Box.createHorizontalGlue());
+    pane.add(lineEndings);
+    pane.add(Box.createRigidArea(new Dimension(8, 0)));
     pane.add(serialRates);
     
     getContentPane().add(pane, BorderLayout.SOUTH);
