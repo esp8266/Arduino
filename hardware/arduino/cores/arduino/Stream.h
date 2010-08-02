@@ -26,7 +26,7 @@
 class Stream : public Print
 {
   public:
-    virtual uint8_t available() = 0;
+    virtual int available() = 0;
     virtual int peek() = 0;
     virtual int read() = 0;
     virtual void flush() = 0;

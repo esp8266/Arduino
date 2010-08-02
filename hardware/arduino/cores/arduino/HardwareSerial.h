@@ -48,7 +48,7 @@ class HardwareSerial : public Stream
       uint8_t rxen, uint8_t txen, uint8_t rxcie, uint8_t udre, uint8_t u2x);
     void begin(long);
     void end();
-    virtual uint8_t available(void);
+    virtual int available(void);
     virtual int peek(void);
     virtual int read(void);
     virtual void flush(void);

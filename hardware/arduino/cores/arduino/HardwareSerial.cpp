@@ -173,7 +173,7 @@ void HardwareSerial::end()
   cbi(*_ucsrb, _rxcie);  
 }
 
-uint8_t HardwareSerial::available(void)
+int HardwareSerial::available(void)
 {
   return (RX_BUFFER_SIZE + _rx_buffer->head - _rx_buffer->tail) % RX_BUFFER_SIZE;
 }
