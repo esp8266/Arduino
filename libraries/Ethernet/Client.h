@@ -28,7 +28,6 @@ public:
 
 private:
   static uint16_t _srcport;
-  bool _connected;
   uint8_t _sock;
   uint8_t *_ip;
   uint16_t _port;
