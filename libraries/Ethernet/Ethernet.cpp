@@ -1,5 +1,5 @@
 #include "w5100.h"
-#include "ethernet.h"
+#include "Ethernet.h"
 
 // XXX: don't make assumptions about the value of MAX_SOCK_NUM.
 uint8_t EthernetClass::_state[MAX_SOCK_NUM] = { 

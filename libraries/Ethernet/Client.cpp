@@ -1,32 +1,29 @@
 #include "w5100.h"
 #include "socket.h"
+
 extern "C" {
-#include "string.h"
+  #include "string.h"
 }
 
 #include "WProgram.h"
 
-#include "ethernet.h"
-#include "client.h"
-#include "server.h"
+#include "Ethernet.h"
+#include "Client.h"
+#include "Server.h"
 
 uint16_t Client::_srcport = 1024;
 
-Client::Client() : _connected(false) {
+Client::Client(uint8_t sock) : _sock(sock) {
 }
 
-Client::Client(uint8_t sock) : _connected(true), _sock(sock) {
-}
-
-Client::Client(uint8_t *ip, uint16_t port) : _ip(ip), _port(port), _connected(false) {
+Client::Client(uint8_t *ip, uint16_t port) : _ip(ip), _port(port), _sock(MAX_SOCK_NUM) {
 }
 
 uint8_t Client::connect() {
-  if (_connected)
+  if (_sock != MAX_SOCK_NUM)
     return 0;
 
-  int i;
-  for (i=0; i<MAX_SOCK_NUM; i++) {
+  for (int i = 0; i < MAX_SOCK_NUM; i++) {
     uint8_t s = W5100.readSnSR(i);
     if (s == SnSR::CLOSED || s == SnSR::FIN_WAIT) {
       _sock = i;
@@ -34,43 +31,46 @@ uint8_t Client::connect() {
     }
   }
 
-  if (i == MAX_SOCK_NUM)
+  if (_sock == MAX_SOCK_NUM)
     return 0;
 
   _srcport++;
   if (_srcport == 0) _srcport = 1024;
   socket(_sock, SnMR::TCP, _srcport, 0);
 
-  if (!::connect(_sock, _ip, _port))
+  if (!::connect(_sock, _ip, _port)) {
+    _sock = MAX_SOCK_NUM;
     return 0;
+  }
 
   while (status() != SnSR::ESTABLISHED) {
     delay(1);
-    if (status() == SnSR::CLOSED)
+    if (status() == SnSR::CLOSED) {
+      _sock = MAX_SOCK_NUM;
       return 0;
+    }
   }
 
-  _connected = true;
   return 1;
 }
 
 void Client::write(uint8_t b) {
-  if (_connected)
+  if (_sock != MAX_SOCK_NUM)
     send(_sock, &b, 1);
 }
 
 void Client::write(const char *str) {
-  if (_connected)
+  if (_sock != MAX_SOCK_NUM)
     send(_sock, (const uint8_t *)str, strlen(str));
 }
 
 void Client::write(const uint8_t *buf, size_t size) {
-  if (_connected)
+  if (_sock != MAX_SOCK_NUM)
     send(_sock, buf, size);
 }
 
 int Client::available() {
-  if (_connected)
+  if (_sock != MAX_SOCK_NUM)
     return W5100.getRXReceivedSize(_sock);
   return 0;
 }
@@ -89,7 +89,7 @@ void Client::flush() {
 }
 
 void Client::stop() {
-  if (!_connected)
+  if (_sock == MAX_SOCK_NUM)
     return;
 
   // attempt to close the connection gracefully (send a FIN to other side)
@@ -105,11 +105,11 @@ void Client::stop() {
     close(_sock);
 
   EthernetClass::_server_port[_sock] = 0;
-  _connected = false;
+  _sock = MAX_SOCK_NUM;
 }
 
 uint8_t Client::connected() {
-  if (!_connected) return 0;
+  if (_sock == MAX_SOCK_NUM) return 0;
   
   uint8_t s = status();
   return !(s == SnSR::LISTEN || s == SnSR::CLOSED || s == SnSR::FIN_WAIT ||
@@ -117,7 +117,7 @@ uint8_t Client::connected() {
 }
 
 uint8_t Client::status() {
-  if (!_connected) return SnSR::CLOSED;
+  if (_sock == MAX_SOCK_NUM) return SnSR::CLOSED;
   return W5100.readSnSR(_sock);
 }
 
@@ -127,13 +127,13 @@ uint8_t Client::status() {
 // library.
 
 uint8_t Client::operator==(int p) {
-  return !_connected;
+  return _sock == MAX_SOCK_NUM;
 }
 
 uint8_t Client::operator!=(int p) {
-  return _connected;
+  return _sock != MAX_SOCK_NUM;
 }
 
 Client::operator bool() {
-  return _connected;
+  return _sock != MAX_SOCK_NUM;
 }

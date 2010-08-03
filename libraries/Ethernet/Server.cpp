@@ -4,9 +4,9 @@ extern "C" {
 #include "string.h"
 }
 
-#include "ethernet.h"
-#include "client.h"
-#include "server.h"
+#include "Ethernet.h"
+#include "Client.h"
+#include "Server.h"
 
 Server::Server(uint16_t port)
 {

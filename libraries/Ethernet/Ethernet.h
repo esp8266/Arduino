@@ -3,8 +3,8 @@
 
 #include <inttypes.h>
 //#include "w5100.h"
-#include "client.h"
-#include "server.h"
+#include "Client.h"
+#include "Server.h"
 
 #define MAX_SOCK_NUM 4
 
