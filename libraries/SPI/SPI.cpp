@@ -27,7 +27,7 @@ SPIClass::SPIClass()
   
   digitalWrite(SCK, LOW);
   digitalWrite(MOSI, LOW);
-  digitalWrite(SS, LOW);
+  digitalWrite(SS, HIGH);
 
   SPCR  = _BV(SPE) | _BV(MSTR);
   
