@@ -63,7 +63,7 @@ Client Server::available()
     }
   }
 
-  return Client();
+  return Client(MAX_SOCK_NUM);
 }
 
 void Server::write(uint8_t b) 
