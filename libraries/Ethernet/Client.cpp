@@ -109,12 +109,15 @@ void Client::stop() {
 }
 
 uint8_t Client::connected() {
+  if (!_connected) return 0;
+  
   uint8_t s = status();
   return !(s == SnSR::LISTEN || s == SnSR::CLOSED || s == SnSR::FIN_WAIT ||
     (s == SnSR::CLOSE_WAIT && !available()));
 }
 
 uint8_t Client::status() {
+  if (!_connected) return SnSR::CLOSED;
   return W5100.readSnSR(_sock);
 }
 
