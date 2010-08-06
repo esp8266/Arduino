@@ -56,9 +56,9 @@ class String
     // general methods
     char charAt( unsigned int index ) const;
     int	compareTo( const String &anotherString ) const;
-    boolean endsWith( const String &suffix ) const;
-    boolean equals( const String &anObject ) const;
-    boolean equalsIgnoreCase( const String &anotherString ) const;
+    unsigned char endsWith( const String &suffix ) const;
+    unsigned char equals( const String &anObject ) const;
+    unsigned char equalsIgnoreCase( const String &anotherString ) const;
     int	indexOf( char ch ) const;
     int	indexOf( char ch, unsigned int fromIndex ) const;
     int	indexOf( const String &str ) const;
@@ -69,14 +69,14 @@ class String
     int	lastIndexOf( const String &str, unsigned int fromIndex ) const;
     const unsigned int length( ) const { return _length; }
     void setCharAt(unsigned int index, const char ch);
-    boolean startsWith( const String &prefix ) const;
-    boolean startsWith( const String &prefix, unsigned int toffset ) const;
+    unsigned char startsWith( const String &prefix ) const;
+    unsigned char startsWith( const String &prefix, unsigned int toffset ) const;
     String substring( unsigned int beginIndex ) const;
     String substring( unsigned int beginIndex, unsigned int endIndex ) const;
     String toLowerCase( ) const;
     String toUpperCase( ) const;
     String trim( ) const;
-    const byte *getBytes() const { return (byte*)_buffer; }
+    const unsigned char *getBytes() const { return (unsigned char*)_buffer; }
     const char* toCharArray() const { return _buffer; }
     const String& concat( const String &str );
     String replace( char oldChar, char newChar );

@@ -2,7 +2,6 @@
 #define LiquidCrystal_h
 
 #include <inttypes.h>
-#include "WProgram.h"
 #include "Print.h"
 
 // commands
