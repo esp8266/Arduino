@@ -1128,7 +1128,7 @@ static int find_max_exp_index(bigint *biexp)
         }
 
         shift >>= 1;
-    } while (--i != 0);
+    } while (i-- != 0);
 
     return -1;      /* error - must have been a leading 0 */
 }
@@ -1151,7 +1151,7 @@ static int exp_bit_is_one(bigint *biexp, int offset)
         shift <<= 1;
     }
 
-    return test & shift;
+    return (test & shift) != 0;
 }
 
 #ifdef CONFIG_BIGINT_CHECK_ON

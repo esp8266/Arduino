@@ -48,10 +48,10 @@ static HCRYPTPROV gCryptProv;
 #endif
 
 #if (!defined(CONFIG_USE_DEV_URANDOM) && !defined(CONFIG_WIN32_USE_CRYPTO_LIB))
-/* change to 32bit processor registers as appropriate */
+/* change to processor registers as appropriate */
 #define ENTROPY_POOL_SIZE 32
-#define ENTROPY_COUNTER1 (uint32_t)((tv.tv_sec<<16) + tv.tv_usec)
-#define ENTROPY_COUNTER2 (uint32_t)rand()
+#define ENTROPY_COUNTER1 ((((uint64_t)tv.tv_sec)<<32) | tv.tv_usec)
+#define ENTROPY_COUNTER2 rand()
 static uint8_t entropy_pool[ENTROPY_POOL_SIZE];
 #endif
 
@@ -181,8 +181,8 @@ EXP_FUNC void STDCALL get_random(int num_rand_bytes, uint8_t *rand_data)
     /* A proper implementation would use counters etc for entropy */
     gettimeofday(&tv, NULL);    
     uint64_t *ep = (uint64_t *)entropy_pool;
-    ep[0] ^= (uint64_t)ENTROPY_COUNTER1;
-    ep[1] ^= (uint64_t)ENTROPY_COUNTER2; 
+    ep[0] ^= ENTROPY_COUNTER1;
+    ep[1] ^= ENTROPY_COUNTER2; 
 
     /* use a digested version of the entropy pool as a key */
     MD5_Init(&rng_digest_ctx);

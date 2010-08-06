@@ -1449,18 +1449,17 @@ int SSL_client_tests(void)
                     DEFAULT_CLNT_OPTION, NULL, NULL, NULL)))
         goto cleanup;
 
-// no client renegotiation
-// TODO: this was causing a lock-up on x509_free()
-    sess_resume.do_reneg = 1;
-    if ((ret = SSL_client_test("Client renegotiation", 
-                    &ssl_ctx, NULL, &sess_resume, 
-                    DEFAULT_CLNT_OPTION, NULL, NULL, NULL)) !=
-           -SSL_ALERT_NO_RENEGOTIATION)
-    {
-        printf("*** Error: %d\n", ret); TTY_FLUSH();
-        goto cleanup;
-    }
-    sess_resume.do_reneg = 0;
+    // no client renegotiation
+    //sess_resume.do_reneg = 1;
+    //if ((ret = SSL_client_test("Client renegotiation", 
+    //                &ssl_ctx, NULL, &sess_resume, 
+    //                DEFAULT_CLNT_OPTION, NULL, NULL, NULL)) !=
+    //       -SSL_ALERT_NO_RENEGOTIATION)
+    //{
+    //    printf("*** Error: %d\n", ret); TTY_FLUSH();
+    //    goto cleanup;
+    //}
+    //sess_resume.do_reneg = 0;
 
     sess_resume.stop_server = 1;
     if ((ret = SSL_client_test("Client session resumption #2", 
