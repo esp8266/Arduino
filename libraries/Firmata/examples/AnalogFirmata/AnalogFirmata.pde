@@ -3,8 +3,8 @@
  *
  * This example code is in the public domain.
  */
-#include <Firmata.h>
 #include <Servo.h>
+#include <Firmata.h>
 
 /*==============================================================================
  * GLOBAL VARIABLES
@@ -17,7 +17,7 @@ int analogInputsToReport = 0; // bitwise array to store pin reporting
 int analogPin = 0; // counter for reading analog pins
 /* timer variables */
 unsigned long currentMillis;     // store the current value from millis()
-unsigned long nextExecuteMillis; // for comparison with currentMillis
+unsigned long previousMillis;    // for comparison with currentMillis
 
 
 /*==============================================================================
@@ -72,8 +72,8 @@ void loop()
     while(Firmata.available())
         Firmata.processInput();
     currentMillis = millis();
-    if(currentMillis > nextExecuteMillis) {  
-        nextExecuteMillis = currentMillis + 19; // run this every 20ms
+    if(currentMillis - previousMillis > 20) {  
+        previousMillis += 20;                   // run this every 20ms
         for(analogPin=0;analogPin<TOTAL_ANALOG_PINS;analogPin++) {
             if( analogInputsToReport & (1 << analogPin) ) 
                 Firmata.sendAnalog(analogPin, analogRead(analogPin));

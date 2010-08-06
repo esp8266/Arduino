@@ -4,21 +4,21 @@
  */
 #include <Firmata.h>
 
-byte previousPIN[2];  // PIN means PORT for input
-byte previousPORT[2]; 
+byte previousPIN[TOTAL_PORTS];  // PIN means PORT for input
+byte previousPORT[TOTAL_PORTS]; 
 
 void outputPort(byte portNumber, byte portValue)
 {
-// only send the data when it changes, otherwise you get too many messages!
-    if(previousPIN[portNumber] != portValue) {
+    // only send the data when it changes, otherwise you get too many messages!
+    if (previousPIN[portNumber] != portValue) {
         Firmata.sendDigitalPort(portNumber, portValue); 
         previousPIN[portNumber] = portValue;
     }
 }
 
 void setPinModeCallback(byte pin, int mode) {
-    if(pin > 1) { // don't touch RxTx pins (0,1)
-        pinMode(pin, mode);
+    if (IS_PIN_DIGITAL(pin)) {
+        pinMode(PIN_TO_DIGITAL(pin), mode);
     }
 }
 
@@ -27,7 +27,7 @@ void digitalWriteCallback(byte port, int value)
     byte i;
     byte currentPinValue, previousPinValue;
 
-    if(value != previousPORT[port]) {
+    if (port < TOTAL_PORTS && value != previousPORT[port]) {
         for(i=0; i<8; i++) {
             currentPinValue = (byte) value & (1 << i);
             previousPinValue = previousPORT[port] & (1 << i);
@@ -49,8 +49,12 @@ void setup()
 
 void loop()
 {
-    outputPort(0, PIND &~ B00000011); // pins 0-7, ignoring Rx/Tx pins (0/1)
-    outputPort(1, PINB); // pins 8-13
+    byte i;
+
+    for (i=0; i<TOTAL_PORTS; i++) {
+        outputPort(i, readPort(i));
+    }
+
     while(Firmata.available()) {
         Firmata.processInput();
     }

@@ -30,12 +30,12 @@ int analogPin = 0; // counter for reading analog pins
 /* digital pins */
 byte reportPINs[TOTAL_PORTS];   // PIN == input port
 byte previousPINs[TOTAL_PORTS]; // PIN == input port
-byte pinStatus[TOTAL_DIGITAL_PINS]; // store pin status, default OUTPUT
+byte pinStatus[TOTAL_PINS]; // store pin status, default OUTPUT
 byte portStatus[TOTAL_PORTS];
 
 /* timer variables */
 unsigned long currentMillis;     // store the current value from millis()
-unsigned long nextExecuteMillis; // for comparison with currentMillis
+unsigned long previousMillis;    // for comparison with currentMillis
 
 
 /*==============================================================================
@@ -63,7 +63,7 @@ void checkDigitalInputs(void)
             switch(i) {
             case 0: outputPort(0, PIND &~ B00000011); break; // ignore Rx/Tx 0/1
             case 1: outputPort(1, PINB); break;
-            case ANALOG_PORT: outputPort(ANALOG_PORT, PINC); break;
+            case 2: outputPort(2, PINC); break;
             }
         }
     }
@@ -150,7 +150,7 @@ void reportAnalogCallback(byte pin, int value)
 void reportDigitalCallback(byte port, int value)
 {
     reportPINs[port] = (byte)value;
-    if(port == ANALOG_PORT) // turn off analog reporting when used as digital
+    if(port == 2) // turn off analog reporting when used as digital
         analogInputsToReport = 0;
 }
 
@@ -173,7 +173,7 @@ void setup()
     portStatus[1] = B11000000;  // ignore 14/15 pins 
     portStatus[2] = B00000000;
 
-//    for(i=0; i<TOTAL_DIGITAL_PINS; ++i) { // TODO make this work with analogs
+//    for(i=0; i<TOTAL_PINS; ++i) { // TODO make this work with analogs
     for(i=0; i<14; ++i) {
         setPinModeCallback(i,OUTPUT);
     }
@@ -193,7 +193,7 @@ void setup()
      * digital data on change. */
     if(reportPINs[0]) outputPort(0, PIND &~ B00000011); // ignore Rx/Tx 0/1
     if(reportPINs[1]) outputPort(1, PINB);
-    if(reportPINs[ANALOG_PORT]) outputPort(ANALOG_PORT, PINC);
+    if(reportPINs[2]) outputPort(2, PINC);
 
     Firmata.begin(115200);
 }
@@ -207,8 +207,8 @@ void loop()
  * FTDI buffer using Serial.print()  */
     checkDigitalInputs();  
     currentMillis = millis();
-    if(currentMillis > nextExecuteMillis) {  
-        nextExecuteMillis = currentMillis + 19; // run this every 20ms
+    if(currentMillis - previousMillis > 20) {  
+        previousMillis += 20;     // run this every 20ms
         /* SERIALREAD - Serial.read() uses a 128 byte circular buffer, so handle
          * all serialReads at once, i.e. empty the buffer */
         while(Firmata.available())

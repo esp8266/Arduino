@@ -23,7 +23,7 @@
 #define MAX_QUERIES 8
 
 unsigned long currentMillis;     // store the current value from millis()
-unsigned long nextExecuteMillis; // for comparison with currentMillis
+unsigned long previousMillis;    // for comparison with currentMillis
 unsigned int samplingInterval = 32;  // default sampling interval is 33ms
 unsigned int i2cReadDelayTime = 0;  // default delay time between i2c read request and Wire.requestFrom()
 unsigned int powerPinsEnabled = 0;  // use as boolean to prevent enablePowerPins from being called more than once
@@ -192,7 +192,7 @@ void setup()
   Firmata.attach(START_SYSEX, sysexCallback);
   Firmata.attach(SYSTEM_RESET, systemResetCallback);
 
-  for (int i = 0; i < TOTAL_DIGITAL_PINS; ++i) {
+  for (int i = 0; i < TOTAL_PINS; ++i) {
     pinMode(i, OUTPUT);
   }
 
@@ -207,8 +207,8 @@ void loop()
   }
 
   currentMillis = millis();
-  if (currentMillis > nextExecuteMillis) {
-    nextExecuteMillis = currentMillis + samplingInterval;
+  if (currentMillis - previousMillis > samplingInterval) {
+    previousMillis += samplingInterval;
 
     for (byte i = 0; i < queryIndex; i++) {
       readAndReportData(query[i].addr, query[i].reg, query[i].bytes);
