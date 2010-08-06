@@ -24,10 +24,8 @@
 // - The SPI functions herein were developed for the AVR910_ARD programmer 
 // - More information at http://code.google.com/p/mega-isp
 
-#define SCK 13
-#define MISO 12
-#define MOSI 11
-#define RESET 10
+#include "pins_arduino.h"  // defines SS,MOSI,MISO,SCK
+#define RESET SS
 
 #define LED_HB 9
 #define LED_ERR 8
