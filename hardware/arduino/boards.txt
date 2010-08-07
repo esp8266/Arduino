@@ -80,27 +80,6 @@ mini.build.core=arduino
 
 ##############################################################
 
-bt.name=Arduino BT
-
-bt.upload.protocol=stk500
-bt.upload.maximum_size=14336
-bt.upload.speed=19200
-bt.upload.disable_flushing=true
-
-bt.bootloader.low_fuses=0xff
-bt.bootloader.high_fuses=0xdd
-bt.bootloader.extended_fuses=0x00
-bt.bootloader.path=bt
-bt.bootloader.file=ATmegaBOOT_168.hex
-bt.bootloader.unlock_bits=0x3F
-bt.bootloader.lock_bits=0x0F
-
-bt.build.mcu=atmega168
-bt.build.f_cpu=16000000L
-bt.build.core=arduino
-
-##############################################################
-
 fio.name=Arduino Fio
 
 fio.upload.protocol=stk500
@@ -118,6 +97,48 @@ fio.bootloader.lock_bits=0x0F
 fio.build.mcu=atmega328p
 fio.build.f_cpu=8000000L
 fio.build.core=arduino:arduino
+
+##############################################################
+
+bt328.name=Arduino BT w/ ATmega328
+
+bt328.upload.protocol=stk500
+bt328.upload.maximum_size=28672
+bt328.upload.speed=19200
+bt328.upload.disable_flushing=true
+
+bt328.bootloader.low_fuses=0xff
+bt328.bootloader.high_fuses=0xd8
+bt328.bootloader.extended_fuses=0x05
+bt328.bootloader.path=bt
+bt328.bootloader.file=ATmegaBOOT_168_atmega328_bt.hex
+bt328.bootloader.unlock_bits=0x3F
+bt328.bootloader.lock_bits=0x0F
+
+bt328.build.mcu=atmega328p
+bt328.build.f_cpu=16000000L
+bt328.build.core=arduino
+
+##############################################################
+
+bt.name=Arduino BT w/ ATmega168
+
+bt.upload.protocol=stk500
+bt.upload.maximum_size=14336
+bt.upload.speed=19200
+bt.upload.disable_flushing=true
+
+bt.bootloader.low_fuses=0xff
+bt.bootloader.high_fuses=0xdd
+bt.bootloader.extended_fuses=0x00
+bt.bootloader.path=bt
+bt.bootloader.file=ATmegaBOOT_168.hex
+bt.bootloader.unlock_bits=0x3F
+bt.bootloader.lock_bits=0x0F
+
+bt.build.mcu=atmega168
+bt.build.f_cpu=16000000L
+bt.build.core=arduino
 
 ##############################################################
 
