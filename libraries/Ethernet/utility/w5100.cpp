@@ -25,8 +25,11 @@ W5100Class W5100;
 
 void W5100Class::init(void)
 {
-  initSS();
+  delay(300);
 
+  SPI.begin();
+  initSS();
+  
   writeMR(1<<RST);
   writeTMSR(0x55);
   writeRMSR(0x55);

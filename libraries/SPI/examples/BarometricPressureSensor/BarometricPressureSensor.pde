@@ -36,12 +36,13 @@ const int chipSelectPin = 7;
 
 void setup() {
   Serial.begin(9600);
-  // initalize the  data ready and chip select pins:
-  pinMode(dataReadyPin, INPUT);
-  pinMode(chipSelectPin, OUTPUT);
 
   // start the SPI library:
   SPI.begin();
+
+  // initalize the  data ready and chip select pins:
+  pinMode(dataReadyPin, INPUT);
+  pinMode(chipSelectPin, OUTPUT);
 
   //Configure SCP1000 for low noise configuration:
   writeRegister(0x02, 0x2D);

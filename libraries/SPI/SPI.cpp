@@ -13,8 +13,7 @@
 
 SPIClass SPI;
 
-SPIClass::SPIClass()
-{
+void SPIClass::begin() {
   // Set direction register for SCK and MOSI pin.
   // MISO pin automatically overrides to INPUT.
   // When the SS pin is set as OUTPUT, it can be used as
@@ -29,12 +28,15 @@ SPIClass::SPIClass()
   digitalWrite(MOSI, LOW);
   digitalWrite(SS, HIGH);
 
-  SPCR  = _BV(SPE) | _BV(MSTR);
-  
   // Warning: if the SS pin ever becomes a LOW INPUT then SPI 
   // automatically switches to Slave, so the data direction of 
   // the SS pin MUST be kept as OUTPUT.
-  SPCR  = _BV(SPE) | _BV(MSTR);
+  SPCR |= _BV(MSTR);
+  SPCR |= _BV(SPE);
+}
+
+void SPIClass::end() {
+  SPCR &= ~_BV(SPE);
 }
 
 void SPIClass::setBitOrder(uint8_t bitOrder)

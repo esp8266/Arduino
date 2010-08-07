@@ -35,8 +35,6 @@
 
 class SPIClass {
 public:
-  SPIClass();
-
   inline static byte transfer(byte _data);
 
   // SPI Configuration methods
@@ -44,8 +42,8 @@ public:
   inline static void attachInterrupt();
   inline static void detachInterrupt(); // Default
 
-  inline static void begin(); // Default
-  inline static void end();
+  static void begin(); // Default
+  static void end();
 
   static void setBitOrder(uint8_t);
   static void setDataMode(uint8_t);
@@ -67,14 +65,6 @@ void SPIClass::attachInterrupt() {
 
 void SPIClass::detachInterrupt() {
   SPCR &= ~_BV(SPIE);
-}
-
-void SPIClass::begin() {
-  SPCR |= _BV(SPE);
-}
-
-void SPIClass::end() {
-  SPCR &= ~_BV(SPE);
 }
 
 #endif

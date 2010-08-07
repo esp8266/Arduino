@@ -60,6 +60,9 @@ long pressure = 0;
 long lastReadingTime = 0;
 
 void setup() {
+  // start the SPI library:
+  SPI.begin();
+
   // start the Ethernet connection and the server:
   Ethernet.begin(mac, ip);
   server.begin();
@@ -68,8 +71,6 @@ void setup() {
   pinMode(dataReadyPin, INPUT);
   pinMode(chipSelectPin, OUTPUT);
 
-  // start the SPI library:
-  SPI.begin();
   Serial.begin(9600);
 
   //Configure SCP1000 for low noise configuration:
