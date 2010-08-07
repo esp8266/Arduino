@@ -37,51 +37,23 @@ SPIClass::SPIClass()
   SPCR  = _BV(SPE) | _BV(MSTR);
 }
 
-void SPIClass::setDataOrder(SPIDataOrder _d)
+void SPIClass::setBitOrder(uint8_t bitOrder)
 {
-  if (_d == SPI_DataOrder_LSB)
-    SPCR |= _BV(DORD); // LSB
-  else
-    SPCR &= ~_BV(DORD); // MSB
-}
-
-void SPIClass::setSPIMode(SPIMode _d)
-{
-  switch (_d) {
-    case SPI_Mode_SampleRising:
-      SPCR &= ~(_BV(CPOL) | _BV(CPHA));  
-      break;
-    case SPI_Mode_SetupRising:
-      SPCR &= ~_BV(CPOL);
-      SPCR |= _BV(CPHA);
-      break;
-    case SPI_Mode_SampleFalling:
-      SPCR &= ~_BV(CPHA);
-      SPCR |= _BV(CPOL);
-      break;
-    case SPI_Mode_SetupFalling:
-      SPCR |= _BV(CPOL) | _BV(CPHA);
-      break;
+  if(bitOrder == LSBFIRST) {
+    SPCR |= _BV(DORD);
+  } else {
+    SPCR &= ~(_BV(DORD));
   }
 }
 
-void SPIClass::setClockDivider(SPIClockDivider _d)
+void SPIClass::setDataMode(uint8_t mode)
 {
-  switch (_d) {
-    case SPI_ClkDiv_4:
-      SPCR &= ~(_BV(SPR1) | _BV(SPR0));
-      break;
-    case SPI_ClkDiv_16:
-      SPCR &= ~_BV(SPR1);
-      SPCR |= _BV(SPR0);
-      break;
-    case SPI_ClkDiv_64:
-      SPCR |= _BV(SPR1);
-      SPCR &= ~_BV(SPR0);
-      break;
-    case SPI_ClkDiv_128:
-      SPCR |= _BV(SPR1) | _BV(SPR0);
-      break;
-  }
+  SPCR = (SPCR & ~SPI_MODE_MASK) | mode;
+}
+
+void SPIClass::setClockDivider(uint8_t rate)
+{
+  SPCR = (SPCR & ~SPI_CLOCK_MASK) | (rate & SPI_CLOCK_MASK);
+  SPSR = (SPSR & ~SPI_2XCLOCK_MASK) | (rate & SPI_2XCLOCK_MASK);
 }
 

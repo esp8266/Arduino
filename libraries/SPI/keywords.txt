@@ -11,41 +11,26 @@ SPI	KEYWORD1
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
-send KEYWORD2
-sendInt16 KEYWORD2
-sendInt32 KEYWORD2
-initSS KEYWORD2
-setSS KEYWORD2
-resetSS KEYWORD2
-initSS2 KEYWORD2
-setSS2 KEYWORD2
-resetSS2 KEYWORD2
-initSS3 KEYWORD2
-setSS3 KEYWORD2
-resetSS3 KEYWORD2
-initSS4 KEYWORD2
-setSS4 KEYWORD2
-resetSS4 KEYWORD2
-
-enableInterrupt KEYWORD2
-disableInterrupt KEYWORD2
-enable KEYWORD2
-disable KEYWORD2
-dataOrderLSB KEYWORD2
-dataOrderMSB KEYWORD2
-setSPIMode0 KEYWORD2
-setSPIMode1 KEYWORD2
-setSPIMode2 KEYWORD2
-setSPIMode3 KEYWORD2
-setClockDividerTo2 KEYWORD2
-setClockDividerTo4 KEYWORD2
-setClockDividerTo8 KEYWORD2
-setClockDividerTo16 KEYWORD2
-setClockDividerTo32 KEYWORD2
-setClockDividerTo64 KEYWORD2
-setClockDividerTo128 KEYWORD2
+begin	KEYWORD2
+end	KEYWORD2
+transfer	KEYWORD2
+setBitOrder	KEYWORD2
+setDataMode	KEYWORD2
+setClockDivider	KEYWORD2
 
 
 #######################################
 # Constants (LITERAL1)
 #######################################
+SPI_CLOCK_DIV4	LITERAL1
+SPI_CLOCK_DIV16	LITERAL1
+SPI_CLOCK_DIV64	LITERAL1
+SPI_CLOCK_DIV128	LITERAL1
+SPI_CLOCK_DIV2	LITERAL1
+SPI_CLOCK_DIV8	LITERAL1
+SPI_CLOCK_DIV32	LITERAL1
+SPI_CLOCK_DIV64	LITERAL1
+SPI_MODE0	LITERAL1
+SPI_MODE1	LITERAL1
+SPI_MODE2	LITERAL1
+SPI_MODE3	LITERAL1

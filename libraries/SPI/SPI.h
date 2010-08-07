@@ -15,24 +15,23 @@
 #include <WProgram.h>
 #include <avr/pgmspace.h>
 
-enum SPIClockDivider {
-  SPI_ClkDiv_4,
-  SPI_ClkDiv_16,
-  SPI_ClkDiv_64,
-  SPI_ClkDiv_128,
-};
+#define SPI_CLOCK_DIV4 0x00
+#define SPI_CLOCK_DIV16 0x01
+#define SPI_CLOCK_DIV64 0x02
+#define SPI_CLOCK_DIV128 0x03
+#define SPI_CLOCK_DIV2 0x04
+#define SPI_CLOCK_DIV8 0x05
+#define SPI_CLOCK_DIV32 0x06
+#define SPI_CLOCK_DIV64 0x07
 
-enum SPIDataOrder {
-  SPI_DataOrder_LSB,
-  SPI_DataOrder_MSB,
-};
+#define SPI_MODE0 0x00
+#define SPI_MODE1 0x04
+#define SPI_MODE2 0x08
+#define SPI_MODE3 0x0C
 
-enum SPIMode {
-  SPI_Mode_SampleRising,
-  SPI_Mode_SetupRising,
-  SPI_Mode_SampleFalling,
-  SPI_Mode_SetupFalling,
-};
+#define SPI_MODE_MASK 0x0C  // CPOL = bit 3, CPHA = bit 2 on SPCR
+#define SPI_CLOCK_MASK 0x03  // SPR1 = bit 1, SPR0 = bit 0 on SPCR
+#define SPI_2XCLOCK_MASK 0x01  // SPI2X = bit 0 on SPSR
 
 class SPIClass {
 public:
@@ -48,13 +47,9 @@ public:
   inline static void begin(); // Default
   inline static void end();
 
-  static void setDataOrder(SPIDataOrder);
-
-  static void setSPIMode(SPIMode);
-
-  static void setClockDivider(SPIClockDivider);
-  inline static void doubleSpeed();
-  inline static void noDoubleSpeed(); // Default
+  static void setBitOrder(uint8_t);
+  static void setDataMode(uint8_t);
+  static void setClockDivider(uint8_t);
 };
 
 extern SPIClass SPI;
@@ -80,14 +75,6 @@ void SPIClass::begin() {
 
 void SPIClass::end() {
   SPCR &= ~_BV(SPE);
-}
-
-void SPIClass::doubleSpeed() {
-  SPSR |= _BV(SPI2X);
-}
-
-void SPIClass::noDoubleSpeed() {
-  SPSR &= ~_BV(SPI2X);
 }
 
 #endif
