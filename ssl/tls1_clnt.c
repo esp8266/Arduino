@@ -123,7 +123,7 @@ int do_clnt_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len)
         case HS_FINISHED:
             ret = process_finished(ssl, hs_len);
             disposable_free(ssl);   /* free up some memory */
-            /* note: client renogiation is not allowed after this */
+            /* note: client renegotiation is not allowed after this */
             break;
 
         case HS_HELLO_REQUEST:
@@ -146,7 +146,6 @@ int do_client_connect(SSL *ssl)
     ssl->bm_read_index = 0;
     ssl->next_state = HS_SERVER_HELLO;
     ssl->hs_status = SSL_NOT_OK;            /* not connected */
-    x509_free(ssl->x509_ctx);
 
     /* sit in a loop until it all looks good */
     while (ssl->hs_status != SSL_OK)

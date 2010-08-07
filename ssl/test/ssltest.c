@@ -1352,8 +1352,12 @@ static int SSL_client_test(
     /* renegotiate client */
     if (sess_resume && sess_resume->do_reneg) 
     {
-        if ((ret = ssl_renegotiate(ssl)) < 0)
-            goto client_test_exit;
+        if (ssl_renegotiate(ssl) == -SSL_ALERT_NO_RENEGOTIATION) 
+            ret = 0;
+        else
+            ret = -SSL_ALERT_NO_RENEGOTIATION;
+
+        goto client_test_exit;
     }
 
     if (sess_resume)
@@ -1450,16 +1454,13 @@ int SSL_client_tests(void)
         goto cleanup;
 
     // no client renegotiation
-    //sess_resume.do_reneg = 1;
-    //if ((ret = SSL_client_test("Client renegotiation", 
-    //                &ssl_ctx, NULL, &sess_resume, 
-    //                DEFAULT_CLNT_OPTION, NULL, NULL, NULL)) !=
-    //       -SSL_ALERT_NO_RENEGOTIATION)
-    //{
-    //    printf("*** Error: %d\n", ret); TTY_FLUSH();
-    //    goto cleanup;
-    //}
-    //sess_resume.do_reneg = 0;
+    sess_resume.do_reneg = 1;
+    // test relies on openssl killing the call
+    if ((ret = SSL_client_test("Client renegotiation", 
+                    &ssl_ctx, NULL, &sess_resume, 
+                    DEFAULT_CLNT_OPTION, NULL, NULL, NULL)))
+        goto cleanup;
+    sess_resume.do_reneg = 0;
 
     sess_resume.stop_server = 1;
     if ((ret = SSL_client_test("Client session resumption #2", 
@@ -1579,7 +1580,6 @@ static void do_basic(void)
     /* check the return status */
     if (ssl_handshake_status(ssl_clnt) < 0)
     {
-        printf("YA YA\n");
         ssl_display_error(ssl_handshake_status(ssl_clnt));
         goto error;
     }

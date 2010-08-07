@@ -1239,7 +1239,7 @@ int basic_read(SSL *ssl, uint8_t **in_data)
                 ssl->dc->bm_proc_index = 0;
                 ret = do_handshake(ssl, buf, read_len);
             }
-            else /* no client renogiation allowed */
+            else /* no client renegotiation allowed */
             {
                 ret = SSL_ERROR_NO_CLIENT_RENOG;              
                 goto error;
