@@ -92,8 +92,8 @@ void writeRegister(byte registerName, byte registerValue) {
   // take the chip select low to select the device:
   digitalWrite(chipSelectPin, LOW); 
 
-  SPI.send(registerName); //Send register location
-  SPI.send(registerValue); //Send value to record into register
+  SPI.transfer(registerName); //Send register location
+  SPI.transfer(registerValue); //Send value to record into register
 
   // take the chip select high to de-select:
   digitalWrite(chipSelectPin, HIGH); //Select SPI device
@@ -114,9 +114,9 @@ unsigned int readRegister(byte registerName, int numBytes) {
   // take the chip select low to select the device:
   digitalWrite(chipSelectPin, LOW); 
   // send the device the register you want to read:
-  int command = SPI.send(registerName); 
+  int command = SPI.transfer(registerName); 
   // send a value of 0 to read the forst byte returned:
-  inByte = SPI.send(0x00); 
+  inByte = SPI.transfer(0x00); 
 
   // if there's more than one byte returned, 
   // shift the first byte then get the second byte:
@@ -126,7 +126,7 @@ unsigned int readRegister(byte registerName, int numBytes) {
     break;
   case 2: 
     result = inByte << 8;
-    inByte = SPI.send(0x00); 
+    inByte = SPI.transfer(0x00); 
     result = result |inByte;
     break;
   }

@@ -118,10 +118,10 @@ void W5100Class::read_data(SOCKET s, volatile uint8_t *src, volatile uint8_t *ds
 uint8_t W5100Class::write(uint16_t _addr, uint8_t _data)
 {
   setSS();  
-  SPI.send(0xF0);
-  SPI.send(_addr >> 8);
-  SPI.send(_addr & 0xFF);
-  SPI.send(_data);
+  SPI.transfer(0xF0);
+  SPI.transfer(_addr >> 8);
+  SPI.transfer(_addr & 0xFF);
+  SPI.transfer(_data);
   resetSS();
   return 1;
 }
@@ -131,11 +131,11 @@ uint16_t W5100Class::write(uint16_t _addr, uint8_t *_buf, uint16_t _len)
   for (int i=0; i<_len; i++)
   {
     setSS();    
-    SPI.send(0xF0);
-    SPI.send(_addr >> 8);
-    SPI.send(_addr & 0xFF);
+    SPI.transfer(0xF0);
+    SPI.transfer(_addr >> 8);
+    SPI.transfer(_addr & 0xFF);
     _addr++;
-    SPI.send(_buf[i]);
+    SPI.transfer(_buf[i]);
     resetSS();
   }
   return _len;
@@ -144,10 +144,10 @@ uint16_t W5100Class::write(uint16_t _addr, uint8_t *_buf, uint16_t _len)
 uint8_t W5100Class::read(uint16_t _addr)
 {
   setSS();  
-  SPI.send(0x0F);
-  SPI.send(_addr >> 8);
-  SPI.send(_addr & 0xFF);
-  uint8_t _data = SPI.send(0);
+  SPI.transfer(0x0F);
+  SPI.transfer(_addr >> 8);
+  SPI.transfer(_addr & 0xFF);
+  uint8_t _data = SPI.transfer(0);
   resetSS();
   return _data;
 }
@@ -157,11 +157,11 @@ uint16_t W5100Class::read(uint16_t _addr, uint8_t *_buf, uint16_t _len)
   for (int i=0; i<_len; i++)
   {
     setSS();
-    SPI.send(0x0F);
-    SPI.send(_addr >> 8);
-    SPI.send(_addr & 0xFF);
+    SPI.transfer(0x0F);
+    SPI.transfer(_addr >> 8);
+    SPI.transfer(_addr & 0xFF);
     _addr++;
-    _buf[i] = SPI.send(0);
+    _buf[i] = SPI.transfer(0);
     resetSS();
   }
   return _len;

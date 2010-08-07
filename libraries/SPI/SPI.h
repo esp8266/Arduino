@@ -38,7 +38,7 @@ class SPIClass {
 public:
   SPIClass();
 
-  inline static byte send(byte _data);
+  inline static byte transfer(byte _data);
 
   // SPI Configuration methods
 
@@ -59,7 +59,7 @@ public:
 
 extern SPIClass SPI;
 
-byte SPIClass::send(byte _data) {
+byte SPIClass::transfer(byte _data) {
   SPDR = _data;
   while (!(SPSR & _BV(SPIF)))
     ;
