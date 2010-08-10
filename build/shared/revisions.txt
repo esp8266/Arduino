@@ -5,10 +5,14 @@ ARDUINO 0019
 * Added aliases for the analog input pins: A0, A1, etc.
   http://code.google.com/p/arduino/issues/detail?id=244
 
+* Added a String class.  
+
 * Added an SPI library (by Christian Maglie).
   http://code.google.com/p/arduino/issues/detail?id=240
 
 * Revised Ethernet library (by Christian Maglie).
+
+* Updated version of Firmata supports Mega and capability querying.
 
 * More accurate delay() function from BenF.
   http://code.google.com/p/arduino/issues/detail?id=237
@@ -51,6 +55,10 @@ ARDUINO 0019
 
 * Allowing third-party hardware platforms to reference programmers defined
   in other platforms.  http://code.google.com/p/arduino/issues/detail?id=283
+
+[examples]
+
+* Re-organized and numbered for easier access and better progression.
 
 ARDUINO 0018 - 2010.01.29
 
