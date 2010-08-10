@@ -12,7 +12,7 @@
  
  created 18 Dec 2009
  by David A. Mellis
- modified 25 July 2010
+ modified 10 August 2010
  by Tom Igoe
  
  */
@@ -30,6 +30,7 @@ byte subnet[] = { 255, 255, 0, 0 };
 
 // telnet defaults to port 23
 Server server(23);
+boolean gotAMessage = false; // whether or not you got a message from the client yet
 
 void setup() {
   // initialize the ethernet device
@@ -43,7 +44,15 @@ void setup() {
 void loop() {
   // wait for a new client:
   Client client = server.available();
+  
+  // when the client sends the first byte, say hello:
   if (client) {
+    if (!gotAMessage) {
+      Serial.println("We have a new client");
+      client.println("Hello, client!"); 
+      gotAMessage = true;
+    }
+    
     // read the bytes incoming from the client:
     char thisChar = client.read();
     // echo the bytes back to the client:
@@ -52,4 +61,3 @@ void loop() {
     Serial.print(thisChar);
   }
 }
-
