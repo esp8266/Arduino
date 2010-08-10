@@ -496,6 +496,10 @@ public class Serial implements SerialPortEventListener {
     port.setDTR(state);
   }
 
+  public void setRTS(boolean state) {
+    port.setRTS(state);
+  }
+
   /**
    * If this just hangs and never completes on Windows, 
    * it may be because the DLL doesn't have its exec bit set.

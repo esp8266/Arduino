@@ -80,12 +80,14 @@ public abstract class Uploader implements MessageConsumer  {
       }
 
       serialPort.setDTR(false);
+      serialPort.setRTS(false);
 
       try {
         Thread.sleep(100);
       } catch (InterruptedException e) {}
 
       serialPort.setDTR(true);
+      serialPort.setRTS(true);
       
       serialPort.dispose();
     } catch(Exception e) {
