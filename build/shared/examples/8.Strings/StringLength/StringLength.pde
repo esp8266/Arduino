@@ -10,7 +10,7 @@
  This example code is in the public domain.
  */
 String txtMsg = "";                         // a string for incoming text
-int lastStringLength = txtString.length();  //previous lenngth of the String
+int lastStringLength = txtMsg.length();     // previous length of the String
 
 void setup() {
   // open the serial port:
