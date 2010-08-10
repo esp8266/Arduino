@@ -44,6 +44,9 @@ ARDUINO 0019
 
 * Modified the parsing of avr-gcc / avr-g++ output and error messages.
 
+* Toggling RTS on upload for auto-reset with FTDI cables on Linux.
+  http://code.google.com/p/arduino/issues/detail?id=309
+
 * Adding control over scrolling in serial monitor.
   http://code.google.com/p/arduino/issues/detail?id=97
 
