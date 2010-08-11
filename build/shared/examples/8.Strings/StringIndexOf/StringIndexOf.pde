@@ -48,8 +48,8 @@ void loop() {
 // lastIndexOf() can also search for a string:
    stringOne = "<p>Lorem ipsum dolor sit amet</p><p>Ipsem</p><p>Quod</p>";
   int lastParagraph = stringOne.lastIndexOf("<p");
-  int penultimateParagraph = stringOne.lastIndexOf("<p", lastParagraph - 1);
-  Serial.println("The index of the second last paragraph tag " + stringOne + " is " + penultimateParagraph);
+  int secondLastGraf = stringOne.lastIndexOf("<p", lastParagraph - 1);
+  Serial.println("The index of the second last paragraph tag " + stringOne + " is " + secondLastGraf);
 
 // do nothing while true:
  while(true);
