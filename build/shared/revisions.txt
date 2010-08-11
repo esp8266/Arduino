@@ -12,6 +12,9 @@ ARDUINO 0019
 
 * Revised Ethernet library (by Christian Maglie).
 
+* Added a shiftIn() function (from Wiring).
+  http://code.google.com/p/arduino/issues/detail?id=280
+
 * Updated version of Firmata supports Mega and capability querying.
 
 * More accurate delay() function from BenF.

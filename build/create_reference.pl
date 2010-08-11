@@ -26,9 +26,11 @@ my $stepper = create_page('Stepper.html', "$ARDUINO/Reference/Stepper");
 my $softser = create_page('SoftwareSerial.html', "$ARDUINO/Reference/SoftwareSerial");
 my $wire = create_page('Wire.html', "$ARDUINO/Reference/Wire");
 my $servo = create_page('Servo.html', "$ARDUINO/Reference/Servo");
+my $spi = create_page('SPI.html', "$ARDUINO/Reference/SPI");
 my $lcd = create_page('LiquidCrystal.html', "$ARDUINO/Reference/LiquidCrystal");
 my $ethernet = create_page('Ethernet.html', "$ARDUINO/Reference/Ethernet");
 my $serial = create_page('Serial.html', "$ARDUINO/Reference/Serial");
+my $string = create_page('StringClass.html', "$ARDUINO/Reference/StringClass");
 
 create_linked_pages($guide,   qr!$ARDUINO/Guide/(\w+)!,             'Guide_%%.html');
 create_linked_pages($softser, qr!$ARDUINO/Reference/(SoftwareSerial\w+)!, '%%.html');
@@ -36,19 +38,21 @@ create_linked_pages($eeprom,  qr!$ARDUINO/Reference/(EEPROM\w+)!,         '%%.ht
 create_linked_pages($stepper, qr!$ARDUINO/Reference/(Stepper\w+)!,        '%%.html');
 create_linked_pages($wire, qr!$ARDUINO/Reference/(Wire\w+)!,        '%%.html');
 create_linked_pages($servo, qr!$ARDUINO/Reference/(Servo\w+)!,        '%%.html');
+create_linked_pages($spi, qr!$ARDUINO/Reference/(SPI\w+)!,        '%%.html');
 create_linked_pages($lcd, qr!$ARDUINO/Reference/(LiquidCrystal\w+)!,        '%%.html');
 create_linked_pages($ethernet, qr!$ARDUINO/Reference/(Ethernet\w+)!,        '%%.html');
 create_linked_pages($ethernet, qr!$ARDUINO/Reference/(Server\w+)!,        '%%.html');
 create_linked_pages($ethernet, qr!$ARDUINO/Reference/(Client\w+)!,        '%%.html');
 create_linked_pages($serial, qr!$ARDUINO/Serial/(\w+)!,    'Serial_%%.html');
+create_linked_pages($string, qr!$ARDUINO/Reference/(String\w+)!,    '%%.html');
 
 my $index = create_page('index.html', "$ARDUINO/Reference/HomePage");
 
 create_linked_pages($index, qr!$ARDUINO/Reference/(\w+)!,        '%%.html');
 
-my $ext = create_page('Extended.html', "$ARDUINO/Reference/Extended");
+#my $ext = create_page('Extended.html', "$ARDUINO/Reference/Extended");
 
-create_linked_pages($ext, qr!$ARDUINO/Reference/(\w+)!, '%%.html');
+#create_linked_pages($ext, qr!$ARDUINO/Reference/(\w+)!, '%%.html');
 
 exit 0;
 
