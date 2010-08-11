@@ -17,11 +17,16 @@ void setup() {
 void loop() {
   // toUpperCase() changes all letters to upper case:
   String stringOne = "<html><head><body>";
-  Serial.println(stringOne.toUpperCase());
+  Serial.println(stringOne);
+  stringOne = (stringOne.toUpperCase());
+  Serial.println(stringOne);
   
  // toLowerCase() changes all letters to lower case:  
   String stringTwo = "</BODY></HTML>";
-  Serial.println(stringTwo.toLowerCase());
+  Serial.println(stringTwo);
+  stringTwo = stringTwo.toLowerCase();
+  Serial.println(stringTwo);
+  
   
   // do nothing while true:
   while(true);
