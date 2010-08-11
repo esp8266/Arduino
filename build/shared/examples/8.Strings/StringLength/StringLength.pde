@@ -7,6 +7,8 @@
  created 1 Aug 2010
  by Tom Igoe
  
+ http://arduino.cc/en/Tutorial/StringLengthTrim
+ 
  This example code is in the public domain.
  */
 String txtMsg = "";                         // a string for incoming text

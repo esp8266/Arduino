@@ -6,6 +6,8 @@
  created 27 July 2010
  by Tom Igoe
  
+ http://arduino.cc/en/Tutorial/StringStartsWithEndsWith
+ 
  This example code is in the public domain.
  */
 
