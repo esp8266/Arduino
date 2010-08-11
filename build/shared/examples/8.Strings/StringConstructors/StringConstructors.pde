@@ -14,34 +14,46 @@ void setup() {
 }
 
 void loop() {
-  
-    String stringOne = "Hello String";     // using a constant String
+    // using a constant String:
+    String stringOne = "Hello String";     
     Serial.println(stringOne);      // prints "Hello String"
 
-    stringOne =  String('a');        // converting a constant char into a String
+    // converting a constant char into a String:
+    stringOne =  String('a');        
     Serial.println(stringOne);       // prints "a"
 
-    String stringTwo =  String("This is a string");  // converting a constant string into a String object
+    // converting a constant string into a String object:
+    String stringTwo =  String("This is a string");  
     Serial.println(stringTwo);      // prints "This is a string"
 
-    stringOne =  String(stringTwo + " with more");  // concatenating two strings
-    Serial.println(stringOne);      // prints "This is a string with more"
+    // concatenating two strings:
+    stringOne =  String(stringTwo + " with more"); 
+    // prints "This is a string with more":
+    Serial.println(stringOne);      
 
-    stringOne =  String(13);        // using a constant integer
+    // using a constant integer:
+    stringOne =  String(13);        
     Serial.println(stringOne);      // prints "13"
     
-    stringOne =  String(analogRead(0), DEC);  // using an int and a base
-    Serial.println(stringOne);      // prints "453" or whatever the value of analogRead(0) is
+    // using an int and a base:
+    stringOne =  String(analogRead(0), DEC);  
+    // prints "453" or whatever the value of analogRead(0) is
+    Serial.println(stringOne);      
 
-    stringOne =  String(45, HEX);   // using an int and a base (hexadecimal)
-    Serial.println(stringOne);      // prints "2d", which is the hexadecimal version of decimal 45
+    // using an int and a base (hexadecimal):
+    stringOne =  String(45, HEX);   
+    // prints "2d", which is the hexadecimal version of decimal 45:
+    Serial.println(stringOne);      
 
-    stringOne =  String(255, BIN);  // using an int and a base (binary)
-    Serial.println(stringOne);      // prints "11111111" which is the binary value of 255
-
-
-    stringOne =  String(millis(), DEC); // using a long and a base
-    Serial.println(stringOne);      // prints "123456" or whatever the value of millis() is
+	// using an int and a base (binary)
+    stringOne =  String(255, BIN);  
+    // prints "11111111" which is the binary value of 255
+    Serial.println(stringOne);      
+    
+    // using a long and a base:
+    stringOne =  String(millis(), DEC);
+    // prints "123456" or whatever the value of millis() is: 
+    Serial.println(stringOne);      
 
   // do nothing while true:
   while(true);
