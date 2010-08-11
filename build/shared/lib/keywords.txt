@@ -157,6 +157,7 @@ noInterrupts	KEYWORD2	NoInterrupts
 noTone	KEYWORD2	NoTone
 pinMode	KEYWORD2	PinMode
 pulseIn	KEYWORD2	PulseIn
+shiftIn	KEYWORD2	ShiftIn
 shiftOut	KEYWORD2	ShiftOut
 tone	KEYWORD2	Tone
 
