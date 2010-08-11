@@ -24,7 +24,7 @@ void setup() {
 void loop() {
   // adding a constant integer to a string:
   stringThree =  stringOne + 123;
-  Serial.println(stringThree);    // prints "You added 123"
+  Serial.println(stringThree);    // prints "stringThree = 123"
 
   // adding a constant long interger to a string:
   stringThree = stringOne + 123456789;
