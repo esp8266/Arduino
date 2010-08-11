@@ -23,8 +23,8 @@ ARDUINO 0019
 * Added Serial.peek() method.
   http://code.google.com/p/arduino/issues/detail?id=270
 
-* Added Stream base class to Serial object (w/ available(), peek(), read()
-  and the write(), print(), and println() functions from the Print class).
+* Added Stream base class to Serial object (w/ available(), read() and
+  the write(), print(), and println() functions from the Print class).
   http://code.google.com/p/arduino/issues/detail?id=60
 
 * Disabling interrupts while digitalWrite() and pinMode() write to pins.

@@ -3,7 +3,7 @@
 #include "WProgram.h"	
 #include "Print.h"
 
-class Client : public Print {
+class Client : public Stream {
 
 public:
   Client();
@@ -15,9 +15,9 @@ public:
   virtual void write(uint8_t);
   virtual void write(const char *str);
   virtual void write(const uint8_t *buf, size_t size);
-  int available();
-  int read();
-  void flush();
+  virtual int available();
+  virtual int read();
+  virtual void flush();
   void stop();
   uint8_t connected();
   uint8_t operator==(int);
