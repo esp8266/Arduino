@@ -224,6 +224,14 @@
 
     <!-- The ant copy command does not preserve permissions. -->
     <chmod file="macosx/working_dir/Arduino.app/Contents/MacOS/JavaApplicationStub" perm="+x" />
+    <chmod perm="+x">
+      <fileset dir="macosx/working_dir/Arduino.app/Contents/Resources/Java/hardware/tools/avr/bin" includes="**/*" />
+      <fileset dir="macosx/working_dir/Arduino.app/Contents/Resources/Java/hardware/tools/avr/avr/bin" includes="**/*" />
+      <fileset dir="macosx/working_dir/Arduino.app/Contents/Resources/Java/hardware/tools/avr/avr-3/bin" includes="**/*" />
+      <fileset dir="macosx/working_dir/Arduino.app/Contents/Resources/Java/hardware/tools/avr/avr-4/bin" includes="**/*" />
+      <fileset dir="macosx/working_dir/Arduino.app/Contents/Resources/Java/hardware/tools/avr/libexec/gcc/avr/3.4.6/" includes="**/cc1*" />
+      <fileset dir="macosx/working_dir/Arduino.app/Contents/Resources/Java/hardware/tools/avr/libexec/gcc/avr/4.3.2/" includes="**/cc1*" />
+    </chmod>
 
     <!-- Pause briefly for the OS to catch up with the DMG changes. 
 	 This prevents "hdiutil: couldn't eject "disk3" - Resource busy"
