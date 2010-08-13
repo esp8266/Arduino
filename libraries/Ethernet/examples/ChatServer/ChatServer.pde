@@ -1,5 +1,5 @@
 /*
-  Web  Server
+ Chat  Server
  
  A simple server that distributes any incoming messages to all
  connected clients.  To use telnet to  your device's IP address and type.
