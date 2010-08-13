@@ -30,9 +30,13 @@
 // inslude the SPI library:
 #include <SPI.h>
 
+
+// set pin 10 as the slave select for the digital pot:
+const int slaveSelectPin = 10;
+
 void setup() {
-  // set pin 10 as the slave select for the digital pot:
-  pinMode (10, OUTPUT);
+  // set the slaveSelectPin as an output:
+  pinMode (slaveSelectPin, OUTPUT);
   // initialize SPI:
   SPI.begin(); 
 }
@@ -58,10 +62,10 @@ void loop() {
 
 int digitalPotWrite(int address, int value) {
   // take the SS pin low to select the chip:
-  digitalWrite(10,LOW);
+  digitalWrite(slaveSelectPin,LOW);
   //  send in the address and value via SPI:
   SPI.transfer(address);
   SPI.transfer(value);
   // take the SS pin high to de-select the chip:
-  digitalWrite(10,HIGH); 
+  digitalWrite(slaveSelectPin,HIGH); 
 }
