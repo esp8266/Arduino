@@ -13,10 +13,10 @@
  SCP1000 sensor attached to pins 6, 7, 10 - 13:
  DRDY: pin 6
  CSB: pin 7
- MOSI: pin 11
- MISO: pin 12
+ MOSI: pin 11    MOSI, MISO, SCK pins are different depending on the 
+ MISO: pin 12    board type. See your board's documentation for details
  SCK: pin 13
- 
+
  created 31 July 2010
  by Tom Igoe
  */
