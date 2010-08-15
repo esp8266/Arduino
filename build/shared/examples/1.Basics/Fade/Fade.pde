@@ -12,6 +12,7 @@ int fadeAmount = 5;    // how many points to fade the LED by
 
 void setup()  { 
   // nothing happens in setup 
+  pinMode(9, OUTPUT);
 } 
 
 void loop()  { 
