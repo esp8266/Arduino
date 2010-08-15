@@ -904,8 +904,8 @@ public class Base {
 
     // Add a list of all sketches and subfolders
     try {
-      //boolean sketches = addSketches(menu, getSketchbookFolder(), true);
-      boolean sketches = addSketches(menu, getSketchbookFolder());
+      boolean sketches = addSketches(menu, getSketchbookFolder(), true);
+      //boolean sketches = addSketches(menu, getSketchbookFolder());
       if (sketches) menu.addSeparator();
     } catch (IOException e) {
       e.printStackTrace();
@@ -914,11 +914,11 @@ public class Base {
     //System.out.println("rebuilding examples menu");
     // Add each of the subfolders of examples directly to the menu
     try {
-      boolean found = addSketches(menu, examplesFolder);
+      boolean found = addSketches(menu, examplesFolder, true);
       if (found) menu.addSeparator();
-      found = addSketches(menu, getSketchbookLibrariesFolder());
+      found = addSketches(menu, getSketchbookLibrariesFolder(), true);
       if (found) menu.addSeparator();
-      addSketches(menu, librariesFolder);
+      addSketches(menu, librariesFolder, true);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -930,8 +930,8 @@ public class Base {
     //new Exception().printStackTrace();
     try {
         menu.removeAll();
-      //addSketches(menu, getSketchbookFolder(), false);
-      addSketches(menu, getSketchbookFolder());
+      addSketches(menu, getSketchbookFolder(), false);
+      //addSketches(menu, getSketchbookFolder());
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -975,11 +975,11 @@ public class Base {
     //System.out.println("rebuilding examples menu");
     try {
       menu.removeAll();
-      boolean found = addSketches(menu, examplesFolder);
+      boolean found = addSketches(menu, examplesFolder, false);
       if (found) menu.addSeparator();
-      found = addSketches(menu, getSketchbookLibrariesFolder());
+      found = addSketches(menu, getSketchbookLibrariesFolder(), false);
       if (found) menu.addSeparator();
-      addSketches(menu, librariesFolder);
+      addSketches(menu, librariesFolder, false);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -1042,7 +1042,8 @@ public class Base {
    * should replace the sketch in the current window, or false when the
    * sketch should open in a new window.
    */
-  protected boolean addSketches(JMenu menu, File folder) throws IOException {
+  protected boolean addSketches(JMenu menu, File folder,
+                                final boolean replaceExisting) throws IOException {
     // skip .DS_Store files, etc (this shouldn't actually be necessary)
     if (!folder.isDirectory()) return false;
 
@@ -1059,8 +1060,11 @@ public class Base {
         public void actionPerformed(ActionEvent e) {
           String path = e.getActionCommand();
           if (new File(path).exists()) {
-//            if (openReplaces) {
-            if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 0) {
+            boolean replace = replaceExisting;
+            if ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
+              replace = !replace;
+            }
+            if (replace) {
               handleOpenReplace(path);
             } else {
               handleOpen(path);
@@ -1113,15 +1117,15 @@ public class Base {
       } else {
         // don't create an extra menu level for a folder named "examples"
         if (subfolder.getName().equals("examples")) {
-          boolean found = addSketches(menu, subfolder);
+          boolean found = addSketches(menu, subfolder, replaceExisting);
           if (found) ifound = true;
         } else {
         // not a sketch folder, but maybe a subfolder containing sketches
         JMenu submenu = new JMenu(list[i]);
         // needs to be separate var
         // otherwise would set ifound to false
-        //boolean found = addSketches(submenu, subfolder, openReplaces); //, false);
-        boolean found = addSketches(submenu, subfolder); //, false);
+        boolean found = addSketches(submenu, subfolder, replaceExisting);
+        //boolean found = addSketches(submenu, subfolder); //, false);
         if (found) {
           menu.add(submenu);
           ifound = true;
