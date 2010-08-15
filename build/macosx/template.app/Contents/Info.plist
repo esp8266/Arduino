@@ -5,6 +5,15 @@
     <key>CFBundleName</key>
     <string>Arduino</string>
 
+    <!-- all these need to change for new releases -->
+    <key>CFBundleGetInfoString</key>
+    <string>0019</string>
+    <key>CFBundleVersion</key>
+    <string>0019</string>
+    <key>CFBundleShortVersionString</key>
+    <string>0019</string>
+    <!-- now stop changing things and get outta here -->
+
     <key>CFBundleAllowMixedLocalizations</key>
     <string>true</string>
     <key>CFBundleExecutable</key>
