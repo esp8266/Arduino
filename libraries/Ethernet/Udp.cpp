@@ -28,8 +28,8 @@
 
 #include "w5100.h"
 #include "socket.h"
-#include "ethernet.h"
-#include "udp.h"
+#include "Ethernet.h"
+#include "Udp.h"
 
 /* Start UDP socket, listening at local port PORT */
 void UdpClass::begin(uint16_t port) {
