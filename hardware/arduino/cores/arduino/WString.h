@@ -52,7 +52,7 @@ class String
     char operator []( unsigned int index ) const;
     char& operator []( unsigned int index );
     //operator const char *() const { return _buffer; }
-
+    
     // general methods
     char charAt( unsigned int index ) const;
     int	compareTo( const String &anotherString ) const;
@@ -89,7 +89,6 @@ class String
     unsigned int _length;    // the String length (not counting the '\0')
 
     void getBuffer(unsigned int maxStrLen);
-    void doubleBuffer( );
 
   private:
 
@@ -100,15 +99,7 @@ inline void String::getBuffer(unsigned int maxStrLen)
 {
   _capacity = maxStrLen;
   _buffer = (char *) malloc(_capacity + 1);
-}
-
-// double the buffer size
-inline void String::doubleBuffer( )
-{
-  char *temp = _buffer;
-  getBuffer( ++_capacity * 2 );
-  strcpy( _buffer, temp );
-  free(temp);
+  if (_buffer == NULL) _length = _capacity = 0;
 }
 
 inline String operator+( String lhs, const String &rhs )

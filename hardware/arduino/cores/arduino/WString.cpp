@@ -27,29 +27,35 @@ String::String( const char *value )
   if ( value == NULL )
     value = "";
   getBuffer( _length = strlen( value ) );
-  strcpy( _buffer, value );
+  if ( _buffer != NULL )
+    strcpy( _buffer, value );
 }
 
 String::String( const String &value )
 {
   getBuffer( _length = value._length );
-  strcpy( _buffer, value._buffer );
+  if ( _buffer != NULL )
+    strcpy( _buffer, value._buffer );
 }
 
 String::String( const char value )
 {
   _length = 1;
   getBuffer(1);
-  _buffer[0] = value;
-  _buffer[1] = 0;
+  if ( _buffer != NULL ) {
+    _buffer[0] = value;
+    _buffer[1] = 0;
+  }
 }
 
 String::String( const unsigned char value )
 {
   _length = 1;
   getBuffer(1);
-  _buffer[0] = value;
-  _buffer[1] = 0;
+  if ( _buffer != NULL) {
+    _buffer[0] = value;
+    _buffer[1] = 0;
+  }
 }
 
 String::String( const int value, const int base )
@@ -57,7 +63,8 @@ String::String( const int value, const int base )
   char buf[33];   
   itoa((signed long)value, buf, base);
   getBuffer( _length = strlen(buf) );
-  strcpy( _buffer, buf );
+  if ( _buffer != NULL )
+    strcpy( _buffer, buf );
 }
 
 String::String( const unsigned int value, const int base )
@@ -65,7 +72,8 @@ String::String( const unsigned int value, const int base )
   char buf[33];   
   ultoa((unsigned long)value, buf, base);
   getBuffer( _length = strlen(buf) );
-  strcpy( _buffer, buf );
+  if ( _buffer != NULL )
+    strcpy( _buffer, buf );
 }
 
 String::String( const long value, const int base )
@@ -73,7 +81,8 @@ String::String( const long value, const int base )
   char buf[33];   
   ltoa(value, buf, base);
   getBuffer( _length = strlen(buf) );
-  strcpy( _buffer, buf );
+  if ( _buffer != NULL )
+    strcpy( _buffer, buf );
 }
 
 String::String( const unsigned long value, const int base )
@@ -81,7 +90,8 @@ String::String( const unsigned long value, const int base )
   char buf[33];   
   ultoa(value, buf, 10);
   getBuffer( _length = strlen(buf) );
-  strcpy( _buffer, buf );
+  if ( _buffer != NULL )
+    strcpy( _buffer, buf );
 }
 
 char String::charAt( unsigned int loc ) const
@@ -91,6 +101,7 @@ char String::charAt( unsigned int loc ) const
 
 void String::setCharAt( unsigned int loc, const char aChar ) 
 {
+  if(_buffer == NULL) return;
   if(_length > loc) {
     _buffer[loc] = aChar;
   }
@@ -116,8 +127,11 @@ const String & String::operator=( const String &rhs )
     free(_buffer);
     getBuffer( rhs._length );
   }
-  _length = rhs._length;
-  strcpy( _buffer, rhs._buffer );
+  
+  if ( _buffer != NULL ) {
+    _length = rhs._length;
+    strcpy( _buffer, rhs._buffer );
+  }
   return *this;
 }
 
@@ -138,10 +152,12 @@ const String & String::operator+=( const String &other )
   {
     char *temp = _buffer;
     getBuffer( _length );
-    strcpy( _buffer, temp );
+    if ( _buffer != NULL )
+      strcpy( _buffer, temp );
     free(temp);
   }
-  strcat( _buffer, other._buffer );
+  if ( _buffer != NULL )
+    strcat( _buffer, other._buffer );
   return *this;
 }
 
@@ -213,6 +229,7 @@ boolean String::equalsIgnoreCase( const String &s2 ) const
 
 String String::replace( char findChar, char replaceChar )
 {
+  if ( _buffer == NULL ) return *this;
   String theReturn = _buffer;
   char* temp = theReturn._buffer;
   while( (temp = strchr( temp, findChar )) != 0 )
@@ -223,6 +240,7 @@ String String::replace( char findChar, char replaceChar )
 
 String String::replace( const String& match, const String& replace )
 {
+  if ( _buffer == NULL ) return *this;
   String temp = _buffer, newString;
 
   int loc;
@@ -376,6 +394,7 @@ String String::toUpperCase() const
 
 String String::trim() const
 {
+  if ( _buffer == NULL ) return *this;
   String temp = _buffer;
   unsigned int i,j;
 
