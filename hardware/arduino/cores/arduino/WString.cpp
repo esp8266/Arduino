@@ -194,7 +194,11 @@ int String::operator>=( const String & rhs ) const
 
 char & String::operator[]( unsigned int index )
 {
-  // need to check for valid index, to do later
+  static char dummy_writable_char;
+  if (index >= _length || !_buffer) {
+    dummy_writable_char = 0;
+    return dummy_writable_char;
+  }
   return _buffer[ index ];
 }
 
