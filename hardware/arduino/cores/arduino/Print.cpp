@@ -45,7 +45,9 @@ void Print::write(const uint8_t *buffer, size_t size)
 
 void Print::print(const String &s)
 {
-  print(s.toCharArray());
+  for (int i = 0; i < s.length(); i++) {
+    write(s[i]);
+  }
 }
 
 void Print::print(const char str[])

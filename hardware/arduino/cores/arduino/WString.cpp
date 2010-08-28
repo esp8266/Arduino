@@ -169,7 +169,7 @@ int String::operator==( const String &rhs ) const
 
 int String::operator!=( const String &rhs ) const
 {
-  return ( _length != rhs.length() || strcmp( _buffer, rhs.toCharArray() ) != 0 );
+  return ( _length != rhs.length() || strcmp( _buffer, rhs._buffer ) != 0 );
 }
 
 int String::operator<( const String &rhs ) const
@@ -213,7 +213,7 @@ boolean String::endsWith( const String &s2 ) const
   if ( _length < s2._length )
     return 0;
 
-  return strcmp( &_buffer[ _length - s2._length], s2.toCharArray() ) == 0;
+  return strcmp( &_buffer[ _length - s2._length], s2._buffer ) == 0;
 }
 
 boolean String::equals( const String &s2 ) const
@@ -228,7 +228,7 @@ boolean String::equalsIgnoreCase( const String &s2 ) const
   else if ( _length != s2._length )
     return false; //0;
 
-  return strcmp(toLowerCase().toCharArray(), s2.toLowerCase().toCharArray()) == 0;
+  return strcmp(toLowerCase()._buffer, s2.toLowerCase()._buffer) == 0;
 }
 
 String String::replace( char findChar, char replaceChar )
@@ -285,7 +285,7 @@ int String::indexOf( const String &s2, unsigned int fromIndex ) const
   if ( fromIndex >= _length )
     return -1;
 
-  const char *theFind = strstr( &_buffer[ fromIndex ], s2.toCharArray() );
+  const char *theFind = strstr( &_buffer[ fromIndex ], s2._buffer );
 
   if ( theFind == NULL )
     return -1;
@@ -349,7 +349,7 @@ boolean String::startsWith( const String &s2, unsigned int offset ) const
   if ( offset > _length - s2._length )
     return 0;
 
-  return strncmp( &_buffer[offset], s2.toCharArray(), s2._length ) == 0;
+  return strncmp( &_buffer[offset], s2._buffer, s2._length ) == 0;
 }
 
 String String::substring( unsigned int left ) const
@@ -417,3 +417,20 @@ String String::trim() const
   return temp.substring( i, j + 1);
 }
 
+void String::getBytes(unsigned char *buf, unsigned int bufsize)
+{
+  if (!bufsize || !buf) return;
+  unsigned int len = bufsize - 1;
+  if (len > _length) len = _length;
+  strncpy((char *)buf, _buffer, len);
+  buf[len] = 0;
+}
+
+void String::toCharArray(char *buf, unsigned int bufsize)
+{
+  if (!bufsize || !buf) return;
+  unsigned int len = bufsize - 1;
+  if (len > _length) len = _length;
+  strncpy(buf, _buffer, len);
+  buf[len] = 0;
+}

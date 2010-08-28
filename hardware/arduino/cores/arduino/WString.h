@@ -76,8 +76,8 @@ class String
     String toLowerCase( ) const;
     String toUpperCase( ) const;
     String trim( ) const;
-    const unsigned char *getBytes() const { return (unsigned char*)_buffer; }
-    const char* toCharArray() const { return _buffer; }
+    void getBytes(unsigned char *buf, unsigned int bufsize);
+    void toCharArray(char *buf, unsigned int bufsize);
     const String& concat( const String &str );
     String replace( char oldChar, char newChar );
     String replace( const String& match, const String& replace );
