@@ -321,20 +321,28 @@
   <target name="linux-dist" depends="linux-build" 
 	  description="Build .tar.gz of linux version">
 
-    <get src="http://dev.processing.org/build/jre-tools-6u18-linux-i586.tgz" 
+    <!--get src="http://dev.processing.org/build/jre-tools-6u18-linux-i586.tgz" 
 	 dest="linux/jre.tgz" 
 	 usetimestamp="true" />    
     <untar compression="gzip" 
 	   dest="linux/work" 
 	   src="linux/jre.tgz" 
-	   overwrite="false"/>
+	   overwrite="false"/-->
 
 <!--
     <tar compression="gzip" basedir="linux/work" 
 	 destfile="linux/arduino-${version}.tgz" />
 -->
     <tar compression="gzip" destfile="linux/arduino-${version}.tgz">
-      <tarfileset dir="linux/work" prefix="arduino-${version}" />
+      <tarfileset dir="linux/work" 
+		  prefix="arduino-${version}" 
+		  excludes="arduino, 
+			    hardware/tools/avrdude,
+			    java/**"
+		  /> 
+      <tarfileset file="linux/work/arduino" filemode="755" prefix="arduino-${version}" />
+      <tarfileset file="linux/work/hardware/tools/avrdude" filemode="755" 
+		  prefix="arduino-${version}/hardware/tools" />
     </tar>
 
     <echo>
