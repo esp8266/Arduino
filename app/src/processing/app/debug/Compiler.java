@@ -364,9 +364,9 @@ public class Compiler implements MessageConsumer {
       }
       
       if (pieces[3].trim().equals("SPI.h: No such file or directory")) {
-        e = new RunnerException("Import the SPI library from the Sketch menu.");
+        e = new RunnerException("Please import the SPI library from the Sketch > Import Library menu.");
         s += "\nAs of Arduino 0019, the Ethernet library depends on the SPI library." +
-             "\nPlease import it from the Sketch > Import Library menu.";
+             "\nYou appear to be using it or another library that depends on the SPI library.";
       }        
       
       if (exception == null && e != null) {

@@ -1,16 +1,18 @@
-ARDUINO 0019
+ARDUINO 0019 - 2010.09.03
 
 [core / libraries]
+
+* Revised Ethernet library (by Christian Maglie).  This depends on the
+  new SPI library, so existing sketches will need: #include <SPI.h>
+  added to the top of their code.
+
+* Added an SPI library (by Christian Maglie).
+  http://code.google.com/p/arduino/issues/detail?id=240
 
 * Added aliases for the analog input pins: A0, A1, etc.
   http://code.google.com/p/arduino/issues/detail?id=244
 
 * Added a String class.  
-
-* Added an SPI library (by Christian Maglie).
-  http://code.google.com/p/arduino/issues/detail?id=240
-
-* Revised Ethernet library (by Christian Maglie).
 
 * Added a shiftIn() function (from Wiring).
   http://code.google.com/p/arduino/issues/detail?id=280
