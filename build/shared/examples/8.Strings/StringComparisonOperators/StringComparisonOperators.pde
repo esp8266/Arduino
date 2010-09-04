@@ -4,6 +4,7 @@
  Examples of how to compare strings using the comparison operators
  
  created 27 July 2010
+ modified 4 Sep 2010
  by Tom Igoe
  
  http://arduino.cc/en/Tutorial/StringComparisonOperators
@@ -109,8 +110,8 @@ void loop() {
     stringOne = "Sensor: ";
     stringTwo= "Sensor: ";
 
-    stringOne += analogRead(0); 
-    stringTwo += analogRead(5);
+    stringOne += analogRead(A0); 
+    stringTwo += analogRead(A5);
 
     if (stringOne.compareTo(stringTwo) < 0 ) {
       Serial.println(stringOne + " comes after " + stringTwo); 

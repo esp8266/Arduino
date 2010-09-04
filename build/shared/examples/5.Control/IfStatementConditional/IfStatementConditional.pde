@@ -16,6 +16,7 @@
  connected to pin 13, so you don't need any extra components for this example.
  
  created 17 Jan 2009
+ modified 4 Sep 2010
  by Tom Igoe
 
 This example code is in the public domain.
@@ -25,7 +26,7 @@ http://arduino.cc/en/Tutorial/IfStatement
  */
  
 // These constants won't change:
-const int analogPin = 0;     // pin that the sensor is attached to
+const int analogPin = A0;    // pin that the sensor is attached to
 const int ledPin = 13;       // pin that the LED is attached to
 const int threshold = 400;   // an arbitrary threshold level that's in the range of the analog input
 

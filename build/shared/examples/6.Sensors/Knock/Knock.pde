@@ -14,7 +14,7 @@
    
    created 25 Mar 2007
    by David Cuartielles <http://www.0j0.org>
-   modified 30 Jun 2009
+   modified 4 Sep 2010
    by Tom Igoe
    
    This example code is in the public domain.
@@ -24,7 +24,7 @@
 
 // these constants won't change:
 const int ledPin = 13;      // led connected to digital pin 13
-const int knockSensor = 0;  // the piezo is connected to analog pin 0
+const int knockSensor = A0; // the piezo is connected to analog pin 0
 const int threshold = 100;  // threshold value to decide when the detected sound is a knock or not
 
 

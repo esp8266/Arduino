@@ -12,6 +12,7 @@
  * LED connected from digital pin 9 to ground
  
  created 29 Dec. 2008
+ Modified 4 Sep 2010
  by Tom Igoe
  
  This example code is in the public domain.
@@ -20,7 +21,7 @@
 
 // These constants won't change.  They're used to give names
 // to the pins used:
-const int analogInPin = 0;  // Analog input pin that the potentiometer is attached to
+const int analogInPin = A0;  // Analog input pin that the potentiometer is attached to
 const int analogOutPin = 9; // Analog output pin that the LED is attached to
 
 int sensorValue = 0;        // value read from the pot

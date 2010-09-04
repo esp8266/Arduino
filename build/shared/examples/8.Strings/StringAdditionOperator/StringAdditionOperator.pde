@@ -5,6 +5,7 @@
  You can also add several different data types to string, as shown here:
  
  created 27 July 2010
+ modified 4 Sep 2010
  by Tom Igoe
  
  http://arduino.cc/en/Tutorial/StringAdditionOperator
@@ -44,10 +45,10 @@ void loop() {
   Serial.println(stringThree);    // prints "You added this string"
 
   // adding a variable integer to a string:
-  int sensorValue = analogRead(0);
+  int sensorValue = analogRead(A0);
   stringOne = "Sensor value: ";
   stringThree = stringOne  + sensorValue;
-  Serial.println(stringThree);    // prints "Sensor Value: 401" or whatever value analogRead(0) has
+  Serial.println(stringThree);    // prints "Sensor Value: 401" or whatever value analogRead(A0) has
 
   // adding a variable long integer to a string:
   long currentTime = millis();

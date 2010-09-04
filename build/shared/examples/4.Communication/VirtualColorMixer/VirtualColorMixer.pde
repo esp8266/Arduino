@@ -10,15 +10,15 @@
  
  created 2 Dec 2006
  by David A. Mellis
- modified 14 Apr 2009 
+ modified 4 Sep 2010
  by Tom Igoe and Scott Fitzgerald
  
   This example code is in the public domain.
  */
 
-const int redPin = 0;		// sensor to control red color
-const int greenPin = 1;		// sensor to control green color
-const int bluePin = 2;		// sensor to control blue color
+const int redPin = A0;		// sensor to control red color
+const int greenPin = A1;	// sensor to control green color
+const int bluePin = A2;		// sensor to control blue color
 
 void setup()
 {

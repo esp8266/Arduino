@@ -4,6 +4,7 @@
  Examples of how  to create strings from other data types
  
  created 27 July 2010
+ modified 4 Sep 2010
  by Tom Igoe
  
  http://arduino.cc/en/Tutorial/StringConstructors
@@ -38,8 +39,8 @@ void loop() {
     Serial.println(stringOne);      // prints "13"
     
     // using an int and a base:
-    stringOne =  String(analogRead(0), DEC);  
-    // prints "453" or whatever the value of analogRead(0) is
+    stringOne =  String(analogRead(A0), DEC);  
+    // prints "453" or whatever the value of analogRead(A0) is
     Serial.println(stringOne);      
 
     // using an int and a base (hexadecimal):

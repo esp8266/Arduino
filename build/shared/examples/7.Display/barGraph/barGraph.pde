@@ -12,7 +12,7 @@
   The circuit:
    * LEDs from pins 2 through 11 to ground
  
- created 26 Jun 2009
+ created 4 Sep 2010
  by Tom Igoe 
 
  This example code is in the public domain.
@@ -22,7 +22,7 @@
 
 
 // these constants won't change:
-const int analogPin = 0;    // the pin that the potentiometer is attached to
+const int analogPin = A0;   // the pin that the potentiometer is attached to
 const int ledCount = 10;    // the number of LEDs in the bar graph
 
 int ledPins[] = { 

@@ -18,7 +18,7 @@
  
  
  Created by David Cuartielles
- Modified 16 Jun 2009
+ Modified 4 Sep 2010
  By Tom Igoe
  
  This example code is in the public domain.
@@ -27,7 +27,7 @@
  
  */
 
-int sensorPin = 0;    // select the input pin for the potentiometer
+int sensorPin = A0;    // select the input pin for the potentiometer
 int ledPin = 13;      // select the pin for the LED
 int sensorValue = 0;  // variable to store the value coming from the sensor
 

@@ -4,6 +4,7 @@
  Examples of how to use startsWith() and endsWith() in a String
  
  created 27 July 2010
+ modified 4 Sep 2010
  by Tom Igoe
  
  http://arduino.cc/en/Tutorial/StringStartsWithEndsWith
@@ -33,7 +34,7 @@ void loop() {
   
   // endsWith() checks to see if a String ends with a particular character:
   String sensorReading = "sensor = ";
-  sensorReading += analogRead(0);
+  sensorReading += analogRead(A0);
   Serial.print (sensorReading);
   if (sensorReading.endsWith(0)) {
     Serial.println(". This reading is divisible by ten"); 

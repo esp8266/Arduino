@@ -9,6 +9,7 @@
  * 4.7K resistor on analog 0 to ground
  
  created 21 Jan 2010
+ Modified 4 Sep 2010
  by Tom Igoe 
 
 This example code is in the public domain.
@@ -25,7 +26,7 @@ void setup() {
 
 void loop() {
   // read the sensor:
-  int sensorReading = analogRead(0);
+  int sensorReading = analogRead(A0);
   // print the sensor reading so you know its range
   Serial.println(sensorReading);
   // map the pitch to the range of the analog input.

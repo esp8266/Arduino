@@ -14,6 +14,7 @@
  * 10K resistor from analog in 0 to ground
  
  created 1 Jul 2009
+ modified 4 Sep 2010
  by Tom Igoe 
  
  This example code is in the public domain.
@@ -32,7 +33,7 @@ void setup() {
 
 void loop() {
   // read the sensor:
-  int sensorReading = analogRead(0);
+  int sensorReading = analogRead(A0);
   // map the sensor range to a range of four options:
   int range = map(sensorReading, sensorMin, sensorMax, 0, 3);
 

@@ -4,7 +4,7 @@
  This example controls an 8x8 LED matrix using two analog inputs
  
  created 27 May 2009
- modified 29 Jun 2009
+ modified 4 Sep 2010
  by Tom Igoe
  
  This example works for the Lumex  LDM-24488NI Matrix. See 
@@ -83,8 +83,8 @@ void readSensors() {
   // turn off the last position:
   pixels[x][y] = HIGH;
   // read the sensors for X and Y values:
-  x = 7 - map(analogRead(0), 0, 1023, 0, 7);
-  y = map(analogRead(1), 0, 1023, 0, 7);
+  x = 7 - map(analogRead(A0), 0, 1023, 0, 7);
+  y = map(analogRead(A1), 0, 1023, 0, 7);
   // set the new pixel position low so that the LED will turn on
   // in the next screen refresh:
   pixels[x][y] = LOW;

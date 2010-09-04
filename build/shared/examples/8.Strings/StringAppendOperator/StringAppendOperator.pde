@@ -4,6 +4,7 @@
  Examples of how to append different data types to strings
  
  created 27 July 2010
+ modified 4 Sep 2010
  by Tom Igoe
  
  http://arduino.cc/en/Tutorial/StringAppendOperator
@@ -43,8 +44,8 @@ void loop() {
   Serial.println(stringOne);  // prints "Sensor value for input"
 
   // adding a variable integer to a string:
-  stringOne += analogRead(0);
-  Serial.println(stringOne);   // prints "Sensor value for input A0: 456" or whatever analogRead(0) is
+  stringOne += analogRead(A0);
+  Serial.println(stringOne);   // prints "Sensor value for input A0: 456" or whatever analogRead(A0) is
 
   Serial.println("\n\nchanging the Strings' values");
   stringOne = "A long integer: ";

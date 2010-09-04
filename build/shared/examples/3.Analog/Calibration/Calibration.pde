@@ -17,7 +17,7 @@
  
  created 29 Oct 2008
  By David A Mellis
- Modified 17 Jun 2009
+ Modified 4 Sep 2010
  By Tom Igoe
  
  http://arduino.cc/en/Tutorial/Calibration
@@ -27,7 +27,7 @@
  */
 
 // These constants won't change:
-const int sensorPin = 0;     // pin that the sensor is attached to
+const int sensorPin = A0;     // pin that the sensor is attached to
 const int ledPin = 9;        // pin that the LED is attached to
 
 // variables:

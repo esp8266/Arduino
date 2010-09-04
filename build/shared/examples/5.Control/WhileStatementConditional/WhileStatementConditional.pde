@@ -17,7 +17,7 @@
  * 10K resistor attached from pin 2 to ground
  
  created 17 Jan 2009
- modified 25 Jun 2009
+ modified 4 Sep 2010
  by Tom Igoe
  
  This example code is in the public domain.
@@ -28,10 +28,10 @@
 
 
 // These constants won't change:
-const int sensorPin = 2;     // pin that the sensor is attached to
-const int ledPin = 9;        // pin that the LED is attached to
-const int indicatorLedPin = 13;  // pin that the built-in LED is attached to
-const int buttonPin = 2;      // pin that the button is attached to
+const int sensorPin = A2;       // pin that the sensor is attached to
+const int ledPin = 9;           // pin that the LED is attached to
+const int indicatorLedPin = 13; // pin that the built-in LED is attached to
+const int buttonPin = 2;        // pin that the button is attached to
 
 
 // These variables will change:

@@ -15,7 +15,7 @@
  
  Created 26 Sept. 2005
  by Tom Igoe
- Modified 14 April 2009
+ Modified 4 Sep 2010
  by Tom Igoe and Scott Fitzgerald
 
  This example code is in the public domain.
@@ -44,7 +44,7 @@ void loop()
     // get incoming byte:
     inByte = Serial.read();
     // read first analog input, divide by 4 to make the range 0-255:
-    firstSensor = analogRead(0)/4;
+    firstSensor = analogRead(A0)/4;
     // delay 10ms to let the ADC recover:
     delay(10);
     // read second analog input, divide by 4 to make the range 0-255:

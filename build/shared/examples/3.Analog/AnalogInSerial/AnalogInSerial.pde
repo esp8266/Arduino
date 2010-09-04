@@ -22,7 +22,7 @@
  
  void loop() {
   // read the analog input into a variable:
-   int analogValue = analogRead(0);
+   int analogValue = analogRead(A0);
    // print the result:
    Serial.println(analogValue);
    // wait 10 milliseconds for the analog-to-digital converter

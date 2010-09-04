@@ -31,7 +31,7 @@ int index = 0;                  // the index of the current reading
 int total = 0;                  // the running total
 int average = 0;                // the average
 
-int inputPin = 0;
+int inputPin = A0;
 
 void setup()
 {
