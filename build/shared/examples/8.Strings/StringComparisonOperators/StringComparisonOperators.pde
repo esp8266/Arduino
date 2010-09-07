@@ -114,10 +114,10 @@ void loop() {
     stringTwo += analogRead(A5);
 
     if (stringOne.compareTo(stringTwo) < 0 ) {
-      Serial.println(stringOne + " comes after " + stringTwo); 
+      Serial.println(stringOne + " comes before " + stringTwo); 
     } 
     else {
-      Serial.println(stringOne + " comes before " + stringTwo); 
+      Serial.println(stringOne + " comes after " + stringTwo); 
 
     }
   }
