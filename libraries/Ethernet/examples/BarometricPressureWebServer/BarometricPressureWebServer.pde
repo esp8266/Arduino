@@ -32,7 +32,7 @@ byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
 // assign an IP address for the controller:
 byte ip[] = { 
-  192,169,1,20 };
+  192,168,1,20 };
 byte gateway[] = {
   192,168,1,1};	
 byte subnet[] = { 
