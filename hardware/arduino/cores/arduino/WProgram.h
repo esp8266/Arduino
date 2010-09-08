@@ -29,7 +29,7 @@ long random(long, long);
 void randomSeed(unsigned int);
 long map(long, long, long, long, long);
 
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 const static uint8_t A0 = 54;
 const static uint8_t A1 = 55;
 const static uint8_t A2 = 56;

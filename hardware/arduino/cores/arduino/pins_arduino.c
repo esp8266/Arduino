@@ -78,7 +78,7 @@
 #define PL 12
 
 
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 const uint16_t PROGMEM port_to_mode_PGM[] = {
 	NOT_A_PORT,
 	&DDRA,

@@ -39,7 +39,7 @@ int analogRead(uint8_t pin)
 {
 	uint8_t low, high;
 
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 	if (pin >= 54) pin -= 54; // allow for channel or pin numbers
 
 	// the MUX5 bit of ADCSRB selects whether we're reading from channels
@@ -133,7 +133,7 @@ void analogWrite(uint8_t pin, int val)
 		// set pwm duty
 		OCR2B = val;
 #endif
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 	// XXX: need to handle other timers here
 	} else if (digitalPinToTimer(pin) == TIMER3A) {
 		// connect pwm to pin on timer 3, channel A

@@ -66,7 +66,7 @@ volatile long timer2_toggle_count;
 volatile uint8_t *timer2_pin_port;
 volatile uint8_t timer2_pin_mask;
 
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 volatile long timer3_toggle_count;
 volatile uint8_t *timer3_pin_port;
 volatile uint8_t timer3_pin_mask;
@@ -79,7 +79,7 @@ volatile uint8_t timer5_pin_mask;
 #endif
 
 
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 
 #define AVAILABLE_TONE_PINS 1
 
@@ -164,7 +164,7 @@ static int8_t toneBegin(uint8_t _pin)
         timer2_pin_mask = digitalPinToBitMask(_pin);
         break;
 
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
       case 3:
         // 16 bit timer
         TCCR3A = 0;
@@ -279,7 +279,7 @@ void tone(uint8_t _pin, unsigned int frequency, unsigned long duration)
 
       if (_timer == 1)
         TCCR1B = (TCCR1B & 0b11111000) | prescalarbits;
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
       else if (_timer == 3)
         TCCR3B = (TCCR3B & 0b11111000) | prescalarbits;
       else if (_timer == 4)
@@ -326,7 +326,7 @@ void tone(uint8_t _pin, unsigned int frequency, unsigned long duration)
         bitWrite(TIMSK2, OCIE2A, 1);
         break;
 
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
       case 3:
         OCR3A = ocr;
         timer3_toggle_count = toggle_count;
@@ -370,7 +370,7 @@ void disableTimer(uint8_t _timer)
       TCCR2B = (TCCR2B & 0b11111000) | (1 << CS22);
       OCR2A = 0;
       break;
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
     case 3:
       TIMSK3 = 0;
       break;
@@ -461,7 +461,7 @@ ISR(TIMER2_COMPA_vect)
 
 
 
-//#if defined(__AVR_ATmega1280__)
+//#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 #if 0
 
 ISR(TIMER3_COMPA_vect)

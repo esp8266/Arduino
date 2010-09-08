@@ -153,7 +153,7 @@ writePort(port, value, bitmask):  Write an 8 bit port.
 
 
 // Arduino Mega
-#elif defined(__AVR_ATmega1280__)
+#elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 #define TOTAL_ANALOG_PINS       16
 #define TOTAL_PINS              70 // 54 digital + 16 analog
 #define VERSION_BLINK_PIN       13

@@ -71,7 +71,7 @@ static inline void turnOffPWM(uint8_t timer)
 	if (timer == TIMER2B) cbi(TCCR2A, COM2B1);
 #endif
 
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 	if (timer == TIMER3A) cbi(TCCR3A, COM3A1);
 	if (timer == TIMER3B) cbi(TCCR3A, COM3B1);
 	if (timer == TIMER3C) cbi(TCCR3A, COM3C1);

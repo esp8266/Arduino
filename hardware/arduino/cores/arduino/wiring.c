@@ -209,7 +209,7 @@ void init()
 	sbi(TCCR2A, WGM20);
 #endif
 
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 	// set timer 3, 4, 5 prescale factor to 64
 	sbi(TCCR3B, CS31);	sbi(TCCR3B, CS30);
 	sbi(TCCR4B, CS41);	sbi(TCCR4B, CS40);

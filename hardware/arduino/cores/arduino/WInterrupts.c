@@ -52,7 +52,7 @@ void attachInterrupt(uint8_t interruptNum, void (*userFunc)(void), int mode) {
     // Enable the interrupt.
       
     switch (interruptNum) {
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
     case 2:
       EICRA = (EICRA & ~((1 << ISC00) | (1 << ISC01))) | (mode << ISC00);
       EIMSK |= (1 << INT0);
@@ -105,7 +105,7 @@ void detachInterrupt(uint8_t interruptNum) {
     // to the number of the EIMSK bit to clear, as this isn't true on the 
     // ATmega8.  There, INT0 is 6 and INT1 is 7.)
     switch (interruptNum) {
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
     case 2:
       EIMSK &= ~(1 << INT0);
       break;
@@ -150,7 +150,7 @@ void attachInterruptTwi(void (*userFunc)(void) ) {
 }
 */
 
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 
 SIGNAL(INT0_vect) {
   if(intFunc[EXTERNAL_INT_2])

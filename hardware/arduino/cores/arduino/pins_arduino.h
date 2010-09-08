@@ -49,7 +49,7 @@
 #define TIMER5B 15
 #define TIMER5C 16
 
-#if defined(__AVR_ATmega1280__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 const static uint8_t SS   = 53;
 const static uint8_t MOSI = 51;
 const static uint8_t MISO = 50;
