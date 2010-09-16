@@ -55,7 +55,8 @@ Client Server::available()
   for (int sock = 0; sock < MAX_SOCK_NUM; sock++) {
     Client client(sock);
     if (EthernetClass::_server_port[sock] == _port &&
-      client.status() == SnSR::ESTABLISHED) {
+        (client.status() == SnSR::ESTABLISHED ||
+         client.status() == SnSR::CLOSE_WAIT)) {
       if (client.available()) {
         // XXX: don't always pick the lowest numbered socket.
         return client;
