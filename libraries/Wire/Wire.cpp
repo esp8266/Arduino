@@ -28,12 +28,12 @@ extern "C" {
 
 // Initialize Class Variables //////////////////////////////////////////////////
 
-uint8_t* TwoWire::rxBuffer = 0;
+uint8_t TwoWire::rxBuffer[BUFFER_LENGTH];
 uint8_t TwoWire::rxBufferIndex = 0;
 uint8_t TwoWire::rxBufferLength = 0;
 
 uint8_t TwoWire::txAddress = 0;
-uint8_t* TwoWire::txBuffer = 0;
+uint8_t TwoWire::txBuffer[BUFFER_LENGTH];
 uint8_t TwoWire::txBufferIndex = 0;
 uint8_t TwoWire::txBufferLength = 0;
 
@@ -51,13 +51,9 @@ TwoWire::TwoWire()
 
 void TwoWire::begin(void)
 {
-  // init buffer for reads
-  rxBuffer = (uint8_t*) calloc(BUFFER_LENGTH, sizeof(uint8_t));
   rxBufferIndex = 0;
   rxBufferLength = 0;
 
-  // init buffer for writes
-  txBuffer = (uint8_t*) calloc(BUFFER_LENGTH, sizeof(uint8_t));
   txBufferIndex = 0;
   txBufferLength = 0;
 

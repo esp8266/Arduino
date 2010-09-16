@@ -27,12 +27,12 @@
 class TwoWire
 {
   private:
-    static uint8_t* rxBuffer;
+    static uint8_t rxBuffer[];
     static uint8_t rxBufferIndex;
     static uint8_t rxBufferLength;
 
     static uint8_t txAddress;
-    static uint8_t* txBuffer;
+    static uint8_t txBuffer[];
     static uint8_t txBufferIndex;
     static uint8_t txBufferLength;
 
