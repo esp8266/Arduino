@@ -413,12 +413,14 @@ SIGNAL(TWI_vect)
       if(twi_rxBufferIndex < TWI_BUFFER_LENGTH){
         twi_rxBuffer[twi_rxBufferIndex] = '\0';
       }
+      // sends ack and stops interface for clock stretching
+      twi_stop();
       // callback to user defined callback
       twi_onSlaveReceive(twi_rxBuffer, twi_rxBufferIndex);
-      // ack future responses
-      twi_reply(1);
-      // leave slave receiver state
-      twi_state = TWI_READY;
+      // since we submit rx buffer to "wire" library, we can reset it
+      twi_rxBufferIndex = 0;
+      // ack future responses and leave slave receiver state
+      twi_releaseBus();
       break;
     case TW_SR_DATA_NACK:       // data received, returned nack
     case TW_SR_GCALL_DATA_NACK: // data received generally, returned nack
