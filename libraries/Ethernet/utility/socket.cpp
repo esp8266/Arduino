@@ -159,6 +159,19 @@ uint16_t recv(SOCKET s, uint8_t *buf, uint16_t len)
 
 
 /**
+ * @brief	Returns the first byte in the receive queue (no checking)
+ * 		
+ * @return
+ */
+uint16_t peek(SOCKET s, uint8_t *buf)
+{
+  W5100.recv_data_processing(s, buf, 1, 1);
+
+  return 1;
+}
+
+
+/**
  * @brief	This function is an application I/F function which is used to send the data for other then TCP mode. 
  * 		Unlike TCP transmission, The peer's destination address and the port is needed.
  * 		

@@ -17,6 +17,7 @@ public:
   virtual void write(const uint8_t *buf, size_t size);
   virtual int available();
   virtual int read();
+  virtual int peek();
   virtual void flush();
   void stop();
   uint8_t connected();

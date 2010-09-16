@@ -83,6 +83,14 @@ int Client::read() {
   return b;
 }
 
+int Client::peek() {
+  uint8_t b;
+  if (!available())
+    return -1;
+  ::peek(_sock, &b);
+  return b;
+}
+
 void Client::flush() {
   while (available())
     read();

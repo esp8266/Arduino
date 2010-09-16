@@ -155,7 +155,7 @@ public:
    * and after copy the data from receive buffer update the Rx write pointer register.
    * User should read upper byte first and lower byte later to get proper value.
    */
-  void recv_data_processing(SOCKET s, uint8_t *data, uint16_t len);
+  void recv_data_processing(SOCKET s, uint8_t *data, uint16_t len, uint8_t peek = 0);
 
   inline void setGatewayIp(uint8_t *_addr);
   inline void getGatewayIp(uint8_t *_addr);

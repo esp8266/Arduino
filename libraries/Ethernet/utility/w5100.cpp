@@ -88,13 +88,16 @@ void W5100Class::send_data_processing(SOCKET s, uint8_t *data, uint16_t len)
 }
 
 
-void W5100Class::recv_data_processing(SOCKET s, uint8_t *data, uint16_t len)
+void W5100Class::recv_data_processing(SOCKET s, uint8_t *data, uint16_t len, uint8_t peek)
 {
   uint16_t ptr;
   ptr = readSnRX_RD(s);
   read_data(s, (uint8_t *)ptr, data, len);
-  ptr += len;
-  writeSnRX_RD(s, ptr);
+  if (!peek)
+  {
+    ptr += len;
+    writeSnRX_RD(s, ptr);
+  }
 }
 
 void W5100Class::read_data(SOCKET s, volatile uint8_t *src, volatile uint8_t *dst, uint16_t len)
