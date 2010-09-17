@@ -11,7 +11,7 @@
  * Ethernet shield attached to pins 10, 11, 12, 13
  
  created 15 March 2010
- updated 25 July 2010
+ updated 4 Sep 2010
  by Tom Igoe
  
  http://www.tigoe.net/pcomp/code/category/arduinowiring/873
@@ -55,7 +55,7 @@ void setup() {
 
 void loop() {
   // read the analog sensor:
-  int sensorReading = analogRead(0);   
+  int sensorReading = analogRead(A0);   
 
   // if there's incoming data from the net connection.
   // send it out the serial port.  This is for debugging

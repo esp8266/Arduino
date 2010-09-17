@@ -14,7 +14,7 @@
  * Ethernet shield attached to pins 10, 11, 12, 13
  
  created 15 March 2010
- updated 25 July 2010
+ updated 4 Sep 2010
  by Tom Igoe
  
  This code is in the public domain.
@@ -57,13 +57,13 @@ void setup() {
 
 void loop() {
   // read the analog sensor:
-  int sensorReading = analogRead(0);   
+  int sensorReading = analogRead(A0);   
   // convert the data to a String to send it:
   String dataString = String(sensorReading);
 
   // you can append multiple readings to this String if your
   // pachube feed is set up to handle multiple values:
-  int otherSensorReading = analogRead(1);
+  int otherSensorReading = analogRead(A1);
   dataString += ",";
   dataString += String(otherSensorReading);
 

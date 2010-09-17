@@ -10,6 +10,8 @@
  
  created 18 Dec 2009
  by David A. Mellis
+ modified 4 Sep 2010
+ by Tom Igoe
  
  */
 
@@ -53,11 +55,11 @@ void loop()
           client.println();
 
           // output the value of each analog input pin
-          for (int i = 0; i < 6; i++) {
+          for (int analogChannel = 0; analogChannel < 6; analogChannel++) {
             client.print("analog input ");
-            client.print(i);
+            client.print(analogChannel);
             client.print(" is ");
-            client.print(analogRead(i));
+            client.print(analogRead(analogChannel));
             client.println("<br />");
           }
           break;
