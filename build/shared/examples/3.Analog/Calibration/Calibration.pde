@@ -1,14 +1,14 @@
 /*
   Calibration
  
- Demonstrates one techinque for calibrating sensor input.  The
+ Demonstrates one technique for calibrating sensor input.  The
  sensor readings during the first five seconds of the sketch
  execution define the minimum and maximum of expected values
  attached to the sensor pin.
  
- The sensor minumum and maximum initial values may seem backwards.
+ The sensor minimum and maximum initial values may seem backwards.
  Initially, you set the minimum high and listen for anything 
- lower, saving it as the new minumum. Likewise, you set the
+ lower, saving it as the new minimum. Likewise, you set the
  maximum low and listen for anything higher as the new maximum.
  
  The circuit:
@@ -27,13 +27,13 @@
  */
 
 // These constants won't change:
-const int sensorPin = A0;     // pin that the sensor is attached to
+const int sensorPin = A0;    // pin that the sensor is attached to
 const int ledPin = 9;        // pin that the LED is attached to
 
 // variables:
 int sensorValue = 0;         // the sensor value
-int sensorMin = 1023;  // minimum sensor value
-int sensorMax = 0;     // maximum sensor value
+int sensorMin = 1023;        // minimum sensor value
+int sensorMax = 0;           // maximum sensor value
 
 
 void setup() {
