@@ -53,6 +53,9 @@ public:
   uint16_t sendPacket(const char[], uint8_t *, uint16_t);  //send a string as a packet to specified peer
   int readPacket(uint8_t *, uint16_t);		// read a received packet 
   int readPacket(uint8_t *, uint16_t, uint8_t *, uint16_t *);		// read a received packet, also return sender's ip and port 	
+  // readPacket that fills a character string buffer
+  int readPacket(char *, uint16_t, uint8_t *, uint16_t &);
+
 };
 
 extern UdpClass Udp;

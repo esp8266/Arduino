@@ -122,6 +122,13 @@ int UdpClass::readPacket(uint8_t * buf, uint16_t len) {
   return recvfrom(_sock,buf,len,ip,port);
 }
 
+int UdpClass::readPacket(char * buf, uint16_t bufLen, uint8_t *ip, uint16_t &port) {
+uint16_t myPort;
+uint16_t ret = readPacket( (byte*)buf, bufLen, ip, &myPort);
+port = myPort;
+return ret;
+}
+
 
 
 
