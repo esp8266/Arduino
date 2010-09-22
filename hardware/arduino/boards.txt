@@ -1,5 +1,22 @@
 ##############################################################
 
+uno.name=Arduino Uno
+uno.upload.protocol=stk500
+uno.upload.maximum_size=32256
+uno.upload.speed=115200
+uno.bootloader.low_fuses=0xff
+uno.bootloader.high_fuses=0xde
+uno.bootloader.extended_fuses=0x05
+uno.bootloader.path=optiboot
+uno.bootloader.file=optiboot_atmega328.hex
+uno.bootloader.unlock_bits=0x3F
+uno.bootloader.lock_bits=0x0F
+uno.build.mcu=atmega328p
+uno.build.f_cpu=16000000L
+uno.build.core=arduino
+
+##############################################################
+
 atmega328.name=Arduino Duemilanove or Nano w/ ATmega328
 
 atmega328.upload.protocol=stk500
