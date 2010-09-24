@@ -57,7 +57,27 @@ diecimila.build.core=arduino
 
 ##############################################################
 
-mega.name=Arduino Mega
+mega2560.name=Arduino Mega 2560
+
+mega2560.upload.protocol=stk500v2
+mega2560.upload.maximum_size=258048
+mega2560.upload.speed=115200
+
+mega2560.bootloader.low_fuses=0xFF
+mega2560.bootloader.high_fuses=0xD8
+mega2560.bootloader.extended_fuses=0xFD
+mega2560.bootloader.path=stk500v2
+mega2560.bootloader.file=stk500boot_v2_mega2560.hex
+mega2560.bootloader.unlock_bits=0x3F
+mega2560.bootloader.lock_bits=0x0F
+
+mega2560.build.mcu=atmega2560
+mega2560.build.f_cpu=16000000L
+mega2560.build.core=arduino
+
+##############################################################
+
+mega.name=Arduino Mega (ATmega1280)
 
 mega.upload.protocol=stk500
 mega.upload.maximum_size=126976
