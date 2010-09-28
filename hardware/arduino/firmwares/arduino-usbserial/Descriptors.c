@@ -67,7 +67,7 @@ USB_Descriptor_Device_t PROGMEM DeviceDescriptor =
 		
 	.VendorID               = 0x03EB, // Atmel
 
-	.ProductID          	= 0x2018, // PID_MegaCDC
+	.ProductID          	= 0x204B, // LUFA USB to Serial Demo Application
 	.ReleaseNumber          = 0x0000,
 		
 	.ManufacturerStrIndex   = 0x01,
