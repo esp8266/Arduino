@@ -37,5 +37,6 @@ Gianluca Martino, and David A. Mellis.
 Arduino uses the GNU avr-gcc toolchain, avrdude, avr-libc, and code from
 Processing and Wiring.
 
-Icon Design and Artwork created by Thomas Glaser (envis precisely).
+Icon designed by ToDo: http://www.todo.to.it/
+"About" image created by Thomas Glaser (envis precisely).
 
