@@ -53,8 +53,8 @@ USB_Descriptor_Device_t DeviceDescriptor =
 				
 	.Endpoint0Size          = FIXED_CONTROL_ENDPOINT_SIZE,
 		
-	.VendorID               = 0x03EB,
-	.ProductID              = PRODUCT_ID_CODE,
+	.VendorID               = 0x03EB, // Atmel
+	.ProductID              = PRODUCT_ID_CODE, // MCU-dependent
 	.ReleaseNumber          = 0x0000,
 		
 	.ManufacturerStrIndex   = NO_DESCRIPTOR,

@@ -65,9 +65,9 @@ USB_Descriptor_Device_t PROGMEM DeviceDescriptor =
 				
 	.Endpoint0Size          = FIXED_CONTROL_ENDPOINT_SIZE,
 		
-	.VendorID               = 0x2341,
+	.VendorID               = 0x03EB, // Atmel
 
-	.ProductID          	= ARDUINO_MODEL_PID,
+	.ProductID          	= 0x2018, // PID_MegaCDC
 	.ReleaseNumber          = 0x0000,
 		
 	.ManufacturerStrIndex   = 0x01,
