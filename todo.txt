@@ -105,6 +105,7 @@ Sketch.java
 PreProcessor.java
  - split write() into writeHeader() and write() as in Processing?
  - add getExtraImports() function instead of having Sketch grab them directly.
+ - don't use oro.jar
 
 Base.java
  - add keywords from libraries to the syntax coloring

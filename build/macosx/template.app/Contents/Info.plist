@@ -72,7 +72,7 @@
       <!-- In 0149, removed /System/Library/Java from the CLASSPATH because
            it can cause problems if users have installed weird files there.
            http://dev.processing.org/bugs/show_bug.cgi?id=1045 -->
-      <string>$JAVAROOT/pde.jar:$JAVAROOT/core.jar:$JAVAROOT/antlr.jar:$JAVAROOT/ecj.jar:$JAVAROOT/registry.jar:$JAVAROOT/quaqua.jar:$JAVAROOT/RXTXcomm.jar</string>
+      <string>$JAVAROOT/pde.jar:$JAVAROOT/core.jar:$JAVAROOT/antlr.jar:$JAVAROOT/ecj.jar:$JAVAROOT/registry.jar:$JAVAROOT/quaqua.jar:$JAVAROOT/oro.jar:$JAVAROOT/RXTXcomm.jar</string>
 
       <key>JVMArchs</key>  
       <array>  
