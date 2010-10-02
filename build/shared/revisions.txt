@@ -1,3 +1,17 @@
+ARDUINO 0021 - 2010.10.02
+
+* Modifying VID / PID combination in 8U2 firmwares.
+* Fixing analogWrite() bug on pins 9 and 10 (Arduino Uno).
+* Patched RXTX to include /dev/ttyACM* on Linux.
+
+ARDUINO 0020 - 2010.09.27
+
+* Added support for the Arduino Uno and Arduino Mega 2560.
+* Including ATmega8U2 firmware used by Uno and Mega 2560.
+* Including source code to optiboot bootloader used by the Uno.
+* Including source code to the stk500v2 bootloader used by Mega 2560.
+* New application icon (by ToDo).
+
 ARDUINO 0019 - 2010.09.03
 
 [core / libraries]
