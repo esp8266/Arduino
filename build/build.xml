@@ -471,7 +471,39 @@
     </echo>
   </target>
   
+
+  <!-- - - - - - - - -->
+  <!-- Source        -->
+  <!-- - - - - - - - -->
+ 
+   <target name="source-dist" depends="revision-check"
+	  description="Build .tar.gz of source code">
+    <input message="Enter version number:" 
+	   addproperty="version"
+	   defaultvalue="${revision}" />
+
+    <tar compression="gzip" destfile="arduino-${version}-src.tar.gz">
+      <tarfileset dir="../" 
+		  prefix="arduino-${version}" 
+		  excludes="**/*.tgz,
+			     **/macosx/,
+			     **/windows/,
+			     **/work/,
+			     **/.git/,
+			     **/*.class"
+		  /> 
+    </tar>
+
+    <echo>
+      =======================================================
+      Arduino source distribution was built. Grab the archive from   
+      
+      arduino-${version}-src.tar.gz
+      =======================================================
+    </echo>
+  </target>
   
+
   <!-- - - - - - - - -->
   <!-- Run It!       -->
   <!-- - - - - - - - -->
