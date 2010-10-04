@@ -314,7 +314,7 @@
   
   <target name="linux-run" depends="linux-build" 
 	  description="Run Linux version">
-    <exec executable="linux/work/arduino" dir="linux/work" spawn="false"/>
+    <exec executable="./arduino" dir="linux/work" spawn="false"/>
   </target>
   
   <target name="linux-dist" depends="linux-build" 
