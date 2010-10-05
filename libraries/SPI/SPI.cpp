@@ -56,6 +56,6 @@ void SPIClass::setDataMode(uint8_t mode)
 void SPIClass::setClockDivider(uint8_t rate)
 {
   SPCR = (SPCR & ~SPI_CLOCK_MASK) | (rate & SPI_CLOCK_MASK);
-  SPSR = (SPSR & ~SPI_2XCLOCK_MASK) | (rate & SPI_2XCLOCK_MASK);
+  SPSR = (SPSR & ~SPI_2XCLOCK_MASK) | ((rate >> 2) & SPI_2XCLOCK_MASK);
 }
 
