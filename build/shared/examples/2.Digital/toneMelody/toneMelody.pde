@@ -7,6 +7,7 @@
  * 8-ohm speaker on digital pin 8
  
  created 21 Jan 2010
+ modified 14 Oct 2010
  by Tom Igoe 
 
 This example code is in the public domain.
@@ -38,6 +39,8 @@ void setup() {
     // the note's duration + 30% seems to work well:
     int pauseBetweenNotes = noteDuration * 1.30;
     delay(pauseBetweenNotes);
+    // stop the tone playing:
+    noTone(8);
   }
 }
 

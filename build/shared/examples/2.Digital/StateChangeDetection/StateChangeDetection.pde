@@ -16,7 +16,7 @@
    most Arduino boards)
  
  created  27 Sep 2005
- modified 30 Dec 2009
+ modified 14 Oct 2010
  by Tom Igoe
 
 This example code is in the public domain.
@@ -64,11 +64,11 @@ void loop() {
       // wend from on to off:
       Serial.println("off"); 
     }
-
-    // save the current state as the last state, 
-    //for next time through the loop
-    lastButtonState = buttonState;
   }
+  // save the current state as the last state, 
+  //for next time through the loop
+  lastButtonState = buttonState;
+
   
   // turns on the LED every four button pushes by 
   // checking the modulo of the button push counter.
