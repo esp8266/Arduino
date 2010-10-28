@@ -17,6 +17,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   
   Modified 23 November 2006 by David A. Mellis
+  Modified 28 September 2010 by Mark Sproul
 */
 
 #include <stdlib.h>
@@ -26,26 +27,40 @@
 #include "wiring.h"
 #include "wiring_private.h"
 
+// this next line disables the entire HardwareSerial.cpp, 
+// this is so I can support Attiny series and any other chip without a uart
+#if defined(UBRRH) || defined(UBRR0H) || defined(UBRR1H) || defined(UBRR2H) || defined(UBRR3H)
+
 #include "HardwareSerial.h"
 
 // Define constants and variables for buffering incoming serial data.  We're
 // using a ring buffer (I think), in which rx_buffer_head is the index of the
 // location to which to write the next incoming character and rx_buffer_tail
 // is the index of the location from which to read.
-#define RX_BUFFER_SIZE 128
+#if (RAMEND < 1000)
+  #define RX_BUFFER_SIZE 32
+#else
+  #define RX_BUFFER_SIZE 128
+#endif
 
-struct ring_buffer {
+struct ring_buffer
+{
   unsigned char buffer[RX_BUFFER_SIZE];
   int head;
   int tail;
 };
 
-ring_buffer rx_buffer = { { 0 }, 0, 0 };
-
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-ring_buffer rx_buffer1 = { { 0 }, 0, 0 };
-ring_buffer rx_buffer2 = { { 0 }, 0, 0 };
-ring_buffer rx_buffer3 = { { 0 }, 0, 0 };
+#if defined(UBRRH) || defined(UBRR0H)
+  ring_buffer rx_buffer  =  { { 0 }, 0, 0 };
+#endif
+#if defined(UBRR1H)
+  ring_buffer rx_buffer1  =  { { 0 }, 0, 0 };
+#endif
+#if defined(UBRR2H)
+  ring_buffer rx_buffer2  =  { { 0 }, 0, 0 };
+#endif
+#if defined(UBRR3H)
+  ring_buffer rx_buffer3  =  { { 0 }, 0, 0 };
 #endif
 
 inline void store_char(unsigned char c, ring_buffer *rx_buffer)
@@ -62,49 +77,96 @@ inline void store_char(unsigned char c, ring_buffer *rx_buffer)
   }
 }
 
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-
-SIGNAL(SIG_USART0_RECV)
-{
-  unsigned char c = UDR0;
-  store_char(c, &rx_buffer);
-}
-
-SIGNAL(SIG_USART1_RECV)
-{
-  unsigned char c = UDR1;
-  store_char(c, &rx_buffer1);
-}
-
-SIGNAL(SIG_USART2_RECV)
-{
-  unsigned char c = UDR2;
-  store_char(c, &rx_buffer2);
-}
-
-SIGNAL(SIG_USART3_RECV)
-{
-  unsigned char c = UDR3;
-  store_char(c, &rx_buffer3);
-}
-
+#if defined(USART_RX_vect)
+  SIGNAL(USART_RX_vect)
+  {
+  #if defined(UDR0)
+    unsigned char c  =  UDR0;
+  #elif defined(UDR)
+    unsigned char c  =  UDR;  //  atmega8535
+  #else
+    #error UDR not defined
+  #endif
+    store_char(c, &rx_buffer);
+  }
+#elif defined(SIG_USART0_RECV) && defined(UDR0)
+  SIGNAL(SIG_USART0_RECV)
+  {
+    unsigned char c  =  UDR0;
+    store_char(c, &rx_buffer);
+  }
+#elif defined(SIG_UART0_RECV) && defined(UDR0)
+  SIGNAL(SIG_UART0_RECV)
+  {
+    unsigned char c  =  UDR0;
+    store_char(c, &rx_buffer);
+  }
+//#elif defined(SIG_USART_RECV)
+#elif defined(USART0_RX_vect)
+  // fixed by Mark Sproul this is on the 644/644p
+  //SIGNAL(SIG_USART_RECV)
+  SIGNAL(USART0_RX_vect)
+  {
+  #if defined(UDR0)
+    unsigned char c  =  UDR0;
+  #elif defined(UDR)
+    unsigned char c  =  UDR;  //  atmega8, atmega32
+  #else
+    #error UDR not defined
+  #endif
+    store_char(c, &rx_buffer);
+  }
+#elif defined(SIG_UART_RECV)
+  // this is for atmega8
+  SIGNAL(SIG_UART_RECV)
+  {
+  #if defined(UDR0)
+    unsigned char c  =  UDR0;  //  atmega645
+  #elif defined(UDR)
+    unsigned char c  =  UDR;  //  atmega8
+  #endif
+    store_char(c, &rx_buffer);
+  }
+#elif defined(USBCON)
+  #warning No interrupt handler for usart 0
+  #warning Serial(0) is on USB interface
 #else
+  #error No interrupt handler for usart 0
+#endif
 
-#if defined(__AVR_ATmega8__)
-SIGNAL(SIG_UART_RECV)
-#else
-SIGNAL(USART_RX_vect)
+//#if defined(SIG_USART1_RECV)
+#if defined(USART1_RX_vect)
+  //SIGNAL(SIG_USART1_RECV)
+  SIGNAL(USART1_RX_vect)
+  {
+    unsigned char c = UDR1;
+    store_char(c, &rx_buffer1);
+  }
+#elif defined(SIG_USART1_RECV)
+  #error SIG_USART1_RECV
 #endif
-{
-#if defined(__AVR_ATmega8__)
-  unsigned char c = UDR;
-#else
-  unsigned char c = UDR0;
-#endif
-  store_char(c, &rx_buffer);
-}
 
+#if defined(USART2_RX_vect) && defined(UDR2)
+  SIGNAL(USART2_RX_vect)
+  {
+    unsigned char c = UDR2;
+    store_char(c, &rx_buffer2);
+  }
+#elif defined(SIG_USART2_RECV)
+  #error SIG_USART2_RECV
 #endif
+
+#if defined(USART3_RX_vect) && defined(UDR3)
+  SIGNAL(USART3_RX_vect)
+  {
+    unsigned char c = UDR3;
+    store_char(c, &rx_buffer3);
+  }
+#elif defined(SIG_USART3_RECV)
+  #error SIG_USART3_RECV
+#endif
+
+
 
 // Constructors ////////////////////////////////////////////////////////////////
 
@@ -223,14 +285,25 @@ void HardwareSerial::write(uint8_t c)
 
 // Preinstantiate Objects //////////////////////////////////////////////////////
 
-#if defined(__AVR_ATmega8__)
-HardwareSerial Serial(&rx_buffer, &UBRRH, &UBRRL, &UCSRA, &UCSRB, &UDR, RXEN, TXEN, RXCIE, UDRE, U2X);
+#if defined(UBRRH) && defined(UBRRL)
+  HardwareSerial Serial(&rx_buffer, &UBRRH, &UBRRL, &UCSRA, &UCSRB, &UDR, RXEN, TXEN, RXCIE, UDRE, U2X);
+#elif defined(UBRR0H) && defined(UBRR0L)
+  HardwareSerial Serial(&rx_buffer, &UBRR0H, &UBRR0L, &UCSR0A, &UCSR0B, &UDR0, RXEN0, TXEN0, RXCIE0, UDRE0, U2X0);
+#elif defined(USBCON)
+  #warning no serial port defined  (port 0)
 #else
-HardwareSerial Serial(&rx_buffer, &UBRR0H, &UBRR0L, &UCSR0A, &UCSR0B, &UDR0, RXEN0, TXEN0, RXCIE0, UDRE0, U2X0);
+  #error no serial port defined  (port 0)
 #endif
 
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-HardwareSerial Serial1(&rx_buffer1, &UBRR1H, &UBRR1L, &UCSR1A, &UCSR1B, &UDR1, RXEN1, TXEN1, RXCIE1, UDRE1, U2X1);
-HardwareSerial Serial2(&rx_buffer2, &UBRR2H, &UBRR2L, &UCSR2A, &UCSR2B, &UDR2, RXEN2, TXEN2, RXCIE2, UDRE2, U2X2);
-HardwareSerial Serial3(&rx_buffer3, &UBRR3H, &UBRR3L, &UCSR3A, &UCSR3B, &UDR3, RXEN3, TXEN3, RXCIE3, UDRE3, U2X3);
+#if defined(UBRR1H)
+  HardwareSerial Serial1(&rx_buffer1, &UBRR1H, &UBRR1L, &UCSR1A, &UCSR1B, &UDR1, RXEN1, TXEN1, RXCIE1, UDRE1, U2X1);
 #endif
+#if defined(UBRR2H)
+  HardwareSerial Serial2(&rx_buffer2, &UBRR2H, &UBRR2L, &UCSR2A, &UCSR2B, &UDR2, RXEN2, TXEN2, RXCIE2, UDRE2, U2X2);
+#endif
+#if defined(UBRR3H)
+  HardwareSerial Serial3(&rx_buffer3, &UBRR3H, &UBRR3L, &UCSR3A, &UCSR3B, &UDR3, RXEN3, TXEN3, RXCIE3, UDRE3, U2X3);
+#endif
+
+#endif // whole file
+
