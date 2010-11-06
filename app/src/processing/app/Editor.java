@@ -2020,14 +2020,65 @@ public class Editor extends JFrame implements RunnerListener {
    * modifications (if any) to the previous sketch need to be saved.
    */
   protected boolean handleOpenInternal(String path) {
+    // rename .pde files to .ino
+    File[] oldFiles = (new File(path)).getParentFile().listFiles(new FilenameFilter() {
+      public boolean accept(File dir, String name) {
+        return (name.toLowerCase().endsWith(".pde"));
+      }
+    });
+    
+    if (oldFiles != null && oldFiles.length > 0) {
+      if (!Preferences.getBoolean("editor.update_extension")) {
+        Object[] options = { "OK", "Cancel" };
+        String prompt =
+          "In Arduino 1.0, the file extension for sketches changed\n" +
+          "from \".pde\" to \".ino\".  This version of the software only\n" +
+          "supports the new extension.  Rename the files in this sketch\n" +
+          "(and future sketches) and continue?";
+        
+        int result = JOptionPane.showOptionDialog(this,
+                                                  prompt,
+                                                  "New extension",
+                                                  JOptionPane.YES_NO_OPTION,
+                                                  JOptionPane.QUESTION_MESSAGE,
+                                                  null,
+                                                  options,
+                                                  options[0]);
+        if (result != JOptionPane.YES_OPTION) {
+          return false;
+        }
+        
+        Preferences.setBoolean("editor.update_extension", true);
+      }
+      
+      for (int i = 0; i < oldFiles.length; i++) {
+        String oldPath = oldFiles[i].getPath();
+        File newFile = new File(oldPath.substring(0, oldPath.length() - 4) + ".ino");
+        try {
+          Base.copyFile(oldFiles[i], newFile);
+        } catch (IOException e) {
+          Base.showWarning("Error", "Could not copy to a proper location.", e);
+          return false;
+        }
+
+        // remove the original file, so user doesn't get confused
+        oldFiles[i].delete();
+
+        // update with the new path
+        if (oldFiles[i].compareTo(new File(path)) == 0) {
+          path = newFile.getAbsolutePath();      	
+        }
+      }
+    }
+    
     // check to make sure that this .pde file is
     // in a folder of the same name
     File file = new File(path);
     File parentFile = new File(file.getParent());
     String parentName = parentFile.getName();
-    String pdeName = parentName + ".pde";
+    String pdeName = parentName + ".ino";
     File altFile = new File(file.getParent(), pdeName);
-
+    
     if (pdeName.equals(file.getName())) {
       // no beef with this guy
 
@@ -2037,10 +2088,10 @@ public class Editor extends JFrame implements RunnerListener {
       path = altFile.getAbsolutePath();
       //System.out.println("found alt file in same folder");
 
-    } else if (!path.endsWith(".pde")) {
+    } else if (!path.endsWith(".ino")) {
       Base.showWarning("Bad file selected",
                        "Processing can only open its own sketches\n" +
-                       "and other files ending in .pde", null);
+                       "and other files ending in .ino", null);
       return false;
 
     } else {

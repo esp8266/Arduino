@@ -545,7 +545,7 @@ public class Base {
     newbieDir.mkdirs();
 
     // Make an empty pde file
-    File newbieFile = new File(newbieDir, newbieName + ".pde");
+    File newbieFile = new File(newbieDir, newbieName + ".ino");
     new FileOutputStream(newbieFile);  // create the file
     return newbieFile.getAbsolutePath();
   }
@@ -637,7 +637,8 @@ public class Base {
         public boolean accept(File dir, String name) {
           // TODO this doesn't seem to ever be used. AWESOME.
           //System.out.println("check filter on " + dir + " " + name);
-          return name.toLowerCase().endsWith(".pde");
+          return name.toLowerCase().endsWith(".ino")
+              || name.toLowerCase().endsWith(".pde");
         }
       });
 
@@ -1089,7 +1090,10 @@ public class Base {
       File subfolder = new File(folder, list[i]);
       if (!subfolder.isDirectory()) continue;
 
-      File entry = new File(subfolder, list[i] + ".pde");
+      File entry = new File(subfolder, list[i] + ".ino");
+      if (!entry.exists() && (new File(subfolder, list[i] + ".pde")).exists()) {
+      	entry = new File(subfolder, list[i] + ".pde");
+      }
       // if a .pde file of the same prefix as the folder exists..
       if (entry.exists()) {
         //String sanityCheck = sanitizedName(list[i]);
