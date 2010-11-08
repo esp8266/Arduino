@@ -19,6 +19,7 @@
 package processing.app;
 
 import processing.app.debug.MessageConsumer;
+import processing.core.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -127,7 +128,7 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
         Preferences.set("serial.debug_rate", rateString);
         closeSerialPort();
         try {
-	        openSerialPort();
+          openSerialPort();
         } catch (SerialException e) {
           System.err.println(e);
         }
@@ -144,8 +145,40 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
     getContentPane().add(pane, BorderLayout.SOUTH);
 
     pack();
+    
+    Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+    if (Preferences.get("last.screen.height") != null) {
+      // if screen size has changed, the window coordinates no longer
+      // make sense, so don't use them unless they're identical
+      int screenW = Preferences.getInteger("last.screen.width");
+      int screenH = Preferences.getInteger("last.screen.height");
+      if ((screen.width == screenW) && (screen.height == screenH)) {
+        String locationStr = Preferences.get("last.serial.location");
+        if (locationStr != null) {
+          int[] location = PApplet.parseInt(PApplet.split(locationStr, ','));
+          setPlacement(location);
+        }
+      }
+    }
   }
   
+  protected void setPlacement(int[] location) {
+    setBounds(location[0], location[1], location[2], location[3]);
+  }
+
+  protected int[] getPlacement() {
+    int[] location = new int[4];
+
+    // Get the dimensions of the Frame
+    Rectangle bounds = getBounds();
+    location[0] = bounds.x;
+    location[1] = bounds.y;
+    location[2] = bounds.width;
+    location[3] = bounds.height;
+
+    return location;
+  }
+
   private void send(String s) {
     if (serial != null) {
       switch (lineEndings.getSelectedIndex()) {
@@ -166,6 +199,9 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
   
   public void closeSerialPort() {
     if (serial != null) {
+      int[] location = getPlacement();
+      String locationStr = PApplet.join(PApplet.str(location), ",");
+      Preferences.set("last.serial.location", locationStr);
       textArea.setText("");
       serial.dispose();
       serial = null;
