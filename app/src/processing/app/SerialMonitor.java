@@ -107,6 +107,14 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
     autoscrollBox = new JCheckBox("Autoscroll", true);
     
     lineEndings = new JComboBox(new String[] { "No line ending", "Newline", "Carriage return", "Both NL & CR" });
+    lineEndings.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent event) {
+      	Preferences.setInteger("serial.line_ending", lineEndings.getSelectedIndex());
+      }
+    });
+    if (Preferences.get("serial.line_ending") != null) {
+      lineEndings.setSelectedIndex(Preferences.getInteger("serial.line_ending"));
+    }
     lineEndings.setMaximumSize(lineEndings.getMinimumSize());
       
     String[] serialRateStrings = {
