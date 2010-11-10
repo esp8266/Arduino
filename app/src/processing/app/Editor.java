@@ -151,7 +151,7 @@ public class Editor extends JFrame implements RunnerListener {
     super("Arduino");
     this.base = ibase;
 
-    //Base.setIcon(this);
+    Base.setIcon(this);
 
     // Install default actions for Run, Present, etc.
     resetHandlers();
