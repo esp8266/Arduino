@@ -618,13 +618,13 @@ public class Editor extends JFrame implements RunnerListener {
 //      });
 //    sketchMenu.add(item);
 
-    item = new JMenuItem("Stop");
-    item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          handleStop();
-        }
-      });
-    sketchMenu.add(item);
+//    item = new JMenuItem("Stop");
+//    item.addActionListener(new ActionListener() {
+//        public void actionPerformed(ActionEvent e) {
+//          handleStop();
+//        }
+//      });
+//    sketchMenu.add(item);
 
     sketchMenu.addSeparator();
 
@@ -1875,12 +1875,12 @@ public class Editor extends JFrame implements RunnerListener {
    * Implements Sketch &rarr; Stop, or pressing Stop on the toolbar.
    */
   public void handleStop() {  // called by menu or buttons
-    toolbar.activate(EditorToolbar.STOP);
+//    toolbar.activate(EditorToolbar.STOP);
 
     internalCloseRunner();
 
     toolbar.deactivate(EditorToolbar.RUN);
-    toolbar.deactivate(EditorToolbar.STOP);
+//    toolbar.deactivate(EditorToolbar.STOP);
 
     // focus the PDE again after quitting presentation mode [toxi 030903]
     toFront();
