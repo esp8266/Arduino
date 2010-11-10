@@ -151,7 +151,7 @@ public class Editor extends JFrame implements RunnerListener {
     super("Arduino");
     this.base = ibase;
 
-    //Base.setIcon(this);
+    Base.setIcon(this);
 
     // Install default actions for Run, Present, etc.
     resetHandlers();
@@ -2392,10 +2392,10 @@ public class Editor extends JFrame implements RunnerListener {
     if (uploading) return;
     
     try {
-	    serialMonitor.openSerialPort();
+      serialMonitor.openSerialPort();
       serialMonitor.setVisible(true);
     } catch (SerialException e) {
-    	statusError(e);
+      statusError(e);
     }
   }
 

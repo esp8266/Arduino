@@ -789,6 +789,7 @@ public class Base {
 
       // This will store the sketch count as zero
       editors.remove(editor);
+      Editor.serialMonitor.closeSerialPort();
       storeSketches();
 
       // Save out the current prefs state
@@ -826,6 +827,7 @@ public class Base {
     // If quit is canceled, this will be replaced anyway
     // by a later handleQuit() that is not canceled.
     storeSketches();
+    Editor.serialMonitor.closeSerialPort();
 
     if (handleQuitEach()) {
       // make sure running sketches close before quitting
