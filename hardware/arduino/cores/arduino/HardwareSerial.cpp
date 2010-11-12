@@ -65,7 +65,7 @@ struct ring_buffer
 
 inline void store_char(unsigned char c, ring_buffer *rx_buffer)
 {
-  int i = (rx_buffer->head + 1) % RX_BUFFER_SIZE;
+  int i = (unsigned int)(rx_buffer->head + 1) % RX_BUFFER_SIZE;
 
   // if we should be storing the received character into the location
   // just before the tail (meaning that the head would advance to the
@@ -231,7 +231,7 @@ void HardwareSerial::end()
 
 int HardwareSerial::available(void)
 {
-  return (RX_BUFFER_SIZE + _rx_buffer->head - _rx_buffer->tail) % RX_BUFFER_SIZE;
+  return (unsigned int)(RX_BUFFER_SIZE + _rx_buffer->head - _rx_buffer->tail) % RX_BUFFER_SIZE;
 }
 
 int HardwareSerial::peek(void)
@@ -250,7 +250,7 @@ int HardwareSerial::read(void)
     return -1;
   } else {
     unsigned char c = _rx_buffer->buffer[_rx_buffer->tail];
-    _rx_buffer->tail = (_rx_buffer->tail + 1) % RX_BUFFER_SIZE;
+    _rx_buffer->tail = (unsigned int)(_rx_buffer->tail + 1) % RX_BUFFER_SIZE;
     return c;
   }
 }
