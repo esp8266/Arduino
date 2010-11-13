@@ -1,0 +1,2 @@
+rm -r */applet
+pause
