@@ -1,6 +1,6 @@
 /*
 
- MemoryCard - a slightly more friendly wrapper for sdfatlib
+ SD - a slightly more friendly wrapper for sdfatlib
 
  This library aims to expose a subset of SD card functionality
  in the form of a higher level "wrapper" object.
@@ -13,13 +13,13 @@
 
  This library provides four key benefits:
 
-   * Including `MemoryCard.h` automatically creates a global
-     `MemoryCard` object which can be interacted with in a similar
+   * Including `SD.h` automatically creates a global
+     `SD` object which can be interacted with in a similar
      manner to other standard global objects like `Serial` and `Ethernet`.
 
    * Boilerplate initialisation code is contained in one method named 
      `begin` and no further objects need to be created in order to access
-     the memory card.
+     the SD card.
 
    * Calls to `open` can supply a full path name including parent 
      directories which simplifies interacting with files in subdirectories.
@@ -50,10 +50,10 @@
 
  */
 
-#include "MemoryCardDevice.h"
+#include "SD.h"
 
 // Use this to configure the chip select pin of the SD card.
-#define SD_CARD_CHIP_SELECT_PIN 8 // For use with SparkFun MicroSD shield
+#define SD_CARD_CHIP_SELECT_PIN 4 // For use with Arduino Ethernet Shield
 
 
 // Used by `getNextPathComponent`
@@ -286,7 +286,7 @@ boolean callback_openPath(SdFile& parentDir, char *filePathComponent,
     Callback used to open a file specified by a filepath that may
     specify one or more directories above it.
 
-    Expects the context object to be an instance of `MemoryCard` and
+    Expects the context object to be an instance of `SDClass` and
     will use the `file` property of the instance to open the requested
     file/directory with the associated file open mode property.
 
@@ -298,7 +298,7 @@ boolean callback_openPath(SdFile& parentDir, char *filePathComponent,
 
   */
   if (isLastComponent) {
-    MemoryCardDevice *p_MemoryCard = static_cast<MemoryCardDevice*>(object);
+    SDClass *p_MemoryCard = static_cast<SDClass*>(object);
     p_MemoryCard->file.open(parentDir, filePathComponent,
 			    p_MemoryCard->fileOpenMode);
     // TODO: Return file open result?
@@ -309,9 +309,9 @@ boolean callback_openPath(SdFile& parentDir, char *filePathComponent,
 
 
 
-/* Implementation of class used to create `MemoryCard` object. */
+/* Implementation of class used to create `SDCard` object. */
 
-void MemoryCardDevice::begin() {
+void SDClass::begin() {
   /*
 
     Performs the initialisation required by the sdfatlib library.
@@ -329,14 +329,14 @@ void MemoryCardDevice::begin() {
 }
 
 
-boolean MemoryCardDevice::open(char *filepath,
+boolean SDClass::open(char *filepath,
 			       boolean write, boolean append) {
   /*
 
      Open the supplied file path for reading or writing.
 
      The file content can be accessed via the `file` property of
-     the `MemoryCardDevice` object--this property is currently
+     the `SDClass` object--this property is currently
      a standard `SdFile` object from `sdfatlib`.
 
      Defaults to read only.
@@ -375,7 +375,7 @@ boolean MemoryCardDevice::open(char *filepath,
 }
 
 
-boolean MemoryCardDevice::close() {
+boolean SDClass::close() {
   /*
 
     Closes the file opened by the `open` method.
@@ -385,7 +385,7 @@ boolean MemoryCardDevice::close() {
 }
 
 
-boolean MemoryCardDevice::exists(char *filepath) {
+boolean SDClass::exists(char *filepath) {
   /*
 
      Returns true if the supplied file path exists.
@@ -395,7 +395,7 @@ boolean MemoryCardDevice::exists(char *filepath) {
 }
 
 
-boolean MemoryCardDevice::exists(char *filepath, SdFile& parentDir) {
+boolean SDClass::exists(char *filepath, SdFile& parentDir) {
   /*
 
      Returns true if the supplied file path rooted at `parentDir`
@@ -406,7 +406,7 @@ boolean MemoryCardDevice::exists(char *filepath, SdFile& parentDir) {
 }
 
 
-boolean MemoryCardDevice::makeDir(char *filepath) {
+boolean SDClass::makeDir(char *filepath) {
   /*
   
     Makes a single directory or a heirarchy of directories.
@@ -416,3 +416,5 @@ boolean MemoryCardDevice::makeDir(char *filepath) {
    */
   return walkPath(filepath, root, callback_makeDirPath);
 }
+
+SDClass SD;

@@ -17,9 +17,9 @@
 
 #include <WProgram.h>
 
-#include <SdFat.h>
+#include <utility/SdFat.h>
 
-class MemoryCardDevice {
+class SDClass {
 
  private:
   // These are required for initialisation and use of sdfatlib
@@ -61,5 +61,7 @@ class MemoryCardDevice {
   // It shouldn't be set directly--it is set via the parameters to `open`.
   int fileOpenMode; // TODO: Don't make this public?
 };
+
+extern SDClass SD;
 
 #endif
