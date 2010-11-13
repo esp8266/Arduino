@@ -18,6 +18,7 @@
 #include <WProgram.h>
 
 #include <utility/SdFat.h>
+#include <utility/SdFatUtil.h>
 
 class SDClass {
 
