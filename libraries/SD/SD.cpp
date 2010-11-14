@@ -52,10 +52,6 @@
 
 #include "SD.h"
 
-// Use this to configure the chip select pin of the SD card.
-#define SD_CARD_CHIP_SELECT_PIN 4 // For use with Arduino Ethernet Shield
-
-
 // Used by `getNextPathComponent`
 #define MAX_COMPONENT_LEN 12 // What is max length?
 #define PATH_COMPONENT_BUFFER_LEN MAX_COMPONENT_LEN+1
@@ -311,7 +307,9 @@ boolean callback_openPath(SdFile& parentDir, char *filePathComponent,
 
 /* Implementation of class used to create `SDCard` object. */
 
-void SDClass::begin() {
+
+
+void SDClass::begin(uint8_t csPin) {
   /*
 
     Performs the initialisation required by the sdfatlib library.
@@ -320,7 +318,7 @@ void SDClass::begin() {
 
    */
   // TODO: Allow chip select pin to be supplied?
-  if (!(card.init(SPI_HALF_SPEED, SD_CARD_CHIP_SELECT_PIN) 
+  if (!(card.init(SPI_HALF_SPEED, csPin) 
 	&& volume.init(card) && root.openRoot(volume))) {
     while (true) {
       // Bail

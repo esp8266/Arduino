@@ -1,6 +1,6 @@
 /*
 
- MemoryCard - a slightly more friendly wrapper for sdfatlib
+ SD - a slightly more friendly wrapper for sdfatlib
 
  This library aims to expose a subset of SD card functionality
  in the form of a higher level "wrapper" object.
@@ -20,6 +20,9 @@
 #include <utility/SdFat.h>
 #include <utility/SdFatUtil.h>
 
+// Use this to configure the chip select pin of the SD card.
+#define SD_CARD_CHIP_SELECT_PIN 4 // For use with Arduino Ethernet Shield
+
 class SDClass {
 
  private:
@@ -32,7 +35,7 @@ class SDClass {
  public:
   // This needs to be called to set up the connection to the memory card
   // before other methods are used.
-  void begin();
+  void begin(uint8_t csPin = SD_CARD_CHIP_SELECT_PIN);
   
   // Open the specified file/directory with the supplied mode (e.g. read or
   // write, etc). Once opened the file can be accessed via the
