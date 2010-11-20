@@ -26,8 +26,29 @@ void File::write(const uint8_t *buf, size_t size) {
   SD.file.write(buf, size);
 }
 
+int File::peek() {
+  if (SD.c != -1) return SD.c;
+  SD.c = SD.file.read();
+  return SD.c;
+}
+
 int File::read() {
+  if (SD.c != -1) {
+    int tmp = SD.c;
+    SD.c = -1;
+    return tmp;
+  }
   return SD.file.read();
+}
+
+int File::available() {
+  if (SD.c != -1) return 1;
+  SD.c = SD.file.read();
+  return SD.c != -1;
+}
+
+void File::flush() {
+  SD.file.sync();
 }
 
 void File::close() {

@@ -297,6 +297,7 @@ boolean callback_openPath(SdFile& parentDir, char *filePathComponent,
     SDClass *p_MemoryCard = static_cast<SDClass*>(object);
     p_MemoryCard->file.open(parentDir, filePathComponent,
 			    p_MemoryCard->fileOpenMode);
+    p_MemoryCard->c = -1;
     // TODO: Return file open result?
     return false;
   }

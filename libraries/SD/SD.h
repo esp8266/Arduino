@@ -23,26 +23,28 @@
 // Use this to configure the chip select pin of the SD card.
 #define SD_CARD_CHIP_SELECT_PIN 4 // For use with Arduino Ethernet Shield
 
-class File : public Print {
-  public:
-    virtual void write(uint8_t);
-    virtual void write(const char *str);
-    virtual void write(const uint8_t *buf, size_t size);
-    int read();
-    void close();
-    operator bool();
+class File : public Stream {
+public:
+  virtual void write(uint8_t);
+  virtual void write(const char *str);
+  virtual void write(const uint8_t *buf, size_t size);
+  virtual int read();
+  virtual int peek();
+  virtual int available();
+  virtual void flush();
+  void close();
+  operator bool();
 };
 
 class SDClass {
 
- private:
+private:
   // These are required for initialisation and use of sdfatlib
   Sd2Card card;
   SdVolume volume;
   SdFile root;
   
-  
- public:
+public:
   // This needs to be called to set up the connection to the SD card
   // before other methods are used.
   void begin(uint8_t csPin = SD_CARD_CHIP_SELECT_PIN);
@@ -59,7 +61,7 @@ class SDClass {
   // do not exist they will be created.
   boolean makeDir(char *filepath);
 
- private:
+private:
   SdFile file;
 
   // This is used to determine the mode used to open a file
@@ -68,6 +70,8 @@ class SDClass {
   // it's probably not the best place for it.
   // It shouldn't be set directly--it is set via the parameters to `open`.
   int fileOpenMode;
+  
+  int c;
   
   friend class File;
   friend boolean callback_openPath(SdFile&, char *, boolean, void *); 
