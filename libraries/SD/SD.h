@@ -59,7 +59,7 @@ public:
 
   // Create the requested directory heirarchy--if intermediate directories
   // do not exist they will be created.
-  boolean makeDir(char *filepath);
+  boolean mkdir(char *filepath);
 
 private:
   SdFile file;

@@ -404,7 +404,7 @@ boolean SDClass::exists(char *filepath) {
 //}
 
 
-boolean SDClass::makeDir(char *filepath) {
+boolean SDClass::mkdir(char *filepath) {
   /*
   
     Makes a single directory or a heirarchy of directories.
