@@ -23,6 +23,16 @@
 // Use this to configure the chip select pin of the SD card.
 #define SD_CARD_CHIP_SELECT_PIN 4 // For use with Arduino Ethernet Shield
 
+class File : public Print {
+  public:
+    virtual void write(uint8_t);
+    virtual void write(const char *str);
+    virtual void write(const uint8_t *buf, size_t size);
+    int read();
+    void close();
+    operator bool();
+};
+
 class SDClass {
 
  private:
@@ -40,14 +50,14 @@ class SDClass {
   // Open the specified file/directory with the supplied mode (e.g. read or
   // write, etc). Once opened the file can be accessed via the
   // `MemoryCard.file` field which is a standard `sdfatlib` file object.
-  boolean open(char *filename, boolean write = false, boolean append = true);
+  File open(char *filename, boolean write = false, boolean append = true);
 
   // Close an opened file object.
-  boolean close();
+  //boolean close();
 
   // Methods to determine if the requested file path exists.
   boolean exists(char *filepath);
-  boolean exists(char *filepath, SdFile& parentDir);
+  //boolean exists(char *filepath, SdFile& parentDir);
 
   // Create the requested directory heirarchy--if intermediate directories
   // do not exist they will be created.

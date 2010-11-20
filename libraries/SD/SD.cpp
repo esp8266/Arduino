@@ -327,7 +327,7 @@ void SDClass::begin(uint8_t csPin) {
 }
 
 
-boolean SDClass::open(char *filepath,
+File SDClass::open(char *filepath,
 			       boolean write, boolean append) {
   /*
 
@@ -368,19 +368,19 @@ boolean SDClass::open(char *filepath,
   fileOpenMode = oflag;
   walkPath(filepath, root, callback_openPath, this);
 
-  // TODO: Actually return something useful.
+  return File();
 
 }
 
 
-boolean SDClass::close() {
-  /*
-
-    Closes the file opened by the `open` method.
-
-   */
-  file.close();
-}
+//boolean SDClass::close() {
+//  /*
+//
+//    Closes the file opened by the `open` method.
+//
+//   */
+//  file.close();
+//}
 
 
 boolean SDClass::exists(char *filepath) {
@@ -389,19 +389,19 @@ boolean SDClass::exists(char *filepath) {
      Returns true if the supplied file path exists.
 
    */
-  return exists(filepath, root);
+  return walkPath(filepath, root, callback_pathExists);
 }
 
 
-boolean SDClass::exists(char *filepath, SdFile& parentDir) {
-  /*
-
-     Returns true if the supplied file path rooted at `parentDir`
-     exists.
-
-   */
-  return walkPath(filepath, parentDir, callback_pathExists);
-}
+//boolean SDClass::exists(char *filepath, SdFile& parentDir) {
+//  /*
+//
+//     Returns true if the supplied file path rooted at `parentDir`
+//     exists.
+//
+//   */
+//  return walkPath(filepath, parentDir, callback_pathExists);
+//}
 
 
 boolean SDClass::makeDir(char *filepath) {
