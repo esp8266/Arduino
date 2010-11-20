@@ -327,8 +327,7 @@ void SDClass::begin(uint8_t csPin) {
 }
 
 
-File SDClass::open(char *filepath,
-			       boolean write, boolean append) {
+File SDClass::open(char *filepath, boolean write, boolean append) {
   /*
 
      Open the supplied file path for reading or writing.
