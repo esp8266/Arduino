@@ -182,6 +182,10 @@ boolean walkPath(char *filepath, SdFile& parentDir,
       return false;
     }
     
+    if (!moreComponents) {
+      break;
+    }
+    
     boolean exists = (*p_child).open(*p_parent, buffer, O_RDONLY);
 
     // If it's one we've created then we
@@ -204,14 +208,11 @@ boolean walkPath(char *filepath, SdFile& parentDir,
     } else {
       return false;
     }
-    
-    if (!moreComponents) {
-      // TODO: Check if this check should be earlier.
-      break;
-    }
   }
   
-  (*p_parent).close(); // TODO: Return/ handle different?
+  if (p_parent != &parentDir) {
+    (*p_parent).close(); // TODO: Return/ handle different?
+  }
 
   return true;
 }
@@ -307,8 +308,17 @@ boolean callback_openPath(SdFile& parentDir, char *filePathComponent,
 boolean callback_remove(SdFile& parentDir, char *filePathComponent, 
 			boolean isLastComponent, void *object) {
   if (isLastComponent) {
-    SdFile::remove(parentDir, filePathComponent);
-    return false;
+    return SdFile::remove(parentDir, filePathComponent);
+  }
+  return true;
+}
+
+boolean callback_rmdir(SdFile& parentDir, char *filePathComponent, 
+			boolean isLastComponent, void *object) {
+  if (isLastComponent) {
+    SdFile f;
+    if (!f.open(parentDir, filePathComponent, O_READ)) return false;
+    return f.rmDir();
   }
   return true;
 }
@@ -420,8 +430,19 @@ boolean SDClass::mkdir(char *filepath) {
   return walkPath(filepath, root, callback_makeDirPath);
 }
 
-void SDClass::remove(char *filepath) {
-  walkPath(filepath, root, callback_remove);
+boolean SDClass::rmdir(char *filepath) {
+  /*
+  
+    Makes a single directory or a heirarchy of directories.
+
+    A rough equivalent to `mkdir -p`.
+  
+   */
+  return walkPath(filepath, root, callback_rmdir);
+}
+
+boolean SDClass::remove(char *filepath) {
+  return walkPath(filepath, root, callback_remove);
 }
 
 SDClass SD;

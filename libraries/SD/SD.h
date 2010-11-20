@@ -59,7 +59,9 @@ public:
   boolean mkdir(char *filepath);
   
   // Delete the file.
-  void remove(char *filepath);
+  boolean remove(char *filepath);
+  
+  boolean rmdir(char *filepath);
 
 private:
   SdFile file;
