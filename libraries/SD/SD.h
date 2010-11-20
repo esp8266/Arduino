@@ -60,6 +60,9 @@ public:
   // Create the requested directory heirarchy--if intermediate directories
   // do not exist they will be created.
   boolean mkdir(char *filepath);
+  
+  // Delete the file.
+  void remove(char *filepath);
 
 private:
   SdFile file;

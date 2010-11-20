@@ -294,11 +294,20 @@ boolean callback_openPath(SdFile& parentDir, char *filePathComponent,
 
   */
   if (isLastComponent) {
-    SDClass *p_MemoryCard = static_cast<SDClass*>(object);
-    p_MemoryCard->file.open(parentDir, filePathComponent,
-			    p_MemoryCard->fileOpenMode);
-    p_MemoryCard->c = -1;
+    SDClass *p_SD = static_cast<SDClass*>(object);
+    p_SD->file.open(parentDir, filePathComponent, p_SD->fileOpenMode);
+    p_SD->c = -1;
     // TODO: Return file open result?
+    return false;
+  }
+  return true;
+}
+
+
+boolean callback_remove(SdFile& parentDir, char *filePathComponent, 
+			boolean isLastComponent, void *object) {
+  if (isLastComponent) {
+    SdFile::remove(parentDir, filePathComponent);
     return false;
   }
   return true;
@@ -413,6 +422,10 @@ boolean SDClass::mkdir(char *filepath) {
   
    */
   return walkPath(filepath, root, callback_makeDirPath);
+}
+
+void SDClass::remove(char *filepath) {
+  walkPath(filepath, root, callback_remove);
 }
 
 SDClass SD;
