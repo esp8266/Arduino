@@ -319,21 +319,17 @@ boolean callback_remove(SdFile& parentDir, char *filePathComponent,
 
 
 
-void SDClass::begin(uint8_t csPin) {
+boolean SDClass::begin(uint8_t csPin) {
   /*
 
     Performs the initialisation required by the sdfatlib library.
 
-    Does not return if initialisation fails.
+    Return true if initialization succeeds, false otherwise.
 
    */
-  // TODO: Allow chip select pin to be supplied?
-  if (!(card.init(SPI_HALF_SPEED, csPin) 
-	&& volume.init(card) && root.openRoot(volume))) {
-    while (true) {
-      // Bail
-    }
-  }
+  return card.init(SPI_HALF_SPEED, csPin) &&
+         volume.init(card) &&
+         root.openRoot(volume);
 }
 
 

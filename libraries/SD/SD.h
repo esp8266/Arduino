@@ -20,9 +20,6 @@
 #include <utility/SdFat.h>
 #include <utility/SdFatUtil.h>
 
-// Use this to configure the chip select pin of the SD card.
-#define SD_CARD_CHIP_SELECT_PIN 4 // For use with Arduino Ethernet Shield
-
 class File : public Stream {
 public:
   virtual void write(uint8_t);
@@ -47,7 +44,7 @@ private:
 public:
   // This needs to be called to set up the connection to the SD card
   // before other methods are used.
-  void begin(uint8_t csPin = SD_CARD_CHIP_SELECT_PIN);
+  boolean begin(uint8_t csPin = SD_CHIP_SELECT_PIN);
   
   // Open the specified file/directory with the supplied mode (e.g. read or
   // write, etc). Returns a File object for interacting with the file.

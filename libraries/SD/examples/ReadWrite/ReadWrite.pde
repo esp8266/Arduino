@@ -6,7 +6,11 @@ void setup()
 {
   Serial.begin(9600);
   Serial.print("Initializing SD card...");
-  SD.begin();
+  // On the Ethernet Shield, CS is pin 4.
+  if (!SD.begin(4)) {
+    Serial.println("failed!");
+    return;
+  }
   Serial.println("done.");
   
   f = SD.open("test.txt", true, false);
