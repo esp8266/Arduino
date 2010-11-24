@@ -150,7 +150,7 @@ public class Serial implements SerialPortEventListener {
     }
     
     if (port == null) {
-      throw new SerialException("Serial port '" + iname + "' not found.  Did you select the right one from the Tools > Serial Port menu?");
+      throw new SerialNotFoundException("Serial port '" + iname + "' not found.  Did you select the right one from the Tools > Serial Port menu?");
     }
   }
 

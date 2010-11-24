@@ -29,6 +29,8 @@ package processing.app.debug;
 import processing.app.Base;
 import processing.app.Preferences;
 import processing.app.Serial;
+import processing.app.SerialException;
+import processing.app.SerialNotFoundException;
 
 import java.io.*;
 import java.util.*;
@@ -63,11 +65,11 @@ public abstract class Uploader implements MessageConsumer  {
   }
 
   public abstract boolean uploadUsingPreferences(String buildPath, String className, boolean verbose)
-    throws RunnerException;
+    throws RunnerException, SerialException;
   
   public abstract boolean burnBootloader(String target, String programmer) throws RunnerException;
   
-  protected void flushSerialBuffer() throws RunnerException {
+  protected void flushSerialBuffer() throws RunnerException, SerialException {
     // Cleanup the serial buffer
     try {
       Serial serialPort = new Serial();
@@ -90,6 +92,8 @@ public abstract class Uploader implements MessageConsumer  {
       serialPort.setRTS(true);
       
       serialPort.dispose();
+    } catch (SerialNotFoundException e) {
+      throw e;
     } catch(Exception e) {
       e.printStackTrace();
       throw new RunnerException(e.getMessage());
