@@ -43,6 +43,7 @@
 	   excludes="**/tools/format/**" 
 	   encoding="UTF-8"
 	   includeAntRuntime="false"
+	   debug="true"
 	   classpath="../core/core.jar; ${env.JAVA_HOME}/lib/tools.jar; lib/ant.jar; lib/ant-launcher.jar; lib/apple.jar; lib/ecj.jar; lib/jna.jar; lib/RXTXcomm.jar" />
   </target>
   
