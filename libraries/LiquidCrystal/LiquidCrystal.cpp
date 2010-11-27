@@ -122,7 +122,7 @@ void LiquidCrystal::begin(uint8_t cols, uint8_t lines, uint8_t dotsize) {
     write4bits(0x03); 
     delayMicroseconds(150);
 
-    // finally, set to 8-bit interface
+    // finally, set to 4-bit interface
     write4bits(0x02); 
   } else {
     // this is according to the hitachi HD44780 datasheet
