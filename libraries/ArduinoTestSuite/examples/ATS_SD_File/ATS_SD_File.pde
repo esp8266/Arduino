@@ -15,21 +15,21 @@ void setup()
   ATS_PrintTestStatus("SD.begin()", b = SD.begin(4));
   if (!b) goto done;
   
-  f = SD.open("test.txt", SD_TRUNCATE);
+  f = SD.open("test.txt", FILE_TRUNCATE);
   ATS_PrintTestStatus("SD.open()", f);
   if (!f) goto done;
   
   f.print("1234");
   f.close();
   
-  f = SD.open("test.txt", SD_TRUNCATE);
+  f = SD.open("test.txt", FILE_TRUNCATE);
   ATS_PrintTestStatus("SD.open()", f);
   if (!f) goto done;
   
   f.print("abcde");
   f.close();
   
-  f = SD.open("test.txt", SD_APPEND);
+  f = SD.open("test.txt", FILE_APPEND);
   ATS_PrintTestStatus("SD.open()", f);
   if (!f) goto done;
   
@@ -71,7 +71,7 @@ void setup()
   
   f.close();  
 
-  f = SD.open("test2.txt", SD_TRUNCATE);
+  f = SD.open("test2.txt", FILE_TRUNCATE);
   ATS_PrintTestStatus("SD.open()", f);
   if (!f) goto done;
   

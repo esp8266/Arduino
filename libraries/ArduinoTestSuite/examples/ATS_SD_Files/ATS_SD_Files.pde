@@ -13,7 +13,7 @@ void setup()
   if (!b) goto done;
   
   ATS_PrintTestStatus("!SD.exists()", !SD.exists("asdf.txt"));
-  ATS_PrintTestStatus("SD.open()", f = SD.open("asdf.txt", SD_TRUNCATE)); f.close();
+  ATS_PrintTestStatus("SD.open()", f = SD.open("asdf.txt", FILE_TRUNCATE)); f.close();
   ATS_PrintTestStatus("SD.exists()", SD.exists("asdf.txt"));
   ATS_PrintTestStatus("SD.exists()", SD.exists("/asdf.txt"));
   ATS_PrintTestStatus("SD.remove()", SD.remove("asdf.txt"));
@@ -48,13 +48,13 @@ void setup()
   ATS_PrintTestStatus("!SD.exists()", !SD.exists("x/y"));  
   ATS_PrintTestStatus("!SD.exists()", !SD.exists("x/y/z"));  
   
-  ATS_PrintTestStatus("!SD.open()", !(f = SD.open("asdf/asdf.txt", SD_TRUNCATE))); f.close();
+  ATS_PrintTestStatus("!SD.open()", !(f = SD.open("asdf/asdf.txt", FILE_TRUNCATE))); f.close();
   ATS_PrintTestStatus("!SD.exists()", !SD.exists("asdf"));
   ATS_PrintTestStatus("!SD.exists()", !SD.exists("asdf.txt"));
   ATS_PrintTestStatus("!SD.exists()", !SD.exists("asdf/asdf.txt"));
   ATS_PrintTestStatus("SD.mkdir()", SD.mkdir("asdf"));
   ATS_PrintTestStatus("SD.exists()", SD.exists("asdf"));
-  ATS_PrintTestStatus("SD.open()", f = SD.open("asdf/asdf.txt", SD_TRUNCATE)); f.close();
+  ATS_PrintTestStatus("SD.open()", f = SD.open("asdf/asdf.txt", FILE_TRUNCATE)); f.close();
   ATS_PrintTestStatus("SD.exists()", SD.exists("asdf/asdf.txt"));
   ATS_PrintTestStatus("!SD.rmdir()", !SD.rmdir("asdf"));
   ATS_PrintTestStatus("SD.exists()", SD.exists("asdf"));

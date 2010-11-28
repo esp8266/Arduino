@@ -20,9 +20,9 @@
 #include <utility/SdFat.h>
 #include <utility/SdFatUtil.h>
 
-#define SD_READ O_READ
-#define SD_TRUNCATE (O_WRITE | O_CREAT | O_TRUNC)
-#define SD_APPEND (O_WRITE | O_CREAT | O_APPEND)
+#define FILE_READ O_READ
+#define FILE_TRUNCATE (O_WRITE | O_CREAT | O_TRUNC)
+#define FILE_APPEND (O_WRITE | O_CREAT | O_APPEND)
 
 class File : public Stream {
 public:
@@ -53,7 +53,7 @@ public:
   // Open the specified file/directory with the supplied mode (e.g. read or
   // write, etc). Returns a File object for interacting with the file.
   // Note that currently only one file can be open at a time.
-  File open(char *filename, uint8_t mode = SD_READ);
+  File open(char *filename, uint8_t mode = FILE_READ);
 
   // Methods to determine if the requested file path exists.
   boolean exists(char *filepath);
