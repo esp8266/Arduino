@@ -20,6 +20,10 @@
 #include <utility/SdFat.h>
 #include <utility/SdFatUtil.h>
 
+#define SD_READ O_READ
+#define SD_TRUNCATE (O_WRITE | O_CREAT | O_TRUNC)
+#define SD_APPEND (O_WRITE | O_CREAT | O_APPEND)
+
 class File : public Stream {
 public:
   virtual void write(uint8_t);
@@ -49,7 +53,7 @@ public:
   // Open the specified file/directory with the supplied mode (e.g. read or
   // write, etc). Returns a File object for interacting with the file.
   // Note that currently only one file can be open at a time.
-  File open(char *filename, boolean write = false, boolean append = true);
+  File open(char *filename, uint8_t mode = SD_READ);
 
   // Methods to determine if the requested file path exists.
   boolean exists(char *filepath);
