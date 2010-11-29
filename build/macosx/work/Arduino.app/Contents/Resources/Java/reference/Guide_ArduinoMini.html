@@ -1,67 +1,0 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head>  <title>Arduino - ArduinoMini </title>  <link rel='stylesheet' href='arduino.css' type='text/css' />  <meta name="verify-v1" content="TtxFIEJAB6zdJ509wLxjnapQzKAMNm9u0Wj4ho6wxIY=" /></head><body><div id="page"><!--PageHeaderFmt--><div id="pageheader">  <div class="title"><a href="http://www.arduino.cc"/>Arduino</a></div>  <div class="search">    <!-- SiteSearch Google -->    <FORM method=GET action="http://www.google.com/search">    <input type=hidden name=ie value=UTF-8>    <input type=hidden name=oe value=UTF-8>    <INPUT TYPE=text name=q size=25 maxlength=255 value="">    <INPUT type=submit name=btnG VALUE="search">    <input type=hidden name=domains value="http://www.arduino.cc/">    <input type=hidden name=sitesearch value="http://www.arduino.cc/">    </FORM>    <!-- SiteSearch Google -->  </div></div><!--/PageHeaderFmt--><!--PageLeftFmt--><div id="pagenav" style="text-align: right">  <div style="float: left;">  <p><a class='wikilink' href='http://arduino.cc/en/Main/Buy'>Buy</a>
-|
-<a class='wikilink' href='http://arduino.cc/en/Main/Software'>Download</a>
-|
-<a class='wikilink' href='Guide_index.html'>Getting Started</a>
-|
-<a class='wikilink' href='http://arduino.cc/en/Tutorial/HomePage'>Learning</a>
-|
-<a class='wikilink' href='index.html'>Reference</a>
-|
-<a class='wikilink' href='http://arduino.cc/en/Main/Hardware'>Hardware</a>
-|
-<a class='wikilink' href='FAQ.html'>FAQ</a>
-</p>
-<p class='vspace'></p>
-  </div>  <a class="urllink" href="http://www.arduino.cc/blog/" rel="nofollow">Blog &raquo;</a> |  <a class="urllink" href="http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl" rel="nofollow">Forum &raquo;</a> |  <a class="urllink" href="http://www.arduino.cc/playground/" rel="nofollow">Playground &raquo;</a></div><!--/PageLeftFmt--><div id="pagetext"><!--PageText-->
-<div id='wikitext'>
-<h2>Guide to the Arduino Mini</h2>
-<p>To get started with the Arduino Mini, follow the directions for the regular Arduino on your operating system (<a class='wikilink' href='Guide_Windows.html'>Windows</a>, <a class='wikilink' href='Guide_MacOSX.html'>Mac OS X</a>, <a class='urllink' href='http://www.arduino.cc/playground/Learning/Linux' rel='nofollow'>Linux</a>),   with the following modifications:
-</p>
-<p class='vspace'></p><ul><li>Connecting the Arduino Mini is a bit more complicated than a regular Arduino board (<a href='#connecting'>see below</a> for instructions and photos).
-<p class='vspace'></p></li><li>You need to select <strong>Arduino Mini</strong> from the <strong>Tools | Board</strong> menu of the Arduino environment.
-<p class='vspace'></p></li><li>To upload a new sketch to the Arduino Mini, you need to press the reset button on the board immediately before pressing the upload button in the Arduino environment.
-</li></ul><p class='vspace'></p><h3>Information about the Arduino Mini</h3>
-<p>The microcontroller (an <span class='wikiword'>ATmega168</span>) on the Arduino Mini is a physically smaller version of the chip on the USB Arduino boards, with the following small difference:
-</p>
-<p class='vspace'></p><ul><li>There are two extra analog inputs on the Mini (8 total).  Four of these, however, are not connected to the legs that come on the Arduino Mini, requiring you to solder wires to their holes to use them.  Two of these unconnected pins are also used by the Wire library (<span class='wikiword'>I2C</span>), meaning that its use will require soldering as well.
-</li></ul><p class='vspace'></p><p>Also, the Arduino Mini is more <strong>fragile and easy to break</strong> than a regular Arduino board.  
-</p>
-<p class='vspace'></p><ul><li>Don't connect more than 9 volts to the +9V pin or reverse the power and ground pins of your power supply, or you might kill the <span class='wikiword'>ATmega168</span> on the Arduino Mini.
-<p class='vspace'></p></li><li>You can't remove the <span class='wikiword'>ATmega168</span>, so if you kill it, you need a new Mini.
-</li></ul><p class='vspace'></p><p><a name='connecting' id='connecting'></a>
-</p><h3>Connecting the Arduino Mini</h3>
-<p>Here's a diagram of the pin layout of the Arduino Mini:
-</p>
-<p class='vspace'></p>
-<table  width='95%' border='0' cellpadding='5' cellspacing='0'><tr><td  width='50%' valign='top'>
-<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Guide/arduino_mini_pinout.png' alt='' title='' /></div>
-<p class='vspace'></p><p><em>Mini 03 pinout</em> (compatible with earlier revisions)
-</p>
-<p class='vspace'></p></td><td  width='50%' valign='top'>
-<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Guide/arduino_mini04_pinout.png' alt='' title='' /></div>
-<p class='vspace'></p><p><em>Mini 04 pinout</em> (the ground on the left has moved down one pin)
-</p>
-<p class='vspace'></p></td></tr></table>
-<p class='vspace'></p><p>To use the Arduino Mini, you need to connect:
-</p>
-<p class='vspace'></p><ul><li>Power.  This can be a regulated +5V power source (e.g. from the +5V pin of the Mini USB Adapter or an Arduino NG) connected to the +5V pin of the Arduino Mini.  Or, a +9V power source (e.g. a 9 volt battery) connected to the +9V pin of the Arduino Mini.
-<p class='vspace'></p></li><li>Ground.  One of the ground pins on the Arduino Mini must be connected to ground of the power source.
-<p class='vspace'></p></li><li>TX/RX.  These pins are used both for uploading new sketches to the board and communicating with a computer or other device.
-<p class='vspace'></p></li><li>Reset.  Whenever this pin is connected to ground, the Arduino Mini resets.  You can wire it to a pushbutton, or connect it to +5V to prevent the Arduino Mini from resetting (except when it loses power).  If you leave the reset pin unconnected, the Arduino Mini will reset randomly.
-<p class='vspace'></p></li><li>An LED.  While not technically necessary, connecting an LED to the Arduino Mini makes it easier to check if it's working.  Pin 13 has a 1 KB resistor on it, so you can connect an LED to it directly between it and ground.  When using another pin, you will need an external resistor.
-</li></ul><p class='vspace'></p><p>You have a few options for connecting the board: the Mini USB Adapter, a regular Arduino board, or your own power supply and USB/Serial adapter.
-</p>
-<p class='vspace'></p><h4>Connecting the Arduino Mini and Mini USB Adapter</h4>
-<p>Here is a photo showing the Arduino Mini connected to the Mini USB adapter.  Notice that the reset pin is connected directly to +5V (the orange wire), without a pushbutton.  Thus, to reset the Arduino Mini, you will need to unplug and reconnect the USB cable to the Mini USB Adapter, or manually move the orange wire connected to the reset pin from +5V to ground and back.
-</p>
-<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Guide/ArduinoMiniBreadboardPhoto.jpg' alt='' title='' /></div>
-<p class='vspace'></p><h4>Connecting the Arduino Mini and a regular Arduino</h4>
-<p>Here's a photo of the Arduino Mini connected to an Arduino NG.  The NG has its <span class='wikiword'>ATmega8</span> removed and is being used for its USB connection, power source, and reset button.  Thus, you can reset the Arduino Mini just by pressing the button on the NG.
-</p>
-<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Guide/ArduinoMiniAndNGBreadboardPhoto.jpg' alt='' title='' /></div>
-<p>The text of the Arduino getting started guide is licensed under a
-<a class='urllink' href='http://creativecommons.org/licenses/by-sa/3.0/' rel='nofollow'>Creative Commons Attribution-ShareAlike 3.0 License</a>.  Code samples in the guide are released into the public domain.
-</p>
-</div>
-<!-- AddThis Button BEGIN --><script type="text/javascript">var addthis_language = "en";</script><div class="addthis_container addthis_toolbox addthis_default_style" addthis:url="Guide_ArduinoMini" addthis:title="Arduino Wiki English"><a href="http://www.addthis.com/bookmark.php?v=250&amp;username=arduinoteam" class="addthis_button_compact">Share</a><span class="addthis_separator">|</span><a class="addthis_button_email"></a><a class="addthis_button_favorites"></a><a class="addthis_button_print"></a><a class="addthis_button_facebook"></a><a class="addthis_button_twitter"></a><script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#username=arduinoteam"></script></div><!-- AddThis Button END --></div><!--PageFooterFmt--><div id="pagefooter">  <a href=.html'Guide_ArduinoMini?action=edit.html'>Edit Page</a> | <a href='Guide_ArduinoMini?action=diff.html'>Page History</a> | <a href='Guide_ArduinoMini?action=print.html' target='_blank'>Printable View</a> | <a href='http://arduino.cc/en/Site/AllRecentChanges'>All Recent Site Changes</a></div><!--/PageFooterFmt--></div></body></html>

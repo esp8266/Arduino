@@ -1,42 +1,0 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head>  <title>Arduino - ArduinoBT </title>  <link rel='stylesheet' href='arduino.css' type='text/css' />  <meta name="verify-v1" content="TtxFIEJAB6zdJ509wLxjnapQzKAMNm9u0Wj4ho6wxIY=" /></head><body><div id="page"><!--PageHeaderFmt--><div id="pageheader">  <div class="title"><a href="http://www.arduino.cc"/>Arduino</a></div>  <div class="search">    <!-- SiteSearch Google -->    <FORM method=GET action="http://www.google.com/search">    <input type=hidden name=ie value=UTF-8>    <input type=hidden name=oe value=UTF-8>    <INPUT TYPE=text name=q size=25 maxlength=255 value="">    <INPUT type=submit name=btnG VALUE="search">    <input type=hidden name=domains value="http://www.arduino.cc/">    <input type=hidden name=sitesearch value="http://www.arduino.cc/">    </FORM>    <!-- SiteSearch Google -->  </div></div><!--/PageHeaderFmt--><!--PageLeftFmt--><div id="pagenav" style="text-align: right">  <div style="float: left;">  <p><a class='wikilink' href='http://arduino.cc/en/Main/Buy'>Buy</a>
-|
-<a class='wikilink' href='http://arduino.cc/en/Main/Software'>Download</a>
-|
-<a class='wikilink' href='Guide_index.html'>Getting Started</a>
-|
-<a class='wikilink' href='http://arduino.cc/en/Tutorial/HomePage'>Learning</a>
-|
-<a class='wikilink' href='index.html'>Reference</a>
-|
-<a class='wikilink' href='http://arduino.cc/en/Main/Hardware'>Hardware</a>
-|
-<a class='wikilink' href='FAQ.html'>FAQ</a>
-</p>
-<p class='vspace'></p>
-  </div>  <a class="urllink" href="http://www.arduino.cc/blog/" rel="nofollow">Blog &raquo;</a> |  <a class="urllink" href="http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl" rel="nofollow">Forum &raquo;</a> |  <a class="urllink" href="http://www.arduino.cc/playground/" rel="nofollow">Playground &raquo;</a></div><!--/PageLeftFmt--><div id="pagetext"><!--PageText-->
-<div id='wikitext'>
-<h2><span class='wikiword'>ArduinoBT</span></h2>
-<p>The Arduino BT is an Arduino board with built-in bluetooth module, allowing for wireless communication.  To get started with the Arduino BT, follow the directions for the Arduino NG on your operating system (<a class='wikilink' href='Guide_Windows.html'>Windows</a>, <a class='wikilink' href='Guide_MacOSX.html'>Mac OS X</a>, <a class='urllink' href='http://www.arduino.cc/playground/Learning/Linux' rel='nofollow'>Linux</a>), with the following modifications:
-</p>
-<p class='vspace'></p><ul><li>First, pair the Arduino BT with your computer and create a virtual serial port for it.  Look for a bluetooth device called <strong>ARDUINOBT</strong> and the pass code is <strong>12345</strong>.
-<p class='vspace'></p></li><li>Select <strong>Arduino BT</strong> from the <strong>Tools | Board</strong> menu of the Arduino environment.
-</li></ul><p class='vspace'></p><h3>Information about the Arduino BT</h3>
-<p>In most respects, the Arduino BT is similar to the Arduino Diecimila.  Here are the main differences of BT board (besides the fact that it communicates over bluetooth instead of USB):
-</p>
-<p class='vspace'></p><ul><li>The Arduino BT is more fragile and easy to break than a regular Arduino board.  
-<p class='vspace'></p></li><li><strong>Don't power the board with more than 5.5 volts to the or reverse the polarity (power and ground pins) of your power supply, or you might kill the <span class='wikiword'>ATmega168</span> on the Arduino BT.</strong>  The Arduino BT can, however, run with a minimum of 1.2 volts, making it easier to power with batteries.
-<p class='vspace'></p></li><li>The microcontroller (an <span class='wikiword'>ATmega168</span>) on the Arduino BT is a physically smaller version of the chip on the USB Arduino boards.  You can't remove it, so if you kill it, you need a new Arduino BT.
-<p class='vspace'></p></li><li>There are two extra analog inputs on the Arduino BT (8 total).  Two of these, however, are not connected to the pin headers on the board; you'll need to solder something to the pads next to the numbers "6" and "7".
-<p class='vspace'></p></li><li>Pin 7 is connected to the reset pin of the bluetooth module; <strong>don't use it for anything</strong> (except resetting the module).
-</li></ul><p class='vspace'></p><p>For more details, see the <a class='wikilink' href='http://arduino.cc/en/Main/ArduinoBoardBluetooth'>Arduino BT hardware page</a>.
-</p>
-<p class='vspace'></p><h3>Using the Arduino BT</h3>
-<p>The on-board serial communication between the bluetooth module and the Arduino sketch (running on the <span class='wikiword'>ATmega168</span>) needs to be at 115200 baud (i.e. call Serial.begin(115200) in your setup() function).  Communication between the bluetooth module and the computer can be at any baud rate.
-</p>
-<p class='vspace'></p><p>Communication between the BT module and the computer can be temperamental.  You might want to open the serial monitor a couple of seconds after resetting the board.
-</p>
-<p class='vspace'></p><p>The text of the Arduino getting started guide is licensed under a
-<a class='urllink' href='http://creativecommons.org/licenses/by-sa/3.0/' rel='nofollow'>Creative Commons Attribution-ShareAlike 3.0 License</a>.  Code samples in the guide are released into the public domain.
-</p>
-</div>
-<!-- AddThis Button BEGIN --><script type="text/javascript">var addthis_language = "en";</script><div class="addthis_container addthis_toolbox addthis_default_style" addthis:url="Guide_ArduinoBT" addthis:title="Arduino Wiki English"><a href="http://www.addthis.com/bookmark.php?v=250&amp;username=arduinoteam" class="addthis_button_compact">Share</a><span class="addthis_separator">|</span><a class="addthis_button_email"></a><a class="addthis_button_favorites"></a><a class="addthis_button_print"></a><a class="addthis_button_facebook"></a><a class="addthis_button_twitter"></a><script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#username=arduinoteam"></script></div><!-- AddThis Button END --></div><!--PageFooterFmt--><div id="pagefooter">  <a href=.html'Guide_ArduinoBT?action=edit.html'>Edit Page</a> | <a href='Guide_ArduinoBT?action=diff.html'>Page History</a> | <a href='Guide_ArduinoBT?action=print.html' target='_blank'>Printable View</a> | <a href='http://arduino.cc/en/Site/AllRecentChanges'>All Recent Site Changes</a></div><!--/PageFooterFmt--></div></body></html>

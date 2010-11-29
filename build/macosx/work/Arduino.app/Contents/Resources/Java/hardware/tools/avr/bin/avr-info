@@ -1,2 +1,0 @@
-#!/bin/sh
-exec info -d "`dirname "$0"`/../info" "$@"

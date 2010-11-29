@@ -1,51 +1,0 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head>  <title>Arduino - ArduinoProMini </title>  <link rel='stylesheet' href='arduino.css' type='text/css' />  <meta name="verify-v1" content="TtxFIEJAB6zdJ509wLxjnapQzKAMNm9u0Wj4ho6wxIY=" /></head><body><div id="page"><!--PageHeaderFmt--><div id="pageheader">  <div class="title"><a href="http://www.arduino.cc"/>Arduino</a></div>  <div class="search">    <!-- SiteSearch Google -->    <FORM method=GET action="http://www.google.com/search">    <input type=hidden name=ie value=UTF-8>    <input type=hidden name=oe value=UTF-8>    <INPUT TYPE=text name=q size=25 maxlength=255 value="">    <INPUT type=submit name=btnG VALUE="search">    <input type=hidden name=domains value="http://www.arduino.cc/">    <input type=hidden name=sitesearch value="http://www.arduino.cc/">    </FORM>    <!-- SiteSearch Google -->  </div></div><!--/PageHeaderFmt--><!--PageLeftFmt--><div id="pagenav" style="text-align: right">  <div style="float: left;">  <p><a class='wikilink' href='http://arduino.cc/en/Main/Buy'>Buy</a>
-|
-<a class='wikilink' href='http://arduino.cc/en/Main/Software'>Download</a>
-|
-<a class='wikilink' href='Guide_index.html'>Getting Started</a>
-|
-<a class='wikilink' href='http://arduino.cc/en/Tutorial/HomePage'>Learning</a>
-|
-<a class='wikilink' href='index.html'>Reference</a>
-|
-<a class='wikilink' href='http://arduino.cc/en/Main/Hardware'>Hardware</a>
-|
-<a class='wikilink' href='FAQ.html'>FAQ</a>
-</p>
-<p class='vspace'></p>
-  </div>  <a class="urllink" href="http://www.arduino.cc/blog/" rel="nofollow">Blog &raquo;</a> |  <a class="urllink" href="http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl" rel="nofollow">Forum &raquo;</a> |  <a class="urllink" href="http://www.arduino.cc/playground/" rel="nofollow">Playground &raquo;</a></div><!--/PageLeftFmt--><div id="pagetext"><!--PageText-->
-<div id='wikitext'>
-<h2>Arduino Pro Mini</h2>
-<p>The Arduino Pro Mini is intended for advanced users who require flexibility, low-cost, and small size.  It comes with the minimum of components (no on-board USB or pin headers) to keep the cost down.  It's a good choice for a board you want to leave embedded in a project.  Please note that there are two versions of the board: one that operates at 5V (like most Arduino boards), and one that operates at 3.3V.  Be sure to provide the correct power and use components whose operating voltage matches that of the board.
-</p>
-<p class='vspace'></p><h3>Uploading Sketches</h3>
-<p>The board comes without built-in USB circuitry, so an off-board USB-to-TTL serial convertor must be used to upload sketches.  This can be a <a class='urllink' href='http://www.ftdichip.com/Products/EvaluationKits/TTL-232R.htm' rel='nofollow'>FTDI TTL-232R USB - TTL Level Serial Converter Cable</a> for the 5V Arduino Mini Pro), or a  <a class='urllink' href='http://www.ftdichip.com/Products/EvaluationKits/TTL-232R-3V3.htm' rel='nofollow'>FTDI TTL-232R-3V3 USB - TTL Level Serial Converter Cable</a> or the <span class='wikiword'>SparkFun</span> <a class='urllink' href='http://www.sparkfun.com/commerce/product_info.php?products_id=8772' rel='nofollow'>FTDI Basic Breakout Board</a> for a 3.3V Arduino Mini Pro.
-One quick way to connect these is by inserting a six-pin 0.1" male pin header into the end of the FTDI cable or breakout board, and pressing it against the six hole programming header on the Mini Pro.  If, however, you're going to be uploading lots of sketches to your Pro Mini, you'll probably want to solder some pins (male headers) to the holes.
-</p>
-<p class='vspace'></p><p>If using the FTDI cable on Windows, you'll need to make one configuration change to enable the auto-reset.  With the board connected, open the Device Manager (in Control Panels &gt; System &gt; Hardware), and find the USB Serial Port under Ports.  Right-click and select properties, then go to Port Settings &gt; Advanced and check Set RTS on Close under Miscellaneous Options.
-</p>
-<p class='vspace'></p><p>For the 3.3V versions of the Arduino Pro Mini, select <strong>Arduino Pro or Pro Mini (3.3V, 8 <span class='wikiword'>MHz</span>) w/ <span class='wikiword'>ATmega328</span></strong> or <strong>Arduino Pro or Pro Mini (3.3V, 8 <span class='wikiword'>MHz</span>) w/ <span class='wikiword'>ATmega168</span></strong> from the <strong>Tools &gt; Board</strong> menu (depending on the microcontroller on your board).  For the 5V versions of the Arduino Pro Mini, select <strong>Arduino Duemilanove or Nano w/ <span class='wikiword'>ATmega328</span></strong> or <strong>Arduino Diecimila, Duemilanove, or Nano w/ <span class='wikiword'>ATmega168</span></strong>.
-</p>
-<p class='vspace'></p><p><br clear='all' />
-</p>
-<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Guide/ArduinoProMiniFTDICable.jpg' alt='' title='' /></div>
-<p class='vspace'></p><p><em>The Arduino Pro Mini connected to (and powered by) an  FTDI TTL-232R-3V3 USB - TTL Level Serial Converter Cable.  The green and black wires align with the labels "GRN" and "BLK" written next to the holes.</em>
-</p>
-<p class='vspace'></p><p><br clear='all' />
-</p>
-<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Guide/ArduinoProMiniFTDIBreakout2.jpg' alt='' title='' /></div>
-<p class='vspace'></p><p><em>The Arduino Pro Mini connected to (and powered by) a <span class='wikiword'>SparkFun</span> FTDI Basic Breakout Board and USB Mini-B cable.  Note that on earlier Pro Mini boards the orientation of the 6-pin header may be reversed; check that the words GRN and BLK align on the Pro Mini and FTDI Basic Breakout.</em>
-</p>
-<p class='vspace'></p><p><br clear='all' />
-</p>
-<p class='vspace'></p><h3>Power</h3>
-<p>The board can be powered through USB via the six-pin programming header, or from a regulated 5V or 3.3V (depending on the model) supply applied to the VCC pin or an unregulated supply on the RAW pin.
-</p>
-<p class='vspace'></p><h3>Connectors</h3>
-<p>Any standard 0.1" spaced header can be soldered to the holes on the Arduino Pro Mini.  To use every pin requires two 12-pin headers, plus a six pin header for programming, if desired.  Bare wire can also be soldered directly to the holes.
-</p>
-<p class='vspace'></p><p>The text of the Arduino getting started guide is licensed under a
-<a class='urllink' href='http://creativecommons.org/licenses/by-sa/3.0/' rel='nofollow'>Creative Commons Attribution-ShareAlike 3.0 License</a>.  Code samples in the guide are released into the public domain.
-</p>
-</div>
-<!-- AddThis Button BEGIN --><script type="text/javascript">var addthis_language = "en";</script><div class="addthis_container addthis_toolbox addthis_default_style" addthis:url="Guide_ArduinoProMini" addthis:title="Arduino Wiki English"><a href="http://www.addthis.com/bookmark.php?v=250&amp;username=arduinoteam" class="addthis_button_compact">Share</a><span class="addthis_separator">|</span><a class="addthis_button_email"></a><a class="addthis_button_favorites"></a><a class="addthis_button_print"></a><a class="addthis_button_facebook"></a><a class="addthis_button_twitter"></a><script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#username=arduinoteam"></script></div><!-- AddThis Button END --></div><!--PageFooterFmt--><div id="pagefooter">  <a href=.html'Guide_ArduinoProMini?action=edit.html'>Edit Page</a> | <a href='Guide_ArduinoProMini?action=diff.html'>Page History</a> | <a href='Guide_ArduinoProMini?action=print.html' target='_blank'>Printable View</a> | <a href='http://arduino.cc/en/Site/AllRecentChanges'>All Recent Site Changes</a></div><!--/PageFooterFmt--></div></body></html>

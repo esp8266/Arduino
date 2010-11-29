@@ -1,2 +1,0 @@
-#!/bin/sh
-exec man -M "`dirname "$0"`/../man" "$@"
