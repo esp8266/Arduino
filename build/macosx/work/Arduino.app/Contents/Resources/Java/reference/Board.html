@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+  <title>Arduino - Board </title>
+  <link rel='stylesheet' href='arduino.css' type='text/css' />
+</head>
+<body>
+<div id="page">
+<!--PageHeaderFmt-->
+<div id="pageheader">
+  <div class="title"><a href="http://www.arduino.cc"/>Arduino</a></div>
+  <div class="search">
+    <!-- SiteSearch Google -->    <FORM method=GET action="http://www.google.com/search">    <input type=hidden name=ie value=UTF-8>    <input type=hidden name=oe value=UTF-8>    <INPUT TYPE=text name=q size=25 maxlength=255 value="">    <INPUT type=submit name=btnG VALUE="search">    <input type=hidden name=domains value="http://www.arduino.cc/">
+    <input type=hidden name=sitesearch value="http://www.arduino.cc/">
+    </FORM>    <!-- SiteSearch Google -->
+  </div>
+</div>
+<!--/PageHeaderFmt-->
+<!--PageLeftFmt-->
+<div id="pagenav" style="text-align: right">
+  <div style="float: left;">
+  <p><a class='wikilink' href='http://www.arduino.cc/en/Main/Buy'>Buy</a>
+|
+<a class='wikilink' href='http://www.arduino.cc/en/Main/Software'>Download</a>
+|
+<a class='wikilink' href='Guide_index.html'>Getting Started</a>
+|
+<a class='wikilink' href='http://www.arduino.cc/en/Tutorial/HomePage'>Learning</a>
+|
+<a class='wikilink' href='index.html'>Reference</a>
+|
+<a class='wikilink' href='http://www.arduino.cc/en/Main/Hardware'>Hardware</a>
+|
+<a class='wikilink' href='FAQ.html'>FAQ</a>
+</p>
+<p class='vspace'></p>
+
+  </div>
+  <a class="urllink" href="http://www.arduino.cc/blog/" rel="nofollow">Blog &raquo;</a> |
+  <a class="urllink" href="http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl" rel="nofollow">Forum &raquo;</a> |
+  <a class="urllink" href="http://www.arduino.cc/playground/" rel="nofollow">Playground &raquo;</a>
+</div>
+<!--/PageLeftFmt-->
+<div id="pagetext">
+<!--PageText-->
+<div id='wikitext'>
+<p><strong>Reference</strong> &nbsp;  <a class='wikilink' href='index.html'>Language</a> (<a class='wikilink' href='Extended.html'>extended</a>) | <a class='wikilink' href='Libraries.html'>Libraries</a> | <a class='wikilink' href='Comparison.html'>Comparison</a> | <a class='selflink' href='Board.html'>Board</a>
+</p>
+<p class='vspace'></p><h2>Introduction to the Arduino Board</h2>
+<p>Looking at the board from the top down, this is an outline of what you will see (parts of the board you might interact with in the course of normal use are highlighted):
+</p>
+<p class='vspace'></p><div><img src='http://www.arduino.cc/en/uploads/Reference/arduino_board.png' alt='' title='' /></div>
+<p class='vspace'></p><p>Starting clockwise from the top center:
+</p>
+<p class='vspace'></p><ul><li>Analog Reference pin (orange)
+</li><li>Digital Ground (light green)
+</li><li>Digital Pins 2-13 (green)
+</li><li>Digital Pins 0-1/Serial In/Out - TX/RX (dark green) - <em>These pins cannot be used for digital i/o (<strong>digitalRead</strong> and <strong>digitalWrite</strong>) if you are also using serial communication (e.g. <strong>Serial.begin</strong>)</em>.
+</li><li>Reset Button - S1 (dark blue)
+</li><li>In-circuit Serial Programmer (blue-green)
+</li><li>Analog In Pins 0-5 (light blue)
+</li><li>Power and Ground Pins (power: orange, grounds: light orange)
+</li><li>External Power Supply In (9-12VDC) - X1 (pink)
+</li><li>Toggles External Power and USB Power (place jumper on two pins closest to desired supply) - <span class='wikiword'>SV1</span> (purple)
+</li><li>USB (used for uploading sketches to the board and for serial communication between the board and the computer; can be used to power the board) (yellow)
+</li></ul><p class='vspace'></p><h3>Microcontrollers</h3>
+<table  width='100%' border='0' cellpadding='5' cellspacing='0'><tr><td  width='50%' valign='top'>
+<p class='vspace'></p><p><em><span class='wikiword'>ATmega168</span></em> (used on most Arduino boards)
+</p>
+<p class='vspace'></p>
+<table border='0'><tr ><td  align='left'>Digital I/O Pins</td><td  align='left'>14  (of which 6 provide PWM output)</td></tr>
+<tr ><td  align='left'>Analog Input Pins</td><td  align='left'>6 (DIP) or 8 (SMD)</td></tr>
+<tr ><td  align='left'>DC Current per I/O Pin</td><td  align='left'>40 mA</td></tr>
+<tr ><td  align='left'>Flash Memory</td><td  align='left'>16 KB</td></tr>
+<tr ><td  align='left'>SRAM</td><td  align='left'>1 KB</td></tr>
+<tr ><td  align='left'>EEPROM</td><td  align='left'>512 bytes</td></tr>
+</table>
+<p class='vspace'></p><p>(<a class='urllink' href='http://www.atmel.com/dyn/resources/prod_documents/doc2545.pdf' rel='nofollow'>datasheet</a>)
+</p>
+<p class='vspace'></p></td><td  width='50%' valign='top'>
+<p class='vspace'></p><p><em><span class='wikiword'>ATmega8</span></em> (used on some older board)
+</p>
+<p class='vspace'></p>
+<table border='0'><tr ><td  align='left'>Digital I/O Pins</td><td  align='left'>14  (of which 3 provide PWM output)</td></tr>
+<tr ><td  align='left'>Analog Input Pins</td><td  align='left'>6</td></tr>
+<tr ><td  align='left'>DC Current per I/O Pin</td><td  align='left'>40 mA</td></tr>
+<tr ><td  align='left'>Flash Memory</td><td  align='left'>8 KB</td></tr>
+<tr ><td  align='left'>SRAM</td><td  align='left'>1 KB</td></tr>
+<tr ><td  align='left'>EEPROM</td><td  align='left'>512 bytes</td></tr>
+</table>
+<p class='vspace'></p><p>(<a class='urllink' href='http://www.atmel.com/dyn/resources/prod_documents/doc2486.pdf' rel='nofollow'>datasheet</a>)
+</p>
+<p class='vspace'></p></td></tr></table>
+<p class='vspace'></p><h3>Digital Pins</h3>
+<p>In addition to the specific functions listed below, the digital pins on an Arduino board can be used for general purpose input and output via the <a class='wikilink' href='PinMode.html'>pinMode()</a>, <a class='wikilink' href='DigitalRead.html'>digitalRead()</a>, and <a class='wikilink' href='DigitalWrite.html'>digitalWrite()</a> commands.  Each pin has an internal pull-up resistor which can be turned on and off using digitalWrite() (w/ a value of HIGH or LOW, respectively) when the pin is configured as an input.  The maximum current per pin is 40 mA.  
+</p>
+<p class='vspace'></p><ul><li><strong>Serial: 0 (RX) and 1 (TX).</strong>  Used to receive (RX) and transmit (TX) TTL serial data.  On the Arduino Diecimila, these pins are connected to the corresponding pins of the FTDI USB-to-TTL Serial chip.  On the Arduino BT, they are connected to the corresponding pins of the <span class='wikiword'>WT11</span> Bluetooth module.  On the Arduino Mini and <span class='wikiword'>LilyPad</span> Arduino, they are intended for use with an external TTL serial module (e.g. the Mini-USB Adapter).
+<p class='vspace'></p></li><li><strong>External Interrupts: 2 and 3.</strong> These pins can be configured to trigger an interrupt on a low value, a rising or falling edge, or a change in value.  See the <a class='wikilink' href='AttachInterrupt.html'>attachInterrupt()</a> function for details.
+<p class='vspace'></p></li><li><strong>PWM: 3, 5, 6, 9, 10, and 11.</strong>  Provide 8-bit PWM output with the <a class='wikilink' href='AnalogWrite.html'>analogWrite()</a> function.  On boards with an <span class='wikiword'>ATmega8</span>, PWM output is available only on pins 9, 10, and 11.
+<p class='vspace'></p></li><li><strong>BT Reset: 7.</strong> (Arduino BT-only) Connected to the reset line of the bluetooth module.
+<p class='vspace'></p></li><li><strong>SPI: 10 (SS), 11 (MOSI), 12 (MISO), 13 (SCK).</strong>  These pins support SPI communication, which, although provided by the underlying hardware, is not currently included in the Arduino language.
+<p class='vspace'></p></li><li><strong>LED: 13.</strong> On the Diecimila and <span class='wikiword'>LilyPad</span>, there is a built-in LED connected to digital pin 13.  When the pin is HIGH value, the LED is on, when the pin is LOW, it's off.
+</li></ul><p class='vspace'></p><h3>Analog Pins</h3>
+<p>In addition to the specific functions listed below, the analog input pins support 10-bit analog-to-digital conversion (ADC) using the <a class='wikilink' href='AnalogRead.html'>analogRead()</a> function.  Most of the analog inputs can also be used as digital pins: analog input 0 as digital pin 14 through analog input 5 as digital pin 19.  Analog inputs 6 and 7 (present on the Mini and BT) cannot be used as digital pins.
+</p>
+<p class='vspace'></p><ul><li><strong>I<sup>2</sup>C: 4 (SDA) and 5 (SCL).</strong>  Support I<sup>2</sup>C (TWI) communication using the <a class='urllink' href='http://wiring.org.co/reference/libraries/Wire/index.html' rel='nofollow'>Wire library</a> (documentation on the Wiring website).
+</li></ul><p class='vspace'></p><h3>Power Pins</h3>
+<ul><li><strong>VIN</strong>  (sometimes labelled "9V").  The input voltage to the Arduino board when it's using an external power source (as opposed to 5 volts from the USB connection or other regulated power source).  You can supply voltage through this pin, or, if supplying voltage via the power jack, access it through this pin.  Note that different boards accept different input voltages ranges, please see the <a class='urllink' href='http://www.arduino.cc/en/Main/Hardware' rel='nofollow'>documentation for your board</a>.  Also note that the <span class='wikiword'>LilyPad</span> has no VIN pin and accepts only a regulated input.
+<p class='vspace'></p></li><li><strong>5V.</strong> The regulated power supply used to power the microcontroller and other components on the board.  This can come either from VIN via an on-board regulator, or be supplied by USB or another regulated 5V supply.
+<p class='vspace'></p></li><li><strong>3V3.</strong>  (Diecimila-only) A 3.3 volt supply generated by the on-board FTDI chip.
+<p class='vspace'></p></li><li><strong>GND.</strong> Ground pins.  
+</li></ul><p class='vspace'></p><h3>Other Pins</h3>
+<ul><li><strong>AREF.</strong> Reference voltage for the analog inputs.  Used with <a class='wikilink' href='AnalogReference.html'>analogReference</a>().
+<p class='vspace'></p></li><li><strong>Reset.</strong> (Diecimila-only) Bring this line LOW to reset the microcontroller.  Typically used to add a reset button to shields which block the one on the board.
+</li></ul><p class='vspace'></p><p><a class='wikilink' href='index.html'>Reference Home</a>
+</p>
+<p class='vspace'></p><p><em>Corrections, suggestions, and new documentation should be posted to the <a class='urllink' href='http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?board=swbugs' rel='nofollow'>Forum</a>.</em>
+</p>
+<p class='vspace'></p><p>The text of the Arduino reference is licensed under a
+<a class='urllink' href='http://creativecommons.org/licenses/by-sa/3.0/' rel='nofollow'>Creative Commons Attribution-ShareAlike 3.0 License</a>.  Code samples in the reference are released into the public domain.
+</p>
+</div>
+
+</div>
+<!--PageFooterFmt-->
+<div id="pagefooter">
+  <a href='#'>Edit Page</a> | <a href='#'>Page History</a> | <a href='#' target='_blank'>Printable View</a> | <a href='http://www.arduino.cc/en/Site/AllRecentChanges'>All Recent Site Changes</a>
+</div>
+<!--/PageFooterFmt-->
+</div>
+</body>
+</html>

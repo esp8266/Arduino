@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist SYSTEM "file://localhost/System/Library/DTDs/PropertyList.dtd">
+<plist version="0.9">
+  <dict>
+    <key>CFBundleName</key>
+    <string>Arduino</string>
+
+    <!-- all these need to change for new releases -->
+    <key>CFBundleGetInfoString</key>
+    <string>0022</string>
+    <key>CFBundleVersion</key>
+    <string>0022</string>
+    <key>CFBundleShortVersionString</key>
+    <string>0022</string>
+    <!-- now stop changing things and get outta here -->
+
+    <key>CFBundleAllowMixedLocalizations</key>
+    <string>true</string>
+    <key>CFBundleExecutable</key>
+    <string>JavaApplicationStub</string>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>English</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleSignature</key>
+    <string>Pde1</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleIconFile</key>
+    <string>processing.icns</string>
+    <key>CFBundleIdentifier</key> 
+    <string>cc.arduino.Arduino</string>
+    <key>CFBundleDocumentTypes</key>
+    <array>
+      <dict>
+        <key>CFBundleTypeExtensions</key>
+        <array>
+          <string>pde</string>
+          <string>java</string>
+        </array>
+        <key>CFBundleTypeIconFile</key>
+        <string>pde.icns</string>
+      	<key>CFBundleTypeName</key>
+        <string>Processing Source File</string>
+        <key>CFBundleTypeMIMETypes</key>
+        <array>
+          <string>text/plain</string>
+        </array>
+        <key>CFBundleTypeOSTypes</key>
+        <array>
+          <string>TEXT</string>
+        </array>
+        <key>CFBundleTypeRole</key>
+        <string>Editor</string>
+      </dict>
+    </array>
+    <key>Java</key>
+    <dict>
+      <key>VMOptions</key>
+      <array>
+        <string>-Xms128M</string>
+        <string>-Xmx256M</string>
+      </array>
+
+      <key>MainClass</key>
+      <string>processing.app.Base</string>
+
+      <key>JVMVersion</key>
+      <string>1.5*</string>
+
+      <key>ClassPath</key>
+      <!-- In 0149, removed /System/Library/Java from the CLASSPATH because
+           it can cause problems if users have installed weird files there.
+           http://dev.processing.org/bugs/show_bug.cgi?id=1045 -->
+      <string>$JAVAROOT/pde.jar:$JAVAROOT/core.jar:$JAVAROOT/antlr.jar:$JAVAROOT/ecj.jar:$JAVAROOT/registry.jar:$JAVAROOT/quaqua.jar:$JAVAROOT/RXTXcomm.jar</string>
+
+      <key>JVMArchs</key>  
+      <array>  
+	<!--<string>x86_64</string>--> <!-- currently no 64 bit support -->
+	<string>i386</string>  
+        <string>ppc</string>  
+      </array>
+
+      <!-- More properties can be found in http://developer.apple.com/releasenotes/Java/java141/system_properties/chapter_4_section_1.html#//apple_ref/doc/uid/TP30000285 -->
+      <key>Properties</key>
+      <dict>
+	<!-- Pass the full path of Contents/Resources/Java to the PDE -->
+	<key>javaroot</key>
+	<string>$JAVAROOT</string>
+
+	<!-- as of 1.0.8, it's safe to use this option again -->
+        <key>apple.laf.useScreenMenuBar</key>
+        <string>true</string>
+
+	<key>apple.awt.showGrowBox</key>
+	<string>false</string>
+	<key>com.apple.smallTabs</key>
+	<string>true</string>
+	<key>apple.awt.Antialiasing</key>
+	<string>false</string>
+	<key>apple.awt.TextAntialiasing</key>
+	<string>true</string>
+	<key>com.apple.hwaccel</key>
+	<string>true</string>
+	<key>apple.awt.use-file-dialog-packages</key>
+	<string>false</string>
+	<key>apple.awt.graphics.UseQuartz</key>
+	<string>true</string>
+      </dict>
+    </dict>
+  </dict>
+</plist>

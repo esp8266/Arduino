@@ -1,0 +1,327 @@
+.TH "inttypes.h" 3 "6 Nov 2008" "Version 1.6.4" "avr-libc" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+inttypes.h \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Defines"
+
+.PP
+.RI "\fBmacros for printf and scanf format specifiers\fP"
+.br
+For C++, these are only included if __STDC_LIMIT_MACROS is defined before including <\fBinttypes.h\fP>. 
+.PP
+.in +1c
+.in +1c
+.ti -1c
+.RI "#define \fBPRId8\fP   'd'"
+.br
+.ti -1c
+.RI "#define \fBPRIdLEAST8\fP   'd'"
+.br
+.ti -1c
+.RI "#define \fBPRIdFAST8\fP   'd'"
+.br
+.ti -1c
+.RI "#define \fBPRIi8\fP   'i'"
+.br
+.ti -1c
+.RI "#define \fBPRIiLEAST8\fP   'i'"
+.br
+.ti -1c
+.RI "#define \fBPRIiFAST8\fP   'i'"
+.br
+.ti -1c
+.RI "#define \fBPRId16\fP   'd'"
+.br
+.ti -1c
+.RI "#define \fBPRIdLEAST16\fP   'd'"
+.br
+.ti -1c
+.RI "#define \fBPRIdFAST16\fP   'd'"
+.br
+.ti -1c
+.RI "#define \fBPRIi16\fP   'i'"
+.br
+.ti -1c
+.RI "#define \fBPRIiLEAST16\fP   'i'"
+.br
+.ti -1c
+.RI "#define \fBPRIiFAST16\fP   'i'"
+.br
+.ti -1c
+.RI "#define \fBPRId32\fP   'ld'"
+.br
+.ti -1c
+.RI "#define \fBPRIdLEAST32\fP   'ld'"
+.br
+.ti -1c
+.RI "#define \fBPRIdFAST32\fP   'ld'"
+.br
+.ti -1c
+.RI "#define \fBPRIi32\fP   'li'"
+.br
+.ti -1c
+.RI "#define \fBPRIiLEAST32\fP   'li'"
+.br
+.ti -1c
+.RI "#define \fBPRIiFAST32\fP   'li'"
+.br
+.ti -1c
+.RI "#define \fBPRIdPTR\fP   PRId16"
+.br
+.ti -1c
+.RI "#define \fBPRIiPTR\fP   PRIi16"
+.br
+.ti -1c
+.RI "#define \fBPRIo8\fP   'o'"
+.br
+.ti -1c
+.RI "#define \fBPRIoLEAST8\fP   'o'"
+.br
+.ti -1c
+.RI "#define \fBPRIoFAST8\fP   'o'"
+.br
+.ti -1c
+.RI "#define \fBPRIu8\fP   'u'"
+.br
+.ti -1c
+.RI "#define \fBPRIuLEAST8\fP   'u'"
+.br
+.ti -1c
+.RI "#define \fBPRIuFAST8\fP   'u'"
+.br
+.ti -1c
+.RI "#define \fBPRIx8\fP   'x'"
+.br
+.ti -1c
+.RI "#define \fBPRIxLEAST8\fP   'x'"
+.br
+.ti -1c
+.RI "#define \fBPRIxFAST8\fP   'x'"
+.br
+.ti -1c
+.RI "#define \fBPRIX8\fP   'X'"
+.br
+.ti -1c
+.RI "#define \fBPRIXLEAST8\fP   'X'"
+.br
+.ti -1c
+.RI "#define \fBPRIXFAST8\fP   'X'"
+.br
+.ti -1c
+.RI "#define \fBPRIo16\fP   'o'"
+.br
+.ti -1c
+.RI "#define \fBPRIoLEAST16\fP   'o'"
+.br
+.ti -1c
+.RI "#define \fBPRIoFAST16\fP   'o'"
+.br
+.ti -1c
+.RI "#define \fBPRIu16\fP   'u'"
+.br
+.ti -1c
+.RI "#define \fBPRIuLEAST16\fP   'u'"
+.br
+.ti -1c
+.RI "#define \fBPRIuFAST16\fP   'u'"
+.br
+.ti -1c
+.RI "#define \fBPRIx16\fP   'x'"
+.br
+.ti -1c
+.RI "#define \fBPRIxLEAST16\fP   'x'"
+.br
+.ti -1c
+.RI "#define \fBPRIxFAST16\fP   'x'"
+.br
+.ti -1c
+.RI "#define \fBPRIX16\fP   'X'"
+.br
+.ti -1c
+.RI "#define \fBPRIXLEAST16\fP   'X'"
+.br
+.ti -1c
+.RI "#define \fBPRIXFAST16\fP   'X'"
+.br
+.ti -1c
+.RI "#define \fBPRIo32\fP   'lo'"
+.br
+.ti -1c
+.RI "#define \fBPRIoLEAST32\fP   'lo'"
+.br
+.ti -1c
+.RI "#define \fBPRIoFAST32\fP   'lo'"
+.br
+.ti -1c
+.RI "#define \fBPRIu32\fP   'lu'"
+.br
+.ti -1c
+.RI "#define \fBPRIuLEAST32\fP   'lu'"
+.br
+.ti -1c
+.RI "#define \fBPRIuFAST32\fP   'lu'"
+.br
+.ti -1c
+.RI "#define \fBPRIx32\fP   'lx'"
+.br
+.ti -1c
+.RI "#define \fBPRIxLEAST32\fP   'lx'"
+.br
+.ti -1c
+.RI "#define \fBPRIxFAST32\fP   'lx'"
+.br
+.ti -1c
+.RI "#define \fBPRIX32\fP   'lX'"
+.br
+.ti -1c
+.RI "#define \fBPRIXLEAST32\fP   'lX'"
+.br
+.ti -1c
+.RI "#define \fBPRIXFAST32\fP   'lX'"
+.br
+.ti -1c
+.RI "#define \fBPRIoPTR\fP   PRIo16"
+.br
+.ti -1c
+.RI "#define \fBPRIuPTR\fP   PRIu16"
+.br
+.ti -1c
+.RI "#define \fBPRIxPTR\fP   PRIx16"
+.br
+.ti -1c
+.RI "#define \fBPRIXPTR\fP   PRIX16"
+.br
+.ti -1c
+.RI "#define \fBSCNd16\fP   'd'"
+.br
+.ti -1c
+.RI "#define \fBSCNdLEAST16\fP   'd'"
+.br
+.ti -1c
+.RI "#define \fBSCNdFAST16\fP   'd'"
+.br
+.ti -1c
+.RI "#define \fBSCNi16\fP   'i'"
+.br
+.ti -1c
+.RI "#define \fBSCNiLEAST16\fP   'i'"
+.br
+.ti -1c
+.RI "#define \fBSCNiFAST16\fP   'i'"
+.br
+.ti -1c
+.RI "#define \fBSCNd32\fP   'ld'"
+.br
+.ti -1c
+.RI "#define \fBSCNdLEAST32\fP   'ld'"
+.br
+.ti -1c
+.RI "#define \fBSCNdFAST32\fP   'ld'"
+.br
+.ti -1c
+.RI "#define \fBSCNi32\fP   'li'"
+.br
+.ti -1c
+.RI "#define \fBSCNiLEAST32\fP   'li'"
+.br
+.ti -1c
+.RI "#define \fBSCNiFAST32\fP   'li'"
+.br
+.ti -1c
+.RI "#define \fBSCNdPTR\fP   SCNd16"
+.br
+.ti -1c
+.RI "#define \fBSCNiPTR\fP   SCNi16"
+.br
+.ti -1c
+.RI "#define \fBSCNo16\fP   'o'"
+.br
+.ti -1c
+.RI "#define \fBSCNoLEAST16\fP   'o'"
+.br
+.ti -1c
+.RI "#define \fBSCNoFAST16\fP   'o'"
+.br
+.ti -1c
+.RI "#define \fBSCNu16\fP   'u'"
+.br
+.ti -1c
+.RI "#define \fBSCNuLEAST16\fP   'u'"
+.br
+.ti -1c
+.RI "#define \fBSCNuFAST16\fP   'u'"
+.br
+.ti -1c
+.RI "#define \fBSCNx16\fP   'x'"
+.br
+.ti -1c
+.RI "#define \fBSCNxLEAST16\fP   'x'"
+.br
+.ti -1c
+.RI "#define \fBSCNxFAST16\fP   'x'"
+.br
+.ti -1c
+.RI "#define \fBSCNo32\fP   'lo'"
+.br
+.ti -1c
+.RI "#define \fBSCNoLEAST32\fP   'lo'"
+.br
+.ti -1c
+.RI "#define \fBSCNoFAST32\fP   'lo'"
+.br
+.ti -1c
+.RI "#define \fBSCNu32\fP   'lu'"
+.br
+.ti -1c
+.RI "#define \fBSCNuLEAST32\fP   'lu'"
+.br
+.ti -1c
+.RI "#define \fBSCNuFAST32\fP   'lu'"
+.br
+.ti -1c
+.RI "#define \fBSCNx32\fP   'lx'"
+.br
+.ti -1c
+.RI "#define \fBSCNxLEAST32\fP   'lx'"
+.br
+.ti -1c
+.RI "#define \fBSCNxFAST32\fP   'lx'"
+.br
+.ti -1c
+.RI "#define \fBSCNoPTR\fP   SCNo16"
+.br
+.ti -1c
+.RI "#define \fBSCNuPTR\fP   SCNu16"
+.br
+.ti -1c
+.RI "#define \fBSCNxPTR\fP   SCNx16"
+.br
+.in -1c
+.in -1c
+.SS "Typedefs"
+
+.PP
+.RI "\fBFar pointers for memory access >64K\fP"
+.br
+
+.PP
+.in +1c
+.in +1c
+.ti -1c
+.RI "typedef \fBint32_t\fP \fBint_farptr_t\fP"
+.br
+.ti -1c
+.RI "typedef \fBuint32_t\fP \fBuint_farptr_t\fP"
+.br
+.in -1c
+.in -1c
+.SH "Detailed Description"
+.PP 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for avr-libc from the source code.

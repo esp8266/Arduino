@@ -1,0 +1,61 @@
+.TH "<util/delay.h>: Convenience functions for busy-wait delay loops" 3 "6 Nov 2008" "Version 1.6.4" "avr-libc" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+<util/delay.h>: Convenience functions for busy-wait delay loops \- 
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fB_delay_us\fP (double __us)"
+.br
+.ti -1c
+.RI "void \fB_delay_ms\fP (double __ms)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+.PP
+.nf
+    #define F_CPU 1000000UL  // 1 MHz
+    //#define F_CPU 14.7456E6
+    #include <util/delay.h>
+.fi
+.PP
+.PP
+\fBNote:\fP
+.RS 4
+As an alternative method, it is possible to pass the F_CPU macro down to the compiler from the Makefile. Obviously, in that case, no \fC#define\fP statement should be used.
+.RE
+.PP
+The functions in this header file are wrappers around the basic busy-wait functions from <\fButil/delay_basic.h\fP>. They are meant as convenience functions where actual time values can be specified rather than a number of cycles to wait for. The idea behind is that compile-time constant expressions will be eliminated by compiler optimization so floating-point expressions can be used to calculate the number of delay cycles needed based on the CPU frequency passed by the macro F_CPU.
+.PP
+\fBNote:\fP
+.RS 4
+In order for these functions to work as intended, compiler optimizations \fImust\fP be enabled, and the delay time \fImust\fP be an expression that is a known constant at compile-time. If these requirements are not met, the resulting delay will be much longer (and basically unpredictable), and applications that otherwise do not use floating-point calculations will experience severe code bloat by the floating-point library routines linked into the application.
+.RE
+.PP
+The functions available allow the specification of microsecond, and millisecond delays directly, using the application-supplied macro F_CPU as the CPU clock frequency (in Hertz). 
+.SH "Function Documentation"
+.PP 
+.SS "void _delay_ms (double __ms)"
+.PP
+Perform a delay of \fC__ms\fP milliseconds, using \fB_delay_loop_2()\fP.
+.PP
+The macro F_CPU is supposed to be defined to a constant defining the CPU clock frequency (in Hertz).
+.PP
+The maximal possible delay is 262.14 ms / F_CPU in MHz.
+.PP
+When the user request delay which exceed the maximum possible one, \fB_delay_ms()\fP provides a decreased resolution functionality. In this mode \fB_delay_ms()\fP will work with a resolution of 1/10 ms, providing delays up to 6.5535 seconds (independent from CPU frequency). The user will not be informed about decreased resolution. 
+.SS "void _delay_us (double __us)"
+.PP
+Perform a delay of \fC__us\fP microseconds, using \fB_delay_loop_1()\fP.
+.PP
+The macro F_CPU is supposed to be defined to a constant defining the CPU clock frequency (in Hertz).
+.PP
+The maximal possible delay is 768 us / F_CPU in MHz.
+.PP
+If the user requests a delay greater than the maximal possible one, \fB_delay_us()\fP will automatically call \fB_delay_ms()\fP instead. The user will not be informed about this case. 
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for avr-libc from the source code.

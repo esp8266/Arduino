@@ -1,0 +1,94 @@
+.TH "using_avrprog" 3 "6 Nov 2008" "Version 1.6.4" "avr-libc" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+using_avrprog \- Using the avrdude program 
+ 
+.PP
+\fBNote:\fP
+.RS 4
+This section was contributed by Brian Dean [ bsd@bsdhome.com ].
+.PP
+The avrdude program was previously called avrprog. The name was changed to avoid confusion with the avrprog program that Atmel ships with AvrStudio.
+.RE
+.PP
+\fCavrdude\fP is a program that is used to update or read the flash and EEPROM memories of Atmel AVR microcontrollers on FreeBSD Unix. It supports the Atmel serial programming protocol using the PC's parallel port and can upload either a raw binary file or an Intel Hex format file. It can also be used in an interactive mode to individually update EEPROM cells, fuse bits, and/or lock bits (if their access is supported by the Atmel serial programming protocol.) The main flash instruction memory of the AVR can also be programmed in interactive mode, however this is not very useful because one can only turn bits off. The only way to turn flash bits on is to erase the entire memory (using \fCavrdude\fP's \fC-e\fP option).
+.PP
+\fCavrdude\fP is part of the FreeBSD ports system. To install it, simply do the following:
+.PP
+.PP
+.nf
+
+# cd /usr/ports/devel/avrdude
+# make install
+.fi
+.PP
+.PP
+Once installed, \fCavrdude\fP can program processors using the contents of the \fC\fP.hex file specified on the command line. In this example, the file \fCmain.hex\fP is burned into the flash memory:
+.PP
+.PP
+.nf
+
+# avrdude -p 2313 -e -m flash -i main.hex
+
+avrdude: AVR device initialized and ready to accept instructions
+
+avrdude: Device signature = 0x1e9101
+
+avrdude: erasing chip
+avrdude: done.
+avrdude: reading input file "main.hex"
+avrdude: input file main.hex auto detected as Intel Hex
+
+avrdude: writing flash:
+1749 0x00
+avrdude: 1750 bytes of flash written
+avrdude: verifying flash memory against main.hex:
+avrdude: reading on-chip flash data:
+1749  0x00
+avrdude: verifying ...
+avrdude: 1750 bytes of flash verified
+
+avrdude done.  Thank you.
+.fi
+.PP
+.PP
+The \fC-p 2313\fP option lets \fCavrdude\fP know that we are operating on an AT90S2313 chip. This option specifies the device id and is matched up with the device of the same id in \fCavrdude\fP's configuration file ( \fC/usr/local/etc/avrdude\fP.conf ). To list valid parts, specify the \fC-v\fP option. The \fC-e\fP option instructs \fCavrdude\fP to perform a chip-erase before programming; this is almost always necessary before programming the flash. The \fC-m flash\fP option indicates that we want to upload data into the flash memory, while \fC-i main.hex\fP specifies the name of the input file.
+.PP
+The EEPROM is uploaded in the same way, the only difference is that you would use \fC-m eeprom\fP instead of \fC-m flash\fP.
+.PP
+To use interactive mode, use the \fC-t\fP option:
+.PP
+.PP
+.nf
+
+# avrdude -p 2313 -t
+avrdude: AVR device initialized and ready to accept instructions
+avrdude: Device signature = 0x1e9101
+avrdude>
+
+The '?' command displays a list of valid
+commands:
+
+avrdude> ?
+>>> ?
+Valid commands:
+
+  dump   : dump memory  : dump <memtype> <addr> <N-Bytes>
+  read   : alias for dump
+  write  : write memory : write <memtype> <addr> <b1> <b2> ... <bN>
+  erase  : perform a chip erase
+  sig    : display device signature bytes
+  part   : display the current part information
+  send   : send a raw command : send <b1> <b2> <b3> <b4>
+  help   : help
+  ?      : help
+  quit   : quit
+
+Use the 'part' command to display valid memory types for use with the
+'dump' and 'write' commands.
+
+avrdude>
+.fi
+.PP
+ 

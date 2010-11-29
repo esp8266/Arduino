@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>AVR MacPack - A Development Environment for AVR Microcontrollers</title>
+<link rel="stylesheet" href="resources/style.css" type="text/css">
+</head>
+<body>
+<table border=0 cellspacing=0 cellpadding=0><tr>
+<td valign=top align=left><div class="index">
+<img src='resources/logo150.jpg' width="150" height="131" border=0 alt="Logo" align=center><h3>AVR MacPack 20081213</h3>
+<p>
+<a href="index.html">Overview</a><p>
+<a href="installation.html">Installation and Removal</a><p>
+<a href="gettingstarted.html">Getting Started</a><p>
+<a href="documentation.html">Documentation</a><p>
+<a href="links.html">Links</a><p>
+<a href="releasenotes.html">Release Notes</a><p>
+<a href="licenses.html">Software Licenses</a>
+</p>
+</div></td>
+<td bgcolor="#bbb" width=1></td><td width=20>&nbsp;</td>
+<td valign=top align=left>
+<h1>Overview</h1>
+<h2>What is AVR MacPack?</h2>
+AVR MacPack is a development environment for <a href="http://www.atmel.com/products/AVR/" target="_blank">Atmel's AVR microcontrollers</a> running on Apple's Mac OS X, similar to <a href="http://winavr.sourceforge.net/" target="_blank">WinAVR</a> for Windows. It consists of the GNU compiler suite, a C library for the AVR, the AVRDUDE uploader and several other useful tools. AVR MacPack always tracks the patch status of the latest WinAVR release.
+
+<h2>Features</h2>
+<ul>
+	<li>Does not depend on Xcode for building AVR code.</li>
+	<li>Universal binaries, runs on PowerPC and Intel Macs.</li>
+	<li>Runs on Mac OS X 10.3 and higher.</li>
+	<li>Includes gcc (the GNU C compiler) in versions 3 and 4.</li>
+	<li>Includes the same patches for new devices as WinAVR does.</li>
+	<li>Includes gdb for debugging with simulavr and avarice.</li>
+</ul>
+
+AVR MacPack consists of the following packages:
+<ul>
+<li>avarice in version 2.8</li>
+<li>avr-libc in version 1.6.4</li>
+<li>avrdude in version 5.5</li>
+<li>GNU binutils in version 2.19</li>
+<li>gcc-3 in version 3.4.6</li>
+<li>gcc-4 in version 4.3.2</li>
+<li>gdb in version 6.8</li>
+<li>libusb in version 0.1.12</li>
+<li>GNU make in version 3.81</li>
+<li>simulavr in version 0.1.2.5</li>
+</ul>
+
+<h2>Supported Devices</h2>
+<h3>Devices supported by <tt>avr-gcc-3</tt></h3>
+at43usb320, at43usb355, at76c711, at86rf401, at90c8534, at90can128, at90can32, at90can64, at90pwm2, at90pwm3, at90s1200, at90s2313, at90s2323, at90s2333, at90s2343, at90s4414, at90s4433, at90s4434, at90s8515, at90s8535, at90usb1286, at90usb1287, at90usb646, at90usb647, at94k, atmega103, atmega128, atmega1280, atmega1281, atmega16, atmega161, atmega162, atmega163, atmega164p, atmega165, atmega165p, atmega168, atmega169, atmega169p, atmega32, atmega323, atmega324p, atmega325, atmega3250, atmega329, atmega3290, atmega406, atmega48, atmega603, atmega64, atmega640, atmega644, atmega644p, atmega645, atmega6450, atmega649, atmega6490, atmega8, atmega8515, atmega8535, atmega88, attiny11, attiny12, attiny13, attiny15, attiny22, attiny2313, attiny24, attiny25, attiny26, attiny261, attiny28, attiny44, attiny45, attiny461, attiny84, attiny85, attiny861, avr1, avr2, avr3, avr4, avr5<h3>Devices supported by <tt>avr-gcc-4</tt></h3>
+at43usb320, at43usb355, at76c711, at86rf401, at90c8534, at90can128, at90can32, at90can64, at90pwm1, at90pwm2, at90pwm216, at90pwm2b, at90pwm3, at90pwm316, at90pwm3b, at90s1200, at90s2313, at90s2323, at90s2333, at90s2343, at90s4414, at90s4433, at90s4434, at90s8515, at90s8535, at90usb1286, at90usb1287, at90usb162, at90usb646, at90usb647, at90usb82, at94k, atmega103, atmega128, atmega1280, atmega1281, atmega1284p, atmega16, atmega161, atmega162, atmega163, atmega164p, atmega165, atmega165p, atmega168, atmega168p, atmega169, atmega169p, atmega16hva, atmega2560, atmega2561, atmega32, atmega323, atmega324p, atmega325, atmega3250, atmega3250p, atmega325p, atmega328p, atmega329, atmega3290, atmega3290p, atmega329p, atmega32c1, atmega32m1, atmega32u4, atmega32u6, atmega406, atmega48, atmega48p, atmega64, atmega640, atmega644, atmega644p, atmega645, atmega6450, atmega649, atmega6490, atmega8, atmega8515, atmega8535, atmega88, atmega88p, atmega8hva, attiny11, attiny12, attiny13, attiny13a, attiny15, attiny167, attiny22, attiny2313, attiny24, attiny25, attiny26, attiny261, attiny28, attiny43u, attiny44, attiny45, attiny461, attiny48, attiny84, attiny85, attiny861, attiny88, atxmega128a1, atxmega128a3, atxmega256a3, atxmega256a3b, atxmega64a1, atxmega64a3, avr1, avr2, avr25, avr3, avr31, avr35, avr4, avr5, avr51, avr6, avrxmega4, avrxmega5, avrxmega6, avrxmega7
+<h3>Devices supported by the assembler <tt>avr-as</tt></h3>
+at43usb320, at43usb355, at76c711, at86rf401, at90c8534, at90can128, at90can32, at90can64, at90pwm1, at90pwm2, at90pwm216, at90pwm2b, at90pwm3, at90pwm316, at90pwm3b, at90s1200, at90s2313, at90s2323, at90s2333, at90s2343, at90s4414, at90s4433, at90s4434, at90s8515, at90s8535, at90usb1286, at90usb1287, at90usb162, at90usb646, at90usb647, at90usb82, at94k, atmega103, atmega128, atmega1280, atmega1281, atmega1284p, atmega16, atmega161, atmega162, atmega163, atmega164p, atmega165, atmega165p, atmega168, atmega168p, atmega169, atmega169p, atmega16hva, atmega16u4, atmega2560, atmega2561, atmega32, atmega323, atmega324p, atmega325, atmega3250, atmega3250p, atmega325p, atmega328p, atmega329, atmega3290, atmega3290p, atmega329p, atmega32c1, atmega32m1, atmega32u4, atmega32u6, atmega406, atmega48, atmega48p, atmega64, atmega640, atmega644, atmega644p, atmega645, atmega6450, atmega649, atmega6490, atmega8, atmega8515, atmega8535, atmega88, atmega88p, atmega8hva, attiny11, attiny12, attiny13, attiny13a, attiny15, attiny167, attiny22, attiny2313, attiny24, attiny25, attiny26, attiny261, attiny28, attiny43u, attiny44, attiny45, attiny461, attiny48, attiny84, attiny85, attiny861, attiny88, atxmega128a1, atxmega128a3, atxmega256a3, atxmega256a3b, atxmega64a1, atxmega64a3, avr1, avr2, avr25, avr3, avr31, avr35, avr4, avr5, avr51, avr6, avrxmega1, avrxmega2, avrxmega3, avrxmega4, avrxmega5, avrxmega6, avrxmega7</td></table>
+</body></html>

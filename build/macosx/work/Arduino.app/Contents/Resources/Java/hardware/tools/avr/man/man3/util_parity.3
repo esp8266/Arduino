@@ -1,0 +1,54 @@
+.TH "<util/parity.h>: Parity bit generation" 3 "6 Nov 2008" "Version 1.6.4" "avr-libc" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+<util/parity.h>: Parity bit generation \- 
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBparity_even_bit\fP(val)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+.PP
+.nf
+ #include <util/parity.h> 
+.fi
+.PP
+.PP
+This header file contains optimized assembler code to calculate the parity bit for a byte. 
+.SH "Define Documentation"
+.PP 
+.SS "#define parity_even_bit(val)"
+.PP
+\fBValue:\fP
+.PP
+.nf
+(__extension__({                                    \
+        unsigned char __t;                              \
+        __asm__ (                                       \
+                'mov __tmp_reg__,%0' '\n\t'             \
+                'swap %0' '\n\t'                        \
+                'eor %0,__tmp_reg__' '\n\t'             \
+                'mov __tmp_reg__,%0' '\n\t'             \
+                'lsr %0' '\n\t'                         \
+                'lsr %0' '\n\t'                         \
+                'eor %0,__tmp_reg__'                    \
+                : '=r' (__t)                            \
+                : '0' ((unsigned char)(val))            \
+                : 'r0'                                  \
+        );                                              \
+        (((__t + 1) >> 1) & 1);                         \
+ }))
+.fi
+\fBReturns:\fP
+.RS 4
+1 if \fCval\fP has an odd number of bits set. 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for avr-libc from the source code.

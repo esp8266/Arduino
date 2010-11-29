@@ -1,0 +1,217 @@
+.TH "stdio.h" 3 "6 Nov 2008" "Version 1.6.4" "avr-libc" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+stdio.h \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fB_STDIO_H_\fP   1"
+.br
+.ti -1c
+.RI "#define \fB__need_NULL\fP"
+.br
+.ti -1c
+.RI "#define \fB__need_size_t\fP"
+.br
+.ti -1c
+.RI "#define \fBFILE\fP   struct __file"
+.br
+.ti -1c
+.RI "#define \fBstdin\fP   (__iob[0])"
+.br
+.ti -1c
+.RI "#define \fBstdout\fP   (__iob[1])"
+.br
+.ti -1c
+.RI "#define \fBstderr\fP   (__iob[2])"
+.br
+.ti -1c
+.RI "#define \fBEOF\fP   (-1)"
+.br
+.ti -1c
+.RI "#define \fBfdev_set_udata\fP(stream, u)   do { (stream)->udata = u; } while(0)"
+.br
+.ti -1c
+.RI "#define \fBfdev_get_udata\fP(stream)   ((stream)->udata)"
+.br
+.ti -1c
+.RI "#define \fBfdev_setup_stream\fP(stream, put, get, rwflag)"
+.br
+.ti -1c
+.RI "#define \fB_FDEV_SETUP_READ\fP   __SRD"
+.br
+.ti -1c
+.RI "#define \fB_FDEV_SETUP_WRITE\fP   __SWR"
+.br
+.ti -1c
+.RI "#define \fB_FDEV_SETUP_RW\fP   (__SRD|__SWR)"
+.br
+.ti -1c
+.RI "#define \fB_FDEV_ERR\fP   (-1)"
+.br
+.ti -1c
+.RI "#define \fB_FDEV_EOF\fP   (-2)"
+.br
+.ti -1c
+.RI "#define \fBFDEV_SETUP_STREAM\fP(put, get, rwflag)"
+.br
+.ti -1c
+.RI "#define \fBfdev_close\fP()"
+.br
+.ti -1c
+.RI "#define \fBputc\fP(__c, __stream)   fputc(__c, __stream)"
+.br
+.ti -1c
+.RI "#define \fBputchar\fP(__c)   fputc(__c, stdout)"
+.br
+.ti -1c
+.RI "#define \fBgetc\fP(__stream)   fgetc(__stream)"
+.br
+.ti -1c
+.RI "#define \fBgetchar\fP()   fgetc(stdin)"
+.br
+.ti -1c
+.RI "#define \fBSEEK_SET\fP   0"
+.br
+.ti -1c
+.RI "#define \fBSEEK_CUR\fP   1"
+.br
+.ti -1c
+.RI "#define \fBSEEK_END\fP   2"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "int \fBfclose\fP (FILE *__stream)"
+.br
+.ti -1c
+.RI "int \fBvfprintf\fP (FILE *__stream, const char *__fmt, va_list __ap)"
+.br
+.ti -1c
+.RI "int \fBvfprintf_P\fP (FILE *__stream, const char *__fmt, va_list __ap)"
+.br
+.ti -1c
+.RI "int \fBfputc\fP (int __c, FILE *__stream)"
+.br
+.ti -1c
+.RI "int \fBprintf\fP (const char *__fmt,...)"
+.br
+.ti -1c
+.RI "int \fBprintf_P\fP (const char *__fmt,...)"
+.br
+.ti -1c
+.RI "int \fBvprintf\fP (const char *__fmt, va_list __ap)"
+.br
+.ti -1c
+.RI "int \fBsprintf\fP (char *__s, const char *__fmt,...)"
+.br
+.ti -1c
+.RI "int \fBsprintf_P\fP (char *__s, const char *__fmt,...)"
+.br
+.ti -1c
+.RI "int \fBsnprintf\fP (char *__s, size_t __n, const char *__fmt,...)"
+.br
+.ti -1c
+.RI "int \fBsnprintf_P\fP (char *__s, size_t __n, const char *__fmt,...)"
+.br
+.ti -1c
+.RI "int \fBvsprintf\fP (char *__s, const char *__fmt, va_list ap)"
+.br
+.ti -1c
+.RI "int \fBvsprintf_P\fP (char *__s, const char *__fmt, va_list ap)"
+.br
+.ti -1c
+.RI "int \fBvsnprintf\fP (char *__s, size_t __n, const char *__fmt, va_list ap)"
+.br
+.ti -1c
+.RI "int \fBvsnprintf_P\fP (char *__s, size_t __n, const char *__fmt, va_list ap)"
+.br
+.ti -1c
+.RI "int \fBfprintf\fP (FILE *__stream, const char *__fmt,...)"
+.br
+.ti -1c
+.RI "int \fBfprintf_P\fP (FILE *__stream, const char *__fmt,...)"
+.br
+.ti -1c
+.RI "int \fBfputs\fP (const char *__str, FILE *__stream)"
+.br
+.ti -1c
+.RI "int \fBfputs_P\fP (const char *__str, FILE *__stream)"
+.br
+.ti -1c
+.RI "int \fBputs\fP (const char *__str)"
+.br
+.ti -1c
+.RI "int \fBputs_P\fP (const char *__str)"
+.br
+.ti -1c
+.RI "size_t \fBfwrite\fP (const void *__ptr, size_t __size, size_t __nmemb, FILE *__stream)"
+.br
+.ti -1c
+.RI "int \fBfgetc\fP (FILE *__stream)"
+.br
+.ti -1c
+.RI "int \fBungetc\fP (int __c, FILE *__stream)"
+.br
+.ti -1c
+.RI "char * \fBfgets\fP (char *__str, int __size, FILE *__stream)"
+.br
+.ti -1c
+.RI "char * \fBgets\fP (char *__str)"
+.br
+.ti -1c
+.RI "size_t \fBfread\fP (void *__ptr, size_t __size, size_t __nmemb, FILE *__stream)"
+.br
+.ti -1c
+.RI "void \fBclearerr\fP (FILE *__stream)"
+.br
+.ti -1c
+.RI "int \fBfeof\fP (FILE *__stream)"
+.br
+.ti -1c
+.RI "int \fBferror\fP (FILE *__stream)"
+.br
+.ti -1c
+.RI "int \fBvfscanf\fP (FILE *__stream, const char *__fmt, va_list __ap)"
+.br
+.ti -1c
+.RI "int \fBvfscanf_P\fP (FILE *__stream, const char *__fmt, va_list __ap)"
+.br
+.ti -1c
+.RI "int \fBfscanf\fP (FILE *__stream, const char *__fmt,...)"
+.br
+.ti -1c
+.RI "int \fBfscanf_P\fP (FILE *__stream, const char *__fmt,...)"
+.br
+.ti -1c
+.RI "int \fBscanf\fP (const char *__fmt,...)"
+.br
+.ti -1c
+.RI "int \fBscanf_P\fP (const char *__fmt,...)"
+.br
+.ti -1c
+.RI "int \fBvscanf\fP (const char *__fmt, va_list __ap)"
+.br
+.ti -1c
+.RI "int \fBsscanf\fP (const char *__buf, const char *__fmt,...)"
+.br
+.ti -1c
+.RI "int \fBsscanf_P\fP (const char *__buf, const char *__fmt,...)"
+.br
+.ti -1c
+.RI "int \fBfflush\fP (FILE *stream)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for avr-libc from the source code.

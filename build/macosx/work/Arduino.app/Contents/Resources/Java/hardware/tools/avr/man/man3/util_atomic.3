@@ -1,0 +1,146 @@
+.TH "<util/atomic.h> Atomically and Non-Atomically Executed Code Blocks" 3 "6 Nov 2008" "Version 1.6.4" "avr-libc" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+<util/atomic.h> Atomically and Non-Atomically Executed Code Blocks \- 
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBATOMIC_BLOCK\fP(type)"
+.br
+.ti -1c
+.RI "#define \fBNONATOMIC_BLOCK\fP(type)"
+.br
+.ti -1c
+.RI "#define \fBATOMIC_RESTORESTATE\fP"
+.br
+.ti -1c
+.RI "#define \fBATOMIC_FORCEON\fP"
+.br
+.ti -1c
+.RI "#define \fBNONATOMIC_RESTORESTATE\fP"
+.br
+.ti -1c
+.RI "#define \fBNONATOMIC_FORCEOFF\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+.PP
+.nf
+    #include <util/atomic.h>
+.fi
+.PP
+.PP
+\fBNote:\fP
+.RS 4
+The macros in this header file require the ISO/IEC 9899:1999 ('ISO C99') feature of for loop variables that are declared inside the for loop itself. For that reason, this header file can only be used if the standard level of the compiler (option --std=) is set to either \fCc99\fP or \fCgnu99\fP.
+.RE
+.PP
+The macros in this header file deal with code blocks that are guaranteed to be excuted Atomically or Non-Atmomically. The term 'Atomic' in this context refers to the unability of the respective code to be interrupted.
+.PP
+These macros operate via automatic manipulation of the Global Interrupt Status (I) bit of the SREG register. Exit paths from both block types are all managed automatically without the need for special considerations, i. e. the interrupt status will be restored to the same value it has been when entering the respective block.
+.PP
+A typical example that requires atomic access is a 16 (or more) bit variable that is shared between the main execution path and an ISR. While declaring such a variable as volatile ensures that the compiler will not optimize accesses to it away, it does not guarantee atomic access to it. Assuming the following example:
+.PP
+.PP
+.nf
+#include <inttypes.h>
+#include <avr/interrupt.h>
+#include <avr/io.h>
+
+volatile uint16_t ctr;
+
+ISR(TIMER1_OVF_vect)
+{
+  ctr--;
+}
+
+...
+int
+main(void)
+{
+   ...
+   ctr = 0x200;
+   start_timer();
+   while (ctr != 0)
+     // wait
+       ;
+   ...
+}
+.fi
+.PP
+.PP
+There is a chance where the main context will exit its wait loop when the variable \fCctr\fP just reached the value 0xFF. This happens because the compiler cannot natively access a 16-bit variable atomically in an 8-bit CPU. So the variable is for example at 0x100, the compiler then tests the low byte for 0, which succeeds. It then proceeds to test the high byte, but that moment the ISR triggers, and the main context is interrupted. The ISR will decrement the variable from 0x100 to 0xFF, and the main context proceeds. It now tests the high byte of the variable which is (now) also 0, so it concludes the variable has reached 0, and terminates the loop.
+.PP
+Using the macros from this header file, the above code can be rewritten like:
+.PP
+.PP
+.nf
+#include <inttypes.h>
+#include <avr/interrupt.h>
+#include <avr/io.h>
+#include <util/atomic.h>
+
+volatile uint16_t ctr;
+
+ISR(TIMER1_OVF_vect)
+{
+  ctr--;
+}
+
+...
+int
+main(void)
+{
+   ...
+   ctr = 0x200;
+   start_timer();
+   sei();
+   uint16_t ctr_copy;
+   do
+   {
+     ATOMIC_BLOCK(ATOMIC_FORCEON)
+     {
+       ctr_copy = ctr;
+     }
+   }
+   while (ctr_copy != 0);
+   ...
+}
+.fi
+.PP
+.PP
+This will install the appropriate interrupt protection before accessing variable \fCctr\fP, so it is guaranteed to be consistently tested. If the global interrupt state were uncertain before entering the ATOMIC_BLOCK, it should be executed with the parameter ATOMIC_RESTORESTATE rather than ATOMIC_FORCEON. 
+.SH "Define Documentation"
+.PP 
+.SS "#define ATOMIC_BLOCK(type)"
+.PP
+Creates a block of code that is guaranteed to be executed atomically. Upon entering the block the Global Interrupt Status flag in SREG is disabled, and re-enabled upon exiting the block from any exit path.
+.PP
+Two possible macro parameters are permitted, ATOMIC_RESTORESTATE and ATOMIC_FORCEON. 
+.SS "#define ATOMIC_FORCEON"
+.PP
+This is a possible parameter for ATOMIC_BLOCK. When used, it will cause the ATOMIC_BLOCK to force the state of the SREG register on exit, enabling the Global Interrupt Status flag bit. This saves on flash space as the previous value of the SREG register does not need to be saved at the start of the block.
+.PP
+Care should be taken that ATOMIC_FORCEON is only used when it is known that interrupts are enabled before the block's execution or when the side effects of enabling global interrupts at the block's completion are known and understood. 
+.SS "#define ATOMIC_RESTORESTATE"
+.PP
+This is a possible parameter for ATOMIC_BLOCK. When used, it will cause the ATOMIC_BLOCK to restore the previous state of the SREG register, saved before the Global Interrupt Status flag bit was disabled. The net effect of this is to make the ATOMIC_BLOCK's contents guaranteed atomic, without changing the state of the Global Interrupt Status flag when execution of the block completes. 
+.SS "#define NONATOMIC_BLOCK(type)"
+.PP
+Creates a block of code that is executed non-atomically. Upon entering the block the Global Interrupt Status flag in SREG is enabled, and disabled upon exiting the block from any exit path. This is useful when nested inside ATOMIC_BLOCK sections, allowing for non-atomic execution of small blocks of code while maintaining the atomic access of the other sections of the parent ATOMIC_BLOCK.
+.PP
+Two possible macro parameters are permitted, NONATOMIC_RESTORESTATE and NONATOMIC_FORCEOFF. 
+.SS "#define NONATOMIC_FORCEOFF"
+.PP
+This is a possible parameter for NONATOMIC_BLOCK. When used, it will cause the NONATOMIC_BLOCK to force the state of the SREG register on exit, disabling the Global Interrupt Status flag bit. This saves on flash space as the previous value of the SREG register does not need to be saved at the start of the block.
+.PP
+Care should be taken that NONATOMIC_FORCEOFF is only used when it is known that interrupts are disabled before the block's execution or when the side effects of disabling global interrupts at the block's completion are known and understood. 
+.SS "#define NONATOMIC_RESTORESTATE"
+.PP
+This is a possible parameter for NONATOMIC_BLOCK. When used, it will cause the NONATOMIC_BLOCK to restore the previous state of the SREG register, saved before the Global Interrupt Status flag bit was enabled. The net effect of this is to make the NONATOMIC_BLOCK's contents guaranteed non-atomic, without changing the state of the Global Interrupt Status flag when execution of the block completes. 
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for avr-libc from the source code.

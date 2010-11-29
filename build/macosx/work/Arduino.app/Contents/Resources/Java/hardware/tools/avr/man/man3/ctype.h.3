@@ -1,0 +1,89 @@
+.TH "ctype.h" 3 "6 Nov 2008" "Version 1.6.4" "avr-libc" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+ctype.h \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fB__CTYPE_H_\fP   1"
+.br
+.in -1c
+.SS "Functions"
+
+.PP
+.RI "\fBCharacter classification routines\fP"
+.br
+These functions perform character classification. They return true or false status depending whether the character passed to the function falls into the function's classification (i.e. \fBisdigit()\fP returns true if its argument is any value '0' though '9', inclusive). If the input is not an unsigned char value, all of this function return false. 
+.PP
+.in +1c
+.in +1c
+.ti -1c
+.RI "int \fBisalnum\fP (int __c)"
+.br
+.ti -1c
+.RI "int \fBisalpha\fP (int __c)"
+.br
+.ti -1c
+.RI "int \fBisascii\fP (int __c)"
+.br
+.ti -1c
+.RI "int \fBisblank\fP (int __c)"
+.br
+.ti -1c
+.RI "int \fBiscntrl\fP (int __c)"
+.br
+.ti -1c
+.RI "int \fBisdigit\fP (int __c)"
+.br
+.ti -1c
+.RI "int \fBisgraph\fP (int __c)"
+.br
+.ti -1c
+.RI "int \fBislower\fP (int __c)"
+.br
+.ti -1c
+.RI "int \fBisprint\fP (int __c)"
+.br
+.ti -1c
+.RI "int \fBispunct\fP (int __c)"
+.br
+.ti -1c
+.RI "int \fBisspace\fP (int __c)"
+.br
+.ti -1c
+.RI "int \fBisupper\fP (int __c)"
+.br
+.ti -1c
+.RI "int \fBisxdigit\fP (int __c)"
+.br
+.in -1c
+.in -1c
+.PP
+.RI "\fBCharacter convertion routines\fP"
+.br
+This realization permits all possible values of integer argument. The \fBtoascii()\fP function clears all highest bits. The \fBtolower()\fP and \fBtoupper()\fP functions return an input argument as is, if it is not an unsigned char value. 
+.PP
+.in +1c
+.in +1c
+.ti -1c
+.RI "int \fBtoascii\fP (int __c)"
+.br
+.ti -1c
+.RI "int \fBtolower\fP (int __c)"
+.br
+.ti -1c
+.RI "int \fBtoupper\fP (int __c)"
+.br
+.in -1c
+.in -1c
+.SH "Detailed Description"
+.PP 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for avr-libc from the source code.

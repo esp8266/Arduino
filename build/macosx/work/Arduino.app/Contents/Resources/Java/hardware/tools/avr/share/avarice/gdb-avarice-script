@@ -1,0 +1,25 @@
+set remoteaddresssize 32
+set remote Z-packet enable
+set remote hardware-breakpoint-limit 3
+set remote hardware-watchpoint-limit 2
+
+define target-ice
+  target extended-remote localhost:6423
+end
+
+define ice-load
+  shell start-avarice $arg0
+  file $arg0
+  target-ice
+end
+
+define ice-restart
+  shell start-avarice
+  target-ice
+end
+
+define hook-quit
+  shell kill-avarice
+end
+
+target-ice

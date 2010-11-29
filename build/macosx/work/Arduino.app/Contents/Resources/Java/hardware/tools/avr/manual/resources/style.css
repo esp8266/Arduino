@@ -1,0 +1,107 @@
+/* elements */
+
+A:link		{ text-decoration: none; color: #049; }
+A:visited	{ text-decoration: none; color: #049; }
+A:active	{ text-decoration: none; color: #025; }
+A:hover		{ text-decoration: underline; }
+
+BODY {
+	color: #222;
+	text-align: left;
+	font-family: Lucida Grande,Verdana,Arial,Helvetica;
+	font-size: 12px;
+	margin: 20px;
+	padding: 0px 0px;
+}
+TD {
+	font-size: 12px;
+}
+
+H1 {
+	font-size: 24px;
+	color: #334;
+	margin: 32px 0px;
+	margin-bottom: 1em;
+	padding-bottom: 0.2em;
+	border-bottom: 2px solid #bbb;
+	line-height: 1.1em;
+}
+
+H2 {
+	font-size: 14px;
+	color: #555;
+	margin: 2em 0em 1em 0px;
+	padding: 2px 0px 3px 0px;
+	border-bottom: 1px solid #bbb;
+	line-height: normal;
+}
+H3 { font-size: 13px; margin-top: 1.8em; margin-bottom: 0.8em; color: #333; }
+H4 { font-size: 12px; margin-bottom: 3px; color: #333; }
+H5 { font-size: 11px; margin-bottom: 3px; }
+H6 { font-size: 10px; }
+
+HR.dotted {
+	border: none;
+	height: 1px;
+	background-image: url(images/hdots.gif);
+	margin: 10px 0px;
+	padding: 0px;
+}
+
+I {	font-family: Helvetica; margin-right: 0.3em; }
+INPUT { font-size: 12px; }
+PRE { font-family: Courier; font-size: 12px; }
+SELECT { font-size: 12px; }
+SMALL { font-size: 10px; line-height: 145%; }
+TT, KBD { font-family: Monaco, Courier, monospace; font-size: 90%; }
+UL { list-style-image: url(images/bullet.png); padding-left: 20px; margin-left: 0px; }
+UL UL { list-style: circle outside none; }
+OL { list-style-image: none; padding-left: 36px; margin-left: 0px; }
+
+/* classes */
+
+.index {
+	width: 150px;
+	padding: 8px 10px;
+	margin-top: 16px;
+	height: 100%;
+}
+
+.box {
+	background-color: #eee;
+	border: 1px solid #bbb;
+	border-left-width: 1px;
+	padding: 8px 10px;
+	margin-top: 0px;
+	margin-bottom: 18px;
+	font-family: Courier, Monaco;
+	font-size: 12px;
+	white-space: pre;
+	line-height: 130%;
+	width: 580px;
+}
+
+.box.shell {
+	background-color: #eee;
+	border-color: #bbb;
+}
+.box.code {
+	background-color: #ffee80;
+	border-color: #ddcc60;
+}
+.box.shell.header {
+	margin-top: 12px;
+	margin-bottom: 0px;
+	padding: 0px 10px;
+	border-bottom-width: 0px;
+	background-color: #bbb;
+	font-size: 10px;
+}
+.box.code.header {
+	margin-top: 12px;
+	margin-bottom: 0px;
+	padding: 0px 10px;
+	border-bottom-width: 0px;
+	background-color: #ddcc60;
+	font-size: 10px;
+}

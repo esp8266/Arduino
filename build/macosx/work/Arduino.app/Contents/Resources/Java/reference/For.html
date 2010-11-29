@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head>  <title>Arduino - For </title>  <link rel='stylesheet' href='arduino.css' type='text/css' />  <meta name="verify-v1" content="TtxFIEJAB6zdJ509wLxjnapQzKAMNm9u0Wj4ho6wxIY=" /></head><body><div id="page"><!--PageHeaderFmt--><div id="pageheader">  <div class="title"><a href="http://www.arduino.cc"/>Arduino</a></div>  <div class="search">    <!-- SiteSearch Google -->    <FORM method=GET action="http://www.google.com/search">    <input type=hidden name=ie value=UTF-8>    <input type=hidden name=oe value=UTF-8>    <INPUT TYPE=text name=q size=25 maxlength=255 value="">    <INPUT type=submit name=btnG VALUE="search">    <input type=hidden name=domains value="http://www.arduino.cc/">    <input type=hidden name=sitesearch value="http://www.arduino.cc/">    </FORM>    <!-- SiteSearch Google -->  </div></div><!--/PageHeaderFmt--><!--PageLeftFmt--><div id="pagenav" style="text-align: right">  <div style="float: left;">  <p><a class='wikilink' href='http://arduino.cc/en/Main/Buy'>Buy</a>
+|
+<a class='wikilink' href='http://arduino.cc/en/Main/Software'>Download</a>
+|
+<a class='wikilink' href='Guide_index.html'>Getting Started</a>
+|
+<a class='wikilink' href='http://arduino.cc/en/Tutorial/HomePage'>Learning</a>
+|
+<a class='wikilink' href='index.html'>Reference</a>
+|
+<a class='wikilink' href='http://arduino.cc/en/Main/Hardware'>Hardware</a>
+|
+<a class='wikilink' href='FAQ.html'>FAQ</a>
+</p>
+<p class='vspace'></p>
+  </div>  <a class="urllink" href="http://www.arduino.cc/blog/" rel="nofollow">Blog &raquo;</a> |  <a class="urllink" href="http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl" rel="nofollow">Forum &raquo;</a> |  <a class="urllink" href="http://www.arduino.cc/playground/" rel="nofollow">Playground &raquo;</a></div><!--/PageLeftFmt--><div id="pagetext"><!--PageText-->
+<div id='wikitext'>
+<p><strong>Reference</strong> &nbsp;  <a class='wikilink' href='index.html'>Language</a> | <a class='wikilink' href='Libraries.html'>Libraries</a> | <a class='wikilink' href='Comparison.html'>Comparison</a> | <a class='wikilink' href='Changes.html'>Changes</a>
+</p>
+<p class='vspace'></p><h2>for statements</h2>
+<h4>Desciption</h4>
+<p>The <strong>for</strong> statement is used to repeat a block of statements enclosed in curly braces. An increment counter is usually used to increment and terminate the loop. The <strong>for</strong> statement is useful for any repetitive operation, and is often used in combination with arrays to operate on collections of data/pins.
+</p>
+<p class='vspace'></p><p>There are three parts to the <strong>for</strong> loop header:
+</p>
+<p class='vspace'></p><p><code><strong>for</strong> (<strong>initialization</strong>;<strong> condition</strong>;<strong>  increment</strong>) {</code>
+</p>
+<p class='vspace'></p><p><code> //statement(s);</code>
+</p>
+<p class='vspace'></p><p><code>}</code>
+</p><div><img height='220px' src='http://arduino.cc/en/uploads/Reference/ForLoopIllustrated.png' alt='' title='' /></div>
+<p class='vspace'></p><p>The <strong>initialization</strong> happens first and exactly once.  Each time through the loop, the <strong>condition</strong> is tested; if it's true, the statement block, and the <strong>increment</strong> is executed, then the <strong>condition</strong> is tested again.  When the <strong>condition</strong> becomes false, the loop ends.
+</p>
+<p class='vspace'></p><h4>Example</h4>
+<pre>
+// Dim an LED using a PWM pin
+int PWMpin = 10; // LED in series with 470 ohm resistor on pin 10
+
+void setup()
+{
+  // no setup needed
+}
+
+void loop()
+{
+   for (int i=0; i &lt;= 255; i++){
+      analogWrite(PWMpin, i);
+      delay(10);
+   } 
+}
+
+</pre>
+<p class='vspace'></p><h4>Coding Tips</h4>
+<p>The C <strong>for</strong> loop is much more flexible than <strong>for</strong> loops found in some other computer languages, including BASIC. Any or all of the three header elements may be omitted, although the semicolons are required. Also the statements for initialization, condition, and increment can be any valid C statements with unrelated variables, and use any C datatypes including floats. These types of unusual <strong>for</strong> statements may provide solutions to some rare programming problems. 
+</p>
+<p class='vspace'></p><p>For example, using a multiplication in the increment line will generate a logarithmic progression:<br />
+</p><pre>for(int x = 2; x &lt; 100; x = x * 1.5){
+println(x);
+}
+</pre>
+<p class='vspace'></p><p>Generates: 2,3,4,6,9,13,19,28,42,63,94
+</p>
+<p class='vspace'></p><p>Another example, fade an LED up and down with one <strong>for</strong> loop:
+</p>
+<p class='vspace'></p><pre>void loop()
+{
+   int x = 1;
+   for (int i = 0; i &gt; -1; i = i + x){
+      analogWrite(PWMpin, i);
+      if (i = 255) x = -1;             // switch direction at peak
+      delay(10);
+   } 
+}
+</pre>
+<p class='vspace'></p><h4>See also</h4>
+<ul><li><a class='wikilink' href='While.html'>while</a>
+</li></ul><p class='vspace'></p><p><a class='wikilink' href='index.html'>Reference Home</a>
+</p>
+<p class='vspace'></p><p><em>Corrections, suggestions, and new documentation should be posted to the <a class='urllink' href='http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?board=swbugs' rel='nofollow'>Forum</a>.</em>
+</p>
+<p class='vspace'></p><p>The text of the Arduino reference is licensed under a
+<a class='urllink' href='http://creativecommons.org/licenses/by-sa/3.0/' rel='nofollow'>Creative Commons Attribution-ShareAlike 3.0 License</a>.  Code samples in the reference are released into the public domain.
+</p>
+</div>
+<!-- AddThis Button BEGIN --><script type="text/javascript">var addthis_language = "en";</script><div class="addthis_container addthis_toolbox addthis_default_style" addthis:url="For" addthis:title="Arduino Wiki English"><a href="http://www.addthis.com/bookmark.php?v=250&amp;username=arduinoteam" class="addthis_button_compact">Share</a><span class="addthis_separator">|</span><a class="addthis_button_email"></a><a class="addthis_button_favorites"></a><a class="addthis_button_print"></a><a class="addthis_button_facebook"></a><a class="addthis_button_twitter"></a><script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#username=arduinoteam"></script></div><!-- AddThis Button END --></div><!--PageFooterFmt--><div id="pagefooter">  <a href=.html'#'>Edit Page</a> | <a href='#'>Page History</a> | <a href='#' target='_blank'>Printable View</a> | <a href='http://arduino.cc/en/Site/AllRecentChanges'>All Recent Site Changes</a></div><!--/PageFooterFmt--></div></body></html>

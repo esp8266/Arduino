@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html401/loose.dtd">
+<html>
+<!-- Created on October, 30 2007 by texi2html 1.76 -->
+<!--
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Many creative people <dev@texi2html.cvshome.org>
+Send bugs and suggestions to <users@texi2html.cvshome.org>
+
+-->
+<head>
+<title>AVRDUDE: 1. Introduction</title>
+
+<meta name="description" content="AVRDUDE: 1. Introduction">
+<meta name="keywords" content="AVRDUDE: 1. Introduction">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="texi2html 1.76">
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+pre.display {font-family: serif}
+pre.format {font-family: serif}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+pre.smalldisplay {font-family: serif; font-size: smaller}
+pre.smallexample {font-size: smaller}
+pre.smallformat {font-family: serif; font-size: smaller}
+pre.smalllisp {font-size: smaller}
+span.sansserif {font-family:sans-serif; font-weight:normal;}
+ul.toc {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
+
+<a name="Introduction"></a>
+<a name="SEC1"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="avrdude.html#Top" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="avrdude_2.html#SEC2" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[ &lt;&lt; ]</td>
+<td valign="middle" align="left">[<a href="avrdude.html#Top" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="avrdude_3.html#SEC3" title="Next chapter"> &gt;&gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="avrdude.html#Top" title="Cover (top) of document">Top</a>]</td>
+<td valign="middle" align="left">[<a href="avrdude_toc.html#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[Index]</td>
+<td valign="middle" align="left">[<a href="avrdude_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h1 class="chapter"> 1. Introduction </h1>
+
+<p>AVRDUDE - AVR Downloader Uploader - is a program for downloading and
+uploading the on-chip memories of Atmel's AVR microcontrollers. It can
+program the Flash and EEPROM, and where supported by the serial
+programming protocol, it can program fuse and lock bits. AVRDUDE also
+supplies a direct instruction mode allowing one to issue any programming
+instruction to the AVR chip regardless of whether AVRDUDE implements
+that specific feature of a particular chip.
+</p>
+<p>AVRDUDE can be used effectively via the command line to read or write
+all chip memory types (eeprom, flash, fuse bits, lock bits, signature
+bytes) or via an interactive (terminal) mode. Using AVRDUDE from the
+command line works well for programming the entire memory of the chip
+from the contents of a file, while interactive mode is useful for
+exploring memory contents, modifing individual bytes of eeprom,
+programming fuse/lock bits, etc.
+</p>
+<p>AVRDUDE supports the following basic programmer types: Atmel's STK500,
+Atmel's AVRISP and AVRISP mkII devices,
+Atmel's JTAG ICE (both mkI and mkII, the latter also in ISP mode), appnote
+avr910, appnote avr109 (including the AVR Butterfly),
+serial bit-bang adapters,
+and the PPI (parallel port interface). PPI represents a class
+of simple programmers where the programming lines are directly
+connected to the PC parallel port. Several pin configurations exist
+for several variations of the PPI programmers, and AVRDUDE can be be
+configured to work with them by either specifying the appropriate
+programmer on the command line or by creating a new entry in its
+configuration file. All that's usually required for a new entry is to
+tell AVRDUDE which pins to use for each programming function.
+</p>
+<p>A number of equally simple bit-bang programming adapters that connect
+to a serial port are supported as well, among them the popular
+Ponyprog serial adapter, and the DASA and DASA3 adapters that used to
+be supported by uisp(1).  Note that these adapters are meant to be
+attached to a physical serial port.  Connecting to a serial port
+emulated on top of USB is likely to not work at all, or to work
+abysmally slow.
+</p>
+<p>The STK500, JTAG ICE, avr910, and avr109/butterfly use the serial port to communicate with the PC.
+The STK500, JTAG ICE, and avr910 contain on-board logic to control the programming of the target
+device.
+The avr109 bootloader implements a protocol similar to avr910, but is
+actually implemented in the boot area of the target's flash ROM, as
+opposed to being an external device.
+The fundamental difference between the two types lies in the
+protocol used to control the programmer. The avr910 protocol is very
+simplistic and can easily be used as the basis for a simple, home made
+programer since the firmware is available online. On the other hand,
+the STK500 protocol is more robust and complicated and the firmware is
+not openly available.
+The JTAG ICE also uses a serial communication protocol which is similar
+to the STK500 firmware version 2 one.  However, as the JTAG ICE is
+intented to allow on-chip debugging as well as memory programming, the
+protocol is more sophisticated.
+(The JTAG ICE mkII protocol can also be run on top of USB.)
+Only the memory programming functionality of the JTAG ICE is supported
+by AVRDUDE.
+For the JTAG ICE mkII, JTAG, debugWire and ISP mode are supported.
+See below for the limitations of debugWire.
+</p>
+<p>The AVR Dragon is supported in all modes (ISP, JTAG, HVSP, PP, debugWire).
+(High-voltage programming is not yet supported.)
+When used in JTAG and debugWire mode, the AVR Dragon behaves similar to a
+JTAG ICE mkII, so all device-specific comments for that device
+will apply as well.
+When used in ISP mode, the AVR Dragon behaves similar to an
+AVRISP mkII (or JTAG ICE mkII in ISP mode), so all device-specific
+comments will apply there.
+In particular, the Dragon starts out with a rather fast ISP clock
+frequency, so the <code>-B <var>bitclock</var></code>
+option might be required to achieve a stable ISP communication.
+</p>
+<p>The USBasp ISP and USBtinyISP adapters are also supported, provided AVRDUDE
+has been compiled with libusb support.
+They both feature simple firwmare-only USB implementations, running on
+an ATmega8 (or ATmega88), or ATtiny2313, respectively.
+</p>
+
+<table class="menu" border="0" cellspacing="0">
+<tr><td align="left" valign="top"><a href="avrdude_2.html#SEC2">1.1 History and Credits</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">                     
+</td></tr>
+</table>
+
+<hr size="6">
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="avrdude.html#Top" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="avrdude_2.html#SEC2" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[ &lt;&lt; ]</td>
+<td valign="middle" align="left">[<a href="avrdude.html#Top" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="avrdude_3.html#SEC3" title="Next chapter"> &gt;&gt; </a>]</td>
+</tr></table>
+<p>
+ <font size="-1">
+  This document was generated by <em>Joerg Wunsch</em> on <em>October, 30 2007</em> using <a href="http://texi2html.cvshome.org/"><em>texi2html 1.76</em></a>.
+ </font>
+ <br>
+
+</p>
+</body>
+</html>

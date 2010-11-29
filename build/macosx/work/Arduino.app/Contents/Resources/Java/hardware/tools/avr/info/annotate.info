@@ -1,0 +1,1108 @@
+This is annotate.info, produced by makeinfo version 4.8 from
+../.././gdb/doc/annotate.texinfo.
+
+INFO-DIR-SECTION Software development
+START-INFO-DIR-ENTRY
+* Annotate: (annotate).                 The obsolete annotation interface.
+END-INFO-DIR-ENTRY
+
+   This file documents GDB's obsolete annotations.
+
+   Copyright (C) 1994, 1995, 2000, 2001, 2003 Free Software Foundation,
+Inc.
+
+   Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.1 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
+Texts.  A copy of the license is included in the section entitled "GNU
+Free Documentation License".
+
+
+File: annotate.info,  Node: Top,  Next: Annotations Overview,  Up: (dir)
+
+GDB Annotations
+***************
+
+This document describes the obsolete level two annotation interface
+implemented in older GDB versions.
+
+* Menu:
+
+* Annotations Overview::  What annotations are; the general syntax.
+* Limitations::           Limitations of the annotation interface.
+* Migrating to GDB/MI::   Migrating to GDB/MI
+* Server Prefix::       Issuing a command without affecting user state.
+* Value Annotations::   Values are marked as such.
+* Frame Annotations::   Stack frames are annotated.
+* Displays::            GDB can be told to display something periodically.
+* Prompting::           Annotations marking GDB's need for input.
+* Errors::              Annotations for error messages.
+* Breakpoint Info::     Information on breakpoints.
+* Invalidation::        Some annotations describe things now invalid.
+* Annotations for Running::
+                        Whether the program is running, how it stopped, etc.
+* Source Annotations::  Annotations describing source code.
+
+* GNU Free Documentation License::
+
+
+File: annotate.info,  Node: Annotations Overview,  Next: Limitations,  Prev: Top,  Up: Top
+
+1 What is an Annotation?
+************************
+
+To produce obsolete level two annotations, start GDB with the
+`--annotate=2' option.
+
+   Annotations start with a newline character, two `control-z'
+characters, and the name of the annotation.  If there is no additional
+information associated with this annotation, the name of the annotation
+is followed immediately by a newline.  If there is additional
+information, the name of the annotation is followed by a space, the
+additional information, and a newline.  The additional information
+cannot contain newline characters.
+
+   Any output not beginning with a newline and two `control-z'
+characters denotes literal output from GDB.  Currently there is no need
+for GDB to output a newline followed by two `control-z' characters, but
+if there was such a need, the annotations could be extended with an
+`escape' annotation which means those three characters as output.
+
+   A simple example of starting up GDB with annotations is:
+
+     $ gdb --annotate=2
+     GNU GDB 5.0
+     Copyright 2000 Free Software Foundation, Inc.
+     GDB is free software, covered by the GNU General Public License,
+     and you are welcome to change it and/or distribute copies of it
+     under certain conditions.
+     Type "show copying" to see the conditions.
+     There is absolutely no warranty for GDB.  Type "show warranty"
+     for details.
+     This GDB was configured as "sparc-sun-sunos4.1.3"
+
+     ^Z^Zpre-prompt
+     (gdb)
+     ^Z^Zprompt
+     quit
+
+     ^Z^Zpost-prompt
+     $
+
+   Here `quit' is input to GDB; the rest is output from GDB.  The three
+lines beginning `^Z^Z' (where `^Z' denotes a `control-z' character) are
+annotations; the rest is output from GDB.
+
+
+File: annotate.info,  Node: Limitations,  Next: Migrating to GDB/MI,  Prev: Annotations Overview,  Up: Top
+
+2 Limitations of the Annotation Interface
+*****************************************
+
+The level two annotations mechanism is known to have a number of
+technical and architectural limitations.  As a consequence, in 2001,
+with the release of GDB 5.1 and the addition of GDB/MI, the annotation
+interface was marked as deprecated.
+
+   This chapter discusses the known problems.
+
+2.1 Dependant on CLI output
+===========================
+
+The annotation interface works by interspersing markups with GDB normal
+command-line interpreter output.  Unfortunately, this makes the
+annotation client dependant on not just the annotations, but also the
+CLI output.  This is because the client is forced to assume that
+specific GDB commands provide specific information.  Any change to
+GDB's CLI output modifies or removes that information and,
+consequently, likely breaks the client.
+
+   Since the GDB/MI output is independent of the CLI, it does not have
+this problem.
+
+2.2 Scalability
+===============
+
+The annotation interface relies on value annotations (*note Value
+Annotations::) and the display mechanism as a way of obtaining
+up-to-date value information.  These mechanisms are not scalable.
+
+   In a graphical environment, where many values can be displayed
+simultaneously, a serious performance problem occurs when the client
+tries to first extract from GDB, and then re-display, all those values.
+The client should instead only request and update the values that
+changed.
+
+   The GDB/MI Variable Objects provide just that mechanism.
+
+2.3 Correctness
+===============
+
+The annotation interface assumes that a variable's value can only be
+changed when the target is running.  This assumption is not correct.  A
+single assignment to a single variable can result in the entire target,
+and all displayed values, needing an update.
+
+   The GDB/MI Variable Objects include a mechanism for efficiently
+reporting such changes.
+
+2.4 Reliability
+===============
+
+The GDB/MI interface includes a dedicated test directory
+(`gdb/gdb.mi'), and any addition or fix to GDB/MI must include
+testsuite changes.
+
+2.5 Maintainability
+===================
+
+The annotation mechanism was implemented by interspersing CLI print
+statements with various annotations.  As a consequence, any CLI output
+change can alter the annotation output.
+
+   Since the GDB/MI output is independent of the CLI, and the GDB/MI is
+increasingly implemented independent of the CLI code, its long term
+maintenance is much easier.
+
+
+File: annotate.info,  Node: Migrating to GDB/MI,  Next: Server Prefix,  Prev: Limitations,  Up: Top
+
+3 Migrating to GDB/MI
+*********************
+
+By using the `interp mi' command, it is possible for annotation clients
+to invoke GDB/MI commands, and hence access the GDB/MI.  By doing this,
+existing annotation clients have a migration path from this obsolete
+interface to GDB/MI.
+
+
+File: annotate.info,  Node: Server Prefix,  Next: Value Annotations,  Prev: Migrating to GDB/MI,  Up: Top
+
+4 The Server Prefix
+*******************
+
+To issue a command to GDB without affecting certain aspects of the
+state which is seen by users, prefix it with `server '.  This means
+that this command will not affect the command history, nor will it
+affect GDB's notion of which command to repeat if <RET> is pressed on a
+line by itself.
+
+   The server prefix does not affect the recording of values into the
+value history; to print a value without recording it into the value
+history, use the `output' command instead of the `print' command.
+
+
+File: annotate.info,  Node: Value Annotations,  Next: Frame Annotations,  Prev: Server Prefix,  Up: Top
+
+5 Values
+********
+
+_Value Annotations have been removed.  GDB/MI instead provides Variable
+Objects._
+
+   When a value is printed in various contexts, GDB uses annotations to
+delimit the value from the surrounding text.
+
+   If a value is printed using `print' and added to the value history,
+the annotation looks like
+
+     ^Z^Zvalue-history-begin HISTORY-NUMBER VALUE-FLAGS
+     HISTORY-STRING
+     ^Z^Zvalue-history-value
+     THE-VALUE
+     ^Z^Zvalue-history-end
+
+where HISTORY-NUMBER is the number it is getting in the value history,
+HISTORY-STRING is a string, such as `$5 = ', which introduces the value
+to the user, THE-VALUE is the output corresponding to the value itself,
+and VALUE-FLAGS is `*' for a value which can be dereferenced and `-'
+for a value which cannot.
+
+   If the value is not added to the value history (it is an invalid
+float or it is printed with the `output' command), the annotation is
+similar:
+
+     ^Z^Zvalue-begin VALUE-FLAGS
+     THE-VALUE
+     ^Z^Zvalue-end
+
+   When GDB prints an argument to a function (for example, in the output
+from the `backtrace' command), it annotates it as follows:
+
+     ^Z^Zarg-begin
+     ARGUMENT-NAME
+     ^Z^Zarg-name-end
+     SEPARATOR-STRING
+     ^Z^Zarg-value VALUE-FLAGS
+     THE-VALUE
+     ^Z^Zarg-end
+
+where ARGUMENT-NAME is the name of the argument, SEPARATOR-STRING is
+text which separates the name from the value for the user's benefit
+(such as `='), and VALUE-FLAGS and THE-VALUE have the same meanings as
+in a `value-history-begin' annotation.
+
+   When printing a structure, GDB annotates it as follows:
+
+     ^Z^Zfield-begin VALUE-FLAGS
+     FIELD-NAME
+     ^Z^Zfield-name-end
+     SEPARATOR-STRING
+     ^Z^Zfield-value
+     THE-VALUE
+     ^Z^Zfield-end
+
+where FIELD-NAME is the name of the field, SEPARATOR-STRING is text
+which separates the name from the value for the user's benefit (such as
+`='), and VALUE-FLAGS and THE-VALUE have the same meanings as in a
+`value-history-begin' annotation.
+
+   When printing an array, GDB annotates it as follows:
+
+     ^Z^Zarray-section-begin ARRAY-INDEX VALUE-FLAGS
+
+where ARRAY-INDEX is the index of the first element being annotated and
+VALUE-FLAGS has the same meaning as in a `value-history-begin'
+annotation.  This is followed by any number of elements, where is
+element can be either a single element:
+
+     `,' WHITESPACE         ; omitted for the first element
+     THE-VALUE
+     ^Z^Zelt
+
+   or a repeated element
+
+     `,' WHITESPACE         ; omitted for the first element
+     THE-VALUE
+     ^Z^Zelt-rep NUMBER-OF-REPETITIONS
+     REPETITION-STRING
+     ^Z^Zelt-rep-end
+
+   In both cases, THE-VALUE is the output for the value of the element
+and WHITESPACE can contain spaces, tabs, and newlines.  In the repeated
+case, NUMBER-OF-REPETITIONS is the number of consecutive array elements
+which contain that value, and REPETITION-STRING is a string which is
+designed to convey to the user that repetition is being depicted.
+
+   Once all the array elements have been output, the array annotation is
+ended with
+
+     ^Z^Zarray-section-end
+
+
+File: annotate.info,  Node: Frame Annotations,  Next: Displays,  Prev: Value Annotations,  Up: Top
+
+6 Frames
+********
+
+_Value Annotations have been removed.  GDB/MI instead provides a number
+of frame commands._
+
+   _Frame annotations are no longer available.  The GDB/MI provides
+`-stack-list-arguments', `-stack-list-locals', and `-stack-list-frames'
+commands._
+
+   Whenever GDB prints a frame, it annotates it.  For example, this
+applies to frames printed when GDB stops, output from commands such as
+`backtrace' or `up', etc.
+
+   The frame annotation begins with
+
+     ^Z^Zframe-begin LEVEL ADDRESS
+     LEVEL-STRING
+
+where LEVEL is the number of the frame (0 is the innermost frame, and
+other frames have positive numbers), ADDRESS is the address of the code
+executing in that frame, and LEVEL-STRING is a string designed to
+convey the level to the user.  ADDRESS is in the form `0x' followed by
+one or more lowercase hex digits (note that this does not depend on the
+language).  The frame ends with
+
+     ^Z^Zframe-end
+
+   Between these annotations is the main body of the frame, which can
+consist of
+
+   *      ^Z^Zfunction-call
+          FUNCTION-CALL-STRING
+
+     where FUNCTION-CALL-STRING is text designed to convey to the user
+     that this frame is associated with a function call made by GDB to a
+     function in the program being debugged.
+
+   *      ^Z^Zsignal-handler-caller
+          SIGNAL-HANDLER-CALLER-STRING
+
+     where SIGNAL-HANDLER-CALLER-STRING is text designed to convey to
+     the user that this frame is associated with whatever mechanism is
+     used by this operating system to call a signal handler (it is the
+     frame which calls the signal handler, not the frame for the signal
+     handler itself).
+
+   * A normal frame.
+
+     This can optionally (depending on whether this is thought of as
+     interesting information for the user to see) begin with
+
+          ^Z^Zframe-address
+          ADDRESS
+          ^Z^Zframe-address-end
+          SEPARATOR-STRING
+
+     where ADDRESS is the address executing in the frame (the same
+     address as in the `frame-begin' annotation, but printed in a form
+     which is intended for user consumption--in particular, the syntax
+     varies depending on the language), and SEPARATOR-STRING is a string
+     intended to separate this address from what follows for the user's
+     benefit.
+
+     Then comes
+
+          ^Z^Zframe-function-name
+          FUNCTION-NAME
+          ^Z^Zframe-args
+          ARGUMENTS
+
+     where FUNCTION-NAME is the name of the function executing in the
+     frame, or `??' if not known, and ARGUMENTS are the arguments to
+     the frame, with parentheses around them (each argument is annotated
+     individually as well, *note Value Annotations::).
+
+     If source information is available, a reference to it is then
+     printed:
+
+          ^Z^Zframe-source-begin
+          SOURCE-INTRO-STRING
+          ^Z^Zframe-source-file
+          FILENAME
+          ^Z^Zframe-source-file-end
+          :
+          ^Z^Zframe-source-line
+          LINE-NUMBER
+          ^Z^Zframe-source-end
+
+     where SOURCE-INTRO-STRING separates for the user's benefit the
+     reference from the text which precedes it, FILENAME is the name of
+     the source file, and LINE-NUMBER is the line number within that
+     file (the first line is line 1).
+
+     If GDB prints some information about where the frame is from (which
+     library, which load segment, etc.; currently only done on the
+     RS/6000), it is annotated with
+
+          ^Z^Zframe-where
+          INFORMATION
+
+     Then, if source is to actually be displayed for this frame (for
+     example, this is not true for output from the `backtrace'
+     command), then a `source' annotation (*note Source Annotations::)
+     is displayed.  Unlike most annotations, this is output instead of
+     the normal text which would be output, not in addition.
+
+
+File: annotate.info,  Node: Displays,  Next: Prompting,  Prev: Frame Annotations,  Up: Top
+
+7 Displays
+**********
+
+_Display Annotations have been removed.  GDB/MI instead provides
+Variable Objects._
+
+   When GDB is told to display something using the `display' command,
+the results of the display are annotated:
+
+     ^Z^Zdisplay-begin
+     NUMBER
+     ^Z^Zdisplay-number-end
+     NUMBER-SEPARATOR
+     ^Z^Zdisplay-format
+     FORMAT
+     ^Z^Zdisplay-expression
+     EXPRESSION
+     ^Z^Zdisplay-expression-end
+     EXPRESSION-SEPARATOR
+     ^Z^Zdisplay-value
+     VALUE
+     ^Z^Zdisplay-end
+
+where NUMBER is the number of the display, NUMBER-SEPARATOR is intended
+to separate the number from what follows for the user, FORMAT includes
+information such as the size, format, or other information about how
+the value is being displayed, EXPRESSION is the expression being
+displayed, EXPRESSION-SEPARATOR is intended to separate the expression
+from the text that follows for the user, and VALUE is the actual value
+being displayed.
+
+
+File: annotate.info,  Node: Prompting,  Next: Errors,  Prev: Displays,  Up: Top
+
+8 Annotation for GDB Input
+**************************
+
+When GDB prompts for input, it annotates this fact so it is possible to
+know when to send output, when the output from a given command is over,
+etc.
+
+   Different kinds of input each have a different "input type".  Each
+input type has three annotations: a `pre-' annotation, which denotes
+the beginning of any prompt which is being output, a plain annotation,
+which denotes the end of the prompt, and then a `post-' annotation
+which denotes the end of any echo which may (or may not) be associated
+with the input.  For example, the `prompt' input type features the
+following annotations:
+
+     ^Z^Zpre-prompt
+     ^Z^Zprompt
+     ^Z^Zpost-prompt
+
+   The input types are
+
+`prompt'
+     When GDB is prompting for a command (the main GDB prompt).
+
+`commands'
+     When GDB prompts for a set of commands, like in the `commands'
+     command.  The annotations are repeated for each command which is
+     input.
+
+`overload-choice'
+     When GDB wants the user to select between various overloaded
+     functions.
+
+`query'
+     When GDB wants the user to confirm a potentially dangerous
+     operation.
+
+`prompt-for-continue'
+     When GDB is asking the user to press return to continue.  Note:
+     Don't expect this to work well; instead use `set height 0' to
+     disable prompting.  This is because the counting of lines is buggy
+     in the presence of annotations.
+
+
+File: annotate.info,  Node: Errors,  Next: Breakpoint Info,  Prev: Prompting,  Up: Top
+
+9 Errors
+********
+
+     ^Z^Zquit
+
+   This annotation occurs right before GDB responds to an interrupt.
+
+     ^Z^Zerror
+
+   This annotation occurs right before GDB responds to an error.
+
+   Quit and error annotations indicate that any annotations which GDB
+was in the middle of may end abruptly.  For example, if a
+`value-history-begin' annotation is followed by a `error', one cannot
+expect to receive the matching `value-history-end'.  One cannot expect
+not to receive it either, however; an error annotation does not
+necessarily mean that GDB is immediately returning all the way to the
+top level.
+
+   A quit or error annotation may be preceded by
+
+     ^Z^Zerror-begin
+
+   Any output between that and the quit or error annotation is the error
+message.
+
+   Warning messages are not yet annotated.
+
+
+File: annotate.info,  Node: Breakpoint Info,  Next: Invalidation,  Prev: Errors,  Up: Top
+
+10 Information on Breakpoints
+*****************************
+
+_Breakpoint Annotations have been removed.  GDB/MI instead provides
+breakpoint commands._
+
+   The output from the `info breakpoints' command is annotated as
+follows:
+
+     ^Z^Zbreakpoints-headers
+     HEADER-ENTRY
+     ^Z^Zbreakpoints-table
+
+where HEADER-ENTRY has the same syntax as an entry (see below) but
+instead of containing data, it contains strings which are intended to
+convey the meaning of each field to the user.  This is followed by any
+number of entries.  If a field does not apply for this entry, it is
+omitted.  Fields may contain trailing whitespace.  Each entry consists
+of:
+
+     ^Z^Zrecord
+     ^Z^Zfield 0
+     NUMBER
+     ^Z^Zfield 1
+     TYPE
+     ^Z^Zfield 2
+     DISPOSITION
+     ^Z^Zfield 3
+     ENABLE
+     ^Z^Zfield 4
+     ADDRESS
+     ^Z^Zfield 5
+     WHAT
+     ^Z^Zfield 6
+     FRAME
+     ^Z^Zfield 7
+     CONDITION
+     ^Z^Zfield 8
+     IGNORE-COUNT
+     ^Z^Zfield 9
+     COMMANDS
+
+   Note that ADDRESS is intended for user consumption--the syntax
+varies depending on the language.
+
+   The output ends with
+
+     ^Z^Zbreakpoints-table-end
+
+
+File: annotate.info,  Node: Invalidation,  Next: Annotations for Running,  Prev: Breakpoint Info,  Up: Top
+
+11 Invalidation Notices
+***********************
+
+The following annotations say that certain pieces of state may have
+changed.
+
+`^Z^Zframes-invalid'
+     The frames (for example, output from the `backtrace' command) may
+     have changed.
+
+`^Z^Zbreakpoints-invalid'
+     The breakpoints may have changed.  For example, the user just
+     added or deleted a breakpoint.
+
+
+File: annotate.info,  Node: Annotations for Running,  Next: Source Annotations,  Prev: Invalidation,  Up: Top
+
+12 Running the Program
+**********************
+
+When the program starts executing due to a GDB command such as `step'
+or `continue',
+
+     ^Z^Zstarting
+
+   is output.  When the program stops,
+
+     ^Z^Zstopped
+
+   is output.  Before the `stopped' annotation, a variety of
+annotations describe how the program stopped.
+
+`^Z^Zexited EXIT-STATUS'
+     The program exited, and EXIT-STATUS is the exit status (zero for
+     successful exit, otherwise nonzero).
+
+`^Z^Zsignalled'
+     The program exited with a signal.  After the `^Z^Zsignalled', the
+     annotation continues:
+
+          INTRO-TEXT
+          ^Z^Zsignal-name
+          NAME
+          ^Z^Zsignal-name-end
+          MIDDLE-TEXT
+          ^Z^Zsignal-string
+          STRING
+          ^Z^Zsignal-string-end
+          END-TEXT
+
+     where NAME is the name of the signal, such as `SIGILL' or
+     `SIGSEGV', and STRING is the explanation of the signal, such as
+     `Illegal Instruction' or `Segmentation fault'.  INTRO-TEXT,
+     MIDDLE-TEXT, and END-TEXT are for the user's benefit and have no
+     particular format.
+
+`^Z^Zsignal'
+     The syntax of this annotation is just like `signalled', but GDB is
+     just saying that the program received the signal, not that it was
+     terminated with it.
+
+`^Z^Zbreakpoint NUMBER'
+     The program hit breakpoint number NUMBER.
+
+`^Z^Zwatchpoint NUMBER'
+     The program hit watchpoint number NUMBER.
+
+
+File: annotate.info,  Node: Source Annotations,  Next: GNU Free Documentation License,  Prev: Annotations for Running,  Up: Top
+
+13 Displaying Source
+********************
+
+The following annotation is used instead of displaying source code:
+
+     ^Z^Zsource FILENAME:LINE:CHARACTER:MIDDLE:ADDR
+
+   where FILENAME is an absolute file name indicating which source
+file, LINE is the line number within that file (where 1 is the first
+line in the file), CHARACTER is the character position within the file
+(where 0 is the first character in the file) (for most debug formats
+this will necessarily point to the beginning of a line), MIDDLE is
+`middle' if ADDR is in the middle of the line, or `beg' if ADDR is at
+the beginning of the line, and ADDR is the address in the target
+program associated with the source which is being displayed.  ADDR is
+in the form `0x' followed by one or more lowercase hex digits (note
+that this does not depend on the language).
+
+
+File: annotate.info,  Node: GNU Free Documentation License,  Prev: Source Annotations,  Up: Top
+
+14 GNU Free Documentation License
+*********************************
+
+                      Version 1.2, November 2002
+
+     Copyright (C) 2000,2001,2002 Free Software Foundation, Inc.
+     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+     Everyone is permitted to copy and distribute verbatim copies
+     of this license document, but changing it is not allowed.
+
+  0. PREAMBLE
+
+     The purpose of this License is to make a manual, textbook, or other
+     functional and useful document "free" in the sense of freedom: to
+     assure everyone the effective freedom to copy and redistribute it,
+     with or without modifying it, either commercially or
+     noncommercially.  Secondarily, this License preserves for the
+     author and publisher a way to get credit for their work, while not
+     being considered responsible for modifications made by others.
+
+     This License is a kind of "copyleft", which means that derivative
+     works of the document must themselves be free in the same sense.
+     It complements the GNU General Public License, which is a copyleft
+     license designed for free software.
+
+     We have designed this License in order to use it for manuals for
+     free software, because free software needs free documentation: a
+     free program should come with manuals providing the same freedoms
+     that the software does.  But this License is not limited to
+     software manuals; it can be used for any textual work, regardless
+     of subject matter or whether it is published as a printed book.
+     We recommend this License principally for works whose purpose is
+     instruction or reference.
+
+  1. APPLICABILITY AND DEFINITIONS
+
+     This License applies to any manual or other work, in any medium,
+     that contains a notice placed by the copyright holder saying it
+     can be distributed under the terms of this License.  Such a notice
+     grants a world-wide, royalty-free license, unlimited in duration,
+     to use that work under the conditions stated herein.  The
+     "Document", below, refers to any such manual or work.  Any member
+     of the public is a licensee, and is addressed as "you".  You
+     accept the license if you copy, modify or distribute the work in a
+     way requiring permission under copyright law.
+
+     A "Modified Version" of the Document means any work containing the
+     Document or a portion of it, either copied verbatim, or with
+     modifications and/or translated into another language.
+
+     A "Secondary Section" is a named appendix or a front-matter section
+     of the Document that deals exclusively with the relationship of the
+     publishers or authors of the Document to the Document's overall
+     subject (or to related matters) and contains nothing that could
+     fall directly within that overall subject.  (Thus, if the Document
+     is in part a textbook of mathematics, a Secondary Section may not
+     explain any mathematics.)  The relationship could be a matter of
+     historical connection with the subject or with related matters, or
+     of legal, commercial, philosophical, ethical or political position
+     regarding them.
+
+     The "Invariant Sections" are certain Secondary Sections whose
+     titles are designated, as being those of Invariant Sections, in
+     the notice that says that the Document is released under this
+     License.  If a section does not fit the above definition of
+     Secondary then it is not allowed to be designated as Invariant.
+     The Document may contain zero Invariant Sections.  If the Document
+     does not identify any Invariant Sections then there are none.
+
+     The "Cover Texts" are certain short passages of text that are
+     listed, as Front-Cover Texts or Back-Cover Texts, in the notice
+     that says that the Document is released under this License.  A
+     Front-Cover Text may be at most 5 words, and a Back-Cover Text may
+     be at most 25 words.
+
+     A "Transparent" copy of the Document means a machine-readable copy,
+     represented in a format whose specification is available to the
+     general public, that is suitable for revising the document
+     straightforwardly with generic text editors or (for images
+     composed of pixels) generic paint programs or (for drawings) some
+     widely available drawing editor, and that is suitable for input to
+     text formatters or for automatic translation to a variety of
+     formats suitable for input to text formatters.  A copy made in an
+     otherwise Transparent file format whose markup, or absence of
+     markup, has been arranged to thwart or discourage subsequent
+     modification by readers is not Transparent.  An image format is
+     not Transparent if used for any substantial amount of text.  A
+     copy that is not "Transparent" is called "Opaque".
+
+     Examples of suitable formats for Transparent copies include plain
+     ASCII without markup, Texinfo input format, LaTeX input format,
+     SGML or XML using a publicly available DTD, and
+     standard-conforming simple HTML, PostScript or PDF designed for
+     human modification.  Examples of transparent image formats include
+     PNG, XCF and JPG.  Opaque formats include proprietary formats that
+     can be read and edited only by proprietary word processors, SGML or
+     XML for which the DTD and/or processing tools are not generally
+     available, and the machine-generated HTML, PostScript or PDF
+     produced by some word processors for output purposes only.
+
+     The "Title Page" means, for a printed book, the title page itself,
+     plus such following pages as are needed to hold, legibly, the
+     material this License requires to appear in the title page.  For
+     works in formats which do not have any title page as such, "Title
+     Page" means the text near the most prominent appearance of the
+     work's title, preceding the beginning of the body of the text.
+
+     A section "Entitled XYZ" means a named subunit of the Document
+     whose title either is precisely XYZ or contains XYZ in parentheses
+     following text that translates XYZ in another language.  (Here XYZ
+     stands for a specific section name mentioned below, such as
+     "Acknowledgements", "Dedications", "Endorsements", or "History".)
+     To "Preserve the Title" of such a section when you modify the
+     Document means that it remains a section "Entitled XYZ" according
+     to this definition.
+
+     The Document may include Warranty Disclaimers next to the notice
+     which states that this License applies to the Document.  These
+     Warranty Disclaimers are considered to be included by reference in
+     this License, but only as regards disclaiming warranties: any other
+     implication that these Warranty Disclaimers may have is void and
+     has no effect on the meaning of this License.
+
+  2. VERBATIM COPYING
+
+     You may copy and distribute the Document in any medium, either
+     commercially or noncommercially, provided that this License, the
+     copyright notices, and the license notice saying this License
+     applies to the Document are reproduced in all copies, and that you
+     add no other conditions whatsoever to those of this License.  You
+     may not use technical measures to obstruct or control the reading
+     or further copying of the copies you make or distribute.  However,
+     you may accept compensation in exchange for copies.  If you
+     distribute a large enough number of copies you must also follow
+     the conditions in section 3.
+
+     You may also lend copies, under the same conditions stated above,
+     and you may publicly display copies.
+
+  3. COPYING IN QUANTITY
+
+     If you publish printed copies (or copies in media that commonly
+     have printed covers) of the Document, numbering more than 100, and
+     the Document's license notice requires Cover Texts, you must
+     enclose the copies in covers that carry, clearly and legibly, all
+     these Cover Texts: Front-Cover Texts on the front cover, and
+     Back-Cover Texts on the back cover.  Both covers must also clearly
+     and legibly identify you as the publisher of these copies.  The
+     front cover must present the full title with all words of the
+     title equally prominent and visible.  You may add other material
+     on the covers in addition.  Copying with changes limited to the
+     covers, as long as they preserve the title of the Document and
+     satisfy these conditions, can be treated as verbatim copying in
+     other respects.
+
+     If the required texts for either cover are too voluminous to fit
+     legibly, you should put the first ones listed (as many as fit
+     reasonably) on the actual cover, and continue the rest onto
+     adjacent pages.
+
+     If you publish or distribute Opaque copies of the Document
+     numbering more than 100, you must either include a
+     machine-readable Transparent copy along with each Opaque copy, or
+     state in or with each Opaque copy a computer-network location from
+     which the general network-using public has access to download
+     using public-standard network protocols a complete Transparent
+     copy of the Document, free of added material.  If you use the
+     latter option, you must take reasonably prudent steps, when you
+     begin distribution of Opaque copies in quantity, to ensure that
+     this Transparent copy will remain thus accessible at the stated
+     location until at least one year after the last time you
+     distribute an Opaque copy (directly or through your agents or
+     retailers) of that edition to the public.
+
+     It is requested, but not required, that you contact the authors of
+     the Document well before redistributing any large number of
+     copies, to give them a chance to provide you with an updated
+     version of the Document.
+
+  4. MODIFICATIONS
+
+     You may copy and distribute a Modified Version of the Document
+     under the conditions of sections 2 and 3 above, provided that you
+     release the Modified Version under precisely this License, with
+     the Modified Version filling the role of the Document, thus
+     licensing distribution and modification of the Modified Version to
+     whoever possesses a copy of it.  In addition, you must do these
+     things in the Modified Version:
+
+       A. Use in the Title Page (and on the covers, if any) a title
+          distinct from that of the Document, and from those of
+          previous versions (which should, if there were any, be listed
+          in the History section of the Document).  You may use the
+          same title as a previous version if the original publisher of
+          that version gives permission.
+
+       B. List on the Title Page, as authors, one or more persons or
+          entities responsible for authorship of the modifications in
+          the Modified Version, together with at least five of the
+          principal authors of the Document (all of its principal
+          authors, if it has fewer than five), unless they release you
+          from this requirement.
+
+       C. State on the Title page the name of the publisher of the
+          Modified Version, as the publisher.
+
+       D. Preserve all the copyright notices of the Document.
+
+       E. Add an appropriate copyright notice for your modifications
+          adjacent to the other copyright notices.
+
+       F. Include, immediately after the copyright notices, a license
+          notice giving the public permission to use the Modified
+          Version under the terms of this License, in the form shown in
+          the Addendum below.
+
+       G. Preserve in that license notice the full lists of Invariant
+          Sections and required Cover Texts given in the Document's
+          license notice.
+
+       H. Include an unaltered copy of this License.
+
+       I. Preserve the section Entitled "History", Preserve its Title,
+          and add to it an item stating at least the title, year, new
+          authors, and publisher of the Modified Version as given on
+          the Title Page.  If there is no section Entitled "History" in
+          the Document, create one stating the title, year, authors,
+          and publisher of the Document as given on its Title Page,
+          then add an item describing the Modified Version as stated in
+          the previous sentence.
+
+       J. Preserve the network location, if any, given in the Document
+          for public access to a Transparent copy of the Document, and
+          likewise the network locations given in the Document for
+          previous versions it was based on.  These may be placed in
+          the "History" section.  You may omit a network location for a
+          work that was published at least four years before the
+          Document itself, or if the original publisher of the version
+          it refers to gives permission.
+
+       K. For any section Entitled "Acknowledgements" or "Dedications",
+          Preserve the Title of the section, and preserve in the
+          section all the substance and tone of each of the contributor
+          acknowledgements and/or dedications given therein.
+
+       L. Preserve all the Invariant Sections of the Document,
+          unaltered in their text and in their titles.  Section numbers
+          or the equivalent are not considered part of the section
+          titles.
+
+       M. Delete any section Entitled "Endorsements".  Such a section
+          may not be included in the Modified Version.
+
+       N. Do not retitle any existing section to be Entitled
+          "Endorsements" or to conflict in title with any Invariant
+          Section.
+
+       O. Preserve any Warranty Disclaimers.
+
+     If the Modified Version includes new front-matter sections or
+     appendices that qualify as Secondary Sections and contain no
+     material copied from the Document, you may at your option
+     designate some or all of these sections as invariant.  To do this,
+     add their titles to the list of Invariant Sections in the Modified
+     Version's license notice.  These titles must be distinct from any
+     other section titles.
+
+     You may add a section Entitled "Endorsements", provided it contains
+     nothing but endorsements of your Modified Version by various
+     parties--for example, statements of peer review or that the text
+     has been approved by an organization as the authoritative
+     definition of a standard.
+
+     You may add a passage of up to five words as a Front-Cover Text,
+     and a passage of up to 25 words as a Back-Cover Text, to the end
+     of the list of Cover Texts in the Modified Version.  Only one
+     passage of Front-Cover Text and one of Back-Cover Text may be
+     added by (or through arrangements made by) any one entity.  If the
+     Document already includes a cover text for the same cover,
+     previously added by you or by arrangement made by the same entity
+     you are acting on behalf of, you may not add another; but you may
+     replace the old one, on explicit permission from the previous
+     publisher that added the old one.
+
+     The author(s) and publisher(s) of the Document do not by this
+     License give permission to use their names for publicity for or to
+     assert or imply endorsement of any Modified Version.
+
+  5. COMBINING DOCUMENTS
+
+     You may combine the Document with other documents released under
+     this License, under the terms defined in section 4 above for
+     modified versions, provided that you include in the combination
+     all of the Invariant Sections of all of the original documents,
+     unmodified, and list them all as Invariant Sections of your
+     combined work in its license notice, and that you preserve all
+     their Warranty Disclaimers.
+
+     The combined work need only contain one copy of this License, and
+     multiple identical Invariant Sections may be replaced with a single
+     copy.  If there are multiple Invariant Sections with the same name
+     but different contents, make the title of each such section unique
+     by adding at the end of it, in parentheses, the name of the
+     original author or publisher of that section if known, or else a
+     unique number.  Make the same adjustment to the section titles in
+     the list of Invariant Sections in the license notice of the
+     combined work.
+
+     In the combination, you must combine any sections Entitled
+     "History" in the various original documents, forming one section
+     Entitled "History"; likewise combine any sections Entitled
+     "Acknowledgements", and any sections Entitled "Dedications".  You
+     must delete all sections Entitled "Endorsements."
+
+  6. COLLECTIONS OF DOCUMENTS
+
+     You may make a collection consisting of the Document and other
+     documents released under this License, and replace the individual
+     copies of this License in the various documents with a single copy
+     that is included in the collection, provided that you follow the
+     rules of this License for verbatim copying of each of the
+     documents in all other respects.
+
+     You may extract a single document from such a collection, and
+     distribute it individually under this License, provided you insert
+     a copy of this License into the extracted document, and follow
+     this License in all other respects regarding verbatim copying of
+     that document.
+
+  7. AGGREGATION WITH INDEPENDENT WORKS
+
+     A compilation of the Document or its derivatives with other
+     separate and independent documents or works, in or on a volume of
+     a storage or distribution medium, is called an "aggregate" if the
+     copyright resulting from the compilation is not used to limit the
+     legal rights of the compilation's users beyond what the individual
+     works permit.  When the Document is included in an aggregate, this
+     License does not apply to the other works in the aggregate which
+     are not themselves derivative works of the Document.
+
+     If the Cover Text requirement of section 3 is applicable to these
+     copies of the Document, then if the Document is less than one half
+     of the entire aggregate, the Document's Cover Texts may be placed
+     on covers that bracket the Document within the aggregate, or the
+     electronic equivalent of covers if the Document is in electronic
+     form.  Otherwise they must appear on printed covers that bracket
+     the whole aggregate.
+
+  8. TRANSLATION
+
+     Translation is considered a kind of modification, so you may
+     distribute translations of the Document under the terms of section
+     4.  Replacing Invariant Sections with translations requires special
+     permission from their copyright holders, but you may include
+     translations of some or all Invariant Sections in addition to the
+     original versions of these Invariant Sections.  You may include a
+     translation of this License, and all the license notices in the
+     Document, and any Warranty Disclaimers, provided that you also
+     include the original English version of this License and the
+     original versions of those notices and disclaimers.  In case of a
+     disagreement between the translation and the original version of
+     this License or a notice or disclaimer, the original version will
+     prevail.
+
+     If a section in the Document is Entitled "Acknowledgements",
+     "Dedications", or "History", the requirement (section 4) to
+     Preserve its Title (section 1) will typically require changing the
+     actual title.
+
+  9. TERMINATION
+
+     You may not copy, modify, sublicense, or distribute the Document
+     except as expressly provided for under this License.  Any other
+     attempt to copy, modify, sublicense or distribute the Document is
+     void, and will automatically terminate your rights under this
+     License.  However, parties who have received copies, or rights,
+     from you under this License will not have their licenses
+     terminated so long as such parties remain in full compliance.
+
+ 10. FUTURE REVISIONS OF THIS LICENSE
+
+     The Free Software Foundation may publish new, revised versions of
+     the GNU Free Documentation License from time to time.  Such new
+     versions will be similar in spirit to the present version, but may
+     differ in detail to address new problems or concerns.  See
+     `http://www.gnu.org/copyleft/'.
+
+     Each version of the License is given a distinguishing version
+     number.  If the Document specifies that a particular numbered
+     version of this License "or any later version" applies to it, you
+     have the option of following the terms and conditions either of
+     that specified version or of any later version that has been
+     published (not as a draft) by the Free Software Foundation.  If
+     the Document does not specify a version number of this License,
+     you may choose any version ever published (not as a draft) by the
+     Free Software Foundation.
+
+14.1 ADDENDUM: How to use this License for your documents
+=========================================================
+
+To use this License in a document you have written, include a copy of
+the License in the document and put the following copyright and license
+notices just after the title page:
+
+       Copyright (C)  YEAR  YOUR NAME.
+       Permission is granted to copy, distribute and/or modify this document
+       under the terms of the GNU Free Documentation License, Version 1.2
+       or any later version published by the Free Software Foundation;
+       with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
+       Texts.  A copy of the license is included in the section entitled ``GNU
+       Free Documentation License''.
+
+   If you have Invariant Sections, Front-Cover Texts and Back-Cover
+Texts, replace the "with...Texts." line with this:
+
+         with the Invariant Sections being LIST THEIR TITLES, with
+         the Front-Cover Texts being LIST, and with the Back-Cover Texts
+         being LIST.
+
+   If you have Invariant Sections without Cover Texts, or some other
+combination of the three, merge those two alternatives to suit the
+situation.
+
+   If your document contains nontrivial examples of program code, we
+recommend releasing these examples in parallel under your choice of
+free software license, such as the GNU General Public License, to
+permit their use in free software.
+
+
+
+Tag Table:
+Node: Top763
+Node: Annotations Overview1862
+Node: Limitations3661
+Node: Migrating to GDB/MI6246
+Node: Server Prefix6629
+Node: Value Annotations7275
+Node: Frame Annotations10445
+Node: Displays14344
+Node: Prompting15375
+Node: Errors16878
+Node: Breakpoint Info17768
+Node: Invalidation18993
+Node: Annotations for Running19472
+Node: Source Annotations20985
+Node: GNU Free Documentation License21942
+
+End Tag Table

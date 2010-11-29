@@ -1,0 +1,323 @@
+.TH "benchmarks" 3 "6 Nov 2008" "Version 1.6.4" "avr-libc" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+benchmarks \- Benchmarks 
+The results below can only give a rough estimate of the resources necessary for using certain library functions. There is a number of factors which can both increase or reduce the effort required:
+.PP
+.PD 0
+.IP "\(bu" 2
+Expenses for preparation of operands and their stack are not considered.
+.PP
+.PD 0
+.IP "\(bu" 2
+In the table, the size includes all additional functions (for example, function to multiply two integers) but they are only linked from the library.
+.PP
+.PD 0
+.IP "\(bu" 2
+Expenses of time of performance of some functions essentially depend on parameters of a call, for example, \fBqsort()\fP is recursive, and \fBsprintf()\fP receives parameters in a stack.
+.PP
+.PD 0
+.IP "\(bu" 2
+Different versions of the compiler can give a significant difference in code size and execution time. For example, the \fBdtostre()\fP function, compiled with avr-gcc 3.4.6, requires 930 bytes. After transition to avr-gcc 4.2.3, the size become 1088 bytes.
+.PP
+.SH "A few of libc functions."
+.PP
+Avr-gcc version is 4.2.3
+.PP
+The size of function is given in view of all picked up functions. By default Avr-libc is compiled with \fC-mcall-prologues\fP option. In brackets the size without taking into account modules of a prologue and an epilogue is resulted. Both of the size can coincide, if function does not cause a prologue/epilogue.
+.PP
+ \fBFunction\fP \fBUnits\fP \fBAvr2\fP \fBAvr25\fP \fBAvr4\fP  atoi ('12345') Flash bytes
+.br
+Stack bytes
+.br
+MCU clocks 82 (82)
+.br
+2
+.br
+155 78 (78)
+.br
+
+.br
+ 74 (74)
+.br
+2
+.br
+149  atol ('12345') Flash bytes
+.br
+Stack bytes
+.br
+MCU clocks 122 (122)
+.br
+2
+.br
+221 118 (118)
+.br
+
+.br
+ 118 (118)
+.br
+2
+.br
+219  dtostre (1.2345, s, 6, 0) Flash bytes
+.br
+Stack bytes
+.br
+MCU clocks 1184 (1072)
+.br
+17
+.br
+1313 1088 (978)
+.br
+
+.br
+ 1088 (978)
+.br
+17
+.br
+1152  dtostrf (1.2345, 15, 6, s) Flash bytes
+.br
+Stack bytes
+.br
+MCU clocks 1676 (1564)
+.br
+36
+.br
+1608 1548 (1438)
+.br
+
+.br
+ 1548 (1438)
+.br
+36
+.br
+1443  itoa (12345, s, 10) Flash bytes
+.br
+Stack bytes
+.br
+MCU clocks 150 (150)
+.br
+4
+.br
+1172 134 (134)
+.br
+
+.br
+ 134 (134)
+.br
+4
+.br
+1152  ltoa (12345L, s, 10) Flash bytes
+.br
+Stack bytes
+.br
+MCU clocks 220 (220)
+.br
+9
+.br
+3174 200 (200)
+.br
+
+.br
+ 200 (200)
+.br
+9
+.br
+3136  malloc (1) Flash bytes
+.br
+Stack bytes
+.br
+MCU clocks 554 (554)
+.br
+4
+.br
+196 506 (506)
+.br
+
+.br
+ 506 (506)
+.br
+4
+.br
+178  realloc ((void *)0, 1) Flash bytes
+.br
+Stack bytes
+.br
+MCU clocks 1152 (1040)
+.br
+20
+.br
+303 1042 (932)
+.br
+
+.br
+ 1042 (932)
+.br
+20
+.br
+280  qsort (s, sizeof(s), 1, cmp) Flash bytes
+.br
+Stack bytes
+.br
+MCU clocks 1242 (1130)
+.br
+38
+.br
+20914 990 (880)
+.br
+
+.br
+ 1008 (898)
+.br
+38
+.br
+16678  sprintf_min (s, '%d', 12345) Flash bytes
+.br
+Stack bytes
+.br
+MCU clocks 1216 (1104)
+.br
+59
+.br
+1846 1090 (980)
+.br
+
+.br
+ 1086 (976)
+.br
+59
+.br
+1711  sprintf (s, '%d', 12345) Flash bytes
+.br
+Stack bytes
+.br
+MCU clocks 1674 (1562)
+.br
+58
+.br
+1610 1542 (1432)
+.br
+
+.br
+ 1498 (1388)
+.br
+58
+.br
+1528  sprintf_flt (s, '%e', 1.2345) Flash bytes
+.br
+Stack bytes
+.br
+MCU clocks 3334 (3222)
+.br
+66
+.br
+2513 3084 (2974)
+.br
+
+.br
+ 3040 (2930)
+.br
+66
+.br
+2297  sscanf_min ('12345', '%d', &i) Flash bytes
+.br
+Stack bytes
+.br
+MCU clocks 1540 (1428)
+.br
+55
+.br
+1339 1354 (1244)
+.br
+
+.br
+ 1354 (1244)
+.br
+55
+.br
+1240  sscanf ('12345', '%d', &i) Flash bytes
+.br
+Stack bytes
+.br
+MCU clocks 1950 (1838)
+.br
+53
+.br
+1334 1704 (1594)
+.br
+
+.br
+ 1704 (1594)
+.br
+53
+.br
+1235  sscanf ('point,color', '%[a-z]', s) Flash bytes
+.br
+Stack bytes
+.br
+MCU clocks 1950 (1838)
+.br
+87
+.br
+2878 1704 (1594)
+.br
+
+.br
+ 1704 (1594)
+.br
+87
+.br
+2718  sscanf_flt ('1.2345', '%e', &x) Flash bytes
+.br
+Stack bytes
+.br
+MCU clocks 3298 (3186)
+.br
+63
+.br
+2187 2934 (2824)
+.br
+
+.br
+ 2918 (2808)
+.br
+63
+.br
+1833  strtod ('1.2345', &p) Flash bytes
+.br
+Stack bytes
+.br
+MCU clocks 1570 (1458)
+.br
+22
+.br
+1237 1472 (1362)
+.br
+
+.br
+ 1456 (1346)
+.br
+22
+.br
+971  strtol ('12345', &p, 0) Flash bytes
+.br
+Stack bytes
+.br
+MCU clocks 942 (830)
+.br
+29
+.br
+1074 874 (764)
+.br
+
+.br
+ 808 (698)
+.br
+21
+.br
+722  
+.SH "Math functions."
+.PP
+The table contains the number of MCU clocks to calculate a function with a given argument(s). The main reason of a big difference between Avr2 and Avr4 is a hardware multiplication.
+.PP
+\fBFunction\fP \fBAvr2\fP \fBAvr4\fP  __addsf3 (1.234, 5.678) 113 108  __mulsf3 (1.234, 5.678) 375 138  __divsf3 (1.234, 5.678) 466 465  acos (0.54321) 4648 2689  asin (0.54321) 4754 2790  atan (0.54321) 4710 2271  atan2 (1.234, 5.678) 5270 2857  ceil (1.2345) 177 177  cos (1.2345) 3381 1665  cosh (1.2345) 4922 2979  exp (1.2345) 4708 2765  fdim (5.678, 1.234) 111 111  floor (1.2345) 180 180  fmax (1.234, 5.678) 39 37  fmin (1.234, 5.678) 35 35  fmod (5.678, 1.234) 132 132  frexp (1.2345, 0) 37 36  hypot (1.234, 5.678) 1556 1078  ldexp (1.2345, 6) 42 42  log (1.2345) 4142 2134  log10 (1.2345) 4498 2260  modf (1.2345, 0) 433 429  pow (1.234, 5.678) 9293 5047  round (1.2345) 150 150  sin (1.2345) 3347 1647  sinh (1.2345) 4946 3003  sqrt (1.2345) 709 704  tan (1.2345) 4375 2420  tanh (1.2345) 5126 3173  trunc (1.2345) 178 178  

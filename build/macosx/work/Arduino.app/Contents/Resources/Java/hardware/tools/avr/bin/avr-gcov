@@ -1,0 +1,6 @@
+#!/bin/sh
+if readlink "`dirname "$0"`/../etc/options/gcc-version" | grep 3 >/dev/null 2>&1; then
+exec -a "$0" "`dirname "$0"`/../avr-3/bin/gcov" "$@"
+else
+exec -a "$0" "`dirname "$0"`/../avr-4/bin/gcov" "$@"
+fi

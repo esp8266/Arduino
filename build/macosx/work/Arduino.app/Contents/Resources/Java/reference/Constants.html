@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head>  <title>Arduino - Constants </title>  <link rel='stylesheet' href='arduino.css' type='text/css' />  <meta name="verify-v1" content="TtxFIEJAB6zdJ509wLxjnapQzKAMNm9u0Wj4ho6wxIY=" /></head><body><div id="page"><!--PageHeaderFmt--><div id="pageheader">  <div class="title"><a href="http://www.arduino.cc"/>Arduino</a></div>  <div class="search">    <!-- SiteSearch Google -->    <FORM method=GET action="http://www.google.com/search">    <input type=hidden name=ie value=UTF-8>    <input type=hidden name=oe value=UTF-8>    <INPUT TYPE=text name=q size=25 maxlength=255 value="">    <INPUT type=submit name=btnG VALUE="search">    <input type=hidden name=domains value="http://www.arduino.cc/">    <input type=hidden name=sitesearch value="http://www.arduino.cc/">    </FORM>    <!-- SiteSearch Google -->  </div></div><!--/PageHeaderFmt--><!--PageLeftFmt--><div id="pagenav" style="text-align: right">  <div style="float: left;">  <p><a class='wikilink' href='http://arduino.cc/en/Main/Buy'>Buy</a>
+|
+<a class='wikilink' href='http://arduino.cc/en/Main/Software'>Download</a>
+|
+<a class='wikilink' href='Guide_index.html'>Getting Started</a>
+|
+<a class='wikilink' href='http://arduino.cc/en/Tutorial/HomePage'>Learning</a>
+|
+<a class='wikilink' href='index.html'>Reference</a>
+|
+<a class='wikilink' href='http://arduino.cc/en/Main/Hardware'>Hardware</a>
+|
+<a class='wikilink' href='FAQ.html'>FAQ</a>
+</p>
+<p class='vspace'></p>
+  </div>  <a class="urllink" href="http://www.arduino.cc/blog/" rel="nofollow">Blog &raquo;</a> |  <a class="urllink" href="http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl" rel="nofollow">Forum &raquo;</a> |  <a class="urllink" href="http://www.arduino.cc/playground/" rel="nofollow">Playground &raquo;</a></div><!--/PageLeftFmt--><div id="pagetext"><!--PageText-->
+<div id='wikitext'>
+<p><strong>Reference</strong> &nbsp;  <a class='wikilink' href='index.html'>Language</a> | <a class='wikilink' href='Libraries.html'>Libraries</a> | <a class='wikilink' href='Comparison.html'>Comparison</a> | <a class='wikilink' href='Changes.html'>Changes</a>
+</p>
+<p class='vspace'></p><h2>constants</h2>
+<p>Constants are predefined variables in the Arduino language. They are used to make the programs easier to read. We classify constants in groups.
+</p>
+<p class='vspace'></p><h3>Defining Logical Levels, true and false (Boolean Constants)</h3>
+<p>There are two constants used to represent truth and falsity in the Arduino language: <strong>true</strong>, and <strong>false</strong>.
+</p>
+<p class='vspace'></p><h4>false</h4>
+<p>false is the easier of the two to define. false is defined as 0 (zero). 
+</p>
+<p class='vspace'></p><h4>true</h4>
+<p>true is often said to be defined as 1, which is correct, but true has a wider definition. Any integer which is <em>non-zero</em> is TRUE, in a Boolean sense. So -1, 2 and -200 are all defined as true, too, in a Boolean sense. 
+</p>
+<p class='vspace'></p><p>Note that the <em>true</em> and <em>false</em> constants are typed in  lowercase unlike HIGH, LOW, INPUT, &amp; OUTPUT. 
+</p>
+<p class='vspace'></p><h3>Defining Pin Levels, HIGH and LOW</h3>
+<p>When reading or writing to a digital pin there are only two possible values a pin can take/be-set-to: <strong>HIGH</strong> and <strong>LOW</strong>.
+</p>
+<p class='vspace'></p><p><strong>HIGH</strong>
+</p>
+<p class='vspace'></p><p>The meaning of HIGH (in reference to a pin) is somewhat different depending on whether a pin is set to an INPUT or OUTPUT. 
+When a pin is configured as an INPUT with pinMode, and read with digitalRead, the microcontroller will report HIGH if a voltage of 3 volts or more is present at the pin. 
+</p>
+<p class='vspace'></p><p>A pin may also be configured as an INPUT with pinMode, and subsequently made HIGH with digitalWrite, this will set the internal 20K pullup resistors, which will <em>steer</em> the input pin to a HIGH reading unless it is pulled LOW by external circuitry.
+</p>
+<p class='vspace'></p><p>When a pin is configured to OUTPUT with pinMode, and set to HIGH with digitalWrite, the pin is at 5 volts. In this state it can <em>source</em> current, e.g. light an LED that is connected through a series resistor to ground, or to another pin configured as an output, and set to LOW.
+</p>
+<p class='vspace'></p><p><strong>LOW</strong>
+</p>
+<p class='vspace'></p><p>The meaning of LOW also has a different meaning depending on whether a pin is set to INPUT or OUTPUT. When a pin is configured as an INPUT with pinMode, and read with digitalRead, the microcontroller will report LOW if a voltage of 2 volts or less is present at the pin. 
+</p>
+<p class='vspace'></p><p>When a pin is configured to OUTPUT with pinMode, and set to LOW with digitalWrite, the pin is at 0 volts. In this state it can <em>sink</em> current, e.g. light an LED that is connected through a series resistor to, +5 volts, or to another pin configured as an output, and set to HIGH.
+</p>
+<p class='vspace'></p><h3>Defining Digital Pins, INPUT and OUTPUT</h3>
+<p>Digital pins can be used either as <strong>INPUT</strong> or <strong>OUTPUT</strong>. Changing a pin from INPUT TO OUTPUT with pinMode() drastically changes the electrical behavior of the pin.
+</p>
+<p class='vspace'></p><h4>Pins Configured as Inputs</h4>
+<p>Arduino (Atmega) pins configured as <strong>INPUT</strong> with pinMode() are said to be in a high-impedance state. One way of explaining this is that  pins configured as INPUT make extremely small demands on the circuit that they are sampling, say equivalent to a series resistor of 100 Megohms in front of the pin. This makes them useful for reading a sensor, but not powering an LED.
+</p>
+<p class='vspace'></p><h4>Pins Configured as Outputs</h4>
+<p>Pins configured as <strong>OUTPUT</strong> with pinMode() are said to be in a low-impedance state. This means that they can provide a substantial amount of current to other circuits. Atmega pins can source (provide positive current) or sink (provide negative current) up to 40 mA (milliamps) of current to other devices/circuits. This makes them useful for powering LED's but useless for reading sensors. Pins configured as outputs can also be damaged or destroyed if short circuited to either ground or 5 volt power rails. The amount of current provided by an Atmega pin is also not enough to power most relays or motors, and some interface circuitry will be required. 
+</p>
+<p class='vspace'></p><h4>See also</h4>
+<ul><li><a class='wikilink' href='PinMode.html'>pinMode()</a>
+</li><li><a class='wikilink' href='IntegerConstants.html'>Integer Constants</a>
+</li><li><a class='wikilink' href='BooleanVariables.html'>boolean variables</a>
+</li></ul><p class='vspace'></p><p><a class='wikilink' href='index.html'>Reference Home</a>
+</p>
+<p class='vspace'></p><p><em>Corrections, suggestions, and new documentation should be posted to the <a class='urllink' href='http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?board=swbugs' rel='nofollow'>Forum</a>.</em>
+</p>
+<p class='vspace'></p><p>The text of the Arduino reference is licensed under a
+<a class='urllink' href='http://creativecommons.org/licenses/by-sa/3.0/' rel='nofollow'>Creative Commons Attribution-ShareAlike 3.0 License</a>.  Code samples in the reference are released into the public domain.
+</p>
+</div>
+<!-- AddThis Button BEGIN --><script type="text/javascript">var addthis_language = "en";</script><div class="addthis_container addthis_toolbox addthis_default_style" addthis:url="Constants" addthis:title="Arduino Wiki English"><a href="http://www.addthis.com/bookmark.php?v=250&amp;username=arduinoteam" class="addthis_button_compact">Share</a><span class="addthis_separator">|</span><a class="addthis_button_email"></a><a class="addthis_button_favorites"></a><a class="addthis_button_print"></a><a class="addthis_button_facebook"></a><a class="addthis_button_twitter"></a><script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#username=arduinoteam"></script></div><!-- AddThis Button END --></div><!--PageFooterFmt--><div id="pagefooter">  <a href=.html'#'>Edit Page</a> | <a href='#'>Page History</a> | <a href='#' target='_blank'>Printable View</a> | <a href='http://arduino.cc/en/Site/AllRecentChanges'>All Recent Site Changes</a></div><!--/PageFooterFmt--></div></body></html>

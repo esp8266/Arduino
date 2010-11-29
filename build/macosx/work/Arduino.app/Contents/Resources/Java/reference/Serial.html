@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head>  <title>Arduino - Serial </title>  <link rel='stylesheet' href='arduino.css' type='text/css' />  <meta name="verify-v1" content="TtxFIEJAB6zdJ509wLxjnapQzKAMNm9u0Wj4ho6wxIY=" /></head><body><div id="page"><!--PageHeaderFmt--><div id="pageheader">  <div class="title"><a href="http://www.arduino.cc"/>Arduino</a></div>  <div class="search">    <!-- SiteSearch Google -->    <FORM method=GET action="http://www.google.com/search">    <input type=hidden name=ie value=UTF-8>    <input type=hidden name=oe value=UTF-8>    <INPUT TYPE=text name=q size=25 maxlength=255 value="">    <INPUT type=submit name=btnG VALUE="search">    <input type=hidden name=domains value="http://www.arduino.cc/">    <input type=hidden name=sitesearch value="http://www.arduino.cc/">    </FORM>    <!-- SiteSearch Google -->  </div></div><!--/PageHeaderFmt--><!--PageLeftFmt--><div id="pagenav" style="text-align: right">  <div style="float: left;">  <p><a class='wikilink' href='http://arduino.cc/en/Main/Buy'>Buy</a>
+|
+<a class='wikilink' href='http://arduino.cc/en/Main/Software'>Download</a>
+|
+<a class='wikilink' href='Guide_index.html'>Getting Started</a>
+|
+<a class='wikilink' href='http://arduino.cc/en/Tutorial/HomePage'>Learning</a>
+|
+<a class='wikilink' href='index.html'>Reference</a>
+|
+<a class='wikilink' href='http://arduino.cc/en/Main/Hardware'>Hardware</a>
+|
+<a class='wikilink' href='FAQ.html'>FAQ</a>
+</p>
+<p class='vspace'></p>
+  </div>  <a class="urllink" href="http://www.arduino.cc/blog/" rel="nofollow">Blog &raquo;</a> |  <a class="urllink" href="http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl" rel="nofollow">Forum &raquo;</a> |  <a class="urllink" href="http://www.arduino.cc/playground/" rel="nofollow">Playground &raquo;</a></div><!--/PageLeftFmt--><div id="pagetext"><!--PageText-->
+<div id='wikitext'>
+<p><strong>Reference</strong> &nbsp;  <a class='wikilink' href='index.html'>Language</a> | <a class='wikilink' href='Libraries.html'>Libraries</a> | <a class='wikilink' href='Comparison.html'>Comparison</a> | <a class='wikilink' href='Changes.html'>Changes</a>
+</p>
+<p class='vspace'></p><h2>Serial</h2>
+<p>Used for communication between the Arduino board and a computer or other devices.  All Arduino boards have at least one serial port (also known as a UART or USART): <strong>Serial</strong>.  It communicates on digital pins 0 (RX) and 1 (TX) as well as with the computer via USB.  Thus, if you use these functions, you cannot also use pins 0 and 1 for digital input or output.
+</p>
+<p class='vspace'></p><p>You can use the Arduino environment's built-in serial monitor to communicate with an Arduino board.  Click the serial monitor button in the toolbar and select the same baud rate used in the call to begin().
+</p>
+<p class='vspace'></p><p>The Arduino Mega has three additional serial ports: <strong>Serial1</strong> on pins 19 (RX) and 18 (TX),  <strong>Serial2</strong> on pins 17 (RX) and 16 (TX), <strong>Serial3</strong> on pins 15 (RX) and 14 (TX).   To use these pins to communicate with your personal computer, you will need an additional USB-to-serial adaptor, as they are not connected to the Mega's USB-to-serial adaptor. To use them to communicate with an external TTL serial device, connect the TX pin to your device's RX pin, the RX to your device's TX pin, and the ground of your Mega to your device's ground.  (Don't connect these pins directly to an <span class='wikiword'>RS232</span> serial port; they operate at +/- 12V and can damage your Arduino board.)
+</p>
+<p class='vspace'></p><h4>Functions</h4>
+<ul><li><a class='wikilink' href='Serial_Begin.html'>begin</a>()
+</li><li><a class='wikilink' href='Serial_End.html'>end</a>()
+</li><li><a class='wikilink' href='Serial_Available.html'>available</a>()
+</li><li><a class='wikilink' href='Serial_Read.html'>read</a>()
+</li><li><a class='wikilink' href='Serial_Flush.html'>flush</a>()
+</li><li><a class='wikilink' href='Serial_Print.html'>print</a>()
+</li><li><a class='wikilink' href='Serial_Println.html'>println</a>()
+</li><li><a class='wikilink' href='Serial_Write.html'>write</a>()
+</li></ul><p class='vspace'></p><h4>Examples</h4>
+<ul><li><a class='wikilink' href='http://arduino.cc/en/Tutorial/ASCIITable'>ASCII Table</a>
+</li><li><a class='wikilink' href='http://arduino.cc/en/Tutorial/Dimmer'>Dimmer</a>
+</li><li><a class='wikilink' href='http://arduino.cc/en/Tutorial/Graph'>Graph</a>
+</li><li><a class='wikilink' href='http://arduino.cc/en/Tutorial/PhysicalPixel'>Physical Pixel</a>
+</li><li><a class='wikilink' href='http://arduino.cc/en/Tutorial/VirtualColorMixer'>Virtual Color Mixer</a>
+</li><li><a class='wikilink' href='http://arduino.cc/en/Tutorial/SerialCallResponse'>Serial Call Response</a>
+</li><li><a class='wikilink' href='http://arduino.cc/en/Tutorial/SerialCallResponseASCII'>Serial Call Response ASCII</a>
+</li></ul><p class='vspace'></p><p><a class='wikilink' href='index.html'>Reference Home</a>
+</p>
+<p class='vspace'></p><p><em>Corrections, suggestions, and new documentation should be posted to the <a class='urllink' href='http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?board=swbugs' rel='nofollow'>Forum</a>.</em>
+</p>
+<p class='vspace'></p><p>The text of the Arduino reference is licensed under a
+<a class='urllink' href='http://creativecommons.org/licenses/by-sa/3.0/' rel='nofollow'>Creative Commons Attribution-ShareAlike 3.0 License</a>.  Code samples in the reference are released into the public domain.
+</p>
+</div>
+<!-- AddThis Button BEGIN --><script type="text/javascript">var addthis_language = "en";</script><div class="addthis_container addthis_toolbox addthis_default_style" addthis:url="Serial" addthis:title="Arduino Wiki English"><a href="http://www.addthis.com/bookmark.php?v=250&amp;username=arduinoteam" class="addthis_button_compact">Share</a><span class="addthis_separator">|</span><a class="addthis_button_email"></a><a class="addthis_button_favorites"></a><a class="addthis_button_print"></a><a class="addthis_button_facebook"></a><a class="addthis_button_twitter"></a><script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#username=arduinoteam"></script></div><!-- AddThis Button END --></div><!--PageFooterFmt--><div id="pagefooter">  <a href=.html'#'>Edit Page</a> | <a href='#'>Page History</a> | <a href='#' target='_blank'>Printable View</a> | <a href='http://arduino.cc/en/Site/AllRecentChanges'>All Recent Site Changes</a></div><!--/PageFooterFmt--></div></body></html>

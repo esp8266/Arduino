@@ -1,0 +1,71 @@
+.TH "<avr/version.h>: avr-libc version macros" 3 "6 Nov 2008" "Version 1.6.4" "avr-libc" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+<avr/version.h>: avr-libc version macros \- 
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fB__AVR_LIBC_VERSION_STRING__\fP   '1.6.4'"
+.br
+.ti -1c
+.RI "#define \fB__AVR_LIBC_VERSION__\fP   10604UL"
+.br
+.ti -1c
+.RI "#define \fB__AVR_LIBC_DATE_STRING__\fP   '20081106'"
+.br
+.ti -1c
+.RI "#define \fB__AVR_LIBC_DATE_\fP   20081106UL"
+.br
+.ti -1c
+.RI "#define \fB__AVR_LIBC_MAJOR__\fP   1"
+.br
+.ti -1c
+.RI "#define \fB__AVR_LIBC_MINOR__\fP   6"
+.br
+.ti -1c
+.RI "#define \fB__AVR_LIBC_REVISION__\fP   4"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+.PP
+.nf
+ #include <avr/version.h> 
+.fi
+.PP
+.PP
+This header file defines macros that contain version numbers and strings describing the current version of avr-libc.
+.PP
+The version number itself basically consists of three pieces that are separated by a dot: the major number, the minor number, and the revision number. For development versions (which use an odd minor number), the string representation additionally gets the date code (YYYYMMDD) appended.
+.PP
+This file will also be included by \fC<\fBavr/io.h\fP>\fP. That way, portable tests can be implemented using \fC<\fBavr/io.h\fP>\fP that can be used in code that wants to remain backwards-compatible to library versions prior to the date when the library version API had been added, as referenced but undefined C preprocessor macros automatically evaluate to 0. 
+.SH "Define Documentation"
+.PP 
+.SS "#define __AVR_LIBC_DATE_   20081106UL"
+.PP
+Numerical representation of the release date. 
+.SS "#define __AVR_LIBC_DATE_STRING__   '20081106'"
+.PP
+String literal representation of the release date. 
+.SS "#define __AVR_LIBC_MAJOR__   1"
+.PP
+Library major version number. 
+.SS "#define __AVR_LIBC_MINOR__   6"
+.PP
+Library minor version number. 
+.SS "#define __AVR_LIBC_REVISION__   4"
+.PP
+Library revision number. 
+.SS "#define __AVR_LIBC_VERSION__   10604UL"
+.PP
+Numerical representation of the current library version.
+.PP
+In the numerical representation, the major number is multiplied by 10000, the minor number by 100, and all three parts are then added. It is intented to provide a monotonically increasing numerical value that can easily be used in numerical checks. 
+.SS "#define __AVR_LIBC_VERSION_STRING__   '1.6.4'"
+.PP
+String literal representation of the current library version. 
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for avr-libc from the source code.

@@ -1,0 +1,10 @@
+avarice: 2.8
+avr-libc: 1.6.4
+avrdude: 5.4-arduino
+binutils: 2.19
+gcc-3: 3.4.6
+gcc-4: 4.3.2
+gdb: 6.8
+libusb: 0.1.12
+make: 3.81
+simulavr: 0.1.2.5

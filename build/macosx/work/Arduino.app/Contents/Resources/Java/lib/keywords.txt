@@ -1,0 +1,178 @@
+# LITERAL1 specifies constants
+
+HIGH	LITERAL1	Constants
+LOW	LITERAL1	Constants
+INPUT	LITERAL1	Constants
+OUTPUT	LITERAL1	Constants
+DEC	LITERAL1	Serial_Print
+BIN	LITERAL1	Serial_Print
+HEX	LITERAL1	Serial_Print
+OCT	LITERAL1	Serial_Print
+BYTE	LITERAL1	Serial_Print
+PI	LITERAL1
+HALF_PI	LITERAL1
+TWO_PI	LITERAL1
+LSBFIRST	LITERAL1	ShiftOut
+MSBFIRST	LITERAL1	ShiftOut
+CHANGE	LITERAL1	AttachInterrupt
+FALLING	LITERAL1	AttachInterrupt
+RISING	LITERAL1	AttachInterrupt
+DEFAULT	LITERAL1	AnalogReference
+EXTERNAL	LITERAL1	AnalogReference
+INTERNAL	LITERAL1	AnalogReference
+INTERNAL1V1	LITERAL1	AnalogReference
+INTERNAL2V56	LITERAL1	AnalogReference
+
+# KEYWORD1 specifies datatypes and C/C++ keywords
+
+boolean	KEYWORD1	BooleanVariables
+break	KEYWORD1	Break
+byte	KEYWORD1	Byte
+case	KEYWORD1	SwitchCase
+char	KEYWORD1	Char
+class	KEYWORD1
+continue	KEYWORD1	Continue
+default	KEYWORD1	SwitchCase	
+do	KEYWORD1	DoWhile
+double	KEYWORD1	Double
+else	KEYWORD1	Else
+false	KEYWORD1	Constants
+float	KEYWORD1	Float
+for	KEYWORD1	For
+if	KEYWORD1	If
+int	KEYWORD1	Int
+long	KEYWORD1	Long
+new	KEYWORD1	
+null	KEYWORD1	
+private	KEYWORD1
+protected	KEYWORD1	
+public	KEYWORD1	
+return	KEYWORD1	Return	
+short	KEYWORD1
+signed	KEYWORD1
+static	KEYWORD1	Static
+String	KEYWORD1	String	
+switch	KEYWORD1	SwitchCase
+this	KEYWORD1	
+throw	KEYWORD1	
+try	KEYWORD1	
+true	KEYWORD1	
+unsigned	KEYWORD1
+void	KEYWORD1	Void
+while	KEYWORD1	While
+word	KEYWORD1	Word
+
+# operators aren't highlighted, but may have documentation
+
++=		IncrementCompound
++		Arithmetic
+[]		arrayaccess
+=		assign
+&		BitwiseAnd
+|		BitwiseAnd
+,		
+//		Comments
+?:		
+{}		Braces
+--		Increment
+/		Arithmetic
+/*		Comments
+.		dot
+==		
+<		greaterthan
+<=		greaterthanorequalto
+++		Increment
+!=		inequality
+<<		Bitshift
+<		lessthan
+<=		lessthanorequalto
+&&		Boolean
+!		Boolean
+||		Boolean
+-		Arithmetic
+%		Modulo
+*		Arithmetic
+()		parentheses
+>>		Bitshift
+;		SemiColon
+-=		IncrementCompound
+
+# these are datatypes, but we've also defined functions to cast to them
+
+boolean	KEYWORD2	boolean_
+byte	KEYWORD2	byte_
+char	KEYWORD2	char_
+float	KEYWORD2	float_
+int	KEYWORD2	int_
+long	KEYWORD2	long_
+word	KEYWORD2	word_
+
+# KEYWORD2 specifies methods and functions
+
+abs	KEYWORD2	Abs
+acos	KEYWORD2	ACos
+asin	KEYWORD2	ASin
+atan	KEYWORD2	ATan
+atan2	KEYWORD2	ATan2
+ceil	KEYWORD2	Ceil
+constrain	KEYWORD2	Constrain
+cos	KEYWORD2	Cos
+degrees	KEYWORD2
+exp	KEYWORD2	Exp
+floor	KEYWORD2	Floor
+log	KEYWORD2	Log
+map	KEYWORD2	Map
+max	KEYWORD2	Max
+min	KEYWORD2	Min
+radians	KEYWORD2
+random	KEYWORD2	Random
+randomSeed	KEYWORD2	RandomSeed
+round	KEYWORD2
+sin	KEYWORD2	Sin
+sq	KEYWORD2	Sq
+sqrt	KEYWORD2	Sqrt
+tan	KEYWORD2	Tan
+
+bitRead	KEYWORD2	BitRead
+bitWrite	KEYWORD2	BitWrite
+bitSet	KEYWORD2	BitSet
+bitClear	KEYWORD2	BitClear
+bit	KEYWORD2	Bit
+highByte	KEYWORD2	HighByte
+lowByte	KEYWORD2	LowByte
+
+analogReference	KEYWORD2	AnalogReference
+analogRead	KEYWORD2	AnalogRead
+analogWrite	KEYWORD2	AnalogWrite
+attachInterrupt	KEYWORD2	AttachInterrupt
+detachInterrupt	KEYWORD2	DetachInterrupt
+delay	KEYWORD2	Delay
+delayMicroseconds	KEYWORD2	DelayMicroseconds
+digitalWrite	KEYWORD2	DigitalWrite
+digitalRead	KEYWORD2	DigitalRead
+interrupts	KEYWORD2
+millis	KEYWORD2	Millis
+micros	KEYWORD2	Micros
+noInterrupts	KEYWORD2	NoInterrupts
+noTone	KEYWORD2	NoTone
+pinMode	KEYWORD2	PinMode
+pulseIn	KEYWORD2	PulseIn
+shiftIn	KEYWORD2	ShiftIn
+shiftOut	KEYWORD2	ShiftOut
+tone	KEYWORD2	Tone
+
+Serial	KEYWORD3	Serial
+Serial1	KEYWORD3	Serial
+Serial2	KEYWORD3	Serial
+Serial3	KEYWORD3	Serial
+begin	KEYWORD2	Serial_Begin
+end	KEYWORD2	Serial_End
+peek	KEYWORD2	Serial_Peek
+read	KEYWORD2	Serial_Read
+print	KEYWORD2	Serial_Print
+println	KEYWORD2	Serial_Println
+available	KEYWORD2	Serial_Available
+flush	KEYWORD2	Serial_Flush
+
+setup	KEYWORD3	Setup
+loop	KEYWORD3	Loop

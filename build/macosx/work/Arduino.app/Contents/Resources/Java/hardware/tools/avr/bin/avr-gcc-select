@@ -1,0 +1,16 @@
+#!/bin/sh
+prefix="`dirname "$0"`/.."
+if [ $# -gt 0 ]; then
+if [ "$1" = "--help" -o "$1" = "-h" ]; then
+echo "usage: $0 [3|4]" 1>&2
+exit 0;
+fi
+if [ "$1" = 3 ]; then
+version=3
+else
+version=4
+fi
+rm -f "$prefix/etc/options/gcc-version"
+ln -s "../../avr-$version" "$prefix/etc/options/gcc-version"
+fi
+echo "Current default compiler: gcc" `readlink "$prefix/etc/options/gcc-version" | sed -e 's/[^0-9]//g'`

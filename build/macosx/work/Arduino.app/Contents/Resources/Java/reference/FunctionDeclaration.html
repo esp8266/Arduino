@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+  <title>Arduino - FunctionDeclaration </title>
+  <link rel='stylesheet' href='arduino.css' type='text/css' />
+</head>
+<body>
+<div id="page">
+<!--PageHeaderFmt-->
+<div id="pageheader">
+  <div class="title"><a href="http://www.arduino.cc"/>Arduino</a></div>
+  <div class="search">
+    <!-- SiteSearch Google -->    <FORM method=GET action="http://www.google.com/search">    <input type=hidden name=ie value=UTF-8>    <input type=hidden name=oe value=UTF-8>    <INPUT TYPE=text name=q size=25 maxlength=255 value="">    <INPUT type=submit name=btnG VALUE="search">    <input type=hidden name=domains value="http://www.arduino.cc/">
+    <input type=hidden name=sitesearch value="http://www.arduino.cc/">
+    </FORM>    <!-- SiteSearch Google -->
+  </div>
+</div>
+<!--/PageHeaderFmt-->
+<!--PageLeftFmt-->
+<div id="pagenav" style="text-align: right">
+  <div style="float: left;">
+  <p><a class='wikilink' href='http://www.arduino.cc/en/Main/Buy'>Buy</a>
+|
+<a class='wikilink' href='http://www.arduino.cc/en/Main/Software'>Download</a>
+|
+<a class='wikilink' href='Guide_index.html'>Getting Started</a>
+|
+<a class='wikilink' href='http://www.arduino.cc/en/Tutorial/HomePage'>Learning</a>
+|
+<a class='wikilink' href='index.html'>Reference</a>
+|
+<a class='wikilink' href='http://www.arduino.cc/en/Main/Hardware'>Hardware</a>
+|
+<a class='wikilink' href='FAQ.html'>FAQ</a>
+</p>
+<p class='vspace'></p>
+
+  </div>
+  <a class="urllink" href="http://www.arduino.cc/blog/" rel="nofollow">Blog &raquo;</a> |
+  <a class="urllink" href="http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl" rel="nofollow">Forum &raquo;</a> |
+  <a class="urllink" href="http://www.arduino.cc/playground/" rel="nofollow">Playground &raquo;</a>
+</div>
+<!--/PageLeftFmt-->
+<div id="pagetext">
+<!--PageText-->
+<div id='wikitext'>
+<p><strong>Reference</strong> &nbsp;  <a class='wikilink' href='index.html'>Language</a> (<a class='wikilink' href='Extended.html'>extended</a>) | <a class='wikilink' href='Libraries.html'>Libraries</a> | <a class='wikilink' href='Comparison.html'>Comparison</a> | <a class='wikilink' href='Board.html'>Board</a>
+</p>
+<p class='vspace'></p><h2>Functions</h2>
+<p>Segmenting code into functions allows a programmer to create modular pieces of code that perform a defined task and then return to the area of code from which the function was "called". The typical case for creating a function is when one needs to perform the same action multiple times in a program.
+</p>
+<p class='vspace'></p><p>For programmers accustomed to using BASIC, functions in Arduino provide (and extend) the utility of using subroutines (GOSUB in BASIC).
+</p>
+<p class='vspace'></p><p>Standardizing code fragments into functions has several advantages:
+</p>
+<p class='vspace'></p><ul><li>Functions help the programmer stay organized. Often this helps to conceptualize the program.
+<p class='vspace'></p></li><li>Functions codify one action in one place so that the function only has to be thought out and debugged once.
+<p class='vspace'></p></li><li>This also reduces chances for errors in modification, if the code needs to be changed.
+<p class='vspace'></p></li><li>Functions make the whole sketch smaller and more compact because sections of code are reused many times.
+<p class='vspace'></p></li><li>They make it easier to reuse code in other programs by making it more modular, and as a nice side effect, using functions also often makes the code more readable.
+</li></ul><p class='vspace'></p><p>There are two required functions in an Arduino sketch, setup() and loop(). Other functions must be created outside the brackets of those two functions. As an example, we will create a simple function to multiply two numbers. 
+</p>
+<p class='vspace'></p><h4>Example</h4>
+<div><img src='http://www.arduino.cc/en/uploads/Reference/FuncAnatomy.png' alt='' title='' /></div>
+<p class='vspace'></p><p>To "call" our simple multiply function, we pass it parameters of the datatype that it is expecting:
+</p>
+<p class='vspace'></p><pre>
+void loop{
+int i = 2;
+int j = 3;
+int k;
+
+k = myMultiplyFunction(i, j); // k now contains 6
+}
+
+</pre><p>Our function needs to be <em>declared</em> outside any other function, so "myMultiplyFunction()" can go either above or below the "loop()" function. 
+</p>
+<p class='vspace'></p><p>The entire sketch would then look like this:
+</p><pre>void setup(){
+  Serial.begin(9600);
+}
+
+void loop{
+  int i = 2;
+  int j = 3;
+  int k;
+
+  k = myMultiplyFunction(i, j); // k now contains 6
+  Serial.println(k);
+  delay(500);
+}
+
+int myMultiplyFunction(int x, int y){
+  int result;
+  result = x * y;
+  return result;
+}
+</pre>
+<p class='vspace'></p><h4>Another example </h4>
+<p>This function will read a sensor five times with analogRead() and calculate the average of five readings. It then scales the data to 8 bits (0-255), and inverts it, returning the inverted result.
+</p>
+<p class='vspace'></p><pre>int ReadSens_and_Condition(){
+  int i;
+  int sval;
+
+  for (i = 0; i &lt; 5; i++){
+    sval = sval + analogRead(0);    // sensor on analog pin 0
+  }
+
+  sval = sval / 5;    // average
+  sval = sval / 4;    // scale to 8 bits (0 - 255)
+  sval = 255 - sval;  // invert output
+  return sval;
+}
+</pre>
+<p class='vspace'></p><p>To call our function we just assign it to a variable.
+</p>
+<p class='vspace'></p><pre>int sens;
+
+sens = ReadSens_and_Condition();
+
+</pre>
+<p class='vspace'></p><p><a class='wikilink' href='index.html'>Reference Home</a>
+</p>
+<p class='vspace'></p><p><em>Corrections, suggestions, and new documentation should be posted to the <a class='urllink' href='http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?board=swbugs' rel='nofollow'>Forum</a>.</em>
+</p>
+<p class='vspace'></p><p>The text of the Arduino reference is licensed under a
+<a class='urllink' href='http://creativecommons.org/licenses/by-sa/3.0/' rel='nofollow'>Creative Commons Attribution-ShareAlike 3.0 License</a>.  Code samples in the reference are released into the public domain.
+</p>
+</div>
+
+</div>
+<!--PageFooterFmt-->
+<div id="pagefooter">
+  <a href='#'>Edit Page</a> | <a href='#'>Page History</a> | <a href='#' target='_blank'>Printable View</a> | <a href='http://www.arduino.cc/en/Site/AllRecentChanges'>All Recent Site Changes</a>
+</div>
+<!--/PageFooterFmt-->
+</div>
+</body>
+</html>

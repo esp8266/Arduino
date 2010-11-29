@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head>  <title>Arduino - Bitshift </title>  <link rel='stylesheet' href='arduino.css' type='text/css' />  <meta name="verify-v1" content="TtxFIEJAB6zdJ509wLxjnapQzKAMNm9u0Wj4ho6wxIY=" /></head><body><div id="page"><!--PageHeaderFmt--><div id="pageheader">  <div class="title"><a href="http://www.arduino.cc"/>Arduino</a></div>  <div class="search">    <!-- SiteSearch Google -->    <FORM method=GET action="http://www.google.com/search">    <input type=hidden name=ie value=UTF-8>    <input type=hidden name=oe value=UTF-8>    <INPUT TYPE=text name=q size=25 maxlength=255 value="">    <INPUT type=submit name=btnG VALUE="search">    <input type=hidden name=domains value="http://www.arduino.cc/">    <input type=hidden name=sitesearch value="http://www.arduino.cc/">    </FORM>    <!-- SiteSearch Google -->  </div></div><!--/PageHeaderFmt--><!--PageLeftFmt--><div id="pagenav" style="text-align: right">  <div style="float: left;">  <p><a class='wikilink' href='http://arduino.cc/en/Main/Buy'>Buy</a>
+|
+<a class='wikilink' href='http://arduino.cc/en/Main/Software'>Download</a>
+|
+<a class='wikilink' href='Guide_index.html'>Getting Started</a>
+|
+<a class='wikilink' href='http://arduino.cc/en/Tutorial/HomePage'>Learning</a>
+|
+<a class='wikilink' href='index.html'>Reference</a>
+|
+<a class='wikilink' href='http://arduino.cc/en/Main/Hardware'>Hardware</a>
+|
+<a class='wikilink' href='FAQ.html'>FAQ</a>
+</p>
+<p class='vspace'></p>
+  </div>  <a class="urllink" href="http://www.arduino.cc/blog/" rel="nofollow">Blog &raquo;</a> |  <a class="urllink" href="http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl" rel="nofollow">Forum &raquo;</a> |  <a class="urllink" href="http://www.arduino.cc/playground/" rel="nofollow">Playground &raquo;</a></div><!--/PageLeftFmt--><div id="pagetext"><!--PageText-->
+<div id='wikitext'>
+<p><strong>Reference</strong> &nbsp;  <a class='wikilink' href='index.html'>Language</a> | <a class='wikilink' href='Libraries.html'>Libraries</a> | <a class='wikilink' href='Comparison.html'>Comparison</a> | <a class='wikilink' href='Changes.html'>Changes</a>
+</p>
+<p class='vspace'></p><h2>bitshift left (&lt;&lt;), bitshift right (&gt;&gt;)</h2>
+<h4>Description</h4>
+<p>From <em>The Bitmath Tutorial</em>  in The Playground
+</p>
+<p class='vspace'></p><p>There are two bit shift operators in C++: the left shift operator &lt;&lt; and the right shift operator &gt;&gt;. These operators cause the bits in the left operand to be shifted left or right by the number of positions specified by the right operand.<br /><br />More on bitwise math may be found <a class='urllink' href='http://www.arduino.cc/playground/Code/BitMath' rel='nofollow'>here.</a>
+</p>
+<p class='vspace'></p><h4>Syntax</h4>
+<p>variable &lt;&lt; number_of_bits
+</p>
+<p class='vspace'></p><p>variable &gt;&gt; number_of_bits 
+</p>
+<p class='vspace'></p><h4>Parameters</h4>
+<p>variable - (byte, int, long)
+number_of_bits integer &lt;= 32
+</p>
+<p class='vspace'></p><h4>Example:</h4>
+<pre>    int a = 5;        // binary: 0000000000000101
+    int b = a &lt;&lt; 3;   // binary: 0000000000101000, or 40 in decimal
+    int c = b &gt;&gt; 3;   // binary: 0000000000000101, or back to 5 like we started with
+</pre>
+<p class='vspace'></p><p>When you shift a value x by y bits (x &lt;&lt; y), the leftmost y bits in x are lost, literally shifted out of existence:
+</p>
+<p class='vspace'></p><pre>    int a = 5;        // binary: 0000000000000101
+    int b = a &lt;&lt; 14;  // binary: 0100000000000000 - the first 1 in 101 was discarded
+</pre>
+<p class='vspace'></p><p>If you are certain that none of the ones in a value are being shifted into oblivion, a simple way to think of the left-shift operator is that it multiplies the left operand by 2 raised to the right operand power. For example, to generate powers of 2, the following expressions can be employed:
+</p>
+<p class='vspace'></p><pre>    1 &lt;&lt;  0  ==    1
+    1 &lt;&lt;  1  ==    2
+    1 &lt;&lt;  2  ==    4
+    1 &lt;&lt;  3  ==    8
+    ...
+    1 &lt;&lt;  8  ==  256
+    1 &lt;&lt;  9  ==  512
+    1 &lt;&lt; 10  == 1024
+    ...
+</pre>
+<p class='vspace'></p><p>When you shift x right by y bits (x &gt;&gt; y), and the highest bit in x is a 1, the behavior depends on the exact data type of x. If x is of type int, the highest bit is the sign bit, determining whether x is negative or not, as we have discussed above. In that case, the sign bit is copied into lower bits, for esoteric historical reasons:
+</p>
+<p class='vspace'></p><pre>    int x = -16;     // binary: 1111111111110000
+    int y = x &gt;&gt; 3;  // binary: 1111111111111110
+</pre>
+<p class='vspace'></p><p>This behavior, called sign extension, is often not the behavior you want. Instead, you may wish zeros to be shifted in from the left. It turns out that the right shift rules are different for unsigned int expressions, so you can use a typecast to suppress ones being copied from the left:
+</p>
+<p class='vspace'></p><pre>    int x = -16;                   // binary: 1111111111110000
+    int y = (unsigned int)x &gt;&gt; 3;  // binary: 0001111111111110
+</pre>
+<p class='vspace'></p><p>If you are careful to avoid sign extension, you can use the right-shift operator &gt;&gt; as a way to divide by powers of 2. For example:
+</p>
+<p class='vspace'></p><pre>    int x = 1000;
+    int y = x &gt;&gt; 3;   // integer division of 1000 by 8, causing y = 125.
+</pre>
+<p class='vspace'></p><p><a class='wikilink' href='index.html'>Reference Home</a>
+</p>
+<p class='vspace'></p><p><em>Corrections, suggestions, and new documentation should be posted to the <a class='urllink' href='http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?board=swbugs' rel='nofollow'>Forum</a>.</em>
+</p>
+<p class='vspace'></p><p>The text of the Arduino reference is licensed under a
+<a class='urllink' href='http://creativecommons.org/licenses/by-sa/3.0/' rel='nofollow'>Creative Commons Attribution-ShareAlike 3.0 License</a>.  Code samples in the reference are released into the public domain.
+</p>
+</div>
+<!-- AddThis Button BEGIN --><script type="text/javascript">var addthis_language = "en";</script><div class="addthis_container addthis_toolbox addthis_default_style" addthis:url="Bitshift" addthis:title="Arduino Wiki English"><a href="http://www.addthis.com/bookmark.php?v=250&amp;username=arduinoteam" class="addthis_button_compact">Share</a><span class="addthis_separator">|</span><a class="addthis_button_email"></a><a class="addthis_button_favorites"></a><a class="addthis_button_print"></a><a class="addthis_button_facebook"></a><a class="addthis_button_twitter"></a><script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#username=arduinoteam"></script></div><!-- AddThis Button END --></div><!--PageFooterFmt--><div id="pagefooter">  <a href=.html'#'>Edit Page</a> | <a href='#'>Page History</a> | <a href='#' target='_blank'>Printable View</a> | <a href='http://arduino.cc/en/Site/AllRecentChanges'>All Recent Site Changes</a></div><!--/PageFooterFmt--></div></body></html>

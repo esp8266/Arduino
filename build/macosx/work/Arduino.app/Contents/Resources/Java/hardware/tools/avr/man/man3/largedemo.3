@@ -1,0 +1,113 @@
+.TH "A more sophisticated project" 3 "6 Nov 2008" "Version 1.6.4" "avr-libc" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+A more sophisticated project \- This project extends the basic idea of the \fBsimple project\fP to control a LED with a PWM output, but adds methods to adjust the LED brightness. It employs a lot of the basic concepts of avr-libc to achieve that goal.
+.PP
+Understanding this project assumes the simple project has been understood in full, as well as being acquainted with the basic hardware concepts of an AVR microcontroller.
+.SH "Hardware setup"
+.PP
+The demo is set up in a way so it can be run on the ATmega16 that ships with the STK500 development kit. The only external part needed is a potentiometer attached to the ADC. It is connected to a 10-pin ribbon cable for port A, both ends of the potentiometer to pins 9 (GND) and 10 (VCC), and the wiper to pin 1 (port A0). A bypass capacitor from pin 1 to pin 9 (like 47 nF) is recommendable.
+.PP
+Setup of the STK500Setup of the STK500
+.PP
+The coloured patch cables are used to provide various interconnections. As there are only four of them in the STK500, there are two options to connect them for this demo. The second option for the yellow-green cable is shown in parenthesis in the table. Alternatively, the 'squid' cable from the JTAG ICE kit can be used if available.
+.PP
+\fBPort\fP\fBHeader\fP\fBColor\fP\fBFunction\fP\fBConnect to\fP D0 1 brown RxD RXD of the RS-232 header D1 2 grey TxD TXD of the RS-232 header D2 3 black button 'down' SW0 (pin 1 switches header) D3 4 red button 'up' SW1 (pin 2 switches header) D4 5 green button 'ADC' SW2 (pin 3 switches header) D5 6 blue LED LED0 (pin 1 LEDs header) D6 7 (green)clock out LED1 (pin 2 LEDs header) D7 8 white 1-second flashLED2 (pin 3 LEDs header) GND9 unused VCC10unused 
+.PP
+Wiring of the STK500Wiring of the STK500
+.PP
+The following picture shows the alternate wiring where LED1 is connected but SW2 is not:
+.PP
+Wiring option #2 of the STK500Wiring option #2 of the STK500
+.PP
+As an alternative, this demo can also be run on the popular ATmega8 controller, or its successor ATmega88 as well as the ATmega48 and ATmega168 variants of the latter. These controllers do not have a port named 'A', so their ADC inputs are located on port C instead, thus the potentiometer needs to be attached to port C. Likewise, the OC1A output is not on port D pin 5 but on port B pin 1 (PB1). Thus, the above cabling scheme needs to be changed so that PB1 connects to the LED0 pin. (PD6 remains unconnected.) When using the STK500, use one of the jumper cables for this connection. All other port D pins should be connected the same way as described for the ATmega16 above.
+.PP
+When not using an STK500 starter kit, attach the LEDs through some resistor to Vcc (low-active LEDs), and attach pushbuttons from the respective input pins to GND. The internal pull-up resistors are enabled for the pushbutton pins, so no external resistors are needed.
+.PP
+Finally, the demo has been ported to the ATtiny2313 as well. As this AVR does not offer an ADC, everything related to handling the ADC is disabled in the code for that MCU type. Also, port D of this controller type only features 6 pins, so the 1-second flash LED had to be moved from PD6 to PD4. (PD4 is used as the ADC control button on the other MCU types, but that is not needed here.) OC1A is located at PB3 on this device.
+.PP
+The \fCMCU_TARGET\fP macro in the Makefile needs to be adjusted appropriately for the alternative controller types.
+.PP
+The flash ROM and RAM consumption of this demo are way below the resources of even an ATmega48, and still well within the capabilities of an ATtiny2313. The major advantage of experimenting with the ATmega16 (in addition that it ships together with an STK500 anyway) is that it can be debugged online via JTAG. Likewise, the ATmega48/88/168 and ATtiny2313 devices can be debugged through debugWire, using the Atmel JTAG ICE mkII or the low-cost AVR Dragon.
+.PP
+Note that in the explanation below, all port/pin names are applicable to the ATmega16 setup.
+.SH "Functional overview"
+.PP
+PD6 will be toggled with each internal clock tick (approx. 10 ms). PD7 will flash once per second.
+.PP
+PD0 and PD1 are configured as UART IO, and can be used to connect the demo kit to a PC (9600 Bd, 8N1 frame format). The demo application talks to the serial port, and it can be controlled from the serial port.
+.PP
+PD2 through PD4 are configured as inputs, and control the application unless control has been taken over by the serial port. Shorting PD2 to GND will decrease the current PWM value, shorting PD3 to GND will increase it.
+.PP
+While PD4 is shorted to GND, one ADC conversion for channel 0 (ADC input is on PA0) will be triggered each internal clock tick, and the resulting value will be used as the PWM value. So the brightness of the LED follows the analog input value on PC0. VAREF on the STK500 should be set to the same value as VCC.
+.PP
+When running in serial control mode, the function of the watchdog timer can be demonstrated by typing an `r'. This will make the demo application run in a tight loop without retriggering the watchdog so after some seconds, the watchdog will reset the MCU. This situation can be figured out on startup by reading the MCUCSR register.
+.PP
+The current value of the PWM is backed up in an EEPROM cell after about 3 seconds of idle time after the last change. If that EEPROM cell contains a reasonable (i. e. non-erased) value at startup, it is taken as the initial value for the PWM. This virtually preserves the last value across power cycles. By not updating the EEPROM immmediately but only after a timeout, EEPROM wear is reduced considerably compared to immediately writing the value at each change.
+.SH "A code walkthrough"
+.PP
+This section explains the ideas behind individual parts of the code. The \fBsource code\fP has been divided into numbered parts, and the following subsections explain each of these parts.
+.SS "Part 1: Macro definitions"
+A number of preprocessor macros are defined to improve readability and/or portability of the application.
+.PP
+The first macros describe the IO pins our LEDs and pushbuttons are connected to. This provides some kind of mini-HAL (hardware abstraction layer) so should some of the connections be changed, they don't need to be changed inside the code but only on top. Note that the location of the PWM output itself is mandated by the hardware, so it cannot be easily changed. As the ATmega48/88/168 controllers belong to a more recent generation of AVRs, a number of register and bit names have been changed there, so they are mapped back to their ATmega8/16 equivalents to keep the actual program code portable.
+.PP
+The name \fCF_CPU\fP is the conventional name to describe the CPU clock frequency of the controller. This demo project just uses the internal calibrated 1 MHz RC oscillator that is enabled by default. Note that when using the \fC<\fButil/delay.h\fP>\fP functions, \fCF_CPU\fP needs to be defined before including that file.
+.PP
+The remaining macros have their own comments in the source code. The macro \fCTMR1_SCALE\fP shows how to use the preprocessor and the compiler's constant expression computation to calculate the value of timer 1's post-scaler in a way so it only depends on \fCF_CPU\fP and the desired software clock frequency. While the formula looks a bit complicated, using a macro offers the advantage that the application will automatically scale to new target softclock or master CPU frequencies without having to manually re-calculate hardcoded constants.
+.SS "Part 2: Variable definitions"
+The \fCintflags\fP structure demonstrates a way to allocate bit variables in memory. Each of the interrupt service routines just sets one bit within that structure, and the application's main loop then monitors the bits in order to act appropriately.
+.PP
+Like all variables that are used to communicate values between an interrupt service routine and the main application, it is declared \fBvolatile\fP.
+.PP
+The variable \fCee_pwm\fP is not a variable in the classical C sense that could be used as an lvalue or within an expression to obtain its value. Instead, the
+.PP
+.PP
+.nf
+ __attribute__((section('.eeprom'))) 
+.fi
+.PP
+.PP
+marks it as belonging to the \fBEEPROM section\fP. This section is merely used as a placeholder so the compiler can arrange for each individual variable's location in EEPROM. The compiler will also keep track of initial values assigned, and usually the Makefile is arranged to extract these initial values into a separate load file (\fClargedemo_eeprom\fP.* in this case) that can be used to initialize the EEPROM.
+.PP
+The actual EEPROM IO must be performed manually.
+.PP
+Similarly, the variable \fCmcucsr\fP is kept in the \fB.noinit\fP section in order to prevent it from being cleared upon application startup.
+.SS "Part 3: Interrupt service routines"
+The ISR to handle timer 1's overflow interrupt arranges for the software clock. While timer 1 runs the PWM, it calls its overflow handler rather frequently, so the \fCTMR1_SCALE\fP value is used as a postscaler to reduce the internal software clock frequency further. If the software clock triggers, it sets the \fCtmr_int\fP bitfield, and defers all further tasks to the main loop.
+.PP
+The ADC ISR just fetches the value from the ADC conversion, disables the ADC interrupt again, and announces the presence of the new value in the \fCadc_int\fP bitfield. The interrupt is kept disabled while not needed, because the ADC will also be triggered by executing the SLEEP instruction in idle mode (which is the default sleep mode). Another option would be to turn off the ADC completely here, but that increases the ADC's startup time (not that it would matter much for this application).
+.SS "Part 4: Auxiliary functions"
+The function \fChandle_mcucsr()\fP uses two \fC__attribute__\fP declarators to achieve specific goals. First, it will instruct the compiler to place the generated code into the \fB.init3\fP section of the output. Thus, it will become part of the application initialization sequence. This is done in order to fetch (and clear) the reason of the last hardware reset from \fCMCUCSR\fP as early as possible. There is a short period of time where the next reset could already trigger before the current reason has been evaluated. This also explains why the variable \fCmcucsr\fP that mirrors the register's value needs to be placed into the .noinit section, because otherwise the default initialization (which happens after .init3) would blank the value again.
+.PP
+As the initialization code is not called using CALL/RET instructions but rather concatenated together, the compiler needs to be instructed to omit the entire function prologue and epilogue. This is performed by the \fInaked\fP attribute. So while syntactically, \fChandle_mcucsr()\fP is a function to the compiler, the compiler will just emit the instructions for it without setting up any stack frame, and not even a RET instruction at the end.
+.PP
+Function \fCioinit()\fP centralizes all hardware setup. The very last part of that function demonstrates the use of the EEPROM variable \fCee_pwm\fP to obtain an EEPROM address that can in turn be applied as an argument to \fC\fBeeprom_read_word()\fP\fP.
+.PP
+The following functions handle UART character and string output. (UART input is handled by an ISR.) There are two string output functions, \fCprintstr()\fP and \fCprintstr_p()\fP. The latter function fetches the string from \fBprogram memory\fP. Both functions translate a newline character into a carriage return/newline sequence, so a simple \fC\\n\fP can be used in the source code.
+.PP
+The function \fCset_pwm()\fP propagates the new PWM value to the PWM, performing range checking. When the value has been changed, the new percentage will be announced on the serial link. The current value is mirrored in the variable \fCpwm\fP so others can use it in calculations. In order to allow for a simple calculation of a percentage value without requiring floating-point mathematics, the maximal value of the PWM is restricted to 1000 rather than 1023, so a simple division by 10 can be used. Due to the nature of the human eye, the difference in LED brightness between 1000 and 1023 is not noticable anyway.
+.SS "Part 5: main()"
+At the start of \fCmain()\fP, a variable \fCmode\fP is declared to keep the current mode of operation. An enumeration is used to improve the readability. By default, the compiler would allocate a variable of type \fIint\fP for an enumeration. The \fIpacked\fP attribute declarator instructs the compiler to use the smallest possible integer type (which would be an 8-bit type here).
+.PP
+After some initialization actions, the application's main loop follows. In an embedded application, this is normally an infinite loop as there is nothing an application could 'exit' into anyway.
+.PP
+At the beginning of the loop, the watchdog timer will be retriggered. If that timer is not triggered for about 2 seconds, it will issue a hardware reset. Care needs to be taken that no code path blocks longer than this, or it needs to frequently perform watchdog resets of its own. An example of such a code path would be the string IO functions: for an overly large string to print (about 2000 characters at 9600 Bd), they might block for too long.
+.PP
+The loop itself then acts on the interrupt indication bitfields as appropriate, and will eventually put the CPU on sleep at its end to conserve power.
+.PP
+The first interrupt bit that is handled is the (software) timer, at a frequency of approximately 100 Hz. The \fCCLOCKOUT\fP pin will be toggled here, so e. g. an oscilloscope can be used on that pin to measure the accuracy of our software clock. Then, the LED flasher for LED2 ('We are alive'-LED) is built. It will flash that LED for about 50 ms, and pause it for another 950 ms. Various actions depending on the operation mode follow. Finally, the 3-second backup timer is implemented that will write the PWM value back to EEPROM once it is not changing anymore.
+.PP
+The ADC interrupt will just adjust the PWM value only.
+.PP
+Finally, the UART Rx interrupt will dispatch on the last character received from the UART.
+.PP
+All the string literals that are used as informational messages within \fCmain()\fP are placed in \fBprogram memory\fP so no SRAM needs to be allocated for them. This is done by using the PSTR macro, and passing the string to \fCprintstr_p()\fP.
+.SH "The source code"
+.PP
+.PP
+ 
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for avr-libc from the source code.

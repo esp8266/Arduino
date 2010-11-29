@@ -1,0 +1,73 @@
+#
+# $Id: INSTALL,v 1.8 2002/04/12 23:12:21 troth Exp $
+#
+
+This file documents how to build and install simulavr on a unix-like system
+using the provided configure script.
+
+Although it is not required, you should have already built and installed
+binutils for avr, avr-gcc, uisp and possibly avr-gdb. In order to build and
+use the test programs in test_asm/ and test_c/ directories, you must have
+avr gcc and avr binutils properly installed and in your PATH. If you don't
+have them installed, you should pass configure the "--disable-tests" option.
+
+If you want to use simulavr as a backend to gdb, see the README.gdb file in
+the simulavr source.
+
+To build simulavr, run this command in the top level directory:
+
+    $ ./configure
+
+This will configure simulavr to be installed in the default "/usr/local/"
+location. If you wish to install it in another location, use the
+"--prefix=<dir>" option to configure. It is posible to install in your home
+directory if you don't have root access to the "/usr/local/". For instance, I
+like to install software like this:
+
+    $ ./configure --prefix=$HOME/local/simulavr
+
+In this case, if you think that simulavr is crappy software, you can easily
+remove it by removing the "$HOME/local/simulavr" directory. If you wish to
+keep it, you might need to add "$HOME/local/simulavr/bin" to your PATH
+environment variable so that you can run it by just typing `simulavr` instead
+of the full path. Theoretically, you should be able to uninstall the installed
+files using the 'make uninstall' command.
+
+If you wish to include more agressive build optimizations, do this:
+
+   $ my_CFLAGS='-g -O2 -Wall -fomit-frame-pointer -finline-functions \
+   > -march=i686 -mcpu=i686"
+   $ CFLAGS=$my_CFLAGS ./configure
+
+I have seen significant speedups using the above optimizations on my Pentium
+Pro development system. You may have better luck with other CFLAGS values. See
+`man gcc` for other compiler flags. Of course, if you aren't using gcc, your
+CFLAGS choices may be quite different.
+
+Once you have run the configure script, you can build and install the
+simulator.
+
+    $ make
+    $ make install
+
+If the build fails while trying to build the programs in the test_c directory
+complaining about not being able to find the avr libc header files, you will
+have to tell the build system where those files are located. This is done by
+passing an option to configure:
+
+    $ ./configure --with-avr-include=<your path to avr include files>
+
+To view all the available configure options, use the "--help" configure
+option:
+
+    $ ./configure --help
+
+If you wish to verify that your build of the simulator works, run the
+regression tests like this:
+
+	$ make check
+
+This will automatically build simulavr if needed. The regression test engine
+automatically starts up an instance of simulavr to run the tests. If any test
+fails, I want to hear about it, so send me an email.
+

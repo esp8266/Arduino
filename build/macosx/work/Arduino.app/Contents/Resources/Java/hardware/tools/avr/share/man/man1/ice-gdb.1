@@ -1,0 +1,129 @@
+.TH ice-gdb 1 "August 22, 2003"
+.LO 1
+.SH NAME
+ice-gdb \- JTAG ICE frontend for avr-gdb
+.br
+ice-insight \- JTAG ICE frontend for avr-insight
+.SH SYNOPSIS
+.B ice-gdb/ice-insight
+.RB [ --debugger
+.IR debugger ]
+.RB [ --capture ]
+.RB [ --ignore-intr ]
+.RB [ --external ]
+.RI [ gdb_arguments ]
+.SH DESCRIPTION
+.B ice-gdb
+(respectively
+.BR ice-insight )
+starts
+.B avr-gdb
+(respectively
+.BR avr-insight )
+and
+.B avarice
+to do on-chip debugging on Atmel AVR processors using their JTAG-based
+on-chip debug facilities, via the Atmel JTAG ICE pod.
+
+The executable for the program being debugged is downloaded to the
+processor unless the
+.B --capture
+option is specified. A number of extra commands are available within gdb
+when started, see their description in NEW GDB COMMANDS below. Restrictions
+on debugging with the JTAG ICE pod are discussed in more detail in DEBUGGING
+WITH JTAG ICE below.
+
+The arguments passed to
+.B avarice
+include the value of the
+.B AVARICE_ARGS
+environment variable. This is typically used to specify the serial port to
+which the JTAG ICE pod is connected by setting
+.B AVARICE_ARGS
+to "-j <serial port name>".
+.SH OPTIONS
+.TP
+.B --debugger debugger_command
+Specify a different debugger than avr-gdb (or avr-insight). This other
+debugger should behave similarly to gdb.
+.TP
+.B --capture
+Don't download the executable being debugged to the mote, just interrupt the
+current program and assume that it matches the executable passed to
+.BR ice-gdb .
+This is similar to "attaching" to a running program within gdb.
+.TP
+.B --ignore-intr
+Pass the
+.B --ignore-intr
+option to
+.BR avarice .
+The single-step commands in gdb (s, n) will then "step over" interrupt
+handlers (i.e., if an interrupt occurs, execution will resume for the
+duration of the interrupt).
+.TP
+.B --external
+Do not start
+.BR avarice .
+Instead,
+.B avr-gdb
+will attempt to connect to an already running
+.B avarice
+on port localhost:6423.
+.SH NEW GDB COMMANDS
+.TP
+.B ice-restart
+Restart avarice.
+.TP
+.B ice-load filename
+Download executable filename to the Atmel processor and start debugging it
+(this replaces the gdb
+.B load
+command).
+.TP 
+.B target-ice
+Connect to a copy of
+.B avarice
+running on port localhost:6423.
+.SH DEBUGGING WITH JTAG ICE
+The JTAG ICE debugging environment has a few restrictions and changes:
+.IP \(bu 4
+No "soft" breakpoints, and only three hardware breakpoints. The break
+command sets hardware breakpoints. The easiest way to deal with this
+restriction is to enable and disable breakpoints as needed.
+.IP \(bu
+Two 1-byte hardware watchpoints (but each hardware watchpoint takes away
+one hardware breakpoint). If you set a watchpoint on a variable which takes
+more than one byte, execution will be abysmally slow. Instead it is better
+to do the following:
+
+.RS 6
+watch *(char *)&myvariable
+.RE
+.IP
+which watches the least significant byte of
+.BR myvariable .
+.IP \(bu
+The Atmel AVR processors have a Harvard architecture (separate code and
+data buses). To distinguish data address 0 from code address 0,
+.B avr-gdb
+adds 0x800000 to all data addresses. Bear this in mind when examining
+printed pointers, or when passing absolute addresses to gdb commands.
+.SH ENVIRONMENT
+.TP
+.B AVARICE_ARGS
+Extra arguments to pass to
+.B avarice
+at startup.
+.SH SEE ALSO
+gdb(1), insight(1).
+.SH BUGS
+On Windows, the
+.B ice-gdb
+and
+.B ice-insight
+commands only work in the
+.B cygwin
+environment. They do not work with the
+.B mingw
+environment.

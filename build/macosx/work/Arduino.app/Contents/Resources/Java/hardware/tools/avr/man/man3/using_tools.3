@@ -1,0 +1,456 @@
+.TH "using_tools" 3 "6 Nov 2008" "Version 1.6.4" "avr-libc" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+using_tools \- Using the GNU tools 
+This is a short summary of the AVR-specific aspects of using the GNU tools. Normally, the generic documentation of these tools is fairly large and maintained in \fCtexinfo\fP files. Command-line options are explained in detail in the manual page.
+.SH "Options for the C compiler avr-gcc"
+.PP
+.SS "Machine-specific options for the AVR"
+The following machine-specific options are recognized by the C compiler frontend. In addition to the preprocessor macros indicated in the tables below, the preprocessor will define the macros __AVR and __AVR__ (to the value 1) when compiling for an AVR target. The macro AVR will be defined as well when using the standard levels gnu89 (default) and gnu99 but not with c89 and c99.
+.PP
+.IP "\(bu" 2
+\fC-mmcu=\fP\fIarchitecture\fP 
+.PP
+.PP
+Compile code for \fIarchitecture\fP. Currently known architectures are  
+.PP
+Architecture Macros Description  avr1 __AVR_ARCH__=1
+.br
+ __AVR_ASM_ONLY__
+.br
+ __AVR_2_BYTE_PC__ [2]  Simple CPU core, only assembler support  avr2 __AVR_ARCH__=2
+.br
+ __AVR_2_BYTE_PC__ [2]  'Classic' CPU core, up to 8 KB of ROM  avr25 [1] __AVR_ARCH__=25
+.br
+ __AVR_HAVE_MOVW__ [1]
+.br
+ __AVR_HAVE_LPMX__ [1]
+.br
+ __AVR_2_BYTE_PC__ [2]  'Classic' CPU core with 'MOVW' and 'LPM Rx, Z[+]' instruction, up to 8 KB of ROM  avr3 __AVR_ARCH__=3
+.br
+ __AVR_MEGA__ [5]
+.br
+ __AVR_HAVE_JMP_CALL__ [4]
+.br
+ __AVR_2_BYTE_PC__ [2]  'Classic' CPU core, 16 KB to 64 KB of ROM  avr31 __AVR_ARCH__=31
+.br
+ __AVR_MEGA__
+.br
+ __AVR_HAVE_RAMPZ__[4]
+.br
+ __AVR_HAVE_ELPM__[4]
+.br
+ __AVR_2_BYTE_PC__ [2]  'Classic' CPU core, 128 KB of ROM  avr35 [3] __AVR_ARCH__=35
+.br
+ __AVR_MEGA__ [5]
+.br
+ __AVR_HAVE_JMP_CALL__ [4]
+.br
+ __AVR_HAVE_MOVW__ [1]
+.br
+ __AVR_HAVE_LPMX__ [1]
+.br
+ __AVR_2_BYTE_PC__ [2]  'Classic' CPU core with 'MOVW' and 'LPM Rx, Z[+]' instruction, 16 KB to 64 KB of ROM  avr4 __AVR_ARCH__=4
+.br
+ __AVR_ENHANCED__ [5]
+.br
+ __AVR_HAVE_MOVW__ [1]
+.br
+ __AVR_HAVE_LPMX__ [1]
+.br
+ __AVR_HAVE_MUL__ [1]
+.br
+ __AVR_2_BYTE_PC__ [2]  'Enhanced' CPU core, up to 8 KB of ROM  avr5 __AVR_ARCH__=5
+.br
+ __AVR_MEGA__ [5]
+.br
+ __AVR_ENHANCED__ [5]
+.br
+ __AVR_HAVE_JMP_CALL__ [4]
+.br
+ __AVR_HAVE_MOVW__ [1]
+.br
+ __AVR_HAVE_LPMX__ [1]
+.br
+ __AVR_HAVE_MUL__ [1]
+.br
+ __AVR_2_BYTE_PC__ [2]  'Enhanced' CPU core, 16 KB to 64 KB of ROM  avr51 __AVR_ARCH__=51
+.br
+ __AVR_MEGA__
+.br
+ __AVR_ENHANCED__
+.br
+ __AVR_HAVE_MOVW__ [1]
+.br
+ __AVR_HAVE_LPMX__ [1]
+.br
+ __AVR_HAVE_MUL__ [1]
+.br
+ __AVR_HAVE_RAMPZ__[4]
+.br
+ __AVR_HAVE_ELPM__[4]
+.br
+ __AVR_HAVE_ELPMX__[4]
+.br
+ __AVR_2_BYTE_PC__ [2]  'Enhanced' CPU core, 128 KB of ROM  avr6 [2] __AVR_ARCH__=6
+.br
+ __AVR_MEGA__ [5]
+.br
+ __AVR_ENHANCED__ [5]
+.br
+ __AVR_HAVE_JMP_CALL__ [4]
+.br
+ __AVR_HAVE_MOVW__ [1]
+.br
+ __AVR_HAVE_LPMX__ [1]
+.br
+ __AVR_HAVE_MUL__ [1]
+.br
+ __AVR_HAVE_RAMPZ__[4]
+.br
+ __AVR_HAVE_ELPM__[4]
+.br
+ __AVR_HAVE_ELPMX__[4]
+.br
+ __AVR_3_BYTE_PC__ [2]  'Enhanced' CPU core, 256 KB of ROM  
+.PP
+[1] New in GCC 4.2
+.br
+ [2] Unofficial patch for GCC 4.1
+.br
+ [3] New in GCC 4.2.3
+.br
+ [4] New in GCC 4.3
+.br
+ [5] Obsolete.   
+.PP
+By default, code is generated for the avr2 architecture.  
+.PP
+Note that when only using \fC-mmcu=\fP\fIarchitecture\fP but no \fC-mmcu=\fP\fIMCU type\fP, including the file \fC<\fBavr/io.h\fP>\fP cannot work since it cannot decide which device's definitions to select. 
+.PP
+.IP "\(bu" 2
+\fC-mmcu=\fP\fIMCU type\fP 
+.PP
+.PP
+The following MCU types are currently understood by avr-gcc. The table matches them against the corresponding avr-gcc architecture name, and shows the preprocessor symbol declared by the \fC-mmcu\fP option.  
+.PP
+ArchitectureMCU nameMacro avr1at90s1200__AVR_AT90S1200__ avr1attiny11__AVR_ATtiny11__ avr1attiny12__AVR_ATtiny12__ avr1attiny15__AVR_ATtiny15__ avr1attiny28__AVR_ATtiny28__ avr2at90s2313__AVR_AT90S2313__ avr2at90s2323__AVR_AT90S2323__ avr2at90s2333__AVR_AT90S2333__ avr2at90s2343__AVR_AT90S2343__ avr2attiny22__AVR_ATtiny22__ avr2attiny26__AVR_ATtiny26__ avr2at90s4414__AVR_AT90S4414__ avr2at90s4433__AVR_AT90S4433__ avr2at90s4434__AVR_AT90S4434__ avr2at90s8515__AVR_AT90S8515__ avr2at90c8534__AVR_AT90C8534__ avr2at90s8535__AVR_AT90S8535__ avr2/avr25 [1]at86rf401__AVR_AT86RF401__ avr2/avr25 [1]attiny13__AVR_ATtiny13__ avr2/avr25 [1]attiny13a__AVR_ATtiny13A__ avr2/avr25 [1]attiny2313__AVR_ATtiny2313__ avr2/avr25 [1]attiny24__AVR_ATtiny24__ avr2/avr25 [1]attiny25__AVR_ATtiny25__ avr2/avr25 [1]attiny261__AVR_ATtiny261__ avr2/avr25 [1]attiny43u__AVR_ATtiny43U__ avr2/avr25 [1]attiny44__AVR_ATtiny44__ avr2/avr25 [1]attiny45__AVR_ATtiny45__ avr2/avr25 [1]attiny461__AVR_ATtiny461__ avr2/avr25 [1]attiny48__AVR_ATtiny48__ avr2/avr25 [1]attiny84__AVR_ATtiny84__ avr2/avr25 [1]attiny85__AVR_ATtiny85__ avr2/avr25 [1]attiny861__AVR_ATtiny861__ avr2/avr25 [1]attiny88__AVR_ATtiny88__ avr3atmega603__AVR_ATmega603__ avr3at43usb355__AVR_AT43USB355__ avr3/avr31 [3]atmega103__AVR_ATmega103__ avr3/avr31 [3]at43usb320__AVR_AT43USB320__ avr3/avr35 [2]at90usb82__AVR_AT90USB82__ avr3/avr35 [2]at90usb162__AVR_AT90USB162__ avr3/avr35 [2]attiny167__AVR_ATtiny167__ avr3at76c711__AVR_AT76C711__ avr4atmega48__AVR_ATmega48__ avr4atmega48p__AVR_ATmega48P__ avr4atmega8__AVR_ATmega8__ avr4atmega8515__AVR_ATmega8515__ avr4atmega8535__AVR_ATmega8535__ avr4atmega88__AVR_ATmega88__ avr4atmega88p__AVR_ATmega88P__ avr4atmega8hva__AVR_ATmega8HVA__ avr4at90pwm1__AVR_AT90PWM1__ avr4at90pwm2__AVR_AT90PWM2__ avr4at90pwm2b__AVR_AT90PWM2B__ avr4at90pwm3__AVR_AT90PWM3__ avr4at90pwm3b__AVR_AT90PWM3B__ avr5at90pwm216__AVR_AT90PWM216__ avr5at90pwm316__AVR_AT90PWM316__ avr5at90can32__AVR_AT90CAN32__ avr5at90can64__AVR_AT90CAN64__ avr5at90usb646__AVR_AT90USB646__ avr5at90usb647__AVR_AT90USB647__ avr5atmega16__AVR_ATmega16__ avr5atmega161__AVR_ATmega161__ avr5atmega162__AVR_ATmega162__ avr5atmega163__AVR_ATmega163__ avr5atmega164p__AVR_ATmega164P__ avr5atmega165__AVR_ATmega165__ avr5atmega165p__AVR_ATmega165P__ avr5atmega168__AVR_ATmega168__ avr5atmega168p__AVR_ATmega168P__ avr5atmega169__AVR_ATmega169__ avr5atmega169p__AVR_ATmega169P__ avr5atmega16hva__AVR_ATmega16HVA__ avr5atmega32__AVR_ATmega32__ avr5atmega323__AVR_ATmega323__ avr5atmega324p__AVR_ATmega324P__ avr5atmega325__AVR_ATmega325__ avr5atmega325p__AVR_ATmega325P__ avr5atmega3250__AVR_ATmega3250__ avr5atmega3250p__AVR_ATmega3250P__ avr5atmega328p__AVR_ATmega328P__ avr5atmega329__AVR_ATmega329__ avr5atmega329p__AVR_ATmega329P__ avr5atmega3290__AVR_ATmega3290__ avr5atmega3290p__AVR_ATmega3290P__ avr5atmega32c1__AVR_ATMEGA32C1__ avr5atmega32hvb__AVR_ATmega32HVB__ avr5atmega32m1__AVR_ATMEGA32M1__ avr5atmega32u4__AVR_ATMEGA32U4__ avr5atmega32u6__AVR_ATMEGA32U6__ avr5atmega406__AVR_ATmega406__ avr5atmega64__AVR_ATmega64__ avr5atmega640__AVR_ATmega640__ avr5atmega644__AVR_ATmega644__ avr5atmega644p__AVR_ATmega644P__ avr5atmega645__AVR_ATmega645__ avr5atmega6450__AVR_ATmega6450__ avr5atmega649__AVR_ATmega649__ avr5atmega6490__AVR_ATmega6490__ avr5at94k__AVR_AT94K__ avr5/avr51 [3]atmega128__AVR_ATmega128__ avr5/avr51 [3]atmega1280__AVR_ATmega1280__ avr5/avr51 [3]atmega1281__AVR_ATmega1281__ avr5/avr51 [3]atmega1284p__AVR_ATmega1284P__ avr5/avr51 [3]at90can128__AVR_AT90CAN128__ avr5/avr51 [3]at90usb1286__AVR_AT90USB1286__ avr5/avr51 [3]at90usb1287__AVR_AT90USB1287__ avr6atmega2560__AVR_ATmega2560__ avr6atmega2561__AVR_ATmega2561__ avrxmega4atxmega64a3__AVR_ATxmega64A3__ avrxmega5atxmega64a1__AVR_ATxmega64A1__ avrxmega6atxmega128a3__AVR_ATxmega128A3__ avrxmega6atxmega256a3__AVR_ATxmega256A3__ avrxmega6atxmega256a3b__AVR_ATxmega256A3B__ avrxmega7atxmega128a1__AVR_ATxmega128A1__
+.PP
+.PP
+[1] 'avr25' architecture is new in GCC 4.2
+.br
+ [2] 'avr35' architecture is new in GCC 4.2.3 
+.PP
+.IP "\(bu" 2
+\fC-morder1\fP 
+.IP "\(bu" 2
+\fC-morder2\fP 
+.PP
+.PP
+Change the order of register assignment. The default is  
+.PP
+r24, r25, r18, r19, r20, r21, r22, r23, r30, r31, r26, r27, r28, r29, r17, r16, r15, r14, r13, r12, r11, r10, r9, r8, r7, r6, r5, r4, r3, r2, r0, r1  
+.PP
+Order 1 uses  
+.PP
+r18, r19, r20, r21, r22, r23, r24, r25, r30, r31, r26, r27, r28, r29, r17, r16, r15, r14, r13, r12, r11, r10, r9, r8, r7, r6, r5, r4, r3, r2, r0, r1  
+.PP
+Order 2 uses  
+.PP
+r25, r24, r23, r22, r21, r20, r19, r18, r30, r31, r26, r27, r28, r29, r17, r16, r15, r14, r13, r12, r11, r10, r9, r8, r7, r6, r5, r4, r3, r2, r1, r0 
+.PP
+.IP "\(bu" 2
+\fC-mint8\fP 
+.PP
+.PP
+Assume \fCint\fP to be an 8-bit integer. Note that this is not really supported by \fCavr-libc\fP, so it should normally not be used. The default is to use 16-bit integers. 
+.PP
+.IP "\(bu" 2
+\fC-mno-interrupts\fP 
+.PP
+.PP
+Generates code that changes the stack pointer without disabling interrupts. Normally, the state of the status register \fCSREG\fP is saved in a temporary register, interrupts are disabled while changing the stack pointer, and \fCSREG\fP is restored.  
+.PP
+Specifying this option will define the preprocessor macro \fC__NO_INTERRUPTS__\fP to the value 1. 
+.PP
+.IP "\(bu" 2
+\fC-mcall-prologues\fP 
+.PP
+.PP
+Use subroutines for function prologue/epilogue. For complex functions that use many registers (that needs to be saved/restored on function entry/exit), this saves some space at the cost of a slightly increased execution time. 
+.PP
+.IP "\(bu" 2
+\fC-mtiny-stack\fP 
+.PP
+.PP
+Change only the low 8 bits of the stack pointer. 
+.PP
+.IP "\(bu" 2
+\fC-mno-tablejump\fP 
+.PP
+.PP
+Do not generate tablejump instructions. By default, jump tables can be used to optimize \fCswitch\fP statements. When turned off, sequences of compare statements are used instead. Jump tables are usually faster to execute on average, but in particular for \fCswitch\fP statements where most of the jumps would go to the default label, they might waste a bit of flash memory. 
+.PP
+.IP "\(bu" 2
+\fC-mshort-calls\fP 
+.PP
+.PP
+Use \fCrjmp/rcall\fP (limited range) on >8K devices. On \fCavr2\fP and \fCavr4\fP architectures (less than 8 KB or flash memory), this is always the case. On \fCavr3\fP and \fCavr5\fP architectures, calls and jumps to targets outside the current function will by default use \fCjmp/call\fP instructions that can cover the entire address range, but that require more flash ROM and execution time. 
+.PP
+.IP "\(bu" 2
+\fC-mrtl\fP 
+.PP
+.PP
+Dump the internal compilation result called 'RTL' into comments in the generated assembler code. Used for debugging avr-gcc. 
+.PP
+.IP "\(bu" 2
+\fC-msize\fP 
+.PP
+.PP
+Dump the address, size, and relative cost of each statement into comments in the generated assembler code. Used for debugging avr-gcc. 
+.PP
+.IP "\(bu" 2
+\fC-mdeb\fP 
+.PP
+.PP
+Generate lots of debugging information to \fCstderr\fP. 
+.SS "Selected general compiler options"
+The following general gcc options might be of some interest to AVR users.
+.PP
+.IP "\(bu" 2
+\fC-O\fP\fIn\fP 
+.PP
+.PP
+ Optimization level \fIn\fP. Increasing \fIn\fP is meant to optimize more, an optimization level of 0 means no optimization at all, which is the default if no \fC-O\fP option is present. The special option \fC-Os\fP is meant to turn on all \fC-O2\fP optimizations that are not expected to increase code size.  
+.PP
+Note that at \fC-O3\fP, gcc attempts to inline all 'simple' functions. For the AVR target, this will normally constitute a large pessimization due to the code increasement. The only other optimization turned on with \fC-O3\fP is \fC-frename-registers\fP, which could rather be enabled manually instead.  
+.PP
+A simple \fC-O\fP option is equivalent to \fC-O1\fP.  
+.PP
+Note also that turning off all optimizations will prevent some warnings from being issued since the generation of those warnings depends on code analysis steps that are only performed when optimizing (unreachable code, unused variables).  
+.PP
+See also the \fBappropriate FAQ entry\fP for issues regarding debugging optimized code. 
+.PP
+.IP "\(bu" 2
+\fC-Wa,\fP\fIassembler-options\fP
+.IP "\(bu" 2
+\fC-Wl,\fP\fIlinker-options\fP 
+.PP
+.PP
+ Pass the listed options to the assembler, or linker, respectively. 
+.PP
+.IP "\(bu" 2
+\fC-g\fP 
+.PP
+.PP
+Generate debugging information that can be used by avr-gdb. 
+.PP
+.IP "\(bu" 2
+\fC-ffreestanding\fP 
+.PP
+.PP
+Assume a 'freestanding' environment as per the C standard. This turns off automatic builtin functions (though they can still be reached by prepending \fC__builtin_\fP to the actual function name). It also makes the compiler not complain when \fCmain()\fP is declared with a \fCvoid\fP return type which makes some sense in a microcontroller environment where the application cannot meaningfully provide a return value to its environment (in most cases, \fCmain()\fP won't even return anyway). However, this also turns off all optimizations normally done by the compiler which assume that functions known by a certain name behave as described by the standard. E. g., applying the function \fBstrlen()\fP to a literal string will normally cause the compiler to immediately replace that call by the actual length of the string, while with \fC-ffreestanding\fP, it will always call \fBstrlen()\fP at run-time. 
+.PP
+.IP "\(bu" 2
+\fC-funsigned-char\fP 
+.PP
+.PP
+Make any unqualfied \fCchar\fP type an unsigned char. Without this option, they default to a signed char. 
+.PP
+.IP "\(bu" 2
+\fC-funsigned-bitfields\fP 
+.PP
+.PP
+Make any unqualified bitfield type unsigned. By default, they are signed. 
+.PP
+.IP "\(bu" 2
+\fC-fshort-enums\fP 
+.PP
+.PP
+Allocate to an \fCenum\fP type only as many bytes as it needs for the declared range of possible values. Specifically, the enum type will be equivalent to the smallest integer type which has enough room. 
+.PP
+.IP "\(bu" 2
+\fC-fpack-struct\fP 
+.PP
+.PP
+Pack all structure members together without holes. 
+.SH "Options for the assembler avr-as"
+.PP
+.SS "Machine-specific assembler options"
+.IP "\(bu" 2
+\fC-mmcu=\fP\fIarchitecture\fP
+.IP "\(bu" 2
+\fC-mmcu=\fP\fIMCU name\fP 
+.PP
+.PP
+avr-as understands the same \fC-mmcu=\fP options as \fBavr-gcc\fP. By default, avr2 is assumed, but this can be altered by using the appropriate \fC\fP.arch pseudo-instruction inside the assembler source file. 
+.PP
+.IP "\(bu" 2
+\fC-mall-opcodes\fP 
+.PP
+.PP
+Turns off opcode checking for the actual MCU type, and allows any possible AVR opcode to be assembled. 
+.PP
+.IP "\(bu" 2
+\fC-mno-skip-bug\fP 
+.PP
+.PP
+Don't emit a warning when trying to skip a 2-word instruction with a \fCCPSE/SBIC/SBIS/SBRC/SBRS\fP instruction. Early AVR devices suffered from a hardware bug where these instructions could not be properly skipped. 
+.PP
+.IP "\(bu" 2
+\fC-mno-wrap\fP 
+.PP
+.PP
+For \fCRJMP/RCALL\fP instructions, don't allow the target address to wrap around for devices that have more than 8 KB of memory. 
+.PP
+.IP "\(bu" 2
+\fC--gstabs\fP 
+.PP
+.PP
+Generate \fC\fP.stabs debugging symbols for assembler source lines. This enables avr-gdb to trace through assembler source files. This option \fImust not\fP be used when assembling sources that have been generated by the C compiler; these files already contain the appropriate line number information from the C source files. 
+.PP
+.IP "\(bu" 2
+\fC-a[cdhlmns=\fP\fIfile\fP\fC]\fP 
+.PP
+.PP
+Turn on the assembler listing. The sub-options are:  
+.PP
+.PD 0
+.IP "\(bu" 2
+\fCc\fP omit false conditionals 
+.IP "\(bu" 2
+\fCd\fP omit debugging directives 
+.IP "\(bu" 2
+\fCh\fP include high-level source 
+.IP "\(bu" 2
+\fCl\fP include assembly 
+.IP "\(bu" 2
+\fCm\fP include macro expansions 
+.IP "\(bu" 2
+\fCn\fP omit forms processing 
+.IP "\(bu" 2
+\fCs\fP include symbols 
+.IP "\(bu" 2
+\fC=\fP\fIfile\fP set the name of the listing file 
+.PP
+.PP
+The various sub-options can be combined into a single \fC-a\fP option list; \fI=file\fP must be the last one in that case. 
+.SS "Examples for assembler options passed through the C compiler"
+Remember that assembler options can be passed from the C compiler frontend using \fC-Wa\fP (see \fBabove\fP), so in order to include the C source code into the assembler listing in file \fCfoo.lst\fP, when compiling \fCfoo.c\fP, the following compiler command-line can be used:
+.PP
+.PP
+.nf
+
+	$ avr-gcc -c -O foo.c -o foo.o -Wa,-ahls=foo.lst
+.fi
+.PP
+.PP
+In order to pass an assembler file through the C preprocessor first, and have the assembler generate line number debugging information for it, the following command can be used:
+.PP
+.PP
+.nf
+
+	$ avr-gcc -c -x assembler-with-cpp -o foo.o foo.S -Wa,--gstabs
+.fi
+.PP
+.PP
+Note that on Unix systems that have case-distinguishing file systems, specifying a file name with the suffix \fC\fP.S (upper-case letter S) will make the compiler automatically assume \fC-x assembler-with-cpp\fP, while using \fC\fP.s would pass the file directly to the assembler (no preprocessing done).
+.SH "Controlling the linker avr-ld"
+.PP
+.SS "Selected linker options"
+While there are no machine-specific options for avr-ld, a number of the standard options might be of interest to AVR users.
+.PP
+.IP "\(bu" 2
+\fC-l\fP\fIname\fP 
+.PP
+.PP
+Locate the archive library named \fClib\fP\fIname\fP\fC.a\fP, and use it to resolve currently unresolved symbols from it. The library is searched along a path that consists of builtin pathname entries that have been specified at compile time (e. g. \fC/usr/local/avr/lib\fP on Unix systems), possibly extended by pathname entries as specified by \fC-L\fP options (that must precede the \fC-l\fP options on the command-line). 
+.PP
+.IP "\(bu" 2
+\fC-L\fP\fIpath\fP 
+.PP
+.PP
+Additional location to look for archive libraries requested by \fC-l\fP options. 
+.PP
+.IP "\(bu" 2
+\fC--defsym \fP\fIsymbol=expr\fP 
+.PP
+.PP
+Define a global symbol \fIsymbol\fP using \fIexpr\fP as the value. 
+.PP
+.IP "\(bu" 2
+\fC-M\fP 
+.PP
+.PP
+Print a linker map to \fCstdout\fP. 
+.PP
+.IP "\(bu" 2
+\fC-Map \fP\fImapfile\fP 
+.PP
+.PP
+Print a linker map to \fImapfile\fP. 
+.PP
+.IP "\(bu" 2
+\fC--cref\fP 
+.PP
+.PP
+Output a cross reference table to the map file (in case \fC-Map\fP is also present), or to \fCstdout\fP. 
+.PP
+.IP "\(bu" 2
+\fC--section-start \fP\fIsectionname=org\fP 
+.PP
+.PP
+Start section \fIsectionname\fP at absolute address \fIorg\fP. 
+.PP
+.IP "\(bu" 2
+\fC-Tbss \fP\fIorg\fP
+.IP "\(bu" 2
+\fC-Tdata \fP\fIorg\fP
+.IP "\(bu" 2
+\fC-Ttext \fP\fIorg\fP 
+.PP
+.PP
+Start the \fCbss\fP, \fCdata\fP, or \fCtext\fP section at \fIorg\fP, respectively. 
+.PP
+.IP "\(bu" 2
+\fC-T \fP\fIscriptfile\fP 
+.PP
+.PP
+Use \fIscriptfile\fP as the linker script, replacing the default linker script. Default linker scripts are stored in a system-specific location (e. g. under \fC/usr/local/avr/lib/ldscripts\fP on Unix systems), and consist of the AVR architecture name (avr2 through avr5) with the suffix \fC\fP.x appended. They describe how the various \fBmemory sections\fP will be linked together. 
+.SS "Passing linker options from the C compiler"
+By default, all unknown non-option arguments on the avr-gcc command-line (i. e., all filename arguments that don't have a suffix that is handled by avr-gcc) are passed straight to the linker. Thus, all files ending in \fC\fP.o (object files) and \fC\fP.a (object libraries) are provided to the linker.
+.PP
+System libraries are usually not passed by their explicit filename but rather using the \fC-l\fP option which uses an abbreviated form of the archive filename (see above). avr-libc ships two system libraries, \fClibc.a\fP, and \fClibm.a\fP. While the standard library \fClibc.a\fP will always be searched for unresolved references when the linker is started using the C compiler frontend (i. e., there's always at least one implied \fC-lc\fP option), the mathematics library \fClibm.a\fP needs to be explicitly requested using \fC-lm\fP. See also the \fBentry in the FAQ\fP explaining this.
+.PP
+Conventionally, Makefiles use the \fCmake\fP macro \fCLDLIBS\fP to keep track of \fC-l\fP (and possibly \fC-L\fP) options that should only be appended to the C compiler command-line when linking the final binary. In contrast, the macro \fCLDFLAGS\fP is used to store other command-line options to the C compiler that should be passed as options during the linking stage. The difference is that options are placed early on the command-line, while libraries are put at the end since they are to be used to resolve global symbols that are still unresolved at this point.
+.PP
+Specific linker flags can be passed from the C compiler command-line using the \fC-Wl\fP compiler option, see \fBabove\fP. This option requires that there be no spaces in the appended linker option, while some of the linker options above (like \fC-Map\fP or \fC--defsym\fP) would require a space. In these situations, the space can be replaced by an equal sign as well. For example, the following command-line can be used to compile \fCfoo.c\fP into an executable, and also produce a link map that contains a cross-reference list in the file \fCfoo.map:\fP 
+.PP
+.PP
+.nf
+
+	$ avr-gcc -O -o foo.out -Wl,-Map=foo.map -Wl,--cref foo.c
+.fi
+.PP
+.PP
+Alternatively, a comma as a placeholder will be replaced by a space before passing the option to the linker. So for a device with external SRAM, the following command-line would cause the linker to place the data segment at address 0x2000 in the SRAM:
+.PP
+.PP
+.nf
+
+	$ avr-gcc -mmcu=atmega128 -o foo.out -Wl,-Tdata,0x802000
+.fi
+.PP
+.PP
+See the explanation of the \fBdata section\fP for why 0x800000 needs to be added to the actual value. Note that the stack will still remain in internal RAM, through the symbol \fC__stack\fP that is provided by the run-time startup code. This is probably a good idea anyway (since internal RAM access is faster), and even required for some early devices that had hardware bugs preventing them from using a stack in external RAM. Note also that the heap for \fC\fBmalloc()\fP\fP will still be placed after all the variables in the data section, so in this situation, no stack/heap collision can occur.
+.PP
+In order to relocate the stack from its default location at the top of interns RAM, the value of the symbol \fC__stack\fP can be changed on the linker command-line. As the linker is typically called from the compiler frontend, this can be achieved using a compiler option like
+.PP
+.PP
+.nf
+-Wl,--defsym=__stack=0x8003ff
+.fi
+.PP
+.PP
+The above will make the code use stack space from RAM address 0x3ff downwards. The amount of stack space available then depends on the bottom address of internal RAM for a particular device. It is the responsibility of the application to ensure the stack does not grow out of bounds, as well as to arrange for the stack to not collide with variable allocations made by the compiler (sections .data and .bss). 

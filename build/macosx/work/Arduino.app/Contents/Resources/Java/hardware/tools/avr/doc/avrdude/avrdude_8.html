@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html401/loose.dtd">
+<html>
+<!-- Created on October, 30 2007 by texi2html 1.76 -->
+<!--
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Many creative people <dev@texi2html.cvshome.org>
+Send bugs and suggestions to <users@texi2html.cvshome.org>
+
+-->
+<head>
+<title>AVRDUDE: 3.2 Terminal Mode Examples</title>
+
+<meta name="description" content="AVRDUDE: 3.2 Terminal Mode Examples">
+<meta name="keywords" content="AVRDUDE: 3.2 Terminal Mode Examples">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="texi2html 1.76">
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+pre.display {font-family: serif}
+pre.format {font-family: serif}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+pre.smalldisplay {font-family: serif; font-size: smaller}
+pre.smallexample {font-size: smaller}
+pre.smallformat {font-family: serif; font-size: smaller}
+pre.smalllisp {font-size: smaller}
+span.sansserif {font-family:sans-serif; font-weight:normal;}
+ul.toc {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
+
+<a name="Terminal-Mode-Examples"></a>
+<a name="SEC8"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="avrdude_7.html#SEC7" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="avrdude_9.html#SEC9" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="avrdude_6.html#SEC6" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="avrdude_6.html#SEC6" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="avrdude_9.html#SEC9" title="Next chapter"> &gt;&gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="avrdude.html#Top" title="Cover (top) of document">Top</a>]</td>
+<td valign="middle" align="left">[<a href="avrdude_toc.html#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[Index]</td>
+<td valign="middle" align="left">[<a href="avrdude_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 3.2 Terminal Mode Examples </h2>
+
+
+<p>Display part parameters, modify eeprom cells, perform a chip erase:
+</p>
+<table><tr><td>&nbsp;</td><td><table class="cartouche" border="1"><tr><td>
+<pre class="smallexample">% avrdude -p m128 -c stk500 -t
+
+avrdude: AVR device initialized and ready to accept instructions
+avrdude: Device signature = 0x1e9702
+avrdude: current erase-rewrite cycle count is 52 (if being tracked)
+avrdude&gt; part
+&gt;&gt;&gt; part 
+
+AVR Part              : ATMEGA128
+Chip Erase delay      : 9000 us
+PAGEL                 : PD7
+BS2                   : PA0
+RESET disposition     : dedicated
+RETRY pulse           : SCK
+serial program mode   : yes
+parallel program mode : yes
+Memory Detail         :
+
+                            Page                       Polled
+  Memory Type Paged  Size   Size #Pages MinW  MaxW   ReadBack
+  ----------- ------ ------ ---- ------ ----- ----- ---------
+  eeprom      no       4096    8     0  9000  9000 0xff 0xff
+  flash       yes    131072  256   512  4500  9000 0xff 0x00
+  lfuse       no          1    0     0     0     0 0x00 0x00
+  hfuse       no          1    0     0     0     0 0x00 0x00
+  efuse       no          1    0     0     0     0 0x00 0x00
+  lock        no          1    0     0     0     0 0x00 0x00
+  calibration no          1    0     0     0     0 0x00 0x00
+  signature   no          3    0     0     0     0 0x00 0x00
+
+avrdude&gt; dump eeprom 0 16
+&gt;&gt;&gt; dump eeprom 0 16 
+0000  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff  |................|
+
+avrdude&gt; write eeprom 0 1 2 3 4
+&gt;&gt;&gt; write eeprom 0 1 2 3 4 
+
+avrdude&gt; dump eeprom 0 16
+&gt;&gt;&gt; dump eeprom 0 16 
+0000  01 02 03 04 ff ff ff ff  ff ff ff ff ff ff ff ff  |................|
+
+avrdude&gt; erase
+&gt;&gt;&gt; erase 
+avrdude: erasing chip
+avrdude&gt; dump eeprom 0 16
+&gt;&gt;&gt; dump eeprom 0 16 
+0000  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff  |................|
+
+avrdude&gt; 
+</pre></td></tr></table>
+</td></tr></table>
+
+
+<p>Program the fuse bits of an ATmega128 (disable M103 compatibility,
+enable high speed external crystal, enable brown-out detection, slowly
+rising power).  Note since we are working with fuse bits the -u (unsafe)
+option is specified, which allows you to modify the fuse bits. First 
+display the factory defaults, then reprogram:
+</p>
+<table><tr><td>&nbsp;</td><td><table class="cartouche" border="1"><tr><td>
+<pre class="smallexample">% avrdude -p m128 -u -c stk500 -t
+
+avrdude: AVR device initialized and ready to accept instructions
+avrdude: Device signature = 0x1e9702
+avrdude: current erase-rewrite cycle count is 52 (if being tracked)
+avrdude&gt; d efuse
+&gt;&gt;&gt; d efuse 
+0000  fd                                                |.               |
+
+avrdude&gt; d hfuse
+&gt;&gt;&gt; d hfuse 
+0000  99                                                |.               |
+
+avrdude&gt; d lfuse
+&gt;&gt;&gt; d lfuse 
+0000  e1                                                |.               |
+
+avrdude&gt; w efuse 0 0xff
+&gt;&gt;&gt; w efuse 0 0xff 
+
+avrdude&gt; w hfuse 0 0x89
+&gt;&gt;&gt; w hfuse 0 0x89 
+
+avrdude&gt; w lfuse 0 0x2f
+&gt;&gt;&gt; w lfuse 0 0x2f 
+
+avrdude&gt; 
+</pre></td></tr></table>
+</td></tr></table>
+
+<hr size="6">
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="avrdude_7.html#SEC7" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="avrdude_9.html#SEC9" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="avrdude_6.html#SEC6" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="avrdude_6.html#SEC6" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="avrdude_9.html#SEC9" title="Next chapter"> &gt;&gt; </a>]</td>
+</tr></table>
+<p>
+ <font size="-1">
+  This document was generated by <em>Joerg Wunsch</em> on <em>October, 30 2007</em> using <a href="http://texi2html.cvshome.org/"><em>texi2html 1.76</em></a>.
+ </font>
+ <br>
+
+</p>
+</body>
+</html>

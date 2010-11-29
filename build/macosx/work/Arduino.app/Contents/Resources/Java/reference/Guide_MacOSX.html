@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head>  <title>Arduino - MacOSX </title>  <link rel='stylesheet' href='arduino.css' type='text/css' />  <meta name="verify-v1" content="TtxFIEJAB6zdJ509wLxjnapQzKAMNm9u0Wj4ho6wxIY=" /></head><body><div id="page"><!--PageHeaderFmt--><div id="pageheader">  <div class="title"><a href="http://www.arduino.cc"/>Arduino</a></div>  <div class="search">    <!-- SiteSearch Google -->    <FORM method=GET action="http://www.google.com/search">    <input type=hidden name=ie value=UTF-8>    <input type=hidden name=oe value=UTF-8>    <INPUT TYPE=text name=q size=25 maxlength=255 value="">    <INPUT type=submit name=btnG VALUE="search">    <input type=hidden name=domains value="http://www.arduino.cc/">    <input type=hidden name=sitesearch value="http://www.arduino.cc/">    </FORM>    <!-- SiteSearch Google -->  </div></div><!--/PageHeaderFmt--><!--PageLeftFmt--><div id="pagenav" style="text-align: right">  <div style="float: left;">  <p><a class='wikilink' href='http://arduino.cc/en/Main/Buy'>Buy</a>
+|
+<a class='wikilink' href='http://arduino.cc/en/Main/Software'>Download</a>
+|
+<a class='wikilink' href='Guide_index.html'>Getting Started</a>
+|
+<a class='wikilink' href='http://arduino.cc/en/Tutorial/HomePage'>Learning</a>
+|
+<a class='wikilink' href='index.html'>Reference</a>
+|
+<a class='wikilink' href='http://arduino.cc/en/Main/Hardware'>Hardware</a>
+|
+<a class='wikilink' href='FAQ.html'>FAQ</a>
+</p>
+<p class='vspace'></p>
+  </div>  <a class="urllink" href="http://www.arduino.cc/blog/" rel="nofollow">Blog &raquo;</a> |  <a class="urllink" href="http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl" rel="nofollow">Forum &raquo;</a> |  <a class="urllink" href="http://www.arduino.cc/playground/" rel="nofollow">Playground &raquo;</a></div><!--/PageLeftFmt--><div id="pagetext"><!--PageText-->
+<div id='wikitext'>
+<h2>Getting Started w/ Arduino on Mac OS X</h2>
+<p><em>This document explains how to connect your Arduino board to the computer and upload your first sketch.</em>
+</p>
+<p class='vspace'></p><div class='toc'><p><a name='toc' id='toc'></a><b>On this page...</b> (<a id="tocidtog" href="javascript:toggle('tocid');">hide</a>)</p><ul class='toc' id='tocid'><li><a href='#toc1'>1 | Get an Arduino board and USB cable</a></li><li><a href='#toc2'>2 | Download the Arduino environment</a></li><li><a href='#toc3'>3 | Install the Application and USB drivers</a></li><li><a href='#toc4'>4 | Connect the board</a></li><li><a href='#toc5'>5 | Launch the Arduino application</a></li><li><a href='#toc6'>6 | Open the blink example</a></li><li><a href='#toc7'>7 | Select your board</a></li><li><a href='#toc8'>8 | Select your serial port</a></li><li><a href='#toc9'>9 | Upload the program</a></li></ul></div>
+<p class='vspace'></p><h3><a name='toc1' id='toc1'></a>1 | Get an Arduino board and USB cable</h3>
+<p>In this tutorial, we assume you're using an <a class='wikilink' href='http://arduino.cc/en/Main/ArduinoBoardDuemilanove'>Arduino Duemilanove</a>, <a class='wikilink' href='http://arduino.cc/en/Main/ArduinoBoardNano'>Nano</a>, or <a class='wikilink' href='http://arduino.cc/en/Main/ArduinoBoardDiecimila'>Diecimila</a>.  If you have another board, read the corresponding page in this getting started guide.
+</p>
+<p class='vspace'></p><p>You also need a standard USB cable (A plug to B plug): the kind you would connect to a USB printer, for example.  (For the Arduino Nano, you'll need an A to Mini-B cable instead.)
+</p>
+<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Guide/ArduinoDuemilanove.png' alt='' title='' /> <img src='http://arduino.cc/en/uploads/Guide/USBCable.jpg' alt='' title='' /></div>
+<p class='vspace'></p><p><em>Photos by <span class='wikiword'>SparkFun</span> Electronics.</em>
+</p>
+<p class='vspace'></p><h3><a name='toc2' id='toc2'></a>2 | Download the Arduino environment</h3>
+<p>Get the latest version from the <a class='wikilink' href='http://arduino.cc/en/Main/Software'>download page</a>.
+</p>
+<p class='vspace'></p><p>The disk image (.dmg) should mount automatically.  If it doesn't, double-click it.  It should look like the following image.
+</p>
+<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Guide/ArduinoDiskImage.png' alt='' title='' /></div>
+<p class='vspace'></p><h3><a name='toc3' id='toc3'></a>3 | Install the Application and USB drivers</h3>
+<p>Copy the Arduino application into the Applications folder (or elsewhere on your computer).  
+</p>
+<p class='vspace'></p><p>If this is your first time using an Arduino with your computer, you will need to install the drivers for the FTDI chip on the board.  Double-click the <strong><span class='wikiword'>FTDIUSBSerialDriver</span>_10_4_10_5_10_6.mpkg</strong> icon and follow the instructions in the installer.  You'll need to restart your computer after installing the drivers.  (The latest version of the drivers can be found on the <a class='urllink' href='http://www.ftdichip.com/Drivers/VCP.htm' rel='nofollow'>FTDI website</a>.)
+</p>
+<p class='vspace'></p><h3><a name='toc4' id='toc4'></a>4 | Connect the board</h3>
+<p>Connect the Arduino board to your computer using the USB cable.  The green power LED (labelled <strong>PWR</strong>) should go on.
+</p>
+<p class='vspace'></p><p>If you're using an Arduino Diecimila, you'll need to make sure that the board is configured to draw power from the USB connection.  The power source is selected with a jumper, a small piece of plastic that fits onto two of the three pins between the USB and power jacks.  Check that it's on the two pins closest to the USB port.
+</p>
+<p class='vspace'></p><p>The Arduino Duemilanove and Arduino Nano automatically select the appropriate power source.
+</p>
+<p class='vspace'></p><h3><a name='toc5' id='toc5'></a>5 | Launch the Arduino application</h3>
+<p>Double-click the Arduino application.
+</p>
+<p class='vspace'></p><h3><a name='toc6' id='toc6'></a>6 | Open the blink example</h3>
+<p>Open the LED blink example sketch: <strong>File  &gt; Examples &gt; Digital &gt; Blink</strong>.
+</p>
+<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Guide/Arduino0018Blink.png' alt='' title='' /></div>
+<p class='vspace'></p><h3><a name='toc7' id='toc7'></a>7 | Select your board</h3>
+<p>You'll need to select the entry in the <strong>Tools &gt; Board</strong> menu that corresponds to your Arduino.  For newer Arduino boards with an <span class='wikiword'>ATmega328</span> (check the text on the chip on the board), select <strong>Arduino Duemilanove or Nano w/ <span class='wikiword'>ATmega328</span></strong>.  Previously, Arduino boards came with an <span class='wikiword'>ATmega168</span>; for those, select <strong>Arduino Diecimila, Duemilanove, or Nano w/ <span class='wikiword'>ATmega168</span></strong>.  (Details of the board menu entries are available <a class='urllink' href='Guide_Environment#boards.html' rel='nofollow'>on the environment page</a>.)
+</p>
+<p class='vspace'></p><h3><a name='toc8' id='toc8'></a>8 | Select your serial port</h3>
+<p>Select the serial device of the Arduino board from the <strong>Tools &gt; Serial Port</strong> menu.  On the Mac, this should be something with <strong>/dev/tty.usbserial</strong> in it.
+</p>
+<p class='vspace'></p><h3><a name='toc9' id='toc9'></a>9 | Upload the program</h3>
+<p>Now, simply click the "Upload" button in the environment.  Wait a few seconds - you should see the RX and TX leds on the board flashing.  If the upload is successful, the message "Done uploading." will appear in the status bar.  (<em>Note:</em> If you have an Arduino Mini, NG, or other board, you'll need to physically present the reset button on the board immediately before pressing the upload button.)
+</p>
+<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Guide/UploadButton.png' alt='' title='' /></div>
+<p class='vspace'></p><p>A few seconds after the upload finishes, you should see the pin 13 (L) LED on the board start to blink (in orange).  If it does, congratulations!  You've gotten Arduino up-and-running.
+</p>
+<p class='vspace'></p><p>If you have problems, please see the <a class='wikilink' href='Guide_Troubleshooting.html'>troubleshooting suggestions</a>.
+</p>
+<p class='vspace'></p><p>You might also want to look at:
+</p><ul><li>the <a class='wikilink' href='http://arduino.cc/en/Tutorial/HomePage'>examples</a> for using various sensors and actuators
+</li><li>the <a class='wikilink' href='index.html'>reference</a> for the Arduino language
+</li></ul><p>The text of the Arduino getting started guide is licensed under a
+<a class='urllink' href='http://creativecommons.org/licenses/by-sa/3.0/' rel='nofollow'>Creative Commons Attribution-ShareAlike 3.0 License</a>.  Code samples in the guide are released into the public domain.
+</p>
+</div>
+<!-- AddThis Button BEGIN --><script type="text/javascript">var addthis_language = "en";</script><div class="addthis_container addthis_toolbox addthis_default_style" addthis:url="Guide_MacOSX" addthis:title="Arduino Wiki English"><a href="http://www.addthis.com/bookmark.php?v=250&amp;username=arduinoteam" class="addthis_button_compact">Share</a><span class="addthis_separator">|</span><a class="addthis_button_email"></a><a class="addthis_button_favorites"></a><a class="addthis_button_print"></a><a class="addthis_button_facebook"></a><a class="addthis_button_twitter"></a><script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#username=arduinoteam"></script></div><!-- AddThis Button END --></div><!--PageFooterFmt--><div id="pagefooter">  <a href=.html'Guide_MacOSX?action=edit.html'>Edit Page</a> | <a href='Guide_MacOSX?action=diff.html'>Page History</a> | <a href='Guide_MacOSX?action=print.html' target='_blank'>Printable View</a> | <a href='http://arduino.cc/en/Site/AllRecentChanges'>All Recent Site Changes</a></div><!--/PageFooterFmt--></div></body></html>

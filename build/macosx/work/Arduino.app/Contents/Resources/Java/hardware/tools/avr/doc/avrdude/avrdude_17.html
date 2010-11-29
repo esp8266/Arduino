@@ -1,0 +1,234 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html401/loose.dtd">
+<html>
+<!-- Created on October, 30 2007 by texi2html 1.76 -->
+<!--
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Many creative people <dev@texi2html.cvshome.org>
+Send bugs and suggestions to <users@texi2html.cvshome.org>
+
+-->
+<head>
+<title>AVRDUDE: B. Troubleshooting</title>
+
+<meta name="description" content="AVRDUDE: B. Troubleshooting">
+<meta name="keywords" content="AVRDUDE: B. Troubleshooting">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="texi2html 1.76">
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+pre.display {font-family: serif}
+pre.format {font-family: serif}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+pre.smalldisplay {font-family: serif; font-size: smaller}
+pre.smallexample {font-size: smaller}
+pre.smallformat {font-family: serif; font-size: smaller}
+pre.smalllisp {font-size: smaller}
+span.sansserif {font-family:sans-serif; font-weight:normal;}
+ul.toc {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
+
+<a name="Troubleshooting"></a>
+<a name="SEC38"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="avrdude_16.html#SEC37" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[ &gt; ]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="avrdude_14.html#SEC15" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="avrdude.html#Top" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[ &gt;&gt; ]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="avrdude.html#Top" title="Cover (top) of document">Top</a>]</td>
+<td valign="middle" align="left">[<a href="avrdude_toc.html#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[Index]</td>
+<td valign="middle" align="left">[<a href="avrdude_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h1 class="appendix"> B. Troubleshooting </h1>
+
+
+<p>In general, please report any bugs encountered via
+<br>
+<a href="http://savannah.nongnu.org/bugs/?group=avrdude">http://savannah.nongnu.org/bugs/?group=avrdude</a>.
+</p>
+
+<ul>
+<li>
+Problem: I'm using a serial programmer under Windows and get the following
+error:
+
+<p><code>avrdude: serial_open(): can't set attributes for device &quot;com1&quot;</code>,
+</p>
+<p>Solution: This problem seems to appear with certain versions of Cygwin. Specifying
+<code>&quot;/dev/com1&quot;</code> instead of <code>&quot;com1&quot;</code> should help.
+</p>
+
+</li><li>
+Problem: I'm using linux and my AVR910 programmer is really slow.
+
+<p>Solution (short): <code>setserial <var>port</var> low_latency</code>
+</p>
+<p>Solution (long):
+There are two problems here. First, the system may wait some time before it
+passes data from the serial port to the program. Under Linux the following
+command works around this (you may need root privileges for this).
+</p>
+<p><code>setserial <var>port</var> low_latency</code>
+</p>
+<p>Secondly, the serial interface chip may delay the interrupt for some time.
+This behaviour can be changed by setting the FIFO-threshold to one. Under Linux this
+can only be done by changing the kernel source in <code>drivers/char/serial.c</code>.
+Search the file for <code>UART_FCR_TRIGGER_8</code> and replace it with <code>UART_FCR_TRIGGER_1</code>. Note that overall performance might suffer if there
+is high throughput on serial lines. Also note that you are modifying the kernel at
+your own risk.
+</p>
+
+</li><li>
+Problem: I'm not using linux and my AVR910 programmer is really slow.
+
+<p>Solutions: The reasons for this are the same as above.
+If you know how to work around this on your OS, please let us know.
+</p>
+</li><li>
+Problem: Updating the flash ROM from terminal mode does not work with the
+JTAG ICEs.
+
+<p>Solution: None at this time.  Currently, the JTAG ICE code cannot
+write to the flash ROM one byte at a time.
+</p>
+</li><li>
+Problem: Page-mode programming the EEPROM (using the -U option) does
+not erase EEPROM cells before writing, and thus cannot overwrite any
+previous value != 0xff.
+
+<p>Solution: None.  This is an inherent feature of the way JTAG EEPROM
+programming works, and is documented that way in the Atmel AVR
+datasheets.
+In order to successfully program the EEPROM that way, a prior chip
+erase (with the EESAVE fuse unprogrammed) is required.
+This also applies to the STK500 in high-voltage programming mode.
+</p>
+</li><li>
+Problem: How do I turn off the <var>DWEN</var> fuse?
+
+<p>Solution: If the <var>DWEN</var> (debugWire enable) fuse is activated,
+the <var>/RESET</var> pin is not functional anymore, so normal ISP
+communication cannot be established.
+There are two options to deactivate that fuse again: high-voltage
+programming, or getting the JTAG ICE mkII talk debugWire, and
+prepare the target AVR to accept normal ISP communication again.
+</p>
+<p>The first option requires a programmer that is capable of high-voltage
+programming (either serial or parallel, depending on the AVR device),
+for example the STK500.  In high-voltage programming mode, the
+<var>/RESET</var> pin is activated initially using a 12 V pulse (thus the
+name <em>high voltage</em>), so the target AVR can subsequently be
+reprogrammed, and the <var>DWEN</var> fuse can be cleared.  Typically, this
+operation cannot be performed while the AVR is located in the target
+circuit though.
+</p>
+<p>The second option requires a JTAG ICE mkII that can talk the debugWire
+protocol.  The ICE needs to be connected to the target using the
+JTAG-to-ISP adapter, so the JTAG ICE mkII can be used as a debugWire
+initiator as well as an ISP programmer.  AVRDUDE will then be activated
+using the <var>jtag2isp</var> programmer type.  The initial ISP
+communication attempt will fail, but AVRDUDE then tries to iniate a
+debugWire reset.  When successful, this will leave the target AVR in a
+state where it can accept standard ISP communication.  The ICE is then
+signed off (which will make it signing off from the USB as well), so
+AVRDUDE has to be called again afterwards.  This time, standard ISP
+communication can work, so the <var>DWEN</var> fuse can be cleared.
+</p>
+<p>The pin mapping for the JTAG-to-ISP adapter is:
+</p>
+<table>
+<tr><td><p> <strong>JTAG pin</strong> </p></td><td><p> <strong>ISP pin</strong>
+</p></td></tr>
+<tr><td><p> 1 </p></td><td><p> 3
+</p></td></tr>
+<tr><td><p> 2 </p></td><td><p> 6
+</p></td></tr>
+<tr><td><p> 3 </p></td><td><p> 1
+</p></td></tr>
+<tr><td><p> 4 </p></td><td><p> 2
+</p></td></tr>
+<tr><td><p> 6 </p></td><td><p> 5
+</p></td></tr>
+<tr><td><p> 9 </p></td><td><p> 4
+</p></td></tr>
+</table>
+
+</li><li>
+Problem: Multiple USBasp or USBtinyISP programmers connected simultaneously are not
+found.
+
+<p>Solution: none at this time.  The simplicity of these programmers
+doesn't offer a method to distinguish multiple programmers that are
+connected simultaneously, so effectively only one of them is supported.
+</p>
+</li><li>
+Problem: I cannot do &hellip; when the target is in debugWire mode.
+
+<p>Solution: debugWire mode imposes several limitations.
+</p>
+<p>The debugWire protocol is Atmel's proprietary one-wire (plus ground)
+protocol to allow an in-circuit emulation of the smaller AVR devices,
+using the <var>/RESET</var> line.
+DebugWire mode is initiated by activating the <var>DWEN</var>
+fuse, and then power-cycling the target.
+While this mode is mainly intented for debugging/emulation, it
+also offers limited programming capabilities.
+Effectively, the only memory areas that can be read or programmed
+in this mode are flash ROM and EEPROM.
+It is also possible to read out the signature.
+All other memory areas cannot be accessed.
+There is no
+<em>chip erase</em>
+functionality in debugWire mode; instead, while reprogramming the
+flash ROM, each flash ROM page is erased right before updating it.
+This is done transparently by the JTAG ICE mkII (or AVR Dragon).
+The only way back from debugWire mode is to initiate a special
+sequence of commands to the JTAG ICE mkII (or AVR Dragon), so the
+debugWire mode will be temporarily disabled, and the target can
+be accessed using normal ISP programming.
+This sequence is automatically initiated by using the JTAG ICE mkII
+or AVR Dragon in ISP mode, when they detect that ISP mode cannot be
+entered.
+</p>
+
+</li></ul>
+
+
+
+<hr size="6">
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="avrdude_16.html#SEC37" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[ &gt; ]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="avrdude_14.html#SEC15" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="avrdude.html#Top" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[ &gt;&gt; ]</td>
+</tr></table>
+<p>
+ <font size="-1">
+  This document was generated by <em>Joerg Wunsch</em> on <em>October, 30 2007</em> using <a href="http://texi2html.cvshome.org/"><em>texi2html 1.76</em></a>.
+ </font>
+ <br>
+
+</p>
+</body>
+</html>

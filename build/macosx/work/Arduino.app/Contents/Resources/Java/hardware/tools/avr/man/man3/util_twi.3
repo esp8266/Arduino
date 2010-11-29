@@ -1,0 +1,121 @@
+.TH "<util/twi.h>: TWI bit mask definitions" 3 "6 Nov 2008" "Version 1.6.4" "avr-libc" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+<util/twi.h>: TWI bit mask definitions \- 
+.SH "Detailed Description"
+.PP 
+.PP
+.nf
+ #include <util/twi.h> 
+.fi
+.PP
+.PP
+This header file contains bit mask definitions for use with the AVR TWI interface. 
+.SH "Define Documentation"
+.PP 
+.SS "#define TW_BUS_ERROR   0x00"
+.PP
+illegal start or stop condition 
+.SS "#define TW_MR_ARB_LOST   0x38"
+.PP
+arbitration lost in SLA+R or NACK 
+.SS "#define TW_MR_DATA_ACK   0x50"
+.PP
+data received, ACK returned 
+.SS "#define TW_MR_DATA_NACK   0x58"
+.PP
+data received, NACK returned 
+.SS "#define TW_MR_SLA_ACK   0x40"
+.PP
+SLA+R transmitted, ACK received 
+.SS "#define TW_MR_SLA_NACK   0x48"
+.PP
+SLA+R transmitted, NACK received 
+.SS "#define TW_MT_ARB_LOST   0x38"
+.PP
+arbitration lost in SLA+W or data 
+.SS "#define TW_MT_DATA_ACK   0x28"
+.PP
+data transmitted, ACK received 
+.SS "#define TW_MT_DATA_NACK   0x30"
+.PP
+data transmitted, NACK received 
+.SS "#define TW_MT_SLA_ACK   0x18"
+.PP
+SLA+W transmitted, ACK received 
+.SS "#define TW_MT_SLA_NACK   0x20"
+.PP
+SLA+W transmitted, NACK received 
+.SS "#define TW_NO_INFO   0xF8"
+.PP
+no state information available 
+.SS "#define TW_READ   1"
+.PP
+SLA+R address 
+.SS "#define TW_REP_START   0x10"
+.PP
+repeated start condition transmitted 
+.SS "#define TW_SR_ARB_LOST_GCALL_ACK   0x78"
+.PP
+arbitration lost in SLA+RW, general call received, ACK returned 
+.SS "#define TW_SR_ARB_LOST_SLA_ACK   0x68"
+.PP
+arbitration lost in SLA+RW, SLA+W received, ACK returned 
+.SS "#define TW_SR_DATA_ACK   0x80"
+.PP
+data received, ACK returned 
+.SS "#define TW_SR_DATA_NACK   0x88"
+.PP
+data received, NACK returned 
+.SS "#define TW_SR_GCALL_ACK   0x70"
+.PP
+general call received, ACK returned 
+.SS "#define TW_SR_GCALL_DATA_ACK   0x90"
+.PP
+general call data received, ACK returned 
+.SS "#define TW_SR_GCALL_DATA_NACK   0x98"
+.PP
+general call data received, NACK returned 
+.SS "#define TW_SR_SLA_ACK   0x60"
+.PP
+SLA+W received, ACK returned 
+.SS "#define TW_SR_STOP   0xA0"
+.PP
+stop or repeated start condition received while selected 
+.SS "#define TW_ST_ARB_LOST_SLA_ACK   0xB0"
+.PP
+arbitration lost in SLA+RW, SLA+R received, ACK returned 
+.SS "#define TW_ST_DATA_ACK   0xB8"
+.PP
+data transmitted, ACK received 
+.SS "#define TW_ST_DATA_NACK   0xC0"
+.PP
+data transmitted, NACK received 
+.SS "#define TW_ST_LAST_DATA   0xC8"
+.PP
+last data byte transmitted, ACK received 
+.SS "#define TW_ST_SLA_ACK   0xA8"
+.PP
+SLA+R received, ACK returned 
+.SS "#define TW_START   0x08"
+.PP
+start condition transmitted 
+.SS "#define TW_STATUS   (TWSR & TW_STATUS_MASK)"
+.PP
+TWSR, masked by TW_STATUS_MASK 
+.SS "#define TW_STATUS_MASK"
+.PP
+\fBValue:\fP
+.PP
+.nf
+(_BV(TWS7)|_BV(TWS6)|_BV(TWS5)|_BV(TWS4)|\
+                                _BV(TWS3))
+.fi
+The lower 3 bits of TWSR are reserved on the ATmega163. The 2 LSB carry the prescaler bits on the newer ATmegas. 
+.SS "#define TW_WRITE   0"
+.PP
+SLA+W address 
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for avr-libc from the source code.

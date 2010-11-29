@@ -1,0 +1,15 @@
+#
+# $Id: AUTHORS,v 1.4 2003/07/24 16:42:39 troth Exp $
+#
+
+Main Developer:
+
+	Theodore A. Roth       <troth@openavr.org>
+
+Contributors:
+
+	Ken Restivo            <ken@246gt.com>
+	Reinhard Jessich       <reinhard.jessich@telering.at>
+	Josef Angermeier       <josef.angermeier@web.de>
+
+See the ChangeLog file for more contributions.

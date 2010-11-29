@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html401/loose.dtd">
+<html>
+<!-- Created on October, 30 2007 by texi2html 1.76 -->
+<!--
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Many creative people <dev@texi2html.cvshome.org>
+Send bugs and suggestions to <users@texi2html.cvshome.org>
+
+-->
+<head>
+<title>AVRDUDE: 3.1 Terminal Mode Commands</title>
+
+<meta name="description" content="AVRDUDE: 3.1 Terminal Mode Commands">
+<meta name="keywords" content="AVRDUDE: 3.1 Terminal Mode Commands">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="texi2html 1.76">
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+pre.display {font-family: serif}
+pre.format {font-family: serif}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+pre.smalldisplay {font-family: serif; font-size: smaller}
+pre.smallexample {font-size: smaller}
+pre.smallformat {font-family: serif; font-size: smaller}
+pre.smalllisp {font-size: smaller}
+span.sansserif {font-family:sans-serif; font-weight:normal;}
+ul.toc {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
+
+<a name="Terminal-Mode-Commands"></a>
+<a name="SEC7"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="avrdude_6.html#SEC6" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="avrdude_8.html#SEC8" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="avrdude_6.html#SEC6" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="avrdude_6.html#SEC6" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="avrdude_9.html#SEC9" title="Next chapter"> &gt;&gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="avrdude.html#Top" title="Cover (top) of document">Top</a>]</td>
+<td valign="middle" align="left">[<a href="avrdude_toc.html#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[Index]</td>
+<td valign="middle" align="left">[<a href="avrdude_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 3.1 Terminal Mode Commands </h2>
+
+
+<p>The following commands are implemented:
+</p>
+<dl compact="compact">
+<dt> <code>dump <var>memtype</var> <var>addr</var> <var>nbytes</var></code></dt>
+<dd><p>Read <var>nbytes</var> from the specified memory area, and display them in
+the usual hexadecimal and ASCII form.
+</p>
+</dd>
+<dt> <code>dump</code></dt>
+<dd><p>Continue dumping the memory contents for another <var>nbytes</var> where the
+previous dump command left off.
+</p>
+</dd>
+<dt> <code>write <var>memtype</var> <var>addr</var> <var>byte1</var> &hellip; <var>byteN</var></code></dt>
+<dd><p>Manually program the respective memory cells, starting at address addr,
+using the values <var>byte1</var> through <var>byteN</var>.  This feature is not
+implemented for bank-addressed memories such as the flash memory of
+ATMega devices.
+</p>
+</dd>
+<dt> <code>erase</code></dt>
+<dd><p>Perform a chip erase.
+</p>
+</dd>
+<dt> <code>send <var>b1</var> <var>b2</var> <var>b3</var> <var>b4</var></code></dt>
+<dd><p>Send raw instruction codes to the AVR device.  If you need access to a
+feature of an AVR part that is not directly supported by AVRDUDE, this
+command allows you to use it, even though AVRDUDE does not implement the
+command.
+</p>
+</dd>
+<dt> <code>sig</code></dt>
+<dd><p>Display the device signature bytes.
+</p>
+</dd>
+<dt> <code>part</code></dt>
+<dd><p>Display the current part settings and parameters.  Includes chip
+specific information including all memory types supported by the
+device, read/write timing, etc.
+</p>
+</dd>
+<dt> <code>?</code></dt>
+<dt> <code>help</code></dt>
+<dd><p>Give a short on-line summary of the available commands.
+</p>
+</dd>
+<dt> <code>quit</code></dt>
+<dd><p>Leave terminal mode and thus AVRDUDE.
+</p>
+</dd>
+</dl>
+
+
+<p>In addition, the following commands are supported on the STK500
+programmer:
+</p>
+<dl compact="compact">
+<dt> <code>vtarg <var>voltage</var></code></dt>
+<dd><p>Set the target's supply voltage to <var>voltage</var> Volts.
+</p>
+</dd>
+<dt> <code>varef <var>voltage</var></code></dt>
+<dd><p>Set the adjustable voltage source to <var>voltage</var> Volts.
+This voltage is normally used to drive the target's
+<em>Aref</em> input on the STK500.
+</p>
+</dd>
+<dt> <code>fosc <var>freq</var>[<var>M</var>|<var>k</var>]</code></dt>
+<dd><p>Set the master oscillator to <var>freq</var> Hz.
+An optional trailing letter <var>M</var>
+multiplies by 1E6, a trailing letter <var>k</var> by 1E3.
+</p>
+</dd>
+<dt> <code>fosc off</code></dt>
+<dd><p>Turn the master oscillator off.
+</p>
+</dd>
+<dt> <code>sck <var>period</var></code></dt>
+<dd><p><em>STK500 only:</em>
+Set the SCK clock period to <var>period</var> microseconds.
+</p>
+<p><em>JTAG ICE only:</em>
+Set the JTAG ICE bit clock period to <var>period</var> microseconds.
+Note that unlike STK500 settings, this setting will be reverted to
+its default value (approximately 1 microsecond) when the programming
+software signs off from the JTAG ICE.
+This parameter can also be used on the JTAG ICE mkII to specify the
+ISP clock period when operating the ICE in ISP mode.
+</p>
+</dd>
+<dt> <code>parms</code></dt>
+<dd><p><em>STK500 only:</em>
+Display the current voltage and master oscillator parameters.
+</p>
+<p><em>JTAG ICE only:</em>
+Display the current target supply voltage and JTAG bit clock rate/period.
+</p>
+</dd>
+</dl>
+
+<hr size="6">
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="avrdude_6.html#SEC6" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="avrdude_8.html#SEC8" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="avrdude_6.html#SEC6" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="avrdude_6.html#SEC6" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="avrdude_9.html#SEC9" title="Next chapter"> &gt;&gt; </a>]</td>
+</tr></table>
+<p>
+ <font size="-1">
+  This document was generated by <em>Joerg Wunsch</em> on <em>October, 30 2007</em> using <a href="http://texi2html.cvshome.org/"><em>texi2html 1.76</em></a>.
+ </font>
+ <br>
+
+</p>
+</body>
+</html>

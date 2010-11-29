@@ -1,0 +1,107 @@
+.TH SIMULAVR "1" "@DATE@" "simulavr 0.1.2.5" "User Commands"
+.SH NAME
+simulavr \- Atmel AVR simulator
+.SH SYNOPSIS
+.B simulavr
+[\fIOPTIONS\fR]... -d DEVICE [\fIIMAGE\fR]
+.SH DESCRIPTION
+Simulate an avr device. The optional IMAGE file is loaded
+into the flash program memory space of the device.
+.SS Options
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Show this message
+.TP
+\fB\-D\fR, \fB\-\-debug\fR
+Debug instruction output
+.TP
+\fB\-v\fR, \fB\-\-version\fR
+Print out the version number and exit
+.TP
+\fB\-g\fR, \fB\-\-gdbserver\fR
+Run as a gdbserver process
+.TP
+\fB\-G\fR, \fB\-\-gdb\-debug\fR
+Print out debug messages for gdbserver
+.TP
+\fB\-p\fR, \fB\-\-port \fR<port>
+Listen for gdb connection on TCP port
+.TP
+\fB\-d\fR, \fB\-\-device \fR<dev>
+Specify device type
+.TP
+\fB\-e\fR, \fB\-\-eeprom\-image \fR<img>
+Specify an eeprom image file
+.TP
+\fB\-E\fR, \fB\-\-eeprom\-type \fR<type>
+Specify the type of the eeprom image file
+.TP
+\fB\-F\fR, \fB\-\-flash\-type \fR<type>
+Specify the type of the flash image file
+.TP
+\fB\-L\fR, \fB\-\-list\-devices\fR
+Print supported devices to stdout and exit
+.TP
+\fB\-P\fR, \fB\-\-disp\-prog \fR<prog>
+Display register and memory info with prog
+.TP
+\fB\-X\fR, \fB\-\-without\-xterm\fR
+Don't start disp prog in an xterm
+.TP
+\fB\-C\fR, \fB\-\-core\-dump\fR
+Dump a core memory image to file on exit
+.TP
+\fB\-c\fR, \fB\-\-clock\-freq \fR<freq>
+Set the simulated mcu clock freqency (in Hz)
+.TP
+\fB\-B\fR, \fB\-\-breakpoint \fR<addr>
+Set a breakpoint (address is a byte address)
+.PP
+If the image file types for eeprom or flash images are not given,
+the default file type is binary.
+.PP
+If you wish to run the simulator in gdbserver mode, you do not
+have to specify a flash-image file since the program can be loaded
+from gdb via the `load` command.
+.PP
+If '--port' option is given, and '--gdbserver' is not, port is ignored
+.PP
+If running in gdbserver mode and port is not specified, a default
+port of 1212 is used.
+.PP
+If using the '--breakpoint' option, note the simulator will terminate when
+the address is hit if you are not running in gdbserver mode. This feature
+not intended for use in gdbserver mode. It is really intended for testing
+the simulator itself, but may be useful for testing avr programs too.
+.SS "Currently available device types:"
+Use the '--list-devices' option to obtain the list your version of simulavr
+supports.
+.IP
+ at90s1200
+ at90s2313
+ at90s4414
+ at90s8515
+ atmega8
+ atmega16
+ atmega32
+ atmega103
+ atmega128
+ at43usb351
+ at43usb353
+ at43usb355
+ at43usb320
+ at43usb324
+ at43usb325
+ at43usb326
+.SH "AUTHOR"
+Written by Theodore A. Roth.
+.SH "REPORTING BUGS"
+Report bugs to <simulavr-devel@nongnu.org>
+.SH "COPYRIGHT"
+Copyright 2001, 2002, 2003  Theodore A. Roth.
+
+simulavr is free software, covered by the GNU General Public License,
+and you are welcome to change it and/or distribute copies of it under
+the conditions of the GNU General Public License.
+.SH "SEE ALSO"
+http://savannah.nongnu.org/projects/simulavr/

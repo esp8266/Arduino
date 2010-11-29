@@ -1,0 +1,202 @@
+.TH "<util/crc16.h>: CRC Computations" 3 "6 Nov 2008" "Version 1.6.4" "avr-libc" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+<util/crc16.h>: CRC Computations \- 
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "static __inline__ \fBuint16_t\fP \fB_crc16_update\fP (\fBuint16_t\fP __crc, \fBuint8_t\fP __data)"
+.br
+.ti -1c
+.RI "static __inline__ \fBuint16_t\fP \fB_crc_xmodem_update\fP (\fBuint16_t\fP __crc, \fBuint8_t\fP __data)"
+.br
+.ti -1c
+.RI "static __inline__ \fBuint16_t\fP \fB_crc_ccitt_update\fP (\fBuint16_t\fP __crc, \fBuint8_t\fP __data)"
+.br
+.ti -1c
+.RI "static __inline__ \fBuint8_t\fP \fB_crc_ibutton_update\fP (\fBuint8_t\fP __crc, \fBuint8_t\fP __data)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+.PP
+.nf
+ #include <util/crc16.h>
+.fi
+.PP
+.PP
+This header file provides a optimized inline functions for calculating cyclic redundancy checks (CRC) using common polynomials.
+.PP
+\fBReferences:\fP.RS 4
+
+.RE
+.PP
+\fB\fP.RS 4
+.RE
+.PP
+See the Dallas Semiconductor app note 27 for 8051 assembler example and general CRC optimization suggestions. The table on the last page of the app note is the key to understanding these implementations.
+.PP
+\fB\fP.RS 4
+.RE
+.PP
+Jack Crenshaw's 'Implementing CRCs' article in the January 1992 isue of \fIEmbedded\fP \fISystems\fP \fIProgramming\fP. This may be difficult to find, but it explains CRC's in very clear and concise terms. Well worth the effort to obtain a copy.
+.PP
+A typical application would look like:
+.PP
+.PP
+.nf
+    // Dallas iButton test vector.
+    uint8_t serno[] = { 0x02, 0x1c, 0xb8, 0x01, 0, 0, 0, 0xa2 };
+
+    int
+    checkcrc(void)
+    {
+        uint8_t crc = 0, i;
+
+        for (i = 0; i < sizeof serno / sizeof serno[0]; i++)
+            crc = _crc_ibutton_update(crc, serno[i]);
+
+        return crc; // must be 0
+    }
+.fi
+.PP
+ 
+.SH "Function Documentation"
+.PP 
+.SS "static __inline__ \fBuint16_t\fP _crc16_update (\fBuint16_t\fP __crc, \fBuint8_t\fP __data)\fC [static]\fP"
+.PP
+Optimized CRC-16 calculation.
+.PP
+Polynomial: x^16 + x^15 + x^2 + 1 (0xa001)
+.br
+ Initial value: 0xffff
+.PP
+This CRC is normally used in disk-drive controllers.
+.PP
+The following is the equivalent functionality written in C.
+.PP
+.PP
+.nf
+    uint16_t
+    crc16_update(uint16_t crc, uint8_t a)
+    {
+        int i;
+
+        crc ^= a;
+        for (i = 0; i < 8; ++i)
+        {
+            if (crc & 1)
+                crc = (crc >> 1) ^ 0xA001;
+            else
+                crc = (crc >> 1);
+        }
+
+        return crc;
+    }
+.fi
+.PP
+ 
+.SS "static __inline__ \fBuint16_t\fP _crc_ccitt_update (\fBuint16_t\fP __crc, \fBuint8_t\fP __data)\fC [static]\fP"
+.PP
+Optimized CRC-CCITT calculation.
+.PP
+Polynomial: x^16 + x^12 + x^5 + 1 (0x8408)
+.br
+ Initial value: 0xffff
+.PP
+This is the CRC used by PPP and IrDA.
+.PP
+See RFC1171 (PPP protocol) and IrDA IrLAP 1.1
+.PP
+\fBNote:\fP
+.RS 4
+Although the CCITT polynomial is the same as that used by the Xmodem protocol, they are quite different. The difference is in how the bits are shifted through the alorgithm. Xmodem shifts the MSB of the CRC and the input first, while CCITT shifts the LSB of the CRC and the input first.
+.RE
+.PP
+The following is the equivalent functionality written in C.
+.PP
+.PP
+.nf
+    uint16_t
+    crc_ccitt_update (uint16_t crc, uint8_t data)
+    {
+        data ^= lo8 (crc);
+        data ^= data << 4;
+
+        return ((((uint16_t)data << 8) | hi8 (crc)) ^ (uint8_t)(data >> 4) 
+                ^ ((uint16_t)data << 3));
+    }
+.fi
+.PP
+ 
+.SS "static __inline__ \fBuint8_t\fP _crc_ibutton_update (\fBuint8_t\fP __crc, \fBuint8_t\fP __data)\fC [static]\fP"
+.PP
+Optimized Dallas (now Maxim) iButton 8-bit CRC calculation.
+.PP
+Polynomial: x^8 + x^5 + x^4 + 1 (0x8C)
+.br
+ Initial value: 0x0
+.PP
+See http://www.maxim-ic.com/appnotes.cfm/appnote_number/27
+.PP
+The following is the equivalent functionality written in C.
+.PP
+.PP
+.nf
+    uint8_t
+    _crc_ibutton_update(uint8_t crc, uint8_t data)
+    {
+        uint8_t i;
+
+        crc = crc ^ data;
+        for (i = 0; i < 8; i++)
+        {
+            if (crc & 0x01)
+                crc = (crc >> 1) ^ 0x8C;
+            else
+                crc >>= 1;
+        }
+
+        return crc;
+    }
+.fi
+.PP
+ 
+.SS "static __inline__ \fBuint16_t\fP _crc_xmodem_update (\fBuint16_t\fP __crc, \fBuint8_t\fP __data)\fC [static]\fP"
+.PP
+Optimized CRC-XMODEM calculation.
+.PP
+Polynomial: x^16 + x^12 + x^5 + 1 (0x1021)
+.br
+ Initial value: 0x0
+.PP
+This is the CRC used by the Xmodem-CRC protocol.
+.PP
+The following is the equivalent functionality written in C.
+.PP
+.PP
+.nf
+    uint16_t
+    crc_xmodem_update (uint16_t crc, uint8_t data)
+    {
+        int i;
+
+        crc = crc ^ ((uint16_t)data << 8);
+        for (i=0; i<8; i++)
+        {
+            if (crc & 0x8000)
+                crc = (crc << 1) ^ 0x1021;
+            else
+                crc <<= 1;
+        }
+
+        return crc;
+    }
+.fi
+.PP
+ 
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for avr-libc from the source code.

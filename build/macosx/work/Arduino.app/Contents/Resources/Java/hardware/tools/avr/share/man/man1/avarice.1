@@ -1,0 +1,422 @@
+.ig
+Copyright (C) 2001 Scott Finneran
+Copyright (C) 2003 Intel Corporation
+Copyright (C) 2003, 2004 Theodore A. Roth
+Copyright (C) 2005 - 2008 Joerg Wunsch
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this
+manual into another language, under the above conditions for modified
+versions, except that this permission notice may be included in
+translations approved by the Free Software Foundation instead of in
+the original English.
+
+$Id: avarice.1,v 1.20 2008/06/12 20:21:44 joerg_wunsch Exp $
+
+..
+.TH avarice 1 "March 21, 2007"
+.LO 1
+.SH NAME
+avarice \- Provides an interface from avr-gdb to Atmel's JTAGICE box.
+.SH SYNOPSIS
+.B avarice
+[\fIOPTIONS\fR]... [[\fIHOST_NAME\fR]:\fIPORT\fR]
+.SH DESCRIPTION
+.PP
+AVaRICE runs on a POSIX machine and connects to gdb via a TCP socket and
+communicates via gdb's "serial debug protocol". This protocol allows gdb to
+send commands like "set/remove breakpoint" and "read/write memory".
+.PP
+AVaRICE translates these commands into the Atmel protocol used to control the
+AVR JTAG ICE. Connection to the AVR JTAG ICE is via a serial port on the POSIX
+machine.
+.PP
+Because the GDB <---> AVaRICE connection is via a TCP socket, the two programs
+do not need to run on the same machine. In an office environment, this allows
+a developer to debug a target in the lab from the comfort of their cube (or
+even better, their home!)
+.HP 6
+.B NOTE:
+Even though you can run \fBavarice\fR and \fBavr\-gdb\fR on different systems,
+it is not recommended because of the security risk involved. \fBavarice\fR was
+not designed to be a secure server. There is no authentication performed
+when a client connects to \fBavarice\fR when it is running in gdb server mode.
+.SS Supported Devices
+.B avarice
+currently has support for the following devices:
+.RS 4
+at90can128
+.br
+at90can32 (\fBo\fP)
+.br
+at90can64 (\fBo\fP)
+.br
+at90pwm2 (\fBo\fP) (\fB+\fP)
+.br
+at90pwm216 (\fBo\fP) (\fB+\fP)
+.br
+at90pwm2b (\fBo\fP) (\fB+\fP)
+.br
+at90pwm3 (\fBo\fP) (\fB+\fP)
+.br
+at90pwm316 (\fBo\fP) (\fB+\fP)
+.br
+at90pwm3b (\fBo\fP) (\fB+\fP)
+.br
+at90usb1287 (\fB*\fP)
+.br
+at90usb162 (\fBo\fP) (\fB+\fP)
+.br
+at90usb646 (\fB*\fP)
+.br
+at90usb647 (\fB*\fP)
+.br
+atmega128
+.br
+atmega1280 (\fB*\fP)
+.br
+atmega1281 (\fB*\fP)
+.br
+atmega1284p (\fB*\fP)
+.br
+atmega16
+.br
+atmega162
+.br
+atmega164p (\fBo\fP)
+.br
+atmega165 (\fBo\fP)
+.br
+atmega165p (\fBo\fP)
+.br
+atmega168 (\fBo\fP) (\fB+\fP)
+.br
+atmega168p (\fBo\fP) (\fB+\fP)
+.br
+atmega169
+.br
+atmega16hva (\fBo\fP)
+.br
+atmega2560 (\fB*\fP)
+.br
+atmega2561 (\fB*\fP)
+.br
+atmega32
+.br
+atmega323
+.br
+atmega324p (\fBo\fP)
+.br
+atmega325 (\fBo\fP)
+.br
+atmega3250 (\fBo\fP)
+.br
+atmega3250p (\fBo\fP)
+.br
+atmega325p (\fBo\fP)
+.br
+atmega328p (\fBo\fP) (\fB+\fP)
+.br
+atmega329 (\fBo\fP)
+.br
+atmega3290 (\fBo\fP)
+.br
+atmega3290p (\fBo\fP)
+.br
+atmega329p (\fBo\fP)
+.br
+atmega32c1 (\fBo\fP) (\fB+\fP)
+.br
+atmega32hvb (\fBo\fP) (\fB+\fP)
+.br
+atmega32m1 (\fBo\fP) (\fB+\fP)
+.br
+atmega32u4 (\fBo\fP)
+.br
+atmega406 (\fB*\fP)
+.br
+atmega48 (\fBo\fP) (\fB+\fP)
+.br
+atmega48p (\fBo\fP) (\fB+\fP)
+.br
+atmega64
+.br
+atmega640 (\fB*\fP)
+.br
+atmega644 (\fB*\fP)
+.br
+atmega644p (\fB*\fP)
+.br
+atmega645 (\fB*\fP)
+.br
+atmega6450 (\fB*\fP)
+.br
+atmega649 (\fB*\fP)
+.br
+atmega6490 (\fB*\fP)
+.br
+atmega88 (\fBo\fP) (\fB+\fP)
+.br
+atmega88p (\fBo\fP) (\fB+\fP)
+.br
+attiny13 (\fBo\fP) (\fB+\fP)
+.br
+attiny167 (\fBo\fP) (\fB+\fP)
+.br
+attiny2313 (\fBo\fP) (\fB+\fP)
+.br
+attiny24 (\fBo\fP) (\fB+\fP)
+.br
+attiny25 (\fBo\fP) (\fB+\fP)
+.br
+attiny261 (\fBo\fP) (\fB+\fP)
+.br
+attiny43u (\fBo\fP) (\fB+\fP)
+.br
+attiny44 (\fBo\fP) (\fB+\fP)
+.br
+attiny45 (\fBo\fP) (\fB+\fP)
+.br
+attiny461 (\fBo\fP) (\fB+\fP)
+.br
+attiny48 (\fBo\fP) (\fB+\fP)
+.br
+attiny84 (\fBo\fP) (\fB+\fP)
+.br
+attiny85 (\fBo\fP) (\fB+\fP)
+.br
+attiny861 (\fBo\fP) (\fB+\fP)
+.br
+attiny88 (\fBo\fP) (\fB+\fP)
+.br
+atxmega128a1 (\fB*\fP)
+.RE
+.PP
+\fB*\fP \- Only supported by the JTAG ICE mkII device.
+.br
+\fBo\fP \- Only supported by the JTAG ICE mkII and AVR Dragon device.
+.br
+\fB+\fP \- debugWire, see below
+.SS Supported File Formats
+.B avarice
+uses libbfd for reading input files. As such, it can handle any file format
+that libbfd knowns about. This includes the Intel Hex, Motorola SRecord and
+ELF formats, among others. If you tell \fBavarice\fR to read an ELF file, it
+will automatically handle programming all of the sections contained in the
+file (e.g. flash, eeprom, etc.).
+.SH OPTIONS
+.TP
+.BR \-h ,\  \-\-help
+Print this message.
+.TP
+.BR \-1 ,\  \-\-mkI
+Connect to JTAG ICE mkI (default).
+.TP
+.BR \-2 ,\  \-\-mkII
+Connect to JTAG ICE mkII.
+.TP
+.BR \-B ,\  \-\-jtag-bitrate \ <rate>
+Set the bitrate that the JTAG box communicates with the AVR target device.
+This must be less than 1/4 of the frequency of the target. Valid values are
+1 MHz, 500 kHz, 250 kHz or 125 kHz for the JTAG ICE mkI,
+anything between 22 kHz through approximately 6400 kHz for the
+JTAG ICE mkII. (default: 250 kHz)
+.TP
+.BR \-C ,\  \-\-capture
+Capture running program.
+.br
+Note: debugging must have been enabled prior to starting the program. (e.g.,
+by running avarice earlier)
+.TP
+.BR \-c ,\  \-\-daisy-chain \ <ub,ua,bb,ba>
+Setup JTAG daisy-chain information.
+.br
+Four comma-separated parameters need to be provided, corresponding to
+\fIunits before\fP, \fIunits after\fP, \fIbits before\fP, and
+\fIbits after\fP.
+.TP
+.BR \-D ,\  \-\-detach
+Detach once synced with JTAG ICE
+.TP
+.BR \-d ,\  \-\-debug
+Enable printing of debug information.
+.TP
+.BR \-e ,\  \-\-erase
+Erase target.
+Not possible in debugWire mode.
+.TP
+.BR \-E ,\  \-\-event\ <eventlist>
+List of events that do not interrupt.
+JTAG ICE mkII and AVR Dragon only.
+Default is "none,run,target_power_on,target_sleep,target_wakeup"
+.TP
+.BR \-f ,\  \-\-file \ <filename>
+Specify a file for use with the --program and --verify options. If --file is
+passed and neither --program or --verify are given then --program is implied.
+.TP
+.BR \-g ,\  \-\-dragon
+Connect to an AVR Dragon.
+This option implies the \fB-2\fP option.
+.TP
+.BR \-I ,\  \-\-ignore-intr
+Automatically step over interrupts.
+.br
+Note: EXPERIMENTAL. Can not currently handle
+devices fused for compatibility.
+.TP
+.BR \-j ,\  \-\-jtag \ <devname>
+Port attached to JTAG box (default: /dev/avrjtag). If the JTAG_DEV environmental
+variable is set, avarice will use that as the default instead.
+.br
+If \fBavarice\fR has been configured with libusb support, the JTAG ICE
+mkII can be connected through USB.
+In that case, the string \fIusb\fR is used as the name of the device.
+If there are multiple JTAG ICE mkII devices connected to the system
+through USB, this string may be followed by the (trailing part of the)
+ICE's serial number, delimited from the \fIusb\fR by a colon.
+.br
+The AVR Dragon can only be connected through USB, so this option
+defaults to "usb" in that case.
+.TP
+.BR \-k ,\  \-\-known-devices
+Print a list of known devices.
+.TP
+.BR \-L ,\  \-\-write-lockbits \ <ll>
+Write lock bits. The lock byte data must be given in two digit hexidecimal
+format with zero padding if needed.
+.TP
+.BR \-l ,\  \-\-read-lockbits
+Read the lock bits from the target. The individual bits are also displayed
+with names.
+.TP
+.BR \-P ,\  \-\-part \ <name>
+Target device name (e.g. atmega16)
+.TP
+.BR \-p ,\  \-\-program
+Program the target. Binary filename must be specified with --file option.
+.br
+.B NOTE:
+The old behaviour of automatically erasing the target before
+programming is no longer done. You must explicitly give the --erase option
+for the target to be erased.
+.TP
+.BR \-R ,\  \-\-reset-srst
+Apply nSRST signal (external reset) when connecting.
+This can override applications that set the JTD bit.
+.TP
+.BR \-r ,\  \-\-read-fuses
+Read fuses bytes.
+.TP
+.BR \-V ,\  \-\-version
+Print version information.
+.TP
+.BR \-v ,\  \-\-verify
+Verify program in device against file specified with --file option.
+.TP
+.BR \-w ,\  \-\-debugwire
+Connect to JTAG ICE mkII (or AVR Dragon), talking debugWire protocol to the target.
+This option implies the \fB-2\fP option.
+See the DEBUGWIRE section below.
+.TP
+.BR \-W ,\  \-\-write-fuses \ <eehhll>
+Write fuses bytes. \fBee\fR is the extended fuse byte, \fBhh\fR is the high
+fuse byte and \fBll\fR is the low fuse byte. The fuse byte data must be given
+in two digit hexidecimal format with zero padding if needed. All three bytes
+must currently be given.
+.br
+.B NOTE:
+Current, if the target device doesn't have an extended fuse byte
+(e.g. the atmega16), the you should set ee==ll when writing the fuse bytes.
+.PP
+\fIHOST_NAME\fR defaults to 0.0.0.0 (listen on any interface) if not given.
+.PP
+:\fIPORT\fR is required to put avarice into gdb server mode.
+.SH EXAMPLE USAGE
+avarice --erase --program --file test.bin --jtag /dev/ttyS0 :4242
+.PP
+Program the file \fItest.bin\fR into the JTAG ICE (mkI) connected to
+/dev/ttyS0 after erasing the device, then listen in GDB mode on the
+local port 4242.
+.PP
+avarice --jtag usb:1234 --mkII :4242
+.PP
+Connect to the JTAG ICE mkII attached to USB which serial number ends
+in \fI1234\fR, and listen in GDB mode on local port 4242.
+.SH DEBUGGING WITH AVARICE
+The JTAG ICE debugging environment has a few restrictions and changes:
+.IP \(bu 4
+No "soft" breakpoints, and only three hardware breakpoints. The break
+command sets hardware breakpoints. The easiest way to deal with this
+restriction is to enable and disable breakpoints as needed.
+.IP \(bu
+Two 1-byte hardware watchpoints (but each hardware watchpoint takes away
+one hardware breakpoint). If you set a watchpoint on a variable which takes
+more than one byte, execution will be abysmally slow. Instead it is better
+to do the following:
+.IP
+.RS 6
+watch *(char *)&myvariable
+.RE
+.IP
+which watches the least significant byte of
+.BR myvariable .
+.IP \(bu
+The Atmel AVR processors have a Harvard architecture (separate code and
+data buses). To distinguish data address 0 from code address 0,
+.B avr-gdb
+adds 0x800000 to all data addresses. Bear this in mind when examining
+printed pointers, or when passing absolute addresses to gdb commands.
+.SH DEBUGWIRE
+The \fIdebugWire\fP protocol is a proprietary protocol introduced
+by Atmel to allow debugging small AVR controllers that don't offer
+enough pins (and enough chip resources) to implement full JTAG.
+The communication takes place over the \fI/RESET\fP pin which needs
+to be turned into a debugWire connection pin by programming the
+\fIDWEN\fP fuse (debugWire enable), using a normal programmer
+connection (in-system programming, high-voltage programming).
+Note that by enabling this fuse, the standard reset functionality
+of that pin will be lost, so any in-system programming will cease
+to work as it requires a functional \fI/RESET\fP pin.
+Thus it should be made \fBabsolutely sure there is a way back\fP,
+like a device (as the STK500, for example) that can handle
+high-voltage programming of the AVR.
+Currently, \fBavarice\fP offers no option to turn off the DWEN fuse.
+However, \fBavrdude\fP offers the option to turn it off either
+through high-voltage programming, or by using the JTAG ICE mkII to
+first turn the target into an ISP-compatible mode, and then using
+normal ISP commands to change the fuse settings.
+.br
+Note that the debugWire environment is further limited, compared to
+JTAG.
+It does not offer hardware breakpoints, so all breakpoints have to
+be implemented as software breakpoints by rewriting flash pages
+using \fIBREAK\fP instructions.
+(Software breakpoints are currently not implemented by \fBavarice\fP.)
+Some memory spaces (fuse and lock bits) are not accessible through
+the debugWire protocol.
+.SH SEE ALSO
+.BR gdb (1),
+.BR avrdude (1),
+.BR avr\-gdb (1),
+.BR insight (1),
+.BR avr\-insight (1),
+.BR ice\-gdb (1),
+.BR ice\-insight (1)
+.SH AUTHORS
+Avarice (up to version 1.5) was originally written by Scott Finneran with help
+from Peter Jansen. They did the work of figuring out the jtagice communication
+protocol before Atmel released the spec (appnote AVR060).
+.PP
+David Gay made major improvements bringing avarice up to 2.0.
+.PP
+Joerg Wunsch reworked the code to abstract the JTAG ICE communication
+from the remainder, and then extended the code to support the JTAG ICE
+mkII protocol (see Atmel appnote AVR067).

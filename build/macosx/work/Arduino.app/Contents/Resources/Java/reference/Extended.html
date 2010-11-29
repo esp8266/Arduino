@@ -1,0 +1,226 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+  <title>Arduino - Extended Reference </title>
+  <link rel='stylesheet' href='arduino.css' type='text/css' />
+  <meta name="verify-v1" content="TtxFIEJAB6zdJ509wLxjnapQzKAMNm9u0Wj4ho6wxIY=" />
+</head>
+<body>
+<div id="page">
+<!--PageHeaderFmt-->
+<div id="pageheader">
+  <div class="title"><a href="http://www.arduino.cc"/>Arduino</a></div>
+  <div class="search">
+    <!-- SiteSearch Google -->    <FORM method=GET action="http://www.google.com/search">    <input type=hidden name=ie value=UTF-8>    <input type=hidden name=oe value=UTF-8>    <INPUT TYPE=text name=q size=25 maxlength=255 value="">    <INPUT type=submit name=btnG VALUE="search">    <input type=hidden name=domains value="http://www.arduino.cc/">
+    <input type=hidden name=sitesearch value="http://www.arduino.cc/">
+    </FORM>    <!-- SiteSearch Google -->
+  </div>
+</div>
+<!--/PageHeaderFmt-->
+<!--PageLeftFmt-->
+<div id="pagenav" style="text-align: right">
+  <div style="float: left;">
+  <p><a class='wikilink' href='http://arduino.cc/en/Main/Buy'>Buy</a>
+|
+<a class='wikilink' href='http://arduino.cc/en/Main/Software'>Download</a>
+|
+<a class='wikilink' href='Guide_index.html'>Getting Started</a>
+|
+<a class='wikilink' href='http://arduino.cc/en/Tutorial/HomePage'>Learning</a>
+|
+<a class='wikilink' href='index.html'>Reference</a>
+|
+<a class='wikilink' href='http://arduino.cc/en/Main/Hardware'>Hardware</a>
+|
+<a class='wikilink' href='FAQ.html'>FAQ</a>
+</p>
+<p class='vspace'></p>
+
+  </div>
+  <a class="urllink" href="http://www.arduino.cc/blog/" rel="nofollow">Blog &raquo;</a> |
+  <a class="urllink" href="http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl" rel="nofollow">Forum &raquo;</a> |
+  <a class="urllink" href="http://www.arduino.cc/playground/" rel="nofollow">Playground &raquo;</a>
+</div>
+<!--/PageLeftFmt-->
+<div id="pagetext">
+<!--PageText-->
+<div id='wikitext'>
+<p><strong>Reference</strong> &nbsp;  <a class='wikilink' href='index.html'>Language</a> (<a class='selflink' href='Extended.html'>extended</a>) | <a class='wikilink' href='Libraries.html'>Libraries</a> | <a class='wikilink' href='Comparison.html'>Comparison</a> | <a class='wikilink' href='Changes.html'>Changes</a>
+</p>
+<p class='vspace'></p><h1>Language Reference (extended)</h1>
+<p>The Arduino language is based on C/C++ and supports all standard C constructs and some C++ features.  It links against <a class='urllink' href='http://www.nongnu.org/avr-libc/' rel='nofollow'>AVR Libc</a> and allows the use of any of its functions; see its <a class='urllink' href='http://www.nongnu.org/avr-libc/user-manual/index.html' rel='nofollow'>user manual</a> for details.
+</p>
+<p class='vspace'></p>
+<table  width='100%' border='0' cellpadding='5' cellspacing='0'><tr><td  width='50%' valign='top'>
+<h2>Structure</h2>
+<ul><li>void <a class='wikilink' href='Setup.html'>setup</a>()
+</li><li>void <a class='wikilink' href='Loop.html'>loop</a>()
+</li></ul><p class='vspace'></p><h4>Control Structures</h4>
+<ul><li><a class='wikilink' href='If.html'>if</a>
+</li><li><a class='wikilink' href='Else.html'>if...else</a>
+</li><li><a class='wikilink' href='For.html'>for</a>
+</li><li><a class='wikilink' href='SwitchCase.html'>switch case</a>
+</li><li><a class='wikilink' href='While.html'>while</a>
+</li><li><a class='wikilink' href='DoWhile.html'>do... while</a>
+</li><li><a class='wikilink' href='Break.html'>break</a>
+</li><li><a class='wikilink' href='Continue.html'>continue</a>
+</li><li><a class='wikilink' href='Return.html'>return</a>
+</li><li><a class='wikilink' href='Goto.html'>goto</a>
+</li></ul><p class='vspace'></p><h4>Further Syntax</h4>
+<ul><li><a class='wikilink' href='SemiColon.html'>;</a> (semicolon)
+</li><li><a class='wikilink' href='Braces.html'>{}</a> (curly braces)
+</li><li><a class='wikilink' href='Comments.html'>//</a> (single line comment)
+</li><li><a class='wikilink' href='Comments.html'>/* */</a> (multi-line comment)
+</li><li><a class='wikilink' href='Define.html'>#define</a>
+</li><li><a class='wikilink' href='Include.html'>#include</a>
+</li></ul><p class='vspace'></p><h4>Arithmetic Operators</h4>
+<ul><li><a class='wikilink' href='Assignment.html'>=</a> (assignment operator)
+</li><li><a class='wikilink' href='Arithmetic.html'>+&nbsp;</a> (addition)
+</li><li><a class='wikilink' href='Arithmetic.html'>-</a> (subtraction)
+</li><li><a class='wikilink' href='Arithmetic.html'>*</a> (multiplication)
+</li><li><a class='wikilink' href='Arithmetic.html'>/</a> (division)
+</li><li><a class='wikilink' href='Modulo.html'>%</a> (modulo)
+</li></ul><p class='vspace'></p><h4>Comparison Operators</h4>
+<ul><li><a class='wikilink' href='If.html'>==</a> (equal to)
+</li><li><a class='wikilink' href='If.html'>!=</a> (not equal to)
+</li><li><a class='wikilink' href='If.html'>&lt;</a> (less than)
+</li><li><a class='wikilink' href='If.html'>&gt;</a> (greater than)
+</li><li><a class='wikilink' href='If.html'>&lt;=</a> (less than or equal to)
+</li><li><a class='wikilink' href='If.html'>&gt;=</a> (greater than or equal to)
+</li></ul><p class='vspace'></p><h4>Boolean Operators</h4>
+<ul><li><a class='wikilink' href='Boolean.html'>&amp;&amp;</a> (and)
+</li><li><a class='wikilink' href='Boolean.html'>||</a> (or)
+</li><li><a class='wikilink' href='Boolean.html'>!</a> (not)
+</li></ul><p class='vspace'></p><h4>Pointer Access Operators</h4>
+<ul><li><a class='wikilink' href='Pointer.html'>* dereference operator</a>
+</li><li><a class='wikilink' href='Pointer.html'>&amp; reference operator</a>
+</li></ul><p class='vspace'></p><h4>Bitwise Operators</h4>
+<ul><li><a class='wikilink' href='BitwiseAnd.html'>&amp;</a> (bitwise and)
+</li><li><a class='wikilink' href='BitwiseAnd.html'>|</a> (bitwise or)
+</li><li><a class='wikilink' href='BitwiseAnd.html'>^</a> (bitwise xor)
+</li><li><a class='wikilink' href='BitwiseXorNot.html'>~</a> (bitwise not)
+</li><li><a class='wikilink' href='Bitshift.html'>&lt;&lt;</a> (bitshift left)
+</li><li><a class='wikilink' href='Bitshift.html'>&gt;&gt;</a> (bitshift right)
+<p class='vspace'></p></li><li><a class='wikilink' href='PortManipulation.html'>Port Manipulation</a>
+</li></ul><p class='vspace'></p><h4>Compound Operators</h4>
+<ul><li><a class='wikilink' href='Increment.html'>++</a> (increment)
+</li><li><a class='wikilink' href='Increment.html'>--</a> (decrement)
+</li><li><a class='wikilink' href='IncrementCompound.html'>+=</a> (compound addition)
+</li><li><a class='wikilink' href='IncrementCompound.html'>-=</a> (compound subtraction)
+</li><li><a class='wikilink' href='IncrementCompound.html'>*=</a> (compound multiplication)
+</li><li><a class='wikilink' href='IncrementCompound.html'>/=</a> (compound division)
+<p class='vspace'></p></li><li><a class='wikilink' href='BitwiseCompound.html'>&amp;=</a> (compound bitwise and)
+</li><li><a class='wikilink' href='BitwiseCompound.html'>|=</a> (compound bitwise or)
+</li></ul><p class='vspace'></p><h2>Variables</h2>
+<h4>Constants</h4>
+<ul><li><a class='wikilink' href='Constants.html'>HIGH</a> | <a class='wikilink' href='Constants.html'>LOW</a>
+</li><li><a class='wikilink' href='Constants.html'>INPUT</a> | <a class='wikilink' href='Constants.html'>OUTPUT</a>
+</li><li><a class='wikilink' href='Constants.html'>true</a> | <a class='wikilink' href='Constants.html'>false</a>
+</li><li><a class='wikilink' href='IntegerConstants.html'>integer constants</a>
+</li><li><a class='wikilink' href='Fpconstants.html'>floating point constants</a>
+</li></ul><p class='vspace'></p><h4>Data Types</h4>
+<ul><li><a class='wikilink' href='Void.html'>void keyword</a>
+</li><li><a class='wikilink' href='BooleanVariables.html'>boolean</a>
+</li><li><a class='wikilink' href='Char.html'>char</a>
+</li><li><a class='wikilink' href='UnsignedChar.html'>unsigned char</a>
+</li><li><a class='wikilink' href='Byte.html'>byte</a>
+</li><li><a class='wikilink' href='Int.html'>int</a>
+</li><li><a class='wikilink' href='UnsignedInt.html'>unsigned int</a>
+</li><li><a class='wikilink' href='Word.html'>word</a>
+</li><li><a class='wikilink' href='Long.html'>long</a>
+</li><li><a class='wikilink' href='UnsignedLong.html'>unsigned long</a>
+</li><li><a class='wikilink' href='Float.html'>float</a>
+</li><li><a class='wikilink' href='Double.html'>double</a>
+</li><li><a class='wikilink' href='String.html'>string</a>
+</li><li><a class='wikilink' href='Array.html'>array</a>
+</li></ul><p class='vspace'></p><h4>Conversion</h4>
+<ul><li><a class='wikilink' href='CharCast.html'>char()</a>
+</li><li><a class='wikilink' href='ByteCast.html'>byte()</a>
+</li><li><a class='wikilink' href='IntCast.html'>int()</a>
+</li><li><a class='wikilink' href='WordCast.html'>word()</a>
+</li><li><a class='wikilink' href='LongCast.html'>long()</a>
+</li><li><a class='wikilink' href='FloatCast.html'>float()</a>
+</li></ul><p class='vspace'></p><h4>Variable Scope &amp; Qualifiers</h4>
+<ul><li><a class='wikilink' href='Scope.html'>variable scope</a>
+</li><li><a class='wikilink' href='Static.html'>static</a>
+</li><li><a class='wikilink' href='Volatile.html'>volatile</a>
+</li><li><a class='wikilink' href='Const.html'>const</a>
+</li></ul><p class='vspace'></p><h4>Utilities</h4>
+<ul><li><a class='wikilink' href='Sizeof.html'>sizeof</a>() (sizeof operator)
+</li></ul><p class='vspace'></p><h2>Reference</h2>
+<ul><li><a class='wikilink' href='ASCIIchart.html'>ASCII chart</a>
+</li></ul></td><td  width='50%' valign='top'> 
+<p class='vspace'></p><h2>Functions</h2>
+<p><strong>Digital I/O</strong>
+</p><ul><li><a class='wikilink' href='PinMode.html'>pinMode</a>(pin, mode)   
+</li><li><a class='wikilink' href='DigitalWrite.html'>digitalWrite</a>(pin, value) 
+</li><li>int <a class='wikilink' href='DigitalRead.html'>digitalRead</a>(pin)
+</li></ul><p class='vspace'></p><p><strong>Analog I/O</strong>
+</p><ul><li><a class='wikilink' href='AnalogReference.html'>analogReference</a>(type)
+</li><li>int <a class='wikilink' href='AnalogRead.html'>analogRead</a>(pin) 
+</li><li><a class='wikilink' href='AnalogWrite.html'>analogWrite</a>(pin, value) - <em>PWM</em>
+</li></ul><p class='vspace'></p><p><strong>Advanced I/O</strong>
+</p><ul><li><a class='wikilink' href='ShiftOut.html'>shiftOut</a>(dataPin, clockPin, bitOrder, value) 
+</li><li>unsigned long <a class='wikilink' href='PulseIn.html'>pulseIn</a>(pin, value)
+</li></ul><p class='vspace'></p><p><strong>Time</strong>
+</p><ul><li>unsigned long <a class='wikilink' href='Millis.html'>millis</a>()   
+</li><li>unsigned long <a class='wikilink' href='Micros.html'>micros</a>()   
+</li><li><a class='wikilink' href='Delay.html'>delay</a>(ms)  
+</li><li><a class='wikilink' href='DelayMicroseconds.html'>delayMicroseconds</a>(us)
+</li></ul><p class='vspace'></p><p><strong>Math</strong>
+</p><ul><li><a class='wikilink' href='Min.html'>min</a>(x, y)
+</li><li><a class='wikilink' href='Max.html'>max</a>(x, y)
+</li><li><a class='wikilink' href='Abs.html'>abs</a>(x)
+</li><li><a class='wikilink' href='Constrain.html'>constrain</a>(x, a, b)
+</li><li><a class='wikilink' href='Map.html'>map</a>(value, fromLow, fromHigh, toLow, toHigh)
+</li><li><a class='wikilink' href='Pow.html'>pow</a>(base, exponent)
+</li><li><a class='wikilink' href='Sqrt.html'>sqrt</a>(x)
+</li></ul><p class='vspace'></p><p><strong>Trigonometry</strong> 
+</p><ul><li><a class='wikilink' href='Sin.html'>sin</a>(rad)
+</li><li><a class='wikilink' href='Cos.html'>cos</a>(rad)
+</li><li><a class='wikilink' href='Tan.html'>tan</a>(rad)
+</li></ul><p class='vspace'></p><p><strong>Random Numbers</strong>
+</p>
+<p class='vspace'></p><ul><li><a class='wikilink' href='RandomSeed.html'>randomSeed</a>(seed)
+</li><li>long <a class='wikilink' href='Random.html'>random</a>(max)
+</li><li>long <a class='wikilink' href='Random.html'>random</a>(min, max)
+</li></ul><p class='vspace'></p><p><strong>Bits and Bytes</strong>
+</p><ul><li><a class='wikilink' href='LowByte.html'>lowByte</a>()
+</li><li><a class='wikilink' href='HighByte.html'>highByte</a>()
+</li><li><a class='wikilink' href='BitRead.html'>bitRead</a>()
+</li><li><a class='wikilink' href='BitWrite.html'>bitWrite</a>()
+</li><li><a class='wikilink' href='BitSet.html'>bitSet</a>()
+</li><li><a class='wikilink' href='BitClear.html'>bitClear</a>()
+</li><li><a class='wikilink' href='Bit.html'>bit</a>()
+</li></ul><p class='vspace'></p><p><strong>External Interrupts</strong>
+</p>
+<p class='vspace'></p><ul><li><a class='wikilink' href='AttachInterrupt.html'>attachInterrupt</a>(interrupt, function, mode)
+</li><li><a class='wikilink' href='DetachInterrupt.html'>detachInterrupt</a>(interrupt)
+</li></ul><p class='vspace'></p><p><strong>Interrupts</strong>
+</p>
+<p class='vspace'></p><ul><li><a class='wikilink' href='Interrupts.html'>interrupts</a>()
+</li><li><a class='wikilink' href='NoInterrupts.html'>noInterrupts</a>()
+</li></ul><p class='vspace'></p><p><strong>Communication</strong>
+</p>
+<p class='vspace'></p><ul><li><a class='wikilink' href='Serial.html'>Serial</a>
+</li></ul><p class='vspace'></p><p><strong>Looking for something else?</strong>  Try the list of <a class='urllink' href='http://www.arduino.cc/playground/Main/GeneralCodeLibrary' rel='nofollow'>community-contributed code</a>.
+</p>
+<p class='vspace'></p></td></tr></table>
+<p class='vspace'></p><p><a class='wikilink' href='index.html'>Reference Home</a>
+</p>
+<p class='vspace'></p><p><em>Corrections, suggestions, and new documentation should be posted to the <a class='urllink' href='http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?board=swbugs' rel='nofollow'>Forum</a>.</em>
+</p>
+<p class='vspace'></p><p>The text of the Arduino reference is licensed under a
+<a class='urllink' href='http://creativecommons.org/licenses/by-sa/3.0/' rel='nofollow'>Creative Commons Attribution-ShareAlike 3.0 License</a>.  Code samples in the reference are released into the public domain.
+</p>
+</div>
+
+</div>
+<!--PageFooterFmt-->
+<div id="pagefooter">
+  <a href='#'>Edit Page</a> | <a href='#'>Page History</a> | <a href='#' target='_blank'>Printable View</a> | <a href='http://arduino.cc/en/Site/AllRecentChanges'>All Recent Site Changes</a>
+</div>
+<!--/PageFooterFmt-->
+</div>
+</body>
+</html>

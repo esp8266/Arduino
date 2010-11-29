@@ -1,0 +1,233 @@
+.TH "mem_sections" 3 "6 Nov 2008" "Version 1.6.4" "avr-libc" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+mem_sections \- Memory Sections 
+\fBRemarks:\fP
+.RS 4
+Need to list all the sections which are available to the avr.
+.RE
+.PP
+\fBWeak Bindings\fP.RS 4
+FIXME: need to discuss the .weak directive.
+.RE
+.PP
+The following describes the various sections available.
+.SH "The .text Section"
+.PP
+The .text section contains the actual machine instructions which make up your program. This section is further subdivided by the .initN and .finiN sections dicussed below.
+.PP
+\fBNote:\fP
+.RS 4
+The \fCavr-size\fP program (part of binutils), coming from a Unix background, doesn't account for the .data initialization space added to the .text section, so in order to know how much flash the final program will consume, one needs to add the values for both, .text and .data (but not .bss), while the amount of pre-allocated SRAM is the sum of .data and .bss.
+.RE
+.PP
+.SH "The .data Section"
+.PP
+This section contains static data which was defined in your code. Things like the following would end up in .data:
+.PP
+.PP
+.nf
+char err_str[] = 'Your program has died a horrible death!';
+
+struct point pt = { 1, 1 };
+.fi
+.PP
+.PP
+It is possible to tell the linker the SRAM address of the beginning of the .data section. This is accomplished by adding \fB\fC-Wl,-Tdata,\fIaddr\fP\fP\fP to the \fCavr-gcc\fP command used to the link your program. Not that \fI\fCaddr\fP\fP must be offset by adding 0x800000 the to real SRAM address so that the linker knows that the address is in the SRAM memory space. Thus, if you want the .data section to start at 0x1100, pass 0x801100 at the address to the linker. [offset \fBexplained\fP]
+.PP
+\fBNote:\fP
+.RS 4
+When using \fC\fBmalloc()\fP\fP in the application (which could even happen inside library calls), \fBadditional adjustments\fP are required.
+.RE
+.PP
+.SH "The .bss Section"
+.PP
+Uninitialized global or static variables end up in the .bss section.
+.SH "The .eeprom Section"
+.PP
+This is where eeprom variables are stored.
+.SH "The .noinit Section"
+.PP
+This sections is a part of the .bss section. What makes the .noinit section special is that variables which are defined as such:
+.PP
+.PP
+.nf
+int foo __attribute__ ((section ('.noinit')));
+.fi
+.PP
+.PP
+will not be initialized to zero during startup as would normal .bss data.
+.PP
+Only uninitialized variables can be placed in the .noinit section. Thus, the following code will cause \fCavr-gcc\fP to issue an error:
+.PP
+.PP
+.nf
+int bar __attribute__ ((section ('.noinit'))) = 0xaa;
+.fi
+.PP
+.PP
+It is possible to tell the linker explicitly where to place the .noinit section by adding \fC-Wl,--section-start=.noinit=0x802000\fP to the \fCavr-gcc\fP command line at the linking stage. For example, suppose you wish to place the .noinit section at SRAM address 0x2000:
+.PP
+.PP
+.nf
+
+	$ avr-gcc ... -Wl,--section-start=.noinit=0x802000 ...
+.fi
+.PP
+.PP
+ 
+.PP
+\fBNote:\fP
+.RS 4
+Because of the Harvard architecture of the AVR devices, you must manually add 0x800000 to the address you pass to the linker as the start of the section. Otherwise, the linker thinks you want to put the .noinit section into the .text section instead of .data/.bss and will complain.
+.RE
+.PP
+Alternatively, you can write your own linker script to automate this. [FIXME: need an example or ref to dox for writing linker scripts.]
+.SH "The .initN Sections"
+.PP
+These sections are used to define the startup code from reset up through the start of main(). These all are subparts of the \fB.text section\fP.
+.PP
+The purpose of these sections is to allow for more specific placement of code within your program.
+.PP
+\fBNote:\fP
+.RS 4
+Sometimes, it is convenient to think of the .initN and .finiN sections as functions, but in reality they are just symbolic names which tell the linker where to stick a chunk of code which is \fInot\fP a function. Notice that the examples for \fBasm\fP and \fBC\fP can not be called as functions and should not be jumped into.
+.RE
+.PP
+The \fB.initN\fP sections are executed in order from 0 to 9.
+.PP
+\fB.init0:\fP.RS 4
+Weakly bound to __init(). If user defines __init(), it will be jumped into immediately after a reset.
+.RE
+.PP
+\fB.init1:\fP.RS 4
+Unused. User definable.
+.RE
+.PP
+\fB.init2:\fP.RS 4
+In C programs, weakly bound to initialize the stack, and to clear __zero_reg__ (r1).
+.RE
+.PP
+\fB.init3:\fP.RS 4
+Unused. User definable.
+.RE
+.PP
+\fB.init4:\fP.RS 4
+
+.RE
+.PP
+For devices with > 64 KB of ROM, .init4 defines the code which takes care of copying the contents of .data from the flash to SRAM. For all other devices, this code as well as the code to zero out the .bss section is loaded from libgcc.a.
+.PP
+\fB.init5:\fP.RS 4
+Unused. User definable.
+.RE
+.PP
+\fB.init6:\fP.RS 4
+Unused for C programs, but used for constructors in C++ programs.
+.RE
+.PP
+\fB.init7:\fP.RS 4
+Unused. User definable.
+.RE
+.PP
+\fB.init8:\fP.RS 4
+Unused. User definable.
+.RE
+.PP
+\fB.init9:\fP.RS 4
+Jumps into main().
+.RE
+.PP
+.SH "The .finiN Sections"
+.PP
+These sections are used to define the exit code executed after return from main() or a call to \fBexit()\fP. These all are subparts of the \fB.text section\fP.
+.PP
+The \fB.finiN\fP sections are executed in descending order from 9 to 0.
+.PP
+\fB.finit9:\fP.RS 4
+Unused. User definable. This is effectively where _exit() starts.
+.RE
+.PP
+\fB.fini8:\fP.RS 4
+Unused. User definable.
+.RE
+.PP
+\fB.fini7:\fP.RS 4
+Unused. User definable.
+.RE
+.PP
+\fB.fini6:\fP.RS 4
+Unused for C programs, but used for destructors in C++ programs.
+.RE
+.PP
+\fB.fini5:\fP.RS 4
+Unused. User definable.
+.RE
+.PP
+\fB.fini4:\fP.RS 4
+Unused. User definable.
+.RE
+.PP
+\fB.fini3:\fP.RS 4
+Unused. User definable.
+.RE
+.PP
+\fB.fini2:\fP.RS 4
+Unused. User definable.
+.RE
+.PP
+\fB.fini1:\fP.RS 4
+Unused. User definable.
+.RE
+.PP
+\fB.fini0:\fP.RS 4
+Goes into an infinite loop after program termination and completion of any _exit() code (execution of code in the .fini9 -> .fini1 sections).
+.RE
+.PP
+.SH "Using Sections in Assembler Code"
+.PP
+Example:
+.PP
+.PP
+.nf
+#include <avr/io.h>
+
+        .section .init1,'ax',@progbits
+        ldi       r0, 0xff
+        out       _SFR_IO_ADDR(PORTB), r0
+        out       _SFR_IO_ADDR(DDRB), r0
+.fi
+.PP
+.PP
+\fBNote:\fP
+.RS 4
+The \fB\fC,'ax',@progbits\fP\fP tells the assembler that the section is allocatable ('a'), executable ('x') and contains data ('@progbits'). For more detailed information on the .section directive, see the gas user manual.
+.RE
+.PP
+.SH "Using Sections in C Code"
+.PP
+Example:
+.PP
+.PP
+.nf
+#include <avr/io.h>
+
+void my_init_portb (void) __attribute__ ((naked)) \
+    __attribute__ ((section ('.init3')));
+
+void
+my_init_portb (void)
+{
+        PORTB = 0xff;
+        DDRB = 0xff;
+}
+.fi
+.PP
+.PP
+\fBNote:\fP
+.RS 4
+Section .init3 is used in this example, as this ensures the inernal \fC__zero_reg__\fP has already been set up. The code generated by the compiler might blindly rely on \fC__zero_reg__\fP being really 0. 
+.RE
+.PP
+

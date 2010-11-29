@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head>  <title>Arduino - String </title>  <link rel='stylesheet' href='arduino.css' type='text/css' />  <meta name="verify-v1" content="TtxFIEJAB6zdJ509wLxjnapQzKAMNm9u0Wj4ho6wxIY=" /></head><body><div id="page"><!--PageHeaderFmt--><div id="pageheader">  <div class="title"><a href="http://www.arduino.cc"/>Arduino</a></div>  <div class="search">    <!-- SiteSearch Google -->    <FORM method=GET action="http://www.google.com/search">    <input type=hidden name=ie value=UTF-8>    <input type=hidden name=oe value=UTF-8>    <INPUT TYPE=text name=q size=25 maxlength=255 value="">    <INPUT type=submit name=btnG VALUE="search">    <input type=hidden name=domains value="http://www.arduino.cc/">    <input type=hidden name=sitesearch value="http://www.arduino.cc/">    </FORM>    <!-- SiteSearch Google -->  </div></div><!--/PageHeaderFmt--><!--PageLeftFmt--><div id="pagenav" style="text-align: right">  <div style="float: left;">  <p><a class='wikilink' href='http://arduino.cc/en/Main/Buy'>Buy</a>
+|
+<a class='wikilink' href='http://arduino.cc/en/Main/Software'>Download</a>
+|
+<a class='wikilink' href='Guide_index.html'>Getting Started</a>
+|
+<a class='wikilink' href='http://arduino.cc/en/Tutorial/HomePage'>Learning</a>
+|
+<a class='wikilink' href='index.html'>Reference</a>
+|
+<a class='wikilink' href='http://arduino.cc/en/Main/Hardware'>Hardware</a>
+|
+<a class='wikilink' href='FAQ.html'>FAQ</a>
+</p>
+<p class='vspace'></p>
+  </div>  <a class="urllink" href="http://www.arduino.cc/blog/" rel="nofollow">Blog &raquo;</a> |  <a class="urllink" href="http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl" rel="nofollow">Forum &raquo;</a> |  <a class="urllink" href="http://www.arduino.cc/playground/" rel="nofollow">Playground &raquo;</a></div><!--/PageLeftFmt--><div id="pagetext"><!--PageText-->
+<div id='wikitext'>
+<p><strong>Reference</strong> &nbsp;  <a class='wikilink' href='index.html'>Language</a> | <a class='wikilink' href='Libraries.html'>Libraries</a> | <a class='wikilink' href='Comparison.html'>Comparison</a> | <a class='wikilink' href='Changes.html'>Changes</a>
+</p>
+<p class='vspace'></p><h2>string</h2>
+<h4>Description</h4>
+<p>Strings are represented as arrays of type char and are null-terminated.
+</p>
+<p class='vspace'></p><h4>Examples</h4>
+<p>All of the following are valid declarations for strings.
+</p><pre>
+  char Str1[15];
+  char Str2[8] = {'a', 'r', 'd', 'u', 'i', 'n', 'o'};
+  char Str3[8] = {'a', 'r', 'd', 'u', 'i', 'n', 'o', '\0'};
+  char Str4[ ] = "arduino";
+  char Str5[8] = "arduino";
+  char Str6[15] = "arduino";
+
+</pre>
+<p class='vspace'></p><p><strong>Possibilities for declaring strings</strong>
+</p>
+<p class='vspace'></p><ul><li>Declare an array of chars without initializing it as in Str1
+</li><li>Declare an array of chars (with one extra char) and the compiler will add the required null character, as in Str2
+</li><li>Explicitly add the null character, Str3
+</li><li>Initialize with a string constant in quotation marks; the compiler will size the array to fit the string constant and a terminating null character, Str4
+</li><li>Initialize the array with an explicit size and string constant, Str5
+</li><li>Initialize the array, leaving extra space for a larger string, Str6
+</li></ul><p class='vspace'></p><p><strong>Null termination</strong>
+</p>
+<p class='vspace'></p><p>Generally, strings are terminated with a null character (ASCII code 0).  This allows functions (like Serial.print()) to tell where the end of a string is.  Otherwise, they would continue reading subsequent bytes of memory that aren't actually part of the string.
+</p>
+<p class='vspace'></p><p>This means that your string needs to have space for one more character than the text you want it to contain.  That is why Str2 and Str5 need to be eight characters, even though "arduino" is only seven - the last position is automatically filled with a null character.  Str4 will be automatically sized to eight characters, one for the extra null.  In Str3, we've explicitly included the null character (written '\0') ourselves.  
+</p>
+<p class='vspace'></p><p>Note that it's possible to have a string without a final null character (e.g. if you had specified the length of Str2 as seven instead of eight).  This will break most functions that use strings, so you shouldn't do it intentionally.  If you notice something behaving strangely (operating on characters not in the string), however, this could be the problem.
+</p>
+<p class='vspace'></p><p><strong>Single quotes or double quotes?</strong>
+</p>
+<p class='vspace'></p><p>Strings are always defined inside double quotes ("Abc") and characters are always defined inside single quotes('A').
+</p>
+<p class='vspace'></p><p><strong>Wrapping long strings</strong>
+</p>
+<p class='vspace'></p><p>You can wrap long strings like this:
+</p><pre>
+char myString[] = "This is the first line"
+" this is the second line"
+" etcetera";
+
+</pre>
+<p class='vspace'></p><p><strong>Arrays of strings</strong>
+</p>
+<p class='vspace'></p><p>It is often convenient, when working with large amounts of text, such as a project with an LCD display, to setup an array of strings. Because strings themselves are arrays, this is in actually an example of a two-dimensional array. 
+</p>
+<p class='vspace'></p><p>In the code below, the asterisk after the datatype char "char*" indicates that this is an array of "pointers". All array names are actually pointers, so this is required to make an array of arrays. Pointers are one of the more esoteric parts of C for beginners to understand, but it isn't necessary to understand pointers in detail to use them effectively here.
+</p>
+<p class='vspace'></p><h4>Example</h4>
+<pre>
+
+char* myStrings[]={"This is string 1", "This is string 2", "This is string 3",
+"This is string 4", "This is string 5","This is string 6"};
+
+void setup(){
+Serial.begin(9600);
+}
+
+void loop(){
+for (int i = 0; i &lt; 6; i++){
+   Serial.println(myStrings[i]);
+   delay(500);
+   }
+}
+</pre>
+<p class='vspace'></p><h4>See Also</h4>
+<ul><li><a class='wikilink' href='Array.html'>array</a>
+</li><li><a class='wikilink' href='PROGMEM.html'>PROGMEM</a>
+</li><li><a class='urllink' href='VariableDeclaration.html' rel='nofollow'>Variable Declaration</a>
+</li></ul><p class='vspace'></p><p><a class='wikilink' href='index.html'>Reference Home</a>
+</p>
+<p class='vspace'></p><p><em>Corrections, suggestions, and new documentation should be posted to the <a class='urllink' href='http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?board=swbugs' rel='nofollow'>Forum</a>.</em>
+</p>
+<p class='vspace'></p><p>The text of the Arduino reference is licensed under a
+<a class='urllink' href='http://creativecommons.org/licenses/by-sa/3.0/' rel='nofollow'>Creative Commons Attribution-ShareAlike 3.0 License</a>.  Code samples in the reference are released into the public domain.
+</p>
+</div>
+<!-- AddThis Button BEGIN --><script type="text/javascript">var addthis_language = "en";</script><div class="addthis_container addthis_toolbox addthis_default_style" addthis:url="String" addthis:title="Arduino Wiki English"><a href="http://www.addthis.com/bookmark.php?v=250&amp;username=arduinoteam" class="addthis_button_compact">Share</a><span class="addthis_separator">|</span><a class="addthis_button_email"></a><a class="addthis_button_favorites"></a><a class="addthis_button_print"></a><a class="addthis_button_facebook"></a><a class="addthis_button_twitter"></a><script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#username=arduinoteam"></script></div><!-- AddThis Button END --></div><!--PageFooterFmt--><div id="pagefooter">  <a href=.html'#'>Edit Page</a> | <a href='#'>Page History</a> | <a href='#' target='_blank'>Printable View</a> | <a href='http://arduino.cc/en/Site/AllRecentChanges'>All Recent Site Changes</a></div><!--/PageFooterFmt--></div></body></html>

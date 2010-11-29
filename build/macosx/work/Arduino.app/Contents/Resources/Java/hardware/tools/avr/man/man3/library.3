@@ -1,0 +1,98 @@
+.TH "library" 3 "6 Nov 2008" "Version 1.6.4" "avr-libc" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+library \- How to Build a Library 
+.SH "Introduction"
+.PP
+So you keep reusing the same functions that you created over and over? Tired of cut and paste going from one project to the next? Would you like to reduce your maintenance overhead? Then you're ready to create your own library! Code reuse is a very laudable goal. With some upfront investment, you can save time and energy on future projects by having ready-to-go libraries. This chapter describes some background information, design considerations, and practical knowledge that you will need to create and use your own libraries.
+.SH "How the Linker Works"
+.PP
+The compiler compiles a single high-level language file (C language, for example) into a single object module file. The linker (ld) can only work with object modules to link them together. Object modules are the smallest unit that the linker works with.
+.PP
+Typically, on the linker command line, you will specify a set of object modules (that has been previously compiled) and then a list of libraries, including the Standard C Library. The linker takes the set of object modules that you specify on the command line and links them together. Afterwards there will probably be a set of 'undefined references'. A reference is essentially a function call. An undefined reference is a function call, with no defined function to match the call.
+.PP
+The linker will then go through the libraries, in order, to match the undefined references with function definitions that are found in the libraries. If it finds the function that matches the call, the linker will then link in the object module in which the function is located. This part is important: the linker links in THE ENTIRE OBJECT MODULE in which the function is located. Remember, the linker knows nothing about the functions internal to an object module, other than symbol names (such as function names). The smallest unit the linker works with is object modules.
+.PP
+When there are no more undefined references, the linker has linked everything and is done and outputs the final application.
+.SH "How to Design a Library"
+.PP
+How the linker behaves is very important in designing a library. Ideally, you want to design a library where only the functions that are called are the only functions to be linked into the final application. This helps keep the code size to a minimum. In order to do this, with the way the linker works, is to only write one function per code module. This will compile to one function per object module. This is usually a very different way of doing things than writing an application!
+.PP
+There are always exceptions to the rule. There are generally two cases where you would want to have more than one function per object module.
+.PP
+The first is when you have very complementary functions that it doesn't make much sense to split them up. For example, \fBmalloc()\fP and \fBfree()\fP. If someone is going to use \fBmalloc()\fP, they will very likely be using \fBfree()\fP (or at least should be using \fBfree()\fP). In this case, it makes more sense to aggregate those two functions in the same object module.
+.PP
+The second case is when you want to have an Interrupt Service Routine (ISR) in your library that you want to link in. The problem in this case is that the linker looks for unresolved references and tries to resolve them with code in libraries. A reference is the same as a function call. But with ISRs, there is no function call to initiate the ISR. The ISR is placed in the Interrupt Vector Table (IVT), hence no call, no reference, and no linking in of the ISR. In order to do this, you have to trick the linker in a way. Aggregate the ISR, with another function in the same object module, but have the other function be something that is required for the user to call in order to use the ISR, like perhaps an initialization function for the subsystem, or perhaps a function that enables the ISR in the first place.
+.SH "Creating a Library"
+.PP
+The librarian program is called \fCar\fP (for 'archiver') and is found in the GNU Binutils project. This program will have been built for the AVR target and will therefore be named \fCavr-ar\fP.
+.PP
+The job of the librarian program is simple: aggregate a list of object modules into a single library (archive) and create an index for the linker to use. The name that you create for the library filename must follow a specific pattern: lib\fIname\fP.a. The \fIname\fP part is the unique part of the filename that you create. It makes it easier if the \fIname\fP part relates to what the library is about. This \fIname\fP part must be prefixed by 'lib', and it must have a file extension of .a, for 'archive'. The reason for the special form of the filename is for how the library gets used by the toolchain, as we will see later on.
+.PP
+\fBNote:\fP
+.RS 4
+The filename is case-sensitive. Use a lowercase 'lib' prefix, and a lowercase '.a' as the file extension.
+.RE
+.PP
+The command line is fairly simple:
+.PP
+.PP
+.nf
+avr-ar rcs <library name> <list of object modules>
+.fi
+.PP
+.PP
+The \fCr\fP command switch tells the program to insert the object modules into the archive with replacement. The \fCc\fP command line switch tells the program to create the archive. And the \fCs\fP command line switch tells the program to write an object-file index into the archive, or update an existing one. This last switch is very important as it helps the linker to find what it needs to do its job.
+.PP
+\fBNote:\fP
+.RS 4
+The command line switches are case sensitive! There are uppercase switches that have completely different actions.
+.PP
+MFile and the WinAVR distribution contain a Makefile Template that includes the necessary command lines to build a library. You will have to manually modify the template to switch it over to build a library instead of an application.
+.RE
+.PP
+See the GNU Binutils manual for more information on the \fCar\fP program.
+.SH "Using a Library"
+.PP
+To use a library, use the \fC-l\fP switch on your linker command line. The string immediately following the \fC-l\fP is the unique part of the library filename that the linker will link in. For example, if you use:
+.PP
+.PP
+.nf
+-lm
+.fi
+.PP
+.PP
+this will expand to the library filename:
+.PP
+.PP
+.nf
+libm.a
+.fi
+.PP
+.PP
+which happens to be the math library included in avr-libc.
+.PP
+If you use this on your linker command line:
+.PP
+.PP
+.nf
+-lprintf_flt
+.fi
+.PP
+.PP
+then the linker will look for a library called:
+.PP
+.PP
+.nf
+libprintf_flt.a
+.fi
+.PP
+.PP
+This is why naming your library is so important when you create it!
+.PP
+The linker will search libraries in the order that they appear on the command line. Whichever function is found first that matches the undefined reference, it will be linked in.
+.PP
+There are also command line switches that tell GCC which directory to look in (\fC-L\fP) for the libraries that are specified to be linke in with \fC-l\fP.
+.PP
+See the GNU Binutils manual for more information on the GNU linker (ld) program. 

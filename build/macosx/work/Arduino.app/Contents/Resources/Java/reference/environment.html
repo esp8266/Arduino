@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head>  <title>Arduino - Environment </title>  <link rel='stylesheet' href='arduino.css' type='text/css' />  <meta name="verify-v1" content="TtxFIEJAB6zdJ509wLxjnapQzKAMNm9u0Wj4ho6wxIY=" /></head><body><div id="page"><!--PageHeaderFmt--><div id="pageheader">  <div class="title"><a href="http://www.arduino.cc"/>Arduino</a></div>  <div class="search">    <!-- SiteSearch Google -->    <FORM method=GET action="http://www.google.com/search">    <input type=hidden name=ie value=UTF-8>    <input type=hidden name=oe value=UTF-8>    <INPUT TYPE=text name=q size=25 maxlength=255 value="">    <INPUT type=submit name=btnG VALUE="search">    <input type=hidden name=domains value="http://www.arduino.cc/">    <input type=hidden name=sitesearch value="http://www.arduino.cc/">    </FORM>    <!-- SiteSearch Google -->  </div></div><!--/PageHeaderFmt--><!--PageLeftFmt--><div id="pagenav" style="text-align: right">  <div style="float: left;">  <p><a class='wikilink' href='http://arduino.cc/en/Main/Buy'>Buy</a>
+|
+<a class='wikilink' href='http://arduino.cc/en/Main/Software'>Download</a>
+|
+<a class='wikilink' href='Guide_index.html'>Getting Started</a>
+|
+<a class='wikilink' href='http://arduino.cc/en/Tutorial/HomePage'>Learning</a>
+|
+<a class='wikilink' href='index.html'>Reference</a>
+|
+<a class='wikilink' href='http://arduino.cc/en/Main/Hardware'>Hardware</a>
+|
+<a class='wikilink' href='FAQ.html'>FAQ</a>
+</p>
+<p class='vspace'></p>
+  </div>  <a class="urllink" href="http://www.arduino.cc/blog/" rel="nofollow">Blog &raquo;</a> |  <a class="urllink" href="http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl" rel="nofollow">Forum &raquo;</a> |  <a class="urllink" href="http://www.arduino.cc/playground/" rel="nofollow">Playground &raquo;</a></div><!--/PageLeftFmt--><div id="pagetext"><!--PageText-->
+<div id='wikitext'>
+<h2>Arduino Environment</h2>
+<p>(:redirect Guide/Environment:)
+</p>
+<p class='vspace'></p>
+<table  width='90%' border='0' cellpadding='5' cellspacing='0'><tr><td  width='50%' valign='top'>
+<p class='vspace'></p><h3>Toolbar</h3>
+<p><em>Verify/Compile</em>
+</p>
+<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Main/play.gif' alt='' title='' /></div>
+<p class='vspace'></p><p>Checks your code for errors.
+</p>
+<p class='vspace'></p><p><em>Stop</em>
+</p>
+<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Main/stop.gif' alt='' title='' /></div>
+<p class='vspace'></p><p>Stops the serial monitor, or unhighlight other buttons.
+</p>
+<p class='vspace'></p><p><em>New</em>
+</p>
+<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Main/new.gif' alt='' title='' /></div>
+<p class='vspace'></p><p>Creates a new sketch.
+</p>
+<p class='vspace'></p><p><em>Open</em>
+</p>
+<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Main/open.gif' alt='' title='' /></div>
+<p class='vspace'></p><p>Presents a menu of all the sketches in your sketchbook.  Note: due to a bug in Java, this menu doesn't scroll; if you need to open a sketch late in the list, use the <strong>File | Sketchbook</strong> menu instead.
+</p>
+<p class='vspace'></p><p><em>Save</em>
+</p>
+<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Main/save.gif' alt='' title='' /></div>
+<p class='vspace'></p><p>Saves your sketch.
+</p>
+<p class='vspace'></p><p><em>Upload to I/O Board</em>
+</p>
+<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Main/export.gif' alt='' title='' /></div>
+<p class='vspace'></p><p>Uploads your code to the Arduino I/O board.  Make sure to save or verify your sketch before uploading it.
+</p>
+<p class='vspace'></p><p><em>Serial Monitor</em>
+</p>
+<p class='vspace'></p><div><img src='http://arduino.cc/en/uploads/Main/serial_monitor.gif' alt='' title='' /></div>
+<p class='vspace'></p><p>Displays serial data being sent from the Arduino board (USB or serial board).  To send data to the board, enter text and click on the "send" button or press enter (in Arduino 0005, pressing enter appends a newline to your text, this was removed in Arduino 0006).  Choose the baud rate from the drop-down that matches the rate passed to <strong>Serial.begin</strong> in your sketch (in version of Arduino prior to 0006, the baud rate is specified in the <strong>Tools | Serial Monitor Baud Rate</strong> menu).
+</p>
+<p class='vspace'></p><p>You can also talk to the board from Processing, Flash, <span class='wikiword'>MaxMSP</span>, etc (see the <a class='urllink' href='http://www.arduino.cc/playground/Main/Interfacing' rel='nofollow'>interfacing page</a> for details).
+</p>
+<p class='vspace'></p></td><td  width='50%' valign='top'>
+<p class='vspace'></p><h3>Menus</h3>
+<h4>Sketch</h4>
+<p><em>Verify/Compile</em>
+</p>
+<p class='vspace'></p><p>Checks your sketch for errors.
+</p>
+<p class='vspace'></p><p><em>Import Library</em>
+</p>
+<p class='vspace'></p><p>Uses a library in your sketch.  Works by adding <strong>#include</strong>s to the top of your code.  This makes extra functionality available to your sketch, but increases its size.  To stop using a library, delete the appropriate <strong>#include</strong>s from the top of your sketch.  For more details, see the page on <a class='wikilink' href='http://arduino.cc/en/Main/Libraries'>libraries</a>.
+</p>
+<p class='vspace'></p><h4>Tools</h4>
+<p><em>Auto Format</em>
+</p>
+<p class='vspace'></p><p>This formats your code nicely: i.e. indents it so that opening and closing curly braces line up, and that the statements instead curly braces are indented more.
+</p>
+<p class='vspace'></p><p><em>Microcontroller (MCU)</em>
+</p>
+<p class='vspace'></p><p>This menu lets you choose which microcontroller you're using; it should match the name (up to the dash) of the chip on your Arduino board (e.g. if your chip says "<span class='wikiword'>ATMEGA8</span>-16PI", you would choose "atmega8").  Almost all Arduino boards use the atmega8, but the new Arduino stamps use the atmega168 (which can hold programs which are twice as big).
+</p>
+<p class='vspace'></p><p><em>Serial Port</em>
+</p>
+<p class='vspace'></p><p>This menu contains all the serial devices (real or virtual) on your machine.  It should automatically refresh every time you open the top-level tools menu.
+</p>
+<p class='vspace'></p><p>Before uploading your sketch, you need to select the item from this menu that represents your Arduino board.  On the Mac, this is probably something like <strong>/dev/tty.usbserial-1B1</strong> (for a USB board), or <strong>/dev/<span class='wikiword'>tty.USA19QW1b1P1</span>.1</strong> (for a serial board connected with a Keyspan USB-to-Serial adapter).  On Windows, it's probably <strong><span class='wikiword'>COM1</span></strong> or <strong><span class='wikiword'>COM2</span></strong> (for a serial board) or <strong><span class='wikiword'>COM4</span></strong>, <strong><span class='wikiword'>COM5</span></strong>, <strong><span class='wikiword'>COM7</span></strong>, or higher (for a USB board) - to find out, you look for USB serial device in the ports section of the Windows Device Manager.
+</p>
+<p class='vspace'></p><p><em>Serial Monitor Baud Rate</em> (Arduino 0005 and earlier)
+</p>
+<p class='vspace'></p><p>This menu item controls the baud rate (speed) that the serial monitor uses to communicate with a sketch running on the Arduino board.  It must match the value passed to  in the code of the sketch.  In Arduino 0006, this baud rate is set from a drop-down in the status bar when the serial monitor is enabled.
+</p>
+<p class='vspace'></p><p>This baud rate does not affect the process of uploading sketches to the Arduino board; see the <a class='wikilink' href='FAQ.html'>FAQ</a> if you need to change that.
+</p>
+<p class='vspace'></p><p><em>Burn Bootloader</em>
+</p>
+<p class='vspace'></p><p>This burns the bootloader to your Arduino board, using an an AVR-ISP connected to the serial port selected in the <strong>Serial Port</strong> submenu.  This only works with the atmega8 (not the atmega168).  For more details see the <a class='wikilink' href='http://arduino.cc/en/Main/Bootloader'>bootloader</a> page.
+</p>
+<p class='vspace'></p><p><em>Burn Bootloader (parallel)</em>
+</p>
+<p class='vspace'></p><p><em>Windows and Linux only</em>.  Burns the bootloader to your Arduino board, using a <a class='wikilink' href='http://arduino.cc/en/Main/ParallelProgrammer'>parallel programmer</a>.  This only works with the atmega8 (not the atmega168).
+</p>
+<p class='vspace'></p></td></tr></table>
+<p class='vspace'></p><h3>Preferences</h3>
+<p>Some preferences can be set in the preferences dialog (found under the <strong>Arduino</strong> menu on the Mac, or <strong>File</strong> on Windows and Linux).  The rest can be found in the <a class='wikilink' href='http://arduino.cc/en/Main/Preferences'>preferences.txt file</a>.
+</p>
+</div>
+<!-- AddThis Button BEGIN --><script type="text/javascript">var addthis_language = "en";</script><div class="addthis_container addthis_toolbox addthis_default_style" addthis:url="http://arduino.cc/en/Main/Environment" addthis:title="Arduino Wiki English"><a href="http://www.addthis.com/bookmark.php?v=250&amp;username=arduinoteam" class="addthis_button_compact">Share</a><span class="addthis_separator">|</span><a class="addthis_button_email"></a><a class="addthis_button_favorites"></a><a class="addthis_button_print"></a><a class="addthis_button_facebook"></a><a class="addthis_button_twitter"></a><script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#username=arduinoteam"></script></div><!-- AddThis Button END --></div><!--PageFooterFmt--><div id="pagefooter">  <a href='http://arduino.cc/en/Main/Environment?action=edit'>Edit Page</a> | <a href='http://arduino.cc/en/Main/Environment?action=diff'>Page History</a> | <a href='http://arduino.cc/en/Main/Environment?action=print' target='_blank'>Printable View</a> | <a href='http://arduino.cc/en/Site/AllRecentChanges'>All Recent Site Changes</a></div><!--/PageFooterFmt--></div></body></html>

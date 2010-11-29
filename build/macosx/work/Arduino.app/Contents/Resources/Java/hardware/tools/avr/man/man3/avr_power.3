@@ -1,0 +1,152 @@
+.TH "<avr/power.h>: Power Reduction Management" 3 "6 Nov 2008" "Version 1.6.4" "avr-libc" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+<avr/power.h>: Power Reduction Management \- .PP
+.nf
+ #include <avr/power.h>
+.fi
+.PP
+.PP
+Many AVRs contain a Power Reduction Register (PRR) or Registers (PRRx) that allow you to reduce power consumption by disabling or enabling various on-board peripherals as needed.
+.PP
+There are many macros in this header file that provide an easy interface to enable or disable on-board peripherals to reduce power. See the table below.
+.PP
+\fBNote:\fP
+.RS 4
+Not all AVR devices have a Power Reduction Register (for example the ATmega128). On those devices without a Power Reduction Register, these macros are not available.
+.PP
+Not all AVR devices contain the same peripherals (for example, the LCD interface), or they will be named differently (for example, USART and USART0). Please consult your device's datasheet, or the header file, to find out which macros are applicable to your device.
+.RE
+.PP
+   \fBPower Macro\fP \fBDescription\fP \fBApplicable for device\fP 
+.PP
+power_adc_enable() Enable the Analog to Digital Converter module. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561, AT90USB646, AT90USB647, AT90USB1286, AT90USB1287, AT90PWM1, AT90PWM2, AT90PWM2B, AT90PWM3, AT90PWM3B, AT90PWM216, AT90PWM316, ATmega165, ATmega165P, ATmega325, ATmega3250, ATmega645, ATmega6450, ATmega169, ATmega169P, ATmega329, ATmega3290, ATmega649, ATmega6490, ATmega164P, ATmega324P, ATmega644, ATmega48, ATmega88, ATmega168, ATtiny24, ATtiny44, ATtiny84, ATtiny25, ATtiny45, ATtiny85, ATtiny261, ATtiny461, ATtiny861 
+.PP
+power_adc_disable() Disable the Analog to Digital Converter module. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561, AT90USB646, AT90USB647, AT90USB1286, AT90USB1287, AT90PWM1, AT90PWM2, AT90PWM2B, AT90PWM3, AT90PWM3B, AT90PWM216, AT90PWM316, ATmega165, ATmega165P, ATmega325, ATmega3250, ATmega645, ATmega6450, ATmega169, ATmega169P, ATmega329, ATmega3290, ATmega649, ATmega6490, ATmega164P, ATmega324P, ATmega644, ATmega48, ATmega88, ATmega168, ATtiny24, ATtiny44, ATtiny84, ATtiny25, ATtiny45, ATtiny85, ATtiny261, ATtiny461, ATtiny861 
+.PP
+power_lcd_enable() Enable the LCD module. ATmega169, ATmega169P, ATmega329, ATmega3290, ATmega649, ATmega6490 
+.PP
+power_lcd_disable(). Disable the LCD module. ATmega169, ATmega169P, ATmega329, ATmega3290, ATmega649, ATmega6490 
+.PP
+power_psc0_enable() Enable the Power Stage Controller 0 module. AT90PWM1, AT90PWM2, AT90PWM2B, AT90PWM3, AT90PWM3B 
+.PP
+power_psc0_disable() Disable the Power Stage Controller 0 module. AT90PWM1, AT90PWM2, AT90PWM2B, AT90PWM3, AT90PWM3B 
+.PP
+power_psc1_enable() Enable the Power Stage Controller 1 module. AT90PWM1, AT90PWM2, AT90PWM2B, AT90PWM3, AT90PWM3B 
+.PP
+power_psc1_disable() Disable the Power Stage Controller 1 module. AT90PWM1, AT90PWM2, AT90PWM2B, AT90PWM3, AT90PWM3B 
+.PP
+power_psc2_enable() Enable the Power Stage Controller 2 module. AT90PWM1, AT90PWM2, AT90PWM2B, AT90PWM3, AT90PWM3B 
+.PP
+power_psc2_disable() Disable the Power Stage Controller 2 module. AT90PWM1, AT90PWM2, AT90PWM2B, AT90PWM3, AT90PWM3B 
+.PP
+power_spi_enable() Enable the Serial Peripheral Interface module. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561, AT90USB646, AT90USB647, AT90USB1286, AT90USB1287, AT90PWM1, AT90PWM2, AT90PWM2B, AT90PWM3, AT90PWM3B, AT90PWM216, AT90PWM316, ATmega165, ATmega165P, ATmega325, ATmega3250, ATmega645, ATmega6450, ATmega169, ATmega169P, ATmega329, ATmega3290, ATmega649, ATmega6490, ATmega164P, ATmega324P, ATmega644, ATmega48, ATmega88, ATmega168 
+.PP
+power_spi_disable() Disable the Serial Peripheral Interface module. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561, AT90USB646, AT90USB647, AT90USB1286, AT90USB1287, AT90PWM1, AT90PWM2, AT90PWM2B, AT90PWM3, AT90PWM3B, AT90PWM216, AT90PWM316, ATmega165, ATmega165P, ATmega325, ATmega3250, ATmega645, ATmega6450, ATmega169, ATmega169P, ATmega329, ATmega3290, ATmega649, ATmega6490, ATmega164P, ATmega324P, ATmega644, ATmega48, ATmega88, ATmega168 
+.PP
+power_timer0_enable() Enable the Timer 0 module. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561, AT90USB646, AT90USB647, AT90USB1286, AT90USB1287, AT90PWM1, AT90PWM216, AT90PWM316, AT90PWM2, AT90PWM2B, AT90PWM3, AT90PWM3B, ATmega165, ATmega165P, ATmega325, ATmega3250, ATmega645, ATmega6450, ATmega164P, ATmega324P, ATmega644, ATmega406, ATmega48, ATmega88, ATmega168, ATtiny24, ATtiny44, ATtiny84, ATtiny25, ATtiny45, ATtiny85, ATtiny261, ATtiny461, ATtiny861 
+.PP
+power_timer0_disable() Disable the Timer 0 module. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561, AT90USB646, AT90USB647, AT90USB1286, AT90USB1287, AT90PWM1, AT90PWM2, AT90PWM2B, AT90PWM3, AT90PWM3B, AT90PWM216, AT90PWM316, ATmega165, ATmega165P, ATmega325, ATmega3250, ATmega645, ATmega6450, ATmega164P, ATmega324P, ATmega644, ATmega406, ATmega48, ATmega88, ATmega168, ATtiny24, ATtiny44, ATtiny84, ATtiny25, ATtiny45, ATtiny85, ATtiny261, ATtiny461, ATtiny861 
+.PP
+power_timer1_enable() Enable the Timer 1 module. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561, AT90USB646, AT90USB647, AT90USB1286, AT90USB1287, AT90PWM1, AT90PWM2, AT90PWM2B, AT90PWM3, AT90PWM3B, AT90PWM216, AT90PWM316, ATmega165, ATmega165P, ATmega325, ATmega3250, ATmega645, ATmega6450, ATmega169, ATmega169P, ATmega329, ATmega3290, ATmega649, ATmega6490, ATmega164P, ATmega324P, ATmega644, ATmega406, ATmega48, ATmega88, ATmega168, ATtiny24, ATtiny44, ATtiny84, ATtiny25, ATtiny45, ATtiny85, ATtiny261, ATtiny461, ATtiny861 
+.PP
+power_timer1_disable() Disable the Timer 1 module. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561, AT90USB646, AT90USB647, AT90USB1286, AT90USB1287, AT90PWM1, AT90PWM2, AT90PWM2B, AT90PWM3, AT90PWM3B, AT90PWM216, AT90PWM316, ATmega165, ATmega165P, ATmega325, ATmega3250, ATmega645, ATmega6450, ATmega169, ATmega169P, ATmega329, ATmega3290, ATmega649, ATmega6490, ATmega164P, ATmega324P, ATmega644, ATmega406, ATmega48, ATmega88, ATmega168, ATtiny24, ATtiny44, ATtiny84, ATtiny25, ATtiny45, ATtiny85, ATtiny261, ATtiny461, ATtiny861 
+.PP
+power_timer2_enable() Enable the Timer 2 module. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561, AT90USB646, AT90USB647, AT90USB1286, AT90USB1287, ATmega164P, ATmega324P, ATmega644, ATmega48, ATmega88, ATmega168 
+.PP
+power_timer2_disable() Disable the Timer 2 module. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561, AT90USB646, AT90USB647, AT90USB1286, AT90USB1287, ATmega164P, ATmega324P, ATmega644, ATmega48, ATmega88, ATmega168 
+.PP
+power_timer3_enable() Enable the Timer 3 module. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561, AT90USB646, AT90USB647, AT90USB1286, AT90USB1287 
+.PP
+power_timer3_disable() Disable the Timer 3 module. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561, AT90USB646, AT90USB647, AT90USB1286, AT90USB1287 
+.PP
+power_timer4_enable() Enable the Timer 4 module. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561 
+.PP
+power_timer4_disable() Disable the Timer 4 module. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561 
+.PP
+power_timer5_enable() Enable the Timer 5 module. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561 
+.PP
+power_timer5_disable() Disable the Timer 5 module. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561 
+.PP
+power_twi_enable() Enable the Two Wire Interface module. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561, AT90USB646, AT90USB647, AT90USB1286, AT90USB1287, ATmega164P, ATmega324P, ATmega644, ATmega406, ATmega48, ATmega88, ATmega168 
+.PP
+power_twi_disable() Disable the Two Wire Interface module. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561, AT90USB646, AT90USB647, AT90USB1286, AT90USB1287, ATmega164P, ATmega324P, ATmega644, ATmega406, ATmega48, ATmega88, ATmega168 
+.PP
+power_usart_enable() Enable the USART module. AT90PWM2, AT90PWM2B, AT90PWM3, AT90PWM3B 
+.PP
+power_usart_disable() Disable the USART module. AT90PWM2, AT90PWM2B, AT90PWM3, AT90PWM3B 
+.PP
+power_usart0_enable() Enable the USART 0 module. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561, ATmega165, ATmega165P, ATmega325, ATmega3250, ATmega645, ATmega6450, ATmega169, ATmega169P, ATmega329, ATmega3290, ATmega649, ATmega6490, ATmega164P, ATmega324P, ATmega644, ATmega48, ATmega88, ATmega168 
+.PP
+power_usart0_disable() Disable the USART 0 module. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561, ATmega165, ATmega165P, ATmega325, ATmega3250, ATmega645, ATmega6450, ATmega169, ATmega169P, ATmega329, ATmega3290, ATmega649, ATmega6490, ATmega164P, ATmega324P, ATmega644, ATmega48, ATmega88, ATmega168 
+.PP
+power_usart1_enable() Enable the USART 1 module. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561, AT90USB646, AT90USB647, AT90USB1286, AT90USB1287, ATmega164P, ATmega324P 
+.PP
+power_usart1_disable() Disable the USART 1 module. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561, AT90USB646, AT90USB647, AT90USB1286, AT90USB1287, ATmega164P, ATmega324P 
+.PP
+power_usart2_enable() Enable the USART 2 module. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561 
+.PP
+power_usart2_disable() Disable the USART 2 module. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561 
+.PP
+power_usart3_enable() Enable the USART 3 module. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561 
+.PP
+power_usart3_disable() Disable the USART 3 module. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561 
+.PP
+power_usb_enable() Enable the USB module. AT90USB646, AT90USB647, AT90USB1286, AT90USB1287 
+.PP
+power_usb_disable() Disable the USB module. AT90USB646, AT90USB647, AT90USB1286, AT90USB1287 
+.PP
+power_usi_enable() Enable the Universal Serial Interface module. ATtiny24, ATtiny44, ATtiny84, ATtiny25, ATtiny45, ATtiny85, ATtiny261, ATtiny461, ATtiny861 
+.PP
+power_usi_disable() Disable the Universal Serial Interface module. ATtiny24, ATtiny44, ATtiny84, ATtiny25, ATtiny45, ATtiny85, ATtiny261, ATtiny461, ATtiny861 
+.PP
+power_vadc_enable() Enable the Voltage ADC module. ATmega406 
+.PP
+power_vadc_disable() Disable the Voltage ADC module. ATmega406 
+.PP
+power_all_enable() Enable all modules. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561, AT90USB646, AT90USB647, AT90USB1286, AT90USB1287, AT90PWM1, AT90PWM2, AT90PWM2B, AT90PWM3, AT90PWM3B, AT90PWM216, AT90PWM316, ATmega165, ATmega165P, ATmega325, ATmega3250, ATmega645, ATmega6450, ATmega169, ATmega169P, ATmega329, ATmega3290, ATmega649, ATmega6490, ATmega164P, ATmega324P, ATmega644, ATmega406, ATmega48, ATmega88, ATmega168, ATtiny24, ATtiny44, ATtiny84, ATtiny25, ATtiny45, ATtiny85, ATtiny261, ATtiny461, ATtiny861 
+.PP
+power_all_disable() Disable all modules. ATmega640, ATmega1280, ATmega1281, ATmega2560, ATmega2561, AT90USB646, AT90USB647, AT90USB1286, AT90USB1287, AT90PWM1, AT90PWM2, AT90PWM2B, AT90PWM3, AT90PWM3B, AT90PWM216, AT90PWM316, ATmega165, ATmega165P, ATmega325, ATmega3250, ATmega645, ATmega6450, ATmega169, ATmega169P, ATmega329, ATmega3290, ATmega649, ATmega6490, ATmega164P, ATmega324P, ATmega644, ATmega406, ATmega48, ATmega88, ATmega168, ATtiny24, ATtiny44, ATtiny84, ATtiny25, ATtiny45, ATtiny85, ATtiny261, ATtiny461, ATtiny861   
+.PP
+Some of the newer AVRs contain a System Clock Prescale Register (CLKPR) that allows you to decrease the system clock frequency and the power consumption when the need for processing power is low. Below are two macros and an enumerated type that can be used to interface to the Clock Prescale Register.
+.PP
+\fBNote:\fP
+.RS 4
+Not all AVR devices have a Clock Prescale Register. On those devices without a Clock Prescale Register, these macros are not available.
+.RE
+.PP
+.PP
+.nf
+typedef enum
+{
+    clock_div_1 = 0,
+    clock_div_2 = 1,
+    clock_div_4 = 2,
+    clock_div_8 = 3,
+    clock_div_16 = 4,
+    clock_div_32 = 5,
+    clock_div_64 = 6,
+    clock_div_128 = 7,
+    clock_div_256 = 8
+} clock_div_t;
+.fi
+.PP
+ Clock prescaler setting enumerations.
+.PP
+.PP
+.nf
+ clock_prescale_set(x) 
+.fi
+.PP
+ Set the clock prescaler register select bits, selecting a system clock division setting. They type of x is clock_div_t.
+.PP
+.PP
+.nf
+ clock_prescale_get() 
+.fi
+.PP
+ Gets and returns the clock prescaler register setting. The return type is clock_div_t. 
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for avr-libc from the source code.

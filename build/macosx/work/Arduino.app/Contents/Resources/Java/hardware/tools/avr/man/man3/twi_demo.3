@@ -1,0 +1,123 @@
+.TH "Example using the two-wire interface (TWI)" 3 "6 Nov 2008" "Version 1.6.4" "avr-libc" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Example using the two-wire interface (TWI) \- Some newer devices of the ATmega series contain builtin support for interfacing the microcontroller to a two-wire bus, called TWI. This is essentially the same called I2C by Philips, but that term is avoided in Atmel's documentation due to patenting issues.
+.PP
+For the original Philips documentation, see
+.PP
+http://www.semiconductors.philips.com/buses/i2c/index.html
+.SH "Introduction into TWI"
+.PP
+The two-wire interface consists of two signal lines named \fISDA\fP (serial data) and \fISCL\fP (serial clock) (plus a ground line, of course). All devices participating in the bus are connected together, using open-drain driver circuitry, so the wires must be terminated using appropriate pullup resistors. The pullups must be small enough to recharge the line capacity in short enough time compared to the desired maximal clock frequency, yet large enough so all drivers will not be overloaded. There are formulas in the datasheet that help selecting the pullups.
+.PP
+Devices can either act as a master to the bus (i. e., they initiate a transfer), or as a slave (they only act when being called by a master). The bus is multi-master capable, and a particular device implementation can act as either master or slave at different times. Devices are addressed using a 7-bit address (coordinated by Philips) transfered as the first byte after the so-called start condition. The LSB of that byte is R/~W, i. e. it determines whether the request to the slave is to read or write data during the next cycles. (There is also an option to have devices using 10-bit addresses but that is not covered by this example.)
+.SH "The TWI example project"
+.PP
+The ATmega TWI hardware supports both, master and slave operation. This example will only demonstrate how to use an AVR microcontroller as TWI master. The implementation is kept simple in order to concentrate on the steps that are required to talk to a TWI slave, so all processing is done in polled-mode, waiting for the TWI interface to indicate that the next processing step is due (by setting the TWINT interrupt bit). If it is desired to have the entire TWI communication happen in 'background', all this can be implemented in an interrupt-controlled way, where only the start condition needs to be triggered from outside the interrupt routine.
+.PP
+There is a variety of slave devices available that can be connected to a TWI bus. For the purpose of this example, an EEPROM device out of the industry-standard \fB24C\fIxx\fP\fP series has been chosen (where \fIxx\fP can be one of \fB01\fP, \fB02\fP, \fB04\fP, \fB08\fP, or \fB16\fP) which are available from various vendors. The choice was almost arbitrary, mainly triggered by the fact that an EEPROM device is being talked to in both directions, reading and writing the slave device, so the example will demonstrate the details of both.
+.PP
+Usually, there is probably not much need to add more EEPROM to an ATmega system that way: the smallest possible AVR device that offers hardware TWI support is the ATmega8 which comes with 512 bytes of EEPROM, which is equivalent to an 24C04 device. The ATmega128 already comes with twice as much EEPROM as the 24C16 would offer. One exception might be to use an externally connected EEPROM device that is removable; e. g. SDRAM PC memory comes with an integrated TWI EEPROM that carries the RAM configuration information.
+.SH "The Source Code"
+.PP
+.PP
+.PP
+\fBNote [1]\fP.RS 4
+
+.RE
+.PP
+The header file \fC<\fButil/twi.h\fP>\fP contains some macro definitions for symbolic constants used in the TWI status register. These definitions match the names used in the Atmel datasheet except that all names have been prefixed with \fCTW_\fP.
+.PP
+\fBNote [2]\fP.RS 4
+
+.RE
+.PP
+The clock is used in timer calculations done by the compiler, for the UART baud rate and the TWI clock rate.
+.PP
+\fBNote [3]\fP.RS 4
+
+.RE
+.PP
+The address assigned for the 24Cxx EEPROM consists of 1010 in the upper four bits. The following three bits are normally available as slave sub-addresses, allowing to operate more than one device of the same type on a single bus, where the actual subaddress used for each device is configured by hardware strapping. However, since the next data packet following the device selection only allows for 8 bits that are used as an EEPROM address, devices that require more than 8 address bits (24C04 and above) 'steal' subaddress bits and use them for the EEPROM cell address bits 9 to 11 as required. This example simply assumes all subaddress bits are 0 for the smaller devices, so the E0, E1, and E2 inputs of the 24Cxx must be grounded.
+.PP
+\fBNote [4]\fP.RS 4
+
+.RE
+.PP
+For slow clocks, enable the 2 x U[S]ART clock multiplier, to improve the baud rate error. This will allow a 9600 Bd communication using the standard 1 MHz calibrated RC oscillator. See also the Baud rate tables in the datasheets.
+.PP
+\fBNote [5]\fP.RS 4
+
+.RE
+.PP
+The datasheet explains why a minimum TWBR value of 10 should be maintained when running in master mode. Thus, for system clocks below 3.6 MHz, we cannot run the bus at the intented clock rate of 100 kHz but have to slow down accordingly.
+.PP
+\fBNote [6]\fP.RS 4
+
+.RE
+.PP
+This function is used by the standard output facilities that are utilized in this example for debugging and demonstration purposes.
+.PP
+\fBNote [7]\fP.RS 4
+
+.RE
+.PP
+In order to shorten the data to be sent over the TWI bus, the 24Cxx EEPROMs support multiple data bytes transfered within a single request, maintaining an internal address counter that is updated after each data byte transfered successfully. When reading data, one request can read the entire device memory if desired (the counter would wrap around and start back from 0 when reaching the end of the device).
+.PP
+\fBNote [8]\fP.RS 4
+
+.RE
+.PP
+When reading the EEPROM, a first device selection must be made with write intent (R/~W bit set to 0 indicating a write operation) in order to transfer the EEPROM address to start reading from. This is called \fImaster transmitter mode\fP. Each completion of a particular step in TWI communication is indicated by an asserted TWINT bit in TWCR. (An interrupt would be generated if allowed.) After performing any actions that are needed for the next communication step, the interrupt condition must be manually cleared by \fIsetting\fP the TWINT bit. Unlike with many other interrupt sources, this would even be required when using a true interrupt routine, since as soon as TWINT is re-asserted, the next bus transaction will start.
+.PP
+\fBNote [9]\fP.RS 4
+
+.RE
+.PP
+Since the TWI bus is multi-master capable, there is potential for a bus contention when one master starts to access the bus. Normally, the TWI bus interface unit will detect this situation, and will not initiate a start condition while the bus is busy. However, in case two masters were starting at exactly the same time, the way bus arbitration works, there is always a chance that one master could lose arbitration of the bus during any transmit operation. A master that has lost arbitration is required by the protocol to immediately cease talking on the bus; in particular it must not initiate a stop condition in order to not corrupt the ongoing transfer from the active master. In this example, upon detecting a lost arbitration condition, the entire transfer is going to be restarted. This will cause a new start condition to be initiated, which will normally be delayed until the currently active master has released the bus.
+.PP
+\fBNote [10]\fP.RS 4
+
+.RE
+.PP
+Next, the device slave is going to be reselected (using a so-called repeated start condition which is meant to guarantee that the bus arbitration will remain at the current master) using the same slave address (SLA), but this time with read intent (R/~W bit set to 1) in order to request the device slave to start transfering data from the slave to the master in the next packet.
+.PP
+\fBNote [11]\fP.RS 4
+
+.RE
+.PP
+If the EEPROM device is still busy writing one or more cells after a previous write request, it will simply leave its bus interface drivers at high impedance, and does not respond to a selection in any way at all. The master selecting the device will see the high level at SDA after transfering the SLA+R/W packet as a NACK to its selection request. Thus, the select process is simply started over (effectively causing a \fIrepeated start condition\fP), until the device will eventually respond. This polling procedure is recommended in the 24Cxx datasheet in order to minimize the busy wait time when writing. Note that in case a device is broken and never responds to a selection (e. g. since it is no longer present at all), this will cause an infinite loop. Thus the maximal number of iterations made until the device is declared to be not responding at all, and an error is returned, will be limited to MAX_ITER.
+.PP
+\fBNote [12]\fP.RS 4
+
+.RE
+.PP
+This is called \fImaster receiver mode\fP: the bus master still supplies the SCL clock, but the device slave drives the SDA line with the appropriate data. After 8 data bits, the master responds with an ACK bit (SDA driven low) in order to request another data transfer from the slave, or it can leave the SDA line high (NACK), indicating to the slave that it is going to stop the transfer now. Assertion of ACK is handled by setting the TWEA bit in TWCR when starting the current transfer.
+.PP
+\fBNote [13]\fP.RS 4
+
+.RE
+.PP
+The control word sent out in order to initiate the transfer of the next data packet is initially set up to assert the TWEA bit. During the last loop iteration, TWEA is de-asserted so the client will get informed that no further transfer is desired.
+.PP
+\fBNote [14]\fP.RS 4
+
+.RE
+.PP
+Except in the case of lost arbitration, all bus transactions must properly be terminated by the master initiating a stop condition.
+.PP
+\fBNote [15]\fP.RS 4
+
+.RE
+.PP
+Writing to the EEPROM device is simpler than reading, since only a master transmitter mode transfer is needed. Note that the first packet after the SLA+W selection is always considered to be the EEPROM address for the next operation. (This packet is exactly the same as the one above sent before starting to read the device.) In case a master transmitter mode transfer is going to send more than one data packet, all following packets will be considered data bytes to write at the indicated address. The internal address pointer will be incremented after each write operation.
+.PP
+\fBNote [16]\fP.RS 4
+
+.RE
+.PP
+24Cxx devices can become write-protected by strapping their ~WC pin to logic high. (Leaving it unconnected is explicitly allowed, and constitutes logic low level, i. e. no write protection.) In case of a write protected device, all data transfer attempts will be NACKed by the device. Note that some devices might not implement this. 
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for avr-libc from the source code.

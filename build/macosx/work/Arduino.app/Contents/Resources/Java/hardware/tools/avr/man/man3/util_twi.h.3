@@ -1,0 +1,142 @@
+.TH "twi.h" 3 "6 Nov 2008" "Version 1.6.4" "avr-libc" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+twi.h \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fB_UTIL_TWI_H_\fP   1"
+.br
+.in -1c
+.PP
+.RI "\fBTWSR values\fP"
+.br
+Mnemonics: 
+.br
+TW_MT_xxx - master transmitter 
+.br
+TW_MR_xxx - master receiver 
+.br
+TW_ST_xxx - slave transmitter 
+.br
+TW_SR_xxx - slave receiver 
+.PP
+.in +1c
+.in +1c
+.ti -1c
+.RI "#define \fBTW_START\fP   0x08"
+.br
+.ti -1c
+.RI "#define \fBTW_REP_START\fP   0x10"
+.br
+.ti -1c
+.RI "#define \fBTW_MT_SLA_ACK\fP   0x18"
+.br
+.ti -1c
+.RI "#define \fBTW_MT_SLA_NACK\fP   0x20"
+.br
+.ti -1c
+.RI "#define \fBTW_MT_DATA_ACK\fP   0x28"
+.br
+.ti -1c
+.RI "#define \fBTW_MT_DATA_NACK\fP   0x30"
+.br
+.ti -1c
+.RI "#define \fBTW_MT_ARB_LOST\fP   0x38"
+.br
+.ti -1c
+.RI "#define \fBTW_MR_ARB_LOST\fP   0x38"
+.br
+.ti -1c
+.RI "#define \fBTW_MR_SLA_ACK\fP   0x40"
+.br
+.ti -1c
+.RI "#define \fBTW_MR_SLA_NACK\fP   0x48"
+.br
+.ti -1c
+.RI "#define \fBTW_MR_DATA_ACK\fP   0x50"
+.br
+.ti -1c
+.RI "#define \fBTW_MR_DATA_NACK\fP   0x58"
+.br
+.ti -1c
+.RI "#define \fBTW_ST_SLA_ACK\fP   0xA8"
+.br
+.ti -1c
+.RI "#define \fBTW_ST_ARB_LOST_SLA_ACK\fP   0xB0"
+.br
+.ti -1c
+.RI "#define \fBTW_ST_DATA_ACK\fP   0xB8"
+.br
+.ti -1c
+.RI "#define \fBTW_ST_DATA_NACK\fP   0xC0"
+.br
+.ti -1c
+.RI "#define \fBTW_ST_LAST_DATA\fP   0xC8"
+.br
+.ti -1c
+.RI "#define \fBTW_SR_SLA_ACK\fP   0x60"
+.br
+.ti -1c
+.RI "#define \fBTW_SR_ARB_LOST_SLA_ACK\fP   0x68"
+.br
+.ti -1c
+.RI "#define \fBTW_SR_GCALL_ACK\fP   0x70"
+.br
+.ti -1c
+.RI "#define \fBTW_SR_ARB_LOST_GCALL_ACK\fP   0x78"
+.br
+.ti -1c
+.RI "#define \fBTW_SR_DATA_ACK\fP   0x80"
+.br
+.ti -1c
+.RI "#define \fBTW_SR_DATA_NACK\fP   0x88"
+.br
+.ti -1c
+.RI "#define \fBTW_SR_GCALL_DATA_ACK\fP   0x90"
+.br
+.ti -1c
+.RI "#define \fBTW_SR_GCALL_DATA_NACK\fP   0x98"
+.br
+.ti -1c
+.RI "#define \fBTW_SR_STOP\fP   0xA0"
+.br
+.ti -1c
+.RI "#define \fBTW_NO_INFO\fP   0xF8"
+.br
+.ti -1c
+.RI "#define \fBTW_BUS_ERROR\fP   0x00"
+.br
+.ti -1c
+.RI "#define \fBTW_STATUS_MASK\fP"
+.br
+.ti -1c
+.RI "#define \fBTW_STATUS\fP   (TWSR & TW_STATUS_MASK)"
+.br
+.in -1c
+.in -1c
+.PP
+.RI "\fBR/~W bit in SLA+R/W address field.\fP"
+.br
+
+.in +1c
+.in +1c
+.ti -1c
+.RI "#define \fBTW_READ\fP   1"
+.br
+.ti -1c
+.RI "#define \fBTW_WRITE\fP   0"
+.br
+.in -1c
+.in -1c
+.SH "Detailed Description"
+.PP 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for avr-libc from the source code.

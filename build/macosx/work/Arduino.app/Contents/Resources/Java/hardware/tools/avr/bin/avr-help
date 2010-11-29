@@ -1,0 +1,2 @@
+#!/bin/sh
+exec open "`dirname "$0"`/../manual/index.html"

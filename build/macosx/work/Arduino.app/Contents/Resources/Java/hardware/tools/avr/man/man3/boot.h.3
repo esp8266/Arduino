@@ -1,0 +1,429 @@
+.TH "boot.h" 3 "6 Nov 2008" "Version 1.6.4" "avr-libc" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+boot.h \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fB_AVR_BOOT_H_\fP   1"
+.br
+.ti -1c
+.RI "#define \fBBOOTLOADER_SECTION\fP   __attribute__ ((section ('.bootloader')))"
+.br
+.ti -1c
+.RI "#define \fB__COMMON_ASB\fP   RWWSB"
+.br
+.ti -1c
+.RI "#define \fB__COMMON_ASRE\fP   RWWSRE"
+.br
+.ti -1c
+.RI "#define \fBBLB12\fP   5"
+.br
+.ti -1c
+.RI "#define \fBBLB11\fP   4"
+.br
+.ti -1c
+.RI "#define \fBBLB02\fP   3"
+.br
+.ti -1c
+.RI "#define \fBBLB01\fP   2"
+.br
+.ti -1c
+.RI "#define \fBboot_spm_interrupt_enable\fP()   (__SPM_REG |= (\fBuint8_t\fP)_BV(SPMIE))"
+.br
+.ti -1c
+.RI "#define \fBboot_spm_interrupt_disable\fP()   (__SPM_REG &= (\fBuint8_t\fP)~_BV(SPMIE))"
+.br
+.ti -1c
+.RI "#define \fBboot_is_spm_interrupt\fP()   (__SPM_REG & (\fBuint8_t\fP)_BV(SPMIE))"
+.br
+.ti -1c
+.RI "#define \fBboot_rww_busy\fP()   (__SPM_REG & (\fBuint8_t\fP)_BV(__COMMON_ASB))"
+.br
+.ti -1c
+.RI "#define \fBboot_spm_busy\fP()   (__SPM_REG & (\fBuint8_t\fP)_BV(__SPM_ENABLE))"
+.br
+.ti -1c
+.RI "#define \fBboot_spm_busy_wait\fP()   do{}while(boot_spm_busy())"
+.br
+.ti -1c
+.RI "#define \fB__BOOT_PAGE_ERASE\fP   (_BV(__SPM_ENABLE) | _BV(PGERS))"
+.br
+.ti -1c
+.RI "#define \fB__BOOT_PAGE_WRITE\fP   (_BV(__SPM_ENABLE) | _BV(PGWRT))"
+.br
+.ti -1c
+.RI "#define \fB__BOOT_PAGE_FILL\fP   _BV(__SPM_ENABLE)"
+.br
+.ti -1c
+.RI "#define \fB__BOOT_RWW_ENABLE\fP   (_BV(__SPM_ENABLE) | _BV(__COMMON_ASRE))"
+.br
+.ti -1c
+.RI "#define \fB__BOOT_LOCK_BITS_SET\fP   (_BV(__SPM_ENABLE) | _BV(BLBSET))"
+.br
+.ti -1c
+.RI "#define \fB__boot_page_fill_normal\fP(address, data)"
+.br
+.ti -1c
+.RI "#define \fB__boot_page_fill_alternate\fP(address, data)"
+.br
+.ti -1c
+.RI "#define \fB__boot_page_fill_extended\fP(address, data)"
+.br
+.ti -1c
+.RI "#define \fB__boot_page_erase_normal\fP(address)"
+.br
+.ti -1c
+.RI "#define \fB__boot_page_erase_alternate\fP(address)"
+.br
+.ti -1c
+.RI "#define \fB__boot_page_erase_extended\fP(address)"
+.br
+.ti -1c
+.RI "#define \fB__boot_page_write_normal\fP(address)"
+.br
+.ti -1c
+.RI "#define \fB__boot_page_write_alternate\fP(address)"
+.br
+.ti -1c
+.RI "#define \fB__boot_page_write_extended\fP(address)"
+.br
+.ti -1c
+.RI "#define \fB__boot_rww_enable\fP()"
+.br
+.ti -1c
+.RI "#define \fB__boot_rww_enable_alternate\fP()"
+.br
+.ti -1c
+.RI "#define \fB__boot_lock_bits_set\fP(lock_bits)"
+.br
+.ti -1c
+.RI "#define \fB__boot_lock_bits_set_alternate\fP(lock_bits)"
+.br
+.ti -1c
+.RI "#define \fBGET_LOW_FUSE_BITS\fP   (0x0000)"
+.br
+.ti -1c
+.RI "#define \fBGET_LOCK_BITS\fP   (0x0001)"
+.br
+.ti -1c
+.RI "#define \fBGET_EXTENDED_FUSE_BITS\fP   (0x0002)"
+.br
+.ti -1c
+.RI "#define \fBGET_HIGH_FUSE_BITS\fP   (0x0003)"
+.br
+.ti -1c
+.RI "#define \fBboot_lock_fuse_bits_get\fP(address)"
+.br
+.ti -1c
+.RI "#define \fB__BOOT_SIGROW_READ\fP   (_BV(__SPM_ENABLE) | _BV(SIGRD))"
+.br
+.ti -1c
+.RI "#define \fBboot_signature_byte_get\fP(addr)"
+.br
+.ti -1c
+.RI "#define \fBboot_page_fill\fP(address, data)   __boot_page_fill_normal(address, data)"
+.br
+.ti -1c
+.RI "#define \fBboot_page_erase\fP(address)   __boot_page_erase_normal(address)"
+.br
+.ti -1c
+.RI "#define \fBboot_page_write\fP(address)   __boot_page_write_normal(address)"
+.br
+.ti -1c
+.RI "#define \fBboot_rww_enable\fP()   __boot_rww_enable()"
+.br
+.ti -1c
+.RI "#define \fBboot_lock_bits_set\fP(lock_bits)   __boot_lock_bits_set(lock_bits)"
+.br
+.ti -1c
+.RI "#define \fBboot_page_fill_safe\fP(address, data)"
+.br
+.ti -1c
+.RI "#define \fBboot_page_erase_safe\fP(address)"
+.br
+.ti -1c
+.RI "#define \fBboot_page_write_safe\fP(address)"
+.br
+.ti -1c
+.RI "#define \fBboot_rww_enable_safe\fP()"
+.br
+.ti -1c
+.RI "#define \fBboot_lock_bits_set_safe\fP(lock_bits)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+
+.SH "Define Documentation"
+.PP 
+.SS "#define __boot_lock_bits_set(lock_bits)"
+.PP
+\fBValue:\fP
+.PP
+.nf
+(__extension__({                                           \
+    uint8_t value = (uint8_t)(~(lock_bits));               \
+    __asm__ __volatile__                                   \
+    (                                                      \
+        'ldi r30, 1\n\t'                                   \
+        'ldi r31, 0\n\t'                                   \
+        'mov r0, %2\n\t'                                   \
+        'sts %0, %1\n\t'                                   \
+        'spm\n\t'                                          \
+        :                                                  \
+        : 'i' (_SFR_MEM_ADDR(__SPM_REG)),                  \
+          'r' ((uint8_t)__BOOT_LOCK_BITS_SET),             \
+          'r' (value)                                      \
+        : 'r0', 'r30', 'r31'                               \
+    );                                                     \
+}))
+.fi
+.SS "#define __boot_lock_bits_set_alternate(lock_bits)"
+.PP
+\fBValue:\fP
+.PP
+.nf
+(__extension__({                                           \
+    uint8_t value = (uint8_t)(~(lock_bits));               \
+    __asm__ __volatile__                                   \
+    (                                                      \
+        'ldi r30, 1\n\t'                                   \
+        'ldi r31, 0\n\t'                                   \
+        'mov r0, %2\n\t'                                   \
+        'sts %0, %1\n\t'                                   \
+        'spm\n\t'                                          \
+        '.word 0xffff\n\t'                                 \
+        'nop\n\t'                                          \
+        :                                                  \
+        : 'i' (_SFR_MEM_ADDR(__SPM_REG)),                  \
+          'r' ((uint8_t)__BOOT_LOCK_BITS_SET),             \
+          'r' (value)                                      \
+        : 'r0', 'r30', 'r31'                               \
+    );                                                     \
+}))
+.fi
+.SS "#define __boot_page_erase_alternate(address)"
+.PP
+\fBValue:\fP
+.PP
+.nf
+(__extension__({                                 \
+    __asm__ __volatile__                         \
+    (                                            \
+        'sts %0, %1\n\t'                         \
+        'spm\n\t'                                \
+        '.word 0xffff\n\t'                       \
+        'nop\n\t'                                \
+        :                                        \
+        : 'i' (_SFR_MEM_ADDR(__SPM_REG)),        \
+          'r' ((uint8_t)__BOOT_PAGE_ERASE),      \
+          'z' ((uint16_t)address)                \
+    );                                           \
+}))
+.fi
+.SS "#define __boot_page_erase_extended(address)"
+.PP
+\fBValue:\fP
+.PP
+.nf
+(__extension__({                                 \
+    __asm__ __volatile__                         \
+    (                                            \
+        'movw r30, %A3\n\t'                      \
+        'sts  %1, %C3\n\t'                       \
+        'sts %0, %2\n\t'                         \
+        'spm\n\t'                                \
+        :                                        \
+        : 'i' (_SFR_MEM_ADDR(__SPM_REG)),        \
+          'i' (_SFR_MEM_ADDR(RAMPZ)),            \
+          'r' ((uint8_t)__BOOT_PAGE_ERASE),      \
+          'r' ((uint32_t)address)                \
+        : 'r30', 'r31'                           \
+    );                                           \
+}))
+.fi
+.SS "#define __boot_page_erase_normal(address)"
+.PP
+\fBValue:\fP
+.PP
+.nf
+(__extension__({                                 \
+    __asm__ __volatile__                         \
+    (                                            \
+        'sts %0, %1\n\t'                         \
+        'spm\n\t'                                \
+        :                                        \
+        : 'i' (_SFR_MEM_ADDR(__SPM_REG)),        \
+          'r' ((uint8_t)__BOOT_PAGE_ERASE),      \
+          'z' ((uint16_t)address)                \
+    );                                           \
+}))
+.fi
+.SS "#define __boot_page_fill_alternate(address, data)"
+.PP
+\fBValue:\fP
+.PP
+.nf
+(__extension__({                                 \
+    __asm__ __volatile__                         \
+    (                                            \
+        'movw  r0, %3\n\t'                       \
+        'sts %0, %1\n\t'                         \
+        'spm\n\t'                                \
+        '.word 0xffff\n\t'                       \
+        'nop\n\t'                                \
+        'clr  r1\n\t'                            \
+        :                                        \
+        : 'i' (_SFR_MEM_ADDR(__SPM_REG)),        \
+          'r' ((uint8_t)__BOOT_PAGE_FILL),       \
+          'z' ((uint16_t)address),               \
+          'r' ((uint16_t)data)                   \
+        : 'r0'                                   \
+    );                                           \
+}))
+.fi
+.SS "#define __boot_page_fill_extended(address, data)"
+.PP
+\fBValue:\fP
+.PP
+.nf
+(__extension__({                                 \
+    __asm__ __volatile__                         \
+    (                                            \
+        'movw  r0, %4\n\t'                       \
+        'movw r30, %A3\n\t'                      \
+        'sts %1, %C3\n\t'                        \
+        'sts %0, %2\n\t'                         \
+        'spm\n\t'                                \
+        'clr  r1\n\t'                            \
+        :                                        \
+        : 'i' (_SFR_MEM_ADDR(__SPM_REG)),        \
+          'i' (_SFR_MEM_ADDR(RAMPZ)),            \
+          'r' ((uint8_t)__BOOT_PAGE_FILL),       \
+          'r' ((uint32_t)address),               \
+          'r' ((uint16_t)data)                   \
+        : 'r0', 'r30', 'r31'                     \
+    );                                           \
+}))
+.fi
+.SS "#define __boot_page_fill_normal(address, data)"
+.PP
+\fBValue:\fP
+.PP
+.nf
+(__extension__({                                 \
+    __asm__ __volatile__                         \
+    (                                            \
+        'movw  r0, %3\n\t'                       \
+        'sts %0, %1\n\t'                         \
+        'spm\n\t'                                \
+        'clr  r1\n\t'                            \
+        :                                        \
+        : 'i' (_SFR_MEM_ADDR(__SPM_REG)),        \
+          'r' ((uint8_t)__BOOT_PAGE_FILL),       \
+          'z' ((uint16_t)address),               \
+          'r' ((uint16_t)data)                   \
+        : 'r0'                                   \
+    );                                           \
+}))
+.fi
+.SS "#define __boot_page_write_alternate(address)"
+.PP
+\fBValue:\fP
+.PP
+.nf
+(__extension__({                                 \
+    __asm__ __volatile__                         \
+    (                                            \
+        'sts %0, %1\n\t'                         \
+        'spm\n\t'                                \
+        '.word 0xffff\n\t'                       \
+        'nop\n\t'                                \
+        :                                        \
+        : 'i' (_SFR_MEM_ADDR(__SPM_REG)),        \
+          'r' ((uint8_t)__BOOT_PAGE_WRITE),      \
+          'z' ((uint16_t)address)                \
+    );                                           \
+}))
+.fi
+.SS "#define __boot_page_write_extended(address)"
+.PP
+\fBValue:\fP
+.PP
+.nf
+(__extension__({                                 \
+    __asm__ __volatile__                         \
+    (                                            \
+        'movw r30, %A3\n\t'                      \
+        'sts %1, %C3\n\t'                        \
+        'sts %0, %2\n\t'                         \
+        'spm\n\t'                                \
+        :                                        \
+        : 'i' (_SFR_MEM_ADDR(__SPM_REG)),        \
+          'i' (_SFR_MEM_ADDR(RAMPZ)),            \
+          'r' ((uint8_t)__BOOT_PAGE_WRITE),      \
+          'r' ((uint32_t)address)                \
+        : 'r30', 'r31'                           \
+    );                                           \
+}))
+.fi
+.SS "#define __boot_page_write_normal(address)"
+.PP
+\fBValue:\fP
+.PP
+.nf
+(__extension__({                                 \
+    __asm__ __volatile__                         \
+    (                                            \
+        'sts %0, %1\n\t'                         \
+        'spm\n\t'                                \
+        :                                        \
+        : 'i' (_SFR_MEM_ADDR(__SPM_REG)),        \
+          'r' ((uint8_t)__BOOT_PAGE_WRITE),      \
+          'z' ((uint16_t)address)                \
+    );                                           \
+}))
+.fi
+.SS "#define __boot_rww_enable()"
+.PP
+\fBValue:\fP
+.PP
+.nf
+(__extension__({                                 \
+    __asm__ __volatile__                         \
+    (                                            \
+        'sts %0, %1\n\t'                         \
+        'spm\n\t'                                \
+        :                                        \
+        : 'i' (_SFR_MEM_ADDR(__SPM_REG)),        \
+          'r' ((uint8_t)__BOOT_RWW_ENABLE)       \
+    );                                           \
+}))
+.fi
+.SS "#define __boot_rww_enable_alternate()"
+.PP
+\fBValue:\fP
+.PP
+.nf
+(__extension__({                                 \
+    __asm__ __volatile__                         \
+    (                                            \
+        'sts %0, %1\n\t'                         \
+        'spm\n\t'                                \
+        '.word 0xffff\n\t'                       \
+        'nop\n\t'                                \
+        :                                        \
+        : 'i' (_SFR_MEM_ADDR(__SPM_REG)),        \
+          'r' ((uint8_t)__BOOT_RWW_ENABLE)       \
+    );                                           \
+}))
+.fi
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for avr-libc from the source code.

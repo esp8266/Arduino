@@ -1,0 +1,330 @@
+.TH "<inttypes.h>: Integer Type conversions" 3 "6 Nov 2008" "Version 1.6.4" "avr-libc" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+<inttypes.h>: Integer Type conversions \- 
+.SH "Detailed Description"
+.PP 
+.PP
+.nf
+ #include <inttypes.h> 
+.fi
+.PP
+.PP
+This header file includes the exact-width integer definitions from \fC<\fBstdint.h\fP>\fP, and extends them with additional facilities provided by the implementation.
+.PP
+Currently, the extensions include two additional integer types that could hold a 'far' pointer (i.e. a code pointer that can address more than 64 KB), as well as standard names for all printf and scanf formatting options that are supported by the \fB<stdio.h>: Standard IO facilities\fP. As the library does not support the full range of conversion specifiers from ISO 9899:1999, only those conversions that are actually implemented will be listed here.
+.PP
+The idea behind these conversion macros is that, for each of the types defined by <\fBstdint.h\fP>, a macro will be supplied that portably allows formatting an object of that type in \fBprintf()\fP or \fBscanf()\fP operations. Example:
+.PP
+.PP
+.nf
+    #include <inttypes.h>
+
+    uint8_t smallval;
+    int32_t longval;
+    ...
+    printf('The hexadecimal value of smallval is %' PRIx8
+           ', the decimal value of longval is %' PRId32 '.\n',
+           smallval, longval);
+.fi
+.PP
+ 
+.SH "Define Documentation"
+.PP 
+.SS "#define PRId16   'd'"
+.PP
+decimal printf format for int16_t 
+.SS "#define PRId32   'ld'"
+.PP
+decimal printf format for int32_t 
+.SS "#define PRId8   'd'"
+.PP
+decimal printf format for int8_t 
+.SS "#define PRIdFAST16   'd'"
+.PP
+decimal printf format for int_fast16_t 
+.SS "#define PRIdFAST32   'ld'"
+.PP
+decimal printf format for int_fast32_t 
+.SS "#define PRIdFAST8   'd'"
+.PP
+decimal printf format for int_fast8_t 
+.SS "#define PRIdLEAST16   'd'"
+.PP
+decimal printf format for int_least16_t 
+.SS "#define PRIdLEAST32   'ld'"
+.PP
+decimal printf format for int_least32_t 
+.SS "#define PRIdLEAST8   'd'"
+.PP
+decimal printf format for int_least8_t 
+.SS "#define PRIdPTR   PRId16"
+.PP
+decimal printf format for intptr_t 
+.SS "#define PRIi16   'i'"
+.PP
+integer printf format for int16_t 
+.SS "#define PRIi32   'li'"
+.PP
+integer printf format for int32_t 
+.SS "#define PRIi8   'i'"
+.PP
+integer printf format for int8_t 
+.SS "#define PRIiFAST16   'i'"
+.PP
+integer printf format for int_fast16_t 
+.SS "#define PRIiFAST32   'li'"
+.PP
+integer printf format for int_fast32_t 
+.SS "#define PRIiFAST8   'i'"
+.PP
+integer printf format for int_fast8_t 
+.SS "#define PRIiLEAST16   'i'"
+.PP
+integer printf format for int_least16_t 
+.SS "#define PRIiLEAST32   'li'"
+.PP
+integer printf format for int_least32_t 
+.SS "#define PRIiLEAST8   'i'"
+.PP
+integer printf format for int_least8_t 
+.SS "#define PRIiPTR   PRIi16"
+.PP
+integer printf format for intptr_t 
+.SS "#define PRIo16   'o'"
+.PP
+octal printf format for uint16_t 
+.SS "#define PRIo32   'lo'"
+.PP
+octal printf format for uint32_t 
+.SS "#define PRIo8   'o'"
+.PP
+octal printf format for uint8_t 
+.SS "#define PRIoFAST16   'o'"
+.PP
+octal printf format for uint_fast16_t 
+.SS "#define PRIoFAST32   'lo'"
+.PP
+octal printf format for uint_fast32_t 
+.SS "#define PRIoFAST8   'o'"
+.PP
+octal printf format for uint_fast8_t 
+.SS "#define PRIoLEAST16   'o'"
+.PP
+octal printf format for uint_least16_t 
+.SS "#define PRIoLEAST32   'lo'"
+.PP
+octal printf format for uint_least32_t 
+.SS "#define PRIoLEAST8   'o'"
+.PP
+octal printf format for uint_least8_t 
+.SS "#define PRIoPTR   PRIo16"
+.PP
+octal printf format for uintptr_t 
+.SS "#define PRIu16   'u'"
+.PP
+decimal printf format for uint16_t 
+.SS "#define PRIu32   'lu'"
+.PP
+decimal printf format for uint32_t 
+.SS "#define PRIu8   'u'"
+.PP
+decimal printf format for uint8_t 
+.SS "#define PRIuFAST16   'u'"
+.PP
+decimal printf format for uint_fast16_t 
+.SS "#define PRIuFAST32   'lu'"
+.PP
+decimal printf format for uint_fast32_t 
+.SS "#define PRIuFAST8   'u'"
+.PP
+decimal printf format for uint_fast8_t 
+.SS "#define PRIuLEAST16   'u'"
+.PP
+decimal printf format for uint_least16_t 
+.SS "#define PRIuLEAST32   'lu'"
+.PP
+decimal printf format for uint_least32_t 
+.SS "#define PRIuLEAST8   'u'"
+.PP
+decimal printf format for uint_least8_t 
+.SS "#define PRIuPTR   PRIu16"
+.PP
+decimal printf format for uintptr_t 
+.SS "#define PRIX16   'X'"
+.PP
+uppercase hexadecimal printf format for uint16_t 
+.SS "#define PRIx16   'x'"
+.PP
+hexadecimal printf format for uint16_t 
+.SS "#define PRIX32   'lX'"
+.PP
+uppercase hexadecimal printf format for uint32_t 
+.SS "#define PRIx32   'lx'"
+.PP
+hexadecimal printf format for uint32_t 
+.SS "#define PRIX8   'X'"
+.PP
+uppercase hexadecimal printf format for uint8_t 
+.SS "#define PRIx8   'x'"
+.PP
+hexadecimal printf format for uint8_t 
+.SS "#define PRIXFAST16   'X'"
+.PP
+uppercase hexadecimal printf format for uint_fast16_t 
+.SS "#define PRIxFAST16   'x'"
+.PP
+hexadecimal printf format for uint_fast16_t 
+.SS "#define PRIXFAST32   'lX'"
+.PP
+uppercase hexadecimal printf format for uint_fast32_t 
+.SS "#define PRIxFAST32   'lx'"
+.PP
+hexadecimal printf format for uint_fast32_t 
+.SS "#define PRIXFAST8   'X'"
+.PP
+uppercase hexadecimal printf format for uint_fast8_t 
+.SS "#define PRIxFAST8   'x'"
+.PP
+hexadecimal printf format for uint_fast8_t 
+.SS "#define PRIXLEAST16   'X'"
+.PP
+uppercase hexadecimal printf format for uint_least16_t 
+.SS "#define PRIxLEAST16   'x'"
+.PP
+hexadecimal printf format for uint_least16_t 
+.SS "#define PRIXLEAST32   'lX'"
+.PP
+uppercase hexadecimal printf format for uint_least32_t 
+.SS "#define PRIxLEAST32   'lx'"
+.PP
+hexadecimal printf format for uint_least32_t 
+.SS "#define PRIXLEAST8   'X'"
+.PP
+uppercase hexadecimal printf format for uint_least8_t 
+.SS "#define PRIxLEAST8   'x'"
+.PP
+hexadecimal printf format for uint_least8_t 
+.SS "#define PRIXPTR   PRIX16"
+.PP
+uppercase hexadecimal printf format for uintptr_t 
+.SS "#define PRIxPTR   PRIx16"
+.PP
+hexadecimal printf format for uintptr_t 
+.SS "#define SCNd16   'd'"
+.PP
+decimal scanf format for int16_t 
+.SS "#define SCNd32   'ld'"
+.PP
+decimal scanf format for int32_t 
+.SS "#define SCNdFAST16   'd'"
+.PP
+decimal scanf format for int_fast16_t 
+.SS "#define SCNdFAST32   'ld'"
+.PP
+decimal scanf format for int_fast32_t 
+.SS "#define SCNdLEAST16   'd'"
+.PP
+decimal scanf format for int_least16_t 
+.SS "#define SCNdLEAST32   'ld'"
+.PP
+decimal scanf format for int_least32_t 
+.SS "#define SCNdPTR   SCNd16"
+.PP
+decimal scanf format for intptr_t 
+.SS "#define SCNi16   'i'"
+.PP
+generic-integer scanf format for int16_t 
+.SS "#define SCNi32   'li'"
+.PP
+generic-integer scanf format for int32_t 
+.SS "#define SCNiFAST16   'i'"
+.PP
+generic-integer scanf format for int_fast16_t 
+.SS "#define SCNiFAST32   'li'"
+.PP
+generic-integer scanf format for int_fast32_t 
+.SS "#define SCNiLEAST16   'i'"
+.PP
+generic-integer scanf format for int_least16_t 
+.SS "#define SCNiLEAST32   'li'"
+.PP
+generic-integer scanf format for int_least32_t 
+.SS "#define SCNiPTR   SCNi16"
+.PP
+generic-integer scanf format for intptr_t 
+.SS "#define SCNo16   'o'"
+.PP
+octal scanf format for uint16_t 
+.SS "#define SCNo32   'lo'"
+.PP
+octal scanf format for uint32_t 
+.SS "#define SCNoFAST16   'o'"
+.PP
+octal scanf format for uint_fast16_t 
+.SS "#define SCNoFAST32   'lo'"
+.PP
+octal scanf format for uint_fast32_t 
+.SS "#define SCNoLEAST16   'o'"
+.PP
+octal scanf format for uint_least16_t 
+.SS "#define SCNoLEAST32   'lo'"
+.PP
+octal scanf format for uint_least32_t 
+.SS "#define SCNoPTR   SCNo16"
+.PP
+octal scanf format for uintptr_t 
+.SS "#define SCNu16   'u'"
+.PP
+decimal scanf format for uint16_t 
+.SS "#define SCNu32   'lu'"
+.PP
+decimal scanf format for uint32_t 
+.SS "#define SCNuFAST16   'u'"
+.PP
+decimal scanf format for uint_fast16_t 
+.SS "#define SCNuFAST32   'lu'"
+.PP
+decimal scanf format for uint_fast32_t 
+.SS "#define SCNuLEAST16   'u'"
+.PP
+decimal scanf format for uint_least16_t 
+.SS "#define SCNuLEAST32   'lu'"
+.PP
+decimal scanf format for uint_least32_t 
+.SS "#define SCNuPTR   SCNu16"
+.PP
+decimal scanf format for uintptr_t 
+.SS "#define SCNx16   'x'"
+.PP
+hexadecimal scanf format for uint16_t 
+.SS "#define SCNx32   'lx'"
+.PP
+hexadecimal scanf format for uint32_t 
+.SS "#define SCNxFAST16   'x'"
+.PP
+hexadecimal scanf format for uint_fast16_t 
+.SS "#define SCNxFAST32   'lx'"
+.PP
+hexadecimal scanf format for uint_fast32_t 
+.SS "#define SCNxLEAST16   'x'"
+.PP
+hexadecimal scanf format for uint_least16_t 
+.SS "#define SCNxLEAST32   'lx'"
+.PP
+hexadecimal scanf format for uint_least32_t 
+.SS "#define SCNxPTR   SCNx16"
+.PP
+hexadecimal scanf format for uintptr_t 
+.SH "Typedef Documentation"
+.PP 
+.SS "typedef \fBint32_t\fP \fBint_farptr_t\fP"
+.PP
+signed integer type that can hold a pointer > 64 KB 
+.SS "typedef \fBuint32_t\fP \fBuint_farptr_t\fP"
+.PP
+unsigned integer type that can hold a pointer > 64 KB 
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for avr-libc from the source code.

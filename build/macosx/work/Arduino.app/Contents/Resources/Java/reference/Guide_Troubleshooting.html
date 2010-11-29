@@ -1,0 +1,229 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head>  <title>Arduino - Troubleshooting </title>  <link rel='stylesheet' href='arduino.css' type='text/css' />  <meta name="verify-v1" content="TtxFIEJAB6zdJ509wLxjnapQzKAMNm9u0Wj4ho6wxIY=" /></head><body><div id="page"><!--PageHeaderFmt--><div id="pageheader">  <div class="title"><a href="http://www.arduino.cc"/>Arduino</a></div>  <div class="search">    <!-- SiteSearch Google -->    <FORM method=GET action="http://www.google.com/search">    <input type=hidden name=ie value=UTF-8>    <input type=hidden name=oe value=UTF-8>    <INPUT TYPE=text name=q size=25 maxlength=255 value="">    <INPUT type=submit name=btnG VALUE="search">    <input type=hidden name=domains value="http://www.arduino.cc/">    <input type=hidden name=sitesearch value="http://www.arduino.cc/">    </FORM>    <!-- SiteSearch Google -->  </div></div><!--/PageHeaderFmt--><!--PageLeftFmt--><div id="pagenav" style="text-align: right">  <div style="float: left;">  <p><a class='wikilink' href='http://arduino.cc/en/Main/Buy'>Buy</a>
+|
+<a class='wikilink' href='http://arduino.cc/en/Main/Software'>Download</a>
+|
+<a class='wikilink' href='Guide_index.html'>Getting Started</a>
+|
+<a class='wikilink' href='http://arduino.cc/en/Tutorial/HomePage'>Learning</a>
+|
+<a class='wikilink' href='index.html'>Reference</a>
+|
+<a class='wikilink' href='http://arduino.cc/en/Main/Hardware'>Hardware</a>
+|
+<a class='wikilink' href='FAQ.html'>FAQ</a>
+</p>
+<p class='vspace'></p>
+  </div>  <a class="urllink" href="http://www.arduino.cc/blog/" rel="nofollow">Blog &raquo;</a> |  <a class="urllink" href="http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl" rel="nofollow">Forum &raquo;</a> |  <a class="urllink" href="http://www.arduino.cc/playground/" rel="nofollow">Playground &raquo;</a></div><!--/PageLeftFmt--><div id="pagetext"><!--PageText-->
+<div id='wikitext'>
+<h2>Arduino Troubleshooting</h2>
+<div class='toc'><p><a name='toc' id='toc'></a><b>On this page...</b> (<a id="tocidtog" href="javascript:toggle('tocid');">hide</a>)</p><ul class='toc' id='tocid'><li><a href='#toc1'>Why I can't upload my programs to the Arduino board?</a></li><li><a href='#toc2'>Why do I get "Build folder disappeared or could not be written" (Mac OS X)?</a></li><li><a href='#toc3'>Why doesn't the Arduino software run after I updated the Java on my Mac?</a></li><li><a href='#toc4'>Why do I get a java.lang.StackOverflowError when I try to compile my program?</a></li><li><a href='#toc5'>Why doesn't my sketch start when I'm powering the board with an external power supply?  (Arduino Diecimila or earlier)</a></li><li><a href='#toc6'>Why does the Arduino software freeze when I try to upload a program?  (on Windows)?</a></li><li><a href='#toc7'>What if my board doesn't turn on (the green power LED doesn't light up)?</a></li><li><a href='#toc8'>Why does my Diecimila take such a long time (6-8 seconds) to start my sketch?</a></li><li><a href='#toc9'>What should I do if I get an error when launching arduino.exe on Windows?</a></li><li><a href='#toc10'>Why won't Arduino run on old versions of Mac OS X?</a></li><li><a href='#toc11'>What do I do if I get an UnsatisfiedLinkError error (about native library librxtxSerial.jnilib) when launching Arduino?</a></li><li><a href='#toc12'>What about the error "Could not find the main class."?</a></li><li><a href='#toc13'>What can I do about cygwin conflicts on Windows?</a></li><li><a href='#toc14'>Why does do the Arduino software and the Tools menu take a long time to open (on Windows)?</a></li><li><a href='#toc15'>Why doesn't my board show in the Tools | Serial Port menu ?</a></li><li><a href='#toc16'>What if I get a gnu.io.PortInUseException when uploading code or using the serial monitor (on the Mac)?</a></li><li><a href='#toc17'>I'm having trouble with the FTDI USB drivers.</a></li><li><a href='#toc18'>Why doesn't my sketch start when I power up or reset the Arduino board?</a></li><li><a href='#toc19'>Why does my sketch appear to upload successfully but not do anything?</a></li><li><a href='#toc20'>How can I reduce the size of my sketch?</a></li><li><a href='#toc21'>Why don't I get a PWM (an analog output) when I call analogWrite() on pins other than 3, 5, 6, 9, 10, or 11?</a></li><li><a href='#toc22'>Why do I get errors about undeclared functions or undeclared types?</a></li><li><a href='#toc23'>Why do I get errors about an invalid device signature when trying to upload a sketch?</a></li></ul></div>
+<p class='vspace'></p><p><a name='upload' id='upload'></a>
+</p><h3><a name='toc1' id='toc1'></a>Why I can't upload my programs to the Arduino board?</h3>
+<p>There are a few things that could be wrong.
+</p>
+<p class='vspace'></p><ul><li>First make sure your board is on (the green LED is on) and connected to the computer (if it's not, see "what if my board doesn't turn on" above).
+<p class='vspace'></p></li><li>Then, check that the proper port is selected in the "Tools &gt; Serial Port" menu (if your port doesn't appear, restart the IDE with the board connected to the computer).
+<p class='vspace'></p></li><li>Make sure you have the right item selected in the <strong>Tools &gt; Board</strong> menu.  In particular, newer Arduino Duemilanove boards come with an <span class='wikiword'>ATmega328</span>, while older ones have an <span class='wikiword'>ATmega168</span>.  To check, read the text on the microcontroller (the larger chip) on your Arduino board.  For more information on the board menu items, see the <a class='wikilink' href='Guide_Environment.html'>guide to the Arduino environment</a>.
+<p class='vspace'></p></li><li>Disconnect digital pins 0 and 1 while uploading (they can connected and used after the code has been uploaded).
+<p class='vspace'></p></li><li>Try uploading with nothing connected to the board (apart from the USB cable, of course).
+<p class='vspace'></p></li><li>Make sure the board isn't touching anything metallic or conductive.
+<p class='vspace'></p></li><li>Check that you're not running any programs that scan all serial ports, like PDA sync applications, Bluetooth-USB drivers (e.g. <span class='wikiword'>BlueSoleil</span>), virtual daemon tools, etc.
+<p class='vspace'></p></li><li>Make sure you don't have firewall software that blocks access to the serial port (e.g. <span class='wikiword'>ZoneAlarm</span>).
+<p class='vspace'></p></li><li>You may need to quit Processing, PD, vvvv, etc. if you're using them to read data over the USB or serial connection to the Arduino board.
+<p class='vspace'></p></li><li>If you have a board that doesn't support auto-reset, be sure that you are resetting the board a couple of seconds before uploading. (The Arduino Diecimila, Duemilanove, and Nano support auto-reset as do the <span class='wikiword'>LilyPad</span>, Pro, and Pro Mini with 6-pin programming headers).
+<p class='vspace'></p></li><li>However, note that some Diecimila were accidently burned with the wrong bootloader and may require you to physically press the reset button before uploading; see <a href='#wrongbootloader'>this question</a> below.
+<p class='vspace'></p></li><li>However, on some computers, you may need to press the reset button on the board after you hit the upload button in the Arduino environment.  Try different intervals of time between the two, up to 10 seconds or more.
+<p class='vspace'></p></li><li>If you get this error:  <code>[VP 1] Device is not responding correctly.</code>  try uploading again (i.e. reset the board and press the download button a second time).
+<p class='vspace'></p></li><li>Make sure there's a bootloader burned on your Arduino board.  To check, connect an LED to pin 13 and reset the board.  The LED should blink.  If it doesn't, see the <a class='wikilink' href='http://arduino.cc/en/Hacking/Bootloader'>Bootloader</a> page for instructions on burning a bootloader to the board.
+<p class='vspace'></p></li><li>If you have a really ancient Arduino board, you may need to change the baud rate at which sketches are uploaded to 9600 (from the normal 19200).  You will have to change the speed in the <em>preferences</em> file directly.   See the <a class='wikilink' href='http://arduino.cc/en/Hacking/Preferences'>preferences</a> page for instructions on finding the file.  Look for the file in your computer and change the <strong>serial.download_rate</strong> property to match the one in your board.  If you have such a board, it's recommended that you burn the latest bootloader (which works at 19200 baud).  This can be done with the <em>'Tools | Burn Bootloader</em> menu item.
+</li></ul><p class='vspace'></p><p>If it still doesn't work, you can ask for help <a class='urllink' href='http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?board=troubleshoot' rel='nofollow'>in the forum</a>.  Please include the following information:
+</p>
+<p class='vspace'></p><ul><li>Your operating system.
+<p class='vspace'></p></li><li>What kind of board you have.  If it's a Mini, <span class='wikiword'>LilyPad</span> or other board that requires extra wiring, include a photo of your circuit, if possible.
+<p class='vspace'></p></li><li>Whether or not you were ever able to upload to the board.  If so, what were you doing with the board before / when it stopped working, and what software have you recently added or removed from your computer?
+<p class='vspace'></p></li><li>The messages displayed when you try to upload with verbose output enabled.  To do this, hold down the shift key while clicking on the upload button in the toolbar.
+</li></ul><p class='vspace'></p><h3><a name='toc2' id='toc2'></a>Why do I get "Build folder disappeared or could not be written" (Mac OS X)?</h3>
+<p>Did you drag the Arduino.app out of the disk image (and into, say, your Applications folder)?  If not, you won't be able to upload the examples.
+</p>
+<p class='vspace'></p><p><a name='macupdate' id='macupdate'></a>
+</p><h3><a name='toc3' id='toc3'></a>Why doesn't the Arduino software run after I updated the Java on my Mac?</h3>
+<p>The latest Java update from Apple attempts to use 64-bit version of native libraries, but the Arduino application comes with a 32 bit version of the RXTX library.  If you launch Arduino, you'll get an error like:
+</p>
+<p class='vspace'></p><p><code>Uncaught exception in main method: java.<span class='wikiword'>lang.UnsatisfiedLinkError</span>: /Applications/arduino-0016/Arduino 16.app/Contents/Resources/Java/librxtxSerial.jnilib: no suitable image found.  Did find: /Applications/arduino-0016/Arduino 16.app/Contents/Resources/Java/librxtxSerial.jnilib: no matching architecture in universal wrapper</code>
+</p>
+<p class='vspace'></p><p>To fix this, click on the Arduino application (e.g. <strong>Arduino 16.app</strong>) in the Finder, and select <strong>Get Info</strong> from the <strong>File</strong> menu.  In the info panel, click the <strong>Open in 32 Bit Mode</strong> checkbox.   You should then be able to launch Arduino normally.
+</p>
+<p class='vspace'></p><p><a name='stackoverflow' id='stackoverflow'></a>
+</p><h3><a name='toc4' id='toc4'></a>Why do I get a java.<span class='wikiword'>lang.StackOverflowError</span> when I try to compile my program?</h3>
+<p>The Arduino environment does some preliminary processing on your sketch by manipulating the code using regular expressions.  This sometimes gets confused by certain strings of text.  If you see an error like:
+</p>
+<p class='vspace'></p><pre>
+java.lang.StackOverflowError
+at java.util.Vector.addElement(Unknown Source)
+at java.util.Stack.push(Unknown Source)
+at com.oroinc.text.regex.Perl5Matcher._pushState(Perl5Matcher.java) 
+</pre>
+<p class='vspace'></p><p>or: 
+</p>
+<p class='vspace'></p><pre>
+	at com.oroinc.text.regex.Perl5Matcher._match(Perl5Matcher.java)
+	at com.oroinc.text.regex.Perl5Matcher._match(Perl5Matcher.java)
+	at com.oroinc.text.regex.Perl5Matcher._match(Perl5Matcher.java)
+	at com.oroinc.text.regex.Perl5Matcher._match(Perl5Matcher.java)
+	at com.oroinc.text.regex.Perl5Matcher._match(Perl5Matcher.java)
+	at com.oroinc.text.regex.Perl5Matcher._match(Perl5Matcher.java)
+	at com.oroinc.text.regex.Perl5Matcher._match(Perl5Matcher.java) 
+</pre>
+<p class='vspace'></p><p>this is what's happening.  Look for unusual sequences involving "double-quotes", "single-quotes", \backslashes, comments, etc.  For example, missing quotes can cause problems and so can the sequence '\"' (use '"' instead).
+</p>
+<p class='vspace'></p><p><a name='externalpower' id='externalpower'></a>
+</p><h3><a name='toc5' id='toc5'></a>Why doesn't my sketch start when I'm powering the board with an external power supply?  (Arduino Diecimila or earlier)</h3>
+<p>Because the RX pin is unconnected, the bootloader on the board may be seeing garbage data coming in, meaning that it never times out and starts your sketch.  Try tying the RX pin to ground with a 10K resistor (or connecting it to the TX pin).
+</p>
+<p class='vspace'></p><h3><a name='toc6' id='toc6'></a>Why does the Arduino software freeze when I try to upload a program?  (on Windows)?</h3>
+<p>This might be caused by a conflict with the Logitech process '<span class='wikiword'>LVPrcSrv</span>.exe'.  Open the Task Manager and see if this program is running, and if so, kill it before attempting the upload.  <a class='urllink' href='http://lists-archives.org/mingw-users/03939-as-exe-hanging-intermittently-solved.html' rel='nofollow'>more information</a>
+</p>
+<p class='vspace'></p><p><a name='power' id='power'></a>
+</p><h3><a name='toc7' id='toc7'></a>What if my board doesn't turn on (the green power LED doesn't light up)?</h3>
+<p>If you're using a USB board, make sure that the jumper (little plastic piece near the USB plug) is on the correct pins.  If you're powering the board with an external power supply (plugged into the power plug), the jumper should be on the two pins closest to the power plug.  If you're powering the board through the USB, the jumper should be on the two pins closest to the USB plug.  This picture shows the arrangment for powering the board from the USB port.
+</p>
+<p class='vspace'></p><p><a class='createlinktext' href='Guide_Troubleshooting?action=upload&amp;upname=jumper.jpg.html'>Attach:jumper.jpg</a><a class='createlink' href='Guide_Troubleshooting?action=upload&amp;upname=jumper.jpg.html'>&nbsp;&Delta;</a>
+</p>
+<p class='vspace'></p><p>(thanks to mrbbp for report and picture)
+</p>
+<p class='vspace'></p><p><a name='wrongbootloader' id='wrongbootloader'></a>
+</p><h3><a name='toc8' id='toc8'></a>Why does my Diecimila take such a long time (6-8 seconds) to start my sketch?</h3>
+<p>Some of the Arduino Diecimila boards were accidently burned with the Arduino NG bootloader.  It should work fine, but has a longer delay when the board is reset (because the NG doesn't have an automatic reset, so you have to time the uploads manually).  You can recognize the NG bootloader because the LED on pin 13 will blink three times when you reset the board (as compared to once with the Diecimila bootloader).  If your Diecimila has the NG bootloader on it, you may need to physically press the reset button on the board before uploading your sketch.  You can burn the correct bootloader onto your Diecimila, see the <a class='wikilink' href='http://arduino.cc/en/Hacking/Bootloader'>bootloader</a> page for details.
+</p>
+<p class='vspace'></p><p><a name='startup' id='startup'></a>
+</p><h3><a name='toc9' id='toc9'></a>What should I do if I get an error when launching arduino.exe on Windows?</h3>
+<p>If you get an error when double-clicking the arduino.exe executable on Windows, for example:
+</p>
+<p class='vspace'></p><p><code>Arduino has encountered a problem and needs to close.</code>
+</p>
+<p class='vspace'></p><p>you'll need to launch Arduino using the run.bat file.  Please be patient, the Arduino environment may take some time to open.
+</p>
+<p class='vspace'></p><h3><a name='toc10' id='toc10'></a>Why won't Arduino run on old versions of Mac OS X?</h3>
+<p>If you get an error like this:
+</p>
+<p class='vspace'></p><pre>Link (dyld) error: 
+
+dyld: /Applications/arduino-0004/Arduino 04.app/Contents/MacOS/Arduino Undefined symbols: 
+/Applications/arduino-0004/librxtxSerial.jnilib undefined reference to _printf$LDBL128 expected to be defined in /usr/lib/libSystem.B.dylib 
+</pre>
+<p class='vspace'></p><p>you probably need to upgrade to Max OS X 10.3.9 or later.  Older versions have incompatible versions of some system libraries.
+</p>
+<p class='vspace'></p><p>Thanks to Gabe462 for the report.
+</p>
+<p class='vspace'></p><h3><a name='toc11' id='toc11'></a>What do I do if I get an <span class='wikiword'>UnsatisfiedLinkError</span> error (about native library librxtxSerial.jnilib) when launching Arduino?</h3>
+<p>If you get an error like this when launching Arduino:
+</p>
+<p class='vspace'></p><p><code>Uncaught exception in main method: java.<span class='wikiword'>lang.UnsatisfiedLinkError</span>: Native Library /Users/anu/Desktop/arduino-0002/librxtxSerial.jnilib already loaded in another classloader</code>
+</p>
+<p class='vspace'></p><p>you probably have an old version of the communications library lying around.  Search for comm.jar or jcl.jar in /System/Library/<span class='wikiword'>Frameworks/JavaVM</span>.framework/ or in directories in your CLASSPATH or PATH environment variables. (reported by Anurag Sehgal)
+</p>
+<p class='vspace'></p><h3><a name='toc12' id='toc12'></a>What about the error "Could not find the main class."?</h3>
+<p>If you get this error when launching Arduino:
+</p>
+<p class='vspace'></p><p><code>Java Virtual Machine Launcher: Could not find the main class. Program will exit.</code>
+</p>
+<p class='vspace'></p><p>make sure that you correctly extracted the contents of the Arduino .zip file - in particular that the <strong>lib</strong> directory is directly inside of the Arduino directory and contains the file <strong>pde.jar</strong>.
+</p>
+<p class='vspace'></p><h3><a name='toc13' id='toc13'></a>What can I do about cygwin conflicts on Windows?</h3>
+<p>If you already have cygwin installed on your machine, you might get an error like this when you try to compile a sketch in Arduino:
+</p>
+<p class='vspace'></p><p><code> 6 [main] ? (3512) C:\Dev\arduino-0006\tools\avr\bin\avr-gcc.exe: *** fatal error - C:\Dev\arduino-0006\tools\avr\bin\avr-gcc.exe: *** system shared memory version mismatch detected - 0x75BE0084/0x75BE009C.</code>
+</p>
+<p class='vspace'></p><p><code>This problem is probably due to using incompatible versions of the cygwin DLL.</code>
+</p>
+<p class='vspace'></p><p><code>Search for cygwin1.dll using the Windows Start-&gt;Find/Search facility and delete all but the most recent version.  The most recent version *should* reside in x:\cygwin\bin, where 'x' is the drive on which you have installed the cygwin distribution.  Rebooting is also suggested if you are unable to find another cygwin DLL.</code>
+</p>
+<p class='vspace'></p><p>If so, first make sure that you don't have cygwin running when you use Arduino.  If that doesn't help, you can try deleting cygwin1.dll from the Arduino directory and replacing it with the cygwin1.dll from your existing cygwin install (probably in c:\cygwin\bin).  
+</p>
+<p class='vspace'></p><p><em>Thanks to karlcswanson for the suggestion.</em>
+</p>
+<p class='vspace'></p><h3><a name='toc14' id='toc14'></a>Why does do the Arduino software and the Tools menu take a long time to open (on Windows)?</h3>
+<p>If the Arduino software takes a long time to start up and appears to freeze when you try to open the Tools menu, there by a conflict with another device on your system.  The Arduino software, on startup and when you open the Tools menu, tries to get a list of all the COM ports on your computer.  It's possible that a COM port created by one of the devices on your computer slows down this process.  Take a look in the Device Manager.  Try disabling the devices that provide COM ports (e.g. Bluetooth devices).
+</p>
+<p class='vspace'></p><p><a name='serialport' id='serialport'></a>
+</p><h3><a name='toc15' id='toc15'></a>Why doesn't my board show in the Tools | Serial Port menu ?</h3>
+<p>If you're using a USB Arduino board, make sure you installed the FTDI drivers (see the <a class='wikilink' href='Guide_Howto.html'>Howto</a> for directions).  If you're using a USB-to-Serial adapter with a serial board, make sure you installed its drivers.
+</p>
+<p class='vspace'></p><p>Make sure that the board is plugged in: the serial port menu refreshes whenever you open the <strong>Tools</strong> menu, so if you just unplugged the board, it won't be in the menu.
+</p>
+<p class='vspace'></p><p>Check that you're not running any programs that scan all serial ports, like PDA sync applications, Bluetooth-USB drivers (e.g. <span class='wikiword'>BlueSoleil</span>), virtual daemon tools, etc.
+</p>
+<p class='vspace'></p><p>On Windows, the COM port assigned to the board may be too high.  From zeveland:
+</p>
+<p class='vspace'></p><p>"One little note if you aren't able to export and your USB board is trying to use a high COM port number: try changing the FTDI chip's COM port assignment to a lower one.   
+</p>
+<p class='vspace'></p><p>"I had a bunch of virtual COM ports set up for Bluetooth so the board was set to use <span class='wikiword'>COM17</span>.  The IDE wasn't able to find the board so I deleted the other virtual ports in Control Panel (on XP) and moved the FTDI's assignment down to <span class='wikiword'>COM2</span>.  Make sure to set Arduino to use the new port and good luck."
+</p>
+<p class='vspace'></p><p>On the Mac, if you have an old version of the FTDI drivers, you may need to remove them and reinstall the latest version.  See <a class='urllink' href='http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1143197735' rel='nofollow'>this forum thread for directions</a> (thanks to gck).
+</p>
+<p class='vspace'></p><h3><a name='toc16' id='toc16'></a>What if I get a gnu.<span class='wikiword'>io.PortInUseException</span> when uploading code or using the serial monitor (on the Mac)?</h3>
+<pre>
+Error inside Serial.&lt;init&gt;() 
+gnu.io.PortInUseException: Unknown Application 
+     at gnu.io.CommPortIdentifier.open(CommPortIdentifier.java:354) 
+     at processing.app.Serial.&lt;init&gt;(Serial.java:127) 
+     at processing.app.Serial.&lt;init&gt;(Serial.java:72) 
+
+</pre>
+<p class='vspace'></p><p>This probably means that the port is actually in use by another application.  Please make sure that you're not running other programs that access serial or USB ports, like PDA sync application, bluetooth device managers, certain firewalls, etc.  Also, note that some programs (e.g. Max/MSP) keep the serial port open even when not using it - you may to need to close any patches that use the serial port or quit the application entirely.
+</p>
+<p class='vspace'></p><p>If you get this error with Arduino 0004 or earlier, or with Processing, you'll need to run the <code>macosx_setup.command</code>, and then restart your computer.  Arduino 0004 includes a modified version of this script that all users need to run (even those who ran the one that came with Arduino 0003).  You may also need to delete the contents of the <strong>/var/spool/uucp</strong> directory.
+</p>
+<p class='vspace'></p><h3><a name='toc17' id='toc17'></a>I'm having trouble with the FTDI USB drivers.</h3>
+<p>Try installing the <a class='urllink' href='http://www.ftdichip.com/Drivers/VCP.htm' rel='nofollow'>latest drivers</a> from FTDI or contacting their support at <a class='urllink' href='mailto:support1@ftdichip.com' rel='nofollow'>support1@ftdichip.com</a>.
+</p>
+<p class='vspace'></p><p><a name='sketchstart' id='sketchstart'></a>
+</p><h3><a name='toc18' id='toc18'></a>Why doesn't my sketch start when I power up or reset the Arduino board?</h3>
+<p>Most likely because you are sending serial data to the board when it firsts turns on.  During the first few seconds, the bootloader (a program pre-burned onto the chip on the board) listens for the computer to send it a new sketch to be uploaded to the board.  After a few seconds without communication, the bootloader will time out and start the sketch that's already on the board.  If you continue to send data to the bootloader, it will never time out and your sketch will never start.  You'll either need to find a way to stop serial data from arriving for the first few seconds when the board powers (e.g. by enabling the chip that sends the data from within your setup() function) or burn your sketch onto the board with an <a class='wikilink' href='http://arduino.cc/en/Hacking/Programmer'>external programmer</a>, replacing the bootloader.
+</p>
+<p class='vspace'></p><h3><a name='toc19' id='toc19'></a>Why does my sketch appear to upload successfully but not do anything?</h3>
+<p>You have selected the wrong item from the Tools &gt; Microcontroller menu.  Make sure the selected microcontroller corresponds to the one on your board (either <span class='wikiword'>ATmega8</span> or <span class='wikiword'>ATmega168</span>) - the name will be written on the largest chip on the board.
+</p>
+<p class='vspace'></p><p>Check for a noisy power supply.  It's possible this could cause the chip to lose its sketch.  
+</p>
+<p class='vspace'></p><p>Alternatively, the sketch may be too big for the board.  When uploading your sketch, Arduino 0004 checks if it's too big for the <span class='wikiword'>ATmega8</span>, but it bases its calculation on a 1 Kb bootloader.  You may have a older bootloader that takes up 2 Kb of the 8 Kb of program space (flash) on the <span class='wikiword'>ATmega8</span> instead of the 1 Kb used by the current bootloader.  If yours is bigger, only part of the sketch will be uploaded, but the software won't know, and your board will continually reset, pause, reset.
+</p>
+<p class='vspace'></p><p>If you have access to an AVR-ISP or parallel port programmer, you can burn the latest version of the bootloader to your board with the <strong>Tools | Burn Bootloader</strong> menu item.  Otherwise, you can tell the Arduino environment the amount of space available for sketches by editing the upload.maximum_size variable in your preferences file (see: <a class='wikilink' href='http://arduino.cc/en/Hacking/Preferences'>instructions on finding the file</a>).  Change 7168 to 6144, and the environment should correctly warn you when your sketch is too big.   
+</p>
+<p class='vspace'></p><p><a name='size' id='size'></a>
+</p><h3><a name='toc20' id='toc20'></a>How can I reduce the size of my sketch?</h3>
+<p>The <span class='wikiword'>ATmega168</span> chip on the Arduino board is cheap, but it has only 16 Kb of program code, which isn't very much (and 2 Kb is used by the bootloader).
+</p>
+<p class='vspace'></p><p>If you're using floating point, try to rewrite your code with integer math, which should save you about 2 Kb.  Delete any <strong>#include</strong> statements at the top of your sketch for libraries that you're not using.
+</p>
+<p class='vspace'></p><p>Otherwise, see if you can make your program shorter.  
+</p>
+<p class='vspace'></p><p>We're always working to reduce the size of the Arduino core to leave more room for your sketches.
+</p>
+<p class='vspace'></p><h3><a name='toc21' id='toc21'></a>Why don't I get a PWM (an analog output) when I call analogWrite() on pins other than 3, 5, 6, 9, 10, or 11?</h3>
+<p>The microcontroller on the Arduino board (the <span class='wikiword'>ATmega168</span>) only supports PWM/analogWrite() on certain pins.  Calling analogWrite() on any other pins will give high (5 volts) for values greater than 128 and low (0 volts) for values less than 128.  (Older Arduino boards with an <span class='wikiword'>ATmega8</span> only support PWM output on pins 9, 10, and 11.)
+</p>
+<p class='vspace'></p><h3><a name='toc22' id='toc22'></a>Why do I get errors about undeclared functions or undeclared types?</h3>
+<p>The Arduino environment attempts to automatically generate prototypes for your functions, so that you can order them as you like in your sketch.  This process, however, isn't perfect, and sometimes leads to obscure error messages.
+</p>
+<p class='vspace'></p><p>If you declare a custom type in your code and create a function that accepts or returns a value of that type, you'll get an error when you try to compile the sketch.  This is because the automatically-generated prototype for that function will appear above the type definition.  
+</p>
+<p class='vspace'></p><p>If you declare a function with a two-word return type (e.g. "unsigned int") the environment will not realize it's a function and will not create a prototype for it.  That means you need to provide your own, or place the definition of the function above any calls to it.
+</p>
+<p class='vspace'></p><h3><a name='toc23' id='toc23'></a>Why do I get errors about an invalid device signature when trying to upload a sketch?</h3>
+<p>If you get an error like:
+</p>
+<p class='vspace'></p><pre>
+avrdude: Yikes!  Invalid device signature.
+       Double check connections and try again, or use -F to override
+       this check.
+
+</pre>
+<p class='vspace'></p><p>it can mean one of two things.  Either you have the wrong board selected from the Tools &gt; Board menu or you're not using the right version of avrdude.  Arduino uses a slightly modified version of avrdude to upload sketches to the Arduino board.  The standard version queries for the board's device signature in a way not understood by the bootloader, resulting in this error.  Make sure you're using the version of avrdude that comes with Arduino (<a class='urllink' href='http://svn.berlios.de/wsvn/arduino/avrdude-5.4-arduino/#_avrdude-5.4-arduino_' rel='nofollow'>source code</a>).
+</p>
+<p class='vspace'></p><p><a class='urllink' href='http://www.arduino.cc/en/Guide/HomePage' rel='nofollow'>Guide Home</a>
+The text of the Arduino getting started guide is licensed under a
+<a class='urllink' href='http://creativecommons.org/licenses/by-sa/3.0/' rel='nofollow'>Creative Commons Attribution-ShareAlike 3.0 License</a>.  Code samples in the guide are released into the public domain.
+</p>
+</div>
+<!-- AddThis Button BEGIN --><script type="text/javascript">var addthis_language = "en";</script><div class="addthis_container addthis_toolbox addthis_default_style" addthis:url="Guide_Troubleshooting" addthis:title="Arduino Wiki English"><a href="http://www.addthis.com/bookmark.php?v=250&amp;username=arduinoteam" class="addthis_button_compact">Share</a><span class="addthis_separator">|</span><a class="addthis_button_email"></a><a class="addthis_button_favorites"></a><a class="addthis_button_print"></a><a class="addthis_button_facebook"></a><a class="addthis_button_twitter"></a><script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#username=arduinoteam"></script></div><!-- AddThis Button END --></div><!--PageFooterFmt--><div id="pagefooter">  <a href=.html'Guide_Troubleshooting?action=edit.html'>Edit Page</a> | <a href='Guide_Troubleshooting?action=diff.html'>Page History</a> | <a href='Guide_Troubleshooting?action=print.html' target='_blank'>Printable View</a> | <a href='http://arduino.cc/en/Site/AllRecentChanges'>All Recent Site Changes</a></div><!--/PageFooterFmt--></div></body></html>

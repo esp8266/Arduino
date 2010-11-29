@@ -1,0 +1,46 @@
+.TH "Demo projects" 3 "6 Nov 2008" "Version 1.6.4" "avr-libc" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Demo projects \- 
+.SS "Modules"
+
+.in +1c
+.ti -1c
+.RI "\fBCombining C and assembly source files\fP"
+.br
+.ti -1c
+.RI "\fBA simple project\fP"
+.br
+.ti -1c
+.RI "\fBA more sophisticated project\fP"
+.br
+.ti -1c
+.RI "\fBUsing the standard IO facilities\fP"
+.br
+.ti -1c
+.RI "\fBExample using the two-wire interface (TWI)\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+Various small demo projects are provided to illustrate several aspects of using the opensource utilities for the AVR controller series. It should be kept in mind that these demos serve mainly educational purposes, and are normally not directly suitable for use in any production environment. Usually, they have been kept as simple as sufficient to demonstrate one particular feature.
+.PP
+The \fBsimple project\fP is somewhat like the 'Hello world!' application for a microcontroller, about the most simple project that can be done. It is explained in good detail, to allow the reader to understand the basic concepts behind using the tools on an AVR microcontroller.
+.PP
+The \fBmore sophisticated demo project\fP builds on top of that simple project, and adds some controls to it. It touches a number of avr-libc's basic concepts on its way.
+.PP
+A \fBcomprehensive example on using the standard IO facilities\fP intends to explain that complex topic, using a practical microcontroller peripheral setup with one RS-232 connection, and an HD44780-compatible industry-standard LCD display.
+.PP
+The \fBExample using the two-wire interface (TWI)\fP project explains the use of the two-wire hardware interface (also known as 'I2C') that is present on many AVR controllers.
+.PP
+Finally, the \fBCombining C and assembly source files\fP demo shows how C and assembly language source files can collaborate within one project. While the overall project is managed by a C program part for easy maintenance, time-critical parts are written directly in manually optimized assembly language for shortest execution times possible. Naturally, this kind of project is very closely tied to the hardware design, thus it is custom-tailored to a particular controller type and peripheral setup. As an alternative to the assembly-language solution, this project also offers a C-only implementation (deploying the exact same peripheral setup) based on a more sophisticated (and thus more expensive) but pin-compatible controller.
+.PP
+While the simple demo is meant to run on about any AVR setup possible where a LED could be connected to the OCR1[A] output, the \fBlarge\fP and \fBstdio\fP demos are mainly targeted to the Atmel STK500 starter kit, and the \fBTWI\fP example requires a controller where some 24Cxx two-wire EEPPROM can be connected to. For the STK500 demos, the default CPU (either an AT90S8515 or an ATmega8515) should be removed from its socket, and the ATmega16 that ships with the kit should be inserted into socket SCKT3100A3. The ATmega16 offers an on-board ADC that is used in the \fBlarge\fP demo, and all AVRs with an ADC feature a different pinout than the industry-standard compatible devices.
+.PP
+In order to fully utilize the \fBlarge\fP demo, a female 10-pin header with cable, connecting to a 10 kOhm potentiometer will be useful.
+.PP
+For the \fBstdio\fP demo, an industry-standard HD44780-compatible LCD display of at least 16x1 characters will be needed. Among other things, the \fCLCD4Linux\fP project page describes many things around these displays, including common pinouts. 
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for avr-libc from the source code.

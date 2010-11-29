@@ -1,0 +1,822 @@
+.\"
+.\" avrdude - A Downloader/Uploader for AVR device programmers
+.\" Copyright (C) 2001, 2002, 2003, 2005, 2006, 2007  Joerg Wunsch
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program; if not, write to the Free Software
+.\" Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+.\"
+.\"
+.\" $Id: avrdude.1,v 1.72 2007/10/29 18:03:02 joerg_wunsch Exp $
+.\"
+.Dd DATE October 29, 2007
+.Os
+.Dt AVRDUDE 1
+.Sh NAME
+.Nm avrdude
+.Nd driver program for ``simple'' Atmel AVR MCU programmer
+.Sh SYNOPSIS
+.Nm
+.Fl p Ar partno
+.Op Fl b Ar baudrate
+.Op Fl B Ar bitclock
+.Op Fl c Ar programmer-id
+.Op Fl C Ar config-file
+.Op Fl D
+.Op Fl e
+.Oo Fl E Ar exitspec Ns
+.Op \&, Ns Ar exitspec
+.Oc
+.Op Fl F
+.Op Fl i Ar delay
+.Op Fl n
+.Op Fl O
+.Op Fl P Ar port
+.Op Fl q
+.Op Fl s
+.Op Fl t
+.Op Fl u
+.Op Fl U Ar memtype:op:filename:filefmt
+.Op Fl v
+.Op Fl V
+.Op Fl y
+.Op Fl Y
+.Sh DESCRIPTION
+.Nm Avrdude
+is a program for downloading code and data to Atmel AVR
+microcontrollers.
+.Nm Avrdude
+supports Atmel's STK500 programmer,
+Atmel's AVRISP and AVRISP mkII devices,
+Atmel's JTAG ICE (both mkI and mkII, the latter also in ISP mode),
+programmers complying to AppNote AVR910 and AVR109 (including the Butterfly),
+as well as a simple hard-wired
+programmer connected directly to a
+.Xr ppi 4
+or
+.Xr parport 4
+parallel port, or to a standard serial port.
+In the simplest case, the hardware consists just of a
+cable connecting the respective AVR signal lines to the parallel port.
+.Pp
+The MCU is programmed in
+.Em serial programming mode ,
+so, for the
+.Xr ppi 4
+based programmer, the MCU signals
+.Ql /RESET ,
+.Ql SCK ,
+.Ql MISO
+and
+.Ql MOSI
+need to be connected to the parallel port.  Optionally, some otherwise
+unused output pins of the parallel port can be used to supply power
+for the MCU part, so it is also possible to construct a passive
+stand-alone programming device.  Some status LEDs indicating the
+current operating state of the programmer can be connected, and a
+signal is available to control a buffer/driver IC 74LS367 (or
+74HCT367).  The latter can be useful to decouple the parallel port
+from the MCU when in-system programming is used.
+.Pp
+A number of equally simple bit-bang programming adapters that connect
+to a serial port are supported as well, among them the popular
+Ponyprog serial adapter, and the DASA and DASA3 adapters that used to
+be supported by uisp(1).
+Note that these adapters are meant to be attached to a physical serial
+port.
+Connecting to a serial port emulated on top of USB is likely to not
+work at all, or to work abysmally slow.
+.Pp
+Atmel's STK500 programmer is also supported and connects to a serial
+port.
+Both, firmware versions 1.x and 2.x can be handled, but require a
+different programmer type specification (by now).
+Using firmware version 2, high-voltage programming is also supported,
+both parallel and serial
+(programmer types stk500pp and stk500hvsp).
+.Pp
+The simple serial programmer described in Atmel's application note
+AVR910, and the bootloader described in Atmel's application note
+AVR109 (which is also used by the AVR Butterfly evaluation board), are
+supported on a serial port.
+.Pp
+Atmel's JTAG ICE (both mkI and mkII) is supported as well to up- or download memory
+areas from/to an AVR target (no support for on-chip debugging).
+For the JTAG ICE mkII, JTAG, debugWire and ISP mode are supported.
+See below for the limitations of debugWire.
+.Pp
+The AVR Dragon is supported in all modes (ISP, JTAG, HVSP, PP, debugWire).
+When used in JTAG and debugWire mode, the AVR Dragon behaves similar to a
+JTAG ICE mkII, so all device-specific comments for that device
+will apply as well.
+When used in ISP mode, the AVR Dragon behaves similar to an
+AVRISP mkII (or JTAG ICE mkII in ISP mode), so all device-specific
+comments will apply there.
+In particular, the Dragon starts out with a rather fast ISP clock
+frequency, so the
+.Fl B Ar bitclock
+option might be required to achieve a stable ISP communication.
+.Pp
+The USBasp ISP and USBtinyISP adapters are also supported, provided
+.Nm avrdude
+has been compiled with libusb support.
+They both feature simple firwmare-only USB implementations, running on
+an ATmega8 (or ATmega88), or ATtiny2313, respectively.
+.Pp
+Input files can be provided, and output files can be written in
+different file formats, such as raw binary files containing the data
+to download to the chip, Intel hex format, or Motorola S-record
+format.  There are a number of tools available to produce those files,
+like
+.Xr asl 1
+as a standalone assembler, or
+.Xr avr-objcopy 1
+for the final stage of the GNU toolchain for the AVR microcontroller.
+.Pp
+.Nm Avrdude
+can program the EEPROM and flash ROM memory cells of supported AVR
+parts.  Where supported by the serial instruction set, fuse bits and
+lock bits can be programmed as well.  These are implemented within
+.Nm
+as separate memory types and can be programmed using data from a file
+(see the
+.Fl m
+option) or from terminal mode (see the
+.Ar dump
+and
+.Ar write
+commands).  It is also possible to read the chip (provided it has not
+been code-protected previously, of course) and store the data in a
+file.  Finally, a ``terminal'' mode is available that allows one to
+interactively communicate with the MCU, and to display or program
+individual memory cells.
+On the STK500 programmer, several operational parameters (target supply
+voltage, target Aref voltage, master clock) can be examined and changed
+from within terminal mode as well.
+.Ss Options
+In order to control all the different operation modi, a number of options
+need to be specified to
+.Nm avrdude .
+.Bl -tag -offset indent -width indent
+.It Fl p Ar partno
+This is the only option that is mandatory for every invocation of
+.Nm avrdude .
+It specifies the type of the MCU connected to the programmer.  These are read from the config file.  If
+.Nm avrdude
+does not know about a part that you have, simply add it to the config
+file (be sure and submit a patch back to the author so that it can be
+incorporated for the next version).  See the sample config file for
+the format.  Currently, the following MCU types are understood:
+.Pp
+.TS
+ll.
+\fBOption tag\fP	\fBOfficial part name\fP
+c128	AT90CAN128
+pwm2	AT90PWM2
+pwm3	AT90PWM3
+1200	AT90S1200
+2313	AT90S2313
+2333	AT90S2333
+2343	AT90S2343 (*)
+4414	AT90S4414
+4433	AT90S4433
+4434	AT90S4434
+8515	AT90S8515
+8535	AT90S8535
+m103	ATmega103
+m128	ATmega128
+m1280	ATmega1280
+m1281	ATmega1281
+m16	ATmega16
+m161	ATmega161
+m162	ATmega162
+m163	ATmega163
+m164	ATmega164
+m169	ATmega169
+m2560	ATmega2560 (**)
+m2561	ATmega2561 (**)
+m32	ATmega32
+m324	ATmega324
+m329	ATmega329
+m3290	ATmega3290
+m48	ATmega48
+m64	ATmega64
+m640	ATmega640
+m644	ATmega644
+m649	ATmega649
+m6490	ATmega6490
+m8	ATmega8
+m8515	ATmega8515
+m8535	ATmega8535
+m88	ATmega88
+t12	ATtiny12
+t13	ATtiny13
+t15	ATtiny15
+t2313	ATtiny2313
+t25	ATtiny25
+t26	ATtiny26
+t45	ATtiny45
+t85	ATtiny85
+.TE
+.Bl -tag -width "(**) "
+.It "(*)"
+The AT90S2323 and ATtiny22 use the same algorithm.
+.It "(**)"
+Flash addressing above 128 KB is not supported by all
+programming hardware.  Known to work are jtag2, stk500v2,
+and bit-bang programmers.
+.El
+.It Fl b Ar baudrate
+Override the RS-232 connection baud rate specified in the respective
+programmer's entry of the configuration file.
+.It Fl B Ar bitclock
+Specify the bit clock period for the JTAG interface or the ISP clock (JTAG ICE only).
+The value is a floating-point number in microseconds.
+The default value of the JTAG ICE results in about 1 microsecond bit
+clock period, suitable for target MCUs running at 4 MHz clock and
+above.
+Unlike certain parameters in the STK500, the JTAG ICE resets all its
+parameters to default values when the programming software signs
+off from the ICE, so for MCUs running at lower clock speeds, this
+parameter must be specified on the command-line.
+.It Fl c Ar programmer-id
+Use the pin configuration specified by the argument.  Pin
+configurations are read from the config file (see the
+.Fl C
+option).  New pin configurations can be easily added or modified
+through the use of a config file to make
+.Nm avrdude
+work with different programmers as long as the programmer supports the
+Atmel AVR serial program method.  You can use the 'default_programmer'
+keyword in your
+.Pa ${HOME}/.avrduderc
+file to assign a default programmer to keep from having to specify
+this option on every invocation.
+.It Fl C Ar config-file
+Use the specified config file to load configuration data.  This file
+contains all programmer and part definitions that
+.Nm avrdude
+knows about.  If you have a programmer or part that
+.Nm avrdude
+does not know about, you can add it to the config file (be sure and
+submit a patch back to the author so that it can be incorporated for
+the next version).  See the config file, located at
+.Pa ${PREFIX}/etc/avrdude.conf ,
+which contains a description of the format.
+.It Fl D
+Disable auto erase for flash.  When the
+.Fl U
+option with flash memory is specified,
+.Nm
+will perform a chip erase before starting any of the programming
+operations, since it generally is a mistake to program the flash
+without performing an erase first.  This option disables that.
+.It Fl e
+Causes a chip erase to be executed.  This will reset the contents of the
+flash ROM and EEPROM to the value
+.Ql 0xff ,
+and is basically a prerequisite command before the flash ROM can be
+reprogrammed again.  The only exception would be if the new
+contents would exclusively cause bits to be programmed from the value
+.Ql 1
+to
+.Ql 0 .
+Note that in order to reprogram EERPOM cells, no explicit prior chip
+erase is required since the MCU provides an auto-erase cycle in that
+case before programming the cell.
+.It Xo Fl E Ar exitspec Ns
+.Op \&, Ns Ar exitspec
+.Xc
+By default,
+.Nm
+leaves the parallel port in the same state at exit as it has been
+found at startup.  This option modifies the state of the
+.Ql /RESET
+and
+.Ql Vcc
+lines the parallel port is left at, according to the
+.Ar exitspec
+arguments provided, as follows:
+.Bl -tag -width noreset
+.It Ar reset
+The
+.Ql /RESET
+signal will be left activated at program exit, that is it will be held
+.Em low ,
+in order to keep the MCU in reset state afterwards.  Note in particular
+that the programming algorithm for the AT90S1200 device mandates that
+the
+.Ql /RESET
+signal is active
+.Em before
+powering up the MCU, so in case an external power supply is used for this
+MCU type, a previous invocation of
+.Nm
+with this option specified is one of the possible ways to guarantee this
+condition.
+.It Ar noreset
+The
+.Ql /RESET
+line will be deactivated at program exit, thus allowing the MCU target
+program to run while the programming hardware remains connected.
+.It Ar vcc
+This option will leave those parallel port pins active
+.Pq \&i. \&e. Em high
+that can be used to supply
+.Ql Vcc
+power to the MCU.
+.It Ar novcc
+This option will pull the
+.Ql Vcc
+pins of the parallel port down at program exit.
+.El
+.Pp
+Multiple
+.Ar exitspec
+arguments can be separated with commas.
+.It Fl F
+Normally,
+.Nm
+tries to verify that the device signature read from the part is
+reasonable before continuing.  Since it can happen from time to time
+that a device has a broken (erased or overwritten) device signature
+but is otherwise operating normally, this options is provided to
+override the check.
+.It Fl i Ar delay
+For bitbang-type programmers, delay for approximately
+.Ar delay
+microseconds between each bit state change.
+If the host system is very fast, or the target runs off a slow clock
+(like a 32 kHz crystal, or the 128 kHz internal RC oscillator), this
+can become necessary to satisfy the requirement that the ISP clock
+frequency must not be higher than 1/4 of the CPU clock frequency.
+This is implemented as a spin-loop delay to allow even for very
+short delays.
+On Unix-style operating systems, the spin loop is initially calibrated
+against a system timer, so the number of microseconds might be rather
+realistic, assuming a constant system load while
+.Nm
+is running.
+On Win32 operating systems, a preconfigured number of cycles per
+microsecond is assumed that might be off a bit for very fast or very
+slow machines.
+.It Fl n
+No-write - disables actually writing data to the MCU (useful for debugging
+.Nm avrdude
+).
+.It Fl O
+Perform a RC oscillator run-time calibration according to Atmel
+application note AVR053.
+This is only supported on the STK500v2, AVRISP mkII, and JTAG ICE mkII
+hardware.
+Note that the result will be stored in the EEPROM cell at address 0.
+.It Fl P Ar port
+Use
+.Ar port
+to identify the device to which the programmer is attached.  By
+default the
+.Pa /dev/ppi0
+port is used, but if the programmer type normally connects to the
+serial port, the
+.Pa /dev/cuaa0
+port is the default.  If you need to use a different parallel or
+serial port, use this option to specify the alternate port name.
+.Pp
+For the JTAG ICE mkII, if
+.Nm
+has been configured with libusb support,
+.Ar port
+can alternatively be specified as
+.Pa usb Ns Op \&: Ns Ar serialno .
+This will cause
+.Nm
+to search a JTAG ICE mkII on USB.
+If
+.Ar serialno
+is also specified, it will be matched against the serial number read
+from any JTAG ICE mkII found on USB.
+The match is done after stripping any existing colons from the given
+serial number, and right-to-left, so only the least significant bytes
+from the serial number need to be given.
+.Pp
+As the AVRISP mkII device can only be talked to over USB, the very
+same method of specifying the port is required there.
+.Pp
+For the USB programmer "AVR-Doper" running in HID mode, the port must
+be specified as
+.Ar avrdoper.
+Libusb support is required on Unix but not on Windows. For more
+information about AVR-Doper see http://www.obdev.at/avrusb/avrdoper.html.
+.Pp
+For programmers that attach to a serial port using some kind of
+higher level protocol (as opposed to bit-bang style programmers),
+.Ar port
+can be specified as
+.Pa net Ns \&: Ns Ar host Ns \&: Ns Ar port .
+In this case, instead of trying to open a local device, a TCP
+network connection to (TCP)
+.Ar port
+on
+.Ar host
+is established.
+The remote endpoint is assumed to be a terminal or console server
+that connects the network stream to a local serial port where the
+actual programmer has been attached to.
+The port is assumed to be properly configured, for example using a
+transparent 8-bit data connection without parity at 115200 Baud
+for a STK500.
+.Em This feature is currently not implemented for Win32 systems.
+.It Fl q
+Disable (or quell) output of the progress bar while reading or writing
+to the device.  Specify it a second time for even quieter operation.
+.It Fl s
+Disable safemode prompting.  When safemode discovers that one or more
+fuse bits have unintentionally changed, it will prompt for
+confirmation regarding whether or not it should attempt to recover the
+fuse bit(s).  Specifying this flag disables the prompt and assumes
+that the fuse bit(s) should be recovered without asking for
+confirmation first.
+.It Fl t
+Tells
+.Nm
+to enter the interactive ``terminal'' mode instead of up- or downloading
+files.  See below for a detailed description of the terminal mode.
+.It Fl u
+Disable the safemode fuse bit checks.  Safemode is enabled by default
+and is intended to prevent unintentional fuse bit changes.  When
+enabled, safemode will issue a warning if the any fuse bits are found
+to be different at program exit than they were when
+.Nm
+was invoked.  Safemode won't alter fuse bits itself, but rather will
+prompt for instructions, unless the terminal is non-interactive, in
+which case safemode is disabled.  See the
+.Fl s
+option to disable safemode prompting.
+.It Xo Fl U Ar memtype Ns
+.Ar \&: Ns Ar op Ns
+.Ar \&: Ns Ar filename Ns
+.Op \&: Ns Ar format
+.Xc
+Perform a memory operation as indicated.  The
+.Ar memtype
+field specifies the memory type to operate on.
+The available memory types are device-dependent, the actual
+configuration can be viewed with the
+.Cm part
+command in terminal mode.
+Typically, a device's memory configuration at least contains
+the memory types
+.Ar flash
+and
+.Ar eeprom .
+All memory types currently known are:
+.Bl -tag -width "calibration" -compact
+.It calibration
+One or more bytes of RC oscillator calibration data.
+.It eeprom
+The EEPROM of the device.
+.It efuse
+The extended fuse byte.
+.It flash
+The flash ROM of the device.
+.It fuse
+The fuse byte in devices that have only a single fuse byte.
+.It hfuse
+The high fuse byte.
+.It lfuse
+The low fuse byte.
+.It lock
+The lock byte.
+.It signature
+The three device signature bytes (device ID).
+.El
+.Pp
+The
+.Ar op
+field specifies what operation to perform:
+.Bl -tag -width noreset
+.It Ar r
+read device memory and write to the specified file
+.It Ar w
+read data from the specified file and write to the device memory
+.It Ar v
+read data from both the device and the specified file and perform a verify
+.El
+.Pp
+The
+.Ar filename
+field indicates the name of the file to read or write.
+The
+.Ar format
+field is optional and contains the format of the file to read or
+write.
+.Ar Format
+can be one of:
+.Bl -tag -width sss
+.It Ar i
+Intel Hex
+.It Ar s
+Motorola S-record
+.It Ar r
+raw binary; little-endian byte order, in the case of the flash ROM data
+.It Ar m
+immediate; actual byte values specified on the command line, separated
+by commas or spaces.  This is good for programming fuse bytes without
+having to create a single-byte file or enter terminal mode.
+.It Ar a
+auto detect; valid for input only, and only if the input is not
+provided at
+.Em stdin .
+.It Ar d
+decimal; this and the following formats are only valid on output.
+They generate one line of output for the respective memory section,
+forming a comma-separated list of the values.
+This can be particularly useful for subsequent processing, like for
+fuse bit settings.
+.It Ar h
+hexadecimal; each value will get the string
+.Em 0x
+prepended.
+.It Ar o
+octal; each value will get a
+.Em 0
+prepended unless it is less than 8 in which case it gets no prefix.
+.It Ar b
+binary; each value will get the string
+.Em 0b
+prepended.
+.El
+.Pp
+The default is to use auto detection for input files, and raw binary
+format for output files.
+Note that if
+.Ar filename
+contains a colon, the
+.Ar format
+field is no longer optional since the filename part following the colon
+would otherwise be misinterpreted as
+.Ar format .
+.Pp
+As an abbreviation, the form
+.Fl U Ar filename
+is equivalent to specifying
+.Fl U Em flash:w: Ns Ar filename Ns :a .
+This will only work if
+.Ar filename
+does not have a colon in it.
+.It Fl v
+Enable verbose output.
+.It Fl V
+Disable automatic verify check when uploading data.
+.It Fl y
+Tells
+.Nm
+to use the last four bytes of the connected parts' EEPROM memory to
+track the number of times the device has been erased.  When this
+option is used and the
+.Fl e
+flag is specified to generate a chip erase, the previous counter will
+be saved before the chip erase, it is then incremented, and written
+back after the erase cycle completes.  Presumably, the device would
+only be erased just before being programmed, and thus, this can be
+utilized to give an indication of how many erase-rewrite cycles the
+part has undergone.  Since the FLASH memory can only endure a finite
+number of erase-rewrite cycles, one can use this option to track when
+a part is nearing the limit.  The typical limit for Atmel AVR FLASH is
+1000 cycles.  Of course, if the application needs the last four bytes
+of EEPROM memory, this option should not be used.
+.It Fl Y Ar cycles
+Instructs
+.Nm
+to initialize the erase-rewrite cycle counter residing at the last four
+bytes of EEPROM memory to the specified value.  If the application
+needs the last four bytes of EEPROM memory, this option should not be
+used.
+.El
+.Ss Terminal mode
+In this mode,
+.Nm
+only initializes communication with the MCU, and then awaits user
+commands on standard input.  Commands and parameters may be
+abbreviated to the shortest unambiguous form.  Terminal mode provides
+a command history using
+.Xr readline 3 ,
+so previously entered command lines can be recalled and edited.  The
+following commands are currently implemented:
+.Bl -tag -offset indent -width indent
+.It Ar dump memtype addr nbytes
+Read
+.Ar nbytes
+bytes from the specified memory area, and display them in the usual
+hexadecimal and ASCII form.
+.It Ar dump
+Continue dumping the memory contents for another
+.Ar nbytes
+where the previous
+.Ar dump
+command left off.
+.It Ar write memtype addr byte1 ... byteN
+Manually program the respective memory cells, starting at address
+.Ar addr ,
+using the values
+.Ar byte1
+through
+.Ar byteN .
+This feature is not implemented for bank-addressed memories such as
+the flash memory of ATMega devices.
+.It Ar erase
+Perform a chip erase.
+.It Ar send b1 b2 b3 b4
+Send raw instruction codes to the AVR device.  If you need access to a
+feature of an AVR part that is not directly supported by
+.Nm ,
+this command allows you to use it, even though
+.Nm
+does not implement the command.
+.It Ar sig
+Display the device signature bytes.
+.It Ar part
+Display the current part settings and parameters.  Includes chip
+specific information including all memory types supported by the
+device, read/write timing, etc.
+.It Ar vtarg voltage
+Set the target's supply voltage to
+.Ar voltage
+Volts.
+.Em Only supported on the STK500 programmer.
+.It Ar varef voltage
+Set the adjustable voltage source to
+.Ar voltage
+Volts.
+This voltage is normally used to drive the target's
+.Em Aref
+input on the STK500.
+.Em Only supported on the STK500 programmer.
+.It Ar fosc freq Ns Op M Ns \&| Ns k
+Set the master oscillator to
+.Ar freq
+Hz.
+An optional trailing letter
+.Ar \&M
+multiplies by 1E6, a trailing letter
+.Ar \&k
+by 1E3.
+.Em Only supported on the STK500 programmer.
+.It Ar fosc off
+Turn the master oscillator off.
+.Em Only supported on the STK500 programmer.
+.It Ar sck period
+.Em STK500 programmer only:
+Set the SCK clock period to
+.Ar period
+microseconds.
+.Pp
+.Em JTAG ICE only:
+Set the JTAG ICE bit clock period to
+.Ar period
+microseconds.
+Note that unlike STK500 settings, this setting will be reverted to
+its default value (approximately 1 microsecond) when the programming
+software signs off from the JTAG ICE.
+This parameter can also be used on the JTAG ICE mkII to specify the
+ISP clock period when operating the ICE in ISP mode.
+.It Ar parms
+.Em STK500 programmer only:
+Display the current voltage and master oscillator parameters.
+.Pp
+.Em JTAG ICE only:
+Display the current target supply voltage and JTAG bit clock rate/period.
+.It Ar \&?
+.It Ar help
+Give a short on-line summary of the available commands.
+.It Ar quit
+Leave terminal mode and thus
+.Nm avrdude .
+.El
+.Ss Default Parallel port pin connections
+(these can be changed, see the
+.Fl c
+option)
+.TS
+ll.
+\fBPin number\fP	\fBFunction\fP
+2-5	Vcc (optional power supply to MCU)
+7	/RESET (to MCU)
+8	SCK (to MCU)
+9	MOSI (to MCU)
+10	MISO (from MCU)
+18-25	GND
+.TE
+.Ss debugWire limitations
+The debugWire protocol is Atmel's proprietary one-wire (plus ground)
+protocol to allow an in-circuit emulation of the smaller AVR devices,
+using the
+.Ql /RESET
+line.
+DebugWire mode is initiated by activating the
+.Ql DWEN
+fuse, and then power-cycling the target.
+While this mode is mainly intented for debugging/emulation, it
+also offers limited programming capabilities.
+Effectively, the only memory areas that can be read or programmed
+in this mode are flash ROM and EEPROM.
+It is also possible to read out the signature.
+All other memory areas cannot be accessed.
+There is no
+.Em chip erase
+functionality in debugWire mode; instead, while reprogramming the
+flash ROM, each flash ROM page is erased right before updating it.
+This is done transparently by the JTAG ICE mkII (or AVR Dragon).
+The only way back from debugWire mode is to initiate a special
+sequence of commands to the JTAG ICE mkII (or AVR Dragon), so the
+debugWire mode will be temporarily disabled, and the target can
+be accessed using normal ISP programming.
+This sequence is automatically initiated by using the JTAG ICE mkII
+or AVR Dragon in ISP mode, when they detect that ISP mode cannot be
+entered.
+.Sh FILES
+.Bl -tag -offset indent -width /dev/ppi0XXX
+.It Pa /dev/ppi0
+default device to be used for communication with the programming
+hardware
+.It Pa ${PREFIX}/etc/avrdude.conf
+programmer and parts configuration file
+.It Pa ${HOME}/.avrduderc
+programmer and parts configuration file (per-user overrides)
+.It Pa ~/.inputrc
+Initialization file for the
+.Xr readline 3
+library
+.It Pa ${PREFIX}/share/doc/avrdude/avrdude.pdf
+Schematic of programming hardware
+.El
+.\" .Sh EXAMPLES
+.Sh DIAGNOSTICS
+.Bd -literal
+avrdude: jtagmkII_setparm(): bad response to set parameter command: RSP_FAILED
+avrdude: jtagmkII_getsync(): ISP activation failed, trying debugWire
+avrdude: Target prepared for ISP, signed off.
+avrdude: Please restart avrdude without power-cycling the target.
+.Ed
+.Pp
+If the target AVR has been set up for debugWire mode (i. e. the
+.Em DWEN
+fuse is programmed), normal ISP connection attempts will fail as
+the
+.Em /RESET
+pin is not available.
+When using the JTAG ICE mkII in ISP mode, the message shown indicates
+that
+.Nm
+has guessed this condition, and tried to initiate a debugWire reset
+to the target.
+When successful, this will leave the target AVR in a state where it
+can respond to normal ISP communication again (until the next power
+cycle).
+Typically, the same command is going to be retried again immediately
+afterwards, and will then succeed connecting to the target using
+normal ISP communication.
+.Sh SEE ALSO
+.Xr avr-objcopy 1 ,
+.Xr ppi 4 ,
+.Xr readline 3
+.Pp
+The AVR microcontroller product description can be found at
+.Pp
+.Dl "http://www.atmel.com/products/AVR/"
+.\" .Sh HISTORY
+.Sh AUTHORS
+.Nm Avrdude
+was written by Brian S. Dean <bsd@bsdhome.com>.
+.Pp
+This man page by
+.ie t J\(:org Wunsch.
+.el Joerg Wunsch.
+.Sh BUGS
+Please report bugs via
+.Dl "http://savannah.nongnu.org/bugs/?group=avrdude" .
+.Pp
+The JTAG ICE programmers currently cannot write to the flash ROM
+one byte at a time.
+For that reason, updating the flash ROM from terminal mode does not
+work.
+.Pp
+Page-mode programming the EEPROM through JTAG (i.e. through an
+.Fl U
+option) requires a prior chip erase.
+This is an inherent feature of the way JTAG EEPROM programming works.
+This also applies to the STK500 in parallel programming mode.
+.Pp
+The USBasp and USBtinyISP drivers do not offer any option to distinguish multiple
+devices connected simultaneously, so effectively only a single device
+is supported.

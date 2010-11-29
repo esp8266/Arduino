@@ -1,0 +1,37 @@
+.TH "<alloca.h>: Allocate space in the stack" 3 "6 Nov 2008" "Version 1.6.4" "avr-libc" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+<alloca.h>: Allocate space in the stack \- 
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void * \fBalloca\fP (size_t __size)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+
+.SH "Function Documentation"
+.PP 
+.SS "void* alloca (size_t __size)"
+.PP
+Allocate \fI__size\fP bytes of space in the stack frame of the caller. 
+.PP
+This temporary space is automatically freed when the function that called \fBalloca()\fP returns to its caller. Avr-libc defines the \fBalloca()\fP as a macro, which is translated into the inlined \fC__builtin_alloca()\fP function. The fact that the code is inlined, means that it is impossible to take the address of this function, or to change its behaviour by linking with a different library.
+.PP
+\fBReturns:\fP
+.RS 4
+\fBalloca()\fP returns a pointer to the beginning of the allocated space. If the allocation causes stack overflow, program behaviour is undefined.
+.RE
+.PP
+\fBWarning:\fP
+.RS 4
+Avoid use \fBalloca()\fP inside the list of arguments of a function call. 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for avr-libc from the source code.

@@ -1,0 +1,739 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html401/loose.dtd">
+<html>
+<!-- Created on October, 30 2007 by texi2html 1.76 -->
+<!--
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Many creative people <dev@texi2html.cvshome.org>
+Send bugs and suggestions to <users@texi2html.cvshome.org>
+
+-->
+<head>
+<title>AVRDUDE: 2.1 Option Descriptions</title>
+
+<meta name="description" content="AVRDUDE: 2.1 Option Descriptions">
+<meta name="keywords" content="AVRDUDE: 2.1 Option Descriptions">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="texi2html 1.76">
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+pre.display {font-family: serif}
+pre.format {font-family: serif}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+pre.smalldisplay {font-family: serif; font-size: smaller}
+pre.smallexample {font-size: smaller}
+pre.smallformat {font-family: serif; font-size: smaller}
+pre.smalllisp {font-size: smaller}
+span.sansserif {font-family:sans-serif; font-weight:normal;}
+ul.toc {list-style: none}
+-->
+</style>
+
+
+</head>
+
+<body lang="en" bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
+
+<a name="Option-Descriptions"></a>
+<a name="SEC4"></a>
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="avrdude_3.html#SEC3" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="avrdude_5.html#SEC5" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="avrdude_3.html#SEC3" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="avrdude_3.html#SEC3" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="avrdude_6.html#SEC6" title="Next chapter"> &gt;&gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="avrdude.html#Top" title="Cover (top) of document">Top</a>]</td>
+<td valign="middle" align="left">[<a href="avrdude_toc.html#SEC_Contents" title="Table of contents">Contents</a>]</td>
+<td valign="middle" align="left">[Index]</td>
+<td valign="middle" align="left">[<a href="avrdude_abt.html#SEC_About" title="About (help)"> ? </a>]</td>
+</tr></table>
+<h2 class="section"> 2.1 Option Descriptions </h2>
+
+
+<p>AVRDUDE is a command line tool, used as follows:
+</p>
+<table><tr><td>&nbsp;</td><td><pre class="smallexample">avrdude -p partno <var>options</var> &hellip;
+</pre></td></tr></table>
+
+<p>Command line options are used to control AVRDUDE's behaviour.  The
+following options are recognized:
+</p>
+<dl compact="compact">
+<dt> <code>-p <var>partno</var></code></dt>
+<dd><p>This is the only mandatory option and it tells AVRDUDE what type of part
+(MCU) that is connected to the programmer.  The <var>partno</var> parameter
+is the part's id listed in the configuration file.  Specify -p ? to list
+all parts in the configuration file.  If a part is unknown
+to AVRDUDE, it means that there is no config file entry for that part,
+but it can be added to the configuration file if you have the Atmel
+datasheet so that you can enter the programming specifications.
+Currently, the following MCU types are understood:
+</p>
+<table>
+<tr><td><p> <code>c128</code>  </p></td><td><p> AT90CAN128
+</p></td></tr>
+<tr><td><p> <code>pwm2</code>  </p></td><td><p> AT90PWM2
+</p></td></tr>
+<tr><td><p> <code>pwm3</code>  </p></td><td><p> AT90PWM3
+</p></td></tr>
+<tr><td><p> <code>1200</code>  </p></td><td><p> AT90S1200
+</p></td></tr>
+<tr><td><p> <code>2313</code>  </p></td><td><p> AT90S2313
+</p></td></tr>
+<tr><td><p> <code>2333</code>  </p></td><td><p> AT90S2333
+</p></td></tr>
+<tr><td><p> <code>2343</code>  </p></td><td><p> AT90S2343 (*)
+</p></td></tr>
+<tr><td><p> <code>4414</code>  </p></td><td><p> AT90S4414
+</p></td></tr>
+<tr><td><p> <code>4433</code>  </p></td><td><p> AT90S4433
+</p></td></tr>
+<tr><td><p> <code>4434</code>  </p></td><td><p> AT90S4434
+</p></td></tr>
+<tr><td><p> <code>8515</code>  </p></td><td><p> AT90S8515
+</p></td></tr>
+<tr><td><p> <code>8535</code>  </p></td><td><p> AT90S8535
+</p></td></tr>
+<tr><td><p> <code>m103</code>  </p></td><td><p> ATmega103
+</p></td></tr>
+<tr><td><p> <code>m128</code>  </p></td><td><p> ATmega128
+</p></td></tr>
+<tr><td><p> <code>m1280</code> </p></td><td><p> ATmega1280
+</p></td></tr>
+<tr><td><p> <code>m1281</code> </p></td><td><p> ATmega1281
+</p></td></tr>
+<tr><td><p> <code>m16</code>   </p></td><td><p> ATmega16
+</p></td></tr>
+<tr><td><p> <code>m161</code>  </p></td><td><p> ATmega161
+</p></td></tr>
+<tr><td><p> <code>m162</code>  </p></td><td><p> ATmega162
+</p></td></tr>
+<tr><td><p> <code>m163</code>  </p></td><td><p> ATmega163
+</p></td></tr>
+<tr><td><p> <code>m164</code>  </p></td><td><p> ATmega164
+</p></td></tr>
+<tr><td><p> <code>m169</code>  </p></td><td><p> ATmega169
+</p></td></tr>
+<tr><td><p> <code>m2560</code> </p></td><td><p> ATmega2560 (**)
+</p></td></tr>
+<tr><td><p> <code>m2561</code> </p></td><td><p> ATmega2561 (**)
+</p></td></tr>
+<tr><td><p> <code>m32</code>   </p></td><td><p> ATmega32
+</p></td></tr>
+<tr><td><p> <code>m324</code>  </p></td><td><p> ATmega324
+</p></td></tr>
+<tr><td><p> <code>m329</code>  </p></td><td><p> ATmega329
+</p></td></tr>
+<tr><td><p> <code>m3290</code> </p></td><td><p> ATmega3290
+</p></td></tr>
+<tr><td><p> <code>m48</code>   </p></td><td><p> ATmega48
+</p></td></tr>
+<tr><td><p> <code>m64</code>   </p></td><td><p> ATmega64
+</p></td></tr>
+<tr><td><p> <code>m640</code>  </p></td><td><p> ATmega640
+</p></td></tr>
+<tr><td><p> <code>m644</code>  </p></td><td><p> ATmega644
+</p></td></tr>
+<tr><td><p> <code>m649</code>  </p></td><td><p> ATmega649
+</p></td></tr>
+<tr><td><p> <code>m6490</code> </p></td><td><p> ATmega6490
+</p></td></tr>
+<tr><td><p> <code>m8</code>    </p></td><td><p> ATmega8
+</p></td></tr>
+<tr><td><p> <code>m8515</code> </p></td><td><p> ATmega8515
+</p></td></tr>
+<tr><td><p> <code>m8535</code> </p></td><td><p> ATmega8535
+</p></td></tr>
+<tr><td><p> <code>m88</code>   </p></td><td><p> ATmega88
+</p></td></tr>
+<tr><td><p> <code>t12</code>   </p></td><td><p> ATtiny12
+</p></td></tr>
+<tr><td><p> <code>t13</code>   </p></td><td><p> ATtiny13
+</p></td></tr>
+<tr><td><p> <code>t15</code>   </p></td><td><p> ATtiny15
+</p></td></tr>
+<tr><td><p> <code>t2313</code> </p></td><td><p> ATtiny2313
+</p></td></tr>
+<tr><td><p> <code>t25</code>   </p></td><td><p> ATtiny25
+</p></td></tr>
+<tr><td><p> <code>t26</code>   </p></td><td><p> ATtiny26
+</p></td></tr>
+<tr><td><p> <code>t45</code>   </p></td><td><p> ATtiny45
+</p></td></tr>
+<tr><td><p> <code>t85</code>   </p></td><td><p> ATtiny85
+</p></td></tr>
+</table>
+
+<p>(*)   The AT90S2323 and ATtiny22 use the same algorithm.
+</p>
+<p>(**)  Flash addressing above 128 KB is not supported by all
+programming hardware.  Known to work are jtag2, stk500v2,
+and bit-bang programmers.
+</p>
+</dd>
+<dt> <code>-b <var>baudrate</var></code></dt>
+<dd><p>Override the RS-232 connection baud rate specified in the respective
+programmer's entry of the configuration file.
+</p>
+</dd>
+<dt> <code>-B <var>bitclock</var></code></dt>
+<dd><p>Specify the bit clock period for the JTAG interface or the ISP clock (JTAG ICE only).
+The value is a floating-point number in microseconds.
+The default value of the JTAG ICE results in about 1 microsecond bit
+clock period, suitable for target MCUs running at 4 MHz clock and
+above.
+Unlike certain parameters in the STK500, the JTAG ICE resets all its
+parameters to default values when the programming software signs
+off from the ICE, so for MCUs running at lower clock speeds, this
+parameter must be specified on the command-line.
+</p>
+</dd>
+<dt> <code>-c <var>programmer-id</var></code></dt>
+<dd><p>Specify the programmer to be used.  AVRDUDE knows about several common
+programmers.  Use this option to specify which one to use.  The
+<var>programmer-id</var> parameter is the programmer's id listed in the
+configuration file.  Specify -c ? to list all programmers in the
+configuration file.  If you have a programmer that is unknown to
+AVRDUDE, and the programmer is controlled via the PC parallel port,
+there's a good chance that it can be easily added to the configuration
+file without any code changes to AVRDUDE.  Simply copy an existing entry
+and change the pin definitions to match that of the unknown programmer.
+Currently, the following programmer ids are understood and supported:
+</p>
+<table>
+<tr><td><p> <code>abcmini</code>     </p></td><td>
+<p>ABCmini Board, aka Dick Smith HOTCHIP
+</p></td></tr>
+<tr><td><p> <code>alf</code>         </p></td><td>
+<p>Nightshade ALF-PgmAVR,<br>
+<a href="http://nightshade.homeip.net/">http://nightshade.homeip.net/</a>
+</p></td></tr>
+<tr><td><p> <code>atisp</code>       </p></td><td>
+<p>AT-ISP V1.1 programming cable for AVR-SDK1 from,<br>
+<a href="http://micro-research.co.th/">http://micro-research.co.th/</a>
+</p></td></tr>
+<tr><td><p> <code>avr109</code>      </p></td><td>
+<p>Atmel AppNote AVR109 Boot Loader
+</p></td></tr>
+<tr><td><p> <code>avr910</code>      </p></td><td>
+<p>Atmel Low Cost Serial Programmer
+</p></td></tr>
+<tr><td><p> <code>avr911</code>      </p></td><td>
+<p>Atmel AppNote AVR911 AVROSP (an alias for avr109)
+</p></td></tr>
+<tr><td><p> <code>avrisp</code>      </p></td><td>
+<p>Atmel AVR ISP (an alias for stk500)
+</p></td></tr>
+<tr><td><p> <code>avrisp2</code>     </p></td><td>
+<p>Atmel AVR ISP mkII (alias for stk500v2)
+</p></td></tr>
+<tr><td><p> <code>avrispmkII</code>  </p></td><td>
+<p>Atmel AVR ISP mkII (alias for stk500v2)
+</p></td></tr>
+<tr><td><p> <code>avrispv2</code>    </p></td><td>
+<p>Atmel AVR ISP, running a version 2.x firmware (an alias for stk500v2)
+</p></td></tr>
+<tr><td><p> <code>bascom</code>      </p></td><td>
+<p>Bascom SAMPLE programming cable
+</p></td></tr>
+<tr><td><p> <code>blaster</code>     </p></td><td>
+<p>Altera ByteBlaster
+</p></td></tr>
+<tr><td><p> <code>bsd</code>         </p></td><td>
+<p>Brian Dean's Programmer,<br>
+<a href="http://www.bsdhome.com/avrdude/">http://www.bsdhome.com/avrdude/</a>
+</p></td></tr>
+<tr><td><p> <code>butterfly</code>   </p></td><td>
+<p>Atmel Butterfly Development Board
+</p></td></tr>
+<tr><td><p> <code>c2n232i</code>     </p></td><td>
+<p>C2N232I, reset=dtr sck=!rts mosi=!txd miso=!cts,<br>
+<a href="http://www.ktverkko.fi/~msmakela/8bit/c2n232/hardware/index.en.html">http://www.ktverkko.fi/~msmakela/8bit/c2n232/hardware/index.en.html</a>
+</p></td></tr>
+<tr><td><p> <code>dapa</code>        </p></td><td>
+<p>Direct AVR Parallel Access cable
+</p></td></tr>
+<tr><td><p> <code>dasa</code>        </p></td><td>
+<p>serial port banging, reset=rts sck=dtr mosi=txd miso=cts
+</p></td></tr>
+<tr><td><p> <code>dasa3</code>       </p></td><td>
+<p>serial port banging, reset=!dtr sck=rts mosi=txd miso=cts
+</p></td></tr>
+<tr><td><p> <code>dragon_dw</code>   </p></td><td>
+<p>AVR Dragon in debugWire mode
+</p></td></tr>
+<tr><td><p> <code>dragon_hvsp</code> </p></td><td>
+<p>AVR Dragon in high-voltage serial programming mode
+</p></td></tr>
+<tr><td><p> <code>dragon_isp</code>  </p></td><td>
+<p>AVR Dragon in ISP mode
+</p></td></tr>
+<tr><td><p> <code>dragon_jtag</code> </p></td><td>
+<p>AVR Dragon in JTAG mode
+</p></td></tr>
+<tr><td><p> <code>dragon_pp</code>   </p></td><td>
+<p>AVR Dragon in (high-voltage) parallel programming mode
+</p></td></tr>
+<tr><td><p> <code>dt006</code>       </p></td><td>
+<p>Dontronics DT006
+</p></td></tr>
+<tr><td><p> <code>ere-isp-avr</code> </p></td><td>
+<p>ERE ISP-AVR,<br>
+<a href="http://www.ere.co.th/download/sch050713.pdf">http://www.ere.co.th/download/sch050713.pdf</a>
+</p></td></tr>
+<tr><td><p> <code>frank-stk200</code></p></td><td>
+<p>Frank's STK200 clone,<br>
+<a href="http://electropol.free.fr/spip/spip.php?article15">http://electropol.free.fr/spip/spip.php?article15</a>
+</p></td></tr>
+<tr><td><p> <code>futurlec</code>    </p></td><td>
+<p>Futurlec.com programming cable
+</p></td></tr>
+<tr><td><p> <code>jtag1</code>       </p></td><td>
+<p>Atmel JTAG ICE mkI, running at 115200 Bd
+</p></td></tr>
+<tr><td><p> <code>jtag1slow</code>   </p></td><td>
+<p>Atmel JTAG ICE mkI, running at 19200 Bd
+</p></td></tr>
+<tr><td><p> <code>jtag2slow</code>   </p></td><td>
+<p>Atmel JTAG ICE mkII (default speed 19200 Bd)
+</p></td></tr>
+<tr><td><p> <code>jtag2</code>       </p></td><td>
+<p>Atmel JTAG ICE mkII, running at 115200 Bd
+</p></td></tr>
+<tr><td><p> <code>jtag2fast</code>   </p></td><td>
+<p>Atmel JTAG ICE mkII, running at 115200 Bd
+</p></td></tr>
+<tr><td><p> <code>jtag2isp</code>    </p></td><td>
+<p>Atmel JTAG ICE mkII in ISP mode.
+</p></td></tr>
+<tr><td><p> <code>jtag2dw</code>     </p></td><td>
+<p>Atmel JTAG ICE mkII in debugWire mode.
+</p></td></tr>
+<tr><td><p> <code>jtagmkI</code>     </p></td><td>
+<p>Atmel JTAG ICE mkI, running at 115200 Bd
+</p></td></tr>
+<tr><td><p> <code>jtagmkII</code>    </p></td><td>
+<p>Atmel JTAG ICE mkII (default speed 19200 Bd)
+</p></td></tr>
+<tr><td><p> <code>pavr</code>        </p></td><td>
+<p>Jason Kyle's pAVR Serial Programmer
+</p></td></tr>
+<tr><td><p> <code>picoweb</code>     </p></td><td>
+<p>Picoweb Programming Cable,<br>
+<a href="http://www.picoweb.net/">http://www.picoweb.net/</a>
+</p></td></tr>
+<tr><td><p> <code>pony-stk200</code> </p></td><td>
+<p>Pony Prog STK200
+</p></td></tr>
+<tr><td><p> <code>ponyser</code>     </p></td><td>
+<p>design ponyprog serial, reset=!txd sck=rts mosi=dtr miso=cts
+</p></td></tr>
+<tr><td><p> <code>siprog</code>      </p></td><td>
+<p>Lancos SI-Prog,<br>
+<a href="http://www.lancos.com/siprogsch.html">http://www.lancos.com/siprogsch.html</a>
+</p></td></tr>
+<tr><td><p> <code>sp12</code>        </p></td><td>
+<p>Steve Bolt's Programmer
+</p></td></tr>
+<tr><td><p> <code>stk200</code>      </p></td><td>
+<p>STK200
+</p></td></tr>
+<tr><td><p> <code>stk500</code>      </p></td><td>
+<p>Atmel STK500, probing for either version 1.x or 2.x firmware
+</p></td></tr>
+<tr><td><p> <code>stk500hvsp</code>  </p></td><td>
+<p>Atmel STK500 in high-voltage serial programming mode(version 2.x firmware only)
+</p></td></tr>
+<tr><td><p> <code>stk500pp</code>    </p></td><td>
+<p>Atmel STK500 in parallel programming mode (version 2.xfirmware only)
+</p></td></tr>
+<tr><td><p> <code>stk500v1</code>    </p></td><td>
+<p>Atmel STK500, running a version 1.x firmware
+</p></td></tr>
+<tr><td><p> <code>stk500v2</code>    </p></td><td>
+<p>Atmel STK500, running a version 2.x firmware
+</p></td></tr>
+<tr><td><p> <code>usbasp</code>      </p></td><td>
+<p>USBasp,<br>
+<a href="http://www.fischl.de/usbasp/">http://www.fischl.de/usbasp/</a>
+</p></td></tr>
+<tr><td><p> <code>usbtiny</code>     </p></td><td>
+<p>USBtiny simple USB programmer,<br>
+<a href="http://www.ladyada.net/make/usbtinyisp/">http://www.ladyada.net/make/usbtinyisp/</a>
+</p></td></tr>
+<tr><td><p> <code>xil</code>         </p></td><td>
+<p>Xilinx JTAG cable
+</p></td></tr>
+</table>
+
+
+
+</dd>
+<dt> <code>-C <var>config-file</var></code></dt>
+<dd><p>Use the specified config file for configuration data.  This file
+contains all programmer and part definitions that AVRDUDE knows about.
+If you have a programmer or part that AVRDUDE does not know about, you
+can add it to the config file (be sure and submit a patch back to the
+author so that it can be incorporated for the next version).  If not
+specified, AVRDUDE reads the configuration file from
+/usr/local/etc/avrdude.conf (FreeBSD and Linux). See Appendix A for
+the method of searching for the configuration file for Windows.
+</p>
+</dd>
+<dt> <code>-D</code></dt>
+<dd><p>Disable auto erase for flash.  When the -U option with flash memory is 
+specified, avrdude will perform a chip erase before starting any of the 
+programming operations, since it generally is a mistake to program the flash
+without performing an erase first.  This option disables that.  However, to 
+remain backward compatible, the -i, and -m options automatically disable the 
+auto erase feature.
+</p>
+</dd>
+<dt> <code>-e</code></dt>
+<dd><p>Causes a chip erase to be executed.  This will reset the contents of the
+flash ROM and EEPROM to the value `0xff', and is basically a
+prerequisite command before the flash ROM can be reprogrammed again.
+The only exception would be if the new contents would exclusively cause
+bits to be programmed from the value `1' to `0'.  Note that in order
+to reprogram EERPOM cells, no explicit prior chip erase is required
+since the MCU provides an auto-erase cycle in that case before
+programming the cell.
+</p>
+
+</dd>
+<dt> <code>-E <var>exitspec</var>[,&hellip;]</code></dt>
+<dd><p>By default, AVRDUDE leaves the parallel port in the same state at exit
+as it has been found at startup.  This option modifies the state of the
+`/RESET' and `Vcc' lines the parallel port is left at, according to
+the exitspec arguments provided, as follows:
+</p>
+<dl compact="compact">
+<dt> <code>reset</code></dt>
+<dd><p>The `/RESET' signal will be left activated at program exit, that is it
+will be held low, in order to keep the MCU in reset state afterwards.
+Note in particular that the programming algorithm for the AT90S1200
+device mandates that the `/RESET' signal is active before powering up
+the MCU, so in case an external power supply is used for this MCU type,
+a previous invocation of AVRDUDE with this option specified is one of
+the possible ways to guarantee this condition.
+</p>
+</dd>
+<dt> <code>noreset</code></dt>
+<dd><p>The `/RESET' line will be deactivated at program exit, thus allowing the
+MCU target program to run while the programming hardware remains
+connected.
+</p>
+</dd>
+<dt> <code>vcc</code></dt>
+<dd><p>This option will leave those parallel port pins active (i. e. high) that
+can be used to supply `Vcc' power to the MCU.
+</p>
+</dd>
+<dt> <code>novcc</code></dt>
+<dd><p>This option will pull the `Vcc' pins of the parallel port down at
+program exit.
+</p>
+</dd>
+</dl>
+
+<p>Multiple <var>exitspec</var> arguments can be separated with commas.
+</p>
+
+</dd>
+<dt> <code>-F</code></dt>
+<dd><p>Normally, AVRDUDE tries to verify that the device signature read from
+the part is reasonable before continuing.  Since it can happen from time
+to time that a device has a broken (erased or overwritten) device
+signature but is otherwise operating normally, this options is provided
+to override the check.
+</p>
+</dd>
+<dt> <code>-i <var>delay</var></code></dt>
+<dd><p>For bitbang-type programmers, delay for approximately
+<var>delay</var>
+microseconds between each bit state change.
+If the host system is very fast, or the target runs off a slow clock
+(like a 32 kHz crystal, or the 128 kHz internal RC oscillator), this
+can become necessary to satisfy the requirement that the ISP clock
+frequency must not be higher than 1/4 of the CPU clock frequency.
+This is implemented as a spin-loop delay to allow even for very
+short delays.
+On Unix-style operating systems, the spin loop is initially calibrated
+against a system timer, so the number of microseconds might be rather
+realistic, assuming a constant system load while AVRDUDE is running.
+On Win32 operating systems, a preconfigured number of cycles per
+microsecond is assumed that might be off a bit for very fast or very
+slow machines.
+</p>
+</dd>
+<dt> <code>-n</code></dt>
+<dd><p>No-write - disables actually writing data to the MCU (useful for
+debugging AVRDUDE).
+</p>
+</dd>
+<dt> <code>-O</code></dt>
+<dd><p>Perform a RC oscillator run-time calibration according to Atmel
+application note AVR053.
+This is only supported on the STK500v2, AVRISP mkII, and JTAG ICE mkII
+hardware.
+Note that the result will be stored in the EEPROM cell at address 0.
+</p>
+</dd>
+<dt> <code>-P <var>port</var></code></dt>
+<dd><p>Use port to identify the device to which the programmer is attached.
+Normally, the default parallel port is used, but if the programmer type
+normally connects to the serial port, the default serial port will be
+used. See Appendix A, Platform Dependent Information, to find out the
+default port names for your platform. If you need to use a different
+parallel or serial port, use this option to specify the alternate port name.
+</p>
+<p>For the JTAG ICE mkII, if AVRDUDE has been built with libusb support,
+<var>port</var> may alternatively be specified as
+<code>usb</code>[:<var>serialno</var>].  In that case, the JTAG ICE mkII will be
+looked up on USB.  If <var>serialno</var> is also specified, it will be
+matched against the serial number read from any JTAG ICE mkII found on
+USB.  The match is done after stripping any existing colons from the
+given serial number, and right-to-left, so only the least significant
+bytes from the serial number need to be given.
+For a trick how to find out the serial numbers of all JTAG ICEs
+attached to USB, see <a href="avrdude_5.html#SEC5">Example Command Line Invocations</a>.
+</p>
+<p>As the AVRISP mkII device can only be talked to over USB, the very
+same method of specifying the port is required there.
+</p>
+<p>For the USB programmer &quot;AVR-Doper&quot; running in HID mode, the port must
+be specified as <var>avrdoper</var>. Libusb support is required on Unix
+but not on Windows. For more information about AVR-Doper see
+<a href="http://www.obdev.at/avrusb/avrdoper.html">http://www.obdev.at/avrusb/avrdoper.html</a>.
+</p>
+<p>For programmers that attach to a serial port using some kind of
+higher level protocol (as opposed to bit-bang style programmers),
+<var>port</var> can be specified as <code>net</code>:<var>host</var>:<var>port</var>.
+In this case, instead of trying to open a local device, a TCP
+network connection to (TCP) <var>port</var> on <var>host</var>
+is established.
+The remote endpoint is assumed to be a terminal or console server
+that connects the network stream to a local serial port where the
+actual programmer has been attached to.
+The port is assumed to be properly configured, for example using a
+transparent 8-bit data connection without parity at 115200 Baud
+for a STK500.
+</p>
+<p><em>This feature is currently not implemented for Win32 systems.</em>
+</p>
+
+</dd>
+<dt> <code>-q</code></dt>
+<dd><p>Disable (or quell) output of the progress bar while reading or writing
+to the device.  Specify it a second time for even quieter operation.
+</p>
+</dd>
+<dt> <code>-u</code></dt>
+<dd><p>Disables the default behaviour of reading out the fuses three times before
+programming, then verifying at the end of programming that the fuses have not
+changed. If you want to change fuses you will need to specify this option,
+as avrdude will see the fuses have changed (even though you wanted to) and
+will change them back for your &quot;saftey&quot;. This option was designed to
+prevent cases of fuse bits magically changing (usually called <em>safemode</em>).
+</p>
+</dd>
+<dt> <code>-t</code></dt>
+<dd><p>Tells AVRDUDE to enter the interactive &quot;terminal&quot; mode instead of up-
+or downloading files.  See below for a detailed description of the
+terminal mode.
+</p>
+</dd>
+<dt> <code>-U <var>memtype</var>:<var>op</var>:<var>filename</var>[:<var>format</var>]</code></dt>
+<dd><p>Perform a memory operation, equivalent to specifing the <samp>`-m'</samp>,
+<samp>`-i'</samp> or <samp>`-o'</samp>, and <samp>`-f'</samp> options, except that
+multiple <samp>`-U'</samp> optins can be specified in order to operate on
+mulitple memories on the same command-line invocation.  The
+<var>memtype</var> field specifies the memory type to operate on. Use
+the <samp>`-v'</samp> option on the command line or the <code>part</code> command from
+terminal mode to display all the memory types supported by a particular
+device.
+Typically, a device's memory configuration at least contains
+the memory types
+<code>flash</code>
+and
+<code>eeprom</code>.
+All memory types currently known are:
+</p><dl compact="compact">
+<dt> <code>calibration</code></dt>
+<dd><p>One or more bytes of RC oscillator calibration data.
+</p></dd>
+<dt> <code>eeprom</code></dt>
+<dd><p>The EEPROM of the device.
+</p></dd>
+<dt> <code>efuse</code></dt>
+<dd><p>The extended fuse byte.
+</p></dd>
+<dt> <code>flash</code></dt>
+<dd><p>The flash ROM of the device.
+</p></dd>
+<dt> <code>fuse</code></dt>
+<dd><p>The fuse byte in devices that have only a single fuse byte.
+</p></dd>
+<dt> <code>hfuse</code></dt>
+<dd><p>The high fuse byte.
+</p></dd>
+<dt> <code>lfuse</code></dt>
+<dd><p>The low fuse byte.
+</p></dd>
+<dt> <code>lock</code></dt>
+<dd><p>The lock byte.
+</p></dd>
+<dt> <code>signature</code></dt>
+<dd><p>The three device signature bytes (device ID).
+</p></dd>
+</dl>
+
+<p>The <var>op</var> field specifies what operation to perform:
+</p>
+<dl compact="compact">
+<dt> <code>r</code></dt>
+<dd><p>read the specified device memory and write to the specified file
+</p>
+</dd>
+<dt> <code>w</code></dt>
+<dd><p>read the specified file and write it to the specified device memory
+</p>
+</dd>
+<dt> <code>v</code></dt>
+<dd><p>read the specified device memory and the specified file and perform a verify operation
+</p>
+</dd>
+</dl>
+
+<p>The <var>filename</var> field indicates the name of the file to read or
+write.  The <var>format</var> field is optional and contains the format of
+the file to read or write.  Possible values are:
+</p>
+<dl compact="compact">
+<dt> <code>i</code></dt>
+<dd><p>Intel Hex
+</p>
+</dd>
+<dt> <code>s</code></dt>
+<dd><p>Motorola S-record
+</p>
+</dd>
+<dt> <code>r</code></dt>
+<dd><p>raw binary; little-endian byte order, in the case of the flash ROM data
+</p>
+</dd>
+<dt> <code>m</code></dt>
+<dd><p>immediate mode; actual byte values specified on the command line,
+seperated by commas or spaces in place of the <var>filename</var> field of
+the <samp>`-i'</samp>, <samp>`-o'</samp>, or <samp>`-U'</samp> options.  This is useful
+for programming fuse bytes without having to create a single-byte file
+or enter terminal mode.  If the number specified begins with <code>0x</code>,
+it is treated as a hex value.  If the number otherwise begins with a
+leading zero (<code>0</code>) it is treated as octal.  Otherwise, the value is
+treated as decimal.
+</p>
+</dd>
+<dt> <code>a</code></dt>
+<dd><p>auto detect; valid for input only, and only if the input is not provided
+at stdin.
+</p>
+</dd>
+<dt> <code>d</code></dt>
+<dd><p>decimal; this and the following formats are only valid on output.
+They generate one line of output for the respective memory section,
+forming a comma-separated list of the values.
+This can be particularly useful for subsequent processing, like for
+fuse bit settings.
+</p>
+</dd>
+<dt> <code>h</code></dt>
+<dd><p>hexadecimal; each value will get the string <em>0x</em> prepended.
+</p>
+</dd>
+<dt> <code>o</code></dt>
+<dd><p>octal; each value will get a <em>0</em>
+prepended unless it is less than 8 in which case it gets no prefix.
+</p>
+</dd>
+<dt> <code>b</code></dt>
+<dd><p>binary; each value will get the string <em>0b</em> prepended.
+</p>
+</dd>
+</dl>
+
+<p>The default is to use auto detection for input files, and raw binary
+format for output files.
+</p>
+<p>Note that if <var>filename</var> contains a colon, the <var>format</var> field is
+no longer optional since the filename part following the colon would
+otherwise be misinterpreted as <var>format</var>.
+</p>
+<p>As an abbreviation, the form <code>-U</code> <var>filename</var>
+is equivalent to specifying
+<code>-U</code> <em>flash:w:</em><var>filename</var><em>:a</em>.
+This will only work if <var>filename</var> does not have a colon in it.
+</p>
+</dd>
+<dt> <code>-v</code></dt>
+<dd><p>Enable verbose output.
+</p>
+</dd>
+<dt> <code>-V</code></dt>
+<dd><p>Disable automatic verify check when uploading data.
+</p>
+</dd>
+<dt> <code>-y</code></dt>
+<dd><p>Tells AVRDUDE to use the last four bytes of the connected parts' EEPROM
+memory to track the number of times the device has been erased.  When
+this option is used and the <samp>`-e'</samp> flag is specified to generate a
+chip erase, the previous counter will be saved before the chip erase, it
+is then incremented, and written back after the erase cycle completes.
+Presumably, the device would only be erased just before being
+programmed, and thus, this can be utilized to give an indication of how
+many erase-rewrite cycles the part has undergone.  Since the FLASH
+memory can only endure a finite number of erase-rewrite cycles, one can
+use this option to track when a part is nearing the limit.  The typical
+limit for Atmel AVR FLASH is 1000 cycles.  Of course, if the
+application needs the last four bytes of EEPROM memory, this option
+should not be used.
+</p>
+</dd>
+<dt> <code>-Y <var>cycles</var></code></dt>
+<dd><p>Instructs AVRDUDE to initialize the erase-rewrite cycle counter residing
+at the last four bytes of EEPROM memory to the specified value.  If the
+application needs the last four bytes of EEPROM memory, this option
+should not be used.
+</p>
+</dd>
+</dl>
+
+
+<hr size="6">
+<table cellpadding="1" cellspacing="1" border="0">
+<tr><td valign="middle" align="left">[<a href="avrdude_3.html#SEC3" title="Previous section in reading order"> &lt; </a>]</td>
+<td valign="middle" align="left">[<a href="avrdude_5.html#SEC5" title="Next section in reading order"> &gt; </a>]</td>
+<td valign="middle" align="left"> &nbsp; </td>
+<td valign="middle" align="left">[<a href="avrdude_3.html#SEC3" title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign="middle" align="left">[<a href="avrdude_3.html#SEC3" title="Up section"> Up </a>]</td>
+<td valign="middle" align="left">[<a href="avrdude_6.html#SEC6" title="Next chapter"> &gt;&gt; </a>]</td>
+</tr></table>
+<p>
+ <font size="-1">
+  This document was generated by <em>Joerg Wunsch</em> on <em>October, 30 2007</em> using <a href="http://texi2html.cvshome.org/"><em>texi2html 1.76</em></a>.
+ </font>
+ <br>
+
+</p>
+</body>
+</html>

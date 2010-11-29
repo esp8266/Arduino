@@ -1,0 +1,110 @@
+.TH "<util/setbaud.h>: Helper macros for baud rate calculations" 3 "6 Nov 2008" "Version 1.6.4" "avr-libc" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+<util/setbaud.h>: Helper macros for baud rate calculations \- 
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBBAUD_TOL\fP   2"
+.br
+.ti -1c
+.RI "#define \fBUBRR_VALUE\fP"
+.br
+.ti -1c
+.RI "#define \fBUBRRL_VALUE\fP"
+.br
+.ti -1c
+.RI "#define \fBUBRRH_VALUE\fP"
+.br
+.ti -1c
+.RI "#define \fBUSE_2X\fP   0"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+.PP
+.nf
+   #define F_CPU 11059200
+   #define BAUD 38400
+   #include <util/setbaud.h>
+.fi
+.PP
+.PP
+This header file requires that on entry values are already defined for F_CPU and BAUD. In addition, the macro BAUD_TOL will define the baud rate tolerance (in percent) that is acceptable during the calculations. The value of BAUD_TOL will default to 2 %.
+.PP
+This header file defines macros suitable to setup the UART baud rate prescaler registers of an AVR. All calculations are done using the C preprocessor. Including this header file causes no other side effects so it is possible to include this file more than once (supposedly, with different values for the BAUD parameter), possibly even within the same function.
+.PP
+Assuming that the requested BAUD is valid for the given F_CPU then the macro UBRR_VALUE is set to the required prescaler value. Two additional macros are provided for the low and high bytes of the prescaler, respectively: UBRRL_VALUE is set to the lower byte of the UBRR_VALUE and UBRRH_VALUE is set to the upper byte. An additional macro USE_2X will be defined. Its value is set to 1 if the desired BAUD rate within the given tolerance could only be achieved by setting the U2X bit in the UART configuration. It will be defined to 0 if U2X is not needed.
+.PP
+Example usage:
+.PP
+.PP
+.nf
+   #include <avr/io.h>
+
+   #define F_CPU 4000000
+
+   static void
+   uart_9600(void)
+   {
+   #define BAUD 9600
+   #include <util/setbaud.h>
+   UBRRH = UBRRH_VALUE;
+   UBRRL = UBRRL_VALUE;
+   #if USE_2X
+   UCSRA |= (1 << U2X);
+   #else
+   UCSRA &= ~(1 << U2X);
+   #endif
+   }
+
+   static void
+   uart_38400(void)
+   {
+   #undef BAUD  // avoid compiler warning
+   #define BAUD 38400
+   #include <util/setbaud.h>
+   UBRRH = UBRRH_VALUE;
+   UBRRL = UBRRL_VALUE;
+   #if USE_2X
+   UCSRA |= (1 << U2X);
+   #else
+   UCSRA &= ~(1 << U2X);
+   #endif
+   }
+.fi
+.PP
+.PP
+In this example, two functions are defined to setup the UART to run at 9600 Bd, and 38400 Bd, respectively. Using a CPU clock of 4 MHz, 9600 Bd can be achieved with an acceptable tolerance without setting U2X (prescaler 25), while 38400 Bd require U2X to be set (prescaler 12). 
+.SH "Define Documentation"
+.PP 
+.SS "#define BAUD_TOL   2"
+.PP
+Input and output macro for <\fButil/setbaud.h\fP>
+.PP
+Define the acceptable baud rate tolerance in percent. If not set on entry, it will be set to its default value of 2. 
+.SS "#define UBRR_VALUE"
+.PP
+Output macro from <\fButil/setbaud.h\fP>
+.PP
+Contains the calculated baud rate prescaler value for the UBRR register. 
+.SS "#define UBRRH_VALUE"
+.PP
+Output macro from <\fButil/setbaud.h\fP>
+.PP
+Contains the upper byte of the calculated prescaler value (UBRR_VALUE). 
+.SS "#define UBRRL_VALUE"
+.PP
+Output macro from <\fButil/setbaud.h\fP>
+.PP
+Contains the lower byte of the calculated prescaler value (UBRR_VALUE). 
+.SS "#define USE_2X   0"
+.PP
+Output bacro from <\fButil/setbaud.h\fP>
+.PP
+Contains the value 1 if the desired baud rate tolerance could only be achieved by setting the U2X bit in the UART configuration. Contains 0 otherwise. 
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for avr-libc from the source code.

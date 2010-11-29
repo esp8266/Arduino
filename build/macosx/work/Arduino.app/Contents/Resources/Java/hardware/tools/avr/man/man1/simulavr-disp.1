@@ -1,0 +1,26 @@
+.TH SIMULAVR-DISP "1" "@DATE@" "simulavr-disp" "User Commands"
+.SH NAME
+simulavr-disp \- Atmel AVR simulator display
+.SH SYNOPSIS
+.B simulavr-disp
+[-p|--pfd=nn] flash_size sram_size sram_start eeprom_size
+.SH DESCRIPTION
+Displays register and memory information in real time as a child
+process to simulavr.
+.SS Options
+.TP
+\fB\-p\fR, \fB\-\-pfd\fR=nn
+The file descriptor number of the pipe used for getting information from
+simulavr.
+.SH "AUTHOR"
+Written by Theodore A. Roth.
+.SH "REPORTING BUGS"
+Report bugs to <Simulavr-devel@mail.freesoftware.fsf.org>
+.SH "COPYRIGHT"
+Copyright 2001, 2002  Theodore A. Roth.
+
+simulavr-disp is free software, covered by the GNU General Public License,
+and you are welcome to change it and/or distribute copies of it under
+the conditions of the GNU General Public License.
+.SH "SEE ALSO"
+http://savannah.nongnu.org/projects/simulavr/

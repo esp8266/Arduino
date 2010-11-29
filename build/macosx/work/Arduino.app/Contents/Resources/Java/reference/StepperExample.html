@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+  <title>Arduino - StepperExample </title>
+  <link rel='stylesheet' href='arduino.css' type='text/css' />
+</head>
+<body>
+<div id="page">
+<!--PageHeaderFmt-->
+<div id="pageheader">
+  <div class="title"><a href="http://www.arduino.cc"/>Arduino</a></div>
+  <div class="search">
+    <!-- SiteSearch Google -->    <FORM method=GET action="http://www.google.com/search">    <input type=hidden name=ie value=UTF-8>    <input type=hidden name=oe value=UTF-8>    <INPUT TYPE=text name=q size=25 maxlength=255 value="">    <INPUT type=submit name=btnG VALUE="search">    <input type=hidden name=domains value="http://www.arduino.cc/">
+    <input type=hidden name=sitesearch value="http://www.arduino.cc/">
+    </FORM>    <!-- SiteSearch Google -->
+  </div>
+</div>
+<!--/PageHeaderFmt-->
+<!--PageLeftFmt-->
+<div id="pagenav">
+  <p><a class='wikilink' href='Guide_index.html'>Getting Started</a>
+</p>
+<p class='vspace'></p><p><a class='wikilink' href='http://www.arduino.cc/en/Tutorial/HomePage'>Tutorials</a>
+</p>
+<p class='vspace'></p><p><a class='wikilink' href='index.html'>Reference</a>
+</p>
+<p class='vspace'></p><p><a class='wikilink' href='http://www.arduino.cc/en/Main/Hardware'>Hardware</a>
+</p>
+<p class='vspace'></p><p><a class='wikilink' href='http://www.arduino.cc/en/Main/Software'>Software</a>
+</p>
+<p class='vspace'></p><p><a class='urllink' href='http://www.arduino.cc/blog/' rel='nofollow'>Blog</a>
+</p>
+<p class='vspace'></p><p><a class='urllink' href='http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl' rel='nofollow'>Forum</a>
+</p>
+<p class='vspace'></p><p><a class='urllink' href='http://www.arduino.cc/playground/' rel='nofollow'>Playground</a>
+</p>
+<p class='vspace'></p><p><a class='urllink' href='http://www.arduino.cc/playground/Projects/ArduinoUsers' rel='nofollow'>Exhibition</a>
+</p>
+<p class='vspace'></p><p><a class='wikilink' href='http://www.arduino.cc/en/Hacking/HomePage'>Hacking</a>
+</p>
+<p class='vspace'></p><p><a class='wikilink' href='FAQ.html'>FAQ</a>
+</p>
+<p class='vspace'></p><p><a class='wikilink' href='http://www.arduino.cc/en/Main/Buy'>Buy</a>
+</p>
+
+</div>
+<!--/PageLeftFmt-->
+<div id="pagetext">
+<!--PageText-->
+<div id='wikitext'>
+<p><strong>Reference</strong> &nbsp;  <a class='wikilink' href='index.html'>Language</a> (<a class='wikilink' href='Extended.html'>extended</a>) | <a class='wikilink' href='Libraries.html'>Libraries</a> | <a class='wikilink' href='Comparison.html'>Comparison</a>
+</p>
+<p class='vspace'></p><h2>Stepper Library Example Sketch</h2>
+<h4>Description</h4>
+<p>A stepper motor follows the turns of a potentiometer (or other sensor) on analog input 0.  The <a class='wikilink' href='StepperUnipolarCircuit.html'>unipolar</a> or <a class='wikilink' href='StepperBipolarCircuit.html'>bipolar</a> stepper is controlled with pins 8, 9, 10, and 11, using one of the circuits on the linked pages.
+</p>
+<p class='vspace'></p><h4>Code</h4>
+<pre>
+#include &lt;Stepper.h&gt;
+
+// change this to the number of steps on your motor
+#define STEPS 100
+
+// create an instance of the stepper class, specifying
+// the number of steps of the motor and the pins it's
+// attached to
+Stepper stepper(STEPS, 8, 9, 10, 11);
+
+// the previous reading from the analog input
+int previous = 0;
+
+void setup()
+{
+  // set the speed of the motor to 30 RPMs
+  stepper.setSpeed(30);
+}
+
+void loop()
+{
+  // get the sensor value
+  int val = analogRead(0);
+
+  // move a number of steps equal to the change in the
+  // sensor reading
+  stepper.step(val - previous);
+
+  // remember the previous value of the sensor
+  previous = val;
+}
+
+</pre><p><a class='wikilink' href='index.html'>Reference Home</a>
+</p>
+<p class='vspace'></p><p><em>Corrections, suggestions, and new documentation should be posted to the <a class='urllink' href='http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?board=swbugs' rel='nofollow'>Forum</a>.</em>
+</p>
+<p class='vspace'></p><p>The text of the Arduino reference is licensed under a
+<a class='urllink' href='http://creativecommons.org/licenses/by-sa/3.0/' rel='nofollow'>Creative Commons Attribution-ShareAlike 3.0 License</a>.  Code samples in the reference are released into the public domain.
+</p>
+</div>
+
+</div>
+<!--PageFooterFmt-->
+<div id="pagefooter">
+  <a href='#'>Edit Page</a> | <a href='#'>Page History</a> | <a href='#' target='_blank'>Printable View</a> | <a href='http://www.arduino.cc/en/Site/AllRecentChanges'>All Recent Site Changes</a>
+</div>
+<!--/PageFooterFmt-->
+</div>
+</body>
+</html>

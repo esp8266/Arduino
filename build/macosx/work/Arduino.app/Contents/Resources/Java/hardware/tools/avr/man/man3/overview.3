@@ -1,0 +1,147 @@
+.TH "overview" 3 "6 Nov 2008" "Version 1.6.4" "avr-libc" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+overview \- Toolchain Overview 
+.SH "Introduction"
+.PP
+Welcome to the open source software development toolset for the Atmel AVR!
+.PP
+There is not a single tool that provides everything needed to develop software for the AVR. It takes many tools working together. Collectively, the group of tools are called a toolset, or commonly a toolchain, as the tools are chained together to produce the final executable application for the AVR microcontroller.
+.PP
+The following sections provide an overview of all of these tools. You may be used to cross-compilers that provide everything with a GUI front-end, and not know what goes on 'underneath the hood'. You may be coming from a desktop or server computer background and not used to embedded systems. Or you may be just learning about the most common software development toolchain available on Unix and Linux systems. Hopefully the following overview will be helpful in putting everything in perspective.
+.SH "FSF and GNU"
+.PP
+According to its website, 'the Free Software Foundation (FSF), established in 1985, is dedicated to promoting computer users' rights to use, study, copy, modify, and redistribute computer programs. The FSF promotes the development and use of free software, particularly the GNU operating system, used widely in its GNU/Linux variant.' The FSF remains the primary sponsor of the GNU project.
+.PP
+The GNU Project was launched in 1984 to develop a complete Unix-like operating system which is free software: the GNU system. GNU is a recursive acronym for »GNU's Not Unix«; it is pronounced guh-noo, approximately like canoe.
+.PP
+One of the main projects of the GNU system is the GNU Compiler Collection, or GCC, and its sister project, GNU Binutils. These two open source projects provide a foundation for a software development toolchain. Note that these projects were designed to originally run on Unix-like systems.
+.SH "GCC"
+.PP
+GCC stands for GNU Compiler Collection. GCC is highly flexible compiler system. It has different compiler front-ends for different languages. It has many back-ends that generate assembly code for many different processors and host operating systems. All share a common 'middle-end', containing the generic parts of the compiler, including a lot of optimizations.
+.PP
+In GCC, a \fIhost\fP system is the system (processor/OS) that the compiler runs on. A \fItarget\fP system is the system that the compiler compiles code for. And, a \fIbuild\fP system is the system that the compiler is built (from source code) on. If a compiler has the same system for \fIhost\fP and for \fItarget\fP, it is known as a \fInative\fP compiler. If a compiler has different systems for \fIhost\fP and \fItarget\fP, it is known as a cross-compiler. (And if all three, \fIbuild\fP, \fIhost\fP, and \fItarget\fP systems are different, it is known as a Canadian cross compiler, but we won't discuss that here.) When GCC is built to execute on a \fIhost\fP system such as FreeBSD, Linux, or Windows, and it is built to generate code for the AVR microcontroller \fItarget\fP, then it is a cross compiler, and this version of GCC is commonly known as 'AVR GCC'. In documentation, or discussion, AVR GCC is used when referring to GCC targeting specifically the AVR, or something that is AVR specific about GCC. The term 'GCC' is usually used to refer to something generic about GCC, or about GCC as a whole.
+.PP
+GCC is different from most other compilers. GCC focuses on translating a high-level language to the target assembly only. AVR GCC has three available compilers for the AVR: C language, C++, and Ada. The compiler itself does not assemble or link the final code.
+.PP
+GCC is also known as a 'driver' program, in that it knows about, and drives other programs seamlessly to create the final output. The assembler, and the linker are part of another open source project called GNU Binutils. GCC knows how to drive the GNU assembler (gas) to assemble the output of the compiler. GCC knows how to drive the GNU linker (ld) to link all of the object modules into a final executable.
+.PP
+The two projects, GCC and Binutils, are very much interrelated and many of the same volunteers work on both open source projects.
+.PP
+When GCC is built for the AVR target, the actual program names are prefixed with 'avr-'. So the actual executable name for AVR GCC is: avr-gcc. The name 'avr-gcc' is used in documentation and discussion when referring to the program itself and not just the whole AVR GCC system.
+.PP
+See the GCC Web Site and GCC User Manual for more information about GCC.
+.SH "GNU Binutils"
+.PP
+The name GNU Binutils stands for 'Binary Utilities'. It contains the GNU assembler (gas), and the GNU linker (ld), but also contains many other utilities that work with binary files that are created as part of the software development toolchain.
+.PP
+Again, when these tools are built for the AVR target, the actual program names are prefixed with 'avr-'. For example, the assembler program name, for a native assembler is 'as' (even though in documentation the GNU assembler is commonly referred to as 'gas'). But when built for an AVR target, it becomes 'avr-as'. Below is a list of the programs that are included in Binutils:
+.PP
+\fBavr-as\fP.RS 4
+The Assembler.
+.RE
+.PP
+\fBavr-ld\fP.RS 4
+The Linker.
+.RE
+.PP
+\fBavr-ar\fP.RS 4
+Create, modify, and extract from libraries (archives).
+.RE
+.PP
+\fBavr-ranlib\fP.RS 4
+Generate index to library (archive) contents.
+.RE
+.PP
+\fBavr-objcopy\fP.RS 4
+Copy and translate object files to different formats.
+.RE
+.PP
+\fBavr-objdump\fP.RS 4
+Display information from object files including disassembly.
+.RE
+.PP
+\fBavr-size\fP.RS 4
+List section sizes and total size.
+.RE
+.PP
+\fBavr-nm\fP.RS 4
+List symbols from object files.
+.RE
+.PP
+\fBavr-strings\fP.RS 4
+List printable strings from files.
+.RE
+.PP
+\fBavr-strip\fP.RS 4
+Discard symbols from files.
+.RE
+.PP
+\fBavr-readelf\fP.RS 4
+Display the contents of ELF format files.
+.RE
+.PP
+\fBavr-addr2line\fP.RS 4
+Convert addresses to file and line.
+.RE
+.PP
+\fBavr-c++filt\fP.RS 4
+Filter to demangle encoded C++ symbols.
+.RE
+.PP
+.SH "avr-libc"
+.PP
+GCC and Binutils provides a lot of the tools to develop software, but there is one critical component that they do not provide: a Standard C Library.
+.PP
+There are different open source projects that provide a Standard C Library depending upon your system time, whether for a native compiler (GNU Libc), for some other embedded system (newlib), or for some versions of Linux (uCLibc). The open source AVR toolchain has its own Standard C Library project: avr-libc.
+.PP
+AVR-Libc provides many of the same functions found in a regular Standard C Library and many additional library functions that is specific to an AVR. Some of the Standard C Library functions that are commonly used on a PC environment have limitations or additional issues that a user needs to be aware of when used on an embedded system.
+.PP
+AVR-Libc also contains the most documentation about the whole AVR toolchain.
+.SH "Building Software"
+.PP
+Even though GCC, Binutils, and avr-libc are the core projects that are used to build software for the AVR, there is another piece of software that ties it all together: Make. GNU Make is a program that makes things, and mainly software. Make interprets and executes a Makefile that is written for a project. A Makefile contains dependency rules, showing which output files are dependent upon which input files, and instructions on how to build output files from input files.
+.PP
+Some distributions of the toolchains, and other AVR tools such as MFile, contain a Makefile template written for the AVR toolchain and AVR applications that you can copy and modify for your application.
+.PP
+See the GNU Make User Manual for more information.
+.SH "AVRDUDE"
+.PP
+After creating your software, you'll want to program your device. You can do this by using the program AVRDUDE which can interface with various hardware devices to program your processor.
+.PP
+AVRDUDE is a very flexible package. All the information about AVR processors and various hardware programmers is stored in a text database. This database can be modified by any user to add new hardware or to add an AVR processor if it is not already listed.
+.SH "GDB / Insight / DDD"
+.PP
+The GNU Debugger (GDB) is a command-line debugger that can be used with the rest of the AVR toolchain. Insight is GDB plus a GUI written in Tcl/Tk. Both GDB and Insight are configured for the AVR and the main executables are prefixed with the target name: avr-gdb, and avr-insight. There is also a 'text mode' GUI for GDB: avr-gdbtui. DDD (Data Display Debugger) is another popular GUI front end to GDB, available on Unix and Linux systems.
+.SH "AVaRICE"
+.PP
+AVaRICE is a back-end program to AVR GDB and interfaces to the Atmel JTAG In-Circuit Emulator (ICE), to provide emulation capabilities.
+.SH "SimulAVR"
+.PP
+SimulAVR is an AVR simulator used as a back-end with AVR GDB. Unfortunately, this project is currently unmaintained and could use some help.
+.SH "Utilities"
+.PP
+There are also other optional utilities available that may be useful to add to your toolset.
+.PP
+\fCSRecord\fP is a collection of powerful tools for manipulating EPROM load files. It reads and writes numerous EPROM file formats, and can perform many different manipulations.
+.PP
+\fCMFile\fP is a simple Makefile generator is meant as an aid to quickly customize a Makefile to use for your AVR application.
+.SH "Toolchain Distributions (Distros)"
+.PP
+All of the various open source projects that comprise the entire toolchain are normally distributed as source code. It is left up to the user to build the tool application from its source code. This can be a very daunting task to any potential user of these tools.
+.PP
+Luckily there are people who help out in this area. Volunteers take the time to build the application from source code on particular host platforms and sometimes packaging the tools for convenient installation by the end user. These packages contain the binary executables of the tools, pre-made and ready to use. These packages are known as 'distributions' of the AVR toolchain, or by a more shortened name, 'distros'.
+.PP
+AVR toolchain distros are available on FreeBSD, Windows, Mac OS X, and certain flavors of Linux.
+.SH "Open Source"
+.PP
+All of these tools, from the original source code in the multitude of projects, to the various distros, are put together by many, many volunteers. All of these projects could always use more help from other people who are willing to volunteer some of their time. There are many different ways to help, for people with varying skill levels, abilities, and available time.
+.PP
+You can help to answer questions in mailing lists such as the avr-gcc-list, or on forums at the AVR Freaks website. This helps many people new to the open source AVR tools.
+.PP
+If you think you found a bug in any of the tools, it is always a big help to submit a good bug report to the proper project. A good bug report always helps other volunteers to analyze the problem and to get it fixed for future versions of the software.
+.PP
+You can also help to fix bugs in various software projects, or to add desirable new features.
+.PP
+Volunteers are always welcome! :-) 

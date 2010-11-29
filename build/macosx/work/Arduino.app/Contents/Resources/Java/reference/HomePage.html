@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+  <title>Arduino - Reference </title>
+  <link rel='stylesheet' href='arduino.css' type='text/css' />
+</head>
+<body>
+<div id="page">
+<!--PageHeaderFmt-->
+<div id="pageheader">
+  <div class="title"><a href="http://www.arduino.cc/">Arduino</a></div>
+  <div class="search">
+    <!-- SiteSearch Google -->    <FORM method=GET action="http://www.google.com/search">    <input type=hidden name=ie value=UTF-8>    <input type=hidden name=oe value=UTF-8>    <INPUT TYPE=text name=q size=25 maxlength=255 value="">    <INPUT type=submit name=btnG VALUE="search">    <input type=hidden name=domains value="http://www.arduino.cc/">
+    <input type=hidden name=sitesearch value="http://www.arduino.cc/">
+    </FORM>    <!-- SiteSearch Google -->
+  </div>
+</div>
+<!--/PageHeaderFmt-->
+<!--PageLeftFmt-->
+<div id="pagenav">
+  <p><a class='wikilink' href='Guide_index.html'>Guide</a>
+</p>
+<p class='vspace'></p><p><a class='wikilink' href='http://www.arduino.cc/en/Tutorial/HomePage'>Tutorials</a>
+</p>
+<p class='vspace'></p><p><a class='selflink' href='index.html'>Reference</a>
+</p>
+<p class='vspace'></p><p><a class='wikilink' href='http://www.arduino.cc/en/Main/Hardware'>Hardware</a>
+</p>
+<p class='vspace'></p><p><a class='wikilink' href='http://www.arduino.cc/en/Main/Software'>Software</a>
+</p>
+<p class='vspace'></p><p><a class='urllink' href='http://www.arduino.cc/blog/' rel='nofollow'>Blog</a>
+</p>
+<p class='vspace'></p><p><a class='urllink' href='http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl' rel='nofollow'>Forum</a>
+</p>
+<p class='vspace'></p><p><a class='urllink' href='http://www.arduino.cc/playground/' rel='nofollow'>Playground</a>
+</p>
+<p class='vspace'></p><p><a class='urllink' href='http://www.arduino.cc/playground/Projects/ArduinoUsers' rel='nofollow'>Exhibition</a>
+</p>
+<p class='vspace'></p><p><a class='wikilink' href='http://www.arduino.cc/en/Hacking/HomePage'>Hacking</a>
+</p>
+<p class='vspace'></p><p><a class='wikilink' href='http://www.arduino.cc/en/Main/FAQ'>FAQ</a>
+</p>
+<p class='vspace'></p><p><a class='wikilink' href='http://www.arduino.cc/en/Main/Buy'>Buy</a>
+</p>
+
+</div>
+<!--/PageLeftFmt-->
+<div id="pagetext">
+<!--PageText-->
+<div id='wikitext'>
+<p><strong>Reference</strong> &nbsp;  <a class='selflink' href='index.html'>Language</a> (<a class='wikilink' href='Extended.html'>extended</a>) | <a class='wikilink' href='Libraries.html'>Libraries</a> | <a class='wikilink' href='Comparison.html'>Comparison</a>
+</p>
+<p class='vspace'></p><h1>Arduino Reference</h1>
+<p><em>See the <strong><a class='wikilink' href='Extended.html'>extended reference</a></strong> for more advanced features of the Arduino languages.</em>
+</p>
+<p class='vspace'></p><p>Arduino programs can be divided in three main parts: <em>structure</em>, <em>values</em> (variables and constants), and <em>functions</em>.  The Arduino language is based on C/C++.
+</p>
+<p class='vspace'></p>
+<table  width='90%' border='0' cellpadding='5' cellspacing='0'><tr><td  width='50%' valign='top'>
+<h2>Structure</h2>
+<p>An Arduino program run in two parts:
+</p>
+<p class='vspace'></p><ul><li>void <a class='wikilink' href='Setup.html'>setup</a>()
+</li><li>void <a class='wikilink' href='Loop.html'>loop</a>()
+</li></ul><p class='vspace'></p><p>setup() is preparation, and loop() is execution. In the setup section, always at the top of your program, you would set <a class='wikilink' href='PinMode.html'>pinModes</a>, initialize serial communication, etc. The loop section is the code to be executed -- reading inputs, triggering outputs, etc.
+</p>
+<p class='vspace'></p><ul><li><a class='wikilink' href='VariableDeclaration.html'>Variable Declaration</a>
+</li><li><a class='wikilink' href='FunctionDeclaration.html'>Function Declaration</a>
+<ul><li><a class='wikilink' href='Void.html'>void</a>
+</li></ul></li></ul><p class='vspace'></p><h4>Control Structures</h4>
+<ul><li><a class='wikilink' href='If.html'>if</a>
+</li><li><a class='wikilink' href='Else.html'>if...else</a>
+</li><li><a class='wikilink' href='For.html'>for</a>
+</li><li><a class='wikilink' href='SwitchCase.html'>switch case</a>
+</li><li><a class='wikilink' href='While.html'>while</a>
+</li><li><a class='wikilink' href='DoWhile.html'>do... while</a>
+</li><li><a class='wikilink' href='Break.html'>break</a>
+</li><li><a class='wikilink' href='Continue.html'>continue</a>
+</li><li><a class='wikilink' href='Return.html'>return</a>
+</li></ul><p class='vspace'></p><h4>Further Syntax</h4>
+<ul><li><a class='wikilink' href='SemiColon.html'>;</a> (semicolon)
+</li><li><a class='wikilink' href='Braces.html'>{}</a> (curly braces)
+</li><li><a class='wikilink' href='Comments.html'>//</a> (single line comment)
+</li><li><a class='wikilink' href='Comments.html'>/* */</a> (multi-line comment)
+</li></ul><p class='vspace'></p><h4>Arithmetic Operators</h4>
+<ul><li><a class='wikilink' href='Arithmetic.html'>plus</a> (addition)
+</li><li><a class='wikilink' href='Arithmetic.html'>-</a> (subtraction)
+</li><li><a class='wikilink' href='Arithmetic.html'>*</a> (multiplication)
+</li><li><a class='wikilink' href='Arithmetic.html'>/</a> (division)
+</li><li><a class='wikilink' href='Modulo.html'>%</a> (modulo)
+</li></ul><p class='vspace'></p><h4>Comparison Operators</h4>
+<ul><li><a class='wikilink' href='If.html'>==</a> (equal to)
+</li><li><a class='wikilink' href='If.html'>!=</a> (not equal to)
+</li><li><a class='wikilink' href='If.html'>&lt;</a> (less than)
+</li><li><a class='wikilink' href='If.html'>&gt;</a> (greater than)
+</li><li><a class='wikilink' href='If.html'>&lt;=</a> (less than or equal to)
+</li><li><a class='wikilink' href='If.html'>&gt;=</a> (greater than or equal to)
+</li></ul><p class='vspace'></p><h4>Boolean Operators</h4>
+<ul><li><a class='wikilink' href='Boolean.html'>&amp;&amp;</a> (and)
+</li><li><a class='wikilink' href='Boolean.html'>||</a> (or)
+</li><li><a class='wikilink' href='Boolean.html'>!</a> (not)
+</li></ul><p class='vspace'></p><h4>Compound Operators</h4>
+<ul><li><a class='wikilink' href='Increment.html'>++</a> (increment)
+</li><li><a class='wikilink' href='Increment.html'>--</a> (decrement)
+</li><li><a class='wikilink' href='IncrementCompound.html'>+=</a> (compound addition)
+</li><li><a class='wikilink' href='IncrementCompound.html'>-=</a> (compound subtraction)
+</li><li><a class='wikilink' href='IncrementCompound.html'>*=</a> (compound multiplication)
+</li><li><a class='wikilink' href='IncrementCompound.html'>/=</a> (compound division)
+</li></ul><p class='vspace'></p><h2>Variables</h2>
+<p>Variables are expressions that you can use in programs to store values, such as a sensor reading from an analog pin.  
+</p>
+<p class='vspace'></p><h4>Constants</h4>
+<p>Constants are particular values with specific meanings.  
+</p>
+<p class='vspace'></p><ul><li><a class='wikilink' href='Constants.html'>HIGH</a> | <a class='wikilink' href='Constants.html'>LOW</a>
+</li><li><a class='wikilink' href='Constants.html'>INPUT</a> | <a class='wikilink' href='Constants.html'>OUTPUT</a>
+<p class='vspace'></p></li><li><a class='wikilink' href='IntegerConstants.html'>Integer Constants</a>
+</li></ul><p class='vspace'></p><h4>Data Types</h4>
+<p>Variables can have various types, which are described below.  
+</p>
+<p class='vspace'></p><ul><li><a class='wikilink' href='BooleanVariables.html'>boolean</a>
+</li><li><a class='wikilink' href='Char.html'>char</a>
+</li><li><a class='wikilink' href='Byte.html'>byte</a>
+</li><li><a class='wikilink' href='Int.html'>int</a>
+</li><li><a class='wikilink' href='UnsignedInt.html'>unsigned int</a>
+</li><li><a class='wikilink' href='Long.html'>long</a>
+</li><li><a class='wikilink' href='UnsignedLong.html'>unsigned long</a>
+</li><li><a class='wikilink' href='Float.html'>float</a>
+</li><li><a class='wikilink' href='Double.html'>double</a>
+</li><li><a class='wikilink' href='String.html'>string</a>
+</li><li><a class='wikilink' href='Array.html'>array</a>
+</li></ul><p class='vspace'></p><h2>Reference</h2>
+<ul><li><a class='wikilink' href='ASCIIchart.html'>ASCII chart</a>
+</li></ul><p class='vspace'></p></td><td  width='50%' valign='top'> 
+<h2>Functions</h2>
+<p><strong>Digital I/O</strong>
+</p><ul><li><a class='wikilink' href='PinMode.html'>pinMode</a>(pin, mode)   
+</li><li><a class='wikilink' href='DigitalWrite.html'>digitalWrite</a>(pin, value) 
+</li><li>int <a class='wikilink' href='DigitalRead.html'>digitalRead</a>(pin)
+</li></ul><p class='vspace'></p><p><strong>Analog I/O</strong>
+</p><ul><li>int <a class='wikilink' href='AnalogRead.html'>analogRead</a>(pin) 
+</li><li><a class='wikilink' href='AnalogWrite.html'>analogWrite</a>(pin, value) - <em>PWM</em>
+</li></ul><p class='vspace'></p><p><strong>Advanced I/O</strong>
+</p><ul><li><a class='wikilink' href='ShiftOut.html'>shiftOut</a>(dataPin, clockPin, bitOrder, value) 
+</li><li>unsigned long <a class='wikilink' href='PulseIn.html'>pulseIn</a>(pin, value)
+</li></ul><p class='vspace'></p><p><strong>Time</strong>
+</p><ul><li>unsigned long <a class='wikilink' href='Millis.html'>millis</a>()   
+</li><li><a class='wikilink' href='Delay.html'>delay</a>(ms)  
+</li><li><a class='wikilink' href='DelayMicroseconds.html'>delayMicroseconds</a>(us)
+</li></ul><p class='vspace'></p><p><strong>Math</strong>
+</p><ul><li><a class='wikilink' href='Min.html'>min</a>(x, y)
+</li><li><a class='wikilink' href='Max.html'>max</a>(x, y)
+</li><li><a class='wikilink' href='Abs.html'>abs</a>(x)
+</li><li><a class='wikilink' href='Constrain.html'>constrain</a>(x, a, b)
+</li></ul><p class='vspace'></p><p><strong>Random Numbers</strong>
+</p>
+<p class='vspace'></p><ul><li><a class='wikilink' href='RandomSeed.html'>randomSeed</a>(seed)
+</li><li>long <a class='wikilink' href='Random.html'>random</a>(max)
+</li><li>long <a class='wikilink' href='Random.html'>random</a>(min, max)
+</li></ul><p class='vspace'></p><p><strong>Serial Communication</strong>
+</p>
+<p class='vspace'></p><p>Used for communication between the Arduino board and a computer or other devices.  This communication happens via the Arduino board's serial or USB connection and on digital pins 0 (RX) and 1 (TX).  Thus, if you use these functions, <em>you cannot also use pins 0 and 1 for digital i/o.</em>
+</p>
+<p class='vspace'></p><ul><li><a class='wikilink' href='Serial_Begin.html'>Serial.begin</a>(speed)
+</li><li>int <a class='wikilink' href='Serial_Available.html'>Serial.available</a>()
+</li><li>int <a class='wikilink' href='Serial_Read.html'>Serial.read</a>()
+</li><li><a class='wikilink' href='Serial_Flush.html'>Serial.flush</a>()
+</li><li><a class='wikilink' href='Serial_Print.html'>Serial.print</a>(data)
+</li><li><a class='wikilink' href='Serial_Println.html'>Serial.println</a>(data)
+</li></ul><p class='vspace'></p><p><br clear='all' />
+</p>
+<p class='vspace'></p><p><strong>Didn't find something?</strong>  Check the <a class='wikilink' href='Extended.html'>extended reference</a>.
+</p>
+<p class='vspace'></p></td></tr></table>
+<p><a class='selflink' href='index.html'>Reference Home</a>
+</p>
+<p class='vspace'></p><p><em>Corrections, suggestions, and new documentation should be posted to the <a class='urllink' href='http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?board=swbugs' rel='nofollow'>Forum</a>.</em>
+</p>
+<p class='vspace'></p><p>The text of the Arduino reference is licensed under a
+<a class='urllink' href='http://creativecommons.org/licenses/by-sa/3.0/' rel='nofollow'>Creative Commons Attribution-ShareAlike 3.0 License</a>.  Code samples in the reference are released into the public domain.
+</p>
+</div>
+
+</div>
+<!--PageFooterFmt-->
+<div id="pagefooter">
+  <a href='#'>Edit Page</a> | <a href='#'>Page History</a> | <a href='#' target='_blank'>Printable View</a> | <a href='RecentChanges.html'>Recent Site Changes</a>
+</div>
+<!--/PageFooterFmt-->
+</div>
+</body>
+</html>
