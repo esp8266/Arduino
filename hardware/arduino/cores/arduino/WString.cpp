@@ -434,3 +434,19 @@ void String::toCharArray(char *buf, unsigned int bufsize)
   strncpy(buf, _buffer, len);
   buf[len] = 0;
 }
+
+
+long String::toInt() {
+  String temp = _buffer;
+  long value = 0;
+  
+  for (unsigned int charPos = 0; charPos < _length; charPos++) {
+    int thisChar = temp[charPos];
+    if (isdigit(thisChar)) {
+      value *= 10;
+      value += (thisChar - '0');
+    }
+  }
+  
+  return value;
+}
