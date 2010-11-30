@@ -150,18 +150,6 @@ void SetupHardware(void)
 	AVR_RESET_LINE_DDR  |= AVR_RESET_LINE_MASK;
 }
 
-/** Event handler for the library USB Connection event. */
-void EVENT_USB_Device_Connect(void)
-{
-
-}
-
-/** Event handler for the library USB Disconnection event. */
-void EVENT_USB_Device_Disconnect(void)
-{
-
-}
-
 /** Event handler for the library USB Configuration Changed event. */
 void EVENT_USB_Device_ConfigurationChanged(void)
 {
