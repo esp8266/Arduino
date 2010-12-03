@@ -13,6 +13,7 @@
  ** CS - pin 4
  
  created  24 Nov 2010
+ updated 2 Dec 2010
  by Tom Igoe
  
  This example code is in the public domain.
@@ -31,8 +32,9 @@ void setup()
 {
   Serial.begin(9600);
   Serial.print("Initializing SD card...");
-  
-  pinMode(10, OUTPUT);
+  // make sure that the default chip select pin is set to
+  // output, even if you don't use it:
+ // pinMode(10, OUTPUT);
   
   // see if the card is present and can be initialized:
   if (!SD.begin(chipSelect)) {
@@ -58,7 +60,7 @@ void loop()
   }
 
   // open the file:
-  File dataFile = SD.open("datalog.txt", true, true);
+  File dataFile = SD.open("datalog.txt", FILE_APPEND);
 
   // if the file is available, write to it:
   if (dataFile) {
