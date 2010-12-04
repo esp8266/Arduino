@@ -20,8 +20,7 @@
 #ifndef Character_h
 #define Character_h
 
-
-#include "WProgram.h"
+#include <ctype.h>
 
 // WCharacter.h prototypes
 inline boolean isAlphaNumeric(int c) __attribute__((always_inline));
@@ -117,8 +116,8 @@ inline boolean isPunct(int c)
 
 
 // Checks for white-space characters. For the avr-libc library, 
-// these are: space, formfeed (’\f’), newline (’\n’), carriage 
-// return (’\r’), horizontal tab (’\t’), and vertical tab (’\v’).
+// these are: space, formfeed ('\f'), newline ('\n'), carriage 
+// return ('\r'), horizontal tab ('\t'), and vertical tab ('\v').
 inline boolean isSpace(int c)
 {
   return ( isspace (c) == 0 ? false : true);

@@ -13,9 +13,6 @@
  This example code is in the public domain. 
  */
 
-// include the character conversion functions:
-#include <WCharacter.h>
-
 String inString = "";    // string to hold input
 
 void setup() {

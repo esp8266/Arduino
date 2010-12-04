@@ -1,8 +1,7 @@
 /*
   Character analysis operators 
  
- Examples using the character analysis operators 
- from WCharacter.h, by Hernando Barragan.
+ Examples using the character analysis operators.
  Send any byte and the sketch will tell you about it.
  
  created 29 Nov 2010
@@ -10,8 +9,6 @@
  
  This example code is in the public domain.
  */
-
-#include <WCharacter.h>     // include the character analysis library
 
 void setup() {
   // Open serial communications:
