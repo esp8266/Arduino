@@ -88,10 +88,15 @@ int main(void)
 
 	for (;;)
 	{
-		/* Read bytes from the USB OUT endpoint into the USART transmit buffer */
-		int16_t ReceivedByte = CDC_Device_ReceiveByte(&VirtualSerial_CDC_Interface);
-		if (!(ReceivedByte < 0) && !(RingBuffer_IsFull(&USBtoUSART_Buffer)))
-		  RingBuffer_Insert(&USBtoUSART_Buffer, ReceivedByte);		
+		/* Only try to read in bytes from the CDC interface if the transmit buffer is not full */
+		if (!(RingBuffer_IsFull(&USBtoUSART_Buffer)))
+		{
+			int16_t ReceivedByte = CDC_Device_ReceiveByte(&VirtualSerial_CDC_Interface);
+
+			/* Read bytes from the USB OUT endpoint into the USART transmit buffer */
+			if (!(ReceivedByte < 0))
+			  RingBuffer_Insert(&USBtoUSART_Buffer, ReceivedByte);
+		}
 		
 		/* Check if the UART receive buffer flush timer has expired or the buffer is nearly full */
 		RingBuff_Count_t BufferCount = RingBuffer_GetCount(&USARTtoUSB_Buffer);
@@ -153,10 +158,7 @@ void SetupHardware(void)
 /** Event handler for the library USB Configuration Changed event. */
 void EVENT_USB_Device_ConfigurationChanged(void)
 {
-
-
-	if (!(CDC_Device_ConfigureEndpoints(&VirtualSerial_CDC_Interface))) 
-		;
+	CDC_Device_ConfigureEndpoints(&VirtualSerial_CDC_Interface);
 }
 
 /** Event handler for the library USB Unhandled Control Request event. */
@@ -205,12 +207,13 @@ void EVENT_CDC_Device_LineEncodingChanged(USB_ClassInfo_CDC_Device_t* const CDCI
 	UCSR1C = 0;
 
 	/* Special case 57600 baud for compatibility with the ATmega328 bootloader. */	
-	UCSR1A = (CDCInterfaceInfo->State.LineEncoding.BaudRateBPS == 57600) ? 0 : (1 << U2X1);
-	UCSR1B = ((1 << RXCIE1) | (1 << TXEN1) | (1 << RXEN1));
-	UCSR1C = ConfigMask;    
 	UBRR1  = (CDCInterfaceInfo->State.LineEncoding.BaudRateBPS == 57600)
 			 ? SERIAL_UBBRVAL(CDCInterfaceInfo->State.LineEncoding.BaudRateBPS)
 			 : SERIAL_2X_UBBRVAL(CDCInterfaceInfo->State.LineEncoding.BaudRateBPS);	
+
+	UCSR1C = ConfigMask;
+	UCSR1A = (CDCInterfaceInfo->State.LineEncoding.BaudRateBPS == 57600) ? 0 : (1 << U2X1);
+	UCSR1B = ((1 << RXCIE1) | (1 << TXEN1) | (1 << RXEN1));
 }
 
 /** ISR to manage the reception of data from the serial port, placing received bytes into a circular buffer
@@ -233,11 +236,7 @@ void EVENT_CDC_Device_ControLineStateChanged(USB_ClassInfo_CDC_Device_t* const C
 	bool CurrentDTRState = (CDCInterfaceInfo->State.ControlLineStates.HostToDevice & CDC_CONTROL_LINE_OUT_DTR);
 
 	if (CurrentDTRState)
-	{
-		AVR_RESET_LINE_PORT &= ~AVR_RESET_LINE_MASK;
-	}
+	  AVR_RESET_LINE_PORT &= ~AVR_RESET_LINE_MASK;
 	else
-	{
-		AVR_RESET_LINE_PORT |= AVR_RESET_LINE_MASK;
-	}
+	  AVR_RESET_LINE_PORT |= AVR_RESET_LINE_MASK;
 }
