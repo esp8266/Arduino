@@ -1,3 +1,60 @@
+ARDUINO 0022
+
+[core / libraries]
+
+* Adding an SD card library based on sdfatlib by Bill Greiman and the
+  MemoryCard library by Philip Lindsay (follower) for SparkFun.
+  http://arduino.cc/en/Reference/SD
+
+* Added character manipulation macros (from Wiring): isAlphaNumeric(),
+  isAlpha(), isAscii(), isWhitespace(), isControl(), isDigit(), isGraph(),
+  isLowerCase(), isPrintable(), isPunct(), isSpace(), isUpperCase(),
+  isHexadecimalDigit(), toAscii(), toLowerCase(), toLowerCase().
+  http://code.google.com/p/arduino/issues/detail?id=418
+
+* Added String.toInt() function.
+
+* Refactoring core to use register-based, not CPU-based, #ifdefs.
+  Patch by Mark Sproul.
+  http://code.google.com/p/arduino/issues/detail?id=307
+  http://code.google.com/p/arduino/issues/detail?id=315
+  http://code.google.com/p/arduino/issues/detail?id=316
+  http://code.google.com/p/arduino/issues/detail?id=323
+  http://code.google.com/p/arduino/issues/detail?id=324
+  http://code.google.com/p/arduino/issues/detail?id=340
+
+* Modification of serial baud rate calculation to match bootloader and 8U2
+  firmware at 57600 baud.
+  http://code.google.com/p/arduino/issues/detail?id=394
+
+* Fixed bug in tone() function.
+  http://code.google.com/p/arduino/issues/detail?id=361
+
+* Fixed SPI.setClockDivider() function.
+  http://code.google.com/p/arduino/issues/detail?id=365
+
+* Hardware serial receive interrupt optimization.
+  http://code.google.com/p/arduino/issues/detail?id=391
+
+[environment]
+
+* Fixed problem with copy as html and angle brackets.
+  http://code.google.com/p/arduino/issues/detail?id=29
+
+* Showing serial port selection dialog if serial port not found on upload.
+
+* Remembering serial monitor window size and line ending selection.
+  http://code.google.com/p/arduino/issues/detail?id=96
+  http://code.google.com/p/arduino/issues/detail?id=330
+
+* Replaced oro.jar regular expressions with java.regex ones (patch by
+  Eberhard Fahle and Christian Maglie).
+  http://code.google.com/p/arduino/issues/detail?id=171
+
+* Building the user sketch before the core or libraries, so errors appear
+  faster.  Patch by William Westfield and Paul Stoffregen.
+  http://code.google.com/p/arduino/issues/detail?id=393
+
 ARDUINO 0021 - 2010.10.02
 
 * Modifying VID / PID combination in 8U2 firmwares.
