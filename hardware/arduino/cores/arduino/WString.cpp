@@ -150,14 +150,16 @@ const String & String::operator+=( const String &other )
   _length += other._length;
   if ( _length > _capacity )
   {
-    char *temp = _buffer;
-    getBuffer( _length );
-    if ( _buffer != NULL )
-      strcpy( _buffer, temp );
-    free(temp);
+    char *temp = (char *)realloc(_buffer, _length + 1);
+    if ( temp != NULL ) {
+      _buffer = temp;
+      _capacity = _length;
+    } else {
+      _length -= other._length;
+      return *this;
+    }
   }
-  if ( _buffer != NULL )
-    strcat( _buffer, other._buffer );
+  strcat( _buffer, other._buffer );
   return *this;
 }
 
