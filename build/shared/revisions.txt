@@ -36,6 +36,9 @@ ARDUINO 0022
 * Hardware serial receive interrupt optimization.
   http://code.google.com/p/arduino/issues/detail?id=391
 
+* Applying the timeout parameter of pulseIn() during measurement of the
+  pulse, not just while waiting for it.
+
 [environment]
 
 * Fixed problem with copy as html and angle brackets.
@@ -54,6 +57,8 @@ ARDUINO 0022
 * Building the user sketch before the core or libraries, so errors appear
   faster.  Patch by William Westfield and Paul Stoffregen.
   http://code.google.com/p/arduino/issues/detail?id=393
+
+* Setting application icon under Windows.
 
 ARDUINO 0021 - 2010.10.02
 
