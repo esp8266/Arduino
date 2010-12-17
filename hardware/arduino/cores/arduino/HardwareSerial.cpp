@@ -65,7 +65,7 @@ struct ring_buffer
 
 inline void store_char(unsigned char c, ring_buffer *rx_buffer)
 {
-  int i = (rx_buffer->head + 1) % RX_BUFFER_SIZE;
+  int i = (unsigned int)(rx_buffer->head + 1) % RX_BUFFER_SIZE;
 
   // if we should be storing the received character into the location
   // just before the tail (meaning that the head would advance to the
@@ -194,22 +194,16 @@ HardwareSerial::HardwareSerial(ring_buffer *rx_buffer,
 void HardwareSerial::begin(long baud)
 {
   uint16_t baud_setting;
-  bool use_u2x;
+  bool use_u2x = true;
 
-  // U2X mode is needed for baud rates higher than (CPU Hz / 16)
-  if (baud > F_CPU / 16) {
-    use_u2x = true;
-  } else {
-    // figure out if U2X mode would allow for a better connection
-    
-    // calculate the percent difference between the baud-rate specified and
-    // the real baud rate for both U2X and non-U2X mode (0-255 error percent)
-    uint8_t nonu2x_baud_error = abs((int)(255-((F_CPU/(16*(((F_CPU/8/baud-1)/2)+1))*255)/baud)));
-    uint8_t u2x_baud_error = abs((int)(255-((F_CPU/(8*(((F_CPU/4/baud-1)/2)+1))*255)/baud)));
-    
-    // prefer non-U2X mode because it handles clock skew better
-    use_u2x = (nonu2x_baud_error > u2x_baud_error);
+#if F_CPU == 16000000UL
+  // hardcoded exception for compatibility with the bootloader shipped
+  // with the Duemilanove and previous boards and the firmware on the 8U2
+  // on the Uno and Mega 2560.
+  if (baud == 57600) {
+    use_u2x = false;
   }
+#endif
   
   if (use_u2x) {
     *_ucsra = 1 << _u2x;
@@ -237,7 +231,7 @@ void HardwareSerial::end()
 
 int HardwareSerial::available(void)
 {
-  return (RX_BUFFER_SIZE + _rx_buffer->head - _rx_buffer->tail) % RX_BUFFER_SIZE;
+  return (unsigned int)(RX_BUFFER_SIZE + _rx_buffer->head - _rx_buffer->tail) % RX_BUFFER_SIZE;
 }
 
 int HardwareSerial::peek(void)
@@ -256,7 +250,7 @@ int HardwareSerial::read(void)
     return -1;
   } else {
     unsigned char c = _rx_buffer->buffer[_rx_buffer->tail];
-    _rx_buffer->tail = (_rx_buffer->tail + 1) % RX_BUFFER_SIZE;
+    _rx_buffer->tail = (unsigned int)(_rx_buffer->tail + 1) % RX_BUFFER_SIZE;
     return c;
   }
 }

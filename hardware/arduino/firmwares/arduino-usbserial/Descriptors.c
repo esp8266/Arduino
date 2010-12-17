@@ -68,7 +68,7 @@ USB_Descriptor_Device_t PROGMEM DeviceDescriptor =
 	.VendorID               = 0x03EB, // Atmel
 
 	.ProductID          	= 0x204B, // LUFA USB to Serial Demo Application
-	.ReleaseNumber          = 0x0000,
+	.ReleaseNumber          = 0x0001,
 		
 	.ManufacturerStrIndex   = 0x01,
 	.ProductStrIndex        = 0x02,
@@ -172,7 +172,7 @@ USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor =
 			.EndpointAddress        = (ENDPOINT_DESCRIPTOR_DIR_OUT | CDC_RX_EPNUM),
 			.Attributes             = (EP_TYPE_BULK | ENDPOINT_ATTR_NO_SYNC | ENDPOINT_USAGE_DATA),
 			.EndpointSize           = CDC_TXRX_EPSIZE,
-			.PollingIntervalMS      = 0x00
+			.PollingIntervalMS      = 0x01
 		},
 		
 	.CDC_DataInEndpoint = 
@@ -182,7 +182,7 @@ USB_Descriptor_Configuration_t PROGMEM ConfigurationDescriptor =
 			.EndpointAddress        = (ENDPOINT_DESCRIPTOR_DIR_IN | CDC_TX_EPNUM),
 			.Attributes             = (EP_TYPE_BULK | ENDPOINT_ATTR_NO_SYNC | ENDPOINT_USAGE_DATA),
 			.EndpointSize           = CDC_TXRX_EPSIZE,
-			.PollingIntervalMS      = 0x00
+			.PollingIntervalMS      = 0x01
 		}
 };
 

@@ -55,12 +55,15 @@ unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout)
 			return 0;
 	
 	// wait for the pulse to stop
-	while ((*portInputRegister(port) & bit) == stateMask)
+	while ((*portInputRegister(port) & bit) == stateMask) {
+		if (numloops++ == maxloops)
+			return 0;
 		width++;
+	}
 
 	// convert the reading to microseconds. The loop has been determined
-	// to be 10 clock cycles long and have about 16 clocks between the edge
+	// to be 20 clock cycles long and have about 16 clocks between the edge
 	// and the start of the loop. There will be some error introduced by
 	// the interrupt handlers.
-	return clockCyclesToMicroseconds(width * 10 + 16); 
+	return clockCyclesToMicroseconds(width * 21 + 16); 
 }

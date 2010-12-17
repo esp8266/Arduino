@@ -114,6 +114,26 @@ public class DiscourseFormat {
                         " has been copied to the clipboard.");
   }
 
+  /**
+    * Append a char to a stringbuffer while escaping for proper display in HTML.
+    * @param c input char to escape
+    * @param buffer StringBuffer to append html-safe version of c to.
+    */
+  private void appendToHTML(char c, StringBuffer buffer) {
+    if (!html) {
+      buffer.append(c);
+    } else if (c == '<') {
+      buffer.append("&lt;");
+    } else if (c == '>') {
+      buffer.append("&gt;");
+    } else if (c == '&') {
+      buffer.append("&amp;");
+    } else if (c > 127) {
+      buffer.append("&#" + ((int) c) + ";");  // use unicode entity
+    } else {
+      buffer.append(c);  // normal character
+    }
+  }
 
   // A terrible headache...
   public void appendFormattedLine(StringBuffer cf, int line) {
@@ -138,7 +158,7 @@ public class DiscourseFormat {
     if (tokenMarker == null) {
       for (int j = 0; j < segmentCount; j++) {
         char c = segmentArray[j + segmentOffset];
-        cf = cf.append(c);
+        appendToHTML(c, cf);
 //        int charWidth;
 //        if (c == '\t') {
 //          charWidth = (int) painter.nextTabStop(width, j) - width;
@@ -171,7 +191,7 @@ public class DiscourseFormat {
         if (id == Token.END) {
           char c = segmentArray[segmentOffset + offset];
           if (segmentOffset + offset < limit) {
-            cf.append(c);
+            appendToHTML(c, cf);
           } else {
             cf.append('\n');
           }
@@ -203,7 +223,7 @@ public class DiscourseFormat {
 //              cf.append(' ');
 //            }
           } else {
-            cf.append(c);
+            appendToHTML(c, cf);
           }
           // Place close tags [/]
           if (j == (length - 1) && id != Token.NULL && styles[id].isBold())

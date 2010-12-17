@@ -29,6 +29,7 @@ package processing.app.debug;
 import processing.app.Base;
 import processing.app.Preferences;
 import processing.app.Serial;
+import processing.app.SerialException;
 
 import java.io.*;
 import java.util.*;
@@ -43,7 +44,7 @@ public class AvrdudeUploader extends Uploader  {
 
   // XXX: add support for uploading sketches using a programmer
   public boolean uploadUsingPreferences(String buildPath, String className, boolean verbose)
-  throws RunnerException {
+  throws RunnerException, SerialException {
     this.verbose = verbose;
     Map<String, String> boardPreferences = Base.getBoardPreferences();
     String uploadUsing = boardPreferences.get("upload.using");
@@ -71,7 +72,7 @@ public class AvrdudeUploader extends Uploader  {
   }
   
   private boolean uploadViaBootloader(String buildPath, String className)
-  throws RunnerException {
+  throws RunnerException, SerialException {
     Map<String, String> boardPreferences = Base.getBoardPreferences();
     List commandDownloader = new ArrayList();
     String protocol = boardPreferences.get("upload.protocol");
