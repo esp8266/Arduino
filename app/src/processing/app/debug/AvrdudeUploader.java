@@ -42,33 +42,28 @@ public class AvrdudeUploader extends Uploader  {
   public AvrdudeUploader() {
   }
 
-  // XXX: add support for uploading sketches using a programmer
   public boolean uploadUsingPreferences(String buildPath, String className, boolean verbose)
   throws RunnerException, SerialException {
     this.verbose = verbose;
     Map<String, String> boardPreferences = Base.getBoardPreferences();
-    String uploadUsing = boardPreferences.get("upload.using");
-    if (uploadUsing == null) {
-      // fall back on global preference
-      uploadUsing = Preferences.get("upload.using");
-    }
-    if (uploadUsing.equals("bootloader")) {
-      return uploadViaBootloader(buildPath, className);
-    } else {
-      Target t;
 
-      if (uploadUsing.indexOf(':') == -1) {
-        t = Base.getTarget(); // the current target (associated with the board)
-      } else {
-        String targetName = uploadUsing.substring(0, uploadUsing.indexOf(':'));
-        t = Base.targetsTable.get(targetName);
-        uploadUsing = uploadUsing.substring(uploadUsing.indexOf(':') + 1);
+    // if no protocol is specified for this board, assume it lacks a 
+    // bootloader and upload using the selected programmer.
+    if (boardPreferences.get("upload.protocol") == null) {
+      String programmer = Preferences.get("programmer");
+      Target target = Base.getTarget();
+
+      if (programmer.indexOf(":") != -1) {
+        target = Base.targetsTable.get(programmer.substring(0, programmer.indexOf(":")));
+        programmer = programmer.substring(programmer.indexOf(":") + 1);
       }
-
-      Collection params = getProgrammerCommands(t, uploadUsing);
+      
+      Collection params = getProgrammerCommands(target, programmer);
       params.add("-Uflash:w:" + buildPath + File.separator + className + ".hex:i");
       return avrdude(params);
     }
+
+    return uploadViaBootloader(buildPath, className);
   }
   
   private boolean uploadViaBootloader(String buildPath, String className)
