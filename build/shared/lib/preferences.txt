@@ -237,8 +237,10 @@ run.present.exclusive = false
 run.present.exclusive.macosx = true
 
 # ARDUINO PREFERENCES
-board = atmega328
+board = uno
 target = arduino
+
+programmer = arduino:avrispmkii
 
 upload.using = bootloader
 

@@ -96,8 +96,14 @@ public class AvrdudeUploader extends Uploader  {
     return avrdude(commandDownloader);
   }
   
-  public boolean burnBootloader(String targetName, String programmer) throws RunnerException {
-    return burnBootloader(getProgrammerCommands(Base.targetsTable.get(targetName), programmer));
+  public boolean burnBootloader() throws RunnerException {
+    String programmer = Preferences.get("programmer");
+    Target target = Base.getTarget();
+    if (programmer.indexOf(":") != -1) {
+      target = Base.targetsTable.get(programmer.substring(0, programmer.indexOf(":")));
+      programmer = programmer.substring(programmer.indexOf(":") + 1);
+    }
+    return burnBootloader(getProgrammerCommands(target, programmer));
   }
   
   private Collection getProgrammerCommands(Target target, String programmer) {

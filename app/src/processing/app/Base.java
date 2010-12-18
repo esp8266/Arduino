@@ -1017,22 +1017,28 @@ public class Base {
   }
   
   
-  public void rebuildBurnBootloaderMenu(JMenu menu) {
-    //System.out.println("rebuilding burn bootloader menu");
+  public void rebuildProgrammerMenu(JMenu menu) {
+    //System.out.println("rebuilding programmer menu");
     menu.removeAll();      
+    ButtonGroup group = new ButtonGroup();
     for (Target target : targetsTable.values()) {
       for (String programmer : target.getProgrammers().keySet()) {
         AbstractAction action = 
           new AbstractAction(
-            "w/ " + target.getProgrammers().get(programmer).get("name")) {
+            target.getProgrammers().get(programmer).get("name")) {
             public void actionPerformed(ActionEvent actionevent) {
-              activeEditor.handleBurnBootloader((String) getValue("target"),
-                                                (String) getValue("programmer"));
+              Preferences.set("programmer", getValue("target") + ":" +
+                                            getValue("programmer"));
             }
           };
         action.putValue("target", target.getName());
         action.putValue("programmer", programmer);
-        JMenuItem item = new JMenuItem(action);
+        JMenuItem item = new JRadioButtonMenuItem(action);
+        if (Preferences.get("programmer").equals(target.getName() + ":" +
+                                                 programmer)) {
+          item.setSelected(true);
+        }
+        group.add(item);
         menu.add(item);
       }
     }

@@ -693,12 +693,20 @@ public class Editor extends JFrame implements RunnerListener {
       serialMenu = new JMenu("Serial Port");
     populateSerialMenu();
     menu.add(serialMenu);
-	  
+    
     menu.addSeparator();
+    
+    JMenu programmerMenu = new JMenu("Programmer");
+    base.rebuildProgrammerMenu(programmerMenu);
+    menu.add(programmerMenu);
 
-    JMenu bootloaderMenu = new JMenu("Burn Bootloader");
-    base.rebuildBurnBootloaderMenu(bootloaderMenu);
-    menu.add(bootloaderMenu);
+    item = new JMenuItem("Burn Bootloader");
+    item.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        handleBurnBootloader();
+      }
+    });
+    menu.add(item);
         
     menu.addMenuListener(new MenuListener() {
       public void menuCanceled(MenuEvent e) {}
@@ -989,8 +997,8 @@ public class Editor extends JFrame implements RunnerListener {
     //serialMenu.addSeparator();
     //serialMenu.add(item);
   }
-
-
+  
+  
   protected JMenu buildHelpMenu() {
     // To deal with a Mac OS X 10.5 bug, add an extra space after the name
     // so that the OS doesn't try to insert its slow help menu.
@@ -2440,14 +2448,14 @@ public class Editor extends JFrame implements RunnerListener {
   }
 
 
-  protected void handleBurnBootloader(final String target, final String programmer) {
+  protected void handleBurnBootloader() {
     console.clear();
     statusNotice("Burning bootloader to I/O Board (this may take a minute)...");
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         try {
           Uploader uploader = new AvrdudeUploader();
-          if (uploader.burnBootloader(target, programmer)) {
+          if (uploader.burnBootloader()) {
             statusNotice("Done burning bootloader.");
           } else {
             statusError("Error while burning bootloader.");
