@@ -1520,15 +1520,15 @@ public class Sketch {
   }
   
   
-  protected boolean exportApplet(boolean verbose) throws Exception {
-    return exportApplet(tempBuildFolder.getAbsolutePath(), verbose);
+  protected boolean exportApplet(boolean usingProgrammer) throws Exception {
+    return exportApplet(tempBuildFolder.getAbsolutePath(), usingProgrammer);
   }
 
 
   /**
    * Handle export to applet.
    */
-  public boolean exportApplet(String appletPath, boolean verbose)
+  public boolean exportApplet(String appletPath, boolean usingProgrammer)
     throws RunnerException, IOException, SerialException {
     
     // Make sure the user didn't hide the sketch folder
@@ -1565,7 +1565,7 @@ public class Sketch {
 //      return false;
 //    }
 
-    upload(appletFolder.getPath(), foundName, verbose);
+    upload(appletFolder.getPath(), foundName, usingProgrammer);
     
     return true;
   }
@@ -1592,7 +1592,7 @@ public class Sketch {
   }
 
 
-  protected String upload(String buildPath, String suggestedClassName, boolean verbose)
+  protected String upload(String buildPath, String suggestedClassName, boolean usingProgrammer)
     throws RunnerException, SerialException {
 
     Uploader uploader;
@@ -1602,7 +1602,7 @@ public class Sketch {
     uploader = new AvrdudeUploader();
     boolean success = uploader.uploadUsingPreferences(buildPath,
                                                       suggestedClassName,
-                                                      verbose);
+                                                      usingProgrammer);
 
     return success ? suggestedClassName : null;
   }

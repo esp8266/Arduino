@@ -538,7 +538,7 @@ public class Editor extends JFrame implements RunnerListener {
       });
     fileMenu.add(saveAsMenuItem);
 
-    item = newJMenuItem("Upload to I/O Board", 'U');
+    item = newJMenuItem("Upload", 'U');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           handleExport(false);
@@ -546,13 +546,13 @@ public class Editor extends JFrame implements RunnerListener {
       });
     fileMenu.add(item);
 
-//    item = newJMenuItemShift("Upload to I/O Board (verbose)", 'U');
-//    item.addActionListener(new ActionListener() {
-//        public void actionPerformed(ActionEvent e) {
-//          handleExport(true);
-//        }
-//      });
-//    fileMenu.add(item);
+    item = newJMenuItemShift("Upload Using Programmer", 'U');
+    item.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          handleExport(true);
+        }
+      });
+    fileMenu.add(item);
 
     fileMenu.addSeparator();
 
@@ -2331,13 +2331,13 @@ public class Editor extends JFrame implements RunnerListener {
    * Made synchronized to (hopefully) avoid problems of people
    * hitting export twice, quickly, and horking things up.
    */
-  synchronized public void handleExport(final boolean verbose) {
+  synchronized public void handleExport(final boolean usingProgrammer) {
     //if (!handleExportCheckModified()) return;
     toolbar.activate(EditorToolbar.EXPORT);
     console.clear();
     statusNotice("Uploading to I/O Board...");
 
-    new Thread(verbose ? exportAppHandler : exportHandler).start();
+    new Thread(usingProgrammer ? exportAppHandler : exportHandler).start();
   }
 
   // DAM: in Arduino, this is upload
@@ -2388,6 +2388,9 @@ public class Editor extends JFrame implements RunnerListener {
         } else {
           // error message will already be visible
         }
+      } catch (SerialNotFoundException e) {
+        if (serialPrompt()) run();
+        else statusNotice("Upload canceled.");
       } catch (RunnerException e) {
         //statusError("Error during upload.");
         //e.printStackTrace();

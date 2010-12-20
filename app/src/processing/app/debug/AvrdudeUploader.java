@@ -42,14 +42,14 @@ public class AvrdudeUploader extends Uploader  {
   public AvrdudeUploader() {
   }
 
-  public boolean uploadUsingPreferences(String buildPath, String className, boolean verbose)
+  public boolean uploadUsingPreferences(String buildPath, String className, boolean usingProgrammer)
   throws RunnerException, SerialException {
     this.verbose = verbose;
     Map<String, String> boardPreferences = Base.getBoardPreferences();
 
     // if no protocol is specified for this board, assume it lacks a 
     // bootloader and upload using the selected programmer.
-    if (boardPreferences.get("upload.protocol") == null) {
+    if (usingProgrammer || boardPreferences.get("upload.protocol") == null) {
       String programmer = Preferences.get("programmer");
       Target target = Base.getTarget();
 

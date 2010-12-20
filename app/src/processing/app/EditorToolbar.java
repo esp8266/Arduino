@@ -42,7 +42,7 @@ public class EditorToolbar extends JComponent implements MouseInputListener, Key
 
   /** Titles for each button when the shift key is pressed. */ 
   static final String titleShift[] = {
-    "Verify (w/ Verbose Output)", "Upload (w/ Verbose Output)", "New Editor Window", "Open in Another Window", "Save", "Serial Monitor"
+    "Verify", "Upload Using Programmer", "New Editor Window", "Open in Another Window", "Save", "Serial Monitor"
   };
 
   static final int BUTTON_COUNT  = title.length;
@@ -310,7 +310,7 @@ public class EditorToolbar extends JComponent implements MouseInputListener, Key
 
     switch (sel) {
     case RUN:
-      editor.handleRun(e.isShiftDown());
+      editor.handleRun(false);
       break;
 
 //    case STOP:
