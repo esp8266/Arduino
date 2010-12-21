@@ -550,9 +550,9 @@ boolean SDClass::mkdir(char *filepath) {
 boolean SDClass::rmdir(char *filepath) {
   /*
   
-    Makes a single directory or a heirarchy of directories.
+    Remove a single directory or a heirarchy of directories.
 
-    A rough equivalent to `mkdir -p`.
+    A rough equivalent to `rm -rf`.
   
    */
   return walkPath(filepath, root, callback_rmdir);
