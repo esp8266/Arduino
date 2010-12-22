@@ -15,14 +15,17 @@
 #include <SD.h>
 
 void File::write(uint8_t val) {
+  SD.c = -1;
   SD.file.write(val);
 }
 
 void File::write(const char *str) {
+  SD.c = -1;
   SD.file.write(str);
 }
 
 void File::write(const uint8_t *buf, size_t size) {
+  SD.c = -1;
   SD.file.write(buf, size);
 }
 
@@ -52,10 +55,12 @@ void File::flush() {
 }
 
 boolean File::seek(uint32_t pos) {
+  SD.c = -1;
   return SD.file.seekSet(pos);
 }
 
 uint32_t File::position() {
+  if (SD.c != -1) return SD.file.curPosition() - 1;
   return SD.file.curPosition();
 }
 
