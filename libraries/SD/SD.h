@@ -21,8 +21,7 @@
 #include <utility/SdFatUtil.h>
 
 #define FILE_READ O_READ
-#define FILE_TRUNCATE (O_WRITE | O_CREAT | O_TRUNC)
-#define FILE_APPEND (O_WRITE | O_CREAT | O_APPEND)
+#define FILE_WRITE (O_READ | O_WRITE | O_CREAT | O_SYNC)
 
 class File : public Stream {
 public:
@@ -34,6 +33,7 @@ public:
   virtual int available();
   virtual void flush();
   boolean seek(uint32_t pos);
+  uint32_t position();
   uint32_t size();
   void close();
   operator bool();

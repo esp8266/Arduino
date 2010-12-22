@@ -19,11 +19,12 @@ remove	KEYWORD2
 rmdir	KEYWORD2
 open	KEYWORD2
 close	KEYWORD2
-
+seek	KEYWORD2
+position	KEYWORD2
+size	KEYWORD2	
 
 #######################################
 # Constants (LITERAL1)
 #######################################
 FILE_READ	LITERAL1
-FILE_TRUNCATE	LITERAL1
-FILE_APPEND	LITERAL1
+FILE_WRITE	LITERAL1

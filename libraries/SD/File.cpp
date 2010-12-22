@@ -55,6 +55,10 @@ boolean File::seek(uint32_t pos) {
   return SD.file.seekSet(pos);
 }
 
+uint32_t File::position() {
+  return SD.file.curPosition();
+}
+
 uint32_t File::size() {
   return SD.file.fileSize();
 }

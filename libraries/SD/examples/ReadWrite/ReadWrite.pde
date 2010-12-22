@@ -39,7 +39,7 @@ void setup()
   Serial.println("initialization done.");
   
   // open a file:
-  myFile = SD.open("test.txt", FILE_TRUNCATE);
+  myFile = SD.open("test.txt", FILE_WRITE);
   
   // if the file opened okay, write to it:
   if (myFile) {

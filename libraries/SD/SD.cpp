@@ -297,6 +297,9 @@ boolean callback_openPath(SdFile& parentDir, char *filePathComponent,
   if (isLastComponent) {
     SDClass *p_SD = static_cast<SDClass*>(object);
     p_SD->file.open(parentDir, filePathComponent, p_SD->fileOpenMode);
+    if (p_SD->fileOpenMode == FILE_WRITE) {
+      p_SD->file.seekSet(p_SD->file.fileSize());
+    }
     p_SD->c = -1;
     // TODO: Return file open result?
     return false;
