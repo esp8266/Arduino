@@ -15,39 +15,29 @@
 #include <SD.h>
 
 void File::write(uint8_t val) {
-  SD.c = -1;
   SD.file.write(val);
 }
 
 void File::write(const char *str) {
-  SD.c = -1;
   SD.file.write(str);
 }
 
 void File::write(const uint8_t *buf, size_t size) {
-  SD.c = -1;
   SD.file.write(buf, size);
 }
 
 int File::peek() {
-  if (SD.c != -1) return SD.c;
-  SD.c = SD.file.read();
-  return SD.c;
+  char c = SD.file.read();
+  if (c != -1) SD.file.seekCur(-1);
+  return c;
 }
 
 int File::read() {
-  if (SD.c != -1) {
-    int tmp = SD.c;
-    SD.c = -1;
-    return tmp;
-  }
   return SD.file.read();
 }
 
 int File::available() {
-  if (SD.c != -1) return 1;
-  SD.c = SD.file.read();
-  return SD.c != -1;
+  return size() - position();
 }
 
 void File::flush() {
@@ -55,12 +45,10 @@ void File::flush() {
 }
 
 boolean File::seek(uint32_t pos) {
-  SD.c = -1;
   return SD.file.seekSet(pos);
 }
 
 uint32_t File::position() {
-  if (SD.c != -1) return SD.file.curPosition() - 1;
   return SD.file.curPosition();
 }
 

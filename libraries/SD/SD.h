@@ -79,8 +79,6 @@ private:
   // It shouldn't be set directly--it is set via the parameters to `open`.
   int fileOpenMode;
   
-  int c;
-  
   friend class File;
   friend boolean callback_openPath(SdFile&, char *, boolean, void *); 
 };
