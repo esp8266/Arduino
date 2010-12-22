@@ -51,6 +51,14 @@ void File::flush() {
   SD.file.sync();
 }
 
+boolean File::seek(uint32_t pos) {
+  return SD.file.seekSet(pos);
+}
+
+uint32_t File::size() {
+  return SD.file.fileSize();
+}
+
 void File::close() {
   SD.file.close();
 }

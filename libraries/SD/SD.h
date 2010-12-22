@@ -33,6 +33,8 @@ public:
   virtual int peek();
   virtual int available();
   virtual void flush();
+  boolean seek(uint32_t pos);
+  uint32_t size();
   void close();
   operator bool();
 };
