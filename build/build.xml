@@ -198,6 +198,10 @@
       <arg value="macosx/dist/tools-universal.zip" />
     </exec>
 
+    <copy todir="macosx/work/Arduino.app/Contents/Resources/Java/hardware/tools/avr/avr/include/avr">    
+      <fileset file="macosx/dist/eeprom.h" />
+    </copy>
+
     <antcall target="assemble">
       <param name="target.path" value="macosx/work/Arduino.app/Contents/Resources/Java" />
     </antcall>
