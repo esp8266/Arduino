@@ -406,6 +406,10 @@
     <!-- Unzip AVR tools -->
     <unzip dest="windows/work/hardware" src="windows/avr_tools.zip" overwrite="false"/>
 
+    <copy todir="windows/work/hardware/tools/avr/avr/include/avr">
+      <fileset file="windows/eeprom.h" />
+    </copy>
+
     <antcall target="assemble">
       <param name="target.path" value="windows/work" />
     </antcall>
