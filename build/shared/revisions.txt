@@ -1,4 +1,4 @@
-ARDUINO 0022
+ARDUINO 0022 - 2010.12.24
 
 [core / libraries]
 
@@ -32,6 +32,9 @@ ARDUINO 0022
 
 * Fixed SPI.setClockDivider() function.
   http://code.google.com/p/arduino/issues/detail?id=365
+
+* Fixed EEPROM library on Mega 2560.
+  http://code.google.com/p/arduino/issues/detail?id=381
 
 * Hardware serial receive interrupt optimization.
   http://code.google.com/p/arduino/issues/detail?id=391
