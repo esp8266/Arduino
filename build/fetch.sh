@@ -12,6 +12,9 @@ mkdir reference  || die 'unable to create reference directory'
 cd reference
 perl ../create_reference.pl || die 'unable to create local reference pages'
 
+mkdir img
+curl http://arduino.cc/en/pub/skins/arduinoUno/img/logo.png > img/logo.png
+
 cd ..
 zip -r shared/reference.zip reference || die 'unable to create reference.zip archive'
 

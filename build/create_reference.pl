@@ -20,11 +20,12 @@ my $guide = create_page('Guide_index.html', "$ARDUINO/Guide/HomePage");
 
 my $faq = create_page('FAQ.html', "$ARDUINO/Main/FAQ");
 my $env = create_page('environment.html', "$ARDUINO/Main/Environment");
-my $css = create_page('arduino.css', "$ARDUINO/pub/skins/arduino/arduino.css");
+my $css = create_page('arduinoUno.css', "$ARDUINO/pub/skins/arduinoUno/arduinoUno.css");
 my $eeprom = create_page('EEPROM.html', "$ARDUINO/Reference/EEPROM");
 my $stepper = create_page('Stepper.html', "$ARDUINO/Reference/Stepper");
 my $softser = create_page('SoftwareSerial.html', "$ARDUINO/Reference/SoftwareSerial");
 my $wire = create_page('Wire.html', "$ARDUINO/Reference/Wire");
+my $sd = create_page('SD.html', "$ARDUINO/Reference/SD");
 my $servo = create_page('Servo.html', "$ARDUINO/Reference/Servo");
 my $spi = create_page('SPI.html', "$ARDUINO/Reference/SPI");
 my $lcd = create_page('LiquidCrystal.html', "$ARDUINO/Reference/LiquidCrystal");
@@ -38,6 +39,8 @@ create_linked_pages($eeprom,  qr!$ARDUINO/Reference/(EEPROM\w+)!,         '%%.ht
 create_linked_pages($stepper, qr!$ARDUINO/Reference/(Stepper\w+)!,        '%%.html');
 create_linked_pages($wire, qr!$ARDUINO/Reference/(Wire\w+)!,        '%%.html');
 create_linked_pages($servo, qr!$ARDUINO/Reference/(Servo\w+)!,        '%%.html');
+create_linked_pages($sd, qr!$ARDUINO/Reference/(SD\w+)!,        '%%.html');
+create_linked_pages($sd, qr!$ARDUINO/Reference/(File\w+)!,        '%%.html');
 create_linked_pages($spi, qr!$ARDUINO/Reference/(SPI\w+)!,        '%%.html');
 create_linked_pages($lcd, qr!$ARDUINO/Reference/(LiquidCrystal\w+)!,        '%%.html');
 create_linked_pages($ethernet, qr!$ARDUINO/Reference/(Ethernet\w+)!,        '%%.html');
@@ -104,7 +107,7 @@ sub localize_page {
   $text =~ s!$ARDUINO/Serial/([^']*)!Serial_$1.html!xg;
 
   # direct pages to the local style file
-  $text =~ s!$ARDUINO/pub/skins/arduino/arduino.css!arduino.css!xg;
+  $text =~ s!$ARDUINO/pub/skins/arduinoUno/arduinoUno.css!arduinoUno.css!xg;
 
   # change links to Main/FAQ to go to FAQ.html 
   $text =~ s!$ARDUINO/Main/FAQ!FAQ.html!xg;
