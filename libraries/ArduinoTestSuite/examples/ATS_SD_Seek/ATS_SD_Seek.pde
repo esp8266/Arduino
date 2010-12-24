@@ -82,6 +82,24 @@ void setup()
 
   f.close();
 
+  f = SD.open("test.txt");
+  ATS_PrintTestStatus("SD.open()", f);
+  if (!f) goto done;
+  
+  ATS_PrintTestStatus("position()", f.position() == 0);
+  ATS_PrintTestStatus("size()", f.size() == 10);
+  ATS_PrintTestStatus("peek()", f.peek() == 'A');
+  ATS_PrintTestStatus("read()", f.read() == 'A');
+
+  f.seek(4);
+  
+  ATS_PrintTestStatus("position()", f.position() == 4);
+  ATS_PrintTestStatus("size()", f.size() == 10);
+  ATS_PrintTestStatus("peek()", f.peek() == '4');
+  ATS_PrintTestStatus("read()", f.read() == '4');
+  
+  f.close();
+
 done:
   ATS_ReportMemoryUsage(startMemoryUsage);
   ATS_end();
