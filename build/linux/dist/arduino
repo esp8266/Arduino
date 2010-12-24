@@ -1,6 +1,6 @@
 #!/bin/sh
  
-APPDIR="$(dirname -- "${0}")"
+APPDIR="$(dirname -- $(readlink -f -- "${0}") )"
 
 cd $APPDIR
  
