@@ -46,7 +46,7 @@ void setup()
 
   // open a new file and immediately close it:
   Serial.println("Creating example.txt...");
-  myFile = SD.open("example.txt", FILE_TRUNCATE);
+  myFile = SD.open("example.txt", FILE_WRITE);
   myFile.close();
 
   // Check to see if the file exists: 

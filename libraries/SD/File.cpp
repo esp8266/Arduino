@@ -27,28 +27,33 @@ void File::write(const uint8_t *buf, size_t size) {
 }
 
 int File::peek() {
-  if (SD.c != -1) return SD.c;
-  SD.c = SD.file.read();
-  return SD.c;
+  char c = SD.file.read();
+  if (c != -1) SD.file.seekCur(-1);
+  return c;
 }
 
 int File::read() {
-  if (SD.c != -1) {
-    int tmp = SD.c;
-    SD.c = -1;
-    return tmp;
-  }
   return SD.file.read();
 }
 
 int File::available() {
-  if (SD.c != -1) return 1;
-  SD.c = SD.file.read();
-  return SD.c != -1;
+  return size() - position();
 }
 
 void File::flush() {
   SD.file.sync();
+}
+
+boolean File::seek(uint32_t pos) {
+  return SD.file.seekSet(pos);
+}
+
+uint32_t File::position() {
+  return SD.file.curPosition();
+}
+
+uint32_t File::size() {
+  return SD.file.fileSize();
 }
 
 void File::close() {

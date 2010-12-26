@@ -2292,7 +2292,6 @@ public class Editor extends JFrame implements RunnerListener {
   
   
   public boolean serialPrompt() {
-    populateSerialMenu();
     int count = serialMenu.getItemCount();
     Object[] names = new Object[count];
     for (int i = 0; i < count; i++) {
@@ -2357,7 +2356,9 @@ public class Editor extends JFrame implements RunnerListener {
           // error message will already be visible
         }
       } catch (SerialNotFoundException e) {
-        if (serialPrompt()) run();
+        populateSerialMenu();
+        if (serialMenu.getItemCount() == 0) statusError(e);
+        else if (serialPrompt()) run();
         else statusNotice("Upload canceled.");
       } catch (RunnerException e) {
         //statusError("Error during upload.");
@@ -2389,7 +2390,9 @@ public class Editor extends JFrame implements RunnerListener {
           // error message will already be visible
         }
       } catch (SerialNotFoundException e) {
-        if (serialPrompt()) run();
+        populateSerialMenu();
+        if (serialMenu.getItemCount() == 0) statusError(e);
+        else if (serialPrompt()) run();
         else statusNotice("Upload canceled.");
       } catch (RunnerException e) {
         //statusError("Error during upload.");
