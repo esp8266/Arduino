@@ -66,6 +66,7 @@ static int g_port = 19001;
 #define TEST1_SIZE  16
 #define TEST2_SIZE  32
 
+#if 0
 static int AES_test(BI_CTX *bi_ctx)
 {
     AES_CTX aes_key;
@@ -419,6 +420,7 @@ static int HMAC_test(BI_CTX *bi_ctx)
 end:
     return res;
 }
+#endif
 
 /**************************************************************************
  * BIGINT tests 
@@ -427,10 +429,12 @@ end:
 static int BIGINT_test(BI_CTX *ctx)
 {
     int res = 1;
+
+#ifndef REGISTER_8 
+#ifndef REGISTER_16
     bigint *bi_data, *bi_exp, *bi_res;
     const char *expnt, *plaintext, *mod;
     uint8_t compare[MAX_KEY_BYTE_SIZE];
-
     /**
      * 512 bit key
      */
@@ -461,6 +465,47 @@ static int BIGINT_test(BI_CTX *ctx)
     bi_export(ctx, bi_res, compare, 64);
     if (memcmp(plaintext, compare, 64) != 0)
         goto end;
+#endif
+#endif
+
+    /*
+     * Multiply with psssible carry issue (8 bit)
+     */
+    {
+        int i;
+        bigint *bi_x = bi_str_import(
+                ctx,
+               "AFD5060E224B70DA99EFB385BA5C0D2BEA0AD1DAAA52686E1A02D677BC65C1DA7A496BBDCC02999E8814F10AFC4B8E0DD4E6687E0762CE717A5EA1E452B5C56065C8431F0FB9D23CFF3A4B4149798C0670AF7F9565A0EAE5CF1AB16A1F0C3DD5E485DC5ABB96EBE0B6778A15B7302CBCE358E4BF2E2E30932758AC6EFA9F5828");
+        uint8_t exp_sqr_result[bi_x->size*2];
+        uint8_t exp_mlt_result[bi_x->size*2];
+        bigint *arg2 = bi_clone(ctx, bi_x);
+        bigint *arg3 = bi_clone(ctx, bi_x);
+        bigint *sqr_result = bi_square(ctx, bi_x);
+        bigint *mlt_result = bi_multiply(ctx, arg2, arg3);
+        //bi_print("SQR_RESULT", sqr_result);
+        //bi_print("MLT_RESULT", mlt_result);
+
+        if (bi_compare(sqr_result, mlt_result) != 0)
+        {
+            bi_export(ctx, sqr_result, exp_sqr_result, sizeof(exp_sqr_result));
+            bi_export(ctx, mlt_result, exp_mlt_result, sizeof(exp_mlt_result));
+            bi_free(ctx, sqr_result);
+            bi_free(ctx, mlt_result);
+
+            for (i = 0; i < sizeof(exp_sqr_result); i++)
+            {
+                if (exp_sqr_result[i] != exp_mlt_result[i])
+                {
+                    printf("Error: SQUARE failed %d %02x %02x\n", i, 
+                                exp_sqr_result[i], exp_mlt_result[i]);
+                    goto end;
+                }
+            }
+        }
+
+        bi_free(ctx, sqr_result);
+        bi_free(ctx, mlt_result);
+    }
 
     printf("All BIGINT tests passed\n");
     res = 0;
@@ -755,9 +800,7 @@ typedef struct
 static void do_client(client_t *clnt)
 {
     char openssl_buf[2048];
-
-    /* make sure the main thread goes first */
-    sleep(0);
+    usleep(500000);           /* allow server to start */
 
     /* show the session ids in the reconnect test */
     if (strcmp(clnt->testname, "Session Reuse") == 0)
@@ -882,7 +925,11 @@ static int SSL_server_test(
         while ((size = ssl_read(ssl, &read_buf)) == SSL_OK);
         SOCKET_CLOSE(client_fd);
         
-        if (size < SSL_OK) /* got some alert or something nasty */
+        if (size == SSL_CLOSE_NOTIFY)
+        {
+            ret = SSL_OK;
+        }
+        else if (size < SSL_OK) /* got some alert or something nasty */
         {
             ret = size;
 
@@ -1392,7 +1439,7 @@ static int SSL_client_test(
 client_test_exit:
     ssl_free(ssl);
     SOCKET_CLOSE(client_fd);
-    usleep(200000);           /* allow openssl to say something */
+    usleep(500000);           /* allow openssl to say something */
 
     if (sess_resume)
     {
@@ -1566,7 +1613,7 @@ static void do_basic(void)
     SSL *ssl_clnt;
     SSL_CTX *ssl_clnt_ctx = ssl_ctx_new(
                             DEFAULT_CLNT_OPTION, SSL_DEFAULT_CLNT_SESS);
-    usleep(200000);           /* allow server to start */
+    usleep(500000);           /* allow server to start */
 
     if ((client_fd = client_socket_init(g_port)) < 0)
         goto error;
@@ -1692,7 +1739,7 @@ void do_multi_clnt(multi_t *multi_data)
     if ((client_fd = client_socket_init(multi_data->port)) < 0)
         goto client_test_exit;
 
-    sleep(1);
+    usleep(500000);
     ssl = ssl_client_new(multi_data->ssl_clnt_ctx, client_fd, NULL, 0);
 
     if ((res = ssl_handshake_status(ssl)))
@@ -1869,7 +1916,7 @@ static int header_issue(void)
 
     size = fread(buf, 1, sizeof(buf), f);
     SOCKET_WRITE(client_fd, buf, size);
-    usleep(200000);
+    usleep(500000);
 
     ret = 0;
 error:
@@ -1911,6 +1958,7 @@ int main(int argc, char *argv[])
 
     bi_ctx = bi_initialize();
 
+#if 0
     if (AES_test(bi_ctx))
     {
         printf("AES tests failed\n");
@@ -1945,6 +1993,7 @@ int main(int argc, char *argv[])
         goto cleanup;
     }
     TTY_FLUSH();
+#endif
 
     if (BIGINT_test(bi_ctx))
     {

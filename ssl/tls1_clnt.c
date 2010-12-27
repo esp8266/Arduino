@@ -250,6 +250,12 @@ static int process_server_hello(SSL *ssl)
     offset = 6 + SSL_RANDOM_SIZE; /* skip of session id size */
     sess_id_size = buf[offset++];
 
+    if (sess_id_size > SSL_SESSION_ID_SIZE)
+    {
+        ret = SSL_ERROR_INVALID_SESSION;
+        goto error;
+    }
+
     if (num_sessions)
     {
         ssl->session = ssl_session_update(num_sessions,

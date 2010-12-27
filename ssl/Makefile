@@ -91,10 +91,10 @@ include $(AXTLS_HOME)/config/makefile.post
 
 ifndef CONFIG_PLATFORM_WIN32     # Linux/Unix/Cygwin
 
-$(TARGET1) : $(OBJ)
+$(TARGET1) : $(CRYPTO_OBJ) $(OBJ)
 	$(AR) -r $@ $(CRYPTO_OBJ) $(OBJ)
 
-$(TARGET2) : $(OBJ)
+$(TARGET2) : $(CRYPTO_OBJ) $(OBJ)
 ifndef CONFIG_PLATFORM_CYGWIN
 	$(LD) $(LDFLAGS) $(LDSHARED) -Wl,-soname,$(LIBMAJOR) -o $(AXTLS_HOME)/$(STAGE)/$(LIBMINOR) $(CRYPTO_OBJ) $(OBJ)
 	cd $(AXTLS_HOME)/$(STAGE); ln -sf $(LIBMINOR) $(LIBMAJOR); ln -sf $(LIBMAJOR) $(BASETARGET); cd -

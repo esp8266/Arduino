@@ -385,6 +385,11 @@ static void do_server(int argc, char *argv[])
                         printf("%s", read_buf);
                         TTY_FLUSH();
                     }
+                    else if (res == SSL_CLOSE_NOTIFY)
+                    {
+                        printf("shutting down SSL\n");
+                        TTY_FLUSH();
+                    }
                     else if (res < SSL_OK && !quiet)
                     {
                         ssl_display_error(res);

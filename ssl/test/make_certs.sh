@@ -69,15 +69,18 @@ EOF
 openssl genrsa -out axTLS.ca_key.pem 1024
 openssl genrsa -out axTLS.key_512.pem 512
 openssl genrsa -out axTLS.key_1024.pem 1024
+openssl genrsa -out axTLS.key_1042.pem 1042
 openssl genrsa -out axTLS.key_2048.pem 2048
 openssl genrsa -out axTLS.key_4096.pem 4096
 openssl genrsa -out axTLS.device_key.pem 1024
 openssl genrsa -aes128 -passout pass:abcd -out axTLS.key_aes128.pem 512
 openssl genrsa -aes256 -passout pass:abcd -out axTLS.key_aes256.pem 512
 
+
 # convert private keys into DER format
 openssl rsa -in axTLS.key_512.pem -out axTLS.key_512 -outform DER
 openssl rsa -in axTLS.key_1024.pem -out axTLS.key_1024 -outform DER
+openssl rsa -in axTLS.key_1042.pem -out axTLS.key_1042 -outform DER
 openssl rsa -in axTLS.key_2048.pem -out axTLS.key_2048 -outform DER
 openssl rsa -in axTLS.key_4096.pem -out axTLS.key_4096 -outform DER
 openssl rsa -in axTLS.device_key.pem -out axTLS.device_key -outform DER
@@ -88,6 +91,8 @@ openssl req -out axTLS.ca_x509.req -key axTLS.ca_key.pem -new \
 openssl req -out axTLS.x509_512.req -key axTLS.key_512.pem -new \
             -config ./certs.conf 
 openssl req -out axTLS.x509_1024.req -key axTLS.key_1024.pem -new \
+            -config ./certs.conf 
+openssl req -out axTLS.x509_1042.req -key axTLS.key_1042.pem -new \
             -config ./certs.conf 
 openssl req -out axTLS.x509_2048.req -key axTLS.key_2048.pem -new \
             -config ./certs.conf 
@@ -102,29 +107,32 @@ openssl req -out axTLS.x509_aes256.req -key axTLS.key_aes256.pem \
 
 # generate the actual certs.
 openssl x509 -req -in axTLS.ca_x509.req -out axTLS.ca_x509.pem \
-            -sha1 -days 10000 -signkey axTLS.ca_key.pem
+            -sha1 -days 5000 -signkey axTLS.ca_key.pem
 openssl x509 -req -in axTLS.x509_512.req -out axTLS.x509_512.pem \
-            -sha1 -CAcreateserial -days 10000 \
+            -sha1 -CAcreateserial -days 5000 \
             -CA axTLS.ca_x509.pem -CAkey axTLS.ca_key.pem
 openssl x509 -req -in axTLS.x509_1024.req -out axTLS.x509_1024.pem \
-            -sha1 -CAcreateserial -days 10000 \
+            -sha1 -CAcreateserial -days 5000 \
+            -CA axTLS.ca_x509.pem -CAkey axTLS.ca_key.pem
+openssl x509 -req -in axTLS.x509_1042.req -out axTLS.x509_1042.pem \
+            -sha1 -CAcreateserial -days 5000 \
             -CA axTLS.ca_x509.pem -CAkey axTLS.ca_key.pem
 openssl x509 -req -in axTLS.x509_2048.req -out axTLS.x509_2048.pem \
-            -md5 -CAcreateserial -days 10000 \
+            -md5 -CAcreateserial -days 5000 \
             -CA axTLS.ca_x509.pem -CAkey axTLS.ca_key.pem
 openssl x509 -req -in axTLS.x509_4096.req -out axTLS.x509_4096.pem \
-            -md5 -CAcreateserial -days 10000 \
+            -md5 -CAcreateserial -days 5000 \
             -CA axTLS.ca_x509.pem -CAkey axTLS.ca_key.pem
 openssl x509 -req -in axTLS.x509_device.req -out axTLS.x509_device.pem \
-            -sha1 -CAcreateserial -days 10000 \
+            -sha1 -CAcreateserial -days 5000 \
             -CA axTLS.x509_512.pem -CAkey axTLS.key_512.pem
 openssl x509 -req -in axTLS.x509_aes128.req \
             -out axTLS.x509_aes128.pem \
-            -sha1 -CAcreateserial -days 10000 \
+            -sha1 -CAcreateserial -days 5000 \
             -CA axTLS.ca_x509.pem -CAkey axTLS.ca_key.pem
 openssl x509 -req -in axTLS.x509_aes256.req \
             -out axTLS.x509_aes256.pem \
-            -sha1 -CAcreateserial -days 10000 \
+            -sha1 -CAcreateserial -days 5000 \
             -CA axTLS.ca_x509.pem -CAkey axTLS.ca_key.pem
 
 # note: must be root to do this
@@ -149,6 +157,7 @@ rm *.conf
 openssl x509 -in axTLS.ca_x509.pem -outform DER -out axTLS.ca_x509.cer 
 openssl x509 -in axTLS.x509_512.pem -outform DER -out axTLS.x509_512.cer
 openssl x509 -in axTLS.x509_1024.pem -outform DER -out axTLS.x509_1024.cer
+openssl x509 -in axTLS.x509_1042.pem -outform DER -out axTLS.x509_1042.cer
 openssl x509 -in axTLS.x509_2048.pem -outform DER -out axTLS.x509_2048.cer
 openssl x509 -in axTLS.x509_4096.pem -outform DER -out axTLS.x509_4096.cer
 openssl x509 -in axTLS.x509_device.pem -outform DER -out axTLS.x509_device.cer

@@ -245,8 +245,10 @@ EXP_FUNC void STDCALL ssl_free(SSL *ssl)
     if (ssl == NULL)        /* just ignore null pointers */
         return;
 
-    /* spec says we must notify when we are dying */
-    send_alert(ssl, SSL_ALERT_CLOSE_NOTIFY);
+    /* only notify if we weren't notified first */
+    if (!IS_SET_SSL_FLAG(SSL_RECEIVED_CLOSE_NOTIFY))
+      /* spec says we must notify when we are dying */
+      send_alert(ssl, SSL_ALERT_CLOSE_NOTIFY);
 
     ssl_ctx = ssl->ssl_ctx;
 
@@ -284,7 +286,7 @@ EXP_FUNC int STDCALL ssl_read(SSL *ssl, uint8_t **in_data)
     int ret = basic_read(ssl, in_data);
 
     /* check for return code so we can send an alert */
-    if (ret < SSL_OK)
+    if (ret < SSL_OK && ret != SSL_CLOSE_NOTIFY)
     {
         if (ret != SSL_ERROR_CONN_LOST)
         {
@@ -1276,7 +1278,15 @@ int basic_read(SSL *ssl, uint8_t **in_data)
 
         case PT_ALERT_PROTOCOL:
             /* return the alert # with alert bit set */
-            ret = -buf[1]; 
+            if(buf[0] == SSL_ALERT_TYPE_WARNING &&
+               buf[1] == SSL_ALERT_CLOSE_NOTIFY)
+            {
+              ret = SSL_CLOSE_NOTIFY;
+              SET_SSL_FLAG(SSL_RECEIVED_CLOSE_NOTIFY);
+            }
+            else 
+                ret = -buf[1]; 
+
             DISPLAY_ALERT(ssl, buf[1]);
             break;
 

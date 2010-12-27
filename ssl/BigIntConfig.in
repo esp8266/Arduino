@@ -8,7 +8,7 @@ menu "BigInt Options"
 
 choice
     prompt "Reduction Algorithm"
-    default CONFIG_BIGINT_BARRETT 
+    default CONFIG_BIGINT_MONTGOMERY
 
 config CONFIG_BIGINT_CLASSICAL
     bool "Classical"

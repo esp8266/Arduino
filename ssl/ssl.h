@@ -88,6 +88,7 @@ extern "C" {
 #define SSL_OK                                  0
 #define SSL_NOT_OK                              -1
 #define SSL_ERROR_DEAD                          -2
+#define SSL_CLOSE_NOTIFY                        -3
 #define SSL_ERROR_CONN_LOST                     -256
 #define SSL_ERROR_SOCK_SETUP_FAILURE            -258
 #define SSL_ERROR_INVALID_HANDSHAKE             -260
@@ -104,6 +105,10 @@ extern "C" {
 #define SSL_ERROR_NOT_SUPPORTED                 -274
 #define SSL_X509_OFFSET                         -512
 #define SSL_X509_ERROR(A)                       (SSL_X509_OFFSET+A)
+
+/* alert types that are recognized */
+#define SSL_ALERT_TYPE_WARNING                  1
+#define SLL_ALERT_TYPE_FATAL                    2
 
 /* these are all the alerts that are recognized */
 #define SSL_ALERT_CLOSE_NOTIFY                  0

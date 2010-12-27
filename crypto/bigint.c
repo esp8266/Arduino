@@ -442,18 +442,18 @@ bigint *bi_divide(BI_CTX *ctx, bigint *u, bigint *v, int is_mod)
         else
         {
             q_dash = (comp)(((long_comp)U(0)*COMP_RADIX + U(1))/V1);
-        }
 
-        if (v->size > 1 && V2)
-        {
-            /* we are implementing the following:
-            if (V2*q_dash > (((U(0)*COMP_RADIX + U(1) - 
-                    q_dash*V1)*COMP_RADIX) + U(2))) ... */
-            comp inner = (comp)((long_comp)COMP_RADIX*U(0) + U(1) - 
-                                        (long_comp)q_dash*V1);
-            if ((long_comp)V2*q_dash > (long_comp)inner*COMP_RADIX + U(2))
+            if (v->size > 1 && V2)
             {
-                q_dash--;
+                /* we are implementing the following:
+                if (V2*q_dash > (((U(0)*COMP_RADIX + U(1) - 
+                        q_dash*V1)*COMP_RADIX) + U(2))) ... */
+                comp inner = (comp)((long_comp)COMP_RADIX*U(0) + U(1) - 
+                                            (long_comp)q_dash*V1);
+                if ((long_comp)V2*q_dash > (long_comp)inner*COMP_RADIX + U(2))
+                {
+                    q_dash--;
+                }
             }
         }
 
@@ -926,55 +926,52 @@ bigint *bi_multiply(BI_CTX *ctx, bigint *bia, bigint *bib)
 /*
  * Perform the actual square operion. It takes into account overflow.
  */
-static bigint *regular_square(BI_CTX *ctx, bigint *bi)
+bigint *regular_square(BI_CTX *ctx, bigint *bi)
 {
     int t = bi->size;
     int i = 0, j;
     bigint *biR = alloc(ctx, t*2);
     comp *w = biR->comps;
     comp *x = bi->comps;
-    comp carry;
-
+    long_comp carry;
     memset(w, 0, biR->size*COMP_BYTE_SIZE);
 
     do
     {
         long_comp tmp = w[2*i] + (long_comp)x[i]*x[i];
-        comp u = 0;
+        uint8_t c = 0, q = 0;
         w[2*i] = (comp)tmp;
         carry = (comp)(tmp >> COMP_BIT_SIZE);
 
         for (j = i+1; j < t; j++)
         {
+            c = q = 0;
             long_comp xx = (long_comp)x[i]*x[j];
-            long_comp xx2 = 2*xx;
-            long_comp blob = (long_comp)w[i+j]+carry;
+            if (COMP_MAX-xx < xx)
+                c = 1;
 
-            if (u)                  /* previous overflow */
-            {
-                blob += COMP_RADIX;
-            }
+            tmp = (xx<<1);
 
+            if (COMP_MAX-tmp < w[i+j])
+                c = 1;
 
-            u = 0;
-            tmp = xx2 + blob;
+            tmp += w[i+j];
 
-            /* check for overflow */
-            if ((COMP_MAX-xx) < xx  || (COMP_MAX-xx2) < blob)
-            {
-                u = 1;
-            }
+            if (COMP_MAX-tmp < carry)
+                c = q = 1;
 
+            tmp += carry;
             w[i+j] = (comp)tmp;
-            carry = (comp)(tmp >> COMP_BIT_SIZE);
+            carry = tmp >> COMP_BIT_SIZE;
+
+            if (c)
+                carry += COMP_RADIX;
         }
 
         w[i+t] += carry;
 
-        if (u)
-        {
-            w[i+t+1] = 1;   /* add carry */
-        }
+        if (c && !q)
+            w[i+t+1] = 1; /* add carry */
     } while (++i < t);
 
     bi_free(ctx, bi);

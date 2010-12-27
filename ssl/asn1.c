@@ -210,6 +210,7 @@ static int asn1_get_utc_time(const uint8_t *buf, int *offset, time_t *t)
 
     if (buf[(*offset)++] != ASN1_UTC_TIME)
         goto end_utc_time;
+
     len = get_asn1_length(buf, offset);
     t_offset = *offset;
 
