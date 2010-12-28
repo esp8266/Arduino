@@ -37,6 +37,9 @@ const int NTP_PACKET_SIZE= 48; // NTP time stamp is in the first 48 bytes of the
 
 byte packetBuffer[ NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing packets 
 
+// A UDP instance to let us send and receive packets over UDP
+UdpClass Udp;
+
 void setup() 
 {
   // start Ethernet and UDP
@@ -80,8 +83,16 @@ void loop()
     Serial.print("The UTC time is ");       // UTC is the time at Greenwich Meridian (GMT)
     Serial.print((epoch  % 86400L) / 3600); // print the hour (86400 equals secs per day)
     Serial.print(':');  
+    if ( ((epoch % 3600) / 60) < 10 ) {
+      // In the first 10 minutes of each hour, we'll want a leading '0'
+      Serial.print('0');
+    }
     Serial.print((epoch  % 3600) / 60); // print the minute (3600 equals secs per minute)
     Serial.print(':'); 
+    if ( (epoch % 60) < 10 ) {
+      // In the first 10 seconds of each minute, we'll want a leading '0'
+      Serial.print('0');
+    }
     Serial.println(epoch %60); // print the second
   }
   // wait ten seconds before asking for the time again

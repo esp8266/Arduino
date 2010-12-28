@@ -32,10 +32,25 @@
 #include "Udp.h"
 
 /* Start UDP socket, listening at local port PORT */
-void UdpClass::begin(uint16_t port) {
+uint8_t UdpClass::begin(uint16_t port) {
+  if (_sock != MAX_SOCK_NUM)
+    return 0;
+
+  for (int i = 0; i < MAX_SOCK_NUM; i++) {
+    uint8_t s = W5100.readSnSR(i);
+    if (s == SnSR::CLOSED || s == SnSR::FIN_WAIT) {
+      _sock = i;
+      break;
+    }
+  }
+
+  if (_sock == MAX_SOCK_NUM)
+    return 0;
+
   _port = port;
-  _sock = 0; //TODO: should not be hardcoded
   socket(_sock, SnMR::UDP, _port, 0);
+
+  return 1;
 }
 
 /* Send packet contained in buf of length len to peer at specified ip, and port */
@@ -129,8 +144,15 @@ port = myPort;
 return ret;
 }
 
+/* Release any resources being used by this UdpClass instance */
+void UdpClass::stop()
+{
+  if (_sock == MAX_SOCK_NUM)
+    return;
 
+  close(_sock);
 
+  EthernetClass::_server_port[_sock] = 0;
+  _sock = MAX_SOCK_NUM;
+}
 
-/* Create one global object */
-UdpClass Udp;
