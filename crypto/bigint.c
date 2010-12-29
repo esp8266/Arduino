@@ -926,7 +926,7 @@ bigint *bi_multiply(BI_CTX *ctx, bigint *bia, bigint *bib)
 /*
  * Perform the actual square operion. It takes into account overflow.
  */
-bigint *regular_square(BI_CTX *ctx, bigint *bi)
+static bigint *regular_square(BI_CTX *ctx, bigint *bi)
 {
     int t = bi->size;
     int i = 0, j;
@@ -939,13 +939,13 @@ bigint *regular_square(BI_CTX *ctx, bigint *bi)
     do
     {
         long_comp tmp = w[2*i] + (long_comp)x[i]*x[i];
-        uint8_t c = 0, q = 0;
+        uint8_t c = 0;
         w[2*i] = (comp)tmp;
         carry = (comp)(tmp >> COMP_BIT_SIZE);
 
         for (j = i+1; j < t; j++)
         {
-            c = q = 0;
+            c = 0;
             long_comp xx = (long_comp)x[i]*x[j];
             if (COMP_MAX-xx < xx)
                 c = 1;
@@ -958,7 +958,7 @@ bigint *regular_square(BI_CTX *ctx, bigint *bi)
             tmp += w[i+j];
 
             if (COMP_MAX-tmp < carry)
-                c = q = 1;
+                c = 1;
 
             tmp += carry;
             w[i+j] = (comp)tmp;
@@ -968,10 +968,9 @@ bigint *regular_square(BI_CTX *ctx, bigint *bi)
                 carry += COMP_RADIX;
         }
 
-        w[i+t] += carry;
-
-        if (c && !q)
-            w[i+t+1] = 1; /* add carry */
+        tmp = carry + w[i+t];
+        w[i+t] = (comp)tmp;
+        w[i+t+1] = tmp >> COMP_BIT_SIZE;
     } while (++i < t);
 
     bi_free(ctx, bi);

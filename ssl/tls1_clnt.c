@@ -32,7 +32,7 @@
 #include <string.h>
 #include <time.h>
 #include <stdio.h>
-
+#include "os_port.h"
 #include "ssl.h"
 
 #ifdef CONFIG_SSL_ENABLE_CLIENT        /* all commented out if no client */
@@ -79,7 +79,7 @@ EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const
  */
 int do_clnt_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len)
 {
-    int ret = SSL_OK;
+    int ret;
 
     /* To get here the state must be valid */
     switch (handshake_type)

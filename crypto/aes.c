@@ -168,7 +168,7 @@ static void AES_decrypt(const AES_CTX *ctx, uint32_t *data);
    x^8+x^4+x^3+x+1 */
 static unsigned char AES_xtime(uint32_t x)
 {
-	return x = (x&0x80) ? (x<<1)^0x1b : x<<1;
+	return (x&0x80) ? (x<<1)^0x1b : x<<1;
 }
 
 /**

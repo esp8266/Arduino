@@ -31,7 +31,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-
+#include "os_port.h"
 #include "ssl.h"
 
 static const uint8_t g_hello_done[] = { HS_SERVER_HELLO_DONE, 0, 0, 0 };
@@ -416,8 +416,9 @@ static int process_client_key_xchg(SSL *ssl)
 #else
     ssl->next_state = HS_FINISHED; 
 #endif
-error:
+
     ssl->dc->bm_proc_index += rsa_ctx->num_octets+offset;
+error:
     return ret;
 }
 

@@ -310,7 +310,6 @@ static void do_server(int argc, char *argv[])
         if ((client_fd = accept(server_fd, 
                 (struct sockaddr *)&client_addr, &client_len)) < 0)
         {
-            res = 1;
             break;
         }
 
@@ -683,7 +682,6 @@ static void do_client(int argc, char *argv[])
     for (;;)
     {
         uint8_t buf[1024];
-        res = SSL_OK;
 
         /* allow parallel reading of server and standard input */
         FD_SET(client_fd, &read_set);

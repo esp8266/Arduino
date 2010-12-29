@@ -66,7 +66,6 @@ static int g_port = 19001;
 #define TEST1_SIZE  16
 #define TEST2_SIZE  32
 
-#if 0
 static int AES_test(BI_CTX *bi_ctx)
 {
     AES_CTX aes_key;
@@ -420,7 +419,6 @@ static int HMAC_test(BI_CTX *bi_ctx)
 end:
     return res;
 }
-#endif
 
 /**************************************************************************
  * BIGINT tests 
@@ -472,35 +470,20 @@ static int BIGINT_test(BI_CTX *ctx)
      * Multiply with psssible carry issue (8 bit)
      */
     {
-        int i;
-        bigint *bi_x = bi_str_import(
-                ctx,
-               "AFD5060E224B70DA99EFB385BA5C0D2BEA0AD1DAAA52686E1A02D677BC65C1DA7A496BBDCC02999E8814F10AFC4B8E0DD4E6687E0762CE717A5EA1E452B5C56065C8431F0FB9D23CFF3A4B4149798C0670AF7F9565A0EAE5CF1AB16A1F0C3DD5E485DC5ABB96EBE0B6778A15B7302CBCE358E4BF2E2E30932758AC6EFA9F5828");
-        uint8_t exp_sqr_result[bi_x->size*2];
-        uint8_t exp_mlt_result[bi_x->size*2];
+        bigint *bi_x = bi_str_import(ctx, 
+                "AFD5060E224B70DA99EFB385BA5C0D2BEA0AD1DAAA52686E1A02D677BC65C1DA7A496BBDCC02999E8814F10AFC4B8E0DD4E6687E0762CE717A5EA1E452B5C56065C8431F0FB9D23CFF3A4B4149798C0670AF7F9565A0EAE5CF1AB16A1F0C3DD5E485DC5ABB96EBE0B6778A15B7302CBCE358E4BF2E2E30932758AC6EFA9F5828");
         bigint *arg2 = bi_clone(ctx, bi_x);
         bigint *arg3 = bi_clone(ctx, bi_x);
         bigint *sqr_result = bi_square(ctx, bi_x);
         bigint *mlt_result = bi_multiply(ctx, arg2, arg3);
-        //bi_print("SQR_RESULT", sqr_result);
-        //bi_print("MLT_RESULT", mlt_result);
 
         if (bi_compare(sqr_result, mlt_result) != 0)
         {
-            bi_export(ctx, sqr_result, exp_sqr_result, sizeof(exp_sqr_result));
-            bi_export(ctx, mlt_result, exp_mlt_result, sizeof(exp_mlt_result));
+            bi_print("SQR_RESULT", sqr_result);
+            bi_print("MLT_RESULT", mlt_result);
             bi_free(ctx, sqr_result);
             bi_free(ctx, mlt_result);
-
-            for (i = 0; i < sizeof(exp_sqr_result); i++)
-            {
-                if (exp_sqr_result[i] != exp_mlt_result[i])
-                {
-                    printf("Error: SQUARE failed %d %02x %02x\n", i, 
-                                exp_sqr_result[i], exp_mlt_result[i]);
-                    goto end;
-                }
-            }
+            goto end;
         }
 
         bi_free(ctx, sqr_result);
@@ -1203,6 +1186,7 @@ int SSL_server_tests(void)
                     NULL, "abcd", DEFAULT_SVR_OPTION)))
         goto cleanup;
 
+//#if 0
     /* 
      * AES128 Encrypted invalid key 
      */
@@ -1215,6 +1199,7 @@ int SSL_server_tests(void)
 
     printf("SSL server test \"%s\" passed\n", "AES128 encrypted invalid key");
     TTY_FLUSH();
+//#endif
 
     /*
      * PKCS#8 key (encrypted)
@@ -1328,7 +1313,7 @@ static int SSL_client_test(
 #endif
     }
     
-    usleep(500000);           /* allow server to start */
+    sleep(5);           /* allow server to start */
 
     if (*ssl_ctx == NULL)
     {
@@ -1590,6 +1575,7 @@ cleanup:
     {
         ssl_display_error(ret);
         printf("Error: A client test failed\n");
+        system("sh ../ssl/test/killopenssl.sh");
         exit(1);
     }
     else
@@ -1685,7 +1671,6 @@ static int SSL_basic_test(void)
 
         if (size < SSL_OK) /* got some alert or something nasty */
         {
-            printf("Server ");
             ssl_display_error(size);
             ret = size;
             break;
@@ -1958,7 +1943,6 @@ int main(int argc, char *argv[])
 
     bi_ctx = bi_initialize();
 
-#if 0
     if (AES_test(bi_ctx))
     {
         printf("AES tests failed\n");
@@ -1993,7 +1977,6 @@ int main(int argc, char *argv[])
         goto cleanup;
     }
     TTY_FLUSH();
-#endif
 
     if (BIGINT_test(bi_ctx))
     {

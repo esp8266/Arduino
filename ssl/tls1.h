@@ -42,7 +42,6 @@ extern "C" {
 
 #include "version.h"
 #include "crypto.h"
-#include "os_port.h"
 #include "crypto_misc.h"
 
 #define SSL_RANDOM_SIZE             32

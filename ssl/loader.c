@@ -41,7 +41,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-
+#include "os_port.h"
 #include "ssl.h"
 
 static int do_obj(SSL_CTX *ssl_ctx, int obj_type, 
@@ -77,7 +77,7 @@ EXP_FUNC int STDCALL ssl_obj_load(SSL_CTX *ssl_ctx, int obj_type,
     }
 
     /* is the file a PEM file? */
-    if (strncmp((char *)ssl_obj->buf, begin, strlen(begin)) == 0)
+    if (strstr((char *)ssl_obj->buf, begin) != NULL)
     {
 #ifdef CONFIG_SSL_HAS_PEM
         ret = ssl_obj_PEM_load(ssl_ctx, obj_type, ssl_obj, password);
