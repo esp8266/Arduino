@@ -39,13 +39,13 @@
 
 #define UDP_TX_PACKET_MAX_SIZE 24
 
-class UdpClass {
+class UDP {
 private:
   uint8_t _sock;  // socket ID for Wiz5100
   uint16_t _port; // local port to listen on
 
 public:
-  UdpClass() : _sock(MAX_SOCK_NUM) {};
+  UDP();
   uint8_t begin(uint16_t);	// initialize, start listening on specified port. Returns 1 if successful, 0 if there are no sockets available to use
   int available();								// has data been received?
 

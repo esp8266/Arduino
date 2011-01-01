@@ -31,8 +31,11 @@
 #include "Ethernet.h"
 #include "Udp.h"
 
+/* Constructor */
+UDP::UDP() : _sock(MAX_SOCK_NUM) {}
+
 /* Start UDP socket, listening at local port PORT */
-uint8_t UdpClass::begin(uint16_t port) {
+uint8_t UDP::begin(uint16_t port) {
   if (_sock != MAX_SOCK_NUM)
     return 0;
 
@@ -56,13 +59,13 @@ uint8_t UdpClass::begin(uint16_t port) {
 /* Send packet contained in buf of length len to peer at specified ip, and port */
 /* Use this function to transmit binary data that might contain 0x00 bytes*/
 /* This function returns sent data size for success else -1. */
-uint16_t UdpClass::sendPacket(uint8_t * buf, uint16_t len,  uint8_t * ip, uint16_t port){
+uint16_t UDP::sendPacket(uint8_t * buf, uint16_t len,  uint8_t * ip, uint16_t port){
   return sendto(_sock,(const uint8_t *)buf,len,ip,port);
 }
 
 /* Send  zero-terminated string str as packet to peer at specified ip, and port */
 /* This function returns sent data size for success else -1. */
-uint16_t UdpClass::sendPacket(const char str[], uint8_t * ip, uint16_t port){	
+uint16_t UDP::sendPacket(const char str[], uint8_t * ip, uint16_t port){	
   // compute strlen
   const char *s;
   for(s = str; *s; ++s);
@@ -72,7 +75,7 @@ uint16_t UdpClass::sendPacket(const char str[], uint8_t * ip, uint16_t port){
 }
 /* Is data available in rx buffer? Returns 0 if no, number of available bytes if yes. 
  * returned value includes 8 byte UDP header!*/
-int UdpClass::available() {
+int UDP::available() {
   return W5100.getRXReceivedSize(_sock);
 }
 
@@ -82,7 +85,7 @@ int UdpClass::available() {
 /* NOTE: I don't believe len is ever checked in implementation of recvfrom(),*/
 /*       so it's easy to overflow buffer. so we check and truncate. */
 /* returns number of bytes read, or negative number of bytes we would have needed if we truncated */
-int UdpClass::readPacket(uint8_t * buf, uint16_t bufLen, uint8_t *ip, uint16_t *port) {
+int UDP::readPacket(uint8_t * buf, uint16_t bufLen, uint8_t *ip, uint16_t *port) {
   int packetLen = available()-8; //skip UDP header;
   if(packetLen < 0 ) return 0; // no real data here	
   if(packetLen > (int)bufLen) {
@@ -131,21 +134,21 @@ int UdpClass::readPacket(uint8_t * buf, uint16_t bufLen, uint8_t *ip, uint16_t *
 }
 
 /* Read a received packet, throw away peer's ip and port.  See note above. */
-int UdpClass::readPacket(uint8_t * buf, uint16_t len) {
+int UDP::readPacket(uint8_t * buf, uint16_t len) {
   uint8_t ip[4];
   uint16_t port[1];
   return recvfrom(_sock,buf,len,ip,port);
 }
 
-int UdpClass::readPacket(char * buf, uint16_t bufLen, uint8_t *ip, uint16_t &port) {
+int UDP::readPacket(char * buf, uint16_t bufLen, uint8_t *ip, uint16_t &port) {
 uint16_t myPort;
 uint16_t ret = readPacket( (byte*)buf, bufLen, ip, &myPort);
 port = myPort;
 return ret;
 }
 
-/* Release any resources being used by this UdpClass instance */
-void UdpClass::stop()
+/* Release any resources being used by this UDP instance */
+void UDP::stop()
 {
   if (_sock == MAX_SOCK_NUM)
     return;
