@@ -1186,7 +1186,6 @@ int SSL_server_tests(void)
                     NULL, "abcd", DEFAULT_SVR_OPTION)))
         goto cleanup;
 
-//#if 0
     /* 
      * AES128 Encrypted invalid key 
      */
@@ -1199,7 +1198,6 @@ int SSL_server_tests(void)
 
     printf("SSL server test \"%s\" passed\n", "AES128 encrypted invalid key");
     TTY_FLUSH();
-//#endif
 
     /*
      * PKCS#8 key (encrypted)
