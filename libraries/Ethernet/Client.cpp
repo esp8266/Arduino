@@ -77,7 +77,7 @@ int Client::available() {
 
 int Client::read() {
   uint8_t b;
-  if ( recv(_sock, &b, 1) )
+  if ( recv(_sock, &b, 1) > 0 )
   {
     // recv worked
     return b;
