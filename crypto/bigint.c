@@ -826,11 +826,10 @@ static bigint *regular_multiply(BI_CTX *ctx, bigint *bia, bigint *bib,
     do 
     {
         comp carry = 0;
-        comp b = *sb++;
         int r_index = i;
         j = 0;
 
-        if (outer_partial)
+        if (outer_partial && outer_partial-i > 0 && outer_partial < n)
         {
             r_index = outer_partial-1;
             j = outer_partial-i-1;
@@ -843,7 +842,7 @@ static bigint *regular_multiply(BI_CTX *ctx, bigint *bia, bigint *bib,
                 break;
             }
 
-            long_comp tmp = sr[r_index] + ((long_comp)sa[j])*b + carry;
+            long_comp tmp = sr[r_index] + ((long_comp)sa[j])*sb[i] + carry;
             sr[r_index++] = (comp)tmp;              /* downsize */
             carry = tmp >> COMP_BIT_SIZE;
         } while (++j < n);
@@ -945,7 +944,7 @@ static bigint *regular_square(BI_CTX *ctx, bigint *bi)
 {
     int t = bi->size;
     int i = 0, j;
-    bigint *biR = alloc(ctx, t*2);
+    bigint *biR = alloc(ctx, t*2+1);
     comp *w = biR->comps;
     comp *x = bi->comps;
     long_comp carry;
