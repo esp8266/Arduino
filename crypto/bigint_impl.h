@@ -41,10 +41,8 @@
 #define BIGINT_NUM_MODS     1    
 #endif
 
-//#define REGISTER_8          1
-
 /* Architecture specific functions for big ints */
-#if defined(REGISTER_8)
+#if defined(CONFIG_INTEGER_8BIT)
 #define COMP_RADIX          256U       /**< Max component + 1 */
 #define COMP_MAX            0xFFFFU/**< (Max dbl comp -1) */
 #define COMP_BIT_SIZE       8   /**< Number of bits in a component. */
@@ -53,7 +51,7 @@
 typedef uint8_t comp;	        /**< A single precision component. */
 typedef uint16_t long_comp;     /**< A double precision component. */
 typedef int16_t slong_comp;     /**< A signed double precision component. */
-#elif defined(REGISTER_16)
+#elif defined(CONFIG_INTEGER_16BIT)
 #define COMP_RADIX          65536U       /**< Max component + 1 */
 #define COMP_MAX            0xFFFFFFFFU/**< (Max dbl comp -1) */
 #define COMP_BIT_SIZE       16  /**< Number of bits in a component. */

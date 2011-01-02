@@ -801,11 +801,16 @@ void bi_free_mod(BI_CTX *ctx, int mod_offset)
 
 /** 
  * Perform a standard multiplication between two bigints.
+ *
+ * Barrett reduction has no need for some parts of the product, so ignore bits
+ * of the multiply. This routine gives Barrett its big performance
+ * improvements over Classical/Montgomery reduction methods. 
  */
-static bigint *regular_multiply(BI_CTX *ctx, bigint *bia, bigint *bib)
+static bigint *regular_multiply(BI_CTX *ctx, bigint *bia, bigint *bib, 
+        int inner_partial, int outer_partial)
 {
-    int i, j, i_plus_j;
-    int n = bia->size; 
+    int i = 0, j;
+    int n = bia->size;
     int t = bib->size;
     bigint *biR = alloc(ctx, n + t);
     comp *sr = biR->comps;
@@ -817,23 +822,33 @@ static bigint *regular_multiply(BI_CTX *ctx, bigint *bia, bigint *bib)
 
     /* clear things to start with */
     memset(biR->comps, 0, ((n+t)*COMP_BYTE_SIZE));
-    i = 0;
 
     do 
     {
         comp carry = 0;
         comp b = *sb++;
-        i_plus_j = i;
+        int r_index = i;
         j = 0;
+
+        if (outer_partial)
+        {
+            r_index = outer_partial-1;
+            j = outer_partial-i-1;
+        }
 
         do
         {
-            long_comp tmp = sr[i_plus_j] + (long_comp)sa[j]*b + carry;
-            sr[i_plus_j++] = (comp)tmp;              /* downsize */
-            carry = (comp)(tmp >> COMP_BIT_SIZE);
+            if (inner_partial && r_index >= inner_partial) 
+            {
+                break;
+            }
+
+            long_comp tmp = sr[r_index] + ((long_comp)sa[j])*b + carry;
+            sr[r_index++] = (comp)tmp;              /* downsize */
+            carry = tmp >> COMP_BIT_SIZE;
         } while (++j < n);
 
-        sr[i_plus_j] = carry;
+        sr[r_index] = carry;
     } while (++i < t);
 
     bi_free(ctx, bia);
@@ -913,12 +928,12 @@ bigint *bi_multiply(BI_CTX *ctx, bigint *bia, bigint *bib)
 #ifdef CONFIG_BIGINT_KARATSUBA
     if (min(bia->size, bib->size) < MUL_KARATSUBA_THRESH)
     {
-        return regular_multiply(ctx, bia, bib);
+        return regular_multiply(ctx, bia, bib, 0, 0);
     }
 
     return karatsuba(ctx, bia, bib, 0);
 #else
-    return regular_multiply(ctx, bia, bib);
+    return regular_multiply(ctx, bia, bib, 0, 0);
 #endif
 }
 
@@ -941,7 +956,7 @@ static bigint *regular_square(BI_CTX *ctx, bigint *bi)
         long_comp tmp = w[2*i] + (long_comp)x[i]*x[i];
         uint8_t c = 0;
         w[2*i] = (comp)tmp;
-        carry = (comp)(tmp >> COMP_BIT_SIZE);
+        carry = tmp >> COMP_BIT_SIZE;
 
         for (j = i+1; j < t; j++)
         {
@@ -1242,81 +1257,6 @@ static bigint *comp_mod(bigint *bi, int mod)
     return bi;
 }
 
-/*
- * Barrett reduction has no need for some parts of the product, so ignore bits
- * of the multiply. This routine gives Barrett its big performance
- * improvements over Classical/Montgomery reduction methods. 
- */
-static bigint *partial_multiply(BI_CTX *ctx, bigint *bia, bigint *bib, 
-        int inner_partial, int outer_partial)
-{
-    int i = 0, j, n = bia->size, t = bib->size;
-    bigint *biR;
-    comp carry;
-    comp *sr, *sa, *sb;
-
-    check(bia);
-    check(bib);
-
-    biR = alloc(ctx, n + t);
-    sa = bia->comps;
-    sb = bib->comps;
-    sr = biR->comps;
-
-    if (inner_partial)
-    {
-        memset(sr, 0, inner_partial*COMP_BYTE_SIZE); 
-    }
-    else    /* outer partial */
-    {
-        if (n < outer_partial || t < outer_partial) /* should we bother? */
-        {
-            bi_free(ctx, bia);
-            bi_free(ctx, bib);
-            biR->comps[0] = 0;      /* return 0 */
-            biR->size = 1;
-            return biR;
-        }
-
-        memset(&sr[outer_partial], 0, (n+t-outer_partial)*COMP_BYTE_SIZE);
-    }
-
-    do 
-    {
-        comp *a = sa;
-        comp b = *sb++;
-        long_comp tmp;
-        int i_plus_j = i;
-        carry = 0;
-        j = n;
-
-        if (outer_partial && i_plus_j < outer_partial)
-        {
-            i_plus_j = outer_partial;
-            a = &sa[outer_partial-i];
-            j = n-(outer_partial-i);
-        }
-
-        do
-        {
-            if (inner_partial && i_plus_j >= inner_partial) 
-            {
-                break;
-            }
-
-            tmp = sr[i_plus_j] + ((long_comp)*a++)*b + carry;
-            sr[i_plus_j++] = (comp)tmp;              /* downsize */
-            carry = (comp)(tmp >> COMP_BIT_SIZE);
-        } while (--j != 0);
-
-        sr[i_plus_j] = carry;
-    } while (++i < t);
-
-    bi_free(ctx, bia);
-    bi_free(ctx, bib);
-    return trim(biR);
-}
-
 /**
  * @brief Perform a single Barrett reduction.
  * @param ctx [in]  The bigint session context.
@@ -1342,12 +1282,12 @@ bigint *bi_barrett(BI_CTX *ctx, bigint *bi)
     q1 = comp_right_shift(bi_clone(ctx, bi), k-1);
 
     /* do outer partial multiply */
-    q2 = partial_multiply(ctx, q1, ctx->bi_mu[mod_offset], 0, k-1); 
+    q2 = regular_multiply(ctx, q1, ctx->bi_mu[mod_offset], 0, k-1); 
     q3 = comp_right_shift(q2, k+1);
     r1 = comp_mod(bi, k+1);
 
     /* do inner partial multiply */
-    r2 = comp_mod(partial_multiply(ctx, q3, bim, k+1, 0), k+1);
+    r2 = comp_mod(regular_multiply(ctx, q3, bim, k+1, 0), k+1);
     r = bi_subtract(ctx, r1, r2, NULL);
 
     /* if (r >= m) r = r - m; */

@@ -428,8 +428,8 @@ static int BIGINT_test(BI_CTX *ctx)
 {
     int res = 1;
 
-#ifndef REGISTER_8 
-#ifndef REGISTER_16
+#ifndef CONFIG_INTEGER_8BIT 
+#ifndef CONFIG_INTEGER_16BIT 
     bigint *bi_data, *bi_exp, *bi_res;
     const char *expnt, *plaintext, *mod;
     uint8_t compare[MAX_KEY_BYTE_SIZE];

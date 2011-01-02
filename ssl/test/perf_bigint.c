@@ -45,10 +45,11 @@
 int main(int argc, char *argv[])
 {
 #ifdef CONFIG_SSL_CERT_VERIFICATION
-    RSA_CTX *rsa_ctx;
+    RSA_CTX *rsa_ctx = NULL;
     BI_CTX *ctx;
     bigint *bi_data, *bi_res;
-    int diff, res = 1;
+    float diff;
+    int res = 1;
     struct timeval tv_old, tv_new;
     const char *plaintext;
     uint8_t compare[MAX_KEY_BYTE_SIZE];
@@ -84,7 +85,7 @@ int main(int argc, char *argv[])
 
     diff = (tv_new.tv_sec-tv_old.tv_sec)*1000 +
                 (tv_new.tv_usec-tv_old.tv_usec)/1000;
-    printf("512 bit decrypt time: %dms\n", diff/max_biggie);
+    printf("512 bit decrypt time: %.2fms\n", diff/max_biggie);
     TTY_FLUSH();
     bi_export(ctx, bi_res, compare, 64);
     RSA_free(rsa_ctx);
@@ -100,6 +101,7 @@ int main(int argc, char *argv[])
         "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ*^";
 
     len = get_file("../ssl/test/axTLS.key_1024", &buf);
+    rsa_ctx = NULL;
     asn1_get_private_key(buf, len, &rsa_ctx);
     ctx = rsa_ctx->bi_ctx;
     bi_data = bi_import(ctx, (uint8_t *)plaintext, strlen(plaintext));
@@ -121,7 +123,7 @@ int main(int argc, char *argv[])
 
     diff = (tv_new.tv_sec-tv_old.tv_sec)*1000 +
                 (tv_new.tv_usec-tv_old.tv_usec)/1000;
-    printf("1024 bit decrypt time: %dms\n", diff/max_biggie);
+    printf("1024 bit decrypt time: %.2fms\n", diff/max_biggie);
     TTY_FLUSH();
     bi_export(ctx, bi_res, compare, 128);
     RSA_free(rsa_ctx);
@@ -139,6 +141,7 @@ int main(int argc, char *argv[])
         "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ*^";
 
     len = get_file("../ssl/test/axTLS.key_2048", &buf);
+    rsa_ctx = NULL;
     asn1_get_private_key(buf, len, &rsa_ctx);
     ctx = rsa_ctx->bi_ctx;
     bi_data = bi_import(ctx, (uint8_t *)plaintext, strlen(plaintext));
@@ -159,7 +162,7 @@ int main(int argc, char *argv[])
 
     diff = (tv_new.tv_sec-tv_old.tv_sec)*1000 +
                 (tv_new.tv_usec-tv_old.tv_usec)/1000;
-    printf("2048 bit decrypt time: %dms\n", diff/max_biggie);
+    printf("2048 bit decrypt time: %.2fms\n", diff/max_biggie);
     TTY_FLUSH();
     bi_export(ctx, bi_res, compare, 256);
     RSA_free(rsa_ctx);
@@ -181,6 +184,7 @@ int main(int argc, char *argv[])
         "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ*^";
 
     len = get_file("../ssl/test/axTLS.key_4096", &buf);
+    rsa_ctx = NULL;
     asn1_get_private_key(buf, len, &rsa_ctx);
     ctx = rsa_ctx->bi_ctx;
     bi_data = bi_import(ctx, (uint8_t *)plaintext, strlen(plaintext));
@@ -189,7 +193,7 @@ int main(int argc, char *argv[])
     gettimeofday(&tv_new, NULL);
     diff = (tv_new.tv_sec-tv_old.tv_sec)*1000 +
                 (tv_new.tv_usec-tv_old.tv_usec)/1000;
-    printf("4096 bit encrypt time: %dms\n", diff);
+    printf("4096 bit encrypt time: %.2fms\n", diff);
     TTY_FLUSH();
     bi_data = bi_res;   /* reuse again */
 
@@ -208,7 +212,7 @@ int main(int argc, char *argv[])
 
     diff = (tv_new.tv_sec-tv_old.tv_sec)*1000 +
                 (tv_new.tv_usec-tv_old.tv_usec)/1000;
-    printf("4096 bit decrypt time: %dms\n", diff/max_biggie);
+    printf("4096 bit decrypt time: %.2fms\n", diff/max_biggie);
     TTY_FLUSH();
     bi_export(ctx, bi_res, compare, 512);
     RSA_free(rsa_ctx);

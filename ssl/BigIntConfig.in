@@ -8,7 +8,7 @@ menu "BigInt Options"
 
 choice
     prompt "Reduction Algorithm"
-    default CONFIG_BIGINT_CLASSICAL
+    default CONFIG_BIGINT_BARRETT
 
 config CONFIG_BIGINT_CLASSICAL
     bool "Classical"
@@ -21,9 +21,8 @@ config CONFIG_BIGINT_MONTGOMERY
     bool "Montgomery"
     help
         Montgomery uses simple addition and multiplication to achieve its
-        performance. In this implementation it is slower than classical, 
-        and it has the limitation that 0 <= x, y < m, and so is not used 
-        when CRT is active.
+        performance.  It has the limitation that 0 <= x, y < m, and so is not 
+        used when CRT is active.
 
         This option will not be normally selected.
 
@@ -31,9 +30,7 @@ config CONFIG_BIGINT_BARRETT
     bool "Barrett"
     help
         Barrett performs expensive precomputation before reduction and partial
-        multiplies for computational speed. It can't be used with some of the
-        calculations when CRT is used, and so defaults to classical when this
-        occurs.
+        multiplies for computational speed.
 
         It is about 40% faster than Classical/Montgomery with the expense of
         about 2kB, and so this option is normally selected.
@@ -108,12 +105,9 @@ config CONFIG_BIGINT_SQUARE
     bool "Square Algorithm"
     default y
     help
-        Allow squaring to be used instead of a multiplication.
- 
-        Squaring is theoretically 50% faster than a standard multiply 
-        (but is actually about 25% faster). 
-
-        It gives a 20% speed improvement and so should be selected.
+        Allow squaring to be used instead of a multiplication. It uses
+        1/2 of the standard multiplies to obtain its performance.  
+        It gives a 20% speed improvement overall and so should be selected.
 
 config CONFIG_BIGINT_CHECK_ON
     bool "BigInt Integrity Checking"
@@ -126,7 +120,26 @@ config CONFIG_BIGINT_CHECK_ON
         This option is only selected when developing and should normally be
         turned off.
 
+choice
+    prompt "Integer Size"
+    default CONFIG_INTEGER_32BIT
+
+config CONFIG_INTEGER_32BIT
+    bool "32"
+    help
+        The native integer size is 32 bits or higher.
+        
+
+config CONFIG_INTEGER_16BIT
+    bool "16"
+    help
+        The native integer size is 16 bits.
+
+config CONFIG_INTEGER_8BIT
+    bool "8"
+    help
+        The native integer size is 8 bits.
+
+endchoice
 endmenu
-
-
 
