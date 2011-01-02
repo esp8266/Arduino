@@ -59,8 +59,8 @@ config CONFIG_BIGINT_KARATSUBA
         Uses 3 multiplications (plus a number of additions/subtractions) 
         instead of 4. Multiplications are O(N^2) but addition/subtraction 
         is O(N) hence for large numbers is beneficial. For this project, the 
-        effect was only useful for 4096 bit keys. As these aren't likely to 
-        be used, the feature is disabled by default. 
+        effect was only useful for 4096 bit keys (for 32 bit processors). For
+        8 bit processors this option might be a possibility.
         
         It costs about 2kB to enable it.
 
