@@ -146,13 +146,17 @@ uint16_t send(SOCKET s, const uint8_t * buf, uint16_t len)
  */
 uint16_t recv(SOCKET s, uint8_t *buf, uint16_t len)
 {
-  uint16_t ret=0;
-
-  if ( len > 0 )
+  // Check how much data is available
+  uint16_t ret = W5100.getRXReceivedSize(s);
+  if (ret > len)
   {
-    W5100.recv_data_processing(s, buf, len);
-    W5100.execCmdSn(s, Sock_RECV);
     ret = len;
+  }
+
+  if ( ret > 0 )
+  {
+    W5100.recv_data_processing(s, buf, ret);
+    W5100.execCmdSn(s, Sock_RECV);
   }
   return ret;
 }

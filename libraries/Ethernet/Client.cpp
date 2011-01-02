@@ -77,14 +77,25 @@ int Client::available() {
 
 int Client::read() {
   uint8_t b;
-  if (!available())
+  if ( recv(_sock, &b, 1) )
+  {
+    // recv worked
+    return b;
+  }
+  else
+  {
+    // No data available
     return -1;
-  recv(_sock, &b, 1);
-  return b;
+  }
+}
+
+int Client::read(uint8_t *buf, size_t size) {
+  return recv(_sock, buf, size);
 }
 
 int Client::peek() {
   uint8_t b;
+  // Unlike recv, peek doesn't check to see if there's any data available, so we must
   if (!available())
     return -1;
   ::peek(_sock, &b);
