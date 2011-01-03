@@ -40,9 +40,16 @@ extern "C" {
 #endif
 
 #include "config.h"
-#include "os_port.h"
 #include "bigint_impl.h"
 #include "bigint.h"
+
+#ifndef STDCALL
+#define STDCALL
+#endif
+#ifndef EXP_FUNC
+#define EXP_FUNC
+#endif
+
 
 /* enable features based on a 'super-set' capbaility. */
 #if defined(CONFIG_SSL_FULL_MODE) 

@@ -47,6 +47,7 @@
 #include <pthread.h>
 #endif
 
+#include "os_port.h"
 #include "ssl.h"
 
 #define DEFAULT_CERT            "../ssl/test/axTLS.x509_512.cer"
@@ -694,6 +695,16 @@ static int cert_tests(void)
     x509_free(x509_ctx);
     free(buf);
 
+    ssl_ctx = ssl_ctx_new(0, 0);
+    if (ssl_obj_load(ssl_ctx, SSL_OBJ_X509_CACERT, 
+            "../ssl/test/ca-bundle.crt", NULL))
+    {
+        printf("Cert #10\n");
+        goto bad_cert;
+    }
+
+    ssl_ctx_free(ssl_ctx);
+
     res = 0;        /* all ok */
     printf("All Certificate tests passed\n");
 
@@ -1008,7 +1019,8 @@ int SSL_server_tests(void)
     /* 
      * 512 bit RSA key 
      */
-    if ((ret = SSL_server_test("512 bit key", "-cipher RC4-SHA", 
+    if ((ret = SSL_server_test("512 bit key", 
+                    "-cipher RC4-SHA", 
                     "../ssl/test/axTLS.x509_512.cer", NULL, 
                     "../ssl/test/axTLS.key_512",
                     NULL, NULL, DEFAULT_SVR_OPTION)))
@@ -1018,13 +1030,21 @@ int SSL_server_tests(void)
      * 1024 bit RSA key (check certificate chaining)
      */
     if ((ret = SSL_server_test("1024 bit key", 
-                    "-cipher RC4-SHA", 
-                    "../ssl/test/axTLS.x509_device.cer", 
-                    "../ssl/test/axTLS.x509_512.cer", 
-                    "../ssl/test/axTLS.device_key",
+                    "-cipher RC4-SHA",
+                    "../ssl/test/axTLS.x509_1024.cer", NULL, 
+                    "../ssl/test/axTLS.key_1024",
                     NULL, NULL, DEFAULT_SVR_OPTION)))
         goto cleanup;
 
+    /* 
+     * 1042 bit RSA key (check certificate chaining)
+     */
+    if ((ret = SSL_server_test("1042 bit key", 
+                    "-cipher RC4-SHA",
+                    "../ssl/test/axTLS.x509_1042.cer", NULL, 
+                    "../ssl/test/axTLS.key_1042",
+                    NULL, NULL, DEFAULT_SVR_OPTION)))
+        goto cleanup;
     /* 
      * 2048 bit RSA key 
      */
@@ -1311,7 +1331,7 @@ static int SSL_client_test(
 #endif
     }
     
-    sleep(5);           /* allow server to start */
+    usleep(500000);           /* allow server to start */
 
     if (*ssl_ctx == NULL)
     {
@@ -1354,8 +1374,8 @@ static int SSL_client_test(
             }
         }
 
-	if (ssl_obj_load(*ssl_ctx, SSL_OBJ_X509_CACERT, 
-				"../ssl/test/axTLS.ca_x509.cer", NULL))
+        if (ssl_obj_load(*ssl_ctx, SSL_OBJ_X509_CACERT, 
+                "../ssl/test/axTLS.ca_x509.cer", NULL))
         {
             printf("could not add cert auth\n"); TTY_FLUSH();
             goto client_test_exit;
@@ -1566,6 +1586,23 @@ int SSL_client_tests(void)
     }
 
     printf("SSL client test \"Expired cert (verify later)\" passed\n");
+
+    /* invalid cert type */
+    if ((ret = SSL_client_test("Error: Invalid certificate type", 
+                    &ssl_ctx,
+                    "-cert ../ssl/test/axTLS.x509_2048.pem "
+                    "-key ../ssl/test/axTLS.key_2048.pem "
+                    "-CAfile ../ssl/test/axTLS.ca_x509.pem "
+                    "-verify 1 ", NULL, DEFAULT_CLNT_OPTION, 
+                    "../ssl/test/axTLS.x509_1024.cer", NULL,
+                    "../ssl/test/axTLS.x509_1024.cer")) 
+                            != SSL_ERROR_INVALID_KEY)
+    {
+        printf("*** Error: %d\n", ret); TTY_FLUSH();
+        goto cleanup;
+    }
+
+    printf("SSL client test \"Invalid certificate type\" passed\n");
     ret = 0;
 
 cleanup:

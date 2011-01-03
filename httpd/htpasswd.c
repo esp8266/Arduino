@@ -31,6 +31,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "os_port.h"
 #include "ssl.h"
 
 int tfd;

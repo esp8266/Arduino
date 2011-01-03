@@ -46,6 +46,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "os_port.h"
 #include "ssl.h"
 
 /* define standard input */

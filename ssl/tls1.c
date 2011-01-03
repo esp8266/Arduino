@@ -399,7 +399,7 @@ int add_cert_auth(SSL_CTX *ssl_ctx, const uint8_t *buf, int len)
     while (i < CONFIG_X509_MAX_CA_CERTS && ca_cert_ctx->cert[i]) 
         i++;
 
-    if (i > CONFIG_X509_MAX_CA_CERTS)
+    if (i >= CONFIG_X509_MAX_CA_CERTS)
     {
 #ifdef CONFIG_SSL_FULL_MODE
         printf("Error: maximum number of CA certs added - change of "
@@ -421,7 +421,6 @@ int add_cert_auth(SSL_CTX *ssl_ctx, const uint8_t *buf, int len)
 error:
     return ret;
 }
-
 
 /*
  * Retrieve an X.509 distinguished name component

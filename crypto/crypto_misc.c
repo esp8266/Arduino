@@ -36,6 +36,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include "os_port.h"
 #include "crypto_misc.h"
 #ifdef CONFIG_WIN32_USE_CRYPTO_LIB
 #include "wincrypt.h"

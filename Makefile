@@ -108,6 +108,7 @@ endif
 	install -m 644 ssl/*.h $(PREFIX)/include/axTLS
 	-rm $(PREFIX)/include/axTLS/cert.h
 	-rm $(PREFIX)/include/axTLS/private_key.h
+	-rm $(PREFIX)/include/axTLS/os_port.h
 	install -m 644 config/config.h $(PREFIX)/include/axTLS
 
 installclean:

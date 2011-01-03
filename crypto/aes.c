@@ -35,6 +35,7 @@
  */
 
 #include <string.h>
+#include "os_port.h"
 #include "crypto.h"
 
 /* all commented out in skeleton mode */

@@ -252,7 +252,7 @@ config CONFIG_SSL_EXPIRY_TIME
 
 config CONFIG_X509_MAX_CA_CERTS
     int "Maximum number of certificate authorites"
-    default 4
+    default 120 if CONFIG_SSL_CERT_VERIFICATION
     depends on !CONFIG_SSL_SERVER_ONLY && !CONFIG_SSL_SKELETON_MODE
     help
         Determines the number of CA's allowed. 
@@ -260,11 +260,11 @@ config CONFIG_X509_MAX_CA_CERTS
         Increase this figure if more trusted sites are allowed. Each
         certificate adds about 300 bytes (when added).
 
-        The default is to allow four certification authorities.
+        The default is to allow the Debian cert bundle to be parsed.
 
 config CONFIG_SSL_MAX_CERTS
     int "Maximum number of chained certificates"
-    default 2
+    default 3
     help
         Determines the number of certificates used in a certificate
         chain. The chain length must be at least 1.
@@ -272,8 +272,7 @@ config CONFIG_SSL_MAX_CERTS
         Increase this figure if more certificates are to be added to the 
         chain. Each certificate adds about 300 bytes (when added).
 
-        The default is to allow one certificate + 1 certificate in the chain
-        (which may be the certificate authority certificate).
+        The default is to allow one certificate + 2 certificates in the chain.
 
 config CONFIG_SSL_CTX_MUTEXING
     bool "Enable SSL_CTX mutexing"

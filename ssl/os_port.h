@@ -152,7 +152,7 @@ EXP_FUNC int STDCALL getdomainname(char *buf, int buf_size);
 
 #define SOCKET_READ(A,B,C)      read(A,B,C)
 #define SOCKET_WRITE(A,B,C)     write(A,B,C)
-#define SOCKET_CLOSE(A)         close(A)
+#define SOCKET_CLOSE(A)         if (A >= 0) close(A)
 #define SOCKET_BLOCK(A)         int fd = fcntl(A, F_GETFL, NULL); \
                                 fcntl(A, F_SETFL, fd & ~O_NONBLOCK)
 #define TTY_FLUSH()
