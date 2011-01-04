@@ -572,6 +572,17 @@ static int cert_tests(void)
     SSL_CTX *ssl_ctx;
     uint8_t *buf;
 
+    ssl_ctx = ssl_ctx_new(0, 0);
+    if (ssl_obj_load(ssl_ctx, SSL_OBJ_X509_CACERT, 
+            "../ssl/test/ca-bundle.crt", NULL))
+    {
+        printf("Cert #10\n");
+        goto bad_cert;
+    }
+
+    ssl_ctx_free(ssl_ctx);
+    exit(0);
+
     /* check a bunch of 3rd party certificates */
     ssl_ctx = ssl_ctx_new(0, 0);
     len = get_file("../ssl/test/microsoft.x509_ca", &buf);
@@ -694,16 +705,6 @@ static int cert_tests(void)
     }
     x509_free(x509_ctx);
     free(buf);
-
-    ssl_ctx = ssl_ctx_new(0, 0);
-    if (ssl_obj_load(ssl_ctx, SSL_OBJ_X509_CACERT, 
-            "../ssl/test/ca-bundle.crt", NULL))
-    {
-        printf("Cert #10\n");
-        goto bad_cert;
-    }
-
-    ssl_ctx_free(ssl_ctx);
 
     res = 0;        /* all ok */
     printf("All Certificate tests passed\n");

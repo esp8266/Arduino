@@ -386,9 +386,9 @@ error:
  */
 int add_cert_auth(SSL_CTX *ssl_ctx, const uint8_t *buf, int len)
 {
-    int ret = SSL_ERROR_NO_CERT_DEFINED;
     int i = 0;
     int offset;
+    int ret = SSL_OK; /* ignore errors for now */
     CA_CERT_CTX *ca_cert_ctx;
 
     if (ssl_ctx->ca_cert_ctx == NULL)
@@ -408,9 +408,7 @@ int add_cert_auth(SSL_CTX *ssl_ctx, const uint8_t *buf, int len)
         goto error;
     }
 
-    if ((ret = x509_new(buf, &offset, &ca_cert_ctx->cert[i])))
-        goto error;
-
+    ret = x509_new(buf, &offset, &ca_cert_ctx->cert[i]);
     len -= offset;
     ret = SSL_OK;           /* ok so far */
 

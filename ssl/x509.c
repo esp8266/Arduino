@@ -113,7 +113,9 @@ int x509_new(const uint8_t *cert, int *len, X509_CTX **ctx)
             asn1_validity(cert, &offset, x509_ctx) ||
             asn1_name(cert, &offset, x509_ctx->cert_dn) ||
             asn1_public_key(cert, &offset, x509_ctx))
+    {
         goto end_cert;
+    }
 
     bi_ctx = x509_ctx->rsa_ctx->bi_ctx;
 
@@ -210,7 +212,8 @@ end_cert:
 #ifdef CONFIG_SSL_FULL_MODE
     if (ret)
     {
-        printf("Error: Invalid X509 ASN.1 file\n");
+        printf("Error: Invalid X509 ASN.1 file (%s)\n",
+                        x509_display_error(ret));
     }
 #endif
 

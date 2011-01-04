@@ -961,17 +961,17 @@ static bigint *regular_square(BI_CTX *ctx, bigint *bi)
         {
             uint8_t c = 0;
             long_comp xx = (long_comp)x[i]*x[j];
-            if (COMP_MAX-xx < xx)
+            if ((COMP_MAX-xx) < xx)
                 c = 1;
 
             tmp = (xx<<1);
 
-            if (COMP_MAX-tmp < w[i+j])
+            if ((COMP_MAX-tmp) < w[i+j])
                 c = 1;
 
             tmp += w[i+j];
 
-            if (COMP_MAX-tmp < carry)
+            if ((COMP_MAX-tmp) < carry)
                 c = 1;
 
             tmp += carry;
@@ -982,7 +982,7 @@ static bigint *regular_square(BI_CTX *ctx, bigint *bi)
                 carry += COMP_RADIX;
         }
 
-        tmp = carry + w[i+t];
+        tmp = w[i+t] + carry;
         w[i+t] = (comp)tmp;
         w[i+t+1] = tmp >> COMP_BIT_SIZE;
     } while (++i < t);
