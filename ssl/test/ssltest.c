@@ -572,17 +572,6 @@ static int cert_tests(void)
     SSL_CTX *ssl_ctx;
     uint8_t *buf;
 
-    ssl_ctx = ssl_ctx_new(0, 0);
-    if (ssl_obj_load(ssl_ctx, SSL_OBJ_X509_CACERT, 
-            "../ssl/test/ca-bundle.crt", NULL))
-    {
-        printf("Cert #10\n");
-        goto bad_cert;
-    }
-
-    ssl_ctx_free(ssl_ctx);
-    exit(0);
-
     /* check a bunch of 3rd party certificates */
     ssl_ctx = ssl_ctx_new(0, 0);
     len = get_file("../ssl/test/microsoft.x509_ca", &buf);
@@ -706,7 +695,17 @@ static int cert_tests(void)
     x509_free(x509_ctx);
     free(buf);
 
-    res = 0;        /* all ok */
+    ssl_ctx = ssl_ctx_new(0, 0);
+    if (ssl_obj_load(ssl_ctx, SSL_OBJ_X509_CACERT, 
+            "../ssl/test/ca-bundle.crt", NULL))
+    {
+        printf("Cert #10\n");
+        goto bad_cert;
+    }
+
+    ssl_ctx_free(ssl_ctx);
+
+res = 0;        /* all ok */
     printf("All Certificate tests passed\n");
 
 bad_cert:
@@ -795,7 +794,7 @@ typedef struct
 static void do_client(client_t *clnt)
 {
     char openssl_buf[2048];
-    usleep(500000);           /* allow server to start */
+    usleep(200000);           /* allow server to start */
 
     /* show the session ids in the reconnect test */
     if (strcmp(clnt->testname, "Session Reuse") == 0)
@@ -1332,7 +1331,7 @@ static int SSL_client_test(
 #endif
     }
     
-    usleep(500000);           /* allow server to start */
+    usleep(200000);           /* allow server to start */
 
     if (*ssl_ctx == NULL)
     {
@@ -1443,7 +1442,7 @@ static int SSL_client_test(
 client_test_exit:
     ssl_free(ssl);
     SOCKET_CLOSE(client_fd);
-    usleep(500000);           /* allow openssl to say something */
+    usleep(200000);           /* allow openssl to say something */
 
     if (sess_resume)
     {
@@ -1451,9 +1450,6 @@ client_test_exit:
         {
             ssl_ctx_free(*ssl_ctx);
             *ssl_ctx = NULL;
-#ifndef WIN32
-            pthread_cancel(sess_resume->server_thread);
-#endif
         }
         else if (sess_resume->start_server)
         {
@@ -1466,9 +1462,6 @@ client_test_exit:
     {
         ssl_ctx_free(*ssl_ctx);
         *ssl_ctx = NULL;
-#ifndef WIN32
-        pthread_cancel(thread);
-#endif
     }
 
     if (ret == 0)
@@ -1635,7 +1628,7 @@ static void do_basic(void)
     SSL *ssl_clnt;
     SSL_CTX *ssl_clnt_ctx = ssl_ctx_new(
                             DEFAULT_CLNT_OPTION, SSL_DEFAULT_CLNT_SESS);
-    usleep(500000);           /* allow server to start */
+    usleep(200000);           /* allow server to start */
 
     if ((client_fd = client_socket_init(g_port)) < 0)
         goto error;
@@ -1760,7 +1753,7 @@ void do_multi_clnt(multi_t *multi_data)
     if ((client_fd = client_socket_init(multi_data->port)) < 0)
         goto client_test_exit;
 
-    usleep(500000);
+    usleep(200000);
     ssl = ssl_client_new(multi_data->ssl_clnt_ctx, client_fd, NULL, 0);
 
     if ((res = ssl_handshake_status(ssl)))
@@ -1937,7 +1930,7 @@ static int header_issue(void)
 
     size = fread(buf, 1, sizeof(buf), f);
     SOCKET_WRITE(client_fd, buf, size);
-    usleep(500000);
+    usleep(200000);
 
     ret = 0;
 error:

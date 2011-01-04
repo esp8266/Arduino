@@ -209,13 +209,15 @@ int x509_new(const uint8_t *cert, int *len, X509_CTX **ctx)
     ret = X509_OK;
 end_cert:
 
-#ifdef CONFIG_SSL_FULL_MODE
     if (ret)
     {
+#ifdef CONFIG_SSL_FULL_MODE
         printf("Error: Invalid X509 ASN.1 file (%s)\n",
                         x509_display_error(ret));
-    }
 #endif
+        x509_free(x509_ctx);
+        *ctx = NULL;
+    }
 
     return ret;
 }

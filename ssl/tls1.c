@@ -386,9 +386,8 @@ error:
  */
 int add_cert_auth(SSL_CTX *ssl_ctx, const uint8_t *buf, int len)
 {
-    int i = 0;
-    int offset;
     int ret = SSL_OK; /* ignore errors for now */
+    int i = 0;
     CA_CERT_CTX *ca_cert_ctx;
 
     if (ssl_ctx->ca_cert_ctx == NULL)
@@ -399,24 +398,26 @@ int add_cert_auth(SSL_CTX *ssl_ctx, const uint8_t *buf, int len)
     while (i < CONFIG_X509_MAX_CA_CERTS && ca_cert_ctx->cert[i]) 
         i++;
 
-    if (i >= CONFIG_X509_MAX_CA_CERTS)
+    while (len > 0)
     {
+        int offset;
+        if (i >= CONFIG_X509_MAX_CA_CERTS)
+        {
 #ifdef CONFIG_SSL_FULL_MODE
-        printf("Error: maximum number of CA certs added - change of "
-                "compile-time configuration required\n");
+            printf("Error: maximum number of CA certs added - change of "
+                    "compile-time configuration required\n");
 #endif
-        goto error;
+            break;
+        }
+
+
+        /* ignore the return code */
+        if (x509_new(buf, &offset, &ca_cert_ctx->cert[i]) == X509_OK)
+            i++;
+
+        len -= offset;
     }
 
-    ret = x509_new(buf, &offset, &ca_cert_ctx->cert[i]);
-    len -= offset;
-    ret = SSL_OK;           /* ok so far */
-
-    /* recurse? */
-    if (len > 0)
-        ret = add_cert_auth(ssl_ctx, &buf[offset], len);
-
-error:
     return ret;
 }
 
