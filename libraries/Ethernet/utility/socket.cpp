@@ -146,13 +146,32 @@ uint16_t send(SOCKET s, const uint8_t * buf, uint16_t len)
  */
 uint16_t recv(SOCKET s, uint8_t *buf, uint16_t len)
 {
-  uint16_t ret=0;
-
-  if ( len > 0 )
+  // Check how much data is available
+  uint16_t ret = W5100.getRXReceivedSize(s);
+  if ( ret == 0 )
   {
-    W5100.recv_data_processing(s, buf, len);
-    W5100.execCmdSn(s, Sock_RECV);
+    // No data available.
+    uint8_t status = W5100.readSnSR(s);
+    if ( s == SnSR::LISTEN || s == SnSR::CLOSED || s == SnSR::CLOSE_WAIT )
+    {
+      // The remote end has closed its side of the connection, so this is the eof state
+      ret = 0;
+    }
+    else
+    {
+      // The connection is still up, but there's no data waiting to be read
+      ret = -1;
+    }
+  }
+  else if (ret > len)
+  {
     ret = len;
+  }
+
+  if ( ret > 0 )
+  {
+    W5100.recv_data_processing(s, buf, ret);
+    W5100.execCmdSn(s, Sock_RECV);
   }
   return ret;
 }
