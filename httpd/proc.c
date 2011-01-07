@@ -103,7 +103,7 @@ static int procheadelem(struct connstruct *cn, char *buf)
         if ((delim = strchr(value, ' ')) == NULL)       /* expect HTTP type */
             return 0;
 
-        *delim = 0;
+        *delim++ = 0;
         urldecode(value);
 
         if (sanitizefile(value) == 0) 
@@ -118,6 +118,8 @@ static int procheadelem(struct connstruct *cn, char *buf)
         my_strncpy(cn->filereq, value, MAXREQUESTLENGTH);
 #endif
         cn->if_modified_since = -1;
+        if (strcmp(delim, "HTTP/1.0") == 0) /* v1.0 HTTP? */
+            cn->is_v1_0 = 1;
     } 
     else if (strcasecmp(buf, "Host:") == 0) 
     {
@@ -315,7 +317,7 @@ void procreadhead(struct connstruct *cn)
     rv = special_read(cn, buf, sizeof(buf)-1);
     if (rv <= 0) 
     {
-        if (rv < 0) /* really dead? */
+        if (rv < 0 || !cn->is_ssl) /* really dead? */
             removeconnection(cn);
         return;
     }
@@ -512,9 +514,14 @@ void procreadfile(struct connstruct *cn)
         if (cn->close_when_done)        /* close immediately */
             removeconnection(cn);
         else 
-        {                               /* keep socket open - HTTP 1.1 */
-            cn->state = STATE_WANT_TO_READ_HEAD;
-            cn->numbytes = 0;
+        {
+            if (cn->is_v1_0)    /* die now */
+                removeconnection(cn);
+            else                /* keep socket open - HTTP 1.1 */
+            {
+                cn->state = STATE_WANT_TO_READ_HEAD;
+                cn->numbytes = 0;
+            }
         }
 
         return;
@@ -853,7 +860,7 @@ void read_post_data(struct connstruct *cn)
     rv = special_read(cn, buf, sizeof(buf)-1);
     if (rv <= 0) 
     {
-        if (rv < 0) /* really dead? */
+        if (rv < 0 || !cn->is_ssl) /* really dead? */
             removeconnection(cn);
         return;
     }

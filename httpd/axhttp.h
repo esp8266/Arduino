@@ -85,6 +85,7 @@ struct connstruct
     int numbytes;
     char databuf[BLOCKSIZE];
     uint8_t is_ssl;
+    uint8_t is_v1_0;
     uint8_t close_when_done;
     time_t if_modified_since;
 
