@@ -347,8 +347,9 @@ int add_cert(SSL_CTX *ssl_ctx, const uint8_t *buf, int len)
     if (i == CONFIG_SSL_MAX_CERTS) /* too many certs */
     {
 #ifdef CONFIG_SSL_FULL_MODE
-        printf("Error: maximum number of certs added - change of "
-                "compile-time configuration required\n");
+        printf("Error: maximum number of certs added (%d) - change of "
+                "compile-time configuration required\n",
+                CONFIG_SSL_MAX_CERTS);
 #endif
         goto error;
     }
@@ -404,8 +405,9 @@ int add_cert_auth(SSL_CTX *ssl_ctx, const uint8_t *buf, int len)
         if (i >= CONFIG_X509_MAX_CA_CERTS)
         {
 #ifdef CONFIG_SSL_FULL_MODE
-            printf("Error: maximum number of CA certs added - change of "
-                    "compile-time configuration required\n");
+            printf("Error: maximum number of CA certs added (%d) - change of "
+                    "compile-time configuration required\n", 
+                    CONFIG_X509_MAX_CA_CERTS);
 #endif
             break;
         }
