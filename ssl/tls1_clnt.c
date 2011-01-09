@@ -51,7 +51,6 @@ EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const
         uint8_t *session_id, uint8_t sess_id_size)
 {
     SSL *ssl;
-    int ret;
 
     SOCKET_BLOCK(client_fd);    /* ensure blocking mode */
     ssl = ssl_new(ssl_ctx, client_fd);
@@ -70,7 +69,7 @@ EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const
     }
 
     SET_SSL_FLAG(SSL_IS_CLIENT);
-    ret = do_client_connect(ssl);
+    do_client_connect(ssl);
     return ssl;
 }
 
@@ -129,6 +128,10 @@ int do_clnt_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len)
         case HS_HELLO_REQUEST:
             disposable_new(ssl);
             ret = do_client_connect(ssl);
+            break;
+
+        default:
+            ret = SSL_ERROR_INVALID_HANDSHAKE;
             break;
     }
 

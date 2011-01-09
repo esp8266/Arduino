@@ -515,7 +515,6 @@ static int RSA_test(void)
     bigint *plaintext_bi;
     bigint *enc_data_bi, *dec_data_bi;
     uint8_t enc_data2[128], dec_data2[128];
-    int size;
     int len; 
     uint8_t *buf;
 
@@ -546,7 +545,7 @@ static int RSA_test(void)
     }
 
     RSA_encrypt(rsa_ctx, (const uint8_t *)"abc", 3, enc_data2, 0);
-    size = RSA_decrypt(rsa_ctx, enc_data2, dec_data2, 1);
+    RSA_decrypt(rsa_ctx, enc_data2, dec_data2, 1);
     if (memcmp("abc", dec_data2, 3))
     {
         printf("Error: ENCRYPT/DECRYPT #2 failed\n");
@@ -921,17 +920,14 @@ static int SSL_server_test(
         
         if (size == SSL_CLOSE_NOTIFY)
         {
-            ret = SSL_OK;
+            /* do nothing */ 
         }
         else if (size < SSL_OK) /* got some alert or something nasty */
         {
             ret = size;
 
             if (ret == SSL_ERROR_CONN_LOST)
-            {
-                ret = SSL_OK;
                 continue;
-            }
 
             break;  /* we've got a problem */
         }
@@ -1092,7 +1088,6 @@ int SSL_server_tests(void)
 
         printf("SSL server test \"%s\" passed\n", "Bad Before Cert");
         TTY_FLUSH();
-        ret = 0;    /* is ok */
     }
 
     /* this test should fail */
