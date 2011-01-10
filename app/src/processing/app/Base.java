@@ -545,7 +545,7 @@ public class Base {
     newbieDir.mkdirs();
 
     // Make an empty pde file
-    File newbieFile = new File(newbieDir, newbieName + ".pde");
+    File newbieFile = new File(newbieDir, newbieName + ".ino");
     new FileOutputStream(newbieFile);  // create the file
     return newbieFile.getAbsolutePath();
   }
@@ -637,7 +637,8 @@ public class Base {
         public boolean accept(File dir, String name) {
           // TODO this doesn't seem to ever be used. AWESOME.
           //System.out.println("check filter on " + dir + " " + name);
-          return name.toLowerCase().endsWith(".pde");
+          return name.toLowerCase().endsWith(".ino")
+              || name.toLowerCase().endsWith(".pde");
         }
       });
 
@@ -1016,22 +1017,28 @@ public class Base {
   }
   
   
-  public void rebuildBurnBootloaderMenu(JMenu menu) {
-    //System.out.println("rebuilding burn bootloader menu");
+  public void rebuildProgrammerMenu(JMenu menu) {
+    //System.out.println("rebuilding programmer menu");
     menu.removeAll();      
+    ButtonGroup group = new ButtonGroup();
     for (Target target : targetsTable.values()) {
       for (String programmer : target.getProgrammers().keySet()) {
         AbstractAction action = 
           new AbstractAction(
-            "w/ " + target.getProgrammers().get(programmer).get("name")) {
+            target.getProgrammers().get(programmer).get("name")) {
             public void actionPerformed(ActionEvent actionevent) {
-              activeEditor.handleBurnBootloader((String) getValue("target"),
-                                                (String) getValue("programmer"));
+              Preferences.set("programmer", getValue("target") + ":" +
+                                            getValue("programmer"));
             }
           };
         action.putValue("target", target.getName());
         action.putValue("programmer", programmer);
-        JMenuItem item = new JMenuItem(action);
+        JMenuItem item = new JRadioButtonMenuItem(action);
+        if (Preferences.get("programmer").equals(target.getName() + ":" +
+                                                 programmer)) {
+          item.setSelected(true);
+        }
+        group.add(item);
         menu.add(item);
       }
     }
@@ -1091,7 +1098,10 @@ public class Base {
       File subfolder = new File(folder, list[i]);
       if (!subfolder.isDirectory()) continue;
 
-      File entry = new File(subfolder, list[i] + ".pde");
+      File entry = new File(subfolder, list[i] + ".ino");
+      if (!entry.exists() && (new File(subfolder, list[i] + ".pde")).exists()) {
+      	entry = new File(subfolder, list[i] + ".pde");
+      }
       // if a .pde file of the same prefix as the folder exists..
       if (entry.exists()) {
         //String sanityCheck = sanitizedName(list[i]);
