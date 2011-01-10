@@ -37,28 +37,57 @@
 #ifndef udp_h
 #define udp_h
 
+#include <Stream.h>
+#include <IPAddress.h>
+
 #define UDP_TX_PACKET_MAX_SIZE 24
 
-class UDP {
+class UDP : public Stream {
 private:
   uint8_t _sock;  // socket ID for Wiz5100
   uint16_t _port; // local port to listen on
+  IPAddress _remoteIP; // remote IP address for the incoming packet whilst it's being processed
+  uint16_t _remotePort; // remote port for the incoming packet whilst it's being processed
+  uint16_t _offset; // offset into the packet being sent
 
 public:
-  UDP();
+  UDP();  // Constructor
   uint8_t begin(uint16_t);	// initialize, start listening on specified port. Returns 1 if successful, 0 if there are no sockets available to use
-  int available();								// has data been received?
+  void stop();  // Finish with the UDP socket
 
-  // C-style buffer-oriented functions
-  uint16_t sendPacket(uint8_t *, uint16_t, uint8_t *, uint16_t); //send a packet to specified peer 
-  uint16_t sendPacket(const char[], uint8_t *, uint16_t);  //send a string as a packet to specified peer
-  int readPacket(uint8_t *, uint16_t);		// read a received packet 
-  int readPacket(uint8_t *, uint16_t, uint8_t *, uint16_t *);		// read a received packet, also return sender's ip and port 	
-  // readPacket that fills a character string buffer
-  int readPacket(char *, uint16_t, uint8_t *, uint16_t &);
+  // Sending UDP packets
+  
+  // Start building up a packet to send to the remote host specific in ip and port
+  // Returns 1 if successful, 0 if there was a problem with the supplied IP address or port
+  int beginPacket(IPAddress ip, uint16_t port);
+  // Finish off this packet and send it
+  // Returns 1 if the packet was sent successfully, 0 if there was an error
+  int endPacket();
+  // Write a single byte into the packet
+  virtual void write(uint8_t);
+  // Write a string of characters into the packet
+  virtual void write(const char *str);
+  // Write size bytes from buffer into the packet
+  virtual void write(const uint8_t *buffer, size_t size);
 
-  // Finish with the UDP socket
-  void stop();
+  // Start processing the next available incoming packet
+  // Returns the size of the packet in bytes, or 0 if no packets are available
+  int parsePacket();
+  // Number of bytes remaining in the current packet
+  virtual int available();
+  // Read a single byte from the current packet
+  virtual int read();
+  // Read up to len bytes from the current packet and place them into buffer
+  // Returns the number of bytes read, or 0 if none are available
+  virtual int read(unsigned char* buffer, size_t len);
+  // Return the next byte from the current packet without moving on to the next byte
+  virtual int peek();
+  virtual void flush();	// Finish reading the current packet
+
+  // Return the IP address of the host who sent the current incoming packet
+  IPAddress remoteIP() { return _remoteIP; };
+  // Return the port of the host who sent the current incoming packet
+  uint16_t remotePort() { return _remotePort; };
 };
 
 #endif

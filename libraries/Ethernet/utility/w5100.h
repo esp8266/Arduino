@@ -146,7 +146,19 @@ public:
    * This function read the Tx write pointer register and after copy the data in buffer update the Tx write pointer
    * register. User should read upper byte first and lower byte later to get proper value.
    */
-  void send_data_processing(SOCKET s, uint8_t *data, uint16_t len);
+  void send_data_processing(SOCKET s, const uint8_t *data, uint16_t len);
+  /**
+   * @brief A copy of send_data_processing that uses the provided ptr for the
+   *        write offset.  Only needed for the "streaming" UDP API, where
+   *        a single UDP packet is built up over a number of calls to
+   *        send_data_processing_ptr, because TX_WR doesn't seem to get updated
+   *        correctly in those scenarios
+   * @param ptr value to use in place of TX_WR.  If 0, then the value is read
+   *        in from TX_WR
+   * @return New value for ptr, to be used in the next call
+   */
+// FIXME Update documentation
+  void send_data_processing_offset(SOCKET s, uint16_t data_offset, const uint8_t *data, uint16_t len);
 
   /**
    * @brief	This function is being called by recv() also.
@@ -182,7 +194,7 @@ public:
   // ---------------
 private:
   static uint8_t write(uint16_t _addr, uint8_t _data);
-  static uint16_t write(uint16_t addr, uint8_t *buf, uint16_t len);
+  static uint16_t write(uint16_t addr, const uint8_t *buf, uint16_t len);
   static uint8_t read(uint16_t addr);
   static uint16_t read(uint16_t addr, uint8_t *buf, uint16_t len);
   
