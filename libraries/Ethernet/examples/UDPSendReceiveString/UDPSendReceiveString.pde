@@ -62,7 +62,7 @@ void loop() {
     Serial.println(Udp.remotePort());
 
     // read the packet into packetBufffer
-    Udp.read((byte*)packetBuffer,UDP_TX_PACKET_MAX_SIZE);
+    Udp.read(packetBuffer,UDP_TX_PACKET_MAX_SIZE);
     Serial.println("Contents:");
     Serial.println(packetBuffer);
 
