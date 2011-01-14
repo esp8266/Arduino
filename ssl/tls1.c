@@ -287,6 +287,7 @@ EXP_FUNC int STDCALL ssl_read(SSL *ssl, uint8_t **in_data)
     int ret = basic_read(ssl, in_data);
 
     /* check for return code so we can send an alert */
+
     if (ret < SSL_OK && ret != SSL_CLOSE_NOTIFY)
     {
         if (ret != SSL_ERROR_CONN_LOST)
@@ -1158,6 +1159,14 @@ int basic_read(SSL *ssl, uint8_t **in_data)
 
     read_len = SOCKET_READ(ssl->client_fd, &buf[ssl->bm_read_index], 
                             ssl->need_bytes-ssl->got_bytes);
+
+    if (ret < 0) 
+#ifdef WIN32
+        if (GetLastError() == WSAEWOULDBLOCK)
+#else
+        if (errno == EAGAIN || errno == EWOULDBLOCK)
+#endif
+            return 0;
 
     /* connection has gone, so die */
     if (read_len <= 0)

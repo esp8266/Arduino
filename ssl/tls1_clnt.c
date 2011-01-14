@@ -50,10 +50,7 @@ static int send_cert_verify(SSL *ssl);
 EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const
         uint8_t *session_id, uint8_t sess_id_size)
 {
-    SSL *ssl;
-
-    SOCKET_BLOCK(client_fd);    /* ensure blocking mode */
-    ssl = ssl_new(ssl_ctx, client_fd);
+    SSL *ssl = ssl_new(ssl_ctx, client_fd);
 
     if (session_id && ssl_ctx->num_sessions)
     {

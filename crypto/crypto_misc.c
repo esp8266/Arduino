@@ -177,11 +177,12 @@ EXP_FUNC void STDCALL get_random(int num_rand_bytes, uint8_t *rand_data)
     struct timeval tv;
     MD5_CTX rng_digest_ctx;
     uint8_t digest[MD5_SIZE];
+    uint64_t *ep;
     int i;
 
     /* A proper implementation would use counters etc for entropy */
     gettimeofday(&tv, NULL);    
-    uint64_t *ep = (uint64_t *)entropy_pool;
+    ep = (uint64_t *)entropy_pool;
     ep[0] ^= ENTROPY_COUNTER1;
     ep[1] ^= ENTROPY_COUNTER2; 
 

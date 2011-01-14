@@ -826,6 +826,7 @@ static bigint *regular_multiply(BI_CTX *ctx, bigint *bia, bigint *bib,
 
     do 
     {
+        long_comp tmp;
         comp carry = 0;
         int r_index = i;
         j = 0;
@@ -843,7 +844,7 @@ static bigint *regular_multiply(BI_CTX *ctx, bigint *bia, bigint *bib,
                 break;
             }
 
-            long_comp tmp = sr[r_index] + ((long_comp)sa[j])*sb[i] + carry;
+            tmp = sr[r_index] + ((long_comp)sa[j])*sb[i] + carry;
             sr[r_index++] = (comp)tmp;              /* downsize */
             carry = tmp >> COMP_BIT_SIZE;
         } while (++j < n);

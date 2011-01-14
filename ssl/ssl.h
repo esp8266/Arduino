@@ -197,7 +197,8 @@ extern "C" {
  * are passed during a handshake.
  * - SSL_DISPLAY_RSA (full mode build only): Display the RSA key details that
  * are passed during a handshake.
- *
+ * - SSL_CLIENT_NON_BLOCKING (client only): Use non-blocking version of 
+ * ssl_client_new.
  * @param num_sessions [in] The number of sessions to be used for session
  * caching. If this value is 0, then there is no session caching. This option
  * is not used in skeleton mode.
@@ -231,8 +232,9 @@ EXP_FUNC SSL * STDCALL ssl_server_new(SSL_CTX *ssl_ctx, int client_fd);
  * It is up to the application to establish the initial logical connection 
  * (whether it is  a socket, serial connection etc).
  *
- * This is a blocking call - it will finish when the handshake is complete (or
- * has failed).
+ * This is a normall a blocking call - it will finish when the handshake is 
+ * complete (or has failed). To use in non-blocking mode, set 
+ * SSL_CLIENT_NON_BLOCKING in ssl_ctx_new.
  * @param ssl_ctx [in] The client context.
  * @param client_fd [in] The client's file descriptor.
  * @param session_id [in] A 32 byte session id for session resumption. This 
