@@ -155,22 +155,10 @@ int do_client_connect(SSL *ssl)
     {
         while (ssl->hs_status != SSL_OK)
         {
-            ret = basic_read(ssl, NULL);
+            ret = ssl_read(ssl, NULL);
             
             if (ret < SSL_OK)
-            { 
-                if (ret != SSL_ERROR_CONN_LOST)
-                {
-                    /* let the server know we are dying and why */
-                    if (send_alert(ssl, ret))
-                    {
-                        /* something nasty happened, so get rid of it */
-                        kill_ssl_session(ssl->ssl_ctx->ssl_sessions, ssl);
-                    }
-                }
-
                 break;
-            }
         }
     }
 
