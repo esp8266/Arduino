@@ -82,6 +82,7 @@ extern "C" {
 #define SSL_DISPLAY_BYTES                       0x00100000
 #define SSL_DISPLAY_CERTS                       0x00200000
 #define SSL_DISPLAY_RSA                         0x00400000
+#define SSL_CLIENT_NON_BLOCKING                 0x00800000
 
 /* errors that can be generated */
 #define SSL_OK                                  0
