@@ -35,7 +35,7 @@ void loop() {
   int thisPitch = map(sensorReading, 400, 1000, 100, 1000);
 
   // play the pitch:
-  tone(8, thisPitch, 10);
+  tone(9, thisPitch, 10);
 
 }
 
