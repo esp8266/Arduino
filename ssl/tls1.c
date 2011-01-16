@@ -939,14 +939,21 @@ static int send_raw_packet(SSL *ssl, uint8_t protocol)
 
     while (sent < pkt_size)
     {
-        if ((ret = SOCKET_WRITE(ssl->client_fd, 
-                        &ssl->bm_all_data[sent], pkt_size)) < 0)
-        {
-            ret = SSL_ERROR_CONN_LOST;
-            break;
-        }
+        ret = SOCKET_WRITE(ssl->client_fd, 
+                        &ssl->bm_all_data[sent], pkt_size);
 
-        sent += ret;
+        if (ret >= 0)
+            sent += ret;
+        else
+        {
+
+#ifdef WIN32
+            if (GetLastError() != WSAEWOULDBLOCK)
+#else
+            if (errno != EAGAIN && errno != EWOULDBLOCK)
+#endif
+                return SSL_ERROR_CONN_LOST;
+        }
 
         /* keep going until the write buffer has some space */
         if (sent != pkt_size)
@@ -955,11 +962,9 @@ static int send_raw_packet(SSL *ssl, uint8_t protocol)
             FD_ZERO(&wfds);
             FD_SET(ssl->client_fd, &wfds);
 
+            /* block and wait for it */
             if (select(ssl->client_fd + 1, NULL, &wfds, NULL, NULL) < 0)
-            {
-                ret = SSL_ERROR_CONN_LOST;
-                break;
-            }
+                return SSL_ERROR_CONN_LOST;
         }
     }
 

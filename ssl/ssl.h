@@ -197,8 +197,8 @@ extern "C" {
  * are passed during a handshake.
  * - SSL_DISPLAY_RSA (full mode build only): Display the RSA key details that
  * are passed during a handshake.
- * - SSL_CLIENT_NON_BLOCKING (client only): Use non-blocking version of 
- * ssl_client_new.
+ * - SSL_CLIENT_NON_BLOCKING (client only): To use a non-blocking version of 
+ * ssl_client_new().
  * @param num_sessions [in] The number of sessions to be used for session
  * caching. If this value is 0, then there is no session caching. This option
  * is not used in skeleton mode.
@@ -232,9 +232,9 @@ EXP_FUNC SSL * STDCALL ssl_server_new(SSL_CTX *ssl_ctx, int client_fd);
  * It is up to the application to establish the initial logical connection 
  * (whether it is  a socket, serial connection etc).
  *
- * This is a normall a blocking call - it will finish when the handshake is 
+ * This is a normally a blocking call - it will finish when the handshake is 
  * complete (or has failed). To use in non-blocking mode, set 
- * SSL_CLIENT_NON_BLOCKING in ssl_ctx_new.
+ * SSL_CLIENT_NON_BLOCKING in ssl_ctx_new().
  * @param ssl_ctx [in] The client context.
  * @param client_fd [in] The client's file descriptor.
  * @param session_id [in] A 32 byte session id for session resumption. This 
@@ -257,7 +257,8 @@ EXP_FUNC void STDCALL ssl_free(SSL *ssl);
 
 /**
  * @brief Read the SSL data stream.
- * The socket must be in blocking mode.
+ * If the socket is non-blocking and data is blocked then SSO_OK will be
+ * returned.
  * @param ssl [in] An SSL object reference.
  * @param in_data [out] If the read was successful, a pointer to the read
  * buffer will be here. Do NOT ever free this memory as this buffer is used in
@@ -274,7 +275,8 @@ EXP_FUNC int STDCALL ssl_read(SSL *ssl, uint8_t **in_data);
 
 /**
  * @brief Write to the SSL data stream. 
- * The socket must be in blocking mode.
+ * if the socket is non-blocking and data is blocked then a check is made
+ * to ensure that all data is sent (i.e. blocked mode is forced).
  * @param ssl [in] An SSL obect reference.
  * @param out_data [in] The data to be written
  * @param out_len [in] The number of bytes to be written.
