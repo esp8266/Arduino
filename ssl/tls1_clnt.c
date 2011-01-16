@@ -148,7 +148,7 @@ int do_client_connect(SSL *ssl)
     ssl->hs_status = SSL_NOT_OK;            /* not connected */
 
     /* sit in a loop until it all looks good */
-    if (!IS_SET_SSL_FLAG(SSL_CLIENT_NON_BLOCKING))
+    if (!IS_SET_SSL_FLAG(SSL_CONNECT_IN_PARTS))
     {
         while (ssl->hs_status != SSL_OK)
         {

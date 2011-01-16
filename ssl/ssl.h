@@ -82,7 +82,7 @@ extern "C" {
 #define SSL_DISPLAY_BYTES                       0x00100000
 #define SSL_DISPLAY_CERTS                       0x00200000
 #define SSL_DISPLAY_RSA                         0x00400000
-#define SSL_CLIENT_NON_BLOCKING                 0x00800000
+#define SSL_CONNECT_IN_PARTS                    0x00800000
 
 /* errors that can be generated */
 #define SSL_OK                                  0
@@ -197,7 +197,7 @@ extern "C" {
  * are passed during a handshake.
  * - SSL_DISPLAY_RSA (full mode build only): Display the RSA key details that
  * are passed during a handshake.
- * - SSL_CLIENT_NON_BLOCKING (client only): To use a non-blocking version of 
+ * - SSL_CONNECT_IN_PARTS (client only): To use a non-blocking version of 
  * ssl_client_new().
  * @param num_sessions [in] The number of sessions to be used for session
  * caching. If this value is 0, then there is no session caching. This option
@@ -234,7 +234,7 @@ EXP_FUNC SSL * STDCALL ssl_server_new(SSL_CTX *ssl_ctx, int client_fd);
  *
  * This is a normally a blocking call - it will finish when the handshake is 
  * complete (or has failed). To use in non-blocking mode, set 
- * SSL_CLIENT_NON_BLOCKING in ssl_ctx_new().
+ * SSL_CONNECT_IN_PARTS in ssl_ctx_new().
  * @param ssl_ctx [in] The client context.
  * @param client_fd [in] The client's file descriptor.
  * @param session_id [in] A 32 byte session id for session resumption. This 
