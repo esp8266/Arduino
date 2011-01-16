@@ -23,20 +23,13 @@
 #include <Ethernet.h>
 
 // assign a MAC address for the ethernet controller.
+// Newer Ethernet shields have a MAC address printed on a sticker on the shield
 // fill in your address here:
 byte mac[] = { 
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
-// assign an IP address for the controller:
-byte ip[] = { 
-  192,169,1,20 };
-byte gateway[] = {
-  192,168,1,1};	
-byte subnet[] = { 
-  255, 255, 255, 0 };
 
 //  The address of the server you want to connect to (pachube.com):
-byte server[] = { 
-  209,40,205,190 }; 
+IPAddress server(209,40,205,190); 
 
 // initialize the library instance:
 Client client(server, 80);
@@ -46,9 +39,15 @@ boolean lastConnected = false;      // state of the connection last time through
 const int postingInterval = 10000;  //delay between updates to Pachube.com
 
 void setup() {
-  // start the ethernet connection and serial port:
-  Ethernet.begin(mac, ip);
+  // start serial port:
   Serial.begin(9600);
+  // start the Ethernet connection:
+  if (Ethernet.begin(mac) == 0) {
+    Serial.println("Failed to configure Ethernet using DHCP");
+    // no point in carrying on, so do nothing forevermore:
+    for(;;)
+      ;
+  }
   // give the ethernet module time to boot up:
   delay(1000);
 }

@@ -20,12 +20,10 @@
 #include <Ethernet.h>
 #include <Udp.h>
 
-// Enter a MAC address and IP address for your controller below.
-// The IP address will be dependent on your local network:
+// Enter a MAC address for your controller below.
+// Newer Ethernet shields have a MAC address printed on a sticker on the shield
 byte mac[] = {  
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-
-IPAddress ip(192, 168, 1, 177);
 
 unsigned int localPort = 8888;      // local port to listen for UDP packets
 
@@ -40,11 +38,16 @@ UDP Udp;
 
 void setup() 
 {
-  // start Ethernet and UDP
-  Ethernet.begin(mac,ip);
-  Udp.begin(localPort);
-
   Serial.begin(9600);
+
+  // start Ethernet and UDP
+  if (Ethernet.begin(mac) == 0) {
+    Serial.println("Failed to configure Ethernet using DHCP");
+    // no point in carrying on, so do nothing forevermore:
+    for(;;)
+      ;
+  }
+  Udp.begin(localPort);
 }
 
 void loop()
@@ -99,7 +102,7 @@ void loop()
 }
 
 // send an NTP request to the time server at the given address 
-unsigned long sendNTPpacket(byte *address)
+unsigned long sendNTPpacket(IPAddress& address)
 {
   // set all bytes in the buffer to 0
   memset(packetBuffer, 0, NTP_PACKET_SIZE); 

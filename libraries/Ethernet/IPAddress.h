@@ -31,6 +31,11 @@
 class IPAddress {
 private:
     uint8_t _address[4];  // IPv4 address
+    // Access the raw byte array containing the address.  Because this returns a pointer
+    // to the internal structure rather than a copy of the address this function should only
+    // be used when you know that the usage of the returned uint8_t* will be transient and not
+    // stored.
+    uint8_t* raw_address() { return _address; };
 
 public:
     // Constructors
@@ -41,7 +46,9 @@ public:
 
     // Overloaded cast operator to allow IPAddress objects to be used where a pointer
     // to a four-byte uint8_t array is expected
-    operator uint8_t*() { return _address; };
+    operator uint32_t() { return *((uint32_t*)_address); };
+    bool operator==(const IPAddress& addr) { return (*((uint32_t*)_address)) == (*((uint32_t*)addr._address)); };
+    bool operator==(const uint8_t* addr);
 
     // Overloaded index operator to allow getting and setting individual octets of the address
     uint8_t operator[](int index) const { return _address[index]; };
@@ -50,6 +57,12 @@ public:
     // Overloaded copy operators to allow initialisation of IPAddress objects from other types
     IPAddress& operator=(const uint8_t *address);
     IPAddress& operator=(uint32_t address);
+
+    friend class EthernetClass;
+    friend class UDP;
+    friend class Client;
+    friend class Server;
+    friend class DhcpClass;
 };
 
 #endif

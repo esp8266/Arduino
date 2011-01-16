@@ -77,7 +77,7 @@ void UDP::stop()
 int UDP::beginPacket(IPAddress ip, uint16_t port)
 {
   _offset = 0;
-  return startUDP(_sock, ip, port);
+  return startUDP(_sock, ip.raw_address(), port);
 }
 
 int UDP::endPacket()
