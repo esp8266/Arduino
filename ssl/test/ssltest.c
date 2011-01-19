@@ -1725,6 +1725,133 @@ error:
     return ret;
 }
 
+/**************************************************************************
+ * SSL unblocked case
+ *
+ **************************************************************************/
+static void do_unblocked(void)
+{
+    int client_fd;
+    SSL *ssl_clnt;
+    SSL_CTX *ssl_clnt_ctx = ssl_ctx_new(
+                            DEFAULT_CLNT_OPTION, 
+                            SSL_DEFAULT_CLNT_SESS |
+                            SSL_CONNECT_IN_PARTS);
+    usleep(200000);           /* allow server to start */
+
+    if ((client_fd = client_socket_init(g_port)) < 0)
+        goto error;
+
+    {
+#ifdef WIN32
+        u_long argp = 1;
+        ioctlsocket(client_fd, FIONBIO, &argp);
+#else
+        int flags = fcntl(client_fd, F_GETFL, NULL);
+        fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
+#endif
+    }
+
+    if (ssl_obj_load(ssl_clnt_ctx, SSL_OBJ_X509_CACERT, 
+                                        "../ssl/test/axTLS.ca_x509.cer", NULL))
+        goto error;
+
+    ssl_clnt = ssl_client_new(ssl_clnt_ctx, client_fd, NULL, 0);
+
+    while (ssl_handshake_status(ssl_clnt) != SSL_OK)
+    {
+        if (ssl_read(ssl_clnt, NULL) < 0)
+        {
+            ssl_display_error(ssl_handshake_status(ssl_clnt));
+            goto error;
+        }
+    }
+
+    ssl_write(ssl_clnt, basic_buf, sizeof(basic_buf));
+    ssl_free(ssl_clnt);
+
+error:
+    ssl_ctx_free(ssl_clnt_ctx);
+    SOCKET_CLOSE(client_fd);
+
+    /* exit this thread */
+}
+
+static int SSL_unblocked_test(void)
+{
+    int server_fd, client_fd, ret = 0, size = 0, offset = 0;
+    SSL_CTX *ssl_svr_ctx = NULL;
+    struct sockaddr_in client_addr;
+    uint8_t *read_buf;
+    socklen_t clnt_len = sizeof(client_addr);
+    SSL *ssl_svr;
+#ifndef WIN32
+    pthread_t thread;
+#endif
+    memset(basic_buf, 0xA5, sizeof(basic_buf)/2);
+    memset(&basic_buf[sizeof(basic_buf)/2], 0x5A, sizeof(basic_buf)/2);
+
+    if ((server_fd = server_socket_init(&g_port)) < 0)
+        goto error;
+
+    ssl_svr_ctx = ssl_ctx_new(DEFAULT_SVR_OPTION, SSL_DEFAULT_SVR_SESS);
+
+#ifndef WIN32
+    pthread_create(&thread, NULL, 
+                (void *(*)(void *))do_unblocked, NULL);
+    pthread_detach(thread);
+#else
+    CreateThread(NULL, 1024, (LPTHREAD_START_ROUTINE)do_unblocked, 
+                        NULL, 0, NULL);
+#endif
+
+    /* Wait for a client to connect */
+    if ((client_fd = accept(server_fd, 
+                    (struct sockaddr *) &client_addr, &clnt_len)) < 0)
+    {
+        ret = SSL_ERROR_SOCK_SETUP_FAILURE;
+        goto error;
+    }
+    
+    /* we are ready to go */
+    ssl_svr = ssl_server_new(ssl_svr_ctx, client_fd);
+    
+    do
+    {
+        while ((size = ssl_read(ssl_svr, &read_buf)) == SSL_OK);
+
+        if (size < SSL_OK) /* got some alert or something nasty */
+        {
+            ssl_display_error(size);
+            ret = size;
+            break;
+        }
+        else /* looks more promising */
+        {
+            if (memcmp(read_buf, &basic_buf[offset], size) != 0)
+            {
+                ret = SSL_NOT_OK;
+                break;
+            }
+        }
+
+        offset += size;
+    } while (offset < sizeof(basic_buf));
+
+    printf(ret == SSL_OK && offset == sizeof(basic_buf) ? 
+                            "SSL unblocked test passed\n" :
+                            "SSL unblocked test failed\n");
+    TTY_FLUSH();
+
+    ssl_free(ssl_svr);
+    SOCKET_CLOSE(server_fd);
+    SOCKET_CLOSE(client_fd);
+
+error:
+    ssl_ctx_free(ssl_svr_ctx);
+    return ret;
+}
+
 #if !defined(WIN32) && defined(CONFIG_SSL_CTX_MUTEXING)
 /**************************************************************************
  * Multi-Threading Tests
@@ -2031,6 +2158,11 @@ int main(int argc, char *argv[])
 #endif
 
     if (SSL_basic_test())
+        goto cleanup;
+
+    system("sh ../ssl/test/killopenssl.sh");
+
+    if (SSL_unblocked_test())
         goto cleanup;
 
     system("sh ../ssl/test/killopenssl.sh");

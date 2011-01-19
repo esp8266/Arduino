@@ -1165,13 +1165,15 @@ int basic_read(SSL *ssl, uint8_t **in_data)
     read_len = SOCKET_READ(ssl->client_fd, &buf[ssl->bm_read_index], 
                             ssl->need_bytes-ssl->got_bytes);
 
-    if (ret < 0) 
+    if (read_len < 0) 
+    {
 #ifdef WIN32
         if (GetLastError() == WSAEWOULDBLOCK)
 #else
         if (errno == EAGAIN || errno == EWOULDBLOCK)
 #endif
             return 0;
+    }
 
     /* connection has gone, so die */
     if (read_len <= 0)
