@@ -433,13 +433,13 @@ end_sig:
  */
 static int asn1_compare_dn_comp(const char *dn1, const char *dn2)
 {
-    int ret = 1;
+    int ret;
 
-    if ((dn1 && dn2 == NULL) || (dn1 == NULL && dn2)) goto err_no_match;
+    if (dn1 == NULL && dn2 == NULL)
+        ret = 0;
+    else
+        ret = (dn1 && dn2) ? strcmp(dn1, dn2) : 0;
 
-    ret = (dn1 && dn2) ? strcmp(dn1, dn2) : 0;
-
-err_no_match:
     return ret;
 }
 

@@ -303,7 +303,7 @@ static int new_pem_obj(SSL_CTX *ssl_ctx, int is_cacert, char *where,
             if ((start = strstr(where, begins[i])) &&
                     (end = strstr(where, ends[i])))
             {
-                remain -= (int)(end-start);
+                remain -= (int)(end-where);
                 start += strlen(begins[i]);
                 pem_size = (int)(end-start);
 
@@ -362,20 +362,16 @@ static int new_pem_obj(SSL_CTX *ssl_ctx, int is_cacert, char *where,
                     remain--;
                 }
 
+                where = end;
                 break;
             }
         }
 
         ssl_obj_free(ssl_obj);
         ssl_obj = NULL;
-
-        if (i == NUM_PEM_TYPES)
-        {
-            ret = SSL_ERROR_BAD_CERTIFICATE;
-            goto error;
-        }
+        if (start == NULL)
+           break;
     }
-
 error:
     ssl_obj_free(ssl_obj);
     return ret;

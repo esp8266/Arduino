@@ -367,7 +367,7 @@ int x509_verify(const CA_CERT_CTX *ca_cert_ctx, const X509_CTX *cert)
        if (ca_cert_ctx != NULL) 
        {
             /* go thu the CA store */
-           while (i < CONFIG_X509_MAX_CA_CERTS && ca_cert_ctx->cert[i])
+            while (i < CONFIG_X509_MAX_CA_CERTS && ca_cert_ctx->cert[i])
             {
                 if (asn1_compare_dn(cert->ca_cert_dn,
                                             ca_cert_ctx->cert[i]->cert_dn) == 0)

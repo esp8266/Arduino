@@ -416,7 +416,13 @@ int add_cert_auth(SSL_CTX *ssl_ctx, const uint8_t *buf, int len)
 
         /* ignore the return code */
         if (x509_new(buf, &offset, &ca_cert_ctx->cert[i]) == X509_OK)
+        {
+#if defined (CONFIG_SSL_FULL_MODE)
+            if (ssl_ctx->options & SSL_DISPLAY_CERTS)
+                x509_print(ca_cert_ctx->cert[i], NULL);
+#endif
             i++;
+        }
 
         len -= offset;
     }
@@ -1808,7 +1814,6 @@ int process_certificate(SSL *ssl, X509_CTX **x509_ctx)
             goto error;
         }
 
-        /* DISPLAY_CERT(ssl, *chain); */
         chain = &((*chain)->next);
         offset += cert_size;
     }
@@ -1895,18 +1900,6 @@ void DISPLAY_STATE(SSL *ssl, int is_send, uint8_t state, int not_ok)
     }
 
     printf("%s\n", str);
-    TTY_FLUSH();
-}
-
-/**
- * Debugging routine to display X509 certificates.
- */
-void DISPLAY_CERT(SSL *ssl, const X509_CTX *x509_ctx)
-{
-    if (!IS_SET_SSL_FLAG(SSL_DISPLAY_CERTS))
-        return;
-
-    x509_print(x509_ctx, ssl->ssl_ctx->ca_cert_ctx);
     TTY_FLUSH();
 }
 
