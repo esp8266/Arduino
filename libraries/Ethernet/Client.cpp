@@ -10,16 +10,32 @@ extern "C" {
 #include "Ethernet.h"
 #include "Client.h"
 #include "Server.h"
+#include "Dns.h"
 
 uint16_t Client::_srcport = 1024;
+
+Client::Client() : _sock(MAX_SOCK_NUM) {
+}
 
 Client::Client(uint8_t sock) : _sock(sock) {
 }
 
-Client::Client(IPAddress& ip, uint16_t port) : _ip(ip), _port(port), _sock(MAX_SOCK_NUM) {
+int Client::connect(const char* host, uint16_t port) {
+  // Look up the host first
+  int ret = 0;
+  DNSClient dns;
+  IPAddress remote_addr;
+
+  dns.begin(Ethernet.dnsServerIP());
+  ret = dns.getHostByName(host, remote_addr);
+  if (ret == 1) {
+    return connect(remote_addr, port);
+  } else {
+    return ret;
+  }
 }
 
-uint8_t Client::connect() {
+int Client::connect(IPAddress ip, uint16_t port) {
   if (_sock != MAX_SOCK_NUM)
     return 0;
 
@@ -38,7 +54,7 @@ uint8_t Client::connect() {
   if (_srcport == 0) _srcport = 1024;
   socket(_sock, SnMR::TCP, _srcport, 0);
 
-  if (!::connect(_sock, _ip.raw_address(), _port)) {
+  if (!::connect(_sock, ip.raw_address(), port)) {
     _sock = MAX_SOCK_NUM;
     return 0;
   }

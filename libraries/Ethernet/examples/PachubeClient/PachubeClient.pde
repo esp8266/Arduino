@@ -28,11 +28,8 @@
 byte mac[] = { 
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
 
-//  The address of the server you want to connect to (pachube.com):
-IPAddress server(209,40,205,190); 
-
 // initialize the library instance:
-Client client(server, 80);
+Client client;
 
 long lastConnectionTime = 0;        // last time you connected to the server, in milliseconds
 boolean lastConnected = false;      // state of the connection last time through the main loop
@@ -85,7 +82,7 @@ void loop() {
 // this method makes a HTTP connection to the server:
 void sendData(int thisData) {
   // if there's a successful connection:
-  if (client.connect()) {
+  if (client.connect("www.pachube.com", 80)) {
     Serial.println("connecting...");
     // send the HTTP PUT request. 
     // fill in your feed address here:
