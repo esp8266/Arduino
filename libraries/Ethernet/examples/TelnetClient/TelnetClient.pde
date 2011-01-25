@@ -33,7 +33,7 @@ IPAddress server(1,1,1,1);
 // with the IP address and port of the server 
 // that you want to connect to (port 23 is default for telnet;
 // if you're using Processing's ChatServer, use  port 10002):
-Client client(server, 10002);
+Client client;
 
 void setup() {
   // start the Ethernet connection:
@@ -45,7 +45,7 @@ void setup() {
   Serial.println("connecting...");
 
   // if you get a connection, report back via serial:
-  if (client.connect()) {
+  if (client.connect(server, 10002)) {
     Serial.println("connected");
   } 
   else {
