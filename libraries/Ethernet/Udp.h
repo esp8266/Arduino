@@ -60,6 +60,9 @@ public:
   // Start building up a packet to send to the remote host specific in ip and port
   // Returns 1 if successful, 0 if there was a problem with the supplied IP address or port
   int beginPacket(IPAddress ip, uint16_t port);
+  // Start building up a packet to send to the remote host specific in host and port
+  // Returns 1 if successful, 0 if there was a problem resolving the hostname or port
+  int beginPacket(const char *host, uint16_t port);
   // Finish off this packet and send it
   // Returns 1 if the packet was sent successfully, 0 if there was an error
   int endPacket();

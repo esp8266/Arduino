@@ -30,6 +30,7 @@
 #include "socket.h"
 #include "Ethernet.h"
 #include "Udp.h"
+#include "Dns.h"
 
 /* Constructor */
 UDP::UDP() : _sock(MAX_SOCK_NUM) {}
@@ -72,6 +73,22 @@ void UDP::stop()
 
   EthernetClass::_server_port[_sock] = 0;
   _sock = MAX_SOCK_NUM;
+}
+
+int UDP::beginPacket(const char *host, uint16_t port)
+{
+  // Look up the host first
+  int ret = 0;
+  DNSClient dns;
+  IPAddress remote_addr;
+
+  dns.begin(Ethernet.dnsServerIP());
+  ret = dns.getHostByName(host, remote_addr);
+  if (ret == 1) {
+    return beginPacket(remote_addr, port);
+  } else {
+    return ret;
+  }
 }
 
 int UDP::beginPacket(IPAddress ip, uint16_t port)
