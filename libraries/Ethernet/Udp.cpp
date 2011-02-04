@@ -121,20 +121,25 @@ void UDP::write(const uint8_t *buffer, size_t size)
 
 int UDP::parsePacket()
 {
-  //HACK - hand-parse the UDP packet using TCP recv method
-  uint8_t tmpBuf[8];
-  int ret =0;	
-  //read 8 header bytes and get IP and port from it
-  ret = recv(_sock,tmpBuf,8);
-  if (ret > 0)
+  if (available() > 0)
   {
-    _remoteIP = tmpBuf;
-    _remotePort = tmpBuf[4];
-    _remotePort = (_remotePort << 8) + tmpBuf[5];
-    // When we get here, any remaining bytes are the data
-    ret = available();
+    //HACK - hand-parse the UDP packet using TCP recv method
+    uint8_t tmpBuf[8];
+    int ret =0;	
+    //read 8 header bytes and get IP and port from it
+    ret = recv(_sock,tmpBuf,8);
+    if (ret > 0)
+    {
+      _remoteIP = tmpBuf;
+      _remotePort = tmpBuf[4];
+      _remotePort = (_remotePort << 8) + tmpBuf[5];
+      // When we get here, any remaining bytes are the data
+      ret = available();
+    }
+    return ret;
   }
-  return ret;
+  // There aren't any packets available
+  return 0;
 }
 
 int UDP::read()
