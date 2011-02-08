@@ -136,7 +136,7 @@ static int do_obj(SSL_CTX *ssl_ctx, int obj_type,
 
 #ifdef CONFIG_SSL_CERT_VERIFICATION
         case SSL_OBJ_X509_CACERT:
-            ret = add_cert_auth(ssl_ctx, ssl_obj->buf, ssl_obj->len);
+            add_cert_auth(ssl_ctx, ssl_obj->buf, ssl_obj->len);
             break;
 #endif
 

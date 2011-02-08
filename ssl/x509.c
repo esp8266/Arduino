@@ -200,14 +200,12 @@ int x509_new(const uint8_t *cert, int *len, X509_CTX **ctx)
             asn1_signature(cert, &offset, x509_ctx))
         goto end_cert;
 #endif
-
+    ret = X509_OK;
+end_cert:
     if (len)
     {
         *len = cert_size;
     }
-
-    ret = X509_OK;
-end_cert:
 
     if (ret)
     {

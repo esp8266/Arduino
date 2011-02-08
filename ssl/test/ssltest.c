@@ -703,13 +703,13 @@ static int cert_tests(void)
     }
 
     ssl_ctx_free(ssl_ctx);
-
-res = 0;        /* all ok */
+    res = 0;        /* all ok */
     printf("All Certificate tests passed\n");
 
 bad_cert:
     if (res)
         printf("Error: A certificate test failed\n");
+
     return res;
 }
 

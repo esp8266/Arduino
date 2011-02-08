@@ -421,9 +421,9 @@ int add_cert_auth(SSL_CTX *ssl_ctx, const uint8_t *buf, int len)
             if (ssl_ctx->options & SSL_DISPLAY_CERTS)
                 x509_print(ca_cert_ctx->cert[i], NULL);
 #endif
-            i++;
         }
 
+        i++;
         len -= offset;
     }
 
