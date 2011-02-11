@@ -26,8 +26,10 @@
 #define Wiring_h
 
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include <stdlib.h>
 #include "binary.h"
+#include "pins_arduino.h"
 
 #ifdef __cplusplus
 extern "C"{
@@ -106,9 +108,9 @@ typedef uint8_t byte;
 
 void init(void);
 
-void pinMode(uint8_t, uint8_t);
-void digitalWrite(uint8_t, uint8_t);
-int digitalRead(uint8_t);
+void pinMode_lookup(uint8_t, uint8_t);
+void digitalWrite_lookup(uint8_t, uint8_t);
+int digitalRead_lookup(uint8_t);
 int analogRead(uint8_t);
 void analogReference(uint8_t mode);
 void analogWrite(uint8_t, int);
@@ -127,6 +129,71 @@ void detachInterrupt(uint8_t);
 
 void setup(void);
 void loop(void);
+
+/*
+ * Check if a given pin requires locking.
+ * When accessing lower 32 IO ports we can use SBI/CBI instructions, which are atomic. However
+ * other IO ports require load+modify+store and we need to make them atomic by disabling
+ * interrupts.
+ */
+INLINED int portWriteNeedsLocking(uint8_t pin)
+{
+	/* SBI/CBI instructions only work on lower 32 IO ports */
+	if (inlined_portOutputRegister(inlined_digitalPinToPort(pin)) > (volatile uint8_t*)&_SFR_IO8(0x1F)) {
+		return 1;
+	}
+	return 0;
+}
+
+/*
+ * These functions will perform OR/AND on a given register, and are atomic.
+ */
+extern void __digitalWriteOR_locked(volatile uint8_t*out, uint8_t bit);
+extern void __digitalWriteAND_locked(volatile uint8_t*out, uint8_t bit);
+
+INLINED void digitalWrite(uint8_t pin, uint8_t value)
+{
+	if (__builtin_constant_p(pin)) {
+		if (portWriteNeedsLocking(pin)) {
+			if (value==LOW) {
+				__digitalWriteAND_locked(inlined_portOutputRegister(inlined_digitalPinToPort(pin)),~inlined_digitalPinToBitMask(pin));
+			} else {
+				__digitalWriteOR_locked(inlined_portOutputRegister(inlined_digitalPinToPort(pin)),inlined_digitalPinToBitMask(pin));
+			}
+		} else {
+			if (value==LOW) {
+				*inlined_portOutputRegister(inlined_digitalPinToPort(pin)) &= ~(inlined_digitalPinToBitMask(pin));
+			} else {
+				*inlined_portOutputRegister(inlined_digitalPinToPort(pin)) |= inlined_digitalPinToBitMask(pin);
+			}
+		}
+	} else {
+		digitalWrite_lookup(pin,value);
+	}
+}
+
+INLINED void pinMode(uint8_t pin, uint8_t mode)
+{
+	if (__builtin_constant_p(pin)) {
+		if (mode==INPUT) {
+			*inlined_portModeRegister(inlined_digitalPinToPort(pin)) &= ~(inlined_digitalPinToBitMask(pin));
+		} else {
+			*inlined_portModeRegister(inlined_digitalPinToPort(pin)) |= inlined_digitalPinToBitMask(pin);
+		}
+	} else {
+		pinMode_lookup(pin,mode);
+	}
+}
+
+INLINED int digitalRead(uint8_t pin)
+{
+	if (__builtin_constant_p(pin)) {
+		return !! *inlined_portInputRegister(inlined_digitalPinToPort(pin));
+	} else {
+		return digitalRead_lookup(pin);
+	}
+}
+
 
 #ifdef __cplusplus
 } // extern "C"
