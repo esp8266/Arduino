@@ -946,7 +946,7 @@ static int send_raw_packet(SSL *ssl, uint8_t protocol)
     while (sent < pkt_size)
     {
         ret = SOCKET_WRITE(ssl->client_fd, 
-                        &ssl->bm_all_data[sent], pkt_size);
+                        &ssl->bm_all_data[sent], pkt_size-sent);
 
         if (ret >= 0)
             sent += ret;

@@ -34,7 +34,10 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+
+#if !defined(WIN32)
 #include <pwd.h>
+#endif
 #include "axhttp.h"
 
 struct serverstruct *servers;
@@ -614,7 +617,9 @@ void removeconnection(struct connstruct *cn)
             cn->ssl = NULL;
         }
 
+#ifndef WIN32
         shutdown(cn->networkdesc, SHUT_WR);
+#endif
         SOCKET_CLOSE(cn->networkdesc);
     }
 
