@@ -339,30 +339,6 @@ INLINED uint8_t inlined_digitalPinToBitMask(uint8_t pin)
 	}
 }
 
-// XXX: this needs to return false (or -1) if the pin doesn't have a timer,
-// rather than throwing a compilation error.
-INLINED uint8_t inlined_digitalPinToTimer(uint8_t pin)
-{
-	switch(pin) {
-	case  2: return TIMER3B; // PE 4 ** 2 ** PWM2
-	case  3: return TIMER3C; // PE 5 ** 3 ** PWM3
-	case  4: return TIMER0B; // PG 5 ** 4 ** PWM4
-	case  5: return TIMER3A; // PE 3 ** 5 ** PWM5
-	case  6: return TIMER4A; // PH 3 ** 6 ** PWM6
-	case  7: return TIMER4B; // PH 4 ** 7 ** PWM7
-	case  8: return TIMER4C; // PH 5 ** 8 ** PWM8
-	case  9: return TIMER2B; // PH 6 ** 9 ** PWM9
-	case 10: return TIMER2A; // PB 4 ** 10 ** PWM10
-	case 11: return TIMER1A; // PB 5 ** 11 ** PWM11
-	case 12: return TIMER1B; // PB 6 ** 12 ** PWM12
-	case 13: return TIMER0A; // PB 7 ** 13 ** PWM13
-	case 44: return TIMER5C; // PL 5 ** 44 ** D44
-	case 45: return TIMER5B; // PL 4 ** 45 ** D45
-	case 46: return TIMER5A; // PL 3 ** 46 ** D46
-	default: invalidPinSpecified();
-	}
-}
-
 #else // defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 
 INLINED volatile uint8_t *inlined_portModeRegister(uint8_t port_index)
@@ -452,25 +428,6 @@ INLINED uint8_t inlined_digitalPinToBitMask(uint8_t pin)
 	default:
 		// TODO: throw error here
 		invalidPinSpecified();
-	}
-}
-
-// XXX: this needs to return false (or -1) if the pin doesn't have a timer,
-// rather than throwing a compilation error.
-INLINED uint8_t inlined_digitalPinToTimer(uint8_t pin)
-{
-	switch(pin) {
-#if defined(__AVR_ATmega8__)
-	case 11: return TIMER2;
-#else
-	case  3: return TIMER2B;
-	case  5: return TIMER0B;
-	case  6: return TIMER0A;
-	case 11: return TIMER2A;
-#endif
-	case  9: return TIMER1A;
-	case 10: return TIMER1B;
-	default: invalidPinSpecified();
 	}
 }
 
