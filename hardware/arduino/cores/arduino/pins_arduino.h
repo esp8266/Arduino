@@ -339,6 +339,8 @@ INLINED uint8_t inlined_digitalPinToBitMask(uint8_t pin)
 	}
 }
 
+// XXX: this needs to return false (or -1) if the pin doesn't have a timer,
+// rather than throwing a compilation error.
 INLINED uint8_t inlined_digitalPinToTimer(uint8_t pin)
 {
 	switch(pin) {
@@ -453,6 +455,8 @@ INLINED uint8_t inlined_digitalPinToBitMask(uint8_t pin)
 	}
 }
 
+// XXX: this needs to return false (or -1) if the pin doesn't have a timer,
+// rather than throwing a compilation error.
 INLINED uint8_t inlined_digitalPinToTimer(uint8_t pin)
 {
 	switch(pin) {
@@ -476,47 +480,5 @@ INLINED uint8_t inlined_digitalPinToTimer(uint8_t pin)
 // This comes from the pins_*.c file for the active board configuration.
 
 #define analogInPinToBit(P) (P)
-
-INLINED uint8_t digitalPinToPort(uint8_t pin) {
-	if (__builtin_constant_p(pin))
-		return inlined_digitalPinToPort(pin);
-	else
-		return pgm_read_byte( digital_pin_to_port_PGM + pin );
-}
-
-INLINED uint8_t digitalPinToBitMask(uint8_t pin) {
-	if (__builtin_constant_p(pin))
-		return inlined_digitalPinToBitMask(pin);
-	else
-		return pgm_read_byte( digital_pin_to_bit_mask_PGM + pin );
-}
-
-INLINED uint8_t digitalPinToTimer(uint8_t pin) {
-	if (__builtin_constant_p(pin))
-		return inlined_digitalPinToTimer(pin);
-	else
-		return pgm_read_byte( digital_pin_to_timer_PGM + pin );
-}
-
-INLINED volatile uint8_t *portOutputRegister(uint8_t index) {
-	if (__builtin_constant_p(index))
-		return inlined_portOutputRegister(index);
-	else
-		return (volatile uint8_t *)( pgm_read_word( port_to_output_PGM + index ) );
-}
-
-INLINED volatile uint8_t* portInputRegister(uint8_t index) {
-	if (__builtin_constant_p(index))
-		return inlined_portInputRegister(index);
-	else
-		return (volatile uint8_t *)( pgm_read_word( port_to_input_PGM + index) );
-}
-
-INLINED volatile uint8_t* portModeRegister(uint8_t index) {
-	if (__builtin_constant_p(index))
-		return inlined_portModeRegister(index);
-	else
-		return (volatile uint8_t *)( pgm_read_word( port_to_mode_PGM + index) );
-}
 
 #endif

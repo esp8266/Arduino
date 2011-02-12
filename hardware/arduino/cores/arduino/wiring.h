@@ -130,68 +130,136 @@ void detachInterrupt(uint8_t);
 void setup(void);
 void loop(void);
 
+INLINED uint8_t digitalPinToPort(uint8_t pin) {
+	if (__builtin_constant_p(pin))
+		return inlined_digitalPinToPort(pin);
+	else
+		return pgm_read_byte( digital_pin_to_port_PGM + pin );
+}
+
+INLINED uint8_t digitalPinToBitMask(uint8_t pin) {
+	if (__builtin_constant_p(pin))
+		return inlined_digitalPinToBitMask(pin);
+	else
+		return pgm_read_byte( digital_pin_to_bit_mask_PGM + pin );
+}
+
+INLINED uint8_t digitalPinToTimer(uint8_t pin) {
+	if (__builtin_constant_p(pin))
+		return inlined_digitalPinToTimer(pin);
+	else
+		return pgm_read_byte( digital_pin_to_timer_PGM + pin );
+}
+
+INLINED volatile uint8_t *portOutputRegister(uint8_t index) {
+	if (__builtin_constant_p(index))
+		return inlined_portOutputRegister(index);
+	else
+		return (volatile uint8_t *)( pgm_read_word( port_to_output_PGM + index ) );
+}
+
+INLINED volatile uint8_t* portInputRegister(uint8_t index) {
+	if (__builtin_constant_p(index))
+		return inlined_portInputRegister(index);
+	else
+		return (volatile uint8_t *)( pgm_read_word( port_to_input_PGM + index) );
+}
+
+INLINED volatile uint8_t* portModeRegister(uint8_t index) {
+	if (__builtin_constant_p(index))
+		return inlined_portModeRegister(index);
+	else
+		return (volatile uint8_t *)( pgm_read_word( port_to_mode_PGM + index) );
+}
+
 /*
  * Check if a given pin requires locking.
  * When accessing lower 32 IO ports we can use SBI/CBI instructions, which are atomic. However
  * other IO ports require load+modify+store and we need to make them atomic by disabling
  * interrupts.
  */
-INLINED int portWriteNeedsLocking(uint8_t pin)
+INLINED int registerWriteNeedsLocking(volatile uint8_t *reg)
 {
 	/* SBI/CBI instructions only work on lower 32 IO ports */
-	if (inlined_portOutputRegister(inlined_digitalPinToPort(pin)) > (volatile uint8_t*)&_SFR_IO8(0x1F)) {
+	if (reg > (volatile uint8_t*)&_SFR_IO8(0x1F)) {
 		return 1;
 	}
 	return 0;
 }
 
-/*
- * These functions will perform OR/AND on a given register, and are atomic.
- */
-extern void __digitalWriteOR_locked(volatile uint8_t*out, uint8_t bit);
-extern void __digitalWriteAND_locked(volatile uint8_t*out, uint8_t bit);
-
+#define digitalWrite_implementation(pin, value)\
+do {\
+	uint8_t oldSREG;\
+	uint8_t bit = digitalPinToBitMask(pin);\
+	uint8_t port = digitalPinToPort(pin);\
+	volatile uint8_t *reg = portOutputRegister(port);\
+\
+	if (!__builtin_constant_p(pin) || registerWriteNeedsLocking(reg)) {\
+		oldSREG = SREG;\
+		cli();\
+	}\
+\
+	if (value == LOW) {\
+		*reg &= ~bit;\
+	} else {\
+		*reg |= bit;\
+	}\
+\
+	if (!__builtin_constant_p(pin) || registerWriteNeedsLocking(reg)) {\
+		SREG = oldSREG;\
+	}\
+} while(0)
+	
 INLINED void digitalWrite(uint8_t pin, uint8_t value)
 {
-	if (__builtin_constant_p(pin)) {
-		if (portWriteNeedsLocking(pin)) {
-			if (value==LOW) {
-				__digitalWriteAND_locked(inlined_portOutputRegister(inlined_digitalPinToPort(pin)),~inlined_digitalPinToBitMask(pin));
-			} else {
-				__digitalWriteOR_locked(inlined_portOutputRegister(inlined_digitalPinToPort(pin)),inlined_digitalPinToBitMask(pin));
-			}
-		} else {
-			if (value==LOW) {
-				*inlined_portOutputRegister(inlined_digitalPinToPort(pin)) &= ~(inlined_digitalPinToBitMask(pin));
-			} else {
-				*inlined_portOutputRegister(inlined_digitalPinToPort(pin)) |= inlined_digitalPinToBitMask(pin);
-			}
-		}
-	} else {
-		digitalWrite_lookup(pin,value);
-	}
+	if (__builtin_constant_p(pin)) digitalWrite_implementation(pin, value);
+	else digitalWrite_lookup(pin, value);
 }
 
-INLINED void pinMode(uint8_t pin, uint8_t mode)
+#define pinMode_implementation(pin, value)\
+do {\
+	uint8_t bit = digitalPinToBitMask(pin);\
+	uint8_t oldSREG;\
+	uint8_t port = digitalPinToPort(pin);\
+	volatile uint8_t *reg = portModeRegister(port);\
+\
+	if (!__builtin_constant_p(pin) || registerWriteNeedsLocking(reg)) {\
+		oldSREG = SREG;\
+		cli();\
+	}\
+\
+	if (value == INPUT) { \
+		*reg &= ~bit;\
+	} else {\
+		*reg |= bit;\
+	}\
+\
+	if (!__builtin_constant_p(pin) || registerWriteNeedsLocking(reg)) {\
+		SREG = oldSREG;\
+	}\
+} while(0)
+
+INLINED void pinMode(uint8_t pin, uint8_t value)
 {
-	if (__builtin_constant_p(pin)) {
-		if (mode==INPUT) {
-			*inlined_portModeRegister(inlined_digitalPinToPort(pin)) &= ~(inlined_digitalPinToBitMask(pin));
-		} else {
-			*inlined_portModeRegister(inlined_digitalPinToPort(pin)) |= inlined_digitalPinToBitMask(pin);
-		}
-	} else {
-		pinMode_lookup(pin,mode);
-	}
+	if (__builtin_constant_p(pin)) pinMode_implementation(pin, value);
+	else pinMode_lookup(pin, value);
 }
+
+#define digitalRead_implementation(pin)\
+do {\
+	uint8_t bit = digitalPinToBitMask(pin);\
+	uint8_t port = digitalPinToPort(pin);\
+\
+	if (port == NOT_A_PIN) return LOW;\
+\
+	if (*portInputRegister(port) & bit) return HIGH;\
+	return LOW;\
+} while(0)
 
 INLINED int digitalRead(uint8_t pin)
 {
-	if (__builtin_constant_p(pin)) {
-		return !! *inlined_portInputRegister(inlined_digitalPinToPort(pin));
-	} else {
-		return digitalRead_lookup(pin);
-	}
+	if (__builtin_constant_p(pin)) digitalRead_implementation(pin);
+	else return digitalRead_lookup(pin);
 }
 
 

@@ -27,28 +27,9 @@
 #include "wiring_private.h"
 #include "pins_arduino.h"
 
-void pinMode_lookup(uint8_t pin, uint8_t mode)
+void pinMode_lookup(uint8_t pin, uint8_t val)
 {
-	uint8_t bit = digitalPinToBitMask(pin);
-	uint8_t port = digitalPinToPort(pin);
-	volatile uint8_t *reg;
-
-	if (port == NOT_A_PIN) return;
-
-	// JWS: can I let the optimizer do this?
-	reg = portModeRegister(port);
-
-	if (mode == INPUT) { 
-		uint8_t oldSREG = SREG;
-                cli();
-		*reg &= ~bit;
-		SREG = oldSREG;
-	} else {
-		uint8_t oldSREG = SREG;
-                cli();
-		*reg |= bit;
-		SREG = oldSREG;
-	}
+	pinMode_implementation(pin, val);
 }
 
 // Forcing this inline keeps the callers from having to push their own stuff
@@ -121,61 +102,12 @@ static void turnOffPWM(uint8_t timer)
 	}
 }
 
-void __digitalWriteOR_locked(volatile uint8_t*out, uint8_t bit)
-{
-	uint8_t oldSREG = SREG;
-	cli();
-	*out |= bit;
-	SREG=oldSREG;
-}
-
-void __digitalWriteAND_locked(volatile uint8_t*out, uint8_t bit)
-{
-	uint8_t oldSREG = SREG;
-	cli();
-	*out &= bit; // NOTE - no inversion here, invert before calling!!!
-	SREG=oldSREG;
-}
-
 void digitalWrite_lookup(uint8_t pin, uint8_t val)
 {
-	uint8_t timer = digitalPinToTimer(pin);
-	uint8_t bit = digitalPinToBitMask(pin);
-	uint8_t port = digitalPinToPort(pin);
-	volatile uint8_t *out;
-
-	if (port == NOT_A_PIN) return;
-
-	// If the pin that support PWM output, we need to turn it off
-	// before doing a digital write.
-	if (timer != NOT_ON_TIMER) turnOffPWM(timer);
-
-	out = portOutputRegister(port);
-
-	uint8_t oldSREG = SREG;
-	cli();
-
-	if (val == LOW) {
-		*out &= ~bit;
-	} else {
-		*out |= bit;
-	}
-
-	SREG = oldSREG;
+	digitalWrite_implementation(pin, val);
 }
 
 int digitalRead_lookup(uint8_t pin)
 {
-	uint8_t timer = digitalPinToTimer(pin);
-	uint8_t bit = digitalPinToBitMask(pin);
-	uint8_t port = digitalPinToPort(pin);
-
-	if (port == NOT_A_PIN) return LOW;
-
-	// If the pin that support PWM output, we need to turn it off
-	// before getting a digital reading.
-	if (timer != NOT_ON_TIMER) turnOffPWM(timer);
-
-	if (*portInputRegister(port) & bit) return HIGH;
-	return LOW;
+	digitalRead_implementation(pin);
 }
