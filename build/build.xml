@@ -326,7 +326,6 @@
 
   <target name="linux64-build" depends="linux-build" description="Build linux (64-bit) version">
     <copy tofile="linux/work/hardware/tools/avrdude" file="linux/dist/tools/avrdude64" overwrite="true" />
-    <copy tofile="linux/work/hardware/tools/avrdude.conf" file="linux/dist/tools/avrdude64.conf" overwrite="true" />
     <copy tofile="linux/work/lib/librxtxSerial.so" file="linux/dist/lib/librxtxSerial64.so" overwrite="true" />
     <copy tofile="linux/work/lib/RXTXcomm.jar" file="../app/lib/RXTXcomm-2.2.jar" overwrite="true" />
   </target>
