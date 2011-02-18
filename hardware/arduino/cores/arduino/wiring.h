@@ -114,7 +114,6 @@ int digitalRead_lookup(uint8_t);
 int analogRead(uint8_t);
 void analogReference(uint8_t mode);
 void analogWrite(uint8_t, int);
-void noAnalogWrite(uint8_t);
 
 unsigned long millis(void);
 unsigned long micros(void);
@@ -146,7 +145,10 @@ INLINED uint8_t digitalPinToBitMask(uint8_t pin) {
 }
 
 INLINED uint8_t digitalPinToTimer(uint8_t pin) {
-	return pgm_read_byte( digital_pin_to_timer_PGM + pin );
+	if (__builtin_constant_p(pin))
+		return inlined_digitalPinToTimer(pin);
+	else
+		return pgm_read_byte( digital_pin_to_timer_PGM + pin );
 }
 
 INLINED volatile uint8_t *portOutputRegister(uint8_t index) {

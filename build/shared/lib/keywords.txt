@@ -153,7 +153,6 @@ digitalRead	KEYWORD2	DigitalRead
 interrupts	KEYWORD2
 millis	KEYWORD2	Millis
 micros	KEYWORD2	Micros
-noAnalogWrite	KEYWORD2	NoAnalogWrite
 noInterrupts	KEYWORD2	NoInterrupts
 noTone	KEYWORD2	NoTone
 pinMode	KEYWORD2	PinMode
