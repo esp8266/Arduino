@@ -16,10 +16,8 @@ begin	KEYWORD2
 end	KEYWORD2
 read	KEYWORD2
 available	KEYWORD2
-is_listening	KEYWORD2
+isListening	KEYWORD2
 overflow	KEYWORD2
-library_version	KEYWORD2
-enable_timer0	KEYWORD2
 flush	KEYWORD2
 listen	KEYWORD2
 
