@@ -421,7 +421,7 @@ void SoftwareSerial::end()
 // Read data from buffer
 int SoftwareSerial::read()
 {
-  if (!is_listening())
+  if (!isListening())
     return -1;
 
   // Empty buffer?
@@ -436,7 +436,7 @@ int SoftwareSerial::read()
 
 int SoftwareSerial::available()
 {
-  if (!is_listening())
+  if (!isListening())
     return 0;
 
   return (_receive_buffer_tail + _SS_MAX_RX_BUFF - _receive_buffer_head) % _SS_MAX_RX_BUFF;
@@ -488,30 +488,9 @@ void SoftwareSerial::write(uint8_t b)
   tunedDelay(_tx_delay);
 }
 
-#if !defined(cbi)
-#define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
-#define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
-#endif
-
-void SoftwareSerial::enable_timer0(bool enable) 
-{
-  if (enable)
-#if defined(__AVR_ATmega8__)
-    sbi(TIMSK, TOIE0);
-#else
-    sbi(TIMSK0, TOIE0);
-#endif
-  else 
-#if defined(__AVR_ATmega8__)
-    cbi(TIMSK, TOIE0);
-#else
-    cbi(TIMSK0, TOIE0);
-#endif
-}
-
 void SoftwareSerial::flush()
 {
-  if (!is_listening())
+  if (!isListening())
     return;
 
   uint8_t oldSREG = SREG;
@@ -522,7 +501,7 @@ void SoftwareSerial::flush()
 
 int SoftwareSerial::peek()
 {
-  if (!is_listening())
+  if (!isListening())
     return -1;
 
   // Empty buffer?

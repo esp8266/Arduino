@@ -40,7 +40,6 @@ http://arduiniana.org.
 ******************************************************************************/
 
 #define _SS_MAX_RX_BUFF 64 // RX buffer size
-#define _SS_VERSION 11 // software version of this library
 #ifndef GCC_VERSION
 #define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #endif
@@ -86,10 +85,8 @@ public:
   void begin(long speed);
   bool listen();
   void end();
-  bool is_listening() { return this == active_object; }
+  bool isListening() { return this == active_object; }
   bool overflow() { bool ret = _buffer_overflow; _buffer_overflow = false; return ret; }
-  static int library_version() { return _SS_VERSION; }
-  static void enable_timer0(bool enable);
   int peek();
 
   virtual void write(uint8_t byte);
