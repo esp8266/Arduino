@@ -79,7 +79,7 @@ void twi_init(void)
   // initialize twi prescaler and bit rate
   cbi(TWSR, TWPS0);
   cbi(TWSR, TWPS1);
-  TWBR = ((CPU_FREQ / TWI_FREQ) - 16) / 2;
+  TWBR = ((F_CPU / TWI_FREQ) - 16) / 2;
 
   /* twi bit rate formula from atmega128 manual pg 204
   SCL Frequency = CPU Clock Frequency / (16 + (2 * TWBR))
