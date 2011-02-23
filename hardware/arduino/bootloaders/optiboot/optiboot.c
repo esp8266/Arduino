@@ -213,7 +213,7 @@ int main(void) {
   // If not, uncomment the following instructions:
   // cli();
   // SP=RAMEND;  // This is done by hardware reset
-  // asm volatile ("clr __zero_reg__");
+  asm volatile ("clr __zero_reg__");
 
   uint8_t ch;
 
