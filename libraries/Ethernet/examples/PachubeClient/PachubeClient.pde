@@ -28,7 +28,7 @@ byte mac[] = {
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
 // assign an IP address for the controller:
 byte ip[] = { 
-  192,169,1,20 };
+  192,168,1,20 };
 byte gateway[] = {
   192,168,1,1};	
 byte subnet[] = { 
@@ -36,7 +36,7 @@ byte subnet[] = {
 
 //  The address of the server you want to connect to (pachube.com):
 byte server[] = { 
-  209,40,205,190 }; 
+  173,203,98,29 }; 
 
 // initialize the library instance:
 Client client(server, 80);
