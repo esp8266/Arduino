@@ -538,7 +538,7 @@ public class Editor extends JFrame implements RunnerListener {
       });
     fileMenu.add(saveAsMenuItem);
 
-    item = newJMenuItem("Upload", 'U');
+    item = newJMenuItem("Upload to I/O Board", 'U');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           handleExport(false);
@@ -546,13 +546,13 @@ public class Editor extends JFrame implements RunnerListener {
       });
     fileMenu.add(item);
 
-    item = newJMenuItemShift("Upload Using Programmer", 'U');
-    item.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          handleExport(true);
-        }
-      });
-    fileMenu.add(item);
+//    item = newJMenuItemShift("Upload to I/O Board (verbose)", 'U');
+//    item.addActionListener(new ActionListener() {
+//        public void actionPerformed(ActionEvent e) {
+//          handleExport(true);
+//        }
+//      });
+//    fileMenu.add(item);
 
     fileMenu.addSeparator();
 
@@ -618,13 +618,13 @@ public class Editor extends JFrame implements RunnerListener {
 //      });
 //    sketchMenu.add(item);
 
-//    item = new JMenuItem("Stop");
-//    item.addActionListener(new ActionListener() {
-//        public void actionPerformed(ActionEvent e) {
-//          handleStop();
-//        }
-//      });
-//    sketchMenu.add(item);
+    item = new JMenuItem("Stop");
+    item.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          handleStop();
+        }
+      });
+    sketchMenu.add(item);
 
     sketchMenu.addSeparator();
 
@@ -693,20 +693,12 @@ public class Editor extends JFrame implements RunnerListener {
       serialMenu = new JMenu("Serial Port");
     populateSerialMenu();
     menu.add(serialMenu);
-    
+	  
     menu.addSeparator();
-    
-    JMenu programmerMenu = new JMenu("Programmer");
-    base.rebuildProgrammerMenu(programmerMenu);
-    menu.add(programmerMenu);
 
-    item = new JMenuItem("Burn Bootloader");
-    item.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        handleBurnBootloader();
-      }
-    });
-    menu.add(item);
+    JMenu bootloaderMenu = new JMenu("Burn Bootloader");
+    base.rebuildBurnBootloaderMenu(bootloaderMenu);
+    menu.add(bootloaderMenu);
         
     menu.addMenuListener(new MenuListener() {
       public void menuCanceled(MenuEvent e) {}
@@ -997,8 +989,8 @@ public class Editor extends JFrame implements RunnerListener {
     //serialMenu.addSeparator();
     //serialMenu.add(item);
   }
-  
-  
+
+
   protected JMenu buildHelpMenu() {
     // To deal with a Mac OS X 10.5 bug, add an extra space after the name
     // so that the OS doesn't try to insert its slow help menu.
@@ -1895,12 +1887,12 @@ public class Editor extends JFrame implements RunnerListener {
    * Implements Sketch &rarr; Stop, or pressing Stop on the toolbar.
    */
   public void handleStop() {  // called by menu or buttons
-//    toolbar.activate(EditorToolbar.STOP);
+    toolbar.activate(EditorToolbar.STOP);
 
     internalCloseRunner();
 
     toolbar.deactivate(EditorToolbar.RUN);
-//    toolbar.deactivate(EditorToolbar.STOP);
+    toolbar.deactivate(EditorToolbar.STOP);
 
     // focus the PDE again after quitting presentation mode [toxi 030903]
     toFront();
@@ -2040,65 +2032,14 @@ public class Editor extends JFrame implements RunnerListener {
    * modifications (if any) to the previous sketch need to be saved.
    */
   protected boolean handleOpenInternal(String path) {
-    // rename .pde files to .ino
-    File[] oldFiles = (new File(path)).getParentFile().listFiles(new FilenameFilter() {
-      public boolean accept(File dir, String name) {
-        return (name.toLowerCase().endsWith(".pde"));
-      }
-    });
-    
-    if (oldFiles != null && oldFiles.length > 0) {
-      if (!Preferences.getBoolean("editor.update_extension")) {
-        Object[] options = { "OK", "Cancel" };
-        String prompt =
-          "In Arduino 1.0, the file extension for sketches changed\n" +
-          "from \".pde\" to \".ino\".  This version of the software only\n" +
-          "supports the new extension.  Rename the files in this sketch\n" +
-          "(and future sketches) and continue?";
-        
-        int result = JOptionPane.showOptionDialog(this,
-                                                  prompt,
-                                                  "New extension",
-                                                  JOptionPane.YES_NO_OPTION,
-                                                  JOptionPane.QUESTION_MESSAGE,
-                                                  null,
-                                                  options,
-                                                  options[0]);
-        if (result != JOptionPane.YES_OPTION) {
-          return false;
-        }
-        
-        Preferences.setBoolean("editor.update_extension", true);
-      }
-      
-      for (int i = 0; i < oldFiles.length; i++) {
-        String oldPath = oldFiles[i].getPath();
-        File newFile = new File(oldPath.substring(0, oldPath.length() - 4) + ".ino");
-        try {
-          Base.copyFile(oldFiles[i], newFile);
-        } catch (IOException e) {
-          Base.showWarning("Error", "Could not copy to a proper location.", e);
-          return false;
-        }
-
-        // remove the original file, so user doesn't get confused
-        oldFiles[i].delete();
-
-        // update with the new path
-        if (oldFiles[i].compareTo(new File(path)) == 0) {
-          path = newFile.getAbsolutePath();      	
-        }
-      }
-    }
-    
     // check to make sure that this .pde file is
     // in a folder of the same name
     File file = new File(path);
     File parentFile = new File(file.getParent());
     String parentName = parentFile.getName();
-    String pdeName = parentName + ".ino";
+    String pdeName = parentName + ".pde";
     File altFile = new File(file.getParent(), pdeName);
-    
+
     if (pdeName.equals(file.getName())) {
       // no beef with this guy
 
@@ -2108,10 +2049,10 @@ public class Editor extends JFrame implements RunnerListener {
       path = altFile.getAbsolutePath();
       //System.out.println("found alt file in same folder");
 
-    } else if (!path.endsWith(".ino")) {
+    } else if (!path.endsWith(".pde")) {
       Base.showWarning("Bad file selected",
                        "Processing can only open its own sketches\n" +
-                       "and other files ending in .ino", null);
+                       "and other files ending in .pde", null);
       return false;
 
     } else {
@@ -2330,13 +2271,13 @@ public class Editor extends JFrame implements RunnerListener {
    * Made synchronized to (hopefully) avoid problems of people
    * hitting export twice, quickly, and horking things up.
    */
-  synchronized public void handleExport(final boolean usingProgrammer) {
+  synchronized public void handleExport(final boolean verbose) {
     //if (!handleExportCheckModified()) return;
     toolbar.activate(EditorToolbar.EXPORT);
     console.clear();
     statusNotice("Uploading to I/O Board...");
 
-    new Thread(usingProgrammer ? exportAppHandler : exportHandler).start();
+    new Thread(verbose ? exportAppHandler : exportHandler).start();
   }
 
   // DAM: in Arduino, this is upload
@@ -2454,14 +2395,14 @@ public class Editor extends JFrame implements RunnerListener {
   }
 
 
-  protected void handleBurnBootloader() {
+  protected void handleBurnBootloader(final String target, final String programmer) {
     console.clear();
     statusNotice("Burning bootloader to I/O Board (this may take a minute)...");
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         try {
           Uploader uploader = new AvrdudeUploader();
-          if (uploader.burnBootloader()) {
+          if (uploader.burnBootloader(target, programmer)) {
             statusNotice("Done burning bootloader.");
           } else {
             statusError("Error while burning bootloader.");

@@ -1,35 +1,35 @@
 # GUI - STATUS
-status.notice.fgcolor = #002325
-status.notice.bgcolor = #17A1A5
-status.error.fgcolor = #FFFFFF
-status.error.bgcolor = #E34C00
+status.notice.fgcolor = #000000
+status.notice.bgcolor = #54919e
+status.error.fgcolor = #ffffff
+status.error.bgcolor = #662000
 status.edit.fgcolor = #000000
-status.edit.bgcolor = #F1B500
+status.edit.bgcolor = #cc9900
 status.font = SansSerif,plain,12
 
 # GUI - TABS
 # settings for the tabs at the top
 # (tab images are stored in the lib/theme folder)
-header.bgcolor = #17A1A5
-header.text.selected.color = #005B5B
-header.text.unselected.color = #007e82
+header.bgcolor = #216886
+header.text.selected.color = #1a1a00
+header.text.unselected.color = #ffffff
 header.text.font = SansSerif,plain,12
 
 # GUI - CONSOLE
 console.font = Monospaced,plain,11
 console.font.macosx = Monaco,plain,10
 console.color = #000000
-console.output.color = #eeeeee
-console.error.color = #E34C00
+console.output.color = #cccccc
+console.error.color = #ff3000
 
 # GUI - BUTTONS
-buttons.bgcolor = #006468
+buttons.bgcolor = #044f6f
 buttons.status.font = SansSerif,plain,12
 buttons.status.color = #ffffff
 
-# GUI - LINESTATUS   
-linestatus.color = #17A1A5
-linestatus.bgcolor = #006468
+# GUI - LINESTATUS
+linestatus.color = #ffffff
+linestatus.bgcolor = #044f6f
 
 # EDITOR - DETAILS
 

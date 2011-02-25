@@ -1,27 +1,16 @@
 #######################################
-# Syntax Coloring Map for NewSoftSerial
+# Syntax Coloring Map For Ultrasound
 #######################################
 
 #######################################
 # Datatypes (KEYWORD1)
 #######################################
 
-NewSoftSerial	KEYWORD1
+SoftwareSerial	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
-
-begin	KEYWORD2
-end	KEYWORD2
-read	KEYWORD2
-available	KEYWORD2
-is_listening	KEYWORD2
-overflow	KEYWORD2
-library_version	KEYWORD2
-enable_timer0	KEYWORD2
-flush	KEYWORD2
-listen	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)

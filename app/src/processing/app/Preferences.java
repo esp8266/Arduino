@@ -113,8 +113,6 @@ public class Preferences {
 
   JTextField sketchbookLocationField;
   JCheckBox exportSeparateBox;
-  JCheckBox verboseCompilationBox;
-  JCheckBox verboseUploadBox;
   JCheckBox deletePreviousBox;
   JCheckBox externalEditorBox;
   JCheckBox memoryOverrideBox;
@@ -280,21 +278,6 @@ public class Preferences {
     fontSizeField.setText(String.valueOf(editorFont.getSize()));
     top += d.height + GUI_BETWEEN;
 
-
-    // Show verbose output during: [ ] compilation [ ] upload
-    
-    box = Box.createHorizontalBox();
-    label = new JLabel("Show verbose output during: ");
-    box.add(label);
-    verboseCompilationBox = new JCheckBox("compilation ");
-    box.add(verboseCompilationBox);
-    verboseUploadBox = new JCheckBox("upload");
-    box.add(verboseUploadBox);
-    pain.add(box);
-    d = box.getPreferredSize();
-    box.setBounds(left, top, d.width, d.height);
-    top += d.height + GUI_BETWEEN;
-    
 
     // [ ] Delete previous applet or application folder on export
 
@@ -478,8 +461,6 @@ public class Preferences {
    */
   protected void applyFrame() {
     // put each of the settings into the table
-    setBoolean("build.verbose", verboseCompilationBox.isSelected());
-    setBoolean("upload.verbose", verboseUploadBox.isSelected());
     setBoolean("export.delete_target_folder",
                deletePreviousBox.isSelected());
 
@@ -535,8 +516,6 @@ public class Preferences {
     this.editor = editor;
 
     // set all settings entry boxes to their actual status
-    verboseCompilationBox.setSelected(getBoolean("build.verbose"));
-    verboseUploadBox.setSelected(getBoolean("upload.verbose"));
     deletePreviousBox.
       setSelected(getBoolean("export.delete_target_folder"));
 

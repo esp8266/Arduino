@@ -37,12 +37,12 @@ public class EditorToolbar extends JComponent implements MouseInputListener, Key
 
   /** Rollover titles for each button. */
   static final String title[] = {
-    "Verify", "Upload", "New", "Open", "Save", "Serial Monitor"
+    "Verify", "Stop", "New", "Open", "Save", "Upload", "Serial Monitor"
   };
 
   /** Titles for each button when the shift key is pressed. */ 
   static final String titleShift[] = {
-    "Verify", "Upload Using Programmer", "New Editor Window", "Open in Another Window", "Save", "Serial Monitor"
+    "Verify (w/ Verbose Output)", "Stop", "New Editor Window", "Open in Another Window", "Save", "Upload (w/ Verbose Output)", "Serial Monitor"
   };
 
   static final int BUTTON_COUNT  = title.length;
@@ -57,13 +57,14 @@ public class EditorToolbar extends JComponent implements MouseInputListener, Key
 
 
   static final int RUN      = 0;
-  static final int EXPORT   = 1;
+  static final int STOP     = 1;
 
   static final int NEW      = 2;
   static final int OPEN     = 3;
   static final int SAVE     = 4;
+  static final int EXPORT   = 5;
 
-  static final int SERIAL   = 5;
+  static final int SERIAL   = 6;
 
   static final int INACTIVE = 0;
   static final int ROLLOVER = 1;
@@ -104,10 +105,11 @@ public class EditorToolbar extends JComponent implements MouseInputListener, Key
 
     //which[buttonCount++] = NOTHING;
     which[buttonCount++] = RUN;
-    which[buttonCount++] = EXPORT;
+    which[buttonCount++] = STOP;
     which[buttonCount++] = NEW;
     which[buttonCount++] = OPEN;
     which[buttonCount++] = SAVE;
+    which[buttonCount++] = EXPORT;
     which[buttonCount++] = SERIAL;
 
     currentRollover = -1;
@@ -310,13 +312,13 @@ public class EditorToolbar extends JComponent implements MouseInputListener, Key
 
     switch (sel) {
     case RUN:
-      editor.handleRun(false);
+      editor.handleRun(e.isShiftDown());
       break;
 
-//    case STOP:
-//      editor.handleStop();
-//      break;
-//
+    case STOP:
+      editor.handleStop();
+      break;
+
     case OPEN:
       popup = menu.getPopupMenu();
       popup.show(EditorToolbar.this, x, y);

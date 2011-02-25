@@ -315,7 +315,7 @@ public class Sketch {
     renamingCode = true;
     String prompt = (currentIndex == 0) ?
       "New name for sketch:" : "New name for file:";
-    String oldName = (current.isExtension("ino")) ?
+    String oldName = (current.isExtension("pde")) ?
       current.getPrettyName() : current.getFileName();
     editor.status.edit(prompt, oldName);
   }
@@ -495,7 +495,7 @@ public class Sketch {
         }
         // if successful, set base properties for the sketch
 
-        File newMainFile = new File(newFolder, newName + ".ino");
+        File newMainFile = new File(newFolder, newName + ".pde");
         String newMainFilePath = newMainFile.getAbsolutePath();
 
         // having saved everything and renamed the folder and the main .pde,
@@ -860,7 +860,7 @@ public class Sketch {
     }
 
     // save the main tab with its new name
-    File newFile = new File(newFolder, newName + ".ino");
+    File newFile = new File(newFolder, newName + ".pde");
     code[0].saveAs(newFile);
 
     editor.handleOpenUnchecked(newFile.getPath(),
@@ -1261,7 +1261,7 @@ public class Sketch {
     StringBuffer bigCode = new StringBuffer();
     int bigCount = 0;
     for (SketchCode sc : code) {
-      if (sc.isExtension("ino")) {
+      if (sc.isExtension("pde")) {
         sc.setPreprocOffset(bigCount);
         bigCode.append(sc.getProgram());
         bigCode.append('\n');
@@ -1357,7 +1357,7 @@ public class Sketch {
         }
 //        sc.setPreprocName(filename);
 
-      } else if (sc.isExtension("ino")) {
+      } else if (sc.isExtension("pde")) {
         // The compiler and runner will need this to have a proper offset
         sc.addPreprocOffset(headerOffset);
       }
@@ -1386,7 +1386,7 @@ public class Sketch {
 //    SketchCode errorCode = null;
 //    if (filename.equals(appletJavaFile)) {
 //      for (SketchCode code : getCode()) {
-//        if (code.isExtension("ino")) {
+//        if (code.isExtension("pde")) {
 //          if (line >= code.getPreprocOffset()) {
 //            errorCode = code;
 //          }
@@ -1520,15 +1520,15 @@ public class Sketch {
   }
   
   
-  protected boolean exportApplet(boolean usingProgrammer) throws Exception {
-    return exportApplet(tempBuildFolder.getAbsolutePath(), usingProgrammer);
+  protected boolean exportApplet(boolean verbose) throws Exception {
+    return exportApplet(tempBuildFolder.getAbsolutePath(), verbose);
   }
 
 
   /**
    * Handle export to applet.
    */
-  public boolean exportApplet(String appletPath, boolean usingProgrammer)
+  public boolean exportApplet(String appletPath, boolean verbose)
     throws RunnerException, IOException, SerialException {
     
     // Make sure the user didn't hide the sketch folder
@@ -1565,7 +1565,7 @@ public class Sketch {
 //      return false;
 //    }
 
-    upload(appletFolder.getPath(), foundName, usingProgrammer);
+    upload(appletFolder.getPath(), foundName, verbose);
     
     return true;
   }
@@ -1592,7 +1592,7 @@ public class Sketch {
   }
 
 
-  protected String upload(String buildPath, String suggestedClassName, boolean usingProgrammer)
+  protected String upload(String buildPath, String suggestedClassName, boolean verbose)
     throws RunnerException, SerialException {
 
     Uploader uploader;
@@ -1602,7 +1602,7 @@ public class Sketch {
     uploader = new AvrdudeUploader();
     boolean success = uploader.uploadUsingPreferences(buildPath,
                                                       suggestedClassName,
-                                                      usingProgrammer);
+                                                      verbose);
 
     return success ? suggestedClassName : null;
   }
@@ -1791,7 +1791,7 @@ public class Sketch {
    * Returns the default extension for this editor setup.
    */
   public String getDefaultExtension() {
-    return "ino";
+    return "pde";
   }
 
 
@@ -1799,7 +1799,7 @@ public class Sketch {
    * Returns a String[] array of proper extensions.
    */
   public String[] getExtensions() {
-    return new String[] { "ino", "c", "cpp", "h" };
+    return new String[] { "pde", "c", "cpp", "h" };
   }
 
 
