@@ -55,9 +55,9 @@ void Print::print(const char str[])
   write(str);
 }
 
-void Print::print(char c, int base)
+void Print::print(char c)
 {
-  print((long) c, base);
+  write(c);
 }
 
 void Print::print(unsigned char b, int base)
@@ -119,9 +119,9 @@ void Print::println(const char c[])
   println();
 }
 
-void Print::println(char c, int base)
+void Print::println(char c)
 {
-  print(c, base);
+  print(c);
   println();
 }
 

@@ -367,7 +367,13 @@ public class Compiler implements MessageConsumer {
         e = new RunnerException("Please import the SPI library from the Sketch > Import Library menu.");
         s += "\nAs of Arduino 0019, the Ethernet library depends on the SPI library." +
              "\nYou appear to be using it or another library that depends on the SPI library.";
-      }        
+      }
+      
+      if (pieces[3].trim().equals("'BYTE' was not declared in this scope")) {
+        e = new RunnerException("The 'BYTE' keyword is no longer supported.");
+	s += "\nAs of Arduino 1.0, the 'BYTE' keyword is no longer supported." +
+	     "\nPlease use Serial.write() instead.";
+      }
       
       if (exception == null && e != null) {
         exception = e;

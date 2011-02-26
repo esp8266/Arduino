@@ -29,7 +29,6 @@
 #define HEX 16
 #define OCT 8
 #define BIN 2
-#define BYTE 0
 
 class Print
 {
@@ -43,8 +42,8 @@ class Print
     
     void print(const String &);
     void print(const char[]);
-    void print(char, int = BYTE);
-    void print(unsigned char, int = BYTE);
+    void print(char);
+    void print(unsigned char, int = DEC);
     void print(int, int = DEC);
     void print(unsigned int, int = DEC);
     void print(long, int = DEC);
@@ -53,8 +52,8 @@ class Print
 
     void println(const String &s);
     void println(const char[]);
-    void println(char, int = BYTE);
-    void println(unsigned char, int = BYTE);
+    void println(char);
+    void println(unsigned char, int = DEC);
     void println(int, int = DEC);
     void println(unsigned int, int = DEC);
     void println(long, int = DEC);
