@@ -14,12 +14,12 @@ void stringCallback(char *myString)
 
 void sysexCallback(byte command, byte argc, byte*argv)
 {
-    Serial.print(START_SYSEX, BYTE);
-    Serial.print(command, BYTE);
+    Serial.write(START_SYSEX);
+    Serial.write(command);
     for(byte i=0; i<argc; i++) {
-        Serial.print(argv[i], BYTE);
+        Serial.write(argv[i]);
     }
-    Serial.print(END_SYSEX, BYTE);
+    Serial.write(END_SYSEX);
 }
 
 void setup()

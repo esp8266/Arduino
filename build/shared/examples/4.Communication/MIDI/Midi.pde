@@ -42,8 +42,8 @@ void loop() {
 //  plays a MIDI note.  Doesn't check to see that
 //  cmd is greater than 127, or that data values are  less than 127:
 void noteOn(int cmd, int pitch, int velocity) {
-  Serial.print(cmd, BYTE);
-  Serial.print(pitch, BYTE);
-  Serial.print(velocity, BYTE);
+  Serial.write(cmd);
+  Serial.write(pitch);
+  Serial.write(velocity);
 }
 
