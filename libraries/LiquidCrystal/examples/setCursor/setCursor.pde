@@ -61,7 +61,7 @@ void loop() {
         // set the cursor position:
         lcd.setCursor(thisRow,thisCol);
         // print the letter:
-        lcd.print(thisLetter, BYTE);
+        lcd.write(thisLetter);
         delay(200);
       }
     }
