@@ -1,0 +1,45 @@
+#######################################
+# Syntax Coloring Map For WiFi
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+WiFi	KEYWORD1
+Client	KEYWORD1
+Server	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+status	KEYWORD2
+connect	KEYWORD2
+write	KEYWORD2
+available	KEYWORD2
+read	KEYWORD2
+flush	KEYWORD2
+stop	KEYWORD2
+connected	KEYWORD2
+begin	KEYWORD2
+begink	KEYWORD2
+beginp	KEYWORD2
+disconnect	KEYWORD2
+getMacAddr	KEYWORD2
+getIpAddr	KEYWORD2
+getSSIDList	KEYWORD2
+getCurrSSID	KEYWORD2
+getCurrBSSID	KEYWORD2
+getCurrRSSI		KEYWORD2
+getCurrEncType	KEYWORD2
+wl_get_network_list	KEYWORD2
+get_result	KEYWORD2
+get_status	KEYWORD2
+getSocket	KEYWORD2
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
