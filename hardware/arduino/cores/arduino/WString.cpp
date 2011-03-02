@@ -18,7 +18,7 @@
 */
 
 #include <stdlib.h>
-#include "WProgram.h"
+#include "Arduino.h"
 #include "WString.h"
 
 

@@ -5,7 +5,7 @@ extern "C" {
   #include "string.h"
 }
 
-#include "WProgram.h"
+#include "Arduino.h"
 
 #include "Ethernet.h"
 #include "Client.h"

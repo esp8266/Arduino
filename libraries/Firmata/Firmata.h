@@ -13,7 +13,7 @@
 #ifndef Firmata_h
 #define Firmata_h
 
-#include <WProgram.h>
+#include <Arduino.h>
 #include <inttypes.h>
 
 

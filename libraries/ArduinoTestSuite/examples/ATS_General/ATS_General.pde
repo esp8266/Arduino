@@ -8,7 +8,6 @@
 //*	Oct 18,	2010	<MLS> Added memory testing
 //************************************************************************
 
-#include	"WProgram.h"
 #include	"HardwareSerial.h"
 #include	"pins_arduino.h"
 #include	<ArduinoTestSuite.h>

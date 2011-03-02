@@ -1,5 +1,5 @@
-#ifndef WProgram_h
-#define WProgram_h
+#ifndef Arduino_h
+#define Arduino_h
 
 #include <stdlib.h>
 #include <string.h>

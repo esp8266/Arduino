@@ -26,7 +26,6 @@
 
 
 
-#include	"WProgram.h"
 #include	"HardwareSerial.h"
 
 #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__)

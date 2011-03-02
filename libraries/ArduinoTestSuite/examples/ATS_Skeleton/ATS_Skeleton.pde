@@ -7,7 +7,6 @@
 //*	Oct 16,	2010	<ROA> Started on String Test
 //************************************************************************
 
-#include	"WProgram.h"
 #include	"HardwareSerial.h"
 #include	<ArduinoTestSuite.h>
 
