@@ -33,7 +33,7 @@ Version Modified By Date     Comments
 
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
-#include "wiring.h"
+#include "Arduino.h"
 #include "pins_arduino.h"
 
 #if defined(__AVR_ATmega8__) || defined(__AVR_ATmega128__)
