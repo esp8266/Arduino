@@ -140,18 +140,8 @@ uint8_t Client::status() {
   return W5100.readSnSR(_sock);
 }
 
-// the next three functions are a hack so we can compare the client returned
-// by Server::available() to null, or use it as the condition in an
-// if-statement.  this lets us stay compatible with the Processing network
-// library.
-
-uint8_t Client::operator==(int p) {
-  return _sock == MAX_SOCK_NUM;
-}
-
-uint8_t Client::operator!=(int p) {
-  return _sock != MAX_SOCK_NUM;
-}
+// the next function allows us to use the client returned by
+// Server::available() as the condition in an if-statement.
 
 Client::operator bool() {
   return _sock != MAX_SOCK_NUM;
