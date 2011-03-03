@@ -385,7 +385,7 @@ INLINED uint8_t inlined_digitalPinToTimer(uint8_t pin)
 	case 44: return TIMER5C; // PL 5 ** 44 ** D44
 	case 45: return TIMER5B; // PL 4 ** 45 ** D45
 	case 46: return TIMER5A; // PL 3 ** 46 ** D46
-	default: invalidPinSpecified();
+	default: return NOT_ON_TIMER;
 	}
 }
 
@@ -494,57 +494,10 @@ INLINED uint8_t inlined_digitalPinToTimer(uint8_t pin)
 #endif
 	case  9: return TIMER1A;
 	case 10: return TIMER1B;
-	default: invalidPinSpecified();
+	default: return NOT_ON_TIMER;
 	}
 }
 
 #endif // defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-
-// Get the bit location within the hardware port of the given virtual pin.
-// This comes from the pins_*.c file for the active board configuration.
-
-#define analogInPinToBit(P) (P)
-
-INLINED uint8_t digitalPinToPort(uint8_t pin) {
-	if (__builtin_constant_p(pin))
-		return inlined_digitalPinToPort(pin);
-	else
-		return pgm_read_byte( digital_pin_to_port_PGM + pin );
-}
-
-INLINED uint8_t digitalPinToBitMask(uint8_t pin) {
-	if (__builtin_constant_p(pin))
-		return inlined_digitalPinToBitMask(pin);
-	else
-		return pgm_read_byte( digital_pin_to_bit_mask_PGM + pin );
-}
-
-INLINED uint8_t digitalPinToTimer(uint8_t pin) {
-	if (__builtin_constant_p(pin))
-		return inlined_digitalPinToTimer(pin);
-	else
-		return pgm_read_byte( digital_pin_to_timer_PGM + pin );
-}
-
-INLINED volatile uint8_t *portOutputRegister(uint8_t index) {
-	if (__builtin_constant_p(index))
-		return inlined_portOutputRegister(index);
-	else
-		return (volatile uint8_t *)( pgm_read_word( port_to_output_PGM + index ) );
-}
-
-INLINED volatile uint8_t* portInputRegister(uint8_t index) {
-	if (__builtin_constant_p(index))
-		return inlined_portInputRegister(index);
-	else
-		return (volatile uint8_t *)( pgm_read_word( port_to_input_PGM + index) );
-}
-
-INLINED volatile uint8_t* portModeRegister(uint8_t index) {
-	if (__builtin_constant_p(index))
-		return inlined_portModeRegister(index);
-	else
-		return (volatile uint8_t *)( pgm_read_word( port_to_mode_PGM + index) );
-}
 
 #endif

@@ -112,6 +112,53 @@ void detachInterrupt(uint8_t);
 void setup(void);
 void loop(void);
 
+// Get the bit location within the hardware port of the given virtual pin.
+// This comes from the pins_*.c file for the active board configuration.
+
+#define analogInPinToBit(P) (P)
+
+INLINED uint8_t digitalPinToPort(uint8_t pin) {
+	if (__builtin_constant_p(pin))
+		return inlined_digitalPinToPort(pin);
+	else
+		return pgm_read_byte( digital_pin_to_port_PGM + pin );
+}
+
+INLINED uint8_t digitalPinToBitMask(uint8_t pin) {
+	if (__builtin_constant_p(pin))
+		return inlined_digitalPinToBitMask(pin);
+	else
+		return pgm_read_byte( digital_pin_to_bit_mask_PGM + pin );
+}
+
+INLINED uint8_t digitalPinToTimer(uint8_t pin) {
+	if (__builtin_constant_p(pin))
+		return inlined_digitalPinToTimer(pin);
+	else
+		return pgm_read_byte( digital_pin_to_timer_PGM + pin );
+}
+
+INLINED volatile uint8_t *portOutputRegister(uint8_t index) {
+	if (__builtin_constant_p(index))
+		return inlined_portOutputRegister(index);
+	else
+		return (volatile uint8_t *)( pgm_read_word( port_to_output_PGM + index ) );
+}
+
+INLINED volatile uint8_t* portInputRegister(uint8_t index) {
+	if (__builtin_constant_p(index))
+		return inlined_portInputRegister(index);
+	else
+		return (volatile uint8_t *)( pgm_read_word( port_to_input_PGM + index) );
+}
+
+INLINED volatile uint8_t* portModeRegister(uint8_t index) {
+	if (__builtin_constant_p(index))
+		return inlined_portModeRegister(index);
+	else
+		return (volatile uint8_t *)( pgm_read_word( port_to_mode_PGM + index) );
+}
+
 /*
  * Check if a given pin requires locking.
  * When accessing lower 32 IO ports we can use SBI/CBI instructions, which are atomic. However
@@ -122,6 +169,15 @@ INLINED int portWriteNeedsLocking(uint8_t pin)
 {
 	/* SBI/CBI instructions only work on lower 32 IO ports */
 	if (inlined_portOutputRegister(inlined_digitalPinToPort(pin)) > (volatile uint8_t*)&_SFR_IO8(0x1F)) {
+		return 1;
+	}
+	return 0;
+}
+
+INLINED int portModeNeedsLocking(uint8_t pin)
+{
+	/* SBI/CBI instructions only work on lower 32 IO ports */
+	if (inlined_portModeRegister(inlined_digitalPinToPort(pin)) > (volatile uint8_t*)&_SFR_IO8(0x1F)) {
 		return 1;
 	}
 	return 0;
@@ -157,10 +213,18 @@ INLINED void digitalWrite(uint8_t pin, uint8_t value)
 INLINED void pinMode(uint8_t pin, uint8_t mode)
 {
 	if (__builtin_constant_p(pin)) {
-		if (mode==INPUT) {
-			*inlined_portModeRegister(inlined_digitalPinToPort(pin)) &= ~(inlined_digitalPinToBitMask(pin));
+		if (portModeNeedsLocking(pin)) {
+			if (mode==INPUT) {
+				__digitalWriteAND_locked(inlined_portModeRegister(inlined_digitalPinToPort(pin)),~inlined_digitalPinToBitMask(pin));
+			} else {
+				__digitalWriteOR_locked(inlined_portModeRegister(inlined_digitalPinToPort(pin)),inlined_digitalPinToBitMask(pin));
+			}
 		} else {
-			*inlined_portModeRegister(inlined_digitalPinToPort(pin)) |= inlined_digitalPinToBitMask(pin);
+			if (mode==INPUT) {
+				*inlined_portModeRegister(inlined_digitalPinToPort(pin)) &= ~(inlined_digitalPinToBitMask(pin));
+			} else {
+				*inlined_portModeRegister(inlined_digitalPinToPort(pin)) |= inlined_digitalPinToBitMask(pin);
+			}
 		}
 	} else {
 		pinMode_lookup(pin,mode);

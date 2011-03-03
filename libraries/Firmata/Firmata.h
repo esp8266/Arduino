@@ -66,8 +66,8 @@
 #define SYSEX_SAMPLING_INTERVAL 0x7A // same as SAMPLING_INTERVAL
 
 // pin modes
-//#define INPUT                 0x00 // defined in wiring.h
-//#define OUTPUT                0x01 // defined in wiring.h
+//#define INPUT                 0x00 // defined in Arduino.h
+//#define OUTPUT                0x01 // defined in Arduino.h
 #define ANALOG                  0x02 // analog pin in analogInput mode
 #define PWM                     0x03 // digital pin in PWM output mode
 #define SERVO                   0x04 // digital pin in Servo output mode
