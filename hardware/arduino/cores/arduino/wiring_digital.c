@@ -27,7 +27,7 @@
 #include "wiring_private.h"
 #include "pins_arduino.h"
 
-void pinMode_lookup(uint8_t pin, uint8_t mode)
+void pinMode(uint8_t pin, uint8_t mode)
 {
 	uint8_t bit = digitalPinToBitMask(pin);
 	uint8_t port = digitalPinToPort(pin);
@@ -121,23 +121,7 @@ static void turnOffPWM(uint8_t timer)
 	}
 }
 
-void __digitalWriteOR_locked(volatile uint8_t*out, uint8_t bit)
-{
-	uint8_t oldSREG = SREG;
-	cli();
-	*out |= bit;
-	SREG=oldSREG;
-}
-
-void __digitalWriteAND_locked(volatile uint8_t*out, uint8_t bit)
-{
-	uint8_t oldSREG = SREG;
-	cli();
-	*out &= bit; // NOTE - no inversion here, invert before calling!!!
-	SREG=oldSREG;
-}
-
-void digitalWrite_lookup(uint8_t pin, uint8_t val)
+void digitalWrite(uint8_t pin, uint8_t val)
 {
 	uint8_t timer = digitalPinToTimer(pin);
 	uint8_t bit = digitalPinToBitMask(pin);
@@ -164,7 +148,7 @@ void digitalWrite_lookup(uint8_t pin, uint8_t val)
 	SREG = oldSREG;
 }
 
-int digitalRead_lookup(uint8_t pin)
+int digitalRead(uint8_t pin)
 {
 	uint8_t timer = digitalPinToTimer(pin);
 	uint8_t bit = digitalPinToBitMask(pin);

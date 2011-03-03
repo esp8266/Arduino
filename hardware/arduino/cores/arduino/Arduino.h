@@ -90,9 +90,9 @@ typedef uint8_t byte;
 
 void init(void);
 
-void pinMode_lookup(uint8_t, uint8_t);
-void digitalWrite_lookup(uint8_t, uint8_t);
-int digitalRead_lookup(uint8_t);
+void pinMode(uint8_t, uint8_t);
+void digitalWrite(uint8_t, uint8_t);
+int digitalRead(uint8_t);
 int analogRead(uint8_t);
 void analogReference(uint8_t mode);
 void analogWrite(uint8_t, int);
@@ -117,129 +117,29 @@ void loop(void);
 
 #define analogInPinToBit(P) (P)
 
-INLINED uint8_t digitalPinToPort(uint8_t pin) {
-	if (__builtin_constant_p(pin))
-		return inlined_digitalPinToPort(pin);
-	else
-		return pgm_read_byte( digital_pin_to_port_PGM + pin );
-}
+// On the ATmega1280, the addresses of some of the port registers are
+// greater than 255, so we can't store them in uint8_t's.
+extern const uint16_t PROGMEM port_to_mode_PGM[];
+extern const uint16_t PROGMEM port_to_input_PGM[];
+extern const uint16_t PROGMEM port_to_output_PGM[];
 
-INLINED uint8_t digitalPinToBitMask(uint8_t pin) {
-	if (__builtin_constant_p(pin))
-		return inlined_digitalPinToBitMask(pin);
-	else
-		return pgm_read_byte( digital_pin_to_bit_mask_PGM + pin );
-}
+extern const uint8_t PROGMEM digital_pin_to_port_PGM[];
+// extern const uint8_t PROGMEM digital_pin_to_bit_PGM[];
+extern const uint8_t PROGMEM digital_pin_to_bit_mask_PGM[];
+extern const uint8_t PROGMEM digital_pin_to_timer_PGM[];
 
-INLINED uint8_t digitalPinToTimer(uint8_t pin) {
-	if (__builtin_constant_p(pin))
-		return inlined_digitalPinToTimer(pin);
-	else
-		return pgm_read_byte( digital_pin_to_timer_PGM + pin );
-}
-
-INLINED volatile uint8_t *portOutputRegister(uint8_t index) {
-	if (__builtin_constant_p(index))
-		return inlined_portOutputRegister(index);
-	else
-		return (volatile uint8_t *)( pgm_read_word( port_to_output_PGM + index ) );
-}
-
-INLINED volatile uint8_t* portInputRegister(uint8_t index) {
-	if (__builtin_constant_p(index))
-		return inlined_portInputRegister(index);
-	else
-		return (volatile uint8_t *)( pgm_read_word( port_to_input_PGM + index) );
-}
-
-INLINED volatile uint8_t* portModeRegister(uint8_t index) {
-	if (__builtin_constant_p(index))
-		return inlined_portModeRegister(index);
-	else
-		return (volatile uint8_t *)( pgm_read_word( port_to_mode_PGM + index) );
-}
-
-/*
- * Check if a given pin requires locking.
- * When accessing lower 32 IO ports we can use SBI/CBI instructions, which are atomic. However
- * other IO ports require load+modify+store and we need to make them atomic by disabling
- * interrupts.
- */
-INLINED int portWriteNeedsLocking(uint8_t pin)
-{
-	/* SBI/CBI instructions only work on lower 32 IO ports */
-	if (inlined_portOutputRegister(inlined_digitalPinToPort(pin)) > (volatile uint8_t*)&_SFR_IO8(0x1F)) {
-		return 1;
-	}
-	return 0;
-}
-
-INLINED int portModeNeedsLocking(uint8_t pin)
-{
-	/* SBI/CBI instructions only work on lower 32 IO ports */
-	if (inlined_portModeRegister(inlined_digitalPinToPort(pin)) > (volatile uint8_t*)&_SFR_IO8(0x1F)) {
-		return 1;
-	}
-	return 0;
-}
-
-/*
- * These functions will perform OR/AND on a given register, and are atomic.
- */
-extern void __digitalWriteOR_locked(volatile uint8_t*out, uint8_t bit);
-extern void __digitalWriteAND_locked(volatile uint8_t*out, uint8_t bit);
-
-INLINED void digitalWrite(uint8_t pin, uint8_t value)
-{
-	if (__builtin_constant_p(pin)) {
-		if (portWriteNeedsLocking(pin)) {
-			if (value==LOW) {
-				__digitalWriteAND_locked(inlined_portOutputRegister(inlined_digitalPinToPort(pin)),~inlined_digitalPinToBitMask(pin));
-			} else {
-				__digitalWriteOR_locked(inlined_portOutputRegister(inlined_digitalPinToPort(pin)),inlined_digitalPinToBitMask(pin));
-			}
-		} else {
-			if (value==LOW) {
-				*inlined_portOutputRegister(inlined_digitalPinToPort(pin)) &= ~(inlined_digitalPinToBitMask(pin));
-			} else {
-				*inlined_portOutputRegister(inlined_digitalPinToPort(pin)) |= inlined_digitalPinToBitMask(pin);
-			}
-		}
-	} else {
-		digitalWrite_lookup(pin,value);
-	}
-}
-
-INLINED void pinMode(uint8_t pin, uint8_t mode)
-{
-	if (__builtin_constant_p(pin)) {
-		if (portModeNeedsLocking(pin)) {
-			if (mode==INPUT) {
-				__digitalWriteAND_locked(inlined_portModeRegister(inlined_digitalPinToPort(pin)),~inlined_digitalPinToBitMask(pin));
-			} else {
-				__digitalWriteOR_locked(inlined_portModeRegister(inlined_digitalPinToPort(pin)),inlined_digitalPinToBitMask(pin));
-			}
-		} else {
-			if (mode==INPUT) {
-				*inlined_portModeRegister(inlined_digitalPinToPort(pin)) &= ~(inlined_digitalPinToBitMask(pin));
-			} else {
-				*inlined_portModeRegister(inlined_digitalPinToPort(pin)) |= inlined_digitalPinToBitMask(pin);
-			}
-		}
-	} else {
-		pinMode_lookup(pin,mode);
-	}
-}
-
-INLINED int digitalRead(uint8_t pin)
-{
-	if (__builtin_constant_p(pin)) {
-		return !! *inlined_portInputRegister(inlined_digitalPinToPort(pin));
-	} else {
-		return digitalRead_lookup(pin);
-	}
-}
-
+// Get the bit location within the hardware port of the given virtual pin.
+// This comes from the pins_*.c file for the active board configuration.
+// 
+// These perform slightly better as macros compared to inline functions
+//
+#define digitalPinToPort(P) ( pgm_read_byte( digital_pin_to_port_PGM + (P) ) )
+#define digitalPinToBitMask(P) ( pgm_read_byte( digital_pin_to_bit_mask_PGM + (P) ) )
+#define digitalPinToTimer(P) ( pgm_read_byte( digital_pin_to_timer_PGM + (P) ) )
+#define analogInPinToBit(P) (P)
+#define portOutputRegister(P) ( (volatile uint8_t *)( pgm_read_word( port_to_output_PGM + (P))) )
+#define portInputRegister(P) ( (volatile uint8_t *)( pgm_read_word( port_to_input_PGM + (P))) )
+#define portModeRegister(P) ( (volatile uint8_t *)( pgm_read_word( port_to_mode_PGM + (P))) )
 
 #ifdef __cplusplus
 } // extern "C"
