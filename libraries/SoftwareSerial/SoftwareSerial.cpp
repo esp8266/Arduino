@@ -40,8 +40,7 @@ http://arduiniana.org.
 // 
 #include <avr/interrupt.h>
 #include <avr/pgmspace.h>
-#include "WConstants.h"
-#include "pins_arduino.h"
+#include "Arduino.h"
 #include "SoftwareSerial.h"
 #include "icrmacros.h"
 //
