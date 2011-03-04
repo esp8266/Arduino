@@ -9,23 +9,9 @@ extern "C" {
   #include "utility/debug.h"	// only for test, not released
 }
   
+#include "IPAddress.h"
 #include "Client.h"
 #include "Server.h"
-
-// location in EEPROM to store key information
-#define EE_WIFI_DATA_ADDR   0x10
-#define EE_WIFI_SSID_LEN    EE_WIFI_DATA_ADDR
-#define EE_WIFI_ENC_TYPE	EE_WIFI_SSID_LEN + 1
-#define EE_WIFI_KEY_LEN     EE_WIFI_ENC_TYPE + 1
-#define EE_WIFI_SSID_DATA   EE_WIFI_KEY_LEN  + 1
-#define EE_WIFI_KEY_DATA    EE_WIFI_SSID_DATA + WL_SSID_MAX_LENGTH
-#define EE_WIFI_END_DATA    EE_WIFI_KEY_DATA  + WL_KEY_MAX_LENGTH
-
-// Wifi Encryption selection type
-#define WIFI_ENC_NONE	0
-#define WIFI_ENC_WEP	1
-#define WIFI_ENC_WPA	2
-
 
 class WiFiClass
 {
@@ -47,59 +33,51 @@ public:
 
     WiFiClass();
 
-    // Start Wifi connection
-    void begin();
+    // Start Wifi connection with latest settings
+    int begin();
 
-    // Set SSID name
-    void setSSID(char* ssid);
+    // Start Wifi connection with no encryption
+    int begin(char* ssid, uint8_t ssid_len);
 
-    // Set the encryption type: WPA, WEP or NONE
-    void setEncryption(uint8_t encType);
+    // Start Wifi connection with WEP encryption
+    int begin(char* ssid, uint8_t ssid_len, uint8_t key_idx, const char* key, const uint8_t key_len);
 
-    // Set the key used for the encryption
-    void setPassword(const char *key, const uint8_t keyLen, uint8_t keyIndex);
-
-    //getSock get the first socket available
-    static uint8_t getSocket();
-
-    // verify the completion of the scan command
-    wl_status_t getScanCmdStatus();
-
-    // get the result of the last operation 
-    uint8_t getResult(uint8_t dummy = 0);
+    // Start Wifi connection with passphrase
+    // the most secure supported mode will be automatically selected
+    int begin(char* ssid, uint8_t ssid_len, const char *passphrase, const uint8_t len);
 
     // Disconnect from the network
-    uint8_t disconnect(void);
+    int disconnect(void);
 
     //Get the interface MAC address.
-    uint8_t* getMacAddr();
+    uint8_t* macAddress();
 
     //Get the DHCP information related to IP
-    uint8_t* getIpAddr();
+    IPAddress localIp();
 
-    //Get the DHCP information related to IP
-    uint8_t* getNetMask();
+    //Get the DHCP information related to subnetMask
+    IPAddress subnetMask();
 
-    //Get the DHCP information related to IP
-    uint8_t* getGatewayIp();
-
-    // Return SSID item available
-    char*	getSSIDListItem(uint8_t ssidListItem);
-
-    // Return the number of SSID discovered
-    uint8_t getSSIDListNum();
+    //Get the DHCP information related to gateway IP
+    IPAddress gatewayIP();
 
     // Return the current SSID associated with the network
-    char* getSSID();
+    char* SSID();
 
     // Return the current BSSID associated with the network
-    uint8_t* getBSSID();
+    uint8_t* BSSID();
 
-    // Return the current RSSI associated with the network
-    int32_t getRSSI();
+    // Start scan SSIDs available and return the number of SSID discovered
+    uint8_t scanSSID();
+
+    // Return SSID item available
+    char*	SSIDListItem(uint8_t ssidListItem);
 
     // Return the current Encryption Type associated with the network
-    uint8_t	getCurrEncType();
+    uint8_t	encType(uint8_t ssidListItem);
+
+    // Return the current RSSI /Received Signal Strength in dBm) associated with the network
+    int32_t RSSI(uint8_t ssidListItem);
 
     friend class Client;
     friend class Server;
