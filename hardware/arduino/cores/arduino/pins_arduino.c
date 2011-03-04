@@ -81,50 +81,50 @@
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 const uint16_t PROGMEM port_to_mode_PGM[] = {
 	NOT_A_PORT,
-	&DDRA,
-	&DDRB,
-	&DDRC,
-	&DDRD,
-	&DDRE,
-	&DDRF,
-	&DDRG,
-	&DDRH,
+	(uint16_t) &DDRA,
+	(uint16_t) &DDRB,
+	(uint16_t) &DDRC,
+	(uint16_t) &DDRD,
+	(uint16_t) &DDRE,
+	(uint16_t) &DDRF,
+	(uint16_t) &DDRG,
+	(uint16_t) &DDRH,
 	NOT_A_PORT,
-	&DDRJ,
-	&DDRK,
-	&DDRL,
+	(uint16_t) &DDRJ,
+	(uint16_t) &DDRK,
+	(uint16_t) &DDRL,
 };
 
 const uint16_t PROGMEM port_to_output_PGM[] = {
 	NOT_A_PORT,
-	&PORTA,
-	&PORTB,
-	&PORTC,
-	&PORTD,
-	&PORTE,
-	&PORTF,
-	&PORTG,
-	&PORTH,
+	(uint16_t) &PORTA,
+	(uint16_t) &PORTB,
+	(uint16_t) &PORTC,
+	(uint16_t) &PORTD,
+	(uint16_t) &PORTE,
+	(uint16_t) &PORTF,
+	(uint16_t) &PORTG,
+	(uint16_t) &PORTH,
 	NOT_A_PORT,
-	&PORTJ,
-	&PORTK,
-	&PORTL,
+	(uint16_t) &PORTJ,
+	(uint16_t) &PORTK,
+	(uint16_t) &PORTL,
 };
 
 const uint16_t PROGMEM port_to_input_PGM[] = {
 	NOT_A_PIN,
-	&PINA,
-	&PINB,
-	&PINC,
-	&PIND,
-	&PINE,
-	&PINF,
-	&PING,
-	&PINH,
+	(uint16_t) &PINA,
+	(uint16_t) &PINB,
+	(uint16_t) &PINC,
+	(uint16_t) &PIND,
+	(uint16_t) &PINE,
+	(uint16_t) &PINF,
+	(uint16_t) &PING,
+	(uint16_t) &PINH,
 	NOT_A_PIN,
-	&PINJ,
-	&PINK,
-	&PINL,
+	(uint16_t) &PINJ,
+	(uint16_t) &PINK,
+	(uint16_t) &PINL,
 };
 
 const uint8_t PROGMEM digital_pin_to_port_PGM[] = {
@@ -358,25 +358,25 @@ const uint8_t PROGMEM digital_pin_to_timer_PGM[] = {
 const uint16_t PROGMEM port_to_mode_PGM[] = {
 	NOT_A_PORT,
 	NOT_A_PORT,
-	&DDRB,
-	&DDRC,
-	&DDRD,
+	(uint16_t) &DDRB,
+	(uint16_t) &DDRC,
+	(uint16_t) &DDRD,
 };
 
 const uint16_t PROGMEM port_to_output_PGM[] = {
 	NOT_A_PORT,
 	NOT_A_PORT,
-	&PORTB,
-	&PORTC,
-	&PORTD,
+	(uint16_t) &PORTB,
+	(uint16_t) &PORTC,
+	(uint16_t) &PORTD,
 };
 
 const uint16_t PROGMEM port_to_input_PGM[] = {
 	NOT_A_PORT,
 	NOT_A_PORT,
-	&PINB,
-	&PINC,
-	&PIND,
+	(uint16_t) &PINB,
+	(uint16_t) &PINC,
+	(uint16_t) &PIND,
 };
 
 const uint8_t PROGMEM digital_pin_to_port_PGM[] = {

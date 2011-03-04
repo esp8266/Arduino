@@ -27,7 +27,7 @@ void File::write(const uint8_t *buf, size_t size) {
 }
 
 int File::peek() {
-  char c = SD.file.read();
+  int c = SD.file.read();
   if (c != -1) SD.file.seekCur(-1);
   return c;
 }

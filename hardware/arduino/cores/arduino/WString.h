@@ -67,7 +67,7 @@ class String
     int	lastIndexOf( char ch, unsigned int fromIndex ) const;
     int	lastIndexOf( const String &str ) const;
     int	lastIndexOf( const String &str, unsigned int fromIndex ) const;
-    const unsigned int length( ) const { return _length; }
+    unsigned int length( ) const { return _length; }
     void setCharAt(unsigned int index, const char ch);
     unsigned char startsWith( const String &prefix ) const;
     unsigned char startsWith( const String &prefix, unsigned int toffset ) const;
