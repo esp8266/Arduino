@@ -313,16 +313,22 @@ void HardwareSerial::begin(long baud)
   sbi(*_ucsrb, _rxen);
   sbi(*_ucsrb, _txen);
   sbi(*_ucsrb, _rxcie);
-  cbi(*_ucsrb, _udrie); // XXX: what if there's already data in the tx buffer?
+  cbi(*_ucsrb, _udrie);
 }
 
-// XXX: should we empty the rx and tx buffers here?
 void HardwareSerial::end()
 {
+  // wait for transmission of outgoing data
+  while (_tx_buffer->head != _tx_buffer->tail)
+    ;
+
   cbi(*_ucsrb, _rxen);
   cbi(*_ucsrb, _txen);
   cbi(*_ucsrb, _rxcie);  
   cbi(*_ucsrb, _udrie);
+  
+  // clear any received data
+  _rx_buffer->head = _rx_buffer->tail;
 }
 
 int HardwareSerial::available(void)
