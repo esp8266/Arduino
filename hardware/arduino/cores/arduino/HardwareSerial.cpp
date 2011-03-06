@@ -367,7 +367,6 @@ void HardwareSerial::flush()
 
 void HardwareSerial::write(uint8_t c)
 {
-  bool empty = (_tx_buffer->head == _tx_buffer->tail);
   int i = (_tx_buffer->head + 1) % SERIAL_BUFFER_SIZE;
 	
   // If the output buffer is full, there's nothing for it other than to 
@@ -378,11 +377,7 @@ void HardwareSerial::write(uint8_t c)
   _tx_buffer->buffer[_tx_buffer->head] = c;
   _tx_buffer->head = i;
 	
-  if (empty) {
-    // The buffer was empty, so enable interrupt on
-    // USART Data Register empty. The interrupt handler will take it from there
-    sbi(*_ucsrb, _udrie);
-  }
+  sbi(*_ucsrb, _udrie);
 }
 
 // Preinstantiate Objects //////////////////////////////////////////////////////
