@@ -23,19 +23,16 @@ flush	KEYWORD2
 stop	KEYWORD2
 connected	KEYWORD2
 begin	KEYWORD2
-begink	KEYWORD2
-beginp	KEYWORD2
 disconnect	KEYWORD2
-getMacAddr	KEYWORD2
-getIpAddr	KEYWORD2
-getSSIDList	KEYWORD2
-getCurrSSID	KEYWORD2
-getCurrBSSID	KEYWORD2
-getCurrRSSI		KEYWORD2
-getCurrEncType	KEYWORD2
-wl_get_network_list	KEYWORD2
-get_result	KEYWORD2
-get_status	KEYWORD2
+macAddress	KEYWORD2
+localIp	KEYWORD2
+subnetMask	KEYWORD2
+gatewayIP	KEYWORD2
+SSID	KEYWORD2
+BSSID		KEYWORD2
+RSSI	KEYWORD2
+encryptionType	KEYWORD2
+getResult	KEYWORD2
 getSocket	KEYWORD2
 
 

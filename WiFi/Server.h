@@ -2,7 +2,7 @@
 #define Server_h
 
 extern "C" {
-  #include "utility/wl_types.h"
+  #include "utility/wl_definitions.h"
 }
 
 #include "Print.h"

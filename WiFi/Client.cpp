@@ -1,5 +1,6 @@
 extern "C" {
-  #include "wl_types.h"
+  #include "utility/wl_definitions.h"
+  #include "utility/wl_types.h"
   #include "socket.h"
   #include "string.h"
 }
@@ -11,45 +12,28 @@ extern "C" {
 #include "Server.h"
 #include "server_drv.h"
 
-uint16_t Client::_srcport = 0;
+uint16_t Client::_srcport = 1024;
 
-Client::Client(uint8_t sock) {
-  _sock = sock;
+Client::Client(uint8_t sock) : _sock(sock) {
 }
 
-Client::Client(uint8_t *ip, uint16_t port) {
-  _ip = ip;
-  _port = port;  
-  _sock = 255;
-}
-
-uint8_t Client::getFirstSock()
-{
-    for (int i = 0; i < MAX_SOCK_NUM; i++) {
-      if (WiFiClass::_state[i] < 0)
-      {
-          return i;
-      }
-    }
-    return SOCK_NOT_AVAIL;
+Client::Client(IPAddress& ip, uint16_t port) : _ip(ip), _port(port), _sock(MAX_SOCK_NUM) {
 }
 
 uint8_t Client::connect() {
-    _sock = getFirstSock();
-
-//    _srcport++;
-//  if (_srcport + 1024 == 0) _srcport = 0;
+    _sock = getFirstSocket();
+//TODO implementation
     _socket = socket(TCP_SOCKET);
     if (_socket<0)
     {
-        return 0; 
+        return 0;
     }else{
         WiFiClass::_state[_sock] = _socket;
     }
-  
-  if (!::connect(_socket, _ip, _port)) {
-    return 0;
-  }
+//
+//  if (!::connect(_socket, _ip, _port)) {
+//    return 0;
+//  }
   return 1;
 }
 
@@ -97,8 +81,8 @@ int Client::read() {
 }
 
 
-int Client::readBuf(uint8_t* buf, uint16_t* len) {
-  if (!ServerDrv::getDataBuf(_sock, buf, len))
+int Client::read(uint8_t* buf, size_t size) {
+  if (!ServerDrv::getDataBuf(_sock, buf, &size))
       return -1;
   return 0;
 }
@@ -146,19 +130,19 @@ uint8_t Client::status() {
   }
 }
 
-// the next three functions are a hack so we can compare the client returned
-// by Server::available() to null, or use it as the condition in an
-// if-statement.  this lets us stay compatible with the Processing network
-// library.
-
-uint8_t Client::operator==(int p) {
-  return _sock == 255;
-}
-
-uint8_t Client::operator!=(int p) {
-  return _sock != 255;
-}
-
 Client::operator bool() {
   return _sock != 255;
 }
+
+// Private Methods
+uint8_t Client::getFirstSocket()
+{
+    for (int i = 0; i < MAX_SOCK_NUM; i++) {
+      if (WiFiClass::_state[i] < 0)
+      {
+          return i;
+      }
+    }
+    return SOCK_NOT_AVAIL;
+}
+

@@ -1,6 +1,4 @@
 #include <string.h>
-#include "HardwareSerial.h"
-#include "wifi_spi.h"
 #include "Server.h"
 #include "Client.h"
 #include "WiFi.h"
