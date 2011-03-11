@@ -139,11 +139,11 @@ public:
 	String substring( unsigned int beginIndex, unsigned int endIndex ) const;
 
 	// modification
-	String & replace(char find, char replace);
-	String & replace(const String& find, const String& replace);
-	String & toLowerCase(void);
-	String & toUpperCase(void);
-	String & trim(void);
+	void replace(char find, char replace);
+	void replace(const String& find, const String& replace);
+	void toLowerCase(void);
+	void toUpperCase(void);
+	void trim(void);
 
 	// parsing/conversion
 	long toInt(void) const;

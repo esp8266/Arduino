@@ -550,18 +550,17 @@ String String::substring(unsigned int left, unsigned int right) const
 /*  Modification                             */
 /*********************************************/
 
-String & String::replace(char find, char replace)
+void String::replace(char find, char replace)
 {
-	if (!buffer) return *this;
+	if (!buffer) return;
 	for (char *p = buffer; *p; p++) {
 		if (*p == find) *p = replace;
 	}
-	return *this;
 }
 
-String & String::replace(const String& find, const String& replace)
+void String::replace(const String& find, const String& replace)
 {
-	if (len == 0 || find.len == 0) return *this;
+	if (len == 0 || find.len == 0) return;
 	int diff = replace.len - find.len;
 	char *readFrom = buffer;
 	char *foundAt;
@@ -588,8 +587,8 @@ String & String::replace(const String& find, const String& replace)
 			readFrom = foundAt + find.len;
 			size += diff;
 		}
-		if (size == len) return *this;
-		if (size > capacity && !changeBuffer(size)) return *this;
+		if (size == len) return;
+		if (size > capacity && !changeBuffer(size)) return; // XXX: tell user!
 		int index = len - 1;
 		while ((index = lastIndexOf(find, index)) >= 0) {
 			readFrom = buffer + index + find.len;
@@ -600,30 +599,27 @@ String & String::replace(const String& find, const String& replace)
 			index--;
 		}
 	}
-	return *this;
 }
 
-String & String::toLowerCase(void)
+void String::toLowerCase(void)
 {
-	if (!buffer) return *this;
+	if (!buffer) return;
 	for (char *p = buffer; *p; p++) {
 		*p = tolower(*p);
 	}
-	return *this;
 }
 
-String & String::toUpperCase(void)
+void String::toUpperCase(void)
 {
-	if (!buffer) return *this;
+	if (!buffer) return;
 	for (char *p = buffer; *p; p++) {
 		*p = toupper(*p);
 	}
-	return *this;
 }
 
-String & String::trim(void)
+void String::trim(void)
 {
-	if (!buffer || len == 0) return *this;
+	if (!buffer || len == 0) return;
 	char *begin = buffer;
 	while (isspace(*begin)) begin++;
 	char *end = buffer + len - 1;
@@ -631,7 +627,6 @@ String & String::trim(void)
 	len = end + 1 - begin;
 	if (begin > buffer) memcpy(buffer, begin, len);
 	buffer[len] = 0;
-	return *this;
 }
 
 /*********************************************/
