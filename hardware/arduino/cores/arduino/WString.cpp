@@ -32,12 +32,6 @@ String::String(const char *cstr)
 	if (cstr) copy(cstr, strlen(cstr));
 }
 
-String::String(const __FlashStringHelper *pgmstr)
-{
-	init();
-	*this = pgmstr;
-}
-
 String::String(const String &value)
 {
 	init();
@@ -163,22 +157,6 @@ String & String::copy(const char *cstr, unsigned int length)
 	return *this;
 }
 
-String & String::copy(const __FlashStringHelper *pgmstr)
-{
-	unsigned int length = strlen_P((const prog_char *)pgmstr);
-	if (!reserve(length)) {
-		if (buffer) {
-			free(buffer);
-			buffer = NULL;
-		}
-		len = capacity = 0;
-		return *this;
-	}
-	len = length;
-	strcpy_P(buffer, (const prog_char *)pgmstr);
-	return *this;
-}
-
 void String::move(String &rhs)
 {
 	if (buffer) {
@@ -229,12 +207,6 @@ String & String::operator = (const char *cstr)
 	return *this;
 }
 
-String & String::operator = (const __FlashStringHelper *pgmstr)
-{
-	copy(pgmstr);
-	return *this;
-}
-
 String & String::operator = (char c)
 {
 	char buf[2];
@@ -264,16 +236,6 @@ String & String::append(const char *cstr, unsigned int length)
 String & String::append(const char *cstr)
 {
 	if (cstr) append(cstr, strlen(cstr));
-	return *this;
-}
-
-String & String::append(const __FlashStringHelper *pgmstr)
-{
-	unsigned int length = strlen_P((const prog_char *)pgmstr);
-	unsigned int newlen = len + length;
-	if (length == 0 || !reserve(newlen)) return *this;
-	strcpy_P(buffer + len, (const prog_char *)pgmstr);
-	len = newlen;
 	return *this;
 }
 
@@ -333,13 +295,6 @@ StringSumHelper & operator + (const StringSumHelper &lhs, const char *cstr)
 {
 	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
 	if (cstr) a.append(cstr, strlen(cstr));
-	return a;
-}
-
-StringSumHelper & operator + (const StringSumHelper &lhs, const __FlashStringHelper *pgmstr)
-{
-	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	a.append(pgmstr);
 	return a;
 }
 
@@ -409,12 +364,6 @@ unsigned char String::equals(const char *cstr) const
 	if (len == 0) return (cstr == NULL || *cstr == 0);
 	if (cstr == NULL) return buffer[0] == 0;
 	return strcmp(buffer, cstr) == 0;
-}
-
-unsigned char String::equals(const __FlashStringHelper *pgmstr) const
-{
-	if (len == 0) return pgm_read_byte(pgmstr) == 0;
-	return strcmp_P(buffer, (const prog_char *)pgmstr) == 0;
 }
 
 unsigned char String::operator<(const String &rhs) const
