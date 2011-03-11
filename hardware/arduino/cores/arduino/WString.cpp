@@ -216,15 +216,15 @@ String & String::operator = (char c)
 }
 
 /*********************************************/
-/*  Append                                   */
+/*  concat                                   */
 /*********************************************/
 
-String & String::append(const String &s)
+String & String::concat(const String &s)
 {
-	return append(s.buffer, s.len);
+	return concat(s.buffer, s.len);
 }
 
-String & String::append(const char *cstr, unsigned int length)
+String & String::concat(const char *cstr, unsigned int length)
 {
 	unsigned int newlen = len + length;
 	if (length == 0 || !reserve(newlen)) return *this;
@@ -233,50 +233,50 @@ String & String::append(const char *cstr, unsigned int length)
 	return *this;
 }
 
-String & String::append(const char *cstr)
+String & String::concat(const char *cstr)
 {
-	if (cstr) append(cstr, strlen(cstr));
+	if (cstr) concat(cstr, strlen(cstr));
 	return *this;
 }
 
-String & String::append(char c)
+String & String::concat(char c)
 {
 	char buf[2];
 	buf[0] = c;
 	buf[1] = 0;
-	append(buf, 1);
+	concat(buf, 1);
 	return *this;
 }
 
-String & String::append(int num)
+String & String::concat(int num)
 {
 	char buf[7];
 	itoa(num, buf, 10);
-	append(buf, strlen(buf));
+	concat(buf, strlen(buf));
 	return *this;
 }
 
-String & String::append(unsigned int num)
+String & String::concat(unsigned int num)
 {
 	char buf[6];
 	utoa(num, buf, 10);
-	append(buf, strlen(buf));
+	concat(buf, strlen(buf));
 	return *this;
 }
 
-String & String::append(long num)
+String & String::concat(long num)
 {
 	char buf[12];
 	ltoa(num, buf, 10);
-	append(buf, strlen(buf));
+	concat(buf, strlen(buf));
 	return *this;
 }
 
-String & String::append(unsigned long num)
+String & String::concat(unsigned long num)
 {
 	char buf[11];
 	ultoa(num, buf, 10);
-	append(buf, strlen(buf));
+	concat(buf, strlen(buf));
 	return *this;
 }
 
@@ -287,56 +287,56 @@ String & String::append(unsigned long num)
 StringSumHelper & operator + (const StringSumHelper &lhs, const String &rhs)
 {
 	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	a.append(rhs.buffer, rhs.len);
+	a.concat(rhs.buffer, rhs.len);
 	return a;
 }
 
 StringSumHelper & operator + (const StringSumHelper &lhs, const char *cstr)
 {
 	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	if (cstr) a.append(cstr, strlen(cstr));
+	if (cstr) a.concat(cstr, strlen(cstr));
 	return a;
 }
 
 StringSumHelper & operator + (const StringSumHelper &lhs, char c)
 {
 	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	a.append(c);
+	a.concat(c);
 	return a;
 }
 
 StringSumHelper & operator + (const StringSumHelper &lhs, unsigned char c)
 {
 	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	a.append(c);
+	a.concat(c);
 	return a;
 }
 
 StringSumHelper & operator + (const StringSumHelper &lhs, int num)
 {
 	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	a.append(num);
+	a.concat(num);
 	return a;
 }
 
 StringSumHelper & operator + (const StringSumHelper &lhs, unsigned int num)
 {
 	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	a.append(num);
+	a.concat(num);
 	return a;
 }
 
 StringSumHelper & operator + (const StringSumHelper &lhs, long num)
 {
 	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	a.append(num);
+	a.concat(num);
 	return a;
 }
 
 StringSumHelper & operator + (const StringSumHelper &lhs, unsigned long num)
 {
 	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	a.append(num);
+	a.concat(num);
 	return a;
 }
 

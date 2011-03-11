@@ -72,23 +72,23 @@ public:
 	#endif
 	String & operator = (char c);
 
-	// append
-	String & append(const String &str);
-	String & append(const char *cstr);
-	String & append(char c);
-	String & append(unsigned char c)		{return append((char)c);}
-	String & append(int num);
-	String & append(unsigned int num);
-	String & append(long num);
-	String & append(unsigned long num);
-	String & operator += (const String &rhs)	{return append(rhs);}
-	String & operator += (const char *cstr)		{return append(cstr);}
-	String & operator += (char c)			{return append(c);}
-	String & operator += (unsigned char c)		{return append((char)c);}
-	String & operator += (int num)			{return append(num);}
-	String & operator += (unsigned int num)		{return append(num);}
-	String & operator += (long num)			{return append(num);}
-	String & operator += (unsigned long num)	{return append(num);}
+	// concat
+	String & concat(const String &str);
+	String & concat(const char *cstr);
+	String & concat(char c);
+	String & concat(unsigned char c)		{return concat((char)c);}
+	String & concat(int num);
+	String & concat(unsigned int num);
+	String & concat(long num);
+	String & concat(unsigned long num);
+	String & operator += (const String &rhs)	{return concat(rhs);}
+	String & operator += (const char *cstr)		{return concat(cstr);}
+	String & operator += (char c)			{return concat(c);}
+	String & operator += (unsigned char c)		{return concat((char)c);}
+	String & operator += (int num)			{return concat(num);}
+	String & operator += (unsigned int num)		{return concat(num);}
+	String & operator += (long num)			{return concat(num);}
+	String & operator += (unsigned long num)	{return concat(num);}
 
 	// concatenate
 	friend StringSumHelper & operator + (const StringSumHelper &lhs, const String &rhs);
@@ -156,7 +156,7 @@ protected:
 protected:
 	void init(void);
 	unsigned char changeBuffer(unsigned int maxStrLen);
-	String & append(const char *cstr, unsigned int length);
+	String & concat(const char *cstr, unsigned int length);
 };
 
 class StringSumHelper : public String
