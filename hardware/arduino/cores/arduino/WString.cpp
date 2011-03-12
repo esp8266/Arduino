@@ -219,65 +219,61 @@ String & String::operator = (char c)
 /*  concat                                   */
 /*********************************************/
 
-String & String::concat(const String &s)
+unsigned char String::concat(const String &s)
 {
 	return concat(s.buffer, s.len);
 }
 
-String & String::concat(const char *cstr, unsigned int length)
+unsigned char String::concat(const char *cstr, unsigned int length)
 {
 	unsigned int newlen = len + length;
-	if (length == 0 || !reserve(newlen)) return *this;
+	if (!cstr || length == 0) return 1; // nothing to append = success
+	if (!reserve(newlen)) return 0;
 	strcpy(buffer + len, cstr);
 	len = newlen;
-	return *this;
+	return 1;
 }
 
-String & String::concat(const char *cstr)
+unsigned char String::concat(const char *cstr)
 {
-	if (cstr) concat(cstr, strlen(cstr));
-	return *this;
+	if (!cstr) return 1; // nothing to append = success
+	return concat(cstr, strlen(cstr));
 }
 
-String & String::concat(char c)
+unsigned char String::concat(char c)
 {
 	char buf[2];
 	buf[0] = c;
 	buf[1] = 0;
-	concat(buf, 1);
-	return *this;
+	return concat(buf, 1);
 }
 
-String & String::concat(int num)
+unsigned char String::concat(int num)
 {
 	char buf[7];
 	itoa(num, buf, 10);
-	concat(buf, strlen(buf));
-	return *this;
+	return concat(buf, strlen(buf));
 }
 
-String & String::concat(unsigned int num)
+unsigned char String::concat(unsigned int num)
 {
 	char buf[6];
 	utoa(num, buf, 10);
-	concat(buf, strlen(buf));
-	return *this;
+	return concat(buf, strlen(buf));
 }
 
-String & String::concat(long num)
+unsigned char String::concat(long num)
 {
 	char buf[12];
 	ltoa(num, buf, 10);
-	concat(buf, strlen(buf));
-	return *this;
+	return concat(buf, strlen(buf));
 }
 
-String & String::concat(unsigned long num)
+unsigned char String::concat(unsigned long num)
 {
 	char buf[11];
 	ultoa(num, buf, 10);
-	concat(buf, strlen(buf));
-	return *this;
+	return concat(buf, strlen(buf));
 }
 
 /*********************************************/

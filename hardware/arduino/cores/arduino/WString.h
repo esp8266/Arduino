@@ -73,22 +73,22 @@ public:
 	String & operator = (char c);
 
 	// concat
-	String & concat(const String &str);
-	String & concat(const char *cstr);
-	String & concat(char c);
-	String & concat(unsigned char c)		{return concat((char)c);}
-	String & concat(int num);
-	String & concat(unsigned int num);
-	String & concat(long num);
-	String & concat(unsigned long num);
-	String & operator += (const String &rhs)	{return concat(rhs);}
-	String & operator += (const char *cstr)		{return concat(cstr);}
-	String & operator += (char c)			{return concat(c);}
-	String & operator += (unsigned char c)		{return concat((char)c);}
-	String & operator += (int num)			{return concat(num);}
-	String & operator += (unsigned int num)		{return concat(num);}
-	String & operator += (long num)			{return concat(num);}
-	String & operator += (unsigned long num)	{return concat(num);}
+	unsigned char concat(const String &str);
+	unsigned char concat(const char *cstr);
+	unsigned char concat(char c);
+	unsigned char concat(unsigned char c)		{return concat((char)c);}
+	unsigned char concat(int num);
+	unsigned char concat(unsigned int num);
+	unsigned char concat(long num);
+	unsigned char concat(unsigned long num);
+	String & operator += (const String &rhs)	{concat(rhs); return (*this);}
+	String & operator += (const char *cstr)		{concat(cstr); return (*this);}
+	String & operator += (char c)			{concat(c); return (*this);}
+	String & operator += (unsigned char c)		{concat((char)c); return (*this);}
+	String & operator += (int num)			{concat(num); return (*this);}
+	String & operator += (unsigned int num)		{concat(num); return (*this);}
+	String & operator += (long num)			{concat(num); return (*this);}
+	String & operator += (unsigned long num)	{concat(num); return (*this);}
 
 	// concatenate
 	friend StringSumHelper & operator + (const StringSumHelper &lhs, const String &rhs);
@@ -156,7 +156,7 @@ protected:
 protected:
 	void init(void);
 	unsigned char changeBuffer(unsigned int maxStrLen);
-	String & concat(const char *cstr, unsigned int length);
+	unsigned char concat(const char *cstr, unsigned int length);
 };
 
 class StringSumHelper : public String
