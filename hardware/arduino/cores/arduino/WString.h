@@ -61,11 +61,6 @@ public:
 	unsigned char reserve(unsigned int size);
 	inline unsigned int length(void) const {return len;}
 
-	// copy and move
-	String & copy(const char *cstr, unsigned int length);
-	#ifdef __GXX_EXPERIMENTAL_CXX0X__
-	void move(String &rhs);
-	#endif
 	String & operator = (const String &rhs);
 	String & operator = (const char *cstr);
 	#ifdef __GXX_EXPERIMENTAL_CXX0X__
@@ -160,6 +155,12 @@ protected:
 	void init(void);
 	unsigned char changeBuffer(unsigned int maxStrLen);
 	unsigned char concat(const char *cstr, unsigned int length);
+
+	// copy and move
+	String & copy(const char *cstr, unsigned int length);
+	#ifdef __GXX_EXPERIMENTAL_CXX0X__
+	void move(String &rhs);
+	#endif
 };
 
 class StringSumHelper : public String
