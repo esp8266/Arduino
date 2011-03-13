@@ -63,7 +63,9 @@ public:
 
 	// copy and move
 	String & copy(const char *cstr, unsigned int length);
+	#ifdef __GXX_EXPERIMENTAL_CXX0X__
 	void move(String &rhs);
+	#endif
 	String & operator = (const String &rhs);
 	String & operator = (const char *cstr);
 	#ifdef __GXX_EXPERIMENTAL_CXX0X__
@@ -101,6 +103,7 @@ public:
 	friend StringSumHelper & operator + (const StringSumHelper &lhs, unsigned long num);
 
 	// comparison
+	operator bool() const;
 	int compareTo(const String &s) const;
 	unsigned char equals(const String &s) const;
 	unsigned char equals(const char *cstr) const;

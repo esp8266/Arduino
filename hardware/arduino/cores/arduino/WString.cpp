@@ -157,6 +157,7 @@ String & String::copy(const char *cstr, unsigned int length)
 	return *this;
 }
 
+#ifdef __GXX_EXPERIMENTAL_CXX0X__
 void String::move(String &rhs)
 {
 	if (buffer) {
@@ -176,6 +177,7 @@ void String::move(String &rhs)
 	rhs.capacity = 0;
 	rhs.len = 0;
 }
+#endif
 
 String & String::operator = (const String &rhs)
 {
@@ -339,6 +341,11 @@ StringSumHelper & operator + (const StringSumHelper &lhs, unsigned long num)
 /*********************************************/
 /*  Comparison                               */
 /*********************************************/
+
+String::operator bool() const
+{
+	return !!buffer;
+}
 
 int String::compareTo(const String &s) const
 {
