@@ -175,5 +175,40 @@ public:
 	StringSumHelper(unsigned long num) : String(num, 10) {}
 };
 
+inline StringSumHelper operator + (const String &lhs, const String &rhs)
+	{ return StringSumHelper(lhs) + rhs; }
+	
+inline StringSumHelper operator + (const String &lhs, const char *cstr)
+	{ return StringSumHelper(lhs) + cstr; }
+inline StringSumHelper operator + (const String &lhs, char c)
+	{ return StringSumHelper(lhs) + c; }
+inline StringSumHelper operator + (const String &lhs, unsigned char c)
+	{ return StringSumHelper(lhs) + c; }
+inline StringSumHelper operator + (const String &lhs, int num)
+	{ return StringSumHelper(lhs) + num; }
+inline StringSumHelper operator + (const String &lhs, unsigned int num)
+	{ return StringSumHelper(lhs) + num; }
+inline StringSumHelper operator + (const String &lhs, long num)
+	{ return StringSumHelper(lhs) + num; }
+inline StringSumHelper operator + (const String &lhs, unsigned long num)
+	{ return StringSumHelper(lhs) + num; }
+	
+inline StringSumHelper operator + (const char *cstr, const String &rhs)
+	{ return StringSumHelper(cstr) + rhs; }
+inline StringSumHelper operator + (char c, const String &rhs)
+	{ return StringSumHelper(c) + rhs; }
+inline StringSumHelper operator + (unsigned char c, const String &rhs)
+	{ return StringSumHelper(c) + rhs; }
+inline StringSumHelper operator + (int num, const String &rhs)
+	{ return StringSumHelper(num) + rhs; }
+inline StringSumHelper operator + (unsigned int num, const String &rhs)
+	{ return StringSumHelper(num) + rhs; }
+inline StringSumHelper operator + (long num, const String &rhs)
+	{ return StringSumHelper(num) + rhs; }
+inline StringSumHelper operator + (unsigned long num, const String &rhs)
+	{ return StringSumHelper(num) + rhs; }
+	
+
+
 #endif  // __cplusplus
 #endif  // String_class_h
