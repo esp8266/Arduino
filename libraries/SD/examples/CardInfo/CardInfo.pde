@@ -10,11 +10,14 @@
  ** MOSI - pin 11 on Arduino Uno/Duemilanove/Diecimila
  ** MISO - pin 12 on Arduino Uno/Duemilanove/Diecimila
  ** CLK - pin 13 on Arduino Uno/Duemilanove/Diecimila
- ** CS - depends on your SD card shield or module
+ ** CS - depends on your SD card shield or module. 
+ 		Pin 4 used here for consistency with other Arduino examples
 
  
  created  28 Mar 2011
  by Limor Fried 
+ modified 16 Mar 2011
+ by Tom Igoe
  */
  // include the SD library:
 #include <SD.h>
@@ -28,7 +31,7 @@ SdFile root;
 // Arduino Ethernet shield: pin 4
 // Adafruit SD shields and modules: pin 10
 // Sparkfun SD shield: pin 8
-const int chipSelect = 8;    
+const int chipSelect = 4;    
 
 void setup()
 {
