@@ -43,7 +43,7 @@ class String
 {
 public:
 	// constructors
-	String(const char *cstr = NULL);
+	String(const char *cstr = "");
 	String(const String &str);
 	#ifdef __GXX_EXPERIMENTAL_CXX0X__
 	String(String &&rval);
