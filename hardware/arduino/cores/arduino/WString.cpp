@@ -112,6 +112,13 @@ inline void String::init(void)
 	flags = 0;
 }
 
+void String::invalidate(void)
+{
+	if (buffer) free(buffer);
+	buffer = NULL;
+	capacity = len = 0;
+}
+
 unsigned char String::reserve(unsigned int size)
 {
 	if (buffer && capacity >= size) return 1;
@@ -140,11 +147,7 @@ unsigned char String::changeBuffer(unsigned int maxStrLen)
 String & String::copy(const char *cstr, unsigned int length)
 {
 	if (!reserve(length)) {
-		if (buffer) {
-			free(buffer);
-			buffer = NULL;
-		}
-		len = capacity = 0;
+		invalidate();
 		return *this;
 	}
 	len = length;
@@ -177,7 +180,11 @@ void String::move(String &rhs)
 String & String::operator = (const String &rhs)
 {
 	if (this == &rhs) return *this;
-	return copy(rhs.buffer, rhs.len);
+	
+	if (rhs.buffer) copy(rhs.buffer, rhs.len);
+	else invalidate();
+	
+	return *this;
 }
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
@@ -196,16 +203,9 @@ String & String::operator = (StringSumHelper &&rval)
 
 String & String::operator = (const char *cstr)
 {
-	if (cstr) {
-		copy(cstr, strlen(cstr));
-	} else {
-		if (buffer) {
-			free(buffer);
-			capacity = 0;
-			buffer = NULL;
-		}
-		len = 0;
-	}
+	if (cstr) copy(cstr, strlen(cstr));
+	else invalidate();
+	
 	return *this;
 }
 
@@ -229,7 +229,8 @@ unsigned char String::concat(const String &s)
 unsigned char String::concat(const char *cstr, unsigned int length)
 {
 	unsigned int newlen = len + length;
-	if (!cstr || length == 0) return 1; // nothing to append = success
+	if (!cstr) return 0;
+	if (length == 0) return 1;
 	if (!reserve(newlen)) return 0;
 	strcpy(buffer + len, cstr);
 	len = newlen;
@@ -238,7 +239,7 @@ unsigned char String::concat(const char *cstr, unsigned int length)
 
 unsigned char String::concat(const char *cstr)
 {
-	if (!cstr) return 1; // nothing to append = success
+	if (!cstr) return 0;
 	return concat(cstr, strlen(cstr));
 }
 
@@ -285,56 +286,56 @@ unsigned char String::concat(unsigned long num)
 StringSumHelper & operator + (const StringSumHelper &lhs, const String &rhs)
 {
 	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	a.concat(rhs.buffer, rhs.len);
+	if (!a.concat(rhs.buffer, rhs.len)) a.invalidate();
 	return a;
 }
 
 StringSumHelper & operator + (const StringSumHelper &lhs, const char *cstr)
 {
 	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	if (cstr) a.concat(cstr, strlen(cstr));
+	if (!cstr || !a.concat(cstr, strlen(cstr))) a.invalidate();
 	return a;
 }
 
 StringSumHelper & operator + (const StringSumHelper &lhs, char c)
 {
 	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	a.concat(c);
+	if (!a.concat(c)) a.invalidate();
 	return a;
 }
 
 StringSumHelper & operator + (const StringSumHelper &lhs, unsigned char c)
 {
 	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	a.concat(c);
+	if (!a.concat(c)) a.invalidate();
 	return a;
 }
 
 StringSumHelper & operator + (const StringSumHelper &lhs, int num)
 {
 	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	a.concat(num);
+	if (!a.concat(num)) a.invalidate();
 	return a;
 }
 
 StringSumHelper & operator + (const StringSumHelper &lhs, unsigned int num)
 {
 	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	a.concat(num);
+	if (!a.concat(num)) a.invalidate();
 	return a;
 }
 
 StringSumHelper & operator + (const StringSumHelper &lhs, long num)
 {
 	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	a.concat(num);
+	if (!a.concat(num)) a.invalidate();
 	return a;
 }
 
 StringSumHelper & operator + (const StringSumHelper &lhs, unsigned long num)
 {
 	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
-	a.concat(num);
+	if (!a.concat(num)) a.invalidate();
 	return a;
 }
 

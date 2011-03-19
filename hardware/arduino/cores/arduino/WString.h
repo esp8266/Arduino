@@ -153,6 +153,7 @@ protected:
 	unsigned char flags;    // unused, for future features
 protected:
 	void init(void);
+	void invalidate(void);
 	unsigned char changeBuffer(unsigned int maxStrLen);
 	unsigned char concat(const char *cstr, unsigned int length);
 
