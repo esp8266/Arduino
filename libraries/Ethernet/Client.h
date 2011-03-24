@@ -7,8 +7,8 @@ class Client : public Stream {
 
 public:
   Client();
-  Client(uint8_t);
-  Client(uint8_t *, uint16_t);
+  Client(uint8_t sock);
+  Client(IPAddress& ip, uint16_t port);
 
   uint8_t status();
   uint8_t connect();
@@ -29,7 +29,7 @@ public:
 private:
   static uint16_t _srcport;
   uint8_t _sock;
-  uint8_t *_ip;
+  IPAddress _ip;
   uint16_t _port;
 };
 

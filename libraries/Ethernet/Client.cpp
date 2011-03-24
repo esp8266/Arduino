@@ -16,7 +16,7 @@ uint16_t Client::_srcport = 1024;
 Client::Client(uint8_t sock) : _sock(sock) {
 }
 
-Client::Client(uint8_t *ip, uint16_t port) : _ip(ip), _port(port), _sock(MAX_SOCK_NUM) {
+Client::Client(IPAddress& ip, uint16_t port) : _ip(ip), _port(port), _sock(MAX_SOCK_NUM) {
 }
 
 uint8_t Client::connect() {
@@ -38,7 +38,7 @@ uint8_t Client::connect() {
   if (_srcport == 0) _srcport = 1024;
   socket(_sock, SnMR::TCP, _srcport, 0);
 
-  if (!::connect(_sock, _ip, _port)) {
+  if (!::connect(_sock, _ip.raw_address(), _port)) {
     _sock = MAX_SOCK_NUM;
     return 0;
   }

@@ -56,95 +56,10 @@ uint8_t UDP::begin(uint16_t port) {
   return 1;
 }
 
-/* Send packet contained in buf of length len to peer at specified ip, and port */
-/* Use this function to transmit binary data that might contain 0x00 bytes*/
-/* This function returns sent data size for success else -1. */
-uint16_t UDP::sendPacket(uint8_t * buf, uint16_t len,  uint8_t * ip, uint16_t port){
-  return sendto(_sock,(const uint8_t *)buf,len,ip,port);
-}
-
-/* Send  zero-terminated string str as packet to peer at specified ip, and port */
-/* This function returns sent data size for success else -1. */
-uint16_t UDP::sendPacket(const char str[], uint8_t * ip, uint16_t port){	
-  // compute strlen
-  const char *s;
-  for(s = str; *s; ++s);
-  uint16_t len = (s-str);
-  // send packet
-  return sendto(_sock,(const uint8_t *)str,len,ip,port);
-}
 /* Is data available in rx buffer? Returns 0 if no, number of available bytes if yes. 
  * returned value includes 8 byte UDP header!*/
 int UDP::available() {
   return W5100.getRXReceivedSize(_sock);
-}
-
-
-/* Read a received packet into buffer buf (which is of maximum length len); */
-/* store calling ip and port as well. Call available() to make sure data is ready first. */
-/* NOTE: I don't believe len is ever checked in implementation of recvfrom(),*/
-/*       so it's easy to overflow buffer. so we check and truncate. */
-/* returns number of bytes read, or negative number of bytes we would have needed if we truncated */
-int UDP::readPacket(uint8_t * buf, uint16_t bufLen, uint8_t *ip, uint16_t *port) {
-  int packetLen = available()-8; //skip UDP header;
-  if(packetLen < 0 ) return 0; // no real data here	
-  if(packetLen > (int)bufLen) {
-    //packet is too large - truncate
-    //HACK - hand-parse the UDP packet using TCP recv method
-    uint8_t tmpBuf[8];
-    int i;
-    //read 8 header bytes and get IP and port from it
-    recv(_sock,tmpBuf,8);
-    ip[0] = tmpBuf[0];
-    ip[1] = tmpBuf[1];
-    ip[2] = tmpBuf[2];
-    ip[3] = tmpBuf[3];
-    *port = tmpBuf[4];
-    *port = (*port << 8) + tmpBuf[5];
-
-    //now copy first (bufLen) bytes into buf		
-    for(i=0;i<(int)bufLen;i++) {
-      recv(_sock,tmpBuf,1);
-      buf[i]=tmpBuf[0];
-    }
-
-    //and just read the rest byte by byte and throw it away
-    while(available()) {
-      recv(_sock,tmpBuf,1);
-    }
-
-    return (-1*packetLen);
-
-    //ALTERNATIVE: requires stdlib - takes a bunch of space
-    /*//create new buffer and read everything into it
-     		uint8_t * tmpBuf = (uint8_t *)malloc(packetLen);
-     		recvfrom(_sock,tmpBuf,packetLen,ip,port);
-     		if(!tmpBuf) return 0; //couldn't allocate
-     		// copy first bufLen bytes
-     		for(unsigned int i=0; i<bufLen; i++) {
-     			buf[i]=tmpBuf[i];
-     		}
-     		//free temp buffer
-     		free(tmpBuf);
-     		*/
-
-
-  } 
-  return recvfrom(_sock,buf,bufLen,ip,port);
-}
-
-/* Read a received packet, throw away peer's ip and port.  See note above. */
-int UDP::readPacket(uint8_t * buf, uint16_t len) {
-  uint8_t ip[4];
-  uint16_t port[1];
-  return recvfrom(_sock,buf,len,ip,port);
-}
-
-int UDP::readPacket(char * buf, uint16_t bufLen, uint8_t *ip, uint16_t &port) {
-uint16_t myPort;
-uint16_t ret = readPacket( (byte*)buf, bufLen, ip, &myPort);
-port = myPort;
-return ret;
 }
 
 /* Release any resources being used by this UDP instance */
@@ -157,5 +72,95 @@ void UDP::stop()
 
   EthernetClass::_server_port[_sock] = 0;
   _sock = MAX_SOCK_NUM;
+}
+
+int UDP::beginPacket(IPAddress ip, uint16_t port)
+{
+  _offset = 0;
+  return startUDP(_sock, ip.raw_address(), port);
+}
+
+int UDP::endPacket()
+{
+  return sendUDP(_sock);
+}
+
+void UDP::write(uint8_t byte)
+{
+  write(&byte, 1);
+}
+
+void UDP::write(const char *str)
+{
+  size_t len = strlen(str);
+  write((const uint8_t *)str, len);
+}
+
+void UDP::write(const uint8_t *buffer, size_t size)
+{
+  uint16_t bytes_written = bufferData(_sock, _offset, buffer, size);
+  _offset += bytes_written;
+}
+
+int UDP::parsePacket()
+{
+  //HACK - hand-parse the UDP packet using TCP recv method
+  uint8_t tmpBuf[8];
+  int ret =0;	
+  //read 8 header bytes and get IP and port from it
+  ret = recv(_sock,tmpBuf,8);
+  if (ret > 0)
+  {
+    _remoteIP = tmpBuf;
+    _remotePort = tmpBuf[4];
+    _remotePort = (_remotePort << 8) + tmpBuf[5];
+    // When we get here, any remaining bytes are the data
+    ret = available();
+  }
+  return ret;
+}
+
+int UDP::read()
+{
+  uint8_t byte;
+  if (recv(_sock, &byte, 1) > 0)
+  {
+    // We read things without any problems
+    return byte;
+  }
+  // If we get here, there's no data available
+  return -1;
+}
+
+int UDP::read(unsigned char* buffer, size_t len)
+{
+  /* In the readPacket that copes with truncating packets, the buffer was
+     filled with this code.  Not sure why it loops round reading out a byte
+     at a time.
+  int i;
+  for(i=0;i<(int)bufLen;i++) {
+    recv(_sock,tmpBuf,1);
+    buf[i]=tmpBuf[0];
+  }
+  */
+  return recv(_sock, buffer, len);
+}
+
+int UDP::peek()
+{
+  uint8_t b;
+  // Unlike recv, peek doesn't check to see if there's any data available, so we must
+  if (!available())
+    return -1;
+  ::peek(_sock, &b);
+  return b;
+}
+
+void UDP::flush()
+{
+  while (available())
+  {
+    read();
+  }
 }
 

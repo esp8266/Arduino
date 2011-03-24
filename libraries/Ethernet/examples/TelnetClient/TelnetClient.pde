@@ -24,12 +24,10 @@
 // The IP address will be dependent on your local network:
 byte mac[] = {  
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-byte ip[] = { 
-  192,168,1,177 };
+IPAddress ip(192,168,1,177);
 
 // Enter the IP address of the server you're connecting to:
-byte server[] = { 
-  1,1,1,1 }; 
+IPAddress server(1,1,1,1); 
 
 // Initialize the Ethernet client library
 // with the IP address and port of the server 

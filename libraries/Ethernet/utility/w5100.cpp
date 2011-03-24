@@ -65,10 +65,16 @@ uint16_t W5100Class::getRXReceivedSize(SOCKET s)
 }
 
 
-void W5100Class::send_data_processing(SOCKET s, uint8_t *data, uint16_t len)
+void W5100Class::send_data_processing(SOCKET s, const uint8_t *data, uint16_t len)
+{
+  // This is same as having no offset in a call to send_data_processing_offset
+  send_data_processing_offset(s, 0, data, len);
+}
+
+void W5100Class::send_data_processing_offset(SOCKET s, uint16_t data_offset, const uint8_t *data, uint16_t len)
 {
   uint16_t ptr = readSnTX_WR(s);
-
+  ptr += data_offset;
   uint16_t offset = ptr & SMASK;
   uint16_t dstAddr = offset + SBASE[s];
 
@@ -132,7 +138,7 @@ uint8_t W5100Class::write(uint16_t _addr, uint8_t _data)
   return 1;
 }
 
-uint16_t W5100Class::write(uint16_t _addr, uint8_t *_buf, uint16_t _len)
+uint16_t W5100Class::write(uint16_t _addr, const uint8_t *_buf, uint16_t _len)
 {
   for (int i=0; i<_len; i++)
   {

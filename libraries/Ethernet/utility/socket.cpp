@@ -344,3 +344,58 @@ uint16_t igmpsend(SOCKET s, const uint8_t * buf, uint16_t len)
   return ret;
 }
 
+uint16_t bufferData(SOCKET s, uint16_t offset, const uint8_t* buf, uint16_t len)
+{
+  uint16_t ret =0;
+  if (len > W5100.getTXFreeSize(s))
+  {
+    ret = W5100.getTXFreeSize(s); // check size not to exceed MAX size.
+  }
+  else
+  {
+    ret = len;
+  }
+  W5100.send_data_processing_offset(s, offset, buf, ret);
+  return ret;
+}
+
+int startUDP(SOCKET s, uint8_t* addr, uint16_t port)
+{
+  if
+    (
+     ((addr[0] == 0x00) && (addr[1] == 0x00) && (addr[2] == 0x00) && (addr[3] == 0x00)) ||
+     ((port == 0x00))
+    ) 
+  {
+    return 0;
+  }
+  else
+  {
+    W5100.writeSnDIPR(s, addr);
+    W5100.writeSnDPORT(s, port);
+    return 1;
+  }
+}
+
+int sendUDP(SOCKET s)
+{
+  W5100.execCmdSn(s, Sock_SEND);
+		
+  /* +2008.01 bj */
+  while ( (W5100.readSnIR(s) & SnIR::SEND_OK) != SnIR::SEND_OK ) 
+  {
+    if (W5100.readSnIR(s) & SnIR::TIMEOUT)
+    {
+      /* +2008.01 [bj]: clear interrupt */
+      W5100.writeSnIR(s, (SnIR::SEND_OK|SnIR::TIMEOUT));
+      return 0;
+    }
+  }
+
+  /* +2008.01 bj */	
+  W5100.writeSnIR(s, SnIR::SEND_OK);
+
+  /* Sent ok */
+  return 1;
+}
+
