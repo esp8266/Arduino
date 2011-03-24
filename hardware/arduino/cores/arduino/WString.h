@@ -43,6 +43,10 @@ class String
 {
 public:
 	// constructors
+	// creates a copy of the initial value.
+	// if the initial value is null or invalid, or if memory allocation
+	// fails, the string will be marked as invalid (i.e. operator bool()
+	// will return false).
 	String(const char *cstr = "");
 	String(const String &str);
 	#ifdef __GXX_EXPERIMENTAL_CXX0X__
@@ -58,9 +62,15 @@ public:
 	~String(void);
 
 	// memory management
+	// return true on success, false on failure (in which case, the string
+	// is left unchanged).  reserve(0), if successful, will validate an
+	// invalid string (i.e., operator bool() will return true afterwards)
 	unsigned char reserve(unsigned int size);
 	inline unsigned int length(void) const {return len;}
 
+	// creates a copy of the assigned value.  if the value is null or
+	// invalid, or if the memory allocation fails, the string will be 
+	// marked as invalid (operator bool() will return false).
 	String & operator = (const String &rhs);
 	String & operator = (const char *cstr);
 	#ifdef __GXX_EXPERIMENTAL_CXX0X__
@@ -70,6 +80,9 @@ public:
 	String & operator = (char c);
 
 	// concat
+	// returns true on success, false on failure (in which case, the string
+	// is left unchanged).  if the argument is null or invalid, the 
+	// concatenation is considered unsucessful.  
 	unsigned char concat(const String &str);
 	unsigned char concat(const char *cstr);
 	unsigned char concat(char c);
@@ -78,6 +91,9 @@ public:
 	unsigned char concat(unsigned int num);
 	unsigned char concat(long num);
 	unsigned char concat(unsigned long num);
+	
+	// if there's not enough memory for the concatenated value, the string
+	// will be left unchanged (but this isn't signalled in any way)
 	String & operator += (const String &rhs)	{concat(rhs); return (*this);}
 	String & operator += (const char *cstr)		{concat(cstr); return (*this);}
 	String & operator += (char c)			{concat(c); return (*this);}
