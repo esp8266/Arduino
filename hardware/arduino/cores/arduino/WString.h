@@ -41,6 +41,12 @@ class StringSumHelper;
 // The string class
 class String
 {
+	// use a function pointer to allow for "if (s)" without the
+	// complications of an operator bool(). for more information, see:
+	// http://www.artima.com/cppsource/safebool.html
+	typedef void (String::*StringIfHelperType)() const;
+	void StringIfHelper() const {}
+
 public:
 	// constructors
 	// creates a copy of the initial value.
@@ -53,12 +59,12 @@ public:
 	String(String &&rval);
 	String(StringSumHelper &&rval);
 	#endif
-	String(char c);
-	String(unsigned char c);
-	String(int, unsigned char base=10);
-	String(unsigned int, unsigned char base=10);
-	String(long, unsigned char base=10);
-	String(unsigned long, unsigned char base=10);
+	explicit String(char c);
+	explicit String(unsigned char, unsigned char base=10);
+	explicit String(int, unsigned char base=10);
+	explicit String(unsigned int, unsigned char base=10);
+	explicit String(long, unsigned char base=10);
+	explicit String(unsigned long, unsigned char base=10);
 	~String(void);
 
 	// memory management
@@ -77,7 +83,6 @@ public:
 	String & operator = (String &&rval);
 	String & operator = (StringSumHelper &&rval);
 	#endif
-	String & operator = (char c);
 
 	// concat
 	// returns true on success, false on failure (in which case, the string
@@ -85,36 +90,19 @@ public:
 	// concatenation is considered unsucessful.  
 	unsigned char concat(const String &str);
 	unsigned char concat(const char *cstr);
-	unsigned char concat(char c);
-	unsigned char concat(unsigned char c)		{return concat((char)c);}
-	unsigned char concat(int num);
-	unsigned char concat(unsigned int num);
-	unsigned char concat(long num);
-	unsigned char concat(unsigned long num);
 	
 	// if there's not enough memory for the concatenated value, the string
 	// will be left unchanged (but this isn't signalled in any way)
 	String & operator += (const String &rhs)	{concat(rhs); return (*this);}
 	String & operator += (const char *cstr)		{concat(cstr); return (*this);}
-	String & operator += (char c)			{concat(c); return (*this);}
-	String & operator += (unsigned char c)		{concat((char)c); return (*this);}
-	String & operator += (int num)			{concat(num); return (*this);}
-	String & operator += (unsigned int num)		{concat(num); return (*this);}
-	String & operator += (long num)			{concat(num); return (*this);}
-	String & operator += (unsigned long num)	{concat(num); return (*this);}
 
 	// concatenate
 	friend StringSumHelper & operator + (const StringSumHelper &lhs, const String &rhs);
 	friend StringSumHelper & operator + (const StringSumHelper &lhs, const char *cstr);
-	friend StringSumHelper & operator + (const StringSumHelper &lhs, char c);
-	friend StringSumHelper & operator + (const StringSumHelper &lhs, unsigned char c);
-	friend StringSumHelper & operator + (const StringSumHelper &lhs, int num);
-	friend StringSumHelper & operator + (const StringSumHelper &lhs, unsigned int num);
-	friend StringSumHelper & operator + (const StringSumHelper &lhs, long num);
-	friend StringSumHelper & operator + (const StringSumHelper &lhs, unsigned long num);
 
 	// comparison
-	operator bool() const;
+	operator StringIfHelperType() const { return buffer ? &String::StringIfHelper : 0; }
+
 	int compareTo(const String &s) const;
 	unsigned char equals(const String &s) const;
 	unsigned char equals(const char *cstr) const;
@@ -185,48 +173,7 @@ class StringSumHelper : public String
 public:
 	StringSumHelper(const String &s) : String(s) {}
 	StringSumHelper(const char *p) : String(p) {}
-	StringSumHelper(char c) : String(c) {}
-	StringSumHelper(unsigned char c) : String(c) {}
-	StringSumHelper(int num) : String(num, 10) {}
-	StringSumHelper(unsigned int num) : String(num, 10) {}
-	StringSumHelper(long num) : String(num, 10) {}
-	StringSumHelper(unsigned long num) : String(num, 10) {}
 };
-
-inline StringSumHelper operator + (const String &lhs, const String &rhs)
-	{ return StringSumHelper(lhs) + rhs; }
-	
-inline StringSumHelper operator + (const String &lhs, const char *cstr)
-	{ return StringSumHelper(lhs) + cstr; }
-inline StringSumHelper operator + (const String &lhs, char c)
-	{ return StringSumHelper(lhs) + c; }
-inline StringSumHelper operator + (const String &lhs, unsigned char c)
-	{ return StringSumHelper(lhs) + c; }
-inline StringSumHelper operator + (const String &lhs, int num)
-	{ return StringSumHelper(lhs) + num; }
-inline StringSumHelper operator + (const String &lhs, unsigned int num)
-	{ return StringSumHelper(lhs) + num; }
-inline StringSumHelper operator + (const String &lhs, long num)
-	{ return StringSumHelper(lhs) + num; }
-inline StringSumHelper operator + (const String &lhs, unsigned long num)
-	{ return StringSumHelper(lhs) + num; }
-	
-inline StringSumHelper operator + (const char *cstr, const String &rhs)
-	{ return StringSumHelper(cstr) + rhs; }
-inline StringSumHelper operator + (char c, const String &rhs)
-	{ return StringSumHelper(c) + rhs; }
-inline StringSumHelper operator + (unsigned char c, const String &rhs)
-	{ return StringSumHelper(c) + rhs; }
-inline StringSumHelper operator + (int num, const String &rhs)
-	{ return StringSumHelper(num) + rhs; }
-inline StringSumHelper operator + (unsigned int num, const String &rhs)
-	{ return StringSumHelper(num) + rhs; }
-inline StringSumHelper operator + (long num, const String &rhs)
-	{ return StringSumHelper(num) + rhs; }
-inline StringSumHelper operator + (unsigned long num, const String &rhs)
-	{ return StringSumHelper(num) + rhs; }
-	
-
 
 #endif  // __cplusplus
 #endif  // String_class_h
