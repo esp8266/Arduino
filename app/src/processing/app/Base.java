@@ -349,6 +349,10 @@ public class Base {
     int opened = 0;
     for (int i = 0; i < count; i++) {
       String path = Preferences.get("last.sketch" + i + ".path");
+      // don't automatically rename sketches that were left open from a 
+      // pre-1.0 version of Arduino (wait for the user to explicitly open
+      // the sketch before renaming it).
+      if (path.toLowerCase().endsWith(".pde")) continue;
       int[] location;
       if (windowPositionValid) {
         String locationStr = Preferences.get("last.sketch" + i + ".location");
