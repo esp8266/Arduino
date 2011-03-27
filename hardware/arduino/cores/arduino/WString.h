@@ -34,6 +34,9 @@
 //     -felide-constructors
 //     -std=c++0x
 
+class __FlashStringHelper;
+#define F(string_literal) (reinterpret_cast<__FlashStringHelper *>(PSTR(string_literal)))
+
 // An inherited class for holding the result of a concatenation.  These
 // result objects are assumed to be writable by subsequent concatenations.
 class StringSumHelper;
@@ -51,8 +54,8 @@ public:
 	// constructors
 	// creates a copy of the initial value.
 	// if the initial value is null or invalid, or if memory allocation
-	// fails, the string will be marked as invalid (i.e. operator bool()
-	// will return false).
+	// fails, the string will be marked as invalid (i.e. "if (s)" will
+	// be false).
 	String(const char *cstr = "");
 	String(const String &str);
 	#ifdef __GXX_EXPERIMENTAL_CXX0X__
@@ -70,13 +73,13 @@ public:
 	// memory management
 	// return true on success, false on failure (in which case, the string
 	// is left unchanged).  reserve(0), if successful, will validate an
-	// invalid string (i.e., operator bool() will return true afterwards)
+	// invalid string (i.e., "if (s)" will be true afterwards)
 	unsigned char reserve(unsigned int size);
 	inline unsigned int length(void) const {return len;}
 
 	// creates a copy of the assigned value.  if the value is null or
 	// invalid, or if the memory allocation fails, the string will be 
-	// marked as invalid (operator bool() will return false).
+	// marked as invalid ("if (s)" will be false).
 	String & operator = (const String &rhs);
 	String & operator = (const char *cstr);
 	#ifdef __GXX_EXPERIMENTAL_CXX0X__

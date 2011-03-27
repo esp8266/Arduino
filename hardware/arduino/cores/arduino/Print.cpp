@@ -43,6 +43,16 @@ void Print::write(const uint8_t *buffer, size_t size)
     write(*buffer++);
 }
 
+void Print::print(const __FlashStringHelper *ifsh)
+{
+  const prog_char *p = (const prog_char *)ifsh;
+  while (1) {
+    unsigned char c = pgm_read_byte(p++);
+    if (c == 0) return;
+    write(c);
+  }
+}
+
 void Print::print(const String &s)
 {
   for (int i = 0; i < s.length(); i++) {
@@ -101,10 +111,16 @@ void Print::print(double n, int digits)
   printFloat(n, digits);
 }
 
+void Print::println(const __FlashStringHelper *ifsh)
+{
+  print(ifsh);
+  println();
+}
+
 void Print::println(void)
 {
   print('\r');
-  print('\n');  
+  print('\n');
 }
 
 void Print::println(const String &s)
