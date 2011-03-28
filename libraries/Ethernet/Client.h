@@ -2,16 +2,18 @@
 #define client_h
 #include "WProgram.h"	
 #include "Print.h"
+#include "NetClient.h"
+#include "IPAddress.h"
 
-class Client : public Stream {
+class Client : public NetClient {
 
 public:
   Client();
   Client(uint8_t sock);
 
   uint8_t status();
-  int connect(IPAddress ip, uint16_t port);
-  int connect(const char *host, uint16_t port);
+  virtual int connect(IPAddress ip, uint16_t port);
+  virtual int connect(const char *host, uint16_t port);
   virtual void write(uint8_t);
   virtual void write(const char *str);
   virtual void write(const uint8_t *buf, size_t size);
@@ -20,11 +22,11 @@ public:
   virtual int read(uint8_t *buf, size_t size);
   virtual int peek();
   virtual void flush();
-  void stop();
-  uint8_t connected();
-  uint8_t operator==(int);
-  uint8_t operator!=(int);
-  operator bool();
+  virtual void stop();
+  virtual uint8_t connected();
+  virtual uint8_t operator==(int);
+  virtual uint8_t operator!=(int);
+  virtual operator bool();
 
   friend class Server;
 
