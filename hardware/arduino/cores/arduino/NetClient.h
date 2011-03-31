@@ -20,8 +20,6 @@ public:
   virtual void flush() = 0;
   virtual void stop() = 0;
   virtual uint8_t connected() = 0;
-  virtual uint8_t operator==(int) = 0;
-  virtual uint8_t operator!=(int) = 0;
   virtual operator bool() = 0;
 };
 
