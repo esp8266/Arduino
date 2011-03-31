@@ -240,6 +240,49 @@ unsigned char String::concat(const char *cstr)
 	return concat(cstr, strlen(cstr));
 }
 
+unsigned char String::concat(char c)
+{
+	char buf[2];
+	buf[0] = c;
+	buf[1] = 0;
+	return concat(buf, 1);
+}
+
+unsigned char String::concat(unsigned char num)
+{
+	char buf[4];
+	itoa(num, buf, 10);
+	return concat(buf, strlen(buf));
+}
+
+unsigned char String::concat(int num)
+{
+	char buf[7];
+	itoa(num, buf, 10);
+	return concat(buf, strlen(buf));
+}
+
+unsigned char String::concat(unsigned int num)
+{
+	char buf[6];
+	utoa(num, buf, 10);
+	return concat(buf, strlen(buf));
+}
+
+unsigned char String::concat(long num)
+{
+	char buf[12];
+	ltoa(num, buf, 10);
+	return concat(buf, strlen(buf));
+}
+
+unsigned char String::concat(unsigned long num)
+{
+	char buf[11];
+	ultoa(num, buf, 10);
+	return concat(buf, strlen(buf));
+}
+
 /*********************************************/
 /*  Concatenate                              */
 /*********************************************/
@@ -255,6 +298,48 @@ StringSumHelper & operator + (const StringSumHelper &lhs, const char *cstr)
 {
 	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
 	if (!cstr || !a.concat(cstr, strlen(cstr))) a.invalidate();
+	return a;
+}
+
+StringSumHelper & operator + (const StringSumHelper &lhs, char c)
+{
+	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
+	if (!a.concat(c)) a.invalidate();
+	return a;
+}
+
+StringSumHelper & operator + (const StringSumHelper &lhs, unsigned char num)
+{
+	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
+	if (!a.concat(num)) a.invalidate();
+	return a;
+}
+
+StringSumHelper & operator + (const StringSumHelper &lhs, int num)
+{
+	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
+	if (!a.concat(num)) a.invalidate();
+	return a;
+}
+
+StringSumHelper & operator + (const StringSumHelper &lhs, unsigned int num)
+{
+	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
+	if (!a.concat(num)) a.invalidate();
+	return a;
+}
+
+StringSumHelper & operator + (const StringSumHelper &lhs, long num)
+{
+	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
+	if (!a.concat(num)) a.invalidate();
+	return a;
+}
+
+StringSumHelper & operator + (const StringSumHelper &lhs, unsigned long num)
+{
+	StringSumHelper &a = const_cast<StringSumHelper&>(lhs);
+	if (!a.concat(num)) a.invalidate();
 	return a;
 }
 

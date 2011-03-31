@@ -87,25 +87,42 @@ public:
 	String & operator = (StringSumHelper &&rval);
 	#endif
 
-	// concat
+	// concatenate (works w/ built-in types)
+	
 	// returns true on success, false on failure (in which case, the string
 	// is left unchanged).  if the argument is null or invalid, the 
 	// concatenation is considered unsucessful.  
 	unsigned char concat(const String &str);
 	unsigned char concat(const char *cstr);
+	unsigned char concat(char c);
+	unsigned char concat(unsigned char c);
+	unsigned char concat(int num);
+	unsigned char concat(unsigned int num);
+	unsigned char concat(long num);
+	unsigned char concat(unsigned long num);
 	
 	// if there's not enough memory for the concatenated value, the string
 	// will be left unchanged (but this isn't signalled in any way)
 	String & operator += (const String &rhs)	{concat(rhs); return (*this);}
 	String & operator += (const char *cstr)		{concat(cstr); return (*this);}
+	String & operator += (char c)			{concat(c); return (*this);}
+	String & operator += (unsigned char num)		{concat(num); return (*this);}
+	String & operator += (int num)			{concat(num); return (*this);}
+	String & operator += (unsigned int num)		{concat(num); return (*this);}
+	String & operator += (long num)			{concat(num); return (*this);}
+	String & operator += (unsigned long num)	{concat(num); return (*this);}
 
-	// concatenate
 	friend StringSumHelper & operator + (const StringSumHelper &lhs, const String &rhs);
 	friend StringSumHelper & operator + (const StringSumHelper &lhs, const char *cstr);
+	friend StringSumHelper & operator + (const StringSumHelper &lhs, char c);
+	friend StringSumHelper & operator + (const StringSumHelper &lhs, unsigned char num);
+	friend StringSumHelper & operator + (const StringSumHelper &lhs, int num);
+	friend StringSumHelper & operator + (const StringSumHelper &lhs, unsigned int num);
+	friend StringSumHelper & operator + (const StringSumHelper &lhs, long num);
+	friend StringSumHelper & operator + (const StringSumHelper &lhs, unsigned long num);
 
-	// comparison
+	// comparison (only works w/ Strings and "strings")
 	operator StringIfHelperType() const { return buffer ? &String::StringIfHelper : 0; }
-
 	int compareTo(const String &s) const;
 	unsigned char equals(const String &s) const;
 	unsigned char equals(const char *cstr) const;
@@ -176,6 +193,12 @@ class StringSumHelper : public String
 public:
 	StringSumHelper(const String &s) : String(s) {}
 	StringSumHelper(const char *p) : String(p) {}
+	StringSumHelper(char c) : String(c) {}
+	StringSumHelper(unsigned char num) : String(num) {}
+	StringSumHelper(int num) : String(num) {}
+	StringSumHelper(unsigned int num) : String(num) {}
+	StringSumHelper(long num) : String(num) {}
+	StringSumHelper(unsigned long num) : String(num) {}
 };
 
 #endif  // __cplusplus
