@@ -101,6 +101,11 @@ void Print::print(double n, int digits)
   printFloat(n, digits);
 }
 
+void Print::print(const Printable& x)
+{
+  x.printTo(*this);
+}
+
 void Print::println(void)
 {
   print('\r');
@@ -158,6 +163,12 @@ void Print::println(unsigned long n, int base)
 void Print::println(double n, int digits)
 {
   print(n, digits);
+  println();
+}
+
+void Print::println(const Printable& x)
+{
+  print(x);
   println();
 }
 

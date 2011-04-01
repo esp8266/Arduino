@@ -24,6 +24,7 @@
 #include <stdio.h> // for size_t
 
 #include "WString.h"
+#include "Printable.h"
 
 #define DEC 10
 #define HEX 16
@@ -50,6 +51,7 @@ class Print
     void print(long, int = DEC);
     void print(unsigned long, int = DEC);
     void print(double, int = 2);
+    void print(const Printable&);
 
     void println(const String &s);
     void println(const char[]);
@@ -60,6 +62,7 @@ class Print
     void println(long, int = DEC);
     void println(unsigned long, int = DEC);
     void println(double, int = 2);
+    void println(const Printable&);
     void println(void);
 };
 
