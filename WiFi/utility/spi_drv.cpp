@@ -1,7 +1,8 @@
 
 #include "WProgram.h"
 #include "spi_drv.h"                   
-
+#include "pins_arduino.h"
+#define _DEBUG_
 extern "C" {
 #include "debug.h"
 }
@@ -9,30 +10,39 @@ extern "C" {
 #define DATAOUT 11//MOSI
 #define DATAIN  12//MISO 
 #define SPICLOCK  13//sck
-#define SLAVESELECT 10//ss
+#define SLAVESELECT 2//ss
+#define SLAVEREADY 3
                        
 
-void SpiDrv::spiSetup()
+void SpiDrv::begin()
 {
-    int clr = 0;
-    pinMode(DATAOUT, OUTPUT);
-    pinMode(DATAIN, INPUT);
-    pinMode(SPICLOCK,OUTPUT);
-    pinMode(SLAVESELECT,OUTPUT);
-    digitalWrite(SLAVESELECT,HIGH); //disable device
-    // SPCR = 01010000
-    //interrupt disabled,spi enabled,msb 1st,master,clk low when idle,
-    //sample on leading edge of clk,system clock/4 rate (fastest)
-    SPCR = (1<<SPE)|(1<<MSTR);
-    clr=SPSR;
-    clr=SPDR;
+	  // Set direction register for SCK and MOSI pin.
+	  // MISO pin automatically overrides to INPUT.
+	  // When the SS pin is set as OUTPUT, it can be used as
+	  // a general purpose output port (it doesn't influence
+	  // SPI operations).
+
+	  pinMode(SCK, OUTPUT);
+	  pinMode(MOSI, OUTPUT);
+	  pinMode(SS, OUTPUT);
+	  pinMode(SLAVESELECT, OUTPUT);
+	  pinMode(SLAVEREADY, INPUT);
+
+	  digitalWrite(SCK, LOW);
+	  digitalWrite(MOSI, LOW);
+	  digitalWrite(SS, HIGH);
+	  digitalWrite(SLAVESELECT, HIGH);
+
+	  // Warning: if the SS pin ever becomes a LOW INPUT then SPI
+	  // automatically switches to Slave, so the data direction of
+	  // the SS pin MUST be kept as OUTPUT.
+	  SPCR |= _BV(MSTR);
+	  SPCR |= _BV(SPE);
 }
 
-void SpiDrv::spiDriverInit()
-{
-    spiSetup();
+void SpiDrv::end() {
+  SPCR &= ~_BV(SPE);
 }
-
 
 void SpiDrv::spiSlaveSelect()
 {
@@ -132,8 +142,27 @@ char SpiDrv::readChar()
         if (!readAndCheckChar(check, &x))   \
         {                                               \
             WARN("Reply error");                        \
+            INFO2(check, (uint8_t)x);							\
             return 0;                                   \
         }else                                           \
+
+bool SpiDrv::waitSlaveReady()
+{
+	return (digitalRead(SLAVEREADY) == LOW);
+}
+
+void SpiDrv::waitForSlaveReady()
+{
+#if 0
+	int count = 0;
+	while (!waitSlaveReady() && (++count<TIMEOUT_READY_SLAVE))
+	{
+		delayMicroseconds(1);
+	}
+#else
+	while (!waitSlaveReady());
+#endif
+}
 
 int SpiDrv::waitResponse(uint8_t cmd, uint8_t numParam, uint8_t* param, uint8_t* param_len)
 {
@@ -317,6 +346,53 @@ int SpiDrv::waitResponse(uint8_t cmd, tParam* params, uint8_t* numParamRead, uin
     }         
     return 1;
 }
+
+int SpiDrv::waitResponse(uint8_t cmd, uint8_t* numParamRead, uint8_t** params, uint8_t maxNumParams)
+{
+    char _data = 0;
+    int i =0, ii = 0;
+
+    char    *index[WL_SSID_MAX_LENGTH];
+
+    for (i = 0 ; i < WL_NETWORKS_LIST_MAXNUM ; i++)
+            index[i] = (char *)params + WL_SSID_MAX_LENGTH*i;
+
+    IF_CHECK_START_CMD(_data)
+    {
+        CHECK_DATA(cmd | REPLY_FLAG, _data){};
+
+        uint8_t numParam = readChar();
+
+        if (numParam > maxNumParams)
+        {
+            numParam = maxNumParams;
+        }
+        *numParamRead = numParam;
+        if (numParam != 0)
+        {
+            for (i=0; i<numParam; ++i)
+            {
+            	uint8_t paramLen = readParamLen8();
+                for (ii=0; ii<paramLen; ++ii)
+                {
+                	//ssid[ii] = spiTransfer(DUMMY_DATA);
+                    // Get Params data
+                    index[i][ii] = (uint8_t)spiTransfer(DUMMY_DATA);
+
+                }
+                index[i][ii]=0;
+            }
+        } else
+        {
+            WARN("Error numParams == 0");
+            Serial.println(cmd, 16);
+            return 0;
+        }
+        readAndCheckChar(END_CMD, &_data);
+    }
+    return 1;
+}
+
 
 void SpiDrv::sendParam(uint8_t* param, uint8_t param_len, uint8_t lastParam)
 {

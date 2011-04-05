@@ -2,9 +2,12 @@
 #include "WiFi.h"
 #include "wiring.h"
 
+#define _DEBUG_
+
 extern "C" {
   #include "utility/wl_definitions.h"
   #include "utility/wl_types.h"
+	#include "debug.h"
 }
 
 // XXX: don't make assumptions about the value of MAX_SOCK_NUM.
@@ -19,7 +22,6 @@ wl_status_t WiFiClass::_status;
 
 WiFiClass::WiFiClass()
 {
-	init();
 }
 
 void WiFiClass::init()
@@ -41,42 +43,66 @@ uint8_t WiFiClass::getSocket()
 
 int WiFiClass::begin()
 {
+	init();
 }
 
 int WiFiClass::begin(char* ssid)
 {
+	uint8_t status = WL_IDLE_STATUS;
+	init();
+
    if (WiFiDrv::wifiSetNetwork(ssid, strlen(ssid)) != WL_FAILURE)
    {
-	   delay(WL_DELAY_START_CONNECTION);
-	   return  WiFiDrv::getConnectionStatus();
+
+	   do
+	   {
+		   delay(WL_DELAY_START_CONNECTION);
+		   status = WiFiDrv::getConnectionStatus();
+	   }
+	   while (( status == WL_IDLE_STATUS)||(status == WL_SCAN_COMPLETED));
    }else
    {
-	   return WL_CONNECT_FAILED;
+	   status = WL_CONNECT_FAILED;
    }
+   return status;
 }
 
 int WiFiClass::begin(char* ssid, uint8_t key_idx, const char *key)
 {
+	uint8_t status = WL_IDLE_STATUS;
+	init();
     // set encryption key
    if (WiFiDrv::wifiSetKey(ssid, strlen(ssid), key_idx, key, strlen(key)) != WL_FAILURE)
    {
-	   delay(WL_DELAY_START_CONNECTION);
-	   return  WiFiDrv::getConnectionStatus();
+	   do
+	   {
+		   delay(WL_DELAY_START_CONNECTION);
+		   status = WiFiDrv::getConnectionStatus();
+	   }
+	   while (( status == WL_IDLE_STATUS)||(status == WL_SCAN_COMPLETED));
    }else{
-	   return WL_CONNECT_FAILED;
+	   status = WL_CONNECT_FAILED;
    }
+   return status;
 }
 
 int WiFiClass::begin(char* ssid, const char *passphrase)
 {
+	uint8_t status = WL_IDLE_STATUS;
+	init();
     // set passphrase
     if (WiFiDrv::wifiSetPassphrase(ssid, strlen(ssid), passphrase, strlen(passphrase))!= WL_FAILURE)
     {
-    	delay(WL_DELAY_START_CONNECTION);
-    	return  WiFiDrv::getConnectionStatus();
+ 	   do
+ 	   {
+ 		   delay(WL_DELAY_START_CONNECTION);
+ 		   status = WiFiDrv::getConnectionStatus();
+ 	   }
+ 	   while (( status == WL_IDLE_STATUS)||(status == WL_SCAN_COMPLETED));
     }else{
- 	   return WL_CONNECT_FAILED;
+    	status = WL_CONNECT_FAILED;
     }
+    return status;
 }
 
 int WiFiClass::disconnect()
@@ -86,7 +112,8 @@ int WiFiClass::disconnect()
 
 uint8_t* WiFiClass::macAddress(uint8_t* mac)
 {
-	mac = WiFiDrv::getMacAddress();
+	uint8_t* _mac = WiFiDrv::getMacAddress();
+	memcpy(mac, _mac, WL_MAC_ADDR_LENGTH);
     return mac;
 }
    
@@ -118,7 +145,8 @@ char* WiFiClass::SSID()
 
 uint8_t* WiFiClass::BSSID(uint8_t* bssid)
 {
-	bssid = WiFiDrv::getCurrentBSSID();
+	uint8_t* _bssid = WiFiDrv::getCurrentBSSID();
+	memcpy(bssid, _bssid, WL_MAC_ADDR_LENGTH);
     return bssid;
 }
 
@@ -152,5 +180,11 @@ uint8_t WiFiClass::encryptionType(uint8_t networkItem)
 {
     return WiFiDrv::getEncTypeNetowrks(networkItem);
 }
+
+uint8_t WiFiClass::status()
+{
+    return WiFiDrv::getConnectionStatus();
+}
+
 
 WiFiClass WiFi;

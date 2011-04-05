@@ -6,12 +6,13 @@
 
 #define KEY_IDX_LEN     1
 #define WL_DELAY_START_CONNECTION 5000
+#define WL_DELAY_RETRY_START_CONNECTION 1000
 
 class WiFiDrv
 {
 private:
 	// settings of requested network
-	static char 	_networkSsid[WL_SSID_MAX_LENGTH];
+	static char 	_networkSsid[WL_NETWORKS_LIST_MAXNUM][WL_SSID_MAX_LENGTH];
 
 	// settings of current selected network
 	static char 	_ssid[WL_SSID_MAX_LENGTH];

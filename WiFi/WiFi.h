@@ -83,6 +83,9 @@ public:
     // Return the current RSSI /Received Signal Strength in dBm) associated with the network identified with networkItem
     int32_t RSSI(uint8_t networkItem);
 
+    // Return Connection status
+    uint8_t status();
+
     friend class Client;
     friend class Server;
 };

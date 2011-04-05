@@ -94,7 +94,7 @@ typedef struct  __attribute__((__packed__))
 {
 	unsigned char	cmd;
 	unsigned char	tcmd;
-	unsigned char	totLen;
+	//unsigned char	totLen;
 	unsigned char	nParam;
 }tSpiHdr;
 

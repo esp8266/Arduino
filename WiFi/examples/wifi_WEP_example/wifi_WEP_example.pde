@@ -18,6 +18,9 @@ IPAddress subnet;
 byte dataBuf[80] = { 0 };
 char ssid[32] = { 0 };
 int status = WL_IDLE_STATUS;
+#define MAX_NUM_SSID 10
+char ssidList[MAX_NUM_SSID][32] = { {0} };
+ 
 
 Server server(23);
 
@@ -57,13 +60,13 @@ void printIpData()
 
 void printCurrNet()
 {
-    //WiFi.getCurrSSID(&ssid[0]);
-    //Serial.print("SSID:");
-    //Serial.println(ssid);
+    char* ssid = WiFi.SSID();
+    Serial.print("SSID: ");
+    Serial.println(ssid);
+    
     byte bssid[6];
-    WiFi.BSSID(bssid);
-    //delay(200);
-    Serial.print("BSSID:");
+    WiFi.BSSID(bssid);    
+    Serial.print("BSSID: ");
     Serial.print(bssid[5],16);Serial.print(":");
     Serial.print(bssid[4],16);Serial.print(":");
     Serial.print(bssid[3],16);Serial.print(":");
@@ -78,58 +81,66 @@ void printCurrNet()
     uint8_t enct = WiFi.encryptionType();
     Serial.print("Encryption Type:");
     Serial.println(enct,16);
-       
-    char ssid[20][32] = { {0} };
+}
+
+void scanNetworks()
+{
     byte numSsid = WiFi.scanNetworks();
+    if (numSsid > MAX_NUM_SSID) numSsid = MAX_NUM_SSID;
     Serial.print("SSID List:");
     Serial.println(numSsid, 10);
     for (int i = 0; i<numSsid; ++i)
     {
         Serial.println(WiFi.SSID(i));
     }
+}
 
+int startWiFiWep()
+{
+  Serial.println("Setup WiFi Wep...");
+  strcpy(ssid, "Cariddiwep");
+  Serial.print("SSID: ");
+  Serial.println(ssid);
+  uint8_t key_idx = 0;
+  const char *key = "1234567890";
+  Serial.println("Connecting...");
+  status = WiFi.begin(ssid,key_idx, key);
+  if ( status != WL_CONNECTED)
+  {	  
+    Serial.println("Connection Failed");
+  }
+  return status;
 }
 
 void setup()
 {
   Serial.begin(9600);
-  Serial.println("Setup WiFi...");
-  strcpy(ssid, "Vodafone-10289870");
-  Serial.println(ssid);
-  int status = WiFi.begin(ssid);
-  if ( status != WL_CONNECTED)
+  Serial.println("*** Start WiFi example ***");
+
+  delay(3000);
+
+  int _status = startWiFiWep();
+  
+  if ( _status == WL_CONNECTED)
   {
-    // Using WPA
-    Serial.println("Trying with Passphrase...");
-    const char *pass = "12345678";
-    status = WiFi.begin(ssid, pass);
-    if ( status != WL_CONNECTED)
-    {	  
-      // using WEP     
-      Serial.println("Trying with Key...");
-      uint8_t key_idx = 0;
-      const char *key = "12345678";
-      status = WiFi.begin(ssid,key_idx, key);
-      if ( status != WL_CONNECTED)
-      {	  
-        Serial.println("Wifi Connection failed!");  
-        return;
-      }      
-    }
+    Serial.println("Wifi Connected!");
+
+    printIpData();      
+
+    printCurrNet();
+    
+    scanNetworks();
+  /*
+    Serial.println("Starting server...");
+    server.begin();
+   delay(1000);  
+   */
   }
-  Serial.println("Wifi Connected!");
-
-  printIpData();      
-
-  printCurrNet();
-
-  Serial.println("Starting server...");
-  server.begin();
-  delay(1000);  
 }
 
 void loop()
 {
+  /*
   static uint8_t count = 0;
   Serial.println("Retry connect...");
   status = WiFi.begin(ssid);
@@ -155,5 +166,7 @@ void loop()
         return;
       }
   }
+  */
 }
+
 

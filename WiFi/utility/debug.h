@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "HardwareSerial.h"
+
 #define INFO_0 1
 #define INFO_1 2
 #define INFO_2 4
@@ -30,13 +32,13 @@
 
 #ifdef _DEBUG_
 
-#define INFO1(x) do { PRINT_FILE_LINE() Serial.print("-W-");\
+#define INFO1(x) do { PRINT_FILE_LINE() Serial.print("-I-");\
 		Serial.println(x);    			\
 }while (0);
 
 
 #define INFO2(x,y) do { PRINT_FILE_LINE() Serial.print("-I-");\
-		Serial.print(x);Serial.print(",");Serial.println(y); \
+		Serial.print(x,16);Serial.print(",");Serial.println(y,16); \
 }while (0);
 
 
@@ -49,7 +51,7 @@
 		Serial.print("-W-"); Serial.println(args);	\
 }while (0);
 
-#define DBG_PIN2 3
+#define DBG_PIN2 5
 #define DBG_PIN 4
 
 #define START()         digitalWrite(DBG_PIN2, HIGH);

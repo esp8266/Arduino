@@ -6,6 +6,7 @@
 
 #define WAIT_CHAR_DELAY 100
 #define TIMEOUT_CHAR_DELAY 10
+#define TIMEOUT_READY_SLAVE    1000
 #define SPI_TX_DELAY 2
 
 #define NO_LAST_PARAM   0
@@ -16,9 +17,13 @@
 
 class SpiDrv
 {
+private:
+	static bool waitSlaveReady();
 public:
 
-    static void spiSetup();
+    static void begin();
+
+    static void end();
     
     static void spiDriverInit();
         
@@ -27,6 +32,8 @@ public:
     static void spiSlaveDeselect();
     
     static char spiTransfer(volatile char data);
+
+    static void waitForSlaveReady();
 
     static int waitSpiChar(char waitChar, char* readChar);
 
@@ -48,6 +55,8 @@ public:
      
     static int waitResponse(uint8_t cmd, uint8_t* param, uint16_t* param_len);
     
+    static int waitResponse(uint8_t cmd, uint8_t* numParamRead, uint8_t** params, uint8_t maxNumParams);
+
     static void sendParam(uint8_t* param, uint8_t param_len, uint8_t lastParam = NO_LAST_PARAM);
 
     static void sendParamLen8(uint8_t param_len);

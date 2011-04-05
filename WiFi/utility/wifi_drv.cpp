@@ -14,7 +14,7 @@ extern "C" {
 #include "debug.h"
 }
 
-char 	WiFiDrv::_networkSsid[] = {0};
+char 	WiFiDrv::_networkSsid[][WL_SSID_MAX_LENGTH] = {{"1"},{"2"},{"3"},{"4"},{"5"}};
 char 	WiFiDrv::_ssid[] = {0};
 uint8_t	WiFiDrv::_bssid[] = {0};
 uint8_t WiFiDrv::_mac[] = {0};
@@ -25,12 +25,17 @@ uint8_t WiFiDrv::_gatewayIp[] = {0};
 
 // Private Methods
 
+#define WAIT_FOR_SLAVE_SELECT()	 \
+	SpiDrv::waitForSlaveReady(); \
+	SpiDrv::spiSlaveSelect();
+
 
 void WiFiDrv::getNetworkData(uint8_t *ip, uint8_t *mask, uint8_t *gwip)
 {
     tParam params[PARAM_NUMS_3] = { {0, (char*)ip}, {0, (char*)mask}, {0, (char*)gwip}};
 
-    SpiDrv::spiSlaveSelect();
+    WAIT_FOR_SLAVE_SELECT();
+
     // Send Command
     SpiDrv::sendCmd(GET_IPADDR_CMD, PARAM_NUMS_1);
 
@@ -38,7 +43,7 @@ void WiFiDrv::getNetworkData(uint8_t *ip, uint8_t *mask, uint8_t *gwip)
     SpiDrv::sendParam(&_dummy, sizeof(_dummy), LAST_PARAM);
 
     //Wait the reply elaboration
-    delayMicroseconds(DELAY_RX_TX);
+    SpiDrv::waitForSlaveReady();
 
     // Wait for reply
     uint8_t _data = 0;
@@ -53,19 +58,19 @@ void WiFiDrv::getNetworkData(uint8_t *ip, uint8_t *mask, uint8_t *gwip)
 
 void WiFiDrv::wifiDriverInit()
 {
-    SpiDrv::spiDriverInit();
+    SpiDrv::begin();
 }
 
 // If ssid == NULL execute a wifi scan, otherwise try to connect to the network specified
 uint8_t WiFiDrv::wifiSetNetwork(char* ssid, uint8_t ssid_len)
 {
-    SpiDrv::spiSlaveSelect();
+	WAIT_FOR_SLAVE_SELECT();
     // Send Command
     SpiDrv::sendCmd(SET_NET_CMD, PARAM_NUMS_1);
     SpiDrv::sendParam((uint8_t*)ssid, ssid_len, LAST_PARAM);
 
     //Wait the reply elaboration
-    delayMicroseconds(DELAY_RX_TX);
+    SpiDrv::waitForSlaveReady();
 
     // Wait for reply
     uint8_t _data = 0;
@@ -81,14 +86,14 @@ uint8_t WiFiDrv::wifiSetNetwork(char* ssid, uint8_t ssid_len)
 
 uint8_t WiFiDrv::wifiSetPassphrase(char* ssid, uint8_t ssid_len, const char *passphrase, const uint8_t len)
 {
-    SpiDrv::spiSlaveSelect();
+	WAIT_FOR_SLAVE_SELECT();
     // Send Command
     SpiDrv::sendCmd(SET_PASSPHRASE_CMD, PARAM_NUMS_2);
     SpiDrv::sendParam((uint8_t*)ssid, ssid_len, NO_LAST_PARAM);
     SpiDrv::sendParam((uint8_t*)passphrase, len, LAST_PARAM);
 
     //Wait the reply elaboration
-    delayMicroseconds(DELAY_RX_TX);
+    SpiDrv::waitForSlaveReady();
 
     // Wait for reply
     uint8_t _data = 0;
@@ -104,7 +109,7 @@ uint8_t WiFiDrv::wifiSetPassphrase(char* ssid, uint8_t ssid_len, const char *pas
 
 uint8_t WiFiDrv::wifiSetKey(char* ssid, uint8_t ssid_len, uint8_t key_idx, const void *key, const uint8_t len)
 {
-    SpiDrv::spiSlaveSelect();
+	WAIT_FOR_SLAVE_SELECT();
     // Send Command
     SpiDrv::sendCmd(SET_KEY_CMD, PARAM_NUMS_3);
     SpiDrv::sendParam((uint8_t*)ssid, ssid_len, NO_LAST_PARAM);
@@ -112,7 +117,7 @@ uint8_t WiFiDrv::wifiSetKey(char* ssid, uint8_t ssid_len, uint8_t key_idx, const
     SpiDrv::sendParam((uint8_t*)key, len, LAST_PARAM);
     
     //Wait the reply elaboration
-    delayMicroseconds(DELAY_RX_TX);
+    SpiDrv::waitForSlaveReady();
 
     // Wait for reply
     uint8_t _data = 0;
@@ -127,7 +132,7 @@ uint8_t WiFiDrv::wifiSetKey(char* ssid, uint8_t ssid_len, uint8_t key_idx, const
                         
 uint8_t WiFiDrv::disconnect()
 {
-    SpiDrv::spiSlaveSelect();
+	WAIT_FOR_SLAVE_SELECT();
     // Send Command
     SpiDrv::sendCmd(DISCONNECT_CMD, PARAM_NUMS_1);
 
@@ -135,7 +140,7 @@ uint8_t WiFiDrv::disconnect()
     SpiDrv::sendParam(&_dummy, 1, LAST_PARAM);
 
     //Wait the reply elaboration
-    delayMicroseconds(DELAY_RX_TX);
+    SpiDrv::waitForSlaveReady();
 
     // Wait for reply
     uint8_t _data = 0;
@@ -149,16 +154,14 @@ uint8_t WiFiDrv::disconnect()
 
 uint8_t WiFiDrv::getConnectionStatus()
 {
-    SpiDrv::spiSlaveSelect();
+	WAIT_FOR_SLAVE_SELECT();
 
     // Send Command
-    SpiDrv::sendCmd(GET_CONN_STATUS_CMD, PARAM_NUMS_1);
-
-    uint8_t _dummy = DUMMY_DATA;
-    SpiDrv::sendParam(&_dummy, 1, LAST_PARAM);
+    SpiDrv::sendCmd(GET_CONN_STATUS_CMD, PARAM_NUMS_0);
 
     //Wait the reply elaboration
-    delayMicroseconds(DELAY_RX_TX);
+    SpiDrv::waitForSlaveReady();
+    //delayMicroseconds(DELAY_RX_TX);
 
     // Wait for reply
     uint8_t _data = 0;
@@ -172,7 +175,8 @@ uint8_t WiFiDrv::getConnectionStatus()
 
 uint8_t* WiFiDrv::getMacAddress()
 {
-    SpiDrv::spiSlaveSelect();
+	WAIT_FOR_SLAVE_SELECT();
+
     // Send Command
     SpiDrv::sendCmd(GET_MACADDR_CMD, PARAM_NUMS_1);
 
@@ -180,7 +184,7 @@ uint8_t* WiFiDrv::getMacAddress()
     SpiDrv::sendParam(&_dummy, 1, LAST_PARAM);
 
     //Wait the reply elaboration
-    delayMicroseconds(DELAY_RX_TX);
+    SpiDrv::waitForSlaveReady();
 
     // Wait for reply
     uint8_t _dataLen = 0;
@@ -211,7 +215,8 @@ void WiFiDrv::getIpAddress(uint8_t *ip)
 
 char* WiFiDrv::getCurrentSSID()
 {
-    SpiDrv::spiSlaveSelect();
+	WAIT_FOR_SLAVE_SELECT();
+
     // Send Command
     SpiDrv::sendCmd(GET_CURR_SSID_CMD, PARAM_NUMS_1);
 
@@ -219,7 +224,7 @@ char* WiFiDrv::getCurrentSSID()
     SpiDrv::sendParam(&_dummy, 1, LAST_PARAM);
 
     //Wait the reply elaboration
-    delayMicroseconds(DELAY_RX_TX);
+    SpiDrv::waitForSlaveReady();
 
     // Wait for reply
     uint8_t _dataLen = 0;
@@ -232,7 +237,8 @@ char* WiFiDrv::getCurrentSSID()
 
 uint8_t* WiFiDrv::getCurrentBSSID()
 {
-    SpiDrv::spiSlaveSelect();
+	WAIT_FOR_SLAVE_SELECT();
+
     // Send Command
     SpiDrv::sendCmd(GET_CURR_BSSID_CMD, PARAM_NUMS_1);
 
@@ -240,11 +246,11 @@ uint8_t* WiFiDrv::getCurrentBSSID()
     SpiDrv::sendParam(&_dummy, 1, LAST_PARAM);
 
     //Wait the reply elaboration
-    delayMicroseconds(DELAY_RX_TX);
+    SpiDrv::waitForSlaveReady();
 
     // Wait for reply
     uint8_t _dataLen = 0;
-    uint8_t result = SpiDrv::waitResponse(GET_CURR_BSSID_CMD, PARAM_NUMS_1, (uint8_t*)_bssid, &_dataLen);
+    uint8_t result = SpiDrv::waitResponse(GET_CURR_BSSID_CMD, PARAM_NUMS_1, _bssid, &_dataLen);
 
     SpiDrv::spiSlaveDeselect();
 
@@ -253,7 +259,8 @@ uint8_t* WiFiDrv::getCurrentBSSID()
 
 int32_t WiFiDrv::getCurrentRSSI()
 {
-    SpiDrv::spiSlaveSelect();
+	WAIT_FOR_SLAVE_SELECT();
+
     // Send Command
     SpiDrv::sendCmd(GET_CURR_RSSI_CMD, PARAM_NUMS_1);
 
@@ -261,12 +268,12 @@ int32_t WiFiDrv::getCurrentRSSI()
     SpiDrv::sendParam(&_dummy, 1, LAST_PARAM);
 
     //Wait the reply elaboration
-    delayMicroseconds(DELAY_RX_TX);
+    SpiDrv::waitForSlaveReady();
 
     // Wait for reply
     uint8_t _dataLen = 0;
     int32_t rssi = 0;
-    uint8_t result = SpiDrv::waitResponse(GET_CURR_RSSI_CMD, PARAM_NUMS_1, (uint8_t*)rssi, &_dataLen);
+    uint8_t result = SpiDrv::waitResponse(GET_CURR_RSSI_CMD, PARAM_NUMS_1, (uint8_t*)&rssi, &_dataLen);
 
     SpiDrv::spiSlaveDeselect();
 
@@ -275,7 +282,8 @@ int32_t WiFiDrv::getCurrentRSSI()
 
 uint8_t WiFiDrv::getCurrentEncryptionType()
 {
-    SpiDrv::spiSlaveSelect();
+	WAIT_FOR_SLAVE_SELECT();
+
     // Send Command
     SpiDrv::sendCmd(GET_CURR_ENCT_CMD, PARAM_NUMS_1);
 
@@ -283,7 +291,7 @@ uint8_t WiFiDrv::getCurrentEncryptionType()
     SpiDrv::sendParam(&_dummy, 1, LAST_PARAM);
 
     //Wait the reply elaboration
-    delayMicroseconds(DELAY_RX_TX);
+    SpiDrv::waitForSlaveReady();
 
     // Wait for reply
     uint8_t dataLen = 0;
@@ -297,7 +305,8 @@ uint8_t WiFiDrv::getCurrentEncryptionType()
 
 uint8_t WiFiDrv::scanNetworks()
 {
-    SpiDrv::spiSlaveSelect();
+	WAIT_FOR_SLAVE_SELECT();
+
     // Send Command
     SpiDrv::sendCmd(SCAN_NETWORKS, PARAM_NUMS_1);
 
@@ -305,14 +314,15 @@ uint8_t WiFiDrv::scanNetworks()
     SpiDrv::sendParam(&_dummy, 1, LAST_PARAM);
 
     //Wait the reply elaboration
-    delayMicroseconds(DELAY_RX_TX);
+    SpiDrv::waitForSlaveReady();
 
     // Wait for reply
     uint16_t _dataLen = 0;
 
     tParam params[WL_NETWORKS_LIST_MAXNUM];
+
     uint8_t ssidListNum = 0;
-    uint8_t result = SpiDrv::waitResponse(SCAN_NETWORKS, params, &ssidListNum, WL_NETWORKS_LIST_MAXNUM);
+    uint8_t result = SpiDrv::waitResponse(SCAN_NETWORKS, &ssidListNum, (uint8_t**)_networkSsid, WL_NETWORKS_LIST_MAXNUM);
 
     SpiDrv::spiSlaveDeselect();
 
@@ -325,7 +335,7 @@ char* WiFiDrv::getSSIDNetoworks(uint8_t networkItem)
 		return NULL;
 
 	//TODO make an RPC call to get the ssid associated with networkItem
-	return _networkSsid;
+	return _networkSsid[networkItem];
 }
 
 uint8_t WiFiDrv::getEncTypeNetowrks(uint8_t networkItem)

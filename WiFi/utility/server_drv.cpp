@@ -19,7 +19,7 @@ void ServerDrv::StartServer(uint16_t port, uint8_t sock)
     SpiDrv::sendParam(&sock, 1, LAST_PARAM);
 
     //Wait the reply elaboration
-    delayMicroseconds(DELAY_RX_TX);
+    SpiDrv::waitForSlaveReady();
 
     // Wait for reply
     uint8_t _data = 0;
@@ -40,7 +40,7 @@ uint8_t ServerDrv::getState(uint8_t sock)
     SpiDrv::sendParam(&sock, sizeof(sock), LAST_PARAM);
 
     //Wait the reply elaboration
-    delayMicroseconds(DELAY_RX_TX);
+    SpiDrv::waitForSlaveReady();
 
     // Wait for reply
     uint8_t _data = 0;
@@ -64,7 +64,7 @@ uint8_t ServerDrv::availData(uint8_t sock)
     SpiDrv::sendParam(&sock, sizeof(sock), LAST_PARAM);
 
     //Wait the reply elaboration
-    delayMicroseconds(DELAY_RX_TX);
+    SpiDrv::waitForSlaveReady();
 
     // Wait for reply
     uint8_t _data = 0;
@@ -92,7 +92,7 @@ bool ServerDrv::getData(uint8_t sock, uint8_t *data)
     SpiDrv::sendParam(&sock, sizeof(sock), LAST_PARAM);
 
     //Wait the reply elaboration
-    delayMicroseconds(DELAY_RX_TX);
+    SpiDrv::waitForSlaveReady();
 
     // Wait for reply
     uint8_t _data = 0;
@@ -118,7 +118,7 @@ bool ServerDrv::getDataBuf(uint8_t sock, uint8_t *_data, uint16_t *_dataLen)
     SpiDrv::sendParam(&sock, sizeof(sock), LAST_PARAM);
 
     //Wait the reply elaboration
-    delayMicroseconds(DELAY_RX_TX);
+    SpiDrv::waitForSlaveReady();
 
     // Wait for reply
     if (!SpiDrv::waitResponse(GET_DATABUF_TCP_CMD, _data, _dataLen))
@@ -143,7 +143,7 @@ bool ServerDrv::sendData(uint8_t sock, const uint8_t *data, uint16_t len)
     SpiDrv::sendBuffer((uint8_t *)data, len, LAST_PARAM);
 
     //Wait the reply elaboration
-    delayMicroseconds(DELAY_RX_TX);
+    SpiDrv::waitForSlaveReady();
 
     // Wait for reply
     uint8_t _data = 0;
@@ -169,7 +169,7 @@ uint8_t ServerDrv::isDataSent(uint8_t sock)
     SpiDrv::sendParam(&sock, sizeof(sock), LAST_PARAM);
 
     //Wait the reply elaboration
-    delayMicroseconds(DELAY_RX_TX);
+    SpiDrv::waitForSlaveReady();
 
     // Wait for reply
     uint8_t _data = 0;
