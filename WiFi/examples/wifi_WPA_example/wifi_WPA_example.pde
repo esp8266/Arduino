@@ -101,7 +101,7 @@ void scanNetworks()
 int startWiFiWpa()
 {
   Serial.println("Setup WiFi Wpa...");
-  strcpy(ssid, "Cariddiwep");
+  strcpy(ssid, "Cariddi");
   Serial.print("SSID: ");
   Serial.println(ssid);
   const char *pass = "1234567890";
@@ -117,9 +117,10 @@ void setup()
 {
   Serial.begin(9600);
   Serial.println("*** Start WiFi example ***");
-
-  //scanNetworks();
   delay(3000);
+  WiFi.begin();
+  scanNetworks();
+
 
   int _status = startWiFiWpa();
 

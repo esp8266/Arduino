@@ -10,8 +10,6 @@
 #define WIFI_SPI_ERR        0xFF
 
 #define TIMEOUT_CHAR    1000
-#define DELAY_RX_TX     200  //usec
-#define DELAY_POST_CMD  0  //usec
 
 //#define	MAX_SOCK_NUM		4	/**< Maxmium number of socket  */
 #define NO_SOCKET_AVAIL     255

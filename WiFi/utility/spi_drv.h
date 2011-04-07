@@ -14,6 +14,9 @@
 
 #define DUMMY_DATA  0xFF
 
+#define WAIT_FOR_SLAVE_SELECT()	 \
+	SpiDrv::waitForSlaveReady(); \
+	SpiDrv::spiSlaveSelect();
 
 class SpiDrv
 {

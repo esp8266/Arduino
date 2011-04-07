@@ -25,11 +25,6 @@ uint8_t WiFiDrv::_gatewayIp[] = {0};
 
 // Private Methods
 
-#define WAIT_FOR_SLAVE_SELECT()	 \
-	SpiDrv::waitForSlaveReady(); \
-	SpiDrv::spiSlaveSelect();
-
-
 void WiFiDrv::getNetworkData(uint8_t *ip, uint8_t *mask, uint8_t *gwip)
 {
     tParam params[PARAM_NUMS_3] = { {0, (char*)ip}, {0, (char*)mask}, {0, (char*)gwip}};
@@ -161,7 +156,6 @@ uint8_t WiFiDrv::getConnectionStatus()
 
     //Wait the reply elaboration
     SpiDrv::waitForSlaveReady();
-    //delayMicroseconds(DELAY_RX_TX);
 
     // Wait for reply
     uint8_t _data = 0;
@@ -334,7 +328,6 @@ char* WiFiDrv::getSSIDNetoworks(uint8_t networkItem)
 	if (networkItem >= WL_NETWORKS_LIST_MAXNUM)
 		return NULL;
 
-	//TODO make an RPC call to get the ssid associated with networkItem
 	return _networkSsid[networkItem];
 }
 

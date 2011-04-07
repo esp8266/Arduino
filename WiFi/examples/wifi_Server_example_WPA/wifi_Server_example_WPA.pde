@@ -98,16 +98,14 @@ void scanNetworks()
     }
 }
 
-int startWiFiWep()
+int startWiFiWpa()
 {
-  Serial.println("Setup WiFi Wep...");
-  strcpy(ssid, "Cariddiwep");
+  Serial.println("Setup WiFi Wpa...");
+  strcpy(ssid, "Cariddi");
   Serial.print("SSID: ");
   Serial.println(ssid);
-  uint8_t key_idx = 0;
-  const char *key = "1234567890";
-  Serial.println("Connecting...");
-  status = WiFi.begin(ssid,key_idx, key);
+  const char *pass = "1234567890";
+  status = WiFi.begin(ssid, pass);
   if ( status != WL_CONNECTED)
   {	  
     Serial.println("Connection Failed");
@@ -119,12 +117,15 @@ void setup()
 {
   Serial.begin(9600);
   Serial.println("*** Start WiFi example ***");
-
   delay(3000);
-
-  startWiFiWep();
   
-  if ( status == WL_CONNECTED)
+  WiFi.begin();
+  
+  scanNetworks();
+
+  int _status = startWiFiWpa();
+
+  if ( _status == WL_CONNECTED)
   {
     Serial.println("Wifi Connected!");
 
@@ -133,11 +134,11 @@ void setup()
     printCurrNet();
     
     scanNetworks();
-
+  
     Serial.println("Starting server...");
     server.begin();
     delay(1000);  
-  
+   
   }
 }
 
