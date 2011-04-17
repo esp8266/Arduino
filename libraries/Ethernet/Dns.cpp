@@ -9,7 +9,7 @@
 #include "Dns.h"
 #include <string.h>
 //#include <stdlib.h>
-#include "wiring.h"
+#include "Arduino.h"
 
 
 #define SOCKET_NONE	255
