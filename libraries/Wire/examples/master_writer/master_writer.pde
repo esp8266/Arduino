@@ -22,8 +22,8 @@ byte x = 0;
 void loop()
 {
   Wire.beginTransmission(4); // transmit to device #4
-  Wire.send("x is ");        // sends five bytes
-  Wire.send(x);              // sends one byte  
+  Wire.write("x is ");        // sends five bytes
+  Wire.write(x);              // sends one byte  
   Wire.endTransmission();    // stop transmitting
 
   x++;

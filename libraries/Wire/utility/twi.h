@@ -46,7 +46,7 @@
   void twi_setAddress(uint8_t);
   uint8_t twi_readFrom(uint8_t, uint8_t*, uint8_t);
   uint8_t twi_writeTo(uint8_t, uint8_t*, uint8_t, uint8_t);
-  uint8_t twi_transmit(uint8_t*, uint8_t);
+  uint8_t twi_transmit(const uint8_t*, uint8_t);
   void twi_attachSlaveRxEvent( void (*)(uint8_t*, int) );
   void twi_attachSlaveTxEvent( void (*)(void) );
   void twi_reply(uint8_t);

@@ -232,7 +232,7 @@ uint8_t twi_writeTo(uint8_t address, uint8_t* data, uint8_t length, uint8_t wait
  *          2 not slave transmitter
  *          0 ok
  */
-uint8_t twi_transmit(uint8_t* data, uint8_t length)
+uint8_t twi_transmit(const uint8_t* data, uint8_t length)
 {
   uint8_t i;
 

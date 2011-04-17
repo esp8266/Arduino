@@ -26,8 +26,8 @@ void loop()
   Wire.beginTransmission(112); // transmit to device #112 (0x70)
                                // the address specified in the datasheet is 224 (0xE0)
                                // but i2c adressing uses the high 7 bits so it's 112
-  Wire.send(0x00);             // sets register pointer to the command register (0x00)  
-  Wire.send(0x50);             // command sensor to measure in "inches" (0x50) 
+  Wire.write(byte(0x00));      // sets register pointer to the command register (0x00)  
+  Wire.write(byte(0x50));      // command sensor to measure in "inches" (0x50) 
                                // use 0x51 for centimeters
                                // use 0x52 for ping microseconds
   Wire.endTransmission();      // stop transmitting
@@ -37,7 +37,7 @@ void loop()
 
   // step 3: instruct sensor to return a particular echo reading
   Wire.beginTransmission(112); // transmit to device #112
-  Wire.send(0x02);             // sets register pointer to echo #1 register (0x02)
+  Wire.write(byte(0x02));      // sets register pointer to echo #1 register (0x02)
   Wire.endTransmission();      // stop transmitting
 
   // step 4: request reading from sensor
@@ -46,9 +46,9 @@ void loop()
   // step 5: receive reading from sensor
   if(2 <= Wire.available())    // if two bytes were received
   {
-    reading = Wire.receive();  // receive high byte (overwrites previous reading)
+    reading = Wire.read();  // receive high byte (overwrites previous reading)
     reading = reading << 8;    // shift high byte to be high 8 bits
-    reading |= Wire.receive(); // receive low byte as lower 8 bits
+    reading |= Wire.read(); // receive low byte as lower 8 bits
     Serial.println(reading);   // print the reading
   }
 
@@ -64,23 +64,23 @@ void loop()
 void changeAddress(byte oldAddress, byte newAddress)
 {
   Wire.beginTransmission(oldAddress);
-  Wire.send(0x00);
-  Wire.send(0xA0);
+  Wire.write(byte(0x00));
+  Wire.write(byte(0xA0));
   Wire.endTransmission();
 
   Wire.beginTransmission(oldAddress);
-  Wire.send(0x00);
-  Wire.send(0xAA);
+  Wire.write(byte(0x00));
+  Wire.write(byte(0xAA));
   Wire.endTransmission();
 
   Wire.beginTransmission(oldAddress);
-  Wire.send(0x00);
-  Wire.send(0xA5);
+  Wire.write(byte(0x00));
+  Wire.write(byte(0xA5));
   Wire.endTransmission();
 
   Wire.beginTransmission(oldAddress);
-  Wire.send(0x00);
-  Wire.send(newAddress);
+  Wire.write(byte(0x00));
+  Wire.write(newAddress);
   Wire.endTransmission();
 }
 
