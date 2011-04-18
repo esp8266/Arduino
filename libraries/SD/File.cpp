@@ -14,52 +14,130 @@
 
 #include <SD.h>
 
+/* for debugging file open/close leaks
+   uint8_t nfilecount=0;
+*/
+
+File::File(SdFile f, char *n) {
+  // oh man you are kidding me, new() doesnt exist? Ok we do it by hand!
+  _file = (SdFile *)malloc(sizeof(SdFile)); 
+  if (_file) {
+    memcpy(_file, &f, sizeof(SdFile));
+    
+    strncpy(_name, n, 12);
+    _name[12] = 0;
+    
+    /* for debugging file open/close leaks
+       nfilecount++;
+       Serial.print("Created \"");
+       Serial.print(n);
+       Serial.print("\": ");
+       Serial.println(nfilecount, DEC);
+    */
+  }
+}
+
+File::File(void) {
+  _file = 0;
+  _name[0] = 0;
+  //Serial.print("Created empty file object");
+}
+
+File::~File(void) {
+  //  Serial.print("Deleted file object");
+}
+
+// returns a pointer to the file name
+char *File::name(void) {
+  return _name;
+}
+
+// a directory is a special type of file
+boolean File::isDirectory(void) {
+  return (_file && _file->isDir());
+}
+
+
 void File::write(uint8_t val) {
-  SD.file.write(val);
+  if (_file)
+    _file->write(val);
 }
 
 void File::write(const char *str) {
-  SD.file.write(str);
+  if (_file) 
+    _file->write(str);
 }
 
 void File::write(const uint8_t *buf, size_t size) {
-  SD.file.write(buf, size);
+  if (_file)
+    _file->write(buf, size);
 }
 
 int File::peek() {
-  char c = SD.file.read();
-  if (c != -1) SD.file.seekCur(-1);
+  if (! _file) 
+    return 0;
+
+  int c = _file->read();
+  if (c != -1) _file->seekCur(-1);
   return c;
 }
 
 int File::read() {
-  return SD.file.read();
+  if (_file) 
+    return _file->read();
+  return -1;
+}
+
+// buffered read for more efficient, high speed reading
+int File::read(void *buf, uint16_t nbyte) {
+  if (_file) 
+    return _file->read(buf, nbyte);
+  return 0;
 }
 
 int File::available() {
+  if (! _file) return 0;
   return size() - position();
 }
 
 void File::flush() {
-  SD.file.sync();
+  if (_file)
+    _file->sync();
 }
 
 boolean File::seek(uint32_t pos) {
-  return SD.file.seekSet(pos);
+  if (! _file) return false;
+
+  return _file->seekSet(pos);
 }
 
 uint32_t File::position() {
-  return SD.file.curPosition();
+  if (! _file) return -1;
+  return _file->curPosition();
 }
 
 uint32_t File::size() {
-  return SD.file.fileSize();
+  if (! _file) return 0;
+  return _file->fileSize();
 }
 
 void File::close() {
-  SD.file.close();
+  if (_file) {
+    _file->close();
+    free(_file); 
+    _file = 0;
+
+    /* for debugging file open/close leaks
+    nfilecount--;
+    Serial.print("Deleted ");
+    Serial.println(nfilecount, DEC);
+    */
+  }
 }
 
 File::operator bool() {
-  return SD.file.isOpen();
+  if (_file) 
+    return  _file->isOpen();
+  return false;
 }
+
