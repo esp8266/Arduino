@@ -22,6 +22,8 @@
 #define WL_NETWORKS_LIST_MAXNUM	10
 // Maxmium number of socket
 #define	MAX_SOCK_NUM		4
+//Maximum number of attempts to establish wifi connection
+#define WL_MAX_ATTEMPT_CONNECTION	5
 
 typedef enum {
         WL_IDLE_STATUS,

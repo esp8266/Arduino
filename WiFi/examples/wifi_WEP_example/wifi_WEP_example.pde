@@ -119,8 +119,10 @@ void setup()
 {
   Serial.begin(9600);
   Serial.println("*** Start WiFi example ***");
-
   delay(3000);
+  
+  WiFi.begin();
+  scanNetworks();
 
   startWiFiWep();
   
@@ -130,42 +132,12 @@ void setup()
 
     printIpData();      
 
-    printCurrNet();
-    
-    scanNetworks();
-
-    Serial.println("Starting server...");
-    server.begin();
-    delay(1000);  
-  
+    printCurrNet();  
   }
 }
 
 void loop()
 {
-
-  if (status == WL_CONNECTED)
-  {
-      byte _status = 0;
-      Client client = server.available(&_status);
-      if (client) {
-        //Serial.print("Status: ");
-        //Serial.println(status, 16);
-        byte idx = 0;
-        while (client.available())
-        {
-            dataBuf[idx++] = client.read();
-        }
-
-        if (idx>0) 
-        {
-          dataBuf[idx]=0; 
-          Serial.println((char*)&dataBuf[0]);
-          server.write((char*)&dataBuf[0]);
-        }
-        return;
-      }
-  }
 }
 
 

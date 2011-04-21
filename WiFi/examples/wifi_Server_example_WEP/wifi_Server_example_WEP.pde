@@ -149,8 +149,9 @@ void loop()
       byte _status = 0;
       Client client = server.available(&_status);
       if (client) {
-        //Serial.print("Status: ");
-        //Serial.println(status, 16);
+        Serial.print("Status: ");
+        Serial.println(status, 16);
+        /*
         byte idx = 0;
         while (client.available())
         {
@@ -164,6 +165,7 @@ void loop()
           server.write((char*)&dataBuf[0]);
         }
         return;
+        */
       }
   }
 }

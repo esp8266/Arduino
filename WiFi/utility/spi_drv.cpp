@@ -33,6 +33,10 @@ void SpiDrv::begin()
 	  digitalWrite(SS, HIGH);
 	  digitalWrite(SLAVESELECT, HIGH);
 
+#ifdef _DEBUG_
+	  INIT_TRIGGER()
+#endif
+
 	  // Warning: if the SS pin ever becomes a LOW INPUT then SPI
 	  // automatically switches to Slave, so the data direction of
 	  // the SS pin MUST be kept as OUTPUT.
@@ -75,6 +79,9 @@ int SpiDrv::waitSpiChar(unsigned char waitChar)
         if (_readChar == WAIT_CMD)
         {
             delayMicroseconds(WAIT_CHAR_DELAY);
+        }else if (_readChar == ERR_CMD)
+        {
+        	return -1;
         }else
         {
             delayMicroseconds(TIMEOUT_CHAR_DELAY);
@@ -164,7 +171,7 @@ void SpiDrv::waitForSlaveReady()
 #endif
 }
 
-int SpiDrv::waitResponse(uint8_t cmd, uint8_t numParam, uint8_t* param, uint8_t* param_len)
+int SpiDrv::waitResponseCmd(uint8_t cmd, uint8_t numParam, uint8_t* param, uint8_t* param_len)
 {
     char _data = 0;
     int i =0, ii = 0;
@@ -188,7 +195,7 @@ int SpiDrv::waitResponse(uint8_t cmd, uint8_t numParam, uint8_t* param, uint8_t*
     
     return 1;
 }
-
+/*
 int SpiDrv::waitResponse(uint8_t cmd, uint8_t numParam, uint8_t* param, uint16_t* param_len)
 {
     char _data = 0;
@@ -213,9 +220,9 @@ int SpiDrv::waitResponse(uint8_t cmd, uint8_t numParam, uint8_t* param, uint16_t
     
     return 1;
 }
+*/
 
-
-int SpiDrv::waitResponse(uint8_t cmd, uint8_t* param, uint16_t* param_len)
+int SpiDrv::waitResponseData16(uint8_t cmd, uint8_t* param, uint16_t* param_len)
 {
     char _data = 0;
     int i =0, ii = 0;
@@ -241,7 +248,7 @@ int SpiDrv::waitResponse(uint8_t cmd, uint8_t* param, uint16_t* param_len)
     return 1;
 }
 
-int SpiDrv::waitResponse(uint8_t cmd, uint8_t* param, uint8_t* param_len)
+int SpiDrv::waitResponseData8(uint8_t cmd, uint8_t* param, uint8_t* param_len)
 {
     char _data = 0;
     int i =0, ii = 0;
@@ -267,7 +274,7 @@ int SpiDrv::waitResponse(uint8_t cmd, uint8_t* param, uint8_t* param_len)
     return 1;
 }
 
-int SpiDrv::waitResponse(uint8_t cmd, uint8_t numParam, tParam* params)
+int SpiDrv::waitResponseParams(uint8_t cmd, uint8_t numParam, tParam* params)
 {
     char _data = 0;
     int i =0, ii = 0;
@@ -308,6 +315,7 @@ int SpiDrv::waitResponse(uint8_t cmd, uint8_t numParam, tParam* params)
     return 1;
 }
 
+/*
 int SpiDrv::waitResponse(uint8_t cmd, tParam* params, uint8_t* numParamRead, uint8_t maxNumParams)
 {
     char _data = 0;
@@ -346,6 +354,7 @@ int SpiDrv::waitResponse(uint8_t cmd, tParam* params, uint8_t* numParamRead, uin
     }         
     return 1;
 }
+*/
 
 int SpiDrv::waitResponse(uint8_t cmd, uint8_t* numParamRead, uint8_t** params, uint8_t maxNumParams)
 {
@@ -491,6 +500,9 @@ void SpiDrv::sendCmd(uint8_t cmd, uint8_t numParam)
 {
     // Send Spi START CMD
     spiTransfer(START_CMD);
+
+    //wait the interrupt trigger on slave
+    delayMicroseconds(SPI_START_CMD_DELAY);
 
     // Send Spi C + cmd
     spiTransfer(cmd & ~(REPLY_FLAG));

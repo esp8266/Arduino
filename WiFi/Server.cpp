@@ -35,10 +35,7 @@ Client Server::available(byte* status)
                 *status == ESTABLISHED)
             {                
                 return client;  //TODO 
-            }else{
-                delayMicroseconds(100);
             }
-
         }
     }
 

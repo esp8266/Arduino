@@ -49,17 +49,18 @@ int WiFiClass::begin()
 int WiFiClass::begin(char* ssid)
 {
 	uint8_t status = WL_IDLE_STATUS;
-	init();
+	uint8_t attempts = WL_MAX_ATTEMPT_CONNECTION;
+
+	begin();
 
    if (WiFiDrv::wifiSetNetwork(ssid, strlen(ssid)) != WL_FAILURE)
    {
-
 	   do
 	   {
 		   delay(WL_DELAY_START_CONNECTION);
 		   status = WiFiDrv::getConnectionStatus();
 	   }
-	   while (( status == WL_IDLE_STATUS)||(status == WL_SCAN_COMPLETED));
+	   while ((( status == WL_IDLE_STATUS)||(status == WL_SCAN_COMPLETED))&&(--attempts>0));
    }else
    {
 	   status = WL_CONNECT_FAILED;
@@ -70,7 +71,9 @@ int WiFiClass::begin(char* ssid)
 int WiFiClass::begin(char* ssid, uint8_t key_idx, const char *key)
 {
 	uint8_t status = WL_IDLE_STATUS;
-	init();
+	uint8_t attempts = WL_MAX_ATTEMPT_CONNECTION;
+
+	begin();
     // set encryption key
    if (WiFiDrv::wifiSetKey(ssid, strlen(ssid), key_idx, key, strlen(key)) != WL_FAILURE)
    {
@@ -79,7 +82,7 @@ int WiFiClass::begin(char* ssid, uint8_t key_idx, const char *key)
 		   delay(WL_DELAY_START_CONNECTION);
 		   status = WiFiDrv::getConnectionStatus();
 	   }
-	   while (( status == WL_IDLE_STATUS)||(status == WL_SCAN_COMPLETED));
+	   while ((( status == WL_IDLE_STATUS)||(status == WL_SCAN_COMPLETED))&&(--attempts>0));
    }else{
 	   status = WL_CONNECT_FAILED;
    }
@@ -89,7 +92,9 @@ int WiFiClass::begin(char* ssid, uint8_t key_idx, const char *key)
 int WiFiClass::begin(char* ssid, const char *passphrase)
 {
 	uint8_t status = WL_IDLE_STATUS;
-	init();
+	uint8_t attempts = WL_MAX_ATTEMPT_CONNECTION;
+
+	begin();
     // set passphrase
     if (WiFiDrv::wifiSetPassphrase(ssid, strlen(ssid), passphrase, strlen(passphrase))!= WL_FAILURE)
     {
@@ -98,7 +103,7 @@ int WiFiClass::begin(char* ssid, const char *passphrase)
  		   delay(WL_DELAY_START_CONNECTION);
  		   status = WiFiDrv::getConnectionStatus();
  	   }
- 	   while (( status == WL_IDLE_STATUS)||(status == WL_SCAN_COMPLETED));
+	   while ((( status == WL_IDLE_STATUS)||(status == WL_SCAN_COMPLETED))&&(--attempts>0));
     }else{
     	status = WL_CONNECT_FAILED;
     }

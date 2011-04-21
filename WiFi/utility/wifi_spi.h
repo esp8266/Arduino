@@ -5,6 +5,7 @@
 
 #define CMD_FLAG        0
 #define REPLY_FLAG      1<<7
+#define DATA_FLAG 		0x40
 
 #define WIFI_SPI_ACK        1
 #define WIFI_SPI_ERR        0xFF
@@ -17,6 +18,7 @@
 #define START_CMD   0xE0
 #define WAIT_CMD   	0xE1
 #define END_CMD     0xEE
+#define ERR_CMD   	0xEF
   
 enum {
 	SET_NET_CMD 		= 0x10,
@@ -31,17 +33,17 @@ enum {
 	GET_CURR_RSSI_CMD	= 0x25,
 	GET_CURR_ENCT_CMD	= 0x26,
 	SCAN_NETWORKS		= 0x27,
-
+	START_SERVER_TCP_CMD= 0x28,
+	GET_STATE_TCP_CMD   = 0x29,
+	DATA_SENT_TCP_CMD	= 0x2A,
+    AVAIL_DATA_TCP_CMD	= 0x2B,
+    GET_DATA_TCP_CMD	= 0x2C,
 
     DISCONNECT_CMD		= 0x30,
+    // All command with DATA_FLAG 0x40 send a 16bit Len
 
-    START_SERVER_TCP_CMD    = 0x40,
-    GET_STATE_TCP_CMD       = 0x41,
-    GET_DATA_TCP_CMD		= 0x42,
-    AVAIL_DATA_TCP_CMD		= 0x43,
 	SEND_DATA_TCP_CMD		= 0x44,
-    DATA_SENT_TCP_CMD		= 0x45,
-    GET_DATABUF_TCP_CMD		= 0x46,
+    GET_DATABUF_TCP_CMD		= 0x45,
 };
 
 
@@ -81,11 +83,26 @@ typedef struct  __attribute__((__packed__))
 
 typedef struct  __attribute__((__packed__))
 {
+	uint16_t     dataLen;
+	char*	     data;
+}tDataParam;
+
+
+typedef struct  __attribute__((__packed__))
+{
 	unsigned char	cmd;
 	unsigned char	tcmd;
 	unsigned char	nParam;
 	tParam	params[MAX_PARAMS];
 }tSpiMsg;
+
+typedef struct  __attribute__((__packed__))
+{
+	unsigned char	cmd;
+	unsigned char	tcmd;
+	unsigned char	nParam;
+	tDataParam		params[MAX_PARAMS];
+}tSpiMsgData;
 
 
 typedef struct  __attribute__((__packed__))

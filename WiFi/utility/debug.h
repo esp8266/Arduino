@@ -44,6 +44,7 @@
 
 #else
 #define INFO1(x) do {} while(0);
+#define INFO2(x,y) do {} while(0);
 #define INFO(format, args...) do {} while(0);
 #endif
 

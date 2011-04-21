@@ -23,12 +23,13 @@ char ssidList[MAX_NUM_SSID][32] = { {0} };
  
 
 Server server(23);
+boolean gotAMessage = false; // whether or not you got a message from the client yet
 
 void printIpData()
 {
   ip = WiFi.localIp();
        
-  Serial.print("IP: ");
+  Serial.print("\nIP: ");
   Serial.print(ip[3],10);Serial.print(".");
   Serial.print(ip[2],10);Serial.print(".");
   Serial.print(ip[1],10);Serial.print(".");
@@ -85,7 +86,7 @@ void printCurrNet()
 
 void scanNetworks()
 {
-    Serial.println("** Scan Networks **");
+    Serial.println("\n** Scan Networks **");
     byte numSsid = WiFi.scanNetworks();
     if (numSsid > MAX_NUM_SSID) numSsid = MAX_NUM_SSID;
     Serial.print("SSID List:");
@@ -100,7 +101,8 @@ void scanNetworks()
 
 int startWiFiWpa()
 {
-  Serial.println("Setup WiFi Wpa...");
+  Serial.println("\nSetup WiFi Wpa...");
+  //strcpy(ssid, "AndroidAP9647");
   strcpy(ssid, "Cariddi");
   Serial.print("SSID: ");
   Serial.println(ssid);
@@ -127,44 +129,71 @@ void setup()
 
   if ( _status == WL_CONNECTED)
   {
-    Serial.println("Wifi Connected!");
+    Serial.println("\nWifi Connected!");
 
     printIpData();      
 
     printCurrNet();
-    
-    scanNetworks();
   
-    Serial.println("Starting server...");
+    Serial.println("\nStarting server...");
     server.begin();
     delay(1000);  
    
   }
 }
 
+void execCmd(char* buf)
+{
+  Serial.print("Executing command: ");
+  Serial.println(buf);
+  server.write(buf);
+}
+
+
 void loop()
 {
-
   if (status == WL_CONNECTED)
   {
       byte _status = 0;
       Client client = server.available(&_status);
+      //delay(2000);
       if (client) {
-        //Serial.print("Status: ");
-        //Serial.println(status, 16);
-        byte idx = 0;
+            if (!gotAMessage) {
+              Serial.println("We have a new client");
+              client.println("Hello, client!"); 
+              gotAMessage = true;
+            }
+/*            
+    // read the bytes incoming from the client:
+    char thisChar = client.read();
+    // echo the bytes back to the client:
+    server.write(thisChar);
+    // echo the bytes to the server as well:
+    Serial.print(thisChar);
+    */
+    /*
+        Serial.print("Status: ");
+        Serial.println(_status, 16);
+        delay(2000);       
+      */  
+      
+      static byte idx = 0;
+
         while (client.available())
         {
-            dataBuf[idx++] = client.read();
+            delay(10);
+            dataBuf[idx] = client.read();
+            Serial.print(dataBuf[idx]);
+            if (dataBuf[idx] = 0xa)
+            {
+              dataBuf[idx+1]=0; 
+              //Serial.println((char*)dataBuf);
+              //execCmd((char*)dataBuf);
+              idx=0;
+            }else{
+              ++idx;
+            }
         }
-
-        if (idx>0) 
-        {
-          dataBuf[idx]=0; 
-          Serial.println((char*)&dataBuf[0]);
-          server.write((char*)&dataBuf[0]);
-        }
-        return;
       }
   }
 }

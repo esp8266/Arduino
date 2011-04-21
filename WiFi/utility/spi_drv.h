@@ -7,7 +7,9 @@
 #define WAIT_CHAR_DELAY 100
 #define TIMEOUT_CHAR_DELAY 10
 #define TIMEOUT_READY_SLAVE    1000
-#define SPI_TX_DELAY 2
+#define SPI_TX_DELAY 5
+#define SPI_START_CMD_DELAY 10
+
 
 #define NO_LAST_PARAM   0
 #define LAST_PARAM      1
@@ -16,7 +18,10 @@
 
 #define WAIT_FOR_SLAVE_SELECT()	 \
 	SpiDrv::waitForSlaveReady(); \
-	SpiDrv::spiSlaveSelect();
+	SpiDrv::spiSlaveSelect(); \
+    delayMicroseconds(SPI_TX_DELAY);
+
+
 
 class SpiDrv
 {
@@ -46,18 +51,18 @@ public:
 
     static char readChar();
 
-    static int waitResponse(uint8_t cmd, tParam* params, uint8_t* numParamRead, uint8_t maxNumParams);
-
-    static int waitResponse(uint8_t cmd, uint8_t numParam, tParam* params);
+    static int waitResponseParams(uint8_t cmd, uint8_t numParam, tParam* params);
     
-    static int waitResponse(uint8_t cmd, uint8_t numParam, uint8_t* param, uint8_t* param_len);
+    static int waitResponseCmd(uint8_t cmd, uint8_t numParam, uint8_t* param, uint8_t* param_len);
 
-    static int waitResponse(uint8_t cmd, uint8_t numParam, uint8_t* param, uint16_t* param_len);
-
-    static int waitResponse(uint8_t cmd, uint8_t* param, uint8_t* param_len);
+    static int waitResponseData8(uint8_t cmd, uint8_t* param, uint8_t* param_len);
      
-    static int waitResponse(uint8_t cmd, uint8_t* param, uint16_t* param_len);
+    static int waitResponseData16(uint8_t cmd, uint8_t* param, uint16_t* param_len);
+ /*
+    static int waitResponse(uint8_t cmd, tParam* params, uint8_t* numParamRead, uint8_t maxNumParams);
     
+    static int waitResponse(uint8_t cmd, uint8_t numParam, uint8_t* param, uint16_t* param_len);
+*/
     static int waitResponse(uint8_t cmd, uint8_t* numParamRead, uint8_t** params, uint8_t maxNumParams);
 
     static void sendParam(uint8_t* param, uint8_t param_len, uint8_t lastParam = NO_LAST_PARAM);
