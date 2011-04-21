@@ -144,7 +144,7 @@ void setup()
 
 void execCmd(char* buf)
 {
-  Serial.print("Executing command: ");
+  Serial.print("\nExecuting command: ");
   Serial.println(buf);
   server.write(buf);
 }
@@ -159,7 +159,7 @@ void loop()
       //delay(2000);
       if (client) {
             if (!gotAMessage) {
-              Serial.println("We have a new client");
+              Serial.println("\nWe have a new client\n");
               client.println("Hello, client!"); 
               gotAMessage = true;
             }
@@ -181,14 +181,14 @@ void loop()
 
         while (client.available())
         {
-            delay(10);
             dataBuf[idx] = client.read();
+            if (idx == 0) Serial.print("Client chatting...: ");
             Serial.print(dataBuf[idx]);
-            if (dataBuf[idx] = 0xa)
+            if ((dataBuf[idx] == 0xa)/*||(dataBuf[idx] == 0xd)*/)
             {
               dataBuf[idx+1]=0; 
               //Serial.println((char*)dataBuf);
-              //execCmd((char*)dataBuf);
+              execCmd((char*)dataBuf);
               idx=0;
             }else{
               ++idx;

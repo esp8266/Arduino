@@ -15,7 +15,7 @@ private:
   void*     pcb;
 public:
   Server(uint16_t);
-  Client available(uint8_t*);
+  Client available(uint8_t* status = NULL);
   void begin();
   virtual void write(uint8_t);
   virtual void write(const char *str);

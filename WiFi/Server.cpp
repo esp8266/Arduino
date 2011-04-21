@@ -29,10 +29,12 @@ Client Server::available(byte* status)
         if (WiFiClass::_server_port[sock] != 0)
         {
             Client client(sock);
-            *status = client.status();
+            int _status = client.status();
+            if (status != NULL)
+            	*status = _status;
 
             if (WiFiClass::_server_port[sock] == _port &&
-                *status == ESTABLISHED)
+                _status == ESTABLISHED)
             {                
                 return client;  //TODO 
             }
