@@ -22,19 +22,14 @@ Client::Client(IPAddress& ip, uint16_t port) : _ip(ip), _port(port), _sock(MAX_S
 
 uint8_t Client::connect() {
     _sock = getFirstSocket();
-//TODO implementation
-    _socket = socket(TCP_SOCKET);
-    if (_socket<0)
+    if (_sock != NO_SOCKET_AVAIL)
     {
-        return 0;
+    	ServerDrv::StartClient(uint32_t(_ip), _port, _sock);
+    	 WiFiClass::_state[_sock] = _socket;
     }else{
-        WiFiClass::_state[_sock] = _socket;
+    	return 0;
     }
-//
-//  if (!::connect(_socket, _ip, _port)) {
-//    return 0;
-//  }
-  return 1;
+    return 1;
 }
 
 void Client::write(uint8_t b) {
@@ -138,7 +133,7 @@ Client::operator bool() {
 uint8_t Client::getFirstSocket()
 {
     for (int i = 0; i < MAX_SOCK_NUM; i++) {
-      if (WiFiClass::_state[i] < 0)
+      if (WiFiClass::_state[i] == 0)
       {
           return i;
       }

@@ -426,14 +426,12 @@ void SpiDrv::sendParamLen8(uint8_t param_len)
     spiTransfer(param_len);
 }
 
-
 void SpiDrv::sendParamLen16(uint16_t param_len)
 {
     // Send Spi paramLen
     spiTransfer((uint8_t)((param_len & 0xff00)>>8));
     spiTransfer((uint8_t)(param_len & 0xff));
 }
-
 
 uint8_t SpiDrv::readParamLen8(uint8_t* param_len)
 {

@@ -38,6 +38,7 @@ enum {
 	DATA_SENT_TCP_CMD	= 0x2A,
     AVAIL_DATA_TCP_CMD	= 0x2B,
     GET_DATA_TCP_CMD	= 0x2C,
+    START_CLIENT_TCP_CMD= 0x2D,
 
     DISCONNECT_CMD		= 0x30,
     // All command with DATA_FLAG 0x40 send a 16bit Len
@@ -112,5 +113,23 @@ typedef struct  __attribute__((__packed__))
 	//unsigned char	totLen;
 	unsigned char	nParam;
 }tSpiHdr;
+
+typedef struct  __attribute__((__packed__))
+{
+	uint8_t     paramLen;
+	uint32_t	param;
+}tLongParam;
+
+typedef struct  __attribute__((__packed__))
+{
+	uint8_t     paramLen;
+	uint16_t	param;
+}tIntParam;
+
+typedef struct  __attribute__((__packed__))
+{
+	uint8_t     paramLen;
+	uint8_t	param;
+}tByteParam;
 
 #endif

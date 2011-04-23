@@ -9,6 +9,8 @@ class ServerDrv
 public:
     // Start server TCP on port specified
     static void StartServer(uint16_t port, uint8_t sock);
+
+    static void StartClient(uint32_t ipAddress, uint16_t port, uint8_t sock);
                                                                                   
     static uint8_t getState(uint8_t sock);
 
