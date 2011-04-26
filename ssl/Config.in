@@ -192,7 +192,7 @@ config CONFIG_SSL_X509_ORGANIZATION_UNIT_NAME
 
 config CONFIG_SSL_ENABLE_V23_HANDSHAKE
     bool "Enable v23 Handshake"
-    default y
+    default n
     help
         Some browsers use the v23 handshake client hello message 
         (an SSL2 format message which all SSL servers can understand). 

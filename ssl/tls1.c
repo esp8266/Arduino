@@ -287,7 +287,6 @@ EXP_FUNC int STDCALL ssl_read(SSL *ssl, uint8_t **in_data)
     int ret = basic_read(ssl, in_data);
 
     /* check for return code so we can send an alert */
-
     if (ret < SSL_OK && ret != SSL_CLOSE_NOTIFY)
     {
         if (ret != SSL_ERROR_CONN_LOST)
@@ -695,19 +694,38 @@ static int verify_digest(SSL *ssl, int mode, const uint8_t *buf, int read_len)
    
     if (ssl->cipher_info->padding_size)
     {
-        hmac_offset = read_len-buf[read_len-1]-ssl->cipher_info->digest_size-1;
+        int last_blk_size = buf[read_len-1], i;
+        hmac_offset = read_len-last_blk_size-ssl->cipher_info->digest_size-1;
+
+        /* guard against a timing attack - make sure we do the digest */
+        if (hmac_offset < 0 || last_blk_size > ssl->cipher_info->padding_size)
+        {
+            hmac_offset = 0;
+        }
+        else
+        {
+            /* already looked at last byte */
+            for (i = 1; i < last_blk_size; i++)
+            {
+                if (buf[read_len-i] != last_blk_size)
+                {
+                    hmac_offset = 0;
+                    break;
+                }
+            }
+        }
     }
     else
     {
         hmac_offset = read_len - ssl->cipher_info->digest_size;
+
+        if (hmac_offset < 0)
+        {
+            hmac_offset = 0;
+        }
     }
 
     /* sanity check the offset */
-    if (hmac_offset < 0)
-    {
-        return SSL_ERROR_INVALID_HMAC;
-    }
-
     ssl->hmac_header[3] = hmac_offset >> 8;      /* insert size */
     ssl->hmac_header[4] = hmac_offset & 0xff;
     add_hmac_digest(ssl, mode, ssl->hmac_header, buf, hmac_offset, hmac_buf);
@@ -935,8 +953,8 @@ static int send_raw_packet(SSL *ssl, uint8_t protocol)
     int ret = SSL_OK;
 
     rec_buf[0] = protocol;
-    rec_buf[1] = 0x03;      /* version = 3.1 (TLS) */
-    rec_buf[2] = 0x01;
+    rec_buf[1] = 0x03;      /* version = 3.1 or higher */
+    rec_buf[2] = ssl->version & 0x0f;
     rec_buf[3] = ssl->bm_index >> 8;
     rec_buf[4] = ssl->bm_index & 0xff;
 
@@ -1011,8 +1029,8 @@ int send_packet(SSL *ssl, uint8_t protocol, const uint8_t *in, int length)
         uint8_t hmac_header[SSL_RECORD_SIZE];
 
         hmac_header[0] = protocol;
-        hmac_header[1] = 0x03;
-        hmac_header[2] = 0x01;
+        hmac_header[1] = 0x03; /* version = 3.1 or higher */
+        hmac_header[2] = ssl->version & 0x0f;
         hmac_header[3] = length >> 8; 
         hmac_header[4] = length & 0xff;
 

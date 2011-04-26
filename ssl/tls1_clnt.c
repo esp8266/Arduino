@@ -51,6 +51,7 @@ EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const
         uint8_t *session_id, uint8_t sess_id_size)
 {
     SSL *ssl = ssl_new(ssl_ctx, client_fd);
+    ssl->version = SSL_PROTOCOL_VERSION;
 
     if (session_id && ssl_ctx->num_sessions)
     {
@@ -178,7 +179,7 @@ static int send_client_hello(SSL *ssl)
     buf[2] = 0;
     /* byte 3 is calculated later */
     buf[4] = 0x03;
-    buf[5] = 0x01;
+    buf[5] = ssl->version & 0x0f;
 
     /* client random value - spec says that 1st 4 bytes are big endian time */
     *tm_ptr++ = (uint8_t)(((long)tm & 0xff000000) >> 24);
@@ -227,14 +228,22 @@ static int process_server_hello(SSL *ssl)
 {
     uint8_t *buf = ssl->bm_data;
     int pkt_size = ssl->bm_index;
-    int version = (buf[4] << 4) + buf[5];
     int num_sessions = ssl->ssl_ctx->num_sessions;
     uint8_t sess_id_size;
     int offset, ret = SSL_OK;
 
     /* check that we are talking to a TLSv1 server */
-    if (version != 0x31)
-        return SSL_ERROR_INVALID_VERSION;
+    uint8_t version = (buf[4] << 4) + buf[5];
+    if (version > SSL_PROTOCOL_VERSION)
+        version = SSL_PROTOCOL_VERSION;
+    else if (ssl->version < SSL_PROTOCOL_MIN_VERSION)
+    {
+        ret = SSL_ERROR_INVALID_VERSION;
+        ssl_display_error(ret);
+        goto error;
+    }
+
+    ssl->version = version;
 
     /* get the server random value */
     memcpy(ssl->dc->server_random, &buf[6], SSL_RANDOM_SIZE);
@@ -300,7 +309,7 @@ static int send_client_key_xchg(SSL *ssl)
     buf[1] = 0;
 
     premaster_secret[0] = 0x03; /* encode the version number */
-    premaster_secret[1] = 0x01;
+    premaster_secret[1] = SSL_PROTOCOL_MINOR_VERSION; /* must be TLS 1.1 */
     get_random(SSL_SECRET_SIZE-2, &premaster_secret[2]);
     DISPLAY_RSA(ssl, ssl->x509_ctx->rsa_ctx);
 

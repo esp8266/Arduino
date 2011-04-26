@@ -44,6 +44,11 @@ extern "C" {
 #include "crypto.h"
 #include "crypto_misc.h"
 
+#define SSL_PROTOCOL_MIN_VERSION    0x31   /* TLS v1.0 */
+//#define SSL_PROTOCOL_MINOR_VERSION  0x02   /* TLS v1.1 */
+#define SSL_PROTOCOL_MINOR_VERSION  0x01   /* TLS v1.0 */
+//#define SSL_PROTOCOL_VERSION        0x32   /* TLS v1.1 */
+#define SSL_PROTOCOL_VERSION        0x31   /* TLS v1.1 */
 #define SSL_RANDOM_SIZE             32
 #define SSL_SECRET_SIZE             48
 #define SSL_FINISHED_HASH_SIZE      12
@@ -160,6 +165,8 @@ struct _SSL
     uint8_t record_type;
     uint8_t cipher;
     uint8_t sess_id_size;
+    uint8_t version;
+    uint8_t client_version;
     int16_t next_state;
     int16_t hs_status;
     DISPOSABLE_CTX *dc;         /* temporary data which we'll get rid of soon */
