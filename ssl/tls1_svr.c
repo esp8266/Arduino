@@ -122,19 +122,18 @@ static int process_client_hello(SSL *ssl)
     int i, j, cs_len, id_len, offset = 6 + SSL_RANDOM_SIZE;
     int ret = SSL_OK;
     
-    /* should be v3.1 (TLSv1) or better - we'll send in v3.1 mode anyway */
     uint8_t version = (record_buf[1] << 4) + record_buf[2];
+    ssl->version = ssl->client_version = version;
 
     if (version > SSL_PROTOCOL_VERSION)
-        version = SSL_PROTOCOL_VERSION;
-    else if (version < SSL_PROTOCOL_MIN_VERSION) 
+        ssl->version = SSL_PROTOCOL_VERSION; /* use client's version */
+    else if (version < SSL_PROTOCOL_MIN_VERSION)  /* old version supported? */
     {
         ret = SSL_ERROR_INVALID_VERSION;
         ssl_display_error(ret);
         goto error;
     }
 
-    ssl->version = ssl->client_version = version;
     memcpy(ssl->dc->client_random, &buf[6], SSL_RANDOM_SIZE);
 
     /* process the session id */
