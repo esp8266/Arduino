@@ -698,7 +698,7 @@ static int verify_digest(SSL *ssl, int mode, const uint8_t *buf, int read_len)
         hmac_offset = read_len-last_blk_size-ssl->cipher_info->digest_size-1;
 
         /* guard against a timing attack - make sure we do the digest */
-        if (hmac_offset < 0 || last_blk_size > ssl->cipher_info->padding_size)
+        if (hmac_offset < 0)
         {
             hmac_offset = 0;
         }

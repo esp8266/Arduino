@@ -124,9 +124,10 @@ static int process_client_hello(SSL *ssl)
     
     /* should be v3.1 (TLSv1) or better - we'll send in v3.1 mode anyway */
     uint8_t version = (record_buf[1] << 4) + record_buf[2];
+
     if (version > SSL_PROTOCOL_VERSION)
         version = SSL_PROTOCOL_VERSION;
-    else if (ssl->version < SSL_PROTOCOL_MIN_VERSION) 
+    else if (version < SSL_PROTOCOL_MIN_VERSION) 
     {
         ret = SSL_ERROR_INVALID_VERSION;
         ssl_display_error(ret);

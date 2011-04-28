@@ -798,13 +798,13 @@ static void do_client(client_t *clnt)
     /* show the session ids in the reconnect test */
     if (strcmp(clnt->testname, "Session Reuse") == 0)
     {
-        sprintf(openssl_buf, "echo \"hello client\" | openssl s_client "
+        sprintf(openssl_buf, "echo \"hello client\" | openssl s_client -tls1 "
             "-connect localhost:%d %s 2>&1 | grep \"Session-ID:\"", 
             g_port, clnt->openssl_option);
     }
     else
     {
-        sprintf(openssl_buf, "echo \"hello client\" | openssl s_client "
+        sprintf(openssl_buf, "echo \"hello client\" | openssl s_client -tls1 "
 #ifdef WIN32
             "-connect localhost:%d -quiet %s",
 #else
