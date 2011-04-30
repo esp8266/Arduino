@@ -42,6 +42,7 @@ void SpiDrv::begin()
 	  // the SS pin MUST be kept as OUTPUT.
 	  SPCR |= _BV(MSTR);
 	  SPCR |= _BV(SPE);
+	  //SPSR |= _BV(SPI2X);
 }
 
 void SpiDrv::end() {
@@ -76,48 +77,29 @@ int SpiDrv::waitSpiChar(unsigned char waitChar)
     unsigned char _readChar = 0;
     do{
         _readChar = readChar(); //get data byte
-        if (_readChar == WAIT_CMD)
+        if (_readChar == ERR_CMD)
         {
-            delayMicroseconds(WAIT_CHAR_DELAY);
-        }else if (_readChar == ERR_CMD)
-        {
+        	WARN("Err cmd received\n");
         	return -1;
-        }else
-        {
-            delayMicroseconds(TIMEOUT_CHAR_DELAY);
         }
-//        else if (_readChar != waitChar)
-//        {
-//            Serial.println(_readChar,16);
-//        }
     }while((timeout-- > 0) && (_readChar != waitChar));
-
-    if ((_readChar != waitChar)&&(timeout >=0))
-    {
-        INFO1("*C*");
-        Serial.println(_readChar,16);
-    }else if (timeout == 0)
-    {
-        INFO1("*T*");
-    }
-
     return  (_readChar == waitChar);
 }
 
-int SpiDrv::waitSpiChar(char waitChar, char* readChar)
-{
-    int timeout = TIMEOUT_CHAR;
-    do{
-        *readChar = spiTransfer(DUMMY_DATA); //get data byte
-        if (*readChar == WAIT_CMD)
-        {
-            INFO1("WAIT");
-            delayMicroseconds(WAIT_CHAR_DELAY);
-        }
-    }while((timeout-- > 0) && (*readChar != waitChar));
-
-    return  (*readChar == waitChar);
-}
+//int SpiDrv::waitSpiChar(char waitChar, char* readChar)
+//{
+//    int timeout = TIMEOUT_CHAR;
+//    do{
+//        *readChar = spiTransfer(DUMMY_DATA); //get data byte
+//        if (*readChar == WAIT_CMD)
+//        {
+//            INFO1("WAIT");
+//            delayMicroseconds(WAIT_CHAR_DELAY);
+//        }
+//    }while((timeout-- > 0) && (*readChar != waitChar));
+//
+//    return  (*readChar == waitChar);
+//}
 
 
 int SpiDrv::readAndCheckChar(char checkChar, char* readChar)
@@ -153,22 +135,11 @@ char SpiDrv::readChar()
             return 0;                                   \
         }else                                           \
 
-bool SpiDrv::waitSlaveReady()
-{
-	return (digitalRead(SLAVEREADY) == LOW);
-}
+#define waitSlaveReady() (digitalRead(SLAVEREADY) == LOW)
 
 void SpiDrv::waitForSlaveReady()
 {
-#if 0
-	int count = 0;
-	while (!waitSlaveReady() && (++count<TIMEOUT_READY_SLAVE))
-	{
-		delayMicroseconds(1);
-	}
-#else
 	while (!waitSlaveReady());
-#endif
 }
 
 int SpiDrv::waitResponseCmd(uint8_t cmd, uint8_t numParam, uint8_t* param, uint8_t* param_len)

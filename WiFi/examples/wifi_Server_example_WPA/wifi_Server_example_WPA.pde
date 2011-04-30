@@ -119,9 +119,11 @@ void setup()
 {
   Serial.begin(9600);
   Serial.println("*** Start WiFi example ***");
-  delay(3000);
   
   WiFi.begin();
+  
+  // Wait for initialize WiFi
+  delay(3000);
   
   scanNetworks();
 
@@ -156,27 +158,13 @@ void loop()
   {
       byte _status = 0;
       Client client = server.available(&_status);
-      //delay(2000);
       if (client) {
             if (!gotAMessage) {
               Serial.println("\nWe have a new client\n");
               client.println("Hello, client!"); 
               gotAMessage = true;
             }
-/*            
-    // read the bytes incoming from the client:
-    char thisChar = client.read();
-    // echo the bytes back to the client:
-    server.write(thisChar);
-    // echo the bytes to the server as well:
-    Serial.print(thisChar);
-    */
-    /*
-        Serial.print("Status: ");
-        Serial.println(_status, 16);
-        delay(2000);       
-      */  
-      
+    
       static byte idx = 0;
 
         while (client.available())

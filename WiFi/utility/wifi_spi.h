@@ -16,7 +16,6 @@
 #define NO_SOCKET_AVAIL     255
 
 #define START_CMD   0xE0
-#define WAIT_CMD   	0xE1
 #define END_CMD     0xEE
 #define ERR_CMD   	0xEF
   

@@ -5,9 +5,9 @@
 #include "wifi_spi.h"
 
 #define WAIT_CHAR_DELAY 100
-#define TIMEOUT_CHAR_DELAY 10
+#define TIMEOUT_CHAR_DELAY 1 //10
 #define TIMEOUT_READY_SLAVE    1000
-#define SPI_TX_DELAY 5
+#define SPI_TX_DELAY 1
 #define SPI_START_CMD_DELAY 10
 
 
@@ -18,8 +18,7 @@
 
 #define WAIT_FOR_SLAVE_SELECT()	 \
 	SpiDrv::waitForSlaveReady(); \
-	SpiDrv::spiSlaveSelect(); \
-    delayMicroseconds(SPI_TX_DELAY);
+	SpiDrv::spiSlaveSelect();
 
 
 
@@ -43,7 +42,7 @@ public:
 
     static void waitForSlaveReady();
 
-    static int waitSpiChar(char waitChar, char* readChar);
+    //static int waitSpiChar(char waitChar, char* readChar);
 
     static int waitSpiChar(unsigned char waitChar);
     

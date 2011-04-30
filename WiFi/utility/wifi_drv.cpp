@@ -302,10 +302,10 @@ uint8_t WiFiDrv::scanNetworks()
 	WAIT_FOR_SLAVE_SELECT();
 
     // Send Command
-    SpiDrv::sendCmd(SCAN_NETWORKS, PARAM_NUMS_1);
+    SpiDrv::sendCmd(SCAN_NETWORKS, PARAM_NUMS_0);
 
-    uint8_t _dummy = DUMMY_DATA;
-    SpiDrv::sendParam(&_dummy, 1, LAST_PARAM);
+//    uint8_t _dummy = DUMMY_DATA;
+//    SpiDrv::sendParam(&_dummy, 1, LAST_PARAM);
 
     //Wait the reply elaboration
     SpiDrv::waitForSlaveReady();
