@@ -51,7 +51,7 @@ EXP_FUNC SSL * STDCALL ssl_client_new(SSL_CTX *ssl_ctx, int client_fd, const
         uint8_t *session_id, uint8_t sess_id_size)
 {
     SSL *ssl = ssl_new(ssl_ctx, client_fd);
-    ssl->version = SSL_PROTOCOL_VERSION;
+    ssl->version = SSL_PROTOCOL_VERSION_MAX; /* try top version first */
 
     if (session_id && ssl_ctx->num_sessions)
     {
@@ -118,7 +118,7 @@ int do_clnt_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len)
             break;
 
         case HS_FINISHED:
-            ret = process_finished(ssl, hs_len);
+            ret = process_finished(ssl, buf, hs_len);
             disposable_free(ssl);   /* free up some memory */
             /* note: client renegotiation is not allowed after this */
             break;
@@ -234,8 +234,10 @@ static int process_server_hello(SSL *ssl)
 
     /* check that we are talking to a TLSv1 server */
     uint8_t version = (buf[4] << 4) + buf[5];
-    if (version > SSL_PROTOCOL_VERSION)
-        version = SSL_PROTOCOL_VERSION;
+    if (version > SSL_PROTOCOL_VERSION_MAX)
+    {
+        version = SSL_PROTOCOL_VERSION_MAX;
+    }
     else if (ssl->version < SSL_PROTOCOL_MIN_VERSION)
     {
         ret = SSL_ERROR_INVALID_VERSION;

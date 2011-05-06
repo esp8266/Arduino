@@ -802,13 +802,23 @@ static void do_client(client_t *clnt)
             "-connect localhost:%d %s 2>&1 | grep \"Session-ID:\"", 
             g_port, clnt->openssl_option);
     }
-    else
+    else if (strstr(clnt->testname, "GNUTLS") == NULL)
     {
         sprintf(openssl_buf, "echo \"hello client\" | openssl s_client -tls1 "
 #ifdef WIN32
             "-connect localhost:%d -quiet %s",
 #else
             "-connect localhost:%d -quiet %s > /dev/null 2>&1",
+#endif
+        g_port, clnt->openssl_option);
+    }
+    else /* gnutls */
+    {
+        sprintf(openssl_buf, "echo \"hello client\" | gnutls-cli "
+#ifdef WIN32
+            "-p %d %s 127.0.0.1",
+#else
+            "-p %d %s 127.0.0.1 > /dev/null 2>&1",
 #endif
         g_port, clnt->openssl_option);
     }
@@ -1243,6 +1253,15 @@ int SSL_server_tests(void)
                 NULL, "abcd", DEFAULT_SVR_OPTION)))
         goto cleanup;
 
+    /* 
+     * GNUTLS
+     */
+    if ((ret = SSL_server_test("GNUTLS client", 
+                    "",
+                    "../ssl/test/axTLS.x509_1024.cer", NULL, 
+                    "../ssl/test/axTLS.key_1024",
+                    NULL, NULL, DEFAULT_SVR_OPTION)))
+        goto cleanup;
     ret = 0;
 
 cleanup:
@@ -1279,6 +1298,7 @@ typedef struct
 {
     const char *testname;
     const char *openssl_option;
+    int do_gnutls;
 } server_t;
 
 static void do_server(server_t *svr)
@@ -1287,8 +1307,17 @@ static void do_server(server_t *svr)
 #ifndef WIN32
     pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 #endif
-    sprintf(openssl_buf, "openssl s_server -tls1 " 
-            "-accept %d -quiet %s ", g_port, svr->openssl_option);
+    if (svr->do_gnutls)
+    {
+        sprintf(openssl_buf, "gnutls-serv " 
+                "-p %d --quiet %s ", g_port, svr->openssl_option);
+    }
+    else
+    {
+        sprintf(openssl_buf, "openssl s_server -tls1 " 
+                "-accept %d -quiet %s ", g_port, svr->openssl_option);
+    }
+
     system(openssl_buf);
 }
 
@@ -1310,6 +1339,8 @@ static int SSL_client_test(
 #ifndef WIN32
     pthread_t thread;
 #endif
+
+    server_data.do_gnutls = strstr(test, "GNUTLS") != NULL;
 
     if (sess_resume == NULL || sess_resume->start_server)
     {
@@ -1592,6 +1623,14 @@ int SSL_client_tests(void)
     }
 
     printf("SSL client test \"Invalid certificate type\" passed\n");
+
+    if ((ret = SSL_client_test("GNUTLS client", 
+                    &ssl_ctx,
+                    "--x509certfile ../ssl/test/axTLS.x509_1024.pem "
+                    "--x509keyfile ../ssl/test/axTLS.key_1024.pem -q", NULL,
+                    DEFAULT_CLNT_OPTION, NULL, NULL, NULL)))
+        goto cleanup;
+
     ret = 0;
 
 cleanup:
@@ -1600,6 +1639,7 @@ cleanup:
         ssl_display_error(ret);
         printf("Error: A client test failed\n");
         system("sh ../ssl/test/killopenssl.sh");
+        system("sh ../ssl/test/killgnutls.sh");
         exit(1);
     }
     else
@@ -2171,6 +2211,7 @@ int main(int argc, char *argv[])
         goto cleanup;
 
     system("sh ../ssl/test/killopenssl.sh");
+    system("sh ../ssl/test/killgnutls.sh");
 
     if (SSL_server_tests())
         goto cleanup;

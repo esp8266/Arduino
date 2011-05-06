@@ -103,7 +103,7 @@ int do_svr_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len)
             break;
 
         case HS_FINISHED:
-            ret = process_finished(ssl, hs_len);
+            ret = process_finished(ssl, buf, hs_len);
             disposable_free(ssl);   /* free up some memory */
             break;
     }
@@ -125,8 +125,11 @@ static int process_client_hello(SSL *ssl)
     uint8_t version = (record_buf[1] << 4) + record_buf[2];
     ssl->version = ssl->client_version = version;
 
-    if (version > SSL_PROTOCOL_VERSION)
-        ssl->version = SSL_PROTOCOL_VERSION; /* use client's version */
+    if (version > SSL_PROTOCOL_VERSION_MAX)
+    {
+        /* use client's version instead */
+        ssl->version = SSL_PROTOCOL_VERSION_MAX; 
+    }
     else if (version < SSL_PROTOCOL_MIN_VERSION)  /* old version supported? */
     {
         ret = SSL_ERROR_INVALID_VERSION;
@@ -196,13 +199,6 @@ int process_sslv23_client_hello(SSL *ssl)
 
     DISPLAY_BYTES(ssl, "received %d bytes", buf, read_len, read_len);
     
-    /* should be v3.1 (TLSv1) or better  */
-    ssl->version = (buf[3] << 4) + buf[4];
-    if (ssl->version < SSL_PROTOCOL_MIN_VERSION)
-    {
-        return SSL_ERROR_INVALID_VERSION;
-    }
-
     add_packet(ssl, buf, read_len);
 
     /* connection has gone, so die */

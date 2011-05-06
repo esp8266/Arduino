@@ -715,7 +715,7 @@ static int verify_digest(SSL *ssl, int mode, const uint8_t *buf, int read_len)
             }
         }
     }
-    else
+    else /* stream cipher */
     {
         hmac_offset = read_len - ssl->cipher_info->digest_size;
 
@@ -1009,9 +1009,7 @@ static int send_raw_packet(SSL *ssl, uint8_t protocol)
  */
 int send_packet(SSL *ssl, uint8_t protocol, const uint8_t *in, int length)
 {
-    int msg_length = length;
-    int ret, pad_bytes = 0;
-    ssl->bm_index = msg_length;
+    int ret, msg_length = 0;
 
     /* if our state is bad, don't bother */
     if (ssl->hs_status == SSL_ERROR_DEAD)
@@ -1022,17 +1020,19 @@ int send_packet(SSL *ssl, uint8_t protocol, const uint8_t *in, int length)
         memcpy(ssl->bm_data, in, length);
     }
 
+    msg_length += length;
     if (IS_SET_SSL_FLAG(SSL_TX_ENCRYPTED))
     {
         int mode = IS_SET_SSL_FLAG(SSL_IS_CLIENT) ? 
                             SSL_CLIENT_WRITE : SSL_SERVER_WRITE;
-        uint8_t hmac_header[SSL_RECORD_SIZE];
-
-        hmac_header[0] = protocol;
-        hmac_header[1] = 0x03; /* version = 3.1 or higher */
-        hmac_header[2] = ssl->version & 0x0f;
-        hmac_header[3] = length >> 8; 
-        hmac_header[4] = length & 0xff;
+        uint8_t hmac_header[SSL_RECORD_SIZE] = 
+        {
+            protocol, 
+            0x03, /* version = 3.1 or higher */
+            ssl->version & 0x0f,
+            msg_length >> 8,
+            msg_length & 0xff 
+        };
 
         if (protocol == PT_HANDSHAKE_PROTOCOL)
         {
@@ -1040,21 +1040,20 @@ int send_packet(SSL *ssl, uint8_t protocol, const uint8_t *in, int length)
 
             if (ssl->bm_data[0] != HS_HELLO_REQUEST)
             {
-                add_packet(ssl, ssl->bm_data, ssl->bm_index);
+                add_packet(ssl, ssl->bm_data, msg_length);
             }
         }
 
         /* add the packet digest */
+        add_hmac_digest(ssl, mode, hmac_header, ssl->bm_data, msg_length, 
+                                                &ssl->bm_data[msg_length]);
         msg_length += ssl->cipher_info->digest_size;
-        ssl->bm_index = msg_length;
-        add_hmac_digest(ssl, mode, hmac_header, ssl->bm_data, length, 
-                                                &ssl->bm_data[length]);
 
         /* add padding? */
         if (ssl->cipher_info->padding_size)
         {
             int last_blk_size = msg_length%ssl->cipher_info->padding_size;
-            pad_bytes = ssl->cipher_info->padding_size - last_blk_size;
+            int pad_bytes = ssl->cipher_info->padding_size - last_blk_size;
 
             /* ensure we always have at least 1 padding byte */
             if (pad_bytes == 0)
@@ -1062,11 +1061,23 @@ int send_packet(SSL *ssl, uint8_t protocol, const uint8_t *in, int length)
 
             memset(&ssl->bm_data[msg_length], pad_bytes-1, pad_bytes);
             msg_length += pad_bytes;
-            ssl->bm_index = msg_length;
         }
 
         DISPLAY_BYTES(ssl, "unencrypted write", ssl->bm_data, msg_length);
         increment_write_sequence(ssl);
+
+        /* add the explicit IV for TLS1.1 */
+        if (ssl->version >= SSL_PROTOCOL_VERSION1_1 &&
+                        ssl->cipher_info->iv_size)
+                        
+        {
+            uint8_t iv_size = ssl->cipher_info->iv_size;
+            uint8_t *t_buf = alloca(msg_length + iv_size);
+            memcpy(t_buf + iv_size, ssl->bm_data, msg_length);
+            get_random(iv_size, t_buf);
+            msg_length += iv_size;
+            memcpy(ssl->bm_data, t_buf, msg_length);
+        }
 
         /* now encrypt the packet */
         ssl->cipher_info->encrypt(ssl->encrypt_ctx, ssl->bm_data, 
@@ -1078,10 +1089,11 @@ int send_packet(SSL *ssl, uint8_t protocol, const uint8_t *in, int length)
 
         if (ssl->bm_data[0] != HS_HELLO_REQUEST)
         {
-            add_packet(ssl, ssl->bm_data, ssl->bm_index);
+            add_packet(ssl, ssl->bm_data, length);
         }
     }
 
+    ssl->bm_index = msg_length;
     if ((ret = send_raw_packet(ssl, protocol)) <= 0)
         return ret;
 
@@ -1223,10 +1235,27 @@ int basic_read(SSL *ssl, uint8_t **in_data)
     if (IS_SET_SSL_FLAG(SSL_NEED_RECORD))
     {
         /* check for sslv2 "client hello" */
-        if (buf[0] & 0x80 && buf[2] == 1 && buf[3] == 0x03)
+        if (buf[0] & 0x80 && buf[2] == 1)
         {
 #ifdef CONFIG_SSL_ENABLE_V23_HANDSHAKE
+            uint8_t version = (buf[3] << 4) + buf[4];
             DISPLAY_BYTES(ssl, "ssl2 record", buf, 5);
+
+            /* should be v3.1 (TLSv1) or better  */
+            ssl->version = ssl->client_version = version;
+
+            if (version > SSL_PROTOCOL_VERSION_MAX)
+            {
+                /* use client's version */
+                ssl->version = SSL_PROTOCOL_VERSION_MAX;
+            }
+            else if (version < SSL_PROTOCOL_MIN_VERSION)  
+            {
+                ret = SSL_ERROR_INVALID_VERSION;
+                ssl_display_error(ret);
+                return ret;
+            }
+
             add_packet(ssl, &buf[2], 3);
             ret = process_sslv23_client_hello(ssl); 
 #else
@@ -1259,6 +1288,14 @@ int basic_read(SSL *ssl, uint8_t **in_data)
     if (IS_SET_SSL_FLAG(SSL_RX_ENCRYPTED))
     {
         ssl->cipher_info->decrypt(ssl->decrypt_ctx, buf, buf, read_len);
+
+        if (ssl->version >= SSL_PROTOCOL_VERSION1_1 &&
+                        ssl->cipher_info->iv_size)
+        {
+            buf += ssl->cipher_info->iv_size;
+            read_len -= ssl->cipher_info->iv_size;
+        }
+
         read_len = verify_digest(ssl, 
                 is_client ? SSL_CLIENT_READ : SSL_SERVER_READ, buf, read_len);
 
@@ -1310,7 +1347,7 @@ int basic_read(SSL *ssl, uint8_t **in_data)
         case PT_APP_PROTOCOL_DATA:
             if (in_data)
             {
-                *in_data = ssl->bm_data;   /* point to the work buffer */
+                *in_data = buf;   /* point to the work buffer */
                 (*in_data)[read_len] = 0;  /* null terminate just in case */
             }
 
@@ -1414,12 +1451,8 @@ int send_change_cipher_spec(SSL *ssl)
  */
 int send_finished(SSL *ssl)
 {
-    uint8_t *buf = ssl->bm_data;
-
-    buf[0] = HS_FINISHED;
-    buf[1] = 0;
-    buf[2] = 0;
-    buf[3] = SSL_FINISHED_HASH_SIZE;
+    uint8_t buf[SSL_FINISHED_HASH_SIZE+4] = {
+        HS_FINISHED, 0, 0, SSL_FINISHED_HASH_SIZE };
 
     /* now add the finished digest mac (12 bytes) */
     finished_digest(ssl, 
@@ -1436,7 +1469,7 @@ int send_finished(SSL *ssl)
 #endif
 
     return send_packet(ssl, PT_HANDSHAKE_PROTOCOL,
-                                NULL, SSL_FINISHED_HASH_SIZE+4);
+                                buf, SSL_FINISHED_HASH_SIZE+4);
 }
 
 /**
@@ -1516,9 +1549,8 @@ int send_alert(SSL *ssl, int error_code)
 /**
  * Process a client finished message.
  */
-int process_finished(SSL *ssl, int hs_len)
+int process_finished(SSL *ssl, uint8_t *buf, int hs_len)
 {
-    uint8_t *buf = ssl->bm_data;
     int ret = SSL_OK;
     int is_client = IS_SET_SSL_FLAG(SSL_IS_CLIENT);
     int resume = IS_SET_SSL_FLAG(SSL_SESSION_RESUME);

@@ -45,10 +45,9 @@ extern "C" {
 #include "crypto_misc.h"
 
 #define SSL_PROTOCOL_MIN_VERSION    0x31   /* TLS v1.0 */
-//#define SSL_PROTOCOL_MINOR_VERSION  0x02   /* TLS v1.1 */
-#define SSL_PROTOCOL_MINOR_VERSION  0x01   /* TLS v1.0 */
-//#define SSL_PROTOCOL_VERSION        0x32   /* TLS v1.1 */
-#define SSL_PROTOCOL_VERSION        0x31   /* TLS v1.1 */
+#define SSL_PROTOCOL_MINOR_VERSION  0x02   /* TLS v1.1 */
+#define SSL_PROTOCOL_VERSION_MAX    0x32   /* TLS v1.1 */
+#define SSL_PROTOCOL_VERSION1_1     0x32   /* TLS v1.1 */
 #define SSL_RANDOM_SIZE             32
 #define SSL_SECRET_SIZE             48
 #define SSL_FINISHED_HASH_SIZE      12
@@ -236,7 +235,7 @@ int send_packet(SSL *ssl, uint8_t protocol,
         const uint8_t *in, int length);
 int do_svr_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len);
 int do_clnt_handshake(SSL *ssl, int handshake_type, uint8_t *buf, int hs_len);
-int process_finished(SSL *ssl, int hs_len);
+int process_finished(SSL *ssl, uint8_t *buf, int hs_len);
 int process_sslv23_client_hello(SSL *ssl);
 int send_alert(SSL *ssl, int error_code);
 int send_finished(SSL *ssl);
