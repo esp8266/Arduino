@@ -179,25 +179,23 @@ void Print::println(double n, int digits)
 
 // Private Methods /////////////////////////////////////////////////////////////
 
-void Print::printNumber(unsigned long n, uint8_t base)
-{
-  unsigned char buf[8 * sizeof(long)]; // Assumes 8-bit chars. 
-  unsigned long i = 0;
+void Print::printNumber(unsigned long n, uint8_t base) {
+  char buf[8 * sizeof(long) + 1]; // Assumes 8-bit chars plus zero byte.
+  char *str = &buf[sizeof(buf) - 1];
 
-  if (n == 0) {
-    print('0');
-    return;
-  } 
+  *str = '\0';
 
-  while (n > 0) {
-    buf[i++] = n % base;
+  // prevent crash if called with base == 1
+  if (base < 2) base = 10;
+
+  do {
+    unsigned long m = n;
     n /= base;
-  }
+    char c = m - base * n;
+    *--str = c < 10 ? c + '0' : c + 'A' - 10;
+  } while(n);
 
-  for (; i > 0; i--)
-    print((char) (buf[i - 1] < 10 ?
-      '0' + buf[i - 1] :
-      'A' + buf[i - 1] - 10));
+  write(str);
 }
 
 void Print::printFloat(double number, uint8_t digits) 
