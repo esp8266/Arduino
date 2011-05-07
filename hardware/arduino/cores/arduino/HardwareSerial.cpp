@@ -81,61 +81,32 @@ inline void store_char(unsigned char c, ring_buffer *buffer)
   }
 }
 
+#if !defined(USART_RX_vect) && !defined(SIG_USART0_RECV) && \
+    !defined(SIG_UART0_RECV) && !defined(USART0_RX_vect) && \
+	!defined(SIG_UART_RECV)
+  #error Don't know what the Data Received vector is called for the first UART
+#else
 #if defined(USART_RX_vect)
   SIGNAL(USART_RX_vect)
-  {
-  #if defined(UDR0)
-    unsigned char c  =  UDR0;
-  #elif defined(UDR)
-    unsigned char c  =  UDR;  //  atmega8535
-  #else
-    #error UDR not defined
-  #endif
-    store_char(c, &rx_buffer);
-  }
-#elif defined(SIG_USART0_RECV) && defined(UDR0)
+#elif defined(SIG_USART0_RECV)
   SIGNAL(SIG_USART0_RECV)
-  {
-    unsigned char c  =  UDR0;
-    store_char(c, &rx_buffer);
-  }
-#elif defined(SIG_UART0_RECV) && defined(UDR0)
+#elif defined(SIG_UART0_RECV)
   SIGNAL(SIG_UART0_RECV)
-  {
-    unsigned char c  =  UDR0;
-    store_char(c, &rx_buffer);
-  }
-//#elif defined(SIG_USART_RECV)
 #elif defined(USART0_RX_vect)
-  // fixed by Mark Sproul this is on the 644/644p
-  //SIGNAL(SIG_USART_RECV)
   SIGNAL(USART0_RX_vect)
+#elif defined(SIG_UART_RECV)
+  SIGNAL(SIG_UART_RECV)
+#endif
   {
   #if defined(UDR0)
     unsigned char c  =  UDR0;
   #elif defined(UDR)
-    unsigned char c  =  UDR;  //  atmega8, atmega32
+    unsigned char c  =  UDR;
   #else
     #error UDR not defined
   #endif
     store_char(c, &rx_buffer);
   }
-#elif defined(SIG_UART_RECV)
-  // this is for atmega8
-  SIGNAL(SIG_UART_RECV)
-  {
-  #if defined(UDR0)
-    unsigned char c  =  UDR0;  //  atmega645
-  #elif defined(UDR)
-    unsigned char c  =  UDR;  //  atmega8
-  #endif
-    store_char(c, &rx_buffer);
-  }
-#elif defined(USBCON)
-  #warning No interrupt handler for usart 0
-  #warning Serial(0) is on USB interface
-#else
-  #error No interrupt handler for usart 0
 #endif
 
 //#if defined(SIG_USART1_RECV)
