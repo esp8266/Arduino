@@ -359,16 +359,8 @@ int HardwareSerial::read(void)
 
 void HardwareSerial::flush()
 {
-  // don't reverse this or there may be problems if the RX interrupt
-  // occurs after reading the value of rx_buffer_head but before writing
-  // the value to rx_buffer_tail; the previous value of rx_buffer_head
-  // may be written to rx_buffer_tail, making it appear as if the buffer
-  // don't reverse this or there may be problems if the RX interrupt
-  // occurs after reading the value of rx_buffer_head but before writing
-  // the value to rx_buffer_tail; the previous value of rx_buffer_head
-  // may be written to rx_buffer_tail, making it appear as if the buffer
-  // were full, not empty.
-  _rx_buffer->head = _rx_buffer->tail;
+  while (_tx_buffer->head != _tx_buffer->tail)
+    ;
 }
 
 void HardwareSerial::write(uint8_t c)
