@@ -247,8 +247,8 @@ EXP_FUNC void STDCALL ssl_free(SSL *ssl)
         return;
 
     /* only notify if we weren't notified first */
-    if (!IS_SET_SSL_FLAG(SSL_RECEIVED_CLOSE_NOTIFY))
-      /* spec says we must notify when we are dying */
+    /* spec says we must notify when we are dying */
+    if (!IS_SET_SSL_FLAG(SSL_SENT_CLOSE_NOTIFY))
       send_alert(ssl, SSL_ALERT_CLOSE_NOTIFY);
 
     ssl_ctx = ssl->ssl_ctx;
@@ -1021,6 +1021,7 @@ int send_packet(SSL *ssl, uint8_t protocol, const uint8_t *in, int length)
     }
 
     msg_length += length;
+
     if (IS_SET_SSL_FLAG(SSL_TX_ENCRYPTED))
     {
         int mode = IS_SET_SSL_FLAG(SSL_IS_CLIENT) ? 
@@ -1360,12 +1361,15 @@ int basic_read(SSL *ssl, uint8_t **in_data)
                buf[1] == SSL_ALERT_CLOSE_NOTIFY)
             {
               ret = SSL_CLOSE_NOTIFY;
-              SET_SSL_FLAG(SSL_RECEIVED_CLOSE_NOTIFY);
+              send_alert(ssl, SSL_ALERT_CLOSE_NOTIFY);
+              SET_SSL_FLAG(SSL_SENT_CLOSE_NOTIFY);
             }
             else 
+            {
                 ret = -buf[1]; 
+                DISPLAY_ALERT(ssl, buf[1]);
+            }
 
-            DISPLAY_ALERT(ssl, buf[1]);
             break;
 
         default:

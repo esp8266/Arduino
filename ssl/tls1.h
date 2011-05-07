@@ -65,7 +65,7 @@ extern "C" {
 #define SSL_SESSION_RESUME          0x0008
 #define SSL_IS_CLIENT               0x0010
 #define SSL_HAS_CERT_REQ            0x0020
-#define SSL_RECEIVED_CLOSE_NOTIFY   0x0040
+#define SSL_SENT_CLOSE_NOTIFY       0x0040
 
 /* some macros to muck around with flag bits */
 #define SET_SSL_FLAG(A)             (ssl->flag |= A)
