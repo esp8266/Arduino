@@ -204,6 +204,8 @@ void HardwareSerial::begin(unsigned long baud)
     use_u2x = false;
   }
 #endif
+
+try_again:
   
   if (use_u2x) {
     *_ucsra = 1 << _u2x;
@@ -211,6 +213,12 @@ void HardwareSerial::begin(unsigned long baud)
   } else {
     *_ucsra = 0;
     baud_setting = (F_CPU / 8 / baud - 1) / 2;
+  }
+  
+  if ((baud_setting > 4095) && use_u2x)
+  {
+    use_u2x = false;
+    goto try_again;
   }
 
   // assign the baud_setting, a.k.a. ubbr (USART Baud Rate Register)
