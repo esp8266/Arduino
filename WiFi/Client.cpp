@@ -6,8 +6,6 @@ extern "C" {
   #include "utility/debug.h"
 }
 
-#include "WProgram.h"
-
 #include "WiFi.h"
 #include "Client.h"
 #include "Server.h"
@@ -15,18 +13,36 @@ extern "C" {
 
 uint16_t Client::_srcport = 1024;
 
+Client::Client() : _sock(MAX_SOCK_NUM) {
+}
+
 Client::Client(uint8_t sock) : _sock(sock) {
 }
 
-Client::Client(IPAddress& ip, uint16_t port) : _ip(ip), _port(port), _sock(MAX_SOCK_NUM) {
+int Client::connect(const char* host, uint16_t port) {
+	/* TODO Add DNS wifi spi function to resolve DNS */
+#if 0
+  // Look up the host first
+  int ret = 0;
+  DNSClient dns;
+  IPAddress remote_addr;
+
+  dns.begin(Ethernet.dnsServerIP());
+  ret = dns.getHostByName(host, remote_addr);
+  if (ret == 1) {
+    return connect(remote_addr, port);
+  } else {
+    return ret;
+  }
+#endif
 }
 
-uint8_t Client::connect() {
+int Client::connect(IPAddress ip, uint16_t port) {
     _sock = getFirstSocket();
     if (_sock != NO_SOCKET_AVAIL)
     {
-    	ServerDrv::StartClient(uint32_t(_ip), _port, _sock);
-    	 WiFiClass::_state[_sock] = _socket;
+    	ServerDrv::StartClient(uint32_t(ip), port, _sock);
+    	 WiFiClass::_state[_sock] = _sock;
     }else{
     	return 0;
     }
@@ -84,6 +100,11 @@ int Client::read(uint8_t* buf, size_t size) {
   if (!ServerDrv::getDataBuf(_sock, buf, &size))
       return -1;
   return 0;
+}
+
+int Client::peek() {
+	//TODO to be implemented
+	return 0;
 }
 
 void Client::flush() {

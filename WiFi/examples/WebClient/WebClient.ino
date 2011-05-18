@@ -19,12 +19,11 @@
 char ssid[32] = { 0 };
 int status = WL_IDLE_STATUS;
 IPAddress server(74,125,232,115);  // Google
-//byte server[] = { 173,194,33,104 }; // Google
 
 // Initialize the Ethernet client library
 // with the IP address and port of the server 
 // that you want to connect to (port 80 is default for HTTP):
-Client client(server, 80);
+Client client;
 
 int startWiFiWpa()
 {
@@ -53,7 +52,7 @@ void setup() {
 	{
 		Serial.println("\nStarting connection...");
 		// if you get a connection, report back via serial:
-		if (client.connect()) {
+		if (client.connect(server, 80)) {
 			Serial.println("connected");
 			// Make a HTTP request:
 			client.println("GET /search?q=arduino HTTP/1.0");

@@ -3,6 +3,7 @@
 
 #include <inttypes.h>
 #include "wifi_spi.h"
+#include "IPAddress.h"
 
 #define KEY_IDX_LEN     1
 #define WL_DELAY_START_CONNECTION 5000
@@ -40,11 +41,11 @@ public:
 
     static uint8_t* getMacAddress();
 
-    static void getIpAddress(uint8_t *ip);
+    static void getIpAddress(IPAddress& ip);
 
-    static void getSubnetMask(uint8_t *ip);
+    static void getSubnetMask(IPAddress& ip);
 
-    static void getGatewayIP(uint8_t *ip);
+    static void getGatewayIP(IPAddress& ip);
 
     static char* getCurrentSSID();
 

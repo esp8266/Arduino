@@ -1,5 +1,5 @@
-#ifndef Server_h
-#define Server_h
+#ifndef server_h
+#define server_h
 
 extern "C" {
   #include "utility/wl_definitions.h"

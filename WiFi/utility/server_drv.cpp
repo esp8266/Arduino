@@ -1,6 +1,6 @@
 #include "server_drv.h"
 
-#include "WProgram.h"
+#include "Arduino.h"
 #include "spi_drv.h"
 
 #define _DEBUG_

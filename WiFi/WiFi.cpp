@@ -1,6 +1,5 @@
 #include "wifi_drv.h"
 #include "WiFi.h"
-#include "wiring.h"
 
 #define _DEBUG_
 
@@ -125,21 +124,21 @@ uint8_t* WiFiClass::macAddress(uint8_t* mac)
 IPAddress WiFiClass::localIp()
 {
 	IPAddress ret;
-	WiFiDrv::getIpAddress(ret.raw_address());
+	WiFiDrv::getIpAddress(ret);
 	return ret;
 }
 
 IPAddress WiFiClass::subnetMask()
 {
 	IPAddress ret;
-	WiFiDrv::getSubnetMask(ret.raw_address());
+	WiFiDrv::getSubnetMask(ret);
 	return ret;
 }
 
 IPAddress WiFiClass::gatewayIP()
 {
 	IPAddress ret;
-	WiFiDrv::getGatewayIP(ret.raw_address());
+	WiFiDrv::getGatewayIP(ret);
 	return ret;
 }
 

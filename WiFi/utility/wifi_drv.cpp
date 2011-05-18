@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "WProgram.h"
+#include "Arduino.h"
 #include "spi_drv.h"
 #include "wifi_drv.h"
 
@@ -189,22 +189,25 @@ uint8_t* WiFiDrv::getMacAddress()
     return _mac;
 }
 
-void WiFiDrv::getIpAddress(uint8_t *ip)
+void WiFiDrv::getIpAddress(IPAddress& ip)
 {
 	getNetworkData(_localIp, _subnetMask, _gatewayIp);
-	memcpy(ip, _localIp, WL_IPV4_LENGTH);
+	ip = _localIp;
+	//memcpy(ip, _localIp, WL_IPV4_LENGTH);
 }
 
- void WiFiDrv::getSubnetMask(uint8_t *ip)
+ void WiFiDrv::getSubnetMask(IPAddress& ip)
  {
 	getNetworkData(_localIp, _subnetMask, _gatewayIp);
-	memcpy(ip, _subnetMask, WL_IPV4_LENGTH);
+	ip = _subnetMask;
+	//memcpy(ip, _subnetMask, WL_IPV4_LENGTH);
  }
 
- void WiFiDrv::getGatewayIP(uint8_t *ip)
+ void WiFiDrv::getGatewayIP(IPAddress& ip)
  {
 	getNetworkData(_localIp, _subnetMask, _gatewayIp);
-	memcpy(ip, _gatewayIp, WL_IPV4_LENGTH);
+	ip = _gatewayIp;
+	//memcpy(ip, _gatewayIp, WL_IPV4_LENGTH);
  }
 
 char* WiFiDrv::getCurrentSSID()

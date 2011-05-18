@@ -1,5 +1,5 @@
 
-#include "WProgram.h"
+#include "Arduino.h"
 #include "spi_drv.h"                   
 #include "pins_arduino.h"
 #define _DEBUG_
