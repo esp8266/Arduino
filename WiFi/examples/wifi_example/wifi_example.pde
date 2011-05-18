@@ -114,12 +114,12 @@ void setup()
 {
   Serial.begin(9600);
   Serial.println("*** Start WiFi example ***");
-
+  WiFi.begin();
   //scanNetworks();
   delay(3000);
 
-  int _status = startWiFi();
-
+  //int _status = startWiFi();
+/*
   if ( _status == WL_CONNECTED)
   {
     Serial.println("Wifi Connected!");
@@ -129,17 +129,53 @@ void setup()
     printCurrNet();
     
     scanNetworks();
-  /*
+  
     Serial.println("Starting server...");
     server.begin();
    delay(1000);  
-   */
+   
   }
+  */
 }
 
 void loop()
 {
+  static boolean free = false;
+
+//  if (free) Serial.println(WiFi.test(),10);
+  if (free) WiFi.test();
+  
+  byte c = Serial.read();
+  if (c!=255)
+  {
+    switch (c)
+    {
+      case '1': 
+      case '2': 
+      case '3': 
+      case '4': 
+      case '5': 
+      case '6': 
+      {
+        int i = 0;
+        for (;i<(c-0x30);++i)
+        {
+          int num = WiFi.test();
+          //Serial.println(num,10);
+        }
+        break;
+      }
+      case 'c': 
+        free = true;
+        break;
+      case 's': 
+        free = false;
+        break;
+
+    }
+  }
   /*
+    Client client = server.available();
   static uint8_t count = 0;
   Serial.println("Retry connect...");
   status = WiFi.begin(ssid);

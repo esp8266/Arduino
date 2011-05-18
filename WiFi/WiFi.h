@@ -86,6 +86,9 @@ public:
     // Return Connection status
     uint8_t status();
 
+    // function used for test
+    uint8_t test();
+
     friend class Client;
     friend class Server;
 };

@@ -62,6 +62,7 @@ public:
 
     static uint8_t getEncTypeNetowrks(uint8_t networkItem);
 
+    static uint8_t testCmd();
 };
 
 extern WiFiDrv wiFiDrv;

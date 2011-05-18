@@ -3,6 +3,7 @@ extern "C" {
   #include "utility/wl_types.h"
   #include "socket.h"
   #include "string.h"
+  #include "utility/debug.h"
 }
 
 #include "WProgram.h"
@@ -35,25 +36,28 @@ uint8_t Client::connect() {
 void Client::write(uint8_t b) {
   if (_sock != 255)
   {
-      while (!ServerDrv::isDataSent(_sock));
+	  START();
       ServerDrv::sendData(_sock, &b, 1);
+      while (!ServerDrv::isDataSent(_sock));
+      END();
+
   }
 }
 
 void Client::write(const char *str) {
   if (_sock != 255)
   {
-      while (!ServerDrv::isDataSent(_sock));
       unsigned int len = strlen(str);
       ServerDrv::sendData(_sock, (const uint8_t *)str, len);
+      while (!ServerDrv::isDataSent(_sock));
   }
 }
 
 void Client::write(const uint8_t *buf, size_t size) {
   if (_sock != 255)
   {
-      while (!ServerDrv::isDataSent(_sock));
       ServerDrv::sendData(_sock, buf, size);
+      while (!ServerDrv::isDataSent(_sock));
   }
   
 }

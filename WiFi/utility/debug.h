@@ -13,8 +13,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "HardwareSerial.h"
-
 #define INFO_0 1
 #define INFO_1 2
 #define INFO_2 4

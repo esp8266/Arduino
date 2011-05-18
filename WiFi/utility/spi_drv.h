@@ -4,12 +4,7 @@
 #include <inttypes.h>
 #include "wifi_spi.h"
 
-#define WAIT_CHAR_DELAY 100
-#define TIMEOUT_CHAR_DELAY 1 //10
-#define TIMEOUT_READY_SLAVE    1000
-#define SPI_TX_DELAY 1
-#define SPI_START_CMD_DELAY 10
-
+#define SPI_START_CMD_DELAY 	10
 
 #define NO_LAST_PARAM   0
 #define LAST_PARAM      1
@@ -25,7 +20,9 @@
 class SpiDrv
 {
 private:
-	static bool waitSlaveReady();
+	//static bool waitSlaveReady();
+	static void waitForSlaveSign();
+	static void getParam(uint8_t* param);
 public:
 
     static void begin();

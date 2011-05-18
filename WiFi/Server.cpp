@@ -66,10 +66,7 @@ void Server::write(const uint8_t *buffer, size_t size)
                 client.status() == ESTABLISHED)
             {                
                 client.write(buffer, size);
-            }else{
-                delay(20);
             }
-
         }
     }
 }

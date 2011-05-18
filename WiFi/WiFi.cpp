@@ -191,5 +191,11 @@ uint8_t WiFiClass::status()
     return WiFiDrv::getConnectionStatus();
 }
 
+uint8_t WiFiClass::test()
+{
+    return WiFiDrv::testCmd();
+}
+
+
 
 WiFiClass WiFi;

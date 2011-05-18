@@ -10,6 +10,7 @@
  */
 #include <WiFi.h>
 #include <IPAddress.h>
+#define _PRINT_
 
 byte mac[6] = { 0 };
 IPAddress ip;
@@ -103,11 +104,13 @@ int startWiFiWpa()
 {
   Serial.println("\nSetup WiFi Wpa...");
   //strcpy(ssid, "AndroidAP9647");
+  //strcpy(ssid, "AndroidAP3551");
   strcpy(ssid, "Cariddi");
   Serial.print("SSID: ");
   Serial.println(ssid);
   const char *pass = "1234567890";
   status = WiFi.begin(ssid, pass);
+  //status = WiFi.begin(ssid);
   if ( status != WL_CONNECTED)
   {	  
     Serial.println("Connection Failed");
@@ -146,9 +149,12 @@ void setup()
 
 void execCmd(char* buf)
 {
+  #ifdef _PRINT_
   Serial.print("\nExecuting command: ");
   Serial.println(buf);
-  server.write(buf);
+  #endif
+  //server.write(buf);
+  server.print(buf);
 }
 
 
@@ -166,12 +172,18 @@ void loop()
             }
     
       static byte idx = 0;
+      int c = 0;
 
-        while (client.available())
+        do 
         {
-            dataBuf[idx] = client.read();
+          c = client.read();
+          if (c!=-1)
+          {
+            dataBuf[idx] = c;
+            #ifdef _PRINT_
             if (idx == 0) Serial.print("Client chatting...: ");
             Serial.print(dataBuf[idx]);
+            #endif
             if ((dataBuf[idx] == 0xa)/*||(dataBuf[idx] == 0xd)*/)
             {
               dataBuf[idx+1]=0; 
@@ -181,7 +193,8 @@ void loop()
             }else{
               ++idx;
             }
-        }
+          }
+        }while (c!=-1);
       }
   }
 }

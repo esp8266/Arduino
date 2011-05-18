@@ -23,6 +23,7 @@ enum {
 	SET_NET_CMD 		= 0x10,
 	SET_PASSPHRASE_CMD	= 0x11,
 	SET_KEY_CMD	        = 0x12,
+	TEST_CMD	        = 0x13,
 
 	GET_CONN_STATUS_CMD	= 0x20,
 	GET_IPADDR_CMD		= 0x21,

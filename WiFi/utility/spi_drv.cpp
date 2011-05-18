@@ -12,7 +12,8 @@ extern "C" {
 #define SPICLOCK  13//sck
 #define SLAVESELECT 2//ss
 #define SLAVEREADY 3
-                       
+
+#define DELAY_100NS asm volatile("nop")
 
 void SpiDrv::begin()
 {
@@ -60,6 +61,16 @@ void SpiDrv::spiSlaveDeselect()
     digitalWrite(SLAVESELECT,HIGH);
 }
 
+void delaySpi()
+{
+	int i = 0;
+	const int DELAY = 1000;
+	for (;i<DELAY;++i)
+	{
+		int a =a+1;
+	}
+}
+
 char SpiDrv::spiTransfer(volatile char data)
 {
     SPDR = data;                    // Start the transmission
@@ -67,7 +78,9 @@ char SpiDrv::spiTransfer(volatile char data)
     {
     };
     char result = SPDR;
-    delayMicroseconds(SPI_TX_DELAY);
+    DELAY_100NS;
+    DELAY_100NS;
+    //delayMicroseconds(SPI_TX_DELAY);
     return result;                    // return the received byte
 }
 
@@ -104,14 +117,18 @@ int SpiDrv::waitSpiChar(unsigned char waitChar)
 
 int SpiDrv::readAndCheckChar(char checkChar, char* readChar)
 {
-    *readChar = spiTransfer(DUMMY_DATA); //get data byte
+    //*readChar = spiTransfer(DUMMY_DATA); //get data byte
+    getParam((uint8_t*)readChar);
 
     return  (*readChar == checkChar);
 }
 
 char SpiDrv::readChar()
 {
-    return spiTransfer(DUMMY_DATA); //get data byte
+	uint8_t readChar = 0;
+	getParam(&readChar);
+	return readChar;
+    //return spiTransfer(DUMMY_DATA); //get data byte
 }
 
 //#define WAIT_START_CMD(x) waitSpiChar(START_CMD, &x)
@@ -130,16 +147,35 @@ char SpiDrv::readChar()
 #define CHECK_DATA(check, x)                   \
         if (!readAndCheckChar(check, &x))   \
         {                                               \
+        	TOGGLE_TRIGGER()                        \
             WARN("Reply error");                        \
             INFO2(check, (uint8_t)x);							\
             return 0;                                   \
         }else                                           \
 
 #define waitSlaveReady() (digitalRead(SLAVEREADY) == LOW)
+#define waitSlaveSign() (digitalRead(SLAVEREADY) == HIGH)
+#define waitSlaveSignalH() while(digitalRead(SLAVEREADY) != HIGH){}
+#define waitSlaveSignalL() while(digitalRead(SLAVEREADY) != LOW){}
+
+void SpiDrv::waitForSlaveSign()
+{
+	while (!waitSlaveSign());
+}
 
 void SpiDrv::waitForSlaveReady()
 {
 	while (!waitSlaveReady());
+}
+
+void SpiDrv::getParam(uint8_t* param)
+{
+    // Get Params data
+    *param = spiTransfer(DUMMY_DATA);
+    DELAY_100NS;
+    DELAY_100NS;
+    DELAY_100NS;
+    DELAY_100NS;
 }
 
 int SpiDrv::waitResponseCmd(uint8_t cmd, uint8_t numParam, uint8_t* param, uint8_t* param_len)
@@ -157,7 +193,8 @@ int SpiDrv::waitResponseCmd(uint8_t cmd, uint8_t numParam, uint8_t* param, uint8
             for (ii=0; ii<(*param_len); ++ii)
             {
                 // Get Params data
-                param[ii] = spiTransfer(DUMMY_DATA);
+                //param[ii] = spiTransfer(DUMMY_DATA);
+                getParam(&param[ii]);
             } 
         }         
 
@@ -470,6 +507,7 @@ void SpiDrv::sendCmd(uint8_t cmd, uint8_t numParam)
     // Send Spi START CMD
     spiTransfer(START_CMD);
 
+    //waitForSlaveSign();
     //wait the interrupt trigger on slave
     delayMicroseconds(SPI_START_CMD_DELAY);
 
