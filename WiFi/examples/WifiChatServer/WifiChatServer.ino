@@ -20,8 +20,8 @@
 #include <WiFi.h>
 #include <IPAddress.h>
 
-char ssid[] = "tigoenet";
-char pass[] = "m30w-m30w";
+char ssid[] = "yourWifiNetwork";
+char pass[] = "seekrit-password";
 int status = WL_IDLE_STATUS;
 // telnet defaults to port 23
 Server server(23);
