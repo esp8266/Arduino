@@ -1,0 +1,89 @@
+<html lang="en">
+<head>
+<title>wcsftime - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Wchar-strings.html#Wchar-strings" title="Wchar strings">
+<link rel="prev" href="wcscspn.html#wcscspn" title="wcscspn">
+<link rel="next" href="wcslcat.html#wcslcat" title="wcslcat">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="wcsftime"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="wcslcat.html#wcslcat">wcslcat</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="wcscspn.html#wcscspn">wcscspn</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Wchar-strings.html#Wchar-strings">Wchar strings</a>
+<hr>
+</div>
+
+<h3 class="section">6.13 <code>wcsftime</code>&ndash;convert date and time to a formatted wide-character string</h3>
+
+<p><a name="index-wcsftime-416"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;time.h&gt;
+     #include &lt;wchar.h&gt;
+     size_t wcsftime(wchar_t *<var>s</var>, size_t <var>maxsize</var>,
+         const wchar_t *<var>format</var>, const struct tm *<var>timp</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>wcsftime</code> is equivalent to <code>strftime</code>, except that:
+     <ul>
+<li>The argument s points to the initial element of an array of wide characters
+into which the generated output is to be placed. 
+<li>The argument maxsize indicates the limiting number of wide characters. 
+<li>The argument format is a wide-character string and the conversion specifiers
+are replaced by corresponding sequences of wide characters. 
+<li>The return value indicates the number of wide characters. 
+</ul>
+
+   <p>(The difference in all of the above being wide characters versus regular
+characters.) 
+See <code>strftime</code> for the details of the format specifiers.
+
+   <p><br>
+<strong>Returns</strong><br>
+When the formatted time takes up no more than <var>maxsize</var> wide characters,
+the result is the length of the formatted wide string.  Otherwise, if the
+formatting operation was abandoned due to lack of room, the result is
+<code>0</code>, and the wide-character string starting at <var>s</var> corresponds to just those
+parts of <code>*</code><var>format</var> that could be completely filled in within the
+<var>maxsize</var> limit.
+
+   <p><br>
+<strong>Portability</strong><br>
+C99 and POSIX require <code>wcsftime</code>, but do not specify the contents of
+<code>*</code><var>s</var> when the formatted string would require more than
+<var>maxsize</var> characters.  Unrecognized specifiers and fields of
+<code>timp</code> that are out of range cause undefined results.  Since some
+formats expand to 0 bytes, it is wise to set <code>*</code><var>s</var> to a nonzero
+value beforehand to distinguish between failure and an empty string. 
+This implementation does not support <code>s</code> being NULL, nor overlapping
+<code>s</code> and <code>format</code>.
+
+   <p><code>wcsftime</code> requires no supporting OS subroutines.
+
+   <p><br>
+<strong>See Also</strong><br>
+<code>strftime</code>
+
+   <p><br>
+
+   </body></html>
+

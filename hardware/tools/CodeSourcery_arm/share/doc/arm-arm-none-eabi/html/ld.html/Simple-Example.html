@@ -1,0 +1,118 @@
+<html lang="en">
+<head>
+<title>Simple Example - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Scripts.html#Scripts" title="Scripts">
+<link rel="prev" href="Script-Format.html#Script-Format" title="Script Format">
+<link rel="next" href="Simple-Commands.html#Simple-Commands" title="Simple Commands">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Simple-Example"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Simple-Commands.html#Simple-Commands">Simple Commands</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Script-Format.html#Script-Format">Script Format</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Scripts.html#Scripts">Scripts</a>
+<hr>
+</div>
+
+<h3 class="section">3.3 Simple Linker Script Example</h3>
+
+<p><a name="index-linker-script-example-339"></a><a name="index-example-of-linker-script-340"></a>Many linker scripts are fairly simple.
+
+   <p>The simplest possible linker script has just one command:
+&lsquo;<samp><span class="samp">SECTIONS</span></samp>&rsquo;.  You use the &lsquo;<samp><span class="samp">SECTIONS</span></samp>&rsquo; command to describe the
+memory layout of the output file.
+
+   <p>The &lsquo;<samp><span class="samp">SECTIONS</span></samp>&rsquo; command is a powerful command.  Here we will
+describe a simple use of it.  Let's assume your program consists only of
+code, initialized data, and uninitialized data.  These will be in the
+&lsquo;<samp><span class="samp">.text</span></samp>&rsquo;, &lsquo;<samp><span class="samp">.data</span></samp>&rsquo;, and &lsquo;<samp><span class="samp">.bss</span></samp>&rsquo; sections, respectively. 
+Let's assume further that these are the only sections which appear in
+your input files.
+
+   <p>For this example, let's say that the code should be loaded at address
+0x10000, and that the data should start at address 0x8000000.  Here is a
+linker script which will do that:
+<pre class="smallexample">     SECTIONS
+     {
+       . = 0x10000;
+       .text : { *(.text) }
+       . = 0x8000000;
+       .data : { *(.data) }
+       .bss : { *(.bss) }
+     }
+</pre>
+   <p>You write the &lsquo;<samp><span class="samp">SECTIONS</span></samp>&rsquo; command as the keyword &lsquo;<samp><span class="samp">SECTIONS</span></samp>&rsquo;,
+followed by a series of symbol assignments and output section
+descriptions enclosed in curly braces.
+
+   <p>The first line inside the &lsquo;<samp><span class="samp">SECTIONS</span></samp>&rsquo; command of the above example
+sets the value of the special symbol &lsquo;<samp><span class="samp">.</span></samp>&rsquo;, which is the location
+counter.  If you do not specify the address of an output section in some
+other way (other ways are described later), the address is set from the
+current value of the location counter.  The location counter is then
+incremented by the size of the output section.  At the start of the
+&lsquo;<samp><span class="samp">SECTIONS</span></samp>&rsquo; command, the location counter has the value &lsquo;<samp><span class="samp">0</span></samp>&rsquo;.
+
+   <p>The second line defines an output section, &lsquo;<samp><span class="samp">.text</span></samp>&rsquo;.  The colon is
+required syntax which may be ignored for now.  Within the curly braces
+after the output section name, you list the names of the input sections
+which should be placed into this output section.  The &lsquo;<samp><span class="samp">*</span></samp>&rsquo; is a
+wildcard which matches any file name.  The expression &lsquo;<samp><span class="samp">*(.text)</span></samp>&rsquo;
+means all &lsquo;<samp><span class="samp">.text</span></samp>&rsquo; input sections in all input files.
+
+   <p>Since the location counter is &lsquo;<samp><span class="samp">0x10000</span></samp>&rsquo; when the output section
+&lsquo;<samp><span class="samp">.text</span></samp>&rsquo; is defined, the linker will set the address of the
+&lsquo;<samp><span class="samp">.text</span></samp>&rsquo; section in the output file to be &lsquo;<samp><span class="samp">0x10000</span></samp>&rsquo;.
+
+   <p>The remaining lines define the &lsquo;<samp><span class="samp">.data</span></samp>&rsquo; and &lsquo;<samp><span class="samp">.bss</span></samp>&rsquo; sections in
+the output file.  The linker will place the &lsquo;<samp><span class="samp">.data</span></samp>&rsquo; output section
+at address &lsquo;<samp><span class="samp">0x8000000</span></samp>&rsquo;.  After the linker places the &lsquo;<samp><span class="samp">.data</span></samp>&rsquo;
+output section, the value of the location counter will be
+&lsquo;<samp><span class="samp">0x8000000</span></samp>&rsquo; plus the size of the &lsquo;<samp><span class="samp">.data</span></samp>&rsquo; output section.  The
+effect is that the linker will place the &lsquo;<samp><span class="samp">.bss</span></samp>&rsquo; output section
+immediately after the &lsquo;<samp><span class="samp">.data</span></samp>&rsquo; output section in memory.
+
+   <p>The linker will ensure that each output section has the required
+alignment, by increasing the location counter if necessary.  In this
+example, the specified addresses for the &lsquo;<samp><span class="samp">.text</span></samp>&rsquo; and &lsquo;<samp><span class="samp">.data</span></samp>&rsquo;
+sections will probably satisfy any alignment constraints, but the linker
+may have to create a small gap between the &lsquo;<samp><span class="samp">.data</span></samp>&rsquo; and &lsquo;<samp><span class="samp">.bss</span></samp>&rsquo;
+sections.
+
+   <p>That's it!  That's a simple and complete linker script.
+
+   </body></html>
+

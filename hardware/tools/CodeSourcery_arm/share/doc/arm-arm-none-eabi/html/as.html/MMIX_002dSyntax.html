@@ -1,0 +1,80 @@
+<html lang="en">
+<head>
+<title>MMIX-Syntax - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="MMIX_002dDependent.html#MMIX_002dDependent" title="MMIX-Dependent">
+<link rel="prev" href="MMIX_002dExpand.html#MMIX_002dExpand" title="MMIX-Expand">
+<link rel="next" href="MMIX_002dmmixal.html#MMIX_002dmmixal" title="MMIX-mmixal">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="MMIX-Syntax"></a>
+<a name="MMIX_002dSyntax"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="MMIX_002dmmixal.html#MMIX_002dmmixal">MMIX-mmixal</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="MMIX_002dExpand.html#MMIX_002dExpand">MMIX-Expand</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="MMIX_002dDependent.html#MMIX_002dDependent">MMIX-Dependent</a>
+<hr>
+</div>
+
+<h4 class="subsection">9.25.3 Syntax</h4>
+
+<p>The assembly syntax is supposed to be upward compatible with that
+described in Sections 1.3 and 1.4 of &lsquo;<samp><span class="samp">The Art of Computer
+Programming, Volume 1</span></samp>&rsquo;.  Draft versions of those chapters as well as other
+MMIX information is located at
+<a name="mmixsite"></a><a href="http://www-cs-faculty.stanford.edu/~knuth/mmix-news.html">http://www-cs-faculty.stanford.edu/~knuth/mmix-news.html</a>. 
+Most code examples from the mmixal package located there should work
+unmodified when assembled and linked as single files, with a few
+noteworthy exceptions (see <a href="MMIX_002dmmixal.html#MMIX_002dmmixal">MMIX-mmixal</a>).
+
+   <p>Before an instruction is emitted, the current location is aligned to the
+next four-byte boundary.  If a label is defined at the beginning of the
+line, its value will be the aligned value.
+
+   <p>In addition to the traditional hex-prefix &lsquo;<samp><span class="samp">0x</span></samp>&rsquo;, a hexadecimal number
+can also be specified by the prefix character &lsquo;<samp><span class="samp">#</span></samp>&rsquo;.
+
+   <p>After all operands to an MMIX instruction or directive have been
+specified, the rest of the line is ignored, treated as a comment.
+
+<ul class="menu">
+<li><a accesskey="1" href="MMIX_002dChars.html#MMIX_002dChars">MMIX-Chars</a>: 		        Special Characters
+<li><a accesskey="2" href="MMIX_002dSymbols.html#MMIX_002dSymbols">MMIX-Symbols</a>: 		Symbols
+<li><a accesskey="3" href="MMIX_002dRegs.html#MMIX_002dRegs">MMIX-Regs</a>: 			Register Names
+<li><a accesskey="4" href="MMIX_002dPseudos.html#MMIX_002dPseudos">MMIX-Pseudos</a>: 		Assembler Directives
+</ul>
+
+   </body></html>
+

@@ -1,0 +1,178 @@
+<html lang="en">
+<head>
+<title>Emacs - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="TUI.html#TUI" title="TUI">
+<link rel="next" href="GDB_002fMI.html#GDB_002fMI" title="GDB/MI">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Emacs"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="GDB_002fMI.html#GDB_002fMI">GDB/MI</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="TUI.html#TUI">TUI</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">26 Using <span class="sc">gdb</span> under <span class="sc">gnu</span> Emacs</h2>
+
+<p><a name="index-Emacs-1998"></a><a name="index-g_t_0040sc_007bgnu_007d-Emacs-1999"></a>A special interface allows you to use <span class="sc">gnu</span> Emacs to view (and
+edit) the source files for the program you are debugging with
+<span class="sc">gdb</span>.
+
+   <p>To use this interface, use the command <kbd>M-x gdb</kbd> in Emacs.  Give the
+executable file you want to debug as an argument.  This command starts
+<span class="sc">gdb</span> as a subprocess of Emacs, with input and output through a newly
+created Emacs buffer. 
+<!-- (Do not use the @code{-tui} option to run @value{GDBN} from Emacs.) -->
+
+   <p>Running <span class="sc">gdb</span> under Emacs can be just like running <span class="sc">gdb</span> normally except for two
+things:
+
+     <ul>
+<li>All &ldquo;terminal&rdquo; input and output goes through an Emacs buffer, called
+the GUD buffer.
+
+     <p>This applies both to <span class="sc">gdb</span> commands and their output, and to the input
+and output done by the program you are debugging.
+
+     <p>This is useful because it means that you can copy the text of previous
+commands and input them again; you can even use parts of the output
+in this way.
+
+     <p>All the facilities of Emacs' Shell mode are available for interacting
+with your program.  In particular, you can send signals the usual
+way&mdash;for example, <kbd>C-c C-c</kbd> for an interrupt, <kbd>C-c C-z</kbd> for a
+stop.
+
+     <li><span class="sc">gdb</span> displays source code through Emacs.
+
+     <p>Each time <span class="sc">gdb</span> displays a stack frame, Emacs automatically finds the
+source file for that frame and puts an arrow (&lsquo;<samp><span class="samp">=&gt;</span></samp>&rsquo;) at the
+left margin of the current line.  Emacs uses a separate buffer for
+source display, and splits the screen to show both your <span class="sc">gdb</span> session
+and the source.
+
+     <p>Explicit <span class="sc">gdb</span> <code>list</code> or search commands still produce output as
+usual, but you probably have no reason to use them from Emacs. 
+</ul>
+
+   <p>We call this <dfn>text command mode</dfn>.  Emacs 22.1, and later, also uses
+a graphical mode, enabled by default, which provides further buffers
+that can control the execution and describe the state of your program. 
+See <a href="../Emacs/GDB-Graphical-Interface.html#GDB-Graphical-Interface">GDB Graphical Interface</a>.
+
+   <p>If you specify an absolute file name when prompted for the <kbd>M-x
+gdb</kbd> argument, then Emacs sets your current working directory to where
+your program resides.  If you only specify the file name, then Emacs
+sets your current working directory to to the directory associated
+with the previous buffer.  In this case, <span class="sc">gdb</span> may find your
+program by searching your environment's <code>PATH</code> variable, but on
+some operating systems it might not find the source.  So, although the
+<span class="sc">gdb</span> input and output session proceeds normally, the auxiliary
+buffer does not display the current source and line of execution.
+
+   <p>The initial working directory of <span class="sc">gdb</span> is printed on the top
+line of the GUD buffer and this serves as a default for the commands
+that specify files for <span class="sc">gdb</span> to operate on.  See <a href="Files.html#Files">Commands to Specify Files</a>.
+
+   <p>By default, <kbd>M-x gdb</kbd> calls the program called <samp><span class="file">gdb</span></samp>.  If you
+need to call <span class="sc">gdb</span> by a different name (for example, if you
+keep several configurations around, with different names) you can
+customize the Emacs variable <code>gud-gdb-command-name</code> to run the
+one you want.
+
+   <p>In the GUD buffer, you can use these special Emacs commands in
+addition to the standard Shell mode commands:
+
+     <dl>
+<dt><kbd>C-h m</kbd><dd>Describe the features of Emacs' GUD Mode.
+
+     <br><dt><kbd>C-c C-s</kbd><dd>Execute to another source line, like the <span class="sc">gdb</span> <code>step</code> command; also
+update the display window to show the current file and location.
+
+     <br><dt><kbd>C-c C-n</kbd><dd>Execute to next source line in this function, skipping all function
+calls, like the <span class="sc">gdb</span> <code>next</code> command.  Then update the display window
+to show the current file and location.
+
+     <br><dt><kbd>C-c C-i</kbd><dd>Execute one instruction, like the <span class="sc">gdb</span> <code>stepi</code> command; update
+display window accordingly.
+
+     <br><dt><kbd>C-c C-f</kbd><dd>Execute until exit from the selected stack frame, like the <span class="sc">gdb</span>
+<code>finish</code> command.
+
+     <br><dt><kbd>C-c C-r</kbd><dd>Continue execution of your program, like the <span class="sc">gdb</span> <code>continue</code>
+command.
+
+     <br><dt><kbd>C-c &lt;</kbd><dd>Go up the number of frames indicated by the numeric argument
+(see <a href="../Emacs/Arguments.html#Arguments">Numeric Arguments</a>),
+like the <span class="sc">gdb</span> <code>up</code> command.
+
+     <br><dt><kbd>C-c &gt;</kbd><dd>Go down the number of frames indicated by the numeric argument, like the
+<span class="sc">gdb</span> <code>down</code> command. 
+</dl>
+
+   <p>In any source file, the Emacs command <kbd>C-x &lt;SPC&gt;</kbd> (<code>gud-break</code>)
+tells <span class="sc">gdb</span> to set a breakpoint on the source line point is on.
+
+   <p>In text command mode, if you type <kbd>M-x speedbar</kbd>, Emacs displays a
+separate frame which shows a backtrace when the GUD buffer is current. 
+Move point to any frame in the stack and type &lt;RET&gt; to make it
+become the current frame and display the associated source in the
+source buffer.  Alternatively, click <kbd>Mouse-2</kbd> to make the
+selected frame become the current one.  In graphical mode, the
+speedbar displays watch expressions.
+
+   <p>If you accidentally delete the source-display buffer, an easy way to get
+it back is to type the command <code>f</code> in the <span class="sc">gdb</span> buffer, to
+request a frame display; when you run under Emacs, this recreates
+the source buffer if necessary to show you the context of the current
+frame.
+
+   <p>The source files displayed in Emacs are in ordinary Emacs buffers
+which are visiting the source files in the usual way.  You can edit
+the files with these buffers if you wish; but keep in mind that <span class="sc">gdb</span>
+communicates with Emacs in terms of line numbers.  If you add or
+delete lines from the text, the line numbers that <span class="sc">gdb</span> knows cease
+to correspond properly with the code.
+
+   <p>A more detailed description of Emacs' interaction with <span class="sc">gdb</span> is
+given in the Emacs manual (see <a href="../Emacs/Debuggers.html#Debuggers">Debuggers</a>).
+
+<!-- The following dropped because Epoch is nonstandard.  Reactivate -->
+<!-- if/when v19 does something similar. -doc@cygnus.com 19dec1990 -->
+   </body></html>
+

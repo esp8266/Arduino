@@ -1,0 +1,65 @@
+<html lang="en">
+<head>
+<title>D10V-Size - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="D10V_002dSyntax.html#D10V_002dSyntax" title="D10V-Syntax">
+<link rel="next" href="D10V_002dSubs.html#D10V_002dSubs" title="D10V-Subs">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="D10V-Size"></a>
+<a name="D10V_002dSize"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="D10V_002dSubs.html#D10V_002dSubs">D10V-Subs</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="D10V_002dSyntax.html#D10V_002dSyntax">D10V-Syntax</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">9.8.2.1 Size Modifiers</h5>
+
+<p><a name="index-D10V-size-modifiers-754"></a><a name="index-size-modifiers_002c-D10V-755"></a>The D10V version of <code>as</code> uses the instruction names in the D10V
+Architecture Manual.  However, the names in the manual are sometimes ambiguous. 
+There are instruction names that can assemble to a short or long form opcode. 
+How does the assembler pick the correct form?  <code>as</code> will always pick the
+smallest form if it can.  When dealing with a symbol that is not defined yet when a
+line is being assembled, it will always use the long form.  If you need to force the
+assembler to use either the short or long form of the instruction, you can append
+either &lsquo;<samp><span class="samp">.s</span></samp>&rsquo; (short) or &lsquo;<samp><span class="samp">.l</span></samp>&rsquo; (long) to it.  For example, if you are writing
+an assembly program and you want to do a branch to a symbol that is defined later
+in your program, you can write &lsquo;<samp><span class="samp">bra.s   foo</span></samp>&rsquo;. 
+Objdump and GDB will always append &lsquo;<samp><span class="samp">.s</span></samp>&rsquo; or &lsquo;<samp><span class="samp">.l</span></samp>&rsquo; to instructions which
+have both short and long forms.
+
+   </body></html>
+

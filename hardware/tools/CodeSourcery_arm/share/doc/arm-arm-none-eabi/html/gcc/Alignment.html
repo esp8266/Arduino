@@ -1,0 +1,89 @@
+<html lang="en">
+<head>
+<title>Alignment - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Type-Attributes.html#Type-Attributes" title="Type Attributes">
+<link rel="next" href="Inline.html#Inline" title="Inline">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Alignment"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Inline.html#Inline">Inline</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Type-Attributes.html#Type-Attributes">Type Attributes</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.35 Inquiring on Alignment of Types or Variables</h3>
+
+<p><a name="index-alignment-2481"></a><a name="index-type-alignment-2482"></a><a name="index-variable-alignment-2483"></a>
+The keyword <code>__alignof__</code> allows you to inquire about how an object
+is aligned, or the minimum alignment usually required by a type.  Its
+syntax is just like <code>sizeof</code>.
+
+ <p>For example, if the target machine requires a <code>double</code> value to be
+aligned on an 8-byte boundary, then <code>__alignof__ (double)</code> is 8. 
+This is true on many RISC machines.  On more traditional machine
+designs, <code>__alignof__ (double)</code> is 4 or even 2.
+
+ <p>Some machines never actually require alignment; they allow reference to any
+data type even at an odd address.  For these machines, <code>__alignof__</code>
+reports the smallest alignment that GCC will give the data type, usually as
+mandated by the target ABI.
+
+ <p>If the operand of <code>__alignof__</code> is an lvalue rather than a type,
+its value is the required alignment for its type, taking into account
+any minimum alignment specified with GCC's <code>__attribute__</code>
+extension (see <a href="Variable-Attributes.html#Variable-Attributes">Variable Attributes</a>).  For example, after this
+declaration:
+
+<pre class="smallexample">     struct foo { int x; char y; } foo1;
+</pre>
+ <p class="noindent">the value of <code>__alignof__ (foo1.y)</code> is 1, even though its actual
+alignment is probably 2 or 4, the same as <code>__alignof__ (int)</code>.
+
+ <p>It is an error to ask for the alignment of an incomplete type.
+
+ </body></html>
+

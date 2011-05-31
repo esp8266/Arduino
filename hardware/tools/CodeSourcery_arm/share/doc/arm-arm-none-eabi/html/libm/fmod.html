@@ -1,0 +1,67 @@
+<html lang="en">
+<head>
+<title>fmod - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Math.html#Math" title="Math">
+<link rel="prev" href="fmin.html#fmin" title="fmin">
+<link rel="next" href="fpclassify.html#fpclassify" title="fpclassify">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="fmod"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="fpclassify.html#fpclassify">fpclassify</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="fmin.html#fmin">fmin</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Math.html#Math">Math</a>
+<hr>
+</div>
+
+<h3 class="section">1.24 <code>fmod</code>, <code>fmodf</code>&mdash;floating-point remainder (modulo)</h3>
+
+<p><a name="index-fmod-59"></a><a name="index-fmodf-60"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double fmod(double <var>x</var>, double <var>y</var>)
+     float fmodf(float <var>x</var>, float <var>y</var>)
+     
+</pre>
+   <p><strong>Description</strong><br>
+The <code>fmod</code> and <code>fmodf</code> functions compute the floating-point
+remainder of <var>x</var>/<var>y</var> (<var>x</var> modulo <var>y</var>).
+
+   <p><br>
+<strong>Returns</strong><br>
+The <code>fmod</code> function returns the value
+<var>x</var>-<var>i</var>*<var>y</var>,
+for the largest integer <var>i</var> such that, if <var>y</var> is nonzero, the
+result has the same sign as <var>x</var> and magnitude less than the
+magnitude of <var>y</var>.
+
+   <p><code>fmod(</code><var>x</var><code>,0)</code> returns NaN, and sets <code>errno</code> to <code>EDOM</code>.
+
+   <p>You can modify error treatment for these functions using <code>matherr</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>fmod</code> is ANSI C. <code>fmodf</code> is an extension.
+
+   <p><br>
+
+   </body></html>
+

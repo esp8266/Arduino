@@ -1,0 +1,336 @@
+<html lang="en">
+<head>
+<title>ARM Options - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="ARM_002dDependent.html#ARM_002dDependent" title="ARM-Dependent">
+<link rel="next" href="ARM-Syntax.html#ARM-Syntax" title="ARM Syntax">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="ARM-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="ARM-Syntax.html#ARM-Syntax">ARM Syntax</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="ARM_002dDependent.html#ARM_002dDependent">ARM-Dependent</a>
+<hr>
+</div>
+
+<h4 class="subsection">9.3.1 Options</h4>
+
+<p><a name="index-ARM-options-_0028none_0029-569"></a><a name="index-options-for-ARM-_0028none_0029-570"></a>
+     
+<a name="index-g_t_0040code_007b_002dmcpu_003d_007d-command-line-option_002c-ARM-571"></a>
+<dl><dt><code>-mcpu=</code><var>processor</var><code>[+</code><var>extension</var><code>...]</code><dd>This option specifies the target processor.  The assembler will issue an
+error message if an attempt is made to assemble an instruction which
+will not execute on the target processor.  The following processor names are
+recognized:
+<code>arm1</code>,
+<code>arm2</code>,
+<code>arm250</code>,
+<code>arm3</code>,
+<code>arm6</code>,
+<code>arm60</code>,
+<code>arm600</code>,
+<code>arm610</code>,
+<code>arm620</code>,
+<code>arm7</code>,
+<code>arm7m</code>,
+<code>arm7d</code>,
+<code>arm7dm</code>,
+<code>arm7di</code>,
+<code>arm7dmi</code>,
+<code>arm70</code>,
+<code>arm700</code>,
+<code>arm700i</code>,
+<code>arm710</code>,
+<code>arm710t</code>,
+<code>arm720</code>,
+<code>arm720t</code>,
+<code>arm740t</code>,
+<code>arm710c</code>,
+<code>arm7100</code>,
+<code>arm7500</code>,
+<code>arm7500fe</code>,
+<code>arm7t</code>,
+<code>arm7tdmi</code>,
+<code>arm7tdmi-s</code>,
+<code>arm8</code>,
+<code>arm810</code>,
+<code>strongarm</code>,
+<code>strongarm1</code>,
+<code>strongarm110</code>,
+<code>strongarm1100</code>,
+<code>strongarm1110</code>,
+<code>arm9</code>,
+<code>arm920</code>,
+<code>arm920t</code>,
+<code>arm922t</code>,
+<code>arm940t</code>,
+<code>arm9tdmi</code>,
+<code>fa526</code> (Faraday FA526 processor),
+<code>fa626</code> (Faraday FA626 processor),
+<code>arm9e</code>,
+<code>arm926e</code>,
+<code>arm926ej-s</code>,
+<code>arm946e-r0</code>,
+<code>arm946e</code>,
+<code>arm946e-s</code>,
+<code>arm966e-r0</code>,
+<code>arm966e</code>,
+<code>arm966e-s</code>,
+<code>arm968e-s</code>,
+<code>arm10t</code>,
+<code>arm10tdmi</code>,
+<code>arm10e</code>,
+<code>arm1020</code>,
+<code>arm1020t</code>,
+<code>arm1020e</code>,
+<code>arm1022e</code>,
+<code>arm1026ej-s</code>,
+<code>fa626te</code> (Faraday FA626TE processor),
+<code>fa726te</code> (Faraday FA726TE processor),
+<code>arm1136j-s</code>,
+<code>arm1136jf-s</code>,
+<code>arm1156t2-s</code>,
+<code>arm1156t2f-s</code>,
+<code>arm1176jz-s</code>,
+<code>arm1176jzf-s</code>,
+<code>mpcore</code>,
+<code>mpcorenovfp</code>,
+<code>cortex-a5</code>,
+<code>cortex-a8</code>,
+<code>cortex-a9</code>,
+<code>cortex-a15</code>,
+<code>cortex-r4</code>,
+<code>cortex-r4f</code>,
+<code>cortex-m4</code>,
+<code>cortex-m3</code>,
+<code>cortex-m1</code>,
+<code>cortex-m0</code>,
+<code>ep9312</code> (ARM920 with Cirrus Maverick coprocessor),
+<code>i80200</code> (Intel XScale processor)
+<code>iwmmxt</code> (Intel(r) XScale processor with Wireless MMX(tm) technology coprocessor)
+and
+<code>xscale</code>. 
+The special name <code>all</code> may be used to allow the
+assembler to accept instructions valid for any ARM processor.
+
+     <p>In addition to the basic instruction set, the assembler can be told to
+accept various extension mnemonics that extend the processor using the
+co-processor instruction space.  For example, <code>-mcpu=arm920+maverick</code>
+is equivalent to specifying <code>-mcpu=ep9312</code>.
+
+     <p>Multiple extensions may be specified, separated by a <code>+</code>.  The
+extensions should be specified in ascending alphabetical order.
+
+     <p>Some extensions may be restricted to particular architectures; this is
+documented in the list of extensions below.
+
+     <p>Extension mnemonics may also be removed from those the assembler accepts. 
+This is done be prepending <code>no</code> to the option that adds the extension. 
+Extensions that are removed should be listed after all extensions which have
+been added, again in ascending alphabetical order.  For example,
+<code>-mcpu=ep9312+nomaverick</code> is equivalent to specifying <code>-mcpu=arm920</code>.
+
+     <p>The following extensions are currently supported:
+<code>idiv</code>, (Integer Divide Extensions for v7-A and v7-R architectures),
+<code>iwmmxt</code>,
+<code>iwmmxt2</code>,
+<code>maverick</code>,
+<code>mp</code> (Multiprocessing Extensions for v7-A and v7-R architectures),
+<code>os</code> (Operating System for v6M architecture),
+<code>sec</code> (Security Extensions for v6K and v7-A architectures),
+<code>virt</code> (Virtualization Extensions for v7-A architecture, implies
+<code>idiv</code>),
+and
+<code>xscale</code>.
+
+     <p><a name="index-g_t_0040code_007b_002dmarch_003d_007d-command-line-option_002c-ARM-572"></a><br><dt><code>-march=</code><var>architecture</var><code>[+</code><var>extension</var><code>...]</code><dd>This option specifies the target architecture.  The assembler will issue
+an error message if an attempt is made to assemble an instruction which
+will not execute on the target architecture.  The following architecture
+names are recognized:
+<code>armv1</code>,
+<code>armv2</code>,
+<code>armv2a</code>,
+<code>armv2s</code>,
+<code>armv3</code>,
+<code>armv3m</code>,
+<code>armv4</code>,
+<code>armv4xm</code>,
+<code>armv4t</code>,
+<code>armv4txm</code>,
+<code>armv5</code>,
+<code>armv5t</code>,
+<code>armv5txm</code>,
+<code>armv5te</code>,
+<code>armv5texp</code>,
+<code>armv6</code>,
+<code>armv6j</code>,
+<code>armv6k</code>,
+<code>armv6z</code>,
+<code>armv6zk</code>,
+<code>armv6-m</code>,
+<code>armv6s-m</code>,
+<code>armv7</code>,
+<code>armv7-a</code>,
+<code>armv7-r</code>,
+<code>armv7-m</code>,
+<code>armv7e-m</code>,
+<code>iwmmxt</code>
+and
+<code>xscale</code>. 
+If both <code>-mcpu</code> and
+<code>-march</code> are specified, the assembler will use
+the setting for <code>-mcpu</code>.
+
+     <p>The architecture option can be extended with the same instruction set
+extension options as the <code>-mcpu</code> option.
+
+     <p><a name="index-g_t_0040code_007b_002dmfpu_003d_007d-command-line-option_002c-ARM-573"></a><br><dt><code>-mfpu=</code><var>floating-point-format</var><dd>
+This option specifies the floating point format to assemble for.  The
+assembler will issue an error message if an attempt is made to assemble
+an instruction which will not execute on the target floating point unit. 
+The following format options are recognized:
+<code>softfpa</code>,
+<code>fpe</code>,
+<code>fpe2</code>,
+<code>fpe3</code>,
+<code>fpa</code>,
+<code>fpa10</code>,
+<code>fpa11</code>,
+<code>arm7500fe</code>,
+<code>softvfp</code>,
+<code>softvfp+vfp</code>,
+<code>vfp</code>,
+<code>vfp10</code>,
+<code>vfp10-r0</code>,
+<code>vfp9</code>,
+<code>vfpxd</code>,
+<code>vfpv2</code>,
+<code>vfpv3</code>,
+<code>vfpv3-fp16</code>,
+<code>vfpv3-d16</code>,
+<code>vfpv3-d16-fp16</code>,
+<code>vfpv3xd</code>,
+<code>vfpv3xd-d16</code>,
+<code>vfpv4</code>,
+<code>vfpv4-d16</code>,
+<code>fpv4-sp-d16</code>,
+<code>arm1020t</code>,
+<code>arm1020e</code>,
+<code>arm1136jf-s</code>,
+<code>maverick</code>,
+<code>neon</code>,
+and
+<code>neon-vfpv4</code>.
+
+     <p>In addition to determining which instructions are assembled, this option
+also affects the way in which the <code>.double</code> assembler directive behaves
+when assembling little-endian code.
+
+     <p>The default is dependent on the processor selected.  For Architecture 5 or
+later, the default is to assembler for VFP instructions; for earlier
+architectures the default is to assemble for FPA instructions.
+
+     <p><a name="index-g_t_0040code_007b_002dmthumb_007d-command-line-option_002c-ARM-574"></a><br><dt><code>-mthumb</code><dd>This option specifies that the assembler should start assembling Thumb
+instructions; that is, it should behave as though the file starts with a
+<code>.code 16</code> directive.
+
+     <p><a name="index-g_t_0040code_007b_002dmthumb_002dinterwork_007d-command-line-option_002c-ARM-575"></a><br><dt><code>-mthumb-interwork</code><dd>This option specifies that the output generated by the assembler should
+be marked as supporting interworking.
+
+     <p><a name="index-g_t_0040code_007b_002dmimplicit_002dit_007d-command-line-option_002c-ARM-576"></a><br><dt><code>-mimplicit-it=never</code><dt><code>-mimplicit-it=always</code><dt><code>-mimplicit-it=arm</code><dt><code>-mimplicit-it=thumb</code><dd>The <code>-mimplicit-it</code> option controls the behavior of the assembler when
+conditional instructions are not enclosed in IT blocks. 
+There are four possible behaviors. 
+If <code>never</code> is specified, such constructs cause a warning in ARM
+code and an error in Thumb-2 code. 
+If <code>always</code> is specified, such constructs are accepted in both
+ARM and Thumb-2 code, where the IT instruction is added implicitly. 
+If <code>arm</code> is specified, such constructs are accepted in ARM code
+and cause an error in Thumb-2 code. 
+If <code>thumb</code> is specified, such constructs cause a warning in ARM
+code and are accepted in Thumb-2 code.  If you omit this option, the
+behavior is equivalent to <code>-mimplicit-it=arm</code>.
+
+     <p><a name="index-g_t_0040code_007b_002dmapcs_002d26_007d-command-line-option_002c-ARM-577"></a><a name="index-g_t_0040code_007b_002dmapcs_002d32_007d-command-line-option_002c-ARM-578"></a><br><dt><code>-mapcs-26</code><dt><code>-mapcs-32</code><dd>These options specify that the output generated by the assembler should
+be marked as supporting the indicated version of the Arm Procedure. 
+Calling Standard.
+
+     <p><a name="index-g_t_0040code_007b_002dmatpcs_007d-command-line-option_002c-ARM-579"></a><br><dt><code>-matpcs</code><dd>This option specifies that the output generated by the assembler should
+be marked as supporting the Arm/Thumb Procedure Calling Standard.  If
+enabled this option will cause the assembler to create an empty
+debugging section in the object file called .arm.atpcs.  Debuggers can
+use this to determine the ABI being used by.
+
+     <p><a name="index-g_t_0040code_007b_002dmapcs_002dfloat_007d-command-line-option_002c-ARM-580"></a><br><dt><code>-mapcs-float</code><dd>This indicates the floating point variant of the APCS should be
+used.  In this variant floating point arguments are passed in FP
+registers rather than integer registers.
+
+     <p><a name="index-g_t_0040code_007b_002dmapcs_002dreentrant_007d-command-line-option_002c-ARM-581"></a><br><dt><code>-mapcs-reentrant</code><dd>This indicates that the reentrant variant of the APCS should be used. 
+This variant supports position independent code.
+
+     <p><a name="index-g_t_0040code_007b_002dmfloat_002dabi_003d_007d-command-line-option_002c-ARM-582"></a><br><dt><code>-mfloat-abi=</code><var>abi</var><dd>This option specifies that the output generated by the assembler should be
+marked as using specified floating point ABI. 
+The following values are recognized:
+<code>soft</code>,
+<code>softfp</code>
+and
+<code>hard</code>.
+
+     <p><a name="index-g_t_0040code_007b_002deabi_003d_007d-command-line-option_002c-ARM-583"></a><br><dt><code>-meabi=</code><var>ver</var><dd>This option specifies which EABI version the produced object files should
+conform to. 
+The following values are recognized:
+<code>gnu</code>,
+<code>4</code>
+and
+<code>5</code>.
+
+     <p><a name="index-g_t_0040code_007b_002dEB_007d-command-line-option_002c-ARM-584"></a><br><dt><code>-EB</code><dd>This option specifies that the output generated by the assembler should
+be marked as being encoded for a big-endian processor.
+
+     <p><a name="index-g_t_0040code_007b_002dEL_007d-command-line-option_002c-ARM-585"></a><br><dt><code>-EL</code><dd>This option specifies that the output generated by the assembler should
+be marked as being encoded for a little-endian processor.
+
+     <p><a name="index-g_t_0040code_007b_002dk_007d-command-line-option_002c-ARM-586"></a><a name="index-PIC-code-generation-for-ARM-587"></a><br><dt><code>-k</code><dd>This option specifies that the output of the assembler should be marked
+as position-independent code (PIC).
+
+     <p><a name="index-g_t_0040code_007b_002d_002dfix_002dv4bx_007d-command-line-option_002c-ARM-588"></a><br><dt><code>--fix-v4bx</code><dd>Allow <code>BX</code> instructions in ARMv4 code.  This is intended for use with
+the linker option of the same name.
+
+     <p><a name="index-g_t_0040code_007b_002dmwarn_002ddeprecated_007d-command-line-option_002c-ARM-589"></a><br><dt><code>-mwarn-deprecated</code><dt><code>-mno-warn-deprecated</code><dd>Enable or disable warnings about using deprecated options or
+features.  The default is to warn.
+
+   </dl>
+
+   </body></html>
+

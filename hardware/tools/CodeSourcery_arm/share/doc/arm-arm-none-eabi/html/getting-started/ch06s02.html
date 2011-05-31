@@ -1,0 +1,52 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>6.2. Debug Sprite Example</title><link rel="stylesheet" href="cs.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.74.0"><link rel="home" href="index.html" title="Sourcery G++ Lite"><link rel="up" href="sprite.html" title="Chapter 6. Sourcery G++ Debug Sprite"><link rel="prev" href="sprite.html" title="Chapter 6. Sourcery G++ Debug Sprite"><link rel="next" href="sec-sprite-invocation.html" title="6.3. Invoking Sourcery G++ Debug Sprite"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">6.2. Debug Sprite Example</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="sprite.html">Prev</a> </td><th width="60%" align="center">Chapter 6. Sourcery G++ Debug Sprite</th><td width="20%" align="right"> <a accesskey="n" href="sec-sprite-invocation.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="id283083"></a>6.2. Debug Sprite Example</h2></div></div></div><p>
+    Start by compiling and linking a simple test program for your target
+    board, following the instructions in <a class="xref" href="chap-building.html" title="Chapter 4. Using Sourcery G++ from the Command Line">Chapter 4, &#8220;Using Sourcery G++ from the Command Line&#8221;</a>.
+    Use the <code class="option">-g</code> option to tell the compiler to generate
+    debugging information.
+  </p><p>
+    To build the <code class="filename">factorial</code> program to
+    run on the ARMulator simulator, which can communicate with the Sprite
+    via the RDI protocol, use:
+
+    </p><pre class="screen">&gt; arm-none-eabi-gcc -g -Tarmulator-ram-hosted.ld main.c \
+    -o factorial</pre><p>
+  </p><p>
+    Next start the debugger on your host system:
+    </p><pre class="screen">&gt; arm-none-eabi-gdb factorial</pre><p>
+  </p><p>
+    The command for connecting GDB to the board depends on the 
+    debug device you are using; this is described in more detail in
+    <a class="xref" href="sec-sprite-invocation.html" title="6.3. Invoking Sourcery G++ Debug Sprite">Section 6.3, &#8220;Invoking Sourcery G++ Debug Sprite&#8221;</a>.
+
+    
+    
+
+    <span>
+      If you are connecting via RDI, you must specify the full path to
+      the RDI library file and configuration file for that library.  Use
+      quotes to escape the Sprite argument syntax from the shell.  For
+      example, use a command like this to connect to the ARMulator:
+    </span>
+    </p><pre class="screen">(gdb) target remote | arm-none-eabi-sprite \
+  "rdi:///?rdi-library=<em class="replaceable"><code>library</code></em>&amp;rdi-config=<em class="replaceable"><code>config</code></em>" armulator</pre><p>
+  </p><p>
+    The Sprite prints some status messages as it connects to your 
+    debug device and target board.  
+    If the connection is successful, you should see output similar to:
+
+    </p><pre class="screen">arm-none-eabi-sprite:Target reset
+0x00008936 in ?? ()
+(gdb)</pre><p>
+  </p><p>
+    Next, use GDB to load your program onto the target board.  
+    
+
+    </p><pre class="screen">(gdb) load</pre><p>
+
+  </p><p>
+    At this point you can use GDB to control the execution of your
+    program as required.  For example:
+
+    </p><pre class="screen">(gdb) break main
+(gdb) continue</pre><p>
+  </p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="sprite.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="sprite.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="sec-sprite-invocation.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter 6. Sourcery G++ Debug Sprite </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 6.3. Invoking Sourcery G++ Debug Sprite</td></tr></table></div></body></html>

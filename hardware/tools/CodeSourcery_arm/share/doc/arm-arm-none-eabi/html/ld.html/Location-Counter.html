@@ -1,0 +1,175 @@
+<html lang="en">
+<head>
+<title>Location Counter - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Expressions.html#Expressions" title="Expressions">
+<link rel="prev" href="Orphan-Sections.html#Orphan-Sections" title="Orphan Sections">
+<link rel="next" href="Operators.html#Operators" title="Operators">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Location-Counter"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Operators.html#Operators">Operators</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Orphan-Sections.html#Orphan-Sections">Orphan Sections</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Expressions.html#Expressions">Expressions</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.10.5 The Location Counter</h4>
+
+<p><a name="index-g_t_002e-505"></a><a name="index-dot-506"></a><a name="index-location-counter-507"></a><a name="index-current-output-location-508"></a>The special linker variable <dfn>dot</dfn> &lsquo;<samp><span class="samp">.</span></samp>&rsquo; always contains the
+current output location counter.  Since the <code>.</code> always refers to a
+location in an output section, it may only appear in an expression
+within a <code>SECTIONS</code> command.  The <code>.</code> symbol may appear
+anywhere that an ordinary symbol is allowed in an expression.
+
+   <p><a name="index-holes-509"></a>Assigning a value to <code>.</code> will cause the location counter to be
+moved.  This may be used to create holes in the output section.  The
+location counter may not be moved backwards inside an output section,
+and may not be moved backwards outside of an output section if so
+doing creates areas with overlapping LMAs.
+
+<pre class="smallexample">     SECTIONS
+     {
+       output :
+         {
+           file1(.text)
+           . = . + 1000;
+           file2(.text)
+           . += 1000;
+           file3(.text)
+         } = 0x12345678;
+     }
+</pre>
+   <p class="noindent">In the previous example, the &lsquo;<samp><span class="samp">.text</span></samp>&rsquo; section from <samp><span class="file">file1</span></samp> is
+located at the beginning of the output section &lsquo;<samp><span class="samp">output</span></samp>&rsquo;.  It is
+followed by a 1000 byte gap.  Then the &lsquo;<samp><span class="samp">.text</span></samp>&rsquo; section from
+<samp><span class="file">file2</span></samp> appears, also with a 1000 byte gap following before the
+&lsquo;<samp><span class="samp">.text</span></samp>&rsquo; section from <samp><span class="file">file3</span></samp>.  The notation &lsquo;<samp><span class="samp">= 0x12345678</span></samp>&rsquo;
+specifies what data to write in the gaps (see <a href="Output-Section-Fill.html#Output-Section-Fill">Output Section Fill</a>).
+
+   <p><a name="index-dot-inside-sections-510"></a>Note: <code>.</code> actually refers to the byte offset from the start of the
+current containing object.  Normally this is the <code>SECTIONS</code>
+statement, whose start address is 0, hence <code>.</code> can be used as an
+absolute address.  If <code>.</code> is used inside a section description
+however, it refers to the byte offset from the start of that section,
+not an absolute address.  Thus in a script like this:
+
+<pre class="smallexample">     SECTIONS
+     {
+         . = 0x100
+         .text: {
+           *(.text)
+           . = 0x200
+         }
+         . = 0x500
+         .data: {
+           *(.data)
+           . += 0x600
+         }
+     }
+</pre>
+   <p>The &lsquo;<samp><span class="samp">.text</span></samp>&rsquo; section will be assigned a starting address of 0x100
+and a size of exactly 0x200 bytes, even if there is not enough data in
+the &lsquo;<samp><span class="samp">.text</span></samp>&rsquo; input sections to fill this area.  (If there is too
+much data, an error will be produced because this would be an attempt to
+move <code>.</code> backwards).  The &lsquo;<samp><span class="samp">.data</span></samp>&rsquo; section will start at 0x500
+and it will have an extra 0x600 bytes worth of space after the end of
+the values from the &lsquo;<samp><span class="samp">.data</span></samp>&rsquo; input sections and before the end of
+the &lsquo;<samp><span class="samp">.data</span></samp>&rsquo; output section itself.
+
+   <p><a name="index-dot-outside-sections-511"></a>Setting symbols to the value of the location counter outside of an
+output section statement can result in unexpected values if the linker
+needs to place orphan sections.  For example, given the following:
+
+<pre class="smallexample">     SECTIONS
+     {
+         start_of_text = . ;
+         .text: { *(.text) }
+         end_of_text = . ;
+     
+         start_of_data = . ;
+         .data: { *(.data) }
+         end_of_data = . ;
+     }
+</pre>
+   <p>If the linker needs to place some input section, e.g. <code>.rodata</code>,
+not mentioned in the script, it might choose to place that section
+between <code>.text</code> and <code>.data</code>.  You might think the linker
+should place <code>.rodata</code> on the blank line in the above script, but
+blank lines are of no particular significance to the linker.  As well,
+the linker doesn't associate the above symbol names with their
+sections.  Instead, it assumes that all assignments or other
+statements belong to the previous output section, except for the
+special case of an assignment to <code>.</code>.  I.e., the linker will
+place the orphan <code>.rodata</code> section as if the script was written
+as follows:
+
+<pre class="smallexample">     SECTIONS
+     {
+         start_of_text = . ;
+         .text: { *(.text) }
+         end_of_text = . ;
+     
+         start_of_data = . ;
+         .rodata: { *(.rodata) }
+         .data: { *(.data) }
+         end_of_data = . ;
+     }
+</pre>
+   <p>This may or may not be the script author's intention for the value of
+<code>start_of_data</code>.  One way to influence the orphan section
+placement is to assign the location counter to itself, as the linker
+assumes that an assignment to <code>.</code> is setting the start address of
+a following output section and thus should be grouped with that
+section.  So you could write:
+
+<pre class="smallexample">     SECTIONS
+     {
+         start_of_text = . ;
+         .text: { *(.text) }
+         end_of_text = . ;
+     
+         . = . ;
+         start_of_data = . ;
+         .data: { *(.data) }
+         end_of_data = . ;
+     }
+</pre>
+   <p>Now, the orphan <code>.rodata</code> section will be placed between
+<code>end_of_text</code> and <code>start_of_data</code>.
+
+   </body></html>
+

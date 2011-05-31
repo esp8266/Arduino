@@ -1,0 +1,108 @@
+<html lang="en">
+<head>
+<title>Local Reg Vars - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Explicit-Reg-Vars.html#Explicit-Reg-Vars" title="Explicit Reg Vars">
+<link rel="prev" href="Global-Reg-Vars.html#Global-Reg-Vars" title="Global Reg Vars">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Local-Reg-Vars"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Global-Reg-Vars.html#Global-Reg-Vars">Global Reg Vars</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Explicit-Reg-Vars.html#Explicit-Reg-Vars">Explicit Reg Vars</a>
+<hr>
+</div>
+
+<h4 class="subsection">6.42.2 Specifying Registers for Local Variables</h4>
+
+<p><a name="index-local-variables_002c-specifying-registers-2598"></a><a name="index-specifying-registers-for-local-variables-2599"></a><a name="index-registers-for-local-variables-2600"></a>
+You can define a local register variable with a specified register
+like this:
+
+<pre class="smallexample">     register int *foo asm ("a5");
+</pre>
+ <p class="noindent">Here <code>a5</code> is the name of the register which should be used.  Note
+that this is the same syntax used for defining global register
+variables, but for a local variable it would appear within a function.
+
+ <p>Naturally the register name is cpu-dependent, but this is not a
+problem, since specific registers are most often useful with explicit
+assembler instructions (see <a href="Extended-Asm.html#Extended-Asm">Extended Asm</a>).  Both of these things
+generally require that you conditionalize your program according to
+cpu type.
+
+ <p>In addition, operating systems on one type of cpu may differ in how they
+name the registers; then you would need additional conditionals.  For
+example, some 68000 operating systems call this register <code>%a5</code>.
+
+ <p>Defining such a register variable does not reserve the register; it
+remains available for other uses in places where flow control determines
+the variable's value is not live.
+
+ <p>This option does not guarantee that GCC will generate code that has
+this variable in the register you specify at all times.  You may not
+code an explicit reference to this register in the <em>assembler
+instruction template</em> part of an <code>asm</code> statement and assume it will
+always refer to this variable.  However, using the variable as an
+<code>asm</code> <em>operand</em> guarantees that the specified register is used
+for the operand.
+
+ <p>Stores into local register variables may be deleted when they appear to be dead
+according to dataflow analysis.  References to local register variables may
+be deleted or moved or simplified.
+
+ <p>As for global register variables, it's recommended that you choose a
+register which is normally saved and restored by function calls on
+your machine, so that library routines will not clobber it.  A common
+pitfall is to initialize multiple call-clobbered registers with
+arbitrary expressions, where a function call or library call for an
+arithmetic operator will overwrite a register value from a previous
+assignment, for example <code>r0</code> below:
+<pre class="smallexample">     register int *p1 asm ("r0") = ...;
+     register int *p2 asm ("r1") = ...;
+</pre>
+ <p>In those cases, a solution is to use a temporary variable for
+each arbitrary expression.   See <a href="Example-of-asm-with-clobbered-asm-reg.html#Example-of-asm-with-clobbered-asm-reg">Example of asm with clobbered asm reg</a>.
+
+ </body></html>
+

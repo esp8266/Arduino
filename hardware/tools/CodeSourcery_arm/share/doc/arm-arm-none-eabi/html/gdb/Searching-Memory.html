@@ -1,0 +1,135 @@
+<html lang="en">
+<head>
+<title>Searching Memory - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Data.html#Data" title="Data">
+<link rel="prev" href="Caching-Remote-Data.html#Caching-Remote-Data" title="Caching Remote Data">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Searching-Memory"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Caching-Remote-Data.html#Caching-Remote-Data">Caching Remote Data</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Data.html#Data">Data</a>
+<hr>
+</div>
+
+<h3 class="section">10.21 Search Memory</h3>
+
+<p><a name="index-searching-memory-659"></a>
+Memory can be searched for a particular sequence of bytes with the
+<code>find</code> command.
+
+     
+<a name="index-find-660"></a>
+<dl><dt><code>find </code><span class="roman">[</span><code>/</code><var>sn</var><span class="roman">]</span> <var>start_addr</var><code>, +</code><var>len</var><code>, </code><var>val1</var> <span class="roman">[</span><code>, </code><var>val2</var><code>, ...</code><span class="roman">]</span><dt><code>find </code><span class="roman">[</span><code>/</code><var>sn</var><span class="roman">]</span> <var>start_addr</var><code>, </code><var>end_addr</var><code>, </code><var>val1</var> <span class="roman">[</span><code>, </code><var>val2</var><code>, ...</code><span class="roman">]</span><dd>Search memory for the sequence of bytes specified by <var>val1</var>, <var>val2</var>,
+etc.  The search begins at address <var>start_addr</var> and continues for either
+<var>len</var> bytes or through to <var>end_addr</var> inclusive. 
+</dl>
+
+   <p><var>s</var> and <var>n</var> are optional parameters. 
+They may be specified in either order, apart or together.
+
+     <dl>
+<dt><var>s</var><span class="roman">, search query size</span><dd>The size of each search query value.
+
+          <dl>
+<dt><code>b</code><dd>bytes
+<br><dt><code>h</code><dd>halfwords (two bytes)
+<br><dt><code>w</code><dd>words (four bytes)
+<br><dt><code>g</code><dd>giant words (eight bytes)
+</dl>
+
+     <p>All values are interpreted in the current language. 
+This means, for example, that if the current source language is C/C<tt>++</tt>
+then searching for the string &ldquo;hello&rdquo; includes the trailing '\0'.
+
+     <p>If the value size is not specified, it is taken from the
+value's type in the current language. 
+This is useful when one wants to specify the search
+pattern as a mixture of types. 
+Note that this means, for example, that in the case of C-like languages
+a search for an untyped 0x42 will search for &lsquo;<samp><span class="samp">(int) 0x42</span></samp>&rsquo;
+which is typically four bytes.
+
+     <br><dt><var>n</var><span class="roman">, maximum number of finds</span><dd>The maximum number of matches to print.  The default is to print all finds. 
+</dl>
+
+   <p>You can use strings as search values.  Quote them with double-quotes
+ (<code>"</code>). 
+The string value is copied into the search pattern byte by byte,
+regardless of the endianness of the target and the size specification.
+
+   <p>The address of each match found is printed as well as a count of the
+number of matches found.
+
+   <p>The address of the last value found is stored in convenience variable
+&lsquo;<samp><span class="samp">$_</span></samp>&rsquo;. 
+A count of the number of matches is stored in &lsquo;<samp><span class="samp">$numfound</span></samp>&rsquo;.
+
+   <p>For example, if stopped at the <code>printf</code> in this function:
+
+<pre class="smallexample">     void
+     hello ()
+     {
+       static char hello[] = "hello-hello";
+       static struct { char c; short s; int i; }
+         __attribute__ ((packed)) mixed
+         = { 'c', 0x1234, 0x87654321 };
+       printf ("%s\n", hello);
+     }
+</pre>
+   <p class="noindent">you get during debugging:
+
+<pre class="smallexample">     (gdb) find &amp;hello[0], +sizeof(hello), "hello"
+     0x804956d &lt;hello.1620+6&gt;
+     1 pattern found
+     (gdb) find &amp;hello[0], +sizeof(hello), 'h', 'e', 'l', 'l', 'o'
+     0x8049567 &lt;hello.1620&gt;
+     0x804956d &lt;hello.1620+6&gt;
+     2 patterns found
+     (gdb) find /b1 &amp;hello[0], +sizeof(hello), 'h', 0x65, 'l'
+     0x8049567 &lt;hello.1620&gt;
+     1 pattern found
+     (gdb) find &amp;mixed, +sizeof(mixed), (char) 'c', (short) 0x1234, (int) 0x87654321
+     0x8049560 &lt;mixed.1625&gt;
+     1 pattern found
+     (gdb) print $numfound
+     $1 = 1
+     (gdb) print $_
+     $2 = (void *) 0x8049560
+</pre>
+   </body></html>
+

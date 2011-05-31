@@ -1,0 +1,126 @@
+<html lang="en">
+<head>
+<title>Xtensa Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Submodel-Options.html#Submodel-Options" title="Submodel Options">
+<link rel="prev" href="Xstormy16-Options.html#Xstormy16-Options" title="Xstormy16 Options">
+<link rel="next" href="zSeries-Options.html#zSeries-Options" title="zSeries Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Xtensa-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="zSeries-Options.html#zSeries-Options">zSeries Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Xstormy16-Options.html#Xstormy16-Options">Xstormy16 Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Submodel-Options.html#Submodel-Options">Submodel Options</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.17.45 Xtensa Options</h4>
+
+<p><a name="index-Xtensa-Options-2087"></a>
+These options are supported for Xtensa targets:
+
+     <dl>
+<dt><code>-mconst16</code><dt><code>-mno-const16</code><dd><a name="index-mconst16-2088"></a><a name="index-mno_002dconst16-2089"></a>Enable or disable use of <code>CONST16</code> instructions for loading
+constant values.  The <code>CONST16</code> instruction is currently not a
+standard option from Tensilica.  When enabled, <code>CONST16</code>
+instructions are always used in place of the standard <code>L32R</code>
+instructions.  The use of <code>CONST16</code> is enabled by default only if
+the <code>L32R</code> instruction is not available.
+
+     <br><dt><code>-mfused-madd</code><dt><code>-mno-fused-madd</code><dd><a name="index-mfused_002dmadd-2090"></a><a name="index-mno_002dfused_002dmadd-2091"></a>Enable or disable use of fused multiply/add and multiply/subtract
+instructions in the floating-point option.  This has no effect if the
+floating-point option is not also enabled.  Disabling fused multiply/add
+and multiply/subtract instructions forces the compiler to use separate
+instructions for the multiply and add/subtract operations.  This may be
+desirable in some cases where strict IEEE 754-compliant results are
+required: the fused multiply add/subtract instructions do not round the
+intermediate result, thereby producing results with <em>more</em> bits of
+precision than specified by the IEEE standard.  Disabling fused multiply
+add/subtract instructions also ensures that the program output is not
+sensitive to the compiler's ability to combine multiply and add/subtract
+operations.
+
+     <br><dt><code>-mserialize-volatile</code><dt><code>-mno-serialize-volatile</code><dd><a name="index-mserialize_002dvolatile-2092"></a><a name="index-mno_002dserialize_002dvolatile-2093"></a>When this option is enabled, GCC inserts <code>MEMW</code> instructions before
+<code>volatile</code> memory references to guarantee sequential consistency. 
+The default is <samp><span class="option">-mserialize-volatile</span></samp>.  Use
+<samp><span class="option">-mno-serialize-volatile</span></samp> to omit the <code>MEMW</code> instructions.
+
+     <br><dt><code>-mtext-section-literals</code><dt><code>-mno-text-section-literals</code><dd><a name="index-mtext_002dsection_002dliterals-2094"></a><a name="index-mno_002dtext_002dsection_002dliterals-2095"></a>Control the treatment of literal pools.  The default is
+<samp><span class="option">-mno-text-section-literals</span></samp>, which places literals in a separate
+section in the output file.  This allows the literal pool to be placed
+in a data RAM/ROM, and it also allows the linker to combine literal
+pools from separate object files to remove redundant literals and
+improve code size.  With <samp><span class="option">-mtext-section-literals</span></samp>, the literals
+are interspersed in the text section in order to keep them as close as
+possible to their references.  This may be necessary for large assembly
+files.
+
+     <br><dt><code>-mtarget-align</code><dt><code>-mno-target-align</code><dd><a name="index-mtarget_002dalign-2096"></a><a name="index-mno_002dtarget_002dalign-2097"></a>When this option is enabled, GCC instructs the assembler to
+automatically align instructions to reduce branch penalties at the
+expense of some code density.  The assembler attempts to widen density
+instructions to align branch targets and the instructions following call
+instructions.  If there are not enough preceding safe density
+instructions to align a target, no widening will be performed.  The
+default is <samp><span class="option">-mtarget-align</span></samp>.  These options do not affect the
+treatment of auto-aligned instructions like <code>LOOP</code>, which the
+assembler will always align, either by widening density instructions or
+by inserting no-op instructions.
+
+     <br><dt><code>-mlongcalls</code><dt><code>-mno-longcalls</code><dd><a name="index-mlongcalls-2098"></a><a name="index-mno_002dlongcalls-2099"></a>When this option is enabled, GCC instructs the assembler to translate
+direct calls to indirect calls unless it can determine that the target
+of a direct call is in the range allowed by the call instruction.  This
+translation typically occurs for calls to functions in other source
+files.  Specifically, the assembler translates a direct <code>CALL</code>
+instruction into an <code>L32R</code> followed by a <code>CALLX</code> instruction. 
+The default is <samp><span class="option">-mno-longcalls</span></samp>.  This option should be used in
+programs where the call target can potentially be out of range.  This
+option is implemented in the assembler, not the compiler, so the
+assembly code generated by GCC will still show direct call
+instructions&mdash;look at the disassembled object code to see the actual
+instructions.  Note that the assembler will use an indirect call for
+every cross-file call, not just those that really will be out of range. 
+</dl>
+
+ </body></html>
+

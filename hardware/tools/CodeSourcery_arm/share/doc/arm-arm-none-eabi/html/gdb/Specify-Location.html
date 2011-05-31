@@ -1,0 +1,126 @@
+<html lang="en">
+<head>
+<title>Specify Location - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Source.html#Source" title="Source">
+<link rel="prev" href="List.html#List" title="List">
+<link rel="next" href="Edit.html#Edit" title="Edit">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Specify-Location"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Edit.html#Edit">Edit</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="List.html#List">List</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Source.html#Source">Source</a>
+<hr>
+</div>
+
+<h3 class="section">9.2 Specifying a Location</h3>
+
+<p><a name="index-specifying-location-444"></a><a name="index-linespec-445"></a>
+Several <span class="sc">gdb</span> commands accept arguments that specify a location
+of your program's code.  Since <span class="sc">gdb</span> is a source-level
+debugger, a location usually specifies some line in the source code;
+for that reason, locations are also known as <dfn>linespecs</dfn>.
+
+   <p>Here are all the different ways of specifying a code location that
+<span class="sc">gdb</span> understands:
+
+     <dl>
+<dt><var>linenum</var><dd>Specifies the line number <var>linenum</var> of the current source file.
+
+     <br><dt><code>-</code><var>offset</var><dt><code>+</code><var>offset</var><dd>Specifies the line <var>offset</var> lines before or after the <dfn>current
+line</dfn>.  For the <code>list</code> command, the current line is the last one
+printed; for the breakpoint commands, this is the line at which
+execution stopped in the currently selected <dfn>stack frame</dfn>
+(see <a href="Frames.html#Frames">Frames</a>, for a description of stack frames.)  When
+used as the second of the two linespecs in a <code>list</code> command,
+this specifies the line <var>offset</var> lines up or down from the first
+linespec.
+
+     <br><dt><var>filename</var><code>:</code><var>linenum</var><dd>Specifies the line <var>linenum</var> in the source file <var>filename</var>.
+
+     <br><dt><var>function</var><dd>Specifies the line that begins the body of the function <var>function</var>. 
+For example, in C, this is the line with the open brace.
+
+     <br><dt><var>filename</var><code>:</code><var>function</var><dd>Specifies the line that begins the body of the function <var>function</var>
+in the file <var>filename</var>.  You only need the file name with a
+function name to avoid ambiguity when there are identically named
+functions in different source files.
+
+     <br><dt><var>label</var><dd>Specifies the line at which the label named <var>label</var> appears. 
+<span class="sc">gdb</span> searches for the label in the function corresponding to
+the currently selected stack frame.  If there is no current selected
+stack frame (for instance, if the inferior is not running), then
+<span class="sc">gdb</span> will not search for a label.
+
+     <br><dt><code>*</code><var>address</var><dd>Specifies the program address <var>address</var>.  For line-oriented
+commands, such as <code>list</code> and <code>edit</code>, this specifies a source
+line that contains <var>address</var>.  For <code>break</code> and other
+breakpoint oriented commands, this can be used to set breakpoints in
+parts of your program which do not have debugging information or
+source files.
+
+     <p>Here <var>address</var> may be any expression valid in the current working
+language (see <a href="Languages.html#Languages">working language</a>) that specifies a code
+address.  In addition, as a convenience, <span class="sc">gdb</span> extends the
+semantics of expressions used in locations to cover the situations
+that frequently happen during debugging.  Here are the various forms
+of <var>address</var>:
+
+          <dl>
+<dt><var>expression</var><dd>Any expression valid in the current working language.
+
+          <br><dt><var>funcaddr</var><dd>An address of a function or procedure derived from its name.  In C,
+C<tt>++</tt>, Java, Objective-C, Fortran, minimal, and assembly, this is
+simply the function's name <var>function</var> (and actually a special case
+of a valid expression).  In Pascal and Modula-2, this is
+<code>&amp;</code><var>function</var>.  In Ada, this is <var>function</var><code>'Address</code>
+(although the Pascal form also works).
+
+          <p>This form specifies the address of the function's first instruction,
+before the stack frame and arguments have been set up.
+
+          <br><dt><code>'</code><var>filename</var><code>'::</code><var>funcaddr</var><dd>Like <var>funcaddr</var> above, but also specifies the name of the source
+file explicitly.  This is useful if the name of the function does not
+specify the function unambiguously, e.g., if there are several
+functions with identical names in different source files. 
+</dl>
+
+   </dl>
+
+   </body></html>
+

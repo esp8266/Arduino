@@ -1,0 +1,131 @@
+<html lang="en">
+<head>
+<title>TUI Overview - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="TUI.html#TUI" title="TUI">
+<link rel="next" href="TUI-Keys.html#TUI-Keys" title="TUI Keys">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="TUI-Overview"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="TUI-Keys.html#TUI-Keys">TUI Keys</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="TUI.html#TUI">TUI</a>
+<hr>
+</div>
+
+<h3 class="section">25.1 TUI Overview</h3>
+
+<p>In TUI mode, <span class="sc">gdb</span> can display several text windows:
+
+     <dl>
+<dt><em>command</em><dd>This window is the <span class="sc">gdb</span> command window with the <span class="sc">gdb</span>
+prompt and the <span class="sc">gdb</span> output.  The <span class="sc">gdb</span> input is still
+managed using readline.
+
+     <br><dt><em>source</em><dd>The source window shows the source file of the program.  The current
+line and active breakpoints are displayed in this window.
+
+     <br><dt><em>assembly</em><dd>The assembly window shows the disassembly output of the program.
+
+     <br><dt><em>register</em><dd>This window shows the processor registers.  Registers are highlighted
+when their values change. 
+</dl>
+
+   <p>The source and assembly windows show the current program position
+by highlighting the current line and marking it with a &lsquo;<samp><span class="samp">&gt;</span></samp>&rsquo; marker. 
+Breakpoints are indicated with two markers.  The first marker
+indicates the breakpoint type:
+
+     <dl>
+<dt><code>B</code><dd>Breakpoint which was hit at least once.
+
+     <br><dt><code>b</code><dd>Breakpoint which was never hit.
+
+     <br><dt><code>H</code><dd>Hardware breakpoint which was hit at least once.
+
+     <br><dt><code>h</code><dd>Hardware breakpoint which was never hit. 
+</dl>
+
+   <p>The second marker indicates whether the breakpoint is enabled or not:
+
+     <dl>
+<dt><code>+</code><dd>Breakpoint is enabled.
+
+     <br><dt><code>-</code><dd>Breakpoint is disabled. 
+</dl>
+
+   <p>The source, assembly and register windows are updated when the current
+thread changes, when the frame changes, or when the program counter
+changes.
+
+   <p>These windows are not all visible at the same time.  The command
+window is always visible.  The others can be arranged in several
+layouts:
+
+     <ul>
+<li>source only,
+
+     <li>assembly only,
+
+     <li>source and assembly,
+
+     <li>source and registers, or
+
+     <li>assembly and registers. 
+</ul>
+
+   <p>A status line above the command window shows the following information:
+
+     <dl>
+<dt><em>target</em><dd>Indicates the current <span class="sc">gdb</span> target. 
+(see <a href="Targets.html#Targets">Specifying a Debugging Target</a>).
+
+     <br><dt><em>process</em><dd>Gives the current process or thread number. 
+When no process is being debugged, this field is set to <code>No process</code>.
+
+     <br><dt><em>function</em><dd>Gives the current function name for the selected frame. 
+The name is demangled if demangling is turned on (see <a href="Print-Settings.html#Print-Settings">Print Settings</a>). 
+When there is no symbol corresponding to the current program counter,
+the string <code>??</code> is displayed.
+
+     <br><dt><em>line</em><dd>Indicates the current line number for the selected frame. 
+When the current line number is not known, the string <code>??</code> is displayed.
+
+     <br><dt><em>pc</em><dd>Indicates the current program counter address. 
+</dl>
+
+   </body></html>
+

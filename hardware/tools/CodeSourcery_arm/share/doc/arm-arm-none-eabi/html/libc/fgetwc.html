@@ -1,0 +1,85 @@
+<html lang="en">
+<head>
+<title>fgetwc - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="fgets.html#fgets" title="fgets">
+<link rel="next" href="fgetws.html#fgetws" title="fgetws">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="fgetwc"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="fgetws.html#fgetws">fgetws</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="fgets.html#fgets">fgets</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.13 <code>fgetwc</code>, <code>getwc</code>&mdash;get a wide character from a file or stream</h3>
+
+<p><a name="index-fgetwc-170"></a><a name="index-g_t_005ffgetwc_005fr-171"></a><a name="index-getwc-172"></a><a name="index-g_t_005fgetwc_005fr-173"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     #include &lt;wchar.h&gt;
+     wint_t fgetwc(FILE *<var>fp</var>);
+     
+     #include &lt;stdio.h&gt;
+     #include &lt;wchar.h&gt;
+     wint_t _fgetwc_r(struct _reent *<var>ptr</var>, FILE *<var>fp</var>);
+     
+     #include &lt;stdio.h&gt;
+     #include &lt;wchar.h&gt;
+     wint_t getwc(FILE *<var>fp</var>);
+     
+     #include &lt;stdio.h&gt;
+     #include &lt;wchar.h&gt;
+     wint_t _getwc_r(struct _reent *<var>ptr</var>, FILE *<var>fp</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+Use <code>fgetwc</code> to get the next wide character from the file or stream
+identified by <var>fp</var>.  As a side effect, <code>fgetwc</code> advances the file's
+current position indicator.
+
+   <p>The  <code>getwc</code>  function  or macro functions identically to <code>fgetwc</code>.  It
+may be implemented as a macro, and may evaluate its argument more  than
+once. There is no reason ever to use it.
+
+   <p><code>_fgetwc_r</code> and <code>_getwc_r</code> are simply reentrant versions of
+<code>fgetwc</code> and <code>getwc</code> that are passed the additional reentrant
+structure pointer argument: <var>ptr</var>.
+
+   <p><br>
+<strong>Returns</strong><br>
+The next wide character cast to <code>wint_t</code>), unless there is no more data,
+or the host system reports a read error; in either of these situations,
+<code>fgetwc</code> and <code>getwc</code> return <code>WEOF</code>.
+
+   <p>You can distinguish the two situations that cause an <code>EOF</code> result by
+using the <code>ferror</code> and <code>feof</code> functions.
+
+   <p><br>
+<strong>Portability</strong><br>
+C99, POSIX.1-2001
+
+   <p><br>
+
+   </body></html>
+

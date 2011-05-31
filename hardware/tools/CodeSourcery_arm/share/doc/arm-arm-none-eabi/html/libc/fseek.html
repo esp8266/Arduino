@@ -1,0 +1,89 @@
+<html lang="en">
+<head>
+<title>fseek - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="freopen.html#freopen" title="freopen">
+<link rel="next" href="fsetpos.html#fsetpos" title="fsetpos">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="fseek"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="fsetpos.html#fsetpos">fsetpos</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="freopen.html#freopen">freopen</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.26 <code>fseek</code>, <code>fseeko</code>&mdash;set file position</h3>
+
+<p><a name="index-fseek-197"></a><a name="index-fseeko-198"></a><a name="index-g_t_005ffseek_005fr-199"></a><a name="index-g_t_005ffseeko_005fr-200"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     int fseek(FILE *<var>fp</var>, long <var>offset</var>, int <var>whence</var>)
+     int fseeko(FILE *<var>fp</var>, off_t <var>offset</var>, int <var>whence</var>)
+     int _fseek_r(struct _reent *<var>ptr</var>, FILE *<var>fp</var>,
+         long <var>offset</var>, int <var>whence</var>)
+     int _fseeko_r(struct _reent *<var>ptr</var>, FILE *<var>fp</var>,
+         off_t <var>offset</var>, int <var>whence</var>)
+     
+</pre>
+   <p><strong>Description</strong><br>
+Objects of type <code>FILE</code> can have a &ldquo;position&rdquo; that records how much
+of the file your program has already read.  Many of the <code>stdio</code> functions
+depend on this position, and many change it as a side effect.
+
+   <p>You can use <code>fseek</code>/<code>fseeko</code> to set the position for the file identified by
+<var>fp</var>.  The value of <var>offset</var> determines the new position, in one
+of three ways selected by the value of <var>whence</var> (defined as macros
+in `<code>stdio.h</code>'):
+
+   <p><code>SEEK_SET</code>&mdash;<var>offset</var> is the absolute file position (an offset
+from the beginning of the file) desired.  <var>offset</var> must be positive.
+
+   <p><code>SEEK_CUR</code>&mdash;<var>offset</var> is relative to the current file position. 
+<var>offset</var> can meaningfully be either positive or negative.
+
+   <p><code>SEEK_END</code>&mdash;<var>offset</var> is relative to the current end of file. 
+<var>offset</var> can meaningfully be either positive (to increase the size
+of the file) or negative.
+
+   <p>See <code>ftell</code>/<code>ftello</code> to determine the current file position.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>fseek</code>/<code>fseeko</code> return <code>0</code> when successful.  On failure, the
+result is <code>EOF</code>.  The reason for failure is indicated in <code>errno</code>:
+either <code>ESPIPE</code> (the stream identified by <var>fp</var> doesn't support
+repositioning) or <code>EINVAL</code> (invalid file position).
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C requires <code>fseek</code>.
+
+   <p><code>fseeko</code> is defined by the Single Unix specification.
+
+   <p>Supporting OS subroutines required: <code>close</code>, <code>fstat</code>, <code>isatty</code>,
+<code>lseek</code>, <code>read</code>, <code>sbrk</code>, <code>write</code>.
+
+   <p><br>
+
+   </body></html>
+

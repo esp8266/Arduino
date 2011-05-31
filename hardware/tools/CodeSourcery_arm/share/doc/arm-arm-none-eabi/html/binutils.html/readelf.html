@@ -1,0 +1,198 @@
+<html lang="en">
+<head>
+<title>readelf - GNU Binary Utilities</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GNU Binary Utilities">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="ranlib.html#ranlib" title="ranlib">
+<link rel="next" href="size.html#size" title="size">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="readelf"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="size.html#size">size</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="ranlib.html#ranlib">ranlib</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">15 readelf</h2>
+
+<p><a name="index-ELF-file-information-131"></a><a name="index-readelf-132"></a>
+<!-- man title readelf Displays information about ELF files. -->
+
+<pre class="smallexample">     <!-- man begin SYNOPSIS readelf -->
+     readelf [<samp><span class="option">-a</span></samp>|<samp><span class="option">--all</span></samp>]
+             [<samp><span class="option">-h</span></samp>|<samp><span class="option">--file-header</span></samp>]
+             [<samp><span class="option">-l</span></samp>|<samp><span class="option">--program-headers</span></samp>|<samp><span class="option">--segments</span></samp>]
+             [<samp><span class="option">-S</span></samp>|<samp><span class="option">--section-headers</span></samp>|<samp><span class="option">--sections</span></samp>]
+             [<samp><span class="option">-g</span></samp>|<samp><span class="option">--section-groups</span></samp>]
+             [<samp><span class="option">-t</span></samp>|<samp><span class="option">--section-details</span></samp>]
+             [<samp><span class="option">-e</span></samp>|<samp><span class="option">--headers</span></samp>]
+             [<samp><span class="option">-s</span></samp>|<samp><span class="option">--syms</span></samp>|<samp><span class="option">--symbols</span></samp>]
+             [<samp><span class="option">--dyn-syms</span></samp>]
+             [<samp><span class="option">-n</span></samp>|<samp><span class="option">--notes</span></samp>]
+             [<samp><span class="option">-r</span></samp>|<samp><span class="option">--relocs</span></samp>]
+             [<samp><span class="option">-u</span></samp>|<samp><span class="option">--unwind</span></samp>]
+             [<samp><span class="option">-d</span></samp>|<samp><span class="option">--dynamic</span></samp>]
+             [<samp><span class="option">-V</span></samp>|<samp><span class="option">--version-info</span></samp>]
+             [<samp><span class="option">-A</span></samp>|<samp><span class="option">--arch-specific</span></samp>]
+             [<samp><span class="option">-D</span></samp>|<samp><span class="option">--use-dynamic</span></samp>]
+             [<samp><span class="option">-x</span></samp> &lt;number or name&gt;|<samp><span class="option">--hex-dump=</span></samp>&lt;number or name&gt;]
+             [<samp><span class="option">-p</span></samp> &lt;number or name&gt;|<samp><span class="option">--string-dump=</span></samp>&lt;number or name&gt;]
+             [<samp><span class="option">-R</span></samp> &lt;number or name&gt;|<samp><span class="option">--relocated-dump=</span></samp>&lt;number or name&gt;]
+             [<samp><span class="option">-c</span></samp>|<samp><span class="option">--archive-index</span></samp>]
+             [<samp><span class="option">-w[lLiaprmfFsoRt]</span></samp>|
+              <samp><span class="option">--debug-dump</span></samp>[=rawline,=decodedline,=info,=abbrev,=pubnames,=aranges,=macro,=frames,=frames-interp,=str,=loc,=Ranges,=pubtypes,=trace_info,=trace_abbrev,=trace_aranges]]
+             [<samp><span class="option">-I</span></samp>|<samp><span class="option">--histogram</span></samp>]
+             [<samp><span class="option">-v</span></samp>|<samp><span class="option">--version</span></samp>]
+             [<samp><span class="option">-W</span></samp>|<samp><span class="option">--wide</span></samp>]
+             [<samp><span class="option">-H</span></samp>|<samp><span class="option">--help</span></samp>]
+             <var>elffile</var>...
+     <!-- man end -->
+</pre>
+   <!-- man begin DESCRIPTION readelf -->
+   <p><samp><span class="command">readelf</span></samp> displays information about one or more ELF format object
+files.  The options control what particular information to display.
+
+   <p><var>elffile</var><small class="dots">...</small> are the object files to be examined.  32-bit and
+64-bit ELF files are supported, as are archives containing ELF files.
+
+   <p>This program performs a similar function to <samp><span class="command">objdump</span></samp> but it
+goes into more detail and it exists independently of the <span class="sc">bfd</span>
+library, so if there is a bug in <span class="sc">bfd</span> then readelf will not be
+affected.
+
+<!-- man end -->
+<!-- man begin OPTIONS readelf -->
+   <p>The long and short forms of options, shown here as alternatives, are
+equivalent.  At least one option besides &lsquo;<samp><span class="samp">-v</span></samp>&rsquo; or &lsquo;<samp><span class="samp">-H</span></samp>&rsquo; must be
+given.
+
+     <dl>
+<dt><samp><span class="env">-a</span></samp><dt><samp><span class="env">--all</span></samp><dd>Equivalent to specifying <samp><span class="option">--file-header</span></samp>,
+<samp><span class="option">--program-headers</span></samp>, <samp><span class="option">--sections</span></samp>, <samp><span class="option">--symbols</span></samp>,
+<samp><span class="option">--relocs</span></samp>, <samp><span class="option">--dynamic</span></samp>, <samp><span class="option">--notes</span></samp> and
+<samp><span class="option">--version-info</span></samp>.
+
+     <br><dt><samp><span class="env">-h</span></samp><dt><samp><span class="env">--file-header</span></samp><dd><a name="index-ELF-file-header-information-133"></a>Displays the information contained in the ELF header at the start of the
+file.
+
+     <br><dt><samp><span class="env">-l</span></samp><dt><samp><span class="env">--program-headers</span></samp><dt><samp><span class="env">--segments</span></samp><dd><a name="index-ELF-program-header-information-134"></a><a name="index-ELF-segment-information-135"></a>Displays the information contained in the file's segment headers, if it
+has any.
+
+     <br><dt><samp><span class="env">-S</span></samp><dt><samp><span class="env">--sections</span></samp><dt><samp><span class="env">--section-headers</span></samp><dd><a name="index-ELF-section-information-136"></a>Displays the information contained in the file's section headers, if it
+has any.
+
+     <br><dt><samp><span class="env">-g</span></samp><dt><samp><span class="env">--section-groups</span></samp><dd><a name="index-ELF-section-group-information-137"></a>Displays the information contained in the file's section groups, if it
+has any.
+
+     <br><dt><samp><span class="env">-t</span></samp><dt><samp><span class="env">--section-details</span></samp><dd><a name="index-ELF-section-information-138"></a>Displays the detailed section information. Implies <samp><span class="option">-S</span></samp>.
+
+     <br><dt><samp><span class="env">-s</span></samp><dt><samp><span class="env">--symbols</span></samp><dt><samp><span class="env">--syms</span></samp><dd><a name="index-ELF-symbol-table-information-139"></a>Displays the entries in symbol table section of the file, if it has one.
+
+     <br><dt><samp><span class="env">--dyn-syms</span></samp><dd><a name="index-ELF-dynamic-symbol-table-information-140"></a>Displays the entries in dynamic symbol table section of the file, if it
+has one.
+
+     <br><dt><samp><span class="env">-e</span></samp><dt><samp><span class="env">--headers</span></samp><dd>Display all the headers in the file.  Equivalent to <samp><span class="option">-h -l -S</span></samp>.
+
+     <br><dt><samp><span class="env">-n</span></samp><dt><samp><span class="env">--notes</span></samp><dd><a name="index-ELF-notes-141"></a>Displays the contents of the NOTE segments and/or sections, if any.
+
+     <br><dt><samp><span class="env">-r</span></samp><dt><samp><span class="env">--relocs</span></samp><dd><a name="index-ELF-reloc-information-142"></a>Displays the contents of the file's relocation section, if it has one.
+
+     <br><dt><samp><span class="env">-u</span></samp><dt><samp><span class="env">--unwind</span></samp><dd><a name="index-unwind-information-143"></a>Displays the contents of the file's unwind section, if it has one.  Only
+the unwind sections for IA64 ELF files, as well as ARM unwind tables
+(<code>.ARM.exidx</code> / <code>.ARM.extab</code>) are currently supported.
+
+     <br><dt><samp><span class="env">-d</span></samp><dt><samp><span class="env">--dynamic</span></samp><dd><a name="index-ELF-dynamic-section-information-144"></a>Displays the contents of the file's dynamic section, if it has one.
+
+     <br><dt><samp><span class="env">-V</span></samp><dt><samp><span class="env">--version-info</span></samp><dd><a name="index-ELF-version-sections-informations-145"></a>Displays the contents of the version sections in the file, it they
+exist.
+
+     <br><dt><samp><span class="env">-A</span></samp><dt><samp><span class="env">--arch-specific</span></samp><dd>Displays architecture-specific information in the file, if there
+is any.
+
+     <br><dt><samp><span class="env">-D</span></samp><dt><samp><span class="env">--use-dynamic</span></samp><dd>When displaying symbols, this option makes <samp><span class="command">readelf</span></samp> use the
+symbol hash tables in the file's dynamic section, rather than the
+symbol table sections.
+
+     <br><dt><samp><span class="env">-x &lt;number or name&gt;</span></samp><dt><samp><span class="env">--hex-dump=&lt;number or name&gt;</span></samp><dd>Displays the contents of the indicated section as a hexadecimal bytes. 
+A number identifies a particular section by index in the section table;
+any other string identifies all sections with that name in the object file.
+
+     <br><dt><samp><span class="env">-R &lt;number or name&gt;</span></samp><dt><samp><span class="env">--relocated-dump=&lt;number or name&gt;</span></samp><dd>Displays the contents of the indicated section as a hexadecimal
+bytes.  A number identifies a particular section by index in the
+section table; any other string identifies all sections with that name
+in the object file.  The contents of the section will be relocated
+before they are displayed.
+
+     <br><dt><samp><span class="env">-p &lt;number or name&gt;</span></samp><dt><samp><span class="env">--string-dump=&lt;number or name&gt;</span></samp><dd>Displays the contents of the indicated section as printable strings. 
+A number identifies a particular section by index in the section table;
+any other string identifies all sections with that name in the object file.
+
+     <br><dt><samp><span class="env">-c</span></samp><dt><samp><span class="env">--archive-index</span></samp><dd><a name="index-Archive-file-symbol-index-information-146"></a>Displays the file symbol index infomation contained in the header part
+of binary archives.  Performs the same function as the <samp><span class="option">t</span></samp>
+command to <samp><span class="command">ar</span></samp>, but without using the BFD library.  See <a href="ar.html#ar">ar</a>.
+
+     <br><dt><samp><span class="env">-w[lLiaprmfFsoRt]</span></samp><dt><samp><span class="env">--debug-dump[=rawline,=decodedline,=info,=abbrev,=pubnames,=aranges,=macro,=frames,=frames-interp,=str,=loc,=Ranges,=pubtypes,=trace_info,=trace_abbrev,=trace_aranges]</span></samp><dd>Displays the contents of the debug sections in the file, if any are
+present.  If one of the optional letters or words follows the switch
+then only data found in those specific sections will be dumped.
+
+     <p>Note that there is no single letter option to display the content of
+trace sections.
+
+     <p>Note: the <samp><span class="option">=decodedline</span></samp> option will display the interpreted
+contents of a .debug_line section whereas the <samp><span class="option">=rawline</span></samp> option
+dumps the contents in a raw format.
+
+     <p>Note: the <samp><span class="option">=frames-interp</span></samp> option will display the interpreted
+contents of a .debug_frame section whereas the <samp><span class="option">=frames</span></samp> option
+dumps the contents in a raw format.
+
+     <br><dt><samp><span class="env">-I</span></samp><dt><samp><span class="env">--histogram</span></samp><dd>Display a histogram of bucket list lengths when displaying the contents
+of the symbol tables.
+
+     <br><dt><samp><span class="env">-v</span></samp><dt><samp><span class="env">--version</span></samp><dd>Display the version number of readelf.
+
+     <br><dt><samp><span class="env">-W</span></samp><dt><samp><span class="env">--wide</span></samp><dd>Don't break output lines to fit into 80 columns. By default
+<samp><span class="command">readelf</span></samp> breaks section header and segment listing lines for
+64-bit ELF files, so that they fit into 80 columns. This option causes
+<samp><span class="command">readelf</span></samp> to print each section header resp. each segment one a
+single line, which is far more readable on terminals wider than 80 columns.
+
+     <br><dt><samp><span class="env">-H</span></samp><dt><samp><span class="env">--help</span></samp><dd>Display the command line options understood by <samp><span class="command">readelf</span></samp>.
+
+   </dl>
+
+<!-- man end -->
+   </body></html>
+

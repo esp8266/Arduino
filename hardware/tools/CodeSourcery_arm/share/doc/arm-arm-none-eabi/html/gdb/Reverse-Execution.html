@@ -1,0 +1,156 @@
+<html lang="en">
+<head>
+<title>Reverse Execution - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Stopping.html#Stopping" title="Stopping">
+<link rel="next" href="Process-Record-and-Replay.html#Process-Record-and-Replay" title="Process Record and Replay">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Reverse-Execution"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Process-Record-and-Replay.html#Process-Record-and-Replay">Process Record and Replay</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Stopping.html#Stopping">Stopping</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">6 Running programs backward</h2>
+
+<p><a name="index-reverse-execution-358"></a><a name="index-running-programs-backward-359"></a>
+When you are debugging a program, it is not unusual to realize that
+you have gone too far, and some event of interest has already happened. 
+If the target environment supports it, <span class="sc">gdb</span> can allow you to
+&ldquo;rewind&rdquo; the program by running it backward.
+
+   <p>A target environment that supports reverse execution should be able
+to &ldquo;undo&rdquo; the changes in machine state that have taken place as the
+program was executing normally.  Variables, registers etc. should
+revert to their previous values.  Obviously this requires a great
+deal of sophistication on the part of the target environment; not
+all target environments can support reverse execution.
+
+   <p>When a program is executed in reverse, the instructions that
+have most recently been executed are &ldquo;un-executed&rdquo;, in reverse
+order.  The program counter runs backward, following the previous
+thread of execution in reverse.  As each instruction is &ldquo;un-executed&rdquo;,
+the values of memory and/or registers that were changed by that
+instruction are reverted to their previous states.  After executing
+a piece of source code in reverse, all side effects of that code
+should be &ldquo;undone&rdquo;, and all variables should be returned to their
+prior values<a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a>.
+
+   <p>If you are debugging in a target environment that supports
+reverse execution, <span class="sc">gdb</span> provides the following commands.
+
+     
+<a name="index-reverse_002dcontinue-360"></a>
+<a name="index-rc-_0040r_007b_0028_0040code_007breverse_002dcontinue_007d_0029_007d-361"></a>
+<dl><dt><code>reverse-continue </code><span class="roman">[</span><var>ignore-count</var><span class="roman">]</span><dt><code>rc </code><span class="roman">[</span><var>ignore-count</var><span class="roman">]</span><dd>Beginning at the point where your program last stopped, start executing
+in reverse.  Reverse execution will stop for breakpoints and synchronous
+exceptions (signals), just like normal execution.  Behavior of
+asynchronous signals depends on the target environment.
+
+     <p><a name="index-reverse_002dstep-362"></a><a name="index-rs-_0040r_007b_0028_0040code_007bstep_007d_0029_007d-363"></a><br><dt><code>reverse-step </code><span class="roman">[</span><var>count</var><span class="roman">]</span><dd>Run the program backward until control reaches the start of a
+different source line; then stop it, and return control to <span class="sc">gdb</span>.
+
+     <p>Like the <code>step</code> command, <code>reverse-step</code> will only stop
+at the beginning of a source line.  It &ldquo;un-executes&rdquo; the previously
+executed source line.  If the previous source line included calls to
+debuggable functions, <code>reverse-step</code> will step (backward) into
+the called function, stopping at the beginning of the <em>last</em>
+statement in the called function (typically a return statement).
+
+     <p>Also, as with the <code>step</code> command, if non-debuggable functions are
+called, <code>reverse-step</code> will run thru them backward without stopping.
+
+     <p><a name="index-reverse_002dstepi-364"></a><a name="index-rsi-_0040r_007b_0028_0040code_007breverse_002dstepi_007d_0029_007d-365"></a><br><dt><code>reverse-stepi </code><span class="roman">[</span><var>count</var><span class="roman">]</span><dd>Reverse-execute one machine instruction.  Note that the instruction
+to be reverse-executed is <em>not</em> the one pointed to by the program
+counter, but the instruction executed prior to that one.  For instance,
+if the last instruction was a jump, <code>reverse-stepi</code> will take you
+back from the destination of the jump to the jump instruction itself.
+
+     <p><a name="index-reverse_002dnext-366"></a><a name="index-rn-_0040r_007b_0028_0040code_007breverse_002dnext_007d_0029_007d-367"></a><br><dt><code>reverse-next </code><span class="roman">[</span><var>count</var><span class="roman">]</span><dd>Run backward to the beginning of the previous line executed in
+the current (innermost) stack frame.  If the line contains function
+calls, they will be &ldquo;un-executed&rdquo; without stopping.  Starting from
+the first line of a function, <code>reverse-next</code> will take you back
+to the caller of that function, <em>before</em> the function was called,
+just as the normal <code>next</code> command would take you from the last
+line of a function back to its return to its caller
+<a rel="footnote" href="#fn-2" name="fnd-2"><sup>2</sup></a>.
+
+     <p><a name="index-reverse_002dnexti-368"></a><a name="index-rni-_0040r_007b_0028_0040code_007breverse_002dnexti_007d_0029_007d-369"></a><br><dt><code>reverse-nexti </code><span class="roman">[</span><var>count</var><span class="roman">]</span><dd>Like <code>nexti</code>, <code>reverse-nexti</code> executes a single instruction
+in reverse, except that called functions are &ldquo;un-executed&rdquo; atomically. 
+That is, if the previously executed instruction was a return from
+another function, <code>reverse-nexti</code> will continue to execute
+in reverse until the call to that function (from the current stack
+frame) is reached.
+
+     <p><a name="index-reverse_002dfinish-370"></a><br><dt><code>reverse-finish</code><dd>Just as the <code>finish</code> command takes you to the point where the
+current function returns, <code>reverse-finish</code> takes you to the point
+where it was called.  Instead of ending up at the end of the current
+function invocation, you end up at the beginning.
+
+     <p><a name="index-set-exec_002ddirection-371"></a><br><dt><code>set exec-direction</code><dd>Set the direction of target execution. 
+<dt><code>set exec-direction reverse</code><dd><a name="index-execute-forward-or-backward-in-time-372"></a><span class="sc">gdb</span> will perform all execution commands in reverse, until the
+exec-direction mode is changed to &ldquo;forward&rdquo;.  Affected commands include
+<code>step, stepi, next, nexti, continue, and finish</code>.  The <code>return</code>
+command cannot be used in reverse mode. 
+<br><dt><code>set exec-direction forward</code><dd><span class="sc">gdb</span> will perform all execution commands in the normal fashion. 
+This is the default. 
+</dl>
+
+   <div class="footnote">
+<hr>
+<h4>Footnotes</h4><p class="footnote"><small>[<a name="fn-1" href="#fnd-1">1</a>]</small> 
+Note that some side effects are easier to undo than others.  For instance,
+memory and registers are relatively easy, but device I/O is hard.  Some
+targets may be able undo things like device I/O, and some may not.
+
+   <p>The contract between <span class="sc">gdb</span> and the reverse executing target
+requires only that the target do something reasonable when
+<span class="sc">gdb</span> tells it to execute backwards, and then report the
+results back to <span class="sc">gdb</span>.  Whatever the target reports back to
+<span class="sc">gdb</span>, <span class="sc">gdb</span> will report back to the user.  <span class="sc">gdb</span>
+assumes that the memory and registers that the target reports are in a
+consistant state, but <span class="sc">gdb</span> accepts whatever it is given. 
+</p>
+
+   <p class="footnote"><small>[<a name="fn-2" href="#fnd-2">2</a>]</small> Unless the code is too heavily optimized.</p>
+
+   <hr></div>
+
+   </body></html>
+

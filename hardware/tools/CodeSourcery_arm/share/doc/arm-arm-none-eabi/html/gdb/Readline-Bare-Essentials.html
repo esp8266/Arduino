@@ -1,0 +1,86 @@
+<html lang="en">
+<head>
+<title>Readline Bare Essentials - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Readline-Interaction.html#Readline-Interaction" title="Readline Interaction">
+<link rel="next" href="Readline-Movement-Commands.html#Readline-Movement-Commands" title="Readline Movement Commands">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Readline-Bare-Essentials"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Readline-Movement-Commands.html#Readline-Movement-Commands">Readline Movement Commands</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Readline-Interaction.html#Readline-Interaction">Readline Interaction</a>
+<hr>
+</div>
+
+<h4 class="subsection">31.2.1 Readline Bare Essentials</h4>
+
+<p><a name="index-notation_002c-readline-2187"></a><a name="index-command-editing-2188"></a><a name="index-editing-command-lines-2189"></a>
+In order to enter characters into the line, simply type them.  The typed
+character appears where the cursor was, and then the cursor moves one
+space to the right.  If you mistype a character, you can use your
+erase character to back up and delete the mistyped character.
+
+   <p>Sometimes you may mistype a character, and
+not notice the error until you have typed several other characters.  In
+that case, you can type <kbd>C-b</kbd> to move the cursor to the left, and then
+correct your mistake.  Afterwards, you can move the cursor to the right
+with <kbd>C-f</kbd>.
+
+   <p>When you add text in the middle of a line, you will notice that characters
+to the right of the cursor are `pushed over' to make room for the text
+that you have inserted.  Likewise, when you delete text behind the cursor,
+characters to the right of the cursor are `pulled back' to fill in the
+blank space created by the removal of the text.  A list of the bare
+essentials for editing the text of an input line follows.
+
+     <dl>
+<dt><kbd>C-b</kbd><dd>Move back one character. 
+<br><dt><kbd>C-f</kbd><dd>Move forward one character. 
+<br><dt>&lt;DEL&gt; or &lt;Backspace&gt;<dd>Delete the character to the left of the cursor. 
+<br><dt><kbd>C-d</kbd><dd>Delete the character underneath the cursor. 
+<br><dt>Printing&nbsp;characters<!-- /@w --><dd>Insert the character into the line at the cursor. 
+<br><dt><kbd>C-_</kbd> or <kbd>C-x C-u</kbd><dd>Undo the last editing command.  You can undo all the way back to an
+empty line. 
+</dl>
+
+<p class="noindent">(Depending on your configuration, the &lt;Backspace&gt; key be set to
+delete the character to the left of the cursor and the &lt;DEL&gt; key set
+to delete the character underneath the cursor, like <kbd>C-d</kbd>, rather
+than the character to the left of the cursor.)
+
+   </body></html>
+

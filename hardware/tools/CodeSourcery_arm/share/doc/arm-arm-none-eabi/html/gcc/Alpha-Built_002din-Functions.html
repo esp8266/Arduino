@@ -1,0 +1,131 @@
+<html lang="en">
+<head>
+<title>Alpha Built-in Functions - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Target-Builtins.html#Target-Builtins" title="Target Builtins">
+<link rel="next" href="ARM-iWMMXt-Built_002din-Functions.html#ARM-iWMMXt-Built_002din-Functions" title="ARM iWMMXt Built-in Functions">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Alpha-Built-in-Functions"></a>
+<a name="Alpha-Built_002din-Functions"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="ARM-iWMMXt-Built_002din-Functions.html#ARM-iWMMXt-Built_002din-Functions">ARM iWMMXt Built-in Functions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Target-Builtins.html#Target-Builtins">Target Builtins</a>
+<hr>
+</div>
+
+<h4 class="subsection">6.52.1 Alpha Built-in Functions</h4>
+
+<p>These built-in functions are available for the Alpha family of
+processors, depending on the command-line switches used.
+
+ <p>The following built-in functions are always available.  They
+all generate the machine instruction that is part of the name.
+
+<pre class="smallexample">     long __builtin_alpha_implver (void)
+     long __builtin_alpha_rpcc (void)
+     long __builtin_alpha_amask (long)
+     long __builtin_alpha_cmpbge (long, long)
+     long __builtin_alpha_extbl (long, long)
+     long __builtin_alpha_extwl (long, long)
+     long __builtin_alpha_extll (long, long)
+     long __builtin_alpha_extql (long, long)
+     long __builtin_alpha_extwh (long, long)
+     long __builtin_alpha_extlh (long, long)
+     long __builtin_alpha_extqh (long, long)
+     long __builtin_alpha_insbl (long, long)
+     long __builtin_alpha_inswl (long, long)
+     long __builtin_alpha_insll (long, long)
+     long __builtin_alpha_insql (long, long)
+     long __builtin_alpha_inswh (long, long)
+     long __builtin_alpha_inslh (long, long)
+     long __builtin_alpha_insqh (long, long)
+     long __builtin_alpha_mskbl (long, long)
+     long __builtin_alpha_mskwl (long, long)
+     long __builtin_alpha_mskll (long, long)
+     long __builtin_alpha_mskql (long, long)
+     long __builtin_alpha_mskwh (long, long)
+     long __builtin_alpha_msklh (long, long)
+     long __builtin_alpha_mskqh (long, long)
+     long __builtin_alpha_umulh (long, long)
+     long __builtin_alpha_zap (long, long)
+     long __builtin_alpha_zapnot (long, long)
+</pre>
+ <p>The following built-in functions are always with <samp><span class="option">-mmax</span></samp>
+or <samp><span class="option">-mcpu=</span><var>cpu</var></samp> where <var>cpu</var> is <code>pca56</code> or
+later.  They all generate the machine instruction that is part
+of the name.
+
+<pre class="smallexample">     long __builtin_alpha_pklb (long)
+     long __builtin_alpha_pkwb (long)
+     long __builtin_alpha_unpkbl (long)
+     long __builtin_alpha_unpkbw (long)
+     long __builtin_alpha_minub8 (long, long)
+     long __builtin_alpha_minsb8 (long, long)
+     long __builtin_alpha_minuw4 (long, long)
+     long __builtin_alpha_minsw4 (long, long)
+     long __builtin_alpha_maxub8 (long, long)
+     long __builtin_alpha_maxsb8 (long, long)
+     long __builtin_alpha_maxuw4 (long, long)
+     long __builtin_alpha_maxsw4 (long, long)
+     long __builtin_alpha_perr (long, long)
+</pre>
+ <p>The following built-in functions are always with <samp><span class="option">-mcix</span></samp>
+or <samp><span class="option">-mcpu=</span><var>cpu</var></samp> where <var>cpu</var> is <code>ev67</code> or
+later.  They all generate the machine instruction that is part
+of the name.
+
+<pre class="smallexample">     long __builtin_alpha_cttz (long)
+     long __builtin_alpha_ctlz (long)
+     long __builtin_alpha_ctpop (long)
+</pre>
+ <p>The following builtins are available on systems that use the OSF/1
+PALcode.  Normally they invoke the <code>rduniq</code> and <code>wruniq</code>
+PAL calls, but when invoked with <samp><span class="option">-mtls-kernel</span></samp>, they invoke
+<code>rdval</code> and <code>wrval</code>.
+
+<pre class="smallexample">     void *__builtin_thread_pointer (void)
+     void __builtin_set_thread_pointer (void *)
+</pre>
+ </body></html>
+

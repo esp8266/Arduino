@@ -1,0 +1,241 @@
+<html lang="en">
+<head>
+<title>TIC54X-Directives - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="TIC54X_002dDependent.html#TIC54X_002dDependent" title="TIC54X-Dependent">
+<link rel="prev" href="TIC54X_002dExt.html#TIC54X_002dExt" title="TIC54X-Ext">
+<link rel="next" href="TIC54X_002dMacros.html#TIC54X_002dMacros" title="TIC54X-Macros">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="TIC54X-Directives"></a>
+<a name="TIC54X_002dDirectives"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="TIC54X_002dMacros.html#TIC54X_002dMacros">TIC54X-Macros</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="TIC54X_002dExt.html#TIC54X_002dExt">TIC54X-Ext</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="TIC54X_002dDependent.html#TIC54X_002dDependent">TIC54X-Dependent</a>
+<hr>
+</div>
+
+<h4 class="subsection">9.36.9 Directives</h4>
+
+<p><a name="index-machine-directives_002c-TIC54X-1710"></a><a name="index-TIC54X-machine-directives-1711"></a>
+     
+<a name="index-g_t_0040code_007balign_007d-directive_002c-TIC54X-1712"></a>
+<a name="index-g_t_0040code_007beven_007d-directive_002c-TIC54X-1713"></a>
+<dl><dt><code>.align [</code><var>size</var><code>]</code><dt><code>.even</code><dd>Align the section program counter on the next boundary, based on
+<var>size</var>.  <var>size</var> may be any power of 2.  <code>.even</code> is
+equivalent to <code>.align</code> with a <var>size</var> of 2.
+          <dl>
+<dt><code>1</code><dd>Align SPC to word boundary
+<br><dt><code>2</code><dd>Align SPC to longword boundary (same as .even)
+<br><dt><code>128</code><dd>Align SPC to page boundary
+</dl>
+
+     <p><a name="index-g_t_0040code_007basg_007d-directive_002c-TIC54X-1714"></a><br><dt><code>.asg </code><var>string</var><code>, </code><var>name</var><dd>Assign <var>name</var> the string <var>string</var>.  String replacement is
+performed on <var>string</var> before assignment.
+
+     <p><a name="index-g_t_0040code_007beval_007d-directive_002c-TIC54X-1715"></a><dt><code>.eval </code><var>string</var><code>, </code><var>name</var><dd>Evaluate the contents of string <var>string</var> and assign the result as a
+string to the subsym <var>name</var>.  String replacement is performed on
+<var>string</var> before assignment.
+
+     <p><a name="index-g_t_0040code_007bbss_007d-directive_002c-TIC54X-1716"></a><br><dt><code>.bss </code><var>symbol</var><code>, </code><var>size</var><code> [, [</code><var>blocking_flag</var><code>] [,</code><var>alignment_flag</var><code>]]</code><dd>Reserve space for <var>symbol</var> in the .bss section.  <var>size</var> is in
+words.  If present, <var>blocking_flag</var> indicates the allocated space
+should be aligned on a page boundary if it would otherwise cross a page
+boundary.  If present, <var>alignment_flag</var> causes the assembler to
+allocate <var>size</var> on a long word boundary.
+
+     <p><a name="index-g_t_0040code_007bbyte_007d-directive_002c-TIC54X-1717"></a><a name="index-g_t_0040code_007bubyte_007d-directive_002c-TIC54X-1718"></a><a name="index-g_t_0040code_007bchar_007d-directive_002c-TIC54X-1719"></a><a name="index-g_t_0040code_007buchar_007d-directive_002c-TIC54X-1720"></a><br><dt><code>.byte </code><var>value</var><code> [,...,</code><var>value_n</var><code>]</code><dt><code>.ubyte </code><var>value</var><code> [,...,</code><var>value_n</var><code>]</code><dt><code>.char </code><var>value</var><code> [,...,</code><var>value_n</var><code>]</code><dt><code>.uchar </code><var>value</var><code> [,...,</code><var>value_n</var><code>]</code><dd>Place one or more bytes into consecutive words of the current section. 
+The upper 8 bits of each word is zero-filled.  If a label is used, it
+points to the word allocated for the first byte encountered.
+
+     <p><a name="index-g_t_0040code_007bclink_007d-directive_002c-TIC54X-1721"></a><br><dt><code>.clink ["</code><var>section_name</var><code>"]</code><dd>Set STYP_CLINK flag for this section, which indicates to the linker that
+if no symbols from this section are referenced, the section should not
+be included in the link.  If <var>section_name</var> is omitted, the current
+section is used.
+
+     <p><a name="index-g_t_0040code_007bc_005fmode_007d-directive_002c-TIC54X-1722"></a><br><dt><code>.c_mode</code><dd>TBD.
+
+     <p><a name="index-g_t_0040code_007bcopy_007d-directive_002c-TIC54X-1723"></a><br><dt><code>.copy "</code><var>filename</var><code>" | </code><var>filename</var><dt><code>.include "</code><var>filename</var><code>" | </code><var>filename</var><dd>Read source statements from <var>filename</var>.  The normal include search
+path is used.  Normally .copy will cause statements from the included
+file to be printed in the assembly listing and .include will not, but
+this distinction is not currently implemented.
+
+     <p><a name="index-g_t_0040code_007bdata_007d-directive_002c-TIC54X-1724"></a><br><dt><code>.data</code><dd>Begin assembling code into the .data section.
+
+     <p><a name="index-g_t_0040code_007bdouble_007d-directive_002c-TIC54X-1725"></a><a name="index-g_t_0040code_007bldouble_007d-directive_002c-TIC54X-1726"></a><a name="index-g_t_0040code_007bfloat_007d-directive_002c-TIC54X-1727"></a><a name="index-g_t_0040code_007bxfloat_007d-directive_002c-TIC54X-1728"></a><br><dt><code>.double </code><var>value</var><code> [,...,</code><var>value_n</var><code>]</code><dt><code>.ldouble </code><var>value</var><code> [,...,</code><var>value_n</var><code>]</code><dt><code>.float </code><var>value</var><code> [,...,</code><var>value_n</var><code>]</code><dt><code>.xfloat </code><var>value</var><code> [,...,</code><var>value_n</var><code>]</code><dd>Place an IEEE single-precision floating-point representation of one or
+more floating-point values into the current section.  All but
+<code>.xfloat</code> align the result on a longword boundary.  Values are
+stored most-significant word first.
+
+     <p><a name="index-g_t_0040code_007bdrlist_007d-directive_002c-TIC54X-1729"></a><a name="index-g_t_0040code_007bdrnolist_007d-directive_002c-TIC54X-1730"></a><br><dt><code>.drlist</code><dt><code>.drnolist</code><dd>Control printing of directives to the listing file.  Ignored.
+
+     <p><a name="index-g_t_0040code_007bemsg_007d-directive_002c-TIC54X-1731"></a><a name="index-g_t_0040code_007bmmsg_007d-directive_002c-TIC54X-1732"></a><a name="index-g_t_0040code_007bwmsg_007d-directive_002c-TIC54X-1733"></a><br><dt><code>.emsg </code><var>string</var><dt><code>.mmsg </code><var>string</var><dt><code>.wmsg </code><var>string</var><dd>Emit a user-defined error, message, or warning, respectively.
+
+     <p><a name="index-g_t_0040code_007bfar_005fmode_007d-directive_002c-TIC54X-1734"></a><br><dt><code>.far_mode</code><dd>Use extended addressing when assembling statements.  This should appear
+only once per file, and is equivalent to the -mfar-mode option see <a href="TIC54X_002dOpts.html#TIC54X_002dOpts"><code>-mfar-mode</code></a>.
+
+     <p><a name="index-g_t_0040code_007bfclist_007d-directive_002c-TIC54X-1735"></a><a name="index-g_t_0040code_007bfcnolist_007d-directive_002c-TIC54X-1736"></a><br><dt><code>.fclist</code><dt><code>.fcnolist</code><dd>Control printing of false conditional blocks to the listing file.
+
+     <p><a name="index-g_t_0040code_007bfield_007d-directive_002c-TIC54X-1737"></a><br><dt><code>.field </code><var>value</var><code> [,</code><var>size</var><code>]</code><dd>Initialize a bitfield of <var>size</var> bits in the current section.  If
+<var>value</var> is relocatable, then <var>size</var> must be 16.  <var>size</var>
+defaults to 16 bits.  If <var>value</var> does not fit into <var>size</var> bits,
+the value will be truncated.  Successive <code>.field</code> directives will
+pack starting at the current word, filling the most significant bits
+first, and aligning to the start of the next word if the field size does
+not fit into the space remaining in the current word.  A <code>.align</code>
+directive with an operand of 1 will force the next <code>.field</code>
+directive to begin packing into a new word.  If a label is used, it
+points to the word that contains the specified field.
+
+     <p><a name="index-g_t_0040code_007bglobal_007d-directive_002c-TIC54X-1738"></a><a name="index-g_t_0040code_007bdef_007d-directive_002c-TIC54X-1739"></a><a name="index-g_t_0040code_007bref_007d-directive_002c-TIC54X-1740"></a><br><dt><code>.global </code><var>symbol</var><code> [,...,</code><var>symbol_n</var><code>]</code><dt><code>.def </code><var>symbol</var><code> [,...,</code><var>symbol_n</var><code>]</code><dt><code>.ref </code><var>symbol</var><code> [,...,</code><var>symbol_n</var><code>]</code><dd><code>.def</code> nominally identifies a symbol defined in the current file
+and available to other files.  <code>.ref</code> identifies a symbol used in
+the current file but defined elsewhere.  Both map to the standard
+<code>.global</code> directive.
+
+     <p><a name="index-g_t_0040code_007bhalf_007d-directive_002c-TIC54X-1741"></a><a name="index-g_t_0040code_007buhalf_007d-directive_002c-TIC54X-1742"></a><a name="index-g_t_0040code_007bshort_007d-directive_002c-TIC54X-1743"></a><a name="index-g_t_0040code_007bushort_007d-directive_002c-TIC54X-1744"></a><a name="index-g_t_0040code_007bint_007d-directive_002c-TIC54X-1745"></a><a name="index-g_t_0040code_007buint_007d-directive_002c-TIC54X-1746"></a><a name="index-g_t_0040code_007bword_007d-directive_002c-TIC54X-1747"></a><a name="index-g_t_0040code_007buword_007d-directive_002c-TIC54X-1748"></a><br><dt><code>.half </code><var>value</var><code> [,...,</code><var>value_n</var><code>]</code><dt><code>.uhalf </code><var>value</var><code> [,...,</code><var>value_n</var><code>]</code><dt><code>.short </code><var>value</var><code> [,...,</code><var>value_n</var><code>]</code><dt><code>.ushort </code><var>value</var><code> [,...,</code><var>value_n</var><code>]</code><dt><code>.int </code><var>value</var><code> [,...,</code><var>value_n</var><code>]</code><dt><code>.uint </code><var>value</var><code> [,...,</code><var>value_n</var><code>]</code><dt><code>.word </code><var>value</var><code> [,...,</code><var>value_n</var><code>]</code><dt><code>.uword </code><var>value</var><code> [,...,</code><var>value_n</var><code>]</code><dd>Place one or more values into consecutive words of the current section. 
+If a label is used, it points to the word allocated for the first value
+encountered.
+
+     <p><a name="index-g_t_0040code_007blabel_007d-directive_002c-TIC54X-1749"></a><br><dt><code>.label </code><var>symbol</var><dd>Define a special <var>symbol</var> to refer to the load time address of the
+current section program counter.
+
+     <p><a name="index-g_t_0040code_007blength_007d-directive_002c-TIC54X-1750"></a><a name="index-g_t_0040code_007bwidth_007d-directive_002c-TIC54X-1751"></a><br><dt><code>.length</code><dt><code>.width</code><dd>Set the page length and width of the output listing file.  Ignored.
+
+     <p><a name="index-g_t_0040code_007blist_007d-directive_002c-TIC54X-1752"></a><a name="index-g_t_0040code_007bnolist_007d-directive_002c-TIC54X-1753"></a><br><dt><code>.list</code><dt><code>.nolist</code><dd>Control whether the source listing is printed.  Ignored.
+
+     <p><a name="index-g_t_0040code_007blong_007d-directive_002c-TIC54X-1754"></a><a name="index-g_t_0040code_007bulong_007d-directive_002c-TIC54X-1755"></a><a name="index-g_t_0040code_007bxlong_007d-directive_002c-TIC54X-1756"></a><br><dt><code>.long </code><var>value</var><code> [,...,</code><var>value_n</var><code>]</code><dt><code>.ulong </code><var>value</var><code> [,...,</code><var>value_n</var><code>]</code><dt><code>.xlong </code><var>value</var><code> [,...,</code><var>value_n</var><code>]</code><dd>Place one or more 32-bit values into consecutive words in the current
+section.  The most significant word is stored first.  <code>.long</code> and
+<code>.ulong</code> align the result on a longword boundary; <code>xlong</code> does
+not.
+
+     <p><a name="index-g_t_0040code_007bloop_007d-directive_002c-TIC54X-1757"></a><a name="index-g_t_0040code_007bbreak_007d-directive_002c-TIC54X-1758"></a><a name="index-g_t_0040code_007bendloop_007d-directive_002c-TIC54X-1759"></a><br><dt><code>.loop [</code><var>count</var><code>]</code><dt><code>.break [</code><var>condition</var><code>]</code><dt><code>.endloop</code><dd>Repeatedly assemble a block of code.  <code>.loop</code> begins the block, and
+<code>.endloop</code> marks its termination.  <var>count</var> defaults to 1024,
+and indicates the number of times the block should be repeated. 
+<code>.break</code> terminates the loop so that assembly begins after the
+<code>.endloop</code> directive.  The optional <var>condition</var> will cause the
+loop to terminate only if it evaluates to zero.
+
+     <p><a name="index-g_t_0040code_007bmacro_007d-directive_002c-TIC54X-1760"></a><a name="index-g_t_0040code_007bendm_007d-directive_002c-TIC54X-1761"></a><br><dt><var>macro_name</var><code> .macro [</code><var>param1</var><code>][,...</code><var>param_n</var><code>]</code><dt><code>[.mexit]</code><dt><code>.endm</code><dd>See the section on macros for more explanation (See <a href="TIC54X_002dMacros.html#TIC54X_002dMacros">TIC54X-Macros</a>.
+
+     <p><a name="index-g_t_0040code_007bmlib_007d-directive_002c-TIC54X-1762"></a><br><dt><code>.mlib "</code><var>filename</var><code>" | </code><var>filename</var><dd>Load the macro library <var>filename</var>.  <var>filename</var> must be an
+archived library (BFD ar-compatible) of text files, expected to contain
+only macro definitions.   The standard include search path is used.
+
+     <p><a name="index-g_t_0040code_007bmlist_007d-directive_002c-TIC54X-1763"></a><a name="index-g_t_0040code_007bmnolist_007d-directive_002c-TIC54X-1764"></a><br><dt><code>.mlist</code><dt><code>.mnolist</code><dd>Control whether to include macro and loop block expansions in the
+listing output.  Ignored.
+
+     <p><a name="index-g_t_0040code_007bmmregs_007d-directive_002c-TIC54X-1765"></a><br><dt><code>.mmregs</code><dd>Define global symbolic names for the 'c54x registers.  Supposedly
+equivalent to executing <code>.set</code> directives for each register with
+its memory-mapped value, but in reality is provided only for
+compatibility and does nothing.
+
+     <p><a name="index-g_t_0040code_007bnewblock_007d-directive_002c-TIC54X-1766"></a><br><dt><code>.newblock</code><dd>This directive resets any TIC54X local labels currently defined.  Normal
+<code>as</code> local labels are unaffected.
+
+     <p><a name="index-g_t_0040code_007boption_007d-directive_002c-TIC54X-1767"></a><br><dt><code>.option </code><var>option_list</var><dd>Set listing options.  Ignored.
+
+     <p><a name="index-g_t_0040code_007bsblock_007d-directive_002c-TIC54X-1768"></a><br><dt><code>.sblock "</code><var>section_name</var><code>" | </code><var>section_name</var><code> [,"</code><var>name_n</var><code>" | </code><var>name_n</var><code>]</code><dd>Designate <var>section_name</var> for blocking.  Blocking guarantees that a
+section will start on a page boundary (128 words) if it would otherwise
+cross a page boundary.  Only initialized sections may be designated with
+this directive.  See also See <a href="TIC54X_002dBlock.html#TIC54X_002dBlock">TIC54X-Block</a>.
+
+     <p><a name="index-g_t_0040code_007bsect_007d-directive_002c-TIC54X-1769"></a><br><dt><code>.sect "</code><var>section_name</var><code>"</code><dd>Define a named initialized section and make it the current section.
+
+     <p><a name="index-g_t_0040code_007bset_007d-directive_002c-TIC54X-1770"></a><a name="index-g_t_0040code_007bequ_007d-directive_002c-TIC54X-1771"></a><br><dt><var>symbol</var><code> .set "</code><var>value</var><code>"</code><dt><var>symbol</var><code> .equ "</code><var>value</var><code>"</code><dd>Equate a constant <var>value</var> to a <var>symbol</var>, which is placed in the
+symbol table.  <var>symbol</var> may not be previously defined.
+
+     <p><a name="index-g_t_0040code_007bspace_007d-directive_002c-TIC54X-1772"></a><a name="index-g_t_0040code_007bbes_007d-directive_002c-TIC54X-1773"></a><br><dt><code>.space </code><var>size_in_bits</var><dt><code>.bes </code><var>size_in_bits</var><dd>Reserve the given number of bits in the current section and zero-fill
+them.  If a label is used with <code>.space</code>, it points to the
+<strong>first</strong> word reserved.  With <code>.bes</code>, the label points to the
+<strong>last</strong> word reserved.
+
+     <p><a name="index-g_t_0040code_007bsslist_007d-directive_002c-TIC54X-1774"></a><a name="index-g_t_0040code_007bssnolist_007d-directive_002c-TIC54X-1775"></a><br><dt><code>.sslist</code><dt><code>.ssnolist</code><dd>Controls the inclusion of subsym replacement in the listing output.  Ignored.
+
+     <p><a name="index-g_t_0040code_007bstring_007d-directive_002c-TIC54X-1776"></a><a name="index-g_t_0040code_007bpstring_007d-directive_002c-TIC54X-1777"></a><br><dt><code>.string "</code><var>string</var><code>" [,...,"</code><var>string_n</var><code>"]</code><dt><code>.pstring "</code><var>string</var><code>" [,...,"</code><var>string_n</var><code>"]</code><dd>Place 8-bit characters from <var>string</var> into the current section. 
+<code>.string</code> zero-fills the upper 8 bits of each word, while
+<code>.pstring</code> puts two characters into each word, filling the
+most-significant bits first.  Unused space is zero-filled.  If a label
+is used, it points to the first word initialized.
+
+     <p><a name="index-g_t_0040code_007bstruct_007d-directive_002c-TIC54X-1778"></a><a name="index-g_t_0040code_007btag_007d-directive_002c-TIC54X-1779"></a><a name="index-g_t_0040code_007bendstruct_007d-directive_002c-TIC54X-1780"></a><br><dt><code>[</code><var>stag</var><code>] .struct [</code><var>offset</var><code>]</code><dt><code>[</code><var>name_1</var><code>] element [</code><var>count_1</var><code>]</code><dt><code>[</code><var>name_2</var><code>] element [</code><var>count_2</var><code>]</code><dt><code>[</code><var>tname</var><code>] .tag </code><var>stagx</var><code> [</code><var>tcount</var><code>]</code><dt><code>...</code><dt><code>[</code><var>name_n</var><code>] element [</code><var>count_n</var><code>]</code><dt><code>[</code><var>ssize</var><code>] .endstruct</code><dt><var>label</var><code> .tag [</code><var>stag</var><code>]</code><dd>Assign symbolic offsets to the elements of a structure.  <var>stag</var>
+defines a symbol to use to reference the structure.  <var>offset</var>
+indicates a starting value to use for the first element encountered;
+otherwise it defaults to zero.  Each element can have a named offset,
+<var>name</var>, which is a symbol assigned the value of the element's offset
+into the structure.  If <var>stag</var> is missing, these become global
+symbols.  <var>count</var> adjusts the offset that many times, as if
+<code>element</code> were an array.  <code>element</code> may be one of
+<code>.byte</code>, <code>.word</code>, <code>.long</code>, <code>.float</code>, or any
+equivalent of those, and the structure offset is adjusted accordingly. 
+<code>.field</code> and <code>.string</code> are also allowed; the size of
+<code>.field</code> is one bit, and <code>.string</code> is considered to be one
+word in size.  Only element descriptors, structure/union tags,
+<code>.align</code> and conditional assembly directives are allowed within
+<code>.struct</code>/<code>.endstruct</code>.  <code>.align</code> aligns member offsets
+to word boundaries only.  <var>ssize</var>, if provided, will always be
+assigned the size of the structure.
+
+     <p>The <code>.tag</code> directive, in addition to being used to define a
+structure/union element within a structure, may be used to apply a
+structure to a symbol.  Once applied to <var>label</var>, the individual
+structure elements may be applied to <var>label</var> to produce the desired
+offsets using <var>label</var> as the structure base.
+
+     <p><a name="index-g_t_0040code_007btab_007d-directive_002c-TIC54X-1781"></a><br><dt><code>.tab</code><dd>Set the tab size in the output listing.  Ignored.
+
+     <p><a name="index-g_t_0040code_007bunion_007d-directive_002c-TIC54X-1782"></a><a name="index-g_t_0040code_007btag_007d-directive_002c-TIC54X-1783"></a><a name="index-g_t_0040code_007bendunion_007d-directive_002c-TIC54X-1784"></a><br><dt><code>[</code><var>utag</var><code>] .union</code><dt><code>[</code><var>name_1</var><code>] element [</code><var>count_1</var><code>]</code><dt><code>[</code><var>name_2</var><code>] element [</code><var>count_2</var><code>]</code><dt><code>[</code><var>tname</var><code>] .tag </code><var>utagx</var><code>[,</code><var>tcount</var><code>]</code><dt><code>...</code><dt><code>[</code><var>name_n</var><code>] element [</code><var>count_n</var><code>]</code><dt><code>[</code><var>usize</var><code>] .endstruct</code><dt><var>label</var><code> .tag [</code><var>utag</var><code>]</code><dd>Similar to <code>.struct</code>, but the offset after each element is reset to
+zero, and the <var>usize</var> is set to the maximum of all defined elements. 
+Starting offset for the union is always zero.
+
+     <p><a name="index-g_t_0040code_007busect_007d-directive_002c-TIC54X-1785"></a><br><dt><code>[</code><var>symbol</var><code>] .usect "</code><var>section_name</var><code>", </code><var>size</var><code>, [,[</code><var>blocking_flag</var><code>] [,</code><var>alignment_flag</var><code>]]</code><dd>Reserve space for variables in a named, uninitialized section (similar to
+.bss).  <code>.usect</code> allows definitions sections independent of .bss. 
+<var>symbol</var> points to the first location reserved by this allocation. 
+The symbol may be used as a variable name.  <var>size</var> is the allocated
+size in words.  <var>blocking_flag</var> indicates whether to block this
+section on a page boundary (128 words) (see <a href="TIC54X_002dBlock.html#TIC54X_002dBlock">TIC54X-Block</a>). 
+<var>alignment flag</var> indicates whether the section should be
+longword-aligned.
+
+     <p><a name="index-g_t_0040code_007bvar_007d-directive_002c-TIC54X-1786"></a><br><dt><code>.var </code><var>sym</var><code>[,..., </code><var>sym_n</var><code>]</code><dd>Define a subsym to be a local variable within a macro.  See
+See <a href="TIC54X_002dMacros.html#TIC54X_002dMacros">TIC54X-Macros</a>.
+
+     <p><a name="index-g_t_0040code_007bversion_007d-directive_002c-TIC54X-1787"></a><br><dt><code>.version </code><var>version</var><dd>Set which processor to build instructions for.  Though the following
+values are accepted, the op is ignored.
+          <dl>
+<dt><code>541</code><dt><code>542</code><dt><code>543</code><dt><code>545</code><dt><code>545LP</code><dt><code>546LP</code><dt><code>548</code><dt><code>549</code><dd></dl>
+     </dl>
+
+   </body></html>
+

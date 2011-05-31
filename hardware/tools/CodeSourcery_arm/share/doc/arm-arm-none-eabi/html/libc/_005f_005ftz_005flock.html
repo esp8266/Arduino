@@ -1,0 +1,62 @@
+<html lang="en">
+<head>
+<title>__tz_lock - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Timefns.html#Timefns" title="Timefns">
+<link rel="prev" href="time.html#time" title="time">
+<link rel="next" href="tzset.html#tzset" title="tzset">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="__tz_lock"></a>
+<a name="g_t_005f_005ftz_005flock"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="tzset.html#tzset">tzset</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="time.html#time">time</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Timefns.html#Timefns">Timefns</a>
+<hr>
+</div>
+
+<h3 class="section">8.10 <code>__tz_lock</code>, <code>__tz_unlock</code>&mdash;lock time zone global variables</h3>
+
+<p><a name="index-g_t_005f_005ftz_005flock-439"></a><a name="index-g_t_005f_005ftz_005funlock-440"></a><strong>Synopsis</strong>
+<pre class="example">     #include "local.h"
+     void __tz_lock (void);
+     void __tz_unlock (void);
+     
+</pre>
+   <p><strong>Description</strong><br>
+The <code>tzset</code> facility functions call these functions when they need to
+ensure the values of global variables.  The version of these routines
+supplied in the library use the lock API defined in sys/lock.h.  If multiple
+threads of execution can call the time functions and give up scheduling in
+the middle, then you you need to define your own versions of these functions
+in order to safely lock the time zone variables during a call.  If you do
+not, the results of <code>localtime</code>, <code>mktime</code>, <code>ctime</code>, and <code>strftime</code>
+are undefined.
+
+   <p>The lock <code>__tz_lock</code> may not be called recursively; that is,
+a call <code>__tz_lock</code> will always lock all subsequent <code>__tz_lock</code> calls
+until the corresponding <code>__tz_unlock</code> call on the same thread is made.
+
+   <p><br>
+
+   </body></html>
+

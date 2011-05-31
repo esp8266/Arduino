@@ -1,0 +1,63 @@
+<html lang="en">
+<head>
+<title>__malloc_lock - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdlib.html#Stdlib" title="Stdlib">
+<link rel="prev" href="mallinfo.html#mallinfo" title="mallinfo">
+<link rel="next" href="mbsrtowcs.html#mbsrtowcs" title="mbsrtowcs">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="__malloc_lock"></a>
+<a name="g_t_005f_005fmalloc_005flock"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="mbsrtowcs.html#mbsrtowcs">mbsrtowcs</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="mallinfo.html#mallinfo">mallinfo</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdlib.html#Stdlib">Stdlib</a>
+<hr>
+</div>
+
+<h3 class="section">2.25 <code>__malloc_lock</code>, <code>__malloc_unlock</code>&mdash;lock malloc pool</h3>
+
+<p><a name="index-g_t_005f_005fmalloc_005flock-55"></a><a name="index-g_t_005f_005fmalloc_005funlock-56"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;malloc.h&gt;
+     void __malloc_lock (struct _reent *<var>reent</var>);
+     void __malloc_unlock (struct _reent *<var>reent</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+The <code>malloc</code> family of routines call these functions when they need to lock
+the memory pool.  The version of these routines supplied in the library use
+the lock API defined in sys/lock.h.  If multiple threads of execution can
+call <code>malloc</code>, or if <code>malloc</code> can be called reentrantly, then you need to
+define your own versions of these functions in order to safely lock the
+memory pool during a call.  If you do not, the memory pool may become
+corrupted.
+
+   <p>A call to <code>malloc</code> may call <code>__malloc_lock</code> recursively; that is,
+the sequence of calls may go <code>__malloc_lock</code>, <code>__malloc_lock</code>,
+<code>__malloc_unlock</code>, <code>__malloc_unlock</code>.  Any implementation of these
+routines must be careful to avoid causing a thread to wait for a lock
+that it already holds.
+
+   <p><br>
+
+   </body></html>
+

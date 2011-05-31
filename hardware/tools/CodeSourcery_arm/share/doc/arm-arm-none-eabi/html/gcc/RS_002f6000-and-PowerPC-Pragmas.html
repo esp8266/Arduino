@@ -1,0 +1,80 @@
+<html lang="en">
+<head>
+<title>RS/6000 and PowerPC Pragmas - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Pragmas.html#Pragmas" title="Pragmas">
+<link rel="prev" href="MeP-Pragmas.html#MeP-Pragmas" title="MeP Pragmas">
+<link rel="next" href="Darwin-Pragmas.html#Darwin-Pragmas" title="Darwin Pragmas">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="RS%2f6000-and-PowerPC-Pragmas"></a>
+<a name="RS_002f6000-and-PowerPC-Pragmas"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Darwin-Pragmas.html#Darwin-Pragmas">Darwin Pragmas</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="MeP-Pragmas.html#MeP-Pragmas">MeP Pragmas</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Pragmas.html#Pragmas">Pragmas</a>
+<hr>
+</div>
+
+<h4 class="subsection">6.54.4 RS/6000 and PowerPC Pragmas</h4>
+
+<p>The RS/6000 and PowerPC targets define one pragma for controlling
+whether or not the <code>longcall</code> attribute is added to function
+declarations by default.  This pragma overrides the <samp><span class="option">-mlongcall</span></samp>
+option, but not the <code>longcall</code> and <code>shortcall</code> attributes. 
+See <a href="RS_002f6000-and-PowerPC-Options.html#RS_002f6000-and-PowerPC-Options">RS/6000 and PowerPC Options</a>, for more information about when long
+calls are and are not necessary.
+
+     <dl>
+<dt><code>longcall (1)</code><dd><a name="index-pragma_002c-longcall-3129"></a>Apply the <code>longcall</code> attribute to all subsequent function
+declarations.
+
+     <br><dt><code>longcall (0)</code><dd>Do not apply the <code>longcall</code> attribute to subsequent function
+declarations. 
+</dl>
+
+<!-- Describe h8300 pragmas here. -->
+<!-- Describe sh pragmas here. -->
+<!-- Describe v850 pragmas here. -->
+ </body></html>
+

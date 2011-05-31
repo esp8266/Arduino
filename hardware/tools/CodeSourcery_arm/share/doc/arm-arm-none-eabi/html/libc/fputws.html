@@ -1,0 +1,65 @@
+<html lang="en">
+<head>
+<title>fputws - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="fputwc.html#fputwc" title="fputwc">
+<link rel="next" href="fread.html#fread" title="fread">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="fputws"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="fread.html#fread">fread</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="fputwc.html#fputwc">fputwc</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.23 <code>fputws</code>&mdash;write a wide character string in a file or stream</h3>
+
+<p><a name="index-fputws-191"></a><a name="index-g_t_005ffputws_005fr-192"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;wchar.h&gt;
+     int fputws(const wchar_t *<var>ws</var>, FILE *<var>fp</var>);
+     
+     #include &lt;wchar.h&gt;
+     int _fputws_r(struct _reent *<var>ptr</var>, const wchar_t *<var>ws</var>, FILE *<var>fp</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>fputws</code> writes the wide character string at <var>ws</var> (but without the
+trailing null) to the file or stream identified by <var>fp</var>.
+
+   <p><code>_fputws_r</code> is simply the reentrant version of <code>fputws</code> that takes
+an additional reentrant struct pointer argument: <var>ptr</var>.
+
+   <p><br>
+<strong>Returns</strong><br>
+If successful, the result is a non-negative integer; otherwise, the result
+is <code>-1</code> to indicate an error.
+
+   <p><br>
+<strong>Portability</strong><br>
+C99, POSIX.1-2001
+
+   <p><br>
+
+   </body></html>
+

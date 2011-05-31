@@ -1,0 +1,238 @@
+<html lang="en">
+<head>
+<title>Basic Python - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Python-API.html#Python-API" title="Python API">
+<link rel="next" href="Exception-Handling.html#Exception-Handling" title="Exception Handling">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Basic-Python"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Exception-Handling.html#Exception-Handling">Exception Handling</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Python-API.html#Python-API">Python API</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">23.2.2.1 Basic Python</h5>
+
+<p><a name="index-python-functions-1577"></a><a name="index-python-module-1578"></a><a name="index-gdb-module-1579"></a><span class="sc">gdb</span> introduces a new Python module, named <code>gdb</code>.  All
+methods and classes added by <span class="sc">gdb</span> are placed in this module. 
+<span class="sc">gdb</span> automatically <code>import</code>s the <code>gdb</code> module for
+use in all scripts evaluated by the <code>python</code> command.
+
+   <p><a name="index-gdb_002ePYTHONDIR-1580"></a>
+
+<div class="defun">
+&mdash; Variable: <b>PYTHONDIR</b><var><a name="index-PYTHONDIR-1581"></a></var><br>
+<blockquote><p>A string containing the python directory (see <a href="Python.html#Python">Python</a>). 
+</p></blockquote></div>
+
+   <p><a name="index-gdb_002eexecute-1582"></a>
+
+<div class="defun">
+&mdash; Function: <b>execute</b><var> command </var>[<var>from_tty</var>] [<var>to_string</var>]<var><a name="index-execute-1583"></a></var><br>
+<blockquote><p>Evaluate <var>command</var>, a string, as a <span class="sc">gdb</span> CLI command. 
+If a GDB exception happens while <var>command</var> runs, it is
+translated as described in <a href="Exception-Handling.html#Exception-Handling">Exception Handling</a>.
+
+        <p><var>from_tty</var> specifies whether <span class="sc">gdb</span> ought to consider this
+command as having originated from the user invoking it interactively. 
+It must be a boolean value.  If omitted, it defaults to <code>False</code>.
+
+        <p>By default, any output produced by <var>command</var> is sent to
+<span class="sc">gdb</span>'s standard output.  If the <var>to_string</var> parameter is
+<code>True</code>, then output will be collected by <code>gdb.execute</code> and
+returned as a string.  The default is <code>False</code>, in which case the
+return value is <code>None</code>.  If <var>to_string</var> is <code>True</code>, the
+<span class="sc">gdb</span> virtual terminal will be temporarily set to unlimited width
+and height, and its pagination will be disabled; see <a href="Screen-Size.html#Screen-Size">Screen Size</a>. 
+</p></blockquote></div>
+
+   <p><a name="index-gdb_002ebreakpoints-1584"></a>
+
+<div class="defun">
+&mdash; Function: <b>breakpoints</b><var><a name="index-breakpoints-1585"></a></var><br>
+<blockquote><p>Return a sequence holding all of <span class="sc">gdb</span>'s breakpoints. 
+See <a href="Breakpoints-In-Python.html#Breakpoints-In-Python">Breakpoints In Python</a>, for more information. 
+</p></blockquote></div>
+
+   <p><a name="index-gdb_002eparameter-1586"></a>
+
+<div class="defun">
+&mdash; Function: <b>parameter</b><var> parameter<a name="index-parameter-1587"></a></var><br>
+<blockquote><p>Return the value of a <span class="sc">gdb</span> parameter.  <var>parameter</var> is a
+string naming the parameter to look up; <var>parameter</var> may contain
+spaces if the parameter has a multi-part name.  For example,
+&lsquo;<samp><span class="samp">print object</span></samp>&rsquo; is a valid parameter name.
+
+        <p>If the named parameter does not exist, this function throws a
+<code>RuntimeError</code>.  Otherwise, the parameter's value is converted to
+a Python value of the appropriate type, and returned. 
+</p></blockquote></div>
+
+   <p><a name="index-gdb_002ehistory-1588"></a>
+
+<div class="defun">
+&mdash; Function: <b>history</b><var> number<a name="index-history-1589"></a></var><br>
+<blockquote><p>Return a value from <span class="sc">gdb</span>'s value history (see <a href="Value-History.html#Value-History">Value History</a>).  <var>number</var> indicates which history element to return. 
+If <var>number</var> is negative, then <span class="sc">gdb</span> will take its absolute value
+and count backward from the last element (i.e., the most recent element) to
+find the value to return.  If <var>number</var> is zero, then <span class="sc">gdb</span> will
+return the most recent element.  If the element specified by <var>number</var>
+doesn't exist in the value history, a <code>RuntimeError</code> exception will be
+raised.
+
+        <p>If no exception is raised, the return value is always an instance of
+<code>gdb.Value</code> (see <a href="Values-From-Inferior.html#Values-From-Inferior">Values From Inferior</a>). 
+</p></blockquote></div>
+
+   <p><a name="index-gdb_002eparse_005fand_005feval-1590"></a>
+
+<div class="defun">
+&mdash; Function: <b>parse_and_eval</b><var> expression<a name="index-parse_005fand_005feval-1591"></a></var><br>
+<blockquote><p>Parse <var>expression</var> as an expression in the current language,
+evaluate it, and return the result as a <code>gdb.Value</code>. 
+<var>expression</var> must be a string.
+
+        <p>This function can be useful when implementing a new command
+(see <a href="Commands-In-Python.html#Commands-In-Python">Commands In Python</a>), as it provides a way to parse the
+command's argument as an expression.  It is also useful simply to
+compute values, for example, it is the only way to get the value of a
+convenience variable (see <a href="Convenience-Vars.html#Convenience-Vars">Convenience Vars</a>) as a <code>gdb.Value</code>. 
+</p></blockquote></div>
+
+   <p><a name="index-gdb_002epost_005fevent-1592"></a>
+
+<div class="defun">
+&mdash; Function: <b>post_event</b><var> event<a name="index-post_005fevent-1593"></a></var><br>
+<blockquote><p>Put <var>event</var>, a callable object taking no arguments, into
+<span class="sc">gdb</span>'s internal event queue.  This callable will be invoked at
+some later point, during <span class="sc">gdb</span>'s event processing.  Events
+posted using <code>post_event</code> will be run in the order in which they
+were posted; however, there is no way to know when they will be
+processed relative to other events inside <span class="sc">gdb</span>.
+
+        <p><span class="sc">gdb</span> is not thread-safe.  If your Python program uses multiple
+threads, you must be careful to only call <span class="sc">gdb</span>-specific
+functions in the main <span class="sc">gdb</span> thread.  <code>post_event</code> ensures
+this.  For example:
+
+     <pre class="smallexample">          (gdb) python
+          &gt;import threading
+          &gt;
+          &gt;class Writer():
+          &gt; def __init__(self, message):
+          &gt;        self.message = message;
+          &gt; def __call__(self):
+          &gt;        gdb.write(self.message)
+          &gt;
+          &gt;class MyThread1 (threading.Thread):
+          &gt; def run (self):
+          &gt;        gdb.post_event(Writer("Hello "))
+          &gt;
+          &gt;class MyThread2 (threading.Thread):
+          &gt; def run (self):
+          &gt;        gdb.post_event(Writer("World\n"))
+          &gt;
+          &gt;MyThread1().start()
+          &gt;MyThread2().start()
+          &gt;end
+          (gdb) Hello World
+</pre>
+        </blockquote></div>
+
+   <p><a name="index-gdb_002ewrite-1594"></a>
+
+<div class="defun">
+&mdash; Function: <b>write</b><var> string<a name="index-write-1595"></a></var><br>
+<blockquote><p>Print a string to <span class="sc">gdb</span>'s paginated standard output stream. 
+Writing to <code>sys.stdout</code> or <code>sys.stderr</code> will automatically
+call this function. 
+</p></blockquote></div>
+
+   <p><a name="index-gdb_002eflush-1596"></a>
+
+<div class="defun">
+&mdash; Function: <b>flush</b><var><a name="index-flush-1597"></a></var><br>
+<blockquote><p>Flush <span class="sc">gdb</span>'s paginated standard output stream.  Flushing
+<code>sys.stdout</code> or <code>sys.stderr</code> will automatically call this
+function. 
+</p></blockquote></div>
+
+   <p><a name="index-gdb_002etarget_005fcharset-1598"></a>
+
+<div class="defun">
+&mdash; Function: <b>target_charset</b><var><a name="index-target_005fcharset-1599"></a></var><br>
+<blockquote><p>Return the name of the current target character set (see <a href="Character-Sets.html#Character-Sets">Character Sets</a>).  This differs from <code>gdb.parameter('target-charset')</code> in
+that &lsquo;<samp><span class="samp">auto</span></samp>&rsquo; is never returned. 
+</p></blockquote></div>
+
+   <p><a name="index-gdb_002etarget_005fwide_005fcharset-1600"></a>
+
+<div class="defun">
+&mdash; Function: <b>target_wide_charset</b><var><a name="index-target_005fwide_005fcharset-1601"></a></var><br>
+<blockquote><p>Return the name of the current target wide character set
+(see <a href="Character-Sets.html#Character-Sets">Character Sets</a>).  This differs from
+<code>gdb.parameter('target-wide-charset')</code> in that &lsquo;<samp><span class="samp">auto</span></samp>&rsquo; is
+never returned. 
+</p></blockquote></div>
+
+   <p><a name="index-gdb_002esolib_005fname-1602"></a>
+
+<div class="defun">
+&mdash; Function: <b>solib_name</b><var> address<a name="index-solib_005fname-1603"></a></var><br>
+<blockquote><p>Return the name of the shared library holding the given <var>address</var>
+as a string, or <code>None</code>. 
+</p></blockquote></div>
+
+   <p><a name="index-gdb_002edecode_005fline-1604"></a>
+
+<div class="defun">
+&mdash; Function: <b>decode_line</b> <span class="roman">[</span><var>expression</var><span class="roman">]</span><var><a name="index-decode_005fline-1605"></a></var><br>
+<blockquote><p>Return locations of the line specified by <var>expression</var>, or of the
+current line if no argument was given.  This function returns a Python
+tuple containing two elements.  The first element contains a string
+holding any unparsed section of <var>expression</var> (or <code>None</code> if
+the expression has been fully parsed).  The second element contains
+either <code>None</code> or another tuple that contains all the locations
+that match the expression represented as <code>gdb.Symtab_and_line</code>
+objects (see <a href="Symbol-Tables-In-Python.html#Symbol-Tables-In-Python">Symbol Tables In Python</a>).  If <var>expression</var> is
+provided, it is decoded the way that <span class="sc">gdb</span>'s inbuilt
+<code>break</code> or <code>edit</code> commands do (see <a href="Specify-Location.html#Specify-Location">Specify Location</a>). 
+</p></blockquote></div>
+
+   </body></html>
+

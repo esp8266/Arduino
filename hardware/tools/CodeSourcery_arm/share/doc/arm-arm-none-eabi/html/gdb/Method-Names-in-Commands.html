@@ -1,0 +1,101 @@
+<html lang="en">
+<head>
+<title>Method Names in Commands - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Objective_002dC.html#Objective_002dC" title="Objective-C">
+<link rel="next" href="The-Print-Command-with-Objective_002dC.html#The-Print-Command-with-Objective_002dC" title="The Print Command with Objective-C">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Method-Names-in-Commands"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="The-Print-Command-with-Objective_002dC.html#The-Print-Command-with-Objective_002dC">The Print Command with Objective-C</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Objective_002dC.html#Objective_002dC">Objective-C</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">15.4.3.1 Method Names in Commands</h5>
+
+<p>The following commands have been extended to accept Objective-C method
+names as line specifications:
+
+   <p><a name="index-clear_0040r_007b_002c-and-Objective_002dC_007d-826"></a><a name="index-break_0040r_007b_002c-and-Objective_002dC_007d-827"></a><a name="index-info-line_0040r_007b_002c-and-Objective_002dC_007d-828"></a><a name="index-jump_0040r_007b_002c-and-Objective_002dC_007d-829"></a><a name="index-list_0040r_007b_002c-and-Objective_002dC_007d-830"></a>
+     <ul>
+<li><code>clear</code>
+<li><code>break</code>
+<li><code>info line</code>
+<li><code>jump</code>
+<li><code>list</code>
+</ul>
+
+   <p>A fully qualified Objective-C method name is specified as
+
+<pre class="smallexample">     -[<var>Class</var> <var>methodName</var>]
+</pre>
+   <p>where the minus sign is used to indicate an instance method and a
+plus sign (not shown) is used to indicate a class method.  The class
+name <var>Class</var> and method name <var>methodName</var> are enclosed in
+brackets, similar to the way messages are specified in Objective-C
+source code.  For example, to set a breakpoint at the <code>create</code>
+instance method of class <code>Fruit</code> in the program currently being
+debugged, enter:
+
+<pre class="smallexample">     break -[Fruit create]
+</pre>
+   <p>To list ten program lines around the <code>initialize</code> class method,
+enter:
+
+<pre class="smallexample">     list +[NSText initialize]
+</pre>
+   <p>In the current version of <span class="sc">gdb</span>, the plus or minus sign is
+required.  In future versions of <span class="sc">gdb</span>, the plus or minus
+sign will be optional, but you can use it to narrow the search.  It
+is also possible to specify just a method name:
+
+<pre class="smallexample">     break create
+</pre>
+   <p>You must specify the complete method name, including any colons.  If
+your program's source files contain more than one <code>create</code> method,
+you'll be presented with a numbered list of classes that implement that
+method.  Indicate your choice by number, or type &lsquo;<samp><span class="samp">0</span></samp>&rsquo; to exit if
+none apply.
+
+   <p>As another example, to clear a breakpoint established at the
+<code>makeKeyAndOrderFront:</code> method of the <code>NSWindow</code> class, enter:
+
+<pre class="smallexample">     clear -[NSWindow makeKeyAndOrderFront:]
+</pre>
+   </body></html>
+

@@ -1,0 +1,92 @@
+<html lang="en">
+<head>
+<title>signal - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Signals.html#Signals" title="Signals">
+<link rel="prev" href="raise.html#raise" title="raise">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="signal"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="raise.html#raise">raise</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Signals.html#Signals">Signals</a>
+<hr>
+</div>
+
+<h3 class="section">7.2 <code>signal</code>&mdash;specify handler subroutine for a signal</h3>
+
+<p><a name="index-signal-424"></a><a name="index-g_t_005fsignal_005fr-425"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;signal.h&gt;
+     void (*signal(int <var>sig</var>, void(*<var>func</var>)(int))) (int);
+     
+     void (*_signal_r(void *<var>reent</var>, int <var>sig</var>, void(*<var>func</var>)(int))) (int);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>signal</code> provides a simple signal-handling implementation for embedded
+targets.
+
+   <p><code>signal</code> allows you to request changed treatment for a particular
+signal <var>sig</var>.  You can use one of the predefined macros <code>SIG_DFL</code>
+(select system default handling) or <code>SIG_IGN</code> (ignore this signal)
+as the value of <var>func</var>; otherwise, <var>func</var> is a function pointer
+that identifies a subroutine in your program as the handler for this signal.
+
+   <p>Some of the execution environment for signal handlers is
+unpredictable; notably, the only library function required to work
+correctly from within a signal handler is <code>signal</code> itself, and
+only when used to redefine the handler for the current signal value.
+
+   <p>Static storage is likewise unreliable for signal handlers, with one
+exception: if you declare a static storage location as `<code>volatile
+sig_atomic_t</code>', then you may use that location in a signal handler to
+store signal values.
+
+   <p>If your signal handler terminates using <code>return</code> (or implicit
+return), your program's execution continues at the point
+where it was when the signal was raised (whether by your program
+itself, or by an external event).  Signal handlers can also
+use functions such as <code>exit</code> and <code>abort</code> to avoid returning.
+
+   <p>The alternate function <code>_signal_r</code> is the reentrant version. 
+The extra argument <var>reent</var> is a pointer to a reentrancy structure.
+
+<!-- FIXME: do we have setjmp.h and assoc fns? -->
+   <p><br>
+<strong>Returns</strong><br>
+If your request for a signal handler cannot be honored, the result is
+<code>SIG_ERR</code>; a specific error number is also recorded in <code>errno</code>.
+
+   <p>Otherwise, the result is the previous handler (a function pointer or
+one of the predefined macros).
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C requires <code>signal</code>.
+
+   <p>No supporting OS subroutines are required to link with <code>signal</code>, but
+it will not have any useful effects, except for software generated signals,
+without an operating system that can actually raise exceptions.
+
+   <p><br>
+
+   </body></html>
+

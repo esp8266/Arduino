@@ -1,0 +1,60 @@
+<html lang="en">
+<head>
+<title>difftime - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Timefns.html#Timefns" title="Timefns">
+<link rel="prev" href="ctime.html#ctime" title="ctime">
+<link rel="next" href="gmtime.html#gmtime" title="gmtime">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="difftime"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="gmtime.html#gmtime">gmtime</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="ctime.html#ctime">ctime</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Timefns.html#Timefns">Timefns</a>
+<hr>
+</div>
+
+<h3 class="section">8.4 <code>difftime</code>&mdash;subtract two times</h3>
+
+<p><a name="index-difftime-431"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;time.h&gt;
+     double difftime(time_t <var>tim1</var>, time_t <var>tim2</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+Subtracts the two times in the arguments: `<var>tim1</var><code> - </code><var>tim2</var>'.
+
+   <p><br>
+<strong>Returns</strong><br>
+The difference (in seconds) between <var>tim2</var> and <var>tim1</var>, as a <code>double</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C requires <code>difftime</code>, and defines its result to be in seconds
+in all implementations.
+
+   <p><code>difftime</code> requires no supporting OS subroutines.
+
+   <p><br>
+
+   </body></html>
+

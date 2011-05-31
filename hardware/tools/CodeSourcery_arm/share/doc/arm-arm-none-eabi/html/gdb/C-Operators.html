@@ -1,0 +1,170 @@
+<html lang="en">
+<head>
+<title>C Operators - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C.html#C" title="C">
+<link rel="next" href="C-Constants.html#C-Constants" title="C Constants">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="C-Operators"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="C-Constants.html#C-Constants">C Constants</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C.html#C">C</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">15.4.1.1 C and C<tt>++</tt> Operators</h5>
+
+<p><a name="index-C-and-C_0040t_007b_002b_002b_007d-operators-798"></a>
+Operators must be defined on values of specific types.  For instance,
+<code>+</code> is defined on numbers, but not on structures.  Operators are
+often defined on groups of types.
+
+   <p>For the purposes of C and C<tt>++</tt>, the following definitions hold:
+
+     <ul>
+<li><em>Integral types</em> include <code>int</code> with any of its storage-class
+specifiers; <code>char</code>; <code>enum</code>; and, for C<tt>++</tt>, <code>bool</code>.
+
+     <li><em>Floating-point types</em> include <code>float</code>, <code>double</code>, and
+<code>long double</code> (if supported by the target platform).
+
+     <li><em>Pointer types</em> include all types defined as <code>(</code><var>type</var><code> *)</code>.
+
+     <li><em>Scalar types</em> include all of the above.
+
+   </ul>
+
+<p class="noindent">The following operators are supported.  They are listed here
+in order of increasing precedence:
+
+     <dl>
+<dt><code>,</code><dd>The comma or sequencing operator.  Expressions in a comma-separated list
+are evaluated from left to right, with the result of the entire
+expression being the last expression evaluated.
+
+     <br><dt><code>=</code><dd>Assignment.  The value of an assignment expression is the value
+assigned.  Defined on scalar types.
+
+     <br><dt><var>op</var><code>=</code><dd>Used in an expression of the form <var>a</var><code>&nbsp;</code><var>op</var><code>=&nbsp;</code><var>b</var><!-- /@w -->,
+and translated to <var>a</var><code>&nbsp;=&nbsp;</code><var>a&nbsp;op&nbsp;b</var><!-- /@w -->. 
+<var>op</var><code>=</code><!-- /@w --> and <code>=</code> have the same precedence. 
+<var>op</var> is any one of the operators <code>|</code>, <code>^</code>, <code>&amp;</code>,
+<code>&lt;&lt;</code>, <code>&gt;&gt;</code>, <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>%</code>.
+
+     <br><dt><code>?:</code><dd>The ternary operator.  <var>a</var><code> ? </code><var>b</var><code> : </code><var>c</var> can be thought
+of as:  if <var>a</var> then <var>b</var> else <var>c</var>.  <var>a</var> should be of an
+integral type.
+
+     <br><dt><code>||</code><dd>Logical <span class="sc">or</span>.  Defined on integral types.
+
+     <br><dt><code>&amp;&amp;</code><dd>Logical <span class="sc">and</span>.  Defined on integral types.
+
+     <br><dt><code>|</code><dd>Bitwise <span class="sc">or</span>.  Defined on integral types.
+
+     <br><dt><code>^</code><dd>Bitwise exclusive-<span class="sc">or</span>.  Defined on integral types.
+
+     <br><dt><code>&amp;</code><dd>Bitwise <span class="sc">and</span>.  Defined on integral types.
+
+     <br><dt><code>==</code><span class="roman">, </span><code>!=</code><dd>Equality and inequality.  Defined on scalar types.  The value of these
+expressions is 0 for false and non-zero for true.
+
+     <br><dt><code>&lt;</code><span class="roman">, </span><code>&gt;</code><span class="roman">, </span><code>&lt;=</code><span class="roman">, </span><code>&gt;=</code><dd>Less than, greater than, less than or equal, greater than or equal. 
+Defined on scalar types.  The value of these expressions is 0 for false
+and non-zero for true.
+
+     <br><dt><code>&lt;&lt;</code><span class="roman">, </span><code>&gt;&gt;</code><dd>left shift, and right shift.  Defined on integral types.
+
+     <br><dt><code>@</code><dd>The <span class="sc">gdb</span> &ldquo;artificial array&rdquo; operator (see <a href="Expressions.html#Expressions">Expressions</a>).
+
+     <br><dt><code>+</code><span class="roman">, </span><code>-</code><dd>Addition and subtraction.  Defined on integral types, floating-point types and
+pointer types.
+
+     <br><dt><code>*</code><span class="roman">, </span><code>/</code><span class="roman">, </span><code>%</code><dd>Multiplication, division, and modulus.  Multiplication and division are
+defined on integral and floating-point types.  Modulus is defined on
+integral types.
+
+     <br><dt><code>++</code><span class="roman">, </span><code>--</code><dd>Increment and decrement.  When appearing before a variable, the
+operation is performed before the variable is used in an expression;
+when appearing after it, the variable's value is used before the
+operation takes place.
+
+     <br><dt><code>*</code><dd>Pointer dereferencing.  Defined on pointer types.  Same precedence as
+<code>++</code>.
+
+     <br><dt><code>&amp;</code><dd>Address operator.  Defined on variables.  Same precedence as <code>++</code>.
+
+     <p>For debugging C<tt>++</tt>, <span class="sc">gdb</span> implements a use of &lsquo;<samp><span class="samp">&amp;</span></samp>&rsquo; beyond what is
+allowed in the C<tt>++</tt> language itself: you can use &lsquo;<samp><span class="samp">&amp;(&amp;</span><var>ref</var><span class="samp">)</span></samp>&rsquo;
+to examine the address
+where a C<tt>++</tt> reference variable (declared with &lsquo;<samp><span class="samp">&amp;</span><var>ref</var></samp>&rsquo;) is
+stored.
+
+     <br><dt><code>-</code><dd>Negative.  Defined on integral and floating-point types.  Same
+precedence as <code>++</code>.
+
+     <br><dt><code>!</code><dd>Logical negation.  Defined on integral types.  Same precedence as
+<code>++</code>.
+
+     <br><dt><code>~</code><dd>Bitwise complement operator.  Defined on integral types.  Same precedence as
+<code>++</code>.
+
+     <br><dt><code>.</code><span class="roman">, </span><code>-&gt;</code><dd>Structure member, and pointer-to-structure member.  For convenience,
+<span class="sc">gdb</span> regards the two as equivalent, choosing whether to dereference a
+pointer based on the stored type information. 
+Defined on <code>struct</code> and <code>union</code> data.
+
+     <br><dt><code>.*</code><span class="roman">, </span><code>-&gt;*</code><dd>Dereferences of pointers to members.
+
+     <br><dt><code>[]</code><dd>Array indexing.  <var>a</var><code>[</code><var>i</var><code>]</code> is defined as
+<code>*(</code><var>a</var><code>+</code><var>i</var><code>)</code>.  Same precedence as <code>-&gt;</code>.
+
+     <br><dt><code>()</code><dd>Function parameter list.  Same precedence as <code>-&gt;</code>.
+
+     <br><dt><code>::</code><dd>C<tt>++</tt> scope resolution operator.  Defined on <code>struct</code>, <code>union</code>,
+and <code>class</code> types.
+
+     <br><dt><code>::</code><dd>Doubled colons also represent the <span class="sc">gdb</span> scope operator
+(see <a href="Expressions.html#Expressions">Expressions</a>).  Same precedence as <code>::</code>,
+above. 
+</dl>
+
+   <p>If an operator is redefined in the user code, <span class="sc">gdb</span> usually
+attempts to invoke the redefined version instead of using the operator's
+predefined meaning.
+
+   </body></html>
+

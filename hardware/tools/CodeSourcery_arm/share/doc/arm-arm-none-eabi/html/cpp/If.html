@@ -1,0 +1,118 @@
+<html lang="en">
+<head>
+<title>If - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Conditional-Syntax.html#Conditional-Syntax" title="Conditional Syntax">
+<link rel="prev" href="Ifdef.html#Ifdef" title="Ifdef">
+<link rel="next" href="Defined.html#Defined" title="Defined">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="If"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Defined.html#Defined">Defined</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Ifdef.html#Ifdef">Ifdef</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Conditional-Syntax.html#Conditional-Syntax">Conditional Syntax</a>
+<hr>
+</div>
+
+<h4 class="subsection">4.2.2 If</h4>
+
+<p>The &lsquo;<samp><span class="samp">#if</span></samp>&rsquo; directive allows you to test the value of an arithmetic
+expression, rather than the mere existence of one macro.  Its syntax is
+
+<pre class="smallexample">     #if <var>expression</var>
+     
+     <var>controlled text</var>
+     
+     #endif /* <var>expression</var> */
+</pre>
+   <p><var>expression</var> is a C expression of integer type, subject to stringent
+restrictions.  It may contain
+
+     <ul>
+<li>Integer constants.
+
+     <li>Character constants, which are interpreted as they would be in normal
+code.
+
+     <li>Arithmetic operators for addition, subtraction, multiplication,
+division, bitwise operations, shifts, comparisons, and logical
+operations (<code>&amp;&amp;</code> and <code>||</code>).  The latter two obey the usual
+short-circuiting rules of standard C.
+
+     <li>Macros.  All macros in the expression are expanded before actual
+computation of the expression's value begins.
+
+     <li>Uses of the <code>defined</code> operator, which lets you check whether macros
+are defined in the middle of an &lsquo;<samp><span class="samp">#if</span></samp>&rsquo;.
+
+     <li>Identifiers that are not macros, which are all considered to be the
+number zero.  This allows you to write <code>#if&nbsp;MACRO<!-- /@w --></code> instead of
+<code>#ifdef&nbsp;MACRO<!-- /@w --></code>, if you know that MACRO, when defined, will
+always have a nonzero value.  Function-like macros used without their
+function call parentheses are also treated as zero.
+
+     <p>In some contexts this shortcut is undesirable.  The <samp><span class="option">-Wundef</span></samp>
+option causes GCC to warn whenever it encounters an identifier which is
+not a macro in an &lsquo;<samp><span class="samp">#if</span></samp>&rsquo;. 
+</ul>
+
+   <p>The preprocessor does not know anything about types in the language. 
+Therefore, <code>sizeof</code> operators are not recognized in &lsquo;<samp><span class="samp">#if</span></samp>&rsquo;, and
+neither are <code>enum</code> constants.  They will be taken as identifiers
+which are not macros, and replaced by zero.  In the case of
+<code>sizeof</code>, this is likely to cause the expression to be invalid.
+
+   <p>The preprocessor calculates the value of <var>expression</var>.  It carries
+out all calculations in the widest integer type known to the compiler;
+on most machines supported by GCC this is 64 bits.  This is not the same
+rule as the compiler uses to calculate the value of a constant
+expression, and may give different results in some cases.  If the value
+comes out to be nonzero, the &lsquo;<samp><span class="samp">#if</span></samp>&rsquo; succeeds and the <var>controlled
+text</var> is included; otherwise it is skipped.
+
+   </body></html>
+

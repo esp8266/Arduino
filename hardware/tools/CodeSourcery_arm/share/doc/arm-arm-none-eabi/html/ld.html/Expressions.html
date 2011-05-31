@@ -1,0 +1,75 @@
+<html lang="en">
+<head>
+<title>Expressions - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Scripts.html#Scripts" title="Scripts">
+<link rel="prev" href="VERSION.html#VERSION" title="VERSION">
+<link rel="next" href="Implicit-Linker-Scripts.html#Implicit-Linker-Scripts" title="Implicit Linker Scripts">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Expressions"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Implicit-Linker-Scripts.html#Implicit-Linker-Scripts">Implicit Linker Scripts</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="VERSION.html#VERSION">VERSION</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Scripts.html#Scripts">Scripts</a>
+<hr>
+</div>
+
+<h3 class="section">3.10 Expressions in Linker Scripts</h3>
+
+<p><a name="index-expressions-487"></a><a name="index-arithmetic-488"></a>The syntax for expressions in the linker script language is identical to
+that of C expressions.  All expressions are evaluated as integers.  All
+expressions are evaluated in the same size, which is 32 bits if both the
+host and target are 32 bits, and is otherwise 64 bits.
+
+   <p>You can use and set symbol values in expressions.
+
+   <p>The linker defines several special purpose builtin functions for use in
+expressions.
+
+<ul class="menu">
+<li><a accesskey="1" href="Constants.html#Constants">Constants</a>: 			Constants
+<li><a accesskey="2" href="Symbolic-Constants.html#Symbolic-Constants">Symbolic Constants</a>:           Symbolic constants
+<li><a accesskey="3" href="Symbols.html#Symbols">Symbols</a>: 			Symbol Names
+<li><a accesskey="4" href="Orphan-Sections.html#Orphan-Sections">Orphan Sections</a>: 		Orphan Sections
+<li><a accesskey="5" href="Location-Counter.html#Location-Counter">Location Counter</a>: 		The Location Counter
+<li><a accesskey="6" href="Operators.html#Operators">Operators</a>: 			Operators
+<li><a accesskey="7" href="Evaluation.html#Evaluation">Evaluation</a>: 			Evaluation
+<li><a accesskey="8" href="Expression-Section.html#Expression-Section">Expression Section</a>: 		The Section of an Expression
+<li><a accesskey="9" href="Builtin-Functions.html#Builtin-Functions">Builtin Functions</a>: 		Builtin Functions
+</ul>
+
+   </body></html>
+

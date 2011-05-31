@@ -1,0 +1,88 @@
+<html lang="en">
+<head>
+<title>C++ Named Operators - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Predefined-Macros.html#Predefined-Macros" title="Predefined Macros">
+<link rel="prev" href="System_002dspecific-Predefined-Macros.html#System_002dspecific-Predefined-Macros" title="System-specific Predefined Macros">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="C++-Named-Operators"></a>
+<a name="C_002b_002b-Named-Operators"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="System_002dspecific-Predefined-Macros.html#System_002dspecific-Predefined-Macros">System-specific Predefined Macros</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Predefined-Macros.html#Predefined-Macros">Predefined Macros</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.7.4 C++ Named Operators</h4>
+
+<p><a name="index-named-operators-65"></a><a name="index-C_002b_002b-named-operators-66"></a><a name="index-iso646_002eh-67"></a>
+In C++, there are eleven keywords which are simply alternate spellings
+of operators normally written with punctuation.  These keywords are
+treated as such even in the preprocessor.  They function as operators in
+&lsquo;<samp><span class="samp">#if</span></samp>&rsquo;, and they cannot be defined as macros or poisoned.  In C, you
+can request that those keywords take their C++ meaning by including
+<samp><span class="file">iso646.h</span></samp>.  That header defines each one as a normal object-like
+macro expanding to the appropriate punctuator.
+
+   <p>These are the named operators and their corresponding punctuators:
+
+   <p><table summary=""><tr align="left"><td valign="top">Named Operator </td><td valign="top">Punctuator
+<br></td></tr><tr align="left"><td valign="top"><code>and</code>    </td><td valign="top"><code>&amp;&amp;</code>
+<br></td></tr><tr align="left"><td valign="top"><code>and_eq</code> </td><td valign="top"><code>&amp;=</code>
+<br></td></tr><tr align="left"><td valign="top"><code>bitand</code> </td><td valign="top"><code>&amp;</code>
+<br></td></tr><tr align="left"><td valign="top"><code>bitor</code>  </td><td valign="top"><code>|</code>
+<br></td></tr><tr align="left"><td valign="top"><code>compl</code>  </td><td valign="top"><code>~</code>
+<br></td></tr><tr align="left"><td valign="top"><code>not</code>    </td><td valign="top"><code>!</code>
+<br></td></tr><tr align="left"><td valign="top"><code>not_eq</code> </td><td valign="top"><code>!=</code>
+<br></td></tr><tr align="left"><td valign="top"><code>or</code>     </td><td valign="top"><code>||</code>
+<br></td></tr><tr align="left"><td valign="top"><code>or_eq</code>  </td><td valign="top"><code>|=</code>
+<br></td></tr><tr align="left"><td valign="top"><code>xor</code>    </td><td valign="top"><code>^</code>
+<br></td></tr><tr align="left"><td valign="top"><code>xor_eq</code> </td><td valign="top"><code>^=</code>
+   <br></td></tr></table>
+
+   </body></html>
+

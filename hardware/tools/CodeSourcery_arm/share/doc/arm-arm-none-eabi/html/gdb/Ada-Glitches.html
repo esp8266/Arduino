@@ -1,0 +1,115 @@
+<html lang="en">
+<head>
+<title>Ada Glitches - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Ada.html#Ada" title="Ada">
+<link rel="prev" href="Ada-Tasks-and-Core-Files.html#Ada-Tasks-and-Core-Files" title="Ada Tasks and Core Files">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Ada-Glitches"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Ada-Tasks-and-Core-Files.html#Ada-Tasks-and-Core-Files">Ada Tasks and Core Files</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Ada.html#Ada">Ada</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">15.4.7.7 Known Peculiarities of Ada Mode</h5>
+
+<p><a name="index-Ada_002c-problems-878"></a>
+Besides the omissions listed previously (see <a href="Omissions-from-Ada.html#Omissions-from-Ada">Omissions from Ada</a>),
+we know of several problems with and limitations of Ada mode in
+<span class="sc">gdb</span>,
+some of which will be fixed with planned future releases of the debugger
+and the GNU Ada compiler.
+
+     <ul>
+<li>Currently, the debugger
+has insufficient information to determine whether certain pointers represent
+pointers to objects or the objects themselves. 
+Thus, the user may have to tack an extra <code>.all</code> after an expression
+to get it printed properly.
+
+     <li>Static constants that the compiler chooses not to materialize as objects in
+storage are invisible to the debugger.
+
+     <li>Named parameter associations in function argument lists are ignored (the
+argument lists are treated as positional).
+
+     <li>Many useful library packages are currently invisible to the debugger.
+
+     <li>Fixed-point arithmetic, conversions, input, and output is carried out using
+floating-point arithmetic, and may give results that only approximate those on
+the host machine.
+
+     <li>The GNAT compiler never generates the prefix <code>Standard</code> for any of
+the standard symbols defined by the Ada language.  <span class="sc">gdb</span> knows about
+this: it will strip the prefix from names when you use it, and will never
+look for a name you have so qualified among local symbols, nor match against
+symbols in other packages or subprograms.  If you have
+defined entities anywhere in your program other than parameters and
+local variables whose simple names match names in <code>Standard</code>,
+GNAT's lack of qualification here can cause confusion.  When this happens,
+you can usually resolve the confusion
+by qualifying the problematic names with package
+<code>Standard</code> explicitly. 
+</ul>
+
+   <p>Older versions of the compiler sometimes generate erroneous debugging
+information, resulting in the debugger incorrectly printing the value
+of affected entities.  In some cases, the debugger is able to work
+around an issue automatically. In other cases, the debugger is able
+to work around the issue, but the work-around has to be specifically
+enabled.
+
+   <p><a name="index-set-ada-trust_002dPAD_002dover_002dXVS-879"></a><a name="index-show-ada-trust_002dPAD_002dover_002dXVS-880"></a>
+     <dl>
+<dt><code>set ada trust-PAD-over-XVS on</code><dd>Configure GDB to strictly follow the GNAT encoding when computing the
+value of Ada entities, particularly when <code>PAD</code> and <code>PAD___XVS</code>
+types are involved (see <code>ada/exp_dbug.ads</code> in the GCC sources for
+a complete description of the encoding used by the GNAT compiler). 
+This is the default.
+
+     <br><dt><code>set ada trust-PAD-over-XVS off</code><dd>This is related to the encoding using by the GNAT compiler.  If <span class="sc">gdb</span>
+sometimes prints the wrong value for certain entities, changing <code>ada
+trust-PAD-over-XVS</code> to <code>off</code> activates a work-around which may fix
+the issue.  It is always safe to set <code>ada trust-PAD-over-XVS</code> to
+<code>off</code>, but this incurs a slight performance penalty, so it is
+recommended to leave this setting to <code>on</code> unless necessary.
+
+   </dl>
+
+   </body></html>
+

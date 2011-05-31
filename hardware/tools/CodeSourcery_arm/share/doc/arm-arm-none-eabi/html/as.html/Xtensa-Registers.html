@@ -1,0 +1,61 @@
+<html lang="en">
+<head>
+<title>Xtensa Registers - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Xtensa-Syntax.html#Xtensa-Syntax" title="Xtensa Syntax">
+<link rel="prev" href="Xtensa-Opcodes.html#Xtensa-Opcodes" title="Xtensa Opcodes">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Xtensa-Registers"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Xtensa-Opcodes.html#Xtensa-Opcodes">Xtensa Opcodes</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Xtensa-Syntax.html#Xtensa-Syntax">Xtensa Syntax</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">9.42.2.2 Register Names</h5>
+
+<p><a name="index-Xtensa-register-names-2015"></a><a name="index-register-names_002c-Xtensa-2016"></a><a name="index-sp-register-2017"></a>
+The assembly syntax for a register file entry is the &ldquo;short&rdquo; name for
+a TIE register file followed by the index into that register file.  For
+example, the general-purpose <code>AR</code> register file has a short name of
+<code>a</code>, so these registers are named <code>a0</code><small class="dots">...</small><code>a15</code>. 
+As a special feature, <code>sp</code> is also supported as a synonym for
+<code>a1</code>.  Additional registers may be added by processor configuration
+options and by designer-defined TIE extensions.  An initial &lsquo;<samp><span class="samp">$</span></samp>&rsquo;
+character is optional in all register names.
+
+   </body></html>
+

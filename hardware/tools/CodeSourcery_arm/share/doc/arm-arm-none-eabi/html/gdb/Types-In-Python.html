@@ -1,0 +1,287 @@
+<html lang="en">
+<head>
+<title>Types In Python - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Python-API.html#Python-API" title="Python API">
+<link rel="prev" href="Values-From-Inferior.html#Values-From-Inferior" title="Values From Inferior">
+<link rel="next" href="Pretty-Printing-API.html#Pretty-Printing-API" title="Pretty Printing API">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Types-In-Python"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Pretty-Printing-API.html#Pretty-Printing-API">Pretty Printing API</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Values-From-Inferior.html#Values-From-Inferior">Values From Inferior</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Python-API.html#Python-API">Python API</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">23.2.2.4 Types In Python</h5>
+
+<p><a name="index-types-in-Python-1623"></a><a name="index-Python_002c-working-with-types-1624"></a>
+<a name="index-gdb_002eType-1625"></a><span class="sc">gdb</span> represents types from the inferior using the class
+<code>gdb.Type</code>.
+
+   <p>The following type-related functions are available in the <code>gdb</code>
+module:
+
+   <p><a name="index-gdb_002elookup_005ftype-1626"></a>
+
+<div class="defun">
+&mdash; Function: <b>lookup_type</b><var> name </var>[<var>block</var>]<var><a name="index-lookup_005ftype-1627"></a></var><br>
+<blockquote><p>This function looks up a type by name.  <var>name</var> is the name of the
+type to look up.  It must be a string.
+
+        <p>If <var>block</var> is given, then <var>name</var> is looked up in that scope. 
+Otherwise, it is searched for globally.
+
+        <p>Ordinarily, this function will return an instance of <code>gdb.Type</code>. 
+If the named type cannot be found, it will throw an exception. 
+</p></blockquote></div>
+
+   <p>An instance of <code>Type</code> has the following attributes:
+
+     <dl>
+
+     <div class="defun">
+&mdash; Instance Variable of Type: <b>code</b><var><a name="index-code-1628"></a></var><br>
+<blockquote> <p>The type code for this type.  The type code will be one of the
+<code>TYPE_CODE_</code> constants defined below. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Instance Variable of Type: <b>sizeof</b><var><a name="index-sizeof-1629"></a></var><br>
+<blockquote> <p>The size of this type, in target <code>char</code> units.  Usually, a
+target's <code>char</code> type will be an 8-bit byte.  However, on some
+unusual platforms, this type may have a different size. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Instance Variable of Type: <b>tag</b><var><a name="index-tag-1630"></a></var><br>
+<blockquote> <p>The tag name for this type.  The tag name is the name after
+<code>struct</code>, <code>union</code>, or <code>enum</code> in C and C<tt>++</tt>; not all
+languages have this concept.  If this type has no tag name, then
+<code>None</code> is returned. 
+</p></blockquote></div>
+     </dl>
+
+   <p>The following methods are provided:
+
+     <dl>
+
+     <div class="defun">
+&mdash; Method on Type: <b>fields</b><var><a name="index-fields-on-Type-1631"></a></var><br>
+<blockquote> <p>For structure and union types, this method returns the fields.  Range
+types have two fields, the minimum and maximum values.  Enum types
+have one field per enum constant.  Function and method types have one
+field per parameter.  The base types of C<tt>++</tt> classes are also
+represented as fields.  If the type has no fields, or does not fit
+into one of these categories, an empty sequence will be returned.
+
+             <p>Each field is an object, with some pre-defined attributes:
+               <dl>
+<dt><code>bitpos</code><dd>This attribute is not available for <code>static</code> fields (as in
+C<tt>++</tt> or Java).  For non-<code>static</code> fields, the value is the bit
+position of the field.
+
+               <br><dt><code>name</code><dd>The name of the field, or <code>None</code> for anonymous fields.
+
+               <br><dt><code>artificial</code><dd>This is <code>True</code> if the field is artificial, usually meaning that
+it was provided by the compiler and not the user.  This attribute is
+always provided, and is <code>False</code> if the field is not artificial.
+
+               <br><dt><code>is_base_class</code><dd>This is <code>True</code> if the field represents a base class of a C<tt>++</tt>
+structure.  This attribute is always provided, and is <code>False</code>
+if the field is not a base class of the type that is the argument of
+<code>fields</code>, or if that type was not a C<tt>++</tt> class.
+
+               <br><dt><code>bitsize</code><dd>If the field is packed, or is a bitfield, then this will have a
+non-zero value, which is the size of the field in bits.  Otherwise,
+this will be zero; in this case the field's size is given by its type.
+
+               <br><dt><code>type</code><dd>The type of the field.  This is usually an instance of <code>Type</code>,
+but it can be <code>None</code> in some situations. 
+</dl>
+             </p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on Type: <b>array</b><var> n1 </var><span class="roman">[</span><var>n2</var><span class="roman">]</span><var><a name="index-array-on-Type-1632"></a></var><br>
+<blockquote> <p>Return a new <code>gdb.Type</code> object which represents an array of this
+type.  If one argument is given, it is the inclusive upper bound of
+the array; in this case the lower bound is zero.  If two arguments are
+given, the first argument is the lower bound of the array, and the
+second argument is the upper bound of the array.  An array's length
+must not be negative, but the bounds can be. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on Type: <b>const</b><var><a name="index-const-on-Type-1633"></a></var><br>
+<blockquote> <p>Return a new <code>gdb.Type</code> object which represents a
+<code>const</code>-qualified variant of this type. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on Type: <b>volatile</b><var><a name="index-volatile-on-Type-1634"></a></var><br>
+<blockquote> <p>Return a new <code>gdb.Type</code> object which represents a
+<code>volatile</code>-qualified variant of this type. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on Type: <b>unqualified</b><var><a name="index-unqualified-on-Type-1635"></a></var><br>
+<blockquote> <p>Return a new <code>gdb.Type</code> object which represents an unqualified
+variant of this type.  That is, the result is neither <code>const</code> nor
+<code>volatile</code>. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on Type: <b>range</b><var><a name="index-range-on-Type-1636"></a></var><br>
+<blockquote> <p>Return a Python <code>Tuple</code> object that contains two elements: the
+low bound of the argument type and the high bound of that type.  If
+the type does not have a range, <span class="sc">gdb</span> will raise a
+<code>RuntimeError</code> exception. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on Type: <b>reference</b><var><a name="index-reference-on-Type-1637"></a></var><br>
+<blockquote> <p>Return a new <code>gdb.Type</code> object which represents a reference to this
+type. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on Type: <b>pointer</b><var><a name="index-pointer-on-Type-1638"></a></var><br>
+<blockquote> <p>Return a new <code>gdb.Type</code> object which represents a pointer to this
+type. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on Type: <b>strip_typedefs</b><var><a name="index-strip_005ftypedefs-on-Type-1639"></a></var><br>
+<blockquote> <p>Return a new <code>gdb.Type</code> that represents the real type,
+after removing all layers of typedefs. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on Type: <b>target</b><var><a name="index-target-on-Type-1640"></a></var><br>
+<blockquote> <p>Return a new <code>gdb.Type</code> object which represents the target type
+of this type.
+
+             <p>For a pointer type, the target type is the type of the pointed-to
+object.  For an array type (meaning C-like arrays), the target type is
+the type of the elements of the array.  For a function or method type,
+the target type is the type of the return value.  For a complex type,
+the target type is the type of the elements.  For a typedef, the
+target type is the aliased type.
+
+             <p>If the type does not have a target, this method will throw an
+exception. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on Type: <b>template_argument</b><var> n </var>[<var>block</var>]<var><a name="index-template_005fargument-on-Type-1641"></a></var><br>
+<blockquote> <p>If this <code>gdb.Type</code> is an instantiation of a template, this will
+return a new <code>gdb.Type</code> which represents the type of the
+<var>n</var>th template argument.
+
+             <p>If this <code>gdb.Type</code> is not a template type, this will throw an
+exception.  Ordinarily, only C<tt>++</tt> code will have template types.
+
+             <p>If <var>block</var> is given, then <var>name</var> is looked up in that scope. 
+Otherwise, it is searched for globally. 
+</p></blockquote></div>
+     </dl>
+
+   <p>Each type has a code, which indicates what category this type falls
+into.  The available type categories are represented by constants
+defined in the <code>gdb</code> module:
+
+     
+<a name="index-TYPE_005fCODE_005fPTR-1642"></a>
+<a name="index-gdb_002eTYPE_005fCODE_005fPTR-1643"></a>
+<dl><dt><code>TYPE_CODE_PTR</code><dd>The type is a pointer.
+
+     <p><a name="index-TYPE_005fCODE_005fARRAY-1644"></a><a name="index-gdb_002eTYPE_005fCODE_005fARRAY-1645"></a><br><dt><code>TYPE_CODE_ARRAY</code><dd>The type is an array.
+
+     <p><a name="index-TYPE_005fCODE_005fSTRUCT-1646"></a><a name="index-gdb_002eTYPE_005fCODE_005fSTRUCT-1647"></a><br><dt><code>TYPE_CODE_STRUCT</code><dd>The type is a structure.
+
+     <p><a name="index-TYPE_005fCODE_005fUNION-1648"></a><a name="index-gdb_002eTYPE_005fCODE_005fUNION-1649"></a><br><dt><code>TYPE_CODE_UNION</code><dd>The type is a union.
+
+     <p><a name="index-TYPE_005fCODE_005fENUM-1650"></a><a name="index-gdb_002eTYPE_005fCODE_005fENUM-1651"></a><br><dt><code>TYPE_CODE_ENUM</code><dd>The type is an enum.
+
+     <p><a name="index-TYPE_005fCODE_005fFLAGS-1652"></a><a name="index-gdb_002eTYPE_005fCODE_005fFLAGS-1653"></a><br><dt><code>TYPE_CODE_FLAGS</code><dd>A bit flags type, used for things such as status registers.
+
+     <p><a name="index-TYPE_005fCODE_005fFUNC-1654"></a><a name="index-gdb_002eTYPE_005fCODE_005fFUNC-1655"></a><br><dt><code>TYPE_CODE_FUNC</code><dd>The type is a function.
+
+     <p><a name="index-TYPE_005fCODE_005fINT-1656"></a><a name="index-gdb_002eTYPE_005fCODE_005fINT-1657"></a><br><dt><code>TYPE_CODE_INT</code><dd>The type is an integer type.
+
+     <p><a name="index-TYPE_005fCODE_005fFLT-1658"></a><a name="index-gdb_002eTYPE_005fCODE_005fFLT-1659"></a><br><dt><code>TYPE_CODE_FLT</code><dd>A floating point type.
+
+     <p><a name="index-TYPE_005fCODE_005fVOID-1660"></a><a name="index-gdb_002eTYPE_005fCODE_005fVOID-1661"></a><br><dt><code>TYPE_CODE_VOID</code><dd>The special type <code>void</code>.
+
+     <p><a name="index-TYPE_005fCODE_005fSET-1662"></a><a name="index-gdb_002eTYPE_005fCODE_005fSET-1663"></a><br><dt><code>TYPE_CODE_SET</code><dd>A Pascal set type.
+
+     <p><a name="index-TYPE_005fCODE_005fRANGE-1664"></a><a name="index-gdb_002eTYPE_005fCODE_005fRANGE-1665"></a><br><dt><code>TYPE_CODE_RANGE</code><dd>A range type, that is, an integer type with bounds.
+
+     <p><a name="index-TYPE_005fCODE_005fSTRING-1666"></a><a name="index-gdb_002eTYPE_005fCODE_005fSTRING-1667"></a><br><dt><code>TYPE_CODE_STRING</code><dd>A string type.  Note that this is only used for certain languages with
+language-defined string types; C strings are not represented this way.
+
+     <p><a name="index-TYPE_005fCODE_005fBITSTRING-1668"></a><a name="index-gdb_002eTYPE_005fCODE_005fBITSTRING-1669"></a><br><dt><code>TYPE_CODE_BITSTRING</code><dd>A string of bits.
+
+     <p><a name="index-TYPE_005fCODE_005fERROR-1670"></a><a name="index-gdb_002eTYPE_005fCODE_005fERROR-1671"></a><br><dt><code>TYPE_CODE_ERROR</code><dd>An unknown or erroneous type.
+
+     <p><a name="index-TYPE_005fCODE_005fMETHOD-1672"></a><a name="index-gdb_002eTYPE_005fCODE_005fMETHOD-1673"></a><br><dt><code>TYPE_CODE_METHOD</code><dd>A method type, as found in C<tt>++</tt> or Java.
+
+     <p><a name="index-TYPE_005fCODE_005fMETHODPTR-1674"></a><a name="index-gdb_002eTYPE_005fCODE_005fMETHODPTR-1675"></a><br><dt><code>TYPE_CODE_METHODPTR</code><dd>A pointer-to-member-function.
+
+     <p><a name="index-TYPE_005fCODE_005fMEMBERPTR-1676"></a><a name="index-gdb_002eTYPE_005fCODE_005fMEMBERPTR-1677"></a><br><dt><code>TYPE_CODE_MEMBERPTR</code><dd>A pointer-to-member.
+
+     <p><a name="index-TYPE_005fCODE_005fREF-1678"></a><a name="index-gdb_002eTYPE_005fCODE_005fREF-1679"></a><br><dt><code>TYPE_CODE_REF</code><dd>A reference type.
+
+     <p><a name="index-TYPE_005fCODE_005fCHAR-1680"></a><a name="index-gdb_002eTYPE_005fCODE_005fCHAR-1681"></a><br><dt><code>TYPE_CODE_CHAR</code><dd>A character type.
+
+     <p><a name="index-TYPE_005fCODE_005fBOOL-1682"></a><a name="index-gdb_002eTYPE_005fCODE_005fBOOL-1683"></a><br><dt><code>TYPE_CODE_BOOL</code><dd>A boolean type.
+
+     <p><a name="index-TYPE_005fCODE_005fCOMPLEX-1684"></a><a name="index-gdb_002eTYPE_005fCODE_005fCOMPLEX-1685"></a><br><dt><code>TYPE_CODE_COMPLEX</code><dd>A complex float type.
+
+     <p><a name="index-TYPE_005fCODE_005fTYPEDEF-1686"></a><a name="index-gdb_002eTYPE_005fCODE_005fTYPEDEF-1687"></a><br><dt><code>TYPE_CODE_TYPEDEF</code><dd>A typedef to some other type.
+
+     <p><a name="index-TYPE_005fCODE_005fNAMESPACE-1688"></a><a name="index-gdb_002eTYPE_005fCODE_005fNAMESPACE-1689"></a><br><dt><code>TYPE_CODE_NAMESPACE</code><dd>A C<tt>++</tt> namespace.
+
+     <p><a name="index-TYPE_005fCODE_005fDECFLOAT-1690"></a><a name="index-gdb_002eTYPE_005fCODE_005fDECFLOAT-1691"></a><br><dt><code>TYPE_CODE_DECFLOAT</code><dd>A decimal floating point type.
+
+     <p><a name="index-TYPE_005fCODE_005fINTERNAL_005fFUNCTION-1692"></a><a name="index-gdb_002eTYPE_005fCODE_005fINTERNAL_005fFUNCTION-1693"></a><br><dt><code>TYPE_CODE_INTERNAL_FUNCTION</code><dd>A function internal to <span class="sc">gdb</span>.  This is the type used to represent
+convenience functions. 
+</dl>
+
+   </body></html>
+

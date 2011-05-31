@@ -1,0 +1,197 @@
+<html lang="en">
+<head>
+<title>Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="#Top">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled "GNU Free Documentation License".-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a name="toc_Top" href="index.html#Top">LD</a>
+<li><a name="toc_Overview" href="Overview.html#Overview">1 Overview</a>
+<li><a name="toc_Invocation" href="Invocation.html#Invocation">2 Invocation</a>
+<ul>
+<li><a href="Options.html#Options">2.1 Command Line Options</a>
+<ul>
+<li><a href="Options.html#Options">2.1.1 Options Specific to i386 PE Targets</a>
+<li><a href="Options.html#Options">2.1.2 Options specific to Motorola 68HC11 and 68HC12 targets</a>
+<li><a href="Options.html#Options">2.1.3 Options specific to Motorola 68K target</a>
+</li></ul>
+<li><a href="Environment.html#Environment">2.2 Environment Variables</a>
+</li></ul>
+<li><a name="toc_Scripts" href="Scripts.html#Scripts">3 Linker Scripts</a>
+<ul>
+<li><a href="Basic-Script-Concepts.html#Basic-Script-Concepts">3.1 Basic Linker Script Concepts</a>
+<li><a href="Script-Format.html#Script-Format">3.2 Linker Script Format</a>
+<li><a href="Simple-Example.html#Simple-Example">3.3 Simple Linker Script Example</a>
+<li><a href="Simple-Commands.html#Simple-Commands">3.4 Simple Linker Script Commands</a>
+<ul>
+<li><a href="Entry-Point.html#Entry-Point">3.4.1 Setting the Entry Point</a>
+<li><a href="File-Commands.html#File-Commands">3.4.2 Commands Dealing with Files</a>
+<li><a href="Format-Commands.html#Format-Commands">3.4.3 Commands Dealing with Object File Formats</a>
+<li><a href="REGION_005fALIAS.html#REGION_005fALIAS">3.4.4 Assign alias names to memory regions</a>
+<li><a href="Miscellaneous-Commands.html#Miscellaneous-Commands">3.4.5 Other Linker Script Commands</a>
+</li></ul>
+<li><a href="Assignments.html#Assignments">3.5 Assigning Values to Symbols</a>
+<ul>
+<li><a href="Simple-Assignments.html#Simple-Assignments">3.5.1 Simple Assignments</a>
+<li><a href="PROVIDE.html#PROVIDE">3.5.2 PROVIDE</a>
+<li><a href="PROVIDE_005fHIDDEN.html#PROVIDE_005fHIDDEN">3.5.3 PROVIDE_HIDDEN</a>
+<li><a href="Source-Code-Reference.html#Source-Code-Reference">3.5.4 Source Code Reference</a>
+</li></ul>
+<li><a href="SECTIONS.html#SECTIONS">3.6 SECTIONS Command</a>
+<ul>
+<li><a href="Output-Section-Description.html#Output-Section-Description">3.6.1 Output Section Description</a>
+<li><a href="Output-Section-Name.html#Output-Section-Name">3.6.2 Output Section Name</a>
+<li><a href="Output-Section-Address.html#Output-Section-Address">3.6.3 Output Section Address</a>
+<li><a href="Input-Section.html#Input-Section">3.6.4 Input Section Description</a>
+<ul>
+<li><a href="Input-Section-Basics.html#Input-Section-Basics">3.6.4.1 Input Section Basics</a>
+<li><a href="Input-Section-Wildcards.html#Input-Section-Wildcards">3.6.4.2 Input Section Wildcard Patterns</a>
+<li><a href="Input-Section-Common.html#Input-Section-Common">3.6.4.3 Input Section for Common Symbols</a>
+<li><a href="Input-Section-Keep.html#Input-Section-Keep">3.6.4.4 Input Section and Garbage Collection</a>
+<li><a href="Input-Section-Example.html#Input-Section-Example">3.6.4.5 Input Section Example</a>
+</li></ul>
+<li><a href="Output-Section-Data.html#Output-Section-Data">3.6.5 Output Section Data</a>
+<li><a href="Output-Section-Keywords.html#Output-Section-Keywords">3.6.6 Output Section Keywords</a>
+<li><a href="Output-Section-Discarding.html#Output-Section-Discarding">3.6.7 Output Section Discarding</a>
+<li><a href="Output-Section-Attributes.html#Output-Section-Attributes">3.6.8 Output Section Attributes</a>
+<ul>
+<li><a href="Output-Section-Type.html#Output-Section-Type">3.6.8.1 Output Section Type</a>
+<li><a href="Output-Section-LMA.html#Output-Section-LMA">3.6.8.2 Output Section LMA</a>
+<li><a href="Forced-Output-Alignment.html#Forced-Output-Alignment">3.6.8.3 Forced Output Alignment</a>
+<li><a href="Forced-Input-Alignment.html#Forced-Input-Alignment">3.6.8.4 Forced Input Alignment</a>
+<li><a href="Output-Section-Constraint.html#Output-Section-Constraint">3.6.8.5 Output Section Constraint</a>
+<li><a href="Output-Section-Region.html#Output-Section-Region">3.6.8.6 Output Section Region</a>
+<li><a href="Output-Section-Phdr.html#Output-Section-Phdr">3.6.8.7 Output Section Phdr</a>
+<li><a href="Output-Section-Fill.html#Output-Section-Fill">3.6.8.8 Output Section Fill</a>
+</li></ul>
+<li><a href="Overlay-Description.html#Overlay-Description">3.6.9 Overlay Description</a>
+</li></ul>
+<li><a href="MEMORY.html#MEMORY">3.7 MEMORY Command</a>
+<li><a href="PHDRS.html#PHDRS">3.8 PHDRS Command</a>
+<li><a href="VERSION.html#VERSION">3.9 VERSION Command</a>
+<li><a href="Expressions.html#Expressions">3.10 Expressions in Linker Scripts</a>
+<ul>
+<li><a href="Constants.html#Constants">3.10.1 Constants</a>
+<li><a href="Symbolic-Constants.html#Symbolic-Constants">3.10.2 Symbolic Constants</a>
+<li><a href="Symbols.html#Symbols">3.10.3 Symbol Names</a>
+<li><a href="Orphan-Sections.html#Orphan-Sections">3.10.4 Orphan Sections</a>
+<li><a href="Location-Counter.html#Location-Counter">3.10.5 The Location Counter</a>
+<li><a href="Operators.html#Operators">3.10.6 Operators</a>
+<li><a href="Evaluation.html#Evaluation">3.10.7 Evaluation</a>
+<li><a href="Expression-Section.html#Expression-Section">3.10.8 The Section of an Expression</a>
+<li><a href="Builtin-Functions.html#Builtin-Functions">3.10.9 Builtin Functions</a>
+</li></ul>
+<li><a href="Implicit-Linker-Scripts.html#Implicit-Linker-Scripts">3.11 Implicit Linker Scripts</a>
+</li></ul>
+<li><a name="toc_Machine-Dependent" href="Machine-Dependent.html#Machine-Dependent">4 Machine Dependent Features</a>
+<ul>
+<li><a href="H8_002f300.html#H8_002f300">4.1 <samp><span class="command">ld</span></samp> and the H8/300</a>
+<li><a href="i960.html#i960">4.2 <samp><span class="command">ld</span></samp> and the Intel 960 Family</a>
+<li><a href="M68HC11_002f68HC12.html#M68HC11_002f68HC12">4.3 <samp><span class="command">ld</span></samp> and the Motorola 68HC11 and 68HC12 families</a>
+<ul>
+<li><a href="M68HC11_002f68HC12.html#M68HC11_002f68HC12">4.3.1 Linker Relaxation</a>
+<li><a href="M68HC11_002f68HC12.html#M68HC11_002f68HC12">4.3.2 Trampoline Generation</a>
+</li></ul>
+<li><a href="ARM.html#ARM">4.4 <samp><span class="command">ld</span></samp> and the ARM family</a>
+<li><a href="HPPA-ELF32.html#HPPA-ELF32">4.5 <samp><span class="command">ld</span></samp> and HPPA 32-bit ELF Support</a>
+<li><a href="M68K.html#M68K">4.6 <samp><span class="command">ld</span></samp> and the Motorola 68K family</a>
+<li><a href="MMIX.html#MMIX">4.7 <code>ld</code> and MMIX</a>
+<li><a href="MSP430.html#MSP430">4.8 <code>ld</code> and MSP430</a>
+<li><a href="PowerPC-ELF32.html#PowerPC-ELF32">4.9 <samp><span class="command">ld</span></samp> and PowerPC 32-bit ELF Support</a>
+<li><a href="PowerPC64-ELF64.html#PowerPC64-ELF64">4.10 <samp><span class="command">ld</span></samp> and PowerPC64 64-bit ELF Support</a>
+<li><a href="SPU-ELF.html#SPU-ELF">4.11 <samp><span class="command">ld</span></samp> and SPU ELF Support</a>
+<li><a href="TI-COFF.html#TI-COFF">4.12 <samp><span class="command">ld</span></samp>'s Support for Various TI COFF Versions</a>
+<li><a href="WIN32.html#WIN32">4.13 <samp><span class="command">ld</span></samp> and WIN32 (cygwin/mingw)</a>
+<li><a href="Xtensa.html#Xtensa">4.14 <code>ld</code> and Xtensa Processors</a>
+</li></ul>
+<li><a name="toc_BFD" href="BFD.html#BFD">5 BFD</a>
+<ul>
+<li><a href="BFD-outline.html#BFD-outline">5.1 How It Works: An Outline of BFD</a>
+<ul>
+<li><a href="BFD-information-loss.html#BFD-information-loss">5.1.1 Information Loss</a>
+<li><a href="Canonical-format.html#Canonical-format">5.1.2 The BFD canonical object-file format</a>
+</li></ul>
+</li></ul>
+<li><a name="toc_Reporting-Bugs" href="Reporting-Bugs.html#Reporting-Bugs">6 Reporting Bugs</a>
+<ul>
+<li><a href="Bug-Criteria.html#Bug-Criteria">6.1 Have You Found a Bug?</a>
+<li><a href="Bug-Reporting.html#Bug-Reporting">6.2 How to Report Bugs</a>
+</li></ul>
+<li><a name="toc_MRI" href="MRI.html#MRI">Appendix A MRI Compatible Script Files</a>
+<li><a name="toc_GNU-Free-Documentation-License" href="GNU-Free-Documentation-License.html#GNU-Free-Documentation-License">Appendix B GNU Free Documentation License</a>
+<li><a name="toc_LD-Index" href="LD-Index.html#LD-Index">LD Index</a>
+</li></ul>
+</div>
+
+
+
+<!-- FIXME: Talk about importance of *order* of args, cmds to linker! -->
+<div class="node">
+<a name="Top"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Overview.html#Overview">Overview</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="../index.html#dir">(dir)</a>
+<hr>
+</div>
+
+<h2 class="unnumbered">LD</h2>
+
+<p>This file documents the <span class="sc">gnu</span> linker ld
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+   <p>This document is distributed under the terms of the GNU Free
+Documentation License version 1.3.  A copy of the license is included
+in the section entitled &ldquo;GNU Free Documentation License&rdquo;.
+
+<ul class="menu">
+<li><a accesskey="1" href="Overview.html#Overview">Overview</a>:                     Overview
+<li><a accesskey="2" href="Invocation.html#Invocation">Invocation</a>:                   Invocation
+<li><a accesskey="3" href="Scripts.html#Scripts">Scripts</a>:                      Linker Scripts
+
+<li><a accesskey="4" href="Machine-Dependent.html#Machine-Dependent">Machine Dependent</a>:            Machine Dependent Features
+
+<li><a accesskey="5" href="BFD.html#BFD">BFD</a>:                          BFD
+<!-- Following blank line required for remaining bug in makeinfo conds/menus -->
+
+<li><a accesskey="6" href="Reporting-Bugs.html#Reporting-Bugs">Reporting Bugs</a>:               Reporting Bugs
+<li><a accesskey="7" href="MRI.html#MRI">MRI</a>:                          MRI Compatible Script Files
+<li><a accesskey="8" href="GNU-Free-Documentation-License.html#GNU-Free-Documentation-License">GNU Free Documentation License</a>:   GNU Free Documentation License
+<li><a accesskey="9" href="LD-Index.html#LD-Index">LD Index</a>:                        LD Index
+</ul>
+
+   </body></html>
+

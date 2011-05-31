@@ -1,0 +1,126 @@
+<html lang="en">
+<head>
+<title>Math - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="index.html#Top" title="Top">
+<link rel="next" href="Reentrancy.html#Reentrancy" title="Reentrancy">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Math"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Reentrancy.html#Reentrancy">Reentrancy</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="index.html#Top">Top</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">1 Mathematical Functions (<samp><span class="file">math.h</span></samp>)</h2>
+
+<p>This chapter groups a wide variety of mathematical functions.  The
+corresponding definitions and declarations are in <samp><span class="file">math.h</span></samp>. 
+Two definitions from <samp><span class="file">math.h</span></samp> are of particular interest.
+
+     <ol type=1 start=1>
+<li>The representation of infinity as a <code>double</code> is defined as
+<code>HUGE_VAL</code>; this number is returned on overflow by many functions. 
+The macro <code>HUGE_VALF</code> is a corresponding value for <code>float</code>.
+
+     <li>The structure <code>exception</code> is used when you write customized error
+handlers for the mathematical functions.  You can customize error
+handling for most of these functions by defining your own version of
+<code>matherr</code>; see the section on <code>matherr</code> for details.
+        </ol>
+
+   <p><a name="index-system-calls-1"></a><a name="index-support-subroutines-2"></a><a name="index-stubs-3"></a><a name="index-OS-stubs-4"></a>Since the error handling code calls <code>fputs</code>, the mathematical
+subroutines require stubs or minimal implementations for the same list
+of OS subroutines as <code>fputs</code>: <code>close</code>, <code>fstat</code>,
+<code>isatty</code>, <code>lseek</code>, <code>read</code>, <code>sbrk</code>, <code>write</code>. 
+See <a href="../libc/syscalls.html#syscalls">System Calls</a>,
+for a discussion and for sample minimal implementations of these support
+subroutines.
+
+   <p>Alternative declarations of the mathematical functions, which exploit
+specific machine capabilities to operate faster&mdash;but generally have
+less error checking and may reflect additional limitations on some
+machines&mdash;are available when you include <samp><span class="file">fastmath.h</span></samp> instead of
+<samp><span class="file">math.h</span></samp>.
+
+<ul class="menu">
+<li><a accesskey="1" href="version.html#version">version</a>: 	Version of library
+<li><a accesskey="2" href="acos.html#acos">acos</a>: 	Arccosine
+<li><a accesskey="3" href="acosh.html#acosh">acosh</a>: 	Inverse hyperbolic cosine
+<li><a accesskey="4" href="asin.html#asin">asin</a>: 	Arcsine
+<li><a accesskey="5" href="asinh.html#asinh">asinh</a>: 	Inverse hyperbolic sine
+<li><a accesskey="6" href="atan.html#atan">atan</a>: 	Arctangent
+<li><a accesskey="7" href="atan2.html#atan2">atan2</a>: 	Arctangent of y/x
+<li><a accesskey="8" href="atanh.html#atanh">atanh</a>: 	Inverse hyperbolic tangent
+<li><a accesskey="9" href="jN.html#jN">jN</a>: 	        Bessel functions (jN, yN)
+<li><a href="cbrt.html#cbrt">cbrt</a>: 	Cube root
+<li><a href="copysign.html#copysign">copysign</a>: 	Sign of Y, magnitude of X
+<li><a href="cosh.html#cosh">cosh</a>: 	Hyperbolic cosine
+<li><a href="erf.html#erf">erf</a>: 		Error function (erf, erfc)
+<li><a href="exp.html#exp">exp</a>: 		Exponential, base e
+<li><a href="exp2.html#exp2">exp2</a>: 	Exponential, base 2
+<li><a href="expm1.html#expm1">expm1</a>: 	Exponential, base e, of x - 1
+<li><a href="fabs.html#fabs">fabs</a>: 	Absolute value (magnitude)
+<li><a href="fdim.html#fdim">fdim</a>: 	Positive difference
+<li><a href="floor.html#floor">floor</a>: 	Floor and ceiling (floor, ceil)
+<li><a href="fma.html#fma">fma</a>: 		Floating multiply add
+<li><a href="fmax.html#fmax">fmax</a>: 	Maximum
+<li><a href="fmin.html#fmin">fmin</a>: 	Minimum
+<li><a href="fmod.html#fmod">fmod</a>: 	Floating-point remainder (modulo)
+<li><a href="fpclassify.html#fpclassify">fpclassify</a>: 	Floating-point classification macro
+<li><a href="frexp.html#frexp">frexp</a>: 	Split floating-point number
+<li><a href="gamma.html#gamma">gamma</a>: 	Logarithmic gamma function
+<li><a href="hypot.html#hypot">hypot</a>: 	Distance from origin
+<li><a href="ilogb.html#ilogb">ilogb</a>: 	Get exponent
+<li><a href="infinity.html#infinity">infinity</a>: 	Floating infinity
+<li><a href="isgreater.html#isgreater">isgreater</a>: 	Comparison macros
+<li><a href="ldexp.html#ldexp">ldexp</a>: 	Scale by a power of 2
+<li><a href="log.html#log">log</a>: 		Natural logarithms
+<li><a href="log10.html#log10">log10</a>: 	Base 10 logarithms
+<li><a href="log1p.html#log1p">log1p</a>: 	Log of 1 + X
+<li><a href="log2.html#log2">log2</a>: 	Base 2 logarithms
+<li><a href="logb.html#logb">logb</a>: 	Get exponent
+<li><a href="lrint.html#lrint">lrint</a>: 	Round to integer
+<li><a href="lround.html#lround">lround</a>: 	Round to integer, away from zero (lround, llround)
+<li><a href="matherr.html#matherr">matherr</a>: 	Modifiable math error handler
+<li><a href="modf.html#modf">modf</a>: 	Split fractional and integer parts
+<li><a href="nan.html#nan">nan</a>: 		Floating Not a Number
+<li><a href="nearbyint.html#nearbyint">nearbyint</a>: 	Round to integer
+<li><a href="nextafter.html#nextafter">nextafter</a>: 	Get next representable number
+<li><a href="pow.html#pow">pow</a>: 		X to the power Y
+<li><a href="remainder.html#remainder">remainder</a>: 	remainder of X divided by Y
+<li><a href="remquo.html#remquo">remquo</a>: 	Remainder and part of quotient
+<li><a href="rint.html#rint">rint</a>: 	Round to integer
+<li><a href="round.html#round">round</a>: 	Round to integer, away from zero
+<li><a href="scalbn.html#scalbn">scalbn</a>: 	Scale by a power of FLT_RADIX (2)
+<li><a href="signbit.html#signbit">signbit</a>: 	Does floating-point number have negative sign? 
+<li><a href="sin.html#sin">sin</a>: 		Sine or cosine (sin, cos)
+<li><a href="sinh.html#sinh">sinh</a>: 	Hyperbolic sine
+<li><a href="sqrt.html#sqrt">sqrt</a>: 	Positive square root
+<li><a href="tan.html#tan">tan</a>: 		Tangent
+<li><a href="tanh.html#tanh">tanh</a>: 	Hyperbolic tangent
+<li><a href="trunc.html#trunc">trunc</a>: 	Round to integer, towards zero
+</ul>
+
+   </body></html>
+

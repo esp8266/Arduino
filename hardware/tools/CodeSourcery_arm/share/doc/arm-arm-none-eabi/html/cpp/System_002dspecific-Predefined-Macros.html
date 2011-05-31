@@ -1,0 +1,99 @@
+<html lang="en">
+<head>
+<title>System-specific Predefined Macros - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Predefined-Macros.html#Predefined-Macros" title="Predefined Macros">
+<link rel="prev" href="Common-Predefined-Macros.html#Common-Predefined-Macros" title="Common Predefined Macros">
+<link rel="next" href="C_002b_002b-Named-Operators.html#C_002b_002b-Named-Operators" title="C++ Named Operators">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="System-specific-Predefined-Macros"></a>
+<a name="System_002dspecific-Predefined-Macros"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="C_002b_002b-Named-Operators.html#C_002b_002b-Named-Operators">C++ Named Operators</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Common-Predefined-Macros.html#Common-Predefined-Macros">Common Predefined Macros</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Predefined-Macros.html#Predefined-Macros">Predefined Macros</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.7.3 System-specific Predefined Macros</h4>
+
+<p><a name="index-system_002dspecific-predefined-macros-62"></a><a name="index-predefined-macros_002c-system_002dspecific-63"></a><a name="index-reserved-namespace-64"></a>
+The C preprocessor normally predefines several macros that indicate what
+type of system and machine is in use.  They are obviously different on
+each target supported by GCC.  This manual, being for all systems and
+machines, cannot tell you what their names are, but you can use
+<samp><span class="command">cpp -dM</span></samp> to see them all.  See <a href="Invocation.html#Invocation">Invocation</a>.  All system-specific
+predefined macros expand to the constant 1, so you can test them with
+either &lsquo;<samp><span class="samp">#ifdef</span></samp>&rsquo; or &lsquo;<samp><span class="samp">#if</span></samp>&rsquo;.
+
+   <p>The C standard requires that all system-specific macros be part of the
+<dfn>reserved namespace</dfn>.  All names which begin with two underscores,
+or an underscore and a capital letter, are reserved for the compiler and
+library to use as they wish.  However, historically system-specific
+macros have had names with no special prefix; for instance, it is common
+to find <code>unix</code> defined on Unix systems.  For all such macros, GCC
+provides a parallel macro with two underscores added at the beginning
+and the end.  If <code>unix</code> is defined, <code>__unix__</code> will be defined
+too.  There will never be more than two underscores; the parallel of
+<code>_mips</code> is <code>__mips__</code>.
+
+   <p>When the <samp><span class="option">-ansi</span></samp> option, or any <samp><span class="option">-std</span></samp> option that
+requests strict conformance, is given to the compiler, all the
+system-specific predefined macros outside the reserved namespace are
+suppressed.  The parallel macros, inside the reserved namespace, remain
+defined.
+
+   <p>We are slowly phasing out all predefined macros which are outside the
+reserved namespace.  You should never use them in new programs, and we
+encourage you to correct older code to use the parallel macros whenever
+you find it.  We don't recommend you use the system-specific macros that
+are in the reserved namespace, either.  It is better in the long run to
+check specifically for features you need, using a tool such as
+<samp><span class="command">autoconf</span></samp>.
+
+   </body></html>
+

@@ -1,0 +1,73 @@
+<html lang="en">
+<head>
+<title>SH64 Opcodes - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="SH64_002dDependent.html#SH64_002dDependent" title="SH64-Dependent">
+<link rel="prev" href="SH64-Directives.html#SH64-Directives" title="SH64 Directives">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="SH64-Opcodes"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="SH64-Directives.html#SH64-Directives">SH64 Directives</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="SH64_002dDependent.html#SH64_002dDependent">SH64-Dependent</a>
+<hr>
+</div>
+
+<h4 class="subsection">9.34.4 Opcodes</h4>
+
+<p><a name="index-SH64-opcode-summary-1617"></a><a name="index-opcode-summary_002c-SH64-1618"></a><a name="index-mnemonics_002c-SH64-1619"></a><a name="index-instruction-summary_002c-SH64-1620"></a>For detailed information on the SH64 machine instruction set, see
+<cite>SuperH 64 bit RISC Series Architecture Manual</cite> (SuperH, Inc.).
+
+   <p><code>as</code> implements all the standard SH64 opcodes.  In
+addition, the following pseudo-opcodes may be expanded into one or more
+alternate opcodes:
+
+     <dl>
+<dt><code>movi</code><dd>If the value doesn't fit into a standard <code>movi</code> opcode,
+<code>as</code> will replace the <code>movi</code> with a sequence of
+<code>movi</code> and <code>shori</code> opcodes.
+
+     <br><dt><code>pt</code><dd>This expands to a sequence of <code>movi</code> and <code>shori</code> opcode,
+followed by a <code>ptrel</code> opcode, or to a <code>pta</code> or <code>ptb</code>
+opcode, depending on the label referenced.
+
+   </dl>
+
+<!-- Copyright 1991, 1992, 1993, 1994, 1995, 1997, 1999, 2002, 2008 -->
+<!-- Free Software Foundation, Inc. -->
+<!-- This is part of the GAS manual. -->
+<!-- For copying conditions, see the file as.texinfo. -->
+   </body></html>
+

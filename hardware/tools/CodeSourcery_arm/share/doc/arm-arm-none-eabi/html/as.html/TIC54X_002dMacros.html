@@ -1,0 +1,100 @@
+<html lang="en">
+<head>
+<title>TIC54X-Macros - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="TIC54X_002dDependent.html#TIC54X_002dDependent" title="TIC54X-Dependent">
+<link rel="prev" href="TIC54X_002dDirectives.html#TIC54X_002dDirectives" title="TIC54X-Directives">
+<link rel="next" href="TIC54X_002dMMRegs.html#TIC54X_002dMMRegs" title="TIC54X-MMRegs">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="TIC54X-Macros"></a>
+<a name="TIC54X_002dMacros"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="TIC54X_002dMMRegs.html#TIC54X_002dMMRegs">TIC54X-MMRegs</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="TIC54X_002dDirectives.html#TIC54X_002dDirectives">TIC54X-Directives</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="TIC54X_002dDependent.html#TIC54X_002dDependent">TIC54X-Dependent</a>
+<hr>
+</div>
+
+<h4 class="subsection">9.36.10 Macros</h4>
+
+<p><a name="index-TIC54X_002dspecific-macros-1788"></a><a name="index-macros_002c-TIC54X-1789"></a>Macros do not require explicit dereferencing of arguments (i.e., \ARG).
+
+   <p>During macro expansion, the macro parameters are converted to subsyms. 
+If the number of arguments passed the macro invocation exceeds the
+number of parameters defined, the last parameter is assigned the string
+equivalent of all remaining arguments.  If fewer arguments are given
+than parameters, the missing parameters are assigned empty strings.  To
+include a comma in an argument, you must enclose the argument in quotes.
+
+   <p><a name="index-subsym-builtins_002c-TIC54X-1790"></a><a name="index-TIC54X-subsym-builtins-1791"></a><a name="index-builtin-subsym-functions_002c-TIC54X-1792"></a>The following built-in subsym functions allow examination of the string
+value of subsyms (or ordinary strings).  The arguments are strings
+unless otherwise indicated (subsyms passed as args will be replaced by
+the strings they represent).
+     
+<a name="index-g_t_0040code_007b_0024symlen_007d-subsym-builtin_002c-TIC54X-1793"></a>
+<dl><dt><code>$symlen(</code><var>str</var><code>)</code><dd>Returns the length of <var>str</var>.
+
+     <p><a name="index-g_t_0040code_007b_0024symcmp_007d-subsym-builtin_002c-TIC54X-1794"></a><br><dt><code>$symcmp(</code><var>str1</var><code>,</code><var>str2</var><code>)</code><dd>Returns 0 if <var>str1</var> == <var>str2</var>, non-zero otherwise.
+
+     <p><a name="index-g_t_0040code_007b_0024firstch_007d-subsym-builtin_002c-TIC54X-1795"></a><br><dt><code>$firstch(</code><var>str</var><code>,</code><var>ch</var><code>)</code><dd>Returns index of the first occurrence of character constant <var>ch</var> in
+<var>str</var>.
+
+     <p><a name="index-g_t_0040code_007b_0024lastch_007d-subsym-builtin_002c-TIC54X-1796"></a><br><dt><code>$lastch(</code><var>str</var><code>,</code><var>ch</var><code>)</code><dd>Returns index of the last occurrence of character constant <var>ch</var> in
+<var>str</var>.
+
+     <p><a name="index-g_t_0040code_007b_0024isdefed_007d-subsym-builtin_002c-TIC54X-1797"></a><br><dt><code>$isdefed(</code><var>symbol</var><code>)</code><dd>Returns zero if the symbol <var>symbol</var> is not in the symbol table,
+non-zero otherwise.
+
+     <p><a name="index-g_t_0040code_007b_0024ismember_007d-subsym-builtin_002c-TIC54X-1798"></a><br><dt><code>$ismember(</code><var>symbol</var><code>,</code><var>list</var><code>)</code><dd>Assign the first member of comma-separated string <var>list</var> to
+<var>symbol</var>; <var>list</var> is reassigned the remainder of the list.  Returns
+zero if <var>list</var> is a null string.  Both arguments must be subsyms.
+
+     <p><a name="index-g_t_0040code_007b_0024iscons_007d-subsym-builtin_002c-TIC54X-1799"></a><br><dt><code>$iscons(</code><var>expr</var><code>)</code><dd>Returns 1 if string <var>expr</var> is binary, 2 if octal, 3 if hexadecimal,
+4 if a character, 5 if decimal, and zero if not an integer.
+
+     <p><a name="index-g_t_0040code_007b_0024isname_007d-subsym-builtin_002c-TIC54X-1800"></a><br><dt><code>$isname(</code><var>name</var><code>)</code><dd>Returns 1 if <var>name</var> is a valid symbol name, zero otherwise.
+
+     <p><a name="index-g_t_0040code_007b_0024isreg_007d-subsym-builtin_002c-TIC54X-1801"></a><br><dt><code>$isreg(</code><var>reg</var><code>)</code><dd>Returns 1 if <var>reg</var> is a valid predefined register name (AR0-AR7 only).
+
+     <p><a name="index-g_t_0040code_007b_0024structsz_007d-subsym-builtin_002c-TIC54X-1802"></a><br><dt><code>$structsz(</code><var>stag</var><code>)</code><dd>Returns the size of the structure or union represented by <var>stag</var>.
+
+     <p><a name="index-g_t_0040code_007b_0024structacc_007d-subsym-builtin_002c-TIC54X-1803"></a><br><dt><code>$structacc(</code><var>stag</var><code>)</code><dd>Returns the reference point of the structure or union represented by
+<var>stag</var>.   Always returns zero.
+
+   </dl>
+
+   </body></html>
+

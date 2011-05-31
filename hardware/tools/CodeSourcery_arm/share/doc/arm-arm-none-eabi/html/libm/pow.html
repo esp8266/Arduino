@@ -1,0 +1,66 @@
+<html lang="en">
+<head>
+<title>pow - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Math.html#Math" title="Math">
+<link rel="prev" href="nextafter.html#nextafter" title="nextafter">
+<link rel="next" href="remainder.html#remainder" title="remainder">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="pow"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="remainder.html#remainder">remainder</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="nextafter.html#nextafter">nextafter</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Math.html#Math">Math</a>
+<hr>
+</div>
+
+<h3 class="section">1.45 <code>pow</code>, <code>powf</code>&mdash;x to the power y</h3>
+
+<p><a name="index-pow-125"></a><a name="index-powf-126"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double pow(double <var>x</var>, double <var>y</var>);
+     float powf(float <var>x</var>, float <var>y</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>pow</code> and <code>powf</code> calculate <var>x</var> raised to the exponent <var>y</var>.
+
+   <p><br>
+<strong>Returns</strong><br>
+On success, <code>pow</code> and <code>powf</code> return the value calculated.
+
+   <p>When the argument values would produce overflow, <code>pow</code>
+returns <code>HUGE_VAL</code> and set <code>errno</code> to <code>ERANGE</code>.  If the
+argument <var>x</var> passed to <code>pow</code> or <code>powf</code> is a negative
+noninteger, and <var>y</var> is also not an integer, then <code>errno</code>
+is set to <code>EDOM</code>.  If <var>x</var> and <var>y</var> are both 0, then
+<code>pow</code> and <code>powf</code> return <code>1</code>.
+
+   <p>You can modify error handling for these functions using <code>matherr</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>pow</code> is ANSI C. <code>powf</code> is an extension. 
+<br>
+
+   </body></html>
+

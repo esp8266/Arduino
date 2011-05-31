@@ -1,0 +1,71 @@
+<html lang="en">
+<head>
+<title>wcsncpy - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Wchar-strings.html#Wchar-strings" title="Wchar strings">
+<link rel="prev" href="wcsncmp.html#wcsncmp" title="wcsncmp">
+<link rel="next" href="wcpncpy.html#wcpncpy" title="wcpncpy">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="wcsncpy"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="wcpncpy.html#wcpncpy">wcpncpy</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="wcsncmp.html#wcsncmp">wcsncmp</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Wchar-strings.html#Wchar-strings">Wchar strings</a>
+<hr>
+</div>
+
+<h3 class="section">6.19 <code>wcsncpy</code>&mdash;copy part of a wide-character string</h3>
+
+<p><strong>Synopsis</strong>
+<pre class="example">     #include &lt;wchar.h&gt;
+     wchar_t *wcsncpy(wchar_t *<var>s1</var>, const wchar_t *<var>s2</var>, size_t <var>n</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+The <code>wcsncpy</code> function copies not more than <var>n</var> wide-character codes
+(wide-character codes that follow a null wide-character code are not
+copied) from the array pointed to by <var>s2</var> to the array pointed to
+by <var>s1</var>. If copying takes place between objects that overlap, the
+behaviour is undefined.  Note that if <var>s1</var> contains more than <var>n</var>
+wide characters before its terminating null, the result is not
+null-terminated.
+
+   <p>If the array pointed to by <var>s2</var> is a wide-character string that is
+shorter than <var>n</var> wide-character codes, null wide-character codes are
+appended to the copy in the array pointed to by <var>s1</var>, until <var>n</var>
+wide-character codes in all are written.
+
+   <p><br>
+<strong>Returns</strong><br>
+The <code>wcsncpy</code> function returns <var>s1</var>; no return value is reserved to
+indicate an error.
+
+   <p><br>
+<strong>Portability</strong><br>
+ISO/IEC 9899; POSIX.1.
+
+   <p>No supporting OS subroutines are required.
+
+   <p><br>
+
+   </body></html>
+

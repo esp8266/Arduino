@@ -1,0 +1,134 @@
+<html lang="en">
+<head>
+<title>Invoking GCC - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Standards.html#Standards" title="Standards">
+<link rel="next" href="C-Implementation.html#C-Implementation" title="C Implementation">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Invoking-GCC"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="C-Implementation.html#C-Implementation">C Implementation</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Standards.html#Standards">Standards</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">3 GCC Command Options</h2>
+
+<p><a name="index-GCC-command-options-62"></a><a name="index-command-options-63"></a><a name="index-options_002c-GCC-command-64"></a>
+<!-- man begin DESCRIPTION -->
+When you invoke GCC, it normally does preprocessing, compilation,
+assembly and linking.  The &ldquo;overall options&rdquo; allow you to stop this
+process at an intermediate stage.  For example, the <samp><span class="option">-c</span></samp> option
+says not to run the linker.  Then the output consists of object files
+output by the assembler.
+
+ <p>Other options are passed on to one stage of processing.  Some options
+control the preprocessor and others the compiler itself.  Yet other
+options control the assembler and linker; most of these are not
+documented here, since you rarely need to use any of them.
+
+ <p><a name="index-C-compilation-options-65"></a>Most of the command line options that you can use with GCC are useful
+for C programs; when an option is only useful with another language
+(usually C++), the explanation says so explicitly.  If the description
+for a particular option does not mention a source language, you can use
+that option with all supported languages.
+
+ <p><a name="index-C_002b_002b-compilation-options-66"></a>See <a href="Invoking-G_002b_002b.html#Invoking-G_002b_002b">Compiling C++ Programs</a>, for a summary of special
+options for compiling C++ programs.
+
+ <p><a name="index-grouping-options-67"></a><a name="index-options_002c-grouping-68"></a>The <samp><span class="command">gcc</span></samp> program accepts options and file names as operands.  Many
+options have multi-letter names; therefore multiple single-letter options
+may <em>not</em> be grouped: <samp><span class="option">-dv</span></samp> is very different from &lsquo;<samp><span class="samp">-d&nbsp;-v</span></samp>&rsquo;<!-- /@w -->.
+
+ <p><a name="index-order-of-options-69"></a><a name="index-options_002c-order-70"></a>You can mix options and other arguments.  For the most part, the order
+you use doesn't matter.  Order does matter when you use several
+options of the same kind; for example, if you specify <samp><span class="option">-L</span></samp> more
+than once, the directories are searched in the order specified.  Also,
+the placement of the <samp><span class="option">-l</span></samp> option is significant.
+
+ <p>Many options have long names starting with &lsquo;<samp><span class="samp">-f</span></samp>&rsquo; or with
+&lsquo;<samp><span class="samp">-W</span></samp>&rsquo;&mdash;for example,
+<samp><span class="option">-fmove-loop-invariants</span></samp>, <samp><span class="option">-Wformat</span></samp> and so on.  Most of
+these have both positive and negative forms; the negative form of
+<samp><span class="option">-ffoo</span></samp> would be <samp><span class="option">-fno-foo</span></samp>.  This manual documents
+only one of these two forms, whichever one is not the default.
+
+<!-- man end -->
+ <p>See <a href="Option-Index.html#Option-Index">Option Index</a>, for an index to GCC's options.
+
+<ul class="menu">
+<li><a accesskey="1" href="Option-Summary.html#Option-Summary">Option Summary</a>:       Brief list of all options, without explanations. 
+<li><a accesskey="2" href="Overall-Options.html#Overall-Options">Overall Options</a>:      Controlling the kind of output:
+                        an executable, object files, assembler files,
+                        or preprocessed source. 
+<li><a accesskey="3" href="Invoking-G_002b_002b.html#Invoking-G_002b_002b">Invoking G++</a>:         Compiling C++ programs. 
+<li><a accesskey="4" href="C-Dialect-Options.html#C-Dialect-Options">C Dialect Options</a>:    Controlling the variant of C language compiled. 
+<li><a accesskey="5" href="C_002b_002b-Dialect-Options.html#C_002b_002b-Dialect-Options">C++ Dialect Options</a>:  Variations on C++. 
+<li><a accesskey="6" href="Objective_002dC-and-Objective_002dC_002b_002b-Dialect-Options.html#Objective_002dC-and-Objective_002dC_002b_002b-Dialect-Options">Objective-C and Objective-C++ Dialect Options</a>:  Variations on Objective-C
+                        and Objective-C++. 
+<li><a accesskey="7" href="Language-Independent-Options.html#Language-Independent-Options">Language Independent Options</a>:  Controlling how diagnostics should be
+                        formatted. 
+<li><a accesskey="8" href="Warning-Options.html#Warning-Options">Warning Options</a>:      How picky should the compiler be? 
+<li><a accesskey="9" href="Debugging-Options.html#Debugging-Options">Debugging Options</a>:    Symbol tables, measurements, and debugging dumps. 
+<li><a href="Optimize-Options.html#Optimize-Options">Optimize Options</a>:     How much optimization? 
+<li><a href="Preprocessor-Options.html#Preprocessor-Options">Preprocessor Options</a>:  Controlling header files and macro definitions. 
+                         Also, getting dependency information for Make. 
+<li><a href="Assembler-Options.html#Assembler-Options">Assembler Options</a>:    Passing options to the assembler. 
+<li><a href="Link-Options.html#Link-Options">Link Options</a>:         Specifying libraries and so on. 
+<li><a href="Directory-Options.html#Directory-Options">Directory Options</a>:    Where to find header files and libraries. 
+                        Where to find the compiler executable files. 
+<li><a href="Spec-Files.html#Spec-Files">Spec Files</a>:           How to pass switches to sub-processes. 
+<li><a href="Target-Options.html#Target-Options">Target Options</a>:       Running a cross-compiler, or an old version of GCC. 
+<li><a href="Submodel-Options.html#Submodel-Options">Submodel Options</a>:     Specifying minor hardware or convention variations,
+                        such as 68010 vs 68020. 
+<li><a href="Code-Gen-Options.html#Code-Gen-Options">Code Gen Options</a>:     Specifying conventions for function calls, data layout
+                        and register usage. 
+<li><a href="Environment-Variables.html#Environment-Variables">Environment Variables</a>:  Env vars that affect GCC. 
+<li><a href="Precompiled-Headers.html#Precompiled-Headers">Precompiled Headers</a>:  Compiling a header once, and using it many times. 
+</ul>
+
+<!-- man begin OPTIONS -->
+ </body></html>
+

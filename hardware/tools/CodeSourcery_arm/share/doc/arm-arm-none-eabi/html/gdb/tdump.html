@@ -1,0 +1,121 @@
+<html lang="en">
+<head>
+<title>tdump - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Analyze-Collected-Data.html#Analyze-Collected-Data" title="Analyze Collected Data">
+<link rel="prev" href="tfind.html#tfind" title="tfind">
+<link rel="next" href="save-tracepoints.html#save-tracepoints" title="save tracepoints">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="tdump"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="save-tracepoints.html#save-tracepoints">save tracepoints</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="tfind.html#tfind">tfind</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Analyze-Collected-Data.html#Analyze-Collected-Data">Analyze Collected Data</a>
+<hr>
+</div>
+
+<h4 class="subsection">13.2.2 <code>tdump</code></h4>
+
+<p><a name="index-tdump-744"></a><a name="index-dump-all-data-collected-at-tracepoint-745"></a><a name="index-tracepoint-data_002c-display-746"></a>
+This command takes no arguments.  It prints all the data collected at
+the current trace snapshot.
+
+<pre class="smallexample">     (gdb) <b>trace 444</b>
+     (gdb) <b>actions</b>
+     Enter actions for tracepoint #2, one per line:
+     &gt; collect $regs, $locals, $args, gdb_long_test
+     &gt; end
+     
+     (gdb) <b>tstart</b>
+     
+     (gdb) <b>tfind line 444</b>
+     #0  gdb_test (p1=0x11, p2=0x22, p3=0x33, p4=0x44, p5=0x55, p6=0x66)
+     at gdb_test.c:444
+     444        printp( "%s: arguments = 0x%X 0x%X 0x%X 0x%X 0x%X 0x%X\n", )
+     
+     (gdb) <b>tdump</b>
+     Data collected at tracepoint 2, trace frame 1:
+     d0             0xc4aa0085       -995491707
+     d1             0x18     24
+     d2             0x80     128
+     d3             0x33     51
+     d4             0x71aea3d        119204413
+     d5             0x22     34
+     d6             0xe0     224
+     d7             0x380035 3670069
+     a0             0x19e24a 1696330
+     a1             0x3000668        50333288
+     a2             0x100    256
+     a3             0x322000 3284992
+     a4             0x3000698        50333336
+     a5             0x1ad3cc 1758156
+     fp             0x30bf3c 0x30bf3c
+     sp             0x30bf34 0x30bf34
+     ps             0x0      0
+     pc             0x20b2c8 0x20b2c8
+     fpcontrol      0x0      0
+     fpstatus       0x0      0
+     fpiaddr        0x0      0
+     p = 0x20e5b4 "gdb-test"
+     p1 = (void *) 0x11
+     p2 = (void *) 0x22
+     p3 = (void *) 0x33
+     p4 = (void *) 0x44
+     p5 = (void *) 0x55
+     p6 = (void *) 0x66
+     gdb_long_test = 17 '\021'
+     
+     (gdb)
+</pre>
+   <p><code>tdump</code> works by scanning the tracepoint's current collection
+actions and printing the value of each expression listed.  So
+<code>tdump</code> can fail, if after a run, you change the tracepoint's
+actions to mention variables that were not collected during the run.
+
+   <p>Also, for tracepoints with <code>while-stepping</code> loops, <code>tdump</code>
+uses the collected value of <code>$pc</code> to distinguish between trace
+frames that were collected at the tracepoint hit, and frames that were
+collected while stepping.  This allows it to correctly choose whether
+to display the basic list of collections, or the collections from the
+body of the while-stepping loop.  However, if <code>$pc</code> was not collected,
+then <code>tdump</code> will always attempt to dump using the basic collection
+list, and may fail if a while-stepping frame does not include all the
+same data that is collected at the tracepoint hit. 
+<!-- This is getting pretty arcane, example would be good. -->
+
+   </body></html>
+

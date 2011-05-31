@@ -1,0 +1,71 @@
+<html lang="en">
+<head>
+<title>Bug Criteria - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Reporting-Bugs.html#Reporting-Bugs" title="Reporting Bugs">
+<link rel="next" href="Bug-Reporting.html#Bug-Reporting" title="Bug Reporting">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Bug-Criteria"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Bug-Reporting.html#Bug-Reporting">Bug Reporting</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Reporting-Bugs.html#Reporting-Bugs">Reporting Bugs</a>
+<hr>
+</div>
+
+<h3 class="section">6.1 Have You Found a Bug?</h3>
+
+<p><a name="index-bug-criteria-687"></a>
+If you are not sure whether you have found a bug, here are some guidelines:
+
+     
+<a name="index-fatal-signal-688"></a>
+<a name="index-linker-crash-689"></a>
+<a name="index-crash-of-linker-690"></a>
+<ul><li>If the linker gets a fatal signal, for any input whatever, that is a
+<samp><span class="command">ld</span></samp> bug.  Reliable linkers never crash.
+
+     <p><a name="index-error-on-valid-input-691"></a><li>If <samp><span class="command">ld</span></samp> produces an error message for valid input, that is a bug.
+
+     <p><a name="index-invalid-input-692"></a><li>If <samp><span class="command">ld</span></samp> does not produce an error message for invalid input, that
+may be a bug.  In the general case, the linker can not verify that
+object files are correct.
+
+     <li>If you are an experienced user of linkers, your suggestions for
+improvement of <samp><span class="command">ld</span></samp> are welcome in any case. 
+</ul>
+
+   </body></html>
+

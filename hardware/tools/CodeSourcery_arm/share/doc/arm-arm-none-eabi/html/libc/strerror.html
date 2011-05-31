@@ -1,0 +1,257 @@
+<html lang="en">
+<head>
+<title>strerror - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Strings.html#Strings" title="Strings">
+<link rel="prev" href="strcspn.html#strcspn" title="strcspn">
+<link rel="next" href="strerror_005fr.html#strerror_005fr" title="strerror_r">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="strerror"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="strerror_005fr.html#strerror_005fr">strerror_r</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="strcspn.html#strcspn">strcspn</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Strings.html#Strings">Strings</a>
+<hr>
+</div>
+
+<h3 class="section">5.24 <code>strerror</code>&mdash;convert error number to string</h3>
+
+<p><a name="index-strerror-391"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;string.h&gt;
+     char *strerror(int <var>errnum</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>strerror</code> converts the error number <var>errnum</var> into a
+string.  The value of <var>errnum</var> is usually a copy of <code>errno</code>. 
+If <code>errnum</code> is not a known error number, the result points to an
+empty string.
+
+   <p>This implementation of <code>strerror</code> prints out the following strings
+for each of the values defined in `<code>errno.h</code>':
+
+     <dl>
+<dt><code>E2BIG</code><dd>Arg list too long
+
+     <br><dt><code>EACCES</code><dd>Permission denied
+
+     <br><dt><code>EADDRINUSE</code><dd>Address already in use
+
+     <br><dt><code>EADV</code><dd>Advertise error
+
+     <br><dt><code>EAFNOSUPPORT</code><dd>Address family not supported by protocol family
+
+     <br><dt><code>EAGAIN</code><dd>No more processes
+
+     <br><dt><code>EALREADY</code><dd>Socket already connected
+
+     <br><dt><code>EBADF</code><dd>Bad file number
+
+     <br><dt><code>EBADMSG</code><dd>Bad message
+
+     <br><dt><code>EBUSY</code><dd>Device or resource busy
+
+     <br><dt><code>ECHILD</code><dd>No children
+
+     <br><dt><code>ECOMM</code><dd>Communication error
+
+     <br><dt><code>ECONNABORTED</code><dd>Software caused connection abort
+
+     <br><dt><code>ECONNREFUSED</code><dd>Connection refused
+
+     <br><dt><code>EDEADLK</code><dd>Deadlock
+
+     <br><dt><code>EDESTADDRREQ</code><dd>Destination address required
+
+     <br><dt><code>EEXIST</code><dd>File exists
+
+     <br><dt><code>EDOM</code><dd>Math argument
+
+     <br><dt><code>EFAULT</code><dd>Bad address
+
+     <br><dt><code>EFBIG</code><dd>File too large
+
+     <br><dt><code>EHOSTDOWN</code><dd>Host is down
+
+     <br><dt><code>EHOSTUNREACH</code><dd>Host is unreachable
+
+     <br><dt><code>EIDRM</code><dd>Identifier removed
+
+     <br><dt><code>EINPROGRESS</code><dd>Connection already in progress
+
+     <br><dt><code>EINTR</code><dd>Interrupted system call
+
+     <br><dt><code>EINVAL</code><dd>Invalid argument
+
+     <br><dt><code>EIO</code><dd>I/O error
+
+     <br><dt><code>EISCONN</code><dd>Socket is already connected
+
+     <br><dt><code>EISDIR</code><dd>Is a directory
+
+     <br><dt><code>ELIBACC</code><dd>Cannot access a needed shared library
+
+     <br><dt><code>ELIBBAD</code><dd>Accessing a corrupted shared library
+
+     <br><dt><code>ELIBEXEC</code><dd>Cannot exec a shared library directly
+
+     <br><dt><code>ELIBMAX</code><dd>Attempting to link in more shared libraries than system limit
+
+     <br><dt><code>ELIBSCN</code><dd><code>.lib</code> section in a.out corrupted
+
+     <br><dt><code>EMFILE</code><dd>Too many open files
+
+     <br><dt><code>EMLINK</code><dd>Too many links
+
+     <br><dt><code>EMSGSIZE</code><dd>Message too long
+
+     <br><dt><code>EMULTIHOP</code><dd>Multihop attempted
+
+     <br><dt><code>ENAMETOOLONG</code><dd>File or path name too long
+
+     <br><dt><code>ENETDOWN</code><dd>Network interface not configured
+
+     <br><dt><code>ENETUNREACH</code><dd>Network is unreachable
+
+     <br><dt><code>ENFILE</code><dd>Too many open files in system
+
+     <br><dt><code>ENODEV</code><dd>No such device
+
+     <br><dt><code>ENOENT</code><dd>No such file or directory
+
+     <br><dt><code>ENOEXEC</code><dd>Exec format error
+
+     <br><dt><code>ENOLCK</code><dd>No lock
+
+     <br><dt><code>ENOLINK</code><dd>Virtual circuit is gone
+
+     <br><dt><code>ENOMEM</code><dd>Not enough space
+
+     <br><dt><code>ENOMSG</code><dd>No message of desired type
+
+     <br><dt><code>ENONET</code><dd>Machine is not on the network
+
+     <br><dt><code>ENOPKG</code><dd>No package
+
+     <br><dt><code>ENOPROTOOPT</code><dd>Protocol not available
+
+     <br><dt><code>ENOSPC</code><dd>No space left on device
+
+     <br><dt><code>ENOSR</code><dd>No stream resources
+
+     <br><dt><code>ENOSTR</code><dd>Not a stream
+
+     <br><dt><code>ENOSYS</code><dd>Function not implemented
+
+     <br><dt><code>ENOTBLK</code><dd>Block device required
+
+     <br><dt><code>ENOTCONN</code><dd>Socket is not connected
+
+     <br><dt><code>ENOTDIR</code><dd>Not a directory
+
+     <br><dt><code>ENOTEMPTY</code><dd>Directory not empty
+
+     <br><dt><code>ENOTSOCK</code><dd>Socket operation on non-socket
+
+     <br><dt><code>ENOTSUP</code><dd>Not supported
+
+     <br><dt><code>ENOTTY</code><dd>Not a character device
+
+     <br><dt><code>ENXIO</code><dd>No such device or address
+
+     <br><dt><code>EPERM</code><dd>Not owner
+
+     <br><dt><code>EPIPE</code><dd>Broken pipe
+
+     <br><dt><code>EPROTO</code><dd>Protocol error
+
+     <br><dt><code>EPROTOTYPE</code><dd>Protocol wrong type for socket
+
+     <br><dt><code>EPROTONOSUPPORT</code><dd>Unknown protocol
+
+     <br><dt><code>ERANGE</code><dd>Result too large
+
+     <br><dt><code>EREMOTE</code><dd>Resource is remote
+
+     <br><dt><code>EROFS</code><dd>Read-only file system
+
+     <br><dt><code>ESHUTDOWN</code><dd>Can't send after socket shutdown
+
+     <br><dt><code>ESOCKTNOSUPPORT</code><dd>Socket type not supported
+
+     <br><dt><code>ESPIPE</code><dd>Illegal seek
+
+     <br><dt><code>ESRCH</code><dd>No such process
+
+     <br><dt><code>ESRMNT</code><dd>Srmount error
+
+     <br><dt><code>ETIME</code><dd>Stream ioctl timeout
+
+     <br><dt><code>ETIMEDOUT</code><dd>Connection timed out
+
+     <br><dt><code>ETXTBSY</code><dd>Text file busy
+
+     <br><dt><code>EXDEV</code><dd>Cross-device link
+
+     <br><dt><code>ECANCELED</code><dd>Operation canceled
+
+     <br><dt><code>ENOTRECOVERABLE</code><dd>State not recoverable
+
+     <br><dt><code>EOWNERDEAD</code><dd>Previous owner died
+
+     <br><dt><code>ESTRPIPE</code><dd>Strings pipe error
+
+   </dl>
+
+   <p><br>
+<strong>Returns</strong><br>
+This function returns a pointer to a string.  Your application must
+not modify that string.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C requires <code>strerror</code>, but does not specify the strings used
+for each error number.
+
+   <p>Although this implementation of <code>strerror</code> is reentrant, ANSI C
+declares that subsequent calls to <code>strerror</code> may overwrite the
+result string; therefore portable code cannot depend on the reentrancy
+of this subroutine.
+
+   <p>This implementation of <code>strerror</code> provides for user-defined
+extensibility.  <code>errno.h</code> defines <var>__ELASTERROR</var>, which can be
+used as a base for user-defined error values.  If the user supplies a
+routine named <code>_user_strerror</code>, and <var>errnum</var> passed to
+<code>strerror</code> does not match any of the supported values,
+<code>_user_strerror</code> is called with <var>errnum</var> as its argument.
+
+   <p><code>_user_strerror</code> takes one argument of type <var>int</var>, and returns a
+character pointer.  If <var>errnum</var> is unknown to <code>_user_strerror</code>,
+<code>_user_strerror</code> returns <var>NULL</var>.  The default <code>_user_strerror</code>
+returns <var>NULL</var> for all input values.
+
+   <p><code>strerror</code> requires no supporting OS subroutines.
+
+   <p><br>
+
+   </body></html>
+

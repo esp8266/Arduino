@@ -1,0 +1,64 @@
+<html lang="en">
+<head>
+<title>Constants - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Syntax.html#Syntax" title="Syntax">
+<link rel="prev" href="Statements.html#Statements" title="Statements">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Constants"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Statements.html#Statements">Statements</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Syntax.html#Syntax">Syntax</a>
+<hr>
+</div>
+
+<h3 class="section">3.6 Constants</h3>
+
+<p><a name="index-constants-139"></a>A constant is a number, written so that its value is known by
+inspection, without knowing any context.  Like this:
+<pre class="smallexample">     .byte  74, 0112, 092, 0x4A, 0X4a, 'J, '\J # All the same value.
+     .ascii "Ring the bell\7"                  # A string constant.
+     .octa  0x123456789abcdef0123456789ABCDEF0 # A bignum.
+     .float 0f-314159265358979323846264338327\
+     95028841971.693993751E-40                 # - pi, a flonum.
+</pre>
+   <ul class="menu">
+<li><a accesskey="1" href="Characters.html#Characters">Characters</a>:                   Character Constants
+<li><a accesskey="2" href="Numbers.html#Numbers">Numbers</a>:                      Number Constants
+</ul>
+
+   </body></html>
+

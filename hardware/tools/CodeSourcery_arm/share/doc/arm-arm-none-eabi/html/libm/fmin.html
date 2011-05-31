@@ -1,0 +1,60 @@
+<html lang="en">
+<head>
+<title>fmin - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Math.html#Math" title="Math">
+<link rel="prev" href="fmax.html#fmax" title="fmax">
+<link rel="next" href="fmod.html#fmod" title="fmod">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="fmin"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="fmod.html#fmod">fmod</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="fmax.html#fmax">fmax</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Math.html#Math">Math</a>
+<hr>
+</div>
+
+<h3 class="section">1.23 <code>fmin</code>, <code>fminf</code>&ndash;minimum</h3>
+
+<p><a name="index-fmin-57"></a><a name="index-fminf-58"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double fmin(double <var>x</var>, double <var>y</var>);
+     float fminf(float <var>x</var>, float <var>y</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+The <code>fmin</code> functions determine the minimum numeric value of their arguments. 
+NaN arguments are treated as missing data:  if one argument is a NaN and the
+other numeric, then the <code>fmin</code> functions choose the numeric value.
+
+   <p><br>
+<strong>Returns</strong><br>
+The <code>fmin</code> functions return the minimum numeric value of their arguments.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C, POSIX.
+
+   <p><br>
+
+   </body></html>
+

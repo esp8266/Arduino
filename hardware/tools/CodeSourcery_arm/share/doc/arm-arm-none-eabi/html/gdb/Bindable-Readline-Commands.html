@@ -1,0 +1,74 @@
+<html lang="en">
+<head>
+<title>Bindable Readline Commands - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Command-Line-Editing.html#Command-Line-Editing" title="Command Line Editing">
+<link rel="prev" href="Readline-Init-File.html#Readline-Init-File" title="Readline Init File">
+<link rel="next" href="Readline-vi-Mode.html#Readline-vi-Mode" title="Readline vi Mode">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Bindable-Readline-Commands"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Readline-vi-Mode.html#Readline-vi-Mode">Readline vi Mode</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Readline-Init-File.html#Readline-Init-File">Readline Init File</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Command-Line-Editing.html#Command-Line-Editing">Command Line Editing</a>
+<hr>
+</div>
+
+<h3 class="section">31.4 Bindable Readline Commands</h3>
+
+<ul class="menu">
+<li><a accesskey="1" href="Commands-For-Moving.html#Commands-For-Moving">Commands For Moving</a>: 		Moving about the line. 
+<li><a accesskey="2" href="Commands-For-History.html#Commands-For-History">Commands For History</a>: 	Getting at previous lines. 
+<li><a accesskey="3" href="Commands-For-Text.html#Commands-For-Text">Commands For Text</a>: 		Commands for changing text. 
+<li><a accesskey="4" href="Commands-For-Killing.html#Commands-For-Killing">Commands For Killing</a>: 	Commands for killing and yanking. 
+<li><a accesskey="5" href="Numeric-Arguments.html#Numeric-Arguments">Numeric Arguments</a>: 		Specifying numeric arguments, repeat counts. 
+<li><a accesskey="6" href="Commands-For-Completion.html#Commands-For-Completion">Commands For Completion</a>: 	Getting Readline to do the typing for you. 
+<li><a accesskey="7" href="Keyboard-Macros.html#Keyboard-Macros">Keyboard Macros</a>: 		Saving and re-executing typed characters
+<li><a accesskey="8" href="Miscellaneous-Commands.html#Miscellaneous-Commands">Miscellaneous Commands</a>: 	Other miscellaneous commands. 
+</ul>
+
+<p>This section describes Readline commands that may be bound to key
+sequences. 
+Command names without an accompanying key sequence are unbound by default.
+
+   <p>In the following descriptions, <dfn>point</dfn> refers to the current cursor
+position, and <dfn>mark</dfn> refers to a cursor position saved by the
+<code>set-mark</code> command. 
+The text between the point and mark is referred to as the <dfn>region</dfn>.
+
+   </body></html>
+

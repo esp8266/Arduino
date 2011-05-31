@@ -1,0 +1,128 @@
+<html lang="en">
+<head>
+<title>GNU Binary Utilities</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GNU Binary Utilities">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="#Top">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled "GNU Free Documentation License".
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<h1 class="settitle">GNU Binary Utilities</h1>
+<div class="contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a name="toc_Top" href="index.html#Top">Introduction</a>
+<li><a name="toc_ar" href="ar.html#ar">1 ar</a>
+<ul>
+<li><a href="ar-cmdline.html#ar-cmdline">1.1 Controlling <samp><span class="command">ar</span></samp> on the Command Line</a>
+<li><a href="ar-scripts.html#ar-scripts">1.2 Controlling <samp><span class="command">ar</span></samp> with a Script</a>
+</li></ul>
+<li><a name="toc_nm" href="nm.html#nm">2 nm</a>
+<li><a name="toc_objcopy" href="objcopy.html#objcopy">3 objcopy</a>
+<li><a name="toc_objdump" href="objdump.html#objdump">4 objdump</a>
+<li><a name="toc_ranlib" href="ranlib.html#ranlib">5 ranlib</a>
+<li><a name="toc_size" href="size.html#size">6 size</a>
+<li><a name="toc_strings" href="strings.html#strings">7 strings</a>
+<li><a name="toc_strip" href="strip.html#strip">8 strip</a>
+<li><a name="toc_c_002b_002bfilt" href="c_002b_002bfilt.html#c_002b_002bfilt">9 c++filt</a>
+<li><a name="toc_addr2line" href="addr2line.html#addr2line">10 addr2line</a>
+<li><a name="toc_nlmconv" href="nlmconv.html#nlmconv">11 nlmconv</a>
+<li><a name="toc_windmc" href="windmc.html#windmc">12 windmc</a>
+<li><a name="toc_windres" href="windres.html#windres">13 windres</a>
+<li><a name="toc_dlltool" href="dlltool.html#dlltool">14 dlltool</a>
+<ul>
+<li><a href="def-file-format.html#def-file-format">14.1 The format of the <samp><span class="command">dlltool</span></samp> <samp><span class="file">.def</span></samp> file</a>
+</li></ul>
+<li><a name="toc_readelf" href="readelf.html#readelf">15 readelf</a>
+<li><a name="toc_elfedit" href="elfedit.html#elfedit">16 elfedit</a>
+<li><a name="toc_Common-Options" href="Common-Options.html#Common-Options">17 Common Options</a>
+<li><a name="toc_Selecting-the-Target-System" href="Selecting-the-Target-System.html#Selecting-the-Target-System">18 Selecting the Target System</a>
+<ul>
+<li><a href="Target-Selection.html#Target-Selection">18.1 Target Selection</a>
+<li><a href="Architecture-Selection.html#Architecture-Selection">18.2 Architecture Selection</a>
+</li></ul>
+<li><a name="toc_Reporting-Bugs" href="Reporting-Bugs.html#Reporting-Bugs">19 Reporting Bugs</a>
+<ul>
+<li><a href="Bug-Criteria.html#Bug-Criteria">19.1 Have You Found a Bug?</a>
+<li><a href="Bug-Reporting.html#Bug-Reporting">19.2 How to Report Bugs</a>
+</li></ul>
+<li><a name="toc_GNU-Free-Documentation-License" href="GNU-Free-Documentation-License.html#GNU-Free-Documentation-License">Appendix A GNU Free Documentation License</a>
+<li><a name="toc_Binutils-Index" href="Binutils-Index.html#Binutils-Index">Binutils Index</a>
+</li></ul>
+</div>
+
+
+
+<div class="node">
+<a name="Top"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="ar.html#ar">ar</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="../index.html#dir">(dir)</a>
+<hr>
+</div>
+
+<h2 class="unnumbered">Introduction</h2>
+
+<p><a name="index-version-1"></a>This brief manual contains documentation for the <span class="sc">gnu</span> binary
+utilities
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51:
+
+   <p>This document is distributed under the terms of the GNU Free
+Documentation License version 1.3.  A copy of the license is included
+in the section entitled &ldquo;GNU Free Documentation License&rdquo;.
+
+<ul class="menu">
+<li><a accesskey="1" href="ar.html#ar">ar</a>:                           Create, modify, and extract from archives
+<li><a accesskey="2" href="nm.html#nm">nm</a>:                           List symbols from object files
+<li><a accesskey="3" href="objcopy.html#objcopy">objcopy</a>: 			Copy and translate object files
+<li><a accesskey="4" href="objdump.html#objdump">objdump</a>:                      Display information from object files
+<li><a accesskey="5" href="ranlib.html#ranlib">ranlib</a>:                       Generate index to archive contents
+<li><a accesskey="6" href="readelf.html#readelf">readelf</a>:                      Display the contents of ELF format files
+<li><a accesskey="7" href="size.html#size">size</a>:                         List section sizes and total size
+<li><a accesskey="8" href="strings.html#strings">strings</a>:                      List printable strings from files
+<li><a accesskey="9" href="strip.html#strip">strip</a>:                        Discard symbols
+<li><a href="elfedit.html#elfedit">elfedit</a>:                      Update the ELF header of ELF files
+<li><a href="c_002b_002bfilt.html#c_002b_002bfilt">c++filt</a>: 			Filter to demangle encoded C++ symbols
+<li><a href="c_002b_002bfilt.html#c_002b_002bfilt">cxxfilt</a>:              MS-DOS name for c++filt
+<li><a href="addr2line.html#addr2line">addr2line</a>: 			Convert addresses to file and line
+<li><a href="nlmconv.html#nlmconv">nlmconv</a>:                      Converts object code into an NLM
+<li><a href="windres.html#windres">windres</a>: 			Manipulate Windows resources
+<li><a href="windmc.html#windmc">windmc</a>: 			Generator for Windows message resources
+<li><a href="dlltool.html#dlltool">dlltool</a>: 			Create files needed to build and use DLLs
+<li><a href="Common-Options.html#Common-Options">Common Options</a>:               Command-line options for all utilities
+<li><a href="Selecting-the-Target-System.html#Selecting-the-Target-System">Selecting the Target System</a>:  How these utilities determine the target
+<li><a href="Reporting-Bugs.html#Reporting-Bugs">Reporting Bugs</a>:               Reporting Bugs
+<li><a href="GNU-Free-Documentation-License.html#GNU-Free-Documentation-License">GNU Free Documentation License</a>:   GNU Free Documentation License
+<li><a href="Binutils-Index.html#Binutils-Index">Binutils Index</a>:               Binutils Index
+</ul>
+
+   </body></html>
+

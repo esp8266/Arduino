@@ -1,0 +1,92 @@
+<html lang="en">
+<head>
+<title>vfprintf - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="ungetwc.html#ungetwc" title="ungetwc">
+<link rel="next" href="vfscanf.html#vfscanf" title="vfscanf">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="vfprintf"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="vfscanf.html#vfscanf">vfscanf</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="ungetwc.html#ungetwc">ungetwc</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.68 <code>vfprintf</code>, <code>vprintf</code>, <code>vsprintf</code>, <code>vsnprintf</code>, <code>vasprintf</code>, <code>vasnprintf</code>&mdash;format argument list</h3>
+
+<p><a name="index-vfprintf-324"></a><a name="index-g_t_005fvfprintf_005fr-325"></a><a name="index-vprintf-326"></a><a name="index-g_t_005fvprintf_005fr-327"></a><a name="index-vsprintf-328"></a><a name="index-g_t_005fvsprintf_005fr-329"></a><a name="index-vsnprintf-330"></a><a name="index-g_t_005fvsnprintf_005fr-331"></a><a name="index-vasprintf-332"></a><a name="index-g_t_005fvasprintf_005fr-333"></a><a name="index-vasnprintf-334"></a><a name="index-g_t_005fvasnprintf_005fr-335"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     #include &lt;stdarg.h&gt;
+     int vprintf(const char *<var>fmt</var>, va_list <var>list</var>);
+     int vfprintf(FILE *<var>fp</var>, const char *<var>fmt</var>, va_list <var>list</var>);
+     int vsprintf(char *<var>str</var>, const char *<var>fmt</var>, va_list <var>list</var>);
+     int vsnprintf(char *<var>str</var>, size_t <var>size</var>, const char *<var>fmt</var>,
+         va_list <var>list</var>);
+     int vasprintf(char **<var>strp</var>, const char *<var>fmt</var>, va_list <var>list</var>);
+     char *vasnprintf(char *<var>str</var>, size_t *<var>size</var>, const char *<var>fmt</var>,
+         va_list <var>list</var>);
+     
+     int _vprintf_r(struct _reent *<var>reent</var>, const char *<var>fmt</var>,
+         va_list <var>list</var>);
+     int _vfprintf_r(struct _reent *<var>reent</var>, FILE *<var>fp</var>,
+         const char *<var>fmt</var>, va_list <var>list</var>);
+     int _vsprintf_r(struct _reent *<var>reent</var>, char *<var>str</var>,
+         const char *<var>fmt</var>, va_list <var>list</var>);
+     int _vasprintf_r(struct _reent *<var>reent</var>, char **<var>str</var>,
+         const char *<var>fmt</var>, va_list <var>list</var>);
+     int _vsnprintf_r(struct _reent *<var>reent</var>, char *<var>str</var>,
+         size_t <var>size</var>, const char *<var>fmt</var>, va_list <var>list</var>);
+     char *_vasnprintf_r(struct _reent *<var>reent</var>, char *<var>str</var>,
+         size_t *<var>size</var>, const char *<var>fmt</var>, va_list <var>list</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>vprintf</code>, <code>vfprintf</code>, <code>vasprintf</code>, <code>vsprintf</code>, <code>vsnprintf</code>,
+and <code>vasnprintf</code> are (respectively) variants of <code>printf</code>,
+<code>fprintf</code>, <code>asprintf</code>, <code>sprintf</code>, <code>snprintf</code>, and
+<code>asnprintf</code>.  They differ only in allowing their caller to pass the
+variable argument list as a <code>va_list</code> object (initialized by
+<code>va_start</code>) rather than directly accepting a variable number of
+arguments.  The caller is responsible for calling <code>va_end</code>.
+
+   <p><code>_vprintf_r</code>, <code>_vfprintf_r</code>, <code>_vasprintf_r</code>, <code>_vsprintf_r</code>,
+<code>_vsnprintf_r</code>, and <code>_vasnprintf_r</code> are reentrant versions of the
+above.
+
+   <p><br>
+<strong>Returns</strong><br>
+The return values are consistent with the corresponding functions.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C requires <code>vprintf</code>, <code>vfprintf</code>, <code>vsprintf</code>, and
+<code>vsnprintf</code>.  The remaining functions are newlib extensions.
+
+   <p>Supporting OS subroutines required: <code>close</code>, <code>fstat</code>, <code>isatty</code>,
+<code>lseek</code>, <code>read</code>, <code>sbrk</code>, <code>write</code>.
+
+   <p><br>
+
+   </body></html>
+

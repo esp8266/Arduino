@@ -1,0 +1,194 @@
+<html lang="en">
+<head>
+<title>Bug Reporting - GNU Binary Utilities</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GNU Binary Utilities">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Reporting-Bugs.html#Reporting-Bugs" title="Reporting Bugs">
+<link rel="prev" href="Bug-Criteria.html#Bug-Criteria" title="Bug Criteria">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Bug-Reporting"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Bug-Criteria.html#Bug-Criteria">Bug Criteria</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Reporting-Bugs.html#Reporting-Bugs">Reporting Bugs</a>
+<hr>
+</div>
+
+<h3 class="section">19.2 How to Report Bugs</h3>
+
+<p><a name="index-bug-reports-155"></a><a name="index-bugs_002c-reporting-156"></a>
+A number of companies and individuals offer support for <span class="sc">gnu</span>
+products.  If you obtained the binary utilities from a support
+organization, we recommend you contact that organization first.
+
+   <p>You can find contact information for many support companies and
+individuals in the file <samp><span class="file">etc/SERVICE</span></samp> in the <span class="sc">gnu</span> Emacs
+distribution.
+
+   <p>In any event, we also recommend that you send bug reports for the binary
+utilities to <a href="https://support.codesourcery.com/GNUToolchain/">https://support.codesourcery.com/GNUToolchain/</a>.
+
+   <p>The fundamental principle of reporting bugs usefully is this:
+<strong>report all the facts</strong>.  If you are not sure whether to state a
+fact or leave it out, state it!
+
+   <p>Often people omit facts because they think they know what causes the
+problem and assume that some details do not matter.  Thus, you might
+assume that the name of a file you use in an example does not matter. 
+Well, probably it does not, but one cannot be sure.  Perhaps the bug is
+a stray memory reference which happens to fetch from the location where
+that pathname is stored in memory; perhaps, if the pathname were
+different, the contents of that location would fool the utility into
+doing the right thing despite the bug.  Play it safe and give a
+specific, complete example.  That is the easiest thing for you to do,
+and the most helpful.
+
+   <p>Keep in mind that the purpose of a bug report is to enable us to fix the bug if
+it is new to us.  Therefore, always write your bug reports on the assumption
+that the bug has not been reported previously.
+
+   <p>Sometimes people give a few sketchy facts and ask, &ldquo;Does this ring a
+bell?&rdquo;  This cannot help us fix a bug, so it is basically useless.  We
+respond by asking for enough details to enable us to investigate. 
+You might as well expedite matters by sending them to begin with.
+
+   <p>To enable us to fix the bug, you should include all these things:
+
+     <ul>
+<li>The version of the utility.  Each utility announces it if you start it
+with the <samp><span class="option">--version</span></samp> argument.
+
+     <p>Without this, we will not know whether there is any point in looking for
+the bug in the current version of the binary utilities.
+
+     <li>Any patches you may have applied to the source, including any patches
+made to the <code>BFD</code> library.
+
+     <li>The type of machine you are using, and the operating system name and
+version number.
+
+     <li>What compiler (and its version) was used to compile the utilities&mdash;e.g. 
+&ldquo;<code>gcc-2.7</code>&rdquo;.
+
+     <li>The command arguments you gave the utility to observe the bug.  To
+guarantee you will not omit something important, list them all.  A copy
+of the Makefile (or the output from make) is sufficient.
+
+     <p>If we were to try to guess the arguments, we would probably guess wrong
+and then we might not encounter the bug.
+
+     <li>A complete input file, or set of input files, that will reproduce the
+bug.  If the utility is reading an object file or files, then it is
+generally most helpful to send the actual object files.
+
+     <p>If the source files were produced exclusively using <span class="sc">gnu</span> programs
+(e.g., <samp><span class="command">gcc</span></samp>, <samp><span class="command">gas</span></samp>, and/or the <span class="sc">gnu</span> <samp><span class="command">ld</span></samp>), then it
+may be OK to send the source files rather than the object files.  In
+this case, be sure to say exactly what version of <samp><span class="command">gcc</span></samp>, or
+whatever, was used to produce the object files.  Also say how
+<samp><span class="command">gcc</span></samp>, or whatever, was configured.
+
+     <li>A description of what behavior you observe that you believe is
+incorrect.  For example, &ldquo;It gets a fatal signal.&rdquo;
+
+     <p>Of course, if the bug is that the utility gets a fatal signal, then we
+will certainly notice it.  But if the bug is incorrect output, we might
+not notice unless it is glaringly wrong.  You might as well not give us
+a chance to make a mistake.
+
+     <p>Even if the problem you experience is a fatal signal, you should still
+say so explicitly.  Suppose something strange is going on, such as your
+copy of the utility is out of sync, or you have encountered a bug in
+the C library on your system.  (This has happened!)  Your copy might
+crash and ours would not.  If you told us to expect a crash, then when
+ours fails to crash, we would know that the bug was not happening for
+us.  If you had not told us to expect a crash, then we would not be able
+to draw any conclusion from our observations.
+
+     <li>If you wish to suggest changes to the source, send us context diffs, as
+generated by <samp><span class="command">diff</span></samp> with the <samp><span class="option">-u</span></samp>, <samp><span class="option">-c</span></samp>, or <samp><span class="option">-p</span></samp>
+option.  Always send diffs from the old file to the new file.  If you
+wish to discuss something in the <samp><span class="command">ld</span></samp> source, refer to it by
+context, not by line number.
+
+     <p>The line numbers in our development sources will not match those in your
+sources.  Your line numbers would convey no useful information to us. 
+</ul>
+
+   <p>Here are some things that are not necessary:
+
+     <ul>
+<li>A description of the envelope of the bug.
+
+     <p>Often people who encounter a bug spend a lot of time investigating
+which changes to the input file will make the bug go away and which
+changes will not affect it.
+
+     <p>This is often time consuming and not very useful, because the way we
+will find the bug is by running a single example under the debugger
+with breakpoints, not by pure deduction from a series of examples. 
+We recommend that you save your time for something else.
+
+     <p>Of course, if you can find a simpler example to report <em>instead</em>
+of the original one, that is a convenience for us.  Errors in the
+output will be easier to spot, running under the debugger will take
+less time, and so on.
+
+     <p>However, simplification is not vital; if you do not want to do this,
+report the bug anyway and send us the entire test case you used.
+
+     <li>A patch for the bug.
+
+     <p>A patch for the bug does help us if it is a good one.  But do not omit
+the necessary information, such as the test case, on the assumption that
+a patch is all we need.  We might see problems with your patch and decide
+to fix the problem another way, or we might not understand it at all.
+
+     <p>Sometimes with programs as complicated as the binary utilities it is
+very hard to construct an example that will make the program follow a
+certain path through the code.  If you do not send us the example, we
+will not be able to construct one, so we will not be able to verify that
+the bug is fixed.
+
+     <p>And if we cannot understand what bug you are trying to fix, or why your
+patch should be an improvement, we will not install it.  A test case will
+help us to understand.
+
+     <li>A guess about what the bug is or what it depends on.
+
+     <p>Such guesses are usually wrong.  Even we cannot guess right about such
+things without first using the debugger to find the facts. 
+</ul>
+
+   </body></html>
+

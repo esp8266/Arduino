@@ -1,0 +1,81 @@
+<html lang="en">
+<head>
+<title>Named Address Spaces - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Fixed_002dPoint.html#Fixed_002dPoint" title="Fixed-Point">
+<link rel="next" href="Zero-Length.html#Zero-Length" title="Zero Length">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Named-Address-Spaces"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Zero-Length.html#Zero-Length">Zero Length</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Fixed_002dPoint.html#Fixed_002dPoint">Fixed-Point</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.15 Named address spaces</h3>
+
+<p><a name="index-named-address-spaces-2283"></a>
+As an extension, the GNU C compiler supports named address spaces as
+defined in the N1275 draft of ISO/IEC DTR 18037.  Support for named
+address spaces in GCC will evolve as the draft technical report changes. 
+Calling conventions for any target might also change.  At present, only
+the SPU target supports other address spaces.  On the SPU target, for
+example, variables may be declared as belonging to another address space
+by qualifying the type with the <code>__ea</code> address space identifier:
+
+<pre class="smallexample">     extern int __ea i;
+</pre>
+ <p>When the variable <code>i</code> is accessed, the compiler will generate
+special code to access this variable.  It may use runtime library
+support, or generate special machine instructions to access that address
+space.
+
+ <p>The <code>__ea</code> identifier may be used exactly like any other C type
+qualifier (e.g., <code>const</code> or <code>volatile</code>).  See the N1275
+document for more details.
+
+ </body></html>
+

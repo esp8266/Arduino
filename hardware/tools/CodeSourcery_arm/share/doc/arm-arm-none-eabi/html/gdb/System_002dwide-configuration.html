@@ -1,0 +1,82 @@
+<html lang="en">
+<head>
+<title>System-wide configuration - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Installing-GDB.html#Installing-GDB" title="Installing GDB">
+<link rel="prev" href="Configure-Options.html#Configure-Options" title="Configure Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="System-wide-configuration"></a>
+<a name="System_002dwide-configuration"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Configure-Options.html#Configure-Options">Configure Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Installing-GDB.html#Installing-GDB">Installing GDB</a>
+<hr>
+</div>
+
+<h3 class="section">B.6 System-wide configuration and settings</h3>
+
+<p><a name="index-system_002dwide-init-file-2299"></a>
+<span class="sc">gdb</span> can be configured to have a system-wide init file;
+this file will be read and executed at startup (see <a href="Startup.html#Startup">What <span class="sc">gdb</span> does during startup</a>).
+
+   <p>Here is the corresponding configure option:
+
+     <dl>
+<dt><code>--with-system-gdbinit=</code><var>file</var><dd>Specify that the default location of the system-wide init file is
+<var>file</var>. 
+</dl>
+
+   <p>If <span class="sc">gdb</span> has been configured with the option <samp><span class="option">--prefix=$prefix</span></samp>,
+it may be subject to relocation.  Two possible cases:
+
+     <ul>
+<li>If the default location of this init file contains <samp><span class="file">$prefix</span></samp>,
+it will be subject to relocation.  Suppose that the configure options
+are <samp><span class="option">--prefix=$prefix --with-system-gdbinit=$prefix/etc/gdbinit</span></samp>;
+if <span class="sc">gdb</span> is moved from <samp><span class="file">$prefix</span></samp> to <samp><span class="file">$install</span></samp>, the system
+init file is looked for as <samp><span class="file">$install/etc/gdbinit</span></samp> instead of
+<samp><span class="file">$prefix/etc/gdbinit</span></samp>.
+
+     <li>By contrast, if the default location does not contain the prefix,
+it will not be relocated.  E.g. if <span class="sc">gdb</span> has been configured with
+<samp><span class="option">--prefix=/usr/local --with-system-gdbinit=/usr/share/gdb/gdbinit</span></samp>,
+then <span class="sc">gdb</span> will always look for <samp><span class="file">/usr/share/gdb/gdbinit</span></samp>,
+wherever <span class="sc">gdb</span> is installed. 
+</ul>
+
+   </body></html>
+

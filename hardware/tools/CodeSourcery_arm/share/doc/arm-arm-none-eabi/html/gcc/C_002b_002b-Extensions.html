@@ -1,0 +1,87 @@
+<html lang="en">
+<head>
+<title>C++ Extensions - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="C_002b_002b-Implementation.html#C_002b_002b-Implementation" title="C++ Implementation">
+<link rel="next" href="Objective_002dC.html#Objective_002dC" title="Objective-C">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="C++-Extensions"></a>
+<a name="C_002b_002b-Extensions"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Objective_002dC.html#Objective_002dC">Objective-C</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="C_002b_002b-Implementation.html#C_002b_002b-Implementation">C++ Implementation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">7 Extensions to the C++ Language</h2>
+
+<p><a name="index-extensions_002c-C_002b_002b-language-3157"></a><a name="index-C_002b_002b-language-extensions-3158"></a>
+The GNU compiler provides these extensions to the C++ language (and you
+can also use most of the C language extensions in your C++ programs).  If you
+want to write code that checks whether these features are available, you can
+test for the GNU compiler the same way as for C programs: check for a
+predefined macro <code>__GNUC__</code>.  You can also use <code>__GNUG__</code> to
+test specifically for GNU C++ (see <a href="../cpp/Common-Predefined-Macros.html#Common-Predefined-Macros">Predefined Macros</a>).
+
+<ul class="menu">
+<li><a accesskey="1" href="Volatiles.html#Volatiles">Volatiles</a>:            What constitutes an access to a volatile object. 
+<li><a accesskey="2" href="Restricted-Pointers.html#Restricted-Pointers">Restricted Pointers</a>:  C99 restricted pointers and references. 
+<li><a accesskey="3" href="Vague-Linkage.html#Vague-Linkage">Vague Linkage</a>:        Where G++ puts inlines, vtables and such. 
+<li><a accesskey="4" href="C_002b_002b-Interface.html#C_002b_002b-Interface">C++ Interface</a>:        You can use a single C++ header file for both
+                        declarations and definitions. 
+<li><a accesskey="5" href="Template-Instantiation.html#Template-Instantiation">Template Instantiation</a>:  Methods for ensuring that exactly one copy of
+                        each needed template instantiation is emitted. 
+<li><a accesskey="6" href="Bound-member-functions.html#Bound-member-functions">Bound member functions</a>:  You can extract a function pointer to the
+                        method denoted by a &lsquo;<samp><span class="samp">-&gt;*</span></samp>&rsquo; or &lsquo;<samp><span class="samp">.*</span></samp>&rsquo; expression. 
+<li><a accesskey="7" href="C_002b_002b-Attributes.html#C_002b_002b-Attributes">C++ Attributes</a>:       Variable, function, and type attributes for C++ only. 
+<li><a accesskey="8" href="Namespace-Association.html#Namespace-Association">Namespace Association</a>:  Strong using-directives for namespace association. 
+<li><a accesskey="9" href="Type-Traits.html#Type-Traits">Type Traits</a>:          Compiler support for type traits
+<li><a href="Java-Exceptions.html#Java-Exceptions">Java Exceptions</a>:      Tweaking exception handling to work with Java. 
+<li><a href="Deprecated-Features.html#Deprecated-Features">Deprecated Features</a>:  Things will disappear from g++. 
+<li><a href="Backwards-Compatibility.html#Backwards-Compatibility">Backwards Compatibility</a>:  Compatibilities with earlier definitions of C++. 
+</ul>
+
+ </body></html>
+

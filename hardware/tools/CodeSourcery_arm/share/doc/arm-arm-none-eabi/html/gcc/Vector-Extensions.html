@@ -1,0 +1,137 @@
+<html lang="en">
+<head>
+<title>Vector Extensions - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Return-Address.html#Return-Address" title="Return Address">
+<link rel="next" href="Offsetof.html#Offsetof" title="Offsetof">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Vector-Extensions"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Offsetof.html#Offsetof">Offsetof</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Return-Address.html#Return-Address">Return Address</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.47 Using vector instructions through built-in functions</h3>
+
+<p>On some targets, the instruction set contains SIMD vector instructions that
+operate on multiple values contained in one large register at the same time. 
+For example, on the i386 the MMX, 3DNow! and SSE extensions can be used
+this way.
+
+ <p>The first step in using these extensions is to provide the necessary data
+types.  This should be done using an appropriate <code>typedef</code>:
+
+<pre class="smallexample">     typedef int v4si __attribute__ ((vector_size (16)));
+</pre>
+ <p>The <code>int</code> type specifies the base type, while the attribute specifies
+the vector size for the variable, measured in bytes.  For example, the
+declaration above causes the compiler to set the mode for the <code>v4si</code>
+type to be 16 bytes wide and divided into <code>int</code> sized units.  For
+a 32-bit <code>int</code> this means a vector of 4 units of 4 bytes, and the
+corresponding mode of <code>foo</code> will be <acronym>V4SI</acronym>.
+
+ <p>The <code>vector_size</code> attribute is only applicable to integral and
+float scalars, although arrays, pointers, and function return values
+are allowed in conjunction with this construct.
+
+ <p>All the basic integer types can be used as base types, both as signed
+and as unsigned: <code>char</code>, <code>short</code>, <code>int</code>, <code>long</code>,
+<code>long long</code>.  In addition, <code>float</code> and <code>double</code> can be
+used to build floating-point vector types.
+
+ <p>Specifying a combination that is not valid for the current architecture
+will cause GCC to synthesize the instructions using a narrower mode. 
+For example, if you specify a variable of type <code>V4SI</code> and your
+architecture does not allow for this specific SIMD type, GCC will
+produce code that uses 4 <code>SIs</code>.
+
+ <p>The types defined in this manner can be used with a subset of normal C
+operations.  Currently, GCC will allow using the following operators
+on these types: <code>+, -, *, /, unary minus, ^, |, &amp;, ~, %</code>.
+
+ <p>The operations behave like C++ <code>valarrays</code>.  Addition is defined as
+the addition of the corresponding elements of the operands.  For
+example, in the code below, each of the 4 elements in <var>a</var> will be
+added to the corresponding 4 elements in <var>b</var> and the resulting
+vector will be stored in <var>c</var>.
+
+<pre class="smallexample">     typedef int v4si __attribute__ ((vector_size (16)));
+     
+     v4si a, b, c;
+     
+     c = a + b;
+</pre>
+ <p>Subtraction, multiplication, division, and the logical operations
+operate in a similar manner.  Likewise, the result of using the unary
+minus or complement operators on a vector type is a vector whose
+elements are the negative or complemented values of the corresponding
+elements in the operand.
+
+ <p>You can declare variables and use them in function calls and returns, as
+well as in assignments and some casts.  You can specify a vector type as
+a return type for a function.  Vector types can also be used as function
+arguments.  It is possible to cast from one vector type to another,
+provided they are of the same size (in fact, you can also cast vectors
+to and from other datatypes of the same size).
+
+ <p>You cannot operate between vectors of different lengths or different
+signedness without a cast.
+
+ <p>A port that supports hardware vector operations, usually provides a set
+of built-in functions that can be used to operate on vectors.  For
+example, a function to add two vectors and multiply the result by a
+third could look like this:
+
+<pre class="smallexample">     v4si f (v4si a, v4si b, v4si c)
+     {
+       v4si tmp = __builtin_addv4si (a, b);
+       return __builtin_mulv4si (tmp, c);
+     }
+     
+</pre>
+ </body></html>
+

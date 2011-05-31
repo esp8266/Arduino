@@ -1,0 +1,90 @@
+<html lang="en">
+<head>
+<title>Java Exceptions - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C_002b_002b-Extensions.html#C_002b_002b-Extensions" title="C++ Extensions">
+<link rel="prev" href="Type-Traits.html#Type-Traits" title="Type Traits">
+<link rel="next" href="Deprecated-Features.html#Deprecated-Features" title="Deprecated Features">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Java-Exceptions"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Deprecated-Features.html#Deprecated-Features">Deprecated Features</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Type-Traits.html#Type-Traits">Type Traits</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C_002b_002b-Extensions.html#C_002b_002b-Extensions">C++ Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">7.10 Java Exceptions</h3>
+
+<p>The Java language uses a slightly different exception handling model
+from C++.  Normally, GNU C++ will automatically detect when you are
+writing C++ code that uses Java exceptions, and handle them
+appropriately.  However, if C++ code only needs to execute destructors
+when Java exceptions are thrown through it, GCC will guess incorrectly. 
+Sample problematic code is:
+
+<pre class="smallexample">       struct S { ~S(); };
+       extern void bar();    // <span class="roman">is written in Java, and may throw exceptions</span>
+       void foo()
+       {
+         S s;
+         bar();
+       }
+</pre>
+ <p class="noindent">The usual effect of an incorrect guess is a link failure, complaining of
+a missing routine called &lsquo;<samp><span class="samp">__gxx_personality_v0</span></samp>&rsquo;.
+
+ <p>You can inform the compiler that Java exceptions are to be used in a
+translation unit, irrespective of what it might think, by writing
+&lsquo;<samp><span class="samp">#pragma&nbsp;GCC&nbsp;java_exceptions<!-- /@w --></span></samp>&rsquo; at the head of the file.  This
+&lsquo;<samp><span class="samp">#pragma</span></samp>&rsquo; must appear before any functions that throw or catch
+exceptions, or run destructors when exceptions are thrown through them.
+
+ <p>You cannot mix Java and C++ exceptions in the same translation unit.  It
+is believed to be safe to throw a C++ exception from one file through
+another file compiled for the Java exception model, or vice versa, but
+there may be bugs in this area.
+
+ </body></html>
+

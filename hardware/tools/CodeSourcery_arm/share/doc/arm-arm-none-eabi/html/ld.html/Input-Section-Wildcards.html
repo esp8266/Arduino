@@ -1,0 +1,156 @@
+<html lang="en">
+<head>
+<title>Input Section Wildcards - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Input-Section.html#Input-Section" title="Input Section">
+<link rel="prev" href="Input-Section-Basics.html#Input-Section-Basics" title="Input Section Basics">
+<link rel="next" href="Input-Section-Common.html#Input-Section-Common" title="Input Section Common">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Input-Section-Wildcards"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Input-Section-Common.html#Input-Section-Common">Input Section Common</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Input-Section-Basics.html#Input-Section-Basics">Input Section Basics</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Input-Section.html#Input-Section">Input Section</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">3.6.4.2 Input Section Wildcard Patterns</h5>
+
+<p><a name="index-input-section-wildcards-399"></a><a name="index-wildcard-file-name-patterns-400"></a><a name="index-file-name-wildcard-patterns-401"></a><a name="index-section-name-wildcard-patterns-402"></a>In an input section description, either the file name or the section
+name or both may be wildcard patterns.
+
+   <p>The file name of &lsquo;<samp><span class="samp">*</span></samp>&rsquo; seen in many examples is a simple wildcard
+pattern for the file name.
+
+   <p>The wildcard patterns are like those used by the Unix shell.
+
+     <dl>
+<dt>&lsquo;<samp><span class="samp">*</span></samp>&rsquo;<dd>matches any number of characters
+<br><dt>&lsquo;<samp><span class="samp">?</span></samp>&rsquo;<dd>matches any single character
+<br><dt>&lsquo;<samp><span class="samp">[</span><var>chars</var><span class="samp">]</span></samp>&rsquo;<dd>matches a single instance of any of the <var>chars</var>; the &lsquo;<samp><span class="samp">-</span></samp>&rsquo;
+character may be used to specify a range of characters, as in
+&lsquo;<samp><span class="samp">[a-z]</span></samp>&rsquo; to match any lower case letter
+<br><dt>&lsquo;<samp><span class="samp">\</span></samp>&rsquo;<dd>quotes the following character
+</dl>
+
+   <p>When a file name is matched with a wildcard, the wildcard characters
+will not match a &lsquo;<samp><span class="samp">/</span></samp>&rsquo; character (used to separate directory names on
+Unix).  A pattern consisting of a single &lsquo;<samp><span class="samp">*</span></samp>&rsquo; character is an
+exception; it will always match any file name, whether it contains a
+&lsquo;<samp><span class="samp">/</span></samp>&rsquo; or not.  In a section name, the wildcard characters will match
+a &lsquo;<samp><span class="samp">/</span></samp>&rsquo; character.
+
+   <p>File name wildcard patterns only match files which are explicitly
+specified on the command line or in an <code>INPUT</code> command.  The linker
+does not search directories to expand wildcards.
+
+   <p>If a file name matches more than one wildcard pattern, or if a file name
+appears explicitly and is also matched by a wildcard pattern, the linker
+will use the first match in the linker script.  For example, this
+sequence of input section descriptions is probably in error, because the
+<samp><span class="file">data.o</span></samp> rule will not be used:
+<pre class="smallexample">     .data : { *(.data) }
+     .data1 : { data.o(.data) }
+</pre>
+   <p><a name="index-SORT_005fBY_005fNAME-403"></a>Normally, the linker will place files and sections matched by wildcards
+in the order in which they are seen during the link.  You can change
+this by using the <code>SORT_BY_NAME</code> keyword, which appears before a wildcard
+pattern in parentheses (e.g., <code>SORT_BY_NAME(.text*)</code>).  When the
+<code>SORT_BY_NAME</code> keyword is used, the linker will sort the files or sections
+into ascending order by name before placing them in the output file.
+
+   <p><a name="index-SORT_005fBY_005fALIGNMENT-404"></a><code>SORT_BY_ALIGNMENT</code> is very similar to <code>SORT_BY_NAME</code>. The
+difference is <code>SORT_BY_ALIGNMENT</code> will sort sections into
+ascending order by alignment before placing them in the output file.
+
+   <p><a name="index-SORT-405"></a><code>SORT</code> is an alias for <code>SORT_BY_NAME</code>.
+
+   <p>When there are nested section sorting commands in linker script, there
+can be at most 1 level of nesting for section sorting commands.
+
+     <ol type=1 start=1>
+<li><code>SORT_BY_NAME</code> (<code>SORT_BY_ALIGNMENT</code> (wildcard section pattern)). 
+It will sort the input sections by name first, then by alignment if 2
+sections have the same name. 
+<li><code>SORT_BY_ALIGNMENT</code> (<code>SORT_BY_NAME</code> (wildcard section pattern)). 
+It will sort the input sections by alignment first, then by name if 2
+sections have the same alignment. 
+<li><code>SORT_BY_NAME</code> (<code>SORT_BY_NAME</code> (wildcard section pattern)) is
+treated the same as <code>SORT_BY_NAME</code> (wildcard section pattern). 
+<li><code>SORT_BY_ALIGNMENT</code> (<code>SORT_BY_ALIGNMENT</code> (wildcard section pattern))
+is treated the same as <code>SORT_BY_ALIGNMENT</code> (wildcard section pattern). 
+<li>All other nested section sorting commands are invalid.
+        </ol>
+
+   <p>When both command line section sorting option and linker script
+section sorting command are used, section sorting command always
+takes precedence over the command line option.
+
+   <p>If the section sorting command in linker script isn't nested, the
+command line option will make the section sorting command to be
+treated as nested sorting command.
+
+     <ol type=1 start=1>
+<li><code>SORT_BY_NAME</code> (wildcard section pattern ) with
+<samp><span class="option">--sort-sections alignment</span></samp> is equivalent to
+<code>SORT_BY_NAME</code> (<code>SORT_BY_ALIGNMENT</code> (wildcard section pattern)). 
+<li><code>SORT_BY_ALIGNMENT</code> (wildcard section pattern) with
+<samp><span class="option">--sort-section name</span></samp> is equivalent to
+<code>SORT_BY_ALIGNMENT</code> (<code>SORT_BY_NAME</code> (wildcard section pattern)).
+        </ol>
+
+   <p>If the section sorting command in linker script is nested, the
+command line option will be ignored.
+
+   <p>If you ever get confused about where input sections are going, use the
+&lsquo;<samp><span class="samp">-M</span></samp>&rsquo; linker option to generate a map file.  The map file shows
+precisely how input sections are mapped to output sections.
+
+   <p>This example shows how wildcard patterns might be used to partition
+files.  This linker script directs the linker to place all &lsquo;<samp><span class="samp">.text</span></samp>&rsquo;
+sections in &lsquo;<samp><span class="samp">.text</span></samp>&rsquo; and all &lsquo;<samp><span class="samp">.bss</span></samp>&rsquo; sections in &lsquo;<samp><span class="samp">.bss</span></samp>&rsquo;. 
+The linker will place the &lsquo;<samp><span class="samp">.data</span></samp>&rsquo; section from all files beginning
+with an upper case character in &lsquo;<samp><span class="samp">.DATA</span></samp>&rsquo;; for all other files, the
+linker will place the &lsquo;<samp><span class="samp">.data</span></samp>&rsquo; section in &lsquo;<samp><span class="samp">.data</span></samp>&rsquo;.
+<pre class="smallexample">     SECTIONS {
+       .text : { *(.text) }
+       .DATA : { [A-Z]*(.data) }
+       .data : { *(.data) }
+       .bss : { *(.bss) }
+     }
+</pre>
+   </body></html>
+

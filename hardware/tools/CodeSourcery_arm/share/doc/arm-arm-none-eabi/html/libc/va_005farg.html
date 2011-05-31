@@ -1,0 +1,68 @@
+<html lang="en">
+<head>
+<title>va_arg - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdarg.html#Stdarg" title="Stdarg">
+<link rel="prev" href="va_005fstart.html#va_005fstart" title="va_start">
+<link rel="next" href="va_005fend.html#va_005fend" title="va_end">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="va_arg"></a>
+<a name="va_005farg"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="va_005fend.html#va_005fend">va_end</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="va_005fstart.html#va_005fstart">va_start</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdarg.html#Stdarg">Stdarg</a>
+<hr>
+</div>
+
+<h4 class="subsection">13.1.2 Extract a value from argument list</h4>
+
+<p><a name="index-va_005farg-496"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdarg.h&gt;
+     <var>type</var> va_arg(va_list <var>ap</var>, <var>type</var>);
+</pre>
+   <p><strong>Description</strong><br>
+<code>va_arg</code> returns the next unprocessed value from a variable
+argument list <var>ap</var> (which you must previously create with
+<var>va_start</var>).  Specify the type for the value as the second parameter
+to the macro, <var>type</var>.
+
+   <p>You may pass a <code>va_list</code> object <var>ap</var> to a subfunction, and use
+<code>va_arg</code> from the subfunction rather than from the function
+actually declared with an ellipsis in the header; however, in that case
+you may <em>only</em> use <code>va_arg</code> from the subfunction.  ANSI C does
+not permit extracting successive values from a single variable-argument
+list from different levels of the calling stack.
+
+   <p>There is no mechanism for testing whether there is actually a next
+argument available; you might instead pass an argument count (or some
+other data that implies an argument count) as one of the fixed arguments
+in your function call.
+
+   <p><strong>Returns</strong><br>
+<code>va_arg</code> returns the next argument, an object of type <var>type</var>.
+
+   <p><strong>Portability</strong><br>
+ANSI C requires <code>va_arg</code>.
+
+   </body></html>
+

@@ -1,0 +1,98 @@
+<html lang="en">
+<head>
+<title>Python Commands - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Python.html#Python" title="Python">
+<link rel="next" href="Python-API.html#Python-API" title="Python API">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Python-Commands"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Python-API.html#Python-API">Python API</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Python.html#Python">Python</a>
+<hr>
+</div>
+
+<h4 class="subsection">23.2.1 Python Commands</h4>
+
+<p><a name="index-python-commands-1569"></a><a name="index-commands-to-access-python-1570"></a>
+<span class="sc">gdb</span> provides one command for accessing the Python interpreter,
+and one related setting:
+
+     
+<a name="index-python-1571"></a>
+<dl><dt><code>python </code><span class="roman">[</span><var>code</var><span class="roman">]</span><dd>The <code>python</code> command can be used to evaluate Python code.
+
+     <p>If given an argument, the <code>python</code> command will evaluate the
+argument as a Python command.  For example:
+
+     <pre class="smallexample">          (gdb) python print 23
+          23
+</pre>
+     <p>If you do not provide an argument to <code>python</code>, it will act as a
+multi-line command, like <code>define</code>.  In this case, the Python
+script is made up of subsequent command lines, given after the
+<code>python</code> command.  This command list is terminated using a line
+containing <code>end</code>.  For example:
+
+     <pre class="smallexample">          (gdb) python
+          Type python script
+          End with a line saying just "end".
+          &gt;print 23
+          &gt;end
+          23
+</pre>
+     <p><a name="index-maint-set-python-print_002dstack-1572"></a><br><dt><code>maint set python print-stack</code><dd>By default, <span class="sc">gdb</span> will print a stack trace when an error occurs
+in a Python script.  This can be controlled using <code>maint set
+python print-stack</code>: if <code>on</code>, the default, then Python stack
+printing is enabled; if <code>off</code>, then Python stack printing is
+disabled. 
+</dl>
+
+   <p>It is also possible to execute a Python script from the <span class="sc">gdb</span>
+interpreter:
+
+     <dl>
+<dt><code>source </code><samp><span class="file">script-name</span></samp><dd>The script name must end with &lsquo;<samp><span class="samp">.py</span></samp>&rsquo; and <span class="sc">gdb</span> must be configured
+to recognize the script language based on filename extension using
+the <code>script-extension</code> setting.  See <a href="Extending-GDB.html#Extending-GDB">Extending GDB</a>.
+
+     <br><dt><code>python execfile ("script-name")</code><dd>This method is based on the <code>execfile</code> Python built-in function,
+and thus is always available. 
+</dl>
+
+   </body></html>
+

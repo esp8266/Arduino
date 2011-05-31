@@ -1,0 +1,35 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>7.3. Manuals for GNU Toolchain Components</title><link rel="stylesheet" href="cs.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.74.0"><link rel="home" href="index.html" title="Sourcery G++ Lite"><link rel="up" href="chap-next-steps.html" title="Chapter 7. Next Steps with Sourcery G++"><link rel="prev" href="sec-example-programs.html" title="7.2. Example Programs"><link rel="next" href="chap-release.html" title="Appendix A. Sourcery G++ Lite Release Notes"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">7.3. Manuals for GNU Toolchain Components</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="sec-example-programs.html">Prev</a> </td><th width="60%" align="center">Chapter 7. Next Steps with Sourcery G++</th><td width="20%" align="right"> <a accesskey="n" href="chap-release.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="id284909"></a>7.3. Manuals for GNU Toolchain Components</h2></div></div></div><p>
+   Sourcery G++ Lite includes the full user manuals for each of the GNU 
+   toolchain components, such as the compiler, linker,
+   assembler, and debugger.  Most of the manuals include tutorial
+   material for new users as well as serving as a complete reference
+   for command-line options, supported extensions, and the like.
+  </p><p>
+   When you install Sourcery G++ Lite, links to both the PDF and HTML versions
+   of the manuals are created in the shortcuts folder you select.  If
+   you elected not to create shortcuts when installing Sourcery G++ Lite, the
+   documentation can be found in the
+   <code class="filename">share/doc/sourceryg++-arm-none-eabi/</code>
+   subdirectory of your installation directory.
+  </p><p>
+   In addition to the detailed reference manuals, Sourcery G++ Lite includes 
+   a Unix-style manual page for each toolchain component.
+   You can view these by invoking the <code class="command">man</code> command  
+   with the pathname of the file you want to view.  For example, you can
+   first go to the directory containing the man pages:
+   </p><pre class="screen">&gt; cd $INSTALL/share/doc/sourceryg++-arm-none-eabi/man/man1</pre><p>
+   Then you can invoke <code class="command">man</code> as:
+   </p><pre class="screen">&gt; man ./arm-none-eabi-gcc.1</pre><p>
+   Alternatively, if you use <code class="command">man</code> regularly, you'll 
+   probably find it more convenient to add the directory containing the
+   Sourcery G++ man pages to your <code class="envar">MANPATH</code> environment variable.
+   This should go in your <code class="filename">.profile</code> or equivalent
+   shell startup file; see <a class="xref" href="sec-setting-up-environment.html" title="2.6. Setting up the Environment">Section 2.6, &#8220;Setting up the Environment&#8221;</a> for
+   instructions.  Then you can invoke <code class="command">man</code> 
+   with just the command name rather than a pathname.
+ </p><p>
+   Finally, note that every command-line utility program included with
+   Sourcery G++ Lite can be invoked with a <code class="option">--help</code> option.  
+   This prints a brief description of the arguments and options to the 
+   program and exits without doing further processing.
+  </p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="sec-example-programs.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="chap-next-steps.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="chap-release.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">7.2. Example Programs </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Appendix A. Sourcery G++ Lite Release Notes</td></tr></table></div></body></html>

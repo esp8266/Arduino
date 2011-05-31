@@ -1,0 +1,148 @@
+<html lang="en">
+<head>
+<title>Differences from previous versions - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Implementation-Details.html#Implementation-Details" title="Implementation Details">
+<link rel="prev" href="Obsolete-Features.html#Obsolete-Features" title="Obsolete Features">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Differences-from-previous-versions"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Obsolete-Features.html#Obsolete-Features">Obsolete Features</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Implementation-Details.html#Implementation-Details">Implementation Details</a>
+<hr>
+</div>
+
+<h3 class="section">11.4 Differences from previous versions</h3>
+
+<p><a name="index-differences-from-previous-versions-117"></a>
+This section details behavior which has changed from previous versions
+of CPP.  We do not plan to change it again in the near future, but
+we do not promise not to, either.
+
+   <p>The &ldquo;previous versions&rdquo; discussed here are 2.95 and before.  The
+behavior of GCC 3.0 is mostly the same as the behavior of the widely
+used 2.96 and 2.97 development snapshots.  Where there are differences,
+they generally represent bugs in the snapshots.
+
+     <ul>
+<li>-I- deprecated
+
+     <p>This option has been deprecated in 4.0.  <samp><span class="option">-iquote</span></samp> is meant to
+replace the need for this option.
+
+     <li>Order of evaluation of &lsquo;<samp><span class="samp">#</span></samp>&rsquo; and &lsquo;<samp><span class="samp">##</span></samp>&rsquo; operators
+
+     <p>The standard does not specify the order of evaluation of a chain of
+&lsquo;<samp><span class="samp">##</span></samp>&rsquo; operators, nor whether &lsquo;<samp><span class="samp">#</span></samp>&rsquo; is evaluated before, after, or
+at the same time as &lsquo;<samp><span class="samp">##</span></samp>&rsquo;.  You should therefore not write any code
+which depends on any specific ordering.  It is possible to guarantee an
+ordering, if you need one, by suitable use of nested macros.
+
+     <p>An example of where this might matter is pasting the arguments &lsquo;<samp><span class="samp">1</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">e</span></samp>&rsquo; and &lsquo;<samp><span class="samp">-2</span></samp>&rsquo;.  This would be fine for left-to-right pasting,
+but right-to-left pasting would produce an invalid token &lsquo;<samp><span class="samp">e-2</span></samp>&rsquo;.
+
+     <p>GCC 3.0 evaluates &lsquo;<samp><span class="samp">#</span></samp>&rsquo; and &lsquo;<samp><span class="samp">##</span></samp>&rsquo; at the same time and strictly
+left to right.  Older versions evaluated all &lsquo;<samp><span class="samp">#</span></samp>&rsquo; operators first,
+then all &lsquo;<samp><span class="samp">##</span></samp>&rsquo; operators, in an unreliable order.
+
+     <li>The form of whitespace between tokens in preprocessor output
+
+     <p>See <a href="Preprocessor-Output.html#Preprocessor-Output">Preprocessor Output</a>, for the current textual format.  This is
+also the format used by stringification.  Normally, the preprocessor
+communicates tokens directly to the compiler's parser, and whitespace
+does not come up at all.
+
+     <p>Older versions of GCC preserved all whitespace provided by the user and
+inserted lots more whitespace of their own, because they could not
+accurately predict when extra spaces were needed to prevent accidental
+token pasting.
+
+     <li>Optional argument when invoking rest argument macros
+
+     <p>As an extension, GCC permits you to omit the variable arguments entirely
+when you use a variable argument macro.  This is forbidden by the 1999 C
+standard, and will provoke a pedantic warning with GCC 3.0.  Previous
+versions accepted it silently.
+
+     <li>&lsquo;<samp><span class="samp">##</span></samp>&rsquo; swallowing preceding text in rest argument macros
+
+     <p>Formerly, in a macro expansion, if &lsquo;<samp><span class="samp">##</span></samp>&rsquo; appeared before a variable
+arguments parameter, and the set of tokens specified for that argument
+in the macro invocation was empty, previous versions of CPP would
+back up and remove the preceding sequence of non-whitespace characters
+(<strong>not</strong> the preceding token).  This extension is in direct
+conflict with the 1999 C standard and has been drastically pared back.
+
+     <p>In the current version of the preprocessor, if &lsquo;<samp><span class="samp">##</span></samp>&rsquo; appears between
+a comma and a variable arguments parameter, and the variable argument is
+omitted entirely, the comma will be removed from the expansion.  If the
+variable argument is empty, or the token before &lsquo;<samp><span class="samp">##</span></samp>&rsquo; is not a
+comma, then &lsquo;<samp><span class="samp">##</span></samp>&rsquo; behaves as a normal token paste.
+
+     <li>&lsquo;<samp><span class="samp">#line</span></samp>&rsquo; and &lsquo;<samp><span class="samp">#include</span></samp>&rsquo;
+
+     <p>The &lsquo;<samp><span class="samp">#line</span></samp>&rsquo; directive used to change GCC's notion of the
+&ldquo;directory containing the current file&rdquo;, used by &lsquo;<samp><span class="samp">#include</span></samp>&rsquo; with
+a double-quoted header file name.  In 3.0 and later, it does not. 
+See <a href="Line-Control.html#Line-Control">Line Control</a>, for further explanation.
+
+     <li>Syntax of &lsquo;<samp><span class="samp">#line</span></samp>&rsquo;
+
+     <p>In GCC 2.95 and previous, the string constant argument to &lsquo;<samp><span class="samp">#line</span></samp>&rsquo;
+was treated the same way as the argument to &lsquo;<samp><span class="samp">#include</span></samp>&rsquo;: backslash
+escapes were not honored, and the string ended at the second &lsquo;<samp><span class="samp">"</span></samp>&rsquo;. 
+This is not compliant with the C standard.  In GCC 3.0, an attempt was
+made to correct the behavior, so that the string was treated as a real
+string constant, but it turned out to be buggy.  In 3.1, the bugs have
+been fixed.  (We are not fixing the bugs in 3.0 because they affect
+relatively few people and the fix is quite invasive.)
+
+   </ul>
+
+   </body></html>
+

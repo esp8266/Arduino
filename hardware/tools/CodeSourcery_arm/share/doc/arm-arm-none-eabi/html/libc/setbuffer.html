@@ -1,0 +1,77 @@
+<html lang="en">
+<head>
+<title>setbuffer - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="setbuf.html#setbuf" title="setbuf">
+<link rel="next" href="setlinebuf.html#setlinebuf" title="setlinebuf">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="setbuffer"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="setlinebuf.html#setlinebuf">setlinebuf</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="setbuf.html#setbuf">setbuf</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.55 <code>setbuffer</code>&mdash;specify full buffering for a file or stream with size</h3>
+
+<p><a name="index-setbuffer-263"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     void setbuffer(FILE *<var>fp</var>, char *<var>buf</var>, int <var>size</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>setbuffer</code> specifies that output to the file or stream identified by
+<var>fp</var> should be fully buffered.  All output for this file will go to a
+buffer (of size <var>size</var>).  Output will be passed on to the host system
+only when the buffer is full, or when an input operation intervenes.
+
+   <p>You may, if you wish, supply your own buffer by passing a pointer to
+it as the argument <var>buf</var>.  It must have size <var>size</var>.  You can
+also use <code>NULL</code> as the value of <var>buf</var>, to signal that the
+<code>setbuffer</code> function is to allocate the buffer.
+
+   <p><br>
+<strong>Warnings</strong><br>
+You may only use <code>setbuffer</code> before performing any file operation
+other than opening the file.
+
+   <p>If you supply a non-null <var>buf</var>, you must ensure that the associated
+storage continues to be available until you close the stream
+identified by <var>fp</var>.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>setbuffer</code> does not return a result.
+
+   <p><br>
+<strong>Portability</strong><br>
+This function comes from BSD not ANSI or POSIX.
+
+   <p>Supporting OS subroutines required: <code>close</code>, <code>fstat</code>, <code>isatty</code>,
+<code>lseek</code>, <code>read</code>, <code>sbrk</code>, <code>write</code>.
+
+   <p><br>
+
+   </body></html>
+

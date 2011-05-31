@@ -1,0 +1,80 @@
+<html lang="en">
+<head>
+<title>Other Directives - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Pragmas.html#Pragmas" title="Pragmas">
+<link rel="next" href="Preprocessor-Output.html#Preprocessor-Output" title="Preprocessor Output">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Other-Directives"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Preprocessor-Output.html#Preprocessor-Output">Preprocessor Output</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Pragmas.html#Pragmas">Pragmas</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">8 Other Directives</h2>
+
+<p><a name="index-g_t_0023ident-104"></a><a name="index-g_t_0023sccs-105"></a>The &lsquo;<samp><span class="samp">#ident</span></samp>&rsquo; directive takes one argument, a string constant.  On
+some systems, that string constant is copied into a special segment of
+the object file.  On other systems, the directive is ignored.  The
+&lsquo;<samp><span class="samp">#sccs</span></samp>&rsquo; directive is a synonym for &lsquo;<samp><span class="samp">#ident</span></samp>&rsquo;.
+
+   <p>These directives are not part of the C standard, but they are not
+official GNU extensions either.  What historical information we have
+been able to find, suggests they originated with System V.
+
+   <p><a name="index-null-directive-106"></a>The <dfn>null directive</dfn> consists of a &lsquo;<samp><span class="samp">#</span></samp>&rsquo; followed by a newline,
+with only whitespace (including comments) in between.  A null directive
+is understood as a preprocessing directive but has no effect on the
+preprocessor output.  The primary significance of the existence of the
+null directive is that an input line consisting of just a &lsquo;<samp><span class="samp">#</span></samp>&rsquo; will
+produce no output, rather than a line of output containing just a
+&lsquo;<samp><span class="samp">#</span></samp>&rsquo;.  Supposedly some old C programs contain such lines.
+
+   </body></html>
+

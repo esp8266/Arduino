@@ -1,0 +1,157 @@
+<html lang="en">
+<head>
+<title>ARM - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Embedded-Processors.html#Embedded-Processors" title="Embedded Processors">
+<link rel="next" href="M32R_002fD.html#M32R_002fD" title="M32R/D">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="ARM"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="M32R_002fD.html#M32R_002fD">M32R/D</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Embedded-Processors.html#Embedded-Processors">Embedded Processors</a>
+<hr>
+</div>
+
+<h4 class="subsection">21.3.1 ARM</h4>
+
+<p><a name="index-ARM-RDI-1282"></a>
+     
+<a name="index-target-rdi-1283"></a>
+<dl><dt><code>target rdi </code><var>dev</var><dd>ARM Angel monitor, via RDI library interface to ADP protocol.  You may
+use this target to communicate with both boards running the Angel
+monitor, or with the EmbeddedICE JTAG debug device.
+
+     <p><a name="index-target-rdp-1284"></a><br><dt><code>target rdp </code><var>dev</var><dd>ARM Demon monitor.
+
+   </dl>
+
+   <p><span class="sc">gdb</span> provides the following ARM-specific commands:
+
+     <dl>
+<dt><code>set arm disassembler</code><dd><a name="index-set-arm-1285"></a>This commands selects from a list of disassembly styles.  The
+<code>"std"</code> style is the standard style.
+
+     <br><dt><code>show arm disassembler</code><dd><a name="index-show-arm-1286"></a>Show the current disassembly style.
+
+     <br><dt><code>set arm apcs32</code><dd><a name="index-ARM-32_002dbit-mode-1287"></a>This command toggles ARM operation mode between 32-bit and 26-bit.
+
+     <br><dt><code>show arm apcs32</code><dd>Display the current usage of the ARM 32-bit mode.
+
+     <br><dt><code>set arm fpu </code><var>fputype</var><dd>This command sets the ARM floating-point unit (FPU) type.  The
+argument <var>fputype</var> can be one of these:
+
+          <dl>
+<dt><code>auto</code><dd>Determine the FPU type by querying the OS ABI. 
+<br><dt><code>softfpa</code><dd>Software FPU, with mixed-endian doubles on little-endian ARM
+processors. 
+<br><dt><code>fpa</code><dd>GCC-compiled FPA co-processor. 
+<br><dt><code>softvfp</code><dd>Software FPU with pure-endian doubles. 
+<br><dt><code>vfp</code><dd>VFP co-processor. 
+</dl>
+
+     <br><dt><code>show arm fpu</code><dd>Show the current type of the FPU.
+
+     <br><dt><code>set arm abi</code><dd>This command forces <span class="sc">gdb</span> to use the specified ABI.
+
+     <br><dt><code>show arm abi</code><dd>Show the currently used ABI.
+
+     <br><dt><code>set arm fallback-mode (arm|thumb|auto)</code><dd><span class="sc">gdb</span> uses the symbol table, when available, to determine
+whether instructions are ARM or Thumb.  This command controls
+<span class="sc">gdb</span>'s default behavior when the symbol table is not
+available.  The default is &lsquo;<samp><span class="samp">auto</span></samp>&rsquo;, which causes <span class="sc">gdb</span> to
+use the current execution mode (from the <code>T</code> bit in the <code>CPSR</code>
+register).
+
+     <br><dt><code>show arm fallback-mode</code><dd>Show the current fallback instruction mode.
+
+     <br><dt><code>set arm force-mode (arm|thumb|auto)</code><dd>This command overrides use of the symbol table to determine whether
+instructions are ARM or Thumb.  The default is &lsquo;<samp><span class="samp">auto</span></samp>&rsquo;, which
+causes <span class="sc">gdb</span> to use the symbol table and then the setting
+of &lsquo;<samp><span class="samp">set arm fallback-mode</span></samp>&rsquo;.
+
+     <br><dt><code>show arm force-mode</code><dd>Show the current forced instruction mode.
+
+     <br><dt><code>set debug arm</code><dd>Toggle whether to display ARM-specific debugging messages from the ARM
+target support subsystem.
+
+     <br><dt><code>show debug arm</code><dd>Show whether ARM-specific debugging messages are enabled. 
+</dl>
+
+   <p>The following commands are available when an ARM target is debugged
+using the RDI interface:
+
+     <dl>
+<dt><code>rdilogfile </code><span class="roman">[</span><var>file</var><span class="roman">]</span><dd><a name="index-rdilogfile-1288"></a><a name="index-ADP-_0028Angel-Debugger-Protocol_0029-logging-1289"></a>Set the filename for the ADP (Angel Debugger Protocol) packet log. 
+With an argument, sets the log file to the specified <var>file</var>.  With
+no argument, show the current log file name.  The default log file is
+<samp><span class="file">rdi.log</span></samp>.
+
+     <br><dt><code>rdilogenable </code><span class="roman">[</span><var>arg</var><span class="roman">]</span><dd><a name="index-rdilogenable-1290"></a>Control logging of ADP packets.  With an argument of 1 or <code>"yes"</code>
+enables logging, with an argument 0 or <code>"no"</code> disables it.  With
+no arguments displays the current setting.  When logging is enabled,
+ADP packets exchanged between <span class="sc">gdb</span> and the RDI target device
+are logged to a file.
+
+     <br><dt><code>set rdiromatzero</code><dd><a name="index-set-rdiromatzero-1291"></a><a name="index-ROM-at-zero-address_002c-RDI-1292"></a>Tell <span class="sc">gdb</span> whether the target has ROM at address 0.  If on,
+vector catching is disabled, so that zero address can be used.  If off
+(the default), vector catching is enabled.  For this command to take
+effect, it needs to be invoked prior to the <code>target rdi</code> command.
+
+     <br><dt><code>show rdiromatzero</code><dd><a name="index-show-rdiromatzero-1293"></a>Show the current setting of ROM at zero address.
+
+     <br><dt><code>set rdiheartbeat</code><dd><a name="index-set-rdiheartbeat-1294"></a><a name="index-RDI-heartbeat-1295"></a>Enable or disable RDI heartbeat packets.  It is not recommended to
+turn on this option, since it confuses ARM and EPI JTAG interface, as
+well as the Angel monitor.
+
+     <br><dt><code>show rdiheartbeat</code><dd><a name="index-show-rdiheartbeat-1296"></a>Show the setting of RDI heartbeat packets. 
+</dl>
+
+     <dl>
+<dt><code>target sim </code><span class="roman">[</span><var>simargs</var><span class="roman">]</span><code> ...</code><dd>The <span class="sc">gdb</span> ARM simulator accepts the following optional arguments.
+
+          <dl>
+<dt><code>--swi-support=</code><var>type</var><dd>Tell the simulator which SWI interfaces to support. 
+<var>type</var> may be a comma separated list of the following values. 
+The default value is <code>all</code>.
+
+               <dl>
+<dt><code>none</code><br><dt><code>demon</code><br><dt><code>angel</code><br><dt><code>redboot</code><br><dt><code>all</code><dd></dl>
+          </dl>
+     </dl>
+
+   </body></html>
+

@@ -1,0 +1,125 @@
+<html lang="en">
+<head>
+<title>Remote Stub - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Remote-Debugging.html#Remote-Debugging" title="Remote Debugging">
+<link rel="prev" href="Remote-Configuration.html#Remote-Configuration" title="Remote Configuration">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Remote-Stub"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Remote-Configuration.html#Remote-Configuration">Remote Configuration</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Remote-Debugging.html#Remote-Debugging">Remote Debugging</a>
+<hr>
+</div>
+
+<h3 class="section">20.5 Implementing a Remote Stub</h3>
+
+<p><a name="index-debugging-stub_002c-example-1113"></a><a name="index-remote-stub_002c-example-1114"></a><a name="index-stub-example_002c-remote-debugging-1115"></a>The stub files provided with <span class="sc">gdb</span> implement the target side of the
+communication protocol, and the <span class="sc">gdb</span> side is implemented in the
+<span class="sc">gdb</span> source file <samp><span class="file">remote.c</span></samp>.  Normally, you can simply allow
+these subroutines to communicate, and ignore the details.  (If you're
+implementing your own stub file, you can still ignore the details: start
+with one of the existing stub files.  <samp><span class="file">sparc-stub.c</span></samp> is the best
+organized, and therefore the easiest to read.)
+
+   <p><a name="index-remote-serial-debugging_002c-overview-1116"></a>To debug a program running on another machine (the debugging
+<dfn>target</dfn> machine), you must first arrange for all the usual
+prerequisites for the program to run by itself.  For example, for a C
+program, you need:
+
+     <ol type=1 start=1>
+<li>A startup routine to set up the C runtime environment; these usually
+have a name like <samp><span class="file">crt0</span></samp>.  The startup routine may be supplied by
+your hardware supplier, or you may have to write your own.
+
+     <li>A C subroutine library to support your program's
+subroutine calls, notably managing input and output.
+
+     <li>A way of getting your program to the other machine&mdash;for example, a
+download program.  These are often supplied by the hardware
+manufacturer, but you may have to write your own from hardware
+documentation.
+        </ol>
+
+   <p>The next step is to arrange for your program to use a serial port to
+communicate with the machine where <span class="sc">gdb</span> is running (the <dfn>host</dfn>
+machine).  In general terms, the scheme looks like this:
+
+     <dl>
+<dt><em>On the host,</em><dd><span class="sc">gdb</span> already understands how to use this protocol; when everything
+else is set up, you can simply use the &lsquo;<samp><span class="samp">target remote</span></samp>&rsquo; command
+(see <a href="Targets.html#Targets">Specifying a Debugging Target</a>).
+
+     <br><dt><em>On the target,</em><dd>you must link with your program a few special-purpose subroutines that
+implement the <span class="sc">gdb</span> remote serial protocol.  The file containing these
+subroutines is called  a <dfn>debugging stub</dfn>.
+
+     <p>On certain remote targets, you can use an auxiliary program
+<code>gdbserver</code> instead of linking a stub into your program. 
+See <a href="Server.html#Server">Using the <code>gdbserver</code> Program</a>, for details. 
+</dl>
+
+   <p>The debugging stub is specific to the architecture of the remote
+machine; for example, use <samp><span class="file">sparc-stub.c</span></samp> to debug programs on
+<span class="sc">sparc</span> boards.
+
+   <p><a name="index-remote-serial-stub-list-1117"></a>These working remote stubs are distributed with <span class="sc">gdb</span>:
+
+     <dl>
+<dt><code>i386-stub.c</code><dd><a name="index-g_t_0040file_007bi386_002dstub_002ec_007d-1118"></a><a name="index-Intel-1119"></a><a name="index-i386-1120"></a>For Intel 386 and compatible architectures.
+
+     <br><dt><code>m68k-stub.c</code><dd><a name="index-g_t_0040file_007bm68k_002dstub_002ec_007d-1121"></a><a name="index-Motorola-680x0-1122"></a><a name="index-m680x0-1123"></a>For Motorola 680x0 architectures.
+
+     <br><dt><code>sh-stub.c</code><dd><a name="index-g_t_0040file_007bsh_002dstub_002ec_007d-1124"></a><a name="index-Renesas-1125"></a><a name="index-SH-1126"></a>For Renesas SH architectures.
+
+     <br><dt><code>sparc-stub.c</code><dd><a name="index-g_t_0040file_007bsparc_002dstub_002ec_007d-1127"></a><a name="index-Sparc-1128"></a>For <span class="sc">sparc</span> architectures.
+
+     <br><dt><code>sparcl-stub.c</code><dd><a name="index-g_t_0040file_007bsparcl_002dstub_002ec_007d-1129"></a><a name="index-Fujitsu-1130"></a><a name="index-SparcLite-1131"></a>For Fujitsu <span class="sc">sparclite</span> architectures.
+
+   </dl>
+
+   <p>The <samp><span class="file">README</span></samp> file in the <span class="sc">gdb</span> distribution may list other
+recently added stubs.
+
+<ul class="menu">
+<li><a accesskey="1" href="Stub-Contents.html#Stub-Contents">Stub Contents</a>:        What the stub can do for you
+<li><a accesskey="2" href="Bootstrapping.html#Bootstrapping">Bootstrapping</a>:        What you must do for the stub
+<li><a accesskey="3" href="Debug-Session.html#Debug-Session">Debug Session</a>:        Putting it all together
+</ul>
+
+   </body></html>
+

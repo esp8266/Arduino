@@ -1,0 +1,189 @@
+<html lang="en">
+<head>
+<title>Template Instantiation - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C_002b_002b-Extensions.html#C_002b_002b-Extensions" title="C++ Extensions">
+<link rel="prev" href="C_002b_002b-Interface.html#C_002b_002b-Interface" title="C++ Interface">
+<link rel="next" href="Bound-member-functions.html#Bound-member-functions" title="Bound member functions">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Template-Instantiation"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Bound-member-functions.html#Bound-member-functions">Bound member functions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="C_002b_002b-Interface.html#C_002b_002b-Interface">C++ Interface</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C_002b_002b-Extensions.html#C_002b_002b-Extensions">C++ Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">7.5 Where's the Template?</h3>
+
+<p><a name="index-template-instantiation-3182"></a>
+C++ templates are the first language feature to require more
+intelligence from the environment than one usually finds on a UNIX
+system.  Somehow the compiler and linker have to make sure that each
+template instance occurs exactly once in the executable if it is needed,
+and not at all otherwise.  There are two basic approaches to this
+problem, which are referred to as the Borland model and the Cfront model.
+
+     <dl>
+<dt>Borland model<dd>Borland C++ solved the template instantiation problem by adding the code
+equivalent of common blocks to their linker; the compiler emits template
+instances in each translation unit that uses them, and the linker
+collapses them together.  The advantage of this model is that the linker
+only has to consider the object files themselves; there is no external
+complexity to worry about.  This disadvantage is that compilation time
+is increased because the template code is being compiled repeatedly. 
+Code written for this model tends to include definitions of all
+templates in the header file, since they must be seen to be
+instantiated.
+
+     <br><dt>Cfront model<dd>The AT&amp;T C++ translator, Cfront, solved the template instantiation
+problem by creating the notion of a template repository, an
+automatically maintained place where template instances are stored.  A
+more modern version of the repository works as follows: As individual
+object files are built, the compiler places any template definitions and
+instantiations encountered in the repository.  At link time, the link
+wrapper adds in the objects in the repository and compiles any needed
+instances that were not previously emitted.  The advantages of this
+model are more optimal compilation speed and the ability to use the
+system linker; to implement the Borland model a compiler vendor also
+needs to replace the linker.  The disadvantages are vastly increased
+complexity, and thus potential for error; for some code this can be
+just as transparent, but in practice it can been very difficult to build
+multiple programs in one directory and one program in multiple
+directories.  Code written for this model tends to separate definitions
+of non-inline member templates into a separate file, which should be
+compiled separately. 
+</dl>
+
+ <p>When used with GNU ld version 2.8 or later on an ELF system such as
+GNU/Linux or Solaris 2, or on Microsoft Windows, G++ supports the
+Borland model.  On other systems, G++ implements neither automatic
+model.
+
+ <p>A future version of G++ will support a hybrid model whereby the compiler
+will emit any instantiations for which the template definition is
+included in the compile, and store template definitions and
+instantiation context information into the object file for the rest. 
+The link wrapper will extract that information as necessary and invoke
+the compiler to produce the remaining instantiations.  The linker will
+then combine duplicate instantiations.
+
+ <p>In the mean time, you have the following options for dealing with
+template instantiations:
+
+     <ol type=1 start=1>
+<li><a name="index-frepo-3183"></a>Compile your template-using code with <samp><span class="option">-frepo</span></samp>.  The compiler will
+generate files with the extension &lsquo;<samp><span class="samp">.rpo</span></samp>&rsquo; listing all of the
+template instantiations used in the corresponding object files which
+could be instantiated there; the link wrapper, &lsquo;<samp><span class="samp">collect2</span></samp>&rsquo;, will
+then update the &lsquo;<samp><span class="samp">.rpo</span></samp>&rsquo; files to tell the compiler where to place
+those instantiations and rebuild any affected object files.  The
+link-time overhead is negligible after the first pass, as the compiler
+will continue to place the instantiations in the same files.
+
+     <p>This is your best option for application code written for the Borland
+model, as it will just work.  Code written for the Cfront model will
+need to be modified so that the template definitions are available at
+one or more points of instantiation; usually this is as simple as adding
+<code>#include &lt;tmethods.cc&gt;</code> to the end of each template header.
+
+     <p>For library code, if you want the library to provide all of the template
+instantiations it needs, just try to link all of its object files
+together; the link will fail, but cause the instantiations to be
+generated as a side effect.  Be warned, however, that this may cause
+conflicts if multiple libraries try to provide the same instantiations. 
+For greater control, use explicit instantiation as described in the next
+option.
+
+     <li><a name="index-fno_002dimplicit_002dtemplates-3184"></a>Compile your code with <samp><span class="option">-fno-implicit-templates</span></samp> to disable the
+implicit generation of template instances, and explicitly instantiate
+all the ones you use.  This approach requires more knowledge of exactly
+which instances you need than do the others, but it's less
+mysterious and allows greater control.  You can scatter the explicit
+instantiations throughout your program, perhaps putting them in the
+translation units where the instances are used or the translation units
+that define the templates themselves; you can put all of the explicit
+instantiations you need into one big file; or you can create small files
+like
+
+     <pre class="smallexample">          #include "Foo.h"
+          #include "Foo.cc"
+          
+          template class Foo&lt;int&gt;;
+          template ostream&amp; operator &lt;&lt;
+                          (ostream&amp;, const Foo&lt;int&gt;&amp;);
+</pre>
+     <p>for each of the instances you need, and create a template instantiation
+library from those.
+
+     <p>If you are using Cfront-model code, you can probably get away with not
+using <samp><span class="option">-fno-implicit-templates</span></samp> when compiling files that don't
+&lsquo;<samp><span class="samp">#include</span></samp>&rsquo; the member template definitions.
+
+     <p>If you use one big file to do the instantiations, you may want to
+compile it without <samp><span class="option">-fno-implicit-templates</span></samp> so you get all of the
+instances required by your explicit instantiations (but not by any
+other files) without having to specify them as well.
+
+     <p>G++ has extended the template instantiation syntax given in the ISO
+standard to allow forward declaration of explicit instantiations
+(with <code>extern</code>), instantiation of the compiler support data for a
+template class (i.e. the vtable) without instantiating any of its
+members (with <code>inline</code>), and instantiation of only the static data
+members of a template class, without the support data or member
+functions (with (<code>static</code>):
+
+     <pre class="smallexample">          extern template int max (int, int);
+          inline template class Foo&lt;int&gt;;
+          static template class Foo&lt;int&gt;;
+</pre>
+     <li>Do nothing.  Pretend G++ does implement automatic instantiation
+management.  Code written for the Borland model will work fine, but
+each translation unit will contain instances of each of the templates it
+uses.  In a large program, this can lead to an unacceptable amount of code
+duplication.
+      </ol>
+
+ </body></html>
+

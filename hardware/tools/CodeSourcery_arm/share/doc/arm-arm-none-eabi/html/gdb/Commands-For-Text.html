@@ -1,0 +1,110 @@
+<html lang="en">
+<head>
+<title>Commands For Text - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Bindable-Readline-Commands.html#Bindable-Readline-Commands" title="Bindable Readline Commands">
+<link rel="prev" href="Commands-For-History.html#Commands-For-History" title="Commands For History">
+<link rel="next" href="Commands-For-Killing.html#Commands-For-Killing" title="Commands For Killing">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Commands-For-Text"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Commands-For-Killing.html#Commands-For-Killing">Commands For Killing</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Commands-For-History.html#Commands-For-History">Commands For History</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Bindable-Readline-Commands.html#Bindable-Readline-Commands">Bindable Readline Commands</a>
+<hr>
+</div>
+
+<h4 class="subsection">31.4.3 Commands For Changing Text</h4>
+
+     <dl>
+<dt><code>delete-char (C-d)</code><a name="index-delete_002dchar-_0028C_002dd_0029-2239"></a><dd>Delete the character at point.  If point is at the
+beginning of the line, there are no characters in the line, and
+the last character typed was not bound to <code>delete-char</code>, then
+return <span class="sc">eof</span>.
+
+     <br><dt><code>backward-delete-char (Rubout)</code><a name="index-backward_002ddelete_002dchar-_0028Rubout_0029-2240"></a><dd>Delete the character behind the cursor.  A numeric argument means
+to kill the characters instead of deleting them.
+
+     <br><dt><code>forward-backward-delete-char ()</code><a name="index-forward_002dbackward_002ddelete_002dchar-_0028_0029-2241"></a><dd>Delete the character under the cursor, unless the cursor is at the
+end of the line, in which case the character behind the cursor is
+deleted.  By default, this is not bound to a key.
+
+     <br><dt><code>quoted-insert (C-q or C-v)</code><a name="index-quoted_002dinsert-_0028C_002dq-or-C_002dv_0029-2242"></a><dd>Add the next character typed to the line verbatim.  This is
+how to insert key sequences like <kbd>C-q</kbd>, for example.
+
+     <br><dt><code>tab-insert (M-&lt;TAB&gt;)</code><dd>Insert a tab character.
+
+     <br><dt><code>self-insert (a, b, A, 1, !, ...)</code><a name="index-self_002dinsert-_0028a_002c-b_002c-A_002c-1_002c-_0021_002c-_0040dots_007b_007d_0029-2243"></a><dd>Insert yourself.
+
+     <br><dt><code>transpose-chars (C-t)</code><a name="index-transpose_002dchars-_0028C_002dt_0029-2244"></a><dd>Drag the character before the cursor forward over
+the character at the cursor, moving the
+cursor forward as well.  If the insertion point
+is at the end of the line, then this
+transposes the last two characters of the line. 
+Negative arguments have no effect.
+
+     <br><dt><code>transpose-words (M-t)</code><a name="index-transpose_002dwords-_0028M_002dt_0029-2245"></a><dd>Drag the word before point past the word after point,
+moving point past that word as well. 
+If the insertion point is at the end of the line, this transposes
+the last two words on the line.
+
+     <br><dt><code>upcase-word (M-u)</code><a name="index-upcase_002dword-_0028M_002du_0029-2246"></a><dd>Uppercase the current (or following) word.  With a negative argument,
+uppercase the previous word, but do not move the cursor.
+
+     <br><dt><code>downcase-word (M-l)</code><a name="index-downcase_002dword-_0028M_002dl_0029-2247"></a><dd>Lowercase the current (or following) word.  With a negative argument,
+lowercase the previous word, but do not move the cursor.
+
+     <br><dt><code>capitalize-word (M-c)</code><a name="index-capitalize_002dword-_0028M_002dc_0029-2248"></a><dd>Capitalize the current (or following) word.  With a negative argument,
+capitalize the previous word, but do not move the cursor.
+
+     <br><dt><code>overwrite-mode ()</code><a name="index-overwrite_002dmode-_0028_0029-2249"></a><dd>Toggle overwrite mode.  With an explicit positive numeric argument,
+switches to overwrite mode.  With an explicit non-positive numeric
+argument, switches to insert mode.  This command affects only
+<code>emacs</code> mode; <code>vi</code> mode does overwrite differently. 
+Each call to <code>readline()</code> starts in insert mode.
+
+     <p>In overwrite mode, characters bound to <code>self-insert</code> replace
+the text at point rather than pushing the text to the right. 
+Characters bound to <code>backward-delete-char</code> replace the character
+before point with a space.
+
+     <p>By default, this command is unbound.
+
+</dl>
+
+   </body></html>
+

@@ -1,0 +1,177 @@
+<html lang="en">
+<head>
+<title>Constructing Calls - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Nested-Functions.html#Nested-Functions" title="Nested Functions">
+<link rel="next" href="Typeof.html#Typeof" title="Typeof">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Constructing-Calls"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Typeof.html#Typeof">Typeof</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Nested-Functions.html#Nested-Functions">Nested Functions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.5 Constructing Function Calls</h3>
+
+<p><a name="index-constructing-calls-2194"></a><a name="index-forwarding-calls-2195"></a>
+Using the built-in functions described below, you can record
+the arguments a function received, and call another function
+with the same arguments, without knowing the number or types
+of the arguments.
+
+ <p>You can also record the return value of that function call,
+and later return that value, without knowing what data type
+the function tried to return (as long as your caller expects
+that data type).
+
+ <p>However, these built-in functions may interact badly with some
+sophisticated features or other extensions of the language.  It
+is, therefore, not recommended to use them outside very simple
+functions acting as mere forwarders for their arguments.
+
+<div class="defun">
+&mdash; Built-in Function: void * <b>__builtin_apply_args</b> ()<var><a name="index-g_t_005f_005fbuiltin_005fapply_005fargs-2196"></a></var><br>
+<blockquote><p>This built-in function returns a pointer to data
+describing how to perform a call with the same arguments as were passed
+to the current function.
+
+      <p>The function saves the arg pointer register, structure value address,
+and all registers that might be used to pass arguments to a function
+into a block of memory allocated on the stack.  Then it returns the
+address of that block. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Built-in Function: void * <b>__builtin_apply</b> (<var>void </var>(<var>*function</var>)()<var>, void *arguments, size_t size</var>)<var><a name="index-g_t_005f_005fbuiltin_005fapply-2197"></a></var><br>
+<blockquote><p>This built-in function invokes <var>function</var>
+with a copy of the parameters described by <var>arguments</var>
+and <var>size</var>.
+
+      <p>The value of <var>arguments</var> should be the value returned by
+<code>__builtin_apply_args</code>.  The argument <var>size</var> specifies the size
+of the stack argument data, in bytes.
+
+      <p>This function returns a pointer to data describing
+how to return whatever value was returned by <var>function</var>.  The data
+is saved in a block of memory allocated on the stack.
+
+      <p>It is not always simple to compute the proper value for <var>size</var>.  The
+value is used by <code>__builtin_apply</code> to compute the amount of data
+that should be pushed on the stack and copied from the incoming argument
+area. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Built-in Function: void <b>__builtin_return</b> (<var>void *result</var>)<var><a name="index-g_t_005f_005fbuiltin_005freturn-2198"></a></var><br>
+<blockquote><p>This built-in function returns the value described by <var>result</var> from
+the containing function.  You should specify, for <var>result</var>, a value
+returned by <code>__builtin_apply</code>. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Built-in Function: __builtin_va_arg_pack <b>(</b>)<var><a name="index-g_t_0028-2199"></a></var><br>
+<blockquote><p>This built-in function represents all anonymous arguments of an inline
+function.  It can be used only in inline functions which will be always
+inlined, never compiled as a separate function, such as those using
+<code>__attribute__ ((__always_inline__))</code> or
+<code>__attribute__ ((__gnu_inline__))</code> extern inline functions. 
+It must be only passed as last argument to some other function
+with variable arguments.  This is useful for writing small wrapper
+inlines for variable argument functions, when using preprocessor
+macros is undesirable.  For example:
+     <pre class="smallexample">          extern int myprintf (FILE *f, const char *format, ...);
+          extern inline __attribute__ ((__gnu_inline__)) int
+          myprintf (FILE *f, const char *format, ...)
+          {
+            int r = fprintf (f, "myprintf: ");
+            if (r &lt; 0)
+              return r;
+            int s = fprintf (f, format, __builtin_va_arg_pack ());
+            if (s &lt; 0)
+              return s;
+            return r + s;
+          }
+</pre>
+      </blockquote></div>
+
+<div class="defun">
+&mdash; Built-in Function: __builtin_va_arg_pack_len <b>(</b>)<var><a name="index-g_t_0028-2200"></a></var><br>
+<blockquote><p>This built-in function returns the number of anonymous arguments of
+an inline function.  It can be used only in inline functions which
+will be always inlined, never compiled as a separate function, such
+as those using <code>__attribute__ ((__always_inline__))</code> or
+<code>__attribute__ ((__gnu_inline__))</code> extern inline functions. 
+For example following will do link or runtime checking of open
+arguments for optimized code:
+     <pre class="smallexample">          #ifdef __OPTIMIZE__
+          extern inline __attribute__((__gnu_inline__)) int
+          myopen (const char *path, int oflag, ...)
+          {
+            if (__builtin_va_arg_pack_len () &gt; 1)
+              warn_open_too_many_arguments ();
+          
+            if (__builtin_constant_p (oflag))
+              {
+                if ((oflag &amp; O_CREAT) != 0 &amp;&amp; __builtin_va_arg_pack_len () &lt; 1)
+                  {
+                    warn_open_missing_mode ();
+                    return __open_2 (path, oflag);
+                  }
+                return open (path, oflag, __builtin_va_arg_pack ());
+              }
+          
+            if (__builtin_va_arg_pack_len () &lt; 1)
+              return __open_2 (path, oflag);
+          
+            return open (path, oflag, __builtin_va_arg_pack ());
+          }
+          #endif
+</pre>
+      </blockquote></div>
+
+ </body></html>
+

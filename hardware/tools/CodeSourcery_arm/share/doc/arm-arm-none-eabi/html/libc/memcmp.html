@@ -1,0 +1,63 @@
+<html lang="en">
+<head>
+<title>memcmp - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Strings.html#Strings" title="Strings">
+<link rel="prev" href="memchr.html#memchr" title="memchr">
+<link rel="next" href="memcpy.html#memcpy" title="memcpy">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="memcmp"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="memcpy.html#memcpy">memcpy</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="memchr.html#memchr">memchr</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Strings.html#Strings">Strings</a>
+<hr>
+</div>
+
+<h3 class="section">5.7 <code>memcmp</code>&mdash;compare two memory areas</h3>
+
+<p><a name="index-memcmp-376"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;string.h&gt;
+     int memcmp(const void *<var>s1</var>, const void *<var>s2</var>, size_t <var>n</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+This function compares not more than <var>n</var> characters of the
+object pointed to by <var>s1</var> with the object pointed to by <var>s2</var>.
+
+   <p><br>
+<strong>Returns</strong><br>
+The function returns an integer greater than, equal to or
+less than zero 	according to whether the object pointed to by
+<var>s1</var> is greater than, equal to or less than the object
+pointed to by <var>s2</var>.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>memcmp</code> is ANSI C.
+
+   <p><code>memcmp</code> requires no supporting OS subroutines.
+
+   <p><br>
+
+   </body></html>
+

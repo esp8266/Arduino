@@ -1,0 +1,121 @@
+<html lang="en">
+<head>
+<title>Canonical format - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="BFD-outline.html#BFD-outline" title="BFD outline">
+<link rel="prev" href="BFD-information-loss.html#BFD-information-loss" title="BFD information loss">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Canonical-format"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="BFD-information-loss.html#BFD-information-loss">BFD information loss</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="BFD-outline.html#BFD-outline">BFD outline</a>
+<hr>
+</div>
+
+<h4 class="subsection">5.1.2 The BFD canonical object-file format</h4>
+
+<p>The greatest potential for loss of information occurs when there is the least
+overlap between the information provided by the source format, that
+stored by the canonical format, and that needed by the
+destination format. A brief description of the canonical form may help
+you understand which kinds of data you can count on preserving across
+conversions. 
+<a name="index-BFD-canonical-format-683"></a><a name="index-internal-object_002dfile-format-684"></a>
+     <dl>
+<dt><em>files</em><dd>Information stored on a per-file basis includes target machine
+architecture, particular implementation format type, a demand pageable
+bit, and a write protected bit.  Information like Unix magic numbers is
+not stored here&mdash;only the magic numbers' meaning, so a <code>ZMAGIC</code>
+file would have both the demand pageable bit and the write protected
+text bit set.  The byte order of the target is stored on a per-file
+basis, so that big- and little-endian object files may be used with one
+another.
+
+     <br><dt><em>sections</em><dd>Each section in the input file contains the name of the section, the
+section's original address in the object file, size and alignment
+information, various flags, and pointers into other BFD data
+structures.
+
+     <br><dt><em>symbols</em><dd>Each symbol contains a pointer to the information for the object file
+which originally defined it, its name, its value, and various flag
+bits.  When a BFD back end reads in a symbol table, it relocates all
+symbols to make them relative to the base of the section where they were
+defined.  Doing this ensures that each symbol points to its containing
+section.  Each symbol also has a varying amount of hidden private data
+for the BFD back end.  Since the symbol points to the original file, the
+private data format for that symbol is accessible.  <code>ld</code> can
+operate on a collection of symbols of wildly different formats without
+problems.
+
+     <p>Normal global and simple local symbols are maintained on output, so an
+output file (no matter its format) will retain symbols pointing to
+functions and to global, static, and common variables.  Some symbol
+information is not worth retaining; in <code>a.out</code>, type information is
+stored in the symbol table as long symbol names.  This information would
+be useless to most COFF debuggers; the linker has command line switches
+to allow users to throw it away.
+
+     <p>There is one word of type information within the symbol, so if the
+format supports symbol type information within symbols (for example, COFF,
+IEEE, Oasys) and the type is simple enough to fit within one word
+(nearly everything but aggregates), the information will be preserved.
+
+     <br><dt><em>relocation level</em><dd>Each canonical BFD relocation record contains a pointer to the symbol to
+relocate to, the offset of the data to relocate, the section the data
+is in, and a pointer to a relocation type descriptor. Relocation is
+performed by passing messages through the relocation type
+descriptor and the symbol pointer. Therefore, relocations can be performed
+on output data using a relocation method that is only available in one of the
+input formats. For instance, Oasys provides a byte relocation format. 
+A relocation record requesting this relocation type would point
+indirectly to a routine to perform this, so the relocation may be
+performed on a byte being written to a 68k COFF file, even though 68k COFF
+has no such relocation type.
+
+     <br><dt><em>line numbers</em><dd>Object formats can contain, for debugging purposes, some form of mapping
+between symbols, source line numbers, and addresses in the output file. 
+These addresses have to be relocated along with the symbol information. 
+Each symbol with an associated list of line number records points to the
+first record of the list.  The head of a line number list consists of a
+pointer to the symbol, which allows finding out the address of the
+function whose line number is being described. The rest of the list is
+made up of pairs: offsets into the section and line numbers. Any format
+which can simply derive this information can pass it successfully
+between formats (COFF, IEEE and Oasys). 
+</dl>
+
+   </body></html>
+

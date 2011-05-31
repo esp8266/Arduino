@@ -1,0 +1,112 @@
+<html lang="en">
+<head>
+<title>Debugging C Plus Plus - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C.html#C" title="C">
+<link rel="prev" href="Debugging-C.html#Debugging-C" title="Debugging C">
+<link rel="next" href="Decimal-Floating-Point.html#Decimal-Floating-Point" title="Decimal Floating Point">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Debugging-C-Plus-Plus"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Decimal-Floating-Point.html#Decimal-Floating-Point">Decimal Floating Point</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Debugging-C.html#Debugging-C">Debugging C</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C.html#C">C</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">15.4.1.7 <span class="sc">gdb</span> Features for C<tt>++</tt></h5>
+
+<p><a name="index-commands-for-C_0040t_007b_002b_002b_007d-814"></a>
+Some <span class="sc">gdb</span> commands are particularly useful with C<tt>++</tt>, and some are
+designed specifically for use with C<tt>++</tt>.  Here is a summary:
+
+     
+<a name="index-break-in-overloaded-functions-815"></a>
+<dl><dt><span class="roman">breakpoint menus</span><dd>When you want a breakpoint in a function whose name is overloaded,
+<span class="sc">gdb</span> has the capability to display a menu of possible breakpoint
+locations to help you specify which function definition you want. 
+See <a href="Ambiguous-Expressions.html#Ambiguous-Expressions">Ambiguous Expressions</a>.
+
+     <p><a name="index-overloading-in-C_0040t_007b_002b_002b_007d-816"></a><br><dt><code>rbreak </code><var>regex</var><dd>Setting breakpoints using regular expressions is helpful for setting
+breakpoints on overloaded functions that are not members of any special
+classes. 
+See <a href="Set-Breaks.html#Set-Breaks">Setting Breakpoints</a>.
+
+     <p><a name="index-C_0040t_007b_002b_002b_007d-exception-handling-817"></a><br><dt><code>catch throw</code><dt><code>catch catch</code><dd>Debug C<tt>++</tt> exception handling using these commands.  See <a href="Set-Catchpoints.html#Set-Catchpoints">Setting Catchpoints</a>.
+
+     <p><a name="index-inheritance-818"></a><br><dt><code>ptype </code><var>typename</var><dd>Print inheritance relationships as well as other information for type
+<var>typename</var>. 
+See <a href="Symbols.html#Symbols">Examining the Symbol Table</a>.
+
+     <p><a name="index-C_0040t_007b_002b_002b_007d-symbol-display-819"></a><br><dt><code>set print demangle</code><dt><code>show print demangle</code><dt><code>set print asm-demangle</code><dt><code>show print asm-demangle</code><dd>Control whether C<tt>++</tt> symbols display in their source form, both when
+displaying code as C<tt>++</tt> source and when displaying disassemblies. 
+See <a href="Print-Settings.html#Print-Settings">Print Settings</a>.
+
+     <br><dt><code>set print object</code><dt><code>show print object</code><dd>Choose whether to print derived (actual) or declared types of objects. 
+See <a href="Print-Settings.html#Print-Settings">Print Settings</a>.
+
+     <br><dt><code>set print vtbl</code><dt><code>show print vtbl</code><dd>Control the format for printing virtual function tables. 
+See <a href="Print-Settings.html#Print-Settings">Print Settings</a>. 
+(The <code>vtbl</code> commands do not work on programs compiled with the HP
+ANSI C<tt>++</tt> compiler (<code>aCC</code>).)
+
+     <p><a name="index-set-overload_002dresolution-820"></a><a name="index-overloaded-functions_002c-overload-resolution-821"></a><br><dt><code>set overload-resolution on</code><dd>Enable overload resolution for C<tt>++</tt> expression evaluation.  The default
+is on.  For overloaded functions, <span class="sc">gdb</span> evaluates the arguments
+and searches for a function whose signature matches the argument types,
+using the standard C<tt>++</tt> conversion rules (see <a href="C-Plus-Plus-Expressions.html#C-Plus-Plus-Expressions">C<tt>++</tt> Expressions</a>, for details). 
+If it cannot find a match, it emits a message.
+
+     <br><dt><code>set overload-resolution off</code><dd>Disable overload resolution for C<tt>++</tt> expression evaluation.  For
+overloaded functions that are not class member functions, <span class="sc">gdb</span>
+chooses the first function of the specified name that it finds in the
+symbol table, whether or not its arguments are of the correct type.  For
+overloaded functions that are class member functions, <span class="sc">gdb</span>
+searches for a function whose signature <em>exactly</em> matches the
+argument types.
+
+     <p><a name="index-show-overload_002dresolution-822"></a><br><dt><code>show overload-resolution</code><dd>Show the current setting of overload resolution.
+
+     <br><dt><span class="roman">Overloaded symbol names</span><dd>You can specify a particular definition of an overloaded symbol, using
+the same notation that is used to declare such symbols in C<tt>++</tt>: type
+<var>symbol</var><code>(</code><var>types</var><code>)</code> rather than just <var>symbol</var>.  You can
+also use the <span class="sc">gdb</span> command-line word completion facilities to list the
+available choices, or to finish the type list for you. 
+See <a href="Completion.html#Completion">Command Completion</a>, for details on how to do this. 
+</dl>
+
+   </body></html>
+

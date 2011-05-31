@@ -1,0 +1,85 @@
+<html lang="en">
+<head>
+<title>vfscanf - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="vfprintf.html#vfprintf" title="vfprintf">
+<link rel="next" href="vfwprintf.html#vfwprintf" title="vfwprintf">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="vfscanf"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="vfwprintf.html#vfwprintf">vfwprintf</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="vfprintf.html#vfprintf">vfprintf</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.69 <code>vfscanf</code>, <code>vscanf</code>, <code>vsscanf</code>&mdash;format argument list</h3>
+
+<p><a name="index-vfscanf-336"></a><a name="index-g_t_005fvfscanf_005fr-337"></a><a name="index-vscanf-338"></a><a name="index-g_t_005fvscanf_005fr-339"></a><a name="index-vsscanf-340"></a><a name="index-g_t_005fvsscanf_005fr-341"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     #include &lt;stdarg.h&gt;
+     int vscanf(const char *<var>fmt</var>, va_list <var>list</var>);
+     int vfscanf(FILE *<var>fp</var>, const char *<var>fmt</var>, va_list <var>list</var>);
+     int vsscanf(const char *<var>str</var>, const char *<var>fmt</var>, va_list <var>list</var>);
+     
+     int _vscanf_r(struct _reent *<var>reent</var>, const char *<var>fmt</var>,
+         va_list <var>list</var>);
+     int _vfscanf_r(struct _reent *<var>reent</var>, FILE *<var>fp</var>, const char *<var>fmt</var>,
+         va_list <var>list</var>);
+     int _vsscanf_r(struct _reent *<var>reent</var>, const char *<var>str</var>,
+         const char *<var>fmt</var>, va_list <var>list</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>vscanf</code>, <code>vfscanf</code>, and <code>vsscanf</code> are (respectively) variants
+of <code>scanf</code>, <code>fscanf</code>, and <code>sscanf</code>.  They differ only in
+allowing their caller to pass the variable argument list as a
+<code>va_list</code> object (initialized by <code>va_start</code>) rather than
+directly accepting a variable number of arguments.
+
+   <p><br>
+<strong>Returns</strong><br>
+The return values are consistent with the corresponding functions:
+<code>vscanf</code> returns the number of input fields successfully scanned,
+converted, and stored; the return value does not include scanned
+fields which were not stored.
+
+   <p>If <code>vscanf</code> attempts to read at end-of-file, the return value
+is <code>EOF</code>.
+
+   <p>If no fields were stored, the return value is <code>0</code>.
+
+   <p>The routines <code>_vscanf_r</code>, <code>_vfscanf_f</code>, and <code>_vsscanf_r</code> are
+reentrant versions which take an additional first parameter which points to the
+reentrancy structure.
+
+   <p><br>
+<strong>Portability</strong><br>
+These are GNU extensions.
+
+   <p>Supporting OS subroutines required:
+
+   <p><br>
+
+   </body></html>
+

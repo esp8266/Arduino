@@ -1,0 +1,119 @@
+<html lang="en">
+<head>
+<title>Observer Mode - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Thread-Stops.html#Thread-Stops" title="Thread Stops">
+<link rel="prev" href="Interrupted-System-Calls.html#Interrupted-System-Calls" title="Interrupted System Calls">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Observer-Mode"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Interrupted-System-Calls.html#Interrupted-System-Calls">Interrupted System Calls</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Thread-Stops.html#Thread-Stops">Thread Stops</a>
+<hr>
+</div>
+
+<h4 class="subsection">5.4.6 Observer Mode</h4>
+
+<p>If you want to build on non-stop mode and observe program behavior
+without any chance of disruption by <span class="sc">gdb</span>, you can set
+variables to disable all of the debugger's attempts to modify state,
+whether by writing memory, inserting breakpoints, etc.  These operate
+at a low level, intercepting operations from all commands.
+
+   <p>When all of these are set to <code>off</code>, then <span class="sc">gdb</span> is said to
+be <dfn>observer mode</dfn>.  As a convenience, the variable
+<code>observer</code> can be set to disable these, plus enable non-stop
+mode.
+
+   <p>Note that <span class="sc">gdb</span> will not prevent you from making nonsensical
+combinations of these settings. For instance, if you have enabled
+<code>may-insert-breakpoints</code> but disabled <code>may-write-memory</code>,
+then breakpoints that work by writing trap instructions into the code
+stream will still not be able to be placed.
+
+     
+<a name="index-observer-351"></a>
+<dl><dt><code>set observer on</code><dt><code>set observer off</code><dd>When set to <code>on</code>, this disables all the permission variables
+below (except for <code>insert-fast-tracepoints</code>), plus enables
+non-stop debugging.  Setting this to <code>off</code> switches back to
+normal debugging, though remaining in non-stop mode.
+
+     <br><dt><code>show observer</code><dd>Show whether observer mode is on or off.
+
+     <p><a name="index-may_002dwrite_002dregisters-352"></a><br><dt><code>set may-write-registers on</code><dt><code>set may-write-registers off</code><dd>This controls whether <span class="sc">gdb</span> will attempt to alter the values of
+registers, such as with assignment expressions in <code>print</code>, or the
+<code>jump</code> command.  It defaults to <code>on</code>.
+
+     <br><dt><code>show may-write-registers</code><dd>Show the current permission to write registers.
+
+     <p><a name="index-may_002dwrite_002dmemory-353"></a><br><dt><code>set may-write-memory on</code><dt><code>set may-write-memory off</code><dd>This controls whether <span class="sc">gdb</span> will attempt to alter the contents
+of memory, such as with assignment expressions in <code>print</code>.  It
+defaults to <code>on</code>.
+
+     <br><dt><code>show may-write-memory</code><dd>Show the current permission to write memory.
+
+     <p><a name="index-may_002dinsert_002dbreakpoints-354"></a><br><dt><code>set may-insert-breakpoints on</code><dt><code>set may-insert-breakpoints off</code><dd>This controls whether <span class="sc">gdb</span> will attempt to insert breakpoints. 
+This affects all breakpoints, including internal breakpoints defined
+by <span class="sc">gdb</span>.  It defaults to <code>on</code>.
+
+     <br><dt><code>show may-insert-breakpoints</code><dd>Show the current permission to insert breakpoints.
+
+     <p><a name="index-may_002dinsert_002dtracepoints-355"></a><br><dt><code>set may-insert-tracepoints on</code><dt><code>set may-insert-tracepoints off</code><dd>This controls whether <span class="sc">gdb</span> will attempt to insert (regular)
+tracepoints at the beginning of a tracing experiment.  It affects only
+non-fast tracepoints, fast tracepoints being under the control of
+<code>may-insert-fast-tracepoints</code>.  It defaults to <code>on</code>.
+
+     <br><dt><code>show may-insert-tracepoints</code><dd>Show the current permission to insert tracepoints.
+
+     <p><a name="index-may_002dinsert_002dfast_002dtracepoints-356"></a><br><dt><code>set may-insert-fast-tracepoints on</code><dt><code>set may-insert-fast-tracepoints off</code><dd>This controls whether <span class="sc">gdb</span> will attempt to insert fast
+tracepoints at the beginning of a tracing experiment.  It affects only
+fast tracepoints, regular (non-fast) tracepoints being under the
+control of <code>may-insert-tracepoints</code>.  It defaults to <code>on</code>.
+
+     <br><dt><code>show may-insert-fast-tracepoints</code><dd>Show the current permission to insert fast tracepoints.
+
+     <p><a name="index-may_002dinterrupt-357"></a><br><dt><code>set may-interrupt on</code><dt><code>set may-interrupt off</code><dd>This controls whether <span class="sc">gdb</span> will attempt to interrupt or stop
+program execution.  When this variable is <code>off</code>, the
+<code>interrupt</code> command will have no effect, nor will
+<kbd>Ctrl-c</kbd>. It defaults to <code>on</code>.
+
+     <br><dt><code>show may-interrupt</code><dd>Show the current permission to interrupt or stop the program.
+
+   </dl>
+
+   </body></html>
+

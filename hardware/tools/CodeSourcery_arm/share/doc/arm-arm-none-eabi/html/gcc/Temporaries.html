@@ -1,0 +1,107 @@
+<html lang="en">
+<head>
+<title>Temporaries - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C_002b_002b-Misunderstandings.html#C_002b_002b-Misunderstandings" title="C++ Misunderstandings">
+<link rel="prev" href="Name-lookup.html#Name-lookup" title="Name lookup">
+<link rel="next" href="Copy-Assignment.html#Copy-Assignment" title="Copy Assignment">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Temporaries"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Copy-Assignment.html#Copy-Assignment">Copy Assignment</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Name-lookup.html#Name-lookup">Name lookup</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C_002b_002b-Misunderstandings.html#C_002b_002b-Misunderstandings">C++ Misunderstandings</a>
+<hr>
+</div>
+
+<h4 class="subsection">11.8.3 Temporaries May Vanish Before You Expect</h4>
+
+<p><a name="index-temporaries_002c-lifetime-of-3240"></a><a name="index-portions-of-temporary-objects_002c-pointers-to-3241"></a>It is dangerous to use pointers or references to <em>portions</em> of a
+temporary object.  The compiler may very well delete the object before
+you expect it to, leaving a pointer to garbage.  The most common place
+where this problem crops up is in classes like string classes,
+especially ones that define a conversion function to type <code>char *</code>
+or <code>const char *</code>&mdash;which is one reason why the standard
+<code>string</code> class requires you to call the <code>c_str</code> member
+function.  However, any class that returns a pointer to some internal
+structure is potentially subject to this problem.
+
+ <p>For example, a program may use a function <code>strfunc</code> that returns
+<code>string</code> objects, and another function <code>charfunc</code> that
+operates on pointers to <code>char</code>:
+
+<pre class="smallexample">     string strfunc ();
+     void charfunc (const char *);
+     
+     void
+     f ()
+     {
+       const char *p = strfunc().c_str();
+       ...
+       charfunc (p);
+       ...
+       charfunc (p);
+     }
+</pre>
+ <p class="noindent">In this situation, it may seem reasonable to save a pointer to the C
+string returned by the <code>c_str</code> member function and use that rather
+than call <code>c_str</code> repeatedly.  However, the temporary string
+created by the call to <code>strfunc</code> is destroyed after <code>p</code> is
+initialized, at which point <code>p</code> is left pointing to freed memory.
+
+ <p>Code like this may run successfully under some other compilers,
+particularly obsolete cfront-based compilers that delete temporaries
+along with normal local variables.  However, the GNU C++ behavior is
+standard-conforming, so if your program depends on late destruction of
+temporaries it is not portable.
+
+ <p>The safe way to write such code is to give the temporary a name, which
+forces it to remain until the end of the scope of the name.  For
+example:
+
+<pre class="smallexample">     const string&amp; tmp = strfunc ();
+     charfunc (tmp.c_str ());
+</pre>
+ </body></html>
+

@@ -1,0 +1,98 @@
+<html lang="en">
+<head>
+<title>Diagnostics - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Conditionals.html#Conditionals" title="Conditionals">
+<link rel="next" href="Line-Control.html#Line-Control" title="Line Control">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Diagnostics"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Line-Control.html#Line-Control">Line Control</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Conditionals.html#Conditionals">Conditionals</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">5 Diagnostics</h2>
+
+<p><a name="index-diagnostic-93"></a><a name="index-reporting-errors-94"></a><a name="index-reporting-warnings-95"></a>
+<a name="index-g_t_0023error-96"></a>The directive &lsquo;<samp><span class="samp">#error</span></samp>&rsquo; causes the preprocessor to report a fatal
+error.  The tokens forming the rest of the line following &lsquo;<samp><span class="samp">#error</span></samp>&rsquo;
+are used as the error message.
+
+   <p>You would use &lsquo;<samp><span class="samp">#error</span></samp>&rsquo; inside of a conditional that detects a
+combination of parameters which you know the program does not properly
+support.  For example, if you know that the program will not run
+properly on a VAX, you might write
+
+<pre class="smallexample">     #ifdef __vax__
+     #error "Won't work on VAXen.  See comments at get_last_object."
+     #endif
+</pre>
+   <p>If you have several configuration parameters that must be set up by
+the installation in a consistent way, you can use conditionals to detect
+an inconsistency and report it with &lsquo;<samp><span class="samp">#error</span></samp>&rsquo;.  For example,
+
+<pre class="smallexample">     #if !defined(UNALIGNED_INT_ASM_OP) &amp;&amp; defined(DWARF2_DEBUGGING_INFO)
+     #error "DWARF2_DEBUGGING_INFO requires UNALIGNED_INT_ASM_OP."
+     #endif
+</pre>
+   <p><a name="index-g_t_0023warning-97"></a>The directive &lsquo;<samp><span class="samp">#warning</span></samp>&rsquo; is like &lsquo;<samp><span class="samp">#error</span></samp>&rsquo;, but causes the
+preprocessor to issue a warning and continue preprocessing.  The tokens
+following &lsquo;<samp><span class="samp">#warning</span></samp>&rsquo; are used as the warning message.
+
+   <p>You might use &lsquo;<samp><span class="samp">#warning</span></samp>&rsquo; in obsolete header files, with a message
+directing the user to the header file which should be used instead.
+
+   <p>Neither &lsquo;<samp><span class="samp">#error</span></samp>&rsquo; nor &lsquo;<samp><span class="samp">#warning</span></samp>&rsquo; macro-expands its argument. 
+Internal whitespace sequences are each replaced with a single space. 
+The line must consist of complete tokens.  It is wisest to make the
+argument of these directives be a single string constant; this avoids
+problems with apostrophes and the like.
+
+   </body></html>
+

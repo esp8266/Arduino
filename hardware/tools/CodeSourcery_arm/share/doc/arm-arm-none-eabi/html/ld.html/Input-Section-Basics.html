@@ -1,0 +1,121 @@
+<html lang="en">
+<head>
+<title>Input Section Basics - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Input-Section.html#Input-Section" title="Input Section">
+<link rel="next" href="Input-Section-Wildcards.html#Input-Section-Wildcards" title="Input Section Wildcards">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Input-Section-Basics"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Input-Section-Wildcards.html#Input-Section-Wildcards">Input Section Wildcards</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Input-Section.html#Input-Section">Input Section</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">3.6.4.1 Input Section Basics</h5>
+
+<p><a name="index-input-section-basics-398"></a>An input section description consists of a file name optionally followed
+by a list of section names in parentheses.
+
+   <p>The file name and the section name may be wildcard patterns, which we
+describe further below (see <a href="Input-Section-Wildcards.html#Input-Section-Wildcards">Input Section Wildcards</a>).
+
+   <p>The most common input section description is to include all input
+sections with a particular name in the output section.  For example, to
+include all input &lsquo;<samp><span class="samp">.text</span></samp>&rsquo; sections, you would write:
+<pre class="smallexample">     *(.text)
+</pre>
+   <p class="noindent">Here the &lsquo;<samp><span class="samp">*</span></samp>&rsquo; is a wildcard which matches any file name.  To exclude a list
+of files from matching the file name wildcard, EXCLUDE_FILE may be used to
+match all files except the ones specified in the EXCLUDE_FILE list.  For
+example:
+<pre class="smallexample">     *(EXCLUDE_FILE (*crtend.o *otherfile.o) .ctors)
+</pre>
+   <p>will cause all .ctors sections from all files except <samp><span class="file">crtend.o</span></samp> and
+<samp><span class="file">otherfile.o</span></samp> to be included.
+
+   <p>There are two ways to include more than one section:
+<pre class="smallexample">     *(.text .rdata)
+     *(.text) *(.rdata)
+</pre>
+   <p class="noindent">The difference between these is the order in which the &lsquo;<samp><span class="samp">.text</span></samp>&rsquo; and
+&lsquo;<samp><span class="samp">.rdata</span></samp>&rsquo; input sections will appear in the output section.  In the
+first example, they will be intermingled, appearing in the same order as
+they are found in the linker input.  In the second example, all
+&lsquo;<samp><span class="samp">.text</span></samp>&rsquo; input sections will appear first, followed by all
+&lsquo;<samp><span class="samp">.rdata</span></samp>&rsquo; input sections.
+
+   <p>You can specify a file name to include sections from a particular file. 
+You would do this if one or more of your files contain special data that
+needs to be at a particular location in memory.  For example:
+<pre class="smallexample">     data.o(.data)
+</pre>
+   <p>You can also specify files within archives by writing a pattern
+matching the archive, a colon, then the pattern matching the file,
+with no whitespace around the colon.
+
+     <dl>
+<dt>&lsquo;<samp><span class="samp">archive:file</span></samp>&rsquo;<dd>matches file within archive
+<br><dt>&lsquo;<samp><span class="samp">archive:</span></samp>&rsquo;<dd>matches the whole archive
+<br><dt>&lsquo;<samp><span class="samp">:file</span></samp>&rsquo;<dd>matches file but not one in an archive
+</dl>
+
+   <p>Either one or both of &lsquo;<samp><span class="samp">archive</span></samp>&rsquo; and &lsquo;<samp><span class="samp">file</span></samp>&rsquo; can contain shell
+wildcards.  On DOS based file systems, the linker will assume that a
+single letter followed by a colon is a drive specifier, so
+&lsquo;<samp><span class="samp">c:myfile.o</span></samp>&rsquo; is a simple file specification, not &lsquo;<samp><span class="samp">myfile.o</span></samp>&rsquo;
+within an archive called &lsquo;<samp><span class="samp">c</span></samp>&rsquo;.  &lsquo;<samp><span class="samp">archive:file</span></samp>&rsquo; filespecs may
+also be used within an <code>EXCLUDE_FILE</code> list, but may not appear in
+other linker script contexts.  For instance, you cannot extract a file
+from an archive by using &lsquo;<samp><span class="samp">archive:file</span></samp>&rsquo; in an <code>INPUT</code>
+command.
+
+   <p>If you use a file name without a list of sections, then all sections in
+the input file will be included in the output section.  This is not
+commonly done, but it may by useful on occasion.  For example:
+<pre class="smallexample">     data.o
+</pre>
+   <p>When you use a file name which is not an &lsquo;<samp><span class="samp">archive:file</span></samp>&rsquo; specifier
+and does not contain any wild card
+characters, the linker will first see if you also specified the file
+name on the linker command line or in an <code>INPUT</code> command.  If you
+did not, the linker will attempt to open the file as an input file, as
+though it appeared on the command line.  Note that this differs from an
+<code>INPUT</code> command, because the linker will not search for the file in
+the archive search path.
+
+   </body></html>
+

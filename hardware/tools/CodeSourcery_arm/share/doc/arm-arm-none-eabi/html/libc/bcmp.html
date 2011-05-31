@@ -1,0 +1,61 @@
+<html lang="en">
+<head>
+<title>bcmp - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Strings.html#Strings" title="Strings">
+<link rel="next" href="bcopy.html#bcopy" title="bcopy">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="bcmp"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="bcopy.html#bcopy">bcopy</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Strings.html#Strings">Strings</a>
+<hr>
+</div>
+
+<h3 class="section">5.1 <code>bcmp</code>&mdash;compare two memory areas</h3>
+
+<p><a name="index-bcmp-372"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;string.h&gt;
+     int bcmp(const void *<var>s1</var>, const void *<var>s2</var>, size_t <var>n</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+This function compares not more than <var>n</var> bytes of the
+object pointed to by <var>s1</var> with the object pointed to by <var>s2</var>.
+
+   <p>This function is identical to <code>memcmp</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+The function returns an integer greater than, equal to or
+less than zero 	according to whether the object pointed to by
+<var>s1</var> is greater than, equal to or less than the object
+pointed to by <var>s2</var>.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>bcmp</code> requires no supporting OS subroutines.
+
+   <p><br>
+
+   </body></html>
+

@@ -1,0 +1,64 @@
+<html lang="en">
+<head>
+<title>memcpy - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Strings.html#Strings" title="Strings">
+<link rel="prev" href="memcmp.html#memcmp" title="memcmp">
+<link rel="next" href="memmem.html#memmem" title="memmem">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="memcpy"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="memmem.html#memmem">memmem</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="memcmp.html#memcmp">memcmp</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Strings.html#Strings">Strings</a>
+<hr>
+</div>
+
+<h3 class="section">5.8 <code>memcpy</code>&mdash;copy memory regions</h3>
+
+<p><strong>Synopsis</strong>
+<pre class="example">     #include &lt;string.h&gt;
+     void* memcpy(void *<var>out</var>, const void *<var>in</var>, size_t <var>n</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+This function copies <var>n</var> bytes from the memory region
+pointed to by <var>in</var> to the memory region pointed to by
+<var>out</var>.
+
+   <p>If the regions overlap, the behavior is undefined.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>memcpy</code> returns a pointer to the first byte of the <var>out</var>
+region.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>memcpy</code> is ANSI C.
+
+   <p><code>memcpy</code> requires no supporting OS subroutines.
+
+   <p><br>
+
+   </body></html>
+

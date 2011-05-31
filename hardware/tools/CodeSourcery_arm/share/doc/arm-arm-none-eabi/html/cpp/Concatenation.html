@@ -1,0 +1,135 @@
+<html lang="en">
+<head>
+<title>Concatenation - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Macros.html#Macros" title="Macros">
+<link rel="prev" href="Stringification.html#Stringification" title="Stringification">
+<link rel="next" href="Variadic-Macros.html#Variadic-Macros" title="Variadic Macros">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Concatenation"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Variadic-Macros.html#Variadic-Macros">Variadic Macros</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Stringification.html#Stringification">Stringification</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Macros.html#Macros">Macros</a>
+<hr>
+</div>
+
+<h3 class="section">3.5 Concatenation</h3>
+
+<p><a name="index-concatenation-52"></a><a name="index-token-pasting-53"></a><a name="index-token-concatenation-54"></a><a name="index-g_t_0040samp_007b_0023_0023_007d-operator-55"></a>
+It is often useful to merge two tokens into one while expanding macros. 
+This is called <dfn>token pasting</dfn> or <dfn>token concatenation</dfn>.  The
+&lsquo;<samp><span class="samp">##</span></samp>&rsquo; preprocessing operator performs token pasting.  When a macro
+is expanded, the two tokens on either side of each &lsquo;<samp><span class="samp">##</span></samp>&rsquo; operator
+are combined into a single token, which then replaces the &lsquo;<samp><span class="samp">##</span></samp>&rsquo; and
+the two original tokens in the macro expansion.  Usually both will be
+identifiers, or one will be an identifier and the other a preprocessing
+number.  When pasted, they make a longer identifier.  This isn't the
+only valid case.  It is also possible to concatenate two numbers (or a
+number and a name, such as <code>1.5</code> and <code>e3</code>) into a number. 
+Also, multi-character operators such as <code>+=</code> can be formed by
+token pasting.
+
+   <p>However, two tokens that don't together form a valid token cannot be
+pasted together.  For example, you cannot concatenate <code>x</code> with
+<code>+</code> in either order.  If you try, the preprocessor issues a warning
+and emits the two tokens.  Whether it puts white space between the
+tokens is undefined.  It is common to find unnecessary uses of &lsquo;<samp><span class="samp">##</span></samp>&rsquo;
+in complex macros.  If you get this warning, it is likely that you can
+simply remove the &lsquo;<samp><span class="samp">##</span></samp>&rsquo;.
+
+   <p>Both the tokens combined by &lsquo;<samp><span class="samp">##</span></samp>&rsquo; could come from the macro body,
+but you could just as well write them as one token in the first place. 
+Token pasting is most useful when one or both of the tokens comes from a
+macro argument.  If either of the tokens next to an &lsquo;<samp><span class="samp">##</span></samp>&rsquo; is a
+parameter name, it is replaced by its actual argument before &lsquo;<samp><span class="samp">##</span></samp>&rsquo;
+executes.  As with stringification, the actual argument is not
+macro-expanded first.  If the argument is empty, that &lsquo;<samp><span class="samp">##</span></samp>&rsquo; has no
+effect.
+
+   <p>Keep in mind that the C preprocessor converts comments to whitespace
+before macros are even considered.  Therefore, you cannot create a
+comment by concatenating &lsquo;<samp><span class="samp">/</span></samp>&rsquo; and &lsquo;<samp><span class="samp">*</span></samp>&rsquo;.  You can put as much
+whitespace between &lsquo;<samp><span class="samp">##</span></samp>&rsquo; and its operands as you like, including
+comments, and you can put comments in arguments that will be
+concatenated.  However, it is an error if &lsquo;<samp><span class="samp">##</span></samp>&rsquo; appears at either
+end of a macro body.
+
+   <p>Consider a C program that interprets named commands.  There probably
+needs to be a table of commands, perhaps an array of structures declared
+as follows:
+
+<pre class="smallexample">     struct command
+     {
+       char *name;
+       void (*function) (void);
+     };
+     
+     struct command commands[] =
+     {
+       { "quit", quit_command },
+       { "help", help_command },
+       ...
+     };
+</pre>
+   <p>It would be cleaner not to have to give each command name twice, once in
+the string constant and once in the function name.  A macro which takes the
+name of a command as an argument can make this unnecessary.  The string
+constant can be created with stringification, and the function name by
+concatenating the argument with &lsquo;<samp><span class="samp">_command</span></samp>&rsquo;.  Here is how it is done:
+
+<pre class="smallexample">     #define COMMAND(NAME)  { #NAME, NAME ## _command }
+     
+     struct command commands[] =
+     {
+       COMMAND (quit),
+       COMMAND (help),
+       ...
+     };
+</pre>
+   </body></html>
+

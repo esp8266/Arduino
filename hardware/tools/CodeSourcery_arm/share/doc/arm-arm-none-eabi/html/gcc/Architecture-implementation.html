@@ -1,0 +1,80 @@
+<html lang="en">
+<head>
+<title>Architecture implementation - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Implementation.html#C-Implementation" title="C Implementation">
+<link rel="prev" href="Library-functions-implementation.html#Library-functions-implementation" title="Library functions implementation">
+<link rel="next" href="Locale_002dspecific-behavior-implementation.html#Locale_002dspecific-behavior-implementation" title="Locale-specific behavior implementation">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Architecture-implementation"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Locale_002dspecific-behavior-implementation.html#Locale_002dspecific-behavior-implementation">Locale-specific behavior implementation</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Library-functions-implementation.html#Library-functions-implementation">Library functions implementation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Implementation.html#C-Implementation">C Implementation</a>
+<hr>
+</div>
+
+<h3 class="section">4.15 Architecture</h3>
+
+     <ul>
+<li><cite>The values or expressions assigned to the macros specified in the
+headers </cite><code>&lt;float.h&gt;</code><cite>, </cite><code>&lt;limits.h&gt;</code><cite>, and </cite><code>&lt;stdint.h&gt;</code><cite>
+(C90 and C99 5.2.4.2, C99 7.18.2, C99 7.18.3).</cite>
+
+     <p>Determined by ABI.
+
+     <li><cite>The number, order, and encoding of bytes in any object
+(when not explicitly specified in this International Standard) (C99 6.2.6.1).</cite>
+
+     <p>Determined by ABI.
+
+     <li><cite>The value of the result of the </cite><code>sizeof</code><cite> operator (C90
+6.3.3.4, C99 6.5.3.4).</cite>
+
+     <p>Determined by ABI.
+
+</ul>
+
+ </body></html>
+

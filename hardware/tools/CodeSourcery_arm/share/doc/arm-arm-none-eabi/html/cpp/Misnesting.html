@@ -1,0 +1,88 @@
+<html lang="en">
+<head>
+<title>Misnesting - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Macro-Pitfalls.html#Macro-Pitfalls" title="Macro Pitfalls">
+<link rel="next" href="Operator-Precedence-Problems.html#Operator-Precedence-Problems" title="Operator Precedence Problems">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Misnesting"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Operator-Precedence-Problems.html#Operator-Precedence-Problems">Operator Precedence Problems</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Macro-Pitfalls.html#Macro-Pitfalls">Macro Pitfalls</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.10.1 Misnesting</h4>
+
+<p>When a macro is called with arguments, the arguments are substituted
+into the macro body and the result is checked, together with the rest of
+the input file, for more macro calls.  It is possible to piece together
+a macro call coming partially from the macro body and partially from the
+arguments.  For example,
+
+<pre class="smallexample">     #define twice(x) (2*(x))
+     #define call_with_1(x) x(1)
+     call_with_1 (twice)
+          ==&gt; twice(1)
+          ==&gt; (2*(1))
+</pre>
+   <p>Macro definitions do not have to have balanced parentheses.  By writing
+an unbalanced open parenthesis in a macro body, it is possible to create
+a macro call that begins inside the macro body but ends outside of it. 
+For example,
+
+<pre class="smallexample">     #define strange(file) fprintf (file, "%s %d",
+     ...
+     strange(stderr) p, 35)
+          ==&gt; fprintf (stderr, "%s %d", p, 35)
+</pre>
+   <p>The ability to piece together a macro call can be useful, but the use of
+unbalanced open parentheses in a macro body is just confusing, and
+should be avoided.
+
+   </body></html>
+

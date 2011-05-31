@@ -1,0 +1,65 @@
+<html lang="en">
+<head>
+<title>acos - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Math.html#Math" title="Math">
+<link rel="prev" href="version.html#version" title="version">
+<link rel="next" href="acosh.html#acosh" title="acosh">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="acos"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="acosh.html#acosh">acosh</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="version.html#version">version</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Math.html#Math">Math</a>
+<hr>
+</div>
+
+<h3 class="section">1.3 <code>acos</code>, <code>acosf</code>&mdash;arc cosine</h3>
+
+<p><a name="index-acos-5"></a><a name="index-acosf-6"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double acos(double <var>x</var>);
+     float acosf(float <var>x</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+
+   <p><code>acos</code> computes the inverse cosine (arc cosine) of the input value. 
+Arguments to <code>acos</code> must be in the range &minus;1 to 1.
+
+   <p><code>acosf</code> is identical to <code>acos</code>, except that it performs
+its calculations on <code>floats</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>acos</code> and <code>acosf</code> return values in radians, in the range of 0 to pi.
+
+   <p>If <var>x</var> is not between &minus;1 and 1, the returned value is NaN
+(not a number) the global variable <code>errno</code> is set to <code>EDOM</code>, and a
+<code>DOMAIN error</code> message is sent as standard error output.
+
+   <p>You can modify error handling for these functions using <code>matherr</code>.
+
+   <p><br>
+
+   </body></html>
+

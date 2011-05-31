@@ -1,0 +1,108 @@
+<html lang="en">
+<head>
+<title>Frames - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stack.html#Stack" title="Stack">
+<link rel="next" href="Backtrace.html#Backtrace" title="Backtrace">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Frames"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Backtrace.html#Backtrace">Backtrace</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stack.html#Stack">Stack</a>
+<hr>
+</div>
+
+<h3 class="section">8.1 Stack Frames</h3>
+
+<p><a name="index-frame_002c-definition-398"></a><a name="index-stack-frame-399"></a>The call stack is divided up into contiguous pieces called <dfn>stack
+frames</dfn>, or <dfn>frames</dfn> for short; each frame is the data associated
+with one call to one function.  The frame contains the arguments given
+to the function, the function's local variables, and the address at
+which the function is executing.
+
+   <p><a name="index-initial-frame-400"></a><a name="index-outermost-frame-401"></a><a name="index-innermost-frame-402"></a>When your program is started, the stack has only one frame, that of the
+function <code>main</code>.  This is called the <dfn>initial</dfn> frame or the
+<dfn>outermost</dfn> frame.  Each time a function is called, a new frame is
+made.  Each time a function returns, the frame for that function invocation
+is eliminated.  If a function is recursive, there can be many frames for
+the same function.  The frame for the function in which execution is
+actually occurring is called the <dfn>innermost</dfn> frame.  This is the most
+recently created of all the stack frames that still exist.
+
+   <p><a name="index-frame-pointer-403"></a>Inside your program, stack frames are identified by their addresses.  A
+stack frame consists of many bytes, each of which has its own address; each
+kind of computer has a convention for choosing one byte whose
+address serves as the address of the frame.  Usually this address is kept
+in a register called the <dfn>frame pointer register</dfn>
+(see <a href="Registers.html#Registers">$fp</a>) while execution is going on in that frame.
+
+   <p><a name="index-frame-number-404"></a><span class="sc">gdb</span> assigns numbers to all existing stack frames, starting with
+zero for the innermost frame, one for the frame that called it,
+and so on upward.  These numbers do not really exist in your program;
+they are assigned by <span class="sc">gdb</span> to give you a way of designating stack
+frames in <span class="sc">gdb</span> commands.
+
+<!-- The -fomit-frame-pointer below perennially causes hbox overflow -->
+<!-- underflow problems. -->
+   <p><a name="index-frameless-execution-405"></a>Some compilers provide a way to compile functions so that they operate
+without stack frames.  (For example, the <span class="sc">gcc</span> option
+<pre class="smallexample">     &lsquo;<samp><span class="samp">-fomit-frame-pointer</span></samp>&rsquo;
+</pre>
+   <p>generates functions without a frame.) 
+This is occasionally done with heavily used library functions to save
+the frame setup time.  <span class="sc">gdb</span> has limited facilities for dealing
+with these function invocations.  If the innermost function invocation
+has no stack frame, <span class="sc">gdb</span> nevertheless regards it as though
+it had a separate frame, which is numbered zero as usual, allowing
+correct tracing of the function call chain.  However, <span class="sc">gdb</span> has
+no provision for frameless functions elsewhere in the stack.
+
+     
+<a name="index-frame_0040r_007b_002c-command_007d-406"></a>
+<a name="index-current-stack-frame-407"></a>
+<dl><dt><code>frame </code><var>args</var><dd>The <code>frame</code> command allows you to move from one stack frame to another,
+and to print the stack frame you select.  <var>args</var> may be either the
+address of the frame or the stack frame number.  Without an argument,
+<code>frame</code> prints the current stack frame.
+
+     <p><a name="index-select_002dframe-408"></a><a name="index-selecting-frame-silently-409"></a><br><dt><code>select-frame</code><dd>The <code>select-frame</code> command allows you to move from one stack frame
+to another without printing the frame.  This is the silent version of
+<code>frame</code>. 
+</dl>
+
+   </body></html>
+

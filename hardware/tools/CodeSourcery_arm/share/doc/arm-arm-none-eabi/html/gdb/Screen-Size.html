@@ -1,0 +1,94 @@
+<html lang="en">
+<head>
+<title>Screen Size - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Controlling-GDB.html#Controlling-GDB" title="Controlling GDB">
+<link rel="prev" href="Command-History.html#Command-History" title="Command History">
+<link rel="next" href="Numbers.html#Numbers" title="Numbers">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Screen-Size"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Numbers.html#Numbers">Numbers</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Command-History.html#Command-History">Command History</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Controlling-GDB.html#Controlling-GDB">Controlling GDB</a>
+<hr>
+</div>
+
+<h3 class="section">22.4 Screen Size</h3>
+
+<p><a name="index-size-of-screen-1454"></a><a name="index-pauses-in-output-1455"></a>
+Certain commands to <span class="sc">gdb</span> may produce large amounts of
+information output to the screen.  To help you read all of it,
+<span class="sc">gdb</span> pauses and asks you for input at the end of each page of
+output.  Type &lt;RET&gt; when you want to continue the output, or <kbd>q</kbd>
+to discard the remaining output.  Also, the screen width setting
+determines when to wrap lines of output.  Depending on what is being
+printed, <span class="sc">gdb</span> tries to break the line at a readable place,
+rather than simply letting it overflow onto the following line.
+
+   <p>Normally <span class="sc">gdb</span> knows the size of the screen from the terminal
+driver software.  For example, on Unix <span class="sc">gdb</span> uses the termcap data base
+together with the value of the <code>TERM</code> environment variable and the
+<code>stty rows</code> and <code>stty cols</code> settings.  If this is not correct,
+you can override it with the <code>set height</code> and <code>set
+width</code> commands:
+
+     
+<a name="index-set-height-1456"></a>
+<a name="index-set-width-1457"></a>
+<a name="index-show-width-1458"></a>
+<a name="index-show-height-1459"></a>
+<dl><dt><code>set height </code><var>lpp</var><dt><code>show height</code><dt><code>set width </code><var>cpl</var><dt><code>show width</code><dd>These <code>set</code> commands specify a screen height of <var>lpp</var> lines and
+a screen width of <var>cpl</var> characters.  The associated <code>show</code>
+commands display the current settings.
+
+     <p>If you specify a height of zero lines, <span class="sc">gdb</span> does not pause during
+output no matter how long the output is.  This is useful if output is to a
+file or to an editor buffer.
+
+     <p>Likewise, you can specify &lsquo;<samp><span class="samp">set width 0</span></samp>&rsquo; to prevent <span class="sc">gdb</span>
+from wrapping its output.
+
+     <br><dt><code>set pagination on</code><dt><code>set pagination off</code><dd><a name="index-set-pagination-1460"></a>Turn the output pagination on or off; the default is on.  Turning
+pagination off is the alternative to <code>set height 0</code>.  Note that
+running <span class="sc">gdb</span> with the <samp><span class="option">--batch</span></samp> option (see <a href="Mode-Options.html#Mode-Options">-batch</a>) also automatically disables pagination.
+
+     <br><dt><code>show pagination</code><dd><a name="index-show-pagination-1461"></a>Show the current pagination mode. 
+</dl>
+
+   </body></html>
+

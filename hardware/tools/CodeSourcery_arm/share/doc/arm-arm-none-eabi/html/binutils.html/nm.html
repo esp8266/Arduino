@@ -1,0 +1,254 @@
+<html lang="en">
+<head>
+<title>nm - GNU Binary Utilities</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GNU Binary Utilities">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="ar.html#ar" title="ar">
+<link rel="next" href="objcopy.html#objcopy" title="objcopy">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="nm"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="objcopy.html#objcopy">objcopy</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="ar.html#ar">ar</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">2 nm</h2>
+
+<p><a name="index-symbols-32"></a><a name="index-nm-33"></a>
+<!-- man title nm list symbols from object files -->
+
+<pre class="smallexample">     <!-- man begin SYNOPSIS nm -->
+     nm [<samp><span class="option">-a</span></samp>|<samp><span class="option">--debug-syms</span></samp>]
+        [<samp><span class="option">-g</span></samp>|<samp><span class="option">--extern-only</span></samp>][<samp><span class="option">--plugin</span></samp> <var>name</var>]
+        [<samp><span class="option">-B</span></samp>] [<samp><span class="option">-C</span></samp>|<samp><span class="option">--demangle</span></samp>[=<var>style</var>]] [<samp><span class="option">-D</span></samp>|<samp><span class="option">--dynamic</span></samp>]
+        [<samp><span class="option">-S</span></samp>|<samp><span class="option">--print-size</span></samp>] [<samp><span class="option">-s</span></samp>|<samp><span class="option">--print-armap</span></samp>]
+        [<samp><span class="option">-A</span></samp>|<samp><span class="option">-o</span></samp>|<samp><span class="option">--print-file-name</span></samp>][<samp><span class="option">--special-syms</span></samp>]
+        [<samp><span class="option">-n</span></samp>|<samp><span class="option">-v</span></samp>|<samp><span class="option">--numeric-sort</span></samp>] [<samp><span class="option">-p</span></samp>|<samp><span class="option">--no-sort</span></samp>]
+        [<samp><span class="option">-r</span></samp>|<samp><span class="option">--reverse-sort</span></samp>] [<samp><span class="option">--size-sort</span></samp>] [<samp><span class="option">-u</span></samp>|<samp><span class="option">--undefined-only</span></samp>]
+        [<samp><span class="option">-t</span></samp> <var>radix</var>|<samp><span class="option">--radix=</span></samp><var>radix</var>] [<samp><span class="option">-P</span></samp>|<samp><span class="option">--portability</span></samp>]
+        [<samp><span class="option">--target=</span></samp><var>bfdname</var>] [<samp><span class="option">-f</span></samp><var>format</var>|<samp><span class="option">--format=</span></samp><var>format</var>]
+        [<samp><span class="option">--defined-only</span></samp>] [<samp><span class="option">-l</span></samp>|<samp><span class="option">--line-numbers</span></samp>] [<samp><span class="option">--no-demangle</span></samp>]
+        [<samp><span class="option">-V</span></samp>|<samp><span class="option">--version</span></samp>] [<samp><span class="option">-X 32_64</span></samp>] [<samp><span class="option">--help</span></samp>]  [<var>objfile</var>...]
+     <!-- man end -->
+</pre>
+   <!-- man begin DESCRIPTION nm -->
+   <p><span class="sc">gnu</span> <samp><span class="command">nm</span></samp> lists the symbols from object files <var>objfile</var><small class="dots">...</small>. 
+If no object files are listed as arguments, <samp><span class="command">nm</span></samp> assumes the file
+<samp><span class="file">a.out</span></samp>.
+
+   <p>For each symbol, <samp><span class="command">nm</span></samp> shows:
+
+     <ul>
+<li>The symbol value, in the radix selected by options (see below), or
+hexadecimal by default.
+
+     <li>The symbol type.  At least the following types are used; others are, as
+well, depending on the object file format.  If lowercase, the symbol is
+local; if uppercase, the symbol is global (external).
+
+     <!-- Some more detail on exactly what these symbol types are used for -->
+     <!-- would be nice. -->
+          <dl>
+<dt><code>A</code><dd>The symbol's value is absolute, and will not be changed by further
+linking.
+
+          <br><dt><code>B</code><dt><code>b</code><dd>The symbol is in the uninitialized data section (known as BSS).
+
+          <br><dt><code>C</code><dd>The symbol is common.  Common symbols are uninitialized data.  When
+linking, multiple common symbols may appear with the same name.  If the
+symbol is defined anywhere, the common symbols are treated as undefined
+references. 
+For more details on common symbols, see the discussion of
+&ndash;warn-common in <a href="../ld/Options.html#Options">Linker options</a>.
+
+          <br><dt><code>D</code><dt><code>d</code><dd>The symbol is in the initialized data section.
+
+          <br><dt><code>G</code><dt><code>g</code><dd>The symbol is in an initialized data section for small objects.  Some
+object file formats permit more efficient access to small data objects,
+such as a global int variable as opposed to a large global array.
+
+          <br><dt><code>i</code><dd>For PE format files this indicates that the symbol is in a section
+specific to the implementation of DLLs.  For ELF format files this
+indicates that the symbol is an indirect function.  This is a GNU
+extension to the standard set of ELF symbol types.  It indicates a
+symbol which if referenced by a relocation does not evaluate to its
+address, but instead must be invoked at runtime.  The runtime
+execution will then return the value to be used in the relocation.
+
+          <br><dt><code>N</code><dd>The symbol is a debugging symbol.
+
+          <br><dt><code>p</code><dd>The symbols is in a stack unwind section.
+
+          <br><dt><code>R</code><dt><code>r</code><dd>The symbol is in a read only data section.
+
+          <br><dt><code>S</code><dt><code>s</code><dd>The symbol is in an uninitialized data section for small objects.
+
+          <br><dt><code>T</code><dt><code>t</code><dd>The symbol is in the text (code) section.
+
+          <br><dt><code>U</code><dd>The symbol is undefined.
+
+          <br><dt><code>u</code><dd>The symbol is a unique global symbol.  This is a GNU extension to the
+standard set of ELF symbol bindings.  For such a symbol the dynamic linker
+will make sure that in the entire process there is just one symbol with
+this name and type in use.
+
+          <br><dt><code>V</code><dt><code>v</code><dd>The symbol is a weak object.  When a weak defined symbol is linked with
+a normal defined symbol, the normal defined symbol is used with no error. 
+When a weak undefined symbol is linked and the symbol is not defined,
+the value of the weak symbol becomes zero with no error.  On some
+systems, uppercase indicates that a default value has been specified.
+
+          <br><dt><code>W</code><dt><code>w</code><dd>The symbol is a weak symbol that has not been specifically tagged as a
+weak object symbol.  When a weak defined symbol is linked with a normal
+defined symbol, the normal defined symbol is used with no error. 
+When a weak undefined symbol is linked and the symbol is not defined,
+the value of the symbol is determined in a system-specific manner without
+error.  On some systems, uppercase indicates that a default value has been
+specified.
+
+          <br><dt><code>-</code><dd>The symbol is a stabs symbol in an a.out object file.  In this case, the
+next values printed are the stabs other field, the stabs desc field, and
+the stab type.  Stabs symbols are used to hold debugging information. 
+For more information, see <a href="../stabs/index.html#Top">Stabs</a>.
+
+          <br><dt><code>?</code><dd>The symbol type is unknown, or object file format specific. 
+</dl>
+
+     <li>The symbol name. 
+</ul>
+
+<!-- man end -->
+<!-- man begin OPTIONS nm -->
+   <p>The long and short forms of options, shown here as alternatives, are
+equivalent.
+
+     <dl>
+<dt><samp><span class="env">-A</span></samp><dt><samp><span class="env">-o</span></samp><dt><samp><span class="env">--print-file-name</span></samp><dd><a name="index-input-file-name-34"></a><a name="index-file-name-35"></a><a name="index-source-file-name-36"></a>Precede each symbol by the name of the input file (or archive member)
+in which it was found, rather than identifying the input file once only,
+before all of its symbols.
+
+     <br><dt><samp><span class="env">-a</span></samp><dt><samp><span class="env">--debug-syms</span></samp><dd><a name="index-debugging-symbols-37"></a>Display all symbols, even debugger-only symbols; normally these are not
+listed.
+
+     <br><dt><samp><span class="env">-B</span></samp><dd><a name="index-g_t_0040command_007bnm_007d-format-38"></a><a name="index-g_t_0040command_007bnm_007d-compatibility-39"></a>The same as <samp><span class="option">--format=bsd</span></samp> (for compatibility with the MIPS <samp><span class="command">nm</span></samp>).
+
+     <br><dt><samp><span class="env">-C</span></samp><dt><samp><span class="env">--demangle[=</span><var>style</var><span class="env">]</span></samp><dd><a name="index-demangling-in-nm-40"></a>Decode (<dfn>demangle</dfn>) low-level symbol names into user-level names. 
+Besides removing any initial underscore prepended by the system, this
+makes C++ function names readable. Different compilers have different
+mangling styles. The optional demangling style argument can be used to
+choose an appropriate demangling style for your compiler. See <a href="c_002b_002bfilt.html#c_002b_002bfilt">c++filt</a>,
+for more information on demangling.
+
+     <br><dt><samp><span class="env">--no-demangle</span></samp><dd>Do not demangle low-level symbol names.  This is the default.
+
+     <br><dt><samp><span class="env">-D</span></samp><dt><samp><span class="env">--dynamic</span></samp><dd><a name="index-dynamic-symbols-41"></a>Display the dynamic symbols rather than the normal symbols.  This is
+only meaningful for dynamic objects, such as certain types of shared
+libraries.
+
+     <br><dt><samp><span class="env">-f </span><var>format</var></samp><dt><samp><span class="env">--format=</span><var>format</var></samp><dd><a name="index-g_t_0040command_007bnm_007d-format-42"></a><a name="index-g_t_0040command_007bnm_007d-compatibility-43"></a>Use the output format <var>format</var>, which can be <code>bsd</code>,
+<code>sysv</code>, or <code>posix</code>.  The default is <code>bsd</code>. 
+Only the first character of <var>format</var> is significant; it can be
+either upper or lower case.
+
+     <br><dt><samp><span class="env">-g</span></samp><dt><samp><span class="env">--extern-only</span></samp><dd><a name="index-external-symbols-44"></a>Display only external symbols.
+
+     <br><dt><samp><span class="env">--plugin </span><var>name</var></samp><dd><a name="index-load-plugin-45"></a>Load the plugin called <var>name</var> to add support for extra target
+types.  This option is only available if the toolchain has been built
+with plugin support enabled.
+
+     <br><dt><samp><span class="env">-l</span></samp><dt><samp><span class="env">--line-numbers</span></samp><dd><a name="index-symbol-line-numbers-46"></a>For each symbol, use debugging information to try to find a filename and
+line number.  For a defined symbol, look for the line number of the
+address of the symbol.  For an undefined symbol, look for the line
+number of a relocation entry which refers to the symbol.  If line number
+information can be found, print it after the other symbol information.
+
+     <br><dt><samp><span class="env">-n</span></samp><dt><samp><span class="env">-v</span></samp><dt><samp><span class="env">--numeric-sort</span></samp><dd>Sort symbols numerically by their addresses, rather than alphabetically
+by their names.
+
+     <br><dt><samp><span class="env">-p</span></samp><dt><samp><span class="env">--no-sort</span></samp><dd><a name="index-sorting-symbols-47"></a>Do not bother to sort the symbols in any order; print them in the order
+encountered.
+
+     <br><dt><samp><span class="env">-P</span></samp><dt><samp><span class="env">--portability</span></samp><dd>Use the POSIX.2 standard output format instead of the default format. 
+Equivalent to &lsquo;<samp><span class="samp">-f posix</span></samp>&rsquo;.
+
+     <br><dt><samp><span class="env">-S</span></samp><dt><samp><span class="env">--print-size</span></samp><dd>Print both value and size of defined symbols for the <code>bsd</code> output style. 
+This option has no effect for object formats that do not record symbol
+sizes, unless &lsquo;<samp><span class="samp">--size-sort</span></samp>&rsquo; is also used in which case a
+calculated size is displayed.
+
+     <br><dt><samp><span class="env">-s</span></samp><dt><samp><span class="env">--print-armap</span></samp><dd><a name="index-symbol-index_002c-listing-48"></a>When listing symbols from archive members, include the index: a mapping
+(stored in the archive by <samp><span class="command">ar</span></samp> or <samp><span class="command">ranlib</span></samp>) of which modules
+contain definitions for which names.
+
+     <br><dt><samp><span class="env">-r</span></samp><dt><samp><span class="env">--reverse-sort</span></samp><dd>Reverse the order of the sort (whether numeric or alphabetic); let the
+last come first.
+
+     <br><dt><samp><span class="env">--size-sort</span></samp><dd>Sort symbols by size.  The size is computed as the difference between
+the value of the symbol and the value of the symbol with the next higher
+value.  If the <code>bsd</code> output format is used the size of the symbol
+is printed, rather than the value, and &lsquo;<samp><span class="samp">-S</span></samp>&rsquo; must be used in order
+both size and value to be printed.
+
+     <br><dt><samp><span class="env">--special-syms</span></samp><dd>Display symbols which have a target-specific special meaning.  These
+symbols are usually used by the target for some special processing and
+are not normally helpful when included included in the normal symbol
+lists.  For example for ARM targets this option would skip the mapping
+symbols used to mark transitions between ARM code, THUMB code and
+data.
+
+     <br><dt><samp><span class="env">-t </span><var>radix</var></samp><dt><samp><span class="env">--radix=</span><var>radix</var></samp><dd>Use <var>radix</var> as the radix for printing the symbol values.  It must be
+&lsquo;<samp><span class="samp">d</span></samp>&rsquo; for decimal, &lsquo;<samp><span class="samp">o</span></samp>&rsquo; for octal, or &lsquo;<samp><span class="samp">x</span></samp>&rsquo; for hexadecimal.
+
+     <br><dt><samp><span class="env">--target=</span><var>bfdname</var></samp><dd><a name="index-object-code-format-49"></a>Specify an object code format other than your system's default format. 
+See <a href="Target-Selection.html#Target-Selection">Target Selection</a>, for more information.
+
+     <br><dt><samp><span class="env">-u</span></samp><dt><samp><span class="env">--undefined-only</span></samp><dd><a name="index-external-symbols-50"></a><a name="index-undefined-symbols-51"></a>Display only undefined symbols (those external to each object file).
+
+     <br><dt><samp><span class="env">--defined-only</span></samp><dd><a name="index-external-symbols-52"></a><a name="index-undefined-symbols-53"></a>Display only defined symbols for each object file.
+
+     <br><dt><samp><span class="env">-V</span></samp><dt><samp><span class="env">--version</span></samp><dd>Show the version number of <samp><span class="command">nm</span></samp> and exit.
+
+     <br><dt><samp><span class="env">-X</span></samp><dd>This option is ignored for compatibility with the AIX version of
+<samp><span class="command">nm</span></samp>.  It takes one parameter which must be the string
+<samp><span class="option">32_64</span></samp>.  The default mode of AIX <samp><span class="command">nm</span></samp> corresponds
+to <samp><span class="option">-X 32</span></samp>, which is not supported by <span class="sc">gnu</span> <samp><span class="command">nm</span></samp>.
+
+     <br><dt><samp><span class="env">--help</span></samp><dd>Show a summary of the options to <samp><span class="command">nm</span></samp> and exit. 
+</dl>
+
+<!-- man end -->
+   </body></html>
+

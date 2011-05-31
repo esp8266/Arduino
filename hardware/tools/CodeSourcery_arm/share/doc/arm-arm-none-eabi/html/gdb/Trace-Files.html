@@ -1,0 +1,79 @@
+<html lang="en">
+<head>
+<title>Trace Files - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Tracepoints.html#Tracepoints" title="Tracepoints">
+<link rel="prev" href="Tracepoint-Variables.html#Tracepoint-Variables" title="Tracepoint Variables">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Trace-Files"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Tracepoint-Variables.html#Tracepoint-Variables">Tracepoint Variables</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Tracepoints.html#Tracepoints">Tracepoints</a>
+<hr>
+</div>
+
+<h3 class="section">13.4 Using Trace Files</h3>
+
+<p><a name="index-trace-files-757"></a>
+In some situations, the target running a trace experiment may no
+longer be available; perhaps it crashed, or the hardware was needed
+for a different activity.  To handle these cases, you can arrange to
+dump the trace data into a file, and later use that file as a source
+of trace data, via the <code>target tfile</code> command.
+
+     
+<a name="index-tsave-758"></a>
+<dl><dt><code>tsave [ -r ] </code><var>filename</var><dd>Save the trace data to <var>filename</var>.  By default, this command
+assumes that <var>filename</var> refers to the host filesystem, so if
+necessary <span class="sc">gdb</span> will copy raw trace data up from the target and
+then save it.  If the target supports it, you can also supply the
+optional argument <code>-r</code> (&ldquo;remote&rdquo;) to direct the target to save
+the data directly into <var>filename</var> in its own filesystem, which may be
+more efficient if the trace buffer is very large.  (Note, however, that
+<code>target tfile</code> can only read from files accessible to the host.)
+
+     <p><a name="index-target-tfile-759"></a><a name="index-tfile-760"></a><br><dt><code>target tfile </code><var>filename</var><dd>Use the file named <var>filename</var> as a source of trace data.  Commands
+that examine data work as they do with a live target, but it is not
+possible to run any new trace experiments.  <code>tstatus</code> will report
+the state of the trace run at the moment the data was saved, as well
+as the current trace frame you are examining.  <var>filename</var> must be
+on a filesystem accessible to the host.
+
+   </dl>
+
+   </body></html>
+

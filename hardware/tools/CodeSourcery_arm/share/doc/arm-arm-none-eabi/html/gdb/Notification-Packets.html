@@ -1,0 +1,102 @@
+<html lang="en">
+<head>
+<title>Notification Packets - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Remote-Protocol.html#Remote-Protocol" title="Remote Protocol">
+<link rel="prev" href="Interrupts.html#Interrupts" title="Interrupts">
+<link rel="next" href="Remote-Non_002dStop.html#Remote-Non_002dStop" title="Remote Non-Stop">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Notification-Packets"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Remote-Non_002dStop.html#Remote-Non_002dStop">Remote Non-Stop</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Interrupts.html#Interrupts">Interrupts</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Remote-Protocol.html#Remote-Protocol">Remote Protocol</a>
+<hr>
+</div>
+
+<h3 class="section">D.10 Notification Packets</h3>
+
+<p><a name="index-notification-packets-2490"></a><a name="index-packets_002c-notification-2491"></a>
+The <span class="sc">gdb</span> remote serial protocol includes <dfn>notifications</dfn>,
+packets that require no acknowledgment.  Both the GDB and the stub
+may send notifications (although the only notifications defined at
+present are sent by the stub).  Notifications carry information
+without incurring the round-trip latency of an acknowledgment, and so
+are useful for low-impact communications where occasional packet loss
+is not a problem.
+
+   <p>A notification packet has the form &lsquo;<samp><span class="samp">% </span><var>data</var><span class="samp"> #
+</span><var>checksum</var></samp>&rsquo;, where <var>data</var> is the content of the notification,
+and <var>checksum</var> is a checksum of <var>data</var>, computed and formatted
+as for ordinary <span class="sc">gdb</span> packets.  A notification's <var>data</var>
+never contains &lsquo;<samp><span class="samp">$</span></samp>&rsquo;, &lsquo;<samp><span class="samp">%</span></samp>&rsquo; or &lsquo;<samp><span class="samp">#</span></samp>&rsquo; characters.  Upon
+receiving a notification, the recipient sends no &lsquo;<samp><span class="samp">+</span></samp>&rsquo; or &lsquo;<samp><span class="samp">-</span></samp>&rsquo;
+to acknowledge the notification's receipt or to report its corruption.
+
+   <p>Every notification's <var>data</var> begins with a name, which contains no
+colon characters, followed by a colon character.
+
+   <p>Recipients should silently ignore corrupted notifications and
+notifications they do not understand.  Recipients should restart
+timeout periods on receipt of a well-formed notification, whether or
+not they understand it.
+
+   <p>Senders should only send the notifications described here when this
+protocol description specifies that they are permitted.  In the
+future, we may extend the protocol to permit existing notifications in
+new contexts; this rule helps older senders avoid confusing newer
+recipients.
+
+   <p>(Older versions of <span class="sc">gdb</span> ignore bytes received until they see
+the &lsquo;<samp><span class="samp">$</span></samp>&rsquo; byte that begins an ordinary packet, so new stubs may
+transmit notifications without fear of confusing older clients.  There
+are no notifications defined for <span class="sc">gdb</span> to send at the moment, but we
+assume that most older stubs would ignore them, as well.)
+
+   <p>The following notification packets from the stub to <span class="sc">gdb</span> are
+defined:
+
+     <dl>
+<dt>&lsquo;<samp><span class="samp">Stop: </span><var>reply</var></samp>&rsquo;<dd>Report an asynchronous stop event in non-stop mode. 
+The <var>reply</var> has the form of a stop reply, as
+described in <a href="Stop-Reply-Packets.html#Stop-Reply-Packets">Stop Reply Packets</a>.  Refer to <a href="Remote-Non_002dStop.html#Remote-Non_002dStop">Remote Non-Stop</a>,
+for information on how these notifications are acknowledged by
+<span class="sc">gdb</span>. 
+</dl>
+
+   </body></html>
+

@@ -1,0 +1,134 @@
+<html lang="en">
+<head>
+<title>Executing code before main - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Objective_002dC.html#Objective_002dC" title="Objective-C">
+<link rel="prev" href="Objective_002dC.html#Objective_002dC" title="Objective-C">
+<link rel="next" href="Type-encoding.html#Type-encoding" title="Type encoding">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Executing-code-before-main"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Type-encoding.html#Type-encoding">Type encoding</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Objective_002dC.html#Objective_002dC">Objective-C</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Objective_002dC.html#Objective_002dC">Objective-C</a>
+<hr>
+</div>
+
+<h3 class="section">8.1 <code>+load</code>: Executing code before main</h3>
+
+<p>The GNU Objective-C runtime provides a way that allows you to execute
+code before the execution of the program enters the <code>main</code>
+function.  The code is executed on a per-class and a per-category basis,
+through a special class method <code>+load</code>.
+
+ <p>This facility is very useful if you want to initialize global variables
+which can be accessed by the program directly, without sending a message
+to the class first.  The usual way to initialize global variables, in the
+<code>+initialize</code> method, might not be useful because
+<code>+initialize</code> is only called when the first message is sent to a
+class object, which in some cases could be too late.
+
+ <p>Suppose for example you have a <code>FileStream</code> class that declares
+<code>Stdin</code>, <code>Stdout</code> and <code>Stderr</code> as global variables, like
+below:
+
+<pre class="smallexample">     
+     FileStream *Stdin = nil;
+     FileStream *Stdout = nil;
+     FileStream *Stderr = nil;
+     
+     @implementation FileStream
+     
+     + (void)initialize
+     {
+         Stdin = [[FileStream new] initWithFd:0];
+         Stdout = [[FileStream new] initWithFd:1];
+         Stderr = [[FileStream new] initWithFd:2];
+     }
+     
+     /* <span class="roman">Other methods here</span> */
+     @end
+     
+</pre>
+ <p>In this example, the initialization of <code>Stdin</code>, <code>Stdout</code> and
+<code>Stderr</code> in <code>+initialize</code> occurs too late.  The programmer can
+send a message to one of these objects before the variables are actually
+initialized, thus sending messages to the <code>nil</code> object.  The
+<code>+initialize</code> method which actually initializes the global
+variables is not invoked until the first message is sent to the class
+object.  The solution would require these variables to be initialized
+just before entering <code>main</code>.
+
+ <p>The correct solution of the above problem is to use the <code>+load</code>
+method instead of <code>+initialize</code>:
+
+<pre class="smallexample">     
+     @implementation FileStream
+     
+     + (void)load
+     {
+         Stdin = [[FileStream new] initWithFd:0];
+         Stdout = [[FileStream new] initWithFd:1];
+         Stderr = [[FileStream new] initWithFd:2];
+     }
+     
+     /* <span class="roman">Other methods here</span> */
+     @end
+     
+</pre>
+ <p>The <code>+load</code> is a method that is not overridden by categories.  If a
+class and a category of it both implement <code>+load</code>, both methods are
+invoked.  This allows some additional initializations to be performed in
+a category.
+
+ <p>This mechanism is not intended to be a replacement for <code>+initialize</code>. 
+You should be aware of its limitations when you decide to use it
+instead of <code>+initialize</code>.
+
+<ul class="menu">
+<li><a accesskey="1" href="What-you-can-and-what-you-cannot-do-in-_002bload.html#What-you-can-and-what-you-cannot-do-in-_002bload">What you can and what you cannot do in +load</a>
+</ul>
+
+ </body></html>
+

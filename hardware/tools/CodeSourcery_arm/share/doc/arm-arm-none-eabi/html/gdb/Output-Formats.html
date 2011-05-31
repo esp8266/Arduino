@@ -1,0 +1,136 @@
+<html lang="en">
+<head>
+<title>Output Formats - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Data.html#Data" title="Data">
+<link rel="prev" href="Arrays.html#Arrays" title="Arrays">
+<link rel="next" href="Memory.html#Memory" title="Memory">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Output-Formats"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Memory.html#Memory">Memory</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Arrays.html#Arrays">Arrays</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Data.html#Data">Data</a>
+<hr>
+</div>
+
+<h3 class="section">10.5 Output Formats</h3>
+
+<p><a name="index-formatted-output-517"></a><a name="index-output-formats-518"></a>By default, <span class="sc">gdb</span> prints a value according to its data type.  Sometimes
+this is not what you want.  For example, you might want to print a number
+in hex, or a pointer in decimal.  Or you might want to view data in memory
+at a certain address as a character string or as an instruction.  To do
+these things, specify an <dfn>output format</dfn> when you print a value.
+
+   <p>The simplest use of output formats is to say how to print a value
+already computed.  This is done by starting the arguments of the
+<code>print</code> command with a slash and a format letter.  The format
+letters supported are:
+
+     <dl>
+<dt><code>x</code><dd>Regard the bits of the value as an integer, and print the integer in
+hexadecimal.
+
+     <br><dt><code>d</code><dd>Print as integer in signed decimal.
+
+     <br><dt><code>u</code><dd>Print as integer in unsigned decimal.
+
+     <br><dt><code>o</code><dd>Print as integer in octal.
+
+     <br><dt><code>t</code><dd>Print as integer in binary.  The letter &lsquo;<samp><span class="samp">t</span></samp>&rsquo; stands for &ldquo;two&rdquo;. 
+<a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a>
+
+     <br><dt><code>a</code><dd><a name="index-unknown-address_002c-locating-519"></a><a name="index-locate-address-520"></a>Print as an address, both absolute in hexadecimal and as an offset from
+the nearest preceding symbol.  You can use this format used to discover
+where (in what function) an unknown address is located:
+
+     <pre class="smallexample">          (gdb) p/a 0x54320
+          $3 = 0x54320 &lt;_initialize_vx+396&gt;
+</pre>
+     <p class="noindent">The command <code>info symbol 0x54320</code> yields similar results. 
+See <a href="Symbols.html#Symbols">info symbol</a>.
+
+     <br><dt><code>c</code><dd>Regard as an integer and print it as a character constant.  This
+prints both the numerical value and its character representation.  The
+character representation is replaced with the octal escape &lsquo;<samp><span class="samp">\nnn</span></samp>&rsquo;
+for characters outside the 7-bit <span class="sc">ascii</span> range.
+
+     <p>Without this format, <span class="sc">gdb</span> displays <code>char</code>,
+<code>unsigned&nbsp;char</code><!-- /@w -->, and <code>signed&nbsp;char</code><!-- /@w --> data as character
+constants.  Single-byte members of vectors are displayed as integer
+data.
+
+     <br><dt><code>f</code><dd>Regard the bits of the value as a floating point number and print
+using typical floating point syntax.
+
+     <br><dt><code>s</code><dd><a name="index-printing-strings-521"></a><a name="index-printing-byte-arrays-522"></a>Regard as a string, if possible.  With this format, pointers to single-byte
+data are displayed as null-terminated strings and arrays of single-byte data
+are displayed as fixed-length strings.  Other values are displayed in their
+natural types.
+
+     <p>Without this format, <span class="sc">gdb</span> displays pointers to and arrays of
+<code>char</code>, <code>unsigned&nbsp;char</code><!-- /@w -->, and <code>signed&nbsp;char</code><!-- /@w --> as
+strings.  Single-byte members of a vector are displayed as an integer
+array.
+
+     <br><dt><code>r</code><dd><a name="index-raw-printing-523"></a>Print using the &lsquo;<samp><span class="samp">raw</span></samp>&rsquo; formatting.  By default, <span class="sc">gdb</span> will
+use a Python-based pretty-printer, if one is available (see <a href="Pretty-Printing.html#Pretty-Printing">Pretty Printing</a>).  This typically results in a higher-level display of the
+value's contents.  The &lsquo;<samp><span class="samp">r</span></samp>&rsquo; format bypasses any Python
+pretty-printer which might exist. 
+</dl>
+
+   <p>For example, to print the program counter in hex (see <a href="Registers.html#Registers">Registers</a>), type
+
+<pre class="smallexample">     p/x $pc
+</pre>
+   <p class="noindent">Note that no space is required before the slash; this is because command
+names in <span class="sc">gdb</span> cannot contain a slash.
+
+   <p>To reprint the last value in the value history with a different format,
+you can use the <code>print</code> command with just a format and no
+expression.  For example, &lsquo;<samp><span class="samp">p/x</span></samp>&rsquo; reprints the last value in hex.
+
+   <div class="footnote">
+<hr>
+<h4>Footnotes</h4><p class="footnote"><small>[<a name="fn-1" href="#fnd-1">1</a>]</small> &lsquo;<samp><span class="samp">b</span></samp>&rsquo; cannot be used because these format letters are also
+used with the <code>x</code> command, where &lsquo;<samp><span class="samp">b</span></samp>&rsquo; stands for &ldquo;byte&rdquo;;
+see <a href="Memory.html#Memory">Examining Memory</a>.</p>
+
+   <hr></div>
+
+   </body></html>
+

@@ -1,0 +1,106 @@
+<html lang="en">
+<head>
+<title>Preprocessing directives implementation - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Implementation.html#C-Implementation" title="C Implementation">
+<link rel="prev" href="Statements-implementation.html#Statements-implementation" title="Statements implementation">
+<link rel="next" href="Library-functions-implementation.html#Library-functions-implementation" title="Library functions implementation">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Preprocessing-directives-implementation"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Library-functions-implementation.html#Library-functions-implementation">Library functions implementation</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Statements-implementation.html#Statements-implementation">Statements implementation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Implementation.html#C-Implementation">C Implementation</a>
+<hr>
+</div>
+
+<h3 class="section">4.13 Preprocessing directives</h3>
+
+<p>See <a href="../cpp/Implementation_002ddefined-behavior.html#Implementation_002ddefined-behavior">Implementation-defined behavior</a>, for details of these aspects of
+implementation-defined behavior.
+
+     <ul>
+<li><cite>How sequences in both forms of header names are mapped to headers
+or external source file names (C90 6.1.7, C99 6.4.7).</cite>
+
+     <li><cite>Whether the value of a character constant in a constant expression
+that controls conditional inclusion matches the value of the same character
+constant in the execution character set (C90 6.8.1, C99 6.10.1).</cite>
+
+     <li><cite>Whether the value of a single-character character constant in a
+constant expression that controls conditional inclusion may have a
+negative value (C90 6.8.1, C99 6.10.1).</cite>
+
+     <li><cite>The places that are searched for an included &lsquo;</cite><samp><span class="samp">&lt;&gt;</span></samp><cite>&rsquo; delimited
+header, and how the places are specified or the header is
+identified (C90 6.8.2, C99 6.10.2).</cite>
+
+     <li><cite>How the named source file is searched for in an included &lsquo;</cite><samp><span class="samp">""</span></samp><cite>&rsquo;
+delimited header (C90 6.8.2, C99 6.10.2).</cite>
+
+     <li><cite>The method by which preprocessing tokens (possibly resulting from
+macro expansion) in a </cite><code>#include</code><cite> directive are combined into a header
+name (C90 6.8.2, C99 6.10.2).</cite>
+
+     <li><cite>The nesting limit for </cite><code>#include</code><cite> processing (C90 6.8.2, C99
+6.10.2).</cite>
+
+     <li><cite>Whether the &lsquo;</cite><samp><span class="samp">#</span></samp><cite>&rsquo; operator inserts a &lsquo;</cite><samp><span class="samp">\</span></samp><cite>&rsquo; character before
+the &lsquo;</cite><samp><span class="samp">\</span></samp><cite>&rsquo; character that begins a universal character name in a
+character constant or string literal (C99 6.10.3.2).</cite>
+
+     <li><cite>The behavior on each recognized non-</cite><code>STDC #pragma</code><cite>
+directive (C90 6.8.6, C99 6.10.6).</cite>
+
+     <p>See <a href="../cpp/Pragmas.html#Pragmas">Pragmas</a>, for details of
+pragmas accepted by GCC on all targets.  See <a href="Pragmas.html#Pragmas">Pragmas Accepted by GCC</a>, for details of target-specific pragmas.
+
+     <li><cite>The definitions for </cite><code>__DATE__</code><cite> and </cite><code>__TIME__</code><cite> when
+respectively, the date and time of translation are not available (C90
+6.8.8, C99 6.10.8).</cite>
+
+ </ul>
+
+ </body></html>
+

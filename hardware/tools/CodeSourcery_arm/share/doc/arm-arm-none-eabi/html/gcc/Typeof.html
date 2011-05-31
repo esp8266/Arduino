@@ -1,0 +1,157 @@
+<html lang="en">
+<head>
+<title>Typeof - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Constructing-Calls.html#Constructing-Calls" title="Constructing Calls">
+<link rel="next" href="Conditionals.html#Conditionals" title="Conditionals">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Typeof"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Conditionals.html#Conditionals">Conditionals</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Constructing-Calls.html#Constructing-Calls">Constructing Calls</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.6 Referring to a Type with <code>typeof</code></h3>
+
+<p><a name="index-typeof-2201"></a><a name="index-sizeof-2202"></a><a name="index-macros_002c-types-of-arguments-2203"></a>
+Another way to refer to the type of an expression is with <code>typeof</code>. 
+The syntax of using of this keyword looks like <code>sizeof</code>, but the
+construct acts semantically like a type name defined with <code>typedef</code>.
+
+ <p>There are two ways of writing the argument to <code>typeof</code>: with an
+expression or with a type.  Here is an example with an expression:
+
+<pre class="smallexample">     typeof (x[0](1))
+</pre>
+ <p class="noindent">This assumes that <code>x</code> is an array of pointers to functions;
+the type described is that of the values of the functions.
+
+ <p>Here is an example with a typename as the argument:
+
+<pre class="smallexample">     typeof (int *)
+</pre>
+ <p class="noindent">Here the type described is that of pointers to <code>int</code>.
+
+ <p>If you are writing a header file that must work when included in ISO C
+programs, write <code>__typeof__</code> instead of <code>typeof</code>. 
+See <a href="Alternate-Keywords.html#Alternate-Keywords">Alternate Keywords</a>.
+
+ <p>A <code>typeof</code>-construct can be used anywhere a typedef name could be
+used.  For example, you can use it in a declaration, in a cast, or inside
+of <code>sizeof</code> or <code>typeof</code>.
+
+ <p>The operand of <code>typeof</code> is evaluated for its side effects if and
+only if it is an expression of variably modified type or the name of
+such a type.
+
+ <p><code>typeof</code> is often useful in conjunction with the
+statements-within-expressions feature.  Here is how the two together can
+be used to define a safe &ldquo;maximum&rdquo; macro that operates on any
+arithmetic type and evaluates each of its arguments exactly once:
+
+<pre class="smallexample">     #define max(a,b) \
+       ({ typeof (a) _a = (a); \
+           typeof (b) _b = (b); \
+         _a &gt; _b ? _a : _b; })
+</pre>
+ <p><a name="index-underscores-in-variables-in-macros-2204"></a><a name="index-g_t_0040samp_007b_005f_007d-in-variables-in-macros-2205"></a><a name="index-local-variables-in-macros-2206"></a><a name="index-variables_002c-local_002c-in-macros-2207"></a><a name="index-macros_002c-local-variables-in-2208"></a>
+The reason for using names that start with underscores for the local
+variables is to avoid conflicts with variable names that occur within the
+expressions that are substituted for <code>a</code> and <code>b</code>.  Eventually we
+hope to design a new form of declaration syntax that allows you to declare
+variables whose scopes start only after their initializers; this will be a
+more reliable way to prevent such conflicts.
+
+<p class="noindent">Some more examples of the use of <code>typeof</code>:
+
+     <ul>
+<li>This declares <code>y</code> with the type of what <code>x</code> points to.
+
+     <pre class="smallexample">          typeof (*x) y;
+</pre>
+     <li>This declares <code>y</code> as an array of such values.
+
+     <pre class="smallexample">          typeof (*x) y[4];
+</pre>
+     <li>This declares <code>y</code> as an array of pointers to characters:
+
+     <pre class="smallexample">          typeof (typeof (char *)[4]) y;
+</pre>
+     <p class="noindent">It is equivalent to the following traditional C declaration:
+
+     <pre class="smallexample">          char *y[4];
+</pre>
+     <p>To see the meaning of the declaration using <code>typeof</code>, and why it
+might be a useful way to write, rewrite it with these macros:
+
+     <pre class="smallexample">          #define pointer(T)  typeof(T *)
+          #define array(T, N) typeof(T [N])
+</pre>
+     <p class="noindent">Now the declaration can be rewritten this way:
+
+     <pre class="smallexample">          array (pointer (char), 4) y;
+</pre>
+     <p class="noindent">Thus, <code>array (pointer (char), 4)</code> is the type of arrays of 4
+pointers to <code>char</code>. 
+</ul>
+
+ <p><em>Compatibility Note:</em> In addition to <code>typeof</code>, GCC 2 supported
+a more limited extension which permitted one to write
+
+<pre class="smallexample">     typedef <var>T</var> = <var>expr</var>;
+</pre>
+ <p class="noindent">with the effect of declaring <var>T</var> to have the type of the expression
+<var>expr</var>.  This extension does not work with GCC 3 (versions between
+3.0 and 3.2 will crash; 3.2.1 and later give an error).  Code which
+relies on it should be rewritten to use <code>typeof</code>:
+
+<pre class="smallexample">     typedef typeof(<var>expr</var>) <var>T</var>;
+</pre>
+ <p class="noindent">This will work with all versions of GCC.
+
+ </body></html>
+

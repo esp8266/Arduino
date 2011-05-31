@@ -1,0 +1,840 @@
+<html lang="en">
+<head>
+<title>Option Summary - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Invoking-GCC.html#Invoking-GCC" title="Invoking GCC">
+<link rel="next" href="Overall-Options.html#Overall-Options" title="Overall Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Option-Summary"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Overall-Options.html#Overall-Options">Overall Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Invoking-GCC.html#Invoking-GCC">Invoking GCC</a>
+<hr>
+</div>
+
+<h3 class="section">3.1 Option Summary</h3>
+
+<p>Here is a summary of all the options, grouped by type.  Explanations are
+in the following sections.
+
+     <dl>
+<dt><em>Overall Options</em><dd>See <a href="Overall-Options.html#Overall-Options">Options Controlling the Kind of Output</a>.
+     <pre class="smallexample">          -c  -S  -E  -o <var>file</var>  -combine  -no-canonical-prefixes  
+          -pipe  -pass-exit-codes  
+          -x <var>language</var>  -v  -###  --help<span class="roman">[</span>=<var>class</var><span class="roman">[</span>,...<span class="roman">]]</span>  --target-help  
+          --version -wrapper@<var>file</var> -fplugin=<var>file</var> -fplugin-arg-<var>name</var>=<var>arg</var>
+</pre>
+     <br><dt><em>C Language Options</em><dd>See <a href="C-Dialect-Options.html#C-Dialect-Options">Options Controlling C Dialect</a>.
+     <pre class="smallexample">          -ansi  -std=<var>standard</var>  -fgnu89-inline 
+          -aux-info <var>filename</var> 
+          -fno-asm  -fno-builtin  -fno-builtin-<var>function</var> 
+          -fhosted  -ffreestanding -fopenmp -fms-extensions 
+          -trigraphs  -no-integrated-cpp  -traditional  -traditional-cpp 
+          -fallow-single-precision  -fcond-mismatch -flax-vector-conversions 
+          -fsigned-bitfields  -fsigned-char 
+          -funsigned-bitfields  -funsigned-char
+</pre>
+     <br><dt><em>C++ Language Options</em><dd>See <a href="C_002b_002b-Dialect-Options.html#C_002b_002b-Dialect-Options">Options Controlling C++ Dialect</a>.
+     <pre class="smallexample">          -fabi-version=<var>n</var>  -fno-access-control  -fcheck-new 
+          -fconserve-space  -ffriend-injection 
+          -fno-elide-constructors 
+          -fno-enforce-eh-specs 
+          -ffor-scope  -fno-for-scope  -fno-gnu-keywords 
+          -fno-implicit-templates 
+          -fno-implicit-inline-templates 
+          -fno-implement-inlines  -fms-extensions 
+          -fno-nonansi-builtins  -fno-operator-names 
+          -fno-optional-diags  -fpermissive 
+          -fno-pretty-templates 
+          -frepo  -fno-rtti  -fstats  -ftemplate-depth=<var>n</var> 
+          -fno-threadsafe-statics -fuse-cxa-atexit  -fno-weak  -nostdinc++ 
+          -fno-default-inline  -fvisibility-inlines-hidden 
+          -fvisibility-ms-compat 
+          -Wabi  -Wconversion-null  -Wctor-dtor-privacy 
+          -Wnon-virtual-dtor  -Wreorder 
+          -Weffc++  -Wstrict-null-sentinel 
+          -Wno-non-template-friend  -Wold-style-cast 
+          -Woverloaded-virtual  -Wno-pmf-conversions 
+          -Wsign-promo
+</pre>
+     <br><dt><em>Objective-C and Objective-C++ Language Options</em><dd>See <a href="Objective_002dC-and-Objective_002dC_002b_002b-Dialect-Options.html#Objective_002dC-and-Objective_002dC_002b_002b-Dialect-Options">Options Controlling Objective-C and Objective-C++ Dialects</a>.
+     <pre class="smallexample">          -fconstant-string-class=<var>class-name</var> 
+          -fgnu-runtime  -fnext-runtime 
+          -fno-nil-receivers 
+          -fobjc-call-cxx-cdtors 
+          -fobjc-direct-dispatch 
+          -fobjc-exceptions 
+          -fobjc-gc 
+          -freplace-objc-classes 
+          -fzero-link 
+          -gen-decls 
+          -Wassign-intercept 
+          -Wno-protocol  -Wselector 
+          -Wstrict-selector-match 
+          -Wundeclared-selector
+</pre>
+     <br><dt><em>Language Independent Options</em><dd>See <a href="Language-Independent-Options.html#Language-Independent-Options">Options to Control Diagnostic Messages Formatting</a>.
+     <pre class="smallexample">          -fmessage-length=<var>n</var>  
+          -fdiagnostics-show-location=<span class="roman">[</span>once<span class="roman">|</span>every-line<span class="roman">]</span>  
+          -fdiagnostics-show-option
+</pre>
+     <br><dt><em>Warning Options</em><dd>See <a href="Warning-Options.html#Warning-Options">Options to Request or Suppress Warnings</a>.
+     <pre class="smallexample">          -fsyntax-only  -pedantic  -pedantic-errors 
+          -w  -Wextra  -Wall  -Waddress  -Waggregate-return  -Warray-bounds 
+          -Wno-attributes -Wno-builtin-macro-redefined 
+          -Wc++-compat -Wc++0x-compat -Wcast-align  -Wcast-qual  
+          -Wchar-subscripts -Wclobbered  -Wcomment 
+          -Wconversion  -Wcoverage-mismatch  -Wno-deprecated  
+          -Wno-deprecated-declarations -Wdisabled-optimization  
+          -Wno-div-by-zero -Wdouble-promotion -Wempty-body  -Wenum-compare 
+          -Wno-endif-labels -Werror  -Werror=* 
+          -Wfatal-errors  -Wfloat-equal  -Wformat  -Wformat=2 
+          -Wno-format-contains-nul -Wno-format-extra-args -Wformat-nonliteral 
+          -Wformat-security  -Wformat-y2k 
+          -Wframe-larger-than=<var>len</var> -Wjump-misses-init -Wignored-qualifiers 
+          -Wimplicit  -Wimplicit-function-declaration  -Wimplicit-int 
+          -Winit-self  -Winline 
+          -Wno-int-to-pointer-cast -Wno-invalid-offsetof 
+          -Winvalid-pch -Wlarger-than=<var>len</var>  -Wunsafe-loop-optimizations 
+          -Wlogical-op -Wlong-long 
+          -Wmain  -Wmissing-braces  -Wmissing-field-initializers 
+          -Wmissing-format-attribute  -Wmissing-include-dirs 
+          -Wmissing-noreturn  -Wno-mudflap 
+          -Wno-multichar  -Wnonnull  -Wno-overflow 
+          -Woverlength-strings  -Wpacked  -Wpacked-bitfield-compat  -Wpadded 
+          -Wparentheses  -Wpedantic-ms-format -Wno-pedantic-ms-format 
+          -Wpointer-arith  -Wno-pointer-to-int-cast 
+          -Wno-poison-system-directories 
+          -Wredundant-decls 
+          -Wreturn-type  -Wsequence-point  -Wshadow 
+          -Wsign-compare  -Wsign-conversion  -Wstack-protector 
+          -Wstrict-aliasing -Wstrict-aliasing=n 
+          -Wstrict-overflow -Wstrict-overflow=<var>n</var> 
+          -Wswitch  -Wswitch-default  -Wswitch-enum -Wsync-nand 
+          -Wsystem-headers  -Wtrigraphs  -Wtype-limits  -Wundef  -Wuninitialized 
+          -Wunknown-pragmas  -Wno-pragmas 
+          -Wunsuffixed-float-constants  -Wunused  -Wunused-function 
+          -Wunused-label  -Wunused-parameter -Wno-unused-result -Wunused-value  -Wunused-variable 
+          -Wvariadic-macros -Wvla 
+          -Wvolatile-register-var  -Wwrite-strings
+</pre>
+     <br><dt><em>C and Objective-C-only Warning Options</em><dd>
+     <pre class="smallexample">          -Wbad-function-cast  -Wmissing-declarations 
+          -Wmissing-parameter-type  -Wmissing-prototypes  -Wnested-externs 
+          -Wold-style-declaration  -Wold-style-definition 
+          -Wstrict-prototypes  -Wtraditional  -Wtraditional-conversion 
+          -Wdeclaration-after-statement -Wpointer-sign
+</pre>
+     <br><dt><em>Debugging Options</em><dd>See <a href="Debugging-Options.html#Debugging-Options">Options for Debugging Your Program or GCC</a>.
+     <pre class="smallexample">          -d<var>letters</var>  -dumpspecs  -dumpmachine  -dumpversion 
+          -fdbg-cnt-list -fdbg-cnt=<var>counter-value-list</var> 
+          -fdump-noaddr -fdump-unnumbered -fdump-unnumbered-links 
+          -fdump-translation-unit<span class="roman">[</span>-<var>n</var><span class="roman">]</span> 
+          -fdump-class-hierarchy<span class="roman">[</span>-<var>n</var><span class="roman">]</span> 
+          -fdump-ipa-all -fdump-ipa-cgraph -fdump-ipa-inline 
+          -fdump-statistics 
+          -fdump-tree-all 
+          -fdump-tree-original<span class="roman">[</span>-<var>n</var><span class="roman">]</span>  
+          -fdump-tree-optimized<span class="roman">[</span>-<var>n</var><span class="roman">]</span> 
+          -fdump-tree-cfg -fdump-tree-vcg -fdump-tree-alias 
+          -fdump-tree-ch 
+          -fdump-tree-ssa<span class="roman">[</span>-<var>n</var><span class="roman">]</span> -fdump-tree-pre<span class="roman">[</span>-<var>n</var><span class="roman">]</span> 
+          -fdump-tree-ccp<span class="roman">[</span>-<var>n</var><span class="roman">]</span> -fdump-tree-dce<span class="roman">[</span>-<var>n</var><span class="roman">]</span> 
+          -fdump-tree-gimple<span class="roman">[</span>-raw<span class="roman">]</span> -fdump-tree-mudflap<span class="roman">[</span>-<var>n</var><span class="roman">]</span> 
+          -fdump-tree-dom<span class="roman">[</span>-<var>n</var><span class="roman">]</span> 
+          -fdump-tree-dse<span class="roman">[</span>-<var>n</var><span class="roman">]</span> 
+          -fdump-tree-phiprop<span class="roman">[</span>-<var>n</var><span class="roman">]</span> 
+          -fdump-tree-phiopt<span class="roman">[</span>-<var>n</var><span class="roman">]</span> 
+          -fdump-tree-forwprop<span class="roman">[</span>-<var>n</var><span class="roman">]</span> 
+          -fdump-tree-copyrename<span class="roman">[</span>-<var>n</var><span class="roman">]</span> 
+          -fdump-tree-nrv -fdump-tree-vect 
+          -fdump-tree-sink 
+          -fdump-tree-sra<span class="roman">[</span>-<var>n</var><span class="roman">]</span> 
+          -fdump-tree-forwprop<span class="roman">[</span>-<var>n</var><span class="roman">]</span> 
+          -fdump-tree-fre<span class="roman">[</span>-<var>n</var><span class="roman">]</span> 
+          -fdump-tree-vrp<span class="roman">[</span>-<var>n</var><span class="roman">]</span> 
+          -ftree-vectorizer-verbose=<var>n</var> 
+          -fdump-tree-storeccp<span class="roman">[</span>-<var>n</var><span class="roman">]</span> 
+          -fdump-final-insns=<var>file</var> 
+          -fcompare-debug<span class="roman">[</span>=<var>opts</var><span class="roman">]</span>  -fcompare-debug-second 
+          -feliminate-dwarf2-dups -feliminate-unused-debug-types 
+          -feliminate-unused-debug-symbols -femit-class-debug-always 
+          -fenable-icf-debug 
+          -fmem-report -fpre-ipa-mem-report -fpost-ipa-mem-report -fprofile-arcs 
+          -frandom-seed=<var>string</var> -fsched-verbose=<var>n</var> 
+          -fsel-sched-verbose -fsel-sched-dump-cfg -fsel-sched-pipelining-verbose 
+          -ftest-coverage  -ftime-report -fvar-tracking 
+          -fvar-tracking-assignments  -fvar-tracking-assignments-toggle 
+          -g  -g<var>level</var>  -gtoggle  -gcoff  -gdwarf-<var>version</var> 
+          -ggdb  -gstabs  -gstabs+  -gstrict-dwarf  -gno-strict-dwarf 
+          -gvms  -gxcoff  -gxcoff+ 
+          -fno-merge-debug-strings -fno-dwarf2-cfi-asm 
+          -fdebug-prefix-map=<var>old</var>=<var>new</var> 
+          -femit-struct-debug-baseonly -femit-struct-debug-reduced 
+          -femit-struct-debug-detailed<span class="roman">[</span>=<var>spec-list</var><span class="roman">]</span> 
+          -p  -pg  -print-file-name=<var>library</var>  -print-libgcc-file-name 
+          -print-multi-directory  -print-multi-lib  -print-multi-os-directory 
+          -print-prog-name=<var>program</var>  -print-search-dirs  -Q 
+          -print-sysroot -print-sysroot-headers-suffix 
+          -save-temps -save-temps=cwd -save-temps=obj -time<span class="roman">[</span>=<var>file</var><span class="roman">]</span>
+</pre>
+     <br><dt><em>Optimization Options</em><dd>See <a href="Optimize-Options.html#Optimize-Options">Options that Control Optimization</a>.
+     <pre class="smallexample">          -falign-arrays -falign-functions[=<var>n</var>] -falign-jumps[=<var>n</var>] 
+          -falign-labels[=<var>n</var>] -falign-loops[=<var>n</var>] -fassociative-math 
+          -fauto-inc-dec -fbranch-probabilities -fbranch-target-load-optimize 
+          -fbranch-target-load-optimize2 -fbtr-bb-exclusive -fcaller-saves 
+          -fcheck-data-deps -fconserve-stack -fcprop-registers -fcrossjumping 
+          -fcse-follow-jumps -fcse-skip-blocks -fcx-fortran-rules -fcx-limited-range 
+          -fdata-sections -fdce -fdce 
+          -fdelayed-branch -fdelete-null-pointer-checks -fdse -fdse 
+          -fearly-inlining -fipa-sra -fexpensive-optimizations -ffast-math 
+          -ffinite-math-only -ffloat-store -fexcess-precision=<var>style</var> 
+          -fforward-propagate -ffunction-sections 
+          -fgcse -fgcse-after-reload -fgcse-las -fgcse-lm 
+          -fgcse-sm -fif-conversion -fif-conversion2 -findirect-inlining 
+          -finline-functions -finline-functions-called-once -finline-limit=<var>n</var> 
+          -finline-small-functions -fipa-cp -fipa-cp-clone -fipa-matrix-reorg -fipa-pta 
+          -fipa-pure-const -fipa-reference -fipa-struct-reorg 
+          -fipa-type-escape -fira-algorithm=<var>algorithm</var> 
+          -fira-region=<var>region</var> -fira-coalesce 
+          -fira-loop-pressure -fno-ira-share-save-slots 
+          -fno-ira-share-spill-slots -fira-verbose=<var>n</var> 
+          -fivopts -fkeep-inline-functions -fkeep-static-consts 
+          -floop-block -floop-interchange -floop-strip-mine -fgraphite-identity 
+          -floop-parallelize-all -flto -flto-compression-level -flto-report -fltrans 
+          -fltrans-output-list -fmerge-all-constants -fmerge-constants -fmodulo-sched 
+          -fmodulo-sched-allow-regmoves -fmove-loop-invariants -fmudflap 
+          -fmudflapir -fmudflapth -fno-branch-count-reg -fno-default-inline 
+          -fno-defer-pop -fno-function-cse -fno-guess-branch-probability 
+          -fno-inline -fno-math-errno -fno-peephole -fno-peephole2 
+          -fno-sched-interblock -fno-sched-spec -fno-signed-zeros 
+          -fno-toplevel-reorder -fno-trapping-math -fno-zero-initialized-in-bss 
+          -fomit-frame-pointer -foptimize-register-move -foptimize-sibling-calls 
+          -fpeel-loops -fpredictive-commoning -fprefetch-loop-arrays 
+          -fprofile-correction -fprofile-dir=<var>path</var> -fprofile-generate 
+          -fprofile-generate=<var>path</var> 
+          -fprofile-use -fprofile-use=<var>path</var> -fprofile-values 
+          -freciprocal-math -fregmove -frename-registers -freorder-blocks 
+          -freorder-blocks-and-partition -freorder-functions 
+          -frerun-cse-after-loop -freschedule-modulo-scheduled-loops 
+          -frounding-math -fsched2-use-superblocks -fsched-pressure 
+          -fsched-spec-load -fsched-spec-load-dangerous 
+          -fsched-stalled-insns-dep[=<var>n</var>] -fsched-stalled-insns[=<var>n</var>] 
+          -fsched-group-heuristic -fsched-critical-path-heuristic 
+          -fsched-spec-insn-heuristic -fsched-rank-heuristic 
+          -fsched-last-insn-heuristic -fsched-dep-count-heuristic 
+          -fschedule-insns -fschedule-insns2 -fsection-anchors 
+          -fselective-scheduling -fselective-scheduling2 
+          -fsel-sched-pipelining -fsel-sched-pipelining-outer-loops 
+          -fsignaling-nans -fsingle-precision-constant -fsplit-ivs-in-unroller 
+          -fsplit-wide-types -fstack-protector -fstack-protector-all 
+          -fstrict-aliasing -fstrict-overflow -fthread-jumps -ftracer 
+          -ftree-builtin-call-dce -ftree-ccp -ftree-ch -ftree-copy-prop 
+          -ftree-copyrename -ftree-dce 
+          -ftree-dominator-opts -ftree-dse -ftree-forwprop -ftree-fre 
+          -ftree-if-to-switch-conversion -ftree-loop-im 
+          -ftree-phiprop -ftree-loop-distribution 
+          -ftree-loop-ivcanon -ftree-loop-linear -ftree-loop-optimize 
+          -ftree-parallelize-loops=<var>n</var> -ftree-pre -ftree-pta -ftree-reassoc 
+          -ftree-sink -ftree-sra -ftree-switch-conversion 
+          -ftree-ter -ftree-vect-loop-version -ftree-vectorize -ftree-vrp 
+          -funit-at-a-time -funroll-all-loops -funroll-loops 
+          -funsafe-loop-optimizations -funsafe-math-optimizations -funswitch-loops 
+          -fvariable-expansion-in-unroller -fvect-cost-model -fvpt -fweb 
+          -fwhole-program -fwhopr -fwpa -fuse-linker-plugin 
+          --param <var>name</var>=<var>value</var>
+          -O  -O0  -O1  -O2  -O3  -Os
+</pre>
+     <br><dt><em>Preprocessor Options</em><dd>See <a href="Preprocessor-Options.html#Preprocessor-Options">Options Controlling the Preprocessor</a>.
+     <pre class="smallexample">          -A<var>question</var>=<var>answer</var> 
+          -A-<var>question</var><span class="roman">[</span>=<var>answer</var><span class="roman">]</span> 
+          -C  -dD  -dI  -dM  -dN 
+          -D<var>macro</var><span class="roman">[</span>=<var>defn</var><span class="roman">]</span>  -E  -H 
+          -idirafter <var>dir</var> 
+          -include <var>file</var>  -imacros <var>file</var> 
+          -iprefix <var>file</var>  -iwithprefix <var>dir</var> 
+          -iwithprefixbefore <var>dir</var>  -isystem <var>dir</var> 
+          -imultilib <var>dir</var> -isysroot <var>dir</var> 
+          -M  -MM  -MF  -MG  -MP  -MQ  -MT  -nostdinc  
+          -P  -fworking-directory  -remap 
+          -trigraphs  -undef  -U<var>macro</var>  -Wp,<var>option</var> 
+          -Xpreprocessor <var>option</var>
+</pre>
+     <br><dt><em>Assembler Option</em><dd>See <a href="Assembler-Options.html#Assembler-Options">Passing Options to the Assembler</a>.
+     <pre class="smallexample">          -Wa,<var>option</var>  -Xassembler <var>option</var>
+</pre>
+     <br><dt><em>Linker Options</em><dd>See <a href="Link-Options.html#Link-Options">Options for Linking</a>.
+     <pre class="smallexample">          <var>object-file-name</var>  -l<var>library</var> 
+          -nostartfiles  -nodefaultlibs  -nostdlib -pie -rdynamic 
+          -s  -static  -static-libgcc  -static-libstdc++ -shared  
+          -shared-libgcc  -symbolic 
+          -T <var>script</var>  -Wl,<var>option</var>  -Xlinker <var>option</var> 
+          -u <var>symbol</var>
+</pre>
+     <br><dt><em>Directory Options</em><dd>See <a href="Directory-Options.html#Directory-Options">Options for Directory Search</a>.
+     <pre class="smallexample">          -B<var>prefix</var>  -I<var>dir</var>  -iquote<var>dir</var>  -L<var>dir</var>
+          -specs=<var>file</var>  -I- --sysroot=<var>dir</var>
+</pre>
+     <br><dt><em>Target Options</em><dd><!-- I wrote this xref this way to avoid overfull hbox. - rms -->
+See <a href="Target-Options.html#Target-Options">Target Options</a>.
+     <pre class="smallexample">          -V <var>version</var>  -b <var>machine</var>
+</pre>
+     <br><dt><em>Machine Dependent Options</em><dd>See <a href="Submodel-Options.html#Submodel-Options">Hardware Models and Configurations</a>. 
+<!-- This list is ordered alphanumerically by subsection name. -->
+<!-- Try and put the significant identifier (CPU or system) first, -->
+<!-- so users have a clue at guessing where the ones they want will be. -->
+
+     <p><em>ARC Options</em>
+     <pre class="smallexample">          -EB  -EL 
+          -mmangle-cpu  -mcpu=<var>cpu</var>  -mtext=<var>text-section</var> 
+          -mdata=<var>data-section</var>  -mrodata=<var>readonly-data-section</var>
+</pre>
+     <p><em>ARM Options</em>
+     <pre class="smallexample">          -mapcs-frame  -mno-apcs-frame 
+          -mabi=<var>name</var> 
+          -mapcs-stack-check  -mno-apcs-stack-check 
+          -mapcs-float  -mno-apcs-float 
+          -mapcs-reentrant  -mno-apcs-reentrant 
+          -msched-prolog  -mno-sched-prolog 
+          -mlittle-endian  -mbig-endian  -mwords-little-endian 
+          -mfloat-abi=<var>name</var>  -msoft-float  -mhard-float  -mfpe 
+          -mfp16-format=<var>name</var>
+          -mthumb-interwork  -mno-thumb-interwork 
+          -mcpu=<var>name</var>  -march=<var>name</var>  -mfpu=<var>name</var>  
+          -mstructure-size-boundary=<var>n</var> 
+          -mabort-on-noreturn 
+          -mlong-calls  -mno-long-calls 
+          -msingle-pic-base  -mno-single-pic-base 
+          -mpic-register=<var>reg</var> 
+          -mnop-fun-dllimport 
+          -mcirrus-fix-invalid-insns -mno-cirrus-fix-invalid-insns 
+          -mpoke-function-name 
+          -mthumb  -marm 
+          -mtpcs-frame  -mtpcs-leaf-frame 
+          -mcaller-super-interworking  -mcallee-super-interworking 
+          -mtp=<var>name</var> -mtls-dialect=<var>dialect</var> 
+          -mlow-irq-latency 
+          -mword-relocations 
+          -mfix-cortex-m3-ldrd
+</pre>
+     <p><em>AVR Options</em>
+     <pre class="smallexample">          -mmcu=<var>mcu</var>  -mno-interrupts 
+          -mcall-prologues  -mtiny-stack  -mint8
+</pre>
+     <p><em>Blackfin Options</em>
+     <pre class="smallexample">          -mcpu=<var>cpu</var><span class="roman">[</span>-<var>sirevision</var><span class="roman">]</span> 
+          -msim -momit-leaf-frame-pointer  -mno-omit-leaf-frame-pointer 
+          -mspecld-anomaly  -mno-specld-anomaly  -mcsync-anomaly  -mno-csync-anomaly 
+          -mlow-64k -mno-low64k  -mstack-check-l1  -mid-shared-library 
+          -mno-id-shared-library  -mshared-library-id=<var>n</var> 
+          -mleaf-id-shared-library  -mno-leaf-id-shared-library 
+          -msep-data  -mno-sep-data  -mlong-calls  -mno-long-calls 
+          -mfast-fp -minline-plt -mmulticore  -mcorea  -mcoreb  -msdram 
+          -micplb
+</pre>
+     <p><em>CRIS Options</em>
+     <pre class="smallexample">          -mcpu=<var>cpu</var>  -march=<var>cpu</var>  -mtune=<var>cpu</var> 
+          -mmax-stack-frame=<var>n</var>  -melinux-stacksize=<var>n</var> 
+          -metrax4  -metrax100  -mpdebug  -mcc-init  -mno-side-effects 
+          -mstack-align  -mdata-align  -mconst-align 
+          -m32-bit  -m16-bit  -m8-bit  -mno-prologue-epilogue  -mno-gotplt 
+          -melf  -maout  -melinux  -mlinux  -sim  -sim2 
+          -mmul-bug-workaround  -mno-mul-bug-workaround
+</pre>
+     <p><em>CRX Options</em>
+     <pre class="smallexample">          -mmac -mpush-args
+</pre>
+     <p><em>Darwin Options</em>
+     <pre class="smallexample">          -all_load  -allowable_client  -arch  -arch_errors_fatal 
+          -arch_only  -bind_at_load  -bundle  -bundle_loader 
+          -client_name  -compatibility_version  -current_version 
+          -dead_strip 
+          -dependency-file  -dylib_file  -dylinker_install_name 
+          -dynamic  -dynamiclib  -exported_symbols_list 
+          -filelist  -flat_namespace  -force_cpusubtype_ALL 
+          -force_flat_namespace  -headerpad_max_install_names 
+          -iframework 
+          -image_base  -init  -install_name  -keep_private_externs 
+          -multi_module  -multiply_defined  -multiply_defined_unused 
+          -noall_load   -no_dead_strip_inits_and_terms 
+          -nofixprebinding -nomultidefs  -noprebind  -noseglinkedit 
+          -pagezero_size  -prebind  -prebind_all_twolevel_modules 
+          -private_bundle  -read_only_relocs  -sectalign 
+          -sectobjectsymbols  -whyload  -seg1addr 
+          -sectcreate  -sectobjectsymbols  -sectorder 
+          -segaddr -segs_read_only_addr -segs_read_write_addr 
+          -seg_addr_table  -seg_addr_table_filename  -seglinkedit 
+          -segprot  -segs_read_only_addr  -segs_read_write_addr 
+          -single_module  -static  -sub_library  -sub_umbrella 
+          -twolevel_namespace  -umbrella  -undefined 
+          -unexported_symbols_list  -weak_reference_mismatches 
+          -whatsloaded -F -gused -gfull -mmacosx-version-min=<var>version</var> 
+          -mkernel -mone-byte-bool
+</pre>
+     <p><em>DEC Alpha Options</em>
+     <pre class="smallexample">          -mno-fp-regs  -msoft-float  -malpha-as  -mgas 
+          -mieee  -mieee-with-inexact  -mieee-conformant 
+          -mfp-trap-mode=<var>mode</var>  -mfp-rounding-mode=<var>mode</var> 
+          -mtrap-precision=<var>mode</var>  -mbuild-constants 
+          -mcpu=<var>cpu-type</var>  -mtune=<var>cpu-type</var> 
+          -mbwx  -mmax  -mfix  -mcix 
+          -mfloat-vax  -mfloat-ieee 
+          -mexplicit-relocs  -msmall-data  -mlarge-data 
+          -msmall-text  -mlarge-text 
+          -mmemory-latency=<var>time</var>
+</pre>
+     <p><em>DEC Alpha/VMS Options</em>
+     <pre class="smallexample">          -mvms-return-codes -mdebug-main=<var>prefix</var> -mmalloc64
+</pre>
+     <p><em>FR30 Options</em>
+     <pre class="smallexample">          -msmall-model -mno-lsim
+</pre>
+     <p><em>FRV Options</em>
+     <pre class="smallexample">          -mgpr-32  -mgpr-64  -mfpr-32  -mfpr-64 
+          -mhard-float  -msoft-float 
+          -malloc-cc  -mfixed-cc  -mdword  -mno-dword 
+          -mdouble  -mno-double 
+          -mmedia  -mno-media  -mmuladd  -mno-muladd 
+          -mfdpic  -minline-plt -mgprel-ro  -multilib-library-pic 
+          -mlinked-fp  -mlong-calls  -malign-labels 
+          -mlibrary-pic  -macc-4  -macc-8 
+          -mpack  -mno-pack  -mno-eflags  -mcond-move  -mno-cond-move 
+          -moptimize-membar -mno-optimize-membar 
+          -mscc  -mno-scc  -mcond-exec  -mno-cond-exec 
+          -mvliw-branch  -mno-vliw-branch 
+          -mmulti-cond-exec  -mno-multi-cond-exec  -mnested-cond-exec 
+          -mno-nested-cond-exec  -mtomcat-stats 
+          -mTLS -mtls 
+          -mcpu=<var>cpu</var>
+</pre>
+     <p><em>GNU/Linux Options</em>
+     <pre class="smallexample">          -muclibc
+</pre>
+     <p><em>H8/300 Options</em>
+     <pre class="smallexample">          -mrelax  -mh  -ms  -mn  -mint32  -malign-300
+</pre>
+     <p><em>HPPA Options</em>
+     <pre class="smallexample">          -march=<var>architecture-type</var> 
+          -mbig-switch  -mdisable-fpregs  -mdisable-indexing 
+          -mfast-indirect-calls  -mgas  -mgnu-ld   -mhp-ld 
+          -mfixed-range=<var>register-range</var> 
+          -mjump-in-delay -mlinker-opt -mlong-calls 
+          -mlong-load-store  -mno-big-switch  -mno-disable-fpregs 
+          -mno-disable-indexing  -mno-fast-indirect-calls  -mno-gas 
+          -mno-jump-in-delay  -mno-long-load-store 
+          -mno-portable-runtime  -mno-soft-float 
+          -mno-space-regs  -msoft-float  -mpa-risc-1-0 
+          -mpa-risc-1-1  -mpa-risc-2-0  -mportable-runtime 
+          -mschedule=<var>cpu-type</var>  -mspace-regs  -msio  -mwsio 
+          -munix=<var>unix-std</var>  -nolibdld  -static  -threads
+</pre>
+     <p><em>i386 and x86-64 Options</em>
+     <pre class="smallexample">          -mtune=<var>cpu-type</var>  -march=<var>cpu-type</var> 
+          -mfpmath=<var>unit</var> 
+          -masm=<var>dialect</var>  -mno-fancy-math-387 
+          -mno-fp-ret-in-387  -msoft-float 
+          -mno-wide-multiply  -mrtd  -malign-double 
+          -mpreferred-stack-boundary=<var>num</var>
+          -mincoming-stack-boundary=<var>num</var>
+          -mcld -mcx16 -msahf -mmovbe -mcrc32 -mrecip 
+          -mmmx  -msse  -msse2 -msse3 -mssse3 -msse4.1 -msse4.2 -msse4 -mavx 
+          -maes -mpclmul -mfused-madd 
+          -msse4a -m3dnow -mpopcnt -mabm -mfma4 -mxop -mlwp 
+          -mthreads  -mno-align-stringops  -minline-all-stringops 
+          -minline-stringops-dynamically -mstringop-strategy=<var>alg</var> 
+          -mpush-args  -maccumulate-outgoing-args  -m128bit-long-double 
+          -m96bit-long-double  -mregparm=<var>num</var>  -msseregparm 
+          -mveclibabi=<var>type</var> -mpc32 -mpc64 -mpc80 -mstackrealign 
+          -momit-leaf-frame-pointer  -mno-red-zone -mno-tls-direct-seg-refs 
+          -mcmodel=<var>code-model</var> -mabi=<var>name</var> 
+          -m32  -m64 -mlarge-data-threshold=<var>num</var> 
+          -msse2avx
+</pre>
+     <p><em>IA-64 Options</em>
+     <pre class="smallexample">          -mbig-endian  -mlittle-endian  -mgnu-as  -mgnu-ld  -mno-pic 
+          -mvolatile-asm-stop  -mregister-names  -msdata -mno-sdata 
+          -mconstant-gp  -mauto-pic  -mfused-madd 
+          -minline-float-divide-min-latency 
+          -minline-float-divide-max-throughput 
+          -mno-inline-float-divide 
+          -minline-int-divide-min-latency 
+          -minline-int-divide-max-throughput  
+          -mno-inline-int-divide 
+          -minline-sqrt-min-latency -minline-sqrt-max-throughput 
+          -mno-inline-sqrt 
+          -mdwarf2-asm -mearly-stop-bits 
+          -mfixed-range=<var>register-range</var> -mtls-size=<var>tls-size</var> 
+          -mtune=<var>cpu-type</var> -milp32 -mlp64 
+          -msched-br-data-spec -msched-ar-data-spec -msched-control-spec 
+          -msched-br-in-data-spec -msched-ar-in-data-spec -msched-in-control-spec 
+          -msched-spec-ldc -msched-spec-control-ldc 
+          -msched-prefer-non-data-spec-insns -msched-prefer-non-control-spec-insns 
+          -msched-stop-bits-after-every-cycle -msched-count-spec-in-critical-path 
+          -msel-sched-dont-check-control-spec -msched-fp-mem-deps-zero-cost 
+          -msched-max-memory-insns-hard-limit -msched-max-memory-insns=<var>max-insns</var>
+</pre>
+     <p><em>IA-64/VMS Options</em>
+     <pre class="smallexample">          -mvms-return-codes -mdebug-main=<var>prefix</var> -mmalloc64
+</pre>
+     <p><em>LM32 Options</em>
+     <pre class="smallexample">          -mbarrel-shift-enabled -mdivide-enabled -mmultiply-enabled 
+          -msign-extend-enabled -muser-enabled
+</pre>
+     <p><em>M32R/D Options</em>
+     <pre class="smallexample">          -m32r2 -m32rx -m32r 
+          -mdebug 
+          -malign-loops -mno-align-loops 
+          -missue-rate=<var>number</var> 
+          -mbranch-cost=<var>number</var> 
+          -mmodel=<var>code-size-model-type</var> 
+          -msdata=<var>sdata-type</var> 
+          -mno-flush-func -mflush-func=<var>name</var> 
+          -mno-flush-trap -mflush-trap=<var>number</var> 
+          -G <var>num</var>
+</pre>
+     <p><em>M32C Options</em>
+     <pre class="smallexample">          -mcpu=<var>cpu</var> -msim -memregs=<var>number</var>
+</pre>
+     <p><em>M680x0 Options</em>
+     <pre class="smallexample">          -march=<var>arch</var>  -mcpu=<var>cpu</var>  -mtune=<var>tune</var>
+          -m68000  -m68020  -m68020-40  -m68020-60  -m68030  -m68040 
+          -m68060  -mcpu32  -m5200  -m5206e  -m528x  -m5307  -m5407 
+          -mcfv4e  -mbitfield  -mno-bitfield  -mc68000  -mc68020 
+          -mnobitfield  -mrtd  -mno-rtd  -mdiv  -mno-div  -mshort 
+          -mno-short  -mhard-float  -m68881  -msoft-float  -mpcrel 
+          -malign-int  -mstrict-align  -msep-data  -mno-sep-data 
+          -mshared-library-id=n  -mid-shared-library  -mno-id-shared-library 
+          -mxgot -mno-xgot
+</pre>
+     <p><em>M68hc1x Options</em>
+     <pre class="smallexample">          -m6811  -m6812  -m68hc11  -m68hc12   -m68hcs12 
+          -mauto-incdec  -minmax  -mlong-calls  -mshort 
+          -msoft-reg-count=<var>count</var>
+</pre>
+     <p><em>MCore Options</em>
+     <pre class="smallexample">          -mhardlit  -mno-hardlit  -mdiv  -mno-div  -mrelax-immediates 
+          -mno-relax-immediates  -mwide-bitfields  -mno-wide-bitfields 
+          -m4byte-functions  -mno-4byte-functions  -mcallgraph-data 
+          -mno-callgraph-data  -mslow-bytes  -mno-slow-bytes  -mno-lsim 
+          -mlittle-endian  -mbig-endian  -m210  -m340  -mstack-increment
+</pre>
+     <p><em>MeP Options</em>
+     <pre class="smallexample">          -mabsdiff -mall-opts -maverage -mbased=<var>n</var> -mbitops 
+          -mc=<var>n</var> -mclip -mconfig=<var>name</var> -mcop -mcop32 -mcop64 -mivc2 
+          -mdc -mdiv -meb -mel -mio-volatile -ml -mleadz -mm -mminmax 
+          -mmult -mno-opts -mrepeat -ms -msatur -msdram -msim -msimnovec -mtf 
+          -mtiny=<var>n</var>
+</pre>
+     <p><em>MIPS Options</em>
+     <pre class="smallexample">          -EL  -EB  -march=<var>arch</var>  -mtune=<var>arch</var> 
+          -mips1  -mips2  -mips3  -mips4  -mips32  -mips32r2 
+          -mips64  -mips64r2 
+          -mips16  -mips16e  -mno-mips16  -mflip-mips16 
+          -minterlink-mips16  -mno-interlink-mips16 
+          -mabi=<var>abi</var>  -mabicalls  -mno-abicalls 
+          -mshared  -mno-shared  -mplt  -mno-plt  -mxgot  -mno-xgot 
+          -mgp32  -mgp64  -mfp32  -mfp64  -mhard-float  -msoft-float 
+          -msingle-float  -mdouble-float  -mdsp  -mno-dsp  -mdspr2  -mno-dspr2 
+          -mmicromips -mno-micromips -mmcu -mmno-mcu 
+          -mfpu=<var>fpu-type</var> 
+          -msmartmips  -mno-smartmips 
+          -mpaired-single  -mno-paired-single  -mdmx  -mno-mdmx 
+          -mips3d  -mno-mips3d  -mmt  -mno-mt  -mllsc  -mno-llsc 
+          -mlong64  -mlong32  -msym32  -mno-sym32 
+          -G<var>num</var>  -mlocal-sdata  -mno-local-sdata 
+          -mextern-sdata  -mno-extern-sdata  -mgpopt  -mno-gopt 
+          -membedded-data  -mno-embedded-data 
+          -muninit-const-in-rodata  -mno-uninit-const-in-rodata 
+          -mcode-readable=<var>setting</var> 
+          -msplit-addresses  -mno-split-addresses 
+          -mexplicit-relocs  -mno-explicit-relocs 
+          -mcheck-zero-division  -mno-check-zero-division 
+          -mdivide-traps  -mdivide-breaks 
+          -mmemcpy  -mno-memcpy  -mlong-calls  -mno-long-calls 
+          -mjals -mno-jals 
+          -mmad  -mno-mad  -mfused-madd  -mno-fused-madd  -nocpp 
+          -mfix-r4000  -mno-fix-r4000  -mfix-r4400  -mno-fix-r4400 
+          -mfix-r10000 -mno-fix-r10000  -mfix-vr4120  -mno-fix-vr4120 
+          -mfix-vr4130  -mno-fix-vr4130  -mfix-sb1  -mno-fix-sb1 
+          -mflush-func=<var>func</var>  -mno-flush-func 
+          -mbranch-cost=<var>num</var>  -mbranch-likely  -mno-branch-likely 
+          -mfp-exceptions -mno-fp-exceptions 
+          -mvr4130-align -mno-vr4130-align -msynci -mno-synci 
+          -mrelax-pic-calls -mno-relax-pic-calls -mmcount-ra-address
+</pre>
+     <p><em>MMIX Options</em>
+     <pre class="smallexample">          -mlibfuncs  -mno-libfuncs  -mepsilon  -mno-epsilon  -mabi=gnu 
+          -mabi=mmixware  -mzero-extend  -mknuthdiv  -mtoplevel-symbols 
+          -melf  -mbranch-predict  -mno-branch-predict  -mbase-addresses 
+          -mno-base-addresses  -msingle-exit  -mno-single-exit
+</pre>
+     <p><em>MN10300 Options</em>
+     <pre class="smallexample">          -mmult-bug  -mno-mult-bug 
+          -mam33  -mno-am33 
+          -mam33-2  -mno-am33-2 
+          -mreturn-pointer-on-d0 
+          -mno-crt0  -mrelax
+</pre>
+     <p><em>PDP-11 Options</em>
+     <pre class="smallexample">          -mfpu  -msoft-float  -mac0  -mno-ac0  -m40  -m45  -m10 
+          -mbcopy  -mbcopy-builtin  -mint32  -mno-int16 
+          -mint16  -mno-int32  -mfloat32  -mno-float64 
+          -mfloat64  -mno-float32  -mabshi  -mno-abshi 
+          -mbranch-expensive  -mbranch-cheap 
+          -msplit  -mno-split  -munix-asm  -mdec-asm
+</pre>
+     <p><em>picoChip Options</em>
+     <pre class="smallexample">          -mae=<var>ae_type</var> -mvliw-lookahead=<var>N</var>
+          -msymbol-as-address -mno-inefficient-warnings
+</pre>
+     <p><em>PowerPC Options</em>
+See RS/6000 and PowerPC Options.
+
+     <p><em>RS/6000 and PowerPC Options</em>
+     <pre class="smallexample">          -mcpu=<var>cpu-type</var> 
+          -mtune=<var>cpu-type</var> 
+          -mpower  -mno-power  -mpower2  -mno-power2 
+          -mpowerpc  -mpowerpc64  -mno-powerpc 
+          -maltivec  -mno-altivec 
+          -mpowerpc-gpopt  -mno-powerpc-gpopt 
+          -mpowerpc-gfxopt  -mno-powerpc-gfxopt 
+          -mmfcrf  -mno-mfcrf  -mpopcntb  -mno-popcntb -mpopcntd -mno-popcntd 
+          -mfprnd  -mno-fprnd 
+          -mcmpb -mno-cmpb -mmfpgpr -mno-mfpgpr -mhard-dfp -mno-hard-dfp 
+          -mnew-mnemonics  -mold-mnemonics 
+          -mfull-toc   -mminimal-toc  -mno-fp-in-toc  -mno-sum-in-toc 
+          -m64  -m32  -mxl-compat  -mno-xl-compat  -mpe 
+          -malign-power  -malign-natural 
+          -msoft-float  -mhard-float  -mmultiple  -mno-multiple 
+          -msingle-float -mdouble-float -msimple-fpu 
+          -mstring  -mno-string  -mupdate  -mno-update 
+          -mavoid-indexed-addresses  -mno-avoid-indexed-addresses 
+          -mfused-madd  -mno-fused-madd  -mbit-align  -mno-bit-align 
+          -mstrict-align  -mno-strict-align  -mrelocatable 
+          -mno-relocatable  -mrelocatable-lib  -mno-relocatable-lib 
+          -mtoc  -mno-toc  -mlittle  -mlittle-endian  -mbig  -mbig-endian 
+          -mdynamic-no-pic  -maltivec -mswdiv 
+          -mprioritize-restricted-insns=<var>priority</var> 
+          -msched-costly-dep=<var>dependence_type</var> 
+          -minsert-sched-nops=<var>scheme</var> 
+          -mcall-sysv  -mcall-netbsd 
+          -maix-struct-return  -msvr4-struct-return 
+          -mabi=<var>abi-type</var> -msecure-plt -mbss-plt 
+          -mblock-move-inline-limit=<var>num</var> 
+          -misel -mno-isel 
+          -misel=yes  -misel=no 
+          -mspe -mno-spe 
+          -mspe=yes  -mspe=no 
+          -mpaired 
+          -mgen-cell-microcode -mwarn-cell-microcode 
+          -mvrsave -mno-vrsave 
+          -mmulhw -mno-mulhw 
+          -mdlmzb -mno-dlmzb 
+          -mfloat-gprs=yes  -mfloat-gprs=no -mfloat-gprs=single -mfloat-gprs=double 
+          -mprototype  -mno-prototype 
+          -msim  -mmvme  -mads  -myellowknife  -memb  -msdata 
+          -msdata=<var>opt</var>  -mvxworks  -G <var>num</var>  -pthread
+</pre>
+     <p><em>RX Options</em>
+     <pre class="smallexample">          -m64bit-doubles  -m32bit-doubles  -fpu  -nofpu
+          -mcpu= -patch=
+          -mbig-endian-data -mlittle-endian-data 
+          -msmall-data 
+          -msim  -mno-sim
+          -mas100-syntax -mno-as100-syntax
+          -mrelax
+          -mmax-constant-size=
+          -mint-register=
+          -msave-acc-in-interrupts
+</pre>
+     <p><em>S/390 and zSeries Options</em>
+     <pre class="smallexample">          -mtune=<var>cpu-type</var>  -march=<var>cpu-type</var> 
+          -mhard-float  -msoft-float  -mhard-dfp -mno-hard-dfp 
+          -mlong-double-64 -mlong-double-128 
+          -mbackchain  -mno-backchain -mpacked-stack  -mno-packed-stack 
+          -msmall-exec  -mno-small-exec  -mmvcle -mno-mvcle 
+          -m64  -m31  -mdebug  -mno-debug  -mesa  -mzarch 
+          -mtpf-trace -mno-tpf-trace  -mfused-madd  -mno-fused-madd 
+          -mwarn-framesize  -mwarn-dynamicstack  -mstack-size -mstack-guard
+</pre>
+     <p><em>Score Options</em>
+     <pre class="smallexample">          -meb -mel 
+          -mnhwloop 
+          -muls 
+          -mmac 
+          -mscore5 -mscore5u -mscore7 -mscore7d
+</pre>
+     <p><em>SH Options</em>
+     <pre class="smallexample">          -m1  -m2  -m2e 
+          -m2a-nofpu -m2a-single-only -m2a-single -m2a 
+          -m3  -m3e 
+          -m4-nofpu  -m4-single-only  -m4-single  -m4 
+          -m4a-nofpu -m4a-single-only -m4a-single -m4a -m4al 
+          -m5-64media  -m5-64media-nofpu 
+          -m5-32media  -m5-32media-nofpu 
+          -m5-compact  -m5-compact-nofpu 
+          -mb  -ml  -mdalign  -mrelax 
+          -mbigtable -mfmovd -mhitachi -mrenesas -mno-renesas -mnomacsave 
+          -mieee  -mbitops  -misize  -minline-ic_invalidate -mpadstruct  -mspace 
+          -mprefergot  -musermode -multcost=<var>number</var> -mdiv=<var>strategy</var> 
+          -mdivsi3_libfunc=<var>name</var> -mfixed-range=<var>register-range</var> 
+          -madjust-unroll -mindexed-addressing -mgettrcost=<var>number</var> -mpt-fixed 
+          -minvalid-symbols
+</pre>
+     <p><em>SPARC Options</em>
+     <pre class="smallexample">          -mcpu=<var>cpu-type</var> 
+          -mtune=<var>cpu-type</var> 
+          -mcmodel=<var>code-model</var> 
+          -m32  -m64  -mapp-regs  -mno-app-regs 
+          -mfaster-structs  -mno-faster-structs 
+          -mfpu  -mno-fpu  -mhard-float  -msoft-float 
+          -mhard-quad-float  -msoft-quad-float 
+          -mimpure-text  -mno-impure-text  -mlittle-endian 
+          -mstack-bias  -mno-stack-bias 
+          -munaligned-doubles  -mno-unaligned-doubles 
+          -mv8plus  -mno-v8plus  -mvis  -mno-vis
+          -threads -pthreads -pthread
+</pre>
+     <p><em>SPU Options</em>
+     <pre class="smallexample">          -mwarn-reloc -merror-reloc 
+          -msafe-dma -munsafe-dma 
+          -mbranch-hints 
+          -msmall-mem -mlarge-mem -mstdmain 
+          -mfixed-range=<var>register-range</var> 
+          -mea32 -mea64 
+          -maddress-space-conversion -mno-address-space-conversion 
+          -mcache-size=<var>cache-size</var> 
+          -matomic-updates -mno-atomic-updates
+</pre>
+     <p><em>System V Options</em>
+     <pre class="smallexample">          -Qy  -Qn  -YP,<var>paths</var>  -Ym,<var>dir</var>
+</pre>
+     <p><em>V850 Options</em>
+     <pre class="smallexample">          -mlong-calls  -mno-long-calls  -mep  -mno-ep 
+          -mprolog-function  -mno-prolog-function  -mspace 
+          -mtda=<var>n</var>  -msda=<var>n</var>  -mzda=<var>n</var> 
+          -mapp-regs  -mno-app-regs 
+          -mdisable-callt  -mno-disable-callt 
+          -mv850e1 
+          -mv850e 
+          -mv850  -mbig-switch
+</pre>
+     <p><em>VAX Options</em>
+     <pre class="smallexample">          -mg  -mgnu  -munix
+</pre>
+     <p><em>VxWorks Options</em>
+     <pre class="smallexample">          -mrtp  -non-static  -Bstatic  -Bdynamic 
+          -Xbind-lazy  -Xbind-now
+</pre>
+     <p><em>x86-64 Options</em>
+See i386 and x86-64 Options.
+
+     <p><em>i386 and x86-64 Windows Options</em>
+     <pre class="smallexample">          -mconsole -mcygwin -mno-cygwin -mdll
+          -mnop-fun-dllimport -mthread -municode -mwin32 -mwindows
+          -fno-set-stack-executable
+</pre>
+     <p><em>Xstormy16 Options</em>
+     <pre class="smallexample">          -msim
+</pre>
+     <p><em>Xtensa Options</em>
+     <pre class="smallexample">          -mconst16 -mno-const16 
+          -mfused-madd  -mno-fused-madd 
+          -mserialize-volatile  -mno-serialize-volatile 
+          -mtext-section-literals  -mno-text-section-literals 
+          -mtarget-align  -mno-target-align 
+          -mlongcalls  -mno-longcalls
+</pre>
+     <p><em>zSeries Options</em>
+See S/390 and zSeries Options.
+
+     <br><dt><em>Code Generation Options</em><dd>See <a href="Code-Gen-Options.html#Code-Gen-Options">Options for Code Generation Conventions</a>.
+     <pre class="smallexample">          -fcall-saved-<var>reg</var>  -fcall-used-<var>reg</var> 
+          -ffixed-<var>reg</var>  -fexceptions 
+          -fnon-call-exceptions  -funwind-tables 
+          -fasynchronous-unwind-tables 
+          -finhibit-size-directive  -finstrument-functions 
+          -finstrument-functions-exclude-function-list=<var>sym</var>,<var>sym</var>,... 
+          -finstrument-functions-exclude-file-list=<var>file</var>,<var>file</var>,... 
+          -fno-common  -fno-ident 
+          -fpcc-struct-return  -fpic  -fPIC -fpie -fPIE 
+          -fno-jump-tables 
+          -frecord-gcc-switches 
+          -freg-struct-return  -fshort-enums 
+          -fshort-double  -fshort-wchar 
+          -fverbose-asm  -fpack-struct[=<var>n</var>]  -fstack-check 
+          -fstack-limit-register=<var>reg</var>  -fstack-limit-symbol=<var>sym</var> 
+          -fno-stack-limit  -fargument-alias  -fargument-noalias 
+          -fargument-noalias-global  -fargument-noalias-anything 
+          -fleading-underscore  -ftls-model=<var>model</var> 
+          -ftrapv  -fwrapv  -fbounds-check 
+          -fvisibility -fstrict-volatile-bitfields
+</pre>
+     </dl>
+
+<ul class="menu">
+<li><a accesskey="1" href="Overall-Options.html#Overall-Options">Overall Options</a>:      Controlling the kind of output:
+                        an executable, object files, assembler files,
+                        or preprocessed source. 
+<li><a accesskey="2" href="C-Dialect-Options.html#C-Dialect-Options">C Dialect Options</a>:    Controlling the variant of C language compiled. 
+<li><a accesskey="3" href="C_002b_002b-Dialect-Options.html#C_002b_002b-Dialect-Options">C++ Dialect Options</a>:  Variations on C++. 
+<li><a accesskey="4" href="Objective_002dC-and-Objective_002dC_002b_002b-Dialect-Options.html#Objective_002dC-and-Objective_002dC_002b_002b-Dialect-Options">Objective-C and Objective-C++ Dialect Options</a>:  Variations on Objective-C
+                        and Objective-C++. 
+<li><a accesskey="5" href="Language-Independent-Options.html#Language-Independent-Options">Language Independent Options</a>:  Controlling how diagnostics should be
+                        formatted. 
+<li><a accesskey="6" href="Warning-Options.html#Warning-Options">Warning Options</a>:      How picky should the compiler be? 
+<li><a accesskey="7" href="Debugging-Options.html#Debugging-Options">Debugging Options</a>:    Symbol tables, measurements, and debugging dumps. 
+<li><a accesskey="8" href="Optimize-Options.html#Optimize-Options">Optimize Options</a>:     How much optimization? 
+<li><a accesskey="9" href="Preprocessor-Options.html#Preprocessor-Options">Preprocessor Options</a>:  Controlling header files and macro definitions. 
+                         Also, getting dependency information for Make. 
+<li><a href="Assembler-Options.html#Assembler-Options">Assembler Options</a>:    Passing options to the assembler. 
+<li><a href="Link-Options.html#Link-Options">Link Options</a>:         Specifying libraries and so on. 
+<li><a href="Directory-Options.html#Directory-Options">Directory Options</a>:    Where to find header files and libraries. 
+                        Where to find the compiler executable files. 
+<li><a href="Spec-Files.html#Spec-Files">Spec Files</a>:           How to pass switches to sub-processes. 
+<li><a href="Target-Options.html#Target-Options">Target Options</a>:       Running a cross-compiler, or an old version of GCC. 
+</ul>
+
+ </body></html>
+

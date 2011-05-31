@@ -1,0 +1,75 @@
+<html lang="en">
+<head>
+<title>fread - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="fputws.html#fputws" title="fputws">
+<link rel="next" href="freopen.html#freopen" title="freopen">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="fread"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="freopen.html#freopen">freopen</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="fputws.html#fputws">fputws</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.24 <code>fread</code>&mdash;read array elements from a file</h3>
+
+<p><a name="index-fread-193"></a><a name="index-g_t_005ffread_005fr-194"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     size_t fread(void *<var>buf</var>, size_t <var>size</var>, size_t <var>count</var>,
+         FILE *<var>fp</var>);
+     
+     #include &lt;stdio.h&gt;
+     size_t _fread_r(struct _reent *<var>ptr</var>, void *<var>buf</var>,
+         size_t <var>size</var>, size_t <var>count</var>, FILE *<var>fp</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>fread</code> attempts to copy, from the file or stream identified by
+<var>fp</var>, <var>count</var> elements (each of size <var>size</var>) into memory,
+starting at <var>buf</var>.   <code>fread</code> may copy fewer elements than
+<var>count</var> if an error, or end of file, intervenes.
+
+   <p><code>fread</code> also advances the file position indicator (if any) for
+<var>fp</var> by the number of <em>characters</em> actually read.
+
+   <p><code>_fread_r</code> is simply the reentrant version of <code>fread</code> that
+takes an additional reentrant structure pointer argument: <var>ptr</var>.
+
+   <p><br>
+<strong>Returns</strong><br>
+The result of <code>fread</code> is the number of elements it succeeded in
+reading.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C requires <code>fread</code>.
+
+   <p>Supporting OS subroutines required: <code>close</code>, <code>fstat</code>, <code>isatty</code>,
+<code>lseek</code>, <code>read</code>, <code>sbrk</code>, <code>write</code>.
+
+   <p><br>
+
+   </body></html>
+

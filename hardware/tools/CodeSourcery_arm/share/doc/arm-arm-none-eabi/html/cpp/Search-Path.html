@@ -1,0 +1,130 @@
+<html lang="en">
+<head>
+<title>Search Path - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Header-Files.html#Header-Files" title="Header Files">
+<link rel="prev" href="Include-Operation.html#Include-Operation" title="Include Operation">
+<link rel="next" href="Once_002dOnly-Headers.html#Once_002dOnly-Headers" title="Once-Only Headers">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Search-Path"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Once_002dOnly-Headers.html#Once_002dOnly-Headers">Once-Only Headers</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Include-Operation.html#Include-Operation">Include Operation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Header-Files.html#Header-Files">Header Files</a>
+<hr>
+</div>
+
+<h3 class="section">2.3 Search Path</h3>
+
+<p>GCC looks in several different places for headers.  On a normal Unix
+system, if you do not instruct it otherwise, it will look for headers
+requested with <code>#include&nbsp;&lt;</code><var>file</var><code>&gt;<!-- /@w --></code> in:
+
+<pre class="smallexample">     /usr/local/include
+     <var>libdir</var>/gcc/<var>target</var>/<var>version</var>/include
+     /usr/<var>target</var>/include
+     /usr/include
+</pre>
+   <p>For C++ programs, it will also look in <samp><span class="file">/usr/include/g++-v3</span></samp>,
+first.  In the above, <var>target</var> is the canonical name of the system
+GCC was configured to compile code for; often but not always the same as
+the canonical name of the system it runs on.  <var>version</var> is the
+version of GCC in use.
+
+   <p>You can add to this list with the <samp><span class="option">-I</span><var>dir</var></samp> command line
+option.  All the directories named by <samp><span class="option">-I</span></samp> are searched, in
+left-to-right order, <em>before</em> the default directories.  The only
+exception is when <samp><span class="file">dir</span></samp> is already searched by default.  In
+this case, the option is ignored and the search order for system
+directories remains unchanged.
+
+   <p>Duplicate directories are removed from the quote and bracket search
+chains before the two chains are merged to make the final search chain. 
+Thus, it is possible for a directory to occur twice in the final search
+chain if it was specified in both the quote and bracket chains.
+
+   <p>You can prevent GCC from searching any of the default directories with
+the <samp><span class="option">-nostdinc</span></samp> option.  This is useful when you are compiling an
+operating system kernel or some other program that does not use the
+standard C library facilities, or the standard C library itself. 
+<samp><span class="option">-I</span></samp> options are not ignored as described above when
+<samp><span class="option">-nostdinc</span></samp> is in effect.
+
+   <p>GCC looks for headers requested with <code>#include&nbsp;"</code><var>file</var><code>"<!-- /@w --></code>
+first in the directory containing the current file, then in the
+directories as specified by <samp><span class="option">-iquote</span></samp> options, then in the same
+places it would have looked for a header requested with angle
+brackets.  For example, if <samp><span class="file">/usr/include/sys/stat.h</span></samp> contains
+<code>#include&nbsp;"types.h"<!-- /@w --></code>, GCC looks for <samp><span class="file">types.h</span></samp> first in
+<samp><span class="file">/usr/include/sys</span></samp>, then in its usual search path.
+
+   <p>&lsquo;<samp><span class="samp">#line</span></samp>&rsquo; (see <a href="Line-Control.html#Line-Control">Line Control</a>) does not change GCC's idea of the
+directory containing the current file.
+
+   <p>You may put <samp><span class="option">-I-</span></samp> at any point in your list of <samp><span class="option">-I</span></samp> options. 
+This has two effects.  First, directories appearing before the
+<samp><span class="option">-I-</span></samp> in the list are searched only for headers requested with
+quote marks.  Directories after <samp><span class="option">-I-</span></samp> are searched for all
+headers.  Second, the directory containing the current file is not
+searched for anything, unless it happens to be one of the directories
+named by an <samp><span class="option">-I</span></samp> switch.  <samp><span class="option">-I-</span></samp> is deprecated, <samp><span class="option">-iquote</span></samp>
+should be used instead.
+
+   <p><samp><span class="option">-I. -I-</span></samp> is not the same as no <samp><span class="option">-I</span></samp> options at all, and does
+not cause the same behavior for &lsquo;<samp><span class="samp">&lt;&gt;</span></samp>&rsquo; includes that &lsquo;<samp><span class="samp">""</span></samp>&rsquo;
+includes get with no special options.  <samp><span class="option">-I.</span></samp> searches the
+compiler's current working directory for header files.  That may or may
+not be the same as the directory containing the current file.
+
+   <p>If you need to look for headers in a directory named <samp><span class="file">-</span></samp>, write
+<samp><span class="option">-I./-</span></samp>.
+
+   <p>There are several more ways to adjust the header search path.  They are
+generally less useful.  See <a href="Invocation.html#Invocation">Invocation</a>.
+
+   </body></html>
+

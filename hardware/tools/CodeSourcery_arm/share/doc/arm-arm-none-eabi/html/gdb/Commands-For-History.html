@@ -1,0 +1,113 @@
+<html lang="en">
+<head>
+<title>Commands For History - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Bindable-Readline-Commands.html#Bindable-Readline-Commands" title="Bindable Readline Commands">
+<link rel="prev" href="Commands-For-Moving.html#Commands-For-Moving" title="Commands For Moving">
+<link rel="next" href="Commands-For-Text.html#Commands-For-Text" title="Commands For Text">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Commands-For-History"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Commands-For-Text.html#Commands-For-Text">Commands For Text</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Commands-For-Moving.html#Commands-For-Moving">Commands For Moving</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Bindable-Readline-Commands.html#Bindable-Readline-Commands">Bindable Readline Commands</a>
+<hr>
+</div>
+
+<h4 class="subsection">31.4.2 Commands For Manipulating The History</h4>
+
+     <dl>
+<dt><code>accept-line (Newline or Return)</code><a name="index-accept_002dline-_0028Newline-or-Return_0029-2226"></a><dd>Accept the line regardless of where the cursor is. 
+If this line is
+non-empty, it may be added to the history list for future recall with
+<code>add_history()</code>. 
+If this line is a modified history line, the history line is restored
+to its original state.
+
+     <br><dt><code>previous-history (C-p)</code><a name="index-previous_002dhistory-_0028C_002dp_0029-2227"></a><dd>Move `back' through the history list, fetching the previous command.
+
+     <br><dt><code>next-history (C-n)</code><a name="index-next_002dhistory-_0028C_002dn_0029-2228"></a><dd>Move `forward' through the history list, fetching the next command.
+
+     <br><dt><code>beginning-of-history (M-&lt;)</code><a name="index-beginning_002dof_002dhistory-_0028M_002d_003c_0029-2229"></a><dd>Move to the first line in the history.
+
+     <br><dt><code>end-of-history (M-&gt;)</code><a name="index-end_002dof_002dhistory-_0028M_002d_003e_0029-2230"></a><dd>Move to the end of the input history, i.e., the line currently
+being entered.
+
+     <br><dt><code>reverse-search-history (C-r)</code><a name="index-reverse_002dsearch_002dhistory-_0028C_002dr_0029-2231"></a><dd>Search backward starting at the current line and moving `up' through
+the history as necessary.  This is an incremental search.
+
+     <br><dt><code>forward-search-history (C-s)</code><a name="index-forward_002dsearch_002dhistory-_0028C_002ds_0029-2232"></a><dd>Search forward starting at the current line and moving `down' through
+the the history as necessary.  This is an incremental search.
+
+     <br><dt><code>non-incremental-reverse-search-history (M-p)</code><a name="index-non_002dincremental_002dreverse_002dsearch_002dhistory-_0028M_002dp_0029-2233"></a><dd>Search backward starting at the current line and moving `up'
+through the history as necessary using a non-incremental search
+for a string supplied by the user.
+
+     <br><dt><code>non-incremental-forward-search-history (M-n)</code><a name="index-non_002dincremental_002dforward_002dsearch_002dhistory-_0028M_002dn_0029-2234"></a><dd>Search forward starting at the current line and moving `down'
+through the the history as necessary using a non-incremental search
+for a string supplied by the user.
+
+     <br><dt><code>history-search-forward ()</code><a name="index-history_002dsearch_002dforward-_0028_0029-2235"></a><dd>Search forward through the history for the string of characters
+between the start of the current line and the point. 
+This is a non-incremental search. 
+By default, this command is unbound.
+
+     <br><dt><code>history-search-backward ()</code><a name="index-history_002dsearch_002dbackward-_0028_0029-2236"></a><dd>Search backward through the history for the string of characters
+between the start of the current line and the point.  This
+is a non-incremental search.  By default, this command is unbound.
+
+     <br><dt><code>yank-nth-arg (M-C-y)</code><a name="index-yank_002dnth_002darg-_0028M_002dC_002dy_0029-2237"></a><dd>Insert the first argument to the previous command (usually
+the second word on the previous line) at point. 
+With an argument <var>n</var>,
+insert the <var>n</var>th word from the previous command (the words
+in the previous command begin with word 0).  A negative argument
+inserts the <var>n</var>th word from the end of the previous command. 
+Once the argument <var>n</var> is computed, the argument is extracted
+as if the &lsquo;<samp><span class="samp">!</span><var>n</var></samp>&rsquo; history expansion had been specified.
+
+     <br><dt><code>yank-last-arg (M-. or M-_)</code><a name="index-yank_002dlast_002darg-_0028M_002d_002e-or-M_002d_005f_0029-2238"></a><dd>Insert last argument to the previous command (the last word of the
+previous history entry).  With an
+argument, behave exactly like <code>yank-nth-arg</code>. 
+Successive calls to <code>yank-last-arg</code> move back through the history
+list, inserting the last argument of each line in turn. 
+The history expansion facilities are used to extract the last argument,
+as if the &lsquo;<samp><span class="samp">!$</span></samp>&rsquo; history expansion had been specified.
+
+</dl>
+
+   </body></html>
+

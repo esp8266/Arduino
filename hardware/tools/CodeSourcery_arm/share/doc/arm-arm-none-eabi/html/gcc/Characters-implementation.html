@@ -1,0 +1,126 @@
+<html lang="en">
+<head>
+<title>Characters implementation - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Implementation.html#C-Implementation" title="C Implementation">
+<link rel="prev" href="Identifiers-implementation.html#Identifiers-implementation" title="Identifiers implementation">
+<link rel="next" href="Integers-implementation.html#Integers-implementation" title="Integers implementation">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Characters-implementation"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Integers-implementation.html#Integers-implementation">Integers implementation</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Identifiers-implementation.html#Identifiers-implementation">Identifiers implementation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Implementation.html#C-Implementation">C Implementation</a>
+<hr>
+</div>
+
+<h3 class="section">4.4 Characters</h3>
+
+     <ul>
+<li><cite>The number of bits in a byte (C90 3.4, C99 3.6).</cite>
+
+     <p>Determined by ABI.
+
+     <li><cite>The values of the members of the execution character set (C90
+and C99 5.2.1).</cite>
+
+     <p>Determined by ABI.
+
+     <li><cite>The unique value of the member of the execution character set produced
+for each of the standard alphabetic escape sequences (C90 and C99 5.2.2).</cite>
+
+     <p>Determined by ABI.
+
+     <li><cite>The value of a </cite><code>char</code><cite> object into which has been stored any
+character other than a member of the basic execution character set
+(C90 6.1.2.5, C99 6.2.5).</cite>
+
+     <p>Determined by ABI.
+
+     <li><cite>Which of </cite><code>signed char</code><cite> or </cite><code>unsigned char</code><cite> has the same
+range, representation, and behavior as &ldquo;plain&rdquo; </cite><code>char</code><cite> (C90
+6.1.2.5, C90 6.2.1.1, C99 6.2.5, C99 6.3.1.1).</cite>
+
+     <p><a name="index-fsigned_002dchar-2172"></a><a name="index-funsigned_002dchar-2173"></a>Determined by ABI.  The options <samp><span class="option">-funsigned-char</span></samp> and
+<samp><span class="option">-fsigned-char</span></samp> change the default.  See <a href="C-Dialect-Options.html#C-Dialect-Options">Options Controlling C Dialect</a>.
+
+     <li><cite>The mapping of members of the source character set (in character
+constants and string literals) to members of the execution character
+set (C90 6.1.3.4, C99 6.4.4.4, C90 and C99 5.1.1.2).</cite>
+
+     <p>Determined by ABI.
+
+     <li><cite>The value of an integer character constant containing more than one
+character or containing a character or escape sequence that does not map
+to a single-byte execution character (C90 6.1.3.4, C99 6.4.4.4).</cite>
+
+     <p>See <a href="../cpp/Implementation_002ddefined-behavior.html#Implementation_002ddefined-behavior">Implementation-defined behavior</a>.
+
+     <li><cite>The value of a wide character constant containing more than one
+multibyte character, or containing a multibyte character or escape
+sequence not represented in the extended execution character set (C90
+6.1.3.4, C99 6.4.4.4).</cite>
+
+     <p>See <a href="../cpp/Implementation_002ddefined-behavior.html#Implementation_002ddefined-behavior">Implementation-defined behavior</a>.
+
+     <li><cite>The current locale used to convert a wide character constant consisting
+of a single multibyte character that maps to a member of the extended
+execution character set into a corresponding wide character code (C90
+6.1.3.4, C99 6.4.4.4).</cite>
+
+     <p>See <a href="../cpp/Implementation_002ddefined-behavior.html#Implementation_002ddefined-behavior">Implementation-defined behavior</a>.
+
+     <li><cite>The current locale used to convert a wide string literal into
+corresponding wide character codes (C90 6.1.4, C99 6.4.5).</cite>
+
+     <p>See <a href="../cpp/Implementation_002ddefined-behavior.html#Implementation_002ddefined-behavior">Implementation-defined behavior</a>.
+
+     <li><cite>The value of a string literal containing a multibyte character or escape
+sequence not represented in the execution character set (C90 6.1.4, C99 6.4.5).</cite>
+
+     <p>See <a href="../cpp/Implementation_002ddefined-behavior.html#Implementation_002ddefined-behavior">Implementation-defined behavior</a>. 
+</ul>
+
+ </body></html>
+

@@ -1,0 +1,65 @@
+<html lang="en">
+<head>
+<title>wcscat - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Wchar-strings.html#Wchar-strings" title="Wchar strings">
+<link rel="prev" href="wmemset.html#wmemset" title="wmemset">
+<link rel="next" href="wcschr.html#wcschr" title="wcschr">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="wcscat"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="wcschr.html#wcschr">wcschr</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="wmemset.html#wmemset">wmemset</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Wchar-strings.html#Wchar-strings">Wchar strings</a>
+<hr>
+</div>
+
+<h3 class="section">6.6 <code>wcscat</code>&mdash;concatenate two wide-character strings</h3>
+
+<p><a name="index-wcscat-414"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;wchar.h&gt;
+     wchar_t *wcscat(wchar_t *<var>s1</var>, const wchar_t *<var>s2</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+The <code>wcscat</code> function appends a copy of the wide-character string
+pointed to by <var>s2</var> (including the terminating null wide-character
+code) to the end of the wide-character string pointed to by <var>s1</var>. 
+The initial wide-character code of <var>s2</var> overwrites the null
+wide-character code at the end of <var>s1</var>. If copying takes place between
+objects that overlap, the behaviour is undefined.
+
+   <p><br>
+<strong>Returns</strong><br>
+The <code>wcscat</code> function returns <var>s1</var>;
+no return value is reserved to indicate an error.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>wcscat</code> is ISO/IEC 9899/AMD1:1995 (ISO C).
+
+   <p>No supporting OS subroutines are required.
+
+   <p><br>
+
+   </body></html>
+

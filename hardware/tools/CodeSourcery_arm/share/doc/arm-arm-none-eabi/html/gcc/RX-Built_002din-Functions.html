@@ -1,0 +1,196 @@
+<html lang="en">
+<head>
+<title>RX Built-in Functions - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Target-Builtins.html#Target-Builtins" title="Target Builtins">
+<link rel="prev" href="PowerPC-AltiVec_002fVSX-Built_002din-Functions.html#PowerPC-AltiVec_002fVSX-Built_002din-Functions" title="PowerPC AltiVec/VSX Built-in Functions">
+<link rel="next" href="SPARC-VIS-Built_002din-Functions.html#SPARC-VIS-Built_002din-Functions" title="SPARC VIS Built-in Functions">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="RX-Built-in-Functions"></a>
+<a name="RX-Built_002din-Functions"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="SPARC-VIS-Built_002din-Functions.html#SPARC-VIS-Built_002din-Functions">SPARC VIS Built-in Functions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="PowerPC-AltiVec_002fVSX-Built_002din-Functions.html#PowerPC-AltiVec_002fVSX-Built_002din-Functions">PowerPC AltiVec/VSX Built-in Functions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Target-Builtins.html#Target-Builtins">Target Builtins</a>
+<hr>
+</div>
+
+<h4 class="subsection">6.52.13 RX Built-in Functions</h4>
+
+<p>GCC supports some of the RX instructions which cannot be expressed in
+the C programming language via the use of built-in functions.  The
+following functions are supported:
+
+<div class="defun">
+&mdash; Built-in Function: void <b>__builtin_rx_brk</b> (<var>void</var>)<var><a name="index-g_t_005f_005fbuiltin_005frx_005fbrk-3096"></a></var><br>
+<blockquote><p>Generates the <code>brk</code> machine instruction. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Built-in Function: void <b>__builtin_rx_clrpsw</b> (<var>int</var>)<var><a name="index-g_t_005f_005fbuiltin_005frx_005fclrpsw-3097"></a></var><br>
+<blockquote><p>Generates the <code>clrpsw</code> machine instruction to clear the specified
+bit in the processor status word. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Built-in Function: void <b>__builtin_rx_int</b> (<var>int</var>)<var><a name="index-g_t_005f_005fbuiltin_005frx_005fint-3098"></a></var><br>
+<blockquote><p>Generates the <code>int</code> machine instruction to generate an interrupt
+with the specified value. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Built-in Function: void <b>__builtin_rx_machi</b> (<var>int, int</var>)<var><a name="index-g_t_005f_005fbuiltin_005frx_005fmachi-3099"></a></var><br>
+<blockquote><p>Generates the <code>machi</code> machine instruction to add the result of
+multiplying the top 16-bits of the two arguments into the
+accumulator. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Built-in Function: void <b>__builtin_rx_maclo</b> (<var>int, int</var>)<var><a name="index-g_t_005f_005fbuiltin_005frx_005fmaclo-3100"></a></var><br>
+<blockquote><p>Generates the <code>maclo</code> machine instruction to add the result of
+multiplying the bottom 16-bits of the two arguments into the
+accumulator. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Built-in Function: void <b>__builtin_rx_mulhi</b> (<var>int, int</var>)<var><a name="index-g_t_005f_005fbuiltin_005frx_005fmulhi-3101"></a></var><br>
+<blockquote><p>Generates the <code>mulhi</code> machine instruction to place the result of
+multiplying the top 16-bits of the two arguments into the
+accumulator. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Built-in Function: void <b>__builtin_rx_mullo</b> (<var>int, int</var>)<var><a name="index-g_t_005f_005fbuiltin_005frx_005fmullo-3102"></a></var><br>
+<blockquote><p>Generates the <code>mullo</code> machine instruction to place the result of
+multiplying the bottom 16-bits of the two arguments into the
+accumulator. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Built-in Function: int <b>__builtin_rx_mvfachi</b> (<var>void</var>)<var><a name="index-g_t_005f_005fbuiltin_005frx_005fmvfachi-3103"></a></var><br>
+<blockquote><p>Generates the <code>mvfachi</code> machine instruction to read the top
+32-bits of the accumulator. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Built-in Function: int <b>__builtin_rx_mvfacmi</b> (<var>void</var>)<var><a name="index-g_t_005f_005fbuiltin_005frx_005fmvfacmi-3104"></a></var><br>
+<blockquote><p>Generates the <code>mvfacmi</code> machine instruction to read the middle
+32-bits of the accumulator. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Built-in Function: int <b>__builtin_rx_mvfc</b> (<var>int</var>)<var><a name="index-g_t_005f_005fbuiltin_005frx_005fmvfc-3105"></a></var><br>
+<blockquote><p>Generates the <code>mvfc</code> machine instruction which reads the control
+register specified in its argument and returns its value. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Built-in Function: void <b>__builtin_rx_mvtachi</b> (<var>int</var>)<var><a name="index-g_t_005f_005fbuiltin_005frx_005fmvtachi-3106"></a></var><br>
+<blockquote><p>Generates the <code>mvtachi</code> machine instruction to set the top
+32-bits of the accumulator. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Built-in Function: void <b>__builtin_rx_mvtaclo</b> (<var>int</var>)<var><a name="index-g_t_005f_005fbuiltin_005frx_005fmvtaclo-3107"></a></var><br>
+<blockquote><p>Generates the <code>mvtaclo</code> machine instruction to set the bottom
+32-bits of the accumulator. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Built-in Function: void <b>__builtin_rx_mvtc</b> (<var>int reg, int val</var>)<var><a name="index-g_t_005f_005fbuiltin_005frx_005fmvtc-3108"></a></var><br>
+<blockquote><p>Generates the <code>mvtc</code> machine instruction which sets control
+register number <code>reg</code> to <code>val</code>. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Built-in Function: void <b>__builtin_rx_mvtipl</b> (<var>int</var>)<var><a name="index-g_t_005f_005fbuiltin_005frx_005fmvtipl-3109"></a></var><br>
+<blockquote><p>Generates the <code>mvtipl</code> machine instruction set the interrupt
+priority level. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Built-in Function: void <b>__builtin_rx_racw</b> (<var>int</var>)<var><a name="index-g_t_005f_005fbuiltin_005frx_005fracw-3110"></a></var><br>
+<blockquote><p>Generates the <code>racw</code> machine instruction to round the accumulator
+according to the specified mode. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Built-in Function: int <b>__builtin_rx_revw</b> (<var>int</var>)<var><a name="index-g_t_005f_005fbuiltin_005frx_005frevw-3111"></a></var><br>
+<blockquote><p>Generates the <code>revw</code> machine instruction which swaps the bytes in
+the argument so that bits 0&ndash;7 now occupy bits 8&ndash;15 and vice versa,
+and also bits 16&ndash;23 occupy bits 24&ndash;31 and vice versa. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Built-in Function: void <b>__builtin_rx_rmpa</b> (<var>void</var>)<var><a name="index-g_t_005f_005fbuiltin_005frx_005frmpa-3112"></a></var><br>
+<blockquote><p>Generates the <code>rmpa</code> machine instruction which initiates a
+repeated multiply and accumulate sequence. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Built-in Function: void <b>__builtin_rx_round</b> (<var>float</var>)<var><a name="index-g_t_005f_005fbuiltin_005frx_005fround-3113"></a></var><br>
+<blockquote><p>Generates the <code>round</code> machine instruction which returns the
+floating point argument rounded according to the current rounding mode
+set in the floating point status word register. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Built-in Function: int <b>__builtin_rx_sat</b> (<var>int</var>)<var><a name="index-g_t_005f_005fbuiltin_005frx_005fsat-3114"></a></var><br>
+<blockquote><p>Generates the <code>sat</code> machine instruction which returns the
+saturated value of the argument. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Built-in Function: void <b>__builtin_rx_setpsw</b> (<var>int</var>)<var><a name="index-g_t_005f_005fbuiltin_005frx_005fsetpsw-3115"></a></var><br>
+<blockquote><p>Generates the <code>setpsw</code> machine instruction to set the specified
+bit in the processor status word. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Built-in Function: void <b>__builtin_rx_wait</b> (<var>void</var>)<var><a name="index-g_t_005f_005fbuiltin_005frx_005fwait-3116"></a></var><br>
+<blockquote><p>Generates the <code>wait</code> machine instruction. 
+</p></blockquote></div>
+
+ </body></html>
+

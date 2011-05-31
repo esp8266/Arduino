@@ -1,0 +1,113 @@
+<html lang="en">
+<head>
+<title>Annotations Overview - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Annotations.html#Annotations" title="Annotations">
+<link rel="next" href="Server-Prefix.html#Server-Prefix" title="Server Prefix">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Annotations-Overview"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Server-Prefix.html#Server-Prefix">Server Prefix</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Annotations.html#Annotations">Annotations</a>
+<hr>
+</div>
+
+<h3 class="section">28.1 What is an Annotation?</h3>
+
+<p><a name="index-annotations-2131"></a>
+Annotations start with a newline character, two &lsquo;<samp><span class="samp">control-z</span></samp>&rsquo;
+characters, and the name of the annotation.  If there is no additional
+information associated with this annotation, the name of the annotation
+is followed immediately by a newline.  If there is additional
+information, the name of the annotation is followed by a space, the
+additional information, and a newline.  The additional information
+cannot contain newline characters.
+
+   <p>Any output not beginning with a newline and two &lsquo;<samp><span class="samp">control-z</span></samp>&rsquo;
+characters denotes literal output from <span class="sc">gdb</span>.  Currently there is
+no need for <span class="sc">gdb</span> to output a newline followed by two
+&lsquo;<samp><span class="samp">control-z</span></samp>&rsquo; characters, but if there was such a need, the
+annotations could be extended with an &lsquo;<samp><span class="samp">escape</span></samp>&rsquo; annotation which
+means those three characters as output.
+
+   <p>The annotation <var>level</var>, which is specified using the
+<samp><span class="option">--annotate</span></samp> command line option (see <a href="Mode-Options.html#Mode-Options">Mode Options</a>), controls
+how much information <span class="sc">gdb</span> prints together with its prompt,
+values of expressions, source lines, and other types of output.  Level 0
+is for no annotations, level 1 is for use when <span class="sc">gdb</span> is run as a
+subprocess of <span class="sc">gnu</span> Emacs, level 3 is the maximum annotation suitable
+for programs that control <span class="sc">gdb</span>, and level 2 annotations have
+been made obsolete (see <a href="../annotate/Limitations.html#Limitations">Limitations of the Annotation Interface</a>).
+
+     
+<a name="index-set-annotate-2132"></a>
+<dl><dt><code>set annotate </code><var>level</var><dd>The <span class="sc">gdb</span> command <code>set annotate</code> sets the level of
+annotations to the specified <var>level</var>.
+
+     <br><dt><code>show annotate</code><dd><a name="index-show-annotate-2133"></a>Show the current annotation level. 
+</dl>
+
+   <p>This chapter describes level 3 annotations.
+
+   <p>A simple example of starting up <span class="sc">gdb</span> with annotations is:
+
+<pre class="smallexample">     $ <kbd>gdb --annotate=3</kbd>
+     GNU gdb 6.0
+     Copyright 2003 Free Software Foundation, Inc.
+     GDB is free software, covered by the GNU General Public License,
+     and you are welcome to change it and/or distribute copies of it
+     under certain conditions.
+     Type "show copying" to see the conditions.
+     There is absolutely no warranty for GDB.  Type "show warranty"
+     for details.
+     This GDB was configured as "i386-pc-linux-gnu"
+     
+     ^Z^Zpre-prompt
+     (gdb)
+     ^Z^Zprompt
+     <kbd>quit</kbd>
+     
+     ^Z^Zpost-prompt
+     $
+</pre>
+   <p>Here &lsquo;<samp><span class="samp">quit</span></samp>&rsquo; is input to <span class="sc">gdb</span>; the rest is output from
+<span class="sc">gdb</span>.  The three lines beginning &lsquo;<samp><span class="samp">^Z^Z</span></samp>&rsquo; (where &lsquo;<samp><span class="samp">^Z</span></samp>&rsquo;
+denotes a &lsquo;<samp><span class="samp">control-z</span></samp>&rsquo; character) are annotations; the rest is
+output from <span class="sc">gdb</span>.
+
+   </body></html>
+

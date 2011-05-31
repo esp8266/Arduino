@@ -1,0 +1,175 @@
+<html lang="en">
+<head>
+<title>Name lookup - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C_002b_002b-Misunderstandings.html#C_002b_002b-Misunderstandings" title="C++ Misunderstandings">
+<link rel="prev" href="Static-Definitions.html#Static-Definitions" title="Static Definitions">
+<link rel="next" href="Temporaries.html#Temporaries" title="Temporaries">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Name-lookup"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Temporaries.html#Temporaries">Temporaries</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Static-Definitions.html#Static-Definitions">Static Definitions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C_002b_002b-Misunderstandings.html#C_002b_002b-Misunderstandings">C++ Misunderstandings</a>
+<hr>
+</div>
+
+<h4 class="subsection">11.8.2 Name lookup, templates, and accessing members of base classes</h4>
+
+<p><a name="index-base-class-members-3237"></a><a name="index-two_002dstage-name-lookup-3238"></a><a name="index-dependent-name-lookup-3239"></a>
+The C++ standard prescribes that all names that are not dependent on
+template parameters are bound to their present definitions when parsing
+a template function or class.<a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a>  Only names that are dependent are looked up at the point
+of instantiation.  For example, consider
+
+<pre class="smallexample">       void foo(double);
+     
+       struct A {
+         template &lt;typename T&gt;
+         void f () {
+           foo (1);        // <span class="roman">1</span>
+           int i = N;      // <span class="roman">2</span>
+           T t;
+           t.bar();        // <span class="roman">3</span>
+           foo (t);        // <span class="roman">4</span>
+         }
+     
+         static const int N;
+       };
+</pre>
+ <p>Here, the names <code>foo</code> and <code>N</code> appear in a context that does
+not depend on the type of <code>T</code>.  The compiler will thus require that
+they are defined in the context of use in the template, not only before
+the point of instantiation, and will here use <code>::foo(double)</code> and
+<code>A::N</code>, respectively.  In particular, it will convert the integer
+value to a <code>double</code> when passing it to <code>::foo(double)</code>.
+
+ <p>Conversely, <code>bar</code> and the call to <code>foo</code> in the fourth marked
+line are used in contexts that do depend on the type of <code>T</code>, so
+they are only looked up at the point of instantiation, and you can
+provide declarations for them after declaring the template, but before
+instantiating it.  In particular, if you instantiate <code>A::f&lt;int&gt;</code>,
+the last line will call an overloaded <code>::foo(int)</code> if one was
+provided, even if after the declaration of <code>struct A</code>.
+
+ <p>This distinction between lookup of dependent and non-dependent names is
+called two-stage (or dependent) name lookup.  G++ implements it
+since version 3.4.
+
+ <p>Two-stage name lookup sometimes leads to situations with behavior
+different from non-template codes.  The most common is probably this:
+
+<pre class="smallexample">       template &lt;typename T&gt; struct Base {
+         int i;
+       };
+     
+       template &lt;typename T&gt; struct Derived : public Base&lt;T&gt; {
+         int get_i() { return i; }
+       };
+</pre>
+ <p>In <code>get_i()</code>, <code>i</code> is not used in a dependent context, so the
+compiler will look for a name declared at the enclosing namespace scope
+(which is the global scope here).  It will not look into the base class,
+since that is dependent and you may declare specializations of
+<code>Base</code> even after declaring <code>Derived</code>, so the compiler can't
+really know what <code>i</code> would refer to.  If there is no global
+variable <code>i</code>, then you will get an error message.
+
+ <p>In order to make it clear that you want the member of the base class,
+you need to defer lookup until instantiation time, at which the base
+class is known.  For this, you need to access <code>i</code> in a dependent
+context, by either using <code>this-&gt;i</code> (remember that <code>this</code> is of
+type <code>Derived&lt;T&gt;*</code>, so is obviously dependent), or using
+<code>Base&lt;T&gt;::i</code>.  Alternatively, <code>Base&lt;T&gt;::i</code> might be brought
+into scope by a <code>using</code>-declaration.
+
+ <p>Another, similar example involves calling member functions of a base
+class:
+
+<pre class="smallexample">       template &lt;typename T&gt; struct Base {
+           int f();
+       };
+     
+       template &lt;typename T&gt; struct Derived : Base&lt;T&gt; {
+           int g() { return f(); };
+       };
+</pre>
+ <p>Again, the call to <code>f()</code> is not dependent on template arguments
+(there are no arguments that depend on the type <code>T</code>, and it is also
+not otherwise specified that the call should be in a dependent context). 
+Thus a global declaration of such a function must be available, since
+the one in the base class is not visible until instantiation time.  The
+compiler will consequently produce the following error message:
+
+<pre class="smallexample">       x.cc: In member function `int Derived&lt;T&gt;::g()':
+       x.cc:6: error: there are no arguments to `f' that depend on a template
+          parameter, so a declaration of `f' must be available
+       x.cc:6: error: (if you use `-fpermissive', G++ will accept your code, but
+          allowing the use of an undeclared name is deprecated)
+</pre>
+ <p>To make the code valid either use <code>this-&gt;f()</code>, or
+<code>Base&lt;T&gt;::f()</code>.  Using the <samp><span class="option">-fpermissive</span></samp> flag will also let
+the compiler accept the code, by marking all function calls for which no
+declaration is visible at the time of definition of the template for
+later lookup at instantiation time, as if it were a dependent call. 
+We do not recommend using <samp><span class="option">-fpermissive</span></samp> to work around invalid
+code, and it will also only catch cases where functions in base classes
+are called, not where variables in base classes are used (as in the
+example above).
+
+ <p>Note that some compilers (including G++ versions prior to 3.4) get these
+examples wrong and accept above code without an error.  Those compilers
+do not implement two-stage name lookup correctly.
+
+ <div class="footnote">
+<hr>
+<h4>Footnotes</h4><p class="footnote"><small>[<a name="fn-1" href="#fnd-1">1</a>]</small> The C++ standard just uses the
+term &ldquo;dependent&rdquo; for names that depend on the type or value of
+template parameters.  This shorter term will also be used in the rest of
+this section.</p>
+
+ <hr></div>
+
+ </body></html>
+

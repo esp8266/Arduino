@@ -1,0 +1,122 @@
+<html lang="en">
+<head>
+<title>Modifiers - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Constraints.html#Constraints" title="Constraints">
+<link rel="prev" href="Multi_002dAlternative.html#Multi_002dAlternative" title="Multi-Alternative">
+<link rel="next" href="Machine-Constraints.html#Machine-Constraints" title="Machine Constraints">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Modifiers"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Machine-Constraints.html#Machine-Constraints">Machine Constraints</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Multi_002dAlternative.html#Multi_002dAlternative">Multi-Alternative</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Constraints.html#Constraints">Constraints</a>
+<hr>
+</div>
+
+<h4 class="subsection">6.40.3 Constraint Modifier Characters</h4>
+
+<p><a name="index-modifiers-in-constraints-2572"></a><a name="index-constraint-modifier-characters-2573"></a>
+<!-- prevent bad page break with this line -->
+Here are constraint modifier characters.
+
+     
+<a name="index-g_t_0040samp_007b_003d_007d-in-constraint-2574"></a>
+<dl><dt>&lsquo;<samp><span class="samp">=</span></samp>&rsquo;<dd>Means that this operand is write-only for this instruction: the previous
+value is discarded and replaced by output data.
+
+     <p><a name="index-g_t_0040samp_007b_002b_007d-in-constraint-2575"></a><br><dt>&lsquo;<samp><span class="samp">+</span></samp>&rsquo;<dd>Means that this operand is both read and written by the instruction.
+
+     <p>When the compiler fixes up the operands to satisfy the constraints,
+it needs to know which operands are inputs to the instruction and
+which are outputs from it.  &lsquo;<samp><span class="samp">=</span></samp>&rsquo; identifies an output; &lsquo;<samp><span class="samp">+</span></samp>&rsquo;
+identifies an operand that is both input and output; all other operands
+are assumed to be input only.
+
+     <p>If you specify &lsquo;<samp><span class="samp">=</span></samp>&rsquo; or &lsquo;<samp><span class="samp">+</span></samp>&rsquo; in a constraint, you put it in the
+first character of the constraint string.
+
+     <p><a name="index-g_t_0040samp_007b_0026_007d-in-constraint-2576"></a><a name="index-earlyclobber-operand-2577"></a><br><dt>&lsquo;<samp><span class="samp">&amp;</span></samp>&rsquo;<dd>Means (in a particular alternative) that this operand is an
+<dfn>earlyclobber</dfn> operand, which is modified before the instruction is
+finished using the input operands.  Therefore, this operand may not lie
+in a register that is used as an input operand or as part of any memory
+address.
+
+     <p>&lsquo;<samp><span class="samp">&amp;</span></samp>&rsquo; applies only to the alternative in which it is written.  In
+constraints with multiple alternatives, sometimes one alternative
+requires &lsquo;<samp><span class="samp">&amp;</span></samp>&rsquo; while others do not.  See, for example, the
+&lsquo;<samp><span class="samp">movdf</span></samp>&rsquo; insn of the 68000.
+
+     <p>An input operand can be tied to an earlyclobber operand if its only
+use as an input occurs before the early result is written.  Adding
+alternatives of this form often allows GCC to produce better code
+when only some of the inputs can be affected by the earlyclobber. 
+See, for example, the &lsquo;<samp><span class="samp">mulsi3</span></samp>&rsquo; insn of the ARM.
+
+     <p>&lsquo;<samp><span class="samp">&amp;</span></samp>&rsquo; does not obviate the need to write &lsquo;<samp><span class="samp">=</span></samp>&rsquo;.
+
+     <p><a name="index-g_t_0040samp_007b_0025_007d-in-constraint-2578"></a><br><dt>&lsquo;<samp><span class="samp">%</span></samp>&rsquo;<dd>Declares the instruction to be commutative for this operand and the
+following operand.  This means that the compiler may interchange the
+two operands if that is the cheapest way to make all operands fit the
+constraints. 
+GCC can only handle one commutative pair in an asm; if you use more,
+the compiler may fail.  Note that you need not use the modifier if
+the two alternatives are strictly identical; this would only waste
+time in the reload pass.  The modifier is not operational after
+register allocation, so the result of <code>define_peephole2</code>
+and <code>define_split</code>s performed after reload cannot rely on
+&lsquo;<samp><span class="samp">%</span></samp>&rsquo; to make the intended insn match.
+
+     <p><a name="index-g_t_0040samp_007b_0023_007d-in-constraint-2579"></a><br><dt>&lsquo;<samp><span class="samp">#</span></samp>&rsquo;<dd>Says that all following characters, up to the next comma, are to be
+ignored as a constraint.  They are significant only for choosing
+register preferences.
+
+     <p><a name="index-g_t_0040samp_007b_002a_007d-in-constraint-2580"></a><br><dt>&lsquo;<samp><span class="samp">*</span></samp>&rsquo;<dd>Says that the following character should be ignored when choosing
+register preferences.  &lsquo;<samp><span class="samp">*</span></samp>&rsquo; has no effect on the meaning of the
+constraint as a constraint, and no effect on reloading.
+
+ </dl>
+
+ </body></html>
+

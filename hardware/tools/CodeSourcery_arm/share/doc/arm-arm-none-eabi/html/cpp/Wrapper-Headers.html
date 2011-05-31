@@ -1,0 +1,108 @@
+<html lang="en">
+<head>
+<title>Wrapper Headers - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Header-Files.html#Header-Files" title="Header Files">
+<link rel="prev" href="Computed-Includes.html#Computed-Includes" title="Computed Includes">
+<link rel="next" href="System-Headers.html#System-Headers" title="System Headers">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Wrapper-Headers"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="System-Headers.html#System-Headers">System Headers</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Computed-Includes.html#Computed-Includes">Computed Includes</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Header-Files.html#Header-Files">Header Files</a>
+<hr>
+</div>
+
+<h3 class="section">2.7 Wrapper Headers</h3>
+
+<p><a name="index-wrapper-headers-36"></a><a name="index-overriding-a-header-file-37"></a><a name="index-g_t_0023include_005fnext-38"></a>
+Sometimes it is necessary to adjust the contents of a system-provided
+header file without editing it directly.  GCC's <samp><span class="command">fixincludes</span></samp>
+operation does this, for example.  One way to do that would be to create
+a new header file with the same name and insert it in the search path
+before the original header.  That works fine as long as you're willing
+to replace the old header entirely.  But what if you want to refer to
+the old header from the new one?
+
+   <p>You cannot simply include the old header with &lsquo;<samp><span class="samp">#include</span></samp>&rsquo;.  That
+will start from the beginning, and find your new header again.  If your
+header is not protected from multiple inclusion (see <a href="Once_002dOnly-Headers.html#Once_002dOnly-Headers">Once-Only Headers</a>), it will recurse infinitely and cause a fatal error.
+
+   <p>You could include the old header with an absolute pathname:
+<pre class="smallexample">     #include "/usr/include/old-header.h"
+</pre>
+   <p class="noindent">This works, but is not clean; should the system headers ever move, you
+would have to edit the new headers to match.
+
+   <p>There is no way to solve this problem within the C standard, but you can
+use the GNU extension &lsquo;<samp><span class="samp">#include_next</span></samp>&rsquo;.  It means, &ldquo;Include the
+<em>next</em> file with this name&rdquo;.  This directive works like
+&lsquo;<samp><span class="samp">#include</span></samp>&rsquo; except in searching for the specified file: it starts
+searching the list of header file directories <em>after</em> the directory
+in which the current file was found.
+
+   <p>Suppose you specify <samp><span class="option">-I /usr/local/include</span></samp>, and the list of
+directories to search also includes <samp><span class="file">/usr/include</span></samp>; and suppose
+both directories contain <samp><span class="file">signal.h</span></samp>.  Ordinary <code>#include&nbsp;&lt;signal.h&gt;<!-- /@w --></code> finds the file under <samp><span class="file">/usr/local/include</span></samp>.  If that
+file contains <code>#include_next&nbsp;&lt;signal.h&gt;<!-- /@w --></code>, it starts searching
+after that directory, and finds the file in <samp><span class="file">/usr/include</span></samp>.
+
+   <p>&lsquo;<samp><span class="samp">#include_next</span></samp>&rsquo; does not distinguish between <code>&lt;</code><var>file</var><code>&gt;</code>
+and <code>"</code><var>file</var><code>"</code> inclusion, nor does it check that the file you
+specify has the same name as the current file.  It simply looks for the
+file named, starting with the directory in the search path after the one
+where the current file was found.
+
+   <p>The use of &lsquo;<samp><span class="samp">#include_next</span></samp>&rsquo; can lead to great confusion.  We
+recommend it be used only when there is no other alternative.  In
+particular, it should not be used in the headers belonging to a specific
+program; it should be used only to make global corrections along the
+lines of <samp><span class="command">fixincludes</span></samp>.
+
+   </body></html>
+

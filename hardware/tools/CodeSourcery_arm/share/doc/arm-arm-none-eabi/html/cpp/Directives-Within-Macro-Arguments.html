@@ -1,0 +1,99 @@
+<html lang="en">
+<head>
+<title>Directives Within Macro Arguments - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Macros.html#Macros" title="Macros">
+<link rel="prev" href="Undefining-and-Redefining-Macros.html#Undefining-and-Redefining-Macros" title="Undefining and Redefining Macros">
+<link rel="next" href="Macro-Pitfalls.html#Macro-Pitfalls" title="Macro Pitfalls">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Directives-Within-Macro-Arguments"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Macro-Pitfalls.html#Macro-Pitfalls">Macro Pitfalls</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Undefining-and-Redefining-Macros.html#Undefining-and-Redefining-Macros">Undefining and Redefining Macros</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Macros.html#Macros">Macros</a>
+<hr>
+</div>
+
+<h3 class="section">3.9 Directives Within Macro Arguments</h3>
+
+<p><a name="index-macro-arguments-and-directives-71"></a>
+Occasionally it is convenient to use preprocessor directives within
+the arguments of a macro.  The C and C++ standards declare that
+behavior in these cases is undefined.
+
+   <p>Versions of CPP prior to 3.2 would reject such constructs with an
+error message.  This was the only syntactic difference between normal
+functions and function-like macros, so it seemed attractive to remove
+this limitation, and people would often be surprised that they could
+not use macros in this way.  Moreover, sometimes people would use
+conditional compilation in the argument list to a normal library
+function like &lsquo;<samp><span class="samp">printf</span></samp>&rsquo;, only to find that after a library upgrade
+&lsquo;<samp><span class="samp">printf</span></samp>&rsquo; had changed to be a function-like macro, and their code
+would no longer compile.  So from version 3.2 we changed CPP to
+successfully process arbitrary directives within macro arguments in
+exactly the same way as it would have processed the directive were the
+function-like macro invocation not present.
+
+   <p>If, within a macro invocation, that macro is redefined, then the new
+definition takes effect in time for argument pre-expansion, but the
+original definition is still used for argument replacement.  Here is a
+pathological example:
+
+<pre class="smallexample">     #define f(x) x x
+     f (1
+     #undef f
+     #define f 2
+     f)
+</pre>
+   <p class="noindent">which expands to
+
+<pre class="smallexample">     1 2 1 2
+</pre>
+   <p class="noindent">with the semantics described above.
+
+   </body></html>
+

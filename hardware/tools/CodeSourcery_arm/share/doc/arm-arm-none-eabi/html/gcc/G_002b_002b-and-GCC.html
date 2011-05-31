@@ -1,0 +1,103 @@
+<html lang="en">
+<head>
+<title>G++ and GCC - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="index.html#Top" title="Top">
+<link rel="next" href="Standards.html#Standards" title="Standards">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<h1 class="settitle">Using the GNU Compiler Collection (GCC)</h1>
+<div class="node">
+<a name="G++-and-GCC"></a>
+<a name="G_002b_002b-and-GCC"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Standards.html#Standards">Standards</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="index.html#Top">Top</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">1 Programming Languages Supported by GCC</h2>
+
+<p><a name="index-GCC-2"></a><a name="index-GNU-Compiler-Collection-3"></a><a name="index-GNU-C-Compiler-4"></a><a name="index-Ada-5"></a><a name="index-Fortran-6"></a><a name="index-Java-7"></a><a name="index-Objective_002dC-8"></a><a name="index-Objective_002dC_002b_002b-9"></a>GCC stands for &ldquo;GNU Compiler Collection&rdquo;.  GCC is an integrated
+distribution of compilers for several major programming languages.  These
+languages currently include C, C++, Objective-C, Objective-C++, Java,
+Fortran, and Ada.
+
+ <p>The abbreviation <dfn>GCC</dfn> has multiple meanings in common use.  The
+current official meaning is &ldquo;GNU Compiler Collection&rdquo;, which refers
+generically to the complete suite of tools.  The name historically stood
+for &ldquo;GNU C Compiler&rdquo;, and this usage is still common when the emphasis
+is on compiling C programs.  Finally, the name is also used when speaking
+of the <dfn>language-independent</dfn> component of GCC: code shared among the
+compilers for all supported languages.
+
+ <p>The language-independent component of GCC includes the majority of the
+optimizers, as well as the &ldquo;back ends&rdquo; that generate machine code for
+various processors.
+
+ <p><a name="index-COBOL-10"></a><a name="index-Mercury-11"></a><a name="index-Pascal-12"></a>The part of a compiler that is specific to a particular language is
+called the &ldquo;front end&rdquo;.  In addition to the front ends that are
+integrated components of GCC, there are several other front ends that
+are maintained separately.  These support languages such as Pascal,
+Mercury, and COBOL.  To use these, they must be built together with
+GCC proper.
+
+ <p><a name="index-C_002b_002b-13"></a><a name="index-G_002b_002b-14"></a><a name="index-Ada-15"></a><a name="index-GNAT-16"></a>Most of the compilers for languages other than C have their own names. 
+The C++ compiler is G++, the Ada compiler is GNAT, and so on.  When we
+talk about compiling one of those languages, we might refer to that
+compiler by its own name, or as GCC.  Either is correct.
+
+ <p><a name="index-compiler-compared-to-C_002b_002b-preprocessor-17"></a><a name="index-intermediate-C-version_002c-nonexistent-18"></a><a name="index-C-intermediate-output_002c-nonexistent-19"></a>Historically, compilers for many languages, including C++ and Fortran,
+have been implemented as &ldquo;preprocessors&rdquo; which emit another high
+level language such as C.  None of the compilers included in GCC are
+implemented this way; they all generate machine code directly.  This
+sort of preprocessor should not be confused with the <dfn>C
+preprocessor</dfn>, which is an integral feature of the C, C++, Objective-C
+and Objective-C++ languages.
+
+<!-- Copyright (C) 2000, 2001, 2002, 2004, 2006, 2007, 2008, 2010 -->
+<!-- Free Software Foundation, Inc. -->
+<!-- This is part of the GCC manual. -->
+<!-- For copying conditions, see the file gcc.texi. -->
+ </body></html>
+

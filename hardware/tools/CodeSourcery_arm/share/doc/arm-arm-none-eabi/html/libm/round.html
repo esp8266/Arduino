@@ -1,0 +1,68 @@
+<html lang="en">
+<head>
+<title>round - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Math.html#Math" title="Math">
+<link rel="prev" href="rint.html#rint" title="rint">
+<link rel="next" href="scalbn.html#scalbn" title="scalbn">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="round"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="scalbn.html#scalbn">scalbn</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="rint.html#rint">rint</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Math.html#Math">Math</a>
+<hr>
+</div>
+
+<h3 class="section">1.49 <code>round</code>, <code>roundf</code>&ndash;round to integer, to nearest</h3>
+
+<p><a name="index-round-133"></a><a name="index-roundf-134"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double round(double <var>x</var>);
+     float roundf(float <var>x</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+The <code>round</code> functions round their argument to the nearest integer
+value in floating-point format, rounding halfway cases away from zero,
+regardless of the current rounding direction.  (While the "inexact"
+floating-point exception behavior is unspecified by the C standard, the
+<code>round</code> functions are written so that "inexact" is not raised if the
+result does not equal the argument, which behavior is as recommended by
+IEEE 754 for its related functions.)
+
+   <p><br>
+<strong>Returns</strong><br>
+<var>x</var> rounded to an integral value.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C, POSIX
+
+   <p><br>
+<strong>See Also</strong><br>
+<code>nearbyint</code>, <code>rint</code>
+
+   <p><br>
+
+   </body></html>
+

@@ -1,0 +1,520 @@
+<html lang="en">
+<head>
+<title>Files - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="GDB-Files.html#GDB-Files" title="GDB Files">
+<link rel="next" href="Separate-Debug-Files.html#Separate-Debug-Files" title="Separate Debug Files">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Files"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Separate-Debug-Files.html#Separate-Debug-Files">Separate Debug Files</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="GDB-Files.html#GDB-Files">GDB Files</a>
+<hr>
+</div>
+
+<h3 class="section">18.1 Commands to Specify Files</h3>
+
+<p><a name="index-symbol-table-950"></a><a name="index-core-dump-file-951"></a>
+You may want to specify executable and core dump file names.  The usual
+way to do this is at start-up time, using the arguments to
+<span class="sc">gdb</span>'s start-up commands (see <a href="Invocation.html#Invocation">Getting In and Out of <span class="sc">gdb</span></a>).
+
+   <p>Occasionally it is necessary to change to a different file during a
+<span class="sc">gdb</span> session.  Or you may run <span class="sc">gdb</span> and forget to
+specify a file you want to use.  Or you are debugging a remote target
+via <code>gdbserver</code> (see <a href="Server.html#Server">file</a>).  In these situations the <span class="sc">gdb</span> commands to specify
+new files are useful.
+
+     
+<a name="index-executable-file-952"></a>
+<a name="index-file-953"></a>
+<dl><dt><code>file </code><var>filename</var><dd>Use <var>filename</var> as the program to be debugged.  It is read for its
+symbols and for the contents of pure memory.  It is also the program
+executed when you use the <code>run</code> command.  If you do not specify a
+directory and the file is not found in the <span class="sc">gdb</span> working directory,
+<span class="sc">gdb</span> uses the environment variable <code>PATH</code> as a list of
+directories to search, just as the shell does when looking for a program
+to run.  You can change the value of this variable, for both <span class="sc">gdb</span>
+and your program, using the <code>path</code> command.
+
+     <p><a name="index-unlinked-object-files-954"></a><a name="index-patching-object-files-955"></a>You can load unlinked object <samp><span class="file">.o</span></samp> files into <span class="sc">gdb</span> using
+the <code>file</code> command.  You will not be able to &ldquo;run&rdquo; an object
+file, but you can disassemble functions and inspect variables.  Also,
+if the underlying BFD functionality supports it, you could use
+<kbd>gdb -write</kbd> to patch object files using this technique.  Note
+that <span class="sc">gdb</span> can neither interpret nor modify relocations in this
+case, so branches and some initialized variables will appear to go to
+the wrong place.  But this feature is still handy from time to time.
+
+     <br><dt><code>file</code><dd><code>file</code> with no argument makes <span class="sc">gdb</span> discard any information it
+has on both executable file and the symbol table.
+
+     <p><a name="index-exec_002dfile-956"></a><br><dt><code>exec-file </code><span class="roman">[</span> <var>filename</var> <span class="roman">]</span><dd>Specify that the program to be run (but not the symbol table) is found
+in <var>filename</var>.  <span class="sc">gdb</span> searches the environment variable <code>PATH</code>
+if necessary to locate your program.  Omitting <var>filename</var> means to
+discard information on the executable file.
+
+     <p><a name="index-symbol_002dfile-957"></a><br><dt><code>symbol-file </code><span class="roman">[</span> <var>filename</var> <span class="roman">]</span><dd>Read symbol table information from file <var>filename</var>.  <code>PATH</code> is
+searched when necessary.  Use the <code>file</code> command to get both symbol
+table and program to run from the same file.
+
+     <p><code>symbol-file</code> with no argument clears out <span class="sc">gdb</span> information on your
+program's symbol table.
+
+     <p>The <code>symbol-file</code> command causes <span class="sc">gdb</span> to forget the contents of
+some breakpoints and auto-display expressions.  This is because they may
+contain pointers to the internal data recording symbols and data types,
+which are part of the old symbol table data being discarded inside
+<span class="sc">gdb</span>.
+
+     <p><code>symbol-file</code> does not repeat if you press &lt;RET&gt; again after
+executing it once.
+
+     <p>When <span class="sc">gdb</span> is configured for a particular environment, it
+understands debugging information in whatever format is the standard
+generated for that environment; you may use either a <span class="sc">gnu</span> compiler, or
+other compilers that adhere to the local conventions. 
+Best results are usually obtained from <span class="sc">gnu</span> compilers; for example,
+using <span class="sc">gcc</span> you can generate debugging information for
+optimized code.
+
+     <p>For most kinds of object files, with the exception of old SVR3 systems
+using COFF, the <code>symbol-file</code> command does not normally read the
+symbol table in full right away.  Instead, it scans the symbol table
+quickly to find which source files and which symbols are present.  The
+details are read later, one source file at a time, as they are needed.
+
+     <p>The purpose of this two-stage reading strategy is to make <span class="sc">gdb</span>
+start up faster.  For the most part, it is invisible except for
+occasional pauses while the symbol table details for a particular source
+file are being read.  (The <code>set verbose</code> command can turn these
+pauses into messages if desired.  See <a href="Messages_002fWarnings.html#Messages_002fWarnings">Optional Warnings and Messages</a>.)
+
+     <p>We have not implemented the two-stage strategy for COFF yet.  When the
+symbol table is stored in COFF format, <code>symbol-file</code> reads the
+symbol table data in full right away.  Note that &ldquo;stabs-in-COFF&rdquo;
+still does the two-stage strategy, since the debug info is actually
+in stabs format.
+
+     <p><a name="index-readnow-958"></a><a name="index-reading-symbols-immediately-959"></a><a name="index-symbols_002c-reading-immediately-960"></a><br><dt><code>symbol-file </code><span class="roman">[</span><code> -readnow </code><span class="roman">]</span> <var>filename</var><dt><code>file </code><span class="roman">[</span><code> -readnow </code><span class="roman">]</span> <var>filename</var><dd>You can override the <span class="sc">gdb</span> two-stage strategy for reading symbol
+tables by using the &lsquo;<samp><span class="samp">-readnow</span></samp>&rsquo; option with any of the commands that
+load symbol table information, if you want to be sure <span class="sc">gdb</span> has the
+entire symbol table available.
+
+     <!-- FIXME: for now no mention of directories, since this seems to be in -->
+     <!-- flux.  13mar1992 status is that in theory GDB would look either in -->
+     <!-- current dir or in same dir as myprog; but issues like competing -->
+     <!-- GDB's, or clutter in system dirs, mean that in practice right now -->
+     <!-- only current dir is used.  FFish says maybe a special GDB hierarchy -->
+     <!-- (eg rooted in val of env var GDBSYMS) could exist for mappable symbol -->
+     <!-- files. -->
+     <p><a name="index-core_002dfile-961"></a><br><dt><code>core-file </code><span class="roman">[</span><var>filename</var><span class="roman">]</span><dt><code>core</code><dd>Specify the whereabouts of a core dump file to be used as the &ldquo;contents
+of memory&rdquo;.  Traditionally, core files contain only some parts of the
+address space of the process that generated them; <span class="sc">gdb</span> can access the
+executable file itself for other parts.
+
+     <p><code>core-file</code> with no argument specifies that no core file is
+to be used.
+
+     <p>Note that the core file is ignored when your program is actually running
+under <span class="sc">gdb</span>.  So, if you have been running your program and you
+wish to debug a core file instead, you must kill the subprocess in which
+the program is running.  To do this, use the <code>kill</code> command
+(see <a href="Kill-Process.html#Kill-Process">Killing the Child Process</a>).
+
+     <p><a name="index-add_002dsymbol_002dfile-962"></a><a name="index-dynamic-linking-963"></a><br><dt><code>add-symbol-file </code><var>filename</var> <var>address</var><dt><code>add-symbol-file </code><var>filename</var> <var>address</var> <span class="roman">[</span><code> -readnow </code><span class="roman">]</span><dt><code>add-symbol-file </code><var>filename</var> <span class="roman">-s</span><var>section</var> <var>address</var><code> ...</code><dd>The <code>add-symbol-file</code> command reads additional symbol table
+information from the file <var>filename</var>.  You would use this command
+when <var>filename</var> has been dynamically loaded (by some other means)
+into the program that is running.  <var>address</var> should be the memory
+address at which the file has been loaded; <span class="sc">gdb</span> cannot figure
+this out for itself.  You can additionally specify an arbitrary number
+of &lsquo;<samp><span class="samp">-s</span><var>section</var> <var>address</var></samp>&rsquo; pairs, to give an explicit
+section name and base address for that section.  You can specify any
+<var>address</var> as an expression.
+
+     <p>The symbol table of the file <var>filename</var> is added to the symbol table
+originally read with the <code>symbol-file</code> command.  You can use the
+<code>add-symbol-file</code> command any number of times; the new symbol data
+thus read keeps adding to the old.  To discard all old symbol data
+instead, use the <code>symbol-file</code> command without any arguments.
+
+     <p><a name="index-relocatable-object-files_002c-reading-symbols-from-964"></a><a name="index-object-files_002c-relocatable_002c-reading-symbols-from-965"></a><a name="index-reading-symbols-from-relocatable-object-files-966"></a><a name="index-symbols_002c-reading-from-relocatable-object-files-967"></a><a name="index-g_t_0040file_007b_002eo_007d-files_002c-reading-symbols-from-968"></a>Although <var>filename</var> is typically a shared library file, an
+executable file, or some other object file which has been fully
+relocated for loading into a process, you can also load symbolic
+information from relocatable <samp><span class="file">.o</span></samp> files, as long as:
+
+          <ul>
+<li>the file's symbolic information refers only to linker symbols defined in
+that file, not to symbols defined by other object files,
+<li>every section the file's symbolic information refers to has actually
+been loaded into the inferior, as it appears in the file, and
+<li>you can determine the address at which every section was loaded, and
+provide these to the <code>add-symbol-file</code> command. 
+</ul>
+
+     <p class="noindent">Some embedded operating systems, like Sun Chorus and VxWorks, can load
+relocatable files into an already running program; such systems
+typically make the requirements above easy to meet.  However, it's
+important to recognize that many native systems use complex link
+procedures (<code>.linkonce</code> section factoring and C<tt>++</tt> constructor table
+assembly, for example) that make the requirements difficult to meet.  In
+general, one cannot assume that using <code>add-symbol-file</code> to read a
+relocatable object file's symbolic information will have the same effect
+as linking the relocatable object file into the program in the normal
+way.
+
+     <p><code>add-symbol-file</code> does not repeat if you press &lt;RET&gt; after using it.
+
+     <p><a name="index-add_002dsymbol_002dfile_002dfrom_002dmemory-969"></a><a name="index-g_t_0040code_007bsyscall-DSO_007d-970"></a><a name="index-load-symbols-from-memory-971"></a><br><dt><code>add-symbol-file-from-memory </code><var>address</var><dd>Load symbols from the given <var>address</var> in a dynamically loaded
+object file whose image is mapped directly into the inferior's memory. 
+For example, the Linux kernel maps a <code>syscall DSO</code> into each
+process's address space; this DSO provides kernel-specific code for
+some system calls.  The argument can be any expression whose
+evaluation yields the address of the file's shared object file header. 
+For this command to work, you must have used <code>symbol-file</code> or
+<code>exec-file</code> commands in advance.
+
+     <p><a name="index-add_002dshared_002dsymbol_002dfiles-972"></a><a name="index-assf-973"></a><br><dt><code>add-shared-symbol-files </code><var>library-file</var><dt><code>assf </code><var>library-file</var><dd>The <code>add-shared-symbol-files</code> command can currently be used only
+in the Cygwin build of <span class="sc">gdb</span> on MS-Windows OS, where it is an
+alias for the <code>dll-symbols</code> command (see <a href="Cygwin-Native.html#Cygwin-Native">Cygwin Native</a>). 
+<span class="sc">gdb</span> automatically looks for shared libraries, however if
+<span class="sc">gdb</span> does not find yours, you can invoke
+<code>add-shared-symbol-files</code>.  It takes one argument: the shared
+library's file name.  <code>assf</code> is a shorthand alias for
+<code>add-shared-symbol-files</code>.
+
+     <p><a name="index-section-974"></a><br><dt><code>section </code><var>section</var> <var>addr</var><dd>The <code>section</code> command changes the base address of the named
+<var>section</var> of the exec file to <var>addr</var>.  This can be used if the
+exec file does not contain section addresses, (such as in the
+<code>a.out</code> format), or when the addresses specified in the file
+itself are wrong.  Each section must be changed separately.  The
+<code>info files</code> command, described below, lists all the sections and
+their addresses.
+
+     <p><a name="index-info-files-975"></a><a name="index-info-target-976"></a><br><dt><code>info files</code><dt><code>info target</code><dd><code>info files</code> and <code>info target</code> are synonymous; both print the
+current target (see <a href="Targets.html#Targets">Specifying a Debugging Target</a>),
+including the names of the executable and core dump files currently in
+use by <span class="sc">gdb</span>, and the files from which symbols were loaded.  The
+command <code>help target</code> lists all possible targets rather than
+current ones.
+
+     <p><a name="index-maint-info-sections-977"></a><br><dt><code>maint info sections</code><dd>Another command that can give you extra information about program sections
+is <code>maint info sections</code>.  In addition to the section information
+displayed by <code>info files</code>, this command displays the flags and file
+offset of each section in the executable and core dump files.  In addition,
+<code>maint info sections</code> provides the following command options (which
+may be arbitrarily combined):
+
+          <dl>
+<dt><code>ALLOBJ</code><dd>Display sections for all loaded object files, including shared libraries. 
+<br><dt><var>sections</var><dd>Display info only for named <var>sections</var>. 
+<br><dt><var>section-flags</var><dd>Display info only for sections for which <var>section-flags</var> are true. 
+The section flags that <span class="sc">gdb</span> currently knows about are:
+               <dl>
+<dt><code>ALLOC</code><dd>Section will have space allocated in the process when loaded. 
+Set for all sections except those containing debug information. 
+<br><dt><code>LOAD</code><dd>Section will be loaded from the file into the child process memory. 
+Set for pre-initialized code and data, clear for <code>.bss</code> sections. 
+<br><dt><code>RELOC</code><dd>Section needs to be relocated before loading. 
+<br><dt><code>READONLY</code><dd>Section cannot be modified by the child process. 
+<br><dt><code>CODE</code><dd>Section contains executable code only. 
+<br><dt><code>DATA</code><dd>Section contains data only (no executable code). 
+<br><dt><code>ROM</code><dd>Section will reside in ROM. 
+<br><dt><code>CONSTRUCTOR</code><dd>Section contains data for constructor/destructor lists. 
+<br><dt><code>HAS_CONTENTS</code><dd>Section is not empty. 
+<br><dt><code>NEVER_LOAD</code><dd>An instruction to the linker to not output the section. 
+<br><dt><code>COFF_SHARED_LIBRARY</code><dd>A notification to the linker that the section contains
+COFF shared library information. 
+<br><dt><code>IS_COMMON</code><dd>Section contains common symbols. 
+</dl>
+          </dl>
+     <a name="index-set-trust_002dreadonly_002dsections-978"></a><a name="index-read_002donly-sections-979"></a><br><dt><code>set trust-readonly-sections on</code><dd>Tell <span class="sc">gdb</span> that readonly sections in your object file
+really are read-only (i.e. that their contents will not change). 
+In that case, <span class="sc">gdb</span> can fetch values from these sections
+out of the object file, rather than from the target program. 
+For some targets (notably embedded ones), this can be a significant
+enhancement to debugging performance.
+
+     <p>The default is off.
+
+     <br><dt><code>set trust-readonly-sections off</code><dd>Tell <span class="sc">gdb</span> not to trust readonly sections.  This means that
+the contents of the section might change while the program is running,
+and must therefore be fetched from the target when needed.
+
+     <br><dt><code>show trust-readonly-sections</code><dd>Show the current setting of trusting readonly sections. 
+</dl>
+
+   <p>All file-specifying commands allow both absolute and relative file names
+as arguments.  <span class="sc">gdb</span> always converts the file name to an absolute file
+name and remembers it that way.
+
+   <p><a name="index-shared-libraries-980"></a><a name="Shared-Libraries"></a><span class="sc">gdb</span> supports <span class="sc">gnu</span>/Linux, MS-Windows, HP-UX, SunOS, SVr4, Irix,
+and IBM RS/6000 AIX shared libraries.
+
+   <p>On MS-Windows <span class="sc">gdb</span> must be linked with the Expat library to support
+shared libraries.  See <a href="Expat.html#Expat">Expat</a>.
+
+   <p><span class="sc">gdb</span> automatically loads symbol definitions from shared libraries
+when you use the <code>run</code> command, or when you examine a core file. 
+(Before you issue the <code>run</code> command, <span class="sc">gdb</span> does not understand
+references to a function in a shared library, however&mdash;unless you are
+debugging a core file).
+
+   <p>On HP-UX, if the program loads a library explicitly, <span class="sc">gdb</span>
+automatically loads the symbols at the time of the <code>shl_load</code> call.
+
+<!-- FIXME: some @value{GDBN} release may permit some refs to undef -->
+<!-- FIXME...symbols-eg in a break cmd-assuming they are from a shared -->
+<!-- FIXME...lib; check this from time to time when updating manual -->
+   <p>There are times, however, when you may wish to not automatically load
+symbol definitions from shared libraries, such as when they are
+particularly large or there are many of them.
+
+   <p>To control the automatic loading of shared library symbols, use the
+commands:
+
+     
+<a name="index-set-auto_002dsolib_002dadd-981"></a>
+<dl><dt><code>set auto-solib-add </code><var>mode</var><dd>If <var>mode</var> is <code>on</code>, symbols from all shared object libraries
+will be loaded automatically when the inferior begins execution, you
+attach to an independently started inferior, or when the dynamic linker
+informs <span class="sc">gdb</span> that a new library has been loaded.  If <var>mode</var>
+is <code>off</code>, symbols must be loaded manually, using the
+<code>sharedlibrary</code> command.  The default value is <code>on</code>.
+
+     <p><a name="index-memory-used-for-symbol-tables-982"></a>If your program uses lots of shared libraries with debug info that
+takes large amounts of memory, you can decrease the <span class="sc">gdb</span>
+memory footprint by preventing it from automatically loading the
+symbols from shared libraries.  To that end, type <kbd>set
+auto-solib-add off</kbd> before running the inferior, then load each
+library whose debug symbols you do need with <kbd>sharedlibrary
+</kbd><var>regexp</var>, where <var>regexp</var> is a regular expression that matches
+the libraries whose symbols you want to be loaded.
+
+     <p><a name="index-show-auto_002dsolib_002dadd-983"></a><br><dt><code>show auto-solib-add</code><dd>Display the current autoloading mode. 
+</dl>
+
+   <p><a name="index-load-shared-library-984"></a>To explicitly load shared library symbols, use the <code>sharedlibrary</code>
+command:
+
+     
+<a name="index-info-sharedlibrary-985"></a>
+<a name="index-info-share-986"></a>
+<dl><dt><code>info share </code><var>regex</var><dt><code>info sharedlibrary </code><var>regex</var><dd>Print the names of the shared libraries which are currently loaded
+that match <var>regex</var>.  If <var>regex</var> is omitted then print
+all shared libraries that are loaded.
+
+     <p><a name="index-sharedlibrary-987"></a><a name="index-share-988"></a><br><dt><code>sharedlibrary </code><var>regex</var><dt><code>share </code><var>regex</var><dd>Load shared object library symbols for files matching a
+Unix regular expression. 
+As with files loaded automatically, it only loads shared libraries
+required by your program for a core file or after typing <code>run</code>.  If
+<var>regex</var> is omitted all shared libraries required by your program are
+loaded.
+
+     <br><dt><code>nosharedlibrary</code><dd><a name="index-nosharedlibrary-989"></a><a name="index-unload-symbols-from-shared-libraries-990"></a>Unload all shared object library symbols.  This discards all symbols
+that have been loaded from all shared libraries.  Symbols from shared
+libraries that were loaded by explicit user requests are not
+discarded. 
+</dl>
+
+   <p>Sometimes you may wish that <span class="sc">gdb</span> stops and gives you control
+when any of shared library events happen.  Use the <code>set
+stop-on-solib-events</code> command for this:
+
+     <dl>
+<dt><code>set stop-on-solib-events</code><dd><a name="index-set-stop_002don_002dsolib_002devents-991"></a>This command controls whether <span class="sc">gdb</span> should give you control
+when the dynamic linker notifies it about some shared library event. 
+The most common event of interest is loading or unloading of a new
+shared library.
+
+     <br><dt><code>show stop-on-solib-events</code><dd><a name="index-show-stop_002don_002dsolib_002devents-992"></a>Show whether <span class="sc">gdb</span> stops and gives you control when shared
+library events happen. 
+</dl>
+
+   <p>Shared libraries are also supported in many cross or remote debugging
+configurations.  <span class="sc">gdb</span> needs to have access to the target's libraries;
+this can be accomplished either by providing copies of the libraries
+on the host system, or by asking <span class="sc">gdb</span> to automatically retrieve the
+libraries from the target.  If copies of the target libraries are
+provided, they need to be the same as the target libraries, although the
+copies on the target can be stripped as long as the copies on the host are
+not.
+
+   <p><a name="index-where-to-look-for-shared-libraries-993"></a>For remote debugging, you need to tell <span class="sc">gdb</span> where the target
+libraries are, so that it can load the correct copies&mdash;otherwise, it
+may try to load the host's libraries.  <span class="sc">gdb</span> has two variables
+to specify the search directories for target libraries.
+
+     
+<a name="index-prefix-for-shared-library-file-names-994"></a>
+<a name="index-system-root_002c-alternate-995"></a>
+<a name="index-set-solib_002dabsolute_002dprefix-996"></a>
+<a name="index-set-sysroot-997"></a>
+<dl><dt><code>set sysroot </code><var>path</var><dd>Use <var>path</var> as the system root for the program being debugged.  Any
+absolute shared library paths will be prefixed with <var>path</var>; many
+runtime loaders store the absolute paths to the shared library in the
+target program's memory.  If you use <code>set sysroot</code> to find shared
+libraries, they need to be laid out in the same way that they are on
+the target, with e.g. a <samp><span class="file">/lib</span></samp> and <samp><span class="file">/usr/lib</span></samp> hierarchy
+under <var>path</var>.
+
+     <p>If <var>path</var> starts with the sequence <samp><span class="file">remote:</span></samp>, <span class="sc">gdb</span> will
+retrieve the target libraries from the remote system.  This is only
+supported when using a remote target that supports the <code>remote get</code>
+command (see <a href="File-Transfer.html#File-Transfer">Sending files to a remote system</a>). 
+The part of <var>path</var> following the initial <samp><span class="file">remote:</span></samp>
+(if present) is used as system root prefix on the remote file system. 
+<a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a>
+
+     <p>For targets with an MS-DOS based filesystem, such as MS-Windows and
+SymbianOS, <span class="sc">gdb</span> tries prefixing a few variants of the target
+absolute file name with <var>path</var>.  But first, on Unix hosts,
+<span class="sc">gdb</span> converts all backslash directory separators into forward
+slashes, because the backslash is not a directory separator on Unix:
+
+     <pre class="smallexample">            c:\foo\bar.dll &rArr; c:/foo/bar.dll
+</pre>
+     <p>Then, <span class="sc">gdb</span> attempts prefixing the target file name with
+<var>path</var>, and looks for the resulting file name in the host file
+system:
+
+     <pre class="smallexample">            c:/foo/bar.dll &rArr; /path/to/sysroot/c:/foo/bar.dll
+</pre>
+     <p>If that does not find the shared library, <span class="sc">gdb</span> tries removing
+the &lsquo;<samp><span class="samp">:</span></samp>&rsquo; character from the drive spec, both for convenience, and,
+for the case of the host file system not supporting file names with
+colons:
+
+     <pre class="smallexample">            c:/foo/bar.dll &rArr; /path/to/sysroot/c/foo/bar.dll
+</pre>
+     <p>This makes it possible to have a system root that mirrors a target
+with more than one drive.  E.g., you may want to setup your local
+copies of the target system shared libraries like so (note &lsquo;<samp><span class="samp">c</span></samp>&rsquo; vs
+&lsquo;<samp><span class="samp">z</span></samp>&rsquo;):
+
+     <pre class="smallexample">           <samp><span class="file">/path/to/sysroot/c/sys/bin/foo.dll</span></samp>
+           <samp><span class="file">/path/to/sysroot/c/sys/bin/bar.dll</span></samp>
+           <samp><span class="file">/path/to/sysroot/z/sys/bin/bar.dll</span></samp>
+</pre>
+     <p class="noindent">and point the system root at <samp><span class="file">/path/to/sysroot</span></samp>, so that
+<span class="sc">gdb</span> can find the correct copies of both
+<samp><span class="file">c:\sys\bin\foo.dll</span></samp>, and <samp><span class="file">z:\sys\bin\bar.dll</span></samp>.
+
+     <p>If that still does not find the shared library, <span class="sc">gdb</span> tries
+removing the whole drive spec from the target file name:
+
+     <pre class="smallexample">            c:/foo/bar.dll &rArr; /path/to/sysroot/foo/bar.dll
+</pre>
+     <p>This last lookup makes it possible to not care about the drive name,
+if you don't want or need to.
+
+     <p>The <code>set solib-absolute-prefix</code> command is an alias for <code>set
+sysroot</code>.
+
+     <p><a name="index-default-system-root-998"></a><a name="index-g_t_0040samp_007b_002d_002dwith_002dsysroot_007d-999"></a>You can set the default system root by using the configure-time
+&lsquo;<samp><span class="samp">--with-sysroot</span></samp>&rsquo; option.  If the system root is inside
+<span class="sc">gdb</span>'s configured binary prefix (set with &lsquo;<samp><span class="samp">--prefix</span></samp>&rsquo; or
+&lsquo;<samp><span class="samp">--exec-prefix</span></samp>&rsquo;), then the default system root will be updated
+automatically if the installed <span class="sc">gdb</span> is moved to a new
+location.
+
+     <p><a name="index-show-sysroot-1000"></a><br><dt><code>show sysroot</code><dd>Display the current shared library prefix.
+
+     <p><a name="index-set-solib_002dsearch_002dpath-1001"></a><br><dt><code>set solib-search-path </code><var>path</var><dd>If this variable is set, <var>path</var> is a colon-separated list of
+directories to search for shared libraries.  &lsquo;<samp><span class="samp">solib-search-path</span></samp>&rsquo;
+is used after &lsquo;<samp><span class="samp">sysroot</span></samp>&rsquo; fails to locate the library, or if the
+path to the library is relative instead of absolute.  If you want to
+use &lsquo;<samp><span class="samp">solib-search-path</span></samp>&rsquo; instead of &lsquo;<samp><span class="samp">sysroot</span></samp>&rsquo;, be sure to set
+&lsquo;<samp><span class="samp">sysroot</span></samp>&rsquo; to a nonexistent directory to prevent <span class="sc">gdb</span> from
+finding your host's libraries.  &lsquo;<samp><span class="samp">sysroot</span></samp>&rsquo; is preferred; setting
+it to a nonexistent directory may interfere with automatic loading
+of shared library symbols.
+
+     <p><a name="index-show-solib_002dsearch_002dpath-1002"></a><br><dt><code>show solib-search-path</code><dd>Display the current shared library search path.
+
+     <p><a name="index-DOS-file_002dname-semantics-of-file-names_002e-1003"></a><a name="index-set-target_002dfile_002dsystem_002dkind-_0028unix_007cdos_002dbased_007cauto_0029-1004"></a><a name="index-show-target_002dfile_002dsystem_002dkind-1005"></a><br><dt><code>set target-file-system-kind </code><var>kind</var><dd>Set assumed file system kind for target reported file names.
+
+     <p>Shared library file names as reported by the target system may not
+make sense as is on the system <span class="sc">gdb</span> is running on.  For
+example, when remote debugging a target that has MS-DOS based file
+system semantics, from a Unix host, the target may be reporting to
+<span class="sc">gdb</span> a list of loaded shared libraries with file names such as
+<samp><span class="file">c:\Windows\kernel32.dll</span></samp>.  On Unix hosts, there's no concept of
+drive letters, so the &lsquo;<samp><span class="samp">c:\</span></samp>&rsquo; prefix is not normally understood as
+indicating an absolute file name, and neither is the backslash
+normally considered a directory separator character.  In that case,
+the native file system would interpret this whole absolute file name
+as a relative file name with no directory components.  This would make
+it impossible to point <span class="sc">gdb</span> at a copy of the remote target's
+shared libraries on the host using <code>set sysroot</code>, and impractical
+with <code>set solib-search-path</code>.  Setting
+<code>target-file-system-kind</code> to <code>dos-based</code> tells <span class="sc">gdb</span>
+to interpret such file names similarly to how the target would, and to
+map them to file names valid on <span class="sc">gdb</span>'s native file system
+semantics.  The value of <var>kind</var> can be <code>"auto"</code>, in addition
+to one of the supported file system kinds.  In that case, <span class="sc">gdb</span>
+tries to determine the appropriate file system variant based on the
+current target's operating system (see <a href="ABI.html#ABI">Configuring the Current ABI</a>).  The supported file system settings are:
+
+          <dl>
+<dt><code>unix</code><dd>Instruct <span class="sc">gdb</span> to assume the target file system is of Unix
+kind.  Only file names starting the forward slash (&lsquo;<samp><span class="samp">/</span></samp>&rsquo;) character
+are considered absolute, and the directory separator character is also
+the forward slash.
+
+          <br><dt><code>dos-based</code><dd>Instruct <span class="sc">gdb</span> to assume the target file system is DOS based. 
+File names starting with either a forward slash, or a drive letter
+followed by a colon (e.g., &lsquo;<samp><span class="samp">c:</span></samp>&rsquo;), are considered absolute, and
+both the slash (&lsquo;<samp><span class="samp">/</span></samp>&rsquo;) and the backslash (&lsquo;<samp><span class="samp">\\</span></samp>&rsquo;) characters are
+considered directory separators.
+
+          <br><dt><code>auto</code><dd>Instruct <span class="sc">gdb</span> to use the file system kind associated with the
+target operating system (see <a href="ABI.html#ABI">Configuring the Current ABI</a>). 
+This is the default. 
+</dl>
+     </dl>
+
+   <div class="footnote">
+<hr>
+<h4>Footnotes</h4><p class="footnote"><small>[<a name="fn-1" href="#fnd-1">1</a>]</small> If you want to specify a local system root using a directory
+that happens to be named <samp><span class="file">remote:</span></samp>, you need to use some equivalent
+variant of the name like <samp><span class="file">./remote:</span></samp>.</p>
+
+   <hr></div>
+
+   </body></html>
+

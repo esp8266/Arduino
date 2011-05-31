@@ -1,0 +1,91 @@
+<html lang="en">
+<head>
+<title>Cast to Union - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Designated-Inits.html#Designated-Inits" title="Designated Inits">
+<link rel="next" href="Case-Ranges.html#Case-Ranges" title="Case Ranges">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Cast-to-Union"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Case-Ranges.html#Case-Ranges">Case Ranges</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Designated-Inits.html#Designated-Inits">Designated Inits</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.27 Cast to a Union Type</h3>
+
+<p><a name="index-cast-to-a-union-2327"></a><a name="index-union_002c-casting-to-a-2328"></a>
+A cast to union type is similar to other casts, except that the type
+specified is a union type.  You can specify the type either with
+<code>union </code><var>tag</var> or with a typedef name.  A cast to union is actually
+a constructor though, not a cast, and hence does not yield an lvalue like
+normal casts.  (See <a href="Compound-Literals.html#Compound-Literals">Compound Literals</a>.)
+
+ <p>The types that may be cast to the union type are those of the members
+of the union.  Thus, given the following union and variables:
+
+<pre class="smallexample">     union foo { int i; double d; };
+     int x;
+     double y;
+</pre>
+ <p class="noindent">both <code>x</code> and <code>y</code> can be cast to type <code>union foo</code>.
+
+ <p>Using the cast as the right-hand side of an assignment to a variable of
+union type is equivalent to storing in a member of the union:
+
+<pre class="smallexample">     union foo u;
+     /* <span class="roman">...</span> */
+     u = (union foo) x  ==  u.i = x
+     u = (union foo) y  ==  u.d = y
+</pre>
+ <p>You can also use the union cast as a function argument:
+
+<pre class="smallexample">     void hack (union foo);
+     /* <span class="roman">...</span> */
+     hack ((union foo) x);
+</pre>
+ </body></html>
+

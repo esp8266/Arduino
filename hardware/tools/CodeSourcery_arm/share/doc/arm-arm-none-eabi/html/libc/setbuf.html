@@ -1,0 +1,82 @@
+<html lang="en">
+<head>
+<title>setbuf - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="rewind.html#rewind" title="rewind">
+<link rel="next" href="setbuffer.html#setbuffer" title="setbuffer">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="setbuf"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="setbuffer.html#setbuffer">setbuffer</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="rewind.html#rewind">rewind</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.54 <code>setbuf</code>&mdash;specify full buffering for a file or stream</h3>
+
+<p><a name="index-setbuf-262"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     void setbuf(FILE *<var>fp</var>, char *<var>buf</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>setbuf</code> specifies that output to the file or stream identified by <var>fp</var>
+should be fully buffered.  All output for this file will go to a
+buffer (of size <code>BUFSIZ</code>, specified in `<code>stdio.h</code>').  Output will
+be passed on to the host system only when the buffer is full, or when
+an input operation intervenes.
+
+   <p>You may, if you wish, supply your own buffer by passing a pointer to
+it as the argument <var>buf</var>.  It must have size <code>BUFSIZ</code>.  You can
+also use <code>NULL</code> as the value of <var>buf</var>, to signal that the
+<code>setbuf</code> function is to allocate the buffer.
+
+   <p><br>
+<strong>Warnings</strong><br>
+You may only use <code>setbuf</code> before performing any file operation other
+than opening the file.
+
+   <p>If you supply a non-null <var>buf</var>, you must ensure that the associated
+storage continues to be available until you close the stream
+identified by <var>fp</var>.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>setbuf</code> does not return a result.
+
+   <p><br>
+<strong>Portability</strong><br>
+Both ANSI C and the System V Interface Definition (Issue 2) require
+<code>setbuf</code>.  However, they differ on the meaning of a <code>NULL</code> buffer
+pointer: the SVID issue 2 specification says that a <code>NULL</code> buffer
+pointer requests unbuffered output.  For maximum portability, avoid
+<code>NULL</code> buffer pointers.
+
+   <p>Supporting OS subroutines required: <code>close</code>, <code>fstat</code>, <code>isatty</code>,
+<code>lseek</code>, <code>read</code>, <code>sbrk</code>, <code>write</code>.
+
+   <p><br>
+
+   </body></html>
+

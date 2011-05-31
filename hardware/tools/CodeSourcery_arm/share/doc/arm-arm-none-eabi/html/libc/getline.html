@@ -1,0 +1,68 @@
+<html lang="en">
+<head>
+<title>getline - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="getdelim.html#getdelim" title="getdelim">
+<link rel="next" href="gets.html#gets" title="gets">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="getline"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="gets.html#gets">gets</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="getdelim.html#getdelim">getdelim</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.37 <code>getline</code>&mdash;read a line from a file</h3>
+
+<p><a name="index-getline-223"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     ssize_t getline(char **<var>bufptr</var>, size_t *<var>n</var>, FILE *<var>fp</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>getline</code> reads a file <var>fp</var> up to and possibly including the
+newline character.  The line is read into a buffer pointed to
+by <var>bufptr</var> and designated with size *<var>n</var>.  If the buffer is
+not large enough, it will be dynamically grown by <code>getdelim</code>. 
+As the buffer is grown, the pointer to the size <var>n</var> will be
+updated.
+
+   <p><code>getline</code> is equivalent to getdelim(bufptr, n, '\n', fp);
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>getline</code> returns <code>-1</code> if no characters were successfully read,
+otherwise, it returns the number of bytes successfully read. 
+at end of file, the result is nonzero.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>getline</code> is a glibc extension.
+
+   <p>No supporting OS subroutines are directly required.
+
+   <p><br>
+
+   </body></html>
+

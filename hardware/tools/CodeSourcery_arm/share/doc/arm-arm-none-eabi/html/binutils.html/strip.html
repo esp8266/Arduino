@@ -1,0 +1,194 @@
+<html lang="en">
+<head>
+<title>strip - GNU Binary Utilities</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GNU Binary Utilities">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="strings.html#strings" title="strings">
+<link rel="next" href="elfedit.html#elfedit" title="elfedit">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="strip"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="elfedit.html#elfedit">elfedit</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="strings.html#strings">strings</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">8 strip</h2>
+
+<p><a name="index-strip-116"></a><a name="index-removing-symbols-117"></a><a name="index-discarding-symbols-118"></a><a name="index-symbols_002c-discarding-119"></a>
+<!-- man title strip Discard symbols from object files. -->
+
+<pre class="smallexample">     <!-- man begin SYNOPSIS strip -->
+     strip [<samp><span class="option">-F</span></samp> <var>bfdname</var> |<samp><span class="option">--target=</span></samp><var>bfdname</var>]
+           [<samp><span class="option">-I</span></samp> <var>bfdname</var> |<samp><span class="option">--input-target=</span></samp><var>bfdname</var>]
+           [<samp><span class="option">-O</span></samp> <var>bfdname</var> |<samp><span class="option">--output-target=</span></samp><var>bfdname</var>]
+           [<samp><span class="option">-s</span></samp>|<samp><span class="option">--strip-all</span></samp>]
+           [<samp><span class="option">-S</span></samp>|<samp><span class="option">-g</span></samp>|<samp><span class="option">-d</span></samp>|<samp><span class="option">--strip-debug</span></samp>]
+           [<samp><span class="option">-K</span></samp> <var>symbolname</var> |<samp><span class="option">--keep-symbol=</span></samp><var>symbolname</var>]
+           [<samp><span class="option">-N</span></samp> <var>symbolname</var> |<samp><span class="option">--strip-symbol=</span></samp><var>symbolname</var>]
+           [<samp><span class="option">-w</span></samp>|<samp><span class="option">--wildcard</span></samp>]
+           [<samp><span class="option">-x</span></samp>|<samp><span class="option">--discard-all</span></samp>] [<samp><span class="option">-X</span></samp> |<samp><span class="option">--discard-locals</span></samp>]
+           [<samp><span class="option">-R</span></samp> <var>sectionname</var> |<samp><span class="option">--remove-section=</span></samp><var>sectionname</var>]
+           [<samp><span class="option">-o</span></samp> <var>file</var>] [<samp><span class="option">-p</span></samp>|<samp><span class="option">--preserve-dates</span></samp>]
+           [<samp><span class="option">--keep-file-symbols</span></samp>]
+           [<samp><span class="option">--only-keep-debug</span></samp>]
+           [<samp><span class="option">-v</span></samp> |<samp><span class="option">--verbose</span></samp>] [<samp><span class="option">-V</span></samp>|<samp><span class="option">--version</span></samp>]
+           [<samp><span class="option">--help</span></samp>] [<samp><span class="option">--info</span></samp>]
+           <var>objfile</var>...
+     <!-- man end -->
+</pre>
+   <!-- man begin DESCRIPTION strip -->
+   <p><span class="sc">gnu</span> <samp><span class="command">strip</span></samp> discards all symbols from object files
+<var>objfile</var>.  The list of object files may include archives. 
+At least one object file must be given.
+
+   <p><samp><span class="command">strip</span></samp> modifies the files named in its argument,
+rather than writing modified copies under different names.
+
+<!-- man end -->
+<!-- man begin OPTIONS strip -->
+     <dl>
+<dt><samp><span class="env">-F </span><var>bfdname</var></samp><dt><samp><span class="env">--target=</span><var>bfdname</var></samp><dd>Treat the original <var>objfile</var> as a file with the object
+code format <var>bfdname</var>, and rewrite it in the same format. 
+See <a href="Target-Selection.html#Target-Selection">Target Selection</a>, for more information.
+
+     <br><dt><samp><span class="env">--help</span></samp><dd>Show a summary of the options to <samp><span class="command">strip</span></samp> and exit.
+
+     <br><dt><samp><span class="env">--info</span></samp><dd>Display a list showing all architectures and object formats available.
+
+     <br><dt><samp><span class="env">-I </span><var>bfdname</var></samp><dt><samp><span class="env">--input-target=</span><var>bfdname</var></samp><dd>Treat the original <var>objfile</var> as a file with the object
+code format <var>bfdname</var>. 
+See <a href="Target-Selection.html#Target-Selection">Target Selection</a>, for more information.
+
+     <br><dt><samp><span class="env">-O </span><var>bfdname</var></samp><dt><samp><span class="env">--output-target=</span><var>bfdname</var></samp><dd>Replace <var>objfile</var> with a file in the output format <var>bfdname</var>. 
+See <a href="Target-Selection.html#Target-Selection">Target Selection</a>, for more information.
+
+     <br><dt><samp><span class="env">-R </span><var>sectionname</var></samp><dt><samp><span class="env">--remove-section=</span><var>sectionname</var></samp><dd>Remove any section named <var>sectionname</var> from the output file.  This
+option may be given more than once.  Note that using this option
+inappropriately may make the output file unusable.
+
+     <br><dt><samp><span class="env">-s</span></samp><dt><samp><span class="env">--strip-all</span></samp><dd>Remove all symbols.
+
+     <br><dt><samp><span class="env">-g</span></samp><dt><samp><span class="env">-S</span></samp><dt><samp><span class="env">-d</span></samp><dt><samp><span class="env">--strip-debug</span></samp><dd>Remove debugging symbols only.
+
+     <br><dt><samp><span class="env">--strip-unneeded</span></samp><dd>Remove all symbols that are not needed for relocation processing.
+
+     <br><dt><samp><span class="env">-K </span><var>symbolname</var></samp><dt><samp><span class="env">--keep-symbol=</span><var>symbolname</var></samp><dd>When stripping symbols, keep symbol <var>symbolname</var> even if it would
+normally be stripped.  This option may be given more than once.
+
+     <br><dt><samp><span class="env">-N </span><var>symbolname</var></samp><dt><samp><span class="env">--strip-symbol=</span><var>symbolname</var></samp><dd>Remove symbol <var>symbolname</var> from the source file. This option may be
+given more than once, and may be combined with strip options other than
+<samp><span class="option">-K</span></samp>.
+
+     <br><dt><samp><span class="env">-o </span><var>file</var></samp><dd>Put the stripped output in <var>file</var>, rather than replacing the
+existing file.  When this argument is used, only one <var>objfile</var>
+argument may be specified.
+
+     <br><dt><samp><span class="env">-p</span></samp><dt><samp><span class="env">--preserve-dates</span></samp><dd>Preserve the access and modification dates of the file.
+
+     <br><dt><samp><span class="env">-w</span></samp><dt><samp><span class="env">--wildcard</span></samp><dd>Permit regular expressions in <var>symbolname</var>s used in other command
+line options.  The question mark (?), asterisk (*), backslash (\) and
+square brackets ([]) operators can be used anywhere in the symbol
+name.  If the first character of the symbol name is the exclamation
+point (!) then the sense of the switch is reversed for that symbol. 
+For example:
+
+     <pre class="smallexample">            -w -K !foo -K fo*
+</pre>
+     <p>would cause strip to only keep symbols that start with the letters
+&ldquo;fo&rdquo;, but to discard the symbol &ldquo;foo&rdquo;.
+
+     <br><dt><samp><span class="env">-x</span></samp><dt><samp><span class="env">--discard-all</span></samp><dd>Remove non-global symbols.
+
+     <br><dt><samp><span class="env">-X</span></samp><dt><samp><span class="env">--discard-locals</span></samp><dd>Remove compiler-generated local symbols. 
+(These usually start with &lsquo;<samp><span class="samp">L</span></samp>&rsquo; or &lsquo;<samp><span class="samp">.</span></samp>&rsquo;.)
+
+     <br><dt><samp><span class="env">--keep-file-symbols</span></samp><dd>When stripping a file, perhaps with <samp><span class="option">--strip-debug</span></samp> or
+<samp><span class="option">--strip-unneeded</span></samp>, retain any symbols specifying source file names,
+which would otherwise get stripped.
+
+     <br><dt><samp><span class="env">--only-keep-debug</span></samp><dd>Strip a file, removing contents of any sections that would not be
+stripped by <samp><span class="option">--strip-debug</span></samp> and leaving the debugging sections
+intact.  In ELF files, this preserves all note sections in the output.
+
+     <p>The intention is that this option will be used in conjunction with
+<samp><span class="option">--add-gnu-debuglink</span></samp> to create a two part executable.  One a
+stripped binary which will occupy less space in RAM and in a
+distribution and the second a debugging information file which is only
+needed if debugging abilities are required.  The suggested procedure
+to create these files is as follows:
+
+          <ol type=1 start=1>
+<li>Link the executable as normal.  Assuming that is is called
+<code>foo</code> then... 
+<li>Run <code>objcopy --only-keep-debug foo foo.dbg</code> to
+create a file containing the debugging info. 
+<li>Run <code>objcopy --strip-debug foo</code> to create a
+stripped executable. 
+<li>Run <code>objcopy --add-gnu-debuglink=foo.dbg foo</code>
+to add a link to the debugging info into the stripped executable.
+          </ol>
+
+     <p>Note&mdash;the choice of <code>.dbg</code> as an extension for the debug info
+file is arbitrary.  Also the <code>--only-keep-debug</code> step is
+optional.  You could instead do this:
+
+          <ol type=1 start=1>
+<li>Link the executable as normal. 
+<li>Copy <code>foo</code> to <code>foo.full</code>
+<li>Run <code>strip --strip-debug foo</code>
+<li>Run <code>objcopy --add-gnu-debuglink=foo.full foo</code>
+          </ol>
+
+     <p>i.e., the file pointed to by the <samp><span class="option">--add-gnu-debuglink</span></samp> can be the
+full executable.  It does not have to be a file created by the
+<samp><span class="option">--only-keep-debug</span></samp> switch.
+
+     <p>Note&mdash;this switch is only intended for use on fully linked files.  It
+does not make sense to use it on object files where the debugging
+information may be incomplete.  Besides the gnu_debuglink feature
+currently only supports the presence of one filename containing
+debugging information, not multiple filenames on a one-per-object-file
+basis.
+
+     <br><dt><samp><span class="env">-V</span></samp><dt><samp><span class="env">--version</span></samp><dd>Show the version number for <samp><span class="command">strip</span></samp>.
+
+     <br><dt><samp><span class="env">-v</span></samp><dt><samp><span class="env">--verbose</span></samp><dd>Verbose output: list all object files modified.  In the case of
+archives, &lsquo;<samp><span class="samp">strip -v</span></samp>&rsquo; lists all members of the archive. 
+</dl>
+
+<!-- man end -->
+   </body></html>
+

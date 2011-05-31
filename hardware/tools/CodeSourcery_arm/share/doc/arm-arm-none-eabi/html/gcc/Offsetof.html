@@ -1,0 +1,81 @@
+<html lang="en">
+<head>
+<title>Offsetof - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Vector-Extensions.html#Vector-Extensions" title="Vector Extensions">
+<link rel="next" href="Atomic-Builtins.html#Atomic-Builtins" title="Atomic Builtins">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Offsetof"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Atomic-Builtins.html#Atomic-Builtins">Atomic Builtins</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Vector-Extensions.html#Vector-Extensions">Vector Extensions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.48 Offsetof</h3>
+
+<p><a name="index-g_t_005f_005fbuiltin_005foffsetof-2612"></a>
+GCC implements for both C and C++ a syntactic extension to implement
+the <code>offsetof</code> macro.
+
+<pre class="smallexample">     primary:
+             "__builtin_offsetof" "(" <code>typename</code> "," offsetof_member_designator ")"
+     
+     offsetof_member_designator:
+               <code>identifier</code>
+             | offsetof_member_designator "." <code>identifier</code>
+             | offsetof_member_designator "[" <code>expr</code> "]"
+</pre>
+ <p>This extension is sufficient such that
+
+<pre class="smallexample">     #define offsetof(<var>type</var>, <var>member</var>)  __builtin_offsetof (<var>type</var>, <var>member</var>)
+</pre>
+ <p>is a suitable definition of the <code>offsetof</code> macro.  In C++, <var>type</var>
+may be dependent.  In either case, <var>member</var> may consist of a single
+identifier, or a sequence of member accesses and array references.
+
+ </body></html>
+

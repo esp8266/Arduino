@@ -1,0 +1,67 @@
+<html lang="en">
+<head>
+<title>rename - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="remove.html#remove" title="remove">
+<link rel="next" href="rewind.html#rewind" title="rewind">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="rename"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="rewind.html#rewind">rewind</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="remove.html#remove">remove</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.52 <code>rename</code>&mdash;rename a file</h3>
+
+<p><a name="index-rename-259"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     int rename(const char *<var>old</var>, const char *<var>new</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+Use <code>rename</code> to establish a new name (the string at <var>new</var>) for a
+file now known by the string at <var>old</var>.  After a successful
+<code>rename</code>, the file is no longer accessible by the string at <var>old</var>.
+
+   <p>If <code>rename</code> fails, the file named <code>*</code><var>old</var> is unaffected.  The
+conditions for failure depend on the host operating system.
+
+   <p><br>
+<strong>Returns</strong><br>
+The result is either <code>0</code> (when successful) or <code>-1</code> (when the file
+could not be renamed).
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C requires <code>rename</code>, but only specifies that the result on
+failure be nonzero.  The effects of using the name of an existing file
+as <code>*</code><var>new</var> may vary from one implementation to another.
+
+   <p>Supporting OS subroutines required: <code>link</code>, <code>unlink</code>, or <code>rename</code>.
+
+   <p><br>
+
+   </body></html>
+

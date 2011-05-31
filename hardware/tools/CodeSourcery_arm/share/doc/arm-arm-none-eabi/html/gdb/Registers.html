@@ -1,0 +1,165 @@
+<html lang="en">
+<head>
+<title>Registers - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Data.html#Data" title="Data">
+<link rel="prev" href="Convenience-Vars.html#Convenience-Vars" title="Convenience Vars">
+<link rel="next" href="Floating-Point-Hardware.html#Floating-Point-Hardware" title="Floating Point Hardware">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Registers"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Floating-Point-Hardware.html#Floating-Point-Hardware">Floating Point Hardware</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Convenience-Vars.html#Convenience-Vars">Convenience Vars</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Data.html#Data">Data</a>
+<hr>
+</div>
+
+<h3 class="section">10.12 Registers</h3>
+
+<p><a name="index-registers-598"></a>You can refer to machine register contents, in expressions, as variables
+with names starting with &lsquo;<samp><span class="samp">$</span></samp>&rsquo;.  The names of registers are different
+for each machine; use <code>info registers</code> to see the names used on
+your machine.
+
+     
+<a name="index-info-registers-599"></a>
+<dl><dt><code>info registers</code><dd>Print the names and values of all registers except floating-point
+and vector registers (in the selected stack frame).
+
+     <p><a name="index-info-all_002dregisters-600"></a><a name="index-floating-point-registers-601"></a><br><dt><code>info all-registers</code><dd>Print the names and values of all registers, including floating-point
+and vector registers (in the selected stack frame).
+
+     <br><dt><code>info registers </code><var>regname</var><code> ...</code><dd>Print the <dfn>relativized</dfn> value of each specified register <var>regname</var>. 
+As discussed in detail below, register values are normally relative to
+the selected stack frame.  <var>regname</var> may be any register name valid on
+the machine you are using, with or without the initial &lsquo;<samp><span class="samp">$</span></samp>&rsquo;. 
+</dl>
+
+   <p><a name="index-stack-pointer-register-602"></a><a name="index-program-counter-register-603"></a><a name="index-process-status-register-604"></a><a name="index-frame-pointer-register-605"></a><a name="index-standard-registers-606"></a><span class="sc">gdb</span> has four &ldquo;standard&rdquo; register names that are available (in
+expressions) on most machines&mdash;whenever they do not conflict with an
+architecture's canonical mnemonics for registers.  The register names
+<code>$pc</code> and <code>$sp</code> are used for the program counter register and
+the stack pointer.  <code>$fp</code> is used for a register that contains a
+pointer to the current stack frame, and <code>$ps</code> is used for a
+register that contains the processor status.  For example,
+you could print the program counter in hex with
+
+<pre class="smallexample">     p/x $pc
+</pre>
+   <p class="noindent">or print the instruction to be executed next with
+
+<pre class="smallexample">     x/i $pc
+</pre>
+   <p class="noindent">or add four to the stack pointer<a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a> with
+
+<pre class="smallexample">     set $sp += 4
+</pre>
+   <p>Whenever possible, these four standard register names are available on
+your machine even though the machine has different canonical mnemonics,
+so long as there is no conflict.  The <code>info registers</code> command
+shows the canonical names.  For example, on the SPARC, <code>info
+registers</code> displays the processor status register as <code>$psr</code> but you
+can also refer to it as <code>$ps</code>; and on x86-based machines <code>$ps</code>
+is an alias for the <span class="sc">eflags</span> register.
+
+   <p><span class="sc">gdb</span> always considers the contents of an ordinary register as an
+integer when the register is examined in this way.  Some machines have
+special registers which can hold nothing but floating point; these
+registers are considered to have floating point values.  There is no way
+to refer to the contents of an ordinary register as floating point value
+(although you can <em>print</em> it as a floating point value with
+&lsquo;<samp><span class="samp">print/f $</span><var>regname</var></samp>&rsquo;).
+
+   <p>Some registers have distinct &ldquo;raw&rdquo; and &ldquo;virtual&rdquo; data formats.  This
+means that the data format in which the register contents are saved by
+the operating system is not the same one that your program normally
+sees.  For example, the registers of the 68881 floating point
+coprocessor are always saved in &ldquo;extended&rdquo; (raw) format, but all C
+programs expect to work with &ldquo;double&rdquo; (virtual) format.  In such
+cases, <span class="sc">gdb</span> normally works with the virtual format only (the format
+that makes sense for your program), but the <code>info registers</code> command
+prints the data in both formats.
+
+   <p><a name="index-SSE-registers-_0028x86_0029-607"></a><a name="index-MMX-registers-_0028x86_0029-608"></a>Some machines have special registers whose contents can be interpreted
+in several different ways.  For example, modern x86-based machines
+have SSE and MMX registers that can hold several values packed
+together in several different formats.  <span class="sc">gdb</span> refers to such
+registers in <code>struct</code> notation:
+
+<pre class="smallexample">     (gdb) print $xmm1
+     $1 = {
+       v4_float = {0, 3.43859137e-038, 1.54142831e-044, 1.821688e-044},
+       v2_double = {9.92129282474342e-303, 2.7585945287983262e-313},
+       v16_int8 = "\000\000\000\000\3706;\001\v\000\000\000\r\000\000",
+       v8_int16 = {0, 0, 14072, 315, 11, 0, 13, 0},
+       v4_int32 = {0, 20657912, 11, 13},
+       v2_int64 = {88725056443645952, 55834574859},
+       uint128 = 0x0000000d0000000b013b36f800000000
+     }
+</pre>
+   <p class="noindent">To set values of such registers, you need to tell <span class="sc">gdb</span> which
+view of the register you wish to change, as if you were assigning
+value to a <code>struct</code> member:
+
+<pre class="smallexample">      (gdb) set $xmm1.uint128 = 0x000000000000000000000000FFFFFFFF
+</pre>
+   <p>Normally, register values are relative to the selected stack frame
+(see <a href="Selection.html#Selection">Selecting a Frame</a>).  This means that you get the
+value that the register would contain if all stack frames farther in
+were exited and their saved registers restored.  In order to see the
+true contents of hardware registers, you must select the innermost
+frame (with &lsquo;<samp><span class="samp">frame 0</span></samp>&rsquo;).
+
+   <p>However, <span class="sc">gdb</span> must deduce where registers are saved, from the machine
+code generated by your compiler.  If some registers are not saved, or if
+<span class="sc">gdb</span> is unable to locate the saved registers, the selected stack
+frame makes no difference.
+
+   <div class="footnote">
+<hr>
+<h4>Footnotes</h4><p class="footnote"><small>[<a name="fn-1" href="#fnd-1">1</a>]</small> This is a way of removing
+one word from the stack, on machines where stacks grow downward in
+memory (most machines, nowadays).  This assumes that the innermost
+stack frame is selected; setting <code>$sp</code> is not allowed when other
+stack frames are selected.  To pop entire frames off the stack,
+regardless of machine architecture, use <code>return</code>;
+see <a href="Returning.html#Returning">Returning from a Function</a>.</p>
+
+   <hr></div>
+
+   </body></html>
+

@@ -1,0 +1,61 @@
+<html lang="en">
+<head>
+<title>fileno - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="fgetws.html#fgetws" title="fgetws">
+<link rel="next" href="fmemopen.html#fmemopen" title="fmemopen">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="fileno"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="fmemopen.html#fmemopen">fmemopen</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="fgetws.html#fgetws">fgetws</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.15 <code>fileno</code>&mdash;return file descriptor associated with stream</h3>
+
+<p><a name="index-fileno-176"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     int fileno(FILE *<var>fp</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+You can use <code>fileno</code> to return the file descriptor identified by <var>fp</var>.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>fileno</code> returns a non-negative integer when successful. 
+If <var>fp</var> is not an open stream, <code>fileno</code> returns -1.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>fileno</code> is not part of ANSI C. 
+POSIX requires <code>fileno</code>.
+
+   <p>Supporting OS subroutines required: none.
+
+   <p><br>
+
+   </body></html>
+

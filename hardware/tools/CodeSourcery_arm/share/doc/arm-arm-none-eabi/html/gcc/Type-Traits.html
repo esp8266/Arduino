@@ -1,0 +1,159 @@
+<html lang="en">
+<head>
+<title>Type Traits - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C_002b_002b-Extensions.html#C_002b_002b-Extensions" title="C++ Extensions">
+<link rel="prev" href="Namespace-Association.html#Namespace-Association" title="Namespace Association">
+<link rel="next" href="Java-Exceptions.html#Java-Exceptions" title="Java Exceptions">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Type-Traits"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Java-Exceptions.html#Java-Exceptions">Java Exceptions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Namespace-Association.html#Namespace-Association">Namespace Association</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C_002b_002b-Extensions.html#C_002b_002b-Extensions">C++ Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">7.9 Type Traits</h3>
+
+<p>The C++ front-end implements syntactic extensions that allow to
+determine at compile time various characteristics of a type (or of a
+pair of types).
+
+     <dl>
+<dt><code>__has_nothrow_assign (type)</code><dd>If <code>type</code> is const qualified or is a reference type then the trait is
+false.  Otherwise if <code>__has_trivial_assign (type)</code> is true then the trait
+is true, else if <code>type</code> is a cv class or union type with copy assignment
+operators that are known not to throw an exception then the trait is true,
+else it is false.  Requires: <code>type</code> shall be a complete type, an array
+type of unknown bound, or is a <code>void</code> type.
+
+     <br><dt><code>__has_nothrow_copy (type)</code><dd>If <code>__has_trivial_copy (type)</code> is true then the trait is true, else if
+<code>type</code> is a cv class or union type with copy constructors that
+are known not to throw an exception then the trait is true, else it is false. 
+Requires: <code>type</code> shall be a complete type, an array type of
+unknown bound, or is a <code>void</code> type.
+
+     <br><dt><code>__has_nothrow_constructor (type)</code><dd>If <code>__has_trivial_constructor (type)</code> is true then the trait is
+true, else if <code>type</code> is a cv class or union type (or array
+thereof) with a default constructor that is known not to throw an
+exception then the trait is true, else it is false.  Requires:
+<code>type</code> shall be a complete type, an array type of unknown bound,
+or is a <code>void</code> type.
+
+     <br><dt><code>__has_trivial_assign (type)</code><dd>If <code>type</code> is const qualified or is a reference type then the trait is
+false.  Otherwise if <code>__is_pod (type)</code> is true then the trait is
+true, else if <code>type</code> is a cv class or union type with a trivial
+copy assignment ([class.copy]) then the trait is true, else it is
+false.  Requires: <code>type</code> shall be a complete type, an array type
+of unknown bound, or is a <code>void</code> type.
+
+     <br><dt><code>__has_trivial_copy (type)</code><dd>If <code>__is_pod (type)</code> is true or <code>type</code> is a reference type
+then the trait is true, else if <code>type</code> is a cv class or union type
+with a trivial copy constructor ([class.copy]) then the trait
+is true, else it is false.  Requires: <code>type</code> shall be a complete
+type, an array type of unknown bound, or is a <code>void</code> type.
+
+     <br><dt><code>__has_trivial_constructor (type)</code><dd>If <code>__is_pod (type)</code> is true then the trait is true, else if
+<code>type</code> is a cv class or union type (or array thereof) with a
+trivial default constructor ([class.ctor]) then the trait is true,
+else it is false.  Requires: <code>type</code> shall be a complete type, an
+array type of unknown bound, or is a <code>void</code> type.
+
+     <br><dt><code>__has_trivial_destructor (type)</code><dd>If <code>__is_pod (type)</code> is true or <code>type</code> is a reference type then
+the trait is true, else if <code>type</code> is a cv class or union type (or
+array thereof) with a trivial destructor ([class.dtor]) then the trait
+is true, else it is false.  Requires: <code>type</code> shall be a complete
+type, an array type of unknown bound, or is a <code>void</code> type.
+
+     <br><dt><code>__has_virtual_destructor (type)</code><dd>If <code>type</code> is a class type with a virtual destructor
+([class.dtor]) then the trait is true, else it is false.  Requires:
+<code>type</code>  shall be a complete type, an array type of unknown bound,
+or is a <code>void</code> type.
+
+     <br><dt><code>__is_abstract (type)</code><dd>If <code>type</code> is an abstract class ([class.abstract]) then the trait
+is true, else it is false.  Requires: <code>type</code> shall be a complete
+type, an array type of unknown bound, or is a <code>void</code> type.
+
+     <br><dt><code>__is_base_of (base_type, derived_type)</code><dd>If <code>base_type</code> is a base class of <code>derived_type</code>
+([class.derived]) then the trait is true, otherwise it is false. 
+Top-level cv qualifications of <code>base_type</code> and
+<code>derived_type</code> are ignored.  For the purposes of this trait, a
+class type is considered is own base.  Requires: if <code>__is_class
+(base_type)</code> and <code>__is_class (derived_type)</code> are true and
+<code>base_type</code> and <code>derived_type</code> are not the same type
+(disregarding cv-qualifiers), <code>derived_type</code> shall be a complete
+type.  Diagnostic is produced if this requirement is not met.
+
+     <br><dt><code>__is_class (type)</code><dd>If <code>type</code> is a cv class type, and not a union type
+([basic.compound]) the trait is true, else it is false.
+
+     <br><dt><code>__is_empty (type)</code><dd>If <code>__is_class (type)</code> is false then the trait is false. 
+Otherwise <code>type</code> is considered empty if and only if: <code>type</code>
+has no non-static data members, or all non-static data members, if
+any, are bit-fields of length 0, and <code>type</code> has no virtual
+members, and <code>type</code> has no virtual base classes, and <code>type</code>
+has no base classes <code>base_type</code> for which
+<code>__is_empty (base_type)</code> is false.  Requires: <code>type</code> shall
+be a complete type, an array type of unknown bound, or is a
+<code>void</code> type.
+
+     <br><dt><code>__is_enum (type)</code><dd>If <code>type</code> is a cv enumeration type ([basic.compound]) the trait is
+true, else it is false.
+
+     <br><dt><code>__is_pod (type)</code><dd>If <code>type</code> is a cv POD type ([basic.types]) then the trait is true,
+else it is false.  Requires: <code>type</code> shall be a complete type,
+an array type of unknown bound, or is a <code>void</code> type.
+
+     <br><dt><code>__is_polymorphic (type)</code><dd>If <code>type</code> is a polymorphic class ([class.virtual]) then the trait
+is true, else it is false.  Requires: <code>type</code> shall be a complete
+type, an array type of unknown bound, or is a <code>void</code> type.
+
+     <br><dt><code>__is_union (type)</code><dd>If <code>type</code> is a cv union type ([basic.compound]) the trait is
+true, else it is false.
+
+ </dl>
+
+ </body></html>
+

@@ -1,0 +1,119 @@
+<html lang="en">
+<head>
+<title>SVR4 Process Information - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Native.html#Native" title="Native">
+<link rel="prev" href="BSD-libkvm-Interface.html#BSD-libkvm-Interface" title="BSD libkvm Interface">
+<link rel="next" href="DJGPP-Native.html#DJGPP-Native" title="DJGPP Native">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="SVR4-Process-Information"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="DJGPP-Native.html#DJGPP-Native">DJGPP Native</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="BSD-libkvm-Interface.html#BSD-libkvm-Interface">BSD libkvm Interface</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Native.html#Native">Native</a>
+<hr>
+</div>
+
+<h4 class="subsection">21.1.3 SVR4 Process Information</h4>
+
+<p><a name="index-g_t_002fproc-1151"></a><a name="index-examine-process-image-1152"></a><a name="index-process-info-via-_0040file_007b_002fproc_007d-1153"></a>
+Many versions of SVR4 and compatible systems provide a facility called
+&lsquo;<samp><span class="samp">/proc</span></samp>&rsquo; that can be used to examine the image of a running
+process using file-system subroutines.  If <span class="sc">gdb</span> is configured
+for an operating system with this facility, the command <code>info
+proc</code> is available to report information about the process running
+your program, or about any process running on your system.  <code>info
+proc</code> works only on SVR4 systems that include the <code>procfs</code> code. 
+This includes, as of this writing, <span class="sc">gnu</span>/Linux, OSF/1 (Digital
+Unix), Solaris, Irix, and Unixware, but not HP-UX, for example.
+
+     
+<a name="index-info-proc-1154"></a>
+<a name="index-process-ID-1155"></a>
+<dl><dt><code>info proc</code><dt><code>info proc </code><var>process-id</var><dd>Summarize available information about any running process.  If a
+process ID is specified by <var>process-id</var>, display information about
+that process; otherwise display information about the program being
+debugged.  The summary includes the debugged process ID, the command
+line used to invoke it, its current working directory, and its
+executable file's absolute file name.
+
+     <p>On some systems, <var>process-id</var> can be of the form
+&lsquo;<samp><span class="samp">[</span><var>pid</var><span class="samp">]/</span><var>tid</var></samp>&rsquo; which specifies a certain thread ID
+within a process.  If the optional <var>pid</var> part is missing, it means
+a thread from the process being debugged (the leading &lsquo;<samp><span class="samp">/</span></samp>&rsquo; still
+needs to be present, or else <span class="sc">gdb</span> will interpret the number as
+a process ID rather than a thread ID).
+
+     <br><dt><code>info proc mappings</code><dd><a name="index-memory-address-space-mappings-1156"></a>Report the memory address space ranges accessible in the program, with
+information on whether the process has read, write, or execute access
+rights to each range.  On <span class="sc">gnu</span>/Linux systems, each memory range
+includes the object file which is mapped to that range, instead of the
+memory access rights to that range.
+
+     <br><dt><code>info proc stat</code><dt><code>info proc status</code><dd><a name="index-process-detailed-status-information-1157"></a>These subcommands are specific to <span class="sc">gnu</span>/Linux systems.  They show
+the process-related information, including the user ID and group ID;
+how many threads are there in the process; its virtual memory usage;
+the signals that are pending, blocked, and ignored; its TTY; its
+consumption of system and user time; its stack size; its &lsquo;<samp><span class="samp">nice</span></samp>&rsquo;
+value; etc.  For more information, see the &lsquo;<samp><span class="samp">proc</span></samp>&rsquo; man page
+(type <kbd>man 5 proc</kbd> from your shell prompt).
+
+     <br><dt><code>info proc all</code><dd>Show all the information about the process described under all of the
+above <code>info proc</code> subcommands.
+
+     <br><dt><code>set procfs-trace</code><dd><a name="index-set-procfs_002dtrace-1158"></a><a name="index-g_t_0040code_007bprocfs_007d-API-calls-1159"></a>This command enables and disables tracing of <code>procfs</code> API calls.
+
+     <br><dt><code>show procfs-trace</code><dd><a name="index-show-procfs_002dtrace-1160"></a>Show the current state of <code>procfs</code> API call tracing.
+
+     <br><dt><code>set procfs-file </code><var>file</var><dd><a name="index-set-procfs_002dfile-1161"></a>Tell <span class="sc">gdb</span> to write <code>procfs</code> API trace to the named
+<var>file</var>.  <span class="sc">gdb</span> appends the trace info to the previous
+contents of the file.  The default is to display the trace on the
+standard output.
+
+     <br><dt><code>show procfs-file</code><dd><a name="index-show-procfs_002dfile-1162"></a>Show the file to which <code>procfs</code> API trace is written.
+
+     <br><dt><code>proc-trace-entry</code><dt><code>proc-trace-exit</code><dt><code>proc-untrace-entry</code><dt><code>proc-untrace-exit</code><dd><a name="index-proc_002dtrace_002dentry-1163"></a><a name="index-proc_002dtrace_002dexit-1164"></a><a name="index-proc_002duntrace_002dentry-1165"></a><a name="index-proc_002duntrace_002dexit-1166"></a>These commands enable and disable tracing of entries into and exits
+from the <code>syscall</code> interface.
+
+     <br><dt><code>info pidlist</code><dd><a name="index-info-pidlist-1167"></a><a name="index-process-list_002c-QNX-Neutrino-1168"></a>For QNX Neutrino only, this command displays the list of all the
+processes and all the threads within each process.
+
+     <br><dt><code>info meminfo</code><dd><a name="index-info-meminfo-1169"></a><a name="index-mapinfo-list_002c-QNX-Neutrino-1170"></a>For QNX Neutrino only, this command displays the list of all mapinfos. 
+</dl>
+
+   </body></html>
+

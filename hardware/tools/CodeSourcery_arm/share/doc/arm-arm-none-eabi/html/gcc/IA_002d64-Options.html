@@ -1,0 +1,219 @@
+<html lang="en">
+<head>
+<title>IA-64 Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Submodel-Options.html#Submodel-Options" title="Submodel Options">
+<link rel="prev" href="i386-and-x86_002d64-Windows-Options.html#i386-and-x86_002d64-Windows-Options" title="i386 and x86-64 Windows Options">
+<link rel="next" href="IA_002d64_002fVMS-Options.html#IA_002d64_002fVMS-Options" title="IA-64/VMS Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="IA-64-Options"></a>
+<a name="IA_002d64-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="IA_002d64_002fVMS-Options.html#IA_002d64_002fVMS-Options">IA-64/VMS Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="i386-and-x86_002d64-Windows-Options.html#i386-and-x86_002d64-Windows-Options">i386 and x86-64 Windows Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Submodel-Options.html#Submodel-Options">Submodel Options</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.17.16 IA-64 Options</h4>
+
+<p><a name="index-IA_002d64-Options-1359"></a>
+These are the &lsquo;<samp><span class="samp">-m</span></samp>&rsquo; options defined for the Intel IA-64 architecture.
+
+     <dl>
+<dt><code>-mbig-endian</code><dd><a name="index-mbig_002dendian-1360"></a>Generate code for a big endian target.  This is the default for HP-UX.
+
+     <br><dt><code>-mlittle-endian</code><dd><a name="index-mlittle_002dendian-1361"></a>Generate code for a little endian target.  This is the default for AIX5
+and GNU/Linux.
+
+     <br><dt><code>-mgnu-as</code><dt><code>-mno-gnu-as</code><dd><a name="index-mgnu_002das-1362"></a><a name="index-mno_002dgnu_002das-1363"></a>Generate (or don't) code for the GNU assembler.  This is the default. 
+<!-- Also, this is the default if the configure option @option{-with-gnu-as} -->
+<!-- is used. -->
+
+     <br><dt><code>-mgnu-ld</code><dt><code>-mno-gnu-ld</code><dd><a name="index-mgnu_002dld-1364"></a><a name="index-mno_002dgnu_002dld-1365"></a>Generate (or don't) code for the GNU linker.  This is the default. 
+<!-- Also, this is the default if the configure option @option{-with-gnu-ld} -->
+<!-- is used. -->
+
+     <br><dt><code>-mno-pic</code><dd><a name="index-mno_002dpic-1366"></a>Generate code that does not use a global pointer register.  The result
+is not position independent code, and violates the IA-64 ABI.
+
+     <br><dt><code>-mvolatile-asm-stop</code><dt><code>-mno-volatile-asm-stop</code><dd><a name="index-mvolatile_002dasm_002dstop-1367"></a><a name="index-mno_002dvolatile_002dasm_002dstop-1368"></a>Generate (or don't) a stop bit immediately before and after volatile asm
+statements.
+
+     <br><dt><code>-mregister-names</code><dt><code>-mno-register-names</code><dd><a name="index-mregister_002dnames-1369"></a><a name="index-mno_002dregister_002dnames-1370"></a>Generate (or don't) &lsquo;<samp><span class="samp">in</span></samp>&rsquo;, &lsquo;<samp><span class="samp">loc</span></samp>&rsquo;, and &lsquo;<samp><span class="samp">out</span></samp>&rsquo; register names for
+the stacked registers.  This may make assembler output more readable.
+
+     <br><dt><code>-mno-sdata</code><dt><code>-msdata</code><dd><a name="index-mno_002dsdata-1371"></a><a name="index-msdata-1372"></a>Disable (or enable) optimizations that use the small data section.  This may
+be useful for working around optimizer bugs.
+
+     <br><dt><code>-mconstant-gp</code><dd><a name="index-mconstant_002dgp-1373"></a>Generate code that uses a single constant global pointer value.  This is
+useful when compiling kernel code.
+
+     <br><dt><code>-mauto-pic</code><dd><a name="index-mauto_002dpic-1374"></a>Generate code that is self-relocatable.  This implies <samp><span class="option">-mconstant-gp</span></samp>. 
+This is useful when compiling firmware code.
+
+     <br><dt><code>-minline-float-divide-min-latency</code><dd><a name="index-minline_002dfloat_002ddivide_002dmin_002dlatency-1375"></a>Generate code for inline divides of floating point values
+using the minimum latency algorithm.
+
+     <br><dt><code>-minline-float-divide-max-throughput</code><dd><a name="index-minline_002dfloat_002ddivide_002dmax_002dthroughput-1376"></a>Generate code for inline divides of floating point values
+using the maximum throughput algorithm.
+
+     <br><dt><code>-mno-inline-float-divide</code><dd><a name="index-mno_002dinline_002dfloat_002ddivide-1377"></a>Do not generate inline code for divides of floating point values.
+
+     <br><dt><code>-minline-int-divide-min-latency</code><dd><a name="index-minline_002dint_002ddivide_002dmin_002dlatency-1378"></a>Generate code for inline divides of integer values
+using the minimum latency algorithm.
+
+     <br><dt><code>-minline-int-divide-max-throughput</code><dd><a name="index-minline_002dint_002ddivide_002dmax_002dthroughput-1379"></a>Generate code for inline divides of integer values
+using the maximum throughput algorithm.
+
+     <br><dt><code>-mno-inline-int-divide</code><dd><a name="index-mno_002dinline_002dint_002ddivide-1380"></a>Do not generate inline code for divides of integer values.
+
+     <br><dt><code>-minline-sqrt-min-latency</code><dd><a name="index-minline_002dsqrt_002dmin_002dlatency-1381"></a>Generate code for inline square roots
+using the minimum latency algorithm.
+
+     <br><dt><code>-minline-sqrt-max-throughput</code><dd><a name="index-minline_002dsqrt_002dmax_002dthroughput-1382"></a>Generate code for inline square roots
+using the maximum throughput algorithm.
+
+     <br><dt><code>-mno-inline-sqrt</code><dd><a name="index-mno_002dinline_002dsqrt-1383"></a>Do not generate inline code for sqrt.
+
+     <br><dt><code>-mfused-madd</code><dt><code>-mno-fused-madd</code><dd><a name="index-mfused_002dmadd-1384"></a><a name="index-mno_002dfused_002dmadd-1385"></a>Do (don't) generate code that uses the fused multiply/add or multiply/subtract
+instructions.  The default is to use these instructions.
+
+     <br><dt><code>-mno-dwarf2-asm</code><dt><code>-mdwarf2-asm</code><dd><a name="index-mno_002ddwarf2_002dasm-1386"></a><a name="index-mdwarf2_002dasm-1387"></a>Don't (or do) generate assembler code for the DWARF2 line number debugging
+info.  This may be useful when not using the GNU assembler.
+
+     <br><dt><code>-mearly-stop-bits</code><dt><code>-mno-early-stop-bits</code><dd><a name="index-mearly_002dstop_002dbits-1388"></a><a name="index-mno_002dearly_002dstop_002dbits-1389"></a>Allow stop bits to be placed earlier than immediately preceding the
+instruction that triggered the stop bit.  This can improve instruction
+scheduling, but does not always do so.
+
+     <br><dt><code>-mfixed-range=</code><var>register-range</var><dd><a name="index-mfixed_002drange-1390"></a>Generate code treating the given register range as fixed registers. 
+A fixed register is one that the register allocator can not use.  This is
+useful when compiling kernel code.  A register range is specified as
+two registers separated by a dash.  Multiple register ranges can be
+specified separated by a comma.
+
+     <br><dt><code>-mtls-size=</code><var>tls-size</var><dd><a name="index-mtls_002dsize-1391"></a>Specify bit size of immediate TLS offsets.  Valid values are 14, 22, and
+64.
+
+     <br><dt><code>-mtune=</code><var>cpu-type</var><dd><a name="index-mtune-1392"></a>Tune the instruction scheduling for a particular CPU, Valid values are
+itanium, itanium1, merced, itanium2, and mckinley.
+
+     <br><dt><code>-milp32</code><dt><code>-mlp64</code><dd><a name="index-milp32-1393"></a><a name="index-mlp64-1394"></a>Generate code for a 32-bit or 64-bit environment. 
+The 32-bit environment sets int, long and pointer to 32 bits. 
+The 64-bit environment sets int to 32 bits and long and pointer
+to 64 bits.  These are HP-UX specific flags.
+
+     <br><dt><code>-mno-sched-br-data-spec</code><dt><code>-msched-br-data-spec</code><dd><a name="index-mno_002dsched_002dbr_002ddata_002dspec-1395"></a><a name="index-msched_002dbr_002ddata_002dspec-1396"></a>(Dis/En)able data speculative scheduling before reload. 
+This will result in generation of the ld.a instructions and
+the corresponding check instructions (ld.c / chk.a). 
+The default is 'disable'.
+
+     <br><dt><code>-msched-ar-data-spec</code><dt><code>-mno-sched-ar-data-spec</code><dd><a name="index-msched_002dar_002ddata_002dspec-1397"></a><a name="index-mno_002dsched_002dar_002ddata_002dspec-1398"></a>(En/Dis)able data speculative scheduling after reload. 
+This will result in generation of the ld.a instructions and
+the corresponding check instructions (ld.c / chk.a). 
+The default is 'enable'.
+
+     <br><dt><code>-mno-sched-control-spec</code><dt><code>-msched-control-spec</code><dd><a name="index-mno_002dsched_002dcontrol_002dspec-1399"></a><a name="index-msched_002dcontrol_002dspec-1400"></a>(Dis/En)able control speculative scheduling.  This feature is
+available only during region scheduling (i.e. before reload). 
+This will result in generation of the ld.s instructions and
+the corresponding check instructions chk.s . 
+The default is 'disable'.
+
+     <br><dt><code>-msched-br-in-data-spec</code><dt><code>-mno-sched-br-in-data-spec</code><dd><a name="index-msched_002dbr_002din_002ddata_002dspec-1401"></a><a name="index-mno_002dsched_002dbr_002din_002ddata_002dspec-1402"></a>(En/Dis)able speculative scheduling of the instructions that
+are dependent on the data speculative loads before reload. 
+This is effective only with <samp><span class="option">-msched-br-data-spec</span></samp> enabled. 
+The default is 'enable'.
+
+     <br><dt><code>-msched-ar-in-data-spec</code><dt><code>-mno-sched-ar-in-data-spec</code><dd><a name="index-msched_002dar_002din_002ddata_002dspec-1403"></a><a name="index-mno_002dsched_002dar_002din_002ddata_002dspec-1404"></a>(En/Dis)able speculative scheduling of the instructions that
+are dependent on the data speculative loads after reload. 
+This is effective only with <samp><span class="option">-msched-ar-data-spec</span></samp> enabled. 
+The default is 'enable'.
+
+     <br><dt><code>-msched-in-control-spec</code><dt><code>-mno-sched-in-control-spec</code><dd><a name="index-msched_002din_002dcontrol_002dspec-1405"></a><a name="index-mno_002dsched_002din_002dcontrol_002dspec-1406"></a>(En/Dis)able speculative scheduling of the instructions that
+are dependent on the control speculative loads. 
+This is effective only with <samp><span class="option">-msched-control-spec</span></samp> enabled. 
+The default is 'enable'.
+
+     <br><dt><code>-mno-sched-prefer-non-data-spec-insns</code><dt><code>-msched-prefer-non-data-spec-insns</code><dd><a name="index-mno_002dsched_002dprefer_002dnon_002ddata_002dspec_002dinsns-1407"></a><a name="index-msched_002dprefer_002dnon_002ddata_002dspec_002dinsns-1408"></a>If enabled, data speculative instructions will be chosen for schedule
+only if there are no other choices at the moment.  This will make
+the use of the data speculation much more conservative. 
+The default is 'disable'.
+
+     <br><dt><code>-mno-sched-prefer-non-control-spec-insns</code><dt><code>-msched-prefer-non-control-spec-insns</code><dd><a name="index-mno_002dsched_002dprefer_002dnon_002dcontrol_002dspec_002dinsns-1409"></a><a name="index-msched_002dprefer_002dnon_002dcontrol_002dspec_002dinsns-1410"></a>If enabled, control speculative instructions will be chosen for schedule
+only if there are no other choices at the moment.  This will make
+the use of the control speculation much more conservative. 
+The default is 'disable'.
+
+     <br><dt><code>-mno-sched-count-spec-in-critical-path</code><dt><code>-msched-count-spec-in-critical-path</code><dd><a name="index-mno_002dsched_002dcount_002dspec_002din_002dcritical_002dpath-1411"></a><a name="index-msched_002dcount_002dspec_002din_002dcritical_002dpath-1412"></a>If enabled, speculative dependencies will be considered during
+computation of the instructions priorities.  This will make the use of the
+speculation a bit more conservative. 
+The default is 'disable'.
+
+     <br><dt><code>-msched-spec-ldc</code><dd><a name="index-msched_002dspec_002dldc-1413"></a>Use a simple data speculation check.  This option is on by default.
+
+     <br><dt><code>-msched-control-spec-ldc</code><dd><a name="index-msched_002dspec_002dldc-1414"></a>Use a simple check for control speculation.  This option is on by default.
+
+     <br><dt><code>-msched-stop-bits-after-every-cycle</code><dd><a name="index-msched_002dstop_002dbits_002dafter_002devery_002dcycle-1415"></a>Place a stop bit after every cycle when scheduling.  This option is on
+by default.
+
+     <br><dt><code>-msched-fp-mem-deps-zero-cost</code><dd><a name="index-msched_002dfp_002dmem_002ddeps_002dzero_002dcost-1416"></a>Assume that floating-point stores and loads are not likely to cause a conflict
+when placed into the same instruction group.  This option is disabled by
+default.
+
+     <br><dt><code>-msel-sched-dont-check-control-spec</code><dd><a name="index-msel_002dsched_002ddont_002dcheck_002dcontrol_002dspec-1417"></a>Generate checks for control speculation in selective scheduling. 
+This flag is disabled by default.
+
+     <br><dt><code>-msched-max-memory-insns=</code><var>max-insns</var><dd><a name="index-msched_002dmax_002dmemory_002dinsns-1418"></a>Limit on the number of memory insns per instruction group, giving lower
+priority to subsequent memory insns attempting to schedule in the same
+instruction group. Frequently useful to prevent cache bank conflicts. 
+The default value is 1.
+
+     <br><dt><code>-msched-max-memory-insns-hard-limit</code><dd><a name="index-msched_002dmax_002dmemory_002dinsns_002dhard_002dlimit-1419"></a>Disallow more than `msched-max-memory-insns' in instruction group. 
+Otherwise, limit is `soft' meaning that we would prefer non-memory operations
+when limit is reached but may still schedule memory operations.
+
+ </dl>
+
+ </body></html>
+

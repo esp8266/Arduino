@@ -1,0 +1,76 @@
+<html lang="en">
+<head>
+<title>MSP430 - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Machine-Dependent.html#Machine-Dependent" title="Machine Dependent">
+<link rel="prev" href="MMIX.html#MMIX" title="MMIX">
+<link rel="next" href="M68HC11_002f68HC12.html#M68HC11_002f68HC12" title="M68HC11/68HC12">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="MSP430"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="M68HC11_002f68HC12.html#M68HC11_002f68HC12">M68HC11/68HC12</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="MMIX.html#MMIX">MMIX</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Machine-Dependent.html#Machine-Dependent">Machine Dependent</a>
+<hr>
+</div>
+
+<h3 class="section">4.8 <code>ld</code> and MSP430</h3>
+
+<p>For the MSP430 it is possible to select the MPU architecture.  The flag &lsquo;<samp><span class="samp">-m [mpu type]</span></samp>&rsquo;
+will select an appropriate linker script for selected MPU type.  (To get a list of known MPUs
+just pass &lsquo;<samp><span class="samp">-m help</span></samp>&rsquo; option to the linker).
+
+   <p><a name="index-MSP430-extra-sections-613"></a>The linker will recognize some extra sections which are MSP430 specific:
+
+     <dl>
+<dt><code>&lsquo;</code><samp><span class="samp">.vectors</span></samp><code>&rsquo;</code><dd>Defines a portion of ROM where interrupt vectors located.
+
+     <br><dt><code>&lsquo;</code><samp><span class="samp">.bootloader</span></samp><code>&rsquo;</code><dd>Defines the bootloader portion of the ROM (if applicable).  Any code
+in this section will be uploaded to the MPU.
+
+     <br><dt><code>&lsquo;</code><samp><span class="samp">.infomem</span></samp><code>&rsquo;</code><dd>Defines an information memory section (if applicable).  Any code in
+this section will be uploaded to the MPU.
+
+     <br><dt><code>&lsquo;</code><samp><span class="samp">.infomemnobits</span></samp><code>&rsquo;</code><dd>This is the same as the &lsquo;<samp><span class="samp">.infomem</span></samp>&rsquo; section except that any code
+in this section will not be uploaded to the MPU.
+
+     <br><dt><code>&lsquo;</code><samp><span class="samp">.noinit</span></samp><code>&rsquo;</code><dd>Denotes a portion of RAM located above &lsquo;<samp><span class="samp">.bss</span></samp>&rsquo; section.
+
+     <p>The last two sections are used by gcc. 
+</dl>
+
+   </body></html>
+

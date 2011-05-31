@@ -1,0 +1,146 @@
+<html lang="en">
+<head>
+<title>Argument Prescan - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Macro-Pitfalls.html#Macro-Pitfalls" title="Macro Pitfalls">
+<link rel="prev" href="Self_002dReferential-Macros.html#Self_002dReferential-Macros" title="Self-Referential Macros">
+<link rel="next" href="Newlines-in-Arguments.html#Newlines-in-Arguments" title="Newlines in Arguments">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Argument-Prescan"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Newlines-in-Arguments.html#Newlines-in-Arguments">Newlines in Arguments</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Self_002dReferential-Macros.html#Self_002dReferential-Macros">Self-Referential Macros</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Macro-Pitfalls.html#Macro-Pitfalls">Macro Pitfalls</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.10.6 Argument Prescan</h4>
+
+<p><a name="index-expansion-of-arguments-79"></a><a name="index-macro-argument-expansion-80"></a><a name="index-prescan-of-macro-arguments-81"></a>
+Macro arguments are completely macro-expanded before they are
+substituted into a macro body, unless they are stringified or pasted
+with other tokens.  After substitution, the entire macro body, including
+the substituted arguments, is scanned again for macros to be expanded. 
+The result is that the arguments are scanned <em>twice</em> to expand
+macro calls in them.
+
+   <p>Most of the time, this has no effect.  If the argument contained any
+macro calls, they are expanded during the first scan.  The result
+therefore contains no macro calls, so the second scan does not change
+it.  If the argument were substituted as given, with no prescan, the
+single remaining scan would find the same macro calls and produce the
+same results.
+
+   <p>You might expect the double scan to change the results when a
+self-referential macro is used in an argument of another macro
+(see <a href="Self_002dReferential-Macros.html#Self_002dReferential-Macros">Self-Referential Macros</a>): the self-referential macro would be
+expanded once in the first scan, and a second time in the second scan. 
+However, this is not what happens.  The self-references that do not
+expand in the first scan are marked so that they will not expand in the
+second scan either.
+
+   <p>You might wonder, &ldquo;Why mention the prescan, if it makes no difference? 
+And why not skip it and make the preprocessor faster?&rdquo;  The answer is
+that the prescan does make a difference in three special cases:
+
+     <ul>
+<li>Nested calls to a macro.
+
+     <p>We say that <dfn>nested</dfn> calls to a macro occur when a macro's argument
+contains a call to that very macro.  For example, if <code>f</code> is a macro
+that expects one argument, <code>f (f (1))</code> is a nested pair of calls to
+<code>f</code>.  The desired expansion is made by expanding <code>f (1)</code> and
+substituting that into the definition of <code>f</code>.  The prescan causes
+the expected result to happen.  Without the prescan, <code>f (1)</code> itself
+would be substituted as an argument, and the inner use of <code>f</code> would
+appear during the main scan as an indirect self-reference and would not
+be expanded.
+
+     <li>Macros that call other macros that stringify or concatenate.
+
+     <p>If an argument is stringified or concatenated, the prescan does not
+occur.  If you <em>want</em> to expand a macro, then stringify or
+concatenate its expansion, you can do that by causing one macro to call
+another macro that does the stringification or concatenation.  For
+instance, if you have
+
+     <pre class="smallexample">          #define AFTERX(x) X_ ## x
+          #define XAFTERX(x) AFTERX(x)
+          #define TABLESIZE 1024
+          #define BUFSIZE TABLESIZE
+</pre>
+     <p>then <code>AFTERX(BUFSIZE)</code> expands to <code>X_BUFSIZE</code>, and
+<code>XAFTERX(BUFSIZE)</code> expands to <code>X_1024</code>.  (Not to
+<code>X_TABLESIZE</code>.  Prescan always does a complete expansion.)
+
+     <li>Macros used in arguments, whose expansions contain unshielded commas.
+
+     <p>This can cause a macro expanded on the second scan to be called with the
+wrong number of arguments.  Here is an example:
+
+     <pre class="smallexample">          #define foo  a,b
+          #define bar(x) lose(x)
+          #define lose(x) (1 + (x))
+</pre>
+     <p>We would like <code>bar(foo)</code> to turn into <code>(1 + (foo))</code>, which
+would then turn into <code>(1 + (a,b))</code>.  Instead, <code>bar(foo)</code>
+expands into <code>lose(a,b)</code>, and you get an error because <code>lose</code>
+requires a single argument.  In this case, the problem is easily solved
+by the same parentheses that ought to be used to prevent misnesting of
+arithmetic operations:
+
+     <pre class="smallexample">          #define foo (a,b)
+     <br>or<br>
+          #define bar(x) lose((x))
+</pre>
+     <p>The extra pair of parentheses prevents the comma in <code>foo</code>'s
+definition from being interpreted as an argument separator.
+
+   </ul>
+
+   </body></html>
+

@@ -1,0 +1,138 @@
+<html lang="en">
+<head>
+<title>C Extensions - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="C-Implementation.html#C-Implementation" title="C Implementation">
+<link rel="next" href="C_002b_002b-Implementation.html#C_002b_002b-Implementation" title="C++ Implementation">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="C-Extensions"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="C_002b_002b-Implementation.html#C_002b_002b-Implementation">C++ Implementation</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="C-Implementation.html#C-Implementation">C Implementation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">6 Extensions to the C Language Family</h2>
+
+<p><a name="index-extensions_002c-C-language-2177"></a><a name="index-C-language-extensions-2178"></a>
+<a name="index-pedantic-2179"></a>GNU C provides several language features not found in ISO standard C. 
+(The <samp><span class="option">-pedantic</span></samp> option directs GCC to print a warning message if
+any of these features is used.)  To test for the availability of these
+features in conditional compilation, check for a predefined macro
+<code>__GNUC__</code>, which is always defined under GCC.
+
+ <p>These extensions are available in C and Objective-C.  Most of them are
+also available in C++.  See <a href="C_002b_002b-Extensions.html#C_002b_002b-Extensions">Extensions to the C++ Language</a>, for extensions that apply <em>only</em> to C++.
+
+ <p>Some features that are in ISO C99 but not C90 or C++ are also, as
+extensions, accepted by GCC in C90 mode and in C++.
+
+<ul class="menu">
+<li><a accesskey="1" href="Statement-Exprs.html#Statement-Exprs">Statement Exprs</a>:      Putting statements and declarations inside expressions. 
+<li><a accesskey="2" href="Local-Labels.html#Local-Labels">Local Labels</a>:         Labels local to a block. 
+<li><a accesskey="3" href="Labels-as-Values.html#Labels-as-Values">Labels as Values</a>:     Getting pointers to labels, and computed gotos. 
+<li><a accesskey="4" href="Nested-Functions.html#Nested-Functions">Nested Functions</a>:     As in Algol and Pascal, lexical scoping of functions. 
+<li><a accesskey="5" href="Constructing-Calls.html#Constructing-Calls">Constructing Calls</a>:   Dispatching a call to another function. 
+<li><a accesskey="6" href="Typeof.html#Typeof">Typeof</a>:               <code>typeof</code>: referring to the type of an expression. 
+<li><a accesskey="7" href="Conditionals.html#Conditionals">Conditionals</a>:         Omitting the middle operand of a &lsquo;<samp><span class="samp">?:</span></samp>&rsquo; expression. 
+<li><a accesskey="8" href="Long-Long.html#Long-Long">Long Long</a>:            Double-word integers---<code>long long int</code>. 
+<li><a accesskey="9" href="Complex.html#Complex">Complex</a>:              Data types for complex numbers. 
+<li><a href="Floating-Types.html#Floating-Types">Floating Types</a>:       Additional Floating Types. 
+<li><a href="Half_002dPrecision.html#Half_002dPrecision">Half-Precision</a>:       Half-Precision Floating Point. 
+<li><a href="Decimal-Float.html#Decimal-Float">Decimal Float</a>:        Decimal Floating Types. 
+<li><a href="Hex-Floats.html#Hex-Floats">Hex Floats</a>:           Hexadecimal floating-point constants. 
+<li><a href="Fixed_002dPoint.html#Fixed_002dPoint">Fixed-Point</a>:          Fixed-Point Types. 
+<li><a href="Named-Address-Spaces.html#Named-Address-Spaces">Named Address Spaces</a>: Named address spaces. 
+<li><a href="Zero-Length.html#Zero-Length">Zero Length</a>:          Zero-length arrays. 
+<li><a href="Variable-Length.html#Variable-Length">Variable Length</a>:      Arrays whose length is computed at run time. 
+<li><a href="Empty-Structures.html#Empty-Structures">Empty Structures</a>:     Structures with no members. 
+<li><a href="Variadic-Macros.html#Variadic-Macros">Variadic Macros</a>:      Macros with a variable number of arguments. 
+<li><a href="Escaped-Newlines.html#Escaped-Newlines">Escaped Newlines</a>:     Slightly looser rules for escaped newlines. 
+<li><a href="Subscripting.html#Subscripting">Subscripting</a>:         Any array can be subscripted, even if not an lvalue. 
+<li><a href="Pointer-Arith.html#Pointer-Arith">Pointer Arith</a>:        Arithmetic on <code>void</code>-pointers and function pointers. 
+<li><a href="Initializers.html#Initializers">Initializers</a>:         Non-constant initializers. 
+<li><a href="Compound-Literals.html#Compound-Literals">Compound Literals</a>:    Compound literals give structures, unions
+                        or arrays as values. 
+<li><a href="Designated-Inits.html#Designated-Inits">Designated Inits</a>:     Labeling elements of initializers. 
+<li><a href="Cast-to-Union.html#Cast-to-Union">Cast to Union</a>:        Casting to union type from any member of the union. 
+<li><a href="Case-Ranges.html#Case-Ranges">Case Ranges</a>:          `case 1 ... 9' and such. 
+<li><a href="Mixed-Declarations.html#Mixed-Declarations">Mixed Declarations</a>:   Mixing declarations and code. 
+<li><a href="Function-Attributes.html#Function-Attributes">Function Attributes</a>:  Declaring that functions have no side effects,
+                        or that they can never return. 
+<li><a href="Attribute-Syntax.html#Attribute-Syntax">Attribute Syntax</a>:     Formal syntax for attributes. 
+<li><a href="Function-Prototypes.html#Function-Prototypes">Function Prototypes</a>:  Prototype declarations and old-style definitions. 
+<li><a href="C_002b_002b-Comments.html#C_002b_002b-Comments">C++ Comments</a>:         C++ comments are recognized. 
+<li><a href="Dollar-Signs.html#Dollar-Signs">Dollar Signs</a>:         Dollar sign is allowed in identifiers. 
+<li><a href="Character-Escapes.html#Character-Escapes">Character Escapes</a>:    &lsquo;<samp><span class="samp">\e</span></samp>&rsquo; stands for the character &lt;ESC&gt;. 
+<li><a href="Variable-Attributes.html#Variable-Attributes">Variable Attributes</a>:  Specifying attributes of variables. 
+<li><a href="Type-Attributes.html#Type-Attributes">Type Attributes</a>:      Specifying attributes of types. 
+<li><a href="Alignment.html#Alignment">Alignment</a>:            Inquiring about the alignment of a type or variable. 
+<li><a href="Inline.html#Inline">Inline</a>:               Defining inline functions (as fast as macros). 
+<li><a href="Extended-Asm.html#Extended-Asm">Extended Asm</a>:         Assembler instructions with C expressions as operands. 
+                        (With them you can define ``built-in'' functions.) 
+<li><a href="Constraints.html#Constraints">Constraints</a>:          Constraints for asm operands
+<li><a href="Asm-Labels.html#Asm-Labels">Asm Labels</a>:           Specifying the assembler name to use for a C symbol. 
+<li><a href="Explicit-Reg-Vars.html#Explicit-Reg-Vars">Explicit Reg Vars</a>:    Defining variables residing in specified registers. 
+<li><a href="Alternate-Keywords.html#Alternate-Keywords">Alternate Keywords</a>:   <code>__const__</code>, <code>__asm__</code>, etc., for header files. 
+<li><a href="Incomplete-Enums.html#Incomplete-Enums">Incomplete Enums</a>:     <code>enum foo;</code>, with details to follow. 
+<li><a href="Function-Names.html#Function-Names">Function Names</a>:       Printable strings which are the name of the current
+                        function. 
+<li><a href="Return-Address.html#Return-Address">Return Address</a>:       Getting the return or frame address of a function. 
+<li><a href="Vector-Extensions.html#Vector-Extensions">Vector Extensions</a>:    Using vector instructions through built-in functions. 
+<li><a href="Offsetof.html#Offsetof">Offsetof</a>:             Special syntax for implementing <code>offsetof</code>. 
+<li><a href="Atomic-Builtins.html#Atomic-Builtins">Atomic Builtins</a>:      Built-in functions for atomic memory access. 
+<li><a href="Object-Size-Checking.html#Object-Size-Checking">Object Size Checking</a>:  Built-in functions for limited buffer overflow
+                        checking. 
+<li><a href="Other-Builtins.html#Other-Builtins">Other Builtins</a>:       Other built-in functions. 
+<li><a href="Target-Builtins.html#Target-Builtins">Target Builtins</a>:      Built-in functions specific to particular targets. 
+<li><a href="Target-Format-Checks.html#Target-Format-Checks">Target Format Checks</a>:  Format checks specific to particular targets. 
+<li><a href="Pragmas.html#Pragmas">Pragmas</a>:              Pragmas accepted by GCC. 
+<li><a href="Unnamed-Fields.html#Unnamed-Fields">Unnamed Fields</a>:       Unnamed struct/union fields within structs/unions. 
+<li><a href="Thread_002dLocal.html#Thread_002dLocal">Thread-Local</a>:         Per-thread variables. 
+<li><a href="Binary-constants.html#Binary-constants">Binary constants</a>:     Binary constants using the &lsquo;<samp><span class="samp">0b</span></samp>&rsquo; prefix. 
+</ul>
+
+ </body></html>
+

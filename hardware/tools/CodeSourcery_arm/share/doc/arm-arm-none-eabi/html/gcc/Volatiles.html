@@ -1,0 +1,104 @@
+<html lang="en">
+<head>
+<title>Volatiles - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C_002b_002b-Extensions.html#C_002b_002b-Extensions" title="C++ Extensions">
+<link rel="next" href="Restricted-Pointers.html#Restricted-Pointers" title="Restricted Pointers">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Volatiles"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Restricted-Pointers.html#Restricted-Pointers">Restricted Pointers</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C_002b_002b-Extensions.html#C_002b_002b-Extensions">C++ Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">7.1 When is a Volatile Object Accessed?</h3>
+
+<p><a name="index-accessing-volatiles-3159"></a><a name="index-volatile-read-3160"></a><a name="index-volatile-write-3161"></a><a name="index-volatile-access-3162"></a>
+Both the C and C++ standard have the concept of volatile objects.  These
+are normally accessed by pointers and used for accessing hardware.  The
+standards encourage compilers to refrain from optimizations concerning
+accesses to volatile objects.  The C standard leaves it implementation
+defined  as to what constitutes a volatile access.  The C++ standard omits
+to specify this, except to say that C++ should behave in a similar manner
+to C with respect to volatiles, where possible.  The minimum either
+standard specifies is that at a sequence point all previous accesses to
+volatile objects have stabilized and no subsequent accesses have
+occurred.  Thus an implementation is free to reorder and combine
+volatile accesses which occur between sequence points, but cannot do so
+for accesses across a sequence point.  The use of volatiles does not
+allow you to violate the restriction on updating objects multiple times
+within a sequence point.
+
+ <p>See <a href="Qualifiers-implementation.html#Qualifiers-implementation">Volatile qualifier and the C compiler</a>.
+
+ <p>The behavior differs slightly between C and C++ in the non-obvious cases:
+
+<pre class="smallexample">     volatile int *src = <var>somevalue</var>;
+     *src;
+</pre>
+ <p>With C, such expressions are rvalues, and GCC interprets this either as a
+read of the volatile object being pointed to or only as request to evaluate
+the side-effects.  The C++ standard specifies that such expressions do not
+undergo lvalue to rvalue conversion, and that the type of the dereferenced
+object may be incomplete.  The C++ standard does not specify explicitly
+that it is this lvalue to rvalue conversion which may be responsible for
+causing an access.  However, there is reason to believe that it is,
+because otherwise certain simple expressions become undefined.  However,
+because it would surprise most programmers, G++ treats dereferencing a
+pointer to volatile object of complete type when the value is unused as
+GCC would do for an equivalent type in C.  When the object has incomplete
+type, G++ issues a warning; if you wish to force an error, you must
+force a conversion to rvalue with, for instance, a static cast.
+
+ <p>When using a reference to volatile, G++ does not treat equivalent
+expressions as accesses to volatiles, but instead issues a warning that
+no volatile is accessed.  The rationale for this is that otherwise it
+becomes difficult to determine where volatile access occur, and not
+possible to ignore the return value from functions returning volatile
+references.  Again, if you wish to force a read, cast the reference to
+an rvalue.
+
+ </body></html>
+

@@ -1,0 +1,79 @@
+<html lang="en">
+<head>
+<title>Absolute Literals Directive - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Xtensa-Directives.html#Xtensa-Directives" title="Xtensa Directives">
+<link rel="prev" href="Literal-Prefix-Directive.html#Literal-Prefix-Directive" title="Literal Prefix Directive">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Absolute-Literals-Directive"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Literal-Prefix-Directive.html#Literal-Prefix-Directive">Literal Prefix Directive</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Xtensa-Directives.html#Xtensa-Directives">Xtensa Directives</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">9.42.5.7 absolute-literals</h5>
+
+<p><a name="index-g_t_0040code_007babsolute_002dliterals_007d-directive-2054"></a><a name="index-g_t_0040code_007bno_002dabsolute_002dliterals_007d-directive-2055"></a>
+The <code>absolute-literals</code> and <code>no-absolute-literals</code>
+directives control the absolute vs. PC-relative mode for <code>L32R</code>
+instructions.  These are relevant only for Xtensa configurations that
+include the absolute addressing option for <code>L32R</code> instructions.
+
+<pre class="smallexample">         .begin [no-]absolute-literals
+         .end [no-]absolute-literals
+</pre>
+   <p>These directives do not change the <code>L32R</code> mode&mdash;they only cause
+the assembler to emit the appropriate kind of relocation for <code>L32R</code>
+instructions and to place the literal values in the appropriate section. 
+To change the <code>L32R</code> mode, the program must write the
+<code>LITBASE</code> special register.  It is the programmer's responsibility
+to keep track of the mode and indicate to the assembler which mode is
+used in each region of code.
+
+   <p>If the Xtensa configuration includes the absolute <code>L32R</code> addressing
+option, the default is to assume absolute <code>L32R</code> addressing unless
+the &lsquo;<samp><span class="samp">--no-absolute-literals</span></samp>&rsquo; command-line option is specified. 
+Otherwise, the default is to assume PC-relative <code>L32R</code> addressing. 
+The <code>absolute-literals</code> directive can then be used to override
+the default determined by the command-line options.
+
+<!-- Local Variables: -->
+<!-- fill-column: 72 -->
+<!-- End: -->
+<!-- reverse effect of @down at top of generic Machine-Dep chapter -->
+   </body></html>
+

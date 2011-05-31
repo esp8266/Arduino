@@ -1,0 +1,93 @@
+<html lang="en">
+<head>
+<title>Word - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Pseudo-Ops.html#Pseudo-Ops" title="Pseudo Ops">
+<link rel="prev" href="Weakref.html#Weakref" title="Weakref">
+<link rel="next" href="Deprecated.html#Deprecated" title="Deprecated">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Word"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Deprecated.html#Deprecated">Deprecated</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Weakref.html#Weakref">Weakref</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Pseudo-Ops.html#Pseudo-Ops">Pseudo Ops</a>
+<hr>
+</div>
+
+<h3 class="section">7.121 <code>.word </code><var>expressions</var></h3>
+
+<p><a name="index-g_t_0040code_007bword_007d-directive-500"></a>This directive expects zero or more <var>expressions</var>, of any section,
+separated by commas.
+
+   <p>The size of the number emitted, and its byte order,
+depend on what target computer the assembly is for.
+
+<!-- on amd29k, i960, sparc the "special treatment to support compilers" doesn't -->
+<!-- happen-32-bit addressability, period; no long/short jumps. -->
+   <p><a name="index-difference-tables-altered-501"></a><a name="index-altered-difference-tables-502"></a><blockquote>
+<em>Warning: Special Treatment to support Compilers</em>
+</blockquote>
+
+   <p>Machines with a 32-bit address space, but that do less than 32-bit
+addressing, require the following special treatment.  If the machine of
+interest to you does 32-bit addressing (or doesn't require it;
+see <a href="Machine-Dependencies.html#Machine-Dependencies">Machine Dependencies</a>), you can ignore this issue.
+
+   <p>In order to assemble compiler output into something that works,
+<samp><span class="command">as</span></samp> occasionally does strange things to &lsquo;<samp><span class="samp">.word</span></samp>&rsquo; directives. 
+Directives of the form &lsquo;<samp><span class="samp">.word sym1-sym2</span></samp>&rsquo; are often emitted by
+compilers as part of jump tables.  Therefore, when <samp><span class="command">as</span></samp> assembles a
+directive of the form &lsquo;<samp><span class="samp">.word sym1-sym2</span></samp>&rsquo;, and the difference between
+<code>sym1</code> and <code>sym2</code> does not fit in 16 bits, <samp><span class="command">as</span></samp>
+creates a <dfn>secondary jump table</dfn>, immediately before the next label. 
+This secondary jump table is preceded by a short-jump to the
+first byte after the secondary table.  This short-jump prevents the flow
+of control from accidentally falling into the new table.  Inside the
+table is a long-jump to <code>sym2</code>.  The original &lsquo;<samp><span class="samp">.word</span></samp>&rsquo;
+contains <code>sym1</code> minus the address of the long-jump to
+<code>sym2</code>.
+
+   <p>If there were several occurrences of &lsquo;<samp><span class="samp">.word sym1-sym2</span></samp>&rsquo; before the
+secondary jump table, all of them are adjusted.  If there was a
+&lsquo;<samp><span class="samp">.word sym3-sym4</span></samp>&rsquo;, that also did not fit in sixteen bits, a
+long-jump to <code>sym4</code> is included in the secondary jump table,
+and the <code>.word</code> directives are adjusted to contain <code>sym3</code>
+minus the address of the long-jump to <code>sym4</code>; and so on, for as many
+entries in the original jump table as necessary.
+
+<!-- end     DIFF-TBL-KLUGE -->
+   </body></html>
+

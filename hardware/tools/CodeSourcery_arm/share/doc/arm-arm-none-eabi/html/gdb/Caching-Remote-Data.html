@@ -1,0 +1,99 @@
+<html lang="en">
+<head>
+<title>Caching Remote Data - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Data.html#Data" title="Data">
+<link rel="prev" href="Character-Sets.html#Character-Sets" title="Character Sets">
+<link rel="next" href="Searching-Memory.html#Searching-Memory" title="Searching Memory">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Caching-Remote-Data"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Searching-Memory.html#Searching-Memory">Searching Memory</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Character-Sets.html#Character-Sets">Character Sets</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Data.html#Data">Data</a>
+<hr>
+</div>
+
+<h3 class="section">10.20 Caching Data of Remote Targets</h3>
+
+<p><a name="index-caching-data-of-remote-targets-653"></a>
+<span class="sc">gdb</span> caches data exchanged between the debugger and a
+remote target (see <a href="Remote-Debugging.html#Remote-Debugging">Remote Debugging</a>).  Such caching generally improves
+performance, because it reduces the overhead of the remote protocol by
+bundling memory reads and writes into large chunks.  Unfortunately, simply
+caching everything would lead to incorrect results, since <span class="sc">gdb</span>
+does not necessarily know anything about volatile values, memory-mapped I/O
+addresses, etc.  Furthermore, in non-stop mode (see <a href="Non_002dStop-Mode.html#Non_002dStop-Mode">Non-Stop Mode</a>)
+memory can be changed <em>while</em> a gdb command is executing. 
+Therefore, by default, <span class="sc">gdb</span> only caches data
+known to be on the stack<a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a>. 
+Other regions of memory can be explicitly marked as
+cacheable; see see <a href="Memory-Region-Attributes.html#Memory-Region-Attributes">Memory Region Attributes</a>.
+
+     
+<a name="index-set-remotecache-654"></a>
+<dl><dt><code>set remotecache on</code><dt><code>set remotecache off</code><dd>This option no longer does anything; it exists for compatibility
+with old scripts.
+
+     <p><a name="index-show-remotecache-655"></a><br><dt><code>show remotecache</code><dd>Show the current state of the obsolete remotecache flag.
+
+     <p><a name="index-set-stack_002dcache-656"></a><br><dt><code>set stack-cache on</code><dt><code>set stack-cache off</code><dd>Enable or disable caching of stack accesses.  When <code>ON</code>, use
+caching.  By default, this option is <code>ON</code>.
+
+     <p><a name="index-show-stack_002dcache-657"></a><br><dt><code>show stack-cache</code><dd>Show the current state of data caching for memory accesses.
+
+     <p><a name="index-info-dcache-658"></a><br><dt><code>info dcache </code><span class="roman">[</span><code>line</code><span class="roman">]</span><dd>Print the information about the data cache performance.  The
+information displayed includes the dcache width and depth, and for
+each cache line, its number, address, and how many times it was
+referenced.  This command is useful for debugging the data cache
+operation.
+
+     <p>If a line number is specified, the contents of that line will be
+printed in hex. 
+</dl>
+
+   <div class="footnote">
+<hr>
+<h4>Footnotes</h4><p class="footnote"><small>[<a name="fn-1" href="#fnd-1">1</a>]</small> In non-stop mode, it is moderately
+rare for a running thread to modify the stack of a stopped thread
+in a way that would interfere with a backtrace, and caching of
+stack reads provides a significant speed up of remote backtraces.</p>
+
+   <hr></div>
+
+   </body></html>
+

@@ -1,0 +1,134 @@
+<html lang="en">
+<head>
+<title>Computed Includes - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Header-Files.html#Header-Files" title="Header Files">
+<link rel="prev" href="Alternatives-to-Wrapper-_0023ifndef.html#Alternatives-to-Wrapper-_0023ifndef" title="Alternatives to Wrapper #ifndef">
+<link rel="next" href="Wrapper-Headers.html#Wrapper-Headers" title="Wrapper Headers">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Computed-Includes"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Wrapper-Headers.html#Wrapper-Headers">Wrapper Headers</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Alternatives-to-Wrapper-_0023ifndef.html#Alternatives-to-Wrapper-_0023ifndef">Alternatives to Wrapper #ifndef</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Header-Files.html#Header-Files">Header Files</a>
+<hr>
+</div>
+
+<h3 class="section">2.6 Computed Includes</h3>
+
+<p><a name="index-computed-includes-34"></a><a name="index-macros-in-include-35"></a>
+Sometimes it is necessary to select one of several different header
+files to be included into your program.  They might specify
+configuration parameters to be used on different sorts of operating
+systems, for instance.  You could do this with a series of conditionals,
+
+<pre class="smallexample">     #if SYSTEM_1
+     # include "system_1.h"
+     #elif SYSTEM_2
+     # include "system_2.h"
+     #elif SYSTEM_3
+     ...
+     #endif
+</pre>
+   <p>That rapidly becomes tedious.  Instead, the preprocessor offers the
+ability to use a macro for the header name.  This is called a
+<dfn>computed include</dfn>.  Instead of writing a header name as the direct
+argument of &lsquo;<samp><span class="samp">#include</span></samp>&rsquo;, you simply put a macro name there instead:
+
+<pre class="smallexample">     #define SYSTEM_H "system_1.h"
+     ...
+     #include SYSTEM_H
+</pre>
+   <p class="noindent"><code>SYSTEM_H</code> will be expanded, and the preprocessor will look for
+<samp><span class="file">system_1.h</span></samp> as if the &lsquo;<samp><span class="samp">#include</span></samp>&rsquo; had been written that way
+originally.  <code>SYSTEM_H</code> could be defined by your Makefile with a
+<samp><span class="option">-D</span></samp> option.
+
+   <p>You must be careful when you define the macro.  &lsquo;<samp><span class="samp">#define</span></samp>&rsquo; saves
+tokens, not text.  The preprocessor has no way of knowing that the macro
+will be used as the argument of &lsquo;<samp><span class="samp">#include</span></samp>&rsquo;, so it generates
+ordinary tokens, not a header name.  This is unlikely to cause problems
+if you use double-quote includes, which are close enough to string
+constants.  If you use angle brackets, however, you may have trouble.
+
+   <p>The syntax of a computed include is actually a bit more general than the
+above.  If the first non-whitespace character after &lsquo;<samp><span class="samp">#include</span></samp>&rsquo; is
+not &lsquo;<samp><span class="samp">"</span></samp>&rsquo; or &lsquo;<samp><span class="samp">&lt;</span></samp>&rsquo;, then the entire line is macro-expanded
+like running text would be.
+
+   <p>If the line expands to a single string constant, the contents of that
+string constant are the file to be included.  CPP does not re-examine the
+string for embedded quotes, but neither does it process backslash
+escapes in the string.  Therefore
+
+<pre class="smallexample">     #define HEADER "a\"b"
+     #include HEADER
+</pre>
+   <p class="noindent">looks for a file named <samp><span class="file">a\"b</span></samp>.  CPP searches for the file according
+to the rules for double-quoted includes.
+
+   <p>If the line expands to a token stream beginning with a &lsquo;<samp><span class="samp">&lt;</span></samp>&rsquo; token
+and including a &lsquo;<samp><span class="samp">&gt;</span></samp>&rsquo; token, then the tokens between the &lsquo;<samp><span class="samp">&lt;</span></samp>&rsquo; and
+the first &lsquo;<samp><span class="samp">&gt;</span></samp>&rsquo; are combined to form the filename to be included. 
+Any whitespace between tokens is reduced to a single space; then any
+space after the initial &lsquo;<samp><span class="samp">&lt;</span></samp>&rsquo; is retained, but a trailing space
+before the closing &lsquo;<samp><span class="samp">&gt;</span></samp>&rsquo; is ignored.  CPP searches for the file
+according to the rules for angle-bracket includes.
+
+   <p>In either case, if there are any tokens on the line after the file name,
+an error occurs and the directive is not processed.  It is also an error
+if the result of expansion does not match either of the two expected
+forms.
+
+   <p>These rules are implementation-defined behavior according to the C
+standard.  To minimize the risk of different compilers interpreting your
+computed includes differently, we recommend you use only a single
+object-like macro which expands to a string constant.  This will also
+minimize confusion for people reading your program.
+
+   </body></html>
+

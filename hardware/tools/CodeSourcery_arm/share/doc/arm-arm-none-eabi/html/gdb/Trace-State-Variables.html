@@ -1,0 +1,96 @@
+<html lang="en">
+<head>
+<title>Trace State Variables - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Set-Tracepoints.html#Set-Tracepoints" title="Set Tracepoints">
+<link rel="prev" href="Tracepoint-Conditions.html#Tracepoint-Conditions" title="Tracepoint Conditions">
+<link rel="next" href="Tracepoint-Actions.html#Tracepoint-Actions" title="Tracepoint Actions">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Trace-State-Variables"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Tracepoint-Actions.html#Tracepoint-Actions">Tracepoint Actions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Tracepoint-Conditions.html#Tracepoint-Conditions">Tracepoint Conditions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Set-Tracepoints.html#Set-Tracepoints">Set Tracepoints</a>
+<hr>
+</div>
+
+<h4 class="subsection">13.1.5 Trace State Variables</h4>
+
+<p><a name="index-trace-state-variables-706"></a>
+A <dfn>trace state variable</dfn> is a special type of variable that is
+created and managed by target-side code.  The syntax is the same as
+that for GDB's convenience variables (a string prefixed with &ldquo;$&rdquo;),
+but they are stored on the target.  They must be created explicitly,
+using a <code>tvariable</code> command.  They are always 64-bit signed
+integers.
+
+   <p>Trace state variables are remembered by <span class="sc">gdb</span>, and downloaded
+to the target along with tracepoint information when the trace
+experiment starts.  There are no intrinsic limits on the number of
+trace state variables, beyond memory limitations of the target.
+
+   <p><a name="index-convenience-variables_002c-and-trace-state-variables-707"></a>Although trace state variables are managed by the target, you can use
+them in print commands and expressions as if they were convenience
+variables; <span class="sc">gdb</span> will get the current value from the target
+while the trace experiment is running.  Trace state variables share
+the same namespace as other &ldquo;$&rdquo; variables, which means that you
+cannot have trace state variables with names like <code>$23</code> or
+<code>$pc</code>, nor can you have a trace state variable and a convenience
+variable with the same name.
+
+     <dl>
+<dt><code>tvariable $</code><var>name</var><code> [ = </code><var>expression</var><code> ]</code><dd><a name="index-tvariable-708"></a>The <code>tvariable</code> command creates a new trace state variable named
+<code>$</code><var>name</var>, and optionally gives it an initial value of
+<var>expression</var>.  <var>expression</var> is evaluated when this command is
+entered; the result will be converted to an integer if possible,
+otherwise <span class="sc">gdb</span> will report an error. A subsequent
+<code>tvariable</code> command specifying the same name does not create a
+variable, but instead assigns the supplied initial value to the
+existing variable of that name, overwriting any previous initial
+value. The default initial value is 0.
+
+     <br><dt><code>info tvariables</code><dd><a name="index-info-tvariables-709"></a>List all the trace state variables along with their initial values. 
+Their current values may also be displayed, if the trace experiment is
+currently running.
+
+     <br><dt><code>delete tvariable </code><span class="roman">[</span><code> $</code><var>name</var><code> ... </code><span class="roman">]</span><dd><a name="index-delete-tvariable-710"></a>Delete the given trace state variables, or all of them if no arguments
+are specified.
+
+   </dl>
+
+   </body></html>
+

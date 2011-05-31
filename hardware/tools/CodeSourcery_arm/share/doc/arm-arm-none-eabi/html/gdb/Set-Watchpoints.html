@@ -1,0 +1,234 @@
+<html lang="en">
+<head>
+<title>Set Watchpoints - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Breakpoints.html#Breakpoints" title="Breakpoints">
+<link rel="prev" href="Set-Breaks.html#Set-Breaks" title="Set Breaks">
+<link rel="next" href="Set-Catchpoints.html#Set-Catchpoints" title="Set Catchpoints">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Set-Watchpoints"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Set-Catchpoints.html#Set-Catchpoints">Set Catchpoints</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Set-Breaks.html#Set-Breaks">Set Breaks</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Breakpoints.html#Breakpoints">Breakpoints</a>
+<hr>
+</div>
+
+<h4 class="subsection">5.1.2 Setting Watchpoints</h4>
+
+<p><a name="index-setting-watchpoints-240"></a>You can use a watchpoint to stop execution whenever the value of an
+expression changes, without having to predict a particular place where
+this may happen.  (This is sometimes called a <dfn>data breakpoint</dfn>.) 
+The expression may be as simple as the value of a single variable, or
+as complex as many variables combined by operators.  Examples include:
+
+     <ul>
+<li>A reference to the value of a single variable.
+
+     <li>An address cast to an appropriate data type.  For example,
+&lsquo;<samp><span class="samp">*(int *)0x12345678</span></samp>&rsquo; will watch a 4-byte region at the specified
+address (assuming an <code>int</code> occupies 4 bytes).
+
+     <li>An arbitrarily complex expression, such as &lsquo;<samp><span class="samp">a*b + c/d</span></samp>&rsquo;.  The
+expression can use any operators valid in the program's native
+language (see <a href="Languages.html#Languages">Languages</a>). 
+</ul>
+
+   <p>You can set a watchpoint on an expression even if the expression can
+not be evaluated yet.  For instance, you can set a watchpoint on
+&lsquo;<samp><span class="samp">*global_ptr</span></samp>&rsquo; before &lsquo;<samp><span class="samp">global_ptr</span></samp>&rsquo; is initialized. 
+<span class="sc">gdb</span> will stop when your program sets &lsquo;<samp><span class="samp">global_ptr</span></samp>&rsquo; and
+the expression produces a valid value.  If the expression becomes
+valid in some other way than changing a variable (e.g. if the memory
+pointed to by &lsquo;<samp><span class="samp">*global_ptr</span></samp>&rsquo; becomes readable as the result of a
+<code>malloc</code> call), <span class="sc">gdb</span> may not stop until the next time
+the expression changes.
+
+   <p><a name="index-software-watchpoints-241"></a><a name="index-hardware-watchpoints-242"></a>Depending on your system, watchpoints may be implemented in software or
+hardware.  <span class="sc">gdb</span> does software watchpointing by single-stepping your
+program and testing the variable's value each time, which is hundreds of
+times slower than normal execution.  (But this may still be worth it, to
+catch errors where you have no clue what part of your program is the
+culprit.)
+
+   <p>On some systems, such as HP-UX, PowerPC, <span class="sc">gnu</span>/Linux and most other
+x86-based targets, <span class="sc">gdb</span> includes support for hardware
+watchpoints, which do not slow down the running of your program.
+
+     
+<a name="index-watch-243"></a>
+<dl><dt><code>watch </code><span class="roman">[</span><code>-l</code><span class="roman">|</span><code>-location</code><span class="roman">]</span> <var>expr</var> <span class="roman">[</span><code>thread </code><var>threadnum</var><span class="roman">]</span><dd>Set a watchpoint for an expression.  <span class="sc">gdb</span> will break when the
+expression <var>expr</var> is written into by the program and its value
+changes.  The simplest (and the most popular) use of this command is
+to watch the value of a single variable:
+
+     <pre class="smallexample">          (gdb) watch foo
+</pre>
+     <p>If the command includes a <span class="roman">[</span><code>thread </code><var>threadnum</var><span class="roman">]</span>
+clause, <span class="sc">gdb</span> breaks only when the thread identified by
+<var>threadnum</var> changes the value of <var>expr</var>.  If any other threads
+change the value of <var>expr</var>, <span class="sc">gdb</span> will not break.  Note
+that watchpoints restricted to a single thread in this way only work
+with Hardware Watchpoints.
+
+     <p>Ordinarily a watchpoint respects the scope of variables in <var>expr</var>
+(see below).  The <code>-location</code> argument tells <span class="sc">gdb</span> to
+instead watch the memory referred to by <var>expr</var>.  In this case,
+<span class="sc">gdb</span> will evaluate <var>expr</var>, take the address of the result,
+and watch the memory at that address.  The type of the result is used
+to determine the size of the watched memory.  If the expression's
+result does not have an address, then <span class="sc">gdb</span> will print an
+error.
+
+     <p><a name="index-rwatch-244"></a><br><dt><code>rwatch </code><span class="roman">[</span><code>-l</code><span class="roman">|</span><code>-location</code><span class="roman">]</span> <var>expr</var> <span class="roman">[</span><code>thread </code><var>threadnum</var><span class="roman">]</span><dd>Set a watchpoint that will break when the value of <var>expr</var> is read
+by the program.
+
+     <p><a name="index-awatch-245"></a><br><dt><code>awatch </code><span class="roman">[</span><code>-l</code><span class="roman">|</span><code>-location</code><span class="roman">]</span> <var>expr</var> <span class="roman">[</span><code>thread </code><var>threadnum</var><span class="roman">]</span><dd>Set a watchpoint that will break when <var>expr</var> is either read from
+or written into by the program.
+
+     <p><a name="index-info-watchpoints-_0040r_007b_005b_007d_0040var_007bn_007d_0040r_007b_005d_007d-246"></a><br><dt><code>info watchpoints</code><dd>This command prints a list of watchpoints, using the same format as
+<code>info break</code> (see <a href="Set-Breaks.html#Set-Breaks">Set Breaks</a>). 
+</dl>
+
+   <p>If you watch for a change in a numerically entered address you need to
+dereference it, as the address itself is just a constant number which will
+never change.  <span class="sc">gdb</span> refuses to create a watchpoint that watches
+a never-changing value:
+
+<pre class="smallexample">     (gdb) watch 0x600850
+     Cannot watch constant value 0x600850.
+     (gdb) watch *(int *) 0x600850
+     Watchpoint 1: *(int *) 6293584
+</pre>
+   <p><span class="sc">gdb</span> sets a <dfn>hardware watchpoint</dfn> if possible.  Hardware
+watchpoints execute very quickly, and the debugger reports a change in
+value at the exact instruction where the change occurs.  If <span class="sc">gdb</span>
+cannot set a hardware watchpoint, it sets a software watchpoint, which
+executes more slowly and reports the change in value at the next
+<em>statement</em>, not the instruction, after the change occurs.
+
+   <p><a name="index-use-only-software-watchpoints-247"></a>You can force <span class="sc">gdb</span> to use only software watchpoints with the
+<kbd>set can-use-hw-watchpoints 0</kbd> command.  With this variable set to
+zero, <span class="sc">gdb</span> will never try to use hardware watchpoints, even if
+the underlying system supports them.  (Note that hardware-assisted
+watchpoints that were set <em>before</em> setting
+<code>can-use-hw-watchpoints</code> to zero will still use the hardware
+mechanism of watching expression values.)
+
+     <dl>
+<dt><code>set can-use-hw-watchpoints</code><dd><a name="index-set-can_002duse_002dhw_002dwatchpoints-248"></a>Set whether or not to use hardware watchpoints.
+
+     <br><dt><code>show can-use-hw-watchpoints</code><dd><a name="index-show-can_002duse_002dhw_002dwatchpoints-249"></a>Show the current mode of using hardware watchpoints. 
+</dl>
+
+   <p>For remote targets, you can restrict the number of hardware
+watchpoints <span class="sc">gdb</span> will use, see <a href="set-remote-hardware_002dbreakpoint_002dlimit.html#set-remote-hardware_002dbreakpoint_002dlimit">set remote hardware-breakpoint-limit</a>.
+
+   <p>When you issue the <code>watch</code> command, <span class="sc">gdb</span> reports
+
+<pre class="smallexample">     Hardware watchpoint <var>num</var>: <var>expr</var>
+</pre>
+   <p class="noindent">if it was able to set a hardware watchpoint.
+
+   <p>Currently, the <code>awatch</code> and <code>rwatch</code> commands can only set
+hardware watchpoints, because accesses to data that don't change the
+value of the watched expression cannot be detected without examining
+every instruction as it is being executed, and <span class="sc">gdb</span> does not do
+that currently.  If <span class="sc">gdb</span> finds that it is unable to set a
+hardware breakpoint with the <code>awatch</code> or <code>rwatch</code> command, it
+will print a message like this:
+
+<pre class="smallexample">     Expression cannot be implemented with read/access watchpoint.
+</pre>
+   <p>Sometimes, <span class="sc">gdb</span> cannot set a hardware watchpoint because the
+data type of the watched expression is wider than what a hardware
+watchpoint on the target machine can handle.  For example, some systems
+can only watch regions that are up to 4 bytes wide; on such systems you
+cannot set hardware watchpoints for an expression that yields a
+double-precision floating-point number (which is typically 8 bytes
+wide).  As a work-around, it might be possible to break the large region
+into a series of smaller ones and watch them with separate watchpoints.
+
+   <p>If you set too many hardware watchpoints, <span class="sc">gdb</span> might be unable
+to insert all of them when you resume the execution of your program. 
+Since the precise number of active watchpoints is unknown until such
+time as the program is about to be resumed, <span class="sc">gdb</span> might not be
+able to warn you about this when you set the watchpoints, and the
+warning will be printed only when the program is resumed:
+
+<pre class="smallexample">     Hardware watchpoint <var>num</var>: Could not insert watchpoint
+</pre>
+   <p class="noindent">If this happens, delete or disable some of the watchpoints.
+
+   <p>Watching complex expressions that reference many variables can also
+exhaust the resources available for hardware-assisted watchpoints. 
+That's because <span class="sc">gdb</span> needs to watch every variable in the
+expression with separately allocated resources.
+
+   <p>If you call a function interactively using <code>print</code> or <code>call</code>,
+any watchpoints you have set will be inactive until <span class="sc">gdb</span> reaches another
+kind of breakpoint or the call completes.
+
+   <p><span class="sc">gdb</span> automatically deletes watchpoints that watch local
+(automatic) variables, or expressions that involve such variables, when
+they go out of scope, that is, when the execution leaves the block in
+which these variables were defined.  In particular, when the program
+being debugged terminates, <em>all</em> local variables go out of scope,
+and so only watchpoints that watch global variables remain set.  If you
+rerun the program, you will need to set all such watchpoints again.  One
+way of doing that would be to set a code breakpoint at the entry to the
+<code>main</code> function and when it breaks, set all the watchpoints.
+
+   <p><a name="index-watchpoints-and-threads-250"></a><a name="index-threads-and-watchpoints-251"></a>In multi-threaded programs, watchpoints will detect changes to the
+watched expression from every thread.
+
+   <blockquote>
+<em>Warning:</em> In multi-threaded programs, software watchpoints
+have only limited usefulness.  If <span class="sc">gdb</span> creates a software
+watchpoint, it can only watch the value of an expression <em>in a
+single thread</em>.  If you are confident that the expression can only
+change due to the current thread's activity (and if you are also
+confident that no other thread can become current), then you can use
+software watchpoints as usual.  However, <span class="sc">gdb</span> may not notice
+when a non-current thread's activity changes the expression.  (Hardware
+watchpoints, in contrast, watch an expression in all threads.) 
+</blockquote>
+
+   <p>See <a href="set-remote-hardware_002dwatchpoint_002dlimit.html#set-remote-hardware_002dwatchpoint_002dlimit">set remote hardware-watchpoint-limit</a>.
+
+   </body></html>
+

@@ -1,0 +1,268 @@
+<html lang="en">
+<head>
+<title>SPARC Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Submodel-Options.html#Submodel-Options" title="Submodel Options">
+<link rel="prev" href="SH-Options.html#SH-Options" title="SH Options">
+<link rel="next" href="SPU-Options.html#SPU-Options" title="SPU Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="SPARC-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="SPU-Options.html#SPU-Options">SPU Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="SH-Options.html#SH-Options">SH Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Submodel-Options.html#Submodel-Options">Submodel Options</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.17.36 SPARC Options</h4>
+
+<p><a name="index-SPARC-options-1985"></a>
+These &lsquo;<samp><span class="samp">-m</span></samp>&rsquo; options are supported on the SPARC:
+
+     <dl>
+<dt><code>-mno-app-regs</code><dt><code>-mapp-regs</code><dd><a name="index-mno_002dapp_002dregs-1986"></a><a name="index-mapp_002dregs-1987"></a>Specify <samp><span class="option">-mapp-regs</span></samp> to generate output using the global registers
+2 through 4, which the SPARC SVR4 ABI reserves for applications.  This
+is the default.
+
+     <p>To be fully SVR4 ABI compliant at the cost of some performance loss,
+specify <samp><span class="option">-mno-app-regs</span></samp>.  You should compile libraries and system
+software with this option.
+
+     <br><dt><code>-mfpu</code><dt><code>-mhard-float</code><dd><a name="index-mfpu-1988"></a><a name="index-mhard_002dfloat-1989"></a>Generate output containing floating point instructions.  This is the
+default.
+
+     <br><dt><code>-mno-fpu</code><dt><code>-msoft-float</code><dd><a name="index-mno_002dfpu-1990"></a><a name="index-msoft_002dfloat-1991"></a>Generate output containing library calls for floating point. 
+<strong>Warning:</strong> the requisite libraries are not available for all SPARC
+targets.  Normally the facilities of the machine's usual C compiler are
+used, but this cannot be done directly in cross-compilation.  You must make
+your own arrangements to provide suitable library functions for
+cross-compilation.  The embedded targets &lsquo;<samp><span class="samp">sparc-*-aout</span></samp>&rsquo; and
+&lsquo;<samp><span class="samp">sparclite-*-*</span></samp>&rsquo; do provide software floating point support.
+
+     <p><samp><span class="option">-msoft-float</span></samp> changes the calling convention in the output file;
+therefore, it is only useful if you compile <em>all</em> of a program with
+this option.  In particular, you need to compile <samp><span class="file">libgcc.a</span></samp>, the
+library that comes with GCC, with <samp><span class="option">-msoft-float</span></samp> in order for
+this to work.
+
+     <br><dt><code>-mhard-quad-float</code><dd><a name="index-mhard_002dquad_002dfloat-1992"></a>Generate output containing quad-word (long double) floating point
+instructions.
+
+     <br><dt><code>-msoft-quad-float</code><dd><a name="index-msoft_002dquad_002dfloat-1993"></a>Generate output containing library calls for quad-word (long double)
+floating point instructions.  The functions called are those specified
+in the SPARC ABI.  This is the default.
+
+     <p>As of this writing, there are no SPARC implementations that have hardware
+support for the quad-word floating point instructions.  They all invoke
+a trap handler for one of these instructions, and then the trap handler
+emulates the effect of the instruction.  Because of the trap handler overhead,
+this is much slower than calling the ABI library routines.  Thus the
+<samp><span class="option">-msoft-quad-float</span></samp> option is the default.
+
+     <br><dt><code>-mno-unaligned-doubles</code><dt><code>-munaligned-doubles</code><dd><a name="index-mno_002dunaligned_002ddoubles-1994"></a><a name="index-munaligned_002ddoubles-1995"></a>Assume that doubles have 8 byte alignment.  This is the default.
+
+     <p>With <samp><span class="option">-munaligned-doubles</span></samp>, GCC assumes that doubles have 8 byte
+alignment only if they are contained in another type, or if they have an
+absolute address.  Otherwise, it assumes they have 4 byte alignment. 
+Specifying this option avoids some rare compatibility problems with code
+generated by other compilers.  It is not the default because it results
+in a performance loss, especially for floating point code.
+
+     <br><dt><code>-mno-faster-structs</code><dt><code>-mfaster-structs</code><dd><a name="index-mno_002dfaster_002dstructs-1996"></a><a name="index-mfaster_002dstructs-1997"></a>With <samp><span class="option">-mfaster-structs</span></samp>, the compiler assumes that structures
+should have 8 byte alignment.  This enables the use of pairs of
+<code>ldd</code> and <code>std</code> instructions for copies in structure
+assignment, in place of twice as many <code>ld</code> and <code>st</code> pairs. 
+However, the use of this changed alignment directly violates the SPARC
+ABI.  Thus, it's intended only for use on targets where the developer
+acknowledges that their resulting code will not be directly in line with
+the rules of the ABI.
+
+     <br><dt><code>-mimpure-text</code><dd><a name="index-mimpure_002dtext-1998"></a><samp><span class="option">-mimpure-text</span></samp>, used in addition to <samp><span class="option">-shared</span></samp>, tells
+the compiler to not pass <samp><span class="option">-z text</span></samp> to the linker when linking a
+shared object.  Using this option, you can link position-dependent
+code into a shared object.
+
+     <p><samp><span class="option">-mimpure-text</span></samp> suppresses the &ldquo;relocations remain against
+allocatable but non-writable sections&rdquo; linker error message. 
+However, the necessary relocations will trigger copy-on-write, and the
+shared object is not actually shared across processes.  Instead of
+using <samp><span class="option">-mimpure-text</span></samp>, you should compile all source code with
+<samp><span class="option">-fpic</span></samp> or <samp><span class="option">-fPIC</span></samp>.
+
+     <p>This option is only available on SunOS and Solaris.
+
+     <br><dt><code>-mcpu=</code><var>cpu_type</var><dd><a name="index-mcpu-1999"></a>Set the instruction set, register set, and instruction scheduling parameters
+for machine type <var>cpu_type</var>.  Supported values for <var>cpu_type</var> are
+&lsquo;<samp><span class="samp">v7</span></samp>&rsquo;, &lsquo;<samp><span class="samp">cypress</span></samp>&rsquo;, &lsquo;<samp><span class="samp">v8</span></samp>&rsquo;, &lsquo;<samp><span class="samp">supersparc</span></samp>&rsquo;, &lsquo;<samp><span class="samp">sparclite</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">f930</span></samp>&rsquo;, &lsquo;<samp><span class="samp">f934</span></samp>&rsquo;, &lsquo;<samp><span class="samp">hypersparc</span></samp>&rsquo;, &lsquo;<samp><span class="samp">sparclite86x</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">sparclet</span></samp>&rsquo;, &lsquo;<samp><span class="samp">tsc701</span></samp>&rsquo;, &lsquo;<samp><span class="samp">v9</span></samp>&rsquo;, &lsquo;<samp><span class="samp">ultrasparc</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">ultrasparc3</span></samp>&rsquo;, &lsquo;<samp><span class="samp">niagara</span></samp>&rsquo; and &lsquo;<samp><span class="samp">niagara2</span></samp>&rsquo;.
+
+     <p>Default instruction scheduling parameters are used for values that select
+an architecture and not an implementation.  These are &lsquo;<samp><span class="samp">v7</span></samp>&rsquo;, &lsquo;<samp><span class="samp">v8</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">sparclite</span></samp>&rsquo;, &lsquo;<samp><span class="samp">sparclet</span></samp>&rsquo;, &lsquo;<samp><span class="samp">v9</span></samp>&rsquo;.
+
+     <p>Here is a list of each supported architecture and their supported
+implementations.
+
+     <pre class="smallexample">              v7:             cypress
+              v8:             supersparc, hypersparc
+              sparclite:      f930, f934, sparclite86x
+              sparclet:       tsc701
+              v9:             ultrasparc, ultrasparc3, niagara, niagara2
+</pre>
+     <p>By default (unless configured otherwise), GCC generates code for the V7
+variant of the SPARC architecture.  With <samp><span class="option">-mcpu=cypress</span></samp>, the compiler
+additionally optimizes it for the Cypress CY7C602 chip, as used in the
+SPARCStation/SPARCServer 3xx series.  This is also appropriate for the older
+SPARCStation 1, 2, IPX etc.
+
+     <p>With <samp><span class="option">-mcpu=v8</span></samp>, GCC generates code for the V8 variant of the SPARC
+architecture.  The only difference from V7 code is that the compiler emits
+the integer multiply and integer divide instructions which exist in SPARC-V8
+but not in SPARC-V7.  With <samp><span class="option">-mcpu=supersparc</span></samp>, the compiler additionally
+optimizes it for the SuperSPARC chip, as used in the SPARCStation 10, 1000 and
+2000 series.
+
+     <p>With <samp><span class="option">-mcpu=sparclite</span></samp>, GCC generates code for the SPARClite variant of
+the SPARC architecture.  This adds the integer multiply, integer divide step
+and scan (<code>ffs</code>) instructions which exist in SPARClite but not in SPARC-V7. 
+With <samp><span class="option">-mcpu=f930</span></samp>, the compiler additionally optimizes it for the
+Fujitsu MB86930 chip, which is the original SPARClite, with no FPU.  With
+<samp><span class="option">-mcpu=f934</span></samp>, the compiler additionally optimizes it for the Fujitsu
+MB86934 chip, which is the more recent SPARClite with FPU.
+
+     <p>With <samp><span class="option">-mcpu=sparclet</span></samp>, GCC generates code for the SPARClet variant of
+the SPARC architecture.  This adds the integer multiply, multiply/accumulate,
+integer divide step and scan (<code>ffs</code>) instructions which exist in SPARClet
+but not in SPARC-V7.  With <samp><span class="option">-mcpu=tsc701</span></samp>, the compiler additionally
+optimizes it for the TEMIC SPARClet chip.
+
+     <p>With <samp><span class="option">-mcpu=v9</span></samp>, GCC generates code for the V9 variant of the SPARC
+architecture.  This adds 64-bit integer and floating-point move instructions,
+3 additional floating-point condition code registers and conditional move
+instructions.  With <samp><span class="option">-mcpu=ultrasparc</span></samp>, the compiler additionally
+optimizes it for the Sun UltraSPARC I/II/IIi chips.  With
+<samp><span class="option">-mcpu=ultrasparc3</span></samp>, the compiler additionally optimizes it for the
+Sun UltraSPARC III/III+/IIIi/IIIi+/IV/IV+ chips.  With
+<samp><span class="option">-mcpu=niagara</span></samp>, the compiler additionally optimizes it for
+Sun UltraSPARC T1 chips.  With <samp><span class="option">-mcpu=niagara2</span></samp>, the compiler
+additionally optimizes it for Sun UltraSPARC T2 chips.
+
+     <br><dt><code>-mtune=</code><var>cpu_type</var><dd><a name="index-mtune-2000"></a>Set the instruction scheduling parameters for machine type
+<var>cpu_type</var>, but do not set the instruction set or register set that the
+option <samp><span class="option">-mcpu=</span><var>cpu_type</var></samp> would.
+
+     <p>The same values for <samp><span class="option">-mcpu=</span><var>cpu_type</var></samp> can be used for
+<samp><span class="option">-mtune=</span><var>cpu_type</var></samp>, but the only useful values are those
+that select a particular cpu implementation.  Those are &lsquo;<samp><span class="samp">cypress</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">supersparc</span></samp>&rsquo;, &lsquo;<samp><span class="samp">hypersparc</span></samp>&rsquo;, &lsquo;<samp><span class="samp">f930</span></samp>&rsquo;, &lsquo;<samp><span class="samp">f934</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">sparclite86x</span></samp>&rsquo;, &lsquo;<samp><span class="samp">tsc701</span></samp>&rsquo;, &lsquo;<samp><span class="samp">ultrasparc</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">ultrasparc3</span></samp>&rsquo;, &lsquo;<samp><span class="samp">niagara</span></samp>&rsquo;, and &lsquo;<samp><span class="samp">niagara2</span></samp>&rsquo;.
+
+     <br><dt><code>-mv8plus</code><dt><code>-mno-v8plus</code><dd><a name="index-mv8plus-2001"></a><a name="index-mno_002dv8plus-2002"></a>With <samp><span class="option">-mv8plus</span></samp>, GCC generates code for the SPARC-V8+ ABI.  The
+difference from the V8 ABI is that the global and out registers are
+considered 64-bit wide.  This is enabled by default on Solaris in 32-bit
+mode for all SPARC-V9 processors.
+
+     <br><dt><code>-mvis</code><dt><code>-mno-vis</code><dd><a name="index-mvis-2003"></a><a name="index-mno_002dvis-2004"></a>With <samp><span class="option">-mvis</span></samp>, GCC generates code that takes advantage of the UltraSPARC
+Visual Instruction Set extensions.  The default is <samp><span class="option">-mno-vis</span></samp>. 
+</dl>
+
+ <p>These &lsquo;<samp><span class="samp">-m</span></samp>&rsquo; options are supported in addition to the above
+on SPARC-V9 processors in 64-bit environments:
+
+     <dl>
+<dt><code>-mlittle-endian</code><dd><a name="index-mlittle_002dendian-2005"></a>Generate code for a processor running in little-endian mode.  It is only
+available for a few configurations and most notably not on Solaris and Linux.
+
+     <br><dt><code>-m32</code><dt><code>-m64</code><dd><a name="index-m32-2006"></a><a name="index-m64-2007"></a>Generate code for a 32-bit or 64-bit environment. 
+The 32-bit environment sets int, long and pointer to 32 bits. 
+The 64-bit environment sets int to 32 bits and long and pointer
+to 64 bits.
+
+     <br><dt><code>-mcmodel=medlow</code><dd><a name="index-mcmodel_003dmedlow-2008"></a>Generate code for the Medium/Low code model: 64-bit addresses, programs
+must be linked in the low 32 bits of memory.  Programs can be statically
+or dynamically linked.
+
+     <br><dt><code>-mcmodel=medmid</code><dd><a name="index-mcmodel_003dmedmid-2009"></a>Generate code for the Medium/Middle code model: 64-bit addresses, programs
+must be linked in the low 44 bits of memory, the text and data segments must
+be less than 2GB in size and the data segment must be located within 2GB of
+the text segment.
+
+     <br><dt><code>-mcmodel=medany</code><dd><a name="index-mcmodel_003dmedany-2010"></a>Generate code for the Medium/Anywhere code model: 64-bit addresses, programs
+may be linked anywhere in memory, the text and data segments must be less
+than 2GB in size and the data segment must be located within 2GB of the
+text segment.
+
+     <br><dt><code>-mcmodel=embmedany</code><dd><a name="index-mcmodel_003dembmedany-2011"></a>Generate code for the Medium/Anywhere code model for embedded systems:
+64-bit addresses, the text and data segments must be less than 2GB in
+size, both starting anywhere in memory (determined at link time).  The
+global register %g4 points to the base of the data segment.  Programs
+are statically linked and PIC is not supported.
+
+     <br><dt><code>-mstack-bias</code><dt><code>-mno-stack-bias</code><dd><a name="index-mstack_002dbias-2012"></a><a name="index-mno_002dstack_002dbias-2013"></a>With <samp><span class="option">-mstack-bias</span></samp>, GCC assumes that the stack pointer, and
+frame pointer if present, are offset by &minus;2047 which must be added back
+when making stack frame references.  This is the default in 64-bit mode. 
+Otherwise, assume no such offset is present. 
+</dl>
+
+ <p>These switches are supported in addition to the above on Solaris:
+
+     <dl>
+<dt><code>-threads</code><dd><a name="index-threads-2014"></a>Add support for multithreading using the Solaris threads library.  This
+option sets flags for both the preprocessor and linker.  This option does
+not affect the thread safety of object code produced by the compiler or
+that of libraries supplied with it.
+
+     <br><dt><code>-pthreads</code><dd><a name="index-pthreads-2015"></a>Add support for multithreading using the POSIX threads library.  This
+option sets flags for both the preprocessor and linker.  This option does
+not affect the thread safety of object code produced  by the compiler or
+that of libraries supplied with it.
+
+     <br><dt><code>-pthread</code><dd><a name="index-pthread-2016"></a>This is a synonym for <samp><span class="option">-pthreads</span></samp>. 
+</dl>
+
+ </body></html>
+

@@ -1,0 +1,93 @@
+<html lang="en">
+<head>
+<title>open_memstream - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="mktemp.html#mktemp" title="mktemp">
+<link rel="next" href="perror.html#perror" title="perror">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="open_memstream"></a>
+<a name="open_005fmemstream"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="perror.html#perror">perror</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="mktemp.html#mktemp">mktemp</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.42 <code>open_memstream</code>, <code>open_wmemstream</code>&mdash;open a write stream around an arbitrary-length string</h3>
+
+<p><a name="index-open_005fmemstream-241"></a><a name="index-open_005fwmemstream-242"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     FILE *open_memstream(char **restrict <var>buf</var>,
+         size_t *restrict <var>size</var>);
+     
+     #include &lt;wchar.h&gt;
+     FILE *open_wmemstream(wchar_t **restrict <var>buf</var>,
+         size_t *restrict <var>size</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>open_memstream</code> creates a seekable, byte-oriented <code>FILE</code> stream that
+wraps an arbitrary-length buffer, created as if by <code>malloc</code>.  The current
+contents of *<var>buf</var> are ignored; this implementation uses *<var>size</var>
+as a hint of the maximum size expected, but does not fail if the hint
+was wrong.  The parameters <var>buf</var> and <var>size</var> are later stored
+through following any call to <code>fflush</code> or <code>fclose</code>, set to the
+current address and usable size of the allocated string; although
+after fflush, the pointer is only valid until another stream operation
+that results in a write.  Behavior is undefined if the user alters
+either *<var>buf</var> or *<var>size</var> prior to <code>fclose</code>.
+
+   <p><code>open_wmemstream</code> is like <code>open_memstream</code> just with the associated
+stream being wide-oriented.  The size set in <var>size</var> in subsequent
+operations is the number of wide characters.
+
+   <p>The stream is write-only, since the user can directly read *<var>buf</var>
+after a flush; see <code>fmemopen</code> for a way to wrap a string with a
+readable stream.  The user is responsible for calling <code>free</code> on
+the final *<var>buf</var> after <code>fclose</code>.
+
+   <p>Any time the stream is flushed, a NUL byte is written at the current
+position (but is not counted in the buffer length), so that the string
+is always NUL-terminated after at most *<var>size</var> bytes (or wide characters
+in case of <code>open_wmemstream</code>).  However, data previously written beyond
+the current stream offset is not lost, and the NUL value written during a
+flush is restored to its previous value when seeking elsewhere in the string.
+
+   <p><br>
+<strong>Returns</strong><br>
+The return value is an open FILE pointer on success.  On error,
+<code>NULL</code> is returned, and <code>errno</code> will be set to EINVAL if <var>buf</var>
+or <var>size</var> is NULL, ENOMEM if memory could not be allocated, or
+EMFILE if too many streams are already open.
+
+   <p><br>
+<strong>Portability</strong><br>
+POSIX.1-2008
+
+   <p>Supporting OS subroutines required: <code>sbrk</code>.
+
+   <p><br>
+
+   </body></html>
+

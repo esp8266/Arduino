@@ -1,0 +1,198 @@
+<html lang="en">
+<head>
+<title>Type encoding - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Objective_002dC.html#Objective_002dC" title="Objective-C">
+<link rel="prev" href="Executing-code-before-main.html#Executing-code-before-main" title="Executing code before main">
+<link rel="next" href="Garbage-Collection.html#Garbage-Collection" title="Garbage Collection">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Type-encoding"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Garbage-Collection.html#Garbage-Collection">Garbage Collection</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Executing-code-before-main.html#Executing-code-before-main">Executing code before main</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Objective_002dC.html#Objective_002dC">Objective-C</a>
+<hr>
+</div>
+
+<h3 class="section">8.2 Type encoding</h3>
+
+<p>The Objective-C compiler generates type encodings for all the
+types.  These type encodings are used at runtime to find out information
+about selectors and methods and about objects and classes.
+
+ <p>The types are encoded in the following way:
+
+<!-- @sp 1 -->
+ <p><table summary=""><tr align="left"><td valign="top" width="25%"><code>_Bool</code>
+</td><td valign="top" width="75%"><code>B</code>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><code>char</code>
+</td><td valign="top" width="75%"><code>c</code>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><code>unsigned char</code>
+</td><td valign="top" width="75%"><code>C</code>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><code>short</code>
+</td><td valign="top" width="75%"><code>s</code>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><code>unsigned short</code>
+</td><td valign="top" width="75%"><code>S</code>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><code>int</code>
+</td><td valign="top" width="75%"><code>i</code>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><code>unsigned int</code>
+</td><td valign="top" width="75%"><code>I</code>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><code>long</code>
+</td><td valign="top" width="75%"><code>l</code>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><code>unsigned long</code>
+</td><td valign="top" width="75%"><code>L</code>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><code>long long</code>
+</td><td valign="top" width="75%"><code>q</code>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><code>unsigned long long</code>
+</td><td valign="top" width="75%"><code>Q</code>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><code>float</code>
+</td><td valign="top" width="75%"><code>f</code>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><code>double</code>
+</td><td valign="top" width="75%"><code>d</code>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><code>void</code>
+</td><td valign="top" width="75%"><code>v</code>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><code>id</code>
+</td><td valign="top" width="75%"><code>@</code>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><code>Class</code>
+</td><td valign="top" width="75%"><code>#</code>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><code>SEL</code>
+</td><td valign="top" width="75%"><code>:</code>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><code>char*</code>
+</td><td valign="top" width="75%"><code>*</code>
+<br></td></tr><tr align="left"><td valign="top" width="25%">unknown type
+</td><td valign="top" width="75%"><code>?</code>
+<br></td></tr><tr align="left"><td valign="top" width="25%">Complex types
+</td><td valign="top" width="75%"><code>j</code> followed by the inner type.  For example <code>_Complex double</code> is encoded as "jd". 
+<br></td></tr><tr align="left"><td valign="top" width="25%">bit-fields
+</td><td valign="top" width="75%"><code>b</code> followed by the starting position of the bit-field, the type of the bit-field and the size of the bit-field (the bit-fields encoding was changed from the NeXT's compiler encoding, see below)
+ <br></td></tr></table>
+
+<!-- @sp 1 -->
+ <p>The encoding of bit-fields has changed to allow bit-fields to be properly
+handled by the runtime functions that compute sizes and alignments of
+types that contain bit-fields.  The previous encoding contained only the
+size of the bit-field.  Using only this information it is not possible to
+reliably compute the size occupied by the bit-field.  This is very
+important in the presence of the Boehm's garbage collector because the
+objects are allocated using the typed memory facility available in this
+collector.  The typed memory allocation requires information about where
+the pointers are located inside the object.
+
+ <p>The position in the bit-field is the position, counting in bits, of the
+bit closest to the beginning of the structure.
+
+ <p>The non-atomic types are encoded as follows:
+
+<!-- @sp 1 -->
+ <p><table summary=""><tr align="left"><td valign="top" width="20%">pointers
+</td><td valign="top" width="80%">&lsquo;<samp><span class="samp">^</span></samp>&rsquo; followed by the pointed type. 
+<br></td></tr><tr align="left"><td valign="top" width="20%">arrays
+</td><td valign="top" width="80%">&lsquo;<samp><span class="samp">[</span></samp>&rsquo; followed by the number of elements in the array followed by the type of the elements followed by &lsquo;<samp><span class="samp">]</span></samp>&rsquo;
+<br></td></tr><tr align="left"><td valign="top" width="20%">structures
+</td><td valign="top" width="80%">&lsquo;<samp><span class="samp">{</span></samp>&rsquo; followed by the name of the structure (or &lsquo;<samp><span class="samp">?</span></samp>&rsquo; if the structure is unnamed), the &lsquo;<samp><span class="samp">=</span></samp>&rsquo; sign, the type of the members and by &lsquo;<samp><span class="samp">}</span></samp>&rsquo;
+<br></td></tr><tr align="left"><td valign="top" width="20%">unions
+</td><td valign="top" width="80%">&lsquo;<samp><span class="samp">(</span></samp>&rsquo; followed by the name of the structure (or &lsquo;<samp><span class="samp">?</span></samp>&rsquo; if the union is unnamed), the &lsquo;<samp><span class="samp">=</span></samp>&rsquo; sign, the type of the members followed by &lsquo;<samp><span class="samp">)</span></samp>&rsquo;
+ <br></td></tr></table>
+
+ <p>Here are some types and their encodings, as they are generated by the
+compiler on an i386 machine:
+
+ <pre class="sp">
+
+</pre>
+ <p><table summary=""><tr align="left"><td valign="top" width="25%">Objective-C type
+</td><td valign="top" width="75%">Compiler encoding
+<br></td></tr><tr align="left"><td valign="top" width="25%">
+<pre class="smallexample">     int a[10];
+</pre>
+ <p></td><td valign="top" width="75%"><code>[10i]</code>
+<br></td></tr><tr align="left"><td valign="top" width="25%">
+<pre class="smallexample">     struct {
+       int i;
+       float f[3];
+       int a:3;
+       int b:2;
+       char c;
+     }
+</pre>
+ <p></td><td valign="top" width="75%"><code>{?=i[3f]b128i3b131i2c}</code>
+ <br></td></tr></table>
+
+ <pre class="sp">
+
+</pre>
+
+In addition to the types the compiler also encodes the type
+specifiers.  The table below describes the encoding of the current
+Objective-C type specifiers:
+
+ <pre class="sp">
+
+</pre>
+ <p><table summary=""><tr align="left"><td valign="top" width="25%">Specifier
+</td><td valign="top" width="75%">Encoding
+<br></td></tr><tr align="left"><td valign="top" width="25%"><code>const</code>
+</td><td valign="top" width="75%"><code>r</code>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><code>in</code>
+</td><td valign="top" width="75%"><code>n</code>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><code>inout</code>
+</td><td valign="top" width="75%"><code>N</code>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><code>out</code>
+</td><td valign="top" width="75%"><code>o</code>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><code>bycopy</code>
+</td><td valign="top" width="75%"><code>O</code>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><code>oneway</code>
+</td><td valign="top" width="75%"><code>V</code>
+ <br></td></tr></table>
+
+ <pre class="sp">
+
+</pre>
+
+The type specifiers are encoded just before the type.  Unlike types
+however, the type specifiers are only encoded when they appear in method
+argument types.
+
+ </body></html>
+

@@ -1,0 +1,133 @@
+<html lang="en">
+<head>
+<title>Formatting Documentation - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Using-History-Interactively.html#Using-History-Interactively" title="Using History Interactively">
+<link rel="next" href="Installing-GDB.html#Installing-GDB" title="Installing GDB">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Formatting-Documentation"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Installing-GDB.html#Installing-GDB">Installing GDB</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Using-History-Interactively.html#Using-History-Interactively">Using History Interactively</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="appendix">Appendix A Formatting Documentation</h2>
+
+<p><a name="index-g_t_0040value_007bGDBN_007d-reference-card-2292"></a><a name="index-reference-card-2293"></a>The <span class="sc">gdb</span> 4 release includes an already-formatted reference card, ready
+for printing with PostScript or Ghostscript, in the <samp><span class="file">gdb</span></samp>
+subdirectory of the main source directory<a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a>.  If you can use PostScript or Ghostscript with your printer,
+you can print the reference card immediately with <samp><span class="file">refcard.ps</span></samp>.
+
+   <p>The release also includes the source for the reference card.  You
+can format it, using TeX, by typing:
+
+<pre class="smallexample">     make refcard.dvi
+</pre>
+   <p>The <span class="sc">gdb</span> reference card is designed to print in <dfn>landscape</dfn>
+mode on US &ldquo;letter&rdquo; size paper;
+that is, on a sheet 11 inches wide by 8.5 inches
+high.  You will need to specify this form of printing as an option to
+your <span class="sc">dvi</span> output program.
+
+   <p><a name="index-documentation-2294"></a>
+All the documentation for <span class="sc">gdb</span> comes as part of the machine-readable
+distribution.  The documentation is written in Texinfo format, which is
+a documentation system that uses a single source file to produce both
+on-line information and a printed manual.  You can use one of the Info
+formatting commands to create the on-line version of the documentation
+and TeX (or <code>texi2roff</code>) to typeset the printed version.
+
+   <p><span class="sc">gdb</span> includes an already formatted copy of the on-line Info
+version of this manual in the <samp><span class="file">gdb</span></samp> subdirectory.  The main Info
+file is <samp><span class="file">gdb-7.2.50.20100908-cvs/gdb/gdb.info</span></samp>, and it refers to
+subordinate files matching &lsquo;<samp><span class="samp">gdb.info*</span></samp>&rsquo; in the same directory.  If
+necessary, you can print out these files, or read them with any editor;
+but they are easier to read using the <code>info</code> subsystem in <span class="sc">gnu</span>
+Emacs or the standalone <code>info</code> program, available as part of the
+<span class="sc">gnu</span> Texinfo distribution.
+
+   <p>If you want to format these Info files yourself, you need one of the
+Info formatting programs, such as <code>texinfo-format-buffer</code> or
+<code>makeinfo</code>.
+
+   <p>If you have <code>makeinfo</code> installed, and are in the top level
+<span class="sc">gdb</span> source directory (<samp><span class="file">gdb-7.2.50.20100908-cvs</span></samp>, in the case of
+version 7.2.50.20100908-cvs), you can make the Info file by typing:
+
+<pre class="smallexample">     cd gdb
+     make gdb.info
+</pre>
+   <p>If you want to typeset and print copies of this manual, you need TeX,
+a program to print its <span class="sc">dvi</span> output files, and <samp><span class="file">texinfo.tex</span></samp>, the
+Texinfo definitions file.
+
+   <p>TeX is a typesetting program; it does not print files directly, but
+produces output files called <span class="sc">dvi</span> files.  To print a typeset
+document, you need a program to print <span class="sc">dvi</span> files.  If your system
+has TeX installed, chances are it has such a program.  The precise
+command to use depends on your system; <kbd>lpr -d</kbd> is common; another
+(for PostScript devices) is <kbd>dvips</kbd>.  The <span class="sc">dvi</span> print command may
+require a file name without any extension or a &lsquo;<samp><span class="samp">.dvi</span></samp>&rsquo; extension.
+
+   <p>TeX also requires a macro definitions file called
+<samp><span class="file">texinfo.tex</span></samp>.  This file tells TeX how to typeset a document
+written in Texinfo format.  On its own, TeX cannot either read or
+typeset a Texinfo file.  <samp><span class="file">texinfo.tex</span></samp> is distributed with GDB
+and is located in the <samp><span class="file">gdb-</span><var>version-number</var><span class="file">/texinfo</span></samp>
+directory.
+
+   <p>If you have TeX and a <span class="sc">dvi</span> printer program installed, you can
+typeset and print this manual.  First switch to the <samp><span class="file">gdb</span></samp>
+subdirectory of the main source directory (for example, to
+<samp><span class="file">gdb-7.2.50.20100908-cvs/gdb</span></samp>) and type:
+
+<pre class="smallexample">     make gdb.dvi
+</pre>
+   <p>Then give <samp><span class="file">gdb.dvi</span></samp> to your <span class="sc">dvi</span> printing program.
+
+   <div class="footnote">
+<hr>
+<h4>Footnotes</h4><p class="footnote"><small>[<a name="fn-1" href="#fnd-1">1</a>]</small> In
+<samp><span class="file">gdb-7.2.50.20100908-cvs/gdb/refcard.ps</span></samp> of the version 7.2.50.20100908-cvs
+release.</p>
+
+   <hr></div>
+
+   </body></html>
+

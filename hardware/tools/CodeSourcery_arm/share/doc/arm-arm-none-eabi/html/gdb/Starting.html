@@ -1,0 +1,229 @@
+<html lang="en">
+<head>
+<title>Starting - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Running.html#Running" title="Running">
+<link rel="prev" href="Compilation.html#Compilation" title="Compilation">
+<link rel="next" href="Arguments.html#Arguments" title="Arguments">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Starting"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Arguments.html#Arguments">Arguments</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Compilation.html#Compilation">Compilation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Running.html#Running">Running</a>
+<hr>
+</div>
+
+<h3 class="section">4.2 Starting your Program</h3>
+
+<p><a name="index-starting-100"></a><a name="index-running-101"></a>
+     
+<a name="index-run-102"></a>
+<a name="index-r-_0040r_007b_0028_0040code_007brun_007d_0029_007d-103"></a>
+<dl><dt><code>run</code><dt><code>r</code><dd>Use the <code>run</code> command to start your program under <span class="sc">gdb</span>. 
+You must first specify the program name (except on VxWorks) with an
+argument to <span class="sc">gdb</span> (see <a href="Invocation.html#Invocation">Getting In and Out of <span class="sc">gdb</span></a>), or by using the <code>file</code> or <code>exec-file</code> command
+(see <a href="Files.html#Files">Commands to Specify Files</a>).
+
+   </dl>
+
+   <p>If you are running your program in an execution environment that
+supports processes, <code>run</code> creates an inferior process and makes
+that process run your program.  In some environments without processes,
+<code>run</code> jumps to the start of your program.  Other targets,
+like &lsquo;<samp><span class="samp">remote</span></samp>&rsquo;, are always running.  If you get an error
+message like this one:
+
+<pre class="smallexample">     The "remote" target does not support "run".
+     Try "help target" or "continue".
+</pre>
+   <p class="noindent">then use <code>continue</code> to run your program.  You may need <code>load</code>
+first (see <a href="load.html#load">load</a>).
+
+   <p>The execution of a program is affected by certain information it
+receives from its superior.  <span class="sc">gdb</span> provides ways to specify this
+information, which you must do <em>before</em> starting your program.  (You
+can change it after starting your program, but such changes only affect
+your program the next time you start it.)  This information may be
+divided into four categories:
+
+     <dl>
+<dt>The <em>arguments.</em><dd>Specify the arguments to give your program as the arguments of the
+<code>run</code> command.  If a shell is available on your target, the shell
+is used to pass the arguments, so that you may use normal conventions
+(such as wildcard expansion or variable substitution) in describing
+the arguments. 
+In Unix systems, you can control which shell is used with the
+<code>SHELL</code> environment variable. 
+See <a href="Arguments.html#Arguments">Your Program's Arguments</a>.
+
+     <br><dt>The <em>environment.</em><dd>Your program normally inherits its environment from <span class="sc">gdb</span>, but you can
+use the <span class="sc">gdb</span> commands <code>set environment</code> and <code>unset
+environment</code> to change parts of the environment that affect
+your program.  See <a href="Environment.html#Environment">Your Program's Environment</a>.
+
+     <br><dt>The <em>working directory.</em><dd>Your program inherits its working directory from <span class="sc">gdb</span>.  You can set
+the <span class="sc">gdb</span> working directory with the <code>cd</code> command in <span class="sc">gdb</span>. 
+See <a href="Working-Directory.html#Working-Directory">Your Program's Working Directory</a>.
+
+     <br><dt>The <em>standard input and output.</em><dd>Your program normally uses the same device for standard input and
+standard output as <span class="sc">gdb</span> is using.  You can redirect input and output
+in the <code>run</code> command line, or you can use the <code>tty</code> command to
+set a different device for your program. 
+See <a href="Input_002fOutput.html#Input_002fOutput">Your Program's Input and Output</a>.
+
+     <p><a name="index-pipes-104"></a><em>Warning:</em> While input and output redirection work, you cannot use
+pipes to pass the output of the program you are debugging to another
+program; if you attempt this, <span class="sc">gdb</span> is likely to wind up debugging the
+wrong program. 
+</dl>
+
+   <p>When you issue the <code>run</code> command, your program begins to execute
+immediately.  See <a href="Stopping.html#Stopping">Stopping and Continuing</a>, for discussion
+of how to arrange for your program to stop.  Once your program has
+stopped, you may call functions in your program, using the <code>print</code>
+or <code>call</code> commands.  See <a href="Data.html#Data">Examining Data</a>.
+
+   <p>If the modification time of your symbol file has changed since the last
+time <span class="sc">gdb</span> read its symbols, <span class="sc">gdb</span> discards its symbol
+table, and reads it again.  When it does this, <span class="sc">gdb</span> tries to retain
+your current breakpoints.
+
+     
+<a name="index-start-105"></a>
+<dl><dt><code>start</code><dd><a name="index-run-to-main-procedure-106"></a>The name of the main procedure can vary from language to language. 
+With C or C<tt>++</tt>, the main procedure name is always <code>main</code>, but
+other languages such as Ada do not require a specific name for their
+main procedure.  The debugger provides a convenient way to start the
+execution of the program and to stop at the beginning of the main
+procedure, depending on the language used.
+
+     <p>The &lsquo;<samp><span class="samp">start</span></samp>&rsquo; command does the equivalent of setting a temporary
+breakpoint at the beginning of the main procedure and then invoking
+the &lsquo;<samp><span class="samp">run</span></samp>&rsquo; command.
+
+     <p><a name="index-elaboration-phase-107"></a>Some programs contain an <dfn>elaboration</dfn> phase where some startup code is
+executed before the main procedure is called.  This depends on the
+languages used to write your program.  In C<tt>++</tt>, for instance,
+constructors for static and global objects are executed before
+<code>main</code> is called.  It is therefore possible that the debugger stops
+before reaching the main procedure.  However, the temporary breakpoint
+will remain to halt execution.
+
+     <p>Specify the arguments to give to your program as arguments to the
+&lsquo;<samp><span class="samp">start</span></samp>&rsquo; command.  These arguments will be given verbatim to the
+underlying &lsquo;<samp><span class="samp">run</span></samp>&rsquo; command.  Note that the same arguments will be
+reused if no argument is provided during subsequent calls to
+&lsquo;<samp><span class="samp">start</span></samp>&rsquo; or &lsquo;<samp><span class="samp">run</span></samp>&rsquo;.
+
+     <p>It is sometimes necessary to debug the program during elaboration.  In
+these cases, using the <code>start</code> command would stop the execution of
+your program too late, as the program would have already completed the
+elaboration phase.  Under these circumstances, insert breakpoints in your
+elaboration code before running your program.
+
+     <p><a name="index-set-exec_002dwrapper-108"></a><br><dt><code>set exec-wrapper </code><var>wrapper</var><dt><code>show exec-wrapper</code><dt><code>unset exec-wrapper</code><dd>When &lsquo;<samp><span class="samp">exec-wrapper</span></samp>&rsquo; is set, the specified wrapper is used to
+launch programs for debugging.  <span class="sc">gdb</span> starts your program
+with a shell command of the form <kbd>exec </kbd><var>wrapper</var>
+<var>program</var>.  Quoting is added to <var>program</var> and its
+arguments, but not to <var>wrapper</var>, so you should add quotes if
+appropriate for your shell.  The wrapper runs until it executes
+your program, and then <span class="sc">gdb</span> takes control.
+
+     <p>You can use any program that eventually calls <code>execve</code> with
+its arguments as a wrapper.  Several standard Unix utilities do
+this, e.g. <code>env</code> and <code>nohup</code>.  Any Unix shell script ending
+with <code>exec "$@"</code> will also work.
+
+     <p>For example, you can use <code>env</code> to pass an environment variable to
+the debugged program, without setting the variable in your shell's
+environment:
+
+     <pre class="smallexample">          (gdb) set exec-wrapper env 'LD_PRELOAD=libtest.so'
+          (gdb) run
+</pre>
+     <p>This command is available when debugging locally on most targets, excluding
+<span class="sc">djgpp</span>, Cygwin, MS Windows, and QNX Neutrino.
+
+     <p><a name="index-set-disable_002drandomization-109"></a><br><dt><code>set disable-randomization</code><dt><code>set disable-randomization on</code><dd>This option (enabled by default in <span class="sc">gdb</span>) will turn off the native
+randomization of the virtual address space of the started program.  This option
+is useful for multiple debugging sessions to make the execution better
+reproducible and memory addresses reusable across debugging sessions.
+
+     <p>This feature is implemented only on <span class="sc">gnu</span>/Linux.  You can get the same
+behavior using
+
+     <pre class="smallexample">          (gdb) set exec-wrapper setarch `uname -m` -R
+</pre>
+     <br><dt><code>set disable-randomization off</code><dd>Leave the behavior of the started executable unchanged.  Some bugs rear their
+ugly heads only when the program is loaded at certain addresses.  If your bug
+disappears when you run the program under <span class="sc">gdb</span>, that might be because
+<span class="sc">gdb</span> by default disables the address randomization on platforms, such
+as <span class="sc">gnu</span>/Linux, which do that for stand-alone programs.  Use <kbd>set
+disable-randomization off</kbd> to try to reproduce such elusive bugs.
+
+     <p>The virtual address space randomization is implemented only on <span class="sc">gnu</span>/Linux. 
+It protects the programs against some kinds of security attacks.  In these
+cases the attacker needs to know the exact location of a concrete executable
+code.  Randomizing its location makes it impossible to inject jumps misusing
+a code at its expected addresses.
+
+     <p>Prelinking shared libraries provides a startup performance advantage but it
+makes addresses in these libraries predictable for privileged processes by
+having just unprivileged access at the target system.  Reading the shared
+library binary gives enough information for assembling the malicious code
+misusing it.  Still even a prelinked shared library can get loaded at a new
+random address just requiring the regular relocation process during the
+startup.  Shared libraries not already prelinked are always loaded at
+a randomly chosen address.
+
+     <p>Position independent executables (PIE) contain position independent code
+similar to the shared libraries and therefore such executables get loaded at
+a randomly chosen address upon startup.  PIE executables always load even
+already prelinked shared libraries at a random address.  You can build such
+executable using <samp><span class="command">gcc -fPIE -pie</span></samp>.
+
+     <p>Heap (malloc storage), stack and custom mmap areas are always placed randomly
+(as long as the randomization is enabled).
+
+     <br><dt><code>show disable-randomization</code><dd>Show the current setting of the explicit disable of the native randomization of
+the virtual address space of the started program.
+
+   </dl>
+
+   </body></html>
+

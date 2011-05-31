@@ -1,0 +1,189 @@
+<html lang="en">
+<head>
+<title>MIPS Loongson Built-in Functions - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Target-Builtins.html#Target-Builtins" title="Target Builtins">
+<link rel="prev" href="MIPS-Paired_002dSingle-Support.html#MIPS-Paired_002dSingle-Support" title="MIPS Paired-Single Support">
+<link rel="next" href="Other-MIPS-Built_002din-Functions.html#Other-MIPS-Built_002din-Functions" title="Other MIPS Built-in Functions">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="MIPS-Loongson-Built-in-Functions"></a>
+<a name="MIPS-Loongson-Built_002din-Functions"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Other-MIPS-Built_002din-Functions.html#Other-MIPS-Built_002din-Functions">Other MIPS Built-in Functions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="MIPS-Paired_002dSingle-Support.html#MIPS-Paired_002dSingle-Support">MIPS Paired-Single Support</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Target-Builtins.html#Target-Builtins">Target Builtins</a>
+<hr>
+</div>
+
+<h4 class="subsection">6.52.9 MIPS Loongson Built-in Functions</h4>
+
+<p>GCC provides intrinsics to access the SIMD instructions provided by the
+ST Microelectronics Loongson-2E and -2F processors.  These intrinsics,
+available after inclusion of the <code>loongson.h</code> header file,
+operate on the following 64-bit vector types:
+
+     <ul>
+<li><code>uint8x8_t</code>, a vector of eight unsigned 8-bit integers;
+<li><code>uint16x4_t</code>, a vector of four unsigned 16-bit integers;
+<li><code>uint32x2_t</code>, a vector of two unsigned 32-bit integers;
+<li><code>int8x8_t</code>, a vector of eight signed 8-bit integers;
+<li><code>int16x4_t</code>, a vector of four signed 16-bit integers;
+<li><code>int32x2_t</code>, a vector of two signed 32-bit integers. 
+</ul>
+
+ <p>The intrinsics provided are listed below; each is named after the
+machine instruction to which it corresponds, with suffixes added as
+appropriate to distinguish intrinsics that expand to the same machine
+instruction yet have different argument types.  Refer to the architecture
+documentation for a description of the functionality of each
+instruction.
+
+<pre class="smallexample">     int16x4_t packsswh (int32x2_t s, int32x2_t t);
+     int8x8_t packsshb (int16x4_t s, int16x4_t t);
+     uint8x8_t packushb (uint16x4_t s, uint16x4_t t);
+     uint32x2_t paddw_u (uint32x2_t s, uint32x2_t t);
+     uint16x4_t paddh_u (uint16x4_t s, uint16x4_t t);
+     uint8x8_t paddb_u (uint8x8_t s, uint8x8_t t);
+     int32x2_t paddw_s (int32x2_t s, int32x2_t t);
+     int16x4_t paddh_s (int16x4_t s, int16x4_t t);
+     int8x8_t paddb_s (int8x8_t s, int8x8_t t);
+     uint64_t paddd_u (uint64_t s, uint64_t t);
+     int64_t paddd_s (int64_t s, int64_t t);
+     int16x4_t paddsh (int16x4_t s, int16x4_t t);
+     int8x8_t paddsb (int8x8_t s, int8x8_t t);
+     uint16x4_t paddush (uint16x4_t s, uint16x4_t t);
+     uint8x8_t paddusb (uint8x8_t s, uint8x8_t t);
+     uint64_t pandn_ud (uint64_t s, uint64_t t);
+     uint32x2_t pandn_uw (uint32x2_t s, uint32x2_t t);
+     uint16x4_t pandn_uh (uint16x4_t s, uint16x4_t t);
+     uint8x8_t pandn_ub (uint8x8_t s, uint8x8_t t);
+     int64_t pandn_sd (int64_t s, int64_t t);
+     int32x2_t pandn_sw (int32x2_t s, int32x2_t t);
+     int16x4_t pandn_sh (int16x4_t s, int16x4_t t);
+     int8x8_t pandn_sb (int8x8_t s, int8x8_t t);
+     uint16x4_t pavgh (uint16x4_t s, uint16x4_t t);
+     uint8x8_t pavgb (uint8x8_t s, uint8x8_t t);
+     uint32x2_t pcmpeqw_u (uint32x2_t s, uint32x2_t t);
+     uint16x4_t pcmpeqh_u (uint16x4_t s, uint16x4_t t);
+     uint8x8_t pcmpeqb_u (uint8x8_t s, uint8x8_t t);
+     int32x2_t pcmpeqw_s (int32x2_t s, int32x2_t t);
+     int16x4_t pcmpeqh_s (int16x4_t s, int16x4_t t);
+     int8x8_t pcmpeqb_s (int8x8_t s, int8x8_t t);
+     uint32x2_t pcmpgtw_u (uint32x2_t s, uint32x2_t t);
+     uint16x4_t pcmpgth_u (uint16x4_t s, uint16x4_t t);
+     uint8x8_t pcmpgtb_u (uint8x8_t s, uint8x8_t t);
+     int32x2_t pcmpgtw_s (int32x2_t s, int32x2_t t);
+     int16x4_t pcmpgth_s (int16x4_t s, int16x4_t t);
+     int8x8_t pcmpgtb_s (int8x8_t s, int8x8_t t);
+     uint16x4_t pextrh_u (uint16x4_t s, int field);
+     int16x4_t pextrh_s (int16x4_t s, int field);
+     uint16x4_t pinsrh_0_u (uint16x4_t s, uint16x4_t t);
+     uint16x4_t pinsrh_1_u (uint16x4_t s, uint16x4_t t);
+     uint16x4_t pinsrh_2_u (uint16x4_t s, uint16x4_t t);
+     uint16x4_t pinsrh_3_u (uint16x4_t s, uint16x4_t t);
+     int16x4_t pinsrh_0_s (int16x4_t s, int16x4_t t);
+     int16x4_t pinsrh_1_s (int16x4_t s, int16x4_t t);
+     int16x4_t pinsrh_2_s (int16x4_t s, int16x4_t t);
+     int16x4_t pinsrh_3_s (int16x4_t s, int16x4_t t);
+     int32x2_t pmaddhw (int16x4_t s, int16x4_t t);
+     int16x4_t pmaxsh (int16x4_t s, int16x4_t t);
+     uint8x8_t pmaxub (uint8x8_t s, uint8x8_t t);
+     int16x4_t pminsh (int16x4_t s, int16x4_t t);
+     uint8x8_t pminub (uint8x8_t s, uint8x8_t t);
+     uint8x8_t pmovmskb_u (uint8x8_t s);
+     int8x8_t pmovmskb_s (int8x8_t s);
+     uint16x4_t pmulhuh (uint16x4_t s, uint16x4_t t);
+     int16x4_t pmulhh (int16x4_t s, int16x4_t t);
+     int16x4_t pmullh (int16x4_t s, int16x4_t t);
+     int64_t pmuluw (uint32x2_t s, uint32x2_t t);
+     uint8x8_t pasubub (uint8x8_t s, uint8x8_t t);
+     uint16x4_t biadd (uint8x8_t s);
+     uint16x4_t psadbh (uint8x8_t s, uint8x8_t t);
+     uint16x4_t pshufh_u (uint16x4_t dest, uint16x4_t s, uint8_t order);
+     int16x4_t pshufh_s (int16x4_t dest, int16x4_t s, uint8_t order);
+     uint16x4_t psllh_u (uint16x4_t s, uint8_t amount);
+     int16x4_t psllh_s (int16x4_t s, uint8_t amount);
+     uint32x2_t psllw_u (uint32x2_t s, uint8_t amount);
+     int32x2_t psllw_s (int32x2_t s, uint8_t amount);
+     uint16x4_t psrlh_u (uint16x4_t s, uint8_t amount);
+     int16x4_t psrlh_s (int16x4_t s, uint8_t amount);
+     uint32x2_t psrlw_u (uint32x2_t s, uint8_t amount);
+     int32x2_t psrlw_s (int32x2_t s, uint8_t amount);
+     uint16x4_t psrah_u (uint16x4_t s, uint8_t amount);
+     int16x4_t psrah_s (int16x4_t s, uint8_t amount);
+     uint32x2_t psraw_u (uint32x2_t s, uint8_t amount);
+     int32x2_t psraw_s (int32x2_t s, uint8_t amount);
+     uint32x2_t psubw_u (uint32x2_t s, uint32x2_t t);
+     uint16x4_t psubh_u (uint16x4_t s, uint16x4_t t);
+     uint8x8_t psubb_u (uint8x8_t s, uint8x8_t t);
+     int32x2_t psubw_s (int32x2_t s, int32x2_t t);
+     int16x4_t psubh_s (int16x4_t s, int16x4_t t);
+     int8x8_t psubb_s (int8x8_t s, int8x8_t t);
+     uint64_t psubd_u (uint64_t s, uint64_t t);
+     int64_t psubd_s (int64_t s, int64_t t);
+     int16x4_t psubsh (int16x4_t s, int16x4_t t);
+     int8x8_t psubsb (int8x8_t s, int8x8_t t);
+     uint16x4_t psubush (uint16x4_t s, uint16x4_t t);
+     uint8x8_t psubusb (uint8x8_t s, uint8x8_t t);
+     uint32x2_t punpckhwd_u (uint32x2_t s, uint32x2_t t);
+     uint16x4_t punpckhhw_u (uint16x4_t s, uint16x4_t t);
+     uint8x8_t punpckhbh_u (uint8x8_t s, uint8x8_t t);
+     int32x2_t punpckhwd_s (int32x2_t s, int32x2_t t);
+     int16x4_t punpckhhw_s (int16x4_t s, int16x4_t t);
+     int8x8_t punpckhbh_s (int8x8_t s, int8x8_t t);
+     uint32x2_t punpcklwd_u (uint32x2_t s, uint32x2_t t);
+     uint16x4_t punpcklhw_u (uint16x4_t s, uint16x4_t t);
+     uint8x8_t punpcklbh_u (uint8x8_t s, uint8x8_t t);
+     int32x2_t punpcklwd_s (int32x2_t s, int32x2_t t);
+     int16x4_t punpcklhw_s (int16x4_t s, int16x4_t t);
+     int8x8_t punpcklbh_s (int8x8_t s, int8x8_t t);
+</pre>
+ <ul class="menu">
+<li><a accesskey="1" href="Paired_002dSingle-Arithmetic.html#Paired_002dSingle-Arithmetic">Paired-Single Arithmetic</a>
+<li><a accesskey="2" href="Paired_002dSingle-Built_002din-Functions.html#Paired_002dSingle-Built_002din-Functions">Paired-Single Built-in Functions</a>
+<li><a accesskey="3" href="MIPS_002d3D-Built_002din-Functions.html#MIPS_002d3D-Built_002din-Functions">MIPS-3D Built-in Functions</a>
+</ul>
+
+ </body></html>
+

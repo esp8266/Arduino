@@ -1,0 +1,100 @@
+<html lang="en">
+<head>
+<title>V850-Regs - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="V850-Syntax.html#V850-Syntax" title="V850 Syntax">
+<link rel="prev" href="V850_002dChars.html#V850_002dChars" title="V850-Chars">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="V850-Regs"></a>
+<a name="V850_002dRegs"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="V850_002dChars.html#V850_002dChars">V850-Chars</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="V850-Syntax.html#V850-Syntax">V850 Syntax</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">9.41.2.2 Register Names</h5>
+
+<p><a name="index-V850-register-names-1955"></a><a name="index-register-names_002c-V850-1956"></a><code>as</code> supports the following names for registers:
+     
+<a name="index-g_t_0040code_007bzero_007d-register_002c-V850-1957"></a>
+<dl><dt><code>general register 0</code><dd>r0, zero
+<br><dt><code>general register 1</code><dd>r1
+<br><dt><code>general register 2</code><dd>r2, hp
+<a name="index-g_t_0040code_007bsp_007d-register_002c-V850-1958"></a><br><dt><code>general register 3</code><dd>r3, sp
+<a name="index-g_t_0040code_007bgp_007d-register_002c-V850-1959"></a><br><dt><code>general register 4</code><dd>r4, gp
+<a name="index-g_t_0040code_007btp_007d-register_002c-V850-1960"></a><br><dt><code>general register 5</code><dd>r5, tp
+<br><dt><code>general register 6</code><dd>r6
+<br><dt><code>general register 7</code><dd>r7
+<br><dt><code>general register 8</code><dd>r8
+<br><dt><code>general register 9</code><dd>r9
+<br><dt><code>general register 10</code><dd>r10
+<br><dt><code>general register 11</code><dd>r11
+<br><dt><code>general register 12</code><dd>r12
+<br><dt><code>general register 13</code><dd>r13
+<br><dt><code>general register 14</code><dd>r14
+<br><dt><code>general register 15</code><dd>r15
+<br><dt><code>general register 16</code><dd>r16
+<br><dt><code>general register 17</code><dd>r17
+<br><dt><code>general register 18</code><dd>r18
+<br><dt><code>general register 19</code><dd>r19
+<br><dt><code>general register 20</code><dd>r20
+<br><dt><code>general register 21</code><dd>r21
+<br><dt><code>general register 22</code><dd>r22
+<br><dt><code>general register 23</code><dd>r23
+<br><dt><code>general register 24</code><dd>r24
+<br><dt><code>general register 25</code><dd>r25
+<br><dt><code>general register 26</code><dd>r26
+<br><dt><code>general register 27</code><dd>r27
+<br><dt><code>general register 28</code><dd>r28
+<br><dt><code>general register 29</code><dd>r29
+<a name="index-g_t_0040code_007bep_007d-register_002c-V850-1961"></a><br><dt><code>general register 30</code><dd>r30, ep
+<a name="index-g_t_0040code_007blp_007d-register_002c-V850-1962"></a><br><dt><code>general register 31</code><dd>r31, lp
+<a name="index-g_t_0040code_007beipc_007d-register_002c-V850-1963"></a><br><dt><code>system register 0</code><dd>eipc
+<a name="index-g_t_0040code_007beipsw_007d-register_002c-V850-1964"></a><br><dt><code>system register 1</code><dd>eipsw
+<a name="index-g_t_0040code_007bfepc_007d-register_002c-V850-1965"></a><br><dt><code>system register 2</code><dd>fepc
+<a name="index-g_t_0040code_007bfepsw_007d-register_002c-V850-1966"></a><br><dt><code>system register 3</code><dd>fepsw
+<a name="index-g_t_0040code_007becr_007d-register_002c-V850-1967"></a><br><dt><code>system register 4</code><dd>ecr
+<a name="index-g_t_0040code_007bpsw_007d-register_002c-V850-1968"></a><br><dt><code>system register 5</code><dd>psw
+<a name="index-g_t_0040code_007bctpc_007d-register_002c-V850-1969"></a><br><dt><code>system register 16</code><dd>ctpc
+<a name="index-g_t_0040code_007bctpsw_007d-register_002c-V850-1970"></a><br><dt><code>system register 17</code><dd>ctpsw
+<a name="index-g_t_0040code_007bdbpc_007d-register_002c-V850-1971"></a><br><dt><code>system register 18</code><dd>dbpc
+<a name="index-g_t_0040code_007bdbpsw_007d-register_002c-V850-1972"></a><br><dt><code>system register 19</code><dd>dbpsw
+<a name="index-g_t_0040code_007bctbp_007d-register_002c-V850-1973"></a><br><dt><code>system register 20</code><dd>ctbp
+</dl>
+
+   </body></html>
+

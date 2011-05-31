@@ -1,0 +1,109 @@
+<html lang="en">
+<head>
+<title>Thread-Local - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Unnamed-Fields.html#Unnamed-Fields" title="Unnamed Fields">
+<link rel="next" href="Binary-constants.html#Binary-constants" title="Binary constants">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Thread-Local"></a>
+<a name="Thread_002dLocal"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Binary-constants.html#Binary-constants">Binary constants</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Unnamed-Fields.html#Unnamed-Fields">Unnamed Fields</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.56 Thread-Local Storage</h3>
+
+<p><a name="index-Thread_002dLocal-Storage-3153"></a><a name="index-g_t_0040acronym_007bTLS_007d-3154"></a><a name="index-g_t_005f_005fthread-3155"></a>
+Thread-local storage (<acronym>TLS</acronym>) is a mechanism by which variables
+are allocated such that there is one instance of the variable per extant
+thread.  The run-time model GCC uses to implement this originates
+in the IA-64 processor-specific ABI, but has since been migrated
+to other processors as well.  It requires significant support from
+the linker (<samp><span class="command">ld</span></samp>), dynamic linker (<samp><span class="command">ld.so</span></samp>), and
+system libraries (<samp><span class="file">libc.so</span></samp> and <samp><span class="file">libpthread.so</span></samp>), so it
+is not available everywhere.
+
+ <p>At the user level, the extension is visible with a new storage
+class keyword: <code>__thread</code>.  For example:
+
+<pre class="smallexample">     __thread int i;
+     extern __thread struct state s;
+     static __thread char *p;
+</pre>
+ <p>The <code>__thread</code> specifier may be used alone, with the <code>extern</code>
+or <code>static</code> specifiers, but with no other storage class specifier. 
+When used with <code>extern</code> or <code>static</code>, <code>__thread</code> must appear
+immediately after the other storage class specifier.
+
+ <p>The <code>__thread</code> specifier may be applied to any global, file-scoped
+static, function-scoped static, or static data member of a class.  It may
+not be applied to block-scoped automatic or non-static data member.
+
+ <p>When the address-of operator is applied to a thread-local variable, it is
+evaluated at run-time and returns the address of the current thread's
+instance of that variable.  An address so obtained may be used by any
+thread.  When a thread terminates, any pointers to thread-local variables
+in that thread become invalid.
+
+ <p>No static initialization may refer to the address of a thread-local variable.
+
+ <p>In C++, if an initializer is present for a thread-local variable, it must
+be a <var>constant-expression</var>, as defined in 5.19.2 of the ANSI/ISO C++
+standard.
+
+ <p>See <a href="http://people.redhat.com/drepper/tls.pdf">ELF Handling For Thread-Local Storage</a> for a detailed explanation of
+the four thread-local storage addressing models, and how the run-time
+is expected to function.
+
+<ul class="menu">
+<li><a accesskey="1" href="C99-Thread_002dLocal-Edits.html#C99-Thread_002dLocal-Edits">C99 Thread-Local Edits</a>
+<li><a accesskey="2" href="C_002b_002b98-Thread_002dLocal-Edits.html#C_002b_002b98-Thread_002dLocal-Edits">C++98 Thread-Local Edits</a>
+</ul>
+
+ </body></html>
+

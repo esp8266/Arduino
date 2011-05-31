@@ -1,0 +1,142 @@
+<html lang="en">
+<head>
+<title>Zero Length - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Named-Address-Spaces.html#Named-Address-Spaces" title="Named Address Spaces">
+<link rel="next" href="Variable-Length.html#Variable-Length" title="Variable Length">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Zero-Length"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Variable-Length.html#Variable-Length">Variable Length</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Named-Address-Spaces.html#Named-Address-Spaces">Named Address Spaces</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.16 Arrays of Length Zero</h3>
+
+<p><a name="index-arrays-of-length-zero-2284"></a><a name="index-zero_002dlength-arrays-2285"></a><a name="index-length_002dzero-arrays-2286"></a><a name="index-flexible-array-members-2287"></a>
+Zero-length arrays are allowed in GNU C.  They are very useful as the
+last element of a structure which is really a header for a variable-length
+object:
+
+<pre class="smallexample">     struct line {
+       int length;
+       char contents[0];
+     };
+     
+     struct line *thisline = (struct line *)
+       malloc (sizeof (struct line) + this_length);
+     thisline-&gt;length = this_length;
+</pre>
+ <p>In ISO C90, you would have to give <code>contents</code> a length of 1, which
+means either you waste space or complicate the argument to <code>malloc</code>.
+
+ <p>In ISO C99, you would use a <dfn>flexible array member</dfn>, which is
+slightly different in syntax and semantics:
+
+     <ul>
+<li>Flexible array members are written as <code>contents[]</code> without
+the <code>0</code>.
+
+     <li>Flexible array members have incomplete type, and so the <code>sizeof</code>
+operator may not be applied.  As a quirk of the original implementation
+of zero-length arrays, <code>sizeof</code> evaluates to zero.
+
+     <li>Flexible array members may only appear as the last member of a
+<code>struct</code> that is otherwise non-empty.
+
+     <li>A structure containing a flexible array member, or a union containing
+such a structure (possibly recursively), may not be a member of a
+structure or an element of an array.  (However, these uses are
+permitted by GCC as extensions.) 
+</ul>
+
+ <p>GCC versions before 3.0 allowed zero-length arrays to be statically
+initialized, as if they were flexible arrays.  In addition to those
+cases that were useful, it also allowed initializations in situations
+that would corrupt later data.  Non-empty initialization of zero-length
+arrays is now treated like any case where there are more initializer
+elements than the array holds, in that a suitable warning about "excess
+elements in array" is given, and the excess elements (all of them, in
+this case) are ignored.
+
+ <p>Instead GCC allows static initialization of flexible array members. 
+This is equivalent to defining a new structure containing the original
+structure followed by an array of sufficient size to contain the data. 
+I.e. in the following, <code>f1</code> is constructed as if it were declared
+like <code>f2</code>.
+
+<pre class="smallexample">     struct f1 {
+       int x; int y[];
+     } f1 = { 1, { 2, 3, 4 } };
+     
+     struct f2 {
+       struct f1 f1; int data[3];
+     } f2 = { { 1 }, { 2, 3, 4 } };
+</pre>
+ <p class="noindent">The convenience of this extension is that <code>f1</code> has the desired
+type, eliminating the need to consistently refer to <code>f2.f1</code>.
+
+ <p>This has symmetry with normal static arrays, in that an array of
+unknown size is also written with <code>[]</code>.
+
+ <p>Of course, this extension only makes sense if the extra data comes at
+the end of a top-level object, as otherwise we would be overwriting
+data at subsequent offsets.  To avoid undue complication and confusion
+with initialization of deeply nested arrays, we simply disallow any
+non-empty initialization except when the structure is the top-level
+object.  For example:
+
+<pre class="smallexample">     struct foo { int x; int y[]; };
+     struct bar { struct foo z; };
+     
+     struct foo a = { 1, { 2, 3, 4 } };        // <span class="roman">Valid.</span>
+     struct bar b = { { 1, { 2, 3, 4 } } };    // <span class="roman">Invalid.</span>
+     struct bar c = { { 1, { } } };            // <span class="roman">Valid.</span>
+     struct foo d[1] = { { 1 { 2, 3, 4 } } };  // <span class="roman">Invalid.</span>
+</pre>
+ </body></html>
+

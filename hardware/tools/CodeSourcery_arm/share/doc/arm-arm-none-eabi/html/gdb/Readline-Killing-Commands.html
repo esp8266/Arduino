@@ -1,0 +1,99 @@
+<html lang="en">
+<head>
+<title>Readline Killing Commands - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Readline-Interaction.html#Readline-Interaction" title="Readline Interaction">
+<link rel="prev" href="Readline-Movement-Commands.html#Readline-Movement-Commands" title="Readline Movement Commands">
+<link rel="next" href="Readline-Arguments.html#Readline-Arguments" title="Readline Arguments">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Readline-Killing-Commands"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Readline-Arguments.html#Readline-Arguments">Readline Arguments</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Readline-Movement-Commands.html#Readline-Movement-Commands">Readline Movement Commands</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Readline-Interaction.html#Readline-Interaction">Readline Interaction</a>
+<hr>
+</div>
+
+<h4 class="subsection">31.2.3 Readline Killing Commands</h4>
+
+<p><a name="index-killing-text-2190"></a><a name="index-yanking-text-2191"></a>
+<dfn>Killing</dfn> text means to delete the text from the line, but to save
+it away for later use, usually by <dfn>yanking</dfn> (re-inserting)
+it back into the line. 
+(`Cut' and `paste' are more recent jargon for `kill' and `yank'.)
+
+   <p>If the description for a command says that it `kills' text, then you can
+be sure that you can get the text back in a different (or the same)
+place later.
+
+   <p>When you use a kill command, the text is saved in a <dfn>kill-ring</dfn>. 
+Any number of consecutive kills save all of the killed text together, so
+that when you yank it back, you get it all.  The kill
+ring is not line specific; the text that you killed on a previously
+typed line is available to be yanked back later, when you are typing
+another line. 
+<a name="index-kill-ring-2192"></a>
+Here is the list of commands for killing text.
+
+     <dl>
+<dt><kbd>C-k</kbd><dd>Kill the text from the current cursor position to the end of the line.
+
+     <br><dt><kbd>M-d</kbd><dd>Kill from the cursor to the end of the current word, or, if between
+words, to the end of the next word. 
+Word boundaries are the same as those used by <kbd>M-f</kbd>.
+
+     <br><dt><kbd>M-&lt;DEL&gt;</kbd><dd>Kill from the cursor the start of the current word, or, if between
+words, to the start of the previous word. 
+Word boundaries are the same as those used by <kbd>M-b</kbd>.
+
+     <br><dt><kbd>C-w</kbd><dd>Kill from the cursor to the previous whitespace.  This is different than
+<kbd>M-&lt;DEL&gt;</kbd> because the word boundaries differ.
+
+   </dl>
+
+   <p>Here is how to <dfn>yank</dfn> the text back into the line.  Yanking
+means to copy the most-recently-killed text from the kill buffer.
+
+     <dl>
+<dt><kbd>C-y</kbd><dd>Yank the most recently killed text back into the buffer at the cursor.
+
+     <br><dt><kbd>M-y</kbd><dd>Rotate the kill-ring, and yank the new top.  You can only do this if
+the prior command is <kbd>C-y</kbd> or <kbd>M-y</kbd>. 
+</dl>
+
+   </body></html>
+

@@ -1,0 +1,61 @@
+<html lang="en">
+<head>
+<title>iswctype - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Ctype.html#Ctype" title="Ctype">
+<link rel="prev" href="iswxdigit.html#iswxdigit" title="iswxdigit">
+<link rel="next" href="wctype.html#wctype" title="wctype">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="iswctype"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="wctype.html#wctype">wctype</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="iswxdigit.html#iswxdigit">iswxdigit</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Ctype.html#Ctype">Ctype</a>
+<hr>
+</div>
+
+<h3 class="section">3.27 <code>iswctype</code>&mdash;extensible wide-character test</h3>
+
+<p><a name="index-iswctype-139"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;wctype.h&gt;
+     int iswctype(wint_t <var>c</var>, wctype_t <var>desc</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>iswctype</code> is a function which classifies wide-character values using the
+wide-character test specified by <var>desc</var>.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>iswctype</code> returns non-zero if and only if <var>c</var> matches the test specified by <var>desc</var>. 
+If <var>desc</var> is unknown, zero is returned.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>iswctype</code> is C99.
+
+   <p>No supporting OS subroutines are required.
+
+   <p><br>
+
+   </body></html>
+

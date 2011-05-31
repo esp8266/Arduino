@@ -1,0 +1,130 @@
+<html lang="en">
+<head>
+<title>OpenRISC 1000 - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Embedded-Processors.html#Embedded-Processors" title="Embedded Processors">
+<link rel="prev" href="MIPS-Embedded.html#MIPS-Embedded" title="MIPS Embedded">
+<link rel="next" href="PA.html#PA" title="PA">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="OpenRISC-1000"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="PA.html#PA">PA</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="MIPS-Embedded.html#MIPS-Embedded">MIPS Embedded</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Embedded-Processors.html#Embedded-Processors">Embedded Processors</a>
+<hr>
+</div>
+
+<h4 class="subsection">21.3.6 OpenRISC 1000</h4>
+
+<p><a name="index-OpenRISC-1000-1349"></a>
+<a name="index-or1k-boards-1350"></a>See OR1k Architecture document (<a href="www.opencores.org">www.opencores.org</a>) for more information
+about platform and commands.
+
+     
+<a name="index-target-jtag-1351"></a>
+<dl><dt><code>target jtag jtag://</code><var>host</var><code>:</code><var>port</var><dd>
+Connects to remote JTAG server. 
+JTAG remote server can be either an or1ksim or JTAG server,
+connected via parallel port to the board.
+
+     <p>Example: <code>target jtag jtag://localhost:9999</code>
+
+     <p><a name="index-or1ksim-1352"></a><br><dt><code>or1ksim </code><var>command</var><dd>If connected to <code>or1ksim</code> OpenRISC 1000 Architectural
+Simulator, proprietary commands can be executed.
+
+     <p><a name="index-info-or1k-spr-1353"></a><br><dt><code>info or1k spr</code><dd>Displays spr groups.
+
+     <br><dt><code>info or1k spr </code><var>group</var><dt><code>info or1k spr </code><var>groupno</var><dd>Displays register names in selected group.
+
+     <br><dt><code>info or1k spr </code><var>group</var> <var>register</var><dt><code>info or1k spr </code><var>register</var><dt><code>info or1k spr </code><var>groupno</var> <var>registerno</var><dt><code>info or1k spr </code><var>registerno</var><dd>Shows information about specified spr register.
+
+     <p><a name="index-spr-1354"></a><br><dt><code>spr </code><var>group</var> <var>register</var> <var>value</var><dt><code>spr </code><var>register value</var><dt><code>spr </code><var>groupno</var> <var>registerno value</var><dt><code>spr </code><var>registerno value</var><dd>Writes <var>value</var> to specified spr register. 
+</dl>
+
+   <p>Some implementations of OpenRISC 1000 Architecture also have hardware trace. 
+It is very similar to <span class="sc">gdb</span> trace, except it does not interfere with normal
+program execution and is thus much faster.  Hardware breakpoints/watchpoint
+triggers can be set using:
+     <dl>
+<dt><code>$LEA/$LDATA</code><dd>Load effective address/data
+<br><dt><code>$SEA/$SDATA</code><dd>Store effective address/data
+<br><dt><code>$AEA/$ADATA</code><dd>Access effective address ($SEA or $LEA) or data ($SDATA/$LDATA)
+<br><dt><code>$FETCH</code><dd>Fetch data
+</dl>
+
+   <p>When triggered, it can capture low level data, like: <code>PC</code>, <code>LSEA</code>,
+<code>LDATA</code>, <code>SDATA</code>, <code>READSPR</code>, <code>WRITESPR</code>, <code>INSTR</code>.
+
+   <p><code>htrace</code> commands:
+<a name="index-OpenRISC-1000-htrace-1355"></a>
+     
+<a name="index-hwatch-1356"></a>
+<dl><dt><code>hwatch </code><var>conditional</var><dd>Set hardware watchpoint on combination of Load/Store Effective Address(es)
+or Data.  For example:
+
+     <p><code>hwatch ($LEA == my_var) &amp;&amp; ($LDATA &lt; 50) || ($SEA == my_var) &amp;&amp; ($SDATA &gt;= 50)</code>
+
+     <p><code>hwatch ($LEA == my_var) &amp;&amp; ($LDATA &lt; 50) || ($SEA == my_var) &amp;&amp; ($SDATA &gt;= 50)</code>
+
+     <p><a name="index-htrace-1357"></a><br><dt><code>htrace info</code><dd>Display information about current HW trace configuration.
+
+     <br><dt><code>htrace trigger </code><var>conditional</var><dd>Set starting criteria for HW trace.
+
+     <br><dt><code>htrace qualifier </code><var>conditional</var><dd>Set acquisition qualifier for HW trace.
+
+     <br><dt><code>htrace stop </code><var>conditional</var><dd>Set HW trace stopping criteria.
+
+     <br><dt><code>htrace record [</code><var>data</var><code>]*</code><dd>Selects the data to be recorded, when qualifier is met and HW trace was
+triggered.
+
+     <br><dt><code>htrace enable</code><dt><code>htrace disable</code><dd>Enables/disables the HW trace.
+
+     <br><dt><code>htrace rewind [</code><var>filename</var><code>]</code><dd>Clears currently recorded trace data.
+
+     <p>If filename is specified, new trace file is made and any newly collected data
+will be written there.
+
+     <br><dt><code>htrace print [</code><var>start</var><code> [</code><var>len</var><code>]]</code><dd>Prints trace buffer, using current record configuration.
+
+     <br><dt><code>htrace mode continuous</code><dd>Set continuous trace mode.
+
+     <br><dt><code>htrace mode suspend</code><dd>Set suspend trace mode.
+
+   </dl>
+
+   </body></html>
+

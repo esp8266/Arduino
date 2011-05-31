@@ -1,0 +1,63 @@
+<html lang="en">
+<head>
+<title>strstr - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Strings.html#Strings" title="Strings">
+<link rel="prev" href="strspn.html#strspn" title="strspn">
+<link rel="next" href="strtok.html#strtok" title="strtok">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="strstr"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="strtok.html#strtok">strtok</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="strspn.html#strspn">strspn</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Strings.html#Strings">Strings</a>
+<hr>
+</div>
+
+<h3 class="section">5.37 <code>strstr</code>&mdash;find string segment</h3>
+
+<p><a name="index-strstr-404"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;string.h&gt;
+     char *strstr(const char *<var>s1</var>, const char *<var>s2</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+Locates the first occurrence in the string pointed to by <var>s1</var> of
+the sequence of characters in the string pointed to by <var>s2</var>
+(excluding the terminating null character).
+
+   <p><br>
+<strong>Returns</strong><br>
+Returns a pointer to the located string segment, or a null
+pointer if the string <var>s2</var> is not found. If <var>s2</var> points to
+a string with zero length, <var>s1</var> is returned.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>strstr</code> is ANSI C.
+
+   <p><code>strstr</code> requires no supporting OS subroutines.
+
+   <p><br>
+
+   </body></html>
+

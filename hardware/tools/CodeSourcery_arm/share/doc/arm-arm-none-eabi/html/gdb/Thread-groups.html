@@ -1,0 +1,92 @@
+<html lang="en">
+<head>
+<title>Thread groups - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="GDB_002fMI-General-Design.html#GDB_002fMI-General-Design" title="GDB/MI General Design">
+<link rel="prev" href="Asynchronous-and-non_002dstop-modes.html#Asynchronous-and-non_002dstop-modes" title="Asynchronous and non-stop modes">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Thread-groups"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Asynchronous-and-non_002dstop-modes.html#Asynchronous-and-non_002dstop-modes">Asynchronous and non-stop modes</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="GDB_002fMI-General-Design.html#GDB_002fMI-General-Design">GDB/MI General Design</a>
+<hr>
+</div>
+
+<h4 class="subsection">27.1.3 Thread groups</h4>
+
+<p><span class="sc">gdb</span> may be used to debug several processes at the same time. 
+On some platfroms, <span class="sc">gdb</span> may support debugging of several
+hardware systems, each one having several cores with several different
+processes running on each core.  This section describes the MI
+mechanism to support such debugging scenarios.
+
+   <p>The key observation is that regardless of the structure of the
+target, MI can have a global list of threads, because most commands that
+accept the &lsquo;<samp><span class="samp">--thread</span></samp>&rsquo; option do not need to know what process that
+thread belongs to.  Therefore, it is not necessary to introduce
+neither additional &lsquo;<samp><span class="samp">--process</span></samp>&rsquo; option, nor an notion of the
+current process in the MI interface.  The only strictly new feature
+that is required is the ability to find how the threads are grouped
+into processes.
+
+   <p>To allow the user to discover such grouping, and to support arbitrary
+hierarchy of machines/cores/processes, MI introduces the concept of a
+<dfn>thread group</dfn>.  Thread group is a collection of threads and other
+thread groups.  A thread group always has a string identifier, a type,
+and may have additional attributes specific to the type.  A new
+command, <code>-list-thread-groups</code>, returns the list of top-level
+thread groups, which correspond to processes that <span class="sc">gdb</span> is
+debugging at the moment.  By passing an identifier of a thread group
+to the <code>-list-thread-groups</code> command, it is possible to obtain
+the members of specific thread group.
+
+   <p>To allow the user to easily discover processes, and other objects, he
+wishes to debug, a concept of <dfn>available thread group</dfn> is
+introduced.  Available thread group is an thread group that
+<span class="sc">gdb</span> is not debugging, but that can be attached to, using the
+<code>-target-attach</code> command.  The list of available top-level thread
+groups can be obtained using &lsquo;<samp><span class="samp">-list-thread-groups --available</span></samp>&rsquo;. 
+In general, the content of a thread group may be only retrieved only
+after attaching to that thread group.
+
+   <p>Thread groups are related to inferiors (see <a href="Inferiors-and-Programs.html#Inferiors-and-Programs">Inferiors and Programs</a>).  Each inferior corresponds to a thread group of a special
+type &lsquo;<samp><span class="samp">process</span></samp>&rsquo;, and some additional operations are permitted on
+such thread groups.
+
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%% SECTION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+   </body></html>
+

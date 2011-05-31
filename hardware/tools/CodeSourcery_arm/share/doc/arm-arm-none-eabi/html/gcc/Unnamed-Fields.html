@@ -1,0 +1,102 @@
+<html lang="en">
+<head>
+<title>Unnamed Fields - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Pragmas.html#Pragmas" title="Pragmas">
+<link rel="next" href="Thread_002dLocal.html#Thread_002dLocal" title="Thread-Local">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Unnamed-Fields"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Thread_002dLocal.html#Thread_002dLocal">Thread-Local</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Pragmas.html#Pragmas">Pragmas</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.55 Unnamed struct/union fields within structs/unions</h3>
+
+<p><a name="index-struct-3150"></a><a name="index-union-3151"></a>
+For compatibility with other compilers, GCC allows you to define
+a structure or union that contains, as fields, structures and unions
+without names.  For example:
+
+<pre class="smallexample">     struct {
+       int a;
+       union {
+         int b;
+         float c;
+       };
+       int d;
+     } foo;
+</pre>
+ <p>In this example, the user would be able to access members of the unnamed
+union with code like &lsquo;<samp><span class="samp">foo.b</span></samp>&rsquo;.  Note that only unnamed structs and
+unions are allowed, you may not have, for example, an unnamed
+<code>int</code>.
+
+ <p>You must never create such structures that cause ambiguous field definitions. 
+For example, this structure:
+
+<pre class="smallexample">     struct {
+       int a;
+       struct {
+         int a;
+       };
+     } foo;
+</pre>
+ <p>It is ambiguous which <code>a</code> is being referred to with &lsquo;<samp><span class="samp">foo.a</span></samp>&rsquo;. 
+Such constructs are not supported and must be avoided.  In the future,
+such constructs may be detected and treated as compilation errors.
+
+ <p><a name="index-fms_002dextensions-3152"></a>Unless <samp><span class="option">-fms-extensions</span></samp> is used, the unnamed field must be a
+structure or union definition without a tag (for example, &lsquo;<samp><span class="samp">struct
+{ int a; };</span></samp>&rsquo;).  If <samp><span class="option">-fms-extensions</span></samp> is used, the field may
+also be a definition with a tag such as &lsquo;<samp><span class="samp">struct foo { int a;
+};</span></samp>&rsquo;, a reference to a previously defined structure or union such as
+&lsquo;<samp><span class="samp">struct foo;</span></samp>&rsquo;, or a reference to a <code>typedef</code> name for a
+previously defined structure or union type.
+
+ </body></html>
+

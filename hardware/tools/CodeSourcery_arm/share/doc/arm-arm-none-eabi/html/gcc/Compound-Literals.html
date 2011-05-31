@@ -1,0 +1,115 @@
+<html lang="en">
+<head>
+<title>Compound Literals - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Initializers.html#Initializers" title="Initializers">
+<link rel="next" href="Designated-Inits.html#Designated-Inits" title="Designated Inits">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Compound-Literals"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Designated-Inits.html#Designated-Inits">Designated Inits</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Initializers.html#Initializers">Initializers</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.24 Compound Literals</h3>
+
+<p><a name="index-constructor-expressions-2314"></a><a name="index-initializations-in-expressions-2315"></a><a name="index-structures_002c-constructor-expression-2316"></a><a name="index-expressions_002c-constructor-2317"></a><a name="index-compound-literals-2318"></a><!-- The GNU C name for what C99 calls compound literals was "constructor expressions". -->
+
+ <p>ISO C99 supports compound literals.  A compound literal looks like
+a cast containing an initializer.  Its value is an object of the
+type specified in the cast, containing the elements specified in
+the initializer; it is an lvalue.  As an extension, GCC supports
+compound literals in C90 mode and in C++.
+
+ <p>Usually, the specified type is a structure.  Assume that
+<code>struct foo</code> and <code>structure</code> are declared as shown:
+
+<pre class="smallexample">     struct foo {int a; char b[2];} structure;
+</pre>
+ <p class="noindent">Here is an example of constructing a <code>struct foo</code> with a compound literal:
+
+<pre class="smallexample">     structure = ((struct foo) {x + y, 'a', 0});
+</pre>
+ <p class="noindent">This is equivalent to writing the following:
+
+<pre class="smallexample">     {
+       struct foo temp = {x + y, 'a', 0};
+       structure = temp;
+     }
+</pre>
+ <p>You can also construct an array.  If all the elements of the compound literal
+are (made up of) simple constant expressions, suitable for use in
+initializers of objects of static storage duration, then the compound
+literal can be coerced to a pointer to its first element and used in
+such an initializer, as shown here:
+
+<pre class="smallexample">     char **foo = (char *[]) { "x", "y", "z" };
+</pre>
+ <p>Compound literals for scalar types and union types are is
+also allowed, but then the compound literal is equivalent
+to a cast.
+
+ <p>As a GNU extension, GCC allows initialization of objects with static storage
+duration by compound literals (which is not possible in ISO C99, because
+the initializer is not a constant). 
+It is handled as if the object was initialized only with the bracket
+enclosed list if the types of the compound literal and the object match. 
+The initializer list of the compound literal must be constant. 
+If the object being initialized has array type of unknown size, the size is
+determined by compound literal size.
+
+<pre class="smallexample">     static struct foo x = (struct foo) {1, 'a', 'b'};
+     static int y[] = (int []) {1, 2, 3};
+     static int z[] = (int [3]) {1};
+</pre>
+ <p class="noindent">The above lines are equivalent to the following:
+<pre class="smallexample">     static struct foo x = {1, 'a', 'b'};
+     static int y[] = {1, 2, 3};
+     static int z[] = {1, 0, 0};
+</pre>
+ </body></html>
+

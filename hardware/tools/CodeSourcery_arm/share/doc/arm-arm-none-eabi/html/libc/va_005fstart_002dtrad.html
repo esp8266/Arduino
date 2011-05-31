@@ -1,0 +1,58 @@
+<html lang="en">
+<head>
+<title>va_start-trad - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Varargs.html#Varargs" title="Varargs">
+<link rel="prev" href="va_005falist.html#va_005falist" title="va_alist">
+<link rel="next" href="va_005farg_002dtrad.html#va_005farg_002dtrad" title="va_arg-trad">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="va_start-trad"></a>
+<a name="va_005fstart_002dtrad"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="va_005farg_002dtrad.html#va_005farg_002dtrad">va_arg-trad</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="va_005falist.html#va_005falist">va_alist</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Varargs.html#Varargs">Varargs</a>
+<hr>
+</div>
+
+<h4 class="subsection">13.2.2 Initialize variable argument list</h4>
+
+<p><a name="index-va_005fstart-500"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;varargs.h&gt;
+     va_list <var>ap</var>;
+     va_start(<var>ap</var>);
+</pre>
+   <p><strong>Description</strong><br>
+With the <samp><span class="file">varargs.h</span></samp> macros, use <code>va_start</code> to initialize a
+data structure <var>ap</var> to permit manipulating a variable argument list. 
+<var>ap</var> must have the type <var>va_alist</var>.
+
+   <p><strong>Returns</strong><br>
+<code>va_start</code> does not return a result.
+
+   <p><strong>Portability</strong><br>
+<code>va_start</code> is also defined as a macro in ANSI C, but the
+definitions are incompatible; the ANSI version has another parameter
+besides <var>ap</var>.
+
+   </body></html>
+

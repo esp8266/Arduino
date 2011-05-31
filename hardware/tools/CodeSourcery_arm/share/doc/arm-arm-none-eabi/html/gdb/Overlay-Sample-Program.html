@@ -1,0 +1,89 @@
+<html lang="en">
+<head>
+<title>Overlay Sample Program - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Overlays.html#Overlays" title="Overlays">
+<link rel="prev" href="Automatic-Overlay-Debugging.html#Automatic-Overlay-Debugging" title="Automatic Overlay Debugging">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Overlay-Sample-Program"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Automatic-Overlay-Debugging.html#Automatic-Overlay-Debugging">Automatic Overlay Debugging</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Overlays.html#Overlays">Overlays</a>
+<hr>
+</div>
+
+<h3 class="section">14.4 Overlay Sample Program</h3>
+
+<p><a name="index-overlay-example-program-776"></a>
+When linking a program which uses overlays, you must place the overlays
+at their load addresses, while relocating them to run at their mapped
+addresses.  To do this, you must write a linker script (see <a href="../ld/Overlay-Description.html#Overlay-Description">Overlay Description</a>).  Unfortunately,
+since linker scripts are specific to a particular host system, target
+architecture, and target memory layout, this manual cannot provide
+portable sample code demonstrating <span class="sc">gdb</span>'s overlay support.
+
+   <p>However, the <span class="sc">gdb</span> source distribution does contain an overlaid
+program, with linker scripts for a few systems, as part of its test
+suite.  The program consists of the following files from
+<samp><span class="file">gdb/testsuite/gdb.base</span></samp>:
+
+     <dl>
+<dt><samp><span class="file">overlays.c</span></samp><dd>The main program file. 
+<br><dt><samp><span class="file">ovlymgr.c</span></samp><dd>A simple overlay manager, used by <samp><span class="file">overlays.c</span></samp>. 
+<br><dt><samp><span class="file">foo.c</span></samp><dt><samp><span class="file">bar.c</span></samp><dt><samp><span class="file">baz.c</span></samp><dt><samp><span class="file">grbx.c</span></samp><dd>Overlay modules, loaded and used by <samp><span class="file">overlays.c</span></samp>. 
+<br><dt><samp><span class="file">d10v.ld</span></samp><dt><samp><span class="file">m32r.ld</span></samp><dd>Linker scripts for linking the test program on the <code>d10v-elf</code>
+and <code>m32r-elf</code> targets. 
+</dl>
+
+   <p>You can build the test program using the <code>d10v-elf</code> GCC
+cross-compiler like this:
+
+<pre class="smallexample">     $ d10v-elf-gcc -g -c overlays.c
+     $ d10v-elf-gcc -g -c ovlymgr.c
+     $ d10v-elf-gcc -g -c foo.c
+     $ d10v-elf-gcc -g -c bar.c
+     $ d10v-elf-gcc -g -c baz.c
+     $ d10v-elf-gcc -g -c grbx.c
+     $ d10v-elf-gcc -g overlays.o ovlymgr.o foo.o bar.o \
+                       baz.o grbx.o -Wl,-Td10v.ld -o overlays
+</pre>
+   <p>The build process is identical for any other architecture, except that
+you must substitute the appropriate compiler and linker script for the
+target system for <code>d10v-elf-gcc</code> and <code>d10v.ld</code>.
+
+   </body></html>
+

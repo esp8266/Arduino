@@ -1,0 +1,135 @@
+<html lang="en">
+<head>
+<title>Source Code Reference - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Assignments.html#Assignments" title="Assignments">
+<link rel="prev" href="PROVIDE_005fHIDDEN.html#PROVIDE_005fHIDDEN" title="PROVIDE_HIDDEN">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Source-Code-Reference"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="PROVIDE_005fHIDDEN.html#PROVIDE_005fHIDDEN">PROVIDE_HIDDEN</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Assignments.html#Assignments">Assignments</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.5.4 Source Code Reference</h4>
+
+<p>Accessing a linker script defined variable from source code is not
+intuitive.  In particular a linker script symbol is not equivalent to
+a variable declaration in a high level language, it is instead a
+symbol that does not have a value.
+
+   <p>Before going further, it is important to note that compilers often
+transform names in the source code into different names when they are
+stored in the symbol table.  For example, Fortran compilers commonly
+prepend or append an underscore, and C++ performs extensive &lsquo;<samp><span class="samp">name
+mangling</span></samp>&rsquo;.  Therefore there might be a discrepancy between the name
+of a variable as it is used in source code and the name of the same
+variable as it is defined in a linker script.  For example in C a
+linker script variable might be referred to as:
+
+<pre class="smallexample">       extern int foo;
+</pre>
+   <p>But in the linker script it might be defined as:
+
+<pre class="smallexample">       _foo = 1000;
+</pre>
+   <p>In the remaining examples however it is assumed that no name
+transformation has taken place.
+
+   <p>When a symbol is declared in a high level language such as C, two
+things happen.  The first is that the compiler reserves enough space
+in the program's memory to hold the <em>value</em> of the symbol.  The
+second is that the compiler creates an entry in the program's symbol
+table which holds the symbol's <em>address</em>.  ie the symbol table
+contains the address of the block of memory holding the symbol's
+value.  So for example the following C declaration, at file scope:
+
+<pre class="smallexample">       int foo = 1000;
+</pre>
+   <p>creates a entry called &lsquo;<samp><span class="samp">foo</span></samp>&rsquo; in the symbol table.  This entry
+holds the address of an &lsquo;<samp><span class="samp">int</span></samp>&rsquo; sized block of memory where the
+number 1000 is initially stored.
+
+   <p>When a program references a symbol the compiler generates code that
+first accesses the symbol table to find the address of the symbol's
+memory block and then code to read the value from that memory block. 
+So:
+
+<pre class="smallexample">       foo = 1;
+</pre>
+   <p>looks up the symbol &lsquo;<samp><span class="samp">foo</span></samp>&rsquo; in the symbol table, gets the address
+associated with this symbol and then writes the value 1 into that
+address.  Whereas:
+
+<pre class="smallexample">       int * a = &amp; foo;
+</pre>
+   <p>looks up the symbol &lsquo;<samp><span class="samp">foo</span></samp>&rsquo; in the symbol table, gets it address
+and then copies this address into the block of memory associated with
+the variable &lsquo;<samp><span class="samp">a</span></samp>&rsquo;.
+
+   <p>Linker scripts symbol declarations, by contrast, create an entry in
+the symbol table but do not assign any memory to them.  Thus they are
+an address without a value.  So for example the linker script definition:
+
+<pre class="smallexample">       foo = 1000;
+</pre>
+   <p>creates an entry in the symbol table called &lsquo;<samp><span class="samp">foo</span></samp>&rsquo; which holds
+the address of memory location 1000, but nothing special is stored at
+address 1000.  This means that you cannot access the <em>value</em> of a
+linker script defined symbol - it has no value - all you can do is
+access the <em>address</em> of a linker script defined symbol.
+
+   <p>Hence when you are using a linker script defined symbol in source code
+you should always take the address of the symbol, and never attempt to
+use its value.  For example suppose you want to copy the contents of a
+section of memory called .ROM into a section called .FLASH and the
+linker script contains these declarations:
+
+<pre class="smallexample">       start_of_ROM   = .ROM;
+       end_of_ROM     = .ROM + sizeof (.ROM) - 1;
+       start_of_FLASH = .FLASH;
+</pre>
+   <p>Then the C source code to perform the copy would be:
+
+<pre class="smallexample">       extern char start_of_ROM, end_of_ROM, start_of_FLASH;
+     
+       memcpy (&amp; start_of_FLASH, &amp; start_of_ROM, &amp; end_of_ROM - &amp; start_of_ROM);
+</pre>
+   <p>Note the use of the &lsquo;<samp><span class="samp">&amp;</span></samp>&rsquo; operators.  These are correct.
+
+   </body></html>
+

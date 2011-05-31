@@ -1,0 +1,95 @@
+<html lang="en">
+<head>
+<title>Symspecs - GNU gprof</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GNU gprof">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Invoking.html#Invoking" title="Invoking">
+<link rel="prev" href="Deprecated-Options.html#Deprecated-Options" title="Deprecated Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the gprof profiler of the GNU system.
+
+Copyright (C) 1988, 1992, 1997, 1998, 1999, 2000, 2001, 2003,
+2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Symspecs"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Deprecated-Options.html#Deprecated-Options">Deprecated Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Invoking.html#Invoking">Invoking</a>
+<hr>
+</div>
+
+<h3 class="section">4.5 Symspecs</h3>
+
+<p>Many of the output options allow functions to be included or excluded
+using <dfn>symspecs</dfn> (symbol specifications), which observe the
+following syntax:
+
+<pre class="example">       filename_containing_a_dot
+     | funcname_not_containing_a_dot
+     | linenumber
+     | ( [ any_filename ] `:' ( any_funcname | linenumber ) )
+</pre>
+   <p>Here are some sample symspecs:
+
+     <dl>
+<dt>&lsquo;<samp><span class="samp">main.c</span></samp>&rsquo;<dd>Selects everything in file <samp><span class="file">main.c</span></samp>&mdash;the
+dot in the string tells <code>gprof</code> to interpret
+the string as a filename, rather than as
+a function name.  To select a file whose
+name does not contain a dot, a trailing colon
+should be specified.  For example, &lsquo;<samp><span class="samp">odd:</span></samp>&rsquo; is
+interpreted as the file named <samp><span class="file">odd</span></samp>.
+
+     <br><dt>&lsquo;<samp><span class="samp">main</span></samp>&rsquo;<dd>Selects all functions named &lsquo;<samp><span class="samp">main</span></samp>&rsquo;.
+
+     <p>Note that there may be multiple instances of the same function name
+because some of the definitions may be local (i.e., static).  Unless a
+function name is unique in a program, you must use the colon notation
+explained below to specify a function from a specific source file.
+
+     <p>Sometimes, function names contain dots.  In such cases, it is necessary
+to add a leading colon to the name.  For example, &lsquo;<samp><span class="samp">:.mul</span></samp>&rsquo; selects
+function &lsquo;<samp><span class="samp">.mul</span></samp>&rsquo;.
+
+     <p>In some object file formats, symbols have a leading underscore. 
+<code>gprof</code> will normally not print these underscores.  When you name a
+symbol in a symspec, you should type it exactly as <code>gprof</code> prints
+it in its output.  For example, if the compiler produces a symbol
+&lsquo;<samp><span class="samp">_main</span></samp>&rsquo; from your <code>main</code> function, <code>gprof</code> still prints
+it as &lsquo;<samp><span class="samp">main</span></samp>&rsquo; in its output, so you should use &lsquo;<samp><span class="samp">main</span></samp>&rsquo; in
+symspecs.
+
+     <br><dt>&lsquo;<samp><span class="samp">main.c:main</span></samp>&rsquo;<dd>Selects function &lsquo;<samp><span class="samp">main</span></samp>&rsquo; in file <samp><span class="file">main.c</span></samp>.
+
+     <br><dt>&lsquo;<samp><span class="samp">main.c:134</span></samp>&rsquo;<dd>Selects line 134 in file <samp><span class="file">main.c</span></samp>. 
+</dl>
+
+   </body></html>
+

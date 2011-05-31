@@ -1,0 +1,162 @@
+<html lang="en">
+<head>
+<title>GDB/MI Thread Commands - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="GDB_002fMI.html#GDB_002fMI" title="GDB/MI">
+<link rel="prev" href="GDB_002fMI-Program-Context.html#GDB_002fMI-Program-Context" title="GDB/MI Program Context">
+<link rel="next" href="GDB_002fMI-Program-Execution.html#GDB_002fMI-Program-Execution" title="GDB/MI Program Execution">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="GDB%2fMI-Thread-Commands"></a>
+<a name="GDB_002fMI-Thread-Commands"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="GDB_002fMI-Program-Execution.html#GDB_002fMI-Program-Execution">GDB/MI Program Execution</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="GDB_002fMI-Program-Context.html#GDB_002fMI-Program-Context">GDB/MI Program Context</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="GDB_002fMI.html#GDB_002fMI">GDB/MI</a>
+<hr>
+</div>
+
+<h3 class="section">27.10 <span class="sc">gdb/mi</span> Thread Commands</h3>
+
+<h4 class="subheading">The <code>-thread-info</code> Command</h4>
+
+<p><a name="index-g_t_002dthread_002dinfo-2048"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -thread-info [ <var>thread-id</var> ]
+</pre>
+   <p>Reports information about either a specific thread, if
+the <var>thread-id</var> parameter is present, or about all
+threads.  When printing information about all threads,
+also reports the current thread.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The &lsquo;<samp><span class="samp">info thread</span></samp>&rsquo; command prints the same information
+about all threads.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     -thread-info
+     ^done,threads=[
+     {id="2",target-id="Thread 0xb7e14b90 (LWP 21257)",
+        frame={level="0",addr="0xffffe410",func="__kernel_vsyscall",args=[]},state="running"},
+     {id="1",target-id="Thread 0xb7e156b0 (LWP 21254)",
+        frame={level="0",addr="0x0804891f",func="foo",args=[{name="i",value="10"}],
+                file="/tmp/a.c",fullname="/tmp/a.c",line="158"},state="running"}],
+     current-thread-id="1"
+     (gdb)
+</pre>
+   <p>The &lsquo;<samp><span class="samp">state</span></samp>&rsquo; field may have the following values:
+
+     <dl>
+<dt><code>stopped</code><dd>The thread is stopped.  Frame information is available for stopped
+threads.
+
+     <br><dt><code>running</code><dd>The thread is running.  There's no frame information for running
+threads.
+
+   </dl>
+
+<h4 class="subheading">The <code>-thread-list-ids</code> Command</h4>
+
+<p><a name="index-g_t_002dthread_002dlist_002dids-2049"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -thread-list-ids
+</pre>
+   <p>Produces a list of the currently known <span class="sc">gdb</span> thread ids.  At the
+end of the list it also prints the total number of such threads.
+
+   <p>This command is retained for historical reasons, the
+<code>-thread-info</code> command should be used instead.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>Part of &lsquo;<samp><span class="samp">info threads</span></samp>&rsquo; supplies the same information.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -thread-list-ids
+     ^done,thread-ids={thread-id="3",thread-id="2",thread-id="1"},
+     current-thread-id="1",number-of-threads="3"
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-thread-select</code> Command</h4>
+
+<p><a name="index-g_t_002dthread_002dselect-2050"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -thread-select <var>threadnum</var>
+</pre>
+   <p>Make <var>threadnum</var> the current thread.  It prints the number of the new
+current thread, and the topmost frame for that thread.
+
+   <p>This command is deprecated in favor of explicitly using the
+&lsquo;<samp><span class="samp">--thread</span></samp>&rsquo; option to each command.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">thread</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -exec-next
+     ^running
+     (gdb)
+     *stopped,reason="end-stepping-range",thread-id="2",line="187",
+     file="../../../devo/gdb/testsuite/gdb.threads/linux-dp.c"
+     (gdb)
+     -thread-list-ids
+     ^done,
+     thread-ids={thread-id="3",thread-id="2",thread-id="1"},
+     number-of-threads="3"
+     (gdb)
+     -thread-select 3
+     ^done,new-thread-id="3",
+     frame={level="0",func="vprintf",
+     args=[{name="format",value="0x8048e9c \"%*s%c %d %c\\n\""},
+     {name="arg",value="0x2"}],file="vprintf.c",line="31"}
+     (gdb)
+</pre>
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%% SECTION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+   </body></html>
+

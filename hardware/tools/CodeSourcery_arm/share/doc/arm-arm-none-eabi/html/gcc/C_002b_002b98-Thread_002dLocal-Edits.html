@@ -1,0 +1,185 @@
+<html lang="en">
+<head>
+<title>C++98 Thread-Local Edits - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Thread_002dLocal.html#Thread_002dLocal" title="Thread-Local">
+<link rel="prev" href="C99-Thread_002dLocal-Edits.html#C99-Thread_002dLocal-Edits" title="C99 Thread-Local Edits">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="C++98-Thread-Local-Edits"></a>
+<a name="C_002b_002b98-Thread_002dLocal-Edits"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="C99-Thread_002dLocal-Edits.html#C99-Thread_002dLocal-Edits">C99 Thread-Local Edits</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Thread_002dLocal.html#Thread_002dLocal">Thread-Local</a>
+<hr>
+</div>
+
+<h4 class="subsection">6.56.2 ISO/IEC 14882:1998 Edits for Thread-Local Storage</h4>
+
+<p>The following are a set of changes to ISO/IEC 14882:1998 (aka C++98)
+that document the exact semantics of the language extension.
+
+     <ul>
+<li><b>[intro.execution]</b>
+
+     <p>New text after paragraph 4
+
+     <blockquote>
+A <dfn>thread</dfn> is a flow of control within the abstract machine. 
+It is implementation defined whether or not there may be more than
+one thread. 
+</blockquote>
+
+     <p>New text after paragraph 7
+
+     <blockquote>
+It is unspecified whether additional action must be taken to
+ensure when and whether side effects are visible to other threads. 
+</blockquote>
+
+     <li><b>[lex.key]</b>
+
+     <p>Add <code>__thread</code>.
+
+     <li><b>[basic.start.main]</b>
+
+     <p>Add after paragraph 5
+
+     <blockquote>
+The thread that begins execution at the <code>main</code> function is called
+the <dfn>main thread</dfn>.  It is implementation defined how functions
+beginning threads other than the main thread are designated or typed. 
+A function so designated, as well as the <code>main</code> function, is called
+a <dfn>thread startup function</dfn>.  It is implementation defined what
+happens if a thread startup function returns.  It is implementation
+defined what happens to other threads when any thread calls <code>exit</code>. 
+</blockquote>
+
+     <li><b>[basic.start.init]</b>
+
+     <p>Add after paragraph 4
+
+     <blockquote>
+The storage for an object of thread storage duration shall be
+statically initialized before the first statement of the thread startup
+function.  An object of thread storage duration shall not require
+dynamic initialization. 
+</blockquote>
+
+     <li><b>[basic.start.term]</b>
+
+     <p>Add after paragraph 3
+
+     <blockquote>
+The type of an object with thread storage duration shall not have a
+non-trivial destructor, nor shall it be an array type whose elements
+(directly or indirectly) have non-trivial destructors. 
+</blockquote>
+
+     <li><b>[basic.stc]</b>
+
+     <p>Add &ldquo;thread storage duration&rdquo; to the list in paragraph 1.
+
+     <p>Change paragraph 2
+
+     <blockquote>
+Thread, static, and automatic storage durations are associated with
+objects introduced by declarations [<small class="dots">...</small>]. 
+</blockquote>
+
+     <p>Add <code>__thread</code> to the list of specifiers in paragraph 3.
+
+     <li><b>[basic.stc.thread]</b>
+
+     <p>New section before <b>[basic.stc.static]</b>
+
+     <blockquote>
+The keyword <code>__thread</code> applied to a non-local object gives the
+object thread storage duration.
+
+     <p>A local variable or class data member declared both <code>static</code>
+and <code>__thread</code> gives the variable or member thread storage
+duration. 
+</blockquote>
+
+     <li><b>[basic.stc.static]</b>
+
+     <p>Change paragraph 1
+
+     <blockquote>
+All objects which have neither thread storage duration, dynamic
+storage duration nor are local [<small class="dots">...</small>]. 
+</blockquote>
+
+     <li><b>[dcl.stc]</b>
+
+     <p>Add <code>__thread</code> to the list in paragraph 1.
+
+     <p>Change paragraph 1
+
+     <blockquote>
+With the exception of <code>__thread</code>, at most one
+<var>storage-class-specifier</var> shall appear in a given
+<var>decl-specifier-seq</var>.  The <code>__thread</code> specifier may
+be used alone, or immediately following the <code>extern</code> or
+<code>static</code> specifiers.  [<small class="dots">...</small>]
+</blockquote>
+
+     <p>Add after paragraph 5
+
+     <blockquote>
+The <code>__thread</code> specifier can be applied only to the names of objects
+and to anonymous unions. 
+</blockquote>
+
+     <li><b>[class.mem]</b>
+
+     <p>Add after paragraph 6
+
+     <blockquote>
+Non-<code>static</code> members shall not be <code>__thread</code>. 
+</blockquote>
+     </ul>
+
+ </body></html>
+

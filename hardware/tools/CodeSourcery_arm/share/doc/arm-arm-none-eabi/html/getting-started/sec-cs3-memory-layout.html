@@ -1,0 +1,184 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>5.3. Memory Layout</title><link rel="stylesheet" href="cs.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.74.0"><link rel="home" href="index.html" title="Sourcery G++ Lite"><link rel="up" href="chap-cs3.html" title="Chapter 5. CS3&#8482;: The CodeSourcery Common Startup Code Sequence"><link rel="prev" href="sec-cs3-startup.html" title="5.2. Program Startup and Termination"><link rel="next" href="sec-cs3-interrupts.html" title="5.4. Interrupt Vectors and Handlers"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">5.3. Memory Layout</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="sec-cs3-startup.html">Prev</a> </td><th width="60%" align="center">Chapter 5. CS3&#8482;: The CodeSourcery Common Startup Code Sequence</th><td width="20%" align="right"> <a accesskey="n" href="sec-cs3-interrupts.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec-cs3-memory-layout"></a>5.3. Memory Layout</h2></div></div></div><p>
+      Boards supported by CS3 can have multiple banks or regions of
+      memory with different characteristics.
+      This section describes how program sections are mapped onto
+      memory regions, and how you can use these CS3 features to customize
+      placement of your program's code or data in memory.
+      CS3 also provides a uniform set of symbolic names for each region,
+      allowing you to programmatically refer to each region's address range
+      from C or assembly language as well as from the linker script.
+    </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="sec-cs3-regions"></a>5.3.1. Memory Regions and Program Sections</h3></div></div></div><p>
+        The regions that are available on a particular board are listed
+        in the table for that board in
+	<a class="xref" href="sec-cs3-supported-boards.html" title="5.5. Supported Boards for ARM EABI">Section 5.5, &#8220;Supported Boards for ARM EABI&#8221;</a>, below.
+	There are two kinds of regions: those documented as
+        "Memory regions", which are general-purpose memory banks
+	that can be used for program or data storage;
+        and those documented as "Other regions", which typically
+	correspond to memory-mapped control registers or other
+	special-purpose storage.
+      </p><p>
+	CS3 supports boards that include both <code class="literal">ram</code>
+	and <code class="literal">rom</code> memory regions.  The <code class="literal">ram</code>
+	region holds the <code class="literal">.data</code> and <code class="literal">.bss</code>
+	sections, and the <code class="literal">.text</code> section in RAM profiles.
+	In ROM profiles, the <code class="literal">rom</code> region holds the
+	<code class="literal">.text</code> section and initialization values for
+	the writable data sections.
+      </p><p>
+        In addition, all regions documented as "Memory regions" correspond to
+        similarly-named program sections.  
+        For example, the linker script assigns the <code class="literal">.ram</code>
+        section to the <code class="literal">ram</code> region.
+      </p><p>
+        More generally, for a memory region named
+	<em class="replaceable"><code>R</code></em>, CS3 linker scripts define a
+	section named <code class="literal">.<em class="replaceable"><code>R</code></em></code>,
+	which may contain initialized data or code.  There is also a section
+	named <code class="literal">.bss.<em class="replaceable"><code>R</code></em></code> for
+	zero-initialized data (BSS), which is placed after the initialized
+	data section for this region.
+	
+      </p><p>
+        You can explicitly locate data or code in a section
+	corresponding to a particular memory region using
+        section attributes in your source C or C++ code.
+        Section attributes are especially useful on code compiled for
+        boards that include special memory banks, such as a fast on-chip
+        cache memory, in addition to the default
+        <code class="literal">ram</code> and/or <code class="literal">rom</code> regions.
+        CS3's start-up code arranges for additional data-like sections
+	to be initialized in the same way as the default
+	<code class="literal">.data</code> section.
+      </p><p>
+        As an example to illustrate the attribute syntax,
+	you can put a variable 
+        <code class="varname">v</code> in the <code class="literal">.ram</code> section using:
+
+        </p><pre class="programlisting">int v __attribute__ ((section (".ram")));</pre><p>
+
+        To declare a function <code class="function">f</code> in this section, use:
+
+        </p><pre class="programlisting">int f (void) __attribute__ ((section (".ram"))) {...}</pre><p>
+
+        For more information about attribute syntax, see the GCC manual.
+      </p><p>
+	In addition to the <code class="literal">.<em class="replaceable"><code>R</code></em></code>
+        and <code class="literal">.bss.<em class="replaceable"><code>R</code></em></code> sections,
+	CS3 places a
+        <code class="literal">.cs3.region-head.<em class="replaceable"><code>R</code></em></code>
+	section at the beginning of each region <em class="replaceable"><code>R</code></em>.
+	Explicitly placing data in
+       	<code class="literal">.cs3.region-head.<em class="replaceable"><code>R</code></em></code>
+	sections is discouraged, because CS3 itself may want to place items
+	(like interrupt vector tables) at these locations. 
+	If there is a conflict, CS3 raises an error at link time.
+      </p><p>
+        Regions documented as "Other regions" in the tables in
+	<a class="xref" href="sec-cs3-supported-boards.html" title="5.5. Supported Boards for ARM EABI">Section 5.5, &#8220;Supported Boards for ARM EABI&#8221;</a>
+	do not have corresponding program sections.
+	Typically, these regions contain
+        memory-mapped control and I/O registers and cannot be used for
+        general data or program storage.
+	If your program needs to manipulate data in
+        these regions, you can use the CS3 memory map access interface
+        declared in <code class="filename">cs3.h</code>,
+	as described in <a class="xref" href="sec-cs3-memory-layout.html#sec-cs3-memory-hooks" title="5.3.2. Programmatic Access to the CS3 Memory Map">Section 5.3.2, &#8220;Programmatic Access to the CS3 Memory Map&#8221;</a>.
+      </p><p>
+        Memory maps for boards supported by Sourcery G++ Lite for ARM EABI
+        are documented in
+        XML files in the <code class="filename">arm-none-eabi/lib/boards/</code>
+        subdirectory of your Sourcery G++ installation directory.
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="sec-cs3-memory-hooks"></a>5.3.2. Programmatic Access to the CS3 Memory Map</h3></div></div></div><p>
+        CS3 makes C declarations describing the memory regions on the
+	target board available to your program via the header file
+        <code class="filename">cs3.h</code>, which you can
+	find in the
+	<code class="filename">arm-none-eabi/include</code> directory
+	within your install.
+      </p><p>
+        For each region named <em class="replaceable"><code>R</code></em>,
+	<code class="filename">cs3.h</code> declares a byte array
+	variable
+	<code class="varname">__cs3_region_start_<em class="replaceable"><code>R</code></em></code>
+	at the region's start address, and a <code class="type">size_t</code> variable
+	<code class="varname">__cs3_region_size_<em class="replaceable"><code>R</code></em></code>
+	to represent the total size of the region.  These symbols are
+	defined by the linker script and so may also be referenced from
+	assembly language.  Note that all regions are aligned on eight-byte
+	boundaries and sizes are also multiples of eight bytes.
+      </p><p>
+	For memory regions that can correspond to program
+	sections (as described in <a class="xref" href="sec-cs3-memory-layout.html#sec-cs3-regions" title="5.3.1. Memory Regions and Program Sections">Section 5.3.1, &#8220;Memory Regions and Program Sections&#8221;</a>),
+	there are additional symbols
+	<code class="varname">__cs3_region_init_<em class="replaceable"><code>R</code></em></code>
+	and
+	<code class="varname">__cs3_region_init_size_<em class="replaceable"><code>R</code></em></code>
+	that describe constant data used to initialize the region.
+	During the C initialization phase (<a class="xref" href="sec-cs3-startup.html" title="5.2. Program Startup and Termination">Section 5.2, &#8220;Program Startup and Termination&#8221;</a>),
+	this data is copied into the lower part of the memory region.
+	The symbol 
+	<code class="varname">__cs3_region_zero_size_<em class="replaceable"><code>R</code></em></code>
+	represents the size of the zero-initialized
+	<code class="literal">.bss.<em class="replaceable"><code>R</code></em></code> section
+	following the initialized data.
+        Any of these identifiers may actually be defined as a preprocessor
+        macro that expands to an expression of the appropriate type and
+        value.
+      </p><p>
+	To perform the memory region initializations during startup,
+	CS3 internally uses the array variable
+	<code class="varname">__cs3_regions</code>, which
+	contains descriptors for all of the writable (RAM) memory regions.
+        These descriptors are also exposed in 
+        <code class="filename">cs3.h</code>;
+	refer to the header file for details.
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="sec-cs3-heap-stack"></a>5.3.3. Heap and Stack Placement</h3></div></div></div><p>
+        CS3 linker scripts provide default placement of the heap and
+	stack in the RAM region.  However, you can override the defaults
+	by providing your own definitions of the associated CS3 variables.
+	For example, you may put the heap and/or stack in some other
+	memory region.
+      </p><p>
+	Heap placement is controlled by defining the symbol
+	<code class="varname">__cs3_heap_start</code> at the beginning of the heap,
+	and either the symbol <code class="varname">__cs3_heap_end</code> or the
+	pointer variable <code class="varname">__cs3_heap_limit</code> to mark the
+	end of the heap.  For example, this fragment of C code places
+	the heap in a region named <code class="literal">extsram</code>:
+
+</p><pre class="programlisting">#define HEAPSIZE ...  /* However big you want to make it. */
+unsigned char __cs3_heap_start[HEAPSIZE] 
+    __attribute__ ((section (".bss.extsram"), aligned(8)));
+unsigned char *__cs3_heap_limit = __cs3_heap_start + HEAPSIZE;
+</pre><p>
+      </p><p>
+	The default initial stack pointer for bare-metal profiles
+	is given by the symbol <code class="varname">__cs3_stack</code>, and the stack
+        grows downward from this address.
+	Stack initialization is discussed in more detail in
+	<a class="xref" href="sec-cs3-startup.html#sec-cs3-assembly-initialization" title="5.2.2. The Assembly Initialization Phase">Section 5.2.2, &#8220;The Assembly Initialization Phase&#8221;</a>.
+      </p><p>
+        You can find C declarations for the CS3 heap and stack symbols
+	in the header file <code class="filename">cs3.h</code>.
+      </p><p>
+        The <code class="filename">cs3.h</code> header file also
+        defines a macro for creating a custom stack.  The custom stack is
+        created as a block of RAM in the zero-initialized data section (BSS).
+        The specified size must be a compile-time constant.  To account for
+        alignment, the final size of the stack may be a few bytes less than the
+        requested size.  The symbol <code class="varname">__cs3_stack</code> is
+        initialized to point to the last extent of the stack block, and is
+        16-byte aligned.
+
+        For example, the following fragment of C code creates a stack of 8192
+        bytes:
+
+        </p><pre class="programlisting">#include &lt;cs3.h&gt;
+
+CS3_STACK(2 * 4096);</pre><p>
+
+	As indicated in <a class="xref" href="sec-cs3-startup.html#sec-cs3-assembly-initialization" title="5.2.2. The Assembly Initialization Phase">Section 5.2.2, &#8220;The Assembly Initialization Phase&#8221;</a>,
+	there are cases where a boot monitor or simulator overrides a custom
+	stack.
+      </p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="sec-cs3-startup.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="chap-cs3.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="sec-cs3-interrupts.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">5.2. Program Startup and Termination </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 5.4. Interrupt Vectors and Handlers</td></tr></table></div></body></html>

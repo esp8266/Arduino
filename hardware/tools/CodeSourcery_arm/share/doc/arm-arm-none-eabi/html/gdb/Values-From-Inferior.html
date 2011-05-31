@@ -1,0 +1,228 @@
+<html lang="en">
+<head>
+<title>Values From Inferior - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Python-API.html#Python-API" title="Python API">
+<link rel="prev" href="Exception-Handling.html#Exception-Handling" title="Exception Handling">
+<link rel="next" href="Types-In-Python.html#Types-In-Python" title="Types In Python">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Values-From-Inferior"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Types-In-Python.html#Types-In-Python">Types In Python</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Exception-Handling.html#Exception-Handling">Exception Handling</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Python-API.html#Python-API">Python API</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">23.2.2.3 Values From Inferior</h5>
+
+<p><a name="index-values-from-inferior_002c-with-Python-1609"></a><a name="index-python_002c-working-with-values-from-inferior-1610"></a>
+<a name="index-g_t_0040code_007bgdb_002eValue_007d-1611"></a><span class="sc">gdb</span> provides values it obtains from the inferior program in
+an object of type <code>gdb.Value</code>.  <span class="sc">gdb</span> uses this object
+for its internal bookkeeping of the inferior's values, and for
+fetching values when necessary.
+
+   <p>Inferior values that are simple scalars can be used directly in
+Python expressions that are valid for the value's data type.  Here's
+an example for an integer or floating-point value <code>some_val</code>:
+
+<pre class="smallexample">     bar = some_val + 2
+</pre>
+   <p class="noindent">As result of this, <code>bar</code> will also be a <code>gdb.Value</code> object
+whose values are of the same type as those of <code>some_val</code>.
+
+   <p>Inferior values that are structures or instances of some class can
+be accessed using the Python <dfn>dictionary syntax</dfn>.  For example, if
+<code>some_val</code> is a <code>gdb.Value</code> instance holding a structure, you
+can access its <code>foo</code> element with:
+
+<pre class="smallexample">     bar = some_val['foo']
+</pre>
+   <p>Again, <code>bar</code> will also be a <code>gdb.Value</code> object.
+
+   <p>A <code>gdb.Value</code> that represents a function can be executed via
+inferior function call.  Any arguments provided to the call must match
+the function's prototype, and must be provided in the order specified
+by that prototype.
+
+   <p>For example, <code>some_val</code> is a <code>gdb.Value</code> instance
+representing a function that takes two integers as arguments.  To
+execute this function, call it like so:
+
+<pre class="smallexample">     result = some_val (10,20)
+</pre>
+   <p>Any values returned from a function call will be stored as a
+<code>gdb.Value</code>.
+
+   <p>The following attributes are provided:
+
+     <dl>
+
+     <div class="defun">
+&mdash; Instance Variable of Value: <b>address</b><var><a name="index-address-1612"></a></var><br>
+<blockquote> <p>If this object is addressable, this read-only attribute holds a
+<code>gdb.Value</code> object representing the address.  Otherwise,
+this attribute holds <code>None</code>. 
+</p></blockquote></div>
+
+     <p><a name="index-optimized-out-value-in-Python-1613"></a>
+
+     <div class="defun">
+&mdash; Instance Variable of Value: <b>is_optimized_out</b><var><a name="index-is_005foptimized_005fout-1614"></a></var><br>
+<blockquote> <p>This read-only boolean attribute is true if the compiler optimized out
+this value, thus it is not available for fetching from the inferior. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Instance Variable of Value: <b>type</b><var><a name="index-type-1615"></a></var><br>
+<blockquote> <p>The type of this <code>gdb.Value</code>.  The value of this attribute is a
+<code>gdb.Type</code> object. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Instance Variable of Value: <b>dynamic_type</b><var><a name="index-dynamic_005ftype-1616"></a></var><br>
+<blockquote> <p>The dynamic type of this <code>gdb.Value</code>.  This uses C<tt>++</tt> run-time
+type information to determine the dynamic type of the value.  If this
+value is of class type, it will return the class in which the value is
+embedded, if any.  If this value is of pointer or reference to a class
+type, it will compute the dynamic type of the referenced object, and
+return a pointer or reference to that type, respectively.  In all
+other cases, it will return the value's static type. 
+</p></blockquote></div>
+     </dl>
+
+   <p>The following methods are provided:
+
+     <dl>
+
+     <div class="defun">
+&mdash; Method on Value: <b>cast</b><var> type<a name="index-cast-on-Value-1617"></a></var><br>
+<blockquote> <p>Return a new instance of <code>gdb.Value</code> that is the result of
+casting this instance to the type described by <var>type</var>, which must
+be a <code>gdb.Type</code> object.  If the cast cannot be performed for some
+reason, this method throws an exception. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on Value: <b>dereference</b><var><a name="index-dereference-on-Value-1618"></a></var><br>
+<blockquote> <p>For pointer data types, this method returns a new <code>gdb.Value</code> object
+whose contents is the object pointed to by the pointer.  For example, if
+<code>foo</code> is a C pointer to an <code>int</code>, declared in your C program as
+
+          <pre class="smallexample">               int *foo;
+</pre>
+             <p class="noindent">then you can use the corresponding <code>gdb.Value</code> to access what
+<code>foo</code> points to like this:
+
+          <pre class="smallexample">               bar = foo.dereference ()
+</pre>
+             <p>The result <code>bar</code> will be a <code>gdb.Value</code> object holding the
+value pointed to by <code>foo</code>. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on Value: <b>dynamic_cast</b><var> type<a name="index-dynamic_005fcast-on-Value-1619"></a></var><br>
+<blockquote> <p>Like <code>Value.cast</code>, but works as if the C<tt>++</tt> <code>dynamic_cast</code>
+operator were used.  Consult a C<tt>++</tt> reference for details. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on Value: <b>reinterpret_cast</b><var> type<a name="index-reinterpret_005fcast-on-Value-1620"></a></var><br>
+<blockquote> <p>Like <code>Value.cast</code>, but works as if the C<tt>++</tt> <code>reinterpret_cast</code>
+operator were used.  Consult a C<tt>++</tt> reference for details. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on Value: <b>string</b> <span class="roman">[</span><var>encoding</var><span class="roman">]</span> <span class="roman">[</span><var>errors</var><span class="roman">]</span> <span class="roman">[</span><var>length</var><span class="roman">]</span><var><a name="index-string-on-Value-1621"></a></var><br>
+<blockquote> <p>If this <code>gdb.Value</code> represents a string, then this method
+converts the contents to a Python string.  Otherwise, this method will
+throw an exception.
+
+             <p>Strings are recognized in a language-specific way; whether a given
+<code>gdb.Value</code> represents a string is determined by the current
+language.
+
+             <p>For C-like languages, a value is a string if it is a pointer to or an
+array of characters or ints.  The string is assumed to be terminated
+by a zero of the appropriate width.  However if the optional length
+argument is given, the string will be converted to that given length,
+ignoring any embedded zeros that the string may contain.
+
+             <p>If the optional <var>encoding</var> argument is given, it must be a string
+naming the encoding of the string in the <code>gdb.Value</code>, such as
+<code>"ascii"</code>, <code>"iso-8859-6"</code> or <code>"utf-8"</code>.  It accepts
+the same encodings as the corresponding argument to Python's
+<code>string.decode</code> method, and the Python codec machinery will be used
+to convert the string.  If <var>encoding</var> is not given, or if
+<var>encoding</var> is the empty string, then either the <code>target-charset</code>
+(see <a href="Character-Sets.html#Character-Sets">Character Sets</a>) will be used, or a language-specific encoding
+will be used, if the current language is able to supply one.
+
+             <p>The optional <var>errors</var> argument is the same as the corresponding
+argument to Python's <code>string.decode</code> method.
+
+             <p>If the optional <var>length</var> argument is given, the string will be
+fetched and converted to the given length. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on Value: <b>lazy_string</b> <span class="roman">[</span><var>encoding</var><span class="roman">]</span> <span class="roman">[</span><var>length</var><span class="roman">]</span><var><a name="index-lazy_005fstring-on-Value-1622"></a></var><br>
+<blockquote> <p>If this <code>gdb.Value</code> represents a string, then this method
+converts the contents to a <code>gdb.LazyString</code> (see <a href="Lazy-Strings-In-Python.html#Lazy-Strings-In-Python">Lazy Strings In Python</a>).  Otherwise, this method will throw an exception.
+
+             <p>If the optional <var>encoding</var> argument is given, it must be a string
+naming the encoding of the <code>gdb.LazyString</code>.  Some examples are:
+&lsquo;<samp><span class="samp">ascii</span></samp>&rsquo;, &lsquo;<samp><span class="samp">iso-8859-6</span></samp>&rsquo; or &lsquo;<samp><span class="samp">utf-8</span></samp>&rsquo;.  If the
+<var>encoding</var> argument is an encoding that <span class="sc">gdb</span> does
+recognize, <span class="sc">gdb</span> will raise an error.
+
+             <p>When a lazy string is printed, the <span class="sc">gdb</span> encoding machinery is
+used to convert the string during printing.  If the optional
+<var>encoding</var> argument is not provided, or is an empty string,
+<span class="sc">gdb</span> will automatically select the encoding most suitable for
+the string type.  For further information on encoding in <span class="sc">gdb</span>
+please see <a href="Character-Sets.html#Character-Sets">Character Sets</a>.
+
+             <p>If the optional <var>length</var> argument is given, the string will be
+fetched and encoded to the length of characters specified.  If
+the <var>length</var> argument is not provided, the string will be fetched
+and encoded until a null of appropriate width is found. 
+</p></blockquote></div>
+     </dl>
+
+   </body></html>
+

@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!DOCTYPE board SYSTEM "board.dtd">
+<!-- Description for Altera Cyclone III Cortex-M1
+
+     Version: Sourcery G++ Lite 2011.03-42
+     Support: https://support.codesourcery.com/GNUToolchain/
+
+     Copyright (c) 2007, 2008, 2009, 2010 CodeSourcery, Inc.
+
+     THIS FILE CONTAINS PROPRIETARY, CONFIDENTIAL, AND TRADE SECRET
+     INFORMATION OF CODESOURCERY AND/OR ITS LICENSORS.
+
+     You may not use or distribute this file without the express written
+     permission of CodeSourcery or its authorized distributor.  This file is
+     licensed only for use with Sourcery G++.  No other use is permitted.
+     -->
+<board>
+  <properties>
+    <property name="system-v6-m"/>
+  </properties>
+  <memory-map>
+    <memory-device address="0x00000000" size="32K" type="ram">
+      <description>
+	ITCM
+      </description>
+    </memory-device>
+    <memory-device address="0x20100000" size="1M" type="ram">
+      <description>
+	SRAM
+      </description>
+    </memory-device>
+    <memory-device address="0x60000000" size="16M" type="flash" device="cfi">
+      <description>
+	Flash
+      </description>
+    </memory-device>
+  </memory-map>
+</board>
+<!-- checksum: 98710e1bc525577841e3d30 -->

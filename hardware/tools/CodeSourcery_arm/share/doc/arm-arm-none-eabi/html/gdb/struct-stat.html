@@ -1,0 +1,104 @@
+<html lang="en">
+<head>
+<title>struct stat - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Protocol_002dspecific-Representation-of-Datatypes.html#Protocol_002dspecific-Representation-of-Datatypes" title="Protocol-specific Representation of Datatypes">
+<link rel="prev" href="Memory-Transfer.html#Memory-Transfer" title="Memory Transfer">
+<link rel="next" href="struct-timeval.html#struct-timeval" title="struct timeval">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="struct-stat"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="struct-timeval.html#struct-timeval">struct timeval</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Memory-Transfer.html#Memory-Transfer">Memory Transfer</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Protocol_002dspecific-Representation-of-Datatypes.html#Protocol_002dspecific-Representation-of-Datatypes">Protocol-specific Representation of Datatypes</a>
+<hr>
+</div>
+
+<h5 class="unnumberedsubsubsec">struct stat</h5>
+
+<p><a name="index-struct-stat_002c-in-file_002di_002fo-protocol-2522"></a>
+The buffer of type <code>struct stat</code> used by the target and <span class="sc">gdb</span>
+is defined as follows:
+
+<pre class="smallexample">     struct stat {
+         unsigned int  st_dev;      /* device */
+         unsigned int  st_ino;      /* inode */
+         mode_t        st_mode;     /* protection */
+         unsigned int  st_nlink;    /* number of hard links */
+         unsigned int  st_uid;      /* user ID of owner */
+         unsigned int  st_gid;      /* group ID of owner */
+         unsigned int  st_rdev;     /* device type (if inode device) */
+         unsigned long st_size;     /* total size, in bytes */
+         unsigned long st_blksize;  /* blocksize for filesystem I/O */
+         unsigned long st_blocks;   /* number of blocks allocated */
+         time_t        st_atime;    /* time of last access */
+         time_t        st_mtime;    /* time of last modification */
+         time_t        st_ctime;    /* time of last change */
+     };
+</pre>
+   <p>The integral datatypes conform to the definitions given in the
+appropriate section (see <a href="Integral-Datatypes.html#Integral-Datatypes">Integral Datatypes</a>, for details) so this
+structure is of size 64 bytes.
+
+   <p>The values of several fields have a restricted meaning and/or
+range of values.
+
+     <dl>
+<dt><code>st_dev</code><dd>A value of 0 represents a file, 1 the console.
+
+     <br><dt><code>st_ino</code><dd>No valid meaning for the target.  Transmitted unchanged.
+
+     <br><dt><code>st_mode</code><dd>Valid mode bits are described in <a href="Constants.html#Constants">Constants</a>.  Any other
+bits have currently no meaning for the target.
+
+     <br><dt><code>st_uid</code><dt><code>st_gid</code><dt><code>st_rdev</code><dd>No valid meaning for the target.  Transmitted unchanged.
+
+     <br><dt><code>st_atime</code><dt><code>st_mtime</code><dt><code>st_ctime</code><dd>These values have a host and file system dependent
+accuracy.  Especially on Windows hosts, the file system may not
+support exact timing values. 
+</dl>
+
+   <p>The target gets a <code>struct stat</code> of the above representation and is
+responsible for coercing it to the target representation before
+continuing.
+
+   <p>Note that due to size differences between the host, target, and protocol
+representations of <code>struct stat</code> members, these members could eventually
+get truncated on the target.
+
+   </body></html>
+

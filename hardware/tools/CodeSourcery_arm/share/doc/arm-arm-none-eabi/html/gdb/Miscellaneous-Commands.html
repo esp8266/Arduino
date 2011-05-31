@@ -1,0 +1,119 @@
+<html lang="en">
+<head>
+<title>Miscellaneous Commands - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Bindable-Readline-Commands.html#Bindable-Readline-Commands" title="Bindable Readline Commands">
+<link rel="prev" href="Keyboard-Macros.html#Keyboard-Macros" title="Keyboard Macros">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Miscellaneous-Commands"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Keyboard-Macros.html#Keyboard-Macros">Keyboard Macros</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Bindable-Readline-Commands.html#Bindable-Readline-Commands">Bindable Readline Commands</a>
+<hr>
+</div>
+
+<h4 class="subsection">31.4.8 Some Miscellaneous Commands</h4>
+
+     <dl>
+<dt><code>re-read-init-file (C-x C-r)</code><a name="index-re_002dread_002dinit_002dfile-_0028C_002dx-C_002dr_0029-2275"></a><dd>Read in the contents of the <var>inputrc</var> file, and incorporate
+any bindings or variable assignments found there.
+
+     <br><dt><code>abort (C-g)</code><a name="index-abort-_0028C_002dg_0029-2276"></a><dd>Abort the current editing command and
+ring the terminal's bell (subject to the setting of
+<code>bell-style</code>).
+
+     <br><dt><code>do-uppercase-version (M-a, M-b, M-</code><var>x</var><code>, ...)</code><a name="index-do_002duppercase_002dversion-_0028M_002da_002c-M_002db_002c-M_002d_0040var_007bx_007d_002c-_0040dots_007b_007d_0029-2277"></a><dd>If the metafied character <var>x</var> is lowercase, run the command
+that is bound to the corresponding uppercase character.
+
+     <br><dt><code>prefix-meta (&lt;ESC&gt;)</code><a name="index-prefix_002dmeta-_0028_0040key_007bESC_007d_0029-2278"></a><dd>Metafy the next character typed.  This is for keyboards
+without a meta key.  Typing &lsquo;<samp><span class="samp">&lt;ESC&gt; f</span></samp>&rsquo; is equivalent to typing
+<kbd>M-f</kbd>.
+
+     <br><dt><code>undo (C-_ or C-x C-u)</code><a name="index-undo-_0028C_002d_005f-or-C_002dx-C_002du_0029-2279"></a><dd>Incremental undo, separately remembered for each line.
+
+     <br><dt><code>revert-line (M-r)</code><a name="index-revert_002dline-_0028M_002dr_0029-2280"></a><dd>Undo all changes made to this line.  This is like executing the <code>undo</code>
+command enough times to get back to the beginning.
+
+     <br><dt><code>tilde-expand (M-~)</code><dd>Perform tilde expansion on the current word.
+
+     <br><dt><code>set-mark (C-@)</code><a name="index-set_002dmark-_0028C_002d_0040_0040_0029-2281"></a><dd>Set the mark to the point.  If a
+numeric argument is supplied, the mark is set to that position.
+
+     <br><dt><code>exchange-point-and-mark (C-x C-x)</code><a name="index-exchange_002dpoint_002dand_002dmark-_0028C_002dx-C_002dx_0029-2282"></a><dd>Swap the point with the mark.  The current cursor position is set to
+the saved position, and the old cursor position is saved as the mark.
+
+     <br><dt><code>character-search (C-])</code><a name="index-character_002dsearch-_0028C_002d_005d_0029-2283"></a><dd>A character is read and point is moved to the next occurrence of that
+character.  A negative count searches for previous occurrences.
+
+     <br><dt><code>character-search-backward (M-C-])</code><a name="index-character_002dsearch_002dbackward-_0028M_002dC_002d_005d_0029-2284"></a><dd>A character is read and point is moved to the previous occurrence
+of that character.  A negative count searches for subsequent
+occurrences.
+
+     <br><dt><code>insert-comment (M-#)</code><a name="index-insert_002dcomment-_0028M_002d_0023_0029-2285"></a><dd>Without a numeric argument, the value of the <code>comment-begin</code>
+variable is inserted at the beginning of the current line. 
+If a numeric argument is supplied, this command acts as a toggle:  if
+the characters at the beginning of the line do not match the value
+of <code>comment-begin</code>, the value is inserted, otherwise
+the characters in <code>comment-begin</code> are deleted from the beginning of
+the line. 
+In either case, the line is accepted as if a newline had been typed.
+
+     <br><dt><code>dump-functions ()</code><a name="index-dump_002dfunctions-_0028_0029-2286"></a><dd>Print all of the functions and their key bindings to the
+Readline output stream.  If a numeric argument is supplied,
+the output is formatted in such a way that it can be made part
+of an <var>inputrc</var> file.  This command is unbound by default.
+
+     <br><dt><code>dump-variables ()</code><a name="index-dump_002dvariables-_0028_0029-2287"></a><dd>Print all of the settable variables and their values to the
+Readline output stream.  If a numeric argument is supplied,
+the output is formatted in such a way that it can be made part
+of an <var>inputrc</var> file.  This command is unbound by default.
+
+     <br><dt><code>dump-macros ()</code><a name="index-dump_002dmacros-_0028_0029-2288"></a><dd>Print all of the Readline key sequences bound to macros and the
+strings they output.  If a numeric argument is supplied,
+the output is formatted in such a way that it can be made part
+of an <var>inputrc</var> file.  This command is unbound by default.
+
+     <br><dt><code>emacs-editing-mode (C-e)</code><dd>When in <code>vi</code> command mode, this causes a switch to <code>emacs</code>
+editing mode.
+
+     <br><dt><code>vi-editing-mode (M-C-j)</code><dd>When in <code>emacs</code> editing mode, this causes a switch to <code>vi</code>
+editing mode.
+
+</dl>
+
+   </body></html>
+

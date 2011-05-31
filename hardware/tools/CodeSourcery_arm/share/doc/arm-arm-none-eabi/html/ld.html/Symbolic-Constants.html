@@ -1,0 +1,69 @@
+<html lang="en">
+<head>
+<title>Symbolic Constants - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Expressions.html#Expressions" title="Expressions">
+<link rel="prev" href="Constants.html#Constants" title="Constants">
+<link rel="next" href="Symbols.html#Symbols" title="Symbols">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Symbolic-Constants"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Symbols.html#Symbols">Symbols</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Constants.html#Constants">Constants</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Expressions.html#Expressions">Expressions</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.10.2 Symbolic Constants</h4>
+
+<p><a name="index-symbolic-constants-496"></a><a name="index-CONSTANT-497"></a>It is possible to refer to target specific constants via the use of
+the <code>CONSTANT(</code><var>name</var><code>)</code> operator, where <var>name</var> is one of:
+
+     <dl>
+<dt><code>MAXPAGESIZE</code><dd><a name="index-MAXPAGESIZE-498"></a>The target's maximum page size.
+
+     <br><dt><code>COMMONPAGESIZE</code><dd><a name="index-COMMONPAGESIZE-499"></a>The target's default page size. 
+</dl>
+
+   <p>So for example:
+
+<pre class="smallexample">       .text ALIGN (CONSTANT (MAXPAGESIZE)) : { *(.text) }
+</pre>
+   <p>will create a text section aligned to the largest page boundary
+supported by the target.
+
+   </body></html>
+

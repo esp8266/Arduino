@@ -1,0 +1,49 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>6.6. Actel FlashPro Devices</title><link rel="stylesheet" href="cs.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.74.0"><link rel="home" href="index.html" title="Sourcery G++ Lite"><link rel="up" href="sprite.html" title="Chapter 6. Sourcery G++ Debug Sprite"><link rel="prev" href="debug-sprite-rdi-url.html" title="6.5. Remote Debug Interface Devices"><link rel="next" href="debug-sprite-altera-url.html" title="6.7. Altera Devices"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">6.6. Actel FlashPro Devices</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="debug-sprite-rdi-url.html">Prev</a> </td><th width="60%" align="center">Chapter 6. Sourcery G++ Debug Sprite</th><td width="20%" align="right"> <a accesskey="n" href="debug-sprite-altera-url.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="debug-sprite-flashpro-url"></a>6.6. Actel FlashPro Devices</h2></div></div></div><p> 
+    On Windows hosts, Sourcery G++ Lite supports FlashPro devices used with 
+    Actel Cortex-M1 development kits.
+  </p><p>
+    For FlashPro devices, the <em class="replaceable"><code>device-url</code></em> 
+    has the following form:
+
+    </p><pre class="screen">flashpro:[//<em class="replaceable"><code>usb12345</code></em>/][?jtagclock=<em class="replaceable"><code>rate</code></em>]</pre><p>
+  </p><p>
+    The optional <em class="replaceable"><code>usb12345</code></em> part indicates
+    the ID of the FlashPro device to connect to, which is useful if
+    you have more than one such device attached to your computer.  
+    If the ID is omitted, the Debug Sprite connects automatically to 
+    the first detected FlashPro device.  
+    You can enumerate the connected FlashPro devices by invoking the
+    Sprite with the <code class="option">-i</code> switch, as follows:
+
+    </p><pre class="screen">&gt; arm-none-eabi-sprite -i flashpro:</pre><p>
+  </p><p> 
+    The <code class="literal">jtagclock</code> option allows the communication
+    speed with the target board to be altered.  The 
+    <em class="replaceable"><code>rate</code></em> is specified in Hz and may range between
+    93750 and 4000000.  
+    The default is 93750, the slowest speed supported  by the FlashPro device.
+    Depending on your target board, you may be able to increase this rate, 
+    but beware that communication errors may occur above a certain threshold.
+    If you encounter communication errors with a higher-than-default speed 
+    selected, try reducing the speed.
+  </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id283734"></a>6.6.1. Installing FlashPro Windows drivers</h3></div></div></div><p>
+      Windows drivers for the FlashPro device are included with the
+      FlashPro software provided by Actel.  Refer to
+      Actel's documentation for details on installing this
+      software.  You must use the Actel FlashPro software to configure 
+      the FPGA on your Cortex-M1 board, but it does not need to be 
+      running when using the Debug Sprite.
+    </p><p>
+      Once you have set up your board using the FlashPro software, 
+      you can check that it is recognized by the Sourcery G++ Debug Sprite
+      by running the following command:
+
+      </p><pre class="screen">&gt; arm-none-eabi-sprite -i
+flashpro: [jtagclock=&lt;n:93750-4000000&gt;] FlashPro device
+  flashpro://usb12345/ - FlashPro Device
+  ...</pre><p>
+
+      If output similar to the above does not appear, your FlashPro 
+      device is not working correctly.  Contact CodeSourcery for 
+      further guidance in that case.
+    </p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="debug-sprite-rdi-url.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="sprite.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="debug-sprite-altera-url.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">6.5. Remote Debug Interface Devices </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 6.7. Altera Devices</td></tr></table></div></body></html>

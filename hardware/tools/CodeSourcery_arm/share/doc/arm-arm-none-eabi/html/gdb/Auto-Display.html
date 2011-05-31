@@ -1,0 +1,130 @@
+<html lang="en">
+<head>
+<title>Auto Display - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Data.html#Data" title="Data">
+<link rel="prev" href="Memory.html#Memory" title="Memory">
+<link rel="next" href="Print-Settings.html#Print-Settings" title="Print Settings">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Auto-Display"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Print-Settings.html#Print-Settings">Print Settings</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Memory.html#Memory">Memory</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Data.html#Data">Data</a>
+<hr>
+</div>
+
+<h3 class="section">10.7 Automatic Display</h3>
+
+<p><a name="index-automatic-display-530"></a><a name="index-display-of-expressions-531"></a>
+If you find that you want to print the value of an expression frequently
+(to see how it changes), you might want to add it to the <dfn>automatic
+display list</dfn> so that <span class="sc">gdb</span> prints its value each time your program stops. 
+Each expression added to the list is given a number to identify it;
+to remove an expression from the list, you specify that number. 
+The automatic display looks like this:
+
+<pre class="smallexample">     2: foo = 38
+     3: bar[5] = (struct hack *) 0x3804
+</pre>
+   <p class="noindent">This display shows item numbers, expressions and their current values.  As with
+displays you request manually using <code>x</code> or <code>print</code>, you can
+specify the output format you prefer; in fact, <code>display</code> decides
+whether to use <code>print</code> or <code>x</code> depending your format
+specification&mdash;it uses <code>x</code> if you specify either the &lsquo;<samp><span class="samp">i</span></samp>&rsquo;
+or &lsquo;<samp><span class="samp">s</span></samp>&rsquo; format, or a unit size; otherwise it uses <code>print</code>.
+
+     
+<a name="index-display-532"></a>
+<dl><dt><code>display </code><var>expr</var><dd>Add the expression <var>expr</var> to the list of expressions to display
+each time your program stops.  See <a href="Expressions.html#Expressions">Expressions</a>.
+
+     <p><code>display</code> does not repeat if you press &lt;RET&gt; again after using it.
+
+     <br><dt><code>display/</code><var>fmt</var> <var>expr</var><dd>For <var>fmt</var> specifying only a display format and not a size or
+count, add the expression <var>expr</var> to the auto-display list but
+arrange to display it each time in the specified format <var>fmt</var>. 
+See <a href="Output-Formats.html#Output-Formats">Output Formats</a>.
+
+     <br><dt><code>display/</code><var>fmt</var> <var>addr</var><dd>For <var>fmt</var> &lsquo;<samp><span class="samp">i</span></samp>&rsquo; or &lsquo;<samp><span class="samp">s</span></samp>&rsquo;, or including a unit-size or a
+number of units, add the expression <var>addr</var> as a memory address to
+be examined each time your program stops.  Examining means in effect
+doing &lsquo;<samp><span class="samp">x/</span><var>fmt</var> <var>addr</var></samp>&rsquo;.  See <a href="Memory.html#Memory">Examining Memory</a>. 
+</dl>
+
+   <p>For example, &lsquo;<samp><span class="samp">display/i $pc</span></samp>&rsquo; can be helpful, to see the machine
+instruction about to be executed each time execution stops (&lsquo;<samp><span class="samp">$pc</span></samp>&rsquo;
+is a common name for the program counter; see <a href="Registers.html#Registers">Registers</a>).
+
+     
+<a name="index-delete-display-533"></a>
+<a name="index-undisplay-534"></a>
+<dl><dt><code>undisplay </code><var>dnums</var><code>...</code><dt><code>delete display </code><var>dnums</var><code>...</code><dd>Remove item numbers <var>dnums</var> from the list of expressions to display.
+
+     <p><code>undisplay</code> does not repeat if you press &lt;RET&gt; after using it. 
+(Otherwise you would just get the error &lsquo;<samp><span class="samp">No display number ...</span></samp>&rsquo;.)
+
+     <p><a name="index-disable-display-535"></a><br><dt><code>disable display </code><var>dnums</var><code>...</code><dd>Disable the display of item numbers <var>dnums</var>.  A disabled display
+item is not printed automatically, but is not forgotten.  It may be
+enabled again later.
+
+     <p><a name="index-enable-display-536"></a><br><dt><code>enable display </code><var>dnums</var><code>...</code><dd>Enable display of item numbers <var>dnums</var>.  It becomes effective once
+again in auto display of its expression, until you specify otherwise.
+
+     <br><dt><code>display</code><dd>Display the current values of the expressions on the list, just as is
+done when your program stops.
+
+     <p><a name="index-info-display-537"></a><br><dt><code>info display</code><dd>Print the list of expressions previously set up to display
+automatically, each one with its item number, but without showing the
+values.  This includes disabled expressions, which are marked as such. 
+It also includes expressions which would not be displayed right now
+because they refer to automatic variables not currently available. 
+</dl>
+
+   <p><a name="index-display-disabled-out-of-scope-538"></a>If a display expression refers to local variables, then it does not make
+sense outside the lexical context for which it was set up.  Such an
+expression is disabled when execution enters a context where one of its
+variables is not defined.  For example, if you give the command
+<code>display last_char</code> while inside a function with an argument
+<code>last_char</code>, <span class="sc">gdb</span> displays this argument while your program
+continues to stop inside that function.  When it stops elsewhere&mdash;where
+there is no variable <code>last_char</code>&mdash;the display is disabled
+automatically.  The next time your program stops where <code>last_char</code>
+is meaningful, you can enable the display expression once again.
+
+   </body></html>
+

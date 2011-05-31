@@ -1,0 +1,77 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>2.4. Installing Sourcery G++ Lite</title><link rel="stylesheet" href="cs.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.74.0"><link rel="home" href="index.html" title="Sourcery G++ Lite"><link rel="up" href="chap-installation.html" title="Chapter 2. Installation and Configuration"><link rel="prev" href="ch02s03.html" title="2.3. Downloading an Installer"><link rel="next" href="sec-updating.html" title="2.5. Installing Sourcery G++ Lite Updates"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">2.4. Installing Sourcery G++ Lite</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch02s03.html">Prev</a> </td><th width="60%" align="center">Chapter 2. Installation and Configuration</th><td width="20%" align="right"> <a accesskey="n" href="sec-updating.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec-installing"></a>2.4. Installing Sourcery G++ Lite</h2></div></div></div><p>
+      The method used to install Sourcery G++ Lite depends on
+      <span>your host system and</span>
+      the kind of installation package you have downloaded.
+    </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id276075"></a>2.4.1. Using the Sourcery G++ Lite Installer on Microsoft Windows</h3></div></div></div><p>
+        If you have received Sourcery G++ Lite on CD, insert the CD in your computer.
+        On most computers, the installer then starts automatically.  If
+        your computer has been configured not to automatically run CDs,
+        open <code class="guilabel">My Computer</code>, and double click on the CD.
+        If you downloaded Sourcery G++ Lite, double-click on the installer.
+      </p><p>
+        After the installer starts, follow the on-screen dialogs to
+        install Sourcery G++ Lite.  
+        The installer is intended to be self-explanatory and on most
+        pages the defaults are appropriate.  
+      </p><div class="informalfigure"><div class="mediaobject" align="center"><img src="images/install1.png" align="middle"><div class="caption"><p><b>Running the Installer. </b>
+                The graphical installer guides you through the steps
+                to install Sourcery G++ Lite.
+              </p></div></div></div><p>
+        You may want to change the install directory pathname and
+        customize the shortcut installation.
+      </p><div class="informalfigure"><div class="mediaobject" align="center"><img src="images/install2.png" align="middle"><div class="caption"><p><b>Choose Install Folder. </b>
+                Select the pathname to your install directory.
+              </p></div></div></div><div class="informalfigure"><div class="mediaobject" align="center"><img src="images/install3.png" align="middle"><div class="caption"><p><b>Choose Shortcut Folder. </b>
+                You can customize where the installer creates shortcuts
+                for quick access to Sourcery G++ Lite.
+              </p></div></div></div><p>
+        When the installer has finished, it asks if you want to launch
+        
+        a viewer for the Getting Started guide.  Finally, the installer 
+        displays a summary screen to confirm a successful install
+        before it exits.
+      </p><div class="informalfigure"><div class="mediaobject" align="center"><img src="images/install4.png" align="middle"><div class="caption"><p><b>Install Complete. </b>
+                You should see a screen similar to this after a successful
+                install.
+              </p></div></div></div><p>
+        If you prefer, you can run the installer in console mode rather than
+	using the graphical interface.  To do this, invoke the installer
+	with the <code class="option">-i console</code> command-line option.  For example:
+        </p><pre class="screen">&gt; /path/to/package.exe -i console</pre><p>
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id276284"></a>2.4.2. Using the Sourcery G++ Lite Installer on GNU/Linux Hosts</h3></div></div></div><p>
+        Start the graphical installer by invoking the executable shell script:
+        </p><pre class="screen">&gt; /bin/sh ./path/to/package.bin</pre><p>
+      </p><p>
+        After the installer starts, follow the on-screen dialogs to 
+        install Sourcery G++ Lite.
+        <span>
+          For additional details on running the installer,
+          see the discussion and screen shots in the
+          Microsoft Windows section above.
+        </span>
+      </p><p>
+        If you prefer, or if your host system does not run the
+	X Window System, you can run the installer in console mode rather than
+	using the graphical interface.  To do this, invoke the installer
+	with the <code class="option">-i console</code> command-line option.  For example:
+        </p><pre class="screen">&gt; /bin/sh ./path/to/package.bin -i console</pre><p>
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="tbz2inst"></a>2.4.3. Installing Sourcery G++ Lite from a Compressed Archive</h3></div></div></div><p>
+        You do not need to be a system administrator to install Sourcery G++ Lite
+	from a compressed archive.  You may install Sourcery G++ Lite using any user
+        account and in any directory to which you have
+        write access.  This guide assumes that you have decided to install
+        Sourcery G++ Lite in the <code class="filename">$HOME/CodeSourcery</code> subdirectory of
+        your home directory and that the filename of the package you have
+        downloaded is <code class="filename">/path/to/package.tar.bz2</code>. After installation
+        the toolchain will be in 
+        <code class="filename">$HOME/CodeSourcery/sourceryg++-2011.03</code>.
+      </p><p>
+        First, uncompress the package file:
+        </p><pre class="screen">&gt; bunzip2 /path/to/package.tar.bz2</pre><p>
+        Next, create the directory in which you wish to install the package:
+        </p><pre class="screen">&gt; mkdir -p $HOME/CodeSourcery</pre><p>
+        Change to the installation directory:
+        </p><pre class="screen">&gt; cd $HOME/CodeSourcery</pre><p>
+        Unpack the package:
+        </p><pre class="screen">&gt; tar xf /path/to/package.tar</pre><p>
+      </p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch02s03.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="chap-installation.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="sec-updating.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">2.3. Downloading an Installer </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 2.5. Installing Sourcery G++ Lite Updates</td></tr></table></div></body></html>

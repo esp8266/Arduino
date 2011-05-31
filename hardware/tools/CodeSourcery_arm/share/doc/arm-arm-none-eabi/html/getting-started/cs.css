@@ -1,0 +1,118 @@
+/* Minimalistic stylesheet for DocBook and TexInfo documents.
+   Some elements are borrowed from the CodeSourcery web site style sheets,
+   but this is optimized for documents that are mostly text and that
+   lack menu bars and the like.  */
+
+
+/***********
+ Body style
+***********/
+
+body {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-weight: normal;
+	font-size: 100%;
+        background-color: #ffffff;
+}
+
+
+/*********
+ Headings  
+*********/
+
+h1, h2, h3, h4 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-weight: bold;
+}
+
+h1  {
+	color: #111111;
+}
+
+h2 {
+	color: #222222;
+}
+
+h3, h4 {
+	color: #333333;
+}
+
+/***********
+ Hyperlinks  
+***********/
+
+a:link, a:visited {
+	color: #3333cc;
+	text-decoration: none;
+}
+
+a:link:hover, a:visited:hover {
+	text-decoration: underline;
+}
+
+
+/***********
+ Markup for specific elements
+***********/
+
+/* Use Courier for all code and samp environments. */
+code, samp {
+	font-family: "Courier New", Courier, mono;
+	font-size: 100%;
+}
+
+/* Texinfo uses @r for "normal body font", but it comes out in the markup
+   as a span with the "roman" attribute.  */
+span.roman {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 100%;
+}
+
+/* Smallmono pre environment has small font, a plain background and no border */
+pre.smallmono {
+	font-family: "Courier New", Courier, mono;
+	font-size: smaller;
+	border: 0px;
+	background-color: #ffffff;
+	margin: 0px;
+	padding: 0px;
+}
+
+/* Format all other pre environments with shaded boxes.  */
+pre {
+	font-family: "Courier New", Courier, mono;
+	border: 1px solid #cccccc;
+	background-color: #eeeeee;
+	margin: 20px;
+	padding: 10px;
+}
+
+/* Make horizontal rules a pretty blue color.  */
+
+hr {
+        background-color: #6699cc;
+	color: #6699cc;
+	height: 3px;
+        border: 0;
+}
+
+/* Center titles on examples and figures, since the objects are also
+   centered.  */
+
+div.example p.title, div.figure p.title {
+	text-align: center;
+}
+
+div.segmentedlist table 
+{
+    margin-left:4%;
+    margin-right:4%;
+    width:92%;
+    empty-cells: show;
+}
+div.segmentedlist table tr th { background-color: #f0f0f0;}
+div.segmentedlist table tr th,
+div.segmentedlist table tr td
+{
+border: 1px solid #dcdcdc;
+}

@@ -1,0 +1,111 @@
+<html lang="en">
+<head>
+<title>GNU Object Attributes - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Object-Attributes.html#Object-Attributes" title="Object Attributes">
+<link rel="next" href="Defining-New-Object-Attributes.html#Defining-New-Object-Attributes" title="Defining New Object Attributes">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="GNU-Object-Attributes"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Defining-New-Object-Attributes.html#Defining-New-Object-Attributes">Defining New Object Attributes</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Object-Attributes.html#Object-Attributes">Object Attributes</a>
+<hr>
+</div>
+
+<h3 class="section">8.1 <span class="sc">gnu</span> Object Attributes</h3>
+
+<p>The <code>.gnu_attribute</code> directive records an object attribute
+with vendor &lsquo;<samp><span class="samp">gnu</span></samp>&rsquo;.
+
+   <p>Except for &lsquo;<samp><span class="samp">Tag_compatibility</span></samp>&rsquo;, which has both an integer and a string for
+its value, <span class="sc">gnu</span> attributes have a string value if the tag number is odd and
+an integer value if the tag number is even.  The second bit (<var>tag</var><code> &amp;
+2</code> is set for architecture-independent attributes and clear for
+architecture-dependent ones.
+
+<h4 class="subsection">8.1.1 Common <span class="sc">gnu</span> attributes</h4>
+
+<p>These attributes are valid on all architectures.
+
+     <dl>
+<dt><span class="roman">Tag_compatibility (32)</span><dd>The compatibility attribute takes an integer flag value and a vendor name.  If
+the flag value is 0, the file is compatible with other toolchains.  If it is 1,
+then the file is only compatible with the named toolchain.  If it is greater
+than 1, the file can only be processed by other toolchains under some private
+arrangement indicated by the flag value and the vendor name. 
+</dl>
+
+<h4 class="subsection">8.1.2 MIPS Attributes</h4>
+
+     <dl>
+<dt><span class="roman">Tag_GNU_MIPS_ABI_FP (4)</span><dd>The floating-point ABI used by this object file.  The value will be:
+
+          <ul>
+<li>0 for files not affected by the floating-point ABI. 
+<li>1 for files using the hardware floating-point with a standard double-precision
+FPU. 
+<li>2 for files using the hardware floating-point ABI with a single-precision FPU. 
+<li>3 for files using the software floating-point ABI. 
+<li>4 for files using the hardware floating-point ABI with 64-bit wide
+double-precision floating-point registers and 32-bit wide general
+purpose registers. 
+</ul>
+     </dl>
+
+<h4 class="subsection">8.1.3 PowerPC Attributes</h4>
+
+     <dl>
+<dt><span class="roman">Tag_GNU_Power_ABI_FP (4)</span><dd>The floating-point ABI used by this object file.  The value will be:
+
+          <ul>
+<li>0 for files not affected by the floating-point ABI. 
+<li>1 for files using double-precision hardware floating-point ABI. 
+<li>2 for files using the software floating-point ABI. 
+<li>3 for files using single-precision hardware floating-point ABI. 
+</ul>
+
+     <br><dt><span class="roman">Tag_GNU_Power_ABI_Vector (8)</span><dd>The vector ABI used by this object file.  The value will be:
+
+          <ul>
+<li>0 for files not affected by the vector ABI. 
+<li>1 for files using general purpose registers to pass vectors. 
+<li>2 for files using AltiVec registers to pass vectors. 
+<li>3 for files using SPE registers to pass vectors. 
+</ul>
+     </dl>
+
+   </body></html>
+

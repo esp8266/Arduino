@@ -1,0 +1,63 @@
+<html lang="en">
+<head>
+<title>putw - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="puts.html#puts" title="puts">
+<link rel="next" href="putwchar.html#putwchar" title="putwchar">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="putw"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="putwchar.html#putwchar">putwchar</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="puts.html#puts">puts</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.49 <code>putw</code>&mdash;write a word (int)</h3>
+
+<p><a name="index-putw-254"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     int putw(int <var>w</var>, FILE *<var>fp</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>putw</code> is a function, defined in <code>stdio.h</code>.  You can use <code>putw</code>
+to write a word to the file or stream identified by <var>fp</var>.  As a side
+effect, <code>putw</code> advances the file's current position indicator.
+
+   <p><br>
+<strong>Returns</strong><br>
+Zero on success, <code>EOF</code> on failure.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>putw</code> is a remnant of K&amp;R C; it is not part of any ISO C Standard. 
+<code>fwrite</code> should be used instead.  In fact, this implementation of
+<code>putw</code> is based upon <code>fwrite</code>.
+
+   <p>Supporting OS subroutines required: <code>fwrite</code>.
+
+   <p><br>
+
+   </body></html>
+

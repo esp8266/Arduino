@@ -1,0 +1,104 @@
+<html lang="en">
+<head>
+<title>PowerPC ELF32 - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Machine-Dependent.html#Machine-Dependent" title="Machine Dependent">
+<link rel="prev" href="M68HC11_002f68HC12.html#M68HC11_002f68HC12" title="M68HC11/68HC12">
+<link rel="next" href="PowerPC64-ELF64.html#PowerPC64-ELF64" title="PowerPC64 ELF64">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="PowerPC-ELF32"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="PowerPC64-ELF64.html#PowerPC64-ELF64">PowerPC64 ELF64</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="M68HC11_002f68HC12.html#M68HC11_002f68HC12">M68HC11/68HC12</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Machine-Dependent.html#Machine-Dependent">Machine Dependent</a>
+<hr>
+</div>
+
+<h3 class="section">4.9 <samp><span class="command">ld</span></samp> and PowerPC 32-bit ELF Support</h3>
+
+<p><a name="index-PowerPC-long-branches-614"></a><a name="index-g_t_002d_002drelax-on-PowerPC-615"></a>Branches on PowerPC processors are limited to a signed 26-bit
+displacement, which may result in <samp><span class="command">ld</span></samp> giving
+&lsquo;<samp><span class="samp">relocation truncated to fit</span></samp>&rsquo; errors with very large programs. 
+&lsquo;<samp><span class="samp">--relax</span></samp>&rsquo; enables the generation of trampolines that can access
+the entire 32-bit address space.  These trampolines are inserted at
+section boundaries, so may not themselves be reachable if an input
+section exceeds 33M in size.  You may combine &lsquo;<samp><span class="samp">-r</span></samp>&rsquo; and
+&lsquo;<samp><span class="samp">--relax</span></samp>&rsquo; to add trampolines in a partial link.  In that case
+both branches to undefined symbols and inter-section branches are also
+considered potentially out of range, and trampolines inserted.
+
+   <p><a name="index-PowerPC-ELF32-options-616"></a>
+     
+<a name="index-PowerPC-PLT-617"></a>
+<a name="index-g_t_002d_002dbss_002dplt-618"></a>
+<dl><dt><samp><span class="option">--bss-plt</span></samp><dd>Current PowerPC GCC accepts a &lsquo;<samp><span class="samp">-msecure-plt</span></samp>&rsquo; option that
+generates code capable of using a newer PLT and GOT layout that has
+the security advantage of no executable section ever needing to be
+writable and no writable section ever being executable.  PowerPC
+<samp><span class="command">ld</span></samp> will generate this layout, including stubs to access the
+PLT, if all input files (including startup and static libraries) were
+compiled with &lsquo;<samp><span class="samp">-msecure-plt</span></samp>&rsquo;.  &lsquo;<samp><span class="samp">--bss-plt</span></samp>&rsquo; forces the old
+BSS PLT (and GOT layout) which can give slightly better performance.
+
+     <p><a name="index-g_t_002d_002dsecure_002dplt-619"></a><br><dt><samp><span class="option">--secure-plt</span></samp><dd><samp><span class="command">ld</span></samp> will use the new PLT and GOT layout if it is linking new
+&lsquo;<samp><span class="samp">-fpic</span></samp>&rsquo; or &lsquo;<samp><span class="samp">-fPIC</span></samp>&rsquo; code, but does not do so automatically
+when linking non-PIC code.  This option requests the new PLT and GOT
+layout.  A warning will be given if some object file requires the old
+style BSS PLT.
+
+     <p><a name="index-PowerPC-GOT-620"></a><a name="index-g_t_002d_002dsdata_002dgot-621"></a><br><dt><samp><span class="option">--sdata-got</span></samp><dd>The new secure PLT and GOT are placed differently relative to other
+sections compared to older BSS PLT and GOT placement.  The location of
+<code>.plt</code> must change because the new secure PLT is an initialized
+section while the old PLT is uninitialized.  The reason for the
+<code>.got</code> change is more subtle:  The new placement allows
+<code>.got</code> to be read-only in applications linked with
+&lsquo;<samp><span class="samp">-z relro -z now</span></samp>&rsquo;.  However, this placement means that
+<code>.sdata</code> cannot always be used in shared libraries, because the
+PowerPC ABI accesses <code>.sdata</code> in shared libraries from the GOT
+pointer.  &lsquo;<samp><span class="samp">--sdata-got</span></samp>&rsquo; forces the old GOT placement.  PowerPC
+GCC doesn't use <code>.sdata</code> in shared libraries, so this option is
+really only useful for other compilers that may do so.
+
+     <p><a name="index-PowerPC-stub-symbols-622"></a><a name="index-g_t_002d_002demit_002dstub_002dsyms-623"></a><br><dt><samp><span class="option">--emit-stub-syms</span></samp><dd>This option causes <samp><span class="command">ld</span></samp> to label linker stubs with a local
+symbol that encodes the stub type and destination.
+
+     <p><a name="index-PowerPC-TLS-optimization-624"></a><a name="index-g_t_002d_002dno_002dtls_002doptimize-625"></a><br><dt><samp><span class="option">--no-tls-optimize</span></samp><dd>PowerPC <samp><span class="command">ld</span></samp> normally performs some optimization of code
+sequences used to access Thread-Local Storage.  Use this option to
+disable the optimization. 
+</dl>
+
+   </body></html>
+

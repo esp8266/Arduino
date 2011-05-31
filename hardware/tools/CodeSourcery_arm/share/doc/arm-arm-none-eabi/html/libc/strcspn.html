@@ -1,0 +1,61 @@
+<html lang="en">
+<head>
+<title>strcspn - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Strings.html#Strings" title="Strings">
+<link rel="prev" href="strcpy.html#strcpy" title="strcpy">
+<link rel="next" href="strerror.html#strerror" title="strerror">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="strcspn"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="strerror.html#strerror">strerror</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="strcpy.html#strcpy">strcpy</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Strings.html#Strings">Strings</a>
+<hr>
+</div>
+
+<h3 class="section">5.23 <code>strcspn</code>&mdash;count characters not in string</h3>
+
+<p><a name="index-strcspn-390"></a><strong>Synopsis</strong>
+<pre class="example">     size_t strcspn(const char *<var>s1</var>, const char *<var>s2</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+This function computes the length of the initial part of
+the string pointed to by <var>s1</var> which consists entirely of
+characters <var>NOT</var> from the string pointed to by <var>s2</var>
+(excluding the terminating null character).
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>strcspn</code> returns the length of the substring found.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>strcspn</code> is ANSI C.
+
+   <p><code>strcspn</code> requires no supporting OS subroutines.
+
+   <p><br>
+
+   </body></html>
+

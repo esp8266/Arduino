@@ -1,0 +1,157 @@
+<html lang="en">
+<head>
+<title>MeP Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Submodel-Options.html#Submodel-Options" title="Submodel Options">
+<link rel="prev" href="MCore-Options.html#MCore-Options" title="MCore Options">
+<link rel="next" href="MIPS-Options.html#MIPS-Options" title="MIPS Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="MeP-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="MIPS-Options.html#MIPS-Options">MIPS Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="MCore-Options.html#MCore-Options">MCore Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Submodel-Options.html#Submodel-Options">Submodel Options</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.17.24 MeP Options</h4>
+
+<p><a name="index-MeP-options-1530"></a>
+     <dl>
+<dt><code>-mabsdiff</code><dd><a name="index-mabsdiff-1531"></a>Enables the <code>abs</code> instruction, which is the absolute difference
+between two registers.
+
+     <br><dt><code>-mall-opts</code><dd><a name="index-mall_002dopts-1532"></a>Enables all the optional instructions - average, multiply, divide, bit
+operations, leading zero, absolute difference, min/max, clip, and
+saturation.
+
+     <br><dt><code>-maverage</code><dd><a name="index-maverage-1533"></a>Enables the <code>ave</code> instruction, which computes the average of two
+registers.
+
+     <br><dt><code>-mbased=</code><var>n</var><dd><a name="index-mbased_003d-1534"></a>Variables of size <var>n</var> bytes or smaller will be placed in the
+<code>.based</code> section by default.  Based variables use the <code>$tp</code>
+register as a base register, and there is a 128 byte limit to the
+<code>.based</code> section.
+
+     <br><dt><code>-mbitops</code><dd><a name="index-mbitops-1535"></a>Enables the bit operation instructions - bit test (<code>btstm</code>), set
+(<code>bsetm</code>), clear (<code>bclrm</code>), invert (<code>bnotm</code>), and
+test-and-set (<code>tas</code>).
+
+     <br><dt><code>-mc=</code><var>name</var><dd><a name="index-mc_003d-1536"></a>Selects which section constant data will be placed in.  <var>name</var> may
+be <code>tiny</code>, <code>near</code>, or <code>far</code>.
+
+     <br><dt><code>-mclip</code><dd><a name="index-mclip-1537"></a>Enables the <code>clip</code> instruction.  Note that <code>-mclip</code> is not
+useful unless you also provide <code>-mminmax</code>.
+
+     <br><dt><code>-mconfig=</code><var>name</var><dd><a name="index-mconfig_003d-1538"></a>Selects one of the build-in core configurations.  Each MeP chip has
+one or more modules in it; each module has a core CPU and a variety of
+coprocessors, optional instructions, and peripherals.  The
+<code>MeP-Integrator</code> tool, not part of GCC, provides these
+configurations through this option; using this option is the same as
+using all the corresponding command line options.  The default
+configuration is <code>default</code>.
+
+     <br><dt><code>-mcop</code><dd><a name="index-mcop-1539"></a>Enables the coprocessor instructions.  By default, this is a 32-bit
+coprocessor.  Note that the coprocessor is normally enabled via the
+<code>-mconfig=</code> option.
+
+     <br><dt><code>-mcop32</code><dd><a name="index-mcop32-1540"></a>Enables the 32-bit coprocessor's instructions.
+
+     <br><dt><code>-mcop64</code><dd><a name="index-mcop64-1541"></a>Enables the 64-bit coprocessor's instructions.
+
+     <br><dt><code>-mivc2</code><dd><a name="index-mivc2-1542"></a>Enables IVC2 scheduling.  IVC2 is a 64-bit VLIW coprocessor.
+
+     <br><dt><code>-mdc</code><dd><a name="index-mdc-1543"></a>Causes constant variables to be placed in the <code>.near</code> section.
+
+     <br><dt><code>-mdiv</code><dd><a name="index-mdiv-1544"></a>Enables the <code>div</code> and <code>divu</code> instructions.
+
+     <br><dt><code>-meb</code><dd><a name="index-meb-1545"></a>Generate big-endian code.
+
+     <br><dt><code>-mel</code><dd><a name="index-mel-1546"></a>Generate little-endian code.
+
+     <br><dt><code>-mio-volatile</code><dd><a name="index-mio_002dvolatile-1547"></a>Tells the compiler that any variable marked with the <code>io</code>
+attribute is to be considered volatile.
+
+     <br><dt><code>-ml</code><dd><a name="index-ml-1548"></a>Causes variables to be assigned to the <code>.far</code> section by default.
+
+     <br><dt><code>-mleadz</code><dd><a name="index-mleadz-1549"></a>Enables the <code>leadz</code> (leading zero) instruction.
+
+     <br><dt><code>-mm</code><dd><a name="index-mm-1550"></a>Causes variables to be assigned to the <code>.near</code> section by default.
+
+     <br><dt><code>-mminmax</code><dd><a name="index-mminmax-1551"></a>Enables the <code>min</code> and <code>max</code> instructions.
+
+     <br><dt><code>-mmult</code><dd><a name="index-mmult-1552"></a>Enables the multiplication and multiply-accumulate instructions.
+
+     <br><dt><code>-mno-opts</code><dd><a name="index-mno_002dopts-1553"></a>Disables all the optional instructions enabled by <code>-mall-opts</code>.
+
+     <br><dt><code>-mrepeat</code><dd><a name="index-mrepeat-1554"></a>Enables the <code>repeat</code> and <code>erepeat</code> instructions, used for
+low-overhead looping.
+
+     <br><dt><code>-ms</code><dd><a name="index-ms-1555"></a>Causes all variables to default to the <code>.tiny</code> section.  Note
+that there is a 65536 byte limit to this section.  Accesses to these
+variables use the <code>%gp</code> base register.
+
+     <br><dt><code>-msatur</code><dd><a name="index-msatur-1556"></a>Enables the saturation instructions.  Note that the compiler does not
+currently generate these itself, but this option is included for
+compatibility with other tools, like <code>as</code>.
+
+     <br><dt><code>-msdram</code><dd><a name="index-msdram-1557"></a>Link the SDRAM-based runtime instead of the default ROM-based runtime.
+
+     <br><dt><code>-msim</code><dd><a name="index-msim-1558"></a>Link the simulator runtime libraries.
+
+     <br><dt><code>-msimnovec</code><dd><a name="index-msimnovec-1559"></a>Link the simulator runtime libraries, excluding built-in support
+for reset and exception vectors and tables.
+
+     <br><dt><code>-mtf</code><dd><a name="index-mtf-1560"></a>Causes all functions to default to the <code>.far</code> section.  Without
+this option, functions default to the <code>.near</code> section.
+
+     <br><dt><code>-mtiny=</code><var>n</var><dd><a name="index-mtiny_003d-1561"></a>Variables that are <var>n</var> bytes or smaller will be allocated to the
+<code>.tiny</code> section.  These variables use the <code>$gp</code> base
+register.  The default for this option is 4, but note that there's a
+65536 byte limit to the <code>.tiny</code> section.
+
+ </dl>
+
+ </body></html>
+

@@ -1,0 +1,387 @@
+<html lang="en">
+<head>
+<title>Overall Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Invoking-GCC.html#Invoking-GCC" title="Invoking GCC">
+<link rel="prev" href="Option-Summary.html#Option-Summary" title="Option Summary">
+<link rel="next" href="Invoking-G_002b_002b.html#Invoking-G_002b_002b" title="Invoking G++">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Overall-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Invoking-G_002b_002b.html#Invoking-G_002b_002b">Invoking G++</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Option-Summary.html#Option-Summary">Option Summary</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Invoking-GCC.html#Invoking-GCC">Invoking GCC</a>
+<hr>
+</div>
+
+<h3 class="section">3.2 Options Controlling the Kind of Output</h3>
+
+<p>Compilation can involve up to four stages: preprocessing, compilation
+proper, assembly and linking, always in that order.  GCC is capable of
+preprocessing and compiling several files either into several
+assembler input files, or into one assembler input file; then each
+assembler input file produces an object file, and linking combines all
+the object files (those newly compiled, and those specified as input)
+into an executable file.
+
+ <p><a name="index-file-name-suffix-71"></a>For any given input file, the file name suffix determines what kind of
+compilation is done:
+
+     <dl>
+<dt><var>file</var><code>.c</code><dd>C source code which must be preprocessed.
+
+     <br><dt><var>file</var><code>.i</code><dd>C source code which should not be preprocessed.
+
+     <br><dt><var>file</var><code>.ii</code><dd>C++ source code which should not be preprocessed.
+
+     <br><dt><var>file</var><code>.m</code><dd>Objective-C source code.  Note that you must link with the <samp><span class="file">libobjc</span></samp>
+library to make an Objective-C program work.
+
+     <br><dt><var>file</var><code>.mi</code><dd>Objective-C source code which should not be preprocessed.
+
+     <br><dt><var>file</var><code>.mm</code><dt><var>file</var><code>.M</code><dd>Objective-C++ source code.  Note that you must link with the <samp><span class="file">libobjc</span></samp>
+library to make an Objective-C++ program work.  Note that &lsquo;<samp><span class="samp">.M</span></samp>&rsquo; refers
+to a literal capital M.
+
+     <br><dt><var>file</var><code>.mii</code><dd>Objective-C++ source code which should not be preprocessed.
+
+     <br><dt><var>file</var><code>.h</code><dd>C, C++, Objective-C or Objective-C++ header file to be turned into a
+precompiled header.
+
+     <br><dt><var>file</var><code>.cc</code><dt><var>file</var><code>.cp</code><dt><var>file</var><code>.cxx</code><dt><var>file</var><code>.cpp</code><dt><var>file</var><code>.CPP</code><dt><var>file</var><code>.c++</code><dt><var>file</var><code>.C</code><dd>C++ source code which must be preprocessed.  Note that in &lsquo;<samp><span class="samp">.cxx</span></samp>&rsquo;,
+the last two letters must both be literally &lsquo;<samp><span class="samp">x</span></samp>&rsquo;.  Likewise,
+&lsquo;<samp><span class="samp">.C</span></samp>&rsquo; refers to a literal capital C.
+
+     <br><dt><var>file</var><code>.mm</code><dt><var>file</var><code>.M</code><dd>Objective-C++ source code which must be preprocessed.
+
+     <br><dt><var>file</var><code>.mii</code><dd>Objective-C++ source code which should not be preprocessed.
+
+     <br><dt><var>file</var><code>.hh</code><dt><var>file</var><code>.H</code><dt><var>file</var><code>.hp</code><dt><var>file</var><code>.hxx</code><dt><var>file</var><code>.hpp</code><dt><var>file</var><code>.HPP</code><dt><var>file</var><code>.h++</code><dt><var>file</var><code>.tcc</code><dd>C++ header file to be turned into a precompiled header.
+
+     <br><dt><var>file</var><code>.f</code><dt><var>file</var><code>.for</code><dt><var>file</var><code>.ftn</code><dd>Fixed form Fortran source code which should not be preprocessed.
+
+     <br><dt><var>file</var><code>.F</code><dt><var>file</var><code>.FOR</code><dt><var>file</var><code>.fpp</code><dt><var>file</var><code>.FPP</code><dt><var>file</var><code>.FTN</code><dd>Fixed form Fortran source code which must be preprocessed (with the traditional
+preprocessor).
+
+     <br><dt><var>file</var><code>.f90</code><dt><var>file</var><code>.f95</code><dt><var>file</var><code>.f03</code><dt><var>file</var><code>.f08</code><dd>Free form Fortran source code which should not be preprocessed.
+
+     <br><dt><var>file</var><code>.F90</code><dt><var>file</var><code>.F95</code><dt><var>file</var><code>.F03</code><dt><var>file</var><code>.F08</code><dd>Free form Fortran source code which must be preprocessed (with the
+traditional preprocessor).
+
+     <!-- FIXME: Descriptions of Java file types. -->
+     <!-- @var{file}.java -->
+     <!-- @var{file}.class -->
+     <!-- @var{file}.zip -->
+     <!-- @var{file}.jar -->
+     <br><dt><var>file</var><code>.ads</code><dd>Ada source code file which contains a library unit declaration (a
+declaration of a package, subprogram, or generic, or a generic
+instantiation), or a library unit renaming declaration (a package,
+generic, or subprogram renaming declaration).  Such files are also
+called <dfn>specs</dfn>.
+
+     <br><dt><var>file</var><code>.adb</code><dd>Ada source code file containing a library unit body (a subprogram or
+package body).  Such files are also called <dfn>bodies</dfn>.
+
+     <!-- GCC also knows about some suffixes for languages not yet included: -->
+     <!-- Pascal: -->
+     <!-- @var{file}.p -->
+     <!-- @var{file}.pas -->
+     <!-- Ratfor: -->
+     <!-- @var{file}.r -->
+     <br><dt><var>file</var><code>.s</code><dd>Assembler code.
+
+     <br><dt><var>file</var><code>.S</code><dt><var>file</var><code>.sx</code><dd>Assembler code which must be preprocessed.
+
+     <br><dt><var>other</var><dd>An object file to be fed straight into linking. 
+Any file name with no recognized suffix is treated this way. 
+</dl>
+
+ <p><a name="index-x-72"></a>You can specify the input language explicitly with the <samp><span class="option">-x</span></samp> option:
+
+     <dl>
+<dt><code>-x </code><var>language</var><dd>Specify explicitly the <var>language</var> for the following input files
+(rather than letting the compiler choose a default based on the file
+name suffix).  This option applies to all following input files until
+the next <samp><span class="option">-x</span></samp> option.  Possible values for <var>language</var> are:
+     <pre class="smallexample">          c  c-header  c-cpp-output
+          c++  c++-header  c++-cpp-output
+          objective-c  objective-c-header  objective-c-cpp-output
+          objective-c++ objective-c++-header objective-c++-cpp-output
+          assembler  assembler-with-cpp
+          ada
+          f77  f77-cpp-input f95  f95-cpp-input
+          java
+</pre>
+     <br><dt><code>-x none</code><dd>Turn off any specification of a language, so that subsequent files are
+handled according to their file name suffixes (as they are if <samp><span class="option">-x</span></samp>
+has not been used at all).
+
+     <br><dt><code>-pass-exit-codes</code><dd><a name="index-pass_002dexit_002dcodes-73"></a>Normally the <samp><span class="command">gcc</span></samp> program will exit with the code of 1 if any
+phase of the compiler returns a non-success return code.  If you specify
+<samp><span class="option">-pass-exit-codes</span></samp>, the <samp><span class="command">gcc</span></samp> program will instead return with
+numerically highest error produced by any phase that returned an error
+indication.  The C, C++, and Fortran frontends return 4, if an internal
+compiler error is encountered. 
+</dl>
+
+ <p>If you only want some of the stages of compilation, you can use
+<samp><span class="option">-x</span></samp> (or filename suffixes) to tell <samp><span class="command">gcc</span></samp> where to start, and
+one of the options <samp><span class="option">-c</span></samp>, <samp><span class="option">-S</span></samp>, or <samp><span class="option">-E</span></samp> to say where
+<samp><span class="command">gcc</span></samp> is to stop.  Note that some combinations (for example,
+&lsquo;<samp><span class="samp">-x cpp-output -E</span></samp>&rsquo;) instruct <samp><span class="command">gcc</span></samp> to do nothing at all.
+
+     <dl>
+<dt><code>-c</code><dd><a name="index-c-74"></a>Compile or assemble the source files, but do not link.  The linking
+stage simply is not done.  The ultimate output is in the form of an
+object file for each source file.
+
+     <p>By default, the object file name for a source file is made by replacing
+the suffix &lsquo;<samp><span class="samp">.c</span></samp>&rsquo;, &lsquo;<samp><span class="samp">.i</span></samp>&rsquo;, &lsquo;<samp><span class="samp">.s</span></samp>&rsquo;, etc., with &lsquo;<samp><span class="samp">.o</span></samp>&rsquo;.
+
+     <p>Unrecognized input files, not requiring compilation or assembly, are
+ignored.
+
+     <br><dt><code>-S</code><dd><a name="index-S-75"></a>Stop after the stage of compilation proper; do not assemble.  The output
+is in the form of an assembler code file for each non-assembler input
+file specified.
+
+     <p>By default, the assembler file name for a source file is made by
+replacing the suffix &lsquo;<samp><span class="samp">.c</span></samp>&rsquo;, &lsquo;<samp><span class="samp">.i</span></samp>&rsquo;, etc., with &lsquo;<samp><span class="samp">.s</span></samp>&rsquo;.
+
+     <p>Input files that don't require compilation are ignored.
+
+     <br><dt><code>-E</code><dd><a name="index-E-76"></a>Stop after the preprocessing stage; do not run the compiler proper.  The
+output is in the form of preprocessed source code, which is sent to the
+standard output.
+
+     <p>Input files which don't require preprocessing are ignored.
+
+     <p><a name="index-output-file-option-77"></a><br><dt><code>-o </code><var>file</var><dd><a name="index-o-78"></a>Place output in file <var>file</var>.  This applies regardless to whatever
+sort of output is being produced, whether it be an executable file,
+an object file, an assembler file or preprocessed C code.
+
+     <p>If <samp><span class="option">-o</span></samp> is not specified, the default is to put an executable
+file in <samp><span class="file">a.out</span></samp>, the object file for
+<samp><var>source</var><span class="file">.</span><var>suffix</var></samp> in <samp><var>source</var><span class="file">.o</span></samp>, its
+assembler file in <samp><var>source</var><span class="file">.s</span></samp>, a precompiled header file in
+<samp><var>source</var><span class="file">.</span><var>suffix</var><span class="file">.gch</span></samp>, and all preprocessed C source on
+standard output.
+
+     <br><dt><code>-v</code><dd><a name="index-v-79"></a>Print (on standard error output) the commands executed to run the stages
+of compilation.  Also print the version number of the compiler driver
+program and of the preprocessor and the compiler proper.
+
+     <br><dt><code>-###</code><dd><a name="index-g_t_0023_0023_0023-80"></a>Like <samp><span class="option">-v</span></samp> except the commands are not executed and all command
+arguments are quoted.  This is useful for shell scripts to capture the
+driver-generated command lines.
+
+     <br><dt><code>-pipe</code><dd><a name="index-pipe-81"></a>Use pipes rather than temporary files for communication between the
+various stages of compilation.  This fails to work on some systems where
+the assembler is unable to read from a pipe; but the GNU assembler has
+no trouble.
+
+     <br><dt><code>-combine</code><dd><a name="index-combine-82"></a>If you are compiling multiple source files, this option tells the driver
+to pass all the source files to the compiler at once (for those
+languages for which the compiler can handle this).  This will allow
+intermodule analysis (IMA) to be performed by the compiler.  Currently the only
+language for which this is supported is C.  If you pass source files for
+multiple languages to the driver, using this option, the driver will invoke
+the compiler(s) that support IMA once each, passing each compiler all the
+source files appropriate for it.  For those languages that do not support
+IMA this option will be ignored, and the compiler will be invoked once for
+each source file in that language.  If you use this option in conjunction
+with <samp><span class="option">-save-temps</span></samp>, the compiler will generate multiple
+pre-processed files
+(one for each source file), but only one (combined) <samp><span class="file">.o</span></samp> or
+<samp><span class="file">.s</span></samp> file.
+
+     <br><dt><code>--help</code><dd><a name="index-help-83"></a>Print (on the standard output) a description of the command line options
+understood by <samp><span class="command">gcc</span></samp>.  If the <samp><span class="option">-v</span></samp> option is also specified
+then <samp><span class="option">--help</span></samp> will also be passed on to the various processes
+invoked by <samp><span class="command">gcc</span></samp>, so that they can display the command line options
+they accept.  If the <samp><span class="option">-Wextra</span></samp> option has also been specified
+(prior to the <samp><span class="option">--help</span></samp> option), then command line options which
+have no documentation associated with them will also be displayed.
+
+     <br><dt><code>--target-help</code><dd><a name="index-target_002dhelp-84"></a>Print (on the standard output) a description of target-specific command
+line options for each tool.  For some targets extra target-specific
+information may also be printed.
+
+     <br><dt><code>--help={</code><var>class</var><span class="roman">|[</span><code>^</code><span class="roman">]</span><var>qualifier</var><code>}</code><span class="roman">[</span><code>,...</code><span class="roman">]</span><dd>Print (on the standard output) a description of the command line
+options understood by the compiler that fit into all specified classes
+and qualifiers.  These are the supported classes:
+
+          <dl>
+<dt>&lsquo;<samp><span class="samp">optimizers</span></samp>&rsquo;<dd>This will display all of the optimization options supported by the
+compiler.
+
+          <br><dt>&lsquo;<samp><span class="samp">warnings</span></samp>&rsquo;<dd>This will display all of the options controlling warning messages
+produced by the compiler.
+
+          <br><dt>&lsquo;<samp><span class="samp">target</span></samp>&rsquo;<dd>This will display target-specific options.  Unlike the
+<samp><span class="option">--target-help</span></samp> option however, target-specific options of the
+linker and assembler will not be displayed.  This is because those
+tools do not currently support the extended <samp><span class="option">--help=</span></samp> syntax.
+
+          <br><dt>&lsquo;<samp><span class="samp">params</span></samp>&rsquo;<dd>This will display the values recognized by the <samp><span class="option">--param</span></samp>
+option.
+
+          <br><dt><var>language</var><dd>This will display the options supported for <var>language</var>, where
+<var>language</var> is the name of one of the languages supported in this
+version of GCC.
+
+          <br><dt>&lsquo;<samp><span class="samp">common</span></samp>&rsquo;<dd>This will display the options that are common to all languages. 
+</dl>
+
+     <p>These are the supported qualifiers:
+
+          <dl>
+<dt>&lsquo;<samp><span class="samp">undocumented</span></samp>&rsquo;<dd>Display only those options which are undocumented.
+
+          <br><dt>&lsquo;<samp><span class="samp">joined</span></samp>&rsquo;<dd>Display options which take an argument that appears after an equal
+sign in the same continuous piece of text, such as:
+&lsquo;<samp><span class="samp">--help=target</span></samp>&rsquo;.
+
+          <br><dt>&lsquo;<samp><span class="samp">separate</span></samp>&rsquo;<dd>Display options which take an argument that appears as a separate word
+following the original option, such as: &lsquo;<samp><span class="samp">-o output-file</span></samp>&rsquo;. 
+</dl>
+
+     <p>Thus for example to display all the undocumented target-specific
+switches supported by the compiler the following can be used:
+
+     <pre class="smallexample">          --help=target,undocumented
+</pre>
+     <p>The sense of a qualifier can be inverted by prefixing it with the
+&lsquo;<samp><span class="samp">^</span></samp>&rsquo; character, so for example to display all binary warning
+options (i.e., ones that are either on or off and that do not take an
+argument), which have a description the following can be used:
+
+     <pre class="smallexample">          --help=warnings,^joined,^undocumented
+</pre>
+     <p>The argument to <samp><span class="option">--help=</span></samp> should not consist solely of inverted
+qualifiers.
+
+     <p>Combining several classes is possible, although this usually
+restricts the output by so much that there is nothing to display.  One
+case where it does work however is when one of the classes is
+<var>target</var>.  So for example to display all the target-specific
+optimization options the following can be used:
+
+     <pre class="smallexample">          --help=target,optimizers
+</pre>
+     <p>The <samp><span class="option">--help=</span></samp> option can be repeated on the command line.  Each
+successive use will display its requested class of options, skipping
+those that have already been displayed.
+
+     <p>If the <samp><span class="option">-Q</span></samp> option appears on the command line before the
+<samp><span class="option">--help=</span></samp> option, then the descriptive text displayed by
+<samp><span class="option">--help=</span></samp> is changed.  Instead of describing the displayed
+options, an indication is given as to whether the option is enabled,
+disabled or set to a specific value (assuming that the compiler
+knows this at the point where the <samp><span class="option">--help=</span></samp> option is used).
+
+     <p>Here is a truncated example from the ARM port of <samp><span class="command">gcc</span></samp>:
+
+     <pre class="smallexample">            % gcc -Q -mabi=2 --help=target -c
+            The following options are target specific:
+            -mabi=                                2
+            -mabort-on-noreturn                   [disabled]
+            -mapcs                                [disabled]
+</pre>
+     <p>The output is sensitive to the effects of previous command line
+options, so for example it is possible to find out which optimizations
+are enabled at <samp><span class="option">-O2</span></samp> by using:
+
+     <pre class="smallexample">          -Q -O2 --help=optimizers
+</pre>
+     <p>Alternatively you can discover which binary optimizations are enabled
+by <samp><span class="option">-O3</span></samp> by using:
+
+     <pre class="smallexample">          gcc -c -Q -O3 --help=optimizers &gt; /tmp/O3-opts
+          gcc -c -Q -O2 --help=optimizers &gt; /tmp/O2-opts
+          diff /tmp/O2-opts /tmp/O3-opts | grep enabled
+</pre>
+     <br><dt><code>-no-canonical-prefixes</code><dd><a name="index-no_002dcanonical_002dprefixes-85"></a>Do not expand any symbolic links, resolve references to &lsquo;<samp><span class="samp">/../</span></samp>&rsquo;
+or &lsquo;<samp><span class="samp">/./</span></samp>&rsquo;, or make the path absolute when generating a relative
+prefix.
+
+     <br><dt><code>--version</code><dd><a name="index-version-86"></a>Display the version number and copyrights of the invoked GCC.
+
+     <br><dt><code>-wrapper</code><dd><a name="index-wrapper-87"></a>Invoke all subcommands under a wrapper program. It takes a single
+comma separated list as an argument, which will be used to invoke
+the wrapper:
+
+     <pre class="smallexample">          gcc -c t.c -wrapper gdb,--args
+</pre>
+     <p>This will invoke all subprograms of gcc under "gdb &ndash;args",
+thus cc1 invocation will be "gdb &ndash;args cc1 ...".
+
+     <br><dt><code>-fplugin=</code><var>name</var><code>.so</code><dd>Load the plugin code in file <var>name</var>.so, assumed to be a
+shared object to be dlopen'd by the compiler.  The base name of
+the shared object file is used to identify the plugin for the
+purposes of argument parsing (See
+<samp><span class="option">-fplugin-arg-</span><var>name</var><span class="option">-</span><var>key</var><span class="option">=</span><var>value</var></samp> below). 
+Each plugin should define the callback functions specified in the
+Plugins API.
+
+     <br><dt><code>-fplugin-arg-</code><var>name</var><code>-</code><var>key</var><code>=</code><var>value</var><dd>Define an argument called <var>key</var> with a value of <var>value</var>
+for the plugin called <var>name</var>.
+
+     <!-- This file is designed to be included in manuals that use -->
+     <!-- expandargv. -->
+     <br><dt><code>@</code><var>file</var><dd>Read command-line options from <var>file</var>.  The options read are
+inserted in place of the original @<var>file</var> option.  If <var>file</var>
+does not exist, or cannot be read, then the option will be treated
+literally, and not removed.
+
+     <p>Options in <var>file</var> are separated by whitespace.  A whitespace
+character may be included in an option by surrounding the entire
+option in either single or double quotes.  Any character (including a
+backslash) may be included by prefixing the character to be included
+with a backslash.  The <var>file</var> may itself contain additional
+@<var>file</var> options; any such options will be processed recursively. 
+</dl>
+
+ </body></html>
+

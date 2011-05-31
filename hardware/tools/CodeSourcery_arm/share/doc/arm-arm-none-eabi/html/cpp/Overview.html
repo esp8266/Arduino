@@ -1,0 +1,119 @@
+<html lang="en">
+<head>
+<title>Overview - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="index.html#Top" title="Top">
+<link rel="next" href="Header-Files.html#Header-Files" title="Header Files">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Overview"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Header-Files.html#Header-Files">Header Files</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="index.html#Top">Top</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">1 Overview</h2>
+
+<!-- man begin DESCRIPTION -->
+<p>The C preprocessor, often known as <dfn>cpp</dfn>, is a <dfn>macro processor</dfn>
+that is used automatically by the C compiler to transform your program
+before compilation.  It is called a macro processor because it allows
+you to define <dfn>macros</dfn>, which are brief abbreviations for longer
+constructs.
+
+   <p>The C preprocessor is intended to be used only with C, C++, and
+Objective-C source code.  In the past, it has been abused as a general
+text processor.  It will choke on input which does not obey C's lexical
+rules.  For example, apostrophes will be interpreted as the beginning of
+character constants, and cause errors.  Also, you cannot rely on it
+preserving characteristics of the input which are not significant to
+C-family languages.  If a Makefile is preprocessed, all the hard tabs
+will be removed, and the Makefile will not work.
+
+   <p>Having said that, you can often get away with using cpp on things which
+are not C.  Other Algol-ish programming languages are often safe
+(Pascal, Ada, etc.) So is assembly, with caution.  <samp><span class="option">-traditional-cpp</span></samp>
+mode preserves more white space, and is otherwise more permissive.  Many
+of the problems can be avoided by writing C or C++ style comments
+instead of native language comments, and keeping macros simple.
+
+   <p>Wherever possible, you should use a preprocessor geared to the language
+you are writing in.  Modern versions of the GNU assembler have macro
+facilities.  Most high level programming languages have their own
+conditional compilation and inclusion mechanism.  If all else fails,
+try a true general text processor, such as GNU M4.
+
+   <p>C preprocessors vary in some details.  This manual discusses the GNU C
+preprocessor, which provides a small superset of the features of ISO
+Standard C.  In its default mode, the GNU C preprocessor does not do a
+few things required by the standard.  These are features which are
+rarely, if ever, used, and may cause surprising changes to the meaning
+of a program which does not expect them.  To get strict ISO Standard C,
+you should use the <samp><span class="option">-std=c90</span></samp> or <samp><span class="option">-std=c99</span></samp> options, depending
+on which version of the standard you want.  To get all the mandatory
+diagnostics, you must also use <samp><span class="option">-pedantic</span></samp>.  See <a href="Invocation.html#Invocation">Invocation</a>.
+
+   <p>This manual describes the behavior of the ISO preprocessor.  To
+minimize gratuitous differences, where the ISO preprocessor's
+behavior does not conflict with traditional semantics, the
+traditional preprocessor should behave the same way.  The various
+differences that do exist are detailed in the section <a href="Traditional-Mode.html#Traditional-Mode">Traditional Mode</a>.
+
+   <p>For clarity, unless noted otherwise, references to &lsquo;<samp><span class="samp">CPP</span></samp>&rsquo; in this
+manual refer to GNU CPP. 
+<!-- man end -->
+
+<ul class="menu">
+<li><a accesskey="1" href="Character-sets.html#Character-sets">Character sets</a>
+<li><a accesskey="2" href="Initial-processing.html#Initial-processing">Initial processing</a>
+<li><a accesskey="3" href="Tokenization.html#Tokenization">Tokenization</a>
+<li><a accesskey="4" href="The-preprocessing-language.html#The-preprocessing-language">The preprocessing language</a>
+</ul>
+
+   </body></html>
+

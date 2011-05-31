@@ -1,0 +1,188 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Chapter 5. CS3&#8482;: The CodeSourcery Common Startup Code Sequence</title><link rel="stylesheet" href="cs.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.74.0"><meta name="description" content=" CS3 is CodeSourcery's low-level board support library. This chapter documents the boards supported by Sourcery G++ Lite and the compiler and linker options you need to use with them. It also explains how you can use and modify CS3-provided definitions for memory maps, system startup code and interrupt vectors in your own code."><link rel="home" href="index.html" title="Sourcery G++ Lite"><link rel="up" href="index.html" title="Sourcery G++ Lite"><link rel="prev" href="sec-remote-debugging.html" title="4.4. Running Applications from GDB"><link rel="next" href="sec-cs3-startup.html" title="5.2. Program Startup and Termination"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter 5. CS3&#8482;: The CodeSourcery Common Startup Code Sequence</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="sec-remote-debugging.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="sec-cs3-startup.html">Next</a></td></tr></table><hr></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="chap-cs3"></a>Chapter 5. CS3&#8482;: The CodeSourcery Common Startup Code Sequence</h2></div><div><div class="abstract"><p class="title"><b></b></p><p>
+     CS3 is CodeSourcery's low-level board support library.
+     This chapter documents the boards
+     supported by Sourcery G++ Lite and the compiler and linker 
+     options you need to use with them.
+     It also explains how you can use and modify CS3-provided
+     definitions for memory maps, system startup code and
+     interrupt vectors in your own code.
+    </p></div></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="chap-cs3.html#sec-cs3-linker-scripts">5.1. Linker Scripts</a></span></dt><dt><span class="section"><a href="sec-cs3-startup.html">5.2. Program Startup and Termination</a></span></dt><dt><span class="section"><a href="sec-cs3-memory-layout.html">5.3. Memory Layout</a></span></dt><dt><span class="section"><a href="sec-cs3-interrupts.html">5.4. Interrupt Vectors and Handlers</a></span></dt><dt><span class="section"><a href="sec-cs3-supported-boards.html">5.5. Supported Boards for ARM EABI</a></span></dt><dt><span class="section"><a href="sec-cs3-vector-tables.html">5.6. Interrupt Vector Tables</a></span></dt></dl></div><p>
+    Many developers turn to the GNU toolchain for its cross-platform
+    consistency: having a single system support so many different
+    processors and boards helps to limit risk and keep learning curves
+    gentle.  Historically, however, the GNU toolchain has lacked a
+    consistent set of conventions for processor- and board-level
+    initialization, language run-time setup, and interrupt and trap
+    handler definition.
+  </p><p>
+    The CodeSourcery Common Startup Code Sequence (CS3) addresses
+    this problem.  For each supported system, CS3 provides a set of
+    linker scripts describing the system's memory map, and a board
+    support library providing generic reset, startup, and interrupt
+    handlers.  These scripts and libraries all follow a standard set
+    of conventions across a range of processors and boards.
+  </p><p>
+    In addition to providing linker support, CS3's functionality is 
+    fully integrated with the Sourcery G++ Debug Sprite.  For each
+    supported board, CS3 provides the board file containing the 
+    memory map and initialization sequence required for debugging 
+    applications on the board via the Sprite, as documented in
+    <a class="xref" href="sec-sprite-supported-boards.html" title="6.9. Supported Board Files">Section 6.9, &#8220;Supported Board Files&#8221;</a>.
+  </p><p>
+    This chapter is organized in two parts.  The first part explains
+    CS3 concepts:
+    </p><div class="itemizedlist"><ul type="disc"><li><a class="xref" href="chap-cs3.html#sec-cs3-linker-scripts" title="5.1. Linker Scripts">Section 5.1, &#8220;Linker Scripts&#8221;</a> provides basic information
+        you need to know in order to select an appropriate
+        CS3-provided linker script for your ARM EABI board.  
+      </li><li>
+	CS3's program startup and termination model is discussed in
+	<a class="xref" href="sec-cs3-startup.html" title="5.2. Program Startup and Termination">Section 5.2, &#8220;Program Startup and Termination&#8221;</a>.
+      </li><li><a class="xref" href="sec-cs3-memory-layout.html" title="5.3. Memory Layout">Section 5.3, &#8220;Memory Layout&#8221;</a>
+	discusses the mapping from program sections to memory regions.
+	It also explains how you can refer to
+	memory regions using CS3-provided symbolic names from C,
+	assembly language, or the linker script, and customize placement
+	of code or data in your program.
+      </li><li><a class="xref" href="sec-cs3-interrupts.html" title="5.4. Interrupt Vectors and Handlers">Section 5.4, &#8220;Interrupt Vectors and Handlers&#8221;</a> covers CS3's interrupt
+	handling model, and discusses how you can customize the CS3-provided
+	interrupt vector tables.
+      </li></ul></div><p>
+    The second part provides details about the CS3 implementation for
+    ARM EABI:
+    </p><div class="itemizedlist"><ul type="disc"><li><a class="xref" href="sec-cs3-supported-boards.html" title="5.5. Supported Boards for ARM EABI">Section 5.5, &#8220;Supported Boards for ARM EABI&#8221;</a> lists the boards
+	supported by CS3 for ARM EABI, and the available linker
+	scripts for them.
+      </li><li><a class="xref" href="sec-cs3-vector-tables.html" title="5.6. Interrupt Vector Tables">Section 5.6, &#8220;Interrupt Vector Tables&#8221;</a>
+        documents the details of the provided interrupt vectors
+	for CS3-supported devices.
+      </li></ul></div><p>
+  </p><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec-cs3-linker-scripts"></a>5.1. Linker Scripts</h2></div></div></div><p>
+      When you build programs for ARM EABI targets, you must
+      use a linker script.  The linker script serves several purposes:
+
+      </p><div class="itemizedlist"><ul type="disc"><li>
+	  It determines the memory addresses for placement of code and
+	  data sections.
+        </li><li>
+	  It defines symbolic names for memory regions present on the
+	  board, which you can use programmatically within your code.
+        </li><li>
+	  It provides appropriate program startup and termination code,
+	  and causes the linker to pull in any low-level board support
+	  libraries that are required to run code on the target.
+        </li><li>
+	  It optionally provides a <em class="firstterm">hosting</em> library
+	  for basic I/O functionality.
+        </li><li>
+	  It provides a default interrupt vector appropriate for the
+	  target processor.
+        </li></ul></div><p>
+    </p><p>
+      
+      When invoking the Sourcery G++ linker from the command line,
+      you must explicitly supply a linker script using the
+      <code class="option">-T</code> option; otherwise a link error results.
+    </p><p>
+      CS3 may provide multiple linker scripts for different configurations
+      using the same board.  For example, on some boards CS3 may support
+      running the program from either RAM or ROM (flash).
+      Some CS3 link configurations are also designed to co-exist with, or be
+      run from, a boot monitor on the target board.
+      Simulator targets typically require different startup code configurations
+      than hardware targets.
+      In CS3 terminology, each of these different
+      configurations is referred to as a <em class="firstterm">profile</em>.
+    </p><p>
+      The remainder of this section discusses profile and hosting
+      selection considerations in more detail.  You can find the full
+      list of supported boards and linker scripts included in this
+      release of Sourcery G++ Lite in <a class="xref" href="sec-cs3-supported-boards.html" title="5.5. Supported Boards for ARM EABI">Section 5.5, &#8220;Supported Boards for ARM EABI&#8221;</a>.
+    </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id279080"></a>5.1.1. Program and Data Placement</h3></div></div></div><p>
+        Many boards have both RAM and ROM (flash) memory devices.  CS3
+        provides distinct linker scripts to place the application either
+        entirely in RAM, or to place code and read-only data in ROM.
+      </p><p>
+        Some boards have very small amounts of RAM memory.  If you use
+        large library functions (such as <code class="function">printf</code> and
+        <code class="function">malloc</code>), you may overflow the available
+        memory.  You may need to use the ROM-based profile for
+        such programs, so that the program itself is stored in ROM.  You
+        may be able to reduce the total amount of memory used by your
+        program by replacing portions of the Sourcery G++ runtime library
+        and/or startup code.
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="sec-cs3-semihosting"></a>5.1.2. Hosting and Semihosting</h3></div></div></div><p>
+        CS3 is designed to support boards without an operating system.
+        To allow functions like
+        <code class="function">open</code> and <code class="function">write</code> to
+        work without operating system support, a
+        <em class="firstterm">semihosting</em> feature is
+        supported, in conjunction with the debugger.
+      </p><p>
+        With semihosting enabled, these system calls are translated
+        into equivalent function calls on your host system.  You can
+        only use these function calls while connected to the debugger;
+        if you try to use them when disconnected from the debugger,
+        you will get a hardware exception.
+      </p><p>
+        Semihosting requires support from the remote GDB debugging stub 
+        or agent, as well as the debugger itself.
+        <span>
+          The Sourcery G++ Debug Sprite implements semihosting for all
+          supported devices.
+        </span>
+        <span>
+          Semihosting is
+          <span>also</span>
+          supported by the
+          <span>
+            GDB Simulator
+            
+          </span>
+          
+          included with Sourcery G++ Lite.
+        </span>
+        However, semihosting may not be supported by debugging stubs
+        provided by third parties.  If you are using a debug device that
+        communicates with GDB using the GDB remote protocol,
+        check the documentation for your device to see whether semihosting
+        is supported.
+      </p><p>
+        A good use of semihosting is to display debugging messages.  For
+        example, this program prints a message on the debugger console
+        on the host:
+        </p><pre class="programlisting">#include &lt;unistd.h&gt;
+
+int main () {
+  write (STDERR_FILENO, "Hello, world!\n", 14);
+  return 0;
+}</pre><p>
+      </p><p>
+        The hosted CS3 linker scripts provide the semihosting support,
+        and as such programs linked with them may only be run with the
+        debugger.  For production code, or programs where memory usage
+	is tightly constrained, use the unhosted CS3 linker scripts
+	instead.
+	These scripts provide stub versions of the system calls,
+	which return an appropriate
+        error value in <code class="varname">errno</code>.  If such a stub
+        system call is required in the executable, the linker also
+        produces a warning.  Such a warning may indicate that you have
+        left debugging code active, or that your program contains unused
+	code.
+      </p><p>
+        As an alternative to semihosting via the debugger,
+	some targets supported by CS3 can run a boot monitor that 
+        provides console I/O services and other basic system calls.
+        CS3 can also provide hosting via these facilities; where a boot
+        monitor is supported, this is noted in the board tables below.
+        Unlike semihosting, hosting via the boot monitor can be used when
+        running programs outside of the debugger.
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id279215"></a>5.1.3. Specifying a Linker Script</h3></div></div></div><p>
+        When using Sourcery G++ from the command line or from a 
+	<code class="filename">Makefile</code>, you must add <code class="option">-T
+        <em class="replaceable"><code>script</code></em></code> to your linking
+        command, where <em class="replaceable"><code>script</code></em> is the
+        appropriate linker script.  For example, to target
+        ARMulator (RDI) boards, you could link with <code class="option">-T
+        armulator-ram-hosted.ld</code>.
+      </p></div></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="sec-remote-debugging.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="sec-cs3-startup.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">4.4. Running Applications from GDB </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 5.2. Program Startup and Termination</td></tr></table></div></body></html>

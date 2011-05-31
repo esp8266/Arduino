@@ -1,0 +1,70 @@
+<html lang="en">
+<head>
+<title>getwchar - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="getw.html#getw" title="getw">
+<link rel="next" href="mktemp.html#mktemp" title="mktemp">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="getwchar"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="mktemp.html#mktemp">mktemp</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="getw.html#getw">getw</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.40 <code>getwchar</code>&mdash;read a wide character from standard input</h3>
+
+<p><a name="index-getwchar-227"></a><a name="index-g_t_005fgetwchar_005fr-228"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;wchar.h&gt;
+     wint_t getwchar(void);
+     
+     wint_t _getwchar_r(struct _reent *<var>reent</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>getwchar</code> function or macro is the wide character equivalent of
+the <code>getchar</code> function.  You can use <code>getwchar</code> to get the next
+wide character from the standard input stream.  As a side effect,
+<code>getwchar</code> advances the standard input's current position indicator.
+
+   <p>The alternate function <code>_getwchar_r</code> is a reentrant version.  The
+extra argument <var>reent</var> is a pointer to a reentrancy structure.
+
+   <p><br>
+<strong>Returns</strong><br>
+The next wide character cast to <code>wint_t</code>, unless there is no more
+data, or the host system reports a read error; in either of these
+situations, <code>getwchar</code> returns <code>WEOF</code>.
+
+   <p>You can distinguish the two situations that cause an <code>WEOF</code> result by
+using `<code>ferror(stdin)</code>' and `<code>feof(stdin)</code>'.
+
+   <p><br>
+<strong>Portability</strong><br>
+C99
+
+   <p><br>
+
+   </body></html>
+

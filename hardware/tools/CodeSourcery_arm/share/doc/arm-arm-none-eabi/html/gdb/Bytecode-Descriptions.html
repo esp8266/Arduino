@@ -1,0 +1,284 @@
+<html lang="en">
+<head>
+<title>Bytecode Descriptions - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Agent-Expressions.html#Agent-Expressions" title="Agent Expressions">
+<link rel="prev" href="General-Bytecode-Design.html#General-Bytecode-Design" title="General Bytecode Design">
+<link rel="next" href="Using-Agent-Expressions.html#Using-Agent-Expressions" title="Using Agent Expressions">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Bytecode-Descriptions"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Using-Agent-Expressions.html#Using-Agent-Expressions">Using Agent Expressions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="General-Bytecode-Design.html#General-Bytecode-Design">General Bytecode Design</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Agent-Expressions.html#Agent-Expressions">Agent Expressions</a>
+<hr>
+</div>
+
+<h3 class="section">E.2 Bytecode Descriptions</h3>
+
+<p>Each bytecode description has the following form:
+
+     <dl>
+<dt><code>add</code> (0x02): <var>a</var> <var>b</var> &rArr; <var>a+b</var><dd>
+Pop the top two stack items, <var>a</var> and <var>b</var>, as integers; push
+their sum, as an integer.
+
+   </dl>
+
+   <p>In this example, <code>add</code> is the name of the bytecode, and
+<code>(0x02)</code> is the one-byte value used to encode the bytecode, in
+hexadecimal.  The phrase &ldquo;<var>a</var> <var>b</var> &rArr; <var>a+b</var>&rdquo; shows
+the stack before and after the bytecode executes.  Beforehand, the stack
+must contain at least two values, <var>a</var> and <var>b</var>; since the top of
+the stack is to the right, <var>b</var> is on the top of the stack, and
+<var>a</var> is underneath it.  After execution, the bytecode will have
+popped <var>a</var> and <var>b</var> from the stack, and replaced them with a
+single value, <var>a+b</var>.  There may be other values on the stack below
+those shown, but the bytecode affects only those shown.
+
+   <p>Here is another example:
+
+     <dl>
+<dt><code>const8</code> (0x22) <var>n</var>: &rArr; <var>n</var><dd>Push the 8-bit integer constant <var>n</var> on the stack, without sign
+extension.
+
+   </dl>
+
+   <p>In this example, the bytecode <code>const8</code> takes an operand <var>n</var>
+directly from the bytecode stream; the operand follows the <code>const8</code>
+bytecode itself.  We write any such operands immediately after the name
+of the bytecode, before the colon, and describe the exact encoding of
+the operand in the bytecode stream in the body of the bytecode
+description.
+
+   <p>For the <code>const8</code> bytecode, there are no stack items given before
+the &rArr;; this simply means that the bytecode consumes no values
+from the stack.  If a bytecode consumes no values, or produces no
+values, the list on either side of the &rArr; may be empty.
+
+   <p>If a value is written as <var>a</var>, <var>b</var>, or <var>n</var>, then the bytecode
+treats it as an integer.  If a value is written is <var>addr</var>, then the
+bytecode treats it as an address.
+
+   <p>We do not fully describe the floating point operations here; although
+this design can be extended in a clean way to handle floating point
+values, they are not of immediate interest to the customer, so we avoid
+describing them, to save time.
+
+     <dl>
+<dt><code>float</code> (0x01): &rArr;<dd>
+Prefix for floating-point bytecodes.  Not implemented yet.
+
+     <br><dt><code>add</code> (0x02): <var>a</var> <var>b</var> &rArr; <var>a+b</var><dd>Pop two integers from the stack, and push their sum, as an integer.
+
+     <br><dt><code>sub</code> (0x03): <var>a</var> <var>b</var> &rArr; <var>a-b</var><dd>Pop two integers from the stack, subtract the top value from the
+next-to-top value, and push the difference.
+
+     <br><dt><code>mul</code> (0x04): <var>a</var> <var>b</var> &rArr; <var>a*b</var><dd>Pop two integers from the stack, multiply them, and push the product on
+the stack.  Note that, when one multiplies two <var>n</var>-bit numbers
+yielding another <var>n</var>-bit number, it is irrelevant whether the
+numbers are signed or not; the results are the same.
+
+     <br><dt><code>div_signed</code> (0x05): <var>a</var> <var>b</var> &rArr; <var>a/b</var><dd>Pop two signed integers from the stack; divide the next-to-top value by
+the top value, and push the quotient.  If the divisor is zero, terminate
+with an error.
+
+     <br><dt><code>div_unsigned</code> (0x06): <var>a</var> <var>b</var> &rArr; <var>a/b</var><dd>Pop two unsigned integers from the stack; divide the next-to-top value
+by the top value, and push the quotient.  If the divisor is zero,
+terminate with an error.
+
+     <br><dt><code>rem_signed</code> (0x07): <var>a</var> <var>b</var> &rArr; <var>a modulo b</var><dd>Pop two signed integers from the stack; divide the next-to-top value by
+the top value, and push the remainder.  If the divisor is zero,
+terminate with an error.
+
+     <br><dt><code>rem_unsigned</code> (0x08): <var>a</var> <var>b</var> &rArr; <var>a modulo b</var><dd>Pop two unsigned integers from the stack; divide the next-to-top value
+by the top value, and push the remainder.  If the divisor is zero,
+terminate with an error.
+
+     <br><dt><code>lsh</code> (0x09): <var>a</var> <var>b</var> &rArr; <var>a&lt;&lt;b</var><dd>Pop two integers from the stack; let <var>a</var> be the next-to-top value,
+and <var>b</var> be the top value.  Shift <var>a</var> left by <var>b</var> bits, and
+push the result.
+
+     <br><dt><code>rsh_signed</code> (0x0a): <var>a</var> <var>b</var> &rArr; <code>(signed)</code><var>a&gt;&gt;b</var><dd>Pop two integers from the stack; let <var>a</var> be the next-to-top value,
+and <var>b</var> be the top value.  Shift <var>a</var> right by <var>b</var> bits,
+inserting copies of the top bit at the high end, and push the result.
+
+     <br><dt><code>rsh_unsigned</code> (0x0b): <var>a</var> <var>b</var> &rArr; <var>a&gt;&gt;b</var><dd>Pop two integers from the stack; let <var>a</var> be the next-to-top value,
+and <var>b</var> be the top value.  Shift <var>a</var> right by <var>b</var> bits,
+inserting zero bits at the high end, and push the result.
+
+     <br><dt><code>log_not</code> (0x0e): <var>a</var> &rArr; <var>!a</var><dd>Pop an integer from the stack; if it is zero, push the value one;
+otherwise, push the value zero.
+
+     <br><dt><code>bit_and</code> (0x0f): <var>a</var> <var>b</var> &rArr; <var>a&amp;b</var><dd>Pop two integers from the stack, and push their bitwise <code>and</code>.
+
+     <br><dt><code>bit_or</code> (0x10): <var>a</var> <var>b</var> &rArr; <var>a|b</var><dd>Pop two integers from the stack, and push their bitwise <code>or</code>.
+
+     <br><dt><code>bit_xor</code> (0x11): <var>a</var> <var>b</var> &rArr; <var>a^b</var><dd>Pop two integers from the stack, and push their bitwise
+exclusive-<code>or</code>.
+
+     <br><dt><code>bit_not</code> (0x12): <var>a</var> &rArr; <var>~a</var><dd>Pop an integer from the stack, and push its bitwise complement.
+
+     <br><dt><code>equal</code> (0x13): <var>a</var> <var>b</var> &rArr; <var>a=b</var><dd>Pop two integers from the stack; if they are equal, push the value one;
+otherwise, push the value zero.
+
+     <br><dt><code>less_signed</code> (0x14): <var>a</var> <var>b</var> &rArr; <var>a&lt;b</var><dd>Pop two signed integers from the stack; if the next-to-top value is less
+than the top value, push the value one; otherwise, push the value zero.
+
+     <br><dt><code>less_unsigned</code> (0x15): <var>a</var> <var>b</var> &rArr; <var>a&lt;b</var><dd>Pop two unsigned integers from the stack; if the next-to-top value is less
+than the top value, push the value one; otherwise, push the value zero.
+
+     <br><dt><code>ext</code> (0x16) <var>n</var>: <var>a</var> &rArr; <var>a</var>, sign-extended from <var>n</var> bits<dd>Pop an unsigned value from the stack; treating it as an <var>n</var>-bit
+twos-complement value, extend it to full length.  This means that all
+bits to the left of bit <var>n-1</var> (where the least significant bit is bit
+0) are set to the value of bit <var>n-1</var>.  Note that <var>n</var> may be
+larger than or equal to the width of the stack elements of the bytecode
+engine; in this case, the bytecode should have no effect.
+
+     <p>The number of source bits to preserve, <var>n</var>, is encoded as a single
+byte unsigned integer following the <code>ext</code> bytecode.
+
+     <br><dt><code>zero_ext</code> (0x2a) <var>n</var>: <var>a</var> &rArr; <var>a</var>, zero-extended from <var>n</var> bits<dd>Pop an unsigned value from the stack; zero all but the bottom <var>n</var>
+bits.  This means that all bits to the left of bit <var>n-1</var> (where the
+least significant bit is bit 0) are set to the value of bit <var>n-1</var>.
+
+     <p>The number of source bits to preserve, <var>n</var>, is encoded as a single
+byte unsigned integer following the <code>zero_ext</code> bytecode.
+
+     <br><dt><code>ref8</code> (0x17): <var>addr</var> &rArr; <var>a</var><dt><code>ref16</code> (0x18): <var>addr</var> &rArr; <var>a</var><dt><code>ref32</code> (0x19): <var>addr</var> &rArr; <var>a</var><dt><code>ref64</code> (0x1a): <var>addr</var> &rArr; <var>a</var><dd>Pop an address <var>addr</var> from the stack.  For bytecode
+<code>ref</code><var>n</var>, fetch an <var>n</var>-bit value from <var>addr</var>, using the
+natural target endianness.  Push the fetched value as an unsigned
+integer.
+
+     <p>Note that <var>addr</var> may not be aligned in any particular way; the
+<code>ref</code><var>n</var> bytecodes should operate correctly for any address.
+
+     <p>If attempting to access memory at <var>addr</var> would cause a processor
+exception of some sort, terminate with an error.
+
+     <br><dt><code>ref_float</code> (0x1b): <var>addr</var> &rArr; <var>d</var><dt><code>ref_double</code> (0x1c): <var>addr</var> &rArr; <var>d</var><dt><code>ref_long_double</code> (0x1d): <var>addr</var> &rArr; <var>d</var><dt><code>l_to_d</code> (0x1e): <var>a</var> &rArr; <var>d</var><dt><code>d_to_l</code> (0x1f): <var>d</var> &rArr; <var>a</var><dd>Not implemented yet.
+
+     <br><dt><code>dup</code> (0x28): <var>a</var> =&gt; <var>a</var> <var>a</var><dd>Push another copy of the stack's top element.
+
+     <br><dt><code>swap</code> (0x2b): <var>a</var> <var>b</var> =&gt; <var>b</var> <var>a</var><dd>Exchange the top two items on the stack.
+
+     <br><dt><code>pop</code> (0x29): <var>a</var> =&gt;<dd>Discard the top value on the stack.
+
+     <br><dt><code>if_goto</code> (0x20) <var>offset</var>: <var>a</var> &rArr;<dd>Pop an integer off the stack; if it is non-zero, branch to the given
+offset in the bytecode string.  Otherwise, continue to the next
+instruction in the bytecode stream.  In other words, if <var>a</var> is
+non-zero, set the <code>pc</code> register to <code>start</code> + <var>offset</var>. 
+Thus, an offset of zero denotes the beginning of the expression.
+
+     <p>The <var>offset</var> is stored as a sixteen-bit unsigned value, stored
+immediately following the <code>if_goto</code> bytecode.  It is always stored
+most significant byte first, regardless of the target's normal
+endianness.  The offset is not guaranteed to fall at any particular
+alignment within the bytecode stream; thus, on machines where fetching a
+16-bit on an unaligned address raises an exception, you should fetch the
+offset one byte at a time.
+
+     <br><dt><code>goto</code> (0x21) <var>offset</var>: &rArr;<dd>Branch unconditionally to <var>offset</var>; in other words, set the
+<code>pc</code> register to <code>start</code> + <var>offset</var>.
+
+     <p>The offset is stored in the same way as for the <code>if_goto</code> bytecode.
+
+     <br><dt><code>const8</code> (0x22) <var>n</var>: &rArr; <var>n</var><dt><code>const16</code> (0x23) <var>n</var>: &rArr; <var>n</var><dt><code>const32</code> (0x24) <var>n</var>: &rArr; <var>n</var><dt><code>const64</code> (0x25) <var>n</var>: &rArr; <var>n</var><dd>Push the integer constant <var>n</var> on the stack, without sign extension. 
+To produce a small negative value, push a small twos-complement value,
+and then sign-extend it using the <code>ext</code> bytecode.
+
+     <p>The constant <var>n</var> is stored in the appropriate number of bytes
+following the <code>const</code><var>b</var> bytecode.  The constant <var>n</var> is
+always stored most significant byte first, regardless of the target's
+normal endianness.  The constant is not guaranteed to fall at any
+particular alignment within the bytecode stream; thus, on machines where
+fetching a 16-bit on an unaligned address raises an exception, you
+should fetch <var>n</var> one byte at a time.
+
+     <br><dt><code>reg</code> (0x26) <var>n</var>: &rArr; <var>a</var><dd>Push the value of register number <var>n</var>, without sign extension.  The
+registers are numbered following GDB's conventions.
+
+     <p>The register number <var>n</var> is encoded as a 16-bit unsigned integer
+immediately following the <code>reg</code> bytecode.  It is always stored most
+significant byte first, regardless of the target's normal endianness. 
+The register number is not guaranteed to fall at any particular
+alignment within the bytecode stream; thus, on machines where fetching a
+16-bit on an unaligned address raises an exception, you should fetch the
+register number one byte at a time.
+
+     <br><dt><code>getv</code> (0x2c) <var>n</var>: &rArr; <var>v</var><dd>Push the value of trace state variable number <var>n</var>, without sign
+extension.
+
+     <p>The variable number <var>n</var> is encoded as a 16-bit unsigned integer
+immediately following the <code>getv</code> bytecode.  It is always stored most
+significant byte first, regardless of the target's normal endianness. 
+The variable number is not guaranteed to fall at any particular
+alignment within the bytecode stream; thus, on machines where fetching a
+16-bit on an unaligned address raises an exception, you should fetch the
+register number one byte at a time.
+
+     <br><dt><code>setv</code> (0x2d) <var>n</var>: &rArr; <var>v</var><dd>Set trace state variable number <var>n</var> to the value found on the top
+of the stack.  The stack is unchanged, so that the value is readily
+available if the assignment is part of a larger expression.  The
+handling of <var>n</var> is as described for <code>getv</code>.
+
+     <br><dt><code>trace</code> (0x0c): <var>addr</var> <var>size</var> &rArr;<dd>Record the contents of the <var>size</var> bytes at <var>addr</var> in a trace
+buffer, for later retrieval by GDB.
+
+     <br><dt><code>trace_quick</code> (0x0d) <var>size</var>: <var>addr</var> &rArr; <var>addr</var><dd>Record the contents of the <var>size</var> bytes at <var>addr</var> in a trace
+buffer, for later retrieval by GDB.  <var>size</var> is a single byte
+unsigned integer following the <code>trace</code> opcode.
+
+     <p>This bytecode is equivalent to the sequence <code>dup const8 </code><var>size</var><code>
+trace</code>, but we provide it anyway to save space in bytecode strings.
+
+     <br><dt><code>trace16</code> (0x30) <var>size</var>: <var>addr</var> &rArr; <var>addr</var><dd>Identical to trace_quick, except that <var>size</var> is a 16-bit big-endian
+unsigned integer, not a single byte.  This should probably have been
+named <code>trace_quick16</code>, for consistency.
+
+     <br><dt><code>tracev</code> (0x2e) <var>n</var>: &rArr; <var>a</var><dd>Record the value of trace state variable number <var>n</var> in the trace
+buffer.  The handling of <var>n</var> is as described for <code>getv</code>.
+
+     <br><dt><code>end</code> (0x27): &rArr;<dd>Stop executing bytecode; the result should be the top element of the
+stack.  If the purpose of the expression was to compute an lvalue or a
+range of memory, then the next-to-top of the stack is the lvalue's
+address, and the top of the stack is the lvalue's size, in bytes.
+
+   </dl>
+
+   </body></html>
+

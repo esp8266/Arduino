@@ -1,0 +1,147 @@
+<html lang="en">
+<head>
+<title>Additions to Ada - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Ada.html#Ada" title="Ada">
+<link rel="prev" href="Omissions-from-Ada.html#Omissions-from-Ada" title="Omissions from Ada">
+<link rel="next" href="Stopping-Before-Main-Program.html#Stopping-Before-Main-Program" title="Stopping Before Main Program">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Additions-to-Ada"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Stopping-Before-Main-Program.html#Stopping-Before-Main-Program">Stopping Before Main Program</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Omissions-from-Ada.html#Omissions-from-Ada">Omissions from Ada</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Ada.html#Ada">Ada</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">15.4.7.3 Additions to Ada</h5>
+
+<p><a name="index-Ada_002c-deviations-from-865"></a>
+As it does for other languages, <span class="sc">gdb</span> makes certain generic
+extensions to Ada (see <a href="Expressions.html#Expressions">Expressions</a>):
+
+     <ul>
+<li>If the expression <var>E</var> is a variable residing in memory (typically
+a local variable or array element) and <var>N</var> is a positive integer,
+then <var>E</var><code>@</code><var>N</var> displays the values of <var>E</var> and the
+<var>N</var>-1 adjacent variables following it in memory as an array.  In
+Ada, this operator is generally not necessary, since its prime use is
+in displaying parts of an array, and slicing will usually do this in
+Ada.  However, there are occasional uses when debugging programs in
+which certain debugging information has been optimized away.
+
+     <li><var>B</var><code>::</code><var>var</var> means &ldquo;the variable named <var>var</var> that
+appears in function or file <var>B</var>.&rdquo;  When <var>B</var> is a file name,
+you must typically surround it in single quotes.
+
+     <li>The expression <code>{</code><var>type</var><code>} </code><var>addr</var> means &ldquo;the variable of type
+<var>type</var> that appears at address <var>addr</var>.&rdquo;
+
+     <li>A name starting with &lsquo;<samp><span class="samp">$</span></samp>&rsquo; is a convenience variable
+(see <a href="Convenience-Vars.html#Convenience-Vars">Convenience Vars</a>) or a machine register (see <a href="Registers.html#Registers">Registers</a>). 
+</ul>
+
+   <p>In addition, <span class="sc">gdb</span> provides a few other shortcuts and outright
+additions specific to Ada:
+
+     <ul>
+<li>The assignment statement is allowed as an expression, returning
+its right-hand operand as its value.  Thus, you may enter
+
+     <pre class="smallexample">          (gdb) set x := y + 3
+          (gdb) print A(tmp := y + 1)
+</pre>
+     <li>The semicolon is allowed as an &ldquo;operator,&rdquo;  returning as its value
+the value of its right-hand operand. 
+This allows, for example,
+complex conditional breaks:
+
+     <pre class="smallexample">          (gdb) break f
+          (gdb) condition 1 (report(i); k += 1; A(k) &gt; 100)
+</pre>
+     <li>Rather than use catenation and symbolic character names to introduce special
+characters into strings, one may instead use a special bracket notation,
+which is also used to print strings.  A sequence of characters of the form
+&lsquo;<samp><span class="samp">["</span><var>XX</var><span class="samp">"]</span></samp>&rsquo; within a string or character literal denotes the
+(single) character whose numeric encoding is <var>XX</var> in hexadecimal.  The
+sequence of characters &lsquo;<samp><span class="samp">["""]</span></samp>&rsquo; also denotes a single quotation mark
+in strings.   For example,
+     <pre class="smallexample">             "One line.["0a"]Next line.["0a"]"
+</pre>
+     <p class="noindent">contains an ASCII newline character (<code>Ada.Characters.Latin_1.LF</code>)
+after each period.
+
+     <li>The subtype used as a prefix for the attributes <tt>'Pos</tt>, <tt>'Min</tt>, and
+<tt>'Max</tt> is optional (and is ignored in any case).  For example, it is valid
+to write
+
+     <pre class="smallexample">          (gdb) print 'max(x, y)
+</pre>
+     <li>When printing arrays, <span class="sc">gdb</span> uses positional notation when the
+array has a lower bound of 1, and uses a modified named notation otherwise. 
+For example, a one-dimensional array of three integers with a lower bound
+of 3 might print as
+
+     <pre class="smallexample">          (3 =&gt; 10, 17, 1)
+</pre>
+     <p class="noindent">That is, in contrast to valid Ada, only the first component has a <code>=&gt;</code>
+clause.
+
+     <li>You may abbreviate attributes in expressions with any unique,
+multi-character subsequence of
+their names (an exact match gets preference). 
+For example, you may use <tt>a'len</tt>, <tt>a'gth</tt>, or <tt>a'lh</tt>
+in place of  <tt>a'length</tt>.
+
+     <li><a name="index-quoting-Ada-internal-identifiers-866"></a>Since Ada is case-insensitive, the debugger normally maps identifiers you type
+to lower case.  The GNAT compiler uses upper-case characters for
+some of its internal identifiers, which are normally of no interest to users. 
+For the rare occasions when you actually have to look at them,
+enclose them in angle brackets to avoid the lower-case mapping. 
+For example,
+     <pre class="smallexample">          (gdb) print &lt;JMPBUF_SAVE&gt;[0]
+</pre>
+     <li>Printing an object of class-wide type or dereferencing an
+access-to-class-wide value will display all the components of the object's
+specific type (as indicated by its run-time tag).  Likewise, component
+selection on such a value will operate on the specific type of the
+object.
+
+   </ul>
+
+   </body></html>
+

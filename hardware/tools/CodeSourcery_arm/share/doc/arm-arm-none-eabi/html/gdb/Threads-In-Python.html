@@ -1,0 +1,114 @@
+<html lang="en">
+<head>
+<title>Threads In Python - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Python-API.html#Python-API" title="Python API">
+<link rel="prev" href="Inferiors-In-Python.html#Inferiors-In-Python" title="Inferiors In Python">
+<link rel="next" href="Commands-In-Python.html#Commands-In-Python" title="Commands In Python">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Threads-In-Python"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Commands-In-Python.html#Commands-In-Python">Commands In Python</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Inferiors-In-Python.html#Inferiors-In-Python">Inferiors In Python</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Python-API.html#Python-API">Python API</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">23.2.2.9 Threads In Python</h5>
+
+<p><a name="index-threads-in-python-1713"></a>
+<a name="index-gdb_002eInferiorThread-1714"></a>Python scripts can access information about, and manipulate inferior threads
+controlled by <span class="sc">gdb</span>, via objects of the <code>gdb.InferiorThread</code> class.
+
+   <p>The following thread-related functions are available in the <code>gdb</code>
+module:
+
+   <p><a name="index-gdb_002eselected_005fthread-1715"></a>
+
+<div class="defun">
+&mdash; Function: <b>selected_thread</b><var><a name="index-selected_005fthread-1716"></a></var><br>
+<blockquote><p>This function returns the thread object for the selected thread.  If there
+is no selected thread, this will return <code>None</code>. 
+</p></blockquote></div>
+
+   <p>A <code>gdb.InferiorThread</code> object has the following attributes:
+
+     <dl>
+
+     <div class="defun">
+&mdash; Instance Variable of InferiorThread: <b>num</b><var><a name="index-num-1717"></a></var><br>
+<blockquote> <p>ID of the thread, as assigned by GDB. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Instance Variable of InferiorThread: <b>ptid</b><var><a name="index-ptid-1718"></a></var><br>
+<blockquote> <p>ID of the thread, as assigned by the operating system.  This attribute is a
+tuple containing three integers.  The first is the Process ID (PID); the second
+is the Lightweight Process ID (LWPID), and the third is the Thread ID (TID). 
+Either the LWPID or TID may be 0, which indicates that the operating system
+does not  use that identifier. 
+</p></blockquote></div>
+     </dl>
+
+   <p>A <code>gdb.InferiorThread</code> object has the following methods:
+
+     <dl>
+
+     <div class="defun">
+&mdash; Method on InferiorThread: <b>switch</b><var><a name="index-switch-on-InferiorThread-1719"></a></var><br>
+<blockquote> <p>This changes <span class="sc">gdb</span>'s currently selected thread to the one represented
+by this object. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on InferiorThread: <b>is_stopped</b><var><a name="index-is_005fstopped-on-InferiorThread-1720"></a></var><br>
+<blockquote> <p>Return a Boolean indicating whether the thread is stopped. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on InferiorThread: <b>is_running</b><var><a name="index-is_005frunning-on-InferiorThread-1721"></a></var><br>
+<blockquote> <p>Return a Boolean indicating whether the thread is running. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on InferiorThread: <b>is_exited</b><var><a name="index-is_005fexited-on-InferiorThread-1722"></a></var><br>
+<blockquote> <p>Return a Boolean indicating whether the thread is exited. 
+</p></blockquote></div>
+     </dl>
+
+   </body></html>
+

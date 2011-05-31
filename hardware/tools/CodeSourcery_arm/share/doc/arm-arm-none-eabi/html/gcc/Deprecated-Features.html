@@ -1,0 +1,120 @@
+<html lang="en">
+<head>
+<title>Deprecated Features - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C_002b_002b-Extensions.html#C_002b_002b-Extensions" title="C++ Extensions">
+<link rel="prev" href="Java-Exceptions.html#Java-Exceptions" title="Java Exceptions">
+<link rel="next" href="Backwards-Compatibility.html#Backwards-Compatibility" title="Backwards Compatibility">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Deprecated-Features"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Backwards-Compatibility.html#Backwards-Compatibility">Backwards Compatibility</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Java-Exceptions.html#Java-Exceptions">Java Exceptions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C_002b_002b-Extensions.html#C_002b_002b-Extensions">C++ Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">7.11 Deprecated Features</h3>
+
+<p>In the past, the GNU C++ compiler was extended to experiment with new
+features, at a time when the C++ language was still evolving.  Now that
+the C++ standard is complete, some of those features are superseded by
+superior alternatives.  Using the old features might cause a warning in
+some cases that the feature will be dropped in the future.  In other
+cases, the feature might be gone already.
+
+ <p>While the list below is not exhaustive, it documents some of the options
+that are now deprecated:
+
+     <dl>
+<dt><code>-fexternal-templates</code><dt><code>-falt-external-templates</code><dd>These are two of the many ways for G++ to implement template
+instantiation.  See <a href="Template-Instantiation.html#Template-Instantiation">Template Instantiation</a>.  The C++ standard clearly
+defines how template definitions have to be organized across
+implementation units.  G++ has an implicit instantiation mechanism that
+should work just fine for standard-conforming code.
+
+     <br><dt><code>-fstrict-prototype</code><dt><code>-fno-strict-prototype</code><dd>Previously it was possible to use an empty prototype parameter list to
+indicate an unspecified number of parameters (like C), rather than no
+parameters, as C++ demands.  This feature has been removed, except where
+it is required for backwards compatibility.   See <a href="Backwards-Compatibility.html#Backwards-Compatibility">Backwards Compatibility</a>. 
+</dl>
+
+ <p>G++ allows a virtual function returning &lsquo;<samp><span class="samp">void *</span></samp>&rsquo; to be overridden
+by one returning a different pointer type.  This extension to the
+covariant return type rules is now deprecated and will be removed from a
+future version.
+
+ <p>The G++ minimum and maximum operators (&lsquo;<samp><span class="samp">&lt;?</span></samp>&rsquo; and &lsquo;<samp><span class="samp">&gt;?</span></samp>&rsquo;) and
+their compound forms (&lsquo;<samp><span class="samp">&lt;?=</span></samp>&rsquo;) and &lsquo;<samp><span class="samp">&gt;?=</span></samp>&rsquo;) have been deprecated
+and are now removed from G++.  Code using these operators should be
+modified to use <code>std::min</code> and <code>std::max</code> instead.
+
+ <p>The named return value extension has been deprecated, and is now
+removed from G++.
+
+ <p>The use of initializer lists with new expressions has been deprecated,
+and is now removed from G++.
+
+ <p>Floating and complex non-type template parameters have been deprecated,
+and are now removed from G++.
+
+ <p>The implicit typename extension has been deprecated and is now
+removed from G++.
+
+ <p>The use of default arguments in function pointers, function typedefs
+and other places where they are not permitted by the standard is
+deprecated and will be removed from a future version of G++.
+
+ <p>G++ allows floating-point literals to appear in integral constant expressions,
+e.g. &lsquo;<samp><span class="samp"> enum E { e = int(2.2 * 3.7) } </span></samp>&rsquo;
+This extension is deprecated and will be removed from a future version.
+
+ <p>G++ allows static data members of const floating-point type to be declared
+with an initializer in a class definition. The standard only allows
+initializers for static members of const integral types and const
+enumeration types so this extension has been deprecated and will be removed
+from a future version.
+
+ </body></html>
+

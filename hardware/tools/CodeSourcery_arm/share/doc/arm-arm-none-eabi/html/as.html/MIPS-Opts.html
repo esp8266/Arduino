@@ -1,0 +1,323 @@
+<html lang="en">
+<head>
+<title>MIPS Opts - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="MIPS_002dDependent.html#MIPS_002dDependent" title="MIPS-Dependent">
+<link rel="next" href="MIPS-Object.html#MIPS-Object" title="MIPS Object">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="MIPS-Opts"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="MIPS-Object.html#MIPS-Object">MIPS Object</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="MIPS_002dDependent.html#MIPS_002dDependent">MIPS-Dependent</a>
+<hr>
+</div>
+
+<h4 class="subsection">9.24.1 Assembler options</h4>
+
+<p>The <span class="sc">mips</span> configurations of <span class="sc">gnu</span> <code>as</code> support these
+special options:
+
+     
+<a name="index-g_t_0040code_007b_002dG_007d-option-_0028MIPS_0029-1252"></a>
+<dl><dt><code>-G </code><var>num</var><dd>This option sets the largest size of an object that can be referenced
+implicitly with the <code>gp</code> register.  It is only accepted for targets
+that use <span class="sc">ecoff</span> format.  The default value is 8.
+
+     <p><a name="index-g_t_0040code_007b_002dEB_007d-option-_0028MIPS_0029-1253"></a><a name="index-g_t_0040code_007b_002dEL_007d-option-_0028MIPS_0029-1254"></a><a name="index-MIPS-big_002dendian-output-1255"></a><a name="index-MIPS-little_002dendian-output-1256"></a><a name="index-big_002dendian-output_002c-MIPS-1257"></a><a name="index-little_002dendian-output_002c-MIPS-1258"></a><br><dt><code>-EB</code><dt><code>-EL</code><dd>Any <span class="sc">mips</span> configuration of <code>as</code> can select big-endian or
+little-endian output at run time (unlike the other <span class="sc">gnu</span> development
+tools, which must be configured for one or the other).  Use &lsquo;<samp><span class="samp">-EB</span></samp>&rsquo;
+to select big-endian output, and &lsquo;<samp><span class="samp">-EL</span></samp>&rsquo; for little-endian.
+
+     <br><dt><code>-KPIC</code><dd><a name="index-PIC-selection_002c-MIPS-1259"></a><a name="index-g_t_0040option_007b_002dKPIC_007d-option_002c-MIPS-1260"></a>Generate SVR4-style PIC.  This option tells the assembler to generate
+SVR4-style position-independent macro expansions.  It also tells the
+assembler to mark the output file as PIC.
+
+     <br><dt><code>-mvxworks-pic</code><dd><a name="index-g_t_0040option_007b_002dmvxworks_002dpic_007d-option_002c-MIPS-1261"></a>Generate VxWorks PIC.  This option tells the assembler to generate
+VxWorks-style position-independent macro expansions.
+
+     <p><a name="index-MIPS-architecture-options-1262"></a><br><dt><code>-mips1</code><dt><code>-mips2</code><dt><code>-mips3</code><dt><code>-mips4</code><dt><code>-mips5xo</code><dt><code>-mips32</code><dt><code>-mips32r2</code><dt><code>-mips64</code><dt><code>-mips64r2</code><dd>Generate code for a particular MIPS Instruction Set Architecture level. 
+&lsquo;<samp><span class="samp">-mips1</span></samp>&rsquo; corresponds to the <span class="sc">r2000</span> and <span class="sc">r3000</span> processors,
+&lsquo;<samp><span class="samp">-mips2</span></samp>&rsquo; to the <span class="sc">r6000</span> processor, &lsquo;<samp><span class="samp">-mips3</span></samp>&rsquo; to the
+<span class="sc">r4000</span> processor, and &lsquo;<samp><span class="samp">-mips4</span></samp>&rsquo; to the <span class="sc">r8000</span> and
+<span class="sc">r10000</span> processors.  &lsquo;<samp><span class="samp">-mips5</span></samp>&rsquo;, &lsquo;<samp><span class="samp">-mips32</span></samp>&rsquo;, &lsquo;<samp><span class="samp">-mips32r2</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">-mips64</span></samp>&rsquo;, and &lsquo;<samp><span class="samp">-mips64r2</span></samp>&rsquo;
+correspond to generic
+<span class="sc">MIPS V</span>, <span class="sc">MIPS32</span>, <span class="sc">MIPS32 Release 2</span>, <span class="sc">MIPS64</span>,
+and <span class="sc">MIPS64 Release 2</span>
+ISA processors, respectively.  You can also switch
+instruction sets during the assembly; see <a href="MIPS-ISA.html#MIPS-ISA">Directives to override the ISA level</a>.
+
+     <br><dt><code>-mgp32</code><dt><code>-mfp32</code><dd>Some macros have different expansions for 32-bit and 64-bit registers. 
+The register sizes are normally inferred from the ISA and ABI, but these
+flags force a certain group of registers to be treated as 32 bits wide at
+all times.  &lsquo;<samp><span class="samp">-mgp32</span></samp>&rsquo; controls the size of general-purpose registers
+and &lsquo;<samp><span class="samp">-mfp32</span></samp>&rsquo; controls the size of floating-point registers.
+
+     <p>The <code>.set gp=32</code> and <code>.set fp=32</code> directives allow the size
+of registers to be changed for parts of an object. The default value is
+restored by <code>.set gp=default</code> and <code>.set fp=default</code>.
+
+     <p>On some MIPS variants there is a 32-bit mode flag; when this flag is
+set, 64-bit instructions generate a trap.  Also, some 32-bit OSes only
+save the 32-bit registers on a context switch, so it is essential never
+to use the 64-bit registers.
+
+     <br><dt><code>-mgp64</code><dt><code>-mfp64</code><dd>Assume that 64-bit registers are available.  This is provided in the
+interests of symmetry with &lsquo;<samp><span class="samp">-mgp32</span></samp>&rsquo; and &lsquo;<samp><span class="samp">-mfp32</span></samp>&rsquo;.
+
+     <p>The <code>.set gp=64</code> and <code>.set fp=64</code> directives allow the size
+of registers to be changed for parts of an object. The default value is
+restored by <code>.set gp=default</code> and <code>.set fp=default</code>.
+
+     <br><dt><code>-mips16</code><dt><code>-no-mips16</code><dd>Generate code for the MIPS 16 processor.  This is equivalent to putting
+<code>.set mips16</code> at the start of the assembly file.  &lsquo;<samp><span class="samp">-no-mips16</span></samp>&rsquo;
+turns off this option.
+
+     <br><dt><code>-mmicromips</code><dt><code>-mno-micromips</code><dd>Generate code for the microMIPS processor.  This is equivalent to putting
+<code>.set micromips</code> at the start of the assembly file.  &lsquo;<samp><span class="samp">-mno-micromips</span></samp>&rsquo;
+turns off this option.  This is equivalent to putting <code>.set nomicromips</code>
+at the start of the assembly file.
+
+     <br><dt><code>-msmartmips</code><dt><code>-mno-smartmips</code><dd>Enables the SmartMIPS extensions to the MIPS32 instruction set, which
+provides a number of new instructions which target smartcard and
+cryptographic applications.  This is equivalent to putting
+<code>.set smartmips</code> at the start of the assembly file. 
+&lsquo;<samp><span class="samp">-mno-smartmips</span></samp>&rsquo; turns off this option.
+
+     <br><dt><code>-mips3d</code><dt><code>-no-mips3d</code><dd>Generate code for the MIPS-3D Application Specific Extension. 
+This tells the assembler to accept MIPS-3D instructions. 
+&lsquo;<samp><span class="samp">-no-mips3d</span></samp>&rsquo; turns off this option.
+
+     <br><dt><code>-mdmx</code><dt><code>-no-mdmx</code><dd>Generate code for the MDMX Application Specific Extension. 
+This tells the assembler to accept MDMX instructions. 
+&lsquo;<samp><span class="samp">-no-mdmx</span></samp>&rsquo; turns off this option.
+
+     <br><dt><code>-mdsp</code><dt><code>-mno-dsp</code><dd>Generate code for the DSP Release 1 Application Specific Extension. 
+This tells the assembler to accept DSP Release 1 instructions. 
+&lsquo;<samp><span class="samp">-mno-dsp</span></samp>&rsquo; turns off this option.
+
+     <br><dt><code>-mdspr2</code><dt><code>-mno-dspr2</code><dd>Generate code for the DSP Release 2 Application Specific Extension. 
+This option implies -mdsp. 
+This tells the assembler to accept DSP Release 2 instructions. 
+&lsquo;<samp><span class="samp">-mno-dspr2</span></samp>&rsquo; turns off this option.
+
+     <br><dt><code>-mmt</code><dt><code>-mno-mt</code><dd>Generate code for the MT Application Specific Extension. 
+This tells the assembler to accept MT instructions. 
+&lsquo;<samp><span class="samp">-mno-mt</span></samp>&rsquo; turns off this option.
+
+     <br><dt><code>-mmcu</code><dt><code>-mno-mcu</code><dd>Generate code for the MCU Application Specific Extension. 
+This tells the assembler to accept MCU instructions. 
+&lsquo;<samp><span class="samp">-mno-mcu</span></samp>&rsquo; turns off this option.
+
+     <br><dt><code>-mfix7000</code><dt><code>-mno-fix7000</code><dd>Cause nops to be inserted if the read of the destination register
+of an mfhi or mflo instruction occurs in the following two instructions.
+
+     <br><dt><code>-mfix-loongson2f-jump</code><dt><code>-mno-fix-loongson2f-jump</code><dd>Eliminate instruction fetch from outside 256M region to work around the
+Loongson2F &lsquo;<samp><span class="samp">jump</span></samp>&rsquo; instructions.  Without it, under extreme cases,
+the kernel may crash.  The issue has been solved in latest processor
+batches, but this fix has no side effect to them.
+
+     <br><dt><code>-mfix-loongson2f-nop</code><dt><code>-mno-fix-loongson2f-nop</code><dd>Replace nops by <code>or at,at,zero</code> to work around the Loongson2F
+&lsquo;<samp><span class="samp">nop</span></samp>&rsquo; errata.  Without it, under extreme cases, cpu might
+deadlock.  The issue has been solved in latest loongson2f batches, but
+this fix has no side effect to them.
+
+     <br><dt><code>-mfix-vr4120</code><dt><code>-mno-fix-vr4120</code><dd>Insert nops to work around certain VR4120 errata.  This option is
+intended to be used on GCC-generated code: it is not designed to catch
+all problems in hand-written assembler code.
+
+     <br><dt><code>-mfix-vr4130</code><dt><code>-mno-fix-vr4130</code><dd>Insert nops to work around the VR4130 &lsquo;<samp><span class="samp">mflo</span></samp>&rsquo;/&lsquo;<samp><span class="samp">mfhi</span></samp>&rsquo; errata.
+
+     <br><dt><code>-mfix-24k</code><dt><code>-no-mfix-24k</code><dd>Insert nops to work around the 24K &lsquo;<samp><span class="samp">eret</span></samp>&rsquo;/&lsquo;<samp><span class="samp">deret</span></samp>&rsquo; errata.
+
+     <br><dt><code>-m4010</code><dt><code>-no-m4010</code><dd>Generate code for the LSI <span class="sc">r4010</span> chip.  This tells the assembler to
+accept the <span class="sc">r4010</span> specific instructions (&lsquo;<samp><span class="samp">addciu</span></samp>&rsquo;, &lsquo;<samp><span class="samp">ffc</span></samp>&rsquo;,
+etc.), and to not schedule &lsquo;<samp><span class="samp">nop</span></samp>&rsquo; instructions around accesses to
+the &lsquo;<samp><span class="samp">HI</span></samp>&rsquo; and &lsquo;<samp><span class="samp">LO</span></samp>&rsquo; registers.  &lsquo;<samp><span class="samp">-no-m4010</span></samp>&rsquo; turns off this
+option.
+
+     <br><dt><code>-m4650</code><dt><code>-no-m4650</code><dd>Generate code for the MIPS <span class="sc">r4650</span> chip.  This tells the assembler to accept
+the &lsquo;<samp><span class="samp">mad</span></samp>&rsquo; and &lsquo;<samp><span class="samp">madu</span></samp>&rsquo; instruction, and to not schedule &lsquo;<samp><span class="samp">nop</span></samp>&rsquo;
+instructions around accesses to the &lsquo;<samp><span class="samp">HI</span></samp>&rsquo; and &lsquo;<samp><span class="samp">LO</span></samp>&rsquo; registers. 
+&lsquo;<samp><span class="samp">-no-m4650</span></samp>&rsquo; turns off this option.
+
+     <dt><code>-m3900</code><dt><code>-no-m3900</code><dt><code>-m4100</code><dt><code>-no-m4100</code><dd>For each option &lsquo;<samp><span class="samp">-m</span><var>nnnn</var></samp>&rsquo;, generate code for the MIPS
+<span class="sc">r</span><var>nnnn</var> chip.  This tells the assembler to accept instructions
+specific to that chip, and to schedule for that chip's hazards.
+
+     <br><dt><code>-march=</code><var>cpu</var><dd>Generate code for a particular MIPS cpu.  It is exactly equivalent to
+&lsquo;<samp><span class="samp">-m</span><var>cpu</var></samp>&rsquo;, except that there are more value of <var>cpu</var>
+understood.  Valid <var>cpu</var> value are:
+
+     <blockquote>
+2000,
+3000,
+3900,
+4000,
+4010,
+4100,
+4111,
+vr4120,
+vr4130,
+vr4181,
+4300,
+4400,
+4600,
+4650,
+5000,
+rm5200,
+rm5230,
+rm5231,
+rm5261,
+rm5721,
+vr5400,
+vr5500,
+6000,
+rm7000,
+8000,
+rm9000,
+10000,
+12000,
+14000,
+16000,
+4kc,
+4km,
+4kp,
+4ksc,
+4kec,
+4kem,
+4kep,
+4ksd,
+m4k,
+m4kp,
+m14k,
+m14kc,
+24kc,
+24kf2_1,
+24kf,
+24kf1_1,
+24kec,
+24kef2_1,
+24kef,
+24kef1_1,
+34kc,
+34kf2_1,
+34kf,
+34kf1_1,
+74kc,
+74kf2_1,
+74kf,
+74kf1_1,
+74kf3_2,
+1004kc,
+1004kf2_1,
+1004kf,
+1004kf1_1,
+5kc,
+5kf,
+20kc,
+25kf,
+sb1,
+sb1a,
+loongson2e,
+loongson2f,
+octeon,
+xlr
+</blockquote>
+
+     <p>For compatibility reasons, &lsquo;<samp><var>n</var><span class="samp">x</span></samp>&rsquo; and &lsquo;<samp><var>b</var><span class="samp">fx</span></samp>&rsquo; are
+accepted as synonyms for &lsquo;<samp><var>n</var><span class="samp">f1_1</span></samp>&rsquo;.  These values are
+deprecated.
+
+     <br><dt><code>-mtune=</code><var>cpu</var><dd>Schedule and tune for a particular MIPS cpu.  Valid <var>cpu</var> values are
+identical to &lsquo;<samp><span class="samp">-march=</span><var>cpu</var></samp>&rsquo;.
+
+     <br><dt><code>-mabi=</code><var>abi</var><dd>Record which ABI the source code uses.  The recognized arguments
+are: &lsquo;<samp><span class="samp">32</span></samp>&rsquo;, &lsquo;<samp><span class="samp">n32</span></samp>&rsquo;, &lsquo;<samp><span class="samp">o64</span></samp>&rsquo;, &lsquo;<samp><span class="samp">64</span></samp>&rsquo; and &lsquo;<samp><span class="samp">eabi</span></samp>&rsquo;.
+
+     <br><dt><code>-msym32</code><dt><code>-mno-sym32</code><dd><a name="index-g_t_002dmsym32-1263"></a><a name="index-g_t_002dmno_002dsym32-1264"></a>Equivalent to adding <code>.set sym32</code> or <code>.set nosym32</code> to
+the beginning of the assembler input.  See <a href="MIPS-symbol-sizes.html#MIPS-symbol-sizes">MIPS symbol sizes</a>.
+
+     <p><a name="index-g_t_0040code_007b_002dnocpp_007d-ignored-_0028MIPS_0029-1265"></a><br><dt><code>-nocpp</code><dd>This option is ignored.  It is accepted for command-line compatibility with
+other assemblers, which use it to turn off C style preprocessing.  With
+<span class="sc">gnu</span> <code>as</code>, there is no need for &lsquo;<samp><span class="samp">-nocpp</span></samp>&rsquo;, because the
+<span class="sc">gnu</span> assembler itself never runs the C preprocessor.
+
+     <br><dt><code>-msoft-float</code><dt><code>-mhard-float</code><dd>Disable or enable floating-point instructions.  Note that by default
+floating-point instructions are always allowed even with CPU targets
+that don't have support for these instructions.
+
+     <br><dt><code>-msingle-float</code><dt><code>-mdouble-float</code><dd>Disable or enable double-precision floating-point operations.  Note
+that by default double-precision floating-point operations are always
+allowed even with CPU targets that don't have support for these
+operations.
+
+     <br><dt><code>--construct-floats</code><dt><code>--no-construct-floats</code><dd>The <code>--no-construct-floats</code> option disables the construction of
+double width floating point constants by loading the two halves of the
+value into the two single width floating point registers that make up
+the double width register.  This feature is useful if the processor
+support the FR bit in its status  register, and this bit is known (by
+the programmer) to be set.  This bit prevents the aliasing of the double
+width register by the single width registers.
+
+     <p>By default <code>--construct-floats</code> is selected, allowing construction
+of these floating point constants.
+
+     <br><dt><code>--trap</code><dt><code>--no-break</code><dd><!-- FIXME!  (1) reflect these options (next item too) in option summaries; -->
+<!-- (2) stop teasing, say _which_ instructions expanded _how_. -->
+<code>as</code> automatically macro expands certain division and
+multiplication instructions to check for overflow and division by zero.  This
+option causes <code>as</code> to generate code to take a trap exception
+rather than a break exception when an error is detected.  The trap instructions
+are only supported at Instruction Set Architecture level 2 and higher.
+
+     <br><dt><code>--break</code><dt><code>--no-trap</code><dd>Generate code to take a break exception rather than a trap exception when an
+error is detected.  This is the default.
+
+     <br><dt><code>-mpdr</code><dt><code>-mno-pdr</code><dd>Control generation of <code>.pdr</code> sections.  Off by default on IRIX, on
+elsewhere.
+
+     <br><dt><code>-mshared</code><dt><code>-mno-shared</code><dd>When generating code using the Unix calling conventions (selected by
+&lsquo;<samp><span class="samp">-KPIC</span></samp>&rsquo; or &lsquo;<samp><span class="samp">-mcall_shared</span></samp>&rsquo;), gas will normally generate code
+which can go into a shared library.  The &lsquo;<samp><span class="samp">-mno-shared</span></samp>&rsquo; option
+tells gas to generate code which uses the calling convention, but can
+not go into a shared library.  The resulting code is slightly more
+efficient.  This option only affects the handling of the
+&lsquo;<samp><span class="samp">.cpload</span></samp>&rsquo; and &lsquo;<samp><span class="samp">.cpsetup</span></samp>&rsquo; pseudo-ops. 
+</dl>
+
+   </body></html>
+

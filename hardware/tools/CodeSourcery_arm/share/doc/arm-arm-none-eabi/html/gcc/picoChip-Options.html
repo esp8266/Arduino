@@ -1,0 +1,101 @@
+<html lang="en">
+<head>
+<title>picoChip Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Submodel-Options.html#Submodel-Options" title="Submodel Options">
+<link rel="prev" href="PDP_002d11-Options.html#PDP_002d11-Options" title="PDP-11 Options">
+<link rel="next" href="PowerPC-Options.html#PowerPC-Options" title="PowerPC Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="picoChip-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="PowerPC-Options.html#PowerPC-Options">PowerPC Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="PDP_002d11-Options.html#PDP_002d11-Options">PDP-11 Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Submodel-Options.html#Submodel-Options">Submodel Options</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.17.29 picoChip Options</h4>
+
+<p><a name="index-picoChip-options-1730"></a>
+These &lsquo;<samp><span class="samp">-m</span></samp>&rsquo; options are defined for picoChip implementations:
+
+     <dl>
+<dt><code>-mae=</code><var>ae_type</var><dd><a name="index-mcpu-1731"></a>Set the instruction set, register set, and instruction scheduling
+parameters for array element type <var>ae_type</var>.  Supported values
+for <var>ae_type</var> are &lsquo;<samp><span class="samp">ANY</span></samp>&rsquo;, &lsquo;<samp><span class="samp">MUL</span></samp>&rsquo;, and &lsquo;<samp><span class="samp">MAC</span></samp>&rsquo;.
+
+     <p><samp><span class="option">-mae=ANY</span></samp> selects a completely generic AE type.  Code
+generated with this option will run on any of the other AE types.  The
+code will not be as efficient as it would be if compiled for a specific
+AE type, and some types of operation (e.g., multiplication) will not
+work properly on all types of AE.
+
+     <p><samp><span class="option">-mae=MUL</span></samp> selects a MUL AE type.  This is the most useful AE type
+for compiled code, and is the default.
+
+     <p><samp><span class="option">-mae=MAC</span></samp> selects a DSP-style MAC AE.  Code compiled with this
+option may suffer from poor performance of byte (char) manipulation,
+since the DSP AE does not provide hardware support for byte load/stores.
+
+     <br><dt><code>-msymbol-as-address</code><dd>Enable the compiler to directly use a symbol name as an address in a
+load/store instruction, without first loading it into a
+register.  Typically, the use of this option will generate larger
+programs, which run faster than when the option isn't used.  However, the
+results vary from program to program, so it is left as a user option,
+rather than being permanently enabled.
+
+     <br><dt><code>-mno-inefficient-warnings</code><dd>Disables warnings about the generation of inefficient code.  These
+warnings can be generated, for example, when compiling code which
+performs byte-level memory operations on the MAC AE type.  The MAC AE has
+no hardware support for byte-level memory operations, so all byte
+load/stores must be synthesized from word load/store operations.  This is
+inefficient and a warning will be generated indicating to the programmer
+that they should rewrite the code to avoid byte operations, or to target
+an AE type which has the necessary hardware support.  This option enables
+the warning to be turned off.
+
+ </dl>
+
+ </body></html>
+

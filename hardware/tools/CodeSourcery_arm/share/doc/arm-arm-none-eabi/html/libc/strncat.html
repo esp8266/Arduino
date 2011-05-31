@@ -1,0 +1,70 @@
+<html lang="en">
+<head>
+<title>strncat - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Strings.html#Strings" title="Strings">
+<link rel="prev" href="strncasecmp.html#strncasecmp" title="strncasecmp">
+<link rel="next" href="strncmp.html#strncmp" title="strncmp">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="strncat"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="strncmp.html#strncmp">strncmp</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="strncasecmp.html#strncasecmp">strncasecmp</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Strings.html#Strings">Strings</a>
+<hr>
+</div>
+
+<h3 class="section">5.29 <code>strncat</code>&mdash;concatenate strings</h3>
+
+<p><a name="index-strncat-396"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;string.h&gt;
+     char *strncat(char *<var>dst</var>, const char *<var>src</var>, size_t <var>length</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>strncat</code> appends not more than <var>length</var> characters from
+the string pointed to by <var>src</var> (including the	terminating
+null character) to the end of the string pointed to by
+<var>dst</var>.  The initial character of <var>src</var> overwrites the null
+character at the end of <var>dst</var>.  A terminating null character
+is always appended to the result
+
+   <p><br>
+<strong>Warnings</strong><br>
+Note that a null is always appended, so that if the copy is
+limited by the <var>length</var> argument, the number of characters
+appended to <var>dst</var> is <code>n + 1</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+This function returns the initial value of <var>dst</var>
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>strncat</code> is ANSI C.
+
+   <p><code>strncat</code> requires no supporting OS subroutines.
+
+   <p><br>
+
+   </body></html>
+

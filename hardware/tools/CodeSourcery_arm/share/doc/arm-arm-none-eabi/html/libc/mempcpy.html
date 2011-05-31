@@ -1,0 +1,64 @@
+<html lang="en">
+<head>
+<title>mempcpy - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Strings.html#Strings" title="Strings">
+<link rel="prev" href="memmove.html#memmove" title="memmove">
+<link rel="next" href="memset.html#memset" title="memset">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="mempcpy"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="memset.html#memset">memset</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="memmove.html#memmove">memmove</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Strings.html#Strings">Strings</a>
+<hr>
+</div>
+
+<h3 class="section">5.11 <code>mempcpy</code>&mdash;copy memory regions and return end pointer</h3>
+
+<p><strong>Synopsis</strong>
+<pre class="example">     #include &lt;string.h&gt;
+     void* mempcpy(void *<var>out</var>, const void *<var>in</var>, size_t <var>n</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+This function copies <var>n</var> bytes from the memory region
+pointed to by <var>in</var> to the memory region pointed to by
+<var>out</var>.
+
+   <p>If the regions overlap, the behavior is undefined.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>mempcpy</code> returns a pointer to the byte following the
+last byte copied to the <var>out</var> region.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>mempcpy</code> is a GNU extension.
+
+   <p><code>mempcpy</code> requires no supporting OS subroutines.
+
+   <p><br>
+
+   </body></html>
+

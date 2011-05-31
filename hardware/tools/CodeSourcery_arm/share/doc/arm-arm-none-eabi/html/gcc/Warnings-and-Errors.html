@@ -1,0 +1,98 @@
+<html lang="en">
+<head>
+<title>Warnings and Errors - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Trouble.html#Trouble" title="Trouble">
+<link rel="prev" href="Non_002dbugs.html#Non_002dbugs" title="Non-bugs">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Warnings-and-Errors"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Non_002dbugs.html#Non_002dbugs">Non-bugs</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Trouble.html#Trouble">Trouble</a>
+<hr>
+</div>
+
+<h3 class="section">11.10 Warning Messages and Error Messages</h3>
+
+<p><a name="index-error-messages-3250"></a><a name="index-warnings-vs-errors-3251"></a><a name="index-messages_002c-warning-and-error-3252"></a>The GNU compiler can produce two kinds of diagnostics: errors and
+warnings.  Each kind has a different purpose:
+
+     <ul>
+<li><dfn>Errors</dfn> report problems that make it impossible to compile your
+program.  GCC reports errors with the source file name and line
+number where the problem is apparent.
+
+     <li><dfn>Warnings</dfn> report other unusual conditions in your code that
+<em>may</em> indicate a problem, although compilation can (and does)
+proceed.  Warning messages also report the source file name and line
+number, but include the text &lsquo;<samp><span class="samp">warning:</span></samp>&rsquo; to distinguish them
+from error messages. 
+</ul>
+
+ <p>Warnings may indicate danger points where you should check to make sure
+that your program really does what you intend; or the use of obsolete
+features; or the use of nonstandard features of GNU C or C++.  Many
+warnings are issued only if you ask for them, with one of the <samp><span class="option">-W</span></samp>
+options (for instance, <samp><span class="option">-Wall</span></samp> requests a variety of useful
+warnings).
+
+ <p><a name="index-pedantic-3253"></a><a name="index-pedantic_002derrors-3254"></a>GCC always tries to compile your program if possible; it never
+gratuitously rejects a program whose meaning is clear merely because
+(for instance) it fails to conform to a standard.  In some cases,
+however, the C and C++ standards specify that certain extensions are
+forbidden, and a diagnostic <em>must</em> be issued by a conforming
+compiler.  The <samp><span class="option">-pedantic</span></samp> option tells GCC to issue warnings in
+such cases; <samp><span class="option">-pedantic-errors</span></samp> says to make them errors instead. 
+This does not mean that <em>all</em> non-ISO constructs get warnings
+or errors.
+
+ <p>See <a href="Warning-Options.html#Warning-Options">Options to Request or Suppress Warnings</a>, for
+more detail on these and related command-line options.
+
+<!-- Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998, -->
+<!-- 1999, 2000, 2001, 2003, 2004, 2007 Free Software Foundation, Inc. -->
+<!-- This is part of the GCC manual. -->
+<!-- For copying conditions, see the file gcc.texi. -->
+ </body></html>
+

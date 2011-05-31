@@ -1,0 +1,129 @@
+<html lang="en">
+<head>
+<title>ESA/390 Directives - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="ESA_002f390_002dDependent.html#ESA_002f390_002dDependent" title="ESA/390-Dependent">
+<link rel="prev" href="ESA_002f390-Floating-Point.html#ESA_002f390-Floating-Point" title="ESA/390 Floating Point">
+<link rel="next" href="ESA_002f390-Opcodes.html#ESA_002f390-Opcodes" title="ESA/390 Opcodes">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="ESA%2f390-Directives"></a>
+<a name="ESA_002f390-Directives"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="ESA_002f390-Opcodes.html#ESA_002f390-Opcodes">ESA/390 Opcodes</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="ESA_002f390-Floating-Point.html#ESA_002f390-Floating-Point">ESA/390 Floating Point</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="ESA_002f390_002dDependent.html#ESA_002f390_002dDependent">ESA/390-Dependent</a>
+<hr>
+</div>
+
+<h4 class="subsection">9.12.5 ESA/390 Assembler Directives</h4>
+
+<p><code>as</code> for the ESA/390 supports all of the standard ELF/SVR4
+assembler directives that are documented in the main part of this
+documentation.  Several additional directives are supported in order
+to implement the ESA/390 addressing model.  The most important of these
+are <code>.using</code> and <code>.ltorg</code>
+
+   <p><a name="index-ESA_002f390_002donly-directives-840"></a>These are the additional directives in <code>as</code> for the ESA/390:
+
+     <dl>
+<dt><code>.dc</code><dd>A small subset of the usual DC directive is supported.
+
+     <br><dt><code>.drop </code><var>regno</var><dd>Stop using <var>regno</var> as the base register.  The <var>regno</var> must
+have been previously declared with a <code>.using</code> directive in the
+same section as the current section.
+
+     <br><dt><code>.ebcdic </code><var>string</var><dd>Emit the EBCDIC equivalent of the indicated string.  The emitted string
+will be null terminated.  Note that the directives <code>.string</code> etc. emit
+ascii strings by default.
+
+     <br><dt><code>EQU</code><dd>The standard HLASM-style EQU directive is not supported; however, the
+standard <code>as</code> directive .equ can be used to the same effect.
+
+     <br><dt><code>.ltorg</code><dd>Dump the literal pool accumulated so far; begin a new literal pool. 
+The literal pool will be written in the current section; in order to
+generate correct assembly, a <code>.using</code> must have been previously
+specified in the same section.
+
+     <br><dt><code>.using </code><var>expr</var><code>,</code><var>regno</var><dd>Use <var>regno</var> as the base register for all subsequent RX, RS, and SS form
+instructions. The <var>expr</var> will be evaluated to obtain the base address;
+usually, <var>expr</var> will merely be &lsquo;<samp><span class="samp">*</span></samp>&rsquo;.
+
+     <p>This assembler allows two <code>.using</code> directives to be simultaneously
+outstanding, one in the <code>.text</code> section, and one in another section
+(typically, the <code>.data</code> section).  This feature allows
+dynamically loaded objects to be implemented in a relatively
+straightforward way.  A <code>.using</code> directive must always be specified
+in the <code>.text</code> section; this will specify the base register that
+will be used for branches in the <code>.text</code> section.  A second
+<code>.using</code> may be specified in another section; this will specify
+the base register that is used for non-label address literals. 
+When a second <code>.using</code> is specified, then the subsequent
+<code>.ltorg</code> must be put in the same section; otherwise an error will
+result.
+
+     <p>Thus, for example, the following code uses <code>r3</code> to address branch
+targets and <code>r4</code> to address the literal pool, which has been written
+to the <code>.data</code> section.  The is, the constants <code>=A(some_routine)</code>,
+<code>=H'42'</code> and <code>=E'3.1416'</code> will all appear in the <code>.data</code>
+section.
+
+     <pre class="example">          .data
+          	.using  LITPOOL,r4
+          .text
+          	BASR	r3,0
+          	.using	*,r3
+                  B       START
+          	.long	LITPOOL
+          START:
+          	L	r4,4(,r3)
+          	L	r15,=A(some_routine)
+          	LTR	r15,r15
+          	BNE	LABEL
+          	AH	r0,=H'42'
+          LABEL:
+          	ME	r6,=E'3.1416'
+          .data
+          LITPOOL:
+          	.ltorg
+</pre>
+     <p>Note that this dual-<code>.using</code> directive semantics extends
+and is not compatible with HLASM semantics.  Note that this assembler
+directive does not support the full range of HLASM semantics.
+
+   </dl>
+
+   </body></html>
+

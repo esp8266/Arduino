@@ -1,0 +1,214 @@
+<html lang="en">
+<head>
+<title>Machine Code - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Source.html#Source" title="Source">
+<link rel="prev" href="Source-Path.html#Source-Path" title="Source Path">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Machine-Code"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Source-Path.html#Source-Path">Source Path</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Source.html#Source">Source</a>
+<hr>
+</div>
+
+<h3 class="section">9.6 Source and Machine Code</h3>
+
+<p><a name="index-source-line-and-its-code-address-472"></a>
+You can use the command <code>info line</code> to map source lines to program
+addresses (and vice versa), and the command <code>disassemble</code> to display
+a range of addresses as machine instructions.  You can use the command
+<code>set disassemble-next-line</code> to set whether to disassemble next
+source line when execution stops.  When run under <span class="sc">gnu</span> Emacs
+mode, the <code>info line</code> command causes the arrow to point to the
+line specified.  Also, <code>info line</code> prints addresses in symbolic form as
+well as hex.
+
+     
+<a name="index-info-line-473"></a>
+<dl><dt><code>info line </code><var>linespec</var><dd>Print the starting and ending addresses of the compiled code for
+source line <var>linespec</var>.  You can specify source lines in any of
+the ways documented in <a href="Specify-Location.html#Specify-Location">Specify Location</a>. 
+</dl>
+
+   <p>For example, we can use <code>info line</code> to discover the location of
+the object code for the first line of function
+<code>m4_changequote</code>:
+
+<!-- FIXME: I think this example should also show the addresses in -->
+<!-- symbolic form, as they usually would be displayed. -->
+<pre class="smallexample">     (gdb) info line m4_changequote
+     Line 895 of "builtin.c" starts at pc 0x634c and ends at 0x6350.
+</pre>
+   <p class="noindent"><a name="index-code-address-and-its-source-line-474"></a>We can also inquire (using <code>*</code><var>addr</var> as the form for
+<var>linespec</var>) what source line covers a particular address:
+<pre class="smallexample">     (gdb) info line *0x63ff
+     Line 926 of "builtin.c" starts at pc 0x63e4 and ends at 0x6404.
+</pre>
+   <p><a name="index-g_t_0040code_007b_0024_005f_007d-and-_0040code_007binfo-line_007d-475"></a><a name="index-g_t_0040code_007bx_007d-command_002c-default-address-476"></a><a name="index-x_0040r_007b_0028examine_0029_002c-and_007d-info-line-477"></a>After <code>info line</code>, the default address for the <code>x</code> command
+is changed to the starting address of the line, so that &lsquo;<samp><span class="samp">x/i</span></samp>&rsquo; is
+sufficient to begin examining the machine code (see <a href="Memory.html#Memory">Examining Memory</a>).  Also, this address is saved as the value of the
+convenience variable <code>$_</code> (see <a href="Convenience-Vars.html#Convenience-Vars">Convenience Variables</a>).
+
+     
+<a name="index-disassemble-478"></a>
+<a name="index-assembly-instructions-479"></a>
+<a name="index-instructions_002c-assembly-480"></a>
+<a name="index-machine-instructions-481"></a>
+<a name="index-listing-machine-instructions-482"></a>
+<dl><dt><code>disassemble</code><dt><code>disassemble /m</code><dt><code>disassemble /r</code><dd>This specialized command dumps a range of memory as machine
+instructions.  It can also print mixed source+disassembly by specifying
+the <code>/m</code> modifier and print the raw instructions in hex as well as
+in symbolic form by specifying the <code>/r</code>. 
+The default memory range is the function surrounding the
+program counter of the selected frame.  A single argument to this
+command is a program counter value; <span class="sc">gdb</span> dumps the function
+surrounding this value.  When two arguments are given, they should
+be separated by a comma, possibly surrounded by whitespace.  The
+arguments specify a range of addresses to dump, in one of two forms:
+
+          <dl>
+<dt><var>start</var><code>,</code><var>end</var><dd>the addresses from <var>start</var> (inclusive) to <var>end</var> (exclusive)
+<br><dt><var>start</var><code>,+</code><var>length</var><dd>the addresses from <var>start</var> (inclusive) to
+<var>start</var><code>+</code><var>length</var> (exclusive). 
+</dl>
+
+     <p class="noindent">When 2 arguments are specified, the name of the function is also
+printed (since there could be several functions in the given range).
+
+     <p>The argument(s) can be any expression yielding a numeric value, such as
+&lsquo;<samp><span class="samp">0x32c4</span></samp>&rsquo;, &lsquo;<samp><span class="samp">&amp;main+10</span></samp>&rsquo; or &lsquo;<samp><span class="samp">$pc - 8</span></samp>&rsquo;.
+
+     <p>If the range of memory being disassembled contains current program counter,
+the instruction at that location is shown with a <code>=&gt;</code> marker. 
+</dl>
+
+   <p>The following example shows the disassembly of a range of addresses of
+HP PA-RISC 2.0 code:
+
+<pre class="smallexample">     (gdb) disas 0x32c4, 0x32e4
+     Dump of assembler code from 0x32c4 to 0x32e4:
+        0x32c4 &lt;main+204&gt;:      addil 0,dp
+        0x32c8 &lt;main+208&gt;:      ldw 0x22c(sr0,r1),r26
+        0x32cc &lt;main+212&gt;:      ldil 0x3000,r31
+        0x32d0 &lt;main+216&gt;:      ble 0x3f8(sr4,r31)
+        0x32d4 &lt;main+220&gt;:      ldo 0(r31),rp
+        0x32d8 &lt;main+224&gt;:      addil -0x800,dp
+        0x32dc &lt;main+228&gt;:      ldo 0x588(r1),r26
+        0x32e0 &lt;main+232&gt;:      ldil 0x3000,r31
+     End of assembler dump.
+</pre>
+   <p>Here is an example showing mixed source+assembly for Intel x86, when the
+program is stopped just after function prologue:
+
+<pre class="smallexample">     (gdb) disas /m main
+     Dump of assembler code for function main:
+     5       {
+        0x08048330 &lt;+0&gt;:    push   %ebp
+        0x08048331 &lt;+1&gt;:    mov    %esp,%ebp
+        0x08048333 &lt;+3&gt;:    sub    $0x8,%esp
+        0x08048336 &lt;+6&gt;:    and    $0xfffffff0,%esp
+        0x08048339 &lt;+9&gt;:    sub    $0x10,%esp
+     
+     6         printf ("Hello.\n");
+     =&gt; 0x0804833c &lt;+12&gt;:   movl   $0x8048440,(%esp)
+        0x08048343 &lt;+19&gt;:   call   0x8048284 &lt;puts@plt&gt;
+     
+     7         return 0;
+     8       }
+        0x08048348 &lt;+24&gt;:   mov    $0x0,%eax
+        0x0804834d &lt;+29&gt;:   leave
+        0x0804834e &lt;+30&gt;:   ret
+     
+     End of assembler dump.
+</pre>
+   <p>Here is another example showing raw instructions in hex for AMD x86-64,
+
+<pre class="smallexample">     (gdb) disas /r 0x400281,+10
+     Dump of assembler code from 0x400281 to 0x40028b:
+        0x0000000000400281:  38 36  cmp    %dh,(%rsi)
+        0x0000000000400283:  2d 36 34 2e 73 sub    $0x732e3436,%eax
+        0x0000000000400288:  6f     outsl  %ds:(%rsi),(%dx)
+        0x0000000000400289:  2e 32 00       xor    %cs:(%rax),%al
+     End of assembler dump.
+</pre>
+   <p>Some architectures have more than one commonly-used set of instruction
+mnemonics or other syntax.
+
+   <p>For programs that were dynamically linked and use shared libraries,
+instructions that call functions or branch to locations in the shared
+libraries might show a seemingly bogus location&mdash;it's actually a
+location of the relocation table.  On some architectures, <span class="sc">gdb</span>
+might be able to resolve these to actual function names.
+
+     
+<a name="index-set-disassembly_002dflavor-483"></a>
+<a name="index-Intel-disassembly-flavor-484"></a>
+<a name="index-AT_0026T-disassembly-flavor-485"></a>
+<dl><dt><code>set disassembly-flavor </code><var>instruction-set</var><dd>Select the instruction set to use when disassembling the
+program via the <code>disassemble</code> or <code>x/i</code> commands.
+
+     <p>Currently this command is only defined for the Intel x86 family.  You
+can set <var>instruction-set</var> to either <code>intel</code> or <code>att</code>. 
+The default is <code>att</code>, the AT&amp;T flavor used by default by Unix
+assemblers for x86-based targets.
+
+     <p><a name="index-show-disassembly_002dflavor-486"></a><br><dt><code>show disassembly-flavor</code><dd>Show the current setting of the disassembly flavor. 
+</dl>
+
+     
+<a name="index-set-disassemble_002dnext_002dline-487"></a>
+<a name="index-show-disassemble_002dnext_002dline-488"></a>
+<dl><dt><code>set disassemble-next-line</code><dt><code>show disassemble-next-line</code><dd>Control whether or not <span class="sc">gdb</span> will disassemble the next source
+line or instruction when execution stops.  If ON, <span class="sc">gdb</span> will
+display disassembly of the next source line when execution of the
+program being debugged stops.  This is <em>in addition</em> to
+displaying the source line itself, which <span class="sc">gdb</span> always does if
+possible.  If the next source line cannot be displayed for some reason
+(e.g., if <span class="sc">gdb</span> cannot find the source file, or there's no line
+info in the debug info), <span class="sc">gdb</span> will display disassembly of the
+next <em>instruction</em> instead of showing the next source line.  If
+AUTO, <span class="sc">gdb</span> will display disassembly of next instruction only
+if the source line cannot be displayed.  This setting causes
+<span class="sc">gdb</span> to display some feedback when you step through a function
+with no line info or whose source file is unavailable.  The default is
+OFF, which means never display the disassembly of the next line or
+instruction. 
+</dl>
+
+   </body></html>
+

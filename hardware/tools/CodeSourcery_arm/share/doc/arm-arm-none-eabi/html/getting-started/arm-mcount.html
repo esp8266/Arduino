@@ -1,0 +1,39 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>3.7. ARM Profiling Implementation</title><link rel="stylesheet" href="cs.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.74.0"><link rel="home" href="index.html" title="Sourcery G++ Lite"><link rel="up" href="chap-target.html" title="Chapter 3. Sourcery G++ Lite for ARM EABI"><link rel="prev" href="ch03s06.html" title="3.6. ABI Compatibility"><link rel="next" href="portable-objects.html" title="3.8. Object File Portability"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">3.7. ARM Profiling Implementation</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch03s06.html">Prev</a> </td><th width="60%" align="center">Chapter 3. Sourcery G++ Lite for ARM EABI</th><td width="20%" align="right"> <a accesskey="n" href="portable-objects.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="arm-mcount"></a>3.7. ARM Profiling Implementation</h2></div></div></div><p>
+    Profiling is enabled by means of the <code class="option">-pg</code>
+    compiler option. In this mode, the compiler inserts a call to
+    <code class="function">__gnu_mcount_nc</code> into every function prologue.
+    However, no implementation of <code class="function">__gnu_mcount_nc</code>
+    is provided (to do so would be impossible without knowledge of
+    the execution environment).
+  </p><p>
+    You must provide your own implementation of
+    <code class="function">__gnu_mcount_nc </code>. Here are the requirements:
+    </p><div class="itemizedlist"><ul type="disc"><li>
+	On exit, pop the top value from the stack, and place it in the
+	<code class="code">lr</code> register. The <code class="code">sp</code> register should
+	be adjusted accordingly. For example, this is how to write it
+	as a stub function:
+	<div class="informalexample"><pre class="programlisting">        .globl __gnu_mcount_nc
+        .type __gnu_mcount_nc, %function
+__gnu_mcount_nc:
+        mov    ip, lr
+        pop    { lr }
+        bx     ip</pre></div></li><li>
+	Preserve all other register state except for <code class="code">r12</code>
+	and the CPSR condition code bits.  In particular all coprocessor
+	state and registers <code class="code">r0</code>-<code class="code">r3</code> must
+	be preserved.
+      </li><li>
+	Record and count all occurrences of the function calls
+	in the program.  The caller can be determined from the
+	<code class="code">lr</code> value stored on the top of the stack (on entry
+	to <code class="function">__gnu_mcount_nc</code>), and the callee can
+	be determined from the current value of the <code class="code">lr</code>
+	register (i.e. the caller of this function).
+      </li><li>
+	Arrange for the data to be saved to a file named
+	<code class="filename">gmon.out</code> when the program exits
+	(via <code class="function">atexit</code>).  Refer to the
+	<code class="command">gprof</code> profiler manual for more information.
+      </li></ul></div><p>
+  </p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch03s06.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="chap-target.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="portable-objects.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">3.6. ABI Compatibility </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 3.8. Object File Portability</td></tr></table></div></body></html>

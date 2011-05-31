@@ -1,0 +1,100 @@
+<html lang="en">
+<head>
+<title>Commands For Killing - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Bindable-Readline-Commands.html#Bindable-Readline-Commands" title="Bindable Readline Commands">
+<link rel="prev" href="Commands-For-Text.html#Commands-For-Text" title="Commands For Text">
+<link rel="next" href="Numeric-Arguments.html#Numeric-Arguments" title="Numeric Arguments">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Commands-For-Killing"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Numeric-Arguments.html#Numeric-Arguments">Numeric Arguments</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Commands-For-Text.html#Commands-For-Text">Commands For Text</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Bindable-Readline-Commands.html#Bindable-Readline-Commands">Bindable Readline Commands</a>
+<hr>
+</div>
+
+<h4 class="subsection">31.4.4 Killing And Yanking</h4>
+
+     <dl>
+<dt><code>kill-line (C-k)</code><a name="index-kill_002dline-_0028C_002dk_0029-2250"></a><dd>Kill the text from point to the end of the line.
+
+     <br><dt><code>backward-kill-line (C-x Rubout)</code><a name="index-backward_002dkill_002dline-_0028C_002dx-Rubout_0029-2251"></a><dd>Kill backward to the beginning of the line.
+
+     <br><dt><code>unix-line-discard (C-u)</code><a name="index-unix_002dline_002ddiscard-_0028C_002du_0029-2252"></a><dd>Kill backward from the cursor to the beginning of the current line.
+
+     <br><dt><code>kill-whole-line ()</code><a name="index-kill_002dwhole_002dline-_0028_0029-2253"></a><dd>Kill all characters on the current line, no matter where point is. 
+By default, this is unbound.
+
+     <br><dt><code>kill-word (M-d)</code><a name="index-kill_002dword-_0028M_002dd_0029-2254"></a><dd>Kill from point to the end of the current word, or if between
+words, to the end of the next word. 
+Word boundaries are the same as <code>forward-word</code>.
+
+     <br><dt><code>backward-kill-word (M-&lt;DEL&gt;)</code><a name="index-backward_002dkill_002dword-_0028M_002d_0040key_007bDEL_007d_0029-2255"></a><dd>Kill the word behind point. 
+Word boundaries are the same as <code>backward-word</code>.
+
+     <br><dt><code>unix-word-rubout (C-w)</code><a name="index-unix_002dword_002drubout-_0028C_002dw_0029-2256"></a><dd>Kill the word behind point, using white space as a word boundary. 
+The killed text is saved on the kill-ring.
+
+     <br><dt><code>unix-filename-rubout ()</code><a name="index-unix_002dfilename_002drubout-_0028_0029-2257"></a><dd>Kill the word behind point, using white space and the slash character
+as the word boundaries. 
+The killed text is saved on the kill-ring.
+
+     <br><dt><code>delete-horizontal-space ()</code><a name="index-delete_002dhorizontal_002dspace-_0028_0029-2258"></a><dd>Delete all spaces and tabs around point.  By default, this is unbound.
+
+     <br><dt><code>kill-region ()</code><a name="index-kill_002dregion-_0028_0029-2259"></a><dd>Kill the text in the current region. 
+By default, this command is unbound.
+
+     <br><dt><code>copy-region-as-kill ()</code><a name="index-copy_002dregion_002das_002dkill-_0028_0029-2260"></a><dd>Copy the text in the region to the kill buffer, so it can be yanked
+right away.  By default, this command is unbound.
+
+     <br><dt><code>copy-backward-word ()</code><a name="index-copy_002dbackward_002dword-_0028_0029-2261"></a><dd>Copy the word before point to the kill buffer. 
+The word boundaries are the same as <code>backward-word</code>. 
+By default, this command is unbound.
+
+     <br><dt><code>copy-forward-word ()</code><a name="index-copy_002dforward_002dword-_0028_0029-2262"></a><dd>Copy the word following point to the kill buffer. 
+The word boundaries are the same as <code>forward-word</code>. 
+By default, this command is unbound.
+
+     <br><dt><code>yank (C-y)</code><a name="index-yank-_0028C_002dy_0029-2263"></a><dd>Yank the top of the kill ring into the buffer at point.
+
+     <br><dt><code>yank-pop (M-y)</code><a name="index-yank_002dpop-_0028M_002dy_0029-2264"></a><dd>Rotate the kill-ring, and yank the new top.  You can only do this if
+the prior command is <code>yank</code> or <code>yank-pop</code>. 
+</dl>
+
+   </body></html>
+

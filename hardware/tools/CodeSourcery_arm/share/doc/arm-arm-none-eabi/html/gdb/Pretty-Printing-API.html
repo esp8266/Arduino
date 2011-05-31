@@ -1,0 +1,147 @@
+<html lang="en">
+<head>
+<title>Pretty Printing API - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Python-API.html#Python-API" title="Python API">
+<link rel="prev" href="Types-In-Python.html#Types-In-Python" title="Types In Python">
+<link rel="next" href="Selecting-Pretty_002dPrinters.html#Selecting-Pretty_002dPrinters" title="Selecting Pretty-Printers">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Pretty-Printing-API"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Selecting-Pretty_002dPrinters.html#Selecting-Pretty_002dPrinters">Selecting Pretty-Printers</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Types-In-Python.html#Types-In-Python">Types In Python</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Python-API.html#Python-API">Python API</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">23.2.2.5 Pretty Printing API</h5>
+
+<p>An example output is provided (see <a href="Pretty-Printing.html#Pretty-Printing">Pretty Printing</a>).
+
+   <p>A pretty-printer is just an object that holds a value and implements a
+specific interface, defined here.
+
+<div class="defun">
+&mdash; Operation on pretty printer: <b>children</b> (<var>self</var>)<var><a name="index-children-on-pretty-printer-1694"></a></var><br>
+<blockquote><p><span class="sc">gdb</span> will call this method on a pretty-printer to compute the
+children of the pretty-printer's value.
+
+        <p>This method must return an object conforming to the Python iterator
+protocol.  Each item returned by the iterator must be a tuple holding
+two elements.  The first element is the &ldquo;name&rdquo; of the child; the
+second element is the child's value.  The value can be any Python
+object which is convertible to a <span class="sc">gdb</span> value.
+
+        <p>This method is optional.  If it does not exist, <span class="sc">gdb</span> will act
+as though the value has no children. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Operation on pretty printer: <b>display_hint</b> (<var>self</var>)<var><a name="index-display_005fhint-on-pretty-printer-1695"></a></var><br>
+<blockquote><p>The CLI may call this method and use its result to change the
+formatting of a value.  The result will also be supplied to an MI
+consumer as a &lsquo;<samp><span class="samp">displayhint</span></samp>&rsquo; attribute of the variable being
+printed.
+
+        <p>This method is optional.  If it does exist, this method must return a
+string.
+
+        <p>Some display hints are predefined by <span class="sc">gdb</span>:
+
+          <dl>
+<dt>&lsquo;<samp><span class="samp">array</span></samp>&rsquo;<dd>Indicate that the object being printed is &ldquo;array-like&rdquo;.  The CLI
+uses this to respect parameters such as <code>set print elements</code> and
+<code>set print array</code>.
+
+          <br><dt>&lsquo;<samp><span class="samp">map</span></samp>&rsquo;<dd>Indicate that the object being printed is &ldquo;map-like&rdquo;, and that the
+children of this value can be assumed to alternate between keys and
+values.
+
+          <br><dt>&lsquo;<samp><span class="samp">string</span></samp>&rsquo;<dd>Indicate that the object being printed is &ldquo;string-like&rdquo;.  If the
+printer's <code>to_string</code> method returns a Python string of some
+kind, then <span class="sc">gdb</span> will call its internal language-specific
+string-printing function to format the string.  For the CLI this means
+adding quotation marks, possibly escaping some characters, respecting
+<code>set print elements</code>, and the like. 
+</dl>
+        </p></blockquote></div>
+
+<div class="defun">
+&mdash; Operation on pretty printer: <b>to_string</b> (<var>self</var>)<var><a name="index-to_005fstring-on-pretty-printer-1696"></a></var><br>
+<blockquote><p><span class="sc">gdb</span> will call this method to display the string
+representation of the value passed to the object's constructor.
+
+        <p>When printing from the CLI, if the <code>to_string</code> method exists,
+then <span class="sc">gdb</span> will prepend its result to the values returned by
+<code>children</code>.  Exactly how this formatting is done is dependent on
+the display hint, and may change as more hints are added.  Also,
+depending on the print settings (see <a href="Print-Settings.html#Print-Settings">Print Settings</a>), the CLI may
+print just the result of <code>to_string</code> in a stack trace, omitting
+the result of <code>children</code>.
+
+        <p>If this method returns a string, it is printed verbatim.
+
+        <p>Otherwise, if this method returns an instance of <code>gdb.Value</code>,
+then <span class="sc">gdb</span> prints this value.  This may result in a call to
+another pretty-printer.
+
+        <p>If instead the method returns a Python value which is convertible to a
+<code>gdb.Value</code>, then <span class="sc">gdb</span> performs the conversion and prints
+the resulting value.  Again, this may result in a call to another
+pretty-printer.  Python scalars (integers, floats, and booleans) and
+strings are convertible to <code>gdb.Value</code>; other types are not.
+
+        <p>Finally, if this method returns <code>None</code> then no further operations
+are peformed in this method and nothing is printed.
+
+        <p>If the result is not one of these types, an exception is raised. 
+</p></blockquote></div>
+
+   <p><span class="sc">gdb</span> provides a function which can be used to look up the
+default pretty-printer for a <code>gdb.Value</code>:
+
+   <p><a name="index-gdb_002edefault_005fvisualizer-1697"></a>
+
+<div class="defun">
+&mdash; Function: <b>default_visualizer</b><var> value<a name="index-default_005fvisualizer-1698"></a></var><br>
+<blockquote><p>This function takes a <code>gdb.Value</code> object as an argument.  If a
+pretty-printer for this value exists, then it is returned.  If no such
+printer exists, then this returns <code>None</code>. 
+</p></blockquote></div>
+
+   </body></html>
+

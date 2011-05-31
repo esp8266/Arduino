@@ -1,0 +1,513 @@
+<html lang="en">
+<head>
+<title>sprintf - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="siscanf.html#siscanf" title="siscanf">
+<link rel="next" href="sscanf.html#sscanf" title="sscanf">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="sprintf"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="sscanf.html#sscanf">sscanf</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="siscanf.html#siscanf">siscanf</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.60 <code>sprintf</code>, <code>fprintf</code>, <code>printf</code>, <code>snprintf</code>, <code>asprintf</code>, <code>asnprintf</code>&mdash;format output</h3>
+
+<p><a name="index-fprintf-284"></a><a name="index-g_t_005ffprintf_005fr-285"></a><a name="index-printf-286"></a><a name="index-g_t_005fprintf_005fr-287"></a><a name="index-asprintf-288"></a><a name="index-g_t_005fasprintf_005fr-289"></a><a name="index-sprintf-290"></a><a name="index-g_t_005fsprintf_005fr-291"></a><a name="index-snprintf-292"></a><a name="index-g_t_005fsnprintf_005fr-293"></a><a name="index-asnprintf-294"></a><a name="index-g_t_005fasnprintf_005fr-295"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     
+     int printf(const char *<var>format</var>, ...);
+     int fprintf(FILE *<var>fd</var>, const char *<var>format</var>, ...);
+     int sprintf(char *<var>str</var>, const char *<var>format</var>, ...);
+     int snprintf(char *<var>str</var>, size_t <var>size</var>, const char *<var>format</var>,
+         ...);
+     int asprintf(char **<var>strp</var>, const char *<var>format</var>, ...);
+     char *asnprintf(char *<var>str</var>, size_t *<var>size</var>, const char *<var>format</var>,
+         ...);
+     
+     int _printf_r(struct _reent *<var>ptr</var>, const char *<var>format</var>, ...);
+     int _fprintf_r(struct _reent *<var>ptr</var>, FILE *<var>fd</var>,
+         const char *<var>format</var>, ...);
+     int _sprintf_r(struct _reent *<var>ptr</var>, char *<var>str</var>,
+         const char *<var>format</var>, ...);
+     int _snprintf_r(struct _reent *<var>ptr</var>, char *<var>str</var>, size_t <var>size</var>,
+         const char *<var>format</var>, ...);
+     int _asprintf_r(struct _reent *<var>ptr</var>, char **<var>strp</var>,
+         const char *<var>format</var>, ...);
+     char *_asnprintf_r(struct _reent *<var>ptr</var>, char *<var>str</var>,
+         size_t *<var>size</var>, const char *<var>format</var>, ...);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>printf</code> accepts a series of arguments, applies to each a
+format specifier from <code>*</code><var>format</var>, and writes the
+formatted data to <code>stdout</code>, without a terminating NUL
+character.  The behavior of <code>printf</code> is undefined if there
+are not enough arguments for the format.  <code>printf</code> returns
+when it reaches the end of the format string.  If there are
+more arguments than the format requires, excess arguments are
+ignored.
+
+   <p><code>fprintf</code> is like <code>printf</code>, except that output is directed
+to the stream <var>fd</var> rather than <code>stdout</code>.
+
+   <p><code>sprintf</code> is like <code>printf</code>, except that output is directed
+to the buffer <var>str</var>, and a terminating NUL is output. 
+Behavior is undefined if more output is generated than the
+buffer can hold.
+
+   <p><code>snprintf</code> is like <code>sprintf</code>, except that output is
+limited to at most <var>size</var> bytes, including the terminating
+<code>NUL</code>.  As a special case, if <var>size</var> is 0, <var>str</var> can be
+NULL, and <code>snprintf</code> merely calculates how many bytes would
+be printed.
+
+   <p><code>asprintf</code> is like <code>sprintf</code>, except that the output is
+stored in a dynamically allocated buffer, <var>pstr</var>, which
+should be freed later with <code>free</code>.
+
+   <p><code>asnprintf</code> is like <code>sprintf</code>, except that the return type
+is either the original <var>str</var> if it was large enough, or a
+dynamically allocated string if the output exceeds *<var>size</var>;
+the length of the result is returned in *<var>size</var>.  When
+dynamic allocation occurs, the contents of the original
+<var>str</var> may have been modified.
+
+   <p>For <code>sprintf</code>, <code>snprintf</code>, and <code>asnprintf</code>, the behavior
+is undefined if the output <code>*</code><var>str</var> overlaps with one of
+the arguments.  Behavior is also undefined if the argument for
+<code>%n</code> within <code>*</code><var>format</var> overlaps another argument.
+
+   <p><var>format</var> is a pointer to a character string containing two
+types of objects: ordinary characters (other than <code>%</code>),
+which are copied unchanged to the output, and conversion
+specifications, each of which is introduced by <code>%</code>. (To
+include <code>%</code> in the output, use <code>%%</code> in the format string.) 
+A conversion specification has the following form:
+
+<pre class="smallexample">            %[<var>pos</var>][<var>flags</var>][<var>width</var>][.<var>prec</var>][<var>size</var>]<var>type</var>
+</pre>
+   <p>The fields of the conversion specification have the following
+meanings:
+
+     <ul>
+<li><var>pos</var>
+
+     <p>Conversions normally consume arguments in the order that they
+are presented.  However, it is possible to consume arguments
+out of order, and reuse an argument for more than one
+conversion specification (although the behavior is undefined
+if the same argument is requested with different types), by
+specifying <var>pos</var>, which is a decimal integer followed by
+'$'.  The integer must be between 1 and &lt;NL_ARGMAX&gt; from
+limits.h, and if argument <code>%n$</code> is requested, all earlier
+arguments must be requested somewhere within <var>format</var>.  If
+positional parameters are used, then all conversion
+specifications except for <code>%%</code> must specify a position. 
+This positional parameters method is a POSIX extension to the C
+standard definition for the functions.
+
+     <li><var>flags</var>
+
+     <p><var>flags</var> is an optional sequence of characters which control
+output justification, numeric signs, decimal points, trailing
+zeros, and octal and hex prefixes.  The flag characters are
+minus (<code>-</code>), plus (<code>+</code>), space ( ), zero (<code>0</code>), sharp
+(<code>#</code>), and quote (<code>'</code>).  They can appear in any
+combination, although not all flags can be used for all
+conversion specification types.
+
+          <dl>
+<dt><code>'</code><dd>A POSIX extension to the C standard.  However, this
+implementation presently treats it as a no-op, which
+is the default behavior for the C locale, anyway.  (If
+it did what it is supposed to, when <var>type</var> were <code>i</code>,
+<code>d</code>, <code>u</code>, <code>f</code>, <code>F</code>, <code>g</code>, or <code>G</code>, the
+integer portion of the conversion would be formatted
+with thousands' grouping wide characters.)
+
+          <br><dt><code>-</code><dd>The result of the conversion is left
+justified, and the right is padded with
+blanks.  If you do not use this flag, the
+result is right justified, and padded on the
+left.
+
+          <br><dt><code>+</code><dd>The result of a signed conversion (as
+determined by <var>type</var> of <code>d</code>, <code>i</code>, <code>a</code>,
+<code>A</code>, <code>e</code>, <code>E</code>, <code>f</code>, <code>F</code>, <code>g</code>, or
+<code>G</code>) will always begin with a plus or minus
+sign.  (If you do not use this flag, positive
+values do not begin with a plus sign.)
+
+          <br><dt><code>" " (space)</code><dd>If the first character of a signed conversion
+specification is not a sign, or if a signed
+conversion results in no characters, the
+result will begin with a space.  If the space
+( ) flag and the plus (<code>+</code>) flag both
+appear, the space flag is ignored.
+
+          <br><dt><code>0</code><dd>If the <var>type</var> character is <code>d</code>, <code>i</code>,
+<code>o</code>, <code>u</code>, <code>x</code>, <code>X</code>, <code>a</code>, <code>A</code>,
+<code>e</code>, <code>E</code>, <code>f</code>, <code>F</code>, <code>g</code>, or <code>G</code>:  leading
+zeros are used to pad the field width
+(following any indication of sign or base); no
+spaces are used for padding.  If the zero
+(<code>0</code>) and minus (<code>-</code>) flags both appear,
+the zero (<code>0</code>) flag will be ignored.  For
+<code>d</code>, <code>i</code>, <code>o</code>, <code>u</code>, <code>x</code>, and <code>X</code>
+conversions, if a precision <var>prec</var> is
+specified, the zero (<code>0</code>) flag is ignored.
+
+          <p>Note that <code>0</code> is interpreted as a flag, not
+as the beginning of a field width.
+
+          <br><dt><code>#</code><dd>The result is to be converted to an
+alternative form, according to the <var>type</var>
+character:
+
+               <dl>
+<dt><code>o</code><dd>Increases precision to force the first
+digit of the result to be a zero.
+
+               <br><dt><code>x</code><dd>A non-zero result will have a <code>0x</code>
+prefix.
+
+               <br><dt><code>X</code><dd>A non-zero result will have a <code>0X</code>
+prefix.
+
+               <br><dt><code>a, A, e, E, f, or F</code><dd>The result will always contain a
+decimal point even if no digits follow
+the point.  (Normally, a decimal point
+appears only if a digit follows it.) 
+Trailing zeros are removed.
+
+               <br><dt><code>g or G</code><dd>The result will always contain a
+decimal point even if no digits follow
+the point.  Trailing zeros are not
+removed.
+
+               <br><dt><code>all others</code><dd>Undefined.
+
+          </dl>
+
+     </dl>
+
+     <li><var>width</var>
+
+     <p><var>width</var> is an optional minimum field width.  You can
+either specify it directly as a decimal integer, or
+indirectly by using instead an asterisk (<code>*</code>), in
+which case an <code>int</code> argument is used as the field
+width.  If positional arguments are used, then the
+width must also be specified positionally as <code>*m$</code>,
+with m as a decimal integer.  Negative field widths
+are treated as specifying the minus (<code>-</code>) flag for
+left justfication, along with a positive field width. 
+The resulting format may be wider than the specified
+width.
+
+     <li><var>prec</var>
+
+     <p><var>prec</var> is an optional field; if present, it is
+introduced with `<code>.</code>' (a period). You can specify
+the precision either directly as a decimal integer or
+indirectly by using an asterisk (<code>*</code>), in which case
+an <code>int</code> argument is used as the precision.  If
+positional arguments are used, then the precision must
+also be specified positionally as <code>*m$</code>, with m as a
+decimal integer.  Supplying a negative precision is
+equivalent to omitting the precision.  If only a
+period is specified the precision is zero. The effect
+depends on the conversion <var>type</var>.
+
+          <dl>
+<dt><code>d, i, o, u, x, or X</code><dd>Minimum number of digits to appear.  If no
+precision is given, defaults to 1.
+
+          <br><dt><code>a or A</code><dd>Number of digits to appear after the decimal
+point.  If no precision is given, the
+precision defaults to the minimum needed for
+an exact representation.
+
+          <br><dt><code>e, E, f or F</code><dd>Number of digits to appear after the decimal
+point.  If no precision is given, the
+precision defaults to 6.
+
+          <br><dt><code>g or G</code><dd>Maximum number of significant digits.  A
+precision of 0 is treated the same as a
+precision of 1.  If no precision is given, the
+precision defaults to 6.
+
+          <br><dt><code>s or S</code><dd>Maximum number of characters to print from the
+string.  If no precision is given, the entire
+string is printed.
+
+          <br><dt><code>all others</code><dd>undefined.
+
+     </dl>
+
+     <li><var>size</var>
+
+     <p><var>size</var> is an optional modifier that changes the data
+type that the corresponding argument has.  Behavior is
+unspecified if a size is given that does not match the
+<var>type</var>.
+
+          <dl>
+<dt><code>hh</code><dd>With <code>d</code>, <code>i</code>, <code>o</code>, <code>u</code>, <code>x</code>, or
+<code>X</code>, specifies that the argument should be
+converted to a <code>signed char</code> or <code>unsigned
+char</code> before printing.
+
+          <p>With <code>n</code>, specifies that the argument is a
+pointer to a <code>signed char</code>.
+
+          <br><dt><code>h</code><dd>With <code>d</code>, <code>i</code>, <code>o</code>, <code>u</code>, <code>x</code>, or
+<code>X</code>, specifies that the argument should be
+converted to a <code>short</code> or <code>unsigned short</code>
+before printing.
+
+          <p>With <code>n</code>, specifies that the argument is a
+pointer to a <code>short</code>.
+
+          <br><dt><code>l</code><dd>With <code>d</code>, <code>i</code>, <code>o</code>, <code>u</code>, <code>x</code>, or
+<code>X</code>, specifies that the argument is a
+<code>long</code> or <code>unsigned long</code>.
+
+          <p>With <code>c</code>, specifies that the argument has
+type <code>wint_t</code>.
+
+          <p>With <code>s</code>, specifies that the argument is a
+pointer to <code>wchar_t</code>.
+
+          <p>With <code>n</code>, specifies that the argument is a
+pointer to a <code>long</code>.
+
+          <p>With <code>a</code>, <code>A</code>, <code>e</code>, <code>E</code>, <code>f</code>, <code>F</code>,
+<code>g</code>, or <code>G</code>, has no effect (because of
+vararg promotion rules, there is no need to
+distinguish between <code>float</code> and <code>double</code>).
+
+          <br><dt><code>ll</code><dd>With <code>d</code>, <code>i</code>, <code>o</code>, <code>u</code>, <code>x</code>, or
+<code>X</code>, specifies that the argument is a
+<code>long long</code> or <code>unsigned long long</code>.
+
+          <p>With <code>n</code>, specifies that the argument is a
+pointer to a <code>long long</code>.
+
+          <br><dt><code>j</code><dd>With <code>d</code>, <code>i</code>, <code>o</code>, <code>u</code>, <code>x</code>, or
+<code>X</code>, specifies that the argument is an
+<code>intmax_t</code> or <code>uintmax_t</code>.
+
+          <p>With <code>n</code>, specifies that the argument is a
+pointer to an <code>intmax_t</code>.
+
+          <br><dt><code>z</code><dd>With <code>d</code>, <code>i</code>, <code>o</code>, <code>u</code>, <code>x</code>, or
+<code>X</code>, specifies that the argument is a <code>size_t</code>.
+
+          <p>With <code>n</code>, specifies that the argument is a
+pointer to a <code>size_t</code>.
+
+          <br><dt><code>t</code><dd>With <code>d</code>, <code>i</code>, <code>o</code>, <code>u</code>, <code>x</code>, or
+<code>X</code>, specifies that the argument is a
+<code>ptrdiff_t</code>.
+
+          <p>With <code>n</code>, specifies that the argument is a
+pointer to a <code>ptrdiff_t</code>.
+
+          <br><dt><code>L</code><dd>With <code>a</code>, <code>A</code>, <code>e</code>, <code>E</code>, <code>f</code>, <code>F</code>,
+<code>g</code>, or <code>G</code>, specifies that the argument
+is a <code>long double</code>.
+
+     </dl>
+
+     <li><var>type</var>
+
+     <p><var>type</var> specifies what kind of conversion <code>printf</code>
+performs.  Here is a table of these:
+
+          <dl>
+<dt><code>%</code><dd>Prints the percent character (<code>%</code>).
+
+          <br><dt><code>c</code><dd>Prints <var>arg</var> as single character.  If the
+<code>l</code> size specifier is in effect, a multibyte
+character is printed.
+
+          <br><dt><code>C</code><dd>Short for <code>%lc</code>.  A POSIX extension to the C standard.
+
+          <br><dt><code>s</code><dd>Prints the elements of a pointer to <code>char</code>
+until the precision or a null character is
+reached.  If the <code>l</code> size specifier is in
+effect, the pointer is to an array of
+<code>wchar_t</code>, and the string is converted to
+multibyte characters before printing.
+
+          <br><dt><code>S</code><dd>Short for <code>%ls</code>.  A POSIX extension to the C standard.
+
+          <br><dt><code>d or i</code><dd>Prints a signed decimal integer; takes an
+<code>int</code>.  Leading zeros are inserted as
+necessary to reach the precision.  A value of 0 with
+a precision of 0 produces an empty string.
+
+          <br><dt><code>D</code><dd>Newlib extension, short for <code>%ld</code>.
+
+          <br><dt><code>o</code><dd>Prints an unsigned octal integer; takes an
+<code>unsigned</code>.  Leading zeros are inserted as
+necessary to reach the precision.  A value of 0 with
+a precision of 0 produces an empty string.
+
+          <br><dt><code>O</code><dd>Newlib extension, short for <code>%lo</code>.
+
+          <br><dt><code>u</code><dd>Prints an unsigned decimal integer; takes an
+<code>unsigned</code>.  Leading zeros are inserted as
+necessary to reach the precision.  A value of 0 with
+a precision of 0 produces an empty string.
+
+          <br><dt><code>U</code><dd>Newlib extension, short for <code>%lu</code>.
+
+          <br><dt><code>x</code><dd>Prints an unsigned hexadecimal integer (using
+<code>abcdef</code> as digits beyond <code>9</code>); takes an
+<code>unsigned</code>.  Leading zeros are inserted as
+necessary to reach the precision.  A value of 0 with
+a precision of 0 produces an empty string.
+
+          <br><dt><code>X</code><dd>Like <code>x</code>, but uses <code>ABCDEF</code> as digits
+beyond <code>9</code>.
+
+          <br><dt><code>f</code><dd>Prints a signed value of the form
+<code>[-]9999.9999</code>, with the precision
+determining how many digits follow the decimal
+point; takes a <code>double</code> (remember that
+<code>float</code> promotes to <code>double</code> as a vararg). 
+The low order digit is rounded to even.  If
+the precision results in at most DECIMAL_DIG
+digits, the result is rounded correctly; if
+more than DECIMAL_DIG digits are printed, the
+result is only guaranteed to round back to the
+original value.
+
+          <p>If the value is infinite, the result is
+<code>inf</code>, and no zero padding is performed.  If
+the value is not a number, the result is
+<code>nan</code>, and no zero padding is performed.
+
+          <br><dt><code>F</code><dd>Like <code>f</code>, but uses <code>INF</code> and <code>NAN</code> for
+non-finite numbers.
+
+          <br><dt><code>e</code><dd>Prints a signed value of the form
+<code>[-]9.9999e[+|-]999</code>; takes a <code>double</code>. 
+The digit before the decimal point is non-zero
+if the value is non-zero.  The precision
+determines how many digits appear between
+<code>.</code> and <code>e</code>, and the exponent always
+contains at least two digits.  The value zero
+has an exponent of zero.  If the value is not
+finite, it is printed like <code>f</code>.
+
+          <br><dt><code>E</code><dd>Like <code>e</code>, but using <code>E</code> to introduce the
+exponent, and like <code>F</code> for non-finite
+values.
+
+          <br><dt><code>g</code><dd>Prints a signed value in either <code>f</code> or <code>e</code>
+form, based on the given value and
+precision&mdash;an exponent less than -4 or
+greater than the precision selects the <code>e</code>
+form.  Trailing zeros and the decimal point
+are printed only if necessary; takes a
+<code>double</code>.
+
+          <br><dt><code>G</code><dd>Like <code>g</code>, except use <code>F</code> or <code>E</code> form.
+
+          <br><dt><code>a</code><dd>Prints a signed value of the form
+<code>[-]0x1.ffffp[+|-]9</code>; takes a <code>double</code>. 
+The letters <code>abcdef</code> are used for digits
+beyond <code>9</code>.  The precision determines how
+many digits appear after the decimal point. 
+The exponent contains at least one digit, and
+is a decimal value representing the power of
+2; a value of 0 has an exponent of 0. 
+Non-finite values are printed like <code>f</code>.
+
+          <br><dt><code>A</code><dd>Like <code>a</code>, except uses <code>X</code>, <code>P</code>, and
+<code>ABCDEF</code> instead of lower case.
+
+          <br><dt><code>n</code><dd>Takes a pointer to <code>int</code>, and stores a count
+of the number of bytes written so far.  No
+output is created.
+
+          <br><dt><code>p</code><dd>Takes a pointer to <code>void</code>, and prints it in
+an implementation-defined format.  This
+implementation is similar to <code>%#tx</code>), except
+that <code>0x</code> appears even for the NULL pointer.
+
+     </dl>
+
+   </ul>
+
+   <p><code>_printf_r</code>, <code>_fprintf_r</code>, <code>_asprintf_r</code>,
+<code>_sprintf_r</code>, <code>_snprintf_r</code>, <code>_asnprintf_r</code> are simply
+reentrant versions of the functions above.
+
+   <p><br>
+<strong>Returns</strong><br>
+On success, <code>sprintf</code> and <code>asprintf</code> return the number of bytes in
+the output string, except the concluding <code>NUL</code> is not counted. 
+<code>snprintf</code> returns the number of bytes that would be in the output
+string, except the concluding <code>NUL</code> is not counted.  <code>printf</code> and
+<code>fprintf</code> return the number of characters transmitted. 
+<code>asnprintf</code> returns the original <var>str</var> if there was enough room,
+otherwise it returns an allocated string.
+
+   <p>If an error occurs, the result of <code>printf</code>, <code>fprintf</code>,
+<code>snprintf</code>, and <code>asprintf</code> is a negative value, and the result of
+<code>asnprintf</code> is NULL.  No error returns occur for <code>sprintf</code>.  For
+<code>printf</code> and <code>fprintf</code>, <code>errno</code> may be set according to
+<code>fputc</code>.  For <code>asprintf</code> and <code>asnprintf</code>, <code>errno</code> may be set
+to ENOMEM if allocation fails, and for <code>snprintf</code>, <code>errno</code> may be
+set to EOVERFLOW if <var>size</var> or the output length exceeds INT_MAX.
+
+   <p><br>
+<strong>Bugs</strong><br>
+The &ldquo;&rdquo;' (quote) flag does not work when locale's thousands_sep is not empty.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C requires <code>printf</code>, <code>fprintf</code>, <code>sprintf</code>, and
+<code>snprintf</code>.  <code>asprintf</code> and <code>asnprintf</code> are newlib extensions.
+
+   <p>The ANSI C standard specifies that implementations must support at
+least formatted output of up to 509 characters.  This implementation
+has no inherent limit.
+
+   <p>Depending on how newlib was configured, not all format specifiers are
+supported.
+
+   <p>Supporting OS subroutines required: <code>close</code>, <code>fstat</code>, <code>isatty</code>,
+<code>lseek</code>, <code>read</code>, <code>sbrk</code>, <code>write</code>.
+
+   <p><br>
+
+   </body></html>
+

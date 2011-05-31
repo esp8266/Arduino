@@ -1,0 +1,63 @@
+<html lang="en">
+<head>
+<title>time - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Timefns.html#Timefns" title="Timefns">
+<link rel="prev" href="strftime.html#strftime" title="strftime">
+<link rel="next" href="_005f_005ftz_005flock.html#g_t_005f_005ftz_005flock" title="__tz_lock">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="time"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="_005f_005ftz_005flock.html#g_t_005f_005ftz_005flock">__tz_lock</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="strftime.html#strftime">strftime</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Timefns.html#Timefns">Timefns</a>
+<hr>
+</div>
+
+<h3 class="section">8.9 <code>time</code>&mdash;get current calendar time (as single number)</h3>
+
+<p><a name="index-time-438"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;time.h&gt;
+     time_t time(time_t *<var>t</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>time</code> looks up the best available representation of the current
+time and returns it, encoded as a <code>time_t</code>.  It stores the same
+value at <var>t</var> unless the argument is <code>NULL</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+A <code>-1</code> result means the current time is not available; otherwise the
+result represents the current time.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C requires <code>time</code>.
+
+   <p>Supporting OS subroutine required: Some implementations require
+<code>gettimeofday</code>.
+
+   <p><br>
+
+   </body></html>
+

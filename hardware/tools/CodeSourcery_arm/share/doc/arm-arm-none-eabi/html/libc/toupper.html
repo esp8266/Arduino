@@ -1,0 +1,73 @@
+<html lang="en">
+<head>
+<title>toupper - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Ctype.html#Ctype" title="Ctype">
+<link rel="prev" href="tolower.html#tolower" title="tolower">
+<link rel="next" href="iswalnum.html#iswalnum" title="iswalnum">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="toupper"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="iswalnum.html#iswalnum">iswalnum</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="tolower.html#tolower">tolower</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Ctype.html#Ctype">Ctype</a>
+<hr>
+</div>
+
+<h3 class="section">3.14 <code>toupper</code>&mdash;translate characters to uppercase</h3>
+
+<p><a name="index-toupper-125"></a><a name="index-g_t_005ftoupper-126"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;ctype.h&gt;
+     int toupper(int <var>c</var>);
+     int _toupper(int <var>c</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>toupper</code> is a macro which converts lowercase characters to uppercase,
+leaving all other characters unchanged.  It is only defined when
+<var>c</var> is an integer in the range <code>EOF</code> to <code>255</code>.
+
+   <p>You can use a compiled subroutine instead of the macro definition by
+undefining this macro using `<code>#undef toupper</code>'.
+
+   <p><code>_toupper</code> performs the same conversion as <code>toupper</code>, but should
+only be used when <var>c</var> is known to be a lowercase character (<code>a</code>&ndash;<code>z</code>).
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>toupper</code> returns the uppercase equivalent of <var>c</var> when it is a
+character between <code>a</code> and <code>z</code>, and <var>c</var> otherwise.
+
+   <p><code>_toupper</code> returns the uppercase equivalent of <var>c</var> when it is a
+character between <code>a</code> and <code>z</code>.  If <var>c</var> is not one of these
+characters, the behaviour of <code>_toupper</code> is undefined.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>toupper</code> is ANSI C.  <code>_toupper</code> is not recommended for portable programs.
+
+   <p>No supporting OS subroutines are required.
+
+   <p><br>
+
+   </body></html>
+

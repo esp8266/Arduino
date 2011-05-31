@@ -1,0 +1,80 @@
+<html lang="en">
+<head>
+<title>Xtensa Opcodes - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Xtensa-Syntax.html#Xtensa-Syntax" title="Xtensa Syntax">
+<link rel="next" href="Xtensa-Registers.html#Xtensa-Registers" title="Xtensa Registers">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Xtensa-Opcodes"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Xtensa-Registers.html#Xtensa-Registers">Xtensa Registers</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Xtensa-Syntax.html#Xtensa-Syntax">Xtensa Syntax</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">9.42.2.1 Opcode Names</h5>
+
+<p><a name="index-Xtensa-opcode-names-2012"></a><a name="index-opcode-names_002c-Xtensa-2013"></a>
+See the <cite>Xtensa Instruction Set Architecture (ISA) Reference
+Manual</cite> for a complete list of opcodes and descriptions of their
+semantics.
+
+   <p><a name="index-g_t_005f-opcode-prefix-2014"></a>If an opcode name is prefixed with an underscore character (&lsquo;<samp><span class="samp">_</span></samp>&rsquo;),
+<samp><span class="command">as</span></samp> will not transform that instruction in any way.  The
+underscore prefix disables both optimization (see <a href="Xtensa-Optimizations.html#Xtensa-Optimizations">Xtensa Optimizations</a>) and relaxation (see <a href="Xtensa-Relaxation.html#Xtensa-Relaxation">Xtensa Relaxation</a>) for that particular instruction.  Only
+use the underscore prefix when it is essential to select the exact
+opcode produced by the assembler.  Using this feature unnecessarily
+makes the code less efficient by disabling assembler optimization and
+less flexible by disabling relaxation.
+
+   <p>Note that this special handling of underscore prefixes only applies to
+Xtensa opcodes, not to either built-in macros or user-defined macros. 
+When an underscore prefix is used with a macro (e.g., <code>_MOV</code>), it
+refers to a different macro.  The assembler generally provides built-in
+macros both with and without the underscore prefix, where the underscore
+versions behave as if the underscore carries through to the instructions
+in the macros.  For example, <code>_MOV</code> may expand to <code>_MOV.N</code>.
+
+   <p>The underscore prefix only applies to individual instructions, not to
+series of instructions.  For example, if a series of instructions have
+underscore prefixes, the assembler will not transform the individual
+instructions, but it may insert other instructions between them (e.g.,
+to align a <code>LOOP</code> instruction).  To prevent the assembler from
+modifying a series of instructions as a whole, use the
+<code>no-transform</code> directive.  See <a href="Transform-Directive.html#Transform-Directive">transform</a>.
+
+   </body></html>
+

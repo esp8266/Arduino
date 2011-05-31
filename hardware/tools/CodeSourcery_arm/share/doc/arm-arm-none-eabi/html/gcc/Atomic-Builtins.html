@@ -1,0 +1,152 @@
+<html lang="en">
+<head>
+<title>Atomic Builtins - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Offsetof.html#Offsetof" title="Offsetof">
+<link rel="next" href="Object-Size-Checking.html#Object-Size-Checking" title="Object Size Checking">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Atomic-Builtins"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Object-Size-Checking.html#Object-Size-Checking">Object Size Checking</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Offsetof.html#Offsetof">Offsetof</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.49 Built-in functions for atomic memory access</h3>
+
+<p>The following builtins are intended to be compatible with those described
+in the <cite>Intel Itanium Processor-specific Application Binary Interface</cite>,
+section 7.4.  As such, they depart from the normal GCC practice of using
+the &ldquo;__builtin_&rdquo; prefix, and further that they are overloaded such that
+they work on multiple types.
+
+ <p>The definition given in the Intel documentation allows only for the use of
+the types <code>int</code>, <code>long</code>, <code>long long</code> as well as their unsigned
+counterparts.  GCC will allow any integral scalar or pointer type that is
+1, 2, 4 or 8 bytes in length.
+
+ <p>Not all operations are supported by all target processors.  If a particular
+operation cannot be implemented on the target processor, a warning will be
+generated and a call an external function will be generated.  The external
+function will carry the same name as the builtin, with an additional suffix
+&lsquo;<samp><span class="samp">_</span><var>n</var></samp>&rsquo; where <var>n</var> is the size of the data type.
+
+<!-- ??? Should we have a mechanism to suppress this warning?  This is almost -->
+<!-- useful for implementing the operation under the control of an external -->
+<!-- mutex. -->
+ <p>In most cases, these builtins are considered a <dfn>full barrier</dfn>.  That is,
+no memory operand will be moved across the operation, either forward or
+backward.  Further, instructions will be issued as necessary to prevent the
+processor from speculating loads across the operation and from queuing stores
+after the operation.
+
+ <p>All of the routines are described in the Intel documentation to take
+&ldquo;an optional list of variables protected by the memory barrier&rdquo;.  It's
+not clear what is meant by that; it could mean that <em>only</em> the
+following variables are protected, or it could mean that these variables
+should in addition be protected.  At present GCC ignores this list and
+protects all variables which are globally accessible.  If in the future
+we make some use of this list, an empty list will continue to mean all
+globally accessible variables.
+
+     <dl>
+<dt><var>type</var><code> __sync_fetch_and_add (</code><var>type</var><code> *ptr, </code><var>type</var><code> value, ...)</code><dt><var>type</var><code> __sync_fetch_and_sub (</code><var>type</var><code> *ptr, </code><var>type</var><code> value, ...)</code><dt><var>type</var><code> __sync_fetch_and_or (</code><var>type</var><code> *ptr, </code><var>type</var><code> value, ...)</code><dt><var>type</var><code> __sync_fetch_and_and (</code><var>type</var><code> *ptr, </code><var>type</var><code> value, ...)</code><dt><var>type</var><code> __sync_fetch_and_xor (</code><var>type</var><code> *ptr, </code><var>type</var><code> value, ...)</code><dt><var>type</var><code> __sync_fetch_and_nand (</code><var>type</var><code> *ptr, </code><var>type</var><code> value, ...)</code><dd><a name="index-g_t_005f_005fsync_005ffetch_005fand_005fadd-2613"></a><a name="index-g_t_005f_005fsync_005ffetch_005fand_005fsub-2614"></a><a name="index-g_t_005f_005fsync_005ffetch_005fand_005for-2615"></a><a name="index-g_t_005f_005fsync_005ffetch_005fand_005fand-2616"></a><a name="index-g_t_005f_005fsync_005ffetch_005fand_005fxor-2617"></a><a name="index-g_t_005f_005fsync_005ffetch_005fand_005fnand-2618"></a>These builtins perform the operation suggested by the name, and
+returns the value that had previously been in memory.  That is,
+
+     <pre class="smallexample">          { tmp = *ptr; *ptr <var>op</var>= value; return tmp; }
+          { tmp = *ptr; *ptr = ~(tmp &amp; value); return tmp; }   // nand
+</pre>
+     <p><em>Note:</em> GCC 4.4 and later implement <code>__sync_fetch_and_nand</code>
+builtin as <code>*ptr = ~(tmp &amp; value)</code> instead of <code>*ptr = ~tmp &amp; value</code>.
+
+     <br><dt><var>type</var><code> __sync_add_and_fetch (</code><var>type</var><code> *ptr, </code><var>type</var><code> value, ...)</code><dt><var>type</var><code> __sync_sub_and_fetch (</code><var>type</var><code> *ptr, </code><var>type</var><code> value, ...)</code><dt><var>type</var><code> __sync_or_and_fetch (</code><var>type</var><code> *ptr, </code><var>type</var><code> value, ...)</code><dt><var>type</var><code> __sync_and_and_fetch (</code><var>type</var><code> *ptr, </code><var>type</var><code> value, ...)</code><dt><var>type</var><code> __sync_xor_and_fetch (</code><var>type</var><code> *ptr, </code><var>type</var><code> value, ...)</code><dt><var>type</var><code> __sync_nand_and_fetch (</code><var>type</var><code> *ptr, </code><var>type</var><code> value, ...)</code><dd><a name="index-g_t_005f_005fsync_005fadd_005fand_005ffetch-2619"></a><a name="index-g_t_005f_005fsync_005fsub_005fand_005ffetch-2620"></a><a name="index-g_t_005f_005fsync_005for_005fand_005ffetch-2621"></a><a name="index-g_t_005f_005fsync_005fand_005fand_005ffetch-2622"></a><a name="index-g_t_005f_005fsync_005fxor_005fand_005ffetch-2623"></a><a name="index-g_t_005f_005fsync_005fnand_005fand_005ffetch-2624"></a>These builtins perform the operation suggested by the name, and
+return the new value.  That is,
+
+     <pre class="smallexample">          { *ptr <var>op</var>= value; return *ptr; }
+          { *ptr = ~(*ptr &amp; value); return *ptr; }   // nand
+</pre>
+     <p><em>Note:</em> GCC 4.4 and later implement <code>__sync_nand_and_fetch</code>
+builtin as <code>*ptr = ~(*ptr &amp; value)</code> instead of
+<code>*ptr = ~*ptr &amp; value</code>.
+
+     <br><dt><code>bool __sync_bool_compare_and_swap (</code><var>type</var><code> *ptr, </code><var>type</var><code> oldval </code><var>type</var><code> newval, ...)</code><dt><var>type</var><code> __sync_val_compare_and_swap (</code><var>type</var><code> *ptr, </code><var>type</var><code> oldval </code><var>type</var><code> newval, ...)</code><dd><a name="index-g_t_005f_005fsync_005fbool_005fcompare_005fand_005fswap-2625"></a><a name="index-g_t_005f_005fsync_005fval_005fcompare_005fand_005fswap-2626"></a>These builtins perform an atomic compare and swap.  That is, if the current
+value of <code>*</code><var>ptr</var> is <var>oldval</var>, then write <var>newval</var> into
+<code>*</code><var>ptr</var>.
+
+     <p>The &ldquo;bool&rdquo; version returns true if the comparison is successful and
+<var>newval</var> was written.  The &ldquo;val&rdquo; version returns the contents
+of <code>*</code><var>ptr</var> before the operation.
+
+     <br><dt><code>__sync_synchronize (...)</code><dd><a name="index-g_t_005f_005fsync_005fsynchronize-2627"></a>This builtin issues a full memory barrier.
+
+     <br><dt><var>type</var><code> __sync_lock_test_and_set (</code><var>type</var><code> *ptr, </code><var>type</var><code> value, ...)</code><dd><a name="index-g_t_005f_005fsync_005flock_005ftest_005fand_005fset-2628"></a>This builtin, as described by Intel, is not a traditional test-and-set
+operation, but rather an atomic exchange operation.  It writes <var>value</var>
+into <code>*</code><var>ptr</var>, and returns the previous contents of
+<code>*</code><var>ptr</var>.
+
+     <p>Many targets have only minimal support for such locks, and do not support
+a full exchange operation.  In this case, a target may support reduced
+functionality here by which the <em>only</em> valid value to store is the
+immediate constant 1.  The exact value actually stored in <code>*</code><var>ptr</var>
+is implementation defined.
+
+     <p>This builtin is not a full barrier, but rather an <dfn>acquire barrier</dfn>. 
+This means that references after the builtin cannot move to (or be
+speculated to) before the builtin, but previous memory stores may not
+be globally visible yet, and previous memory loads may not yet be
+satisfied.
+
+     <br><dt><code>void __sync_lock_release (</code><var>type</var><code> *ptr, ...)</code><dd><a name="index-g_t_005f_005fsync_005flock_005frelease-2629"></a>This builtin releases the lock acquired by <code>__sync_lock_test_and_set</code>. 
+Normally this means writing the constant 0 to <code>*</code><var>ptr</var>.
+
+     <p>This builtin is not a full barrier, but rather a <dfn>release barrier</dfn>. 
+This means that all previous memory stores are globally visible, and all
+previous memory loads have been satisfied, but following memory reads
+are not prevented from being speculated to before the barrier. 
+</dl>
+
+ </body></html>
+

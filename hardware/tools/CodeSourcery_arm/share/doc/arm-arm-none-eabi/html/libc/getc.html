@@ -1,0 +1,80 @@
+<html lang="en">
+<head>
+<title>getc - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="fwrite.html#fwrite" title="fwrite">
+<link rel="next" href="getc_005funlocked.html#getc_005funlocked" title="getc_unlocked">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="getc"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="getc_005funlocked.html#getc_005funlocked">getc_unlocked</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="fwrite.html#fwrite">fwrite</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.32 <code>getc</code>&mdash;read a character (macro)</h3>
+
+<p><a name="index-getc-214"></a><a name="index-g_t_005fgetc_005fr-215"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     int getc(FILE *<var>fp</var>);
+     
+     #include &lt;stdio.h&gt;
+     int _getc_r(struct _reent *<var>ptr</var>, FILE *<var>fp</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>getc</code> is a macro, defined in <code>stdio.h</code>.  You can use <code>getc</code>
+to get the next single character from the file or stream
+identified by <var>fp</var>.  As a side effect, <code>getc</code> advances the file's
+current position indicator.
+
+   <p>For a subroutine version of this macro, see <code>fgetc</code>.
+
+   <p>The <code>_getc_r</code> function is simply the reentrant version of <code>getc</code>
+which passes an additional reentrancy structure pointer argument: <var>ptr</var>.
+
+   <p><br>
+<strong>Returns</strong><br>
+The next character (read as an <code>unsigned char</code>, and cast to
+<code>int</code>), unless there is no more data, or the host system reports a
+read error; in either of these situations, <code>getc</code> returns <code>EOF</code>.
+
+   <p>You can distinguish the two situations that cause an <code>EOF</code> result by
+using the <code>ferror</code> and <code>feof</code> functions.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C requires <code>getc</code>; it suggests, but does not require, that
+<code>getc</code> be implemented as a macro.  The standard explicitly permits
+macro implementations of <code>getc</code> to use the argument more than once;
+therefore, in a portable program, you should not use an expression
+with side effects as the <code>getc</code> argument.
+
+   <p>Supporting OS subroutines required: <code>close</code>, <code>fstat</code>, <code>isatty</code>,
+<code>lseek</code>, <code>read</code>, <code>sbrk</code>, <code>write</code>.
+
+   <p><br>
+
+   </body></html>
+

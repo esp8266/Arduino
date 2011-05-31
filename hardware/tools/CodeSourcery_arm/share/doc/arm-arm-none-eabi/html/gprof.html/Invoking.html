@@ -1,0 +1,83 @@
+<html lang="en">
+<head>
+<title>Invoking - GNU gprof</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GNU gprof">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Executing.html#Executing" title="Executing">
+<link rel="next" href="Output.html#Output" title="Output">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the gprof profiler of the GNU system.
+
+Copyright (C) 1988, 1992, 1997, 1998, 1999, 2000, 2001, 2003,
+2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Invoking"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Output.html#Output">Output</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Executing.html#Executing">Executing</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">4 <code>gprof</code> Command Summary</h2>
+
+<p>After you have a profile data file <samp><span class="file">gmon.out</span></samp>, you can run <code>gprof</code>
+to interpret the information in it.  The <code>gprof</code> program prints a
+flat profile and a call graph on standard output.  Typically you would
+redirect the output of <code>gprof</code> into a file with &lsquo;<samp><span class="samp">&gt;</span></samp>&rsquo;.
+
+   <p>You run <code>gprof</code> like this:
+
+<pre class="smallexample">     gprof <var>options</var> [<var>executable-file</var> [<var>profile-data-files</var>...]] [&gt; <var>outfile</var>]
+</pre>
+   <p class="noindent">Here square-brackets indicate optional arguments.
+
+   <p>If you omit the executable file name, the file <samp><span class="file">a.out</span></samp> is used.  If
+you give no profile data file name, the file <samp><span class="file">gmon.out</span></samp> is used.  If
+any file is not in the proper format, or if the profile data file does not
+appear to belong to the executable file, an error message is printed.
+
+   <p>You can give more than one profile data file by entering all their names
+after the executable file name; then the statistics in all the data files
+are summed together.
+
+   <p>The order of these options does not matter.
+
+<ul class="menu">
+<li><a accesskey="1" href="Output-Options.html#Output-Options">Output Options</a>:       Controlling <code>gprof</code>'s output style
+<li><a accesskey="2" href="Analysis-Options.html#Analysis-Options">Analysis Options</a>:     Controlling how <code>gprof</code> analyzes its data
+<li><a accesskey="3" href="Miscellaneous-Options.html#Miscellaneous-Options">Miscellaneous Options</a>
+<li><a accesskey="4" href="Deprecated-Options.html#Deprecated-Options">Deprecated Options</a>:   Options you no longer need to use, but which
+                            have been retained for compatibility
+<li><a accesskey="5" href="Symspecs.html#Symspecs">Symspecs</a>:             Specifying functions to include or exclude
+</ul>
+
+   </body></html>
+

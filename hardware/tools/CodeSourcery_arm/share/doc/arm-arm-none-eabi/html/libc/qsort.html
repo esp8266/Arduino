@@ -1,0 +1,71 @@
+<html lang="en">
+<head>
+<title>qsort - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdlib.html#Stdlib" title="Stdlib">
+<link rel="prev" href="on_005fexit.html#on_005fexit" title="on_exit">
+<link rel="next" href="rand.html#rand" title="rand">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="qsort"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="rand.html#rand">rand</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="on_005fexit.html#on_005fexit">on_exit</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdlib.html#Stdlib">Stdlib</a>
+<hr>
+</div>
+
+<h3 class="section">2.31 <code>qsort</code>&mdash;sort an array</h3>
+
+<p><a name="index-qsort-65"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdlib.h&gt;
+     void qsort(void *<var>base</var>, size_t <var>nmemb</var>, size_t <var>size</var>,
+         int (*<var>compar</var>)(const void *, const void *) );
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>qsort</code> sorts an array (beginning at <var>base</var>) of <var>nmemb</var> objects. 
+<var>size</var> describes the size of each element of the array.
+
+   <p>You must supply a pointer to a comparison function, using the argument
+shown as <var>compar</var>.  (This permits sorting objects of unknown
+properties.)  Define the comparison function to accept two arguments,
+each a pointer to an element of the array starting at <var>base</var>.  The
+result of <code>(*</code><var>compar</var><code>)</code> must be negative if the first argument is
+less than the second, zero if the two arguments match, and positive if
+the first argument is greater than the second (where &ldquo;less than&rdquo; and
+&ldquo;greater than&rdquo; refer to whatever arbitrary ordering is appropriate).
+
+   <p>The array is sorted in place; that is, when <code>qsort</code> returns, the
+array elements beginning at <var>base</var> have been reordered.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>qsort</code> does not return a result.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>qsort</code> is required by ANSI (without specifying the sorting algorithm).
+
+   <p><br>
+
+   </body></html>
+

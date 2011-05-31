@@ -1,0 +1,200 @@
+<html lang="en">
+<head>
+<title>i386-Options - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="i386_002dDependent.html#i386_002dDependent" title="i386-Dependent">
+<link rel="next" href="i386_002dDirectives.html#i386_002dDirectives" title="i386-Directives">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="i386-Options"></a>
+<a name="i386_002dOptions"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="i386_002dDirectives.html#i386_002dDirectives">i386-Directives</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="i386_002dDependent.html#i386_002dDependent">i386-Dependent</a>
+<hr>
+</div>
+
+<h4 class="subsection">9.13.1 Options</h4>
+
+<p><a name="index-options-for-i386-844"></a><a name="index-options-for-x86_002d64-845"></a><a name="index-i386-options-846"></a><a name="index-x86_002d64-options-847"></a>
+The i386 version of <code>as</code> has a few machine
+dependent options:
+
+     
+<a name="index-g_t_0040samp_007b_002d_002d32_007d-option_002c-i386-848"></a>
+<a name="index-g_t_0040samp_007b_002d_002d32_007d-option_002c-x86_002d64-849"></a>
+<a name="index-g_t_0040samp_007b_002d_002d64_007d-option_002c-i386-850"></a>
+<a name="index-g_t_0040samp_007b_002d_002d64_007d-option_002c-x86_002d64-851"></a>
+<dl><dt><code>--32 | --64</code><dd>Select the word size, either 32 bits or 64 bits. Selecting 32-bit
+implies Intel i386 architecture, while 64-bit implies AMD x86-64
+architecture.
+
+     <p>These options are only available with the ELF object file format, and
+require that the necessary BFD support has been included (on a 32-bit
+platform you have to add &ndash;enable-64-bit-bfd to configure enable 64-bit
+usage and use x86-64 as target platform).
+
+     <br><dt><code>-n</code><dd>By default, x86 GAS replaces multiple nop instructions used for
+alignment within code sections with multi-byte nop instructions such
+as leal 0(%esi,1),%esi.  This switch disables the optimization.
+
+     <p><a name="index-g_t_0040samp_007b_002d_002ddivide_007d-option_002c-i386-852"></a><br><dt><code>--divide</code><dd>On SVR4-derived platforms, the character &lsquo;<samp><span class="samp">/</span></samp>&rsquo; is treated as a comment
+character, which means that it cannot be used in expressions.  The
+&lsquo;<samp><span class="samp">--divide</span></samp>&rsquo; option turns &lsquo;<samp><span class="samp">/</span></samp>&rsquo; into a normal character.  This does
+not disable &lsquo;<samp><span class="samp">/</span></samp>&rsquo; at the beginning of a line starting a comment, or
+affect using &lsquo;<samp><span class="samp">#</span></samp>&rsquo; for starting a comment.
+
+     <p><a name="index-g_t_0040samp_007b_002dmarch_003d_007d-option_002c-i386-853"></a><a name="index-g_t_0040samp_007b_002dmarch_003d_007d-option_002c-x86_002d64-854"></a><br><dt><code>-march=</code><var>CPU</var><code>[+</code><var>EXTENSION</var><code>...]</code><dd>This option specifies the target processor.  The assembler will
+issue an error message if an attempt is made to assemble an instruction
+which will not execute on the target processor.  The following
+processor names are recognized:
+<code>i8086</code>,
+<code>i186</code>,
+<code>i286</code>,
+<code>i386</code>,
+<code>i486</code>,
+<code>i586</code>,
+<code>i686</code>,
+<code>pentium</code>,
+<code>pentiumpro</code>,
+<code>pentiumii</code>,
+<code>pentiumiii</code>,
+<code>pentium4</code>,
+<code>prescott</code>,
+<code>nocona</code>,
+<code>core</code>,
+<code>core2</code>,
+<code>corei7</code>,
+<code>l1om</code>,
+<code>k6</code>,
+<code>k6_2</code>,
+<code>athlon</code>,
+<code>opteron</code>,
+<code>k8</code>,
+<code>amdfam10</code>,
+<code>bdver1</code>,
+<code>generic32</code> and
+<code>generic64</code>.
+
+     <p>In addition to the basic instruction set, the assembler can be told to
+accept various extension mnemonics.  For example,
+<code>-march=i686+sse4+vmx</code> extends <var>i686</var> with <var>sse4</var> and
+<var>vmx</var>.  The following extensions are currently supported:
+<code>8087</code>,
+<code>287</code>,
+<code>387</code>,
+<code>no87</code>,
+<code>mmx</code>,
+<code>nommx</code>,
+<code>sse</code>,
+<code>sse2</code>,
+<code>sse3</code>,
+<code>ssse3</code>,
+<code>sse4.1</code>,
+<code>sse4.2</code>,
+<code>sse4</code>,
+<code>nosse</code>,
+<code>avx</code>,
+<code>noavx</code>,
+<code>vmx</code>,
+<code>smx</code>,
+<code>xsave</code>,
+<code>xsaveopt</code>,
+<code>aes</code>,
+<code>pclmul</code>,
+<code>fsgsbase</code>,
+<code>rdrnd</code>,
+<code>f16c</code>,
+<code>fma</code>,
+<code>movbe</code>,
+<code>ept</code>,
+<code>clflush</code>,
+<code>lwp</code>,
+<code>fma4</code>,
+<code>xop</code>,
+<code>syscall</code>,
+<code>rdtscp</code>,
+<code>3dnow</code>,
+<code>3dnowa</code>,
+<code>sse4a</code>,
+<code>sse5</code>,
+<code>svme</code>,
+<code>abm</code> and
+<code>padlock</code>. 
+Note that rather than extending a basic instruction set, the extension
+mnemonics starting with <code>no</code> revoke the respective functionality.
+
+     <p>When the <code>.arch</code> directive is used with <samp><span class="option">-march</span></samp>, the
+<code>.arch</code> directive will take precedent.
+
+     <p><a name="index-g_t_0040samp_007b_002dmtune_003d_007d-option_002c-i386-855"></a><a name="index-g_t_0040samp_007b_002dmtune_003d_007d-option_002c-x86_002d64-856"></a><br><dt><code>-mtune=</code><var>CPU</var><dd>This option specifies a processor to optimize for. When used in
+conjunction with the <samp><span class="option">-march</span></samp> option, only instructions
+of the processor specified by the <samp><span class="option">-march</span></samp> option will be
+generated.
+
+     <p>Valid <var>CPU</var> values are identical to the processor list of
+<samp><span class="option">-march=</span><var>CPU</var></samp>.
+
+     <p><a name="index-g_t_0040samp_007b_002dmsse2avx_007d-option_002c-i386-857"></a><a name="index-g_t_0040samp_007b_002dmsse2avx_007d-option_002c-x86_002d64-858"></a><br><dt><code>-msse2avx</code><dd>This option specifies that the assembler should encode SSE instructions
+with VEX prefix.
+
+     <p><a name="index-g_t_0040samp_007b_002dmsse_002dcheck_003d_007d-option_002c-i386-859"></a><a name="index-g_t_0040samp_007b_002dmsse_002dcheck_003d_007d-option_002c-x86_002d64-860"></a><br><dt><code>-msse-check=</code><var>none</var><dt><code>-msse-check=</code><var>warning</var><dt><code>-msse-check=</code><var>error</var><dd>These options control if the assembler should check SSE intructions. 
+<samp><span class="option">-msse-check=</span><var>none</var></samp> will make the assembler not to check SSE
+instructions,  which is the default.  <samp><span class="option">-msse-check=</span><var>warning</var></samp>
+will make the assembler issue a warning for any SSE intruction. 
+<samp><span class="option">-msse-check=</span><var>error</var></samp> will make the assembler issue an error
+for any SSE intruction.
+
+     <p><a name="index-g_t_0040samp_007b_002dmavxscalar_003d_007d-option_002c-i386-861"></a><a name="index-g_t_0040samp_007b_002dmavxscalar_003d_007d-option_002c-x86_002d64-862"></a><br><dt><code>-mavxscalar=</code><var>128</var><dt><code>-mavxscalar=</code><var>256</var><dd>This options control how the assembler should encode scalar AVX
+instructions.  <samp><span class="option">-mavxscalar=</span><var>128</var></samp> will encode scalar
+AVX instructions with 128bit vector length, which is the default. 
+<samp><span class="option">-mavxscalar=</span><var>256</var></samp> will encode scalar AVX instructions
+with 256bit vector length.
+
+     <p><a name="index-g_t_0040samp_007b_002dmmnemonic_003d_007d-option_002c-i386-863"></a><a name="index-g_t_0040samp_007b_002dmmnemonic_003d_007d-option_002c-x86_002d64-864"></a><br><dt><code>-mmnemonic=</code><var>att</var><dt><code>-mmnemonic=</code><var>intel</var><dd>This option specifies instruction mnemonic for matching instructions. 
+The <code>.att_mnemonic</code> and <code>.intel_mnemonic</code> directives will
+take precedent.
+
+     <p><a name="index-g_t_0040samp_007b_002dmsyntax_003d_007d-option_002c-i386-865"></a><a name="index-g_t_0040samp_007b_002dmsyntax_003d_007d-option_002c-x86_002d64-866"></a><br><dt><code>-msyntax=</code><var>att</var><dt><code>-msyntax=</code><var>intel</var><dd>This option specifies instruction syntax when processing instructions. 
+The <code>.att_syntax</code> and <code>.intel_syntax</code> directives will
+take precedent.
+
+     <p><a name="index-g_t_0040samp_007b_002dmnaked_002dreg_007d-option_002c-i386-867"></a><a name="index-g_t_0040samp_007b_002dmnaked_002dreg_007d-option_002c-x86_002d64-868"></a><br><dt><code>-mnaked-reg</code><dd>This opetion specifies that registers don't require a &lsquo;<samp><span class="samp">%</span></samp>&rsquo; prefix. 
+The <code>.att_syntax</code> and <code>.intel_syntax</code> directives will take precedent.
+
+   </dl>
+
+   </body></html>
+

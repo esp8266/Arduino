@@ -1,0 +1,227 @@
+<html lang="en">
+<head>
+<title>Contributors - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Summary.html#Summary" title="Summary">
+<link rel="prev" href="Free-Software.html#Free-Software" title="Free Software">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Contributors"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Free-Software.html#Free-Software">Free Software</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Summary.html#Summary">Summary</a>
+<hr>
+</div>
+
+<h3 class="unnumberedsec">Contributors to <span class="sc">gdb</span></h3>
+
+<p>Richard Stallman was the original author of <span class="sc">gdb</span>, and of many
+other <span class="sc">gnu</span> programs.  Many others have contributed to its
+development.  This section attempts to credit major contributors.  One
+of the virtues of free software is that everyone is free to contribute
+to it; with regret, we cannot actually acknowledge everyone here.  The
+file <samp><span class="file">ChangeLog</span></samp> in the <span class="sc">gdb</span> distribution approximates a
+blow-by-blow account.
+
+   <p>Changes much prior to version 2.0 are lost in the mists of time.
+
+   <blockquote>
+<em>Plea:</em> Additions to this section are particularly welcome.  If you
+or your friends (or enemies, to be evenhanded) have been unfairly
+omitted from this list, we would like to add your names! 
+</blockquote>
+
+   <p>So that they may not regard their many labors as thankless, we
+particularly thank those who shepherded <span class="sc">gdb</span> through major
+releases:
+Andrew Cagney (releases 6.3, 6.2, 6.1, 6.0, 5.3, 5.2, 5.1 and 5.0);
+Jim Blandy (release 4.18);
+Jason Molenda (release 4.17);
+Stan Shebs (release 4.14);
+Fred Fish (releases 4.16, 4.15, 4.13, 4.12, 4.11, 4.10, and 4.9);
+Stu Grossman and John Gilmore (releases 4.8, 4.7, 4.6, 4.5, and 4.4);
+John Gilmore (releases 4.3, 4.2, 4.1, 4.0, and 3.9);
+Jim Kingdon (releases 3.5, 3.4, and 3.3);
+and Randy Smith (releases 3.2, 3.1, and 3.0).
+
+   <p>Richard Stallman, assisted at various times by Peter TerMaat, Chris
+Hanson, and Richard Mlynarik, handled releases through 2.8.
+
+   <p>Michael Tiemann is the author of most of the <span class="sc">gnu</span> C<tt>++</tt> support
+in <span class="sc">gdb</span>, with significant additional contributions from Per
+Bothner and Daniel Berlin.  James Clark wrote the <span class="sc">gnu</span> C<tt>++</tt>
+demangler.  Early work on C<tt>++</tt> was by Peter TerMaat (who also did
+much general update work leading to release 3.0).
+
+   <p><span class="sc">gdb</span> uses the BFD subroutine library to examine multiple
+object-file formats; BFD was a joint project of David V. 
+Henkel-Wallace, Rich Pixley, Steve Chamberlain, and John Gilmore.
+
+   <p>David Johnson wrote the original COFF support; Pace Willison did
+the original support for encapsulated COFF.
+
+   <p>Brent Benson of Harris Computer Systems contributed DWARF 2 support.
+
+   <p>Adam de Boor and Bradley Davis contributed the ISI Optimum V support. 
+Per Bothner, Noboyuki Hikichi, and Alessandro Forin contributed MIPS
+support. 
+Jean-Daniel Fekete contributed Sun 386i support. 
+Chris Hanson improved the HP9000 support. 
+Noboyuki Hikichi and Tomoyuki Hasei contributed Sony/News OS 3 support. 
+David Johnson contributed Encore Umax support. 
+Jyrki Kuoppala contributed Altos 3068 support. 
+Jeff Law contributed HP PA and SOM support. 
+Keith Packard contributed NS32K support. 
+Doug Rabson contributed Acorn Risc Machine support. 
+Bob Rusk contributed Harris Nighthawk CX-UX support. 
+Chris Smith contributed Convex support (and Fortran debugging). 
+Jonathan Stone contributed Pyramid support. 
+Michael Tiemann contributed SPARC support. 
+Tim Tucker contributed support for the Gould NP1 and Gould Powernode. 
+Pace Willison contributed Intel 386 support. 
+Jay Vosburgh contributed Symmetry support. 
+Marko Mlinar contributed OpenRISC 1000 support.
+
+   <p>Andreas Schwab contributed M68K <span class="sc">gnu</span>/Linux support.
+
+   <p>Rich Schaefer and Peter Schauer helped with support of SunOS shared
+libraries.
+
+   <p>Jay Fenlason and Roland McGrath ensured that <span class="sc">gdb</span> and GAS agree
+about several machine instruction sets.
+
+   <p>Patrick Duval, Ted Goldstein, Vikram Koka and Glenn Engel helped develop
+remote debugging.  Intel Corporation, Wind River Systems, AMD, and ARM
+contributed remote debugging modules for the i960, VxWorks, A29K UDI,
+and RDI targets, respectively.
+
+   <p>Brian Fox is the author of the readline libraries providing
+command-line editing and command history.
+
+   <p>Andrew Beers of SUNY Buffalo wrote the language-switching code, the
+Modula-2 support, and contributed the Languages chapter of this manual.
+
+   <p>Fred Fish wrote most of the support for Unix System Vr4. 
+He also enhanced the command-completion support to cover C<tt>++</tt> overloaded
+symbols.
+
+   <p>Hitachi America (now Renesas America), Ltd. sponsored the support for
+H8/300, H8/500, and Super-H processors.
+
+   <p>NEC sponsored the support for the v850, Vr4xxx, and Vr5xxx processors.
+
+   <p>Mitsubishi (now Renesas) sponsored the support for D10V, D30V, and M32R/D
+processors.
+
+   <p>Toshiba sponsored the support for the TX39 Mips processor.
+
+   <p>Matsushita sponsored the support for the MN10200 and MN10300 processors.
+
+   <p>Fujitsu sponsored the support for SPARClite and FR30 processors.
+
+   <p>Kung Hsu, Jeff Law, and Rick Sladkey added support for hardware
+watchpoints.
+
+   <p>Michael Snyder added support for tracepoints.
+
+   <p>Stu Grossman wrote gdbserver.
+
+   <p>Jim Kingdon, Peter Schauer, Ian Taylor, and Stu Grossman made
+nearly innumerable bug fixes and cleanups throughout <span class="sc">gdb</span>.
+
+   <p>The following people at the Hewlett-Packard Company contributed
+support for the PA-RISC 2.0 architecture, HP-UX 10.20, 10.30, and 11.0
+(narrow mode), HP's implementation of kernel threads, HP's aC<tt>++</tt>
+compiler, and the Text User Interface (nee Terminal User Interface):
+Ben Krepp, Richard Title, John Bishop, Susan Macchia, Kathy Mann,
+Satish Pai, India Paul, Steve Rehrauer, and Elena Zannoni.  Kim Haase
+provided HP-specific information in this manual.
+
+   <p>DJ Delorie ported <span class="sc">gdb</span> to MS-DOS, for the DJGPP project. 
+Robert Hoehne made significant contributions to the DJGPP port.
+
+   <p>Cygnus Solutions has sponsored <span class="sc">gdb</span> maintenance and much of its
+development since 1991.  Cygnus engineers who have worked on <span class="sc">gdb</span>
+fulltime include Mark Alexander, Jim Blandy, Per Bothner, Kevin
+Buettner, Edith Epstein, Chris Faylor, Fred Fish, Martin Hunt, Jim
+Ingham, John Gilmore, Stu Grossman, Kung Hsu, Jim Kingdon, John Metzler,
+Fernando Nasser, Geoffrey Noer, Dawn Perchik, Rich Pixley, Zdenek
+Radouch, Keith Seitz, Stan Shebs, David Taylor, and Elena Zannoni.  In
+addition, Dave Brolley, Ian Carmichael, Steve Chamberlain, Nick Clifton,
+JT Conklin, Stan Cox, DJ Delorie, Ulrich Drepper, Frank Eigler, Doug
+Evans, Sean Fagan, David Henkel-Wallace, Richard Henderson, Jeff
+Holcomb, Jeff Law, Jim Lemke, Tom Lord, Bob Manson, Michael Meissner,
+Jason Merrill, Catherine Moore, Drew Moseley, Ken Raeburn, Gavin
+Romig-Koch, Rob Savoye, Jamie Smith, Mike Stump, Ian Taylor, Angela
+Thomas, Michael Tiemann, Tom Tromey, Ron Unrau, Jim Wilson, and David
+Zuhn have made contributions both large and small.
+
+   <p>Andrew Cagney, Fernando Nasser, and Elena Zannoni, while working for
+Cygnus Solutions, implemented the original <span class="sc">gdb/mi</span> interface.
+
+   <p>Jim Blandy added support for preprocessor macros, while working for Red
+Hat.
+
+   <p>Andrew Cagney designed <span class="sc">gdb</span>'s architecture vector.  Many
+people including Andrew Cagney, Stephane Carrez, Randolph Chung, Nick
+Duffek, Richard Henderson, Mark Kettenis, Grace Sainsbury, Kei
+Sakamoto, Yoshinori Sato, Michael Snyder, Andreas Schwab, Jason
+Thorpe, Corinna Vinschen, Ulrich Weigand, and Elena Zannoni, helped
+with the migration of old architectures to this new framework.
+
+   <p>Andrew Cagney completely re-designed and re-implemented <span class="sc">gdb</span>'s
+unwinder framework, this consisting of a fresh new design featuring
+frame IDs, independent frame sniffers, and the sentinel frame.  Mark
+Kettenis implemented the <span class="sc">dwarf 2</span> unwinder, Jeff Johnston the
+libunwind unwinder, and Andrew Cagney the dummy, sentinel, tramp, and
+trad unwinders.  The architecture-specific changes, each involving a
+complete rewrite of the architecture's frame code, were carried out by
+Jim Blandy, Joel Brobecker, Kevin Buettner, Andrew Cagney, Stephane
+Carrez, Randolph Chung, Orjan Friberg, Richard Henderson, Daniel
+Jacobowitz, Jeff Johnston, Mark Kettenis, Theodore A. Roth, Kei
+Sakamoto, Yoshinori Sato, Michael Snyder, Corinna Vinschen, and Ulrich
+Weigand.
+
+   <p>Christian Zankel, Ross Morley, Bob Wilson, and Maxim Grigoriev from
+Tensilica, Inc. contributed support for Xtensa processors.  Others
+who have worked on the Xtensa port of <span class="sc">gdb</span> in the past include
+Steve Tjiang, John Newlin, and Scott Foehner.
+
+   <p>Michael Eager and staff of Xilinx, Inc., contributed support for the
+Xilinx MicroBlaze architecture.
+
+   </body></html>
+

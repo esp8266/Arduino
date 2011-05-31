@@ -1,0 +1,65 @@
+<html lang="en">
+<head>
+<title>mktime - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Timefns.html#Timefns" title="Timefns">
+<link rel="prev" href="localtime.html#localtime" title="localtime">
+<link rel="next" href="strftime.html#strftime" title="strftime">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="mktime"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="strftime.html#strftime">strftime</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="localtime.html#localtime">localtime</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Timefns.html#Timefns">Timefns</a>
+<hr>
+</div>
+
+<h3 class="section">8.7 <code>mktime</code>&mdash;convert time to arithmetic representation</h3>
+
+<p><a name="index-mktime-436"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;time.h&gt;
+     time_t mktime(struct tm *<var>timp</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>mktime</code> assumes the time at <var>timp</var> is a local time, and converts
+its representation from the traditional representation defined by
+<code>struct tm</code> into a representation suitable for arithmetic.
+
+   <p><code>localtime</code> is the inverse of <code>mktime</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+If the contents of the structure at <var>timp</var> do not form a valid
+calendar time representation, the result is <code>-1</code>.  Otherwise, the
+result is the time, converted to a <code>time_t</code> value.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C requires <code>mktime</code>.
+
+   <p><code>mktime</code> requires no supporting OS subroutines.
+
+   <p><br>
+
+   </body></html>
+

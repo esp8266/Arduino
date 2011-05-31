@@ -1,0 +1,17 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>6.5. Remote Debug Interface Devices</title><link rel="stylesheet" href="cs.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.74.0"><link rel="home" href="index.html" title="Sourcery G++ Lite"><link rel="up" href="sprite.html" title="Chapter 6. Sourcery G++ Debug Sprite"><link rel="prev" href="sec-sprite-options.html" title="6.4. Sourcery G++ Debug Sprite Options"><link rel="next" href="debug-sprite-flashpro-url.html" title="6.6. Actel FlashPro Devices"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">6.5. Remote Debug Interface Devices</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="sec-sprite-options.html">Prev</a> </td><th width="60%" align="center">Chapter 6. Sourcery G++ Debug Sprite</th><td width="20%" align="right"> <a accesskey="n" href="debug-sprite-flashpro-url.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="debug-sprite-rdi-url"></a>6.5. Remote Debug Interface Devices</h2></div></div></div><p>Remote Debug Interface (RDI) devices are supported.
+  The RDI device URL accepts no hostname, port or path components, so the
+  <em class="replaceable"><code>device-url</code></em> is specified as follows:
+
+  </p><pre class="screen">rdi:[///][?<em class="replaceable"><code>device-options</code></em>]</pre><p>
+  </p><p>
+  The following <em class="replaceable"><code>device-options</code></em> are required:
+
+  </p><div class="variablelist"><dl><dt><span class="term"><code class="option">rdi-library=<em class="replaceable"><code>library</code></em></code></span></dt><dd><p>Specify the library (DLL or shared object) implementing
+  the RDI target you wish to use.</p></dd><dt><span class="term"><code class="option">rdi-config=<em class="replaceable"><code>configfile</code></em></code></span></dt><dd><p>Specify a file containing configuration information for
+  <em class="replaceable"><code>library</code></em>.  The format of this file is specific to
+  the RDI library you are using, but tends to constitute a list of
+  <code class="literal"><em class="replaceable"><code>key</code></em>=<em class="replaceable"><code>value</code></em></code>
+  pairs.  Consult the documentation of your RDI library for details.
+  </p></dd></dl></div><p>
+
+  </p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="sec-sprite-options.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="sprite.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="debug-sprite-flashpro-url.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">6.4. Sourcery G++ Debug Sprite Options </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 6.6. Actel FlashPro Devices</td></tr></table></div></body></html>

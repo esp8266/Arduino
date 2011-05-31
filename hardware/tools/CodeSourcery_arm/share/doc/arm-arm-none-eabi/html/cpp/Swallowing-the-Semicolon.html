@@ -1,0 +1,115 @@
+<html lang="en">
+<head>
+<title>Swallowing the Semicolon - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Macro-Pitfalls.html#Macro-Pitfalls" title="Macro Pitfalls">
+<link rel="prev" href="Operator-Precedence-Problems.html#Operator-Precedence-Problems" title="Operator Precedence Problems">
+<link rel="next" href="Duplication-of-Side-Effects.html#Duplication-of-Side-Effects" title="Duplication of Side Effects">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Swallowing-the-Semicolon"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Duplication-of-Side-Effects.html#Duplication-of-Side-Effects">Duplication of Side Effects</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Operator-Precedence-Problems.html#Operator-Precedence-Problems">Operator Precedence Problems</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Macro-Pitfalls.html#Macro-Pitfalls">Macro Pitfalls</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.10.3 Swallowing the Semicolon</h4>
+
+<p><a name="index-semicolons-_0028after-macro-calls_0029-75"></a>
+Often it is desirable to define a macro that expands into a compound
+statement.  Consider, for example, the following macro, that advances a
+pointer (the argument <code>p</code> says where to find it) across whitespace
+characters:
+
+<pre class="smallexample">     #define SKIP_SPACES(p, limit)  \
+     { char *lim = (limit);         \
+       while (p &lt; lim) {            \
+         if (*p++ != ' ') {         \
+           p--; break; }}}
+</pre>
+   <p class="noindent">Here backslash-newline is used to split the macro definition, which must
+be a single logical line, so that it resembles the way such code would
+be laid out if not part of a macro definition.
+
+   <p>A call to this macro might be <code>SKIP_SPACES (p, lim)</code>.  Strictly
+speaking, the call expands to a compound statement, which is a complete
+statement with no need for a semicolon to end it.  However, since it
+looks like a function call, it minimizes confusion if you can use it
+like a function call, writing a semicolon afterward, as in
+<code>SKIP_SPACES (p, lim);</code>
+
+   <p>This can cause trouble before <code>else</code> statements, because the
+semicolon is actually a null statement.  Suppose you write
+
+<pre class="smallexample">     if (*p != 0)
+       SKIP_SPACES (p, lim);
+     else ...
+</pre>
+   <p class="noindent">The presence of two statements&mdash;the compound statement and a null
+statement&mdash;in between the <code>if</code> condition and the <code>else</code>
+makes invalid C code.
+
+   <p>The definition of the macro <code>SKIP_SPACES</code> can be altered to solve
+this problem, using a <code>do ... while</code> statement.  Here is how:
+
+<pre class="smallexample">     #define SKIP_SPACES(p, limit)     \
+     do { char *lim = (limit);         \
+          while (p &lt; lim) {            \
+            if (*p++ != ' ') {         \
+              p--; break; }}}          \
+     while (0)
+</pre>
+   <p>Now <code>SKIP_SPACES (p, lim);</code> expands into
+
+<pre class="smallexample">     do {...} while (0);
+</pre>
+   <p class="noindent">which is one statement.  The loop executes exactly once; most compilers
+generate no extra code for it.
+
+   </body></html>
+

@@ -1,0 +1,66 @@
+<html lang="en">
+<head>
+<title>wcsrchr - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Wchar-strings.html#Wchar-strings" title="Wchar strings">
+<link rel="prev" href="wcspbrk.html#wcspbrk" title="wcspbrk">
+<link rel="next" href="wcsspn.html#wcsspn" title="wcsspn">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="wcsrchr"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="wcsspn.html#wcsspn">wcsspn</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="wcspbrk.html#wcspbrk">wcspbrk</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Wchar-strings.html#Wchar-strings">Wchar strings</a>
+<hr>
+</div>
+
+<h3 class="section">6.23 <code>wcsrchr</code>&mdash;wide-character string scanning operation</h3>
+
+<p><strong>Synopsis</strong>
+<pre class="example">     #include &lt;wchar.h&gt;
+     wchar_t *wcsrchr(const wchar_t *<var>s</var>, wchar_t <var>c</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+The <code>wcsrchr</code> function locates the last occurrence of <var>c</var> in the
+wide-character string pointed to by <var>s</var>. The value of <var>c</var> must be a
+character representable as a type wchar_t and must be a wide-character
+code corresponding to a valid character in the current locale. 
+The terminating null wide-character code is considered to be part of
+the wide-character string.
+
+   <p><br>
+<strong>Returns</strong><br>
+Upon successful completion, <code>wcsrchr</code> returns a pointer to the
+wide-character code or a null pointer if <var>c</var> does not occur in the
+wide-character string.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>wcsrchr</code> is ISO/IEC 9899/AMD1:1995 (ISO C).
+
+   <p>No supporting OS subroutines are required.
+
+   <p><br>
+
+   </body></html>
+

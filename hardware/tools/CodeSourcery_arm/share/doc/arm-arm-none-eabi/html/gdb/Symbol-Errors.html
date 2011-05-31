@@ -1,0 +1,129 @@
+<html lang="en">
+<head>
+<title>Symbol Errors - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="GDB-Files.html#GDB-Files" title="GDB Files">
+<link rel="prev" href="Index-Files.html#Index-Files" title="Index Files">
+<link rel="next" href="Data-Files.html#Data-Files" title="Data Files">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Symbol-Errors"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Data-Files.html#Data-Files">Data Files</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Index-Files.html#Index-Files">Index Files</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="GDB-Files.html#GDB-Files">GDB Files</a>
+<hr>
+</div>
+
+<h3 class="section">18.4 Errors Reading Symbol Files</h3>
+
+<p>While reading a symbol file, <span class="sc">gdb</span> occasionally encounters problems,
+such as symbol types it does not recognize, or known bugs in compiler
+output.  By default, <span class="sc">gdb</span> does not notify you of such problems, since
+they are relatively common and primarily of interest to people
+debugging compilers.  If you are interested in seeing information
+about ill-constructed symbol tables, you can either ask <span class="sc">gdb</span> to print
+only one message about each such type of problem, no matter how many
+times the problem occurs; or you can ask <span class="sc">gdb</span> to print more messages,
+to see how many times the problems occur, with the <code>set
+complaints</code> command (see <a href="Messages_002fWarnings.html#Messages_002fWarnings">Optional Warnings and Messages</a>).
+
+   <p>The messages currently printed, and their meanings, include:
+
+     <dl>
+<dt><code>inner block not inside outer block in </code><var>symbol</var><dd>
+The symbol information shows where symbol scopes begin and end
+(such as at the start of a function or a block of statements).  This
+error indicates that an inner scope block is not fully contained
+in its outer scope blocks.
+
+     <p><span class="sc">gdb</span> circumvents the problem by treating the inner block as if it had
+the same scope as the outer block.  In the error message, <var>symbol</var>
+may be shown as &ldquo;<code>(don't know)</code>&rdquo; if the outer block is not a
+function.
+
+     <br><dt><code>block at </code><var>address</var><code> out of order</code><dd>
+The symbol information for symbol scope blocks should occur in
+order of increasing addresses.  This error indicates that it does not
+do so.
+
+     <p><span class="sc">gdb</span> does not circumvent this problem, and has trouble
+locating symbols in the source file whose symbols it is reading.  (You
+can often determine what source file is affected by specifying
+<code>set verbose on</code>.  See <a href="Messages_002fWarnings.html#Messages_002fWarnings">Optional Warnings and Messages</a>.)
+
+     <br><dt><code>bad block start address patched</code><dd>
+The symbol information for a symbol scope block has a start address
+smaller than the address of the preceding source line.  This is known
+to occur in the SunOS 4.1.1 (and earlier) C compiler.
+
+     <p><span class="sc">gdb</span> circumvents the problem by treating the symbol scope block as
+starting on the previous source line.
+
+     <br><dt><code>bad string table offset in symbol </code><var>n</var><dd>
+<a name="index-foo-1024"></a>Symbol number <var>n</var> contains a pointer into the string table which is
+larger than the size of the string table.
+
+     <p><span class="sc">gdb</span> circumvents the problem by considering the symbol to have the
+name <code>foo</code>, which may cause other problems if many symbols end up
+with this name.
+
+     <br><dt><code>unknown symbol type 0x</code><var>nn</var><dd>
+The symbol information contains new data types that <span class="sc">gdb</span> does
+not yet know how to read.  <code>0x</code><var>nn</var> is the symbol type of the
+uncomprehended information, in hexadecimal.
+
+     <p><span class="sc">gdb</span> circumvents the error by ignoring this symbol information. 
+This usually allows you to debug your program, though certain symbols
+are not accessible.  If you encounter such a problem and feel like
+debugging it, you can debug <code>gdb</code> with itself, breakpoint
+on <code>complain</code>, then go up to the function <code>read_dbx_symtab</code>
+and examine <code>*bufp</code> to see the symbol.
+
+     <br><dt><code>stub type has NULL name</code><dd>
+<span class="sc">gdb</span> could not find the full definition for a struct or class.
+
+     <br><dt><code>const/volatile indicator missing (ok if using g++ v1.x), got...</code><dd>The symbol information for a C<tt>++</tt> member function is missing some
+information that recent versions of the compiler should have output for
+it.
+
+     <br><dt><code>info mismatch between compiler and debugger</code><dd>
+<span class="sc">gdb</span> could not parse a type specification output by the compiler.
+
+   </dl>
+
+   </body></html>
+

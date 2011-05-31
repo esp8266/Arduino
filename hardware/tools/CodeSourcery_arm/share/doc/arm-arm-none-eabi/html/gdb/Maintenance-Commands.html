@@ -1,0 +1,361 @@
+<html lang="en">
+<head>
+<title>Maintenance Commands - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Installing-GDB.html#Installing-GDB" title="Installing GDB">
+<link rel="next" href="Remote-Protocol.html#Remote-Protocol" title="Remote Protocol">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Maintenance-Commands"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Remote-Protocol.html#Remote-Protocol">Remote Protocol</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Installing-GDB.html#Installing-GDB">Installing GDB</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="appendix">Appendix C Maintenance Commands</h2>
+
+<p><a name="index-maintenance-commands-2300"></a><a name="index-internal-commands-2301"></a>
+In addition to commands intended for <span class="sc">gdb</span> users, <span class="sc">gdb</span>
+includes a number of commands intended for <span class="sc">gdb</span> developers,
+that are not documented elsewhere in this manual.  These commands are
+provided here for reference.  (For commands that turn on debugging
+messages, see <a href="Debugging-Output.html#Debugging-Output">Debugging Output</a>.)
+
+     
+<a name="index-maint-agent-2302"></a>
+<a name="index-maint-agent_002deval-2303"></a>
+<dl><dt><code>maint agent </code><var>expression</var><dt><code>maint agent-eval </code><var>expression</var><dd>Translate the given <var>expression</var> into remote agent bytecodes. 
+This command is useful for debugging the Agent Expression mechanism
+(see <a href="Agent-Expressions.html#Agent-Expressions">Agent Expressions</a>).  The &lsquo;<samp><span class="samp">agent</span></samp>&rsquo; version produces an
+expression useful for data collection, such as by tracepoints, while
+&lsquo;<samp><span class="samp">maint agent-eval</span></samp>&rsquo; produces an expression that evaluates directly
+to a result.  For instance, a collection expression for <code>globa +
+globb</code> will include bytecodes to record four bytes of memory at each
+of the addresses of <code>globa</code> and <code>globb</code>, while discarding
+the result of the addition, while an evaluation expression will do the
+addition and return the sum.
+
+     <p><a name="index-maint-info-breakpoints-2304"></a><br><dt><code><a name="maint-info-breakpoints"></a>maint info breakpoints</code><dd>Using the same format as &lsquo;<samp><span class="samp">info breakpoints</span></samp>&rsquo;, display both the
+breakpoints you've set explicitly, and those <span class="sc">gdb</span> is using for
+internal purposes.  Internal breakpoints are shown with negative
+breakpoint numbers.  The type column identifies what kind of breakpoint
+is shown:
+
+          <dl>
+<dt><code>breakpoint</code><dd>Normal, explicitly set breakpoint.
+
+          <br><dt><code>watchpoint</code><dd>Normal, explicitly set watchpoint.
+
+          <br><dt><code>longjmp</code><dd>Internal breakpoint, used to handle correctly stepping through
+<code>longjmp</code> calls.
+
+          <br><dt><code>longjmp resume</code><dd>Internal breakpoint at the target of a <code>longjmp</code>.
+
+          <br><dt><code>until</code><dd>Temporary internal breakpoint used by the <span class="sc">gdb</span> <code>until</code> command.
+
+          <br><dt><code>finish</code><dd>Temporary internal breakpoint used by the <span class="sc">gdb</span> <code>finish</code> command.
+
+          <br><dt><code>shlib events</code><dd>Shared library events.
+
+     </dl>
+
+     <p><a name="index-set-displaced_002dstepping-2305"></a><a name="index-show-displaced_002dstepping-2306"></a><a name="index-displaced-stepping-support-2307"></a><a name="index-out_002dof_002dline-single_002dstepping-2308"></a><br><dt><code>set displaced-stepping</code><dt><code>show displaced-stepping</code><dd>Control whether or not <span class="sc">gdb</span> will do <dfn>displaced stepping</dfn>
+if the target supports it.  Displaced stepping is a way to single-step
+over breakpoints without removing them from the inferior, by executing
+an out-of-line copy of the instruction that was originally at the
+breakpoint location.  It is also known as out-of-line single-stepping.
+
+          <dl>
+<dt><code>set displaced-stepping on</code><dd>If the target architecture supports it, <span class="sc">gdb</span> will use
+displaced stepping to step over breakpoints.
+
+          <br><dt><code>set displaced-stepping off</code><dd><span class="sc">gdb</span> will not use displaced stepping to step over breakpoints,
+even if such is supported by the target architecture.
+
+          <p><a name="index-non_002dstop-mode_002c-and-_0040samp_007bset-displaced_002dstepping_007d-2309"></a><br><dt><code>set displaced-stepping auto</code><dd>This is the default mode.  <span class="sc">gdb</span> will use displaced stepping
+only if non-stop mode is active (see <a href="Non_002dStop-Mode.html#Non_002dStop-Mode">Non-Stop Mode</a>) and the target
+architecture supports displaced stepping. 
+</dl>
+
+     <p><a name="index-maint-check_002dsymtabs-2310"></a><br><dt><code>maint check-symtabs</code><dd>Check the consistency of psymtabs and symtabs.
+
+     <p><a name="index-maint-cplus-first_005fcomponent-2311"></a><br><dt><code>maint cplus first_component </code><var>name</var><dd>Print the first C<tt>++</tt> class/namespace component of <var>name</var>.
+
+     <p><a name="index-maint-cplus-namespace-2312"></a><br><dt><code>maint cplus namespace</code><dd>Print the list of possible C<tt>++</tt> namespaces.
+
+     <p><a name="index-maint-demangle-2313"></a><br><dt><code>maint demangle </code><var>name</var><dd>Demangle a C<tt>++</tt> or Objective-C mangled <var>name</var>.
+
+     <p><a name="index-maint-deprecate-2314"></a><a name="index-maint-undeprecate-2315"></a><a name="index-deprecated-commands-2316"></a><br><dt><code>maint deprecate </code><var>command</var> <span class="roman">[</span><var>replacement</var><span class="roman">]</span><dt><code>maint undeprecate </code><var>command</var><dd>Deprecate or undeprecate the named <var>command</var>.  Deprecated commands
+cause <span class="sc">gdb</span> to issue a warning when you use them.  The optional
+argument <var>replacement</var> says which newer command should be used in
+favor of the deprecated one; if it is given, <span class="sc">gdb</span> will mention
+the replacement as part of the warning.
+
+     <p><a name="index-maint-dump_002dme-2317"></a><br><dt><code>maint dump-me</code><dd><a name="index-g_t_0040code_007bSIGQUIT_007d-signal_002c-dump-core-of-_0040value_007bGDBN_007d-2318"></a>Cause a fatal signal in the debugger and force it to dump its core. 
+This is supported only on systems which support aborting a program
+with the <code>SIGQUIT</code> signal.
+
+     <p><a name="index-maint-internal_002derror-2319"></a><a name="index-maint-internal_002dwarning-2320"></a><br><dt><code>maint internal-error </code><span class="roman">[</span><var>message-text</var><span class="roman">]</span><dt><code>maint internal-warning </code><span class="roman">[</span><var>message-text</var><span class="roman">]</span><dd>Cause <span class="sc">gdb</span> to call the internal function <code>internal_error</code>
+or <code>internal_warning</code> and hence behave as though an internal error
+or internal warning has been detected.  In addition to reporting the
+internal problem, these functions give the user the opportunity to
+either quit <span class="sc">gdb</span> or create a core file of the current
+<span class="sc">gdb</span> session.
+
+     <p>These commands take an optional parameter <var>message-text</var> that is
+used as the text of the error or warning message.
+
+     <p>Here's an example of using <code>internal-error</code>:
+
+     <pre class="smallexample">          (gdb) <kbd>maint internal-error testing, 1, 2</kbd>
+          .../maint.c:121: internal-error: testing, 1, 2
+          A problem internal to GDB has been detected.  Further
+          debugging may prove unreliable.
+          Quit this debugging session? (y or n) <kbd>n</kbd>
+          Create a core file? (y or n) <kbd>n</kbd>
+          (gdb)
+</pre>
+     <p><a name="index-g_t_0040value_007bGDBN_007d-internal-error-2321"></a><a name="index-internal-errors_002c-control-of-_0040value_007bGDBN_007d-behavior-2322"></a>
+<a name="index-maint-set-internal_002derror-2323"></a><a name="index-maint-show-internal_002derror-2324"></a><a name="index-maint-set-internal_002dwarning-2325"></a><a name="index-maint-show-internal_002dwarning-2326"></a><br><dt><code>maint set internal-error </code><var>action</var><code> [ask|yes|no]</code><dt><code>maint show internal-error </code><var>action</var><dt><code>maint set internal-warning </code><var>action</var><code> [ask|yes|no]</code><dt><code>maint show internal-warning </code><var>action</var><dd>When <span class="sc">gdb</span> reports an internal problem (error or warning) it
+gives the user the opportunity to both quit <span class="sc">gdb</span> and create a
+core file of the current <span class="sc">gdb</span> session.  These commands let you
+override the default behaviour for each particular <var>action</var>,
+described in the table below.
+
+          <dl>
+<dt>&lsquo;<samp><span class="samp">quit</span></samp>&rsquo;<dd>You can specify that <span class="sc">gdb</span> should always (yes) or never (no)
+quit.  The default is to ask the user what to do.
+
+          <br><dt>&lsquo;<samp><span class="samp">corefile</span></samp>&rsquo;<dd>You can specify that <span class="sc">gdb</span> should always (yes) or never (no)
+create a core file.  The default is to ask the user what to do. 
+</dl>
+
+     <p><a name="index-maint-packet-2327"></a><br><dt><code>maint packet </code><var>text</var><dd>If <span class="sc">gdb</span> is talking to an inferior via the serial protocol,
+then this command sends the string <var>text</var> to the inferior, and
+displays the response packet.  <span class="sc">gdb</span> supplies the initial
+&lsquo;<samp><span class="samp">$</span></samp>&rsquo; character, the terminating &lsquo;<samp><span class="samp">#</span></samp>&rsquo; character, and the
+checksum.
+
+     <p><a name="index-maint-print-architecture-2328"></a><br><dt><code>maint print architecture </code><span class="roman">[</span><var>file</var><span class="roman">]</span><dd>Print the entire architecture configuration.  The optional argument
+<var>file</var> names the file where the output goes.
+
+     <p><a name="index-maint-print-c_002dtdesc-2329"></a><br><dt><code>maint print c-tdesc</code><dd>Print the current target description (see <a href="Target-Descriptions.html#Target-Descriptions">Target Descriptions</a>) as
+a C source file.  The created source file can be used in <span class="sc">gdb</span>
+when an XML parser is not available to parse the description.
+
+     <p><a name="index-maint-print-dummy_002dframes-2330"></a><br><dt><code>maint print dummy-frames</code><dd>Prints the contents of <span class="sc">gdb</span>'s internal dummy-frame stack.
+
+     <pre class="smallexample">          (gdb) <kbd>b add</kbd>
+          ...
+          (gdb) <kbd>print add(2,3)</kbd>
+          Breakpoint 2, add (a=2, b=3) at ...
+          58	  return (a + b);
+          The program being debugged stopped while in a function called from GDB.
+          ...
+          (gdb) <kbd>maint print dummy-frames</kbd>
+          0x1a57c80: pc=0x01014068 fp=0x0200bddc sp=0x0200bdd6
+           top=0x0200bdd4 id={stack=0x200bddc,code=0x101405c}
+           call_lo=0x01014000 call_hi=0x01014001
+          (gdb)
+</pre>
+     <p>Takes an optional file parameter.
+
+     <p><a name="index-maint-print-registers-2331"></a><a name="index-maint-print-raw_002dregisters-2332"></a><a name="index-maint-print-cooked_002dregisters-2333"></a><a name="index-maint-print-register_002dgroups-2334"></a><br><dt><code>maint print registers </code><span class="roman">[</span><var>file</var><span class="roman">]</span><dt><code>maint print raw-registers </code><span class="roman">[</span><var>file</var><span class="roman">]</span><dt><code>maint print cooked-registers </code><span class="roman">[</span><var>file</var><span class="roman">]</span><dt><code>maint print register-groups </code><span class="roman">[</span><var>file</var><span class="roman">]</span><dd>Print <span class="sc">gdb</span>'s internal register data structures.
+
+     <p>The command <code>maint print raw-registers</code> includes the contents of
+the raw register cache; the command <code>maint print cooked-registers</code>
+includes the (cooked) value of all registers, including registers which
+aren't available on the target nor visible to user; and the
+command <code>maint print register-groups</code> includes the groups that each
+register is a member of.  See <a href="../gdbint/Registers.html#Registers">Registers</a>.
+
+     <p>These commands take an optional parameter, a file name to which to
+write the information.
+
+     <p><a name="index-maint-print-reggroups-2335"></a><br><dt><code>maint print reggroups </code><span class="roman">[</span><var>file</var><span class="roman">]</span><dd>Print <span class="sc">gdb</span>'s internal register group data structures.  The
+optional argument <var>file</var> tells to what file to write the
+information.
+
+     <p>The register groups info looks like this:
+
+     <pre class="smallexample">          (gdb) <kbd>maint print reggroups</kbd>
+           Group      Type
+           general    user
+           float      user
+           all        user
+           vector     user
+           system     user
+           save       internal
+           restore    internal
+</pre>
+     <p><a name="index-flushregs-2336"></a><br><dt><code>flushregs</code><dd>This command forces <span class="sc">gdb</span> to flush its internal register cache.
+
+     <p><a name="index-maint-print-objfiles-2337"></a><a name="index-info-for-known-object-files-2338"></a><br><dt><code>maint print objfiles</code><dd>Print a dump of all known object files.  For each object file, this
+command prints its name, address in memory, and all of its psymtabs
+and symtabs.
+
+     <p><a name="index-maint-print-section_002dscripts-2339"></a><a name="index-info-for-known-_002edebug_005fgdb_005fscripts_002dloaded-scripts-2340"></a><br><dt><code>maint print section-scripts [</code><var>regexp</var><code>]</code><dd>Print a dump of scripts specified in the <code>.debug_gdb_section</code> section. 
+If <var>regexp</var> is specified, only print scripts loaded by object files
+matching <var>regexp</var>. 
+For each script, this command prints its name as specified in the objfile,
+and the full path if known. 
+See <a href="_002edebug_005fgdb_005fscripts-section.html#g_t_002edebug_005fgdb_005fscripts-section">.debug_gdb_scripts section</a>.
+
+     <p><a name="index-maint-print-statistics-2341"></a><a name="index-bcache-statistics-2342"></a><br><dt><code>maint print statistics</code><dd>This command prints, for each object file in the program, various data
+about that object file followed by the byte cache (<dfn>bcache</dfn>)
+statistics for the object file.  The objfile data includes the number
+of minimal, partial, full, and stabs symbols, the number of types
+defined by the objfile, the number of as yet unexpanded psym tables,
+the number of line tables and string tables, and the amount of memory
+used by the various tables.  The bcache statistics include the counts,
+sizes, and counts of duplicates of all and unique objects, max,
+average, and median entry size, total memory used and its overhead and
+savings, and various measures of the hash table size and chain
+lengths.
+
+     <p><a name="index-maint-print-target_002dstack-2343"></a><a name="index-target-stack-description-2344"></a><br><dt><code>maint print target-stack</code><dd>A <dfn>target</dfn> is an interface between the debugger and a particular
+kind of file or process.  Targets can be stacked in <dfn>strata</dfn>,
+so that more than one target can potentially respond to a request. 
+In particular, memory accesses will walk down the stack of targets
+until they find a target that is interested in handling that particular
+address.
+
+     <p>This command prints a short description of each layer that was pushed on
+the <dfn>target stack</dfn>, starting from the top layer down to the bottom one.
+
+     <p><a name="index-maint-print-type-2345"></a><a name="index-type-chain-of-a-data-type-2346"></a><br><dt><code>maint print type </code><var>expr</var><dd>Print the type chain for a type specified by <var>expr</var>.  The argument
+can be either a type name or a symbol.  If it is a symbol, the type of
+that symbol is described.  The type chain produced by this command is
+a recursive definition of the data type as stored in <span class="sc">gdb</span>'s
+data structures, including its flags and contained types.
+
+     <p><a name="index-maint-set-dwarf2-always_002ddisassemble-2347"></a><a name="index-maint-show-dwarf2-always_002ddisassemble-2348"></a><br><dt><code>maint set dwarf2 always-disassemble</code><br><dt><code>maint show dwarf2 always-disassemble</code><dd>Control the behavior of <code>info address</code> when using DWARF debugging
+information.
+
+     <p>The default is <code>off</code>, which means that <span class="sc">gdb</span> should try to
+describe a variable's location in an easily readable format.  When
+<code>on</code>, <span class="sc">gdb</span> will instead display the DWARF location
+expression in an assembly-like format.  Note that some locations are
+too complex for <span class="sc">gdb</span> to describe simply; in this case you will
+always see the disassembly form.
+
+     <p>Here is an example of the resulting disassembly:
+
+     <pre class="smallexample">          (gdb) info addr argc
+          Symbol "argc" is a complex DWARF expression:
+               1: DW_OP_fbreg 0
+</pre>
+     <p>For more information on these expressions, see
+<a href="http://www.dwarfstd.org/">the DWARF standard</a>.
+
+     <p><a name="index-maint-set-dwarf2-max_002dcache_002dage-2349"></a><a name="index-maint-show-dwarf2-max_002dcache_002dage-2350"></a><br><dt><code>maint set dwarf2 max-cache-age</code><dt><code>maint show dwarf2 max-cache-age</code><dd>Control the DWARF 2 compilation unit cache.
+
+     <p><a name="index-DWARF-2-compilation-units-cache-2351"></a>In object files with inter-compilation-unit references, such as those
+produced by the GCC option &lsquo;<samp><span class="samp">-feliminate-dwarf2-dups</span></samp>&rsquo;, the DWARF 2
+reader needs to frequently refer to previously read compilation units. 
+This setting controls how long a compilation unit will remain in the
+cache if it is not referenced.  A higher limit means that cached
+compilation units will be stored in memory longer, and more total
+memory will be used.  Setting it to zero disables caching, which will
+slow down <span class="sc">gdb</span> startup, but reduce memory consumption.
+
+     <p><a name="index-maint-set-profile-2352"></a><a name="index-maint-show-profile-2353"></a><a name="index-profiling-GDB-2354"></a><br><dt><code>maint set profile</code><dt><code>maint show profile</code><dd>Control profiling of <span class="sc">gdb</span>.
+
+     <p>Profiling will be disabled until you use the &lsquo;<samp><span class="samp">maint set profile</span></samp>&rsquo;
+command to enable it.  When you enable profiling, the system will begin
+collecting timing and execution count data; when you disable profiling or
+exit <span class="sc">gdb</span>, the results will be written to a log file.  Remember that
+if you use profiling, <span class="sc">gdb</span> will overwrite the profiling log file
+(often called <samp><span class="file">gmon.out</span></samp>).  If you have a record of important profiling
+data in a <samp><span class="file">gmon.out</span></samp> file, be sure to move it to a safe location.
+
+     <p>Configuring with &lsquo;<samp><span class="samp">--enable-profiling</span></samp>&rsquo; arranges for <span class="sc">gdb</span> to be
+compiled with the &lsquo;<samp><span class="samp">-pg</span></samp>&rsquo; compiler option.
+
+     <p><a name="index-maint-set-show_002ddebug_002dregs-2355"></a><a name="index-maint-show-show_002ddebug_002dregs-2356"></a><a name="index-hardware-debug-registers-2357"></a><br><dt><code>maint set show-debug-regs</code><dt><code>maint show show-debug-regs</code><dd>Control whether to show variables that mirror the hardware debug
+registers.  Use <code>ON</code> to enable, <code>OFF</code> to disable.  If
+enabled, the debug registers values are shown when <span class="sc">gdb</span> inserts or
+removes a hardware breakpoint or watchpoint, and when the inferior
+triggers a hardware-assisted breakpoint or watchpoint.
+
+     <p><a name="index-maint-set-show_002dall_002dtib-2358"></a><a name="index-maint-show-show_002dall_002dtib-2359"></a><br><dt><code>maint set show-all-tib</code><dt><code>maint show show-all-tib</code><dd>Control whether to show all non zero areas within a 1k block starting
+at thread local base, when using the &lsquo;<samp><span class="samp">info w32 thread-information-block</span></samp>&rsquo;
+command.
+
+     <p><a name="index-maint-space-2360"></a><a name="index-memory-used-by-commands-2361"></a><br><dt><code>maint space</code><dd>Control whether to display memory usage for each command.  If set to a
+nonzero value, <span class="sc">gdb</span> will display how much memory each command
+took, following the command's own output.  This can also be requested
+by invoking <span class="sc">gdb</span> with the <samp><span class="option">--statistics</span></samp> command-line
+switch (see <a href="Mode-Options.html#Mode-Options">Mode Options</a>).
+
+     <p><a name="index-maint-time-2362"></a><a name="index-time-of-command-execution-2363"></a><br><dt><code>maint time</code><dd>Control whether to display the execution time for each command.  If
+set to a nonzero value, <span class="sc">gdb</span> will display how much time it
+took to execute each command, following the command's own output. 
+The time is not printed for the commands that run the target, since
+there's no mechanism currently to compute how much time was spend
+by <span class="sc">gdb</span> and how much time was spend by the program been debugged. 
+it's not possibly currently
+This can also be requested by invoking <span class="sc">gdb</span> with the
+<samp><span class="option">--statistics</span></samp> command-line switch (see <a href="Mode-Options.html#Mode-Options">Mode Options</a>).
+
+     <p><a name="index-maint-translate_002daddress-2364"></a><br><dt><code>maint translate-address </code><span class="roman">[</span><var>section</var><span class="roman">]</span> <var>addr</var><dd>Find the symbol stored at the location specified by the address
+<var>addr</var> and an optional section name <var>section</var>.  If found,
+<span class="sc">gdb</span> prints the name of the closest symbol and an offset from
+the symbol's location to the specified address.  This is similar to
+the <code>info address</code> command (see <a href="Symbols.html#Symbols">Symbols</a>), except that this
+command also allows to find symbols in other sections.
+
+     <p>If section was not specified, the section in which the symbol was found
+is also printed.  For dynamically linked executables, the name of
+executable or shared library containing the symbol is printed as well.
+
+   </dl>
+
+   <p>The following command is useful for non-interactive invocations of
+<span class="sc">gdb</span>, such as in the test suite.
+
+     <dl>
+<dt><code>set watchdog </code><var>nsec</var><dd><a name="index-set-watchdog-2365"></a><a name="index-watchdog-timer-2366"></a><a name="index-timeout-for-commands-2367"></a>Set the maximum number of seconds <span class="sc">gdb</span> will wait for the
+target operation to finish.  If this time expires, <span class="sc">gdb</span>
+reports and error and the command is aborted.
+
+     <br><dt><code>show watchdog</code><dd>Show the current setting of the target wait timeout. 
+</dl>
+
+   </body></html>
+

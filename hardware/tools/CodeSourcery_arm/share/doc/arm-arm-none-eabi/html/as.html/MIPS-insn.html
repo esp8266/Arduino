@@ -1,0 +1,82 @@
+<html lang="en">
+<head>
+<title>MIPS insn - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="MIPS_002dDependent.html#MIPS_002dDependent" title="MIPS-Dependent">
+<link rel="prev" href="MIPS-autoextend.html#MIPS-autoextend" title="MIPS autoextend">
+<link rel="next" href="MIPS-option-stack.html#MIPS-option-stack" title="MIPS option stack">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="MIPS-insn"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="MIPS-option-stack.html#MIPS-option-stack">MIPS option stack</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="MIPS-autoextend.html#MIPS-autoextend">MIPS autoextend</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="MIPS_002dDependent.html#MIPS_002dDependent">MIPS-Dependent</a>
+<hr>
+</div>
+
+<h4 class="subsection">9.24.7 Directive to mark data as an instruction</h4>
+
+<p><a name="index-g_t_0040code_007b_002einsn_007d-1279"></a>The <code>.insn</code> directive tells <code>as</code> that the following
+data is actually instructions.  This makes a difference in MIPS 16 mode:
+when loading the address of a label which precedes instructions,
+<code>as</code> automatically adds 1 to the value, so that jumping to
+the loaded address will do the right thing.
+
+   <p><a name="index-g_t_0040code_007b_002eglobal_007d-1280"></a>The <code>.global</code> and <code>.globl</code> directives supported by
+<code>as</code> will by default mark the symbol as pointing to a
+region of data not code.  This means that, for example, any
+instructions following such a symbol will not be disassembled by
+<code>objdump</code> as it will regard them as data.  To change this
+behaviour an optional section name can be placed after the symbol name
+in the <code>.global</code> directive.  If this section exists and is known
+to be a code section, then the symbol will be marked as poiting at
+code not data.  Ie the syntax for the directive is:
+
+   <p><code>.global </code><var>symbol</var><code>[ </code><var>section</var><code>][, </code><var>symbol</var><code>[ </code><var>section</var><code>]] ...</code>,
+
+   <p>Here is a short example:
+
+<pre class="example">             .global foo .text, bar, baz .data
+     foo:
+             nop
+     bar:
+             .word 0x0
+     baz:
+             .word 0x1
+     
+</pre>
+   </body></html>
+

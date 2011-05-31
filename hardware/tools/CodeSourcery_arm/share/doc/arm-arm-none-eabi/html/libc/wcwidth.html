@@ -1,0 +1,63 @@
+<html lang="en">
+<head>
+<title>wcwidth - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Wchar-strings.html#Wchar-strings" title="Wchar strings">
+<link rel="prev" href="wcsxfrm.html#wcsxfrm" title="wcsxfrm">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="wcwidth"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="wcsxfrm.html#wcsxfrm">wcsxfrm</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Wchar-strings.html#Wchar-strings">Wchar strings</a>
+<hr>
+</div>
+
+<h3 class="section">6.29 <code>wcwidth</code>&mdash;number of column positions of a wide-character code</h3>
+
+<p><a name="index-wcwidth-421"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;wchar.h&gt;
+     int wcwidth(const wchar_t <var>wc</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+The <code>wcwidth</code> function shall determine the number of column
+positions required for the wide character <var>wc</var>. The application
+shall ensure that the value of <var>wc</var> is a character representable
+as a wchar_t, and is a wide-character code corresponding to a
+valid character in the current locale.
+
+   <p><br>
+<strong>Returns</strong><br>
+The <code>wcwidth</code> function shall either return 0 (if <var>wc</var> is a null
+wide-character code), or return the number of column positions to
+be occupied by the wide-character code <var>wc</var>, or return -1 (if <var>wc</var>
+does not correspond to a printable wide-character code).
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>wcwidth</code> has been introduced in the Single UNIX Specification Volume 2. 
+<code>wcwidth</code> has been marked as an extension in the Single UNIX Specification Volume 3.
+
+   <p><br>
+
+   </body></html>
+

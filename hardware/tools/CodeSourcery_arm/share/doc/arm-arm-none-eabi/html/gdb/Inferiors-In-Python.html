@@ -1,0 +1,136 @@
+<html lang="en">
+<head>
+<title>Inferiors In Python - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Python-API.html#Python-API" title="Python API">
+<link rel="prev" href="Disabling-Pretty_002dPrinters.html#Disabling-Pretty_002dPrinters" title="Disabling Pretty-Printers">
+<link rel="next" href="Threads-In-Python.html#Threads-In-Python" title="Threads In Python">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Inferiors-In-Python"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Threads-In-Python.html#Threads-In-Python">Threads In Python</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Disabling-Pretty_002dPrinters.html#Disabling-Pretty_002dPrinters">Disabling Pretty-Printers</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Python-API.html#Python-API">Python API</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">23.2.2.8 Inferiors In Python</h5>
+
+<p><a name="index-inferiors-in-python-1700"></a>
+<a name="index-gdb_002eInferior-1701"></a>Programs which are being run under <span class="sc">gdb</span> are called inferiors
+(see <a href="Inferiors-and-Programs.html#Inferiors-and-Programs">Inferiors and Programs</a>).  Python scripts can access
+information about and manipulate inferiors controlled by <span class="sc">gdb</span>
+via objects of the <code>gdb.Inferior</code> class.
+
+   <p>The following inferior-related functions are available in the <code>gdb</code>
+module:
+
+<div class="defun">
+&mdash; Function: <b>inferiors</b><var><a name="index-inferiors-1702"></a></var><br>
+<blockquote><p>Return a tuple containing all inferior objects. 
+</p></blockquote></div>
+
+   <p>A <code>gdb.Inferior</code> object has the following attributes:
+
+     <dl>
+
+     <div class="defun">
+&mdash; Instance Variable of Inferior: <b>num</b><var><a name="index-num-1703"></a></var><br>
+<blockquote> <p>ID of inferior, as assigned by GDB. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Instance Variable of Inferior: <b>pid</b><var><a name="index-pid-1704"></a></var><br>
+<blockquote> <p>Process ID of the inferior, as assigned by the underlying operating
+system. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Instance Variable of Inferior: <b>was_attached</b><var><a name="index-was_005fattached-1705"></a></var><br>
+<blockquote> <p>Boolean signaling whether the inferior was created using `attach', or
+started by <span class="sc">gdb</span> itself. 
+</p></blockquote></div>
+     </dl>
+
+   <p>A <code>gdb.Inferior</code> object has the following methods:
+
+     <dl>
+
+     <div class="defun">
+&mdash; Method on Inferior: <b>threads</b><var><a name="index-threads-on-Inferior-1706"></a></var><br>
+<blockquote> <p>This method returns a tuple holding all the threads which are valid
+when it is called.  If there are no valid threads, the method will
+return an empty tuple. 
+</p></blockquote></div>
+
+     <p><a name="index-gdb_002eread_005fmemory-1707"></a>
+
+     <div class="defun">
+&mdash; Method on Inferior: <b>read_memory</b><var> address length<a name="index-read_005fmemory-on-Inferior-1708"></a></var><br>
+<blockquote> <p>Read <var>length</var> bytes of memory from the inferior, starting at
+<var>address</var>.  Returns a buffer object, which behaves much like an array
+or a string.  It can be modified and given to the <code>gdb.write_memory</code>
+function. 
+</p></blockquote></div>
+
+     <p><a name="index-gdb_002ewrite_005fmemory-1709"></a>
+
+     <div class="defun">
+&mdash; Method on Inferior: <b>write_memory</b><var> address buffer </var><span class="roman">[</span><var>length</var><span class="roman">]</span><var><a name="index-write_005fmemory-on-Inferior-1710"></a></var><br>
+<blockquote> <p>Write the contents of <var>buffer</var> to the inferior, starting at
+<var>address</var>.  The <var>buffer</var> parameter must be a Python object
+which supports the buffer protocol, i.e., a string, an array or the
+object returned from <code>gdb.read_memory</code>.  If given, <var>length</var>
+determines the number of bytes from <var>buffer</var> to be written. 
+</p></blockquote></div>
+
+     <p><a name="index-gdb_002esearch_005fmemory-1711"></a>
+
+     <div class="defun">
+&mdash; Method on Inferior: <b>search_memory</b><var> address length pattern<a name="index-search_005fmemory-on-Inferior-1712"></a></var><br>
+<blockquote> <p>Search a region of the inferior memory starting at <var>address</var> with
+the given <var>length</var> using the search pattern supplied in
+<var>pattern</var>.  The <var>pattern</var> parameter must be a Python object
+which supports the buffer protocol, i.e., a string, an array or the
+object returned from <code>gdb.read_memory</code>.  Returns a Python <code>Long</code>
+containing the address where the pattern was found, or <code>None</code> if
+the pattern could not be found. 
+</p></blockquote></div>
+     </dl>
+
+   </body></html>
+

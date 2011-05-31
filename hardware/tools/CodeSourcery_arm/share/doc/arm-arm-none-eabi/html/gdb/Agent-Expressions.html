@@ -1,0 +1,101 @@
+<html lang="en">
+<head>
+<title>Agent Expressions - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Remote-Protocol.html#Remote-Protocol" title="Remote Protocol">
+<link rel="next" href="Target-Descriptions.html#Target-Descriptions" title="Target Descriptions">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Agent-Expressions"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Target-Descriptions.html#Target-Descriptions">Target Descriptions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Remote-Protocol.html#Remote-Protocol">Remote Protocol</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="appendix">Appendix E The GDB Agent Expression Mechanism</h2>
+
+<p>In some applications, it is not feasible for the debugger to interrupt
+the program's execution long enough for the developer to learn anything
+helpful about its behavior.  If the program's correctness depends on its
+real-time behavior, delays introduced by a debugger might cause the
+program to fail, even when the code itself is correct.  It is useful to
+be able to observe the program's behavior without interrupting it.
+
+   <p>Using GDB's <code>trace</code> and <code>collect</code> commands, the user can
+specify locations in the program, and arbitrary expressions to evaluate
+when those locations are reached.  Later, using the <code>tfind</code>
+command, she can examine the values those expressions had when the
+program hit the trace points.  The expressions may also denote objects
+in memory &mdash; structures or arrays, for example &mdash; whose values GDB
+should record; while visiting a particular tracepoint, the user may
+inspect those objects as if they were in memory at that moment. 
+However, because GDB records these values without interacting with the
+user, it can do so quickly and unobtrusively, hopefully not disturbing
+the program's behavior.
+
+   <p>When GDB is debugging a remote target, the GDB <dfn>agent</dfn> code running
+on the target computes the values of the expressions itself.  To avoid
+having a full symbolic expression evaluator on the agent, GDB translates
+expressions in the source language into a simpler bytecode language, and
+then sends the bytecode to the agent; the agent then executes the
+bytecode, and records the values for GDB to retrieve later.
+
+   <p>The bytecode language is simple; there are forty-odd opcodes, the bulk
+of which are the usual vocabulary of C operands (addition, subtraction,
+shifts, and so on) and various sizes of literals and memory reference
+operations.  The bytecode interpreter operates strictly on machine-level
+values &mdash; various sizes of integers and floating point numbers &mdash; and
+requires no information about types or symbols; thus, the interpreter's
+internal data structures are simple, and each bytecode requires only a
+few native machine instructions to implement it.  The interpreter is
+small, and strict limits on the memory and time required to evaluate an
+expression are easy to determine, making it suitable for use by the
+debugging agent in real-time applications.
+
+<ul class="menu">
+<li><a accesskey="1" href="General-Bytecode-Design.html#General-Bytecode-Design">General Bytecode Design</a>:      Overview of the interpreter. 
+<li><a accesskey="2" href="Bytecode-Descriptions.html#Bytecode-Descriptions">Bytecode Descriptions</a>:        What each one does. 
+<li><a accesskey="3" href="Using-Agent-Expressions.html#Using-Agent-Expressions">Using Agent Expressions</a>:      How agent expressions fit into the big picture. 
+<li><a accesskey="4" href="Varying-Target-Capabilities.html#Varying-Target-Capabilities">Varying Target Capabilities</a>:  How to discover what the target can do. 
+<li><a accesskey="5" href="Rationale.html#Rationale">Rationale</a>:                    Why we did it this way. 
+</ul>
+
+<!-- @node Rationale -->
+<!-- @section Rationale -->
+   </body></html>
+

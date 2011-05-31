@@ -1,0 +1,88 @@
+<html lang="en">
+<head>
+<title>Comm - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Pseudo-Ops.html#Pseudo-Ops" title="Pseudo Ops">
+<link rel="prev" href="CFI-directives.html#CFI-directives" title="CFI directives">
+<link rel="next" href="Data.html#Data" title="Data">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Comm"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Data.html#Data">Data</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="CFI-directives.html#CFI-directives">CFI directives</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Pseudo-Ops.html#Pseudo-Ops">Pseudo Ops</a>
+<hr>
+</div>
+
+<h3 class="section">7.30 <code>.comm </code><var>symbol</var><code> , </code><var>length</var> </h3>
+
+<p><a name="index-g_t_0040code_007bcomm_007d-directive-295"></a><a name="index-symbol_002c-common-296"></a><code>.comm</code> declares a common symbol named <var>symbol</var>.  When linking, a
+common symbol in one object file may be merged with a defined or common symbol
+of the same name in another object file.  If <code>ld</code> does not see a
+definition for the symbol&ndash;just one or more common symbols&ndash;then it will
+allocate <var>length</var> bytes of uninitialized memory.  <var>length</var> must be an
+absolute expression.  If <code>ld</code> sees multiple common symbols with
+the same name, and they do not all have the same size, it will allocate space
+using the largest size.
+
+   <p>When using ELF or (as a GNU extension) PE, the <code>.comm</code> directive takes
+an optional third argument.  This is the desired alignment of the symbol,
+specified for ELF as a byte boundary (for example, an alignment of 16 means
+that the least significant 4 bits of the address should be zero), and for PE
+as a power of two (for example, an alignment of 5 means aligned to a 32-byte
+boundary).  The alignment must be an absolute expression, and it must be a
+power of two.  If <code>ld</code> allocates uninitialized memory for the
+common symbol, it will use the alignment when placing the symbol.  If no
+alignment is specified, <samp><span class="command">as</span></samp> will set the alignment to the
+largest power of two less than or equal to the size of the symbol, up to a
+maximum of 16 on ELF, or the default section alignment of 4 on PE<a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a>.
+
+   <p>The syntax for <code>.comm</code> differs slightly on the HPPA.  The syntax is
+&lsquo;<samp><var>symbol</var><span class="samp"> .comm, </span><var>length</var></samp>&rsquo;; <var>symbol</var> is optional.
+
+   <div class="footnote">
+<hr>
+<h4>Footnotes</h4><p class="footnote"><small>[<a name="fn-1" href="#fnd-1">1</a>]</small> This
+is not the same as the executable image file alignment controlled by <code>ld</code>'s
+&lsquo;<samp><span class="samp">--section-alignment</span></samp>&rsquo; option; image file sections in PE are aligned to
+multiples of 4096, which is far too large an alignment for ordinary variables. 
+It is rather the default alignment for (non-debug) sections within object
+(&lsquo;<samp><span class="samp">*.o</span></samp>&rsquo;) files, which are less strictly aligned.</p>
+
+   <hr></div>
+
+   </body></html>
+

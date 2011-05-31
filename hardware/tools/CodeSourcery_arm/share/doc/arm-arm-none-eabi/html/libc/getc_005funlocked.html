@@ -1,0 +1,75 @@
+<html lang="en">
+<head>
+<title>getc_unlocked - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="getc.html#getc" title="getc">
+<link rel="next" href="getchar.html#getchar" title="getchar">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="getc_unlocked"></a>
+<a name="getc_005funlocked"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="getchar.html#getchar">getchar</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="getc.html#getc">getc</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.33 <code>getc_unlocked</code>&mdash;non-thread-safe version of getc (macro)</h3>
+
+<p><a name="index-getc_005funlocked-216"></a><a name="index-g_t_005fgetc_005funlocked_005fr-217"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     int getc_unlocked(FILE *<var>fp</var>);
+     
+     #include &lt;stdio.h&gt;
+     int _getc_unlocked_r(FILE *<var>fp</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>getc_unlocked</code> is a non-thread-safe version of <code>getc</code> declared in
+<code>stdio.h</code>.  <code>getc_unlocked</code> may only safely be used within a scope
+protected by flockfile() (or ftrylockfile()) and funlockfile().  These
+functions may safely be used in a multi-threaded program if and only
+if they are called while the invoking thread owns the ( FILE *)
+object, as is the case after a successful call to the flockfile() or
+ftrylockfile() functions.  If threads are disabled, then
+<code>getc_unlocked</code> is equivalent to <code>getc</code>.
+
+   <p>The <code>_getc_unlocked_r</code> function is simply the reentrant version of
+<code>get_unlocked</code> which passes an additional reentrancy structure pointer
+argument: <var>ptr</var>.
+
+   <p><br>
+<strong>Returns</strong><br>
+See <code>getc</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+POSIX 1003.1 requires <code>getc_unlocked</code>.  <code>getc_unlocked</code> may be
+implemented as a macro, so arguments should not have side-effects.
+
+   <p>Supporting OS subroutines required: <code>close</code>, <code>fstat</code>, <code>isatty</code>,
+<code>lseek</code>, <code>read</code>, <code>sbrk</code>, <code>write</code>. 
+<br>
+
+   </body></html>
+

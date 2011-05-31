@@ -1,0 +1,135 @@
+<html lang="en">
+<head>
+<title>CRIS-Pic - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="CRIS_002dSyntax.html#CRIS_002dSyntax" title="CRIS-Syntax">
+<link rel="prev" href="CRIS_002dChars.html#CRIS_002dChars" title="CRIS-Chars">
+<link rel="next" href="CRIS_002dRegs.html#CRIS_002dRegs" title="CRIS-Regs">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="CRIS-Pic"></a>
+<a name="CRIS_002dPic"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="CRIS_002dRegs.html#CRIS_002dRegs">CRIS-Regs</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="CRIS_002dChars.html#CRIS_002dChars">CRIS-Chars</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="CRIS_002dSyntax.html#CRIS_002dSyntax">CRIS-Syntax</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">9.7.4.2 Symbols in position-independent code</h5>
+
+<p><a name="index-Symbols-in-position_002dindependent-code_002c-CRIS-728"></a><a name="index-CRIS-symbols-in-position_002dindependent-code-729"></a><a name="index-Position_002dindependent-code_002c-symbols-in_002c-CRIS-730"></a>
+When generating <a name="crispic"></a>position-independent code (SVR4
+PIC) for use in cris-axis-linux-gnu or crisv32-axis-linux-gnu
+shared libraries, symbol
+suffixes are used to specify what kind of run-time symbol lookup
+will be used, expressed in the object as different
+<em>relocation types</em>.  Usually, all absolute symbol values
+must be located in a table, the <em>global offset table</em>,
+leaving the code position-independent; independent of values of
+global symbols and independent of the address of the code.  The
+suffix modifies the value of the symbol, into for example an
+index into the global offset table where the real symbol value
+is entered, or a PC-relative value, or a value relative to the
+start of the global offset table.  All symbol suffixes start
+with the character &lsquo;<samp><span class="samp">:</span></samp>&rsquo; (omitted in the list below).  Every
+symbol use in code or a read-only section must therefore have a
+PIC suffix to enable a useful shared library to be created. 
+Usually, these constructs must not be used with an additive
+constant offset as is usually allowed, i.e. no 4 as in
+<code>symbol + 4</code> is allowed.  This restriction is checked at
+link-time, not at assembly-time.
+
+     <dl>
+<dt><code>GOT</code><dd>
+Attaching this suffix to a symbol in an instruction causes the
+symbol to be entered into the global offset table.  The value is
+a 32-bit index for that symbol into the global offset table. 
+The name of the corresponding relocation is
+&lsquo;<samp><span class="samp">R_CRIS_32_GOT</span></samp>&rsquo;.  Example: <code>move.d
+[$r0+extsym:GOT],$r9</code>
+
+     <br><dt><code>GOT16</code><dd>
+Same as for &lsquo;<samp><span class="samp">GOT</span></samp>&rsquo;, but the value is a 16-bit index into the
+global offset table.  The corresponding relocation is
+&lsquo;<samp><span class="samp">R_CRIS_16_GOT</span></samp>&rsquo;.  Example: <code>move.d
+[$r0+asymbol:GOT16],$r10</code>
+
+     <br><dt><code>PLT</code><dd>
+This suffix is used for function symbols.  It causes a
+<em>procedure linkage table</em>, an array of code stubs, to be
+created at the time the shared object is created or linked
+against, together with a global offset table entry.  The value
+is a pc-relative offset to the corresponding stub code in the
+procedure linkage table.  This arrangement causes the run-time
+symbol resolver to be called to look up and set the value of the
+symbol the first time the function is called (at latest;
+depending environment variables).  It is only safe to leave the
+symbol unresolved this way if all references are function calls. 
+The name of the relocation is &lsquo;<samp><span class="samp">R_CRIS_32_PLT_PCREL</span></samp>&rsquo;. 
+Example: <code>add.d fnname:PLT,$pc</code>
+
+     <br><dt><code>PLTG</code><dd>
+Like PLT, but the value is relative to the beginning of the
+global offset table.  The relocation is
+&lsquo;<samp><span class="samp">R_CRIS_32_PLT_GOTREL</span></samp>&rsquo;.  Example: <code>move.d
+fnname:PLTG,$r3</code>
+
+     <br><dt><code>GOTPLT</code><dd>
+Similar to &lsquo;<samp><span class="samp">PLT</span></samp>&rsquo;, but the value of the symbol is a 32-bit
+index into the global offset table.  This is somewhat of a mix
+between the effect of the &lsquo;<samp><span class="samp">GOT</span></samp>&rsquo; and the &lsquo;<samp><span class="samp">PLT</span></samp>&rsquo; suffix;
+the difference to &lsquo;<samp><span class="samp">GOT</span></samp>&rsquo; is that there will be a procedure
+linkage table entry created, and that the symbol is assumed to
+be a function entry and will be resolved by the run-time
+resolver as with &lsquo;<samp><span class="samp">PLT</span></samp>&rsquo;.  The relocation is
+&lsquo;<samp><span class="samp">R_CRIS_32_GOTPLT</span></samp>&rsquo;.  Example: <code>jsr
+[$r0+fnname:GOTPLT]</code>
+
+     <br><dt><code>GOTPLT16</code><dd>
+A variant of &lsquo;<samp><span class="samp">GOTPLT</span></samp>&rsquo; giving a 16-bit value.  Its
+relocation name is &lsquo;<samp><span class="samp">R_CRIS_16_GOTPLT</span></samp>&rsquo;.  Example: <code>jsr
+[$r0+fnname:GOTPLT16]</code>
+
+     <br><dt><code>GOTOFF</code><dd>
+This suffix must only be attached to a local symbol, but may be
+used in an expression adding an offset.  The value is the
+address of the symbol relative to the start of the global offset
+table.  The relocation name is &lsquo;<samp><span class="samp">R_CRIS_32_GOTREL</span></samp>&rsquo;. 
+Example: <code>move.d [$r0+localsym:GOTOFF],r3</code>
+</dl>
+
+   </body></html>
+

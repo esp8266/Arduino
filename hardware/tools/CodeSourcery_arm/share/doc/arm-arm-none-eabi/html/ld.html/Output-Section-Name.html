@@ -1,0 +1,66 @@
+<html lang="en">
+<head>
+<title>Output Section Name - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="SECTIONS.html#SECTIONS" title="SECTIONS">
+<link rel="prev" href="Output-Section-Description.html#Output-Section-Description" title="Output Section Description">
+<link rel="next" href="Output-Section-Address.html#Output-Section-Address" title="Output Section Address">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Output-Section-Name"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Output-Section-Address.html#Output-Section-Address">Output Section Address</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Output-Section-Description.html#Output-Section-Description">Output Section Description</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="SECTIONS.html#SECTIONS">SECTIONS</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.6.2 Output Section Name</h4>
+
+<p><a name="index-name_002c-section-392"></a><a name="index-section-name-393"></a>The name of the output section is <var>section</var>.  <var>section</var> must
+meet the constraints of your output format.  In formats which only
+support a limited number of sections, such as <code>a.out</code>, the name
+must be one of the names supported by the format (<code>a.out</code>, for
+example, allows only &lsquo;<samp><span class="samp">.text</span></samp>&rsquo;, &lsquo;<samp><span class="samp">.data</span></samp>&rsquo; or &lsquo;<samp><span class="samp">.bss</span></samp>&rsquo;). If the
+output format supports any number of sections, but with numbers and not
+names (as is the case for Oasys), the name should be supplied as a
+quoted numeric string.  A section name may consist of any sequence of
+characters, but a name which contains any unusual characters such as
+commas must be quoted.
+
+   <p>The output section name &lsquo;<samp><span class="samp">/DISCARD/</span></samp>&rsquo; is special; <a href="Output-Section-Discarding.html#Output-Section-Discarding">Output Section Discarding</a>.
+
+   </body></html>
+

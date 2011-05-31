@@ -1,0 +1,129 @@
+<html lang="en">
+<head>
+<title>File Format - GNU gprof</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GNU gprof">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Details.html#Details" title="Details">
+<link rel="prev" href="Implementation.html#Implementation" title="Implementation">
+<link rel="next" href="Internals.html#Internals" title="Internals">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the gprof profiler of the GNU system.
+
+Copyright (C) 1988, 1992, 1997, 1998, 1999, 2000, 2001, 2003,
+2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="File-Format"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Internals.html#Internals">Internals</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Implementation.html#Implementation">Implementation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Details.html#Details">Details</a>
+<hr>
+</div>
+
+<h3 class="section">9.2 Profiling Data File Format</h3>
+
+<p>The old BSD-derived file format used for profile data does not contain a
+magic cookie that allows to check whether a data file really is a
+<code>gprof</code> file.  Furthermore, it does not provide a version number, thus
+rendering changes to the file format almost impossible.  <span class="sc">gnu</span> <code>gprof</code>
+uses a new file format that provides these features.  For backward
+compatibility, <span class="sc">gnu</span> <code>gprof</code> continues to support the old BSD-derived
+format, but not all features are supported with it.  For example,
+basic-block execution counts cannot be accommodated by the old file
+format.
+
+   <p>The new file format is defined in header file <samp><span class="file">gmon_out.h</span></samp>.  It
+consists of a header containing the magic cookie and a version number,
+as well as some spare bytes available for future extensions.  All data
+in a profile data file is in the native format of the target for which
+the profile was collected.  <span class="sc">gnu</span> <code>gprof</code> adapts automatically
+to the byte-order in use.
+
+   <p>In the new file format, the header is followed by a sequence of
+records.  Currently, there are three different record types: histogram
+records, call-graph arc records, and basic-block execution count
+records.  Each file can contain any number of each record type.  When
+reading a file, <span class="sc">gnu</span> <code>gprof</code> will ensure records of the same type are
+compatible with each other and compute the union of all records.  For
+example, for basic-block execution counts, the union is simply the sum
+of all execution counts for each basic-block.
+
+<h4 class="subsection">9.2.1 Histogram Records</h4>
+
+<p>Histogram records consist of a header that is followed by an array of
+bins.  The header contains the text-segment range that the histogram
+spans, the size of the histogram in bytes (unlike in the old BSD
+format, this does not include the size of the header), the rate of the
+profiling clock, and the physical dimension that the bin counts
+represent after being scaled by the profiling clock rate.  The
+physical dimension is specified in two parts: a long name of up to 15
+characters and a single character abbreviation.  For example, a
+histogram representing real-time would specify the long name as
+&ldquo;seconds&rdquo; and the abbreviation as &ldquo;s&rdquo;.  This feature is useful for
+architectures that support performance monitor hardware (which,
+fortunately, is becoming increasingly common).  For example, under DEC
+OSF/1, the &ldquo;uprofile&rdquo; command can be used to produce a histogram of,
+say, instruction cache misses.  In this case, the dimension in the
+histogram header could be set to &ldquo;i-cache misses&rdquo; and the abbreviation
+could be set to &ldquo;1&rdquo; (because it is simply a count, not a physical
+dimension).  Also, the profiling rate would have to be set to 1 in
+this case.
+
+   <p>Histogram bins are 16-bit numbers and each bin represent an equal
+amount of text-space.  For example, if the text-segment is one
+thousand bytes long and if there are ten bins in the histogram, each
+bin represents one hundred bytes.
+
+<h4 class="subsection">9.2.2 Call-Graph Records</h4>
+
+<p>Call-graph records have a format that is identical to the one used in
+the BSD-derived file format.  It consists of an arc in the call graph
+and a count indicating the number of times the arc was traversed
+during program execution.  Arcs are specified by a pair of addresses:
+the first must be within caller's function and the second must be
+within the callee's function.  When performing profiling at the
+function level, these addresses can point anywhere within the
+respective function.  However, when profiling at the line-level, it is
+better if the addresses are as close to the call-site/entry-point as
+possible.  This will ensure that the line-level call-graph is able to
+identify exactly which line of source code performed calls to a
+function.
+
+<h4 class="subsection">9.2.3 Basic-Block Execution Count Records</h4>
+
+<p>Basic-block execution count records consist of a header followed by a
+sequence of address/count pairs.  The header simply specifies the
+length of the sequence.  In an address/count pair, the address
+identifies a basic-block and the count specifies the number of times
+that basic-block was executed.  Any address within the basic-address can
+be used.
+
+   </body></html>
+

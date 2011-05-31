@@ -1,0 +1,230 @@
+<html lang="en">
+<head>
+<title>Character Sets - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Data.html#Data" title="Data">
+<link rel="prev" href="Core-File-Generation.html#Core-File-Generation" title="Core File Generation">
+<link rel="next" href="Caching-Remote-Data.html#Caching-Remote-Data" title="Caching Remote Data">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Character-Sets"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Caching-Remote-Data.html#Caching-Remote-Data">Caching Remote Data</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Core-File-Generation.html#Core-File-Generation">Core File Generation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Data.html#Data">Data</a>
+<hr>
+</div>
+
+<h3 class="section">10.19 Character Sets</h3>
+
+<p><a name="index-character-sets-640"></a><a name="index-charset-641"></a><a name="index-translating-between-character-sets-642"></a><a name="index-host-character-set-643"></a><a name="index-target-character-set-644"></a>
+If the program you are debugging uses a different character set to
+represent characters and strings than the one <span class="sc">gdb</span> uses itself,
+<span class="sc">gdb</span> can automatically translate between the character sets for
+you.  The character set <span class="sc">gdb</span> uses we call the <dfn>host
+character set</dfn>; the one the inferior program uses we call the
+<dfn>target character set</dfn>.
+
+   <p>For example, if you are running <span class="sc">gdb</span> on a <span class="sc">gnu</span>/Linux system, which
+uses the ISO Latin 1 character set, but you are using <span class="sc">gdb</span>'s
+remote protocol (see <a href="Remote-Debugging.html#Remote-Debugging">Remote Debugging</a>) to debug a program
+running on an IBM mainframe, which uses the <span class="sc">ebcdic</span> character set,
+then the host character set is Latin-1, and the target character set is
+<span class="sc">ebcdic</span>.  If you give <span class="sc">gdb</span> the command <code>set
+target-charset EBCDIC-US</code>, then <span class="sc">gdb</span> translates between
+<span class="sc">ebcdic</span> and Latin 1 as you print character or string values, or use
+character and string literals in expressions.
+
+   <p><span class="sc">gdb</span> has no way to automatically recognize which character set
+the inferior program uses; you must tell it, using the <code>set
+target-charset</code> command, described below.
+
+   <p>Here are the commands for controlling <span class="sc">gdb</span>'s character set
+support:
+
+     <dl>
+<dt><code>set target-charset </code><var>charset</var><dd><a name="index-set-target_002dcharset-645"></a>Set the current target character set to <var>charset</var>.  To display the
+list of supported target character sets, type
+<kbd>set&nbsp;target-charset&nbsp;&lt;TAB&gt;&lt;TAB&gt;<!-- /@w --></kbd>.
+
+     <br><dt><code>set host-charset </code><var>charset</var><dd><a name="index-set-host_002dcharset-646"></a>Set the current host character set to <var>charset</var>.
+
+     <p>By default, <span class="sc">gdb</span> uses a host character set appropriate to the
+system it is running on; you can override that default using the
+<code>set host-charset</code> command.  On some systems, <span class="sc">gdb</span> cannot
+automatically determine the appropriate host character set.  In this
+case, <span class="sc">gdb</span> uses &lsquo;<samp><span class="samp">UTF-8</span></samp>&rsquo;.
+
+     <p><span class="sc">gdb</span> can only use certain character sets as its host character
+set.  If you type <kbd>set&nbsp;target-charset&nbsp;&lt;TAB&gt;&lt;TAB&gt;<!-- /@w --></kbd>,
+<span class="sc">gdb</span> will list the host character sets it supports.
+
+     <br><dt><code>set charset </code><var>charset</var><dd><a name="index-set-charset-647"></a>Set the current host and target character sets to <var>charset</var>.  As
+above, if you type <kbd>set&nbsp;charset&nbsp;&lt;TAB&gt;&lt;TAB&gt;<!-- /@w --></kbd>,
+<span class="sc">gdb</span> will list the names of the character sets that can be used
+for both host and target.
+
+     <br><dt><code>show charset</code><dd><a name="index-show-charset-648"></a>Show the names of the current host and target character sets.
+
+     <br><dt><code>show host-charset</code><dd><a name="index-show-host_002dcharset-649"></a>Show the name of the current host character set.
+
+     <br><dt><code>show target-charset</code><dd><a name="index-show-target_002dcharset-650"></a>Show the name of the current target character set.
+
+     <br><dt><code>set target-wide-charset </code><var>charset</var><dd><a name="index-set-target_002dwide_002dcharset-651"></a>Set the current target's wide character set to <var>charset</var>.  This is
+the character set used by the target's <code>wchar_t</code> type.  To
+display the list of supported wide character sets, type
+<kbd>set&nbsp;target-wide-charset&nbsp;&lt;TAB&gt;&lt;TAB&gt;<!-- /@w --></kbd>.
+
+     <br><dt><code>show target-wide-charset</code><dd><a name="index-show-target_002dwide_002dcharset-652"></a>Show the name of the current target's wide character set. 
+</dl>
+
+   <p>Here is an example of <span class="sc">gdb</span>'s character set support in action. 
+Assume that the following source code has been placed in the file
+<samp><span class="file">charset-test.c</span></samp>:
+
+<pre class="smallexample">     #include &lt;stdio.h&gt;
+     
+     char ascii_hello[]
+       = {72, 101, 108, 108, 111, 44, 32, 119,
+          111, 114, 108, 100, 33, 10, 0};
+     char ibm1047_hello[]
+       = {200, 133, 147, 147, 150, 107, 64, 166,
+          150, 153, 147, 132, 90, 37, 0};
+     
+     main ()
+     {
+       printf ("Hello, world!\n");
+     }
+</pre>
+   <p>In this program, <code>ascii_hello</code> and <code>ibm1047_hello</code> are arrays
+containing the string &lsquo;<samp><span class="samp">Hello, world!</span></samp>&rsquo; followed by a newline,
+encoded in the <span class="sc">ascii</span> and <span class="sc">ibm1047</span> character sets.
+
+   <p>We compile the program, and invoke the debugger on it:
+
+<pre class="smallexample">     $ gcc -g charset-test.c -o charset-test
+     $ gdb -nw charset-test
+     GNU gdb 2001-12-19-cvs
+     Copyright 2001 Free Software Foundation, Inc.
+     ...
+     (gdb)
+</pre>
+   <p>We can use the <code>show charset</code> command to see what character sets
+<span class="sc">gdb</span> is currently using to interpret and display characters and
+strings:
+
+<pre class="smallexample">     (gdb) show charset
+     The current host and target character set is `ISO-8859-1'.
+     (gdb)
+</pre>
+   <p>For the sake of printing this manual, let's use <span class="sc">ascii</span> as our
+initial character set:
+<pre class="smallexample">     (gdb) set charset ASCII
+     (gdb) show charset
+     The current host and target character set is `ASCII'.
+     (gdb)
+</pre>
+   <p>Let's assume that <span class="sc">ascii</span> is indeed the correct character set for our
+host system &mdash; in other words, let's assume that if <span class="sc">gdb</span> prints
+characters using the <span class="sc">ascii</span> character set, our terminal will display
+them properly.  Since our current target character set is also
+<span class="sc">ascii</span>, the contents of <code>ascii_hello</code> print legibly:
+
+<pre class="smallexample">     (gdb) print ascii_hello
+     $1 = 0x401698 "Hello, world!\n"
+     (gdb) print ascii_hello[0]
+     $2 = 72 'H'
+     (gdb)
+</pre>
+   <p><span class="sc">gdb</span> uses the target character set for character and string
+literals you use in expressions:
+
+<pre class="smallexample">     (gdb) print '+'
+     $3 = 43 '+'
+     (gdb)
+</pre>
+   <p>The <span class="sc">ascii</span> character set uses the number 43 to encode the &lsquo;<samp><span class="samp">+</span></samp>&rsquo;
+character.
+
+   <p><span class="sc">gdb</span> relies on the user to tell it which character set the
+target program uses.  If we print <code>ibm1047_hello</code> while our target
+character set is still <span class="sc">ascii</span>, we get jibberish:
+
+<pre class="smallexample">     (gdb) print ibm1047_hello
+     $4 = 0x4016a8 "\310\205\223\223\226k@\246\226\231\223\204Z%"
+     (gdb) print ibm1047_hello[0]
+     $5 = 200 '\310'
+     (gdb)
+</pre>
+   <p>If we invoke the <code>set target-charset</code> followed by &lt;TAB&gt;&lt;TAB&gt;,
+<span class="sc">gdb</span> tells us the character sets it supports:
+
+<pre class="smallexample">     (gdb) set target-charset
+     ASCII       EBCDIC-US   IBM1047     ISO-8859-1
+     (gdb) set target-charset
+</pre>
+   <p>We can select <span class="sc">ibm1047</span> as our target character set, and examine the
+program's strings again.  Now the <span class="sc">ascii</span> string is wrong, but
+<span class="sc">gdb</span> translates the contents of <code>ibm1047_hello</code> from the
+target character set, <span class="sc">ibm1047</span>, to the host character set,
+<span class="sc">ascii</span>, and they display correctly:
+
+<pre class="smallexample">     (gdb) set target-charset IBM1047
+     (gdb) show charset
+     The current host character set is `ASCII'.
+     The current target character set is `IBM1047'.
+     (gdb) print ascii_hello
+     $6 = 0x401698 "\110\145%%?\054\040\167?\162%\144\041\012"
+     (gdb) print ascii_hello[0]
+     $7 = 72 '\110'
+     (gdb) print ibm1047_hello
+     $8 = 0x4016a8 "Hello, world!\n"
+     (gdb) print ibm1047_hello[0]
+     $9 = 200 'H'
+     (gdb)
+</pre>
+   <p>As above, <span class="sc">gdb</span> uses the target character set for character and
+string literals you use in expressions:
+
+<pre class="smallexample">     (gdb) print '+'
+     $10 = 78 '+'
+     (gdb)
+</pre>
+   <p>The <span class="sc">ibm1047</span> character set uses the number 78 to encode the &lsquo;<samp><span class="samp">+</span></samp>&rsquo;
+character.
+
+   </body></html>
+

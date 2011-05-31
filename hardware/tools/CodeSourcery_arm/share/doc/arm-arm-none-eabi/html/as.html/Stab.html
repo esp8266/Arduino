@@ -1,0 +1,102 @@
+<html lang="en">
+<head>
+<title>Stab - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Pseudo-Ops.html#Pseudo-Ops" title="Pseudo Ops">
+<link rel="prev" href="Space.html#Space" title="Space">
+<link rel="next" href="String.html#String" title="String">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Stab"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="String.html#String">String</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Space.html#Space">Space</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Pseudo-Ops.html#Pseudo-Ops">Pseudo Ops</a>
+<hr>
+</div>
+
+<h3 class="section">7.104 <code>.stabd, .stabn, .stabs</code></h3>
+
+<p><a name="index-symbolic-debuggers_002c-information-for-457"></a><a name="index-g_t_0040code_007bstab_0040var_007bx_007d_007d-directives-458"></a>There are three directives that begin &lsquo;<samp><span class="samp">.stab</span></samp>&rsquo;. 
+All emit symbols (see <a href="Symbols.html#Symbols">Symbols</a>), for use by symbolic debuggers. 
+The symbols are not entered in the <samp><span class="command">as</span></samp> hash table: they
+cannot be referenced elsewhere in the source file. 
+Up to five fields are required:
+
+     <dl>
+<dt><var>string</var><dd>This is the symbol's name.  It may contain any character except
+&lsquo;<samp><span class="samp">\000</span></samp>&rsquo;, so is more general than ordinary symbol names.  Some
+debuggers used to code arbitrarily complex structures into symbol names
+using this field.
+
+     <br><dt><var>type</var><dd>An absolute expression.  The symbol's type is set to the low 8 bits of
+this expression.  Any bit pattern is permitted, but <code>ld</code>
+and debuggers choke on silly bit patterns.
+
+     <br><dt><var>other</var><dd>An absolute expression.  The symbol's &ldquo;other&rdquo; attribute is set to the
+low 8 bits of this expression.
+
+     <br><dt><var>desc</var><dd>An absolute expression.  The symbol's descriptor is set to the low 16
+bits of this expression.
+
+     <br><dt><var>value</var><dd>An absolute expression which becomes the symbol's value. 
+</dl>
+
+   <p>If a warning is detected while reading a <code>.stabd</code>, <code>.stabn</code>,
+or <code>.stabs</code> statement, the symbol has probably already been created;
+you get a half-formed symbol in your object file.  This is
+compatible with earlier assemblers!
+
+     
+<a name="index-g_t_0040code_007bstabd_007d-directive-459"></a>
+<dl><dt><code>.stabd </code><var>type</var><code> , </code><var>other</var><code> , </code><var>desc</var><dd>
+The &ldquo;name&rdquo; of the symbol generated is not even an empty string. 
+It is a null pointer, for compatibility.  Older assemblers used a
+null pointer so they didn't waste space in object files with empty
+strings.
+
+     <p>The symbol's value is set to the location counter,
+relocatably.  When your program is linked, the value of this symbol
+is the address of the location counter when the <code>.stabd</code> was
+assembled.
+
+     <p><a name="index-g_t_0040code_007bstabn_007d-directive-460"></a><br><dt><code>.stabn </code><var>type</var><code> , </code><var>other</var><code> , </code><var>desc</var><code> , </code><var>value</var><dd>The name of the symbol is set to the empty string <code>""</code>.
+
+     <p><a name="index-g_t_0040code_007bstabs_007d-directive-461"></a><br><dt><code>.stabs </code><var>string</var><code> ,  </code><var>type</var><code> , </code><var>other</var><code> , </code><var>desc</var><code> , </code><var>value</var><dd>All five fields are specified. 
+</dl>
+   <!-- end     have-stabs -->
+
+   </body></html>
+

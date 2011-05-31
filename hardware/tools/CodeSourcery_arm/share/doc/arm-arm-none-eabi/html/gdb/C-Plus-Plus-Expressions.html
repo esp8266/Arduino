@@ -1,0 +1,127 @@
+<html lang="en">
+<head>
+<title>C Plus Plus Expressions - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C.html#C" title="C">
+<link rel="prev" href="C-Constants.html#C-Constants" title="C Constants">
+<link rel="next" href="C-Defaults.html#C-Defaults" title="C Defaults">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="C-Plus-Plus-Expressions"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="C-Defaults.html#C-Defaults">C Defaults</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="C-Constants.html#C-Constants">C Constants</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C.html#C">C</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">15.4.1.3 C<tt>++</tt> Expressions</h5>
+
+<p><a name="index-expressions-in-C_0040t_007b_002b_002b_007d-800"></a><span class="sc">gdb</span> expression handling can interpret most C<tt>++</tt> expressions.
+
+   <p><a name="index-debugging-C_0040t_007b_002b_002b_007d-programs-801"></a><a name="index-C_0040t_007b_002b_002b_007d-compilers-802"></a><a name="index-debug-formats-and-C_0040t_007b_002b_002b_007d-803"></a><a name="index-g_t_0040value_007bNGCC_007d-and-C_0040t_007b_002b_002b_007d-804"></a><blockquote>
+<em>Warning:</em> <span class="sc">gdb</span> can only debug C<tt>++</tt> code if you use the
+proper compiler and the proper debug format.  Currently, <span class="sc">gdb</span>
+works best when debugging C<tt>++</tt> code that is compiled with
+<span class="sc">gcc</span> 2.95.3 or with <span class="sc">gcc</span> 3.1 or newer, using the options
+<samp><span class="option">-gdwarf-2</span></samp> or <samp><span class="option">-gstabs+</span></samp>.  DWARF 2 is preferred over
+stabs+.  Most configurations of <span class="sc">gcc</span> emit either DWARF 2 or
+stabs+ as their default debug format, so you usually don't need to
+specify a debug format explicitly.  Other compilers and/or debug formats
+are likely to work badly or not at all when using <span class="sc">gdb</span> to debug
+C<tt>++</tt> code. 
+</blockquote>
+
+     <ol type=1 start=1>
+
+     <p><a name="index-member-functions-805"></a><li>Member function calls are allowed; you can use expressions like
+
+     <pre class="smallexample">          count = aml-&gt;GetOriginal(x, y)
+</pre>
+     <p><a name="index-this_0040r_007b_002c-inside-C_0040t_007b_002b_002b_007d-member-functions_007d-806"></a><a name="index-namespace-in-C_0040t_007b_002b_002b_007d-807"></a><li>While a member function is active (in the selected stack frame), your
+expressions have the same namespace available as the member function;
+that is, <span class="sc">gdb</span> allows implicit references to the class instance
+pointer <code>this</code> following the same rules as C<tt>++</tt>.
+
+     <p><a name="index-call-overloaded-functions-808"></a><a name="index-overloaded-functions_002c-calling-809"></a><a name="index-type-conversions-in-C_0040t_007b_002b_002b_007d-810"></a><li>You can call overloaded functions; <span class="sc">gdb</span> resolves the function
+call to the right definition, with some restrictions.  <span class="sc">gdb</span> does not
+perform overload resolution involving user-defined type conversions,
+calls to constructors, or instantiations of templates that do not exist
+in the program.  It also cannot handle ellipsis argument lists or
+default arguments.
+
+     <p>It does perform integral conversions and promotions, floating-point
+promotions, arithmetic conversions, pointer conversions, conversions of
+class objects to base classes, and standard conversions such as those of
+functions or arrays to pointers; it requires an exact match on the
+number of function arguments.
+
+     <p>Overload resolution is always performed, unless you have specified
+<code>set overload-resolution off</code>.  See <a href="Debugging-C-Plus-Plus.html#Debugging-C-Plus-Plus"><span class="sc">gdb</span> Features for C<tt>++</tt></a>.
+
+     <p>You must specify <code>set overload-resolution off</code> in order to use an
+explicit function signature to call an overloaded function, as in
+     <pre class="smallexample">          p 'foo(char,int)'('x', 13)
+</pre>
+     <p>The <span class="sc">gdb</span> command-completion facility can simplify this;
+see <a href="Completion.html#Completion">Command Completion</a>.
+
+     <p><a name="index-reference-declarations-811"></a><li><span class="sc">gdb</span> understands variables declared as C<tt>++</tt> references; you can use
+them in expressions just as you do in C<tt>++</tt> source&mdash;they are automatically
+dereferenced.
+
+     <p>In the parameter list shown when <span class="sc">gdb</span> displays a frame, the values of
+reference variables are not displayed (unlike other variables); this
+avoids clutter, since references are often used for large structures. 
+The <em>address</em> of a reference variable is always shown, unless
+you have specified &lsquo;<samp><span class="samp">set print address off</span></samp>&rsquo;.
+
+     <li><span class="sc">gdb</span> supports the C<tt>++</tt> name resolution operator <code>::</code>&mdash;your
+expressions can use it just as expressions in your program do.  Since
+one scope may be defined in another, you can use <code>::</code> repeatedly if
+necessary, for example in an expression like
+&lsquo;<samp><var>scope1</var><span class="samp">::</span><var>scope2</var><span class="samp">::</span><var>name</var></samp>&rsquo;.  <span class="sc">gdb</span> also allows
+resolving name scope by reference to source files, in both C and C<tt>++</tt>
+debugging (see <a href="Variables.html#Variables">Program Variables</a>).
+        </ol>
+
+   <p>In addition, when used with HP's C<tt>++</tt> compiler, <span class="sc">gdb</span> supports
+calling virtual functions correctly, printing out virtual bases of
+objects, calling functions in a base subobject, casting objects, and
+invoking user-defined operators.
+
+   </body></html>
+

@@ -1,0 +1,66 @@
+<!-- Board description files
+
+     Copyright (c) 2007-2009 CodeSourcery, Inc.
+
+     THIS FILE CONTAINS PROPRIETARY, CONFIDENTIAL, AND TRADE
+     SECRET INFORMATION OF CODESOURCERY AND/OR ITS LICENSORS.
+
+     You may not use or distribute this file without the express
+     written permission of CodeSourcery or its authorized
+     distributor.  This file is licensed only for use with 
+     Sourcery G++.  No other use is permitted.
+     -->
+
+<!ELEMENT board
+	(properties?, feature?, initialize?, memory-map?)>
+
+<!ELEMENT properties
+	(description?, property*)>
+
+<!ELEMENT initialize
+	(write-register | write-memory | delay
+	 | wait-until-memory-equal | wait-until-memory-not-equal)* >
+<!ELEMENT write-register EMPTY>
+<!ATTLIST write-register
+		        address CDATA   #REQUIRED
+                        value   CDATA   #REQUIRED
+                        bits    CDATA   #IMPLIED>
+<!ELEMENT write-memory EMPTY>
+<!ATTLIST write-memory
+		        address CDATA   #REQUIRED
+                        value   CDATA   #REQUIRED
+                        bits    CDATA   #IMPLIED>
+<!ELEMENT delay EMPTY>
+<!ATTLIST delay
+		        time CDATA   #REQUIRED>
+<!ELEMENT wait-until-memory-equal EMPTY>
+<!ATTLIST wait-until-memory-equal
+		        address CDATA   #REQUIRED
+                        value   CDATA   #REQUIRED
+                        timeout CDATA   #IMPLIED
+                        bits    CDATA   #IMPLIED>
+<!ELEMENT wait-until-memory-not-equal EMPTY>
+<!ATTLIST wait-until-memory-not-equal
+		        address CDATA   #REQUIRED
+                        value   CDATA   #REQUIRED
+                        timeout CDATA   #IMPLIED
+                        bits    CDATA   #IMPLIED>
+
+<!ELEMENT memory-map (memory-device)*>
+<!ELEMENT memory-device (property*, description?, sectors*)>
+<!ATTLIST memory-device
+                        address CDATA   #REQUIRED
+		        size    CDATA   #REQUIRED
+		        type    CDATA   #REQUIRED
+                        device  CDATA   #IMPLIED>
+
+<!ELEMENT description (#PCDATA)>
+<!ELEMENT property (#PCDATA)>
+<!ATTLIST property name CDATA #REQUIRED>
+<!ELEMENT sectors EMPTY>
+<!ATTLIST sectors
+	size CDATA #REQUIRED
+	count CDATA #REQUIRED>
+
+<!ENTITY % gdbtarget SYSTEM "gdb-target.dtd">
+%gdbtarget;

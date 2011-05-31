@@ -1,0 +1,164 @@
+<html lang="en">
+<head>
+<title>Designated Inits - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Compound-Literals.html#Compound-Literals" title="Compound Literals">
+<link rel="next" href="Cast-to-Union.html#Cast-to-Union" title="Cast to Union">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Designated-Inits"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Cast-to-Union.html#Cast-to-Union">Cast to Union</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Compound-Literals.html#Compound-Literals">Compound Literals</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.25 Designated Initializers</h3>
+
+<p><a name="index-initializers-with-labeled-elements-2319"></a><a name="index-labeled-elements-in-initializers-2320"></a><a name="index-case-labels-in-initializers-2321"></a><a name="index-designated-initializers-2322"></a>
+Standard C90 requires the elements of an initializer to appear in a fixed
+order, the same as the order of the elements in the array or structure
+being initialized.
+
+ <p>In ISO C99 you can give the elements in any order, specifying the array
+indices or structure field names they apply to, and GNU C allows this as
+an extension in C90 mode as well.  This extension is not
+implemented in GNU C++.
+
+ <p>To specify an array index, write
+&lsquo;<samp><span class="samp">[</span><var>index</var><span class="samp">] =</span></samp>&rsquo; before the element value.  For example,
+
+<pre class="smallexample">     int a[6] = { [4] = 29, [2] = 15 };
+</pre>
+ <p class="noindent">is equivalent to
+
+<pre class="smallexample">     int a[6] = { 0, 0, 15, 0, 29, 0 };
+</pre>
+ <p class="noindent">The index values must be constant expressions, even if the array being
+initialized is automatic.
+
+ <p>An alternative syntax for this which has been obsolete since GCC 2.5 but
+GCC still accepts is to write &lsquo;<samp><span class="samp">[</span><var>index</var><span class="samp">]</span></samp>&rsquo; before the element
+value, with no &lsquo;<samp><span class="samp">=</span></samp>&rsquo;.
+
+ <p>To initialize a range of elements to the same value, write
+&lsquo;<samp><span class="samp">[</span><var>first</var><span class="samp"> ... </span><var>last</var><span class="samp">] = </span><var>value</var></samp>&rsquo;.  This is a GNU
+extension.  For example,
+
+<pre class="smallexample">     int widths[] = { [0 ... 9] = 1, [10 ... 99] = 2, [100] = 3 };
+</pre>
+ <p class="noindent">If the value in it has side-effects, the side-effects will happen only once,
+not for each initialized field by the range initializer.
+
+<p class="noindent">Note that the length of the array is the highest value specified
+plus one.
+
+ <p>In a structure initializer, specify the name of a field to initialize
+with &lsquo;<samp><span class="samp">.</span><var>fieldname</var><span class="samp"> =</span></samp>&rsquo; before the element value.  For example,
+given the following structure,
+
+<pre class="smallexample">     struct point { int x, y; };
+</pre>
+ <p class="noindent">the following initialization
+
+<pre class="smallexample">     struct point p = { .y = yvalue, .x = xvalue };
+</pre>
+ <p class="noindent">is equivalent to
+
+<pre class="smallexample">     struct point p = { xvalue, yvalue };
+</pre>
+ <p>Another syntax which has the same meaning, obsolete since GCC 2.5, is
+&lsquo;<samp><var>fieldname</var><span class="samp">:</span></samp>&rsquo;, as shown here:
+
+<pre class="smallexample">     struct point p = { y: yvalue, x: xvalue };
+</pre>
+ <p><a name="index-designators-2323"></a>The &lsquo;<samp><span class="samp">[</span><var>index</var><span class="samp">]</span></samp>&rsquo; or &lsquo;<samp><span class="samp">.</span><var>fieldname</var></samp>&rsquo; is known as a
+<dfn>designator</dfn>.  You can also use a designator (or the obsolete colon
+syntax) when initializing a union, to specify which element of the union
+should be used.  For example,
+
+<pre class="smallexample">     union foo { int i; double d; };
+     
+     union foo f = { .d = 4 };
+</pre>
+ <p class="noindent">will convert 4 to a <code>double</code> to store it in the union using
+the second element.  By contrast, casting 4 to type <code>union foo</code>
+would store it into the union as the integer <code>i</code>, since it is
+an integer.  (See <a href="Cast-to-Union.html#Cast-to-Union">Cast to Union</a>.)
+
+ <p>You can combine this technique of naming elements with ordinary C
+initialization of successive elements.  Each initializer element that
+does not have a designator applies to the next consecutive element of the
+array or structure.  For example,
+
+<pre class="smallexample">     int a[6] = { [1] = v1, v2, [4] = v4 };
+</pre>
+ <p class="noindent">is equivalent to
+
+<pre class="smallexample">     int a[6] = { 0, v1, v2, 0, v4, 0 };
+</pre>
+ <p>Labeling the elements of an array initializer is especially useful
+when the indices are characters or belong to an <code>enum</code> type. 
+For example:
+
+<pre class="smallexample">     int whitespace[256]
+       = { [' '] = 1, ['\t'] = 1, ['\h'] = 1,
+           ['\f'] = 1, ['\n'] = 1, ['\r'] = 1 };
+</pre>
+ <p><a name="index-designator-lists-2324"></a>You can also write a series of &lsquo;<samp><span class="samp">.</span><var>fieldname</var></samp>&rsquo; and
+&lsquo;<samp><span class="samp">[</span><var>index</var><span class="samp">]</span></samp>&rsquo; designators before an &lsquo;<samp><span class="samp">=</span></samp>&rsquo; to specify a
+nested subobject to initialize; the list is taken relative to the
+subobject corresponding to the closest surrounding brace pair.  For
+example, with the &lsquo;<samp><span class="samp">struct point</span></samp>&rsquo; declaration above:
+
+<pre class="smallexample">     struct point ptarray[10] = { [2].y = yv2, [2].x = xv2, [0].x = xv0 };
+</pre>
+ <p class="noindent">If the same field is initialized multiple times, it will have value from
+the last initialization.  If any such overridden initialization has
+side-effect, it is unspecified whether the side-effect happens or not. 
+Currently, GCC will discard them and issue a warning.
+
+ </body></html>
+

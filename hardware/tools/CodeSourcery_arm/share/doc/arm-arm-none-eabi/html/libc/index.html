@@ -1,0 +1,97 @@
+<html lang="en">
+<head>
+<title>Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="../index.html#dir" title="(dir)">
+<link rel="next" href="Introduction.html#Introduction" title="Introduction">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Top"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Introduction.html#Introduction">Introduction</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="../index.html#dir">(dir)</a>
+<hr>
+</div>
+
+<h2 class="unnumbered">The Red Hat newlib C Library</h2>
+
+<!-- The menu contents depend on the configuration, so we include them -->
+<!-- as a separate file -->
+<!-- switch to set SIGNALS on or off, according to whether config picks up -->
+<!-- signal subdirectory: -->
+<ul class="menu">
+<li><a accesskey="1" href="Introduction.html#Introduction">Introduction</a>
+<li><a accesskey="2" href="Stdlib.html#Stdlib">Stdlib</a>
+<li><a accesskey="3" href="Ctype.html#Ctype">Ctype</a>
+<li><a accesskey="4" href="Stdio.html#Stdio">Stdio</a>
+
+<li><a accesskey="5" href="Strings.html#Strings">Strings</a>
+<li><a accesskey="6" href="Wchar-strings.html#Wchar-strings">Wchar strings</a>
+
+<li><a accesskey="7" href="Signals.html#Signals">Signals</a>
+
+<li><a accesskey="8" href="Timefns.html#Timefns">Timefns</a>
+<li><a accesskey="9" href="Locale.html#Locale">Locale</a>
+<li><a href="Reentrancy.html#Reentrancy">Reentrancy</a>
+
+<li><a href="Misc.html#Misc">Misc</a>
+<li><a href="Syscalls.html#Syscalls">Syscalls</a>
+<li><a href="Arglists.html#Arglists">Arglists</a>
+
+<li><a href="Library-Index.html#Library-Index">Library Index</a>
+</ul>
+
+   <div class="node">
+<a name="index"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="memccpy.html#memccpy">memccpy</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="bzero.html#bzero">bzero</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Strings.html#Strings">Strings</a>
+<hr>
+</div>
+
+<h3 class="section">5.4 <code>index</code>&mdash;search for character in string</h3>
+
+<p><a name="index-index-374"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;string.h&gt;
+     char * index(const char *<var>string</var>, int <var>c</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+This function finds the first occurence of <var>c</var> (converted to
+a char) in the string pointed to by <var>string</var> (including the
+terminating null character).
+
+   <p>This function is identical to <code>strchr</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+Returns a pointer to the located character, or a null pointer
+if <var>c</var> does not occur in <var>string</var>.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>index</code> requires no supporting OS subroutines.
+
+   <p><br>
+
+   </body></html>
+

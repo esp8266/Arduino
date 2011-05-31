@@ -1,0 +1,65 @@
+<html lang="en">
+<head>
+<title>The Print Command with Objective-C - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Objective_002dC.html#Objective_002dC" title="Objective-C">
+<link rel="prev" href="Method-Names-in-Commands.html#Method-Names-in-Commands" title="Method Names in Commands">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="The-Print-Command-with-Objective-C"></a>
+<a name="The-Print-Command-with-Objective_002dC"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Method-Names-in-Commands.html#Method-Names-in-Commands">Method Names in Commands</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Objective_002dC.html#Objective_002dC">Objective-C</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">15.4.3.2 The Print Command With Objective-C</h5>
+
+<p><a name="index-Objective_002dC_002c-print-objects-831"></a><a name="index-print_002dobject-832"></a><a name="index-po-_0040r_007b_0028_0040code_007bprint_002dobject_007d_0029_007d-833"></a>
+The print command has also been extended to accept methods.  For example:
+
+<pre class="smallexample">     print -[<var>object</var> hash]
+</pre>
+   <p><a name="index-print-an-Objective_002dC-object-description-834"></a><a name="index-g_t_0040code_007b_005fNSPrintForDebugger_007d_002c-and-printing-Objective_002dC-objects-835"></a>will tell <span class="sc">gdb</span> to send the <code>hash</code> message to <var>object</var>
+and print the result.  Also, an additional command has been added,
+<code>print-object</code> or <code>po</code> for short, which is meant to print
+the description of an object.  However, this command may only work
+with certain Objective-C libraries that have a particular hook
+function, <code>_NSPrintForDebugger</code>, defined.
+
+   </body></html>
+

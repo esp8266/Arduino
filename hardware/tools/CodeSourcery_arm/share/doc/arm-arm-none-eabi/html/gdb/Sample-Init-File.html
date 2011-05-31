@@ -1,0 +1,156 @@
+<html lang="en">
+<head>
+<title>Sample Init File - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Readline-Init-File.html#Readline-Init-File" title="Readline Init File">
+<link rel="prev" href="Conditional-Init-Constructs.html#Conditional-Init-Constructs" title="Conditional Init Constructs">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Sample-Init-File"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Conditional-Init-Constructs.html#Conditional-Init-Constructs">Conditional Init Constructs</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Readline-Init-File.html#Readline-Init-File">Readline Init File</a>
+<hr>
+</div>
+
+<h4 class="subsection">31.3.3 Sample Init File</h4>
+
+<p>Here is an example of an <var>inputrc</var> file.  This illustrates key
+binding, variable assignment, and conditional syntax.
+
+<pre class="example">     
+     # This file controls the behaviour of line input editing for
+     # programs that use the GNU Readline library.  Existing
+     # programs include FTP, Bash, and GDB.
+     #
+     # You can re-read the inputrc file with C-x C-r.
+     # Lines beginning with '#' are comments.
+     #
+     # First, include any systemwide bindings and variable
+     # assignments from /etc/Inputrc
+     $include /etc/Inputrc
+     
+     #
+     # Set various bindings for emacs mode.
+     
+     set editing-mode emacs
+     
+     $if mode=emacs
+     
+     Meta-Control-h:	backward-kill-word	Text after the function name is ignored
+     
+     #
+     # Arrow keys in keypad mode
+     #
+     #"\M-OD":        backward-char
+     #"\M-OC":        forward-char
+     #"\M-OA":        previous-history
+     #"\M-OB":        next-history
+     #
+     # Arrow keys in ANSI mode
+     #
+     "\M-[D":        backward-char
+     "\M-[C":        forward-char
+     "\M-[A":        previous-history
+     "\M-[B":        next-history
+     #
+     # Arrow keys in 8 bit keypad mode
+     #
+     #"\M-\C-OD":       backward-char
+     #"\M-\C-OC":       forward-char
+     #"\M-\C-OA":       previous-history
+     #"\M-\C-OB":       next-history
+     #
+     # Arrow keys in 8 bit ANSI mode
+     #
+     #"\M-\C-[D":       backward-char
+     #"\M-\C-[C":       forward-char
+     #"\M-\C-[A":       previous-history
+     #"\M-\C-[B":       next-history
+     
+     C-q: quoted-insert
+     
+     $endif
+     
+     # An old-style binding.  This happens to be the default.
+     TAB: complete
+     
+     # Macros that are convenient for shell interaction
+     $if Bash
+     # edit the path
+     "\C-xp": "PATH=${PATH}\e\C-e\C-a\ef\C-f"
+     # prepare to type a quoted word --
+     # insert open and close double quotes
+     # and move to just after the open quote
+     "\C-x\"": "\"\"\C-b"
+     # insert a backslash (testing backslash escapes
+     # in sequences and macros)
+     "\C-x\\": "\\"
+     # Quote the current or previous word
+     "\C-xq": "\eb\"\ef\""
+     # Add a binding to refresh the line, which is unbound
+     "\C-xr": redraw-current-line
+     # Edit variable on current line.
+     "\M-\C-v": "\C-a\C-k$\C-y\M-\C-e\C-a\C-y="
+     $endif
+     
+     # use a visible bell if one is available
+     set bell-style visible
+     
+     # don't strip characters to 7 bits when reading
+     set input-meta on
+     
+     # allow iso-latin1 characters to be inserted rather
+     # than converted to prefix-meta sequences
+     set convert-meta off
+     
+     # display characters with the eighth bit set directly
+     # rather than as meta-prefixed characters
+     set output-meta on
+     
+     # if there are more than 150 possible completions for
+     # a word, ask the user if he wants to see all of them
+     set completion-query-items 150
+     
+     # For FTP
+     $if Ftp
+     "\C-xg": "get \M-?"
+     "\C-xt": "put \M-?"
+     "\M-.": yank-last-arg
+     $endif
+</pre>
+   </body></html>
+

@@ -1,0 +1,91 @@
+<html lang="en">
+<head>
+<title>i386 Features - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Standard-Target-Features.html#Standard-Target-Features" title="Standard Target Features">
+<link rel="prev" href="ARM-Features.html#ARM-Features" title="ARM Features">
+<link rel="next" href="MIPS-Features.html#MIPS-Features" title="MIPS Features">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="i386-Features"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="MIPS-Features.html#MIPS-Features">MIPS Features</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="ARM-Features.html#ARM-Features">ARM Features</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Standard-Target-Features.html#Standard-Target-Features">Standard Target Features</a>
+<hr>
+</div>
+
+<h4 class="subsection">G.4.2 i386 Features</h4>
+
+<p><a name="index-target-descriptions_002c-i386-features-2555"></a>
+The &lsquo;<samp><span class="samp">org.gnu.gdb.i386.core</span></samp>&rsquo; feature is required for i386/amd64
+targets.  It should describe the following registers:
+
+     <ul>
+<li>&lsquo;<samp><span class="samp">eax</span></samp>&rsquo; through &lsquo;<samp><span class="samp">edi</span></samp>&rsquo; plus &lsquo;<samp><span class="samp">eip</span></samp>&rsquo; for i386
+<li>&lsquo;<samp><span class="samp">rax</span></samp>&rsquo; through &lsquo;<samp><span class="samp">r15</span></samp>&rsquo; plus &lsquo;<samp><span class="samp">rip</span></samp>&rsquo; for amd64
+<li>&lsquo;<samp><span class="samp">eflags</span></samp>&rsquo;, &lsquo;<samp><span class="samp">cs</span></samp>&rsquo;, &lsquo;<samp><span class="samp">ss</span></samp>&rsquo;, &lsquo;<samp><span class="samp">ds</span></samp>&rsquo;, &lsquo;<samp><span class="samp">es</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">fs</span></samp>&rsquo;, &lsquo;<samp><span class="samp">gs</span></samp>&rsquo;
+<li>&lsquo;<samp><span class="samp">st0</span></samp>&rsquo; through &lsquo;<samp><span class="samp">st7</span></samp>&rsquo;
+<li>&lsquo;<samp><span class="samp">fctrl</span></samp>&rsquo;, &lsquo;<samp><span class="samp">fstat</span></samp>&rsquo;, &lsquo;<samp><span class="samp">ftag</span></samp>&rsquo;, &lsquo;<samp><span class="samp">fiseg</span></samp>&rsquo;, &lsquo;<samp><span class="samp">fioff</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">foseg</span></samp>&rsquo;, &lsquo;<samp><span class="samp">fooff</span></samp>&rsquo; and &lsquo;<samp><span class="samp">fop</span></samp>&rsquo;
+</ul>
+
+   <p>The register sets may be different, depending on the target.
+
+   <p>The &lsquo;<samp><span class="samp">org.gnu.gdb.i386.sse</span></samp>&rsquo; feature is optional.  It should
+describe registers:
+
+     <ul>
+<li>&lsquo;<samp><span class="samp">xmm0</span></samp>&rsquo; through &lsquo;<samp><span class="samp">xmm7</span></samp>&rsquo; for i386
+<li>&lsquo;<samp><span class="samp">xmm0</span></samp>&rsquo; through &lsquo;<samp><span class="samp">xmm15</span></samp>&rsquo; for amd64
+<li>&lsquo;<samp><span class="samp">mxcsr</span></samp>&rsquo;
+</ul>
+
+   <p>The &lsquo;<samp><span class="samp">org.gnu.gdb.i386.avx</span></samp>&rsquo; feature is optional and requires the
+&lsquo;<samp><span class="samp">org.gnu.gdb.i386.sse</span></samp>&rsquo; feature.  It should
+describe the upper 128 bits of <span class="sc">ymm</span> registers:
+
+     <ul>
+<li>&lsquo;<samp><span class="samp">ymm0h</span></samp>&rsquo; through &lsquo;<samp><span class="samp">ymm7h</span></samp>&rsquo; for i386
+<li>&lsquo;<samp><span class="samp">ymm0h</span></samp>&rsquo; through &lsquo;<samp><span class="samp">ymm15h</span></samp>&rsquo; for amd64
+</ul>
+
+   <p>The &lsquo;<samp><span class="samp">org.gnu.gdb.i386.linux</span></samp>&rsquo; feature is optional.  It should
+describe a single register, &lsquo;<samp><span class="samp">orig_eax</span></samp>&rsquo;.
+
+   </body></html>
+

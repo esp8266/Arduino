@@ -1,0 +1,185 @@
+<html lang="en">
+<head>
+<title>Completion - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Commands.html#Commands" title="Commands">
+<link rel="prev" href="Command-Syntax.html#Command-Syntax" title="Command Syntax">
+<link rel="next" href="Help.html#Help" title="Help">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Completion"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Help.html#Help">Help</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Command-Syntax.html#Command-Syntax">Command Syntax</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Commands.html#Commands">Commands</a>
+<hr>
+</div>
+
+<h3 class="section">3.2 Command Completion</h3>
+
+<p><a name="index-completion-75"></a><a name="index-word-completion-76"></a><span class="sc">gdb</span> can fill in the rest of a word in a command for you, if there is
+only one possibility; it can also show you what the valid possibilities
+are for the next word in a command, at any time.  This works for <span class="sc">gdb</span>
+commands, <span class="sc">gdb</span> subcommands, and the names of symbols in your program.
+
+   <p>Press the &lt;TAB&gt; key whenever you want <span class="sc">gdb</span> to fill out the rest
+of a word.  If there is only one possibility, <span class="sc">gdb</span> fills in the
+word, and waits for you to finish the command (or press &lt;RET&gt; to
+enter it).  For example, if you type
+
+<!-- FIXME "@key" does not distinguish its argument sufficiently to permit -->
+<!-- complete accuracy in these examples; space introduced for clarity. -->
+<!-- If texinfo enhancements make it unnecessary, it would be nice to -->
+<!-- replace " @key" by "@key" in the following... -->
+<pre class="smallexample">     (gdb) info bre &lt;TAB&gt;
+</pre>
+   <p class="noindent"><span class="sc">gdb</span> fills in the rest of the word &lsquo;<samp><span class="samp">breakpoints</span></samp>&rsquo;, since that is
+the only <code>info</code> subcommand beginning with &lsquo;<samp><span class="samp">bre</span></samp>&rsquo;:
+
+<pre class="smallexample">     (gdb) info breakpoints
+</pre>
+   <p class="noindent">You can either press &lt;RET&gt; at this point, to run the <code>info
+breakpoints</code> command, or backspace and enter something else, if
+&lsquo;<samp><span class="samp">breakpoints</span></samp>&rsquo; does not look like the command you expected.  (If you
+were sure you wanted <code>info breakpoints</code> in the first place, you
+might as well just type &lt;RET&gt; immediately after &lsquo;<samp><span class="samp">info bre</span></samp>&rsquo;,
+to exploit command abbreviations rather than command completion).
+
+   <p>If there is more than one possibility for the next word when you press
+&lt;TAB&gt;, <span class="sc">gdb</span> sounds a bell.  You can either supply more
+characters and try again, or just press &lt;TAB&gt; a second time;
+<span class="sc">gdb</span> displays all the possible completions for that word.  For
+example, you might want to set a breakpoint on a subroutine whose name
+begins with &lsquo;<samp><span class="samp">make_</span></samp>&rsquo;, but when you type <kbd>b make_&lt;TAB&gt;</kbd> <span class="sc">gdb</span>
+just sounds the bell.  Typing &lt;TAB&gt; again displays all the
+function names in your program that begin with those characters, for
+example:
+
+<pre class="smallexample">     (gdb) b make_ &lt;TAB&gt;
+<br><span class="sc">gdb</span> sounds bell; press &lt;TAB&gt; again, to see:<br>
+     make_a_section_from_file     make_environ
+     make_abs_section             make_function_type
+     make_blockvector             make_pointer_type
+     make_cleanup                 make_reference_type
+     make_command                 make_symbol_completion_list
+     (gdb) b make_
+</pre>
+   <p class="noindent">After displaying the available possibilities, <span class="sc">gdb</span> copies your
+partial input (&lsquo;<samp><span class="samp">b make_</span></samp>&rsquo; in the example) so you can finish the
+command.
+
+   <p>If you just want to see the list of alternatives in the first place, you
+can press <kbd>M-?</kbd> rather than pressing &lt;TAB&gt; twice.  <kbd>M-?</kbd>
+means <kbd>&lt;META&gt; ?</kbd>.  You can type this either by holding down a
+key designated as the &lt;META&gt; shift on your keyboard (if there is
+one) while typing <kbd>?</kbd>, or as &lt;ESC&gt; followed by <kbd>?</kbd>.
+
+   <p><a name="index-quotes-in-commands-77"></a><a name="index-completion-of-quoted-strings-78"></a>Sometimes the string you need, while logically a &ldquo;word&rdquo;, may contain
+parentheses or other characters that <span class="sc">gdb</span> normally excludes from
+its notion of a word.  To permit word completion to work in this
+situation, you may enclose words in <code>'</code> (single quote marks) in
+<span class="sc">gdb</span> commands.
+
+   <p>The most likely situation where you might need this is in typing the
+name of a C<tt>++</tt> function.  This is because C<tt>++</tt> allows function
+overloading (multiple definitions of the same function, distinguished
+by argument type).  For example, when you want to set a breakpoint you
+may need to distinguish whether you mean the version of <code>name</code>
+that takes an <code>int</code> parameter, <code>name(int)</code>, or the version
+that takes a <code>float</code> parameter, <code>name(float)</code>.  To use the
+word-completion facilities in this situation, type a single quote
+<code>'</code> at the beginning of the function name.  This alerts
+<span class="sc">gdb</span> that it may need to consider more information than usual
+when you press &lt;TAB&gt; or <kbd>M-?</kbd> to request word completion:
+
+<pre class="smallexample">     (gdb) b 'bubble( <kbd>M-?</kbd>
+     bubble(double,double)    bubble(int,int)
+     (gdb) b 'bubble(
+</pre>
+   <p>In some cases, <span class="sc">gdb</span> can tell that completing a name requires using
+quotes.  When this happens, <span class="sc">gdb</span> inserts the quote for you (while
+completing as much as it can) if you do not type the quote in the first
+place:
+
+<pre class="smallexample">     (gdb) b bub &lt;TAB&gt;
+<br><span class="sc">gdb</span> alters your input line to the following, and rings a bell:<br>
+     (gdb) b 'bubble(
+</pre>
+   <p class="noindent">In general, <span class="sc">gdb</span> can tell that a quote is needed (and inserts it) if
+you have not yet started typing the argument list when you ask for
+completion on an overloaded symbol.
+
+   <p>For more information about overloaded functions, see <a href="C-Plus-Plus-Expressions.html#C-Plus-Plus-Expressions">C<tt>++</tt> Expressions</a>.  You can use the command <code>set
+overload-resolution off</code> to disable overload resolution;
+see <a href="Debugging-C-Plus-Plus.html#Debugging-C-Plus-Plus"><span class="sc">gdb</span> Features for C<tt>++</tt></a>.
+
+   <p><a name="index-completion-of-structure-field-names-79"></a><a name="index-structure-field-name-completion-80"></a><a name="index-completion-of-union-field-names-81"></a><a name="index-union-field-name-completion-82"></a>When completing in an expression which looks up a field in a
+structure, <span class="sc">gdb</span> also tries<a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a> to
+limit completions to the field names available in the type of the
+left-hand-side:
+
+<pre class="smallexample">     (gdb) p gdb_stdout.<kbd>M-?</kbd>
+     magic      to_delete  to_fputs   to_put     to_rewind
+     to_data    to_flush   to_isatty  to_read    to_write
+</pre>
+   <p class="noindent">This is because the <code>gdb_stdout</code> is a variable of the type
+<code>struct ui_file</code> that is defined in <span class="sc">gdb</span> sources as
+follows:
+
+<pre class="smallexample">     struct ui_file
+     {
+        int *magic;
+        ui_file_flush_ftype *to_flush;
+        ui_file_write_ftype *to_write;
+        ui_file_fputs_ftype *to_fputs;
+        ui_file_read_ftype *to_read;
+        ui_file_delete_ftype *to_delete;
+        ui_file_isatty_ftype *to_isatty;
+        ui_file_rewind_ftype *to_rewind;
+        ui_file_put_ftype *to_put;
+        void *to_data;
+     }
+</pre>
+   <div class="footnote">
+<hr>
+<h4>Footnotes</h4><p class="footnote"><small>[<a name="fn-1" href="#fnd-1">1</a>]</small> The completer can be
+confused by certain kinds of invalid expressions.  Also, it only
+examines the static type of the expression, not the dynamic type.</p>
+
+   <hr></div>
+
+   </body></html>
+

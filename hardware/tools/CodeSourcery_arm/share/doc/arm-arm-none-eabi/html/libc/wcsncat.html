@@ -1,0 +1,68 @@
+<html lang="en">
+<head>
+<title>wcsncat - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Wchar-strings.html#Wchar-strings" title="Wchar strings">
+<link rel="prev" href="wcslen.html#wcslen" title="wcslen">
+<link rel="next" href="wcsncmp.html#wcsncmp" title="wcsncmp">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="wcsncat"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="wcsncmp.html#wcsncmp">wcsncmp</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="wcslen.html#wcslen">wcslen</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Wchar-strings.html#Wchar-strings">Wchar strings</a>
+<hr>
+</div>
+
+<h3 class="section">6.17 <code>wcsncat</code>&mdash;concatenate part of two wide-character strings</h3>
+
+<p><strong>Synopsis</strong>
+<pre class="example">     #include &lt;wchar.h&gt;
+     wchar_t *wcsncat(wchar_t *<var>s1</var>, const wchar_t *<var>s2</var>, size_t <var>n</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+The <code>wcsncat</code> function appends not more than <var>n</var> wide-character
+codes (a null wide-character code and wide-character codes that follow
+it are not appended) from the array pointed to by <var>s2</var> to the end of
+the wide-character string pointed to by <var>s1</var>. The initial
+wide-character code of <var>s2</var> overwrites the null wide-character code
+at the end of <var>s1</var>. 
+A terminating null wide-character code is always appended to the result. 
+If copying takes place between objects that overlap, the behaviour is
+undefined.
+
+   <p><br>
+<strong>Returns</strong><br>
+The <code>wcsncat</code> function returns <var>s1</var>; no return value is reserved to
+indicate an error.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>wcsncat</code> is ISO/IEC 9899/AMD1:1995 (ISO C).
+
+   <p>No supporting OS subroutines are required.
+
+   <p><br>
+
+   </body></html>
+

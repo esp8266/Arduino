@@ -1,0 +1,508 @@
+<html lang="en">
+<head>
+<title>Spec Files - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Invoking-GCC.html#Invoking-GCC" title="Invoking GCC">
+<link rel="prev" href="Directory-Options.html#Directory-Options" title="Directory Options">
+<link rel="next" href="Target-Options.html#Target-Options" title="Target Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Spec-Files"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Target-Options.html#Target-Options">Target Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Directory-Options.html#Directory-Options">Directory Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Invoking-GCC.html#Invoking-GCC">Invoking GCC</a>
+<hr>
+</div>
+
+<h3 class="section">3.15 Specifying subprocesses and the switches to pass to them</h3>
+
+<p><a name="index-Spec-Files-974"></a>
+<samp><span class="command">gcc</span></samp> is a driver program.  It performs its job by invoking a
+sequence of other programs to do the work of compiling, assembling and
+linking.  GCC interprets its command-line parameters and uses these to
+deduce which programs it should invoke, and which command-line options
+it ought to place on their command lines.  This behavior is controlled
+by <dfn>spec strings</dfn>.  In most cases there is one spec string for each
+program that GCC can invoke, but a few programs have multiple spec
+strings to control their behavior.  The spec strings built into GCC can
+be overridden by using the <samp><span class="option">-specs=</span></samp> command-line switch to specify
+a spec file.
+
+ <p><dfn>Spec files</dfn> are plaintext files that are used to construct spec
+strings.  They consist of a sequence of directives separated by blank
+lines.  The type of directive is determined by the first non-whitespace
+character on the line and it can be one of the following:
+
+     <dl>
+<dt><code>%</code><var>command</var><dd>Issues a <var>command</var> to the spec file processor.  The commands that can
+appear here are:
+
+          <dl>
+<dt><code>%include &lt;</code><var>file</var><code>&gt;</code><dd><a name="index-g_t_0025include-975"></a>Search for <var>file</var> and insert its text at the current point in the
+specs file.
+
+          <br><dt><code>%include_noerr &lt;</code><var>file</var><code>&gt;</code><dd><a name="index-g_t_0025include_005fnoerr-976"></a>Just like &lsquo;<samp><span class="samp">%include</span></samp>&rsquo;, but do not generate an error message if the include
+file cannot be found.
+
+          <br><dt><code>%rename </code><var>old_name</var> <var>new_name</var><dd><a name="index-g_t_0025rename-977"></a>Rename the spec string <var>old_name</var> to <var>new_name</var>.
+
+     </dl>
+
+     <br><dt><code>*[</code><var>spec_name</var><code>]:</code><dd>This tells the compiler to create, override or delete the named spec
+string.  All lines after this directive up to the next directive or
+blank line are considered to be the text for the spec string.  If this
+results in an empty string then the spec will be deleted.  (Or, if the
+spec did not exist, then nothing will happened.)  Otherwise, if the spec
+does not currently exist a new spec will be created.  If the spec does
+exist then its contents will be overridden by the text of this
+directive, unless the first character of that text is the &lsquo;<samp><span class="samp">+</span></samp>&rsquo;
+character, in which case the text will be appended to the spec.
+
+     <br><dt><code>[</code><var>suffix</var><code>]:</code><dd>Creates a new &lsquo;<samp><span class="samp">[</span><var>suffix</var><span class="samp">] spec</span></samp>&rsquo; pair.  All lines after this directive
+and up to the next directive or blank line are considered to make up the
+spec string for the indicated suffix.  When the compiler encounters an
+input file with the named suffix, it will processes the spec string in
+order to work out how to compile that file.  For example:
+
+     <pre class="smallexample">          .ZZ:
+          z-compile -input %i
+</pre>
+     <p>This says that any input file whose name ends in &lsquo;<samp><span class="samp">.ZZ</span></samp>&rsquo; should be
+passed to the program &lsquo;<samp><span class="samp">z-compile</span></samp>&rsquo;, which should be invoked with the
+command-line switch <samp><span class="option">-input</span></samp> and with the result of performing the
+&lsquo;<samp><span class="samp">%i</span></samp>&rsquo; substitution.  (See below.)
+
+     <p>As an alternative to providing a spec string, the text that follows a
+suffix directive can be one of the following:
+
+          <dl>
+<dt><code>@</code><var>language</var><dd>This says that the suffix is an alias for a known <var>language</var>.  This is
+similar to using the <samp><span class="option">-x</span></samp> command-line switch to GCC to specify a
+language explicitly.  For example:
+
+          <pre class="smallexample">               .ZZ:
+               @c++
+</pre>
+          <p>Says that .ZZ files are, in fact, C++ source files.
+
+          <br><dt><code>#</code><var>name</var><dd>This causes an error messages saying:
+
+          <pre class="smallexample">               <var>name</var> compiler not installed on this system.
+</pre>
+          </dl>
+
+     <p>GCC already has an extensive list of suffixes built into it. 
+This directive will add an entry to the end of the list of suffixes, but
+since the list is searched from the end backwards, it is effectively
+possible to override earlier entries using this technique.
+
+ </dl>
+
+ <p>GCC has the following spec strings built into it.  Spec files can
+override these strings or create their own.  Note that individual
+targets can also add their own spec strings to this list.
+
+<pre class="smallexample">     asm          Options to pass to the assembler
+     asm_final    Options to pass to the assembler post-processor
+     cpp          Options to pass to the C preprocessor
+     cc1          Options to pass to the C compiler
+     cc1plus      Options to pass to the C++ compiler
+     endfile      Object files to include at the end of the link
+     link         Options to pass to the linker
+     lib          Libraries to include on the command line to the linker
+     libgcc       Decides which GCC support library to pass to the linker
+     linker       Sets the name of the linker
+     predefines   Defines to be passed to the C preprocessor
+     signed_char  Defines to pass to CPP to say whether <code>char</code> is signed
+                  by default
+     startfile    Object files to include at the start of the link
+</pre>
+ <p>Here is a small example of a spec file:
+
+<pre class="smallexample">     %rename lib                 old_lib
+     
+     *lib:
+     --start-group -lgcc -lc -leval1 --end-group %(old_lib)
+</pre>
+ <p>This example renames the spec called &lsquo;<samp><span class="samp">lib</span></samp>&rsquo; to &lsquo;<samp><span class="samp">old_lib</span></samp>&rsquo; and
+then overrides the previous definition of &lsquo;<samp><span class="samp">lib</span></samp>&rsquo; with a new one. 
+The new definition adds in some extra command-line options before
+including the text of the old definition.
+
+ <p><dfn>Spec strings</dfn> are a list of command-line options to be passed to their
+corresponding program.  In addition, the spec strings can contain
+&lsquo;<samp><span class="samp">%</span></samp>&rsquo;-prefixed sequences to substitute variable text or to
+conditionally insert text into the command line.  Using these constructs
+it is possible to generate quite complex command lines.
+
+ <p>Here is a table of all defined &lsquo;<samp><span class="samp">%</span></samp>&rsquo;-sequences for spec
+strings.  Note that spaces are not generated automatically around the
+results of expanding these sequences.  Therefore you can concatenate them
+together or combine them with constant text in a single argument.
+
+     <dl>
+<dt><code>%%</code><dd>Substitute one &lsquo;<samp><span class="samp">%</span></samp>&rsquo; into the program name or argument.
+
+     <br><dt><code>%i</code><dd>Substitute the name of the input file being processed.
+
+     <br><dt><code>%b</code><dd>Substitute the basename of the input file being processed. 
+This is the substring up to (and not including) the last period
+and not including the directory.
+
+     <br><dt><code>%B</code><dd>This is the same as &lsquo;<samp><span class="samp">%b</span></samp>&rsquo;, but include the file suffix (text after
+the last period).
+
+     <br><dt><code>%d</code><dd>Marks the argument containing or following the &lsquo;<samp><span class="samp">%d</span></samp>&rsquo; as a
+temporary file name, so that that file will be deleted if GCC exits
+successfully.  Unlike &lsquo;<samp><span class="samp">%g</span></samp>&rsquo;, this contributes no text to the
+argument.
+
+     <br><dt><code>%g</code><var>suffix</var><dd>Substitute a file name that has suffix <var>suffix</var> and is chosen
+once per compilation, and mark the argument in the same way as
+&lsquo;<samp><span class="samp">%d</span></samp>&rsquo;.  To reduce exposure to denial-of-service attacks, the file
+name is now chosen in a way that is hard to predict even when previously
+chosen file names are known.  For example, &lsquo;<samp><span class="samp">%g.s ... %g.o ... %g.s</span></samp>&rsquo;
+might turn into &lsquo;<samp><span class="samp">ccUVUUAU.s ccXYAXZ12.o ccUVUUAU.s</span></samp>&rsquo;.  <var>suffix</var> matches
+the regexp &lsquo;<samp><span class="samp">[.A-Za-z]*</span></samp>&rsquo; or the special string &lsquo;<samp><span class="samp">%O</span></samp>&rsquo;, which is
+treated exactly as if &lsquo;<samp><span class="samp">%O</span></samp>&rsquo; had been preprocessed.  Previously, &lsquo;<samp><span class="samp">%g</span></samp>&rsquo;
+was simply substituted with a file name chosen once per compilation,
+without regard to any appended suffix (which was therefore treated
+just like ordinary text), making such attacks more likely to succeed.
+
+     <br><dt><code>%u</code><var>suffix</var><dd>Like &lsquo;<samp><span class="samp">%g</span></samp>&rsquo;, but generates a new temporary file name even if
+&lsquo;<samp><span class="samp">%u</span><var>suffix</var></samp>&rsquo; was already seen.
+
+     <br><dt><code>%U</code><var>suffix</var><dd>Substitutes the last file name generated with &lsquo;<samp><span class="samp">%u</span><var>suffix</var></samp>&rsquo;, generating a
+new one if there is no such last file name.  In the absence of any
+&lsquo;<samp><span class="samp">%u</span><var>suffix</var></samp>&rsquo;, this is just like &lsquo;<samp><span class="samp">%g</span><var>suffix</var></samp>&rsquo;, except they don't share
+the same suffix <em>space</em>, so &lsquo;<samp><span class="samp">%g.s ... %U.s ... %g.s ... %U.s</span></samp>&rsquo;
+would involve the generation of two distinct file names, one
+for each &lsquo;<samp><span class="samp">%g.s</span></samp>&rsquo; and another for each &lsquo;<samp><span class="samp">%U.s</span></samp>&rsquo;.  Previously, &lsquo;<samp><span class="samp">%U</span></samp>&rsquo; was
+simply substituted with a file name chosen for the previous &lsquo;<samp><span class="samp">%u</span></samp>&rsquo;,
+without regard to any appended suffix.
+
+     <br><dt><code>%j</code><var>suffix</var><dd>Substitutes the name of the <code>HOST_BIT_BUCKET</code>, if any, and if it is
+writable, and if save-temps is off; otherwise, substitute the name
+of a temporary file, just like &lsquo;<samp><span class="samp">%u</span></samp>&rsquo;.  This temporary file is not
+meant for communication between processes, but rather as a junk
+disposal mechanism.
+
+     <br><dt><code>%|</code><var>suffix</var><dt><code>%m</code><var>suffix</var><dd>Like &lsquo;<samp><span class="samp">%g</span></samp>&rsquo;, except if <samp><span class="option">-pipe</span></samp> is in effect.  In that case
+&lsquo;<samp><span class="samp">%|</span></samp>&rsquo; substitutes a single dash and &lsquo;<samp><span class="samp">%m</span></samp>&rsquo; substitutes nothing at
+all.  These are the two most common ways to instruct a program that it
+should read from standard input or write to standard output.  If you
+need something more elaborate you can use an &lsquo;<samp><span class="samp">%{pipe:</span><code>X</code><span class="samp">}</span></samp>&rsquo;
+construct: see for example <samp><span class="file">f/lang-specs.h</span></samp>.
+
+     <br><dt><code>%.</code><var>SUFFIX</var><dd>Substitutes <var>.SUFFIX</var> for the suffixes of a matched switch's args
+when it is subsequently output with &lsquo;<samp><span class="samp">%*</span></samp>&rsquo;.  <var>SUFFIX</var> is
+terminated by the next space or %.
+
+     <br><dt><code>%w</code><dd>Marks the argument containing or following the &lsquo;<samp><span class="samp">%w</span></samp>&rsquo; as the
+designated output file of this compilation.  This puts the argument
+into the sequence of arguments that &lsquo;<samp><span class="samp">%o</span></samp>&rsquo; will substitute later.
+
+     <br><dt><code>%o</code><dd>Substitutes the names of all the output files, with spaces
+automatically placed around them.  You should write spaces
+around the &lsquo;<samp><span class="samp">%o</span></samp>&rsquo; as well or the results are undefined. 
+&lsquo;<samp><span class="samp">%o</span></samp>&rsquo; is for use in the specs for running the linker. 
+Input files whose names have no recognized suffix are not compiled
+at all, but they are included among the output files, so they will
+be linked.
+
+     <br><dt><code>%O</code><dd>Substitutes the suffix for object files.  Note that this is
+handled specially when it immediately follows &lsquo;<samp><span class="samp">%g, %u, or %U</span></samp>&rsquo;,
+because of the need for those to form complete file names.  The
+handling is such that &lsquo;<samp><span class="samp">%O</span></samp>&rsquo; is treated exactly as if it had already
+been substituted, except that &lsquo;<samp><span class="samp">%g, %u, and %U</span></samp>&rsquo; do not currently
+support additional <var>suffix</var> characters following &lsquo;<samp><span class="samp">%O</span></samp>&rsquo; as they would
+following, for example, &lsquo;<samp><span class="samp">.o</span></samp>&rsquo;.
+
+     <br><dt><code>%p</code><dd>Substitutes the standard macro predefinitions for the
+current target machine.  Use this when running <code>cpp</code>.
+
+     <br><dt><code>%P</code><dd>Like &lsquo;<samp><span class="samp">%p</span></samp>&rsquo;, but puts &lsquo;<samp><span class="samp">__</span></samp>&rsquo; before and after the name of each
+predefined macro, except for macros that start with &lsquo;<samp><span class="samp">__</span></samp>&rsquo; or with
+&lsquo;<samp><span class="samp">_</span><var>L</var></samp>&rsquo;, where <var>L</var> is an uppercase letter.  This is for ISO
+C.
+
+     <br><dt><code>%I</code><dd>Substitute any of <samp><span class="option">-iprefix</span></samp> (made from <samp><span class="env">GCC_EXEC_PREFIX</span></samp>),
+<samp><span class="option">-isysroot</span></samp> (made from <samp><span class="env">TARGET_SYSTEM_ROOT</span></samp>),
+<samp><span class="option">-isystem</span></samp> (made from <samp><span class="env">COMPILER_PATH</span></samp> and <samp><span class="option">-B</span></samp> options)
+and <samp><span class="option">-imultilib</span></samp> as necessary.
+
+     <br><dt><code>%s</code><dd>Current argument is the name of a library or startup file of some sort. 
+Search for that file in a standard list of directories and substitute
+the full name found.  The current working directory is included in the
+list of directories scanned.
+
+     <br><dt><code>%T</code><dd>Current argument is the name of a linker script.  Search for that file
+in the current list of directories to scan for libraries. If the file
+is located insert a <samp><span class="option">--script</span></samp> option into the command line
+followed by the full path name found.  If the file is not found then
+generate an error message.  Note: the current working directory is not
+searched.
+
+     <br><dt><code>%e</code><var>str</var><dd>Print <var>str</var> as an error message.  <var>str</var> is terminated by a newline. 
+Use this when inconsistent options are detected.
+
+     <br><dt><code>%(</code><var>name</var><code>)</code><dd>Substitute the contents of spec string <var>name</var> at this point.
+
+     <br><dt><code>%[</code><var>name</var><code>]</code><dd>Like &lsquo;<samp><span class="samp">%(...)</span></samp>&rsquo; but put &lsquo;<samp><span class="samp">__</span></samp>&rsquo; around <samp><span class="option">-D</span></samp> arguments.
+
+     <br><dt><code>%x{</code><var>option</var><code>}</code><dd>Accumulate an option for &lsquo;<samp><span class="samp">%X</span></samp>&rsquo;.
+
+     <br><dt><code>%X</code><dd>Output the accumulated linker options specified by <samp><span class="option">-Wl</span></samp> or a &lsquo;<samp><span class="samp">%x</span></samp>&rsquo;
+spec string.
+
+     <br><dt><code>%Y</code><dd>Output the accumulated assembler options specified by <samp><span class="option">-Wa</span></samp>.
+
+     <br><dt><code>%Z</code><dd>Output the accumulated preprocessor options specified by <samp><span class="option">-Wp</span></samp>.
+
+     <br><dt><code>%a</code><dd>Process the <code>asm</code> spec.  This is used to compute the
+switches to be passed to the assembler.
+
+     <br><dt><code>%A</code><dd>Process the <code>asm_final</code> spec.  This is a spec string for
+passing switches to an assembler post-processor, if such a program is
+needed.
+
+     <br><dt><code>%l</code><dd>Process the <code>link</code> spec.  This is the spec for computing the
+command line passed to the linker.  Typically it will make use of the
+&lsquo;<samp><span class="samp">%L %G %S %D and %E</span></samp>&rsquo; sequences.
+
+     <br><dt><code>%D</code><dd>Dump out a <samp><span class="option">-L</span></samp> option for each directory that GCC believes might
+contain startup files.  If the target supports multilibs then the
+current multilib directory will be prepended to each of these paths.
+
+     <br><dt><code>%L</code><dd>Process the <code>lib</code> spec.  This is a spec string for deciding which
+libraries should be included on the command line to the linker.
+
+     <br><dt><code>%G</code><dd>Process the <code>libgcc</code> spec.  This is a spec string for deciding
+which GCC support library should be included on the command line to the linker.
+
+     <br><dt><code>%S</code><dd>Process the <code>startfile</code> spec.  This is a spec for deciding which
+object files should be the first ones passed to the linker.  Typically
+this might be a file named <samp><span class="file">crt0.o</span></samp>.
+
+     <br><dt><code>%E</code><dd>Process the <code>endfile</code> spec.  This is a spec string that specifies
+the last object files that will be passed to the linker.
+
+     <br><dt><code>%C</code><dd>Process the <code>cpp</code> spec.  This is used to construct the arguments
+to be passed to the C preprocessor.
+
+     <br><dt><code>%1</code><dd>Process the <code>cc1</code> spec.  This is used to construct the options to be
+passed to the actual C compiler (&lsquo;<samp><span class="samp">cc1</span></samp>&rsquo;).
+
+     <br><dt><code>%2</code><dd>Process the <code>cc1plus</code> spec.  This is used to construct the options to be
+passed to the actual C++ compiler (&lsquo;<samp><span class="samp">cc1plus</span></samp>&rsquo;).
+
+     <br><dt><code>%*</code><dd>Substitute the variable part of a matched option.  See below. 
+Note that each comma in the substituted string is replaced by
+a single space.
+
+     <br><dt><code>%&lt;S</code><dd>Remove all occurrences of <code>-S</code> from the command line.  Note&mdash;this
+command is position dependent.  &lsquo;<samp><span class="samp">%</span></samp>&rsquo; commands in the spec string
+before this one will see <code>-S</code>, &lsquo;<samp><span class="samp">%</span></samp>&rsquo; commands in the spec string
+after this one will not.
+
+     <br><dt><code>%:</code><var>function</var><code>(</code><var>args</var><code>)</code><dd>Call the named function <var>function</var>, passing it <var>args</var>. 
+<var>args</var> is first processed as a nested spec string, then split
+into an argument vector in the usual fashion.  The function returns
+a string which is processed as if it had appeared literally as part
+of the current spec.
+
+     <p>The following built-in spec functions are provided:
+
+          <dl>
+<dt><code>getenv</code><dd>The <code>getenv</code> spec function takes two arguments: an environment
+variable name and a string.  If the environment variable is not
+defined, a fatal error is issued.  Otherwise, the return value is the
+value of the environment variable concatenated with the string.  For
+example, if <samp><span class="env">TOPDIR</span></samp> is defined as <samp><span class="file">/path/to/top</span></samp>, then:
+
+          <pre class="smallexample">               %:getenv(TOPDIR /include)
+</pre>
+          <p>expands to <samp><span class="file">/path/to/top/include</span></samp>.
+
+          <br><dt><code>if-exists</code><dd>The <code>if-exists</code> spec function takes one argument, an absolute
+pathname to a file.  If the file exists, <code>if-exists</code> returns the
+pathname.  Here is a small example of its usage:
+
+          <pre class="smallexample">               *startfile:
+               crt0%O%s %:if-exists(crti%O%s) crtbegin%O%s
+</pre>
+          <br><dt><code>if-exists-else</code><dd>The <code>if-exists-else</code> spec function is similar to the <code>if-exists</code>
+spec function, except that it takes two arguments.  The first argument is
+an absolute pathname to a file.  If the file exists, <code>if-exists-else</code>
+returns the pathname.  If it does not exist, it returns the second argument. 
+This way, <code>if-exists-else</code> can be used to select one file or another,
+based on the existence of the first.  Here is a small example of its usage:
+
+          <pre class="smallexample">               *startfile:
+               crt0%O%s %:if-exists(crti%O%s) \
+               %:if-exists-else(crtbeginT%O%s crtbegin%O%s)
+</pre>
+          <br><dt><code>replace-outfile</code><dd>The <code>replace-outfile</code> spec function takes two arguments.  It looks for the
+first argument in the outfiles array and replaces it with the second argument.  Here
+is a small example of its usage:
+
+          <pre class="smallexample">               %{fgnu-runtime:%:replace-outfile(-lobjc -lobjc-gnu)}
+</pre>
+          <br><dt><code>print-asm-header</code><dd>The <code>print-asm-header</code> function takes no arguments and simply
+prints a banner like:
+
+          <pre class="smallexample">               Assembler options
+               =================
+               
+               Use "-Wa,OPTION" to pass "OPTION" to the assembler.
+</pre>
+          <p>It is used to separate compiler options from assembler options
+in the <samp><span class="option">--target-help</span></samp> output. 
+</dl>
+
+     <br><dt><code>%{S}</code><dd>Substitutes the <code>-S</code> switch, if that switch was given to GCC. 
+If that switch was not specified, this substitutes nothing.  Note that
+the leading dash is omitted when specifying this option, and it is
+automatically inserted if the substitution is performed.  Thus the spec
+string &lsquo;<samp><span class="samp">%{foo}</span></samp>&rsquo; would match the command-line option <samp><span class="option">-foo</span></samp>
+and would output the command line option <samp><span class="option">-foo</span></samp>.
+
+     <br><dt><code>%W{S}</code><dd>Like %{<code>S</code>} but mark last argument supplied within as a file to be
+deleted on failure.
+
+     <br><dt><code>%{S*}</code><dd>Substitutes all the switches specified to GCC whose names start
+with <code>-S</code>, but which also take an argument.  This is used for
+switches like <samp><span class="option">-o</span></samp>, <samp><span class="option">-D</span></samp>, <samp><span class="option">-I</span></samp>, etc. 
+GCC considers <samp><span class="option">-o foo</span></samp> as being
+one switch whose names starts with &lsquo;<samp><span class="samp">o</span></samp>&rsquo;.  %{o*} would substitute this
+text, including the space.  Thus two arguments would be generated.
+
+     <br><dt><code>%{S*&amp;T*}</code><dd>Like %{<code>S</code>*}, but preserve order of <code>S</code> and <code>T</code> options
+(the order of <code>S</code> and <code>T</code> in the spec is not significant). 
+There can be any number of ampersand-separated variables; for each the
+wild card is optional.  Useful for CPP as &lsquo;<samp><span class="samp">%{D*&amp;U*&amp;A*}</span></samp>&rsquo;.
+
+     <br><dt><code>%{S:X}</code><dd>Substitutes <code>X</code>, if the &lsquo;<samp><span class="samp">-S</span></samp>&rsquo; switch was given to GCC.
+
+     <br><dt><code>%{!S:X}</code><dd>Substitutes <code>X</code>, if the &lsquo;<samp><span class="samp">-S</span></samp>&rsquo; switch was <em>not</em> given to GCC.
+
+     <br><dt><code>%{S*:X}</code><dd>Substitutes <code>X</code> if one or more switches whose names start with
+<code>-S</code> are specified to GCC.  Normally <code>X</code> is substituted only
+once, no matter how many such switches appeared.  However, if <code>%*</code>
+appears somewhere in <code>X</code>, then <code>X</code> will be substituted once
+for each matching switch, with the <code>%*</code> replaced by the part of
+that switch that matched the <code>*</code>.
+
+     <br><dt><code>%{.S:X}</code><dd>Substitutes <code>X</code>, if processing a file with suffix <code>S</code>.
+
+     <br><dt><code>%{!.S:X}</code><dd>Substitutes <code>X</code>, if <em>not</em> processing a file with suffix <code>S</code>.
+
+     <br><dt><code>%{,S:X}</code><dd>Substitutes <code>X</code>, if processing a file for language <code>S</code>.
+
+     <br><dt><code>%{!,S:X}</code><dd>Substitutes <code>X</code>, if not processing a file for language <code>S</code>.
+
+     <br><dt><code>%{S|P:X}</code><dd>Substitutes <code>X</code> if either <code>-S</code> or <code>-P</code> was given to
+GCC.  This may be combined with &lsquo;<samp><span class="samp">!</span></samp>&rsquo;, &lsquo;<samp><span class="samp">.</span></samp>&rsquo;, &lsquo;<samp><span class="samp">,</span></samp>&rsquo;, and
+<code>*</code> sequences as well, although they have a stronger binding than
+the &lsquo;<samp><span class="samp">|</span></samp>&rsquo;.  If <code>%*</code> appears in <code>X</code>, all of the
+alternatives must be starred, and only the first matching alternative
+is substituted.
+
+     <p>For example, a spec string like this:
+
+     <pre class="smallexample">          %{.c:-foo} %{!.c:-bar} %{.c|d:-baz} %{!.c|d:-boggle}
+</pre>
+     <p>will output the following command-line options from the following input
+command-line options:
+
+     <pre class="smallexample">          fred.c        -foo -baz
+          jim.d         -bar -boggle
+          -d fred.c     -foo -baz -boggle
+          -d jim.d      -bar -baz -boggle
+</pre>
+     <br><dt><code>%{S:X; T:Y; :D}</code><dd>
+If <code>S</code> was given to GCC, substitutes <code>X</code>; else if <code>T</code> was
+given to GCC, substitutes <code>Y</code>; else substitutes <code>D</code>.  There can
+be as many clauses as you need.  This may be combined with <code>.</code>,
+<code>,</code>, <code>!</code>, <code>|</code>, and <code>*</code> as needed.
+
+     <br><dt><code>-mlow-irq-latency</code><dd><a name="index-mlow_002dirq_002dlatency-978"></a>Avoid instructions with high interrupt latency when generating
+code.  This can increase code size and reduce performance. 
+The option is off by default.
+
+ </dl>
+
+ <p>The conditional text <code>X</code> in a %{<code>S</code>:<code>X</code>} or similar
+construct may contain other nested &lsquo;<samp><span class="samp">%</span></samp>&rsquo; constructs or spaces, or
+even newlines.  They are processed as usual, as described above. 
+Trailing white space in <code>X</code> is ignored.  White space may also
+appear anywhere on the left side of the colon in these constructs,
+except between <code>.</code> or <code>*</code> and the corresponding word.
+
+ <p>The <samp><span class="option">-O</span></samp>, <samp><span class="option">-f</span></samp>, <samp><span class="option">-m</span></samp>, and <samp><span class="option">-W</span></samp> switches are
+handled specifically in these constructs.  If another value of
+<samp><span class="option">-O</span></samp> or the negated form of a <samp><span class="option">-f</span></samp>, <samp><span class="option">-m</span></samp>, or
+<samp><span class="option">-W</span></samp> switch is found later in the command line, the earlier
+switch value is ignored, except with {<code>S</code>*} where <code>S</code> is
+just one letter, which passes all matching options.
+
+ <p>The character &lsquo;<samp><span class="samp">|</span></samp>&rsquo; at the beginning of the predicate text is used to
+indicate that a command should be piped to the following command, but
+only if <samp><span class="option">-pipe</span></samp> is specified.
+
+ <p>It is built into GCC which switches take arguments and which do not. 
+(You might think it would be useful to generalize this to allow each
+compiler's spec to say which switches take arguments.  But this cannot
+be done in a consistent fashion.  GCC cannot even decide which input
+files have been specified without knowing which switches take arguments,
+and it must know which input files to compile in order to tell which
+compilers to run).
+
+ <p>GCC also knows implicitly that arguments starting in <samp><span class="option">-l</span></samp> are to be
+treated as compiler output files, and passed to the linker in their
+proper position among the other output files.
+
+<!-- man begin OPTIONS -->
+ </body></html>
+

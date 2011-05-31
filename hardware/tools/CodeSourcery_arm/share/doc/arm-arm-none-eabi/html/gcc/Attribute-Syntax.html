@@ -1,0 +1,271 @@
+<html lang="en">
+<head>
+<title>Attribute Syntax - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Function-Attributes.html#Function-Attributes" title="Function Attributes">
+<link rel="next" href="Function-Prototypes.html#Function-Prototypes" title="Function Prototypes">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Attribute-Syntax"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Function-Prototypes.html#Function-Prototypes">Function Prototypes</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Function-Attributes.html#Function-Attributes">Function Attributes</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.30 Attribute Syntax</h3>
+
+<p><a name="index-attribute-syntax-2471"></a>
+This section describes the syntax with which <code>__attribute__</code> may be
+used, and the constructs to which attribute specifiers bind, for the C
+language.  Some details may vary for C++ and Objective-C.  Because of
+infelicities in the grammar for attributes, some forms described here
+may not be successfully parsed in all cases.
+
+ <p>There are some problems with the semantics of attributes in C++.  For
+example, there are no manglings for attributes, although they may affect
+code generation, so problems may arise when attributed types are used in
+conjunction with templates or overloading.  Similarly, <code>typeid</code>
+does not distinguish between types with different attributes.  Support
+for attributes in C++ may be restricted in future to attributes on
+declarations only, but not on nested declarators.
+
+ <p>See <a href="Function-Attributes.html#Function-Attributes">Function Attributes</a>, for details of the semantics of attributes
+applying to functions.  See <a href="Variable-Attributes.html#Variable-Attributes">Variable Attributes</a>, for details of the
+semantics of attributes applying to variables.  See <a href="Type-Attributes.html#Type-Attributes">Type Attributes</a>,
+for details of the semantics of attributes applying to structure, union
+and enumerated types.
+
+ <p>An <dfn>attribute specifier</dfn> is of the form
+<code>__attribute__ ((</code><var>attribute-list</var><code>))</code>.  An <dfn>attribute list</dfn>
+is a possibly empty comma-separated sequence of <dfn>attributes</dfn>, where
+each attribute is one of the following:
+
+     <ul>
+<li>Empty.  Empty attributes are ignored.
+
+     <li>A word (which may be an identifier such as <code>unused</code>, or a reserved
+word such as <code>const</code>).
+
+     <li>A word, followed by, in parentheses, parameters for the attribute. 
+These parameters take one of the following forms:
+
+          <ul>
+<li>An identifier.  For example, <code>mode</code> attributes use this form.
+
+          <li>An identifier followed by a comma and a non-empty comma-separated list
+of expressions.  For example, <code>format</code> attributes use this form.
+
+          <li>A possibly empty comma-separated list of expressions.  For example,
+<code>format_arg</code> attributes use this form with the list being a single
+integer constant expression, and <code>alias</code> attributes use this form
+with the list being a single string constant. 
+</ul>
+     </ul>
+
+ <p>An <dfn>attribute specifier list</dfn> is a sequence of one or more attribute
+specifiers, not separated by any other tokens.
+
+ <p>In GNU C, an attribute specifier list may appear after the colon following a
+label, other than a <code>case</code> or <code>default</code> label.  The only
+attribute it makes sense to use after a label is <code>unused</code>.  This
+feature is intended for code generated by programs which contains labels
+that may be unused but which is compiled with <samp><span class="option">-Wall</span></samp>.  It would
+not normally be appropriate to use in it human-written code, though it
+could be useful in cases where the code that jumps to the label is
+contained within an <code>#ifdef</code> conditional.  GNU C++ only permits
+attributes on labels if the attribute specifier is immediately
+followed by a semicolon (i.e., the label applies to an empty
+statement).  If the semicolon is missing, C++ label attributes are
+ambiguous, as it is permissible for a declaration, which could begin
+with an attribute list, to be labelled in C++.  Declarations cannot be
+labelled in C90 or C99, so the ambiguity does not arise there.
+
+ <p>An attribute specifier list may appear as part of a <code>struct</code>,
+<code>union</code> or <code>enum</code> specifier.  It may go either immediately
+after the <code>struct</code>, <code>union</code> or <code>enum</code> keyword, or after
+the closing brace.  The former syntax is preferred. 
+Where attribute specifiers follow the closing brace, they are considered
+to relate to the structure, union or enumerated type defined, not to any
+enclosing declaration the type specifier appears in, and the type
+defined is not complete until after the attribute specifiers. 
+<!-- Otherwise, there would be the following problems: a shift/reduce -->
+<!-- conflict between attributes binding the struct/union/enum and -->
+<!-- binding to the list of specifiers/qualifiers; and "aligned" -->
+<!-- attributes could use sizeof for the structure, but the size could be -->
+<!-- changed later by "packed" attributes. -->
+
+ <p>Otherwise, an attribute specifier appears as part of a declaration,
+counting declarations of unnamed parameters and type names, and relates
+to that declaration (which may be nested in another declaration, for
+example in the case of a parameter declaration), or to a particular declarator
+within a declaration.  Where an
+attribute specifier is applied to a parameter declared as a function or
+an array, it should apply to the function or array rather than the
+pointer to which the parameter is implicitly converted, but this is not
+yet correctly implemented.
+
+ <p>Any list of specifiers and qualifiers at the start of a declaration may
+contain attribute specifiers, whether or not such a list may in that
+context contain storage class specifiers.  (Some attributes, however,
+are essentially in the nature of storage class specifiers, and only make
+sense where storage class specifiers may be used; for example,
+<code>section</code>.)  There is one necessary limitation to this syntax: the
+first old-style parameter declaration in a function definition cannot
+begin with an attribute specifier, because such an attribute applies to
+the function instead by syntax described below (which, however, is not
+yet implemented in this case).  In some other cases, attribute
+specifiers are permitted by this grammar but not yet supported by the
+compiler.  All attribute specifiers in this place relate to the
+declaration as a whole.  In the obsolescent usage where a type of
+<code>int</code> is implied by the absence of type specifiers, such a list of
+specifiers and qualifiers may be an attribute specifier list with no
+other specifiers or qualifiers.
+
+ <p>At present, the first parameter in a function prototype must have some
+type specifier which is not an attribute specifier; this resolves an
+ambiguity in the interpretation of <code>void f(int
+(__attribute__((foo)) x))</code>, but is subject to change.  At present, if
+the parentheses of a function declarator contain only attributes then
+those attributes are ignored, rather than yielding an error or warning
+or implying a single parameter of type int, but this is subject to
+change.
+
+ <p>An attribute specifier list may appear immediately before a declarator
+(other than the first) in a comma-separated list of declarators in a
+declaration of more than one identifier using a single list of
+specifiers and qualifiers.  Such attribute specifiers apply
+only to the identifier before whose declarator they appear.  For
+example, in
+
+<pre class="smallexample">     __attribute__((noreturn)) void d0 (void),
+         __attribute__((format(printf, 1, 2))) d1 (const char *, ...),
+          d2 (void)
+</pre>
+ <p class="noindent">the <code>noreturn</code> attribute applies to all the functions
+declared; the <code>format</code> attribute only applies to <code>d1</code>.
+
+ <p>An attribute specifier list may appear immediately before the comma,
+<code>=</code> or semicolon terminating the declaration of an identifier other
+than a function definition.  Such attribute specifiers apply
+to the declared object or function.  Where an
+assembler name for an object or function is specified (see <a href="Asm-Labels.html#Asm-Labels">Asm Labels</a>), the attribute must follow the <code>asm</code>
+specification.
+
+ <p>An attribute specifier list may, in future, be permitted to appear after
+the declarator in a function definition (before any old-style parameter
+declarations or the function body).
+
+ <p>Attribute specifiers may be mixed with type qualifiers appearing inside
+the <code>[]</code> of a parameter array declarator, in the C99 construct by
+which such qualifiers are applied to the pointer to which the array is
+implicitly converted.  Such attribute specifiers apply to the pointer,
+not to the array, but at present this is not implemented and they are
+ignored.
+
+ <p>An attribute specifier list may appear at the start of a nested
+declarator.  At present, there are some limitations in this usage: the
+attributes correctly apply to the declarator, but for most individual
+attributes the semantics this implies are not implemented. 
+When attribute specifiers follow the <code>*</code> of a pointer
+declarator, they may be mixed with any type qualifiers present. 
+The following describes the formal semantics of this syntax.  It will make the
+most sense if you are familiar with the formal specification of
+declarators in the ISO C standard.
+
+ <p>Consider (as in C99 subclause 6.7.5 paragraph 4) a declaration <code>T
+D1</code>, where <code>T</code> contains declaration specifiers that specify a type
+<var>Type</var> (such as <code>int</code>) and <code>D1</code> is a declarator that
+contains an identifier <var>ident</var>.  The type specified for <var>ident</var>
+for derived declarators whose type does not include an attribute
+specifier is as in the ISO C standard.
+
+ <p>If <code>D1</code> has the form <code>( </code><var>attribute-specifier-list</var><code> D )</code>,
+and the declaration <code>T D</code> specifies the type
+&ldquo;<var>derived-declarator-type-list</var> <var>Type</var>&rdquo; for <var>ident</var>, then
+<code>T D1</code> specifies the type &ldquo;<var>derived-declarator-type-list</var>
+<var>attribute-specifier-list</var> <var>Type</var>&rdquo; for <var>ident</var>.
+
+ <p>If <code>D1</code> has the form <code>*
+</code><var>type-qualifier-and-attribute-specifier-list</var><code> D</code>, and the
+declaration <code>T D</code> specifies the type
+&ldquo;<var>derived-declarator-type-list</var> <var>Type</var>&rdquo; for <var>ident</var>, then
+<code>T D1</code> specifies the type &ldquo;<var>derived-declarator-type-list</var>
+<var>type-qualifier-and-attribute-specifier-list</var> <var>Type</var>&rdquo; for
+<var>ident</var>.
+
+ <p>For example,
+
+<pre class="smallexample">     void (__attribute__((noreturn)) ****f) (void);
+</pre>
+ <p class="noindent">specifies the type &ldquo;pointer to pointer to pointer to pointer to
+non-returning function returning <code>void</code>&rdquo;.  As another example,
+
+<pre class="smallexample">     char *__attribute__((aligned(8))) *f;
+</pre>
+ <p class="noindent">specifies the type &ldquo;pointer to 8-byte-aligned pointer to <code>char</code>&rdquo;. 
+Note again that this does not work with most attributes; for example,
+the usage of &lsquo;<samp><span class="samp">aligned</span></samp>&rsquo; and &lsquo;<samp><span class="samp">noreturn</span></samp>&rsquo; attributes given above
+is not yet supported.
+
+ <p>For compatibility with existing code written for compiler versions that
+did not implement attributes on nested declarators, some laxity is
+allowed in the placing of attributes.  If an attribute that only applies
+to types is applied to a declaration, it will be treated as applying to
+the type of that declaration.  If an attribute that only applies to
+declarations is applied to the type of a declaration, it will be treated
+as applying to that declaration; and, for compatibility with code
+placing the attributes immediately before the identifier declared, such
+an attribute applied to a function return type will be treated as
+applying to the function type, and such an attribute applied to an array
+element type will be treated as applying to the array type.  If an
+attribute that only applies to function types is applied to a
+pointer-to-function type, it will be treated as applying to the pointer
+target type; if such an attribute is applied to a function return type
+that is not a pointer-to-function type, it will be treated as applying
+to the function type.
+
+ </body></html>
+

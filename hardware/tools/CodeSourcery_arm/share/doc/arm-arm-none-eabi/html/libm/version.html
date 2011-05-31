@@ -1,0 +1,98 @@
+<html lang="en">
+<head>
+<title>version - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Math.html#Math" title="Math">
+<link rel="next" href="acos.html#acos" title="acos">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="version"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="acos.html#acos">acos</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Math.html#Math">Math</a>
+<hr>
+</div>
+
+<h3 class="section">1.1 Error Handling</h3>
+
+<p>There are four different versions of the math library routines: IEEE,
+POSIX, X/Open, or SVID.  The version may be selected at runtime by
+setting the global variable <code>_LIB_VERSION</code>, defined in
+<samp><span class="file">math.h</span></samp>.  It may be set to one of the following constants defined
+in <samp><span class="file">math.h</span></samp>: <code>_IEEE_</code>, <code>_POSIX_</code>, <code>_XOPEN_</code>, or
+<code>_SVID_</code>.  The <code>_LIB_VERSION</code> variable is not specific to any
+thread, and changing it will affect all threads.
+
+   <p>The versions of the library differ only in how errors are handled.
+
+   <p>In IEEE mode, the <code>matherr</code> function is never called, no warning
+messages are printed, and <code>errno</code> is never set.
+
+   <p>In POSIX mode, <code>errno</code> is set correctly, but the <code>matherr</code>
+function is never called and no warning messages are printed.
+
+   <p>In X/Open mode, <code>errno</code> is set correctly, and <code>matherr</code> is
+called, but warning message are not printed.
+
+   <p>In SVID mode, functions which overflow return 3.40282346638528860e+38,
+the maximum single-precision floating-point value, rather than infinity. 
+Also, <code>errno</code> is set correctly, <code>matherr</code> is called, and, if
+<code>matherr</code> returns 0, warning messages are printed for some errors. 
+For example, by default &lsquo;<samp><span class="samp">log(-1.0)</span></samp>&rsquo; writes this message on standard
+error output:
+
+<pre class="example">     log: DOMAIN error
+</pre>
+   <p>The library is set to X/Open mode by default.
+
+   <p>The aforementioned error reporting is the supported Newlib libm error
+handling method.  However, the majority of the functions are written
+so as to produce the floating-point exceptions (e.g. "invalid",
+"divide-by-zero") as required by the C and POSIX standards, for
+floating-point implementations that support them.  Newlib does not provide
+the floating-point exception access routines defined in the standards
+for fenv.h, though, which is why they are considered unsupported.  It is
+mentioned in case you have separately-provided access routines so that
+you are aware that they can be caused.
+
+<h3 class="section">1.2 Standards Compliance And Portability</h3>
+
+<p>Most of the individual function descriptions describe the standards to which
+each function complies.  However, these descriptions are mostly out of date,
+having been written before C99 was released.  One of these days we'll get
+around to updating the rest of them.  (If you'd like to help, please let us
+know.)
+
+   <p>&ldquo;C99&rdquo; refers to ISO/IEC 9899:1999, &ldquo;Programming languages&ndash;C&rdquo;. 
+&ldquo;POSIX&rdquo; refers to IEEE Standard 1003.1.  POSIX&reg; is a
+registered trademark of The IEEE.
+
+<!-- To sort the include list easily, keep the indentation right because want to -->
+<!-- skip the s_|w_ at the start of most-but not all-of the file names. -->
+<!-- (e.g., isgreater.def does not have a leading s nor w.)  Then, sort -->
+<!-- based on the column.  For example:  "sort -t@ -k3.17" -->
+<!-- A few hand-edits might be appropriate after a sort, although not necessary -->
+<!-- and are a nuisance as ought to be kept in sync with menu list above: -->
+<!-- atan2 after atan, exp2 after exp, log first in log list, and w_j0 to place -->
+<!-- to reflect function name of Bessel (as opposed to j; e.g. after atanh, -->
+<!-- before cbrt). -->
+   </body></html>
+

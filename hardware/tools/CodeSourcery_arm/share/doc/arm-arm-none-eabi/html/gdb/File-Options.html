@@ -1,0 +1,112 @@
+<html lang="en">
+<head>
+<title>File Options - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Invoking-GDB.html#Invoking-GDB" title="Invoking GDB">
+<link rel="next" href="Mode-Options.html#Mode-Options" title="Mode Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="File-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Mode-Options.html#Mode-Options">Mode Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Invoking-GDB.html#Invoking-GDB">Invoking GDB</a>
+<hr>
+</div>
+
+<h4 class="subsection">2.1.1 Choosing Files</h4>
+
+<p>When <span class="sc">gdb</span> starts, it reads any arguments other than options as
+specifying an executable file and core file (or process ID).  This is
+the same as if the arguments were specified by the &lsquo;<samp><span class="samp">-se</span></samp>&rsquo; and
+&lsquo;<samp><span class="samp">-c</span></samp>&rsquo; (or &lsquo;<samp><span class="samp">-p</span></samp>&rsquo;) options respectively.  (<span class="sc">gdb</span> reads the
+first argument that does not have an associated option flag as
+equivalent to the &lsquo;<samp><span class="samp">-se</span></samp>&rsquo; option followed by that argument; and the
+second argument that does not have an associated option flag, if any, as
+equivalent to the &lsquo;<samp><span class="samp">-c</span></samp>&rsquo;/&lsquo;<samp><span class="samp">-p</span></samp>&rsquo; option followed by that argument.) 
+If the second argument begins with a decimal digit, <span class="sc">gdb</span> will
+first attempt to attach to it as a process, and if that fails, attempt
+to open it as a corefile.  If you have a corefile whose name begins with
+a digit, you can prevent <span class="sc">gdb</span> from treating it as a pid by
+prefixing it with <samp><span class="file">./</span></samp>, e.g. <samp><span class="file">./12345</span></samp>.
+
+   <p>If <span class="sc">gdb</span> has not been configured to included core file support,
+such as for most embedded targets, then it will complain about a second
+argument and ignore it.
+
+   <p>Many options have both long and short forms; both are shown in the
+following list.  <span class="sc">gdb</span> also recognizes the long forms if you truncate
+them, so long as enough of the option is present to be unambiguous. 
+(If you prefer, you can flag option arguments with &lsquo;<samp><span class="samp">--</span></samp>&rsquo; rather
+than &lsquo;<samp><span class="samp">-</span></samp>&rsquo;, though we illustrate the more usual convention.)
+
+<!-- NOTE: the @cindex entries here use double dashes ON PURPOSE.  This -->
+<!-- way, both those who look for -foo and -foo in the index, will find -->
+<!-- it. -->
+     <dl>
+<dt><code>-symbols </code><var>file</var><dt><code>-s </code><var>file</var><dd><a name="index-g_t_0040code_007b_002d_002dsymbols_007d-4"></a><a name="index-g_t_0040code_007b_002ds_007d-5"></a>Read symbol table from file <var>file</var>.
+
+     <br><dt><code>-exec </code><var>file</var><dt><code>-e </code><var>file</var><dd><a name="index-g_t_0040code_007b_002d_002dexec_007d-6"></a><a name="index-g_t_0040code_007b_002de_007d-7"></a>Use file <var>file</var> as the executable file to execute when appropriate,
+and for examining pure data in conjunction with a core dump.
+
+     <br><dt><code>-se </code><var>file</var><dd><a name="index-g_t_0040code_007b_002d_002dse_007d-8"></a>Read symbol table from file <var>file</var> and use it as the executable
+file.
+
+     <br><dt><code>-core </code><var>file</var><dt><code>-c </code><var>file</var><dd><a name="index-g_t_0040code_007b_002d_002dcore_007d-9"></a><a name="index-g_t_0040code_007b_002dc_007d-10"></a>Use file <var>file</var> as a core dump to examine.
+
+     <br><dt><code>-pid </code><var>number</var><dt><code>-p </code><var>number</var><dd><a name="index-g_t_0040code_007b_002d_002dpid_007d-11"></a><a name="index-g_t_0040code_007b_002dp_007d-12"></a>Connect to process ID <var>number</var>, as with the <code>attach</code> command.
+
+     <br><dt><code>-command </code><var>file</var><dt><code>-x </code><var>file</var><dd><a name="index-g_t_0040code_007b_002d_002dcommand_007d-13"></a><a name="index-g_t_0040code_007b_002dx_007d-14"></a>Execute commands from file <var>file</var>.  The contents of this file is
+evaluated exactly as the <code>source</code> command would. 
+See <a href="Command-Files.html#Command-Files">Command files</a>.
+
+     <br><dt><code>-eval-command </code><var>command</var><dt><code>-ex </code><var>command</var><dd><a name="index-g_t_0040code_007b_002d_002deval_002dcommand_007d-15"></a><a name="index-g_t_0040code_007b_002dex_007d-16"></a>Execute a single <span class="sc">gdb</span> command.
+
+     <p>This option may be used multiple times to call multiple commands.  It may
+also be interleaved with &lsquo;<samp><span class="samp">-command</span></samp>&rsquo; as required.
+
+     <pre class="smallexample">          gdb -ex 'target sim' -ex 'load' \
+             -x setbreakpoints -ex 'run' a.out
+</pre>
+     <br><dt><code>-directory </code><var>directory</var><dt><code>-d </code><var>directory</var><dd><a name="index-g_t_0040code_007b_002d_002ddirectory_007d-17"></a><a name="index-g_t_0040code_007b_002dd_007d-18"></a>Add <var>directory</var> to the path to search for source and script files.
+
+     <br><dt><code>-r</code><dt><code>-readnow</code><dd><a name="index-g_t_0040code_007b_002d_002dreadnow_007d-19"></a><a name="index-g_t_0040code_007b_002dr_007d-20"></a>Read each symbol file's entire symbol table immediately, rather than
+the default, which is to read it incrementally as it is needed. 
+This makes startup slower, but makes future operations faster.
+
+   </dl>
+
+   </body></html>
+

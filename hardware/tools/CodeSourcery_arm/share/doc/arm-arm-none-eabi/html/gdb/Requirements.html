@@ -1,0 +1,111 @@
+<html lang="en">
+<head>
+<title>Requirements - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Installing-GDB.html#Installing-GDB" title="Installing GDB">
+<link rel="next" href="Running-Configure.html#Running-Configure" title="Running Configure">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Requirements"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Running-Configure.html#Running-Configure">Running Configure</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Installing-GDB.html#Installing-GDB">Installing GDB</a>
+<hr>
+</div>
+
+<h3 class="section">B.1 Requirements for Building <span class="sc">gdb</span></h3>
+
+<p><a name="index-building-_0040value_007bGDBN_007d_002c-requirements-for-2296"></a>
+Building <span class="sc">gdb</span> requires various tools and packages to be available. 
+Other packages will be used only if they are found.
+
+<h3 class="heading">Tools/Packages Necessary for Building <span class="sc">gdb</span></h3>
+
+     <dl>
+<dt>ISO C90 compiler<dd><span class="sc">gdb</span> is written in ISO C90.  It should be buildable with any
+working C90 compiler, e.g. GCC.
+
+</dl>
+
+<h3 class="heading">Tools/Packages Optional for Building <span class="sc">gdb</span></h3>
+
+     <dl>
+<dt>Expat<dd><a name="Expat"></a><span class="sc">gdb</span> can use the Expat XML parsing library.  This library may be
+included with your operating system distribution; if it is not, you
+can get the latest version from <a href="http://expat.sourceforge.net">http://expat.sourceforge.net</a>. 
+The <samp><span class="file">configure</span></samp> script will search for this library in several
+standard locations; if it is installed in an unusual path, you can
+use the <samp><span class="option">--with-libexpat-prefix</span></samp> option to specify its location.
+
+     <p>Expat is used for:
+
+          <ul>
+<li>Remote protocol memory maps (see <a href="Memory-Map-Format.html#Memory-Map-Format">Memory Map Format</a>)
+<li>Target descriptions (see <a href="Target-Descriptions.html#Target-Descriptions">Target Descriptions</a>)
+<li>Remote shared library lists (see <a href="Library-List-Format.html#Library-List-Format">Library List Format</a>)
+<li>MS-Windows shared libraries (see <a href="Shared-Libraries.html#Shared-Libraries">Shared Libraries</a>)
+</ul>
+
+     <br><dt>zlib<dd><a name="index-compressed-debug-sections-2297"></a><span class="sc">gdb</span> will use the &lsquo;<samp><span class="samp">zlib</span></samp>&rsquo; library, if available, to read
+compressed debug sections.  Some linkers, such as GNU gold, are capable
+of producing binaries with compressed debug sections.  If <span class="sc">gdb</span>
+is compiled with &lsquo;<samp><span class="samp">zlib</span></samp>&rsquo;, it will be able to read the debug
+information in such binaries.
+
+     <p>The &lsquo;<samp><span class="samp">zlib</span></samp>&rsquo; library is likely included with your operating system
+distribution; if it is not, you can get the latest version from
+<a href="http://zlib.net">http://zlib.net</a>.
+
+     <br><dt>iconv<dd><span class="sc">gdb</span>'s features related to character sets (see <a href="Character-Sets.html#Character-Sets">Character Sets</a>) require a functioning <code>iconv</code> implementation.  If you are
+on a GNU system, then this is provided by the GNU C Library.  Some
+other systems also provide a working <code>iconv</code>.
+
+     <p>On systems with <code>iconv</code>, you can install GNU Libiconv.  If you
+have previously installed Libiconv, you can use the
+<samp><span class="option">--with-libiconv-prefix</span></samp> option to configure.
+
+     <p><span class="sc">gdb</span>'s top-level <samp><span class="file">configure</span></samp> and <samp><span class="file">Makefile</span></samp> will
+arrange to build Libiconv if a directory named <samp><span class="file">libiconv</span></samp> appears
+in the top-most source directory.  If Libiconv is built this way, and
+if the operating system does not provide a suitable <code>iconv</code>
+implementation, then the just-built library will automatically be used
+by <span class="sc">gdb</span>.  One easy way to set this up is to download GNU
+Libiconv, unpack it, and then rename the directory holding the
+Libiconv source code to &lsquo;<samp><span class="samp">libiconv</span></samp>&rsquo;. 
+</dl>
+
+   </body></html>
+

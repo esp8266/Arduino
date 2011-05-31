@@ -1,0 +1,28 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>4.3. Running Applications in the Simulator</title><link rel="stylesheet" href="cs.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.74.0"><link rel="home" href="index.html" title="Sourcery G++ Lite"><link rel="up" href="chap-building.html" title="Chapter 4. Using Sourcery G++ from the Command Line"><link rel="prev" href="ch04s02.html" title="4.2. Running Applications on the Target System"><link rel="next" href="sec-remote-debugging.html" title="4.4. Running Applications from GDB"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">4.3. Running Applications in the Simulator</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch04s02.html">Prev</a> </td><th width="60%" align="center">Chapter 4. Using Sourcery G++ from the Command Line</th><td width="20%" align="right"> <a accesskey="n" href="sec-remote-debugging.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec-gdbsimulator"></a>4.3. Running Applications in the Simulator</h2></div></div></div><p>
+   Sourcery G++ Lite includes a simulator that you can use on the host system to
+   run programs compiled for the target system.  Since you do not need
+   target hardware, this is the easiest way to try out Sourcery G++.
+  </p><p>
+   To use the simulator run:
+   </p><pre class="screen">&gt; arm-none-eabi-run factorial</pre><p>
+   You should see the expected output:
+   </p><pre class="screen">factorial(0) = 1
+factorial(1) = 1
+factorial(2) = 2
+factorial(3) = 6
+factorial(4) = 24
+factorial(5) = 120
+factorial(6) = 720
+factorial(7) = 5040
+factorial(8) = 40320
+factorial(9) = 362880</pre><p>
+  </p><p>
+   You can also use the simulator to execute target programs when 
+   debugging with GDB.  See <a class="xref" href="sec-remote-debugging.html" title="4.4. Running Applications from GDB">Section 4.4, &#8220;Running Applications from GDB&#8221;</a> 
+   for more information.
+  </p><p>
+   The simulator supports the ARMv4 (StrongARM), ARMv4T (ARM7TDMI, ARM920,
+   ARM9TDMI), ARMv5, and ARMv5TE (ARM926, Xscale) instruction sets.
+   The arm-none-eabi-run simulator also includes support for
+   Thumb instructions.  
+  </p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch04s02.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="chap-building.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="sec-remote-debugging.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">4.2. Running Applications on the Target System </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 4.4. Running Applications from GDB</td></tr></table></div></body></html>

@@ -1,0 +1,89 @@
+<html lang="en">
+<head>
+<title>TUI Single Key Mode - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="TUI.html#TUI" title="TUI">
+<link rel="prev" href="TUI-Keys.html#TUI-Keys" title="TUI Keys">
+<link rel="next" href="TUI-Commands.html#TUI-Commands" title="TUI Commands">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="TUI-Single-Key-Mode"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="TUI-Commands.html#TUI-Commands">TUI Commands</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="TUI-Keys.html#TUI-Keys">TUI Keys</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="TUI.html#TUI">TUI</a>
+<hr>
+</div>
+
+<h3 class="section">25.3 TUI Single Key Mode</h3>
+
+<p><a name="index-TUI-single-key-mode-1974"></a>
+The TUI also provides a <dfn>SingleKey</dfn> mode, which binds several
+frequently used <span class="sc">gdb</span> commands to single keys.  Type <kbd>C-x s</kbd> to
+switch into this mode, where the following key bindings are used:
+
+     
+<a name="index-c-_0040r_007b_0028SingleKey-TUI-key_0029_007d-1975"></a>
+<dl><dt><kbd>c</kbd><dd>continue
+
+     <p><a name="index-d-_0040r_007b_0028SingleKey-TUI-key_0029_007d-1976"></a><br><dt><kbd>d</kbd><dd>down
+
+     <p><a name="index-f-_0040r_007b_0028SingleKey-TUI-key_0029_007d-1977"></a><br><dt><kbd>f</kbd><dd>finish
+
+     <p><a name="index-n-_0040r_007b_0028SingleKey-TUI-key_0029_007d-1978"></a><br><dt><kbd>n</kbd><dd>next
+
+     <p><a name="index-q-_0040r_007b_0028SingleKey-TUI-key_0029_007d-1979"></a><br><dt><kbd>q</kbd><dd>exit the SingleKey mode.
+
+     <p><a name="index-r-_0040r_007b_0028SingleKey-TUI-key_0029_007d-1980"></a><br><dt><kbd>r</kbd><dd>run
+
+     <p><a name="index-s-_0040r_007b_0028SingleKey-TUI-key_0029_007d-1981"></a><br><dt><kbd>s</kbd><dd>step
+
+     <p><a name="index-u-_0040r_007b_0028SingleKey-TUI-key_0029_007d-1982"></a><br><dt><kbd>u</kbd><dd>up
+
+     <p><a name="index-v-_0040r_007b_0028SingleKey-TUI-key_0029_007d-1983"></a><br><dt><kbd>v</kbd><dd>info locals
+
+     <p><a name="index-w-_0040r_007b_0028SingleKey-TUI-key_0029_007d-1984"></a><br><dt><kbd>w</kbd><dd>where
+</dl>
+
+   <p>Other keys temporarily switch to the <span class="sc">gdb</span> command prompt. 
+The key that was pressed is inserted in the editing buffer so that
+it is possible to type most <span class="sc">gdb</span> commands without interaction
+with the TUI SingleKey mode.  Once the command is entered the TUI
+SingleKey mode is restored.  The only way to permanently leave
+this mode is by typing <kbd>q</kbd> or <kbd>C-x s</kbd>.
+
+   </body></html>
+

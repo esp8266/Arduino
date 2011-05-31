@@ -1,0 +1,80 @@
+<html lang="en">
+<head>
+<title>log2 - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Math.html#Math" title="Math">
+<link rel="prev" href="log1p.html#log1p" title="log1p">
+<link rel="next" href="logb.html#logb" title="logb">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="log2"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="logb.html#logb">logb</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="log1p.html#log1p">log1p</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Math.html#Math">Math</a>
+<hr>
+</div>
+
+<h3 class="section">1.36 <code>log2</code>, <code>log2f</code>&ndash;base 2 logarithm</h3>
+
+<p><a name="index-log2-104"></a><a name="index-log2f-105"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double log2(double <var>x</var>);
+     float log2f(float <var>x</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+The <code>log2</code> functions compute the base-2 logarithm of <var>x</var>.  A domain error
+occurs if the argument is less than zero.  A range error occurs if the
+argument is zero.
+
+   <p>The Newlib implementations are not full, intrinisic calculations, but
+rather are derivatives based on <code>log</code>.  (Accuracy might be slightly off from
+a direct calculation.)  In addition to functions, they are also implemented as
+macros defined in math.h:
+<pre class="smallexample">      #define log2(x) (log (x) / _M_LOG2_E)
+      #define log2f(x) (logf (x) / (float) _M_LOG2_E)
+</pre>
+   <p>To use the functions instead, just undefine the macros first.
+
+   <p>You can use the (non-ANSI) function <code>matherr</code> to specify error
+handling for these functions, indirectly through the respective <code>log</code>
+function.
+
+   <p><br>
+<strong>Returns</strong><br>
+The <code>log2</code> functions return
+<code>log base-2(</code><var>x</var><code>)</code>
+on success. 
+When <var>x</var> is zero, the
+returned value is <code>-HUGE_VAL</code> and <code>errno</code> is set to <code>ERANGE</code>. 
+When <var>x</var> is negative, the returned value is NaN (not a number) and
+<code>errno</code> is set to <code>EDOM</code>.  You can control the error behavior via
+<code>matherr</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+C99, POSIX, System V Interface Definition (Issue 6).
+
+   <p><br>
+
+   </body></html>
+

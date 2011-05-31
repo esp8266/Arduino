@@ -1,0 +1,210 @@
+<html lang="en">
+<head>
+<title>Tokenization - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Overview.html#Overview" title="Overview">
+<link rel="prev" href="Initial-processing.html#Initial-processing" title="Initial processing">
+<link rel="next" href="The-preprocessing-language.html#The-preprocessing-language" title="The preprocessing language">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Tokenization"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="The-preprocessing-language.html#The-preprocessing-language">The preprocessing language</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Initial-processing.html#Initial-processing">Initial processing</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Overview.html#Overview">Overview</a>
+<hr>
+</div>
+
+<h3 class="section">1.3 Tokenization</h3>
+
+<p><a name="index-tokens-8"></a><a name="index-preprocessing-tokens-9"></a>After the textual transformations are finished, the input file is
+converted into a sequence of <dfn>preprocessing tokens</dfn>.  These mostly
+correspond to the syntactic tokens used by the C compiler, but there are
+a few differences.  White space separates tokens; it is not itself a
+token of any kind.  Tokens do not have to be separated by white space,
+but it is often necessary to avoid ambiguities.
+
+   <p>When faced with a sequence of characters that has more than one possible
+tokenization, the preprocessor is greedy.  It always makes each token,
+starting from the left, as big as possible before moving on to the next
+token.  For instance, <code>a+++++b</code> is interpreted as
+<code>a&nbsp;++&nbsp;++&nbsp;+&nbsp;b<!-- /@w --></code>, not as <code>a&nbsp;++&nbsp;+&nbsp;++&nbsp;b<!-- /@w --></code>, even though the
+latter tokenization could be part of a valid C program and the former
+could not.
+
+   <p>Once the input file is broken into tokens, the token boundaries never
+change, except when the &lsquo;<samp><span class="samp">##</span></samp>&rsquo; preprocessing operator is used to paste
+tokens together.  See <a href="Concatenation.html#Concatenation">Concatenation</a>.  For example,
+
+<pre class="smallexample">     #define foo() bar
+     foo()baz
+          ==&gt; bar baz
+     <em>not</em>
+          ==&gt; barbaz
+</pre>
+   <p>The compiler does not re-tokenize the preprocessor's output.  Each
+preprocessing token becomes one compiler token.
+
+   <p><a name="index-identifiers-10"></a>Preprocessing tokens fall into five broad classes: identifiers,
+preprocessing numbers, string literals, punctuators, and other.  An
+<dfn>identifier</dfn> is the same as an identifier in C: any sequence of
+letters, digits, or underscores, which begins with a letter or
+underscore.  Keywords of C have no significance to the preprocessor;
+they are ordinary identifiers.  You can define a macro whose name is a
+keyword, for instance.  The only identifier which can be considered a
+preprocessing keyword is <code>defined</code>.  See <a href="Defined.html#Defined">Defined</a>.
+
+   <p>This is mostly true of other languages which use the C preprocessor. 
+However, a few of the keywords of C++ are significant even in the
+preprocessor.  See <a href="C_002b_002b-Named-Operators.html#C_002b_002b-Named-Operators">C++ Named Operators</a>.
+
+   <p>In the 1999 C standard, identifiers may contain letters which are not
+part of the &ldquo;basic source character set&rdquo;, at the implementation's
+discretion (such as accented Latin letters, Greek letters, or Chinese
+ideograms).  This may be done with an extended character set, or the
+&lsquo;<samp><span class="samp">\u</span></samp>&rsquo; and &lsquo;<samp><span class="samp">\U</span></samp>&rsquo; escape sequences.  The implementation of this
+feature in GCC is experimental; such characters are only accepted in
+the &lsquo;<samp><span class="samp">\u</span></samp>&rsquo; and &lsquo;<samp><span class="samp">\U</span></samp>&rsquo; forms and only if
+<samp><span class="option">-fextended-identifiers</span></samp> is used.
+
+   <p>As an extension, GCC treats &lsquo;<samp><span class="samp">$</span></samp>&rsquo; as a letter.  This is for
+compatibility with some systems, such as VMS, where &lsquo;<samp><span class="samp">$</span></samp>&rsquo; is commonly
+used in system-defined function and object names.  &lsquo;<samp><span class="samp">$</span></samp>&rsquo; is not a
+letter in strictly conforming mode, or if you specify the <samp><span class="option">-$</span></samp>
+option.  See <a href="Invocation.html#Invocation">Invocation</a>.
+
+   <p><a name="index-numbers-11"></a><a name="index-preprocessing-numbers-12"></a>A <dfn>preprocessing number</dfn> has a rather bizarre definition.  The
+category includes all the normal integer and floating point constants
+one expects of C, but also a number of other things one might not
+initially recognize as a number.  Formally, preprocessing numbers begin
+with an optional period, a required decimal digit, and then continue
+with any sequence of letters, digits, underscores, periods, and
+exponents.  Exponents are the two-character sequences &lsquo;<samp><span class="samp">e+</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">e-</span></samp>&rsquo;, &lsquo;<samp><span class="samp">E+</span></samp>&rsquo;, &lsquo;<samp><span class="samp">E-</span></samp>&rsquo;, &lsquo;<samp><span class="samp">p+</span></samp>&rsquo;, &lsquo;<samp><span class="samp">p-</span></samp>&rsquo;, &lsquo;<samp><span class="samp">P+</span></samp>&rsquo;, and
+&lsquo;<samp><span class="samp">P-</span></samp>&rsquo;.  (The exponents that begin with &lsquo;<samp><span class="samp">p</span></samp>&rsquo; or &lsquo;<samp><span class="samp">P</span></samp>&rsquo; are new
+to C99.  They are used for hexadecimal floating-point constants.)
+
+   <p>The purpose of this unusual definition is to isolate the preprocessor
+from the full complexity of numeric constants.  It does not have to
+distinguish between lexically valid and invalid floating-point numbers,
+which is complicated.  The definition also permits you to split an
+identifier at any position and get exactly two tokens, which can then be
+pasted back together with the &lsquo;<samp><span class="samp">##</span></samp>&rsquo; operator.
+
+   <p>It's possible for preprocessing numbers to cause programs to be
+misinterpreted.  For example, <code>0xE+12</code> is a preprocessing number
+which does not translate to any valid numeric constant, therefore a
+syntax error.  It does not mean <code>0xE&nbsp;+&nbsp;12<!-- /@w --></code>, which is what you
+might have intended.
+
+   <p><a name="index-string-literals-13"></a><a name="index-string-constants-14"></a><a name="index-character-constants-15"></a><a name="index-header-file-names-16"></a><!-- the @: prevents makeinfo from turning '' into ". -->
+<dfn>String literals</dfn> are string constants, character constants, and
+header file names (the argument of &lsquo;<samp><span class="samp">#include</span></samp>&rsquo;).<a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a>  String constants and character
+constants are straightforward: <tt>"<small class="dots">...</small>"</tt> or <tt>'<small class="dots">...</small>'</tt>.  In
+either case embedded quotes should be escaped with a backslash:
+<tt>'\''</tt> is the character constant for &lsquo;<samp><span class="samp">'</span></samp>&rsquo;.  There is no limit on
+the length of a character constant, but the value of a character
+constant that contains more than one character is
+implementation-defined.  See <a href="Implementation-Details.html#Implementation-Details">Implementation Details</a>.
+
+   <p>Header file names either look like string constants, <tt>"<small class="dots">...</small>"</tt>, or are
+written with angle brackets instead, <tt>&lt;<small class="dots">...</small>&gt;</tt>.  In either case,
+backslash is an ordinary character.  There is no way to escape the
+closing quote or angle bracket.  The preprocessor looks for the header
+file in different places depending on which form you use.  See <a href="Include-Operation.html#Include-Operation">Include Operation</a>.
+
+   <p>No string literal may extend past the end of a line.  Older versions
+of GCC accepted multi-line string constants.  You may use continued
+lines instead, or string constant concatenation.  See <a href="Differences-from-previous-versions.html#Differences-from-previous-versions">Differences from previous versions</a>.
+
+   <p><a name="index-punctuators-17"></a><a name="index-digraphs-18"></a><a name="index-alternative-tokens-19"></a><dfn>Punctuators</dfn> are all the usual bits of punctuation which are
+meaningful to C and C++.  All but three of the punctuation characters in
+ASCII are C punctuators.  The exceptions are &lsquo;<samp><span class="samp">@</span></samp>&rsquo;, &lsquo;<samp><span class="samp">$</span></samp>&rsquo;, and
+&lsquo;<samp><span class="samp">`</span></samp>&rsquo;.  In addition, all the two- and three-character operators are
+punctuators.  There are also six <dfn>digraphs</dfn>, which the C++ standard
+calls <dfn>alternative tokens</dfn>, which are merely alternate ways to spell
+other punctuators.  This is a second attempt to work around missing
+punctuation in obsolete systems.  It has no negative side effects,
+unlike trigraphs, but does not cover as much ground.  The digraphs and
+their corresponding normal punctuators are:
+
+<pre class="smallexample">     Digraph:        &lt;%  %&gt;  &lt;:  :&gt;  %:  %:%:
+     Punctuator:      {   }   [   ]   #    ##
+</pre>
+   <p><a name="index-other-tokens-20"></a>Any other single character is considered &ldquo;other&rdquo;.  It is passed on to
+the preprocessor's output unmolested.  The C compiler will almost
+certainly reject source code containing &ldquo;other&rdquo; tokens.  In ASCII, the
+only other characters are &lsquo;<samp><span class="samp">@</span></samp>&rsquo;, &lsquo;<samp><span class="samp">$</span></samp>&rsquo;, &lsquo;<samp><span class="samp">`</span></samp>&rsquo;, and control
+characters other than NUL (all bits zero).  (Note that &lsquo;<samp><span class="samp">$</span></samp>&rsquo; is
+normally considered a letter.)  All characters with the high bit set
+(numeric range 0x7F&ndash;0xFF) are also &ldquo;other&rdquo; in the present
+implementation.  This will change when proper support for international
+character sets is added to GCC.
+
+   <p>NUL is a special case because of the high probability that its
+appearance is accidental, and because it may be invisible to the user
+(many terminals do not display NUL at all).  Within comments, NULs are
+silently ignored, just as any other character would be.  In running
+text, NUL is considered white space.  For example, these two directives
+have the same meaning.
+
+<pre class="smallexample">     #define X^@1
+     #define X 1
+</pre>
+   <p class="noindent">(where &lsquo;<samp><span class="samp">^@</span></samp>&rsquo; is ASCII NUL).  Within string or character constants,
+NULs are preserved.  In the latter two cases the preprocessor emits a
+warning message.
+
+   <div class="footnote">
+<hr>
+<h4>Footnotes</h4><p class="footnote"><small>[<a name="fn-1" href="#fnd-1">1</a>]</small> The C
+standard uses the term <dfn>string literal</dfn> to refer only to what we are
+calling <dfn>string constants</dfn>.</p>
+
+   <hr></div>
+
+   </body></html>
+

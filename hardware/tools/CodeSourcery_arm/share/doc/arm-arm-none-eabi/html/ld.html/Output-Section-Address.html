@@ -1,0 +1,91 @@
+<html lang="en">
+<head>
+<title>Output Section Address - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="SECTIONS.html#SECTIONS" title="SECTIONS">
+<link rel="prev" href="Output-Section-Name.html#Output-Section-Name" title="Output Section Name">
+<link rel="next" href="Input-Section.html#Input-Section" title="Input Section">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Output-Section-Address"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Input-Section.html#Input-Section">Input Section</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Output-Section-Name.html#Output-Section-Name">Output Section Name</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="SECTIONS.html#SECTIONS">SECTIONS</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.6.3 Output Section Address</h4>
+
+<p><a name="index-address_002c-section-394"></a><a name="index-section-address-395"></a>The <var>address</var> is an expression for the VMA (the virtual memory
+address) of the output section.  If you do not provide <var>address</var>,
+the linker will set it based on <var>region</var> if present, or otherwise
+based on the current value of the location counter.
+
+   <p>If you provide <var>address</var>, the address of the output section will be
+set to precisely that.  If you provide neither <var>address</var> nor
+<var>region</var>, then the address of the output section will be set to the
+current value of the location counter aligned to the alignment
+requirements of the output section.  The alignment requirement of the
+output section is the strictest alignment of any input section contained
+within the output section.
+
+   <p>For example,
+<pre class="smallexample">     .text . : { *(.text) }
+</pre>
+   <p class="noindent">and
+<pre class="smallexample">     .text : { *(.text) }
+</pre>
+   <p class="noindent">are subtly different.  The first will set the address of the
+&lsquo;<samp><span class="samp">.text</span></samp>&rsquo; output section to the current value of the location
+counter.  The second will set it to the current value of the location
+counter aligned to the strictest alignment of a &lsquo;<samp><span class="samp">.text</span></samp>&rsquo; input
+section.
+
+   <p>The <var>address</var> may be an arbitrary expression; <a href="Expressions.html#Expressions">Expressions</a>. 
+For example, if you want to align the section on a 0x10 byte boundary,
+so that the lowest four bits of the section address are zero, you could
+do something like this:
+<pre class="smallexample">     .text ALIGN(0x10) : { *(.text) }
+</pre>
+   <p class="noindent">This works because <code>ALIGN</code> returns the current location counter
+aligned upward to the specified value.
+
+   <p>Specifying <var>address</var> for a section will change the value of the
+location counter, provided that the section is non-empty.  (Empty
+sections are ignored).
+
+   </body></html>
+

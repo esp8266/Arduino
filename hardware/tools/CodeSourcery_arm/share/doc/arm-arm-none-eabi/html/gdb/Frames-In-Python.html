@@ -1,0 +1,164 @@
+<html lang="en">
+<head>
+<title>Frames In Python - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Python-API.html#Python-API" title="Python API">
+<link rel="prev" href="Objfiles-In-Python.html#Objfiles-In-Python" title="Objfiles In Python">
+<link rel="next" href="Blocks-In-Python.html#Blocks-In-Python" title="Blocks In Python">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Frames-In-Python"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Blocks-In-Python.html#Blocks-In-Python">Blocks In Python</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Objfiles-In-Python.html#Objfiles-In-Python">Objfiles In Python</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Python-API.html#Python-API">Python API</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">23.2.2.15 Accessing inferior stack frames from Python.</h5>
+
+<p><a name="index-frames-in-python-1817"></a>When the debugged program stops, <span class="sc">gdb</span> is able to analyze its call
+stack (see <a href="Frames.html#Frames">Stack frames</a>).  The <code>gdb.Frame</code> class
+represents a frame in the stack.  A <code>gdb.Frame</code> object is only valid
+while its corresponding frame exists in the inferior's stack.  If you try
+to use an invalid frame object, <span class="sc">gdb</span> will throw a <code>RuntimeError</code>
+exception.
+
+   <p>Two <code>gdb.Frame</code> objects can be compared for equality with the <code>==</code>
+operator, like:
+
+<pre class="smallexample">     (gdb) python print gdb.newest_frame() == gdb.selected_frame ()
+     True
+</pre>
+   <p>The following frame-related functions are available in the <code>gdb</code> module:
+
+   <p><a name="index-gdb_002eselected_005fframe-1818"></a>
+
+<div class="defun">
+&mdash; Function: <b>selected_frame</b><var><a name="index-selected_005fframe-1819"></a></var><br>
+<blockquote><p>Return the selected frame object.  (see <a href="Selection.html#Selection">Selecting a Frame</a>). 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Function: <b>frame_stop_reason_string</b><var> reason<a name="index-frame_005fstop_005freason_005fstring-1820"></a></var><br>
+<blockquote><p>Return a string explaining the reason why <span class="sc">gdb</span> stopped unwinding
+frames, as expressed by the given <var>reason</var> code (an integer, see the
+<code>unwind_stop_reason</code> method further down in this section). 
+</p></blockquote></div>
+
+   <p>A <code>gdb.Frame</code> object has the following methods:
+
+     <dl>
+
+     <div class="defun">
+&mdash; Method on Frame: <b>is_valid</b><var><a name="index-is_005fvalid-on-Frame-1821"></a></var><br>
+<blockquote> <p>Returns true if the <code>gdb.Frame</code> object is valid, false if not. 
+A frame object can become invalid if the frame it refers to doesn't
+exist anymore in the inferior.  All <code>gdb.Frame</code> methods will throw
+an exception if it is invalid at the time the method is called. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on Frame: <b>name</b><var><a name="index-name-on-Frame-1822"></a></var><br>
+<blockquote> <p>Returns the function name of the frame, or <code>None</code> if it can't be
+obtained. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on Frame: <b>type</b><var><a name="index-type-on-Frame-1823"></a></var><br>
+<blockquote> <p>Returns the type of the frame.  The value can be one of
+<code>gdb.NORMAL_FRAME</code>, <code>gdb.DUMMY_FRAME</code>, <code>gdb.SIGTRAMP_FRAME</code>
+or <code>gdb.SENTINEL_FRAME</code>. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on Frame: <b>unwind_stop_reason</b><var><a name="index-unwind_005fstop_005freason-on-Frame-1824"></a></var><br>
+<blockquote> <p>Return an integer representing the reason why it's not possible to find
+more frames toward the outermost frame.  Use
+<code>gdb.frame_stop_reason_string</code> to convert the value returned by this
+function to a string. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on Frame: <b>pc</b><var><a name="index-pc-on-Frame-1825"></a></var><br>
+<blockquote> <p>Returns the frame's resume address. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on Frame: <b>block</b><var><a name="index-block-on-Frame-1826"></a></var><br>
+<blockquote> <p>Return the frame's code block.  See <a href="Blocks-In-Python.html#Blocks-In-Python">Blocks In Python</a>. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on Frame: <b>function</b><var><a name="index-function-on-Frame-1827"></a></var><br>
+<blockquote> <p>Return the symbol for the function corresponding to this frame. 
+See <a href="Symbols-In-Python.html#Symbols-In-Python">Symbols In Python</a>. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on Frame: <b>older</b><var><a name="index-older-on-Frame-1828"></a></var><br>
+<blockquote> <p>Return the frame that called this frame. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on Frame: <b>newer</b><var><a name="index-newer-on-Frame-1829"></a></var><br>
+<blockquote> <p>Return the frame called by this frame. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on Frame: <b>find_sal</b><var><a name="index-find_005fsal-on-Frame-1830"></a></var><br>
+<blockquote> <p>Return the frame's symtab and line object. 
+See <a href="Symbol-Tables-In-Python.html#Symbol-Tables-In-Python">Symbol Tables In Python</a>. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on Frame: <b>read_var</b><var> variable </var><span class="roman">[</span><var>block</var><span class="roman">]</span><var><a name="index-read_005fvar-on-Frame-1831"></a></var><br>
+<blockquote> <p>Return the value of <var>variable</var> in this frame.  If the optional
+argument <var>block</var> is provided, search for the variable from that
+block; otherwise start at the frame's current block (which is
+determined by the frame's current program counter).  <var>variable</var>
+must be a string or a <code>gdb.Symbol</code> object.  <var>block</var> must be a
+<code>gdb.Block</code> object. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Method on Frame: <b>select</b><var><a name="index-select-on-Frame-1832"></a></var><br>
+<blockquote> <p>Set this frame to be the selected frame.  See <a href="Stack.html#Stack">Examining the Stack</a>. 
+</p></blockquote></div>
+     </dl>
+
+   </body></html>
+

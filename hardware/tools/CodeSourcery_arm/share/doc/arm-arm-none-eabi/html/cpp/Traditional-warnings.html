@@ -1,0 +1,104 @@
+<html lang="en">
+<head>
+<title>Traditional warnings - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Traditional-Mode.html#Traditional-Mode" title="Traditional Mode">
+<link rel="prev" href="Traditional-miscellany.html#Traditional-miscellany" title="Traditional miscellany">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Traditional-warnings"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Traditional-miscellany.html#Traditional-miscellany">Traditional miscellany</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Traditional-Mode.html#Traditional-Mode">Traditional Mode</a>
+<hr>
+</div>
+
+<h3 class="section">10.4 Traditional warnings</h3>
+
+<p>You can request warnings about features that did not exist, or worked
+differently, in traditional C with the <samp><span class="option">-Wtraditional</span></samp> option. 
+GCC does not warn about features of ISO C which you must use when you
+are using a conforming compiler, such as the &lsquo;<samp><span class="samp">#</span></samp>&rsquo; and &lsquo;<samp><span class="samp">##</span></samp>&rsquo;
+operators.
+
+   <p>Presently <samp><span class="option">-Wtraditional</span></samp> warns about:
+
+     <ul>
+<li>Macro parameters that appear within string literals in the macro body. 
+In traditional C macro replacement takes place within string literals,
+but does not in ISO C.
+
+     <li>In traditional C, some preprocessor directives did not exist. 
+Traditional preprocessors would only consider a line to be a directive
+if the &lsquo;<samp><span class="samp">#</span></samp>&rsquo; appeared in column 1 on the line.  Therefore
+<samp><span class="option">-Wtraditional</span></samp> warns about directives that traditional C
+understands but would ignore because the &lsquo;<samp><span class="samp">#</span></samp>&rsquo; does not appear as the
+first character on the line.  It also suggests you hide directives like
+&lsquo;<samp><span class="samp">#pragma</span></samp>&rsquo; not understood by traditional C by indenting them.  Some
+traditional implementations would not recognize &lsquo;<samp><span class="samp">#elif</span></samp>&rsquo;, so it
+suggests avoiding it altogether.
+
+     <li>A function-like macro that appears without an argument list.  In some
+traditional preprocessors this was an error.  In ISO C it merely means
+that the macro is not expanded.
+
+     <li>The unary plus operator.  This did not exist in traditional C.
+
+     <li>The &lsquo;<samp><span class="samp">U</span></samp>&rsquo; and &lsquo;<samp><span class="samp">LL</span></samp>&rsquo; integer constant suffixes, which were not
+available in traditional C.  (Traditional C does support the &lsquo;<samp><span class="samp">L</span></samp>&rsquo;
+suffix for simple long integer constants.)  You are not warned about
+uses of these suffixes in macros defined in system headers.  For
+instance, <code>UINT_MAX</code> may well be defined as <code>4294967295U</code>, but
+you will not be warned if you use <code>UINT_MAX</code>.
+
+     <p>You can usually avoid the warning, and the related warning about
+constants which are so large that they are unsigned, by writing the
+integer constant in question in hexadecimal, with no U suffix.  Take
+care, though, because this gives the wrong result in exotic cases. 
+</ul>
+
+   </body></html>
+

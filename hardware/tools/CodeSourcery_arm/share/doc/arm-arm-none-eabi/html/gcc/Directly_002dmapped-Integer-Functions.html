@@ -1,0 +1,97 @@
+<html lang="en">
+<head>
+<title>Directly-mapped Integer Functions - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="FR_002dV-Built_002din-Functions.html#FR_002dV-Built_002din-Functions" title="FR-V Built-in Functions">
+<link rel="prev" href="Argument-Types.html#Argument-Types" title="Argument Types">
+<link rel="next" href="Directly_002dmapped-Media-Functions.html#Directly_002dmapped-Media-Functions" title="Directly-mapped Media Functions">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Directly-mapped-Integer-Functions"></a>
+<a name="Directly_002dmapped-Integer-Functions"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Directly_002dmapped-Media-Functions.html#Directly_002dmapped-Media-Functions">Directly-mapped Media Functions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Argument-Types.html#Argument-Types">Argument Types</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="FR_002dV-Built_002din-Functions.html#FR_002dV-Built_002din-Functions">FR-V Built-in Functions</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">6.52.5.2 Directly-mapped Integer Functions</h5>
+
+<p>The functions listed below map directly to FR-V I-type instructions.
+
+ <p><table summary=""><tr align="left"><td valign="top" width="45%">Function prototype </td><td valign="top" width="32%">Example usage </td><td valign="top" width="23%">Assembly output
+<br></td></tr><tr align="left"><td valign="top" width="45%"><code>sw1 __ADDSS (sw1, sw1)</code>
+</td><td valign="top" width="32%"><var>c</var><code> = __ADDSS (</code><var>a</var><code>, </code><var>b</var><code>)</code>
+</td><td valign="top" width="23%"><code>ADDSS </code><var>a</var><code>,</code><var>b</var><code>,</code><var>c</var>
+<br></td></tr><tr align="left"><td valign="top" width="45%"><code>sw1 __SCAN (sw1, sw1)</code>
+</td><td valign="top" width="32%"><var>c</var><code> = __SCAN (</code><var>a</var><code>, </code><var>b</var><code>)</code>
+</td><td valign="top" width="23%"><code>SCAN </code><var>a</var><code>,</code><var>b</var><code>,</code><var>c</var>
+<br></td></tr><tr align="left"><td valign="top" width="45%"><code>sw1 __SCUTSS (sw1)</code>
+</td><td valign="top" width="32%"><var>b</var><code> = __SCUTSS (</code><var>a</var><code>)</code>
+</td><td valign="top" width="23%"><code>SCUTSS </code><var>a</var><code>,</code><var>b</var>
+<br></td></tr><tr align="left"><td valign="top" width="45%"><code>sw1 __SLASS (sw1, sw1)</code>
+</td><td valign="top" width="32%"><var>c</var><code> = __SLASS (</code><var>a</var><code>, </code><var>b</var><code>)</code>
+</td><td valign="top" width="23%"><code>SLASS </code><var>a</var><code>,</code><var>b</var><code>,</code><var>c</var>
+<br></td></tr><tr align="left"><td valign="top" width="45%"><code>void __SMASS (sw1, sw1)</code>
+</td><td valign="top" width="32%"><code>__SMASS (</code><var>a</var><code>, </code><var>b</var><code>)</code>
+</td><td valign="top" width="23%"><code>SMASS </code><var>a</var><code>,</code><var>b</var>
+<br></td></tr><tr align="left"><td valign="top" width="45%"><code>void __SMSSS (sw1, sw1)</code>
+</td><td valign="top" width="32%"><code>__SMSSS (</code><var>a</var><code>, </code><var>b</var><code>)</code>
+</td><td valign="top" width="23%"><code>SMSSS </code><var>a</var><code>,</code><var>b</var>
+<br></td></tr><tr align="left"><td valign="top" width="45%"><code>void __SMU (sw1, sw1)</code>
+</td><td valign="top" width="32%"><code>__SMU (</code><var>a</var><code>, </code><var>b</var><code>)</code>
+</td><td valign="top" width="23%"><code>SMU </code><var>a</var><code>,</code><var>b</var>
+<br></td></tr><tr align="left"><td valign="top" width="45%"><code>sw2 __SMUL (sw1, sw1)</code>
+</td><td valign="top" width="32%"><var>c</var><code> = __SMUL (</code><var>a</var><code>, </code><var>b</var><code>)</code>
+</td><td valign="top" width="23%"><code>SMUL </code><var>a</var><code>,</code><var>b</var><code>,</code><var>c</var>
+<br></td></tr><tr align="left"><td valign="top" width="45%"><code>sw1 __SUBSS (sw1, sw1)</code>
+</td><td valign="top" width="32%"><var>c</var><code> = __SUBSS (</code><var>a</var><code>, </code><var>b</var><code>)</code>
+</td><td valign="top" width="23%"><code>SUBSS </code><var>a</var><code>,</code><var>b</var><code>,</code><var>c</var>
+<br></td></tr><tr align="left"><td valign="top" width="45%"><code>uw2 __UMUL (uw1, uw1)</code>
+</td><td valign="top" width="32%"><var>c</var><code> = __UMUL (</code><var>a</var><code>, </code><var>b</var><code>)</code>
+</td><td valign="top" width="23%"><code>UMUL </code><var>a</var><code>,</code><var>b</var><code>,</code><var>c</var>
+ <br></td></tr></table>
+
+ </body></html>
+

@@ -1,0 +1,64 @@
+<html lang="en">
+<head>
+<title>memchr - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Strings.html#Strings" title="Strings">
+<link rel="prev" href="memccpy.html#memccpy" title="memccpy">
+<link rel="next" href="memcmp.html#memcmp" title="memcmp">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="memchr"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="memcmp.html#memcmp">memcmp</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="memccpy.html#memccpy">memccpy</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Strings.html#Strings">Strings</a>
+<hr>
+</div>
+
+<h3 class="section">5.6 <code>memchr</code>&mdash;find character in memory</h3>
+
+<p><a name="index-memchr-375"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;string.h&gt;
+     void *memchr(const void *<var>src</var>, int <var>c</var>, size_t <var>length</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+This function searches memory starting at <code>*</code><var>src</var> for the
+character <var>c</var>.  The search only ends with the first
+occurrence of <var>c</var>, or after <var>length</var> characters; in
+particular, <code>NUL</code> does not terminate the search.
+
+   <p><br>
+<strong>Returns</strong><br>
+If the character <var>c</var> is found within <var>length</var> characters
+of <code>*</code><var>src</var>, a pointer to the character is returned. If
+<var>c</var> is not found, then <code>NULL</code> is returned.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>memchr</code> is ANSI C.
+
+   <p><code>memchr</code> requires no supporting OS subroutines.
+
+   <p><br>
+
+   </body></html>
+

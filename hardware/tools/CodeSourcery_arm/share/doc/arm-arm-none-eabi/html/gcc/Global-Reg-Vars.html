@@ -1,0 +1,143 @@
+<html lang="en">
+<head>
+<title>Global Reg Vars - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Explicit-Reg-Vars.html#Explicit-Reg-Vars" title="Explicit Reg Vars">
+<link rel="next" href="Local-Reg-Vars.html#Local-Reg-Vars" title="Local Reg Vars">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Global-Reg-Vars"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Local-Reg-Vars.html#Local-Reg-Vars">Local Reg Vars</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Explicit-Reg-Vars.html#Explicit-Reg-Vars">Explicit Reg Vars</a>
+<hr>
+</div>
+
+<h4 class="subsection">6.42.1 Defining Global Register Variables</h4>
+
+<p><a name="index-global-register-variables-2590"></a><a name="index-registers_002c-global-variables-in-2591"></a>
+You can define a global register variable in GNU C like this:
+
+<pre class="smallexample">     register int *foo asm ("a5");
+</pre>
+ <p class="noindent">Here <code>a5</code> is the name of the register which should be used.  Choose a
+register which is normally saved and restored by function calls on your
+machine, so that library routines will not clobber it.
+
+ <p>Naturally the register name is cpu-dependent, so you would need to
+conditionalize your program according to cpu type.  The register
+<code>a5</code> would be a good choice on a 68000 for a variable of pointer
+type.  On machines with register windows, be sure to choose a &ldquo;global&rdquo;
+register that is not affected magically by the function call mechanism.
+
+ <p>In addition, operating systems on one type of cpu may differ in how they
+name the registers; then you would need additional conditionals.  For
+example, some 68000 operating systems call this register <code>%a5</code>.
+
+ <p>Eventually there may be a way of asking the compiler to choose a register
+automatically, but first we need to figure out how it should choose and
+how to enable you to guide the choice.  No solution is evident.
+
+ <p>Defining a global register variable in a certain register reserves that
+register entirely for this use, at least within the current compilation. 
+The register will not be allocated for any other purpose in the functions
+in the current compilation.  The register will not be saved and restored by
+these functions.  Stores into this register are never deleted even if they
+would appear to be dead, but references may be deleted or moved or
+simplified.
+
+ <p>It is not safe to access the global register variables from signal
+handlers, or from more than one thread of control, because the system
+library routines may temporarily use the register for other things (unless
+you recompile them specially for the task at hand).
+
+ <p><a name="index-g_t_0040code_007bqsort_007d_002c-and-global-register-variables-2592"></a>It is not safe for one function that uses a global register variable to
+call another such function <code>foo</code> by way of a third function
+<code>lose</code> that was compiled without knowledge of this variable (i.e. in a
+different source file in which the variable wasn't declared).  This is
+because <code>lose</code> might save the register and put some other value there. 
+For example, you can't expect a global register variable to be available in
+the comparison-function that you pass to <code>qsort</code>, since <code>qsort</code>
+might have put something else in that register.  (If you are prepared to
+recompile <code>qsort</code> with the same global register variable, you can
+solve this problem.)
+
+ <p>If you want to recompile <code>qsort</code> or other source files which do not
+actually use your global register variable, so that they will not use that
+register for any other purpose, then it suffices to specify the compiler
+option <samp><span class="option">-ffixed-</span><var>reg</var></samp>.  You need not actually add a global
+register declaration to their source code.
+
+ <p>A function which can alter the value of a global register variable cannot
+safely be called from a function compiled without this variable, because it
+could clobber the value the caller expects to find there on return. 
+Therefore, the function which is the entry point into the part of the
+program that uses the global register variable must explicitly save and
+restore the value which belongs to its caller.
+
+ <p><a name="index-register-variable-after-_0040code_007blongjmp_007d-2593"></a><a name="index-global-register-after-_0040code_007blongjmp_007d-2594"></a><a name="index-value-after-_0040code_007blongjmp_007d-2595"></a><a name="index-longjmp-2596"></a><a name="index-setjmp-2597"></a>On most machines, <code>longjmp</code> will restore to each global register
+variable the value it had at the time of the <code>setjmp</code>.  On some
+machines, however, <code>longjmp</code> will not change the value of global
+register variables.  To be portable, the function that called <code>setjmp</code>
+should make other arrangements to save the values of the global register
+variables, and to restore them in a <code>longjmp</code>.  This way, the same
+thing will happen regardless of what <code>longjmp</code> does.
+
+ <p>All global register variable declarations must precede all function
+definitions.  If such a declaration could appear after function
+definitions, the declaration would be too late to prevent the register from
+being used for other purposes in the preceding functions.
+
+ <p>Global register variables may not have initial values, because an
+executable file has no means to supply initial contents for a register.
+
+ <p>On the SPARC, there are reports that g3 <small class="dots">...</small> g7 are suitable
+registers, but certain library functions, such as <code>getwd</code>, as well
+as the subroutines for division and remainder, modify g3 and g4.  g1 and
+g2 are local temporaries.
+
+ <p>On the 68000, a2 <small class="dots">...</small> a5 should be suitable, as should d2 <small class="dots">...</small> d7. 
+Of course, it will not do to use more than a few of those.
+
+ </body></html>
+

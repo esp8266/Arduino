@@ -1,0 +1,80 @@
+<html lang="en">
+<head>
+<title>PROVIDE - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Assignments.html#Assignments" title="Assignments">
+<link rel="prev" href="Simple-Assignments.html#Simple-Assignments" title="Simple Assignments">
+<link rel="next" href="PROVIDE_005fHIDDEN.html#PROVIDE_005fHIDDEN" title="PROVIDE_HIDDEN">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="PROVIDE"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="PROVIDE_005fHIDDEN.html#PROVIDE_005fHIDDEN">PROVIDE_HIDDEN</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Simple-Assignments.html#Simple-Assignments">Simple Assignments</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Assignments.html#Assignments">Assignments</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.5.2 PROVIDE</h4>
+
+<p><a name="index-PROVIDE-389"></a>In some cases, it is desirable for a linker script to define a symbol
+only if it is referenced and is not defined by any object included in
+the link.  For example, traditional linkers defined the symbol
+&lsquo;<samp><span class="samp">etext</span></samp>&rsquo;.  However, ANSI C requires that the user be able to use
+&lsquo;<samp><span class="samp">etext</span></samp>&rsquo; as a function name without encountering an error.  The
+<code>PROVIDE</code> keyword may be used to define a symbol, such as
+&lsquo;<samp><span class="samp">etext</span></samp>&rsquo;, only if it is referenced but not defined.  The syntax is
+<code>PROVIDE(</code><var>symbol</var><code> = </code><var>expression</var><code>)</code>.
+
+   <p>Here is an example of using <code>PROVIDE</code> to define &lsquo;<samp><span class="samp">etext</span></samp>&rsquo;:
+<pre class="smallexample">     SECTIONS
+     {
+       .text :
+         {
+           *(.text)
+           _etext = .;
+           PROVIDE(etext = .);
+         }
+     }
+</pre>
+   <p>In this example, if the program defines &lsquo;<samp><span class="samp">_etext</span></samp>&rsquo; (with a leading
+underscore), the linker will give a multiple definition error.  If, on
+the other hand, the program defines &lsquo;<samp><span class="samp">etext</span></samp>&rsquo; (with no leading
+underscore), the linker will silently use the definition in the program. 
+If the program references &lsquo;<samp><span class="samp">etext</span></samp>&rsquo; but does not define it, the
+linker will use the definition in the linker script.
+
+   </body></html>
+

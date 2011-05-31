@@ -1,0 +1,93 @@
+<html lang="en">
+<head>
+<title>MMIX-Symbols - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="MMIX_002dSyntax.html#MMIX_002dSyntax" title="MMIX-Syntax">
+<link rel="prev" href="MMIX_002dChars.html#MMIX_002dChars" title="MMIX-Chars">
+<link rel="next" href="MMIX_002dRegs.html#MMIX_002dRegs" title="MMIX-Regs">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="MMIX-Symbols"></a>
+<a name="MMIX_002dSymbols"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="MMIX_002dRegs.html#MMIX_002dRegs">MMIX-Regs</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="MMIX_002dChars.html#MMIX_002dChars">MMIX-Chars</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="MMIX_002dSyntax.html#MMIX_002dSyntax">MMIX-Syntax</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">9.25.3.2 Symbols</h5>
+
+<p>The character &lsquo;<samp><span class="samp">:</span></samp>&rsquo; is permitted in identifiers.  There are two
+exceptions to it being treated as any other symbol character: if a symbol
+begins with &lsquo;<samp><span class="samp">:</span></samp>&rsquo;, it means that the symbol is in the global namespace
+and that the current prefix should not be prepended to that symbol
+(see <a href="MMIX_002dprefix.html#MMIX_002dprefix">MMIX-prefix</a>).  The &lsquo;<samp><span class="samp">:</span></samp>&rsquo; is then not considered part of the
+symbol.  For a symbol in the label position (first on a line), a &lsquo;<samp><span class="samp">:</span></samp>&rsquo;
+at the end of a symbol is silently stripped off.  A label is permitted,
+but not required, to be followed by a &lsquo;<samp><span class="samp">:</span></samp>&rsquo;, as with many other
+assembly formats.
+
+   <p>The character &lsquo;<samp><span class="samp">@</span></samp>&rsquo; in an expression, is a synonym for &lsquo;<samp><span class="samp">.</span></samp>&rsquo;, the
+current location.
+
+   <p>In addition to the common forward and backward local symbol formats
+(see <a href="Symbol-Names.html#Symbol-Names">Symbol Names</a>), they can be specified with upper-case &lsquo;<samp><span class="samp">B</span></samp>&rsquo; and
+&lsquo;<samp><span class="samp">F</span></samp>&rsquo;, as in &lsquo;<samp><span class="samp">8B</span></samp>&rsquo; and &lsquo;<samp><span class="samp">9F</span></samp>&rsquo;.  A local label defined for the
+current position is written with a &lsquo;<samp><span class="samp">H</span></samp>&rsquo; appended to the number:
+<pre class="smallexample">     3H LDB $0,$1,2
+</pre>
+   <p>This and traditional local-label formats cannot be mixed: a label must be
+defined and referred to using the same format.
+
+   <p>There's a minor caveat: just as for the ordinary local symbols, the local
+symbols are translated into ordinary symbols using control characters are
+to hide the ordinal number of the symbol.  Unfortunately, these symbols
+are not translated back in error messages.  Thus you may see confusing
+error messages when local symbols are used.  Control characters
+&lsquo;<samp><span class="samp">\003</span></samp>&rsquo; (control-C) and &lsquo;<samp><span class="samp">\004</span></samp>&rsquo; (control-D) are used for the
+MMIX-specific local-symbol syntax.
+
+   <p>The symbol &lsquo;<samp><span class="samp">Main</span></samp>&rsquo; is handled specially; it is always global.
+
+   <p>By defining the symbols &lsquo;<samp><span class="samp">__.MMIX.start..text</span></samp>&rsquo; and
+&lsquo;<samp><span class="samp">__.MMIX.start..data</span></samp>&rsquo;, the address of respectively the &lsquo;<samp><span class="samp">.text</span></samp>&rsquo;
+and &lsquo;<samp><span class="samp">.data</span></samp>&rsquo; segments of the final program can be defined, though when
+linking more than one object file, the code or data in the object file
+containing the symbol is not guaranteed to be start at that position; just
+the final executable.  See <a href="MMIX_002dloc.html#MMIX_002dloc">MMIX-loc</a>.
+
+   </body></html>
+

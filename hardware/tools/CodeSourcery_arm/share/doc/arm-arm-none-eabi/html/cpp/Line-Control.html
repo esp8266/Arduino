@@ -1,0 +1,135 @@
+<html lang="en">
+<head>
+<title>Line Control - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Diagnostics.html#Diagnostics" title="Diagnostics">
+<link rel="next" href="Pragmas.html#Pragmas" title="Pragmas">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Line-Control"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Pragmas.html#Pragmas">Pragmas</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Diagnostics.html#Diagnostics">Diagnostics</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">6 Line Control</h2>
+
+<p><a name="index-line-control-98"></a>
+The C preprocessor informs the C compiler of the location in your source
+code where each token came from.  Presently, this is just the file name
+and line number.  All the tokens resulting from macro expansion are
+reported as having appeared on the line of the source file where the
+outermost macro was used.  We intend to be more accurate in the future.
+
+   <p>If you write a program which generates source code, such as the
+<samp><span class="command">bison</span></samp> parser generator, you may want to adjust the preprocessor's
+notion of the current file name and line number by hand.  Parts of the
+output from <samp><span class="command">bison</span></samp> are generated from scratch, other parts come
+from a standard parser file.  The rest are copied verbatim from
+<samp><span class="command">bison</span></samp>'s input.  You would like compiler error messages and
+symbolic debuggers to be able to refer to <code>bison</code>'s input file.
+
+   <p><a name="index-g_t_0023line-99"></a><samp><span class="command">bison</span></samp> or any such program can arrange this by writing
+&lsquo;<samp><span class="samp">#line</span></samp>&rsquo; directives into the output file.  &lsquo;<samp><span class="samp">#line</span></samp>&rsquo; is a
+directive that specifies the original line number and source file name
+for subsequent input in the current preprocessor input file. 
+&lsquo;<samp><span class="samp">#line</span></samp>&rsquo; has three variants:
+
+     <dl>
+<dt><code>#line </code><var>linenum</var><dd><var>linenum</var> is a non-negative decimal integer constant.  It specifies
+the line number which should be reported for the following line of
+input.  Subsequent lines are counted from <var>linenum</var>.
+
+     <br><dt><code>#line </code><var>linenum</var> <var>filename</var><dd><var>linenum</var> is the same as for the first form, and has the same
+effect.  In addition, <var>filename</var> is a string constant.  The
+following line and all subsequent lines are reported to come from the
+file it specifies, until something else happens to change that. 
+<var>filename</var> is interpreted according to the normal rules for a string
+constant: backslash escapes are interpreted.  This is different from
+&lsquo;<samp><span class="samp">#include</span></samp>&rsquo;.
+
+     <p>Previous versions of CPP did not interpret escapes in &lsquo;<samp><span class="samp">#line</span></samp>&rsquo;;
+we have changed it because the standard requires they be interpreted,
+and most other compilers do.
+
+     <br><dt><code>#line </code><var>anything else</var><dd><var>anything else</var> is checked for macro calls, which are expanded. 
+The result should match one of the above two forms. 
+</dl>
+
+   <p>&lsquo;<samp><span class="samp">#line</span></samp>&rsquo; directives alter the results of the <code>__FILE__</code> and
+<code>__LINE__</code> predefined macros from that point on.  See <a href="Standard-Predefined-Macros.html#Standard-Predefined-Macros">Standard Predefined Macros</a>.  They do not have any effect on &lsquo;<samp><span class="samp">#include</span></samp>&rsquo;'s
+idea of the directory containing the current file.  This is a change
+from GCC 2.95.  Previously, a file reading
+
+<pre class="smallexample">     #line 1 "../src/gram.y"
+     #include "gram.h"
+</pre>
+   <p>would search for <samp><span class="file">gram.h</span></samp> in <samp><span class="file">../src</span></samp>, then the <samp><span class="option">-I</span></samp>
+chain; the directory containing the physical source file would not be
+searched.  In GCC 3.0 and later, the &lsquo;<samp><span class="samp">#include</span></samp>&rsquo; is not affected by
+the presence of a &lsquo;<samp><span class="samp">#line</span></samp>&rsquo; referring to a different directory.
+
+   <p>We made this change because the old behavior caused problems when
+generated source files were transported between machines.  For instance,
+it is common practice to ship generated parsers with a source release,
+so that people building the distribution do not need to have yacc or
+Bison installed.  These files frequently have &lsquo;<samp><span class="samp">#line</span></samp>&rsquo; directives
+referring to the directory tree of the system where the distribution was
+created.  If GCC tries to search for headers in those directories, the
+build is likely to fail.
+
+   <p>The new behavior can cause failures too, if the generated file is not
+in the same directory as its source and it attempts to include a header
+which would be visible searching from the directory containing the
+source file.  However, this problem is easily solved with an additional
+<samp><span class="option">-I</span></samp> switch on the command line.  The failures caused by the old
+semantics could sometimes be corrected only by editing the generated
+files, which is difficult and error-prone.
+
+   </body></html>
+

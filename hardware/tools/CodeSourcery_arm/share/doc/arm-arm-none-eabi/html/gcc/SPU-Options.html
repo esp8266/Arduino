@@ -1,0 +1,152 @@
+<html lang="en">
+<head>
+<title>SPU Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Submodel-Options.html#Submodel-Options" title="Submodel Options">
+<link rel="prev" href="SPARC-Options.html#SPARC-Options" title="SPARC Options">
+<link rel="next" href="System-V-Options.html#System-V-Options" title="System V Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="SPU-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="System-V-Options.html#System-V-Options">System V Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="SPARC-Options.html#SPARC-Options">SPARC Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Submodel-Options.html#Submodel-Options">Submodel Options</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.17.37 SPU Options</h4>
+
+<p><a name="index-SPU-options-2017"></a>
+These &lsquo;<samp><span class="samp">-m</span></samp>&rsquo; options are supported on the SPU:
+
+     <dl>
+<dt><code>-mwarn-reloc</code><dt><code>-merror-reloc</code><dd><a name="index-mwarn_002dreloc-2018"></a><a name="index-merror_002dreloc-2019"></a>
+The loader for SPU does not handle dynamic relocations.  By default, GCC
+will give an error when it generates code that requires a dynamic
+relocation.  <samp><span class="option">-mno-error-reloc</span></samp> disables the error,
+<samp><span class="option">-mwarn-reloc</span></samp> will generate a warning instead.
+
+     <br><dt><code>-msafe-dma</code><dt><code>-munsafe-dma</code><dd><a name="index-msafe_002ddma-2020"></a><a name="index-munsafe_002ddma-2021"></a>
+Instructions which initiate or test completion of DMA must not be
+reordered with respect to loads and stores of the memory which is being
+accessed.  Users typically address this problem using the volatile
+keyword, but that can lead to inefficient code in places where the
+memory is known to not change.  Rather than mark the memory as volatile
+we treat the DMA instructions as potentially effecting all memory.  With
+<samp><span class="option">-munsafe-dma</span></samp> users must use the volatile keyword to protect
+memory accesses.
+
+     <br><dt><code>-mbranch-hints</code><dd><a name="index-mbranch_002dhints-2022"></a>
+By default, GCC will generate a branch hint instruction to avoid
+pipeline stalls for always taken or probably taken branches.  A hint
+will not be generated closer than 8 instructions away from its branch. 
+There is little reason to disable them, except for debugging purposes,
+or to make an object a little bit smaller.
+
+     <br><dt><code>-msmall-mem</code><dt><code>-mlarge-mem</code><dd><a name="index-msmall_002dmem-2023"></a><a name="index-mlarge_002dmem-2024"></a>
+By default, GCC generates code assuming that addresses are never larger
+than 18 bits.  With <samp><span class="option">-mlarge-mem</span></samp> code is generated that assumes
+a full 32 bit address.
+
+     <br><dt><code>-mstdmain</code><dd><a name="index-mstdmain-2025"></a>
+By default, GCC links against startup code that assumes the SPU-style
+main function interface (which has an unconventional parameter list). 
+With <samp><span class="option">-mstdmain</span></samp>, GCC will link your program against startup
+code that assumes a C99-style interface to <code>main</code>, including a
+local copy of <code>argv</code> strings.
+
+     <br><dt><code>-mfixed-range=</code><var>register-range</var><dd><a name="index-mfixed_002drange-2026"></a>Generate code treating the given register range as fixed registers. 
+A fixed register is one that the register allocator can not use.  This is
+useful when compiling kernel code.  A register range is specified as
+two registers separated by a dash.  Multiple register ranges can be
+specified separated by a comma.
+
+     <br><dt><code>-mea32</code><dt><code>-mea64</code><dd><a name="index-mea32-2027"></a><a name="index-mea64-2028"></a>Compile code assuming that pointers to the PPU address space accessed
+via the <code>__ea</code> named address space qualifier are either 32 or 64
+bits wide.  The default is 32 bits.  As this is an ABI changing option,
+all object code in an executable must be compiled with the same setting.
+
+     <br><dt><code>-maddress-space-conversion</code><dt><code>-mno-address-space-conversion</code><dd><a name="index-maddress_002dspace_002dconversion-2029"></a><a name="index-mno_002daddress_002dspace_002dconversion-2030"></a>Allow/disallow treating the <code>__ea</code> address space as superset
+of the generic address space.  This enables explicit type casts
+between <code>__ea</code> and generic pointer as well as implicit
+conversions of generic pointers to <code>__ea</code> pointers.  The
+default is to allow address space pointer conversions.
+
+     <br><dt><code>-mcache-size=</code><var>cache-size</var><dd><a name="index-mcache_002dsize-2031"></a>This option controls the version of libgcc that the compiler links to an
+executable and selects a software-managed cache for accessing variables
+in the <code>__ea</code> address space with a particular cache size.  Possible
+options for <var>cache-size</var> are &lsquo;<samp><span class="samp">8</span></samp>&rsquo;, &lsquo;<samp><span class="samp">16</span></samp>&rsquo;, &lsquo;<samp><span class="samp">32</span></samp>&rsquo;, &lsquo;<samp><span class="samp">64</span></samp>&rsquo;
+and &lsquo;<samp><span class="samp">128</span></samp>&rsquo;.  The default cache size is 64KB.
+
+     <br><dt><code>-matomic-updates</code><dt><code>-mno-atomic-updates</code><dd><a name="index-matomic_002dupdates-2032"></a><a name="index-mno_002datomic_002dupdates-2033"></a>This option controls the version of libgcc that the compiler links to an
+executable and selects whether atomic updates to the software-managed
+cache of PPU-side variables are used.  If you use atomic updates, changes
+to a PPU variable from SPU code using the <code>__ea</code> named address space
+qualifier will not interfere with changes to other PPU variables residing
+in the same cache line from PPU code.  If you do not use atomic updates,
+such interference may occur; however, writing back cache lines will be
+more efficient.  The default behavior is to use atomic updates.
+
+     <br><dt><code>-mdual-nops</code><dt><code>-mdual-nops=</code><var>n</var><dd><a name="index-mdual_002dnops-2034"></a>By default, GCC will insert nops to increase dual issue when it expects
+it to increase performance.  <var>n</var> can be a value from 0 to 10.  A
+smaller <var>n</var> will insert fewer nops.  10 is the default, 0 is the
+same as <samp><span class="option">-mno-dual-nops</span></samp>.  Disabled with <samp><span class="option">-Os</span></samp>.
+
+     <br><dt><code>-mhint-max-nops=</code><var>n</var><dd><a name="index-mhint_002dmax_002dnops-2035"></a>Maximum number of nops to insert for a branch hint.  A branch hint must
+be at least 8 instructions away from the branch it is effecting.  GCC
+will insert up to <var>n</var> nops to enforce this, otherwise it will not
+generate the branch hint.
+
+     <br><dt><code>-mhint-max-distance=</code><var>n</var><dd><a name="index-mhint_002dmax_002ddistance-2036"></a>The encoding of the branch hint instruction limits the hint to be within
+256 instructions of the branch it is effecting.  By default, GCC makes
+sure it is within 125.
+
+     <br><dt><code>-msafe-hints</code><dd><a name="index-msafe_002dhints-2037"></a>Work around a hardware bug which causes the SPU to stall indefinitely. 
+By default, GCC will insert the <code>hbrp</code> instruction to make sure
+this stall won't happen.
+
+ </dl>
+
+ </body></html>
+

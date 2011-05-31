@@ -1,0 +1,106 @@
+<html lang="en">
+<head>
+<title>Startup - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Invoking-GDB.html#Invoking-GDB" title="Invoking GDB">
+<link rel="prev" href="Mode-Options.html#Mode-Options" title="Mode Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Startup"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Mode-Options.html#Mode-Options">Mode Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Invoking-GDB.html#Invoking-GDB">Invoking GDB</a>
+<hr>
+</div>
+
+<h4 class="subsection">2.1.3 What <span class="sc">gdb</span> Does During Startup</h4>
+
+<p><a name="index-g_t_0040value_007bGDBN_007d-startup-49"></a>
+Here's the description of what <span class="sc">gdb</span> does during session startup:
+
+     <ol type=1 start=1>
+<li>Sets up the command interpreter as specified by the command line
+(see <a href="Mode-Options.html#Mode-Options">interpreter</a>).
+
+     <li><a name="index-init-file-50"></a>Reads the system-wide <dfn>init file</dfn> (if <samp><span class="option">--with-system-gdbinit</span></samp> was
+used when building <span class="sc">gdb</span>; see <a href="System_002dwide-configuration.html#System_002dwide-configuration">System-wide configuration and settings</a>) and executes all the commands in
+that file.
+
+     <li>Reads the init file (if any) in your home directory<a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a> and executes all the commands in
+that file.
+
+     <li>Processes command line options and operands.
+
+     <li>Reads and executes the commands from init file (if any) in the current
+working directory.  This is only done if the current directory is
+different from your home directory.  Thus, you can have more than one
+init file, one generic in your home directory, and another, specific
+to the program you are debugging, in the directory where you invoke
+<span class="sc">gdb</span>.
+
+     <li>Reads command files specified by the &lsquo;<samp><span class="samp">-x</span></samp>&rsquo; option.  See <a href="Command-Files.html#Command-Files">Command Files</a>, for more details about <span class="sc">gdb</span> command files.
+
+     <li>Reads the command history recorded in the <dfn>history file</dfn>. 
+See <a href="Command-History.html#Command-History">Command History</a>, for more details about the command history and the
+files where <span class="sc">gdb</span> records it.
+        </ol>
+
+   <p>Init files use the same syntax as <dfn>command files</dfn> (see <a href="Command-Files.html#Command-Files">Command Files</a>) and are processed by <span class="sc">gdb</span> in the same way.  The init
+file in your home directory can set options (such as &lsquo;<samp><span class="samp">set
+complaints</span></samp>&rsquo;) that affect subsequent processing of command line options
+and operands.  Init files are not executed if you use the &lsquo;<samp><span class="samp">-nx</span></samp>&rsquo;
+option (see <a href="Mode-Options.html#Mode-Options">Choosing Modes</a>).
+
+   <p>To display the list of init files loaded by gdb at startup, you
+can use <kbd>gdb --help</kbd>.
+
+   <p><a name="index-init-file-name-51"></a><a name="index-g_t_0040file_007b_002egdbinit_007d-52"></a><a name="index-g_t_0040file_007bgdb_002eini_007d-53"></a>The <span class="sc">gdb</span> init files are normally called <samp><span class="file">.gdbinit</span></samp>. 
+The DJGPP port of <span class="sc">gdb</span> uses the name <samp><span class="file">gdb.ini</span></samp>, due to
+the limitations of file names imposed by DOS filesystems.  The Windows
+ports of <span class="sc">gdb</span> use the standard name, but if they find a
+<samp><span class="file">gdb.ini</span></samp> file, they warn you about that and suggest to rename
+the file to the standard name.
+
+   <div class="footnote">
+<hr>
+<h4>Footnotes</h4><p class="footnote"><small>[<a name="fn-1" href="#fnd-1">1</a>]</small> On
+DOS/Windows systems, the home directory is the one pointed to by the
+<code>HOME</code> environment variable.</p>
+
+   <hr></div>
+
+   </body></html>
+

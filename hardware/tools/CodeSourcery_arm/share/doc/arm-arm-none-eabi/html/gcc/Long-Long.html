@@ -1,0 +1,86 @@
+<html lang="en">
+<head>
+<title>Long Long - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Conditionals.html#Conditionals" title="Conditionals">
+<link rel="next" href="Complex.html#Complex" title="Complex">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Long-Long"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Complex.html#Complex">Complex</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Conditionals.html#Conditionals">Conditionals</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.8 Double-Word Integers</h3>
+
+<p><a name="index-g_t_0040code_007blong-long_007d-data-types-2216"></a><a name="index-double_002dword-arithmetic-2217"></a><a name="index-multiprecision-arithmetic-2218"></a><a name="index-g_t_0040code_007bLL_007d-integer-suffix-2219"></a><a name="index-g_t_0040code_007bULL_007d-integer-suffix-2220"></a>
+ISO C99 supports data types for integers that are at least 64 bits wide,
+and as an extension GCC supports them in C90 mode and in C++. 
+Simply write <code>long long int</code> for a signed integer, or
+<code>unsigned long long int</code> for an unsigned integer.  To make an
+integer constant of type <code>long long int</code>, add the suffix &lsquo;<samp><span class="samp">LL</span></samp>&rsquo;
+to the integer.  To make an integer constant of type <code>unsigned long
+long int</code>, add the suffix &lsquo;<samp><span class="samp">ULL</span></samp>&rsquo; to the integer.
+
+ <p>You can use these types in arithmetic like any other integer types. 
+Addition, subtraction, and bitwise boolean operations on these types
+are open-coded on all types of machines.  Multiplication is open-coded
+if the machine supports fullword-to-doubleword a widening multiply
+instruction.  Division and shifts are open-coded only on machines that
+provide special support.  The operations that are not open-coded use
+special library routines that come with GCC.
+
+ <p>There may be pitfalls when you use <code>long long</code> types for function
+arguments, unless you declare function prototypes.  If a function
+expects type <code>int</code> for its argument, and you pass a value of type
+<code>long long int</code>, confusion will result because the caller and the
+subroutine will disagree about the number of bytes for the argument. 
+Likewise, if the function expects <code>long long int</code> and you pass
+<code>int</code>.  The best way to avoid such problems is to use prototypes.
+
+ </body></html>
+

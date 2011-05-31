@@ -1,0 +1,149 @@
+<html lang="en">
+<head>
+<title>Starting and Stopping Trace Experiments - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Set-Tracepoints.html#Set-Tracepoints" title="Set Tracepoints">
+<link rel="prev" href="Listing-Static-Tracepoint-Markers.html#Listing-Static-Tracepoint-Markers" title="Listing Static Tracepoint Markers">
+<link rel="next" href="Tracepoint-Restrictions.html#Tracepoint-Restrictions" title="Tracepoint Restrictions">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Starting-and-Stopping-Trace-Experiments"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Tracepoint-Restrictions.html#Tracepoint-Restrictions">Tracepoint Restrictions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Listing-Static-Tracepoint-Markers.html#Listing-Static-Tracepoint-Markers">Listing Static Tracepoint Markers</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Set-Tracepoints.html#Set-Tracepoints">Set Tracepoints</a>
+<hr>
+</div>
+
+<h4 class="subsection">13.1.9 Starting and Stopping Trace Experiments</h4>
+
+     
+<a name="index-tstart-726"></a>
+<a name="index-start-a-new-trace-experiment-727"></a>
+<a name="index-collected-data-discarded-728"></a>
+<dl><dt><code>tstart</code><dd>This command takes no arguments.  It starts the trace experiment, and
+begins collecting data.  This has the side effect of discarding all
+the data collected in the trace buffer during the previous trace
+experiment.
+
+     <p><a name="index-tstop-729"></a><a name="index-stop-a-running-trace-experiment-730"></a><br><dt><code>tstop</code><dd>This command takes no arguments.  It ends the trace experiment, and
+stops collecting data.
+
+     <p><strong>Note</strong>: a trace experiment and data collection may stop
+automatically if any tracepoint's passcount is reached
+(see <a href="Tracepoint-Passcounts.html#Tracepoint-Passcounts">Tracepoint Passcounts</a>), or if the trace buffer becomes full.
+
+     <p><a name="index-tstatus-731"></a><a name="index-status-of-trace-data-collection-732"></a><a name="index-trace-experiment_002c-status-of-733"></a><br><dt><code>tstatus</code><dd>This command displays the status of the current trace data
+collection. 
+</dl>
+
+   <p>Here is an example of the commands we described so far:
+
+<pre class="smallexample">     (gdb) <b>trace gdb_c_test</b>
+     (gdb) <b>actions</b>
+     Enter actions for tracepoint #1, one per line.
+     &gt; collect $regs,$locals,$args
+     &gt; while-stepping 11
+       &gt; collect $regs
+       &gt; end
+     &gt; end
+     (gdb) <b>tstart</b>
+     	[time passes ...]
+     (gdb) <b>tstop</b>
+</pre>
+   <p><a name="index-disconnected-tracing-734"></a>You can choose to continue running the trace experiment even if
+<span class="sc">gdb</span> disconnects from the target, voluntarily or
+involuntarily.  For commands such as <code>detach</code>, the debugger will
+ask what you want to do with the trace.  But for unexpected
+terminations (<span class="sc">gdb</span> crash, network outage), it would be
+unfortunate to lose hard-won trace data, so the variable
+<code>disconnected-tracing</code> lets you decide whether the trace should
+continue running without <span class="sc">gdb</span>.
+
+     <dl>
+<dt><code>set disconnected-tracing on</code><dt><code>set disconnected-tracing off</code><dd><a name="index-set-disconnected_002dtracing-735"></a>Choose whether a tracing run should continue to run if <span class="sc">gdb</span>
+has disconnected from the target.  Note that <code>detach</code> or
+<code>quit</code> will ask you directly what to do about a running trace no
+matter what this variable's setting, so the variable is mainly useful
+for handling unexpected situations, such as loss of the network.
+
+     <br><dt><code>show disconnected-tracing</code><dd><a name="index-show-disconnected_002dtracing-736"></a>Show the current choice for disconnected tracing.
+
+   </dl>
+
+   <p>When you reconnect to the target, the trace experiment may or may not
+still be running; it might have filled the trace buffer in the
+meantime, or stopped for one of the other reasons.  If it is running,
+it will continue after reconnection.
+
+   <p>Upon reconnection, the target will upload information about the
+tracepoints in effect.  <span class="sc">gdb</span> will then compare that
+information to the set of tracepoints currently defined, and attempt
+to match them up, allowing for the possibility that the numbers may
+have changed due to creation and deletion in the meantime.  If one of
+the target's tracepoints does not match any in <span class="sc">gdb</span>, the
+debugger will create a new tracepoint, so that you have a number with
+which to specify that tracepoint.  This matching-up process is
+necessarily heuristic, and it may result in useless tracepoints being
+created; you may simply delete them if they are of no use.
+
+   <p><a name="index-circular-trace-buffer-737"></a>If your target agent supports a <dfn>circular trace buffer</dfn>, then you
+can run a trace experiment indefinitely without filling the trace
+buffer; when space runs out, the agent deletes already-collected trace
+frames, oldest first, until there is enough room to continue
+collecting.  This is especially useful if your tracepoints are being
+hit too often, and your trace gets terminated prematurely because the
+buffer is full.  To ask for a circular trace buffer, simply set
+&lsquo;<samp><span class="samp">circular_trace_buffer</span></samp>&rsquo; to on.  You can set this at any time,
+including during tracing; if the agent can do it, it will change
+buffer handling on the fly, otherwise it will not take effect until
+the next run.
+
+     <dl>
+<dt><code>set circular-trace-buffer on</code><dt><code>set circular-trace-buffer off</code><dd><a name="index-set-circular_002dtrace_002dbuffer-738"></a>Choose whether a tracing run should use a linear or circular buffer
+for trace data.  A linear buffer will not lose any trace data, but may
+fill up prematurely, while a circular buffer will discard old trace
+data, but it will have always room for the latest tracepoint hits.
+
+     <br><dt><code>show circular-trace-buffer</code><dd><a name="index-show-circular_002dtrace_002dbuffer-739"></a>Show the current choice for the trace buffer.  Note that this may not
+match the agent's current buffer handling, nor is it guaranteed to
+match the setting that might have been in effect during a past run,
+for instance if you are looking at frames from a trace file.
+
+   </dl>
+
+   </body></html>
+

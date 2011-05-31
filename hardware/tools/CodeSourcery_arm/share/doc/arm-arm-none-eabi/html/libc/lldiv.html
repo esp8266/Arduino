@@ -1,0 +1,75 @@
+<html lang="en">
+<head>
+<title>lldiv - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdlib.html#Stdlib" title="Stdlib">
+<link rel="prev" href="llabs.html#llabs" title="llabs">
+<link rel="next" href="malloc.html#malloc" title="malloc">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="lldiv"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="malloc.html#malloc">malloc</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="llabs.html#llabs">llabs</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdlib.html#Stdlib">Stdlib</a>
+<hr>
+</div>
+
+<h3 class="section">2.22 <code>lldiv</code>&mdash;divide two long long integers</h3>
+
+<p><a name="index-lldiv-36"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdlib.h&gt;
+     lldiv_t lldiv(long long <var>n</var>, long long <var>d</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+Divide
+<var>n</var>/<var>d</var>,
+returning quotient and remainder as two long long integers in a structure
+<code>lldiv_t</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+The result is represented with the structure
+
+<pre class="smallexample">      typedef struct
+      {
+       long long quot;
+       long long rem;
+      } lldiv_t;
+</pre>
+   <p>where the <code>quot</code> field represents the quotient, and <code>rem</code> the
+remainder.  For nonzero <var>d</var>, if `<var>r</var><code> = ldiv(</code><var>n</var><code>,</code><var>d</var><code>);</code>' then
+<var>n</var> equals `<var>r</var><code>.rem + </code><var>d</var><code>*</code><var>r</var><code>.quot</code>'.
+
+   <p>To divide <code>long</code> rather than <code>long long</code> values, use the similar
+function <code>ldiv</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>lldiv</code> is ISO 9899 (C99) compatable.
+
+   <p>No supporting OS subroutines are required.
+
+   <p><br>
+
+   </body></html>
+

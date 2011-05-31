@@ -1,0 +1,113 @@
+<html lang="en">
+<head>
+<title>Disabling - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Breakpoints.html#Breakpoints" title="Breakpoints">
+<link rel="prev" href="Delete-Breaks.html#Delete-Breaks" title="Delete Breaks">
+<link rel="next" href="Conditions.html#Conditions" title="Conditions">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Disabling"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Conditions.html#Conditions">Conditions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Delete-Breaks.html#Delete-Breaks">Delete Breaks</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Breakpoints.html#Breakpoints">Breakpoints</a>
+<hr>
+</div>
+
+<h4 class="subsection">5.1.5 Disabling Breakpoints</h4>
+
+<p><a name="index-enable_002fdisable-a-breakpoint-268"></a>Rather than deleting a breakpoint, watchpoint, or catchpoint, you might
+prefer to <dfn>disable</dfn> it.  This makes the breakpoint inoperative as if
+it had been deleted, but remembers the information on the breakpoint so
+that you can <dfn>enable</dfn> it again later.
+
+   <p>You disable and enable breakpoints, watchpoints, and catchpoints with
+the <code>enable</code> and <code>disable</code> commands, optionally specifying
+one or more breakpoint numbers as arguments.  Use <code>info break</code> to
+print a list of all breakpoints, watchpoints, and catchpoints if you
+do not know which numbers to use.
+
+   <p>Disabling and enabling a breakpoint that has multiple locations
+affects all of its locations.
+
+   <p>A breakpoint, watchpoint, or catchpoint can have any of four different
+states of enablement:
+
+     <ul>
+<li>Enabled.  The breakpoint stops your program.  A breakpoint set
+with the <code>break</code> command starts out in this state. 
+<li>Disabled.  The breakpoint has no effect on your program. 
+<li>Enabled once.  The breakpoint stops your program, but then becomes
+disabled. 
+<li>Enabled for deletion.  The breakpoint stops your program, but
+immediately after it does so it is deleted permanently.  A breakpoint
+set with the <code>tbreak</code> command starts out in this state. 
+</ul>
+
+   <p>You can use the following commands to enable or disable breakpoints,
+watchpoints, and catchpoints:
+
+     
+<a name="index-disable-269"></a>
+<a name="index-dis-_0040r_007b_0028_0040code_007bdisable_007d_0029_007d-270"></a>
+<dl><dt><code>disable </code><span class="roman">[</span><code>breakpoints</code><span class="roman">]</span> <span class="roman">[</span><var>range</var><code>...</code><span class="roman">]</span><dd>Disable the specified breakpoints&mdash;or all breakpoints, if none are
+listed.  A disabled breakpoint has no effect but is not forgotten.  All
+options such as ignore-counts, conditions and commands are remembered in
+case the breakpoint is enabled again later.  You may abbreviate
+<code>disable</code> as <code>dis</code>.
+
+     <p><a name="index-enable-271"></a><br><dt><code>enable </code><span class="roman">[</span><code>breakpoints</code><span class="roman">]</span> <span class="roman">[</span><var>range</var><code>...</code><span class="roman">]</span><dd>Enable the specified breakpoints (or all defined breakpoints).  They
+become effective once again in stopping your program.
+
+     <br><dt><code>enable </code><span class="roman">[</span><code>breakpoints</code><span class="roman">]</span><code> once </code><var>range</var><code>...</code><dd>Enable the specified breakpoints temporarily.  <span class="sc">gdb</span> disables any
+of these breakpoints immediately after stopping your program.
+
+     <br><dt><code>enable </code><span class="roman">[</span><code>breakpoints</code><span class="roman">]</span><code> delete </code><var>range</var><code>...</code><dd>Enable the specified breakpoints to work once, then die.  <span class="sc">gdb</span>
+deletes any of these breakpoints as soon as your program stops there. 
+Breakpoints set by the <code>tbreak</code> command start out in this state. 
+</dl>
+
+<!-- FIXME: I think the following ``Except for [...] @code{tbreak}'' is -->
+<!-- confusing: tbreak is also initially enabled. -->
+   <p>Except for a breakpoint set with <code>tbreak</code> (see <a href="Set-Breaks.html#Set-Breaks">Setting Breakpoints</a>), breakpoints that you set are initially enabled;
+subsequently, they become disabled or enabled only when you use one of
+the commands above.  (The command <code>until</code> can set and delete a
+breakpoint of its own, but it does not change the state of your other
+breakpoints; see <a href="Continuing-and-Stepping.html#Continuing-and-Stepping">Continuing and Stepping</a>.)
+
+   </body></html>
+

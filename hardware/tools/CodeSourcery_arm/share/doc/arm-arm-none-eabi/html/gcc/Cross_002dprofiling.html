@@ -1,0 +1,99 @@
+<html lang="en">
+<head>
+<title>Cross-profiling - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Gcov.html#Gcov" title="Gcov">
+<link rel="prev" href="Gcov-Data-Files.html#Gcov-Data-Files" title="Gcov Data Files">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Cross-profiling"></a>
+<a name="Cross_002dprofiling"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Gcov-Data-Files.html#Gcov-Data-Files">Gcov Data Files</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Gcov.html#Gcov">Gcov</a>
+<hr>
+</div>
+
+<h3 class="section">10.5 Data file relocation to support cross-profiling</h3>
+
+<p>Running the program will cause profile output to be generated.  For each
+source file compiled with <samp><span class="option">-fprofile-arcs</span></samp>, an accompanying <samp><span class="file">.gcda</span></samp>
+file will be placed in the object file directory. That implicitly requires
+running the program on the same system as it was built or having the same
+absolute directory structure on the target system. The program will try
+to create the needed directory structure, if it is not already present.
+
+ <p>To support cross-profiling, a program compiled with <samp><span class="option">-fprofile-arcs</span></samp>
+can relocate the data files based on two environment variables:
+
+     <ul>
+<li>GCOV_PREFIX contains the prefix to add to the absolute paths
+in the object file. Prefix must be absolute as well, otherwise its
+value is ignored. The default is no prefix.
+
+     <li>GCOV_PREFIX_STRIP indicates the how many initial directory names to strip off
+the hardwired absolute paths. Default value is 0.
+
+     <p><em>Note:</em> GCOV_PREFIX_STRIP has no effect if GCOV_PREFIX is undefined, empty
+or non-absolute. 
+</ul>
+
+ <p>For example, if the object file <samp><span class="file">/user/build/foo.o</span></samp> was built with
+<samp><span class="option">-fprofile-arcs</span></samp>, the final executable will try to create the data file
+<samp><span class="file">/user/build/foo.gcda</span></samp> when running on the target system.  This will
+fail if the corresponding directory does not exist and it is unable to create
+it.  This can be overcome by, for example, setting the environment as
+&lsquo;<samp><span class="samp">GCOV_PREFIX=/target/run</span></samp>&rsquo; and &lsquo;<samp><span class="samp">GCOV_PREFIX_STRIP=1</span></samp>&rsquo;.  Such a
+setting will name the data file <samp><span class="file">/target/run/build/foo.gcda</span></samp>.
+
+ <p>You must move the data files to the expected directory tree in order to
+use them for profile directed optimizations (<samp><span class="option">--use-profile</span></samp>), or to
+use the <samp><span class="command">gcov</span></samp> tool.
+
+<!-- Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998, -->
+<!-- 1999, 2000, 2001, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 -->
+<!-- Free Software Foundation, Inc. -->
+<!-- This is part of the GCC manual. -->
+<!-- For copying conditions, see the file gcc.texi. -->
+ </body></html>
+

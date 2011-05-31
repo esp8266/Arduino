@@ -1,0 +1,177 @@
+<html lang="en">
+<head>
+<title>V850 Opcodes - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="V850_002dDependent.html#V850_002dDependent" title="V850-Dependent">
+<link rel="prev" href="V850-Directives.html#V850-Directives" title="V850 Directives">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="V850-Opcodes"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="V850-Directives.html#V850-Directives">V850 Directives</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="V850_002dDependent.html#V850_002dDependent">V850-Dependent</a>
+<hr>
+</div>
+
+<h4 class="subsection">9.41.5 Opcodes</h4>
+
+<p><a name="index-V850-opcodes-1985"></a><a name="index-opcodes-for-V850-1986"></a><code>as</code> implements all the standard V850 opcodes.
+
+   <p><code>as</code> also implements the following pseudo ops:
+
+     
+<a name="index-g_t_0040code_007bhi0_007d-pseudo_002dop_002c-V850-1987"></a>
+<dl><dt><code>hi0()</code><dd>Computes the higher 16 bits of the given expression and stores it into
+the immediate operand field of the given instruction.  For example:
+
+     <p>&lsquo;<samp><span class="samp">mulhi hi0(here - there), r5, r6</span></samp>&rsquo;
+
+     <p>computes the difference between the address of labels 'here' and
+'there', takes the upper 16 bits of this difference, shifts it down 16
+bits and then multiplies it by the lower 16 bits in register 5, putting
+the result into register 6.
+
+     <p><a name="index-g_t_0040code_007blo_007d-pseudo_002dop_002c-V850-1988"></a><br><dt><code>lo()</code><dd>Computes the lower 16 bits of the given expression and stores it into
+the immediate operand field of the given instruction.  For example:
+
+     <p>&lsquo;<samp><span class="samp">addi lo(here - there), r5, r6</span></samp>&rsquo;
+
+     <p>computes the difference between the address of labels 'here' and
+'there', takes the lower 16 bits of this difference and adds it to
+register 5, putting the result into register 6.
+
+     <p><a name="index-g_t_0040code_007bhi_007d-pseudo_002dop_002c-V850-1989"></a><br><dt><code>hi()</code><dd>Computes the higher 16 bits of the given expression and then adds the
+value of the most significant bit of the lower 16 bits of the expression
+and stores the result into the immediate operand field of the given
+instruction.  For example the following code can be used to compute the
+address of the label 'here' and store it into register 6:
+
+     <p>&lsquo;<samp><span class="samp">movhi hi(here), r0, r6</span></samp>&rsquo;
+    &lsquo;<samp><span class="samp">movea lo(here), r6, r6</span></samp>&rsquo;
+
+     <p>The reason for this special behaviour is that movea performs a sign
+extension on its immediate operand.  So for example if the address of
+'here' was 0xFFFFFFFF then without the special behaviour of the hi()
+pseudo-op the movhi instruction would put 0xFFFF0000 into r6, then the
+movea instruction would takes its immediate operand, 0xFFFF, sign extend
+it to 32 bits, 0xFFFFFFFF, and then add it into r6 giving 0xFFFEFFFF
+which is wrong (the fifth nibble is E).  With the hi() pseudo op adding
+in the top bit of the lo() pseudo op, the movhi instruction actually
+stores 0 into r6 (0xFFFF + 1 = 0x0000), so that the movea instruction
+stores 0xFFFFFFFF into r6 - the right value.
+
+     <p><a name="index-g_t_0040code_007bhilo_007d-pseudo_002dop_002c-V850-1990"></a><br><dt><code>hilo()</code><dd>Computes the 32 bit value of the given expression and stores it into
+the immediate operand field of the given instruction (which must be a
+mov instruction).  For example:
+
+     <p>&lsquo;<samp><span class="samp">mov hilo(here), r6</span></samp>&rsquo;
+
+     <p>computes the absolute address of label 'here' and puts the result into
+register 6.
+
+     <p><a name="index-g_t_0040code_007bsdaoff_007d-pseudo_002dop_002c-V850-1991"></a><br><dt><code>sdaoff()</code><dd>Computes the offset of the named variable from the start of the Small
+Data Area (whoes address is held in register 4, the GP register) and
+stores the result as a 16 bit signed value in the immediate operand
+field of the given instruction.  For example:
+
+     <p>&lsquo;<samp><span class="samp">ld.w sdaoff(_a_variable)[gp],r6</span></samp>&rsquo;
+
+     <p>loads the contents of the location pointed to by the label '_a_variable'
+into register 6, provided that the label is located somewhere within +/-
+32K of the address held in the GP register.  [Note the linker assumes
+that the GP register contains a fixed address set to the address of the
+label called '__gp'.  This can either be set up automatically by the
+linker, or specifically set by using the &lsquo;<samp><span class="samp">--defsym __gp=&lt;value&gt;</span></samp>&rsquo;
+command line option].
+
+     <p><a name="index-g_t_0040code_007btdaoff_007d-pseudo_002dop_002c-V850-1992"></a><br><dt><code>tdaoff()</code><dd>Computes the offset of the named variable from the start of the Tiny
+Data Area (whoes address is held in register 30, the EP register) and
+stores the result as a 4,5, 7 or 8 bit unsigned value in the immediate
+operand field of the given instruction.  For example:
+
+     <p>&lsquo;<samp><span class="samp">sld.w tdaoff(_a_variable)[ep],r6</span></samp>&rsquo;
+
+     <p>loads the contents of the location pointed to by the label '_a_variable'
+into register 6, provided that the label is located somewhere within +256
+bytes of the address held in the EP register.  [Note the linker assumes
+that the EP register contains a fixed address set to the address of the
+label called '__ep'.  This can either be set up automatically by the
+linker, or specifically set by using the &lsquo;<samp><span class="samp">--defsym __ep=&lt;value&gt;</span></samp>&rsquo;
+command line option].
+
+     <p><a name="index-g_t_0040code_007bzdaoff_007d-pseudo_002dop_002c-V850-1993"></a><br><dt><code>zdaoff()</code><dd>Computes the offset of the named variable from address 0 and stores the
+result as a 16 bit signed value in the immediate operand field of the
+given instruction.  For example:
+
+     <p>&lsquo;<samp><span class="samp">movea zdaoff(_a_variable),zero,r6</span></samp>&rsquo;
+
+     <p>puts the address of the label '_a_variable' into register 6, assuming
+that the label is somewhere within the first 32K of memory.  (Strictly
+speaking it also possible to access the last 32K of memory as well, as
+the offsets are signed).
+
+     <p><a name="index-g_t_0040code_007bctoff_007d-pseudo_002dop_002c-V850-1994"></a><br><dt><code>ctoff()</code><dd>Computes the offset of the named variable from the start of the Call
+Table Area (whoes address is helg in system register 20, the CTBP
+register) and stores the result a 6 or 16 bit unsigned value in the
+immediate field of then given instruction or piece of data.  For
+example:
+
+     <p>&lsquo;<samp><span class="samp">callt ctoff(table_func1)</span></samp>&rsquo;
+
+     <p>will put the call the function whoes address is held in the call table
+at the location labeled 'table_func1'.
+
+     <p><a name="index-g_t_0040code_007blongcall_007d-pseudo_002dop_002c-V850-1995"></a><br><dt><code>.longcall name</code><dd>Indicates that the following sequence of instructions is a long call
+to function <code>name</code>.  The linker will attempt to shorten this call
+sequence if <code>name</code> is within a 22bit offset of the call.  Only
+valid if the <code>-mrelax</code> command line switch has been enabled.
+
+     <p><a name="index-g_t_0040code_007blongjump_007d-pseudo_002dop_002c-V850-1996"></a><br><dt><code>.longjump name</code><dd>Indicates that the following sequence of instructions is a long jump
+to label <code>name</code>.  The linker will attempt to shorten this code
+sequence if <code>name</code> is within a 22bit offset of the jump.  Only
+valid if the <code>-mrelax</code> command line switch has been enabled.
+
+   </dl>
+
+   <p>For information on the V850 instruction set, see <cite>V850
+Family 32-/16-Bit single-Chip Microcontroller Architecture Manual</cite> from NEC. 
+Ltd.
+
+<!-- Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 -->
+<!-- Free Software Foundation, Inc. -->
+<!-- This is part of the GAS manual. -->
+<!-- For copying conditions, see the file as.texinfo. -->
+   </body></html>
+

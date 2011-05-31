@@ -1,0 +1,115 @@
+<html lang="en">
+<head>
+<title>Symbol-Renaming Pragmas - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Pragmas.html#Pragmas" title="Pragmas">
+<link rel="prev" href="Solaris-Pragmas.html#Solaris-Pragmas" title="Solaris Pragmas">
+<link rel="next" href="Structure_002dPacking-Pragmas.html#Structure_002dPacking-Pragmas" title="Structure-Packing Pragmas">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Symbol-Renaming-Pragmas"></a>
+<a name="Symbol_002dRenaming-Pragmas"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Structure_002dPacking-Pragmas.html#Structure_002dPacking-Pragmas">Structure-Packing Pragmas</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Solaris-Pragmas.html#Solaris-Pragmas">Solaris Pragmas</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Pragmas.html#Pragmas">Pragmas</a>
+<hr>
+</div>
+
+<h4 class="subsection">6.54.7 Symbol-Renaming Pragmas</h4>
+
+<p>For compatibility with the Solaris and Tru64 UNIX system headers, GCC
+supports two <code>#pragma</code> directives which change the name used in
+assembly for a given declaration.  <code>#pragma extern_prefix</code> is only
+available on platforms whose system headers need it. To get this effect
+on all platforms supported by GCC, use the asm labels extension (see <a href="Asm-Labels.html#Asm-Labels">Asm Labels</a>).
+
+     <dl>
+<dt><code>redefine_extname </code><var>oldname</var> <var>newname</var><dd><a name="index-pragma_002c-redefine_005fextname-3137"></a>
+This pragma gives the C function <var>oldname</var> the assembly symbol
+<var>newname</var>.  The preprocessor macro <code>__PRAGMA_REDEFINE_EXTNAME</code>
+will be defined if this pragma is available (currently on all platforms).
+
+     <br><dt><code>extern_prefix </code><var>string</var><dd><a name="index-pragma_002c-extern_005fprefix-3138"></a>
+This pragma causes all subsequent external function and variable
+declarations to have <var>string</var> prepended to their assembly symbols. 
+This effect may be terminated with another <code>extern_prefix</code> pragma
+whose argument is an empty string.  The preprocessor macro
+<code>__PRAGMA_EXTERN_PREFIX</code> will be defined if this pragma is
+available (currently only on Tru64 UNIX). 
+</dl>
+
+ <p>These pragmas and the asm labels extension interact in a complicated
+manner.  Here are some corner cases you may want to be aware of.
+
+     <ol type=1 start=1>
+<li>Both pragmas silently apply only to declarations with external
+linkage.  Asm labels do not have this restriction.
+
+     <li>In C++, both pragmas silently apply only to declarations with
+&ldquo;C&rdquo; linkage.  Again, asm labels do not have this restriction.
+
+     <li>If any of the three ways of changing the assembly name of a
+declaration is applied to a declaration whose assembly name has
+already been determined (either by a previous use of one of these
+features, or because the compiler needed the assembly name in order to
+generate code), and the new name is different, a warning issues and
+the name does not change.
+
+     <li>The <var>oldname</var> used by <code>#pragma redefine_extname</code> is
+always the C-language name.
+
+     <li>If <code>#pragma extern_prefix</code> is in effect, and a declaration
+occurs with an asm label attached, the prefix is silently ignored for
+that declaration.
+
+     <li>If <code>#pragma extern_prefix</code> and <code>#pragma redefine_extname</code>
+apply to the same declaration, whichever triggered first wins, and a
+warning issues if they contradict each other.  (We would like to have
+<code>#pragma redefine_extname</code> always win, for consistency with asm
+labels, but if <code>#pragma extern_prefix</code> triggers first we have no
+way of knowing that that happened.)
+      </ol>
+
+ </body></html>
+

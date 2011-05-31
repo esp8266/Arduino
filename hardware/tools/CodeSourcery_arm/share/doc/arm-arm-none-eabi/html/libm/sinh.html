@@ -1,0 +1,70 @@
+<html lang="en">
+<head>
+<title>sinh - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Math.html#Math" title="Math">
+<link rel="prev" href="sin.html#sin" title="sin">
+<link rel="next" href="sqrt.html#sqrt" title="sqrt">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="sinh"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="sqrt.html#sqrt">sqrt</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="sin.html#sin">sin</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Math.html#Math">Math</a>
+<hr>
+</div>
+
+<h3 class="section">1.53 <code>sinh</code>, <code>sinhf</code>&mdash;hyperbolic sine</h3>
+
+<p><a name="index-sinh-144"></a><a name="index-sinhf-145"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double sinh(double <var>x</var>);
+     float  sinhf(float <var>x</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>sinh</code> computes the hyperbolic sine of the argument <var>x</var>. 
+Angles are specified in radians.   <code>sinh</code>(<var>x</var>) is defined as
+<pre class="smallexample">      (exp(<var>x</var>) - exp(-<var>x</var>))/2
+</pre>
+   <p><code>sinhf</code> is identical, save that it takes and returns <code>float</code> values.
+
+   <p><br>
+<strong>Returns</strong><br>
+The hyperbolic sine of <var>x</var> is returned.
+
+   <p>When the correct result is too large to be representable (an
+overflow),  <code>sinh</code> returns <code>HUGE_VAL</code> with the
+appropriate sign, and sets the global value <code>errno</code> to
+<code>ERANGE</code>.
+
+   <p>You can modify error handling for these functions with <code>matherr</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>sinh</code> is ANSI C. 
+<code>sinhf</code> is an extension.
+
+   <p><br>
+
+   </body></html>
+

@@ -1,0 +1,130 @@
+<html lang="en">
+<head>
+<title>Labels as Values - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Local-Labels.html#Local-Labels" title="Local Labels">
+<link rel="next" href="Nested-Functions.html#Nested-Functions" title="Nested Functions">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Labels-as-Values"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Nested-Functions.html#Nested-Functions">Nested Functions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Local-Labels.html#Local-Labels">Local Labels</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.3 Labels as Values</h3>
+
+<p><a name="index-labels-as-values-2187"></a><a name="index-computed-gotos-2188"></a><a name="index-goto-with-computed-label-2189"></a><a name="index-address-of-a-label-2190"></a>
+You can get the address of a label defined in the current function
+(or a containing function) with the unary operator &lsquo;<samp><span class="samp">&amp;&amp;</span></samp>&rsquo;.  The
+value has type <code>void *</code>.  This value is a constant and can be used
+wherever a constant of that type is valid.  For example:
+
+<pre class="smallexample">     void *ptr;
+     /* <span class="roman">...</span> */
+     ptr = &amp;&amp;foo;
+</pre>
+ <p>To use these values, you need to be able to jump to one.  This is done
+with the computed goto statement<a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a>, <code>goto *</code><var>exp</var><code>;</code>.  For example,
+
+<pre class="smallexample">     goto *ptr;
+</pre>
+ <p class="noindent">Any expression of type <code>void *</code> is allowed.
+
+ <p>One way of using these constants is in initializing a static array that
+will serve as a jump table:
+
+<pre class="smallexample">     static void *array[] = { &amp;&amp;foo, &amp;&amp;bar, &amp;&amp;hack };
+</pre>
+ <p>Then you can select a label with indexing, like this:
+
+<pre class="smallexample">     goto *array[i];
+</pre>
+ <p class="noindent">Note that this does not check whether the subscript is in bounds&mdash;array
+indexing in C never does that.
+
+ <p>Such an array of label values serves a purpose much like that of the
+<code>switch</code> statement.  The <code>switch</code> statement is cleaner, so
+use that rather than an array unless the problem does not fit a
+<code>switch</code> statement very well.
+
+ <p>Another use of label values is in an interpreter for threaded code. 
+The labels within the interpreter function can be stored in the
+threaded code for super-fast dispatching.
+
+ <p>You may not use this mechanism to jump to code in a different function. 
+If you do that, totally unpredictable things will happen.  The best way to
+avoid this is to store the label address only in automatic variables and
+never pass it as an argument.
+
+ <p>An alternate way to write the above example is
+
+<pre class="smallexample">     static const int array[] = { &amp;&amp;foo - &amp;&amp;foo, &amp;&amp;bar - &amp;&amp;foo,
+                                  &amp;&amp;hack - &amp;&amp;foo };
+     goto *(&amp;&amp;foo + array[i]);
+</pre>
+ <p class="noindent">This is more friendly to code living in shared libraries, as it reduces
+the number of dynamic relocations that are needed, and by consequence,
+allows the data to be read-only.
+
+ <p>The <code>&amp;&amp;foo</code> expressions for the same label might have different
+values if the containing function is inlined or cloned.  If a program
+relies on them being always the same,
+<code>__attribute__((__noinline__,__noclone__))</code> should be used to
+prevent inlining and cloning.  If <code>&amp;&amp;foo</code> is used in a static
+variable initializer, inlining and cloning is forbidden.
+
+ <div class="footnote">
+<hr>
+<h4>Footnotes</h4><p class="footnote"><small>[<a name="fn-1" href="#fnd-1">1</a>]</small> The analogous feature in
+Fortran is called an assigned goto, but that name seems inappropriate in
+C, where one can do more than simply store label addresses in label
+variables.</p>
+
+ <hr></div>
+
+ </body></html>
+

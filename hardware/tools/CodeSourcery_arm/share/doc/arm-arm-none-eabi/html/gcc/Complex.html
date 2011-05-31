@@ -1,0 +1,109 @@
+<html lang="en">
+<head>
+<title>Complex - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Long-Long.html#Long-Long" title="Long Long">
+<link rel="next" href="Floating-Types.html#Floating-Types" title="Floating Types">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Complex"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Floating-Types.html#Floating-Types">Floating Types</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Long-Long.html#Long-Long">Long Long</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.9 Complex Numbers</h3>
+
+<p><a name="index-complex-numbers-2221"></a><a name="index-g_t_0040code_007b_005fComplex_007d-keyword-2222"></a><a name="index-g_t_0040code_007b_005f_005fcomplex_005f_005f_007d-keyword-2223"></a>
+ISO C99 supports complex floating data types, and as an extension GCC
+supports them in C90 mode and in C++, and supports complex integer data
+types which are not part of ISO C99.  You can declare complex types
+using the keyword <code>_Complex</code>.  As an extension, the older GNU
+keyword <code>__complex__</code> is also supported.
+
+ <p>For example, &lsquo;<samp><span class="samp">_Complex double x;</span></samp>&rsquo; declares <code>x</code> as a
+variable whose real part and imaginary part are both of type
+<code>double</code>.  &lsquo;<samp><span class="samp">_Complex short int y;</span></samp>&rsquo; declares <code>y</code> to
+have real and imaginary parts of type <code>short int</code>; this is not
+likely to be useful, but it shows that the set of complex types is
+complete.
+
+ <p>To write a constant with a complex data type, use the suffix &lsquo;<samp><span class="samp">i</span></samp>&rsquo; or
+&lsquo;<samp><span class="samp">j</span></samp>&rsquo; (either one; they are equivalent).  For example, <code>2.5fi</code>
+has type <code>_Complex float</code> and <code>3i</code> has type
+<code>_Complex int</code>.  Such a constant always has a pure imaginary
+value, but you can form any complex value you like by adding one to a
+real constant.  This is a GNU extension; if you have an ISO C99
+conforming C library (such as GNU libc), and want to construct complex
+constants of floating type, you should include <code>&lt;complex.h&gt;</code> and
+use the macros <code>I</code> or <code>_Complex_I</code> instead.
+
+ <p><a name="index-g_t_0040code_007b_005f_005freal_005f_005f_007d-keyword-2224"></a><a name="index-g_t_0040code_007b_005f_005fimag_005f_005f_007d-keyword-2225"></a>To extract the real part of a complex-valued expression <var>exp</var>, write
+<code>__real__ </code><var>exp</var>.  Likewise, use <code>__imag__</code> to
+extract the imaginary part.  This is a GNU extension; for values of
+floating type, you should use the ISO C99 functions <code>crealf</code>,
+<code>creal</code>, <code>creall</code>, <code>cimagf</code>, <code>cimag</code> and
+<code>cimagl</code>, declared in <code>&lt;complex.h&gt;</code> and also provided as
+built-in functions by GCC.
+
+ <p><a name="index-complex-conjugation-2226"></a>The operator &lsquo;<samp><span class="samp">~</span></samp>&rsquo; performs complex conjugation when used on a value
+with a complex type.  This is a GNU extension; for values of
+floating type, you should use the ISO C99 functions <code>conjf</code>,
+<code>conj</code> and <code>conjl</code>, declared in <code>&lt;complex.h&gt;</code> and also
+provided as built-in functions by GCC.
+
+ <p>GCC can allocate complex automatic variables in a noncontiguous
+fashion; it's even possible for the real part to be in a register while
+the imaginary part is on the stack (or vice-versa).  Only the DWARF2
+debug info format can represent this, so use of DWARF2 is recommended. 
+If you are using the stabs debug info format, GCC describes a noncontiguous
+complex variable as if it were two separate variables of noncomplex type. 
+If the variable's actual name is <code>foo</code>, the two fictitious
+variables are named <code>foo$real</code> and <code>foo$imag</code>.  You can
+examine and set these two fictitious variables with your debugger.
+
+ </body></html>
+

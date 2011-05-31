@@ -1,0 +1,127 @@
+<html lang="en">
+<head>
+<title>Preprocessor Output - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Other-Directives.html#Other-Directives" title="Other Directives">
+<link rel="next" href="Traditional-Mode.html#Traditional-Mode" title="Traditional Mode">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Preprocessor-Output"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Traditional-Mode.html#Traditional-Mode">Traditional Mode</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Other-Directives.html#Other-Directives">Other Directives</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">9 Preprocessor Output</h2>
+
+<p>When the C preprocessor is used with the C, C++, or Objective-C
+compilers, it is integrated into the compiler and communicates a stream
+of binary tokens directly to the compiler's parser.  However, it can
+also be used in the more conventional standalone mode, where it produces
+textual output. 
+<!-- FIXME: Document the library interface. -->
+
+   <p><a name="index-output-format-107"></a>The output from the C preprocessor looks much like the input, except
+that all preprocessing directive lines have been replaced with blank
+lines and all comments with spaces.  Long runs of blank lines are
+discarded.
+
+   <p>The ISO standard specifies that it is implementation defined whether a
+preprocessor preserves whitespace between tokens, or replaces it with
+e.g. a single space.  In GNU CPP, whitespace between tokens is collapsed
+to become a single space, with the exception that the first token on a
+non-directive line is preceded with sufficient spaces that it appears in
+the same column in the preprocessed output that it appeared in the
+original source file.  This is so the output is easy to read. 
+See <a href="Differences-from-previous-versions.html#Differences-from-previous-versions">Differences from previous versions</a>.  CPP does not insert any
+whitespace where there was none in the original source, except where
+necessary to prevent an accidental token paste.
+
+   <p><a name="index-linemarkers-108"></a>Source file name and line number information is conveyed by lines
+of the form
+
+<pre class="smallexample">     # <var>linenum</var> <var>filename</var> <var>flags</var>
+</pre>
+   <p class="noindent">These are called <dfn>linemarkers</dfn>.  They are inserted as needed into
+the output (but never within a string or character constant).  They mean
+that the following line originated in file <var>filename</var> at line
+<var>linenum</var>.  <var>filename</var> will never contain any non-printing
+characters; they are replaced with octal escape sequences.
+
+   <p>After the file name comes zero or more flags, which are &lsquo;<samp><span class="samp">1</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">2</span></samp>&rsquo;, &lsquo;<samp><span class="samp">3</span></samp>&rsquo;, or &lsquo;<samp><span class="samp">4</span></samp>&rsquo;.  If there are multiple flags, spaces
+separate them.  Here is what the flags mean:
+
+     <dl>
+<dt>&lsquo;<samp><span class="samp">1</span></samp>&rsquo;<dd>This indicates the start of a new file. 
+<br><dt>&lsquo;<samp><span class="samp">2</span></samp>&rsquo;<dd>This indicates returning to a file (after having included another file). 
+<br><dt>&lsquo;<samp><span class="samp">3</span></samp>&rsquo;<dd>This indicates that the following text comes from a system header file,
+so certain warnings should be suppressed. 
+<br><dt>&lsquo;<samp><span class="samp">4</span></samp>&rsquo;<dd>This indicates that the following text should be treated as being
+wrapped in an implicit <code>extern "C"</code> block. 
+<!-- maybe cross reference NO_IMPLICIT_EXTERN_C -->
+</dl>
+
+   <p>As an extension, the preprocessor accepts linemarkers in non-assembler
+input files.  They are treated like the corresponding &lsquo;<samp><span class="samp">#line</span></samp>&rsquo;
+directive, (see <a href="Line-Control.html#Line-Control">Line Control</a>), except that trailing flags are
+permitted, and are interpreted with the meanings described above.  If
+multiple flags are given, they must be in ascending order.
+
+   <p>Some directives may be duplicated in the output of the preprocessor. 
+These are &lsquo;<samp><span class="samp">#ident</span></samp>&rsquo; (always), &lsquo;<samp><span class="samp">#pragma</span></samp>&rsquo; (only if the
+preprocessor does not handle the pragma itself), and &lsquo;<samp><span class="samp">#define</span></samp>&rsquo; and
+&lsquo;<samp><span class="samp">#undef</span></samp>&rsquo; (with certain debugging options).  If this happens, the
+&lsquo;<samp><span class="samp">#</span></samp>&rsquo; of the directive will always be in the first column, and there
+will be no space between the &lsquo;<samp><span class="samp">#</span></samp>&rsquo; and the directive name.  If macro
+expansion happens to generate tokens which might be mistaken for a
+duplicated directive, a space will be inserted between the &lsquo;<samp><span class="samp">#</span></samp>&rsquo; and
+the directive name.
+
+   </body></html>
+

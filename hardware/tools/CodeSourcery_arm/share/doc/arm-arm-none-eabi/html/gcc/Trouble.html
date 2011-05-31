@@ -1,0 +1,86 @@
+<html lang="en">
+<head>
+<title>Trouble - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Gcov.html#Gcov" title="Gcov">
+<link rel="next" href="Bugs.html#Bugs" title="Bugs">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Trouble"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Bugs.html#Bugs">Bugs</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Gcov.html#Gcov">Gcov</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">11 Known Causes of Trouble with GCC</h2>
+
+<p><a name="index-bugs_002c-known-3196"></a><a name="index-installation-trouble-3197"></a><a name="index-known-causes-of-trouble-3198"></a>
+This section describes known problems that affect users of GCC.  Most
+of these are not GCC bugs per se&mdash;if they were, we would fix them. 
+But the result for a user may be like the result of a bug.
+
+ <p>Some of these problems are due to bugs in other software, some are
+missing features that are too much work to add, and some are places
+where people's opinions differ as to what is best.
+
+<ul class="menu">
+<li><a accesskey="1" href="Actual-Bugs.html#Actual-Bugs">Actual Bugs</a>:          Bugs we will fix later. 
+<li><a accesskey="2" href="Cross_002dCompiler-Problems.html#Cross_002dCompiler-Problems">Cross-Compiler Problems</a>:  Common problems of cross compiling with GCC. 
+<li><a accesskey="3" href="Interoperation.html#Interoperation">Interoperation</a>:       Problems using GCC with other compilers,
+                        and with certain linkers, assemblers and debuggers. 
+<li><a accesskey="4" href="Incompatibilities.html#Incompatibilities">Incompatibilities</a>:    GCC is incompatible with traditional C. 
+<li><a accesskey="5" href="Fixed-Headers.html#Fixed-Headers">Fixed Headers</a>:        GCC uses corrected versions of system header files. 
+                        This is necessary, but doesn't always work smoothly. 
+<li><a accesskey="6" href="Standard-Libraries.html#Standard-Libraries">Standard Libraries</a>:   GCC uses the system C library, which might not be
+                        compliant with the ISO C standard. 
+<li><a accesskey="7" href="Disappointments.html#Disappointments">Disappointments</a>:      Regrettable things we can't change, but not quite bugs. 
+<li><a accesskey="8" href="C_002b_002b-Misunderstandings.html#C_002b_002b-Misunderstandings">C++ Misunderstandings</a>:  Common misunderstandings with GNU C++. 
+<li><a accesskey="9" href="Non_002dbugs.html#Non_002dbugs">Non-bugs</a>:             Things we think are right, but some others disagree. 
+<li><a href="Warnings-and-Errors.html#Warnings-and-Errors">Warnings and Errors</a>:  Which problems in your code get warnings,
+                        and which get errors. 
+</ul>
+
+ </body></html>
+

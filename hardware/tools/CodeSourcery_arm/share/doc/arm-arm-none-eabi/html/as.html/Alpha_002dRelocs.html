@@ -1,0 +1,184 @@
+<html lang="en">
+<head>
+<title>Alpha-Relocs - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Alpha-Syntax.html#Alpha-Syntax" title="Alpha Syntax">
+<link rel="prev" href="Alpha_002dRegs.html#Alpha_002dRegs" title="Alpha-Regs">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Alpha-Relocs"></a>
+<a name="Alpha_002dRelocs"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Alpha_002dRegs.html#Alpha_002dRegs">Alpha-Regs</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Alpha-Syntax.html#Alpha-Syntax">Alpha Syntax</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">9.1.3.3 Relocations</h5>
+
+<p><a name="index-Alpha-relocations-530"></a><a name="index-relocations_002c-Alpha-531"></a>
+Some of these relocations are available for ECOFF, but mostly
+only for ELF.  They are modeled after the relocation format
+introduced in Digital Unix 4.0, but there are additions.
+
+   <p>The format is &lsquo;<samp><span class="samp">!</span><var>tag</var></samp>&rsquo; or &lsquo;<samp><span class="samp">!</span><var>tag</var><span class="samp">!</span><var>number</var></samp>&rsquo;
+where <var>tag</var> is the name of the relocation.  In some cases
+<var>number</var> is used to relate specific instructions.
+
+   <p>The relocation is placed at the end of the instruction like so:
+
+<pre class="example">     ldah  $0,a($29)    !gprelhigh
+     lda   $0,a($0)     !gprellow
+     ldq   $1,b($29)    !literal!100
+     ldl   $2,0($1)     !lituse_base!100
+</pre>
+     <dl>
+<dt><code>!literal</code><dt><code>!literal!</code><var>N</var><dd>Used with an <code>ldq</code> instruction to load the address of a symbol
+from the GOT.
+
+     <p>A sequence number <var>N</var> is optional, and if present is used to pair
+<code>lituse</code> relocations with this <code>literal</code> relocation.  The
+<code>lituse</code> relocations are used by the linker to optimize the code
+based on the final location of the symbol.
+
+     <p>Note that these optimizations are dependent on the data flow of the
+program.  Therefore, if <em>any</em> <code>lituse</code> is paired with a
+<code>literal</code> relocation, then <em>all</em> uses of the register set by
+the <code>literal</code> instruction must also be marked with <code>lituse</code>
+relocations.  This is because the original <code>literal</code> instruction
+may be deleted or transformed into another instruction.
+
+     <p>Also note that there may be a one-to-many relationship between
+<code>literal</code> and <code>lituse</code>, but not a many-to-one.  That is, if
+there are two code paths that load up the same address and feed the
+value to a single use, then the use may not use a <code>lituse</code>
+relocation.
+
+     <br><dt><code>!lituse_base!</code><var>N</var><dd>Used with any memory format instruction (e.g. <code>ldl</code>) to indicate
+that the literal is used for an address load.  The offset field of the
+instruction must be zero.  During relaxation, the code may be altered
+to use a gp-relative load.
+
+     <br><dt><code>!lituse_jsr!</code><var>N</var><dd>Used with a register branch format instruction (e.g. <code>jsr</code>) to
+indicate that the literal is used for a call.  During relaxation, the
+code may be altered to use a direct branch (e.g. <code>bsr</code>).
+
+     <br><dt><code>!lituse_jsrdirect!</code><var>N</var><dd>Similar to <code>lituse_jsr</code>, but also that this call cannot be vectored
+through a PLT entry.  This is useful for functions with special calling
+conventions which do not allow the normal call-clobbered registers to be
+clobbered.
+
+     <br><dt><code>!lituse_bytoff!</code><var>N</var><dd>Used with a byte mask instruction (e.g. <code>extbl</code>) to indicate
+that only the low 3 bits of the address are relevant.  During relaxation,
+the code may be altered to use an immediate instead of a register shift.
+
+     <br><dt><code>!lituse_addr!</code><var>N</var><dd>Used with any other instruction to indicate that the original address
+is in fact used, and the original <code>ldq</code> instruction may not be
+altered or deleted.  This is useful in conjunction with <code>lituse_jsr</code>
+to test whether a weak symbol is defined.
+
+     <pre class="example">          ldq  $27,foo($29)   !literal!1
+          beq  $27,is_undef   !lituse_addr!1
+          jsr  $26,($27),foo  !lituse_jsr!1
+</pre>
+     <br><dt><code>!lituse_tlsgd!</code><var>N</var><dd>Used with a register branch format instruction to indicate that the
+literal is the call to <code>__tls_get_addr</code> used to compute the
+address of the thread-local storage variable whose descriptor was
+loaded with <code>!tlsgd!</code><var>N</var>.
+
+     <br><dt><code>!lituse_tlsldm!</code><var>N</var><dd>Used with a register branch format instruction to indicate that the
+literal is the call to <code>__tls_get_addr</code> used to compute the
+address of the base of the thread-local storage block for the current
+module.  The descriptor for the module must have been loaded with
+<code>!tlsldm!</code><var>N</var>.
+
+     <br><dt><code>!gpdisp!</code><var>N</var><dd>Used with <code>ldah</code> and <code>lda</code> to load the GP from the current
+address, a-la the <code>ldgp</code> macro.  The source register for the
+<code>ldah</code> instruction must contain the address of the <code>ldah</code>
+instruction.  There must be exactly one <code>lda</code> instruction paired
+with the <code>ldah</code> instruction, though it may appear anywhere in
+the instruction stream.  The immediate operands must be zero.
+
+     <pre class="example">          bsr  $26,foo
+          ldah $29,0($26)     !gpdisp!1
+          lda  $29,0($29)     !gpdisp!1
+</pre>
+     <br><dt><code>!gprelhigh</code><dd>Used with an <code>ldah</code> instruction to add the high 16 bits of a
+32-bit displacement from the GP.
+
+     <br><dt><code>!gprellow</code><dd>Used with any memory format instruction to add the low 16 bits of a
+32-bit displacement from the GP.
+
+     <br><dt><code>!gprel</code><dd>Used with any memory format instruction to add a 16-bit displacement
+from the GP.
+
+     <br><dt><code>!samegp</code><dd>Used with any branch format instruction to skip the GP load at the
+target address.  The referenced symbol must have the same GP as the
+source object file, and it must be declared to either not use <code>$27</code>
+or perform a standard GP load in the first two instructions via the
+<code>.prologue</code> directive.
+
+     <br><dt><code>!tlsgd</code><dt><code>!tlsgd!</code><var>N</var><dd>Used with an <code>lda</code> instruction to load the address of a TLS
+descriptor for a symbol in the GOT.
+
+     <p>The sequence number <var>N</var> is optional, and if present it used to
+pair the descriptor load with both the <code>literal</code> loading the
+address of the <code>__tls_get_addr</code> function and the <code>lituse_tlsgd</code>
+marking the call to that function.
+
+     <p>For proper relaxation, both the <code>tlsgd</code>, <code>literal</code> and
+<code>lituse</code> relocations must be in the same extended basic block. 
+That is, the relocation with the lowest address must be executed
+first at runtime.
+
+     <br><dt><code>!tlsldm</code><dt><code>!tlsldm!</code><var>N</var><dd>Used with an <code>lda</code> instruction to load the address of a TLS
+descriptor for the current module in the GOT.
+
+     <p>Similar in other respects to <code>tlsgd</code>.
+
+     <br><dt><code>!gotdtprel</code><dd>Used with an <code>ldq</code> instruction to load the offset of the TLS
+symbol within its module's thread-local storage block.  Also known
+as the dynamic thread pointer offset or dtp-relative offset.
+
+     <br><dt><code>!dtprelhi</code><dt><code>!dtprello</code><dt><code>!dtprel</code><dd>Like <code>gprel</code> relocations except they compute dtp-relative offsets.
+
+     <br><dt><code>!gottprel</code><dd>Used with an <code>ldq</code> instruction to load the offset of the TLS
+symbol from the thread pointer.  Also known as the tp-relative offset.
+
+     <br><dt><code>!tprelhi</code><dt><code>!tprello</code><dt><code>!tprel</code><dd>Like <code>gprel</code> relocations except they compute tp-relative offsets. 
+</dl>
+
+   </body></html>
+

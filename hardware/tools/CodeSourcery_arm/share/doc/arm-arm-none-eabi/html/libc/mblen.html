@@ -1,0 +1,73 @@
+<html lang="en">
+<head>
+<title>mblen - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdlib.html#Stdlib" title="Stdlib">
+<link rel="prev" href="mbstowcs.html#mbstowcs" title="mbstowcs">
+<link rel="next" href="mbtowc.html#mbtowc" title="mbtowc">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="mblen"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="mbtowc.html#mbtowc">mbtowc</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="mbstowcs.html#mbstowcs">mbstowcs</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdlib.html#Stdlib">Stdlib</a>
+<hr>
+</div>
+
+<h3 class="section">2.26 <code>mblen</code>&mdash;minimal multibyte length function</h3>
+
+<p><a name="index-mblen-57"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdlib.h&gt;
+     int mblen(const char *<var>s</var>, size_t <var>n</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+When _MB_CAPABLE is not defined, this is a minimal ANSI-conforming
+implementation of <code>mblen</code>.  In this case, the
+only &ldquo;multi-byte character sequences&rdquo; recognized are single bytes,
+and thus <code>1</code> is returned unless <var>s</var> is the null pointer or
+has a length of 0 or is the empty string.
+
+   <p>When _MB_CAPABLE is defined, this routine calls <code>_mbtowc_r</code> to perform
+the conversion, passing a state variable to allow state dependent
+decoding.  The result is based on the locale setting which may
+be restricted to a defined set of locales.
+
+   <p><br>
+<strong>Returns</strong><br>
+This implementation of <code>mblen</code> returns <code>0</code> if
+<var>s</var> is <code>NULL</code> or the empty string; it returns <code>1</code> if not _MB_CAPABLE or
+the character is a single-byte character; it returns <code>-1</code>
+if the multi-byte character is invalid; otherwise it returns
+the number of bytes in the multibyte character.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>mblen</code> is required in the ANSI C standard.  However, the precise
+effects vary with the locale.
+
+   <p><code>mblen</code> requires no supporting OS subroutines.
+
+   <p><br>
+
+   </body></html>
+

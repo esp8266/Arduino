@@ -1,0 +1,61 @@
+<html lang="en">
+<head>
+<title>towlower - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Ctype.html#Ctype" title="Ctype">
+<link rel="prev" href="wctype.html#wctype" title="wctype">
+<link rel="next" href="towupper.html#towupper" title="towupper">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="towlower"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="towupper.html#towupper">towupper</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="wctype.html#wctype">wctype</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Ctype.html#Ctype">Ctype</a>
+<hr>
+</div>
+
+<h3 class="section">3.29 <code>towlower</code>&mdash;translate wide characters to lowercase</h3>
+
+<p><a name="index-towlower-141"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;wctype.h&gt;
+     wint_t towlower(wint_t <var>c</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>towlower</code> is a function which converts uppercase wide characters to
+lowercase, leaving all other characters unchanged.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>towlower</code> returns the lowercase equivalent of <var>c</var> when it is a
+uppercase wide character; otherwise, it returns the input character.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>towlower</code> is C99.
+
+   <p>No supporting OS subroutines are required.
+
+   <p><br>
+
+   </body></html>
+

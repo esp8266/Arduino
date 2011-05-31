@@ -1,0 +1,96 @@
+<html lang="en">
+<head>
+<title>Expressions - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Data.html#Data" title="Data">
+<link rel="next" href="Ambiguous-Expressions.html#Ambiguous-Expressions" title="Ambiguous Expressions">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Expressions"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Ambiguous-Expressions.html#Ambiguous-Expressions">Ambiguous Expressions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Data.html#Data">Data</a>
+<hr>
+</div>
+
+<h3 class="section">10.1 Expressions</h3>
+
+<p><a name="index-expressions-494"></a><code>print</code> and many other <span class="sc">gdb</span> commands accept an expression and
+compute its value.  Any kind of constant, variable or operator defined
+by the programming language you are using is valid in an expression in
+<span class="sc">gdb</span>.  This includes conditional expressions, function calls,
+casts, and string constants.  It also includes preprocessor macros, if
+you compiled your program to include this information; see
+<a href="Compilation.html#Compilation">Compilation</a>.
+
+   <p><a name="index-arrays-in-expressions-495"></a><span class="sc">gdb</span> supports array constants in expressions input by
+the user.  The syntax is {<var>element</var>, <var>element</var><small class="dots">...</small>}.  For example,
+you can use the command <code>print {1, 2, 3}</code> to create an array
+of three integers.  If you pass an array to a function or assign it
+to a program variable, <span class="sc">gdb</span> copies the array to memory that
+is <code>malloc</code>ed in the target program.
+
+   <p>Because C is so widespread, most of the expressions shown in examples in
+this manual are in C.  See <a href="Languages.html#Languages">Using <span class="sc">gdb</span> with Different Languages</a>, for information on how to use expressions in other
+languages.
+
+   <p>In this section, we discuss operators that you can use in <span class="sc">gdb</span>
+expressions regardless of your programming language.
+
+   <p><a name="index-casts_002c-in-expressions-496"></a>Casts are supported in all languages, not just in C, because it is so
+useful to cast a number into a pointer in order to examine a structure
+at that address in memory. 
+<!-- FIXME: casts supported-Mod2 true? -->
+
+   <p><span class="sc">gdb</span> supports these operators, in addition to those common
+to programming languages:
+
+     <dl>
+<dt><code>@</code><dd>&lsquo;<samp><span class="samp">@</span></samp>&rsquo; is a binary operator for treating parts of memory as arrays. 
+See <a href="Arrays.html#Arrays">Artificial Arrays</a>, for more information.
+
+     <br><dt><code>::</code><dd>&lsquo;<samp><span class="samp">::</span></samp>&rsquo; allows you to specify a variable in terms of the file or
+function where it is defined.  See <a href="Variables.html#Variables">Program Variables</a>.
+
+     <p><a name="index-g_t_0040_007b_0040var_007btype_007d_0040_007d-497"></a><a name="index-type-casting-memory-498"></a><a name="index-memory_002c-viewing-as-typed-object-499"></a><a name="index-casts_002c-to-view-memory-500"></a><br><dt><code>{</code><var>type</var><code>} </code><var>addr</var><dd>Refers to an object of type <var>type</var> stored at address <var>addr</var> in
+memory.  <var>addr</var> may be any expression whose value is an integer or
+pointer (but parentheses are required around binary operators, just as in
+a cast).  This construct is allowed regardless of what kind of data is
+normally supposed to reside at <var>addr</var>. 
+</dl>
+
+   </body></html>
+

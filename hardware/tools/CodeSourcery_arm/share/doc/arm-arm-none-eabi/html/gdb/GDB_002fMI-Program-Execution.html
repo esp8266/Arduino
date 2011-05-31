@@ -1,0 +1,489 @@
+<html lang="en">
+<head>
+<title>GDB/MI Program Execution - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="GDB_002fMI.html#GDB_002fMI" title="GDB/MI">
+<link rel="prev" href="GDB_002fMI-Thread-Commands.html#GDB_002fMI-Thread-Commands" title="GDB/MI Thread Commands">
+<link rel="next" href="GDB_002fMI-Stack-Manipulation.html#GDB_002fMI-Stack-Manipulation" title="GDB/MI Stack Manipulation">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="GDB%2fMI-Program-Execution"></a>
+<a name="GDB_002fMI-Program-Execution"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="GDB_002fMI-Stack-Manipulation.html#GDB_002fMI-Stack-Manipulation">GDB/MI Stack Manipulation</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="GDB_002fMI-Thread-Commands.html#GDB_002fMI-Thread-Commands">GDB/MI Thread Commands</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="GDB_002fMI.html#GDB_002fMI">GDB/MI</a>
+<hr>
+</div>
+
+<h3 class="section">27.11 <span class="sc">gdb/mi</span> Program Execution</h3>
+
+<p>These are the asynchronous commands which generate the out-of-band
+record &lsquo;<samp><span class="samp">*stopped</span></samp>&rsquo;.  Currently <span class="sc">gdb</span> only really executes
+asynchronously with remote targets and this interaction is mimicked in
+other cases.
+
+<h4 class="subheading">The <code>-exec-continue</code> Command</h4>
+
+<p><a name="index-g_t_002dexec_002dcontinue-2051"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -exec-continue [--reverse] [--all|--thread-group N]
+</pre>
+   <p>Resumes the execution of the inferior program, which will continue
+to execute until it reaches a debugger stop event.  If the
+&lsquo;<samp><span class="samp">--reverse</span></samp>&rsquo; option is specified, execution resumes in reverse until
+it reaches a stop event.  Stop events may include
+     <ul>
+<li>breakpoints or watchpoints
+<li>signals or exceptions
+<li>the end of the process (or its beginning under &lsquo;<samp><span class="samp">--reverse</span></samp>&rsquo;)
+<li>the end or beginning of a replay log if one is being used. 
+</ul>
+   In all-stop mode (see <a href="All_002dStop-Mode.html#All_002dStop-Mode">All-Stop Mode</a>), may resume only one thread, or all threads, depending on the
+value of the &lsquo;<samp><span class="samp">scheduler-locking</span></samp>&rsquo; variable.  If &lsquo;<samp><span class="samp">--all</span></samp>&rsquo; is
+specified, all threads (in all inferiors) will be resumed.  The &lsquo;<samp><span class="samp">--all</span></samp>&rsquo; option is
+ignored in all-stop mode.  If the &lsquo;<samp><span class="samp">--thread-group</span></samp>&rsquo; options is
+specified, then all threads in that thread group are resumed.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> corresponding is &lsquo;<samp><span class="samp">continue</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     -exec-continue
+     ^running
+     (gdb)
+     @Hello world
+     *stopped,reason="breakpoint-hit",disp="keep",bkptno="2",frame={
+     func="foo",args=[],file="hello.c",fullname="/home/foo/bar/hello.c",
+     line="13"}
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-exec-finish</code> Command</h4>
+
+<p><a name="index-g_t_002dexec_002dfinish-2052"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -exec-finish [--reverse]
+</pre>
+   <p>Resumes the execution of the inferior program until the current
+function is exited.  Displays the results returned by the function. 
+If the &lsquo;<samp><span class="samp">--reverse</span></samp>&rsquo; option is specified, resumes the reverse
+execution of the inferior program until the point where current
+function was called.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">finish</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<p>Function returning <code>void</code>.
+
+<pre class="smallexample">     -exec-finish
+     ^running
+     (gdb)
+     @hello from foo
+     *stopped,reason="function-finished",frame={func="main",args=[],
+     file="hello.c",fullname="/home/foo/bar/hello.c",line="7"}
+     (gdb)
+</pre>
+   <p>Function returning other than <code>void</code>.  The name of the internal
+<span class="sc">gdb</span> variable storing the result is printed, together with the
+value itself.
+
+<pre class="smallexample">     -exec-finish
+     ^running
+     (gdb)
+     *stopped,reason="function-finished",frame={addr="0x000107b0",func="foo",
+     args=[{name="a",value="1"],{name="b",value="9"}},
+     file="recursive2.c",fullname="/home/foo/bar/recursive2.c",line="14"},
+     gdb-result-var="$1",return-value="0"
+     (gdb)
+</pre>
+   <h4 class="subheading">The <code>-exec-interrupt</code> Command</h4>
+
+<p><a name="index-g_t_002dexec_002dinterrupt-2053"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -exec-interrupt [--all|--thread-group N]
+</pre>
+   <p>Interrupts the background execution of the target.  Note how the token
+associated with the stop message is the one for the execution command
+that has been interrupted.  The token for the interrupt itself only
+appears in the &lsquo;<samp><span class="samp">^done</span></samp>&rsquo; output.  If the user is trying to
+interrupt a non-running program, an error message will be printed.
+
+   <p>Note that when asynchronous execution is enabled, this command is
+asynchronous just like other execution commands.  That is, first the
+&lsquo;<samp><span class="samp">^done</span></samp>&rsquo; response will be printed, and the target stop will be
+reported after that using the &lsquo;<samp><span class="samp">*stopped</span></samp>&rsquo; notification.
+
+   <p>In non-stop mode, only the context thread is interrupted by default. 
+All threads (in all inferiors) will be interrupted if the
+&lsquo;<samp><span class="samp">--all</span></samp>&rsquo;  option is specified.  If the &lsquo;<samp><span class="samp">--thread-group</span></samp>&rsquo;
+option is specified, all threads in that group will be interrupted.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">interrupt</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     111-exec-continue
+     111^running
+     
+     (gdb)
+     222-exec-interrupt
+     222^done
+     (gdb)
+     111*stopped,signal-name="SIGINT",signal-meaning="Interrupt",
+     frame={addr="0x00010140",func="foo",args=[],file="try.c",
+     fullname="/home/foo/bar/try.c",line="13"}
+     (gdb)
+     
+     (gdb)
+     -exec-interrupt
+     ^error,msg="mi_cmd_exec_interrupt: Inferior not executing."
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-exec-jump</code> Command</h4>
+
+<p><a name="index-g_t_002dexec_002djump-2054"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -exec-jump <var>location</var>
+</pre>
+   <p>Resumes execution of the inferior program at the location specified by
+parameter.  See <a href="Specify-Location.html#Specify-Location">Specify Location</a>, for a description of the
+different forms of <var>location</var>.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">jump</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     -exec-jump foo.c:10
+     *running,thread-id="all"
+     ^running
+</pre>
+<h4 class="subheading">The <code>-exec-next</code> Command</h4>
+
+<p><a name="index-g_t_002dexec_002dnext-2055"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -exec-next [--reverse]
+</pre>
+   <p>Resumes execution of the inferior program, stopping when the beginning
+of the next source line is reached.
+
+   <p>If the &lsquo;<samp><span class="samp">--reverse</span></samp>&rsquo; option is specified, resumes reverse execution
+of the inferior program, stopping at the beginning of the previous
+source line.  If you issue this command on the first line of a
+function, it will take you back to the caller of that function, to the
+source line where the function was called.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">next</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     -exec-next
+     ^running
+     (gdb)
+     *stopped,reason="end-stepping-range",line="8",file="hello.c"
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-exec-next-instruction</code> Command</h4>
+
+<p><a name="index-g_t_002dexec_002dnext_002dinstruction-2056"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -exec-next-instruction [--reverse]
+</pre>
+   <p>Executes one machine instruction.  If the instruction is a function
+call, continues until the function returns.  If the program stops at an
+instruction in the middle of a source line, the address will be
+printed as well.
+
+   <p>If the &lsquo;<samp><span class="samp">--reverse</span></samp>&rsquo; option is specified, resumes reverse execution
+of the inferior program, stopping at the previous instruction.  If the
+previously executed instruction was a return from another function,
+it will continue to execute in reverse until the call to that function
+(from the current stack frame) is reached.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">nexti</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -exec-next-instruction
+     ^running
+     
+     (gdb)
+     *stopped,reason="end-stepping-range",
+     addr="0x000100d4",line="5",file="hello.c"
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-exec-return</code> Command</h4>
+
+<p><a name="index-g_t_002dexec_002dreturn-2057"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -exec-return
+</pre>
+   <p>Makes current function return immediately.  Doesn't execute the inferior. 
+Displays the new current frame.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">return</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     200-break-insert callee4
+     200^done,bkpt={number="1",addr="0x00010734",
+     file="../../../devo/gdb/testsuite/gdb.mi/basics.c",line="8"}
+     (gdb)
+     000-exec-run
+     000^running
+     (gdb)
+     000*stopped,reason="breakpoint-hit",disp="keep",bkptno="1",
+     frame={func="callee4",args=[],
+     file="../../../devo/gdb/testsuite/gdb.mi/basics.c",
+     fullname="/home/foo/bar/devo/gdb/testsuite/gdb.mi/basics.c",line="8"}
+     (gdb)
+     205-break-delete
+     205^done
+     (gdb)
+     111-exec-return
+     111^done,frame={level="0",func="callee3",
+     args=[{name="strarg",
+     value="0x11940 \"A string argument.\""}],
+     file="../../../devo/gdb/testsuite/gdb.mi/basics.c",
+     fullname="/home/foo/bar/devo/gdb/testsuite/gdb.mi/basics.c",line="18"}
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-exec-run</code> Command</h4>
+
+<p><a name="index-g_t_002dexec_002drun-2058"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -exec-run [--all | --thread-group N]
+</pre>
+   <p>Starts execution of the inferior from the beginning.  The inferior
+executes until either a breakpoint is encountered or the program
+exits.  In the latter case the output will include an exit code, if
+the program has exited exceptionally.
+
+   <p>When no option is specified, the current inferior is started.  If the
+&lsquo;<samp><span class="samp">--thread-group</span></samp>&rsquo; option is specified, it should refer to a thread
+group of type &lsquo;<samp><span class="samp">process</span></samp>&rsquo;, and that thread group will be started. 
+If the &lsquo;<samp><span class="samp">--all</span></samp>&rsquo; option is specified, then all inferiors will be started.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">run</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Examples</h5>
+
+<pre class="smallexample">     (gdb)
+     -break-insert main
+     ^done,bkpt={number="1",addr="0x0001072c",file="recursive2.c",line="4"}
+     (gdb)
+     -exec-run
+     ^running
+     (gdb)
+     *stopped,reason="breakpoint-hit",disp="keep",bkptno="1",
+     frame={func="main",args=[],file="recursive2.c",
+     fullname="/home/foo/bar/recursive2.c",line="4"}
+     (gdb)
+</pre>
+<p class="noindent">Program exited normally:
+
+<pre class="smallexample">     (gdb)
+     -exec-run
+     ^running
+     (gdb)
+     x = 55
+     *stopped,reason="exited-normally"
+     (gdb)
+</pre>
+   <p class="noindent">Program exited exceptionally:
+
+<pre class="smallexample">     (gdb)
+     -exec-run
+     ^running
+     (gdb)
+     x = 55
+     *stopped,reason="exited",exit-code="01"
+     (gdb)
+</pre>
+   <p>Another way the program can terminate is if it receives a signal such as
+<code>SIGINT</code>.  In this case, <span class="sc">gdb/mi</span> displays this:
+
+<pre class="smallexample">     (gdb)
+     *stopped,reason="exited-signalled",signal-name="SIGINT",
+     signal-meaning="Interrupt"
+</pre>
+   <!-- @subheading -exec-signal -->
+<h4 class="subheading">The <code>-exec-step</code> Command</h4>
+
+<p><a name="index-g_t_002dexec_002dstep-2059"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -exec-step [--reverse]
+</pre>
+   <p>Resumes execution of the inferior program, stopping when the beginning
+of the next source line is reached, if the next source line is not a
+function call.  If it is, stop at the first instruction of the called
+function.  If the &lsquo;<samp><span class="samp">--reverse</span></samp>&rsquo; option is specified, resumes reverse
+execution of the inferior program, stopping at the beginning of the
+previously executed source line.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">step</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<p>Stepping into a function:
+
+<pre class="smallexample">     -exec-step
+     ^running
+     (gdb)
+     *stopped,reason="end-stepping-range",
+     frame={func="foo",args=[{name="a",value="10"},
+     {name="b",value="0"}],file="recursive2.c",
+     fullname="/home/foo/bar/recursive2.c",line="11"}
+     (gdb)
+</pre>
+   <p>Regular stepping:
+
+<pre class="smallexample">     -exec-step
+     ^running
+     (gdb)
+     *stopped,reason="end-stepping-range",line="14",file="recursive2.c"
+     (gdb)
+</pre>
+   <h4 class="subheading">The <code>-exec-step-instruction</code> Command</h4>
+
+<p><a name="index-g_t_002dexec_002dstep_002dinstruction-2060"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -exec-step-instruction [--reverse]
+</pre>
+   <p>Resumes the inferior which executes one machine instruction.  If the
+&lsquo;<samp><span class="samp">--reverse</span></samp>&rsquo; option is specified, resumes reverse execution of the
+inferior program, stopping at the previously executed instruction. 
+The output, once <span class="sc">gdb</span> has stopped, will vary depending on
+whether we have stopped in the middle of a source line or not.  In the
+former case, the address at which the program stopped will be printed
+as well.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">stepi</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -exec-step-instruction
+     ^running
+     
+     (gdb)
+     *stopped,reason="end-stepping-range",
+     frame={func="foo",args=[],file="try.c",
+     fullname="/home/foo/bar/try.c",line="10"}
+     (gdb)
+     -exec-step-instruction
+     ^running
+     
+     (gdb)
+     *stopped,reason="end-stepping-range",
+     frame={addr="0x000100f4",func="foo",args=[],file="try.c",
+     fullname="/home/foo/bar/try.c",line="10"}
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-exec-until</code> Command</h4>
+
+<p><a name="index-g_t_002dexec_002duntil-2061"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -exec-until [ <var>location</var> ]
+</pre>
+   <p>Executes the inferior until the <var>location</var> specified in the
+argument is reached.  If there is no argument, the inferior executes
+until a source line greater than the current one is reached.  The
+reason for stopping in this case will be &lsquo;<samp><span class="samp">location-reached</span></samp>&rsquo;.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">until</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -exec-until recursive2.c:6
+     ^running
+     (gdb)
+     x = 55
+     *stopped,reason="location-reached",frame={func="main",args=[],
+     file="recursive2.c",fullname="/home/foo/bar/recursive2.c",line="6"}
+     (gdb)
+</pre>
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%% SECTION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+   </body></html>
+

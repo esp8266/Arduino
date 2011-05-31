@@ -1,0 +1,228 @@
+<html lang="en">
+<head>
+<title>Source Path - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Source.html#Source" title="Source">
+<link rel="prev" href="Search.html#Search" title="Search">
+<link rel="next" href="Machine-Code.html#Machine-Code" title="Machine Code">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Source-Path"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Machine-Code.html#Machine-Code">Machine Code</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Search.html#Search">Search</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Source.html#Source">Source</a>
+<hr>
+</div>
+
+<h3 class="section">9.5 Specifying Source Directories</h3>
+
+<p><a name="index-source-path-453"></a><a name="index-directories-for-source-files-454"></a>Executable programs sometimes do not record the directories of the source
+files from which they were compiled, just the names.  Even when they do,
+the directories could be moved between the compilation and your debugging
+session.  <span class="sc">gdb</span> has a list of directories to search for source files;
+this is called the <dfn>source path</dfn>.  Each time <span class="sc">gdb</span> wants a source file,
+it tries all the directories in the list, in the order they are present
+in the list, until it finds a file with the desired name.
+
+   <p>For example, suppose an executable references the file
+<samp><span class="file">/usr/src/foo-1.0/lib/foo.c</span></samp>, and our source path is
+<samp><span class="file">/mnt/cross</span></samp>.  The file is first looked up literally; if this
+fails, <samp><span class="file">/mnt/cross/usr/src/foo-1.0/lib/foo.c</span></samp> is tried; if this
+fails, <samp><span class="file">/mnt/cross/foo.c</span></samp> is opened; if this fails, an error
+message is printed.  <span class="sc">gdb</span> does not look up the parts of the
+source file name, such as <samp><span class="file">/mnt/cross/src/foo-1.0/lib/foo.c</span></samp>. 
+Likewise, the subdirectories of the source path are not searched: if
+the source path is <samp><span class="file">/mnt/cross</span></samp>, and the binary refers to
+<samp><span class="file">foo.c</span></samp>, <span class="sc">gdb</span> would not find it under
+<samp><span class="file">/mnt/cross/usr/src/foo-1.0/lib</span></samp>.
+
+   <p>Plain file names, relative file names with leading directories, file
+names containing dots, etc. are all treated as described above; for
+instance, if the source path is <samp><span class="file">/mnt/cross</span></samp>, and the source file
+is recorded as <samp><span class="file">../lib/foo.c</span></samp>, <span class="sc">gdb</span> would first try
+<samp><span class="file">../lib/foo.c</span></samp>, then <samp><span class="file">/mnt/cross/../lib/foo.c</span></samp>, and after
+that&mdash;<samp><span class="file">/mnt/cross/foo.c</span></samp>.
+
+   <p>Note that the executable search path is <em>not</em> used to locate the
+source files.
+
+   <p>Whenever you reset or rearrange the source path, <span class="sc">gdb</span> clears out
+any information it has cached about where source files are found and where
+each line is in the file.
+
+   <p><a name="index-directory-455"></a><a name="index-dir-456"></a>When you start <span class="sc">gdb</span>, its source path includes only &lsquo;<samp><span class="samp">cdir</span></samp>&rsquo;
+and &lsquo;<samp><span class="samp">cwd</span></samp>&rsquo;, in that order. 
+To add other directories, use the <code>directory</code> command.
+
+   <p>The search path is used to find both program source files and <span class="sc">gdb</span>
+script files (read using the &lsquo;<samp><span class="samp">-command</span></samp>&rsquo; option and &lsquo;<samp><span class="samp">source</span></samp>&rsquo; command).
+
+   <p>In addition to the source path, <span class="sc">gdb</span> provides a set of commands
+that manage a list of source path substitution rules.  A <dfn>substitution
+rule</dfn> specifies how to rewrite source directories stored in the program's
+debug information in case the sources were moved to a different
+directory between compilation and debugging.  A rule is made of
+two strings, the first specifying what needs to be rewritten in
+the path, and the second specifying how it should be rewritten. 
+In <a href="set-substitute_002dpath.html#set-substitute_002dpath">set substitute-path</a>, we name these two parts <var>from</var> and
+<var>to</var> respectively.  <span class="sc">gdb</span> does a simple string replacement
+of <var>from</var> with <var>to</var> at the start of the directory part of the
+source file name, and uses that result instead of the original file
+name to look up the sources.
+
+   <p>Using the previous example, suppose the <samp><span class="file">foo-1.0</span></samp> tree has been
+moved from <samp><span class="file">/usr/src</span></samp> to <samp><span class="file">/mnt/cross</span></samp>, then you can tell
+<span class="sc">gdb</span> to replace <samp><span class="file">/usr/src</span></samp> in all source path names with
+<samp><span class="file">/mnt/cross</span></samp>.  The first lookup will then be
+<samp><span class="file">/mnt/cross/foo-1.0/lib/foo.c</span></samp> in place of the original location
+of <samp><span class="file">/usr/src/foo-1.0/lib/foo.c</span></samp>.  To define a source path
+substitution rule, use the <code>set substitute-path</code> command
+(see <a href="set-substitute_002dpath.html#set-substitute_002dpath">set substitute-path</a>).
+
+   <p>To avoid unexpected substitution results, a rule is applied only if the
+<var>from</var> part of the directory name ends at a directory separator. 
+For instance, a rule substituting  <samp><span class="file">/usr/source</span></samp> into
+<samp><span class="file">/mnt/cross</span></samp> will be applied to <samp><span class="file">/usr/source/foo-1.0</span></samp> but
+not to <samp><span class="file">/usr/sourceware/foo-2.0</span></samp>.  And because the substitution
+is applied only at the beginning of the directory name, this rule will
+not be applied to <samp><span class="file">/root/usr/source/baz.c</span></samp> either.
+
+   <p>In many cases, you can achieve the same result using the <code>directory</code>
+command.  However, <code>set substitute-path</code> can be more efficient in
+the case where the sources are organized in a complex tree with multiple
+subdirectories.  With the <code>directory</code> command, you need to add each
+subdirectory of your project.  If you moved the entire tree while
+preserving its internal organization, then <code>set substitute-path</code>
+allows you to direct the debugger to all the sources with one single
+command.
+
+   <p><code>set substitute-path</code> is also more than just a shortcut command. 
+The source path is only used if the file at the original location no
+longer exists.  On the other hand, <code>set substitute-path</code> modifies
+the debugger behavior to look at the rewritten location instead.  So, if
+for any reason a source file that is not relevant to your executable is
+located at the original location, a substitution rule is the only
+method available to point <span class="sc">gdb</span> at the new location.
+
+   <p><a name="index-g_t_0040samp_007b_002d_002dwith_002drelocated_002dsources_007d-457"></a><a name="index-default-source-path-substitution-458"></a>You can configure a default source path substitution rule by
+configuring <span class="sc">gdb</span> with the
+&lsquo;<samp><span class="samp">--with-relocated-sources=</span><var>dir</var></samp>&rsquo; option.  The <var>dir</var>
+should be the name of a directory under <span class="sc">gdb</span>'s configured
+prefix (set with &lsquo;<samp><span class="samp">--prefix</span></samp>&rsquo; or &lsquo;<samp><span class="samp">--exec-prefix</span></samp>&rsquo;), and
+directory names in debug information under <var>dir</var> will be adjusted
+automatically if the installed <span class="sc">gdb</span> is moved to a new
+location.  This is useful if <span class="sc">gdb</span>, libraries or executables
+with debug information and corresponding source code are being moved
+together.
+
+     <dl>
+<dt><code>directory </code><var>dirname</var><code> ...</code><br><dt><code>dir </code><var>dirname</var><code> ...</code><dd>Add directory <var>dirname</var> to the front of the source path.  Several
+directory names may be given to this command, separated by &lsquo;<samp><span class="samp">:</span></samp>&rsquo;
+(&lsquo;<samp><span class="samp">;</span></samp>&rsquo; on MS-DOS and MS-Windows, where &lsquo;<samp><span class="samp">:</span></samp>&rsquo; usually appears as
+part of absolute file names) or
+whitespace.  You may specify a directory that is already in the source
+path; this moves it forward, so <span class="sc">gdb</span> searches it sooner.
+
+     <p><a name="index-cdir-459"></a><a name="index-cwd-460"></a><a name="index-g_t_0024cdir_0040r_007b_002c-convenience-variable_007d-461"></a><a name="index-g_t_0024cwd_0040r_007b_002c-convenience-variable_007d-462"></a><a name="index-compilation-directory-463"></a><a name="index-current-directory-464"></a><a name="index-working-directory-465"></a><a name="index-directory_002c-current-466"></a><a name="index-directory_002c-compilation-467"></a>You can use the string &lsquo;<samp><span class="samp">$cdir</span></samp>&rsquo; to refer to the compilation
+directory (if one is recorded), and &lsquo;<samp><span class="samp">$cwd</span></samp>&rsquo; to refer to the current
+working directory.  &lsquo;<samp><span class="samp">$cwd</span></samp>&rsquo; is not the same as &lsquo;<samp><span class="samp">.</span></samp>&rsquo;&mdash;the former
+tracks the current working directory as it changes during your <span class="sc">gdb</span>
+session, while the latter is immediately expanded to the current
+directory at the time you add an entry to the source path.
+
+     <br><dt><code>directory</code><dd>Reset the source path to its default value (&lsquo;<samp><span class="samp">$cdir:$cwd</span></samp>&rsquo; on Unix systems).  This requires confirmation.
+
+     <!-- RET-repeat for @code{directory} is explicitly disabled, but since -->
+     <!-- repeating it would be a no-op we do not say that.  (thanks to RMS) -->
+     <br><dt><code>show directories</code><dd><a name="index-show-directories-468"></a>Print the source path: show which directories it contains.
+
+     <p><a name="set-substitute_002dpath"></a><br><dt><code>set substitute-path </code><var>from</var> <var>to</var><dd><a name="index-set-substitute_002dpath-469"></a>Define a source path substitution rule, and add it at the end of the
+current list of existing substitution rules.  If a rule with the same
+<var>from</var> was already defined, then the old rule is also deleted.
+
+     <p>For example, if the file <samp><span class="file">/foo/bar/baz.c</span></samp> was moved to
+<samp><span class="file">/mnt/cross/baz.c</span></samp>, then the command
+
+     <pre class="smallexample">          (gdb) set substitute-path /usr/src /mnt/cross
+</pre>
+     <p class="noindent">will tell <span class="sc">gdb</span> to replace &lsquo;<samp><span class="samp">/usr/src</span></samp>&rsquo; with
+&lsquo;<samp><span class="samp">/mnt/cross</span></samp>&rsquo;, which will allow <span class="sc">gdb</span> to find the file
+<samp><span class="file">baz.c</span></samp> even though it was moved.
+
+     <p>In the case when more than one substitution rule have been defined,
+the rules are evaluated one by one in the order where they have been
+defined.  The first one matching, if any, is selected to perform
+the substitution.
+
+     <p>For instance, if we had entered the following commands:
+
+     <pre class="smallexample">          (gdb) set substitute-path /usr/src/include /mnt/include
+          (gdb) set substitute-path /usr/src /mnt/src
+</pre>
+     <p class="noindent"><span class="sc">gdb</span> would then rewrite <samp><span class="file">/usr/src/include/defs.h</span></samp> into
+<samp><span class="file">/mnt/include/defs.h</span></samp> by using the first rule.  However, it would
+use the second rule to rewrite <samp><span class="file">/usr/src/lib/foo.c</span></samp> into
+<samp><span class="file">/mnt/src/lib/foo.c</span></samp>.
+
+     <br><dt><code>unset substitute-path [path]</code><dd><a name="index-unset-substitute_002dpath-470"></a>If a path is specified, search the current list of substitution rules
+for a rule that would rewrite that path.  Delete that rule if found. 
+A warning is emitted by the debugger if no rule could be found.
+
+     <p>If no path is specified, then all substitution rules are deleted.
+
+     <br><dt><code>show substitute-path [path]</code><dd><a name="index-show-substitute_002dpath-471"></a>If a path is specified, then print the source path substitution rule
+which would rewrite that path, if any.
+
+     <p>If no path is specified, then print all existing source path substitution
+rules.
+
+   </dl>
+
+   <p>If your source path is cluttered with directories that are no longer of
+interest, <span class="sc">gdb</span> may sometimes cause confusion by finding the wrong
+versions of source.  You can correct the situation as follows:
+
+     <ol type=1 start=1>
+<li>Use <code>directory</code> with no argument to reset the source path to its default value.
+
+     <li>Use <code>directory</code> with suitable arguments to reinstall the
+directories you want in the source path.  You can add all the
+directories in one command.
+        </ol>
+
+   </body></html>
+

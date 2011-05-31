@@ -1,0 +1,67 @@
+<html lang="en">
+<head>
+<title>strerror_r - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Strings.html#Strings" title="Strings">
+<link rel="prev" href="strerror.html#strerror" title="strerror">
+<link rel="next" href="strlen.html#strlen" title="strlen">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="strerror_r"></a>
+<a name="strerror_005fr"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="strlen.html#strlen">strlen</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="strerror.html#strerror">strerror</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Strings.html#Strings">Strings</a>
+<hr>
+</div>
+
+<h3 class="section">5.25 <code>strerror_r</code>&mdash;convert error number to string and copy to buffer</h3>
+
+<p><a name="index-strerror_005fr-392"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;string.h&gt;
+     char *strerror_r(int <var>errnum</var>, char *<var>buffer</var>, size_t <var>n</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>strerror_r</code> converts the error number <var>errnum</var> into a
+string and copies the result into the supplied <var>buffer</var> for
+a length up to <var>n</var>, including the NUL terminator. The value of
+<var>errnum</var> is usually a copy of <code>errno</code>.  If <code>errnum</code> is not a known
+error number, the result is the empty string.
+
+   <p>See <code>strerror</code> for how strings are mapped to <code>errnum</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+This function returns a pointer to a string.  Your application must
+not modify that string.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>strerror_r</code> is a GNU extension.
+
+   <p><code>strerror_r</code> requires no supporting OS subroutines.
+
+   <p><br>
+
+   </body></html>
+

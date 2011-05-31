@@ -1,0 +1,335 @@
+<html lang="en">
+<head>
+<title>sscanf - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="sprintf.html#sprintf" title="sprintf">
+<link rel="next" href="swprintf.html#swprintf" title="swprintf">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="sscanf"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="swprintf.html#swprintf">swprintf</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="sprintf.html#sprintf">sprintf</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.61 <code>sscanf</code>, <code>fscanf</code>, <code>scanf</code>&mdash;scan and format input</h3>
+
+<p><a name="index-scanf-296"></a><a name="index-g_t_005fscanf_005fr-297"></a><a name="index-fscanf-298"></a><a name="index-g_t_005ffscanf_005fr-299"></a><a name="index-sscanf-300"></a><a name="index-g_t_005fsscanf_005fr-301"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     
+     int scanf(const char *<var>format</var>, ...);
+     int fscanf(FILE *<var>fd</var>, const char *<var>format</var>, ...);
+     int sscanf(const char *<var>str</var>, const char *<var>format</var>, ...);
+     
+     int _scanf_r(struct _reent *<var>ptr</var>, const char *<var>format</var>, ...);
+     int _fscanf_r(struct _reent *<var>ptr</var>, FILE *<var>fd</var>,
+         const char *<var>format</var>, ...);
+     int _sscanf_r(struct _reent *<var>ptr</var>, const char *<var>str</var>,
+         const char *<var>format</var>, ...);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>scanf</code> scans a series of input fields from standard input,
+one character at a time.  Each field is interpreted according to
+a format specifier passed to <code>scanf</code> in the format string at
+<code>*</code><var>format</var>.  <code>scanf</code> stores the interpreted input from
+each field at the address passed to it as the corresponding argument
+following <var>format</var>.  You must supply the same number of
+format specifiers and address arguments as there are input fields.
+
+   <p>There must be sufficient address arguments for the given format
+specifiers; if not the results are unpredictable and likely
+disasterous.  Excess address arguments are merely ignored.
+
+   <p><code>scanf</code> often produces unexpected results if the input diverges from
+an expected pattern. Since the combination of <code>gets</code> or <code>fgets</code>
+followed by <code>sscanf</code> is safe and easy, that is the preferred way
+to be certain that a program is synchronized with input at the end
+of a line.
+
+   <p><code>fscanf</code> and <code>sscanf</code> are identical to <code>scanf</code>, other than the
+source of input: <code>fscanf</code> reads from a file, and <code>sscanf</code>
+from a string.
+
+   <p>The routines <code>_scanf_r</code>, <code>_fscanf_r</code>, and <code>_sscanf_r</code> are reentrant
+versions of <code>scanf</code>, <code>fscanf</code>, and <code>sscanf</code> that take an additional
+first argument pointing to a reentrancy structure.
+
+   <p>The string at <code>*</code><var>format</var> is a character sequence composed
+of zero or more directives. Directives are composed of
+one or more whitespace characters, non-whitespace characters,
+and format specifications.
+
+   <p>Whitespace characters are blank ( ), tab (<code>\t</code>), or
+newline (<code>\n</code>). 
+When <code>scanf</code> encounters a whitespace character in the format string
+it will read (but not store) all consecutive whitespace characters
+up to the next non-whitespace character in the input.
+
+   <p>Non-whitespace characters are all other ASCII characters except the
+percent sign (<code>%</code>).  When <code>scanf</code> encounters a non-whitespace
+character in the format string it will read, but not store
+a matching non-whitespace character.
+
+   <p>Format specifications tell <code>scanf</code> to read and convert characters
+from the input field into specific types of values, and store then
+in the locations specified by the address arguments.
+
+   <p>Trailing whitespace is left unread unless explicitly
+matched in the format string.
+
+   <p>The format specifiers must begin with a percent sign (<code>%</code>)
+and have the following form:
+
+<pre class="smallexample">            %[*][<var>width</var>][<var>size</var>]<var>type</var>
+</pre>
+   <p>Each format specification begins with the percent character (<code>%</code>). 
+The other fields are:
+     <dl>
+<dt><code>*</code><dd>an optional marker; if present, it suppresses interpretation and
+assignment of this input field.
+
+     <br><dt><var>width</var><dd>an optional maximum field width: a decimal integer,
+which controls the maximum number of characters that
+will be read before converting the current input field.  If the
+input field has fewer than <var>width</var> characters, <code>scanf</code>
+reads all the characters in the field, and then
+proceeds with the next field and its format specification.
+
+     <p>If a whitespace or a non-convertable character occurs
+before <var>width</var> character are read, the characters up
+to that character are read, converted, and stored. 
+Then <code>scanf</code> proceeds to the next format specification.
+
+     <br><dt><code>size</code><dd><code>h</code>, <code>j</code>, <code>l</code>, <code>L</code>, <code>t</code>, and <code>z</code> are optional size
+characters which override the default way that <code>scanf</code>
+interprets the data type of the corresponding argument.
+
+     <pre class="smallexample">          Modifier   Type(s)
+             hh      d, i, o, u, x, n  convert input to char,
+                                       store in char object
+          
+             h       d, i, o, u, x, n  convert input to short,
+                                       store in short object
+          
+             h       D, I, O, U, X     no effect
+                     e, f, c, s, p
+          
+             j       d, i, o, u, x, n  convert input to intmax_t,
+                                       store in intmax_t object
+          
+             j       all others        no effect
+          
+             l       d, i, o, u, x, n  convert input to long,
+                                       store in long object
+          
+             l       e, f, g           convert input to double
+                                       store in a double object
+          
+             l       D, I, O, U, X     no effect
+                     c, s, p
+          
+             ll      d, i, o, u, x, n  convert to long long,
+                                       store in long long
+          
+             L       d, i, o, u, x, n  convert to long long,
+                                       store in long long
+          
+             L       e, f, g, E, G     convert to long double,
+                                       store in long double
+          
+             L       all others        no effect
+          
+             t       d, i, o, u, x, n  convert input to ptrdiff_t,
+                                       store in ptrdiff_t object
+          
+             t       all others        no effect
+          
+             z       d, i, o, u, x, n  convert input to size_t,
+                                       store in size_t object
+          
+             z       all others        no effect
+          
+</pre>
+     <br><dt><var>type</var><dd>
+A character to specify what kind of conversion
+<code>scanf</code> performs.  Here is a table of the conversion
+characters:
+
+          <dl>
+<dt><code>%</code><dd>No conversion is done; the percent character (<code>%</code>) is stored.
+
+          <br><dt><code>c</code><dd>Scans one character.  Corresponding <var>arg</var>: <code>(char *arg)</code>.
+
+          <br><dt><code>s</code><dd>Reads a character string into the array supplied. 
+Corresponding <var>arg</var>: <code>(char arg[])</code>.
+
+          <br><dt><code>[</code><var>pattern</var><code>]</code><dd>Reads a non-empty character string into memory
+starting at <var>arg</var>.  This area must be large
+enough to accept the sequence and a
+terminating null character which will be added
+automatically.  (<var>pattern</var> is discussed in the paragraph following
+this table). Corresponding <var>arg</var>: <code>(char *arg)</code>.
+
+          <br><dt><code>d</code><dd>Reads a decimal integer into the corresponding <var>arg</var>: <code>(int *arg)</code>.
+
+          <br><dt><code>D</code><dd>Reads a decimal integer into the corresponding
+<var>arg</var>: <code>(long *arg)</code>.
+
+          <br><dt><code>o</code><dd>Reads an octal integer into the corresponding <var>arg</var>: <code>(int *arg)</code>.
+
+          <br><dt><code>O</code><dd>Reads an octal integer into the corresponding <var>arg</var>: <code>(long *arg)</code>.
+
+          <br><dt><code>u</code><dd>Reads an unsigned decimal integer into the corresponding
+<var>arg</var>: <code>(unsigned int *arg)</code>. 
+<br><dt><code>U</code><dd>Reads an unsigned decimal integer into the corresponding <var>arg</var>:
+<code>(unsigned long *arg)</code>.
+
+          <br><dt><code>x,X</code><dd>Read a hexadecimal integer into the corresponding <var>arg</var>:
+<code>(int *arg)</code>.
+
+          <br><dt><code>e, f, g</code><dd>Read a floating-point number into the corresponding <var>arg</var>:
+<code>(float *arg)</code>.
+
+          <br><dt><code>E, F, G</code><dd>Read a floating-point number into the corresponding <var>arg</var>:
+<code>(double *arg)</code>.
+
+          <br><dt><code>i</code><dd>Reads a decimal, octal or hexadecimal integer into the
+corresponding <var>arg</var>: <code>(int *arg)</code>.
+
+          <br><dt><code>I</code><dd>Reads a decimal, octal or hexadecimal integer into the
+corresponding <var>arg</var>: <code>(long *arg)</code>.
+
+          <br><dt><code>n</code><dd>Stores the number of characters read in the corresponding
+<var>arg</var>: <code>(int *arg)</code>.
+
+          <br><dt><code>p</code><dd>Stores a scanned pointer.  ANSI C leaves the details
+to each implementation; this implementation treats
+<code>%p</code> exactly the same as <code>%U</code>.  Corresponding
+<var>arg</var>: <code>(void **arg)</code>. 
+</dl>
+
+     <p>A <var>pattern</var> of characters surrounded by square brackets can be used
+instead of the <code>s</code> type character.  <var>pattern</var> is a set of
+characters which define a search set of possible characters making up
+the <code>scanf</code> input field.  If the first character in the brackets is a
+caret (<code>^</code>), the search set is inverted to include all ASCII characters
+except those between the brackets.  There is also a range facility
+which you can use as a shortcut. <code>%[0-9] </code> matches all decimal digits. 
+The hyphen must not be the first or last character in the set. 
+The character prior to the hyphen must be lexically less than the
+character after it.
+
+     <p>Here are some <var>pattern</var> examples:
+          <dl>
+<dt><code>%[abcd]</code><dd>matches strings containing only <code>a</code>, <code>b</code>, <code>c</code>, and <code>d</code>.
+
+          <br><dt><code>%[^abcd]</code><dd>matches strings containing any characters except <code>a</code>, <code>b</code>,
+<code>c</code>, or <code>d</code>
+
+          <br><dt><code>%[A-DW-Z]</code><dd>matches strings containing <code>A</code>, <code>B</code>, <code>C</code>, <code>D</code>, <code>W</code>,
+<code>X</code>, <code>Y</code>, <code>Z</code>
+
+          <br><dt><code>%[z-a]</code><dd>matches the characters  <code>z</code>, <code>-</code>, and <code>a</code>
+</dl>
+
+     <p>Floating point numbers (for field types <code>e</code>, <code>f</code>, <code>g</code>, <code>E</code>,
+<code>F</code>, <code>G</code>) must correspond to the following general form:
+
+     <pre class="smallexample">          		[+/-] ddddd[.]ddd [E|e[+|-]ddd]
+</pre>
+     <p>where objects inclosed in square brackets are optional, and <code>ddd</code>
+represents decimal, octal, or hexadecimal digits. 
+</dl>
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>scanf</code> returns the number of input fields successfully
+scanned, converted and stored; the return value does
+not include scanned fields which were not stored.
+
+   <p>If <code>scanf</code> attempts to read at end-of-file, the return
+value is <code>EOF</code>.
+
+   <p>If no fields were stored, the return value is <code>0</code>.
+
+   <p><code>scanf</code> might stop scanning a particular field before
+reaching the normal field end character, or may
+terminate entirely.
+
+   <p><code>scanf</code> stops scanning and storing the current field
+and moves to the next input field (if any)
+in any of the following situations:
+
+     <ul>
+<li>The assignment suppressing character (<code>*</code>) appears
+after the <code>%</code> in the format specification; the current
+input field is scanned but not stored.
+
+     <li><var>width</var> characters have been read (<var>width</var> is a
+width specification, a positive decimal integer).
+
+     <li>The next character read cannot be converted
+under the the current format (for example,
+if a <code>Z</code> is read when the format is decimal).
+
+     <li>The next character in the input field does not appear
+in the search set (or does appear in the inverted search set). 
+</ul>
+
+   <p>When <code>scanf</code> stops scanning the current input field for one of
+these reasons, the next character is considered unread and
+used as the first character of the following input field, or the
+first character in a subsequent read operation on the input.
+
+   <p><code>scanf</code> will terminate under the following circumstances:
+
+     <ul>
+<li>The next character in the input field conflicts
+with a corresponding non-whitespace character in the
+format string.
+
+     <li>The next character in the input field is <code>EOF</code>.
+
+     <li>The format string has been exhausted. 
+</ul>
+
+   <p>When the format string contains a character sequence that is
+not part of a format specification, the same character
+sequence must appear in the input; <code>scanf</code> will
+scan but not store the matched characters.  If a
+conflict occurs, the first conflicting character remains in the input
+as if it had never been read.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>scanf</code> is ANSI C.
+
+   <p>Supporting OS subroutines required: <code>close</code>, <code>fstat</code>, <code>isatty</code>,
+<code>lseek</code>, <code>read</code>, <code>sbrk</code>, <code>write</code>.
+
+   <p><br>
+
+   </body></html>
+

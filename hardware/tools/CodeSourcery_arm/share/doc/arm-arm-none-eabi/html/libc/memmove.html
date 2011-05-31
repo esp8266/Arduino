@@ -1,0 +1,62 @@
+<html lang="en">
+<head>
+<title>memmove - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Strings.html#Strings" title="Strings">
+<link rel="prev" href="memmem.html#memmem" title="memmem">
+<link rel="next" href="mempcpy.html#mempcpy" title="mempcpy">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="memmove"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="mempcpy.html#mempcpy">mempcpy</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="memmem.html#memmem">memmem</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Strings.html#Strings">Strings</a>
+<hr>
+</div>
+
+<h3 class="section">5.10 <code>memmove</code>&mdash;move possibly overlapping memory</h3>
+
+<p><a name="index-memmove-378"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;string.h&gt;
+     void *memmove(void *<var>dst</var>, const void *<var>src</var>, size_t <var>length</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+This function moves <var>length</var> characters from the block of
+memory starting at <code>*</code><var>src</var> to the memory starting at
+<code>*</code><var>dst</var>. <code>memmove</code> reproduces the characters correctly
+at <code>*</code><var>dst</var> even if the two areas overlap.
+
+   <p><br>
+<strong>Returns</strong><br>
+The function returns <var>dst</var> as passed.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>memmove</code> is ANSI C.
+
+   <p><code>memmove</code> requires no supporting OS subroutines.
+
+   <p><br>
+
+   </body></html>
+

@@ -1,0 +1,54 @@
+<html lang="en">
+<head>
+<title>Syscalls - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Misc.html#Misc" title="Misc">
+<link rel="next" href="Arglists.html#Arglists" title="Arglists">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Syscalls"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Arglists.html#Arglists">Arglists</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Misc.html#Misc">Misc</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">12 System Calls</h2>
+
+<p><a name="index-linking-the-C-library-459"></a>The C subroutine library depends on a handful of subroutine calls for
+operating system services.  If you use the C library on a system that
+complies with the POSIX.1 standard (also known as IEEE 1003.1), most of
+these subroutines are supplied with your operating system.
+
+   <p>If some of these subroutines are not provided with your system&mdash;in
+the extreme case, if you are developing software for a &ldquo;bare board&rdquo;
+system, without an OS&mdash;you will at least need to provide do-nothing
+stubs (or subroutines with minimal functionality) to allow your
+programs to link with the subroutines in <code>libc.a</code>.
+
+<ul class="menu">
+<li><a accesskey="1" href="Stubs.html#Stubs">Stubs</a>: 		Definitions for OS interface
+<li><a accesskey="2" href="Reentrant-Syscalls.html#Reentrant-Syscalls">Reentrant Syscalls</a>: 	Reentrant covers for OS subroutines
+</ul>
+
+   </body></html>
+

@@ -1,0 +1,33 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>6.8. Debugging a Remote Board</title><link rel="stylesheet" href="cs.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.74.0"><link rel="home" href="index.html" title="Sourcery G++ Lite"><link rel="up" href="sprite.html" title="Chapter 6. Sourcery G++ Debug Sprite"><link rel="prev" href="debug-sprite-altera-url.html" title="6.7. Altera Devices"><link rel="next" href="sec-sprite-supported-boards.html" title="6.9. Supported Board Files"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">6.8. Debugging a Remote Board</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="debug-sprite-altera-url.html">Prev</a> </td><th width="60%" align="center">Chapter 6. Sourcery G++ Debug Sprite</th><td width="20%" align="right"> <a accesskey="n" href="sec-sprite-supported-boards.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="id283958"></a>6.8. Debugging a Remote Board</h2></div></div></div><p>
+      You can run the Sourcery G++ Debug Sprite on a different machine
+      from the one on which GDB is running.  For example, if your board
+      is connected to a machine in your lab, you can run the debugger on
+      your laptop and connect to the remote board.  The Sourcery G++ Debug
+      Sprite must run on the machine that is connected to the target
+      board.
+      You must have Sourcery G++
+      
+      installed on both machines.
+    </p><p>To use this mode, you must start the Sprite with the
+    <code class="option">-l</code> option and specify the port on which you want
+    it to listen.  For example:
+
+</p><pre class="screen">&gt; arm-none-eabi-sprite -l :10000 <em class="replaceable"><code>device-url</code></em> <em class="replaceable"><code>board-file</code></em></pre><p>
+
+    starts the Sprite listening on port 10000.</p><p>
+      
+     When running GDB from the command line, use the following
+     command to connect GDB to the remote Sprite:
+
+</p><pre class="screen">(gdb) target remote <em class="replaceable"><code>host</code></em>:10000</pre><p>
+
+      where
+      <em class="replaceable"><code>host</code></em> is the name of the remote machine.
+      After this, debugging is just as if you are debugging a target
+      board connected to your host machine.
+    </p><p>
+      For more detailed instructions on using the Sourcery G++ Debug Sprite
+      in this way, please refer to the
+      <a class="ulink" href="https://support.codesourcery.com/GNUToolchain/kbentry132" target="_top">
+      Sourcery G++ Knowledge Base</a>.
+    </p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="debug-sprite-altera-url.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="sprite.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="sec-sprite-supported-boards.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">6.7. Altera Devices </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 6.9. Supported Board Files</td></tr></table></div></body></html>

@@ -1,0 +1,75 @@
+<html lang="en">
+<head>
+<title>FR30 Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Submodel-Options.html#Submodel-Options" title="Submodel Options">
+<link rel="prev" href="DEC-Alpha_002fVMS-Options.html#DEC-Alpha_002fVMS-Options" title="DEC Alpha/VMS Options">
+<link rel="next" href="FRV-Options.html#FRV-Options" title="FRV Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="FR30-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="FRV-Options.html#FRV-Options">FRV Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="DEC-Alpha_002fVMS-Options.html#DEC-Alpha_002fVMS-Options">DEC Alpha/VMS Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Submodel-Options.html#Submodel-Options">Submodel Options</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.17.10 FR30 Options</h4>
+
+<p><a name="index-FR30-Options-1211"></a>
+These options are defined specifically for the FR30 port.
+
+     <dl>
+<dt><code>-msmall-model</code><dd><a name="index-msmall_002dmodel-1212"></a>Use the small address space model.  This can produce smaller code, but
+it does assume that all symbolic values and addresses will fit into a
+20-bit range.
+
+     <br><dt><code>-mno-lsim</code><dd><a name="index-mno_002dlsim-1213"></a>Assume that run-time support has been provided and so there is no need
+to include the simulator library (<samp><span class="file">libsim.a</span></samp>) on the linker
+command line.
+
+ </dl>
+
+ </body></html>
+

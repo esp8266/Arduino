@@ -1,0 +1,88 @@
+<html lang="en">
+<head>
+<title>M68HC11/68HC12 - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Machine-Dependent.html#Machine-Dependent" title="Machine Dependent">
+<link rel="prev" href="MSP430.html#MSP430" title="MSP430">
+<link rel="next" href="PowerPC-ELF32.html#PowerPC-ELF32" title="PowerPC ELF32">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="M68HC11%2f68HC12"></a>
+<a name="M68HC11_002f68HC12"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="PowerPC-ELF32.html#PowerPC-ELF32">PowerPC ELF32</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="MSP430.html#MSP430">MSP430</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Machine-Dependent.html#Machine-Dependent">Machine Dependent</a>
+<hr>
+</div>
+
+<h3 class="section">4.3 <samp><span class="command">ld</span></samp> and the Motorola 68HC11 and 68HC12 families</h3>
+
+<p><a name="index-M68HC11-and-68HC12-support-570"></a>
+
+<h4 class="subsection">4.3.1 Linker Relaxation</h4>
+
+<p>For the Motorola 68HC11, <samp><span class="command">ld</span></samp> can perform these global
+optimizations when you specify the &lsquo;<samp><span class="samp">--relax</span></samp>&rsquo; command-line option.
+
+     
+<a name="index-relaxing-on-M68HC11-571"></a>
+<dl><dt><em>relaxing address modes</em><dd><samp><span class="command">ld</span></samp> finds all <code>jsr</code> and <code>jmp</code> instructions whose
+targets are within eight bits, and turns them into eight-bit
+program-counter relative <code>bsr</code> and <code>bra</code> instructions,
+respectively.
+
+     <p><samp><span class="command">ld</span></samp> also looks at all 16-bit extended addressing modes and
+transforms them in a direct addressing mode when the address is in
+page 0 (between 0 and 0x0ff).
+
+     <br><dt><em>relaxing gcc instruction group</em><dd>When <samp><span class="command">gcc</span></samp> is called with <samp><span class="option">-mrelax</span></samp>, it can emit group
+of instructions that the linker can optimize to use a 68HC11 direct
+addressing mode. These instructions consists of <code>bclr</code> or
+<code>bset</code> instructions.
+
+   </dl>
+
+<h4 class="subsection">4.3.2 Trampoline Generation</h4>
+
+<p><a name="index-trampoline-generation-on-M68HC11-572"></a><a name="index-trampoline-generation-on-M68HC12-573"></a>For 68HC11 and 68HC12, <samp><span class="command">ld</span></samp> can generate trampoline code to
+call a far function using a normal <code>jsr</code> instruction. The linker
+will also change the relocation to some far function to use the
+trampoline address instead of the function address. This is typically the
+case when a pointer to a function is taken. The pointer will in fact
+point to the function trampoline.
+
+   </body></html>
+

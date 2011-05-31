@@ -1,0 +1,108 @@
+<html lang="en">
+<head>
+<title>Half-Precision - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Floating-Types.html#Floating-Types" title="Floating Types">
+<link rel="next" href="Decimal-Float.html#Decimal-Float" title="Decimal Float">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Half-Precision"></a>
+<a name="Half_002dPrecision"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Decimal-Float.html#Decimal-Float">Decimal Float</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Floating-Types.html#Floating-Types">Floating Types</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.11 Half-Precision Floating Point</h3>
+
+<p><a name="index-half_002dprecision-floating-point-2234"></a><a name="index-g_t_0040code_007b_005f_005ffp16_007d-data-type-2235"></a>
+On ARM targets, GCC supports half-precision (16-bit) floating point via
+the <code>__fp16</code> type.  You must enable this type explicitly
+with the <samp><span class="option">-mfp16-format</span></samp> command-line option in order to use it.
+
+ <p>ARM supports two incompatible representations for half-precision
+floating-point values.  You must choose one of the representations and
+use it consistently in your program.
+
+ <p>Specifying <samp><span class="option">-mfp16-format=ieee</span></samp> selects the IEEE 754-2008 format. 
+This format can represent normalized values in the range of 2^-14 to 65504. 
+There are 11 bits of significand precision, approximately 3
+decimal digits.
+
+ <p>Specifying <samp><span class="option">-mfp16-format=alternative</span></samp> selects the ARM
+alternative format.  This representation is similar to the IEEE
+format, but does not support infinities or NaNs.  Instead, the range
+of exponents is extended, so that this format can represent normalized
+values in the range of 2^-14 to 131008.
+
+ <p>The <code>__fp16</code> type is a storage format only.  For purposes
+of arithmetic and other operations, <code>__fp16</code> values in C or C++
+expressions are automatically promoted to <code>float</code>.  In addition,
+you cannot declare a function with a return value or parameters
+of type <code>__fp16</code>.
+
+ <p>Note that conversions from <code>double</code> to <code>__fp16</code>
+involve an intermediate conversion to <code>float</code>.  Because
+of rounding, this can sometimes produce a different result than a
+direct conversion.
+
+ <p>ARM provides hardware support for conversions between
+<code>__fp16</code> and <code>float</code> values
+as an extension to VFP and NEON (Advanced SIMD).  GCC generates
+code using these hardware instructions if you compile with
+options to select an FPU that provides them;
+for example, <samp><span class="option">-mfpu=neon-fp16 -mfloat-abi=softfp</span></samp>,
+in addition to the <samp><span class="option">-mfp16-format</span></samp> option to select
+a half-precision format.
+
+ <p>Language-level support for the <code>__fp16</code> data type is
+independent of whether GCC generates code using hardware floating-point
+instructions.  In cases where hardware support is not specified, GCC
+implements conversions between <code>__fp16</code> and <code>float</code> values
+as library calls.
+
+ </body></html>
+

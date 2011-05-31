@@ -1,0 +1,70 @@
+<html lang="en">
+<head>
+<title>atoi - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdlib.html#Stdlib" title="Stdlib">
+<link rel="prev" href="atof.html#atof" title="atof">
+<link rel="next" href="atoll.html#atoll" title="atoll">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="atoi"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="atoll.html#atoll">atoll</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="atof.html#atof">atof</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdlib.html#Stdlib">Stdlib</a>
+<hr>
+</div>
+
+<h3 class="section">2.8 <code>atoi</code>, <code>atol</code>&mdash;string to integer</h3>
+
+<p><a name="index-atoi-10"></a><a name="index-atol-11"></a><a name="index-g_t_005fatoi_005fr-12"></a><a name="index-g_t_005fatol_005fr-13"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdlib.h&gt;
+     int atoi(const char *<var>s</var>);
+     long atol(const char *<var>s</var>);
+     int _atoi_r(struct _reent *<var>ptr</var>, const char *<var>s</var>);
+     long _atol_r(struct _reent *<var>ptr</var>, const char *<var>s</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>atoi</code> converts the initial portion of a string to an <code>int</code>. 
+<code>atol</code> converts the initial portion of a string to a <code>long</code>.
+
+   <p><code>atoi(s)</code> is implemented as <code>(int)strtol(s, NULL, 10).</code>
+<code>atol(s)</code> is implemented as <code>strtol(s, NULL, 10).</code>
+
+   <p><code>_atoi_r</code> and <code>_atol_r</code> are reentrant versions of <code>atoi</code> and
+<code>atol</code> respectively, passing the reentrancy struct pointer.
+
+   <p><br>
+<strong>Returns</strong><br>
+The functions return the converted value, if any. If no conversion was
+made, <code>0</code> is returned.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>atoi</code>, <code>atol</code> are ANSI.
+
+   <p>No supporting OS subroutines are required.
+
+   <p><br>
+
+   </body></html>
+

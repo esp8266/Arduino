@@ -1,0 +1,80 @@
+<html lang="en">
+<head>
+<title>Input Section Common - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Input-Section.html#Input-Section" title="Input Section">
+<link rel="prev" href="Input-Section-Wildcards.html#Input-Section-Wildcards" title="Input Section Wildcards">
+<link rel="next" href="Input-Section-Keep.html#Input-Section-Keep" title="Input Section Keep">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Input-Section-Common"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Input-Section-Keep.html#Input-Section-Keep">Input Section Keep</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Input-Section-Wildcards.html#Input-Section-Wildcards">Input Section Wildcards</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Input-Section.html#Input-Section">Input Section</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">3.6.4.3 Input Section for Common Symbols</h5>
+
+<p><a name="index-common-symbol-placement-406"></a><a name="index-uninitialized-data-placement-407"></a>A special notation is needed for common symbols, because in many object
+file formats common symbols do not have a particular input section.  The
+linker treats common symbols as though they are in an input section
+named &lsquo;<samp><span class="samp">COMMON</span></samp>&rsquo;.
+
+   <p>You may use file names with the &lsquo;<samp><span class="samp">COMMON</span></samp>&rsquo; section just as with any
+other input sections.  You can use this to place common symbols from a
+particular input file in one section while common symbols from other
+input files are placed in another section.
+
+   <p>In most cases, common symbols in input files will be placed in the
+&lsquo;<samp><span class="samp">.bss</span></samp>&rsquo; section in the output file.  For example:
+<pre class="smallexample">     .bss { *(.bss) *(COMMON) }
+</pre>
+   <p><a name="index-scommon-section-408"></a><a name="index-small-common-symbols-409"></a>Some object file formats have more than one type of common symbol.  For
+example, the MIPS ELF object file format distinguishes standard common
+symbols and small common symbols.  In this case, the linker will use a
+different special section name for other types of common symbols.  In
+the case of MIPS ELF, the linker uses &lsquo;<samp><span class="samp">COMMON</span></samp>&rsquo; for standard common
+symbols and &lsquo;<samp><span class="samp">.scommon</span></samp>&rsquo; for small common symbols.  This permits you
+to map the different types of common symbols into memory at different
+locations.
+
+   <p><a name="index-g_t_005bCOMMON_005d-410"></a>You will sometimes see &lsquo;<samp><span class="samp">[COMMON]</span></samp>&rsquo; in old linker scripts.  This
+notation is now considered obsolete.  It is equivalent to
+&lsquo;<samp><span class="samp">*(COMMON)</span></samp>&rsquo;.
+
+   </body></html>
+

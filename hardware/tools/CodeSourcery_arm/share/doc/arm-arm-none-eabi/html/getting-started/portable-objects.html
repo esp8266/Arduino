@@ -1,0 +1,43 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>3.8. Object File Portability</title><link rel="stylesheet" href="cs.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.74.0"><link rel="home" href="index.html" title="Sourcery G++ Lite"><link rel="up" href="chap-target.html" title="Chapter 3. Sourcery G++ Lite for ARM EABI"><link rel="prev" href="arm-mcount.html" title="3.7. ARM Profiling Implementation"><link rel="next" href="chap-building.html" title="Chapter 4. Using Sourcery G++ from the Command Line"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">3.8. Object File Portability</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="arm-mcount.html">Prev</a> </td><th width="60%" align="center">Chapter 3. Sourcery G++ Lite for ARM EABI</th><td width="20%" align="right"> <a accesskey="n" href="chap-building.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="portable-objects"></a>3.8. Object File Portability</h2></div></div></div><p>
+    It is possible to create object files using Sourcery G++ for
+    ARM
+     EABI
+    that are link-compatible with the
+    GNU C library provided with Sourcery G++ for ARM
+    GNU/Linux as well as with the CodeSourcery C Library or
+    Newlib C Library provided with 
+    ARM bare-metal toolchains.
+    <span>
+      These object files are additionally link-compatible with
+      other ARM C Library ABI-compliant static linking environments
+      and toolchains.
+    </span>
+    
+  </p><p>
+    To use this feature, when compiling your files with the bare-metal 
+    ARM 
+     EABI
+    toolchain define the preprocessor constant 
+    <code class="constant">_AEABI_PORTABILITY_LEVEL</code> to 1 
+    before including any system header files.
+    For example, pass the option <code class="option">-D_AEABI_PORTABILITY_LEVEL=1</code> 
+    on your compilation command line.  
+    No special options are required when linking the resulting object files.
+    When building applications for ARM
+     EABI,
+    files compiled with this definition may be linked freely with those
+    compiled without it.
+  </p><p>
+    Files compiled in this manner may not use the
+    functions <code class="function">fgetpos</code>
+    or <code class="function">fsetpos</code>, or reference the
+    type <code class="type">fpos_t</code>.  This is because Newlib assumes a
+    representation for <code class="type">fpos_t</code> that is not AEABI-compliant.
+  </p><p>
+    Note that object files are only portable from bare-metal toolchains
+    to GNU/Linux, and
+    not vice versa; object files compiled for ARM 
+    GNU/Linux targets cannot be linked into ARM 
+     EABI
+    executables.
+  </p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="arm-mcount.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="chap-target.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="chap-building.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">3.7. ARM Profiling Implementation </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Chapter 4. Using Sourcery G++ from the Command Line</td></tr></table></div></body></html>

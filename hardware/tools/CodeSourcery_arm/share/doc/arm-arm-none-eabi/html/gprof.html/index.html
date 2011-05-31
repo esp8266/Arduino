@@ -1,0 +1,132 @@
+<html lang="en">
+<head>
+<title>GNU gprof</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GNU gprof">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="#Top">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the gprof profiler of the GNU system.
+
+Copyright (C) 1988, 1992, 1997, 1998, 1999, 2000, 2001, 2003,
+2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled "GNU Free Documentation License".
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<h1 class="settitle">GNU gprof</h1>
+   <div class="contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a name="toc_Top" href="index.html#Top">Profiling a Program: Where Does It Spend Its Time?</a>
+<li><a name="toc_Introduction" href="Introduction.html#Introduction">1 Introduction to Profiling</a>
+<li><a name="toc_Compiling" href="Compiling.html#Compiling">2 Compiling a Program for Profiling</a>
+<li><a name="toc_Executing" href="Executing.html#Executing">3 Executing the Program</a>
+<li><a name="toc_Invoking" href="Invoking.html#Invoking">4 <code>gprof</code> Command Summary</a>
+<ul>
+<li><a href="Output-Options.html#Output-Options">4.1 Output Options</a>
+<li><a href="Analysis-Options.html#Analysis-Options">4.2 Analysis Options</a>
+<li><a href="Miscellaneous-Options.html#Miscellaneous-Options">4.3 Miscellaneous Options</a>
+<li><a href="Deprecated-Options.html#Deprecated-Options">4.4 Deprecated Options</a>
+<li><a href="Symspecs.html#Symspecs">4.5 Symspecs</a>
+</li></ul>
+<li><a name="toc_Output" href="Output.html#Output">5 Interpreting <code>gprof</code>'s Output</a>
+<ul>
+<li><a href="Flat-Profile.html#Flat-Profile">5.1 The Flat Profile</a>
+<li><a href="Call-Graph.html#Call-Graph">5.2 The Call Graph</a>
+<ul>
+<li><a href="Primary.html#Primary">5.2.1 The Primary Line</a>
+<li><a href="Callers.html#Callers">5.2.2 Lines for a Function's Callers</a>
+<li><a href="Subroutines.html#Subroutines">5.2.3 Lines for a Function's Subroutines</a>
+<li><a href="Cycles.html#Cycles">5.2.4 How Mutually Recursive Functions Are Described</a>
+</li></ul>
+<li><a href="Line_002dby_002dline.html#Line_002dby_002dline">5.3 Line-by-line Profiling</a>
+<li><a href="Annotated-Source.html#Annotated-Source">5.4 The Annotated Source Listing</a>
+</li></ul>
+<li><a name="toc_Inaccuracy" href="Inaccuracy.html#Inaccuracy">6 Inaccuracy of <code>gprof</code> Output</a>
+<ul>
+<li><a href="Sampling-Error.html#Sampling-Error">6.1 Statistical Sampling Error</a>
+<li><a href="Assumptions.html#Assumptions">6.2 Estimating <code>children</code> Times</a>
+</li></ul>
+<li><a name="toc_How-do-I_003f" href="How-do-I_003f.html#How-do-I_003f">7 Answers to Common Questions</a>
+<li><a name="toc_Incompatibilities" href="Incompatibilities.html#Incompatibilities">8 Incompatibilities with Unix <code>gprof</code></a>
+<li><a name="toc_Details" href="Details.html#Details">9 Details of Profiling</a>
+<ul>
+<li><a href="Implementation.html#Implementation">9.1 Implementation of Profiling</a>
+<li><a href="File-Format.html#File-Format">9.2 Profiling Data File Format</a>
+<ul>
+<li><a href="File-Format.html#File-Format">9.2.1 Histogram Records</a>
+<li><a href="File-Format.html#File-Format">9.2.2 Call-Graph Records</a>
+<li><a href="File-Format.html#File-Format">9.2.3 Basic-Block Execution Count Records</a>
+</li></ul>
+<li><a href="Internals.html#Internals">9.3 <code>gprof</code>'s Internal Operation</a>
+<li><a href="Debugging.html#Debugging">9.4 Debugging <code>gprof</code></a>
+</li></ul>
+<li><a name="toc_GNU-Free-Documentation-License" href="GNU-Free-Documentation-License.html#GNU-Free-Documentation-License">Appendix A GNU Free Documentation License</a>
+</li></ul>
+</div>
+
+
+
+<div class="node">
+<a name="Top"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Introduction.html#Introduction">Introduction</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="../index.html#dir">(dir)</a>
+<hr>
+</div>
+
+<h2 class="unnumbered">Profiling a Program: Where Does It Spend Its Time?</h2>
+
+<p>This manual describes the <span class="sc">gnu</span> profiler, <code>gprof</code>, and how you
+can use it to determine which parts of a program are taking most of the
+execution time.  We assume that you know how to write, compile, and
+execute programs.  <span class="sc">gnu</span> <code>gprof</code> was written by Jay Fenlason.
+
+   <p>This manual is for <code>gprof</code>
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+   <p>This document is distributed under the terms of the GNU Free
+Documentation License version 1.3.  A copy of the license is included
+in the section entitled &ldquo;GNU Free Documentation License&rdquo;.
+
+<ul class="menu">
+<li><a accesskey="1" href="Introduction.html#Introduction">Introduction</a>:         What profiling means, and why it is useful.
+
+<li><a accesskey="2" href="Compiling.html#Compiling">Compiling</a>:            How to compile your program for profiling. 
+<li><a accesskey="3" href="Executing.html#Executing">Executing</a>:            Executing your program to generate profile data
+<li><a accesskey="4" href="Invoking.html#Invoking">Invoking</a>:             How to run <code>gprof</code>, and its options
+
+<li><a accesskey="5" href="Output.html#Output">Output</a>:               Interpreting <code>gprof</code>'s output
+
+<li><a accesskey="6" href="Inaccuracy.html#Inaccuracy">Inaccuracy</a>:           Potential problems you should be aware of
+<li><a accesskey="7" href="How-do-I_003f.html#How-do-I_003f">How do I?</a>:            Answers to common questions
+<li><a accesskey="8" href="Incompatibilities.html#Incompatibilities">Incompatibilities</a>:    (between <span class="sc">gnu</span> <code>gprof</code> and Unix <code>gprof</code>.) 
+<li><a accesskey="9" href="Details.html#Details">Details</a>:              Details of how profiling is done
+<li><a href="GNU-Free-Documentation-License.html#GNU-Free-Documentation-License">GNU Free Documentation License</a>:   GNU Free Documentation License
+</ul>
+
+   </body></html>
+

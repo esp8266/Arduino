@@ -1,0 +1,153 @@
+<html lang="en">
+<head>
+<title>Selecting Pretty-Printers - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Python-API.html#Python-API" title="Python API">
+<link rel="prev" href="Pretty-Printing-API.html#Pretty-Printing-API" title="Pretty Printing API">
+<link rel="next" href="Disabling-Pretty_002dPrinters.html#Disabling-Pretty_002dPrinters" title="Disabling Pretty-Printers">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Selecting-Pretty-Printers"></a>
+<a name="Selecting-Pretty_002dPrinters"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Disabling-Pretty_002dPrinters.html#Disabling-Pretty_002dPrinters">Disabling Pretty-Printers</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Pretty-Printing-API.html#Pretty-Printing-API">Pretty Printing API</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Python-API.html#Python-API">Python API</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">23.2.2.6 Selecting Pretty-Printers</h5>
+
+<p>The Python list <code>gdb.pretty_printers</code> contains an array of
+functions or callable objects that have been registered via addition
+as a pretty-printer. 
+Each <code>gdb.Progspace</code> contains a <code>pretty_printers</code> attribute. 
+Each <code>gdb.Objfile</code> also contains a <code>pretty_printers</code>
+attribute.
+
+   <p>A function on one of these lists is passed a single <code>gdb.Value</code>
+argument and should return a pretty-printer object conforming to the
+interface definition above (see <a href="Pretty-Printing-API.html#Pretty-Printing-API">Pretty Printing API</a>).  If a function
+cannot create a pretty-printer for the value, it should return
+<code>None</code>.
+
+   <p><span class="sc">gdb</span> first checks the <code>pretty_printers</code> attribute of each
+<code>gdb.Objfile</code> in the current program space and iteratively calls
+each enabled function (see <a href="Disabling-Pretty_002dPrinters.html#Disabling-Pretty_002dPrinters">Disabling Pretty-Printers</a>)
+in the list for that <code>gdb.Objfile</code> until it receives
+a pretty-printer object. 
+If no pretty-printer is found in the objfile lists, <span class="sc">gdb</span> then
+searches the pretty-printer list of the current program space,
+calling each enabled function until an object is returned. 
+After these lists have been exhausted, it tries the global
+<code>gdb.pretty_printers</code> list, again calling each enabled function until an
+object is returned.
+
+   <p>The order in which the objfiles are searched is not specified.  For a
+given list, functions are always invoked from the head of the list,
+and iterated over sequentially until the end of the list, or a printer
+object is returned.
+
+   <p>Here is an example showing how a <code>std::string</code> printer might be
+written:
+
+<pre class="smallexample">     class StdStringPrinter:
+         "Print a std::string"
+     
+         def __init__ (self, val):
+             self.val = val
+     
+         def to_string (self):
+             return self.val['_M_dataplus']['_M_p']
+     
+         def display_hint (self):
+             return 'string'
+</pre>
+   <p>And here is an example showing how a lookup function for the printer
+example above might be written.
+
+<pre class="smallexample">     def str_lookup_function (val):
+     
+         lookup_tag = val.type.tag
+         regex = re.compile ("^std::basic_string&lt;char,.*&gt;$")
+         if lookup_tag == None:
+             return None
+         if regex.match (lookup_tag):
+             return StdStringPrinter (val)
+     
+         return None
+</pre>
+   <p>The example lookup function extracts the value's type, and attempts to
+match it to a type that it can pretty-print.  If it is a type the
+printer can pretty-print, it will return a printer object.  If not, it
+returns <code>None</code>.
+
+   <p>We recommend that you put your core pretty-printers into a Python
+package.  If your pretty-printers are for use with a library, we
+further recommend embedding a version number into the package name. 
+This practice will enable <span class="sc">gdb</span> to load multiple versions of
+your pretty-printers at the same time, because they will have
+different names.
+
+   <p>You should write auto-loaded code (see <a href="Auto_002dloading.html#Auto_002dloading">Auto-loading</a>) such that it
+can be evaluated multiple times without changing its meaning.  An
+ideal auto-load file will consist solely of <code>import</code>s of your
+printer modules, followed by a call to a register pretty-printers with
+the current objfile.
+
+   <p>Taken as a whole, this approach will scale nicely to multiple
+inferiors, each potentially using a different library version. 
+Embedding a version number in the Python package name will ensure that
+<span class="sc">gdb</span> is able to load both sets of printers simultaneously. 
+Then, because the search for pretty-printers is done by objfile, and
+because your auto-loaded code took care to register your library's
+printers with a specific objfile, <span class="sc">gdb</span> will find the correct
+printers for the specific version of the library used by each
+inferior.
+
+   <p>To continue the <code>std::string</code> example (see <a href="Pretty-Printing-API.html#Pretty-Printing-API">Pretty Printing API</a>),
+this code might appear in <code>gdb.libstdcxx.v6</code>:
+
+<pre class="smallexample">     def register_printers (objfile):
+         objfile.pretty_printers.add (str_lookup_function)
+</pre>
+   <p class="noindent">And then the corresponding contents of the auto-load file would be:
+
+<pre class="smallexample">     import gdb.libstdcxx.v6
+     gdb.libstdcxx.v6.register_printers (gdb.current_objfile ())
+</pre>
+   </body></html>
+

@@ -1,0 +1,91 @@
+<html lang="en">
+<head>
+<title>MN10300 Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Submodel-Options.html#Submodel-Options" title="Submodel Options">
+<link rel="prev" href="MMIX-Options.html#MMIX-Options" title="MMIX Options">
+<link rel="next" href="PDP_002d11-Options.html#PDP_002d11-Options" title="PDP-11 Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="MN10300-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="PDP_002d11-Options.html#PDP_002d11-Options">PDP-11 Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="MMIX-Options.html#MMIX-Options">MMIX Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Submodel-Options.html#Submodel-Options">Submodel Options</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.17.27 MN10300 Options</h4>
+
+<p><a name="index-MN10300-options-1696"></a>
+These <samp><span class="option">-m</span></samp> options are defined for Matsushita MN10300 architectures:
+
+     <dl>
+<dt><code>-mmult-bug</code><dd><a name="index-mmult_002dbug-1697"></a>Generate code to avoid bugs in the multiply instructions for the MN10300
+processors.  This is the default.
+
+     <br><dt><code>-mno-mult-bug</code><dd><a name="index-mno_002dmult_002dbug-1698"></a>Do not generate code to avoid bugs in the multiply instructions for the
+MN10300 processors.
+
+     <br><dt><code>-mam33</code><dd><a name="index-mam33-1699"></a>Generate code which uses features specific to the AM33 processor.
+
+     <br><dt><code>-mno-am33</code><dd><a name="index-mno_002dam33-1700"></a>Do not generate code which uses features specific to the AM33 processor.  This
+is the default.
+
+     <br><dt><code>-mreturn-pointer-on-d0</code><dd><a name="index-mreturn_002dpointer_002don_002dd0-1701"></a>When generating a function which returns a pointer, return the pointer
+in both <code>a0</code> and <code>d0</code>.  Otherwise, the pointer is returned
+only in a0, and attempts to call such functions without a prototype
+would result in errors.  Note that this option is on by default; use
+<samp><span class="option">-mno-return-pointer-on-d0</span></samp> to disable it.
+
+     <br><dt><code>-mno-crt0</code><dd><a name="index-mno_002dcrt0-1702"></a>Do not link in the C run-time initialization object file.
+
+     <br><dt><code>-mrelax</code><dd><a name="index-mrelax-1703"></a>Indicate to the linker that it should perform a relaxation optimization pass
+to shorten branches, calls and absolute memory addresses.  This option only
+has an effect when used on the command line for the final link step.
+
+     <p>This option makes symbolic debugging impossible. 
+</dl>
+
+ </body></html>
+

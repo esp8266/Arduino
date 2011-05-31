@@ -1,0 +1,91 @@
+<html lang="en">
+<head>
+<title>Ada Mode Intro - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Ada.html#Ada" title="Ada">
+<link rel="next" href="Omissions-from-Ada.html#Omissions-from-Ada" title="Omissions from Ada">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Ada-Mode-Intro"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Omissions-from-Ada.html#Omissions-from-Ada">Omissions from Ada</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Ada.html#Ada">Ada</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">15.4.7.1 Introduction</h5>
+
+<p><a name="index-Ada-mode_002c-general-860"></a>
+The Ada mode of <span class="sc">gdb</span> supports a fairly large subset of Ada expression
+syntax, with some extensions. 
+The philosophy behind the design of this subset is
+
+     <ul>
+<li>That <span class="sc">gdb</span> should provide basic literals and access to operations for
+arithmetic, dereferencing, field selection, indexing, and subprogram calls,
+leaving more sophisticated computations to subprograms written into the
+program (which therefore may be called from <span class="sc">gdb</span>).
+
+     <li>That type safety and strict adherence to Ada language restrictions
+are not particularly important to the <span class="sc">gdb</span> user.
+
+     <li>That brevity is important to the <span class="sc">gdb</span> user. 
+</ul>
+
+   <p>Thus, for brevity, the debugger acts as if all names declared in
+user-written packages are directly visible, even if they are not visible
+according to Ada rules, thus making it unnecessary to fully qualify most
+names with their packages, regardless of context.  Where this causes
+ambiguity, <span class="sc">gdb</span> asks the user's intent.
+
+   <p>The debugger will start in Ada mode if it detects an Ada main program. 
+As for other languages, it will enter Ada mode when stopped in a program that
+was translated from an Ada source file.
+
+   <p>While in Ada mode, you may use `<tt>&ndash;</tt>' for comments.  This is useful
+mostly for documenting command files.  The standard <span class="sc">gdb</span> comment
+(&lsquo;<samp><span class="samp">#</span></samp>&rsquo;) still works at the beginning of a line in Ada mode, but not in the
+middle (to allow based literals).
+
+   <p>The debugger supports limited overloading.  Given a subprogram call in which
+the function symbol has multiple definitions, it will use the number of
+actual parameters and some information about their types to attempt to narrow
+the set of definitions.  It also makes very limited use of context, preferring
+procedures to functions in the context of the <code>call</code> command, and
+functions to procedures elsewhere.
+
+   </body></html>
+

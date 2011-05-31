@@ -1,0 +1,583 @@
+<html lang="en">
+<head>
+<title>Variable Attributes - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Character-Escapes.html#Character-Escapes" title="Character Escapes">
+<link rel="next" href="Type-Attributes.html#Type-Attributes" title="Type Attributes">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Variable-Attributes"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Type-Attributes.html#Type-Attributes">Type Attributes</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Character-Escapes.html#Character-Escapes">Character Escapes</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.36 Specifying Attributes of Variables</h3>
+
+<p><a name="index-attribute-of-variables-2484"></a><a name="index-variable-attributes-2485"></a>
+The keyword <code>__attribute__</code> allows you to specify special
+attributes of variables or structure fields.  This keyword is followed
+by an attribute specification inside double parentheses.  Some
+attributes are currently defined generically for variables. 
+Other attributes are defined for variables on particular target
+systems.  Other attributes are available for functions
+(see <a href="Function-Attributes.html#Function-Attributes">Function Attributes</a>) and for types (see <a href="Type-Attributes.html#Type-Attributes">Type Attributes</a>). 
+Other front ends might define more attributes
+(see <a href="C_002b_002b-Extensions.html#C_002b_002b-Extensions">Extensions to the C++ Language</a>).
+
+ <p>You may also specify attributes with &lsquo;<samp><span class="samp">__</span></samp>&rsquo; preceding and following
+each keyword.  This allows you to use them in header files without
+being concerned about a possible macro of the same name.  For example,
+you may use <code>__aligned__</code> instead of <code>aligned</code>.
+
+ <p>See <a href="Attribute-Syntax.html#Attribute-Syntax">Attribute Syntax</a>, for details of the exact syntax for using
+attributes.
+
+     
+<a name="index-g_t_0040code_007baligned_007d-attribute-2486"></a>
+<dl><dt><code>aligned (</code><var>alignment</var><code>)</code><dd>This attribute specifies a minimum alignment for the variable or
+structure field, measured in bytes.  For example, the declaration:
+
+     <pre class="smallexample">          int x __attribute__ ((aligned (16))) = 0;
+</pre>
+     <p class="noindent">causes the compiler to allocate the global variable <code>x</code> on a
+16-byte boundary.  On a 68040, this could be used in conjunction with
+an <code>asm</code> expression to access the <code>move16</code> instruction which
+requires 16-byte aligned operands.
+
+     <p>You can also specify the alignment of structure fields.  For example, to
+create a double-word aligned <code>int</code> pair, you could write:
+
+     <pre class="smallexample">          struct foo { int x[2] __attribute__ ((aligned (8))); };
+</pre>
+     <p class="noindent">This is an alternative to creating a union with a <code>double</code> member
+that forces the union to be double-word aligned.
+
+     <p>As in the preceding examples, you can explicitly specify the alignment
+(in bytes) that you wish the compiler to use for a given variable or
+structure field.  Alternatively, you can leave out the alignment factor
+and just ask the compiler to align a variable or field to the
+default alignment for the target architecture you are compiling for. 
+The default alignment is sufficient for all scalar types, but may not be
+enough for all vector types on a target which supports vector operations. 
+The default alignment is fixed for a particular target ABI.
+
+     <p>Gcc also provides a target specific macro <code>__BIGGEST_ALIGNMENT__</code>,
+which is the largest alignment ever used for any data type on the
+target machine you are compiling for.  For example, you could write:
+
+     <pre class="smallexample">          short array[3] __attribute__ ((aligned (__BIGGEST_ALIGNMENT__)));
+</pre>
+     <p>The compiler automatically sets the alignment for the declared
+variable or field to <code>__BIGGEST_ALIGNMENT__</code>.  Doing this can
+often make copy operations more efficient, because the compiler can
+use whatever instructions copy the biggest chunks of memory when
+performing copies to or from the variables or fields that you have
+aligned this way.  Note that the value of <code>__BIGGEST_ALIGNMENT__</code>
+may change depending on command line options.
+
+     <p>When used on a struct, or struct member, the <code>aligned</code> attribute can
+only increase the alignment; in order to decrease it, the <code>packed</code>
+attribute must be specified as well.  When used as part of a typedef, the
+<code>aligned</code> attribute can both increase and decrease alignment, and
+specifying the <code>packed</code> attribute will generate a warning.
+
+     <p>Note that the effectiveness of <code>aligned</code> attributes may be limited
+by inherent limitations in your linker.  On many systems, the linker is
+only able to arrange for variables to be aligned up to a certain maximum
+alignment.  (For some linkers, the maximum supported alignment may
+be very very small.)  If your linker is only able to align variables
+up to a maximum of 8 byte alignment, then specifying <code>aligned(16)</code>
+in an <code>__attribute__</code> will still only provide you with 8 byte
+alignment.  See your linker documentation for further information.
+
+     <p>The <code>aligned</code> attribute can also be used for functions
+(see <a href="Function-Attributes.html#Function-Attributes">Function Attributes</a>.)
+
+     <br><dt><code>cleanup (</code><var>cleanup_function</var><code>)</code><dd><a name="index-g_t_0040code_007bcleanup_007d-attribute-2487"></a>The <code>cleanup</code> attribute runs a function when the variable goes
+out of scope.  This attribute can only be applied to auto function
+scope variables; it may not be applied to parameters or variables
+with static storage duration.  The function must take one parameter,
+a pointer to a type compatible with the variable.  The return value
+of the function (if any) is ignored.
+
+     <p>If <samp><span class="option">-fexceptions</span></samp> is enabled, then <var>cleanup_function</var>
+will be run during the stack unwinding that happens during the
+processing of the exception.  Note that the <code>cleanup</code> attribute
+does not allow the exception to be caught, only to perform an action. 
+It is undefined what happens if <var>cleanup_function</var> does not
+return normally.
+
+     <br><dt><code>common</code><dt><code>nocommon</code><dd><a name="index-g_t_0040code_007bcommon_007d-attribute-2488"></a><a name="index-g_t_0040code_007bnocommon_007d-attribute-2489"></a><a name="index-fcommon-2490"></a><a name="index-fno_002dcommon-2491"></a>The <code>common</code> attribute requests GCC to place a variable in
+&ldquo;common&rdquo; storage.  The <code>nocommon</code> attribute requests the
+opposite&mdash;to allocate space for it directly.
+
+     <p>These attributes override the default chosen by the
+<samp><span class="option">-fno-common</span></samp> and <samp><span class="option">-fcommon</span></samp> flags respectively.
+
+     <br><dt><code>deprecated</code><dt><code>deprecated (</code><var>msg</var><code>)</code><dd><a name="index-g_t_0040code_007bdeprecated_007d-attribute-2492"></a>The <code>deprecated</code> attribute results in a warning if the variable
+is used anywhere in the source file.  This is useful when identifying
+variables that are expected to be removed in a future version of a
+program.  The warning also includes the location of the declaration
+of the deprecated variable, to enable users to easily find further
+information about why the variable is deprecated, or what they should
+do instead.  Note that the warning only occurs for uses:
+
+     <pre class="smallexample">          extern int old_var __attribute__ ((deprecated));
+          extern int old_var;
+          int new_fn () { return old_var; }
+</pre>
+     <p>results in a warning on line 3 but not line 2.  The optional msg
+argument, which must be a string, will be printed in the warning if
+present.
+
+     <p>The <code>deprecated</code> attribute can also be used for functions and
+types (see <a href="Function-Attributes.html#Function-Attributes">Function Attributes</a>, see <a href="Type-Attributes.html#Type-Attributes">Type Attributes</a>.)
+
+     <br><dt><code>mode (</code><var>mode</var><code>)</code><dd><a name="index-g_t_0040code_007bmode_007d-attribute-2493"></a>This attribute specifies the data type for the declaration&mdash;whichever
+type corresponds to the mode <var>mode</var>.  This in effect lets you
+request an integer or floating point type according to its width.
+
+     <p>You may also specify a mode of &lsquo;<samp><span class="samp">byte</span></samp>&rsquo; or &lsquo;<samp><span class="samp">__byte__</span></samp>&rsquo; to
+indicate the mode corresponding to a one-byte integer, &lsquo;<samp><span class="samp">word</span></samp>&rsquo; or
+&lsquo;<samp><span class="samp">__word__</span></samp>&rsquo; for the mode of a one-word integer, and &lsquo;<samp><span class="samp">pointer</span></samp>&rsquo;
+or &lsquo;<samp><span class="samp">__pointer__</span></samp>&rsquo; for the mode used to represent pointers.
+
+     <br><dt><code>packed</code><dd><a name="index-g_t_0040code_007bpacked_007d-attribute-2494"></a>The <code>packed</code> attribute specifies that a variable or structure field
+should have the smallest possible alignment&mdash;one byte for a variable,
+and one bit for a field, unless you specify a larger value with the
+<code>aligned</code> attribute.
+
+     <p>Here is a structure in which the field <code>x</code> is packed, so that it
+immediately follows <code>a</code>:
+
+     <pre class="smallexample">          struct foo
+          {
+            char a;
+            int x[2] __attribute__ ((packed));
+          };
+</pre>
+     <p><em>Note:</em> The 4.1, 4.2 and 4.3 series of GCC ignore the
+<code>packed</code> attribute on bit-fields of type <code>char</code>.  This has
+been fixed in GCC 4.4 but the change can lead to differences in the
+structure layout.  See the documentation of
+<samp><span class="option">-Wpacked-bitfield-compat</span></samp> for more information.
+
+     <br><dt><code>section ("</code><var>section-name</var><code>")</code><dd><a name="index-g_t_0040code_007bsection_007d-variable-attribute-2495"></a>Normally, the compiler places the objects it generates in sections like
+<code>data</code> and <code>bss</code>.  Sometimes, however, you need additional sections,
+or you need certain particular variables to appear in special sections,
+for example to map to special hardware.  The <code>section</code>
+attribute specifies that a variable (or function) lives in a particular
+section.  For example, this small program uses several specific section names:
+
+     <pre class="smallexample">          struct duart a __attribute__ ((section ("DUART_A"))) = { 0 };
+          struct duart b __attribute__ ((section ("DUART_B"))) = { 0 };
+          char stack[10000] __attribute__ ((section ("STACK"))) = { 0 };
+          int init_data __attribute__ ((section ("INITDATA")));
+          
+          main()
+          {
+            /* <span class="roman">Initialize stack pointer</span> */
+            init_sp (stack + sizeof (stack));
+          
+            /* <span class="roman">Initialize initialized data</span> */
+            memcpy (&amp;init_data, &amp;data, &amp;edata - &amp;data);
+          
+            /* <span class="roman">Turn on the serial ports</span> */
+            init_duart (&amp;a);
+            init_duart (&amp;b);
+          }
+</pre>
+     <p class="noindent">Use the <code>section</code> attribute with
+<em>global</em> variables and not <em>local</em> variables,
+as shown in the example.
+
+     <p>You may use the <code>section</code> attribute with initialized or
+uninitialized global variables but the linker requires
+each object be defined once, with the exception that uninitialized
+variables tentatively go in the <code>common</code> (or <code>bss</code>) section
+and can be multiply &ldquo;defined&rdquo;.  Using the <code>section</code> attribute
+will change what section the variable goes into and may cause the
+linker to issue an error if an uninitialized variable has multiple
+definitions.  You can force a variable to be initialized with the
+<samp><span class="option">-fno-common</span></samp> flag or the <code>nocommon</code> attribute.
+
+     <p>Some file formats do not support arbitrary sections so the <code>section</code>
+attribute is not available on all platforms. 
+If you need to map the entire contents of a module to a particular
+section, consider using the facilities of the linker instead.
+
+     <br><dt><code>shared</code><dd><a name="index-g_t_0040code_007bshared_007d-variable-attribute-2496"></a>On Microsoft Windows, in addition to putting variable definitions in a named
+section, the section can also be shared among all running copies of an
+executable or DLL.  For example, this small program defines shared data
+by putting it in a named section <code>shared</code> and marking the section
+shareable:
+
+     <pre class="smallexample">          int foo __attribute__((section ("shared"), shared)) = 0;
+          
+          int
+          main()
+          {
+            /* <span class="roman">Read and write foo.  All running
+               copies see the same value.</span>  */
+            return 0;
+          }
+</pre>
+     <p class="noindent">You may only use the <code>shared</code> attribute along with <code>section</code>
+attribute with a fully initialized global definition because of the way
+linkers work.  See <code>section</code> attribute for more information.
+
+     <p>The <code>shared</code> attribute is only available on Microsoft Windows.
+
+     <br><dt><code>tls_model ("</code><var>tls_model</var><code>")</code><dd><a name="index-g_t_0040code_007btls_005fmodel_007d-attribute-2497"></a>The <code>tls_model</code> attribute sets thread-local storage model
+(see <a href="Thread_002dLocal.html#Thread_002dLocal">Thread-Local</a>) of a particular <code>__thread</code> variable,
+overriding <samp><span class="option">-ftls-model=</span></samp> command line switch on a per-variable
+basis. 
+The <var>tls_model</var> argument should be one of <code>global-dynamic</code>,
+<code>local-dynamic</code>, <code>initial-exec</code> or <code>local-exec</code>.
+
+     <p>Not all targets support this attribute.
+
+     <br><dt><code>unused</code><dd>This attribute, attached to a variable, means that the variable is meant
+to be possibly unused.  GCC will not produce a warning for this
+variable.
+
+     <br><dt><code>used</code><dd>This attribute, attached to a variable, means that the variable must be
+emitted even if it appears that the variable is not referenced.
+
+     <br><dt><code>vector_size (</code><var>bytes</var><code>)</code><dd>This attribute specifies the vector size for the variable, measured in
+bytes.  For example, the declaration:
+
+     <pre class="smallexample">          int foo __attribute__ ((vector_size (16)));
+</pre>
+     <p class="noindent">causes the compiler to set the mode for <code>foo</code>, to be 16 bytes,
+divided into <code>int</code> sized units.  Assuming a 32-bit int (a vector of
+4 units of 4 bytes), the corresponding mode of <code>foo</code> will be V4SI.
+
+     <p>This attribute is only applicable to integral and float scalars,
+although arrays, pointers, and function return values are allowed in
+conjunction with this construct.
+
+     <p>Aggregates with this attribute are invalid, even if they are of the same
+size as a corresponding scalar.  For example, the declaration:
+
+     <pre class="smallexample">          struct S { int a; };
+          struct S  __attribute__ ((vector_size (16))) foo;
+</pre>
+     <p class="noindent">is invalid even if the size of the structure is the same as the size of
+the <code>int</code>.
+
+     <br><dt><code>selectany</code><dd>The <code>selectany</code> attribute causes an initialized global variable to
+have link-once semantics.  When multiple definitions of the variable are
+encountered by the linker, the first is selected and the remainder are
+discarded.  Following usage by the Microsoft compiler, the linker is told
+<em>not</em> to warn about size or content differences of the multiple
+definitions.
+
+     <p>Although the primary usage of this attribute is for POD types, the
+attribute can also be applied to global C++ objects that are initialized
+by a constructor.  In this case, the static initialization and destruction
+code for the object is emitted in each translation defining the object,
+but the calls to the constructor and destructor are protected by a
+link-once guard variable.
+
+     <p>The <code>selectany</code> attribute is only available on Microsoft Windows
+targets.  You can use <code>__declspec (selectany)</code> as a synonym for
+<code>__attribute__ ((selectany))</code> for compatibility with other
+compilers.
+
+     <br><dt><code>weak</code><dd>The <code>weak</code> attribute is described in <a href="Function-Attributes.html#Function-Attributes">Function Attributes</a>.
+
+     <br><dt><code>dllimport</code><dd>The <code>dllimport</code> attribute is described in <a href="Function-Attributes.html#Function-Attributes">Function Attributes</a>.
+
+     <br><dt><code>dllexport</code><dd>The <code>dllexport</code> attribute is described in <a href="Function-Attributes.html#Function-Attributes">Function Attributes</a>.
+
+ </dl>
+
+<h4 class="subsection">6.36.1 Blackfin Variable Attributes</h4>
+
+<p>Three attributes are currently defined for the Blackfin.
+
+     <dl>
+<dt><code>l1_data</code><dt><code>l1_data_A</code><dt><code>l1_data_B</code><dd><a name="index-g_t_0040code_007bl1_005fdata_007d-variable-attribute-2498"></a><a name="index-g_t_0040code_007bl1_005fdata_005fA_007d-variable-attribute-2499"></a><a name="index-g_t_0040code_007bl1_005fdata_005fB_007d-variable-attribute-2500"></a>Use these attributes on the Blackfin to place the variable into L1 Data SRAM. 
+Variables with <code>l1_data</code> attribute will be put into the specific section
+named <code>.l1.data</code>. Those with <code>l1_data_A</code> attribute will be put into
+the specific section named <code>.l1.data.A</code>. Those with <code>l1_data_B</code>
+attribute will be put into the specific section named <code>.l1.data.B</code>.
+
+     <br><dt><code>l2</code><dd><a name="index-g_t_0040code_007bl2_007d-variable-attribute-2501"></a>Use this attribute on the Blackfin to place the variable into L2 SRAM. 
+Variables with <code>l2</code> attribute will be put into the specific section
+named <code>.l2.data</code>. 
+</dl>
+
+<h4 class="subsection">6.36.2 M32R/D Variable Attributes</h4>
+
+<p>One attribute is currently defined for the M32R/D.
+
+     <dl>
+<dt><code>model (</code><var>model-name</var><code>)</code><dd><a name="index-variable-addressability-on-the-M32R_002fD-2502"></a>Use this attribute on the M32R/D to set the addressability of an object. 
+The identifier <var>model-name</var> is one of <code>small</code>, <code>medium</code>,
+or <code>large</code>, representing each of the code models.
+
+     <p>Small model objects live in the lower 16MB of memory (so that their
+addresses can be loaded with the <code>ld24</code> instruction).
+
+     <p>Medium and large model objects may live anywhere in the 32-bit address space
+(the compiler will generate <code>seth/add3</code> instructions to load their
+addresses). 
+</dl>
+
+ <p><a name="MeP-Variable-Attributes"></a>
+
+<h4 class="subsection">6.36.3 MeP Variable Attributes</h4>
+
+<p>The MeP target has a number of addressing modes and busses.  The
+<code>near</code> space spans the standard memory space's first 16 megabytes
+(24 bits).  The <code>far</code> space spans the entire 32-bit memory space. 
+The <code>based</code> space is a 128 byte region in the memory space which
+is addressed relative to the <code>$tp</code> register.  The <code>tiny</code>
+space is a 65536 byte region relative to the <code>$gp</code> register.  In
+addition to these memory regions, the MeP target has a separate 16-bit
+control bus which is specified with <code>cb</code> attributes.
+
+     <dl>
+<dt><code>based</code><dd>Any variable with the <code>based</code> attribute will be assigned to the
+<code>.based</code> section, and will be accessed with relative to the
+<code>$tp</code> register.
+
+     <br><dt><code>tiny</code><dd>Likewise, the <code>tiny</code> attribute assigned variables to the
+<code>.tiny</code> section, relative to the <code>$gp</code> register.
+
+     <br><dt><code>near</code><dd>Variables with the <code>near</code> attribute are assumed to have addresses
+that fit in a 24-bit addressing mode.  This is the default for large
+variables (<code>-mtiny=4</code> is the default) but this attribute can
+override <code>-mtiny=</code> for small variables, or override <code>-ml</code>.
+
+     <br><dt><code>far</code><dd>Variables with the <code>far</code> attribute are addressed using a full
+32-bit address.  Since this covers the entire memory space, this
+allows modules to make no assumptions about where variables might be
+stored.
+
+     <br><dt><code>io</code><dt><code>io (</code><var>addr</var><code>)</code><dd>Variables with the <code>io</code> attribute are used to address
+memory-mapped peripherals.  If an address is specified, the variable
+is assigned that address, else it is not assigned an address (it is
+assumed some other module will assign an address).  Example:
+
+     <pre class="example">          int timer_count __attribute__((io(0x123)));
+</pre>
+     <br><dt><code>cb</code><dt><code>cb (</code><var>addr</var><code>)</code><dd>Variables with the <code>cb</code> attribute are used to access the control
+bus, using special instructions.  <code>addr</code> indicates the control bus
+address.  Example:
+
+     <pre class="example">          int cpu_clock __attribute__((cb(0x123)));
+</pre>
+     </dl>
+
+ <p><a name="i386-Variable-Attributes"></a>
+
+<h4 class="subsection">6.36.4 i386 Variable Attributes</h4>
+
+<p>Two attributes are currently defined for i386 configurations:
+<code>ms_struct</code> and <code>gcc_struct</code>
+
+     <dl>
+<dt><code>ms_struct</code><dt><code>gcc_struct</code><dd><a name="index-g_t_0040code_007bms_005fstruct_007d-attribute-2503"></a><a name="index-g_t_0040code_007bgcc_005fstruct_007d-attribute-2504"></a>
+If <code>packed</code> is used on a structure, or if bit-fields are used
+it may be that the Microsoft ABI packs them differently
+than GCC would normally pack them.  Particularly when moving packed
+data between functions compiled with GCC and the native Microsoft compiler
+(either via function call or as data in a file), it may be necessary to access
+either format.
+
+     <p>Currently <samp><span class="option">-m[no-]ms-bitfields</span></samp> is provided for the Microsoft Windows X86
+compilers to match the native Microsoft compiler.
+
+     <p>The Microsoft structure layout algorithm is fairly simple with the exception
+of the bitfield packing:
+
+     <p>The padding and alignment of members of structures and whether a bit field
+can straddle a storage-unit boundary
+
+          <ol type=1 start=1>
+<li>Structure members are stored sequentially in the order in which they are
+declared: the first member has the lowest memory address and the last member
+the highest.
+
+          <li>Every data object has an alignment-requirement. The alignment-requirement
+for all data except structures, unions, and arrays is either the size of the
+object or the current packing size (specified with either the aligned attribute
+or the pack pragma), whichever is less. For structures,  unions, and arrays,
+the alignment-requirement is the largest alignment-requirement of its members. 
+Every object is allocated an offset so that:
+
+          <p>offset %  alignment-requirement == 0
+
+          <li>Adjacent bit fields are packed into the same 1-, 2-, or 4-byte allocation
+unit if the integral types are the same size and if the next bit field fits
+into the current allocation unit without crossing the boundary imposed by the
+common alignment requirements of the bit fields.
+          </ol>
+
+     <p>Handling of zero-length bitfields:
+
+     <p>MSVC interprets zero-length bitfields in the following ways:
+
+          <ol type=1 start=1>
+<li>If a zero-length bitfield is inserted between two bitfields that would
+normally be coalesced, the bitfields will not be coalesced.
+
+          <p>For example:
+
+          <pre class="smallexample">               struct
+                {
+                  unsigned long bf_1 : 12;
+                  unsigned long : 0;
+                  unsigned long bf_2 : 12;
+                } t1;
+</pre>
+          <p>The size of <code>t1</code> would be 8 bytes with the zero-length bitfield.  If the
+zero-length bitfield were removed, <code>t1</code>'s size would be 4 bytes.
+
+          <li>If a zero-length bitfield is inserted after a bitfield, <code>foo</code>, and the
+alignment of the zero-length bitfield is greater than the member that follows it,
+<code>bar</code>, <code>bar</code> will be aligned as the type of the zero-length bitfield.
+
+          <p>For example:
+
+          <pre class="smallexample">               struct
+                {
+                  char foo : 4;
+                  short : 0;
+                  char bar;
+                } t2;
+               
+               struct
+                {
+                  char foo : 4;
+                  short : 0;
+                  double bar;
+                } t3;
+</pre>
+          <p>For <code>t2</code>, <code>bar</code> will be placed at offset 2, rather than offset 1. 
+Accordingly, the size of <code>t2</code> will be 4.  For <code>t3</code>, the zero-length
+bitfield will not affect the alignment of <code>bar</code> or, as a result, the size
+of the structure.
+
+          <p>Taking this into account, it is important to note the following:
+
+               <ol type=1 start=1>
+<li>If a zero-length bitfield follows a normal bitfield, the type of the
+zero-length bitfield may affect the alignment of the structure as whole. For
+example, <code>t2</code> has a size of 4 bytes, since the zero-length bitfield follows a
+normal bitfield, and is of type short.
+
+               <li>Even if a zero-length bitfield is not followed by a normal bitfield, it may
+still affect the alignment of the structure:
+
+               <pre class="smallexample">                    struct
+                     {
+                       char foo : 6;
+                       long : 0;
+                     } t4;
+</pre>
+               <p>Here, <code>t4</code> will take up 4 bytes.
+               </ol>
+
+          <li>Zero-length bitfields following non-bitfield members are ignored:
+
+          <pre class="smallexample">               struct
+                {
+                  char foo;
+                  long : 0;
+                  char bar;
+                } t5;
+</pre>
+          <p>Here, <code>t5</code> will take up 2 bytes.
+          </ol>
+</dl>
+
+<h4 class="subsection">6.36.5 PowerPC Variable Attributes</h4>
+
+<p>Three attributes currently are defined for PowerPC configurations:
+<code>altivec</code>, <code>ms_struct</code> and <code>gcc_struct</code>.
+
+ <p>For full documentation of the struct attributes please see the
+documentation in <a href="i386-Variable-Attributes.html#i386-Variable-Attributes">i386 Variable Attributes</a>.
+
+ <p>For documentation of <code>altivec</code> attribute please see the
+documentation in <a href="PowerPC-Type-Attributes.html#PowerPC-Type-Attributes">PowerPC Type Attributes</a>.
+
+<h4 class="subsection">6.36.6 SPU Variable Attributes</h4>
+
+<p>The SPU supports the <code>spu_vector</code> attribute for variables.  For
+documentation of this attribute please see the documentation in
+<a href="SPU-Type-Attributes.html#SPU-Type-Attributes">SPU Type Attributes</a>.
+
+<h4 class="subsection">6.36.7 Xstormy16 Variable Attributes</h4>
+
+<p>One attribute is currently defined for xstormy16 configurations:
+<code>below100</code>.
+
+     <dl>
+<dt><code>below100</code><dd><a name="index-g_t_0040code_007bbelow100_007d-attribute-2505"></a>
+If a variable has the <code>below100</code> attribute (<code>BELOW100</code> is
+allowed also), GCC will place the variable in the first 0x100 bytes of
+memory and use special opcodes to access it.  Such variables will be
+placed in either the <code>.bss_below100</code> section or the
+<code>.data_below100</code> section.
+
+ </dl>
+
+<h4 class="subsection">6.36.8 AVR Variable Attributes</h4>
+
+     <dl>
+<dt><code>progmem</code><dd><a name="index-g_t_0040code_007bprogmem_007d-variable-attribute-2506"></a>The <code>progmem</code> attribute is used on the AVR to place data in the Program
+Memory address space. The AVR is a Harvard Architecture processor and data
+normally resides in the Data Memory address space. 
+</dl>
+
+ </body></html>
+

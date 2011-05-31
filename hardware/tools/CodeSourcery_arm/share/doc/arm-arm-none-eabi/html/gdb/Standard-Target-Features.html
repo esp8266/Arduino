@@ -1,0 +1,91 @@
+<html lang="en">
+<head>
+<title>Standard Target Features - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Target-Descriptions.html#Target-Descriptions" title="Target Descriptions">
+<link rel="prev" href="Predefined-Target-Types.html#Predefined-Target-Types" title="Predefined Target Types">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Standard-Target-Features"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Predefined-Target-Types.html#Predefined-Target-Types">Predefined Target Types</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Target-Descriptions.html#Target-Descriptions">Target Descriptions</a>
+<hr>
+</div>
+
+<h3 class="section">G.4 Standard Target Features</h3>
+
+<p><a name="index-target-descriptions_002c-standard-features-2553"></a>
+A target description must contain either no registers or all the
+target's registers.  If the description contains no registers, then
+<span class="sc">gdb</span> will assume a default register layout, selected based on
+the architecture.  If the description contains any registers, the
+default layout will not be used; the standard registers must be
+described in the target description, in such a way that <span class="sc">gdb</span>
+can recognize them.
+
+   <p>This is accomplished by giving specific names to feature elements
+which contain standard registers.  <span class="sc">gdb</span> will look for features
+with those names and verify that they contain the expected registers;
+if any known feature is missing required registers, or if any required
+feature is missing, <span class="sc">gdb</span> will reject the target
+description.  You can add additional registers to any of the
+standard features &mdash; <span class="sc">gdb</span> will display them just as if
+they were added to an unrecognized feature.
+
+   <p>This section lists the known features and their expected contents. 
+Sample XML documents for these features are included in the
+<span class="sc">gdb</span> source tree, in the directory <samp><span class="file">gdb/features</span></samp>.
+
+   <p>Names recognized by <span class="sc">gdb</span> should include the name of the
+company or organization which selected the name, and the overall
+architecture to which the feature applies; so e.g. the feature
+containing ARM core registers is named &lsquo;<samp><span class="samp">org.gnu.gdb.arm.core</span></samp>&rsquo;.
+
+   <p>The names of registers are not case sensitive for the purpose
+of recognizing standard features, but <span class="sc">gdb</span> will only display
+registers using the capitalization used in the description.
+
+<ul class="menu">
+<li><a accesskey="1" href="ARM-Features.html#ARM-Features">ARM Features</a>
+<li><a accesskey="2" href="i386-Features.html#i386-Features">i386 Features</a>
+<li><a accesskey="3" href="MIPS-Features.html#MIPS-Features">MIPS Features</a>
+<li><a accesskey="4" href="M68K-Features.html#M68K-Features">M68K Features</a>
+<li><a accesskey="5" href="PowerPC-Features.html#PowerPC-Features">PowerPC Features</a>
+</ul>
+
+   </body></html>
+

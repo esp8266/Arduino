@@ -1,0 +1,194 @@
+<html lang="en">
+<head>
+<title>DJGPP Native - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Native.html#Native" title="Native">
+<link rel="prev" href="SVR4-Process-Information.html#SVR4-Process-Information" title="SVR4 Process Information">
+<link rel="next" href="Cygwin-Native.html#Cygwin-Native" title="Cygwin Native">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="DJGPP-Native"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Cygwin-Native.html#Cygwin-Native">Cygwin Native</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="SVR4-Process-Information.html#SVR4-Process-Information">SVR4 Process Information</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Native.html#Native">Native</a>
+<hr>
+</div>
+
+<h4 class="subsection">21.1.4 Features for Debugging <span class="sc">djgpp</span> Programs</h4>
+
+<p><a name="index-g_t_0040sc_007bdjgpp_007d-debugging-1171"></a><a name="index-native-_0040sc_007bdjgpp_007d-debugging-1172"></a><a name="index-MS_002dDOS_002dspecific-commands-1173"></a>
+<a name="index-DPMI-1174"></a><span class="sc">djgpp</span> is a port of the <span class="sc">gnu</span> development tools to MS-DOS and
+MS-Windows.  <span class="sc">djgpp</span> programs are 32-bit protected-mode programs
+that use the <dfn>DPMI</dfn> (DOS Protected-Mode Interface) API to run on
+top of real-mode DOS systems and their emulations.
+
+   <p><span class="sc">gdb</span> supports native debugging of <span class="sc">djgpp</span> programs, and
+defines a few commands specific to the <span class="sc">djgpp</span> port.  This
+subsection describes those commands.
+
+     
+<a name="index-info-dos-1175"></a>
+<dl><dt><code>info dos</code><dd>This is a prefix of <span class="sc">djgpp</span>-specific commands which print
+information about the target system and important OS structures.
+
+     <p><a name="index-sysinfo-1176"></a><a name="index-MS_002dDOS-system-info-1177"></a><a name="index-free-memory-information-_0028MS_002dDOS_0029-1178"></a><br><dt><code>info dos sysinfo</code><dd>This command displays assorted information about the underlying
+platform: the CPU type and features, the OS version and flavor, the
+DPMI version, and the available conventional and DPMI memory.
+
+     <p><a name="index-GDT-1179"></a><a name="index-LDT-1180"></a><a name="index-IDT-1181"></a><a name="index-segment-descriptor-tables-1182"></a><a name="index-descriptor-tables-display-1183"></a><br><dt><code>info dos gdt</code><dt><code>info dos ldt</code><dt><code>info dos idt</code><dd>These 3 commands display entries from, respectively, Global, Local,
+and Interrupt Descriptor Tables (GDT, LDT, and IDT).  The descriptor
+tables are data structures which store a descriptor for each segment
+that is currently in use.  The segment's selector is an index into a
+descriptor table; the table entry for that index holds the
+descriptor's base address and limit, and its attributes and access
+rights.
+
+     <p>A typical <span class="sc">djgpp</span> program uses 3 segments: a code segment, a data
+segment (used for both data and the stack), and a DOS segment (which
+allows access to DOS/BIOS data structures and absolute addresses in
+conventional memory).  However, the DPMI host will usually define
+additional segments in order to support the DPMI environment.
+
+     <p><a name="index-garbled-pointers-1184"></a>These commands allow to display entries from the descriptor tables. 
+Without an argument, all entries from the specified table are
+displayed.  An argument, which should be an integer expression, means
+display a single entry whose index is given by the argument.  For
+example, here's a convenient way to display information about the
+debugged program's data segment:
+
+     <pre class="smallexample">     <br><code>(gdb) info dos ldt $ds</code><br>
+     <br><code>0x13f: base=0x11970000 limit=0x0009ffff 32-Bit Data (Read/Write, Exp-up)</code><br>
+</pre>
+     <p class="noindent">This comes in handy when you want to see whether a pointer is outside
+the data segment's limit (i.e. <dfn>garbled</dfn>).
+
+     <p><a name="index-page-tables-display-_0028MS_002dDOS_0029-1185"></a><br><dt><code>info dos pde</code><dt><code>info dos pte</code><dd>These two commands display entries from, respectively, the Page
+Directory and the Page Tables.  Page Directories and Page Tables are
+data structures which control how virtual memory addresses are mapped
+into physical addresses.  A Page Table includes an entry for every
+page of memory that is mapped into the program's address space; there
+may be several Page Tables, each one holding up to 4096 entries.  A
+Page Directory has up to 4096 entries, one each for every Page Table
+that is currently in use.
+
+     <p>Without an argument, <kbd>info dos pde</kbd> displays the entire Page
+Directory, and <kbd>info dos pte</kbd> displays all the entries in all of
+the Page Tables.  An argument, an integer expression, given to the
+<kbd>info dos pde</kbd> command means display only that entry from the Page
+Directory table.  An argument given to the <kbd>info dos pte</kbd> command
+means display entries from a single Page Table, the one pointed to by
+the specified entry in the Page Directory.
+
+     <p><a name="index-direct-memory-access-_0028DMA_0029-on-MS_002dDOS-1186"></a>These commands are useful when your program uses <dfn>DMA</dfn> (Direct
+Memory Access), which needs physical addresses to program the DMA
+controller.
+
+     <p>These commands are supported only with some DPMI servers.
+
+     <p><a name="index-physical-address-from-linear-address-1187"></a><br><dt><code>info dos address-pte </code><var>addr</var><dd>This command displays the Page Table entry for a specified linear
+address.  The argument <var>addr</var> is a linear address which should
+already have the appropriate segment's base address added to it,
+because this command accepts addresses which may belong to <em>any</em>
+segment.  For example, here's how to display the Page Table entry for
+the page where a variable <code>i</code> is stored:
+
+     <pre class="smallexample">     <br><code>(gdb) info dos address-pte __djgpp_base_address + (char *)&amp;i</code><br>
+     <br><code>Page Table entry for address 0x11a00d30:</code><br>
+     <br><code>Base=0x02698000 Dirty Acc. Not-Cached Write-Back Usr Read-Write +0xd30</code><br>
+</pre>
+     <p class="noindent">This says that <code>i</code> is stored at offset <code>0xd30</code> from the page
+whose physical base address is <code>0x02698000</code>, and shows all the
+attributes of that page.
+
+     <p>Note that you must cast the addresses of variables to a <code>char *</code>,
+since otherwise the value of <code>__djgpp_base_address</code>, the base
+address of all variables and functions in a <span class="sc">djgpp</span> program, will
+be added using the rules of C pointer arithmetics: if <code>i</code> is
+declared an <code>int</code>, <span class="sc">gdb</span> will add 4 times the value of
+<code>__djgpp_base_address</code> to the address of <code>i</code>.
+
+     <p>Here's another example, it displays the Page Table entry for the
+transfer buffer:
+
+     <pre class="smallexample">     <br><code>(gdb) info dos address-pte *((unsigned *)&amp;_go32_info_block + 3)</code><br>
+     <br><code>Page Table entry for address 0x29110:</code><br>
+     <br><code>Base=0x00029000 Dirty Acc. Not-Cached Write-Back Usr Read-Write +0x110</code><br>
+</pre>
+     <p class="noindent">(The <code>+ 3</code> offset is because the transfer buffer's address is the
+3rd member of the <code>_go32_info_block</code> structure.)  The output
+clearly shows that this DPMI server maps the addresses in conventional
+memory 1:1, i.e. the physical (<code>0x00029000</code> + <code>0x110</code>) and
+linear (<code>0x29110</code>) addresses are identical.
+
+     <p>This command is supported only with some DPMI servers. 
+</dl>
+
+   <p><a name="index-DOS-serial-data-link_002c-remote-debugging-1188"></a>In addition to native debugging, the DJGPP port supports remote
+debugging via a serial data link.  The following commands are specific
+to remote serial debugging in the DJGPP port of <span class="sc">gdb</span>.
+
+     
+<a name="index-set-com1base-1189"></a>
+<a name="index-set-com1irq-1190"></a>
+<a name="index-set-com2base-1191"></a>
+<a name="index-set-com2irq-1192"></a>
+<a name="index-set-com3base-1193"></a>
+<a name="index-set-com3irq-1194"></a>
+<a name="index-set-com4base-1195"></a>
+<a name="index-set-com4irq-1196"></a>
+<dl><dt><code>set com1base </code><var>addr</var><dd>This command sets the base I/O port address of the <samp><span class="file">COM1</span></samp> serial
+port.
+
+     <br><dt><code>set com1irq </code><var>irq</var><dd>This command sets the <dfn>Interrupt Request</dfn> (<code>IRQ</code>) line to use
+for the <samp><span class="file">COM1</span></samp> serial port.
+
+     <p>There are similar commands &lsquo;<samp><span class="samp">set com2base</span></samp>&rsquo;, &lsquo;<samp><span class="samp">set com3irq</span></samp>&rsquo;,
+etc. for setting the port address and the <code>IRQ</code> lines for the
+other 3 COM ports.
+
+     <p><a name="index-show-com1base-1197"></a><a name="index-show-com1irq-1198"></a><a name="index-show-com2base-1199"></a><a name="index-show-com2irq-1200"></a><a name="index-show-com3base-1201"></a><a name="index-show-com3irq-1202"></a><a name="index-show-com4base-1203"></a><a name="index-show-com4irq-1204"></a>The related commands &lsquo;<samp><span class="samp">show com1base</span></samp>&rsquo;, &lsquo;<samp><span class="samp">show com1irq</span></samp>&rsquo; etc. 
+display the current settings of the base address and the <code>IRQ</code>
+lines used by the COM ports.
+
+     <br><dt><code>info serial</code><dd><a name="index-info-serial-1205"></a><a name="index-DOS-serial-port-status-1206"></a>This command prints the status of the 4 DOS serial ports.  For each
+port, it prints whether it's active or not, its I/O base address and
+IRQ number, whether it uses a 16550-style FIFO, its baudrate, and the
+counts of various errors encountered so far. 
+</dl>
+
+   </body></html>
+

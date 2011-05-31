@@ -1,0 +1,139 @@
+<html lang="en">
+<head>
+<title>MIPS - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Architectures.html#Architectures" title="Architectures">
+<link rel="prev" href="Alpha.html#Alpha" title="Alpha">
+<link rel="next" href="HPPA.html#HPPA" title="HPPA">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="MIPS"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="HPPA.html#HPPA">HPPA</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Alpha.html#Alpha">Alpha</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Architectures.html#Architectures">Architectures</a>
+<hr>
+</div>
+
+<h4 class="subsection">21.4.4 MIPS</h4>
+
+<p><a name="index-stack-on-Alpha-1401"></a><a name="index-stack-on-MIPS-1402"></a><a name="index-Alpha-stack-1403"></a><a name="index-MIPS-stack-1404"></a>Alpha- and MIPS-based computers use an unusual stack frame, which
+sometimes requires <span class="sc">gdb</span> to search backward in the object code to
+find the beginning of a function.
+
+   <p><a name="index-response-time_002c-MIPS-debugging-1405"></a>To improve response time (especially for embedded applications, where
+<span class="sc">gdb</span> may be restricted to a slow serial line for this search)
+you may want to limit the size of this search, using one of these
+commands:
+
+     
+<a name="index-g_t_0040code_007bheuristic_002dfence_002dpost_007d-_0028Alpha_002c-MIPS_0029-1406"></a>
+<dl><dt><code>set heuristic-fence-post </code><var>limit</var><dd>Restrict <span class="sc">gdb</span> to examining at most <var>limit</var> bytes in its
+search for the beginning of a function.  A value of <var>0</var> (the
+default) means there is no limit.  However, except for <var>0</var>, the
+larger the limit the more bytes <code>heuristic-fence-post</code> must search
+and therefore the longer it takes to run.  You should only need to use
+this command when debugging a stripped executable.
+
+     <br><dt><code>show heuristic-fence-post</code><dd>Display the current limit. 
+</dl>
+
+<p class="noindent">These commands are available <em>only</em> when <span class="sc">gdb</span> is configured
+for debugging programs on Alpha or MIPS processors.
+
+   <p>Several MIPS-specific commands are available when debugging MIPS
+programs:
+
+     <dl>
+<dt><code>set mips abi </code><var>arg</var><dd><a name="index-set-mips-abi-1407"></a><a name="index-set-ABI-for-MIPS-1408"></a>Tell <span class="sc">gdb</span> which MIPS ABI is used by the inferior.  Possible
+values of <var>arg</var> are:
+
+          <dl>
+<dt>&lsquo;<samp><span class="samp">auto</span></samp>&rsquo;<dd>The default ABI associated with the current binary (this is the
+default). 
+<br><dt>&lsquo;<samp><span class="samp">o32</span></samp>&rsquo;<br><dt>&lsquo;<samp><span class="samp">o64</span></samp>&rsquo;<br><dt>&lsquo;<samp><span class="samp">n32</span></samp>&rsquo;<br><dt>&lsquo;<samp><span class="samp">n64</span></samp>&rsquo;<br><dt>&lsquo;<samp><span class="samp">eabi32</span></samp>&rsquo;<br><dt>&lsquo;<samp><span class="samp">eabi64</span></samp>&rsquo;<dd></dl>
+
+     <br><dt><code>show mips abi</code><dd><a name="index-show-mips-abi-1409"></a>Show the MIPS ABI used by <span class="sc">gdb</span> to debug the inferior.
+
+     <br><dt><code>set mips compression </code><var>arg</var><dd><a name="index-set-mips-compression-1410"></a><a name="index-MIPS-code-compression-1411"></a>Tell <span class="sc">gdb</span> which MIPS compressed ISA encoding is used by the
+inferior.  <span class="sc">gdb</span> uses this for code disassembly and other
+internal interpretation purposes.  This setting is only referred to
+when no executable has been associated with the debugging session or
+the executable does not provide information about the encoding it uses. 
+Otherwise this setting is automatically updated from information
+provided by the executable.
+
+     <p>Possible values of <var>arg</var> are &lsquo;<samp><span class="samp">mips16</span></samp>&rsquo; and &lsquo;<samp><span class="samp">micromips</span></samp>&rsquo;. 
+The default compressed ISA encoding is &lsquo;<samp><span class="samp">mips16</span></samp>&rsquo;, as executables
+containing MIPS16 code frequently are not identified as such.
+
+     <p>This setting is &ldquo;sticky&rdquo;; that is, it retains its value across
+debugging sessions until reset either explicitly with this command or
+implicitly from an executable.
+
+     <p>The compiler and/or assembler typically add symbol table annotations to
+identify functions compiled for the MIPS16 or microMIPS ISAs.  If these
+function-scope annotations are present, <span class="sc">gdb</span> uses them in
+preference to the global compressed ISA encoding setting.
+
+     <br><dt><code>show mips compression</code><dd><a name="index-show-mips-compression-1412"></a>Show the MIPS compressed ISA encoding used by <span class="sc">gdb</span> to debug the
+inferior.
+
+     <br><dt><code>set mipsfpu</code><dt><code>show mipsfpu</code><dd>See <a href="MIPS-Embedded.html#MIPS-Embedded">set mipsfpu</a>.
+
+     <br><dt><code>set mips mask-address </code><var>arg</var><dd><a name="index-set-mips-mask_002daddress-1413"></a><a name="index-MIPS-addresses_002c-masking-1414"></a>This command determines whether the most-significant 32 bits of 64-bit
+MIPS addresses are masked off.  The argument <var>arg</var> can be
+&lsquo;<samp><span class="samp">on</span></samp>&rsquo;, &lsquo;<samp><span class="samp">off</span></samp>&rsquo;, or &lsquo;<samp><span class="samp">auto</span></samp>&rsquo;.  The latter is the default
+setting, which lets <span class="sc">gdb</span> determine the correct value.
+
+     <br><dt><code>show mips mask-address</code><dd><a name="index-show-mips-mask_002daddress-1415"></a>Show whether the upper 32 bits of MIPS addresses are masked off or
+not.
+
+     <br><dt><code>set remote-mips64-transfers-32bit-regs</code><dd><a name="index-set-remote_002dmips64_002dtransfers_002d32bit_002dregs-1416"></a>This command controls compatibility with 64-bit MIPS targets that
+transfer data in 32-bit quantities.  If you have an old MIPS 64 target
+that transfers 32 bits for some registers, like <span class="sc">sr</span> and <span class="sc">fsr</span>,
+and 64 bits for other registers, set this option to &lsquo;<samp><span class="samp">on</span></samp>&rsquo;.
+
+     <br><dt><code>show remote-mips64-transfers-32bit-regs</code><dd><a name="index-show-remote_002dmips64_002dtransfers_002d32bit_002dregs-1417"></a>Show the current setting of compatibility with older MIPS 64 targets.
+
+     <br><dt><code>set debug mips</code><dd><a name="index-set-debug-mips-1418"></a>This command turns on and off debugging messages for the MIPS-specific
+target code in <span class="sc">gdb</span>.
+
+     <br><dt><code>show debug mips</code><dd><a name="index-show-debug-mips-1419"></a>Show the current setting of MIPS debugging messages. 
+</dl>
+
+   </body></html>
+

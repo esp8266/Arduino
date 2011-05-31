@@ -1,0 +1,74 @@
+<html lang="en">
+<head>
+<title>SH64-Regs - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="SH64-Syntax.html#SH64-Syntax" title="SH64 Syntax">
+<link rel="prev" href="SH64_002dChars.html#SH64_002dChars" title="SH64-Chars">
+<link rel="next" href="SH64_002dAddressing.html#SH64_002dAddressing" title="SH64-Addressing">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="SH64-Regs"></a>
+<a name="SH64_002dRegs"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="SH64_002dAddressing.html#SH64_002dAddressing">SH64-Addressing</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="SH64_002dChars.html#SH64_002dChars">SH64-Chars</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="SH64-Syntax.html#SH64-Syntax">SH64 Syntax</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">9.34.2.2 Register Names</h5>
+
+<p><a name="index-SH64-registers-1610"></a><a name="index-registers_002c-SH64-1611"></a>You can use the predefined symbols &lsquo;<samp><span class="samp">r0</span></samp>&rsquo; through &lsquo;<samp><span class="samp">r63</span></samp>&rsquo; to refer
+to the SH64 general registers, &lsquo;<samp><span class="samp">cr0</span></samp>&rsquo; through <code>cr63</code> for
+control registers, &lsquo;<samp><span class="samp">tr0</span></samp>&rsquo; through &lsquo;<samp><span class="samp">tr7</span></samp>&rsquo; for target address
+registers, &lsquo;<samp><span class="samp">fr0</span></samp>&rsquo; through &lsquo;<samp><span class="samp">fr63</span></samp>&rsquo; for single-precision floating
+point registers, &lsquo;<samp><span class="samp">dr0</span></samp>&rsquo; through &lsquo;<samp><span class="samp">dr62</span></samp>&rsquo; (even numbered registers
+only) for double-precision floating point registers, &lsquo;<samp><span class="samp">fv0</span></samp>&rsquo; through
+&lsquo;<samp><span class="samp">fv60</span></samp>&rsquo; (multiples of four only) for single-precision floating point
+vectors, &lsquo;<samp><span class="samp">fp0</span></samp>&rsquo; through &lsquo;<samp><span class="samp">fp62</span></samp>&rsquo; (even numbered registers only)
+for single-precision floating point pairs, &lsquo;<samp><span class="samp">mtrx0</span></samp>&rsquo; through
+&lsquo;<samp><span class="samp">mtrx48</span></samp>&rsquo; (multiples of 16 only) for 4x4 matrices of
+single-precision floating point registers, &lsquo;<samp><span class="samp">pc</span></samp>&rsquo; for the program
+counter, and &lsquo;<samp><span class="samp">fpscr</span></samp>&rsquo; for the floating point status and control
+register.
+
+   <p>You can also refer to the control registers by the mnemonics &lsquo;<samp><span class="samp">sr</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">ssr</span></samp>&rsquo;, &lsquo;<samp><span class="samp">pssr</span></samp>&rsquo;, &lsquo;<samp><span class="samp">intevt</span></samp>&rsquo;, &lsquo;<samp><span class="samp">expevt</span></samp>&rsquo;, &lsquo;<samp><span class="samp">pexpevt</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">tra</span></samp>&rsquo;, &lsquo;<samp><span class="samp">spc</span></samp>&rsquo;, &lsquo;<samp><span class="samp">pspc</span></samp>&rsquo;, &lsquo;<samp><span class="samp">resvec</span></samp>&rsquo;, &lsquo;<samp><span class="samp">vbr</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">tea</span></samp>&rsquo;, &lsquo;<samp><span class="samp">dcr</span></samp>&rsquo;, &lsquo;<samp><span class="samp">kcr0</span></samp>&rsquo;, &lsquo;<samp><span class="samp">kcr1</span></samp>&rsquo;, &lsquo;<samp><span class="samp">ctc</span></samp>&rsquo;, and
+&lsquo;<samp><span class="samp">usr</span></samp>&rsquo;.
+
+   </body></html>
+

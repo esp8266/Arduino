@@ -1,0 +1,126 @@
+<html lang="en">
+<head>
+<title>File Commands - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Simple-Commands.html#Simple-Commands" title="Simple Commands">
+<link rel="prev" href="Entry-Point.html#Entry-Point" title="Entry Point">
+<link rel="next" href="Format-Commands.html#Format-Commands" title="Format Commands">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="File-Commands"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Format-Commands.html#Format-Commands">Format Commands</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Entry-Point.html#Entry-Point">Entry Point</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Simple-Commands.html#Simple-Commands">Simple Commands</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.4.2 Commands Dealing with Files</h4>
+
+<p><a name="index-linker-script-file-commands-346"></a>Several linker script commands deal with files.
+
+     <dl>
+<dt><code>INCLUDE </code><var>filename</var><dd><a name="index-INCLUDE-_0040var_007bfilename_007d-347"></a><a name="index-including-a-linker-script-348"></a>Include the linker script <var>filename</var> at this point.  The file will
+be searched for in the current directory, and in any directory specified
+with the <samp><span class="option">-L</span></samp> option.  You can nest calls to <code>INCLUDE</code> up to
+10 levels deep.
+
+     <p>You can place <code>INCLUDE</code> directives at the top level, in <code>MEMORY</code> or
+<code>SECTIONS</code> commands, or in output section descriptions.
+
+     <br><dt><code>INPUT(</code><var>file</var><code>, </code><var>file</var><code>, ...)</code><dt><code>INPUT(</code><var>file</var> <var>file</var><code> ...)</code><dd><a name="index-INPUT_0028_0040var_007bfiles_007d_0029-349"></a><a name="index-input-files-in-linker-scripts-350"></a><a name="index-input-object-files-in-linker-scripts-351"></a><a name="index-linker-script-input-object-files-352"></a>The <code>INPUT</code> command directs the linker to include the named files
+in the link, as though they were named on the command line.
+
+     <p>For example, if you always want to include <samp><span class="file">subr.o</span></samp> any time you do
+a link, but you can't be bothered to put it on every link command line,
+then you can put &lsquo;<samp><span class="samp">INPUT (subr.o)</span></samp>&rsquo; in your linker script.
+
+     <p>In fact, if you like, you can list all of your input files in the linker
+script, and then invoke the linker with nothing but a &lsquo;<samp><span class="samp">-T</span></samp>&rsquo; option.
+
+     <p>In case a <dfn>sysroot prefix</dfn> is configured, and the filename starts
+with the &lsquo;<samp><span class="samp">/</span></samp>&rsquo; character, and the script being processed was
+located inside the <dfn>sysroot prefix</dfn>, the filename will be looked
+for in the <dfn>sysroot prefix</dfn>.  Otherwise, the linker will try to
+open the file in the current directory.  If it is not found, the
+linker will search through the archive library search path.  See the
+description of &lsquo;<samp><span class="samp">-L</span></samp>&rsquo; in <a href="Options.html#Options">Command Line Options</a>.
+
+     <p>If you use &lsquo;<samp><span class="samp">INPUT (-l</span><var>file</var><span class="samp">)</span></samp>&rsquo;, <samp><span class="command">ld</span></samp> will transform the
+name to <code>lib</code><var>file</var><code>.a</code>, as with the command line argument
+&lsquo;<samp><span class="samp">-l</span></samp>&rsquo;.
+
+     <p>When you use the <code>INPUT</code> command in an implicit linker script, the
+files will be included in the link at the point at which the linker
+script file is included.  This can affect archive searching.
+
+     <br><dt><code>GROUP(</code><var>file</var><code>, </code><var>file</var><code>, ...)</code><dt><code>GROUP(</code><var>file</var> <var>file</var><code> ...)</code><dd><a name="index-GROUP_0028_0040var_007bfiles_007d_0029-353"></a><a name="index-grouping-input-files-354"></a>The <code>GROUP</code> command is like <code>INPUT</code>, except that the named
+files should all be archives, and they are searched repeatedly until no
+new undefined references are created.  See the description of &lsquo;<samp><span class="samp">-(</span></samp>&rsquo;
+in <a href="Options.html#Options">Command Line Options</a>.
+
+     <br><dt><code>AS_NEEDED(</code><var>file</var><code>, </code><var>file</var><code>, ...)</code><dt><code>AS_NEEDED(</code><var>file</var> <var>file</var><code> ...)</code><dd><a name="index-AS_005fNEEDED_0028_0040var_007bfiles_007d_0029-355"></a>This construct can appear only inside of the <code>INPUT</code> or <code>GROUP</code>
+commands, among other filenames.  The files listed will be handled
+as if they appear directly in the <code>INPUT</code> or <code>GROUP</code> commands,
+with the exception of ELF shared libraries, that will be added only
+when they are actually needed.  This construct essentially enables
+<samp><span class="option">--as-needed</span></samp> option for all the files listed inside of it
+and restores previous <samp><span class="option">--as-needed</span></samp> resp. <samp><span class="option">--no-as-needed</span></samp>
+setting afterwards.
+
+     <br><dt><code>OUTPUT(</code><var>filename</var><code>)</code><dd><a name="index-OUTPUT_0028_0040var_007bfilename_007d_0029-356"></a><a name="index-output-file-name-in-linker-script-357"></a>The <code>OUTPUT</code> command names the output file.  Using
+<code>OUTPUT(</code><var>filename</var><code>)</code> in the linker script is exactly like using
+&lsquo;<samp><span class="samp">-o </span><var>filename</var></samp>&rsquo; on the command line (see <a href="Options.html#Options">Command Line Options</a>).  If both are used, the command line option takes
+precedence.
+
+     <p>You can use the <code>OUTPUT</code> command to define a default name for the
+output file other than the usual default of <samp><span class="file">a.out</span></samp>.
+
+     <br><dt><code>SEARCH_DIR(</code><var>path</var><code>)</code><dd><a name="index-SEARCH_005fDIR_0028_0040var_007bpath_007d_0029-358"></a><a name="index-library-search-path-in-linker-script-359"></a><a name="index-archive-search-path-in-linker-script-360"></a><a name="index-search-path-in-linker-script-361"></a>The <code>SEARCH_DIR</code> command adds <var>path</var> to the list of paths where
+<samp><span class="command">ld</span></samp> looks for archive libraries.  Using
+<code>SEARCH_DIR(</code><var>path</var><code>)</code> is exactly like using &lsquo;<samp><span class="samp">-L </span><var>path</var></samp>&rsquo;
+on the command line (see <a href="Options.html#Options">Command Line Options</a>).  If both
+are used, then the linker will search both paths.  Paths specified using
+the command line option are searched first.
+
+     <br><dt><code>STARTUP(</code><var>filename</var><code>)</code><dd><a name="index-STARTUP_0028_0040var_007bfilename_007d_0029-362"></a><a name="index-first-input-file-363"></a>The <code>STARTUP</code> command is just like the <code>INPUT</code> command, except
+that <var>filename</var> will become the first input file to be linked, as
+though it were specified first on the command line.  This may be useful
+when using a system in which the entry point is always the start of the
+first file. 
+</dl>
+
+   </body></html>
+

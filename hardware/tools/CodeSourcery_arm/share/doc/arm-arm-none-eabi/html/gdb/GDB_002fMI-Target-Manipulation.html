@@ -1,0 +1,256 @@
+<html lang="en">
+<head>
+<title>GDB/MI Target Manipulation - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="GDB_002fMI.html#GDB_002fMI" title="GDB/MI">
+<link rel="prev" href="GDB_002fMI-File-Commands.html#GDB_002fMI-File-Commands" title="GDB/MI File Commands">
+<link rel="next" href="GDB_002fMI-File-Transfer-Commands.html#GDB_002fMI-File-Transfer-Commands" title="GDB/MI File Transfer Commands">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="GDB%2fMI-Target-Manipulation"></a>
+<a name="GDB_002fMI-Target-Manipulation"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="GDB_002fMI-File-Transfer-Commands.html#GDB_002fMI-File-Transfer-Commands">GDB/MI File Transfer Commands</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="GDB_002fMI-File-Commands.html#GDB_002fMI-File-Commands">GDB/MI File Commands</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="GDB_002fMI.html#GDB_002fMI">GDB/MI</a>
+<hr>
+</div>
+
+<h3 class="section">27.18 <span class="sc">gdb/mi</span> Target Manipulation Commands</h3>
+
+<h4 class="subheading">The <code>-target-attach</code> Command</h4>
+
+<p><a name="index-g_t_002dtarget_002dattach-2111"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -target-attach <var>pid</var> | <var>gid</var> | <var>file</var>
+</pre>
+   <p>Attach to a process <var>pid</var> or a file <var>file</var> outside of
+<span class="sc">gdb</span>, or a thread group <var>gid</var>.  If attaching to a thread
+group, the id previously returned by
+&lsquo;<samp><span class="samp">-list-thread-groups --available</span></samp>&rsquo; must be used.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">attach</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -target-attach 34
+     =thread-created,id="1"
+     *stopped,thread-id="1",frame={addr="0xb7f7e410",func="bar",args=[]}
+     ^done
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-target-detach</code> Command</h4>
+
+<p><a name="index-g_t_002dtarget_002ddetach-2112"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -target-detach [ <var>pid</var> | <var>gid</var> ]
+</pre>
+   <p>Detach from the remote target which normally resumes its execution. 
+If either <var>pid</var> or <var>gid</var> is specified, detaches from either
+the specified process, or specified thread group.  There's no output.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">detach</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -target-detach
+     ^done
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-target-disconnect</code> Command</h4>
+
+<p><a name="index-g_t_002dtarget_002ddisconnect-2113"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -target-disconnect
+</pre>
+   <p>Disconnect from the remote target.  There's no output and the target is
+generally not resumed.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">disconnect</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -target-disconnect
+     ^done
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-target-download</code> Command</h4>
+
+<p><a name="index-g_t_002dtarget_002ddownload-2114"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -target-download
+</pre>
+   <p>Loads the executable onto the remote target. 
+It prints out an update message every half second, which includes the fields:
+
+     <dl>
+<dt>&lsquo;<samp><span class="samp">section</span></samp>&rsquo;<dd>The name of the section. 
+<br><dt>&lsquo;<samp><span class="samp">section-sent</span></samp>&rsquo;<dd>The size of what has been sent so far for that section. 
+<br><dt>&lsquo;<samp><span class="samp">section-size</span></samp>&rsquo;<dd>The size of the section. 
+<br><dt>&lsquo;<samp><span class="samp">total-sent</span></samp>&rsquo;<dd>The total size of what was sent so far (the current and the previous sections). 
+<br><dt>&lsquo;<samp><span class="samp">total-size</span></samp>&rsquo;<dd>The size of the overall executable to download. 
+</dl>
+
+<p class="noindent">Each message is sent as status record (see <a href="GDB_002fMI-Output-Syntax.html#GDB_002fMI-Output-Syntax"><span class="sc">gdb/mi</span> Output Syntax</a>).
+
+   <p>In addition, it prints the name and size of the sections, as they are
+downloaded.  These messages include the following fields:
+
+     <dl>
+<dt>&lsquo;<samp><span class="samp">section</span></samp>&rsquo;<dd>The name of the section. 
+<br><dt>&lsquo;<samp><span class="samp">section-size</span></samp>&rsquo;<dd>The size of the section. 
+<br><dt>&lsquo;<samp><span class="samp">total-size</span></samp>&rsquo;<dd>The size of the overall executable to download. 
+</dl>
+
+<p class="noindent">At the end, a summary is printed.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">load</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<p>Note: each status message appears on a single line.  Here the messages
+have been broken down so that they can fit onto a page.
+
+<pre class="smallexample">     (gdb)
+     -target-download
+     +download,{section=".text",section-size="6668",total-size="9880"}
+     +download,{section=".text",section-sent="512",section-size="6668",
+     total-sent="512",total-size="9880"}
+     +download,{section=".text",section-sent="1024",section-size="6668",
+     total-sent="1024",total-size="9880"}
+     +download,{section=".text",section-sent="1536",section-size="6668",
+     total-sent="1536",total-size="9880"}
+     +download,{section=".text",section-sent="2048",section-size="6668",
+     total-sent="2048",total-size="9880"}
+     +download,{section=".text",section-sent="2560",section-size="6668",
+     total-sent="2560",total-size="9880"}
+     +download,{section=".text",section-sent="3072",section-size="6668",
+     total-sent="3072",total-size="9880"}
+     +download,{section=".text",section-sent="3584",section-size="6668",
+     total-sent="3584",total-size="9880"}
+     +download,{section=".text",section-sent="4096",section-size="6668",
+     total-sent="4096",total-size="9880"}
+     +download,{section=".text",section-sent="4608",section-size="6668",
+     total-sent="4608",total-size="9880"}
+     +download,{section=".text",section-sent="5120",section-size="6668",
+     total-sent="5120",total-size="9880"}
+     +download,{section=".text",section-sent="5632",section-size="6668",
+     total-sent="5632",total-size="9880"}
+     +download,{section=".text",section-sent="6144",section-size="6668",
+     total-sent="6144",total-size="9880"}
+     +download,{section=".text",section-sent="6656",section-size="6668",
+     total-sent="6656",total-size="9880"}
+     +download,{section=".init",section-size="28",total-size="9880"}
+     +download,{section=".fini",section-size="28",total-size="9880"}
+     +download,{section=".data",section-size="3156",total-size="9880"}
+     +download,{section=".data",section-sent="512",section-size="3156",
+     total-sent="7236",total-size="9880"}
+     +download,{section=".data",section-sent="1024",section-size="3156",
+     total-sent="7748",total-size="9880"}
+     +download,{section=".data",section-sent="1536",section-size="3156",
+     total-sent="8260",total-size="9880"}
+     +download,{section=".data",section-sent="2048",section-size="3156",
+     total-sent="8772",total-size="9880"}
+     +download,{section=".data",section-sent="2560",section-size="3156",
+     total-sent="9284",total-size="9880"}
+     +download,{section=".data",section-sent="3072",section-size="3156",
+     total-sent="9796",total-size="9880"}
+     ^done,address="0x10004",load-size="9880",transfer-rate="6586",
+     write-rate="429"
+     (gdb)
+</pre>
+   <h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>No equivalent.
+
+<h5 class="subsubheading">Example</h5>
+
+<p>N.A.
+
+<h4 class="subheading">The <code>-target-select</code> Command</h4>
+
+<p><a name="index-g_t_002dtarget_002dselect-2115"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -target-select <var>type</var> <var>parameters <small class="dots">...</small></var>
+</pre>
+   <p>Connect <span class="sc">gdb</span> to the remote target.  This command takes two args:
+
+     <dl>
+<dt>&lsquo;<samp><var>type</var></samp>&rsquo;<dd>The type of target, for instance &lsquo;<samp><span class="samp">remote</span></samp>&rsquo;, etc. 
+<br><dt>&lsquo;<samp><var>parameters</var></samp>&rsquo;<dd>Device names, host names and the like.  See <a href="Target-Commands.html#Target-Commands">Commands for Managing Targets</a>, for more details. 
+</dl>
+
+   <p>The output is a connection notification, followed by the address at
+which the target program is, in the following form:
+
+<pre class="smallexample">     ^connected,addr="<var>address</var>",func="<var>function name</var>",
+       args=[<var>arg list</var>]
+</pre>
+   <h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">target</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -target-select remote /dev/ttya
+     ^connected,addr="0xfe00a300",func="??",args=[]
+     (gdb)
+</pre>
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%% SECTION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+   </body></html>
+

@@ -1,0 +1,368 @@
+<html lang="en">
+<head>
+<title>Print Settings - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Data.html#Data" title="Data">
+<link rel="prev" href="Auto-Display.html#Auto-Display" title="Auto Display">
+<link rel="next" href="Pretty-Printing.html#Pretty-Printing" title="Pretty Printing">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Print-Settings"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Pretty-Printing.html#Pretty-Printing">Pretty Printing</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Auto-Display.html#Auto-Display">Auto Display</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Data.html#Data">Data</a>
+<hr>
+</div>
+
+<h3 class="section">10.8 Print Settings</h3>
+
+<p><a name="index-format-options-539"></a><a name="index-print-settings-540"></a><span class="sc">gdb</span> provides the following ways to control how arrays, structures,
+and symbols are printed.
+
+<p class="noindent">These settings are useful for debugging programs in any language:
+
+     
+<a name="index-set-print-541"></a>
+<dl><dt><code>set print address</code><dt><code>set print address on</code><dd><a name="index-print_002fdon_0027t-print-memory-addresses-542"></a><span class="sc">gdb</span> prints memory addresses showing the location of stack
+traces, structure values, pointer values, breakpoints, and so forth,
+even when it also displays the contents of those addresses.  The default
+is <code>on</code>.  For example, this is what a stack frame display looks like with
+<code>set print address on</code>:
+
+     <pre class="smallexample">          (gdb) f
+          #0  set_quotes (lq=0x34c78 "&lt;&lt;", rq=0x34c88 "&gt;&gt;")
+              at input.c:530
+          530         if (lquote != def_lquote)
+</pre>
+     <br><dt><code>set print address off</code><dd>Do not print addresses when displaying their contents.  For example,
+this is the same stack frame displayed with <code>set print address off</code>:
+
+     <pre class="smallexample">          (gdb) set print addr off
+          (gdb) f
+          #0  set_quotes (lq="&lt;&lt;", rq="&gt;&gt;") at input.c:530
+          530         if (lquote != def_lquote)
+</pre>
+     <p>You can use &lsquo;<samp><span class="samp">set print address off</span></samp>&rsquo; to eliminate all machine
+dependent displays from the <span class="sc">gdb</span> interface.  For example, with
+<code>print address off</code>, you should get the same text for backtraces on
+all machines&mdash;whether or not they involve pointer arguments.
+
+     <p><a name="index-show-print-543"></a><br><dt><code>show print address</code><dd>Show whether or not addresses are to be printed. 
+</dl>
+
+   <p>When <span class="sc">gdb</span> prints a symbolic address, it normally prints the
+closest earlier symbol plus an offset.  If that symbol does not uniquely
+identify the address (for example, it is a name whose scope is a single
+source file), you may need to clarify.  One way to do this is with
+<code>info line</code>, for example &lsquo;<samp><span class="samp">info line *0x4537</span></samp>&rsquo;.  Alternately,
+you can set <span class="sc">gdb</span> to print the source file and line number when
+it prints a symbolic address:
+
+     <dl>
+<dt><code>set print symbol-filename on</code><dd><a name="index-source-file-and-line-of-a-symbol-544"></a><a name="index-symbol_002c-source-file-and-line-545"></a>Tell <span class="sc">gdb</span> to print the source file name and line number of a
+symbol in the symbolic form of an address.
+
+     <br><dt><code>set print symbol-filename off</code><dd>Do not print source file name and line number of a symbol.  This is the
+default.
+
+     <br><dt><code>show print symbol-filename</code><dd>Show whether or not <span class="sc">gdb</span> will print the source file name and
+line number of a symbol in the symbolic form of an address. 
+</dl>
+
+   <p>Another situation where it is helpful to show symbol filenames and line
+numbers is when disassembling code; <span class="sc">gdb</span> shows you the line
+number and source file that corresponds to each instruction.
+
+   <p>Also, you may wish to see the symbolic form only if the address being
+printed is reasonably close to the closest earlier symbol:
+
+     <dl>
+<dt><code>set print max-symbolic-offset </code><var>max-offset</var><dd><a name="index-maximum-value-for-offset-of-closest-symbol-546"></a>Tell <span class="sc">gdb</span> to only display the symbolic form of an address if the
+offset between the closest earlier symbol and the address is less than
+<var>max-offset</var>.  The default is 0, which tells <span class="sc">gdb</span>
+to always print the symbolic form of an address if any symbol precedes it.
+
+     <br><dt><code>show print max-symbolic-offset</code><dd>Ask how large the maximum offset is that <span class="sc">gdb</span> prints in a
+symbolic address. 
+</dl>
+
+   <p><a name="index-wild-pointer_002c-interpreting-547"></a><a name="index-pointer_002c-finding-referent-548"></a>If you have a pointer and you are not sure where it points, try
+&lsquo;<samp><span class="samp">set print symbol-filename on</span></samp>&rsquo;.  Then you can determine the name
+and source file location of the variable where it points, using
+&lsquo;<samp><span class="samp">p/a </span><var>pointer</var></samp>&rsquo;.  This interprets the address in symbolic form. 
+For example, here <span class="sc">gdb</span> shows that a variable <code>ptt</code> points
+at another variable <code>t</code>, defined in <samp><span class="file">hi2.c</span></samp>:
+
+<pre class="smallexample">     (gdb) set print symbol-filename on
+     (gdb) p/a ptt
+     $4 = 0xe008 &lt;t in hi2.c&gt;
+</pre>
+   <blockquote>
+<em>Warning:</em> For pointers that point to a local variable, &lsquo;<samp><span class="samp">p/a</span></samp>&rsquo;
+does not show the symbol name and filename of the referent, even with
+the appropriate <code>set print</code> options turned on. 
+</blockquote>
+
+   <p>Other settings control how different kinds of objects are printed:
+
+     <dl>
+<dt><code>set print array</code><dt><code>set print array on</code><dd><a name="index-pretty-print-arrays-549"></a>Pretty print arrays.  This format is more convenient to read,
+but uses more space.  The default is off.
+
+     <br><dt><code>set print array off</code><dd>Return to compressed format for arrays.
+
+     <br><dt><code>show print array</code><dd>Show whether compressed or pretty format is selected for displaying
+arrays.
+
+     <p><a name="index-print-array-indexes-550"></a><br><dt><code>set print array-indexes</code><dt><code>set print array-indexes on</code><dd>Print the index of each element when displaying arrays.  May be more
+convenient to locate a given element in the array or quickly find the
+index of a given element in that printed array.  The default is off.
+
+     <br><dt><code>set print array-indexes off</code><dd>Stop printing element indexes when displaying arrays.
+
+     <br><dt><code>show print array-indexes</code><dd>Show whether the index of each element is printed when displaying
+arrays.
+
+     <br><dt><code>set print elements </code><var>number-of-elements</var><dd><a name="index-number-of-array-elements-to-print-551"></a><a name="index-limit-on-number-of-printed-array-elements-552"></a>Set a limit on how many elements of an array <span class="sc">gdb</span> will print. 
+If <span class="sc">gdb</span> is printing a large array, it stops printing after it has
+printed the number of elements set by the <code>set print elements</code> command. 
+This limit also applies to the display of strings. 
+When <span class="sc">gdb</span> starts, this limit is set to 200. 
+Setting  <var>number-of-elements</var> to zero means that the printing is unlimited.
+
+     <br><dt><code>show print elements</code><dd>Display the number of elements of a large array that <span class="sc">gdb</span> will print. 
+If the number is 0, then the printing is unlimited.
+
+     <br><dt><code>set print frame-arguments </code><var>value</var><dd><a name="index-set-print-frame_002darguments-553"></a><a name="index-printing-frame-argument-values-554"></a><a name="index-print-all-frame-argument-values-555"></a><a name="index-print-frame-argument-values-for-scalars-only-556"></a><a name="index-do-not-print-frame-argument-values-557"></a>This command allows to control how the values of arguments are printed
+when the debugger prints a frame (see <a href="Frames.html#Frames">Frames</a>).  The possible
+values are:
+
+          <dl>
+<dt><code>all</code><dd>The values of all arguments are printed.
+
+          <br><dt><code>scalars</code><dd>Print the value of an argument only if it is a scalar.  The value of more
+complex arguments such as arrays, structures, unions, etc, is replaced
+by <code>...</code>.  This is the default.  Here is an example where
+only scalar arguments are shown:
+
+          <pre class="smallexample">               #1  0x08048361 in call_me (i=3, s=..., ss=0xbf8d508c, u=..., e=green)
+                 at frame-args.c:23
+</pre>
+          <br><dt><code>none</code><dd>None of the argument values are printed.  Instead, the value of each argument
+is replaced by <code>...</code>.  In this case, the example above now becomes:
+
+          <pre class="smallexample">               #1  0x08048361 in call_me (i=..., s=..., ss=..., u=..., e=...)
+                 at frame-args.c:23
+</pre>
+          </dl>
+
+     <p>By default, only scalar arguments are printed.  This command can be used
+to configure the debugger to print the value of all arguments, regardless
+of their type.  However, it is often advantageous to not print the value
+of more complex parameters.  For instance, it reduces the amount of
+information printed in each frame, making the backtrace more readable. 
+Also, it improves performance when displaying Ada frames, because
+the computation of large arguments can sometimes be CPU-intensive,
+especially in large applications.  Setting <code>print frame-arguments</code>
+to <code>scalars</code> (the default) or <code>none</code> avoids this computation,
+thus speeding up the display of each Ada frame.
+
+     <br><dt><code>show print frame-arguments</code><dd>Show how the value of arguments should be displayed when printing a frame.
+
+     <br><dt><code>set print repeats</code><dd><a name="index-repeated-array-elements-558"></a>Set the threshold for suppressing display of repeated array
+elements.  When the number of consecutive identical elements of an
+array exceeds the threshold, <span class="sc">gdb</span> prints the string
+<code>"&lt;repeats </code><var>n</var><code> times&gt;"</code>, where <var>n</var> is the number of
+identical repetitions, instead of displaying the identical elements
+themselves.  Setting the threshold to zero will cause all elements to
+be individually printed.  The default threshold is 10.
+
+     <br><dt><code>show print repeats</code><dd>Display the current threshold for printing repeated identical
+elements.
+
+     <br><dt><code>set print null-stop</code><dd><a name="index-g_t_0040sc_007bnull_007d-elements-in-arrays-559"></a>Cause <span class="sc">gdb</span> to stop printing the characters of an array when the first
+<span class="sc">null</span> is encountered.  This is useful when large arrays actually
+contain only short strings. 
+The default is off.
+
+     <br><dt><code>show print null-stop</code><dd>Show whether <span class="sc">gdb</span> stops printing an array on the first
+<span class="sc">null</span> character.
+
+     <br><dt><code>set print pretty on</code><dd><a name="index-print-structures-in-indented-form-560"></a><a name="index-indentation-in-structure-display-561"></a>Cause <span class="sc">gdb</span> to print structures in an indented format with one member
+per line, like this:
+
+     <pre class="smallexample">          $1 = {
+            next = 0x0,
+            flags = {
+              sweet = 1,
+              sour = 1
+            },
+            meat = 0x54 "Pork"
+          }
+</pre>
+     <br><dt><code>set print pretty off</code><dd>Cause <span class="sc">gdb</span> to print structures in a compact format, like this:
+
+     <pre class="smallexample">          $1 = {next = 0x0, flags = {sweet = 1, sour = 1}, \
+          meat = 0x54 "Pork"}
+</pre>
+     <p class="noindent">This is the default format.
+
+     <br><dt><code>show print pretty</code><dd>Show which format <span class="sc">gdb</span> is using to print structures.
+
+     <br><dt><code>set print sevenbit-strings on</code><dd><a name="index-eight_002dbit-characters-in-strings-562"></a><a name="index-octal-escapes-in-strings-563"></a>Print using only seven-bit characters; if this option is set,
+<span class="sc">gdb</span> displays any eight-bit characters (in strings or
+character values) using the notation <code>\</code><var>nnn</var>.  This setting is
+best if you are working in English (<span class="sc">ascii</span>) and you use the
+high-order bit of characters as a marker or &ldquo;meta&rdquo; bit.
+
+     <br><dt><code>set print sevenbit-strings off</code><dd>Print full eight-bit characters.  This allows the use of more
+international character sets, and is the default.
+
+     <br><dt><code>show print sevenbit-strings</code><dd>Show whether or not <span class="sc">gdb</span> is printing only seven-bit characters.
+
+     <br><dt><code>set print union on</code><dd><a name="index-unions-in-structures_002c-printing-564"></a>Tell <span class="sc">gdb</span> to print unions which are contained in structures
+and other unions.  This is the default setting.
+
+     <br><dt><code>set print union off</code><dd>Tell <span class="sc">gdb</span> not to print unions which are contained in
+structures and other unions.  <span class="sc">gdb</span> will print <code>"{...}"</code>
+instead.
+
+     <br><dt><code>show print union</code><dd>Ask <span class="sc">gdb</span> whether or not it will print unions which are contained in
+structures and other unions.
+
+     <p>For example, given the declarations
+
+     <pre class="smallexample">          typedef enum {Tree, Bug} Species;
+          typedef enum {Big_tree, Acorn, Seedling} Tree_forms;
+          typedef enum {Caterpillar, Cocoon, Butterfly}
+                        Bug_forms;
+          
+          struct thing {
+            Species it;
+            union {
+              Tree_forms tree;
+              Bug_forms bug;
+            } form;
+          };
+          
+          struct thing foo = {Tree, {Acorn}};
+</pre>
+     <p class="noindent">with <code>set print union on</code> in effect &lsquo;<samp><span class="samp">p foo</span></samp>&rsquo; would print
+
+     <pre class="smallexample">          $1 = {it = Tree, form = {tree = Acorn, bug = Cocoon}}
+</pre>
+     <p class="noindent">and with <code>set print union off</code> in effect it would print
+
+     <pre class="smallexample">          $1 = {it = Tree, form = {...}}
+</pre>
+     <p class="noindent"><code>set print union</code> affects programs written in C-like languages
+and in Pascal. 
+</dl>
+
+<p class="noindent">These settings are of interest when debugging C<tt>++</tt> programs:
+
+     
+<a name="index-demangling-C_0040t_007b_002b_002b_007d-names-565"></a>
+<dl><dt><code>set print demangle</code><dt><code>set print demangle on</code><dd>Print C<tt>++</tt> names in their source form rather than in the encoded
+(&ldquo;mangled&rdquo;) form passed to the assembler and linker for type-safe
+linkage.  The default is on.
+
+     <br><dt><code>show print demangle</code><dd>Show whether C<tt>++</tt> names are printed in mangled or demangled form.
+
+     <br><dt><code>set print asm-demangle</code><dt><code>set print asm-demangle on</code><dd>Print C<tt>++</tt> names in their source form rather than their mangled form, even
+in assembler code printouts such as instruction disassemblies. 
+The default is off.
+
+     <br><dt><code>show print asm-demangle</code><dd>Show whether C<tt>++</tt> names in assembly listings are printed in mangled
+or demangled form.
+
+     <p><a name="index-C_0040t_007b_002b_002b_007d-symbol-decoding-style-566"></a><a name="index-symbol-decoding-style_002c-C_0040t_007b_002b_002b_007d-567"></a><a name="index-set-demangle_002dstyle-568"></a><br><dt><code>set demangle-style </code><var>style</var><dd>Choose among several encoding schemes used by different compilers to
+represent C<tt>++</tt> names.  The choices for <var>style</var> are currently:
+
+          <dl>
+<dt><code>auto</code><dd>Allow <span class="sc">gdb</span> to choose a decoding style by inspecting your program.
+
+          <br><dt><code>gnu</code><dd>Decode based on the <span class="sc">gnu</span> C<tt>++</tt> compiler (<code>g++</code>) encoding algorithm. 
+This is the default.
+
+          <br><dt><code>hp</code><dd>Decode based on the HP ANSI C<tt>++</tt> (<code>aCC</code>) encoding algorithm.
+
+          <br><dt><code>lucid</code><dd>Decode based on the Lucid C<tt>++</tt> compiler (<code>lcc</code>) encoding algorithm.
+
+          <br><dt><code>arm</code><dd>Decode using the algorithm in the <cite>C</cite><tt>++</tt><cite> Annotated Reference Manual</cite>. 
+<strong>Warning:</strong> this setting alone is not sufficient to allow
+debugging <code>cfront</code>-generated executables.  <span class="sc">gdb</span> would
+require further enhancement to permit that.
+
+     </dl>
+     If you omit <var>style</var>, you will see a list of possible formats.
+
+     <br><dt><code>show demangle-style</code><dd>Display the encoding style currently in use for decoding C<tt>++</tt> symbols.
+
+     <br><dt><code>set print object</code><dt><code>set print object on</code><dd><a name="index-derived-type-of-an-object_002c-printing-569"></a><a name="index-display-derived-types-570"></a>When displaying a pointer to an object, identify the <em>actual</em>
+(derived) type of the object rather than the <em>declared</em> type, using
+the virtual function table.
+
+     <br><dt><code>set print object off</code><dd>Display only the declared type of objects, without reference to the
+virtual function table.  This is the default setting.
+
+     <br><dt><code>show print object</code><dd>Show whether actual, or declared, object types are displayed.
+
+     <br><dt><code>set print static-members</code><dt><code>set print static-members on</code><dd><a name="index-static-members-of-C_0040t_007b_002b_002b_007d-objects-571"></a>Print static members when displaying a C<tt>++</tt> object.  The default is on.
+
+     <br><dt><code>set print static-members off</code><dd>Do not print static members when displaying a C<tt>++</tt> object.
+
+     <br><dt><code>show print static-members</code><dd>Show whether C<tt>++</tt> static members are printed or not.
+
+     <br><dt><code>set print pascal_static-members</code><dt><code>set print pascal_static-members on</code><dd><a name="index-static-members-of-Pascal-objects-572"></a><a name="index-Pascal-objects_002c-static-members-display-573"></a>Print static members when displaying a Pascal object.  The default is on.
+
+     <br><dt><code>set print pascal_static-members off</code><dd>Do not print static members when displaying a Pascal object.
+
+     <br><dt><code>show print pascal_static-members</code><dd>Show whether Pascal static members are printed or not.
+
+     <!-- These don't work with HP ANSI C++ yet. -->
+     <br><dt><code>set print vtbl</code><dt><code>set print vtbl on</code><dd><a name="index-pretty-print-C_0040t_007b_002b_002b_007d-virtual-function-tables-574"></a><a name="index-virtual-functions-_0028C_0040t_007b_002b_002b_007d_0029-display-575"></a><a name="index-VTBL-display-576"></a>Pretty print C<tt>++</tt> virtual function tables.  The default is off. 
+(The <code>vtbl</code> commands do not work on programs compiled with the HP
+ANSI C<tt>++</tt> compiler (<code>aCC</code>).)
+
+     <br><dt><code>set print vtbl off</code><dd>Do not pretty print C<tt>++</tt> virtual function tables.
+
+     <br><dt><code>show print vtbl</code><dd>Show whether C<tt>++</tt> virtual function tables are pretty printed, or not. 
+</dl>
+
+   </body></html>
+

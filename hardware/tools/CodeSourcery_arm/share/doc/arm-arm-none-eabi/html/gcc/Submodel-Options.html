@@ -1,0 +1,129 @@
+<html lang="en">
+<head>
+<title>Submodel Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Invoking-GCC.html#Invoking-GCC" title="Invoking GCC">
+<link rel="prev" href="Target-Options.html#Target-Options" title="Target Options">
+<link rel="next" href="Code-Gen-Options.html#Code-Gen-Options" title="Code Gen Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Submodel-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Code-Gen-Options.html#Code-Gen-Options">Code Gen Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Target-Options.html#Target-Options">Target Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Invoking-GCC.html#Invoking-GCC">Invoking GCC</a>
+<hr>
+</div>
+
+<h3 class="section">3.17 Hardware Models and Configurations</h3>
+
+<p><a name="index-submodel-options-987"></a><a name="index-specifying-hardware-config-988"></a><a name="index-hardware-models-and-configurations_002c-specifying-989"></a><a name="index-machine-dependent-options-990"></a>
+Earlier we discussed the standard option <samp><span class="option">-b</span></samp> which chooses among
+different installed compilers for completely different target
+machines, such as VAX vs. 68000 vs. 80386.
+
+ <p>In addition, each of these target machine types can have its own
+special options, starting with &lsquo;<samp><span class="samp">-m</span></samp>&rsquo;, to choose among various
+hardware models or configurations&mdash;for example, 68010 vs 68020,
+floating coprocessor or none.  A single installed version of the
+compiler can compile for any model or configuration, according to the
+options specified.
+
+ <p>Some configurations of the compiler also support additional special
+options, usually for compatibility with other compilers on the same
+platform.
+
+<!-- This list is ordered alphanumerically by subsection name. -->
+<!-- It should be the same order and spelling as these options are listed -->
+<!-- in Machine Dependent Options -->
+<ul class="menu">
+<li><a accesskey="1" href="ARC-Options.html#ARC-Options">ARC Options</a>
+<li><a accesskey="2" href="ARM-Options.html#ARM-Options">ARM Options</a>
+<li><a accesskey="3" href="AVR-Options.html#AVR-Options">AVR Options</a>
+<li><a accesskey="4" href="Blackfin-Options.html#Blackfin-Options">Blackfin Options</a>
+<li><a accesskey="5" href="CRIS-Options.html#CRIS-Options">CRIS Options</a>
+<li><a accesskey="6" href="CRX-Options.html#CRX-Options">CRX Options</a>
+<li><a accesskey="7" href="Darwin-Options.html#Darwin-Options">Darwin Options</a>
+<li><a accesskey="8" href="DEC-Alpha-Options.html#DEC-Alpha-Options">DEC Alpha Options</a>
+<li><a accesskey="9" href="DEC-Alpha_002fVMS-Options.html#DEC-Alpha_002fVMS-Options">DEC Alpha/VMS Options</a>
+<li><a href="FR30-Options.html#FR30-Options">FR30 Options</a>
+<li><a href="FRV-Options.html#FRV-Options">FRV Options</a>
+<li><a href="GNU_002fLinux-Options.html#GNU_002fLinux-Options">GNU/Linux Options</a>
+<li><a href="H8_002f300-Options.html#H8_002f300-Options">H8/300 Options</a>
+<li><a href="HPPA-Options.html#HPPA-Options">HPPA Options</a>
+<li><a href="i386-and-x86_002d64-Options.html#i386-and-x86_002d64-Options">i386 and x86-64 Options</a>
+<li><a href="i386-and-x86_002d64-Windows-Options.html#i386-and-x86_002d64-Windows-Options">i386 and x86-64 Windows Options</a>
+<li><a href="IA_002d64-Options.html#IA_002d64-Options">IA-64 Options</a>
+<li><a href="IA_002d64_002fVMS-Options.html#IA_002d64_002fVMS-Options">IA-64/VMS Options</a>
+<li><a href="LM32-Options.html#LM32-Options">LM32 Options</a>
+<li><a href="M32C-Options.html#M32C-Options">M32C Options</a>
+<li><a href="M32R_002fD-Options.html#M32R_002fD-Options">M32R/D Options</a>
+<li><a href="M680x0-Options.html#M680x0-Options">M680x0 Options</a>
+<li><a href="M68hc1x-Options.html#M68hc1x-Options">M68hc1x Options</a>
+<li><a href="MCore-Options.html#MCore-Options">MCore Options</a>
+<li><a href="MeP-Options.html#MeP-Options">MeP Options</a>
+<li><a href="MIPS-Options.html#MIPS-Options">MIPS Options</a>
+<li><a href="MMIX-Options.html#MMIX-Options">MMIX Options</a>
+<li><a href="MN10300-Options.html#MN10300-Options">MN10300 Options</a>
+<li><a href="PDP_002d11-Options.html#PDP_002d11-Options">PDP-11 Options</a>
+<li><a href="picoChip-Options.html#picoChip-Options">picoChip Options</a>
+<li><a href="PowerPC-Options.html#PowerPC-Options">PowerPC Options</a>
+<li><a href="RS_002f6000-and-PowerPC-Options.html#RS_002f6000-and-PowerPC-Options">RS/6000 and PowerPC Options</a>
+<li><a href="RX-Options.html#RX-Options">RX Options</a>
+<li><a href="S_002f390-and-zSeries-Options.html#S_002f390-and-zSeries-Options">S/390 and zSeries Options</a>
+<li><a href="Score-Options.html#Score-Options">Score Options</a>
+<li><a href="SH-Options.html#SH-Options">SH Options</a>
+<li><a href="SPARC-Options.html#SPARC-Options">SPARC Options</a>
+<li><a href="SPU-Options.html#SPU-Options">SPU Options</a>
+<li><a href="System-V-Options.html#System-V-Options">System V Options</a>
+<li><a href="V850-Options.html#V850-Options">V850 Options</a>
+<li><a href="VAX-Options.html#VAX-Options">VAX Options</a>
+<li><a href="VxWorks-Options.html#VxWorks-Options">VxWorks Options</a>
+<li><a href="x86_002d64-Options.html#x86_002d64-Options">x86-64 Options</a>
+<li><a href="Xstormy16-Options.html#Xstormy16-Options">Xstormy16 Options</a>
+<li><a href="Xtensa-Options.html#Xtensa-Options">Xtensa Options</a>
+<li><a href="zSeries-Options.html#zSeries-Options">zSeries Options</a>
+</ul>
+
+ </body></html>
+

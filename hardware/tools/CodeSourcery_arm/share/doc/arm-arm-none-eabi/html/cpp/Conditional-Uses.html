@@ -1,0 +1,87 @@
+<html lang="en">
+<head>
+<title>Conditional Uses - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Conditionals.html#Conditionals" title="Conditionals">
+<link rel="next" href="Conditional-Syntax.html#Conditional-Syntax" title="Conditional Syntax">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Conditional-Uses"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Conditional-Syntax.html#Conditional-Syntax">Conditional Syntax</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Conditionals.html#Conditionals">Conditionals</a>
+<hr>
+</div>
+
+<h3 class="section">4.1 Conditional Uses</h3>
+
+<p>There are three general reasons to use a conditional.
+
+     <ul>
+<li>A program may need to use different code depending on the machine or
+operating system it is to run on.  In some cases the code for one
+operating system may be erroneous on another operating system; for
+example, it might refer to data types or constants that do not exist on
+the other system.  When this happens, it is not enough to avoid
+executing the invalid code.  Its mere presence will cause the compiler
+to reject the program.  With a preprocessing conditional, the offending
+code can be effectively excised from the program when it is not valid.
+
+     <li>You may want to be able to compile the same source file into two
+different programs.  One version might make frequent time-consuming
+consistency checks on its intermediate data, or print the values of
+those data for debugging, and the other not.
+
+     <li>A conditional whose condition is always false is one way to exclude code
+from the program but keep it as a sort of comment for future reference. 
+</ul>
+
+   <p>Simple programs that do not need system-specific logic or complex
+debugging hooks generally will not need to use preprocessing
+conditionals.
+
+   </body></html>
+

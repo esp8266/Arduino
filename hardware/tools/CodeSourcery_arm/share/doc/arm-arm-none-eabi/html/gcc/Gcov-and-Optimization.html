@@ -1,0 +1,114 @@
+<html lang="en">
+<head>
+<title>Gcov and Optimization - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Gcov.html#Gcov" title="Gcov">
+<link rel="prev" href="Invoking-Gcov.html#Invoking-Gcov" title="Invoking Gcov">
+<link rel="next" href="Gcov-Data-Files.html#Gcov-Data-Files" title="Gcov Data Files">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Gcov-and-Optimization"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Gcov-Data-Files.html#Gcov-Data-Files">Gcov Data Files</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Invoking-Gcov.html#Invoking-Gcov">Invoking Gcov</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Gcov.html#Gcov">Gcov</a>
+<hr>
+</div>
+
+<h3 class="section">10.3 Using <samp><span class="command">gcov</span></samp> with GCC Optimization</h3>
+
+<p>If you plan to use <samp><span class="command">gcov</span></samp> to help optimize your code, you must
+first compile your program with two special GCC options:
+&lsquo;<samp><span class="samp">-fprofile-arcs -ftest-coverage</span></samp>&rsquo;.  Aside from that, you can use any
+other GCC options; but if you want to prove that every single line
+in your program was executed, you should not compile with optimization
+at the same time.  On some machines the optimizer can eliminate some
+simple code lines by combining them with other lines.  For example, code
+like this:
+
+<pre class="smallexample">     if (a != b)
+       c = 1;
+     else
+       c = 0;
+</pre>
+ <p class="noindent">can be compiled into one instruction on some machines.  In this case,
+there is no way for <samp><span class="command">gcov</span></samp> to calculate separate execution counts
+for each line because there isn't separate code for each line.  Hence
+the <samp><span class="command">gcov</span></samp> output looks like this if you compiled the program with
+optimization:
+
+<pre class="smallexample">           100:   12:if (a != b)
+           100:   13:  c = 1;
+           100:   14:else
+           100:   15:  c = 0;
+</pre>
+ <p>The output shows that this block of code, combined by optimization,
+executed 100 times.  In one sense this result is correct, because there
+was only one instruction representing all four of these lines.  However,
+the output does not indicate how many times the result was 0 and how
+many times the result was 1.
+
+ <p>Inlineable functions can create unexpected line counts.  Line counts are
+shown for the source code of the inlineable function, but what is shown
+depends on where the function is inlined, or if it is not inlined at all.
+
+ <p>If the function is not inlined, the compiler must emit an out of line
+copy of the function, in any object file that needs it.  If
+<samp><span class="file">fileA.o</span></samp> and <samp><span class="file">fileB.o</span></samp> both contain out of line bodies of a
+particular inlineable function, they will also both contain coverage
+counts for that function.  When <samp><span class="file">fileA.o</span></samp> and <samp><span class="file">fileB.o</span></samp> are
+linked together, the linker will, on many systems, select one of those
+out of line bodies for all calls to that function, and remove or ignore
+the other.  Unfortunately, it will not remove the coverage counters for
+the unused function body.  Hence when instrumented, all but one use of
+that function will show zero counts.
+
+ <p>If the function is inlined in several places, the block structure in
+each location might not be the same.  For instance, a condition might
+now be calculable at compile time in some instances.  Because the
+coverage of all the uses of the inline function will be shown for the
+same source lines, the line counts themselves might seem inconsistent.
+
+<!-- man end -->
+ </body></html>
+

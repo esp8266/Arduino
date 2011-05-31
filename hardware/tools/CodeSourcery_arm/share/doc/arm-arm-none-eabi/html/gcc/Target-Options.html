@@ -1,0 +1,89 @@
+<html lang="en">
+<head>
+<title>Target Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Invoking-GCC.html#Invoking-GCC" title="Invoking GCC">
+<link rel="prev" href="Spec-Files.html#Spec-Files" title="Spec Files">
+<link rel="next" href="Submodel-Options.html#Submodel-Options" title="Submodel Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Target-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Submodel-Options.html#Submodel-Options">Submodel Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Spec-Files.html#Spec-Files">Spec Files</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Invoking-GCC.html#Invoking-GCC">Invoking GCC</a>
+<hr>
+</div>
+
+<h3 class="section">3.16 Specifying Target Machine and Compiler Version</h3>
+
+<p><a name="index-target-options-979"></a><a name="index-cross-compiling-980"></a><a name="index-specifying-machine-version-981"></a><a name="index-specifying-compiler-version-and-target-machine-982"></a><a name="index-compiler-version_002c-specifying-983"></a><a name="index-target-machine_002c-specifying-984"></a>
+The usual way to run GCC is to run the executable called <samp><span class="file">gcc</span></samp>, or
+<samp><span class="file">&lt;machine&gt;-gcc</span></samp> when cross-compiling, or
+<samp><span class="file">&lt;machine&gt;-gcc-&lt;version&gt;</span></samp> to run a version other than the one that
+was installed last.  Sometimes this is inconvenient, so GCC provides
+options that will switch to another cross-compiler or version.
+
+     <dl>
+<dt><code>-b </code><var>machine</var><dd><a name="index-b-985"></a>The argument <var>machine</var> specifies the target machine for compilation.
+
+     <p>The value to use for <var>machine</var> is the same as was specified as the
+machine type when configuring GCC as a cross-compiler.  For
+example, if a cross-compiler was configured with &lsquo;<samp><span class="samp">configure
+arm-elf</span></samp>&rsquo;, meaning to compile for an arm processor with elf binaries,
+then you would specify <samp><span class="option">-b arm-elf</span></samp> to run that cross compiler. 
+Because there are other options beginning with <samp><span class="option">-b</span></samp>, the
+configuration must contain a hyphen, or <samp><span class="option">-b</span></samp> alone should be one
+argument followed by the configuration in the next argument.
+
+     <br><dt><code>-V </code><var>version</var><dd><a name="index-V-986"></a>The argument <var>version</var> specifies which version of GCC to run. 
+This is useful when multiple versions are installed.  For example,
+<var>version</var> might be &lsquo;<samp><span class="samp">4.0</span></samp>&rsquo;, meaning to run GCC version 4.0. 
+</dl>
+
+ <p>The <samp><span class="option">-V</span></samp> and <samp><span class="option">-b</span></samp> options work by running the
+<samp><span class="file">&lt;machine&gt;-gcc-&lt;version&gt;</span></samp> executable, so there's no real reason to
+use them if you can just run that directly.
+
+ </body></html>
+

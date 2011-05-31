@@ -1,0 +1,83 @@
+<html lang="en">
+<head>
+<title>vfwprintf - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="vfscanf.html#vfscanf" title="vfscanf">
+<link rel="next" href="vfwscanf.html#vfwscanf" title="vfwscanf">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="vfwprintf"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="vfwscanf.html#vfwscanf">vfwscanf</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="vfscanf.html#vfscanf">vfscanf</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.70 <code>vfwprintf</code>, <code>vwprintf</code>, <code>vswprintf</code>&mdash;wide character format argument list</h3>
+
+<p><a name="index-vfwprintf-342"></a><a name="index-g_t_005fvfwprintf_005fr-343"></a><a name="index-vwprintf-344"></a><a name="index-g_t_005fvwprintf_005fr-345"></a><a name="index-vswprintf-346"></a><a name="index-g_t_005fvswprintf_005fr-347"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     #include &lt;stdarg.h&gt;
+     #include &lt;wchar.h&gt;
+     int vwprintf(const wchar_t *<var>fmt</var>, va_list <var>list</var>);
+     int vfwprintf(FILE *<var>fp</var>, const wchar_t *<var>fmt</var>, va_list <var>list</var>);
+     int vswprintf(wchar_t *<var>str</var>, size_t <var>size</var>, const wchar_t *<var>fmt</var>,
+         va_list <var>list</var>);
+     
+     int _vwprintf_r(struct _reent *<var>reent</var>, const wchar_t *<var>fmt</var>,
+         va_list <var>list</var>);
+     int _vfwprintf_r(struct _reent *<var>reent</var>, FILE *<var>fp</var>,
+         const wchar_t *<var>fmt</var>, va_list <var>list</var>);
+     int _vswprintf_r(struct _reent *<var>reent</var>, wchar_t *<var>str</var>,
+         size_t <var>size</var>, const wchar_t *<var>fmt</var>, va_list <var>list</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>vwprintf</code>, <code>vfwprintf</code> and <code>vswprintf</code> are (respectively) variants
+of <code>wprintf</code>, <code>fwprintf</code> and <code>swprintf</code>.  They differ only in allowing
+their caller to pass the variable argument list as a <code>va_list</code> object
+(initialized by <code>va_start</code>) rather than directly accepting a variable
+number of arguments.  The caller is responsible for calling <code>va_end</code>.
+
+   <p><code>_vwprintf_r</code>, <code>_vfwprintf_r</code> and <code>_vswprintf_r</code> are reentrant
+versions of the above.
+
+   <p><br>
+<strong>Returns</strong><br>
+The return values are consistent with the corresponding functions.
+
+   <p><br>
+<strong>Portability</strong><br>
+POSIX-1.2008 with extensions; C99 (compliant except for POSIX extensions).
+
+   <p>Supporting OS subroutines required: <code>close</code>, <code>fstat</code>, <code>isatty</code>,
+<code>lseek</code>, <code>read</code>, <code>sbrk</code>, <code>write</code>.
+
+   <p><br>
+<strong>See Also</strong><br>
+<code>wprintf</code>, <code>fwprintf</code> and <code>swprintf</code>.
+
+   <p><br>
+
+   </body></html>
+

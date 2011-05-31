@@ -1,0 +1,85 @@
+<html lang="en">
+<head>
+<title>Tracepoint Passcounts - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Set-Tracepoints.html#Set-Tracepoints" title="Set Tracepoints">
+<link rel="prev" href="Enable-and-Disable-Tracepoints.html#Enable-and-Disable-Tracepoints" title="Enable and Disable Tracepoints">
+<link rel="next" href="Tracepoint-Conditions.html#Tracepoint-Conditions" title="Tracepoint Conditions">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Tracepoint-Passcounts"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Tracepoint-Conditions.html#Tracepoint-Conditions">Tracepoint Conditions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Enable-and-Disable-Tracepoints.html#Enable-and-Disable-Tracepoints">Enable and Disable Tracepoints</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Set-Tracepoints.html#Set-Tracepoints">Set Tracepoints</a>
+<hr>
+</div>
+
+<h4 class="subsection">13.1.3 Tracepoint Passcounts</h4>
+
+     
+<a name="index-passcount-702"></a>
+<a name="index-tracepoint-pass-count-703"></a>
+<dl><dt><code>passcount </code><span class="roman">[</span><var>n</var> <span class="roman">[</span><var>num</var><span class="roman">]]</span><dd>Set the <dfn>passcount</dfn> of a tracepoint.  The passcount is a way to
+automatically stop a trace experiment.  If a tracepoint's passcount is
+<var>n</var>, then the trace experiment will be automatically stopped on
+the <var>n</var>'th time that tracepoint is hit.  If the tracepoint number
+<var>num</var> is not specified, the <code>passcount</code> command sets the
+passcount of the most recently defined tracepoint.  If no passcount is
+given, the trace experiment will run until stopped explicitly by the
+user.
+
+     <p>Examples:
+
+     <pre class="smallexample">          (gdb) <b>passcount 5 2</b> // Stop on the 5th execution of
+     <br>                                   <code>// tracepoint 2</code><br>
+          
+          (gdb) <b>passcount 12</b>  // Stop on the 12th execution of the
+     <br>                                   <code>// most recently defined tracepoint.</code><br>
+          (gdb) <b>trace foo</b>
+          (gdb) <b>pass 3</b>
+          (gdb) <b>trace bar</b>
+          (gdb) <b>pass 2</b>
+          (gdb) <b>trace baz</b>
+          (gdb) <b>pass 1</b>        // Stop tracing when foo has been
+     <br>                                    <code>// executed 3 times OR when bar has</code><br>
+     <br>                                    <code>// been executed 2 times</code><br>
+     <br>                                    <code>// OR when baz has been executed 1 time.</code><br>
+</pre>
+     </dl>
+
+   </body></html>
+

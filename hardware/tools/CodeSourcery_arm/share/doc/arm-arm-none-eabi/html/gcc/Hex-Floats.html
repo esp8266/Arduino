@@ -1,0 +1,80 @@
+<html lang="en">
+<head>
+<title>Hex Floats - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Decimal-Float.html#Decimal-Float" title="Decimal Float">
+<link rel="next" href="Fixed_002dPoint.html#Fixed_002dPoint" title="Fixed-Point">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Hex-Floats"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Fixed_002dPoint.html#Fixed_002dPoint">Fixed-Point</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Decimal-Float.html#Decimal-Float">Decimal Float</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.13 Hex Floats</h3>
+
+<p><a name="index-hex-floats-2246"></a>
+ISO C99 supports floating-point numbers written not only in the usual
+decimal notation, such as <code>1.55e1</code>, but also numbers such as
+<code>0x1.fp3</code> written in hexadecimal format.  As a GNU extension, GCC
+supports this in C90 mode (except in some cases when strictly
+conforming) and in C++.  In that format the
+&lsquo;<samp><span class="samp">0x</span></samp>&rsquo; hex introducer and the &lsquo;<samp><span class="samp">p</span></samp>&rsquo; or &lsquo;<samp><span class="samp">P</span></samp>&rsquo; exponent field are
+mandatory.  The exponent is a decimal number that indicates the power of
+2 by which the significant part will be multiplied.  Thus &lsquo;<samp><span class="samp">0x1.f</span></samp>&rsquo; is
+1 15/16,
+&lsquo;<samp><span class="samp">p3</span></samp>&rsquo; multiplies it by 8, and the value of <code>0x1.fp3</code>
+is the same as <code>1.55e1</code>.
+
+ <p>Unlike for floating-point numbers in the decimal notation the exponent
+is always required in the hexadecimal notation.  Otherwise the compiler
+would not be able to resolve the ambiguity of, e.g., <code>0x1.f</code>.  This
+could mean <code>1.0f</code> or <code>1.9375</code> since &lsquo;<samp><span class="samp">f</span></samp>&rsquo; is also the
+extension for floating-point constants of type <code>float</code>.
+
+ </body></html>
+

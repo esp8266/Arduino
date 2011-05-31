@@ -1,0 +1,86 @@
+<html lang="en">
+<head>
+<title>Tracepoint Conditions - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Set-Tracepoints.html#Set-Tracepoints" title="Set Tracepoints">
+<link rel="prev" href="Tracepoint-Passcounts.html#Tracepoint-Passcounts" title="Tracepoint Passcounts">
+<link rel="next" href="Trace-State-Variables.html#Trace-State-Variables" title="Trace State Variables">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Tracepoint-Conditions"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Trace-State-Variables.html#Trace-State-Variables">Trace State Variables</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Tracepoint-Passcounts.html#Tracepoint-Passcounts">Tracepoint Passcounts</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Set-Tracepoints.html#Set-Tracepoints">Set Tracepoints</a>
+<hr>
+</div>
+
+<h4 class="subsection">13.1.4 Tracepoint Conditions</h4>
+
+<p><a name="index-conditional-tracepoints-704"></a><a name="index-tracepoint-conditions-705"></a>
+The simplest sort of tracepoint collects data every time your program
+reaches a specified place.  You can also specify a <dfn>condition</dfn> for
+a tracepoint.  A condition is just a Boolean expression in your
+programming language (see <a href="Expressions.html#Expressions">Expressions</a>).  A
+tracepoint with a condition evaluates the expression each time your
+program reaches it, and data collection happens only if the condition
+is true.
+
+   <p>Tracepoint conditions can be specified when a tracepoint is set, by
+using &lsquo;<samp><span class="samp">if</span></samp>&rsquo; in the arguments to the <code>trace</code> command. 
+See <a href="Create-and-Delete-Tracepoints.html#Create-and-Delete-Tracepoints">Setting Tracepoints</a>.  They can
+also be set or changed at any time with the <code>condition</code> command,
+just as with breakpoints.
+
+   <p>Unlike breakpoint conditions, <span class="sc">gdb</span> does not actually evaluate
+the conditional expression itself.  Instead, <span class="sc">gdb</span> encodes the
+expression into an agent expression (see <a href="Agent-Expressions.html#Agent-Expressions">Agent Expressions</a>
+suitable for execution on the target, independently of <span class="sc">gdb</span>. 
+Global variables become raw memory locations, locals become stack
+accesses, and so forth.
+
+   <p>For instance, suppose you have a function that is usually called
+frequently, but should not be called after an error has occurred.  You
+could use the following tracepoint command to collect data about calls
+of that function that happen while the error code is propagating
+through the program; an unconditional tracepoint could end up
+collecting thousands of useless trace frames that you would have to
+search through.
+
+<pre class="smallexample">     (gdb) <kbd>trace normal_operation if errcode &gt; 0</kbd>
+</pre>
+   </body></html>
+

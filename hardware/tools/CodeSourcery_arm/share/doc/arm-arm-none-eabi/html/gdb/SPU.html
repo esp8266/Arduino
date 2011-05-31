@@ -1,0 +1,101 @@
+<html lang="en">
+<head>
+<title>SPU - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Architectures.html#Architectures" title="Architectures">
+<link rel="prev" href="HPPA.html#HPPA" title="HPPA">
+<link rel="next" href="PowerPC.html#PowerPC" title="PowerPC">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="SPU"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="PowerPC.html#PowerPC">PowerPC</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="HPPA.html#HPPA">HPPA</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Architectures.html#Architectures">Architectures</a>
+<hr>
+</div>
+
+<h4 class="subsection">21.4.6 Cell Broadband Engine SPU architecture</h4>
+
+<p><a name="index-Cell-Broadband-Engine-1423"></a><a name="index-SPU-1424"></a>
+When <span class="sc">gdb</span> is debugging the Cell Broadband Engine SPU architecture,
+it provides the following special commands:
+
+     <dl>
+<dt><code>info spu event</code><dd><a name="index-info-spu-1425"></a>Display SPU event facility status.  Shows current event mask
+and pending event status.
+
+     <br><dt><code>info spu signal</code><dd>Display SPU signal notification facility status.  Shows pending
+signal-control word and signal notification mode of both signal
+notification channels.
+
+     <br><dt><code>info spu mailbox</code><dd>Display SPU mailbox facility status.  Shows all pending entries,
+in order of processing, in each of the SPU Write Outbound,
+SPU Write Outbound Interrupt, and SPU Read Inbound mailboxes.
+
+     <br><dt><code>info spu dma</code><dd>Display MFC DMA status.  Shows all pending commands in the MFC
+DMA queue.  For each entry, opcode, tag, class IDs, effective
+and local store addresses and transfer size are shown.
+
+     <br><dt><code>info spu proxydma</code><dd>Display MFC Proxy-DMA status.  Shows all pending commands in the MFC
+Proxy-DMA queue.  For each entry, opcode, tag, class IDs, effective
+and local store addresses and transfer size are shown.
+
+   </dl>
+
+   <p>When <span class="sc">gdb</span> is debugging a combined PowerPC/SPU application
+on the Cell Broadband Engine, it provides in addition the following
+special commands:
+
+     <dl>
+<dt><code>set spu stop-on-load </code><var>arg</var><dd><a name="index-set-spu-1426"></a>Set whether to stop for new SPE threads.  When set to <code>on</code>, <span class="sc">gdb</span>
+will give control to the user when a new SPE thread enters its <code>main</code>
+function.  The default is <code>off</code>.
+
+     <br><dt><code>show spu stop-on-load</code><dd><a name="index-show-spu-1427"></a>Show whether to stop for new SPE threads.
+
+     <br><dt><code>set spu auto-flush-cache </code><var>arg</var><dd>Set whether to automatically flush the software-managed cache.  When set to
+<code>on</code>, <span class="sc">gdb</span> will automatically cause the SPE software-managed
+cache to be flushed whenever SPE execution stops.  This provides a consistent
+view of PowerPC memory that is accessed via the cache.  If an application
+does not use the software-managed cache, this option has no effect.
+
+     <br><dt><code>show spu auto-flush-cache</code><dd>Show whether to automatically flush the software-managed cache.
+
+   </dl>
+
+   </body></html>
+

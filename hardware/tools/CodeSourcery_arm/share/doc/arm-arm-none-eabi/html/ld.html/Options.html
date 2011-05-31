@@ -1,0 +1,1776 @@
+<html lang="en">
+<head>
+<title>Options - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Invocation.html#Invocation" title="Invocation">
+<link rel="next" href="Environment.html#Environment" title="Environment">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Environment.html#Environment">Environment</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Invocation.html#Invocation">Invocation</a>
+<hr>
+</div>
+
+<h3 class="section">2.1 Command Line Options</h3>
+
+   <p><a name="index-command-line-3"></a><a name="index-options-4"></a>
+<!-- man begin OPTIONS -->
+
+   <p>The linker supports a plethora of command-line options, but in actual
+practice few of them are used in any particular context. 
+<a name="index-standard-Unix-system-5"></a>For instance, a frequent use of <samp><span class="command">ld</span></samp> is to link standard Unix
+object files on a standard, supported Unix system.  On such a system, to
+link a file <code>hello.o</code>:
+
+<pre class="smallexample">     ld -o <var>output</var> /lib/crt0.o hello.o -lc
+</pre>
+   <p>This tells <samp><span class="command">ld</span></samp> to produce a file called <var>output</var> as the
+result of linking the file <code>/lib/crt0.o</code> with <code>hello.o</code> and
+the library <code>libc.a</code>, which will come from the standard search
+directories.  (See the discussion of the &lsquo;<samp><span class="samp">-l</span></samp>&rsquo; option below.)
+
+   <p>Some of the command-line options to <samp><span class="command">ld</span></samp> may be specified at any
+point in the command line.  However, options which refer to files, such
+as &lsquo;<samp><span class="samp">-l</span></samp>&rsquo; or &lsquo;<samp><span class="samp">-T</span></samp>&rsquo;, cause the file to be read at the point at
+which the option appears in the command line, relative to the object
+files and other file options.  Repeating non-file options with a
+different argument will either have no further effect, or override prior
+occurrences (those further to the left on the command line) of that
+option.  Options which may be meaningfully specified more than once are
+noted in the descriptions below.
+
+   <p><a name="index-object-files-6"></a>Non-option arguments are object files or archives which are to be linked
+together.  They may follow, precede, or be mixed in with command-line
+options, except that an object file argument may not be placed between
+an option and its argument.
+
+   <p>Usually the linker is invoked with at least one object file, but you can
+specify other forms of binary input files using &lsquo;<samp><span class="samp">-l</span></samp>&rsquo;, &lsquo;<samp><span class="samp">-R</span></samp>&rsquo;,
+and the script command language.  If <em>no</em> binary input files at all
+are specified, the linker does not produce any output, and issues the
+message &lsquo;<samp><span class="samp">No input files</span></samp>&rsquo;.
+
+   <p>If the linker cannot recognize the format of an object file, it will
+assume that it is a linker script.  A script specified in this way
+augments the main linker script used for the link (either the default
+linker script or the one specified by using &lsquo;<samp><span class="samp">-T</span></samp>&rsquo;).  This feature
+permits the linker to link against a file which appears to be an object
+or an archive, but actually merely defines some symbol values, or uses
+<code>INPUT</code> or <code>GROUP</code> to load other objects.  Specifying a
+script in this way merely augments the main linker script, with the
+extra commands placed after the main script; use the &lsquo;<samp><span class="samp">-T</span></samp>&rsquo; option
+to replace the default linker script entirely, but note the effect of
+the <code>INSERT</code> command.  See <a href="Scripts.html#Scripts">Scripts</a>.
+
+   <p>For options whose names are a single letter,
+option arguments must either follow the option letter without intervening
+whitespace, or be given as separate arguments immediately following the
+option that requires them.
+
+   <p>For options whose names are multiple letters, either one dash or two can
+precede the option name; for example, &lsquo;<samp><span class="samp">-trace-symbol</span></samp>&rsquo; and
+&lsquo;<samp><span class="samp">--trace-symbol</span></samp>&rsquo; are equivalent.  Note&mdash;there is one exception to
+this rule.  Multiple letter options that start with a lower case 'o' can
+only be preceded by two dashes.  This is to reduce confusion with the
+&lsquo;<samp><span class="samp">-o</span></samp>&rsquo; option.  So for example &lsquo;<samp><span class="samp">-omagic</span></samp>&rsquo; sets the output file
+name to &lsquo;<samp><span class="samp">magic</span></samp>&rsquo; whereas &lsquo;<samp><span class="samp">--omagic</span></samp>&rsquo; sets the NMAGIC flag on the
+output.
+
+   <p>Arguments to multiple-letter options must either be separated from the
+option name by an equals sign, or be given as separate arguments
+immediately following the option that requires them.  For example,
+&lsquo;<samp><span class="samp">--trace-symbol foo</span></samp>&rsquo; and &lsquo;<samp><span class="samp">--trace-symbol=foo</span></samp>&rsquo; are equivalent. 
+Unique abbreviations of the names of multiple-letter options are
+accepted.
+
+   <p>Note&mdash;if the linker is being invoked indirectly, via a compiler driver
+(e.g. &lsquo;<samp><span class="samp">gcc</span></samp>&rsquo;) then all the linker command line options should be
+prefixed by &lsquo;<samp><span class="samp">-Wl,</span></samp>&rsquo; (or whatever is appropriate for the particular
+compiler driver) like this:
+
+<pre class="smallexample">       gcc -Wl,--start-group foo.o bar.o -Wl,--end-group
+</pre>
+   <p>This is important, because otherwise the compiler driver program may
+silently drop the linker options, resulting in a bad link.  Confusion
+may also arise when passing options that require values through a
+driver, as the use of a space between option and argument acts as
+a separator, and causes the driver to pass only the option to the linker
+and the argument to the compiler.  In this case, it is simplest to use
+the joined forms of both single- and multiple-letter options, such as:
+
+<pre class="smallexample">       gcc foo.o bar.o -Wl,-eENTRY -Wl,-Map=a.map
+</pre>
+   <p>Here is a table of the generic command line switches accepted by the GNU
+linker:
+
+     <dl>
+<!-- This file is designed to be included in manuals that use -->
+<!-- expandargv. -->
+
+     <dt><code>@</code><var>file</var><dd>Read command-line options from <var>file</var>.  The options read are
+inserted in place of the original @<var>file</var> option.  If <var>file</var>
+does not exist, or cannot be read, then the option will be treated
+literally, and not removed.
+
+     <p>Options in <var>file</var> are separated by whitespace.  A whitespace
+character may be included in an option by surrounding the entire
+option in either single or double quotes.  Any character (including a
+backslash) may be included by prefixing the character to be included
+with a backslash.  The <var>file</var> may itself contain additional
+@<var>file</var> options; any such options will be processed recursively.
+
+     <p><a name="index-g_t_002da-_0040var_007bkeyword_007d-7"></a><br><dt><code>-a </code><var>keyword</var><dd>This option is supported for HP/UX compatibility.  The <var>keyword</var>
+argument must be one of the strings &lsquo;<samp><span class="samp">archive</span></samp>&rsquo;, &lsquo;<samp><span class="samp">shared</span></samp>&rsquo;, or
+&lsquo;<samp><span class="samp">default</span></samp>&rsquo;.  &lsquo;<samp><span class="samp">-aarchive</span></samp>&rsquo; is functionally equivalent to
+&lsquo;<samp><span class="samp">-Bstatic</span></samp>&rsquo;, and the other two keywords are functionally equivalent
+to &lsquo;<samp><span class="samp">-Bdynamic</span></samp>&rsquo;.  This option may be used any number of times.
+
+     <p><a name="index-g_t_002d_002daudit-_0040var_007bAUDITLIB_007d-8"></a><br><dt><code>--audit </code><var>AUDITLIB</var><dd>Adds <var>AUDITLIB</var> to the <code>DT_AUDIT</code> entry of the dynamic section. 
+<var>AUDITLIB</var> is not checked for existence, nor will it use the DT_SONAME
+specified in the library.  If specified multiple times <code>DT_AUDIT</code>
+will contain a colon separated list of audit interfaces to use. If the linker
+finds an object with an audit entry while searching for shared libraries,
+it will add a corresponding <code>DT_DEPAUDIT</code> entry in the output file. 
+This option is only meaningful on ELF platforms supporting the rtld-audit
+interface.
+
+     <p><a name="index-architectures-9"></a><a name="index-g_t_002dA-_0040var_007barch_007d-10"></a><br><dt><code>-A </code><var>architecture</var><dd><a name="index-g_t_002d_002darchitecture_003d_0040var_007barch_007d-11"></a><dt><code>--architecture=</code><var>architecture</var><dd>In the current release of <samp><span class="command">ld</span></samp>, this option is useful only for the
+Intel 960 family of architectures.  In that <samp><span class="command">ld</span></samp> configuration, the
+<var>architecture</var> argument identifies the particular architecture in
+the 960 family, enabling some safeguards and modifying the
+archive-library search path.  See <a href="i960.html#i960"><samp><span class="command">ld</span></samp> and the Intel 960 family</a>, for details.
+
+     <p>Future releases of <samp><span class="command">ld</span></samp> may support similar functionality for
+other architecture families.
+
+     <p><a name="index-binary-input-format-12"></a><a name="index-g_t_002db-_0040var_007bformat_007d-13"></a><a name="index-g_t_002d_002dformat_003d_0040var_007bformat_007d-14"></a><a name="index-input-format-15"></a><a name="index-input-format-16"></a><br><dt><code>-b </code><var>input-format</var><dt><code>--format=</code><var>input-format</var><dd><samp><span class="command">ld</span></samp> may be configured to support more than one kind of object
+file.  If your <samp><span class="command">ld</span></samp> is configured this way, you can use the
+&lsquo;<samp><span class="samp">-b</span></samp>&rsquo; option to specify the binary format for input object files
+that follow this option on the command line.  Even when <samp><span class="command">ld</span></samp> is
+configured to support alternative object formats, you don't usually need
+to specify this, as <samp><span class="command">ld</span></samp> should be configured to expect as a
+default input format the most usual format on each machine. 
+<var>input-format</var> is a text string, the name of a particular format
+supported by the BFD libraries.  (You can list the available binary
+formats with &lsquo;<samp><span class="samp">objdump -i</span></samp>&rsquo;.) 
+See <a href="BFD.html#BFD">BFD</a>.
+
+     <p>You may want to use this option if you are linking files with an unusual
+binary format.  You can also use &lsquo;<samp><span class="samp">-b</span></samp>&rsquo; to switch formats explicitly (when
+linking object files of different formats), by including
+&lsquo;<samp><span class="samp">-b </span><var>input-format</var></samp>&rsquo; before each group of object files in a
+particular format.
+
+     <p>The default format is taken from the environment variable
+<code>GNUTARGET</code>. 
+See <a href="Environment.html#Environment">Environment</a>. 
+You can also define the input format from a script, using the command
+<code>TARGET</code>;
+see <a href="Format-Commands.html#Format-Commands">Format Commands</a>.
+
+     <p><a name="index-g_t_002dc-_0040var_007bMRI_002dcmdfile_007d-17"></a><a name="index-g_t_002d_002dmri_002dscript_003d_0040var_007bMRI_002dcmdfile_007d-18"></a><a name="index-compatibility_002c-MRI-19"></a><br><dt><code>-c </code><var>MRI-commandfile</var><dt><code>--mri-script=</code><var>MRI-commandfile</var><dd>For compatibility with linkers produced by MRI, <samp><span class="command">ld</span></samp> accepts script
+files written in an alternate, restricted command language, described in
+<a href="MRI.html#MRI">MRI Compatible Script Files</a>. 
+Introduce MRI script files with
+the option &lsquo;<samp><span class="samp">-c</span></samp>&rsquo;; use the &lsquo;<samp><span class="samp">-T</span></samp>&rsquo; option to run linker
+scripts written in the general-purpose <samp><span class="command">ld</span></samp> scripting language. 
+If <var>MRI-cmdfile</var> does not exist, <samp><span class="command">ld</span></samp> looks for it in the directories
+specified by any &lsquo;<samp><span class="samp">-L</span></samp>&rsquo; options.
+
+     <p><a name="index-common-allocation-20"></a><a name="index-g_t_002dd-21"></a><a name="index-g_t_002ddc-22"></a><a name="index-g_t_002ddp-23"></a><br><dt><code>-d</code><dt><code>-dc</code><dt><code>-dp</code><dd>These three options are equivalent; multiple forms are supported for
+compatibility with other linkers.  They assign space to common symbols
+even if a relocatable output file is specified (with &lsquo;<samp><span class="samp">-r</span></samp>&rsquo;).  The
+script command <code>FORCE_COMMON_ALLOCATION</code> has the same effect. 
+See <a href="Miscellaneous-Commands.html#Miscellaneous-Commands">Miscellaneous Commands</a>.
+
+     <p><a name="index-g_t_002d_002ddepaudit-_0040var_007bAUDITLIB_007d-24"></a><a name="index-g_t_002dP-_0040var_007bAUDITLIB_007d-25"></a><br><dt><code>--depaudit </code><var>AUDITLIB</var><dt><code>-P </code><var>AUDITLIB</var><dd>Adds <var>AUDITLIB</var> to the <code>DT_DEPAUDIT</code> entry of the dynamic section. 
+<var>AUDITLIB</var> is not checked for existence, nor will it use the DT_SONAME
+specified in the library.  If specified multiple times <code>DT_DEPAUDIT</code>
+will contain a colon separated list of audit interfaces to use.  This
+option is only meaningful on ELF platforms supporting the rtld-audit interface. 
+The -P option is provided for Solaris compatibility.
+
+     <p><a name="index-entry-point_002c-from-command-line-26"></a><a name="index-g_t_002de-_0040var_007bentry_007d-27"></a><a name="index-g_t_002d_002dentry_003d_0040var_007bentry_007d-28"></a><br><dt><code>-e </code><var>entry</var><dt><code>--entry=</code><var>entry</var><dd>Use <var>entry</var> as the explicit symbol for beginning execution of your
+program, rather than the default entry point.  If there is no symbol
+named <var>entry</var>, the linker will try to parse <var>entry</var> as a number,
+and use that as the entry address (the number will be interpreted in
+base 10; you may use a leading &lsquo;<samp><span class="samp">0x</span></samp>&rsquo; for base 16, or a leading
+&lsquo;<samp><span class="samp">0</span></samp>&rsquo; for base 8).  See <a href="Entry-Point.html#Entry-Point">Entry Point</a>, for a discussion of defaults
+and other ways of specifying the entry point.
+
+     <p><a name="index-g_t_002d_002dexclude_002dlibs-29"></a><br><dt><code>--exclude-libs </code><var>lib</var><code>,</code><var>lib</var><code>,...</code><dd>Specifies a list of archive libraries from which symbols should not be automatically
+exported.  The library names may be delimited by commas or colons.  Specifying
+<code>--exclude-libs ALL</code> excludes symbols in all archive libraries from
+automatic export.  This option is available only for the i386 PE targeted
+port of the linker and for ELF targeted ports.  For i386 PE, symbols
+explicitly listed in a .def file are still exported, regardless of this
+option.  For ELF targeted ports, symbols affected by this option will
+be treated as hidden.
+
+     <p><a name="index-g_t_002d_002dexclude_002dmodules_002dfor_002dimplib-30"></a><br><dt><code>--exclude-modules-for-implib </code><var>module</var><code>,</code><var>module</var><code>,...</code><dd>Specifies a list of object files or archive members, from which symbols
+should not be automatically exported, but which should be copied wholesale
+into the import library being generated during the link.  The module names
+may be delimited by commas or colons, and must match exactly the filenames
+used by <samp><span class="command">ld</span></samp> to open the files; for archive members, this is simply
+the member name, but for object files the name listed must include and
+match precisely any path used to specify the input file on the linker's
+command-line.  This option is available only for the i386 PE targeted port
+of the linker.  Symbols explicitly listed in a .def file are still exported,
+regardless of this option.
+
+     <p><a name="index-dynamic-symbol-table-31"></a><a name="index-g_t_002dE-32"></a><a name="index-g_t_002d_002dexport_002ddynamic-33"></a><a name="index-g_t_002d_002dno_002dexport_002ddynamic-34"></a><br><dt><code>-E</code><dt><code>--export-dynamic</code><dt><code>--no-export-dynamic</code><dd>When creating a dynamically linked executable, using the <samp><span class="option">-E</span></samp>
+option or the <samp><span class="option">--export-dynamic</span></samp> option causes the linker to add
+all symbols to the dynamic symbol table.  The dynamic symbol table is the
+set of symbols which are visible from dynamic objects at run time.
+
+     <p>If you do not use either of these options (or use the
+<samp><span class="option">--no-export-dynamic</span></samp> option to restore the default behavior), the
+dynamic symbol table will normally contain only those symbols which are
+referenced by some dynamic object mentioned in the link.
+
+     <p>If you use <code>dlopen</code> to load a dynamic object which needs to refer
+back to the symbols defined by the program, rather than some other
+dynamic object, then you will probably need to use this option when
+linking the program itself.
+
+     <p>You can also use the dynamic list to control what symbols should
+be added to the dynamic symbol table if the output format supports it. 
+See the description of &lsquo;<samp><span class="samp">--dynamic-list</span></samp>&rsquo;.
+
+     <p>Note that this option is specific to ELF targeted ports.  PE targets
+support a similar function to export all symbols from a DLL or EXE; see
+the description of &lsquo;<samp><span class="samp">--export-all-symbols</span></samp>&rsquo; below.
+
+     <p><a name="index-big_002dendian-objects-35"></a><a name="index-endianness-36"></a><a name="index-g_t_002dEB-37"></a><br><dt><code>-EB</code><dd>Link big-endian objects.  This affects the default output format.
+
+     <p><a name="index-little_002dendian-objects-38"></a><a name="index-g_t_002dEL-39"></a><br><dt><code>-EL</code><dd>Link little-endian objects.  This affects the default output format.
+
+     <p><a name="index-g_t_002df-_0040var_007bname_007d-40"></a><a name="index-g_t_002d_002dauxiliary_003d_0040var_007bname_007d-41"></a><br><dt><code>-f </code><var>name</var><dt><code>--auxiliary=</code><var>name</var><dd>When creating an ELF shared object, set the internal DT_AUXILIARY field
+to the specified name.  This tells the dynamic linker that the symbol
+table of the shared object should be used as an auxiliary filter on the
+symbol table of the shared object <var>name</var>.
+
+     <p>If you later link a program against this filter object, then, when you
+run the program, the dynamic linker will see the DT_AUXILIARY field.  If
+the dynamic linker resolves any symbols from the filter object, it will
+first check whether there is a definition in the shared object
+<var>name</var>.  If there is one, it will be used instead of the definition
+in the filter object.  The shared object <var>name</var> need not exist. 
+Thus the shared object <var>name</var> may be used to provide an alternative
+implementation of certain functions, perhaps for debugging or for
+machine specific performance.
+
+     <p>This option may be specified more than once.  The DT_AUXILIARY entries
+will be created in the order in which they appear on the command line.
+
+     <p><a name="index-g_t_002dF-_0040var_007bname_007d-42"></a><a name="index-g_t_002d_002dfilter_003d_0040var_007bname_007d-43"></a><br><dt><code>-F </code><var>name</var><dt><code>--filter=</code><var>name</var><dd>When creating an ELF shared object, set the internal DT_FILTER field to
+the specified name.  This tells the dynamic linker that the symbol table
+of the shared object which is being created should be used as a filter
+on the symbol table of the shared object <var>name</var>.
+
+     <p>If you later link a program against this filter object, then, when you
+run the program, the dynamic linker will see the DT_FILTER field.  The
+dynamic linker will resolve symbols according to the symbol table of the
+filter object as usual, but it will actually link to the definitions
+found in the shared object <var>name</var>.  Thus the filter object can be
+used to select a subset of the symbols provided by the object
+<var>name</var>.
+
+     <p>Some older linkers used the <samp><span class="option">-F</span></samp> option throughout a compilation
+toolchain for specifying object-file format for both input and output
+object files. 
+The <span class="sc">gnu</span> linker uses other mechanisms for this purpose: the
+<samp><span class="option">-b</span></samp>, <samp><span class="option">--format</span></samp>, <samp><span class="option">--oformat</span></samp> options, the
+<code>TARGET</code> command in linker scripts, and the <code>GNUTARGET</code>
+environment variable. 
+The <span class="sc">gnu</span> linker will ignore the <samp><span class="option">-F</span></samp> option when not
+creating an ELF shared object.
+
+     <p><a name="index-finalization-function-44"></a><a name="index-g_t_002dfini_003d_0040var_007bname_007d-45"></a><br><dt><code>-fini=</code><var>name</var><dd>When creating an ELF executable or shared object, call NAME when the
+executable or shared object is unloaded, by setting DT_FINI to the
+address of the function.  By default, the linker uses <code>_fini</code> as
+the function to call.
+
+     <p><a name="index-g_t_002dg-46"></a><br><dt><code>-g</code><dd>Ignored.  Provided for compatibility with other tools.
+
+     <p><a name="index-g_t_002dG-_0040var_007bvalue_007d-47"></a><a name="index-g_t_002d_002dgpsize_003d_0040var_007bvalue_007d-48"></a><a name="index-object-size-49"></a><br><dt><code>-G </code><var>value</var><dt><code>--gpsize=</code><var>value</var><dd>Set the maximum size of objects to be optimized using the GP register to
+<var>size</var>.  This is only meaningful for object file formats such as
+MIPS ECOFF which supports putting large and small objects into different
+sections.  This is ignored for other object file formats.
+
+     <p><a name="index-runtime-library-name-50"></a><a name="index-g_t_002dh-_0040var_007bname_007d-51"></a><a name="index-g_t_002dsoname_003d_0040var_007bname_007d-52"></a><br><dt><code>-h </code><var>name</var><dt><code>-soname=</code><var>name</var><dd>When creating an ELF shared object, set the internal DT_SONAME field to
+the specified name.  When an executable is linked with a shared object
+which has a DT_SONAME field, then when the executable is run the dynamic
+linker will attempt to load the shared object specified by the DT_SONAME
+field rather than the using the file name given to the linker.
+
+     <p><a name="index-g_t_002di-53"></a><a name="index-incremental-link-54"></a><br><dt><code>-i</code><dd>Perform an incremental link (same as option &lsquo;<samp><span class="samp">-r</span></samp>&rsquo;).
+
+     <p><a name="index-initialization-function-55"></a><a name="index-g_t_002dinit_003d_0040var_007bname_007d-56"></a><br><dt><code>-init=</code><var>name</var><dd>When creating an ELF executable or shared object, call NAME when the
+executable or shared object is loaded, by setting DT_INIT to the address
+of the function.  By default, the linker uses <code>_init</code> as the
+function to call.
+
+     <p><a name="index-archive-files_002c-from-cmd-line-57"></a><a name="index-g_t_002dl-_0040var_007bnamespec_007d-58"></a><a name="index-g_t_002d_002dlibrary_003d_0040var_007bnamespec_007d-59"></a><br><dt><code>-l </code><var>namespec</var><dt><code>--library=</code><var>namespec</var><dd>Add the archive or object file specified by <var>namespec</var> to the
+list of files to link.  This option may be used any number of times. 
+If <var>namespec</var> is of the form <samp><span class="file">:</span><var>filename</var></samp>, <samp><span class="command">ld</span></samp>
+will search the library path for a file called <var>filename</var>, otherwise it
+will search the library path for a file called <samp><span class="file">lib</span><var>namespec</var><span class="file">.a</span></samp>.
+
+     <p>On systems which support shared libraries, <samp><span class="command">ld</span></samp> may also search for
+files other than <samp><span class="file">lib</span><var>namespec</var><span class="file">.a</span></samp>.  Specifically, on ELF
+and SunOS systems, <samp><span class="command">ld</span></samp> will search a directory for a library
+called <samp><span class="file">lib</span><var>namespec</var><span class="file">.so</span></samp> before searching for one called
+<samp><span class="file">lib</span><var>namespec</var><span class="file">.a</span></samp>.  (By convention, a <code>.so</code> extension
+indicates a shared library.)  Note that this behavior does not apply
+to <samp><span class="file">:</span><var>filename</var></samp>, which always specifies a file called
+<var>filename</var>.
+
+     <p>The linker will search an archive only once, at the location where it is
+specified on the command line.  If the archive defines a symbol which
+was undefined in some object which appeared before the archive on the
+command line, the linker will include the appropriate file(s) from the
+archive.  However, an undefined symbol in an object appearing later on
+the command line will not cause the linker to search the archive again.
+
+     <p>See the <samp><span class="option">-(</span></samp> option for a way to force the linker to search
+archives multiple times.
+
+     <p>You may list the same archive multiple times on the command line.
+
+     <p>This type of archive searching is standard for Unix linkers.  However,
+if you are using <samp><span class="command">ld</span></samp> on AIX, note that it is different from the
+behaviour of the AIX linker.
+
+     <p><a name="index-search-directory_002c-from-cmd-line-60"></a><a name="index-g_t_002dL-_0040var_007bdir_007d-61"></a><a name="index-g_t_002d_002dlibrary_002dpath_003d_0040var_007bdir_007d-62"></a><br><dt><code>-L </code><var>searchdir</var><dt><code>--library-path=</code><var>searchdir</var><dd>Add path <var>searchdir</var> to the list of paths that <samp><span class="command">ld</span></samp> will search
+for archive libraries and <samp><span class="command">ld</span></samp> control scripts.  You may use this
+option any number of times.  The directories are searched in the order
+in which they are specified on the command line.  Directories specified
+on the command line are searched before the default directories.  All
+<samp><span class="option">-L</span></samp> options apply to all <samp><span class="option">-l</span></samp> options, regardless of the
+order in which the options appear.  <samp><span class="option">-L</span></samp> options do not affect
+how <samp><span class="command">ld</span></samp> searches for a linker script unless <samp><span class="option">-T</span></samp>
+option is specified.
+
+     <p>If <var>searchdir</var> begins with <code>=</code>, then the <code>=</code> will be replaced
+by the <dfn>sysroot prefix</dfn>, a path specified when the linker is configured.
+
+     <p>The default set of paths searched (without being specified with
+&lsquo;<samp><span class="samp">-L</span></samp>&rsquo;) depends on which emulation mode <samp><span class="command">ld</span></samp> is using, and in
+some cases also on how it was configured.  See <a href="Environment.html#Environment">Environment</a>.
+
+     <p>The paths can also be specified in a link script with the
+<code>SEARCH_DIR</code> command.  Directories specified this way are searched
+at the point in which the linker script appears in the command line.
+
+     <p><a name="index-emulation-63"></a><a name="index-g_t_002dm-_0040var_007bemulation_007d-64"></a><br><dt><code>-m </code><var>emulation</var><dd>Emulate the <var>emulation</var> linker.  You can list the available
+emulations with the &lsquo;<samp><span class="samp">--verbose</span></samp>&rsquo; or &lsquo;<samp><span class="samp">-V</span></samp>&rsquo; options.
+
+     <p>If the &lsquo;<samp><span class="samp">-m</span></samp>&rsquo; option is not used, the emulation is taken from the
+<code>LDEMULATION</code> environment variable, if that is defined.
+
+     <p>Otherwise, the default emulation depends upon how the linker was
+configured.
+
+     <p><a name="index-link-map-65"></a><a name="index-g_t_002dM-66"></a><a name="index-g_t_002d_002dprint_002dmap-67"></a><br><dt><code>-M</code><dt><code>--print-map</code><dd>Print a link map to the standard output.  A link map provides
+information about the link, including the following:
+
+          <ul>
+<li>Where object files are mapped into memory. 
+<li>How common symbols are allocated. 
+<li>All archive members included in the link, with a mention of the symbol
+which caused the archive member to be brought in. 
+<li>The values assigned to symbols.
+
+          <p>Note - symbols whose values are computed by an expression which
+involves a reference to a previous value of the same symbol may not
+have correct result displayed in the link map.  This is because the
+linker discards intermediate results and only retains the final value
+of an expression.  Under such circumstances the linker will display
+the final value enclosed by square brackets.  Thus for example a
+linker script containing:
+
+          <pre class="smallexample">                  foo = 1
+                  foo = foo * 4
+                  foo = foo + 8
+</pre>
+          <p>will produce the following output in the link map if the <samp><span class="option">-M</span></samp>
+option is used:
+
+          <pre class="smallexample">                  0x00000001                foo = 0x1
+                  [0x0000000c]                foo = (foo * 0x4)
+                  [0x0000000c]                foo = (foo + 0x8)
+</pre>
+          <p>See <a href="Expressions.html#Expressions">Expressions</a> for more information about expressions in linker
+scripts. 
+</ul>
+
+     <p><a name="index-g_t_002dn-68"></a><a name="index-read_002donly-text-69"></a><a name="index-NMAGIC-70"></a><a name="index-g_t_002d_002dnmagic-71"></a><br><dt><code>-n</code><dt><code>--nmagic</code><dd>Turn off page alignment of sections, and disable linking against shared
+libraries.  If the output format supports Unix style magic numbers,
+mark the output as <code>NMAGIC</code>.
+
+     <p><a name="index-g_t_002dN-72"></a><a name="index-g_t_002d_002domagic-73"></a><a name="index-read_002fwrite-from-cmd-line-74"></a><a name="index-OMAGIC-75"></a><br><dt><code>-N</code><dt><code>--omagic</code><dd>Set the text and data sections to be readable and writable.  Also, do
+not page-align the data segment, and disable linking against shared
+libraries.  If the output format supports Unix style magic numbers,
+mark the output as <code>OMAGIC</code>. Note: Although a writable text section
+is allowed for PE-COFF targets, it does not conform to the format
+specification published by Microsoft.
+
+     <p><a name="index-g_t_002d_002dno_002domagic-76"></a><a name="index-OMAGIC-77"></a><br><dt><code>--no-omagic</code><dd>This option negates most of the effects of the <samp><span class="option">-N</span></samp> option.  It
+sets the text section to be read-only, and forces the data segment to
+be page-aligned.  Note - this option does not enable linking against
+shared libraries.  Use <samp><span class="option">-Bdynamic</span></samp> for this.
+
+     <p><a name="index-g_t_002do-_0040var_007boutput_007d-78"></a><a name="index-g_t_002d_002doutput_003d_0040var_007boutput_007d-79"></a><a name="index-naming-the-output-file-80"></a><br><dt><code>-o </code><var>output</var><dt><code>--output=</code><var>output</var><dd>Use <var>output</var> as the name for the program produced by <samp><span class="command">ld</span></samp>; if this
+option is not specified, the name <samp><span class="file">a.out</span></samp> is used by default.  The
+script command <code>OUTPUT</code> can also specify the output file name.
+
+     <p><a name="index-g_t_002dO-_0040var_007blevel_007d-81"></a><a name="index-generating-optimized-output-82"></a><br><dt><code>-O </code><var>level</var><dd>If <var>level</var> is a numeric values greater than zero <samp><span class="command">ld</span></samp> optimizes
+the output.  This might take significantly longer and therefore probably
+should only be enabled for the final binary.  At the moment this
+option only affects ELF shared library generation.  Future releases of
+the linker may make more use of this option.  Also currently there is
+no difference in the linker's behaviour for different non-zero values
+of this option.  Again this may change with future releases.
+
+     <p><a name="index-g_t_002dq-83"></a><a name="index-g_t_002d_002demit_002drelocs-84"></a><a name="index-retain-relocations-in-final-executable-85"></a><br><dt><code>-q</code><dt><code>--emit-relocs</code><dd>Leave relocation sections and contents in fully linked executables. 
+Post link analysis and optimization tools may need this information in
+order to perform correct modifications of executables.  This results
+in larger executables.
+
+     <p>This option is currently only supported on ELF platforms.
+
+     <p><a name="index-g_t_002d_002dforce_002ddynamic-86"></a><a name="index-forcing-the-creation-of-dynamic-sections-87"></a><br><dt><code>--force-dynamic</code><dd>Force the output file to have dynamic sections.  This option is specific
+to VxWorks targets.
+
+     <p><a name="index-partial-link-88"></a><a name="index-relocatable-output-89"></a><a name="index-g_t_002dr-90"></a><a name="index-g_t_002d_002drelocatable-91"></a><br><dt><code>-r</code><dt><code>--relocatable</code><dd>Generate relocatable output&mdash;i.e., generate an output file that can in
+turn serve as input to <samp><span class="command">ld</span></samp>.  This is often called <dfn>partial
+linking</dfn>.  As a side effect, in environments that support standard Unix
+magic numbers, this option also sets the output file's magic number to
+<code>OMAGIC</code>. 
+<!-- ; see @option{-N}. -->
+If this option is not specified, an absolute file is produced.  When
+linking C++ programs, this option <em>will not</em> resolve references to
+constructors; to do that, use &lsquo;<samp><span class="samp">-Ur</span></samp>&rsquo;.
+
+     <p>When an input file does not have the same format as the output file,
+partial linking is only supported if that input file does not contain any
+relocations.  Different output formats can have further restrictions; for
+example some <code>a.out</code>-based formats do not support partial linking
+with input files in other formats at all.
+
+     <p>This option does the same thing as &lsquo;<samp><span class="samp">-i</span></samp>&rsquo;.
+
+     <p><a name="index-g_t_002dR-_0040var_007bfile_007d-92"></a><a name="index-g_t_002d_002djust_002dsymbols_003d_0040var_007bfile_007d-93"></a><a name="index-symbol_002donly-input-94"></a><br><dt><code>-R </code><var>filename</var><dt><code>--just-symbols=</code><var>filename</var><dd>Read symbol names and their addresses from <var>filename</var>, but do not
+relocate it or include it in the output.  This allows your output file
+to refer symbolically to absolute locations of memory defined in other
+programs.  You may use this option more than once.
+
+     <p>For compatibility with other ELF linkers, if the <samp><span class="option">-R</span></samp> option is
+followed by a directory name, rather than a file name, it is treated as
+the <samp><span class="option">-rpath</span></samp> option.
+
+     <p><a name="index-g_t_002ds-95"></a><a name="index-g_t_002d_002dstrip_002dall-96"></a><a name="index-strip-all-symbols-97"></a><br><dt><code>-s</code><dt><code>--strip-all</code><dd>Omit all symbol information from the output file.
+
+     <p><a name="index-g_t_002dS-98"></a><a name="index-g_t_002d_002dstrip_002ddebug-99"></a><a name="index-strip-debugger-symbols-100"></a><br><dt><code>-S</code><dt><code>--strip-debug</code><dd>Omit debugger symbol information (but not all symbols) from the output file.
+
+     <p><a name="index-g_t_002dt-101"></a><a name="index-g_t_002d_002dtrace-102"></a><a name="index-input-files_002c-displaying-103"></a><br><dt><code>-t</code><dt><code>--trace</code><dd>Print the names of the input files as <samp><span class="command">ld</span></samp> processes them.
+
+     <p><a name="index-g_t_002dT-_0040var_007bscript_007d-104"></a><a name="index-g_t_002d_002dscript_003d_0040var_007bscript_007d-105"></a><a name="index-script-files-106"></a><br><dt><code>-T </code><var>scriptfile</var><dt><code>--script=</code><var>scriptfile</var><dd>Use <var>scriptfile</var> as the linker script.  This script replaces
+<samp><span class="command">ld</span></samp>'s default linker script (rather than adding to it), so
+<var>commandfile</var> must specify everything necessary to describe the
+output file.  See <a href="Scripts.html#Scripts">Scripts</a>.  If <var>scriptfile</var> does not exist in
+the current directory, <code>ld</code> looks for it in the directories
+specified by any preceding &lsquo;<samp><span class="samp">-L</span></samp>&rsquo; options.  Multiple &lsquo;<samp><span class="samp">-T</span></samp>&rsquo;
+options accumulate.
+
+     <p><a name="index-g_t_002ddT-_0040var_007bscript_007d-107"></a><a name="index-g_t_002d_002ddefault_002dscript_003d_0040var_007bscript_007d-108"></a><a name="index-script-files-109"></a><br><dt><code>-dT </code><var>scriptfile</var><dt><code>--default-script=</code><var>scriptfile</var><dd>Use <var>scriptfile</var> as the default linker script.  See <a href="Scripts.html#Scripts">Scripts</a>.
+
+     <p>This option is similar to the <samp><span class="option">--script</span></samp> option except that
+processing of the script is delayed until after the rest of the
+command line has been processed.  This allows options placed after the
+<samp><span class="option">--default-script</span></samp> option on the command line to affect the
+behaviour of the linker script, which can be important when the linker
+command line cannot be directly controlled by the user.  (eg because
+the command line is being constructed by another tool, such as
+&lsquo;<samp><span class="samp">gcc</span></samp>&rsquo;).
+
+     <p><a name="index-g_t_002du-_0040var_007bsymbol_007d-110"></a><a name="index-g_t_002d_002dundefined_003d_0040var_007bsymbol_007d-111"></a><a name="index-undefined-symbol-112"></a><br><dt><code>-u </code><var>symbol</var><dt><code>--undefined=</code><var>symbol</var><dd>Force <var>symbol</var> to be entered in the output file as an undefined
+symbol.  Doing this may, for example, trigger linking of additional
+modules from standard libraries.  &lsquo;<samp><span class="samp">-u</span></samp>&rsquo; may be repeated with
+different option arguments to enter additional undefined symbols.  This
+option is equivalent to the <code>EXTERN</code> linker script command.
+
+     <p><a name="index-g_t_002dUr-113"></a><a name="index-constructors-114"></a><br><dt><code>-Ur</code><dd>For anything other than C++ programs, this option is equivalent to
+&lsquo;<samp><span class="samp">-r</span></samp>&rsquo;: it generates relocatable output&mdash;i.e., an output file that can in
+turn serve as input to <samp><span class="command">ld</span></samp>.  When linking C++ programs, &lsquo;<samp><span class="samp">-Ur</span></samp>&rsquo;
+<em>does</em> resolve references to constructors, unlike &lsquo;<samp><span class="samp">-r</span></samp>&rsquo;. 
+It does not work to use &lsquo;<samp><span class="samp">-Ur</span></samp>&rsquo; on files that were themselves linked
+with &lsquo;<samp><span class="samp">-Ur</span></samp>&rsquo;; once the constructor table has been built, it cannot
+be added to.  Use &lsquo;<samp><span class="samp">-Ur</span></samp>&rsquo; only for the last partial link, and
+&lsquo;<samp><span class="samp">-r</span></samp>&rsquo; for the others.
+
+     <p><a name="index-g_t_002d_002dunique_005b_003d_0040var_007bSECTION_007d_005d-115"></a><br><dt><code>--unique[=</code><var>SECTION</var><code>]</code><dd>Creates a separate output section for every input section matching
+<var>SECTION</var>, or if the optional wildcard <var>SECTION</var> argument is
+missing, for every orphan input section.  An orphan section is one not
+specifically mentioned in a linker script.  You may use this option
+multiple times on the command line;  It prevents the normal merging of
+input sections with the same name, overriding output section assignments
+in a linker script.
+
+     <p><a name="index-g_t_002dv-116"></a><a name="index-g_t_002dV-117"></a><a name="index-g_t_002d_002dversion-118"></a><a name="index-version-119"></a><br><dt><code>-v</code><dt><code>--version</code><dt><code>-V</code><dd>Display the version number for <samp><span class="command">ld</span></samp>.  The <samp><span class="option">-V</span></samp> option also
+lists the supported emulations.
+
+     <p><a name="index-g_t_002dx-120"></a><a name="index-g_t_002d_002ddiscard_002dall-121"></a><a name="index-deleting-local-symbols-122"></a><br><dt><code>-x</code><dt><code>--discard-all</code><dd>Delete all local symbols.
+
+     <p><a name="index-g_t_002dX-123"></a><a name="index-g_t_002d_002ddiscard_002dlocals-124"></a><a name="index-local-symbols_002c-deleting-125"></a><br><dt><code>-X</code><dt><code>--discard-locals</code><dd>Delete all temporary local symbols.  (These symbols start with
+system-specific local label prefixes, typically &lsquo;<samp><span class="samp">.L</span></samp>&rsquo; for ELF systems
+or &lsquo;<samp><span class="samp">L</span></samp>&rsquo; for traditional a.out systems.)
+
+     <p><a name="index-g_t_002dy-_0040var_007bsymbol_007d-126"></a><a name="index-g_t_002d_002dtrace_002dsymbol_003d_0040var_007bsymbol_007d-127"></a><a name="index-symbol-tracing-128"></a><br><dt><code>-y </code><var>symbol</var><dt><code>--trace-symbol=</code><var>symbol</var><dd>Print the name of each linked file in which <var>symbol</var> appears.  This
+option may be given any number of times.  On many systems it is necessary
+to prepend an underscore.
+
+     <p>This option is useful when you have an undefined symbol in your link but
+don't know where the reference is coming from.
+
+     <p><a name="index-g_t_002dY-_0040var_007bpath_007d-129"></a><br><dt><code>-Y </code><var>path</var><dd>Add <var>path</var> to the default library search path.  This option exists
+for Solaris compatibility.
+
+     <p><a name="index-g_t_002dz-_0040var_007bkeyword_007d-130"></a><br><dt><code>-z </code><var>keyword</var><dd>The recognized keywords are:
+          <dl>
+<dt>&lsquo;<samp><span class="samp">combreloc</span></samp>&rsquo;<dd>Combines multiple reloc sections and sorts them to make dynamic symbol
+lookup caching possible.
+
+          <br><dt>&lsquo;<samp><span class="samp">defs</span></samp>&rsquo;<dd>Disallows undefined symbols in object files.  Undefined symbols in
+shared libraries are still allowed.
+
+          <br><dt>&lsquo;<samp><span class="samp">execstack</span></samp>&rsquo;<dd>Marks the object as requiring executable stack.
+
+          <br><dt>&lsquo;<samp><span class="samp">initfirst</span></samp>&rsquo;<dd>This option is only meaningful when building a shared object. 
+It marks the object so that its runtime initialization will occur
+before the runtime initialization of any other objects brought into
+the process at the same time.  Similarly the runtime finalization of
+the object will occur after the runtime finalization of any other
+objects.
+
+          <br><dt>&lsquo;<samp><span class="samp">interpose</span></samp>&rsquo;<dd>Marks the object that its symbol table interposes before all symbols
+but the primary executable.
+
+          <br><dt>&lsquo;<samp><span class="samp">lazy</span></samp>&rsquo;<dd>When generating an executable or shared library, mark it to tell the
+dynamic linker to defer function call resolution to the point when
+the function is called (lazy binding), rather than at load time. 
+Lazy binding is the default.
+
+          <br><dt>&lsquo;<samp><span class="samp">loadfltr</span></samp>&rsquo;<dd>Marks  the object that its filters be processed immediately at
+runtime.
+
+          <br><dt>&lsquo;<samp><span class="samp">muldefs</span></samp>&rsquo;<dd>Allows multiple definitions.
+
+          <br><dt>&lsquo;<samp><span class="samp">nocombreloc</span></samp>&rsquo;<dd>Disables multiple reloc sections combining.
+
+          <br><dt>&lsquo;<samp><span class="samp">nocopyreloc</span></samp>&rsquo;<dd>Disables production of copy relocs.
+
+          <br><dt>&lsquo;<samp><span class="samp">nodefaultlib</span></samp>&rsquo;<dd>Marks the object that the search for dependencies of this object will
+ignore any default library search paths.
+
+          <br><dt>&lsquo;<samp><span class="samp">nodelete</span></samp>&rsquo;<dd>Marks the object shouldn't be unloaded at runtime.
+
+          <br><dt>&lsquo;<samp><span class="samp">nodlopen</span></samp>&rsquo;<dd>Marks the object not available to <code>dlopen</code>.
+
+          <br><dt>&lsquo;<samp><span class="samp">nodump</span></samp>&rsquo;<dd>Marks the object can not be dumped by <code>dldump</code>.
+
+          <br><dt>&lsquo;<samp><span class="samp">noexecstack</span></samp>&rsquo;<dd>Marks the object as not requiring executable stack.
+
+          <br><dt>&lsquo;<samp><span class="samp">norelro</span></samp>&rsquo;<dd>Don't create an ELF <code>PT_GNU_RELRO</code> segment header in the object.
+
+          <br><dt>&lsquo;<samp><span class="samp">now</span></samp>&rsquo;<dd>When generating an executable or shared library, mark it to tell the
+dynamic linker to resolve all symbols when the program is started, or
+when the shared library is linked to using dlopen, instead of
+deferring function call resolution to the point when the function is
+first called.
+
+          <br><dt>&lsquo;<samp><span class="samp">origin</span></samp>&rsquo;<dd>Marks the object may contain $ORIGIN.
+
+          <br><dt>&lsquo;<samp><span class="samp">relro</span></samp>&rsquo;<dd>Create an ELF <code>PT_GNU_RELRO</code> segment header in the object.
+
+          <br><dt>&lsquo;<samp><span class="samp">max-page-size=</span><var>value</var></samp>&rsquo;<dd>Set the emulation maximum page size to <var>value</var>.
+
+          <br><dt>&lsquo;<samp><span class="samp">common-page-size=</span><var>value</var></samp>&rsquo;<dd>Set the emulation common page size to <var>value</var>.
+
+     </dl>
+
+     <p>Other keywords are ignored for Solaris compatibility.
+
+     <p><a name="index-g_t_002d_0028-131"></a><a name="index-groups-of-archives-132"></a><br><dt><code>-( </code><var>archives</var><code> -)</code><dt><code>--start-group </code><var>archives</var><code> --end-group</code><dd>The <var>archives</var> should be a list of archive files.  They may be
+either explicit file names, or &lsquo;<samp><span class="samp">-l</span></samp>&rsquo; options.
+
+     <p>The specified archives are searched repeatedly until no new undefined
+references are created.  Normally, an archive is searched only once in
+the order that it is specified on the command line.  If a symbol in that
+archive is needed to resolve an undefined symbol referred to by an
+object in an archive that appears later on the command line, the linker
+would not be able to resolve that reference.  By grouping the archives,
+they all be searched repeatedly until all possible references are
+resolved.
+
+     <p>Using this option has a significant performance cost.  It is best to use
+it only when there are unavoidable circular references between two or
+more archives.
+
+     <p><a name="index-g_t_002d_002daccept_002dunknown_002dinput_002darch-133"></a><a name="index-g_t_002d_002dno_002daccept_002dunknown_002dinput_002darch-134"></a><br><dt><code>--accept-unknown-input-arch</code><dt><code>--no-accept-unknown-input-arch</code><dd>Tells the linker to accept input files whose architecture cannot be
+recognised.  The assumption is that the user knows what they are doing
+and deliberately wants to link in these unknown input files.  This was
+the default behaviour of the linker, before release 2.14.  The default
+behaviour from release 2.14 onwards is to reject such input files, and
+so the &lsquo;<samp><span class="samp">--accept-unknown-input-arch</span></samp>&rsquo; option has been added to
+restore the old behaviour.
+
+     <p><a name="index-g_t_002d_002das_002dneeded-135"></a><a name="index-g_t_002d_002dno_002das_002dneeded-136"></a><br><dt><code>--as-needed</code><dt><code>--no-as-needed</code><dd>This option affects ELF DT_NEEDED tags for dynamic libraries mentioned
+on the command line after the <samp><span class="option">--as-needed</span></samp> option.  Normally
+the linker will add a DT_NEEDED tag for each dynamic library mentioned
+on the command line, regardless of whether the library is actually
+needed or not.  <samp><span class="option">--as-needed</span></samp> causes a DT_NEEDED tag to only be
+emitted for a library that satisfies an undefined symbol reference
+from a regular object file or, if the library is not found in the
+DT_NEEDED lists of other libraries linked up to that point, an
+undefined symbol reference from another dynamic library. 
+<samp><span class="option">--no-as-needed</span></samp> restores the default behaviour.
+
+     <p><a name="index-g_t_002d_002dadd_002dneeded-137"></a><a name="index-g_t_002d_002dno_002dadd_002dneeded-138"></a><br><dt><code>--add-needed</code><dt><code>--no-add-needed</code><dd>These two options have been deprecated because of the similarity of
+their names to the <samp><span class="option">--as-needed</span></samp> and <samp><span class="option">--no-as-needed</span></samp>
+options.  They have been replaced by <samp><span class="option">--copy-dt-needed-entries</span></samp>
+and <samp><span class="option">--no-copy-dt-needed-entries</span></samp>.
+
+     <p><a name="index-g_t_002dassert-_0040var_007bkeyword_007d-139"></a><br><dt><code>-assert </code><var>keyword</var><dd>This option is ignored for SunOS compatibility.
+
+     <p><a name="index-g_t_002dBdynamic-140"></a><a name="index-g_t_002ddy-141"></a><a name="index-g_t_002dcall_005fshared-142"></a><br><dt><code>-Bdynamic</code><dt><code>-dy</code><dt><code>-call_shared</code><dd>Link against dynamic libraries.  This is only meaningful on platforms
+for which shared libraries are supported.  This option is normally the
+default on such platforms.  The different variants of this option are
+for compatibility with various systems.  You may use this option
+multiple times on the command line: it affects library searching for
+<samp><span class="option">-l</span></samp> options which follow it.
+
+     <p><a name="index-g_t_002dBgroup-143"></a><br><dt><code>-Bgroup</code><dd>Set the <code>DF_1_GROUP</code> flag in the <code>DT_FLAGS_1</code> entry in the dynamic
+section.  This causes the runtime linker to handle lookups in this
+object and its dependencies to be performed only inside the group. 
+<samp><span class="option">--unresolved-symbols=report-all</span></samp> is implied.  This option is
+only meaningful on ELF platforms which support shared libraries.
+
+     <p><a name="index-g_t_002dBstatic-144"></a><a name="index-g_t_002ddn-145"></a><a name="index-g_t_002dnon_005fshared-146"></a><a name="index-g_t_002dstatic-147"></a><br><dt><code>-Bstatic</code><dt><code>-dn</code><dt><code>-non_shared</code><dt><code>-static</code><dd>Do not link against shared libraries.  This is only meaningful on
+platforms for which shared libraries are supported.  The different
+variants of this option are for compatibility with various systems.  You
+may use this option multiple times on the command line: it affects
+library searching for <samp><span class="option">-l</span></samp> options which follow it.  This
+option also implies <samp><span class="option">--unresolved-symbols=report-all</span></samp>.  This
+option can be used with <samp><span class="option">-shared</span></samp>.  Doing so means that a
+shared library is being created but that all of the library's external
+references must be resolved by pulling in entries from static
+libraries.
+
+     <p><a name="index-g_t_002dBsymbolic-148"></a><br><dt><code>-Bsymbolic</code><dd>When creating a shared library, bind references to global symbols to the
+definition within the shared library, if any.  Normally, it is possible
+for a program linked against a shared library to override the definition
+within the shared library.  This option is only meaningful on ELF
+platforms which support shared libraries.
+
+     <p><a name="index-g_t_002dBsymbolic_002dfunctions-149"></a><br><dt><code>-Bsymbolic-functions</code><dd>When creating a shared library, bind references to global function
+symbols to the definition within the shared library, if any. 
+This option is only meaningful on ELF platforms which support shared
+libraries.
+
+     <p><a name="index-g_t_002d_002ddynamic_002dlist_003d_0040var_007bdynamic_002dlist_002dfile_007d-150"></a><br><dt><code>--dynamic-list=</code><var>dynamic-list-file</var><dd>Specify the name of a dynamic list file to the linker.  This is
+typically used when creating shared libraries to specify a list of
+global symbols whose references shouldn't be bound to the definition
+within the shared library, or creating dynamically linked executables
+to specify a list of symbols which should be added to the symbol table
+in the executable.  This option is only meaningful on ELF platforms
+which support shared libraries.
+
+     <p>The format of the dynamic list is the same as the version node without
+scope and node name.  See <a href="VERSION.html#VERSION">VERSION</a> for more information.
+
+     <p><a name="index-g_t_002d_002ddynamic_002dlist_002ddata-151"></a><br><dt><code>--dynamic-list-data</code><dd>Include all global data symbols to the dynamic list.
+
+     <p><a name="index-g_t_002d_002ddynamic_002dlist_002dcpp_002dnew-152"></a><br><dt><code>--dynamic-list-cpp-new</code><dd>Provide the builtin dynamic list for C++ operator new and delete.  It
+is mainly useful for building shared libstdc++.
+
+     <p><a name="index-g_t_002d_002ddynamic_002dlist_002dcpp_002dtypeinfo-153"></a><br><dt><code>--dynamic-list-cpp-typeinfo</code><dd>Provide the builtin dynamic list for C++ runtime type identification.
+
+     <p><a name="index-g_t_002d_002dcheck_002dsections-154"></a><a name="index-g_t_002d_002dno_002dcheck_002dsections-155"></a><br><dt><code>--check-sections</code><dt><code>--no-check-sections</code><dd>Asks the linker <em>not</em> to check section addresses after they have
+been assigned to see if there are any overlaps.  Normally the linker will
+perform this check, and if it finds any overlaps it will produce
+suitable error messages.  The linker does know about, and does make
+allowances for sections in overlays.  The default behaviour can be
+restored by using the command line switch <samp><span class="option">--check-sections</span></samp>. 
+Section overlap is not usually checked for relocatable links.  You can
+force checking in that case by using the <samp><span class="option">--check-sections</span></samp>
+option.
+
+     <p><a name="index-g_t_002d_002dcopy_002ddt_002dneeded_002dentries-156"></a><a name="index-g_t_002d_002dno_002dcopy_002ddt_002dneeded_002dentries-157"></a><br><dt><code>--copy-dt-needed-entries</code><dt><code>--no-copy-dt-needed-entries</code><dd>This option affects the treatment of dynamic libraries referred to
+by DT_NEEDED tags <em>inside</em> ELF dynamic libraries mentioned on the
+command line.  Normally the linker will add a DT_NEEDED tag to the
+output binary for each library mentioned in a DT_NEEDED tag in an
+input dynamic library.  With <samp><span class="option">--no-copy-dt-needed-entries</span></samp>
+specified on the command line however any dynamic libraries that
+follow it will have their DT_NEEDED entries ignored.  The default
+behaviour can be restored with <samp><span class="option">--copy-dt-needed-entries</span></samp>.
+
+     <p>This option also has an effect on the resolution of symbols in dynamic
+libraries.  With the default setting dynamic libraries mentioned on
+the command line will be recursively searched, following their
+DT_NEEDED tags to other libraries, in order to resolve symbols
+required by the output binary.  With
+<samp><span class="option">--no-copy-dt-needed-entries</span></samp> specified however the searching
+of dynamic libraries that follow it will stop with the dynamic
+library itself.  No DT_NEEDED links will be traversed to resolve
+symbols.
+
+     <p><a name="index-cross-reference-table-158"></a><a name="index-g_t_002d_002dcref-159"></a><br><dt><code>--cref</code><dd>Output a cross reference table.  If a linker map file is being
+generated, the cross reference table is printed to the map file. 
+Otherwise, it is printed on the standard output.
+
+     <p>The format of the table is intentionally simple, so that it may be
+easily processed by a script if necessary.  The symbols are printed out,
+sorted by name.  For each symbol, a list of file names is given.  If the
+symbol is defined, the first file listed is the location of the
+definition.  The remaining files contain references to the symbol.
+
+     <p><a name="index-common-allocation-160"></a><a name="index-g_t_002d_002dno_002ddefine_002dcommon-161"></a><br><dt><code>--no-define-common</code><dd>This option inhibits the assignment of addresses to common symbols. 
+The script command <code>INHIBIT_COMMON_ALLOCATION</code> has the same effect. 
+See <a href="Miscellaneous-Commands.html#Miscellaneous-Commands">Miscellaneous Commands</a>.
+
+     <p>The &lsquo;<samp><span class="samp">--no-define-common</span></samp>&rsquo; option allows decoupling
+the decision to assign addresses to Common symbols from the choice
+of the output file type; otherwise a non-Relocatable output type
+forces assigning addresses to Common symbols. 
+Using &lsquo;<samp><span class="samp">--no-define-common</span></samp>&rsquo; allows Common symbols that are referenced
+from a shared library to be assigned addresses only in the main program. 
+This eliminates the unused duplicate space in the shared library,
+and also prevents any possible confusion over resolving to the wrong
+duplicate when there are many dynamic modules with specialized search
+paths for runtime symbol resolution.
+
+     <p><a name="index-symbols_002c-from-command-line-162"></a><a name="index-g_t_002d_002ddefsym_003d_0040var_007bsymbol_007d_003d_0040var_007bexp_007d-163"></a><br><dt><code>--defsym=</code><var>symbol</var><code>=</code><var>expression</var><dd>Create a global symbol in the output file, containing the absolute
+address given by <var>expression</var>.  You may use this option as many
+times as necessary to define multiple symbols in the command line.  A
+limited form of arithmetic is supported for the <var>expression</var> in this
+context: you may give a hexadecimal constant or the name of an existing
+symbol, or use <code>+</code> and <code>-</code> to add or subtract hexadecimal
+constants or symbols.  If you need more elaborate expressions, consider
+using the linker command language from a script (see <a href="Assignments.html#Assignments">Assignment: Symbol Definitions</a>).  <em>Note:</em> there should be no white
+space between <var>symbol</var>, the equals sign (&ldquo;&lt;=&gt;&rdquo;), and
+<var>expression</var>.
+
+     <p><a name="index-demangling_002c-from-command-line-164"></a><a name="index-g_t_002d_002ddemangle_005b_003d_0040var_007bstyle_007d_005d-165"></a><a name="index-g_t_002d_002dno_002ddemangle-166"></a><br><dt><code>--demangle[=</code><var>style</var><code>]</code><dt><code>--no-demangle</code><dd>These options control whether to demangle symbol names in error messages
+and other output.  When the linker is told to demangle, it tries to
+present symbol names in a readable fashion: it strips leading
+underscores if they are used by the object file format, and converts C++
+mangled symbol names into user readable names.  Different compilers have
+different mangling styles.  The optional demangling style argument can be used
+to choose an appropriate demangling style for your compiler.  The linker will
+demangle by default unless the environment variable &lsquo;<samp><span class="samp">COLLECT_NO_DEMANGLE</span></samp>&rsquo;
+is set.  These options may be used to override the default.
+
+     <p><a name="index-dynamic-linker_002c-from-command-line-167"></a><a name="index-g_t_002dI_0040var_007bfile_007d-168"></a><a name="index-g_t_002d_002ddynamic_002dlinker_003d_0040var_007bfile_007d-169"></a><br><dt><code>-I</code><var>file</var><dt><code>--dynamic-linker=</code><var>file</var><dd>Set the name of the dynamic linker.  This is only meaningful when
+generating dynamically linked ELF executables.  The default dynamic
+linker is normally correct; don't use this unless you know what you are
+doing.
+
+     <p><a name="index-g_t_002d_002dfatal_002dwarnings-170"></a><a name="index-g_t_002d_002dno_002dfatal_002dwarnings-171"></a><br><dt><code>--fatal-warnings</code><dt><code>--no-fatal-warnings</code><dd>Treat all warnings as errors.  The default behaviour can be restored
+with the option <samp><span class="option">--no-fatal-warnings</span></samp>.
+
+     <p><a name="index-g_t_002d_002dforce_002dexe_002dsuffix-172"></a><br><dt><code>--force-exe-suffix</code><dd>Make sure that an output file has a .exe suffix.
+
+     <p>If a successfully built fully linked output file does not have a
+<code>.exe</code> or <code>.dll</code> suffix, this option forces the linker to copy
+the output file to one of the same name with a <code>.exe</code> suffix. This
+option is useful when using unmodified Unix makefiles on a Microsoft
+Windows host, since some versions of Windows won't run an image unless
+it ends in a <code>.exe</code> suffix.
+
+     <p><a name="index-g_t_002d_002dgc_002dsections-173"></a><a name="index-g_t_002d_002dno_002dgc_002dsections-174"></a><a name="index-garbage-collection-175"></a><br><dt><code>--gc-sections</code><dt><code>--no-gc-sections</code><dd>Enable garbage collection of unused input sections.  It is ignored on
+targets that do not support this option.  The default behaviour (of not
+performing this garbage collection) can be restored by specifying
+&lsquo;<samp><span class="samp">--no-gc-sections</span></samp>&rsquo; on the command line.
+
+     <p>&lsquo;<samp><span class="samp">--gc-sections</span></samp>&rsquo; decides which input sections are used by
+examining symbols and relocations.  The section containing the entry
+symbol and all sections containing symbols undefined on the
+command-line will be kept, as will sections containing symbols
+referenced by dynamic objects.  Note that when building shared
+libraries, the linker must assume that any visible symbol is
+referenced.  Once this initial set of sections has been determined,
+the linker recursively marks as used any section referenced by their
+relocations.  See &lsquo;<samp><span class="samp">--entry</span></samp>&rsquo; and &lsquo;<samp><span class="samp">--undefined</span></samp>&rsquo;.
+
+     <p>This option can be set when doing a partial link (enabled with option
+&lsquo;<samp><span class="samp">-r</span></samp>&rsquo;).  In this case the root of symbols kept must be explicitly
+specified either by an &lsquo;<samp><span class="samp">--entry</span></samp>&rsquo; or &lsquo;<samp><span class="samp">--undefined</span></samp>&rsquo; option or by
+a <code>ENTRY</code> command in the linker script.
+
+     <p><a name="index-g_t_002d_002dprint_002dgc_002dsections-176"></a><a name="index-g_t_002d_002dno_002dprint_002dgc_002dsections-177"></a><a name="index-garbage-collection-178"></a><br><dt><code>--print-gc-sections</code><dt><code>--no-print-gc-sections</code><dd>List all sections removed by garbage collection.  The listing is
+printed on stderr.  This option is only effective if garbage
+collection has been enabled via the &lsquo;<samp><span class="samp">--gc-sections</span></samp>&rsquo;) option.  The
+default behaviour (of not listing the sections that are removed) can
+be restored by specifying &lsquo;<samp><span class="samp">--no-print-gc-sections</span></samp>&rsquo; on the command
+line.
+
+     <p><a name="index-help-179"></a><a name="index-usage-180"></a><a name="index-g_t_002d_002dhelp-181"></a><br><dt><code>--help</code><dd>Print a summary of the command-line options on the standard output and exit.
+
+     <p><a name="index-g_t_002d_002dtarget_002dhelp-182"></a><br><dt><code>--target-help</code><dd>Print a summary of all target specific options on the standard output and exit.
+
+     <p><a name="index-g_t_002dMap_003d_0040var_007bmapfile_007d-183"></a><br><dt><code>-Map=</code><var>mapfile</var><dd>Print a link map to the file <var>mapfile</var>.  See the description of the
+<samp><span class="option">-M</span></samp> option, above.
+
+     <p><a name="index-memory-usage-184"></a><a name="index-g_t_002d_002dno_002dkeep_002dmemory-185"></a><br><dt><code>--no-keep-memory</code><dd><samp><span class="command">ld</span></samp> normally optimizes for speed over memory usage by caching the
+symbol tables of input files in memory.  This option tells <samp><span class="command">ld</span></samp> to
+instead optimize for memory usage, by rereading the symbol tables as
+necessary.  This may be required if <samp><span class="command">ld</span></samp> runs out of memory space
+while linking a large executable.
+
+     <p><a name="index-g_t_002d_002dno_002dundefined-186"></a><a name="index-g_t_002dz-defs-187"></a><br><dt><code>--no-undefined</code><dt><code>-z defs</code><dd>Report unresolved symbol references from regular object files.  This
+is done even if the linker is creating a non-symbolic shared library. 
+The switch <samp><span class="option">--[no-]allow-shlib-undefined</span></samp> controls the
+behaviour for reporting unresolved references found in shared
+libraries being linked in.
+
+     <p><a name="index-g_t_002d_002dallow_002dmultiple_002ddefinition-188"></a><a name="index-g_t_002dz-muldefs-189"></a><br><dt><code>--allow-multiple-definition</code><dt><code>-z muldefs</code><dd>Normally when a symbol is defined multiple times, the linker will
+report a fatal error. These options allow multiple definitions and the
+first definition will be used.
+
+     <p><a name="index-g_t_002d_002dallow_002dshlib_002dundefined-190"></a><a name="index-g_t_002d_002dno_002dallow_002dshlib_002dundefined-191"></a><br><dt><code>--allow-shlib-undefined</code><dt><code>--no-allow-shlib-undefined</code><dd>Allows or disallows undefined symbols in shared libraries. 
+This switch is similar to <samp><span class="option">--no-undefined</span></samp> except that it
+determines the behaviour when the undefined symbols are in a
+shared library rather than a regular object file.  It does not affect
+how undefined symbols in regular object files are handled.
+
+     <p>The default behaviour is to report errors for any undefined symbols
+referenced in shared libraries if the linker is being used to create
+an executable, but to allow them if the linker is being used to create
+a shared library.
+
+     <p>The reasons for allowing undefined symbol references in shared
+libraries specified at link time are that:
+
+          <ul>
+<li>A shared library specified at link time may not be the same as the one
+that is available at load time, so the symbol might actually be
+resolvable at load time. 
+<li>There are some operating systems, eg BeOS and HPPA, where undefined
+symbols in shared libraries are normal.
+
+          <p>The BeOS kernel for example patches shared libraries at load time to
+select whichever function is most appropriate for the current
+architecture.  This is used, for example, to dynamically select an
+appropriate memset function. 
+</ul>
+
+     <p><a name="index-g_t_002d_002dno_002dundefined_002dversion-192"></a><br><dt><code>--no-undefined-version</code><dd>Normally when a symbol has an undefined version, the linker will ignore
+it. This option disallows symbols with undefined version and a fatal error
+will be issued instead.
+
+     <p><a name="index-g_t_002d_002ddefault_002dsymver-193"></a><br><dt><code>--default-symver</code><dd>Create and use a default symbol version (the soname) for unversioned
+exported symbols.
+
+     <p><a name="index-g_t_002d_002ddefault_002dimported_002dsymver-194"></a><br><dt><code>--default-imported-symver</code><dd>Create and use a default symbol version (the soname) for unversioned
+imported symbols.
+
+     <p><a name="index-g_t_002d_002dno_002dwarn_002dmismatch-195"></a><br><dt><code>--no-warn-mismatch</code><dd>Normally <samp><span class="command">ld</span></samp> will give an error if you try to link together input
+files that are mismatched for some reason, perhaps because they have
+been compiled for different processors or for different endiannesses. 
+This option tells <samp><span class="command">ld</span></samp> that it should silently permit such possible
+errors.  This option should only be used with care, in cases when you
+have taken some special action that ensures that the linker errors are
+inappropriate.
+
+     <p><a name="index-g_t_002d_002dno_002dwarn_002dsearch_002dmismatch-196"></a><br><dt><code>--no-warn-search-mismatch</code><dd>Normally <samp><span class="command">ld</span></samp> will give a warning if it finds an incompatible
+library during a library search.  This option silences the warning.
+
+     <p><a name="index-g_t_002d_002dno_002dwhole_002darchive-197"></a><br><dt><code>--no-whole-archive</code><dd>Turn off the effect of the <samp><span class="option">--whole-archive</span></samp> option for subsequent
+archive files.
+
+     <p><a name="index-output-file-after-errors-198"></a><a name="index-g_t_002d_002dnoinhibit_002dexec-199"></a><br><dt><code>--noinhibit-exec</code><dd>Retain the executable output file whenever it is still usable. 
+Normally, the linker will not produce an output file if it encounters
+errors during the link process; it exits without writing an output file
+when it issues any error whatsoever.
+
+     <p><a name="index-g_t_002dnostdlib-200"></a><br><dt><code>-nostdlib</code><dd>Only search library directories explicitly specified on the
+command line.  Library directories specified in linker scripts
+(including linker scripts specified on the command line) are ignored.
+
+     <p><a name="index-g_t_002d_002doformat_003d_0040var_007boutput_002dformat_007d-201"></a><br><dt><code>--oformat=</code><var>output-format</var><dd><samp><span class="command">ld</span></samp> may be configured to support more than one kind of object
+file.  If your <samp><span class="command">ld</span></samp> is configured this way, you can use the
+&lsquo;<samp><span class="samp">--oformat</span></samp>&rsquo; option to specify the binary format for the output
+object file.  Even when <samp><span class="command">ld</span></samp> is configured to support alternative
+object formats, you don't usually need to specify this, as <samp><span class="command">ld</span></samp>
+should be configured to produce as a default output format the most
+usual format on each machine.  <var>output-format</var> is a text string, the
+name of a particular format supported by the BFD libraries.  (You can
+list the available binary formats with &lsquo;<samp><span class="samp">objdump -i</span></samp>&rsquo;.)  The script
+command <code>OUTPUT_FORMAT</code> can also specify the output format, but
+this option overrides it.  See <a href="BFD.html#BFD">BFD</a>.
+
+     <p><a name="index-g_t_002dpie-202"></a><a name="index-g_t_002d_002dpic_002dexecutable-203"></a><br><dt><code>-pie</code><dt><code>--pic-executable</code><dd><a name="index-position-independent-executables-204"></a>Create a position independent executable.  This is currently only supported on
+ELF platforms.  Position independent executables are similar to shared
+libraries in that they are relocated by the dynamic linker to the virtual
+address the OS chooses for them (which can vary between invocations).  Like
+normal dynamically linked executables they can be executed and symbols
+defined in the executable cannot be overridden by shared libraries.
+
+     <p><a name="index-g_t_002dqmagic-205"></a><br><dt><code>-qmagic</code><dd>This option is ignored for Linux compatibility.
+
+     <p><a name="index-g_t_002dQy-206"></a><br><dt><code>-Qy</code><dd>This option is ignored for SVR4 compatibility.
+
+     <p><a name="index-g_t_002d_002drelax-207"></a><a name="index-synthesizing-linker-208"></a><a name="index-relaxing-addressing-modes-209"></a><a name="index-g_t_002d_002dno_002drelax-210"></a><br><dt><code>--relax</code><dt><code>--no-relax</code><dd>An option with machine dependent effects. 
+This option is only supported on a few targets. 
+See <a href="H8_002f300.html#H8_002f300"><samp><span class="command">ld</span></samp> and the H8/300</a>. 
+See <a href="i960.html#i960"><samp><span class="command">ld</span></samp> and the Intel 960 family</a>. 
+See <a href="Xtensa.html#Xtensa"><samp><span class="command">ld</span></samp> and Xtensa Processors</a>. 
+See <a href="M68HC11_002f68HC12.html#M68HC11_002f68HC12"><samp><span class="command">ld</span></samp> and the 68HC11 and 68HC12</a>. 
+See <a href="PowerPC-ELF32.html#PowerPC-ELF32"><samp><span class="command">ld</span></samp> and PowerPC 32-bit ELF Support</a>.
+
+     <p>On some platforms the &lsquo;<samp><span class="samp">--relax</span></samp>&rsquo; option performs target specific,
+global optimizations that become possible when the linker resolves
+addressing in the program, such as relaxing address modes,
+synthesizing new instructions, selecting shorter version of current
+instructions, and combinig constant values.
+
+     <p>On some platforms these link time global optimizations may make symbolic
+debugging of the resulting executable impossible. 
+This is known to be the case for the Matsushita MN10200 and MN10300
+family of processors.
+
+     <p>On platforms where this is not supported, &lsquo;<samp><span class="samp">--relax</span></samp>&rsquo; is accepted,
+but ignored.
+
+     <p>On platforms where &lsquo;<samp><span class="samp">--relax</span></samp>&rsquo; is accepted the option
+&lsquo;<samp><span class="samp">--no-relax</span></samp>&rsquo; can be used to disable the feature.
+
+     <p><a name="index-retaining-specified-symbols-211"></a><a name="index-stripping-all-but-some-symbols-212"></a><a name="index-symbols_002c-retaining-selectively-213"></a><a name="index-g_t_002d_002dretain_002dsymbols_002dfile_003d_0040var_007bfilename_007d-214"></a><br><dt><code>--retain-symbols-file=</code><var>filename</var><dd>Retain <em>only</em> the symbols listed in the file <var>filename</var>,
+discarding all others.  <var>filename</var> is simply a flat file, with one
+symbol name per line.  This option is especially useful in environments
+(such as VxWorks)
+where a large global symbol table is accumulated gradually, to conserve
+run-time memory.
+
+     <p>&lsquo;<samp><span class="samp">--retain-symbols-file</span></samp>&rsquo; does <em>not</em> discard undefined symbols,
+or symbols needed for relocations.
+
+     <p>You may only specify &lsquo;<samp><span class="samp">--retain-symbols-file</span></samp>&rsquo; once in the command
+line.  It overrides &lsquo;<samp><span class="samp">-s</span></samp>&rsquo; and &lsquo;<samp><span class="samp">-S</span></samp>&rsquo;.
+
+     <br><dt><code>-rpath=</code><var>dir</var><dd><a name="index-runtime-library-search-path-215"></a><a name="index-g_t_002drpath_003d_0040var_007bdir_007d-216"></a>Add a directory to the runtime library search path.  This is used when
+linking an ELF executable with shared objects.  All <samp><span class="option">-rpath</span></samp>
+arguments are concatenated and passed to the runtime linker, which uses
+them to locate shared objects at runtime.  The <samp><span class="option">-rpath</span></samp> option is
+also used when locating shared objects which are needed by shared
+objects explicitly included in the link; see the description of the
+<samp><span class="option">-rpath-link</span></samp> option.  If <samp><span class="option">-rpath</span></samp> is not used when linking an
+ELF executable, the contents of the environment variable
+<code>LD_RUN_PATH</code> will be used if it is defined.
+
+     <p>The <samp><span class="option">-rpath</span></samp> option may also be used on SunOS.  By default, on
+SunOS, the linker will form a runtime search patch out of all the
+<samp><span class="option">-L</span></samp> options it is given.  If a <samp><span class="option">-rpath</span></samp> option is used, the
+runtime search path will be formed exclusively using the <samp><span class="option">-rpath</span></samp>
+options, ignoring the <samp><span class="option">-L</span></samp> options.  This can be useful when using
+gcc, which adds many <samp><span class="option">-L</span></samp> options which may be on NFS mounted
+file systems.
+
+     <p>For compatibility with other ELF linkers, if the <samp><span class="option">-R</span></samp> option is
+followed by a directory name, rather than a file name, it is treated as
+the <samp><span class="option">-rpath</span></samp> option.
+
+     <p><a name="index-link_002dtime-runtime-library-search-path-217"></a><a name="index-g_t_002drpath_002dlink_003d_0040var_007bdir_007d-218"></a><br><dt><code>-rpath-link=</code><var>dir</var><dd>When using ELF or SunOS, one shared library may require another.  This
+happens when an <code>ld -shared</code> link includes a shared library as one
+of the input files.
+
+     <p>When the linker encounters such a dependency when doing a non-shared,
+non-relocatable link, it will automatically try to locate the required
+shared library and include it in the link, if it is not included
+explicitly.  In such a case, the <samp><span class="option">-rpath-link</span></samp> option
+specifies the first set of directories to search.  The
+<samp><span class="option">-rpath-link</span></samp> option may specify a sequence of directory names
+either by specifying a list of names separated by colons, or by
+appearing multiple times.
+
+     <p>This option should be used with caution as it overrides the search path
+that may have been hard compiled into a shared library. In such a case it
+is possible to use unintentionally a different search path than the
+runtime linker would do.
+
+     <p>The linker uses the following search paths to locate required shared
+libraries:
+          <ol type=1 start=1>
+<li>Any directories specified by <samp><span class="option">-rpath-link</span></samp> options. 
+<li>Any directories specified by <samp><span class="option">-rpath</span></samp> options.  The difference
+between <samp><span class="option">-rpath</span></samp> and <samp><span class="option">-rpath-link</span></samp> is that directories
+specified by <samp><span class="option">-rpath</span></samp> options are included in the executable and
+used at runtime, whereas the <samp><span class="option">-rpath-link</span></samp> option is only effective
+at link time. Searching <samp><span class="option">-rpath</span></samp> in this way is only supported
+by native linkers and cross linkers which have been configured with
+the <samp><span class="option">--with-sysroot</span></samp> option. 
+<li>On an ELF system, for native linkers, if the <samp><span class="option">-rpath</span></samp> and
+<samp><span class="option">-rpath-link</span></samp> options were not used, search the contents of the
+environment variable <code>LD_RUN_PATH</code>. 
+<li>On SunOS, if the <samp><span class="option">-rpath</span></samp> option was not used, search any
+directories specified using <samp><span class="option">-L</span></samp> options. 
+<li>For a native linker, the search the contents of the environment
+variable <code>LD_LIBRARY_PATH</code>. 
+<li>For a native ELF linker, the directories in <code>DT_RUNPATH</code> or
+<code>DT_RPATH</code> of a shared library are searched for shared
+libraries needed by it. The <code>DT_RPATH</code> entries are ignored if
+<code>DT_RUNPATH</code> entries exist. 
+<li>The default directories, normally <samp><span class="file">/lib</span></samp> and <samp><span class="file">/usr/lib</span></samp>. 
+<li>For a native linker on an ELF system, if the file <samp><span class="file">/etc/ld.so.conf</span></samp>
+exists, the list of directories found in that file.
+          </ol>
+
+     <p>If the required shared library is not found, the linker will issue a
+warning and continue with the link.
+
+     <p><a name="index-g_t_002dshared-219"></a><a name="index-g_t_002dBshareable-220"></a><br><dt><code>-shared</code><dt><code>-Bshareable</code><dd><a name="index-shared-libraries-221"></a>Create a shared library.  This is currently only supported on ELF, XCOFF
+and SunOS platforms.  On SunOS, the linker will automatically create a
+shared library if the <samp><span class="option">-e</span></samp> option is not used and there are
+undefined symbols in the link.
+
+     <p><a name="index-g_t_002d_002dsort_002dcommon-222"></a><br><dt><code>--sort-common</code><dt><code>--sort-common=ascending</code><dt><code>--sort-common=descending</code><dd>This option tells <samp><span class="command">ld</span></samp> to sort the common symbols by alignment in
+ascending or descending order when it places them in the appropriate output
+sections.  The symbol alignments considered are sixteen-byte or larger,
+eight-byte, four-byte, two-byte, and one-byte. This is to prevent gaps
+between symbols due to alignment constraints.  If no sorting order is
+specified, then descending order is assumed.
+
+     <p><a name="index-g_t_002d_002dsort_002dsection_003dname-223"></a><br><dt><code>--sort-section=name</code><dd>This option will apply <code>SORT_BY_NAME</code> to all wildcard section
+patterns in the linker script.
+
+     <p><a name="index-g_t_002d_002dsort_002dsection_003dalignment-224"></a><br><dt><code>--sort-section=alignment</code><dd>This option will apply <code>SORT_BY_ALIGNMENT</code> to all wildcard section
+patterns in the linker script.
+
+     <p><a name="index-g_t_002d_002dsplit_002dby_002dfile-225"></a><br><dt><code>--split-by-file[=</code><var>size</var><code>]</code><dd>Similar to <samp><span class="option">--split-by-reloc</span></samp> but creates a new output section for
+each input file when <var>size</var> is reached.  <var>size</var> defaults to a
+size of 1 if not given.
+
+     <p><a name="index-g_t_002d_002dsplit_002dby_002dreloc-226"></a><br><dt><code>--split-by-reloc[=</code><var>count</var><code>]</code><dd>Tries to creates extra sections in the output file so that no single
+output section in the file contains more than <var>count</var> relocations. 
+This is useful when generating huge relocatable files for downloading into
+certain real time kernels with the COFF object file format; since COFF
+cannot represent more than 65535 relocations in a single section.  Note
+that this will fail to work with object file formats which do not
+support arbitrary sections.  The linker will not split up individual
+input sections for redistribution, so if a single input section contains
+more than <var>count</var> relocations one output section will contain that
+many relocations.  <var>count</var> defaults to a value of 32768.
+
+     <p><a name="index-g_t_002d_002dstats-227"></a><br><dt><code>--stats</code><dd>Compute and display statistics about the operation of the linker, such
+as execution time and memory usage.
+
+     <p><a name="index-g_t_002d_002dsysroot_003d_0040var_007bdirectory_007d-228"></a><br><dt><code>--sysroot=</code><var>directory</var><dd>Use <var>directory</var> as the location of the sysroot, overriding the
+configure-time default.  This option is only supported by linkers
+that were configured using <samp><span class="option">--with-sysroot</span></samp>.
+
+     <p><a name="index-g_t_002d_002dtraditional_002dformat-229"></a><a name="index-traditional-format-230"></a><br><dt><code>--traditional-format</code><dd>For some targets, the output of <samp><span class="command">ld</span></samp> is different in some ways from
+the output of some existing linker.  This switch requests <samp><span class="command">ld</span></samp> to
+use the traditional format instead.
+
+     <p><a name="index-dbx-231"></a>For example, on SunOS, <samp><span class="command">ld</span></samp> combines duplicate entries in the
+symbol string table.  This can reduce the size of an output file with
+full debugging information by over 30 percent.  Unfortunately, the SunOS
+<code>dbx</code> program can not read the resulting program (<code>gdb</code> has no
+trouble).  The &lsquo;<samp><span class="samp">--traditional-format</span></samp>&rsquo; switch tells <samp><span class="command">ld</span></samp> to not
+combine duplicate entries.
+
+     <p><a name="index-g_t_002d_002dsection_002dstart_003d_0040var_007bsectionname_007d_003d_0040var_007borg_007d-232"></a><br><dt><code>--section-start=</code><var>sectionname</var><code>=</code><var>org</var><dd>Locate a section in the output file at the absolute
+address given by <var>org</var>.  You may use this option as many
+times as necessary to locate multiple sections in the command
+line. 
+<var>org</var> must be a single hexadecimal integer;
+for compatibility with other linkers, you may omit the leading
+&lsquo;<samp><span class="samp">0x</span></samp>&rsquo; usually associated with hexadecimal values.  <em>Note:</em> there
+should be no white space between <var>sectionname</var>, the equals
+sign (&ldquo;&lt;=&gt;&rdquo;), and <var>org</var>.
+
+     <p><a name="index-g_t_002dTbss_003d_0040var_007borg_007d-233"></a><a name="index-g_t_002dTdata_003d_0040var_007borg_007d-234"></a><a name="index-g_t_002dTtext_003d_0040var_007borg_007d-235"></a><a name="index-segment-origins_002c-cmd-line-236"></a><br><dt><code>-Tbss=</code><var>org</var><dt><code>-Tdata=</code><var>org</var><dt><code>-Ttext=</code><var>org</var><dd>Same as <samp><span class="option">--section-start</span></samp>, with <code>.bss</code>, <code>.data</code> or
+<code>.text</code> as the <var>sectionname</var>.
+
+     <p><a name="index-g_t_002dTtext_002dsegment_003d_0040var_007borg_007d-237"></a><br><dt><code>-Ttext-segment=</code><var>org</var><dd><a name="index-text-segment-origin_002c-cmd-line-238"></a>When creating an ELF executable or shared object, it will set the address
+of the first byte of the text segment.
+
+     <p><a name="index-g_t_002d_002dunresolved_002dsymbols-239"></a><br><dt><code>--unresolved-symbols=</code><var>method</var><dd>Determine how to handle unresolved symbols.  There are four possible
+values for &lsquo;<samp><span class="samp">method</span></samp>&rsquo;:
+
+          <dl>
+<dt>&lsquo;<samp><span class="samp">ignore-all</span></samp>&rsquo;<dd>Do not report any unresolved symbols.
+
+          <br><dt>&lsquo;<samp><span class="samp">report-all</span></samp>&rsquo;<dd>Report all unresolved symbols.  This is the default.
+
+          <br><dt>&lsquo;<samp><span class="samp">ignore-in-object-files</span></samp>&rsquo;<dd>Report unresolved symbols that are contained in shared libraries, but
+ignore them if they come from regular object files.
+
+          <br><dt>&lsquo;<samp><span class="samp">ignore-in-shared-libs</span></samp>&rsquo;<dd>Report unresolved symbols that come from regular object files, but
+ignore them if they come from shared libraries.  This can be useful
+when creating a dynamic binary and it is known that all the shared
+libraries that it should be referencing are included on the linker's
+command line. 
+</dl>
+
+     <p>The behaviour for shared libraries on their own can also be controlled
+by the <samp><span class="option">--[no-]allow-shlib-undefined</span></samp> option.
+
+     <p>Normally the linker will generate an error message for each reported
+unresolved symbol but the option <samp><span class="option">--warn-unresolved-symbols</span></samp>
+can change this to a warning.
+
+     <p><a name="index-g_t_002d_002dverbose-240"></a><a name="index-verbose-241"></a><br><dt><code>--dll-verbose</code><dt><code>--verbose</code><dd>Display the version number for <samp><span class="command">ld</span></samp> and list the linker emulations
+supported.  Display which input files can and cannot be opened.  Display
+the linker script being used by the linker.
+
+     <p><a name="index-g_t_002d_002dversion_002dscript_003d_0040var_007bversion_002dscriptfile_007d-242"></a><a name="index-version-script_002c-symbol-versions-243"></a><br><dt><code>--version-script=</code><var>version-scriptfile</var><dd>Specify the name of a version script to the linker.  This is typically
+used when creating shared libraries to specify additional information
+about the version hierarchy for the library being created.  This option
+is only fully supported on ELF platforms which support shared libraries;
+see <a href="VERSION.html#VERSION">VERSION</a>.  It is partially supported on PE platforms, which can
+use version scripts to filter symbol visibility in auto-export mode: any
+symbols marked &lsquo;<samp><span class="samp">local</span></samp>&rsquo; in the version script will not be exported. 
+See <a href="WIN32.html#WIN32">WIN32</a>.
+
+     <p><a name="index-g_t_002d_002dwarn_002dcommon-244"></a><a name="index-warnings_002c-on-combining-symbols-245"></a><a name="index-combining-symbols_002c-warnings-on-246"></a><br><dt><code>--warn-common</code><dd>Warn when a common symbol is combined with another common symbol or with
+a symbol definition.  Unix linkers allow this somewhat sloppy practise,
+but linkers on some other operating systems do not.  This option allows
+you to find potential problems from combining global symbols. 
+Unfortunately, some C libraries use this practise, so you may get some
+warnings about symbols in the libraries as well as in your programs.
+
+     <p>There are three kinds of global symbols, illustrated here by C examples:
+
+          <dl>
+<dt>&lsquo;<samp><span class="samp">int i = 1;</span></samp>&rsquo;<dd>A definition, which goes in the initialized data section of the output
+file.
+
+          <br><dt>&lsquo;<samp><span class="samp">extern int i;</span></samp>&rsquo;<dd>An undefined reference, which does not allocate space. 
+There must be either a definition or a common symbol for the
+variable somewhere.
+
+          <br><dt>&lsquo;<samp><span class="samp">int i;</span></samp>&rsquo;<dd>A common symbol.  If there are only (one or more) common symbols for a
+variable, it goes in the uninitialized data area of the output file. 
+The linker merges multiple common symbols for the same variable into a
+single symbol.  If they are of different sizes, it picks the largest
+size.  The linker turns a common symbol into a declaration, if there is
+a definition of the same variable. 
+</dl>
+
+     <p>The &lsquo;<samp><span class="samp">--warn-common</span></samp>&rsquo; option can produce five kinds of warnings. 
+Each warning consists of a pair of lines: the first describes the symbol
+just encountered, and the second describes the previous symbol
+encountered with the same name.  One or both of the two symbols will be
+a common symbol.
+
+          <ol type=1 start=1>
+<li>Turning a common symbol into a reference, because there is already a
+definition for the symbol.
+          <pre class="smallexample">               <var>file</var>(<var>section</var>): warning: common of `<var>symbol</var>'
+                  overridden by definition
+               <var>file</var>(<var>section</var>): warning: defined here
+</pre>
+          <li>Turning a common symbol into a reference, because a later definition for
+the symbol is encountered.  This is the same as the previous case,
+except that the symbols are encountered in a different order.
+          <pre class="smallexample">               <var>file</var>(<var>section</var>): warning: definition of `<var>symbol</var>'
+                  overriding common
+               <var>file</var>(<var>section</var>): warning: common is here
+</pre>
+          <li>Merging a common symbol with a previous same-sized common symbol.
+          <pre class="smallexample">               <var>file</var>(<var>section</var>): warning: multiple common
+                  of `<var>symbol</var>'
+               <var>file</var>(<var>section</var>): warning: previous common is here
+</pre>
+          <li>Merging a common symbol with a previous larger common symbol.
+          <pre class="smallexample">               <var>file</var>(<var>section</var>): warning: common of `<var>symbol</var>'
+                  overridden by larger common
+               <var>file</var>(<var>section</var>): warning: larger common is here
+</pre>
+          <li>Merging a common symbol with a previous smaller common symbol.  This is
+the same as the previous case, except that the symbols are
+encountered in a different order.
+          <pre class="smallexample">               <var>file</var>(<var>section</var>): warning: common of `<var>symbol</var>'
+                  overriding smaller common
+               <var>file</var>(<var>section</var>): warning: smaller common is here
+</pre>
+          </ol>
+
+     <p><a name="index-g_t_002d_002dwarn_002dconstructors-247"></a><br><dt><code>--warn-constructors</code><dd>Warn if any global constructors are used.  This is only useful for a few
+object file formats.  For formats like COFF or ELF, the linker can not
+detect the use of global constructors.
+
+     <p><a name="index-g_t_002d_002dwarn_002dmultiple_002dgp-248"></a><br><dt><code>--warn-multiple-gp</code><dd>Warn if multiple global pointer values are required in the output file. 
+This is only meaningful for certain processors, such as the Alpha. 
+Specifically, some processors put large-valued constants in a special
+section.  A special register (the global pointer) points into the middle
+of this section, so that constants can be loaded efficiently via a
+base-register relative addressing mode.  Since the offset in
+base-register relative mode is fixed and relatively small (e.g., 16
+bits), this limits the maximum size of the constant pool.  Thus, in
+large programs, it is often necessary to use multiple global pointer
+values in order to be able to address all possible constants.  This
+option causes a warning to be issued whenever this case occurs.
+
+     <p><a name="index-g_t_002d_002dwarn_002donce-249"></a><a name="index-warnings_002c-on-undefined-symbols-250"></a><a name="index-undefined-symbols_002c-warnings-on-251"></a><br><dt><code>--warn-once</code><dd>Only warn once for each undefined symbol, rather than once per module
+which refers to it.
+
+     <p><a name="index-g_t_002d_002dwarn_002dsection_002dalign-252"></a><a name="index-warnings_002c-on-section-alignment-253"></a><a name="index-section-alignment_002c-warnings-on-254"></a><br><dt><code>--warn-section-align</code><dd>Warn if the address of an output section is changed because of
+alignment.  Typically, the alignment will be set by an input section. 
+The address will only be changed if it not explicitly specified; that
+is, if the <code>SECTIONS</code> command does not specify a start address for
+the section (see <a href="SECTIONS.html#SECTIONS">SECTIONS</a>).
+
+     <p><a name="index-g_t_002d_002dwarn_002dshared_002dtextrel-255"></a><br><dt><code>--warn-shared-textrel</code><dd>Warn if the linker adds a DT_TEXTREL to a shared object.
+
+     <p><a name="index-g_t_002d_002dwarn_002dalternate_002dem-256"></a><br><dt><code>--warn-alternate-em</code><dd>Warn if an object has alternate ELF machine code.
+
+     <p><a name="index-g_t_002d_002dwarn_002dunresolved_002dsymbols-257"></a><br><dt><code>--warn-unresolved-symbols</code><dd>If the linker is going to report an unresolved symbol (see the option
+<samp><span class="option">--unresolved-symbols</span></samp>) it will normally generate an error. 
+This option makes it generate a warning instead.
+
+     <p><a name="index-g_t_002d_002derror_002dunresolved_002dsymbols-258"></a><br><dt><code>--error-unresolved-symbols</code><dd>This restores the linker's default behaviour of generating errors when
+it is reporting unresolved symbols.
+
+     <p><a name="index-g_t_002d_002dwhole_002darchive-259"></a><a name="index-including-an-entire-archive-260"></a><br><dt><code>--whole-archive</code><dd>For each archive mentioned on the command line after the
+<samp><span class="option">--whole-archive</span></samp> option, include every object file in the archive
+in the link, rather than searching the archive for the required object
+files.  This is normally used to turn an archive file into a shared
+library, forcing every object to be included in the resulting shared
+library.  This option may be used more than once.
+
+     <p>Two notes when using this option from gcc: First, gcc doesn't know
+about this option, so you have to use <samp><span class="option">-Wl,-whole-archive</span></samp>. 
+Second, don't forget to use <samp><span class="option">-Wl,-no-whole-archive</span></samp> after your
+list of archives, because gcc will add its own list of archives to
+your link and you may not want this flag to affect those as well.
+
+     <p><a name="index-g_t_002d_002dwrap_003d_0040var_007bsymbol_007d-261"></a><br><dt><code>--wrap=</code><var>symbol</var><dd>Use a wrapper function for <var>symbol</var>.  Any undefined reference to
+<var>symbol</var> will be resolved to <code>__wrap_</code><var>symbol</var>.  Any
+undefined reference to <code>__real_</code><var>symbol</var> will be resolved to
+<var>symbol</var>.
+
+     <p>This can be used to provide a wrapper for a system function.  The
+wrapper function should be called <code>__wrap_</code><var>symbol</var>.  If it
+wishes to call the system function, it should call
+<code>__real_</code><var>symbol</var>.
+
+     <p>Here is a trivial example:
+
+     <pre class="smallexample">          void *
+          __wrap_malloc (size_t c)
+          {
+            printf ("malloc called with %zu\n", c);
+            return __real_malloc (c);
+          }
+</pre>
+     <p>If you link other code with this file using <samp><span class="option">--wrap malloc</span></samp>, then
+all calls to <code>malloc</code> will call the function <code>__wrap_malloc</code>
+instead.  The call to <code>__real_malloc</code> in <code>__wrap_malloc</code> will
+call the real <code>malloc</code> function.
+
+     <p>You may wish to provide a <code>__real_malloc</code> function as well, so that
+links without the <samp><span class="option">--wrap</span></samp> option will succeed.  If you do this,
+you should not put the definition of <code>__real_malloc</code> in the same
+file as <code>__wrap_malloc</code>; if you do, the assembler may resolve the
+call before the linker has a chance to wrap it to <code>malloc</code>.
+
+     <p><a name="index-g_t_002d_002deh_002dframe_002dhdr-262"></a><br><dt><code>--eh-frame-hdr</code><dd>Request creation of <code>.eh_frame_hdr</code> section and ELF
+<code>PT_GNU_EH_FRAME</code> segment header.
+
+     <p><a name="index-g_t_002d_002denable_002dnew_002ddtags-263"></a><a name="index-g_t_002d_002ddisable_002dnew_002ddtags-264"></a><br><dt><code>--enable-new-dtags</code><dt><code>--disable-new-dtags</code><dd>This linker can create the new dynamic tags in ELF. But the older ELF
+systems may not understand them. If you specify
+<samp><span class="option">--enable-new-dtags</span></samp>, the dynamic tags will be created as needed. 
+If you specify <samp><span class="option">--disable-new-dtags</span></samp>, no new dynamic tags will be
+created. By default, the new dynamic tags are not created. Note that
+those options are only available for ELF systems.
+
+     <p><a name="index-g_t_002d_002dhash_002dsize_003d_0040var_007bnumber_007d-265"></a><br><dt><code>--hash-size=</code><var>number</var><dd>Set the default size of the linker's hash tables to a prime number
+close to <var>number</var>.  Increasing this value can reduce the length of
+time it takes the linker to perform its tasks, at the expense of
+increasing the linker's memory requirements.  Similarly reducing this
+value can reduce the memory requirements at the expense of speed.
+
+     <p><a name="index-g_t_002d_002dhash_002dstyle_003d_0040var_007bstyle_007d-266"></a><br><dt><code>--hash-style=</code><var>style</var><dd>Set the type of linker's hash table(s).  <var>style</var> can be either
+<code>sysv</code> for classic ELF <code>.hash</code> section, <code>gnu</code> for
+new style GNU <code>.gnu.hash</code> section or <code>both</code> for both
+the classic ELF <code>.hash</code> and new style GNU <code>.gnu.hash</code>
+hash tables.  The default is <code>sysv</code>.
+
+     <p><a name="index-g_t_002d_002dreduce_002dmemory_002doverheads-267"></a><br><dt><code>--reduce-memory-overheads</code><dd>This option reduces memory requirements at ld runtime, at the expense of
+linking speed.  This was introduced to select the old O(n^2) algorithm
+for link map file generation, rather than the new O(n) algorithm which uses
+about 40% more memory for symbol storage.
+
+     <p>Another effect of the switch is to set the default hash table size to
+1021, which again saves memory at the cost of lengthening the linker's
+run time.  This is not done however if the <samp><span class="option">--hash-size</span></samp> switch
+has been used.
+
+     <p>The <samp><span class="option">--reduce-memory-overheads</span></samp> switch may be also be used to
+enable other tradeoffs in future versions of the linker.
+
+     <p><a name="index-g_t_002d_002dbuild_002did-268"></a><a name="index-g_t_002d_002dbuild_002did_003d_0040var_007bstyle_007d-269"></a><br><dt><code>--build-id</code><dt><code>--build-id=</code><var>style</var><dd>Request creation of <code>.note.gnu.build-id</code> ELF note section. 
+The contents of the note are unique bits identifying this linked
+file.  <var>style</var> can be <code>uuid</code> to use 128 random bits,
+<code>sha1</code> to use a 160-bit <span class="sc">SHA1</span> hash on the normative
+parts of the output contents, <code>md5</code> to use a 128-bit
+<span class="sc">MD5</span> hash on the normative parts of the output contents, or
+<code>0x</code><var>hexstring</var> to use a chosen bit string specified as
+an even number of hexadecimal digits (<code>-</code> and <code>:</code>
+characters between digit pairs are ignored).  If <var>style</var> is
+omitted, <code>sha1</code> is used.
+
+     <p>The <code>md5</code> and <code>sha1</code> styles produces an identifier
+that is always the same in an identical output file, but will be
+unique among all nonidentical output files.  It is not intended
+to be compared as a checksum for the file's contents.  A linked
+file may be changed later by other tools, but the build ID bit
+string identifying the original linked file does not change.
+
+     <p>Passing <code>none</code> for <var>style</var> disables the setting from any
+<code>--build-id</code> options earlier on the command line.
+
+     <p><a name="index-g_t_002d_002dno_002dpoison_002dsystem_002ddirectories-270"></a><br><dt><code>--no-poison-system-directories</code><dd>Do not warn for <samp><span class="option">-L</span></samp> options using system directories such as
+<samp><span class="file">/usr/lib</span></samp> when cross linking.  This option is intended for use
+in chroot environments when such directories contain the correct
+libraries for the target system rather than the host.
+
+     <p><a name="index-g_t_002d_002derror_002dpoison_002dsystem_002ddirectories-271"></a><br><dt><code>--error-poison-system-directories</code><dd>Give an error instead of a warning for <samp><span class="option">-L</span></samp> options using
+system directories when cross linking. 
+</dl>
+
+<!-- man end -->
+<h4 class="subsection">2.1.1 Options Specific to i386 PE Targets</h4>
+
+<!-- man begin OPTIONS -->
+<p>The i386 PE linker supports the <samp><span class="option">-shared</span></samp> option, which causes
+the output to be a dynamically linked library (DLL) instead of a
+normal executable.  You should name the output <code>*.dll</code> when you
+use this option.  In addition, the linker fully supports the standard
+<code>*.def</code> files, which may be specified on the linker command line
+like an object file (in fact, it should precede archives it exports
+symbols from, to ensure that they get linked in, just like a normal
+object file).
+
+   <p>In addition to the options common to all targets, the i386 PE linker
+support additional command line options that are specific to the i386
+PE target.  Options that take values may be separated from their
+values by either a space or an equals sign.
+
+     
+<a name="index-g_t_002d_002dadd_002dstdcall_002dalias-272"></a>
+<dl><dt><code>--add-stdcall-alias</code><dd>If given, symbols with a stdcall suffix (@<var>nn</var>) will be exported
+as-is and also with the suffix stripped. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-g_t_002d_002dbase_002dfile-273"></a><br><dt><code>--base-file </code><var>file</var><dd>Use <var>file</var> as the name of a file in which to save the base
+addresses of all the relocations needed for generating DLLs with
+<samp><span class="file">dlltool</span></samp>. 
+[This is an i386 PE specific option]
+
+     <p><a name="index-g_t_002d_002ddll-274"></a><br><dt><code>--dll</code><dd>Create a DLL instead of a regular executable.  You may also use
+<samp><span class="option">-shared</span></samp> or specify a <code>LIBRARY</code> in a given <code>.def</code>
+file. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-g_t_002d_002denable_002dlong_002dsection_002dnames-275"></a><a name="index-g_t_002d_002ddisable_002dlong_002dsection_002dnames-276"></a><br><dt><code>--enable-long-section-names</code><dt><code>--disable-long-section-names</code><dd>The PE variants of the Coff object format add an extension that permits
+the use of section names longer than eight characters, the normal limit
+for Coff.  By default, these names are only allowed in object files, as
+fully-linked executable images do not carry the Coff string table required
+to support the longer names.  As a GNU extension, it is possible to
+allow their use in executable images as well, or to (probably pointlessly!) 
+disallow it in object files, by using these two options.  Executable images
+generated with these long section names are slightly non-standard, carrying
+as they do a string table, and may generate confusing output when examined
+with non-GNU PE-aware tools, such as file viewers and dumpers.  However,
+GDB relies on the use of PE long section names to find Dwarf-2 debug
+information sections in an executable image at runtime, and so if neither
+option is specified on the command-line, <samp><span class="command">ld</span></samp> will enable long
+section names, overriding the default and technically correct behaviour,
+when it finds the presence of debug information while linking an executable
+image and not stripping symbols. 
+[This option is valid for all PE targeted ports of the linker]
+
+     <p><a name="index-g_t_002d_002denable_002dstdcall_002dfixup-277"></a><a name="index-g_t_002d_002ddisable_002dstdcall_002dfixup-278"></a><br><dt><code>--enable-stdcall-fixup</code><dt><code>--disable-stdcall-fixup</code><dd>If the link finds a symbol that it cannot resolve, it will attempt to
+do &ldquo;fuzzy linking&rdquo; by looking for another defined symbol that differs
+only in the format of the symbol name (cdecl vs stdcall) and will
+resolve that symbol by linking to the match.  For example, the
+undefined symbol <code>_foo</code> might be linked to the function
+<code>_foo@12</code>, or the undefined symbol <code>_bar@16</code> might be linked
+to the function <code>_bar</code>.  When the linker does this, it prints a
+warning, since it normally should have failed to link, but sometimes
+import libraries generated from third-party dlls may need this feature
+to be usable.  If you specify <samp><span class="option">--enable-stdcall-fixup</span></samp>, this
+feature is fully enabled and warnings are not printed.  If you specify
+<samp><span class="option">--disable-stdcall-fixup</span></samp>, this feature is disabled and such
+mismatches are considered to be errors. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-g_t_002d_002dleading_002dunderscore-279"></a><a name="index-g_t_002d_002dno_002dleading_002dunderscore-280"></a><br><dt><code>--leading-underscore</code><dt><code>--no-leading-underscore</code><dd>For most targets default symbol-prefix is an underscore and is defined
+in target's description. By this option it is possible to
+disable/enable the default underscore symbol-prefix.
+
+     <p><a name="index-DLLs_002c-creating-281"></a><a name="index-g_t_002d_002dexport_002dall_002dsymbols-282"></a><br><dt><code>--export-all-symbols</code><dd>If given, all global symbols in the objects used to build a DLL will
+be exported by the DLL.  Note that this is the default if there
+otherwise wouldn't be any exported symbols.  When symbols are
+explicitly exported via DEF files or implicitly exported via function
+attributes, the default is to not export anything else unless this
+option is given.  Note that the symbols <code>DllMain@12</code>,
+<code>DllEntryPoint@0</code>, <code>DllMainCRTStartup@12</code>, and
+<code>impure_ptr</code> will not be automatically
+exported.  Also, symbols imported from other DLLs will not be
+re-exported, nor will symbols specifying the DLL's internal layout
+such as those beginning with <code>_head_</code> or ending with
+<code>_iname</code>.  In addition, no symbols from <code>libgcc</code>,
+<code>libstd++</code>, <code>libmingw32</code>, or <code>crtX.o</code> will be exported. 
+Symbols whose names begin with <code>__rtti_</code> or <code>__builtin_</code> will
+not be exported, to help with C++ DLLs.  Finally, there is an
+extensive list of cygwin-private symbols that are not exported
+(obviously, this applies on when building DLLs for cygwin targets). 
+These cygwin-excludes are: <code>_cygwin_dll_entry@12</code>,
+<code>_cygwin_crt0_common@8</code>, <code>_cygwin_noncygwin_dll_entry@12</code>,
+<code>_fmode</code>, <code>_impure_ptr</code>, <code>cygwin_attach_dll</code>,
+<code>cygwin_premain0</code>, <code>cygwin_premain1</code>, <code>cygwin_premain2</code>,
+<code>cygwin_premain3</code>, and <code>environ</code>. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-g_t_002d_002dexclude_002dsymbols-283"></a><br><dt><code>--exclude-symbols </code><var>symbol</var><code>,</code><var>symbol</var><code>,...</code><dd>Specifies a list of symbols which should not be automatically
+exported.  The symbol names may be delimited by commas or colons. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-g_t_002d_002dexclude_002dall_002dsymbols-284"></a><br><dt><code>--exclude-all-symbols</code><dd>Specifies no symbols should be automatically exported. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-g_t_002d_002dfile_002dalignment-285"></a><br><dt><code>--file-alignment</code><dd>Specify the file alignment.  Sections in the file will always begin at
+file offsets which are multiples of this number.  This defaults to
+512. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-heap-size-286"></a><a name="index-g_t_002d_002dheap-287"></a><br><dt><code>--heap </code><var>reserve</var><dt><code>--heap </code><var>reserve</var><code>,</code><var>commit</var><dd>Specify the number of bytes of memory to reserve (and optionally commit)
+to be used as heap for this program.  The default is 1Mb reserved, 4K
+committed. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-image-base-288"></a><a name="index-g_t_002d_002dimage_002dbase-289"></a><br><dt><code>--image-base </code><var>value</var><dd>Use <var>value</var> as the base address of your program or dll.  This is
+the lowest memory location that will be used when your program or dll
+is loaded.  To reduce the need to relocate and improve performance of
+your dlls, each should have a unique base address and not overlap any
+other dlls.  The default is 0x400000 for executables, and 0x10000000
+for dlls. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-g_t_002d_002dkill_002dat-290"></a><br><dt><code>--kill-at</code><dd>If given, the stdcall suffixes (@<var>nn</var>) will be stripped from
+symbols before they are exported. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-g_t_002d_002dlarge_002daddress_002daware-291"></a><br><dt><code>--large-address-aware</code><dd>If given, the appropriate bit in the &ldquo;Characteristics&rdquo; field of the COFF
+header is set to indicate that this executable supports virtual addresses
+greater than 2 gigabytes.  This should be used in conjunction with the /3GB
+or /USERVA=<var>value</var> megabytes switch in the &ldquo;[operating systems]&rdquo;
+section of the BOOT.INI.  Otherwise, this bit has no effect. 
+[This option is specific to PE targeted ports of the linker]
+
+     <p><a name="index-g_t_002d_002dmajor_002dimage_002dversion-292"></a><br><dt><code>--major-image-version </code><var>value</var><dd>Sets the major number of the &ldquo;image version&rdquo;.  Defaults to 1. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-g_t_002d_002dmajor_002dos_002dversion-293"></a><br><dt><code>--major-os-version </code><var>value</var><dd>Sets the major number of the &ldquo;os version&rdquo;.  Defaults to 4. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-g_t_002d_002dmajor_002dsubsystem_002dversion-294"></a><br><dt><code>--major-subsystem-version </code><var>value</var><dd>Sets the major number of the &ldquo;subsystem version&rdquo;.  Defaults to 4. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-g_t_002d_002dminor_002dimage_002dversion-295"></a><br><dt><code>--minor-image-version </code><var>value</var><dd>Sets the minor number of the &ldquo;image version&rdquo;.  Defaults to 0. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-g_t_002d_002dminor_002dos_002dversion-296"></a><br><dt><code>--minor-os-version </code><var>value</var><dd>Sets the minor number of the &ldquo;os version&rdquo;.  Defaults to 0. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-g_t_002d_002dminor_002dsubsystem_002dversion-297"></a><br><dt><code>--minor-subsystem-version </code><var>value</var><dd>Sets the minor number of the &ldquo;subsystem version&rdquo;.  Defaults to 0. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-DEF-files_002c-creating-298"></a><a name="index-DLLs_002c-creating-299"></a><a name="index-g_t_002d_002doutput_002ddef-300"></a><br><dt><code>--output-def </code><var>file</var><dd>The linker will create the file <var>file</var> which will contain a DEF
+file corresponding to the DLL the linker is generating.  This DEF file
+(which should be called <code>*.def</code>) may be used to create an import
+library with <code>dlltool</code> or may be used as a reference to
+automatically or implicitly exported symbols. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-DLLs_002c-creating-301"></a><a name="index-g_t_002d_002dout_002dimplib-302"></a><br><dt><code>--out-implib </code><var>file</var><dd>The linker will create the file <var>file</var> which will contain an
+import lib corresponding to the DLL the linker is generating. This
+import lib (which should be called <code>*.dll.a</code> or <code>*.a</code>
+may be used to link clients against the generated DLL; this behaviour
+makes it possible to skip a separate <code>dlltool</code> import library
+creation step. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-g_t_002d_002denable_002dauto_002dimage_002dbase-303"></a><br><dt><code>--enable-auto-image-base</code><dd>Automatically choose the image base for DLLs, unless one is specified
+using the <code>--image-base</code> argument.  By using a hash generated
+from the dllname to create unique image bases for each DLL, in-memory
+collisions and relocations which can delay program execution are
+avoided. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-g_t_002d_002ddisable_002dauto_002dimage_002dbase-304"></a><br><dt><code>--disable-auto-image-base</code><dd>Do not automatically generate a unique image base.  If there is no
+user-specified image base (<code>--image-base</code>) then use the platform
+default. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-DLLs_002c-linking-to-305"></a><a name="index-g_t_002d_002ddll_002dsearch_002dprefix-306"></a><br><dt><code>--dll-search-prefix </code><var>string</var><dd>When linking dynamically to a dll without an import library,
+search for <code>&lt;string&gt;&lt;basename&gt;.dll</code> in preference to
+<code>lib&lt;basename&gt;.dll</code>. This behaviour allows easy distinction
+between DLLs built for the various "subplatforms": native, cygwin,
+uwin, pw, etc.  For instance, cygwin DLLs typically use
+<code>--dll-search-prefix=cyg</code>. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-g_t_002d_002denable_002dauto_002dimport-307"></a><br><dt><code>--enable-auto-import</code><dd>Do sophisticated linking of <code>_symbol</code> to <code>__imp__symbol</code> for
+DATA imports from DLLs, and create the necessary thunking symbols when
+building the import libraries with those DATA exports. Note: Use of the
+'auto-import' extension will cause the text section of the image file
+to be made writable. This does not conform to the PE-COFF format
+specification published by Microsoft.
+
+     <p>Note - use of the 'auto-import' extension will also cause read only
+data which would normally be placed into the .rdata section to be
+placed into the .data section instead.  This is in order to work
+around a problem with consts that is described here:
+http://www.cygwin.com/ml/cygwin/2004-09/msg01101.html
+
+     <p>Using 'auto-import' generally will 'just work' &ndash; but sometimes you may
+see this message:
+
+     <p>"variable '&lt;var&gt;' can't be auto-imported. Please read the
+documentation for ld's <code>--enable-auto-import</code> for details."
+
+     <p>This message occurs when some (sub)expression accesses an address
+ultimately given by the sum of two constants (Win32 import tables only
+allow one).  Instances where this may occur include accesses to member
+fields of struct variables imported from a DLL, as well as using a
+constant index into an array variable imported from a DLL.  Any
+multiword variable (arrays, structs, long long, etc) may trigger
+this error condition.  However, regardless of the exact data type
+of the offending exported variable, ld will always detect it, issue
+the warning, and exit.
+
+     <p>There are several ways to address this difficulty, regardless of the
+data type of the exported variable:
+
+     <p>One way is to use &ndash;enable-runtime-pseudo-reloc switch. This leaves the task
+of adjusting references in your client code for runtime environment, so
+this method works only when runtime environment supports this feature.
+
+     <p>A second solution is to force one of the 'constants' to be a variable &ndash;
+that is, unknown and un-optimizable at compile time.  For arrays,
+there are two possibilities: a) make the indexee (the array's address)
+a variable, or b) make the 'constant' index a variable.  Thus:
+
+     <pre class="example">          extern type extern_array[];
+          extern_array[1] --&gt;
+             { volatile type *t=extern_array; t[1] }
+</pre>
+     <p>or
+
+     <pre class="example">          extern type extern_array[];
+          extern_array[1] --&gt;
+             { volatile int t=1; extern_array[t] }
+</pre>
+     <p>For structs (and most other multiword data types) the only option
+is to make the struct itself (or the long long, or the ...) variable:
+
+     <pre class="example">          extern struct s extern_struct;
+          extern_struct.field --&gt;
+             { volatile struct s *t=&amp;extern_struct; t-&gt;field }
+</pre>
+     <p>or
+
+     <pre class="example">          extern long long extern_ll;
+          extern_ll --&gt;
+            { volatile long long * local_ll=&amp;extern_ll; *local_ll }
+</pre>
+     <p>A third method of dealing with this difficulty is to abandon
+'auto-import' for the offending symbol and mark it with
+<code>__declspec(dllimport)</code>.  However, in practise that
+requires using compile-time #defines to indicate whether you are
+building a DLL, building client code that will link to the DLL, or
+merely building/linking to a static library.   In making the choice
+between the various methods of resolving the 'direct address with
+constant offset' problem, you should consider typical real-world usage:
+
+     <p>Original:
+     <pre class="example">          --foo.h
+          extern int arr[];
+          --foo.c
+          #include "foo.h"
+          void main(int argc, char **argv){
+            printf("%d\n",arr[1]);
+          }
+</pre>
+     <p>Solution 1:
+     <pre class="example">          --foo.h
+          extern int arr[];
+          --foo.c
+          #include "foo.h"
+          void main(int argc, char **argv){
+            /* This workaround is for win32 and cygwin; do not "optimize" */
+            volatile int *parr = arr;
+            printf("%d\n",parr[1]);
+          }
+</pre>
+     <p>Solution 2:
+     <pre class="example">          --foo.h
+          /* Note: auto-export is assumed (no __declspec(dllexport)) */
+          #if (defined(_WIN32) || defined(__CYGWIN__)) &amp;&amp; \
+            !(defined(FOO_BUILD_DLL) || defined(FOO_STATIC))
+          #define FOO_IMPORT __declspec(dllimport)
+          #else
+          #define FOO_IMPORT
+          #endif
+          extern FOO_IMPORT int arr[];
+          --foo.c
+          #include "foo.h"
+          void main(int argc, char **argv){
+            printf("%d\n",arr[1]);
+          }
+</pre>
+     <p>A fourth way to avoid this problem is to re-code your
+library to use a functional interface rather than a data interface
+for the offending variables (e.g. set_foo() and get_foo() accessor
+functions). 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-g_t_002d_002ddisable_002dauto_002dimport-308"></a><br><dt><code>--disable-auto-import</code><dd>Do not attempt to do sophisticated linking of <code>_symbol</code> to
+<code>__imp__symbol</code> for DATA imports from DLLs. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-g_t_002d_002denable_002druntime_002dpseudo_002dreloc-309"></a><br><dt><code>--enable-runtime-pseudo-reloc</code><dd>If your code contains expressions described in &ndash;enable-auto-import section,
+that is, DATA imports from DLL with non-zero offset, this switch will create
+a vector of 'runtime pseudo relocations' which can be used by runtime
+environment to adjust references to such data in your client code. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-g_t_002d_002ddisable_002druntime_002dpseudo_002dreloc-310"></a><br><dt><code>--disable-runtime-pseudo-reloc</code><dd>Do not create pseudo relocations for non-zero offset DATA imports from
+DLLs.  This is the default. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-g_t_002d_002denable_002dextra_002dpe_002ddebug-311"></a><br><dt><code>--enable-extra-pe-debug</code><dd>Show additional debug info related to auto-import symbol thunking. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-g_t_002d_002dsection_002dalignment-312"></a><br><dt><code>--section-alignment</code><dd>Sets the section alignment.  Sections in memory will always begin at
+addresses which are a multiple of this number.  Defaults to 0x1000. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-stack-size-313"></a><a name="index-g_t_002d_002dstack-314"></a><br><dt><code>--stack </code><var>reserve</var><dt><code>--stack </code><var>reserve</var><code>,</code><var>commit</var><dd>Specify the number of bytes of memory to reserve (and optionally commit)
+to be used as stack for this program.  The default is 2Mb reserved, 4K
+committed. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p><a name="index-g_t_002d_002dsubsystem-315"></a><br><dt><code>--subsystem </code><var>which</var><dt><code>--subsystem </code><var>which</var><code>:</code><var>major</var><dt><code>--subsystem </code><var>which</var><code>:</code><var>major</var><code>.</code><var>minor</var><dd>Specifies the subsystem under which your program will execute.  The
+legal values for <var>which</var> are <code>native</code>, <code>windows</code>,
+<code>console</code>, <code>posix</code>, and <code>xbox</code>.  You may optionally set
+the subsystem version also.  Numeric values are also accepted for
+<var>which</var>. 
+[This option is specific to the i386 PE targeted port of the linker]
+
+     <p>The following options set flags in the <code>DllCharacteristics</code> field
+of the PE file header:
+[These options are specific to PE targeted ports of the linker]
+
+     <p><a name="index-g_t_002d_002ddynamicbase-316"></a><br><dt><code>--dynamicbase</code><dd>The image base address may be relocated using address space layout
+randomization (ASLR).  This feature was introduced with MS Windows
+Vista for i386 PE targets.
+
+     <p><a name="index-g_t_002d_002dforceinteg-317"></a><br><dt><code>--forceinteg</code><dd>Code integrity checks are enforced.
+
+     <p><a name="index-g_t_002d_002dnxcompat-318"></a><br><dt><code>--nxcompat</code><dd>The image is compatible with the Data Execution Prevention. 
+This feature was introduced with MS Windows XP SP2 for i386 PE targets.
+
+     <p><a name="index-g_t_002d_002dno_002disolation-319"></a><br><dt><code>--no-isolation</code><dd>Although the image understands isolation, do not isolate the image.
+
+     <p><a name="index-g_t_002d_002dno_002dseh-320"></a><br><dt><code>--no-seh</code><dd>The image does not use SEH. No SE handler may be called from
+this image.
+
+     <p><a name="index-g_t_002d_002dno_002dbind-321"></a><br><dt><code>--no-bind</code><dd>Do not bind this image.
+
+     <p><a name="index-g_t_002d_002dwdmdriver-322"></a><br><dt><code>--wdmdriver</code><dd>The driver uses the MS Windows Driver Model.
+
+     <p><a name="index-g_t_002d_002dtsaware-323"></a><br><dt><code>--tsaware</code><dd>The image is Terminal Server aware.
+
+   </dl>
+
+<!-- man end -->
+<h4 class="subsection">2.1.2 Options specific to Motorola 68HC11 and 68HC12 targets</h4>
+
+<!-- man begin OPTIONS -->
+<p>The 68HC11 and 68HC12 linkers support specific options to control the
+memory bank switching mapping and trampoline code generation.
+
+     
+<a name="index-g_t_002d_002dno_002dtrampoline-324"></a>
+<dl><dt><code>--no-trampoline</code><dd>This option disables the generation of trampoline. By default a trampoline
+is generated for each far function which is called using a <code>jsr</code>
+instruction (this happens when a pointer to a far function is taken).
+
+     <p><a name="index-g_t_002d_002dbank_002dwindow-325"></a><br><dt><code>--bank-window </code><var>name</var><dd>This option indicates to the linker the name of the memory region in
+the &lsquo;<samp><span class="samp">MEMORY</span></samp>&rsquo; specification that describes the memory bank window. 
+The definition of such region is then used by the linker to compute
+paging and addresses within the memory window.
+
+   </dl>
+
+<!-- man end -->
+<h4 class="subsection">2.1.3 Options specific to Motorola 68K target</h4>
+
+<!-- man begin OPTIONS -->
+<p>The following options are supported to control handling of GOT generation
+when linking for 68K targets.
+
+     
+<a name="index-g_t_002d_002dgot-326"></a>
+<dl><dt><code>--got=</code><var>type</var><dd>This option tells the linker which GOT generation scheme to use. 
+<var>type</var> should be one of &lsquo;<samp><span class="samp">single</span></samp>&rsquo;, &lsquo;<samp><span class="samp">negative</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">multigot</span></samp>&rsquo; or &lsquo;<samp><span class="samp">target</span></samp>&rsquo;.  For more information refer to the
+Info entry for <samp><span class="file">ld</span></samp>.
+
+   </dl>
+
+<!-- man end -->
+   </body></html>
+

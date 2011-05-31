@@ -1,0 +1,130 @@
+<html lang="en">
+<head>
+<title>CRIS Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Submodel-Options.html#Submodel-Options" title="Submodel Options">
+<link rel="prev" href="Blackfin-Options.html#Blackfin-Options" title="Blackfin Options">
+<link rel="next" href="CRX-Options.html#CRX-Options" title="CRX Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="CRIS-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="CRX-Options.html#CRX-Options">CRX Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Blackfin-Options.html#Blackfin-Options">Blackfin Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Submodel-Options.html#Submodel-Options">Submodel Options</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.17.5 CRIS Options</h4>
+
+<p><a name="index-CRIS-Options-1069"></a>
+These options are defined specifically for the CRIS ports.
+
+     <dl>
+<dt><code>-march=</code><var>architecture-type</var><dt><code>-mcpu=</code><var>architecture-type</var><dd><a name="index-march-1070"></a><a name="index-mcpu-1071"></a>Generate code for the specified architecture.  The choices for
+<var>architecture-type</var> are &lsquo;<samp><span class="samp">v3</span></samp>&rsquo;, &lsquo;<samp><span class="samp">v8</span></samp>&rsquo; and &lsquo;<samp><span class="samp">v10</span></samp>&rsquo; for
+respectively ETRAX&nbsp;<!-- /@w -->4, ETRAX&nbsp;<!-- /@w -->100, and ETRAX&nbsp;<!-- /@w -->100&nbsp;<!-- /@w -->LX. 
+Default is &lsquo;<samp><span class="samp">v0</span></samp>&rsquo; except for cris-axis-linux-gnu, where the default is
+&lsquo;<samp><span class="samp">v10</span></samp>&rsquo;.
+
+     <br><dt><code>-mtune=</code><var>architecture-type</var><dd><a name="index-mtune-1072"></a>Tune to <var>architecture-type</var> everything applicable about the generated
+code, except for the ABI and the set of available instructions.  The
+choices for <var>architecture-type</var> are the same as for
+<samp><span class="option">-march=</span><var>architecture-type</var></samp>.
+
+     <br><dt><code>-mmax-stack-frame=</code><var>n</var><dd><a name="index-mmax_002dstack_002dframe-1073"></a>Warn when the stack frame of a function exceeds <var>n</var> bytes.
+
+     <br><dt><code>-metrax4</code><dt><code>-metrax100</code><dd><a name="index-metrax4-1074"></a><a name="index-metrax100-1075"></a>The options <samp><span class="option">-metrax4</span></samp> and <samp><span class="option">-metrax100</span></samp> are synonyms for
+<samp><span class="option">-march=v3</span></samp> and <samp><span class="option">-march=v8</span></samp> respectively.
+
+     <br><dt><code>-mmul-bug-workaround</code><dt><code>-mno-mul-bug-workaround</code><dd><a name="index-mmul_002dbug_002dworkaround-1076"></a><a name="index-mno_002dmul_002dbug_002dworkaround-1077"></a>Work around a bug in the <code>muls</code> and <code>mulu</code> instructions for CPU
+models where it applies.  This option is active by default.
+
+     <br><dt><code>-mpdebug</code><dd><a name="index-mpdebug-1078"></a>Enable CRIS-specific verbose debug-related information in the assembly
+code.  This option also has the effect to turn off the &lsquo;<samp><span class="samp">#NO_APP</span></samp>&rsquo;
+formatted-code indicator to the assembler at the beginning of the
+assembly file.
+
+     <br><dt><code>-mcc-init</code><dd><a name="index-mcc_002dinit-1079"></a>Do not use condition-code results from previous instruction; always emit
+compare and test instructions before use of condition codes.
+
+     <br><dt><code>-mno-side-effects</code><dd><a name="index-mno_002dside_002deffects-1080"></a>Do not emit instructions with side-effects in addressing modes other than
+post-increment.
+
+     <br><dt><code>-mstack-align</code><dt><code>-mno-stack-align</code><dt><code>-mdata-align</code><dt><code>-mno-data-align</code><dt><code>-mconst-align</code><dt><code>-mno-const-align</code><dd><a name="index-mstack_002dalign-1081"></a><a name="index-mno_002dstack_002dalign-1082"></a><a name="index-mdata_002dalign-1083"></a><a name="index-mno_002ddata_002dalign-1084"></a><a name="index-mconst_002dalign-1085"></a><a name="index-mno_002dconst_002dalign-1086"></a>These options (no-options) arranges (eliminate arrangements) for the
+stack-frame, individual data and constants to be aligned for the maximum
+single data access size for the chosen CPU model.  The default is to
+arrange for 32-bit alignment.  ABI details such as structure layout are
+not affected by these options.
+
+     <br><dt><code>-m32-bit</code><dt><code>-m16-bit</code><dt><code>-m8-bit</code><dd><a name="index-m32_002dbit-1087"></a><a name="index-m16_002dbit-1088"></a><a name="index-m8_002dbit-1089"></a>Similar to the stack- data- and const-align options above, these options
+arrange for stack-frame, writable data and constants to all be 32-bit,
+16-bit or 8-bit aligned.  The default is 32-bit alignment.
+
+     <br><dt><code>-mno-prologue-epilogue</code><dt><code>-mprologue-epilogue</code><dd><a name="index-mno_002dprologue_002depilogue-1090"></a><a name="index-mprologue_002depilogue-1091"></a>With <samp><span class="option">-mno-prologue-epilogue</span></samp>, the normal function prologue and
+epilogue that sets up the stack-frame are omitted and no return
+instructions or return sequences are generated in the code.  Use this
+option only together with visual inspection of the compiled code: no
+warnings or errors are generated when call-saved registers must be saved,
+or storage for local variable needs to be allocated.
+
+     <br><dt><code>-mno-gotplt</code><dt><code>-mgotplt</code><dd><a name="index-mno_002dgotplt-1092"></a><a name="index-mgotplt-1093"></a>With <samp><span class="option">-fpic</span></samp> and <samp><span class="option">-fPIC</span></samp>, don't generate (do generate)
+instruction sequences that load addresses for functions from the PLT part
+of the GOT rather than (traditional on other architectures) calls to the
+PLT.  The default is <samp><span class="option">-mgotplt</span></samp>.
+
+     <br><dt><code>-melf</code><dd><a name="index-melf-1094"></a>Legacy no-op option only recognized with the cris-axis-elf and
+cris-axis-linux-gnu targets.
+
+     <br><dt><code>-mlinux</code><dd><a name="index-mlinux-1095"></a>Legacy no-op option only recognized with the cris-axis-linux-gnu target.
+
+     <br><dt><code>-sim</code><dd><a name="index-sim-1096"></a>This option, recognized for the cris-axis-elf arranges
+to link with input-output functions from a simulator library.  Code,
+initialized data and zero-initialized data are allocated consecutively.
+
+     <br><dt><code>-sim2</code><dd><a name="index-sim2-1097"></a>Like <samp><span class="option">-sim</span></samp>, but pass linker options to locate initialized data at
+0x40000000 and zero-initialized data at 0x80000000. 
+</dl>
+
+ </body></html>
+

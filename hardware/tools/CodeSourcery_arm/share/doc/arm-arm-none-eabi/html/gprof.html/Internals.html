@@ -1,0 +1,225 @@
+<html lang="en">
+<head>
+<title>Internals - GNU gprof</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GNU gprof">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Details.html#Details" title="Details">
+<link rel="prev" href="File-Format.html#File-Format" title="File Format">
+<link rel="next" href="Debugging.html#Debugging" title="Debugging">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the gprof profiler of the GNU system.
+
+Copyright (C) 1988, 1992, 1997, 1998, 1999, 2000, 2001, 2003,
+2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Internals"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Debugging.html#Debugging">Debugging</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="File-Format.html#File-Format">File Format</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Details.html#Details">Details</a>
+<hr>
+</div>
+
+<h3 class="section">9.3 <code>gprof</code>'s Internal Operation</h3>
+
+<p>Like most programs, <code>gprof</code> begins by processing its options. 
+During this stage, it may building its symspec list
+(<code>sym_ids.c:sym_id_add</code>), if
+options are specified which use symspecs. 
+<code>gprof</code> maintains a single linked list of symspecs,
+which will eventually get turned into 12 symbol tables,
+organized into six include/exclude pairs&mdash;one
+pair each for the flat profile (INCL_FLAT/EXCL_FLAT),
+the call graph arcs (INCL_ARCS/EXCL_ARCS),
+printing in the call graph (INCL_GRAPH/EXCL_GRAPH),
+timing propagation in the call graph (INCL_TIME/EXCL_TIME),
+the annotated source listing (INCL_ANNO/EXCL_ANNO),
+and the execution count listing (INCL_EXEC/EXCL_EXEC).
+
+   <p>After option processing, <code>gprof</code> finishes
+building the symspec list by adding all the symspecs in
+<code>default_excluded_list</code> to the exclude lists
+EXCL_TIME and EXCL_GRAPH, and if line-by-line profiling is specified,
+EXCL_FLAT as well. 
+These default excludes are not added to EXCL_ANNO, EXCL_ARCS, and EXCL_EXEC.
+
+   <p>Next, the BFD library is called to open the object file,
+verify that it is an object file,
+and read its symbol table (<code>core.c:core_init</code>),
+using <code>bfd_canonicalize_symtab</code> after mallocing
+an appropriately sized array of symbols.  At this point,
+function mappings are read (if the &lsquo;<samp><span class="samp">--file-ordering</span></samp>&rsquo; option
+has been specified), and the core text space is read into
+memory (if the &lsquo;<samp><span class="samp">-c</span></samp>&rsquo; option was given).
+
+   <p><code>gprof</code>'s own symbol table, an array of Sym structures,
+is now built. 
+This is done in one of two ways, by one of two routines, depending
+on whether line-by-line profiling (&lsquo;<samp><span class="samp">-l</span></samp>&rsquo; option) has been
+enabled. 
+For normal profiling, the BFD canonical symbol table is scanned. 
+For line-by-line profiling, every
+text space address is examined, and a new symbol table entry
+gets created every time the line number changes. 
+In either case, two passes are made through the symbol
+table&mdash;one to count the size of the symbol table required,
+and the other to actually read the symbols.  In between the
+two passes, a single array of type <code>Sym</code> is created of
+the appropriate length. 
+Finally, <code>symtab.c:symtab_finalize</code>
+is called to sort the symbol table and remove duplicate entries
+(entries with the same memory address).
+
+   <p>The symbol table must be a contiguous array for two reasons. 
+First, the <code>qsort</code> library function (which sorts an array)
+will be used to sort the symbol table. 
+Also, the symbol lookup routine (<code>symtab.c:sym_lookup</code>),
+which finds symbols
+based on memory address, uses a binary search algorithm
+which requires the symbol table to be a sorted array. 
+Function symbols are indicated with an <code>is_func</code> flag. 
+Line number symbols have no special flags set. 
+Additionally, a symbol can have an <code>is_static</code> flag
+to indicate that it is a local symbol.
+
+   <p>With the symbol table read, the symspecs can now be translated
+into Syms (<code>sym_ids.c:sym_id_parse</code>).  Remember that a single
+symspec can match multiple symbols. 
+An array of symbol tables
+(<code>syms</code>) is created, each entry of which is a symbol table
+of Syms to be included or excluded from a particular listing. 
+The master symbol table and the symspecs are examined by nested
+loops, and every symbol that matches a symspec is inserted
+into the appropriate syms table.  This is done twice, once to
+count the size of each required symbol table, and again to build
+the tables, which have been malloced between passes. 
+From now on, to determine whether a symbol is on an include
+or exclude symspec list, <code>gprof</code> simply uses its
+standard symbol lookup routine on the appropriate table
+in the <code>syms</code> array.
+
+   <p>Now the profile data file(s) themselves are read
+(<code>gmon_io.c:gmon_out_read</code>),
+first by checking for a new-style &lsquo;<samp><span class="samp">gmon.out</span></samp>&rsquo; header,
+then assuming this is an old-style BSD &lsquo;<samp><span class="samp">gmon.out</span></samp>&rsquo;
+if the magic number test failed.
+
+   <p>New-style histogram records are read by <code>hist.c:hist_read_rec</code>. 
+For the first histogram record, allocate a memory array to hold
+all the bins, and read them in. 
+When multiple profile data files (or files with multiple histogram
+records) are read, the memory ranges of each pair of histogram records
+must be either equal, or non-overlapping.  For each pair of histogram
+records, the resolution (memory region size divided by the number of
+bins) must be the same.  The time unit must be the same for all
+histogram records. If the above containts are met, all histograms
+for the same memory range are merged.
+
+   <p>As each call graph record is read (<code>call_graph.c:cg_read_rec</code>),
+the parent and child addresses
+are matched to symbol table entries, and a call graph arc is
+created by <code>cg_arcs.c:arc_add</code>, unless the arc fails a symspec
+check against INCL_ARCS/EXCL_ARCS.  As each arc is added,
+a linked list is maintained of the parent's child arcs, and of the child's
+parent arcs. 
+Both the child's call count and the arc's call count are
+incremented by the record's call count.
+
+   <p>Basic-block records are read (<code>basic_blocks.c:bb_read_rec</code>),
+but only if line-by-line profiling has been selected. 
+Each basic-block address is matched to a corresponding line
+symbol in the symbol table, and an entry made in the symbol's
+bb_addr and bb_calls arrays.  Again, if multiple basic-block
+records are present for the same address, the call counts
+are cumulative.
+
+   <p>A gmon.sum file is dumped, if requested (<code>gmon_io.c:gmon_out_write</code>).
+
+   <p>If histograms were present in the data files, assign them to symbols
+(<code>hist.c:hist_assign_samples</code>) by iterating over all the sample
+bins and assigning them to symbols.  Since the symbol table
+is sorted in order of ascending memory addresses, we can
+simple follow along in the symbol table as we make our pass
+over the sample bins. 
+This step includes a symspec check against INCL_FLAT/EXCL_FLAT. 
+Depending on the histogram
+scale factor, a sample bin may span multiple symbols,
+in which case a fraction of the sample count is allocated
+to each symbol, proportional to the degree of overlap. 
+This effect is rare for normal profiling, but overlaps
+are more common during line-by-line profiling, and can
+cause each of two adjacent lines to be credited with half
+a hit, for example.
+
+   <p>If call graph data is present, <code>cg_arcs.c:cg_assemble</code> is called. 
+First, if &lsquo;<samp><span class="samp">-c</span></samp>&rsquo; was specified, a machine-dependent
+routine (<code>find_call</code>) scans through each symbol's machine code,
+looking for subroutine call instructions, and adding them
+to the call graph with a zero call count. 
+A topological sort is performed by depth-first numbering
+all the symbols (<code>cg_dfn.c:cg_dfn</code>), so that
+children are always numbered less than their parents,
+then making a array of pointers into the symbol table and sorting it into
+numerical order, which is reverse topological
+order (children appear before parents). 
+Cycles are also detected at this point, all members
+of which are assigned the same topological number. 
+Two passes are now made through this sorted array of symbol pointers. 
+The first pass, from end to beginning (parents to children),
+computes the fraction of child time to propagate to each parent
+and a print flag. 
+The print flag reflects symspec handling of INCL_GRAPH/EXCL_GRAPH,
+with a parent's include or exclude (print or no print) property
+being propagated to its children, unless they themselves explicitly appear
+in INCL_GRAPH or EXCL_GRAPH. 
+A second pass, from beginning to end (children to parents) actually
+propagates the timings along the call graph, subject
+to a check against INCL_TIME/EXCL_TIME. 
+With the print flag, fractions, and timings now stored in the symbol
+structures, the topological sort array is now discarded, and a
+new array of pointers is assembled, this time sorted by propagated time.
+
+   <p>Finally, print the various outputs the user requested, which is now fairly
+straightforward.  The call graph (<code>cg_print.c:cg_print</code>) and
+flat profile (<code>hist.c:hist_print</code>) are regurgitations of values
+already computed.  The annotated source listing
+(<code>basic_blocks.c:print_annotated_source</code>) uses basic-block
+information, if present, to label each line of code with call counts,
+otherwise only the function call counts are presented.
+
+   <p>The function ordering code is marginally well documented
+in the source code itself (<code>cg_print.c</code>).  Basically,
+the functions with the most use and the most parents are
+placed first, followed by other functions with the most use,
+followed by lower use functions, followed by unused functions
+at the end.
+
+   </body></html>
+

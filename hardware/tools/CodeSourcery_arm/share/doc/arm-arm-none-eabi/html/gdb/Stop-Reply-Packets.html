@@ -1,0 +1,155 @@
+<html lang="en">
+<head>
+<title>Stop Reply Packets - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Remote-Protocol.html#Remote-Protocol" title="Remote Protocol">
+<link rel="prev" href="Packets.html#Packets" title="Packets">
+<link rel="next" href="General-Query-Packets.html#General-Query-Packets" title="General Query Packets">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Stop-Reply-Packets"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="General-Query-Packets.html#General-Query-Packets">General Query Packets</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Packets.html#Packets">Packets</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Remote-Protocol.html#Remote-Protocol">Remote Protocol</a>
+<hr>
+</div>
+
+<h3 class="section">D.4 Stop Reply Packets</h3>
+
+<p><a name="index-stop-reply-packets-2434"></a>
+The &lsquo;<samp><span class="samp">C</span></samp>&rsquo;, &lsquo;<samp><span class="samp">c</span></samp>&rsquo;, &lsquo;<samp><span class="samp">S</span></samp>&rsquo;, &lsquo;<samp><span class="samp">s</span></samp>&rsquo;, &lsquo;<samp><span class="samp">vCont</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">vAttach</span></samp>&rsquo;, &lsquo;<samp><span class="samp">vRun</span></samp>&rsquo;, &lsquo;<samp><span class="samp">vStopped</span></samp>&rsquo;, and &lsquo;<samp><span class="samp">?</span></samp>&rsquo; packets can
+receive any of the below as a reply.  Except for &lsquo;<samp><span class="samp">?</span></samp>&rsquo;
+and &lsquo;<samp><span class="samp">vStopped</span></samp>&rsquo;, that reply is only returned
+when the target halts.  In the below the exact meaning of <dfn>signal
+number</dfn> is defined by the header <samp><span class="file">include/gdb/signals.h</span></samp> in the
+<span class="sc">gdb</span> source code.
+
+   <p>As in the description of request packets, we include spaces in the
+reply templates for clarity; these are not part of the reply packet's
+syntax.  No <span class="sc">gdb</span> stop reply packet uses spaces to separate its
+components.
+
+     <dl>
+<dt>&lsquo;<samp><span class="samp">S </span><var>AA</var></samp>&rsquo;<dd>The program received signal number <var>AA</var> (a two-digit hexadecimal
+number).  This is equivalent to a &lsquo;<samp><span class="samp">T</span></samp>&rsquo; response with no
+<var>n</var>:<var>r</var> pairs.
+
+     <br><dt>&lsquo;<samp><span class="samp">T </span><var>AA</var> <var>n1</var><span class="samp">:</span><var>r1</var><span class="samp">;</span><var>n2</var><span class="samp">:</span><var>r2</var><span class="samp">;...</span></samp>&rsquo;<dd><a name="index-g_t_0040samp_007bT_007d-packet-reply-2435"></a>The program received signal number <var>AA</var> (a two-digit hexadecimal
+number).  This is equivalent to an &lsquo;<samp><span class="samp">S</span></samp>&rsquo; response, except that the
+&lsquo;<samp><var>n</var><span class="samp">:</span><var>r</var></samp>&rsquo; pairs can carry values of important registers
+and other information directly in the stop reply packet, reducing
+round-trip latency.  Single-step and breakpoint traps are reported
+this way.  Each &lsquo;<samp><var>n</var><span class="samp">:</span><var>r</var></samp>&rsquo; pair is interpreted as follows:
+
+          <ul>
+<li>If <var>n</var> is a hexadecimal number, it is a register number, and the
+corresponding <var>r</var> gives that register's value.  <var>r</var> is a
+series of bytes in target byte order, with each byte given by a
+two-digit hex number.
+
+          <li>If <var>n</var> is &lsquo;<samp><span class="samp">thread</span></samp>&rsquo;, then <var>r</var> is the <var>thread-id</var> of
+the stopped thread, as specified in <a href="thread_002did-syntax.html#thread_002did-syntax">thread-id syntax</a>.
+
+          <li>If <var>n</var> is &lsquo;<samp><span class="samp">core</span></samp>&rsquo;, then <var>r</var> is the hexadecimal number of
+the core on which the stop event was detected.
+
+          <li>If <var>n</var> is a recognized <dfn>stop reason</dfn>, it describes a more
+specific event that stopped the target.  The currently defined stop
+reasons are listed below.  <var>aa</var> should be &lsquo;<samp><span class="samp">05</span></samp>&rsquo;, the trap
+signal.  At most one stop reason should be present.
+
+          <li>Otherwise, <span class="sc">gdb</span> should ignore this &lsquo;<samp><var>n</var><span class="samp">:</span><var>r</var></samp>&rsquo; pair
+and go on to the next; this allows us to extend the protocol in the
+future. 
+</ul>
+
+     <p>The currently defined stop reasons are:
+
+          <dl>
+<dt>&lsquo;<samp><span class="samp">watch</span></samp>&rsquo;<dt>&lsquo;<samp><span class="samp">rwatch</span></samp>&rsquo;<dt>&lsquo;<samp><span class="samp">awatch</span></samp>&rsquo;<dd>The packet indicates a watchpoint hit, and <var>r</var> is the data address, in
+hex.
+
+          <p><a name="index-shared-library-events_002c-remote-reply-2436"></a><br><dt>&lsquo;<samp><span class="samp">library</span></samp>&rsquo;<dd>The packet indicates that the loaded libraries have changed. 
+<span class="sc">gdb</span> should use &lsquo;<samp><span class="samp">qXfer:libraries:read</span></samp>&rsquo; to fetch a new
+list of loaded libraries.  <var>r</var> is ignored.
+
+          <p><a name="index-replay-log-events_002c-remote-reply-2437"></a><br><dt>&lsquo;<samp><span class="samp">replaylog</span></samp>&rsquo;<dd>The packet indicates that the target cannot continue replaying
+logged execution events, because it has reached the end (or the
+beginning when executing backward) of the log.  The value of <var>r</var>
+will be either &lsquo;<samp><span class="samp">begin</span></samp>&rsquo; or &lsquo;<samp><span class="samp">end</span></samp>&rsquo;.  See <a href="Reverse-Execution.html#Reverse-Execution">Reverse Execution</a>,
+for more information. 
+</dl>
+
+     <br><dt>&lsquo;<samp><span class="samp">W </span><var>AA</var></samp>&rsquo;<dt>&lsquo;<samp><span class="samp">W </span><var>AA</var><span class="samp"> ; process:</span><var>pid</var></samp>&rsquo;<dd>The process exited, and <var>AA</var> is the exit status.  This is only
+applicable to certain targets.
+
+     <p>The second form of the response, including the process ID of the exited
+process, can be used only when <span class="sc">gdb</span> has reported support for
+multiprocess protocol extensions; see <a href="multiprocess-extensions.html#multiprocess-extensions">multiprocess extensions</a>. 
+The <var>pid</var> is formatted as a big-endian hex string.
+
+     <br><dt>&lsquo;<samp><span class="samp">X </span><var>AA</var></samp>&rsquo;<dt>&lsquo;<samp><span class="samp">X </span><var>AA</var><span class="samp"> ; process:</span><var>pid</var></samp>&rsquo;<dd>The process terminated with signal <var>AA</var>.
+
+     <p>The second form of the response, including the process ID of the
+terminated process, can be used only when <span class="sc">gdb</span> has reported
+support for multiprocess protocol extensions; see <a href="multiprocess-extensions.html#multiprocess-extensions">multiprocess extensions</a>.  The <var>pid</var> is formatted as a big-endian hex string.
+
+     <br><dt>&lsquo;<samp><span class="samp">O </span><var>XX</var><span class="samp">...</span></samp>&rsquo;<dd>&lsquo;<samp><var>XX</var><span class="samp">...</span></samp>&rsquo; is hex encoding of <span class="sc">ascii</span> data, to be
+written as the program's console output.  This can happen at any time
+while the program is running and the debugger should continue to wait
+for &lsquo;<samp><span class="samp">W</span></samp>&rsquo;, &lsquo;<samp><span class="samp">T</span></samp>&rsquo;, etc.  This reply is not permitted in non-stop mode.
+
+     <br><dt>&lsquo;<samp><span class="samp">F </span><var>call-id</var><span class="samp">,</span><var>parameter</var><span class="samp">...</span></samp>&rsquo;<dd><var>call-id</var> is the identifier which says which host system call should
+be called.  This is just the name of the function.  Translation into the
+correct system call is only applicable as it's defined in <span class="sc">gdb</span>. 
+See <a href="File_002dI_002fO-Remote-Protocol-Extension.html#File_002dI_002fO-Remote-Protocol-Extension">File-I/O Remote Protocol Extension</a>, for a list of implemented
+system calls.
+
+     <p>&lsquo;<samp><var>parameter</var><span class="samp">...</span></samp>&rsquo; is a list of parameters as defined for
+this very system call.
+
+     <p>The target replies with this packet when it expects <span class="sc">gdb</span> to
+call a host system call on behalf of the target.  <span class="sc">gdb</span> replies
+with an appropriate &lsquo;<samp><span class="samp">F</span></samp>&rsquo; packet and keeps up waiting for the next
+reply packet from the target.  The latest &lsquo;<samp><span class="samp">C</span></samp>&rsquo;, &lsquo;<samp><span class="samp">c</span></samp>&rsquo;, &lsquo;<samp><span class="samp">S</span></samp>&rsquo;
+or &lsquo;<samp><span class="samp">s</span></samp>&rsquo; action is expected to be continued.  See <a href="File_002dI_002fO-Remote-Protocol-Extension.html#File_002dI_002fO-Remote-Protocol-Extension">File-I/O Remote Protocol Extension</a>, for more details.
+
+   </dl>
+
+   </body></html>
+

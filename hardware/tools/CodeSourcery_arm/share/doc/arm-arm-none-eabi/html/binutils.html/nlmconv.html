@@ -1,0 +1,115 @@
+<html lang="en">
+<head>
+<title>nlmconv - GNU Binary Utilities</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GNU Binary Utilities">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="addr2line.html#addr2line" title="addr2line">
+<link rel="next" href="windres.html#windres" title="windres">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="nlmconv"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="windres.html#windres">windres</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="addr2line.html#addr2line">addr2line</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">11 nlmconv</h2>
+
+<p><samp><span class="command">nlmconv</span></samp> converts a relocatable object file into a NetWare
+Loadable Module.
+
+   <blockquote>
+<em>Warning:</em> <samp><span class="command">nlmconv</span></samp> is not always built as part of the binary
+utilities, since it is only useful for NLM targets. 
+</blockquote>
+
+<!-- man title nlmconv converts object code into an NLM. -->
+<pre class="smallexample">     <!-- man begin SYNOPSIS nlmconv -->
+     nlmconv [<samp><span class="option">-I</span></samp> <var>bfdname</var>|<samp><span class="option">--input-target=</span></samp><var>bfdname</var>]
+             [<samp><span class="option">-O</span></samp> <var>bfdname</var>|<samp><span class="option">--output-target=</span></samp><var>bfdname</var>]
+             [<samp><span class="option">-T</span></samp> <var>headerfile</var>|<samp><span class="option">--header-file=</span></samp><var>headerfile</var>]
+             [<samp><span class="option">-d</span></samp>|<samp><span class="option">--debug</span></samp>] [<samp><span class="option">-l</span></samp> <var>linker</var>|<samp><span class="option">--linker=</span></samp><var>linker</var>]
+             [<samp><span class="option">-h</span></samp>|<samp><span class="option">--help</span></samp>] [<samp><span class="option">-V</span></samp>|<samp><span class="option">--version</span></samp>]
+             <var>infile</var> <var>outfile</var>
+     <!-- man end -->
+</pre>
+   <!-- man begin DESCRIPTION nlmconv -->
+   <p><samp><span class="command">nlmconv</span></samp> converts the relocatable &lsquo;<samp><span class="samp">i386</span></samp>&rsquo; object file
+<var>infile</var> into the NetWare Loadable Module <var>outfile</var>, optionally
+reading <var>headerfile</var> for NLM header information.  For instructions
+on writing the NLM command file language used in header files, see the
+&lsquo;<samp><span class="samp">linkers</span></samp>&rsquo; section, &lsquo;<samp><span class="samp">NLMLINK</span></samp>&rsquo; in particular, of the <cite>NLM
+Development and Tools Overview</cite>, which is part of the NLM Software
+Developer's Kit (&ldquo;NLM SDK&rdquo;), available from Novell, Inc. 
+<samp><span class="command">nlmconv</span></samp> uses the <span class="sc">gnu</span> Binary File Descriptor library to read
+<var>infile</var>;
+see <a href="../ld/BFD.html#BFD">BFD</a>, for more information.
+
+   <p><samp><span class="command">nlmconv</span></samp> can perform a link step.  In other words, you can list
+more than one object file for input if you list them in the definitions
+file (rather than simply specifying one input file on the command line). 
+In this case, <samp><span class="command">nlmconv</span></samp> calls the linker for you.
+
+<!-- man end -->
+<!-- man begin OPTIONS nlmconv -->
+     <dl>
+<dt><samp><span class="env">-I </span><var>bfdname</var></samp><dt><samp><span class="env">--input-target=</span><var>bfdname</var></samp><dd>Object format of the input file.  <samp><span class="command">nlmconv</span></samp> can usually determine
+the format of a given file (so no default is necessary). 
+See <a href="Target-Selection.html#Target-Selection">Target Selection</a>, for more information.
+
+     <br><dt><samp><span class="env">-O </span><var>bfdname</var></samp><dt><samp><span class="env">--output-target=</span><var>bfdname</var></samp><dd>Object format of the output file.  <samp><span class="command">nlmconv</span></samp> infers the output
+format based on the input format, e.g. for a &lsquo;<samp><span class="samp">i386</span></samp>&rsquo; input file the
+output format is &lsquo;<samp><span class="samp">nlm32-i386</span></samp>&rsquo;. 
+See <a href="Target-Selection.html#Target-Selection">Target Selection</a>, for more information.
+
+     <br><dt><samp><span class="env">-T </span><var>headerfile</var></samp><dt><samp><span class="env">--header-file=</span><var>headerfile</var></samp><dd>Reads <var>headerfile</var> for NLM header information.  For instructions on
+writing the NLM command file language used in header files, see see the
+&lsquo;<samp><span class="samp">linkers</span></samp>&rsquo; section, of the <cite>NLM Development and Tools
+Overview</cite>, which is part of the NLM Software Developer's Kit, available
+from Novell, Inc.
+
+     <br><dt><samp><span class="env">-d</span></samp><dt><samp><span class="env">--debug</span></samp><dd>Displays (on standard error) the linker command line used by <samp><span class="command">nlmconv</span></samp>.
+
+     <br><dt><samp><span class="env">-l </span><var>linker</var></samp><dt><samp><span class="env">--linker=</span><var>linker</var></samp><dd>Use <var>linker</var> for any linking.  <var>linker</var> can be an absolute or a
+relative pathname.
+
+     <br><dt><samp><span class="env">-h</span></samp><dt><samp><span class="env">--help</span></samp><dd>Prints a usage summary.
+
+     <br><dt><samp><span class="env">-V</span></samp><dt><samp><span class="env">--version</span></samp><dd>Prints the version number for <samp><span class="command">nlmconv</span></samp>. 
+</dl>
+
+<!-- man end -->
+   </body></html>
+

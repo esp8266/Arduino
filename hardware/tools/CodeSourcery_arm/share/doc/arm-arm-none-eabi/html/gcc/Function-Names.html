@@ -1,0 +1,128 @@
+<html lang="en">
+<head>
+<title>Function Names - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Incomplete-Enums.html#Incomplete-Enums" title="Incomplete Enums">
+<link rel="next" href="Return-Address.html#Return-Address" title="Return Address">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Function-Names"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Return-Address.html#Return-Address">Return Address</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Incomplete-Enums.html#Incomplete-Enums">Incomplete Enums</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.45 Function Names as Strings</h3>
+
+<p><a name="index-g_t_0040code_007b_005f_005ffunc_005f_005f_007d-identifier-2605"></a><a name="index-g_t_0040code_007b_005f_005fFUNCTION_005f_005f_007d-identifier-2606"></a><a name="index-g_t_0040code_007b_005f_005fPRETTY_005fFUNCTION_005f_005f_007d-identifier-2607"></a>
+GCC provides three magic variables which hold the name of the current
+function, as a string.  The first of these is <code>__func__</code>, which
+is part of the C99 standard:
+
+ <p>The identifier <code>__func__</code> is implicitly declared by the translator
+as if, immediately following the opening brace of each function
+definition, the declaration
+
+<pre class="smallexample">     static const char __func__[] = "function-name";
+</pre>
+ <p class="noindent">appeared, where function-name is the name of the lexically-enclosing
+function.  This name is the unadorned name of the function.
+
+ <p><code>__FUNCTION__</code> is another name for <code>__func__</code>.  Older
+versions of GCC recognize only this name.  However, it is not
+standardized.  For maximum portability, we recommend you use
+<code>__func__</code>, but provide a fallback definition with the
+preprocessor:
+
+<pre class="smallexample">     #if __STDC_VERSION__ &lt; 199901L
+     # if __GNUC__ &gt;= 2
+     #  define __func__ __FUNCTION__
+     # else
+     #  define __func__ "&lt;unknown&gt;"
+     # endif
+     #endif
+</pre>
+ <p>In C, <code>__PRETTY_FUNCTION__</code> is yet another name for
+<code>__func__</code>.  However, in C++, <code>__PRETTY_FUNCTION__</code> contains
+the type signature of the function as well as its bare name.  For
+example, this program:
+
+<pre class="smallexample">     extern "C" {
+     extern int printf (char *, ...);
+     }
+     
+     class a {
+      public:
+       void sub (int i)
+         {
+           printf ("__FUNCTION__ = %s\n", __FUNCTION__);
+           printf ("__PRETTY_FUNCTION__ = %s\n", __PRETTY_FUNCTION__);
+         }
+     };
+     
+     int
+     main (void)
+     {
+       a ax;
+       ax.sub (0);
+       return 0;
+     }
+</pre>
+ <p class="noindent">gives this output:
+
+<pre class="smallexample">     __FUNCTION__ = sub
+     __PRETTY_FUNCTION__ = void a::sub(int)
+</pre>
+ <p>These identifiers are not preprocessor macros.  In GCC 3.3 and
+earlier, in C only, <code>__FUNCTION__</code> and <code>__PRETTY_FUNCTION__</code>
+were treated as string literals; they could be used to initialize
+<code>char</code> arrays, and they could be concatenated with other string
+literals.  GCC 3.4 and later treat them as variables, like
+<code>__func__</code>.  In C++, <code>__FUNCTION__</code> and
+<code>__PRETTY_FUNCTION__</code> have always been variables.
+
+ </body></html>
+

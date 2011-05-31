@@ -1,0 +1,155 @@
+<html lang="en">
+<head>
+<title>Hurd Native - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Native.html#Native" title="Native">
+<link rel="prev" href="Cygwin-Native.html#Cygwin-Native" title="Cygwin Native">
+<link rel="next" href="Neutrino.html#Neutrino" title="Neutrino">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Hurd-Native"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Neutrino.html#Neutrino">Neutrino</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Cygwin-Native.html#Cygwin-Native">Cygwin Native</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Native.html#Native">Native</a>
+<hr>
+</div>
+
+<h4 class="subsection">21.1.6 Commands Specific to <span class="sc">gnu</span> Hurd Systems</h4>
+
+<p><a name="index-g_t_0040sc_007bgnu_007d-Hurd-debugging-1231"></a>
+This subsection describes <span class="sc">gdb</span> commands specific to the
+<span class="sc">gnu</span> Hurd native debugging.
+
+     <dl>
+<dt><code>set signals</code><dt><code>set sigs</code><dd><a name="index-set-signals_0040r_007b_002c-Hurd-command_007d-1232"></a><a name="index-set-sigs_0040r_007b_002c-Hurd-command_007d-1233"></a>This command toggles the state of inferior signal interception by
+<span class="sc">gdb</span>.  Mach exceptions, such as breakpoint traps, are not
+affected by this command.  <code>sigs</code> is a shorthand alias for
+<code>signals</code>.
+
+     <br><dt><code>show signals</code><dt><code>show sigs</code><dd><a name="index-show-signals_0040r_007b_002c-Hurd-command_007d-1234"></a><a name="index-show-sigs_0040r_007b_002c-Hurd-command_007d-1235"></a>Show the current state of intercepting inferior's signals.
+
+     <br><dt><code>set signal-thread</code><dt><code>set sigthread</code><dd><a name="index-set-signal_002dthread-1236"></a><a name="index-set-sigthread-1237"></a>This command tells <span class="sc">gdb</span> which thread is the <code>libc</code> signal
+thread.  That thread is run when a signal is delivered to a running
+process.  <code>set sigthread</code> is the shorthand alias of <code>set
+signal-thread</code>.
+
+     <br><dt><code>show signal-thread</code><dt><code>show sigthread</code><dd><a name="index-show-signal_002dthread-1238"></a><a name="index-show-sigthread-1239"></a>These two commands show which thread will run when the inferior is
+delivered a signal.
+
+     <br><dt><code>set stopped</code><dd><a name="index-set-stopped_0040r_007b_002c-Hurd-command_007d-1240"></a>This commands tells <span class="sc">gdb</span> that the inferior process is stopped,
+as with the <code>SIGSTOP</code> signal.  The stopped process can be
+continued by delivering a signal to it.
+
+     <br><dt><code>show stopped</code><dd><a name="index-show-stopped_0040r_007b_002c-Hurd-command_007d-1241"></a>This command shows whether <span class="sc">gdb</span> thinks the debuggee is
+stopped.
+
+     <br><dt><code>set exceptions</code><dd><a name="index-set-exceptions_0040r_007b_002c-Hurd-command_007d-1242"></a>Use this command to turn off trapping of exceptions in the inferior. 
+When exception trapping is off, neither breakpoints nor
+single-stepping will work.  To restore the default, set exception
+trapping on.
+
+     <br><dt><code>show exceptions</code><dd><a name="index-show-exceptions_0040r_007b_002c-Hurd-command_007d-1243"></a>Show the current state of trapping exceptions in the inferior.
+
+     <br><dt><code>set task pause</code><dd><a name="index-set-task_0040r_007b_002c-Hurd-commands_007d-1244"></a><a name="index-task-attributes-_0028_0040sc_007bgnu_007d-Hurd_0029-1245"></a><a name="index-pause-current-task-_0028_0040sc_007bgnu_007d-Hurd_0029-1246"></a>This command toggles task suspension when <span class="sc">gdb</span> has control. 
+Setting it to on takes effect immediately, and the task is suspended
+whenever <span class="sc">gdb</span> gets control.  Setting it to off will take
+effect the next time the inferior is continued.  If this option is set
+to off, you can use <code>set thread default pause on</code> or <code>set
+thread pause on</code> (see below) to pause individual threads.
+
+     <br><dt><code>show task pause</code><dd><a name="index-show-task_0040r_007b_002c-Hurd-commands_007d-1247"></a>Show the current state of task suspension.
+
+     <br><dt><code>set task detach-suspend-count</code><dd><a name="index-task-suspend-count-1248"></a><a name="index-detach-from-task_002c-_0040sc_007bgnu_007d-Hurd-1249"></a>This command sets the suspend count the task will be left with when
+<span class="sc">gdb</span> detaches from it.
+
+     <br><dt><code>show task detach-suspend-count</code><dd>Show the suspend count the task will be left with when detaching.
+
+     <br><dt><code>set task exception-port</code><dt><code>set task excp</code><dd><a name="index-task-exception-port_002c-_0040sc_007bgnu_007d-Hurd-1250"></a>This command sets the task exception port to which <span class="sc">gdb</span> will
+forward exceptions.  The argument should be the value of the <dfn>send
+rights</dfn> of the task.  <code>set task excp</code> is a shorthand alias.
+
+     <br><dt><code>set noninvasive</code><dd><a name="index-noninvasive-task-options-1251"></a>This command switches <span class="sc">gdb</span> to a mode that is the least
+invasive as far as interfering with the inferior is concerned.  This
+is the same as using <code>set task pause</code>, <code>set exceptions</code>, and
+<code>set signals</code> to values opposite to the defaults.
+
+     <br><dt><code>info send-rights</code><dt><code>info receive-rights</code><dt><code>info port-rights</code><dt><code>info port-sets</code><dt><code>info dead-names</code><dt><code>info ports</code><dt><code>info psets</code><dd><a name="index-send-rights_002c-_0040sc_007bgnu_007d-Hurd-1252"></a><a name="index-receive-rights_002c-_0040sc_007bgnu_007d-Hurd-1253"></a><a name="index-port-rights_002c-_0040sc_007bgnu_007d-Hurd-1254"></a><a name="index-port-sets_002c-_0040sc_007bgnu_007d-Hurd-1255"></a><a name="index-dead-names_002c-_0040sc_007bgnu_007d-Hurd-1256"></a>These commands display information about, respectively, send rights,
+receive rights, port rights, port sets, and dead names of a task. 
+There are also shorthand aliases: <code>info ports</code> for <code>info
+port-rights</code> and <code>info psets</code> for <code>info port-sets</code>.
+
+     <br><dt><code>set thread pause</code><dd><a name="index-set-thread_0040r_007b_002c-Hurd-command_007d-1257"></a><a name="index-thread-properties_002c-_0040sc_007bgnu_007d-Hurd-1258"></a><a name="index-pause-current-thread-_0028_0040sc_007bgnu_007d-Hurd_0029-1259"></a>This command toggles current thread suspension when <span class="sc">gdb</span> has
+control.  Setting it to on takes effect immediately, and the current
+thread is suspended whenever <span class="sc">gdb</span> gets control.  Setting it to
+off will take effect the next time the inferior is continued. 
+Normally, this command has no effect, since when <span class="sc">gdb</span> has
+control, the whole task is suspended.  However, if you used <code>set
+task pause off</code> (see above), this command comes in handy to suspend
+only the current thread.
+
+     <br><dt><code>show thread pause</code><dd><a name="index-show-thread_0040r_007b_002c-Hurd-command_007d-1260"></a>This command shows the state of current thread suspension.
+
+     <br><dt><code>set thread run</code><dd>This command sets whether the current thread is allowed to run.
+
+     <br><dt><code>show thread run</code><dd>Show whether the current thread is allowed to run.
+
+     <br><dt><code>set thread detach-suspend-count</code><dd><a name="index-thread-suspend-count_002c-_0040sc_007bgnu_007d-Hurd-1261"></a><a name="index-detach-from-thread_002c-_0040sc_007bgnu_007d-Hurd-1262"></a>This command sets the suspend count <span class="sc">gdb</span> will leave on a
+thread when detaching.  This number is relative to the suspend count
+found by <span class="sc">gdb</span> when it notices the thread; use <code>set thread
+takeover-suspend-count</code> to force it to an absolute value.
+
+     <br><dt><code>show thread detach-suspend-count</code><dd>Show the suspend count <span class="sc">gdb</span> will leave on the thread when
+detaching.
+
+     <br><dt><code>set thread exception-port</code><dt><code>set thread excp</code><dd>Set the thread exception port to which to forward exceptions.  This
+overrides the port set by <code>set task exception-port</code> (see above). 
+<code>set thread excp</code> is the shorthand alias.
+
+     <br><dt><code>set thread takeover-suspend-count</code><dd>Normally, <span class="sc">gdb</span>'s thread suspend counts are relative to the
+value <span class="sc">gdb</span> finds when it notices each thread.  This command
+changes the suspend counts to be absolute instead.
+
+     <br><dt><code>set thread default</code><dt><code>show thread default</code><dd><a name="index-thread-default-settings_002c-_0040sc_007bgnu_007d-Hurd-1263"></a>Each of the above <code>set thread</code> commands has a <code>set thread
+default</code> counterpart (e.g., <code>set thread default pause</code>, <code>set
+thread default exception-port</code>, etc.).  The <code>thread default</code>
+variety of commands sets the default thread properties for all
+threads; you can then change the properties of individual threads with
+the non-default commands. 
+</dl>
+
+   </body></html>
+

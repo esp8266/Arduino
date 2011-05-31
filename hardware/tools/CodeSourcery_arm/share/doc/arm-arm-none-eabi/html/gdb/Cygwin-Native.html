@@ -1,0 +1,142 @@
+<html lang="en">
+<head>
+<title>Cygwin Native - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Native.html#Native" title="Native">
+<link rel="prev" href="DJGPP-Native.html#DJGPP-Native" title="DJGPP Native">
+<link rel="next" href="Hurd-Native.html#Hurd-Native" title="Hurd Native">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Cygwin-Native"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Hurd-Native.html#Hurd-Native">Hurd Native</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="DJGPP-Native.html#DJGPP-Native">DJGPP Native</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Native.html#Native">Native</a>
+<hr>
+</div>
+
+<h4 class="subsection">21.1.5 Features for Debugging MS Windows PE Executables</h4>
+
+<p><a name="index-MS-Windows-debugging-1207"></a><a name="index-native-Cygwin-debugging-1208"></a><a name="index-Cygwin_002dspecific-commands-1209"></a>
+<span class="sc">gdb</span> supports native debugging of MS Windows programs, including
+DLLs with and without symbolic debugging information.
+
+   <p><a name="index-Ctrl_002dBREAK_002c-MS_002dWindows-1210"></a><a name="index-interrupt-debuggee-on-MS_002dWindows-1211"></a>MS-Windows programs that call <code>SetConsoleMode</code> to switch off the
+special meaning of the &lsquo;<samp><span class="samp">Ctrl-C</span></samp>&rsquo; keystroke cannot be interrupted
+by typing <kbd>C-c</kbd>.  For this reason, <span class="sc">gdb</span> on MS-Windows
+supports <kbd>C-&lt;BREAK&gt;</kbd> as an alternative interrupt key
+sequence, which can be used to interrupt the debuggee even if it
+ignores <kbd>C-c</kbd>.
+
+   <p>There are various additional Cygwin-specific commands, described in
+this section.  Working with DLLs that have no debugging symbols is
+described in <a href="Non_002ddebug-DLL-Symbols.html#Non_002ddebug-DLL-Symbols">Non-debug DLL Symbols</a>.
+
+     
+<a name="index-info-w32-1212"></a>
+<dl><dt><code>info w32</code><dd>This is a prefix of MS Windows-specific commands which print
+information about the target system and important OS structures.
+
+     <br><dt><code>info w32 selector</code><dd>This command displays information returned by
+the Win32 API <code>GetThreadSelectorEntry</code> function. 
+It takes an optional argument that is evaluated to
+a long value to give the information about this given selector. 
+Without argument, this command displays information
+about the six segment registers.
+
+     <br><dt><code>info w32 thread-information-block</code><dd>This command displays thread specific information stored in the
+Thread Information Block (readable on the X86 CPU family using <code>$fs</code>
+selector for 32-bit programs and <code>$gs</code> for 64-bit programs).
+
+     <p><a name="index-info-dll-1213"></a><br><dt><code>info dll</code><dd>This is a Cygwin-specific alias of <code>info shared</code>.
+
+     <p><a name="index-dll_002dsymbols-1214"></a><br><dt><code>dll-symbols</code><dd>This command loads symbols from a dll similarly to
+add-sym command but without the need to specify a base address.
+
+     <p><a name="index-set-cygwin_002dexceptions-1215"></a><a name="index-debugging-the-Cygwin-DLL-1216"></a><a name="index-Cygwin-DLL_002c-debugging-1217"></a><br><dt><code>set cygwin-exceptions </code><var>mode</var><dd>If <var>mode</var> is <code>on</code>, <span class="sc">gdb</span> will break on exceptions that
+happen inside the Cygwin DLL.  If <var>mode</var> is <code>off</code>,
+<span class="sc">gdb</span> will delay recognition of exceptions, and may ignore some
+exceptions which seem to be caused by internal Cygwin DLL
+&ldquo;bookkeeping&rdquo;.  This option is meant primarily for debugging the
+Cygwin DLL itself; the default value is <code>off</code> to avoid annoying
+<span class="sc">gdb</span> users with false <code>SIGSEGV</code> signals.
+
+     <p><a name="index-show-cygwin_002dexceptions-1218"></a><br><dt><code>show cygwin-exceptions</code><dd>Displays whether <span class="sc">gdb</span> will break on exceptions that happen
+inside the Cygwin DLL itself.
+
+     <p><a name="index-set-new_002dconsole-1219"></a><br><dt><code>set new-console </code><var>mode</var><dd>If <var>mode</var> is <code>on</code> the debuggee will
+be started in a new console on next start. 
+If <var>mode</var> is <code>off</code>, the debuggee will
+be started in the same console as the debugger.
+
+     <p><a name="index-show-new_002dconsole-1220"></a><br><dt><code>show new-console</code><dd>Displays whether a new console is used
+when the debuggee is started.
+
+     <p><a name="index-set-new_002dgroup-1221"></a><br><dt><code>set new-group </code><var>mode</var><dd>This boolean value controls whether the debuggee should
+start a new group or stay in the same group as the debugger. 
+This affects the way the Windows OS handles
+&lsquo;<samp><span class="samp">Ctrl-C</span></samp>&rsquo;.
+
+     <p><a name="index-show-new_002dgroup-1222"></a><br><dt><code>show new-group</code><dd>Displays current value of new-group boolean.
+
+     <p><a name="index-set-debugevents-1223"></a><br><dt><code>set debugevents</code><dd>This boolean value adds debug output concerning kernel events related
+to the debuggee seen by the debugger.  This includes events that
+signal thread and process creation and exit, DLL loading and
+unloading, console interrupts, and debugging messages produced by the
+Windows <code>OutputDebugString</code> API call.
+
+     <p><a name="index-set-debugexec-1224"></a><br><dt><code>set debugexec</code><dd>This boolean value adds debug output concerning execute events
+(such as resume thread) seen by the debugger.
+
+     <p><a name="index-set-debugexceptions-1225"></a><br><dt><code>set debugexceptions</code><dd>This boolean value adds debug output concerning exceptions in the
+debuggee seen by the debugger.
+
+     <p><a name="index-set-debugmemory-1226"></a><br><dt><code>set debugmemory</code><dd>This boolean value adds debug output concerning debuggee memory reads
+and writes by the debugger.
+
+     <p><a name="index-set-shell-1227"></a><br><dt><code>set shell</code><dd>This boolean values specifies whether the debuggee is called
+via a shell or directly (default value is on).
+
+     <p><a name="index-show-shell-1228"></a><br><dt><code>show shell</code><dd>Displays if the debuggee will be started with a shell.
+
+   </dl>
+
+<ul class="menu">
+<li><a accesskey="1" href="Non_002ddebug-DLL-Symbols.html#Non_002ddebug-DLL-Symbols">Non-debug DLL Symbols</a>:   Support for DLLs without debugging symbols
+</ul>
+
+   </body></html>
+

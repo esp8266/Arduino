@@ -1,0 +1,76 @@
+<html lang="en">
+<head>
+<title>atanh - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Math.html#Math" title="Math">
+<link rel="prev" href="atan2.html#atan2" title="atan2">
+<link rel="next" href="jN.html#jN" title="jN">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="atanh"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="jN.html#jN">jN</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="atan2.html#atan2">atan2</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Math.html#Math">Math</a>
+<hr>
+</div>
+
+<h3 class="section">1.9 <code>atanh</code>, <code>atanhf</code>&mdash;inverse hyperbolic tangent</h3>
+
+<p><a name="index-atanh-17"></a><a name="index-atanhf-18"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double atanh(double <var>x</var>);
+     float atanhf(float <var>x</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>atanh</code> calculates the inverse hyperbolic tangent of <var>x</var>.
+
+   <p><code>atanhf</code> is identical, other than taking and returning
+<code>float</code> values.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>atanh</code> and <code>atanhf</code> return the calculated value.
+
+   <p>If
+<pre class="smallexample">     <var>x</var>|
+</pre>
+   <p>is greater than 1, the global <code>errno</code> is set to <code>EDOM</code> and
+the result is a NaN.  A <code>DOMAIN error</code> is reported.
+
+   <p>If
+<pre class="smallexample">     <var>x</var>|
+</pre>
+   <p>is 1, the global <code>errno</code> is set to <code>EDOM</code>; and the result is
+infinity with the same sign as <code>x</code>.  A <code>SING error</code> is reported.
+
+   <p>You can modify the error handling for these routines using
+<code>matherr</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+Neither <code>atanh</code> nor <code>atanhf</code> are ANSI C.
+
+   <p><br>
+
+   </body></html>
+

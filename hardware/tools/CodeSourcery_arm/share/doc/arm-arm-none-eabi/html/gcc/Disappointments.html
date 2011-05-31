@@ -1,0 +1,148 @@
+<html lang="en">
+<head>
+<title>Disappointments - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Trouble.html#Trouble" title="Trouble">
+<link rel="prev" href="Standard-Libraries.html#Standard-Libraries" title="Standard Libraries">
+<link rel="next" href="C_002b_002b-Misunderstandings.html#C_002b_002b-Misunderstandings" title="C++ Misunderstandings">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Disappointments"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="C_002b_002b-Misunderstandings.html#C_002b_002b-Misunderstandings">C++ Misunderstandings</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Standard-Libraries.html#Standard-Libraries">Standard Libraries</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Trouble.html#Trouble">Trouble</a>
+<hr>
+</div>
+
+<h3 class="section">11.7 Disappointments and Misunderstandings</h3>
+
+<p>These problems are perhaps regrettable, but we don't know any practical
+way around them.
+
+     <ul>
+<li>Certain local variables aren't recognized by debuggers when you compile
+with optimization.
+
+     <p>This occurs because sometimes GCC optimizes the variable out of
+existence.  There is no way to tell the debugger how to compute the
+value such a variable &ldquo;would have had&rdquo;, and it is not clear that would
+be desirable anyway.  So GCC simply does not mention the eliminated
+variable when it writes debugging information.
+
+     <p>You have to expect a certain amount of disagreement between the
+executable and your source code, when you use optimization.
+
+     <p><a name="index-conflicting-types-3226"></a><a name="index-scope-of-declaration-3227"></a><li>Users often think it is a bug when GCC reports an error for code
+like this:
+
+     <pre class="smallexample">          int foo (struct mumble *);
+          
+          struct mumble { ... };
+          
+          int foo (struct mumble *x)
+          { ... }
+</pre>
+     <p>This code really is erroneous, because the scope of <code>struct
+mumble</code> in the prototype is limited to the argument list containing it. 
+It does not refer to the <code>struct mumble</code> defined with file scope
+immediately below&mdash;they are two unrelated types with similar names in
+different scopes.
+
+     <p>But in the definition of <code>foo</code>, the file-scope type is used
+because that is available to be inherited.  Thus, the definition and
+the prototype do not match, and you get an error.
+
+     <p>This behavior may seem silly, but it's what the ISO standard specifies. 
+It is easy enough for you to make your code work by moving the
+definition of <code>struct mumble</code> above the prototype.  It's not worth
+being incompatible with ISO C just to avoid an error for the example
+shown above.
+
+     <li>Accesses to bit-fields even in volatile objects works by accessing larger
+objects, such as a byte or a word.  You cannot rely on what size of
+object is accessed in order to read or write the bit-field; it may even
+vary for a given bit-field according to the precise usage.
+
+     <p>If you care about controlling the amount of memory that is accessed, use
+volatile but do not use bit-fields.
+
+     <li>GCC comes with shell scripts to fix certain known problems in system
+header files.  They install corrected copies of various header files in
+a special directory where only GCC will normally look for them.  The
+scripts adapt to various systems by searching all the system header
+files for the problem cases that we know about.
+
+     <p>If new system header files are installed, nothing automatically arranges
+to update the corrected header files.  They can be updated using the
+<samp><span class="command">mkheaders</span></samp> script installed in
+<samp><var>libexecdir</var><span class="file">/gcc/</span><var>target</var><span class="file">/</span><var>version</var><span class="file">/install-tools/</span></samp>.
+
+     <li><a name="index-floating-point-precision-3228"></a>On 68000 and x86 systems, for instance, you can get paradoxical results
+if you test the precise values of floating point numbers.  For example,
+you can find that a floating point value which is not a NaN is not equal
+to itself.  This results from the fact that the floating point registers
+hold a few more bits of precision than fit in a <code>double</code> in memory. 
+Compiled code moves values between memory and floating point registers
+at its convenience, and moving them into memory truncates them.
+
+     <p><a name="index-ffloat_002dstore-3229"></a>You can partially avoid this problem by using the <samp><span class="option">-ffloat-store</span></samp>
+option (see <a href="Optimize-Options.html#Optimize-Options">Optimize Options</a>).
+
+     <li>On AIX and other platforms without weak symbol support, templates
+need to be instantiated explicitly and symbols for static members
+of templates will not be generated.
+
+     <li>On AIX, GCC scans object files and library archives for static
+constructors and destructors when linking an application before the
+linker prunes unreferenced symbols.  This is necessary to prevent the
+AIX linker from mistakenly assuming that static constructor or
+destructor are unused and removing them before the scanning can occur. 
+All static constructors and destructors found will be referenced even
+though the modules in which they occur may not be used by the program. 
+This may lead to both increased executable size and unexpected symbol
+references. 
+</ul>
+
+ </body></html>
+

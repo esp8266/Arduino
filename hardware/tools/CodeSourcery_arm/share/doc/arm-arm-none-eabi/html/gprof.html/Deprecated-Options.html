@@ -1,0 +1,95 @@
+<html lang="en">
+<head>
+<title>Deprecated Options - GNU gprof</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GNU gprof">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Invoking.html#Invoking" title="Invoking">
+<link rel="prev" href="Miscellaneous-Options.html#Miscellaneous-Options" title="Miscellaneous Options">
+<link rel="next" href="Symspecs.html#Symspecs" title="Symspecs">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the gprof profiler of the GNU system.
+
+Copyright (C) 1988, 1992, 1997, 1998, 1999, 2000, 2001, 2003,
+2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Deprecated-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Symspecs.html#Symspecs">Symspecs</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Miscellaneous-Options.html#Miscellaneous-Options">Miscellaneous Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Invoking.html#Invoking">Invoking</a>
+<hr>
+</div>
+
+<h3 class="section">4.4 Deprecated Options</h3>
+
+     <dl>
+These options have been replaced with newer versions that use symspecs.
+
+     <dt><code>-e </code><var>function_name</var><dd>The &lsquo;<samp><span class="samp">-e </span><var>function</var></samp>&rsquo; option tells <code>gprof</code> to not print
+information about the function <var>function_name</var> (and its
+children<small class="dots">...</small>) in the call graph.  The function will still be listed
+as a child of any functions that call it, but its index number will be
+shown as &lsquo;<samp><span class="samp">[not printed]</span></samp>&rsquo;.  More than one &lsquo;<samp><span class="samp">-e</span></samp>&rsquo; option may be
+given; only one <var>function_name</var> may be indicated with each &lsquo;<samp><span class="samp">-e</span></samp>&rsquo;
+option.
+
+     <br><dt><code>-E </code><var>function_name</var><dd>The <code>-E </code><var>function</var> option works like the <code>-e</code> option, but
+time spent in the function (and children who were not called from
+anywhere else), will not be used to compute the percentages-of-time for
+the call graph.  More than one &lsquo;<samp><span class="samp">-E</span></samp>&rsquo; option may be given; only one
+<var>function_name</var> may be indicated with each &lsquo;<samp><span class="samp">-E</span></samp>&rsquo; option.
+
+     <br><dt><code>-f </code><var>function_name</var><dd>The &lsquo;<samp><span class="samp">-f </span><var>function</var></samp>&rsquo; option causes <code>gprof</code> to limit the
+call graph to the function <var>function_name</var> and its children (and
+their children<small class="dots">...</small>).  More than one &lsquo;<samp><span class="samp">-f</span></samp>&rsquo; option may be given;
+only one <var>function_name</var> may be indicated with each &lsquo;<samp><span class="samp">-f</span></samp>&rsquo;
+option.
+
+     <br><dt><code>-F </code><var>function_name</var><dd>The &lsquo;<samp><span class="samp">-F </span><var>function</var></samp>&rsquo; option works like the <code>-f</code> option, but
+only time spent in the function and its children (and their
+children<small class="dots">...</small>) will be used to determine total-time and
+percentages-of-time for the call graph.  More than one &lsquo;<samp><span class="samp">-F</span></samp>&rsquo; option
+may be given; only one <var>function_name</var> may be indicated with each
+&lsquo;<samp><span class="samp">-F</span></samp>&rsquo; option.  The &lsquo;<samp><span class="samp">-F</span></samp>&rsquo; option overrides the &lsquo;<samp><span class="samp">-E</span></samp>&rsquo; option.
+
+</dl>
+
+<!-- man end -->
+   <p>Note that only one function can be specified with each <code>-e</code>,
+<code>-E</code>, <code>-f</code> or <code>-F</code> option.  To specify more than one
+function, use multiple options.  For example, this command:
+
+<pre class="example">     gprof -e boring -f foo -f bar myprogram &gt; gprof.output
+</pre>
+   <p class="noindent">lists in the call graph all functions that were reached from either
+<code>foo</code> or <code>bar</code> and were not reachable from <code>boring</code>.
+
+   </body></html>
+

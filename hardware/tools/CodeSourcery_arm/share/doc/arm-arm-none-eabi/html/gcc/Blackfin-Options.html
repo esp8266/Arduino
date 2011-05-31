@@ -1,0 +1,204 @@
+<html lang="en">
+<head>
+<title>Blackfin Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Submodel-Options.html#Submodel-Options" title="Submodel Options">
+<link rel="prev" href="AVR-Options.html#AVR-Options" title="AVR Options">
+<link rel="next" href="CRIS-Options.html#CRIS-Options" title="CRIS Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Blackfin-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="CRIS-Options.html#CRIS-Options">CRIS Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="AVR-Options.html#AVR-Options">AVR Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Submodel-Options.html#Submodel-Options">Submodel Options</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.17.4 Blackfin Options</h4>
+
+<p><a name="index-Blackfin-Options-1042"></a>
+     <dl>
+<dt><code>-mcpu=</code><var>cpu</var><span class="roman">[</span><code>-</code><var>sirevision</var><span class="roman">]</span><dd><a name="index-mcpu_003d-1043"></a>Specifies the name of the target Blackfin processor.  Currently, <var>cpu</var>
+can be one of &lsquo;<samp><span class="samp">bf512</span></samp>&rsquo;, &lsquo;<samp><span class="samp">bf514</span></samp>&rsquo;, &lsquo;<samp><span class="samp">bf516</span></samp>&rsquo;, &lsquo;<samp><span class="samp">bf518</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">bf522</span></samp>&rsquo;, &lsquo;<samp><span class="samp">bf523</span></samp>&rsquo;, &lsquo;<samp><span class="samp">bf524</span></samp>&rsquo;, &lsquo;<samp><span class="samp">bf525</span></samp>&rsquo;, &lsquo;<samp><span class="samp">bf526</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">bf527</span></samp>&rsquo;, &lsquo;<samp><span class="samp">bf531</span></samp>&rsquo;, &lsquo;<samp><span class="samp">bf532</span></samp>&rsquo;, &lsquo;<samp><span class="samp">bf533</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">bf534</span></samp>&rsquo;, &lsquo;<samp><span class="samp">bf536</span></samp>&rsquo;, &lsquo;<samp><span class="samp">bf537</span></samp>&rsquo;, &lsquo;<samp><span class="samp">bf538</span></samp>&rsquo;, &lsquo;<samp><span class="samp">bf539</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">bf542</span></samp>&rsquo;, &lsquo;<samp><span class="samp">bf544</span></samp>&rsquo;, &lsquo;<samp><span class="samp">bf547</span></samp>&rsquo;, &lsquo;<samp><span class="samp">bf548</span></samp>&rsquo;, &lsquo;<samp><span class="samp">bf549</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">bf542m</span></samp>&rsquo;, &lsquo;<samp><span class="samp">bf544m</span></samp>&rsquo;, &lsquo;<samp><span class="samp">bf547m</span></samp>&rsquo;, &lsquo;<samp><span class="samp">bf548m</span></samp>&rsquo;, &lsquo;<samp><span class="samp">bf549m</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">bf561</span></samp>&rsquo;. 
+The optional <var>sirevision</var> specifies the silicon revision of the target
+Blackfin processor.  Any workarounds available for the targeted silicon revision
+will be enabled.  If <var>sirevision</var> is &lsquo;<samp><span class="samp">none</span></samp>&rsquo;, no workarounds are enabled. 
+If <var>sirevision</var> is &lsquo;<samp><span class="samp">any</span></samp>&rsquo;, all workarounds for the targeted processor
+will be enabled.  The <code>__SILICON_REVISION__</code> macro is defined to two
+hexadecimal digits representing the major and minor numbers in the silicon
+revision.  If <var>sirevision</var> is &lsquo;<samp><span class="samp">none</span></samp>&rsquo;, the <code>__SILICON_REVISION__</code>
+is not defined.  If <var>sirevision</var> is &lsquo;<samp><span class="samp">any</span></samp>&rsquo;, the
+<code>__SILICON_REVISION__</code> is defined to be <code>0xffff</code>. 
+If this optional <var>sirevision</var> is not used, GCC assumes the latest known
+silicon revision of the targeted Blackfin processor.
+
+     <p>Support for &lsquo;<samp><span class="samp">bf561</span></samp>&rsquo; is incomplete.  For &lsquo;<samp><span class="samp">bf561</span></samp>&rsquo;,
+Only the processor macro is defined. 
+Without this option, &lsquo;<samp><span class="samp">bf532</span></samp>&rsquo; is used as the processor by default. 
+The corresponding predefined processor macros for <var>cpu</var> is to
+be defined.  And for &lsquo;<samp><span class="samp">bfin-elf</span></samp>&rsquo; toolchain, this causes the hardware BSP
+provided by libgloss to be linked in if <samp><span class="option">-msim</span></samp> is not given.
+
+     <br><dt><code>-msim</code><dd><a name="index-msim-1044"></a>Specifies that the program will be run on the simulator.  This causes
+the simulator BSP provided by libgloss to be linked in.  This option
+has effect only for &lsquo;<samp><span class="samp">bfin-elf</span></samp>&rsquo; toolchain. 
+Certain other options, such as <samp><span class="option">-mid-shared-library</span></samp> and
+<samp><span class="option">-mfdpic</span></samp>, imply <samp><span class="option">-msim</span></samp>.
+
+     <br><dt><code>-momit-leaf-frame-pointer</code><dd><a name="index-momit_002dleaf_002dframe_002dpointer-1045"></a>Don't keep the frame pointer in a register for leaf functions.  This
+avoids the instructions to save, set up and restore frame pointers and
+makes an extra register available in leaf functions.  The option
+<samp><span class="option">-fomit-frame-pointer</span></samp> removes the frame pointer for all functions
+which might make debugging harder.
+
+     <br><dt><code>-mspecld-anomaly</code><dd><a name="index-mspecld_002danomaly-1046"></a>When enabled, the compiler will ensure that the generated code does not
+contain speculative loads after jump instructions. If this option is used,
+<code>__WORKAROUND_SPECULATIVE_LOADS</code> is defined.
+
+     <br><dt><code>-mno-specld-anomaly</code><dd><a name="index-mno_002dspecld_002danomaly-1047"></a>Don't generate extra code to prevent speculative loads from occurring.
+
+     <br><dt><code>-mcsync-anomaly</code><dd><a name="index-mcsync_002danomaly-1048"></a>When enabled, the compiler will ensure that the generated code does not
+contain CSYNC or SSYNC instructions too soon after conditional branches. 
+If this option is used, <code>__WORKAROUND_SPECULATIVE_SYNCS</code> is defined.
+
+     <br><dt><code>-mno-csync-anomaly</code><dd><a name="index-mno_002dcsync_002danomaly-1049"></a>Don't generate extra code to prevent CSYNC or SSYNC instructions from
+occurring too soon after a conditional branch.
+
+     <br><dt><code>-mlow-64k</code><dd><a name="index-mlow_002d64k-1050"></a>When enabled, the compiler is free to take advantage of the knowledge that
+the entire program fits into the low 64k of memory.
+
+     <br><dt><code>-mno-low-64k</code><dd><a name="index-mno_002dlow_002d64k-1051"></a>Assume that the program is arbitrarily large.  This is the default.
+
+     <br><dt><code>-mstack-check-l1</code><dd><a name="index-mstack_002dcheck_002dl1-1052"></a>Do stack checking using information placed into L1 scratchpad memory by the
+uClinux kernel.
+
+     <br><dt><code>-mid-shared-library</code><dd><a name="index-mid_002dshared_002dlibrary-1053"></a>Generate code that supports shared libraries via the library ID method. 
+This allows for execute in place and shared libraries in an environment
+without virtual memory management.  This option implies <samp><span class="option">-fPIC</span></samp>. 
+With a &lsquo;<samp><span class="samp">bfin-elf</span></samp>&rsquo; target, this option implies <samp><span class="option">-msim</span></samp>.
+
+     <br><dt><code>-mno-id-shared-library</code><dd><a name="index-mno_002did_002dshared_002dlibrary-1054"></a>Generate code that doesn't assume ID based shared libraries are being used. 
+This is the default.
+
+     <br><dt><code>-mleaf-id-shared-library</code><dd><a name="index-mleaf_002did_002dshared_002dlibrary-1055"></a>Generate code that supports shared libraries via the library ID method,
+but assumes that this library or executable won't link against any other
+ID shared libraries.  That allows the compiler to use faster code for jumps
+and calls.
+
+     <br><dt><code>-mno-leaf-id-shared-library</code><dd><a name="index-mno_002dleaf_002did_002dshared_002dlibrary-1056"></a>Do not assume that the code being compiled won't link against any ID shared
+libraries.  Slower code will be generated for jump and call insns.
+
+     <br><dt><code>-mshared-library-id=n</code><dd><a name="index-mshared_002dlibrary_002did-1057"></a>Specified the identification number of the ID based shared library being
+compiled.  Specifying a value of 0 will generate more compact code, specifying
+other values will force the allocation of that number to the current
+library but is no more space or time efficient than omitting this option.
+
+     <br><dt><code>-msep-data</code><dd><a name="index-msep_002ddata-1058"></a>Generate code that allows the data segment to be located in a different
+area of memory from the text segment.  This allows for execute in place in
+an environment without virtual memory management by eliminating relocations
+against the text section.
+
+     <br><dt><code>-mno-sep-data</code><dd><a name="index-mno_002dsep_002ddata-1059"></a>Generate code that assumes that the data segment follows the text segment. 
+This is the default.
+
+     <br><dt><code>-mlong-calls</code><dt><code>-mno-long-calls</code><dd><a name="index-mlong_002dcalls-1060"></a><a name="index-mno_002dlong_002dcalls-1061"></a>Tells the compiler to perform function calls by first loading the
+address of the function into a register and then performing a subroutine
+call on this register.  This switch is needed if the target function
+will lie outside of the 24 bit addressing range of the offset based
+version of subroutine call instruction.
+
+     <p>This feature is not enabled by default.  Specifying
+<samp><span class="option">-mno-long-calls</span></samp> will restore the default behavior.  Note these
+switches have no effect on how the compiler generates code to handle
+function calls via function pointers.
+
+     <br><dt><code>-mfast-fp</code><dd><a name="index-mfast_002dfp-1062"></a>Link with the fast floating-point library. This library relaxes some of
+the IEEE floating-point standard's rules for checking inputs against
+Not-a-Number (NAN), in the interest of performance.
+
+     <br><dt><code>-minline-plt</code><dd><a name="index-minline_002dplt-1063"></a>Enable inlining of PLT entries in function calls to functions that are
+not known to bind locally.  It has no effect without <samp><span class="option">-mfdpic</span></samp>.
+
+     <br><dt><code>-mmulticore</code><dd><a name="index-mmulticore-1064"></a>Build standalone application for multicore Blackfin processor. Proper
+start files and link scripts will be used to support multicore. 
+This option defines <code>__BFIN_MULTICORE</code>. It can only be used with
+<samp><span class="option">-mcpu=bf561[-</span><var>sirevision</var><span class="option">]</span></samp>. It can be used with
+<samp><span class="option">-mcorea</span></samp> or <samp><span class="option">-mcoreb</span></samp>. If it's used without
+<samp><span class="option">-mcorea</span></samp> or <samp><span class="option">-mcoreb</span></samp>, single application/dual core
+programming model is used. In this model, the main function of Core B
+should be named as coreb_main. If it's used with <samp><span class="option">-mcorea</span></samp> or
+<samp><span class="option">-mcoreb</span></samp>, one application per core programming model is used. 
+If this option is not used, single core application programming
+model is used.
+
+     <br><dt><code>-mcorea</code><dd><a name="index-mcorea-1065"></a>Build standalone application for Core A of BF561 when using
+one application per core programming model. Proper start files
+and link scripts will be used to support Core A. This option
+defines <code>__BFIN_COREA</code>. It must be used with <samp><span class="option">-mmulticore</span></samp>.
+
+     <br><dt><code>-mcoreb</code><dd><a name="index-mcoreb-1066"></a>Build standalone application for Core B of BF561 when using
+one application per core programming model. Proper start files
+and link scripts will be used to support Core B. This option
+defines <code>__BFIN_COREB</code>. When this option is used, coreb_main
+should be used instead of main. It must be used with
+<samp><span class="option">-mmulticore</span></samp>.
+
+     <br><dt><code>-msdram</code><dd><a name="index-msdram-1067"></a>Build standalone application for SDRAM. Proper start files and
+link scripts will be used to put the application into SDRAM. 
+Loader should initialize SDRAM before loading the application
+into SDRAM. This option defines <code>__BFIN_SDRAM</code>.
+
+     <br><dt><code>-micplb</code><dd><a name="index-micplb-1068"></a>Assume that ICPLBs are enabled at runtime.  This has an effect on certain
+anomaly workarounds.  For Linux targets, the default is to assume ICPLBs
+are enabled; for standalone applications the default is off. 
+</dl>
+
+ </body></html>
+

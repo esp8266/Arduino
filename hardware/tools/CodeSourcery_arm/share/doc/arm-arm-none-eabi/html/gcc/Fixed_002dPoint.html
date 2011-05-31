@@ -1,0 +1,162 @@
+<html lang="en">
+<head>
+<title>Fixed-Point - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Hex-Floats.html#Hex-Floats" title="Hex Floats">
+<link rel="next" href="Named-Address-Spaces.html#Named-Address-Spaces" title="Named Address Spaces">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Fixed-Point"></a>
+<a name="Fixed_002dPoint"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Named-Address-Spaces.html#Named-Address-Spaces">Named Address Spaces</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Hex-Floats.html#Hex-Floats">Hex Floats</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.14 Fixed-Point Types</h3>
+
+<p><a name="index-fixed_002dpoint-types-2247"></a><a name="index-g_t_0040code_007b_005fFract_007d-data-type-2248"></a><a name="index-g_t_0040code_007b_005fAccum_007d-data-type-2249"></a><a name="index-g_t_0040code_007b_005fSat_007d-data-type-2250"></a><a name="index-g_t_0040code_007bhr_007d-fixed_002dsuffix-2251"></a><a name="index-g_t_0040code_007br_007d-fixed_002dsuffix-2252"></a><a name="index-g_t_0040code_007blr_007d-fixed_002dsuffix-2253"></a><a name="index-g_t_0040code_007bllr_007d-fixed_002dsuffix-2254"></a><a name="index-g_t_0040code_007buhr_007d-fixed_002dsuffix-2255"></a><a name="index-g_t_0040code_007bur_007d-fixed_002dsuffix-2256"></a><a name="index-g_t_0040code_007bulr_007d-fixed_002dsuffix-2257"></a><a name="index-g_t_0040code_007bullr_007d-fixed_002dsuffix-2258"></a><a name="index-g_t_0040code_007bhk_007d-fixed_002dsuffix-2259"></a><a name="index-g_t_0040code_007bk_007d-fixed_002dsuffix-2260"></a><a name="index-g_t_0040code_007blk_007d-fixed_002dsuffix-2261"></a><a name="index-g_t_0040code_007bllk_007d-fixed_002dsuffix-2262"></a><a name="index-g_t_0040code_007buhk_007d-fixed_002dsuffix-2263"></a><a name="index-g_t_0040code_007buk_007d-fixed_002dsuffix-2264"></a><a name="index-g_t_0040code_007bulk_007d-fixed_002dsuffix-2265"></a><a name="index-g_t_0040code_007bullk_007d-fixed_002dsuffix-2266"></a><a name="index-g_t_0040code_007bHR_007d-fixed_002dsuffix-2267"></a><a name="index-g_t_0040code_007bR_007d-fixed_002dsuffix-2268"></a><a name="index-g_t_0040code_007bLR_007d-fixed_002dsuffix-2269"></a><a name="index-g_t_0040code_007bLLR_007d-fixed_002dsuffix-2270"></a><a name="index-g_t_0040code_007bUHR_007d-fixed_002dsuffix-2271"></a><a name="index-g_t_0040code_007bUR_007d-fixed_002dsuffix-2272"></a><a name="index-g_t_0040code_007bULR_007d-fixed_002dsuffix-2273"></a><a name="index-g_t_0040code_007bULLR_007d-fixed_002dsuffix-2274"></a><a name="index-g_t_0040code_007bHK_007d-fixed_002dsuffix-2275"></a><a name="index-g_t_0040code_007bK_007d-fixed_002dsuffix-2276"></a><a name="index-g_t_0040code_007bLK_007d-fixed_002dsuffix-2277"></a><a name="index-g_t_0040code_007bLLK_007d-fixed_002dsuffix-2278"></a><a name="index-g_t_0040code_007bUHK_007d-fixed_002dsuffix-2279"></a><a name="index-g_t_0040code_007bUK_007d-fixed_002dsuffix-2280"></a><a name="index-g_t_0040code_007bULK_007d-fixed_002dsuffix-2281"></a><a name="index-g_t_0040code_007bULLK_007d-fixed_002dsuffix-2282"></a>
+As an extension, the GNU C compiler supports fixed-point types as
+defined in the N1169 draft of ISO/IEC DTR 18037.  Support for fixed-point
+types in GCC will evolve as the draft technical report changes. 
+Calling conventions for any target might also change.  Not all targets
+support fixed-point types.
+
+ <p>The fixed-point types are
+<code>short _Fract</code>,
+<code>_Fract</code>,
+<code>long _Fract</code>,
+<code>long long _Fract</code>,
+<code>unsigned short _Fract</code>,
+<code>unsigned _Fract</code>,
+<code>unsigned long _Fract</code>,
+<code>unsigned long long _Fract</code>,
+<code>_Sat short _Fract</code>,
+<code>_Sat _Fract</code>,
+<code>_Sat long _Fract</code>,
+<code>_Sat long long _Fract</code>,
+<code>_Sat unsigned short _Fract</code>,
+<code>_Sat unsigned _Fract</code>,
+<code>_Sat unsigned long _Fract</code>,
+<code>_Sat unsigned long long _Fract</code>,
+<code>short _Accum</code>,
+<code>_Accum</code>,
+<code>long _Accum</code>,
+<code>long long _Accum</code>,
+<code>unsigned short _Accum</code>,
+<code>unsigned _Accum</code>,
+<code>unsigned long _Accum</code>,
+<code>unsigned long long _Accum</code>,
+<code>_Sat short _Accum</code>,
+<code>_Sat _Accum</code>,
+<code>_Sat long _Accum</code>,
+<code>_Sat long long _Accum</code>,
+<code>_Sat unsigned short _Accum</code>,
+<code>_Sat unsigned _Accum</code>,
+<code>_Sat unsigned long _Accum</code>,
+<code>_Sat unsigned long long _Accum</code>.
+
+ <p>Fixed-point data values contain fractional and optional integral parts. 
+The format of fixed-point data varies and depends on the target machine.
+
+ <p>Support for fixed-point types includes:
+     <ul>
+<li>prefix and postfix increment and decrement operators (<code>++</code>, <code>--</code>)
+<li>unary arithmetic operators (<code>+</code>, <code>-</code>, <code>!</code>)
+<li>binary arithmetic operators (<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>)
+<li>binary shift operators (<code>&lt;&lt;</code>, <code>&gt;&gt;</code>)
+<li>relational operators (<code>&lt;</code>, <code>&lt;=</code>, <code>&gt;=</code>, <code>&gt;</code>)
+<li>equality operators (<code>==</code>, <code>!=</code>)
+<li>assignment operators (<code>+=</code>, <code>-=</code>, <code>*=</code>, <code>/=</code>,
+<code>&lt;&lt;=</code>, <code>&gt;&gt;=</code>)
+<li>conversions to and from integer, floating-point, or fixed-point types
+</ul>
+
+ <p>Use a suffix in a fixed-point literal constant:
+     <ul>
+<li>&lsquo;<samp><span class="samp">hr</span></samp>&rsquo; or &lsquo;<samp><span class="samp">HR</span></samp>&rsquo; for <code>short _Fract</code> and
+<code>_Sat short _Fract</code>
+<li>&lsquo;<samp><span class="samp">r</span></samp>&rsquo; or &lsquo;<samp><span class="samp">R</span></samp>&rsquo; for <code>_Fract</code> and <code>_Sat _Fract</code>
+<li>&lsquo;<samp><span class="samp">lr</span></samp>&rsquo; or &lsquo;<samp><span class="samp">LR</span></samp>&rsquo; for <code>long _Fract</code> and
+<code>_Sat long _Fract</code>
+<li>&lsquo;<samp><span class="samp">llr</span></samp>&rsquo; or &lsquo;<samp><span class="samp">LLR</span></samp>&rsquo; for <code>long long _Fract</code> and
+<code>_Sat long long _Fract</code>
+<li>&lsquo;<samp><span class="samp">uhr</span></samp>&rsquo; or &lsquo;<samp><span class="samp">UHR</span></samp>&rsquo; for <code>unsigned short _Fract</code> and
+<code>_Sat unsigned short _Fract</code>
+<li>&lsquo;<samp><span class="samp">ur</span></samp>&rsquo; or &lsquo;<samp><span class="samp">UR</span></samp>&rsquo; for <code>unsigned _Fract</code> and
+<code>_Sat unsigned _Fract</code>
+<li>&lsquo;<samp><span class="samp">ulr</span></samp>&rsquo; or &lsquo;<samp><span class="samp">ULR</span></samp>&rsquo; for <code>unsigned long _Fract</code> and
+<code>_Sat unsigned long _Fract</code>
+<li>&lsquo;<samp><span class="samp">ullr</span></samp>&rsquo; or &lsquo;<samp><span class="samp">ULLR</span></samp>&rsquo; for <code>unsigned long long _Fract</code>
+and <code>_Sat unsigned long long _Fract</code>
+<li>&lsquo;<samp><span class="samp">hk</span></samp>&rsquo; or &lsquo;<samp><span class="samp">HK</span></samp>&rsquo; for <code>short _Accum</code> and
+<code>_Sat short _Accum</code>
+<li>&lsquo;<samp><span class="samp">k</span></samp>&rsquo; or &lsquo;<samp><span class="samp">K</span></samp>&rsquo; for <code>_Accum</code> and <code>_Sat _Accum</code>
+<li>&lsquo;<samp><span class="samp">lk</span></samp>&rsquo; or &lsquo;<samp><span class="samp">LK</span></samp>&rsquo; for <code>long _Accum</code> and
+<code>_Sat long _Accum</code>
+<li>&lsquo;<samp><span class="samp">llk</span></samp>&rsquo; or &lsquo;<samp><span class="samp">LLK</span></samp>&rsquo; for <code>long long _Accum</code> and
+<code>_Sat long long _Accum</code>
+<li>&lsquo;<samp><span class="samp">uhk</span></samp>&rsquo; or &lsquo;<samp><span class="samp">UHK</span></samp>&rsquo; for <code>unsigned short _Accum</code> and
+<code>_Sat unsigned short _Accum</code>
+<li>&lsquo;<samp><span class="samp">uk</span></samp>&rsquo; or &lsquo;<samp><span class="samp">UK</span></samp>&rsquo; for <code>unsigned _Accum</code> and
+<code>_Sat unsigned _Accum</code>
+<li>&lsquo;<samp><span class="samp">ulk</span></samp>&rsquo; or &lsquo;<samp><span class="samp">ULK</span></samp>&rsquo; for <code>unsigned long _Accum</code> and
+<code>_Sat unsigned long _Accum</code>
+<li>&lsquo;<samp><span class="samp">ullk</span></samp>&rsquo; or &lsquo;<samp><span class="samp">ULLK</span></samp>&rsquo; for <code>unsigned long long _Accum</code>
+and <code>_Sat unsigned long long _Accum</code>
+</ul>
+
+ <p>GCC support of fixed-point types as specified by the draft technical report
+is incomplete:
+
+     <ul>
+<li>Pragmas to control overflow and rounding behaviors are not implemented. 
+</ul>
+
+ <p>Fixed-point types are supported by the DWARF2 debug information format.
+
+ </body></html>
+

@@ -1,0 +1,86 @@
+<html lang="en">
+<head>
+<title>H8/300 Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Submodel-Options.html#Submodel-Options" title="Submodel Options">
+<link rel="prev" href="GNU_002fLinux-Options.html#GNU_002fLinux-Options" title="GNU/Linux Options">
+<link rel="next" href="HPPA-Options.html#HPPA-Options" title="HPPA Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="H8%2f300-Options"></a>
+<a name="H8_002f300-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="HPPA-Options.html#HPPA-Options">HPPA Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="GNU_002fLinux-Options.html#GNU_002fLinux-Options">GNU/Linux Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Submodel-Options.html#Submodel-Options">Submodel Options</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.17.13 H8/300 Options</h4>
+
+<p>These &lsquo;<samp><span class="samp">-m</span></samp>&rsquo; options are defined for the H8/300 implementations:
+
+     <dl>
+<dt><code>-mrelax</code><dd><a name="index-mrelax-1264"></a>Shorten some address references at link time, when possible; uses the
+linker option <samp><span class="option">-relax</span></samp>.  See <a href="../ld/H8_002f300.html#H8_002f300"><code>ld</code> and the H8/300</a>, for a fuller description.
+
+     <br><dt><code>-mh</code><dd><a name="index-mh-1265"></a>Generate code for the H8/300H.
+
+     <br><dt><code>-ms</code><dd><a name="index-ms-1266"></a>Generate code for the H8S.
+
+     <br><dt><code>-mn</code><dd><a name="index-mn-1267"></a>Generate code for the H8S and H8/300H in the normal mode.  This switch
+must be used either with <samp><span class="option">-mh</span></samp> or <samp><span class="option">-ms</span></samp>.
+
+     <br><dt><code>-ms2600</code><dd><a name="index-ms2600-1268"></a>Generate code for the H8S/2600.  This switch must be used with <samp><span class="option">-ms</span></samp>.
+
+     <br><dt><code>-mint32</code><dd><a name="index-mint32-1269"></a>Make <code>int</code> data 32 bits by default.
+
+     <br><dt><code>-malign-300</code><dd><a name="index-malign_002d300-1270"></a>On the H8/300H and H8S, use the same alignment rules as for the H8/300. 
+The default for the H8/300H and H8S is to align longs and floats on 4
+byte boundaries. 
+<samp><span class="option">-malign-300</span></samp> causes them to be aligned on 2 byte boundaries. 
+This option has no effect on the H8/300. 
+</dl>
+
+ </body></html>
+

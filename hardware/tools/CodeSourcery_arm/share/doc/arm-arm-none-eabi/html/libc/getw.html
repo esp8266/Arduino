@@ -1,0 +1,67 @@
+<html lang="en">
+<head>
+<title>getw - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="gets.html#gets" title="gets">
+<link rel="next" href="getwchar.html#getwchar" title="getwchar">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="getw"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="getwchar.html#getwchar">getwchar</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="gets.html#gets">gets</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.39 <code>getw</code>&mdash;read a word (int)</h3>
+
+<p><a name="index-getw-226"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     int getw(FILE *<var>fp</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>getw</code> is a function, defined in <code>stdio.h</code>.  You can use <code>getw</code>
+to get the next word from the file or stream identified by <var>fp</var>.  As
+a side effect, <code>getw</code> advances the file's current position
+indicator.
+
+   <p><br>
+<strong>Returns</strong><br>
+The next word (read as an <code>int</code>), unless there is no more
+data or the host system reports a read error; in either of these
+situations, <code>getw</code> returns <code>EOF</code>.  Since <code>EOF</code> is a valid
+<code>int</code>, you must use <code>ferror</code> or <code>feof</code> to distinguish these
+situations.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>getw</code> is a remnant of K&amp;R C; it is not part of any ISO C Standard. 
+<code>fread</code> should be used instead.  In fact, this implementation of
+<code>getw</code> is based upon <code>fread</code>.
+
+   <p>Supporting OS subroutines required: <code>fread</code>. 
+<br>
+
+   </body></html>
+

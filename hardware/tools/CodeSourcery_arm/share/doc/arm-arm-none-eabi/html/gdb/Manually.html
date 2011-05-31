@@ -1,0 +1,79 @@
+<html lang="en">
+<head>
+<title>Manually - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Setting.html#Setting" title="Setting">
+<link rel="prev" href="Filenames.html#Filenames" title="Filenames">
+<link rel="next" href="Automatically.html#Automatically" title="Automatically">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Manually"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Automatically.html#Automatically">Automatically</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Filenames.html#Filenames">Filenames</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Setting.html#Setting">Setting</a>
+<hr>
+</div>
+
+<h4 class="subsection">15.1.2 Setting the Working Language</h4>
+
+<p>If you allow <span class="sc">gdb</span> to set the language automatically,
+expressions are interpreted the same way in your debugging session and
+your program.
+
+   <p><a name="index-set-language-779"></a>If you wish, you may set the language manually.  To do this, issue the
+command &lsquo;<samp><span class="samp">set language </span><var>lang</var></samp>&rsquo;, where <var>lang</var> is the name of
+a language, such as
+<code>c</code> or <code>modula-2</code>. 
+For a list of the supported languages, type &lsquo;<samp><span class="samp">set language</span></samp>&rsquo;.
+
+   <p>Setting the language manually prevents <span class="sc">gdb</span> from updating the working
+language automatically.  This can lead to confusion if you try
+to debug a program when the working language is not the same as the
+source language, when an expression is acceptable to both
+languages&mdash;but means different things.  For instance, if the current
+source file were written in C, and <span class="sc">gdb</span> was parsing Modula-2, a
+command such as:
+
+<pre class="smallexample">     print a = b + c
+</pre>
+   <p class="noindent">might not have the effect you intended.  In C, this means to add
+<code>b</code> and <code>c</code> and place the result in <code>a</code>.  The result
+printed would be the value of <code>a</code>.  In Modula-2, this means to compare
+<code>a</code> to the result of <code>b+c</code>, yielding a <code>BOOLEAN</code> value.
+
+   </body></html>
+

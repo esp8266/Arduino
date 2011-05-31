@@ -1,0 +1,122 @@
+<html lang="en">
+<head>
+<title>Self-Referential Macros - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Macro-Pitfalls.html#Macro-Pitfalls" title="Macro Pitfalls">
+<link rel="prev" href="Duplication-of-Side-Effects.html#Duplication-of-Side-Effects" title="Duplication of Side Effects">
+<link rel="next" href="Argument-Prescan.html#Argument-Prescan" title="Argument Prescan">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Self-Referential-Macros"></a>
+<a name="Self_002dReferential-Macros"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Argument-Prescan.html#Argument-Prescan">Argument Prescan</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Duplication-of-Side-Effects.html#Duplication-of-Side-Effects">Duplication of Side Effects</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Macro-Pitfalls.html#Macro-Pitfalls">Macro Pitfalls</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.10.5 Self-Referential Macros</h4>
+
+<p><a name="index-self_002dreference-78"></a>
+A <dfn>self-referential</dfn> macro is one whose name appears in its
+definition.  Recall that all macro definitions are rescanned for more
+macros to replace.  If the self-reference were considered a use of the
+macro, it would produce an infinitely large expansion.  To prevent this,
+the self-reference is not considered a macro call.  It is passed into
+the preprocessor output unchanged.  Consider an example:
+
+<pre class="smallexample">     #define foo (4 + foo)
+</pre>
+   <p class="noindent">where <code>foo</code> is also a variable in your program.
+
+   <p>Following the ordinary rules, each reference to <code>foo</code> will expand
+into <code>(4 + foo)</code>; then this will be rescanned and will expand into
+<code>(4 + (4 + foo))</code>; and so on until the computer runs out of memory.
+
+   <p>The self-reference rule cuts this process short after one step, at
+<code>(4 + foo)</code>.  Therefore, this macro definition has the possibly
+useful effect of causing the program to add 4 to the value of <code>foo</code>
+wherever <code>foo</code> is referred to.
+
+   <p>In most cases, it is a bad idea to take advantage of this feature.  A
+person reading the program who sees that <code>foo</code> is a variable will
+not expect that it is a macro as well.  The reader will come across the
+identifier <code>foo</code> in the program and think its value should be that
+of the variable <code>foo</code>, whereas in fact the value is four greater.
+
+   <p>One common, useful use of self-reference is to create a macro which
+expands to itself.  If you write
+
+<pre class="smallexample">     #define EPERM EPERM
+</pre>
+   <p class="noindent">then the macro <code>EPERM</code> expands to <code>EPERM</code>.  Effectively, it is
+left alone by the preprocessor whenever it's used in running text.  You
+can tell that it's a macro with &lsquo;<samp><span class="samp">#ifdef</span></samp>&rsquo;.  You might do this if you
+want to define numeric constants with an <code>enum</code>, but have
+&lsquo;<samp><span class="samp">#ifdef</span></samp>&rsquo; be true for each constant.
+
+   <p>If a macro <code>x</code> expands to use a macro <code>y</code>, and the expansion of
+<code>y</code> refers to the macro <code>x</code>, that is an <dfn>indirect
+self-reference</dfn> of <code>x</code>.  <code>x</code> is not expanded in this case
+either.  Thus, if we have
+
+<pre class="smallexample">     #define x (4 + y)
+     #define y (2 * x)
+</pre>
+   <p class="noindent">then <code>x</code> and <code>y</code> expand as follows:
+
+<pre class="smallexample">     x    ==&gt; (4 + y)
+          ==&gt; (4 + (2 * x))
+     
+     y    ==&gt; (2 * x)
+          ==&gt; (2 * (4 + y))
+</pre>
+   <p class="noindent">Each macro is expanded when it appears in the definition of the other
+macro, but not when it indirectly appears in its own definition.
+
+   </body></html>
+

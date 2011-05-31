@@ -1,0 +1,93 @@
+<html lang="en">
+<head>
+<title>BFD information loss - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="BFD-outline.html#BFD-outline" title="BFD outline">
+<link rel="next" href="Canonical-format.html#Canonical-format" title="Canonical format">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="BFD-information-loss"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Canonical-format.html#Canonical-format">Canonical format</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="BFD-outline.html#BFD-outline">BFD outline</a>
+<hr>
+</div>
+
+<h4 class="subsection">5.1.1 Information Loss</h4>
+
+<p><em>Information can be lost during output.</em> The output formats
+supported by BFD do not provide identical facilities, and
+information which can be described in one form has nowhere to go in
+another format. One example of this is alignment information in
+<code>b.out</code>. There is nowhere in an <code>a.out</code> format file to store
+alignment information on the contained data, so when a file is linked
+from <code>b.out</code> and an <code>a.out</code> image is produced, alignment
+information will not propagate to the output file. (The linker will
+still use the alignment information internally, so the link is performed
+correctly).
+
+   <p>Another example is COFF section names. COFF files may contain an
+unlimited number of sections, each one with a textual section name. If
+the target of the link is a format which does not have many sections (e.g.,
+<code>a.out</code>) or has sections without names (e.g., the Oasys format), the
+link cannot be done simply. You can circumvent this problem by
+describing the desired input-to-output section mapping with the linker command
+language.
+
+   <p><em>Information can be lost during canonicalization.</em> The BFD
+internal canonical form of the external formats is not exhaustive; there
+are structures in input formats for which there is no direct
+representation internally.  This means that the BFD back ends
+cannot maintain all possible data richness through the transformation
+between external to internal and back to external formats.
+
+   <p>This limitation is only a problem when an application reads one
+format and writes another.  Each BFD back end is responsible for
+maintaining as much data as possible, and the internal BFD
+canonical form has structures which are opaque to the BFD core,
+and exported only to the back ends. When a file is read in one format,
+the canonical form is generated for BFD and the application. At the
+same time, the back end saves away any information which may otherwise
+be lost. If the data is then written back in the same format, the back
+end routine will be able to use the canonical form provided by the
+BFD core as well as the information it prepared earlier.  Since
+there is a great deal of commonality between back ends,
+there is no information lost when
+linking or copying big endian COFF to little endian COFF, or <code>a.out</code> to
+<code>b.out</code>.  When a mixture of formats is linked, the information is
+only lost from the files whose format differs from the destination.
+
+   </body></html>
+

@@ -1,0 +1,117 @@
+<html lang="en">
+<head>
+<title>List - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Source.html#Source" title="Source">
+<link rel="next" href="Specify-Location.html#Specify-Location" title="Specify Location">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="List"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Specify-Location.html#Specify-Location">Specify Location</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Source.html#Source">Source</a>
+<hr>
+</div>
+
+<h3 class="section">9.1 Printing Source Lines</h3>
+
+<p><a name="index-list-439"></a><a name="index-l-_0040r_007b_0028_0040code_007blist_007d_0029_007d-440"></a>To print lines from a source file, use the <code>list</code> command
+(abbreviated <code>l</code>).  By default, ten lines are printed. 
+There are several ways to specify what part of the file you want to
+print; see <a href="Specify-Location.html#Specify-Location">Specify Location</a>, for the full list.
+
+   <p>Here are the forms of the <code>list</code> command most commonly used:
+
+     <dl>
+<dt><code>list </code><var>linenum</var><dd>Print lines centered around line number <var>linenum</var> in the
+current source file.
+
+     <br><dt><code>list </code><var>function</var><dd>Print lines centered around the beginning of function
+<var>function</var>.
+
+     <br><dt><code>list</code><dd>Print more lines.  If the last lines printed were printed with a
+<code>list</code> command, this prints lines following the last lines
+printed; however, if the last line printed was a solitary line printed
+as part of displaying a stack frame (see <a href="Stack.html#Stack">Examining the Stack</a>), this prints lines centered around that line.
+
+     <br><dt><code>list -</code><dd>Print lines just before the lines last printed. 
+</dl>
+
+   <p><a name="index-g_t_0040code_007blist_007d_002c-how-many-lines-to-display-441"></a>By default, <span class="sc">gdb</span> prints ten source lines with any of these forms of
+the <code>list</code> command.  You can change this using <code>set listsize</code>:
+
+     
+<a name="index-set-listsize-442"></a>
+<dl><dt><code>set listsize </code><var>count</var><dd>Make the <code>list</code> command display <var>count</var> source lines (unless
+the <code>list</code> argument explicitly specifies some other number).
+
+     <p><a name="index-show-listsize-443"></a><br><dt><code>show listsize</code><dd>Display the number of lines that <code>list</code> prints. 
+</dl>
+
+   <p>Repeating a <code>list</code> command with &lt;RET&gt; discards the argument,
+so it is equivalent to typing just <code>list</code>.  This is more useful
+than listing the same lines again.  An exception is made for an
+argument of &lsquo;<samp><span class="samp">-</span></samp>&rsquo;; that argument is preserved in repetition so that
+each repetition moves up in the source file.
+
+   <p>In general, the <code>list</code> command expects you to supply zero, one or two
+<dfn>linespecs</dfn>.  Linespecs specify source lines; there are several ways
+of writing them (see <a href="Specify-Location.html#Specify-Location">Specify Location</a>), but the effect is always
+to specify some source line.
+
+   <p>Here is a complete description of the possible arguments for <code>list</code>:
+
+     <dl>
+<dt><code>list </code><var>linespec</var><dd>Print lines centered around the line specified by <var>linespec</var>.
+
+     <br><dt><code>list </code><var>first</var><code>,</code><var>last</var><dd>Print lines from <var>first</var> to <var>last</var>.  Both arguments are
+linespecs.  When a <code>list</code> command has two linespecs, and the
+source file of the second linespec is omitted, this refers to
+the same source file as the first linespec.
+
+     <br><dt><code>list ,</code><var>last</var><dd>Print lines ending with <var>last</var>.
+
+     <br><dt><code>list </code><var>first</var><code>,</code><dd>Print lines starting with <var>first</var>.
+
+     <br><dt><code>list +</code><dd>Print lines just after the lines last printed.
+
+     <br><dt><code>list -</code><dd>Print lines just before the lines last printed.
+
+     <br><dt><code>list</code><dd>As described in the preceding table. 
+</dl>
+
+   </body></html>
+

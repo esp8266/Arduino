@@ -1,0 +1,115 @@
+<html lang="en">
+<head>
+<title>Constant string objects - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Objective_002dC.html#Objective_002dC" title="Objective-C">
+<link rel="prev" href="Garbage-Collection.html#Garbage-Collection" title="Garbage Collection">
+<link rel="next" href="compatibility_005falias.html#compatibility_005falias" title="compatibility_alias">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Constant-string-objects"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="compatibility_005falias.html#compatibility_005falias">compatibility_alias</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Garbage-Collection.html#Garbage-Collection">Garbage Collection</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Objective_002dC.html#Objective_002dC">Objective-C</a>
+<hr>
+</div>
+
+<h3 class="section">8.4 Constant string objects</h3>
+
+<p>GNU Objective-C provides constant string objects that are generated
+directly by the compiler.  You declare a constant string object by
+prefixing a C constant string with the character &lsquo;<samp><span class="samp">@</span></samp>&rsquo;:
+
+<pre class="smallexample">       id myString = @"this is a constant string object";
+</pre>
+ <p>The constant string objects are by default instances of the
+<code>NXConstantString</code> class which is provided by the GNU Objective-C
+runtime.  To get the definition of this class you must include the
+<samp><span class="file">objc/NXConstStr.h</span></samp> header file.
+
+ <p>User defined libraries may want to implement their own constant string
+class.  To be able to support them, the GNU Objective-C compiler provides
+a new command line options <samp><span class="option">-fconstant-string-class=</span><var>class-name</var></samp>. 
+The provided class should adhere to a strict structure, the same
+as <code>NXConstantString</code>'s structure:
+
+<pre class="smallexample">     
+     @interface MyConstantStringClass
+     {
+       Class isa;
+       char *c_string;
+       unsigned int len;
+     }
+     @end
+     
+</pre>
+ <p><code>NXConstantString</code> inherits from <code>Object</code>; user class
+libraries may choose to inherit the customized constant string class
+from a different class than <code>Object</code>.  There is no requirement in
+the methods the constant string class has to implement, but the final
+ivar layout of the class must be the compatible with the given
+structure.
+
+ <p>When the compiler creates the statically allocated constant string
+object, the <code>c_string</code> field will be filled by the compiler with
+the string; the <code>length</code> field will be filled by the compiler with
+the string length; the <code>isa</code> pointer will be filled with
+<code>NULL</code> by the compiler, and it will later be fixed up automatically
+at runtime by the GNU Objective-C runtime library to point to the class
+which was set by the <samp><span class="option">-fconstant-string-class</span></samp> option when the
+object file is loaded (if you wonder how it works behind the scenes, the
+name of the class to use, and the list of static objects to fixup, are
+stored by the compiler in the object file in a place where the GNU
+runtime library will find them at runtime).
+
+ <p>As a result, when a file is compiled with the
+<samp><span class="option">-fconstant-string-class</span></samp> option, all the constant string objects
+will be instances of the class specified as argument to this option.  It
+is possible to have multiple compilation units referring to different
+constant string classes, neither the compiler nor the linker impose any
+restrictions in doing this.
+
+<!-- ========================================================================= -->
+ </body></html>
+

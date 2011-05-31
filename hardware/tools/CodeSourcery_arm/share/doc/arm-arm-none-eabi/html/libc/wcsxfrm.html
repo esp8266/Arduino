@@ -1,0 +1,69 @@
+<html lang="en">
+<head>
+<title>wcsxfrm - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Wchar-strings.html#Wchar-strings" title="Wchar strings">
+<link rel="prev" href="wcswidth.html#wcswidth" title="wcswidth">
+<link rel="next" href="wcwidth.html#wcwidth" title="wcwidth">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="wcsxfrm"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="wcwidth.html#wcwidth">wcwidth</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="wcswidth.html#wcswidth">wcswidth</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Wchar-strings.html#Wchar-strings">Wchar strings</a>
+<hr>
+</div>
+
+<h3 class="section">6.28 <code>wcsxfrm</code>&mdash;locale-specific wide-character string transformation</h3>
+
+<p><a name="index-wcsxfrm-420"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;wchar.h&gt;
+     int wcsxfrm(wchar_t *<var>stra</var>, const wchar_t * <var>strb</var>, size_t <var>n</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>wcsxfrm</code> transforms the wide-character string pointed to by
+<var>strb</var> to the wide-character string pointed to by <var>stra</var>,
+Comparing two transformed wide strings with <code>wcscmp</code> should return
+the same result as comparing the original strings with <code>wcscoll</code>. 
+No more than <var>n</var> wide characters are transformed, including the
+trailing null character.
+
+   <p>If <var>n</var> is 0, <var>stra</var> may be a NULL pointer.
+
+   <p>The current implementation of <code>wcsxfrm</code> simply uses <code>wcslcpy</code>
+and does not support any language-specific transformations.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>wcsxfrm</code> returns the length of the transformed wide character
+string.  if the return value is greater or equal to <var>n</var>, the
+content of <var>stra</var> is undefined.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>wcsxfrm</code> is ISO/IEC 9899/AMD1:1995 (ISO C).
+
+   <p><br>
+
+   </body></html>
+

@@ -1,0 +1,149 @@
+<html lang="en">
+<head>
+<title>C++ Interface - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C_002b_002b-Extensions.html#C_002b_002b-Extensions" title="C++ Extensions">
+<link rel="prev" href="Vague-Linkage.html#Vague-Linkage" title="Vague Linkage">
+<link rel="next" href="Template-Instantiation.html#Template-Instantiation" title="Template Instantiation">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="C++-Interface"></a>
+<a name="C_002b_002b-Interface"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Template-Instantiation.html#Template-Instantiation">Template Instantiation</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Vague-Linkage.html#Vague-Linkage">Vague Linkage</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C_002b_002b-Extensions.html#C_002b_002b-Extensions">C++ Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">7.4 #pragma interface and implementation</h3>
+
+<p><a name="index-interface-and-implementation-headers_002c-C_002b_002b-3170"></a><a name="index-C_002b_002b-interface-and-implementation-headers-3171"></a><a name="index-pragmas_002c-interface-and-implementation-3172"></a>
+<code>#pragma interface</code> and <code>#pragma implementation</code> provide the
+user with a way of explicitly directing the compiler to emit entities
+with vague linkage (and debugging information) in a particular
+translation unit.
+
+ <p><em>Note:</em> As of GCC 2.7.2, these <code>#pragma</code>s are not useful in
+most cases, because of COMDAT support and the &ldquo;key method&rdquo; heuristic
+mentioned in <a href="Vague-Linkage.html#Vague-Linkage">Vague Linkage</a>.  Using them can actually cause your
+program to grow due to unnecessary out-of-line copies of inline
+functions.  Currently (3.4) the only benefit of these
+<code>#pragma</code>s is reduced duplication of debugging information, and
+that should be addressed soon on DWARF 2 targets with the use of
+COMDAT groups.
+
+     <dl>
+<dt><code>#pragma interface</code><dt><code>#pragma interface "</code><var>subdir</var><code>/</code><var>objects</var><code>.h"</code><dd><a name="index-g_t_0023pragma-interface-3173"></a>Use this directive in <em>header files</em> that define object classes, to save
+space in most of the object files that use those classes.  Normally,
+local copies of certain information (backup copies of inline member
+functions, debugging information, and the internal tables that implement
+virtual functions) must be kept in each object file that includes class
+definitions.  You can use this pragma to avoid such duplication.  When a
+header file containing &lsquo;<samp><span class="samp">#pragma interface</span></samp>&rsquo; is included in a
+compilation, this auxiliary information will not be generated (unless
+the main input source file itself uses &lsquo;<samp><span class="samp">#pragma implementation</span></samp>&rsquo;). 
+Instead, the object files will contain references to be resolved at link
+time.
+
+     <p>The second form of this directive is useful for the case where you have
+multiple headers with the same name in different directories.  If you
+use this form, you must specify the same string to &lsquo;<samp><span class="samp">#pragma
+implementation</span></samp>&rsquo;.
+
+     <br><dt><code>#pragma implementation</code><dt><code>#pragma implementation "</code><var>objects</var><code>.h"</code><dd><a name="index-g_t_0023pragma-implementation-3174"></a>Use this pragma in a <em>main input file</em>, when you want full output from
+included header files to be generated (and made globally visible).  The
+included header file, in turn, should use &lsquo;<samp><span class="samp">#pragma interface</span></samp>&rsquo;. 
+Backup copies of inline member functions, debugging information, and the
+internal tables used to implement virtual functions are all generated in
+implementation files.
+
+     <p><a name="index-implied-_0040code_007b_0023pragma-implementation_007d-3175"></a><a name="index-g_t_0040code_007b_0023pragma-implementation_007d_002c-implied-3176"></a><a name="index-naming-convention_002c-implementation-headers-3177"></a>If you use &lsquo;<samp><span class="samp">#pragma implementation</span></samp>&rsquo; with no argument, it applies to
+an include file with the same basename<a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a> as your source
+file.  For example, in <samp><span class="file">allclass.cc</span></samp>, giving just
+&lsquo;<samp><span class="samp">#pragma implementation</span></samp>&rsquo;
+by itself is equivalent to &lsquo;<samp><span class="samp">#pragma implementation "allclass.h"</span></samp>&rsquo;.
+
+     <p>In versions of GNU C++ prior to 2.6.0 <samp><span class="file">allclass.h</span></samp> was treated as
+an implementation file whenever you would include it from
+<samp><span class="file">allclass.cc</span></samp> even if you never specified &lsquo;<samp><span class="samp">#pragma
+implementation</span></samp>&rsquo;.  This was deemed to be more trouble than it was worth,
+however, and disabled.
+
+     <p>Use the string argument if you want a single implementation file to
+include code from multiple header files.  (You must also use
+&lsquo;<samp><span class="samp">#include</span></samp>&rsquo; to include the header file; &lsquo;<samp><span class="samp">#pragma
+implementation</span></samp>&rsquo; only specifies how to use the file&mdash;it doesn't actually
+include it.)
+
+     <p>There is no way to split up the contents of a single header file into
+multiple implementation files. 
+</dl>
+
+ <p><a name="index-inlining-and-C_002b_002b-pragmas-3178"></a><a name="index-C_002b_002b-pragmas_002c-effect-on-inlining-3179"></a><a name="index-pragmas-in-C_002b_002b_002c-effect-on-inlining-3180"></a>&lsquo;<samp><span class="samp">#pragma implementation</span></samp>&rsquo; and &lsquo;<samp><span class="samp">#pragma interface</span></samp>&rsquo; also have an
+effect on function inlining.
+
+ <p>If you define a class in a header file marked with &lsquo;<samp><span class="samp">#pragma
+interface</span></samp>&rsquo;, the effect on an inline function defined in that class is
+similar to an explicit <code>extern</code> declaration&mdash;the compiler emits
+no code at all to define an independent version of the function.  Its
+definition is used only for inlining with its callers.
+
+ <p><a name="index-fno_002dimplement_002dinlines-3181"></a>Conversely, when you include the same header file in a main source file
+that declares it as &lsquo;<samp><span class="samp">#pragma implementation</span></samp>&rsquo;, the compiler emits
+code for the function itself; this defines a version of the function
+that can be found via pointers (or by callers compiled without
+inlining).  If all calls to the function can be inlined, you can avoid
+emitting the function by compiling with <samp><span class="option">-fno-implement-inlines</span></samp>. 
+If any calls were not inlined, you will get linker errors.
+
+ <div class="footnote">
+<hr>
+<h4>Footnotes</h4><p class="footnote"><small>[<a name="fn-1" href="#fnd-1">1</a>]</small> A file's <dfn>basename</dfn>
+was the name stripped of all leading path information and of trailing
+suffixes, such as &lsquo;<samp><span class="samp">.h</span></samp>&rsquo; or &lsquo;<samp><span class="samp">.C</span></samp>&rsquo; or &lsquo;<samp><span class="samp">.cc</span></samp>&rsquo;.</p>
+
+ <hr></div>
+
+ </body></html>
+

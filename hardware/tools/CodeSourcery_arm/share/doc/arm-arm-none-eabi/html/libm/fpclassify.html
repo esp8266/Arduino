@@ -1,0 +1,144 @@
+<html lang="en">
+<head>
+<title>fpclassify - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Math.html#Math" title="Math">
+<link rel="prev" href="fmod.html#fmod" title="fmod">
+<link rel="next" href="frexp.html#frexp" title="frexp">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="fpclassify"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="frexp.html#frexp">frexp</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="fmod.html#fmod">fmod</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Math.html#Math">Math</a>
+<hr>
+</div>
+
+<h3 class="section">1.31 <code>fpclassify</code>, <code>isfinite</code>, <code>isinf</code>, <code>isnan</code>, and <code>isnormal</code>&ndash;floating-point classification macros; <code>finite</code>, <code>finitef</code>, <code>isinf</code>, <code>isinff</code>, <code>isnan</code>, <code>isnanf</code>&ndash;test for exceptional numbers</h3>
+
+<p><a name="index-fpclassify-85"></a><a name="index-isfinite-86"></a><a name="index-isinf-87"></a><a name="index-isnan-88"></a><a name="index-isnormal-89"></a><a name="index-isnan-90"></a><a name="index-isinf-91"></a><a name="index-finite-92"></a><a name="index-isnanf-93"></a><a name="index-isinff-94"></a><a name="index-finitef-95"></a><strong>Synopsis</strong>
+<pre class="example">     [C99 standard macros:]
+     #include &lt;math.h&gt;
+     int fpclassify(real-floating <var>x</var>);
+     int isfinite(real-floating <var>x</var>);
+     int isinf(real-floating <var>x</var>);
+     int isnan(real-floating <var>x</var>);
+     int isnormal(real-floating <var>x</var>);
+     
+     [Archaic SUSv2 functions:]
+     #include &lt;ieeefp.h&gt;
+     int isnan(double <var>arg</var>);
+     int isinf(double <var>arg</var>);
+     int finite(double <var>arg</var>);
+     int isnanf(float <var>arg</var>);
+     int isinff(float <var>arg</var>);
+     int finitef(float <var>arg</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>fpclassify</code>, <code>isfinite</code>, <code>isinf</code>, <code>isnan</code>, and <code>isnormal</code> are macros
+defined for use in classifying floating-point numbers.  This is a help because
+of special "values" like NaN and infinities.  In the synopses shown,
+"real-floating" indicates that the argument is an expression of real floating
+type.  These function-like macros are C99 and POSIX-compliant, and should be
+used instead of the now-archaic SUSv2 functions.
+
+   <p>The <code>fpclassify</code> macro classifies its argument value as NaN, infinite, normal,
+subnormal, zero, or into another implementation-defined category.  First, an
+argument represented in a format wider than its semantic type is converted to
+its semantic type.  Then classification is based on the type of the argument. 
+The <code>fpclassify</code> macro returns the value of the number classification macro
+appropriate to the value of its argument:
+
+     <dl>
+<dt><code>FP_INFINITE</code><dd><var>x</var> is either plus or minus infinity;
+<br><dt><code>FP_NAN</code><dd><var>x</var> is "Not A Number" (plus or minus);
+<br><dt><code>FP_NORMAL</code><dd><var>x</var> is a "normal" number (i.e. is none of the other special forms);
+<br><dt><code>FP_SUBNORMAL</code><dd><var>x</var> is too small be stored as a regular normalized number (i.e. loss of precision is likely); or
+<br><dt><code>FP_ZERO</code><dd><var>x</var> is 0 (either plus or minus). 
+</dl>
+
+   <p>The "<code>is</code>" set of macros provide a useful set of shorthand ways for
+classifying floating-point numbers, providing the following equivalent
+relations:
+
+     <dl>
+<dt><code>isfinite(</code><var>x</var><code>)</code><dd>returns non-zero if <var>x</var> is finite.  (It is equivalent to
+(<code>fpclassify</code>(<var>x</var>) != FP_INFINITE  &amp;&amp;  <code>fpclassify</code>(<var>x</var>) != FP_NAN).)
+
+     <br><dt><code>isinf(</code><var>x</var><code>)</code><dd>returns non-zero if <var>x</var> is infinite.  (It is equivalent to
+(<code>fpclassify</code>(<var>x</var>) == FP_INFINITE).)
+
+     <br><dt><code>isnan(</code><var>x</var><code>)</code><dd>returns non-zero if <var>x</var> is NaN.  (It is equivalent to
+(<code>fpclassify</code>(<var>x</var>) == FP_NAN).)
+
+     <br><dt><code>isnormal(</code><var>x</var><code>)</code><dd>returns non-zero if <var>x</var> is normal.  (It is equivalent to
+(<code>fpclassify</code>(<var>x</var>) == FP_NORMAL).) 
+</dl>
+
+   <p>The archaic SUSv2 functions provide information on the floating-point
+argument supplied.
+
+   <p>There are five major number formats ("exponent" referring to the
+biased exponent in the binary-encoded number):
+     <dl>
+<dt><code>zero</code><dd>A number which contains all zero bits, excluding the sign bit. 
+<br><dt><code>subnormal</code><dd>A number with a zero exponent but a nonzero fraction. 
+<br><dt><code>normal</code><dd>A number with an exponent and a fraction. 
+<br><dt><code>infinity</code><dd>A number with an all 1's exponent and a zero fraction. 
+<br><dt><code>NAN</code><dd>A number with an all 1's exponent and a nonzero fraction.
+
+   </dl>
+
+   <p><code>isnan</code> returns 1 if the argument is a nan. <code>isinf</code>
+returns 1 if the argument is infinity.  <code>finite</code> returns 1 if the
+argument is zero, subnormal or normal. 
+The <code>isnanf</code>, <code>isinff</code> and <code>finitef</code> functions perform the same
+operations as their <code>isnan</code>, <code>isinf</code> and <code>finite</code>
+counterparts, but on single-precision floating-point numbers.
+
+   <p>It should be noted that the C99 standard dictates that <code>isnan</code>
+and <code>isinf</code> are macros that operate on multiple types of
+floating-point.  The SUSv2 standard declares <code>isnan</code> as
+a function taking double.  Newlib has decided to declare
+them both as macros in math.h and as functions in ieeefp.h to
+maintain backward compatibility.
+
+   <p><br>
+<strong>Returns</strong><br>
+<!-- Formatting note:  "$@" forces a new line -->
+The fpclassify macro returns the value corresponding to the appropriate FP_ macro.<br>
+The isfinite macro returns nonzero if <var>x</var> is finite, else 0.<br>
+The isinf macro returns nonzero if <var>x</var> is infinite, else 0.<br>
+The isnan macro returns nonzero if <var>x</var> is an NaN, else 0.<br>
+The isnormal macro returns nonzero if <var>x</var> has a normal value, else 0.
+
+   <p><br>
+<strong>Portability</strong><br>
+math.h macros are C99, POSIX.
+
+   <p>ieeefp.h funtions are outdated and should be avoided.
+
+   <p><br>
+
+   </body></html>
+

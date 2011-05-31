@@ -1,0 +1,153 @@
+<html lang="en">
+<head>
+<title>Non-debug DLL Symbols - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Cygwin-Native.html#Cygwin-Native" title="Cygwin Native">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Non-debug-DLL-Symbols"></a>
+<a name="Non_002ddebug-DLL-Symbols"></a>
+<p>
+Up:&nbsp;<a rel="up" accesskey="u" href="Cygwin-Native.html#Cygwin-Native">Cygwin Native</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">21.1.5.1 Support for DLLs without Debugging Symbols</h5>
+
+<p><a name="index-DLLs-with-no-debugging-symbols-1229"></a><a name="index-Minimal-symbols-and-DLLs-1230"></a>
+Very often on windows, some of the DLLs that your program relies on do
+not include symbolic debugging information (for example,
+<samp><span class="file">kernel32.dll</span></samp>).  When <span class="sc">gdb</span> doesn't recognize any debugging
+symbols in a DLL, it relies on the minimal amount of symbolic
+information contained in the DLL's export table.  This section
+describes working with such symbols, known internally to <span class="sc">gdb</span> as
+&ldquo;minimal symbols&rdquo;.
+
+   <p>Note that before the debugged program has started execution, no DLLs
+will have been loaded.  The easiest way around this problem is simply to
+start the program &mdash; either by setting a breakpoint or letting the
+program run once to completion.  It is also possible to force
+<span class="sc">gdb</span> to load a particular DLL before starting the executable &mdash;
+see the shared library information in <a href="Files.html#Files">Files</a>, or the
+<code>dll-symbols</code> command in <a href="Cygwin-Native.html#Cygwin-Native">Cygwin Native</a>.  Currently,
+explicitly loading symbols from a DLL with no debugging information will
+cause the symbol names to be duplicated in <span class="sc">gdb</span>'s lookup table,
+which may adversely affect symbol lookup performance.
+
+<h5 class="subsubsection">21.1.5.2 DLL Name Prefixes</h5>
+
+<p>In keeping with the naming conventions used by the Microsoft debugging
+tools, DLL export symbols are made available with a prefix based on the
+DLL name, for instance <code>KERNEL32!CreateFileA</code>.  The plain name is
+also entered into the symbol table, so <code>CreateFileA</code> is often
+sufficient.  In some cases there will be name clashes within a program
+(particularly if the executable itself includes full debugging symbols)
+necessitating the use of the fully qualified name when referring to the
+contents of the DLL.  Use single-quotes around the name to avoid the
+exclamation mark (&ldquo;!&rdquo;)  being interpreted as a language operator.
+
+   <p>Note that the internal name of the DLL may be all upper-case, even
+though the file name of the DLL is lower-case, or vice-versa.  Since
+symbols within <span class="sc">gdb</span> are <em>case-sensitive</em> this may cause
+some confusion. If in doubt, try the <code>info functions</code> and
+<code>info variables</code> commands or even <code>maint print msymbols</code>
+(see <a href="Symbols.html#Symbols">Symbols</a>). Here's an example:
+
+<pre class="smallexample">     (gdb) info function CreateFileA
+     All functions matching regular expression "CreateFileA":
+     
+     Non-debugging symbols:
+     0x77e885f4  CreateFileA
+     0x77e885f4  KERNEL32!CreateFileA
+</pre>
+   <pre class="smallexample">     (gdb) info function !
+     All functions matching regular expression "!":
+     
+     Non-debugging symbols:
+     0x6100114c  cygwin1!__assert
+     0x61004034  cygwin1!_dll_crt0@0
+     0x61004240  cygwin1!dll_crt0(per_process *)
+     [etc...]
+</pre>
+   <h5 class="subsubsection">21.1.5.3 Working with Minimal Symbols</h5>
+
+<p>Symbols extracted from a DLL's export table do not contain very much
+type information. All that <span class="sc">gdb</span> can do is guess whether a symbol
+refers to a function or variable depending on the linker section that
+contains the symbol. Also note that the actual contents of the memory
+contained in a DLL are not available unless the program is running. This
+means that you cannot examine the contents of a variable or disassemble
+a function within a DLL without a running program.
+
+   <p>Variables are generally treated as pointers and dereferenced
+automatically. For this reason, it is often necessary to prefix a
+variable name with the address-of operator (&ldquo;&amp;&rdquo;) and provide explicit
+type information in the command. Here's an example of the type of
+problem:
+
+<pre class="smallexample">     (gdb) print 'cygwin1!__argv'
+     $1 = 268572168
+</pre>
+   <pre class="smallexample">     (gdb) x 'cygwin1!__argv'
+     0x10021610:      "\230y\""
+</pre>
+   <p>And two possible solutions:
+
+<pre class="smallexample">     (gdb) print ((char **)'cygwin1!__argv')[0]
+     $2 = 0x22fd98 "/cygdrive/c/mydirectory/myprogram"
+</pre>
+   <pre class="smallexample">     (gdb) x/2x &amp;'cygwin1!__argv'
+     0x610c0aa8 &lt;cygwin1!__argv&gt;:    0x10021608      0x00000000
+     (gdb) x/x 0x10021608
+     0x10021608:     0x0022fd98
+     (gdb) x/s 0x0022fd98
+     0x22fd98:        "/cygdrive/c/mydirectory/myprogram"
+</pre>
+   <p>Setting a break point within a DLL is possible even before the program
+starts execution. However, under these circumstances, <span class="sc">gdb</span> can't
+examine the initial instructions of the function in order to skip the
+function's frame set-up code. You can work around this by using &ldquo;*&amp;&rdquo;
+to set the breakpoint at a raw memory address:
+
+<pre class="smallexample">     (gdb) break *&amp;'python22!PyOS_Readline'
+     Breakpoint 1 at 0x1e04eff0
+</pre>
+   <p>The author of these extensions is not entirely convinced that setting a
+break point within a shared DLL like <samp><span class="file">kernel32.dll</span></samp> is completely
+safe.
+
+   </body></html>
+

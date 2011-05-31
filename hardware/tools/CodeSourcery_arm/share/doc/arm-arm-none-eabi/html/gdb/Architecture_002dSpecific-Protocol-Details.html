@@ -1,0 +1,113 @@
+<html lang="en">
+<head>
+<title>Architecture-Specific Protocol Details - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Remote-Protocol.html#Remote-Protocol" title="Remote Protocol">
+<link rel="prev" href="General-Query-Packets.html#General-Query-Packets" title="General Query Packets">
+<link rel="next" href="Tracepoint-Packets.html#Tracepoint-Packets" title="Tracepoint Packets">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Architecture-Specific-Protocol-Details"></a>
+<a name="Architecture_002dSpecific-Protocol-Details"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Tracepoint-Packets.html#Tracepoint-Packets">Tracepoint Packets</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="General-Query-Packets.html#General-Query-Packets">General Query Packets</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Remote-Protocol.html#Remote-Protocol">Remote Protocol</a>
+<hr>
+</div>
+
+<h3 class="section">D.6 Architecture-Specific Protocol Details</h3>
+
+<p>This section describes how the remote protocol is applied to specific
+target architectures.  Also see <a href="Standard-Target-Features.html#Standard-Target-Features">Standard Target Features</a>, for
+details of XML target descriptions for each architecture.
+
+<h4 class="subsection">D.6.1 ARM</h4>
+
+<h5 class="subsubsection">D.6.1.1 Breakpoint Kinds</h5>
+
+<p>These breakpoint kinds are defined for the &lsquo;<samp><span class="samp">Z0</span></samp>&rsquo; and &lsquo;<samp><span class="samp">Z1</span></samp>&rsquo; packets.
+
+     <dl>
+<dt><span class="roman">2</span><dd>16-bit Thumb mode breakpoint.
+
+     <br><dt><span class="roman">3</span><dd>32-bit Thumb mode (Thumb-2) breakpoint.
+
+     <br><dt><span class="roman">4</span><dd>32-bit ARM mode breakpoint.
+
+   </dl>
+
+<h4 class="subsection">D.6.2 MIPS</h4>
+
+<h5 class="subsubsection">D.6.2.1 Register Packet Format</h5>
+
+<p>The following <code>g</code>/<code>G</code> packets have previously been defined. 
+In the below, some thirty-two bit registers are transferred as
+sixty-four bits.  Those registers should be zero/sign extended (which?) 
+to fill the space allocated.  Register bytes are transferred in target
+byte order.  The two nibbles within a register byte are transferred
+most-significant - least-significant.
+
+     <dl>
+<dt><span class="roman">MIPS32</span><dd>
+All registers are transferred as thirty-two bit quantities in the order:
+32 general-purpose; sr; lo; hi; bad; cause; pc; 32 floating-point
+registers; fsr; fir; fp.
+
+     <br><dt><span class="roman">MIPS64</span><dd>
+All registers are transferred as sixty-four bit quantities (including
+thirty-two bit registers such as <code>sr</code>).  The ordering is the same
+as <code>MIPS32</code>.
+
+   </dl>
+
+<h5 class="subsubsection">D.6.2.2 Breakpoint Kinds</h5>
+
+<p>These breakpoint kinds are defined for the &lsquo;<samp><span class="samp">Z0</span></samp>&rsquo; and &lsquo;<samp><span class="samp">Z1</span></samp>&rsquo; packets.
+
+     <dl>
+<dt><span class="roman">2</span><dd>16-bit MIPS16 mode breakpoint.
+
+     <br><dt><span class="roman">3</span><dd>16-bit microMIPS mode breakpoint.
+
+     <br><dt><span class="roman">4</span><dd>32-bit standard MIPS mode breakpoint.
+
+     <br><dt><span class="roman">5</span><dd>32-bit microMIPS mode breakpoint.
+
+   </dl>
+
+   </body></html>
+

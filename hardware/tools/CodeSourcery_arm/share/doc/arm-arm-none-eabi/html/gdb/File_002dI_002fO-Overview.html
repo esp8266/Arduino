@@ -1,0 +1,95 @@
+<html lang="en">
+<head>
+<title>File-I/O Overview - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="File_002dI_002fO-Remote-Protocol-Extension.html#File_002dI_002fO-Remote-Protocol-Extension" title="File-I/O Remote Protocol Extension">
+<link rel="next" href="Protocol-Basics.html#Protocol-Basics" title="Protocol Basics">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="File-I%2fO-Overview"></a>
+<a name="File_002dI_002fO-Overview"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Protocol-Basics.html#Protocol-Basics">Protocol Basics</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="File_002dI_002fO-Remote-Protocol-Extension.html#File_002dI_002fO-Remote-Protocol-Extension">File-I/O Remote Protocol Extension</a>
+<hr>
+</div>
+
+<h4 class="subsection">D.14.1 File-I/O Overview</h4>
+
+<p><a name="index-file_002di_002fo-overview-2495"></a>
+The <dfn>File I/O remote protocol extension</dfn> (short: File-I/O) allows the
+target to use the host's file system and console I/O to perform various
+system calls.  System calls on the target system are translated into a
+remote protocol packet to the host system, which then performs the needed
+actions and returns a response packet to the target system. 
+This simulates file system operations even on targets that lack file systems.
+
+   <p>The protocol is defined to be independent of both the host and target systems. 
+It uses its own internal representation of datatypes and values.  Both
+<span class="sc">gdb</span> and the target's <span class="sc">gdb</span> stub are responsible for
+translating the system-dependent value representations into the internal
+protocol representations when data is transmitted.
+
+   <p>The communication is synchronous.  A system call is possible only when
+<span class="sc">gdb</span> is waiting for a response from the &lsquo;<samp><span class="samp">C</span></samp>&rsquo;, &lsquo;<samp><span class="samp">c</span></samp>&rsquo;, &lsquo;<samp><span class="samp">S</span></samp>&rsquo;
+or &lsquo;<samp><span class="samp">s</span></samp>&rsquo; packets.  While <span class="sc">gdb</span> handles the request for a system call,
+the target is stopped to allow deterministic access to the target's
+memory.  Therefore File-I/O is not interruptible by target signals.  On
+the other hand, it is possible to interrupt File-I/O by a user interrupt
+(&lsquo;<samp><span class="samp">Ctrl-C</span></samp>&rsquo;) within <span class="sc">gdb</span>.
+
+   <p>The target's request to perform a host system call does not finish
+the latest &lsquo;<samp><span class="samp">C</span></samp>&rsquo;, &lsquo;<samp><span class="samp">c</span></samp>&rsquo;, &lsquo;<samp><span class="samp">S</span></samp>&rsquo; or &lsquo;<samp><span class="samp">s</span></samp>&rsquo; action.  That means,
+after finishing the system call, the target returns to continuing the
+previous activity (continue, step).  No additional continue or step
+request from <span class="sc">gdb</span> is required.
+
+<pre class="smallexample">     (gdb) continue
+       &lt;- target requests 'system call X'
+       target is stopped, <span class="sc">gdb</span> executes system call
+       -&gt; <span class="sc">gdb</span> returns result
+       ... target continues, <span class="sc">gdb</span> returns to wait for the target
+       &lt;- target hits breakpoint and sends a Txx packet
+</pre>
+   <p>The protocol only supports I/O on the console and to regular files on
+the host file system.  Character or block special devices, pipes,
+named pipes, sockets or any other communication method on the host
+system are not supported by this protocol.
+
+   <p>File I/O is not supported in non-stop mode.
+
+   </body></html>
+

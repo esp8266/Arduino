@@ -1,0 +1,160 @@
+<html lang="en">
+<head>
+<title>Machine Dependencies - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Object-Attributes.html#Object-Attributes" title="Object Attributes">
+<link rel="next" href="Reporting-Bugs.html#Reporting-Bugs" title="Reporting Bugs">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Machine-Dependencies"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Reporting-Bugs.html#Reporting-Bugs">Reporting Bugs</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Object-Attributes.html#Object-Attributes">Object Attributes</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">9 Machine Dependent Features</h2>
+
+<p><a name="index-machine-dependencies-506"></a>The machine instruction sets are (almost by definition) different on
+each machine where <samp><span class="command">as</span></samp> runs.  Floating point representations
+vary as well, and <samp><span class="command">as</span></samp> often supports a few additional
+directives or command-line options for compatibility with other
+assemblers on a particular platform.  Finally, some versions of
+<samp><span class="command">as</span></samp> support special pseudo-instructions for branch
+optimization.
+
+   <p>This chapter discusses most of these differences, though it does not
+include details on any machine's instruction set.  For details on that
+subject, see the hardware manufacturer's manual.
+
+<ul class="menu">
+<li><a accesskey="1" href="Alpha_002dDependent.html#Alpha_002dDependent">Alpha-Dependent</a>: 		Alpha Dependent Features
+
+<li><a accesskey="2" href="ARC_002dDependent.html#ARC_002dDependent">ARC-Dependent</a>:                ARC Dependent Features
+
+<li><a accesskey="3" href="ARM_002dDependent.html#ARM_002dDependent">ARM-Dependent</a>:                ARM Dependent Features
+
+<li><a accesskey="4" href="AVR_002dDependent.html#AVR_002dDependent">AVR-Dependent</a>:                AVR Dependent Features
+
+<li><a accesskey="5" href="Blackfin_002dDependent.html#Blackfin_002dDependent">Blackfin-Dependent</a>: 		Blackfin Dependent Features
+
+<li><a accesskey="6" href="CR16_002dDependent.html#CR16_002dDependent">CR16-Dependent</a>:               CR16 Dependent Features
+
+<li><a accesskey="7" href="CRIS_002dDependent.html#CRIS_002dDependent">CRIS-Dependent</a>:               CRIS Dependent Features
+
+<li><a accesskey="8" href="D10V_002dDependent.html#D10V_002dDependent">D10V-Dependent</a>:               D10V Dependent Features
+
+<li><a accesskey="9" href="D30V_002dDependent.html#D30V_002dDependent">D30V-Dependent</a>:               D30V Dependent Features
+
+<li><a href="H8_002f300_002dDependent.html#H8_002f300_002dDependent">H8/300-Dependent</a>:             Renesas H8/300 Dependent Features
+
+<li><a href="HPPA_002dDependent.html#HPPA_002dDependent">HPPA-Dependent</a>:               HPPA Dependent Features
+
+<li><a href="ESA_002f390_002dDependent.html#ESA_002f390_002dDependent">ESA/390-Dependent</a>:            IBM ESA/390 Dependent Features
+
+<li><a href="i386_002dDependent.html#i386_002dDependent">i386-Dependent</a>:               Intel 80386 and AMD x86-64 Dependent Features
+
+<li><a href="i860_002dDependent.html#i860_002dDependent">i860-Dependent</a>:               Intel 80860 Dependent Features
+
+<li><a href="i960_002dDependent.html#i960_002dDependent">i960-Dependent</a>:               Intel 80960 Dependent Features
+
+<li><a href="IA_002d64_002dDependent.html#IA_002d64_002dDependent">IA-64-Dependent</a>:              Intel IA-64 Dependent Features
+
+<li><a href="IP2K_002dDependent.html#IP2K_002dDependent">IP2K-Dependent</a>:               IP2K Dependent Features
+
+<li><a href="LM32_002dDependent.html#LM32_002dDependent">LM32-Dependent</a>:               LM32 Dependent Features
+
+<li><a href="M32C_002dDependent.html#M32C_002dDependent">M32C-Dependent</a>:               M32C Dependent Features
+
+<li><a href="M32R_002dDependent.html#M32R_002dDependent">M32R-Dependent</a>:               M32R Dependent Features
+
+<li><a href="M68K_002dDependent.html#M68K_002dDependent">M68K-Dependent</a>:               M680x0 Dependent Features
+
+<li><a href="M68HC11_002dDependent.html#M68HC11_002dDependent">M68HC11-Dependent</a>:            M68HC11 and 68HC12 Dependent Features
+
+<li><a href="MicroBlaze_002dDependent.html#MicroBlaze_002dDependent">MicroBlaze-Dependent</a>: 	MICROBLAZE Dependent Features
+
+<li><a href="MIPS_002dDependent.html#MIPS_002dDependent">MIPS-Dependent</a>:               MIPS Dependent Features
+
+<li><a href="MMIX_002dDependent.html#MMIX_002dDependent">MMIX-Dependent</a>:               MMIX Dependent Features
+
+<li><a href="MSP430_002dDependent.html#MSP430_002dDependent">MSP430-Dependent</a>: 		MSP430 Dependent Features
+
+<li><a href="SH_002dDependent.html#SH_002dDependent">SH-Dependent</a>:                 Renesas / SuperH SH Dependent Features
+<li><a href="SH64_002dDependent.html#SH64_002dDependent">SH64-Dependent</a>:               SuperH SH64 Dependent Features
+
+<li><a href="PDP_002d11_002dDependent.html#PDP_002d11_002dDependent">PDP-11-Dependent</a>:             PDP-11 Dependent Features
+
+<li><a href="PJ_002dDependent.html#PJ_002dDependent">PJ-Dependent</a>:                 picoJava Dependent Features
+
+<li><a href="PPC_002dDependent.html#PPC_002dDependent">PPC-Dependent</a>:                PowerPC Dependent Features
+
+<li><a href="RX_002dDependent.html#RX_002dDependent">RX-Dependent</a>:                 RX Dependent Features
+
+<li><a href="S_002f390_002dDependent.html#S_002f390_002dDependent">S/390-Dependent</a>:              IBM S/390 Dependent Features
+
+<li><a href="SCORE_002dDependent.html#SCORE_002dDependent">SCORE-Dependent</a>:              SCORE Dependent Features
+
+<li><a href="Sparc_002dDependent.html#Sparc_002dDependent">Sparc-Dependent</a>:              SPARC Dependent Features
+
+<li><a href="TIC54X_002dDependent.html#TIC54X_002dDependent">TIC54X-Dependent</a>:             TI TMS320C54x Dependent Features
+
+<li><a href="TIC6X_002dDependent.html#TIC6X_002dDependent">TIC6X-Dependent </a>:             TI TMS320C6x Dependent Features
+
+<li><a href="V850_002dDependent.html#V850_002dDependent">V850-Dependent</a>:               V850 Dependent Features
+
+<li><a href="Xtensa_002dDependent.html#Xtensa_002dDependent">Xtensa-Dependent</a>:             Xtensa Dependent Features
+
+<li><a href="Z80_002dDependent.html#Z80_002dDependent">Z80-Dependent</a>:                Z80 Dependent Features
+
+<li><a href="Z8000_002dDependent.html#Z8000_002dDependent">Z8000-Dependent</a>:              Z8000 Dependent Features
+
+<li><a href="Vax_002dDependent.html#Vax_002dDependent">Vax-Dependent</a>:                VAX Dependent Features
+</ul>
+
+<!-- The following major nodes are *sections* in the GENERIC version, *chapters* -->
+<!-- in single-cpu versions.  This is mainly achieved by @lowersections.  There is a -->
+<!-- peculiarity: to preserve cross-references, there must be a node called -->
+<!-- "Machine Dependencies".  Hence the conditional nodenames in each -->
+<!-- major node below.  Node defaulting in makeinfo requires adjacency of -->
+<!-- node and sectioning commands; hence the repetition of @chapter BLAH -->
+<!-- in both conditional blocks. -->
+<!-- Copyright 2002, 2003, 2005, 2009 -->
+<!-- Free Software Foundation, Inc. -->
+<!-- This is part of the GAS manual. -->
+<!-- For copying conditions, see the file as.texinfo. -->
+   </body></html>
+

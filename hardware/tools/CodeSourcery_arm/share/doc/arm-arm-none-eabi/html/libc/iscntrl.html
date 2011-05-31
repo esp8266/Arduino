@@ -1,0 +1,66 @@
+<html lang="en">
+<head>
+<title>iscntrl - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Ctype.html#Ctype" title="Ctype">
+<link rel="prev" href="isascii.html#isascii" title="isascii">
+<link rel="next" href="isdigit.html#isdigit" title="isdigit">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="iscntrl"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="isdigit.html#isdigit">isdigit</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="isascii.html#isascii">isascii</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Ctype.html#Ctype">Ctype</a>
+<hr>
+</div>
+
+<h3 class="section">3.4 <code>iscntrl</code>&mdash;control character predicate</h3>
+
+<p><a name="index-iscntrl-113"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;ctype.h&gt;
+     int iscntrl(int <var>c</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>iscntrl</code> is a macro which classifies ASCII integer values by table
+lookup.  It is a predicate returning non-zero for control characters, and 0
+for other characters.  It is defined only when <code>isascii</code>(<var>c</var>) is
+true or <var>c</var> is EOF.
+
+   <p>You can use a compiled subroutine instead of the macro definition by
+undefining the macro using `<code>#undef iscntrl</code>'.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>iscntrl</code> returns non-zero if <var>c</var> is a delete character or ordinary
+control character (<code>0x7F</code> or <code>0x00</code>&ndash;<code>0x1F</code>).
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>iscntrl</code> is ANSI C.
+
+   <p>No supporting OS subroutines are required.
+
+   <p><br>
+
+   </body></html>
+

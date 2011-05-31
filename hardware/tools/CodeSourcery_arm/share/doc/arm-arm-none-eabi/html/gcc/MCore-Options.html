@@ -1,0 +1,96 @@
+<html lang="en">
+<head>
+<title>MCore Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Submodel-Options.html#Submodel-Options" title="Submodel Options">
+<link rel="prev" href="M68hc1x-Options.html#M68hc1x-Options" title="M68hc1x Options">
+<link rel="next" href="MeP-Options.html#MeP-Options" title="MeP Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="MCore-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="MeP-Options.html#MeP-Options">MeP Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="M68hc1x-Options.html#M68hc1x-Options">M68hc1x Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Submodel-Options.html#Submodel-Options">Submodel Options</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.17.23 MCore Options</h4>
+
+<p><a name="index-MCore-options-1509"></a>
+These are the &lsquo;<samp><span class="samp">-m</span></samp>&rsquo; options defined for the Motorola M*Core
+processors.
+
+     <dl>
+<dt><code>-mhardlit</code><dt><code>-mno-hardlit</code><dd><a name="index-mhardlit-1510"></a><a name="index-mno_002dhardlit-1511"></a>Inline constants into the code stream if it can be done in two
+instructions or less.
+
+     <br><dt><code>-mdiv</code><dt><code>-mno-div</code><dd><a name="index-mdiv-1512"></a><a name="index-mno_002ddiv-1513"></a>Use the divide instruction.  (Enabled by default).
+
+     <br><dt><code>-mrelax-immediate</code><dt><code>-mno-relax-immediate</code><dd><a name="index-mrelax_002dimmediate-1514"></a><a name="index-mno_002drelax_002dimmediate-1515"></a>Allow arbitrary sized immediates in bit operations.
+
+     <br><dt><code>-mwide-bitfields</code><dt><code>-mno-wide-bitfields</code><dd><a name="index-mwide_002dbitfields-1516"></a><a name="index-mno_002dwide_002dbitfields-1517"></a>Always treat bit-fields as int-sized.
+
+     <br><dt><code>-m4byte-functions</code><dt><code>-mno-4byte-functions</code><dd><a name="index-m4byte_002dfunctions-1518"></a><a name="index-mno_002d4byte_002dfunctions-1519"></a>Force all functions to be aligned to a four byte boundary.
+
+     <br><dt><code>-mcallgraph-data</code><dt><code>-mno-callgraph-data</code><dd><a name="index-mcallgraph_002ddata-1520"></a><a name="index-mno_002dcallgraph_002ddata-1521"></a>Emit callgraph information.
+
+     <br><dt><code>-mslow-bytes</code><dt><code>-mno-slow-bytes</code><dd><a name="index-mslow_002dbytes-1522"></a><a name="index-mno_002dslow_002dbytes-1523"></a>Prefer word access when reading byte quantities.
+
+     <br><dt><code>-mlittle-endian</code><dt><code>-mbig-endian</code><dd><a name="index-mlittle_002dendian-1524"></a><a name="index-mbig_002dendian-1525"></a>Generate code for a little endian target.
+
+     <br><dt><code>-m210</code><dt><code>-m340</code><dd><a name="index-m210-1526"></a><a name="index-m340-1527"></a>Generate code for the 210 processor.
+
+     <br><dt><code>-mno-lsim</code><dd><a name="index-mno_002dlsim-1528"></a>Assume that run-time support has been provided and so omit the
+simulator library (<samp><span class="file">libsim.a)</span></samp> from the linker command line.
+
+     <br><dt><code>-mstack-increment=</code><var>size</var><dd><a name="index-mstack_002dincrement-1529"></a>Set the maximum amount for a single stack increment operation.  Large
+values can increase the speed of programs which contain functions
+that need a large amount of stack space, but they can also trigger a
+segmentation fault if the stack is extended too much.  The default
+value is 0x1000.
+
+ </dl>
+
+ </body></html>
+

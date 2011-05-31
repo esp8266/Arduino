@@ -1,0 +1,102 @@
+<html lang="en">
+<head>
+<title>Word Designators - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="History-Interaction.html#History-Interaction" title="History Interaction">
+<link rel="prev" href="Event-Designators.html#Event-Designators" title="Event Designators">
+<link rel="next" href="Modifiers.html#Modifiers" title="Modifiers">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Word-Designators"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Modifiers.html#Modifiers">Modifiers</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Event-Designators.html#Event-Designators">Event Designators</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="History-Interaction.html#History-Interaction">History Interaction</a>
+<hr>
+</div>
+
+<h4 class="subsection">32.1.2 Word Designators</h4>
+
+<p>Word designators are used to select desired words from the event. 
+A &lsquo;<samp><span class="samp">:</span></samp>&rsquo; separates the event specification from the word designator.  It
+may be omitted if the word designator begins with a &lsquo;<samp><span class="samp">^</span></samp>&rsquo;, &lsquo;<samp><span class="samp">$</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">*</span></samp>&rsquo;, &lsquo;<samp><span class="samp">-</span></samp>&rsquo;, or &lsquo;<samp><span class="samp">%</span></samp>&rsquo;.  Words are numbered from the beginning
+of the line, with the first word being denoted by 0 (zero).  Words are
+inserted into the current line separated by single spaces.
+
+   <p>For example,
+
+     <dl>
+<dt><code>!!</code><dd>designates the preceding command.  When you type this, the preceding
+command is repeated in toto.
+
+     <br><dt><code>!!:$</code><dd>designates the last argument of the preceding command.  This may be
+shortened to <code>!$</code>.
+
+     <br><dt><code>!fi:2</code><dd>designates the second argument of the most recent command starting with
+the letters <code>fi</code>. 
+</dl>
+
+   <p>Here are the word designators:
+
+     <dl>
+<dt><code>0 (zero)</code><dd>The <code>0</code>th word.  For many applications, this is the command word.
+
+     <br><dt><var>n</var><dd>The <var>n</var>th word.
+
+     <br><dt><code>^</code><dd>The first argument; that is, word 1.
+
+     <br><dt><code>$</code><dd>The last argument.
+
+     <br><dt><code>%</code><dd>The word matched by the most recent &lsquo;<samp><span class="samp">?</span><var>string</var><span class="samp">?</span></samp>&rsquo; search.
+
+     <br><dt><var>x</var><code>-</code><var>y</var><dd>A range of words; &lsquo;<samp><span class="samp">-</span><var>y</var></samp>&rsquo; abbreviates &lsquo;<samp><span class="samp">0-</span><var>y</var></samp>&rsquo;.
+
+     <br><dt><code>*</code><dd>All of the words, except the <code>0</code>th.  This is a synonym for &lsquo;<samp><span class="samp">1-$</span></samp>&rsquo;. 
+It is not an error to use &lsquo;<samp><span class="samp">*</span></samp>&rsquo; if there is just one word in the event;
+the empty string is returned in that case.
+
+     <br><dt><var>x</var><code>*</code><dd>Abbreviates &lsquo;<samp><var>x</var><span class="samp">-$</span></samp>&rsquo;
+
+     <br><dt><var>x</var><code>-</code><dd>Abbreviates &lsquo;<samp><var>x</var><span class="samp">-$</span></samp>&rsquo; like &lsquo;<samp><var>x</var><span class="samp">*</span></samp>&rsquo;, but omits the last word.
+
+   </dl>
+
+   <p>If a word designator is supplied without an event specification, the
+previous command is used as the event.
+
+   </body></html>
+

@@ -1,0 +1,65 @@
+<html lang="en">
+<head>
+<title>expm1 - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Math.html#Math" title="Math">
+<link rel="prev" href="exp2.html#exp2" title="exp2">
+<link rel="next" href="fabs.html#fabs" title="fabs">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="expm1"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="fabs.html#fabs">fabs</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="exp2.html#exp2">exp2</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Math.html#Math">Math</a>
+<hr>
+</div>
+
+<h3 class="section">1.17 <code>expm1</code>, <code>expm1f</code>&mdash;exponential minus 1</h3>
+
+<p><a name="index-expm1-43"></a><a name="index-expm1f-44"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double expm1(double <var>x</var>);
+     float expm1f(float <var>x</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>expm1</code> and <code>expm1f</code> calculate the exponential of <var>x</var>
+and subtract 1, that is,
+e raised to the power <var>x</var> minus 1 (where e
+is the base of the natural system of logarithms, approximately
+2.71828).  The result is accurate even for small values of
+<var>x</var>, where using <code>exp(</code><var>x</var><code>)-1</code> would lose many
+significant digits.
+
+   <p><br>
+<strong>Returns</strong><br>
+e raised to the power <var>x</var>, minus 1.
+
+   <p><br>
+<strong>Portability</strong><br>
+Neither <code>expm1</code> nor <code>expm1f</code> is required by ANSI C or by
+the System V Interface Definition (Issue 2).
+
+   <p><br>
+
+   </body></html>
+

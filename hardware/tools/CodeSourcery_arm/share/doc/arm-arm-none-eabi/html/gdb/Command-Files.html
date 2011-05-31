@@ -1,0 +1,161 @@
+<html lang="en">
+<head>
+<title>Command Files - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Sequences.html#Sequences" title="Sequences">
+<link rel="prev" href="Hooks.html#Hooks" title="Hooks">
+<link rel="next" href="Output.html#Output" title="Output">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Command-Files"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Output.html#Output">Output</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Hooks.html#Hooks">Hooks</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Sequences.html#Sequences">Sequences</a>
+<hr>
+</div>
+
+<h4 class="subsection">23.1.3 Command Files</h4>
+
+<p><a name="index-command-files-1552"></a><a name="index-scripting-commands-1553"></a>A command file for <span class="sc">gdb</span> is a text file made of lines that are
+<span class="sc">gdb</span> commands.  Comments (lines starting with <kbd>#</kbd>) may
+also be included.  An empty line in a command file does nothing; it
+does not mean to repeat the last command, as it would from the
+terminal.
+
+   <p>You can request the execution of a command file with the <code>source</code>
+command.  Note that the <code>source</code> command is also used to evaluate
+scripts that are not Command Files.  The exact behavior can be configured
+using the <code>script-extension</code> setting. 
+See <a href="Extending-GDB.html#Extending-GDB">Extending GDB</a>.
+
+     
+<a name="index-source-1554"></a>
+<a name="index-execute-commands-from-a-file-1555"></a>
+<dl><dt><code>source [-s] [-v] </code><var>filename</var><dd>Execute the command file <var>filename</var>. 
+</dl>
+
+   <p>The lines in a command file are generally executed sequentially,
+unless the order of execution is changed by one of the
+<em>flow-control commands</em> described below.  The commands are not
+printed as they are executed.  An error in any command terminates
+execution of the command file and control is returned to the console.
+
+   <p><span class="sc">gdb</span> first searches for <var>filename</var> in the current directory. 
+If the file is not found there, and <var>filename</var> does not specify a
+directory, then <span class="sc">gdb</span> also looks for the file on the source search path
+(specified with the &lsquo;<samp><span class="samp">directory</span></samp>&rsquo; command);
+except that <samp><span class="file">$cdir</span></samp> is not searched because the compilation directory
+is not relevant to scripts.
+
+   <p>If <code>-s</code> is specified, then <span class="sc">gdb</span> searches for <var>filename</var>
+on the search path even if <var>filename</var> specifies a directory. 
+The search is done by appending <var>filename</var> to each element of the
+search path.  So, for example, if <var>filename</var> is <samp><span class="file">mylib/myscript</span></samp>
+and the search path contains <samp><span class="file">/home/user</span></samp> then <span class="sc">gdb</span> will
+look for the script <samp><span class="file">/home/user/mylib/myscript</span></samp>. 
+The search is also done if <var>filename</var> is an absolute path. 
+For example, if <var>filename</var> is <samp><span class="file">/tmp/myscript</span></samp> and
+the search path contains <samp><span class="file">/home/user</span></samp> then <span class="sc">gdb</span> will
+look for the script <samp><span class="file">/home/user/tmp/myscript</span></samp>. 
+For DOS-like systems, if <var>filename</var> contains a drive specification,
+it is stripped before concatenation.  For example, if <var>filename</var> is
+<samp><span class="file">d:myscript</span></samp> and the search path contains <samp><span class="file">c:/tmp</span></samp> then <span class="sc">gdb</span>
+will look for the script <samp><span class="file">c:/tmp/myscript</span></samp>.
+
+   <p>If <code>-v</code>, for verbose mode, is given then <span class="sc">gdb</span> displays
+each command as it is executed.  The option must be given before
+<var>filename</var>, and is interpreted as part of the filename anywhere else.
+
+   <p>Commands that would ask for confirmation if used interactively proceed
+without asking when used in a command file.  Many <span class="sc">gdb</span> commands that
+normally print messages to say what they are doing omit the messages
+when called from command files.
+
+   <p><span class="sc">gdb</span> also accepts command input from standard input.  In this
+mode, normal output goes to standard output and error output goes to
+standard error.  Errors in a command file supplied on standard input do
+not terminate execution of the command file&mdash;execution continues with
+the next command.
+
+<pre class="smallexample">     gdb &lt; cmds &gt; log 2&gt;&amp;1
+</pre>
+   <p>(The syntax above will vary depending on the shell used.) This example
+will execute commands from the file <samp><span class="file">cmds</span></samp>. All output and errors
+would be directed to <samp><span class="file">log</span></samp>.
+
+   <p>Since commands stored on command files tend to be more general than
+commands typed interactively, they frequently need to deal with
+complicated situations, such as different or unexpected values of
+variables and symbols, changes in how the program being debugged is
+built, etc.  <span class="sc">gdb</span> provides a set of flow-control commands to
+deal with these complexities.  Using these commands, you can write
+complex scripts that loop over data structures, execute commands
+conditionally, etc.
+
+     
+<a name="index-if-1556"></a>
+<a name="index-else-1557"></a>
+<dl><dt><code>if</code><dt><code>else</code><dd>This command allows to include in your script conditionally executed
+commands. The <code>if</code> command takes a single argument, which is an
+expression to evaluate.  It is followed by a series of commands that
+are executed only if the expression is true (its value is nonzero). 
+There can then optionally be an <code>else</code> line, followed by a series
+of commands that are only executed if the expression was false.  The
+end of the list is marked by a line containing <code>end</code>.
+
+     <p><a name="index-while-1558"></a><br><dt><code>while</code><dd>This command allows to write loops.  Its syntax is similar to
+<code>if</code>: the command takes a single argument, which is an expression
+to evaluate, and must be followed by the commands to execute, one per
+line, terminated by an <code>end</code>.  These commands are called the
+<dfn>body</dfn> of the loop.  The commands in the body of <code>while</code> are
+executed repeatedly as long as the expression evaluates to true.
+
+     <p><a name="index-loop_005fbreak-1559"></a><br><dt><code>loop_break</code><dd>This command exits the <code>while</code> loop in whose body it is included. 
+Execution of the script continues after that <code>while</code>s <code>end</code>
+line.
+
+     <p><a name="index-loop_005fcontinue-1560"></a><br><dt><code>loop_continue</code><dd>This command skips the execution of the rest of the body of commands
+in the <code>while</code> loop in whose body it is included.  Execution
+branches to the beginning of the <code>while</code> loop, where it evaluates
+the controlling expression.
+
+     <p><a name="index-end_0040r_007b-_0028if_002felse_002fwhile-commands_0029_007d-1561"></a><br><dt><code>end</code><dd>Terminate the block of commands that are the body of <code>if</code>,
+<code>else</code>, or <code>while</code> flow-control commands. 
+</dl>
+
+   </body></html>
+

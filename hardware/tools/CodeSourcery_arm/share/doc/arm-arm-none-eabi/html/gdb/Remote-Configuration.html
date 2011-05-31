@@ -1,0 +1,325 @@
+<html lang="en">
+<head>
+<title>Remote Configuration - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Remote-Debugging.html#Remote-Debugging" title="Remote Debugging">
+<link rel="prev" href="Server.html#Server" title="Server">
+<link rel="next" href="Remote-Stub.html#Remote-Stub" title="Remote Stub">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Remote-Configuration"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Remote-Stub.html#Remote-Stub">Remote Stub</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Server.html#Server">Server</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Remote-Debugging.html#Remote-Debugging">Remote Debugging</a>
+<hr>
+</div>
+
+<h3 class="section">20.4 Remote Configuration</h3>
+
+<p><a name="index-set-remote-1089"></a><a name="index-show-remote-1090"></a>This section documents the configuration options available when
+debugging remote programs.  For the options related to the File I/O
+extensions of the remote protocol, see <a href="system.html#system">system-call-allowed</a>.
+
+     <dl>
+<dt><code>set remoteaddresssize </code><var>bits</var><dd><a name="index-address-size-for-remote-targets-1091"></a><a name="index-bits-in-remote-address-1092"></a>Set the maximum size of address in a memory packet to the specified
+number of bits.  <span class="sc">gdb</span> will mask off the address bits above
+that number, when it passes addresses to the remote target.  The
+default value is the number of bits in the target's address.
+
+     <br><dt><code>show remoteaddresssize</code><dd>Show the current value of remote address size in bits.
+
+     <br><dt><code>set remotebaud </code><var>n</var><dd><a name="index-baud-rate-for-remote-targets-1093"></a>Set the baud rate for the remote serial I/O to <var>n</var> baud.  The
+value is used to set the speed of the serial port used for debugging
+remote targets.
+
+     <br><dt><code>show remotebaud</code><dd>Show the current speed of the remote connection.
+
+     <br><dt><code>set remotebreak</code><dd><a name="index-interrupt-remote-programs-1094"></a><a name="index-BREAK-signal-instead-of-Ctrl_002dC-1095"></a><a name="set-remotebreak"></a>If set to on, <span class="sc">gdb</span> sends a <code>BREAK</code> signal to the remote
+when you type <kbd>Ctrl-c</kbd> to interrupt the program running
+on the remote.  If set to off, <span class="sc">gdb</span> sends the &lsquo;<samp><span class="samp">Ctrl-C</span></samp>&rsquo;
+character instead.  The default is off, since most remote systems
+expect to see &lsquo;<samp><span class="samp">Ctrl-C</span></samp>&rsquo; as the interrupt signal.
+
+     <br><dt><code>show remotebreak</code><dd>Show whether <span class="sc">gdb</span> sends <code>BREAK</code> or &lsquo;<samp><span class="samp">Ctrl-C</span></samp>&rsquo; to
+interrupt the remote program.
+
+     <br><dt><code>set remoteflow on</code><dt><code>set remoteflow off</code><dd><a name="index-set-remoteflow-1096"></a>Enable or disable hardware flow control (<code>RTS</code>/<code>CTS</code>)
+on the serial port used to communicate to the remote target.
+
+     <br><dt><code>show remoteflow</code><dd><a name="index-show-remoteflow-1097"></a>Show the current setting of hardware flow control.
+
+     <br><dt><code>set remotelogbase </code><var>base</var><dd>Set the base (a.k.a. radix) of logging serial protocol
+communications to <var>base</var>.  Supported values of <var>base</var> are:
+<code>ascii</code>, <code>octal</code>, and <code>hex</code>.  The default is
+<code>ascii</code>.
+
+     <br><dt><code>show remotelogbase</code><dd>Show the current setting of the radix for logging remote serial
+protocol.
+
+     <br><dt><code>set remotelogfile </code><var>file</var><dd><a name="index-record-serial-communications-on-file-1098"></a>Record remote serial communications on the named <var>file</var>.  The
+default is not to record at all.
+
+     <br><dt><code>show remotelogfile.</code><dd>Show the current setting  of the file name on which to record the
+serial communications.
+
+     <br><dt><code>set remotetimeout </code><var>num</var><dd><a name="index-timeout-for-serial-communications-1099"></a><a name="index-remote-timeout-1100"></a>Set the timeout limit to wait for the remote target to respond to
+<var>num</var> seconds.  The default is 2 seconds.
+
+     <br><dt><code>show remotetimeout</code><dd>Show the current number of seconds to wait for the remote target
+responses.
+
+     <p><a name="index-limit-hardware-breakpoints-and-watchpoints-1101"></a><a name="index-remote-target_002c-limit-break_002d-and-watchpoints-1102"></a><a name="set-remote-hardware_002dwatchpoint_002dlimit"></a><a name="set-remote-hardware_002dbreakpoint_002dlimit"></a><br><dt><code>set remote hardware-watchpoint-limit </code><var>limit</var><dt><code>set remote hardware-breakpoint-limit </code><var>limit</var><dd>Restrict <span class="sc">gdb</span> to using <var>limit</var> remote hardware breakpoint or
+watchpoints.  A limit of -1, the default, is treated as unlimited.
+
+     <br><dt><code>set remote exec-file </code><var>filename</var><dt><code>show remote exec-file</code><dd><a name="set-remote-exec_002dfile"></a><a name="index-executable-file_002c-for-remote-target-1103"></a>Select the file used for <code>run</code> with <code>target
+extended-remote</code>.  This should be set to a filename valid on the
+target system.  If it is not set, the target will use a default
+filename (e.g. the last program run).
+
+     <br><dt><code>set remote username </code><var>username</var><dt><code>show remote username</code><dd>Set the username to be sent to targets that require a login.  The
+username is an arbitary string.
+
+     <br><dt><code>set remote password </code><var>password</var><dt><code>show remote password</code><dd>Set the password to be sent to targets that require a login.  The
+password is an arbitary string. At present it is stored as cleartext.
+
+     <br><dt><code>set remote interrupt-sequence</code><dd><a name="index-interrupt-remote-programs-1104"></a><a name="index-select-Ctrl_002dC_002c-BREAK-or-BREAK_002dg-1105"></a>Allow the user to select one of &lsquo;<samp><span class="samp">Ctrl-C</span></samp>&rsquo;, a <code>BREAK</code> or
+&lsquo;<samp><span class="samp">BREAK-g</span></samp>&rsquo; as the
+sequence to the remote target in order to interrupt the execution. 
+&lsquo;<samp><span class="samp">Ctrl-C</span></samp>&rsquo; is a default.  Some system prefers <code>BREAK</code> which
+is high level of serial line for some certain time. 
+Linux kernel prefers &lsquo;<samp><span class="samp">BREAK-g</span></samp>&rsquo;, a.k.a Magic SysRq g. 
+It is <code>BREAK</code> signal followed by character <code>g</code>.
+
+     <br><dt><code>show interrupt-sequence</code><dd>Show which of &lsquo;<samp><span class="samp">Ctrl-C</span></samp>&rsquo;, <code>BREAK</code> or <code>BREAK-g</code>
+is sent by <span class="sc">gdb</span> to interrupt the remote program. 
+<code>BREAK-g</code> is BREAK signal followed by <code>g</code> and
+also known as Magic SysRq g.
+
+     <br><dt><code>set remote interrupt-on-connect</code><dd><a name="index-send-interrupt_002dsequence-on-start-1106"></a>Specify whether interrupt-sequence is sent to remote target when
+<span class="sc">gdb</span> connects to it.  This is mostly needed when you debug
+Linux kernel.  Linux kernel expects <code>BREAK</code> followed by <code>g</code>
+which is known as Magic SysRq g in order to connect <span class="sc">gdb</span>.
+
+     <br><dt><code>show interrupt-on-connect</code><dd>Show whether interrupt-sequence is sent
+to remote target when <span class="sc">gdb</span> connects to it.
+
+     <p><a name="index-set-tcp-1107"></a><a name="index-show-tcp-1108"></a><br><dt><code>set tcp auto-retry on</code><dd><a name="index-auto_002dretry_002c-for-remote-TCP-target-1109"></a>Enable auto-retry for remote TCP connections.  This is useful if the remote
+debugging agent is launched in parallel with <span class="sc">gdb</span>; there is a race
+condition because the agent may not become ready to accept the connection
+before <span class="sc">gdb</span> attempts to connect.  When auto-retry is
+enabled, if the initial attempt to connect fails, <span class="sc">gdb</span> reattempts
+to establish the connection using the timeout specified by
+<code>set tcp connect-timeout</code>.
+
+     <br><dt><code>set tcp auto-retry off</code><dd>Do not auto-retry failed TCP connections.
+
+     <br><dt><code>show tcp auto-retry</code><dd>Show the current auto-retry setting.
+
+     <br><dt><code>set tcp connect-timeout </code><var>seconds</var><dd><a name="index-connection-timeout_002c-for-remote-TCP-target-1110"></a><a name="index-timeout_002c-for-remote-target-connection-1111"></a>Set the timeout for establishing a TCP connection to the remote target to
+<var>seconds</var>.  The timeout affects both polling to retry failed connections
+(enabled by <code>set tcp auto-retry on</code>) and waiting for connections
+that are merely slow to complete, and represents an approximate cumulative
+value.
+
+     <br><dt><code>show tcp connect-timeout</code><dd>Show the current connection timeout setting. 
+</dl>
+
+   <p><a name="index-remote-packets_002c-enabling-and-disabling-1112"></a>The <span class="sc">gdb</span> remote protocol autodetects the packets supported by
+your debugging stub.  If you need to override the autodetection, you
+can use these commands to enable or disable individual packets.  Each
+packet can be set to &lsquo;<samp><span class="samp">on</span></samp>&rsquo; (the remote target supports this
+packet), &lsquo;<samp><span class="samp">off</span></samp>&rsquo; (the remote target does not support this packet),
+or &lsquo;<samp><span class="samp">auto</span></samp>&rsquo; (detect remote target support for this packet).  They
+all default to &lsquo;<samp><span class="samp">auto</span></samp>&rsquo;.  For more information about each packet,
+see <a href="Remote-Protocol.html#Remote-Protocol">Remote Protocol</a>.
+
+   <p>During normal use, you should not have to use any of these commands. 
+If you do, that may be a bug in your remote debugging stub, or a bug
+in <span class="sc">gdb</span>.  You may want to report the problem to the
+<span class="sc">gdb</span> developers.
+
+   <p>For each packet <var>name</var>, the command to enable or disable the
+packet is <code>set remote </code><var>name</var><code>-packet</code>.  The available settings
+are:
+
+   <p><table summary=""><tr align="left"><td valign="top" width="28%">Command Name
+</td><td valign="top" width="32%">Remote Packet
+</td><td valign="top" width="25%">Related Features
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>fetch-register</code>
+</td><td valign="top" width="32%"><code>p</code>
+</td><td valign="top" width="25%"><code>info registers</code>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>set-register</code>
+</td><td valign="top" width="32%"><code>P</code>
+</td><td valign="top" width="25%"><code>set</code>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>binary-download</code>
+</td><td valign="top" width="32%"><code>X</code>
+</td><td valign="top" width="25%"><code>load</code>, <code>set</code>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>read-aux-vector</code>
+</td><td valign="top" width="32%"><code>qXfer:auxv:read</code>
+</td><td valign="top" width="25%"><code>info auxv</code>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>symbol-lookup</code>
+</td><td valign="top" width="32%"><code>qSymbol</code>
+</td><td valign="top" width="25%">Detecting multiple threads
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>attach</code>
+</td><td valign="top" width="32%"><code>vAttach</code>
+</td><td valign="top" width="25%"><code>attach</code>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>verbose-resume</code>
+</td><td valign="top" width="32%"><code>vCont</code>
+</td><td valign="top" width="25%">Stepping or resuming multiple threads
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>run</code>
+</td><td valign="top" width="32%"><code>vRun</code>
+</td><td valign="top" width="25%"><code>run</code>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>software-breakpoint</code>
+</td><td valign="top" width="32%"><code>Z0</code>
+</td><td valign="top" width="25%"><code>break</code>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>hardware-breakpoint</code>
+</td><td valign="top" width="32%"><code>Z1</code>
+</td><td valign="top" width="25%"><code>hbreak</code>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>write-watchpoint</code>
+</td><td valign="top" width="32%"><code>Z2</code>
+</td><td valign="top" width="25%"><code>watch</code>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>read-watchpoint</code>
+</td><td valign="top" width="32%"><code>Z3</code>
+</td><td valign="top" width="25%"><code>rwatch</code>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>access-watchpoint</code>
+</td><td valign="top" width="32%"><code>Z4</code>
+</td><td valign="top" width="25%"><code>awatch</code>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>target-features</code>
+</td><td valign="top" width="32%"><code>qXfer:features:read</code>
+</td><td valign="top" width="25%"><code>set architecture</code>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>library-info</code>
+</td><td valign="top" width="32%"><code>qXfer:libraries:read</code>
+</td><td valign="top" width="25%"><code>info sharedlibrary</code>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>memory-map</code>
+</td><td valign="top" width="32%"><code>qXfer:memory-map:read</code>
+</td><td valign="top" width="25%"><code>info mem</code>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>read-sdata-object</code>
+</td><td valign="top" width="32%"><code>qXfer:sdata:read</code>
+</td><td valign="top" width="25%"><code>print $_sdata</code>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>read-spu-object</code>
+</td><td valign="top" width="32%"><code>qXfer:spu:read</code>
+</td><td valign="top" width="25%"><code>info spu</code>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>write-spu-object</code>
+</td><td valign="top" width="32%"><code>qXfer:spu:write</code>
+</td><td valign="top" width="25%"><code>info spu</code>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>read-siginfo-object</code>
+</td><td valign="top" width="32%"><code>qXfer:siginfo:read</code>
+</td><td valign="top" width="25%"><code>print $_siginfo</code>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>write-siginfo-object</code>
+</td><td valign="top" width="32%"><code>qXfer:siginfo:write</code>
+</td><td valign="top" width="25%"><code>set $_siginfo</code>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>threads</code>
+</td><td valign="top" width="32%"><code>qXfer:threads:read</code>
+</td><td valign="top" width="25%"><code>info threads</code>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>get-thread-local-<br>storage-address</code>
+</td><td valign="top" width="32%"><code>qGetTLSAddr</code>
+</td><td valign="top" width="25%">Displaying <code>__thread</code> variables
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>get-thread-information-block-address</code>
+</td><td valign="top" width="32%"><code>qGetTIBAddr</code>
+</td><td valign="top" width="25%">Display MS-Windows Thread Information Block.
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>search-memory</code>
+</td><td valign="top" width="32%"><code>qSearch:memory</code>
+</td><td valign="top" width="25%"><code>find</code>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>supported-packets</code>
+</td><td valign="top" width="32%"><code>qSupported</code>
+</td><td valign="top" width="25%">Remote communications parameters
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>pass-signals</code>
+</td><td valign="top" width="32%"><code>QPassSignals</code>
+</td><td valign="top" width="25%"><code>handle </code><var>signal</var>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>hostio-close-packet</code>
+</td><td valign="top" width="32%"><code>vFile:close</code>
+</td><td valign="top" width="25%"><code>remote get</code>, <code>remote put</code>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>hostio-open-packet</code>
+</td><td valign="top" width="32%"><code>vFile:open</code>
+</td><td valign="top" width="25%"><code>remote get</code>, <code>remote put</code>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>hostio-pread-packet</code>
+</td><td valign="top" width="32%"><code>vFile:pread</code>
+</td><td valign="top" width="25%"><code>remote get</code>, <code>remote put</code>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>hostio-pwrite-packet</code>
+</td><td valign="top" width="32%"><code>vFile:pwrite</code>
+</td><td valign="top" width="25%"><code>remote get</code>, <code>remote put</code>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>hostio-unlink-packet</code>
+</td><td valign="top" width="32%"><code>vFile:unlink</code>
+</td><td valign="top" width="25%"><code>remote delete</code>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>noack-packet</code>
+</td><td valign="top" width="32%"><code>QStartNoAckMode</code>
+</td><td valign="top" width="25%">Packet acknowledgment
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>osdata</code>
+</td><td valign="top" width="32%"><code>qXfer:osdata:read</code>
+</td><td valign="top" width="25%"><code>info os</code>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="28%"><code>query-attached</code>
+</td><td valign="top" width="32%"><code>qAttached</code>
+</td><td valign="top" width="25%">Querying remote process attach state.
+   <br></td></tr></table>
+
+   </body></html>
+

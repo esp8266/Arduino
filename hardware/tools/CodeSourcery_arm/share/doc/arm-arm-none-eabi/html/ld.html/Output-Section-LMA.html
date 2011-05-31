@@ -1,0 +1,111 @@
+<html lang="en">
+<head>
+<title>Output Section LMA - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Output-Section-Attributes.html#Output-Section-Attributes" title="Output Section Attributes">
+<link rel="prev" href="Output-Section-Type.html#Output-Section-Type" title="Output Section Type">
+<link rel="next" href="Forced-Output-Alignment.html#Forced-Output-Alignment" title="Forced Output Alignment">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Output-Section-LMA"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Forced-Output-Alignment.html#Forced-Output-Alignment">Forced Output Alignment</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Output-Section-Type.html#Output-Section-Type">Output Section Type</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Output-Section-Attributes.html#Output-Section-Attributes">Output Section Attributes</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">3.6.8.2 Output Section LMA</h5>
+
+<p><a name="index-AT_003e_0040var_007blma_005fregion_007d-438"></a><a name="index-AT_0028_0040var_007blma_007d_0029-439"></a><a name="index-load-address-440"></a><a name="index-section-load-address-441"></a>Every section has a virtual address (VMA) and a load address (LMA); see
+<a href="Basic-Script-Concepts.html#Basic-Script-Concepts">Basic Script Concepts</a>.  The address expression which may appear in
+an output section description sets the VMA (see <a href="Output-Section-Address.html#Output-Section-Address">Output Section Address</a>).
+
+   <p>The expression <var>lma</var> that follows the <code>AT</code> keyword specifies
+the load address of the section.
+
+   <p>Alternatively, with &lsquo;<samp><span class="samp">AT&gt;</span><var>lma_region</var></samp>&rsquo; expression, you may
+specify a memory region for the section's load address. See <a href="MEMORY.html#MEMORY">MEMORY</a>. 
+Note that if the section has not had a VMA assigned to it then the
+linker will use the <var>lma_region</var> as the VMA region as well.
+
+   <p>If neither <code>AT</code> nor <code>AT&gt;</code> is specified for an allocatable
+section, the linker will set the LMA such that the difference between
+VMA and LMA for the section is the same as the preceding output
+section in the same region.  If there is no preceding output section
+or the section is not allocatable, the linker will set the LMA equal
+to the VMA. 
+See <a href="Output-Section-Region.html#Output-Section-Region">Output Section Region</a>.
+
+   <p><a name="index-ROM-initialized-data-442"></a><a name="index-initialized-data-in-ROM-443"></a>This feature is designed to make it easy to build a ROM image.  For
+example, the following linker script creates three output sections: one
+called &lsquo;<samp><span class="samp">.text</span></samp>&rsquo;, which starts at <code>0x1000</code>, one called
+&lsquo;<samp><span class="samp">.mdata</span></samp>&rsquo;, which is loaded at the end of the &lsquo;<samp><span class="samp">.text</span></samp>&rsquo; section
+even though its VMA is <code>0x2000</code>, and one called &lsquo;<samp><span class="samp">.bss</span></samp>&rsquo; to hold
+uninitialized data at address <code>0x3000</code>.  The symbol <code>_data</code> is
+defined with the value <code>0x2000</code>, which shows that the location
+counter holds the VMA value, not the LMA value.
+
+<pre class="smallexample">     SECTIONS
+       {
+       .text 0x1000 : { *(.text) _etext = . ; }
+       .mdata 0x2000 :
+         AT ( ADDR (.text) + SIZEOF (.text) )
+         { _data = . ; *(.data); _edata = . ;  }
+       .bss 0x3000 :
+         { _bstart = . ;  *(.bss) *(COMMON) ; _bend = . ;}
+     }
+</pre>
+   <p>The run-time initialization code for use with a program generated with
+this linker script would include something like the following, to copy
+the initialized data from the ROM image to its runtime address.  Notice
+how this code takes advantage of the symbols defined by the linker
+script.
+
+<pre class="smallexample">     extern char _etext, _data, _edata, _bstart, _bend;
+     char *src = &amp;_etext;
+     char *dst = &amp;_data;
+     
+     /* ROM has data at end of text; copy it. */
+     while (dst &lt; &amp;_edata) {
+       *dst++ = *src++;
+     }
+     
+     /* Zero bss */
+     for (dst = &amp;_bstart; dst&lt; &amp;_bend; dst++)
+       *dst = 0;
+</pre>
+   </body></html>
+

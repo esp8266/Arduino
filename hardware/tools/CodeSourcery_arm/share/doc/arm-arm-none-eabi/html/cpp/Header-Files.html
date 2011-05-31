@@ -1,0 +1,107 @@
+<html lang="en">
+<head>
+<title>Header Files - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Overview.html#Overview" title="Overview">
+<link rel="next" href="Macros.html#Macros" title="Macros">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Header-Files"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Macros.html#Macros">Macros</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Overview.html#Overview">Overview</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">2 Header Files</h2>
+
+<p><a name="index-header-file-25"></a>A header file is a file containing C declarations and macro definitions
+(see <a href="Macros.html#Macros">Macros</a>) to be shared between several source files.  You request
+the use of a header file in your program by <dfn>including</dfn> it, with the
+C preprocessing directive &lsquo;<samp><span class="samp">#include</span></samp>&rsquo;.
+
+   <p>Header files serve two purposes.
+
+     <ul>
+<li><a name="index-system-header-files-26"></a>System header files declare the interfaces to parts of the operating
+system.  You include them in your program to supply the definitions and
+declarations you need to invoke system calls and libraries.
+
+     <li>Your own header files contain declarations for interfaces between the
+source files of your program.  Each time you have a group of related
+declarations and macro definitions all or most of which are needed in
+several different source files, it is a good idea to create a header
+file for them. 
+</ul>
+
+   <p>Including a header file produces the same results as copying the header
+file into each source file that needs it.  Such copying would be
+time-consuming and error-prone.  With a header file, the related
+declarations appear in only one place.  If they need to be changed, they
+can be changed in one place, and programs that include the header file
+will automatically use the new version when next recompiled.  The header
+file eliminates the labor of finding and changing all the copies as well
+as the risk that a failure to find one copy will result in
+inconsistencies within a program.
+
+   <p>In C, the usual convention is to give header files names that end with
+<samp><span class="file">.h</span></samp>.  It is most portable to use only letters, digits, dashes, and
+underscores in header file names, and at most one dot.
+
+<ul class="menu">
+<li><a accesskey="1" href="Include-Syntax.html#Include-Syntax">Include Syntax</a>
+<li><a accesskey="2" href="Include-Operation.html#Include-Operation">Include Operation</a>
+<li><a accesskey="3" href="Search-Path.html#Search-Path">Search Path</a>
+<li><a accesskey="4" href="Once_002dOnly-Headers.html#Once_002dOnly-Headers">Once-Only Headers</a>
+<li><a accesskey="5" href="Alternatives-to-Wrapper-_0023ifndef.html#Alternatives-to-Wrapper-_0023ifndef">Alternatives to Wrapper #ifndef</a>
+<li><a accesskey="6" href="Computed-Includes.html#Computed-Includes">Computed Includes</a>
+<li><a accesskey="7" href="Wrapper-Headers.html#Wrapper-Headers">Wrapper Headers</a>
+<li><a accesskey="8" href="System-Headers.html#System-Headers">System Headers</a>
+</ul>
+
+   </body></html>
+

@@ -1,0 +1,73 @@
+<html lang="en">
+<head>
+<title>ARM Pragmas - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Pragmas.html#Pragmas" title="Pragmas">
+<link rel="next" href="M32C-Pragmas.html#M32C-Pragmas" title="M32C Pragmas">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="ARM-Pragmas"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="M32C-Pragmas.html#M32C-Pragmas">M32C Pragmas</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Pragmas.html#Pragmas">Pragmas</a>
+<hr>
+</div>
+
+<h4 class="subsection">6.54.1 ARM Pragmas</h4>
+
+<p>The ARM target defines pragmas for controlling the default addition of
+<code>long_call</code> and <code>short_call</code> attributes to functions. 
+See <a href="Function-Attributes.html#Function-Attributes">Function Attributes</a>, for information about the effects of these
+attributes.
+
+     <dl>
+<dt><code>long_calls</code><dd><a name="index-pragma_002c-long_005fcalls-3119"></a>Set all subsequent functions to have the <code>long_call</code> attribute.
+
+     <br><dt><code>no_long_calls</code><dd><a name="index-pragma_002c-no_005flong_005fcalls-3120"></a>Set all subsequent functions to have the <code>short_call</code> attribute.
+
+     <br><dt><code>long_calls_off</code><dd><a name="index-pragma_002c-long_005fcalls_005foff-3121"></a>Do not affect the <code>long_call</code> or <code>short_call</code> attributes of
+subsequent functions. 
+</dl>
+
+ </body></html>
+

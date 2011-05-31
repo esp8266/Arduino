@@ -1,0 +1,63 @@
+<html lang="en">
+<head>
+<title>wcpcpy - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Wchar-strings.html#Wchar-strings" title="Wchar strings">
+<link rel="prev" href="wcscpy.html#wcscpy" title="wcscpy">
+<link rel="next" href="wcscspn.html#wcscspn" title="wcscspn">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="wcpcpy"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="wcscspn.html#wcscspn">wcscspn</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="wcscpy.html#wcscpy">wcscpy</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Wchar-strings.html#Wchar-strings">Wchar strings</a>
+<hr>
+</div>
+
+<h3 class="section">6.11 <code>wcpcpy</code>&mdash;copy a wide-character string returning a pointer to its end</h3>
+
+<p><strong>Synopsis</strong>
+<pre class="example">     #include &lt;wchar.h&gt;
+     wchar_t *wcpcpy(wchar_t *<var>s1</var>, const wchar_t *,<var>s2</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+The <code>wcpcpy</code> function copies the wide-character string pointed to by
+<var>s2</var> (including the terminating null wide-character code) into the
+array pointed to by <var>s1</var>. If copying takes place between objects that
+overlap, the behaviour is undefined.
+
+   <p><br>
+<strong>Returns</strong><br>
+This function returns a pointer to the end of the destination string,
+thus pointing to the trailing '\0'.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>wcpcpy</code> is a GNU extension.
+
+   <p>No supporting OS subroutines are required.
+
+   <p><br>
+
+   </body></html>
+

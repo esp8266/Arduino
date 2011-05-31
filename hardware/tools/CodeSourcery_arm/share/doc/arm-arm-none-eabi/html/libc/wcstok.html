@@ -1,0 +1,87 @@
+<html lang="en">
+<head>
+<title>wcstok - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Wchar-strings.html#Wchar-strings" title="Wchar strings">
+<link rel="prev" href="wcsstr.html#wcsstr" title="wcsstr">
+<link rel="next" href="wcswidth.html#wcswidth" title="wcswidth">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="wcstok"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="wcswidth.html#wcswidth">wcswidth</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="wcsstr.html#wcsstr">wcsstr</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Wchar-strings.html#Wchar-strings">Wchar strings</a>
+<hr>
+</div>
+
+<h3 class="section">6.26 <code>wcstok</code>&mdash;get next token from a string</h3>
+
+<p><a name="index-wcstok-418"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;wchar.h&gt;
+     wchar_t *wcstok(wchar_t *<var>source</var>, const wchar_t *<var>delimiters</var>,
+         wchar_t **<var>lasts</var>)
+     
+</pre>
+   <p><strong>Description</strong><br>
+The <code>wcstok</code> function is the wide-character equivalent of the
+<code>strtok_r</code> function (which in turn is the same as the <code>strtok</code>
+function with an added argument to make it thread-safe).
+
+   <p>The <code>wcstok</code> function is used to isolate (one at a time)
+sequential tokens in a null-terminated wide-character string,
+<code>*</code><var>source</var>.  A token is defined as a substring not containing
+any wide-characters from <code>*</code><var>delimiters</var>.
+
+   <p>The first time that <code>wcstok</code> is called, <code>*</code><var>source</var> should
+be specified with the wide-character string to be searched, and
+<code>*</code><var>lasts</var>&ndash;but not <code>lasts</code>, which must be non-NULL&ndash;may be
+random; subsequent calls, wishing to obtain further tokens from
+the same string, should pass a null pointer for <code>*</code><var>source</var>
+instead but must supply <code>*</code><var>lasts</var> unchanged from the last
+call.  The separator wide-character string, <code>*</code><var>delimiters</var>,
+must be supplied each time and may change between calls. 
+A pointer to placeholder <code>*</code><var>lasts</var> must be supplied by
+the caller, and is set each time as needed to save the state
+by <code>wcstok</code>.	Every call to <code>wcstok</code> with <code>*</code><var>source</var>
+== <code>NULL</code> must pass the value of <code>*</code><var>lasts</var> as last set
+by <code>wcstok</code>.
+
+   <p>The <code>wcstok</code> function returns a pointer to the beginning of each
+subsequent token in the string, after replacing the separator
+wide-character itself with a null wide-character.  When no more tokens
+remain, a null pointer is returned.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>wcstok</code> returns a pointer to the first wide character of a token, or
+<code>NULL</code> if there is no token.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>wcstok</code> is C99 and POSIX.1-2001.
+
+   <p><code>wcstok</code> requires no supporting OS subroutines.
+
+   <p><br>
+
+   </body></html>
+

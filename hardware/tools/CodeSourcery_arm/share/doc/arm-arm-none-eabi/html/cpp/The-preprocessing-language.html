@@ -1,0 +1,123 @@
+<html lang="en">
+<head>
+<title>The preprocessing language - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Overview.html#Overview" title="Overview">
+<link rel="prev" href="Tokenization.html#Tokenization" title="Tokenization">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="The-preprocessing-language"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Tokenization.html#Tokenization">Tokenization</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Overview.html#Overview">Overview</a>
+<hr>
+</div>
+
+<h3 class="section">1.4 The preprocessing language</h3>
+
+<p><a name="index-directives-21"></a><a name="index-preprocessing-directives-22"></a><a name="index-directive-line-23"></a><a name="index-directive-name-24"></a>
+After tokenization, the stream of tokens may simply be passed straight
+to the compiler's parser.  However, if it contains any operations in the
+<dfn>preprocessing language</dfn>, it will be transformed first.  This stage
+corresponds roughly to the standard's &ldquo;translation phase 4&rdquo; and is
+what most people think of as the preprocessor's job.
+
+   <p>The preprocessing language consists of <dfn>directives</dfn> to be executed
+and <dfn>macros</dfn> to be expanded.  Its primary capabilities are:
+
+     <ul>
+<li>Inclusion of header files.  These are files of declarations that can be
+substituted into your program.
+
+     <li>Macro expansion.  You can define <dfn>macros</dfn>, which are abbreviations
+for arbitrary fragments of C code.  The preprocessor will replace the
+macros with their definitions throughout the program.  Some macros are
+automatically defined for you.
+
+     <li>Conditional compilation.  You can include or exclude parts of the
+program according to various conditions.
+
+     <li>Line control.  If you use a program to combine or rearrange source files
+into an intermediate file which is then compiled, you can use line
+control to inform the compiler where each source line originally came
+from.
+
+     <li>Diagnostics.  You can detect problems at compile time and issue errors
+or warnings. 
+</ul>
+
+   <p>There are a few more, less useful, features.
+
+   <p>Except for expansion of predefined macros, all these operations are
+triggered with <dfn>preprocessing directives</dfn>.  Preprocessing directives
+are lines in your program that start with &lsquo;<samp><span class="samp">#</span></samp>&rsquo;.  Whitespace is
+allowed before and after the &lsquo;<samp><span class="samp">#</span></samp>&rsquo;.  The &lsquo;<samp><span class="samp">#</span></samp>&rsquo; is followed by an
+identifier, the <dfn>directive name</dfn>.  It specifies the operation to
+perform.  Directives are commonly referred to as &lsquo;<samp><span class="samp">#</span><var>name</var></samp>&rsquo;
+where <var>name</var> is the directive name.  For example, &lsquo;<samp><span class="samp">#define</span></samp>&rsquo; is
+the directive that defines a macro.
+
+   <p>The &lsquo;<samp><span class="samp">#</span></samp>&rsquo; which begins a directive cannot come from a macro
+expansion.  Also, the directive name is not macro expanded.  Thus, if
+<code>foo</code> is defined as a macro expanding to <code>define</code>, that does
+not make &lsquo;<samp><span class="samp">#foo</span></samp>&rsquo; a valid preprocessing directive.
+
+   <p>The set of valid directive names is fixed.  Programs cannot define new
+preprocessing directives.
+
+   <p>Some directives require arguments; these make up the rest of the
+directive line and must be separated from the directive name by
+whitespace.  For example, &lsquo;<samp><span class="samp">#define</span></samp>&rsquo; must be followed by a macro
+name and the intended expansion of the macro.
+
+   <p>A preprocessing directive cannot cover more than one line.  The line
+may, however, be continued with backslash-newline, or by a block comment
+which extends past the end of the line.  In either case, when the
+directive is processed, the continuations have already been merged with
+the first line to make one long line.
+
+   </body></html>
+

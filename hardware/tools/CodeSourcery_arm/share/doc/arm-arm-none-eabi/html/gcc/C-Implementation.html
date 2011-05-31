@@ -1,0 +1,95 @@
+<html lang="en">
+<head>
+<title>C Implementation - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Invoking-GCC.html#Invoking-GCC" title="Invoking GCC">
+<link rel="next" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="C-Implementation"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="C-Extensions.html#C-Extensions">C Extensions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Invoking-GCC.html#Invoking-GCC">Invoking GCC</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">4 C Implementation-defined behavior</h2>
+
+<p><a name="index-implementation_002ddefined-behavior_002c-C-language-2171"></a>
+A conforming implementation of ISO C is required to document its
+choice of behavior in each of the areas that are designated
+&ldquo;implementation defined&rdquo;.  The following lists all such areas,
+along with the section numbers from the ISO/IEC 9899:1990 and ISO/IEC
+9899:1999 standards.  Some areas are only implementation-defined in
+one version of the standard.
+
+ <p>Some choices depend on the externally determined ABI for the platform
+(including standard character encodings) which GCC follows; these are
+listed as &ldquo;determined by ABI&rdquo; below.  See <a href="Compatibility.html#Compatibility">Binary Compatibility</a>, and <a href="http://gcc.gnu.org/readings.html">http://gcc.gnu.org/readings.html</a>.  Some
+choices are documented in the preprocessor manual. 
+See <a href="../cpp/Implementation_002ddefined-behavior.html#Implementation_002ddefined-behavior">Implementation-defined behavior</a>.  Some choices are made by the
+library and operating system (or other environment when compiling for
+a freestanding environment); refer to their documentation for details.
+
+<ul class="menu">
+<li><a accesskey="1" href="Translation-implementation.html#Translation-implementation">Translation implementation</a>
+<li><a accesskey="2" href="Environment-implementation.html#Environment-implementation">Environment implementation</a>
+<li><a accesskey="3" href="Identifiers-implementation.html#Identifiers-implementation">Identifiers implementation</a>
+<li><a accesskey="4" href="Characters-implementation.html#Characters-implementation">Characters implementation</a>
+<li><a accesskey="5" href="Integers-implementation.html#Integers-implementation">Integers implementation</a>
+<li><a accesskey="6" href="Floating-point-implementation.html#Floating-point-implementation">Floating point implementation</a>
+<li><a accesskey="7" href="Arrays-and-pointers-implementation.html#Arrays-and-pointers-implementation">Arrays and pointers implementation</a>
+<li><a accesskey="8" href="Hints-implementation.html#Hints-implementation">Hints implementation</a>
+<li><a accesskey="9" href="Structures-unions-enumerations-and-bit_002dfields-implementation.html#Structures-unions-enumerations-and-bit_002dfields-implementation">Structures unions enumerations and bit-fields implementation</a>
+<li><a href="Qualifiers-implementation.html#Qualifiers-implementation">Qualifiers implementation</a>
+<li><a href="Declarators-implementation.html#Declarators-implementation">Declarators implementation</a>
+<li><a href="Statements-implementation.html#Statements-implementation">Statements implementation</a>
+<li><a href="Preprocessing-directives-implementation.html#Preprocessing-directives-implementation">Preprocessing directives implementation</a>
+<li><a href="Library-functions-implementation.html#Library-functions-implementation">Library functions implementation</a>
+<li><a href="Architecture-implementation.html#Architecture-implementation">Architecture implementation</a>
+<li><a href="Locale_002dspecific-behavior-implementation.html#Locale_002dspecific-behavior-implementation">Locale-specific behavior implementation</a>
+</ul>
+
+ </body></html>
+

@@ -1,0 +1,102 @@
+<html lang="en">
+<head>
+<title>Context management - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="GDB_002fMI-General-Design.html#GDB_002fMI-General-Design" title="GDB/MI General Design">
+<link rel="next" href="Asynchronous-and-non_002dstop-modes.html#Asynchronous-and-non_002dstop-modes" title="Asynchronous and non-stop modes">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Context-management"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Asynchronous-and-non_002dstop-modes.html#Asynchronous-and-non_002dstop-modes">Asynchronous and non-stop modes</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="GDB_002fMI-General-Design.html#GDB_002fMI-General-Design">GDB/MI General Design</a>
+<hr>
+</div>
+
+<h4 class="subsection">27.1.1 Context management</h4>
+
+<p>In most cases when <span class="sc">gdb</span> accesses the target, this access is
+done in context of a specific thread and frame (see <a href="Frames.html#Frames">Frames</a>). 
+Often, even when accessing global data, the target requires that a thread
+be specified.  The CLI interface maintains the selected thread and frame,
+and supplies them to target on each command.  This is convenient,
+because a command line user would not want to specify that information
+explicitly on each command, and because user interacts with
+<span class="sc">gdb</span> via a single terminal, so no confusion is possible as
+to what thread and frame are the current ones.
+
+   <p>In the case of MI, the concept of selected thread and frame is less
+useful.  First, a frontend can easily remember this information
+itself.  Second, a graphical frontend can have more than one window,
+each one used for debugging a different thread, and the frontend might
+want to access additional threads for internal purposes.  This
+increases the risk that by relying on implicitly selected thread, the
+frontend may be operating on a wrong one.  Therefore, each MI command
+should explicitly specify which thread and frame to operate on.  To
+make it possible, each MI command accepts the &lsquo;<samp><span class="samp">--thread</span></samp>&rsquo; and
+&lsquo;<samp><span class="samp">--frame</span></samp>&rsquo; options, the value to each is <span class="sc">gdb</span> identifier
+for thread and frame to operate on.
+
+   <p>Usually, each top-level window in a frontend allows the user to select
+a thread and a frame, and remembers the user selection for further
+operations.  However, in some cases <span class="sc">gdb</span> may suggest that the
+current thread be changed.  For example, when stopping on a breakpoint
+it is reasonable to switch to the thread where breakpoint is hit.  For
+another example, if the user issues the CLI &lsquo;<samp><span class="samp">thread</span></samp>&rsquo; command via
+the frontend, it is desirable to change the frontend's selected thread to the
+one specified by user.  <span class="sc">gdb</span> communicates the suggestion to
+change current thread using the &lsquo;<samp><span class="samp">=thread-selected</span></samp>&rsquo; notification. 
+No such notification is available for the selected frame at the moment.
+
+   <p>Note that historically, MI shares the selected thread with CLI, so
+frontends used the <code>-thread-select</code> to execute commands in the
+right context.  However, getting this to work right is cumbersome.  The
+simplest way is for frontend to emit <code>-thread-select</code> command
+before every command.  This doubles the number of commands that need
+to be sent.  The alternative approach is to suppress <code>-thread-select</code>
+if the selected thread in <span class="sc">gdb</span> is supposed to be identical to the
+thread the frontend wants to operate on.  However, getting this
+optimization right can be tricky.  In particular, if the frontend
+sends several commands to <span class="sc">gdb</span>, and one of the commands changes the
+selected thread, then the behaviour of subsequent commands will
+change.  So, a frontend should either wait for response from such
+problematic commands, or explicitly add <code>-thread-select</code> for
+all subsequent commands.  No frontend is known to do this exactly
+right, so it is suggested to just always pass the &lsquo;<samp><span class="samp">--thread</span></samp>&rsquo; and
+&lsquo;<samp><span class="samp">--frame</span></samp>&rsquo; options.
+
+   </body></html>
+

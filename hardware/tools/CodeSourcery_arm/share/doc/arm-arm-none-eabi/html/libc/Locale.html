@@ -1,0 +1,137 @@
+<html lang="en">
+<head>
+<title>Locale - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Timefns.html#Timefns" title="Timefns">
+<link rel="next" href="Reentrancy.html#Reentrancy" title="Reentrancy">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Locale"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Reentrancy.html#Reentrancy">Reentrancy</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Timefns.html#Timefns">Timefns</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">9 Locale (<samp><span class="file">locale.h</span></samp>)</h2>
+
+<p>A <dfn>locale</dfn> is the name for a collection of parameters (affecting
+collating sequences and formatting conventions) that may be different
+depending on location or culture.  The <code>"C"</code> locale is the only
+one defined in the ANSI C standard.
+
+   <p>This is a minimal implementation, supporting only the required <code>"C"</code>
+value for locale; strings representing other locales are not
+honored.  (<code>""</code> is also accepted; it represents the default locale
+for an implementation, here equivalent to <code>"C"</code>.
+
+   <p><samp><span class="file">locale.h</span></samp> defines the structure <code>lconv</code> to collect the
+information on a locale, with the following fields:
+
+     <dl>
+<dt><code>char *decimal_point</code><dd>The decimal point character used to format &ldquo;ordinary&rdquo; numbers (all
+numbers except those referring to amounts of money).  <code>"."</code> in the
+C locale.
+
+     <br><dt><code>char *thousands_sep</code><dd>The character (if any) used to separate groups of digits, when
+formatting ordinary numbers. 
+<code>""</code> in the C locale.
+
+     <br><dt><code>char *grouping</code><dd>Specifications for how many digits to group (if any grouping is done at
+all) when formatting ordinary numbers.  The <em>numeric value</em> of each
+character in the string represents the number of digits for the next
+group, and a value of <code>0</code> (that is, the string's trailing
+<code>NULL</code>) means to continue grouping digits using the last value
+specified.  Use <code>CHAR_MAX</code> to indicate that no further grouping is
+desired.  <code>""</code> in the C locale.
+
+     <br><dt><code>char *int_curr_symbol</code><dd>The international currency symbol (first three characters), if any, and
+the character used to separate it from numbers. 
+<code>""</code> in the C locale.
+
+     <br><dt><code>char *currency_symbol</code><dd>The local currency symbol, if any. 
+<code>""</code> in the C locale.
+
+     <br><dt><code>char *mon_decimal_point</code><dd>The symbol used to delimit fractions in amounts of money. 
+<code>""</code> in the C locale.
+
+     <br><dt><code>char *mon_thousands_sep</code><dd>Similar to <code>thousands_sep</code>, but used for amounts of money. 
+<code>""</code> in the C locale.
+
+     <br><dt><code>char *mon_grouping</code><dd>Similar to <code>grouping</code>, but used for amounts of money. 
+<code>""</code> in the C locale.
+
+     <br><dt><code>char *positive_sign</code><dd>A string to flag positive amounts of money when formatting. 
+<code>""</code> in the C locale.
+
+     <br><dt><code>char *negative_sign</code><dd>A string to flag negative amounts of money when formatting. 
+<code>""</code> in the C locale.
+
+     <br><dt><code>char int_frac_digits</code><dd>The number of digits to display when formatting amounts of money to
+international conventions. 
+<code>CHAR_MAX</code> (the largest number representable as a <code>char</code>) in
+the C locale.
+
+     <br><dt><code>char frac_digits</code><dd>The number of digits to display when formatting amounts of money to
+local conventions. 
+<code>CHAR_MAX</code> in the C locale.
+
+     <br><dt><code>char p_cs_precedes</code><dd><code>1</code> indicates the local currency symbol is used before a
+<em>positive or zero</em> formatted amount of money; <code>0</code> indicates
+the currency symbol is placed after the formatted number. 
+<code>CHAR_MAX</code> in the C locale.
+
+     <br><dt><code>char p_sep_by_space</code><dd><code>1</code> indicates the local currency symbol must be separated from
+<em>positive or zero</em> numbers by a space; <code>0</code> indicates that it
+is immediately adjacent to numbers. 
+<code>CHAR_MAX</code> in the C locale.
+
+     <br><dt><code>char n_cs_precedes</code><dd><code>1</code> indicates the local currency symbol is used before a
+<em>negative</em> formatted amount of money; <code>0</code> indicates
+the currency symbol is placed after the formatted number. 
+<code>CHAR_MAX</code> in the C locale.
+
+     <br><dt><code>char n_sep_by_space</code><dd><code>1</code> indicates the local currency symbol must be separated from
+<em>negative</em> numbers by a space; <code>0</code> indicates that it
+is immediately adjacent to numbers. 
+<code>CHAR_MAX</code> in the C locale.
+
+     <br><dt><code>char p_sign_posn</code><dd>Controls the position of the <em>positive</em> sign for
+numbers representing money.  <code>0</code> means parentheses surround the
+number; <code>1</code> means the sign is placed before both the number and the
+currency symbol; <code>2</code> means the sign is placed after both the number
+and the currency symbol; <code>3</code> means the sign is placed just before
+the currency symbol; and <code>4</code> means the sign is placed just after
+the currency symbol. 
+<code>CHAR_MAX</code> in the C locale.
+
+     <br><dt><code>char n_sign_posn</code><dd>Controls the position of the <em>negative</em> sign for numbers
+representing money, using the same rules as <code>p_sign_posn</code>. 
+<code>CHAR_MAX</code> in the C locale. 
+</dl>
+
+<ul class="menu">
+<li><a accesskey="1" href="setlocale.html#setlocale">setlocale</a>:   Select or query locale
+</ul>
+
+   </body></html>
+

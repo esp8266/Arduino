@@ -1,0 +1,164 @@
+<html lang="en">
+<head>
+<title>General Bytecode Design - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Agent-Expressions.html#Agent-Expressions" title="Agent Expressions">
+<link rel="next" href="Bytecode-Descriptions.html#Bytecode-Descriptions" title="Bytecode Descriptions">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="General-Bytecode-Design"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Bytecode-Descriptions.html#Bytecode-Descriptions">Bytecode Descriptions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Agent-Expressions.html#Agent-Expressions">Agent Expressions</a>
+<hr>
+</div>
+
+<h3 class="section">E.1 General Bytecode Design</h3>
+
+<p>The agent represents bytecode expressions as an array of bytes.  Each
+instruction is one byte long (thus the term <dfn>bytecode</dfn>).  Some
+instructions are followed by operand bytes; for example, the <code>goto</code>
+instruction is followed by a destination for the jump.
+
+   <p>The bytecode interpreter is a stack-based machine; most instructions pop
+their operands off the stack, perform some operation, and push the
+result back on the stack for the next instruction to consume.  Each
+element of the stack may contain either a integer or a floating point
+value; these values are as many bits wide as the largest integer that
+can be directly manipulated in the source language.  Stack elements
+carry no record of their type; bytecode could push a value as an
+integer, then pop it as a floating point value.  However, GDB will not
+generate code which does this.  In C, one might define the type of a
+stack element as follows:
+<pre class="example">     union agent_val {
+       LONGEST l;
+       DOUBLEST d;
+     };
+</pre>
+   <p class="noindent">where <code>LONGEST</code> and <code>DOUBLEST</code> are <code>typedef</code> names for
+the largest integer and floating point types on the machine.
+
+   <p>By the time the bytecode interpreter reaches the end of the expression,
+the value of the expression should be the only value left on the stack. 
+For tracing applications, <code>trace</code> bytecodes in the expression will
+have recorded the necessary data, and the value on the stack may be
+discarded.  For other applications, like conditional breakpoints, the
+value may be useful.
+
+   <p>Separate from the stack, the interpreter has two registers:
+     <dl>
+<dt><code>pc</code><dd>The address of the next bytecode to execute.
+
+     <br><dt><code>start</code><dd>The address of the start of the bytecode expression, necessary for
+interpreting the <code>goto</code> and <code>if_goto</code> instructions.
+
+   </dl>
+   Neither of these registers is directly visible to the bytecode language
+itself, but they are useful for defining the meanings of the bytecode
+operations.
+
+   <p>There are no instructions to perform side effects on the running
+program, or call the program's functions; we assume that these
+expressions are only used for unobtrusive debugging, not for patching
+the running code.
+
+   <p>Most bytecode instructions do not distinguish between the various sizes
+of values, and operate on full-width values; the upper bits of the
+values are simply ignored, since they do not usually make a difference
+to the value computed.  The exceptions to this rule are:
+     <dl>
+<dt>memory reference instructions (<code>ref</code><var>n</var>)<dd>There are distinct instructions to fetch different word sizes from
+memory.  Once on the stack, however, the values are treated as full-size
+integers.  They may need to be sign-extended; the <code>ext</code> instruction
+exists for this purpose.
+
+     <br><dt>the sign-extension instruction (<code>ext</code> <var>n</var>)<dd>These clearly need to know which portion of their operand is to be
+extended to occupy the full length of the word.
+
+   </dl>
+
+   <p>If the interpreter is unable to evaluate an expression completely for
+some reason (a memory location is inaccessible, or a divisor is zero,
+for example), we say that interpretation &ldquo;terminates with an error&rdquo;. 
+This means that the problem is reported back to the interpreter's caller
+in some helpful way.  In general, code using agent expressions should
+assume that they may attempt to divide by zero, fetch arbitrary memory
+locations, and misbehave in other ways.
+
+   <p>Even complicated C expressions compile to a few bytecode instructions;
+for example, the expression <code>x + y * z</code> would typically produce
+code like the following, assuming that <code>x</code> and <code>y</code> live in
+registers, and <code>z</code> is a global variable holding a 32-bit
+<code>int</code>:
+<pre class="example">     reg 1
+     reg 2
+     const32 <i>address of z</i>
+     ref32
+     ext 32
+     mul
+     add
+     end
+</pre>
+   <p>In detail, these mean:
+     <dl>
+<dt><code>reg 1</code><dd>Push the value of register 1 (presumably holding <code>x</code>) onto the
+stack.
+
+     <br><dt><code>reg 2</code><dd>Push the value of register 2 (holding <code>y</code>).
+
+     <br><dt><code>const32 </code><i>address of z</i><dd>Push the address of <code>z</code> onto the stack.
+
+     <br><dt><code>ref32</code><dd>Fetch a 32-bit word from the address at the top of the stack; replace
+the address on the stack with the value.  Thus, we replace the address
+of <code>z</code> with <code>z</code>'s value.
+
+     <br><dt><code>ext 32</code><dd>Sign-extend the value on the top of the stack from 32 bits to full
+length.  This is necessary because <code>z</code> is a signed integer.
+
+     <br><dt><code>mul</code><dd>Pop the top two numbers on the stack, multiply them, and push their
+product.  Now the top of the stack contains the value of the expression
+<code>y * z</code>.
+
+     <br><dt><code>add</code><dd>Pop the top two numbers, add them, and push the sum.  Now the top of the
+stack contains the value of <code>x + y * z</code>.
+
+     <br><dt><code>end</code><dd>Stop executing; the value left on the stack top is the value to be
+recorded.
+
+   </dl>
+
+   </body></html>
+

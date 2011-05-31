@@ -1,0 +1,241 @@
+<html lang="en">
+<head>
+<title>Standards - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="G_002b_002b-and-GCC.html#G_002b_002b-and-GCC" title="G++ and GCC">
+<link rel="next" href="Invoking-GCC.html#Invoking-GCC" title="Invoking GCC">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Standards"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Invoking-GCC.html#Invoking-GCC">Invoking GCC</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="G_002b_002b-and-GCC.html#G_002b_002b-and-GCC">G++ and GCC</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">2 Language Standards Supported by GCC</h2>
+
+<p>For each language compiled by GCC for which there is a standard, GCC
+attempts to follow one or more versions of that standard, possibly
+with some exceptions, and possibly with some extensions.
+
+<h3 class="section">2.1 C language</h3>
+
+<p><a name="index-C-standard-20"></a><a name="index-C-standards-21"></a><a name="index-ANSI-C-standard-22"></a><a name="index-ANSI-C-23"></a><a name="index-ANSI-C89-24"></a><a name="index-C89-25"></a><a name="index-ANSI-X3_002e159_002d1989-26"></a><a name="index-X3_002e159_002d1989-27"></a><a name="index-ISO-C-standard-28"></a><a name="index-ISO-C-29"></a><a name="index-ISO-C90-30"></a><a name="index-ISO_002fIEC-9899-31"></a><a name="index-ISO-9899-32"></a><a name="index-C90-33"></a><a name="index-ISO-C94-34"></a><a name="index-C94-35"></a><a name="index-ISO-C95-36"></a><a name="index-C95-37"></a><a name="index-ISO-C99-38"></a><a name="index-C99-39"></a><a name="index-ISO-C9X-40"></a><a name="index-C9X-41"></a><a name="index-Technical-Corrigenda-42"></a><a name="index-TC1-43"></a><a name="index-Technical-Corrigendum-1-44"></a><a name="index-TC2-45"></a><a name="index-Technical-Corrigendum-2-46"></a><a name="index-TC3-47"></a><a name="index-Technical-Corrigendum-3-48"></a><a name="index-AMD1-49"></a><a name="index-freestanding-implementation-50"></a><a name="index-freestanding-environment-51"></a><a name="index-hosted-implementation-52"></a><a name="index-hosted-environment-53"></a><a name="index-g_t_005f_005fSTDC_005fHOSTED_005f_005f-54"></a>
+GCC supports three versions of the C standard, although support for
+the most recent version is not yet complete.
+
+ <p><a name="index-std-55"></a><a name="index-ansi-56"></a><a name="index-pedantic-57"></a><a name="index-pedantic_002derrors-58"></a>The original ANSI C standard (X3.159-1989) was ratified in 1989 and
+published in 1990.  This standard was ratified as an ISO standard
+(ISO/IEC 9899:1990) later in 1990.  There were no technical
+differences between these publications, although the sections of the
+ANSI standard were renumbered and became clauses in the ISO standard. 
+This standard, in both its forms, is commonly known as <dfn>C89</dfn>, or
+occasionally as <dfn>C90</dfn>, from the dates of ratification.  The ANSI
+standard, but not the ISO standard, also came with a Rationale
+document.  To select this standard in GCC, use one of the options
+<samp><span class="option">-ansi</span></samp>, <samp><span class="option">-std=c90</span></samp> or <samp><span class="option">-std=iso9899:1990</span></samp>; to obtain
+all the diagnostics required by the standard, you should also specify
+<samp><span class="option">-pedantic</span></samp> (or <samp><span class="option">-pedantic-errors</span></samp> if you want them to be
+errors rather than warnings).  See <a href="C-Dialect-Options.html#C-Dialect-Options">Options Controlling C Dialect</a>.
+
+ <p>Errors in the 1990 ISO C standard were corrected in two Technical
+Corrigenda published in 1994 and 1996.  GCC does not support the
+uncorrected version.
+
+ <p>An amendment to the 1990 standard was published in 1995.  This
+amendment added digraphs and <code>__STDC_VERSION__</code> to the language,
+but otherwise concerned the library.  This amendment is commonly known
+as <dfn>AMD1</dfn>; the amended standard is sometimes known as <dfn>C94</dfn> or
+<dfn>C95</dfn>.  To select this standard in GCC, use the option
+<samp><span class="option">-std=iso9899:199409</span></samp> (with, as for other standard versions,
+<samp><span class="option">-pedantic</span></samp> to receive all required diagnostics).
+
+ <p>A new edition of the ISO C standard was published in 1999 as ISO/IEC
+9899:1999, and is commonly known as <dfn>C99</dfn>.  GCC has incomplete
+support for this standard version; see
+<a href="http://gcc.gnu.org/gcc-4.5/c99status.html">http://gcc.gnu.org/gcc-4.5/c99status.html</a> for details.  To select this
+standard, use <samp><span class="option">-std=c99</span></samp> or <samp><span class="option">-std=iso9899:1999</span></samp>.  (While in
+development, drafts of this standard version were referred to as
+<dfn>C9X</dfn>.)
+
+ <p>Errors in the 1999 ISO C standard were corrected in three Technical
+Corrigenda published in 2001, 2004 and 2007.  GCC does not support the
+uncorrected version.
+
+ <p>By default, GCC provides some extensions to the C language that on
+rare occasions conflict with the C standard.  See <a href="C-Extensions.html#C-Extensions">Extensions to the C Language Family</a>.  Use of the
+<samp><span class="option">-std</span></samp> options listed above will disable these extensions where
+they conflict with the C standard version selected.  You may also
+select an extended version of the C language explicitly with
+<samp><span class="option">-std=gnu90</span></samp> (for C90 with GNU extensions) or <samp><span class="option">-std=gnu99</span></samp>
+(for C99 with GNU extensions).  The default, if no C language dialect
+options are given, is <samp><span class="option">-std=gnu90</span></samp>; this will change to
+<samp><span class="option">-std=gnu99</span></samp> in some future release when the C99 support is
+complete.  Some features that are part of the C99 standard are
+accepted as extensions in C90 mode.
+
+ <p>The ISO C standard defines (in clause 4) two classes of conforming
+implementation.  A <dfn>conforming hosted implementation</dfn> supports the
+whole standard including all the library facilities; a <dfn>conforming
+freestanding implementation</dfn> is only required to provide certain
+library facilities: those in <code>&lt;float.h&gt;</code>, <code>&lt;limits.h&gt;</code>,
+<code>&lt;stdarg.h&gt;</code>, and <code>&lt;stddef.h&gt;</code>; since AMD1, also those in
+<code>&lt;iso646.h&gt;</code>; and in C99, also those in <code>&lt;stdbool.h&gt;</code> and
+<code>&lt;stdint.h&gt;</code>.  In addition, complex types, added in C99, are not
+required for freestanding implementations.  The standard also defines
+two environments for programs, a <dfn>freestanding environment</dfn>,
+required of all implementations and which may not have library
+facilities beyond those required of freestanding implementations,
+where the handling of program startup and termination are
+implementation-defined, and a <dfn>hosted environment</dfn>, which is not
+required, in which all the library facilities are provided and startup
+is through a function <code>int main (void)</code> or <code>int main (int,
+char *[])</code>.  An OS kernel would be a freestanding environment; a
+program using the facilities of an operating system would normally be
+in a hosted implementation.
+
+ <p><a name="index-ffreestanding-59"></a>GCC aims towards being usable as a conforming freestanding
+implementation, or as the compiler for a conforming hosted
+implementation.  By default, it will act as the compiler for a hosted
+implementation, defining <code>__STDC_HOSTED__</code> as <code>1</code> and
+presuming that when the names of ISO C functions are used, they have
+the semantics defined in the standard.  To make it act as a conforming
+freestanding implementation for a freestanding environment, use the
+option <samp><span class="option">-ffreestanding</span></samp>; it will then define
+<code>__STDC_HOSTED__</code> to <code>0</code> and not make assumptions about the
+meanings of function names from the standard library, with exceptions
+noted below.  To build an OS kernel, you may well still need to make
+your own arrangements for linking and startup. 
+See <a href="C-Dialect-Options.html#C-Dialect-Options">Options Controlling C Dialect</a>.
+
+ <p>GCC does not provide the library facilities required only of hosted
+implementations, nor yet all the facilities required by C99 of
+freestanding implementations; to use the facilities of a hosted
+environment, you will need to find them elsewhere (for example, in the
+GNU C library).  See <a href="Standard-Libraries.html#Standard-Libraries">Standard Libraries</a>.
+
+ <p>Most of the compiler support routines used by GCC are present in
+<samp><span class="file">libgcc</span></samp>, but there are a few exceptions.  GCC requires the
+freestanding environment provide <code>memcpy</code>, <code>memmove</code>,
+<code>memset</code> and <code>memcmp</code>. 
+Finally, if <code>__builtin_trap</code> is used, and the target does
+not implement the <code>trap</code> pattern, then GCC will emit a call
+to <code>abort</code>.
+
+ <p>For references to Technical Corrigenda, Rationale documents and
+information concerning the history of C that is available online, see
+<a href="http://gcc.gnu.org/readings.html">http://gcc.gnu.org/readings.html</a>
+
+<h3 class="section">2.2 C++ language</h3>
+
+<p>GCC supports the ISO C++ standard (1998) and contains experimental
+support for the upcoming ISO C++ standard (200x).
+
+ <p>The original ISO C++ standard was published as the ISO standard (ISO/IEC
+14882:1998) and amended by a Technical Corrigenda published in 2003
+(ISO/IEC 14882:2003). These standards are referred to as C++98 and
+C++03, respectively. GCC implements the majority of C++98 (<code>export</code>
+is a notable exception) and most of the changes in C++03.  To select
+this standard in GCC, use one of the options <samp><span class="option">-ansi</span></samp> or
+<samp><span class="option">-std=c++98</span></samp>; to obtain all the diagnostics required by the
+standard, you should also specify <samp><span class="option">-pedantic</span></samp> (or
+<samp><span class="option">-pedantic-errors</span></samp> if you want them to be errors rather than
+warnings).
+
+ <p>The ISO C++ committee is working on a new ISO C++ standard, dubbed
+C++0x, that is intended to be published by 2009. C++0x contains several
+changes to the C++ language, some of which have been implemented in an
+experimental C++0x mode in GCC. The C++0x mode in GCC tracks the draft
+working paper for the C++0x standard; the latest working paper is
+available on the ISO C++ committee's web site at
+<a href="http://www.open-std.org/jtc1/sc22/wg21/">http://www.open-std.org/jtc1/sc22/wg21/</a>. For information
+regarding the C++0x features available in the experimental C++0x mode,
+see <a href="http://gcc.gnu.org/projects/cxx0x.html">http://gcc.gnu.org/projects/cxx0x.html</a>. To select this
+standard in GCC, use the option <samp><span class="option">-std=c++0x</span></samp>; to obtain all the
+diagnostics required by the standard, you should also specify
+<samp><span class="option">-pedantic</span></samp> (or <samp><span class="option">-pedantic-errors</span></samp> if you want them to be
+errors rather than warnings).
+
+ <p>By default, GCC provides some extensions to the C++ language; See <a href="C_002b_002b-Dialect-Options.html#C_002b_002b-Dialect-Options">Options Controlling C++ Dialect</a>.  Use of the
+<samp><span class="option">-std</span></samp> option listed above will disable these extensions.  You
+may also select an extended version of the C++ language explicitly with
+<samp><span class="option">-std=gnu++98</span></samp> (for C++98 with GNU extensions) or
+<samp><span class="option">-std=gnu++0x</span></samp> (for C++0x with GNU extensions).  The default, if
+no C++ language dialect options are given, is <samp><span class="option">-std=gnu++98</span></samp>.
+
+<h3 class="section">2.3 Objective-C and Objective-C++ languages</h3>
+
+<p><a name="index-Objective_002dC-60"></a><a name="index-Objective_002dC_002b_002b-61"></a>
+There is no formal written standard for Objective-C or Objective-C++.  The most
+authoritative manual is &ldquo;Object-Oriented Programming and the
+Objective-C Language&rdquo;, available at a number of web sites:
+
+     <ul>
+<li><a href="http://developer.apple.com/mac/library/documentation/Cocoa/Conceptual/ObjectiveC/">http://developer.apple.com/mac/library/documentation/Cocoa/Conceptual/ObjectiveC/</a>
+is a recent (and periodically updated) version;
+<li><a href="http://objc.toodarkpark.net">http://objc.toodarkpark.net</a>
+is an older example;
+<li><a href="http://www.gnustep.org">http://www.gnustep.org</a>
+and
+<a href="http://gcc.gnu.org/readings.html">http://gcc.gnu.org/readings.html</a>
+have additional useful information. 
+</ul>
+
+ <p>See <a href="../gnat_rm/index.html#Top">GNAT Reference Manual</a>, for information on standard
+conformance and compatibility of the Ada compiler.
+
+ <p>See <a href="../gfortran/Standards.html#Standards">Standards</a>, for details
+of standards supported by GNU Fortran.
+
+ <p>See <a href="../gcj/Compatibility.html#Compatibility">Compatibility with the Java Platform</a>,
+for details of compatibility between <samp><span class="command">gcj</span></samp> and the Java Platform.
+
+<!-- Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, -->
+<!-- 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 -->
+<!-- Free Software Foundation, Inc. -->
+<!-- This is part of the GCC manual. -->
+<!-- For copying conditions, see the file gcc.texi. -->
+ </body></html>
+

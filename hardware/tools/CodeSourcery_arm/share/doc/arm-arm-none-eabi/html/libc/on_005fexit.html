@@ -1,0 +1,78 @@
+<html lang="en">
+<head>
+<title>on_exit - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdlib.html#Stdlib" title="Stdlib">
+<link rel="prev" href="mbtowc.html#mbtowc" title="mbtowc">
+<link rel="next" href="qsort.html#qsort" title="qsort">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="on_exit"></a>
+<a name="on_005fexit"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="qsort.html#qsort">qsort</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="mbtowc.html#mbtowc">mbtowc</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdlib.html#Stdlib">Stdlib</a>
+<hr>
+</div>
+
+<h3 class="section">2.30 <code>on_exit</code>&mdash;request execution of function with argument at program exit</h3>
+
+<p><a name="index-on_005fexit-64"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdlib.h&gt;
+     int on_exit (void (*<var>function</var>)(int, void *), void *<var>arg</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+You can use <code>on_exit</code> to enroll functions in a list of functions that
+will be called when your program terminates normally.  The argument is
+a pointer to a user-defined function which takes two arguments.  The
+first is the status code passed to exit and the second argument is of type
+pointer to void.  The function must not return a result.  The value
+of <var>arg</var> is registered and passed as the argument to <var>function</var>.
+
+   <p>The functions are kept in a LIFO stack; that is, the last function
+enrolled by <code>atexit</code> or <code>on_exit</code> will be the first to execute when
+your program exits.  You can intermix functions using <code>atexit</code> and
+<code>on_exit</code>.
+
+   <p>There is no built-in limit to the number of functions you can enroll
+in this list; however, after every group of 32 functions is enrolled,
+<code>atexit</code>/<code>on_exit</code> will call <code>malloc</code> to get space for the next part
+of the list.   The initial list of 32 functions is statically allocated, so
+you can always count on at least that many slots available.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>on_exit</code> returns <code>0</code> if it succeeds in enrolling your function,
+<code>-1</code> if it fails (possible only if no space was available for
+<code>malloc</code> to extend the list of functions).
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>on_exit</code> is a non-standard glibc extension
+
+   <p>Supporting OS subroutines required: None
+
+   <p><br>
+
+   </body></html>
+

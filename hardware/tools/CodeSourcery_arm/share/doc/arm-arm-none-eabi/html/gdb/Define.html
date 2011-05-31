@@ -1,0 +1,135 @@
+<html lang="en">
+<head>
+<title>Define - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Sequences.html#Sequences" title="Sequences">
+<link rel="next" href="Hooks.html#Hooks" title="Hooks">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Define"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Hooks.html#Hooks">Hooks</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Sequences.html#Sequences">Sequences</a>
+<hr>
+</div>
+
+<h4 class="subsection">23.1.1 User-defined Commands</h4>
+
+<p><a name="index-user_002ddefined-command-1531"></a><a name="index-arguments_002c-to-user_002ddefined-commands-1532"></a>A <dfn>user-defined command</dfn> is a sequence of <span class="sc">gdb</span> commands to
+which you assign a new name as a command.  This is done with the
+<code>define</code> command.  User commands may accept up to 10 arguments
+separated by whitespace.  Arguments are accessed within the user command
+via <code>$arg0...$arg9</code>.  A trivial example:
+
+<pre class="smallexample">     define adder
+       print $arg0 + $arg1 + $arg2
+     end
+</pre>
+   <p class="noindent">To execute the command use:
+
+<pre class="smallexample">     adder 1 2 3
+</pre>
+   <p class="noindent">This defines the command <code>adder</code>, which prints the sum of
+its three arguments.  Note the arguments are text substitutions, so they may
+reference variables, use complex expressions, or even perform inferior
+functions calls.
+
+   <p><a name="index-argument-count-in-user_002ddefined-commands-1533"></a><a name="index-how-many-arguments-_0028user_002ddefined-commands_0029-1534"></a>In addition, <code>$argc</code> may be used to find out how many arguments have
+been passed.  This expands to a number in the range 0<small class="dots">...</small>10.
+
+<pre class="smallexample">     define adder
+       if $argc == 2
+         print $arg0 + $arg1
+       end
+       if $argc == 3
+         print $arg0 + $arg1 + $arg2
+       end
+     end
+</pre>
+     
+<a name="index-define-1535"></a>
+<dl><dt><code>define </code><var>commandname</var><dd>Define a command named <var>commandname</var>.  If there is already a command
+by that name, you are asked to confirm that you want to redefine it. 
+<var>commandname</var> may be a bare command name consisting of letters,
+numbers, dashes, and underscores.  It may also start with any predefined
+prefix command.  For example, &lsquo;<samp><span class="samp">define target my-target</span></samp>&rsquo; creates
+a user-defined &lsquo;<samp><span class="samp">target my-target</span></samp>&rsquo; command.
+
+     <p>The definition of the command is made up of other <span class="sc">gdb</span> command lines,
+which are given following the <code>define</code> command.  The end of these
+commands is marked by a line containing <code>end</code>.
+
+     <p><a name="index-document-1536"></a><a name="index-end_0040r_007b-_0028user_002ddefined-commands_0029_007d-1537"></a><br><dt><code>document </code><var>commandname</var><dd>Document the user-defined command <var>commandname</var>, so that it can be
+accessed by <code>help</code>.  The command <var>commandname</var> must already be
+defined.  This command reads lines of documentation just as <code>define</code>
+reads the lines of the command definition, ending with <code>end</code>. 
+After the <code>document</code> command is finished, <code>help</code> on command
+<var>commandname</var> displays the documentation you have written.
+
+     <p>You may use the <code>document</code> command again to change the
+documentation of a command.  Redefining the command with <code>define</code>
+does not change the documentation.
+
+     <p><a name="index-dont_002drepeat-1538"></a><a name="index-don_0027t-repeat-command-1539"></a><br><dt><code>dont-repeat</code><dd>Used inside a user-defined command, this tells <span class="sc">gdb</span> that this
+command should not be repeated when the user hits &lt;RET&gt;
+(see <a href="Command-Syntax.html#Command-Syntax">repeat last command</a>).
+
+     <p><a name="index-help-user_002ddefined-1540"></a><br><dt><code>help user-defined</code><dd>List all user-defined commands, with the first line of the documentation
+(if any) for each.
+
+     <p><a name="index-show-user-1541"></a><br><dt><code>show user</code><dt><code>show user </code><var>commandname</var><dd>Display the <span class="sc">gdb</span> commands used to define <var>commandname</var> (but
+not its documentation).  If no <var>commandname</var> is given, display the
+definitions for all user-defined commands.
+
+     <p><a name="index-infinite-recursion-in-user_002ddefined-commands-1542"></a><a name="index-show-max_002duser_002dcall_002ddepth-1543"></a><a name="index-set-max_002duser_002dcall_002ddepth-1544"></a><br><dt><code>show max-user-call-depth</code><dt><code>set max-user-call-depth</code><dd>The value of <code>max-user-call-depth</code> controls how many recursion
+levels are allowed in user-defined commands before <span class="sc">gdb</span> suspects an
+infinite recursion and aborts the command. 
+</dl>
+
+   <p>In addition to the above commands, user-defined commands frequently
+use control flow commands, described in <a href="Command-Files.html#Command-Files">Command Files</a>.
+
+   <p>When user-defined commands are executed, the
+commands of the definition are not printed.  An error in any command
+stops execution of the user-defined command.
+
+   <p>If used interactively, commands that would ask for confirmation proceed
+without asking when used inside a user-defined command.  Many <span class="sc">gdb</span>
+commands that normally print messages to say what they are doing omit the
+messages when used in a user-defined command.
+
+   </body></html>
+

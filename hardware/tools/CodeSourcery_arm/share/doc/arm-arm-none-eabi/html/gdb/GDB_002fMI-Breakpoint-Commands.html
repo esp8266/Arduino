@@ -1,0 +1,595 @@
+<html lang="en">
+<head>
+<title>GDB/MI Breakpoint Commands - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="GDB_002fMI.html#GDB_002fMI" title="GDB/MI">
+<link rel="prev" href="GDB_002fMI-Command-Description-Format.html#GDB_002fMI-Command-Description-Format" title="GDB/MI Command Description Format">
+<link rel="next" href="GDB_002fMI-Program-Context.html#GDB_002fMI-Program-Context" title="GDB/MI Program Context">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="GDB%2fMI-Breakpoint-Commands"></a>
+<a name="GDB_002fMI-Breakpoint-Commands"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="GDB_002fMI-Program-Context.html#GDB_002fMI-Program-Context">GDB/MI Program Context</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="GDB_002fMI-Command-Description-Format.html#GDB_002fMI-Command-Description-Format">GDB/MI Command Description Format</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="GDB_002fMI.html#GDB_002fMI">GDB/MI</a>
+<hr>
+</div>
+
+<h3 class="section">27.8 <span class="sc">gdb/mi</span> Breakpoint Commands</h3>
+
+<p><a name="index-breakpoint-commands-for-_0040sc_007bgdb_002fmi_007d-2030"></a><a name="index-g_t_0040sc_007bgdb_002fmi_007d_002c-breakpoint-commands-2031"></a>This section documents <span class="sc">gdb/mi</span> commands for manipulating
+breakpoints.
+
+<h4 class="subheading">The <code>-break-after</code> Command</h4>
+
+<p><a name="index-g_t_002dbreak_002dafter-2032"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -break-after <var>number</var> <var>count</var>
+</pre>
+   <p>The breakpoint number <var>number</var> is not in effect until it has been
+hit <var>count</var> times.  To see how this is reflected in the output of
+the &lsquo;<samp><span class="samp">-break-list</span></samp>&rsquo; command, see the description of the
+&lsquo;<samp><span class="samp">-break-list</span></samp>&rsquo; command below.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">ignore</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -break-insert main
+     ^done,bkpt={number="1",type="breakpoint",disp="keep",
+     enabled="y",addr="0x000100d0",func="main",file="hello.c",
+     fullname="/home/foo/hello.c",line="5",times="0"}
+     (gdb)
+     -break-after 1 3
+     ~
+     ^done
+     (gdb)
+     -break-list
+     ^done,BreakpointTable={nr_rows="1",nr_cols="6",
+     hdr=[{width="3",alignment="-1",col_name="number",colhdr="Num"},
+     {width="14",alignment="-1",col_name="type",colhdr="Type"},
+     {width="4",alignment="-1",col_name="disp",colhdr="Disp"},
+     {width="3",alignment="-1",col_name="enabled",colhdr="Enb"},
+     {width="10",alignment="-1",col_name="addr",colhdr="Address"},
+     {width="40",alignment="2",col_name="what",colhdr="What"}],
+     body=[bkpt={number="1",type="breakpoint",disp="keep",enabled="y",
+     addr="0x000100d0",func="main",file="hello.c",fullname="/home/foo/hello.c",
+     line="5",times="0",ignore="3"}]}
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-break-commands</code> Command</h4>
+
+<p><a name="index-g_t_002dbreak_002dcommands-2033"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -break-commands <var>number</var> [ <var>command1</var> ... <var>commandN</var> ]
+</pre>
+   <p>Specifies the CLI commands that should be executed when breakpoint
+<var>number</var> is hit.  The parameters <var>command1</var> to <var>commandN</var>
+are the commands.  If no command is specified, any previously-set
+commands are cleared.  See <a href="Break-Commands.html#Break-Commands">Break Commands</a>.  Typical use of this
+functionality is tracing a program, that is, printing of values of
+some variables whenever breakpoint is hit and then continuing.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">commands</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -break-insert main
+     ^done,bkpt={number="1",type="breakpoint",disp="keep",
+     enabled="y",addr="0x000100d0",func="main",file="hello.c",
+     fullname="/home/foo/hello.c",line="5",times="0"}
+     (gdb)
+     -break-commands 1 "print v" "continue"
+     ^done
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-break-condition</code> Command</h4>
+
+<p><a name="index-g_t_002dbreak_002dcondition-2034"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -break-condition <var>number</var> <var>expr</var>
+</pre>
+   <p>Breakpoint <var>number</var> will stop the program only if the condition in
+<var>expr</var> is true.  The condition becomes part of the
+&lsquo;<samp><span class="samp">-break-list</span></samp>&rsquo; output (see the description of the &lsquo;<samp><span class="samp">-break-list</span></samp>&rsquo;
+command below).
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">condition</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -break-condition 1 1
+     ^done
+     (gdb)
+     -break-list
+     ^done,BreakpointTable={nr_rows="1",nr_cols="6",
+     hdr=[{width="3",alignment="-1",col_name="number",colhdr="Num"},
+     {width="14",alignment="-1",col_name="type",colhdr="Type"},
+     {width="4",alignment="-1",col_name="disp",colhdr="Disp"},
+     {width="3",alignment="-1",col_name="enabled",colhdr="Enb"},
+     {width="10",alignment="-1",col_name="addr",colhdr="Address"},
+     {width="40",alignment="2",col_name="what",colhdr="What"}],
+     body=[bkpt={number="1",type="breakpoint",disp="keep",enabled="y",
+     addr="0x000100d0",func="main",file="hello.c",fullname="/home/foo/hello.c",
+     line="5",cond="1",times="0",ignore="3"}]}
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-break-delete</code> Command</h4>
+
+<p><a name="index-g_t_002dbreak_002ddelete-2035"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -break-delete ( <var>breakpoint</var> )+
+</pre>
+   <p>Delete the breakpoint(s) whose number(s) are specified in the argument
+list.  This is obviously reflected in the breakpoint list.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">delete</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -break-delete 1
+     ^done
+     (gdb)
+     -break-list
+     ^done,BreakpointTable={nr_rows="0",nr_cols="6",
+     hdr=[{width="3",alignment="-1",col_name="number",colhdr="Num"},
+     {width="14",alignment="-1",col_name="type",colhdr="Type"},
+     {width="4",alignment="-1",col_name="disp",colhdr="Disp"},
+     {width="3",alignment="-1",col_name="enabled",colhdr="Enb"},
+     {width="10",alignment="-1",col_name="addr",colhdr="Address"},
+     {width="40",alignment="2",col_name="what",colhdr="What"}],
+     body=[]}
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-break-disable</code> Command</h4>
+
+<p><a name="index-g_t_002dbreak_002ddisable-2036"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -break-disable ( <var>breakpoint</var> )+
+</pre>
+   <p>Disable the named <var>breakpoint</var>(s).  The field &lsquo;<samp><span class="samp">enabled</span></samp>&rsquo; in the
+break list is now set to &lsquo;<samp><span class="samp">n</span></samp>&rsquo; for the named <var>breakpoint</var>(s).
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">disable</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -break-disable 2
+     ^done
+     (gdb)
+     -break-list
+     ^done,BreakpointTable={nr_rows="1",nr_cols="6",
+     hdr=[{width="3",alignment="-1",col_name="number",colhdr="Num"},
+     {width="14",alignment="-1",col_name="type",colhdr="Type"},
+     {width="4",alignment="-1",col_name="disp",colhdr="Disp"},
+     {width="3",alignment="-1",col_name="enabled",colhdr="Enb"},
+     {width="10",alignment="-1",col_name="addr",colhdr="Address"},
+     {width="40",alignment="2",col_name="what",colhdr="What"}],
+     body=[bkpt={number="2",type="breakpoint",disp="keep",enabled="n",
+     addr="0x000100d0",func="main",file="hello.c",fullname="/home/foo/hello.c",
+     line="5",times="0"}]}
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-break-enable</code> Command</h4>
+
+<p><a name="index-g_t_002dbreak_002denable-2037"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -break-enable ( <var>breakpoint</var> )+
+</pre>
+   <p>Enable (previously disabled) <var>breakpoint</var>(s).
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">enable</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -break-enable 2
+     ^done
+     (gdb)
+     -break-list
+     ^done,BreakpointTable={nr_rows="1",nr_cols="6",
+     hdr=[{width="3",alignment="-1",col_name="number",colhdr="Num"},
+     {width="14",alignment="-1",col_name="type",colhdr="Type"},
+     {width="4",alignment="-1",col_name="disp",colhdr="Disp"},
+     {width="3",alignment="-1",col_name="enabled",colhdr="Enb"},
+     {width="10",alignment="-1",col_name="addr",colhdr="Address"},
+     {width="40",alignment="2",col_name="what",colhdr="What"}],
+     body=[bkpt={number="2",type="breakpoint",disp="keep",enabled="y",
+     addr="0x000100d0",func="main",file="hello.c",fullname="/home/foo/hello.c",
+     line="5",times="0"}]}
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-break-info</code> Command</h4>
+
+<p><a name="index-g_t_002dbreak_002dinfo-2038"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -break-info <var>breakpoint</var>
+</pre>
+<!-- REDUNDANT??? -->
+   <p>Get information about a single breakpoint.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">info break </span><var>breakpoint</var></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<p>N.A.
+
+<h4 class="subheading">The <code>-break-insert</code> Command</h4>
+
+<p><a name="index-g_t_002dbreak_002dinsert-2039"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -break-insert [ -t ] [ -h ] [ -f ] [ -d ] [ -a ]
+         [ -c <var>condition</var> ] [ -i <var>ignore-count</var> ]
+         [ -p <var>thread</var> ] [ <var>location</var> ]
+</pre>
+<p class="noindent">If specified, <var>location</var>, can be one of:
+
+     <ul>
+<li>function
+<!-- @item +offset -->
+<!-- @item -offset -->
+<!-- @item linenum -->
+<li>filename:linenum
+<li>filename:function
+<li>*address
+</ul>
+
+   <p>The possible optional parameters of this command are:
+
+     <dl>
+<dt>&lsquo;<samp><span class="samp">-t</span></samp>&rsquo;<dd>Insert a temporary breakpoint. 
+<br><dt>&lsquo;<samp><span class="samp">-h</span></samp>&rsquo;<dd>Insert a hardware breakpoint. 
+<br><dt>&lsquo;<samp><span class="samp">-c </span><var>condition</var></samp>&rsquo;<dd>Make the breakpoint conditional on <var>condition</var>. 
+<br><dt>&lsquo;<samp><span class="samp">-i </span><var>ignore-count</var></samp>&rsquo;<dd>Initialize the <var>ignore-count</var>. 
+<br><dt>&lsquo;<samp><span class="samp">-f</span></samp>&rsquo;<dd>If <var>location</var> cannot be parsed (for example if it
+refers to unknown files or functions), create a pending
+breakpoint. Without this flag, <span class="sc">gdb</span> will report
+an error, and won't create a breakpoint, if <var>location</var>
+cannot be parsed. 
+<br><dt>&lsquo;<samp><span class="samp">-d</span></samp>&rsquo;<dd>Create a disabled breakpoint. 
+<br><dt>&lsquo;<samp><span class="samp">-a</span></samp>&rsquo;<dd>Create a tracepoint.  See <a href="Tracepoints.html#Tracepoints">Tracepoints</a>.  When this parameter
+is used together with &lsquo;<samp><span class="samp">-h</span></samp>&rsquo;, a fast tracepoint is created. 
+</dl>
+
+<h5 class="subsubheading">Result</h5>
+
+<p>The result is in the form:
+
+<pre class="smallexample">     ^done,bkpt={number="<var>number</var>",type="<var>type</var>",disp="del"|"keep",
+     enabled="y"|"n",addr="<var>hex</var>",func="<var>funcname</var>",file="<var>filename</var>",
+     fullname="<var>full_filename</var>",line="<var>lineno</var>",[thread="<var>threadno</var>,]
+     times="<var>times</var>"}
+</pre>
+   <p class="noindent">where <var>number</var> is the <span class="sc">gdb</span> number for this breakpoint,
+<var>funcname</var> is the name of the function where the breakpoint was
+inserted, <var>filename</var> is the name of the source file which contains
+this function, <var>lineno</var> is the source line number within that file
+and <var>times</var> the number of times that the breakpoint has been hit
+(always 0 for -break-insert but may be greater for -break-info or -break-list
+which use the same output).
+
+   <p>Note: this format is open to change. 
+<!-- An out-of-band breakpoint instead of part of the result? -->
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> commands are &lsquo;<samp><span class="samp">break</span></samp>&rsquo;, &lsquo;<samp><span class="samp">tbreak</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">hbreak</span></samp>&rsquo;, &lsquo;<samp><span class="samp">thbreak</span></samp>&rsquo;, and &lsquo;<samp><span class="samp">rbreak</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -break-insert main
+     ^done,bkpt={number="1",addr="0x0001072c",file="recursive2.c",
+     fullname="/home/foo/recursive2.c,line="4",times="0"}
+     (gdb)
+     -break-insert -t foo
+     ^done,bkpt={number="2",addr="0x00010774",file="recursive2.c",
+     fullname="/home/foo/recursive2.c,line="11",times="0"}
+     (gdb)
+     -break-list
+     ^done,BreakpointTable={nr_rows="2",nr_cols="6",
+     hdr=[{width="3",alignment="-1",col_name="number",colhdr="Num"},
+     {width="14",alignment="-1",col_name="type",colhdr="Type"},
+     {width="4",alignment="-1",col_name="disp",colhdr="Disp"},
+     {width="3",alignment="-1",col_name="enabled",colhdr="Enb"},
+     {width="10",alignment="-1",col_name="addr",colhdr="Address"},
+     {width="40",alignment="2",col_name="what",colhdr="What"}],
+     body=[bkpt={number="1",type="breakpoint",disp="keep",enabled="y",
+     addr="0x0001072c", func="main",file="recursive2.c",
+     fullname="/home/foo/recursive2.c,"line="4",times="0"},
+     bkpt={number="2",type="breakpoint",disp="del",enabled="y",
+     addr="0x00010774",func="foo",file="recursive2.c",
+     fullname="/home/foo/recursive2.c",line="11",times="0"}]}
+     (gdb)
+     -break-insert -r foo.*
+     ~int foo(int, int);
+     ^done,bkpt={number="3",addr="0x00010774",file="recursive2.c,
+     "fullname="/home/foo/recursive2.c",line="11",times="0"}
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-break-list</code> Command</h4>
+
+<p><a name="index-g_t_002dbreak_002dlist-2040"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -break-list
+</pre>
+   <p>Displays the list of inserted breakpoints, showing the following fields:
+
+     <dl>
+<dt>&lsquo;<samp><span class="samp">Number</span></samp>&rsquo;<dd>number of the breakpoint
+<br><dt>&lsquo;<samp><span class="samp">Type</span></samp>&rsquo;<dd>type of the breakpoint: &lsquo;<samp><span class="samp">breakpoint</span></samp>&rsquo; or &lsquo;<samp><span class="samp">watchpoint</span></samp>&rsquo;
+<br><dt>&lsquo;<samp><span class="samp">Disposition</span></samp>&rsquo;<dd>should the breakpoint be deleted or disabled when it is hit: &lsquo;<samp><span class="samp">keep</span></samp>&rsquo;
+or &lsquo;<samp><span class="samp">nokeep</span></samp>&rsquo;
+<br><dt>&lsquo;<samp><span class="samp">Enabled</span></samp>&rsquo;<dd>is the breakpoint enabled or no: &lsquo;<samp><span class="samp">y</span></samp>&rsquo; or &lsquo;<samp><span class="samp">n</span></samp>&rsquo;
+<br><dt>&lsquo;<samp><span class="samp">Address</span></samp>&rsquo;<dd>memory location at which the breakpoint is set
+<br><dt>&lsquo;<samp><span class="samp">What</span></samp>&rsquo;<dd>logical location of the breakpoint, expressed by function name, file
+name, line number
+<br><dt>&lsquo;<samp><span class="samp">Times</span></samp>&rsquo;<dd>number of times the breakpoint has been hit
+</dl>
+
+   <p>If there are no breakpoints or watchpoints, the <code>BreakpointTable</code>
+<code>body</code> field is an empty list.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">info break</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -break-list
+     ^done,BreakpointTable={nr_rows="2",nr_cols="6",
+     hdr=[{width="3",alignment="-1",col_name="number",colhdr="Num"},
+     {width="14",alignment="-1",col_name="type",colhdr="Type"},
+     {width="4",alignment="-1",col_name="disp",colhdr="Disp"},
+     {width="3",alignment="-1",col_name="enabled",colhdr="Enb"},
+     {width="10",alignment="-1",col_name="addr",colhdr="Address"},
+     {width="40",alignment="2",col_name="what",colhdr="What"}],
+     body=[bkpt={number="1",type="breakpoint",disp="keep",enabled="y",
+     addr="0x000100d0",func="main",file="hello.c",line="5",times="0"},
+     bkpt={number="2",type="breakpoint",disp="keep",enabled="y",
+     addr="0x00010114",func="foo",file="hello.c",fullname="/home/foo/hello.c",
+     line="13",times="0"}]}
+     (gdb)
+</pre>
+   <p>Here's an example of the result when there are no breakpoints:
+
+<pre class="smallexample">     (gdb)
+     -break-list
+     ^done,BreakpointTable={nr_rows="0",nr_cols="6",
+     hdr=[{width="3",alignment="-1",col_name="number",colhdr="Num"},
+     {width="14",alignment="-1",col_name="type",colhdr="Type"},
+     {width="4",alignment="-1",col_name="disp",colhdr="Disp"},
+     {width="3",alignment="-1",col_name="enabled",colhdr="Enb"},
+     {width="10",alignment="-1",col_name="addr",colhdr="Address"},
+     {width="40",alignment="2",col_name="what",colhdr="What"}],
+     body=[]}
+     (gdb)
+</pre>
+   <h4 class="subheading">The <code>-break-passcount</code> Command</h4>
+
+<p><a name="index-g_t_002dbreak_002dpasscount-2041"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -break-passcount <var>tracepoint-number</var> <var>passcount</var>
+</pre>
+   <p>Set the passcount for tracepoint <var>tracepoint-number</var> to
+<var>passcount</var>.  If the breakpoint referred to by <var>tracepoint-number</var>
+is not a tracepoint, error is emitted.  This corresponds to CLI
+command &lsquo;<samp><span class="samp">passcount</span></samp>&rsquo;.
+
+<h4 class="subheading">The <code>-break-watch</code> Command</h4>
+
+<p><a name="index-g_t_002dbreak_002dwatch-2042"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -break-watch [ -a | -r ]
+</pre>
+   <p>Create a watchpoint.  With the &lsquo;<samp><span class="samp">-a</span></samp>&rsquo; option it will create an
+<dfn>access</dfn> watchpoint, i.e., a watchpoint that triggers either on a
+read from or on a write to the memory location.  With the &lsquo;<samp><span class="samp">-r</span></samp>&rsquo;
+option, the watchpoint created is a <dfn>read</dfn> watchpoint, i.e., it will
+trigger only when the memory location is accessed for reading.  Without
+either of the options, the watchpoint created is a regular watchpoint,
+i.e., it will trigger when the memory location is accessed for writing. 
+See <a href="Set-Watchpoints.html#Set-Watchpoints">Setting Watchpoints</a>.
+
+   <p>Note that &lsquo;<samp><span class="samp">-break-list</span></samp>&rsquo; will report a single list of watchpoints and
+breakpoints inserted.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> commands are &lsquo;<samp><span class="samp">watch</span></samp>&rsquo;, &lsquo;<samp><span class="samp">awatch</span></samp>&rsquo;, and
+&lsquo;<samp><span class="samp">rwatch</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<p>Setting a watchpoint on a variable in the <code>main</code> function:
+
+<pre class="smallexample">     (gdb)
+     -break-watch x
+     ^done,wpt={number="2",exp="x"}
+     (gdb)
+     -exec-continue
+     ^running
+     (gdb)
+     *stopped,reason="watchpoint-trigger",wpt={number="2",exp="x"},
+     value={old="-268439212",new="55"},
+     frame={func="main",args=[],file="recursive2.c",
+     fullname="/home/foo/bar/recursive2.c",line="5"}
+     (gdb)
+</pre>
+   <p>Setting a watchpoint on a variable local to a function.  <span class="sc">gdb</span> will stop
+the program execution twice: first for the variable changing value, then
+for the watchpoint going out of scope.
+
+<pre class="smallexample">     (gdb)
+     -break-watch C
+     ^done,wpt={number="5",exp="C"}
+     (gdb)
+     -exec-continue
+     ^running
+     (gdb)
+     *stopped,reason="watchpoint-trigger",
+     wpt={number="5",exp="C"},value={old="-276895068",new="3"},
+     frame={func="callee4",args=[],
+     file="../../../devo/gdb/testsuite/gdb.mi/basics.c",
+     fullname="/home/foo/bar/devo/gdb/testsuite/gdb.mi/basics.c",line="13"}
+     (gdb)
+     -exec-continue
+     ^running
+     (gdb)
+     *stopped,reason="watchpoint-scope",wpnum="5",
+     frame={func="callee3",args=[{name="strarg",
+     value="0x11940 \"A string argument.\""}],
+     file="../../../devo/gdb/testsuite/gdb.mi/basics.c",
+     fullname="/home/foo/bar/devo/gdb/testsuite/gdb.mi/basics.c",line="18"}
+     (gdb)
+</pre>
+   <p>Listing breakpoints and watchpoints, at different points in the program
+execution.  Note that once the watchpoint goes out of scope, it is
+deleted.
+
+<pre class="smallexample">     (gdb)
+     -break-watch C
+     ^done,wpt={number="2",exp="C"}
+     (gdb)
+     -break-list
+     ^done,BreakpointTable={nr_rows="2",nr_cols="6",
+     hdr=[{width="3",alignment="-1",col_name="number",colhdr="Num"},
+     {width="14",alignment="-1",col_name="type",colhdr="Type"},
+     {width="4",alignment="-1",col_name="disp",colhdr="Disp"},
+     {width="3",alignment="-1",col_name="enabled",colhdr="Enb"},
+     {width="10",alignment="-1",col_name="addr",colhdr="Address"},
+     {width="40",alignment="2",col_name="what",colhdr="What"}],
+     body=[bkpt={number="1",type="breakpoint",disp="keep",enabled="y",
+     addr="0x00010734",func="callee4",
+     file="../../../devo/gdb/testsuite/gdb.mi/basics.c",
+     fullname="/home/foo/devo/gdb/testsuite/gdb.mi/basics.c"line="8",times="1"},
+     bkpt={number="2",type="watchpoint",disp="keep",
+     enabled="y",addr="",what="C",times="0"}]}
+     (gdb)
+     -exec-continue
+     ^running
+     (gdb)
+     *stopped,reason="watchpoint-trigger",wpt={number="2",exp="C"},
+     value={old="-276895068",new="3"},
+     frame={func="callee4",args=[],
+     file="../../../devo/gdb/testsuite/gdb.mi/basics.c",
+     fullname="/home/foo/bar/devo/gdb/testsuite/gdb.mi/basics.c",line="13"}
+     (gdb)
+     -break-list
+     ^done,BreakpointTable={nr_rows="2",nr_cols="6",
+     hdr=[{width="3",alignment="-1",col_name="number",colhdr="Num"},
+     {width="14",alignment="-1",col_name="type",colhdr="Type"},
+     {width="4",alignment="-1",col_name="disp",colhdr="Disp"},
+     {width="3",alignment="-1",col_name="enabled",colhdr="Enb"},
+     {width="10",alignment="-1",col_name="addr",colhdr="Address"},
+     {width="40",alignment="2",col_name="what",colhdr="What"}],
+     body=[bkpt={number="1",type="breakpoint",disp="keep",enabled="y",
+     addr="0x00010734",func="callee4",
+     file="../../../devo/gdb/testsuite/gdb.mi/basics.c",
+     fullname="/home/foo/devo/gdb/testsuite/gdb.mi/basics.c",line="8",times="1"},
+     bkpt={number="2",type="watchpoint",disp="keep",
+     enabled="y",addr="",what="C",times="-5"}]}
+     (gdb)
+     -exec-continue
+     ^running
+     ^done,reason="watchpoint-scope",wpnum="2",
+     frame={func="callee3",args=[{name="strarg",
+     value="0x11940 \"A string argument.\""}],
+     file="../../../devo/gdb/testsuite/gdb.mi/basics.c",
+     fullname="/home/foo/bar/devo/gdb/testsuite/gdb.mi/basics.c",line="18"}
+     (gdb)
+     -break-list
+     ^done,BreakpointTable={nr_rows="1",nr_cols="6",
+     hdr=[{width="3",alignment="-1",col_name="number",colhdr="Num"},
+     {width="14",alignment="-1",col_name="type",colhdr="Type"},
+     {width="4",alignment="-1",col_name="disp",colhdr="Disp"},
+     {width="3",alignment="-1",col_name="enabled",colhdr="Enb"},
+     {width="10",alignment="-1",col_name="addr",colhdr="Address"},
+     {width="40",alignment="2",col_name="what",colhdr="What"}],
+     body=[bkpt={number="1",type="breakpoint",disp="keep",enabled="y",
+     addr="0x00010734",func="callee4",
+     file="../../../devo/gdb/testsuite/gdb.mi/basics.c",
+     fullname="/home/foo/devo/gdb/testsuite/gdb.mi/basics.c",line="8",
+     times="1"}]}
+     (gdb)
+</pre>
+   <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%% SECTION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+   </body></html>
+

@@ -1,0 +1,170 @@
+<html lang="en">
+<head>
+<title>Nested Functions - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Labels-as-Values.html#Labels-as-Values" title="Labels as Values">
+<link rel="next" href="Constructing-Calls.html#Constructing-Calls" title="Constructing Calls">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Nested-Functions"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Constructing-Calls.html#Constructing-Calls">Constructing Calls</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Labels-as-Values.html#Labels-as-Values">Labels as Values</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.4 Nested Functions</h3>
+
+<p><a name="index-nested-functions-2191"></a><a name="index-downward-funargs-2192"></a><a name="index-thunks-2193"></a>
+A <dfn>nested function</dfn> is a function defined inside another function. 
+(Nested functions are not supported for GNU C++.)  The nested function's
+name is local to the block where it is defined.  For example, here we
+define a nested function named <code>square</code>, and call it twice:
+
+<pre class="smallexample">     foo (double a, double b)
+     {
+       double square (double z) { return z * z; }
+     
+       return square (a) + square (b);
+     }
+</pre>
+ <p>The nested function can access all the variables of the containing
+function that are visible at the point of its definition.  This is
+called <dfn>lexical scoping</dfn>.  For example, here we show a nested
+function which uses an inherited variable named <code>offset</code>:
+
+<pre class="smallexample">     bar (int *array, int offset, int size)
+     {
+       int access (int *array, int index)
+         { return array[index + offset]; }
+       int i;
+       /* <span class="roman">...</span> */
+       for (i = 0; i &lt; size; i++)
+         /* <span class="roman">...</span> */ access (array, i) /* <span class="roman">...</span> */
+     }
+</pre>
+ <p>Nested function definitions are permitted within functions in the places
+where variable definitions are allowed; that is, in any block, mixed
+with the other declarations and statements in the block.
+
+ <p>It is possible to call the nested function from outside the scope of its
+name by storing its address or passing the address to another function:
+
+<pre class="smallexample">     hack (int *array, int size)
+     {
+       void store (int index, int value)
+         { array[index] = value; }
+     
+       intermediate (store, size);
+     }
+</pre>
+ <p>Here, the function <code>intermediate</code> receives the address of
+<code>store</code> as an argument.  If <code>intermediate</code> calls <code>store</code>,
+the arguments given to <code>store</code> are used to store into <code>array</code>. 
+But this technique works only so long as the containing function
+(<code>hack</code>, in this example) does not exit.
+
+ <p>If you try to call the nested function through its address after the
+containing function has exited, all hell will break loose.  If you try
+to call it after a containing scope level has exited, and if it refers
+to some of the variables that are no longer in scope, you may be lucky,
+but it's not wise to take the risk.  If, however, the nested function
+does not refer to anything that has gone out of scope, you should be
+safe.
+
+ <p>GCC implements taking the address of a nested function using a technique
+called <dfn>trampolines</dfn>.  This technique was described in
+<cite>Lexical Closures for C++</cite> (Thomas M. Breuel, USENIX
+C++ Conference Proceedings, October 17-21, 1988).
+
+ <p>A nested function can jump to a label inherited from a containing
+function, provided the label was explicitly declared in the containing
+function (see <a href="Local-Labels.html#Local-Labels">Local Labels</a>).  Such a jump returns instantly to the
+containing function, exiting the nested function which did the
+<code>goto</code> and any intermediate functions as well.  Here is an example:
+
+<pre class="smallexample">     bar (int *array, int offset, int size)
+     {
+       __label__ failure;
+       int access (int *array, int index)
+         {
+           if (index &gt; size)
+             goto failure;
+           return array[index + offset];
+         }
+       int i;
+       /* <span class="roman">...</span> */
+       for (i = 0; i &lt; size; i++)
+         /* <span class="roman">...</span> */ access (array, i) /* <span class="roman">...</span> */
+       /* <span class="roman">...</span> */
+       return 0;
+     
+      /* <span class="roman">Control comes here from </span><code>access</code><span class="roman">
+         if it detects an error.</span>  */
+      failure:
+       return -1;
+     }
+</pre>
+ <p>A nested function always has no linkage.  Declaring one with
+<code>extern</code> or <code>static</code> is erroneous.  If you need to declare the nested function
+before its definition, use <code>auto</code> (which is otherwise meaningless
+for function declarations).
+
+<pre class="smallexample">     bar (int *array, int offset, int size)
+     {
+       __label__ failure;
+       auto int access (int *, int);
+       /* <span class="roman">...</span> */
+       int access (int *array, int index)
+         {
+           if (index &gt; size)
+             goto failure;
+           return array[index + offset];
+         }
+       /* <span class="roman">...</span> */
+     }
+</pre>
+ </body></html>
+

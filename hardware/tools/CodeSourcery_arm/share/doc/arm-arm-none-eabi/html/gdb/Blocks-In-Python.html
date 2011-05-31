@@ -1,0 +1,103 @@
+<html lang="en">
+<head>
+<title>Blocks In Python - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Python-API.html#Python-API" title="Python API">
+<link rel="prev" href="Frames-In-Python.html#Frames-In-Python" title="Frames In Python">
+<link rel="next" href="Symbols-In-Python.html#Symbols-In-Python" title="Symbols In Python">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Blocks-In-Python"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Symbols-In-Python.html#Symbols-In-Python">Symbols In Python</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Frames-In-Python.html#Frames-In-Python">Frames In Python</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Python-API.html#Python-API">Python API</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">23.2.2.16 Accessing frame blocks from Python.</h5>
+
+<p><a name="index-blocks-in-python-1833"></a><a name="index-gdb_002eBlock-1834"></a>
+Within each frame, <span class="sc">gdb</span> maintains information on each block
+stored in that frame.  These blocks are organized hierarchically, and
+are represented individually in Python as a <code>gdb.Block</code>. 
+Please see <a href="Frames-In-Python.html#Frames-In-Python">Frames In Python</a>, for a more in-depth discussion on
+frames.  Furthermore, see <a href="Stack.html#Stack">Examining the Stack</a>, for more
+detailed technical information on <span class="sc">gdb</span>'s book-keeping of the
+stack.
+
+   <p>The following block-related functions are available in the <code>gdb</code>
+module:
+
+   <p><a name="index-gdb_002eblock_005ffor_005fpc-1835"></a>
+
+<div class="defun">
+&mdash; Function: <b>block_for_pc</b><var> pc<a name="index-block_005ffor_005fpc-1836"></a></var><br>
+<blockquote><p>Return the <code>gdb.Block</code> containing the given <var>pc</var> value.  If the
+block cannot be found for the <var>pc</var> value specified, the function
+will return <code>None</code>. 
+</p></blockquote></div>
+
+   <p>A <code>gdb.Block</code> object has the following attributes:
+
+     <dl>
+
+     <div class="defun">
+&mdash; Instance Variable of Block: <b>start</b><var><a name="index-start-1837"></a></var><br>
+<blockquote> <p>The start address of the block.  This attribute is not writable. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Instance Variable of Block: <b>end</b><var><a name="index-end-1838"></a></var><br>
+<blockquote> <p>The end address of the block.  This attribute is not writable. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Instance Variable of Block: <b>function</b><var><a name="index-function-1839"></a></var><br>
+<blockquote> <p>The name of the block represented as a <code>gdb.Symbol</code>.  If the
+block is not named, then this attribute holds <code>None</code>.  This
+attribute is not writable. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Instance Variable of Block: <b>superblock</b><var><a name="index-superblock-1840"></a></var><br>
+<blockquote> <p>The block containing this block.  If this parent block does not exist,
+this attribute holds <code>None</code>.  This attribute is not writable. 
+</p></blockquote></div>
+     </dl>
+
+   </body></html>
+

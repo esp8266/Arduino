@@ -1,0 +1,102 @@
+<html lang="en">
+<head>
+<title>tmpnam - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="tmpfile.html#tmpfile" title="tmpfile">
+<link rel="next" href="ungetc.html#ungetc" title="ungetc">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="tmpnam"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="ungetc.html#ungetc">ungetc</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="tmpfile.html#tmpfile">tmpfile</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.65 <code>tmpnam</code>, <code>tempnam</code>&mdash;name for a temporary file</h3>
+
+<p><a name="index-tmpnam-316"></a><a name="index-tempnam-317"></a><a name="index-g_t_005ftmpnam_005fr-318"></a><a name="index-g_t_005ftempnam_005fr-319"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     char *tmpnam(char *<var>s</var>);
+     char *tempnam(char *<var>dir</var>, char *<var>pfx</var>);
+     char *_tmpnam_r(struct _reent *<var>reent</var>, char *<var>s</var>);
+     char *_tempnam_r(struct _reent *<var>reent</var>, char *<var>dir</var>, char *<var>pfx</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+Use either of these functions to generate a name for a temporary file. 
+The generated name is guaranteed to avoid collision with other files
+(for up to <code>TMP_MAX</code> calls of either function).
+
+   <p><code>tmpnam</code> generates file names with the value of <code>P_tmpdir</code>
+(defined in `<code>stdio.h</code>') as the leading directory component of the path.
+
+   <p>You can use the <code>tmpnam</code> argument <var>s</var> to specify a suitable area
+of memory for the generated filename; otherwise, you can call
+<code>tmpnam(NULL)</code> to use an internal static buffer.
+
+   <p><code>tempnam</code> allows you more control over the generated filename: you
+can use the argument <var>dir</var> to specify the path to a directory for
+temporary files, and you can use the argument <var>pfx</var> to specify a
+prefix for the base filename.
+
+   <p>If <var>dir</var> is <code>NULL</code>, <code>tempnam</code> will attempt to use the value of
+environment variable <code>TMPDIR</code> instead; if there is no such value,
+<code>tempnam</code> uses the value of <code>P_tmpdir</code> (defined in `<code>stdio.h</code>').
+
+   <p>If you don't need any particular prefix to the basename of temporary
+files, you can pass <code>NULL</code> as the <var>pfx</var> argument to <code>tempnam</code>.
+
+   <p><code>_tmpnam_r</code> and <code>_tempnam_r</code> are reentrant versions of <code>tmpnam</code>
+and <code>tempnam</code> respectively.  The extra argument <var>reent</var> is a
+pointer to a reentrancy structure.
+
+   <p><br>
+<strong>Warnings</strong><br>
+The generated filenames are suitable for temporary files, but do not
+in themselves make files temporary.  Files with these names must still
+be explicitly removed when you no longer want them.
+
+   <p>If you supply your own data area <var>s</var> for <code>tmpnam</code>, you must ensure
+that it has room for at least <code>L_tmpnam</code> elements of type <code>char</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+Both <code>tmpnam</code> and <code>tempnam</code> return a pointer to the newly
+generated filename.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C requires <code>tmpnam</code>, but does not specify the use of
+<code>P_tmpdir</code>.  The System V Interface Definition (Issue 2) requires
+both <code>tmpnam</code> and <code>tempnam</code>.
+
+   <p>Supporting OS subroutines required: <code>close</code>,  <code>fstat</code>, <code>getpid</code>,
+<code>isatty</code>, <code>lseek</code>, <code>open</code>, <code>read</code>, <code>sbrk</code>, <code>write</code>.
+
+   <p>The global pointer <code>environ</code> is also required.
+
+   <p><br>
+
+   </body></html>
+

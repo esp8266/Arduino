@@ -1,0 +1,70 @@
+<html lang="en">
+<head>
+<title>abort - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdlib.html#Stdlib" title="Stdlib">
+<link rel="prev" href="a64l.html#a64l" title="a64l">
+<link rel="next" href="abs.html#abs" title="abs">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="abort"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="abs.html#abs">abs</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="a64l.html#a64l">a64l</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdlib.html#Stdlib">Stdlib</a>
+<hr>
+</div>
+
+<h3 class="section">2.3 <code>abort</code>&mdash;abnormal termination of a program</h3>
+
+<p><a name="index-abort-4"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdlib.h&gt;
+     void abort(void);
+     
+</pre>
+   <p><strong>Description</strong><br>
+Use <code>abort</code> to signal that your program has detected a condition it
+cannot deal with.  Normally, <code>abort</code> ends your program's execution.
+
+   <p>Before terminating your program, <code>abort</code> raises the exception <code>SIGABRT</code>
+(using `<code>raise(SIGABRT)</code>').  If you have used <code>signal</code> to register
+an exception handler for this condition, that handler has the
+opportunity to retain control, thereby avoiding program termination.
+
+   <p>In this implementation, <code>abort</code> does not perform any stream- or
+file-related cleanup (the host environment may do so; if not, you can
+arrange for your program to do its own cleanup with a <code>SIGABRT</code>
+exception handler).
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>abort</code> does not return to its caller.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C requires <code>abort</code>.
+
+   <p>Supporting OS subroutines required: <code>_exit</code> and optionally, <code>write</code>.
+
+   <p><br>
+
+   </body></html>
+

@@ -1,0 +1,143 @@
+<html lang="en">
+<head>
+<title>M2 Operators - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Modula_002d2.html#Modula_002d2" title="Modula-2">
+<link rel="next" href="Built_002dIn-Func_002fProc.html#Built_002dIn-Func_002fProc" title="Built-In Func/Proc">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="M2-Operators"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Built_002dIn-Func_002fProc.html#Built_002dIn-Func_002fProc">Built-In Func/Proc</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Modula_002d2.html#Modula_002d2">Modula-2</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">15.4.6.1 Operators</h5>
+
+<p><a name="index-Modula_002d2-operators-846"></a>
+Operators must be defined on values of specific types.  For instance,
+<code>+</code> is defined on numbers, but not on structures.  Operators are
+often defined on groups of types.  For the purposes of Modula-2, the
+following definitions hold:
+
+     <ul>
+<li><em>Integral types</em> consist of <code>INTEGER</code>, <code>CARDINAL</code>, and
+their subranges.
+
+     <li><em>Character types</em> consist of <code>CHAR</code> and its subranges.
+
+     <li><em>Floating-point types</em> consist of <code>REAL</code>.
+
+     <li><em>Pointer types</em> consist of anything declared as <code>POINTER TO
+</code><var>type</var>.
+
+     <li><em>Scalar types</em> consist of all of the above.
+
+     <li><em>Set types</em> consist of <code>SET</code> and <code>BITSET</code> types.
+
+     <li><em>Boolean types</em> consist of <code>BOOLEAN</code>. 
+</ul>
+
+<p class="noindent">The following operators are supported, and appear in order of
+increasing precedence:
+
+     <dl>
+<dt><code>,</code><dd>Function argument or array index separator.
+
+     <br><dt><code>:=</code><dd>Assignment.  The value of <var>var</var> <code>:=</code> <var>value</var> is
+<var>value</var>.
+
+     <br><dt><code>&lt;</code><span class="roman">, </span><code>&gt;</code><dd>Less than, greater than on integral, floating-point, or enumerated
+types.
+
+     <br><dt><code>&lt;=</code><span class="roman">, </span><code>&gt;=</code><dd>Less than or equal to, greater than or equal to
+on integral, floating-point and enumerated types, or set inclusion on
+set types.  Same precedence as <code>&lt;</code>.
+
+     <br><dt><code>=</code><span class="roman">, </span><code>&lt;&gt;</code><span class="roman">, </span><code>#</code><dd>Equality and two ways of expressing inequality, valid on scalar types. 
+Same precedence as <code>&lt;</code>.  In <span class="sc">gdb</span> scripts, only <code>&lt;&gt;</code> is
+available for inequality, since <code>#</code> conflicts with the script
+comment character.
+
+     <br><dt><code>IN</code><dd>Set membership.  Defined on set types and the types of their members. 
+Same precedence as <code>&lt;</code>.
+
+     <br><dt><code>OR</code><dd>Boolean disjunction.  Defined on boolean types.
+
+     <br><dt><code>AND</code><span class="roman">, </span><code>&amp;</code><dd>Boolean conjunction.  Defined on boolean types.
+
+     <br><dt><code>@</code><dd>The <span class="sc">gdb</span> &ldquo;artificial array&rdquo; operator (see <a href="Expressions.html#Expressions">Expressions</a>).
+
+     <br><dt><code>+</code><span class="roman">, </span><code>-</code><dd>Addition and subtraction on integral and floating-point types, or union
+and difference on set types.
+
+     <br><dt><code>*</code><dd>Multiplication on integral and floating-point types, or set intersection
+on set types.
+
+     <br><dt><code>/</code><dd>Division on floating-point types, or symmetric set difference on set
+types.  Same precedence as <code>*</code>.
+
+     <br><dt><code>DIV</code><span class="roman">, </span><code>MOD</code><dd>Integer division and remainder.  Defined on integral types.  Same
+precedence as <code>*</code>.
+
+     <br><dt><code>-</code><dd>Negative.  Defined on <code>INTEGER</code> and <code>REAL</code> data.
+
+     <br><dt><code>^</code><dd>Pointer dereferencing.  Defined on pointer types.
+
+     <br><dt><code>NOT</code><dd>Boolean negation.  Defined on boolean types.  Same precedence as
+<code>^</code>.
+
+     <br><dt><code>.</code><dd><code>RECORD</code> field selector.  Defined on <code>RECORD</code> data.  Same
+precedence as <code>^</code>.
+
+     <br><dt><code>[]</code><dd>Array indexing.  Defined on <code>ARRAY</code> data.  Same precedence as <code>^</code>.
+
+     <br><dt><code>()</code><dd>Procedure argument list.  Defined on <code>PROCEDURE</code> objects.  Same precedence
+as <code>^</code>.
+
+     <br><dt><code>::</code><span class="roman">, </span><code>.</code><dd><span class="sc">gdb</span> and Modula-2 scope operators. 
+</dl>
+
+   <blockquote>
+<em>Warning:</em> Set expressions and their operations are not yet supported, so <span class="sc">gdb</span>
+treats the use of the operator <code>IN</code>, or the use of operators
+<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>=</code>, , <code>&lt;&gt;</code>, <code>#</code>,
+<code>&lt;=</code>, and <code>&gt;=</code> on sets as an error. 
+</blockquote>
+
+   </body></html>
+

@@ -1,0 +1,146 @@
+<html lang="en">
+<head>
+<title>M68K-Branch - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="M68K_002dopcodes.html#M68K_002dopcodes" title="M68K-opcodes">
+<link rel="next" href="M68K_002dChars.html#M68K_002dChars" title="M68K-Chars">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="M68K-Branch"></a>
+<a name="M68K_002dBranch"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="M68K_002dChars.html#M68K_002dChars">M68K-Chars</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="M68K_002dopcodes.html#M68K_002dopcodes">M68K-opcodes</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">9.21.6.1 Branch Improvement</h5>
+
+<p><a name="index-pseudo_002dopcodes_002c-M680x0-1188"></a><a name="index-M680x0-pseudo_002dopcodes-1189"></a><a name="index-branch-improvement_002c-M680x0-1190"></a><a name="index-M680x0-branch-improvement-1191"></a>Certain pseudo opcodes are permitted for branch instructions. 
+They expand to the shortest branch instruction that reach the
+target.  Generally these mnemonics are made by substituting &lsquo;<samp><span class="samp">j</span></samp>&rsquo; for
+&lsquo;<samp><span class="samp">b</span></samp>&rsquo; at the start of a Motorola mnemonic.
+
+   <p>The following table summarizes the pseudo-operations.  A <code>*</code> flags
+cases that are more fully described after the table:
+
+<pre class="smallexample">               Displacement
+               +------------------------------------------------------------
+               |                68020           68000/10, not PC-relative OK
+     Pseudo-Op |BYTE    WORD    LONG            ABSOLUTE LONG JUMP    **
+               +------------------------------------------------------------
+          jbsr |bsrs    bsrw    bsrl            jsr
+           jra |bras    braw    bral            jmp
+     *     jXX |bXXs    bXXw    bXXl            bNXs;jmp
+     *    dbXX | N/A    dbXXw   dbXX;bras;bral  dbXX;bras;jmp
+          fjXX | N/A    fbXXw   fbXXl            N/A
+     
+     XX: condition
+     NX: negative of condition XX
+     
+</pre>
+   <div align="center"><code>*</code>&mdash;see full description below</div>
+<div align="center"><code>**</code>&mdash;this expansion mode is disallowed by &lsquo;<samp><span class="samp">--pcrel</span></samp>&rsquo;</div>
+
+     <dl>
+<dt><code>jbsr</code><dt><code>jra</code><dd>These are the simplest jump pseudo-operations; they always map to one
+particular machine instruction, depending on the displacement to the
+branch target.  This instruction will be a byte or word branch is that
+is sufficient.  Otherwise, a long branch will be emitted if available. 
+If no long branches are available and the &lsquo;<samp><span class="samp">--pcrel</span></samp>&rsquo; option is not
+given, an absolute long jump will be emitted instead.  If no long
+branches are available, the &lsquo;<samp><span class="samp">--pcrel</span></samp>&rsquo; option is given, and a word
+branch cannot reach the target, an error message is generated.
+
+     <p>In addition to standard branch operands, <code>as</code> allows these
+pseudo-operations to have all operands that are allowed for jsr and jmp,
+substituting these instructions if the operand given is not valid for a
+branch instruction.
+
+     <br><dt><code>j</code><var>XX</var><dd>Here, &lsquo;<samp><span class="samp">j</span><var>XX</var></samp>&rsquo; stands for an entire family of pseudo-operations,
+where <var>XX</var> is a conditional branch or condition-code test.  The full
+list of pseudo-ops in this family is:
+     <pre class="smallexample">           jhi   jls   jcc   jcs   jne   jeq   jvc
+           jvs   jpl   jmi   jge   jlt   jgt   jle
+</pre>
+     <p>Usually, each of these pseudo-operations expands to a single branch
+instruction.  However, if a word branch is not sufficient, no long branches
+are available, and the &lsquo;<samp><span class="samp">--pcrel</span></samp>&rsquo; option is not given, <code>as</code>
+issues a longer code fragment in terms of <var>NX</var>, the opposite condition
+to <var>XX</var>.  For example, under these conditions:
+     <pre class="smallexample">              j<var>XX</var> foo
+</pre>
+     <p>gives
+     <pre class="smallexample">               b<var>NX</var>s oof
+               jmp foo
+           oof:
+</pre>
+     <br><dt><code>db</code><var>XX</var><dd>The full family of pseudo-operations covered here is
+     <pre class="smallexample">           dbhi   dbls   dbcc   dbcs   dbne   dbeq   dbvc
+           dbvs   dbpl   dbmi   dbge   dblt   dbgt   dble
+           dbf    dbra   dbt
+</pre>
+     <p>Motorola &lsquo;<samp><span class="samp">db</span><var>XX</var></samp>&rsquo; instructions allow word displacements only.  When
+a word displacement is sufficient, each of these pseudo-operations expands
+to the corresponding Motorola instruction.  When a word displacement is not
+sufficient and long branches are available, when the source reads
+&lsquo;<samp><span class="samp">db</span><var>XX</var><span class="samp"> foo</span></samp>&rsquo;, <code>as</code> emits
+     <pre class="smallexample">               db<var>XX</var> oo1
+               bras oo2
+           oo1:bral foo
+           oo2:
+</pre>
+     <p>If, however, long branches are not available and the &lsquo;<samp><span class="samp">--pcrel</span></samp>&rsquo; option is
+not given, <code>as</code> emits
+     <pre class="smallexample">               db<var>XX</var> oo1
+               bras oo2
+           oo1:jmp foo
+           oo2:
+</pre>
+     <br><dt><code>fj</code><var>XX</var><dd>This family includes
+     <pre class="smallexample">           fjne   fjeq   fjge   fjlt   fjgt   fjle   fjf
+           fjt    fjgl   fjgle  fjnge  fjngl  fjngle fjngt
+           fjnle  fjnlt  fjoge  fjogl  fjogt  fjole  fjolt
+           fjor   fjseq  fjsf   fjsne  fjst   fjueq  fjuge
+           fjugt  fjule  fjult  fjun
+</pre>
+     <p>Each of these pseudo-operations always expands to a single Motorola
+coprocessor branch instruction, word or long.  All Motorola coprocessor
+branch instructions allow both word and long displacements.
+
+   </dl>
+
+   </body></html>
+

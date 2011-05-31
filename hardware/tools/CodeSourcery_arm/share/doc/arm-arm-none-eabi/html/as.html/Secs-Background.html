@@ -1,0 +1,157 @@
+<html lang="en">
+<head>
+<title>Secs Background - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Sections.html#Sections" title="Sections">
+<link rel="next" href="Ld-Sections.html#Ld-Sections" title="Ld Sections">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Secs-Background"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Ld-Sections.html#Ld-Sections">Ld Sections</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Sections.html#Sections">Sections</a>
+<hr>
+</div>
+
+<h3 class="section">4.1 Background</h3>
+
+<p>Roughly, a section is a range of addresses, with no gaps; all data
+&ldquo;in&rdquo; those addresses is treated the same for some particular purpose. 
+For example there may be a &ldquo;read only&rdquo; section.
+
+   <p><a name="index-linker_002c-and-assembler-187"></a><a name="index-assembler_002c-and-linker-188"></a>The linker <code>ld</code> reads many object files (partial programs) and
+combines their contents to form a runnable program.  When <samp><span class="command">as</span></samp>
+emits an object file, the partial program is assumed to start at address 0. 
+<code>ld</code> assigns the final addresses for the partial program, so that
+different partial programs do not overlap.  This is actually an
+oversimplification, but it suffices to explain how <samp><span class="command">as</span></samp> uses
+sections.
+
+   <p><code>ld</code> moves blocks of bytes of your program to their run-time
+addresses.  These blocks slide to their run-time addresses as rigid
+units; their length does not change and neither does the order of bytes
+within them.  Such a rigid unit is called a <em>section</em>.  Assigning
+run-time addresses to sections is called <dfn>relocation</dfn>.  It includes
+the task of adjusting mentions of object-file addresses so they refer to
+the proper run-time addresses. 
+For the H8/300, and for the Renesas / SuperH SH,
+<samp><span class="command">as</span></samp> pads sections if needed to
+ensure they end on a word (sixteen bit) boundary.
+
+   <p><a name="index-standard-assembler-sections-189"></a>An object file written by <samp><span class="command">as</span></samp> has at least three sections, any
+of which may be empty.  These are named <dfn>text</dfn>, <dfn>data</dfn> and
+<dfn>bss</dfn> sections.
+
+   <p>When it generates COFF or ELF output,
+<samp><span class="command">as</span></samp> can also generate whatever other named sections you specify
+using the &lsquo;<samp><span class="samp">.section</span></samp>&rsquo; directive (see <a href="Section.html#Section"><code>.section</code></a>). 
+If you do not use any directives that place output in the &lsquo;<samp><span class="samp">.text</span></samp>&rsquo;
+or &lsquo;<samp><span class="samp">.data</span></samp>&rsquo; sections, these sections still exist, but are empty.
+
+   <p>When <samp><span class="command">as</span></samp> generates SOM or ELF output for the HPPA,
+<samp><span class="command">as</span></samp> can also generate whatever other named sections you
+specify using the &lsquo;<samp><span class="samp">.space</span></samp>&rsquo; and &lsquo;<samp><span class="samp">.subspace</span></samp>&rsquo; directives.  See
+<cite>HP9000 Series 800 Assembly Language Reference Manual</cite>
+(HP 92432-90001) for details on the &lsquo;<samp><span class="samp">.space</span></samp>&rsquo; and &lsquo;<samp><span class="samp">.subspace</span></samp>&rsquo;
+assembler directives.
+
+   <p>Additionally, <samp><span class="command">as</span></samp> uses different names for the standard
+text, data, and bss sections when generating SOM output.  Program text
+is placed into the &lsquo;<samp><span class="samp">$CODE$</span></samp>&rsquo; section, data into &lsquo;<samp><span class="samp">$DATA$</span></samp>&rsquo;, and
+BSS into &lsquo;<samp><span class="samp">$BSS$</span></samp>&rsquo;.
+
+   <p>Within the object file, the text section starts at address <code>0</code>, the
+data section follows, and the bss section follows the data section.
+
+   <p>When generating either SOM or ELF output files on the HPPA, the text
+section starts at address <code>0</code>, the data section at address
+<code>0x4000000</code>, and the bss section follows the data section.
+
+   <p>To let <code>ld</code> know which data changes when the sections are
+relocated, and how to change that data, <samp><span class="command">as</span></samp> also writes to the
+object file details of the relocation needed.  To perform relocation
+<code>ld</code> must know, each time an address in the object
+file is mentioned:
+     <ul>
+<li>Where in the object file is the beginning of this reference to
+an address? 
+<li>How long (in bytes) is this reference? 
+<li>Which section does the address refer to?  What is the numeric value of
+     <pre class="display">          (<var>address</var>) &minus; (<var>start-address of section</var>)?
+</pre>
+     <li>Is the reference to an address &ldquo;Program-Counter relative&rdquo;? 
+</ul>
+
+   <p><a name="index-addresses_002c-format-of-190"></a><a name="index-section_002drelative-addressing-191"></a>In fact, every address <samp><span class="command">as</span></samp> ever uses is expressed as
+<pre class="display">     (<var>section</var>) + (<var>offset into section</var>)
+</pre>
+   <p class="noindent">Further, most expressions <samp><span class="command">as</span></samp> computes have this section-relative
+nature. 
+(For some object formats, such as SOM for the HPPA, some expressions are
+symbol-relative instead.)
+
+   <p>In this manual we use the notation {<var>secname</var> <var>N</var>} to mean &ldquo;offset
+<var>N</var> into section <var>secname</var>.&rdquo;
+
+   <p>Apart from text, data and bss sections you need to know about the
+<dfn>absolute</dfn> section.  When <code>ld</code> mixes partial programs,
+addresses in the absolute section remain unchanged.  For example, address
+<code>{absolute 0}</code> is &ldquo;relocated&rdquo; to run-time address 0 by
+<code>ld</code>.  Although the linker never arranges two partial programs'
+data sections with overlapping addresses after linking, <em>by definition</em>
+their absolute sections must overlap.  Address <code>{absolute 239}</code> in one
+part of a program is always the same address when the program is running as
+address <code>{absolute 239}</code> in any other part of the program.
+
+   <p>The idea of sections is extended to the <dfn>undefined</dfn> section.  Any
+address whose section is unknown at assembly time is by definition
+rendered {undefined <var>U</var>}&mdash;where <var>U</var> is filled in later. 
+Since numbers are always defined, the only way to generate an undefined
+address is to mention an undefined symbol.  A reference to a named
+common block would be such a symbol: its value is unknown at assembly
+time so it has section <em>undefined</em>.
+
+   <p>By analogy the word <em>section</em> is used to describe groups of sections in
+the linked program.  <code>ld</code> puts all partial programs' text
+sections in contiguous addresses in the linked program.  It is
+customary to refer to the <em>text section</em> of a program, meaning all
+the addresses of all partial programs' text sections.  Likewise for
+data and bss sections.
+
+   <p>Some sections are manipulated by <code>ld</code>; others are invented for
+use of <samp><span class="command">as</span></samp> and have no meaning except during assembly.
+
+   </body></html>
+

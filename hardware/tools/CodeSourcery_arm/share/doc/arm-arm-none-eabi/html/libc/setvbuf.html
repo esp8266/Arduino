@@ -1,0 +1,97 @@
+<html lang="en">
+<head>
+<title>setvbuf - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="setlinebuf.html#setlinebuf" title="setlinebuf">
+<link rel="next" href="siprintf.html#siprintf" title="siprintf">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="setvbuf"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="siprintf.html#siprintf">siprintf</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="setlinebuf.html#setlinebuf">setlinebuf</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.57 <code>setvbuf</code>&mdash;specify file or stream buffering</h3>
+
+<p><a name="index-setvbuf-265"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     int setvbuf(FILE *<var>fp</var>, char *<var>buf</var>,
+         int <var>mode</var>, size_t <var>size</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+Use <code>setvbuf</code> to specify what kind of buffering you want for the
+file or stream identified by <var>fp</var>, by using one of the following
+values (from <code>stdio.h</code>) as the <var>mode</var> argument:
+
+     <dl>
+<dt><code>_IONBF</code><dd>Do not use a buffer: send output directly to the host system for the
+file or stream identified by <var>fp</var>.
+
+     <br><dt><code>_IOFBF</code><dd>Use full output buffering: output will be passed on to the host system
+only when the buffer is full, or when an input operation intervenes.
+
+     <br><dt><code>_IOLBF</code><dd>Use line buffering: pass on output to the host system at every
+newline, as well as when the buffer is full, or when an input
+operation intervenes. 
+</dl>
+
+   <p>Use the <var>size</var> argument to specify how large a buffer you wish.  You
+can supply the buffer itself, if you wish, by passing a pointer to a
+suitable area of memory as <var>buf</var>.  Otherwise, you may pass <code>NULL</code>
+as the <var>buf</var> argument, and <code>setvbuf</code> will allocate the buffer.
+
+   <p><br>
+<strong>Warnings</strong><br>
+You may only use <code>setvbuf</code> before performing any file operation other
+than opening the file.
+
+   <p>If you supply a non-null <var>buf</var>, you must ensure that the associated
+storage continues to be available until you close the stream
+identified by <var>fp</var>.
+
+   <p><br>
+<strong>Returns</strong><br>
+A <code>0</code> result indicates success, <code>EOF</code> failure (invalid <var>mode</var> or
+<var>size</var> can cause failure).
+
+   <p><br>
+<strong>Portability</strong><br>
+Both ANSI C and the System V Interface Definition (Issue 2) require
+<code>setvbuf</code>. However, they differ on the meaning of a <code>NULL</code> buffer
+pointer: the SVID issue 2 specification says that a <code>NULL</code> buffer
+pointer requests unbuffered output.  For maximum portability, avoid
+<code>NULL</code> buffer pointers.
+
+   <p>Both specifications describe the result on failure only as a
+nonzero value.
+
+   <p>Supporting OS subroutines required: <code>close</code>, <code>fstat</code>, <code>isatty</code>,
+<code>lseek</code>, <code>read</code>, <code>sbrk</code>, <code>write</code>.
+
+   <p><br>
+
+   </body></html>
+

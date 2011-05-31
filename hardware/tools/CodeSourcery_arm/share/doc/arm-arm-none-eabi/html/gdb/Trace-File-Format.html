@@ -1,0 +1,98 @@
+<html lang="en">
+<head>
+<title>Trace File Format - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Operating-System-Information.html#Operating-System-Information" title="Operating System Information">
+<link rel="next" href="Copying.html#Copying" title="Copying">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Trace-File-Format"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Copying.html#Copying">Copying</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Operating-System-Information.html#Operating-System-Information">Operating System Information</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="appendix">Appendix F Trace File Format</h2>
+
+<p><a name="index-trace-file-format-2534"></a>
+The trace file comes in three parts: a header, a textual description
+section, and a trace frame section with binary data.
+
+   <p>The header has the form <code>\x7fTRACE0\n</code>.  The first byte is
+<code>0x7f</code> so as to indicate that the file contains binary data,
+while the <code>0</code> is a version number that may have different values
+in the future.
+
+   <p>The description section consists of multiple lines of <span class="sc">ascii</span> text
+separated by newline characters (<code>0xa</code>).  The lines may include a
+variety of optional descriptive or context-setting information, such
+as tracepoint definitions or register set size.  <span class="sc">gdb</span> will
+ignore any line that it does not recognize.  An empty line marks the end
+of this section.
+
+<!-- FIXME add some specific types of data -->
+   <p>The trace frame section consists of a number of consecutive frames. 
+Each frame begins with a two-byte tracepoint number, followed by a
+four-byte size giving the amount of data in the frame.  The data in
+the frame consists of a number of blocks, each introduced by a
+character indicating its type (at least register, memory, and trace
+state variable).  The data in this section is raw binary, not a
+hexadecimal or other encoding; its endianness matches the target's
+endianness.
+
+<!-- FIXME bi-arch may require endianness/arch info in description section -->
+     <dl>
+<dt><code>R </code><var>bytes</var><dd>Register block.  The number and ordering of bytes matches that of a
+<code>g</code> packet in the remote protocol.  Note that these are the
+actual bytes, in target order and <span class="sc">gdb</span> register order, not a
+hexadecimal encoding.
+
+     <br><dt><code>M </code><var>address</var> <var>length</var> <var>bytes</var><code>...</code><dd>Memory block.  This is a contiguous block of memory, at the 8-byte
+address <var>address</var>, with a 2-byte length <var>length</var>, followed by
+<var>length</var> bytes.
+
+     <br><dt><code>V </code><var>number</var> <var>value</var><dd>Trace state variable block.  This records the 8-byte signed value
+<var>value</var> of trace state variable numbered <var>number</var>.
+
+   </dl>
+
+   <p>Future enhancements of the trace file format may include additional types
+of blocks.
+
+   </body></html>
+

@@ -1,0 +1,188 @@
+<html lang="en">
+<head>
+<title>REGION_ALIAS - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Simple-Commands.html#Simple-Commands" title="Simple Commands">
+<link rel="prev" href="Format-Commands.html#Format-Commands" title="Format Commands">
+<link rel="next" href="Miscellaneous-Commands.html#Miscellaneous-Commands" title="Miscellaneous Commands">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="REGION_ALIAS"></a>
+<a name="REGION_005fALIAS"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Miscellaneous-Commands.html#Miscellaneous-Commands">Miscellaneous Commands</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Format-Commands.html#Format-Commands">Format Commands</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Simple-Commands.html#Simple-Commands">Simple Commands</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.4.4 Assign alias names to memory regions</h4>
+
+<p><a name="index-REGION_005fALIAS_0028_0040var_007balias_007d_002c-_0040var_007bregion_007d_0029-368"></a><a name="index-region-alias-369"></a><a name="index-region-names-370"></a>
+Alias names can be added to existing memory regions created with the
+<a href="MEMORY.html#MEMORY">MEMORY</a> command.  Each name corresponds to at most one memory region.
+
+<pre class="smallexample">     REGION_ALIAS(<var>alias</var>, <var>region</var>)
+</pre>
+   <p>The <code>REGION_ALIAS</code> function creates an alias name <var>alias</var> for the
+memory region <var>region</var>.  This allows a flexible mapping of output sections
+to memory regions.  An example follows.
+
+   <p>Suppose we have an application for embedded systems which come with various
+memory storage devices.  All have a general purpose, volatile memory <code>RAM</code>
+that allows code execution or data storage.  Some may have a read-only,
+non-volatile memory <code>ROM</code> that allows code execution and read-only data
+access.  The last variant is a read-only, non-volatile memory <code>ROM2</code> with
+read-only data access and no code execution capability.  We have four output
+sections:
+
+     <ul>
+<li><code>.text</code> program code;
+<li><code>.rodata</code> read-only data;
+<li><code>.data</code> read-write initialized data;
+<li><code>.bss</code> read-write zero initialized data. 
+</ul>
+
+   <p>The goal is to provide a linker command file that contains a system independent
+part defining the output sections and a system dependent part mapping the
+output sections to the memory regions available on the system.  Our embedded
+systems come with three different memory setups <code>A</code>, <code>B</code> and
+<code>C</code>:
+   <p><table summary=""><tr align="left"><td valign="top" width="25%">Section </td><td valign="top" width="25%">Variant A </td><td valign="top" width="25%">Variant B </td><td valign="top" width="25%">Variant C
+<br></td></tr><tr align="left"><td valign="top" width="25%">.text </td><td valign="top" width="25%">RAM </td><td valign="top" width="25%">ROM </td><td valign="top" width="25%">ROM
+<br></td></tr><tr align="left"><td valign="top" width="25%">.rodata </td><td valign="top" width="25%">RAM </td><td valign="top" width="25%">ROM </td><td valign="top" width="25%">ROM2
+<br></td></tr><tr align="left"><td valign="top" width="25%">.data </td><td valign="top" width="25%">RAM </td><td valign="top" width="25%">RAM/ROM </td><td valign="top" width="25%">RAM/ROM2
+<br></td></tr><tr align="left"><td valign="top" width="25%">.bss </td><td valign="top" width="25%">RAM </td><td valign="top" width="25%">RAM </td><td valign="top" width="25%">RAM
+   <br></td></tr></table>
+The notation <code>RAM/ROM</code> or <code>RAM/ROM2</code> means that this section is
+loaded into region <code>ROM</code> or <code>ROM2</code> respectively.  Please note that
+the load address of the <code>.data</code> section starts in all three variants at
+the end of the <code>.rodata</code> section.
+
+   <p>The base linker script that deals with the output sections follows.  It
+includes the system dependent <code>linkcmds.memory</code> file that describes the
+memory layout:
+<pre class="smallexample">     INCLUDE linkcmds.memory
+     
+     SECTIONS
+       {
+         .text :
+           {
+             *(.text)
+           } &gt; REGION_TEXT
+         .rodata :
+           {
+             *(.rodata)
+             rodata_end = .;
+           } &gt; REGION_RODATA
+         .data : AT (rodata_end)
+           {
+             data_start = .;
+             *(.data)
+           } &gt; REGION_DATA
+         data_size = SIZEOF(.data);
+         data_load_start = LOADADDR(.data);
+         .bss :
+           {
+             *(.bss)
+           } &gt; REGION_BSS
+       }
+</pre>
+   <p>Now we need three different <code>linkcmds.memory</code> files to define memory
+regions and alias names.  The content of <code>linkcmds.memory</code> for the three
+variants <code>A</code>, <code>B</code> and <code>C</code>:
+     <dl>
+<dt><code>A</code><dd>Here everything goes into the <code>RAM</code>.
+     <pre class="smallexample">          MEMORY
+            {
+              RAM : ORIGIN = 0, LENGTH = 4M
+            }
+          
+          REGION_ALIAS("REGION_TEXT", RAM);
+          REGION_ALIAS("REGION_RODATA", RAM);
+          REGION_ALIAS("REGION_DATA", RAM);
+          REGION_ALIAS("REGION_BSS", RAM);
+</pre>
+     <br><dt><code>B</code><dd>Program code and read-only data go into the <code>ROM</code>.  Read-write data goes
+into the <code>RAM</code>.  An image of the initialized data is loaded into the
+<code>ROM</code> and will be copied during system start into the <code>RAM</code>.
+     <pre class="smallexample">          MEMORY
+            {
+              ROM : ORIGIN = 0, LENGTH = 3M
+              RAM : ORIGIN = 0x10000000, LENGTH = 1M
+            }
+          
+          REGION_ALIAS("REGION_TEXT", ROM);
+          REGION_ALIAS("REGION_RODATA", ROM);
+          REGION_ALIAS("REGION_DATA", RAM);
+          REGION_ALIAS("REGION_BSS", RAM);
+</pre>
+     <br><dt><code>C</code><dd>Program code goes into the <code>ROM</code>.  Read-only data goes into the
+<code>ROM2</code>.  Read-write data goes into the <code>RAM</code>.  An image of the
+initialized data is loaded into the <code>ROM2</code> and will be copied during
+system start into the <code>RAM</code>.
+     <pre class="smallexample">          MEMORY
+            {
+              ROM : ORIGIN = 0, LENGTH = 2M
+              ROM2 : ORIGIN = 0x10000000, LENGTH = 1M
+              RAM : ORIGIN = 0x20000000, LENGTH = 1M
+            }
+          
+          REGION_ALIAS("REGION_TEXT", ROM);
+          REGION_ALIAS("REGION_RODATA", ROM2);
+          REGION_ALIAS("REGION_DATA", RAM);
+          REGION_ALIAS("REGION_BSS", RAM);
+</pre>
+     </dl>
+
+   <p>It is possible to write a common system initialization routine to copy the
+<code>.data</code> section from <code>ROM</code> or <code>ROM2</code> into the <code>RAM</code> if
+necessary:
+<pre class="smallexample">     #include &lt;string.h&gt;
+     
+     extern char data_start [];
+     extern char data_size [];
+     extern char data_load_start [];
+     
+     void copy_data(void)
+     {
+       if (data_start != data_load_start)
+         {
+           memcpy(data_start, data_load_start, (size_t) data_size);
+         }
+     }
+</pre>
+   </body></html>
+

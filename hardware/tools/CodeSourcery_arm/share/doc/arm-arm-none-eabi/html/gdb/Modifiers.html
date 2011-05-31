@@ -1,0 +1,85 @@
+<html lang="en">
+<head>
+<title>Modifiers - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="History-Interaction.html#History-Interaction" title="History Interaction">
+<link rel="prev" href="Word-Designators.html#Word-Designators" title="Word Designators">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Modifiers"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Word-Designators.html#Word-Designators">Word Designators</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="History-Interaction.html#History-Interaction">History Interaction</a>
+<hr>
+</div>
+
+<h4 class="subsection">32.1.3 Modifiers</h4>
+
+<p>After the optional word designator, you can add a sequence of one or more
+of the following modifiers, each preceded by a &lsquo;<samp><span class="samp">:</span></samp>&rsquo;.
+
+     <dl>
+<dt><code>h</code><dd>Remove a trailing pathname component, leaving only the head.
+
+     <br><dt><code>t</code><dd>Remove all leading  pathname  components, leaving the tail.
+
+     <br><dt><code>r</code><dd>Remove a trailing suffix of the form &lsquo;<samp><span class="samp">.</span><var>suffix</var></samp>&rsquo;, leaving
+the basename.
+
+     <br><dt><code>e</code><dd>Remove all but the trailing suffix.
+
+     <br><dt><code>p</code><dd>Print the new command but do not execute it.
+
+     <br><dt><code>s/</code><var>old</var><code>/</code><var>new</var><code>/</code><dd>Substitute <var>new</var> for the first occurrence of <var>old</var> in the
+event line.  Any delimiter may be used in place of &lsquo;<samp><span class="samp">/</span></samp>&rsquo;. 
+The delimiter may be quoted in <var>old</var> and <var>new</var>
+with a single backslash.  If &lsquo;<samp><span class="samp">&amp;</span></samp>&rsquo; appears in <var>new</var>,
+it is replaced by <var>old</var>.  A single backslash will quote
+the &lsquo;<samp><span class="samp">&amp;</span></samp>&rsquo;.  The final delimiter is optional if it is the last
+character on the input line.
+
+     <br><dt><code>&amp;</code><dd>Repeat the previous substitution.
+
+     <br><dt><code>g</code><dt><code>a</code><dd>Cause changes to be applied over the entire event line.  Used in
+conjunction with &lsquo;<samp><span class="samp">s</span></samp>&rsquo;, as in <code>gs/</code><var>old</var><code>/</code><var>new</var><code>/</code>,
+or with &lsquo;<samp><span class="samp">&amp;</span></samp>&rsquo;.
+
+     <br><dt><code>G</code><dd>Apply the following &lsquo;<samp><span class="samp">s</span></samp>&rsquo; modifier once to each word in the event.
+
+   </dl>
+
+   </body></html>
+

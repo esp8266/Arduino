@@ -1,0 +1,170 @@
+<html lang="en">
+<head>
+<title>Object Size Checking - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Atomic-Builtins.html#Atomic-Builtins" title="Atomic Builtins">
+<link rel="next" href="Other-Builtins.html#Other-Builtins" title="Other Builtins">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Object-Size-Checking"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Other-Builtins.html#Other-Builtins">Other Builtins</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Atomic-Builtins.html#Atomic-Builtins">Atomic Builtins</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.50 Object Size Checking Builtins</h3>
+
+<p><a name="index-g_t_005f_005fbuiltin_005fobject_005fsize-2630"></a><a name="index-g_t_005f_005fbuiltin_005f_005f_005fmemcpy_005fchk-2631"></a><a name="index-g_t_005f_005fbuiltin_005f_005f_005fmempcpy_005fchk-2632"></a><a name="index-g_t_005f_005fbuiltin_005f_005f_005fmemmove_005fchk-2633"></a><a name="index-g_t_005f_005fbuiltin_005f_005f_005fmemset_005fchk-2634"></a><a name="index-g_t_005f_005fbuiltin_005f_005f_005fstrcpy_005fchk-2635"></a><a name="index-g_t_005f_005fbuiltin_005f_005f_005fstpcpy_005fchk-2636"></a><a name="index-g_t_005f_005fbuiltin_005f_005f_005fstrncpy_005fchk-2637"></a><a name="index-g_t_005f_005fbuiltin_005f_005f_005fstrcat_005fchk-2638"></a><a name="index-g_t_005f_005fbuiltin_005f_005f_005fstrncat_005fchk-2639"></a><a name="index-g_t_005f_005fbuiltin_005f_005f_005fsprintf_005fchk-2640"></a><a name="index-g_t_005f_005fbuiltin_005f_005f_005fsnprintf_005fchk-2641"></a><a name="index-g_t_005f_005fbuiltin_005f_005f_005fvsprintf_005fchk-2642"></a><a name="index-g_t_005f_005fbuiltin_005f_005f_005fvsnprintf_005fchk-2643"></a><a name="index-g_t_005f_005fbuiltin_005f_005f_005fprintf_005fchk-2644"></a><a name="index-g_t_005f_005fbuiltin_005f_005f_005fvprintf_005fchk-2645"></a><a name="index-g_t_005f_005fbuiltin_005f_005f_005ffprintf_005fchk-2646"></a><a name="index-g_t_005f_005fbuiltin_005f_005f_005fvfprintf_005fchk-2647"></a>
+GCC implements a limited buffer overflow protection mechanism
+that can prevent some buffer overflow attacks.
+
+<div class="defun">
+&mdash; Built-in Function: size_t <b>__builtin_object_size</b> (<var>void * ptr, int type</var>)<var><a name="index-g_t_005f_005fbuiltin_005fobject_005fsize-2648"></a></var><br>
+<blockquote><p>is a built-in construct that returns a constant number of bytes from
+<var>ptr</var> to the end of the object <var>ptr</var> pointer points to
+(if known at compile time).  <code>__builtin_object_size</code> never evaluates
+its arguments for side-effects.  If there are any side-effects in them, it
+returns <code>(size_t) -1</code> for <var>type</var> 0 or 1 and <code>(size_t) 0</code>
+for <var>type</var> 2 or 3.  If there are multiple objects <var>ptr</var> can
+point to and all of them are known at compile time, the returned number
+is the maximum of remaining byte counts in those objects if <var>type</var> &amp; 2 is
+0 and minimum if nonzero.  If it is not possible to determine which objects
+<var>ptr</var> points to at compile time, <code>__builtin_object_size</code> should
+return <code>(size_t) -1</code> for <var>type</var> 0 or 1 and <code>(size_t) 0</code>
+for <var>type</var> 2 or 3.
+
+      <p><var>type</var> is an integer constant from 0 to 3.  If the least significant
+bit is clear, objects are whole variables, if it is set, a closest
+surrounding subobject is considered the object a pointer points to. 
+The second bit determines if maximum or minimum of remaining bytes
+is computed.
+
+     <pre class="smallexample">          struct V { char buf1[10]; int b; char buf2[10]; } var;
+          char *p = &amp;var.buf1[1], *q = &amp;var.b;
+          
+          /* Here the object p points to is var.  */
+          assert (__builtin_object_size (p, 0) == sizeof (var) - 1);
+          /* The subobject p points to is var.buf1.  */
+          assert (__builtin_object_size (p, 1) == sizeof (var.buf1) - 1);
+          /* The object q points to is var.  */
+          assert (__builtin_object_size (q, 0)
+                  == (char *) (&amp;var + 1) - (char *) &amp;var.b);
+          /* The subobject q points to is var.b.  */
+          assert (__builtin_object_size (q, 1) == sizeof (var.b));
+</pre>
+      </blockquote></div>
+
+ <p>There are built-in functions added for many common string operation
+functions, e.g., for <code>memcpy</code> <code>__builtin___memcpy_chk</code>
+built-in is provided.  This built-in has an additional last argument,
+which is the number of bytes remaining in object the <var>dest</var>
+argument points to or <code>(size_t) -1</code> if the size is not known.
+
+ <p>The built-in functions are optimized into the normal string functions
+like <code>memcpy</code> if the last argument is <code>(size_t) -1</code> or if
+it is known at compile time that the destination object will not
+be overflown.  If the compiler can determine at compile time the
+object will be always overflown, it issues a warning.
+
+ <p>The intended use can be e.g.
+
+<pre class="smallexample">     #undef memcpy
+     #define bos0(dest) __builtin_object_size (dest, 0)
+     #define memcpy(dest, src, n) \
+       __builtin___memcpy_chk (dest, src, n, bos0 (dest))
+     
+     char *volatile p;
+     char buf[10];
+     /* It is unknown what object p points to, so this is optimized
+        into plain memcpy - no checking is possible.  */
+     memcpy (p, "abcde", n);
+     /* Destination is known and length too.  It is known at compile
+        time there will be no overflow.  */
+     memcpy (&amp;buf[5], "abcde", 5);
+     /* Destination is known, but the length is not known at compile time.
+        This will result in __memcpy_chk call that can check for overflow
+        at runtime.  */
+     memcpy (&amp;buf[5], "abcde", n);
+     /* Destination is known and it is known at compile time there will
+        be overflow.  There will be a warning and __memcpy_chk call that
+        will abort the program at runtime.  */
+     memcpy (&amp;buf[6], "abcde", 5);
+</pre>
+ <p>Such built-in functions are provided for <code>memcpy</code>, <code>mempcpy</code>,
+<code>memmove</code>, <code>memset</code>, <code>strcpy</code>, <code>stpcpy</code>, <code>strncpy</code>,
+<code>strcat</code> and <code>strncat</code>.
+
+ <p>There are also checking built-in functions for formatted output functions.
+<pre class="smallexample">     int __builtin___sprintf_chk (char *s, int flag, size_t os, const char *fmt, ...);
+     int __builtin___snprintf_chk (char *s, size_t maxlen, int flag, size_t os,
+                                   const char *fmt, ...);
+     int __builtin___vsprintf_chk (char *s, int flag, size_t os, const char *fmt,
+                                   va_list ap);
+     int __builtin___vsnprintf_chk (char *s, size_t maxlen, int flag, size_t os,
+                                    const char *fmt, va_list ap);
+</pre>
+ <p>The added <var>flag</var> argument is passed unchanged to <code>__sprintf_chk</code>
+etc. functions and can contain implementation specific flags on what
+additional security measures the checking function might take, such as
+handling <code>%n</code> differently.
+
+ <p>The <var>os</var> argument is the object size <var>s</var> points to, like in the
+other built-in functions.  There is a small difference in the behavior
+though, if <var>os</var> is <code>(size_t) -1</code>, the built-in functions are
+optimized into the non-checking functions only if <var>flag</var> is 0, otherwise
+the checking function is called with <var>os</var> argument set to
+<code>(size_t) -1</code>.
+
+ <p>In addition to this, there are checking built-in functions
+<code>__builtin___printf_chk</code>, <code>__builtin___vprintf_chk</code>,
+<code>__builtin___fprintf_chk</code> and <code>__builtin___vfprintf_chk</code>. 
+These have just one additional argument, <var>flag</var>, right before
+format string <var>fmt</var>.  If the compiler is able to optimize them to
+<code>fputc</code> etc. functions, it will, otherwise the checking function
+should be called and the <var>flag</var> argument passed to it.
+
+ </body></html>
+

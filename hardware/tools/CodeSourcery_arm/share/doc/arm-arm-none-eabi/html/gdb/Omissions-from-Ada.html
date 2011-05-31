@@ -1,0 +1,161 @@
+<html lang="en">
+<head>
+<title>Omissions from Ada - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Ada.html#Ada" title="Ada">
+<link rel="prev" href="Ada-Mode-Intro.html#Ada-Mode-Intro" title="Ada Mode Intro">
+<link rel="next" href="Additions-to-Ada.html#Additions-to-Ada" title="Additions to Ada">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Omissions-from-Ada"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Additions-to-Ada.html#Additions-to-Ada">Additions to Ada</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Ada-Mode-Intro.html#Ada-Mode-Intro">Ada Mode Intro</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Ada.html#Ada">Ada</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">15.4.7.2 Omissions from Ada</h5>
+
+<p><a name="index-Ada_002c-omissions-from-861"></a>
+Here are the notable omissions from the subset:
+
+     <ul>
+<li>Only a subset of the attributes are supported:
+
+          <ul>
+<li><tt>'First</tt>, <tt>'Last</tt>, and <tt>'Length</tt>
+ on array objects (not on types and subtypes).
+
+          <li><tt>'Min</tt> and <tt>'Max</tt>.
+
+          <li><tt>'Pos</tt> and <tt>'Val</tt>.
+
+          <li><tt>'Tag</tt>.
+
+          <li><tt>'Range</tt> on array objects (not subtypes), but only as the right
+operand of the membership (<code>in</code>) operator.
+
+          <li><tt>'Access</tt>, <tt>'Unchecked_Access</tt>, and
+<tt>'Unrestricted_Access</tt> (a GNAT extension).
+
+          <li><tt>'Address</tt>. 
+</ul>
+
+     <li>The names in
+<code>Characters.Latin_1</code> are not available and
+concatenation is not implemented.  Thus, escape characters in strings are
+not currently available.
+
+     <li>Equality tests (&lsquo;<samp><span class="samp">=</span></samp>&rsquo; and &lsquo;<samp><span class="samp">/=</span></samp>&rsquo;) on arrays test for bitwise
+equality of representations.  They will generally work correctly
+for strings and arrays whose elements have integer or enumeration types. 
+They may not work correctly for arrays whose element
+types have user-defined equality, for arrays of real values
+(in particular, IEEE-conformant floating point, because of negative
+zeroes and NaNs), and for arrays whose elements contain unused bits with
+indeterminate values.
+
+     <li>The other component-by-component array operations (<code>and</code>, <code>or</code>,
+<code>xor</code>, <code>not</code>, and relational tests other than equality)
+are not implemented.
+
+     <li><a name="index-array-aggregates-_0028Ada_0029-862"></a><a name="index-record-aggregates-_0028Ada_0029-863"></a><a name="index-aggregates-_0028Ada_0029-864"></a>There is limited support for array and record aggregates.  They are
+permitted only on the right sides of assignments, as in these examples:
+
+     <pre class="smallexample">          (gdb) set An_Array := (1, 2, 3, 4, 5, 6)
+          (gdb) set An_Array := (1, others =&gt; 0)
+          (gdb) set An_Array := (0|4 =&gt; 1, 1..3 =&gt; 2, 5 =&gt; 6)
+          (gdb) set A_2D_Array := ((1, 2, 3), (4, 5, 6), (7, 8, 9))
+          (gdb) set A_Record := (1, "Peter", True);
+          (gdb) set A_Record := (Name =&gt; "Peter", Id =&gt; 1, Alive =&gt; True)
+</pre>
+     <p>Changing a
+discriminant's value by assigning an aggregate has an
+undefined effect if that discriminant is used within the record. 
+However, you can first modify discriminants by directly assigning to
+them (which normally would not be allowed in Ada), and then performing an
+aggregate assignment.  For example, given a variable <code>A_Rec</code>
+declared to have a type such as:
+
+     <pre class="smallexample">          type Rec (Len : Small_Integer := 0) is record
+              Id : Integer;
+              Vals : IntArray (1 .. Len);
+          end record;
+</pre>
+     <p>you can assign a value with a different size of <code>Vals</code> with two
+assignments:
+
+     <pre class="smallexample">          (gdb) set A_Rec.Len := 4
+          (gdb) set A_Rec := (Id =&gt; 42, Vals =&gt; (1, 2, 3, 4))
+</pre>
+     <p>As this example also illustrates, <span class="sc">gdb</span> is very loose about the usual
+rules concerning aggregates.  You may leave out some of the
+components of an array or record aggregate (such as the <code>Len</code>
+component in the assignment to <code>A_Rec</code> above); they will retain their
+original values upon assignment.  You may freely use dynamic values as
+indices in component associations.  You may even use overlapping or
+redundant component associations, although which component values are
+assigned in such cases is not defined.
+
+     <li>Calls to dispatching subprograms are not implemented.
+
+     <li>The overloading algorithm is much more limited (i.e., less selective)
+than that of real Ada.  It makes only limited use of the context in
+which a subexpression appears to resolve its meaning, and it is much
+looser in its rules for allowing type matches.  As a result, some
+function calls will be ambiguous, and the user will be asked to choose
+the proper resolution.
+
+     <li>The <code>new</code> operator is not implemented.
+
+     <li>Entry calls are not implemented.
+
+     <li>Aside from printing, arithmetic operations on the native VAX floating-point
+formats are not supported.
+
+     <li>It is not possible to slice a packed array.
+
+     <li>The names <code>True</code> and <code>False</code>, when not part of a qualified name,
+are interpreted as if implicitly prefixed by <code>Standard</code>, regardless of
+context. 
+Should your program
+redefine these names in a package or procedure (at best a dubious practice),
+you will have to use fully qualified names to access their new definitions. 
+</ul>
+
+   </body></html>
+

@@ -1,0 +1,83 @@
+<html lang="en">
+<head>
+<title>siscanf - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="siprintf.html#siprintf" title="siprintf">
+<link rel="next" href="sprintf.html#sprintf" title="sprintf">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="siscanf"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="sprintf.html#sprintf">sprintf</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="siprintf.html#siprintf">siprintf</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.59 <code>siscanf</code>, <code>fiscanf</code>, <code>iscanf</code>&mdash;scan and format non-floating input</h3>
+
+<p><a name="index-iscanf-278"></a><a name="index-g_t_005fiscanf_005fr-279"></a><a name="index-fiscanf-280"></a><a name="index-g_t_005ffiscanf_005fr-281"></a><a name="index-siscanf-282"></a><a name="index-g_t_005fsiscanf_005fr-283"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     
+     int iscanf(const char *<var>format</var>, ...);
+     int fiscanf(FILE *<var>fd</var>, const char *<var>format</var>, ...);
+     int siscanf(const char *<var>str</var>, const char *<var>format</var>, ...);
+     
+     int _iscanf_r(struct _reent *<var>ptr</var>, const char *<var>format</var>, ...);
+     int _fiscanf_r(struct _reent *<var>ptr</var>, FILE *<var>fd</var>,
+         const char *<var>format</var>, ...);
+     int _siscanf_r(struct _reent *<var>ptr</var>, const char *<var>str</var>,
+         const char *<var>format</var>, ...);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>iscanf</code>, <code>fiscanf</code>, and <code>siscanf</code> are the same as
+<code>scanf</code>, <code>fscanf</code>, and <code>sscanf</code> respectively, only that
+they restrict the available formats to non-floating-point
+format specifiers.
+
+   <p>The routines <code>_iscanf_r</code>, <code>_fiscanf_r</code>, and <code>_siscanf_r</code> are reentrant
+versions of <code>iscanf</code>, <code>fiscanf</code>, and <code>siscanf</code> that take an additional
+first argument pointing to a reentrancy structure.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>iscanf</code> returns the number of input fields successfully
+scanned, converted and stored; the return value does
+not include scanned fields which were not stored.
+
+   <p>If <code>iscanf</code> attempts to read at end-of-file, the return
+value is <code>EOF</code>.
+
+   <p>If no fields were stored, the return value is <code>0</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>iscanf</code>, <code>fiscanf</code>, and <code>siscanf</code> are newlib extensions.
+
+   <p>Supporting OS subroutines required: <code>close</code>, <code>fstat</code>, <code>isatty</code>,
+<code>lseek</code>, <code>read</code>, <code>sbrk</code>, <code>write</code>.
+
+   <p><br>
+
+   </body></html>
+

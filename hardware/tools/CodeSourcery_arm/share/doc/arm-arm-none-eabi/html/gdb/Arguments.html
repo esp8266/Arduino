@@ -1,0 +1,81 @@
+<html lang="en">
+<head>
+<title>Arguments - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Running.html#Running" title="Running">
+<link rel="prev" href="Starting.html#Starting" title="Starting">
+<link rel="next" href="Environment.html#Environment" title="Environment">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Arguments"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Environment.html#Environment">Environment</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Starting.html#Starting">Starting</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Running.html#Running">Running</a>
+<hr>
+</div>
+
+<h3 class="section">4.3 Your Program's Arguments</h3>
+
+<p><a name="index-arguments-_0028to-your-program_0029-110"></a>The arguments to your program can be specified by the arguments of the
+<code>run</code> command. 
+They are passed to a shell, which expands wildcard characters and
+performs redirection of I/O, and thence to your program.  Your
+<code>SHELL</code> environment variable (if it exists) specifies what shell
+<span class="sc">gdb</span> uses.  If you do not define <code>SHELL</code>, <span class="sc">gdb</span> uses
+the default shell (<samp><span class="file">/bin/sh</span></samp> on Unix).
+
+   <p>On non-Unix systems, the program is usually invoked directly by
+<span class="sc">gdb</span>, which emulates I/O redirection via the appropriate system
+calls, and the wildcard characters are expanded by the startup code of
+the program, not by the shell.
+
+   <p><code>run</code> with no arguments uses the same arguments used by the previous
+<code>run</code>, or those set by the <code>set args</code> command.
+
+     
+<a name="index-set-args-111"></a>
+<dl><dt><code>set args</code><dd>Specify the arguments to be used the next time your program is run.  If
+<code>set args</code> has no arguments, <code>run</code> executes your program
+with no arguments.  Once you have run your program with arguments,
+using <code>set args</code> before the next <code>run</code> is the only way to run
+it again without arguments.
+
+     <p><a name="index-show-args-112"></a><br><dt><code>show args</code><dd>Show the arguments to give your program when it is started. 
+</dl>
+
+   </body></html>
+

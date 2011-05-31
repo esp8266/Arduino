@@ -1,0 +1,568 @@
+<html lang="en">
+<head>
+<title>GDB/MI Data Manipulation - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="GDB_002fMI.html#GDB_002fMI" title="GDB/MI">
+<link rel="prev" href="GDB_002fMI-Variable-Objects.html#GDB_002fMI-Variable-Objects" title="GDB/MI Variable Objects">
+<link rel="next" href="GDB_002fMI-Tracepoint-Commands.html#GDB_002fMI-Tracepoint-Commands" title="GDB/MI Tracepoint Commands">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="GDB%2fMI-Data-Manipulation"></a>
+<a name="GDB_002fMI-Data-Manipulation"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="GDB_002fMI-Tracepoint-Commands.html#GDB_002fMI-Tracepoint-Commands">GDB/MI Tracepoint Commands</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="GDB_002fMI-Variable-Objects.html#GDB_002fMI-Variable-Objects">GDB/MI Variable Objects</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="GDB_002fMI.html#GDB_002fMI">GDB/MI</a>
+<hr>
+</div>
+
+<h3 class="section">27.14 <span class="sc">gdb/mi</span> Data Manipulation</h3>
+
+<p><a name="index-data-manipulation_002c-in-_0040sc_007bgdb_002fmi_007d-2088"></a><a name="index-g_t_0040sc_007bgdb_002fmi_007d_002c-data-manipulation-2089"></a>This section describes the <span class="sc">gdb/mi</span> commands that manipulate data:
+examine memory and registers, evaluate expressions, etc.
+
+<!-- REMOVED FROM THE INTERFACE. -->
+<!-- @subheading -data-assign -->
+<!-- Change the value of a program variable. Plenty of side effects. -->
+<!-- @subsubheading GDB Command -->
+<!-- set variable -->
+<!-- @subsubheading Example -->
+<!-- N.A. -->
+<h4 class="subheading">The <code>-data-disassemble</code> Command</h4>
+
+<p><a name="index-g_t_002ddata_002ddisassemble-2090"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -data-disassemble
+         [ -s <var>start-addr</var> -e <var>end-addr</var> ]
+       | [ -f <var>filename</var> -l <var>linenum</var> [ -n <var>lines</var> ] ]
+       -- <var>mode</var>
+</pre>
+<p class="noindent">Where:
+
+     <dl>
+<dt>&lsquo;<samp><var>start-addr</var></samp>&rsquo;<dd>is the beginning address (or <code>$pc</code>)
+<br><dt>&lsquo;<samp><var>end-addr</var></samp>&rsquo;<dd>is the end address
+<br><dt>&lsquo;<samp><var>filename</var></samp>&rsquo;<dd>is the name of the file to disassemble
+<br><dt>&lsquo;<samp><var>linenum</var></samp>&rsquo;<dd>is the line number to disassemble around
+<br><dt>&lsquo;<samp><var>lines</var></samp>&rsquo;<dd>is the number of disassembly lines to be produced.  If it is -1,
+the whole function will be disassembled, in case no <var>end-addr</var> is
+specified.  If <var>end-addr</var> is specified as a non-zero value, and
+<var>lines</var> is lower than the number of disassembly lines between
+<var>start-addr</var> and <var>end-addr</var>, only <var>lines</var> lines are
+displayed; if <var>lines</var> is higher than the number of lines between
+<var>start-addr</var> and <var>end-addr</var>, only the lines up to <var>end-addr</var>
+are displayed. 
+<br><dt>&lsquo;<samp><var>mode</var></samp>&rsquo;<dd>is either 0 (meaning only disassembly) or 1 (meaning mixed source and
+disassembly). 
+</dl>
+
+<h5 class="subsubheading">Result</h5>
+
+<p>The output for each instruction is composed of four fields:
+
+     <ul>
+<li>Address
+<li>Func-name
+<li>Offset
+<li>Instruction
+</ul>
+
+   <p>Note that whatever included in the instruction field, is not manipulated
+directly by <span class="sc">gdb/mi</span>, i.e., it is not possible to adjust its format.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>There's no direct mapping from this command to the CLI.
+
+<h5 class="subsubheading">Example</h5>
+
+<p>Disassemble from the current value of <code>$pc</code> to <code>$pc + 20</code>:
+
+<pre class="smallexample">     (gdb)
+     -data-disassemble -s $pc -e "$pc + 20" -- 0
+     ^done,
+     asm_insns=[
+     {address="0x000107c0",func-name="main",offset="4",
+     inst="mov  2, %o0"},
+     {address="0x000107c4",func-name="main",offset="8",
+     inst="sethi  %hi(0x11800), %o2"},
+     {address="0x000107c8",func-name="main",offset="12",
+     inst="or  %o2, 0x140, %o1\t! 0x11940 &lt;_lib_version+8&gt;"},
+     {address="0x000107cc",func-name="main",offset="16",
+     inst="sethi  %hi(0x11800), %o2"},
+     {address="0x000107d0",func-name="main",offset="20",
+     inst="or  %o2, 0x168, %o4\t! 0x11968 &lt;_lib_version+48&gt;"}]
+     (gdb)
+</pre>
+   <p>Disassemble the whole <code>main</code> function.  Line 32 is part of
+<code>main</code>.
+
+<pre class="smallexample">     -data-disassemble -f basics.c -l 32 -- 0
+     ^done,asm_insns=[
+     {address="0x000107bc",func-name="main",offset="0",
+     inst="save  %sp, -112, %sp"},
+     {address="0x000107c0",func-name="main",offset="4",
+     inst="mov   2, %o0"},
+     {address="0x000107c4",func-name="main",offset="8",
+     inst="sethi %hi(0x11800), %o2"},
+     [...]
+     {address="0x0001081c",func-name="main",offset="96",inst="ret "},
+     {address="0x00010820",func-name="main",offset="100",inst="restore "}]
+     (gdb)
+</pre>
+   <p>Disassemble 3 instructions from the start of <code>main</code>:
+
+<pre class="smallexample">     (gdb)
+     -data-disassemble -f basics.c -l 32 -n 3 -- 0
+     ^done,asm_insns=[
+     {address="0x000107bc",func-name="main",offset="0",
+     inst="save  %sp, -112, %sp"},
+     {address="0x000107c0",func-name="main",offset="4",
+     inst="mov  2, %o0"},
+     {address="0x000107c4",func-name="main",offset="8",
+     inst="sethi  %hi(0x11800), %o2"}]
+     (gdb)
+</pre>
+   <p>Disassemble 3 instructions from the start of <code>main</code> in mixed mode:
+
+<pre class="smallexample">     (gdb)
+     -data-disassemble -f basics.c -l 32 -n 3 -- 1
+     ^done,asm_insns=[
+     src_and_asm_line={line="31",
+     file="/kwikemart/marge/ezannoni/flathead-dev/devo/gdb/ \
+       testsuite/gdb.mi/basics.c",line_asm_insn=[
+     {address="0x000107bc",func-name="main",offset="0",
+     inst="save  %sp, -112, %sp"}]},
+     src_and_asm_line={line="32",
+     file="/kwikemart/marge/ezannoni/flathead-dev/devo/gdb/ \
+       testsuite/gdb.mi/basics.c",line_asm_insn=[
+     {address="0x000107c0",func-name="main",offset="4",
+     inst="mov  2, %o0"},
+     {address="0x000107c4",func-name="main",offset="8",
+     inst="sethi  %hi(0x11800), %o2"}]}]
+     (gdb)
+</pre>
+   <h4 class="subheading">The <code>-data-evaluate-expression</code> Command</h4>
+
+<p><a name="index-g_t_002ddata_002devaluate_002dexpression-2091"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -data-evaluate-expression <var>expr</var>
+</pre>
+   <p>Evaluate <var>expr</var> as an expression.  The expression could contain an
+inferior function call.  The function call will execute synchronously. 
+If the expression contains spaces, it must be enclosed in double quotes.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> commands are &lsquo;<samp><span class="samp">print</span></samp>&rsquo;, &lsquo;<samp><span class="samp">output</span></samp>&rsquo;, and
+&lsquo;<samp><span class="samp">call</span></samp>&rsquo;.  In <code>gdbtk</code> only, there's a corresponding
+&lsquo;<samp><span class="samp">gdb_eval</span></samp>&rsquo; command.
+
+<h5 class="subsubheading">Example</h5>
+
+<p>In the following example, the numbers that precede the commands are the
+<dfn>tokens</dfn> described in <a href="GDB_002fMI-Command-Syntax.html#GDB_002fMI-Command-Syntax"><span class="sc">gdb/mi</span> Command Syntax</a>.  Notice how <span class="sc">gdb/mi</span> returns the same tokens in its
+output.
+
+<pre class="smallexample">     211-data-evaluate-expression A
+     211^done,value="1"
+     (gdb)
+     311-data-evaluate-expression &amp;A
+     311^done,value="0xefffeb7c"
+     (gdb)
+     411-data-evaluate-expression A+3
+     411^done,value="4"
+     (gdb)
+     511-data-evaluate-expression "A + 3"
+     511^done,value="4"
+     (gdb)
+</pre>
+   <h4 class="subheading">The <code>-data-list-changed-registers</code> Command</h4>
+
+<p><a name="index-g_t_002ddata_002dlist_002dchanged_002dregisters-2092"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -data-list-changed-registers
+</pre>
+   <p>Display a list of the registers that have changed.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p><span class="sc">gdb</span> doesn't have a direct analog for this command; <code>gdbtk</code>
+has the corresponding command &lsquo;<samp><span class="samp">gdb_changed_register_list</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<p>On a PPC MBX board:
+
+<pre class="smallexample">     (gdb)
+     -exec-continue
+     ^running
+     
+     (gdb)
+     *stopped,reason="breakpoint-hit",disp="keep",bkptno="1",frame={
+     func="main",args=[],file="try.c",fullname="/home/foo/bar/try.c",
+     line="5"}
+     (gdb)
+     -data-list-changed-registers
+     ^done,changed-registers=["0","1","2","4","5","6","7","8","9",
+     "10","11","13","14","15","16","17","18","19","20","21","22","23",
+     "24","25","26","27","28","30","31","64","65","66","67","69"]
+     (gdb)
+</pre>
+   <h4 class="subheading">The <code>-data-list-register-names</code> Command</h4>
+
+<p><a name="index-g_t_002ddata_002dlist_002dregister_002dnames-2093"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -data-list-register-names [ ( <var>regno</var> )+ ]
+</pre>
+   <p>Show a list of register names for the current target.  If no arguments
+are given, it shows a list of the names of all the registers.  If
+integer numbers are given as arguments, it will print a list of the
+names of the registers corresponding to the arguments.  To ensure
+consistency between a register name and its number, the output list may
+include empty register names.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p><span class="sc">gdb</span> does not have a command which corresponds to
+&lsquo;<samp><span class="samp">-data-list-register-names</span></samp>&rsquo;.  In <code>gdbtk</code> there is a
+corresponding command &lsquo;<samp><span class="samp">gdb_regnames</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<p>For the PPC MBX board:
+<pre class="smallexample">     (gdb)
+     -data-list-register-names
+     ^done,register-names=["r0","r1","r2","r3","r4","r5","r6","r7",
+     "r8","r9","r10","r11","r12","r13","r14","r15","r16","r17","r18",
+     "r19","r20","r21","r22","r23","r24","r25","r26","r27","r28","r29",
+     "r30","r31","f0","f1","f2","f3","f4","f5","f6","f7","f8","f9",
+     "f10","f11","f12","f13","f14","f15","f16","f17","f18","f19","f20",
+     "f21","f22","f23","f24","f25","f26","f27","f28","f29","f30","f31",
+     "", "pc","ps","cr","lr","ctr","xer"]
+     (gdb)
+     -data-list-register-names 1 2 3
+     ^done,register-names=["r1","r2","r3"]
+     (gdb)
+</pre>
+   <h4 class="subheading">The <code>-data-list-register-values</code> Command</h4>
+
+<p><a name="index-g_t_002ddata_002dlist_002dregister_002dvalues-2094"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -data-list-register-values <var>fmt</var> [ ( <var>regno</var> )*]
+</pre>
+   <p>Display the registers' contents.  <var>fmt</var> is the format according to
+which the registers' contents are to be returned, followed by an optional
+list of numbers specifying the registers to display.  A missing list of
+numbers indicates that the contents of all the registers must be returned.
+
+   <p>Allowed formats for <var>fmt</var> are:
+
+     <dl>
+<dt><code>x</code><dd>Hexadecimal
+<br><dt><code>o</code><dd>Octal
+<br><dt><code>t</code><dd>Binary
+<br><dt><code>d</code><dd>Decimal
+<br><dt><code>r</code><dd>Raw
+<br><dt><code>N</code><dd>Natural
+</dl>
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> commands are &lsquo;<samp><span class="samp">info reg</span></samp>&rsquo;, &lsquo;<samp><span class="samp">info
+all-reg</span></samp>&rsquo;, and (in <code>gdbtk</code>) &lsquo;<samp><span class="samp">gdb_fetch_registers</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<p>For a PPC MBX board (note: line breaks are for readability only, they
+don't appear in the actual output):
+
+<pre class="smallexample">     (gdb)
+     -data-list-register-values r 64 65
+     ^done,register-values=[{number="64",value="0xfe00a300"},
+     {number="65",value="0x00029002"}]
+     (gdb)
+     -data-list-register-values x
+     ^done,register-values=[{number="0",value="0xfe0043c8"},
+     {number="1",value="0x3fff88"},{number="2",value="0xfffffffe"},
+     {number="3",value="0x0"},{number="4",value="0xa"},
+     {number="5",value="0x3fff68"},{number="6",value="0x3fff58"},
+     {number="7",value="0xfe011e98"},{number="8",value="0x2"},
+     {number="9",value="0xfa202820"},{number="10",value="0xfa202808"},
+     {number="11",value="0x1"},{number="12",value="0x0"},
+     {number="13",value="0x4544"},{number="14",value="0xffdfffff"},
+     {number="15",value="0xffffffff"},{number="16",value="0xfffffeff"},
+     {number="17",value="0xefffffed"},{number="18",value="0xfffffffe"},
+     {number="19",value="0xffffffff"},{number="20",value="0xffffffff"},
+     {number="21",value="0xffffffff"},{number="22",value="0xfffffff7"},
+     {number="23",value="0xffffffff"},{number="24",value="0xffffffff"},
+     {number="25",value="0xffffffff"},{number="26",value="0xfffffffb"},
+     {number="27",value="0xffffffff"},{number="28",value="0xf7bfffff"},
+     {number="29",value="0x0"},{number="30",value="0xfe010000"},
+     {number="31",value="0x0"},{number="32",value="0x0"},
+     {number="33",value="0x0"},{number="34",value="0x0"},
+     {number="35",value="0x0"},{number="36",value="0x0"},
+     {number="37",value="0x0"},{number="38",value="0x0"},
+     {number="39",value="0x0"},{number="40",value="0x0"},
+     {number="41",value="0x0"},{number="42",value="0x0"},
+     {number="43",value="0x0"},{number="44",value="0x0"},
+     {number="45",value="0x0"},{number="46",value="0x0"},
+     {number="47",value="0x0"},{number="48",value="0x0"},
+     {number="49",value="0x0"},{number="50",value="0x0"},
+     {number="51",value="0x0"},{number="52",value="0x0"},
+     {number="53",value="0x0"},{number="54",value="0x0"},
+     {number="55",value="0x0"},{number="56",value="0x0"},
+     {number="57",value="0x0"},{number="58",value="0x0"},
+     {number="59",value="0x0"},{number="60",value="0x0"},
+     {number="61",value="0x0"},{number="62",value="0x0"},
+     {number="63",value="0x0"},{number="64",value="0xfe00a300"},
+     {number="65",value="0x29002"},{number="66",value="0x202f04b5"},
+     {number="67",value="0xfe0043b0"},{number="68",value="0xfe00b3e4"},
+     {number="69",value="0x20002b03"}]
+     (gdb)
+</pre>
+   <h4 class="subheading">The <code>-data-read-memory</code> Command</h4>
+
+<p><a name="index-g_t_002ddata_002dread_002dmemory-2095"></a>
+This command is deprecated, use <code>-data-read-memory-bytes</code> instead.
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -data-read-memory [ -o <var>byte-offset</var> ]
+        <var>address</var> <var>word-format</var> <var>word-size</var>
+        <var>nr-rows</var> <var>nr-cols</var> [ <var>aschar</var> ]
+</pre>
+<p class="noindent">where:
+
+     <dl>
+<dt>&lsquo;<samp><var>address</var></samp>&rsquo;<dd>An expression specifying the address of the first memory word to be
+read.  Complex expressions containing embedded white space should be
+quoted using the C convention.
+
+     <br><dt>&lsquo;<samp><var>word-format</var></samp>&rsquo;<dd>The format to be used to print the memory words.  The notation is the
+same as for <span class="sc">gdb</span>'s <code>print</code> command (see <a href="Output-Formats.html#Output-Formats">Output Formats</a>).
+
+     <br><dt>&lsquo;<samp><var>word-size</var></samp>&rsquo;<dd>The size of each memory word in bytes.
+
+     <br><dt>&lsquo;<samp><var>nr-rows</var></samp>&rsquo;<dd>The number of rows in the output table.
+
+     <br><dt>&lsquo;<samp><var>nr-cols</var></samp>&rsquo;<dd>The number of columns in the output table.
+
+     <br><dt>&lsquo;<samp><var>aschar</var></samp>&rsquo;<dd>If present, indicates that each row should include an <span class="sc">ascii</span> dump.  The
+value of <var>aschar</var> is used as a padding character when a byte is not a
+member of the printable <span class="sc">ascii</span> character set (printable <span class="sc">ascii</span>
+characters are those whose code is between 32 and 126, inclusively).
+
+     <br><dt>&lsquo;<samp><var>byte-offset</var></samp>&rsquo;<dd>An offset to add to the <var>address</var> before fetching memory. 
+</dl>
+
+   <p>This command displays memory contents as a table of <var>nr-rows</var> by
+<var>nr-cols</var> words, each word being <var>word-size</var> bytes.  In total,
+<var>nr-rows</var><code> * </code><var>nr-cols</var><code> * </code><var>word-size</var> bytes are read
+(returned as &lsquo;<samp><span class="samp">total-bytes</span></samp>&rsquo;).  Should less than the requested number
+of bytes be returned by the target, the missing words are identified
+using &lsquo;<samp><span class="samp">N/A</span></samp>&rsquo;.  The number of bytes read from the target is returned
+in &lsquo;<samp><span class="samp">nr-bytes</span></samp>&rsquo; and the starting address used to read memory in
+&lsquo;<samp><span class="samp">addr</span></samp>&rsquo;.
+
+   <p>The address of the next/previous row or page is available in
+&lsquo;<samp><span class="samp">next-row</span></samp>&rsquo; and &lsquo;<samp><span class="samp">prev-row</span></samp>&rsquo;, &lsquo;<samp><span class="samp">next-page</span></samp>&rsquo; and
+&lsquo;<samp><span class="samp">prev-page</span></samp>&rsquo;.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">x</span></samp>&rsquo;.  <code>gdbtk</code> has
+&lsquo;<samp><span class="samp">gdb_get_mem</span></samp>&rsquo; memory read command.
+
+<h5 class="subsubheading">Example</h5>
+
+<p>Read six bytes of memory starting at <code>bytes+6</code> but then offset by
+<code>-6</code> bytes.  Format as three rows of two columns.  One byte per
+word.  Display each word in hex.
+
+<pre class="smallexample">     (gdb)
+     9-data-read-memory -o -6 -- bytes+6 x 1 3 2
+     9^done,addr="0x00001390",nr-bytes="6",total-bytes="6",
+     next-row="0x00001396",prev-row="0x0000138e",next-page="0x00001396",
+     prev-page="0x0000138a",memory=[
+     {addr="0x00001390",data=["0x00","0x01"]},
+     {addr="0x00001392",data=["0x02","0x03"]},
+     {addr="0x00001394",data=["0x04","0x05"]}]
+     (gdb)
+</pre>
+   <p>Read two bytes of memory starting at address <code>shorts + 64</code> and
+display as a single word formatted in decimal.
+
+<pre class="smallexample">     (gdb)
+     5-data-read-memory shorts+64 d 2 1 1
+     5^done,addr="0x00001510",nr-bytes="2",total-bytes="2",
+     next-row="0x00001512",prev-row="0x0000150e",
+     next-page="0x00001512",prev-page="0x0000150e",memory=[
+     {addr="0x00001510",data=["128"]}]
+     (gdb)
+</pre>
+   <p>Read thirty two bytes of memory starting at <code>bytes+16</code> and format
+as eight rows of four columns.  Include a string encoding with &lsquo;<samp><span class="samp">x</span></samp>&rsquo;
+used as the non-printable character.
+
+<pre class="smallexample">     (gdb)
+     4-data-read-memory bytes+16 x 1 8 4 x
+     4^done,addr="0x000013a0",nr-bytes="32",total-bytes="32",
+     next-row="0x000013c0",prev-row="0x0000139c",
+     next-page="0x000013c0",prev-page="0x00001380",memory=[
+     {addr="0x000013a0",data=["0x10","0x11","0x12","0x13"],ascii="xxxx"},
+     {addr="0x000013a4",data=["0x14","0x15","0x16","0x17"],ascii="xxxx"},
+     {addr="0x000013a8",data=["0x18","0x19","0x1a","0x1b"],ascii="xxxx"},
+     {addr="0x000013ac",data=["0x1c","0x1d","0x1e","0x1f"],ascii="xxxx"},
+     {addr="0x000013b0",data=["0x20","0x21","0x22","0x23"],ascii=" !\"#"},
+     {addr="0x000013b4",data=["0x24","0x25","0x26","0x27"],ascii="$%&amp;'"},
+     {addr="0x000013b8",data=["0x28","0x29","0x2a","0x2b"],ascii="()*+"},
+     {addr="0x000013bc",data=["0x2c","0x2d","0x2e","0x2f"],ascii=",-./"}]
+     (gdb)
+</pre>
+   <h4 class="subheading">The <code>-data-read-memory-bytes</code> Command</h4>
+
+<p><a name="index-g_t_002ddata_002dread_002dmemory_002dbytes-2096"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -data-read-memory-bytes [ -o <var>byte-offset</var> ]
+        <var>address</var> <var>count</var>
+</pre>
+<p class="noindent">where:
+
+     <dl>
+<dt>&lsquo;<samp><var>address</var></samp>&rsquo;<dd>An expression specifying the address of the first memory word to be
+read.  Complex expressions containing embedded white space should be
+quoted using the C convention.
+
+     <br><dt>&lsquo;<samp><var>count</var></samp>&rsquo;<dd>The number of bytes to read.  This should be an integer literal.
+
+     <br><dt>&lsquo;<samp><var>byte-offset</var></samp>&rsquo;<dd>The offsets in bytes relative to <var>address</var> at which to start
+reading.  This should be an integer literal.  This option is provided
+so that a frontend is not required to first evaluate address and then
+perform address arithmetics itself.
+
+   </dl>
+
+   <p>This command attempts to read all accessible memory regions in the
+specified range.  First, all regions marked as unreadable in the memory
+map (if one is defined) will be skipped.  See <a href="Memory-Region-Attributes.html#Memory-Region-Attributes">Memory Region Attributes</a>.  Second, <span class="sc">gdb</span> will attempt to read the remaining
+regions.  For each one, if reading full region results in an errors,
+<span class="sc">gdb</span> will try to read a subset of the region.
+
+   <p>In general, every single byte in the region may be readable or not,
+and the only way to read every readable byte is to try a read at
+every address, which is not practical.   Therefore, <span class="sc">gdb</span> will
+attempt to read all accessible bytes at either beginning or the end
+of the region, using a binary division scheme.  This heuristic works
+well for reading accross a memory map boundary.  Note that if a region
+has a readable range that is neither at the beginning or the end,
+<span class="sc">gdb</span> will not read it.
+
+   <p>The result record (see <a href="GDB_002fMI-Result-Records.html#GDB_002fMI-Result-Records">GDB/MI Result Records</a>) that is output of
+the command includes a field named &lsquo;<samp><span class="samp">memory</span></samp>&rsquo; whose content is a
+list of tuples.  Each tuple represent a successfully read memory block
+and has the following fields:
+
+     <dl>
+<dt><code>begin</code><dd>The start address of the memory block, as hexadecimal literal.
+
+     <br><dt><code>end</code><dd>The end address of the memory block, as hexadecimal literal.
+
+     <br><dt><code>offset</code><dd>The offset of the memory block, as hexadecimal literal, relative to
+the start address passed to <code>-data-read-memory-bytes</code>.
+
+     <br><dt><code>contents</code><dd>The contents of the memory block, in hex.
+
+   </dl>
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">x</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -data-read-memory-bytes &amp;a 10
+     ^done,memory=[{begin="0xbffff154",offset="0x00000000",
+                   end="0xbffff15e",
+                   contents="01000000020000000300"}]
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-data-write-memory-bytes</code> Command</h4>
+
+<p><a name="index-g_t_002ddata_002dwrite_002dmemory_002dbytes-2097"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -data-write-memory-bytes <var>address</var> <var>contents</var>
+</pre>
+<p class="noindent">where:
+
+     <dl>
+<dt>&lsquo;<samp><var>address</var></samp>&rsquo;<dd>An expression specifying the address of the first memory word to be
+read.  Complex expressions containing embedded white space should be
+quoted using the C convention.
+
+     <br><dt>&lsquo;<samp><var>contents</var></samp>&rsquo;<dd>The hex-encoded bytes to write.
+
+   </dl>
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>There's no corresponding <span class="sc">gdb</span> command.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -data-write-memory-bytes &amp;a "aabbccdd"
+     ^done
+     (gdb)
+</pre>
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%% SECTION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+   </body></html>
+

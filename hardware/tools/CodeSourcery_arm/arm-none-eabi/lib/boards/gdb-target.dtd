@@ -1,0 +1,71 @@
+<!-- Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
+
+     Copying and distribution of this file, with or without modification,
+     are permitted in any medium without royalty provided the copyright
+     notice and this notice are preserved.  -->
+
+<!-- The root element of a GDB target description is <target>.  Omitted here,
+     because it conflicts with the CS3 DTD.  -->
+<!--
+<!ELEMENT target	(architecture?, feature*)>
+<!ATTLIST target
+	version		CDATA	#FIXED "1.0">
+-->
+
+<!ELEMENT architecture	(#PCDATA)>
+
+<!ELEMENT feature
+	((vector | flags | struct | union )*, (reg | space)*)>
+<!ATTLIST feature
+	xml:base	CDATA	#IMPLIED
+	name		ID	#REQUIRED>
+
+<!ELEMENT reg		(description*)>
+<!ATTLIST reg
+	name		CDATA	#REQUIRED
+	bitsize		CDATA	#REQUIRED
+	regnum		CDATA	#IMPLIED
+	save-restore	(yes | no) 'yes'
+	type		CDATA	'int'
+	group		CDATA	#IMPLIED
+	offset		CDATA	#IMPLIED
+	read-sensitive	(yes | no) 'no'>
+
+<!ELEMENT vector	EMPTY>
+<!ATTLIST vector
+	id		CDATA	#REQUIRED
+	type		CDATA	#REQUIRED
+	count		CDATA	#REQUIRED>
+
+<!ELEMENT flags		(field+)>
+<!ATTLIST flags
+	id		CDATA	#REQUIRED
+	size		CDATA	#REQUIRED>
+
+<!ELEMENT struct	(field+)>
+<!ATTLIST struct
+	id		CDATA	#REQUIRED
+	size		CDATA	#IMPLIED>
+
+<!ELEMENT union		(field+)>
+<!ATTLIST union
+	id		CDATA	#REQUIRED>
+
+<!ELEMENT field		EMPTY>
+<!ATTLIST field
+	name		CDATA	#REQUIRED
+	type		CDATA	#IMPLIED
+	start		CDATA	#IMPLIED
+	end		CDATA	#IMPLIED>
+
+<!ELEMENT space         ((reg | group)*)>
+<!ATTLIST space
+        name            CDATA   #REQUIRED
+        annex           CDATA   #REQUIRED>
+
+<!ELEMENT group         ((reg | group)*)>
+<!ATTLIST group
+        name            CDATA   #REQUIRED>
+
+<!ENTITY % xinclude SYSTEM "xinclude.dtd">
+%xinclude;

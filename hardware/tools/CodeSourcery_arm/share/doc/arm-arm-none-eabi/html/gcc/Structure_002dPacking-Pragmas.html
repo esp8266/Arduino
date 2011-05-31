@@ -1,0 +1,94 @@
+<html lang="en">
+<head>
+<title>Structure-Packing Pragmas - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Pragmas.html#Pragmas" title="Pragmas">
+<link rel="prev" href="Symbol_002dRenaming-Pragmas.html#Symbol_002dRenaming-Pragmas" title="Symbol-Renaming Pragmas">
+<link rel="next" href="Weak-Pragmas.html#Weak-Pragmas" title="Weak Pragmas">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Structure-Packing-Pragmas"></a>
+<a name="Structure_002dPacking-Pragmas"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Weak-Pragmas.html#Weak-Pragmas">Weak Pragmas</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Symbol_002dRenaming-Pragmas.html#Symbol_002dRenaming-Pragmas">Symbol-Renaming Pragmas</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Pragmas.html#Pragmas">Pragmas</a>
+<hr>
+</div>
+
+<h4 class="subsection">6.54.8 Structure-Packing Pragmas</h4>
+
+<p>For compatibility with Microsoft Windows compilers, GCC supports a
+set of <code>#pragma</code> directives which change the maximum alignment of
+members of structures (other than zero-width bitfields), unions, and
+classes subsequently defined. The <var>n</var> value below always is required
+to be a small power of two and specifies the new alignment in bytes.
+
+     <ol type=1 start=1>
+<li><code>#pragma pack(</code><var>n</var><code>)</code> simply sets the new alignment. 
+<li><code>#pragma pack()</code> sets the alignment to the one that was in
+effect when compilation started (see also command line option
+<samp><span class="option">-fpack-struct[=&lt;n&gt;]</span></samp> see <a href="Code-Gen-Options.html#Code-Gen-Options">Code Gen Options</a>). 
+<li><code>#pragma pack(push[,</code><var>n</var><code>])</code> pushes the current alignment
+setting on an internal stack and then optionally sets the new alignment. 
+<li><code>#pragma pack(pop)</code> restores the alignment setting to the one
+saved at the top of the internal stack (and removes that stack entry). 
+Note that <code>#pragma pack([</code><var>n</var><code>])</code> does not influence this internal
+stack; thus it is possible to have <code>#pragma pack(push)</code> followed by
+multiple <code>#pragma pack(</code><var>n</var><code>)</code> instances and finalized by a single
+<code>#pragma pack(pop)</code>.
+      </ol>
+
+ <p>Some targets, e.g. i386 and powerpc, support the <code>ms_struct</code>
+<code>#pragma</code> which lays out a structure as the documented
+<code>__attribute__ ((ms_struct))</code>.
+     <ol type=1 start=1>
+<li><code>#pragma ms_struct on</code> turns on the layout for structures
+declared. 
+<li><code>#pragma ms_struct off</code> turns off the layout for structures
+declared. 
+<li><code>#pragma ms_struct reset</code> goes back to the default layout.
+      </ol>
+
+ </body></html>
+

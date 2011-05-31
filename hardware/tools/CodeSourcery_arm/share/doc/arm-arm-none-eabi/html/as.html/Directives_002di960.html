@@ -1,0 +1,97 @@
+<html lang="en">
+<head>
+<title>Directives-i960 - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="i960_002dDependent.html#i960_002dDependent" title="i960-Dependent">
+<link rel="prev" href="Floating-Point_002di960.html#Floating-Point_002di960" title="Floating Point-i960">
+<link rel="next" href="Opcodes-for-i960.html#Opcodes-for-i960" title="Opcodes for i960">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Directives-i960"></a>
+<a name="Directives_002di960"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Opcodes-for-i960.html#Opcodes-for-i960">Opcodes for i960</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Floating-Point_002di960.html#Floating-Point_002di960">Floating Point-i960</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="i960_002dDependent.html#i960_002dDependent">i960-Dependent</a>
+<hr>
+</div>
+
+<h4 class="subsection">9.15.3 i960 Machine Directives</h4>
+
+<p><a name="index-machine-directives_002c-i960-1021"></a><a name="index-i960-machine-directives-1022"></a>
+     
+<a name="index-g_t_0040code_007bbss_007d-directive_002c-i960-1023"></a>
+<dl><dt><code>.bss </code><var>symbol</var><code>, </code><var>length</var><code>, </code><var>align</var><dd>Reserve <var>length</var> bytes in the bss section for a local <var>symbol</var>,
+aligned to the power of two specified by <var>align</var>.  <var>length</var> and
+<var>align</var> must be positive absolute expressions.  This directive
+differs from &lsquo;<samp><span class="samp">.lcomm</span></samp>&rsquo; only in that it permits you to specify
+an alignment.  See <a href="Lcomm.html#Lcomm"><code>.lcomm</code></a>. 
+</dl>
+
+     
+<a name="index-g_t_0040code_007bextended_007d-directive_002c-i960-1024"></a>
+<dl><dt><code>.extended </code><var>flonums</var><dd><code>.extended</code> expects zero or more flonums, separated by commas; for
+each flonum, &lsquo;<samp><span class="samp">.extended</span></samp>&rsquo; emits an <span class="sc">ieee</span> extended-format (80-bit)
+floating-point number.
+
+     <p><a name="index-g_t_0040code_007bleafproc_007d-directive_002c-i960-1025"></a><br><dt><code>.leafproc </code><var>call-lab</var><code>, </code><var>bal-lab</var><dd>You can use the &lsquo;<samp><span class="samp">.leafproc</span></samp>&rsquo; directive in conjunction with the
+optimized <code>callj</code> instruction to enable faster calls of leaf
+procedures.  If a procedure is known to call no other procedures, you
+may define an entry point that skips procedure prolog code (and that does
+not depend on system-supplied saved context), and declare it as the
+<var>bal-lab</var> using &lsquo;<samp><span class="samp">.leafproc</span></samp>&rsquo;.  If the procedure also has an
+entry point that goes through the normal prolog, you can specify that
+entry point as <var>call-lab</var>.
+
+     <p>A &lsquo;<samp><span class="samp">.leafproc</span></samp>&rsquo; declaration is meant for use in conjunction with the
+optimized call instruction &lsquo;<samp><span class="samp">callj</span></samp>&rsquo;; the directive records the data
+needed later to choose between converting the &lsquo;<samp><span class="samp">callj</span></samp>&rsquo; into a
+<code>bal</code> or a <code>call</code>.
+
+     <p><var>call-lab</var> is optional; if only one argument is present, or if the
+two arguments are identical, the single argument is assumed to be the
+<code>bal</code> entry point.
+
+     <p><a name="index-g_t_0040code_007bsysproc_007d-directive_002c-i960-1026"></a><br><dt><code>.sysproc </code><var>name</var><code>, </code><var>index</var><dd>The &lsquo;<samp><span class="samp">.sysproc</span></samp>&rsquo; directive defines a name for a system procedure. 
+After you define it using &lsquo;<samp><span class="samp">.sysproc</span></samp>&rsquo;, you can use <var>name</var> to
+refer to the system procedure identified by <var>index</var> when calling
+procedures with the optimized call instruction &lsquo;<samp><span class="samp">callj</span></samp>&rsquo;.
+
+     <p>Both arguments are required; <var>index</var> must be between 0 and 31
+(inclusive). 
+</dl>
+
+   </body></html>
+

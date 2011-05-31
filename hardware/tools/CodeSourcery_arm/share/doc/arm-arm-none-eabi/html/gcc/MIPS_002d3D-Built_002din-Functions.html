@@ -1,0 +1,181 @@
+<html lang="en">
+<head>
+<title>MIPS-3D Built-in Functions - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="MIPS-Loongson-Built_002din-Functions.html#MIPS-Loongson-Built_002din-Functions" title="MIPS Loongson Built-in Functions">
+<link rel="prev" href="Paired_002dSingle-Built_002din-Functions.html#Paired_002dSingle-Built_002din-Functions" title="Paired-Single Built-in Functions">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="MIPS-3D-Built-in-Functions"></a>
+<a name="MIPS_002d3D-Built_002din-Functions"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Paired_002dSingle-Built_002din-Functions.html#Paired_002dSingle-Built_002din-Functions">Paired-Single Built-in Functions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="MIPS-Loongson-Built_002din-Functions.html#MIPS-Loongson-Built_002din-Functions">MIPS Loongson Built-in Functions</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">6.52.9.3 MIPS-3D Built-in Functions</h5>
+
+<p>The MIPS-3D Application-Specific Extension (ASE) includes additional
+paired-single instructions that are designed to improve the performance
+of 3D graphics operations.  Support for these instructions is controlled
+by the <samp><span class="option">-mips3d</span></samp> command-line option.
+
+ <p>The functions listed below map directly to a particular MIPS-3D
+instruction.  Please refer to the architecture specification for
+more details on what each instruction does.
+
+     <dl>
+<dt><code>v2sf __builtin_mips_addr_ps (v2sf, v2sf)</code><dd>Reduction add (<code>addr.ps</code>).
+
+     <br><dt><code>v2sf __builtin_mips_mulr_ps (v2sf, v2sf)</code><dd>Reduction multiply (<code>mulr.ps</code>).
+
+     <br><dt><code>v2sf __builtin_mips_cvt_pw_ps (v2sf)</code><dd>Convert paired single to paired word (<code>cvt.pw.ps</code>).
+
+     <br><dt><code>v2sf __builtin_mips_cvt_ps_pw (v2sf)</code><dd>Convert paired word to paired single (<code>cvt.ps.pw</code>).
+
+     <br><dt><code>float __builtin_mips_recip1_s (float)</code><dt><code>double __builtin_mips_recip1_d (double)</code><dt><code>v2sf __builtin_mips_recip1_ps (v2sf)</code><dd>Reduced precision reciprocal (sequence step 1) (<code>recip1.</code><var>fmt</var>).
+
+     <br><dt><code>float __builtin_mips_recip2_s (float, float)</code><dt><code>double __builtin_mips_recip2_d (double, double)</code><dt><code>v2sf __builtin_mips_recip2_ps (v2sf, v2sf)</code><dd>Reduced precision reciprocal (sequence step 2) (<code>recip2.</code><var>fmt</var>).
+
+     <br><dt><code>float __builtin_mips_rsqrt1_s (float)</code><dt><code>double __builtin_mips_rsqrt1_d (double)</code><dt><code>v2sf __builtin_mips_rsqrt1_ps (v2sf)</code><dd>Reduced precision reciprocal square root (sequence step 1)
+(<code>rsqrt1.</code><var>fmt</var>).
+
+     <br><dt><code>float __builtin_mips_rsqrt2_s (float, float)</code><dt><code>double __builtin_mips_rsqrt2_d (double, double)</code><dt><code>v2sf __builtin_mips_rsqrt2_ps (v2sf, v2sf)</code><dd>Reduced precision reciprocal square root (sequence step 2)
+(<code>rsqrt2.</code><var>fmt</var>). 
+</dl>
+
+ <p>The following multi-instruction functions are also available. 
+In each case, <var>cond</var> can be any of the 16 floating-point conditions:
+<code>f</code>, <code>un</code>, <code>eq</code>, <code>ueq</code>, <code>olt</code>, <code>ult</code>,
+<code>ole</code>, <code>ule</code>, <code>sf</code>, <code>ngle</code>, <code>seq</code>,
+<code>ngl</code>, <code>lt</code>, <code>nge</code>, <code>le</code> or <code>ngt</code>.
+
+     <dl>
+<dt><code>int __builtin_mips_cabs_</code><var>cond</var><code>_s (float </code><var>a</var><code>, float </code><var>b</var><code>)</code><dt><code>int __builtin_mips_cabs_</code><var>cond</var><code>_d (double </code><var>a</var><code>, double </code><var>b</var><code>)</code><dd>Absolute comparison of two scalar values (<code>cabs.</code><var>cond</var><code>.</code><var>fmt</var>,
+<code>bc1t</code>/<code>bc1f</code>).
+
+     <p>These functions compare <var>a</var> and <var>b</var> using <code>cabs.</code><var>cond</var><code>.s</code>
+or <code>cabs.</code><var>cond</var><code>.d</code> and return the result as a boolean value. 
+For example:
+
+     <pre class="smallexample">          float a, b;
+          if (__builtin_mips_cabs_eq_s (a, b))
+            true ();
+          else
+            false ();
+</pre>
+     <br><dt><code>int __builtin_mips_upper_cabs_</code><var>cond</var><code>_ps (v2sf </code><var>a</var><code>, v2sf </code><var>b</var><code>)</code><dt><code>int __builtin_mips_lower_cabs_</code><var>cond</var><code>_ps (v2sf </code><var>a</var><code>, v2sf </code><var>b</var><code>)</code><dd>Absolute comparison of two paired-single values (<code>cabs.</code><var>cond</var><code>.ps</code>,
+<code>bc1t</code>/<code>bc1f</code>).
+
+     <p>These functions compare <var>a</var> and <var>b</var> using <code>cabs.</code><var>cond</var><code>.ps</code>
+and return either the upper or lower half of the result.  For example:
+
+     <pre class="smallexample">          v2sf a, b;
+          if (__builtin_mips_upper_cabs_eq_ps (a, b))
+            upper_halves_are_equal ();
+          else
+            upper_halves_are_unequal ();
+          
+          if (__builtin_mips_lower_cabs_eq_ps (a, b))
+            lower_halves_are_equal ();
+          else
+            lower_halves_are_unequal ();
+</pre>
+     <br><dt><code>v2sf __builtin_mips_movt_cabs_</code><var>cond</var><code>_ps (v2sf </code><var>a</var><code>, v2sf </code><var>b</var><code>, v2sf </code><var>c</var><code>, v2sf </code><var>d</var><code>)</code><dt><code>v2sf __builtin_mips_movf_cabs_</code><var>cond</var><code>_ps (v2sf </code><var>a</var><code>, v2sf </code><var>b</var><code>, v2sf </code><var>c</var><code>, v2sf </code><var>d</var><code>)</code><dd>Conditional move based on absolute comparison (<code>cabs.</code><var>cond</var><code>.ps</code>,
+<code>movt.ps</code>/<code>movf.ps</code>).
+
+     <p>The <code>movt</code> functions return the value <var>x</var> computed by:
+
+     <pre class="smallexample">          cabs.<var>cond</var>.ps <var>cc</var>,<var>a</var>,<var>b</var>
+          mov.ps <var>x</var>,<var>c</var>
+          movt.ps <var>x</var>,<var>d</var>,<var>cc</var>
+</pre>
+     <p>The <code>movf</code> functions are similar but use <code>movf.ps</code> instead
+of <code>movt.ps</code>.
+
+     <br><dt><code>int __builtin_mips_any_c_</code><var>cond</var><code>_ps (v2sf </code><var>a</var><code>, v2sf </code><var>b</var><code>)</code><dt><code>int __builtin_mips_all_c_</code><var>cond</var><code>_ps (v2sf </code><var>a</var><code>, v2sf </code><var>b</var><code>)</code><dt><code>int __builtin_mips_any_cabs_</code><var>cond</var><code>_ps (v2sf </code><var>a</var><code>, v2sf </code><var>b</var><code>)</code><dt><code>int __builtin_mips_all_cabs_</code><var>cond</var><code>_ps (v2sf </code><var>a</var><code>, v2sf </code><var>b</var><code>)</code><dd>Comparison of two paired-single values
+(<code>c.</code><var>cond</var><code>.ps</code>/<code>cabs.</code><var>cond</var><code>.ps</code>,
+<code>bc1any2t</code>/<code>bc1any2f</code>).
+
+     <p>These functions compare <var>a</var> and <var>b</var> using <code>c.</code><var>cond</var><code>.ps</code>
+or <code>cabs.</code><var>cond</var><code>.ps</code>.  The <code>any</code> forms return true if either
+result is true and the <code>all</code> forms return true if both results are true. 
+For example:
+
+     <pre class="smallexample">          v2sf a, b;
+          if (__builtin_mips_any_c_eq_ps (a, b))
+            one_is_true ();
+          else
+            both_are_false ();
+          
+          if (__builtin_mips_all_c_eq_ps (a, b))
+            both_are_true ();
+          else
+            one_is_false ();
+</pre>
+     <br><dt><code>int __builtin_mips_any_c_</code><var>cond</var><code>_4s (v2sf </code><var>a</var><code>, v2sf </code><var>b</var><code>, v2sf </code><var>c</var><code>, v2sf </code><var>d</var><code>)</code><dt><code>int __builtin_mips_all_c_</code><var>cond</var><code>_4s (v2sf </code><var>a</var><code>, v2sf </code><var>b</var><code>, v2sf </code><var>c</var><code>, v2sf </code><var>d</var><code>)</code><dt><code>int __builtin_mips_any_cabs_</code><var>cond</var><code>_4s (v2sf </code><var>a</var><code>, v2sf </code><var>b</var><code>, v2sf </code><var>c</var><code>, v2sf </code><var>d</var><code>)</code><dt><code>int __builtin_mips_all_cabs_</code><var>cond</var><code>_4s (v2sf </code><var>a</var><code>, v2sf </code><var>b</var><code>, v2sf </code><var>c</var><code>, v2sf </code><var>d</var><code>)</code><dd>Comparison of four paired-single values
+(<code>c.</code><var>cond</var><code>.ps</code>/<code>cabs.</code><var>cond</var><code>.ps</code>,
+<code>bc1any4t</code>/<code>bc1any4f</code>).
+
+     <p>These functions use <code>c.</code><var>cond</var><code>.ps</code> or <code>cabs.</code><var>cond</var><code>.ps</code>
+to compare <var>a</var> with <var>b</var> and to compare <var>c</var> with <var>d</var>. 
+The <code>any</code> forms return true if any of the four results are true
+and the <code>all</code> forms return true if all four results are true. 
+For example:
+
+     <pre class="smallexample">          v2sf a, b, c, d;
+          if (__builtin_mips_any_c_eq_4s (a, b, c, d))
+            some_are_true ();
+          else
+            all_are_false ();
+          
+          if (__builtin_mips_all_c_eq_4s (a, b, c, d))
+            all_are_true ();
+          else
+            some_are_false ();
+</pre>
+     </dl>
+
+ </body></html>
+

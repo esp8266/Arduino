@@ -1,0 +1,99 @@
+<html lang="en">
+<head>
+<title>Qualifiers implementation - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Implementation.html#C-Implementation" title="C Implementation">
+<link rel="prev" href="Structures-unions-enumerations-and-bit_002dfields-implementation.html#Structures-unions-enumerations-and-bit_002dfields-implementation" title="Structures unions enumerations and bit-fields implementation">
+<link rel="next" href="Declarators-implementation.html#Declarators-implementation" title="Declarators implementation">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Qualifiers-implementation"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Declarators-implementation.html#Declarators-implementation">Declarators implementation</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Structures-unions-enumerations-and-bit_002dfields-implementation.html#Structures-unions-enumerations-and-bit_002dfields-implementation">Structures unions enumerations and bit-fields implementation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Implementation.html#C-Implementation">C Implementation</a>
+<hr>
+</div>
+
+<h3 class="section">4.10 Qualifiers</h3>
+
+     <ul>
+<li><cite>What constitutes an access to an object that has volatile-qualified
+type (C90 6.5.3, C99 6.7.3).</cite>
+
+     <p>Such an object is normally accessed by pointers and used for accessing
+hardware.  In most expressions, it is intuitively obvious what is a read
+and what is a write.  For example
+
+     <pre class="smallexample">          volatile int *dst = <var>somevalue</var>;
+          volatile int *src = <var>someothervalue</var>;
+          *dst = *src;
+</pre>
+     <p class="noindent">will cause a read of the volatile object pointed to by <var>src</var> and store the
+value into the volatile object pointed to by <var>dst</var>.  There is no
+guarantee that these reads and writes are atomic, especially for objects
+larger than <code>int</code>.
+
+     <p>However, if the volatile storage is not being modified, and the value of
+the volatile storage is not used, then the situation is less obvious. 
+For example
+
+     <pre class="smallexample">          volatile int *src = <var>somevalue</var>;
+          *src;
+</pre>
+     <p>According to the C standard, such an expression is an rvalue whose type
+is the unqualified version of its original type, i.e. <code>int</code>.  Whether
+GCC interprets this as a read of the volatile object being pointed to or
+only as a request to evaluate the expression for its side-effects depends
+on this type.
+
+     <p>If it is a scalar type, or on most targets an aggregate type whose only
+member object is of a scalar type, or a union type whose member objects
+are of scalar types, the expression is interpreted by GCC as a read of
+the volatile object; in the other cases, the expression is only evaluated
+for its side-effects.
+
+</ul>
+
+ </body></html>
+

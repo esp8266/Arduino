@@ -1,0 +1,69 @@
+<html lang="en">
+<head>
+<title>Readline vi Mode - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Command-Line-Editing.html#Command-Line-Editing" title="Command Line Editing">
+<link rel="prev" href="Bindable-Readline-Commands.html#Bindable-Readline-Commands" title="Bindable Readline Commands">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Readline-vi-Mode"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Bindable-Readline-Commands.html#Bindable-Readline-Commands">Bindable Readline Commands</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Command-Line-Editing.html#Command-Line-Editing">Command Line Editing</a>
+<hr>
+</div>
+
+<h3 class="section">31.5 Readline vi Mode</h3>
+
+<p>While the Readline library does not have a full set of <code>vi</code>
+editing functions, it does contain enough to allow simple editing
+of the line.  The Readline <code>vi</code> mode behaves as specified in
+the <span class="sc">posix</span> 1003.2 standard.
+
+   <p>In order to switch interactively between <code>emacs</code> and <code>vi</code>
+editing modes, use the command <kbd>M-C-j</kbd> (bound to emacs-editing-mode
+when in <code>vi</code> mode and to vi-editing-mode in <code>emacs</code> mode). 
+The Readline default is <code>emacs</code> mode.
+
+   <p>When you enter a line in <code>vi</code> mode, you are already placed in
+`insertion' mode, as if you had typed an &lsquo;<samp><span class="samp">i</span></samp>&rsquo;.  Pressing &lt;ESC&gt;
+switches you into `command' mode, where you can edit the text of the
+line with the standard <code>vi</code> movement keys, move to previous
+history lines with &lsquo;<samp><span class="samp">k</span></samp>&rsquo; and subsequent lines with &lsquo;<samp><span class="samp">j</span></samp>&rsquo;, and
+so forth.
+
+   </body></html>
+

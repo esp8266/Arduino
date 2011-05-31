@@ -1,0 +1,132 @@
+<html lang="en">
+<head>
+<title>Non-Stop Mode - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Thread-Stops.html#Thread-Stops" title="Thread Stops">
+<link rel="prev" href="All_002dStop-Mode.html#All_002dStop-Mode" title="All-Stop Mode">
+<link rel="next" href="Background-Execution.html#Background-Execution" title="Background Execution">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Non-Stop-Mode"></a>
+<a name="Non_002dStop-Mode"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Background-Execution.html#Background-Execution">Background Execution</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="All_002dStop-Mode.html#All_002dStop-Mode">All-Stop Mode</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Thread-Stops.html#Thread-Stops">Thread Stops</a>
+<hr>
+</div>
+
+<h4 class="subsection">5.4.2 Non-Stop Mode</h4>
+
+<p><a name="index-non_002dstop-mode-326"></a>
+<!-- This section is really only a place-holder, and needs to be expanded -->
+<!-- with more details. -->
+
+   <p>For some multi-threaded targets, <span class="sc">gdb</span> supports an optional
+mode of operation in which you can examine stopped program threads in
+the debugger while other threads continue to execute freely.  This
+minimizes intrusion when debugging live systems, such as programs
+where some threads have real-time constraints or must continue to
+respond to external events.  This is referred to as <dfn>non-stop</dfn> mode.
+
+   <p>In non-stop mode, when a thread stops to report a debugging event,
+<em>only</em> that thread is stopped; <span class="sc">gdb</span> does not stop other
+threads as well, in contrast to the all-stop mode behavior.  Additionally,
+execution commands such as <code>continue</code> and <code>step</code> apply by default
+only to the current thread in non-stop mode, rather than all threads as
+in all-stop mode.  This allows you to control threads explicitly in
+ways that are not possible in all-stop mode &mdash; for example, stepping
+one thread while allowing others to run freely, stepping
+one thread while holding all others stopped, or stepping several threads
+independently and simultaneously.
+
+   <p>To enter non-stop mode, use this sequence of commands before you run
+or attach to your program:
+
+<pre class="smallexample">     # Enable the async interface.
+     set target-async 1
+     
+     # If using the CLI, pagination breaks non-stop.
+     set pagination off
+     
+     # Finally, turn it on!
+     set non-stop on
+</pre>
+   <p>You can use these commands to manipulate the non-stop mode setting:
+
+     
+<a name="index-set-non_002dstop-327"></a>
+<dl><dt><code>set non-stop on</code><dd>Enable selection of non-stop mode. 
+<br><dt><code>set non-stop off</code><dd>Disable selection of non-stop mode. 
+<a name="index-show-non_002dstop-328"></a><br><dt><code>show non-stop</code><dd>Show the current non-stop enablement setting. 
+</dl>
+
+   <p>Note these commands only reflect whether non-stop mode is enabled,
+not whether the currently-executing program is being run in non-stop mode. 
+In particular, the <code>set non-stop</code> preference is only consulted when
+<span class="sc">gdb</span> starts or connects to the target program, and it is generally
+not possible to switch modes once debugging has started.  Furthermore,
+since not all targets support non-stop mode, even when you have enabled
+non-stop mode, <span class="sc">gdb</span> may still fall back to all-stop operation by
+default.
+
+   <p>In non-stop mode, all execution commands apply only to the current thread
+by default.  That is, <code>continue</code> only continues one thread. 
+To continue all threads, issue <code>continue -a</code> or <code>c -a</code>.
+
+   <p>You can use <span class="sc">gdb</span>'s background execution commands
+(see <a href="Background-Execution.html#Background-Execution">Background Execution</a>) to run some threads in the background
+while you continue to examine or step others from <span class="sc">gdb</span>. 
+The MI execution commands (see <a href="GDB_002fMI-Program-Execution.html#GDB_002fMI-Program-Execution">GDB/MI Program Execution</a>) are
+always executed asynchronously in non-stop mode.
+
+   <p>Suspending execution is done with the <code>interrupt</code> command when
+running in the background, or <kbd>Ctrl-c</kbd> during foreground execution. 
+In all-stop mode, this stops the whole process;
+but in non-stop mode the interrupt applies only to the current thread. 
+To stop the whole program, use <code>interrupt -a</code>.
+
+   <p>Other execution commands do not currently support the <code>-a</code> option.
+
+   <p>In non-stop mode, when a thread stops, <span class="sc">gdb</span> doesn't automatically make
+that thread current, as it does in all-stop mode.  This is because the
+thread stop notifications are asynchronous with respect to <span class="sc">gdb</span>'s
+command interpreter, and it would be confusing if <span class="sc">gdb</span> unexpectedly
+changed to a different thread just as you entered a command to operate on the
+previously current thread.
+
+   </body></html>
+

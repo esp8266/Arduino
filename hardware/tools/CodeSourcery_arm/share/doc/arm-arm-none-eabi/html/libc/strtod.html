@@ -1,0 +1,96 @@
+<html lang="en">
+<head>
+<title>strtod - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdlib.html#Stdlib" title="Stdlib">
+<link rel="prev" href="rand48.html#rand48" title="rand48">
+<link rel="next" href="strtol.html#strtol" title="strtol">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="strtod"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="strtol.html#strtol">strtol</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="rand48.html#rand48">rand48</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdlib.html#Stdlib">Stdlib</a>
+<hr>
+</div>
+
+<h3 class="section">2.34 <code>strtod</code>, <code>strtof</code>&mdash;string to double or float</h3>
+
+<p><a name="index-strtod-79"></a><a name="index-g_t_005fstrtod_005fr-80"></a><a name="index-strtof-81"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdlib.h&gt;
+     double strtod(const char *<var>str</var>, char **<var>tail</var>);
+     float strtof(const char *<var>str</var>, char **<var>tail</var>);
+     
+     double _strtod_r(void *<var>reent</var>,
+         const char *<var>str</var>, char **<var>tail</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+The function <code>strtod</code> parses the character string <var>str</var>,
+producing a substring which can be converted to a double
+value.  The substring converted is the longest initial
+subsequence of <var>str</var>, beginning with the first
+non-whitespace character, that has one of these formats:
+<pre class="smallexample">     [+|-]<var>digits</var>[.[<var>digits</var>]][(e|E)[+|-]<var>digits</var>]
+     [+|-].<var>digits</var>[(e|E)[+|-]<var>digits</var>]
+     [+|-](i|I)(n|N)(f|F)[(i|I)(n|N)(i|I)(t|T)(y|Y)]
+     [+|-](n|N)(a|A)(n|N)[&lt;(&gt;[<var>hexdigits</var>]&lt;)&gt;]
+     [+|-]0(x|X)<var>hexdigits</var>[.[<var>hexdigits</var>]][(p|P)[+|-]<var>digits</var>]
+     [+|-]0(x|X).<var>hexdigits</var>[(p|P)[+|-]<var>digits</var>]
+</pre>
+   <p>The substring contains no characters if <var>str</var> is empty, consists
+entirely of whitespace, or if the first non-whitespace
+character is something other than <code>+</code>, <code>-</code>, <code>.</code>, or a
+digit, and cannot be parsed as infinity or NaN. If the platform
+does not support NaN, then NaN is treated as an empty substring. 
+If the substring is empty, no conversion is done, and
+the value of <var>str</var> is stored in <code>*</code><var>tail</var>.  Otherwise,
+the substring is converted, and a pointer to the final string
+(which will contain at least the terminating null character of
+<var>str</var>) is stored in <code>*</code><var>tail</var>.  If you want no
+assignment to <code>*</code><var>tail</var>, pass a null pointer as <var>tail</var>. 
+<code>strtof</code> is identical to <code>strtod</code> except for its return type.
+
+   <p>This implementation returns the nearest machine number to the
+input decimal string.  Ties are broken by using the IEEE
+round-even rule.  However, <code>strtof</code> is currently subject to
+double rounding errors.
+
+   <p>The alternate function <code>_strtod_r</code> is a reentrant version. 
+The extra argument <var>reent</var> is a pointer to a reentrancy structure.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>strtod</code> returns the converted substring value, if any.  If
+no conversion could be performed, 0 is returned.  If the
+correct value is out of the range of representable values,
+plus or minus <code>HUGE_VAL</code> is returned, and <code>ERANGE</code> is
+stored in errno. If the correct value would cause underflow, 0
+is returned and <code>ERANGE</code> is stored in errno.
+
+   <p>Supporting OS subroutines required: <code>close</code>, <code>fstat</code>, <code>isatty</code>,
+<code>lseek</code>, <code>read</code>, <code>sbrk</code>, <code>write</code>.
+
+   <p><br>
+
+   </body></html>
+

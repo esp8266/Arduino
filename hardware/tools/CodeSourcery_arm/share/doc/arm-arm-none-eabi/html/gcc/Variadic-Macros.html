@@ -1,0 +1,111 @@
+<html lang="en">
+<head>
+<title>Variadic Macros - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Empty-Structures.html#Empty-Structures" title="Empty Structures">
+<link rel="next" href="Escaped-Newlines.html#Escaped-Newlines" title="Escaped Newlines">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Variadic-Macros"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Escaped-Newlines.html#Escaped-Newlines">Escaped Newlines</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Empty-Structures.html#Empty-Structures">Empty Structures</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.19 Macros with a Variable Number of Arguments.</h3>
+
+<p><a name="index-variable-number-of-arguments-2298"></a><a name="index-macro-with-variable-arguments-2299"></a><a name="index-rest-argument-_0028in-macro_0029-2300"></a><a name="index-variadic-macros-2301"></a>
+In the ISO C standard of 1999, a macro can be declared to accept a
+variable number of arguments much as a function can.  The syntax for
+defining the macro is similar to that of a function.  Here is an
+example:
+
+<pre class="smallexample">     #define debug(format, ...) fprintf (stderr, format, __VA_ARGS__)
+</pre>
+ <p>Here &lsquo;<samp><span class="samp">...</span></samp>&rsquo; is a <dfn>variable argument</dfn>.  In the invocation of
+such a macro, it represents the zero or more tokens until the closing
+parenthesis that ends the invocation, including any commas.  This set of
+tokens replaces the identifier <code>__VA_ARGS__</code> in the macro body
+wherever it appears.  See the CPP manual for more information.
+
+ <p>GCC has long supported variadic macros, and used a different syntax that
+allowed you to give a name to the variable arguments just like any other
+argument.  Here is an example:
+
+<pre class="smallexample">     #define debug(format, args...) fprintf (stderr, format, args)
+</pre>
+ <p>This is in all ways equivalent to the ISO C example above, but arguably
+more readable and descriptive.
+
+ <p>GNU CPP has two further variadic macro extensions, and permits them to
+be used with either of the above forms of macro definition.
+
+ <p>In standard C, you are not allowed to leave the variable argument out
+entirely; but you are allowed to pass an empty argument.  For example,
+this invocation is invalid in ISO C, because there is no comma after
+the string:
+
+<pre class="smallexample">     debug ("A message")
+</pre>
+ <p>GNU CPP permits you to completely omit the variable arguments in this
+way.  In the above examples, the compiler would complain, though since
+the expansion of the macro still has the extra comma after the format
+string.
+
+ <p>To help solve this problem, CPP behaves specially for variable arguments
+used with the token paste operator, &lsquo;<samp><span class="samp">##</span></samp>&rsquo;.  If instead you write
+
+<pre class="smallexample">     #define debug(format, ...) fprintf (stderr, format, ## __VA_ARGS__)
+</pre>
+ <p>and if the variable arguments are omitted or empty, the &lsquo;<samp><span class="samp">##</span></samp>&rsquo;
+operator causes the preprocessor to remove the comma before it.  If you
+do provide some variable arguments in your macro invocation, GNU CPP
+does not complain about the paste operation and instead places the
+variable arguments after the comma.  Just like any other pasted macro
+argument, these arguments are not macro expanded.
+
+ </body></html>
+

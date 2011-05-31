@@ -1,0 +1,38 @@
+/* This file contains the definitions and documentation for the
+   extra tree codes used by gcj.
+   Copyright (C) 1996, 2007 Free Software Foundation, Inc.
+
+This file is part of GCC.
+
+GCC is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 3, or (at your option) any later
+version.
+
+GCC is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with GCC; see the file COPYING3.  If not see
+<http://www.gnu.org/licenses/>.  */
+
+
+/* Shift right, logical. */
+DEFTREECODE (URSHIFT_EXPR, "urshift_expr", tcc_binary, 2)
+
+/* Return -1, 0, 1 depending on whether the first argument is
+   less, equal, or greater to the second argument. */
+DEFTREECODE (COMPARE_EXPR, "compare_expr", tcc_binary, 2)
+
+/* Same as COMPARE_EXPR, but if either value is NaN, the result is -1. */
+DEFTREECODE (COMPARE_L_EXPR, "compare_l_expr", tcc_binary, 2)
+/* Same as COMPARE_EXPR, but if either value is NaN, the result is 1. */
+DEFTREECODE (COMPARE_G_EXPR, "compare_g_expr", tcc_binary, 2)
+
+/*
+Local variables:
+mode:c
+End:
+*/

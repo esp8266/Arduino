@@ -1,0 +1,115 @@
+<html lang="en">
+<head>
+<title>fopencookie - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="fopen.html#fopen" title="fopen">
+<link rel="next" href="fpurge.html#fpurge" title="fpurge">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="fopencookie"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="fpurge.html#fpurge">fpurge</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="fopen.html#fopen">fopen</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.18 <code>fopencookie</code>&mdash;open a stream with custom callbacks</h3>
+
+<p><a name="index-fopencookie-180"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     FILE *fopencookie(const void *<var>cookie</var>, const char *<var>mode</var>,
+         cookie_io_functions_t <var>functions</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>fopencookie</code> creates a <code>FILE</code> stream where I/O is performed using
+custom callbacks.  The callbacks are registered via the structure:
+
+   <p>typedef ssize_t (*cookie_read_function_t)(void *_cookie, char *_buf,
+size_t _n);
+typedef ssize_t (*cookie_write_function_t)(void *_cookie,
+const char *_buf, size_t _n);
+typedef int (*cookie_seek_function_t)(void *_cookie, off_t *_off,
+int _whence);
+typedef int (*cookie_close_function_t)(void *_cookie);
+
+<pre class="smallexample">     	typedef struct
+     	{
+     		cookie_read_function_t	*read;
+     		cookie_write_function_t *write;
+     		cookie_seek_function_t	*seek;
+     		cookie_close_function_t *close;
+     	} cookie_io_functions_t;
+</pre>
+   <p>The stream is opened with <var>mode</var> treated as in <code>fopen</code>.  The
+callbacks <var>functions.read</var> and <var>functions.write</var> may only be NULL
+when <var>mode</var> does not require them.
+
+   <p><var>functions.read</var> should return -1 on failure, or else the number of
+bytes read (0 on EOF).  It is similar to <code>read</code>, except that
+<var>cookie</var> will be passed as the first argument.
+
+   <p><var>functions.write</var> should return -1 on failure, or else the number of
+bytes written.  It is similar to <code>write</code>, except that <var>cookie</var>
+will be passed as the first argument.
+
+   <p><var>functions.seek</var> should return -1 on failure, and 0 on success, with
+<var>_off</var> set to the current file position.  It is a cross between
+<code>lseek</code> and <code>fseek</code>, with the <var>_whence</var> argument interpreted in
+the same manner.  A NULL <var>functions.seek</var> makes the stream behave
+similarly to a pipe in relation to stdio functions that require
+positioning.
+
+   <p><var>functions.close</var> should return -1 on failure, or 0 on success.  It
+is similar to <code>close</code>, except that <var>cookie</var> will be passed as the
+first argument.  A NULL <var>functions.close</var> merely flushes all data
+then lets <code>fclose</code> succeed.  A failed close will still invalidate
+the stream.
+
+   <p>Read and write I/O functions are allowed to change the underlying
+buffer on fully buffered or line buffered streams by calling
+<code>setvbuf</code>.  They are also not required to completely fill or empty
+the buffer.  They are not, however, allowed to change streams from
+unbuffered to buffered or to change the state of the line buffering
+flag.  They must also be prepared to have read or write calls occur on
+buffers other than the one most recently specified.
+
+   <p><br>
+<strong>Returns</strong><br>
+The return value is an open FILE pointer on success.  On error,
+<code>NULL</code> is returned, and <code>errno</code> will be set to EINVAL if a
+function pointer is missing or <var>mode</var> is invalid, ENOMEM if the
+stream cannot be created, or EMFILE if too many streams are already
+open.
+
+   <p><br>
+<strong>Portability</strong><br>
+This function is a newlib extension, copying the prototype from Linux. 
+It is not portable.  See also the <code>funopen</code> interface from BSD.
+
+   <p>Supporting OS subroutines required: <code>sbrk</code>.
+
+   <p><br>
+
+   </body></html>
+

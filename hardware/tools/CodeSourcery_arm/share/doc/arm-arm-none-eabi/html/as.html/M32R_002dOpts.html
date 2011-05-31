@@ -1,0 +1,146 @@
+<html lang="en">
+<head>
+<title>M32R-Opts - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="M32R_002dDependent.html#M32R_002dDependent" title="M32R-Dependent">
+<link rel="next" href="M32R_002dDirectives.html#M32R_002dDirectives" title="M32R-Directives">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="M32R-Opts"></a>
+<a name="M32R_002dOpts"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="M32R_002dDirectives.html#M32R_002dDirectives">M32R-Directives</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="M32R_002dDependent.html#M32R_002dDependent">M32R-Dependent</a>
+<hr>
+</div>
+
+<h4 class="subsection">9.20.1 M32R Options</h4>
+
+<p><a name="index-options_002c-M32R-1094"></a><a name="index-M32R-options-1095"></a>
+The Renease M32R version of <code>as</code> has a few machine
+dependent options:
+
+     <dl>
+<dt><code>-m32rx</code><dd><a name="index-g_t_0040samp_007b_002dm32rx_007d-option_002c-M32RX-1096"></a><a name="index-architecture-options_002c-M32RX-1097"></a><a name="index-M32R-architecture-options-1098"></a><code>as</code> can assemble code for several different members of the
+Renesas M32R family.  Normally the default is to assemble code for
+the M32R microprocessor.  This option may be used to change the default
+to the M32RX microprocessor, which adds some more instructions to the
+basic M32R instruction set, and some additional parameters to some of
+the original instructions.
+
+     <br><dt><code>-m32r2</code><dd><a name="index-g_t_0040samp_007b_002dm32rx_007d-option_002c-M32R2-1099"></a><a name="index-architecture-options_002c-M32R2-1100"></a><a name="index-M32R-architecture-options-1101"></a>This option changes the target processor to the the M32R2
+microprocessor.
+
+     <br><dt><code>-m32r</code><dd><a name="index-g_t_0040samp_007b_002dm32r_007d-option_002c-M32R-1102"></a><a name="index-architecture-options_002c-M32R-1103"></a><a name="index-M32R-architecture-options-1104"></a>This option can be used to restore the assembler's default behaviour of
+assembling for the M32R microprocessor.  This can be useful if the
+default has been changed by a previous command line option.
+
+     <br><dt><code>-little</code><dd><a name="index-g_t_0040code_007b_002dlittle_007d-option_002c-M32R-1105"></a>This option tells the assembler to produce little-endian code and
+data.  The default is dependent upon how the toolchain was
+configured.
+
+     <br><dt><code>-EL</code><dd><a name="index-g_t_0040code_007b_002dEL_007d-option_002c-M32R-1106"></a>This is a synonym for <em>-little</em>.
+
+     <br><dt><code>-big</code><dd><a name="index-g_t_0040code_007b_002dbig_007d-option_002c-M32R-1107"></a>This option tells the assembler to produce big-endian code and
+data.
+
+     <br><dt><code>-EB</code><dd><a name="index-g_t_0040code_007b_002dEB_007d-option_002c-M32R-1108"></a>This is a synonum for <em>-big</em>.
+
+     <br><dt><code>-KPIC</code><dd><a name="index-g_t_0040code_007b_002dKPIC_007d-option_002c-M32R-1109"></a><a name="index-PIC-code-generation-for-M32R-1110"></a>This option specifies that the output of the assembler should be
+marked as position-independent code (PIC).
+
+     <br><dt><code>-parallel</code><dd><a name="index-g_t_0040code_007b_002dparallel_007d-option_002c-M32RX-1111"></a>This option tells the assembler to attempts to combine two sequential
+instructions into a single, parallel instruction, where it is legal to
+do so.
+
+     <br><dt><code>-no-parallel</code><dd><a name="index-g_t_0040code_007b_002dno_002dparallel_007d-option_002c-M32RX-1112"></a>This option disables a previously enabled <em>-parallel</em> option.
+
+     <br><dt><code>-no-bitinst</code><dd><a name="index-g_t_0040samp_007b_002dno_002dbitinst_007d_002c-M32R2-1113"></a>This option disables the support for the extended bit-field
+instructions provided by the M32R2.  If this support needs to be
+re-enabled the <em>-bitinst</em> switch can be used to restore it.
+
+     <br><dt><code>-O</code><dd><a name="index-g_t_0040code_007b_002dO_007d-option_002c-M32RX-1114"></a>This option tells the assembler to attempt to optimize the
+instructions that it produces.  This includes filling delay slots and
+converting sequential instructions into parallel ones.  This option
+implies <em>-parallel</em>.
+
+     <br><dt><code>-warn-explicit-parallel-conflicts</code><dd><a name="index-g_t_0040samp_007b_002dwarn_002dexplicit_002dparallel_002dconflicts_007d-option_002c-M32RX-1115"></a>Instructs <code>as</code> to produce warning messages when
+questionable parallel instructions are encountered.  This option is
+enabled by default, but <code>gcc</code> disables it when it invokes
+<code>as</code> directly.  Questionable instructions are those whose
+behaviour would be different if they were executed sequentially.  For
+example the code fragment &lsquo;<samp><span class="samp">mv r1, r2 || mv r3, r1</span></samp>&rsquo; produces a
+different result from &lsquo;<samp><span class="samp">mv r1, r2 \n mv r3, r1</span></samp>&rsquo; since the former
+moves r1 into r3 and then r2 into r1, whereas the later moves r2 into r1
+and r3.
+
+     <br><dt><code>-Wp</code><dd><a name="index-g_t_0040samp_007b_002dWp_007d-option_002c-M32RX-1116"></a>This is a shorter synonym for the <em>-warn-explicit-parallel-conflicts</em>
+option.
+
+     <br><dt><code>-no-warn-explicit-parallel-conflicts</code><dd><a name="index-g_t_0040samp_007b_002dno_002dwarn_002dexplicit_002dparallel_002dconflicts_007d-option_002c-M32RX-1117"></a>Instructs <code>as</code> not to produce warning messages when
+questionable parallel instructions are encountered.
+
+     <br><dt><code>-Wnp</code><dd><a name="index-g_t_0040samp_007b_002dWnp_007d-option_002c-M32RX-1118"></a>This is a shorter synonym for the <em>-no-warn-explicit-parallel-conflicts</em>
+option.
+
+     <br><dt><code>-ignore-parallel-conflicts</code><dd><a name="index-g_t_0040samp_007b_002dignore_002dparallel_002dconflicts_007d-option_002c-M32RX-1119"></a>This option tells the assembler's to stop checking parallel
+instructions for constraint violations.  This ability is provided for
+hardware vendors testing chip designs and should not be used under
+normal circumstances.
+
+     <br><dt><code>-no-ignore-parallel-conflicts</code><dd><a name="index-g_t_0040samp_007b_002dno_002dignore_002dparallel_002dconflicts_007d-option_002c-M32RX-1120"></a>This option restores the assembler's default behaviour of checking
+parallel instructions to detect constraint violations.
+
+     <br><dt><code>-Ip</code><dd><a name="index-g_t_0040samp_007b_002dIp_007d-option_002c-M32RX-1121"></a>This is a shorter synonym for the <em>-ignore-parallel-conflicts</em>
+option.
+
+     <br><dt><code>-nIp</code><dd><a name="index-g_t_0040samp_007b_002dnIp_007d-option_002c-M32RX-1122"></a>This is a shorter synonym for the <em>-no-ignore-parallel-conflicts</em>
+option.
+
+     <br><dt><code>-warn-unmatched-high</code><dd><a name="index-g_t_0040samp_007b_002dwarn_002dunmatched_002dhigh_007d-option_002c-M32R-1123"></a>This option tells the assembler to produce a warning message if a
+<code>.high</code> pseudo op is encountered without a matching <code>.low</code>
+pseudo op.  The presence of such an unmatched pseudo op usually
+indicates a programming error.
+
+     <br><dt><code>-no-warn-unmatched-high</code><dd><a name="index-g_t_0040samp_007b_002dno_002dwarn_002dunmatched_002dhigh_007d-option_002c-M32R-1124"></a>Disables a previously enabled <em>-warn-unmatched-high</em> option.
+
+     <br><dt><code>-Wuh</code><dd><a name="index-g_t_0040samp_007b_002dWuh_007d-option_002c-M32RX-1125"></a>This is a shorter synonym for the <em>-warn-unmatched-high</em> option.
+
+     <br><dt><code>-Wnuh</code><dd><a name="index-g_t_0040samp_007b_002dWnuh_007d-option_002c-M32RX-1126"></a>This is a shorter synonym for the <em>-no-warn-unmatched-high</em> option.
+
+   </dl>
+
+   </body></html>
+

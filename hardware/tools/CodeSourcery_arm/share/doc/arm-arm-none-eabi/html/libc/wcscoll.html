@@ -1,0 +1,67 @@
+<html lang="en">
+<head>
+<title>wcscoll - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Wchar-strings.html#Wchar-strings" title="Wchar strings">
+<link rel="prev" href="wcscmp.html#wcscmp" title="wcscmp">
+<link rel="next" href="wcscpy.html#wcscpy" title="wcscpy">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="wcscoll"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="wcscpy.html#wcscpy">wcscpy</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="wcscmp.html#wcscmp">wcscmp</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Wchar-strings.html#Wchar-strings">Wchar strings</a>
+<hr>
+</div>
+
+<h3 class="section">6.9 <code>wcscoll</code>&mdash;locale-specific wide-character string compare</h3>
+
+<p><a name="index-wcscoll-415"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;wchar.h&gt;
+     int wcscoll(const wchar_t *<var>stra</var>, const wchar_t * <var>strb</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>wcscoll</code> compares the wide-character string pointed to by
+<var>stra</var> to the wide-character string pointed to by <var>strb</var>,
+using an interpretation appropriate to the current <code>LC_COLLATE</code>
+state.
+
+   <p>The current implementation of <code>wcscoll</code> simply uses <code>wcscmp</code>
+and does not support any language-specific sorting.
+
+   <p><br>
+<strong>Returns</strong><br>
+If the first string is greater than the second string,
+<code>wcscoll</code> returns a number greater than zero.  If the two
+strings are equivalent, <code>wcscoll</code> returns zero.  If the first
+string is less than the second string, <code>wcscoll</code> returns a
+number less than zero.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>wcscoll</code> is ISO/IEC 9899/AMD1:1995 (ISO C).
+
+   <p><br>
+
+   </body></html>
+

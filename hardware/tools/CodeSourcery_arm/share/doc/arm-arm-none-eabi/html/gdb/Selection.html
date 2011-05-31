@@ -1,0 +1,115 @@
+<html lang="en">
+<head>
+<title>Selection - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stack.html#Stack" title="Stack">
+<link rel="prev" href="Backtrace.html#Backtrace" title="Backtrace">
+<link rel="next" href="Frame-Info.html#Frame-Info" title="Frame Info">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Selection"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Frame-Info.html#Frame-Info">Frame Info</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Backtrace.html#Backtrace">Backtrace</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stack.html#Stack">Stack</a>
+<hr>
+</div>
+
+<h3 class="section">8.3 Selecting a Frame</h3>
+
+<p>Most commands for examining the stack and other data in your program work on
+whichever stack frame is selected at the moment.  Here are the commands for
+selecting a stack frame; all of them finish by printing a brief description
+of the stack frame just selected.
+
+     
+<a name="index-frame_0040r_007b_002c-selecting_007d-425"></a>
+<a name="index-f-_0040r_007b_0028_0040code_007bframe_007d_0029_007d-426"></a>
+<dl><dt><code>frame </code><var>n</var><dt><code>f </code><var>n</var><dd>Select frame number <var>n</var>.  Recall that frame zero is the innermost
+(currently executing) frame, frame one is the frame that called the
+innermost one, and so on.  The highest-numbered frame is the one for
+<code>main</code>.
+
+     <br><dt><code>frame </code><var>addr</var><dt><code>f </code><var>addr</var><dd>Select the frame at address <var>addr</var>.  This is useful mainly if the
+chaining of stack frames has been damaged by a bug, making it
+impossible for <span class="sc">gdb</span> to assign numbers properly to all frames.  In
+addition, this can be useful when your program has multiple stacks and
+switches between them.
+
+     <p>On the MIPS and Alpha architectures, <code>frame</code> needs two addresses to
+select an arbitrary frame: a stack pointer and a program counter.
+
+     <p><a name="index-up-427"></a><br><dt><code>up </code><var>n</var><dd>Move <var>n</var> frames up the stack.  For positive numbers <var>n</var>, this
+advances toward the outermost frame, to higher frame numbers, to frames
+that have existed longer.  <var>n</var> defaults to one.
+
+     <p><a name="index-down-428"></a><a name="index-do-_0040r_007b_0028_0040code_007bdown_007d_0029_007d-429"></a><br><dt><code>down </code><var>n</var><dd>Move <var>n</var> frames down the stack.  For positive numbers <var>n</var>, this
+advances toward the innermost frame, to lower frame numbers, to frames
+that were created more recently.  <var>n</var> defaults to one.  You may
+abbreviate <code>down</code> as <code>do</code>. 
+</dl>
+
+   <p>All of these commands end by printing two lines of output describing the
+frame.  The first line shows the frame number, the function name, the
+arguments, and the source file and line number of execution in that
+frame.  The second line shows the text of that source line.
+
+   <p>For example:
+
+<pre class="smallexample">     (gdb) up
+     #1  0x22f0 in main (argc=1, argv=0xf7fffbf4, env=0xf7fffbfc)
+         at env.c:10
+     10              read_input_file (argv[i]);
+</pre>
+   <p>After such a printout, the <code>list</code> command with no arguments
+prints ten lines centered on the point of execution in the frame. 
+You can also edit the program at the point of execution with your favorite
+editing program by typing <code>edit</code>. 
+See <a href="List.html#List">Printing Source Lines</a>,
+for details.
+
+     
+<a name="index-down_002dsilently-430"></a>
+<a name="index-up_002dsilently-431"></a>
+<dl><dt><code>up-silently </code><var>n</var><dt><code>down-silently </code><var>n</var><dd>These two commands are variants of <code>up</code> and <code>down</code>,
+respectively; they differ in that they do their work silently, without
+causing display of the new frame.  They are intended primarily for use
+in <span class="sc">gdb</span> command scripts, where the output might be unnecessary and
+distracting. 
+</dl>
+
+   </body></html>
+

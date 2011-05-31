@@ -1,0 +1,103 @@
+<html lang="en">
+<head>
+<title>C Constants - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C.html#C" title="C">
+<link rel="prev" href="C-Operators.html#C-Operators" title="C Operators">
+<link rel="next" href="C-Plus-Plus-Expressions.html#C-Plus-Plus-Expressions" title="C Plus Plus Expressions">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="C-Constants"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="C-Plus-Plus-Expressions.html#C-Plus-Plus-Expressions">C Plus Plus Expressions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="C-Operators.html#C-Operators">C Operators</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C.html#C">C</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">15.4.1.2 C and C<tt>++</tt> Constants</h5>
+
+<p><a name="index-C-and-C_0040t_007b_002b_002b_007d-constants-799"></a>
+<span class="sc">gdb</span> allows you to express the constants of C and C<tt>++</tt> in the
+following ways:
+
+     <ul>
+<li>Integer constants are a sequence of digits.  Octal constants are
+specified by a leading &lsquo;<samp><span class="samp">0</span></samp>&rsquo; (i.e. zero), and hexadecimal constants
+by a leading &lsquo;<samp><span class="samp">0x</span></samp>&rsquo; or &lsquo;<samp><span class="samp">0X</span></samp>&rsquo;.  Constants may also end with a letter
+&lsquo;<samp><span class="samp">l</span></samp>&rsquo;, specifying that the constant should be treated as a
+<code>long</code> value.
+
+     <li>Floating point constants are a sequence of digits, followed by a decimal
+point, followed by a sequence of digits, and optionally followed by an
+exponent.  An exponent is of the form:
+&lsquo;<samp><span class="samp">e[[+]|-]</span><var>nnn</var><span class="samp"><!-- /@w --></span></samp>&rsquo;, where <var>nnn</var> is another
+sequence of digits.  The &lsquo;<samp><span class="samp">+</span></samp>&rsquo; is optional for positive exponents. 
+A floating-point constant may also end with a letter &lsquo;<samp><span class="samp">f</span></samp>&rsquo; or
+&lsquo;<samp><span class="samp">F</span></samp>&rsquo;, specifying that the constant should be treated as being of
+the <code>float</code> (as opposed to the default <code>double</code>) type; or with
+a letter &lsquo;<samp><span class="samp">l</span></samp>&rsquo; or &lsquo;<samp><span class="samp">L</span></samp>&rsquo;, which specifies a <code>long double</code>
+constant.
+
+     <li>Enumerated constants consist of enumerated identifiers, or their
+integral equivalents.
+
+     <li>Character constants are a single character surrounded by single quotes
+(<code>'</code>), or a number&mdash;the ordinal value of the corresponding character
+(usually its <span class="sc">ascii</span> value).  Within quotes, the single character may
+be represented by a letter or by <dfn>escape sequences</dfn>, which are of
+the form &lsquo;<samp><span class="samp">\</span><var>nnn</var></samp>&rsquo;, where <var>nnn</var> is the octal representation
+of the character's ordinal value; or of the form &lsquo;<samp><span class="samp">\</span><var>x</var></samp>&rsquo;, where
+&lsquo;<samp><var>x</var></samp>&rsquo; is a predefined special character&mdash;for example,
+&lsquo;<samp><span class="samp">\n</span></samp>&rsquo; for newline.
+
+     <li>String constants are a sequence of character constants surrounded by
+double quotes (<code>"</code>).  Any valid character constant (as described
+above) may appear.  Double quotes within the string must be preceded by
+a backslash, so for instance &lsquo;<samp><span class="samp">"a\"b'c"</span></samp>&rsquo; is a string of five
+characters.
+
+     <li>Pointer constants are an integral value.  You can also write pointers
+to constants using the C operator &lsquo;<samp><span class="samp">&amp;</span></samp>&rsquo;.
+
+     <li>Array constants are comma-separated lists surrounded by braces &lsquo;<samp><span class="samp">{</span></samp>&rsquo;
+and &lsquo;<samp><span class="samp">}</span></samp>&rsquo;; for example, &lsquo;<samp><span class="samp">{1,2,3}</span></samp>&rsquo; is a three-element array of
+integers, &lsquo;<samp><span class="samp">{{1,2}, {3,4}, {5,6}}</span></samp>&rsquo; is a three-by-two array,
+and &lsquo;<samp><span class="samp">{&amp;"hi", &amp;"there", &amp;"fred"}</span></samp>&rsquo; is a three-element array of pointers. 
+</ul>
+
+   </body></html>
+

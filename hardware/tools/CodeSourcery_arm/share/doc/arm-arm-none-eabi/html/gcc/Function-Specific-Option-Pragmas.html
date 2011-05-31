@@ -1,0 +1,110 @@
+<html lang="en">
+<head>
+<title>Function Specific Option Pragmas - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Pragmas.html#Pragmas" title="Pragmas">
+<link rel="prev" href="Push_002fPop-Macro-Pragmas.html#Push_002fPop-Macro-Pragmas" title="Push/Pop Macro Pragmas">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Function-Specific-Option-Pragmas"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Push_002fPop-Macro-Pragmas.html#Push_002fPop-Macro-Pragmas">Push/Pop Macro Pragmas</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Pragmas.html#Pragmas">Pragmas</a>
+<hr>
+</div>
+
+<h4 class="subsection">6.54.13 Function Specific Option Pragmas</h4>
+
+     <dl>
+<dt><code>#pragma GCC target (</code><var>"string"</var><code>...)</code><dd><a name="index-pragma-GCC-target-3145"></a>
+This pragma allows you to set target specific options for functions
+defined later in the source file.  One or more strings can be
+specified.  Each function that is defined after this point will be as
+if <code>attribute((target("STRING")))</code> was specified for that
+function.  The parenthesis around the options is optional. 
+See <a href="Function-Attributes.html#Function-Attributes">Function Attributes</a>, for more information about the
+<code>target</code> attribute and the attribute syntax.
+
+     <p>The &lsquo;<samp><span class="samp">#pragma GCC target</span></samp>&rsquo; pragma is not implemented in GCC
+versions earlier than 4.4, and is currently only implemented for the
+386 and x86_64 backends. 
+</dl>
+
+     <dl>
+<dt><code>#pragma GCC optimize (</code><var>"string"</var><code>...)</code><dd><a name="index-pragma-GCC-optimize-3146"></a>
+This pragma allows you to set global optimization options for functions
+defined later in the source file.  One or more strings can be
+specified.  Each function that is defined after this point will be as
+if <code>attribute((optimize("STRING")))</code> was specified for that
+function.  The parenthesis around the options is optional. 
+See <a href="Function-Attributes.html#Function-Attributes">Function Attributes</a>, for more information about the
+<code>optimize</code> attribute and the attribute syntax.
+
+     <p>The &lsquo;<samp><span class="samp">#pragma GCC optimize</span></samp>&rsquo; pragma is not implemented in GCC
+versions earlier than 4.4. 
+</dl>
+
+     <dl>
+<dt><code>#pragma GCC push_options</code><dt><code>#pragma GCC pop_options</code><dd><a name="index-pragma-GCC-push_005foptions-3147"></a><a name="index-pragma-GCC-pop_005foptions-3148"></a>
+These pragmas maintain a stack of the current target and optimization
+options.  It is intended for include files where you temporarily want
+to switch to using a different &lsquo;<samp><span class="samp">#pragma GCC target</span></samp>&rsquo; or
+&lsquo;<samp><span class="samp">#pragma GCC optimize</span></samp>&rsquo; and then to pop back to the previous
+options.
+
+     <p>The &lsquo;<samp><span class="samp">#pragma GCC push_options</span></samp>&rsquo; and &lsquo;<samp><span class="samp">#pragma GCC pop_options</span></samp>&rsquo;
+pragmas are not implemented in GCC versions earlier than 4.4. 
+</dl>
+
+     <dl>
+<dt><code>#pragma GCC reset_options</code><dd><a name="index-pragma-GCC-reset_005foptions-3149"></a>
+This pragma clears the current <code>#pragma GCC target</code> and
+<code>#pragma GCC optimize</code> to use the default switches as specified
+on the command line.
+
+     <p>The &lsquo;<samp><span class="samp">#pragma GCC reset_options</span></samp>&rsquo; pragma is not implemented in GCC
+versions earlier than 4.4. 
+</dl>
+
+ </body></html>
+

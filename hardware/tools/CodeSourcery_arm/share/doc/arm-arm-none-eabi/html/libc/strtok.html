@@ -1,0 +1,90 @@
+<html lang="en">
+<head>
+<title>strtok - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Strings.html#Strings" title="Strings">
+<link rel="prev" href="strstr.html#strstr" title="strstr">
+<link rel="next" href="strupr.html#strupr" title="strupr">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="strtok"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="strupr.html#strupr">strupr</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="strstr.html#strstr">strstr</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Strings.html#Strings">Strings</a>
+<hr>
+</div>
+
+<h3 class="section">5.38 <code>strtok</code>, <code>strtok_r</code>, <code>strsep</code>&mdash;get next token from a string</h3>
+
+<p><a name="index-strtok-405"></a><a name="index-strtok_005fr-406"></a><a name="index-strsep-407"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;string.h&gt;
+     char *strtok(char *<var>source</var>, const char *<var>delimiters</var>)
+     char *strtok_r(char *<var>source</var>, const char *<var>delimiters</var>,
+         char **<var>lasts</var>)
+     char *strsep(char **<var>source_ptr</var>, const char *<var>delimiters</var>)
+     
+</pre>
+   <p><strong>Description</strong><br>
+The <code>strtok</code> function is used to isolate sequential tokens in a
+null-terminated string, <code>*</code><var>source</var>. These tokens are delimited
+in the string by at least one of the characters in <code>*</code><var>delimiters</var>. 
+The first time that <code>strtok</code> is called, <code>*</code><var>source</var> should be
+specified; subsequent calls, wishing to obtain further tokens from
+the same string, should pass a null pointer instead.  The separator
+string, <code>*</code><var>delimiters</var>, must be supplied each time and may
+change between calls.
+
+   <p>The <code>strtok</code> function returns a pointer to the beginning of each
+subsequent token in the string, after replacing the separator
+character itself with a null character.  When no more tokens remain,
+a null pointer is returned.
+
+   <p>The <code>strtok_r</code> function has the same behavior as <code>strtok</code>, except
+a pointer to placeholder <code>*</code><var>lasts</var> must be supplied by the caller.
+
+   <p>The <code>strsep</code> function is similar in behavior to <code>strtok</code>, except
+a pointer to the string pointer must be supplied <var>source_ptr</var> and
+the function does not skip leading delimiters.  When the string starts
+with a delimiter, the delimiter is changed to the null character and
+the empty string is returned.  Like <code>strtok_r</code> and <code>strtok</code>, the
+<code>*</code><var>source_ptr</var> is updated to the next character following the
+last delimiter found or NULL if the end of string is reached with
+no more delimiters.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>strtok</code>, <code>strtok_r</code>, and <code>strsep</code> all return a pointer to the
+next token, or <code>NULL</code> if no more tokens can be found.  For
+<code>strsep</code>, a token may be the empty string.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>strtok</code> is ANSI C. 
+<code>strtok_r</code> is POSIX. 
+<code>strsep</code> is a BSD extension.
+
+   <p><code>strtok</code>, <code>strtok_r</code>, and <code>strsep</code> require no supporting OS subroutines.
+
+   <p><br>
+
+   </body></html>
+

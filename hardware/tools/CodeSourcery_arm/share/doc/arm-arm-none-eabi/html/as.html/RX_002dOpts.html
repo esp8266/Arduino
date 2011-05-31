@@ -1,0 +1,94 @@
+<html lang="en">
+<head>
+<title>RX-Opts - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="RX_002dDependent.html#RX_002dDependent" title="RX-Dependent">
+<link rel="next" href="RX_002dModifiers.html#RX_002dModifiers" title="RX-Modifiers">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="RX-Opts"></a>
+<a name="RX_002dOpts"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="RX_002dModifiers.html#RX_002dModifiers">RX-Modifiers</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="RX_002dDependent.html#RX_002dDependent">RX-Dependent</a>
+<hr>
+</div>
+
+<h4 class="subsection">9.30.1 RX Options</h4>
+
+<p><a name="index-options_002c-RX-1499"></a><a name="index-RX-options-1500"></a>
+The Renesas RX port of <code>as</code> has a few target specfic
+command line options:
+
+     
+<a name="index-g_t_0040samp_007b_002dm32bit_002ddoubles_007d-1501"></a>
+<dl><dt><code>-m32bit-doubles</code><dd>This option controls the ABI and indicates to use a 32-bit float ABI. 
+It has no effect on the assembled instructions, but it does influence
+the behaviour of the &lsquo;<samp><span class="samp">.double</span></samp>&rsquo; pseudo-op. 
+This is the default.
+
+     <p><a name="index-g_t_0040samp_007b_002dm64bit_002ddoubles_007d-1502"></a><br><dt><code>-m64bit-doubles</code><dd>This option controls the ABI and indicates to use a 64-bit float ABI. 
+It has no effect on the assembled instructions, but it does influence
+the behaviour of the &lsquo;<samp><span class="samp">.double</span></samp>&rsquo; pseudo-op.
+
+     <p><a name="index-g_t_0040samp_007b_002dmbig_002dendian_007d-1503"></a><br><dt><code>-mbig-endian</code><dd>This option controls the ABI and indicates to use a big-endian data
+ABI.  It has no effect on the assembled instructions, but it does
+influence the behaviour of the &lsquo;<samp><span class="samp">.short</span></samp>&rsquo;, &lsquo;<samp><span class="samp">.hword</span></samp>&rsquo;, &lsquo;<samp><span class="samp">.int</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">.word</span></samp>&rsquo;, &lsquo;<samp><span class="samp">.long</span></samp>&rsquo;, &lsquo;<samp><span class="samp">.quad</span></samp>&rsquo; and &lsquo;<samp><span class="samp">.octa</span></samp>&rsquo; pseudo-ops.
+
+     <p><a name="index-g_t_0040samp_007b_002dmlittle_002dendian_007d-1504"></a><br><dt><code>-mlittle-endian</code><dd>This option controls the ABI and indicates to use a little-endian data
+ABI.  It has no effect on the assembled instructions, but it does
+influence the behaviour of the &lsquo;<samp><span class="samp">.short</span></samp>&rsquo;, &lsquo;<samp><span class="samp">.hword</span></samp>&rsquo;, &lsquo;<samp><span class="samp">.int</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">.word</span></samp>&rsquo;, &lsquo;<samp><span class="samp">.long</span></samp>&rsquo;, &lsquo;<samp><span class="samp">.quad</span></samp>&rsquo; and &lsquo;<samp><span class="samp">.octa</span></samp>&rsquo; pseudo-ops. 
+This is the default.
+
+     <p><a name="index-g_t_0040samp_007b_002dmuse_002dconventional_002dsection_002dnames_007d-1505"></a><br><dt><code>-muse-conventional-section-names</code><dd>This option controls the default names given to the code (.text),
+initialised data (.data) and uninitialised data sections (.bss).
+
+     <p><a name="index-g_t_0040samp_007b_002dmuse_002drenesas_002dsection_002dnames_007d-1506"></a><br><dt><code>-muse-renesas-section-names</code><dd>This option controls the default names given to the code (.P),
+initialised data (.D_1) and uninitialised data sections (.B_1). 
+This is the default.
+
+     <p><a name="index-g_t_0040samp_007b_002dmsmall_002ddata_002dlimit_007d-1507"></a><br><dt><code>-msmall-data-limit</code><dd>This option tells the assembler that the small data limit feature of
+the RX port of GCC is being used.  This results in the assembler
+generating an undefined reference to a symbol called __gp for use by
+the relocations that are needed to support the small data limit
+feature.   This option is not enabled by default as it would otherwise
+pollute the symbol table.
+
+   </dl>
+
+   </body></html>
+

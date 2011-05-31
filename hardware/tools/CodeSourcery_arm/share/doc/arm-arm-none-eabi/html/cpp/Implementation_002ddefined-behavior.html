@@ -1,0 +1,148 @@
+<html lang="en">
+<head>
+<title>Implementation-defined behavior - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Implementation-Details.html#Implementation-Details" title="Implementation Details">
+<link rel="next" href="Implementation-limits.html#Implementation-limits" title="Implementation limits">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Implementation-defined-behavior"></a>
+<a name="Implementation_002ddefined-behavior"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Implementation-limits.html#Implementation-limits">Implementation limits</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Implementation-Details.html#Implementation-Details">Implementation Details</a>
+<hr>
+</div>
+
+<h3 class="section">11.1 Implementation-defined behavior</h3>
+
+<p><a name="index-implementation_002ddefined-behavior-109"></a>
+This is how CPP behaves in all the cases which the C standard
+describes as <dfn>implementation-defined</dfn>.  This term means that the
+implementation is free to do what it likes, but must document its choice
+and stick to it. 
+<!-- FIXME: Check the C++ standard for more implementation-defined stuff. -->
+
+     <ul>
+<li>The mapping of physical source file multi-byte characters to the
+execution character set.
+
+     <p>The input character set can be specified using the
+<samp><span class="option">-finput-charset</span></samp> option, while the execution character set may
+be controlled using the <samp><span class="option">-fexec-charset</span></samp> and
+<samp><span class="option">-fwide-exec-charset</span></samp> options.
+
+     <li>Identifier characters. 
+<a name="Identifier-characters"></a>The C and C++ standards allow identifiers to be composed of &lsquo;<samp><span class="samp">_</span></samp>&rsquo;
+and the alphanumeric characters.  C++ and C99 also allow universal
+character names, and C99 further permits implementation-defined
+characters.  GCC currently only permits universal character names if
+<samp><span class="option">-fextended-identifiers</span></samp> is used, because the implementation of
+universal character names in identifiers is experimental.
+
+     <p>GCC allows the &lsquo;<samp><span class="samp">$</span></samp>&rsquo; character in identifiers as an extension for
+most targets.  This is true regardless of the <samp><span class="option">std=</span></samp> switch,
+since this extension cannot conflict with standards-conforming
+programs.  When preprocessing assembler, however, dollars are not
+identifier characters by default.
+
+     <p>Currently the targets that by default do not permit &lsquo;<samp><span class="samp">$</span></samp>&rsquo; are AVR,
+IP2K, MMIX, MIPS Irix 3, ARM aout, and PowerPC targets for the AIX
+operating system.
+
+     <p>You can override the default with <samp><span class="option">-fdollars-in-identifiers</span></samp> or
+<samp><span class="option">fno-dollars-in-identifiers</span></samp>.  See <a href="fdollars_002din_002didentifiers.html#fdollars_002din_002didentifiers">fdollars-in-identifiers</a>.
+
+     <li>Non-empty sequences of whitespace characters.
+
+     <p>In textual output, each whitespace sequence is collapsed to a single
+space.  For aesthetic reasons, the first token on each non-directive
+line of output is preceded with sufficient spaces that it appears in the
+same column as it did in the original source file.
+
+     <li>The numeric value of character constants in preprocessor expressions.
+
+     <p>The preprocessor and compiler interpret character constants in the
+same way; i.e. escape sequences such as &lsquo;<samp><span class="samp">\a</span></samp>&rsquo; are given the
+values they would have on the target machine.
+
+     <p>The compiler evaluates a multi-character character constant a character
+at a time, shifting the previous value left by the number of bits per
+target character, and then or-ing in the bit-pattern of the new
+character truncated to the width of a target character.  The final
+bit-pattern is given type <code>int</code>, and is therefore signed,
+regardless of whether single characters are signed or not (a slight
+change from versions 3.1 and earlier of GCC).  If there are more
+characters in the constant than would fit in the target <code>int</code> the
+compiler issues a warning, and the excess leading characters are
+ignored.
+
+     <p>For example, <code>'ab'</code> for a target with an 8-bit <code>char</code> would be
+interpreted as &lsquo;<samp><span class="samp">(int)&nbsp;((unsigned&nbsp;char)&nbsp;'a'&nbsp;*&nbsp;256&nbsp;+&nbsp;(unsigned&nbsp;char)&nbsp;'b')</span></samp>&rsquo;<!-- /@w -->, and <code>'\234a'</code> as &lsquo;<samp><span class="samp">(int)&nbsp;((unsigned&nbsp;char)&nbsp;'\234'&nbsp;*&nbsp;256&nbsp;+&nbsp;(unsigned&nbsp;char)&nbsp;'a')</span></samp>&rsquo;<!-- /@w -->.
+
+     <li>Source file inclusion.
+
+     <p>For a discussion on how the preprocessor locates header files,
+<a href="Include-Operation.html#Include-Operation">Include Operation</a>.
+
+     <li>Interpretation of the filename resulting from a macro-expanded
+&lsquo;<samp><span class="samp">#include</span></samp>&rsquo; directive.
+
+     <p>See <a href="Computed-Includes.html#Computed-Includes">Computed Includes</a>.
+
+     <li>Treatment of a &lsquo;<samp><span class="samp">#pragma</span></samp>&rsquo; directive that after macro-expansion
+results in a standard pragma.
+
+     <p>No macro expansion occurs on any &lsquo;<samp><span class="samp">#pragma</span></samp>&rsquo; directive line, so the
+question does not arise.
+
+     <p>Note that GCC does not yet implement any of the standard
+pragmas.
+
+   </ul>
+
+   </body></html>
+

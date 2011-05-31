@@ -1,0 +1,104 @@
+<html lang="en">
+<head>
+<title>Dump/Restore Files - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Data.html#Data" title="Data">
+<link rel="prev" href="Memory-Region-Attributes.html#Memory-Region-Attributes" title="Memory Region Attributes">
+<link rel="next" href="Core-File-Generation.html#Core-File-Generation" title="Core File Generation">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Dump%2fRestore-Files"></a>
+<a name="Dump_002fRestore-Files"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Core-File-Generation.html#Core-File-Generation">Core File Generation</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Memory-Region-Attributes.html#Memory-Region-Attributes">Memory Region Attributes</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Data.html#Data">Data</a>
+<hr>
+</div>
+
+<h3 class="section">10.17 Copy Between Memory and a File</h3>
+
+<p><a name="index-dump_002frestore-files-630"></a><a name="index-append-data-to-a-file-631"></a><a name="index-dump-data-to-a-file-632"></a><a name="index-restore-data-from-a-file-633"></a>
+You can use the commands <code>dump</code>, <code>append</code>, and
+<code>restore</code> to copy data between target memory and a file.  The
+<code>dump</code> and <code>append</code> commands write data to a file, and the
+<code>restore</code> command reads data from a file back into the inferior's
+memory.  Files may be in binary, Motorola S-record, Intel hex, or
+Tektronix Hex format; however, <span class="sc">gdb</span> can only append to binary
+files.
+
+     
+<a name="index-dump-634"></a>
+<dl><dt><code>dump </code><span class="roman">[</span><var>format</var><span class="roman">]</span><code> memory </code><var>filename</var> <var>start_addr</var> <var>end_addr</var><dt><code>dump </code><span class="roman">[</span><var>format</var><span class="roman">]</span><code> value </code><var>filename</var> <var>expr</var><dd>Dump the contents of memory from <var>start_addr</var> to <var>end_addr</var>,
+or the value of <var>expr</var>, to <var>filename</var> in the given format.
+
+     <p>The <var>format</var> parameter may be any one of:
+          <dl>
+<dt><code>binary</code><dd>Raw binary form. 
+<br><dt><code>ihex</code><dd>Intel hex format. 
+<br><dt><code>srec</code><dd>Motorola S-record format. 
+<br><dt><code>tekhex</code><dd>Tektronix Hex format. 
+</dl>
+
+     <p><span class="sc">gdb</span> uses the same definitions of these formats as the
+<span class="sc">gnu</span> binary utilities, like &lsquo;<samp><span class="samp">objdump</span></samp>&rsquo; and &lsquo;<samp><span class="samp">objcopy</span></samp>&rsquo;.  If
+<var>format</var> is omitted, <span class="sc">gdb</span> dumps the data in raw binary
+form.
+
+     <p><a name="index-append-635"></a><br><dt><code>append </code><span class="roman">[</span><code>binary</code><span class="roman">]</span><code> memory </code><var>filename</var> <var>start_addr</var> <var>end_addr</var><dt><code>append </code><span class="roman">[</span><code>binary</code><span class="roman">]</span><code> value </code><var>filename</var> <var>expr</var><dd>Append the contents of memory from <var>start_addr</var> to <var>end_addr</var>,
+or the value of <var>expr</var>, to the file <var>filename</var>, in raw binary form. 
+(<span class="sc">gdb</span> can only append data to files in raw binary form.)
+
+     <p><a name="index-restore-636"></a><br><dt><code>restore </code><var>filename</var> <span class="roman">[</span><code>binary</code><span class="roman">]</span> <var>bias</var> <var>start</var> <var>end</var><dd>Restore the contents of file <var>filename</var> into memory.  The
+<code>restore</code> command can automatically recognize any known <span class="sc">bfd</span>
+file format, except for raw binary.  To restore a raw binary file you
+must specify the optional keyword <code>binary</code> after the filename.
+
+     <p>If <var>bias</var> is non-zero, its value will be added to the addresses
+contained in the file.  Binary files always start at address zero, so
+they will be restored at address <var>bias</var>.  Other bfd files have
+a built-in location; they will be restored at offset <var>bias</var>
+from that location.
+
+     <p>If <var>start</var> and/or <var>end</var> are non-zero, then only data between
+file offset <var>start</var> and file offset <var>end</var> will be restored. 
+These offsets are relative to the addresses in the file, before
+the <var>bias</var> argument is applied.
+
+   </dl>
+
+   </body></html>
+

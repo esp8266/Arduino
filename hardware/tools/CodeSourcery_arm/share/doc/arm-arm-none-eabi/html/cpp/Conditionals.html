@@ -1,0 +1,99 @@
+<html lang="en">
+<head>
+<title>Conditionals - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Macros.html#Macros" title="Macros">
+<link rel="next" href="Diagnostics.html#Diagnostics" title="Diagnostics">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Conditionals"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Diagnostics.html#Diagnostics">Diagnostics</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Macros.html#Macros">Macros</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">4 Conditionals</h2>
+
+<p><a name="index-conditionals-83"></a>
+A <dfn>conditional</dfn> is a directive that instructs the preprocessor to
+select whether or not to include a chunk of code in the final token
+stream passed to the compiler.  Preprocessor conditionals can test
+arithmetic expressions, or whether a name is defined as a macro, or both
+simultaneously using the special <code>defined</code> operator.
+
+   <p>A conditional in the C preprocessor resembles in some ways an <code>if</code>
+statement in C, but it is important to understand the difference between
+them.  The condition in an <code>if</code> statement is tested during the
+execution of your program.  Its purpose is to allow your program to
+behave differently from run to run, depending on the data it is
+operating on.  The condition in a preprocessing conditional directive is
+tested when your program is compiled.  Its purpose is to allow different
+code to be included in the program depending on the situation at the
+time of compilation.
+
+   <p>However, the distinction is becoming less clear.  Modern compilers often
+do test <code>if</code> statements when a program is compiled, if their
+conditions are known not to vary at run time, and eliminate code which
+can never be executed.  If you can count on your compiler to do this,
+you may find that your program is more readable if you use <code>if</code>
+statements with constant conditions (perhaps determined by macros).  Of
+course, you can only use this to exclude code, not type definitions or
+other preprocessing directives, and you can only do it if the code
+remains syntactically valid when it is not to be used.
+
+   <p>GCC version 3 eliminates this kind of never-executed code even when
+not optimizing.  Older versions did it only when optimizing.
+
+<ul class="menu">
+<li><a accesskey="1" href="Conditional-Uses.html#Conditional-Uses">Conditional Uses</a>
+<li><a accesskey="2" href="Conditional-Syntax.html#Conditional-Syntax">Conditional Syntax</a>
+<li><a accesskey="3" href="Deleted-Code.html#Deleted-Code">Deleted Code</a>
+</ul>
+
+   </body></html>
+

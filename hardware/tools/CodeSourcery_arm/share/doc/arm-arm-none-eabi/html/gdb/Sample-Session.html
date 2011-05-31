@@ -1,0 +1,264 @@
+<html lang="en">
+<head>
+<title>Sample Session - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Summary.html#Summary" title="Summary">
+<link rel="next" href="Invocation.html#Invocation" title="Invocation">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Sample-Session"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Invocation.html#Invocation">Invocation</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Summary.html#Summary">Summary</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">1 A Sample <span class="sc">gdb</span> Session</h2>
+
+<p>You can use this manual at your leisure to read all about <span class="sc">gdb</span>. 
+However, a handful of commands are enough to get started using the
+debugger.  This chapter illustrates those commands.
+
+<!-- FIXME: this example may not be appropriate for some configs, where -->
+<!-- FIXME...primary interest is in remote use. -->
+   <p>One of the preliminary versions of <span class="sc">gnu</span> <code>m4</code> (a generic macro
+processor) exhibits the following bug: sometimes, when we change its
+quote strings from the default, the commands used to capture one macro
+definition within another stop working.  In the following short <code>m4</code>
+session, we define a macro <code>foo</code> which expands to <code>0000</code>; we
+then use the <code>m4</code> built-in <code>defn</code> to define <code>bar</code> as the
+same thing.  However, when we change the open quote string to
+<code>&lt;QUOTE&gt;</code> and the close quote string to <code>&lt;UNQUOTE&gt;</code>, the same
+procedure fails to define a new synonym <code>baz</code>:
+
+<pre class="smallexample">     $ <b>cd gnu/m4</b>
+     $ <b>./m4</b>
+     <b>define(foo,0000)</b>
+     
+     <b>foo</b>
+     0000
+     <b>define(bar,defn(`foo'))</b>
+     
+     <b>bar</b>
+     0000
+     <b>changequote(&lt;QUOTE&gt;,&lt;UNQUOTE&gt;)</b>
+     
+     <b>define(baz,defn(&lt;QUOTE&gt;foo&lt;UNQUOTE&gt;))</b>
+     <b>baz</b>
+     <b>Ctrl-d</b>
+     m4: End of input: 0: fatal error: EOF in string
+</pre>
+   <p class="noindent">Let us use <span class="sc">gdb</span> to try to see what is going on.
+
+<pre class="smallexample">     $ <b>gdb m4</b>
+     <!-- FIXME: this falsifies the exact text played out, to permit smallbook -->
+     <!-- FIXME... format to come out better. -->
+     <span class="sc">gdb</span> is free software and you are welcome to distribute copies
+      of it under certain conditions; type "show copying" to see
+      the conditions.
+     There is absolutely no warranty for <span class="sc">gdb</span>; type "show warranty"
+      for details.
+     
+     <span class="sc">gdb</span> 7.2.50.20100908-cvs, Copyright 1999 Free Software Foundation, Inc...
+     (gdb)
+</pre>
+   <p class="noindent"><span class="sc">gdb</span> reads only enough symbol data to know where to find the
+rest when needed; as a result, the first prompt comes up very quickly. 
+We now tell <span class="sc">gdb</span> to use a narrower display width than usual, so
+that examples fit in this manual.
+
+<pre class="smallexample">     (gdb) <b>set width 70</b>
+</pre>
+   <p class="noindent">We need to see how the <code>m4</code> built-in <code>changequote</code> works. 
+Having looked at the source, we know the relevant subroutine is
+<code>m4_changequote</code>, so we set a breakpoint there with the <span class="sc">gdb</span>
+<code>break</code> command.
+
+<pre class="smallexample">     (gdb) <b>break m4_changequote</b>
+     Breakpoint 1 at 0x62f4: file builtin.c, line 879.
+</pre>
+   <p class="noindent">Using the <code>run</code> command, we start <code>m4</code> running under <span class="sc">gdb</span>
+control; as long as control does not reach the <code>m4_changequote</code>
+subroutine, the program runs as usual:
+
+<pre class="smallexample">     (gdb) <b>run</b>
+     Starting program: /work/Editorial/gdb/gnu/m4/m4
+     <b>define(foo,0000)</b>
+     
+     <b>foo</b>
+     0000
+</pre>
+   <p class="noindent">To trigger the breakpoint, we call <code>changequote</code>.  <span class="sc">gdb</span>
+suspends execution of <code>m4</code>, displaying information about the
+context where it stops.
+
+<pre class="smallexample">     <b>changequote(&lt;QUOTE&gt;,&lt;UNQUOTE&gt;)</b>
+     
+     Breakpoint 1, m4_changequote (argc=3, argv=0x33c70)
+         at builtin.c:879
+     879         if (bad_argc(TOKEN_DATA_TEXT(argv[0]),argc,1,3))
+</pre>
+   <p class="noindent">Now we use the command <code>n</code> (<code>next</code>) to advance execution to
+the next line of the current function.
+
+<pre class="smallexample">     (gdb) <b>n</b>
+     882         set_quotes((argc &gt;= 2) ? TOKEN_DATA_TEXT(argv[1])\
+      : nil,
+</pre>
+   <p class="noindent"><code>set_quotes</code> looks like a promising subroutine.  We can go into it
+by using the command <code>s</code> (<code>step</code>) instead of <code>next</code>. 
+<code>step</code> goes to the next line to be executed in <em>any</em>
+subroutine, so it steps into <code>set_quotes</code>.
+
+<pre class="smallexample">     (gdb) <b>s</b>
+     set_quotes (lq=0x34c78 "&lt;QUOTE&gt;", rq=0x34c88 "&lt;UNQUOTE&gt;")
+         at input.c:530
+     530         if (lquote != def_lquote)
+</pre>
+   <p class="noindent">The display that shows the subroutine where <code>m4</code> is now
+suspended (and its arguments) is called a stack frame display.  It
+shows a summary of the stack.  We can use the <code>backtrace</code>
+command (which can also be spelled <code>bt</code>), to see where we are
+in the stack as a whole: the <code>backtrace</code> command displays a
+stack frame for each active subroutine.
+
+<pre class="smallexample">     (gdb) <b>bt</b>
+     #0  set_quotes (lq=0x34c78 "&lt;QUOTE&gt;", rq=0x34c88 "&lt;UNQUOTE&gt;")
+         at input.c:530
+     #1  0x6344 in m4_changequote (argc=3, argv=0x33c70)
+         at builtin.c:882
+     #2  0x8174 in expand_macro (sym=0x33320) at macro.c:242
+     #3  0x7a88 in expand_token (obs=0x0, t=209696, td=0xf7fffa30)
+         at macro.c:71
+     #4  0x79dc in expand_input () at macro.c:40
+     #5  0x2930 in main (argc=0, argv=0xf7fffb20) at m4.c:195
+</pre>
+   <p class="noindent">We step through a few more lines to see what happens.  The first two
+times, we can use &lsquo;<samp><span class="samp">s</span></samp>&rsquo;; the next two times we use <code>n</code> to avoid
+falling into the <code>xstrdup</code> subroutine.
+
+<pre class="smallexample">     (gdb) <b>s</b>
+     0x3b5c  532         if (rquote != def_rquote)
+     (gdb) <b>s</b>
+     0x3b80  535         lquote = (lq == nil || *lq == '\0') ?  \
+     def_lquote : xstrdup(lq);
+     (gdb) <b>n</b>
+     536         rquote = (rq == nil || *rq == '\0') ? def_rquote\
+      : xstrdup(rq);
+     (gdb) <b>n</b>
+     538         len_lquote = strlen(rquote);
+</pre>
+   <p class="noindent">The last line displayed looks a little odd; we can examine the variables
+<code>lquote</code> and <code>rquote</code> to see if they are in fact the new left
+and right quotes we specified.  We use the command <code>p</code>
+(<code>print</code>) to see their values.
+
+<pre class="smallexample">     (gdb) <b>p lquote</b>
+     $1 = 0x35d40 "&lt;QUOTE&gt;"
+     (gdb) <b>p rquote</b>
+     $2 = 0x35d50 "&lt;UNQUOTE&gt;"
+</pre>
+   <p class="noindent"><code>lquote</code> and <code>rquote</code> are indeed the new left and right quotes. 
+To look at some context, we can display ten lines of source
+surrounding the current line with the <code>l</code> (<code>list</code>) command.
+
+<pre class="smallexample">     (gdb) <b>l</b>
+     533             xfree(rquote);
+     534
+     535         lquote = (lq == nil || *lq == '\0') ? def_lquote\
+      : xstrdup (lq);
+     536         rquote = (rq == nil || *rq == '\0') ? def_rquote\
+      : xstrdup (rq);
+     537
+     538         len_lquote = strlen(rquote);
+     539         len_rquote = strlen(lquote);
+     540     }
+     541
+     542     void
+</pre>
+   <p class="noindent">Let us step past the two lines that set <code>len_lquote</code> and
+<code>len_rquote</code>, and then examine the values of those variables.
+
+<pre class="smallexample">     (gdb) <b>n</b>
+     539         len_rquote = strlen(lquote);
+     (gdb) <b>n</b>
+     540     }
+     (gdb) <b>p len_lquote</b>
+     $3 = 9
+     (gdb) <b>p len_rquote</b>
+     $4 = 7
+</pre>
+   <p class="noindent">That certainly looks wrong, assuming <code>len_lquote</code> and
+<code>len_rquote</code> are meant to be the lengths of <code>lquote</code> and
+<code>rquote</code> respectively.  We can set them to better values using
+the <code>p</code> command, since it can print the value of
+any expression&mdash;and that expression can include subroutine calls and
+assignments.
+
+<pre class="smallexample">     (gdb) <b>p len_lquote=strlen(lquote)</b>
+     $5 = 7
+     (gdb) <b>p len_rquote=strlen(rquote)</b>
+     $6 = 9
+</pre>
+   <p class="noindent">Is that enough to fix the problem of using the new quotes with the
+<code>m4</code> built-in <code>defn</code>?  We can allow <code>m4</code> to continue
+executing with the <code>c</code> (<code>continue</code>) command, and then try the
+example that caused trouble initially:
+
+<pre class="smallexample">     (gdb) <b>c</b>
+     Continuing.
+     
+     <b>define(baz,defn(&lt;QUOTE&gt;foo&lt;UNQUOTE&gt;))</b>
+     
+     baz
+     0000
+</pre>
+   <p class="noindent">Success!  The new quotes now work just as well as the default ones.  The
+problem seems to have been just the two typos defining the wrong
+lengths.  We allow <code>m4</code> exit by giving it an EOF as input:
+
+<pre class="smallexample">     <b>Ctrl-d</b>
+     Program exited normally.
+</pre>
+   <p class="noindent">The message &lsquo;<samp><span class="samp">Program exited normally.</span></samp>&rsquo; is from <span class="sc">gdb</span>; it
+indicates <code>m4</code> has finished executing.  We can end our <span class="sc">gdb</span>
+session with the <span class="sc">gdb</span> <code>quit</code> command.
+
+<pre class="smallexample">     (gdb) <b>quit</b>
+</pre>
+   </body></html>
+

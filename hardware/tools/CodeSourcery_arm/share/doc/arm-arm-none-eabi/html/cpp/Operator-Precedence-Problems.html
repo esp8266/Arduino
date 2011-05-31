@@ -1,0 +1,113 @@
+<html lang="en">
+<head>
+<title>Operator Precedence Problems - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Macro-Pitfalls.html#Macro-Pitfalls" title="Macro Pitfalls">
+<link rel="prev" href="Misnesting.html#Misnesting" title="Misnesting">
+<link rel="next" href="Swallowing-the-Semicolon.html#Swallowing-the-Semicolon" title="Swallowing the Semicolon">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Operator-Precedence-Problems"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Swallowing-the-Semicolon.html#Swallowing-the-Semicolon">Swallowing the Semicolon</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Misnesting.html#Misnesting">Misnesting</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Macro-Pitfalls.html#Macro-Pitfalls">Macro Pitfalls</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.10.2 Operator Precedence Problems</h4>
+
+<p><a name="index-parentheses-in-macro-bodies-74"></a>
+You may have noticed that in most of the macro definition examples shown
+above, each occurrence of a macro argument name had parentheses around
+it.  In addition, another pair of parentheses usually surround the
+entire macro definition.  Here is why it is best to write macros that
+way.
+
+   <p>Suppose you define a macro as follows,
+
+<pre class="smallexample">     #define ceil_div(x, y) (x + y - 1) / y
+</pre>
+   <p class="noindent">whose purpose is to divide, rounding up.  (One use for this operation is
+to compute how many <code>int</code> objects are needed to hold a certain
+number of <code>char</code> objects.)  Then suppose it is used as follows:
+
+<pre class="smallexample">     a = ceil_div (b &amp; c, sizeof (int));
+          ==&gt; a = (b &amp; c + sizeof (int) - 1) / sizeof (int);
+</pre>
+   <p class="noindent">This does not do what is intended.  The operator-precedence rules of
+C make it equivalent to this:
+
+<pre class="smallexample">     a = (b &amp; (c + sizeof (int) - 1)) / sizeof (int);
+</pre>
+   <p class="noindent">What we want is this:
+
+<pre class="smallexample">     a = ((b &amp; c) + sizeof (int) - 1)) / sizeof (int);
+</pre>
+   <p class="noindent">Defining the macro as
+
+<pre class="smallexample">     #define ceil_div(x, y) ((x) + (y) - 1) / (y)
+</pre>
+   <p class="noindent">provides the desired result.
+
+   <p>Unintended grouping can result in another way.  Consider <code>sizeof
+ceil_div(1, 2)</code>.  That has the appearance of a C expression that would
+compute the size of the type of <code>ceil_div (1, 2)</code>, but in fact it
+means something very different.  Here is what it expands to:
+
+<pre class="smallexample">     sizeof ((1) + (2) - 1) / (2)
+</pre>
+   <p class="noindent">This would take the size of an integer and divide it by two.  The
+precedence rules have put the division outside the <code>sizeof</code> when it
+was intended to be inside.
+
+   <p>Parentheses around the entire macro definition prevent such problems. 
+Here, then, is the recommended way to define <code>ceil_div</code>:
+
+<pre class="smallexample">     #define ceil_div(x, y) (((x) + (y) - 1) / (y))
+</pre>
+   </body></html>
+

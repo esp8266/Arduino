@@ -1,0 +1,93 @@
+<html lang="en">
+<head>
+<title>Fixed Headers - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Trouble.html#Trouble" title="Trouble">
+<link rel="prev" href="Incompatibilities.html#Incompatibilities" title="Incompatibilities">
+<link rel="next" href="Standard-Libraries.html#Standard-Libraries" title="Standard Libraries">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Fixed-Headers"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Standard-Libraries.html#Standard-Libraries">Standard Libraries</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Incompatibilities.html#Incompatibilities">Incompatibilities</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Trouble.html#Trouble">Trouble</a>
+<hr>
+</div>
+
+<h3 class="section">11.5 Fixed Header Files</h3>
+
+<p>GCC needs to install corrected versions of some system header files. 
+This is because most target systems have some header files that won't
+work with GCC unless they are changed.  Some have bugs, some are
+incompatible with ISO C, and some depend on special features of other
+compilers.
+
+ <p>Installing GCC automatically creates and installs the fixed header
+files, by running a program called <code>fixincludes</code>.  Normally, you
+don't need to pay attention to this.  But there are cases where it
+doesn't do the right thing automatically.
+
+     <ul>
+<li>If you update the system's header files, such as by installing a new
+system version, the fixed header files of GCC are not automatically
+updated.  They can be updated using the <samp><span class="command">mkheaders</span></samp> script
+installed in
+<samp><var>libexecdir</var><span class="file">/gcc/</span><var>target</var><span class="file">/</span><var>version</var><span class="file">/install-tools/</span></samp>.
+
+     <li>On some systems, header file directories contain
+machine-specific symbolic links in certain places.  This makes it
+possible to share most of the header files among hosts running the
+same version of the system on different machine models.
+
+     <p>The programs that fix the header files do not understand this special
+way of using symbolic links; therefore, the directory of fixed header
+files is good only for the machine model used to build it.
+
+     <p>It is possible to make separate sets of fixed header files for the
+different machine models, and arrange a structure of symbolic links so
+as to use the proper set, but you'll have to do this by hand. 
+</ul>
+
+ </body></html>
+

@@ -1,0 +1,106 @@
+<html lang="en">
+<head>
+<title>VxWorks - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Embedded-OS.html#Embedded-OS" title="Embedded OS">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="VxWorks"></a>
+<p>
+Up:&nbsp;<a rel="up" accesskey="u" href="Embedded-OS.html#Embedded-OS">Embedded OS</a>
+<hr>
+</div>
+
+<h4 class="subsection">21.2.1 Using <span class="sc">gdb</span> with VxWorks</h4>
+
+<p><a name="index-VxWorks-1274"></a>
+     
+<a name="index-target-vxworks-1275"></a>
+<dl><dt><code>target vxworks </code><var>machinename</var><dd>A VxWorks system, attached via TCP/IP.  The argument <var>machinename</var>
+is the target system's machine name or IP address.
+
+   </dl>
+
+   <p>On VxWorks, <code>load</code> links <var>filename</var> dynamically on the
+current target system as well as adding its symbols in <span class="sc">gdb</span>.
+
+   <p><span class="sc">gdb</span> enables developers to spawn and debug tasks running on networked
+VxWorks targets from a Unix host.  Already-running tasks spawned from
+the VxWorks shell can also be debugged.  <span class="sc">gdb</span> uses code that runs on
+both the Unix host and on the VxWorks target.  The program
+<code>gdb</code> is installed and executed on the Unix host.  (It may be
+installed with the name <code>vxgdb</code>, to distinguish it from a
+<span class="sc">gdb</span> for debugging programs on the host itself.)
+
+     <dl>
+<dt><code>VxWorks-timeout </code><var>args</var><dd><a name="index-vxworks_002dtimeout-1276"></a>All VxWorks-based targets now support the option <code>vxworks-timeout</code>. 
+This option is set by the user, and  <var>args</var> represents the number of
+seconds <span class="sc">gdb</span> waits for responses to rpc's.  You might use this if
+your VxWorks target is a slow software simulator or is on the far side
+of a thin network line. 
+</dl>
+
+   <p>The following information on connecting to VxWorks was current when
+this manual was produced; newer releases of VxWorks may use revised
+procedures.
+
+   <p><a name="index-INCLUDE_005fRDB-1277"></a>To use <span class="sc">gdb</span> with VxWorks, you must rebuild your VxWorks kernel
+to include the remote debugging interface routines in the VxWorks
+library <samp><span class="file">rdb.a</span></samp>.  To do this, define <code>INCLUDE_RDB</code> in the
+VxWorks configuration file <samp><span class="file">configAll.h</span></samp> and rebuild your VxWorks
+kernel.  The resulting kernel contains <samp><span class="file">rdb.a</span></samp>, and spawns the
+source debugging task <code>tRdbTask</code> when VxWorks is booted.  For more
+information on configuring and remaking VxWorks, see the manufacturer's
+manual. 
+<!-- VxWorks, see the @cite{VxWorks Programmer's Guide}. -->
+
+   <p>Once you have included <samp><span class="file">rdb.a</span></samp> in your VxWorks system image and set
+your Unix execution search path to find <span class="sc">gdb</span>, you are ready to
+run <span class="sc">gdb</span>.  From your Unix host, run <code>gdb</code> (or
+<code>vxgdb</code>, depending on your installation).
+
+   <p><span class="sc">gdb</span> comes up showing the prompt:
+
+<pre class="smallexample">     (vxgdb)
+</pre>
+   <ul class="menu">
+<li><a accesskey="1" href="VxWorks-Connection.html#VxWorks-Connection">VxWorks Connection</a>:           Connecting to VxWorks
+<li><a accesskey="2" href="VxWorks-Download.html#VxWorks-Download">VxWorks Download</a>:             VxWorks download
+<li><a accesskey="3" href="VxWorks-Attach.html#VxWorks-Attach">VxWorks Attach</a>:               Running tasks
+</ul>
+
+   </body></html>
+

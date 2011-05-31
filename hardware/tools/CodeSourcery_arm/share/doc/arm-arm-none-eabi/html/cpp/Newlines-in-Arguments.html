@@ -1,0 +1,83 @@
+<html lang="en">
+<head>
+<title>Newlines in Arguments - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Macro-Pitfalls.html#Macro-Pitfalls" title="Macro Pitfalls">
+<link rel="prev" href="Argument-Prescan.html#Argument-Prescan" title="Argument Prescan">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Newlines-in-Arguments"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Argument-Prescan.html#Argument-Prescan">Argument Prescan</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Macro-Pitfalls.html#Macro-Pitfalls">Macro Pitfalls</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.10.7 Newlines in Arguments</h4>
+
+<p><a name="index-newlines-in-macro-arguments-82"></a>
+The invocation of a function-like macro can extend over many logical
+lines.  However, in the present implementation, the entire expansion
+comes out on one line.  Thus line numbers emitted by the compiler or
+debugger refer to the line the invocation started on, which might be
+different to the line containing the argument causing the problem.
+
+   <p>Here is an example illustrating this:
+
+<pre class="smallexample">     #define ignore_second_arg(a,b,c) a; c
+     
+     ignore_second_arg (foo (),
+                        ignored (),
+                        syntax error);
+</pre>
+   <p class="noindent">The syntax error triggered by the tokens <code>syntax error</code> results in
+an error message citing line three&mdash;the line of ignore_second_arg&mdash;
+even though the problematic code comes from line five.
+
+   <p>We consider this a bug, and intend to fix it in the near future.
+
+   </body></html>
+

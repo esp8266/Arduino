@@ -1,0 +1,128 @@
+<html lang="en">
+<head>
+<title>Vague Linkage - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C_002b_002b-Extensions.html#C_002b_002b-Extensions" title="C++ Extensions">
+<link rel="prev" href="Restricted-Pointers.html#Restricted-Pointers" title="Restricted Pointers">
+<link rel="next" href="C_002b_002b-Interface.html#C_002b_002b-Interface" title="C++ Interface">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Vague-Linkage"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="C_002b_002b-Interface.html#C_002b_002b-Interface">C++ Interface</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Restricted-Pointers.html#Restricted-Pointers">Restricted Pointers</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C_002b_002b-Extensions.html#C_002b_002b-Extensions">C++ Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">7.3 Vague Linkage</h3>
+
+<p><a name="index-vague-linkage-3166"></a>
+There are several constructs in C++ which require space in the object
+file but are not clearly tied to a single translation unit.  We say that
+these constructs have &ldquo;vague linkage&rdquo;.  Typically such constructs are
+emitted wherever they are needed, though sometimes we can be more
+clever.
+
+     <dl>
+<dt>Inline Functions<dd>Inline functions are typically defined in a header file which can be
+included in many different compilations.  Hopefully they can usually be
+inlined, but sometimes an out-of-line copy is necessary, if the address
+of the function is taken or if inlining fails.  In general, we emit an
+out-of-line copy in all translation units where one is needed.  As an
+exception, we only emit inline virtual functions with the vtable, since
+it will always require a copy.
+
+     <p>Local static variables and string constants used in an inline function
+are also considered to have vague linkage, since they must be shared
+between all inlined and out-of-line instances of the function.
+
+     <br><dt>VTables<dd><a name="index-vtable-3167"></a>C++ virtual functions are implemented in most compilers using a lookup
+table, known as a vtable.  The vtable contains pointers to the virtual
+functions provided by a class, and each object of the class contains a
+pointer to its vtable (or vtables, in some multiple-inheritance
+situations).  If the class declares any non-inline, non-pure virtual
+functions, the first one is chosen as the &ldquo;key method&rdquo; for the class,
+and the vtable is only emitted in the translation unit where the key
+method is defined.
+
+     <p><em>Note:</em> If the chosen key method is later defined as inline, the
+vtable will still be emitted in every translation unit which defines it. 
+Make sure that any inline virtuals are declared inline in the class
+body, even if they are not defined there.
+
+     <br><dt>type_info objects<dd><a name="index-type_005finfo-3168"></a><a name="index-RTTI-3169"></a>C++ requires information about types to be written out in order to
+implement &lsquo;<samp><span class="samp">dynamic_cast</span></samp>&rsquo;, &lsquo;<samp><span class="samp">typeid</span></samp>&rsquo; and exception handling. 
+For polymorphic classes (classes with virtual functions), the type_info
+object is written out along with the vtable so that &lsquo;<samp><span class="samp">dynamic_cast</span></samp>&rsquo;
+can determine the dynamic type of a class object at runtime.  For all
+other types, we write out the type_info object when it is used: when
+applying &lsquo;<samp><span class="samp">typeid</span></samp>&rsquo; to an expression, throwing an object, or
+referring to a type in a catch clause or exception specification.
+
+     <br><dt>Template Instantiations<dd>Most everything in this section also applies to template instantiations,
+but there are other options as well. 
+See <a href="Template-Instantiation.html#Template-Instantiation">Where's the Template?</a>.
+
+ </dl>
+
+ <p>When used with GNU ld version 2.8 or later on an ELF system such as
+GNU/Linux or Solaris 2, or on Microsoft Windows, duplicate copies of
+these constructs will be discarded at link time.  This is known as
+COMDAT support.
+
+ <p>On targets that don't support COMDAT, but do support weak symbols, GCC
+will use them.  This way one copy will override all the others, but
+the unused copies will still take up space in the executable.
+
+ <p>For targets which do not support either COMDAT or weak symbols,
+most entities with vague linkage will be emitted as local symbols to
+avoid duplicate definition errors from the linker.  This will not happen
+for local statics in inlines, however, as having multiple copies will
+almost certainly break things.
+
+ <p>See <a href="C_002b_002b-Interface.html#C_002b_002b-Interface">Declarations and Definitions in One Header</a>, for
+another way to control placement of these constructs.
+
+ </body></html>
+

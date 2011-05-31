@@ -1,0 +1,168 @@
+<html lang="en">
+<head>
+<title>Parameters In Python - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Python-API.html#Python-API" title="Python API">
+<link rel="prev" href="Commands-In-Python.html#Commands-In-Python" title="Commands In Python">
+<link rel="next" href="Functions-In-Python.html#Functions-In-Python" title="Functions In Python">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Parameters-In-Python"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Functions-In-Python.html#Functions-In-Python">Functions In Python</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Commands-In-Python.html#Commands-In-Python">Commands In Python</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Python-API.html#Python-API">Python API</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">23.2.2.11 Parameters In Python</h5>
+
+<p><a name="index-parameters-in-python-1764"></a><a name="index-python-parameters-1765"></a><a name="index-gdb_002eParameter-1766"></a><a name="index-Parameter-1767"></a>You can implement new <span class="sc">gdb</span> parameters using Python.  A new
+parameter is implemented as an instance of the <code>gdb.Parameter</code>
+class.
+
+   <p>Parameters are exposed to the user via the <code>set</code> and
+<code>show</code> commands.  See <a href="Help.html#Help">Help</a>.
+
+   <p>There are many parameters that already exist and can be set in
+<span class="sc">gdb</span>.  Two examples are: <code>set follow fork</code> and
+<code>set charset</code>.  Setting these parameters influences certain
+behavior in <span class="sc">gdb</span>.  Similarly, you can define parameters that
+can be used to influence behavior in custom Python scripts and commands.
+
+<div class="defun">
+&mdash; Method on Parameter: <b>__init__</b><var> name command-class parameter-class </var><span class="roman">[</span><var>enum-sequence</var><span class="roman">]</span><var><a name="index-g_t_005f_005finit_005f_005f-on-Parameter-1768"></a></var><br>
+<blockquote><p>The object initializer for <code>Parameter</code> registers the new
+parameter with <span class="sc">gdb</span>.  This initializer is normally invoked
+from the subclass' own <code>__init__</code> method.
+
+        <p><var>name</var> is the name of the new parameter.  If <var>name</var> consists
+of multiple words, then the initial words are looked for as prefix
+parameters.  An example of this can be illustrated with the
+<code>set print</code> set of parameters.  If <var>name</var> is
+<code>print foo</code>, then <code>print</code> will be searched as the prefix
+parameter.  In this case the parameter can subsequently be accessed in
+<span class="sc">gdb</span> as <code>set print foo</code>.
+
+        <p>If <var>name</var> consists of multiple words, and no prefix parameter group
+can be found, an exception is raised.
+
+        <p><var>command-class</var> should be one of the &lsquo;<samp><span class="samp">COMMAND_</span></samp>&rsquo; constants
+(see <a href="Commands-In-Python.html#Commands-In-Python">Commands In Python</a>).  This argument tells <span class="sc">gdb</span> how to
+categorize the new parameter in the help system.
+
+        <p><var>parameter-class</var> should be one of the &lsquo;<samp><span class="samp">PARAM_</span></samp>&rsquo; constants
+defined below.  This argument tells <span class="sc">gdb</span> the type of the new
+parameter; this information is used for input validation and
+completion.
+
+        <p>If <var>parameter-class</var> is <code>PARAM_ENUM</code>, then
+<var>enum-sequence</var> must be a sequence of strings.  These strings
+represent the possible values for the parameter.
+
+        <p>If <var>parameter-class</var> is not <code>PARAM_ENUM</code>, then the presence
+of a fourth argument will cause an exception to be thrown.
+
+        <p>The help text for the new parameter is taken from the Python
+documentation string for the parameter's class, if there is one.  If
+there is no documentation string, a default value is used. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Instance Variable of Parameter: <b>set_doc</b><var><a name="index-set_005fdoc-1769"></a></var><br>
+<blockquote><p>If this attribute exists, and is a string, then its value is used as
+the help text for this parameter's <code>set</code> command.  The value is
+examined when <code>Parameter.__init__</code> is invoked; subsequent changes
+have no effect. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Instance Variable of Parameter: <b>show_doc</b><var><a name="index-show_005fdoc-1770"></a></var><br>
+<blockquote><p>If this attribute exists, and is a string, then its value is used as
+the help text for this parameter's <code>show</code> command.  The value is
+examined when <code>Parameter.__init__</code> is invoked; subsequent changes
+have no effect. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Instance Variable of Parameter: <b>value</b><var><a name="index-value-1771"></a></var><br>
+<blockquote><p>The <code>value</code> attribute holds the underlying value of the
+parameter.  It can be read and assigned to just as any other
+attribute.  <span class="sc">gdb</span> does validation when assignments are made. 
+</p></blockquote></div>
+
+   <p>When a new parameter is defined, its type must be specified.  The
+available types are represented by constants defined in the <code>gdb</code>
+module:
+
+     
+<a name="index-PARAM_005fBOOLEAN-1772"></a>
+<a name="index-gdb_002ePARAM_005fBOOLEAN-1773"></a>
+<dl><dt><code>PARAM_BOOLEAN</code><dd>The value is a plain boolean.  The Python boolean values, <code>True</code>
+and <code>False</code> are the only valid values.
+
+     <p><a name="index-PARAM_005fAUTO_005fBOOLEAN-1774"></a><a name="index-gdb_002ePARAM_005fAUTO_005fBOOLEAN-1775"></a><br><dt><code>PARAM_AUTO_BOOLEAN</code><dd>The value has three possible states: true, false, and &lsquo;<samp><span class="samp">auto</span></samp>&rsquo;.  In
+Python, true and false are represented using boolean constants, and
+&lsquo;<samp><span class="samp">auto</span></samp>&rsquo; is represented using <code>None</code>.
+
+     <p><a name="index-PARAM_005fUINTEGER-1776"></a><a name="index-gdb_002ePARAM_005fUINTEGER-1777"></a><br><dt><code>PARAM_UINTEGER</code><dd>The value is an unsigned integer.  The value of 0 should be
+interpreted to mean &ldquo;unlimited&rdquo;.
+
+     <p><a name="index-PARAM_005fINTEGER-1778"></a><a name="index-gdb_002ePARAM_005fINTEGER-1779"></a><br><dt><code>PARAM_INTEGER</code><dd>The value is a signed integer.  The value of 0 should be interpreted
+to mean &ldquo;unlimited&rdquo;.
+
+     <p><a name="index-PARAM_005fSTRING-1780"></a><a name="index-gdb_002ePARAM_005fSTRING-1781"></a><br><dt><code>PARAM_STRING</code><dd>The value is a string.  When the user modifies the string, any escape
+sequences, such as &lsquo;<samp><span class="samp">\t</span></samp>&rsquo;, &lsquo;<samp><span class="samp">\f</span></samp>&rsquo;, and octal escapes, are
+translated into corresponding characters and encoded into the current
+host charset.
+
+     <p><a name="index-PARAM_005fSTRING_005fNOESCAPE-1782"></a><a name="index-gdb_002ePARAM_005fSTRING_005fNOESCAPE-1783"></a><br><dt><code>PARAM_STRING_NOESCAPE</code><dd>The value is a string.  When the user modifies the string, escapes are
+passed through untranslated.
+
+     <p><a name="index-PARAM_005fOPTIONAL_005fFILENAME-1784"></a><a name="index-gdb_002ePARAM_005fOPTIONAL_005fFILENAME-1785"></a><br><dt><code>PARAM_OPTIONAL_FILENAME</code><dd>The value is a either a filename (a string), or <code>None</code>.
+
+     <p><a name="index-PARAM_005fFILENAME-1786"></a><a name="index-gdb_002ePARAM_005fFILENAME-1787"></a><br><dt><code>PARAM_FILENAME</code><dd>The value is a filename.  This is just like
+<code>PARAM_STRING_NOESCAPE</code>, but uses file names for completion.
+
+     <p><a name="index-PARAM_005fZINTEGER-1788"></a><a name="index-gdb_002ePARAM_005fZINTEGER-1789"></a><br><dt><code>PARAM_ZINTEGER</code><dd>The value is an integer.  This is like <code>PARAM_INTEGER</code>, except 0
+is interpreted as itself.
+
+     <p><a name="index-PARAM_005fENUM-1790"></a><a name="index-gdb_002ePARAM_005fENUM-1791"></a><br><dt><code>PARAM_ENUM</code><dd>The value is a string, which must be one of a collection string
+constants provided when the parameter is created. 
+</dl>
+
+   </body></html>
+

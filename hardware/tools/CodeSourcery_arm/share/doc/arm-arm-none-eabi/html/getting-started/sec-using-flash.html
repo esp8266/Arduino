@@ -1,0 +1,53 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>3.3. Using Flash Memory</title><link rel="stylesheet" href="cs.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.74.0"><link rel="home" href="index.html" title="Sourcery G++ Lite"><link rel="up" href="chap-target.html" title="Chapter 3. Sourcery G++ Lite for ARM EABI"><link rel="prev" href="sec-multilibs.html" title="3.2. Library Configurations"><link rel="next" href="sec-armfloat.html" title="3.4. Using VFP Floating Point"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">3.3. Using Flash Memory</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="sec-multilibs.html">Prev</a> </td><th width="60%" align="center">Chapter 3. Sourcery G++ Lite for ARM EABI</th><td width="20%" align="right"> <a accesskey="n" href="sec-armfloat.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec-using-flash"></a>3.3. Using Flash Memory</h2></div></div></div><p>
+    Sourcery G++ Lite supports development and debugging of applications
+    loaded into flash memory on ARM EABI targets.  There are
+    three steps involved:
+  </p><div class="orderedlist"><ol type="1"><li><p>
+	You must use an appropriate linker script that identifies the
+	ROM memory region on your target board, and locates the program
+	text within that region.
+	<span>
+	  Refer to <a class="xref" href="chap-cs3.html" title="Chapter 5. CS3&#8482;: The CodeSourcery Common Startup Code Sequence">Chapter 5, &#8220;CS3&#8482;: The CodeSourcery Common Startup Code Sequence&#8221;</a> for information about the
+	  boards supported by Sourcery G++.
+	</span>
+       </p></li><li><p>
+	Next, load your program into the flash memory on your target board.
+	<span></span>
+	You must
+	  <span></span>
+	use third-party tools to program the flash memory.
+      </p></li><li><p>
+	Finally, when debugging a program in flash memory, GDB must be
+	told about the ROM region so that it knows where it must use
+	hardware breakpoints to control program execution.
+	<span>
+	  If you are using the Sourcery G++ Debug Sprite to debug your
+	  program, the Sprite does this automatically, using the memory
+	  map provided in the board configuration file.
+	  Otherwise, you must provide this information explicitly.
+	</span>
+       </p><p>
+	When using GDB from the command line, you can mark the flash memory 
+	as read-only by using the command:
+	</p><pre class="screen">(gdb) mem <em class="replaceable"><code>start</code></em> <em class="replaceable"><code>end</code></em> ro</pre><p>
+	where <em class="replaceable"><code>start</code></em> and
+	<em class="replaceable"><code>end</code></em> define the address range of the
+	read-only memory region.
+      </p></li></ol></div><p>
+    In addition to GDB's automatic use of hardware breakpoints in the
+    ROM region, you can also set hardware breakpoints explicitly from
+    the debugger.
+    However, on many targets the number of available hardware breakpoints
+    is very small.  Furthermore,
+    GDB also uses hardware breakpoints internally to implement commands
+    such as <code class="command">step</code>, <code class="command">next</code>, and 
+    <code class="command">finish</code>.  Thus the number of breakpoints you can
+    explicitly set in ROM may be fewer than the number of hardware
+    breakpoints supported by the target system.
+  </p><p>
+    For example, ARM7TDMI cores support only one hardware breakpoint,
+    which must also be used internally by the debugger if you set any
+    software breakpoints in RAM.  On ARM9 cores, there are two hardware
+    breakpoints supported and one is consumed by the debugger if you
+    set any software breakpoints.  
+  </p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="sec-multilibs.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="chap-target.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="sec-armfloat.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">3.2. Library Configurations </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 3.4. Using VFP Floating Point</td></tr></table></div></body></html>

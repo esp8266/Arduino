@@ -1,0 +1,87 @@
+<html lang="en">
+<head>
+<title>a64l - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdlib.html#Stdlib" title="Stdlib">
+<link rel="prev" href="_005fExit.html#g_t_005fExit" title="_Exit">
+<link rel="next" href="abort.html#abort" title="abort">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="a64l"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="abort.html#abort">abort</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="_005fExit.html#g_t_005fExit">_Exit</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdlib.html#Stdlib">Stdlib</a>
+<hr>
+</div>
+
+<h3 class="section">2.2 <code>a64l</code>, <code>l64a</code>&mdash;convert between radix-64 ASCII string and long</h3>
+
+<p><a name="index-a64l-2"></a><a name="index-l64a-3"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdlib.h&gt;
+     long a64l(const char *<var>input</var>);
+     char *l64a(long <var>input</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+Conversion is performed between long and radix-64 characters.  The
+<code>l64a</code> routine transforms up to 32 bits of input value starting from
+least significant bits to the most significant bits.  The input value
+is split up into a maximum of 5 groups of 6 bits and possibly one
+group of 2 bits (bits 31 and 30).
+
+   <p>Each group of 6 bits forms a value from 0&ndash;63 which is translated into
+a character as follows:
+
+     <ul>
+<li>0 = '.' 
+<li>1 = '/'
+<li>2&ndash;11 = '0' to '9'
+<li>12&ndash;37 = 'A' to 'Z'
+<li>38&ndash;63 = 'a' to 'z'
+</ul>
+
+   <p>When the remaining bits are zero or all bits have been translated, a
+null terminator is appended to the string.  An input value of 0
+results in the empty string.
+
+   <p>The <code>a64l</code> function performs the reverse translation.  Each
+character is used to generate a 6-bit value for up to 30 bits and then
+a 2-bit value to complete a 32-bit result.  The null terminator means
+that the remaining digits are 0.  An empty input string or NULL string
+results in 0L.  An invalid string results in undefined behavior.  If
+the size of a long is greater than 32 bits, the result is sign-extended.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>l64a</code> returns a null-terminated string of 0 to 6 characters. 
+<code>a64l</code> returns the 32-bit translated value from the input character string.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>l64a</code> and <code>a64l</code> are non-ANSI and are defined by the Single Unix Specification.
+
+   <p>Supporting OS subroutines required: None.
+
+   <p><br>
+
+   </body></html>
+

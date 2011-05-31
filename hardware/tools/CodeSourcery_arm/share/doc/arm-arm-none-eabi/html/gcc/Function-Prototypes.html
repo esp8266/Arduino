@@ -1,0 +1,110 @@
+<html lang="en">
+<head>
+<title>Function Prototypes - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Attribute-Syntax.html#Attribute-Syntax" title="Attribute Syntax">
+<link rel="next" href="C_002b_002b-Comments.html#C_002b_002b-Comments" title="C++ Comments">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Function-Prototypes"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="C_002b_002b-Comments.html#C_002b_002b-Comments">C++ Comments</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Attribute-Syntax.html#Attribute-Syntax">Attribute Syntax</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.31 Prototypes and Old-Style Function Definitions</h3>
+
+<p><a name="index-function-prototype-declarations-2472"></a><a name="index-old_002dstyle-function-definitions-2473"></a><a name="index-promotion-of-formal-parameters-2474"></a>
+GNU C extends ISO C to allow a function prototype to override a later
+old-style non-prototype definition.  Consider the following example:
+
+<pre class="smallexample">     /* <span class="roman">Use prototypes unless the compiler is old-fashioned.</span>  */
+     #ifdef __STDC__
+     #define P(x) x
+     #else
+     #define P(x) ()
+     #endif
+     
+     /* <span class="roman">Prototype function declaration.</span>  */
+     int isroot P((uid_t));
+     
+     /* <span class="roman">Old-style function definition.</span>  */
+     int
+     isroot (x)   /* <span class="roman">??? lossage here ???</span> */
+          uid_t x;
+     {
+       return x == 0;
+     }
+</pre>
+ <p>Suppose the type <code>uid_t</code> happens to be <code>short</code>.  ISO C does
+not allow this example, because subword arguments in old-style
+non-prototype definitions are promoted.  Therefore in this example the
+function definition's argument is really an <code>int</code>, which does not
+match the prototype argument type of <code>short</code>.
+
+ <p>This restriction of ISO C makes it hard to write code that is portable
+to traditional C compilers, because the programmer does not know
+whether the <code>uid_t</code> type is <code>short</code>, <code>int</code>, or
+<code>long</code>.  Therefore, in cases like these GNU C allows a prototype
+to override a later old-style definition.  More precisely, in GNU C, a
+function prototype argument type overrides the argument type specified
+by a later old-style definition if the former type is the same as the
+latter type before promotion.  Thus in GNU C the above example is
+equivalent to the following:
+
+<pre class="smallexample">     int isroot (uid_t);
+     
+     int
+     isroot (uid_t x)
+     {
+       return x == 0;
+     }
+</pre>
+ <p class="noindent">GNU C++ does not support old-style function definitions, so this
+extension is irrelevant.
+
+ </body></html>
+

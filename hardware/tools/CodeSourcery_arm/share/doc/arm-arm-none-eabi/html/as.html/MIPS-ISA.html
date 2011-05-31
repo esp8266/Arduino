@@ -1,0 +1,85 @@
+<html lang="en">
+<head>
+<title>MIPS ISA - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="MIPS_002dDependent.html#MIPS_002dDependent" title="MIPS-Dependent">
+<link rel="prev" href="MIPS-Stabs.html#MIPS-Stabs" title="MIPS Stabs">
+<link rel="next" href="MIPS-symbol-sizes.html#MIPS-symbol-sizes" title="MIPS symbol sizes">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="MIPS-ISA"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="MIPS-symbol-sizes.html#MIPS-symbol-sizes">MIPS symbol sizes</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="MIPS-Stabs.html#MIPS-Stabs">MIPS Stabs</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="MIPS_002dDependent.html#MIPS_002dDependent">MIPS-Dependent</a>
+<hr>
+</div>
+
+<h4 class="subsection">9.24.5 Directives to override the ISA level</h4>
+
+<p><a name="index-MIPS-ISA-override-1273"></a><a name="index-g_t_0040code_007b_002eset-mips_0040var_007bn_007d_007d-1274"></a><span class="sc">gnu</span> <code>as</code> supports an additional directive to change
+the <span class="sc">mips</span> Instruction Set Architecture level on the fly: <code>.set
+mips</code><var>n</var>.  <var>n</var> should be a number from 0 to 5, or 32, 32r2, 64
+or 64r2. 
+The values other than 0 make the assembler accept instructions
+for the corresponding <span class="sc">isa</span> level, from that point on in the
+assembly.  <code>.set mips</code><var>n</var> affects not only which instructions
+are permitted, but also how certain macros are expanded.  <code>.set
+mips0</code> restores the <span class="sc">isa</span> level to its original level: either the
+level you selected with command line options, or the default for your
+configuration.  You can use this feature to permit specific <span class="sc">mips3</span>
+instructions while assembling in 32 bit mode.  Use this directive with
+care!
+
+   <p><a name="index-MIPS-CPU-override-1275"></a><a name="index-g_t_0040code_007b_002eset-arch_003d_0040var_007bcpu_007d_007d-1276"></a>The <code>.set arch=</code><var>cpu</var> directive provides even finer control. 
+It changes the effective CPU target and allows the assembler to use
+instructions specific to a particular CPU.  All CPUs supported by the
+&lsquo;<samp><span class="samp">-march</span></samp>&rsquo; command line option are also selectable by this directive. 
+The original value is restored by <code>.set arch=default</code>.
+
+   <p>The directive <code>.set mips16</code> puts the assembler into MIPS 16 mode,
+in which it will assemble instructions for the MIPS 16 processor.  Use
+<code>.set nomips16</code> to return to normal 32 bit mode.
+
+   <p>Traditional <span class="sc">mips</span> assemblers do not support this directive.
+
+   <p>The directive <code>.set micromips</code> puts the assembler into microMIPS mode,
+in which it will assemble instructions for the microMIPS processor.  Use
+<code>.set nomicromips</code> to return to normal 32 bit mode.
+
+   <p>Traditional <span class="sc">mips</span> assemblers do not support this directive.
+
+   </body></html>
+

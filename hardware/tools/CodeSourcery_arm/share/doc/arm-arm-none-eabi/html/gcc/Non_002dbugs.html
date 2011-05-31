@@ -1,0 +1,276 @@
+<html lang="en">
+<head>
+<title>Non-bugs - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Trouble.html#Trouble" title="Trouble">
+<link rel="prev" href="C_002b_002b-Misunderstandings.html#C_002b_002b-Misunderstandings" title="C++ Misunderstandings">
+<link rel="next" href="Warnings-and-Errors.html#Warnings-and-Errors" title="Warnings and Errors">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Non-bugs"></a>
+<a name="Non_002dbugs"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Warnings-and-Errors.html#Warnings-and-Errors">Warnings and Errors</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="C_002b_002b-Misunderstandings.html#C_002b_002b-Misunderstandings">C++ Misunderstandings</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Trouble.html#Trouble">Trouble</a>
+<hr>
+</div>
+
+<h3 class="section">11.9 Certain Changes We Don't Want to Make</h3>
+
+<p>This section lists changes that people frequently request, but which
+we do not make because we think GCC is better without them.
+
+     <ul>
+<li>Checking the number and type of arguments to a function which has an
+old-fashioned definition and no prototype.
+
+     <p>Such a feature would work only occasionally&mdash;only for calls that appear
+in the same file as the called function, following the definition.  The
+only way to check all calls reliably is to add a prototype for the
+function.  But adding a prototype eliminates the motivation for this
+feature.  So the feature is not worthwhile.
+
+     <li>Warning about using an expression whose type is signed as a shift count.
+
+     <p>Shift count operands are probably signed more often than unsigned. 
+Warning about this would cause far more annoyance than good.
+
+     <li>Warning about assigning a signed value to an unsigned variable.
+
+     <p>Such assignments must be very common; warning about them would cause
+more annoyance than good.
+
+     <li>Warning when a non-void function value is ignored.
+
+     <p>C contains many standard functions that return a value that most
+programs choose to ignore.  One obvious example is <code>printf</code>. 
+Warning about this practice only leads the defensive programmer to
+clutter programs with dozens of casts to <code>void</code>.  Such casts are
+required so frequently that they become visual noise.  Writing those
+casts becomes so automatic that they no longer convey useful
+information about the intentions of the programmer.  For functions
+where the return value should never be ignored, use the
+<code>warn_unused_result</code> function attribute (see <a href="Function-Attributes.html#Function-Attributes">Function Attributes</a>).
+
+     <li><a name="index-fshort_002denums-3242"></a>Making <samp><span class="option">-fshort-enums</span></samp> the default.
+
+     <p>This would cause storage layout to be incompatible with most other C
+compilers.  And it doesn't seem very important, given that you can get
+the same result in other ways.  The case where it matters most is when
+the enumeration-valued object is inside a structure, and in that case
+you can specify a field width explicitly.
+
+     <li>Making bit-fields unsigned by default on particular machines where &ldquo;the
+ABI standard&rdquo; says to do so.
+
+     <p>The ISO C standard leaves it up to the implementation whether a bit-field
+declared plain <code>int</code> is signed or not.  This in effect creates two
+alternative dialects of C.
+
+     <p><a name="index-fsigned_002dbitfields-3243"></a><a name="index-funsigned_002dbitfields-3244"></a>The GNU C compiler supports both dialects; you can specify the signed
+dialect with <samp><span class="option">-fsigned-bitfields</span></samp> and the unsigned dialect with
+<samp><span class="option">-funsigned-bitfields</span></samp>.  However, this leaves open the question of
+which dialect to use by default.
+
+     <p>Currently, the preferred dialect makes plain bit-fields signed, because
+this is simplest.  Since <code>int</code> is the same as <code>signed int</code> in
+every other context, it is cleanest for them to be the same in bit-fields
+as well.
+
+     <p>Some computer manufacturers have published Application Binary Interface
+standards which specify that plain bit-fields should be unsigned.  It is
+a mistake, however, to say anything about this issue in an ABI.  This is
+because the handling of plain bit-fields distinguishes two dialects of C. 
+Both dialects are meaningful on every type of machine.  Whether a
+particular object file was compiled using signed bit-fields or unsigned
+is of no concern to other object files, even if they access the same
+bit-fields in the same data structures.
+
+     <p>A given program is written in one or the other of these two dialects. 
+The program stands a chance to work on most any machine if it is
+compiled with the proper dialect.  It is unlikely to work at all if
+compiled with the wrong dialect.
+
+     <p>Many users appreciate the GNU C compiler because it provides an
+environment that is uniform across machines.  These users would be
+inconvenienced if the compiler treated plain bit-fields differently on
+certain machines.
+
+     <p>Occasionally users write programs intended only for a particular machine
+type.  On these occasions, the users would benefit if the GNU C compiler
+were to support by default the same dialect as the other compilers on
+that machine.  But such applications are rare.  And users writing a
+program to run on more than one type of machine cannot possibly benefit
+from this kind of compatibility.
+
+     <p>This is why GCC does and will treat plain bit-fields in the same
+fashion on all types of machines (by default).
+
+     <p>There are some arguments for making bit-fields unsigned by default on all
+machines.  If, for example, this becomes a universal de facto standard,
+it would make sense for GCC to go along with it.  This is something
+to be considered in the future.
+
+     <p>(Of course, users strongly concerned about portability should indicate
+explicitly in each bit-field whether it is signed or not.  In this way,
+they write programs which have the same meaning in both C dialects.)
+
+     <li><a name="index-ansi-3245"></a><a name="index-std-3246"></a>Undefining <code>__STDC__</code> when <samp><span class="option">-ansi</span></samp> is not used.
+
+     <p>Currently, GCC defines <code>__STDC__</code> unconditionally.  This provides
+good results in practice.
+
+     <p>Programmers normally use conditionals on <code>__STDC__</code> to ask whether
+it is safe to use certain features of ISO C, such as function
+prototypes or ISO token concatenation.  Since plain <samp><span class="command">gcc</span></samp> supports
+all the features of ISO C, the correct answer to these questions is
+&ldquo;yes&rdquo;.
+
+     <p>Some users try to use <code>__STDC__</code> to check for the availability of
+certain library facilities.  This is actually incorrect usage in an ISO
+C program, because the ISO C standard says that a conforming
+freestanding implementation should define <code>__STDC__</code> even though it
+does not have the library facilities.  &lsquo;<samp><span class="samp">gcc -ansi -pedantic</span></samp>&rsquo; is a
+conforming freestanding implementation, and it is therefore required to
+define <code>__STDC__</code>, even though it does not come with an ISO C
+library.
+
+     <p>Sometimes people say that defining <code>__STDC__</code> in a compiler that
+does not completely conform to the ISO C standard somehow violates the
+standard.  This is illogical.  The standard is a standard for compilers
+that claim to support ISO C, such as &lsquo;<samp><span class="samp">gcc -ansi</span></samp>&rsquo;&mdash;not for other
+compilers such as plain <samp><span class="command">gcc</span></samp>.  Whatever the ISO C standard says
+is relevant to the design of plain <samp><span class="command">gcc</span></samp> without <samp><span class="option">-ansi</span></samp> only
+for pragmatic reasons, not as a requirement.
+
+     <p>GCC normally defines <code>__STDC__</code> to be 1, and in addition
+defines <code>__STRICT_ANSI__</code> if you specify the <samp><span class="option">-ansi</span></samp> option,
+or a <samp><span class="option">-std</span></samp> option for strict conformance to some version of ISO C. 
+On some hosts, system include files use a different convention, where
+<code>__STDC__</code> is normally 0, but is 1 if the user specifies strict
+conformance to the C Standard.  GCC follows the host convention when
+processing system include files, but when processing user files it follows
+the usual GNU C convention.
+
+     <li>Undefining <code>__STDC__</code> in C++.
+
+     <p>Programs written to compile with C++-to-C translators get the
+value of <code>__STDC__</code> that goes with the C compiler that is
+subsequently used.  These programs must test <code>__STDC__</code>
+to determine what kind of C preprocessor that compiler uses:
+whether they should concatenate tokens in the ISO C fashion
+or in the traditional fashion.
+
+     <p>These programs work properly with GNU C++ if <code>__STDC__</code> is defined. 
+They would not work otherwise.
+
+     <p>In addition, many header files are written to provide prototypes in ISO
+C but not in traditional C.  Many of these header files can work without
+change in C++ provided <code>__STDC__</code> is defined.  If <code>__STDC__</code>
+is not defined, they will all fail, and will all need to be changed to
+test explicitly for C++ as well.
+
+     <li>Deleting &ldquo;empty&rdquo; loops.
+
+     <p>Historically, GCC has not deleted &ldquo;empty&rdquo; loops under the
+assumption that the most likely reason you would put one in a program is
+to have a delay, so deleting them will not make real programs run any
+faster.
+
+     <p>However, the rationale here is that optimization of a nonempty loop
+cannot produce an empty one. This held for carefully written C compiled
+with less powerful optimizers but is not always the case for carefully
+written C++ or with more powerful optimizers. 
+Thus GCC will remove operations from loops whenever it can determine
+those operations are not externally visible (apart from the time taken
+to execute them, of course).  In case the loop can be proved to be finite,
+GCC will also remove the loop itself.
+
+     <p>Be aware of this when performing timing tests, for instance the
+following loop can be completely removed, provided
+<code>some_expression</code> can provably not change any global state.
+
+     <pre class="smallexample">          {
+             int sum = 0;
+             int ix;
+          
+             for (ix = 0; ix != 10000; ix++)
+                sum += some_expression;
+          }
+</pre>
+     <p>Even though <code>sum</code> is accumulated in the loop, no use is made of
+that summation, so the accumulation can be removed.
+
+     <li>Making side effects happen in the same order as in some other compiler.
+
+     <p><a name="index-side-effects_002c-order-of-evaluation-3247"></a><a name="index-order-of-evaluation_002c-side-effects-3248"></a>It is never safe to depend on the order of evaluation of side effects. 
+For example, a function call like this may very well behave differently
+from one compiler to another:
+
+     <pre class="smallexample">          void func (int, int);
+          
+          int i = 2;
+          func (i++, i++);
+</pre>
+     <p>There is no guarantee (in either the C or the C++ standard language
+definitions) that the increments will be evaluated in any particular
+order.  Either increment might happen first.  <code>func</code> might get the
+arguments &lsquo;<samp><span class="samp">2, 3</span></samp>&rsquo;, or it might get &lsquo;<samp><span class="samp">3, 2</span></samp>&rsquo;, or even &lsquo;<samp><span class="samp">2, 2</span></samp>&rsquo;.
+
+     <li>Making certain warnings into errors by default.
+
+     <p>Some ISO C testsuites report failure when the compiler does not produce
+an error message for a certain program.
+
+     <p><a name="index-pedantic_002derrors-3249"></a>ISO C requires a &ldquo;diagnostic&rdquo; message for certain kinds of invalid
+programs, but a warning is defined by GCC to count as a diagnostic.  If
+GCC produces a warning but not an error, that is correct ISO C support. 
+If testsuites call this &ldquo;failure&rdquo;, they should be run with the GCC
+option <samp><span class="option">-pedantic-errors</span></samp>, which will turn these warnings into
+errors.
+
+ </ul>
+
+ </body></html>
+

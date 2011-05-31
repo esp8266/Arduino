@@ -1,0 +1,62 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>4.4. Running Applications from GDB</title><link rel="stylesheet" href="cs.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.74.0"><link rel="home" href="index.html" title="Sourcery G++ Lite"><link rel="up" href="chap-building.html" title="Chapter 4. Using Sourcery G++ from the Command Line"><link rel="prev" href="sec-gdbsimulator.html" title="4.3. Running Applications in the Simulator"><link rel="next" href="chap-cs3.html" title="Chapter 5. CS3&#8482;: The CodeSourcery Common Startup Code Sequence"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">4.4. Running Applications from GDB</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="sec-gdbsimulator.html">Prev</a> </td><th width="60%" align="center">Chapter 4. Using Sourcery G++ from the Command Line</th><td width="20%" align="right"> <a accesskey="n" href="chap-cs3.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec-remote-debugging"></a>4.4. Running Applications from GDB</h2></div></div></div><p>
+    You can run GDB, the GNU Debugger, on your host system 
+    to debug programs running remotely on a target board or system.  
+    <span>
+     You can also run and debug programs using the GDB simulator.
+    </span>
+    
+  </p><p>
+    When starting GDB, give it the pathname to the program you want to
+    debug as a command-line argument.
+    For example, if you have built the factorial program as described in
+    <a class="xref" href="chap-building.html#sec-factorial-build" title="4.1. Building an Application">Section 4.1, &#8220;Building an Application&#8221;</a>, enter:
+    </p><pre class="screen">&gt; arm-none-eabi-gdb factorial</pre><p>
+    
+    
+  </p><p>
+   While this section explains the alternatives for using GDB to run
+   and debug application programs, explaining the use of the GDB 
+   command-line interface is beyond the scope of this document.  Please
+   refer to the GDB manual for further instructions.
+  </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id278650"></a>4.4.1. Connecting to the GDB Simulator</h3></div></div></div><p>
+    GDB includes a simulator that allows you to debug ARM EABI 
+    applications without target hardware.  To start and connect to 
+    the simulator from within GDB, use this command:
+    </p><pre class="screen">(gdb) target sim</pre><p>
+   </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id278670"></a>4.4.2. Connecting to the Sourcery G++ Debug Sprite</h3></div></div></div><p>
+    The Sourcery G++ Debug Sprite is a program that runs on the host system to
+    support hardware debugging devices.  You can use the Debug Sprite to
+    run and debug programs on a target board without an operating system, 
+    or to debug an operating system kernel.  See <a class="xref" href="sprite.html" title="Chapter 6. Sourcery G++ Debug Sprite">Chapter 6, &#8220;Sourcery G++ Debug Sprite&#8221;</a> for
+    detailed information about the supported devices.
+   </p><p>
+    You can start the Sprite directly from within GDB:
+    </p><pre class="screen">(gdb) target remote | arm-none-eabi-sprite <em class="replaceable"><code>arguments</code></em></pre><p>
+    Refer to <a class="xref" href="sec-sprite-invocation.html" title="6.3. Invoking Sourcery G++ Debug Sprite">Section 6.3, &#8220;Invoking Sourcery G++ Debug Sprite&#8221;</a> for a full
+    description of the Sprite arguments.
+   </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="connecting-to-gdbserver"></a>4.4.3. Connecting to an External GDB Server</h3></div></div></div><p>
+    From within GDB, you can connect to a running <code class="command">gdbserver</code>
+    or other debugging stub that uses the GDB remote protocol using:
+    </p><pre class="screen">(gdb) target remote <em class="replaceable"><code>host</code></em>:<em class="replaceable"><code>port</code></em></pre><p>
+    where <em class="replaceable"><code>host</code></em> is the host name or IP address of the
+    machine the stub is running on, and <em class="replaceable"><code>port</code></em> is the
+    port number it is listening on for TCP connections.
+   </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id278747"></a>4.4.4. Loading and Running Applications</h3></div></div></div><p>
+      Connecting to a bare-metal target or simulator from GDB does not
+      cause your program to be loaded into target memory.
+      You must do this explicitly from GDB after you connect:
+      </p><pre class="screen">(gdb) load</pre><p>
+      <span></span>
+      Alternatively, you can use third-party tools to load your application
+      into flash memory before starting GDB.
+    </p><p>
+      To begin execution of your application, you should generally use the
+      <code class="command">continue</code> command:
+      </p><pre class="screen">(gdb) continue</pre><p>
+      <span>
+	However, you should use	<code class="command">run</code> instead of
+	<code class="command">continue</code> to start your program if you used
+	<code class="command">target sim</code> to connect:
+	<pre class="screen">(gdb) run</pre>
+      </span>
+    </p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="sec-gdbsimulator.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="chap-building.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="chap-cs3.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">4.3. Running Applications in the Simulator </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Chapter 5. CS3&#8482;: The CodeSourcery Common Startup Code Sequence</td></tr></table></div></body></html>

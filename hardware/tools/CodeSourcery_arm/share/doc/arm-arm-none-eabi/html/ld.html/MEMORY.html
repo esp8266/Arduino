@@ -1,0 +1,148 @@
+<html lang="en">
+<head>
+<title>MEMORY - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Scripts.html#Scripts" title="Scripts">
+<link rel="prev" href="SECTIONS.html#SECTIONS" title="SECTIONS">
+<link rel="next" href="PHDRS.html#PHDRS" title="PHDRS">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="MEMORY"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="PHDRS.html#PHDRS">PHDRS</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="SECTIONS.html#SECTIONS">SECTIONS</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Scripts.html#Scripts">Scripts</a>
+<hr>
+</div>
+
+<h3 class="section">3.7 MEMORY Command</h3>
+
+<p><a name="index-MEMORY-464"></a><a name="index-memory-regions-465"></a><a name="index-regions-of-memory-466"></a><a name="index-allocating-memory-467"></a><a name="index-discontinuous-memory-468"></a>The linker's default configuration permits allocation of all available
+memory.  You can override this by using the <code>MEMORY</code> command.
+
+   <p>The <code>MEMORY</code> command describes the location and size of blocks of
+memory in the target.  You can use it to describe which memory regions
+may be used by the linker, and which memory regions it must avoid.  You
+can then assign sections to particular memory regions.  The linker will
+set section addresses based on the memory regions, and will warn about
+regions that become too full.  The linker will not shuffle sections
+around to fit into the available regions.
+
+   <p>A linker script may contain at most one use of the <code>MEMORY</code>
+command.  However, you can define as many blocks of memory within it as
+you wish.  The syntax is:
+<pre class="smallexample">     MEMORY
+       {
+         <var>name</var> [(<var>attr</var>)] : ORIGIN = <var>origin</var>, LENGTH = <var>len</var>
+         ...
+       }
+</pre>
+   <p>The <var>name</var> is a name used in the linker script to refer to the
+region.  The region name has no meaning outside of the linker script. 
+Region names are stored in a separate name space, and will not conflict
+with symbol names, file names, or section names.  Each memory region
+must have a distinct name within the <code>MEMORY</code> command.  However you can
+add later alias names to existing memory regions with the <a href="REGION_005fALIAS.html#REGION_005fALIAS">REGION_ALIAS</a>
+command.
+
+   <p><a name="index-memory-region-attributes-469"></a>The <var>attr</var> string is an optional list of attributes that specify
+whether to use a particular memory region for an input section which is
+not explicitly mapped in the linker script.  As described in
+<a href="SECTIONS.html#SECTIONS">SECTIONS</a>, if you do not specify an output section for some input
+section, the linker will create an output section with the same name as
+the input section.  If you define region attributes, the linker will use
+them to select the memory region for the output section that it creates.
+
+   <p>The <var>attr</var> string must consist only of the following characters:
+     <dl>
+<dt>&lsquo;<samp><span class="samp">R</span></samp>&rsquo;<dd>Read-only section
+<br><dt>&lsquo;<samp><span class="samp">W</span></samp>&rsquo;<dd>Read/write section
+<br><dt>&lsquo;<samp><span class="samp">X</span></samp>&rsquo;<dd>Executable section
+<br><dt>&lsquo;<samp><span class="samp">A</span></samp>&rsquo;<dd>Allocatable section
+<br><dt>&lsquo;<samp><span class="samp">I</span></samp>&rsquo;<dd>Initialized section
+<br><dt>&lsquo;<samp><span class="samp">L</span></samp>&rsquo;<dd>Same as &lsquo;<samp><span class="samp">I</span></samp>&rsquo;
+<br><dt>&lsquo;<samp><span class="samp">!</span></samp>&rsquo;<dd>Invert the sense of any of the preceding attributes
+</dl>
+
+   <p>If a unmapped section matches any of the listed attributes other than
+&lsquo;<samp><span class="samp">!</span></samp>&rsquo;, it will be placed in the memory region.  The &lsquo;<samp><span class="samp">!</span></samp>&rsquo;
+attribute reverses this test, so that an unmapped section will be placed
+in the memory region only if it does not match any of the listed
+attributes.
+
+   <p><a name="index-ORIGIN-_003d-470"></a><a name="index-o-_003d-471"></a><a name="index-org-_003d-472"></a>The <var>origin</var> is an numerical expression for the start address of
+the memory region.  The expression must evaluate to a constant and it
+cannot involve any symbols.  The keyword <code>ORIGIN</code> may be
+abbreviated to <code>org</code> or <code>o</code> (but not, for example,
+<code>ORG</code>).
+
+   <p><a name="index-LENGTH-_003d-473"></a><a name="index-len-_003d-474"></a><a name="index-l-_003d-475"></a>The <var>len</var> is an expression for the size in bytes of the memory
+region.  As with the <var>origin</var> expression, the expression must
+be numerical only and must evaluate to a constant.  The keyword
+<code>LENGTH</code> may be abbreviated to <code>len</code> or <code>l</code>.
+
+   <p>In the following example, we specify that there are two memory regions
+available for allocation: one starting at &lsquo;<samp><span class="samp">0</span></samp>&rsquo; for 256 kilobytes,
+and the other starting at &lsquo;<samp><span class="samp">0x40000000</span></samp>&rsquo; for four megabytes.  The
+linker will place into the &lsquo;<samp><span class="samp">rom</span></samp>&rsquo; memory region every section which
+is not explicitly mapped into a memory region, and is either read-only
+or executable.  The linker will place other sections which are not
+explicitly mapped into a memory region into the &lsquo;<samp><span class="samp">ram</span></samp>&rsquo; memory
+region.
+
+<pre class="smallexample">     MEMORY
+       {
+         rom (rx)  : ORIGIN = 0, LENGTH = 256K
+         ram (!rx) : org = 0x40000000, l = 4M
+       }
+</pre>
+   <p>Once you define a memory region, you can direct the linker to place
+specific output sections into that memory region by using the
+&lsquo;<samp><span class="samp">&gt;</span><var>region</var></samp>&rsquo; output section attribute.  For example, if you have
+a memory region named &lsquo;<samp><span class="samp">mem</span></samp>&rsquo;, you would use &lsquo;<samp><span class="samp">&gt;mem</span></samp>&rsquo; in the
+output section definition.  See <a href="Output-Section-Region.html#Output-Section-Region">Output Section Region</a>.  If no address
+was specified for the output section, the linker will set the address to
+the next available address within the memory region.  If the combined
+output sections directed to a memory region are too large for the
+region, the linker will issue an error message.
+
+   <p>It is possible to access the origin and length of a memory in an
+expression via the <code>ORIGIN(</code><var>memory</var><code>)</code> and
+<code>LENGTH(</code><var>memory</var><code>)</code> functions:
+
+<pre class="smallexample">       _fstack = ORIGIN(ram) + LENGTH(ram) - 4;
+</pre>
+   </body></html>
+

@@ -1,0 +1,340 @@
+<html lang="en">
+<head>
+<title>Symbols - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Languages.html#Languages" title="Languages">
+<link rel="next" href="Altering.html#Altering" title="Altering">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Symbols"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Altering.html#Altering">Altering</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Languages.html#Languages">Languages</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">16 Examining the Symbol Table</h2>
+
+<p>The commands described in this chapter allow you to inquire about the
+symbols (names of variables, functions and types) defined in your
+program.  This information is inherent in the text of your program and
+does not change as your program executes.  <span class="sc">gdb</span> finds it in your
+program's symbol table, in the file indicated when you started <span class="sc">gdb</span>
+(see <a href="File-Options.html#File-Options">Choosing Files</a>), or by one of the
+file-management commands (see <a href="Files.html#Files">Commands to Specify Files</a>).
+
+   <p><a name="index-symbol-names-883"></a><a name="index-names-of-symbols-884"></a><a name="index-quoting-names-885"></a>Occasionally, you may need to refer to symbols that contain unusual
+characters, which <span class="sc">gdb</span> ordinarily treats as word delimiters.  The
+most frequent case is in referring to static variables in other
+source files (see <a href="Variables.html#Variables">Program Variables</a>).  File names
+are recorded in object files as debugging symbols, but <span class="sc">gdb</span> would
+ordinarily parse a typical file name, like <samp><span class="file">foo.c</span></samp>, as the three words
+&lsquo;<samp><span class="samp">foo</span></samp>&rsquo; &lsquo;<samp><span class="samp">.</span></samp>&rsquo; &lsquo;<samp><span class="samp">c</span></samp>&rsquo;.  To allow <span class="sc">gdb</span> to recognize
+&lsquo;<samp><span class="samp">foo.c</span></samp>&rsquo; as a single symbol, enclose it in single quotes; for example,
+
+<pre class="smallexample">     p 'foo.c'::x
+</pre>
+   <p class="noindent">looks up the value of <code>x</code> in the scope of the file <samp><span class="file">foo.c</span></samp>.
+
+     
+<a name="index-case_002dinsensitive-symbol-names-886"></a>
+<a name="index-case-sensitivity-in-symbol-names-887"></a>
+<a name="index-set-case_002dsensitive-888"></a>
+<dl><dt><code>set case-sensitive on</code><dt><code>set case-sensitive off</code><dt><code>set case-sensitive auto</code><dd>Normally, when <span class="sc">gdb</span> looks up symbols, it matches their names
+with case sensitivity determined by the current source language. 
+Occasionally, you may wish to control that.  The command <code>set
+case-sensitive</code> lets you do that by specifying <code>on</code> for
+case-sensitive matches or <code>off</code> for case-insensitive ones.  If
+you specify <code>auto</code>, case sensitivity is reset to the default
+suitable for the source language.  The default is case-sensitive
+matches for all languages except for Fortran, for which the default is
+case-insensitive matches.
+
+     <p><a name="index-show-case_002dsensitive-889"></a><br><dt><code>show case-sensitive</code><dd>This command shows the current setting of case sensitivity for symbols
+lookups.
+
+     <p><a name="index-info-address-890"></a><a name="index-address-of-a-symbol-891"></a><br><dt><code>info address </code><var>symbol</var><dd>Describe where the data for <var>symbol</var> is stored.  For a register
+variable, this says which register it is kept in.  For a non-register
+local variable, this prints the stack-frame offset at which the variable
+is always stored.
+
+     <p>Note the contrast with &lsquo;<samp><span class="samp">print &amp;</span><var>symbol</var></samp>&rsquo;, which does not work
+at all for a register variable, and for a stack local variable prints
+the exact address of the current instantiation of the variable.
+
+     <p><a name="index-info-symbol-892"></a><a name="index-symbol-from-address-893"></a><a name="index-closest-symbol-and-offset-for-an-address-894"></a><br><dt><code>info symbol </code><var>addr</var><dd>Print the name of a symbol which is stored at the address <var>addr</var>. 
+If no symbol is stored exactly at <var>addr</var>, <span class="sc">gdb</span> prints the
+nearest symbol and an offset from it:
+
+     <pre class="smallexample">          (gdb) info symbol 0x54320
+          _initialize_vx + 396 in section .text
+</pre>
+     <p class="noindent">This is the opposite of the <code>info address</code> command.  You can use
+it to find out the name of a variable or a function given its address.
+
+     <p>For dynamically linked executables, the name of executable or shared
+library containing the symbol is also printed:
+
+     <pre class="smallexample">          (gdb) info symbol 0x400225
+          _start + 5 in section .text of /tmp/a.out
+          (gdb) info symbol 0x2aaaac2811cf
+          __read_nocancel + 6 in section .text of /usr/lib64/libc.so.6
+</pre>
+     <p><a name="index-whatis-895"></a><br><dt><code>whatis [</code><var>arg</var><code>]</code><dd>Print the data type of <var>arg</var>, which can be either an expression or
+a data type.  With no argument, print the data type of <code>$</code>, the
+last value in the value history.  If <var>arg</var> is an expression, it is
+not actually evaluated, and any side-effecting operations (such as
+assignments or function calls) inside it do not take place.  If
+<var>arg</var> is a type name, it may be the name of a type or typedef, or
+for C code it may have the form &lsquo;<samp><span class="samp">class </span><var>class-name</var></samp>&rsquo;,
+&lsquo;<samp><span class="samp">struct </span><var>struct-tag</var></samp>&rsquo;, &lsquo;<samp><span class="samp">union </span><var>union-tag</var></samp>&rsquo; or
+&lsquo;<samp><span class="samp">enum </span><var>enum-tag</var></samp>&rsquo;. 
+See <a href="Expressions.html#Expressions">Expressions</a>.
+
+     <p><a name="index-ptype-896"></a><br><dt><code>ptype [</code><var>arg</var><code>]</code><dd><code>ptype</code> accepts the same arguments as <code>whatis</code>, but prints a
+detailed description of the type, instead of just the name of the type. 
+See <a href="Expressions.html#Expressions">Expressions</a>.
+
+     <p>For example, for this variable declaration:
+
+     <pre class="smallexample">          struct complex {double real; double imag;} v;
+</pre>
+     <p class="noindent">the two commands give this output:
+
+     <pre class="smallexample">          (gdb) whatis v
+          type = struct complex
+          (gdb) ptype v
+          type = struct complex {
+              double real;
+              double imag;
+          }
+</pre>
+     <p class="noindent">As with <code>whatis</code>, using <code>ptype</code> without an argument refers to
+the type of <code>$</code>, the last value in the value history.
+
+     <p><a name="index-incomplete-type-897"></a>Sometimes, programs use opaque data types or incomplete specifications
+of complex data structure.  If the debug information included in the
+program does not allow <span class="sc">gdb</span> to display a full declaration of
+the data type, it will say &lsquo;<samp><span class="samp">&lt;incomplete type&gt;</span></samp>&rsquo;.  For example,
+given these declarations:
+
+     <pre class="smallexample">              struct foo;
+              struct foo *fooptr;
+</pre>
+     <p class="noindent">but no definition for <code>struct foo</code> itself, <span class="sc">gdb</span> will say:
+
+     <pre class="smallexample">            (gdb) ptype foo
+            $1 = &lt;incomplete type&gt;
+</pre>
+     <p class="noindent">&ldquo;Incomplete type&rdquo; is C terminology for data types that are not
+completely specified.
+
+     <p><a name="index-info-types-898"></a><br><dt><code>info types </code><var>regexp</var><dt><code>info types</code><dd>Print a brief description of all types whose names match the regular
+expression <var>regexp</var> (or all types in your program, if you supply
+no argument).  Each complete typename is matched as though it were a
+complete line; thus, &lsquo;<samp><span class="samp">i type value</span></samp>&rsquo; gives information on all
+types in your program whose names include the string <code>value</code>, but
+&lsquo;<samp><span class="samp">i type ^value$</span></samp>&rsquo; gives information only on types whose complete
+name is <code>value</code>.
+
+     <p>This command differs from <code>ptype</code> in two ways: first, like
+<code>whatis</code>, it does not print a detailed description; second, it
+lists all source files where a type is defined.
+
+     <p><a name="index-info-scope-899"></a><a name="index-local-variables-900"></a><br><dt><code>info scope </code><var>location</var><dd>List all the variables local to a particular scope.  This command
+accepts a <var>location</var> argument&mdash;a function name, a source line, or
+an address preceded by a &lsquo;<samp><span class="samp">*</span></samp>&rsquo;, and prints all the variables local
+to the scope defined by that location.  (See <a href="Specify-Location.html#Specify-Location">Specify Location</a>, for
+details about supported forms of <var>location</var>.)  For example:
+
+     <pre class="smallexample">          (gdb) <b>info scope command_line_handler</b>
+          Scope for command_line_handler:
+          Symbol rl is an argument at stack/frame offset 8, length 4.
+          Symbol linebuffer is in static storage at address 0x150a18, length 4.
+          Symbol linelength is in static storage at address 0x150a1c, length 4.
+          Symbol p is a local variable in register $esi, length 4.
+          Symbol p1 is a local variable in register $ebx, length 4.
+          Symbol nline is a local variable in register $edx, length 4.
+          Symbol repeat is a local variable at frame offset -8, length 4.
+</pre>
+     <p class="noindent">This command is especially useful for determining what data to collect
+during a <dfn>trace experiment</dfn>, see <a href="Tracepoint-Actions.html#Tracepoint-Actions">collect</a>.
+
+     <p><a name="index-info-source-901"></a><br><dt><code>info source</code><dd>Show information about the current source file&mdash;that is, the source file for
+the function containing the current point of execution:
+          <ul>
+<li>the name of the source file, and the directory containing it,
+<li>the directory it was compiled in,
+<li>its length, in lines,
+<li>which programming language it is written in,
+<li>whether the executable includes debugging information for that file, and
+if so, what format the information is in (e.g., STABS, Dwarf 2, etc.), and
+<li>whether the debugging information includes information about
+preprocessor macros. 
+</ul>
+
+     <p><a name="index-info-sources-902"></a><br><dt><code>info sources</code><dd>Print the names of all source files in your program for which there is
+debugging information, organized into two lists: files whose symbols
+have already been read, and files whose symbols will be read when needed.
+
+     <p><a name="index-info-functions-903"></a><br><dt><code>info functions</code><dd>Print the names and data types of all defined functions.
+
+     <br><dt><code>info functions </code><var>regexp</var><dd>Print the names and data types of all defined functions
+whose names contain a match for regular expression <var>regexp</var>. 
+Thus, &lsquo;<samp><span class="samp">info fun step</span></samp>&rsquo; finds all functions whose names
+include <code>step</code>; &lsquo;<samp><span class="samp">info fun ^step</span></samp>&rsquo; finds those whose names
+start with <code>step</code>.  If a function name contains characters
+that conflict with the regular expression language (e.g. 
+&lsquo;<samp><span class="samp">operator*()</span></samp>&rsquo;), they may be quoted with a backslash.
+
+     <p><a name="index-info-variables-904"></a><br><dt><code>info variables</code><dd>Print the names and data types of all variables that are defined
+outside of functions (i.e. excluding local variables).
+
+     <br><dt><code>info variables </code><var>regexp</var><dd>Print the names and data types of all variables (except for local
+variables) whose names contain a match for regular expression
+<var>regexp</var>.
+
+     <p><a name="index-info-classes-905"></a><a name="index-Objective_002dC_002c-classes-and-selectors-906"></a><br><dt><code>info classes</code><dt><code>info classes </code><var>regexp</var><dd>Display all Objective-C classes in your program, or
+(with the <var>regexp</var> argument) all those matching a particular regular
+expression.
+
+     <p><a name="index-info-selectors-907"></a><br><dt><code>info selectors</code><dt><code>info selectors </code><var>regexp</var><dd>Display all Objective-C selectors in your program, or
+(with the <var>regexp</var> argument) all those matching a particular regular
+expression.
+
+     <p><a name="index-reloading-symbols-908"></a>Some systems allow individual object files that make up your program to
+be replaced without stopping and restarting your program.  For example,
+in VxWorks you can simply recompile a defective object file and keep on
+running.  If you are running on one of these systems, you can allow
+<span class="sc">gdb</span> to reload the symbols for automatically relinked modules:
+
+          
+<a name="index-set-symbol_002dreloading-909"></a>
+<dl><dt><code>set symbol-reloading on</code><dd>Replace symbol definitions for the corresponding source file when an
+object file with a particular name is seen again.
+
+          <br><dt><code>set symbol-reloading off</code><dd>Do not replace symbol definitions when encountering object files of the
+same name more than once.  This is the default state; if you are not
+running on a system that permits automatic relinking of modules, you
+should leave <code>symbol-reloading</code> off, since otherwise <span class="sc">gdb</span>
+may discard symbols when linking large programs, that may contain
+several modules (from different directories or libraries) with the same
+name.
+
+          <p><a name="index-show-symbol_002dreloading-910"></a><br><dt><code>show symbol-reloading</code><dd>Show the current <code>on</code> or <code>off</code> setting. 
+</dl>
+
+     <p><a name="index-opaque-data-types-911"></a><a name="index-set-opaque_002dtype_002dresolution-912"></a><br><dt><code>set opaque-type-resolution on</code><dd>Tell <span class="sc">gdb</span> to resolve opaque types.  An opaque type is a type
+declared as a pointer to a <code>struct</code>, <code>class</code>, or
+<code>union</code>&mdash;for example, <code>struct MyType *</code>&mdash;that is used in one
+source file although the full declaration of <code>struct MyType</code> is in
+another source file.  The default is on.
+
+     <p>A change in the setting of this subcommand will not take effect until
+the next time symbols for a file are loaded.
+
+     <br><dt><code>set opaque-type-resolution off</code><dd>Tell <span class="sc">gdb</span> not to resolve opaque types.  In this case, the type
+is printed as follows:
+     <pre class="smallexample">          {&lt;no data fields&gt;}
+</pre>
+     <p><a name="index-show-opaque_002dtype_002dresolution-913"></a><br><dt><code>show opaque-type-resolution</code><dd>Show whether opaque types are resolved or not.
+
+     <p><a name="index-maint-print-symbols-914"></a><a name="index-symbol-dump-915"></a><a name="index-maint-print-psymbols-916"></a><a name="index-partial-symbol-dump-917"></a><br><dt><code>maint print symbols </code><var>filename</var><dt><code>maint print psymbols </code><var>filename</var><dt><code>maint print msymbols </code><var>filename</var><dd>Write a dump of debugging symbol data into the file <var>filename</var>. 
+These commands are used to debug the <span class="sc">gdb</span> symbol-reading code.  Only
+symbols with debugging data are included.  If you use &lsquo;<samp><span class="samp">maint print
+symbols</span></samp>&rsquo;, <span class="sc">gdb</span> includes all the symbols for which it has already
+collected full details: that is, <var>filename</var> reflects symbols for
+only those files whose symbols <span class="sc">gdb</span> has read.  You can use the
+command <code>info sources</code> to find out which files these are.  If you
+use &lsquo;<samp><span class="samp">maint print psymbols</span></samp>&rsquo; instead, the dump shows information about
+symbols that <span class="sc">gdb</span> only knows partially&mdash;that is, symbols defined in
+files that <span class="sc">gdb</span> has skimmed, but not yet read completely.  Finally,
+&lsquo;<samp><span class="samp">maint print msymbols</span></samp>&rsquo; dumps just the minimal symbol information
+required for each object file from which <span class="sc">gdb</span> has read some symbols. 
+See <a href="Files.html#Files">Commands to Specify Files</a>, for a discussion of how
+<span class="sc">gdb</span> reads symbols (in the description of <code>symbol-file</code>).
+
+     <p><a name="index-maint-info-symtabs-918"></a><a name="index-maint-info-psymtabs-919"></a><a name="index-listing-_0040value_007bGDBN_007d_0027s-internal-symbol-tables-920"></a><a name="index-symbol-tables_002c-listing-_0040value_007bGDBN_007d_0027s-internal-921"></a><a name="index-full-symbol-tables_002c-listing-_0040value_007bGDBN_007d_0027s-internal-922"></a><a name="index-partial-symbol-tables_002c-listing-_0040value_007bGDBN_007d_0027s-internal-923"></a><br><dt><code>maint info symtabs </code><span class="roman">[</span> <var>regexp</var> <span class="roman">]</span><dt><code>maint info psymtabs </code><span class="roman">[</span> <var>regexp</var> <span class="roman">]</span><dd>
+List the <code>struct symtab</code> or <code>struct partial_symtab</code>
+structures whose names match <var>regexp</var>.  If <var>regexp</var> is not
+given, list them all.  The output includes expressions which you can
+copy into a <span class="sc">gdb</span> debugging this one to examine a particular
+structure in more detail.  For example:
+
+     <pre class="smallexample">          (gdb) maint info psymtabs dwarf2read
+          { objfile /home/gnu/build/gdb/gdb
+            ((struct objfile *) 0x82e69d0)
+            { psymtab /home/gnu/src/gdb/dwarf2read.c
+              ((struct partial_symtab *) 0x8474b10)
+              readin no
+              fullname (null)
+              text addresses 0x814d3c8 -- 0x8158074
+              globals (* (struct partial_symbol **) 0x8507a08 @ 9)
+              statics (* (struct partial_symbol **) 0x40e95b78 @ 2882)
+              dependencies (none)
+            }
+          }
+          (gdb) maint info symtabs
+          (gdb)
+</pre>
+     <p class="noindent">We see that there is one partial symbol table whose filename contains
+the string &lsquo;<samp><span class="samp">dwarf2read</span></samp>&rsquo;, belonging to the &lsquo;<samp><span class="samp">gdb</span></samp>&rsquo; executable;
+and we see that <span class="sc">gdb</span> has not read in any symtabs yet at all. 
+If we set a breakpoint on a function, that will cause <span class="sc">gdb</span> to
+read the symtab for the compilation unit containing that function:
+
+     <pre class="smallexample">          (gdb) break dwarf2_psymtab_to_symtab
+          Breakpoint 1 at 0x814e5da: file /home/gnu/src/gdb/dwarf2read.c,
+          line 1574.
+          (gdb) maint info symtabs
+          { objfile /home/gnu/build/gdb/gdb
+            ((struct objfile *) 0x82e69d0)
+            { symtab /home/gnu/src/gdb/dwarf2read.c
+              ((struct symtab *) 0x86c1f38)
+              dirname (null)
+              fullname (null)
+              blockvector ((struct blockvector *) 0x86c1bd0) (primary)
+              linetable ((struct linetable *) 0x8370fa0)
+              debugformat DWARF 2
+            }
+          }
+          (gdb)
+</pre>
+     </dl>
+
+   </body></html>
+

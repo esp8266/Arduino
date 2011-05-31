@@ -1,0 +1,460 @@
+<html lang="en">
+<head>
+<title>WIN32 - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Machine-Dependent.html#Machine-Dependent" title="Machine Dependent">
+<link rel="prev" href="TI-COFF.html#TI-COFF" title="TI COFF">
+<link rel="next" href="Xtensa.html#Xtensa" title="Xtensa">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="WIN32"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Xtensa.html#Xtensa">Xtensa</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="TI-COFF.html#TI-COFF">TI COFF</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Machine-Dependent.html#Machine-Dependent">Machine Dependent</a>
+<hr>
+</div>
+
+<h3 class="section">4.13 <samp><span class="command">ld</span></samp> and WIN32 (cygwin/mingw)</h3>
+
+<p>This section describes some of the win32 specific <samp><span class="command">ld</span></samp> issues. 
+See <a href="Options.html#Options">Command Line Options</a> for detailed description of the
+command line options mentioned here.
+
+     
+<a name="index-import-libraries-661"></a>
+<dl><dt><em>import libraries</em><dd>The standard Windows linker creates and uses so-called import
+libraries, which contains information for linking to dll's.  They are
+regular static archives and are handled as any other static
+archive.  The cygwin and mingw ports of <samp><span class="command">ld</span></samp> have specific
+support for creating such libraries provided with the
+&lsquo;<samp><span class="samp">--out-implib</span></samp>&rsquo; command line option.
+
+     <br><dt><em>exporting DLL symbols</em><dd><a name="index-exporting-DLL-symbols-662"></a>The cygwin/mingw <samp><span class="command">ld</span></samp> has several ways to export symbols for dll's.
+
+          <dl>
+<dt><em>using auto-export functionality</em><dd><a name="index-using-auto_002dexport-functionality-663"></a>By default <samp><span class="command">ld</span></samp> exports symbols with the auto-export functionality,
+which is controlled by the following command line options:
+
+               <ul>
+<li>&ndash;export-all-symbols   [This is the default]
+<li>&ndash;exclude-symbols
+<li>&ndash;exclude-libs
+<li>&ndash;exclude-modules-for-implib
+<li>&ndash;version-script
+</ul>
+
+          <p>When auto-export is in operation, <samp><span class="command">ld</span></samp> will export all the non-local
+(global and common) symbols it finds in a DLL, with the exception of a few
+symbols known to belong to the system's runtime and libraries.  As it will
+often not be desirable to export all of a DLL's symbols, which may include
+private functions that are not part of any public interface, the command-line
+options listed above may be used to filter symbols out from the list for
+exporting.  The &lsquo;<samp><span class="samp">--output-def</span></samp>&rsquo; option can be used in order to see the
+final list of exported symbols with all exclusions taken into effect.
+
+          <p>If &lsquo;<samp><span class="samp">--export-all-symbols</span></samp>&rsquo; is not given explicitly on the
+command line, then the default auto-export behavior will be <em>disabled</em>
+if either of the following are true:
+
+               <ul>
+<li>A DEF file is used. 
+<li>Any symbol in any object file was marked with the __declspec(dllexport) attribute. 
+</ul>
+
+          <br><dt><em>using a DEF file</em><dd><a name="index-using-a-DEF-file-664"></a>Another way of exporting symbols is using a DEF file.  A DEF file is
+an ASCII file containing definitions of symbols which should be
+exported when a dll is created.  Usually it is named &lsquo;<samp><span class="samp">&lt;dll
+name&gt;.def</span></samp>&rsquo; and is added as any other object file to the linker's
+command line.  The file's name must end in &lsquo;<samp><span class="samp">.def</span></samp>&rsquo; or &lsquo;<samp><span class="samp">.DEF</span></samp>&rsquo;.
+
+          <pre class="example">               gcc -o &lt;output&gt; &lt;objectfiles&gt; &lt;dll name&gt;.def
+</pre>
+          <p>Using a DEF file turns off the normal auto-export behavior, unless the
+&lsquo;<samp><span class="samp">--export-all-symbols</span></samp>&rsquo; option is also used.
+
+          <p>Here is an example of a DEF file for a shared library called &lsquo;<samp><span class="samp">xyz.dll</span></samp>&rsquo;:
+
+          <pre class="example">               LIBRARY "xyz.dll" BASE=0x20000000
+               
+               EXPORTS
+               foo
+               bar
+               _bar = bar
+               another_foo = abc.dll.afoo
+               var1 DATA
+               doo = foo == foo2
+               eoo DATA == var1
+</pre>
+          <p>This example defines a DLL with a non-default base address and seven
+symbols in the export table. The third exported symbol <code>_bar</code> is an
+alias for the second. The fourth symbol, <code>another_foo</code> is resolved
+by "forwarding" to another module and treating it as an alias for
+<code>afoo</code> exported from the DLL &lsquo;<samp><span class="samp">abc.dll</span></samp>&rsquo;. The final symbol
+<code>var1</code> is declared to be a data object. The &lsquo;<samp><span class="samp">doo</span></samp>&rsquo; symbol in
+export library is an alias of &lsquo;<samp><span class="samp">foo</span></samp>&rsquo;, which gets the string name
+in export table &lsquo;<samp><span class="samp">foo2</span></samp>&rsquo;. The &lsquo;<samp><span class="samp">eoo</span></samp>&rsquo; symbol is an data export
+symbol, which gets in export table the name &lsquo;<samp><span class="samp">var1</span></samp>&rsquo;.
+
+          <p>The optional <code>LIBRARY &lt;name&gt;</code> command indicates the <em>internal</em>
+name of the output DLL. If &lsquo;<samp><span class="samp">&lt;name&gt;</span></samp>&rsquo; does not include a suffix,
+the default library suffix, &lsquo;<samp><span class="samp">.DLL</span></samp>&rsquo; is appended.
+
+          <p>When the .DEF file is used to build an application, rather than a
+library, the <code>NAME &lt;name&gt;</code> command should be used instead of
+<code>LIBRARY</code>. If &lsquo;<samp><span class="samp">&lt;name&gt;</span></samp>&rsquo; does not include a suffix, the default
+executable suffix, &lsquo;<samp><span class="samp">.EXE</span></samp>&rsquo; is appended.
+
+          <p>With either <code>LIBRARY &lt;name&gt;</code> or <code>NAME &lt;name&gt;</code> the optional
+specification <code>BASE = &lt;number&gt;</code> may be used to specify a
+non-default base address for the image.
+
+          <p>If neither <code>LIBRARY &lt;name&gt;</code> nor  <code>NAME &lt;name&gt;</code> is specified,
+or they specify an empty string, the internal name is the same as the
+filename specified on the command line.
+
+          <p>The complete specification of an export symbol is:
+
+          <pre class="example">               EXPORTS
+                 ( (  ( &lt;name1&gt; [ = &lt;name2&gt; ] )
+                    | ( &lt;name1&gt; = &lt;module-name&gt; . &lt;external-name&gt;))
+                 [ @ &lt;integer&gt; ] [NONAME] [DATA] [CONSTANT] [PRIVATE] [== &lt;name3&gt;] ) *
+</pre>
+          <p>Declares &lsquo;<samp><span class="samp">&lt;name1&gt;</span></samp>&rsquo; as an exported symbol from the DLL, or declares
+&lsquo;<samp><span class="samp">&lt;name1&gt;</span></samp>&rsquo; as an exported alias for &lsquo;<samp><span class="samp">&lt;name2&gt;</span></samp>&rsquo;; or declares
+&lsquo;<samp><span class="samp">&lt;name1&gt;</span></samp>&rsquo; as a "forward" alias for the symbol
+&lsquo;<samp><span class="samp">&lt;external-name&gt;</span></samp>&rsquo; in the DLL &lsquo;<samp><span class="samp">&lt;module-name&gt;</span></samp>&rsquo;. 
+Optionally, the symbol may be exported by the specified ordinal
+&lsquo;<samp><span class="samp">&lt;integer&gt;</span></samp>&rsquo; alias. The optional &lsquo;<samp><span class="samp">&lt;name3&gt;</span></samp>&rsquo; is the to be used
+string in import/export table for the symbol.
+
+          <p>The optional keywords that follow the declaration indicate:
+
+          <p><code>NONAME</code>: Do not put the symbol name in the DLL's export table.  It
+will still be exported by its ordinal alias (either the value specified
+by the .def specification or, otherwise, the value assigned by the
+linker). The symbol name, however, does remain visible in the import
+library (if any), unless <code>PRIVATE</code> is also specified.
+
+          <p><code>DATA</code>: The symbol is a variable or object, rather than a function. 
+The import lib will export only an indirect reference to <code>foo</code> as
+the symbol <code>_imp__foo</code> (ie, <code>foo</code> must be resolved as
+<code>*_imp__foo</code>).
+
+          <p><code>CONSTANT</code>: Like <code>DATA</code>, but put the undecorated <code>foo</code> as
+well as <code>_imp__foo</code> into the import library. Both refer to the
+read-only import address table's pointer to the variable, not to the
+variable itself. This can be dangerous. If the user code fails to add
+the <code>dllimport</code> attribute and also fails to explicitly add the
+extra indirection that the use of the attribute enforces, the
+application will behave unexpectedly.
+
+          <p><code>PRIVATE</code>: Put the symbol in the DLL's export table, but do not put
+it into the static import library used to resolve imports at link time. The
+symbol can still be imported using the <code>LoadLibrary/GetProcAddress</code>
+API at runtime or by by using the GNU ld extension of linking directly to
+the DLL without an import library.
+
+          <p>See ld/deffilep.y in the binutils sources for the full specification of
+other DEF file statements
+
+          <p><a name="index-creating-a-DEF-file-665"></a>While linking a shared dll, <samp><span class="command">ld</span></samp> is able to create a DEF file
+with the &lsquo;<samp><span class="samp">--output-def &lt;file&gt;</span></samp>&rsquo; command line option.
+
+          <br><dt><em>Using decorations</em><dd><a name="index-Using-decorations-666"></a>Another way of marking symbols for export is to modify the source code
+itself, so that when building the DLL each symbol to be exported is
+declared as:
+
+          <pre class="example">               __declspec(dllexport) int a_variable
+               __declspec(dllexport) void a_function(int with_args)
+</pre>
+          <p>All such symbols will be exported from the DLL.  If, however,
+any of the object files in the DLL contain symbols decorated in
+this way, then the normal auto-export behavior is disabled, unless
+the &lsquo;<samp><span class="samp">--export-all-symbols</span></samp>&rsquo; option is also used.
+
+          <p>Note that object files that wish to access these symbols must <em>not</em>
+decorate them with dllexport.  Instead, they should use dllimport,
+instead:
+
+          <pre class="example">               __declspec(dllimport) int a_variable
+               __declspec(dllimport) void a_function(int with_args)
+</pre>
+          <p>This complicates the structure of library header files, because
+when included by the library itself the header must declare the
+variables and functions as dllexport, but when included by client
+code the header must declare them as dllimport.  There are a number
+of idioms that are typically used to do this; often client code can
+omit the __declspec() declaration completely.  See
+&lsquo;<samp><span class="samp">--enable-auto-import</span></samp>&rsquo; and &lsquo;<samp><span class="samp">automatic data imports</span></samp>&rsquo; for more
+information. 
+</dl>
+
+     <p><a name="index-automatic-data-imports-667"></a><br><dt><em>automatic data imports</em><dd>The standard Windows dll format supports data imports from dlls only
+by adding special decorations (dllimport/dllexport), which let the
+compiler produce specific assembler instructions to deal with this
+issue.  This increases the effort necessary to port existing Un*x
+code to these platforms, especially for large
+c++ libraries and applications.  The auto-import feature, which was
+initially provided by Paul Sokolovsky, allows one to omit the
+decorations to achieve a behavior that conforms to that on POSIX/Un*x
+platforms. This feature is enabled with the &lsquo;<samp><span class="samp">--enable-auto-import</span></samp>&rsquo;
+command-line option, although it is enabled by default on cygwin/mingw. 
+The &lsquo;<samp><span class="samp">--enable-auto-import</span></samp>&rsquo; option itself now serves mainly to
+suppress any warnings that are ordinarily emitted when linked objects
+trigger the feature's use.
+
+     <p>auto-import of variables does not always work flawlessly without
+additional assistance.  Sometimes, you will see this message
+
+     <p>"variable '&lt;var&gt;' can't be auto-imported. Please read the
+documentation for ld's <code>--enable-auto-import</code> for details."
+
+     <p>The &lsquo;<samp><span class="samp">--enable-auto-import</span></samp>&rsquo; documentation explains why this error
+occurs, and several methods that can be used to overcome this difficulty. 
+One of these methods is the <em>runtime pseudo-relocs</em> feature, described
+below.
+
+     <p><a name="index-runtime-pseudo_002drelocation-668"></a>For complex variables imported from DLLs (such as structs or classes),
+object files typically contain a base address for the variable and an
+offset (<em>addend</em>) within the variable&ndash;to specify a particular
+field or public member, for instance.  Unfortunately, the runtime loader used
+in win32 environments is incapable of fixing these references at runtime
+without the additional information supplied by dllimport/dllexport decorations. 
+The standard auto-import feature described above is unable to resolve these
+references.
+
+     <p>The &lsquo;<samp><span class="samp">--enable-runtime-pseudo-relocs</span></samp>&rsquo; switch allows these references to
+be resolved without error, while leaving the task of adjusting the references
+themselves (with their non-zero addends) to specialized code provided by the
+runtime environment.  Recent versions of the cygwin and mingw environments and
+compilers provide this runtime support; older versions do not.  However, the
+support is only necessary on the developer's platform; the compiled result will
+run without error on an older system.
+
+     <p>&lsquo;<samp><span class="samp">--enable-runtime-pseudo-relocs</span></samp>&rsquo; is not the default; it must be explicitly
+enabled as needed.
+
+     <p><a name="index-direct-linking-to-a-dll-669"></a><br><dt><em>direct linking to a dll</em><dd>The cygwin/mingw ports of <samp><span class="command">ld</span></samp> support the direct linking,
+including data symbols, to a dll without the usage of any import
+libraries.  This is much faster and uses much less memory than does the
+traditional import library method, especially when linking large
+libraries or applications.  When <samp><span class="command">ld</span></samp> creates an import lib, each
+function or variable exported from the dll is stored in its own bfd, even
+though a single bfd could contain many exports.  The overhead involved in
+storing, loading, and processing so many bfd's is quite large, and explains the
+tremendous time, memory, and storage needed to link against particularly
+large or complex libraries when using import libs.
+
+     <p>Linking directly to a dll uses no extra command-line switches other than
+&lsquo;<samp><span class="samp">-L</span></samp>&rsquo; and &lsquo;<samp><span class="samp">-l</span></samp>&rsquo;, because <samp><span class="command">ld</span></samp> already searches for a number
+of names to match each library.  All that is needed from the developer's
+perspective is an understanding of this search, in order to force ld to
+select the dll instead of an import library.
+
+     <p>For instance, when ld is called with the argument &lsquo;<samp><span class="samp">-lxxx</span></samp>&rsquo; it will attempt
+to find, in the first directory of its search path,
+
+     <pre class="example">          libxxx.dll.a
+          xxx.dll.a
+          libxxx.a
+          xxx.lib
+          cygxxx.dll (*)
+          libxxx.dll
+          xxx.dll
+</pre>
+     <p>before moving on to the next directory in the search path.
+
+     <p>(*) Actually, this is not &lsquo;<samp><span class="samp">cygxxx.dll</span></samp>&rsquo; but in fact is &lsquo;<samp><span class="samp">&lt;prefix&gt;xxx.dll</span></samp>&rsquo;,
+where &lsquo;<samp><span class="samp">&lt;prefix&gt;</span></samp>&rsquo; is set by the <samp><span class="command">ld</span></samp> option
+&lsquo;<samp><span class="samp">--dll-search-prefix=&lt;prefix&gt;</span></samp>&rsquo;. In the case of cygwin, the standard gcc spec
+file includes &lsquo;<samp><span class="samp">--dll-search-prefix=cyg</span></samp>&rsquo;, so in effect we actually search for
+&lsquo;<samp><span class="samp">cygxxx.dll</span></samp>&rsquo;.
+
+     <p>Other win32-based unix environments, such as mingw or pw32, may use other
+&lsquo;<samp><span class="samp">&lt;prefix&gt;</span></samp>&rsquo;es, although at present only cygwin makes use of this feature.  It
+was originally intended to help avoid name conflicts among dll's built for the
+various win32/un*x environments, so that (for example) two versions of a zlib dll
+could coexist on the same machine.
+
+     <p>The generic cygwin/mingw path layout uses a &lsquo;<samp><span class="samp">bin</span></samp>&rsquo; directory for
+applications and dll's and a &lsquo;<samp><span class="samp">lib</span></samp>&rsquo; directory for the import
+libraries (using cygwin nomenclature):
+
+     <pre class="example">          bin/
+          	cygxxx.dll
+          lib/
+          	libxxx.dll.a   (in case of dll's)
+          	libxxx.a       (in case of static archive)
+</pre>
+     <p>Linking directly to a dll without using the import library can be
+done two ways:
+
+     <p>1. Use the dll directly by adding the &lsquo;<samp><span class="samp">bin</span></samp>&rsquo; path to the link line
+     <pre class="example">          gcc -Wl,-verbose  -o a.exe -L../bin/ -lxxx
+</pre>
+     <p>However, as the dll's often have version numbers appended to their names
+(&lsquo;<samp><span class="samp">cygncurses-5.dll</span></samp>&rsquo;) this will often fail, unless one specifies
+&lsquo;<samp><span class="samp">-L../bin -lncurses-5</span></samp>&rsquo; to include the version.  Import libs are generally
+not versioned, and do not have this difficulty.
+
+     <p>2. Create a symbolic link from the dll to a file in the &lsquo;<samp><span class="samp">lib</span></samp>&rsquo;
+directory according to the above mentioned search pattern.  This
+should be used to avoid unwanted changes in the tools needed for
+making the app/dll.
+
+     <pre class="example">          ln -s bin/cygxxx.dll lib/[cyg|lib|]xxx.dll[.a]
+</pre>
+     <p>Then you can link without any make environment changes.
+
+     <pre class="example">          gcc -Wl,-verbose  -o a.exe -L../lib/ -lxxx
+</pre>
+     <p>This technique also avoids the version number problems, because the following is
+perfectly legal
+
+     <pre class="example">          bin/
+          	cygxxx-5.dll
+          lib/
+          	libxxx.dll.a -&gt; ../bin/cygxxx-5.dll
+</pre>
+     <p>Linking directly to a dll without using an import lib will work
+even when auto-import features are exercised, and even when
+&lsquo;<samp><span class="samp">--enable-runtime-pseudo-relocs</span></samp>&rsquo; is used.
+
+     <p>Given the improvements in speed and memory usage, one might justifiably
+wonder why import libraries are used at all.  There are three reasons:
+
+     <p>1. Until recently, the link-directly-to-dll functionality did <em>not</em>
+work with auto-imported data.
+
+     <p>2. Sometimes it is necessary to include pure static objects within the
+import library (which otherwise contains only bfd's for indirection
+symbols that point to the exports of a dll).  Again, the import lib
+for the cygwin kernel makes use of this ability, and it is not
+possible to do this without an import lib.
+
+     <p>3. Symbol aliases can only be resolved using an import lib.  This is
+critical when linking against OS-supplied dll's (eg, the win32 API)
+in which symbols are usually exported as undecorated aliases of their
+stdcall-decorated assembly names.
+
+     <p>So, import libs are not going away.  But the ability to replace
+true import libs with a simple symbolic link to (or a copy of)
+a dll, in many cases, is a useful addition to the suite of tools
+binutils makes available to the win32 developer.  Given the
+massive improvements in memory requirements during linking, storage
+requirements, and linking speed, we expect that many developers
+will soon begin to use this feature whenever possible.
+
+     <br><dt><em>symbol aliasing</em><dd>
+          <dl>
+<dt><em>adding additional names</em><dd>Sometimes, it is useful to export symbols with additional names. 
+A symbol &lsquo;<samp><span class="samp">foo</span></samp>&rsquo; will be exported as &lsquo;<samp><span class="samp">foo</span></samp>&rsquo;, but it can also be
+exported as &lsquo;<samp><span class="samp">_foo</span></samp>&rsquo; by using special directives in the DEF file
+when creating the dll.  This will affect also the optional created
+import library.  Consider the following DEF file:
+
+          <pre class="example">               LIBRARY "xyz.dll" BASE=0x61000000
+               
+               EXPORTS
+               foo
+               _foo = foo
+</pre>
+          <p>The line &lsquo;<samp><span class="samp">_foo = foo</span></samp>&rsquo; maps the symbol &lsquo;<samp><span class="samp">foo</span></samp>&rsquo; to &lsquo;<samp><span class="samp">_foo</span></samp>&rsquo;.
+
+          <p>Another method for creating a symbol alias is to create it in the
+source code using the "weak" attribute:
+
+          <pre class="example">               void foo () { /* Do something.  */; }
+               void _foo () __attribute__ ((weak, alias ("foo")));
+</pre>
+          <p>See the gcc manual for more information about attributes and weak
+symbols.
+
+          <br><dt><em>renaming symbols</em><dd>Sometimes it is useful to rename exports.  For instance, the cygwin
+kernel does this regularly.  A symbol &lsquo;<samp><span class="samp">_foo</span></samp>&rsquo; can be exported as
+&lsquo;<samp><span class="samp">foo</span></samp>&rsquo; but not as &lsquo;<samp><span class="samp">_foo</span></samp>&rsquo; by using special directives in the
+DEF file. (This will also affect the import library, if it is
+created).  In the following example:
+
+          <pre class="example">               LIBRARY "xyz.dll" BASE=0x61000000
+               
+               EXPORTS
+               _foo = foo
+</pre>
+          <p>The line &lsquo;<samp><span class="samp">_foo = foo</span></samp>&rsquo; maps the exported symbol &lsquo;<samp><span class="samp">foo</span></samp>&rsquo; to
+&lsquo;<samp><span class="samp">_foo</span></samp>&rsquo;. 
+</dl>
+
+     <p>Note: using a DEF file disables the default auto-export behavior,
+unless the &lsquo;<samp><span class="samp">--export-all-symbols</span></samp>&rsquo; command line option is used. 
+If, however, you are trying to rename symbols, then you should list
+<em>all</em> desired exports in the DEF file, including the symbols
+that are not being renamed, and do <em>not</em> use the
+&lsquo;<samp><span class="samp">--export-all-symbols</span></samp>&rsquo; option.  If you list only the
+renamed symbols in the DEF file, and use &lsquo;<samp><span class="samp">--export-all-symbols</span></samp>&rsquo;
+to handle the other symbols, then the both the new names <em>and</em>
+the original names for the renamed symbols will be exported. 
+In effect, you'd be aliasing those symbols, not renaming them,
+which is probably not what you wanted.
+
+     <p><a name="index-weak-externals-670"></a><br><dt><em>weak externals</em><dd>The Windows object format, PE, specifies a form of weak symbols called
+weak externals.  When a weak symbol is linked and the symbol is not
+defined, the weak symbol becomes an alias for some other symbol.  There
+are three variants of weak externals:
+          <ul>
+<li>Definition is searched for in objects and libraries, historically
+called lazy externals. 
+<li>Definition is searched for only in other objects, not in libraries. 
+This form is not presently implemented. 
+<li>No search; the symbol is an alias.  This form is not presently
+implemented. 
+</ul>
+     As a GNU extension, weak symbols that do not specify an alternate symbol
+are supported.  If the symbol is undefined when linking, the symbol
+uses a default value.
+
+     <p><a name="index-aligned-common-symbols-671"></a><br><dt><em>aligned common symbols</em><dd>As a GNU extension to the PE file format, it is possible to specify the
+desired alignment for a common symbol.  This information is conveyed from
+the assembler or compiler to the linker by means of GNU-specific commands
+carried in the object file's &lsquo;<samp><span class="samp">.drectve</span></samp>&rsquo; section, which are recognized
+by <samp><span class="command">ld</span></samp> and respected when laying out the common symbols.  Native
+tools will be able to process object files employing this GNU extension,
+but will fail to respect the alignment instructions, and may issue noisy
+warnings about unknown linker directives. 
+</dl>
+
+   </body></html>
+

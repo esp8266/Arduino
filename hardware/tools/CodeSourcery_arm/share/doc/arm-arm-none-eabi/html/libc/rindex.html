@@ -1,0 +1,62 @@
+<html lang="en">
+<head>
+<title>rindex - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Strings.html#Strings" title="Strings">
+<link rel="prev" href="memset.html#memset" title="memset">
+<link rel="next" href="stpcpy.html#stpcpy" title="stpcpy">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="rindex"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="stpcpy.html#stpcpy">stpcpy</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="memset.html#memset">memset</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Strings.html#Strings">Strings</a>
+<hr>
+</div>
+
+<h3 class="section">5.13 <code>rindex</code>&mdash;reverse search for character in string</h3>
+
+<p><a name="index-rindex-380"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;string.h&gt;
+     char * rindex(const char *<var>string</var>, int <var>c</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+This function finds the last occurence of <var>c</var> (converted to
+a char) in the string pointed to by <var>string</var> (including the
+terminating null character).
+
+   <p>This function is identical to <code>strrchr</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+Returns a pointer to the located character, or a null pointer
+if <var>c</var> does not occur in <var>string</var>.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>rindex</code> requires no supporting OS subroutines.
+
+   <p><br>
+
+   </body></html>
+

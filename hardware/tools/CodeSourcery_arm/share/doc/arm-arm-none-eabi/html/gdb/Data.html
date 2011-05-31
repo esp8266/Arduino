@@ -1,0 +1,106 @@
+<html lang="en">
+<head>
+<title>Data - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Source.html#Source" title="Source">
+<link rel="next" href="Optimized-Code.html#Optimized-Code" title="Optimized Code">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Data"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Optimized-Code.html#Optimized-Code">Optimized Code</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Source.html#Source">Source</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">10 Examining Data</h2>
+
+<p><a name="index-printing-data-489"></a><a name="index-examining-data-490"></a><a name="index-print-491"></a><a name="index-inspect-492"></a><!-- "inspect" is not quite a synonym if you are using Epoch, which we do not -->
+<!-- document because it is nonstandard...  Under Epoch it displays in a -->
+<!-- different window or something like that. -->
+The usual way to examine data in your program is with the <code>print</code>
+command (abbreviated <code>p</code>), or its synonym <code>inspect</code>.  It
+evaluates and prints the value of an expression of the language your
+program is written in (see <a href="Languages.html#Languages">Using <span class="sc">gdb</span> with Different Languages</a>).  It may also print the expression using a
+Python-based pretty-printer (see <a href="Pretty-Printing.html#Pretty-Printing">Pretty Printing</a>).
+
+     <dl>
+<dt><code>print </code><var>expr</var><dt><code>print /</code><var>f</var> <var>expr</var><dd><var>expr</var> is an expression (in the source language).  By default the
+value of <var>expr</var> is printed in a format appropriate to its data type;
+you can choose a different format by specifying &lsquo;<samp><span class="samp">/</span><var>f</var></samp>&rsquo;, where
+<var>f</var> is a letter specifying the format; see <a href="Output-Formats.html#Output-Formats">Output Formats</a>.
+
+     <br><dt><code>print</code><dt><code>print /</code><var>f</var><dd><a name="index-reprint-the-last-value-493"></a>If you omit <var>expr</var>, <span class="sc">gdb</span> displays the last value again (from the
+<dfn>value history</dfn>; see <a href="Value-History.html#Value-History">Value History</a>).  This allows you to
+conveniently inspect the same value in an alternative format. 
+</dl>
+
+   <p>A more low-level way of examining data is with the <code>x</code> command. 
+It examines data in memory at a specified address and prints it in a
+specified format.  See <a href="Memory.html#Memory">Examining Memory</a>.
+
+   <p>If you are interested in information about types, or about how the
+fields of a struct or a class are declared, use the <code>ptype </code><var>exp</var>
+command rather than <code>print</code>.  See <a href="Symbols.html#Symbols">Examining the Symbol Table</a>.
+
+<ul class="menu">
+<li><a accesskey="1" href="Expressions.html#Expressions">Expressions</a>:                  Expressions
+<li><a accesskey="2" href="Ambiguous-Expressions.html#Ambiguous-Expressions">Ambiguous Expressions</a>:        Ambiguous Expressions
+<li><a accesskey="3" href="Variables.html#Variables">Variables</a>:                    Program variables
+<li><a accesskey="4" href="Arrays.html#Arrays">Arrays</a>:                       Artificial arrays
+<li><a accesskey="5" href="Output-Formats.html#Output-Formats">Output Formats</a>:               Output formats
+<li><a accesskey="6" href="Memory.html#Memory">Memory</a>:                       Examining memory
+<li><a accesskey="7" href="Auto-Display.html#Auto-Display">Auto Display</a>:                 Automatic display
+<li><a accesskey="8" href="Print-Settings.html#Print-Settings">Print Settings</a>:               Print settings
+<li><a accesskey="9" href="Pretty-Printing.html#Pretty-Printing">Pretty Printing</a>:              Python pretty printing
+<li><a href="Value-History.html#Value-History">Value History</a>:                Value history
+<li><a href="Convenience-Vars.html#Convenience-Vars">Convenience Vars</a>:             Convenience variables
+<li><a href="Registers.html#Registers">Registers</a>:                    Registers
+<li><a href="Floating-Point-Hardware.html#Floating-Point-Hardware">Floating Point Hardware</a>:      Floating point hardware
+<li><a href="Vector-Unit.html#Vector-Unit">Vector Unit</a>:                  Vector Unit
+<li><a href="OS-Information.html#OS-Information">OS Information</a>:               Auxiliary data provided by operating system
+<li><a href="Memory-Region-Attributes.html#Memory-Region-Attributes">Memory Region Attributes</a>:     Memory region attributes
+<li><a href="Dump_002fRestore-Files.html#Dump_002fRestore-Files">Dump/Restore Files</a>:           Copy between memory and a file
+<li><a href="Core-File-Generation.html#Core-File-Generation">Core File Generation</a>:         Cause a program dump its core
+<li><a href="Character-Sets.html#Character-Sets">Character Sets</a>:               Debugging programs that use a different
+                                character set than GDB does
+<li><a href="Caching-Remote-Data.html#Caching-Remote-Data">Caching Remote Data</a>:          Data caching for remote targets
+<li><a href="Searching-Memory.html#Searching-Memory">Searching Memory</a>:             Searching memory for a sequence of bytes
+</ul>
+
+   </body></html>
+

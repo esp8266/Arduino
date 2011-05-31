@@ -1,0 +1,167 @@
+<html lang="en">
+<head>
+<title>Statement Exprs - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="next" href="Local-Labels.html#Local-Labels" title="Local Labels">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Statement-Exprs"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Local-Labels.html#Local-Labels">Local Labels</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.1 Statements and Declarations in Expressions</h3>
+
+<p><a name="index-statements-inside-expressions-2180"></a><a name="index-declarations-inside-expressions-2181"></a><a name="index-expressions-containing-statements-2182"></a><a name="index-macros_002c-statements-in-expressions-2183"></a>
+<!-- the above section title wrapped and causes an underfull hbox.. i -->
+<!-- changed it from "within" to "in". -mew 4feb93 -->
+A compound statement enclosed in parentheses may appear as an expression
+in GNU C.  This allows you to use loops, switches, and local variables
+within an expression.
+
+ <p>Recall that a compound statement is a sequence of statements surrounded
+by braces; in this construct, parentheses go around the braces.  For
+example:
+
+<pre class="smallexample">     ({ int y = foo (); int z;
+        if (y &gt; 0) z = y;
+        else z = - y;
+        z; })
+</pre>
+ <p class="noindent">is a valid (though slightly more complex than necessary) expression
+for the absolute value of <code>foo ()</code>.
+
+ <p>The last thing in the compound statement should be an expression
+followed by a semicolon; the value of this subexpression serves as the
+value of the entire construct.  (If you use some other kind of statement
+last within the braces, the construct has type <code>void</code>, and thus
+effectively no value.)
+
+ <p>This feature is especially useful in making macro definitions &ldquo;safe&rdquo; (so
+that they evaluate each operand exactly once).  For example, the
+&ldquo;maximum&rdquo; function is commonly defined as a macro in standard C as
+follows:
+
+<pre class="smallexample">     #define max(a,b) ((a) &gt; (b) ? (a) : (b))
+</pre>
+ <p class="noindent"><a name="index-side-effects_002c-macro-argument-2184"></a>But this definition computes either <var>a</var> or <var>b</var> twice, with bad
+results if the operand has side effects.  In GNU C, if you know the
+type of the operands (here taken as <code>int</code>), you can define
+the macro safely as follows:
+
+<pre class="smallexample">     #define maxint(a,b) \
+       ({int _a = (a), _b = (b); _a &gt; _b ? _a : _b; })
+</pre>
+ <p>Embedded statements are not allowed in constant expressions, such as
+the value of an enumeration constant, the width of a bit-field, or
+the initial value of a static variable.
+
+ <p>If you don't know the type of the operand, you can still do this, but you
+must use <code>typeof</code> (see <a href="Typeof.html#Typeof">Typeof</a>).
+
+ <p>In G++, the result value of a statement expression undergoes array and
+function pointer decay, and is returned by value to the enclosing
+expression.  For instance, if <code>A</code> is a class, then
+
+<pre class="smallexample">             A a;
+     
+             ({a;}).Foo ()
+</pre>
+ <p class="noindent">will construct a temporary <code>A</code> object to hold the result of the
+statement expression, and that will be used to invoke <code>Foo</code>. 
+Therefore the <code>this</code> pointer observed by <code>Foo</code> will not be the
+address of <code>a</code>.
+
+ <p>Any temporaries created within a statement within a statement expression
+will be destroyed at the statement's end.  This makes statement
+expressions inside macros slightly different from function calls.  In
+the latter case temporaries introduced during argument evaluation will
+be destroyed at the end of the statement that includes the function
+call.  In the statement expression case they will be destroyed during
+the statement expression.  For instance,
+
+<pre class="smallexample">     #define macro(a)  ({__typeof__(a) b = (a); b + 3; })
+     template&lt;typename T&gt; T function(T a) { T b = a; return b + 3; }
+     
+     void foo ()
+     {
+       macro (X ());
+       function (X ());
+     }
+</pre>
+ <p class="noindent">will have different places where temporaries are destroyed.  For the
+<code>macro</code> case, the temporary <code>X</code> will be destroyed just after
+the initialization of <code>b</code>.  In the <code>function</code> case that
+temporary will be destroyed when the function returns.
+
+ <p>These considerations mean that it is probably a bad idea to use
+statement-expressions of this form in header files that are designed to
+work with C++.  (Note that some versions of the GNU C Library contained
+header files using statement-expression that lead to precisely this
+bug.)
+
+ <p>Jumping into a statement expression with <code>goto</code> or using a
+<code>switch</code> statement outside the statement expression with a
+<code>case</code> or <code>default</code> label inside the statement expression is
+not permitted.  Jumping into a statement expression with a computed
+<code>goto</code> (see <a href="Labels-as-Values.html#Labels-as-Values">Labels as Values</a>) yields undefined behavior. 
+Jumping out of a statement expression is permitted, but if the
+statement expression is part of a larger expression then it is
+unspecified which other subexpressions of that expression have been
+evaluated except where the language definition requires certain
+subexpressions to be evaluated before or after the statement
+expression.  In any case, as with a function call the evaluation of a
+statement expression is not interleaved with the evaluation of other
+parts of the containing expression.  For example,
+
+<pre class="smallexample">       foo (), (({ bar1 (); goto a; 0; }) + bar2 ()), baz();
+</pre>
+ <p class="noindent">will call <code>foo</code> and <code>bar1</code> and will not call <code>baz</code> but
+may or may not call <code>bar2</code>.  If <code>bar2</code> is called, it will be
+called after <code>foo</code> and before <code>bar1</code>
+
+ </body></html>
+

@@ -1,0 +1,77 @@
+<html lang="en">
+<head>
+<title>Macro Pitfalls - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Macros.html#Macros" title="Macros">
+<link rel="prev" href="Directives-Within-Macro-Arguments.html#Directives-Within-Macro-Arguments" title="Directives Within Macro Arguments">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Macro-Pitfalls"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Directives-Within-Macro-Arguments.html#Directives-Within-Macro-Arguments">Directives Within Macro Arguments</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Macros.html#Macros">Macros</a>
+<hr>
+</div>
+
+<h3 class="section">3.10 Macro Pitfalls</h3>
+
+<p><a name="index-problems-with-macros-72"></a><a name="index-pitfalls-of-macros-73"></a>
+In this section we describe some special rules that apply to macros and
+macro expansion, and point out certain cases in which the rules have
+counter-intuitive consequences that you must watch out for.
+
+<ul class="menu">
+<li><a accesskey="1" href="Misnesting.html#Misnesting">Misnesting</a>
+<li><a accesskey="2" href="Operator-Precedence-Problems.html#Operator-Precedence-Problems">Operator Precedence Problems</a>
+<li><a accesskey="3" href="Swallowing-the-Semicolon.html#Swallowing-the-Semicolon">Swallowing the Semicolon</a>
+<li><a accesskey="4" href="Duplication-of-Side-Effects.html#Duplication-of-Side-Effects">Duplication of Side Effects</a>
+<li><a accesskey="5" href="Self_002dReferential-Macros.html#Self_002dReferential-Macros">Self-Referential Macros</a>
+<li><a accesskey="6" href="Argument-Prescan.html#Argument-Prescan">Argument Prescan</a>
+<li><a accesskey="7" href="Newlines-in-Arguments.html#Newlines-in-Arguments">Newlines in Arguments</a>
+</ul>
+
+   </body></html>
+

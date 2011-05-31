@@ -1,0 +1,71 @@
+<html lang="en">
+<head>
+<title>gvcvt - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdlib.html#Stdlib" title="Stdlib">
+<link rel="prev" href="_005f_005fenv_005flock.html#g_t_005f_005fenv_005flock" title="__env_lock">
+<link rel="next" href="exit.html#exit" title="exit">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="gvcvt"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="exit.html#exit">exit</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="_005f_005fenv_005flock.html#g_t_005f_005fenv_005flock">__env_lock</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdlib.html#Stdlib">Stdlib</a>
+<hr>
+</div>
+
+<h3 class="section">2.14 <code>gvcvt</code>, <code>gcvtf</code>&mdash;format double or float as string</h3>
+
+<p><a name="index-gcvt-24"></a><a name="index-gcvtf-25"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdlib.h&gt;
+     
+     char *gcvt(double <var>val</var>, int <var>precision</var>, char *<var>buf</var>);
+     char *gcvtf(float <var>val</var>, int <var>precision</var>, char *<var>buf</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>gcvt</code> writes a fully formatted number as a null-terminated
+string in the buffer <code>*</code><var>buf</var>.  <code>gdvtf</code> produces corresponding
+character representations of <code>float</code> numbers.
+
+   <p><code>gcvt</code> uses the same rules as the <code>printf</code> format
+`<code>%.</code><var>precision</var><code>g</code>'&mdash;only negative values are signed (with
+`<code>-</code>'), and either exponential or ordinary decimal-fraction format
+is chosen depending on the number of significant digits (specified by
+<var>precision</var>).
+
+   <p><br>
+<strong>Returns</strong><br>
+The result is a pointer to the formatted representation of <var>val</var>
+(the same as the argument <var>buf</var>).
+
+   <p><br>
+<strong>Portability</strong><br>
+Neither function is ANSI C.
+
+   <p>Supporting OS subroutines required: <code>close</code>, <code>fstat</code>, <code>isatty</code>,
+<code>lseek</code>, <code>read</code>, <code>sbrk</code>, <code>write</code>.
+
+   <p><br>
+
+   </body></html>
+

@@ -1,0 +1,91 @@
+<html lang="en">
+<head>
+<title>Prompting - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Annotations.html#Annotations" title="Annotations">
+<link rel="prev" href="Server-Prefix.html#Server-Prefix" title="Server Prefix">
+<link rel="next" href="Errors.html#Errors" title="Errors">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Prompting"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Errors.html#Errors">Errors</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Server-Prefix.html#Server-Prefix">Server Prefix</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Annotations.html#Annotations">Annotations</a>
+<hr>
+</div>
+
+<h3 class="section">28.3 Annotation for <span class="sc">gdb</span> Input</h3>
+
+<p><a name="index-annotations-for-prompts-2135"></a>When <span class="sc">gdb</span> prompts for input, it annotates this fact so it is possible
+to know when to send output, when the output from a given command is
+over, etc.
+
+   <p>Different kinds of input each have a different <dfn>input type</dfn>.  Each
+input type has three annotations: a <code>pre-</code> annotation, which
+denotes the beginning of any prompt which is being output, a plain
+annotation, which denotes the end of the prompt, and then a <code>post-</code>
+annotation which denotes the end of any echo which may (or may not) be
+associated with the input.  For example, the <code>prompt</code> input type
+features the following annotations:
+
+<pre class="smallexample">     ^Z^Zpre-prompt
+     ^Z^Zprompt
+     ^Z^Zpost-prompt
+</pre>
+   <p>The input types are
+
+     
+<a name="index-pre_002dprompt-annotation-2136"></a>
+<a name="index-prompt-annotation-2137"></a>
+<a name="index-post_002dprompt-annotation-2138"></a>
+<dl><dt><code>prompt</code><dd>When <span class="sc">gdb</span> is prompting for a command (the main <span class="sc">gdb</span> prompt).
+
+     <p><a name="index-pre_002dcommands-annotation-2139"></a><a name="index-commands-annotation-2140"></a><a name="index-post_002dcommands-annotation-2141"></a><br><dt><code>commands</code><dd>When <span class="sc">gdb</span> prompts for a set of commands, like in the <code>commands</code>
+command.  The annotations are repeated for each command which is input.
+
+     <p><a name="index-pre_002doverload_002dchoice-annotation-2142"></a><a name="index-overload_002dchoice-annotation-2143"></a><a name="index-post_002doverload_002dchoice-annotation-2144"></a><br><dt><code>overload-choice</code><dd>When <span class="sc">gdb</span> wants the user to select between various overloaded functions.
+
+     <p><a name="index-pre_002dquery-annotation-2145"></a><a name="index-query-annotation-2146"></a><a name="index-post_002dquery-annotation-2147"></a><br><dt><code>query</code><dd>When <span class="sc">gdb</span> wants the user to confirm a potentially dangerous operation.
+
+     <p><a name="index-pre_002dprompt_002dfor_002dcontinue-annotation-2148"></a><a name="index-prompt_002dfor_002dcontinue-annotation-2149"></a><a name="index-post_002dprompt_002dfor_002dcontinue-annotation-2150"></a><br><dt><code>prompt-for-continue</code><dd>When <span class="sc">gdb</span> is asking the user to press return to continue.  Note: Don't
+expect this to work well; instead use <code>set height 0</code> to disable
+prompting.  This is because the counting of lines is buggy in the
+presence of annotations. 
+</dl>
+
+   </body></html>
+

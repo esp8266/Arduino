@@ -1,0 +1,86 @@
+<html lang="en">
+<head>
+<title>Deleted Code - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Conditionals.html#Conditionals" title="Conditionals">
+<link rel="prev" href="Conditional-Syntax.html#Conditional-Syntax" title="Conditional Syntax">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Deleted-Code"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Conditional-Syntax.html#Conditional-Syntax">Conditional Syntax</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Conditionals.html#Conditionals">Conditionals</a>
+<hr>
+</div>
+
+<h3 class="section">4.3 Deleted Code</h3>
+
+<p><a name="index-commenting-out-code-92"></a>
+If you replace or delete a part of the program but want to keep the old
+code around for future reference, you often cannot simply comment it
+out.  Block comments do not nest, so the first comment inside the old
+code will end the commenting-out.  The probable result is a flood of
+syntax errors.
+
+   <p>One way to avoid this problem is to use an always-false conditional
+instead.  For instance, put <code>#if 0</code> before the deleted code and
+<code>#endif</code> after it.  This works even if the code being turned
+off contains conditionals, but they must be entire conditionals
+(balanced &lsquo;<samp><span class="samp">#if</span></samp>&rsquo; and &lsquo;<samp><span class="samp">#endif</span></samp>&rsquo;).
+
+   <p>Some people use <code>#ifdef notdef</code> instead.  This is risky, because
+<code>notdef</code> might be accidentally defined as a macro, and then the
+conditional would succeed.  <code>#if 0</code> can be counted on to fail.
+
+   <p>Do not use <code>#if 0</code> for comments which are not C code.  Use a real
+comment, instead.  The interior of <code>#if 0</code> must consist of complete
+tokens; in particular, single-quote characters must balance.  Comments
+often contain unbalanced single-quote characters (known in English as
+apostrophes).  These confuse <code>#if 0</code>.  They don't confuse
+&lsquo;<samp><span class="samp">/*</span></samp>&rsquo;.
+
+   </body></html>
+

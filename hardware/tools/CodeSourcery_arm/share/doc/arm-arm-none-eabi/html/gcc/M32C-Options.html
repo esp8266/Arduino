@@ -1,0 +1,85 @@
+<html lang="en">
+<head>
+<title>M32C Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Submodel-Options.html#Submodel-Options" title="Submodel Options">
+<link rel="prev" href="LM32-Options.html#LM32-Options" title="LM32 Options">
+<link rel="next" href="M32R_002fD-Options.html#M32R_002fD-Options" title="M32R/D Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="M32C-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="M32R_002fD-Options.html#M32R_002fD-Options">M32R/D Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="LM32-Options.html#LM32-Options">LM32 Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Submodel-Options.html#Submodel-Options">Submodel Options</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.17.19 M32C Options</h4>
+
+<p><a name="index-M32C-options-1429"></a>
+     <dl>
+<dt><code>-mcpu=</code><var>name</var><dd><a name="index-mcpu_003d-1430"></a>Select the CPU for which code is generated.  <var>name</var> may be one of
+&lsquo;<samp><span class="samp">r8c</span></samp>&rsquo; for the R8C/Tiny series, &lsquo;<samp><span class="samp">m16c</span></samp>&rsquo; for the M16C (up to
+/60) series, &lsquo;<samp><span class="samp">m32cm</span></samp>&rsquo; for the M16C/80 series, or &lsquo;<samp><span class="samp">m32c</span></samp>&rsquo; for
+the M32C/80 series.
+
+     <br><dt><code>-msim</code><dd><a name="index-msim-1431"></a>Specifies that the program will be run on the simulator.  This causes
+an alternate runtime library to be linked in which supports, for
+example, file I/O.  You must not use this option when generating
+programs that will run on real hardware; you must provide your own
+runtime library for whatever I/O functions are needed.
+
+     <br><dt><code>-memregs=</code><var>number</var><dd><a name="index-memregs_003d-1432"></a>Specifies the number of memory-based pseudo-registers GCC will use
+during code generation.  These pseudo-registers will be used like real
+registers, so there is a tradeoff between GCC's ability to fit the
+code into available registers, and the performance penalty of using
+memory instead of registers.  Note that all modules in a program must
+be compiled with the same value for this option.  Because of that, you
+must not use this option with the default runtime libraries gcc
+builds.
+
+ </dl>
+
+ </body></html>
+

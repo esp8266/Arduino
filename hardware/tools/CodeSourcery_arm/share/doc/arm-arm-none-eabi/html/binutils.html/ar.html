@@ -1,0 +1,114 @@
+<html lang="en">
+<head>
+<title>ar - GNU Binary Utilities</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GNU Binary Utilities">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="index.html#Top" title="Top">
+<link rel="next" href="nm.html#nm" title="nm">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="ar"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="nm.html#nm">nm</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="index.html#Top">Top</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">1 ar</h2>
+
+<p><a name="index-ar-2"></a><a name="index-archives-3"></a><a name="index-collections-of-files-4"></a>
+<!-- man title ar create, modify, and extract from archives -->
+
+<pre class="smallexample">     ar [<samp><span class="option">--plugin</span></samp> <var>name</var>] [-]<var>p</var>[<var>mod</var> [<var>relpos</var>] [<var>count</var>]] <var>archive</var> [<var>member</var>...]
+     ar -M [ &lt;mri-script ]
+</pre>
+   <!-- man begin DESCRIPTION ar -->
+   <p>The <span class="sc">gnu</span> <samp><span class="command">ar</span></samp> program creates, modifies, and extracts from
+archives.  An <dfn>archive</dfn> is a single file holding a collection of
+other files in a structure that makes it possible to retrieve
+the original individual files (called <dfn>members</dfn> of the archive).
+
+   <p>The original files' contents, mode (permissions), timestamp, owner, and
+group are preserved in the archive, and can be restored on
+extraction.
+
+   <p><a name="index-name-length-5"></a><span class="sc">gnu</span> <samp><span class="command">ar</span></samp> can maintain archives whose members have names of any
+length; however, depending on how <samp><span class="command">ar</span></samp> is configured on your
+system, a limit on member-name length may be imposed for compatibility
+with archive formats maintained with other tools.  If it exists, the
+limit is often 15 characters (typical of formats related to a.out) or 16
+characters (typical of formats related to coff).
+
+   <p><a name="index-libraries-6"></a><samp><span class="command">ar</span></samp> is considered a binary utility because archives of this sort
+are most often used as <dfn>libraries</dfn> holding commonly needed
+subroutines.
+
+   <p><a name="index-symbol-index-7"></a><samp><span class="command">ar</span></samp> creates an index to the symbols defined in relocatable
+object modules in the archive when you specify the modifier &lsquo;<samp><span class="samp">s</span></samp>&rsquo;. 
+Once created, this index is updated in the archive whenever <samp><span class="command">ar</span></samp>
+makes a change to its contents (save for the &lsquo;<samp><span class="samp">q</span></samp>&rsquo; update operation). 
+An archive with such an index speeds up linking to the library, and
+allows routines in the library to call each other without regard to
+their placement in the archive.
+
+   <p>You may use &lsquo;<samp><span class="samp">nm -s</span></samp>&rsquo; or &lsquo;<samp><span class="samp">nm --print-armap</span></samp>&rsquo; to list this index
+table.  If an archive lacks the table, another form of <samp><span class="command">ar</span></samp> called
+<samp><span class="command">ranlib</span></samp> can be used to add just the table.
+
+   <p><a name="index-thin-archives-8"></a><span class="sc">gnu</span> <samp><span class="command">ar</span></samp> can optionally create a <em>thin</em> archive,
+which contains a symbol index and references to the original copies
+of the member files of the archives.  Such an archive is useful
+for building libraries for use within a local build, where the
+relocatable objects are expected to remain available, and copying the
+contents of each object would only waste time and space.  Thin archives
+are also <em>flattened</em>, so that adding one or more archives to a
+thin archive will add the elements of the nested archive individually. 
+The paths to the elements of the archive are stored relative to the
+archive itself.
+
+   <p><a name="index-compatibility_002c-_0040command_007bar_007d-9"></a><a name="index-g_t_0040command_007bar_007d-compatibility-10"></a><span class="sc">gnu</span> <samp><span class="command">ar</span></samp> is designed to be compatible with two different
+facilities.  You can control its activity using command-line options,
+like the different varieties of <samp><span class="command">ar</span></samp> on Unix systems; or, if you
+specify the single command-line option <samp><span class="option">-M</span></samp>, you can control it
+with a script supplied via standard input, like the MRI &ldquo;librarian&rdquo;
+program.
+
+<!-- man end -->
+<ul class="menu">
+<li><a accesskey="1" href="ar-cmdline.html#ar-cmdline">ar cmdline</a>:                   Controlling <samp><span class="command">ar</span></samp> on the command line
+<li><a accesskey="2" href="ar-scripts.html#ar-scripts">ar scripts</a>:                   Controlling <samp><span class="command">ar</span></samp> with a script
+</ul>
+
+   </body></html>
+

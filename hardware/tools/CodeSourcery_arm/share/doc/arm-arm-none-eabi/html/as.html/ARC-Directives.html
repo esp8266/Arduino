@@ -1,0 +1,204 @@
+<html lang="en">
+<head>
+<title>ARC Directives - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="ARC_002dDependent.html#ARC_002dDependent" title="ARC-Dependent">
+<link rel="prev" href="ARC-Floating-Point.html#ARC-Floating-Point" title="ARC Floating Point">
+<link rel="next" href="ARC-Opcodes.html#ARC-Opcodes" title="ARC Opcodes">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="ARC-Directives"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="ARC-Opcodes.html#ARC-Opcodes">ARC Opcodes</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="ARC-Floating-Point.html#ARC-Floating-Point">ARC Floating Point</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="ARC_002dDependent.html#ARC_002dDependent">ARC-Dependent</a>
+<hr>
+</div>
+
+<h4 class="subsection">9.2.4 ARC Machine Directives</h4>
+
+<p><a name="index-machine-directives_002c-ARC-551"></a><a name="index-ARC-machine-directives-552"></a>The ARC version of <code>as</code> supports the following additional
+machine directives:
+
+     
+<a name="index-g_t_0040code_007b2byte_007d-directive_002c-ARC-553"></a>
+<dl><dt><code>.2byte </code><var>expressions</var><dd>*TODO*
+
+     <p><a name="index-g_t_0040code_007b3byte_007d-directive_002c-ARC-554"></a><br><dt><code>.3byte </code><var>expressions</var><dd>*TODO*
+
+     <p><a name="index-g_t_0040code_007b4byte_007d-directive_002c-ARC-555"></a><br><dt><code>.4byte </code><var>expressions</var><dd>*TODO*
+
+     <p><a name="index-g_t_0040code_007bextAuxRegister_007d-directive_002c-ARC-556"></a><br><dt><code>.extAuxRegister </code><var>name</var><code>,</code><var>address</var><code>,</code><var>mode</var><dd>The ARCtangent A4 has extensible auxiliary register space.  The
+auxiliary registers can be defined in the assembler source code by
+using this directive.  The first parameter is the <var>name</var> of the
+new auxiallry register.  The second parameter is the <var>address</var> of
+the register in the auxiliary register memory map for the variant of
+the ARC.  The third parameter specifies the <var>mode</var> in which the
+register can be operated is and it can be one of:
+
+          <dl>
+<dt><code>r          (readonly)</code><br><dt><code>w          (write only)</code><br><dt><code>r|w        (read or write)</code><dd></dl>
+
+     <p>For example:
+
+     <pre class="smallexample">            .extAuxRegister mulhi,0x12,w
+</pre>
+     <p>This specifies an extension auxiliary register called <em>mulhi</em>
+which is at address 0x12 in the memory space and which is only
+writable.
+
+     <p><a name="index-g_t_0040code_007bextCondCode_007d-directive_002c-ARC-557"></a><br><dt><code>.extCondCode </code><var>suffix</var><code>,</code><var>value</var><dd>The condition codes on the ARCtangent A4 are extensible and can be
+specified by means of this assembler directive.  They are specified
+by the suffix and the value for the condition code.  They can be used to
+specify extra condition codes with any values.  For example:
+
+     <pre class="smallexample">            .extCondCode is_busy,0x14
+          
+             add.is_busy  r1,r2,r3
+             bis_busy     _main
+</pre>
+     <p><a name="index-g_t_0040code_007bextCoreRegister_007d-directive_002c-ARC-558"></a><br><dt><code>.extCoreRegister </code><var>name</var><code>,</code><var>regnum</var><code>,</code><var>mode</var><code>,</code><var>shortcut</var><dd>Specifies an extension core register <var>name</var> for the application. 
+This allows a register <var>name</var> with a valid <var>regnum</var> between 0
+and 60, with the following as valid values for <var>mode</var>
+
+          <dl>
+<dt>&lsquo;<samp><em>r</em><span class="samp">   (readonly)</span></samp>&rsquo;<br><dt>&lsquo;<samp><em>w</em><span class="samp">   (write only)</span></samp>&rsquo;<br><dt>&lsquo;<samp><em>r|w</em><span class="samp"> (read or write)</span></samp>&rsquo;<dd></dl>
+
+     <p>The other parameter gives a description of the register having a
+<var>shortcut</var> in the pipeline.  The valid values are:
+
+          <dl>
+<dt><code>can_shortcut</code><br><dt><code>cannot_shortcut</code><dd></dl>
+
+     <p>For example:
+
+     <pre class="smallexample">            .extCoreRegister mlo,57,r,can_shortcut
+</pre>
+     <p>This defines an extension core register mlo with the value 57 which
+can shortcut the pipeline.
+
+     <p><a name="index-g_t_0040code_007bextInstruction_007d-directive_002c-ARC-559"></a><br><dt><code>.extInstruction </code><var>name</var><code>,</code><var>opcode</var><code>,</code><var>subopcode</var><code>,</code><var>suffixclass</var><code>,</code><var>syntaxclass</var><dd>The ARCtangent A4 allows the user to specify extension instructions. 
+The extension instructions are not macros.  The assembler creates
+encodings for use of these instructions according to the specification
+by the user.  The parameters are:
+
+          <dl>
+<dt>&bull;<var>name</var><dd>Name of the extension instruction
+
+          <br><dt>&bull;<var>opcode</var><dd>Opcode to be used. (Bits 27:31 in the encoding).  Valid values
+0x10-0x1f or 0x03
+
+          <br><dt>&bull;<var>subopcode</var><dd>Subopcode to be used.  Valid values are from 0x09-0x3f.  However the
+correct value also depends on <var>syntaxclass</var>
+
+          <br><dt>&bull;<var>suffixclass</var><dd>Determines the kinds of suffixes to be allowed.  Valid values are
+<code>SUFFIX_NONE</code>, <code>SUFFIX_COND</code>,
+<code>SUFFIX_FLAG</code> which indicates the absence or presence of
+conditional suffixes and flag setting by the extension instruction. 
+It is also possible to specify that an instruction sets the flags and
+is conditional by using <code>SUFFIX_CODE</code> | <code>SUFFIX_FLAG</code>.
+
+          <br><dt>&bull;<var>syntaxclass</var><dd>Determines the syntax class for the instruction.  It can have the
+following values:
+
+               <dl>
+<dt><code>SYNTAX_2OP:</code><dd>2 Operand Instruction
+<br><dt><code>SYNTAX_3OP:</code><dd>3 Operand Instruction
+</dl>
+
+          <p>In addition there could be modifiers for the syntax class as described
+below:
+
+               <ul>
+Syntax Class Modifiers are:
+
+               <li><code>OP1_MUST_BE_IMM</code>:
+Modifies syntax class SYNTAX_3OP,  specifying that the first operand
+of a three-operand instruction must be an immediate (i.e., the result
+is discarded).  OP1_MUST_BE_IMM is used by bitwise ORing it with
+SYNTAX_3OP as given in the example below.  This could usually be used
+to set the flags using specific instructions and not retain results.
+
+               <li><code>OP1_IMM_IMPLIED</code>:
+Modifies syntax class SYNTAX_20P, it specifies that there is an
+implied immediate destination operand which does not appear in the
+syntax.  For example, if the source code contains an instruction like:
+
+               <pre class="smallexample">                    inst r1,r2
+</pre>
+               <p>it really means that the first argument is an implied immediate (that
+is, the result is discarded).  This is the same as though the source
+code were: inst 0,r1,r2.  You use OP1_IMM_IMPLIED by bitwise ORing it
+with SYNTAX_20P.
+
+          </ul>
+          </dl>
+
+     <p>For example, defining 64-bit multiplier with immediate operands:
+
+     <pre class="smallexample">          .extInstruction mp64,0x14,0x0,SUFFIX_COND | SUFFIX_FLAG ,
+                          SYNTAX_3OP|OP1_MUST_BE_IMM
+</pre>
+     <p>The above specifies an extension instruction called mp64 which has 3 operands,
+sets the flags, can be used with a condition code, for which the
+first operand is an immediate.  (Equivalent to discarding the result
+of the operation).
+
+     <pre class="smallexample">           .extInstruction mul64,0x14,0x00,SUFFIX_COND, SYNTAX_2OP|OP1_IMM_IMPLIED
+</pre>
+     <p>This describes a 2 operand instruction with an implicit first
+immediate operand.  The result of this operation would be discarded.
+
+     <p><a name="index-g_t_0040code_007bhalf_007d-directive_002c-ARC-560"></a><br><dt><code>.half </code><var>expressions</var><dd>*TODO*
+
+     <p><a name="index-g_t_0040code_007blong_007d-directive_002c-ARC-561"></a><br><dt><code>.long </code><var>expressions</var><dd>*TODO*
+
+     <p><a name="index-g_t_0040code_007boption_007d-directive_002c-ARC-562"></a><br><dt><code>.option </code><var>arc|arc5|arc6|arc7|arc8</var><dd>The <code>.option</code> directive must be followed by the desired core
+version. Again <code>arc</code> is an alias for
+<code>arc6</code>.
+
+     <p>Note: the <code>.option</code> directive overrides the command line option
+<code>-marc</code>; a warning is emitted when the version is not consistent
+between the two - even for the implicit default core version
+(arc6).
+
+     <p><a name="index-g_t_0040code_007bshort_007d-directive_002c-ARC-563"></a><br><dt><code>.short </code><var>expressions</var><dd>*TODO*
+
+     <p><a name="index-g_t_0040code_007bword_007d-directive_002c-ARC-564"></a><br><dt><code>.word </code><var>expressions</var><dd>*TODO*
+
+   </dl>
+
+   </body></html>
+

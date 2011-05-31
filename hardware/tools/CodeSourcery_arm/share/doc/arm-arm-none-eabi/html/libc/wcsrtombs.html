@@ -1,0 +1,92 @@
+<html lang="en">
+<head>
+<title>wcsrtombs - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdlib.html#Stdlib" title="Stdlib">
+<link rel="prev" href="strtoull.html#strtoull" title="strtoull">
+<link rel="next" href="wcstod.html#wcstod" title="wcstod">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="wcsrtombs"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="wcstod.html#wcstod">wcstod</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="strtoull.html#strtoull">strtoull</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdlib.html#Stdlib">Stdlib</a>
+<hr>
+</div>
+
+<h3 class="section">2.39 <code>wcsrtombs</code>, <code>wcsnrtombs</code>&mdash;convert a wide-character string to a character string</h3>
+
+<p><a name="index-wcsrtombs-90"></a><a name="index-g_t_005fwcsrtombs_005fr-91"></a><a name="index-wcsnrtombs-92"></a><a name="index-g_t_005fwcsnrtombs_005fr-93"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;wchar.h&gt;
+     size_t wcsrtombs(char *<var>dst</var>, const wchar_t **<var>src</var>, size_t <var>len</var>,
+         mbstate_t *<var>ps</var>);
+     
+     #include &lt;wchar.h&gt;
+     size_t _wcsrtombs_r(struct _reent *<var>ptr</var>, char *<var>dst</var>,
+         const wchar_t **<var>src</var>, size_t <var>len</var>,
+         mbstate_t *<var>ps</var>);
+     
+     #include &lt;wchar.h&gt;
+     size_t wcsnrtombs(char *<var>dst</var>, const wchar_t **<var>src</var>,
+         size_t <var>nwc</var>, size_t <var>len</var>, mbstate_t *<var>ps</var>);
+     
+     #include &lt;wchar.h&gt;
+     size_t _wcsnrtombs_r(struct _reent *<var>ptr</var>, char *<var>dst</var>,
+         const wchar_t **<var>src</var>, size_t <var>nwc</var>,
+         size_t <var>len</var>, mbstate_t *<var>ps</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+The <code>wcsrtombs</code> function converts a string of wide characters indirectly
+pointed to by <var>src</var> to a corresponding multibyte character string stored in
+the array pointed to by <var>dst</var>&gt;.  No more than <var>len</var> bytes are written to
+<var>dst</var>&gt;.
+
+   <p>If <var>dst</var>&gt; is NULL, no characters are stored.
+
+   <p>If <var>dst</var>&gt; is not NULL, the pointer pointed to by <var>src</var> is updated to point
+to the character after the one that conversion stopped at.  If conversion
+stops because a null character is encountered, *<var>src</var> is set to NULL.
+
+   <p>The mbstate_t argument, <var>ps</var>, is used to keep track of the shift state.  If
+it is NULL, <code>wcsrtombs</code> uses an internal, static mbstate_t object, which
+is initialized to the initial conversion state at program startup.
+
+   <p>The <code>wcsnrtombs</code> function behaves identically to <code>wcsrtombs</code>, except that
+conversion stops after reading at most <var>nwc</var> characters from the buffer
+pointed to by <var>src</var>.
+
+   <p><br>
+<strong>Returns</strong><br>
+The <code>wcsrtombs</code> and <code>wcsnrtombs</code> functions return the number of bytes
+stored in the array pointed to by <var>dst</var> (not including any terminating
+null), if successful, otherwise it returns (size_t)-1.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>wcsrtombs</code> is defined by C99 standard. 
+<code>wcsnrtombs</code> is defined by the POSIX.1-2008 standard.
+
+   <p><br>
+
+   </body></html>
+

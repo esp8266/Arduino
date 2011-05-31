@@ -1,0 +1,133 @@
+<html lang="en">
+<head>
+<title>Garbage Collection - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Objective_002dC.html#Objective_002dC" title="Objective-C">
+<link rel="prev" href="Type-encoding.html#Type-encoding" title="Type encoding">
+<link rel="next" href="Constant-string-objects.html#Constant-string-objects" title="Constant string objects">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Garbage-Collection"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Constant-string-objects.html#Constant-string-objects">Constant string objects</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Type-encoding.html#Type-encoding">Type encoding</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Objective_002dC.html#Objective_002dC">Objective-C</a>
+<hr>
+</div>
+
+<h3 class="section">8.3 Garbage Collection</h3>
+
+<p>Support for a new memory management policy has been added by using a
+powerful conservative garbage collector, known as the
+Boehm-Demers-Weiser conservative garbage collector.  It is available from
+<a href="http://www.hpl.hp.com/personal/Hans_Boehm/gc/">http://www.hpl.hp.com/personal/Hans_Boehm/gc/</a><!-- /@w -->.
+
+ <p>To enable the support for it you have to configure the compiler using an
+additional argument, <samp><span class="option">--enable-objc-gc</span></samp><!-- /@w -->.  You need to have
+garbage collector installed before building the compiler.  This will
+build an additional runtime library which has several enhancements to
+support the garbage collector.  The new library has a new name,
+<samp><span class="file">libobjc_gc.a</span></samp> to not conflict with the non-garbage-collected
+library.
+
+ <p>When the garbage collector is used, the objects are allocated using the
+so-called typed memory allocation mechanism available in the
+Boehm-Demers-Weiser collector.  This mode requires precise information on
+where pointers are located inside objects.  This information is computed
+once per class, immediately after the class has been initialized.
+
+ <p>There is a new runtime function <code>class_ivar_set_gcinvisible()</code>
+which can be used to declare a so-called <dfn>weak pointer</dfn>
+reference.  Such a pointer is basically hidden for the garbage collector;
+this can be useful in certain situations, especially when you want to
+keep track of the allocated objects, yet allow them to be
+collected.  This kind of pointers can only be members of objects, you
+cannot declare a global pointer as a weak reference.  Every type which is
+a pointer type can be declared a weak pointer, including <code>id</code>,
+<code>Class</code> and <code>SEL</code>.
+
+ <p>Here is an example of how to use this feature.  Suppose you want to
+implement a class whose instances hold a weak pointer reference; the
+following class does this:
+
+<pre class="smallexample">     
+     @interface WeakPointer : Object
+     {
+         const void* weakPointer;
+     }
+     
+     - initWithPointer:(const void*)p;
+     - (const void*)weakPointer;
+     @end
+     
+     
+     @implementation WeakPointer
+     
+     + (void)initialize
+     {
+       class_ivar_set_gcinvisible (self, "weakPointer", YES);
+     }
+     
+     - initWithPointer:(const void*)p
+     {
+       weakPointer = p;
+       return self;
+     }
+     
+     - (const void*)weakPointer
+     {
+       return weakPointer;
+     }
+     
+     @end
+     
+</pre>
+ <p>Weak pointers are supported through a new type character specifier
+represented by the &lsquo;<samp><span class="samp">!</span></samp>&rsquo; character.  The
+<code>class_ivar_set_gcinvisible()</code> function adds or removes this
+specifier to the string type description of the instance variable named
+as argument.
+
+<!-- ========================================================================= -->
+ </body></html>
+

@@ -1,0 +1,121 @@
+<html lang="en">
+<head>
+<title>Returning - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Altering.html#Altering" title="Altering">
+<link rel="prev" href="Signaling.html#Signaling" title="Signaling">
+<link rel="next" href="Calling.html#Calling" title="Calling">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Returning"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Calling.html#Calling">Calling</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Signaling.html#Signaling">Signaling</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Altering.html#Altering">Altering</a>
+<hr>
+</div>
+
+<h3 class="section">17.4 Returning from a Function</h3>
+
+     
+<a name="index-returning-from-a-function-931"></a>
+<a name="index-return-932"></a>
+<dl><dt><code>return</code><dt><code>return </code><var>expression</var><dd>You can cancel execution of a function call with the <code>return</code>
+command.  If you give an
+<var>expression</var> argument, its value is used as the function's return
+value. 
+</dl>
+
+   <p>When you use <code>return</code>, <span class="sc">gdb</span> discards the selected stack frame
+(and all frames within it).  You can think of this as making the
+discarded frame return prematurely.  If you wish to specify a value to
+be returned, give that value as the argument to <code>return</code>.
+
+   <p>This pops the selected stack frame (see <a href="Selection.html#Selection">Selecting a Frame</a>), and any other frames inside of it, leaving its caller as the
+innermost remaining frame.  That frame becomes selected.  The
+specified value is stored in the registers used for returning values
+of functions.
+
+   <p>The <code>return</code> command does not resume execution; it leaves the
+program stopped in the state that would exist if the function had just
+returned.  In contrast, the <code>finish</code> command (see <a href="Continuing-and-Stepping.html#Continuing-and-Stepping">Continuing and Stepping</a>) resumes execution until the
+selected stack frame returns naturally.
+
+   <p><span class="sc">gdb</span> needs to know how the <var>expression</var> argument should be set for
+the inferior.  The concrete registers assignment depends on the OS ABI and the
+type being returned by the selected stack frame.  For example it is common for
+OS ABI to return floating point values in FPU registers while integer values in
+CPU registers.  Still some ABIs return even floating point values in CPU
+registers.  Larger integer widths (such as <code>long long int</code>) also have
+specific placement rules.  <span class="sc">gdb</span> already knows the OS ABI from its
+current target so it needs to find out also the type being returned to make the
+assignment into the right register(s).
+
+   <p>Normally, the selected stack frame has debug info.  <span class="sc">gdb</span> will always
+use the debug info instead of the implicit type of <var>expression</var> when the
+debug info is available.  For example, if you type <kbd>return -1</kbd>, and the
+function in the current stack frame is declared to return a <code>long long
+int</code>, <span class="sc">gdb</span> transparently converts the implicit <code>int</code> value of -1
+into a <code>long long int</code>:
+
+<pre class="smallexample">     Breakpoint 1, func () at gdb.base/return-nodebug.c:29
+     29        return 31;
+     (gdb) return -1
+     Make func return now? (y or n) y
+     #0  0x004004f6 in main () at gdb.base/return-nodebug.c:43
+     43        printf ("result=%lld\n", func ());
+     (gdb)
+</pre>
+   <p>However, if the selected stack frame does not have a debug info, e.g., if the
+function was compiled without debug info, <span class="sc">gdb</span> has to find out the type
+to return from user.  Specifying a different type by mistake may set the value
+in different inferior registers than the caller code expects.  For example,
+typing <kbd>return -1</kbd> with its implicit type <code>int</code> would set only a part
+of a <code>long long int</code> result for a debug info less function (on 32-bit
+architectures).  Therefore the user is required to specify the return type by
+an appropriate cast explicitly:
+
+<pre class="smallexample">     Breakpoint 2, 0x0040050b in func ()
+     (gdb) return -1
+     Return value type not available for selected stack frame.
+     Please use an explicit cast of the value to return.
+     (gdb) return (long long int) -1
+     Make selected stack frame return now? (y or n) y
+     #0  0x00400526 in main ()
+     (gdb)
+</pre>
+   </body></html>
+

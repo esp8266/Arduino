@@ -1,0 +1,117 @@
+<html lang="en">
+<head>
+<title>AVR Options - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="AVR_002dDependent.html#AVR_002dDependent" title="AVR-Dependent">
+<link rel="next" href="AVR-Syntax.html#AVR-Syntax" title="AVR Syntax">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="AVR-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="AVR-Syntax.html#AVR-Syntax">AVR Syntax</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="AVR_002dDependent.html#AVR_002dDependent">AVR-Dependent</a>
+<hr>
+</div>
+
+<h4 class="subsection">9.4.1 Options</h4>
+
+<p><a name="index-AVR-options-_0028none_0029-662"></a><a name="index-options-for-AVR-_0028none_0029-663"></a>
+     
+<a name="index-g_t_0040code_007b_002dmmcu_003d_007d-command-line-option_002c-AVR-664"></a>
+<dl><dt><code>-mmcu=</code><var>mcu</var><dd>Specify ATMEL AVR instruction set or MCU type.
+
+     <p>Instruction set avr1 is for the minimal AVR core, not supported by the C
+compiler, only for assembler programs (MCU types: at90s1200,
+attiny11, attiny12, attiny15, attiny28).
+
+     <p>Instruction set avr2 (default) is for the classic AVR core with up to
+8K program memory space (MCU types: at90s2313, at90s2323, at90s2333, at90s2343,
+attiny22, attiny26, at90s4414, at90s4433, at90s4434, at90s8515, at90c8534,
+at90s8535).
+
+     <p>Instruction set avr25 is for the classic AVR core with up to 8K program memory
+space plus the MOVW instruction (MCU types: attiny13, attiny13a, attiny2313,
+attiny2313a, attiny24, attiny24a, attiny4313, attiny44, attiny44a, attiny84,
+attiny84a, attiny25, attiny45, attiny85, attiny261, attiny261a, attiny461,
+attiny461a, attiny861, attiny861a, attiny87, attiny43u, attiny48, attiny88,
+at86rf401, ata6289).
+
+     <p>Instruction set avr3 is for the classic AVR core with up to 128K program
+memory space (MCU types: at43usb355, at76c711).
+
+     <p>Instruction set avr31 is for the classic AVR core with exactly 128K program
+memory space (MCU types: atmega103, at43usb320).
+
+     <p>Instruction set avr35 is for classic AVR core plus MOVW, CALL, and JMP
+instructions (MCU types: attiny167, at90usb82, at90usb162, atmega8u2,
+atmega16u2, atmega32u2).
+
+     <p>Instruction set avr4 is for the enhanced AVR core with up to 8K program
+memory space (MCU types: atmega48, atmega48a, atmega48p, atmega8, atmega88,
+atmega88a, atmega88p, atmega88pa, atmega8515, atmega8535, atmega8hva, at90pwm1,
+at90pwm2, at90pwm2b, at90pwm3, at90pwm3b, at90pwm81).
+
+     <p>Instruction set avr5 is for the enhanced AVR core with up to 128K program
+memory space (MCU types: atmega16, atmega16a, atmega161, atmega162, atmega163,
+atmega164a, atmega164p, atmega165, atmega165a, atmega165p, atmega168,
+atmega168a, atmega168p, atmega169, atmega169a, atmega169p, atmega169pa,
+atmega32, atmega323, atmega324a, atmega324p, atmega325, atmega325a, atmega325p,
+atmega3250, atmega3250a, atmega3250p, atmega328, atmega328p, atmega329,
+atmega329a, atmega329p, atmega329pa, atmega3290, atmega3290a, atmega3290p,
+atmega406, atmega64, atmega640, atmega644, atmega644a, atmega644p, atmega644pa,
+atmega645, atmega645a, atmega645p, atmega6450, atmega6450a, atmega6450p,
+atmega649, atmega649a, atmega649p, atmega6490, atmega6490a, atmega6490p,
+atmega16hva, atmega16hva2, atmega16hvb, atmega32hvb, atmega64hve, at90can32,
+at90can64, at90pwm216, at90pwm316, atmega32c1, atmega64c1, atmega16m1,
+atmega32m1, atmega64m1, atmega16u4, atmega32u4, atmega32u6, at90usb646,
+at90usb647, at94k, at90scr100).
+
+     <p>Instruction set avr51 is for the enhanced AVR core with exactly 128K program
+memory space (MCU types: atmega128, atmega1280, atmega1281, atmega1284p,
+atmega128rfa1, at90can128, at90usb1286, at90usb1287, m3000).
+
+     <p>Instruction set avr6 is for the enhanced AVR core with a 3-byte PC (MCU types:
+atmega2560, atmega2561).
+
+     <p><a name="index-g_t_0040code_007b_002dmall_002dopcodes_007d-command-line-option_002c-AVR-665"></a><br><dt><code>-mall-opcodes</code><dd>Accept all AVR opcodes, even if not supported by <code>-mmcu</code>.
+
+     <p><a name="index-g_t_0040code_007b_002dmno_002dskip_002dbug_007d-command-line-option_002c-AVR-666"></a><br><dt><code>-mno-skip-bug</code><dd>This option disable warnings for skipping two-word instructions.
+
+     <p><a name="index-g_t_0040code_007b_002dmno_002dwrap_007d-command-line-option_002c-AVR-667"></a><br><dt><code>-mno-wrap</code><dd>This option reject <code>rjmp/rcall</code> instructions with 8K wrap-around.
+
+   </dl>
+
+   </body></html>
+

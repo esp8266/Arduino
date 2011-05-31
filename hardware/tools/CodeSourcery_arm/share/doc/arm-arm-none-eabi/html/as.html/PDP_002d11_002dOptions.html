@@ -1,0 +1,204 @@
+<html lang="en">
+<head>
+<title>PDP-11-Options - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="PDP_002d11_002dDependent.html#PDP_002d11_002dDependent" title="PDP-11-Dependent">
+<link rel="next" href="PDP_002d11_002dPseudos.html#PDP_002d11_002dPseudos" title="PDP-11-Pseudos">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="PDP-11-Options"></a>
+<a name="PDP_002d11_002dOptions"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="PDP_002d11_002dPseudos.html#PDP_002d11_002dPseudos">PDP-11-Pseudos</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="PDP_002d11_002dDependent.html#PDP_002d11_002dDependent">PDP-11-Dependent</a>
+<hr>
+</div>
+
+<h4 class="subsection">9.27.1 Options</h4>
+
+<p><a name="index-options-for-PDP_002d11-1407"></a>
+The PDP-11 version of <code>as</code> has a rich set of machine
+dependent options.
+
+<h5 class="subsubsection">9.27.1.1 Code Generation Options</h5>
+
+     
+<a name="index-g_t_002dmpic-1408"></a>
+<a name="index-g_t_002dmno_002dpic-1409"></a>
+<dl><dt><code>-mpic | -mno-pic</code><dd>Generate position-independent (or position-dependent) code.
+
+     <p>The default is to generate position-independent code. 
+</dl>
+
+<h5 class="subsubsection">9.27.1.2 Instruction Set Extension Options</h5>
+
+<p>These options enables or disables the use of extensions over the base
+line instruction set as introduced by the first PDP-11 CPU: the KA11. 
+Most options come in two variants: a <code>-m</code><var>extension</var> that
+enables <var>extension</var>, and a <code>-mno-</code><var>extension</var> that disables
+<var>extension</var>.
+
+   <p>The default is to enable all extensions.
+
+     
+<a name="index-g_t_002dmall-1410"></a>
+<a name="index-g_t_002dmall_002dextensions-1411"></a>
+<dl><dt><code>-mall | -mall-extensions</code><dd>Enable all instruction set extensions.
+
+     <p><a name="index-g_t_002dmno_002dextensions-1412"></a><br><dt><code>-mno-extensions</code><dd>Disable all instruction set extensions.
+
+     <p><a name="index-g_t_002dmcis-1413"></a><a name="index-g_t_002dmno_002dcis-1414"></a><br><dt><code>-mcis | -mno-cis</code><dd>Enable (or disable) the use of the commercial instruction set, which
+consists of these instructions: <code>ADDNI</code>, <code>ADDN</code>, <code>ADDPI</code>,
+<code>ADDP</code>, <code>ASHNI</code>, <code>ASHN</code>, <code>ASHPI</code>, <code>ASHP</code>,
+<code>CMPCI</code>, <code>CMPC</code>, <code>CMPNI</code>, <code>CMPN</code>, <code>CMPPI</code>,
+<code>CMPP</code>, <code>CVTLNI</code>, <code>CVTLN</code>, <code>CVTLPI</code>, <code>CVTLP</code>,
+<code>CVTNLI</code>, <code>CVTNL</code>, <code>CVTNPI</code>, <code>CVTNP</code>, <code>CVTPLI</code>,
+<code>CVTPL</code>, <code>CVTPNI</code>, <code>CVTPN</code>, <code>DIVPI</code>, <code>DIVP</code>,
+<code>L2DR</code>, <code>L3DR</code>, <code>LOCCI</code>, <code>LOCC</code>, <code>MATCI</code>,
+<code>MATC</code>, <code>MOVCI</code>, <code>MOVC</code>, <code>MOVRCI</code>, <code>MOVRC</code>,
+<code>MOVTCI</code>, <code>MOVTC</code>, <code>MULPI</code>, <code>MULP</code>, <code>SCANCI</code>,
+<code>SCANC</code>, <code>SKPCI</code>, <code>SKPC</code>, <code>SPANCI</code>, <code>SPANC</code>,
+<code>SUBNI</code>, <code>SUBN</code>, <code>SUBPI</code>, and <code>SUBP</code>.
+
+     <p><a name="index-g_t_002dmcsm-1415"></a><a name="index-g_t_002dmno_002dcsm-1416"></a><br><dt><code>-mcsm | -mno-csm</code><dd>Enable (or disable) the use of the <code>CSM</code> instruction.
+
+     <p><a name="index-g_t_002dmeis-1417"></a><a name="index-g_t_002dmno_002deis-1418"></a><br><dt><code>-meis | -mno-eis</code><dd>Enable (or disable) the use of the extended instruction set, which
+consists of these instructions: <code>ASHC</code>, <code>ASH</code>, <code>DIV</code>,
+<code>MARK</code>, <code>MUL</code>, <code>RTT</code>, <code>SOB</code> <code>SXT</code>, and
+<code>XOR</code>.
+
+     <p><a name="index-g_t_002dmfis-1419"></a><a name="index-g_t_002dmno_002dfis-1420"></a><a name="index-g_t_002dmkev11-1421"></a><a name="index-g_t_002dmkev11-1422"></a><a name="index-g_t_002dmno_002dkev11-1423"></a><br><dt><code>-mfis | -mkev11</code><dt><code>-mno-fis | -mno-kev11</code><dd>Enable (or disable) the use of the KEV11 floating-point instructions:
+<code>FADD</code>, <code>FDIV</code>, <code>FMUL</code>, and <code>FSUB</code>.
+
+     <p><a name="index-g_t_002dmfpp-1424"></a><a name="index-g_t_002dmno_002dfpp-1425"></a><a name="index-g_t_002dmfpu-1426"></a><a name="index-g_t_002dmno_002dfpu-1427"></a><a name="index-g_t_002dmfp_002d11-1428"></a><a name="index-g_t_002dmno_002dfp_002d11-1429"></a><br><dt><code>-mfpp | -mfpu | -mfp-11</code><dt><code>-mno-fpp | -mno-fpu | -mno-fp-11</code><dd>Enable (or disable) the use of FP-11 floating-point instructions:
+<code>ABSF</code>, <code>ADDF</code>, <code>CFCC</code>, <code>CLRF</code>, <code>CMPF</code>,
+<code>DIVF</code>, <code>LDCFF</code>, <code>LDCIF</code>, <code>LDEXP</code>, <code>LDF</code>,
+<code>LDFPS</code>, <code>MODF</code>, <code>MULF</code>, <code>NEGF</code>, <code>SETD</code>,
+<code>SETF</code>, <code>SETI</code>, <code>SETL</code>, <code>STCFF</code>, <code>STCFI</code>,
+<code>STEXP</code>, <code>STF</code>, <code>STFPS</code>, <code>STST</code>, <code>SUBF</code>, and
+<code>TSTF</code>.
+
+     <p><a name="index-g_t_002dmlimited_002deis-1430"></a><a name="index-g_t_002dmno_002dlimited_002deis-1431"></a><br><dt><code>-mlimited-eis | -mno-limited-eis</code><dd>Enable (or disable) the use of the limited extended instruction set:
+<code>MARK</code>, <code>RTT</code>, <code>SOB</code>, <code>SXT</code>, and <code>XOR</code>.
+
+     <p>The -mno-limited-eis options also implies -mno-eis.
+
+     <p><a name="index-g_t_002dmmfpt-1432"></a><a name="index-g_t_002dmno_002dmfpt-1433"></a><br><dt><code>-mmfpt | -mno-mfpt</code><dd>Enable (or disable) the use of the <code>MFPT</code> instruction.
+
+     <p><a name="index-g_t_002dmmutiproc-1434"></a><a name="index-g_t_002dmno_002dmutiproc-1435"></a><br><dt><code>-mmultiproc | -mno-multiproc</code><dd>Enable (or disable) the use of multiprocessor instructions: <code>TSTSET</code> and
+<code>WRTLCK</code>.
+
+     <p><a name="index-g_t_002dmmxps-1436"></a><a name="index-g_t_002dmno_002dmxps-1437"></a><br><dt><code>-mmxps | -mno-mxps</code><dd>Enable (or disable) the use of the <code>MFPS</code> and <code>MTPS</code> instructions.
+
+     <p><a name="index-g_t_002dmspl-1438"></a><a name="index-g_t_002dmno_002dspl-1439"></a><br><dt><code>-mspl | -mno-spl</code><dd>Enable (or disable) the use of the <code>SPL</code> instruction.
+
+     <p><a name="index-g_t_002dmmicrocode-1440"></a><a name="index-g_t_002dmno_002dmicrocode-1441"></a>Enable (or disable) the use of the microcode instructions: <code>LDUB</code>,
+<code>MED</code>, and <code>XFC</code>. 
+</dl>
+
+<h5 class="subsubsection">9.27.1.3 CPU Model Options</h5>
+
+<p>These options enable the instruction set extensions supported by a
+particular CPU, and disables all other extensions.
+
+     
+<a name="index-g_t_002dmka11-1442"></a>
+<dl><dt><code>-mka11</code><dd>KA11 CPU.  Base line instruction set only.
+
+     <p><a name="index-g_t_002dmkb11-1443"></a><br><dt><code>-mkb11</code><dd>KB11 CPU.  Enable extended instruction set and <code>SPL</code>.
+
+     <p><a name="index-g_t_002dmkd11a-1444"></a><br><dt><code>-mkd11a</code><dd>KD11-A CPU.  Enable limited extended instruction set.
+
+     <p><a name="index-g_t_002dmkd11b-1445"></a><br><dt><code>-mkd11b</code><dd>KD11-B CPU.  Base line instruction set only.
+
+     <p><a name="index-g_t_002dmkd11d-1446"></a><br><dt><code>-mkd11d</code><dd>KD11-D CPU.  Base line instruction set only.
+
+     <p><a name="index-g_t_002dmkd11e-1447"></a><br><dt><code>-mkd11e</code><dd>KD11-E CPU.  Enable extended instruction set, <code>MFPS</code>, and <code>MTPS</code>.
+
+     <p><a name="index-g_t_002dmkd11f-1448"></a><a name="index-g_t_002dmkd11h-1449"></a><a name="index-g_t_002dmkd11q-1450"></a><br><dt><code>-mkd11f | -mkd11h | -mkd11q</code><dd>KD11-F, KD11-H, or KD11-Q CPU.  Enable limited extended instruction set,
+<code>MFPS</code>, and <code>MTPS</code>.
+
+     <p><a name="index-g_t_002dmkd11k-1451"></a><br><dt><code>-mkd11k</code><dd>KD11-K CPU.  Enable extended instruction set, <code>LDUB</code>, <code>MED</code>,
+<code>MFPS</code>, <code>MFPT</code>, <code>MTPS</code>, and <code>XFC</code>.
+
+     <p><a name="index-g_t_002dmkd11z-1452"></a><br><dt><code>-mkd11z</code><dd>KD11-Z CPU.  Enable extended instruction set, <code>CSM</code>, <code>MFPS</code>,
+<code>MFPT</code>, <code>MTPS</code>, and <code>SPL</code>.
+
+     <p><a name="index-g_t_002dmf11-1453"></a><br><dt><code>-mf11</code><dd>F11 CPU.  Enable extended instruction set, <code>MFPS</code>, <code>MFPT</code>, and
+<code>MTPS</code>.
+
+     <p><a name="index-g_t_002dmj11-1454"></a><br><dt><code>-mj11</code><dd>J11 CPU.  Enable extended instruction set, <code>CSM</code>, <code>MFPS</code>,
+<code>MFPT</code>, <code>MTPS</code>, <code>SPL</code>, <code>TSTSET</code>, and <code>WRTLCK</code>.
+
+     <p><a name="index-g_t_002dmt11-1455"></a><br><dt><code>-mt11</code><dd>T11 CPU.  Enable limited extended instruction set, <code>MFPS</code>, and
+<code>MTPS</code>. 
+</dl>
+
+<h5 class="subsubsection">9.27.1.4 Machine Model Options</h5>
+
+<p>These options enable the instruction set extensions supported by a
+particular machine model, and disables all other extensions.
+
+     
+<a name="index-g_t_002dm11_002f03-1456"></a>
+<dl><dt><code>-m11/03</code><dd>Same as <code>-mkd11f</code>.
+
+     <p><a name="index-g_t_002dm11_002f04-1457"></a><br><dt><code>-m11/04</code><dd>Same as <code>-mkd11d</code>.
+
+     <p><a name="index-g_t_002dm11_002f05-1458"></a><a name="index-g_t_002dm11_002f10-1459"></a><br><dt><code>-m11/05 | -m11/10</code><dd>Same as <code>-mkd11b</code>.
+
+     <p><a name="index-g_t_002dm11_002f15-1460"></a><a name="index-g_t_002dm11_002f20-1461"></a><br><dt><code>-m11/15 | -m11/20</code><dd>Same as <code>-mka11</code>.
+
+     <p><a name="index-g_t_002dm11_002f21-1462"></a><br><dt><code>-m11/21</code><dd>Same as <code>-mt11</code>.
+
+     <p><a name="index-g_t_002dm11_002f23-1463"></a><a name="index-g_t_002dm11_002f24-1464"></a><br><dt><code>-m11/23 | -m11/24</code><dd>Same as <code>-mf11</code>.
+
+     <p><a name="index-g_t_002dm11_002f34-1465"></a><br><dt><code>-m11/34</code><dd>Same as <code>-mkd11e</code>.
+
+     <p><a name="index-g_t_002dm11_002f34a-1466"></a><br><dt><code>-m11/34a</code><dd>Ame as <code>-mkd11e</code> <code>-mfpp</code>.
+
+     <p><a name="index-g_t_002dm11_002f35-1467"></a><a name="index-g_t_002dm11_002f40-1468"></a><br><dt><code>-m11/35 | -m11/40</code><dd>Same as <code>-mkd11a</code>.
+
+     <p><a name="index-g_t_002dm11_002f44-1469"></a><br><dt><code>-m11/44</code><dd>Same as <code>-mkd11z</code>.
+
+     <p><a name="index-g_t_002dm11_002f45-1470"></a><a name="index-g_t_002dm11_002f50-1471"></a><a name="index-g_t_002dm11_002f55-1472"></a><a name="index-g_t_002dm11_002f70-1473"></a><br><dt><code>-m11/45 | -m11/50 | -m11/55 | -m11/70</code><dd>Same as <code>-mkb11</code>.
+
+     <p><a name="index-g_t_002dm11_002f53-1474"></a><a name="index-g_t_002dm11_002f73-1475"></a><a name="index-g_t_002dm11_002f83-1476"></a><a name="index-g_t_002dm11_002f84-1477"></a><a name="index-g_t_002dm11_002f93-1478"></a><a name="index-g_t_002dm11_002f94-1479"></a><br><dt><code>-m11/53 | -m11/73 | -m11/83 | -m11/84 | -m11/93 | -m11/94</code><dd>Same as <code>-mj11</code>.
+
+     <p><a name="index-g_t_002dm11_002f60-1480"></a><br><dt><code>-m11/60</code><dd>Same as <code>-mkd11k</code>. 
+</dl>
+
+   </body></html>
+

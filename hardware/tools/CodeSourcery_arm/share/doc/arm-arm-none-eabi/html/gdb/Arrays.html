@@ -1,0 +1,109 @@
+<html lang="en">
+<head>
+<title>Arrays - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Data.html#Data" title="Data">
+<link rel="prev" href="Variables.html#Variables" title="Variables">
+<link rel="next" href="Output-Formats.html#Output-Formats" title="Output Formats">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Arrays"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Output-Formats.html#Output-Formats">Output Formats</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Variables.html#Variables">Variables</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Data.html#Data">Data</a>
+<hr>
+</div>
+
+<h3 class="section">10.4 Artificial Arrays</h3>
+
+<p><a name="index-artificial-array-514"></a><a name="index-arrays-515"></a><a name="index-g_t_0040_0040_0040r_007b_002c-referencing-memory-as-an-array_007d-516"></a>It is often useful to print out several successive objects of the
+same type in memory; a section of an array, or an array of
+dynamically determined size for which only a pointer exists in the
+program.
+
+   <p>You can do this by referring to a contiguous span of memory as an
+<dfn>artificial array</dfn>, using the binary operator &lsquo;<samp><span class="samp">@</span></samp>&rsquo;.  The left
+operand of &lsquo;<samp><span class="samp">@</span></samp>&rsquo; should be the first element of the desired array
+and be an individual object.  The right operand should be the desired length
+of the array.  The result is an array value whose elements are all of
+the type of the left argument.  The first element is actually the left
+argument; the second element comes from bytes of memory immediately
+following those that hold the first element, and so on.  Here is an
+example.  If a program says
+
+<pre class="smallexample">     int *array = (int *) malloc (len * sizeof (int));
+</pre>
+   <p class="noindent">you can print the contents of <code>array</code> with
+
+<pre class="smallexample">     p *array@len
+</pre>
+   <p>The left operand of &lsquo;<samp><span class="samp">@</span></samp>&rsquo; must reside in memory.  Array values made
+with &lsquo;<samp><span class="samp">@</span></samp>&rsquo; in this way behave just like other arrays in terms of
+subscripting, and are coerced to pointers when used in expressions. 
+Artificial arrays most often appear in expressions via the value history
+(see <a href="Value-History.html#Value-History">Value History</a>), after printing one out.
+
+   <p>Another way to create an artificial array is to use a cast. 
+This re-interprets a value as if it were an array. 
+The value need not be in memory:
+<pre class="smallexample">     (gdb) p/x (short[2])0x12345678
+     $1 = {0x1234, 0x5678}
+</pre>
+   <p>As a convenience, if you leave the array length out (as in
+&lsquo;<samp><span class="samp">(</span><var>type</var><span class="samp">[])</span><var>value</var></samp>&rsquo;) <span class="sc">gdb</span> calculates the size to fill
+the value (as &lsquo;<samp><span class="samp">sizeof(</span><var>value</var><span class="samp">)/sizeof(</span><var>type</var><span class="samp">)</span></samp>&rsquo;:
+<pre class="smallexample">     (gdb) p/x (short[])0x12345678
+     $2 = {0x1234, 0x5678}
+</pre>
+   <p>Sometimes the artificial array mechanism is not quite enough; in
+moderately complex data structures, the elements of interest may not
+actually be adjacent&mdash;for example, if you are interested in the values
+of pointers in an array.  One useful work-around in this situation is
+to use a convenience variable (see <a href="Convenience-Vars.html#Convenience-Vars">Convenience Variables</a>) as a counter in an expression that prints the first
+interesting value, and then repeat that expression via &lt;RET&gt;.  For
+instance, suppose you have an array <code>dtab</code> of pointers to
+structures, and you are interested in the values of a field <code>fv</code>
+in each structure.  Here is an example of what you might type:
+
+<pre class="smallexample">     set $i = 0
+     p dtab[$i++]-&gt;fv
+     &lt;RET&gt;
+     &lt;RET&gt;
+     ...
+</pre>
+   </body></html>
+

@@ -1,0 +1,101 @@
+<html lang="en">
+<head>
+<title>SPU ELF - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Machine-Dependent.html#Machine-Dependent" title="Machine Dependent">
+<link rel="prev" href="PowerPC64-ELF64.html#PowerPC64-ELF64" title="PowerPC64 ELF64">
+<link rel="next" href="TI-COFF.html#TI-COFF" title="TI COFF">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="SPU-ELF"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="TI-COFF.html#TI-COFF">TI COFF</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="PowerPC64-ELF64.html#PowerPC64-ELF64">PowerPC64 ELF64</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Machine-Dependent.html#Machine-Dependent">Machine Dependent</a>
+<hr>
+</div>
+
+<h3 class="section">4.11 <samp><span class="command">ld</span></samp> and SPU ELF Support</h3>
+
+<p><a name="index-SPU-ELF-options-644"></a>
+     
+<a name="index-SPU-plugins-645"></a>
+<a name="index-g_t_002d_002dplugin-646"></a>
+<dl><dt><samp><span class="option">--plugin</span></samp><dd>This option marks an executable as a PIC plugin module.
+
+     <p><a name="index-SPU-overlays-647"></a><a name="index-g_t_002d_002dno_002doverlays-648"></a><br><dt><samp><span class="option">--no-overlays</span></samp><dd>Normally, <samp><span class="command">ld</span></samp> recognizes calls to functions within overlay
+regions, and redirects such calls to an overlay manager via a stub. 
+<samp><span class="command">ld</span></samp> also provides a built-in overlay manager.  This option
+turns off all this special overlay handling.
+
+     <p><a name="index-SPU-overlay-stub-symbols-649"></a><a name="index-g_t_002d_002demit_002dstub_002dsyms-650"></a><br><dt><samp><span class="option">--emit-stub-syms</span></samp><dd>This option causes <samp><span class="command">ld</span></samp> to label overlay stubs with a local
+symbol that encodes the stub type and destination.
+
+     <p><a name="index-SPU-extra-overlay-stubs-651"></a><a name="index-g_t_002d_002dextra_002doverlay_002dstubs-652"></a><br><dt><samp><span class="option">--extra-overlay-stubs</span></samp><dd>This option causes <samp><span class="command">ld</span></samp> to add overlay call stubs on all
+function calls out of overlay regions.  Normally stubs are not added
+on calls to non-overlay regions.
+
+     <p><a name="index-SPU-local-store-size-653"></a><a name="index-g_t_002d_002dlocal_002dstore_003dlo_003ahi-654"></a><br><dt><samp><span class="option">--local-store=lo:hi</span></samp><dd><samp><span class="command">ld</span></samp> usually checks that a final executable for SPU fits in
+the address range 0 to 256k.  This option may be used to change the
+range.  Disable the check entirely with <samp><span class="option">--local-store=0:0</span></samp>.
+
+     <p><a name="index-SPU-655"></a><a name="index-g_t_002d_002dstack_002danalysis-656"></a><br><dt><samp><span class="option">--stack-analysis</span></samp><dd>SPU local store space is limited.  Over-allocation of stack space
+unnecessarily limits space available for code and data, while
+under-allocation results in runtime failures.  If given this option,
+<samp><span class="command">ld</span></samp> will provide an estimate of maximum stack usage. 
+<samp><span class="command">ld</span></samp> does this by examining symbols in code sections to
+determine the extents of functions, and looking at function prologues
+for stack adjusting instructions.  A call-graph is created by looking
+for relocations on branch instructions.  The graph is then searched
+for the maximum stack usage path.  Note that this analysis does not
+find calls made via function pointers, and does not handle recursion
+and other cycles in the call graph.  Stack usage may be
+under-estimated if your code makes such calls.  Also, stack usage for
+dynamic allocation, e.g. alloca, will not be detected.  If a link map
+is requested, detailed information about each function's stack usage
+and calls will be given.
+
+     <p><a name="index-SPU-657"></a><a name="index-g_t_002d_002demit_002dstack_002dsyms-658"></a><br><dt><samp><span class="option">--emit-stack-syms</span></samp><dd>This option, if given along with <samp><span class="option">--stack-analysis</span></samp> will result
+in <samp><span class="command">ld</span></samp> emitting stack sizing symbols for each function. 
+These take the form <code>__stack_&lt;function_name&gt;</code> for global
+functions, and <code>__stack_&lt;number&gt;_&lt;function_name&gt;</code> for static
+functions.  <code>&lt;number&gt;</code> is the section id in hex.  The value of
+such symbols is the stack requirement for the corresponding function. 
+The symbol size will be zero, type <code>STT_NOTYPE</code>, binding
+<code>STB_LOCAL</code>, and section <code>SHN_ABS</code>. 
+</dl>
+
+   </body></html>
+

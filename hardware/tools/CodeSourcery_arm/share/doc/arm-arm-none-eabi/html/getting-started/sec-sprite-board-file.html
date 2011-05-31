@@ -1,0 +1,186 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>6.10. Board File Syntax</title><link rel="stylesheet" href="cs.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.74.0"><link rel="home" href="index.html" title="Sourcery G++ Lite"><link rel="up" href="sprite.html" title="Chapter 6. Sourcery G++ Debug Sprite"><link rel="prev" href="sec-sprite-supported-boards.html" title="6.9. Supported Board Files"><link rel="next" href="chap-next-steps.html" title="Chapter 7. Next Steps with Sourcery G++"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">6.10. Board File Syntax</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="sec-sprite-supported-boards.html">Prev</a> </td><th width="60%" align="center">Chapter 6. Sourcery G++ Debug Sprite</th><td width="20%" align="right"> <a accesskey="n" href="chap-next-steps.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec-sprite-board-file"></a>6.10. Board File Syntax</h2></div></div></div><p>The <em class="replaceable"><code>board-file</code></em> can be a
+    user-written XML file to describe a non-standard board.  The
+    Sourcery G++ Debug Sprite searches for board files in the
+    <code class="filename">arm-none-eabi/lib/boards</code> directory in the
+    installation.  Refer to the files in that directory for
+    examples.</p><p>The file's DTD is:
+
+    </p><pre class="programlisting">&lt;!-- Board description files
+
+     Copyright (c) 2007-2009 CodeSourcery, Inc.
+
+     THIS FILE CONTAINS PROPRIETARY, CONFIDENTIAL, AND TRADE
+     SECRET INFORMATION OF CODESOURCERY AND/OR ITS LICENSORS.
+
+     You may not use or distribute this file without the express
+     written permission of CodeSourcery or its authorized
+     distributor.  This file is licensed only for use with 
+     Sourcery G++.  No other use is permitted.
+     --&gt;
+
+&lt;!ELEMENT board
+	(properties?, feature?, initialize?, memory-map?)&gt;
+
+&lt;!ELEMENT properties
+	(description?, property*)&gt;
+
+&lt;!ELEMENT initialize
+	(write-register | write-memory | delay
+	 | wait-until-memory-equal | wait-until-memory-not-equal)* &gt;
+&lt;!ELEMENT write-register EMPTY&gt;
+&lt;!ATTLIST write-register
+		        address CDATA   #REQUIRED
+                        value   CDATA   #REQUIRED
+                        bits    CDATA   #IMPLIED&gt;
+&lt;!ELEMENT write-memory EMPTY&gt;
+&lt;!ATTLIST write-memory
+		        address CDATA   #REQUIRED
+                        value   CDATA   #REQUIRED
+                        bits    CDATA   #IMPLIED&gt;
+&lt;!ELEMENT delay EMPTY&gt;
+&lt;!ATTLIST delay
+		        time CDATA   #REQUIRED&gt;
+&lt;!ELEMENT wait-until-memory-equal EMPTY&gt;
+&lt;!ATTLIST wait-until-memory-equal
+		        address CDATA   #REQUIRED
+                        value   CDATA   #REQUIRED
+                        timeout CDATA   #IMPLIED
+                        bits    CDATA   #IMPLIED&gt;
+&lt;!ELEMENT wait-until-memory-not-equal EMPTY&gt;
+&lt;!ATTLIST wait-until-memory-not-equal
+		        address CDATA   #REQUIRED
+                        value   CDATA   #REQUIRED
+                        timeout CDATA   #IMPLIED
+                        bits    CDATA   #IMPLIED&gt;
+
+&lt;!ELEMENT memory-map (memory-device)*&gt;
+&lt;!ELEMENT memory-device (property*, description?, sectors*)&gt;
+&lt;!ATTLIST memory-device
+                        address CDATA   #REQUIRED
+		        size    CDATA   #REQUIRED
+		        type    CDATA   #REQUIRED
+                        device  CDATA   #IMPLIED&gt;
+
+&lt;!ELEMENT description (#PCDATA)&gt;
+&lt;!ELEMENT property (#PCDATA)&gt;
+&lt;!ATTLIST property name CDATA #REQUIRED&gt;
+&lt;!ELEMENT sectors EMPTY&gt;
+&lt;!ATTLIST sectors
+	size CDATA #REQUIRED
+	count CDATA #REQUIRED&gt;
+
+&lt;!ENTITY % gdbtarget SYSTEM "gdb-target.dtd"&gt;
+%gdbtarget;
+</pre><p>
+
+    All values can be provided in decimal, hex (with
+    a <code class="literal">0x</code> prefix) or octal (with
+    a <code class="literal">0</code> prefix).  Addresses and memory sizes can
+    use a <code class="literal">K</code>, <code class="literal">KB</code>,
+    <code class="literal">M</code>, <code class="literal">MB</code>,
+    <code class="literal">G</code> or <code class="literal">GB</code> suffix to denote
+    a unit of memory.  Times must use a <code class="literal">ms</code> or
+    <code class="literal">us</code> suffix.</p><p>The following elements are available:
+
+    </p><div class="variablelist"><dl><dt><span class="term"><code class="function">&lt;board&gt;</code></span></dt><dd><p>
+      This top-level element encapsulates the entire description of
+      the board.  It can contain
+      <code class="function">&lt;properties&gt;</code>, 
+      <code class="function">&lt;feature&gt;</code>, 
+      <code class="function">&lt;initialize&gt;</code> and
+      <code class="function">&lt;memory-map&gt;</code>
+      elements.</p></dd><dt><span class="term"><code class="function">&lt;properties&gt;</code></span></dt><dd><p>
+      The <code class="function">&lt;properties&gt;</code> element specifies
+      specific properties of the target system.  This element can
+      occur at most once.  It can contain a
+      <code class="function">&lt;description&gt;</code> element.</p><p>
+        It can also contain <code class="function">&lt;property&gt;</code> elements
+        with the following names:
+        </p><div class="variablelist"><dl><dt><span class="term"><code class="literal">banked-regs</code></span></dt><dd><p>
+              The <code class="literal">banked-regs</code> property
+              specifies that the CPU of the target board has banked registers 
+              for different processor modes (supervisor, IRQ, etc.).
+            </p></dd><dt><span class="term"><code class="literal">has-vfp</code></span></dt><dd><p>
+              The <code class="literal">has-vfp</code> property specifies that
+              the CPU of the target board has VFP registers.
+            </p></dd><dt><span class="term"><code class="literal">system-v6-m</code></span></dt><dd><p>
+              The <code class="literal">system-v6-m</code> property
+	      specifies that the CPU of the target board has ARMv6-M
+	      architecture system registers.
+            </p></dd><dt><span class="term"><code class="literal">system-v7-m</code></span></dt><dd><p>
+              The <code class="literal">system-v7-m</code> property
+	      specifies that the CPU of the target board has ARMv7-M
+	      architecture system registers.
+            </p></dd><dt><span class="term"><code class="literal">core-family</code></span></dt><dd><p>
+              The <code class="literal">core-family</code> property specifies
+	      the ARM family of the target.  The body of the
+	      <code class="function">&lt;property&gt;</code> element may be one
+	      of <code class="literal">arm7</code>, <code class="literal">arm9</code>,
+	      <code class="literal">arm11</code>, and <code class="literal">cortex</code>.
+            </p></dd><dt><span class="term"><code class="literal">system-clock</code></span></dt><dd><p>
+	      This property specifies the target clock frequency (in Hertz) after
+	      reset.  It is used to configure flash programming algorithms.
+            </p></dd></dl></div><p>
+      </p></dd><dt><span class="term"><code class="function">&lt;initialize&gt;</code></span></dt><dd><p>
+      The <code class="function">&lt;initialize&gt;</code> element defines an
+      initialization sequence for the board, which the Sprite performs
+      before downloading a program.  It can contain
+      <code class="function">&lt;write-register&gt;</code>,
+      <code class="function">&lt;write-memory&gt;</code> and
+      <code class="function">&lt;delay&gt;</code>
+      elements.</p></dd><dt><span class="term"><code class="function">&lt;feature&gt;</code></span></dt><dd><p>
+      This element is used to inform GDB about additional registers
+      and peripherals available on the board.  It is passed directly
+      to GDB; see the GDB manual for further details.
+
+      
+      </p></dd><dt><span class="term"><code class="function">&lt;memory-map&gt;</code></span></dt><dd><p>
+      This element describes the memory map of the target board.  It
+      is used by GDB to determine where software breakpoints may be
+      used and when flash programming sequences must be used.  This
+      element can occur at most once.  It can contain
+      <code class="function">&lt;memory-device&gt;</code> elements.
+      </p></dd><dt><span class="term"><code class="function">&lt;memory-device&gt;</code></span></dt><dd><p>
+      This element specifies a region of memory.  It has four
+      attributes: <code class="literal">address</code>, <code class="literal">size</code>,
+      <code class="literal">type</code> and <code class="literal">device</code>.  The
+      <code class="literal">address</code> and <code class="literal">size</code>
+      attributes specify the location of the memory device.  The
+      <code class="literal">type</code> attribute specifies that device as
+      <code class="literal">ram</code>, <code class="literal">rom</code> or
+      <code class="literal">flash</code>.  The <code class="literal">device</code>
+      attribute is required for <code class="literal">flash</code> regions; it
+      specifies the flash device type.  
+      
+      
+      
+      The <code class="function">&lt;memory-device&gt;</code> element can contain a
+      <code class="function">&lt;description&gt;</code> element.
+      </p></dd><dt><span class="term"><code class="function">&lt;write-register&gt;</code></span></dt><dd><p>
+      This element writes a value to a control register.  It has three
+      attributes: <code class="literal">address</code>,
+      <code class="literal">value</code> and <code class="literal">bits</code>.  The
+      <code class="literal">bits</code> attribute, specifying the bit width of the
+      write operation, is optional; it defaults to 32.
+      
+      
+      </p></dd><dt><span class="term"><code class="function">&lt;write-memory&gt;</code></span></dt><dd><p>
+      This element writes a value to a memory location.  It has three
+      attributes: <code class="literal">address</code>,
+      <code class="literal">value</code> and <code class="literal">bits</code>.  The
+      <code class="literal">bits</code> attribute is optional and defaults to
+      32.  Bit widths of 8, 16 and 32 bits are supported.  The address
+      written to must be naturally aligned for the size of the write
+      being done.</p></dd><dt><span class="term"><code class="function">&lt;delay&gt;</code></span></dt><dd><p>
+      This element introduces a delay.  It has one attribute,
+      <code class="literal">time</code>, which specifies the number of
+      milliseconds, or microseconds to delay by.
+      </p></dd><dt><span class="term"><code class="function">&lt;description&gt;</code></span></dt><dd><p>
+      This element encapsulates a human-readable description of its enclosing
+      element.</p></dd><dt><span class="term"><code class="function">&lt;property&gt;</code></span></dt><dd><p>
+      The <code class="function">&lt;property&gt;</code> element allows
+      additional name/value pairs to be specified.  The property name
+      is specified in a <code class="literal">name</code> attribute.  The
+      property value is the body of the
+      <code class="function">&lt;property&gt;</code>
+      element.</p></dd></dl></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="sec-sprite-supported-boards.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="sprite.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="chap-next-steps.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">6.9. Supported Board Files </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Chapter 7. Next Steps with Sourcery G++</td></tr></table></div></body></html>

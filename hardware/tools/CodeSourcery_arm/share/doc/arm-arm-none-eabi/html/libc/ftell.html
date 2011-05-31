@@ -1,0 +1,83 @@
+<html lang="en">
+<head>
+<title>ftell - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="fsetpos.html#fsetpos" title="fsetpos">
+<link rel="next" href="funopen.html#funopen" title="funopen">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="ftell"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="funopen.html#funopen">funopen</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="fsetpos.html#fsetpos">fsetpos</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.28 <code>ftell</code>, <code>ftello</code>&mdash;return position in a stream or file</h3>
+
+<p><a name="index-ftell-203"></a><a name="index-ftello-204"></a><a name="index-g_t_005fftell_005fr-205"></a><a name="index-g_t_005fftello_005fr-206"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     long ftell(FILE *<var>fp</var>);
+     off_t ftello(FILE *<var>fp</var>);
+     long _ftell_r(struct _reent *<var>ptr</var>, FILE *<var>fp</var>);
+     off_t _ftello_r(struct _reent *<var>ptr</var>, FILE *<var>fp</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+Objects of type <code>FILE</code> can have a &ldquo;position&rdquo; that records how much
+of the file your program has already read.  Many of the <code>stdio</code> functions
+depend on this position, and many change it as a side effect.
+
+   <p>The result of <code>ftell</code>/<code>ftello</code> is the current position for a file
+identified by <var>fp</var>.  If you record this result, you can later
+use it with <code>fseek</code>/<code>fseeko</code> to return the file to this
+position.  The difference between <code>ftell</code> and <code>ftello</code> is that
+<code>ftell</code> returns <code>long</code> and <code>ftello</code> returns <code>off_t</code>.
+
+   <p>In the current implementation, <code>ftell</code>/<code>ftello</code> simply uses a character
+count to represent the file position; this is the same number that
+would be recorded by <code>fgetpos</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>ftell</code>/<code>ftello</code> return the file position, if possible.  If they cannot do
+this, they return <code>-1L</code>.  Failure occurs on streams that do not support
+positioning; the global <code>errno</code> indicates this condition with the
+value <code>ESPIPE</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>ftell</code> is required by the ANSI C standard, but the meaning of its
+result (when successful) is not specified beyond requiring that it be
+acceptable as an argument to <code>fseek</code>.  In particular, other
+conforming C implementations may return a different result from
+<code>ftell</code> than what <code>fgetpos</code> records.
+
+   <p><code>ftello</code> is defined by the Single Unix specification.
+
+   <p>No supporting OS subroutines are required.
+
+   <p><br>
+
+   </body></html>
+

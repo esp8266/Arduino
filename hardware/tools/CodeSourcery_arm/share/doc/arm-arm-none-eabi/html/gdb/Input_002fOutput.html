@@ -1,0 +1,105 @@
+<html lang="en">
+<head>
+<title>Input/Output - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Running.html#Running" title="Running">
+<link rel="prev" href="Working-Directory.html#Working-Directory" title="Working Directory">
+<link rel="next" href="Attach.html#Attach" title="Attach">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Input%2fOutput"></a>
+<a name="Input_002fOutput"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Attach.html#Attach">Attach</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Working-Directory.html#Working-Directory">Working Directory</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Running.html#Running">Running</a>
+<hr>
+</div>
+
+<h3 class="section">4.6 Your Program's Input and Output</h3>
+
+<p><a name="index-redirection-123"></a><a name="index-i_002fo-124"></a><a name="index-terminal-125"></a>By default, the program you run under <span class="sc">gdb</span> does input and output to
+the same terminal that <span class="sc">gdb</span> uses.  <span class="sc">gdb</span> switches the terminal
+to its own terminal modes to interact with you, but it records the terminal
+modes your program was using and switches back to them when you continue
+running your program.
+
+     
+<a name="index-info-terminal-126"></a>
+<dl><dt><code>info terminal</code><dd>Displays information recorded by <span class="sc">gdb</span> about the terminal modes your
+program is using. 
+</dl>
+
+   <p>You can redirect your program's input and/or output using shell
+redirection with the <code>run</code> command.  For example,
+
+<pre class="smallexample">     run &gt; outfile
+</pre>
+   <p class="noindent">starts your program, diverting its output to the file <samp><span class="file">outfile</span></samp>.
+
+   <p><a name="index-tty-127"></a><a name="index-controlling-terminal-128"></a>Another way to specify where your program should do input and output is
+with the <code>tty</code> command.  This command accepts a file name as
+argument, and causes this file to be the default for future <code>run</code>
+commands.  It also resets the controlling terminal for the child
+process, for future <code>run</code> commands.  For example,
+
+<pre class="smallexample">     tty /dev/ttyb
+</pre>
+   <p class="noindent">directs that processes started with subsequent <code>run</code> commands
+default to do input and output on the terminal <samp><span class="file">/dev/ttyb</span></samp> and have
+that as their controlling terminal.
+
+   <p>An explicit redirection in <code>run</code> overrides the <code>tty</code> command's
+effect on the input/output device, but not its effect on the controlling
+terminal.
+
+   <p>When you use the <code>tty</code> command or redirect input in the <code>run</code>
+command, only the input <em>for your program</em> is affected.  The input
+for <span class="sc">gdb</span> still comes from your terminal.  <code>tty</code> is an alias
+for <code>set inferior-tty</code>.
+
+   <p><a name="index-inferior-tty-129"></a><a name="index-set-inferior-controlling-terminal-130"></a>You can use the <code>show inferior-tty</code> command to tell <span class="sc">gdb</span> to
+display the name of the terminal that will be used for future runs of your
+program.
+
+     <dl>
+<dt><code>set inferior-tty /dev/ttyb</code><dd><a name="index-set-inferior_002dtty-131"></a>Set the tty for the program being debugged to /dev/ttyb.
+
+     <br><dt><code>show inferior-tty</code><dd><a name="index-show-inferior_002dtty-132"></a>Show the current tty for the program being debugged. 
+</dl>
+
+   </body></html>
+

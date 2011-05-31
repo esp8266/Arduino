@@ -1,0 +1,80 @@
+<html lang="en">
+<head>
+<title>C - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Supported-Languages.html#Supported-Languages" title="Supported Languages">
+<link rel="next" href="D.html#D" title="D">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="C"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="D.html#D">D</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Supported-Languages.html#Supported-Languages">Supported Languages</a>
+<hr>
+</div>
+
+<h4 class="subsection">15.4.1 C and C<tt>++</tt></h4>
+
+<p><a name="index-C-and-C_0040t_007b_002b_002b_007d-793"></a><a name="index-expressions-in-C-or-C_0040t_007b_002b_002b_007d-794"></a>
+Since C and C<tt>++</tt> are so closely related, many features of <span class="sc">gdb</span> apply
+to both languages.  Whenever this is the case, we discuss those languages
+together.
+
+   <p><a name="index-C_0040t_007b_002b_002b_007d-795"></a><a name="index-g_t_0040code_007bg_002b_002b_007d_002c-_0040sc_007bgnu_007d-C_0040t_007b_002b_002b_007d-compiler-796"></a><a name="index-g_t_0040sc_007bgnu_007d-C_0040t_007b_002b_002b_007d-797"></a>The C<tt>++</tt> debugging facilities are jointly implemented by the C<tt>++</tt>
+compiler and <span class="sc">gdb</span>.  Therefore, to debug your C<tt>++</tt> code
+effectively, you must compile your C<tt>++</tt> programs with a supported
+C<tt>++</tt> compiler, such as <span class="sc">gnu</span> <code>g++</code>, or the HP ANSI C<tt>++</tt>
+compiler (<code>aCC</code>).
+
+   <p>For best results when using <span class="sc">gnu</span> C<tt>++</tt>, use the DWARF 2 debugging
+format; if it doesn't work on your system, try the stabs+ debugging
+format.  You can select those formats explicitly with the <code>g++</code>
+command-line options <samp><span class="option">-gdwarf-2</span></samp> and <samp><span class="option">-gstabs+</span></samp>. 
+See <a href="../gcc/Debugging-Options.html#Debugging-Options">Options for Debugging Your Program or GCC</a>.
+
+<ul class="menu">
+<li><a accesskey="1" href="C-Operators.html#C-Operators">C Operators</a>:                  C and C<tt>++</tt> operators
+<li><a accesskey="2" href="C-Constants.html#C-Constants">C Constants</a>:                  C and C<tt>++</tt> constants
+<li><a accesskey="3" href="C-Plus-Plus-Expressions.html#C-Plus-Plus-Expressions">C Plus Plus Expressions</a>:      C<tt>++</tt> expressions
+<li><a accesskey="4" href="C-Defaults.html#C-Defaults">C Defaults</a>:                   Default settings for C and C<tt>++</tt>
+<li><a accesskey="5" href="C-Checks.html#C-Checks">C Checks</a>:                     C and C<tt>++</tt> type and range checks
+<li><a accesskey="6" href="Debugging-C.html#Debugging-C">Debugging C</a>:                  <span class="sc">gdb</span> and C
+<li><a accesskey="7" href="Debugging-C-Plus-Plus.html#Debugging-C-Plus-Plus">Debugging C Plus Plus</a>:        <span class="sc">gdb</span> features for C<tt>++</tt>
+<li><a accesskey="8" href="Decimal-Floating-Point.html#Decimal-Floating-Point">Decimal Floating Point</a>:       Numbers in Decimal Floating Point format
+</ul>
+
+   </body></html>
+

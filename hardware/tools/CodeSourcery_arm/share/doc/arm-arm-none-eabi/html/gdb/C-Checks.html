@@ -1,0 +1,72 @@
+<html lang="en">
+<head>
+<title>C Checks - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C.html#C" title="C">
+<link rel="prev" href="C-Defaults.html#C-Defaults" title="C Defaults">
+<link rel="next" href="Debugging-C.html#Debugging-C" title="Debugging C">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="C-Checks"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Debugging-C.html#Debugging-C">Debugging C</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="C-Defaults.html#C-Defaults">C Defaults</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C.html#C">C</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">15.4.1.5 C and C<tt>++</tt> Type and Range Checks</h5>
+
+<p><a name="index-C-and-C_0040t_007b_002b_002b_007d-checks-813"></a>
+By default, when <span class="sc">gdb</span> parses C or C<tt>++</tt> expressions, type checking
+is not used.  However, if you turn type checking on, <span class="sc">gdb</span>
+considers two variables type equivalent if:
+
+     <ul>
+<li>The two variables are structured and have the same structure, union, or
+enumerated tag.
+
+     <li>The two variables have the same type name, or types that have been
+declared equivalent through <code>typedef</code>.
+
+   </ul>
+
+   <p>Range checking, if turned on, is done on mathematical operations.  Array
+indices are not checked, since they are often used to index a pointer
+that is not itself an array.
+
+   </body></html>
+

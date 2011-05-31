@@ -1,0 +1,91 @@
+<html lang="en">
+<head>
+<title>Alternate Keywords - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Explicit-Reg-Vars.html#Explicit-Reg-Vars" title="Explicit Reg Vars">
+<link rel="next" href="Incomplete-Enums.html#Incomplete-Enums" title="Incomplete Enums">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Alternate-Keywords"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Incomplete-Enums.html#Incomplete-Enums">Incomplete Enums</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Explicit-Reg-Vars.html#Explicit-Reg-Vars">Explicit Reg Vars</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.43 Alternate Keywords</h3>
+
+<p><a name="index-alternate-keywords-2601"></a><a name="index-keywords_002c-alternate-2602"></a>
+<samp><span class="option">-ansi</span></samp> and the various <samp><span class="option">-std</span></samp> options disable certain
+keywords.  This causes trouble when you want to use GNU C extensions, or
+a general-purpose header file that should be usable by all programs,
+including ISO C programs.  The keywords <code>asm</code>, <code>typeof</code> and
+<code>inline</code> are not available in programs compiled with
+<samp><span class="option">-ansi</span></samp> or <samp><span class="option">-std</span></samp> (although <code>inline</code> can be used in a
+program compiled with <samp><span class="option">-std=c99</span></samp>).  The ISO C99 keyword
+<code>restrict</code> is only available when <samp><span class="option">-std=gnu99</span></samp> (which will
+eventually be the default) or <samp><span class="option">-std=c99</span></samp> (or the equivalent
+<samp><span class="option">-std=iso9899:1999</span></samp>) is used.
+
+ <p>The way to solve these problems is to put &lsquo;<samp><span class="samp">__</span></samp>&rsquo; at the beginning and
+end of each problematical keyword.  For example, use <code>__asm__</code>
+instead of <code>asm</code>, and <code>__inline__</code> instead of <code>inline</code>.
+
+ <p>Other C compilers won't accept these alternative keywords; if you want to
+compile with another compiler, you can define the alternate keywords as
+macros to replace them with the customary keywords.  It looks like this:
+
+<pre class="smallexample">     #ifndef __GNUC__
+     #define __asm__ asm
+     #endif
+</pre>
+ <p><a name="index-g_t_005f_005fextension_005f_005f-2603"></a><a name="index-pedantic-2604"></a><samp><span class="option">-pedantic</span></samp> and other options cause warnings for many GNU C extensions. 
+You can
+prevent such warnings within one expression by writing
+<code>__extension__</code> before the expression.  <code>__extension__</code> has no
+effect aside from this.
+
+ </body></html>
+

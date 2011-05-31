@@ -1,0 +1,449 @@
+<html lang="en">
+<head>
+<title>GDB/MI Miscellaneous Commands - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="GDB_002fMI.html#GDB_002fMI" title="GDB/MI">
+<link rel="prev" href="GDB_002fMI-File-Transfer-Commands.html#GDB_002fMI-File-Transfer-Commands" title="GDB/MI File Transfer Commands">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="GDB%2fMI-Miscellaneous-Commands"></a>
+<a name="GDB_002fMI-Miscellaneous-Commands"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="GDB_002fMI-File-Transfer-Commands.html#GDB_002fMI-File-Transfer-Commands">GDB/MI File Transfer Commands</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="GDB_002fMI.html#GDB_002fMI">GDB/MI</a>
+<hr>
+</div>
+
+<h3 class="section">27.20 Miscellaneous <span class="sc">gdb/mi</span> Commands</h3>
+
+<!-- @subheading -gdb-complete -->
+<h4 class="subheading">The <code>-gdb-exit</code> Command</h4>
+
+<p><a name="index-g_t_002dgdb_002dexit-2119"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -gdb-exit
+</pre>
+   <p>Exit <span class="sc">gdb</span> immediately.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>Approximately corresponds to &lsquo;<samp><span class="samp">quit</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -gdb-exit
+     ^exit
+</pre>
+<h4 class="subheading">The <code>-gdb-set</code> Command</h4>
+
+<p><a name="index-g_t_002dgdb_002dset-2120"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -gdb-set
+</pre>
+   <p>Set an internal <span class="sc">gdb</span> variable. 
+<!-- IS THIS A DOLLAR VARIABLE? OR SOMETHING LIKE ANNOTATE ????? -->
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">set</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -gdb-set $foo=3
+     ^done
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-gdb-show</code> Command</h4>
+
+<p><a name="index-g_t_002dgdb_002dshow-2121"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -gdb-show
+</pre>
+   <p>Show the current value of a <span class="sc">gdb</span> variable.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">show</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -gdb-show annotate
+     ^done,value="0"
+     (gdb)
+</pre>
+<!-- @subheading -gdb-source -->
+<h4 class="subheading">The <code>-gdb-version</code> Command</h4>
+
+<p><a name="index-g_t_002dgdb_002dversion-2122"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -gdb-version
+</pre>
+   <p>Show version information for <span class="sc">gdb</span>.  Used mostly in testing.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The <span class="sc">gdb</span> equivalent is &lsquo;<samp><span class="samp">show version</span></samp>&rsquo;.  <span class="sc">gdb</span> by
+default shows this information when you start an interactive session.
+
+<h5 class="subsubheading">Example</h5>
+
+<!-- This example modifies the actual output from GDB to avoid overfull -->
+<!-- box in TeX. -->
+<pre class="smallexample">     (gdb)
+     -gdb-version
+     ~GNU gdb 5.2.1
+     ~Copyright 2000 Free Software Foundation, Inc.
+     ~GDB is free software, covered by the GNU General Public License, and
+     ~you are welcome to change it and/or distribute copies of it under
+     ~ certain conditions.
+     ~Type "show copying" to see the conditions.
+     ~There is absolutely no warranty for GDB.  Type "show warranty" for
+     ~ details.
+     ~This GDB was configured as
+      "--host=sparc-sun-solaris2.5.1 --target=ppc-eabi".
+     ^done
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-list-features</code> Command</h4>
+
+<p><a name="index-g_t_002dlist_002dfeatures-2123"></a>
+Returns a list of particular features of the MI protocol that
+this version of gdb implements.  A feature can be a command,
+or a new field in an output of some command, or even an
+important bugfix.  While a frontend can sometimes detect presence
+of a feature at runtime, it is easier to perform detection at debugger
+startup.
+
+   <p>The command returns a list of strings, with each string naming an
+available feature.  Each returned string is just a name, it does not
+have any internal structure.  The list of possible feature names
+is given below.
+
+   <p>Example output:
+
+<pre class="smallexample">     (gdb) -list-features
+     ^done,result=["feature1","feature2"]
+</pre>
+   <p>The current list of features is:
+
+     <dl>
+<dt>&lsquo;<samp><span class="samp">frozen-varobjs</span></samp>&rsquo;<dd>Indicates presence of the <code>-var-set-frozen</code> command, as well
+as possible presense of the <code>frozen</code> field in the output
+of <code>-varobj-create</code>. 
+<br><dt>&lsquo;<samp><span class="samp">pending-breakpoints</span></samp>&rsquo;<dd>Indicates presence of the <samp><span class="option">-f</span></samp> option to the <code>-break-insert</code> command. 
+<br><dt>&lsquo;<samp><span class="samp">python</span></samp>&rsquo;<dd>Indicates presence of Python scripting support, Python-based
+pretty-printing commands, and possible presence of the
+&lsquo;<samp><span class="samp">display_hint</span></samp>&rsquo; field in the output of <code>-var-list-children</code>
+<br><dt>&lsquo;<samp><span class="samp">thread-info</span></samp>&rsquo;<dd>Indicates presence of the <code>-thread-info</code> command. 
+<br><dt>&lsquo;<samp><span class="samp">data-read-memory-bytes</span></samp>&rsquo;<dd>Indicates presense of the <code>-data-read-memory-bytes</code> and the
+<code>-data-write-memory-bytes</code> commands.
+
+   </dl>
+
+<h4 class="subheading">The <code>-list-target-features</code> Command</h4>
+
+<p><a name="index-g_t_002dlist_002dtarget_002dfeatures-2124"></a>
+Returns a list of particular features that are supported by the
+target.  Those features affect the permitted MI commands, but
+unlike the features reported by the <code>-list-features</code> command, the
+features depend on which target GDB is using at the moment.  Whenever
+a target can change, due to commands such as <code>-target-select</code>,
+<code>-target-attach</code> or <code>-exec-run</code>, the list of target features
+may change, and the frontend should obtain it again. 
+Example output:
+
+<pre class="smallexample">     (gdb) -list-features
+     ^done,result=["async"]
+</pre>
+   <p>The current list of features is:
+
+     <dl>
+<dt>&lsquo;<samp><span class="samp">async</span></samp>&rsquo;<dd>Indicates that the target is capable of asynchronous command
+execution, which means that <span class="sc">gdb</span> will accept further commands
+while the target is running.
+
+     <br><dt>&lsquo;<samp><span class="samp">reverse</span></samp>&rsquo;<dd>Indicates that the target is capable of reverse execution. 
+See <a href="Reverse-Execution.html#Reverse-Execution">Reverse Execution</a>, for more information.
+
+   </dl>
+
+<h4 class="subheading">The <code>-list-thread-groups</code> Command</h4>
+
+<p><a name="index-g_t_002dlist_002dthread_002dgroups-2125"></a>
+
+<h4 class="subheading">Synopsis</h4>
+
+<pre class="smallexample">     -list-thread-groups [ --available ] [ --recurse 1 ] [ <var>group</var> ... ]
+</pre>
+   <p>Lists thread groups (see <a href="Thread-groups.html#Thread-groups">Thread groups</a>).  When a single thread
+group is passed as the argument, lists the children of that group. 
+When several thread group are passed, lists information about those
+thread groups.  Without any parameters, lists information about all
+top-level thread groups.
+
+   <p>Normally, thread groups that are being debugged are reported. 
+With the &lsquo;<samp><span class="samp">--available</span></samp>&rsquo; option, <span class="sc">gdb</span> reports thread groups
+available on the target.
+
+   <p>The output of this command may have either a &lsquo;<samp><span class="samp">threads</span></samp>&rsquo; result or
+a &lsquo;<samp><span class="samp">groups</span></samp>&rsquo; result.  The &lsquo;<samp><span class="samp">thread</span></samp>&rsquo; result has a list of tuples
+as value, with each tuple describing a thread (see <a href="GDB_002fMI-Thread-Information.html#GDB_002fMI-Thread-Information">GDB/MI Thread Information</a>).  The &lsquo;<samp><span class="samp">groups</span></samp>&rsquo; result has a list of tuples as value,
+each tuple describing a thread group.  If top-level groups are
+requested (that is, no parameter is passed), or when several groups
+are passed, the output always has a &lsquo;<samp><span class="samp">groups</span></samp>&rsquo; result.  The format
+of the &lsquo;<samp><span class="samp">group</span></samp>&rsquo; result is described below.
+
+   <p>To reduce the number of roundtrips it's possible to list thread groups
+together with their children, by passing the &lsquo;<samp><span class="samp">--recurse</span></samp>&rsquo; option
+and the recursion depth.  Presently, only recursion depth of 1 is
+permitted.  If this option is present, then every reported thread group
+will also include its children, either as &lsquo;<samp><span class="samp">group</span></samp>&rsquo; or
+&lsquo;<samp><span class="samp">threads</span></samp>&rsquo; field.
+
+   <p>In general, any combination of option and parameters is permitted, with
+the following caveats:
+
+     <ul>
+<li>When a single thread group is passed, the output will typically
+be the &lsquo;<samp><span class="samp">threads</span></samp>&rsquo; result.  Because threads may not contain
+anything, the &lsquo;<samp><span class="samp">recurse</span></samp>&rsquo; option will be ignored.
+
+     <li>When the &lsquo;<samp><span class="samp">--available</span></samp>&rsquo; option is passed, limited information may
+be available.  In particular, the list of threads of a process might
+be inaccessible.  Further, specifying specific thread groups might
+not give any performance advantage over listing all thread groups. 
+The frontend should assume that &lsquo;<samp><span class="samp">-list-thread-groups --available</span></samp>&rsquo;
+is always an expensive operation and cache the results.
+
+   </ul>
+
+   <p>The &lsquo;<samp><span class="samp">groups</span></samp>&rsquo; result is a list of tuples, where each tuple may
+have the following fields:
+
+     <dl>
+<dt><code>id</code><dd>Identifier of the thread group.  This field is always present. 
+The identifier is an opaque string; frontends should not try to
+convert it to an integer, even though it might look like one.
+
+     <br><dt><code>type</code><dd>The type of the thread group.  At present, only &lsquo;<samp><span class="samp">process</span></samp>&rsquo; is a
+valid type.
+
+     <br><dt><code>pid</code><dd>The target-specific process identifier.  This field is only present
+for thread groups of type &lsquo;<samp><span class="samp">process</span></samp>&rsquo; and only if the process exists.
+
+     <br><dt><code>num_children</code><dd>The number of children this thread group has.  This field may be
+absent for an available thread group.
+
+     <br><dt><code>threads</code><dd>This field has a list of tuples as value, each tuple describing a
+thread.  It may be present if the &lsquo;<samp><span class="samp">--recurse</span></samp>&rsquo; option is
+specified, and it's actually possible to obtain the threads.
+
+     <br><dt><code>cores</code><dd>This field is a list of integers, each identifying a core that one
+thread of the group is running on.  This field may be absent if
+such information is not available.
+
+     <br><dt><code>executable</code><dd>The name of the executable file that corresponds to this thread group. 
+The field is only present for thread groups of type &lsquo;<samp><span class="samp">process</span></samp>&rsquo;,
+and only if there is a corresponding executable file.
+
+   </dl>
+
+<h4 class="subheading">Example</h4>
+
+<pre class="smallexample">     gdb
+     -list-thread-groups
+     ^done,groups=[{id="17",type="process",pid="yyy",num_children="2"}]
+     -list-thread-groups 17
+     ^done,threads=[{id="2",target-id="Thread 0xb7e14b90 (LWP 21257)",
+        frame={level="0",addr="0xffffe410",func="__kernel_vsyscall",args=[]},state="running"},
+     {id="1",target-id="Thread 0xb7e156b0 (LWP 21254)",
+        frame={level="0",addr="0x0804891f",func="foo",args=[{name="i",value="10"}],
+                file="/tmp/a.c",fullname="/tmp/a.c",line="158"},state="running"}]]
+     -list-thread-groups --available
+     ^done,groups=[{id="17",type="process",pid="yyy",num_children="2",cores=[1,2]}]
+     -list-thread-groups --available --recurse 1
+      ^done,groups=[{id="17", types="process",pid="yyy",num_children="2",cores=[1,2],
+                     threads=[{id="1",target-id="Thread 0xb7e14b90",cores=[1]},
+                              {id="2",target-id="Thread 0xb7e14b90",cores=[2]}]},..]
+     -list-thread-groups --available --recurse 1 17 18
+     ^done,groups=[{id="17", types="process",pid="yyy",num_children="2",cores=[1,2],
+                    threads=[{id="1",target-id="Thread 0xb7e14b90",cores=[1]},
+                             {id="2",target-id="Thread 0xb7e14b90",cores=[2]}]},...]
+</pre>
+<h4 class="subheading">The <code>-add-inferior</code> Command</h4>
+
+<p><a name="index-g_t_002dadd_002dinferior-2126"></a>
+
+<h4 class="subheading">Synopsis</h4>
+
+<pre class="smallexample">     -add-inferior
+</pre>
+   <p>Creates a new inferior (see <a href="Inferiors-and-Programs.html#Inferiors-and-Programs">Inferiors and Programs</a>).  The created
+inferior is not associated with any executable.  Such association may
+be established with the &lsquo;<samp><span class="samp">-file-exec-and-symbols</span></samp>&rsquo; command
+(see <a href="GDB_002fMI-File-Commands.html#GDB_002fMI-File-Commands">GDB/MI File Commands</a>).  The command response has a single
+field, &lsquo;<samp><span class="samp">thread-group</span></samp>&rsquo;, whose value is the identifier of the
+thread group corresponding to the new inferior.
+
+<h4 class="subheading">Example</h4>
+
+<pre class="smallexample">     gdb
+     -add-inferior
+     ^done,thread-group="i3"
+</pre>
+<h4 class="subheading">The <code>-interpreter-exec</code> Command</h4>
+
+<p><a name="index-g_t_002dinterpreter_002dexec-2127"></a>
+
+<h4 class="subheading">Synopsis</h4>
+
+<pre class="smallexample">     -interpreter-exec <var>interpreter</var> <var>command</var>
+</pre>
+   <p><a name="g_t_002dinterpreter_002dexec"></a>Execute the specified <var>command</var> in the given <var>interpreter</var>.
+
+<h4 class="subheading"><span class="sc">gdb</span> Command</h4>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">interpreter-exec</span></samp>&rsquo;.
+
+<h4 class="subheading">Example</h4>
+
+<pre class="smallexample">     (gdb)
+     -interpreter-exec console "break main"
+     &amp;"During symbol reading, couldn't parse type; debugger out of date?.\n"
+     &amp;"During symbol reading, bad structure-type format.\n"
+     ~"Breakpoint 1 at 0x8074fc6: file ../../src/gdb/main.c, line 743.\n"
+     ^done
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-inferior-tty-set</code> Command</h4>
+
+<p><a name="index-g_t_002dinferior_002dtty_002dset-2128"></a>
+
+<h4 class="subheading">Synopsis</h4>
+
+<pre class="smallexample">     -inferior-tty-set /dev/pts/1
+</pre>
+   <p>Set terminal for future runs of the program being debugged.
+
+<h4 class="subheading"><span class="sc">gdb</span> Command</h4>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">set inferior-tty</span></samp>&rsquo; /dev/pts/1.
+
+<h4 class="subheading">Example</h4>
+
+<pre class="smallexample">     (gdb)
+     -inferior-tty-set /dev/pts/1
+     ^done
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-inferior-tty-show</code> Command</h4>
+
+<p><a name="index-g_t_002dinferior_002dtty_002dshow-2129"></a>
+
+<h4 class="subheading">Synopsis</h4>
+
+<pre class="smallexample">     -inferior-tty-show
+</pre>
+   <p>Show terminal for future runs of program being debugged.
+
+<h4 class="subheading"><span class="sc">gdb</span> Command</h4>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">show inferior-tty</span></samp>&rsquo;.
+
+<h4 class="subheading">Example</h4>
+
+<pre class="smallexample">     (gdb)
+     -inferior-tty-set /dev/pts/1
+     ^done
+     (gdb)
+     -inferior-tty-show
+     ^done,inferior_tty_terminal="/dev/pts/1"
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-enable-timings</code> Command</h4>
+
+<p><a name="index-g_t_002denable_002dtimings-2130"></a>
+
+<h4 class="subheading">Synopsis</h4>
+
+<pre class="smallexample">     -enable-timings [yes | no]
+</pre>
+   <p>Toggle the printing of the wallclock, user and system times for an MI
+command as a field in its output.  This command is to help frontend
+developers optimize the performance of their code.  No argument is
+equivalent to &lsquo;<samp><span class="samp">yes</span></samp>&rsquo;.
+
+<h4 class="subheading"><span class="sc">gdb</span> Command</h4>
+
+<p>No equivalent.
+
+<h4 class="subheading">Example</h4>
+
+<pre class="smallexample">     (gdb)
+     -enable-timings
+     ^done
+     (gdb)
+     -break-insert main
+     ^done,bkpt={number="1",type="breakpoint",disp="keep",enabled="y",
+     addr="0x080484ed",func="main",file="myprog.c",
+     fullname="/home/nickrob/myprog.c",line="73",times="0"},
+     time={wallclock="0.05185",user="0.00800",system="0.00000"}
+     (gdb)
+     -enable-timings no
+     ^done
+     (gdb)
+     -exec-run
+     ^running
+     (gdb)
+     *stopped,reason="breakpoint-hit",disp="keep",bkptno="1",thread-id="0",
+     frame={addr="0x080484ed",func="main",args=[{name="argc",value="1"},
+     {name="argv",value="0xbfb60364"}],file="myprog.c",
+     fullname="/home/nickrob/myprog.c",line="73"}
+     (gdb)
+</pre>
+   </body></html>
+

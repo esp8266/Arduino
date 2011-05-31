@@ -1,0 +1,138 @@
+<html lang="en">
+<head>
+<title>Host I/O Packets - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Remote-Protocol.html#Remote-Protocol" title="Remote Protocol">
+<link rel="prev" href="Tracepoint-Packets.html#Tracepoint-Packets" title="Tracepoint Packets">
+<link rel="next" href="Interrupts.html#Interrupts" title="Interrupts">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Host-I%2fO-Packets"></a>
+<a name="Host-I_002fO-Packets"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Interrupts.html#Interrupts">Interrupts</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Tracepoint-Packets.html#Tracepoint-Packets">Tracepoint Packets</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Remote-Protocol.html#Remote-Protocol">Remote Protocol</a>
+<hr>
+</div>
+
+<h3 class="section">D.8 Host I/O Packets</h3>
+
+<p><a name="index-Host-I_002fO_002c-remote-protocol-2487"></a><a name="index-file-transfer_002c-remote-protocol-2488"></a>
+The <dfn>Host I/O</dfn> packets allow <span class="sc">gdb</span> to perform I/O
+operations on the far side of a remote link.  For example, Host I/O is
+used to upload and download files to a remote target with its own
+filesystem.  Host I/O uses the same constant values and data structure
+layout as the target-initiated File-I/O protocol.  However, the
+Host I/O packets are structured differently.  The target-initiated
+protocol relies on target memory to store parameters and buffers. 
+Host I/O requests are initiated by <span class="sc">gdb</span>, and the
+target's memory is not involved.  See <a href="File_002dI_002fO-Remote-Protocol-Extension.html#File_002dI_002fO-Remote-Protocol-Extension">File-I/O Remote Protocol Extension</a>, for more details on the target-initiated protocol.
+
+   <p>The Host I/O request packets all encode a single operation along with
+its arguments.  They have this format:
+
+     <dl>
+<dt>&lsquo;<samp><span class="samp">vFile:</span><var>operation</var><span class="samp">: </span><var>parameter</var><span class="samp">...</span></samp>&rsquo;<dd><var>operation</var> is the name of the particular request; the target
+should compare the entire packet name up to the second colon when checking
+for a supported operation.  The format of <var>parameter</var> depends on
+the operation.  Numbers are always passed in hexadecimal.  Negative
+numbers have an explicit minus sign (i.e. two's complement is not
+used).  Strings (e.g. filenames) are encoded as a series of
+hexadecimal bytes.  The last argument to a system call may be a
+buffer of escaped binary data (see <a href="Binary-Data.html#Binary-Data">Binary Data</a>).
+
+   </dl>
+
+   <p>The valid responses to Host I/O packets are:
+
+     <dl>
+<dt>&lsquo;<samp><span class="samp">F </span><var>result</var><span class="samp"> [, </span><var>errno</var><span class="samp">] [; </span><var>attachment</var><span class="samp">]</span></samp>&rsquo;<dd><var>result</var> is the integer value returned by this operation, usually
+non-negative for success and -1 for errors.  If an error has occured,
+<var>errno</var> will be included in the result.  <var>errno</var> will have a
+value defined by the File-I/O protocol (see <a href="Errno-Values.html#Errno-Values">Errno Values</a>).  For
+operations which return data, <var>attachment</var> supplies the data as a
+binary buffer.  Binary buffers in response packets are escaped in the
+normal way (see <a href="Binary-Data.html#Binary-Data">Binary Data</a>).  See the individual packet
+documentation for the interpretation of <var>result</var> and
+<var>attachment</var>.
+
+     <br><dt>&lsquo;<samp></samp>&rsquo;<dd>An empty response indicates that this operation is not recognized.
+
+   </dl>
+
+   <p>These are the supported Host I/O operations:
+
+     <dl>
+<dt>&lsquo;<samp><span class="samp">vFile:open: </span><var>pathname</var><span class="samp">, </span><var>flags</var><span class="samp">, </span><var>mode</var></samp>&rsquo;<dd>Open a file at <var>pathname</var> and return a file descriptor for it, or
+return -1 if an error occurs.  <var>pathname</var> is a string,
+<var>flags</var> is an integer indicating a mask of open flags
+(see <a href="Open-Flags.html#Open-Flags">Open Flags</a>), and <var>mode</var> is an integer indicating a mask
+of mode bits to use if the file is created (see <a href="mode_005ft-Values.html#mode_005ft-Values">mode_t Values</a>). 
+See <a href="open.html#open">open</a>, for details of the open flags and mode values.
+
+     <br><dt>&lsquo;<samp><span class="samp">vFile:close: </span><var>fd</var></samp>&rsquo;<dd>Close the open file corresponding to <var>fd</var> and return 0, or
+-1 if an error occurs.
+
+     <br><dt>&lsquo;<samp><span class="samp">vFile:pread: </span><var>fd</var><span class="samp">, </span><var>count</var><span class="samp">, </span><var>offset</var></samp>&rsquo;<dd>Read data from the open file corresponding to <var>fd</var>.  Up to
+<var>count</var> bytes will be read from the file, starting at <var>offset</var>
+relative to the start of the file.  The target may read fewer bytes;
+common reasons include packet size limits and an end-of-file
+condition.  The number of bytes read is returned.  Zero should only be
+returned for a successful read at the end of the file, or if
+<var>count</var> was zero.
+
+     <p>The data read should be returned as a binary attachment on success. 
+If zero bytes were read, the response should include an empty binary
+attachment (i.e. a trailing semicolon).  The return value is the
+number of target bytes read; the binary attachment may be longer if
+some characters were escaped.
+
+     <br><dt>&lsquo;<samp><span class="samp">vFile:pwrite: </span><var>fd</var><span class="samp">, </span><var>offset</var><span class="samp">, </span><var>data</var></samp>&rsquo;<dd>Write <var>data</var> (a binary buffer) to the open file corresponding
+to <var>fd</var>.  Start the write at <var>offset</var> from the start of the
+file.  Unlike many <code>write</code> system calls, there is no
+separate <var>count</var> argument; the length of <var>data</var> in the
+packet is used.  &lsquo;<samp><span class="samp">vFile:write</span></samp>&rsquo; returns the number of bytes written,
+which may be shorter than the length of <var>data</var>, or -1 if an
+error occurred.
+
+     <br><dt>&lsquo;<samp><span class="samp">vFile:unlink: </span><var>pathname</var></samp>&rsquo;<dd>Delete the file at <var>pathname</var> on the target.  Return 0,
+or -1 if an error occurs.  <var>pathname</var> is a string.
+
+   </dl>
+
+   </body></html>
+

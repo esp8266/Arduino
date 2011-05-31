@@ -1,0 +1,185 @@
+<html lang="en">
+<head>
+<title>Darwin Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Submodel-Options.html#Submodel-Options" title="Submodel Options">
+<link rel="prev" href="CRX-Options.html#CRX-Options" title="CRX Options">
+<link rel="next" href="DEC-Alpha-Options.html#DEC-Alpha-Options" title="DEC Alpha Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Darwin-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="DEC-Alpha-Options.html#DEC-Alpha-Options">DEC Alpha Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="CRX-Options.html#CRX-Options">CRX Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Submodel-Options.html#Submodel-Options">Submodel Options</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.17.7 Darwin Options</h4>
+
+<p><a name="index-Darwin-options-1101"></a>
+These options are defined for all architectures running the Darwin operating
+system.
+
+ <p>FSF GCC on Darwin does not create &ldquo;fat&rdquo; object files; it will create
+an object file for the single architecture that it was built to
+target.  Apple's GCC on Darwin does create &ldquo;fat&rdquo; files if multiple
+<samp><span class="option">-arch</span></samp> options are used; it does so by running the compiler or
+linker multiple times and joining the results together with
+<samp><span class="file">lipo</span></samp>.
+
+ <p>The subtype of the file created (like &lsquo;<samp><span class="samp">ppc7400</span></samp>&rsquo; or &lsquo;<samp><span class="samp">ppc970</span></samp>&rsquo; or
+&lsquo;<samp><span class="samp">i686</span></samp>&rsquo;) is determined by the flags that specify the ISA
+that GCC is targetting, like <samp><span class="option">-mcpu</span></samp> or <samp><span class="option">-march</span></samp>.  The
+<samp><span class="option">-force_cpusubtype_ALL</span></samp> option can be used to override this.
+
+ <p>The Darwin tools vary in their behavior when presented with an ISA
+mismatch.  The assembler, <samp><span class="file">as</span></samp>, will only permit instructions to
+be used that are valid for the subtype of the file it is generating,
+so you cannot put 64-bit instructions in a &lsquo;<samp><span class="samp">ppc750</span></samp>&rsquo; object file. 
+The linker for shared libraries, <samp><span class="file">/usr/bin/libtool</span></samp>, will fail
+and print an error if asked to create a shared library with a less
+restrictive subtype than its input files (for instance, trying to put
+a &lsquo;<samp><span class="samp">ppc970</span></samp>&rsquo; object file in a &lsquo;<samp><span class="samp">ppc7400</span></samp>&rsquo; library).  The linker
+for executables, <samp><span class="file">ld</span></samp>, will quietly give the executable the most
+restrictive subtype of any of its input files.
+
+     <dl>
+<dt><code>-F</code><var>dir</var><dd><a name="index-F-1102"></a>Add the framework directory <var>dir</var> to the head of the list of
+directories to be searched for header files.  These directories are
+interleaved with those specified by <samp><span class="option">-I</span></samp> options and are
+scanned in a left-to-right order.
+
+     <p>A framework directory is a directory with frameworks in it.  A
+framework is a directory with a &lsquo;<samp><span class="samp">"Headers"</span></samp>&rsquo; and/or
+&lsquo;<samp><span class="samp">"PrivateHeaders"</span></samp>&rsquo; directory contained directly in it that ends
+in &lsquo;<samp><span class="samp">".framework"</span></samp>&rsquo;.  The name of a framework is the name of this
+directory excluding the &lsquo;<samp><span class="samp">".framework"</span></samp>&rsquo;.  Headers associated with
+the framework are found in one of those two directories, with
+&lsquo;<samp><span class="samp">"Headers"</span></samp>&rsquo; being searched first.  A subframework is a framework
+directory that is in a framework's &lsquo;<samp><span class="samp">"Frameworks"</span></samp>&rsquo; directory. 
+Includes of subframework headers can only appear in a header of a
+framework that contains the subframework, or in a sibling subframework
+header.  Two subframeworks are siblings if they occur in the same
+framework.  A subframework should not have the same name as a
+framework, a warning will be issued if this is violated.  Currently a
+subframework cannot have subframeworks, in the future, the mechanism
+may be extended to support this.  The standard frameworks can be found
+in &lsquo;<samp><span class="samp">"/System/Library/Frameworks"</span></samp>&rsquo; and
+&lsquo;<samp><span class="samp">"/Library/Frameworks"</span></samp>&rsquo;.  An example include looks like
+<code>#include &lt;Framework/header.h&gt;</code>, where &lsquo;<samp><span class="samp">Framework</span></samp>&rsquo; denotes
+the name of the framework and header.h is found in the
+&lsquo;<samp><span class="samp">"PrivateHeaders"</span></samp>&rsquo; or &lsquo;<samp><span class="samp">"Headers"</span></samp>&rsquo; directory.
+
+     <br><dt><code>-iframework</code><var>dir</var><dd><a name="index-iframework-1103"></a>Like <samp><span class="option">-F</span></samp> except the directory is a treated as a system
+directory.  The main difference between this <samp><span class="option">-iframework</span></samp> and
+<samp><span class="option">-F</span></samp> is that with <samp><span class="option">-iframework</span></samp> the compiler does not
+warn about constructs contained within header files found via
+<var>dir</var>.  This option is valid only for the C family of languages.
+
+     <br><dt><code>-gused</code><dd><a name="index-gused-1104"></a>Emit debugging information for symbols that are used.  For STABS
+debugging format, this enables <samp><span class="option">-feliminate-unused-debug-symbols</span></samp>. 
+This is by default ON.
+
+     <br><dt><code>-gfull</code><dd><a name="index-gfull-1105"></a>Emit debugging information for all symbols and types.
+
+     <br><dt><code>-mmacosx-version-min=</code><var>version</var><dd>The earliest version of MacOS X that this executable will run on
+is <var>version</var>.  Typical values of <var>version</var> include <code>10.1</code>,
+<code>10.2</code>, and <code>10.3.9</code>.
+
+     <p>If the compiler was built to use the system's headers by default,
+then the default for this option is the system version on which the
+compiler is running, otherwise the default is to make choices which
+are compatible with as many systems and code bases as possible.
+
+     <br><dt><code>-mkernel</code><dd><a name="index-mkernel-1106"></a>Enable kernel development mode.  The <samp><span class="option">-mkernel</span></samp> option sets
+<samp><span class="option">-static</span></samp>, <samp><span class="option">-fno-common</span></samp>, <samp><span class="option">-fno-cxa-atexit</span></samp>,
+<samp><span class="option">-fno-exceptions</span></samp>, <samp><span class="option">-fno-non-call-exceptions</span></samp>,
+<samp><span class="option">-fapple-kext</span></samp>, <samp><span class="option">-fno-weak</span></samp> and <samp><span class="option">-fno-rtti</span></samp> where
+applicable.  This mode also sets <samp><span class="option">-mno-altivec</span></samp>,
+<samp><span class="option">-msoft-float</span></samp>, <samp><span class="option">-fno-builtin</span></samp> and
+<samp><span class="option">-mlong-branch</span></samp> for PowerPC targets.
+
+     <br><dt><code>-mone-byte-bool</code><dd><a name="index-mone_002dbyte_002dbool-1107"></a>Override the defaults for &lsquo;<samp><span class="samp">bool</span></samp>&rsquo; so that &lsquo;<samp><span class="samp">sizeof(bool)==1</span></samp>&rsquo;. 
+By default &lsquo;<samp><span class="samp">sizeof(bool)</span></samp>&rsquo; is &lsquo;<samp><span class="samp">4</span></samp>&rsquo; when compiling for
+Darwin/PowerPC and &lsquo;<samp><span class="samp">1</span></samp>&rsquo; when compiling for Darwin/x86, so this
+option has no effect on x86.
+
+     <p><strong>Warning:</strong> The <samp><span class="option">-mone-byte-bool</span></samp> switch causes GCC
+to generate code that is not binary compatible with code generated
+without that switch.  Using this switch may require recompiling all
+other modules in a program, including system libraries.  Use this
+switch to conform to a non-default data model.
+
+     <br><dt><code>-mfix-and-continue</code><dt><code>-ffix-and-continue</code><dt><code>-findirect-data</code><dd><a name="index-mfix_002dand_002dcontinue-1108"></a><a name="index-ffix_002dand_002dcontinue-1109"></a><a name="index-findirect_002ddata-1110"></a>Generate code suitable for fast turn around development.  Needed to
+enable gdb to dynamically load <code>.o</code> files into already running
+programs.  <samp><span class="option">-findirect-data</span></samp> and <samp><span class="option">-ffix-and-continue</span></samp>
+are provided for backwards compatibility.
+
+     <br><dt><code>-all_load</code><dd><a name="index-all_005fload-1111"></a>Loads all members of static archive libraries. 
+See man ld(1) for more information.
+
+     <br><dt><code>-arch_errors_fatal</code><dd><a name="index-arch_005ferrors_005ffatal-1112"></a>Cause the errors having to do with files that have the wrong architecture
+to be fatal.
+
+     <br><dt><code>-bind_at_load</code><dd><a name="index-bind_005fat_005fload-1113"></a>Causes the output file to be marked such that the dynamic linker will
+bind all undefined references when the file is loaded or launched.
+
+     <br><dt><code>-bundle</code><dd><a name="index-bundle-1114"></a>Produce a Mach-o bundle format file. 
+See man ld(1) for more information.
+
+     <br><dt><code>-bundle_loader </code><var>executable</var><dd><a name="index-bundle_005floader-1115"></a>This option specifies the <var>executable</var> that will be loading the build
+output file being linked.  See man ld(1) for more information.
+
+     <br><dt><code>-dynamiclib</code><dd><a name="index-dynamiclib-1116"></a>When passed this option, GCC will produce a dynamic library instead of
+an executable when linking, using the Darwin <samp><span class="file">libtool</span></samp> command.
+
+     <br><dt><code>-force_cpusubtype_ALL</code><dd><a name="index-force_005fcpusubtype_005fALL-1117"></a>This causes GCC's output file to have the <var>ALL</var> subtype, instead of
+one controlled by the <samp><span class="option">-mcpu</span></samp> or <samp><span class="option">-march</span></samp> option.
+
+     <br><dt><code>-allowable_client  </code><var>client_name</var><dt><code>-client_name</code><dt><code>-compatibility_version</code><dt><code>-current_version</code><dt><code>-dead_strip</code><dt><code>-dependency-file</code><dt><code>-dylib_file</code><dt><code>-dylinker_install_name</code><dt><code>-dynamic</code><dt><code>-exported_symbols_list</code><dt><code>-filelist</code><dt><code>-flat_namespace</code><dt><code>-force_flat_namespace</code><dt><code>-headerpad_max_install_names</code><dt><code>-image_base</code><dt><code>-init</code><dt><code>-install_name</code><dt><code>-keep_private_externs</code><dt><code>-multi_module</code><dt><code>-multiply_defined</code><dt><code>-multiply_defined_unused</code><dt><code>-noall_load</code><dt><code>-no_dead_strip_inits_and_terms</code><dt><code>-nofixprebinding</code><dt><code>-nomultidefs</code><dt><code>-noprebind</code><dt><code>-noseglinkedit</code><dt><code>-pagezero_size</code><dt><code>-prebind</code><dt><code>-prebind_all_twolevel_modules</code><dt><code>-private_bundle</code><dt><code>-read_only_relocs</code><dt><code>-sectalign</code><dt><code>-sectobjectsymbols</code><dt><code>-whyload</code><dt><code>-seg1addr</code><dt><code>-sectcreate</code><dt><code>-sectobjectsymbols</code><dt><code>-sectorder</code><dt><code>-segaddr</code><dt><code>-segs_read_only_addr</code><dt><code>-segs_read_write_addr</code><dt><code>-seg_addr_table</code><dt><code>-seg_addr_table_filename</code><dt><code>-seglinkedit</code><dt><code>-segprot</code><dt><code>-segs_read_only_addr</code><dt><code>-segs_read_write_addr</code><dt><code>-single_module</code><dt><code>-static</code><dt><code>-sub_library</code><dt><code>-sub_umbrella</code><dt><code>-twolevel_namespace</code><dt><code>-umbrella</code><dt><code>-undefined</code><dt><code>-unexported_symbols_list</code><dt><code>-weak_reference_mismatches</code><dt><code>-whatsloaded</code><dd><a name="index-allowable_005fclient-1118"></a><a name="index-client_005fname-1119"></a><a name="index-compatibility_005fversion-1120"></a><a name="index-current_005fversion-1121"></a><a name="index-dead_005fstrip-1122"></a><a name="index-dependency_002dfile-1123"></a><a name="index-dylib_005ffile-1124"></a><a name="index-dylinker_005finstall_005fname-1125"></a><a name="index-dynamic-1126"></a><a name="index-exported_005fsymbols_005flist-1127"></a><a name="index-filelist-1128"></a><a name="index-flat_005fnamespace-1129"></a><a name="index-force_005fflat_005fnamespace-1130"></a><a name="index-headerpad_005fmax_005finstall_005fnames-1131"></a><a name="index-image_005fbase-1132"></a><a name="index-init-1133"></a><a name="index-install_005fname-1134"></a><a name="index-keep_005fprivate_005fexterns-1135"></a><a name="index-multi_005fmodule-1136"></a><a name="index-multiply_005fdefined-1137"></a><a name="index-multiply_005fdefined_005funused-1138"></a><a name="index-noall_005fload-1139"></a><a name="index-no_005fdead_005fstrip_005finits_005fand_005fterms-1140"></a><a name="index-nofixprebinding-1141"></a><a name="index-nomultidefs-1142"></a><a name="index-noprebind-1143"></a><a name="index-noseglinkedit-1144"></a><a name="index-pagezero_005fsize-1145"></a><a name="index-prebind-1146"></a><a name="index-prebind_005fall_005ftwolevel_005fmodules-1147"></a><a name="index-private_005fbundle-1148"></a><a name="index-read_005fonly_005frelocs-1149"></a><a name="index-sectalign-1150"></a><a name="index-sectobjectsymbols-1151"></a><a name="index-whyload-1152"></a><a name="index-seg1addr-1153"></a><a name="index-sectcreate-1154"></a><a name="index-sectobjectsymbols-1155"></a><a name="index-sectorder-1156"></a><a name="index-segaddr-1157"></a><a name="index-segs_005fread_005fonly_005faddr-1158"></a><a name="index-segs_005fread_005fwrite_005faddr-1159"></a><a name="index-seg_005faddr_005ftable-1160"></a><a name="index-seg_005faddr_005ftable_005ffilename-1161"></a><a name="index-seglinkedit-1162"></a><a name="index-segprot-1163"></a><a name="index-segs_005fread_005fonly_005faddr-1164"></a><a name="index-segs_005fread_005fwrite_005faddr-1165"></a><a name="index-single_005fmodule-1166"></a><a name="index-static-1167"></a><a name="index-sub_005flibrary-1168"></a><a name="index-sub_005fumbrella-1169"></a><a name="index-twolevel_005fnamespace-1170"></a><a name="index-umbrella-1171"></a><a name="index-undefined-1172"></a><a name="index-unexported_005fsymbols_005flist-1173"></a><a name="index-weak_005freference_005fmismatches-1174"></a><a name="index-whatsloaded-1175"></a>These options are passed to the Darwin linker.  The Darwin linker man page
+describes them in detail. 
+</dl>
+
+ </body></html>
+

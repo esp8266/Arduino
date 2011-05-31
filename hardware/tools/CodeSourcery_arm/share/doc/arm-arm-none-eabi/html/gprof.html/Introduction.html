@@ -1,0 +1,105 @@
+<html lang="en">
+<head>
+<title>Introduction - GNU gprof</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GNU gprof">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="index.html#Top" title="Top">
+<link rel="next" href="Compiling.html#Compiling" title="Compiling">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the gprof profiler of the GNU system.
+
+Copyright (C) 1988, 1992, 1997, 1998, 1999, 2000, 2001, 2003,
+2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Introduction"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Compiling.html#Compiling">Compiling</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="index.html#Top">Top</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">1 Introduction to Profiling</h2>
+
+<p>Profiling allows you to learn where your program spent its time and which
+functions called which other functions while it was executing.  This
+information can show you which pieces of your program are slower than you
+expected, and might be candidates for rewriting to make your program
+execute faster.  It can also tell you which functions are being called more
+or less often than you expected.  This may help you spot bugs that had
+otherwise been unnoticed.
+
+   <p>Since the profiler uses information collected during the actual execution
+of your program, it can be used on programs that are too large or too
+complex to analyze by reading the source.  However, how your program is run
+will affect the information that shows up in the profile data.  If you
+don't use some feature of your program while it is being profiled, no
+profile information will be generated for that feature.
+
+   <p>Profiling has several steps:
+
+     <ul>
+<li>You must compile and link your program with profiling enabled. 
+See <a href="Compiling.html#Compiling">Compiling a Program for Profiling</a>.
+
+     <li>You must execute your program to generate a profile data file. 
+See <a href="Executing.html#Executing">Executing the Program</a>.
+
+     <li>You must run <code>gprof</code> to analyze the profile data. 
+See <a href="Invoking.html#Invoking"><code>gprof</code> Command Summary</a>. 
+</ul>
+
+   <p>The next three chapters explain these steps in greater detail.
+
+<!-- man begin DESCRIPTION -->
+   <p>Several forms of output are available from the analysis.
+
+   <p>The <dfn>flat profile</dfn> shows how much time your program spent in each function,
+and how many times that function was called.  If you simply want to know
+which functions burn most of the cycles, it is stated concisely here. 
+See <a href="Flat-Profile.html#Flat-Profile">The Flat Profile</a>.
+
+   <p>The <dfn>call graph</dfn> shows, for each function, which functions called it, which
+other functions it called, and how many times.  There is also an estimate
+of how much time was spent in the subroutines of each function.  This can
+suggest places where you might try to eliminate function calls that use a
+lot of time.  See <a href="Call-Graph.html#Call-Graph">The Call Graph</a>.
+
+   <p>The <dfn>annotated source</dfn> listing is a copy of the program's
+source code, labeled with the number of times each line of the
+program was executed.  See <a href="Annotated-Source.html#Annotated-Source">The Annotated Source Listing</a>. 
+<!-- man end -->
+
+   <p>To better understand how profiling works, you may wish to read
+a description of its implementation. 
+See <a href="Implementation.html#Implementation">Implementation of Profiling</a>.
+
+   </body></html>
+

@@ -1,0 +1,178 @@
+<html lang="en">
+<head>
+<title>M - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Invoking.html#Invoking" title="Invoking">
+<link rel="prev" href="listing.html#listing" title="listing">
+<link rel="next" href="MD.html#MD" title="MD">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="M"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="MD.html#MD">MD</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="listing.html#listing">listing</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Invoking.html#Invoking">Invoking</a>
+<hr>
+</div>
+
+<h3 class="section">2.9 Assemble in MRI Compatibility Mode: <samp><span class="option">-M</span></samp></h3>
+
+<p><a name="index-g_t_002dM-79"></a><a name="index-MRI-compatibility-mode-80"></a>The <samp><span class="option">-M</span></samp> or <samp><span class="option">--mri</span></samp> option selects MRI compatibility mode.  This
+changes the syntax and pseudo-op handling of <samp><span class="command">as</span></samp> to make it
+compatible with the <code>ASM68K</code> or the <code>ASM960</code> (depending upon the
+configured target) assembler from Microtec Research.  The exact nature of the
+MRI syntax will not be documented here; see the MRI manuals for more
+information.  Note in particular that the handling of macros and macro
+arguments is somewhat different.  The purpose of this option is to permit
+assembling existing MRI assembler code using <samp><span class="command">as</span></samp>.
+
+   <p>The MRI compatibility is not complete.  Certain operations of the MRI assembler
+depend upon its object file format, and can not be supported using other object
+file formats.  Supporting these would require enhancing each object file format
+individually.  These are:
+
+     <ul>
+<li>global symbols in common section
+
+     <p>The m68k MRI assembler supports common sections which are merged by the linker. 
+Other object file formats do not support this.  <samp><span class="command">as</span></samp> handles
+common sections by treating them as a single common symbol.  It permits local
+symbols to be defined within a common section, but it can not support global
+symbols, since it has no way to describe them.
+
+     <li>complex relocations
+
+     <p>The MRI assemblers support relocations against a negated section address, and
+relocations which combine the start addresses of two or more sections.  These
+are not support by other object file formats.
+
+     <li><code>END</code> pseudo-op specifying start address
+
+     <p>The MRI <code>END</code> pseudo-op permits the specification of a start address. 
+This is not supported by other object file formats.  The start address may
+instead be specified using the <samp><span class="option">-e</span></samp> option to the linker, or in a linker
+script.
+
+     <li><code>IDNT</code>, <code>.ident</code> and <code>NAME</code> pseudo-ops
+
+     <p>The MRI <code>IDNT</code>, <code>.ident</code> and <code>NAME</code> pseudo-ops assign a module
+name to the output file.  This is not supported by other object file formats.
+
+     <li><code>ORG</code> pseudo-op
+
+     <p>The m68k MRI <code>ORG</code> pseudo-op begins an absolute section at a given
+address.  This differs from the usual <samp><span class="command">as</span></samp> <code>.org</code> pseudo-op,
+which changes the location within the current section.  Absolute sections are
+not supported by other object file formats.  The address of a section may be
+assigned within a linker script. 
+</ul>
+
+   <p>There are some other features of the MRI assembler which are not supported by
+<samp><span class="command">as</span></samp>, typically either because they are difficult or because they
+seem of little consequence.  Some of these may be supported in future releases.
+
+     <ul>
+<li>EBCDIC strings
+
+     <p>EBCDIC strings are not supported.
+
+     <li>packed binary coded decimal
+
+     <p>Packed binary coded decimal is not supported.  This means that the <code>DC.P</code>
+and <code>DCB.P</code> pseudo-ops are not supported.
+
+     <li><code>FEQU</code> pseudo-op
+
+     <p>The m68k <code>FEQU</code> pseudo-op is not supported.
+
+     <li><code>NOOBJ</code> pseudo-op
+
+     <p>The m68k <code>NOOBJ</code> pseudo-op is not supported.
+
+     <li><code>OPT</code> branch control options
+
+     <p>The m68k <code>OPT</code> branch control options&mdash;<code>B</code>, <code>BRS</code>, <code>BRB</code>,
+<code>BRL</code>, and <code>BRW</code>&mdash;are ignored.  <samp><span class="command">as</span></samp> automatically
+relaxes all branches, whether forward or backward, to an appropriate size, so
+these options serve no purpose.
+
+     <li><code>OPT</code> list control options
+
+     <p>The following m68k <code>OPT</code> list control options are ignored: <code>C</code>,
+<code>CEX</code>, <code>CL</code>, <code>CRE</code>, <code>E</code>, <code>G</code>, <code>I</code>, <code>M</code>,
+<code>MEX</code>, <code>MC</code>, <code>MD</code>, <code>X</code>.
+
+     <li>other <code>OPT</code> options
+
+     <p>The following m68k <code>OPT</code> options are ignored: <code>NEST</code>, <code>O</code>,
+<code>OLD</code>, <code>OP</code>, <code>P</code>, <code>PCO</code>, <code>PCR</code>, <code>PCS</code>, <code>R</code>.
+
+     <li><code>OPT</code> <code>D</code> option is default
+
+     <p>The m68k <code>OPT</code> <code>D</code> option is the default, unlike the MRI assembler. 
+<code>OPT NOD</code> may be used to turn it off.
+
+     <li><code>XREF</code> pseudo-op.
+
+     <p>The m68k <code>XREF</code> pseudo-op is ignored.
+
+     <li><code>.debug</code> pseudo-op
+
+     <p>The i960 <code>.debug</code> pseudo-op is not supported.
+
+     <li><code>.extended</code> pseudo-op
+
+     <p>The i960 <code>.extended</code> pseudo-op is not supported.
+
+     <li><code>.list</code> pseudo-op.
+
+     <p>The various options of the i960 <code>.list</code> pseudo-op are not supported.
+
+     <li><code>.optimize</code> pseudo-op
+
+     <p>The i960 <code>.optimize</code> pseudo-op is not supported.
+
+     <li><code>.output</code> pseudo-op
+
+     <p>The i960 <code>.output</code> pseudo-op is not supported.
+
+     <li><code>.setreal</code> pseudo-op
+
+     <p>The i960 <code>.setreal</code> pseudo-op is not supported.
+
+   </ul>
+
+   </body></html>
+

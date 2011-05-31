@@ -1,0 +1,75 @@
+<html lang="en">
+<head>
+<title>Visibility Pragmas - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Pragmas.html#Pragmas" title="Pragmas">
+<link rel="prev" href="Diagnostic-Pragmas.html#Diagnostic-Pragmas" title="Diagnostic Pragmas">
+<link rel="next" href="Push_002fPop-Macro-Pragmas.html#Push_002fPop-Macro-Pragmas" title="Push/Pop Macro Pragmas">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Visibility-Pragmas"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Push_002fPop-Macro-Pragmas.html#Push_002fPop-Macro-Pragmas">Push/Pop Macro Pragmas</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Diagnostic-Pragmas.html#Diagnostic-Pragmas">Diagnostic Pragmas</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Pragmas.html#Pragmas">Pragmas</a>
+<hr>
+</div>
+
+<h4 class="subsection">6.54.11 Visibility Pragmas</h4>
+
+     <dl>
+<dt><code>#pragma GCC visibility push(</code><var>visibility</var><code>)</code><dt><code>#pragma GCC visibility pop</code><dd><a name="index-pragma_002c-visibility-3142"></a>
+This pragma allows the user to set the visibility for multiple
+declarations without having to give each a visibility attribute
+See <a href="Function-Attributes.html#Function-Attributes">Function Attributes</a>, for more information about visibility and
+the attribute syntax.
+
+     <p>In C++, &lsquo;<samp><span class="samp">#pragma GCC visibility</span></samp>&rsquo; affects only namespace-scope
+declarations.  Class members and template specializations are not
+affected; if you want to override the visibility for a particular
+member or instantiation, you must use an attribute.
+
+</dl>
+
+ </body></html>
+

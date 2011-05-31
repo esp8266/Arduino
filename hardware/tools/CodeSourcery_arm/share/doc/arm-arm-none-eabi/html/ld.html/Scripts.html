@@ -1,0 +1,89 @@
+<html lang="en">
+<head>
+<title>Scripts - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Invocation.html#Invocation" title="Invocation">
+<link rel="next" href="Machine-Dependent.html#Machine-Dependent" title="Machine Dependent">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Scripts"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Machine-Dependent.html#Machine-Dependent">Machine Dependent</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Invocation.html#Invocation">Invocation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">3 Linker Scripts</h2>
+
+<p><a name="index-scripts-334"></a><a name="index-linker-scripts-335"></a><a name="index-command-files-336"></a>Every link is controlled by a <dfn>linker script</dfn>.  This script is
+written in the linker command language.
+
+   <p>The main purpose of the linker script is to describe how the sections in
+the input files should be mapped into the output file, and to control
+the memory layout of the output file.  Most linker scripts do nothing
+more than this.  However, when necessary, the linker script can also
+direct the linker to perform many other operations, using the commands
+described below.
+
+   <p>The linker always uses a linker script.  If you do not supply one
+yourself, the linker will use a default script that is compiled into the
+linker executable.  You can use the &lsquo;<samp><span class="samp">--verbose</span></samp>&rsquo; command line option
+to display the default linker script.  Certain command line options,
+such as &lsquo;<samp><span class="samp">-r</span></samp>&rsquo; or &lsquo;<samp><span class="samp">-N</span></samp>&rsquo;, will affect the default linker script.
+
+   <p>You may supply your own linker script by using the &lsquo;<samp><span class="samp">-T</span></samp>&rsquo; command
+line option.  When you do this, your linker script will replace the
+default linker script.
+
+   <p>You may also use linker scripts implicitly by naming them as input files
+to the linker, as though they were files to be linked.  See <a href="Implicit-Linker-Scripts.html#Implicit-Linker-Scripts">Implicit Linker Scripts</a>.
+
+<ul class="menu">
+<li><a accesskey="1" href="Basic-Script-Concepts.html#Basic-Script-Concepts">Basic Script Concepts</a>: 	Basic Linker Script Concepts
+<li><a accesskey="2" href="Script-Format.html#Script-Format">Script Format</a>: 		Linker Script Format
+<li><a accesskey="3" href="Simple-Example.html#Simple-Example">Simple Example</a>: 		Simple Linker Script Example
+<li><a accesskey="4" href="Simple-Commands.html#Simple-Commands">Simple Commands</a>: 		Simple Linker Script Commands
+<li><a accesskey="5" href="Assignments.html#Assignments">Assignments</a>: 			Assigning Values to Symbols
+<li><a accesskey="6" href="SECTIONS.html#SECTIONS">SECTIONS</a>: 			SECTIONS Command
+<li><a accesskey="7" href="MEMORY.html#MEMORY">MEMORY</a>: 			MEMORY Command
+<li><a accesskey="8" href="PHDRS.html#PHDRS">PHDRS</a>: 			PHDRS Command
+<li><a accesskey="9" href="VERSION.html#VERSION">VERSION</a>: 			VERSION Command
+<li><a href="Expressions.html#Expressions">Expressions</a>: 			Expressions in Linker Scripts
+<li><a href="Implicit-Linker-Scripts.html#Implicit-Linker-Scripts">Implicit Linker Scripts</a>: 	Implicit Linker Scripts
+</ul>
+
+   </body></html>
+

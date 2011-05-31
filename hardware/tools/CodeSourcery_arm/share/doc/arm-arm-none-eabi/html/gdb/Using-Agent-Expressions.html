@@ -1,0 +1,95 @@
+<html lang="en">
+<head>
+<title>Using Agent Expressions - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Agent-Expressions.html#Agent-Expressions" title="Agent Expressions">
+<link rel="prev" href="Bytecode-Descriptions.html#Bytecode-Descriptions" title="Bytecode Descriptions">
+<link rel="next" href="Varying-Target-Capabilities.html#Varying-Target-Capabilities" title="Varying Target Capabilities">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Using-Agent-Expressions"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Varying-Target-Capabilities.html#Varying-Target-Capabilities">Varying Target Capabilities</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Bytecode-Descriptions.html#Bytecode-Descriptions">Bytecode Descriptions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Agent-Expressions.html#Agent-Expressions">Agent Expressions</a>
+<hr>
+</div>
+
+<h3 class="section">E.3 Using Agent Expressions</h3>
+
+<p>Agent expressions can be used in several different ways by <span class="sc">gdb</span>,
+and the debugger can generate different bytecode sequences as appropriate.
+
+   <p>One possibility is to do expression evaluation on the target rather
+than the host, such as for the conditional of a conditional
+tracepoint.  In such a case, <span class="sc">gdb</span> compiles the source
+expression into a bytecode sequence that simply gets values from
+registers or memory, does arithmetic, and returns a result.
+
+   <p>Another way to use agent expressions is for tracepoint data
+collection.  <span class="sc">gdb</span> generates a different bytecode sequence for
+collection; in addition to bytecodes that do the calculation,
+<span class="sc">gdb</span> adds <code>trace</code> bytecodes to save the pieces of
+memory that were used.
+
+     <ul>
+<li>The user selects trace points in the program's code at which GDB should
+collect data.
+
+     <li>The user specifies expressions to evaluate at each trace point.  These
+expressions may denote objects in memory, in which case those objects'
+contents are recorded as the program runs, or computed values, in which
+case the values themselves are recorded.
+
+     <li>GDB transmits the tracepoints and their associated expressions to the
+GDB agent, running on the debugging target.
+
+     <li>The agent arranges to be notified when a trace point is hit.
+
+     <li>When execution on the target reaches a trace point, the agent evaluates
+the expressions associated with that trace point, and records the
+resulting values and memory ranges.
+
+     <li>Later, when the user selects a given trace event and inspects the
+objects and expression values recorded, GDB talks to the agent to
+retrieve recorded data as necessary to meet the user's requests.  If the
+user asks to see an object whose contents have not been recorded, GDB
+reports an error.
+
+   </ul>
+
+   </body></html>
+

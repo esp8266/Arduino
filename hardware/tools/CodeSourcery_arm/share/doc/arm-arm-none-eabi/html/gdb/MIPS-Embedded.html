@@ -1,0 +1,160 @@
+<html lang="en">
+<head>
+<title>MIPS Embedded - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Embedded-Processors.html#Embedded-Processors" title="Embedded Processors">
+<link rel="prev" href="MicroBlaze.html#MicroBlaze" title="MicroBlaze">
+<link rel="next" href="OpenRISC-1000.html#OpenRISC-1000" title="OpenRISC 1000">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="MIPS-Embedded"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="OpenRISC-1000.html#OpenRISC-1000">OpenRISC 1000</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="MicroBlaze.html#MicroBlaze">MicroBlaze</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Embedded-Processors.html#Embedded-Processors">Embedded Processors</a>
+<hr>
+</div>
+
+<h4 class="subsection">21.3.5 MIPS Embedded</h4>
+
+<p><a name="index-MIPS-boards-1322"></a><span class="sc">gdb</span> can use the MIPS remote debugging protocol to talk to a
+MIPS board attached to a serial line.  This is available when
+you configure <span class="sc">gdb</span> with &lsquo;<samp><span class="samp">--target=mips-idt-ecoff</span></samp>&rsquo;.
+
+   <p>Use these <span class="sc">gdb</span> commands to specify the connection to your target board:
+
+     <dl>
+<dt><code>target mips </code><var>port</var><dd><a name="index-target-mips-_0040var_007bport_007d-1323"></a>To run a program on the board, start up <code>gdb</code> with the
+name of your program as the argument.  To connect to the board, use the
+command &lsquo;<samp><span class="samp">target mips </span><var>port</var></samp>&rsquo;, where <var>port</var> is the name of
+the serial port connected to the board.  If the program has not already
+been downloaded to the board, you may use the <code>load</code> command to
+download it.  You can then use all the usual <span class="sc">gdb</span> commands.
+
+     <p>For example, this sequence connects to the target board through a serial
+port, and loads and runs a program called <var>prog</var> through the
+debugger:
+
+     <pre class="smallexample">          host$ gdb <var>prog</var>
+          <span class="sc">gdb</span> is free software and ...
+          (gdb) target mips /dev/ttyb
+          (gdb) load <var>prog</var>
+          (gdb) run
+</pre>
+     <br><dt><code>target mips </code><var>hostname</var><code>:</code><var>portnumber</var><dd>On some <span class="sc">gdb</span> host configurations, you can specify a TCP
+connection (for instance, to a serial line managed by a terminal
+concentrator) instead of a serial port, using the syntax
+&lsquo;<samp><var>hostname</var><span class="samp">:</span><var>portnumber</var></samp>&rsquo;.
+
+     <br><dt><code>target pmon </code><var>port</var><dd><a name="index-target-pmon-_0040var_007bport_007d-1324"></a>PMON ROM monitor.
+
+     <br><dt><code>target ddb </code><var>port</var><dd><a name="index-target-ddb-_0040var_007bport_007d-1325"></a>NEC's DDB variant of PMON for Vr4300.
+
+     <br><dt><code>target lsi </code><var>port</var><dd><a name="index-target-lsi-_0040var_007bport_007d-1326"></a>LSI variant of PMON.
+
+     <p><a name="index-target-r3900-1327"></a><br><dt><code>target r3900 </code><var>dev</var><dd>Densan DVE-R3900 ROM monitor for Toshiba R3900 Mips.
+
+     <p><a name="index-target-array-1328"></a><br><dt><code>target array </code><var>dev</var><dd>Array Tech LSI33K RAID controller board.
+
+   </dl>
+
+<p class="noindent"><span class="sc">gdb</span> also supports these special commands for MIPS targets:
+
+     <dl>
+<dt><code>set mipsfpu double</code><dt><code>set mipsfpu single</code><dt><code>set mipsfpu none</code><dt><code>set mipsfpu auto</code><dt><code>show mipsfpu</code><dd><a name="index-set-mipsfpu-1329"></a><a name="index-show-mipsfpu-1330"></a><a name="index-MIPS-remote-floating-point-1331"></a><a name="index-floating-point_002c-MIPS-remote-1332"></a>If your target board does not support the MIPS floating point
+coprocessor, you should use the command &lsquo;<samp><span class="samp">set mipsfpu none</span></samp>&rsquo; (if you
+need this, you may wish to put the command in your <span class="sc">gdb</span> init
+file).  This tells <span class="sc">gdb</span> how to find the return value of
+functions which return floating point values.  It also allows
+<span class="sc">gdb</span> to avoid saving the floating point registers when calling
+functions on the board.  If you are using a floating point coprocessor
+with only single precision floating point support, as on the <span class="sc">r4650</span>
+processor, use the command &lsquo;<samp><span class="samp">set mipsfpu single</span></samp>&rsquo;.  The default
+double precision floating point coprocessor may be selected using
+&lsquo;<samp><span class="samp">set mipsfpu double</span></samp>&rsquo;.
+
+     <p>In previous versions the only choices were double precision or no
+floating point, so &lsquo;<samp><span class="samp">set mipsfpu on</span></samp>&rsquo; will select double precision
+and &lsquo;<samp><span class="samp">set mipsfpu off</span></samp>&rsquo; will select no floating point.
+
+     <p>As usual, you can inquire about the <code>mipsfpu</code> variable with
+&lsquo;<samp><span class="samp">show mipsfpu</span></samp>&rsquo;.
+
+     <br><dt><code>set timeout </code><var>seconds</var><dt><code>set retransmit-timeout </code><var>seconds</var><dt><code>show timeout</code><dt><code>show retransmit-timeout</code><dd><a name="index-g_t_0040code_007btimeout_007d_002c-MIPS-protocol-1333"></a><a name="index-g_t_0040code_007bretransmit_002dtimeout_007d_002c-MIPS-protocol-1334"></a><a name="index-set-timeout-1335"></a><a name="index-show-timeout-1336"></a><a name="index-set-retransmit_002dtimeout-1337"></a><a name="index-show-retransmit_002dtimeout-1338"></a>You can control the timeout used while waiting for a packet, in the MIPS
+remote protocol, with the <code>set timeout </code><var>seconds</var> command.  The
+default is 5 seconds.  Similarly, you can control the timeout used while
+waiting for an acknowledgment of a packet with the <code>set
+retransmit-timeout </code><var>seconds</var> command.  The default is 3 seconds. 
+You can inspect both values with <code>show timeout</code> and <code>show
+retransmit-timeout</code>.  (These commands are <em>only</em> available when
+<span class="sc">gdb</span> is configured for &lsquo;<samp><span class="samp">--target=mips-idt-ecoff</span></samp>&rsquo;.)
+
+     <p>The timeout set by <code>set timeout</code> does not apply when <span class="sc">gdb</span>
+is waiting for your program to stop.  In that case, <span class="sc">gdb</span> waits
+forever because it has no way of knowing how long the program is going
+to run before stopping.
+
+     <br><dt><code>set syn-garbage-limit </code><var>num</var><dd><a name="index-set-syn_002dgarbage_002dlimit_0040r_007b_002c-MIPS-remote_007d-1339"></a><a name="index-synchronize-with-remote-MIPS-target-1340"></a>Limit the maximum number of characters <span class="sc">gdb</span> should ignore when
+it tries to synchronize with the remote target.  The default is 10
+characters.  Setting the limit to -1 means there's no limit.
+
+     <br><dt><code>show syn-garbage-limit</code><dd><a name="index-show-syn_002dgarbage_002dlimit_0040r_007b_002c-MIPS-remote_007d-1341"></a>Show the current limit on the number of characters to ignore when
+trying to synchronize with the remote system.
+
+     <br><dt><code>set monitor-prompt </code><var>prompt</var><dd><a name="index-set-monitor_002dprompt_0040r_007b_002c-MIPS-remote_007d-1342"></a><a name="index-remote-monitor-prompt-1343"></a>Tell <span class="sc">gdb</span> to expect the specified <var>prompt</var> string from the
+remote monitor.  The default depends on the target:
+          <dl>
+<dt>pmon target<dd>&lsquo;<samp><span class="samp">PMON</span></samp>&rsquo;
+<br><dt>ddb target<dd>&lsquo;<samp><span class="samp">NEC010</span></samp>&rsquo;
+<br><dt>lsi target<dd>&lsquo;<samp><span class="samp">PMON&gt;</span></samp>&rsquo;
+</dl>
+
+     <br><dt><code>show monitor-prompt</code><dd><a name="index-show-monitor_002dprompt_0040r_007b_002c-MIPS-remote_007d-1344"></a>Show the current strings <span class="sc">gdb</span> expects as the prompt from the
+remote monitor.
+
+     <br><dt><code>set monitor-warnings</code><dd><a name="index-set-monitor_002dwarnings_0040r_007b_002c-MIPS-remote_007d-1345"></a>Enable or disable monitor warnings about hardware breakpoints.  This
+has effect only for the <code>lsi</code> target.  When on, <span class="sc">gdb</span> will
+display warning messages whose codes are returned by the <code>lsi</code>
+PMON monitor for breakpoint commands.
+
+     <br><dt><code>show monitor-warnings</code><dd><a name="index-show-monitor_002dwarnings_0040r_007b_002c-MIPS-remote_007d-1346"></a>Show the current setting of printing monitor warnings.
+
+     <br><dt><code>pmon </code><var>command</var><dd><a name="index-pmon_0040r_007b_002c-MIPS-remote_007d-1347"></a><a name="index-send-PMON-command-1348"></a>This command allows sending an arbitrary <var>command</var> string to the
+monitor.  The monitor must be in debug mode for this to work. 
+</dl>
+
+   </body></html>
+

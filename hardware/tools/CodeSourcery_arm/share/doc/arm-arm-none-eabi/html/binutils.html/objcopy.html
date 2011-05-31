@@ -1,0 +1,601 @@
+<html lang="en">
+<head>
+<title>objcopy - GNU Binary Utilities</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GNU Binary Utilities">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="nm.html#nm" title="nm">
+<link rel="next" href="objdump.html#objdump" title="objdump">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="objcopy"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="objdump.html#objdump">objdump</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="nm.html#nm">nm</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">3 objcopy</h2>
+
+<!-- man title objcopy copy and translate object files -->
+<pre class="smallexample">     <!-- man begin SYNOPSIS objcopy -->
+     objcopy [<samp><span class="option">-F</span></samp> <var>bfdname</var>|<samp><span class="option">--target=</span></samp><var>bfdname</var>]
+             [<samp><span class="option">-I</span></samp> <var>bfdname</var>|<samp><span class="option">--input-target=</span></samp><var>bfdname</var>]
+             [<samp><span class="option">-O</span></samp> <var>bfdname</var>|<samp><span class="option">--output-target=</span></samp><var>bfdname</var>]
+             [<samp><span class="option">-B</span></samp> <var>bfdarch</var>|<samp><span class="option">--binary-architecture=</span></samp><var>bfdarch</var>]
+             [<samp><span class="option">-S</span></samp>|<samp><span class="option">--strip-all</span></samp>]
+             [<samp><span class="option">-g</span></samp>|<samp><span class="option">--strip-debug</span></samp>]
+             [<samp><span class="option">-K</span></samp> <var>symbolname</var>|<samp><span class="option">--keep-symbol=</span></samp><var>symbolname</var>]
+             [<samp><span class="option">-N</span></samp> <var>symbolname</var>|<samp><span class="option">--strip-symbol=</span></samp><var>symbolname</var>]
+             [<samp><span class="option">--strip-unneeded-symbol=</span></samp><var>symbolname</var>]
+             [<samp><span class="option">-G</span></samp> <var>symbolname</var>|<samp><span class="option">--keep-global-symbol=</span></samp><var>symbolname</var>]
+             [<samp><span class="option">--localize-hidden</span></samp>]
+             [<samp><span class="option">-L</span></samp> <var>symbolname</var>|<samp><span class="option">--localize-symbol=</span></samp><var>symbolname</var>]
+             [<samp><span class="option">--globalize-symbol=</span></samp><var>symbolname</var>]
+             [<samp><span class="option">-W</span></samp> <var>symbolname</var>|<samp><span class="option">--weaken-symbol=</span></samp><var>symbolname</var>]
+             [<samp><span class="option">-w</span></samp>|<samp><span class="option">--wildcard</span></samp>]
+             [<samp><span class="option">-x</span></samp>|<samp><span class="option">--discard-all</span></samp>]
+             [<samp><span class="option">-X</span></samp>|<samp><span class="option">--discard-locals</span></samp>]
+             [<samp><span class="option">-b</span></samp> <var>byte</var>|<samp><span class="option">--byte=</span></samp><var>byte</var>]
+             [<samp><span class="option">-i</span></samp> <var>interleave</var>|<samp><span class="option">--interleave=</span></samp><var>interleave</var>]
+             [<samp><span class="option">-j</span></samp> <var>sectionname</var>|<samp><span class="option">--only-section=</span></samp><var>sectionname</var>]
+             [<samp><span class="option">-R</span></samp> <var>sectionname</var>|<samp><span class="option">--remove-section=</span></samp><var>sectionname</var>]
+             [<samp><span class="option">-p</span></samp>|<samp><span class="option">--preserve-dates</span></samp>]
+             [<samp><span class="option">--debugging</span></samp>]
+             [<samp><span class="option">--gap-fill=</span></samp><var>val</var>]
+             [<samp><span class="option">--pad-to=</span></samp><var>address</var>]
+             [<samp><span class="option">--set-start=</span></samp><var>val</var>]
+             [<samp><span class="option">--adjust-start=</span></samp><var>incr</var>]
+             [<samp><span class="option">--change-addresses=</span></samp><var>incr</var>]
+             [<samp><span class="option">--change-section-address</span></samp> <var>section</var>{=,+,-}<var>val</var>]
+             [<samp><span class="option">--change-section-lma</span></samp> <var>section</var>{=,+,-}<var>val</var>]
+             [<samp><span class="option">--change-section-vma</span></samp> <var>section</var>{=,+,-}<var>val</var>]
+             [<samp><span class="option">--change-warnings</span></samp>] [<samp><span class="option">--no-change-warnings</span></samp>]
+             [<samp><span class="option">--set-section-flags</span></samp> <var>section</var>=<var>flags</var>]
+             [<samp><span class="option">--add-section</span></samp> <var>sectionname</var>=<var>filename</var>]
+             [<samp><span class="option">--rename-section</span></samp> <var>oldname</var>=<var>newname</var>[,<var>flags</var>]]
+             [<samp><span class="option">--long-section-names</span></samp> {enable,disable,keep}]
+             [<samp><span class="option">--change-leading-char</span></samp>] [<samp><span class="option">--remove-leading-char</span></samp>]
+             [<samp><span class="option">--reverse-bytes=</span></samp><var>num</var>]
+             [<samp><span class="option">--srec-len=</span></samp><var>ival</var>] [<samp><span class="option">--srec-forceS3</span></samp>]
+             [<samp><span class="option">--redefine-sym</span></samp> <var>old</var>=<var>new</var>]
+             [<samp><span class="option">--redefine-syms=</span></samp><var>filename</var>]
+             [<samp><span class="option">--weaken</span></samp>]
+             [<samp><span class="option">--keep-symbols=</span></samp><var>filename</var>]
+             [<samp><span class="option">--strip-symbols=</span></samp><var>filename</var>]
+             [<samp><span class="option">--strip-unneeded-symbols=</span></samp><var>filename</var>]
+             [<samp><span class="option">--keep-global-symbols=</span></samp><var>filename</var>]
+             [<samp><span class="option">--localize-symbols=</span></samp><var>filename</var>]
+             [<samp><span class="option">--globalize-symbols=</span></samp><var>filename</var>]
+             [<samp><span class="option">--weaken-symbols=</span></samp><var>filename</var>]
+             [<samp><span class="option">--alt-machine-code=</span></samp><var>index</var>]
+             [<samp><span class="option">--prefix-symbols=</span></samp><var>string</var>]
+             [<samp><span class="option">--prefix-sections=</span></samp><var>string</var>]
+             [<samp><span class="option">--prefix-alloc-sections=</span></samp><var>string</var>]
+             [<samp><span class="option">--add-gnu-debuglink=</span></samp><var>path-to-file</var>]
+             [<samp><span class="option">--keep-file-symbols</span></samp>]
+             [<samp><span class="option">--only-keep-debug</span></samp>]
+             [<samp><span class="option">--extract-symbol</span></samp>]
+             [<samp><span class="option">--writable-text</span></samp>]
+             [<samp><span class="option">--readonly-text</span></samp>]
+             [<samp><span class="option">--pure</span></samp>]
+             [<samp><span class="option">--impure</span></samp>]
+             [<samp><span class="option">--file-alignment=</span></samp><var>num</var>]
+             [<samp><span class="option">--heap=</span></samp><var>size</var>]
+             [<samp><span class="option">--image-base=</span></samp><var>address</var>]
+             [<samp><span class="option">--section-alignment=</span></samp><var>num</var>]
+             [<samp><span class="option">--stack=</span></samp><var>size</var>]
+             [<samp><span class="option">--subsystem=</span></samp><var>which</var>:<var>major</var>.<var>minor</var>]
+             [<samp><span class="option">-v</span></samp>|<samp><span class="option">--verbose</span></samp>]
+             [<samp><span class="option">-V</span></samp>|<samp><span class="option">--version</span></samp>]
+             [<samp><span class="option">--help</span></samp>] [<samp><span class="option">--info</span></samp>]
+             <var>infile</var> [<var>outfile</var>]
+     <!-- man end -->
+</pre>
+<!-- man begin DESCRIPTION objcopy -->
+   <p>The <span class="sc">gnu</span> <samp><span class="command">objcopy</span></samp> utility copies the contents of an object
+file to another.  <samp><span class="command">objcopy</span></samp> uses the <span class="sc">gnu</span> <span class="sc">bfd</span> Library to
+read and write the object files.  It can write the destination object
+file in a format different from that of the source object file.  The
+exact behavior of <samp><span class="command">objcopy</span></samp> is controlled by command-line options. 
+Note that <samp><span class="command">objcopy</span></samp> should be able to copy a fully linked file
+between any two formats. However, copying a relocatable object file
+between any two formats may not work as expected.
+
+   <p><samp><span class="command">objcopy</span></samp> creates temporary files to do its translations and
+deletes them afterward.  <samp><span class="command">objcopy</span></samp> uses <span class="sc">bfd</span> to do all its
+translation work; it has access to all the formats described in <span class="sc">bfd</span>
+and thus is able to recognize most formats without being told
+explicitly.  See <a href="../ld/BFD.html#BFD">BFD</a>.
+
+   <p><samp><span class="command">objcopy</span></samp> can be used to generate S-records by using an output
+target of &lsquo;<samp><span class="samp">srec</span></samp>&rsquo; (e.g., use &lsquo;<samp><span class="samp">-O srec</span></samp>&rsquo;).
+
+   <p><samp><span class="command">objcopy</span></samp> can be used to generate a raw binary file by using an
+output target of &lsquo;<samp><span class="samp">binary</span></samp>&rsquo; (e.g., use <samp><span class="option">-O binary</span></samp>).  When
+<samp><span class="command">objcopy</span></samp> generates a raw binary file, it will essentially produce
+a memory dump of the contents of the input object file.  All symbols and
+relocation information will be discarded.  The memory dump will start at
+the load address of the lowest section copied into the output file.
+
+   <p>When generating an S-record or a raw binary file, it may be helpful to
+use <samp><span class="option">-S</span></samp> to remove sections containing debugging information.  In
+some cases <samp><span class="option">-R</span></samp> will be useful to remove sections which contain
+information that is not needed by the binary file.
+
+   <p>Note&mdash;<samp><span class="command">objcopy</span></samp> is not able to change the endianness of its input
+files.  If the input format has an endianness (some formats do not),
+<samp><span class="command">objcopy</span></samp> can only copy the inputs into file formats that have the
+same endianness or which have no endianness (e.g., &lsquo;<samp><span class="samp">srec</span></samp>&rsquo;). 
+(However, see the <samp><span class="option">--reverse-bytes</span></samp> option.)
+
+<!-- man end -->
+<!-- man begin OPTIONS objcopy -->
+     <dl>
+<dt><samp><var>infile</var></samp><dt><samp><var>outfile</var></samp><dd>The input and output files, respectively. 
+If you do not specify <var>outfile</var>, <samp><span class="command">objcopy</span></samp> creates a
+temporary file and destructively renames the result with
+the name of <var>infile</var>.
+
+     <br><dt><samp><span class="env">-I </span><var>bfdname</var></samp><dt><samp><span class="env">--input-target=</span><var>bfdname</var></samp><dd>Consider the source file's object format to be <var>bfdname</var>, rather than
+attempting to deduce it.  See <a href="Target-Selection.html#Target-Selection">Target Selection</a>, for more information.
+
+     <br><dt><samp><span class="env">-O </span><var>bfdname</var></samp><dt><samp><span class="env">--output-target=</span><var>bfdname</var></samp><dd>Write the output file using the object format <var>bfdname</var>. 
+See <a href="Target-Selection.html#Target-Selection">Target Selection</a>, for more information.
+
+     <br><dt><samp><span class="env">-F </span><var>bfdname</var></samp><dt><samp><span class="env">--target=</span><var>bfdname</var></samp><dd>Use <var>bfdname</var> as the object format for both the input and the output
+file; i.e., simply transfer data from source to destination with no
+translation.  See <a href="Target-Selection.html#Target-Selection">Target Selection</a>, for more information.
+
+     <br><dt><samp><span class="env">-B </span><var>bfdarch</var></samp><dt><samp><span class="env">--binary-architecture=</span><var>bfdarch</var></samp><dd>Useful when transforming a architecture-less input file into an object file. 
+In this case the output architecture can be set to <var>bfdarch</var>.  This
+option will be ignored if the input file has a known <var>bfdarch</var>.  You
+can access this binary data inside a program by referencing the special
+symbols that are created by the conversion process.  These symbols are
+called _binary_<var>objfile</var>_start, _binary_<var>objfile</var>_end and
+_binary_<var>objfile</var>_size.  e.g. you can transform a picture file into
+an object file and then access it in your code using these symbols.
+
+     <br><dt><samp><span class="env">-j </span><var>sectionname</var></samp><dt><samp><span class="env">--only-section=</span><var>sectionname</var></samp><dd>Copy only the named section from the input file to the output file. 
+This option may be given more than once.  Note that using this option
+inappropriately may make the output file unusable.
+
+     <br><dt><samp><span class="env">-R </span><var>sectionname</var></samp><dt><samp><span class="env">--remove-section=</span><var>sectionname</var></samp><dd>Remove any section named <var>sectionname</var> from the output file.  This
+option may be given more than once.  Note that using this option
+inappropriately may make the output file unusable.
+
+     <br><dt><samp><span class="env">-S</span></samp><dt><samp><span class="env">--strip-all</span></samp><dd>Do not copy relocation and symbol information from the source file.
+
+     <br><dt><samp><span class="env">-g</span></samp><dt><samp><span class="env">--strip-debug</span></samp><dd>Do not copy debugging symbols or sections from the source file.
+
+     <br><dt><samp><span class="env">--strip-unneeded</span></samp><dd>Strip all symbols that are not needed for relocation processing.
+
+     <br><dt><samp><span class="env">-K </span><var>symbolname</var></samp><dt><samp><span class="env">--keep-symbol=</span><var>symbolname</var></samp><dd>When stripping symbols, keep symbol <var>symbolname</var> even if it would
+normally be stripped.  This option may be given more than once.
+
+     <br><dt><samp><span class="env">-N </span><var>symbolname</var></samp><dt><samp><span class="env">--strip-symbol=</span><var>symbolname</var></samp><dd>Do not copy symbol <var>symbolname</var> from the source file.  This option
+may be given more than once.
+
+     <br><dt><samp><span class="env">--strip-unneeded-symbol=</span><var>symbolname</var></samp><dd>Do not copy symbol <var>symbolname</var> from the source file unless it is needed
+by a relocation.  This option may be given more than once.
+
+     <br><dt><samp><span class="env">-G </span><var>symbolname</var></samp><dt><samp><span class="env">--keep-global-symbol=</span><var>symbolname</var></samp><dd>Keep only symbol <var>symbolname</var> global.  Make all other symbols local
+to the file, so that they are not visible externally.  This option may
+be given more than once.
+
+     <br><dt><samp><span class="env">--localize-hidden</span></samp><dd>In an ELF object, mark all symbols that have hidden or internal visibility
+as local.  This option applies on top of symbol-specific localization options
+such as <samp><span class="option">-L</span></samp>.
+
+     <br><dt><samp><span class="env">-L </span><var>symbolname</var></samp><dt><samp><span class="env">--localize-symbol=</span><var>symbolname</var></samp><dd>Make symbol <var>symbolname</var> local to the file, so that it is not
+visible externally.  This option may be given more than once.
+
+     <br><dt><samp><span class="env">-W </span><var>symbolname</var></samp><dt><samp><span class="env">--weaken-symbol=</span><var>symbolname</var></samp><dd>Make symbol <var>symbolname</var> weak. This option may be given more than once.
+
+     <br><dt><samp><span class="env">--globalize-symbol=</span><var>symbolname</var></samp><dd>Give symbol <var>symbolname</var> global scoping so that it is visible
+outside of the file in which it is defined.  This option may be given
+more than once.
+
+     <br><dt><samp><span class="env">-w</span></samp><dt><samp><span class="env">--wildcard</span></samp><dd>Permit regular expressions in <var>symbolname</var>s used in other command
+line options.  The question mark (?), asterisk (*), backslash (\) and
+square brackets ([]) operators can be used anywhere in the symbol
+name.  If the first character of the symbol name is the exclamation
+point (!) then the sense of the switch is reversed for that symbol. 
+For example:
+
+     <pre class="smallexample">            -w -W !foo -W fo*
+</pre>
+     <p>would cause objcopy to weaken all symbols that start with &ldquo;fo&rdquo;
+except for the symbol &ldquo;foo&rdquo;.
+
+     <br><dt><samp><span class="env">-x</span></samp><dt><samp><span class="env">--discard-all</span></samp><dd>Do not copy non-global symbols from the source file. 
+<!-- FIXME any reason to prefer "non-global" to "local" here? -->
+
+     <br><dt><samp><span class="env">-X</span></samp><dt><samp><span class="env">--discard-locals</span></samp><dd>Do not copy compiler-generated local symbols. 
+(These usually start with &lsquo;<samp><span class="samp">L</span></samp>&rsquo; or &lsquo;<samp><span class="samp">.</span></samp>&rsquo;.)
+
+     <br><dt><samp><span class="env">-b </span><var>byte</var></samp><dt><samp><span class="env">--byte=</span><var>byte</var></samp><dd>Keep only every <var>byte</var>th byte of the input file (header data is not
+affected).  <var>byte</var> can be in the range from 0 to <var>interleave</var>-1,
+where <var>interleave</var> is given by the <samp><span class="option">-i</span></samp> or <samp><span class="option">--interleave</span></samp>
+option, or the default of 4.  This option is useful for creating files
+to program <span class="sc">rom</span>.  It is typically used with an <code>srec</code> output
+target.
+
+     <br><dt><samp><span class="env">-i </span><var>interleave</var></samp><dt><samp><span class="env">--interleave=</span><var>interleave</var></samp><dd>Only copy one out of every <var>interleave</var> bytes.  Select which byte to
+copy with the <samp><span class="option">-b</span></samp> or <samp><span class="option">--byte</span></samp> option.  The default is 4. 
+<samp><span class="command">objcopy</span></samp> ignores this option if you do not specify either <samp><span class="option">-b</span></samp> or
+<samp><span class="option">--byte</span></samp>.
+
+     <br><dt><samp><span class="env">-p</span></samp><dt><samp><span class="env">--preserve-dates</span></samp><dd>Set the access and modification dates of the output file to be the same
+as those of the input file.
+
+     <br><dt><samp><span class="env">--debugging</span></samp><dd>Convert debugging information, if possible.  This is not the default
+because only certain debugging formats are supported, and the
+conversion process can be time consuming.
+
+     <br><dt><samp><span class="env">--gap-fill </span><var>val</var></samp><dd>Fill gaps between sections with <var>val</var>.  This operation applies to
+the <em>load address</em> (LMA) of the sections.  It is done by increasing
+the size of the section with the lower address, and filling in the extra
+space created with <var>val</var>.
+
+     <br><dt><samp><span class="env">--pad-to </span><var>address</var></samp><dd>Pad the output file up to the load address <var>address</var>.  This is
+done by increasing the size of the last section.  The extra space is
+filled in with the value specified by <samp><span class="option">--gap-fill</span></samp> (default zero).
+
+     <br><dt><samp><span class="env">--set-start </span><var>val</var></samp><dd>Set the start address of the new file to <var>val</var>.  Not all object file
+formats support setting the start address.
+
+     <br><dt><samp><span class="env">--change-start </span><var>incr</var></samp><dt><samp><span class="env">--adjust-start </span><var>incr</var></samp><dd><a name="index-changing-start-address-54"></a>Change the start address by adding <var>incr</var>.  Not all object file
+formats support setting the start address.
+
+     <br><dt><samp><span class="env">--change-addresses </span><var>incr</var></samp><dt><samp><span class="env">--adjust-vma </span><var>incr</var></samp><dd><a name="index-changing-object-addresses-55"></a>Change the VMA and LMA addresses of all sections, as well as the start
+address, by adding <var>incr</var>.  Some object file formats do not permit
+section addresses to be changed arbitrarily.  Note that this does not
+relocate the sections; if the program expects sections to be loaded at a
+certain address, and this option is used to change the sections such
+that they are loaded at a different address, the program may fail.
+
+     <br><dt><samp><span class="env">--change-section-address </span><var>section</var><span class="env">{=,+,-}</span><var>val</var></samp><dt><samp><span class="env">--adjust-section-vma </span><var>section</var><span class="env">{=,+,-}</span><var>val</var></samp><dd><a name="index-changing-section-address-56"></a>Set or change both the VMA address and the LMA address of the named
+<var>section</var>.  If &lsquo;<samp><span class="samp">=</span></samp>&rsquo; is used, the section address is set to
+<var>val</var>.  Otherwise, <var>val</var> is added to or subtracted from the
+section address.  See the comments under <samp><span class="option">--change-addresses</span></samp>,
+above. If <var>section</var> does not exist in the input file, a warning will
+be issued, unless <samp><span class="option">--no-change-warnings</span></samp> is used.
+
+     <br><dt><samp><span class="env">--change-section-lma </span><var>section</var><span class="env">{=,+,-}</span><var>val</var></samp><dd><a name="index-changing-section-LMA-57"></a>Set or change the LMA address of the named <var>section</var>.  The LMA
+address is the address where the section will be loaded into memory at
+program load time.  Normally this is the same as the VMA address, which
+is the address of the section at program run time, but on some systems,
+especially those where a program is held in ROM, the two can be
+different.  If &lsquo;<samp><span class="samp">=</span></samp>&rsquo; is used, the section address is set to
+<var>val</var>.  Otherwise, <var>val</var> is added to or subtracted from the
+section address.  See the comments under <samp><span class="option">--change-addresses</span></samp>,
+above.  If <var>section</var> does not exist in the input file, a warning
+will be issued, unless <samp><span class="option">--no-change-warnings</span></samp> is used.
+
+     <br><dt><samp><span class="env">--change-section-vma </span><var>section</var><span class="env">{=,+,-}</span><var>val</var></samp><dd><a name="index-changing-section-VMA-58"></a>Set or change the VMA address of the named <var>section</var>.  The VMA
+address is the address where the section will be located once the
+program has started executing.  Normally this is the same as the LMA
+address, which is the address where the section will be loaded into
+memory, but on some systems, especially those where a program is held in
+ROM, the two can be different.  If &lsquo;<samp><span class="samp">=</span></samp>&rsquo; is used, the section address
+is set to <var>val</var>.  Otherwise, <var>val</var> is added to or subtracted
+from the section address.  See the comments under
+<samp><span class="option">--change-addresses</span></samp>, above.  If <var>section</var> does not exist in
+the input file, a warning will be issued, unless
+<samp><span class="option">--no-change-warnings</span></samp> is used.
+
+     <br><dt><samp><span class="env">--change-warnings</span></samp><dt><samp><span class="env">--adjust-warnings</span></samp><dd>If <samp><span class="option">--change-section-address</span></samp> or <samp><span class="option">--change-section-lma</span></samp> or
+<samp><span class="option">--change-section-vma</span></samp> is used, and the named section does not
+exist, issue a warning.  This is the default.
+
+     <br><dt><samp><span class="env">--no-change-warnings</span></samp><dt><samp><span class="env">--no-adjust-warnings</span></samp><dd>Do not issue a warning if <samp><span class="option">--change-section-address</span></samp> or
+<samp><span class="option">--adjust-section-lma</span></samp> or <samp><span class="option">--adjust-section-vma</span></samp> is used, even
+if the named section does not exist.
+
+     <br><dt><samp><span class="env">--set-section-flags </span><var>section</var><span class="env">=</span><var>flags</var></samp><dd>Set the flags for the named section.  The <var>flags</var> argument is a
+comma separated string of flag names.  The recognized names are
+&lsquo;<samp><span class="samp">alloc</span></samp>&rsquo;, &lsquo;<samp><span class="samp">contents</span></samp>&rsquo;, &lsquo;<samp><span class="samp">load</span></samp>&rsquo;, &lsquo;<samp><span class="samp">noload</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">readonly</span></samp>&rsquo;, &lsquo;<samp><span class="samp">code</span></samp>&rsquo;, &lsquo;<samp><span class="samp">data</span></samp>&rsquo;, &lsquo;<samp><span class="samp">rom</span></samp>&rsquo;, &lsquo;<samp><span class="samp">share</span></samp>&rsquo;, and
+&lsquo;<samp><span class="samp">debug</span></samp>&rsquo;.  You can set the &lsquo;<samp><span class="samp">contents</span></samp>&rsquo; flag for a section which
+does not have contents, but it is not meaningful to clear the
+&lsquo;<samp><span class="samp">contents</span></samp>&rsquo; flag of a section which does have contents&ndash;just remove
+the section instead.  Not all flags are meaningful for all object file
+formats.
+
+     <br><dt><samp><span class="env">--add-section </span><var>sectionname</var><span class="env">=</span><var>filename</var></samp><dd>Add a new section named <var>sectionname</var> while copying the file.  The
+contents of the new section are taken from the file <var>filename</var>.  The
+size of the section will be the size of the file.  This option only
+works on file formats which can support sections with arbitrary names.
+
+     <br><dt><samp><span class="env">--rename-section </span><var>oldname</var><span class="env">=</span><var>newname</var><span class="env">[,</span><var>flags</var><span class="env">]</span></samp><dd>Rename a section from <var>oldname</var> to <var>newname</var>, optionally
+changing the section's flags to <var>flags</var> in the process.  This has
+the advantage over usng a linker script to perform the rename in that
+the output stays as an object file and does not become a linked
+executable.
+
+     <p>This option is particularly helpful when the input format is binary,
+since this will always create a section called .data.  If for example,
+you wanted instead to create a section called .rodata containing binary
+data you could use the following command line to achieve it:
+
+     <pre class="smallexample">            objcopy -I binary -O &lt;output_format&gt; -B &lt;architecture&gt; \
+             --rename-section .data=.rodata,alloc,load,readonly,data,contents \
+             &lt;input_binary_file&gt; &lt;output_object_file&gt;
+</pre>
+     <br><dt><samp><span class="env">--long-section-names {enable,disable,keep}</span></samp><dd>Controls the handling of long section names when processing <code>COFF</code>
+and <code>PE-COFF</code> object formats.  The default behaviour, &lsquo;<samp><span class="samp">keep</span></samp>&rsquo;,
+is to preserve long section names if any are present in the input file. 
+The &lsquo;<samp><span class="samp">enable</span></samp>&rsquo; and &lsquo;<samp><span class="samp">disable</span></samp>&rsquo; options forcibly enable or disable
+the use of long section names in the output object; when &lsquo;<samp><span class="samp">disable</span></samp>&rsquo;
+is in effect, any long section names in the input object will be truncated. 
+The &lsquo;<samp><span class="samp">enable</span></samp>&rsquo; option will only emit long section names if any are
+present in the inputs; this is mostly the same as &lsquo;<samp><span class="samp">keep</span></samp>&rsquo;, but it
+is left undefined whether the &lsquo;<samp><span class="samp">enable</span></samp>&rsquo; option might force the
+creation of an empty string table in the output file.
+
+     <br><dt><samp><span class="env">--change-leading-char</span></samp><dd>Some object file formats use special characters at the start of
+symbols.  The most common such character is underscore, which compilers
+often add before every symbol.  This option tells <samp><span class="command">objcopy</span></samp> to
+change the leading character of every symbol when it converts between
+object file formats.  If the object file formats use the same leading
+character, this option has no effect.  Otherwise, it will add a
+character, or remove a character, or change a character, as
+appropriate.
+
+     <br><dt><samp><span class="env">--remove-leading-char</span></samp><dd>If the first character of a global symbol is a special symbol leading
+character used by the object file format, remove the character.  The
+most common symbol leading character is underscore.  This option will
+remove a leading underscore from all global symbols.  This can be useful
+if you want to link together objects of different file formats with
+different conventions for symbol names.  This is different from
+<samp><span class="option">--change-leading-char</span></samp> because it always changes the symbol name
+when appropriate, regardless of the object file format of the output
+file.
+
+     <br><dt><samp><span class="env">--reverse-bytes=</span><var>num</var></samp><dd>Reverse the bytes in a section with output contents.  A section length must
+be evenly divisible by the value given in order for the swap to be able to
+take place. Reversing takes place before the interleaving is performed.
+
+     <p>This option is used typically in generating ROM images for problematic
+target systems.  For example, on some target boards, the 32-bit words
+fetched from 8-bit ROMs are re-assembled in little-endian byte order
+regardless of the CPU byte order.  Depending on the programming model, the
+endianness of the ROM may need to be modified.
+
+     <p>Consider a simple file with a section containing the following eight
+bytes:  <code>12345678</code>.
+
+     <p>Using &lsquo;<samp><span class="samp">--reverse-bytes=2</span></samp>&rsquo; for the above example, the bytes in the
+output file would be ordered <code>21436587</code>.
+
+     <p>Using &lsquo;<samp><span class="samp">--reverse-bytes=4</span></samp>&rsquo; for the above example, the bytes in the
+output file would be ordered <code>43218765</code>.
+
+     <p>By using &lsquo;<samp><span class="samp">--reverse-bytes=2</span></samp>&rsquo; for the above example, followed by
+&lsquo;<samp><span class="samp">--reverse-bytes=4</span></samp>&rsquo; on the output file, the bytes in the second
+output file would be ordered <code>34127856</code>.
+
+     <br><dt><samp><span class="env">--srec-len=</span><var>ival</var></samp><dd>Meaningful only for srec output.  Set the maximum length of the Srecords
+being produced to <var>ival</var>.  This length covers both address, data and
+crc fields.
+
+     <br><dt><samp><span class="env">--srec-forceS3</span></samp><dd>Meaningful only for srec output.  Avoid generation of S1/S2 records,
+creating S3-only record format.
+
+     <br><dt><samp><span class="env">--redefine-sym </span><var>old</var><span class="env">=</span><var>new</var></samp><dd>Change the name of a symbol <var>old</var>, to <var>new</var>.  This can be useful
+when one is trying link two things together for which you have no
+source, and there are name collisions.
+
+     <br><dt><samp><span class="env">--redefine-syms=</span><var>filename</var></samp><dd>Apply <samp><span class="option">--redefine-sym</span></samp> to each symbol pair "<var>old</var> <var>new</var>"
+listed in the file <var>filename</var>.  <var>filename</var> is simply a flat file,
+with one symbol pair per line.  Line comments may be introduced by the hash
+character.  This option may be given more than once.
+
+     <br><dt><samp><span class="env">--weaken</span></samp><dd>Change all global symbols in the file to be weak.  This can be useful
+when building an object which will be linked against other objects using
+the <samp><span class="option">-R</span></samp> option to the linker.  This option is only effective when
+using an object file format which supports weak symbols.
+
+     <br><dt><samp><span class="env">--keep-symbols=</span><var>filename</var></samp><dd>Apply <samp><span class="option">--keep-symbol</span></samp> option to each symbol listed in the file
+<var>filename</var>.  <var>filename</var> is simply a flat file, with one symbol
+name per line.  Line comments may be introduced by the hash character. 
+This option may be given more than once.
+
+     <br><dt><samp><span class="env">--strip-symbols=</span><var>filename</var></samp><dd>Apply <samp><span class="option">--strip-symbol</span></samp> option to each symbol listed in the file
+<var>filename</var>.  <var>filename</var> is simply a flat file, with one symbol
+name per line.  Line comments may be introduced by the hash character. 
+This option may be given more than once.
+
+     <br><dt><samp><span class="env">--strip-unneeded-symbols=</span><var>filename</var></samp><dd>Apply <samp><span class="option">--strip-unneeded-symbol</span></samp> option to each symbol listed in
+the file <var>filename</var>.  <var>filename</var> is simply a flat file, with one
+symbol name per line.  Line comments may be introduced by the hash
+character.  This option may be given more than once.
+
+     <br><dt><samp><span class="env">--keep-global-symbols=</span><var>filename</var></samp><dd>Apply <samp><span class="option">--keep-global-symbol</span></samp> option to each symbol listed in the
+file <var>filename</var>.  <var>filename</var> is simply a flat file, with one
+symbol name per line.  Line comments may be introduced by the hash
+character.  This option may be given more than once.
+
+     <br><dt><samp><span class="env">--localize-symbols=</span><var>filename</var></samp><dd>Apply <samp><span class="option">--localize-symbol</span></samp> option to each symbol listed in the file
+<var>filename</var>.  <var>filename</var> is simply a flat file, with one symbol
+name per line.  Line comments may be introduced by the hash character. 
+This option may be given more than once.
+
+     <br><dt><samp><span class="env">--globalize-symbols=</span><var>filename</var></samp><dd>Apply <samp><span class="option">--globalize-symbol</span></samp> option to each symbol listed in the file
+<var>filename</var>.  <var>filename</var> is simply a flat file, with one symbol
+name per line.  Line comments may be introduced by the hash character. 
+This option may be given more than once.
+
+     <br><dt><samp><span class="env">--weaken-symbols=</span><var>filename</var></samp><dd>Apply <samp><span class="option">--weaken-symbol</span></samp> option to each symbol listed in the file
+<var>filename</var>.  <var>filename</var> is simply a flat file, with one symbol
+name per line.  Line comments may be introduced by the hash character. 
+This option may be given more than once.
+
+     <br><dt><samp><span class="env">--alt-machine-code=</span><var>index</var></samp><dd>If the output architecture has alternate machine codes, use the
+<var>index</var>th code instead of the default one.  This is useful in case
+a machine is assigned an official code and the tool-chain adopts the
+new code, but other applications still depend on the original code
+being used.  For ELF based architectures if the <var>index</var>
+alternative does not exist then the value is treated as an absolute
+number to be stored in the e_machine field of the ELF header.
+
+     <br><dt><samp><span class="env">--writable-text</span></samp><dd>Mark the output text as writable.  This option isn't meaningful for all
+object file formats.
+
+     <br><dt><samp><span class="env">--readonly-text</span></samp><dd>Make the output text write protected.  This option isn't meaningful for all
+object file formats.
+
+     <br><dt><samp><span class="env">--pure</span></samp><dd>Mark the output file as demand paged.  This option isn't meaningful for all
+object file formats.
+
+     <br><dt><samp><span class="env">--impure</span></samp><dd>Mark the output file as impure.  This option isn't meaningful for all
+object file formats.
+
+     <br><dt><samp><span class="env">--prefix-symbols=</span><var>string</var></samp><dd>Prefix all symbols in the output file with <var>string</var>.
+
+     <br><dt><samp><span class="env">--prefix-sections=</span><var>string</var></samp><dd>Prefix all section names in the output file with <var>string</var>.
+
+     <br><dt><samp><span class="env">--prefix-alloc-sections=</span><var>string</var></samp><dd>Prefix all the names of all allocated sections in the output file with
+<var>string</var>.
+
+     <br><dt><samp><span class="env">--add-gnu-debuglink=</span><var>path-to-file</var></samp><dd>Creates a .gnu_debuglink section which contains a reference to <var>path-to-file</var>
+and adds it to the output file.
+
+     <br><dt><samp><span class="env">--keep-file-symbols</span></samp><dd>When stripping a file, perhaps with <samp><span class="option">--strip-debug</span></samp> or
+<samp><span class="option">--strip-unneeded</span></samp>, retain any symbols specifying source file names,
+which would otherwise get stripped.
+
+     <br><dt><samp><span class="env">--only-keep-debug</span></samp><dd>Strip a file, removing contents of any sections that would not be
+stripped by <samp><span class="option">--strip-debug</span></samp> and leaving the debugging sections
+intact.  In ELF files, this preserves all note sections in the output.
+
+     <p>The intention is that this option will be used in conjunction with
+<samp><span class="option">--add-gnu-debuglink</span></samp> to create a two part executable.  One a
+stripped binary which will occupy less space in RAM and in a
+distribution and the second a debugging information file which is only
+needed if debugging abilities are required.  The suggested procedure
+to create these files is as follows:
+
+          <ol type=1 start=1>
+<li>Link the executable as normal.  Assuming that is is called
+<code>foo</code> then... 
+<li>Run <code>objcopy --only-keep-debug foo foo.dbg</code> to
+create a file containing the debugging info. 
+<li>Run <code>objcopy --strip-debug foo</code> to create a
+stripped executable. 
+<li>Run <code>objcopy --add-gnu-debuglink=foo.dbg foo</code>
+to add a link to the debugging info into the stripped executable.
+          </ol>
+
+     <p>Note&mdash;the choice of <code>.dbg</code> as an extension for the debug info
+file is arbitrary.  Also the <code>--only-keep-debug</code> step is
+optional.  You could instead do this:
+
+          <ol type=1 start=1>
+<li>Link the executable as normal. 
+<li>Copy <code>foo</code> to  <code>foo.full</code>
+<li>Run <code>objcopy --strip-debug foo</code>
+<li>Run <code>objcopy --add-gnu-debuglink=foo.full foo</code>
+          </ol>
+
+     <p>i.e., the file pointed to by the <samp><span class="option">--add-gnu-debuglink</span></samp> can be the
+full executable.  It does not have to be a file created by the
+<samp><span class="option">--only-keep-debug</span></samp> switch.
+
+     <p>Note&mdash;this switch is only intended for use on fully linked files.  It
+does not make sense to use it on object files where the debugging
+information may be incomplete.  Besides the gnu_debuglink feature
+currently only supports the presence of one filename containing
+debugging information, not multiple filenames on a one-per-object-file
+basis.
+
+     <br><dt><samp><span class="env">--file-alignment </span><var>num</var></samp><dd>Specify the file alignment.  Sections in the file will always begin at
+file offsets which are multiples of this number.  This defaults to
+512. 
+[This option is specific to PE targets.]
+
+     <br><dt><samp><span class="env">--heap </span><var>reserve</var></samp><dt><samp><span class="env">--heap </span><var>reserve</var><span class="env">,</span><var>commit</var></samp><dd>Specify the number of bytes of memory to reserve (and optionally commit)
+to be used as heap for this program. 
+[This option is specific to PE targets.]
+
+     <br><dt><samp><span class="env">--image-base </span><var>value</var></samp><dd>Use <var>value</var> as the base address of your program or dll.  This is
+the lowest memory location that will be used when your program or dll
+is loaded.  To reduce the need to relocate and improve performance of
+your dlls, each should have a unique base address and not overlap any
+other dlls.  The default is 0x400000 for executables, and 0x10000000
+for dlls. 
+[This option is specific to PE targets.]
+
+     <br><dt><samp><span class="env">--section-alignment </span><var>num</var></samp><dd>Sets the section alignment.  Sections in memory will always begin at
+addresses which are a multiple of this number.  Defaults to 0x1000. 
+[This option is specific to PE targets.]
+
+     <br><dt><samp><span class="env">--stack </span><var>reserve</var></samp><dt><samp><span class="env">--stack </span><var>reserve</var><span class="env">,</span><var>commit</var></samp><dd>Specify the number of bytes of memory to reserve (and optionally commit)
+to be used as stack for this program. 
+[This option is specific to PE targets.]
+
+     <br><dt><samp><span class="env">--subsystem </span><var>which</var></samp><dt><samp><span class="env">--subsystem </span><var>which</var><span class="env">:</span><var>major</var></samp><dt><samp><span class="env">--subsystem </span><var>which</var><span class="env">:</span><var>major</var><span class="env">.</span><var>minor</var></samp><dd>Specifies the subsystem under which your program will execute.  The
+legal values for <var>which</var> are <code>native</code>, <code>windows</code>,
+<code>console</code>, <code>posix</code>, <code>efi-app</code>, <code>efi-bsd</code>,
+<code>efi-rtd</code>, <code>sal-rtd</code>, and <code>xbox</code>.  You may optionally set
+the subsystem version also.  Numeric values are also accepted for
+<var>which</var>. 
+[This option is specific to PE targets.]
+
+     <br><dt><samp><span class="env">--extract-symbol</span></samp><dd>Keep the file's section flags and symbols but remove all section data. 
+Specifically, the option:
+
+          <ul>
+<li>removes the contents of all sections;
+<li>sets the size of every section to zero; and
+<li>sets the file's start address to zero. 
+</ul>
+
+     <p>This option is used to build a <samp><span class="file">.sym</span></samp> file for a VxWorks kernel. 
+It can also be a useful way of reducing the size of a <samp><span class="option">--just-symbols</span></samp>
+linker input file.
+
+     <br><dt><samp><span class="env">-V</span></samp><dt><samp><span class="env">--version</span></samp><dd>Show the version number of <samp><span class="command">objcopy</span></samp>.
+
+     <br><dt><samp><span class="env">-v</span></samp><dt><samp><span class="env">--verbose</span></samp><dd>Verbose output: list all object files modified.  In the case of
+archives, &lsquo;<samp><span class="samp">objcopy -V</span></samp>&rsquo; lists all members of the archive.
+
+     <br><dt><samp><span class="env">--help</span></samp><dd>Show a summary of the options to <samp><span class="command">objcopy</span></samp>.
+
+     <br><dt><samp><span class="env">--info</span></samp><dd>Display a list showing all architectures and object formats available. 
+</dl>
+
+<!-- man end -->
+   </body></html>
+

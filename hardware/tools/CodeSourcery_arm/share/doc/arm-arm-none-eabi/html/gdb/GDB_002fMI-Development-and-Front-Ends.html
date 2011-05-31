@@ -1,0 +1,99 @@
+<html lang="en">
+<head>
+<title>GDB/MI Development and Front Ends - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="GDB_002fMI.html#GDB_002fMI" title="GDB/MI">
+<link rel="prev" href="GDB_002fMI-Compatibility-with-CLI.html#GDB_002fMI-Compatibility-with-CLI" title="GDB/MI Compatibility with CLI">
+<link rel="next" href="GDB_002fMI-Output-Records.html#GDB_002fMI-Output-Records" title="GDB/MI Output Records">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="GDB%2fMI-Development-and-Front-Ends"></a>
+<a name="GDB_002fMI-Development-and-Front-Ends"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="GDB_002fMI-Output-Records.html#GDB_002fMI-Output-Records">GDB/MI Output Records</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="GDB_002fMI-Compatibility-with-CLI.html#GDB_002fMI-Compatibility-with-CLI">GDB/MI Compatibility with CLI</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="GDB_002fMI.html#GDB_002fMI">GDB/MI</a>
+<hr>
+</div>
+
+<h3 class="section">27.4 <span class="sc">gdb/mi</span> Development and Front Ends</h3>
+
+<p><a name="index-g_t_0040sc_007bgdb_002fmi_007d-development-2016"></a>
+The application which takes the MI output and presents the state of the
+program being debugged to the user is called a <dfn>front end</dfn>.
+
+   <p>Although <span class="sc">gdb/mi</span> is still incomplete, it is currently being used
+by a variety of front ends to <span class="sc">gdb</span>.  This makes it difficult
+to introduce new functionality without breaking existing usage.  This
+section tries to minimize the problems by describing how the protocol
+might change.
+
+   <p>Some changes in MI need not break a carefully designed front end, and
+for these the MI version will remain unchanged.  The following is a
+list of changes that may occur within one level, so front ends should
+parse MI output in a way that can handle them:
+
+     <ul>
+<li>New MI commands may be added.
+
+     <li>New fields may be added to the output of any MI command.
+
+     <li>The range of values for fields with specified values, e.g.,
+<code>in_scope</code> (see <a href="_002dvar_002dupdate.html#g_t_002dvar_002dupdate">-var-update</a>) may be extended.
+
+     <!-- The format of field's content e.g type prefix, may change so parse it -->
+     <!-- at your own risk.  Yes, in general? -->
+     <!-- The order of fields may change?  Shouldn't really matter but it might -->
+     <!-- resolve inconsistencies. -->
+   </ul>
+
+   <p>If the changes are likely to break front ends, the MI version level
+will be increased by one.  This will allow the front end to parse the
+output according to the MI version.  Apart from mi0, new versions of
+<span class="sc">gdb</span> will not support old versions of MI and it will be the
+responsibility of the front end to work with the new one.
+
+<!-- Starting with mi3, add a new command -mi-version that prints the MI -->
+<!-- version? -->
+   <p>The best way to avoid unexpected changes in MI that might break your front
+end is to make your project known to <span class="sc">gdb</span> developers and
+follow development on <a href="mailto:gdb@sourceware.org">gdb@sourceware.org</a> and
+<a href="mailto:gdb-patches@sourceware.org">gdb-patches@sourceware.org</a>. 
+<a name="index-mailing-lists-2017"></a>
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%% SECTION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+
+   </body></html>
+

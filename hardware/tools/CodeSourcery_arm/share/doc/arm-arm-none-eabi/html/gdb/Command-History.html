@@ -1,0 +1,136 @@
+<html lang="en">
+<head>
+<title>Command History - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Controlling-GDB.html#Controlling-GDB" title="Controlling GDB">
+<link rel="prev" href="Editing.html#Editing" title="Editing">
+<link rel="next" href="Screen-Size.html#Screen-Size" title="Screen Size">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Command-History"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Screen-Size.html#Screen-Size">Screen Size</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Editing.html#Editing">Editing</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Controlling-GDB.html#Controlling-GDB">Controlling GDB</a>
+<hr>
+</div>
+
+<h3 class="section">22.3 Command History</h3>
+
+<p><a name="index-command-history-1437"></a>
+<span class="sc">gdb</span> can keep track of the commands you type during your
+debugging sessions, so that you can be certain of precisely what
+happened.  Use these commands to manage the <span class="sc">gdb</span> command
+history facility.
+
+   <p><span class="sc">gdb</span> uses the <span class="sc">gnu</span> History library, a part of the Readline
+package, to provide the history facility.  See <a href="Using-History-Interactively.html#Using-History-Interactively">Using History Interactively</a>, for the detailed description of the History library.
+
+   <p>To issue a command to <span class="sc">gdb</span> without affecting certain aspects of
+the state which is seen by users, prefix it with &lsquo;<samp><span class="samp">server </span></samp>&rsquo;
+(see <a href="Server-Prefix.html#Server-Prefix">Server Prefix</a>).  This
+means that this command will not affect the command history, nor will it
+affect <span class="sc">gdb</span>'s notion of which command to repeat if &lt;RET&gt; is
+pressed on a line by itself.
+
+   <p><a name="index-g_t_0040code_007bserver_007d_002c-command-prefix-1438"></a>The server prefix does not affect the recording of values into the value
+history; to print a value without recording it into the value history,
+use the <code>output</code> command instead of the <code>print</code> command.
+
+   <p>Here is the description of <span class="sc">gdb</span> commands related to command
+history.
+
+     
+<a name="index-history-substitution-1439"></a>
+<a name="index-history-file-1440"></a>
+<a name="index-set-history-filename-1441"></a>
+<a name="index-g_t_0040env_007bGDBHISTFILE_007d_002c-environment-variable-1442"></a>
+<dl><dt><code>set history filename </code><var>fname</var><dd>Set the name of the <span class="sc">gdb</span> command history file to <var>fname</var>. 
+This is the file where <span class="sc">gdb</span> reads an initial command history
+list, and where it writes the command history from this session when it
+exits.  You can access this list through history expansion or through
+the history command editing characters listed below.  This file defaults
+to the value of the environment variable <code>GDBHISTFILE</code>, or to
+<samp><span class="file">./.gdb_history</span></samp> (<samp><span class="file">./_gdb_history</span></samp> on MS-DOS) if this variable
+is not set.
+
+     <p><a name="index-save-command-history-1443"></a><a name="index-set-history-save-1444"></a><br><dt><code>set history save</code><dt><code>set history save on</code><dd>Record command history in a file, whose name may be specified with the
+<code>set history filename</code> command.  By default, this option is disabled.
+
+     <br><dt><code>set history save off</code><dd>Stop recording command history in a file.
+
+     <p><a name="index-history-size-1445"></a><a name="index-set-history-size-1446"></a><a name="index-g_t_0040env_007bHISTSIZE_007d_002c-environment-variable-1447"></a><br><dt><code>set history size </code><var>size</var><dd>Set the number of commands which <span class="sc">gdb</span> keeps in its history list. 
+This defaults to the value of the environment variable
+<code>HISTSIZE</code>, or to 256 if this variable is not set. 
+</dl>
+
+   <p>History expansion assigns special meaning to the character <kbd>!</kbd>. 
+See <a href="Event-Designators.html#Event-Designators">Event Designators</a>, for more details.
+
+   <p><a name="index-history-expansion_002c-turn-on_002foff-1448"></a>Since <kbd>!</kbd> is also the logical not operator in C, history expansion
+is off by default. If you decide to enable history expansion with the
+<code>set history expansion on</code> command, you may sometimes need to
+follow <kbd>!</kbd> (when it is used as logical not, in an expression) with
+a space or a tab to prevent it from being expanded.  The readline
+history facilities do not attempt substitution on the strings
+<kbd>!=</kbd> and <kbd>!(</kbd>, even when history expansion is enabled.
+
+   <p>The commands to control history expansion are:
+
+     <dl>
+<dt><code>set history expansion on</code><dt><code>set history expansion</code><dd><a name="index-set-history-expansion-1449"></a>Enable history expansion.  History expansion is off by default.
+
+     <br><dt><code>set history expansion off</code><dd>Disable history expansion.
+
+     <!-- @group -->
+     <p><a name="index-show-history-1450"></a><br><dt><code>show history</code><dt><code>show history filename</code><dt><code>show history save</code><dt><code>show history size</code><dt><code>show history expansion</code><dd>These commands display the state of the <span class="sc">gdb</span> history parameters. 
+<code>show history</code> by itself displays all four states. 
+<!-- @end group -->
+</dl>
+
+     
+<a name="index-show-commands-1451"></a>
+<a name="index-show-last-commands-1452"></a>
+<a name="index-display-command-history-1453"></a>
+<dl><dt><code>show commands</code><dd>Display the last ten commands in the command history.
+
+     <br><dt><code>show commands </code><var>n</var><dd>Print ten commands centered on command number <var>n</var>.
+
+     <br><dt><code>show commands +</code><dd>Print ten commands just after the commands last printed. 
+</dl>
+
+   </body></html>
+

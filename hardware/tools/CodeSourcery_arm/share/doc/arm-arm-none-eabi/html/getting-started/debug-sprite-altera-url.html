@@ -1,0 +1,51 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>6.7. Altera Devices</title><link rel="stylesheet" href="cs.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.74.0"><link rel="home" href="index.html" title="Sourcery G++ Lite"><link rel="up" href="sprite.html" title="Chapter 6. Sourcery G++ Debug Sprite"><link rel="prev" href="debug-sprite-flashpro-url.html" title="6.6. Actel FlashPro Devices"><link rel="next" href="ch06s08.html" title="6.8. Debugging a Remote Board"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">6.7. Altera Devices</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="debug-sprite-flashpro-url.html">Prev</a> </td><th width="60%" align="center">Chapter 6. Sourcery G++ Debug Sprite</th><td width="20%" align="right"> <a accesskey="n" href="ch06s08.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="debug-sprite-altera-url"></a>6.7. Altera Devices</h2></div></div></div><p>
+  The Debug Sprite can be used to debug applications running on a 
+  Cortex-M1 core embedded in an Altera FPGA supporting the System-Level 
+  Debug (SLD) architecture.  
+  Currently, the Sprite supports the Cyclone III FPGA Starter board on
+  Microsoft Windows hosts.
+  </p><p>
+  The Debug Sprite accepts two forms of the 
+  <em class="replaceable"><code>device-url</code></em> for Altera devices.  
+  For the common case where you have only one Altera Cortex-M1 device 
+  configured, you can use simply:
+
+  </p><pre class="screen">altera://</pre><p>
+  </p><p>
+  The full form of the <em class="replaceable"><code>device-url</code></em> is:
+
+  </p><pre class="screen">altera://usb<em class="replaceable"><code>X</code></em>/hub<em class="replaceable"><code>Y</code></em>/node<em class="replaceable"><code>Z</code></em></pre><p>
+
+  where <em class="replaceable"><code>X</code></em>, <em class="replaceable"><code>Y</code></em>, and 
+  <em class="replaceable"><code>Z</code></em> are non-negative integers.  The SLD 
+  architecture forms a hierarchy; there may be multiple USB Blaster
+  devices (numbered by <em class="replaceable"><code>X</code></em>), multiple Altera FPGAs
+  (numbered by <em class="replaceable"><code>Y</code></em>) per USB Blaster, and multiple
+  nodes (numbered by <em class="replaceable"><code>Z</code></em>) per FPGA.
+  </p><p>
+  The Debug Sprite can autodetect connected Altera Cortex-M1 devices.
+  Invoking the Sprite with the <code class="option">-i</code> option, as described
+  in <a class="xref" href="sprite.html#sec-sprite-probe" title="6.1. Probing for Debug Devices">Section 6.1, &#8220;Probing for Debug Devices&#8221;</a>, displays the 
+  <em class="replaceable"><code>device-url</code></em> for each detected device:
+
+  </p><pre class="screen">&gt; arm-none-eabi-sprite -i
+...
+altera: Altera SLD Hub device
+  altera://usb0/hub0/node1 - Altera Cortex-M Device</pre><p>
+  </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id283866"></a>6.7.1. Setting Up the Altera Device</h3></div></div></div><p>Follow these steps for initial installation and set up of the 
+      Altera device.
+      </p><div class="orderedlist"><ol type="1"><li><p>Install Quartus II Web Edition (or any equivalent), 
+          available from Altera.</p></li><li><p>Install drivers for USB Blaster, also available from
+          Altera.</p></li><li><p>Install Sourcery G++ Lite for ARM EABI.  See
+          <a class="xref" href="chap-installation.html" title="Chapter 2. Installation and Configuration">Chapter 2, &#8220;Installation and Configuration&#8221;</a>.</p></li><li><p>Connect the board and the host computer with a 
+          USB cable.</p></li><li><p>Turn on the board.</p></li><li><p>Use Quartus II to download a 
+          <code class="filename">.sof</code> file including a Cortex-M1 core
+	  to the FPGA.</p></li><li><p>Use <code class="command">arm-none-eabi-sprite -i</code> to
+          verify that the Sprite can detect the installed Cortex-M1 core.
+	  </p></li></ol></div><p>
+    </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id283936"></a>6.7.2. Hardware Breakpoints</h3></div></div></div><p>
+    The Cortex-M1 core only permits hardware breakpoints to be set in
+    the first 512MB of its address space.  Because both external SRAM
+    and flash memory are located at higher addresses, you cannot set
+    hardware breakpoints in these memory regions.
+    </p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="debug-sprite-flashpro-url.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="sprite.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch06s08.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">6.6. Actel FlashPro Devices </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 6.8. Debugging a Remote Board</td></tr></table></div></body></html>

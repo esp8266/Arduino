@@ -1,0 +1,68 @@
+<html lang="en">
+<head>
+<title>Python - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Extending-GDB.html#Extending-GDB" title="Extending GDB">
+<link rel="prev" href="Sequences.html#Sequences" title="Sequences">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Python"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Sequences.html#Sequences">Sequences</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Extending-GDB.html#Extending-GDB">Extending GDB</a>
+<hr>
+</div>
+
+<h3 class="section">23.2 Scripting <span class="sc">gdb</span> using Python</h3>
+
+<p><a name="index-python-scripting-1566"></a><a name="index-scripting-with-python-1567"></a>
+You can script <span class="sc">gdb</span> using the <a href="http://www.python.org/">Python programming language</a>.  This feature is available only if
+<span class="sc">gdb</span> was configured using <samp><span class="option">--with-python</span></samp>.
+
+   <p><a name="index-python-directory-1568"></a>Python scripts used by <span class="sc">gdb</span> should be installed in
+<samp><var>data-directory</var><span class="file">/python</span></samp>, where <var>data-directory</var> is
+the data directory as determined at <span class="sc">gdb</span> startup (see <a href="Data-Files.html#Data-Files">Data Files</a>).  This directory, known as the <dfn>python directory</dfn>,
+is automatically added to the Python Search Path in order to allow
+the Python interpreter to locate all scripts installed at this location.
+
+<ul class="menu">
+<li><a accesskey="1" href="Python-Commands.html#Python-Commands">Python Commands</a>:              Accessing Python from <span class="sc">gdb</span>. 
+<li><a accesskey="2" href="Python-API.html#Python-API">Python API</a>:                   Accessing <span class="sc">gdb</span> from Python. 
+<li><a accesskey="3" href="Auto_002dloading.html#Auto_002dloading">Auto-loading</a>:                 Automatically loading Python code. 
+</ul>
+
+   </body></html>
+

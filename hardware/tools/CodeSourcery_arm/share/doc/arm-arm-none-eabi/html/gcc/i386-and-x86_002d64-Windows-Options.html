@@ -1,0 +1,125 @@
+<html lang="en">
+<head>
+<title>i386 and x86-64 Windows Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Submodel-Options.html#Submodel-Options" title="Submodel Options">
+<link rel="prev" href="i386-and-x86_002d64-Options.html#i386-and-x86_002d64-Options" title="i386 and x86-64 Options">
+<link rel="next" href="IA_002d64-Options.html#IA_002d64-Options" title="IA-64 Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="i386-and-x86-64-Windows-Options"></a>
+<a name="i386-and-x86_002d64-Windows-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="IA_002d64-Options.html#IA_002d64-Options">IA-64 Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="i386-and-x86_002d64-Options.html#i386-and-x86_002d64-Options">i386 and x86-64 Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Submodel-Options.html#Submodel-Options">Submodel Options</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.17.43 i386 and x86-64 Windows Options</h4>
+
+<p><a name="index-i386-and-x86_002d64-Windows-Options-2073"></a>
+These additional options are available for Windows targets:
+
+     <dl>
+<dt><code>-mconsole</code><dd><a name="index-mconsole-2074"></a>This option is available for Cygwin and MinGW targets.  It
+specifies that a console application is to be generated, by
+instructing the linker to set the PE header subsystem type
+required for console applications. 
+This is the default behavior for Cygwin and MinGW targets.
+
+     <br><dt><code>-mcygwin</code><dd><a name="index-mcygwin-2075"></a>This option is available for Cygwin targets.  It specifies that
+the Cygwin internal interface is to be used for predefined
+preprocessor macros, C runtime libraries and related linker
+paths and options.  For Cygwin targets this is the default behavior. 
+This option is deprecated and will be removed in a future release.
+
+     <br><dt><code>-mno-cygwin</code><dd><a name="index-mno_002dcygwin-2076"></a>This option is available for Cygwin targets.  It specifies that
+the MinGW internal interface is to be used instead of Cygwin's, by
+setting MinGW-related predefined macros and linker paths and default
+library options. 
+This option is deprecated and will be removed in a future release.
+
+     <br><dt><code>-mdll</code><dd><a name="index-mdll-2077"></a>This option is available for Cygwin and MinGW targets.  It
+specifies that a DLL - a dynamic link library - is to be
+generated, enabling the selection of the required runtime
+startup object and entry point.
+
+     <br><dt><code>-mnop-fun-dllimport</code><dd><a name="index-mnop_002dfun_002ddllimport-2078"></a>This option is available for Cygwin and MinGW targets.  It
+specifies that the dllimport attribute should be ignored.
+
+     <br><dt><code>-mthread</code><dd><a name="index-mthread-2079"></a>This option is available for MinGW targets. It specifies
+that MinGW-specific thread support is to be used.
+
+     <br><dt><code>-municode</code><dd><a name="index-municode-2080"></a>This option is available for mingw-w64 targets.  It specifies
+that the UNICODE macro is getting pre-defined and that the
+unicode capable runtime startup code is chosen.
+
+     <br><dt><code>-mwin32</code><dd><a name="index-mwin32-2081"></a>This option is available for Cygwin and MinGW targets.  It
+specifies that the typical Windows pre-defined macros are to
+be set in the pre-processor, but does not influence the choice
+of runtime library/startup code.
+
+     <br><dt><code>-mwindows</code><dd><a name="index-mwindows-2082"></a>This option is available for Cygwin and MinGW targets.  It
+specifies that a GUI application is to be generated by
+instructing the linker to set the PE header subsystem type
+appropriately.
+
+     <br><dt><code>-fno-set-stack-executable</code><dd><a name="index-fno_002dset_002dstack_002dexecutable-2083"></a>This option is available for MinGW targets. It specifies that
+the executable flag for stack used by nested functions isn't
+set. This is necessary for binaries running in kernel mode of
+Windows, as there the user32 API, which is used to set executable
+privileges, isn't available.
+
+     <br><dt><code>-mpe-aligned-commons</code><dd><a name="index-mpe_002daligned_002dcommons-2084"></a>This option is available for Cygwin and MinGW targets.  It
+specifies that the GNU extension to the PE file format that
+permits the correct alignment of COMMON variables should be
+used when generating code.  It will be enabled by default if
+GCC detects that the target assembler found during configuration
+supports the feature. 
+</dl>
+
+ <p>See also under <a href="i386-and-x86_002d64-Options.html#i386-and-x86_002d64-Options">i386 and x86-64 Options</a> for standard options.
+
+ </body></html>
+

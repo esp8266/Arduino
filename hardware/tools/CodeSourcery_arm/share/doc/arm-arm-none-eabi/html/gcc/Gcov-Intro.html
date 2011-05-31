@@ -1,0 +1,116 @@
+<html lang="en">
+<head>
+<title>Gcov Intro - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Gcov.html#Gcov" title="Gcov">
+<link rel="next" href="Invoking-Gcov.html#Invoking-Gcov" title="Invoking Gcov">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Gcov-Intro"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Invoking-Gcov.html#Invoking-Gcov">Invoking Gcov</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Gcov.html#Gcov">Gcov</a>
+<hr>
+</div>
+
+<h3 class="section">10.1 Introduction to <samp><span class="command">gcov</span></samp></h3>
+
+<!-- man begin DESCRIPTION -->
+<p><samp><span class="command">gcov</span></samp> is a test coverage program.  Use it in concert with GCC
+to analyze your programs to help create more efficient, faster running
+code and to discover untested parts of your program.  You can use
+<samp><span class="command">gcov</span></samp> as a profiling tool to help discover where your
+optimization efforts will best affect your code.  You can also use
+<samp><span class="command">gcov</span></samp> along with the other profiling tool, <samp><span class="command">gprof</span></samp>, to
+assess which parts of your code use the greatest amount of computing
+time.
+
+ <p>Profiling tools help you analyze your code's performance.  Using a
+profiler such as <samp><span class="command">gcov</span></samp> or <samp><span class="command">gprof</span></samp>, you can find out some
+basic performance statistics, such as:
+
+     <ul>
+<li>how often each line of code executes
+
+     <li>what lines of code are actually executed
+
+     <li>how much computing time each section of code uses
+</ul>
+
+ <p>Once you know these things about how your code works when compiled, you
+can look at each module to see which modules should be optimized. 
+<samp><span class="command">gcov</span></samp> helps you determine where to work on optimization.
+
+ <p>Software developers also use coverage testing in concert with
+testsuites, to make sure software is actually good enough for a release. 
+Testsuites can verify that a program works as expected; a coverage
+program tests to see how much of the program is exercised by the
+testsuite.  Developers can then determine what kinds of test cases need
+to be added to the testsuites to create both better testing and a better
+final product.
+
+ <p>You should compile your code without optimization if you plan to use
+<samp><span class="command">gcov</span></samp> because the optimization, by combining some lines of code
+into one function, may not give you as much information as you need to
+look for `hot spots' where the code is using a great deal of computer
+time.  Likewise, because <samp><span class="command">gcov</span></samp> accumulates statistics by line (at
+the lowest resolution), it works best with a programming style that
+places only one statement on each line.  If you use complicated macros
+that expand to loops or to other control structures, the statistics are
+less helpful&mdash;they only report on the line where the macro call
+appears.  If your complex macros behave like functions, you can replace
+them with inline functions to solve this problem.
+
+ <p><samp><span class="command">gcov</span></samp> creates a logfile called <samp><var>sourcefile</var><span class="file">.gcov</span></samp> which
+indicates how many times each line of a source file <samp><var>sourcefile</var><span class="file">.c</span></samp>
+has executed.  You can use these logfiles along with <samp><span class="command">gprof</span></samp> to aid
+in fine-tuning the performance of your programs.  <samp><span class="command">gprof</span></samp> gives
+timing information you can use along with the information you get from
+<samp><span class="command">gcov</span></samp>.
+
+ <p><samp><span class="command">gcov</span></samp> works only on code compiled with GCC.  It is not
+compatible with any other profiling or test coverage mechanism.
+
+<!-- man end -->
+ </body></html>
+

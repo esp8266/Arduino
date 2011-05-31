@@ -1,0 +1,130 @@
+<html lang="en">
+<head>
+<title>Ifdef - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Conditional-Syntax.html#Conditional-Syntax" title="Conditional Syntax">
+<link rel="next" href="If.html#If" title="If">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Ifdef"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="If.html#If">If</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Conditional-Syntax.html#Conditional-Syntax">Conditional Syntax</a>
+<hr>
+</div>
+
+<h4 class="subsection">4.2.1 Ifdef</h4>
+
+<p><a name="index-g_t_0023ifdef-85"></a><a name="index-g_t_0023endif-86"></a>
+The simplest sort of conditional is
+
+<pre class="smallexample">     #ifdef <var>MACRO</var>
+     
+     <var>controlled text</var>
+     
+     #endif /* <var>MACRO</var> */
+</pre>
+   <p><a name="index-conditional-group-87"></a>This block is called a <dfn>conditional group</dfn>.  <var>controlled text</var>
+will be included in the output of the preprocessor if and only if
+<var>MACRO</var> is defined.  We say that the conditional <dfn>succeeds</dfn> if
+<var>MACRO</var> is defined, <dfn>fails</dfn> if it is not.
+
+   <p>The <var>controlled text</var> inside of a conditional can include
+preprocessing directives.  They are executed only if the conditional
+succeeds.  You can nest conditional groups inside other conditional
+groups, but they must be completely nested.  In other words,
+&lsquo;<samp><span class="samp">#endif</span></samp>&rsquo; always matches the nearest &lsquo;<samp><span class="samp">#ifdef</span></samp>&rsquo; (or
+&lsquo;<samp><span class="samp">#ifndef</span></samp>&rsquo;, or &lsquo;<samp><span class="samp">#if</span></samp>&rsquo;).  Also, you cannot start a conditional
+group in one file and end it in another.
+
+   <p>Even if a conditional fails, the <var>controlled text</var> inside it is
+still run through initial transformations and tokenization.  Therefore,
+it must all be lexically valid C.  Normally the only way this matters is
+that all comments and string literals inside a failing conditional group
+must still be properly ended.
+
+   <p>The comment following the &lsquo;<samp><span class="samp">#endif</span></samp>&rsquo; is not required, but it is a
+good practice if there is a lot of <var>controlled text</var>, because it
+helps people match the &lsquo;<samp><span class="samp">#endif</span></samp>&rsquo; to the corresponding &lsquo;<samp><span class="samp">#ifdef</span></samp>&rsquo;. 
+Older programs sometimes put <var>MACRO</var> directly after the
+&lsquo;<samp><span class="samp">#endif</span></samp>&rsquo; without enclosing it in a comment.  This is invalid code
+according to the C standard.  CPP accepts it with a warning.  It
+never affects which &lsquo;<samp><span class="samp">#ifndef</span></samp>&rsquo; the &lsquo;<samp><span class="samp">#endif</span></samp>&rsquo; matches.
+
+   <p><a name="index-g_t_0023ifndef-88"></a>Sometimes you wish to use some code if a macro is <em>not</em> defined. 
+You can do this by writing &lsquo;<samp><span class="samp">#ifndef</span></samp>&rsquo; instead of &lsquo;<samp><span class="samp">#ifdef</span></samp>&rsquo;. 
+One common use of &lsquo;<samp><span class="samp">#ifndef</span></samp>&rsquo; is to include code only the first
+time a header file is included.  See <a href="Once_002dOnly-Headers.html#Once_002dOnly-Headers">Once-Only Headers</a>.
+
+   <p>Macro definitions can vary between compilations for several reasons. 
+Here are some samples.
+
+     <ul>
+<li>Some macros are predefined on each kind of machine
+(see <a href="System_002dspecific-Predefined-Macros.html#System_002dspecific-Predefined-Macros">System-specific Predefined Macros</a>).  This allows you to provide
+code specially tuned for a particular machine.
+
+     <li>System header files define more macros, associated with the features
+they implement.  You can test these macros with conditionals to avoid
+using a system feature on a machine where it is not implemented.
+
+     <li>Macros can be defined or undefined with the <samp><span class="option">-D</span></samp> and <samp><span class="option">-U</span></samp>
+command line options when you compile the program.  You can arrange to
+compile the same source file into two different programs by choosing a
+macro name to specify which program you want, writing conditionals to
+test whether or how this macro is defined, and then controlling the
+state of the macro with command line options, perhaps set in the
+Makefile.  See <a href="Invocation.html#Invocation">Invocation</a>.
+
+     <li>Your program might have a special header file (often called
+<samp><span class="file">config.h</span></samp>) that is adjusted when the program is compiled.  It can
+define or not define macros depending on the features of the system and
+the desired capabilities of the program.  The adjustment can be
+automated by a tool such as <samp><span class="command">autoconf</span></samp>, or done by hand. 
+</ul>
+
+   </body></html>
+

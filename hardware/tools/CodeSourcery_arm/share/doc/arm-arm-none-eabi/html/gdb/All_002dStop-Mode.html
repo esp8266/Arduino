@@ -1,0 +1,130 @@
+<html lang="en">
+<head>
+<title>All-Stop Mode - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Thread-Stops.html#Thread-Stops" title="Thread Stops">
+<link rel="next" href="Non_002dStop-Mode.html#Non_002dStop-Mode" title="Non-Stop Mode">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="All-Stop-Mode"></a>
+<a name="All_002dStop-Mode"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Non_002dStop-Mode.html#Non_002dStop-Mode">Non-Stop Mode</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Thread-Stops.html#Thread-Stops">Thread Stops</a>
+<hr>
+</div>
+
+<h4 class="subsection">5.4.1 All-Stop Mode</h4>
+
+<p><a name="index-all_002dstop-mode-318"></a>
+In all-stop mode, whenever your program stops under <span class="sc">gdb</span> for any reason,
+<em>all</em> threads of execution stop, not just the current thread.  This
+allows you to examine the overall state of the program, including
+switching between threads, without worrying that things may change
+underfoot.
+
+   <p>Conversely, whenever you restart the program, <em>all</em> threads start
+executing.  <em>This is true even when single-stepping</em> with commands
+like <code>step</code> or <code>next</code>.
+
+   <p>In particular, <span class="sc">gdb</span> cannot single-step all threads in lockstep. 
+Since thread scheduling is up to your debugging target's operating
+system (not controlled by <span class="sc">gdb</span>), other threads may
+execute more than one statement while the current thread completes a
+single step.  Moreover, in general other threads stop in the middle of a
+statement, rather than at a clean statement boundary, when the program
+stops.
+
+   <p>You might even find your program stopped in another thread after
+continuing or even single-stepping.  This happens whenever some other
+thread runs into a breakpoint, a signal, or an exception before the
+first thread completes whatever you requested.
+
+   <p><a name="index-automatic-thread-selection-319"></a><a name="index-switching-threads-automatically-320"></a><a name="index-threads_002c-automatic-switching-321"></a>Whenever <span class="sc">gdb</span> stops your program, due to a breakpoint or a
+signal, it automatically selects the thread where that breakpoint or
+signal happened.  <span class="sc">gdb</span> alerts you to the context switch with a
+message such as &lsquo;<samp><span class="samp">[Switching to Thread </span><var>n</var><span class="samp">]</span></samp>&rsquo; to identify the
+thread.
+
+   <p>On some OSes, you can modify <span class="sc">gdb</span>'s default behavior by
+locking the OS scheduler to allow only a single thread to run.
+
+     <dl>
+<dt><code>set scheduler-locking </code><var>mode</var><dd><a name="index-scheduler-locking-mode-322"></a><a name="index-lock-scheduler-323"></a>Set the scheduler locking mode.  If it is <code>off</code>, then there is no
+locking and any thread may run at any time.  If <code>on</code>, then only the
+current thread may run when the inferior is resumed.  The <code>step</code>
+mode optimizes for single-stepping; it prevents other threads
+from preempting the current thread while you are stepping, so that
+the focus of debugging does not change unexpectedly. 
+Other threads only rarely (or never) get a chance to run
+when you step.  They are more likely to run when you &lsquo;<samp><span class="samp">next</span></samp>&rsquo; over a
+function call, and they are completely free to run when you use commands
+like &lsquo;<samp><span class="samp">continue</span></samp>&rsquo;, &lsquo;<samp><span class="samp">until</span></samp>&rsquo;, or &lsquo;<samp><span class="samp">finish</span></samp>&rsquo;.  However, unless another
+thread hits a breakpoint during its timeslice, <span class="sc">gdb</span> does not change
+the current thread away from the thread that you are debugging.
+
+     <br><dt><code>show scheduler-locking</code><dd>Display the current scheduler locking mode. 
+</dl>
+
+   <p><a name="index-resume-threads-of-multiple-processes-simultaneously-324"></a>By default, when you issue one of the execution commands such as
+<code>continue</code>, <code>next</code> or <code>step</code>, <span class="sc">gdb</span> allows only
+threads of the current inferior to run.  For example, if <span class="sc">gdb</span>
+is attached to two inferiors, each with two threads, the
+<code>continue</code> command resumes only the two threads of the current
+inferior.  This is useful, for example, when you debug a program that
+forks and you want to hold the parent stopped (so that, for instance,
+it doesn't run to exit), while you debug the child.  In other
+situations, you may not be interested in inspecting the current state
+of any of the processes <span class="sc">gdb</span> is attached to, and you may want
+to resume them all until some breakpoint is hit.  In the latter case,
+you can instruct <span class="sc">gdb</span> to allow all threads of all the
+inferiors to run with the <code>set&nbsp;schedule-multiple</code><!-- /@w --> command.
+
+     
+<a name="index-set-schedule_002dmultiple-325"></a>
+<dl><dt><code>set schedule-multiple</code><dd>Set the mode for allowing threads of multiple processes to be resumed
+when an execution command is issued.  When <code>on</code>, all threads of
+all processes are allowed to run.  When <code>off</code>, only the threads
+of the current process are resumed.  The default is <code>off</code>.  The
+<code>scheduler-locking</code> mode takes precedence when set to <code>on</code>,
+or while you are stepping and set to <code>step</code>.
+
+     <br><dt><code>show schedule-multiple</code><dd>Display the current mode for resuming the execution of threads of
+multiple processes. 
+</dl>
+
+   </body></html>
+

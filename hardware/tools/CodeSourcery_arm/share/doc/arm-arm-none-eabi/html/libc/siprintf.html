@@ -1,0 +1,90 @@
+<html lang="en">
+<head>
+<title>siprintf - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="setvbuf.html#setvbuf" title="setvbuf">
+<link rel="next" href="siscanf.html#siscanf" title="siscanf">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="siprintf"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="siscanf.html#siscanf">siscanf</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="setvbuf.html#setvbuf">setvbuf</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.58 <code>siprintf</code>, <code>fiprintf</code>, <code>iprintf</code>, <code>sniprintf</code>, <code>asiprintf</code>, <code>asniprintf</code>&mdash;format output (integer only)</h3>
+
+<p><a name="index-fiprintf-266"></a><a name="index-g_t_005ffiprintf_005fr-267"></a><a name="index-iprintf-268"></a><a name="index-g_t_005fiprintf_005fr-269"></a><a name="index-siprintf-270"></a><a name="index-g_t_005fsiprintf_005fr-271"></a><a name="index-sniprintf-272"></a><a name="index-g_t_005fsniprintf_005fr-273"></a><a name="index-asiprintf-274"></a><a name="index-g_t_005fasiprintf_005fr-275"></a><a name="index-asniprintf-276"></a><a name="index-g_t_005fasniprintf_005fr-277"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     
+     int iprintf(const char *<var>format</var>, ...);
+     int fiprintf(FILE *<var>fd</var>, const char *<var>format</var> , ...);
+     int siprintf(char *<var>str</var>, const char *<var>format</var>, ...);
+     int sniprintf(char *<var>str</var>, size_t <var>size</var>, const char *<var>format</var>,
+         ...);
+     int asiprintf(char **<var>strp</var>, const char *<var>format</var>, ...);
+     char *asniprintf(char *<var>str</var>, size_t *<var>size</var>,
+         const char *<var>format</var>, ...);
+     
+     int _iprintf_r(struct _reent *<var>ptr</var>, const char *<var>format</var>, ...);
+     int _fiprintf_r(struct _reent *<var>ptr</var>, FILE *<var>fd</var>,
+         const char *<var>format</var>, ...);
+     int _siprintf_r(struct _reent *<var>ptr</var>, char *<var>str</var>,
+         const char *<var>format</var>, ...);
+     int _sniprintf_r(struct _reent *<var>ptr</var>, char *<var>str</var>, size_t <var>size</var>,
+         const char *<var>format</var>, ...);
+     int _asiprintf_r(struct _reent *<var>ptr</var>, char **<var>strp</var>,
+         const char *<var>format</var>, ...);
+     char *_asniprintf_r(struct _reent *<var>ptr</var>, char *<var>str</var>,
+         size_t *<var>size</var>, const char *<var>format</var>, ...);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>iprintf</code>, <code>fiprintf</code>, <code>siprintf</code>, <code>sniprintf</code>,
+<code>asiprintf</code>, and <code>asniprintf</code> are the same as <code>printf</code>,
+<code>fprintf</code>, <code>sprintf</code>, <code>snprintf</code>, <code>asprintf</code>, and
+<code>asnprintf</code>, respectively, except that they restrict usage
+to non-floating-point format specifiers.
+
+   <p><code>_iprintf_r</code>, <code>_fiprintf_r</code>, <code>_asiprintf_r</code>,
+<code>_siprintf_r</code>, <code>_sniprintf_r</code>, <code>_asniprintf_r</code> are
+simply reentrant versions of the functions above.
+
+   <p><br>
+<strong>Returns</strong><br>
+Similar to <code>printf</code>, <code>fprintf</code>, <code>sprintf</code>, <code>snprintf</code>, <code>asprintf</code>,
+and <code>asnprintf</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>iprintf</code>, <code>fiprintf</code>, <code>siprintf</code>, <code>sniprintf</code>, <code>asiprintf</code>,
+and <code>asniprintf</code> are newlib extensions.
+
+   <p>Supporting OS subroutines required: <code>close</code>, <code>fstat</code>, <code>isatty</code>,
+<code>lseek</code>, <code>read</code>, <code>sbrk</code>, <code>write</code>.
+
+   <p><br>
+
+   </body></html>
+

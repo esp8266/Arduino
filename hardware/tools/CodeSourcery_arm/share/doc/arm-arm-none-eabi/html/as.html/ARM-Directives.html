@@ -1,0 +1,348 @@
+<html lang="en">
+<head>
+<title>ARM Directives - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="ARM_002dDependent.html#ARM_002dDependent" title="ARM-Dependent">
+<link rel="prev" href="ARM-Floating-Point.html#ARM-Floating-Point" title="ARM Floating Point">
+<link rel="next" href="ARM-Opcodes.html#ARM-Opcodes" title="ARM Opcodes">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="ARM-Directives"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="ARM-Opcodes.html#ARM-Opcodes">ARM Opcodes</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="ARM-Floating-Point.html#ARM-Floating-Point">ARM Floating Point</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="ARM_002dDependent.html#ARM_002dDependent">ARM-Dependent</a>
+<hr>
+</div>
+
+<h4 class="subsection">9.3.4 ARM Machine Directives</h4>
+
+<p><a name="index-machine-directives_002c-ARM-607"></a><a name="index-ARM-machine-directives-608"></a>
+     <dl>
+<!-- AAAAAAAAAAAAAAAAAAAAAAAAA -->
+
+     <p><a name="index-g_t_0040code_007b_002e2byte_007d-directive_002c-ARM-609"></a><a name="index-g_t_0040code_007b_002e4byte_007d-directive_002c-ARM-610"></a><a name="index-g_t_0040code_007b_002e8byte_007d-directive_002c-ARM-611"></a><dt><code>.2byte </code><var>expression</var><code> [, </code><var>expression</var><code>]*</code><dt><code>.4byte </code><var>expression</var><code> [, </code><var>expression</var><code>]*</code><dt><code>.8byte </code><var>expression</var><code> [, </code><var>expression</var><code>]*</code><dd>These directives write 2, 4 or 8 byte values to the output section.
+
+     <p><a name="index-g_t_0040code_007b_002ealign_007d-directive_002c-ARM-612"></a><br><dt><code>.align </code><var>expression</var><code> [, </code><var>expression</var><code>]</code><dd>This is the generic <var>.align</var> directive.  For the ARM however if the
+first argument is zero (ie no alignment is needed) the assembler will
+behave as if the argument had been 2 (ie pad to the next four byte
+boundary).  This is for compatibility with ARM's own assembler.
+
+     <p><a name="index-g_t_0040code_007b_002earch_007d-directive_002c-ARM-613"></a><br><dt><code>.arch </code><var>name</var><dd>Select the target architecture.  Valid values for <var>name</var> are the same as
+for the <samp><span class="option">-march</span></samp> commandline option.
+
+     <p>Specifying <code>.arch</code> clears any previously selected architecture
+extensions.
+
+     <p><a name="index-g_t_0040code_007b_002earch_005fextension_007d-directive_002c-ARM-614"></a><br><dt><code>.arch_extension </code><var>name</var><dd>Add or remove an architecture extension to the target architecture.  Valid
+values for <var>name</var> are the same as those accepted as architectural
+extensions by the <samp><span class="option">-mcpu</span></samp> commandline option.
+
+     <p><code>.arch_extension</code> may be used multiple times to add or remove extensions
+incrementally to the architecture being compiled for.
+
+     <p><a name="index-g_t_0040code_007b_002earm_007d-directive_002c-ARM-615"></a><br><dt><code>.arm</code><dd>This performs the same action as <var>.code 32</var>.
+
+     <p><a name="arm_005fpad"></a><a name="index-g_t_0040code_007b_002epad_007d-directive_002c-ARM-616"></a><br><dt><code>.pad #</code><var>count</var><dd>Generate unwinder annotations for a stack adjustment of <var>count</var> bytes. 
+A positive value indicates the function prologue allocated stack space by
+decrementing the stack pointer.
+
+     <!-- BBBBBBBBBBBBBBBBBBBBBBBBBB -->
+     <p><a name="index-g_t_0040code_007b_002ebss_007d-directive_002c-ARM-617"></a><br><dt><code>.bss</code><dd>This directive switches to the <code>.bss</code> section.
+
+     <!-- CCCCCCCCCCCCCCCCCCCCCCCCCC -->
+     <p><a name="index-g_t_0040code_007b_002ecantunwind_007d-directive_002c-ARM-618"></a><br><dt><code>.cantunwind</code><dd>Prevents unwinding through the current function.  No personality routine
+or exception table data is required or permitted.
+
+     <p><a name="index-g_t_0040code_007b_002ecode_007d-directive_002c-ARM-619"></a><br><dt><code>.code [16|32]</code><dd>This directive selects the instruction set being generated. The value 16
+selects Thumb, with the value 32 selecting ARM.
+
+     <p><a name="index-g_t_0040code_007b_002ecpu_007d-directive_002c-ARM-620"></a><br><dt><code>.cpu </code><var>name</var><dd>Select the target processor.  Valid values for <var>name</var> are the same as
+for the <samp><span class="option">-mcpu</span></samp> commandline option.
+
+     <p>Specifying <code>.cpu</code> clears any previously selected architecture
+extensions.
+
+     <!-- DDDDDDDDDDDDDDDDDDDDDDDDDD -->
+     <p><a name="index-g_t_0040code_007b_002edn_007d-and-_0040code_007b_002eqn_007d-directives_002c-ARM-621"></a><br><dt><var>name</var><code> .dn </code><var>register name</var><code> [</code><var>.type</var><code>] [[</code><var>index</var><code>]]</code><dt><var>name</var><code> .qn </code><var>register name</var><code> [</code><var>.type</var><code>] [[</code><var>index</var><code>]]</code><dd>
+The <code>dn</code> and <code>qn</code> directives are used to create typed
+and/or indexed register aliases for use in Advanced SIMD Extension
+(Neon) instructions.  The former should be used to create aliases
+of double-precision registers, and the latter to create aliases of
+quad-precision registers.
+
+     <p>If these directives are used to create typed aliases, those aliases can
+be used in Neon instructions instead of writing types after the mnemonic
+or after each operand.  For example:
+
+     <pre class="smallexample">                  x .dn d2.f32
+                  y .dn d3.f32
+                  z .dn d4.f32[1]
+                  vmul x,y,z
+</pre>
+     <p>This is equivalent to writing the following:
+
+     <pre class="smallexample">                  vmul.f32 d2,d3,d4[1]
+</pre>
+     <p>Aliases created using <code>dn</code> or <code>qn</code> can be destroyed using
+<code>unreq</code>.
+
+     <!-- EEEEEEEEEEEEEEEEEEEEEEEEEE -->
+     <p><a name="index-g_t_0040code_007b_002eeabi_005fattribute_007d-directive_002c-ARM-622"></a><br><dt><code>.eabi_attribute </code><var>tag</var><code>, </code><var>value</var><dd>Set the EABI object attribute <var>tag</var> to <var>value</var>.
+
+     <p>The <var>tag</var> is either an attribute number, or one of the following:
+<code>Tag_CPU_raw_name</code>, <code>Tag_CPU_name</code>, <code>Tag_CPU_arch</code>,
+<code>Tag_CPU_arch_profile</code>, <code>Tag_ARM_ISA_use</code>,
+<code>Tag_THUMB_ISA_use</code>, <code>Tag_FP_arch</code>, <code>Tag_WMMX_arch</code>,
+<code>Tag_Advanced_SIMD_arch</code>, <code>Tag_PCS_config</code>,
+<code>Tag_ABI_PCS_R9_use</code>, <code>Tag_ABI_PCS_RW_data</code>,
+<code>Tag_ABI_PCS_RO_data</code>, <code>Tag_ABI_PCS_GOT_use</code>,
+<code>Tag_ABI_PCS_wchar_t</code>, <code>Tag_ABI_FP_rounding</code>,
+<code>Tag_ABI_FP_denormal</code>, <code>Tag_ABI_FP_exceptions</code>,
+<code>Tag_ABI_FP_user_exceptions</code>, <code>Tag_ABI_FP_number_model</code>,
+<code>Tag_ABI_align_needed</code>, <code>Tag_ABI_align_preserved</code>,
+<code>Tag_ABI_enum_size</code>, <code>Tag_ABI_HardFP_use</code>,
+<code>Tag_ABI_VFP_args</code>, <code>Tag_ABI_WMMX_args</code>,
+<code>Tag_ABI_optimization_goals</code>, <code>Tag_ABI_FP_optimization_goals</code>,
+<code>Tag_compatibility</code>, <code>Tag_CPU_unaligned_access</code>,
+<code>Tag_FP_HP_extension</code>, <code>Tag_ABI_FP_16bit_format</code>,
+<code>Tag_MPextension_use</code>, <code>Tag_DIV_use</code>,
+<code>Tag_nodefaults</code>, <code>Tag_also_compatible_with</code>,
+<code>Tag_conformance</code>, <code>Tag_T2EE_use</code>,
+<code>Tag_Virtualization_use</code>
+
+     <p>The <var>value</var> is either a <code>number</code>, <code>"string"</code>, or
+<code>number, "string"</code> depending on the tag.
+
+     <p>Note - the following legacy values are also accepted by <var>tag</var>:
+<code>Tag_VFP_arch</code>, <code>Tag_ABI_align8_needed</code>,
+<code>Tag_ABI_align8_preserved</code>, <code>Tag_VFP_HP_extension</code>,
+
+     <p><a name="index-g_t_0040code_007b_002eeven_007d-directive_002c-ARM-623"></a><br><dt><code>.even</code><dd>This directive aligns to an even-numbered address.
+
+     <p><a name="index-g_t_0040code_007b_002eextend_007d-directive_002c-ARM-624"></a><a name="index-g_t_0040code_007b_002eldouble_007d-directive_002c-ARM-625"></a><br><dt><code>.extend  </code><var>expression</var><code> [, </code><var>expression</var><code>]*</code><dt><code>.ldouble  </code><var>expression</var><code> [, </code><var>expression</var><code>]*</code><dd>These directives write 12byte long double floating-point values to the
+output section.  These are not compatible with current ARM processors
+or ABIs.
+
+     <!-- FFFFFFFFFFFFFFFFFFFFFFFFFF -->
+     <p><a name="arm_005ffnend"></a><a name="index-g_t_0040code_007b_002efnend_007d-directive_002c-ARM-626"></a><br><dt><code>.fnend</code><dd>Marks the end of a function with an unwind table entry.  The unwind index
+table entry is created when this directive is processed.
+
+     <p>If no personality routine has been specified then standard personality
+routine 0 or 1 will be used, depending on the number of unwind opcodes
+required.
+
+     <p><a name="arm_005ffnstart"></a><a name="index-g_t_0040code_007b_002efnstart_007d-directive_002c-ARM-627"></a><br><dt><code>.fnstart</code><dd>Marks the start of a function with an unwind table entry.
+
+     <p><a name="index-g_t_0040code_007b_002eforce_005fthumb_007d-directive_002c-ARM-628"></a><br><dt><code>.force_thumb</code><dd>This directive forces the selection of Thumb instructions, even if the
+target processor does not support those instructions
+
+     <p><a name="index-g_t_0040code_007b_002efpu_007d-directive_002c-ARM-629"></a><br><dt><code>.fpu </code><var>name</var><dd>Select the floating-point unit to assemble for.  Valid values for <var>name</var>
+are the same as for the <samp><span class="option">-mfpu</span></samp> commandline option.
+
+     <!-- GGGGGGGGGGGGGGGGGGGGGGGGGG -->
+     <!-- HHHHHHHHHHHHHHHHHHHHHHHHHH -->
+     <p><a name="index-g_t_0040code_007b_002ehandlerdata_007d-directive_002c-ARM-630"></a><br><dt><code>.handlerdata</code><dd>Marks the end of the current function, and the start of the exception table
+entry for that function.  Anything between this directive and the
+<code>.fnend</code> directive will be added to the exception table entry.
+
+     <p>Must be preceded by a <code>.personality</code> or <code>.personalityindex</code>
+directive.
+
+     <!-- IIIIIIIIIIIIIIIIIIIIIIIIII -->
+     <p><a name="index-g_t_0040code_007b_002einst_007d-directive_002c-ARM-631"></a><br><dt><code>.inst </code><var>opcode</var><code> [ , ... ]</code><dt><code>.inst.n </code><var>opcode</var><code> [ , ... ]</code><dt><code>.inst.w </code><var>opcode</var><code> [ , ... ]</code><dd>Generates the instruction corresponding to the numerical value <var>opcode</var>. 
+<code>.inst.n</code> and <code>.inst.w</code> allow the Thumb instruction size to be
+specified explicitly, overriding the normal encoding rules.
+
+     <!-- JJJJJJJJJJJJJJJJJJJJJJJJJJ -->
+     <!-- KKKKKKKKKKKKKKKKKKKKKKKKKK -->
+     <!-- LLLLLLLLLLLLLLLLLLLLLLLLLL -->
+     <br><dt><code>.ldouble  </code><var>expression</var><code> [, </code><var>expression</var><code>]*</code><dd>See <code>.extend</code>.
+
+     <p><a name="index-g_t_0040code_007b_002eltorg_007d-directive_002c-ARM-632"></a><br><dt><code>.ltorg</code><dd>This directive causes the current contents of the literal pool to be
+dumped into the current section (which is assumed to be the .text
+section) at the current location (aligned to a word boundary). 
+<code>GAS</code> maintains a separate literal pool for each section and each
+sub-section.  The <code>.ltorg</code> directive will only affect the literal
+pool of the current section and sub-section.  At the end of assembly
+all remaining, un-empty literal pools will automatically be dumped.
+
+     <p>Note - older versions of <code>GAS</code> would dump the current literal
+pool any time a section change occurred.  This is no longer done, since
+it prevents accurate control of the placement of literal pools.
+
+     <!-- MMMMMMMMMMMMMMMMMMMMMMMMMM -->
+     <p><a name="index-g_t_0040code_007b_002emovsp_007d-directive_002c-ARM-633"></a><br><dt><code>.movsp </code><var>reg</var><code> [, #</code><var>offset</var><code>]</code><dd>Tell the unwinder that <var>reg</var> contains an offset from the current
+stack pointer.  If <var>offset</var> is not specified then it is assumed to be
+zero.
+
+     <!-- NNNNNNNNNNNNNNNNNNNNNNNNNN -->
+     <!-- OOOOOOOOOOOOOOOOOOOOOOOOOO -->
+     <p><a name="index-g_t_0040code_007b_002eobject_005farch_007d-directive_002c-ARM-634"></a><br><dt><code>.object_arch </code><var>name</var><dd>Override the architecture recorded in the EABI object attribute section. 
+Valid values for <var>name</var> are the same as for the <code>.arch</code> directive. 
+Typically this is useful when code uses runtime detection of CPU features.
+
+     <!-- PPPPPPPPPPPPPPPPPPPPPPPPPP -->
+     <p><a name="index-g_t_0040code_007b_002epacked_007d-directive_002c-ARM-635"></a><br><dt><code>.packed  </code><var>expression</var><code> [, </code><var>expression</var><code>]*</code><dd>This directive writes 12-byte packed floating-point values to the
+output section.  These are not compatible with current ARM processors
+or ABIs.
+
+     <p><a name="index-g_t_0040code_007b_002epad_007d-directive_002c-ARM-636"></a><br><dt><code>.pad #</code><var>count</var><dd>Generate unwinder annotations for a stack adjustment of <var>count</var> bytes. 
+A positive value indicates the function prologue allocated stack space by
+decrementing the stack pointer.
+
+     <p><a name="index-g_t_0040code_007b_002epersonality_007d-directive_002c-ARM-637"></a><br><dt><code>.personality </code><var>name</var><dd>Sets the personality routine for the current function to <var>name</var>.
+
+     <p><a name="index-g_t_0040code_007b_002epersonalityindex_007d-directive_002c-ARM-638"></a><br><dt><code>.personalityindex </code><var>index</var><dd>Sets the personality routine for the current function to the EABI standard
+routine number <var>index</var>
+
+     <p><a name="index-g_t_0040code_007b_002epool_007d-directive_002c-ARM-639"></a><br><dt><code>.pool</code><dd>This is a synonym for .ltorg.
+
+     <!-- QQQQQQQQQQQQQQQQQQQQQQQQQQ -->
+     <!-- RRRRRRRRRRRRRRRRRRRRRRRRRR -->
+     <p><a name="index-g_t_0040code_007b_002ereq_007d-directive_002c-ARM-640"></a><br><dt><var>name</var><code> .req </code><var>register name</var><dd>This creates an alias for <var>register name</var> called <var>name</var>.  For
+example:
+
+     <pre class="smallexample">                  foo .req r0
+</pre>
+     <!-- SSSSSSSSSSSSSSSSSSSSSSSSSS -->
+     <p><a name="arm_005fsave"></a><a name="index-g_t_0040code_007b_002esave_007d-directive_002c-ARM-641"></a><br><dt><code>.save </code><var>reglist</var><dd>Generate unwinder annotations to restore the registers in <var>reglist</var>. 
+The format of <var>reglist</var> is the same as the corresponding store-multiple
+instruction.
+
+     <pre class="smallexample">     <br><em>core registers</em><br>
+            .save {r4, r5, r6, lr}
+            stmfd sp!, {r4, r5, r6, lr}
+     <br><em>FPA registers</em><br>
+            .save f4, 2
+            sfmfd f4, 2, [sp]!
+     <br><em>VFP registers</em><br>
+            .save {d8, d9, d10}
+            fstmdx sp!, {d8, d9, d10}
+     <br><em>iWMMXt registers</em><br>
+            .save {wr10, wr11}
+            wstrd wr11, [sp, #-8]!
+            wstrd wr10, [sp, #-8]!
+          or
+            .save wr11
+            wstrd wr11, [sp, #-8]!
+            .save wr10
+            wstrd wr10, [sp, #-8]!
+</pre>
+     <p><a name="arm_005fsetfp"></a><a name="index-g_t_0040code_007b_002esetfp_007d-directive_002c-ARM-642"></a><br><dt><code>.setfp </code><var>fpreg</var><code>, </code><var>spreg</var><code> [, #</code><var>offset</var><code>]</code><dd>Make all unwinder annotations relative to a frame pointer.  Without this
+the unwinder will use offsets from the stack pointer.
+
+     <p>The syntax of this directive is the same as the <code>add</code> or <code>mov</code>
+instruction used to set the frame pointer.  <var>spreg</var> must be either
+<code>sp</code> or mentioned in a previous <code>.movsp</code> directive.
+
+     <pre class="smallexample">          .movsp ip
+          mov ip, sp
+          ...
+          .setfp fp, ip, #4
+          add fp, ip, #4
+</pre>
+     <p><a name="index-g_t_0040code_007b_002esecrel32_007d-directive_002c-ARM-643"></a><br><dt><code>.secrel32 </code><var>expression</var><code> [, </code><var>expression</var><code>]*</code><dd>This directive emits relocations that evaluate to the section-relative
+offset of each expression's symbol.  This directive is only supported
+for PE targets.
+
+     <p><a name="index-g_t_0040code_007b_002esyntax_007d-directive_002c-ARM-644"></a><br><dt><code>.syntax [unified | divided]</code><dd>This directive sets the Instruction Set Syntax as described in the
+<a href="ARM_002dInstruction_002dSet.html#ARM_002dInstruction_002dSet">ARM-Instruction-Set</a> section.
+
+     <!-- TTTTTTTTTTTTTTTTTTTTTTTTTT -->
+     <p><a name="index-g_t_0040code_007b_002ethumb_007d-directive_002c-ARM-645"></a><br><dt><code>.thumb</code><dd>This performs the same action as <var>.code 16</var>.
+
+     <p><a name="index-g_t_0040code_007b_002ethumb_005ffunc_007d-directive_002c-ARM-646"></a><br><dt><code>.thumb_func</code><dd>This directive specifies that the following symbol is the name of a
+Thumb encoded function.  This information is necessary in order to allow
+the assembler and linker to generate correct code for interworking
+between Arm and Thumb instructions and should be used even if
+interworking is not going to be performed.  The presence of this
+directive also implies <code>.thumb</code>
+
+     <p>This directive is not neccessary when generating EABI objects.  On these
+targets the encoding is implicit when generating Thumb code.
+
+     <p><a name="index-g_t_0040code_007b_002ethumb_005fset_007d-directive_002c-ARM-647"></a><br><dt><code>.thumb_set</code><dd>This performs the equivalent of a <code>.set</code> directive in that it
+creates a symbol which is an alias for another symbol (possibly not yet
+defined).  This directive also has the added property in that it marks
+the aliased symbol as being a thumb function entry point, in the same
+way that the <code>.thumb_func</code> directive does.
+
+     <p><a name="index-g_t_0040code_007b_002etlsdescseq_007d-directive_002c-ARM-648"></a><br><dt><code>.tlsdescseq </code><var>tls-variable</var><dd>This directive is used to annotate parts of an inlined TLS descriptor
+trampoline.  Normally the trampoline is provided by the linker, and
+this directive is not needed.
+
+     <!-- UUUUUUUUUUUUUUUUUUUUUUUUUU -->
+     <p><a name="index-g_t_0040code_007b_002eunreq_007d-directive_002c-ARM-649"></a><br><dt><code>.unreq </code><var>alias-name</var><dd>This undefines a register alias which was previously defined using the
+<code>req</code>, <code>dn</code> or <code>qn</code> directives.  For example:
+
+     <pre class="smallexample">                  foo .req r0
+                  .unreq foo
+</pre>
+     <p>An error occurs if the name is undefined.  Note - this pseudo op can
+be used to delete builtin in register name aliases (eg 'r0').  This
+should only be done if it is really necessary.
+
+     <p><a name="index-g_t_0040code_007b_002eunwind_005fraw_007d-directive_002c-ARM-650"></a><br><dt><code>.unwind_raw </code><var>offset</var><code>, </code><var>byte1</var><code>, ...</code><dd>Insert one of more arbitary unwind opcode bytes, which are known to adjust
+the stack pointer by <var>offset</var> bytes.
+
+     <p>For example <code>.unwind_raw 4, 0xb1, 0x01</code> is equivalent to
+<code>.save {r0}</code>
+
+     <!-- VVVVVVVVVVVVVVVVVVVVVVVVVV -->
+     <p><a name="index-g_t_0040code_007b_002evsave_007d-directive_002c-ARM-651"></a><br><dt><code>.vsave </code><var>vfp-reglist</var><dd>Generate unwinder annotations to restore the VFP registers in <var>vfp-reglist</var>
+using FLDMD.  Also works for VFPv3 registers
+that are to be restored using VLDM. 
+The format of <var>vfp-reglist</var> is the same as the corresponding store-multiple
+instruction.
+
+     <pre class="smallexample">     <br><em>VFP registers</em><br>
+            .vsave {d8, d9, d10}
+            fstmdd sp!, {d8, d9, d10}
+     <br><em>VFPv3 registers</em><br>
+            .vsave {d15, d16, d17}
+            vstm sp!, {d15, d16, d17}
+</pre>
+     <p>Since FLDMX and FSTMX are now deprecated, this directive should be
+used in favour of <code>.save</code> for saving VFP registers for ARMv6 and above.
+
+     <!-- WWWWWWWWWWWWWWWWWWWWWWWWWW -->
+     <!-- XXXXXXXXXXXXXXXXXXXXXXXXXX -->
+     <!-- YYYYYYYYYYYYYYYYYYYYYYYYYY -->
+     <!-- ZZZZZZZZZZZZZZZZZZZZZZZZZZ -->
+   </dl>
+
+   </body></html>
+

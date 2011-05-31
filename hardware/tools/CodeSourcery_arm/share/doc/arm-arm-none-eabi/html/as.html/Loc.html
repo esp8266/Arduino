@@ -1,0 +1,84 @@
+<html lang="en">
+<head>
+<title>Loc - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Pseudo-Ops.html#Pseudo-Ops" title="Pseudo Ops">
+<link rel="prev" href="Ln.html#Ln" title="Ln">
+<link rel="next" href="Loc_005fmark_005flabels.html#Loc_005fmark_005flabels" title="Loc_mark_labels">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Loc"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Loc_005fmark_005flabels.html#Loc_005fmark_005flabels">Loc_mark_labels</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Ln.html#Ln">Ln</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Pseudo-Ops.html#Pseudo-Ops">Pseudo Ops</a>
+<hr>
+</div>
+
+<h3 class="section">7.73 <code>.loc </code><var>fileno</var> <var>lineno</var><code> [</code><var>column</var><code>] [</code><var>options</var><code>]</code></h3>
+
+<p><a name="index-g_t_0040code_007bloc_007d-directive-386"></a>When emitting DWARF2 line number information,
+the <code>.loc</code> directive will add a row to the <code>.debug_line</code> line
+number matrix corresponding to the immediately following assembly
+instruction.  The <var>fileno</var>, <var>lineno</var>, and optional <var>column</var>
+arguments will be applied to the <code>.debug_line</code> state machine before
+the row is added.
+
+   <p>The <var>options</var> are a sequence of the following tokens in any order:
+
+     <dl>
+<dt><code>basic_block</code><dd>This option will set the <code>basic_block</code> register in the
+<code>.debug_line</code> state machine to <code>true</code>.
+
+     <br><dt><code>prologue_end</code><dd>This option will set the <code>prologue_end</code> register in the
+<code>.debug_line</code> state machine to <code>true</code>.
+
+     <br><dt><code>epilogue_begin</code><dd>This option will set the <code>epilogue_begin</code> register in the
+<code>.debug_line</code> state machine to <code>true</code>.
+
+     <br><dt><code>is_stmt </code><var>value</var><dd>This option will set the <code>is_stmt</code> register in the
+<code>.debug_line</code> state machine to <code>value</code>, which must be
+either 0 or 1.
+
+     <br><dt><code>isa </code><var>value</var><dd>This directive will set the <code>isa</code> register in the <code>.debug_line</code>
+state machine to <var>value</var>, which must be an unsigned integer.
+
+     <br><dt><code>discriminator </code><var>value</var><dd>This directive will set the <code>discriminator</code> register in the <code>.debug_line</code>
+state machine to <var>value</var>, which must be an unsigned integer.
+
+   </dl>
+
+   </body></html>
+

@@ -1,0 +1,115 @@
+<html lang="en">
+<head>
+<title>TUI Commands - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="TUI.html#TUI" title="TUI">
+<link rel="prev" href="TUI-Single-Key-Mode.html#TUI-Single-Key-Mode" title="TUI Single Key Mode">
+<link rel="next" href="TUI-Configuration.html#TUI-Configuration" title="TUI Configuration">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="TUI-Commands"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="TUI-Configuration.html#TUI-Configuration">TUI Configuration</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="TUI-Single-Key-Mode.html#TUI-Single-Key-Mode">TUI Single Key Mode</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="TUI.html#TUI">TUI</a>
+<hr>
+</div>
+
+<h3 class="section">25.4 TUI-specific Commands</h3>
+
+<p><a name="index-TUI-commands-1985"></a>
+The TUI has specific commands to control the text windows. 
+These commands are always available, even when <span class="sc">gdb</span> is not in
+the TUI mode.  When <span class="sc">gdb</span> is in the standard mode, most
+of these commands will automatically switch to the TUI mode.
+
+   <p>Note that if <span class="sc">gdb</span>'s <code>stdout</code> is not connected to a
+terminal, or <span class="sc">gdb</span> has been started with the machine interface
+interpreter (see <a href="GDB_002fMI.html#GDB_002fMI">The <span class="sc">gdb/mi</span> Interface</a>), most of
+these commands will fail with an error, because it would not be
+possible or desirable to enable curses window management.
+
+     <dl>
+<dt><code>info win</code><dd><a name="index-info-win-1986"></a>List and give the size of all displayed windows.
+
+     <br><dt><code>layout next</code><dd><a name="index-layout-1987"></a>Display the next layout.
+
+     <br><dt><code>layout prev</code><dd>Display the previous layout.
+
+     <br><dt><code>layout src</code><dd>Display the source window only.
+
+     <br><dt><code>layout asm</code><dd>Display the assembly window only.
+
+     <br><dt><code>layout split</code><dd>Display the source and assembly window.
+
+     <br><dt><code>layout regs</code><dd>Display the register window together with the source or assembly window.
+
+     <br><dt><code>focus next</code><dd><a name="index-focus-1988"></a>Make the next window active for scrolling.
+
+     <br><dt><code>focus prev</code><dd>Make the previous window active for scrolling.
+
+     <br><dt><code>focus src</code><dd>Make the source window active for scrolling.
+
+     <br><dt><code>focus asm</code><dd>Make the assembly window active for scrolling.
+
+     <br><dt><code>focus regs</code><dd>Make the register window active for scrolling.
+
+     <br><dt><code>focus cmd</code><dd>Make the command window active for scrolling.
+
+     <br><dt><code>refresh</code><dd><a name="index-refresh-1989"></a>Refresh the screen.  This is similar to typing <kbd>C-L</kbd>.
+
+     <br><dt><code>tui reg float</code><dd><a name="index-tui-reg-1990"></a>Show the floating point registers in the register window.
+
+     <br><dt><code>tui reg general</code><dd>Show the general registers in the register window.
+
+     <br><dt><code>tui reg next</code><dd>Show the next register group.  The list of register groups as well as
+their order is target specific.  The predefined register groups are the
+following: <code>general</code>, <code>float</code>, <code>system</code>, <code>vector</code>,
+<code>all</code>, <code>save</code>, <code>restore</code>.
+
+     <br><dt><code>tui reg system</code><dd>Show the system registers in the register window.
+
+     <br><dt><code>update</code><dd><a name="index-update-1991"></a>Update the source window and the current execution point.
+
+     <br><dt><code>winheight </code><var>name</var><code> +</code><var>count</var><dt><code>winheight </code><var>name</var><code> -</code><var>count</var><dd><a name="index-winheight-1992"></a>Change the height of the window <var>name</var> by <var>count</var>
+lines.  Positive counts increase the height, while negative counts
+decrease it.
+
+     <br><dt><code>tabset </code><var>nchars</var><dd><a name="index-tabset-1993"></a>Set the width of tab stops to be <var>nchars</var> characters. 
+</dl>
+
+   </body></html>
+

@@ -1,0 +1,53 @@
+<html lang="en">
+<head>
+<title>Stdarg - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Arglists.html#Arglists" title="Arglists">
+<link rel="next" href="Varargs.html#Varargs" title="Varargs">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Stdarg"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Varargs.html#Varargs">Varargs</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Arglists.html#Arglists">Arglists</a>
+<hr>
+</div>
+
+<h3 class="section">13.1 ANSI-standard macros, <samp><span class="file">stdarg.h</span></samp></h3>
+
+<p>In ANSI C, a function has a variable number of arguments when its
+parameter list ends in an ellipsis (<code>...</code>).  The parameter list
+must also include at least one explicitly named argument; that argument
+is used to initialize the variable list data structure.
+
+   <p>ANSI C defines three macros (<code>va_start</code>, <code>va_arg</code>, and
+<code>va_end</code>) to operate on variable argument lists.  <samp><span class="file">stdarg.h</span></samp>
+also defines a special type to represent variable argument lists: this
+type is called <code>va_list</code>.
+
+<ul class="menu">
+<li><a accesskey="1" href="va_005fstart.html#va_005fstart">va_start</a>
+<li><a accesskey="2" href="va_005farg.html#va_005farg">va_arg</a>
+<li><a accesskey="3" href="va_005fend.html#va_005fend">va_end</a>
+</ul>
+
+   </body></html>
+

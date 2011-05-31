@@ -1,0 +1,96 @@
+<html lang="en">
+<head>
+<title>SPARC VIS Built-in Functions - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Target-Builtins.html#Target-Builtins" title="Target Builtins">
+<link rel="prev" href="RX-Built_002din-Functions.html#RX-Built_002din-Functions" title="RX Built-in Functions">
+<link rel="next" href="SPU-Built_002din-Functions.html#SPU-Built_002din-Functions" title="SPU Built-in Functions">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="SPARC-VIS-Built-in-Functions"></a>
+<a name="SPARC-VIS-Built_002din-Functions"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="SPU-Built_002din-Functions.html#SPU-Built_002din-Functions">SPU Built-in Functions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="RX-Built_002din-Functions.html#RX-Built_002din-Functions">RX Built-in Functions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Target-Builtins.html#Target-Builtins">Target Builtins</a>
+<hr>
+</div>
+
+<h4 class="subsection">6.52.14 SPARC VIS Built-in Functions</h4>
+
+<p>GCC supports SIMD operations on the SPARC using both the generic vector
+extensions (see <a href="Vector-Extensions.html#Vector-Extensions">Vector Extensions</a>) as well as built-in functions for
+the SPARC Visual Instruction Set (VIS).  When you use the <samp><span class="option">-mvis</span></samp>
+switch, the VIS extension is exposed as the following built-in functions:
+
+<pre class="smallexample">     typedef int v2si __attribute__ ((vector_size (8)));
+     typedef short v4hi __attribute__ ((vector_size (8)));
+     typedef short v2hi __attribute__ ((vector_size (4)));
+     typedef char v8qi __attribute__ ((vector_size (8)));
+     typedef char v4qi __attribute__ ((vector_size (4)));
+     
+     void * __builtin_vis_alignaddr (void *, long);
+     int64_t __builtin_vis_faligndatadi (int64_t, int64_t);
+     v2si __builtin_vis_faligndatav2si (v2si, v2si);
+     v4hi __builtin_vis_faligndatav4hi (v4si, v4si);
+     v8qi __builtin_vis_faligndatav8qi (v8qi, v8qi);
+     
+     v4hi __builtin_vis_fexpand (v4qi);
+     
+     v4hi __builtin_vis_fmul8x16 (v4qi, v4hi);
+     v4hi __builtin_vis_fmul8x16au (v4qi, v4hi);
+     v4hi __builtin_vis_fmul8x16al (v4qi, v4hi);
+     v4hi __builtin_vis_fmul8sux16 (v8qi, v4hi);
+     v4hi __builtin_vis_fmul8ulx16 (v8qi, v4hi);
+     v2si __builtin_vis_fmuld8sux16 (v4qi, v2hi);
+     v2si __builtin_vis_fmuld8ulx16 (v4qi, v2hi);
+     
+     v4qi __builtin_vis_fpack16 (v4hi);
+     v8qi __builtin_vis_fpack32 (v2si, v2si);
+     v2hi __builtin_vis_fpackfix (v2si);
+     v8qi __builtin_vis_fpmerge (v4qi, v4qi);
+     
+     int64_t __builtin_vis_pdist (v8qi, v8qi, int64_t);
+</pre>
+ </body></html>
+

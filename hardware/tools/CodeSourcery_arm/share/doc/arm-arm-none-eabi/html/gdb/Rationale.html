@@ -1,0 +1,187 @@
+<html lang="en">
+<head>
+<title>Rationale - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Agent-Expressions.html#Agent-Expressions" title="Agent Expressions">
+<link rel="prev" href="Varying-Target-Capabilities.html#Varying-Target-Capabilities" title="Varying Target Capabilities">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Rationale"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Varying-Target-Capabilities.html#Varying-Target-Capabilities">Varying Target Capabilities</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Agent-Expressions.html#Agent-Expressions">Agent Expressions</a>
+<hr>
+</div>
+
+<h3 class="section">E.5 Rationale</h3>
+
+<p>Some of the design decisions apparent above are arguable.
+
+     <dl>
+<dt><b>What about stack overflow/underflow?</b><dd>GDB should be able to query the target to discover its stack size. 
+Given that information, GDB can determine at translation time whether a
+given expression will overflow the stack.  But this spec isn't about
+what kinds of error-checking GDB ought to do.
+
+     <br><dt><b>Why are you doing everything in LONGEST?</b><dd>
+Speed isn't important, but agent code size is; using LONGEST brings in a
+bunch of support code to do things like division, etc.  So this is a
+serious concern.
+
+     <p>First, note that you don't need different bytecodes for different
+operand sizes.  You can generate code without <em>knowing</em> how big the
+stack elements actually are on the target.  If the target only supports
+32-bit ints, and you don't send any 64-bit bytecodes, everything just
+works.  The observation here is that the MIPS and the Alpha have only
+fixed-size registers, and you can still get C's semantics even though
+most instructions only operate on full-sized words.  You just need to
+make sure everything is properly sign-extended at the right times.  So
+there is no need for 32- and 64-bit variants of the bytecodes.  Just
+implement everything using the largest size you support.
+
+     <p>GDB should certainly check to see what sizes the target supports, so the
+user can get an error earlier, rather than later.  But this information
+is not necessary for correctness.
+
+     <br><dt><b>Why don't you have </b><code>&gt;</code><b> or </b><code>&lt;=</code><b> operators?</b><dd>I want to keep the interpreter small, and we don't need them.  We can
+combine the <code>less_</code> opcodes with <code>log_not</code>, and swap the order
+of the operands, yielding all four asymmetrical comparison operators. 
+For example, <code>(x &lt;= y)</code> is <code>! (x &gt; y)</code>, which is <code>! (y &lt;
+x)</code>.
+
+     <br><dt><b>Why do you have </b><code>log_not</code><b>?</b><dt><b>Why do you have </b><code>ext</code><b>?</b><dt><b>Why do you have </b><code>zero_ext</code><b>?</b><dd>These are all easily synthesized from other instructions, but I expect
+them to be used frequently, and they're simple, so I include them to
+keep bytecode strings short.
+
+     <p><code>log_not</code> is equivalent to <code>const8 0 equal</code>; it's used in half
+the relational operators.
+
+     <p><code>ext </code><var>n</var> is equivalent to <code>const8 </code><var>s-n</var><code> lsh const8
+</code><var>s-n</var><code> rsh_signed</code>, where <var>s</var> is the size of the stack elements;
+it follows <code>ref</code><var>m</var> and <var>reg</var> bytecodes when the value
+should be signed.  See the next bulleted item.
+
+     <p><code>zero_ext </code><var>n</var> is equivalent to <code>const</code><var>m</var> <var>mask</var><code>
+log_and</code>; it's used whenever we push the value of a register, because we
+can't assume the upper bits of the register aren't garbage.
+
+     <br><dt><b>Why not have sign-extending variants of the </b><code>ref</code><b> operators?</b><dd>Because that would double the number of <code>ref</code> operators, and we
+need the <code>ext</code> bytecode anyway for accessing bitfields.
+
+     <br><dt><b>Why not have constant-address variants of the </b><code>ref</code><b> operators?</b><dd>Because that would double the number of <code>ref</code> operators again, and
+<code>const32 </code><var>address</var><code> ref32</code> is only one byte longer.
+
+     <br><dt><b>Why do the </b><code>ref</code><var>n</var><b> operators have to support unaligned fetches?</b><dd>GDB will generate bytecode that fetches multi-byte values at unaligned
+addresses whenever the executable's debugging information tells it to. 
+Furthermore, GDB does not know the value the pointer will have when GDB
+generates the bytecode, so it cannot determine whether a particular
+fetch will be aligned or not.
+
+     <p>In particular, structure bitfields may be several bytes long, but follow
+no alignment rules; members of packed structures are not necessarily
+aligned either.
+
+     <p>In general, there are many cases where unaligned references occur in
+correct C code, either at the programmer's explicit request, or at the
+compiler's discretion.  Thus, it is simpler to make the GDB agent
+bytecodes work correctly in all circumstances than to make GDB guess in
+each case whether the compiler did the usual thing.
+
+     <br><dt><b>Why are there no side-effecting operators?</b><dd>Because our current client doesn't want them?  That's a cheap answer.  I
+think the real answer is that I'm afraid of implementing function
+calls.  We should re-visit this issue after the present contract is
+delivered.
+
+     <br><dt><b>Why aren't the </b><code>goto</code><b> ops PC-relative?</b><dd>The interpreter has the base address around anyway for PC bounds
+checking, and it seemed simpler.
+
+     <br><dt><b>Why is there only one offset size for the </b><code>goto</code><b> ops?</b><dd>Offsets are currently sixteen bits.  I'm not happy with this situation
+either:
+
+     <p>Suppose we have multiple branch ops with different offset sizes.  As I
+generate code left-to-right, all my jumps are forward jumps (there are
+no loops in expressions), so I never know the target when I emit the
+jump opcode.  Thus, I have to either always assume the largest offset
+size, or do jump relaxation on the code after I generate it, which seems
+like a big waste of time.
+
+     <p>I can imagine a reasonable expression being longer than 256 bytes.  I
+can't imagine one being longer than 64k.  Thus, we need 16-bit offsets. 
+This kind of reasoning is so bogus, but relaxation is pathetic.
+
+     <p>The other approach would be to generate code right-to-left.  Then I'd
+always know my offset size.  That might be fun.
+
+     <br><dt><b>Where is the function call bytecode?</b><dd>
+When we add side-effects, we should add this.
+
+     <br><dt><b>Why does the </b><code>reg</code><b> bytecode take a 16-bit register number?</b><dd>
+Intel's IA-64 architecture has 128 general-purpose registers,
+and 128 floating-point registers, and I'm sure it has some random
+control registers.
+
+     <br><dt><b>Why do we need </b><code>trace</code><b> and </b><code>trace_quick</code><b>?</b><dd>Because GDB needs to record all the memory contents and registers an
+expression touches.  If the user wants to evaluate an expression
+<code>x-&gt;y-&gt;z</code>, the agent must record the values of <code>x</code> and
+<code>x-&gt;y</code> as well as the value of <code>x-&gt;y-&gt;z</code>.
+
+     <br><dt><b>Don't the </b><code>trace</code><b> bytecodes make the interpreter less general?</b><dd>They do mean that the interpreter contains special-purpose code, but
+that doesn't mean the interpreter can only be used for that purpose.  If
+an expression doesn't use the <code>trace</code> bytecodes, they don't get in
+its way.
+
+     <br><dt><b>Why doesn't </b><code>trace_quick</code><b> consume its arguments the way everything else does?</b><dd>In general, you do want your operators to consume their arguments; it's
+consistent, and generally reduces the amount of stack rearrangement
+necessary.  However, <code>trace_quick</code> is a kludge to save space; it
+only exists so we needn't write <code>dup const8 </code><var>SIZE</var><code> trace</code>
+before every memory reference.  Therefore, it's okay for it not to
+consume its arguments; it's meant for a specific context in which we
+know exactly what it should do with the stack.  If we're going to have a
+kludge, it should be an effective kludge.
+
+     <br><dt><b>Why does </b><code>trace16</code><b> exist?</b><dd>That opcode was added by the customer that contracted Cygnus for the
+data tracing work.  I personally think it is unnecessary; objects that
+large will be quite rare, so it is okay to use <code>dup const16
+</code><var>size</var><code> trace</code> in those cases.
+
+     <p>Whatever we decide to do with <code>trace16</code>, we should at least leave
+opcode 0x30 reserved, to remain compatible with the customer who added
+it.
+
+   </dl>
+
+   </body></html>
+

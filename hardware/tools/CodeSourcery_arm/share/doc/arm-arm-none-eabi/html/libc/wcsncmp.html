@@ -1,0 +1,69 @@
+<html lang="en">
+<head>
+<title>wcsncmp - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Wchar-strings.html#Wchar-strings" title="Wchar strings">
+<link rel="prev" href="wcsncat.html#wcsncat" title="wcsncat">
+<link rel="next" href="wcsncpy.html#wcsncpy" title="wcsncpy">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="wcsncmp"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="wcsncpy.html#wcsncpy">wcsncpy</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="wcsncat.html#wcsncat">wcsncat</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Wchar-strings.html#Wchar-strings">Wchar strings</a>
+<hr>
+</div>
+
+<h3 class="section">6.18 <code>wcsncmp</code>&mdash;compare part of two wide-character strings</h3>
+
+<p><strong>Synopsis</strong>
+<pre class="example">     #include &lt;wchar.h&gt;
+     int wcsncmp(const wchar_t *<var>s1</var>, const wchar_t *<var>s2</var>, size_t <var>n</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+The <code>wcsncmp</code> function compares not more than <var>n</var> wide-character
+codes (wide-character codes that follow a null wide-character code are
+not compared) from the array pointed to by <var>s1</var> to the array pointed
+to by <var>s2</var>.
+
+   <p>The sign of a non-zero return value is determined by the sign of the
+difference between the values of the first pair of wide-character codes
+that differ in the objects being compared.
+
+   <p><br>
+<strong>Returns</strong><br>
+Upon successful completion, <code>wcsncmp</code> returns an integer greater than,
+equal to or less than 0, if the possibly null-terminated array pointed
+to by <var>s1</var> is greater than, equal to or less than the possibly
+null-terminated array pointed to by <var>s2</var> respectively.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>wcsncmp</code> is ISO/IEC 9899/AMD1:1995 (ISO C).
+
+   <p>No supporting OS subroutines are required.
+
+   <p><br>
+
+   </body></html>
+

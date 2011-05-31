@@ -1,0 +1,95 @@
+<html lang="en">
+<head>
+<title>C++ Attributes - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C_002b_002b-Extensions.html#C_002b_002b-Extensions" title="C++ Extensions">
+<link rel="prev" href="Bound-member-functions.html#Bound-member-functions" title="Bound member functions">
+<link rel="next" href="Namespace-Association.html#Namespace-Association" title="Namespace Association">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="C++-Attributes"></a>
+<a name="C_002b_002b-Attributes"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Namespace-Association.html#Namespace-Association">Namespace Association</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Bound-member-functions.html#Bound-member-functions">Bound member functions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C_002b_002b-Extensions.html#C_002b_002b-Extensions">C++ Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">7.7 C++-Specific Variable, Function, and Type Attributes</h3>
+
+<p>Some attributes only make sense for C++ programs.
+
+     <dl>
+<dt><code>init_priority (</code><var>priority</var><code>)</code><dd><a name="index-init_005fpriority-attribute-3189"></a>
+
+     <p>In Standard C++, objects defined at namespace scope are guaranteed to be
+initialized in an order in strict accordance with that of their definitions
+<em>in a given translation unit</em>.  No guarantee is made for initializations
+across translation units.  However, GNU C++ allows users to control the
+order of initialization of objects defined at namespace scope with the
+<code>init_priority</code> attribute by specifying a relative <var>priority</var>,
+a constant integral expression currently bounded between 101 and 65535
+inclusive.  Lower numbers indicate a higher priority.
+
+     <p>In the following example, <code>A</code> would normally be created before
+<code>B</code>, but the <code>init_priority</code> attribute has reversed that order:
+
+     <pre class="smallexample">          Some_Class  A  __attribute__ ((init_priority (2000)));
+          Some_Class  B  __attribute__ ((init_priority (543)));
+</pre>
+     <p class="noindent">Note that the particular values of <var>priority</var> do not matter; only their
+relative ordering.
+
+     <br><dt><code>java_interface</code><dd><a name="index-java_005finterface-attribute-3190"></a>
+This type attribute informs C++ that the class is a Java interface.  It may
+only be applied to classes declared within an <code>extern "Java"</code> block. 
+Calls to methods declared in this interface will be dispatched using GCJ's
+interface table mechanism, instead of regular virtual table dispatch.
+
+ </dl>
+
+ <p>See also <a href="Namespace-Association.html#Namespace-Association">Namespace Association</a>.
+
+ </body></html>
+

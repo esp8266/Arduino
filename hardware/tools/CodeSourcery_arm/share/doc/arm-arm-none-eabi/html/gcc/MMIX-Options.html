@@ -1,0 +1,106 @@
+<html lang="en">
+<head>
+<title>MMIX Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Submodel-Options.html#Submodel-Options" title="Submodel Options">
+<link rel="prev" href="MIPS-Options.html#MIPS-Options" title="MIPS Options">
+<link rel="next" href="MN10300-Options.html#MN10300-Options" title="MN10300 Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="MMIX-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="MN10300-Options.html#MN10300-Options">MN10300 Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="MIPS-Options.html#MIPS-Options">MIPS Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Submodel-Options.html#Submodel-Options">Submodel Options</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.17.26 MMIX Options</h4>
+
+<p><a name="index-MMIX-Options-1676"></a>
+These options are defined for the MMIX:
+
+     <dl>
+<dt><code>-mlibfuncs</code><dt><code>-mno-libfuncs</code><dd><a name="index-mlibfuncs-1677"></a><a name="index-mno_002dlibfuncs-1678"></a>Specify that intrinsic library functions are being compiled, passing all
+values in registers, no matter the size.
+
+     <br><dt><code>-mepsilon</code><dt><code>-mno-epsilon</code><dd><a name="index-mepsilon-1679"></a><a name="index-mno_002depsilon-1680"></a>Generate floating-point comparison instructions that compare with respect
+to the <code>rE</code> epsilon register.
+
+     <br><dt><code>-mabi=mmixware</code><dt><code>-mabi=gnu</code><dd><a name="index-mabi_003dmmixware-1681"></a><a name="index-mabi_003dgnu-1682"></a>Generate code that passes function parameters and return values that (in
+the called function) are seen as registers <code>$0</code> and up, as opposed to
+the GNU ABI which uses global registers <code>$231</code> and up.
+
+     <br><dt><code>-mzero-extend</code><dt><code>-mno-zero-extend</code><dd><a name="index-mzero_002dextend-1683"></a><a name="index-mno_002dzero_002dextend-1684"></a>When reading data from memory in sizes shorter than 64 bits, use (do not
+use) zero-extending load instructions by default, rather than
+sign-extending ones.
+
+     <br><dt><code>-mknuthdiv</code><dt><code>-mno-knuthdiv</code><dd><a name="index-mknuthdiv-1685"></a><a name="index-mno_002dknuthdiv-1686"></a>Make the result of a division yielding a remainder have the same sign as
+the divisor.  With the default, <samp><span class="option">-mno-knuthdiv</span></samp>, the sign of the
+remainder follows the sign of the dividend.  Both methods are
+arithmetically valid, the latter being almost exclusively used.
+
+     <br><dt><code>-mtoplevel-symbols</code><dt><code>-mno-toplevel-symbols</code><dd><a name="index-mtoplevel_002dsymbols-1687"></a><a name="index-mno_002dtoplevel_002dsymbols-1688"></a>Prepend (do not prepend) a &lsquo;<samp><span class="samp">:</span></samp>&rsquo; to all global symbols, so the assembly
+code can be used with the <code>PREFIX</code> assembly directive.
+
+     <br><dt><code>-melf</code><dd><a name="index-melf-1689"></a>Generate an executable in the ELF format, rather than the default
+&lsquo;<samp><span class="samp">mmo</span></samp>&rsquo; format used by the <samp><span class="command">mmix</span></samp> simulator.
+
+     <br><dt><code>-mbranch-predict</code><dt><code>-mno-branch-predict</code><dd><a name="index-mbranch_002dpredict-1690"></a><a name="index-mno_002dbranch_002dpredict-1691"></a>Use (do not use) the probable-branch instructions, when static branch
+prediction indicates a probable branch.
+
+     <br><dt><code>-mbase-addresses</code><dt><code>-mno-base-addresses</code><dd><a name="index-mbase_002daddresses-1692"></a><a name="index-mno_002dbase_002daddresses-1693"></a>Generate (do not generate) code that uses <em>base addresses</em>.  Using a
+base address automatically generates a request (handled by the assembler
+and the linker) for a constant to be set up in a global register.  The
+register is used for one or more base address requests within the range 0
+to 255 from the value held in the register.  The generally leads to short
+and fast code, but the number of different data items that can be
+addressed is limited.  This means that a program that uses lots of static
+data may require <samp><span class="option">-mno-base-addresses</span></samp>.
+
+     <br><dt><code>-msingle-exit</code><dt><code>-mno-single-exit</code><dd><a name="index-msingle_002dexit-1694"></a><a name="index-mno_002dsingle_002dexit-1695"></a>Force (do not force) generated code to have a single exit point in each
+function. 
+</dl>
+
+ </body></html>
+

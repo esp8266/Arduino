@@ -1,0 +1,185 @@
+<html lang="en">
+<head>
+<title>Target Commands - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Targets.html#Targets" title="Targets">
+<link rel="prev" href="Active-Targets.html#Active-Targets" title="Active Targets">
+<link rel="next" href="Byte-Order.html#Byte-Order" title="Byte Order">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Target-Commands"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Byte-Order.html#Byte-Order">Byte Order</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Active-Targets.html#Active-Targets">Active Targets</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Targets.html#Targets">Targets</a>
+<hr>
+</div>
+
+<h3 class="section">19.2 Commands for Managing Targets</h3>
+
+     <dl>
+<dt><code>target </code><var>type</var> <var>parameters</var><dd>Connects the <span class="sc">gdb</span> host environment to a target machine or
+process.  A target is typically a protocol for talking to debugging
+facilities.  You use the argument <var>type</var> to specify the type or
+protocol of the target machine.
+
+     <p>Further <var>parameters</var> are interpreted by the target protocol, but
+typically include things like device names or host names to connect
+with, process numbers, and baud rates.
+
+     <p>The <code>target</code> command does not repeat if you press &lt;RET&gt; again
+after executing the command.
+
+     <p><a name="index-help-target-1039"></a><br><dt><code>help target</code><dd>Displays the names of all targets available.  To display targets
+currently selected, use either <code>info target</code> or <code>info files</code>
+(see <a href="Files.html#Files">Commands to Specify Files</a>).
+
+     <br><dt><code>help target </code><var>name</var><dd>Describe a particular target, including any parameters necessary to
+select it.
+
+     <p><a name="index-set-gnutarget-1040"></a><br><dt><code>set gnutarget </code><var>args</var><dd><span class="sc">gdb</span> uses its own library BFD to read your files.  <span class="sc">gdb</span>
+knows whether it is reading an <dfn>executable</dfn>,
+a <dfn>core</dfn>, or a <dfn>.o</dfn> file; however, you can specify the file format
+with the <code>set gnutarget</code> command.  Unlike most <code>target</code> commands,
+with <code>gnutarget</code> the <code>target</code> refers to a program, not a machine.
+
+     <blockquote>
+<em>Warning:</em> To specify a file format with <code>set gnutarget</code>,
+you must know the actual BFD name. 
+</blockquote>
+
+     <p class="noindent">See <a href="Files.html#Files">Commands to Specify Files</a>.
+
+     <p><a name="index-show-gnutarget-1041"></a><br><dt><code>show gnutarget</code><dd>Use the <code>show gnutarget</code> command to display what file format
+<code>gnutarget</code> is set to read.  If you have not set <code>gnutarget</code>,
+<span class="sc">gdb</span> will determine the file format for each file automatically,
+and <code>show gnutarget</code> displays &lsquo;<samp><span class="samp">The current BDF target is "auto"</span></samp>&rsquo;. 
+</dl>
+
+   <p><a name="index-common-targets-1042"></a>Here are some common targets (available, or not, depending on the GDB
+configuration):
+
+     
+<a name="index-target-1043"></a>
+<dl><dt><code>target exec </code><var>program</var><dd><a name="index-executable-file-target-1044"></a>An executable file.  &lsquo;<samp><span class="samp">target exec </span><var>program</var></samp>&rsquo; is the same as
+&lsquo;<samp><span class="samp">exec-file </span><var>program</var></samp>&rsquo;.
+
+     <br><dt><code>target core </code><var>filename</var><dd><a name="index-core-dump-file-target-1045"></a>A core dump file.  &lsquo;<samp><span class="samp">target core </span><var>filename</var></samp>&rsquo; is the same as
+&lsquo;<samp><span class="samp">core-file </span><var>filename</var></samp>&rsquo;.
+
+     <br><dt><code>target remote </code><var>medium</var><dd><a name="index-remote-target-1046"></a>A remote system connected to <span class="sc">gdb</span> via a serial line or network
+connection.  This command tells <span class="sc">gdb</span> to use its own remote
+protocol over <var>medium</var> for debugging.  See <a href="Remote-Debugging.html#Remote-Debugging">Remote Debugging</a>.
+
+     <p>For example, if you have a board connected to <samp><span class="file">/dev/ttya</span></samp> on the
+machine running <span class="sc">gdb</span>, you could say:
+
+     <pre class="smallexample">          target remote /dev/ttya
+</pre>
+     <p><code>target remote</code> supports the <code>load</code> command.  This is only
+useful if you have some other way of getting the stub to the target
+system, and you can put it somewhere in memory where it won't get
+clobbered by the download.
+
+     <br><dt><code>target sim </code><span class="roman">[</span><var>simargs</var><span class="roman">]</span><code> ...</code><dd><a name="index-built_002din-simulator-target-1047"></a>Builtin CPU simulator.  <span class="sc">gdb</span> includes simulators for most architectures. 
+In general,
+     <pre class="smallexample">                  target sim
+                  load
+                  run
+</pre>
+     <p class="noindent">works; however, you cannot assume that a specific memory map, device
+drivers, or even basic I/O is available, although some simulators do
+provide these.  For info about any processor-specific simulator details,
+see the appropriate section in <a href="Embedded-Processors.html#Embedded-Processors">Embedded Processors</a>.
+
+   </dl>
+
+   <p>Some configurations may include these targets as well:
+
+     <dl>
+<dt><code>target nrom </code><var>dev</var><dd><a name="index-NetROM-ROM-emulator-target-1048"></a>NetROM ROM emulator.  This target only supports downloading.
+
+   </dl>
+
+   <p>Different targets are available on different configurations of <span class="sc">gdb</span>;
+your configuration may have more or fewer targets.
+
+   <p>Many remote targets require you to download the executable's code once
+you've successfully established a connection.  You may wish to control
+various aspects of this process.
+
+     <dl>
+<dt><code>set hash</code><dd><a name="index-set-hash_0040r_007b_002c-for-remote-monitors_007d-1049"></a><a name="index-hash-mark-while-downloading-1050"></a>This command controls whether a hash mark &lsquo;<samp><span class="samp">#</span></samp>&rsquo; is displayed while
+downloading a file to the remote monitor.  If on, a hash mark is
+displayed after each S-record is successfully downloaded to the
+monitor.
+
+     <br><dt><code>show hash</code><dd><a name="index-show-hash_0040r_007b_002c-for-remote-monitors_007d-1051"></a>Show the current status of displaying the hash mark.
+
+     <br><dt><code>set debug monitor</code><dd><a name="index-set-debug-monitor-1052"></a><a name="index-display-remote-monitor-communications-1053"></a>Enable or disable display of communications messages between
+<span class="sc">gdb</span> and the remote monitor.
+
+     <br><dt><code>show debug monitor</code><dd><a name="index-show-debug-monitor-1054"></a>Show the current status of displaying communications between
+<span class="sc">gdb</span> and the remote monitor. 
+</dl>
+
+     
+<a name="index-load-_0040var_007bfilename_007d-1055"></a>
+<dl><dt><code>load </code><var>filename</var><dd><a name="load"></a>Depending on what remote debugging facilities are configured into
+<span class="sc">gdb</span>, the <code>load</code> command may be available.  Where it exists, it
+is meant to make <var>filename</var> (an executable) available for debugging
+on the remote system&mdash;by downloading, or dynamic linking, for example. 
+<code>load</code> also records the <var>filename</var> symbol table in <span class="sc">gdb</span>, like
+the <code>add-symbol-file</code> command.
+
+     <p>If your <span class="sc">gdb</span> does not have a <code>load</code> command, attempting to
+execute it gets the error message &ldquo;<code>You can't do that when your
+target is ...</code>&rdquo;
+
+     <p>The file is loaded at whatever address is specified in the executable. 
+For some object file formats, you can specify the load address when you
+link the program; for other formats, like a.out, the object file format
+specifies a fixed address. 
+<!-- FIXME! This would be a good place for an xref to the GNU linker doc. -->
+
+     <p>Depending on the remote side capabilities, <span class="sc">gdb</span> may be able to
+load programs into flash memory.
+
+     <p><code>load</code> does not repeat if you press &lt;RET&gt; again after using it. 
+</dl>
+
+   </body></html>
+

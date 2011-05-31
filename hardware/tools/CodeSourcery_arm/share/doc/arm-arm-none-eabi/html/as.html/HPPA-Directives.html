@@ -1,0 +1,233 @@
+<html lang="en">
+<head>
+<title>HPPA Directives - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="HPPA_002dDependent.html#HPPA_002dDependent" title="HPPA-Dependent">
+<link rel="prev" href="HPPA-Floating-Point.html#HPPA-Floating-Point" title="HPPA Floating Point">
+<link rel="next" href="HPPA-Opcodes.html#HPPA-Opcodes" title="HPPA Opcodes">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="HPPA-Directives"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="HPPA-Opcodes.html#HPPA-Opcodes">HPPA Opcodes</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="HPPA-Floating-Point.html#HPPA-Floating-Point">HPPA Floating Point</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="HPPA_002dDependent.html#HPPA_002dDependent">HPPA-Dependent</a>
+<hr>
+</div>
+
+<h4 class="subsection">9.11.5 HPPA Assembler Directives</h4>
+
+<p><code>as</code> for the HPPA supports many additional directives for
+compatibility with the native assembler.  This section describes them only
+briefly.  For detailed information on HPPA-specific assembler directives, see
+<cite>HP9000 Series 800 Assembly Language Reference Manual</cite> (HP 92432-90001).
+
+   <p><a name="index-HPPA-directives-not-supported-831"></a><code>as</code> does <em>not</em> support the following assembler directives
+described in the HP manual:
+
+<pre class="example">     .endm           .liston
+     .enter          .locct
+     .leave          .macro
+     .listoff
+</pre>
+   <p><a name="index-g_t_0040code_007b_002eparam_007d-on-HPPA-832"></a>Beyond those implemented for compatibility, <code>as</code> supports one
+additional assembler directive for the HPPA: <code>.param</code>.  It conveys
+register argument locations for static functions.  Its syntax closely follows
+the <code>.export</code> directive.
+
+   <p><a name="index-HPPA_002donly-directives-833"></a>These are the additional directives in <code>as</code> for the HPPA:
+
+     <dl>
+<dt><code>.block </code><var>n</var><dt><code>.blockz </code><var>n</var><dd>Reserve <var>n</var> bytes of storage, and initialize them to zero.
+
+     <br><dt><code>.call</code><dd>Mark the beginning of a procedure call.  Only the special case with <em>no
+arguments</em> is allowed.
+
+     <br><dt><code>.callinfo [ </code><var>param</var><code>=</code><var>value</var><code>, ... ]  [ </code><var>flag</var><code>, ... ]</code><dd>Specify a number of parameters and flags that define the environment for a
+procedure.
+
+     <p><var>param</var> may be any of &lsquo;<samp><span class="samp">frame</span></samp>&rsquo; (frame size), &lsquo;<samp><span class="samp">entry_gr</span></samp>&rsquo; (end of
+general register range), &lsquo;<samp><span class="samp">entry_fr</span></samp>&rsquo; (end of float register range),
+&lsquo;<samp><span class="samp">entry_sr</span></samp>&rsquo; (end of space register range).
+
+     <p>The values for <var>flag</var> are &lsquo;<samp><span class="samp">calls</span></samp>&rsquo; or &lsquo;<samp><span class="samp">caller</span></samp>&rsquo; (proc has
+subroutines), &lsquo;<samp><span class="samp">no_calls</span></samp>&rsquo; (proc does not call subroutines), &lsquo;<samp><span class="samp">save_rp</span></samp>&rsquo;
+(preserve return pointer), &lsquo;<samp><span class="samp">save_sp</span></samp>&rsquo; (proc preserves stack pointer),
+&lsquo;<samp><span class="samp">no_unwind</span></samp>&rsquo; (do not unwind this proc), &lsquo;<samp><span class="samp">hpux_int</span></samp>&rsquo; (proc is interrupt
+routine).
+
+     <br><dt><code>.code</code><dd>Assemble into the standard section called &lsquo;<samp><span class="samp">$TEXT$</span></samp>&rsquo;, subsection
+&lsquo;<samp><span class="samp">$CODE$</span></samp>&rsquo;.
+
+     <br><dt><code>.copyright "</code><var>string</var><code>"</code><dd>In the SOM object format, insert <var>string</var> into the object code, marked as a
+copyright string.
+
+     <br><dt><code>.copyright "</code><var>string</var><code>"</code><dd>In the ELF object format, insert <var>string</var> into the object code, marked as a
+version string.
+
+     <br><dt><code>.enter</code><dd>Not yet supported; the assembler rejects programs containing this directive.
+
+     <br><dt><code>.entry</code><dd>Mark the beginning of a procedure.
+
+     <br><dt><code>.exit</code><dd>Mark the end of a procedure.
+
+     <br><dt><code>.export </code><var>name</var><code> [ ,</code><var>typ</var><code> ]  [ ,</code><var>param</var><code>=</code><var>r</var><code> ]</code><dd>Make a procedure <var>name</var> available to callers.  <var>typ</var>, if present, must
+be one of &lsquo;<samp><span class="samp">absolute</span></samp>&rsquo;, &lsquo;<samp><span class="samp">code</span></samp>&rsquo; (ELF only, not SOM), &lsquo;<samp><span class="samp">data</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">entry</span></samp>&rsquo;, &lsquo;<samp><span class="samp">data</span></samp>&rsquo;, &lsquo;<samp><span class="samp">entry</span></samp>&rsquo;, &lsquo;<samp><span class="samp">millicode</span></samp>&rsquo;, &lsquo;<samp><span class="samp">plabel</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">pri_prog</span></samp>&rsquo;, or &lsquo;<samp><span class="samp">sec_prog</span></samp>&rsquo;.
+
+     <p><var>param</var>, if present, provides either relocation information for the
+procedure arguments and result, or a privilege level.  <var>param</var> may be
+&lsquo;<samp><span class="samp">argw</span><var>n</var></samp>&rsquo; (where <var>n</var> ranges from <code>0</code> to <code>3</code>, and
+indicates one of four one-word arguments); &lsquo;<samp><span class="samp">rtnval</span></samp>&rsquo; (the procedure's
+result); or &lsquo;<samp><span class="samp">priv_lev</span></samp>&rsquo; (privilege level).  For arguments or the result,
+<var>r</var> specifies how to relocate, and must be one of &lsquo;<samp><span class="samp">no</span></samp>&rsquo; (not
+relocatable), &lsquo;<samp><span class="samp">gr</span></samp>&rsquo; (argument is in general register), &lsquo;<samp><span class="samp">fr</span></samp>&rsquo; (in
+floating point register), or &lsquo;<samp><span class="samp">fu</span></samp>&rsquo; (upper half of float register). 
+For &lsquo;<samp><span class="samp">priv_lev</span></samp>&rsquo;, <var>r</var> is an integer.
+
+     <br><dt><code>.half </code><var>n</var><dd>Define a two-byte integer constant <var>n</var>; synonym for the portable
+<code>as</code> directive <code>.short</code>.
+
+     <br><dt><code>.import </code><var>name</var><code> [ ,</code><var>typ</var><code> ]</code><dd>Converse of <code>.export</code>; make a procedure available to call.  The arguments
+use the same conventions as the first two arguments for <code>.export</code>.
+
+     <br><dt><code>.label </code><var>name</var><dd>Define <var>name</var> as a label for the current assembly location.
+
+     <br><dt><code>.leave</code><dd>Not yet supported; the assembler rejects programs containing this directive.
+
+     <br><dt><code>.origin </code><var>lc</var><dd>Advance location counter to <var>lc</var>. Synonym for the <code>as</code>
+portable directive <code>.org</code>.
+
+     <br><dt><code>.param </code><var>name</var><code> [ ,</code><var>typ</var><code> ]  [ ,</code><var>param</var><code>=</code><var>r</var><code> ]</code><dd><!-- Not in HP manual; @sc{gnu} HPPA extension -->
+Similar to <code>.export</code>, but used for static procedures.
+
+     <br><dt><code>.proc</code><dd>Use preceding the first statement of a procedure.
+
+     <br><dt><code>.procend</code><dd>Use following the last statement of a procedure.
+
+     <br><dt><var>label</var><code> .reg </code><var>expr</var><dd><!-- ?? Not in HP manual (Jan 1988 vn) -->
+Synonym for <code>.equ</code>; define <var>label</var> with the absolute expression
+<var>expr</var> as its value.
+
+     <br><dt><code>.space </code><var>secname</var><code> [ ,</code><var>params</var><code> ]</code><dd>Switch to section <var>secname</var>, creating a new section by that name if
+necessary.  You may only use <var>params</var> when creating a new section, not
+when switching to an existing one.  <var>secname</var> may identify a section by
+number rather than by name.
+
+     <p>If specified, the list <var>params</var> declares attributes of the section,
+identified by keywords.  The keywords recognized are &lsquo;<samp><span class="samp">spnum=</span><var>exp</var></samp>&rsquo;
+(identify this section by the number <var>exp</var>, an absolute expression),
+&lsquo;<samp><span class="samp">sort=</span><var>exp</var></samp>&rsquo; (order sections according to this sort key when linking;
+<var>exp</var> is an absolute expression), &lsquo;<samp><span class="samp">unloadable</span></samp>&rsquo; (section contains no
+loadable data), &lsquo;<samp><span class="samp">notdefined</span></samp>&rsquo; (this section defined elsewhere), and
+&lsquo;<samp><span class="samp">private</span></samp>&rsquo; (data in this section not available to other programs).
+
+     <br><dt><code>.spnum </code><var>secnam</var><dd><!-- ?? Not in HP manual (Jan 1988) -->
+Allocate four bytes of storage, and initialize them with the section number of
+the section named <var>secnam</var>.  (You can define the section number with the
+HPPA <code>.space</code> directive.)
+
+     <p><a name="index-g_t_0040code_007bstring_007d-directive-on-HPPA-834"></a><br><dt><code>.string "</code><var>str</var><code>"</code><dd>Copy the characters in the string <var>str</var> to the object file. 
+See <a href="Strings.html#Strings">Strings</a>, for information on escape sequences you can use in
+<code>as</code> strings.
+
+     <p><em>Warning!</em> The HPPA version of <code>.string</code> differs from the
+usual <code>as</code> definition: it does <em>not</em> write a zero byte
+after copying <var>str</var>.
+
+     <br><dt><code>.stringz "</code><var>str</var><code>"</code><dd>Like <code>.string</code>, but appends a zero byte after copying <var>str</var> to object
+file.
+
+     <br><dt><code>.subspa </code><var>name</var><code> [ ,</code><var>params</var><code> ]</code><dt><code>.nsubspa </code><var>name</var><code> [ ,</code><var>params</var><code> ]</code><dd>Similar to <code>.space</code>, but selects a subsection <var>name</var> within the
+current section.  You may only specify <var>params</var> when you create a
+subsection (in the first instance of <code>.subspa</code> for this <var>name</var>).
+
+     <p>If specified, the list <var>params</var> declares attributes of the subsection,
+identified by keywords.  The keywords recognized are &lsquo;<samp><span class="samp">quad=</span><var>expr</var></samp>&rsquo;
+(&ldquo;quadrant&rdquo; for this subsection), &lsquo;<samp><span class="samp">align=</span><var>expr</var></samp>&rsquo; (alignment for
+beginning of this subsection; a power of two), &lsquo;<samp><span class="samp">access=</span><var>expr</var></samp>&rsquo; (value
+for &ldquo;access rights&rdquo; field), &lsquo;<samp><span class="samp">sort=</span><var>expr</var></samp>&rsquo; (sorting order for this
+subspace in link), &lsquo;<samp><span class="samp">code_only</span></samp>&rsquo; (subsection contains only code),
+&lsquo;<samp><span class="samp">unloadable</span></samp>&rsquo; (subsection cannot be loaded into memory), &lsquo;<samp><span class="samp">comdat</span></samp>&rsquo;
+(subsection is comdat), &lsquo;<samp><span class="samp">common</span></samp>&rsquo; (subsection is common block),
+&lsquo;<samp><span class="samp">dup_comm</span></samp>&rsquo; (subsection may have duplicate names), or &lsquo;<samp><span class="samp">zero</span></samp>&rsquo;
+(subsection is all zeros, do not write in object file).
+
+     <p><code>.nsubspa</code> always creates a new subspace with the given name, even
+if one with the same name already exists.
+
+     <p>&lsquo;<samp><span class="samp">comdat</span></samp>&rsquo;, &lsquo;<samp><span class="samp">common</span></samp>&rsquo; and &lsquo;<samp><span class="samp">dup_comm</span></samp>&rsquo; can be used to implement
+various flavors of one-only support when using the SOM linker.  The SOM
+linker only supports specific combinations of these flags.  The details
+are not documented.  A brief description is provided here.
+
+     <p>&lsquo;<samp><span class="samp">comdat</span></samp>&rsquo; provides a form of linkonce support.  It is useful for
+both code and data subspaces.  A &lsquo;<samp><span class="samp">comdat</span></samp>&rsquo; subspace has a key symbol
+marked by the &lsquo;<samp><span class="samp">is_comdat</span></samp>&rsquo; flag or &lsquo;<samp><span class="samp">ST_COMDAT</span></samp>&rsquo;.  Only the first
+subspace for any given key is selected.  The key symbol becomes universal
+in shared links.  This is similar to the behavior of &lsquo;<samp><span class="samp">secondary_def</span></samp>&rsquo;
+symbols.
+
+     <p>&lsquo;<samp><span class="samp">common</span></samp>&rsquo; provides Fortran named common support.  It is only useful
+for data subspaces.  Symbols with the flag &lsquo;<samp><span class="samp">is_common</span></samp>&rsquo; retain this
+flag in shared links.  Referencing a &lsquo;<samp><span class="samp">is_common</span></samp>&rsquo; symbol in a shared
+library from outside the library doesn't work.  Thus, &lsquo;<samp><span class="samp">is_common</span></samp>&rsquo;
+symbols must be output whenever they are needed.
+
+     <p>&lsquo;<samp><span class="samp">common</span></samp>&rsquo; and &lsquo;<samp><span class="samp">dup_comm</span></samp>&rsquo; together provide Cobol common support. 
+The subspaces in this case must all be the same length.  Otherwise, this
+support is similar to the Fortran common support.
+
+     <p>&lsquo;<samp><span class="samp">dup_comm</span></samp>&rsquo; by itself provides a type of one-only support for code. 
+Only the first &lsquo;<samp><span class="samp">dup_comm</span></samp>&rsquo; subspace is selected.  There is a rather
+complex algorithm to compare subspaces.  Code symbols marked with the
+&lsquo;<samp><span class="samp">dup_common</span></samp>&rsquo; flag are hidden.  This support was intended for "C++
+duplicate inlines".
+
+     <p>A simplified technique is used to mark the flags of symbols based on
+the flags of their subspace.  A symbol with the scope SS_UNIVERSAL and
+type ST_ENTRY, ST_CODE or ST_DATA is marked with the corresponding
+settings of &lsquo;<samp><span class="samp">comdat</span></samp>&rsquo;, &lsquo;<samp><span class="samp">common</span></samp>&rsquo; and &lsquo;<samp><span class="samp">dup_comm</span></samp>&rsquo; from the
+subspace, respectively.  This avoids having to introduce additional
+directives to mark these symbols.  The HP assembler sets &lsquo;<samp><span class="samp">is_common</span></samp>&rsquo;
+from &lsquo;<samp><span class="samp">common</span></samp>&rsquo;.  However, it doesn't set the &lsquo;<samp><span class="samp">dup_common</span></samp>&rsquo; from
+&lsquo;<samp><span class="samp">dup_comm</span></samp>&rsquo;.  It doesn't have &lsquo;<samp><span class="samp">comdat</span></samp>&rsquo; support.
+
+     <br><dt><code>.version "</code><var>str</var><code>"</code><dd>Write <var>str</var> as version identifier in object code. 
+</dl>
+
+   </body></html>
+

@@ -1,0 +1,245 @@
+<html lang="en">
+<head>
+<title>Stubs - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Syscalls.html#Syscalls" title="Syscalls">
+<link rel="next" href="Reentrant-Syscalls.html#Reentrant-Syscalls" title="Reentrant Syscalls">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Stubs"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Reentrant-Syscalls.html#Reentrant-Syscalls">Reentrant Syscalls</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Syscalls.html#Syscalls">Syscalls</a>
+<hr>
+</div>
+
+<h3 class="section">12.1 Definitions for OS interface</h3>
+
+<p><a name="index-stubs-460"></a>
+<a name="index-subroutines-for-OS-interface-461"></a><a name="index-OS-interface-subroutines-462"></a>This is the complete set of system definitions (primarily subroutines)
+required; the examples shown implement the minimal functionality
+required to allow <code>libc</code> to link, and fail gracefully where OS
+services are not available.
+
+   <p>Graceful failure is permitted by returning an error code.  A minor
+complication arises here: the C library must be compatible with
+development environments that supply fully functional versions of these
+subroutines.  Such environments usually return error codes in a global
+<code>errno</code>.  However, the Red Hat newlib C library provides a <em>macro</em>
+definition for <code>errno</code> in the header file <samp><span class="file">errno.h</span></samp>, as part
+of its support for reentrant routines (see <a href="Reentrancy.html#Reentrancy">Reentrancy</a>).
+
+   <p><a name="index-g_t_0040code_007berrno_007d-global-vs-macro-463"></a>The bridge between these two interpretations of <code>errno</code> is
+straightforward: the C library routines with OS interface calls
+capture the <code>errno</code> values returned globally, and record them in
+the appropriate field of the reentrancy structure (so that you can query
+them using the <code>errno</code> macro from <samp><span class="file">errno.h</span></samp>).
+
+   <p>This mechanism becomes visible when you write stub routines for OS
+interfaces.   You must include <samp><span class="file">errno.h</span></samp>, then disable the macro,
+like this:
+
+<pre class="example">     #include &lt;errno.h&gt;
+     #undef errno
+     extern int errno;
+</pre>
+   <p class="noindent">The examples in this chapter include this treatment of <code>errno</code>.
+
+     <dl>
+<dt><code>_exit</code><a name="index-g_t_005fexit-464"></a><dd>Exit a program without cleaning up files.  If your system doesn't
+provide this, it is best to avoid linking with subroutines that require
+it (<code>exit</code>, <code>system</code>).
+
+     <br><dt><code>close</code><a name="index-close-465"></a><dd>Close a file.  Minimal implementation:
+
+     <pre class="example">          int close(int file) {
+            return -1;
+          }
+</pre>
+     <br><dt><code>environ</code><a name="index-environ-466"></a><dd>A pointer to a list of environment variables and their values.  For a
+minimal environment, this empty list is adequate:
+
+     <pre class="example">          char *__env[1] = { 0 };
+          char **environ = __env;
+</pre>
+     <br><dt><code>execve</code><a name="index-execve-467"></a><dd>Transfer control to a new process.  Minimal implementation (for a system
+without processes):
+
+     <pre class="example">          #include &lt;errno.h&gt;
+          #undef errno
+          extern int errno;
+          int execve(char *name, char **argv, char **env) {
+            errno = ENOMEM;
+            return -1;
+          }
+</pre>
+     <br><dt><code>fork</code><a name="index-fork-468"></a><dd>Create a new process.  Minimal implementation (for a system without processes):
+
+     <pre class="example">          #include &lt;errno.h&gt;
+          #undef errno
+          extern int errno;
+          int fork(void) {
+            errno = EAGAIN;
+            return -1;
+          }
+</pre>
+     <br><dt><code>fstat</code><a name="index-fstat-469"></a><dd>Status of an open file.  For consistency with other minimal
+implementations in these examples, all files are regarded as character
+special devices.  The <samp><span class="file">sys/stat.h</span></samp> header file required is
+distributed in the <samp><span class="file">include</span></samp> subdirectory for this C library.
+
+     <pre class="example">          #include &lt;sys/stat.h&gt;
+          int fstat(int file, struct stat *st) {
+            st-&gt;st_mode = S_IFCHR;
+            return 0;
+          }
+</pre>
+     <br><dt><code>getpid</code><a name="index-getpid-470"></a><dd>Process-ID; this is sometimes used to generate strings unlikely to
+conflict with other processes.  Minimal implementation, for a system
+without processes:
+
+     <pre class="example">          int getpid(void) {
+            return 1;
+          }
+</pre>
+     <br><dt><code>isatty</code><a name="index-isatty-471"></a><dd>Query whether output stream is a terminal.   For consistency with the
+other minimal implementations, which only support output to
+<code>stdout</code>, this minimal implementation is suggested:
+
+     <pre class="example">          int isatty(int file) {
+            return 1;
+          }
+</pre>
+     <br><dt><code>kill</code><a name="index-kill-472"></a><dd>Send a signal.  Minimal implementation:
+
+     <pre class="example">          #include &lt;errno.h&gt;
+          #undef errno
+          extern int errno;
+          int kill(int pid, int sig) {
+            errno = EINVAL;
+            return -1;
+          }
+</pre>
+     <br><dt><code>link</code><a name="index-link-473"></a><dd>Establish a new name for an existing file.  Minimal implementation:
+
+     <pre class="example">          #include &lt;errno.h&gt;
+          #undef errno
+          extern int errno;
+          int link(char *old, char *new) {
+            errno = EMLINK;
+            return -1;
+          }
+</pre>
+     <br><dt><code>lseek</code><a name="index-lseek-474"></a><dd>Set position in a file.  Minimal implementation:
+
+     <pre class="example">          int lseek(int file, int ptr, int dir) {
+            return 0;
+          }
+</pre>
+     <br><dt><code>open</code><a name="index-open-475"></a><dd>Open a file.  Minimal implementation:
+
+     <pre class="example">          int open(const char *name, int flags, int mode) {
+            return -1;
+          }
+</pre>
+     <br><dt><code>read</code><a name="index-read-476"></a><dd>Read from a file.  Minimal implementation:
+
+     <pre class="example">          int read(int file, char *ptr, int len) {
+            return 0;
+          }
+</pre>
+     <br><dt><code>sbrk</code><a name="index-sbrk-477"></a><dd>Increase program data space.  As <code>malloc</code> and related functions
+depend on this, it is useful to have a working implementation.  The
+following suffices for a standalone system; it exploits the symbol
+<code>_end</code> automatically defined by the GNU linker.
+
+     <pre class="example">          caddr_t sbrk(int incr) {
+            extern char _end;		/* <span class="roman">Defined by the linker</span> */
+            static char *heap_end;
+            char *prev_heap_end;
+          
+            if (heap_end == 0) {
+              heap_end = &amp;_end;
+            }
+            prev_heap_end = heap_end;
+            if (heap_end + incr &gt; stack_ptr) {
+              write (1, "Heap and stack collision\n", 25);
+              abort ();
+            }
+          
+            heap_end += incr;
+            return (caddr_t) prev_heap_end;
+          }
+</pre>
+     <br><dt><code>stat</code><a name="index-stat-478"></a><dd>Status of a file (by name).  Minimal implementation:
+
+     <pre class="example">          int stat(char *file, struct stat *st) {
+            st-&gt;st_mode = S_IFCHR;
+            return 0;
+          }
+</pre>
+     <br><dt><code>times</code><a name="index-times-479"></a><dd>Timing information for current process.  Minimal implementation:
+
+     <pre class="example">          int times(struct tms *buf) {
+            return -1;
+          }
+</pre>
+     <br><dt><code>unlink</code><a name="index-unlink-480"></a><dd>Remove a file's directory entry.  Minimal implementation:
+
+     <pre class="example">          #include &lt;errno.h&gt;
+          #undef errno
+          extern int errno;
+          int unlink(char *name) {
+            errno = ENOENT;
+            return -1;
+          }
+</pre>
+     <br><dt><code>wait</code><a name="index-wait-481"></a><dd>Wait for a child process.  Minimal implementation:
+     <pre class="example">          #include &lt;errno.h&gt;
+          #undef errno
+          extern int errno;
+          int wait(int *status) {
+            errno = ECHILD;
+            return -1;
+          }
+</pre>
+     <br><dt><code>write</code><a name="index-write-482"></a><dd>Write to a file.  <samp><span class="file">libc</span></samp> subroutines will use this
+system routine for output to all files, <em>including</em>
+<code>stdout</code>&mdash;so if you need to generate any output, for example to a
+serial port for debugging, you should make your minimal <code>write</code>
+capable of doing this.  The following minimal implementation is an
+incomplete example; it relies on a <code>outbyte</code> subroutine (not
+shown; typically, you must write this in assembler from examples
+provided by your hardware manufacturer) to actually perform the output.
+
+     <pre class="example">          int write(int file, char *ptr, int len) {
+            int todo;
+          
+            for (todo = 0; todo &lt; len; todo++) {
+              outbyte (*ptr++);
+            }
+            return len;
+          }
+</pre>
+     </dl>
+
+   </body></html>
+

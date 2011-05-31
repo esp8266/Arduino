@@ -1,0 +1,268 @@
+<html lang="en">
+<head>
+<title>Commands In Python - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Python-API.html#Python-API" title="Python API">
+<link rel="prev" href="Threads-In-Python.html#Threads-In-Python" title="Threads In Python">
+<link rel="next" href="Parameters-In-Python.html#Parameters-In-Python" title="Parameters In Python">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Commands-In-Python"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Parameters-In-Python.html#Parameters-In-Python">Parameters In Python</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Threads-In-Python.html#Threads-In-Python">Threads In Python</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Python-API.html#Python-API">Python API</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">23.2.2.10 Commands In Python</h5>
+
+<p><a name="index-commands-in-python-1723"></a><a name="index-python-commands-1724"></a>You can implement new <span class="sc">gdb</span> CLI commands in Python.  A CLI
+command is implemented using an instance of the <code>gdb.Command</code>
+class, most commonly using a subclass.
+
+<div class="defun">
+&mdash; Method on Command: <b>__init__</b><var> name command_class </var><span class="roman">[</span><var>completer_class</var><span class="roman">]</span> <span class="roman">[</span><var>prefix</var><span class="roman">]</span><var><a name="index-g_t_005f_005finit_005f_005f-on-Command-1725"></a></var><br>
+<blockquote><p>The object initializer for <code>Command</code> registers the new command
+with <span class="sc">gdb</span>.  This initializer is normally invoked from the
+subclass' own <code>__init__</code> method.
+
+        <p><var>name</var> is the name of the command.  If <var>name</var> consists of
+multiple words, then the initial words are looked for as prefix
+commands.  In this case, if one of the prefix commands does not exist,
+an exception is raised.
+
+        <p>There is no support for multi-line commands.
+
+        <p><var>command_class</var> should be one of the &lsquo;<samp><span class="samp">COMMAND_</span></samp>&rsquo; constants
+defined below.  This argument tells <span class="sc">gdb</span> how to categorize the
+new command in the help system.
+
+        <p><var>completer_class</var> is an optional argument.  If given, it should be
+one of the &lsquo;<samp><span class="samp">COMPLETE_</span></samp>&rsquo; constants defined below.  This argument
+tells <span class="sc">gdb</span> how to perform completion for this command.  If not
+given, <span class="sc">gdb</span> will attempt to complete using the object's
+<code>complete</code> method (see below); if no such method is found, an
+error will occur when completion is attempted.
+
+        <p><var>prefix</var> is an optional argument.  If <code>True</code>, then the new
+command is a prefix command; sub-commands of this command may be
+registered.
+
+        <p>The help text for the new command is taken from the Python
+documentation string for the command's class, if there is one.  If no
+documentation string is provided, the default value &ldquo;This command is
+not documented.&rdquo; is used. 
+</p></blockquote></div>
+
+   <p><a name="index-don_0027t-repeat-Python-command-1726"></a>
+
+<div class="defun">
+&mdash; Method on Command: <b>dont_repeat</b><var><a name="index-dont_005frepeat-on-Command-1727"></a></var><br>
+<blockquote><p>By default, a <span class="sc">gdb</span> command is repeated when the user enters a
+blank line at the command prompt.  A command can suppress this
+behavior by invoking the <code>dont_repeat</code> method.  This is similar
+to the user command <code>dont-repeat</code>, see <a href="Define.html#Define">dont-repeat</a>. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Method on Command: <b>invoke</b><var> argument from_tty<a name="index-invoke-on-Command-1728"></a></var><br>
+<blockquote><p>This method is called by <span class="sc">gdb</span> when this command is invoked.
+
+        <p><var>argument</var> is a string.  It is the argument to the command, after
+leading and trailing whitespace has been stripped.
+
+        <p><var>from_tty</var> is a boolean argument.  When true, this means that the
+command was entered by the user at the terminal; when false it means
+that the command came from elsewhere.
+
+        <p>If this method throws an exception, it is turned into a <span class="sc">gdb</span>
+<code>error</code> call.  Otherwise, the return value is ignored.
+
+        <p><a name="index-gdb_002estring_005fto_005fargv-1729"></a>To break <var>argument</var> up into an argv-like string use
+<code>gdb.string_to_argv</code>.  This function behaves identically to
+<span class="sc">gdb</span>'s internal argument lexer <code>buildargv</code>. 
+It is recommended to use this for consistency. 
+Arguments are separated by spaces and may be quoted. 
+Example:
+
+     <pre class="smallexample">          print gdb.string_to_argv ("1 2\ \\\"3 '4 \"5' \"6 '7\"")
+          ['1', '2 "3', '4 "5', "6 '7"]
+</pre>
+        </blockquote></div>
+
+   <p><a name="index-completion-of-Python-commands-1730"></a>
+
+<div class="defun">
+&mdash; Method on Command: <b>complete</b><var> text word<a name="index-complete-on-Command-1731"></a></var><br>
+<blockquote><p>This method is called by <span class="sc">gdb</span> when the user attempts
+completion on this command.  All forms of completion are handled by
+this method, that is, the &lt;TAB&gt; and &lt;M-?&gt; key bindings
+(see <a href="Completion.html#Completion">Completion</a>), and the <code>complete</code> command (see <a href="Help.html#Help">complete</a>).
+
+        <p>The arguments <var>text</var> and <var>word</var> are both strings.  <var>text</var>
+holds the complete command line up to the cursor's location. 
+<var>word</var> holds the last word of the command line; this is computed
+using a word-breaking heuristic.
+
+        <p>The <code>complete</code> method can return several values:
+          <ul>
+<li>If the return value is a sequence, the contents of the sequence are
+used as the completions.  It is up to <code>complete</code> to ensure that the
+contents actually do complete the word.  A zero-length sequence is
+allowed, it means that there were no completions available.  Only
+string elements of the sequence are used; other elements in the
+sequence are ignored.
+
+          <li>If the return value is one of the &lsquo;<samp><span class="samp">COMPLETE_</span></samp>&rsquo; constants defined
+below, then the corresponding <span class="sc">gdb</span>-internal completion
+function is invoked, and its result is used.
+
+          <li>All other results are treated as though there were no available
+completions. 
+</ul>
+        </p></blockquote></div>
+
+   <p>When a new command is registered, it must be declared as a member of
+some general class of commands.  This is used to classify top-level
+commands in the on-line help system; note that prefix commands are not
+listed under their own category but rather that of their top-level
+command.  The available classifications are represented by constants
+defined in the <code>gdb</code> module:
+
+     
+<a name="index-COMMAND_005fNONE-1732"></a>
+<a name="index-gdb_002eCOMMAND_005fNONE-1733"></a>
+<dl><dt><code>COMMAND_NONE</code><dd>The command does not belong to any particular class.  A command in
+this category will not be displayed in any of the help categories.
+
+     <p><a name="index-COMMAND_005fRUNNING-1734"></a><a name="index-gdb_002eCOMMAND_005fRUNNING-1735"></a><br><dt><code>COMMAND_RUNNING</code><dd>The command is related to running the inferior.  For example,
+<code>start</code>, <code>step</code>, and <code>continue</code> are in this category. 
+Type <kbd>help running</kbd> at the <span class="sc">gdb</span> prompt to see a list of
+commands in this category.
+
+     <p><a name="index-COMMAND_005fDATA-1736"></a><a name="index-gdb_002eCOMMAND_005fDATA-1737"></a><br><dt><code>COMMAND_DATA</code><dd>The command is related to data or variables.  For example,
+<code>call</code>, <code>find</code>, and <code>print</code> are in this category.  Type
+<kbd>help data</kbd> at the <span class="sc">gdb</span> prompt to see a list of commands
+in this category.
+
+     <p><a name="index-COMMAND_005fSTACK-1738"></a><a name="index-gdb_002eCOMMAND_005fSTACK-1739"></a><br><dt><code>COMMAND_STACK</code><dd>The command has to do with manipulation of the stack.  For example,
+<code>backtrace</code>, <code>frame</code>, and <code>return</code> are in this
+category.  Type <kbd>help stack</kbd> at the <span class="sc">gdb</span> prompt to see a
+list of commands in this category.
+
+     <p><a name="index-COMMAND_005fFILES-1740"></a><a name="index-gdb_002eCOMMAND_005fFILES-1741"></a><br><dt><code>COMMAND_FILES</code><dd>This class is used for file-related commands.  For example,
+<code>file</code>, <code>list</code> and <code>section</code> are in this category. 
+Type <kbd>help files</kbd> at the <span class="sc">gdb</span> prompt to see a list of
+commands in this category.
+
+     <p><a name="index-COMMAND_005fSUPPORT-1742"></a><a name="index-gdb_002eCOMMAND_005fSUPPORT-1743"></a><br><dt><code>COMMAND_SUPPORT</code><dd>This should be used for &ldquo;support facilities&rdquo;, generally meaning
+things that are useful to the user when interacting with <span class="sc">gdb</span>,
+but not related to the state of the inferior.  For example,
+<code>help</code>, <code>make</code>, and <code>shell</code> are in this category.  Type
+<kbd>help support</kbd> at the <span class="sc">gdb</span> prompt to see a list of
+commands in this category.
+
+     <p><a name="index-COMMAND_005fSTATUS-1744"></a><a name="index-gdb_002eCOMMAND_005fSTATUS-1745"></a><br><dt><code>COMMAND_STATUS</code><dd>The command is an &lsquo;<samp><span class="samp">info</span></samp>&rsquo;-related command, that is, related to the
+state of <span class="sc">gdb</span> itself.  For example, <code>info</code>, <code>macro</code>,
+and <code>show</code> are in this category.  Type <kbd>help status</kbd> at the
+<span class="sc">gdb</span> prompt to see a list of commands in this category.
+
+     <p><a name="index-COMMAND_005fBREAKPOINTS-1746"></a><a name="index-gdb_002eCOMMAND_005fBREAKPOINTS-1747"></a><br><dt><code>COMMAND_BREAKPOINTS</code><dd>The command has to do with breakpoints.  For example, <code>break</code>,
+<code>clear</code>, and <code>delete</code> are in this category.  Type <kbd>help
+breakpoints</kbd> at the <span class="sc">gdb</span> prompt to see a list of commands in
+this category.
+
+     <p><a name="index-COMMAND_005fTRACEPOINTS-1748"></a><a name="index-gdb_002eCOMMAND_005fTRACEPOINTS-1749"></a><br><dt><code>COMMAND_TRACEPOINTS</code><dd>The command has to do with tracepoints.  For example, <code>trace</code>,
+<code>actions</code>, and <code>tfind</code> are in this category.  Type
+<kbd>help tracepoints</kbd> at the <span class="sc">gdb</span> prompt to see a list of
+commands in this category.
+
+     <p><a name="index-COMMAND_005fOBSCURE-1750"></a><a name="index-gdb_002eCOMMAND_005fOBSCURE-1751"></a><br><dt><code>COMMAND_OBSCURE</code><dd>The command is only used in unusual circumstances, or is not of
+general interest to users.  For example, <code>checkpoint</code>,
+<code>fork</code>, and <code>stop</code> are in this category.  Type <kbd>help
+obscure</kbd> at the <span class="sc">gdb</span> prompt to see a list of commands in this
+category.
+
+     <p><a name="index-COMMAND_005fMAINTENANCE-1752"></a><a name="index-gdb_002eCOMMAND_005fMAINTENANCE-1753"></a><br><dt><code>COMMAND_MAINTENANCE</code><dd>The command is only useful to <span class="sc">gdb</span> maintainers.  The
+<code>maintenance</code> and <code>flushregs</code> commands are in this category. 
+Type <kbd>help internals</kbd> at the <span class="sc">gdb</span> prompt to see a list of
+commands in this category. 
+</dl>
+
+   <p>A new command can use a predefined completion function, either by
+specifying it via an argument at initialization, or by returning it
+from the <code>complete</code> method.  These predefined completion
+constants are all defined in the <code>gdb</code> module:
+
+     
+<a name="index-COMPLETE_005fNONE-1754"></a>
+<a name="index-gdb_002eCOMPLETE_005fNONE-1755"></a>
+<dl><dt><code>COMPLETE_NONE</code><dd>This constant means that no completion should be done.
+
+     <p><a name="index-COMPLETE_005fFILENAME-1756"></a><a name="index-gdb_002eCOMPLETE_005fFILENAME-1757"></a><br><dt><code>COMPLETE_FILENAME</code><dd>This constant means that filename completion should be performed.
+
+     <p><a name="index-COMPLETE_005fLOCATION-1758"></a><a name="index-gdb_002eCOMPLETE_005fLOCATION-1759"></a><br><dt><code>COMPLETE_LOCATION</code><dd>This constant means that location completion should be done. 
+See <a href="Specify-Location.html#Specify-Location">Specify Location</a>.
+
+     <p><a name="index-COMPLETE_005fCOMMAND-1760"></a><a name="index-gdb_002eCOMPLETE_005fCOMMAND-1761"></a><br><dt><code>COMPLETE_COMMAND</code><dd>This constant means that completion should examine <span class="sc">gdb</span>
+command names.
+
+     <p><a name="index-COMPLETE_005fSYMBOL-1762"></a><a name="index-gdb_002eCOMPLETE_005fSYMBOL-1763"></a><br><dt><code>COMPLETE_SYMBOL</code><dd>This constant means that completion should be done using symbol names
+as the source. 
+</dl>
+
+   <p>The following code snippet shows how a trivial CLI command can be
+implemented in Python:
+
+<pre class="smallexample">     class HelloWorld (gdb.Command):
+       """Greet the whole world."""
+     
+       def __init__ (self):
+         super (HelloWorld, self).__init__ ("hello-world", gdb.COMMAND_OBSCURE)
+     
+       def invoke (self, arg, from_tty):
+         print "Hello, World!"
+     
+     HelloWorld ()
+</pre>
+   <p>The last line instantiates the class, and is necessary to trigger the
+registration of the command with <span class="sc">gdb</span>.  Depending on how the
+Python code is read into <span class="sc">gdb</span>, you may need to import the
+<code>gdb</code> module explicitly.
+
+   </body></html>
+

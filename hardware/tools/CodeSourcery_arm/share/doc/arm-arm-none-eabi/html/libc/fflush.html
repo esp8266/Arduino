@@ -1,0 +1,79 @@
+<html lang="en">
+<head>
+<title>fflush - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="ferror.html#ferror" title="ferror">
+<link rel="next" href="fgetc.html#fgetc" title="fgetc">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="fflush"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="fgetc.html#fgetc">fgetc</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="ferror.html#ferror">ferror</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.9 <code>fflush</code>&mdash;flush buffered file output</h3>
+
+<p><a name="index-fflush-162"></a><a name="index-g_t_005ffflush_005fr-163"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     int fflush(FILE *<var>fp</var>);
+     
+     int _fflush_r(struct _reent *<var>reent</var>, FILE *<var>fp</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+The <code>stdio</code> output functions can buffer output before delivering it
+to the host system, in order to minimize the overhead of system calls.
+
+   <p>Use <code>fflush</code> to deliver any such pending output (for the file
+or stream identified by <var>fp</var>) to the host system.
+
+   <p>If <var>fp</var> is <code>NULL</code>, <code>fflush</code> delivers pending output from all
+open files.
+
+   <p>Additionally, if <var>fp</var> is a seekable input stream visiting a file
+descriptor, set the position of the file descriptor to match next
+unread byte, useful for obeying POSIX semantics when ending a process
+without consuming all input from the stream.
+
+   <p>The alternate function <code>_fflush_r</code> is a reentrant version, where the
+extra argument <var>reent</var> is a pointer to a reentrancy structure, and
+<var>fp</var> must not be NULL.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>fflush</code> returns <code>0</code> unless it encounters a write error; in that
+situation, it returns <code>EOF</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C requires <code>fflush</code>.  The behavior on input streams is only
+specified by POSIX, and not all implementations follow POSIX rules.
+
+   <p>No supporting OS subroutines are required.
+
+   <p><br>
+
+   </body></html>
+

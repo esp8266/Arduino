@@ -1,0 +1,136 @@
+<html lang="en">
+<head>
+<title>Reentrancy - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Locale.html#Locale" title="Locale">
+<link rel="next" href="Misc.html#Misc" title="Misc">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Reentrancy"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Misc.html#Misc">Misc</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Locale.html#Locale">Locale</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">10 Reentrancy</h2>
+
+<p><a name="index-reentrancy-447"></a>Reentrancy is a characteristic of library functions which allows multiple
+processes to use the same address space with assurance that the values stored
+in those spaces will remain constant between calls. The Red Hat
+newlib implementation of the library functions ensures that
+whenever possible, these library functions are reentrant.  However,
+there are some functions that can not be trivially made reentrant. 
+Hooks have been provided to allow you to use these functions in a fully
+reentrant fashion.
+
+   <p><a name="index-g_t_005freent-448"></a><a name="index-reent_002eh-449"></a><a name="index-reentrancy-structure-450"></a>These hooks use the structure <code>_reent</code> defined in <samp><span class="file">reent.h</span></samp>. 
+A variable defined as &lsquo;<samp><span class="samp">struct _reent</span></samp>&rsquo; is called a <dfn>reentrancy
+structure</dfn>.  All functions which must manipulate global information are
+available in two versions.  The first version has the usual name, and
+uses a single global instance of the reentrancy structure.  The second
+has a different name, normally formed by prepending &lsquo;<samp><span class="samp">_</span></samp>&rsquo; and
+appending &lsquo;<samp><span class="samp">_r</span></samp>&rsquo;, and takes a pointer to the particular reentrancy
+structure to use.
+
+   <p>For example, the function <code>fopen</code> takes two arguments, <var>file</var>
+and <var>mode</var>, and uses the global reentrancy structure.  The function
+<code>_fopen_r</code> takes the arguments, <var>struct_reent</var>, which is a
+pointer to an instance of the reentrancy structure, <var>file</var>
+and <var>mode</var>.
+
+   <p>There are two versions of &lsquo;<samp><span class="samp">struct _reent</span></samp>&rsquo;, a normal one and one
+for small memory systems, controlled by the <code>_REENT_SMALL</code>
+definition from the (automatically included) <samp><span class="file">&lt;sys/config.h&gt;</span></samp>.
+
+   <p><a name="index-global-reentrancy-structure-451"></a><a name="index-g_t_005fimpure_005fptr-452"></a>Each function which uses the global reentrancy structure uses the global
+variable <code>_impure_ptr</code>, which points to a reentrancy structure.
+
+   <p>This means that you have two ways to achieve reentrancy.  Both require
+that each thread of execution control initialize a unique global
+variable of type &lsquo;<samp><span class="samp">struct _reent</span></samp>&rsquo;:
+
+     <ol type=1 start=1>
+<li><a name="index-extra-argument_002c-reentrant-fns-453"></a>Use the reentrant versions of the library functions, after initializing
+a global reentrancy structure for each process.  Use the pointer to this
+structure as the extra argument for all library functions.
+
+     <li>Ensure that each thread of execution control has a pointer to its own
+unique reentrancy structure in the global variable <code>_impure_ptr</code>,
+and call the standard library subroutines.
+        </ol>
+
+   <p><a name="index-list-of-reentrant-functions-454"></a><a name="index-reentrant-function-list-455"></a>The following functions are provided in both reentrant
+and non-reentrant versions.
+
+<pre class="example"><br><em>Equivalent for errno variable:</em><br>
+     _errno_r
+     
+<br><em>Locale functions:</em><br>
+     _localeconv_r  _setlocale_r
+     
+<br><em>Equivalents for stdio variables:</em><br>
+     _stdin_r        _stdout_r       _stderr_r
+     
+     
+<br><em>Stdio functions:</em><br>
+     _fdopen_r       _perror_r       _tempnam_r
+     _fopen_r        _putchar_r      _tmpnam_r
+     _getchar_r      _puts_r         _tmpfile_r
+     _gets_r         _remove_r       _vfprintf_r
+     _iprintf_r      _rename_r       _vsnprintf_r
+     _mkstemp_r      _snprintf_r     _vsprintf_r
+     _mktemp_t       _sprintf_r
+     
+<br><em>Signal functions:</em><br>
+     _init_signal_r  _signal_r
+     _kill_r         __sigtramp_r
+     _raise_r
+     
+<br><em>Stdlib functions:</em><br>
+     _calloc_r       _mblen_r        _setenv_r
+     _dtoa_r         _mbstowcs_r     _srand_r
+     _free_r         _mbtowc_r       _strtod_r
+     _getenv_r       _memalign_r     _strtol_r
+     _mallinfo_r     _mstats_r       _strtoul_r
+     _malloc_r       _putenv_r       _system_r
+     _malloc_r       _rand_r         _wcstombs_r
+     _malloc_stats_r _realloc_r      _wctomb_r
+     
+<br><em>String functions:</em><br>
+     _strdup_r       _strtok_r
+     
+<br><em>System functions:</em><br>
+     _close_r        _link_r         _unlink_r
+     _execve_r       _lseek_r        _wait_r
+     _fcntl_r        _open_r         _write_r
+     _fork_r         _read_r
+     _fstat_r        _sbrk_r
+     _gettimeofday_r _stat_r
+     _getpid_r       _times_r
+     
+     
+<br><em>Time function:</em><br>
+     _asctime_r
+</pre>
+   </body></html>
+

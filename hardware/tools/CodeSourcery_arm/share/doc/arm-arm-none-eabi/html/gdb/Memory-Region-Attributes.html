@@ -1,0 +1,185 @@
+<html lang="en">
+<head>
+<title>Memory Region Attributes - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Data.html#Data" title="Data">
+<link rel="prev" href="OS-Information.html#OS-Information" title="OS Information">
+<link rel="next" href="Dump_002fRestore-Files.html#Dump_002fRestore-Files" title="Dump/Restore Files">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Memory-Region-Attributes"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Dump_002fRestore-Files.html#Dump_002fRestore-Files">Dump/Restore Files</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="OS-Information.html#OS-Information">OS Information</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Data.html#Data">Data</a>
+<hr>
+</div>
+
+<h3 class="section">10.16 Memory Region Attributes</h3>
+
+<p><a name="index-memory-region-attributes-622"></a>
+<dfn>Memory region attributes</dfn> allow you to describe special handling
+required by regions of your target's memory.  <span class="sc">gdb</span> uses
+attributes to determine whether to allow certain types of memory
+accesses; whether to use specific width accesses; and whether to cache
+target memory.  By default the description of memory regions is
+fetched from the target (if the current target supports this), but the
+user can override the fetched regions.
+
+   <p>Defined memory regions can be individually enabled and disabled.  When a
+memory region is disabled, <span class="sc">gdb</span> uses the default attributes when
+accessing memory in that region.  Similarly, if no memory regions have
+been defined, <span class="sc">gdb</span> uses the default attributes when accessing
+all memory.
+
+   <p>When a memory region is defined, it is given a number to identify it;
+to enable, disable, or remove a memory region, you specify that number.
+
+     
+<a name="index-mem-623"></a>
+<dl><dt><code>mem </code><var>lower</var> <var>upper</var> <var>attributes</var><code>...</code><dd>Define a memory region bounded by <var>lower</var> and <var>upper</var> with
+attributes <var>attributes</var><small class="dots">...</small>, and add it to the list of regions
+monitored by <span class="sc">gdb</span>.  Note that <var>upper</var> == 0 is a special
+case: it is treated as the target's maximum memory address. 
+(0xffff on 16 bit targets, 0xffffffff on 32 bit targets, etc.)
+
+     <br><dt><code>mem auto</code><dd>Discard any user changes to the memory regions and use target-supplied
+regions, if available, or no regions if the target does not support.
+
+     <p><a name="index-delete-mem-624"></a><br><dt><code>delete mem </code><var>nums</var><code>...</code><dd>Remove memory regions <var>nums</var><small class="dots">...</small> from the list of regions
+monitored by <span class="sc">gdb</span>.
+
+     <p><a name="index-disable-mem-625"></a><br><dt><code>disable mem </code><var>nums</var><code>...</code><dd>Disable monitoring of memory regions <var>nums</var><small class="dots">...</small>. 
+A disabled memory region is not forgotten. 
+It may be enabled again later.
+
+     <p><a name="index-enable-mem-626"></a><br><dt><code>enable mem </code><var>nums</var><code>...</code><dd>Enable monitoring of memory regions <var>nums</var><small class="dots">...</small>.
+
+     <p><a name="index-info-mem-627"></a><br><dt><code>info mem</code><dd>Print a table of all defined memory regions, with the following columns
+for each region:
+
+          <dl>
+<dt><em>Memory Region Number</em><br><dt><em>Enabled or Disabled.</em><dd>Enabled memory regions are marked with &lsquo;<samp><span class="samp">y</span></samp>&rsquo;. 
+Disabled memory regions are marked with &lsquo;<samp><span class="samp">n</span></samp>&rsquo;.
+
+          <br><dt><em>Lo Address</em><dd>The address defining the inclusive lower bound of the memory region.
+
+          <br><dt><em>Hi Address</em><dd>The address defining the exclusive upper bound of the memory region.
+
+          <br><dt><em>Attributes</em><dd>The list of attributes set for this memory region. 
+</dl>
+     </dl>
+
+<h4 class="subsection">10.16.1 Attributes</h4>
+
+<h5 class="subsubsection">10.16.1.1 Memory Access Mode</h5>
+
+<p>The access mode attributes set whether <span class="sc">gdb</span> may make read or
+write accesses to a memory region.
+
+   <p>While these attributes prevent <span class="sc">gdb</span> from performing invalid
+memory accesses, they do nothing to prevent the target system, I/O DMA,
+etc. from accessing memory.
+
+     <dl>
+<dt><code>ro</code><dd>Memory is read only. 
+<br><dt><code>wo</code><dd>Memory is write only. 
+<br><dt><code>rw</code><dd>Memory is read/write.  This is the default. 
+</dl>
+
+<h5 class="subsubsection">10.16.1.2 Memory Access Size</h5>
+
+<p>The access size attribute tells <span class="sc">gdb</span> to use specific sized
+accesses in the memory region.  Often memory mapped device registers
+require specific sized accesses.  If no access size attribute is
+specified, <span class="sc">gdb</span> may use accesses of any size.
+
+     <dl>
+<dt><code>8</code><dd>Use 8 bit memory accesses. 
+<br><dt><code>16</code><dd>Use 16 bit memory accesses. 
+<br><dt><code>32</code><dd>Use 32 bit memory accesses. 
+<br><dt><code>64</code><dd>Use 64 bit memory accesses. 
+</dl>
+
+<!-- @subsubsection Hardware/Software Breakpoints -->
+<!-- The hardware/software breakpoint attributes set whether @value{GDBN} -->
+<!-- will use hardware or software breakpoints for the internal breakpoints -->
+<!-- used by the step, next, finish, until, etc. commands. -->
+<!-- @table @code -->
+<!-- @item hwbreak -->
+<!-- Always use hardware breakpoints -->
+<!-- @item swbreak (default) -->
+<!-- @end table -->
+<h5 class="subsubsection">10.16.1.3 Data Cache</h5>
+
+<p>The data cache attributes set whether <span class="sc">gdb</span> will cache target
+memory.  While this generally improves performance by reducing debug
+protocol overhead, it can lead to incorrect results because <span class="sc">gdb</span>
+does not know about volatile variables or memory mapped device
+registers.
+
+     <dl>
+<dt><code>cache</code><dd>Enable <span class="sc">gdb</span> to cache target memory. 
+<br><dt><code>nocache</code><dd>Disable <span class="sc">gdb</span> from caching target memory.  This is the default. 
+</dl>
+
+<h4 class="subsection">10.16.2 Memory Access Checking</h4>
+
+<p><span class="sc">gdb</span> can be instructed to refuse accesses to memory that is
+not explicitly described.  This can be useful if accessing such
+regions has undesired effects for a specific target, or to provide
+better error checking.  The following commands control this behaviour.
+
+     
+<a name="index-set-mem-inaccessible_002dby_002ddefault-628"></a>
+<dl><dt><code>set mem inaccessible-by-default [on|off]</code><dd>If <code>on</code> is specified, make  <span class="sc">gdb</span> treat memory not
+explicitly described by the memory ranges as non-existent and refuse accesses
+to such memory.  The checks are only performed if there's at least one
+memory range defined.  If <code>off</code> is specified, make <span class="sc">gdb</span>
+treat the memory not explicitly described by the memory ranges as RAM. 
+The default value is <code>on</code>. 
+<a name="index-show-mem-inaccessible_002dby_002ddefault-629"></a><br><dt><code>show mem inaccessible-by-default</code><dd>Show the current handling of accesses to unknown memory. 
+</dl>
+
+<!-- @subsubsection Memory Write Verification -->
+<!-- The memory write verification attributes set whether @value{GDBN} -->
+<!-- will re-reads data after each write to verify the write was successful. -->
+<!-- @table @code -->
+<!-- @item verify -->
+<!-- @item noverify (default) -->
+<!-- @end table -->
+   </body></html>
+

@@ -1,0 +1,117 @@
+<html lang="en">
+<head>
+<title>Tracepoint Restrictions - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Set-Tracepoints.html#Set-Tracepoints" title="Set Tracepoints">
+<link rel="prev" href="Starting-and-Stopping-Trace-Experiments.html#Starting-and-Stopping-Trace-Experiments" title="Starting and Stopping Trace Experiments">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Tracepoint-Restrictions"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Starting-and-Stopping-Trace-Experiments.html#Starting-and-Stopping-Trace-Experiments">Starting and Stopping Trace Experiments</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Set-Tracepoints.html#Set-Tracepoints">Set Tracepoints</a>
+<hr>
+</div>
+
+<h4 class="subsection">13.1.10 Tracepoint Restrictions</h4>
+
+<p><a name="index-tracepoint-restrictions-740"></a>There are a number of restrictions on the use of tracepoints.  As
+described above, tracepoint data gathering occurs on the target
+without interaction from <span class="sc">gdb</span>.  Thus the full capabilities of
+the debugger are not available during data gathering, and then at data
+examination time, you will be limited by only having what was
+collected.  The following items describe some common problems, but it
+is not exhaustive, and you may run into additional difficulties not
+mentioned here.
+
+     <ul>
+<li>Tracepoint expressions are intended to gather objects (lvalues).  Thus
+the full flexibility of GDB's expression evaluator is not available. 
+You cannot call functions, cast objects to aggregate types, access
+convenience variables or modify values (except by assignment to trace
+state variables).  Some language features may implicitly call
+functions (for instance Objective-C fields with accessors), and therefore
+cannot be collected either.
+
+     <li>Collection of local variables, either individually or in bulk with
+<code>$locals</code> or <code>$args</code>, during <code>while-stepping</code> may
+behave erratically.  The stepping action may enter a new scope (for
+instance by stepping into a function), or the location of the variable
+may change (for instance it is loaded into a register).  The
+tracepoint data recorded uses the location information for the
+variables that is correct for the tracepoint location.  When the
+tracepoint is created, it is not possible, in general, to determine
+where the steps of a <code>while-stepping</code> sequence will advance the
+program&mdash;particularly if a conditional branch is stepped.
+
+     <li>Collection of an incompletely-initialized or partially-destroyed object
+may result in something that <span class="sc">gdb</span> cannot display, or displays
+in a misleading way.
+
+     <li>When <span class="sc">gdb</span> displays a pointer to character it automatically
+dereferences the pointer to also display characters of the string
+being pointed to.  However, collecting the pointer during tracing does
+not automatically collect the string.  You need to explicitly
+dereference the pointer and provide size information if you want to
+collect not only the pointer, but the memory pointed to.  For example,
+<code>*ptr@50</code> can be used to collect the 50 element array pointed to
+by <code>ptr</code>.
+
+     <li>It is not possible to collect a complete stack backtrace at a
+tracepoint.  Instead, you may collect the registers and a few hundred
+bytes from the stack pointer with something like <code>*$esp@300</code>
+(adjust to use the name of the actual stack pointer register on your
+target architecture, and the amount of stack you wish to capture). 
+Then the <code>backtrace</code> command will show a partial backtrace when
+using a trace frame.  The number of stack frames that can be examined
+depends on the sizes of the frames in the collected stack.  Note that
+if you ask for a block so large that it goes past the bottom of the
+stack, the target agent may report an error trying to read from an
+invalid address.
+
+     <li>If you do not collect registers at a tracepoint, <span class="sc">gdb</span> can
+infer that the value of <code>$pc</code> must be the same as the address of
+the tracepoint and use that when you are looking at a trace frame
+for that tracepoint.  However, this cannot work if the tracepoint has
+multiple locations (for instance if it was set in a function that was
+inlined), or if it has a <code>while-stepping</code> loop.  In those cases
+<span class="sc">gdb</span> will warn you that it can't infer <code>$pc</code>, and default
+it to zero.
+
+   </ul>
+
+   </body></html>
+

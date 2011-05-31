@@ -1,0 +1,92 @@
+<html lang="en">
+<head>
+<title>Packet Acknowledgment - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Remote-Protocol.html#Remote-Protocol" title="Remote Protocol">
+<link rel="prev" href="Remote-Non_002dStop.html#Remote-Non_002dStop" title="Remote Non-Stop">
+<link rel="next" href="Examples.html#Examples" title="Examples">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Packet-Acknowledgment"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Examples.html#Examples">Examples</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Remote-Non_002dStop.html#Remote-Non_002dStop">Remote Non-Stop</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Remote-Protocol.html#Remote-Protocol">Remote Protocol</a>
+<hr>
+</div>
+
+<h3 class="section">D.12 Packet Acknowledgment</h3>
+
+<p><a name="index-acknowledgment_002c-for-_0040value_007bGDBN_007d-remote-2492"></a><a name="index-packet-acknowledgment_002c-for-_0040value_007bGDBN_007d-remote-2493"></a>By default, when either the host or the target machine receives a packet,
+the first response expected is an acknowledgment: either &lsquo;<samp><span class="samp">+</span></samp>&rsquo; (to indicate
+the package was received correctly) or &lsquo;<samp><span class="samp">-</span></samp>&rsquo; (to request retransmission). 
+This mechanism allows the <span class="sc">gdb</span> remote protocol to operate over
+unreliable transport mechanisms, such as a serial line.
+
+   <p>In cases where the transport mechanism is itself reliable (such as a pipe or
+TCP connection), the &lsquo;<samp><span class="samp">+</span></samp>&rsquo;/&lsquo;<samp><span class="samp">-</span></samp>&rsquo; acknowledgments are redundant. 
+It may be desirable to disable them in that case to reduce communication
+overhead, or for other reasons.  This can be accomplished by means of the
+&lsquo;<samp><span class="samp">QStartNoAckMode</span></samp>&rsquo; packet; see <a href="QStartNoAckMode.html#QStartNoAckMode">QStartNoAckMode</a>.
+
+   <p>When in no-acknowledgment mode, neither the stub nor <span class="sc">gdb</span> shall send or
+expect &lsquo;<samp><span class="samp">+</span></samp>&rsquo;/&lsquo;<samp><span class="samp">-</span></samp>&rsquo; protocol acknowledgments.  The packet
+and response format still includes the normal checksum, as described in
+<a href="Overview.html#Overview">Overview</a>, but the checksum may be ignored by the receiver.
+
+   <p>If the stub supports &lsquo;<samp><span class="samp">QStartNoAckMode</span></samp>&rsquo; and prefers to operate in
+no-acknowledgment mode, it should report that to <span class="sc">gdb</span>
+by including &lsquo;<samp><span class="samp">QStartNoAckMode+</span></samp>&rsquo; in its response to &lsquo;<samp><span class="samp">qSupported</span></samp>&rsquo;;
+see <a href="qSupported.html#qSupported">qSupported</a>. 
+If <span class="sc">gdb</span> also supports &lsquo;<samp><span class="samp">QStartNoAckMode</span></samp>&rsquo; and it has not been
+disabled via the <code>set remote noack-packet off</code> command
+(see <a href="Remote-Configuration.html#Remote-Configuration">Remote Configuration</a>),
+<span class="sc">gdb</span> may then send a &lsquo;<samp><span class="samp">QStartNoAckMode</span></samp>&rsquo; packet to the stub. 
+Only then may the stub actually turn off packet acknowledgments. 
+<span class="sc">gdb</span> sends a final &lsquo;<samp><span class="samp">+</span></samp>&rsquo; acknowledgment of the stub's &lsquo;<samp><span class="samp">OK</span></samp>&rsquo;
+response, which can be safely ignored by the stub.
+
+   <p>Note that <code>set remote noack-packet</code> command only affects negotiation
+between <span class="sc">gdb</span> and the stub when subsequent connections are made;
+it does not affect the protocol acknowledgment state for any current
+connection. 
+Since &lsquo;<samp><span class="samp">+</span></samp>&rsquo;/&lsquo;<samp><span class="samp">-</span></samp>&rsquo; acknowledgments are enabled by default when a
+new connection is established,
+there is also no protocol request to re-enable the acknowledgments
+for the current connection, once disabled.
+
+   </body></html>
+

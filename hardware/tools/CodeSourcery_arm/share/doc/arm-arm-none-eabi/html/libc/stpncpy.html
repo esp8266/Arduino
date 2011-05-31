@@ -1,0 +1,67 @@
+<html lang="en">
+<head>
+<title>stpncpy - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Strings.html#Strings" title="Strings">
+<link rel="prev" href="stpcpy.html#stpcpy" title="stpcpy">
+<link rel="next" href="strcasecmp.html#strcasecmp" title="strcasecmp">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="stpncpy"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="strcasecmp.html#strcasecmp">strcasecmp</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="stpcpy.html#stpcpy">stpcpy</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Strings.html#Strings">Strings</a>
+<hr>
+</div>
+
+<h3 class="section">5.15 <code>stpncpy</code>&mdash;counted copy string returning a pointer to its end</h3>
+
+<p><a name="index-stpncpy-382"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;string.h&gt;
+     char *stpncpy(char *<var>dst</var>, const char *<var>src</var>, size_t <var>length</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>stpncpy</code> copies not more than <var>length</var> characters from the
+the string pointed to by <var>src</var> (including the terminating
+null character) to the array pointed to by <var>dst</var>.  If the
+string pointed to by <var>src</var> is shorter than <var>length</var>
+characters, null characters are appended to the destination
+array until a total of <var>length</var> characters have been
+written.
+
+   <p><br>
+<strong>Returns</strong><br>
+This function returns a pointer to the end of the destination string,
+thus pointing to the trailing '\0', or, if the destination string is
+not null-terminated, pointing to dst + n.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>stpncpy</code> is a GNU extension, candidate for inclusion into POSIX/SUSv4.
+
+   <p><code>stpncpy</code> requires no supporting OS subroutines.
+
+   <p><br>
+
+   </body></html>
+

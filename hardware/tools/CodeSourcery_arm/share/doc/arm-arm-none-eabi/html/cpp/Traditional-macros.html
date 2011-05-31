@@ -1,0 +1,146 @@
+<html lang="en">
+<head>
+<title>Traditional macros - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Traditional-Mode.html#Traditional-Mode" title="Traditional Mode">
+<link rel="prev" href="Traditional-lexical-analysis.html#Traditional-lexical-analysis" title="Traditional lexical analysis">
+<link rel="next" href="Traditional-miscellany.html#Traditional-miscellany" title="Traditional miscellany">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Traditional-macros"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Traditional-miscellany.html#Traditional-miscellany">Traditional miscellany</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Traditional-lexical-analysis.html#Traditional-lexical-analysis">Traditional lexical analysis</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Traditional-Mode.html#Traditional-Mode">Traditional Mode</a>
+<hr>
+</div>
+
+<h3 class="section">10.2 Traditional macros</h3>
+
+<p>The major difference between traditional and ISO macros is that the
+former expand to text rather than to a token sequence.  CPP removes
+all leading and trailing horizontal whitespace from a macro's
+replacement text before storing it, but preserves the form of internal
+whitespace.
+
+   <p>One consequence is that it is legitimate for the replacement text to
+contain an unmatched quote (see <a href="Traditional-lexical-analysis.html#Traditional-lexical-analysis">Traditional lexical analysis</a>).  An
+unclosed string or character constant continues into the text
+following the macro call.  Similarly, the text at the end of a macro's
+expansion can run together with the text after the macro invocation to
+produce a single token.
+
+   <p>Normally comments are removed from the replacement text after the
+macro is expanded, but if the <samp><span class="option">-CC</span></samp> option is passed on the
+command line comments are preserved.  (In fact, the current
+implementation removes comments even before saving the macro
+replacement text, but it careful to do it in such a way that the
+observed effect is identical even in the function-like macro case.)
+
+   <p>The ISO stringification operator &lsquo;<samp><span class="samp">#</span></samp>&rsquo; and token paste operator
+&lsquo;<samp><span class="samp">##</span></samp>&rsquo; have no special meaning.  As explained later, an effect
+similar to these operators can be obtained in a different way.  Macro
+names that are embedded in quotes, either from the main file or after
+macro replacement, do not expand.
+
+   <p>CPP replaces an unquoted object-like macro name with its replacement
+text, and then rescans it for further macros to replace.  Unlike
+standard macro expansion, traditional macro expansion has no provision
+to prevent recursion.  If an object-like macro appears unquoted in its
+replacement text, it will be replaced again during the rescan pass,
+and so on <em>ad infinitum</em>.  GCC detects when it is expanding
+recursive macros, emits an error message, and continues after the
+offending macro invocation.
+
+<pre class="smallexample">     #define PLUS +
+     #define INC(x) PLUS+x
+     INC(foo);
+          ==&gt; ++foo;
+</pre>
+   <p>Function-like macros are similar in form but quite different in
+behavior to their ISO counterparts.  Their arguments are contained
+within parentheses, are comma-separated, and can cross physical lines. 
+Commas within nested parentheses are not treated as argument
+separators.  Similarly, a quote in an argument cannot be left
+unclosed; a following comma or parenthesis that comes before the
+closing quote is treated like any other character.  There is no
+facility for handling variadic macros.
+
+   <p>This implementation removes all comments from macro arguments, unless
+the <samp><span class="option">-C</span></samp> option is given.  The form of all other horizontal
+whitespace in arguments is preserved, including leading and trailing
+whitespace.  In particular
+
+<pre class="smallexample">     f( )
+</pre>
+   <p class="noindent">is treated as an invocation of the macro &lsquo;<samp><span class="samp">f</span></samp>&rsquo; with a single
+argument consisting of a single space.  If you want to invoke a
+function-like macro that takes no arguments, you must not leave any
+whitespace between the parentheses.
+
+   <p>If a macro argument crosses a new line, the new line is replaced with
+a space when forming the argument.  If the previous line contained an
+unterminated quote, the following line inherits the quoted state.
+
+   <p>Traditional preprocessors replace parameters in the replacement text
+with their arguments regardless of whether the parameters are within
+quotes or not.  This provides a way to stringize arguments.  For
+example
+
+<pre class="smallexample">     #define str(x) "x"
+     str(/* <span class="roman">A comment</span> */some text )
+          ==&gt; "some text "
+</pre>
+   <p class="noindent">Note that the comment is removed, but that the trailing space is
+preserved.  Here is an example of using a comment to effect token
+pasting.
+
+<pre class="smallexample">     #define suffix(x) foo_/**/x
+     suffix(bar)
+          ==&gt; foo_bar
+</pre>
+   </body></html>
+

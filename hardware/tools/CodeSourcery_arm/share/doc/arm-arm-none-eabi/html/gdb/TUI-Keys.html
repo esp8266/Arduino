@@ -1,0 +1,115 @@
+<html lang="en">
+<head>
+<title>TUI Keys - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="TUI.html#TUI" title="TUI">
+<link rel="prev" href="TUI-Overview.html#TUI-Overview" title="TUI Overview">
+<link rel="next" href="TUI-Single-Key-Mode.html#TUI-Single-Key-Mode" title="TUI Single Key Mode">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="TUI-Keys"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="TUI-Single-Key-Mode.html#TUI-Single-Key-Mode">TUI Single Key Mode</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="TUI-Overview.html#TUI-Overview">TUI Overview</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="TUI.html#TUI">TUI</a>
+<hr>
+</div>
+
+<h3 class="section">25.2 TUI Key Bindings</h3>
+
+<p><a name="index-TUI-key-bindings-1959"></a>
+The TUI installs several key bindings in the readline keymaps
+(see <a href="Command-Line-Editing.html#Command-Line-Editing">Command Line Editing</a>).  The following key bindings
+are installed for both TUI mode and the <span class="sc">gdb</span> standard mode.
+
+     
+<a name="index-C_002dx-C_002da-1960"></a>
+<dl><dt><kbd>C-x C-a</kbd><dd><a name="index-C_002dx-a-1961"></a><dt><kbd>C-x a</kbd><dd><a name="index-C_002dx-A-1962"></a><dt><kbd>C-x A</kbd><dd>Enter or leave the TUI mode.  When leaving the TUI mode,
+the curses window management stops and <span class="sc">gdb</span> operates using
+its standard mode, writing on the terminal directly.  When reentering
+the TUI mode, control is given back to the curses windows. 
+The screen is then refreshed.
+
+     <p><a name="index-C_002dx-1-1963"></a><br><dt><kbd>C-x 1</kbd><dd>Use a TUI layout with only one window.  The layout will
+either be &lsquo;<samp><span class="samp">source</span></samp>&rsquo; or &lsquo;<samp><span class="samp">assembly</span></samp>&rsquo;.  When the TUI mode
+is not active, it will switch to the TUI mode.
+
+     <p>Think of this key binding as the Emacs <kbd>C-x 1</kbd> binding.
+
+     <p><a name="index-C_002dx-2-1964"></a><br><dt><kbd>C-x 2</kbd><dd>Use a TUI layout with at least two windows.  When the current
+layout already has two windows, the next layout with two windows is used. 
+When a new layout is chosen, one window will always be common to the
+previous layout and the new one.
+
+     <p>Think of it as the Emacs <kbd>C-x 2</kbd> binding.
+
+     <p><a name="index-C_002dx-o-1965"></a><br><dt><kbd>C-x o</kbd><dd>Change the active window.  The TUI associates several key bindings
+(like scrolling and arrow keys) with the active window.  This command
+gives the focus to the next TUI window.
+
+     <p>Think of it as the Emacs <kbd>C-x o</kbd> binding.
+
+     <p><a name="index-C_002dx-s-1966"></a><br><dt><kbd>C-x s</kbd><dd>Switch in and out of the TUI SingleKey mode that binds single
+keys to <span class="sc">gdb</span> commands (see <a href="TUI-Single-Key-Mode.html#TUI-Single-Key-Mode">TUI Single Key Mode</a>). 
+</dl>
+
+   <p>The following key bindings only work in the TUI mode:
+
+     
+<a name="index-PgUp-1967"></a>
+<dl><dt>&lt;PgUp&gt;<dd>Scroll the active window one page up.
+
+     <p><a name="index-PgDn-1968"></a><br><dt>&lt;PgDn&gt;<dd>Scroll the active window one page down.
+
+     <p><a name="index-Up-1969"></a><br><dt>&lt;Up&gt;<dd>Scroll the active window one line up.
+
+     <p><a name="index-Down-1970"></a><br><dt>&lt;Down&gt;<dd>Scroll the active window one line down.
+
+     <p><a name="index-Left-1971"></a><br><dt>&lt;Left&gt;<dd>Scroll the active window one column left.
+
+     <p><a name="index-Right-1972"></a><br><dt>&lt;Right&gt;<dd>Scroll the active window one column right.
+
+     <p><a name="index-C_002dL-1973"></a><br><dt><kbd>C-L</kbd><dd>Refresh the screen. 
+</dl>
+
+   <p>Because the arrow keys scroll the active window in the TUI mode, they
+are not available for their normal use by readline unless the command
+window has the focus.  When another window is active, you must use
+other readline key bindings such as <kbd>C-p</kbd>, <kbd>C-n</kbd>, <kbd>C-b</kbd>
+and <kbd>C-f</kbd> to control the command window.
+
+   </body></html>
+

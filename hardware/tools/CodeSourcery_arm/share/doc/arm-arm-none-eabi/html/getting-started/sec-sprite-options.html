@@ -1,0 +1,35 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>6.4. Sourcery G++ Debug Sprite Options</title><link rel="stylesheet" href="cs.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.74.0"><link rel="home" href="index.html" title="Sourcery G++ Lite"><link rel="up" href="sprite.html" title="Chapter 6. Sourcery G++ Debug Sprite"><link rel="prev" href="sec-sprite-invocation.html" title="6.3. Invoking Sourcery G++ Debug Sprite"><link rel="next" href="debug-sprite-rdi-url.html" title="6.5. Remote Debug Interface Devices"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">6.4. Sourcery G++ Debug Sprite Options</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="sec-sprite-invocation.html">Prev</a> </td><th width="60%" align="center">Chapter 6. Sourcery G++ Debug Sprite</th><td width="20%" align="right"> <a accesskey="n" href="debug-sprite-rdi-url.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec-sprite-options"></a>6.4. Sourcery G++ Debug Sprite Options</h2></div></div></div><p>The following command-line options are supported by the 
+    Sourcery G++ Debug Sprite:
+
+    </p><div class="variablelist"><dl><dt><span class="term"><code class="option">-b</code></span></dt><dd><p> Print a list of <em class="replaceable"><code>board-file</code></em>
+      files in the board config
+      directory.  </p></dd><dt><span class="term"><code class="option">-h</code></span></dt><dd><p> Print a list of
+      options and their meanings.  A list of
+      <em class="replaceable"><code>device-url</code></em> syntaxes is also
+      shown. </p></dd><dt><span class="term"><code class="option">-i</code></span></dt><dd><p> Print a list of
+      the accessible devices.  If a
+      <em class="replaceable"><code>device-url</code></em> is also specified, only
+      devices for that device type are scanned.  Each supported device
+      type is listed along with the options that can be appended to
+      the <em class="replaceable"><code>device-url</code></em>.  For each discovered
+      device, the <em class="replaceable"><code>device-url</code></em> is printed
+      along with a description of that
+      device.</p></dd><dt><span class="term"><code class="option">-l <em class="replaceable"><code>[host]:port</code></em></code></span></dt><dd><p>
+      Specify the host address and port number to listen for a GDB
+      connection.  If this option is not given, the Debug Sprite
+      communicates with GDB using stdin and stdout.  If you start the
+      Sprite from within GDB using the <code class="literal">target remote |
+      arm-none-eabi-­sprite ...</code> command, you do not need this
+      option.  </p></dd><dt><span class="term"><code class="option">-m</code></span></dt><dd><p> Listen for
+      multiple sequential connections.  Normally the Debug Sprite
+      terminates after the first connection from GDB terminates.  This
+      option instead makes it listen for a subsequent connection.  To
+      terminate the Sprite, open a connection and send the string
+      <code class="literal">END\n</code>.</p></dd><dt><span class="term"><code class="option">-q</code></span></dt><dd><p> Do not print any
+      messages. </p></dd><dt><span class="term"><code class="option">-v</code></span></dt><dd><p> Print additional
+      messages. </p></dd></dl></div><p>
+
+    If any of <code class="option">-b</code>, <code class="option">-i</code> or
+    <code class="option">-h</code> are given, the Debug Sprite terminates after
+    providing the information rather than waiting for a debugger
+    connection.</p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="sec-sprite-invocation.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="sprite.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="debug-sprite-rdi-url.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">6.3. Invoking Sourcery G++ Debug Sprite </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 6.5. Remote Debug Interface Devices</td></tr></table></div></body></html>

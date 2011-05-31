@@ -1,0 +1,110 @@
+<html lang="en">
+<head>
+<title>What you can and what you cannot do in +load - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Executing-code-before-main.html#Executing-code-before-main" title="Executing code before main">
+<link rel="prev" href="Executing-code-before-main.html#Executing-code-before-main" title="Executing code before main">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="What-you-can-and-what-you-cannot-do-in-+load"></a>
+<a name="What-you-can-and-what-you-cannot-do-in-_002bload"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Executing-code-before-main.html#Executing-code-before-main">Executing code before main</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Executing-code-before-main.html#Executing-code-before-main">Executing code before main</a>
+<hr>
+</div>
+
+<h4 class="subsection">8.1.1 What you can and what you cannot do in <code>+load</code></h4>
+
+<p>The <code>+load</code> implementation in the GNU runtime guarantees you the following
+things:
+
+     <ul>
+<li>you can write whatever C code you like;
+
+     <li>you can send messages to Objective-C constant strings (<code>@"this is a
+constant string"</code>);
+
+     <li>you can allocate and send messages to objects whose class is implemented
+in the same file;
+
+     <li>the <code>+load</code> implementation of all super classes of a class are executed before the <code>+load</code> of that class is executed;
+
+     <li>the <code>+load</code> implementation of a class is executed before the
+<code>+load</code> implementation of any category.
+
+ </ul>
+
+ <p>In particular, the following things, even if they can work in a
+particular case, are not guaranteed:
+
+     <ul>
+<li>allocation of or sending messages to arbitrary objects;
+
+     <li>allocation of or sending messages to objects whose classes have a
+category implemented in the same file;
+
+ </ul>
+
+ <p>You should make no assumptions about receiving <code>+load</code> in sibling
+classes when you write <code>+load</code> of a class.  The order in which
+sibling classes receive <code>+load</code> is not guaranteed.
+
+ <p>The order in which <code>+load</code> and <code>+initialize</code> are called could
+be problematic if this matters.  If you don't allocate objects inside
+<code>+load</code>, it is guaranteed that <code>+load</code> is called before
+<code>+initialize</code>.  If you create an object inside <code>+load</code> the
+<code>+initialize</code> method of object's class is invoked even if
+<code>+load</code> was not invoked.  Note if you explicitly call <code>+load</code>
+on a class, <code>+initialize</code> will be called first.  To avoid possible
+problems try to implement only one of these methods.
+
+ <p>The <code>+load</code> method is also invoked when a bundle is dynamically
+loaded into your running program.  This happens automatically without any
+intervening operation from you.  When you write bundles and you need to
+write <code>+load</code> you can safely create and send messages to objects whose
+classes already exist in the running program.  The same restrictions as
+above apply to classes defined in bundle.
+
+ </body></html>
+

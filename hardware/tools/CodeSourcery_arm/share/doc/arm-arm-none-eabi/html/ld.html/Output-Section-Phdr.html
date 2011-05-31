@@ -1,0 +1,64 @@
+<html lang="en">
+<head>
+<title>Output Section Phdr - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Output-Section-Attributes.html#Output-Section-Attributes" title="Output Section Attributes">
+<link rel="prev" href="Output-Section-Region.html#Output-Section-Region" title="Output Section Region">
+<link rel="next" href="Output-Section-Fill.html#Output-Section-Fill" title="Output Section Fill">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Output-Section-Phdr"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Output-Section-Fill.html#Output-Section-Fill">Output Section Fill</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Output-Section-Region.html#Output-Section-Region">Output Section Region</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Output-Section-Attributes.html#Output-Section-Attributes">Output Section Attributes</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">3.6.8.7 Output Section Phdr</h5>
+
+<p><a name="index-g_t_003a_0040var_007bphdr_007d-456"></a><a name="index-section_002c-assigning-to-program-header-457"></a><a name="index-program-headers-and-sections-458"></a>You can assign a section to a previously defined program segment by
+using &lsquo;<samp><span class="samp">:</span><var>phdr</var></samp>&rsquo;.  See <a href="PHDRS.html#PHDRS">PHDRS</a>.  If a section is assigned to
+one or more segments, then all subsequent allocated sections will be
+assigned to those segments as well, unless they use an explicitly
+<code>:</code><var>phdr</var> modifier.  You can use <code>:NONE</code> to tell the
+linker to not put the section in any segment at all.
+
+   <p>Here is a simple example:
+<pre class="smallexample">     PHDRS { text PT_LOAD ; }
+     SECTIONS { .text : { *(.text) } :text }
+</pre>
+   </body></html>
+

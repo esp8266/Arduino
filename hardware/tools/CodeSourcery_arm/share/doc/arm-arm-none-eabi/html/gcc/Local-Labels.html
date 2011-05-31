@@ -1,0 +1,125 @@
+<html lang="en">
+<head>
+<title>Local Labels - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Statement-Exprs.html#Statement-Exprs" title="Statement Exprs">
+<link rel="next" href="Labels-as-Values.html#Labels-as-Values" title="Labels as Values">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Local-Labels"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Labels-as-Values.html#Labels-as-Values">Labels as Values</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Statement-Exprs.html#Statement-Exprs">Statement Exprs</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.2 Locally Declared Labels</h3>
+
+<p><a name="index-local-labels-2185"></a><a name="index-macros_002c-local-labels-2186"></a>
+GCC allows you to declare <dfn>local labels</dfn> in any nested block
+scope.  A local label is just like an ordinary label, but you can
+only reference it (with a <code>goto</code> statement, or by taking its
+address) within the block in which it was declared.
+
+ <p>A local label declaration looks like this:
+
+<pre class="smallexample">     __label__ <var>label</var>;
+</pre>
+ <p class="noindent">or
+
+<pre class="smallexample">     __label__ <var>label1</var>, <var>label2</var>, /* <span class="roman">...</span> */;
+</pre>
+ <p>Local label declarations must come at the beginning of the block,
+before any ordinary declarations or statements.
+
+ <p>The label declaration defines the label <em>name</em>, but does not define
+the label itself.  You must do this in the usual way, with
+<var>label</var><code>:</code>, within the statements of the statement expression.
+
+ <p>The local label feature is useful for complex macros.  If a macro
+contains nested loops, a <code>goto</code> can be useful for breaking out of
+them.  However, an ordinary label whose scope is the whole function
+cannot be used: if the macro can be expanded several times in one
+function, the label will be multiply defined in that function.  A
+local label avoids this problem.  For example:
+
+<pre class="smallexample">     #define SEARCH(value, array, target)              \
+     do {                                              \
+       __label__ found;                                \
+       typeof (target) _SEARCH_target = (target);      \
+       typeof (*(array)) *_SEARCH_array = (array);     \
+       int i, j;                                       \
+       int value;                                      \
+       for (i = 0; i &lt; max; i++)                       \
+         for (j = 0; j &lt; max; j++)                     \
+           if (_SEARCH_array[i][j] == _SEARCH_target)  \
+             { (value) = i; goto found; }              \
+       (value) = -1;                                   \
+      found:;                                          \
+     } while (0)
+</pre>
+ <p>This could also be written using a statement-expression:
+
+<pre class="smallexample">     #define SEARCH(array, target)                     \
+     ({                                                \
+       __label__ found;                                \
+       typeof (target) _SEARCH_target = (target);      \
+       typeof (*(array)) *_SEARCH_array = (array);     \
+       int i, j;                                       \
+       int value;                                      \
+       for (i = 0; i &lt; max; i++)                       \
+         for (j = 0; j &lt; max; j++)                     \
+           if (_SEARCH_array[i][j] == _SEARCH_target)  \
+             { value = i; goto found; }                \
+       value = -1;                                     \
+      found:                                           \
+       value;                                          \
+     })
+</pre>
+ <p>Local label declarations also make the labels they declare visible to
+nested functions, if there are any.  See <a href="Nested-Functions.html#Nested-Functions">Nested Functions</a>, for details.
+
+ </body></html>
+

@@ -1,0 +1,132 @@
+<html lang="en">
+<head>
+<title>Return Address - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Function-Names.html#Function-Names" title="Function Names">
+<link rel="next" href="Vector-Extensions.html#Vector-Extensions" title="Vector Extensions">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Return-Address"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Vector-Extensions.html#Vector-Extensions">Vector Extensions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Function-Names.html#Function-Names">Function Names</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.46 Getting the Return or Frame Address of a Function</h3>
+
+<p>These functions may be used to get information about the callers of a
+function.
+
+<div class="defun">
+&mdash; Built-in Function: void * <b>__builtin_return_address</b> (<var>unsigned int level</var>)<var><a name="index-g_t_005f_005fbuiltin_005freturn_005faddress-2608"></a></var><br>
+<blockquote><p>This function returns the return address of the current function, or of
+one of its callers.  The <var>level</var> argument is number of frames to
+scan up the call stack.  A value of <code>0</code> yields the return address
+of the current function, a value of <code>1</code> yields the return address
+of the caller of the current function, and so forth.  When inlining
+the expected behavior is that the function will return the address of
+the function that will be returned to.  To work around this behavior use
+the <code>noinline</code> function attribute.
+
+      <p>The <var>level</var> argument must be a constant integer.
+
+      <p>On some machines it may be impossible to determine the return address of
+any function other than the current one; in such cases, or when the top
+of the stack has been reached, this function will return <code>0</code> or a
+random value.  In addition, <code>__builtin_frame_address</code> may be used
+to determine if the top of the stack has been reached.
+
+      <p>Additional post-processing of the returned value may be needed, see
+<code>__builtin_extract_return_address</code>.
+
+      <p>This function should only be used with a nonzero argument for debugging
+purposes. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Built-in Function: void * <b>__builtin_extract_return_address</b> (<var>void *addr</var>)<var><a name="index-g_t_005f_005fbuiltin_005fextract_005freturn_005faddress-2609"></a></var><br>
+<blockquote><p>The address as returned by <code>__builtin_return_address</code> may have to be fed
+through this function to get the actual encoded address.  For example, on the
+31-bit S/390 platform the highest bit has to be masked out, or on SPARC
+platforms an offset has to be added for the true next instruction to be
+executed.
+
+      <p>If no fixup is needed, this function simply passes through <var>addr</var>. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Built-in Function: void * <b>__builtin_frob_return_address</b> (<var>void *addr</var>)<var><a name="index-g_t_005f_005fbuiltin_005ffrob_005freturn_005faddress-2610"></a></var><br>
+<blockquote><p>This function does the reverse of <code>__builtin_extract_return_address</code>. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Built-in Function: void * <b>__builtin_frame_address</b> (<var>unsigned int level</var>)<var><a name="index-g_t_005f_005fbuiltin_005fframe_005faddress-2611"></a></var><br>
+<blockquote><p>This function is similar to <code>__builtin_return_address</code>, but it
+returns the address of the function frame rather than the return address
+of the function.  Calling <code>__builtin_frame_address</code> with a value of
+<code>0</code> yields the frame address of the current function, a value of
+<code>1</code> yields the frame address of the caller of the current function,
+and so forth.
+
+      <p>The frame is the area on the stack which holds local variables and saved
+registers.  The frame address is normally the address of the first word
+pushed on to the stack by the function.  However, the exact definition
+depends upon the processor and the calling convention.  If the processor
+has a dedicated frame pointer register, and the function has a frame,
+then <code>__builtin_frame_address</code> will return the value of the frame
+pointer register.
+
+      <p>On some machines it may be impossible to determine the frame address of
+any function other than the current one; in such cases, or when the top
+of the stack has been reached, this function will return <code>0</code> if
+the first frame pointer is properly initialized by the startup code.
+
+      <p>This function should only be used with a nonzero argument for debugging
+purposes. 
+</p></blockquote></div>
+
+ </body></html>
+

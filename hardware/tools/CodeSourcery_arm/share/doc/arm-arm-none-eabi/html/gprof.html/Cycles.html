@@ -1,0 +1,177 @@
+<html lang="en">
+<head>
+<title>Cycles - GNU gprof</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GNU gprof">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Call-Graph.html#Call-Graph" title="Call Graph">
+<link rel="prev" href="Subroutines.html#Subroutines" title="Subroutines">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the gprof profiler of the GNU system.
+
+Copyright (C) 1988, 1992, 1997, 1998, 1999, 2000, 2001, 2003,
+2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Cycles"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Subroutines.html#Subroutines">Subroutines</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Call-Graph.html#Call-Graph">Call Graph</a>
+<hr>
+</div>
+
+<h4 class="subsection">5.2.4 How Mutually Recursive Functions Are Described</h4>
+
+<p><a name="index-cycle-3"></a><a name="index-recursion-cycle-4"></a>
+The graph may be complicated by the presence of <dfn>cycles of
+recursion</dfn> in the call graph.  A cycle exists if a function calls
+another function that (directly or indirectly) calls (or appears to
+call) the original function.  For example: if <code>a</code> calls <code>b</code>,
+and <code>b</code> calls <code>a</code>, then <code>a</code> and <code>b</code> form a cycle.
+
+   <p>Whenever there are call paths both ways between a pair of functions, they
+belong to the same cycle.  If <code>a</code> and <code>b</code> call each other and
+<code>b</code> and <code>c</code> call each other, all three make one cycle.  Note that
+even if <code>b</code> only calls <code>a</code> if it was not called from <code>a</code>,
+<code>gprof</code> cannot determine this, so <code>a</code> and <code>b</code> are still
+considered a cycle.
+
+   <p>The cycles are numbered with consecutive integers.  When a function
+belongs to a cycle, each time the function name appears in the call graph
+it is followed by &lsquo;<samp><span class="samp">&lt;cycle </span><var>number</var><span class="samp">&gt;</span></samp>&rsquo;.
+
+   <p>The reason cycles matter is that they make the time values in the call
+graph paradoxical.  The &ldquo;time spent in children&rdquo; of <code>a</code> should
+include the time spent in its subroutine <code>b</code> and in <code>b</code>'s
+subroutines&mdash;but one of <code>b</code>'s subroutines is <code>a</code>!  How much of
+<code>a</code>'s time should be included in the children of <code>a</code>, when
+<code>a</code> is indirectly recursive?
+
+   <p>The way <code>gprof</code> resolves this paradox is by creating a single entry
+for the cycle as a whole.  The primary line of this entry describes the
+total time spent directly in the functions of the cycle.  The
+&ldquo;subroutines&rdquo; of the cycle are the individual functions of the cycle, and
+all other functions that were called directly by them.  The &ldquo;callers&rdquo; of
+the cycle are the functions, outside the cycle, that called functions in
+the cycle.
+
+   <p>Here is an example portion of a call graph which shows a cycle containing
+functions <code>a</code> and <code>b</code>.  The cycle was entered by a call to
+<code>a</code> from <code>main</code>; both <code>a</code> and <code>b</code> called <code>c</code>.
+
+<pre class="smallexample">     index  % time    self  children called     name
+     ----------------------------------------
+                      1.77        0    1/1        main [2]
+     [3]     91.71    1.77        0    1+5    &lt;cycle 1 as a whole&gt; [3]
+                      1.02        0    3          b &lt;cycle 1&gt; [4]
+                      0.75        0    2          a &lt;cycle 1&gt; [5]
+     ----------------------------------------
+                                       3          a &lt;cycle 1&gt; [5]
+     [4]     52.85    1.02        0    0      b &lt;cycle 1&gt; [4]
+                                       2          a &lt;cycle 1&gt; [5]
+                         0        0    3/6        c [6]
+     ----------------------------------------
+                      1.77        0    1/1        main [2]
+                                       2          b &lt;cycle 1&gt; [4]
+     [5]     38.86    0.75        0    1      a &lt;cycle 1&gt; [5]
+                                       3          b &lt;cycle 1&gt; [4]
+                         0        0    3/6        c [6]
+     ----------------------------------------
+</pre>
+   <p class="noindent">(The entire call graph for this program contains in addition an entry for
+<code>main</code>, which calls <code>a</code>, and an entry for <code>c</code>, with callers
+<code>a</code> and <code>b</code>.)
+
+<pre class="smallexample">     index  % time    self  children called     name
+                                                  &lt;spontaneous&gt;
+     [1]    100.00       0     1.93    0      start [1]
+                      0.16     1.77    1/1        main [2]
+     ----------------------------------------
+                      0.16     1.77    1/1        start [1]
+     [2]    100.00    0.16     1.77    1      main [2]
+                      1.77        0    1/1        a &lt;cycle 1&gt; [5]
+     ----------------------------------------
+                      1.77        0    1/1        main [2]
+     [3]     91.71    1.77        0    1+5    &lt;cycle 1 as a whole&gt; [3]
+                      1.02        0    3          b &lt;cycle 1&gt; [4]
+                      0.75        0    2          a &lt;cycle 1&gt; [5]
+                         0        0    6/6        c [6]
+     ----------------------------------------
+                                       3          a &lt;cycle 1&gt; [5]
+     [4]     52.85    1.02        0    0      b &lt;cycle 1&gt; [4]
+                                       2          a &lt;cycle 1&gt; [5]
+                         0        0    3/6        c [6]
+     ----------------------------------------
+                      1.77        0    1/1        main [2]
+                                       2          b &lt;cycle 1&gt; [4]
+     [5]     38.86    0.75        0    1      a &lt;cycle 1&gt; [5]
+                                       3          b &lt;cycle 1&gt; [4]
+                         0        0    3/6        c [6]
+     ----------------------------------------
+                         0        0    3/6        b &lt;cycle 1&gt; [4]
+                         0        0    3/6        a &lt;cycle 1&gt; [5]
+     [6]      0.00       0        0    6      c [6]
+     ----------------------------------------
+</pre>
+   <p>The <code>self</code> field of the cycle's primary line is the total time
+spent in all the functions of the cycle.  It equals the sum of the
+<code>self</code> fields for the individual functions in the cycle, found
+in the entry in the subroutine lines for these functions.
+
+   <p>The <code>children</code> fields of the cycle's primary line and subroutine lines
+count only subroutines outside the cycle.  Even though <code>a</code> calls
+<code>b</code>, the time spent in those calls to <code>b</code> is not counted in
+<code>a</code>'s <code>children</code> time.  Thus, we do not encounter the problem of
+what to do when the time in those calls to <code>b</code> includes indirect
+recursive calls back to <code>a</code>.
+
+   <p>The <code>children</code> field of a caller-line in the cycle's entry estimates
+the amount of time spent <em>in the whole cycle</em>, and its other
+subroutines, on the times when that caller called a function in the cycle.
+
+   <p>The <code>called</code> field in the primary line for the cycle has two numbers:
+first, the number of times functions in the cycle were called by functions
+outside the cycle; second, the number of times they were called by
+functions in the cycle (including times when a function in the cycle calls
+itself).  This is a generalization of the usual split into non-recursive and
+recursive calls.
+
+   <p>The <code>called</code> field of a subroutine-line for a cycle member in the
+cycle's entry says how many time that function was called from functions in
+the cycle.  The total of all these is the second number in the primary line's
+<code>called</code> field.
+
+   <p>In the individual entry for a function in a cycle, the other functions in
+the same cycle can appear as subroutines and as callers.  These lines show
+how many times each function in the cycle called or was called from each other
+function in the cycle.  The <code>self</code> and <code>children</code> fields in these
+lines are blank because of the difficulty of defining meanings for them
+when recursion is going on.
+
+   </body></html>
+

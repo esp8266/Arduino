@@ -1,0 +1,178 @@
+<html lang="en">
+<head>
+<title>Backtrace - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stack.html#Stack" title="Stack">
+<link rel="prev" href="Frames.html#Frames" title="Frames">
+<link rel="next" href="Selection.html#Selection" title="Selection">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Backtrace"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Selection.html#Selection">Selection</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Frames.html#Frames">Frames</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stack.html#Stack">Stack</a>
+<hr>
+</div>
+
+<h3 class="section">8.2 Backtraces</h3>
+
+<p><a name="index-traceback-410"></a><a name="index-call-stack-traces-411"></a>A backtrace is a summary of how your program got where it is.  It shows one
+line per frame, for many frames, starting with the currently executing
+frame (frame zero), followed by its caller (frame one), and on up the
+stack.
+
+     
+<a name="index-backtrace-412"></a>
+<a name="index-bt-_0040r_007b_0028_0040code_007bbacktrace_007d_0029_007d-413"></a>
+<dl><dt><code>backtrace</code><dt><code>bt</code><dd>Print a backtrace of the entire stack: one line per frame for all
+frames in the stack.
+
+     <p>You can stop the backtrace at any time by typing the system interrupt
+character, normally <kbd>Ctrl-c</kbd>.
+
+     <br><dt><code>backtrace </code><var>n</var><dt><code>bt </code><var>n</var><dd>Similar, but print only the innermost <var>n</var> frames.
+
+     <br><dt><code>backtrace -</code><var>n</var><dt><code>bt -</code><var>n</var><dd>Similar, but print only the outermost <var>n</var> frames.
+
+     <br><dt><code>backtrace full</code><dt><code>bt full</code><dt><code>bt full </code><var>n</var><dt><code>bt full -</code><var>n</var><dd>Print the values of the local variables also.  <var>n</var> specifies the
+number of frames to print, as described above. 
+</dl>
+
+   <p><a name="index-where-414"></a><a name="index-info-stack-415"></a>The names <code>where</code> and <code>info stack</code> (abbreviated <code>info s</code>)
+are additional aliases for <code>backtrace</code>.
+
+   <p><a name="index-multiple-threads_002c-backtrace-416"></a>In a multi-threaded program, <span class="sc">gdb</span> by default shows the
+backtrace only for the current thread.  To display the backtrace for
+several or all of the threads, use the command <code>thread apply</code>
+(see <a href="Threads.html#Threads">thread apply</a>).  For example, if you type <kbd>thread
+apply all backtrace</kbd>, <span class="sc">gdb</span> will display the backtrace for all
+the threads; this is handy when you debug a core dump of a
+multi-threaded program.
+
+   <p>Each line in the backtrace shows the frame number and the function name. 
+The program counter value is also shown&mdash;unless you use <code>set
+print address off</code>.  The backtrace also shows the source file name and
+line number, as well as the arguments to the function.  The program
+counter value is omitted if it is at the beginning of the code for that
+line number.
+
+   <p>Here is an example of a backtrace.  It was made with the command
+&lsquo;<samp><span class="samp">bt 3</span></samp>&rsquo;, so it shows the innermost three frames.
+
+<pre class="smallexample">     #0  m4_traceon (obs=0x24eb0, argc=1, argv=0x2b8c8)
+         at builtin.c:993
+     #1  0x6e38 in expand_macro (sym=0x2b600, data=...) at macro.c:242
+     #2  0x6840 in expand_token (obs=0x0, t=177664, td=0xf7fffb08)
+         at macro.c:71
+     (More stack frames follow...)
+</pre>
+   <p class="noindent">The display for frame zero does not begin with a program counter
+value, indicating that your program has stopped at the beginning of the
+code for line <code>993</code> of <code>builtin.c</code>.
+
+<p class="noindent">The value of parameter <code>data</code> in frame 1 has been replaced by
+<code>...</code>.  By default, <span class="sc">gdb</span> prints the value of a parameter
+only if it is a scalar (integer, pointer, enumeration, etc).  See command
+<kbd>set print frame-arguments</kbd> in <a href="Print-Settings.html#Print-Settings">Print Settings</a> for more details
+on how to configure the way function parameter values are printed.
+
+   <p><a name="index-value-optimized-out_002c-in-backtrace-417"></a><a name="index-function-call-arguments_002c-optimized-out-418"></a>If your program was compiled with optimizations, some compilers will
+optimize away arguments passed to functions if those arguments are
+never used after the call.  Such optimizations generate code that
+passes arguments through registers, but doesn't store those arguments
+in the stack frame.  <span class="sc">gdb</span> has no way of displaying such
+arguments in stack frames other than the innermost one.  Here's what
+such a backtrace might look like:
+
+<pre class="smallexample">     #0  m4_traceon (obs=0x24eb0, argc=1, argv=0x2b8c8)
+         at builtin.c:993
+     #1  0x6e38 in expand_macro (sym=&lt;value optimized out&gt;) at macro.c:242
+     #2  0x6840 in expand_token (obs=0x0, t=&lt;value optimized out&gt;, td=0xf7fffb08)
+         at macro.c:71
+     (More stack frames follow...)
+</pre>
+   <p class="noindent">The values of arguments that were not saved in their stack frames are
+shown as &lsquo;<samp><span class="samp">&lt;value optimized out&gt;</span></samp>&rsquo;.
+
+   <p>If you need to display the values of such optimized-out arguments,
+either deduce that from other variables whose values depend on the one
+you are interested in, or recompile without optimizations.
+
+   <p><a name="index-backtrace-beyond-_0040code_007bmain_007d-function-419"></a><a name="index-program-entry-point-420"></a><a name="index-startup-code_002c-and-backtrace-421"></a>Most programs have a standard user entry point&mdash;a place where system
+libraries and startup code transition into user code.  For C this is
+<code>main</code><a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a>. 
+When <span class="sc">gdb</span> finds the entry function in a backtrace
+it will terminate the backtrace, to avoid tracing into highly
+system-specific (and generally uninteresting) code.
+
+   <p>If you need to examine the startup code, or limit the number of levels
+in a backtrace, you can change this behavior:
+
+     <dl>
+<dt><code>set backtrace past-main</code><dt><code>set backtrace past-main on</code><dd><a name="index-set-backtrace-422"></a>Backtraces will continue past the user entry point.
+
+     <br><dt><code>set backtrace past-main off</code><dd>Backtraces will stop when they encounter the user entry point.  This is the
+default.
+
+     <br><dt><code>show backtrace past-main</code><dd><a name="index-show-backtrace-423"></a>Display the current user entry point backtrace policy.
+
+     <br><dt><code>set backtrace past-entry</code><dt><code>set backtrace past-entry on</code><dd>Backtraces will continue past the internal entry point of an application. 
+This entry point is encoded by the linker when the application is built,
+and is likely before the user entry point <code>main</code> (or equivalent) is called.
+
+     <br><dt><code>set backtrace past-entry off</code><dd>Backtraces will stop when they encounter the internal entry point of an
+application.  This is the default.
+
+     <br><dt><code>show backtrace past-entry</code><dd>Display the current internal entry point backtrace policy.
+
+     <br><dt><code>set backtrace limit </code><var>n</var><dt><code>set backtrace limit 0</code><dd><a name="index-backtrace-limit-424"></a>Limit the backtrace to <var>n</var> levels.  A value of zero means
+unlimited.
+
+     <br><dt><code>show backtrace limit</code><dd>Display the current limit on backtrace levels. 
+</dl>
+
+   <div class="footnote">
+<hr>
+<h4>Footnotes</h4><p class="footnote"><small>[<a name="fn-1" href="#fnd-1">1</a>]</small> 
+Note that embedded programs (the so-called &ldquo;free-standing&rdquo;
+environment) are not required to have a <code>main</code> function as the
+entry point.  They could even have multiple entry points.</p>
+
+   <hr></div>
+
+   </body></html>
+

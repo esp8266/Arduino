@@ -1,0 +1,252 @@
+<html lang="en">
+<head>
+<title>Continuing and Stepping - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stopping.html#Stopping" title="Stopping">
+<link rel="prev" href="Breakpoints.html#Breakpoints" title="Breakpoints">
+<link rel="next" href="Signals.html#Signals" title="Signals">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Continuing-and-Stepping"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Signals.html#Signals">Signals</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Breakpoints.html#Breakpoints">Breakpoints</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stopping.html#Stopping">Stopping</a>
+<hr>
+</div>
+
+<h3 class="section">5.2 Continuing and Stepping</h3>
+
+<p><a name="index-stepping-284"></a><a name="index-continuing-285"></a><a name="index-resuming-execution-286"></a><dfn>Continuing</dfn> means resuming program execution until your program
+completes normally.  In contrast, <dfn>stepping</dfn> means executing just
+one more &ldquo;step&rdquo; of your program, where &ldquo;step&rdquo; may mean either one
+line of source code, or one machine instruction (depending on what
+particular command you use).  Either when continuing or when stepping,
+your program may stop even sooner, due to a breakpoint or a signal.  (If
+it stops due to a signal, you may want to use <code>handle</code>, or use
+&lsquo;<samp><span class="samp">signal 0</span></samp>&rsquo; to resume execution.  See <a href="Signals.html#Signals">Signals</a>.)
+
+     
+<a name="index-continue-287"></a>
+<a name="index-c-_0040r_007b_0028_0040code_007bcontinue_007d_0029_007d-288"></a>
+<a name="index-fg-_0040r_007b_0028resume-foreground-execution_0029_007d-289"></a>
+<dl><dt><code>continue </code><span class="roman">[</span><var>ignore-count</var><span class="roman">]</span><dt><code>c </code><span class="roman">[</span><var>ignore-count</var><span class="roman">]</span><dt><code>fg </code><span class="roman">[</span><var>ignore-count</var><span class="roman">]</span><dd>Resume program execution, at the address where your program last stopped;
+any breakpoints set at that address are bypassed.  The optional argument
+<var>ignore-count</var> allows you to specify a further number of times to
+ignore a breakpoint at this location; its effect is like that of
+<code>ignore</code> (see <a href="Conditions.html#Conditions">Break Conditions</a>).
+
+     <p>The argument <var>ignore-count</var> is meaningful only when your program
+stopped due to a breakpoint.  At other times, the argument to
+<code>continue</code> is ignored.
+
+     <p>The synonyms <code>c</code> and <code>fg</code> (for <dfn>foreground</dfn>, as the
+debugged program is deemed to be the foreground program) are provided
+purely for convenience, and have exactly the same behavior as
+<code>continue</code>. 
+</dl>
+
+   <p>To resume execution at a different place, you can use <code>return</code>
+(see <a href="Returning.html#Returning">Returning from a Function</a>) to go back to the
+calling function; or <code>jump</code> (see <a href="Jumping.html#Jumping">Continuing at a Different Address</a>) to go to an arbitrary location in your program.
+
+   <p>A typical technique for using stepping is to set a breakpoint
+(see <a href="Breakpoints.html#Breakpoints">Breakpoints; Watchpoints; and Catchpoints</a>) at the
+beginning of the function or the section of your program where a problem
+is believed to lie, run your program until it stops at that breakpoint,
+and then step through the suspect area, examining the variables that are
+interesting, until you see the problem happen.
+
+     
+<a name="index-step-290"></a>
+<a name="index-s-_0040r_007b_0028_0040code_007bstep_007d_0029_007d-291"></a>
+<dl><dt><code>step</code><dd>Continue running your program until control reaches a different source
+line, then stop it and return control to <span class="sc">gdb</span>.  This command is
+abbreviated <code>s</code>.
+
+     <blockquote>
+<!-- "without debugging information" is imprecise; actually "without line -->
+<!-- numbers in the debugging information".  (gcc -g1 has debugging info but -->
+<!-- not line numbers).  But it seems complex to try to make that -->
+<!-- distinction here. -->
+<em>Warning:</em> If you use the <code>step</code> command while control is
+within a function that was compiled without debugging information,
+execution proceeds until control reaches a function that does have
+debugging information.  Likewise, it will not step into a function which
+is compiled without debugging information.  To step through functions
+without debugging information, use the <code>stepi</code> command, described
+below. 
+</blockquote>
+
+     <p>The <code>step</code> command only stops at the first instruction of a source
+line.  This prevents the multiple stops that could otherwise occur in
+<code>switch</code> statements, <code>for</code> loops, etc.  <code>step</code> continues
+to stop if a function that has debugging information is called within
+the line.  In other words, <code>step</code> <em>steps inside</em> any functions
+called within the line.
+
+     <p>Also, the <code>step</code> command only enters a function if there is line
+number information for the function.  Otherwise it acts like the
+<code>next</code> command.  This avoids problems when using <code>cc -gl</code>
+on MIPS machines.  Previously, <code>step</code> entered subroutines if there
+was any debugging information about the routine.
+
+     <br><dt><code>step </code><var>count</var><dd>Continue running as in <code>step</code>, but do so <var>count</var> times.  If a
+breakpoint is reached, or a signal not related to stepping occurs before
+<var>count</var> steps, stepping stops right away.
+
+     <p><a name="index-next-292"></a><a name="index-n-_0040r_007b_0028_0040code_007bnext_007d_0029_007d-293"></a><br><dt><code>next </code><span class="roman">[</span><var>count</var><span class="roman">]</span><dd>Continue to the next source line in the current (innermost) stack frame. 
+This is similar to <code>step</code>, but function calls that appear within
+the line of code are executed without stopping.  Execution stops when
+control reaches a different line of code at the original stack level
+that was executing when you gave the <code>next</code> command.  This command
+is abbreviated <code>n</code>.
+
+     <p>An argument <var>count</var> is a repeat count, as for <code>step</code>.
+
+     <!-- FIX ME!!  Do we delete this, or is there a way it fits in with -->
+     <!-- the following paragraph?   -  Vctoria -->
+     <!-- @code{next} within a function that lacks debugging information acts like -->
+     <!-- @code{step}, but any function calls appearing within the code of the -->
+     <!-- function are executed without stopping. -->
+     <p>The <code>next</code> command only stops at the first instruction of a
+source line.  This prevents multiple stops that could otherwise occur in
+<code>switch</code> statements, <code>for</code> loops, etc.
+
+     <p><a name="index-set-step_002dmode-294"></a><br><dt><code>set step-mode</code><dd><a name="index-functions-without-line-info_002c-and-stepping-295"></a><a name="index-stepping-into-functions-with-no-line-info-296"></a><dt><code>set step-mode on</code><dd>The <code>set step-mode on</code> command causes the <code>step</code> command to
+stop at the first instruction of a function which contains no debug line
+information rather than stepping over it.
+
+     <p>This is useful in cases where you may be interested in inspecting the
+machine instructions of a function which has no symbolic info and do not
+want <span class="sc">gdb</span> to automatically skip over this function.
+
+     <br><dt><code>set step-mode off</code><dd>Causes the <code>step</code> command to step over any functions which contains no
+debug information.  This is the default.
+
+     <br><dt><code>show step-mode</code><dd>Show whether <span class="sc">gdb</span> will stop in or step over functions without
+source line debug information.
+
+     <p><a name="index-finish-297"></a><a name="index-fin-_0040r_007b_0028_0040code_007bfinish_007d_0029_007d-298"></a><br><dt><code>finish</code><dd>Continue running until just after function in the selected stack frame
+returns.  Print the returned value (if any).  This command can be
+abbreviated as <code>fin</code>.
+
+     <p>Contrast this with the <code>return</code> command (see <a href="Returning.html#Returning">Returning from a Function</a>).
+
+     <p><a name="index-until-299"></a><a name="index-u-_0040r_007b_0028_0040code_007buntil_007d_0029_007d-300"></a><a name="index-run-until-specified-location-301"></a><br><dt><code>until</code><dt><code>u</code><dd>Continue running until a source line past the current line, in the
+current stack frame, is reached.  This command is used to avoid single
+stepping through a loop more than once.  It is like the <code>next</code>
+command, except that when <code>until</code> encounters a jump, it
+automatically continues execution until the program counter is greater
+than the address of the jump.
+
+     <p>This means that when you reach the end of a loop after single stepping
+though it, <code>until</code> makes your program continue execution until it
+exits the loop.  In contrast, a <code>next</code> command at the end of a loop
+simply steps back to the beginning of the loop, which forces you to step
+through the next iteration.
+
+     <p><code>until</code> always stops your program if it attempts to exit the current
+stack frame.
+
+     <p><code>until</code> may produce somewhat counterintuitive results if the order
+of machine code does not match the order of the source lines.  For
+example, in the following excerpt from a debugging session, the <code>f</code>
+(<code>frame</code>) command shows that execution is stopped at line
+<code>206</code>; yet when we use <code>until</code>, we get to line <code>195</code>:
+
+     <pre class="smallexample">          (gdb) f
+          #0  main (argc=4, argv=0xf7fffae8) at m4.c:206
+          206                 expand_input();
+          (gdb) until
+          195             for ( ; argc &gt; 0; NEXTARG) {
+</pre>
+     <p>This happened because, for execution efficiency, the compiler had
+generated code for the loop closure test at the end, rather than the
+start, of the loop&mdash;even though the test in a C <code>for</code>-loop is
+written before the body of the loop.  The <code>until</code> command appeared
+to step back to the beginning of the loop when it advanced to this
+expression; however, it has not really gone to an earlier
+statement&mdash;not in terms of the actual machine code.
+
+     <p><code>until</code> with no argument works by means of single
+instruction stepping, and hence is slower than <code>until</code> with an
+argument.
+
+     <br><dt><code>until </code><var>location</var><dt><code>u </code><var>location</var><dd>Continue running your program until either the specified location is
+reached, or the current stack frame returns.  <var>location</var> is any of
+the forms described in <a href="Specify-Location.html#Specify-Location">Specify Location</a>. 
+This form of the command uses temporary breakpoints, and
+hence is quicker than <code>until</code> without an argument.  The specified
+location is actually reached only if it is in the current frame.  This
+implies that <code>until</code> can be used to skip over recursive function
+invocations.  For instance in the code below, if the current location is
+line <code>96</code>, issuing <code>until 99</code> will execute the program up to
+line <code>99</code> in the same invocation of factorial, i.e., after the inner
+invocations have returned.
+
+     <pre class="smallexample">          94	int factorial (int value)
+          95	{
+          96	    if (value &gt; 1) {
+          97            value *= factorial (value - 1);
+          98	    }
+          99	    return (value);
+          100     }
+</pre>
+     <p><a name="index-advance-_0040var_007blocation_007d-302"></a><dt><code>advance </code><var>location</var><dd>Continue running the program up to the given <var>location</var>.  An argument is
+required, which should be of one of the forms described in
+<a href="Specify-Location.html#Specify-Location">Specify Location</a>. 
+Execution will also stop upon exit from the current stack
+frame.  This command is similar to <code>until</code>, but <code>advance</code> will
+not skip over recursive function calls, and the target location doesn't
+have to be in the same frame as the current one.
+
+     <p><a name="index-stepi-303"></a><a name="index-si-_0040r_007b_0028_0040code_007bstepi_007d_0029_007d-304"></a><br><dt><code>stepi</code><dt><code>stepi </code><var>arg</var><dt><code>si</code><dd>Execute one machine instruction, then stop and return to the debugger.
+
+     <p>It is often useful to do &lsquo;<samp><span class="samp">display/i $pc</span></samp>&rsquo; when stepping by machine
+instructions.  This makes <span class="sc">gdb</span> automatically display the next
+instruction to be executed, each time your program stops.  See <a href="Auto-Display.html#Auto-Display">Automatic Display</a>.
+
+     <p>An argument is a repeat count, as in <code>step</code>.
+
+     <p><a name="index-nexti-305"></a><a name="index-ni-_0040r_007b_0028_0040code_007bnexti_007d_0029_007d-306"></a><br><dt><code>nexti</code><dt><code>nexti </code><var>arg</var><dt><code>ni</code><dd>Execute one machine instruction, but if it is a function call,
+proceed until the function returns.
+
+     <p>An argument is a repeat count, as in <code>next</code>. 
+</dl>
+
+   </body></html>
+

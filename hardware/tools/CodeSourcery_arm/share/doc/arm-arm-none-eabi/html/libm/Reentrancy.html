@@ -1,0 +1,56 @@
+<html lang="en">
+<head>
+<title>Reentrancy - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Math.html#Math" title="Math">
+<link rel="next" href="Long-Double-Functions.html#Long-Double-Functions" title="Long Double Functions">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Reentrancy"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Long-Double-Functions.html#Long-Double-Functions">Long Double Functions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Math.html#Math">Math</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">2 Reentrancy Properties of <code>libm</code></h2>
+
+<p><a name="index-reentrancy-154"></a><a name="index-g_t_0040code_007bmatherr_007d-and-reentrancy-155"></a>When a libm function detects an exceptional case, <code>errno</code> may be
+set, the <code>matherr</code> function may be called, and a error message
+may be written to the standard error stream.  This behavior may not
+be reentrant.
+
+<!-- The exact behavior depends on the currently selected error handling -->
+<!-- mode (IEEE, POSIX, X/Open, or SVID). -->
+   <p>With reentrant C libraries like the Red Hat newlib C library, <code>errno</code> is
+a macro which expands to the per-thread error value.  This makes it thread
+safe.
+
+   <p>When the user provides his own <code>matherr</code> function it must be
+reentrant for the math library as a whole to be reentrant.
+
+   <p>In normal debugged programs, there are usually no math subroutine
+errors&mdash;and therefore no assignments to <code>errno</code> and no <code>matherr</code>
+calls; in that situation, the math functions behave reentrantly.
+
+   </body></html>
+

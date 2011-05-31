@@ -1,0 +1,103 @@
+<html lang="en">
+<head>
+<title>elfedit - GNU Binary Utilities</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GNU Binary Utilities">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="strip.html#strip" title="strip">
+<link rel="next" href="c_002b_002bfilt.html#c_002b_002bfilt" title="c++filt">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="elfedit"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="c_002b_002bfilt.html#c_002b_002bfilt">c++filt</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="strip.html#strip">strip</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">16 elfedit</h2>
+
+<p><a name="index-Update-ELF-header-147"></a><a name="index-elfedit-148"></a>
+<!-- man title elfedit Update the ELF header of ELF files. -->
+
+<pre class="smallexample">     <!-- man begin SYNOPSIS elfedit -->
+     elfedit [<samp><span class="option">--input-mach=</span></samp><var>machine</var>]
+             [<samp><span class="option">--input-type=</span></samp><var>type</var>]
+             <samp><span class="option">--output-mach=</span></samp><var>machine</var>
+             <samp><span class="option">--output-type=</span></samp><var>type</var>
+             [<samp><span class="option">-v</span></samp>|<samp><span class="option">--version</span></samp>]
+             [<samp><span class="option">-h</span></samp>|<samp><span class="option">--help</span></samp>]
+             <var>elffile</var>...
+     <!-- man end -->
+</pre>
+   <!-- man begin DESCRIPTION elfedit -->
+   <p><samp><span class="command">elfedit</span></samp> updates the ELF header of ELF files which have
+the matching ELF machine and file types.  The options control how and
+which fields in the ELF header should be updated.
+
+   <p><var>elffile</var><small class="dots">...</small> are the ELF files to be updated.  32-bit and
+64-bit ELF files are supported, as are archives containing ELF files. 
+<!-- man end -->
+
+<!-- man begin OPTIONS elfedit -->
+   <p>The long and short forms of options, shown here as alternatives, are
+equivalent. At least one of the <samp><span class="option">--output-mach</span></samp> and
+<samp><span class="option">--output-type</span></samp> options must be given.
+
+     <dl>
+<dt><samp><span class="env">--input-mach=</span><var>machine</var></samp><dd>Set the matching input ELF machine type to <var>machine</var>.  If
+<samp><span class="option">--input-mach</span></samp> isn't specified, it will match any ELF
+machine types.
+
+     <p>The supported ELF machine types are, <var>L1OM</var> and <var>x86-64</var>.
+
+     <dt><samp><span class="env">--output-mach=</span><var>machine</var></samp><dd>Change the ELF machine type in the ELF header to <var>machine</var>.  The
+supported ELF machine types are the same as <samp><span class="option">--input-mach</span></samp>.
+
+     <dt><samp><span class="env">--input-type=</span><var>type</var></samp><dd>Set the matching input ELF file type to <var>type</var>.  If
+<samp><span class="option">--input-type</span></samp> isn't specified, it will match any ELF file types.
+
+     <p>The supported ELF file types are, <var>rel</var>, <var>exec</var> and <var>dyn</var>.
+
+     <dt><samp><span class="env">--output-type=</span><var>type</var></samp><dd>Change the ELF file type in the ELF header to <var>type</var>.  The
+supported ELF types are the same as <samp><span class="option">--input-type</span></samp>.
+
+     <br><dt><samp><span class="env">-v</span></samp><dt><samp><span class="env">--version</span></samp><dd>Display the version number of <samp><span class="command">elfedit</span></samp>.
+
+     <br><dt><samp><span class="env">-h</span></samp><dt><samp><span class="env">--help</span></samp><dd>Display the command line options understood by <samp><span class="command">elfedit</span></samp>.
+
+   </dl>
+
+<!-- man end -->
+   </body></html>
+

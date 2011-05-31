@@ -1,0 +1,237 @@
+<html lang="en">
+<head>
+<title>Inferiors and Programs - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Running.html#Running" title="Running">
+<link rel="prev" href="Kill-Process.html#Kill-Process" title="Kill Process">
+<link rel="next" href="Threads.html#Threads" title="Threads">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Inferiors-and-Programs"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Threads.html#Threads">Threads</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Kill-Process.html#Kill-Process">Kill Process</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Running.html#Running">Running</a>
+<hr>
+</div>
+
+<h3 class="section">4.9 Debugging Multiple Inferiors and Programs</h3>
+
+<p><span class="sc">gdb</span> lets you run and debug multiple programs in a single
+session.  In addition, <span class="sc">gdb</span> on some systems may let you run
+several programs simultaneously (otherwise you have to exit from one
+before starting another).  In the most general case, you can have
+multiple threads of execution in each of multiple processes, launched
+from multiple executables.
+
+   <p><a name="index-inferior-137"></a><span class="sc">gdb</span> represents the state of each program execution with an
+object called an <dfn>inferior</dfn>.  An inferior typically corresponds to
+a process, but is more general and applies also to targets that do not
+have processes.  Inferiors may be created before a process runs, and
+may be retained after a process exits.  Inferiors have unique
+identifiers that are different from process ids.  Usually each
+inferior will also have its own distinct address space, although some
+embedded targets may have several inferiors running in different parts
+of a single address space.  Each inferior may in turn have multiple
+threads running in it.
+
+   <p>To find out what inferiors exist at any moment, use <code>info&nbsp;inferiors</code><!-- /@w -->:
+
+     
+<a name="index-info-inferiors-138"></a>
+<dl><dt><code>info inferiors</code><dd>Print a list of all inferiors currently being managed by <span class="sc">gdb</span>.
+
+     <p><span class="sc">gdb</span> displays for each inferior (in this order):
+
+          <ol type=1 start=1>
+<li>the inferior number assigned by <span class="sc">gdb</span>
+
+          <li>the target system's inferior identifier
+
+          <li>the name of the executable the inferior is running.
+
+          </ol>
+
+     <p class="noindent">An asterisk &lsquo;<samp><span class="samp">*</span></samp>&rsquo; preceding the <span class="sc">gdb</span> inferior number
+indicates the current inferior.
+
+     <p>For example,
+</dl>
+   <!-- end table here to get a little more width for example -->
+
+<pre class="smallexample">     (gdb) info inferiors
+       Num  Description       Executable
+       2    process 2307      hello
+     * 1    process 3401      goodbye
+</pre>
+   <p>To switch focus between inferiors, use the <code>inferior</code> command:
+
+     
+<a name="index-inferior-_0040var_007binfno_007d-139"></a>
+<dl><dt><code>inferior </code><var>infno</var><dd>Make inferior number <var>infno</var> the current inferior.  The argument
+<var>infno</var> is the inferior number assigned by <span class="sc">gdb</span>, as shown
+in the first field of the &lsquo;<samp><span class="samp">info inferiors</span></samp>&rsquo; display. 
+</dl>
+
+   <p>You can get multiple executables into a debugging session via the
+<code>add-inferior</code> and <code>clone-inferior</code><!-- /@w --> commands.  On some
+systems <span class="sc">gdb</span> can add inferiors to the debug session
+automatically by following calls to <code>fork</code> and <code>exec</code>.  To
+remove inferiors from the debugging session use the
+<code>remove-inferior</code><!-- /@w --> command.
+
+     
+<a name="index-add_002dinferior-140"></a>
+<dl><dt><code>add-inferior [ -copies </code><var>n</var><code> ] [ -exec </code><var>executable</var><code> ]</code><dd>Adds <var>n</var> inferiors to be run using <var>executable</var> as the
+executable.  <var>n</var> defaults to 1.  If no executable is specified,
+the inferiors begins empty, with no program.  You can still assign or
+change the program assigned to the inferior at any time by using the
+<code>file</code> command with the executable name as its argument.
+
+     <p><a name="index-clone_002dinferior-141"></a><br><dt><code>clone-inferior [ -copies </code><var>n</var><code> ] [ </code><var>infno</var><code> ]</code><dd>Adds <var>n</var> inferiors ready to execute the same program as inferior
+<var>infno</var>.  <var>n</var> defaults to 1.  <var>infno</var> defaults to the
+number of the current inferior.  This is a convenient command when you
+want to run another instance of the inferior you are debugging.
+
+     <pre class="smallexample">          (gdb) info inferiors
+            Num  Description       Executable
+          * 1    process 29964     helloworld
+          (gdb) clone-inferior
+          Added inferior 2.
+          1 inferiors added.
+          (gdb) info inferiors
+            Num  Description       Executable
+            2    &lt;null&gt;            helloworld
+          * 1    process 29964     helloworld
+</pre>
+     <p>You can now simply switch focus to inferior 2 and run it.
+
+     <p><a name="index-remove_002dinferior-142"></a><br><dt><code>remove-inferior </code><var>infno</var><dd>Removes the inferior <var>infno</var>.  It is not possible to remove an
+inferior that is running with this command.  For those, use the
+<code>kill</code> or <code>detach</code> command first.
+
+   </dl>
+
+   <p>To quit debugging one of the running inferiors that is not the current
+inferior, you can either detach from it by using the <code>detach&nbsp;inferior</code><!-- /@w --> command (allowing it to run independently), or kill it
+using the <code>kill&nbsp;inferior</code><!-- /@w --> command:
+
+     
+<a name="index-detach-inferior-_0040var_007binfno_007d-143"></a>
+<dl><dt><code>detach inferior </code><var>infno</var><dd>Detach from the inferior identified by <span class="sc">gdb</span> inferior number
+<var>infno</var>.  Note that the inferior's entry still stays on the list
+of inferiors shown by <code>info inferiors</code>, but its Description will
+show &lsquo;<samp><span class="samp">&lt;null&gt;</span></samp>&rsquo;.
+
+     <p><a name="index-kill-inferior-_0040var_007binfno_007d-144"></a><br><dt><code>kill inferior </code><var>infno</var><dd>Kill the inferior identified by <span class="sc">gdb</span> inferior number
+<var>infno</var>.  Note that the inferior's entry still stays on the list
+of inferiors shown by <code>info inferiors</code>, but its Description will
+show &lsquo;<samp><span class="samp">&lt;null&gt;</span></samp>&rsquo;. 
+</dl>
+
+   <p>After the successful completion of a command such as <code>detach</code>,
+<code>detach inferior</code>, <code>kill</code> or <code>kill inferior</code>, or after
+a normal process exit, the inferior is still valid and listed with
+<code>info inferiors</code>, ready to be restarted.
+
+   <p>To be notified when inferiors are started or exit under <span class="sc">gdb</span>'s
+control use <code>set&nbsp;print&nbsp;inferior-events</code><!-- /@w -->:
+
+     
+<a name="index-set-print-inferior_002devents-145"></a>
+<a name="index-print-messages-on-inferior-start-and-exit-146"></a>
+<dl><dt><code>set print inferior-events</code><dt><code>set print inferior-events on</code><dt><code>set print inferior-events off</code><dd>The <code>set print inferior-events</code> command allows you to enable or
+disable printing of messages when <span class="sc">gdb</span> notices that new
+inferiors have started or that inferiors have exited or have been
+detached.  By default, these messages will not be printed.
+
+     <p><a name="index-show-print-inferior_002devents-147"></a><br><dt><code>show print inferior-events</code><dd>Show whether messages will be printed when <span class="sc">gdb</span> detects that
+inferiors have started, exited or have been detached. 
+</dl>
+
+   <p>Many commands will work the same with multiple programs as with a
+single program: e.g., <code>print myglobal</code> will simply display the
+value of <code>myglobal</code> in the current inferior.
+
+   <p>Occasionaly, when debugging <span class="sc">gdb</span> itself, it may be useful to
+get more info about the relationship of inferiors, programs, address
+spaces in a debug session.  You can do that with the <code>maint&nbsp;info&nbsp;program-spaces</code><!-- /@w --> command.
+
+     
+<a name="index-maint-info-program_002dspaces-148"></a>
+<dl><dt><code>maint info program-spaces</code><dd>Print a list of all program spaces currently being managed by
+<span class="sc">gdb</span>.
+
+     <p><span class="sc">gdb</span> displays for each program space (in this order):
+
+          <ol type=1 start=1>
+<li>the program space number assigned by <span class="sc">gdb</span>
+
+          <li>the name of the executable loaded into the program space, with e.g.,
+the <code>file</code> command.
+
+          </ol>
+
+     <p class="noindent">An asterisk &lsquo;<samp><span class="samp">*</span></samp>&rsquo; preceding the <span class="sc">gdb</span> program space number
+indicates the current program space.
+
+     <p>In addition, below each program space line, <span class="sc">gdb</span> prints extra
+information that isn't suitable to display in tabular form.  For
+example, the list of inferiors bound to the program space.
+
+     <pre class="smallexample">          (gdb) maint info program-spaces
+            Id   Executable
+            2    goodbye
+                  Bound inferiors: ID 1 (process 21561)
+          * 1    hello
+</pre>
+     <p>Here we can see that no inferior is running the program <code>hello</code>,
+while <code>process 21561</code> is running the program <code>goodbye</code>.  On
+some targets, it is possible that multiple inferiors are bound to the
+same program space.  The most common example is that of debugging both
+the parent and child processes of a <code>vfork</code> call.  For example,
+
+     <pre class="smallexample">          (gdb) maint info program-spaces
+            Id   Executable
+          * 1    vfork-test
+                  Bound inferiors: ID 2 (process 18050), ID 1 (process 18045)
+</pre>
+     <p>Here, both inferior 2 and inferior 1 are running in the same program
+space as a result of inferior 1 having executed a <code>vfork</code> call. 
+</dl>
+
+   </body></html>
+

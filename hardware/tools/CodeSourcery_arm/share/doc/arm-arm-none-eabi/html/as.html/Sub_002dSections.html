@@ -1,0 +1,117 @@
+<html lang="en">
+<head>
+<title>Sub-Sections - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Sections.html#Sections" title="Sections">
+<link rel="prev" href="As-Sections.html#As-Sections" title="As Sections">
+<link rel="next" href="bss.html#bss" title="bss">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Sub-Sections"></a>
+<a name="Sub_002dSections"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="bss.html#bss">bss</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="As-Sections.html#As-Sections">As Sections</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Sections.html#Sections">Sections</a>
+<hr>
+</div>
+
+<h3 class="section">4.4 Sub-Sections</h3>
+
+<p><a name="index-numbered-subsections-204"></a><a name="index-grouping-data-205"></a>Assembled bytes
+conventionally
+fall into two sections: text and data. 
+You may have separate groups of
+data in named sections
+that you want to end up near to each other in the object file, even though they
+are not contiguous in the assembler source.  <samp><span class="command">as</span></samp> allows you to
+use <dfn>subsections</dfn> for this purpose.  Within each section, there can be
+numbered subsections with values from 0 to 8192.  Objects assembled into the
+same subsection go into the object file together with other objects in the same
+subsection.  For example, a compiler might want to store constants in the text
+section, but might not want to have them interspersed with the program being
+assembled.  In this case, the compiler could issue a &lsquo;<samp><span class="samp">.text 0</span></samp>&rsquo; before each
+section of code being output, and a &lsquo;<samp><span class="samp">.text 1</span></samp>&rsquo; before each group of
+constants being output.
+
+   <p>Subsections are optional.  If you do not use subsections, everything
+goes in subsection number zero.
+
+   <p>Each subsection is zero-padded up to a multiple of four bytes. 
+(Subsections may be padded a different amount on different flavors
+of <samp><span class="command">as</span></samp>.)
+
+   <p>Subsections appear in your object file in numeric order, lowest numbered
+to highest.  (All this to be compatible with other people's assemblers.) 
+The object file contains no representation of subsections; <code>ld</code> and
+other programs that manipulate object files see no trace of them. 
+They just see all your text subsections as a text section, and all your
+data subsections as a data section.
+
+   <p>To specify which subsection you want subsequent statements assembled
+into, use a numeric argument to specify it, in a &lsquo;<samp><span class="samp">.text
+</span><var>expression</var></samp>&rsquo; or a &lsquo;<samp><span class="samp">.data </span><var>expression</var></samp>&rsquo; statement. 
+When generating COFF output, you
+can also use an extra subsection
+argument with arbitrary named sections: &lsquo;<samp><span class="samp">.section </span><var>name</var><span class="samp">,
+</span><var>expression</var></samp>&rsquo;. 
+When generating ELF output, you
+can also use the <code>.subsection</code> directive (see <a href="SubSection.html#SubSection">SubSection</a>)
+to specify a subsection: &lsquo;<samp><span class="samp">.subsection </span><var>expression</var></samp>&rsquo;. 
+<var>Expression</var> should be an absolute expression
+(see <a href="Expressions.html#Expressions">Expressions</a>).  If you just say &lsquo;<samp><span class="samp">.text</span></samp>&rsquo; then &lsquo;<samp><span class="samp">.text 0</span></samp>&rsquo;
+is assumed.  Likewise &lsquo;<samp><span class="samp">.data</span></samp>&rsquo; means &lsquo;<samp><span class="samp">.data 0</span></samp>&rsquo;.  Assembly
+begins in <code>text 0</code>.  For instance:
+<pre class="smallexample">     .text 0     # The default subsection is text 0 anyway.
+     .ascii "This lives in the first text subsection. *"
+     .text 1
+     .ascii "But this lives in the second text subsection."
+     .data 0
+     .ascii "This lives in the data section,"
+     .ascii "in the first data subsection."
+     .text 0
+     .ascii "This lives in the first text section,"
+     .ascii "immediately following the asterisk (*)."
+</pre>
+   <p>Each section has a <dfn>location counter</dfn> incremented by one for every byte
+assembled into that section.  Because subsections are merely a convenience
+restricted to <samp><span class="command">as</span></samp> there is no concept of a subsection location
+counter.  There is no way to directly manipulate a location counter&mdash;but the
+<code>.align</code> directive changes it, and any label definition captures its
+current value.  The location counter of the section where statements are being
+assembled is said to be the <dfn>active</dfn> location counter.
+
+   </body></html>
+

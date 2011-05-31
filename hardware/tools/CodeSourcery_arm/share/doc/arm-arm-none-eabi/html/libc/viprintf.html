@@ -1,0 +1,91 @@
+<html lang="en">
+<head>
+<title>viprintf - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="vfwscanf.html#vfwscanf" title="vfwscanf">
+<link rel="next" href="viscanf.html#viscanf" title="viscanf">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="viprintf"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="viscanf.html#viscanf">viscanf</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="vfwscanf.html#vfwscanf">vfwscanf</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.72 <code>viprintf</code>, <code>vfiprintf</code>, <code>vsiprintf</code>, <code>vsniprintf</code>, <code>vasiprintf</code>, <code>vasniprintf</code>&mdash;format argument list (integer only)</h3>
+
+<p><a name="index-viprintf-354"></a><a name="index-g_t_005fviprintf_005fr-355"></a><a name="index-vfiprintf-356"></a><a name="index-g_t_005fvfiprintf_005fr-357"></a><a name="index-vsiprintf-358"></a><a name="index-g_t_005fvsiprintf_005fr-359"></a><a name="index-vsniprintf-360"></a><a name="index-g_t_005fvsniprintf_005fr-361"></a><a name="index-vasiprintf-362"></a><a name="index-g_t_005fvasiprintf_005fr-363"></a><a name="index-vasniprintf-364"></a><a name="index-g_t_005fvasniprintf_005fr-365"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     #include &lt;stdarg.h&gt;
+     int viprintf(const char *<var>fmt</var>, va_list <var>list</var>);
+     int vfiprintf(FILE *<var>fp</var>, const char *<var>fmt</var>, va_list <var>list</var>);
+     int vsiprintf(char *<var>str</var>, const char *<var>fmt</var>, va_list <var>list</var>);
+     int vsniprintf(char *<var>str</var>, size_t <var>size</var>, const char *<var>fmt</var>,
+         va_list <var>list</var>);
+     int vasiprintf(char **<var>strp</var>, const char *<var>fmt</var>, va_list <var>list</var>);
+     char *vasniprintf(char *<var>str</var>, size_t *<var>size</var>, const char *<var>fmt</var>,
+         va_list <var>list</var>);
+     
+     int _viprintf_r(struct _reent *<var>reent</var>, const char *<var>fmt</var>,
+         va_list <var>list</var>);
+     int _vfiprintf_r(struct _reent *<var>reent</var>, FILE *<var>fp</var>,
+         const char *<var>fmt</var>, va_list <var>list</var>);
+     int _vsiprintf_r(struct _reent *<var>reent</var>, char *<var>str</var>,
+         const char *<var>fmt</var>, va_list <var>list</var>);
+     int _vsniprintf_r(struct _reent *<var>reent</var>, char *<var>str</var>,
+         size_t <var>size</var>, const char *<var>fmt</var>, va_list <var>list</var>);
+     int _vasiprintf_r(struct _reent *<var>reent</var>, char **<var>str</var>,
+         const char *<var>fmt</var>, va_list <var>list</var>);
+     char *_vasniprintf_r(struct _reent *<var>reent</var>, char *<var>str</var>,
+         size_t *<var>size</var>, const char *<var>fmt</var>, va_list <var>list</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>viprintf</code>, <code>vfiprintf</code>, <code>vasiprintf</code>, <code>vsiprintf</code>,
+<code>vsniprintf</code>, and <code>vasniprintf</code> are (respectively) variants of
+<code>iprintf</code>, <code>fiprintf</code>, <code>asiprintf</code>, <code>siprintf</code>, <code>sniprintf</code>,
+and <code>asniprintf</code>.  They differ only in allowing their caller to pass
+the variable argument list as a <code>va_list</code> object (initialized by
+<code>va_start</code>) rather than directly accepting a variable number of
+arguments.  The caller is responsible for calling <code>va_end</code>.
+
+   <p><code>_viprintf_r</code>, <code>_vfiprintf_r</code>, <code>_vasiprintf_r</code>,
+<code>_vsiprintf_r</code>, <code>_vsniprintf_r</code>, and <code>_vasniprintf_r</code> are
+reentrant versions of the above.
+
+   <p><br>
+<strong>Returns</strong><br>
+The return values are consistent with the corresponding functions:
+
+   <p><br>
+<strong>Portability</strong><br>
+All of these functions are newlib extensions.
+
+   <p>Supporting OS subroutines required: <code>close</code>, <code>fstat</code>, <code>isatty</code>,
+<code>lseek</code>, <code>read</code>, <code>sbrk</code>, <code>write</code>.
+
+   <p><br>
+
+   </body></html>
+

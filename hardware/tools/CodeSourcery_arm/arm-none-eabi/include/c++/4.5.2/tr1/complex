@@ -1,0 +1,101 @@
+// TR1 complex -*- C++ -*-
+
+// Copyright (C) 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+//
+// This file is part of the GNU ISO C++ Library.  This library is free
+// software; you can redistribute it and/or modify it under the
+// terms of the GNU General Public License as published by the
+// Free Software Foundation; either version 3, or (at your option)
+// any later version.
+
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// Under Section 7 of GPL version 3, you are granted additional
+// permissions described in the GCC Runtime Library Exception, version
+// 3.1, as published by the Free Software Foundation.
+
+// You should have received a copy of the GNU General Public License and
+// a copy of the GCC Runtime Library Exception along with this program;
+// see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+// <http://www.gnu.org/licenses/>.
+
+/** @file tr1/complex
+ *  This is a TR1 C++ Library header. 
+ */
+
+#ifndef _GLIBCXX_TR1_COMPLEX
+#define _GLIBCXX_TR1_COMPLEX 1
+
+#pragma GCC system_header
+
+#if defined(_GLIBCXX_INCLUDE_AS_CXX0X)
+#  error TR1 header cannot be included from C++0x header
+#endif
+
+#include <complex>
+
+#if defined(_GLIBCXX_INCLUDE_AS_TR1)
+#  include <tr1_impl/complex>
+#else
+#  define _GLIBCXX_INCLUDE_AS_TR1
+#  define _GLIBCXX_BEGIN_NAMESPACE_TR1 namespace tr1 {
+#  define _GLIBCXX_END_NAMESPACE_TR1 }
+#  define _GLIBCXX_TR1 tr1::
+#  include <tr1_impl/complex>
+#  undef _GLIBCXX_TR1
+#  undef _GLIBCXX_END_NAMESPACE_TR1
+#  undef _GLIBCXX_BEGIN_NAMESPACE_TR1
+#  undef _GLIBCXX_INCLUDE_AS_TR1
+#endif
+
+namespace std
+{
+namespace tr1
+{
+  using std::arg;
+
+  template<typename _Tp>
+    inline std::complex<_Tp>
+    conj(const std::complex<_Tp>& __z)
+    { return std::conj(__z); }  
+
+  template<typename _Tp>
+    inline std::complex<typename __gnu_cxx::__promote<_Tp>::__type>
+    conj(_Tp __x)
+    { return __x; }
+
+  using std::imag;
+  using std::norm;
+  using std::polar;
+
+  template<typename _Tp, typename _Up>
+    inline std::complex<typename __gnu_cxx::__promote_2<_Tp, _Up>::__type>
+    polar(const _Tp& __rho, const _Up& __theta)
+    {
+      typedef typename __gnu_cxx::__promote_2<_Tp, _Up>::__type __type;
+      return std::polar(__type(__rho), __type(__theta));
+    }
+
+  using std::real;
+
+  template<typename _Tp>
+    inline std::complex<_Tp>
+    pow(const std::complex<_Tp>& __x, const _Tp& __y)
+    { return std::pow(__x, __y); }
+
+  template<typename _Tp>
+    inline std::complex<_Tp>
+    pow(const _Tp& __x, const std::complex<_Tp>& __y)
+    { return std::pow(__x, __y); }
+
+  template<typename _Tp>
+    inline std::complex<_Tp>
+    pow(const std::complex<_Tp>& __x, const std::complex<_Tp>& __y)
+    { return std::pow(__x, __y); }
+}
+}
+
+#endif // _GLIBCXX_TR1_COMPLEX

@@ -1,0 +1,83 @@
+<html lang="en">
+<head>
+<title>Expression Section - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Expressions.html#Expressions" title="Expressions">
+<link rel="prev" href="Evaluation.html#Evaluation" title="Evaluation">
+<link rel="next" href="Builtin-Functions.html#Builtin-Functions" title="Builtin Functions">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Expression-Section"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Builtin-Functions.html#Builtin-Functions">Builtin Functions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Evaluation.html#Evaluation">Evaluation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Expressions.html#Expressions">Expressions</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.10.8 The Section of an Expression</h4>
+
+<p><a name="index-expression-sections-517"></a><a name="index-absolute-expressions-518"></a><a name="index-relative-expressions-519"></a><a name="index-absolute-and-relocatable-symbols-520"></a><a name="index-relocatable-and-absolute-symbols-521"></a><a name="index-symbols_002c-relocatable-and-absolute-522"></a>When the linker evaluates an expression, the result is either absolute
+or relative to some section.  A relative expression is expressed as a
+fixed offset from the base of a section.
+
+   <p>The position of the expression within the linker script determines
+whether it is absolute or relative.  An expression which appears within
+an output section definition is relative to the base of the output
+section.  An expression which appears elsewhere will be absolute.
+
+   <p>A symbol set to a relative expression will be relocatable if you request
+relocatable output using the &lsquo;<samp><span class="samp">-r</span></samp>&rsquo; option.  That means that a
+further link operation may change the value of the symbol.  The symbol's
+section will be the section of the relative expression.
+
+   <p>A symbol set to an absolute expression will retain the same value
+through any further link operation.  The symbol will be absolute, and
+will not have any particular associated section.
+
+   <p>You can use the builtin function <code>ABSOLUTE</code> to force an expression
+to be absolute when it would otherwise be relative.  For example, to
+create an absolute symbol set to the address of the end of the output
+section &lsquo;<samp><span class="samp">.data</span></samp>&rsquo;:
+<pre class="smallexample">     SECTIONS
+       {
+         .data : { *(.data) _edata = ABSOLUTE(.); }
+       }
+</pre>
+   <p class="noindent">If &lsquo;<samp><span class="samp">ABSOLUTE</span></samp>&rsquo; were not used, &lsquo;<samp><span class="samp">_edata</span></samp>&rsquo; would be relative to the
+&lsquo;<samp><span class="samp">.data</span></samp>&rsquo; section.
+
+   </body></html>
+

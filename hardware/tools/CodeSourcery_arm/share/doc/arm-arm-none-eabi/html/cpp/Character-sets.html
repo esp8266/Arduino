@@ -1,0 +1,111 @@
+<html lang="en">
+<head>
+<title>Character sets - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Overview.html#Overview" title="Overview">
+<link rel="next" href="Initial-processing.html#Initial-processing" title="Initial processing">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Character-sets"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Initial-processing.html#Initial-processing">Initial processing</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Overview.html#Overview">Overview</a>
+<hr>
+</div>
+
+<h3 class="section">1.1 Character sets</h3>
+
+<p>Source code character set processing in C and related languages is
+rather complicated.  The C standard discusses two character sets, but
+there are really at least four.
+
+   <p>The files input to CPP might be in any character set at all.  CPP's
+very first action, before it even looks for line boundaries, is to
+convert the file into the character set it uses for internal
+processing.  That set is what the C standard calls the <dfn>source</dfn>
+character set.  It must be isomorphic with ISO 10646, also known as
+Unicode.  CPP uses the UTF-8 encoding of Unicode.
+
+   <p>The character sets of the input files are specified using the
+<samp><span class="option">-finput-charset=</span></samp> option.
+
+   <p>All preprocessing work (the subject of the rest of this manual) is
+carried out in the source character set.  If you request textual
+output from the preprocessor with the <samp><span class="option">-E</span></samp> option, it will be
+in UTF-8.
+
+   <p>After preprocessing is complete, string and character constants are
+converted again, into the <dfn>execution</dfn> character set.  This
+character set is under control of the user; the default is UTF-8,
+matching the source character set.  Wide string and character
+constants have their own character set, which is not called out
+specifically in the standard.  Again, it is under control of the user. 
+The default is UTF-16 or UTF-32, whichever fits in the target's
+<code>wchar_t</code> type, in the target machine's byte
+order.<a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a>  Octal and hexadecimal escape sequences do not undergo
+conversion; <tt>'\x12'</tt> has the value 0x12 regardless of the currently
+selected execution character set.  All other escapes are replaced by
+the character in the source character set that they represent, then
+converted to the execution character set, just like unescaped
+characters.
+
+   <p>Unless the experimental <samp><span class="option">-fextended-identifiers</span></samp> option is used,
+GCC does not permit the use of characters outside the ASCII range, nor
+&lsquo;<samp><span class="samp">\u</span></samp>&rsquo; and &lsquo;<samp><span class="samp">\U</span></samp>&rsquo; escapes, in identifiers.  Even with that
+option, characters outside the ASCII range can only be specified with
+the &lsquo;<samp><span class="samp">\u</span></samp>&rsquo; and &lsquo;<samp><span class="samp">\U</span></samp>&rsquo; escapes, not used directly in identifiers.
+
+   <div class="footnote">
+<hr>
+<h4>Footnotes</h4><p class="footnote"><small>[<a name="fn-1" href="#fnd-1">1</a>]</small> UTF-16 does not meet the requirements of the C
+standard for a wide character set, but the choice of 16-bit
+<code>wchar_t</code> is enshrined in some system ABIs so we cannot fix
+this.</p>
+
+   <hr></div>
+
+   </body></html>
+

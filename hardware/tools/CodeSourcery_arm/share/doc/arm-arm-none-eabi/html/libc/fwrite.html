@@ -1,0 +1,77 @@
+<html lang="en">
+<head>
+<title>fwrite - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="fwide.html#fwide" title="fwide">
+<link rel="next" href="getc.html#getc" title="getc">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="fwrite"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="getc.html#getc">getc</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="fwide.html#fwide">fwide</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.31 <code>fwrite</code>&mdash;write array elements</h3>
+
+<p><a name="index-fwrite-212"></a><a name="index-g_t_005ffwrite_005fr-213"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     size_t fwrite(const void *<var>buf</var>, size_t <var>size</var>,
+         size_t <var>count</var>, FILE *<var>fp</var>);
+     
+     #include &lt;stdio.h&gt;
+     size_t _fwrite_r(struct _reent *<var>ptr</var>, const void *<var>buf</var>, size_t <var>size</var>,
+         size_t <var>count</var>, FILE *<var>fp</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>fwrite</code> attempts to copy, starting from the memory location
+<var>buf</var>, <var>count</var> elements (each of size <var>size</var>) into the file or
+stream identified by <var>fp</var>.  <code>fwrite</code> may copy fewer elements than
+<var>count</var> if an error intervenes.
+
+   <p><code>fwrite</code> also advances the file position indicator (if any) for
+<var>fp</var> by the number of <em>characters</em> actually written.
+
+   <p><code>_fwrite_r</code> is simply the reentrant version of <code>fwrite</code> that
+takes an additional reentrant structure argument: <var>ptr</var>.
+
+   <p><br>
+<strong>Returns</strong><br>
+If <code>fwrite</code> succeeds in writing all the elements you specify, the
+result is the same as the argument <var>count</var>.  In any event, the
+result is the number of complete elements that <code>fwrite</code> copied to
+the file.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C requires <code>fwrite</code>.
+
+   <p>Supporting OS subroutines required: <code>close</code>, <code>fstat</code>, <code>isatty</code>,
+<code>lseek</code>, <code>read</code>, <code>sbrk</code>, <code>write</code>.
+
+   <p><br>
+
+   </body></html>
+

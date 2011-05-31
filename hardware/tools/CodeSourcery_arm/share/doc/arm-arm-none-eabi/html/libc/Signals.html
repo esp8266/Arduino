@@ -1,0 +1,91 @@
+<html lang="en">
+<head>
+<title>Signals - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Wchar-strings.html#Wchar-strings" title="Wchar strings">
+<link rel="next" href="Timefns.html#Timefns" title="Timefns">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Signals"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Timefns.html#Timefns">Timefns</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Wchar-strings.html#Wchar-strings">Wchar strings</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">7 Signal Handling (<samp><span class="file">signal.h</span></samp>)</h2>
+
+<p>A <dfn>signal</dfn> is an event that interrupts the normal flow of control
+in your program.  Your operating environment normally defines the full
+set of signals available (see <samp><span class="file">sys/signal.h</span></samp>), as well as the
+default means of dealing with them&mdash;typically, either printing an
+error message and aborting your program, or ignoring the signal.
+
+   <p>All systems support at least the following signals:
+     <dl>
+<dt><code>SIGABRT</code><dd>Abnormal termination of a program; raised by the &lt;&lt;abort&gt;&gt; function.
+
+     <br><dt><code>SIGFPE</code><dd>A domain error in arithmetic, such as overflow, or division by zero.
+
+     <br><dt><code>SIGILL</code><dd>Attempt to execute as a function data that is not executable.
+
+     <br><dt><code>SIGINT</code><dd>Interrupt; an interactive attention signal.
+
+     <br><dt><code>SIGSEGV</code><dd>An attempt to access a memory location that is not available.
+
+     <br><dt><code>SIGTERM</code><dd>A request that your program end execution. 
+</dl>
+
+   <p>Two functions are available for dealing with asynchronous
+signals&mdash;one to allow your program to send signals to itself (this is
+called <dfn>raising</dfn> a signal), and one to specify subroutines (called
+<dfn>handlers</dfn> to handle particular signals that you anticipate may
+occur&mdash;whether raised by your own program or the operating environment.
+
+   <p>To support these functions, <samp><span class="file">signal.h</span></samp> defines three macros:
+
+     <dl>
+<dt><code>SIG_DFL</code><dd>Used with the <code>signal</code> function in place of a pointer to a
+handler subroutine, to select the operating environment's default
+handling of a signal.
+
+     <br><dt><code>SIG_IGN</code><dd>Used with the <code>signal</code> function in place of a pointer to a
+handler, to ignore a particular signal.
+
+     <br><dt><code>SIG_ERR</code><dd>Returned by the <code>signal</code> function in place of a pointer to a
+handler, to indicate that your request to set up a handler could not
+be honored for some reason. 
+</dl>
+
+   <p><samp><span class="file">signal.h</span></samp> also defines an integral type, <code>sig_atomic_t</code>. 
+This type is not used in any function declarations; it exists only to
+allow your signal handlers to declare a static storage location where
+they may store a signal value.  (Static storage is not otherwise
+reliable from signal handlers.)
+
+<ul class="menu">
+<li><a accesskey="1" href="raise.html#raise">raise</a>:    Send a signal
+<li><a accesskey="2" href="signal.html#signal">signal</a>:   Specify handler subroutine for a signal
+</ul>
+
+   </body></html>
+

@@ -1,0 +1,87 @@
+<html lang="en">
+<head>
+<title>fputwc - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="fputs.html#fputs" title="fputs">
+<link rel="next" href="fputws.html#fputws" title="fputws">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="fputwc"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="fputws.html#fputws">fputws</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="fputs.html#fputs">fputs</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.22 <code>fputwc</code>, <code>putwc</code>&mdash;write a wide character on a stream or file</h3>
+
+<p><a name="index-fputwc-187"></a><a name="index-g_t_005ffputwc_005fr-188"></a><a name="index-putwc-189"></a><a name="index-g_t_005fputwc_005fr-190"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     #include &lt;wchar.h&gt;
+     wint_t fputwc(wchar_t <var>wc</var>, FILE *<var>fp</var>);
+     
+     #include &lt;stdio.h&gt;
+     #include &lt;wchar.h&gt;
+     wint_t _fputwc_r(struct _reent *<var>ptr</var>, wchar_t <var>wc</var>, FILE *<var>fp</var>);
+     
+     #include &lt;stdio.h&gt;
+     #include &lt;wchar.h&gt;
+     wint_t putwc(wchar_t <var>wc</var>, FILE *<var>fp</var>);
+     
+     #include &lt;stdio.h&gt;
+     #include &lt;wchar.h&gt;
+     wint_t _putwc_r(struct _reent *<var>ptr</var>, wchar_t <var>wc</var>, FILE *<var>fp</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>fputwc</code> writes the wide character argument <var>wc</var> to the file or
+stream identified by <var>fp</var>.
+
+   <p>If the file was opened with append mode (or if the stream cannot
+support positioning), then the new wide character goes at the end of the
+file or stream.  Otherwise, the new wide character is written at the
+current value of the position indicator, and the position indicator
+oadvances by one.
+
+   <p>The <code>putwc</code> function or macro functions identically to <code>fputwc</code>.  It
+may be implemented as a macro, and may evaluate its argument more than
+once. There is no reason ever to use it.
+
+   <p>The <code>_fputwc_r</code> and <code>_putwc_r</code> functions are simply reentrant versions
+of <code>fputwc</code> and <code>putwc</code> that take an additional reentrant structure
+argument: <var>ptr</var>.
+
+   <p><br>
+<strong>Returns</strong><br>
+If successful, <code>fputwc</code> and <code>putwc</code> return their argument <var>wc</var>. 
+If an error intervenes, the result is <code>EOF</code>.  You can use
+`<code>ferror(</code><var>fp</var><code>)</code>' to query for errors.
+
+   <p><br>
+<strong>Portability</strong><br>
+C99, POSIX.1-2001
+
+   <p><br>
+
+   </body></html>
+

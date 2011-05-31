@@ -1,0 +1,562 @@
+<html lang="en">
+<head>
+<title>Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="#Top">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "Funding Free Software", the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+"GNU Free Documentation License".
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+This file documents the use of the GNU compilers.
+ <pre class="sp">
+
+</pre>
+Copyright &copy; 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+ <p>Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being &ldquo;Funding Free Software&rdquo;, the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+&ldquo;GNU Free Documentation License&rdquo;.
+
+ <p>(a) The FSF's Front-Cover Text is:
+
+ <p>A GNU Manual
+
+ <p>(b) The FSF's Back-Cover Text is:
+
+ <p>You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+ <pre class="sp">
+
+</pre>
+
+<div class="shortcontents">
+<h2>Short Contents</h2>
+<ul>
+<li><a href="index.html#toc_Top">Introduction</a></li>
+<li><a href="index.html#toc_G_002b_002b-and-GCC">1 Programming Languages Supported by GCC</a></li>
+<li><a href="index.html#toc_Standards">2 Language Standards Supported by GCC</a></li>
+<li><a href="index.html#toc_Invoking-GCC">3 GCC Command Options</a></li>
+<li><a href="index.html#toc_C-Implementation">4 C Implementation-defined behavior</a></li>
+<li><a href="index.html#toc_C_002b_002b-Implementation">5 C++ Implementation-defined behavior</a></li>
+<li><a href="index.html#toc_C-Extensions">6 Extensions to the C Language Family</a></li>
+<li><a href="index.html#toc_C_002b_002b-Extensions">7 Extensions to the C++ Language</a></li>
+<li><a href="index.html#toc_Objective_002dC">8 GNU Objective-C runtime features</a></li>
+<li><a href="index.html#toc_Compatibility">9 Binary Compatibility</a></li>
+<li><a href="index.html#toc_Gcov">10 <samp><span class="command">gcov</span></samp>&mdash;a Test Coverage Program</a></li>
+<li><a href="index.html#toc_Trouble">11 Known Causes of Trouble with GCC</a></li>
+<li><a href="index.html#toc_Bugs">12 Reporting Bugs</a></li>
+<li><a href="index.html#toc_Service">13 How To Get Help with GCC</a></li>
+<li><a href="index.html#toc_Contributing">14 Contributing to GCC Development</a></li>
+<li><a href="index.html#toc_Funding">Funding Free Software</a></li>
+<li><a href="index.html#toc_GNU-Project">The GNU Project and GNU/Linux</a></li>
+<li><a href="index.html#toc_Copying">GNU General Public License</a></li>
+<li><a href="index.html#toc_GNU-Free-Documentation-License">GNU Free Documentation License</a></li>
+<li><a href="index.html#toc_Contributors">Contributors to GCC</a></li>
+<li><a href="index.html#toc_Option-Index">Option Index</a></li>
+<li><a href="index.html#toc_Keyword-Index">Keyword Index</a></li>
+</ul>
+</div>
+
+
+
+ <div class="contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a name="toc_Top" href="index.html#Top">Introduction</a>
+<li><a name="toc_G_002b_002b-and-GCC" href="G_002b_002b-and-GCC.html#G_002b_002b-and-GCC">1 Programming Languages Supported by GCC</a>
+<li><a name="toc_Standards" href="Standards.html#Standards">2 Language Standards Supported by GCC</a>
+<ul>
+<li><a href="Standards.html#Standards">2.1 C language</a>
+<li><a href="Standards.html#Standards">2.2 C++ language</a>
+<li><a href="Standards.html#Standards">2.3 Objective-C and Objective-C++ languages</a>
+</li></ul>
+<li><a name="toc_Invoking-GCC" href="Invoking-GCC.html#Invoking-GCC">3 GCC Command Options</a>
+<ul>
+<li><a href="Option-Summary.html#Option-Summary">3.1 Option Summary</a>
+<li><a href="Overall-Options.html#Overall-Options">3.2 Options Controlling the Kind of Output</a>
+<li><a href="Invoking-G_002b_002b.html#Invoking-G_002b_002b">3.3 Compiling C++ Programs</a>
+<li><a href="C-Dialect-Options.html#C-Dialect-Options">3.4 Options Controlling C Dialect</a>
+<li><a href="C_002b_002b-Dialect-Options.html#C_002b_002b-Dialect-Options">3.5 Options Controlling C++ Dialect</a>
+<li><a href="Objective_002dC-and-Objective_002dC_002b_002b-Dialect-Options.html#Objective_002dC-and-Objective_002dC_002b_002b-Dialect-Options">3.6 Options Controlling Objective-C and Objective-C++ Dialects</a>
+<li><a href="Language-Independent-Options.html#Language-Independent-Options">3.7 Options to Control Diagnostic Messages Formatting</a>
+<li><a href="Warning-Options.html#Warning-Options">3.8 Options to Request or Suppress Warnings</a>
+<li><a href="Debugging-Options.html#Debugging-Options">3.9 Options for Debugging Your Program or GCC</a>
+<li><a href="Optimize-Options.html#Optimize-Options">3.10 Options That Control Optimization</a>
+<li><a href="Preprocessor-Options.html#Preprocessor-Options">3.11 Options Controlling the Preprocessor</a>
+<li><a href="Assembler-Options.html#Assembler-Options">3.12 Passing Options to the Assembler</a>
+<li><a href="Link-Options.html#Link-Options">3.13 Options for Linking</a>
+<li><a href="Directory-Options.html#Directory-Options">3.14 Options for Directory Search</a>
+<li><a href="Spec-Files.html#Spec-Files">3.15 Specifying subprocesses and the switches to pass to them</a>
+<li><a href="Target-Options.html#Target-Options">3.16 Specifying Target Machine and Compiler Version</a>
+<li><a href="Submodel-Options.html#Submodel-Options">3.17 Hardware Models and Configurations</a>
+<ul>
+<li><a href="ARC-Options.html#ARC-Options">3.17.1 ARC Options</a>
+<li><a href="ARM-Options.html#ARM-Options">3.17.2 ARM Options</a>
+<li><a href="AVR-Options.html#AVR-Options">3.17.3 AVR Options</a>
+<li><a href="Blackfin-Options.html#Blackfin-Options">3.17.4 Blackfin Options</a>
+<li><a href="CRIS-Options.html#CRIS-Options">3.17.5 CRIS Options</a>
+<li><a href="CRX-Options.html#CRX-Options">3.17.6 CRX Options</a>
+<li><a href="Darwin-Options.html#Darwin-Options">3.17.7 Darwin Options</a>
+<li><a href="DEC-Alpha-Options.html#DEC-Alpha-Options">3.17.8 DEC Alpha Options</a>
+<li><a href="DEC-Alpha_002fVMS-Options.html#DEC-Alpha_002fVMS-Options">3.17.9 DEC Alpha/VMS Options</a>
+<li><a href="FR30-Options.html#FR30-Options">3.17.10 FR30 Options</a>
+<li><a href="FRV-Options.html#FRV-Options">3.17.11 FRV Options</a>
+<li><a href="GNU_002fLinux-Options.html#GNU_002fLinux-Options">3.17.12 GNU/Linux Options</a>
+<li><a href="H8_002f300-Options.html#H8_002f300-Options">3.17.13 H8/300 Options</a>
+<li><a href="HPPA-Options.html#HPPA-Options">3.17.14 HPPA Options</a>
+<li><a href="i386-and-x86_002d64-Options.html#i386-and-x86_002d64-Options">3.17.15 Intel 386 and AMD x86-64 Options</a>
+<li><a href="IA_002d64-Options.html#IA_002d64-Options">3.17.16 IA-64 Options</a>
+<li><a href="IA_002d64_002fVMS-Options.html#IA_002d64_002fVMS-Options">3.17.17 IA-64/VMS Options</a>
+<li><a href="LM32-Options.html#LM32-Options">3.17.18 LM32 Options</a>
+<li><a href="M32C-Options.html#M32C-Options">3.17.19 M32C Options</a>
+<li><a href="M32R_002fD-Options.html#M32R_002fD-Options">3.17.20 M32R/D Options</a>
+<li><a href="M680x0-Options.html#M680x0-Options">3.17.21 M680x0 Options</a>
+<li><a href="M68hc1x-Options.html#M68hc1x-Options">3.17.22 M68hc1x Options</a>
+<li><a href="MCore-Options.html#MCore-Options">3.17.23 MCore Options</a>
+<li><a href="MeP-Options.html#MeP-Options">3.17.24 MeP Options</a>
+<li><a href="MIPS-Options.html#MIPS-Options">3.17.25 MIPS Options</a>
+<li><a href="MMIX-Options.html#MMIX-Options">3.17.26 MMIX Options</a>
+<li><a href="MN10300-Options.html#MN10300-Options">3.17.27 MN10300 Options</a>
+<li><a href="PDP_002d11-Options.html#PDP_002d11-Options">3.17.28 PDP-11 Options</a>
+<li><a href="picoChip-Options.html#picoChip-Options">3.17.29 picoChip Options</a>
+<li><a href="PowerPC-Options.html#PowerPC-Options">3.17.30 PowerPC Options</a>
+<li><a href="RS_002f6000-and-PowerPC-Options.html#RS_002f6000-and-PowerPC-Options">3.17.31 IBM RS/6000 and PowerPC Options</a>
+<li><a href="RX-Options.html#RX-Options">3.17.32 RX Options</a>
+<li><a href="S_002f390-and-zSeries-Options.html#S_002f390-and-zSeries-Options">3.17.33 S/390 and zSeries Options</a>
+<li><a href="Score-Options.html#Score-Options">3.17.34 Score Options</a>
+<li><a href="SH-Options.html#SH-Options">3.17.35 SH Options</a>
+<li><a href="SPARC-Options.html#SPARC-Options">3.17.36 SPARC Options</a>
+<li><a href="SPU-Options.html#SPU-Options">3.17.37 SPU Options</a>
+<li><a href="System-V-Options.html#System-V-Options">3.17.38 Options for System V</a>
+<li><a href="V850-Options.html#V850-Options">3.17.39 V850 Options</a>
+<li><a href="VAX-Options.html#VAX-Options">3.17.40 VAX Options</a>
+<li><a href="VxWorks-Options.html#VxWorks-Options">3.17.41 VxWorks Options</a>
+<li><a href="x86_002d64-Options.html#x86_002d64-Options">3.17.42 x86-64 Options</a>
+<li><a href="i386-and-x86_002d64-Windows-Options.html#i386-and-x86_002d64-Windows-Options">3.17.43 i386 and x86-64 Windows Options</a>
+<li><a href="Xstormy16-Options.html#Xstormy16-Options">3.17.44 Xstormy16 Options</a>
+<li><a href="Xtensa-Options.html#Xtensa-Options">3.17.45 Xtensa Options</a>
+<li><a href="zSeries-Options.html#zSeries-Options">3.17.46 zSeries Options</a>
+</li></ul>
+<li><a href="Code-Gen-Options.html#Code-Gen-Options">3.18 Options for Code Generation Conventions</a>
+<li><a href="Environment-Variables.html#Environment-Variables">3.19 Environment Variables Affecting GCC</a>
+<li><a href="Precompiled-Headers.html#Precompiled-Headers">3.20 Using Precompiled Headers</a>
+</li></ul>
+<li><a name="toc_C-Implementation" href="C-Implementation.html#C-Implementation">4 C Implementation-defined behavior</a>
+<ul>
+<li><a href="Translation-implementation.html#Translation-implementation">4.1 Translation</a>
+<li><a href="Environment-implementation.html#Environment-implementation">4.2 Environment</a>
+<li><a href="Identifiers-implementation.html#Identifiers-implementation">4.3 Identifiers</a>
+<li><a href="Characters-implementation.html#Characters-implementation">4.4 Characters</a>
+<li><a href="Integers-implementation.html#Integers-implementation">4.5 Integers</a>
+<li><a href="Floating-point-implementation.html#Floating-point-implementation">4.6 Floating point</a>
+<li><a href="Arrays-and-pointers-implementation.html#Arrays-and-pointers-implementation">4.7 Arrays and pointers</a>
+<li><a href="Hints-implementation.html#Hints-implementation">4.8 Hints</a>
+<li><a href="Structures-unions-enumerations-and-bit_002dfields-implementation.html#Structures-unions-enumerations-and-bit_002dfields-implementation">4.9 Structures, unions, enumerations, and bit-fields</a>
+<li><a href="Qualifiers-implementation.html#Qualifiers-implementation">4.10 Qualifiers</a>
+<li><a href="Declarators-implementation.html#Declarators-implementation">4.11 Declarators</a>
+<li><a href="Statements-implementation.html#Statements-implementation">4.12 Statements</a>
+<li><a href="Preprocessing-directives-implementation.html#Preprocessing-directives-implementation">4.13 Preprocessing directives</a>
+<li><a href="Library-functions-implementation.html#Library-functions-implementation">4.14 Library functions</a>
+<li><a href="Architecture-implementation.html#Architecture-implementation">4.15 Architecture</a>
+<li><a href="Locale_002dspecific-behavior-implementation.html#Locale_002dspecific-behavior-implementation">4.16 Locale-specific behavior</a>
+</li></ul>
+<li><a name="toc_C_002b_002b-Implementation" href="C_002b_002b-Implementation.html#C_002b_002b-Implementation">5 C++ Implementation-defined behavior</a>
+<ul>
+<li><a href="Conditionally_002dsupported-behavior.html#Conditionally_002dsupported-behavior">5.1 Conditionally-supported behavior</a>
+</li></ul>
+<li><a name="toc_C-Extensions" href="C-Extensions.html#C-Extensions">6 Extensions to the C Language Family</a>
+<ul>
+<li><a href="Statement-Exprs.html#Statement-Exprs">6.1 Statements and Declarations in Expressions</a>
+<li><a href="Local-Labels.html#Local-Labels">6.2 Locally Declared Labels</a>
+<li><a href="Labels-as-Values.html#Labels-as-Values">6.3 Labels as Values</a>
+<li><a href="Nested-Functions.html#Nested-Functions">6.4 Nested Functions</a>
+<li><a href="Constructing-Calls.html#Constructing-Calls">6.5 Constructing Function Calls</a>
+<li><a href="Typeof.html#Typeof">6.6 Referring to a Type with <code>typeof</code></a>
+<li><a href="Conditionals.html#Conditionals">6.7 Conditionals with Omitted Operands</a>
+<li><a href="Long-Long.html#Long-Long">6.8 Double-Word Integers</a>
+<li><a href="Complex.html#Complex">6.9 Complex Numbers</a>
+<li><a href="Floating-Types.html#Floating-Types">6.10 Additional Floating Types</a>
+<li><a href="Half_002dPrecision.html#Half_002dPrecision">6.11 Half-Precision Floating Point</a>
+<li><a href="Decimal-Float.html#Decimal-Float">6.12 Decimal Floating Types</a>
+<li><a href="Hex-Floats.html#Hex-Floats">6.13 Hex Floats</a>
+<li><a href="Fixed_002dPoint.html#Fixed_002dPoint">6.14 Fixed-Point Types</a>
+<li><a href="Named-Address-Spaces.html#Named-Address-Spaces">6.15 Named address spaces</a>
+<li><a href="Zero-Length.html#Zero-Length">6.16 Arrays of Length Zero</a>
+<li><a href="Empty-Structures.html#Empty-Structures">6.17 Structures With No Members</a>
+<li><a href="Variable-Length.html#Variable-Length">6.18 Arrays of Variable Length</a>
+<li><a href="Variadic-Macros.html#Variadic-Macros">6.19 Macros with a Variable Number of Arguments.</a>
+<li><a href="Escaped-Newlines.html#Escaped-Newlines">6.20 Slightly Looser Rules for Escaped Newlines</a>
+<li><a href="Subscripting.html#Subscripting">6.21 Non-Lvalue Arrays May Have Subscripts</a>
+<li><a href="Pointer-Arith.html#Pointer-Arith">6.22 Arithmetic on <code>void</code>- and Function-Pointers</a>
+<li><a href="Initializers.html#Initializers">6.23 Non-Constant Initializers</a>
+<li><a href="Compound-Literals.html#Compound-Literals">6.24 Compound Literals</a>
+<li><a href="Designated-Inits.html#Designated-Inits">6.25 Designated Initializers</a>
+<li><a href="Case-Ranges.html#Case-Ranges">6.26 Case Ranges</a>
+<li><a href="Cast-to-Union.html#Cast-to-Union">6.27 Cast to a Union Type</a>
+<li><a href="Mixed-Declarations.html#Mixed-Declarations">6.28 Mixed Declarations and Code</a>
+<li><a href="Function-Attributes.html#Function-Attributes">6.29 Declaring Attributes of Functions</a>
+<li><a href="Attribute-Syntax.html#Attribute-Syntax">6.30 Attribute Syntax</a>
+<li><a href="Function-Prototypes.html#Function-Prototypes">6.31 Prototypes and Old-Style Function Definitions</a>
+<li><a href="C_002b_002b-Comments.html#C_002b_002b-Comments">6.32 C++ Style Comments</a>
+<li><a href="Dollar-Signs.html#Dollar-Signs">6.33 Dollar Signs in Identifier Names</a>
+<li><a href="Character-Escapes.html#Character-Escapes">6.34 The Character &lt;ESC&gt; in Constants</a>
+<li><a href="Alignment.html#Alignment">6.35 Inquiring on Alignment of Types or Variables</a>
+<li><a href="Variable-Attributes.html#Variable-Attributes">6.36 Specifying Attributes of Variables</a>
+<ul>
+<li><a href="Variable-Attributes.html#Variable-Attributes">6.36.1 Blackfin Variable Attributes</a>
+<li><a href="Variable-Attributes.html#Variable-Attributes">6.36.2 M32R/D Variable Attributes</a>
+<li><a href="Variable-Attributes.html#Variable-Attributes">6.36.3 MeP Variable Attributes</a>
+<li><a href="Variable-Attributes.html#Variable-Attributes">6.36.4 i386 Variable Attributes</a>
+<li><a href="Variable-Attributes.html#Variable-Attributes">6.36.5 PowerPC Variable Attributes</a>
+<li><a href="Variable-Attributes.html#Variable-Attributes">6.36.6 SPU Variable Attributes</a>
+<li><a href="Variable-Attributes.html#Variable-Attributes">6.36.7 Xstormy16 Variable Attributes</a>
+<li><a href="Variable-Attributes.html#Variable-Attributes">6.36.8 AVR Variable Attributes</a>
+</li></ul>
+<li><a href="Type-Attributes.html#Type-Attributes">6.37 Specifying Attributes of Types</a>
+<ul>
+<li><a href="Type-Attributes.html#Type-Attributes">6.37.1 ARM Type Attributes</a>
+<li><a href="Type-Attributes.html#Type-Attributes">6.37.2 MeP Type Attributes</a>
+<li><a href="Type-Attributes.html#Type-Attributes">6.37.3 i386 Type Attributes</a>
+<li><a href="Type-Attributes.html#Type-Attributes">6.37.4 PowerPC Type Attributes</a>
+<li><a href="Type-Attributes.html#Type-Attributes">6.37.5 SPU Type Attributes</a>
+</li></ul>
+<li><a href="Inline.html#Inline">6.38 An Inline Function is As Fast As a Macro</a>
+<li><a href="Extended-Asm.html#Extended-Asm">6.39 Assembler Instructions with C Expression Operands</a>
+<ul>
+<li><a href="Extended-Asm.html#Extended-Asm">6.39.1 Size of an <code>asm</code></a>
+<li><a href="Extended-Asm.html#Extended-Asm">6.39.2 i386 floating point asm operands</a>
+</li></ul>
+<li><a href="Constraints.html#Constraints">6.40 Constraints for <code>asm</code> Operands</a>
+<ul>
+<li><a href="Simple-Constraints.html#Simple-Constraints">6.40.1 Simple Constraints</a>
+<li><a href="Multi_002dAlternative.html#Multi_002dAlternative">6.40.2 Multiple Alternative Constraints</a>
+<li><a href="Modifiers.html#Modifiers">6.40.3 Constraint Modifier Characters</a>
+<li><a href="Machine-Constraints.html#Machine-Constraints">6.40.4 Constraints for Particular Machines</a>
+</li></ul>
+<li><a href="Asm-Labels.html#Asm-Labels">6.41 Controlling Names Used in Assembler Code</a>
+<li><a href="Explicit-Reg-Vars.html#Explicit-Reg-Vars">6.42 Variables in Specified Registers</a>
+<ul>
+<li><a href="Global-Reg-Vars.html#Global-Reg-Vars">6.42.1 Defining Global Register Variables</a>
+<li><a href="Local-Reg-Vars.html#Local-Reg-Vars">6.42.2 Specifying Registers for Local Variables</a>
+</li></ul>
+<li><a href="Alternate-Keywords.html#Alternate-Keywords">6.43 Alternate Keywords</a>
+<li><a href="Incomplete-Enums.html#Incomplete-Enums">6.44 Incomplete <code>enum</code> Types</a>
+<li><a href="Function-Names.html#Function-Names">6.45 Function Names as Strings</a>
+<li><a href="Return-Address.html#Return-Address">6.46 Getting the Return or Frame Address of a Function</a>
+<li><a href="Vector-Extensions.html#Vector-Extensions">6.47 Using vector instructions through built-in functions</a>
+<li><a href="Offsetof.html#Offsetof">6.48 Offsetof</a>
+<li><a href="Atomic-Builtins.html#Atomic-Builtins">6.49 Built-in functions for atomic memory access</a>
+<li><a href="Object-Size-Checking.html#Object-Size-Checking">6.50 Object Size Checking Builtins</a>
+<li><a href="Other-Builtins.html#Other-Builtins">6.51 Other built-in functions provided by GCC</a>
+<li><a href="Target-Builtins.html#Target-Builtins">6.52 Built-in Functions Specific to Particular Target Machines</a>
+<ul>
+<li><a href="Alpha-Built_002din-Functions.html#Alpha-Built_002din-Functions">6.52.1 Alpha Built-in Functions</a>
+<li><a href="ARM-iWMMXt-Built_002din-Functions.html#ARM-iWMMXt-Built_002din-Functions">6.52.2 ARM iWMMXt Built-in Functions</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3 ARM NEON Intrinsics</a>
+<ul>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.1 Addition</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.2 Multiplication</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.3 Multiply-accumulate</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.4 Multiply-subtract</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.5 Subtraction</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.6 Comparison (equal-to)</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.7 Comparison (greater-than-or-equal-to)</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.8 Comparison (less-than-or-equal-to)</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.9 Comparison (greater-than)</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.10 Comparison (less-than)</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.11 Comparison (absolute greater-than-or-equal-to)</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.12 Comparison (absolute less-than-or-equal-to)</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.13 Comparison (absolute greater-than)</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.14 Comparison (absolute less-than)</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.15 Test bits</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.16 Absolute difference</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.17 Absolute difference and accumulate</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.18 Maximum</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.19 Minimum</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.20 Pairwise add</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.21 Pairwise add, single_opcode widen and accumulate</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.22 Folding maximum</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.23 Folding minimum</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.24 Reciprocal step</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.25 Vector shift left</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.26 Vector shift left by constant</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.27 Vector shift right by constant</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.28 Vector shift right by constant and accumulate</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.29 Vector shift right and insert</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.30 Vector shift left and insert</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.31 Absolute value</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.32 Negation</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.33 Bitwise not</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.34 Count leading sign bits</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.35 Count leading zeros</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.36 Count number of set bits</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.37 Reciprocal estimate</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.38 Reciprocal square-root estimate</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.39 Get lanes from a vector</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.40 Set lanes in a vector</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.41 Create vector from literal bit pattern</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.42 Set all lanes to the same value</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.43 Combining vectors</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.44 Splitting vectors</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.45 Conversions</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.46 Move, single_opcode narrowing</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.47 Move, single_opcode long</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.48 Table lookup</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.49 Extended table lookup</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.50 Multiply, lane</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.51 Long multiply, lane</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.52 Saturating doubling long multiply, lane</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.53 Saturating doubling multiply high, lane</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.54 Multiply-accumulate, lane</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.55 Multiply-subtract, lane</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.56 Vector multiply by scalar</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.57 Vector long multiply by scalar</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.58 Vector saturating doubling long multiply by scalar</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.59 Vector saturating doubling multiply high by scalar</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.60 Vector multiply-accumulate by scalar</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.61 Vector multiply-subtract by scalar</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.62 Vector extract</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.63 Reverse elements</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.64 Bit selection</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.65 Transpose elements</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.66 Zip elements</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.67 Unzip elements</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.68 Element/structure loads, VLD1 variants</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.69 Element/structure stores, VST1 variants</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.70 Element/structure loads, VLD2 variants</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.71 Element/structure stores, VST2 variants</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.72 Element/structure loads, VLD3 variants</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.73 Element/structure stores, VST3 variants</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.74 Element/structure loads, VLD4 variants</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.75 Element/structure stores, VST4 variants</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.76 Logical operations (AND)</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.77 Logical operations (OR)</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.78 Logical operations (exclusive OR)</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.79 Logical operations (AND-NOT)</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.80 Logical operations (OR-NOT)</a>
+<li><a href="ARM-NEON-Intrinsics.html#ARM-NEON-Intrinsics">6.52.3.81 Reinterpret casts</a>
+</li></ul>
+<li><a href="Blackfin-Built_002din-Functions.html#Blackfin-Built_002din-Functions">6.52.4 Blackfin Built-in Functions</a>
+<li><a href="FR_002dV-Built_002din-Functions.html#FR_002dV-Built_002din-Functions">6.52.5 FR-V Built-in Functions</a>
+<ul>
+<li><a href="Argument-Types.html#Argument-Types">6.52.5.1 Argument Types</a>
+<li><a href="Directly_002dmapped-Integer-Functions.html#Directly_002dmapped-Integer-Functions">6.52.5.2 Directly-mapped Integer Functions</a>
+<li><a href="Directly_002dmapped-Media-Functions.html#Directly_002dmapped-Media-Functions">6.52.5.3 Directly-mapped Media Functions</a>
+<li><a href="Raw-read_002fwrite-Functions.html#Raw-read_002fwrite-Functions">6.52.5.4 Raw read/write Functions</a>
+<li><a href="Other-Built_002din-Functions.html#Other-Built_002din-Functions">6.52.5.5 Other Built-in Functions</a>
+</li></ul>
+<li><a href="X86-Built_002din-Functions.html#X86-Built_002din-Functions">6.52.6 X86 Built-in Functions</a>
+<li><a href="MIPS-DSP-Built_002din-Functions.html#MIPS-DSP-Built_002din-Functions">6.52.7 MIPS DSP Built-in Functions</a>
+<li><a href="MIPS-Paired_002dSingle-Support.html#MIPS-Paired_002dSingle-Support">6.52.8 MIPS Paired-Single Support</a>
+<li><a href="MIPS-Loongson-Built_002din-Functions.html#MIPS-Loongson-Built_002din-Functions">6.52.9 MIPS Loongson Built-in Functions</a>
+<ul>
+<li><a href="Paired_002dSingle-Arithmetic.html#Paired_002dSingle-Arithmetic">6.52.9.1 Paired-Single Arithmetic</a>
+<li><a href="Paired_002dSingle-Built_002din-Functions.html#Paired_002dSingle-Built_002din-Functions">6.52.9.2 Paired-Single Built-in Functions</a>
+<li><a href="MIPS_002d3D-Built_002din-Functions.html#MIPS_002d3D-Built_002din-Functions">6.52.9.3 MIPS-3D Built-in Functions</a>
+</li></ul>
+<li><a href="picoChip-Built_002din-Functions.html#picoChip-Built_002din-Functions">6.52.10 picoChip Built-in Functions</a>
+<li><a href="Other-MIPS-Built_002din-Functions.html#Other-MIPS-Built_002din-Functions">6.52.11 Other MIPS Built-in Functions</a>
+<li><a href="PowerPC-AltiVec_002fVSX-Built_002din-Functions.html#PowerPC-AltiVec_002fVSX-Built_002din-Functions">6.52.12 PowerPC AltiVec Built-in Functions</a>
+<li><a href="RX-Built_002din-Functions.html#RX-Built_002din-Functions">6.52.13 RX Built-in Functions</a>
+<li><a href="SPARC-VIS-Built_002din-Functions.html#SPARC-VIS-Built_002din-Functions">6.52.14 SPARC VIS Built-in Functions</a>
+<li><a href="SPU-Built_002din-Functions.html#SPU-Built_002din-Functions">6.52.15 SPU Built-in Functions</a>
+</li></ul>
+<li><a href="Target-Format-Checks.html#Target-Format-Checks">6.53 Format Checks Specific to Particular Target Machines</a>
+<ul>
+<li><a href="Solaris-Format-Checks.html#Solaris-Format-Checks">6.53.1 Solaris Format Checks</a>
+</li></ul>
+<li><a href="Pragmas.html#Pragmas">6.54 Pragmas Accepted by GCC</a>
+<ul>
+<li><a href="ARM-Pragmas.html#ARM-Pragmas">6.54.1 ARM Pragmas</a>
+<li><a href="M32C-Pragmas.html#M32C-Pragmas">6.54.2 M32C Pragmas</a>
+<li><a href="MeP-Pragmas.html#MeP-Pragmas">6.54.3 MeP Pragmas</a>
+<li><a href="RS_002f6000-and-PowerPC-Pragmas.html#RS_002f6000-and-PowerPC-Pragmas">6.54.4 RS/6000 and PowerPC Pragmas</a>
+<li><a href="Darwin-Pragmas.html#Darwin-Pragmas">6.54.5 Darwin Pragmas</a>
+<li><a href="Solaris-Pragmas.html#Solaris-Pragmas">6.54.6 Solaris Pragmas</a>
+<li><a href="Symbol_002dRenaming-Pragmas.html#Symbol_002dRenaming-Pragmas">6.54.7 Symbol-Renaming Pragmas</a>
+<li><a href="Structure_002dPacking-Pragmas.html#Structure_002dPacking-Pragmas">6.54.8 Structure-Packing Pragmas</a>
+<li><a href="Weak-Pragmas.html#Weak-Pragmas">6.54.9 Weak Pragmas</a>
+<li><a href="Diagnostic-Pragmas.html#Diagnostic-Pragmas">6.54.10 Diagnostic Pragmas</a>
+<li><a href="Visibility-Pragmas.html#Visibility-Pragmas">6.54.11 Visibility Pragmas</a>
+<li><a href="Push_002fPop-Macro-Pragmas.html#Push_002fPop-Macro-Pragmas">6.54.12 Push/Pop Macro Pragmas</a>
+<li><a href="Function-Specific-Option-Pragmas.html#Function-Specific-Option-Pragmas">6.54.13 Function Specific Option Pragmas</a>
+</li></ul>
+<li><a href="Unnamed-Fields.html#Unnamed-Fields">6.55 Unnamed struct/union fields within structs/unions</a>
+<li><a href="Thread_002dLocal.html#Thread_002dLocal">6.56 Thread-Local Storage</a>
+<ul>
+<li><a href="C99-Thread_002dLocal-Edits.html#C99-Thread_002dLocal-Edits">6.56.1 ISO/IEC 9899:1999 Edits for Thread-Local Storage</a>
+<li><a href="C_002b_002b98-Thread_002dLocal-Edits.html#C_002b_002b98-Thread_002dLocal-Edits">6.56.2 ISO/IEC 14882:1998 Edits for Thread-Local Storage</a>
+</li></ul>
+<li><a href="Binary-constants.html#Binary-constants">6.57 Binary constants using the &lsquo;<samp><span class="samp">0b</span></samp>&rsquo; prefix</a>
+</li></ul>
+<li><a name="toc_C_002b_002b-Extensions" href="C_002b_002b-Extensions.html#C_002b_002b-Extensions">7 Extensions to the C++ Language</a>
+<ul>
+<li><a href="Volatiles.html#Volatiles">7.1 When is a Volatile Object Accessed?</a>
+<li><a href="Restricted-Pointers.html#Restricted-Pointers">7.2 Restricting Pointer Aliasing</a>
+<li><a href="Vague-Linkage.html#Vague-Linkage">7.3 Vague Linkage</a>
+<li><a href="C_002b_002b-Interface.html#C_002b_002b-Interface">7.4 #pragma interface and implementation</a>
+<li><a href="Template-Instantiation.html#Template-Instantiation">7.5 Where's the Template?</a>
+<li><a href="Bound-member-functions.html#Bound-member-functions">7.6 Extracting the function pointer from a bound pointer to member function</a>
+<li><a href="C_002b_002b-Attributes.html#C_002b_002b-Attributes">7.7 C++-Specific Variable, Function, and Type Attributes</a>
+<li><a href="Namespace-Association.html#Namespace-Association">7.8 Namespace Association</a>
+<li><a href="Type-Traits.html#Type-Traits">7.9 Type Traits</a>
+<li><a href="Java-Exceptions.html#Java-Exceptions">7.10 Java Exceptions</a>
+<li><a href="Deprecated-Features.html#Deprecated-Features">7.11 Deprecated Features</a>
+<li><a href="Backwards-Compatibility.html#Backwards-Compatibility">7.12 Backwards Compatibility</a>
+</li></ul>
+<li><a name="toc_Objective_002dC" href="Objective_002dC.html#Objective_002dC">8 GNU Objective-C runtime features</a>
+<ul>
+<li><a href="Executing-code-before-main.html#Executing-code-before-main">8.1 <code>+load</code>: Executing code before main</a>
+<ul>
+<li><a href="What-you-can-and-what-you-cannot-do-in-_002bload.html#What-you-can-and-what-you-cannot-do-in-_002bload">8.1.1 What you can and what you cannot do in <code>+load</code></a>
+</li></ul>
+<li><a href="Type-encoding.html#Type-encoding">8.2 Type encoding</a>
+<li><a href="Garbage-Collection.html#Garbage-Collection">8.3 Garbage Collection</a>
+<li><a href="Constant-string-objects.html#Constant-string-objects">8.4 Constant string objects</a>
+<li><a href="compatibility_005falias.html#compatibility_005falias">8.5 compatibility_alias</a>
+</li></ul>
+<li><a name="toc_Compatibility" href="Compatibility.html#Compatibility">9 Binary Compatibility</a>
+<li><a name="toc_Gcov" href="Gcov.html#Gcov">10 <samp><span class="command">gcov</span></samp>&mdash;a Test Coverage Program</a>
+<ul>
+<li><a href="Gcov-Intro.html#Gcov-Intro">10.1 Introduction to <samp><span class="command">gcov</span></samp></a>
+<li><a href="Invoking-Gcov.html#Invoking-Gcov">10.2 Invoking <samp><span class="command">gcov</span></samp></a>
+<li><a href="Gcov-and-Optimization.html#Gcov-and-Optimization">10.3 Using <samp><span class="command">gcov</span></samp> with GCC Optimization</a>
+<li><a href="Gcov-Data-Files.html#Gcov-Data-Files">10.4 Brief description of <samp><span class="command">gcov</span></samp> data files</a>
+<li><a href="Cross_002dprofiling.html#Cross_002dprofiling">10.5 Data file relocation to support cross-profiling</a>
+</li></ul>
+<li><a name="toc_Trouble" href="Trouble.html#Trouble">11 Known Causes of Trouble with GCC</a>
+<ul>
+<li><a href="Actual-Bugs.html#Actual-Bugs">11.1 Actual Bugs We Haven't Fixed Yet</a>
+<li><a href="Cross_002dCompiler-Problems.html#Cross_002dCompiler-Problems">11.2 Cross-Compiler Problems</a>
+<li><a href="Interoperation.html#Interoperation">11.3 Interoperation</a>
+<li><a href="Incompatibilities.html#Incompatibilities">11.4 Incompatibilities of GCC</a>
+<li><a href="Fixed-Headers.html#Fixed-Headers">11.5 Fixed Header Files</a>
+<li><a href="Standard-Libraries.html#Standard-Libraries">11.6 Standard Libraries</a>
+<li><a href="Disappointments.html#Disappointments">11.7 Disappointments and Misunderstandings</a>
+<li><a href="C_002b_002b-Misunderstandings.html#C_002b_002b-Misunderstandings">11.8 Common Misunderstandings with GNU C++</a>
+<ul>
+<li><a href="Static-Definitions.html#Static-Definitions">11.8.1 Declare <em>and</em> Define Static Members</a>
+<li><a href="Name-lookup.html#Name-lookup">11.8.2 Name lookup, templates, and accessing members of base classes</a>
+<li><a href="Temporaries.html#Temporaries">11.8.3 Temporaries May Vanish Before You Expect</a>
+<li><a href="Copy-Assignment.html#Copy-Assignment">11.8.4 Implicit Copy-Assignment for Virtual Bases</a>
+</li></ul>
+<li><a href="Non_002dbugs.html#Non_002dbugs">11.9 Certain Changes We Don't Want to Make</a>
+<li><a href="Warnings-and-Errors.html#Warnings-and-Errors">11.10 Warning Messages and Error Messages</a>
+</li></ul>
+<li><a name="toc_Bugs" href="Bugs.html#Bugs">12 Reporting Bugs</a>
+<ul>
+<li><a href="Bug-Criteria.html#Bug-Criteria">12.1 Have You Found a Bug?</a>
+<li><a href="Bug-Reporting.html#Bug-Reporting">12.2 How and where to Report Bugs</a>
+</li></ul>
+<li><a name="toc_Service" href="Service.html#Service">13 How To Get Help with GCC</a>
+<li><a name="toc_Contributing" href="Contributing.html#Contributing">14 Contributing to GCC Development</a>
+<li><a name="toc_Funding" href="Funding.html#Funding">Funding Free Software</a>
+<li><a name="toc_GNU-Project" href="GNU-Project.html#GNU-Project">The GNU Project and GNU/Linux</a>
+<li><a name="toc_Copying" href="Copying.html#Copying">GNU General Public License</a>
+<li><a name="toc_GNU-Free-Documentation-License" href="GNU-Free-Documentation-License.html#GNU-Free-Documentation-License">GNU Free Documentation License</a>
+<ul>
+<li><a href="GNU-Free-Documentation-License.html#GNU-Free-Documentation-License">ADDENDUM: How to use this License for your documents</a>
+</li></ul>
+<li><a name="toc_Contributors" href="Contributors.html#Contributors">Contributors to GCC</a>
+<li><a name="toc_Option-Index" href="Option-Index.html#Option-Index">Option Index</a>
+<li><a name="toc_Keyword-Index" href="Keyword-Index.html#Keyword-Index">Keyword Index</a>
+</li></ul>
+</div>
+
+<div class="node">
+<a name="Top"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="G_002b_002b-and-GCC.html#G_002b_002b-and-GCC">G++ and GCC</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="../index.html#DIR">(DIR)</a>
+<hr>
+</div>
+
+<h2 class="unnumbered">Introduction</h2>
+
+<p><a name="index-introduction-1"></a>
+This manual documents how to use the GNU compilers,
+as well as their features and incompatibilities, and how to report
+bugs.  It corresponds to the compilers
+(Sourcery G++ Lite 2011.03-42)
+version 4.5.2. 
+The internals of the GNU compilers, including how to port them to new
+targets and some information about how to write front ends for new
+languages, are documented in a separate manual.  See <a href="../gccint/index.html#Top">Introduction</a>.
+
+<ul class="menu">
+<li><a accesskey="1" href="G_002b_002b-and-GCC.html#G_002b_002b-and-GCC">G++ and GCC</a>:      You can compile C or C++ programs. 
+<li><a accesskey="2" href="Standards.html#Standards">Standards</a>:        Language standards supported by GCC. 
+<li><a accesskey="3" href="Invoking-GCC.html#Invoking-GCC">Invoking GCC</a>:     Command options supported by &lsquo;<samp><span class="samp">gcc</span></samp>&rsquo;. 
+<li><a accesskey="4" href="C-Implementation.html#C-Implementation">C Implementation</a>:  How GCC implements the ISO C specification. 
+<li><a accesskey="5" href="C-Extensions.html#C-Extensions">C Extensions</a>:     GNU extensions to the C language family. 
+<li><a accesskey="6" href="C_002b_002b-Implementation.html#C_002b_002b-Implementation">C++ Implementation</a>:  How GCC implements the ISO C++ specification. 
+<li><a accesskey="7" href="C_002b_002b-Extensions.html#C_002b_002b-Extensions">C++ Extensions</a>:   GNU extensions to the C++ language. 
+<li><a accesskey="8" href="Objective_002dC.html#Objective_002dC">Objective-C</a>:      GNU Objective-C runtime features. 
+<li><a accesskey="9" href="Compatibility.html#Compatibility">Compatibility</a>:    Binary Compatibility
+<li><a href="Gcov.html#Gcov">Gcov</a>:             <samp><span class="command">gcov</span></samp>---a test coverage program. 
+<li><a href="Trouble.html#Trouble">Trouble</a>:          If you have trouble using GCC. 
+<li><a href="Bugs.html#Bugs">Bugs</a>:             How, why and where to report bugs. 
+<li><a href="Service.html#Service">Service</a>:          How to find suppliers of support for GCC. 
+<li><a href="Contributing.html#Contributing">Contributing</a>:     How to contribute to testing and developing GCC.
+
+<li><a href="Funding.html#Funding">Funding</a>:          How to help assure funding for free software. 
+<li><a href="GNU-Project.html#GNU-Project">GNU Project</a>:      The GNU Project and GNU/Linux.
+
+<li><a href="Copying.html#Copying">Copying</a>:          GNU General Public License says
+                    how you can copy and share GCC. 
+<li><a href="GNU-Free-Documentation-License.html#GNU-Free-Documentation-License">GNU Free Documentation License</a>:  How you can copy and share this manual. 
+<li><a href="Contributors.html#Contributors">Contributors</a>:     People who have contributed to GCC.
+
+<li><a href="Option-Index.html#Option-Index">Option Index</a>:     Index to command line options. 
+<li><a href="Keyword-Index.html#Keyword-Index">Keyword Index</a>:    Index of concepts and symbol names. 
+</ul>
+
+<!-- Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998, -->
+<!-- 1999, 2000, 2001, 2002, 2004, 2008 Free Software Foundation, Inc. -->
+<!-- This is part of the GCC manual. -->
+<!-- For copying conditions, see the file gcc.texi. -->
+ </body></html>
+

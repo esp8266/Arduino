@@ -1,0 +1,127 @@
+<html lang="en">
+<head>
+<title>Bootstrapping - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Remote-Stub.html#Remote-Stub" title="Remote Stub">
+<link rel="prev" href="Stub-Contents.html#Stub-Contents" title="Stub Contents">
+<link rel="next" href="Debug-Session.html#Debug-Session" title="Debug Session">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Bootstrapping"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Debug-Session.html#Debug-Session">Debug Session</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Stub-Contents.html#Stub-Contents">Stub Contents</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Remote-Stub.html#Remote-Stub">Remote Stub</a>
+<hr>
+</div>
+
+<h4 class="subsection">20.5.2 What You Must Do for the Stub</h4>
+
+<p><a name="index-remote-stub_002c-support-routines-1138"></a>The debugging stubs that come with <span class="sc">gdb</span> are set up for a particular
+chip architecture, but they have no information about the rest of your
+debugging target machine.
+
+   <p>First of all you need to tell the stub how to communicate with the
+serial port.
+
+     <dl>
+<dt><code>int getDebugChar()</code><dd><a name="index-getDebugChar-1139"></a>Write this subroutine to read a single character from the serial port. 
+It may be identical to <code>getchar</code> for your target system; a
+different name is used to allow you to distinguish the two if you wish.
+
+     <br><dt><code>void putDebugChar(int)</code><dd><a name="index-putDebugChar-1140"></a>Write this subroutine to write a single character to the serial port. 
+It may be identical to <code>putchar</code> for your target system; a
+different name is used to allow you to distinguish the two if you wish. 
+</dl>
+
+   <p><a name="index-control-C_002c-and-remote-debugging-1141"></a><a name="index-interrupting-remote-targets-1142"></a>If you want <span class="sc">gdb</span> to be able to stop your program while it is
+running, you need to use an interrupt-driven serial driver, and arrange
+for it to stop when it receives a <code>^C</code> (&lsquo;<samp><span class="samp">\003</span></samp>&rsquo;, the control-C
+character).  That is the character which <span class="sc">gdb</span> uses to tell the
+remote system to stop.
+
+   <p>Getting the debugging target to return the proper status to <span class="sc">gdb</span>
+probably requires changes to the standard stub; one quick and dirty way
+is to just execute a breakpoint instruction (the &ldquo;dirty&rdquo; part is that
+<span class="sc">gdb</span> reports a <code>SIGTRAP</code> instead of a <code>SIGINT</code>).
+
+   <p>Other routines you need to supply are:
+
+     <dl>
+<dt><code>void exceptionHandler (int </code><var>exception_number</var><code>, void *</code><var>exception_address</var><code>)</code><dd><a name="index-exceptionHandler-1143"></a>Write this function to install <var>exception_address</var> in the exception
+handling tables.  You need to do this because the stub does not have any
+way of knowing what the exception handling tables on your target system
+are like (for example, the processor's table might be in <span class="sc">rom</span>,
+containing entries which point to a table in <span class="sc">ram</span>). 
+<var>exception_number</var> is the exception number which should be changed;
+its meaning is architecture-dependent (for example, different numbers
+might represent divide by zero, misaligned access, etc).  When this
+exception occurs, control should be transferred directly to
+<var>exception_address</var>, and the processor state (stack, registers,
+and so on) should be just as it is when a processor exception occurs.  So if
+you want to use a jump instruction to reach <var>exception_address</var>, it
+should be a simple jump, not a jump to subroutine.
+
+     <p>For the 386, <var>exception_address</var> should be installed as an interrupt
+gate so that interrupts are masked while the handler runs.  The gate
+should be at privilege level 0 (the most privileged level).  The
+<span class="sc">sparc</span> and 68k stubs are able to mask interrupts themselves without
+help from <code>exceptionHandler</code>.
+
+     <br><dt><code>void flush_i_cache()</code><dd><a name="index-flush_005fi_005fcache-1144"></a>On <span class="sc">sparc</span> and <span class="sc">sparclite</span> only, write this subroutine to flush the
+instruction cache, if any, on your target machine.  If there is no
+instruction cache, this subroutine may be a no-op.
+
+     <p>On target machines that have instruction caches, <span class="sc">gdb</span> requires this
+function to make certain that the state of your program is stable. 
+</dl>
+
+<p class="noindent">You must also make sure this library routine is available:
+
+     <dl>
+<dt><code>void *memset(void *, int, int)</code><dd><a name="index-memset-1145"></a>This is the standard library function <code>memset</code> that sets an area of
+memory to a known value.  If you have one of the free versions of
+<code>libc.a</code>, <code>memset</code> can be found there; otherwise, you must
+either obtain it from your hardware manufacturer, or write your own. 
+</dl>
+
+   <p>If you do not use the GNU C compiler, you may need other standard
+library subroutines as well; this varies from one stub to another,
+but in general the stubs are likely to use any of the common library
+subroutines which <span class="sc">gcc</span> generates as inline code.
+
+   </body></html>
+

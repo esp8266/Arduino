@@ -1,0 +1,116 @@
+<html lang="en">
+<head>
+<title>Miscellaneous Commands - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Simple-Commands.html#Simple-Commands" title="Simple Commands">
+<link rel="prev" href="REGION_005fALIAS.html#REGION_005fALIAS" title="REGION_ALIAS">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Miscellaneous-Commands"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="REGION_005fALIAS.html#REGION_005fALIAS">REGION_ALIAS</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Simple-Commands.html#Simple-Commands">Simple Commands</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.4.5 Other Linker Script Commands</h4>
+
+<p>There are a few other linker scripts commands.
+
+     <dl>
+<dt><code>ASSERT(</code><var>exp</var><code>, </code><var>message</var><code>)</code><dd><a name="index-ASSERT-371"></a><a name="index-assertion-in-linker-script-372"></a>Ensure that <var>exp</var> is non-zero.  If it is zero, then exit the linker
+with an error code, and print <var>message</var>.
+
+     <br><dt><code>EXTERN(</code><var>symbol</var> <var>symbol</var><code> ...)</code><dd><a name="index-EXTERN-373"></a><a name="index-undefined-symbol-in-linker-script-374"></a>Force <var>symbol</var> to be entered in the output file as an undefined
+symbol.  Doing this may, for example, trigger linking of additional
+modules from standard libraries.  You may list several <var>symbol</var>s for
+each <code>EXTERN</code>, and you may use <code>EXTERN</code> multiple times.  This
+command has the same effect as the &lsquo;<samp><span class="samp">-u</span></samp>&rsquo; command-line option.
+
+     <br><dt><code>FORCE_COMMON_ALLOCATION</code><dd><a name="index-FORCE_005fCOMMON_005fALLOCATION-375"></a><a name="index-common-allocation-in-linker-script-376"></a>This command has the same effect as the &lsquo;<samp><span class="samp">-d</span></samp>&rsquo; command-line option:
+to make <samp><span class="command">ld</span></samp> assign space to common symbols even if a relocatable
+output file is specified (&lsquo;<samp><span class="samp">-r</span></samp>&rsquo;).
+
+     <br><dt><code>INHIBIT_COMMON_ALLOCATION</code><dd><a name="index-INHIBIT_005fCOMMON_005fALLOCATION-377"></a><a name="index-common-allocation-in-linker-script-378"></a>This command has the same effect as the &lsquo;<samp><span class="samp">--no-define-common</span></samp>&rsquo;
+command-line option: to make <code>ld</code> omit the assignment of addresses
+to common symbols even for a non-relocatable output file.
+
+     <br><dt><code>INSERT [ AFTER | BEFORE ] </code><var>output_section</var><dd><a name="index-INSERT-379"></a><a name="index-insert-user-script-into-default-script-380"></a>This command is typically used in a script specified by &lsquo;<samp><span class="samp">-T</span></samp>&rsquo; to
+augment the default <code>SECTIONS</code> with, for example, overlays.  It
+inserts all prior linker script statements after (or before)
+<var>output_section</var>, and also causes &lsquo;<samp><span class="samp">-T</span></samp>&rsquo; to not override the
+default linker script.  The exact insertion point is as for orphan
+sections.  See <a href="Location-Counter.html#Location-Counter">Location Counter</a>.  The insertion happens after the
+linker has mapped input sections to output sections.  Prior to the
+insertion, since &lsquo;<samp><span class="samp">-T</span></samp>&rsquo; scripts are parsed before the default
+linker script, statements in the &lsquo;<samp><span class="samp">-T</span></samp>&rsquo; script occur before the
+default linker script statements in the internal linker representation
+of the script.  In particular, input section assignments will be made
+to &lsquo;<samp><span class="samp">-T</span></samp>&rsquo; output sections before those in the default script.  Here
+is an example of how a &lsquo;<samp><span class="samp">-T</span></samp>&rsquo; script using <code>INSERT</code> might look:
+
+     <pre class="smallexample">          SECTIONS
+          {
+            OVERLAY :
+            {
+              .ov1 { ov1*(.text) }
+              .ov2 { ov2*(.text) }
+            }
+          }
+          INSERT AFTER .text;
+</pre>
+     <br><dt><code>NOCROSSREFS(</code><var>section</var> <var>section</var><code> ...)</code><dd><a name="index-NOCROSSREFS_0028_0040var_007bsections_007d_0029-381"></a><a name="index-cross-references-382"></a>This command may be used to tell <samp><span class="command">ld</span></samp> to issue an error about any
+references among certain output sections.
+
+     <p>In certain types of programs, particularly on embedded systems when
+using overlays, when one section is loaded into memory, another section
+will not be.  Any direct references between the two sections would be
+errors.  For example, it would be an error if code in one section called
+a function defined in the other section.
+
+     <p>The <code>NOCROSSREFS</code> command takes a list of output section names.  If
+<samp><span class="command">ld</span></samp> detects any cross references between the sections, it reports
+an error and returns a non-zero exit status.  Note that the
+<code>NOCROSSREFS</code> command uses output section names, not input section
+names.
+
+     <br><dt><code>OUTPUT_ARCH(</code><var>bfdarch</var><code>)</code><dd><a name="index-OUTPUT_005fARCH_0028_0040var_007bbfdarch_007d_0029-383"></a><a name="index-machine-architecture-384"></a><a name="index-architecture-385"></a>Specify a particular output machine architecture.  The argument is one
+of the names used by the BFD library (see <a href="BFD.html#BFD">BFD</a>).  You can see the
+architecture of an object file by using the <code>objdump</code> program with
+the &lsquo;<samp><span class="samp">-f</span></samp>&rsquo; option. 
+</dl>
+
+   </body></html>
+

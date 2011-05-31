@@ -1,0 +1,102 @@
+<html lang="en">
+<head>
+<title>Input Files - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Overview.html#Overview" title="Overview">
+<link rel="prev" href="Command-Line.html#Command-Line" title="Command Line">
+<link rel="next" href="Object.html#Object" title="Object">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Input-Files"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Object.html#Object">Object</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Command-Line.html#Command-Line">Command Line</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Overview.html#Overview">Overview</a>
+<hr>
+</div>
+
+<h3 class="section">1.5 Input Files</h3>
+
+<p><a name="index-input-29"></a><a name="index-source-program-30"></a><a name="index-files_002c-input-31"></a>We use the phrase <dfn>source program</dfn>, abbreviated <dfn>source</dfn>, to
+describe the program input to one run of <samp><span class="command">as</span></samp>.  The program may
+be in one or more files; how the source is partitioned into files
+doesn't change the meaning of the source.
+
+<!-- I added "con" prefix to "catenation" just to prove I can overcome my -->
+<!-- APL training...   doc@cygnus.com -->
+   <p>The source program is a concatenation of the text in all the files, in the
+order specified.
+
+<!-- man begin DESCRIPTION -->
+   <p>Each time you run <samp><span class="command">as</span></samp> it assembles exactly one source
+program.  The source program is made up of one or more files. 
+(The standard input is also a file.)
+
+   <p>You give <samp><span class="command">as</span></samp> a command line that has zero or more input file
+names.  The input files are read (from left file name to right).  A
+command line argument (in any position) that has no special meaning
+is taken to be an input file name.
+
+   <p>If you give <samp><span class="command">as</span></samp> no file names it attempts to read one input file
+from the <samp><span class="command">as</span></samp> standard input, which is normally your terminal.  You
+may have to type &lt;ctl-D&gt; to tell <samp><span class="command">as</span></samp> there is no more program
+to assemble.
+
+   <p>Use &lsquo;<samp><span class="samp">--</span></samp>&rsquo; if you need to explicitly name the standard input file
+in your command line.
+
+   <p>If the source is empty, <samp><span class="command">as</span></samp> produces a small, empty object
+file.
+
+<!-- man end -->
+<h4 class="subheading">Filenames and Line-numbers</h4>
+
+<p><a name="index-input-file-linenumbers-32"></a><a name="index-line-numbers_002c-in-input-files-33"></a>There are two ways of locating a line in the input file (or files) and
+either may be used in reporting error messages.  One way refers to a line
+number in a physical file; the other refers to a line number in a
+&ldquo;logical&rdquo; file.  See <a href="Errors.html#Errors">Error and Warning Messages</a>.
+
+   <p><dfn>Physical files</dfn> are those files named in the command line given
+to <samp><span class="command">as</span></samp>.
+
+   <p><dfn>Logical files</dfn> are simply names declared explicitly by assembler
+directives; they bear no relation to physical files.  Logical file names help
+error messages reflect the original source file, when <samp><span class="command">as</span></samp> source
+is itself synthesized from other files.  <samp><span class="command">as</span></samp> understands the
+&lsquo;<samp><span class="samp">#</span></samp>&rsquo; directives emitted by the <code>gcc</code> preprocessor.  See also
+<a href="File.html#File"><code>.file</code></a>.
+
+   </body></html>
+

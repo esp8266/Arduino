@@ -1,0 +1,155 @@
+<html lang="en">
+<head>
+<title>Acknowledgements - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Reporting-Bugs.html#Reporting-Bugs" title="Reporting Bugs">
+<link rel="next" href="GNU-Free-Documentation-License.html#GNU-Free-Documentation-License" title="GNU Free Documentation License">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Acknowledgements"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="GNU-Free-Documentation-License.html#GNU-Free-Documentation-License">GNU Free Documentation License</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Reporting-Bugs.html#Reporting-Bugs">Reporting Bugs</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">11 Acknowledgements</h2>
+
+<p>If you have contributed to GAS and your name isn't listed here,
+it is not meant as a slight.  We just don't know about it.  Send mail to the
+maintainer, and we'll correct the situation.  Currently
+<!-- (January 1994), -->
+the maintainer is Ken Raeburn (email address <code>raeburn@cygnus.com</code>).
+
+   <p>Dean Elsner wrote the original <span class="sc">gnu</span> assembler for the VAX.<a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a>
+
+   <p>Jay Fenlason maintained GAS for a while, adding support for GDB-specific debug
+information and the 68k series machines, most of the preprocessing pass, and
+extensive changes in <samp><span class="file">messages.c</span></samp>, <samp><span class="file">input-file.c</span></samp>, <samp><span class="file">write.c</span></samp>.
+
+   <p>K. Richard Pixley maintained GAS for a while, adding various enhancements and
+many bug fixes, including merging support for several processors, breaking GAS
+up to handle multiple object file format back ends (including heavy rewrite,
+testing, an integration of the coff and b.out back ends), adding configuration
+including heavy testing and verification of cross assemblers and file splits
+and renaming, converted GAS to strictly ANSI C including full prototypes, added
+support for m680[34]0 and cpu32, did considerable work on i960 including a COFF
+port (including considerable amounts of reverse engineering), a SPARC opcode
+file rewrite, DECstation, rs6000, and hp300hpux host ports, updated &ldquo;know&rdquo;
+assertions and made them work, much other reorganization, cleanup, and lint.
+
+   <p>Ken Raeburn wrote the high-level BFD interface code to replace most of the code
+in format-specific I/O modules.
+
+   <p>The original VMS support was contributed by David L. Kashtan.  Eric Youngdale
+has done much work with it since.
+
+   <p>The Intel 80386 machine description was written by Eliot Dresselhaus.
+
+   <p>Minh Tran-Le at IntelliCorp contributed some AIX 386 support.
+
+   <p>The Motorola 88k machine description was contributed by Devon Bowen of Buffalo
+University and Torbjorn Granlund of the Swedish Institute of Computer Science.
+
+   <p>Keith Knowles at the Open Software Foundation wrote the original MIPS back end
+(<samp><span class="file">tc-mips.c</span></samp>, <samp><span class="file">tc-mips.h</span></samp>), and contributed Rose format support
+(which hasn't been merged in yet).  Ralph Campbell worked with the MIPS code to
+support a.out format.
+
+   <p>Support for the Zilog Z8k and Renesas H8/300 processors (tc-z8k,
+tc-h8300), and IEEE 695 object file format (obj-ieee), was written by
+Steve Chamberlain of Cygnus Support.  Steve also modified the COFF back end to
+use BFD for some low-level operations, for use with the H8/300 and AMD 29k
+targets.
+
+   <p>John Gilmore built the AMD 29000 support, added <code>.include</code> support, and
+simplified the configuration of which versions accept which directives.  He
+updated the 68k machine description so that Motorola's opcodes always produced
+fixed-size instructions (e.g., <code>jsr</code>), while synthetic instructions
+remained shrinkable (<code>jbsr</code>).  John fixed many bugs, including true tested
+cross-compilation support, and one bug in relaxation that took a week and
+required the proverbial one-bit fix.
+
+   <p>Ian Lance Taylor of Cygnus Support merged the Motorola and MIT syntax for the
+68k, completed support for some COFF targets (68k, i386 SVR3, and SCO Unix),
+added support for MIPS ECOFF and ELF targets, wrote the initial RS/6000 and
+PowerPC assembler, and made a few other minor patches.
+
+   <p>Steve Chamberlain made GAS able to generate listings.
+
+   <p>Hewlett-Packard contributed support for the HP9000/300.
+
+   <p>Jeff Law wrote GAS and BFD support for the native HPPA object format (SOM)
+along with a fairly extensive HPPA testsuite (for both SOM and ELF object
+formats).  This work was supported by both the Center for Software Science at
+the University of Utah and Cygnus Support.
+
+   <p>Support for ELF format files has been worked on by Mark Eichin of Cygnus
+Support (original, incomplete implementation for SPARC), Pete Hoogenboom and
+Jeff Law at the University of Utah (HPPA mainly), Michael Meissner of the Open
+Software Foundation (i386 mainly), and Ken Raeburn of Cygnus Support (sparc,
+and some initial 64-bit support).
+
+   <p>Linas Vepstas added GAS support for the ESA/390 &ldquo;IBM 370&rdquo; architecture.
+
+   <p>Richard Henderson rewrote the Alpha assembler. Klaus Kaempf wrote GAS and BFD
+support for openVMS/Alpha.
+
+   <p>Timothy Wall, Michael Hayes, and Greg Smart contributed to the various tic*
+flavors.
+
+   <p>David Heine, Sterling Augustine, Bob Wilson and John Ruttenberg from Tensilica,
+Inc. added support for Xtensa processors.
+
+   <p>Several engineers at Cygnus Support have also provided many small bug fixes and
+configuration enhancements.
+
+   <p>Jon Beniston added support for the Lattice Mico32 architecture.
+
+   <p>Many others have contributed large or small bugfixes and enhancements.  If
+you have contributed significant work and are not mentioned on this list, and
+want to be, let us know.  Some of the history has been lost; we are not
+intentionally leaving anyone out.
+
+   <div class="footnote">
+<hr>
+<h4>Footnotes</h4><p class="footnote"><small>[<a name="fn-1" href="#fnd-1">1</a>]</small> Any
+more details?</p>
+
+   <hr></div>
+
+   </body></html>
+

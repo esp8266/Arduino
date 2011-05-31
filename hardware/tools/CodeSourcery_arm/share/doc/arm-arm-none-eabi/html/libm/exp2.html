@@ -1,0 +1,65 @@
+<html lang="en">
+<head>
+<title>exp2 - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Math.html#Math" title="Math">
+<link rel="prev" href="exp.html#exp" title="exp">
+<link rel="next" href="expm1.html#expm1" title="expm1">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="exp2"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="expm1.html#expm1">expm1</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="exp.html#exp">exp</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Math.html#Math">Math</a>
+<hr>
+</div>
+
+<h3 class="section">1.16 <code>exp2</code>, <code>exp2f</code>&ndash;exponential, base 2</h3>
+
+<p><a name="index-exp2-41"></a><a name="index-exp2f-42"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double exp2(double <var>x</var>);
+     float exp2f(float <var>x</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>exp2</code> and <code>exp2f</code> calculate 2 ^ <var>x</var>, that is,
+2 raised to the power <var>x</var>.
+
+   <p>You can use the (non-ANSI) function <code>matherr</code> to specify
+error handling for these functions.
+
+   <p><br>
+<strong>Returns</strong><br>
+On success, <code>exp2</code> and <code>exp2f</code> return the calculated value. 
+If the result underflows, the returned value is <code>0</code>.  If the
+result overflows, the returned value is <code>HUGE_VAL</code>.  In
+either case, <code>errno</code> is set to <code>ERANGE</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C, POSIX.
+
+   <p><br>
+
+   </body></html>
+

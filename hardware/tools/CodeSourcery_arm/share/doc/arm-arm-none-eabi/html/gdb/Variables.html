@@ -1,0 +1,172 @@
+<html lang="en">
+<head>
+<title>Variables - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Data.html#Data" title="Data">
+<link rel="prev" href="Ambiguous-Expressions.html#Ambiguous-Expressions" title="Ambiguous Expressions">
+<link rel="next" href="Arrays.html#Arrays" title="Arrays">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Variables"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Arrays.html#Arrays">Arrays</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Ambiguous-Expressions.html#Ambiguous-Expressions">Ambiguous Expressions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Data.html#Data">Data</a>
+<hr>
+</div>
+
+<h3 class="section">10.3 Program Variables</h3>
+
+<p>The most common kind of expression to use is the name of a variable
+in your program.
+
+   <p>Variables in expressions are understood in the selected stack frame
+(see <a href="Selection.html#Selection">Selecting a Frame</a>); they must be either:
+
+     <ul>
+<li>global (or file-static)
+</ul>
+
+<p class="noindent">or
+
+     <ul>
+<li>visible according to the scope rules of the
+programming language from the point of execution in that frame
+</ul>
+
+<p class="noindent">This means that in the function
+
+<pre class="smallexample">     foo (a)
+          int a;
+     {
+       bar (a);
+       {
+         int b = test ();
+         bar (b);
+       }
+     }
+</pre>
+   <p class="noindent">you can examine and use the variable <code>a</code> whenever your program is
+executing within the function <code>foo</code>, but you can only use or
+examine the variable <code>b</code> while your program is executing inside
+the block where <code>b</code> is declared.
+
+   <p><a name="index-variable-name-conflict-505"></a>There is an exception: you can refer to a variable or function whose
+scope is a single source file even if the current execution point is not
+in this file.  But it is possible to have more than one such variable or
+function with the same name (in different source files).  If that
+happens, referring to that name has unpredictable effects.  If you wish,
+you can specify a static variable in a particular function or file,
+using the colon-colon (<code>::</code>) notation:
+
+   <p><a name="index-colon_002dcolon_002c-context-for-variables_002ffunctions-506"></a><!-- info cannot cope with a :: index entry, but why deprive hard copy readers? -->
+<a name="index-g_t_0040code_007b_003a_003a_007d_002c-context-for-variables_002ffunctions-507"></a>
+<pre class="smallexample">     <var>file</var>::<var>variable</var>
+     <var>function</var>::<var>variable</var>
+</pre>
+   <p class="noindent">Here <var>file</var> or <var>function</var> is the name of the context for the
+static <var>variable</var>.  In the case of file names, you can use quotes to
+make sure <span class="sc">gdb</span> parses the file name as a single word&mdash;for example,
+to print a global value of <code>x</code> defined in <samp><span class="file">f2.c</span></samp>:
+
+<pre class="smallexample">     (gdb) p 'f2.c'::x
+</pre>
+   <p><a name="index-C_0040t_007b_002b_002b_007d-scope-resolution-508"></a>This use of &lsquo;<samp><span class="samp">::</span></samp>&rsquo; is very rarely in conflict with the very similar
+use of the same notation in C<tt>++</tt>.  <span class="sc">gdb</span> also supports use of the C<tt>++</tt>
+scope resolution operator in <span class="sc">gdb</span> expressions. 
+<!-- FIXME: Um, so what happens in one of those rare cases where it's in -->
+<!-- conflict??  -mew -->
+
+   <p><a name="index-wrong-values-509"></a><a name="index-variable-values_002c-wrong-510"></a><a name="index-function-entry_002fexit_002c-wrong-values-of-variables-511"></a><a name="index-optimized-code_002c-wrong-values-of-variables-512"></a><blockquote>
+<em>Warning:</em> Occasionally, a local variable may appear to have the
+wrong value at certain points in a function&mdash;just after entry to a new
+scope, and just before exit. 
+</blockquote>
+   You may see this problem when you are stepping by machine instructions. 
+This is because, on most machines, it takes more than one instruction to
+set up a stack frame (including local variable definitions); if you are
+stepping by machine instructions, variables may appear to have the wrong
+values until the stack frame is completely built.  On exit, it usually
+also takes more than one machine instruction to destroy a stack frame;
+after you begin stepping through that group of instructions, local
+variable definitions may be gone.
+
+   <p>This may also happen when the compiler does significant optimizations. 
+To be sure of always seeing accurate values, turn off all optimization
+when compiling.
+
+   <p><a name="index-g_t_0060_0060No-symbol-_0022foo_0022-in-current-context_0027_0027-513"></a>Another possible effect of compiler optimizations is to optimize
+unused variables out of existence, or assign variables to registers (as
+opposed to memory addresses).  Depending on the support for such cases
+offered by the debug info format used by the compiler, <span class="sc">gdb</span>
+might not be able to display values for such local variables.  If that
+happens, <span class="sc">gdb</span> will print a message like this:
+
+<pre class="smallexample">     No symbol "foo" in current context.
+</pre>
+   <p>To solve such problems, either recompile without optimizations, or use a
+different debug info format, if the compiler supports several such
+formats.  For example, <span class="sc">gcc</span>, the <span class="sc">gnu</span> C/C<tt>++</tt> compiler,
+usually supports the <samp><span class="option">-gstabs+</span></samp> option.  <samp><span class="option">-gstabs+</span></samp>
+produces debug info in a format that is superior to formats such as
+COFF.  You may be able to use DWARF 2 (<samp><span class="option">-gdwarf-2</span></samp>), which is also
+an effective form for debug info.  See <a href="../gcc/Debugging-Options.html#Debugging-Options">Options for Debugging Your Program or GCC</a>. 
+See <a href="C.html#C">C and C<tt>++</tt></a>, for more information about debug info formats
+that are best suited to C<tt>++</tt> programs.
+
+   <p>If you ask to print an object whose contents are unknown to
+<span class="sc">gdb</span>, e.g., because its data type is not completely specified
+by the debug information, <span class="sc">gdb</span> will say &lsquo;<samp><span class="samp">&lt;incomplete
+type&gt;</span></samp>&rsquo;.  See <a href="Symbols.html#Symbols">incomplete type</a>, for more about this.
+
+   <p>Strings are identified as arrays of <code>char</code> values without specified
+signedness.  Arrays of either <code>signed char</code> or <code>unsigned char</code> get
+printed as arrays of 1 byte sized integers.  <code>-fsigned-char</code> or
+<code>-funsigned-char</code> <span class="sc">gcc</span> options have no effect as <span class="sc">gdb</span>
+defines literal string type <code>"char"</code> as <code>char</code> without a sign. 
+For program code
+
+<pre class="smallexample">     char var0[] = "A";
+     signed char var1[] = "A";
+</pre>
+   <p>You get during debugging
+<pre class="smallexample">     (gdb) print var0
+     $1 = "A"
+     (gdb) print var1
+     $2 = {65 'A', 0 '\0'}
+</pre>
+   </body></html>
+

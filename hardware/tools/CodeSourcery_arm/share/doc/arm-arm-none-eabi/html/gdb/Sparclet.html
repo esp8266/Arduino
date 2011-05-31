@@ -1,0 +1,94 @@
+<html lang="en">
+<head>
+<title>Sparclet - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Embedded-Processors.html#Embedded-Processors" title="Embedded Processors">
+<link rel="prev" href="PowerPC-Embedded.html#PowerPC-Embedded" title="PowerPC Embedded">
+<link rel="next" href="Sparclite.html#Sparclite" title="Sparclite">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Sparclet"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Sparclite.html#Sparclite">Sparclite</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="PowerPC-Embedded.html#PowerPC-Embedded">PowerPC Embedded</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Embedded-Processors.html#Embedded-Processors">Embedded Processors</a>
+<hr>
+</div>
+
+<h4 class="subsection">21.3.9 Tsqware Sparclet</h4>
+
+<p><a name="index-Sparclet-1370"></a>
+<span class="sc">gdb</span> enables developers to debug tasks running on
+Sparclet targets from a Unix host. 
+<span class="sc">gdb</span> uses code that runs on
+both the Unix host and on the Sparclet target.  The program
+<code>gdb</code> is installed and executed on the Unix host.
+
+     <dl>
+<dt><code>remotetimeout </code><var>args</var><dd><a name="index-remotetimeout-1371"></a><span class="sc">gdb</span> supports the option <code>remotetimeout</code>. 
+This option is set by the user, and  <var>args</var> represents the number of
+seconds <span class="sc">gdb</span> waits for responses. 
+</dl>
+
+   <p><a name="index-compiling_002c-on-Sparclet-1372"></a>When compiling for debugging, include the options &lsquo;<samp><span class="samp">-g</span></samp>&rsquo; to get debug
+information and &lsquo;<samp><span class="samp">-Ttext</span></samp>&rsquo; to relocate the program to where you wish to
+load it on the target.  You may also want to add the options &lsquo;<samp><span class="samp">-n</span></samp>&rsquo; or
+&lsquo;<samp><span class="samp">-N</span></samp>&rsquo; in order to reduce the size of the sections.  Example:
+
+<pre class="smallexample">     sparclet-aout-gcc prog.c -Ttext 0x12010000 -g -o prog -N
+</pre>
+   <p>You can use <code>objdump</code> to verify that the addresses are what you intended:
+
+<pre class="smallexample">     sparclet-aout-objdump --headers --syms prog
+</pre>
+   <p><a name="index-running_002c-on-Sparclet-1373"></a>Once you have set
+your Unix execution search path to find <span class="sc">gdb</span>, you are ready to
+run <span class="sc">gdb</span>.  From your Unix host, run <code>gdb</code>
+(or <code>sparclet-aout-gdb</code>, depending on your installation).
+
+   <p><span class="sc">gdb</span> comes up showing the prompt:
+
+<pre class="smallexample">     (gdbslet)
+</pre>
+   <ul class="menu">
+<li><a accesskey="1" href="Sparclet-File.html#Sparclet-File">Sparclet File</a>:                 Setting the file to debug
+<li><a accesskey="2" href="Sparclet-Connection.html#Sparclet-Connection">Sparclet Connection</a>:           Connecting to Sparclet
+<li><a accesskey="3" href="Sparclet-Download.html#Sparclet-Download">Sparclet Download</a>:             Sparclet download
+<li><a accesskey="4" href="Sparclet-Execution.html#Sparclet-Execution">Sparclet Execution</a>:            Running and debugging
+</ul>
+
+   </body></html>
+

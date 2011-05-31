@@ -1,0 +1,69 @@
+<html lang="en">
+<head>
+<title>scalbn - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Math.html#Math" title="Math">
+<link rel="prev" href="round.html#round" title="round">
+<link rel="next" href="signbit.html#signbit" title="signbit">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="scalbn"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="signbit.html#signbit">signbit</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="round.html#round">round</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Math.html#Math">Math</a>
+<hr>
+</div>
+
+<h3 class="section">1.50 <code>scalbn</code>, <code>scalbnf</code>, <code>scalbln</code>, <code>scalblnf</code>&ndash;scale by power of FLT_RADIX (=2)</h3>
+
+<p><a name="index-scalbn-135"></a><a name="index-scalbnf-136"></a><a name="index-scalbln-137"></a><a name="index-scalblnf-138"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double scalbn(double <var>x</var>, int <var>n</var>);
+     float scalbnf(float <var>x</var>, int <var>n</var>);
+     double scalbln(double <var>x</var>, long int <var>n</var>);
+     float scalblnf(float <var>x</var>, long int <var>n</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+The <code>scalbn</code> and <code>scalbln</code> functions compute
+<var>x</var> times FLT_RADIX to the power <var>n</var>. 
+efficiently.  The result is computed by manipulating the exponent, rather than
+by actually performing an exponentiation or multiplication.  In this
+floating-point implementation FLT_RADIX=2, which makes the <code>scalbn</code>
+functions equivalent to the <code>ldexp</code> functions.
+
+   <p><br>
+<strong>Returns</strong><br>
+<var>x</var> times 2 to the power <var>n</var>.  A range error may occur.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C, POSIX
+
+   <p><br>
+<strong>See Also</strong><br>
+<code>ldexp</code>
+
+   <p><br>
+
+   </body></html>
+

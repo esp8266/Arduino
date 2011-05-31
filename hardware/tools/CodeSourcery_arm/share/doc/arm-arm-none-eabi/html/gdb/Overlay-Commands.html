@@ -1,0 +1,143 @@
+<html lang="en">
+<head>
+<title>Overlay Commands - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Overlays.html#Overlays" title="Overlays">
+<link rel="prev" href="How-Overlays-Work.html#How-Overlays-Work" title="How Overlays Work">
+<link rel="next" href="Automatic-Overlay-Debugging.html#Automatic-Overlay-Debugging" title="Automatic Overlay Debugging">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Overlay-Commands"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Automatic-Overlay-Debugging.html#Automatic-Overlay-Debugging">Automatic Overlay Debugging</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="How-Overlays-Work.html#How-Overlays-Work">How Overlays Work</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Overlays.html#Overlays">Overlays</a>
+<hr>
+</div>
+
+<h3 class="section">14.2 Overlay Commands</h3>
+
+<p>To use <span class="sc">gdb</span>'s overlay support, each overlay in your program must
+correspond to a separate section of the executable file.  The section's
+virtual memory address and load memory address must be the overlay's
+mapped and load addresses.  Identifying overlays with sections allows
+<span class="sc">gdb</span> to determine the appropriate address of a function or
+variable, depending on whether the overlay is mapped or not.
+
+   <p><span class="sc">gdb</span>'s overlay commands all start with the word <code>overlay</code>;
+you can abbreviate this as <code>ov</code> or <code>ovly</code>.  The commands are:
+
+     <dl>
+<dt><code>overlay off</code><dd><a name="index-overlay-767"></a>Disable <span class="sc">gdb</span>'s overlay support.  When overlay support is
+disabled, <span class="sc">gdb</span> assumes that all functions and variables are
+always present at their mapped addresses.  By default, <span class="sc">gdb</span>'s
+overlay support is disabled.
+
+     <br><dt><code>overlay manual</code><dd><a name="index-manual-overlay-debugging-768"></a>Enable <dfn>manual</dfn> overlay debugging.  In this mode, <span class="sc">gdb</span>
+relies on you to tell it which overlays are mapped, and which are not,
+using the <code>overlay map-overlay</code> and <code>overlay unmap-overlay</code>
+commands described below.
+
+     <br><dt><code>overlay map-overlay </code><var>overlay</var><dt><code>overlay map </code><var>overlay</var><dd><a name="index-map-an-overlay-769"></a>Tell <span class="sc">gdb</span> that <var>overlay</var> is now mapped; <var>overlay</var> must
+be the name of the object file section containing the overlay.  When an
+overlay is mapped, <span class="sc">gdb</span> assumes it can find the overlay's
+functions and variables at their mapped addresses.  <span class="sc">gdb</span> assumes
+that any other overlays whose mapped ranges overlap that of
+<var>overlay</var> are now unmapped.
+
+     <br><dt><code>overlay unmap-overlay </code><var>overlay</var><dt><code>overlay unmap </code><var>overlay</var><dd><a name="index-unmap-an-overlay-770"></a>Tell <span class="sc">gdb</span> that <var>overlay</var> is no longer mapped; <var>overlay</var>
+must be the name of the object file section containing the overlay. 
+When an overlay is unmapped, <span class="sc">gdb</span> assumes it can find the
+overlay's functions and variables at their load addresses.
+
+     <br><dt><code>overlay auto</code><dd>Enable <dfn>automatic</dfn> overlay debugging.  In this mode, <span class="sc">gdb</span>
+consults a data structure the overlay manager maintains in the inferior
+to see which overlays are mapped.  For details, see <a href="Automatic-Overlay-Debugging.html#Automatic-Overlay-Debugging">Automatic Overlay Debugging</a>.
+
+     <br><dt><code>overlay load-target</code><dt><code>overlay load</code><dd><a name="index-reloading-the-overlay-table-771"></a>Re-read the overlay table from the inferior.  Normally, <span class="sc">gdb</span>
+re-reads the table <span class="sc">gdb</span> automatically each time the inferior
+stops, so this command should only be necessary if you have changed the
+overlay mapping yourself using <span class="sc">gdb</span>.  This command is only
+useful when using automatic overlay debugging.
+
+     <br><dt><code>overlay list-overlays</code><dt><code>overlay list</code><dd><a name="index-listing-mapped-overlays-772"></a>Display a list of the overlays currently mapped, along with their mapped
+addresses, load addresses, and sizes.
+
+   </dl>
+
+   <p>Normally, when <span class="sc">gdb</span> prints a code address, it includes the name
+of the function the address falls in:
+
+<pre class="smallexample">     (gdb) print main
+     $3 = {int ()} 0x11a0 &lt;main&gt;
+</pre>
+   <p class="noindent">When overlay debugging is enabled, <span class="sc">gdb</span> recognizes code in
+unmapped overlays, and prints the names of unmapped functions with
+asterisks around them.  For example, if <code>foo</code> is a function in an
+unmapped overlay, <span class="sc">gdb</span> prints it this way:
+
+<pre class="smallexample">     (gdb) overlay list
+     No sections are mapped.
+     (gdb) print foo
+     $5 = {int (int)} 0x100000 &lt;*foo*&gt;
+</pre>
+   <p class="noindent">When <code>foo</code>'s overlay is mapped, <span class="sc">gdb</span> prints the function's
+name normally:
+
+<pre class="smallexample">     (gdb) overlay list
+     Section .ov.foo.text, loaded at 0x100000 - 0x100034,
+             mapped at 0x1016 - 0x104a
+     (gdb) print foo
+     $6 = {int (int)} 0x1016 &lt;foo&gt;
+</pre>
+   <p>When overlay debugging is enabled, <span class="sc">gdb</span> can find the correct
+address for functions and variables in an overlay, whether or not the
+overlay is mapped.  This allows most <span class="sc">gdb</span> commands, like
+<code>break</code> and <code>disassemble</code>, to work normally, even on unmapped
+code.  However, <span class="sc">gdb</span>'s breakpoint support has some limitations:
+
+     <ul>
+<li><a name="index-breakpoints-in-overlays-773"></a><a name="index-overlays_002c-setting-breakpoints-in-774"></a>You can set breakpoints in functions in unmapped overlays, as long as
+<span class="sc">gdb</span> can write to the overlay at its load address. 
+<li><span class="sc">gdb</span> can not set hardware or simulator-based breakpoints in
+unmapped overlays.  However, if you set a breakpoint at the end of your
+overlay manager (and tell <span class="sc">gdb</span> which overlays are now mapped, if
+you are using manual overlay management), <span class="sc">gdb</span> will re-set its
+breakpoints properly. 
+</ul>
+
+   </body></html>
+

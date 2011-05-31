@@ -1,0 +1,100 @@
+<html lang="en">
+<head>
+<title>Annotations for Running - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Annotations.html#Annotations" title="Annotations">
+<link rel="prev" href="Invalidation.html#Invalidation" title="Invalidation">
+<link rel="next" href="Source-Annotations.html#Source-Annotations" title="Source Annotations">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Annotations-for-Running"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Source-Annotations.html#Source-Annotations">Source Annotations</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Invalidation.html#Invalidation">Invalidation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Annotations.html#Annotations">Annotations</a>
+<hr>
+</div>
+
+<h3 class="section">28.6 Running the Program</h3>
+
+<p><a name="index-annotations-for-running-programs-2158"></a>
+<a name="index-starting-annotation-2159"></a><a name="index-stopping-annotation-2160"></a>When the program starts executing due to a <span class="sc">gdb</span> command such as
+<code>step</code> or <code>continue</code>,
+
+<pre class="smallexample">     ^Z^Zstarting
+</pre>
+   <p>is output.  When the program stops,
+
+<pre class="smallexample">     ^Z^Zstopped
+</pre>
+   <p>is output.  Before the <code>stopped</code> annotation, a variety of
+annotations describe how the program stopped.
+
+     
+<a name="index-exited-annotation-2161"></a>
+<dl><dt><code>^Z^Zexited </code><var>exit-status</var><dd>The program exited, and <var>exit-status</var> is the exit status (zero for
+successful exit, otherwise nonzero).
+
+     <p><a name="index-signalled-annotation-2162"></a><a name="index-signal_002dname-annotation-2163"></a><a name="index-signal_002dname_002dend-annotation-2164"></a><a name="index-signal_002dstring-annotation-2165"></a><a name="index-signal_002dstring_002dend-annotation-2166"></a><br><dt><code>^Z^Zsignalled</code><dd>The program exited with a signal.  After the <code>^Z^Zsignalled</code>, the
+annotation continues:
+
+     <pre class="smallexample">          <var>intro-text</var>
+          ^Z^Zsignal-name
+          <var>name</var>
+          ^Z^Zsignal-name-end
+          <var>middle-text</var>
+          ^Z^Zsignal-string
+          <var>string</var>
+          ^Z^Zsignal-string-end
+          <var>end-text</var>
+</pre>
+     <p class="noindent">where <var>name</var> is the name of the signal, such as <code>SIGILL</code> or
+<code>SIGSEGV</code>, and <var>string</var> is the explanation of the signal, such
+as <code>Illegal Instruction</code> or <code>Segmentation fault</code>. 
+<var>intro-text</var>, <var>middle-text</var>, and <var>end-text</var> are for the
+user's benefit and have no particular format.
+
+     <p><a name="index-signal-annotation-2167"></a><br><dt><code>^Z^Zsignal</code><dd>The syntax of this annotation is just like <code>signalled</code>, but <span class="sc">gdb</span> is
+just saying that the program received the signal, not that it was
+terminated with it.
+
+     <p><a name="index-breakpoint-annotation-2168"></a><br><dt><code>^Z^Zbreakpoint </code><var>number</var><dd>The program hit breakpoint number <var>number</var>.
+
+     <p><a name="index-watchpoint-annotation-2169"></a><br><dt><code>^Z^Zwatchpoint </code><var>number</var><dd>The program hit watchpoint number <var>number</var>. 
+</dl>
+
+   </body></html>
+

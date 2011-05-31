@@ -1,0 +1,71 @@
+<html lang="en">
+<head>
+<title>Raw read/write Functions - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="FR_002dV-Built_002din-Functions.html#FR_002dV-Built_002din-Functions" title="FR-V Built-in Functions">
+<link rel="prev" href="Directly_002dmapped-Media-Functions.html#Directly_002dmapped-Media-Functions" title="Directly-mapped Media Functions">
+<link rel="next" href="Other-Built_002din-Functions.html#Other-Built_002din-Functions" title="Other Built-in Functions">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Raw-read%2fwrite-Functions"></a>
+<a name="Raw-read_002fwrite-Functions"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Other-Built_002din-Functions.html#Other-Built_002din-Functions">Other Built-in Functions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Directly_002dmapped-Media-Functions.html#Directly_002dmapped-Media-Functions">Directly-mapped Media Functions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="FR_002dV-Built_002din-Functions.html#FR_002dV-Built_002din-Functions">FR-V Built-in Functions</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">6.52.5.4 Raw read/write Functions</h5>
+
+<p>This sections describes built-in functions related to read and write
+instructions to access memory.  These functions generate
+<code>membar</code> instructions to flush the I/O load and stores where
+appropriate, as described in Fujitsu's manual described above.
+
+     <dl>
+<dt><code>unsigned char __builtin_read8 (void *</code><var>data</var><code>)</code><br><dt><code>unsigned short __builtin_read16 (void *</code><var>data</var><code>)</code><br><dt><code>unsigned long __builtin_read32 (void *</code><var>data</var><code>)</code><br><dt><code>unsigned long long __builtin_read64 (void *</code><var>data</var><code>)</code>
+<br><dt><code>void __builtin_write8 (void *</code><var>data</var><code>, unsigned char </code><var>datum</var><code>)</code><br><dt><code>void __builtin_write16 (void *</code><var>data</var><code>, unsigned short </code><var>datum</var><code>)</code><br><dt><code>void __builtin_write32 (void *</code><var>data</var><code>, unsigned long </code><var>datum</var><code>)</code><br><dt><code>void __builtin_write64 (void *</code><var>data</var><code>, unsigned long long </code><var>datum</var><code>)</code><dd></dl>
+
+ </body></html>
+

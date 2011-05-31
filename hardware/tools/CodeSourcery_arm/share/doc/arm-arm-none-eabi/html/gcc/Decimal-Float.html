@@ -1,0 +1,100 @@
+<html lang="en">
+<head>
+<title>Decimal Float - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Half_002dPrecision.html#Half_002dPrecision" title="Half-Precision">
+<link rel="next" href="Hex-Floats.html#Hex-Floats" title="Hex Floats">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Decimal-Float"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Hex-Floats.html#Hex-Floats">Hex Floats</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Half_002dPrecision.html#Half_002dPrecision">Half-Precision</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.12 Decimal Floating Types</h3>
+
+<p><a name="index-decimal-floating-types-2236"></a><a name="index-g_t_0040code_007b_005fDecimal32_007d-data-type-2237"></a><a name="index-g_t_0040code_007b_005fDecimal64_007d-data-type-2238"></a><a name="index-g_t_0040code_007b_005fDecimal128_007d-data-type-2239"></a><a name="index-g_t_0040code_007bdf_007d-integer-suffix-2240"></a><a name="index-g_t_0040code_007bdd_007d-integer-suffix-2241"></a><a name="index-g_t_0040code_007bdl_007d-integer-suffix-2242"></a><a name="index-g_t_0040code_007bDF_007d-integer-suffix-2243"></a><a name="index-g_t_0040code_007bDD_007d-integer-suffix-2244"></a><a name="index-g_t_0040code_007bDL_007d-integer-suffix-2245"></a>
+As an extension, the GNU C compiler supports decimal floating types as
+defined in the N1312 draft of ISO/IEC WDTR24732.  Support for decimal
+floating types in GCC will evolve as the draft technical report changes. 
+Calling conventions for any target might also change.  Not all targets
+support decimal floating types.
+
+ <p>The decimal floating types are <code>_Decimal32</code>, <code>_Decimal64</code>, and
+<code>_Decimal128</code>.  They use a radix of ten, unlike the floating types
+<code>float</code>, <code>double</code>, and <code>long double</code> whose radix is not
+specified by the C standard but is usually two.
+
+ <p>Support for decimal floating types includes the arithmetic operators
+add, subtract, multiply, divide; unary arithmetic operators;
+relational operators; equality operators; and conversions to and from
+integer and other floating types.  Use a suffix &lsquo;<samp><span class="samp">df</span></samp>&rsquo; or
+&lsquo;<samp><span class="samp">DF</span></samp>&rsquo; in a literal constant of type <code>_Decimal32</code>, &lsquo;<samp><span class="samp">dd</span></samp>&rsquo;
+or &lsquo;<samp><span class="samp">DD</span></samp>&rsquo; for <code>_Decimal64</code>, and &lsquo;<samp><span class="samp">dl</span></samp>&rsquo; or &lsquo;<samp><span class="samp">DL</span></samp>&rsquo; for
+<code>_Decimal128</code>.
+
+ <p>GCC support of decimal float as specified by the draft technical report
+is incomplete:
+
+     <ul>
+<li>When the value of a decimal floating type cannot be represented in the
+integer type to which it is being converted, the result is undefined
+rather than the result value specified by the draft technical report.
+
+     <li>GCC does not provide the C library functionality associated with
+<samp><span class="file">math.h</span></samp>, <samp><span class="file">fenv.h</span></samp>, <samp><span class="file">stdio.h</span></samp>, <samp><span class="file">stdlib.h</span></samp>, and
+<samp><span class="file">wchar.h</span></samp>, which must come from a separate C library implementation. 
+Because of this the GNU C compiler does not define macro
+<code>__STDC_DEC_FP__</code> to indicate that the implementation conforms to
+the technical report. 
+</ul>
+
+ <p>Types <code>_Decimal32</code>, <code>_Decimal64</code>, and <code>_Decimal128</code>
+are supported by the DWARF2 debug information format.
+
+ </body></html>
+

@@ -1,0 +1,122 @@
+<html lang="en">
+<head>
+<title>Diagnostic Pragmas - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Pragmas.html#Pragmas" title="Pragmas">
+<link rel="prev" href="Weak-Pragmas.html#Weak-Pragmas" title="Weak Pragmas">
+<link rel="next" href="Visibility-Pragmas.html#Visibility-Pragmas" title="Visibility Pragmas">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Diagnostic-Pragmas"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Visibility-Pragmas.html#Visibility-Pragmas">Visibility Pragmas</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Weak-Pragmas.html#Weak-Pragmas">Weak Pragmas</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Pragmas.html#Pragmas">Pragmas</a>
+<hr>
+</div>
+
+<h4 class="subsection">6.54.10 Diagnostic Pragmas</h4>
+
+<p>GCC allows the user to selectively enable or disable certain types of
+diagnostics, and change the kind of the diagnostic.  For example, a
+project's policy might require that all sources compile with
+<samp><span class="option">-Werror</span></samp> but certain files might have exceptions allowing
+specific types of warnings.  Or, a project might selectively enable
+diagnostics and treat them as errors depending on which preprocessor
+macros are defined.
+
+     <dl>
+<dt><code>#pragma GCC diagnostic </code><var>kind</var> <var>option</var><dd><a name="index-pragma_002c-diagnostic-3140"></a>
+Modifies the disposition of a diagnostic.  Note that not all
+diagnostics are modifiable; at the moment only warnings (normally
+controlled by &lsquo;<samp><span class="samp">-W...</span></samp>&rsquo;) can be controlled, and not all of them. 
+Use <samp><span class="option">-fdiagnostics-show-option</span></samp> to determine which diagnostics
+are controllable and which option controls them.
+
+     <p><var>kind</var> is &lsquo;<samp><span class="samp">error</span></samp>&rsquo; to treat this diagnostic as an error,
+&lsquo;<samp><span class="samp">warning</span></samp>&rsquo; to treat it like a warning (even if <samp><span class="option">-Werror</span></samp> is
+in effect), or &lsquo;<samp><span class="samp">ignored</span></samp>&rsquo; if the diagnostic is to be ignored. 
+<var>option</var> is a double quoted string which matches the command line
+option.
+
+     <pre class="example">          #pragma GCC diagnostic warning "-Wformat"
+          #pragma GCC diagnostic error "-Wformat"
+          #pragma GCC diagnostic ignored "-Wformat"
+</pre>
+     <p>Note that these pragmas override any command line options.  Also,
+while it is syntactically valid to put these pragmas anywhere in your
+sources, the only supported location for them is before any data or
+functions are defined.  Doing otherwise may result in unpredictable
+results depending on how the optimizer manages your sources.  If the
+same option is listed multiple times, the last one specified is the
+one that is in effect.  This pragma is not intended to be a general
+purpose replacement for command line options, but for implementing
+strict control over project policies.
+
+ </dl>
+
+ <p>GCC also offers a simple mechanism for printing messages during
+compilation.
+
+     <dl>
+<dt><code>#pragma message </code><var>string</var><dd><a name="index-pragma_002c-diagnostic-3141"></a>
+Prints <var>string</var> as a compiler message on compilation.  The message
+is informational only, and is neither a compilation warning nor an error.
+
+     <pre class="smallexample">          #pragma message "Compiling " __FILE__ "..."
+</pre>
+     <p><var>string</var> may be parenthesized, and is printed with location
+information.  For example,
+
+     <pre class="smallexample">          #define DO_PRAGMA(x) _Pragma (#x)
+          #define TODO(x) DO_PRAGMA(message ("TODO - " #x))
+          
+          TODO(Remember to fix this)
+</pre>
+     <p>prints &lsquo;<samp><span class="samp">/tmp/file.c:4: note: #pragma message:
+TODO - Remember to fix this</span></samp>&rsquo;.
+
+ </dl>
+
+ </body></html>
+

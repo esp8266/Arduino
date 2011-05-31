@@ -1,0 +1,96 @@
+<html lang="en">
+<head>
+<title>Multi-Alternative - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Constraints.html#Constraints" title="Constraints">
+<link rel="prev" href="Simple-Constraints.html#Simple-Constraints" title="Simple Constraints">
+<link rel="next" href="Modifiers.html#Modifiers" title="Modifiers">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Multi-Alternative"></a>
+<a name="Multi_002dAlternative"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Modifiers.html#Modifiers">Modifiers</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Simple-Constraints.html#Simple-Constraints">Simple Constraints</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Constraints.html#Constraints">Constraints</a>
+<hr>
+</div>
+
+<h4 class="subsection">6.40.2 Multiple Alternative Constraints</h4>
+
+<p><a name="index-multiple-alternative-constraints-2567"></a>
+Sometimes a single instruction has multiple alternative sets of possible
+operands.  For example, on the 68000, a logical-or instruction can combine
+register or an immediate value into memory, or it can combine any kind of
+operand into a register; but it cannot combine one memory location into
+another.
+
+ <p>These constraints are represented as multiple alternatives.  An alternative
+can be described by a series of letters for each operand.  The overall
+constraint for an operand is made from the letters for this operand
+from the first alternative, a comma, the letters for this operand from
+the second alternative, a comma, and so on until the last alternative.
+
+<!-- FIXME Is this ? and ! stuff of use in asm()?  If not, hide unless INTERNAL -->
+ <p>If all the operands fit any one alternative, the instruction is valid. 
+Otherwise, for each alternative, the compiler counts how many instructions
+must be added to copy the operands so that that alternative applies. 
+The alternative requiring the least copying is chosen.  If two alternatives
+need the same amount of copying, the one that comes first is chosen. 
+These choices can be altered with the &lsquo;<samp><span class="samp">?</span></samp>&rsquo; and &lsquo;<samp><span class="samp">!</span></samp>&rsquo; characters:
+
+     
+<a name="index-g_t_0040samp_007b_003f_007d-in-constraint-2568"></a>
+<a name="index-question-mark-2569"></a>
+<dl><dt><code>?</code><dd>Disparage slightly the alternative that the &lsquo;<samp><span class="samp">?</span></samp>&rsquo; appears in,
+as a choice when no alternative applies exactly.  The compiler regards
+this alternative as one unit more costly for each &lsquo;<samp><span class="samp">?</span></samp>&rsquo; that appears
+in it.
+
+     <p><a name="index-g_t_0040samp_007b_0021_007d-in-constraint-2570"></a><a name="index-exclamation-point-2571"></a><br><dt><code>!</code><dd>Disparage severely the alternative that the &lsquo;<samp><span class="samp">!</span></samp>&rsquo; appears in. 
+This alternative can still be used if it fits without reloading,
+but if reloading is needed, some other alternative will be used. 
+</dl>
+
+ </body></html>
+

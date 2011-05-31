@@ -1,0 +1,67 @@
+<html lang="en">
+<head>
+<title>copysign - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Math.html#Math" title="Math">
+<link rel="prev" href="cbrt.html#cbrt" title="cbrt">
+<link rel="next" href="cosh.html#cosh" title="cosh">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="copysign"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="cosh.html#cosh">cosh</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="cbrt.html#cbrt">cbrt</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Math.html#Math">Math</a>
+<hr>
+</div>
+
+<h3 class="section">1.12 <code>copysign</code>, <code>copysignf</code>&mdash;sign of <var>y</var>, magnitude of <var>x</var></h3>
+
+<p><a name="index-copysign-33"></a><a name="index-copysignf-34"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double copysign (double <var>x</var>, double <var>y</var>);
+     float copysignf (float <var>x</var>, float <var>y</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>copysign</code> constructs a number with the magnitude (absolute value)
+of its first argument, <var>x</var>, and the sign of its second argument,
+<var>y</var>.
+
+   <p><code>copysignf</code> does the same thing; the two functions differ only in
+the type of their arguments and result.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>copysign</code> returns a <code>double</code> with the magnitude of
+<var>x</var> and the sign of <var>y</var>. 
+<code>copysignf</code> returns a <code>float</code> with the magnitude of
+<var>x</var> and the sign of <var>y</var>.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>copysign</code> is not required by either ANSI C or the System V Interface
+Definition (Issue 2).
+
+   <p><br>
+
+   </body></html>
+

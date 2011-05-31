@@ -1,0 +1,178 @@
+<html lang="en">
+<head>
+<title>ar scripts - GNU Binary Utilities</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GNU Binary Utilities">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="ar.html#ar" title="ar">
+<link rel="prev" href="ar-cmdline.html#ar-cmdline" title="ar cmdline">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="ar-scripts"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="ar-cmdline.html#ar-cmdline">ar cmdline</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="ar.html#ar">ar</a>
+<hr>
+</div>
+
+<h3 class="section">1.2 Controlling <samp><span class="command">ar</span></samp> with a Script</h3>
+
+<pre class="smallexample">     ar -M [ &lt;<var>script</var> ]
+</pre>
+   <p><a name="index-MRI-compatibility_002c-_0040command_007bar_007d-30"></a><a name="index-scripts_002c-_0040command_007bar_007d-31"></a>If you use the single command-line option &lsquo;<samp><span class="samp">-M</span></samp>&rsquo; with <samp><span class="command">ar</span></samp>, you
+can control its operation with a rudimentary command language.  This
+form of <samp><span class="command">ar</span></samp> operates interactively if standard input is coming
+directly from a terminal.  During interactive use, <samp><span class="command">ar</span></samp> prompts for
+input (the prompt is &lsquo;<samp><span class="samp">AR &gt;</span></samp>&rsquo;), and continues executing even after
+errors.  If you redirect standard input to a script file, no prompts are
+issued, and <samp><span class="command">ar</span></samp> abandons execution (with a nonzero exit code)
+on any error.
+
+   <p>The <samp><span class="command">ar</span></samp> command language is <em>not</em> designed to be equivalent
+to the command-line options; in fact, it provides somewhat less control
+over archives.  The only purpose of the command language is to ease the
+transition to <span class="sc">gnu</span> <samp><span class="command">ar</span></samp> for developers who already have scripts
+written for the MRI &ldquo;librarian&rdquo; program.
+
+   <p>The syntax for the <samp><span class="command">ar</span></samp> command language is straightforward:
+     <ul>
+<li>commands are recognized in upper or lower case; for example, <code>LIST</code>
+is the same as <code>list</code>.  In the following descriptions, commands are
+shown in upper case for clarity.
+
+     <li>a single command may appear on each line; it is the first word on the
+line.
+
+     <li>empty lines are allowed, and have no effect.
+
+     <li>comments are allowed; text after either of the characters &lsquo;<samp><span class="samp">*</span></samp>&rsquo;
+or &lsquo;<samp><span class="samp">;</span></samp>&rsquo; is ignored.
+
+     <li>Whenever you use a list of names as part of the argument to an <samp><span class="command">ar</span></samp>
+command, you can separate the individual names with either commas or
+blanks.  Commas are shown in the explanations below, for clarity.
+
+     <li>&lsquo;<samp><span class="samp">+</span></samp>&rsquo; is used as a line continuation character; if &lsquo;<samp><span class="samp">+</span></samp>&rsquo; appears
+at the end of a line, the text on the following line is considered part
+of the current command. 
+</ul>
+
+   <p>Here are the commands you can use in <samp><span class="command">ar</span></samp> scripts, or when using
+<samp><span class="command">ar</span></samp> interactively.  Three of them have special significance:
+
+   <p><code>OPEN</code> or <code>CREATE</code> specify a <dfn>current archive</dfn>, which is
+a temporary file required for most of the other commands.
+
+   <p><code>SAVE</code> commits the changes so far specified by the script.  Prior
+to <code>SAVE</code>, commands affect only the temporary copy of the current
+archive.
+
+     <dl>
+<dt><code>ADDLIB </code><var>archive</var><dt><code>ADDLIB </code><var>archive</var><code> (</code><var>module</var><code>, </code><var>module</var><code>, ... </code><var>module</var><code>)</code><dd>Add all the contents of <var>archive</var> (or, if specified, each named
+<var>module</var> from <var>archive</var>) to the current archive.
+
+     <p>Requires prior use of <code>OPEN</code> or <code>CREATE</code>.
+
+     <br><dt><code>ADDMOD </code><var>member</var><code>, </code><var>member</var><code>, ... </code><var>member</var><dd><!-- FIXME! w/Replacement??  If so, like "ar r @var{archive} @var{names}" -->
+<!-- else like "ar q..." -->
+Add each named <var>member</var> as a module in the current archive.
+
+     <p>Requires prior use of <code>OPEN</code> or <code>CREATE</code>.
+
+     <br><dt><code>CLEAR</code><dd>Discard the contents of the current archive, canceling the effect of
+any operations since the last <code>SAVE</code>.  May be executed (with no
+effect) even if  no current archive is specified.
+
+     <br><dt><code>CREATE </code><var>archive</var><dd>Creates an archive, and makes it the current archive (required for many
+other commands).  The new archive is created with a temporary name; it
+is not actually saved as <var>archive</var> until you use <code>SAVE</code>. 
+You can overwrite existing archives; similarly, the contents of any
+existing file named <var>archive</var> will not be destroyed until <code>SAVE</code>.
+
+     <br><dt><code>DELETE </code><var>module</var><code>, </code><var>module</var><code>, ... </code><var>module</var><dd>Delete each listed <var>module</var> from the current archive; equivalent to
+&lsquo;<samp><span class="samp">ar -d </span><var>archive</var> <var>module</var><span class="samp"> ... </span><var>module</var></samp>&rsquo;.
+
+     <p>Requires prior use of <code>OPEN</code> or <code>CREATE</code>.
+
+     <br><dt><code>DIRECTORY </code><var>archive</var><code> (</code><var>module</var><code>, ... </code><var>module</var><code>)</code><dt><code>DIRECTORY </code><var>archive</var><code> (</code><var>module</var><code>, ... </code><var>module</var><code>) </code><var>outputfile</var><dd>List each named <var>module</var> present in <var>archive</var>.  The separate
+command <code>VERBOSE</code> specifies the form of the output: when verbose
+output is off, output is like that of &lsquo;<samp><span class="samp">ar -t </span><var>archive</var>
+<var>module</var><span class="samp">...</span></samp>&rsquo;.  When verbose output is on, the listing is like
+&lsquo;<samp><span class="samp">ar -tv </span><var>archive</var> <var>module</var><span class="samp">...</span></samp>&rsquo;.
+
+     <p>Output normally goes to the standard output stream; however, if you
+specify <var>outputfile</var> as a final argument, <samp><span class="command">ar</span></samp> directs the
+output to that file.
+
+     <br><dt><code>END</code><dd>Exit from <samp><span class="command">ar</span></samp>, with a <code>0</code> exit code to indicate successful
+completion.  This command does not save the output file; if you have
+changed the current archive since the last <code>SAVE</code> command, those
+changes are lost.
+
+     <br><dt><code>EXTRACT </code><var>module</var><code>, </code><var>module</var><code>, ... </code><var>module</var><dd>Extract each named <var>module</var> from the current archive, writing them
+into the current directory as separate files.  Equivalent to &lsquo;<samp><span class="samp">ar -x
+</span><var>archive</var> <var>module</var><span class="samp">...</span></samp>&rsquo;.
+
+     <p>Requires prior use of <code>OPEN</code> or <code>CREATE</code>.
+
+     <br><dt><code>LIST</code><dd>Display full contents of the current archive, in &ldquo;verbose&rdquo; style
+regardless of the state of <code>VERBOSE</code>.  The effect is like &lsquo;<samp><span class="samp">ar
+tv </span><var>archive</var></samp>&rsquo;.  (This single command is a <span class="sc">gnu</span> <samp><span class="command">ar</span></samp>
+enhancement, rather than present for MRI compatibility.)
+
+     <p>Requires prior use of <code>OPEN</code> or <code>CREATE</code>.
+
+     <br><dt><code>OPEN </code><var>archive</var><dd>Opens an existing archive for use as the current archive (required for
+many other commands).  Any changes as the result of subsequent commands
+will not actually affect <var>archive</var> until you next use <code>SAVE</code>.
+
+     <br><dt><code>REPLACE </code><var>module</var><code>, </code><var>module</var><code>, ... </code><var>module</var><dd>In the current archive, replace each existing <var>module</var> (named in
+the <code>REPLACE</code> arguments) from files in the current working directory. 
+To execute this command without errors, both the file, and the module in
+the current archive, must exist.
+
+     <p>Requires prior use of <code>OPEN</code> or <code>CREATE</code>.
+
+     <br><dt><code>VERBOSE</code><dd>Toggle an internal flag governing the output from <code>DIRECTORY</code>. 
+When the flag is on, <code>DIRECTORY</code> output matches output from
+&lsquo;<samp><span class="samp">ar -tv </span></samp>&rsquo;<small class="dots">...</small>.
+
+     <br><dt><code>SAVE</code><dd>Commit your changes to the current archive, and actually save it as a
+file with the name specified in the last <code>CREATE</code> or <code>OPEN</code>
+command.
+
+     <p>Requires prior use of <code>OPEN</code> or <code>CREATE</code>.
+
+   </dl>
+
+   </body></html>
+

@@ -1,0 +1,92 @@
+<html lang="en">
+<head>
+<title>mbsrtowcs - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdlib.html#Stdlib" title="Stdlib">
+<link rel="prev" href="_005f_005fmalloc_005flock.html#g_t_005f_005fmalloc_005flock" title="__malloc_lock">
+<link rel="next" href="mbstowcs.html#mbstowcs" title="mbstowcs">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="mbsrtowcs"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="mbstowcs.html#mbstowcs">mbstowcs</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="_005f_005fmalloc_005flock.html#g_t_005f_005fmalloc_005flock">__malloc_lock</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdlib.html#Stdlib">Stdlib</a>
+<hr>
+</div>
+
+<h3 class="section">2.27 <code>mbsrtowcs</code>, <code>mbsnrtowcs</code>&mdash;convert a character string to a wide-character string</h3>
+
+<p><a name="index-mbsrtowcs-58"></a><a name="index-g_t_005fmbsrtowcs_005fr-59"></a><a name="index-mbsnrtowcs-60"></a><a name="index-g_t_005fmbsnrtowcs_005fr-61"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;wchar.h&gt;
+     size_t mbsrtowcs(wchar_t *<var>dst</var>, const char **<var>src</var>, size_t <var>len</var>,
+         mbstate_t *<var>ps</var>);
+     
+     #include &lt;wchar.h&gt;
+     size_t _mbsrtowcs_r(struct _reent *<var>ptr</var>, wchar_t *<var>dst</var>,
+         const char **<var>src</var>, size_t <var>len</var>,
+         mbstate_t *<var>ps</var>);
+     
+     #include &lt;wchar.h&gt;
+     size_t mbsnrtowcs(wchar_t *<var>dst</var>, const char **<var>src</var>,
+         size_t <var>nms</var>, size_t <var>len</var>, mbstate_t *<var>ps</var>);
+     
+     #include &lt;wchar.h&gt;
+     size_t _mbsnrtowcs_r(struct _reent *<var>ptr</var>, wchar_t *<var>dst</var>,
+         const char **<var>src</var>, size_t <var>nms</var>,
+         size_t <var>len</var>, mbstate_t *<var>ps</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+The <code>mbsrtowcs</code> function converts a sequence of multibyte characters
+pointed to indirectly by <var>src</var> into a sequence of corresponding wide
+characters and stores at most <var>len</var> of them in the wchar_t array pointed
+to by <var>dst</var>, until it encounters a terminating null character ('\0').
+
+   <p>If <var>dst</var> is NULL, no characters are stored.
+
+   <p>If <var>dst</var> is not NULL, the pointer pointed to by <var>src</var> is updated to point
+to the character after the one that conversion stopped at.  If conversion
+stops because a null character is encountered, *<var>src</var> is set to NULL.
+
+   <p>The mbstate_t argument, <var>ps</var>, is used to keep track of the shift state.  If
+it is NULL, <code>mbsrtowcs</code> uses an internal, static mbstate_t object, which
+is initialized to the initial conversion state at program startup.
+
+   <p>The <code>mbsnrtowcs</code> function behaves identically to <code>mbsrtowcs</code>, except that
+conversion stops after reading at most <var>nms</var> bytes from the buffer pointed
+to by <var>src</var>.
+
+   <p><br>
+<strong>Returns</strong><br>
+The <code>mbsrtowcs</code> and <code>mbsnrtowcs</code> functions return the number of wide
+characters stored in the array pointed to by <var>dst</var> if successful, otherwise
+it returns (size_t)-1.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>mbsrtowcs</code> is defined by the C99 standard. 
+<code>mbsnrtowcs</code> is defined by the POSIX.1-2008 standard.
+
+   <p><br>
+
+   </body></html>
+

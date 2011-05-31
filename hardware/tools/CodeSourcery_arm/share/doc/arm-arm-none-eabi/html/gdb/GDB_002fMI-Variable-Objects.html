@@ -1,0 +1,767 @@
+<html lang="en">
+<head>
+<title>GDB/MI Variable Objects - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="GDB_002fMI.html#GDB_002fMI" title="GDB/MI">
+<link rel="prev" href="GDB_002fMI-Stack-Manipulation.html#GDB_002fMI-Stack-Manipulation" title="GDB/MI Stack Manipulation">
+<link rel="next" href="GDB_002fMI-Data-Manipulation.html#GDB_002fMI-Data-Manipulation" title="GDB/MI Data Manipulation">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="GDB%2fMI-Variable-Objects"></a>
+<a name="GDB_002fMI-Variable-Objects"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="GDB_002fMI-Data-Manipulation.html#GDB_002fMI-Data-Manipulation">GDB/MI Data Manipulation</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="GDB_002fMI-Stack-Manipulation.html#GDB_002fMI-Stack-Manipulation">GDB/MI Stack Manipulation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="GDB_002fMI.html#GDB_002fMI">GDB/MI</a>
+<hr>
+</div>
+
+<h3 class="section">27.13 <span class="sc">gdb/mi</span> Variable Objects</h3>
+
+<h4 class="subheading">Introduction to Variable Objects</h4>
+
+<p><a name="index-variable-objects-in-_0040sc_007bgdb_002fmi_007d-2069"></a>
+Variable objects are "object-oriented" MI interface for examining and
+changing values of expressions.  Unlike some other MI interfaces that
+work with expressions, variable objects are specifically designed for
+simple and efficient presentation in the frontend.  A variable object
+is identified by string name.  When a variable object is created, the
+frontend specifies the expression for that variable object.  The
+expression can be a simple variable, or it can be an arbitrary complex
+expression, and can even involve CPU registers.  After creating a
+variable object, the frontend can invoke other variable object
+operations&mdash;for example to obtain or change the value of a variable
+object, or to change display format.
+
+   <p>Variable objects have hierarchical tree structure.  Any variable object
+that corresponds to a composite type, such as structure in C, has
+a number of child variable objects, for example corresponding to each
+element of a structure.  A child variable object can itself have
+children, recursively.  Recursion ends when we reach
+leaf variable objects, which always have built-in types.  Child variable
+objects are created only by explicit request, so if a frontend
+is not interested in the children of a particular variable object, no
+child will be created.
+
+   <p>For a leaf variable object it is possible to obtain its value as a
+string, or set the value from a string.  String value can be also
+obtained for a non-leaf variable object, but it's generally a string
+that only indicates the type of the object, and does not list its
+contents.  Assignment to a non-leaf variable object is not allowed.
+
+   <p>A frontend does not need to read the values of all variable objects each time
+the program stops.  Instead, MI provides an update command that lists all
+variable objects whose values has changed since the last update
+operation.  This considerably reduces the amount of data that must
+be transferred to the frontend.  As noted above, children variable
+objects are created on demand, and only leaf variable objects have a
+real value.  As result, gdb will read target memory only for leaf
+variables that frontend has created.
+
+   <p>The automatic update is not always desirable.  For example, a frontend
+might want to keep a value of some expression for future reference,
+and never update it.  For another example,  fetching memory is
+relatively slow for embedded targets, so a frontend might want
+to disable automatic update for the variables that are either not
+visible on the screen, or &ldquo;closed&rdquo;.  This is possible using so
+called &ldquo;frozen variable objects&rdquo;.  Such variable objects are never
+implicitly updated.
+
+   <p>Variable objects can be either <dfn>fixed</dfn> or <dfn>floating</dfn>.  For the
+fixed variable object, the expression is parsed when the variable
+object is created, including associating identifiers to specific
+variables.  The meaning of expression never changes.  For a floating
+variable object the values of variables whose names appear in the
+expressions are re-evaluated every time in the context of the current
+frame.  Consider this example:
+
+<pre class="smallexample">     void do_work(...)
+     {
+             struct work_state state;
+     
+             if (...)
+                do_work(...);
+     }
+</pre>
+   <p>If a fixed variable object for the <code>state</code> variable is created in
+this function, and we enter the recursive call, the the variable
+object will report the value of <code>state</code> in the top-level
+<code>do_work</code> invocation.  On the other hand, a floating variable
+object will report the value of <code>state</code> in the current frame.
+
+   <p>If an expression specified when creating a fixed variable object
+refers to a local variable, the variable object becomes bound to the
+thread and frame in which the variable object is created.  When such
+variable object is updated, <span class="sc">gdb</span> makes sure that the
+thread/frame combination the variable object is bound to still exists,
+and re-evaluates the variable object in context of that thread/frame.
+
+   <p>The following is the complete set of <span class="sc">gdb/mi</span> operations defined to
+access this functionality:
+
+   <p><table summary=""><tr align="left"><td valign="top" width="40%"><strong>Operation</strong>
+</td><td valign="top" width="60%"><strong>Description</strong>
+
+<p><br></td></tr><tr align="left"><td valign="top" width="40%"><code>-enable-pretty-printing</code>
+</td><td valign="top" width="60%">enable Python-based pretty-printing
+<br></td></tr><tr align="left"><td valign="top" width="40%"><code>-var-create</code>
+</td><td valign="top" width="60%">create a variable object
+<br></td></tr><tr align="left"><td valign="top" width="40%"><code>-var-delete</code>
+</td><td valign="top" width="60%">delete the variable object and/or its children
+<br></td></tr><tr align="left"><td valign="top" width="40%"><code>-var-set-format</code>
+</td><td valign="top" width="60%">set the display format of this variable
+<br></td></tr><tr align="left"><td valign="top" width="40%"><code>-var-show-format</code>
+</td><td valign="top" width="60%">show the display format of this variable
+<br></td></tr><tr align="left"><td valign="top" width="40%"><code>-var-info-num-children</code>
+</td><td valign="top" width="60%">tells how many children this object has
+<br></td></tr><tr align="left"><td valign="top" width="40%"><code>-var-list-children</code>
+</td><td valign="top" width="60%">return a list of the object's children
+<br></td></tr><tr align="left"><td valign="top" width="40%"><code>-var-info-type</code>
+</td><td valign="top" width="60%">show the type of this variable object
+<br></td></tr><tr align="left"><td valign="top" width="40%"><code>-var-info-expression</code>
+</td><td valign="top" width="60%">print parent-relative expression that this variable object represents
+<br></td></tr><tr align="left"><td valign="top" width="40%"><code>-var-info-path-expression</code>
+</td><td valign="top" width="60%">print full expression that this variable object represents
+<br></td></tr><tr align="left"><td valign="top" width="40%"><code>-var-show-attributes</code>
+</td><td valign="top" width="60%">is this variable editable? does it exist here? 
+<br></td></tr><tr align="left"><td valign="top" width="40%"><code>-var-evaluate-expression</code>
+</td><td valign="top" width="60%">get the value of this variable
+<br></td></tr><tr align="left"><td valign="top" width="40%"><code>-var-assign</code>
+</td><td valign="top" width="60%">set the value of this variable
+<br></td></tr><tr align="left"><td valign="top" width="40%"><code>-var-update</code>
+</td><td valign="top" width="60%">update the variable and its children
+<br></td></tr><tr align="left"><td valign="top" width="40%"><code>-var-set-frozen</code>
+</td><td valign="top" width="60%">set frozeness attribute
+<br></td></tr><tr align="left"><td valign="top" width="40%"><code>-var-set-update-range</code>
+</td><td valign="top" width="60%">set range of children to display on update
+   <br></td></tr></table>
+
+   <p>In the next subsection we describe each operation in detail and suggest
+how it can be used.
+
+<h4 class="subheading">Description And Use of Operations on Variable Objects</h4>
+
+<h4 class="subheading">The <code>-enable-pretty-printing</code> Command</h4>
+
+<p><a name="index-g_t_002denable_002dpretty_002dprinting-2070"></a>
+<pre class="smallexample">     -enable-pretty-printing
+</pre>
+   <p><span class="sc">gdb</span> allows Python-based visualizers to affect the output of the
+MI variable object commands.  However, because there was no way to
+implement this in a fully backward-compatible way, a front end must
+request that this functionality be enabled.
+
+   <p>Once enabled, this feature cannot be disabled.
+
+   <p>Note that if Python support has not been compiled into <span class="sc">gdb</span>,
+this command will still succeed (and do nothing).
+
+   <p>This feature is currently (as of <span class="sc">gdb</span> 7.0) experimental, and
+may work differently in future versions of <span class="sc">gdb</span>.
+
+<h4 class="subheading">The <code>-var-create</code> Command</h4>
+
+<p><a name="index-g_t_002dvar_002dcreate-2071"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -var-create {<var>name</var> | "-"}
+         {<var>frame-addr</var> | "*" | "@"} <var>expression</var>
+</pre>
+   <p>This operation creates a variable object, which allows the monitoring of
+a variable, the result of an expression, a memory cell or a CPU
+register.
+
+   <p>The <var>name</var> parameter is the string by which the object can be
+referenced.  It must be unique.  If &lsquo;<samp><span class="samp">-</span></samp>&rsquo; is specified, the varobj
+system will generate a string &ldquo;varNNNNNN&rdquo; automatically.  It will be
+unique provided that one does not specify <var>name</var> of that format. 
+The command fails if a duplicate name is found.
+
+   <p>The frame under which the expression should be evaluated can be
+specified by <var>frame-addr</var>.  A &lsquo;<samp><span class="samp">*</span></samp>&rsquo; indicates that the current
+frame should be used.  A &lsquo;<samp><span class="samp">@</span></samp>&rsquo; indicates that a floating variable
+object must be created.
+
+   <p><var>expression</var> is any expression valid on the current language set (must not
+begin with a &lsquo;<samp><span class="samp">*</span></samp>&rsquo;), or one of the following:
+
+     <ul>
+<li>&lsquo;<samp><span class="samp">*</span><var>addr</var></samp>&rsquo;, where <var>addr</var> is the address of a memory cell
+
+     <li>&lsquo;<samp><span class="samp">*</span><var>addr</var><span class="samp">-</span><var>addr</var></samp>&rsquo; &mdash; a memory address range (TBD)
+
+     <li>&lsquo;<samp><span class="samp">$</span><var>regname</var></samp>&rsquo; &mdash; a CPU register name
+</ul>
+
+   <p><a name="index-dynamic-varobj-2072"></a>A varobj's contents may be provided by a Python-based pretty-printer.  In this
+case the varobj is known as a <dfn>dynamic varobj</dfn>.  Dynamic varobjs
+have slightly different semantics in some cases.  If the
+<code>-enable-pretty-printing</code> command is not sent, then <span class="sc">gdb</span>
+will never create a dynamic varobj.  This ensures backward
+compatibility for existing clients.
+
+<h5 class="subsubheading">Result</h5>
+
+<p>This operation returns attributes of the newly-created varobj.  These
+are:
+
+     <dl>
+<dt>&lsquo;<samp><span class="samp">name</span></samp>&rsquo;<dd>The name of the varobj.
+
+     <br><dt>&lsquo;<samp><span class="samp">numchild</span></samp>&rsquo;<dd>The number of children of the varobj.  This number is not necessarily
+reliable for a dynamic varobj.  Instead, you must examine the
+&lsquo;<samp><span class="samp">has_more</span></samp>&rsquo; attribute.
+
+     <br><dt>&lsquo;<samp><span class="samp">value</span></samp>&rsquo;<dd>The varobj's scalar value.  For a varobj whose type is some sort of
+aggregate (e.g., a <code>struct</code>), or for a dynamic varobj, this value
+will not be interesting.
+
+     <br><dt>&lsquo;<samp><span class="samp">type</span></samp>&rsquo;<dd>The varobj's type.  This is a string representation of the type, as
+would be printed by the <span class="sc">gdb</span> CLI.
+
+     <br><dt>&lsquo;<samp><span class="samp">thread-id</span></samp>&rsquo;<dd>If a variable object is bound to a specific thread, then this is the
+thread's identifier.
+
+     <br><dt>&lsquo;<samp><span class="samp">has_more</span></samp>&rsquo;<dd>For a dynamic varobj, this indicates whether there appear to be any
+children available.  For a non-dynamic varobj, this will be 0.
+
+     <br><dt>&lsquo;<samp><span class="samp">dynamic</span></samp>&rsquo;<dd>This attribute will be present and have the value &lsquo;<samp><span class="samp">1</span></samp>&rsquo; if the
+varobj is a dynamic varobj.  If the varobj is not a dynamic varobj,
+then this attribute will not be present.
+
+     <br><dt>&lsquo;<samp><span class="samp">displayhint</span></samp>&rsquo;<dd>A dynamic varobj can supply a display hint to the front end.  The
+value comes directly from the Python pretty-printer object's
+<code>display_hint</code> method.  See <a href="Pretty-Printing-API.html#Pretty-Printing-API">Pretty Printing API</a>.
+
+     <br><dt>&lsquo;<samp><span class="samp">has-side-effects</span></samp>&rsquo;<dd>If updating this varobj, or any of its children, is known to have
+a side effect on the target (such as modifying the state of a
+hardware device), this will be 1.  Otherwise, it will be omitted. 
+If it is this varobj (rather than just a child) which has side effects,
+then the varobj will be created frozen.  Otherwise, the varobj
+may be safely updated but its frozen children will be skipped
+by default.  Care should be taken passing this varobj's expression
+to e.g. <code>-data-evaluate-expression</code>. 
+</dl>
+
+   <p>Typical output will look like this:
+
+<pre class="smallexample">      name="<var>name</var>",numchild="<var>N</var>",type="<var>type</var>",thread-id="<var>M</var>",
+       has_more="<var>has_more</var>"
+</pre>
+   <h4 class="subheading">The <code>-var-delete</code> Command</h4>
+
+<p><a name="index-g_t_002dvar_002ddelete-2073"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -var-delete [ -c ] <var>name</var>
+</pre>
+   <p>Deletes a previously created variable object and all of its children. 
+With the &lsquo;<samp><span class="samp">-c</span></samp>&rsquo; option, just deletes the children.
+
+   <p>Returns an error if the object <var>name</var> is not found.
+
+<h4 class="subheading">The <code>-var-set-format</code> Command</h4>
+
+<p><a name="index-g_t_002dvar_002dset_002dformat-2074"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -var-set-format <var>name</var> <var>format-spec</var>
+</pre>
+   <p>Sets the output format for the value of the object <var>name</var> to be
+<var>format-spec</var>.
+
+   <p><a name="g_t_002dvar_002dset_002dformat"></a>The syntax for the <var>format-spec</var> is as follows:
+
+<pre class="smallexample">      <var>format-spec</var> ==&gt;
+      {binary | decimal | hexadecimal | octal | natural}
+</pre>
+   <p>The natural format is the default format choosen automatically
+based on the variable type (like decimal for an <code>int</code>, hex
+for pointers, etc.).
+
+   <p>For a variable with children, the format is set only on the
+variable itself, and the children are not affected.
+
+<h4 class="subheading">The <code>-var-show-format</code> Command</h4>
+
+<p><a name="index-g_t_002dvar_002dshow_002dformat-2075"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -var-show-format <var>name</var>
+</pre>
+   <p>Returns the format used to display the value of the object <var>name</var>.
+
+<pre class="smallexample">      <var>format</var> ==&gt;
+      <var>format-spec</var>
+</pre>
+   <h4 class="subheading">The <code>-var-info-num-children</code> Command</h4>
+
+<p><a name="index-g_t_002dvar_002dinfo_002dnum_002dchildren-2076"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -var-info-num-children <var>name</var>
+</pre>
+   <p>Returns the number of children of a variable object <var>name</var>:
+
+<pre class="smallexample">      numchild=<var>n</var>
+</pre>
+   <p>Note that this number is not completely reliable for a dynamic varobj. 
+It will return the current number of children, but more children may
+be available.
+
+<h4 class="subheading">The <code>-var-list-children</code> Command</h4>
+
+<p><a name="index-g_t_002dvar_002dlist_002dchildren-2077"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -var-list-children [<var>print-values</var>] <var>name</var> [<var>from</var> <var>to</var>]
+</pre>
+   <p><a name="g_t_002dvar_002dlist_002dchildren"></a>Return a list of the children of the specified variable object and
+create variable objects for them, if they do not already exist.  With
+a single argument or if <var>print-values</var> has a value of 0 or
+<code>--no-values</code>, print only the names of the variables; if
+<var>print-values</var> is 1 or <code>--all-values</code>, also print their
+values; and if it is 2 or <code>--simple-values</code> print the name and
+value for simple data types and just the name for arrays, structures
+and unions.
+
+   <p><var>from</var> and <var>to</var>, if specified, indicate the range of children
+to report.  If <var>from</var> or <var>to</var> is less than zero, the range is
+reset and all children will be reported.  Otherwise, children starting
+at <var>from</var> (zero-based) and up to and excluding <var>to</var> will be
+reported.
+
+   <p>If a child range is requested, it will only affect the current call to
+<code>-var-list-children</code>, but not future calls to <code>-var-update</code>. 
+For this, you must instead use <code>-var-set-update-range</code>.  The
+intent of this approach is to enable a front end to implement any
+update approach it likes; for example, scrolling a view may cause the
+front end to request more children with <code>-var-list-children</code>, and
+then the front end could call <code>-var-set-update-range</code> with a
+different range to ensure that future updates are restricted to just
+the visible items.
+
+   <p>For each child the following results are returned:
+
+     <dl>
+<dt><var>name</var><dd>Name of the variable object created for this child.
+
+     <br><dt><var>exp</var><dd>The expression to be shown to the user by the front end to designate this child. 
+For example this may be the name of a structure member.
+
+     <p>For a dynamic varobj, this value cannot be used to form an
+expression.  There is no way to do this at all with a dynamic varobj.
+
+     <p>For C/C<tt>++</tt> structures there are several pseudo children returned to
+designate access qualifiers.  For these pseudo children <var>exp</var> is
+&lsquo;<samp><span class="samp">public</span></samp>&rsquo;, &lsquo;<samp><span class="samp">private</span></samp>&rsquo;, or &lsquo;<samp><span class="samp">protected</span></samp>&rsquo;.  In this case the
+type and value are not present.
+
+     <p>A dynamic varobj will not report the access qualifying
+pseudo-children, regardless of the language.  This information is not
+available at all with a dynamic varobj.
+
+     <br><dt><var>numchild</var><dd>Number of children this child has.  For a dynamic varobj, this will be
+0.
+
+     <br><dt><var>type</var><dd>The type of the child.
+
+     <br><dt><var>value</var><dd>If values were requested, this is the value.
+
+     <br><dt><var>thread-id</var><dd>If this variable object is associated with a thread, this is the thread id. 
+Otherwise this result is not present.
+
+     <br><dt><var>frozen</var><dd>If the variable object is frozen, this variable will be present with a value of 1. 
+</dl>
+
+   <p>The result may have its own attributes:
+
+     <dl>
+<dt>&lsquo;<samp><span class="samp">displayhint</span></samp>&rsquo;<dd>A dynamic varobj can supply a display hint to the front end.  The
+value comes directly from the Python pretty-printer object's
+<code>display_hint</code> method.  See <a href="Pretty-Printing-API.html#Pretty-Printing-API">Pretty Printing API</a>.
+
+     <br><dt>&lsquo;<samp><span class="samp">has_more</span></samp>&rsquo;<dd>This is an integer attribute which is nonzero if there are children
+remaining after the end of the selected range. 
+</dl>
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+      -var-list-children n
+      ^done,numchild=<var>n</var>,children=[child={name=<var>name</var>,exp=<var>exp</var>,
+      numchild=<var>n</var>,type=<var>type</var>},<span class="roman">(repeats N times)</span>]
+     (gdb)
+      -var-list-children --all-values n
+      ^done,numchild=<var>n</var>,children=[child={name=<var>name</var>,exp=<var>exp</var>,
+      numchild=<var>n</var>,value=<var>value</var>,type=<var>type</var>},<span class="roman">(repeats N times)</span>]
+</pre>
+<h4 class="subheading">The <code>-var-info-type</code> Command</h4>
+
+<p><a name="index-g_t_002dvar_002dinfo_002dtype-2078"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -var-info-type <var>name</var>
+</pre>
+   <p>Returns the type of the specified variable <var>name</var>.  The type is
+returned as a string in the same format as it is output by the
+<span class="sc">gdb</span> CLI:
+
+<pre class="smallexample">      type=<var>typename</var>
+</pre>
+   <h4 class="subheading">The <code>-var-info-expression</code> Command</h4>
+
+<p><a name="index-g_t_002dvar_002dinfo_002dexpression-2079"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -var-info-expression <var>name</var>
+</pre>
+   <p>Returns a string that is suitable for presenting this
+variable object in user interface.  The string is generally
+not valid expression in the current language, and cannot be evaluated.
+
+   <p>For example, if <code>a</code> is an array, and variable object
+<code>A</code> was created for <code>a</code>, then we'll get this output:
+
+<pre class="smallexample">     (gdb) -var-info-expression A.1
+     ^done,lang="C",exp="1"
+</pre>
+   <p class="noindent">Here, the values of <code>lang</code> can be <code>{"C" | "C++" | "Java"}</code>.
+
+   <p>Note that the output of the <code>-var-list-children</code> command also
+includes those expressions, so the <code>-var-info-expression</code> command
+is of limited use.
+
+<h4 class="subheading">The <code>-var-info-path-expression</code> Command</h4>
+
+<p><a name="index-g_t_002dvar_002dinfo_002dpath_002dexpression-2080"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -var-info-path-expression <var>name</var>
+</pre>
+   <p>Returns an expression that can be evaluated in the current
+context and will yield the same value that a variable object has. 
+Compare this with the <code>-var-info-expression</code> command, which
+result can be used only for UI presentation.  Typical use of
+the <code>-var-info-path-expression</code> command is creating a
+watchpoint from a variable object.
+
+   <p>This command is currently not valid for children of a dynamic varobj,
+and will give an error when invoked on one.
+
+   <p>For example, suppose <code>C</code> is a C<tt>++</tt> class, derived from class
+<code>Base</code>, and that the <code>Base</code> class has a member called
+<code>m_size</code>.  Assume a variable <code>c</code> is has the type of
+<code>C</code> and a variable object <code>C</code> was created for variable
+<code>c</code>.  Then, we'll get this output:
+<pre class="smallexample">     (gdb) -var-info-path-expression C.Base.public.m_size
+     ^done,path_expr=((Base)c).m_size)
+</pre>
+   <h4 class="subheading">The <code>-var-show-attributes</code> Command</h4>
+
+<p><a name="index-g_t_002dvar_002dshow_002dattributes-2081"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -var-show-attributes <var>name</var>
+</pre>
+   <p>List attributes of the specified variable object <var>name</var>:
+
+<pre class="smallexample">      status=<var>attr</var> [ ( ,<var>attr</var> )* ]
+</pre>
+   <p class="noindent">where <var>attr</var> is <code>{ { editable | noneditable } | TBD }</code>.
+
+<h4 class="subheading">The <code>-var-evaluate-expression</code> Command</h4>
+
+<p><a name="index-g_t_002dvar_002devaluate_002dexpression-2082"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -var-evaluate-expression [-f <var>format-spec</var>] <var>name</var>
+</pre>
+   <p>Evaluates the expression that is represented by the specified variable
+object and returns its value as a string.  The format of the string
+can be specified with the &lsquo;<samp><span class="samp">-f</span></samp>&rsquo; option.  The possible values of
+this option are the same as for <code>-var-set-format</code>
+(see <a href="_002dvar_002dset_002dformat.html#g_t_002dvar_002dset_002dformat">-var-set-format</a>).  If the &lsquo;<samp><span class="samp">-f</span></samp>&rsquo; option is not specified,
+the current display format will be used.  The current display format
+can be changed using the <code>-var-set-format</code> command.
+
+<pre class="smallexample">      value=<var>value</var>
+</pre>
+   <p>Note that one must invoke <code>-var-list-children</code> for a variable
+before the value of a child variable can be evaluated.
+
+<h4 class="subheading">The <code>-var-assign</code> Command</h4>
+
+<p><a name="index-g_t_002dvar_002dassign-2083"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -var-assign <var>name</var> <var>expression</var>
+</pre>
+   <p>Assigns the value of <var>expression</var> to the variable object specified
+by <var>name</var>.  The object must be &lsquo;<samp><span class="samp">editable</span></samp>&rsquo;.  If the variable's
+value is altered by the assign, the variable will show up in any
+subsequent <code>-var-update</code> list.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -var-assign var1 3
+     ^done,value="3"
+     (gdb)
+     -var-update *
+     ^done,changelist=[{name="var1",in_scope="true",type_changed="false"}]
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-var-update</code> Command</h4>
+
+<p><a name="index-g_t_002dvar_002dupdate-2084"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -var-update [<var>print-values</var>] {<var>name</var> | "*"}
+</pre>
+   <p>Reevaluate the expressions corresponding to the variable object
+<var>name</var> and all its direct and indirect children, and return the
+list of variable objects whose values have changed; <var>name</var> must
+be a root variable object.  Here, &ldquo;changed&rdquo; means that the result of
+<code>-var-evaluate-expression</code> before and after the
+<code>-var-update</code> is different.  If &lsquo;<samp><span class="samp">*</span></samp>&rsquo; is used as the variable
+object names, all existing variable objects are updated, except
+for frozen ones (see <a href="_002dvar_002dset_002dfrozen.html#g_t_002dvar_002dset_002dfrozen">-var-set-frozen</a>).  The option
+<var>print-values</var> determines whether both names and values, or just
+names are printed.  The possible values of this option are the same
+as for <code>-var-list-children</code> (see <a href="_002dvar_002dlist_002dchildren.html#g_t_002dvar_002dlist_002dchildren">-var-list-children</a>).  It is
+recommended to use the &lsquo;<samp><span class="samp">--all-values</span></samp>&rsquo; option, to reduce the
+number of MI commands needed on each program stop.
+
+   <p>With the &lsquo;<samp><span class="samp">*</span></samp>&rsquo; parameter, if a variable object is bound to a
+currently running thread, it will not be updated, without any
+diagnostic.
+
+   <p>If <code>-var-set-update-range</code> was previously used on a varobj, then
+only the selected range of children will be reported.
+
+   <p><code>-var-update</code> reports all the changed varobjs in a tuple named
+&lsquo;<samp><span class="samp">changelist</span></samp>&rsquo;.
+
+   <p>Each item in the change list is itself a tuple holding:
+
+     <dl>
+<dt>&lsquo;<samp><span class="samp">name</span></samp>&rsquo;<dd>The name of the varobj.
+
+     <br><dt>&lsquo;<samp><span class="samp">value</span></samp>&rsquo;<dd>If values were requested for this update, then this field will be
+present and will hold the value of the varobj.
+
+     <br><dt>&lsquo;<samp><span class="samp">in_scope</span></samp>&rsquo;<dd><a name="g_t_002dvar_002dupdate"></a>This field is a string which may take one of three values:
+
+          <dl>
+<dt><code>"true"</code><dd>The variable object's current value is valid.
+
+          <br><dt><code>"false"</code><dd>The variable object does not currently hold a valid value but it may
+hold one in the future if its associated expression comes back into
+scope.
+
+          <br><dt><code>"invalid"</code><dd>The variable object no longer holds a valid value. 
+This can occur when the executable file being debugged has changed,
+either through recompilation or by using the <span class="sc">gdb</span> <code>file</code>
+command.  The front end should normally choose to delete these variable
+objects. 
+</dl>
+
+     <p>In the future new values may be added to this list so the front should
+be prepared for this possibility.  See <a href="GDB_002fMI-Development-and-Front-Ends.html#GDB_002fMI-Development-and-Front-Ends"><span class="sc">GDB/MI</span> Development and Front Ends</a>.
+
+     <br><dt>&lsquo;<samp><span class="samp">type_changed</span></samp>&rsquo;<dd>This is only present if the varobj is still valid.  If the type
+changed, then this will be the string &lsquo;<samp><span class="samp">true</span></samp>&rsquo;; otherwise it will
+be &lsquo;<samp><span class="samp">false</span></samp>&rsquo;.
+
+     <br><dt>&lsquo;<samp><span class="samp">new_type</span></samp>&rsquo;<dd>If the varobj's type changed, then this field will be present and will
+hold the new type.
+
+     <br><dt>&lsquo;<samp><span class="samp">new_num_children</span></samp>&rsquo;<dd>For a dynamic varobj, if the number of children changed, or if the
+type changed, this will be the new number of children.
+
+     <p>The &lsquo;<samp><span class="samp">numchild</span></samp>&rsquo; field in other varobj responses is generally not
+valid for a dynamic varobj &ndash; it will show the number of children that
+<span class="sc">gdb</span> knows about, but because dynamic varobjs lazily
+instantiate their children, this will not reflect the number of
+children which may be available.
+
+     <p>The &lsquo;<samp><span class="samp">new_num_children</span></samp>&rsquo; attribute only reports changes to the
+number of children known by <span class="sc">gdb</span>.  This is the only way to
+detect whether an update has removed children (which necessarily can
+only happen at the end of the update range).
+
+     <br><dt>&lsquo;<samp><span class="samp">displayhint</span></samp>&rsquo;<dd>The display hint, if any.
+
+     <br><dt>&lsquo;<samp><span class="samp">has_more</span></samp>&rsquo;<dd>This is an integer value, which will be 1 if there are more children
+available outside the varobj's update range.
+
+     <br><dt>&lsquo;<samp><span class="samp">dynamic</span></samp>&rsquo;<dd>This attribute will be present and have the value &lsquo;<samp><span class="samp">1</span></samp>&rsquo; if the
+varobj is a dynamic varobj.  If the varobj is not a dynamic varobj,
+then this attribute will not be present.
+
+     <br><dt>&lsquo;<samp><span class="samp">new_children</span></samp>&rsquo;<dd>If new children were added to a dynamic varobj within the selected
+update range (as set by <code>-var-set-update-range</code>), then they will
+be listed in this attribute. 
+</dl>
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -var-assign var1 3
+     ^done,value="3"
+     (gdb)
+     -var-update --all-values var1
+     ^done,changelist=[{name="var1",value="3",in_scope="true",
+     type_changed="false"}]
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-var-set-frozen</code> Command</h4>
+
+<p><a name="index-g_t_002dvar_002dset_002dfrozen-2085"></a><a name="g_t_002dvar_002dset_002dfrozen"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -var-set-frozen <var>name</var> <var>flag</var>
+</pre>
+   <p>Set the frozenness flag on the variable object <var>name</var>.  The
+<var>flag</var> parameter should be either &lsquo;<samp><span class="samp">1</span></samp>&rsquo; to make the variable
+frozen or &lsquo;<samp><span class="samp">0</span></samp>&rsquo; to make it unfrozen.  If a variable object is
+frozen, then neither itself, nor any of its children, are
+implicitly updated by <code>-var-update</code> of
+a parent variable or by <code>-var-update *</code>.  Only
+<code>-var-update</code> of the variable itself will update its value and
+values of its children.  After a variable object is unfrozen, it is
+implicitly updated by all subsequent <code>-var-update</code> operations. 
+Unfreezing a variable does not update it, only subsequent
+<code>-var-update</code> does.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -var-set-frozen V 1
+     ^done
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-var-set-update-range</code> command</h4>
+
+<p><a name="index-g_t_002dvar_002dset_002dupdate_002drange-2086"></a><a name="g_t_002dvar_002dset_002dupdate_002drange"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -var-set-update-range <var>name</var> <var>from</var> <var>to</var>
+</pre>
+   <p>Set the range of children to be returned by future invocations of
+<code>-var-update</code>.
+
+   <p><var>from</var> and <var>to</var> indicate the range of children to report.  If
+<var>from</var> or <var>to</var> is less than zero, the range is reset and all
+children will be reported.  Otherwise, children starting at <var>from</var>
+(zero-based) and up to and excluding <var>to</var> will be reported.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -var-set-update-range V 1 2
+     ^done
+</pre>
+<h4 class="subheading">The <code>-var-set-visualizer</code> command</h4>
+
+<p><a name="index-g_t_002dvar_002dset_002dvisualizer-2087"></a><a name="g_t_002dvar_002dset_002dvisualizer"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -var-set-visualizer <var>name</var> <var>visualizer</var>
+</pre>
+   <p>Set a visualizer for the variable object <var>name</var>.
+
+   <p><var>visualizer</var> is the visualizer to use.  The special value
+&lsquo;<samp><span class="samp">None</span></samp>&rsquo; means to disable any visualizer in use.
+
+   <p>If not &lsquo;<samp><span class="samp">None</span></samp>&rsquo;, <var>visualizer</var> must be a Python expression. 
+This expression must evaluate to a callable object which accepts a
+single argument.  <span class="sc">gdb</span> will call this object with the value of
+the varobj <var>name</var> as an argument (this is done so that the same
+Python pretty-printing code can be used for both the CLI and MI). 
+When called, this object must return an object which conforms to the
+pretty-printing interface (see <a href="Pretty-Printing-API.html#Pretty-Printing-API">Pretty Printing API</a>).
+
+   <p>The pre-defined function <code>gdb.default_visualizer</code> may be used to
+select a visualizer by following the built-in process
+(see <a href="Selecting-Pretty_002dPrinters.html#Selecting-Pretty_002dPrinters">Selecting Pretty-Printers</a>).  This is done automatically when
+a varobj is created, and so ordinarily is not needed.
+
+   <p>This feature is only available if Python support is enabled.  The MI
+command <code>-list-features</code> (see <a href="GDB_002fMI-Miscellaneous-Commands.html#GDB_002fMI-Miscellaneous-Commands">GDB/MI Miscellaneous Commands</a>)
+can be used to check this.
+
+<h5 class="subsubheading">Example</h5>
+
+<p>Resetting the visualizer:
+
+<pre class="smallexample">     (gdb)
+     -var-set-visualizer V None
+     ^done
+</pre>
+   <p>Reselecting the default (type-based) visualizer:
+
+<pre class="smallexample">     (gdb)
+     -var-set-visualizer V gdb.default_visualizer
+     ^done
+</pre>
+   <p>Suppose <code>SomeClass</code> is a visualizer class.  A lambda expression
+can be used to instantiate this class for a varobj:
+
+<pre class="smallexample">     (gdb)
+     -var-set-visualizer V "lambda val: SomeClass()"
+     ^done
+</pre>
+   <!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%% SECTION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+   </body></html>
+

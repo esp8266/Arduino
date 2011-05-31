@@ -1,0 +1,144 @@
+<html lang="en">
+<head>
+<title>setlocale - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Locale.html#Locale" title="Locale">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="setlocale"></a>
+<p>
+Up:&nbsp;<a rel="up" accesskey="u" href="Locale.html#Locale">Locale</a>
+<hr>
+</div>
+
+<h3 class="section">9.1 <code>setlocale</code>, <code>localeconv</code>&mdash;select or query locale</h3>
+
+<p><a name="index-setlocale-443"></a><a name="index-localeconv-444"></a><a name="index-g_t_005fsetlocale_005fr-445"></a><a name="index-g_t_005flocaleconv_005fr-446"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;locale.h&gt;
+     char *setlocale(int <var>category</var>, const char *<var>locale</var>);
+     lconv *localeconv(void);
+     
+     char *_setlocale_r(void *<var>reent</var>,
+         int <var>category</var>, const char *<var>locale</var>);
+     lconv *_localeconv_r(void *<var>reent</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>setlocale</code> is the facility defined by ANSI C to condition the
+execution environment for international collating and formatting
+information; <code>localeconv</code> reports on the settings of the current
+locale.
+
+   <p>This is a minimal implementation, supporting only the required <code>"POSIX"</code>
+and <code>"C"</code> values for <var>locale</var>; strings representing other locales are not
+honored unless _MB_CAPABLE is defined.
+
+   <p>If _MB_CAPABLE is defined, POSIX locale strings are allowed, following
+the form
+
+   <p>language[_TERRITORY][.charset][@modifier]
+
+   <p><code>"language"</code> is a two character string per ISO 639, or, if not available
+for a given language, a three character string per ISO 639-3. 
+<code>"TERRITORY"</code> is a country code per ISO 3166.  For <code>"charset"</code> and
+<code>"modifier"</code> see below.
+
+   <p>Additionally to the POSIX specifier, the following extension is supported
+for backward compatibility with older implementations using newlib:
+<code>"C-charset"</code>. 
+Instead of <code>"C-"</code>, you can also specify <code>"C."</code>.  Both variations allow
+to specify language neutral locales while using other charsets than ASCII,
+for instance <code>"C.UTF-8"</code>, which keeps all settings as in the C locale,
+but uses the UTF-8 charset.
+
+   <p>The following charsets are recognized:
+<code>"UTF-8"</code>, <code>"JIS"</code>, <code>"EUCJP"</code>, <code>"SJIS"</code>, <code>"KOI8-R"</code>, <code>"KOI8-U"</code>,
+<code>"GEORGIAN-PS"</code>, <code>"PT154"</code>, <code>"TIS-620"</code>, <code>"ISO-8859-x"</code> with
+1 &lt;= x &lt;= 16, or <code>"CPxxx"</code> with xxx in [437, 720, 737, 775, 850, 852, 855,
+857, 858, 862, 866, 874, 932, 1125, 1250, 1251, 1252, 1253, 1254, 1255, 1256,
+1257, 1258].
+
+   <p>Charsets are case insensitive.  For instance, <code>"EUCJP"</code> and <code>"eucJP"</code>
+are equivalent.  Charset names with dashes can also be written without
+dashes, as in <code>"UTF8"</code>, <code>"iso88591"</code> or <code>"koi8r"</code>.  <code>"EUCJP"</code> and
+<code>"EUCKR"</code> are also recognized with dash, <code>"EUC-JP"</code> and <code>"EUC-KR"</code>.
+
+   <p>Full support for all of the above charsets requires that newlib has been
+build with multibyte support and support for all ISO and Windows Codepage. 
+Otherwise all singlebyte charsets are simply mapped to ASCII.  Right now,
+only newlib for Cygwin is built with full charset support by default. 
+Under Cygwin, this implementation additionally supports the charsets
+<code>"GBK"</code>, <code>"GB2312"</code>, <code>"eucCN"</code>, <code>"eucKR"</code>, and <code>"Big5"</code>.  Cygwin
+does not support <code>"JIS"</code>.
+
+   <p>Cygwin additionally supports locales from the file
+/usr/share/locale/locale.alias.
+
+   <p>(<code>""</code> is also accepted; if given, the settings are read from the
+corresponding LC_* environment variables and $LANG according to POSIX rules.
+
+   <p>This implementation also supports a single modifier, <code>"cjknarrow"</code>. 
+Any other modifier is ignored.  <code>"cjknarrow"</code>, in conjunction with one
+of the language specifiers <code>"ja"</code>, <code>"ko"</code>, and <code>"zh"</code> specifies
+how the functions <code>wcwidth</code> and <code>wcswidth</code> handle characters from
+the "CJK Ambiguous Width" character class described in
+http://www.unicode.org/unicode/reports/tr11/.  Usually these characters
+have a width of 1, unless you specify one of the aforementioned
+languages, in which case these characters have a width of 2.  By
+specifying the <code>"cjknarrow"</code> modifier, these characters will have a
+width of one in the languages <code>"ja"</code>, <code>"ko"</code>, and <code>"zh"</code> as well.
+
+   <p>If you use <code>NULL</code> as the <var>locale</var> argument, <code>setlocale</code> returns a
+pointer to the string representing the current locale.  The acceptable
+values for <var>category</var> are defined in `<code>locale.h</code>' as macros
+beginning with <code>"LC_"</code>.
+
+   <p><code>localeconv</code> returns a pointer to a structure (also defined in
+`<code>locale.h</code>') describing the locale-specific conventions currently
+in effect.
+
+   <p><code>_localeconv_r</code> and <code>_setlocale_r</code> are reentrant versions of
+<code>localeconv</code> and <code>setlocale</code> respectively.  The extra argument
+<var>reent</var> is a pointer to a reentrancy structure.
+
+   <p><br>
+<strong>Returns</strong><br>
+A successful call to <code>setlocale</code> returns a pointer to a string
+associated with the specified category for the new locale.  The string
+returned by <code>setlocale</code> is such that a subsequent call using that
+string will restore that category (or all categories in case of LC_ALL),
+to that state.  The application shall not modify the string returned
+which may be overwritten by a subsequent call to <code>setlocale</code>. 
+On error, <code>setlocale</code> returns <code>NULL</code>.
+
+   <p><code>localeconv</code> returns a pointer to a structure of type <code>lconv</code>,
+which describes the formatting and collating conventions in effect (in
+this implementation, always those of the C locale).
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C requires <code>setlocale</code>, but the only locale required across all
+implementations is the C locale.
+
+   <p><br>
+
+   </body></html>
+

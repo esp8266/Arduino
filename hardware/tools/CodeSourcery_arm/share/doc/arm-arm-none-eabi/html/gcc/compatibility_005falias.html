@@ -1,0 +1,85 @@
+<html lang="en">
+<head>
+<title>compatibility_alias - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Objective_002dC.html#Objective_002dC" title="Objective-C">
+<link rel="prev" href="Constant-string-objects.html#Constant-string-objects" title="Constant string objects">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="compatibility_alias"></a>
+<a name="compatibility_005falias"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Constant-string-objects.html#Constant-string-objects">Constant string objects</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Objective_002dC.html#Objective_002dC">Objective-C</a>
+<hr>
+</div>
+
+<h3 class="section">8.5 compatibility_alias</h3>
+
+<p>This is a feature of the Objective-C compiler rather than of the
+runtime, anyway since it is documented nowhere and its existence was
+forgotten, we are documenting it here.
+
+ <p>The keyword <code>@compatibility_alias</code> allows you to define a class name
+as equivalent to another class name.  For example:
+
+<pre class="smallexample">     @compatibility_alias WOApplication GSWApplication;
+</pre>
+ <p>tells the compiler that each time it encounters <code>WOApplication</code> as
+a class name, it should replace it with <code>GSWApplication</code> (that is,
+<code>WOApplication</code> is just an alias for <code>GSWApplication</code>).
+
+ <p>There are some constraints on how this can be used&mdash;
+
+     <ul>
+<li><code>WOApplication</code> (the alias) must not be an existing class;
+
+     <li><code>GSWApplication</code> (the real class) must be an existing class.
+
+ </ul>
+
+<!-- Copyright (C) 2002, 2004 Free Software Foundation, Inc. -->
+<!-- This is part of the GCC manual. -->
+<!-- For copying conditions, see the file gcc.texi. -->
+ </body></html>
+

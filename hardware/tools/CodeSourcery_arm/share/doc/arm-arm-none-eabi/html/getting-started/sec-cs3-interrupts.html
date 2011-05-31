@@ -1,0 +1,126 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>5.4. Interrupt Vectors and Handlers</title><link rel="stylesheet" href="cs.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.74.0"><link rel="home" href="index.html" title="Sourcery G++ Lite"><link rel="up" href="chap-cs3.html" title="Chapter 5. CS3&#8482;: The CodeSourcery Common Startup Code Sequence"><link rel="prev" href="sec-cs3-memory-layout.html" title="5.3. Memory Layout"><link rel="next" href="sec-cs3-supported-boards.html" title="5.5. Supported Boards for ARM EABI"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">5.4. Interrupt Vectors and Handlers</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="sec-cs3-memory-layout.html">Prev</a> </td><th width="60%" align="center">Chapter 5. CS3&#8482;: The CodeSourcery Common Startup Code Sequence</th><td width="20%" align="right"> <a accesskey="n" href="sec-cs3-supported-boards.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec-cs3-interrupts"></a>5.4. Interrupt Vectors and Handlers</h2></div></div></div><p>
+      CS3 provides standard handlers for interrupts, exceptions and
+      traps, but also allows you to define your own handlers as needed.
+      In this section, we use the term
+      <em class="firstterm">interrupt</em> as a generic term for this
+      entire class of events.
+    </p><p>
+      Different processors handle interrupts in various ways, but
+      there are two general approaches:
+      </p><div class="itemizedlist"><ul type="disc"><li><p>
+            Some processors fetch an address from an array indexed by
+            the interrupt number, and jump to that address.  We call
+            these <em class="firstterm">address vector</em> processors.
+          </p></li><li><p>
+            Others multiply the interrupt number by some constant
+            factor, add a base address, and jump directly to that
+            address.  Here, the interrupt vector consists of blocks of
+            code, so we call these <em class="firstterm">code vector</em>
+            processors.
+          </p></li><li><p>
+	    Still other processors use a more complicated descriptor
+	    mechanism for the interrupt table.
+	  </p></li></ul></div><p>
+
+      <span>
+        M-profile processors like the Cortex-M3 use the address vector
+	model.  Classic ARM processors (including ARM7/ARM9 as well as
+	Cortex-A/R series processors) are technically code vector processors.
+	However, each vector slot only holds a single instruction.  CS3
+	emulates the address vector model on these processors by placing an
+	indirect branch instruction in each slot of the real exception vector.
+      </span>
+
+      
+
+      
+      
+
+      
+
+      
+
+      The remainder of this section assumes that you have some understanding
+      of the specific requirements for your target; refer to the architecture
+      manuals if necessary.
+    </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id280406"></a>5.4.1. ARM EABI Interrupt Vector Implementation</h3></div></div></div><p>
+        On address vector processors, the CS3 library provides an array
+        of pointers to interrupt handlers named
+        <code class="varname">__cs3_interrupt_vector_<em class="replaceable"><code>form</code></em></code>,
+        where <em class="replaceable"><code>form</code></em> identifies the particular
+        processor variant the vector is appropriate for.
+        Each entry in the vector holds a reference to a symbol named
+        <code class="function">__cs3_isr_<em class="replaceable"><code>name</code></em></code>,
+        where <em class="replaceable"><code>name</code></em> is the customary name of
+        that interrupt on the processor, or a number if there is no
+        consistently used name.  
+	You can find the interrupt vector details in
+	<a class="xref" href="sec-cs3-vector-tables.html" title="5.6. Interrupt Vector Tables">Section 5.6, &#8220;Interrupt Vector Tables&#8221;</a>.  The particular
+	vector used by a given CS3-supported board is documented
+	in the tables in <a class="xref" href="sec-cs3-supported-boards.html" title="5.5. Supported Boards for ARM EABI">Section 5.5, &#8220;Supported Boards for ARM EABI&#8221;</a>.
+      </p><p>
+	CS3 provides a reasonable default definition for each
+        <code class="function">__cs3_isr_<em class="replaceable"><code>name</code></em></code>
+        handler.  Many of these symbols are aliased to a
+	common handler routine.  If your program stops at a default
+	interrupt handler, its name as shown in backtraces may therefore
+	not correctly reflect which interrupt occurred.
+      </p><p>
+        To override an individual handler, provide your own definition
+        for the appropriate
+        <code class="function">__cs3_isr_<em class="replaceable"><code>name</code></em></code>
+        symbol.  The definition need not be placed in any particular
+        object file section.
+      </p><p>
+        To override the entire interrupt vector, you can define
+        <code class="varname">__cs3_interrupt_vector_<em class="replaceable"><code>form</code></em></code>.
+        You must place this definition in a section named
+        <code class="literal">.cs3.interrupt_vector</code>.  The linker script
+        reports an error if the <code class="literal">.cs3.interrupt_vector</code>
+        section is empty, to ensure that the definition of
+        <code class="varname">__cs3_interrupt_vector_<em class="replaceable"><code>form</code></em></code>
+        occupies the proper section.
+      </p><p>
+        You may define the vector in C with an array of pointers using
+        the <code class="literal">section</code> attribute to place it in the
+        appropriate section.  For example, to override the interrupt
+        vector on ARMulator (RDI) boards, make the following definition:
+        </p><pre class="programlisting">typedef void handler(void);
+handler *__attribute__((section (".cs3.interrupt_vector")))
+  __cs3_interrupt_vector_arm[] =
+{ ... };</pre><p>
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="sec-cs3-interrupt-handlers"></a>5.4.2. Writing Interrupt Handlers</h3></div></div></div><p>
+        Interrupt handlers typically require special call/return and
+        register usage conventions that are target-specific and beyond
+        the scope of this document.  In many cases, normal C functions
+	cannot be used as interrupt handlers.
+	<span>
+          For example, the EABI requires that the stack be 8-byte aligned,
+	  but on some ARMv7-M processors, only 4-byte stack alignment
+	  is guaranteed when calling an interrupt vector.  This can cause
+	  subtle runtime failures, usually when 8-byte types are used.
+        </span>
+      </p><p>
+        As an alternative to writing interrupt handlers in assembly language,
+        on ARM targets they may be written in C using the
+        <code class="literal">interrupt</code>
+        
+	attribute.  This tells the compiler to generate appropriate function
+	entry and exit sequences for an interrupt handler.
+	<span>
+  	  For example, to override the
+	  <code class="function">__cs3_isr_undef</code> handler,
+	  use the following definition:
+          <pre class="programlisting">void __attribute__ ((interrupt)) __cs3_isr_undef (void)
+{
+  ... custom handler code ...
+}</pre>
+        </span>
+        <span>
+	  On ARM targets, the <code class="literal">interrupt</code> attribute also
+	  takes an optional parameter to specify the type of interrupt.
+        </span>
+        
+	Refer to the GCC manual for more details about attribute syntax
+	and usage.
+      </p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="sec-cs3-memory-layout.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="chap-cs3.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="sec-cs3-supported-boards.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">5.3. Memory Layout </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 5.5. Supported Boards for ARM EABI</td></tr></table></div></body></html>

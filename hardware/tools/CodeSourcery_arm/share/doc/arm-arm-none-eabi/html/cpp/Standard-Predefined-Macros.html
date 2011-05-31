@@ -1,0 +1,181 @@
+<html lang="en">
+<head>
+<title>Standard Predefined Macros - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Predefined-Macros.html#Predefined-Macros" title="Predefined Macros">
+<link rel="next" href="Common-Predefined-Macros.html#Common-Predefined-Macros" title="Common Predefined Macros">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Standard-Predefined-Macros"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Common-Predefined-Macros.html#Common-Predefined-Macros">Common Predefined Macros</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Predefined-Macros.html#Predefined-Macros">Predefined Macros</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.7.1 Standard Predefined Macros</h4>
+
+<p><a name="index-standard-predefined-macros_002e-60"></a>
+The standard predefined macros are specified by the relevant
+language standards, so they are available with all compilers that
+implement those standards.  Older compilers may not provide all of
+them.  Their names all start with double underscores.
+
+     <dl>
+<dt><code>__FILE__</code><dd>This macro expands to the name of the current input file, in the form of
+a C string constant.  This is the path by which the preprocessor opened
+the file, not the short name specified in &lsquo;<samp><span class="samp">#include</span></samp>&rsquo; or as the
+input file name argument.  For example,
+<code>"/usr/local/include/myheader.h"</code> is a possible expansion of this
+macro.
+
+     <br><dt><code>__LINE__</code><dd>This macro expands to the current input line number, in the form of a
+decimal integer constant.  While we call it a predefined macro, it's
+a pretty strange macro, since its &ldquo;definition&rdquo; changes with each
+new line of source code. 
+</dl>
+
+   <p><code>__FILE__</code> and <code>__LINE__</code> are useful in generating an error
+message to report an inconsistency detected by the program; the message
+can state the source line at which the inconsistency was detected.  For
+example,
+
+<pre class="smallexample">     fprintf (stderr, "Internal error: "
+                      "negative string length "
+                      "%d at %s, line %d.",
+              length, __FILE__, __LINE__);
+</pre>
+   <p>An &lsquo;<samp><span class="samp">#include</span></samp>&rsquo; directive changes the expansions of <code>__FILE__</code>
+and <code>__LINE__</code> to correspond to the included file.  At the end of
+that file, when processing resumes on the input file that contained
+the &lsquo;<samp><span class="samp">#include</span></samp>&rsquo; directive, the expansions of <code>__FILE__</code> and
+<code>__LINE__</code> revert to the values they had before the
+&lsquo;<samp><span class="samp">#include</span></samp>&rsquo; (but <code>__LINE__</code> is then incremented by one as
+processing moves to the line after the &lsquo;<samp><span class="samp">#include</span></samp>&rsquo;).
+
+   <p>A &lsquo;<samp><span class="samp">#line</span></samp>&rsquo; directive changes <code>__LINE__</code>, and may change
+<code>__FILE__</code> as well.  See <a href="Line-Control.html#Line-Control">Line Control</a>.
+
+   <p>C99 introduces <code>__func__</code>, and GCC has provided <code>__FUNCTION__</code>
+for a long time.  Both of these are strings containing the name of the
+current function (there are slight semantic differences; see the GCC
+manual).  Neither of them is a macro; the preprocessor does not know the
+name of the current function.  They tend to be useful in conjunction
+with <code>__FILE__</code> and <code>__LINE__</code>, though.
+
+     <dl>
+<dt><code>__DATE__</code><dd>This macro expands to a string constant that describes the date on which
+the preprocessor is being run.  The string constant contains eleven
+characters and looks like <code>"Feb&nbsp;12&nbsp;1996"<!-- /@w --></code>.  If the day of the
+month is less than 10, it is padded with a space on the left.
+
+     <p>If GCC cannot determine the current date, it will emit a warning message
+(once per compilation) and <code>__DATE__</code> will expand to
+<code>"???&nbsp;??&nbsp;????"<!-- /@w --></code>.
+
+     <br><dt><code>__TIME__</code><dd>This macro expands to a string constant that describes the time at
+which the preprocessor is being run.  The string constant contains
+eight characters and looks like <code>"23:59:01"</code>.
+
+     <p>If GCC cannot determine the current time, it will emit a warning message
+(once per compilation) and <code>__TIME__</code> will expand to
+<code>"??:??:??"</code>.
+
+     <br><dt><code>__STDC__</code><dd>In normal operation, this macro expands to the constant 1, to signify
+that this compiler conforms to ISO Standard C.  If GNU CPP is used with
+a compiler other than GCC, this is not necessarily true; however, the
+preprocessor always conforms to the standard unless the
+<samp><span class="option">-traditional-cpp</span></samp> option is used.
+
+     <p>This macro is not defined if the <samp><span class="option">-traditional-cpp</span></samp> option is used.
+
+     <p>On some hosts, the system compiler uses a different convention, where
+<code>__STDC__</code> is normally 0, but is 1 if the user specifies strict
+conformance to the C Standard.  CPP follows the host convention when
+processing system header files, but when processing user files
+<code>__STDC__</code> is always 1.  This has been reported to cause problems;
+for instance, some versions of Solaris provide X Windows headers that
+expect <code>__STDC__</code> to be either undefined or 1.  See <a href="Invocation.html#Invocation">Invocation</a>.
+
+     <br><dt><code>__STDC_VERSION__</code><dd>This macro expands to the C Standard's version number, a long integer
+constant of the form <var>yyyy</var><var>mm</var><code>L</code> where <var>yyyy</var> and
+<var>mm</var> are the year and month of the Standard version.  This signifies
+which version of the C Standard the compiler conforms to.  Like
+<code>__STDC__</code>, this is not necessarily accurate for the entire
+implementation, unless GNU CPP is being used with GCC.
+
+     <p>The value <code>199409L</code> signifies the 1989 C standard as amended in
+1994, which is the current default; the value <code>199901L</code> signifies
+the 1999 revision of the C standard.  Support for the 1999 revision is
+not yet complete.
+
+     <p>This macro is not defined if the <samp><span class="option">-traditional-cpp</span></samp> option is
+used, nor when compiling C++ or Objective-C.
+
+     <br><dt><code>__STDC_HOSTED__</code><dd>This macro is defined, with value 1, if the compiler's target is a
+<dfn>hosted environment</dfn>.  A hosted environment has the complete
+facilities of the standard C library available.
+
+     <br><dt><code>__cplusplus</code><dd>This macro is defined when the C++ compiler is in use.  You can use
+<code>__cplusplus</code> to test whether a header is compiled by a C compiler
+or a C++ compiler.  This macro is similar to <code>__STDC_VERSION__</code>, in
+that it expands to a version number.  A fully conforming implementation
+of the 1998 C++ standard will define this macro to <code>199711L</code>.  The
+GNU C++ compiler is not yet fully conforming, so it uses <code>1</code>
+instead.  It is hoped to complete the implementation of standard C++
+in the near future.
+
+     <br><dt><code>__OBJC__</code><dd>This macro is defined, with value 1, when the Objective-C compiler is in
+use.  You can use <code>__OBJC__</code> to test whether a header is compiled
+by a C compiler or an Objective-C compiler.
+
+     <br><dt><code>__ASSEMBLER__</code><dd>This macro is defined with value 1 when preprocessing assembly
+language.
+
+   </dl>
+
+   </body></html>
+

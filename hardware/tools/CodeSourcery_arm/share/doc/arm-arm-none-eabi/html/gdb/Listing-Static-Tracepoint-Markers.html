@@ -1,0 +1,95 @@
+<html lang="en">
+<head>
+<title>Listing Static Tracepoint Markers - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Set-Tracepoints.html#Set-Tracepoints" title="Set Tracepoints">
+<link rel="prev" href="Listing-Tracepoints.html#Listing-Tracepoints" title="Listing Tracepoints">
+<link rel="next" href="Starting-and-Stopping-Trace-Experiments.html#Starting-and-Stopping-Trace-Experiments" title="Starting and Stopping Trace Experiments">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Listing-Static-Tracepoint-Markers"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Starting-and-Stopping-Trace-Experiments.html#Starting-and-Stopping-Trace-Experiments">Starting and Stopping Trace Experiments</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Listing-Tracepoints.html#Listing-Tracepoints">Listing Tracepoints</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Set-Tracepoints.html#Set-Tracepoints">Set Tracepoints</a>
+<hr>
+</div>
+
+<h4 class="subsection">13.1.8 Listing Static Tracepoint Markers</h4>
+
+     
+<a name="index-info-static_002dtracepoint_002dmarkers-724"></a>
+<a name="index-information-about-static-tracepoint-markers-725"></a>
+<dl><dt><code>info static-tracepoint-markers</code><dd>Display information about all static tracepoint markers defined in the
+program.
+
+     <p>For each marker, the following columns are printed:
+
+          <dl>
+<dt><em>Count</em><dd>An incrementing counter, output to help readability.  This is not a
+stable identifier. 
+<br><dt><em>ID</em><dd>The marker ID, as reported by the target. 
+<br><dt><em>Enabled or Disabled</em><dd>Probed markers are tagged with &lsquo;<samp><span class="samp">y</span></samp>&rsquo;.  &lsquo;<samp><span class="samp">n</span></samp>&rsquo; identifies marks
+that are not enabled. 
+<br><dt><em>Address</em><dd>Where the marker is in your program, as a memory address. 
+<br><dt><em>What</em><dd>Where the marker is in the source for your program, as a file and line
+number.  If the debug information included in the program does not
+allow <span class="sc">gdb</span> to locate the source of the marker, this column
+will be left blank. 
+</dl>
+
+     <p class="noindent">In addition, the following information may be printed for each marker:
+
+          <dl>
+<dt><em>Data</em><dd>User data passed to the tracing library by the marker call.  In the
+UST backend, this is the format string passed as argument to the
+marker call. 
+<br><dt><em>Static tracepoints probing the marker</em><dd>The list of static tracepoints attached to the marker. 
+</dl>
+
+     <pre class="smallexample">          (gdb) info static-tracepoint-markers
+          Cnt ID         Enb Address            What
+          1   ust/bar2   y   0x0000000000400e1a in main at stexample.c:25
+               Data: number1 %d number2 %d
+               Probed by static tracepoints: #2
+          2   ust/bar33  n   0x0000000000400c87 in main at stexample.c:24
+               Data: str %s
+          (gdb)
+</pre>
+     </dl>
+
+   </body></html>
+

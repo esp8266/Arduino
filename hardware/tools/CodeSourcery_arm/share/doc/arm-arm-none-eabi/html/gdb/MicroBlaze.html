@@ -1,0 +1,83 @@
+<html lang="en">
+<head>
+<title>MicroBlaze - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Embedded-Processors.html#Embedded-Processors" title="Embedded Processors">
+<link rel="prev" href="M68K.html#M68K" title="M68K">
+<link rel="next" href="MIPS-Embedded.html#MIPS-Embedded" title="MIPS Embedded">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="MicroBlaze"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="MIPS-Embedded.html#MIPS-Embedded">MIPS Embedded</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="M68K.html#M68K">M68K</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Embedded-Processors.html#Embedded-Processors">Embedded Processors</a>
+<hr>
+</div>
+
+<h4 class="subsection">21.3.4 MicroBlaze</h4>
+
+<p><a name="index-Xilinx-MicroBlaze-1320"></a><a name="index-XMD_002c-Xilinx-Microprocessor-Debugger-1321"></a>
+The MicroBlaze is a soft-core processor supported on various Xilinx
+FPGAs, such as Spartan or Virtex series.  Boards with these processors
+usually have JTAG ports which connect to a host system running the Xilinx
+Embedded Development Kit (EDK) or Software Development Kit (SDK). 
+This host system is used to download the configuration bitstream to
+the target FPGA.  The Xilinx Microprocessor Debugger (XMD) program
+communicates with the target board using the JTAG interface and
+presents a <code>gdbserver</code> interface to the board.  By default
+<code>xmd</code> uses port <code>1234</code>.  (While it is possible to change
+this default port, it requires the use of undocumented <code>xmd</code>
+commands.  Contact Xilinx support if you need to do this.)
+
+   <p>Use these GDB commands to connect to the MicroBlaze target processor.
+
+     <dl>
+<dt><code>target remote :1234</code><dd>Use this command to connect to the target if you are running <span class="sc">gdb</span>
+on the same system as <code>xmd</code>.
+
+     <br><dt><code>target remote </code><var>xmd-host</var><code>:1234</code><dd>Use this command to connect to the target if it is connected to <code>xmd</code>
+running on a different system named <var>xmd-host</var>.
+
+     <br><dt><code>load</code><dd>Use this command to download a program to the MicroBlaze target.
+
+     <br><dt><code>set debug microblaze </code><var>n</var><dd>Enable MicroBlaze-specific debugging messages if non-zero.
+
+     <br><dt><code>show debug microblaze </code><var>n</var><dd>Show MicroBlaze-specific debugging level. 
+</dl>
+
+   </body></html>
+

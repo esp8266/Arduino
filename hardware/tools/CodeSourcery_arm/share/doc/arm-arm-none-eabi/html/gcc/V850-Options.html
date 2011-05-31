@@ -1,0 +1,125 @@
+<html lang="en">
+<head>
+<title>V850 Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Submodel-Options.html#Submodel-Options" title="Submodel Options">
+<link rel="prev" href="System-V-Options.html#System-V-Options" title="System V Options">
+<link rel="next" href="VAX-Options.html#VAX-Options" title="VAX Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="V850-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="VAX-Options.html#VAX-Options">VAX Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="System-V-Options.html#System-V-Options">System V Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Submodel-Options.html#Submodel-Options">Submodel Options</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.17.39 V850 Options</h4>
+
+<p><a name="index-V850-Options-2043"></a>
+These &lsquo;<samp><span class="samp">-m</span></samp>&rsquo; options are defined for V850 implementations:
+
+     <dl>
+<dt><code>-mlong-calls</code><dt><code>-mno-long-calls</code><dd><a name="index-mlong_002dcalls-2044"></a><a name="index-mno_002dlong_002dcalls-2045"></a>Treat all calls as being far away (near).  If calls are assumed to be
+far away, the compiler will always load the functions address up into a
+register, and call indirect through the pointer.
+
+     <br><dt><code>-mno-ep</code><dt><code>-mep</code><dd><a name="index-mno_002dep-2046"></a><a name="index-mep-2047"></a>Do not optimize (do optimize) basic blocks that use the same index
+pointer 4 or more times to copy pointer into the <code>ep</code> register, and
+use the shorter <code>sld</code> and <code>sst</code> instructions.  The <samp><span class="option">-mep</span></samp>
+option is on by default if you optimize.
+
+     <br><dt><code>-mno-prolog-function</code><dt><code>-mprolog-function</code><dd><a name="index-mno_002dprolog_002dfunction-2048"></a><a name="index-mprolog_002dfunction-2049"></a>Do not use (do use) external functions to save and restore registers
+at the prologue and epilogue of a function.  The external functions
+are slower, but use less code space if more than one function saves
+the same number of registers.  The <samp><span class="option">-mprolog-function</span></samp> option
+is on by default if you optimize.
+
+     <br><dt><code>-mspace</code><dd><a name="index-mspace-2050"></a>Try to make the code as small as possible.  At present, this just turns
+on the <samp><span class="option">-mep</span></samp> and <samp><span class="option">-mprolog-function</span></samp> options.
+
+     <br><dt><code>-mtda=</code><var>n</var><dd><a name="index-mtda-2051"></a>Put static or global variables whose size is <var>n</var> bytes or less into
+the tiny data area that register <code>ep</code> points to.  The tiny data
+area can hold up to 256 bytes in total (128 bytes for byte references).
+
+     <br><dt><code>-msda=</code><var>n</var><dd><a name="index-msda-2052"></a>Put static or global variables whose size is <var>n</var> bytes or less into
+the small data area that register <code>gp</code> points to.  The small data
+area can hold up to 64 kilobytes.
+
+     <br><dt><code>-mzda=</code><var>n</var><dd><a name="index-mzda-2053"></a>Put static or global variables whose size is <var>n</var> bytes or less into
+the first 32 kilobytes of memory.
+
+     <br><dt><code>-mv850</code><dd><a name="index-mv850-2054"></a>Specify that the target processor is the V850.
+
+     <br><dt><code>-mbig-switch</code><dd><a name="index-mbig_002dswitch-2055"></a>Generate code suitable for big switch tables.  Use this option only if
+the assembler/linker complain about out of range branches within a switch
+table.
+
+     <br><dt><code>-mapp-regs</code><dd><a name="index-mapp_002dregs-2056"></a>This option will cause r2 and r5 to be used in the code generated by
+the compiler.  This setting is the default.
+
+     <br><dt><code>-mno-app-regs</code><dd><a name="index-mno_002dapp_002dregs-2057"></a>This option will cause r2 and r5 to be treated as fixed registers.
+
+     <br><dt><code>-mv850e1</code><dd><a name="index-mv850e1-2058"></a>Specify that the target processor is the V850E1.  The preprocessor
+constants &lsquo;<samp><span class="samp">__v850e1__</span></samp>&rsquo; and &lsquo;<samp><span class="samp">__v850e__</span></samp>&rsquo; will be defined if
+this option is used.
+
+     <br><dt><code>-mv850e</code><dd><a name="index-mv850e-2059"></a>Specify that the target processor is the V850E.  The preprocessor
+constant &lsquo;<samp><span class="samp">__v850e__</span></samp>&rsquo; will be defined if this option is used.
+
+     <p>If neither <samp><span class="option">-mv850</span></samp> nor <samp><span class="option">-mv850e</span></samp> nor <samp><span class="option">-mv850e1</span></samp>
+are defined then a default target processor will be chosen and the
+relevant &lsquo;<samp><span class="samp">__v850*__</span></samp>&rsquo; preprocessor constant will be defined.
+
+     <p>The preprocessor constants &lsquo;<samp><span class="samp">__v850</span></samp>&rsquo; and &lsquo;<samp><span class="samp">__v851__</span></samp>&rsquo; are always
+defined, regardless of which processor variant is the target.
+
+     <br><dt><code>-mdisable-callt</code><dd><a name="index-mdisable_002dcallt-2060"></a>This option will suppress generation of the CALLT instruction for the
+v850e and v850e1 flavors of the v850 architecture.  The default is
+<samp><span class="option">-mno-disable-callt</span></samp> which allows the CALLT instruction to be used.
+
+ </dl>
+
+ </body></html>
+

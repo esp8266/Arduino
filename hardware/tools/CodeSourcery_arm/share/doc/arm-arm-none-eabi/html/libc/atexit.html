@@ -1,0 +1,76 @@
+<html lang="en">
+<head>
+<title>atexit - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdlib.html#Stdlib" title="Stdlib">
+<link rel="prev" href="assert.html#assert" title="assert">
+<link rel="next" href="atof.html#atof" title="atof">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="atexit"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="atof.html#atof">atof</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="assert.html#assert">assert</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdlib.html#Stdlib">Stdlib</a>
+<hr>
+</div>
+
+<h3 class="section">2.6 <code>atexit</code>&mdash;request execution of functions at program exit</h3>
+
+<p><a name="index-atexit-7"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdlib.h&gt;
+     int atexit (void (*<var>function</var>)(void));
+     
+</pre>
+   <p><strong>Description</strong><br>
+You can use <code>atexit</code> to enroll functions in a list of functions that
+will be called when your program terminates normally.  The argument is
+a pointer to a user-defined function (which must not require arguments and
+must not return a result).
+
+   <p>The functions are kept in a LIFO stack; that is, the last function
+enrolled by <code>atexit</code> will be the first to execute when your program
+exits.
+
+   <p>There is no built-in limit to the number of functions you can enroll
+in this list; however, after every group of 32 functions is enrolled,
+<code>atexit</code> will call <code>malloc</code> to get space for the next part of the
+list.   The initial list of 32 functions is statically allocated, so
+you can always count on at least that many slots available.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>atexit</code> returns <code>0</code> if it succeeds in enrolling your function,
+<code>-1</code> if it fails (possible only if no space was available for
+<code>malloc</code> to extend the list of functions).
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>atexit</code> is required by the ANSI standard, which also specifies that
+implementations must support enrolling at least 32 functions.
+
+   <p>Supporting OS subroutines required: <code>close</code>, <code>fstat</code>, <code>isatty</code>,
+<code>lseek</code>, <code>read</code>, <code>sbrk</code>, <code>write</code>.
+
+   <p><br>
+
+   </body></html>
+

@@ -1,0 +1,249 @@
+// TR1 type_traits -*- C++ -*-
+
+// Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+//
+// This file is part of the GNU ISO C++ Library.  This library is free
+// software; you can redistribute it and/or modify it under the
+// terms of the GNU General Public License as published by the
+// Free Software Foundation; either version 3, or (at your option)
+// any later version.
+
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// Under Section 7 of GPL version 3, you are granted additional
+// permissions described in the GCC Runtime Library Exception, version
+// 3.1, as published by the Free Software Foundation.
+
+// You should have received a copy of the GNU General Public License and
+// a copy of the GCC Runtime Library Exception along with this program;
+// see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+// <http://www.gnu.org/licenses/>.
+
+/** @file tr1/type_traits
+ *  This is a TR1 C++ Library header. 
+ */
+
+#ifndef _GLIBCXX_TR1_TYPE_TRAITS
+#define _GLIBCXX_TR1_TYPE_TRAITS 1
+
+#pragma GCC system_header
+
+#if defined(_GLIBCXX_INCLUDE_AS_CXX0X)
+#  error TR1 header cannot be included from C++0x header
+#endif
+
+#include <cstddef>
+
+#if defined(_GLIBCXX_INCLUDE_AS_TR1)
+#  include <tr1_impl/type_traits>
+#else
+#  define _GLIBCXX_INCLUDE_AS_TR1
+#  define _GLIBCXX_BEGIN_NAMESPACE_TR1 namespace tr1 {
+#  define _GLIBCXX_END_NAMESPACE_TR1 }
+#  define _GLIBCXX_TR1 tr1::
+#  include <tr1_impl/type_traits>
+#  undef _GLIBCXX_TR1
+#  undef _GLIBCXX_END_NAMESPACE_TR1
+#  undef _GLIBCXX_BEGIN_NAMESPACE_TR1
+#  undef _GLIBCXX_INCLUDE_AS_TR1
+#endif
+
+namespace std
+{
+namespace tr1
+{
+#define _DEFINE_SPEC(_Trait, _Type)    \
+  template<>                           \
+    struct _Trait<_Type>	       \
+    : public true_type { };
+
+  template<typename>
+    struct is_reference
+    : public false_type { };
+
+  template<typename _Tp>
+    struct is_reference<_Tp&>
+    : public true_type { };
+
+  template<typename _Tp>
+    struct is_pod
+    : public integral_constant<bool, __is_pod(_Tp) || is_void<_Tp>::value>
+    { };
+
+  template<typename _Tp>
+    struct has_trivial_constructor
+    : public integral_constant<bool, is_pod<_Tp>::value>
+    { };
+
+  template<typename _Tp>
+    struct has_trivial_copy
+    : public integral_constant<bool, is_pod<_Tp>::value>
+    { };
+
+  template<typename _Tp>
+    struct has_trivial_assign
+    : public integral_constant<bool, is_pod<_Tp>::value>
+    { };
+
+  template<typename _Tp>
+    struct has_trivial_destructor
+    : public integral_constant<bool, is_pod<_Tp>::value>
+    { };
+
+  template<typename _Tp>
+    struct has_nothrow_constructor
+    : public integral_constant<bool, is_pod<_Tp>::value>
+    { };
+
+  template<typename _Tp>
+    struct has_nothrow_copy
+    : public integral_constant<bool, is_pod<_Tp>::value>
+    { };
+
+  template<typename _Tp>
+    struct has_nothrow_assign
+    : public integral_constant<bool, is_pod<_Tp>::value>
+    { };
+
+  template<typename>
+    struct __is_signed_helper
+    : public false_type { };
+  _DEFINE_SPEC(__is_signed_helper, signed char)
+  _DEFINE_SPEC(__is_signed_helper, short)
+  _DEFINE_SPEC(__is_signed_helper, int)
+  _DEFINE_SPEC(__is_signed_helper, long)
+  _DEFINE_SPEC(__is_signed_helper, long long)
+
+  template<typename _Tp>
+    struct is_signed
+    : public integral_constant<bool, (__is_signed_helper<typename
+				      remove_cv<_Tp>::type>::value)>
+    { };
+
+  template<typename>
+    struct __is_unsigned_helper
+    : public false_type { };
+  _DEFINE_SPEC(__is_unsigned_helper, unsigned char)
+  _DEFINE_SPEC(__is_unsigned_helper, unsigned short)
+  _DEFINE_SPEC(__is_unsigned_helper, unsigned int)
+  _DEFINE_SPEC(__is_unsigned_helper, unsigned long)
+  _DEFINE_SPEC(__is_unsigned_helper, unsigned long long)
+
+  template<typename _Tp>
+    struct is_unsigned
+    : public integral_constant<bool, (__is_unsigned_helper<typename
+				      remove_cv<_Tp>::type>::value)>
+    { };
+
+  template<typename _Base, typename _Derived>
+    struct __is_base_of_helper
+    {
+      typedef typename remove_cv<_Base>::type    _NoCv_Base;
+      typedef typename remove_cv<_Derived>::type _NoCv_Derived;
+      static const bool __value = (is_same<_Base, _Derived>::value
+				   || (__is_base_of(_Base, _Derived)
+				       && !is_same<_NoCv_Base,
+				                   _NoCv_Derived>::value));
+    };
+ 
+  template<typename _Base, typename _Derived>
+    struct is_base_of
+    : public integral_constant<bool,
+			       __is_base_of_helper<_Base, _Derived>::__value>
+    { };
+
+  template<typename _From, typename _To>
+    struct __is_convertible_simple
+    : public __sfinae_types
+    {
+    private:
+      static __one __test(_To);
+      static __two __test(...);
+      static _From __makeFrom();
+    
+    public:
+      static const bool __value = sizeof(__test(__makeFrom())) == 1;
+    };
+
+  template<typename _Tp>
+    struct add_reference;
+
+  template<typename _Tp>
+    struct __is_int_or_cref
+    {
+      typedef typename remove_reference<_Tp>::type __rr_Tp;
+      static const bool __value = (is_integral<_Tp>::value
+				   || (is_integral<__rr_Tp>::value
+				       && is_const<__rr_Tp>::value
+				       && !is_volatile<__rr_Tp>::value));
+    };
+
+  template<typename _From, typename _To,
+	   bool = (is_void<_From>::value || is_void<_To>::value
+		   || is_function<_To>::value || is_array<_To>::value
+		   // This special case is here only to avoid warnings.	
+		   || (is_floating_point<typename
+		       remove_reference<_From>::type>::value
+		       && __is_int_or_cref<_To>::__value))>
+    struct __is_convertible_helper
+    {
+      // "An imaginary lvalue of type From...".
+      static const bool __value = (__is_convertible_simple<typename
+				   add_reference<_From>::type, _To>::__value);
+    };
+
+  template<typename _From, typename _To>
+    struct __is_convertible_helper<_From, _To, true>
+    { static const bool __value = (is_void<_To>::value
+				   || (__is_int_or_cref<_To>::__value
+				       && !is_void<_From>::value)); };
+
+  template<typename _From, typename _To>
+    struct is_convertible
+    : public integral_constant<bool,
+			       __is_convertible_helper<_From, _To>::__value>
+    { };
+
+  // reference modifications [4.7.2].
+  template<typename _Tp>
+    struct remove_reference
+    { typedef _Tp     type; };
+
+  template<typename _Tp>
+    struct remove_reference<_Tp&>
+    { typedef _Tp     type; };
+
+  // NB: Careful with reference to void.
+  template<typename _Tp, bool = (is_void<_Tp>::value
+				 || is_reference<_Tp>::value)>
+    struct __add_reference_helper
+    { typedef _Tp&    type; };
+
+  template<typename _Tp>
+    struct __add_reference_helper<_Tp, true>
+    { typedef _Tp     type; };
+
+  template<typename _Tp>
+    struct add_reference
+    : public __add_reference_helper<_Tp>
+    { };
+
+  // other transformations [4.8].
+  template<std::size_t _Len, std::size_t _Align>
+    struct aligned_storage
+    { 
+      union type
+      {
+	unsigned char __data[_Len];
+	struct __attribute__((__aligned__((_Align)))) { } __align; 
+      };
+    };
+
+#undef _DEFINE_SPEC
+}
+}
+
+#endif // _GLIBCXX_TR1_TYPE_TRAITS

@@ -1,0 +1,107 @@
+<html lang="en">
+<head>
+<title>Bug Criteria - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Bugs.html#Bugs" title="Bugs">
+<link rel="next" href="Bug-Reporting.html#Bug-Reporting" title="Bug Reporting">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Bug-Criteria"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Bug-Reporting.html#Bug-Reporting">Bug Reporting</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Bugs.html#Bugs">Bugs</a>
+<hr>
+</div>
+
+<h3 class="section">12.1 Have You Found a Bug?</h3>
+
+<p><a name="index-bug-criteria-3257"></a>
+If you are not sure whether you have found a bug, here are some guidelines:
+
+     
+<a name="index-fatal-signal-3258"></a>
+<a name="index-core-dump-3259"></a>
+<ul><li>If the compiler gets a fatal signal, for any input whatever, that is a
+compiler bug.  Reliable compilers never crash.
+
+     <p><a name="index-invalid-assembly-code-3260"></a><a name="index-assembly-code_002c-invalid-3261"></a><li>If the compiler produces invalid assembly code, for any input whatever
+(except an <code>asm</code> statement), that is a compiler bug, unless the
+compiler reports errors (not just warnings) which would ordinarily
+prevent the assembler from being run.
+
+     <p><a name="index-undefined-behavior-3262"></a><a name="index-undefined-function-value-3263"></a><a name="index-increment-operators-3264"></a><li>If the compiler produces valid assembly code that does not correctly
+execute the input source code, that is a compiler bug.
+
+     <p>However, you must double-check to make sure, because you may have a
+program whose behavior is undefined, which happened by chance to give
+the desired results with another C or C++ compiler.
+
+     <p>For example, in many nonoptimizing compilers, you can write &lsquo;<samp><span class="samp">x;</span></samp>&rsquo;
+at the end of a function instead of &lsquo;<samp><span class="samp">return x;</span></samp>&rsquo;, with the same
+results.  But the value of the function is undefined if <code>return</code>
+is omitted; it is not a bug when GCC produces different results.
+
+     <p>Problems often result from expressions with two increment operators,
+as in <code>f (*p++, *p++)</code>.  Your previous compiler might have
+interpreted that expression the way you intended; GCC might
+interpret it another way.  Neither compiler is wrong.  The bug is
+in your code.
+
+     <p>After you have localized the error to a single source line, it should
+be easy to check for these things.  If your program is correct and
+well defined, you have found a compiler bug.
+
+     <li>If the compiler produces an error message for valid input, that is a
+compiler bug.
+
+     <p><a name="index-invalid-input-3265"></a><li>If the compiler does not produce an error message for invalid input,
+that is a compiler bug.  However, you should note that your idea of
+&ldquo;invalid input&rdquo; might be someone else's idea of &ldquo;an extension&rdquo; or
+&ldquo;support for traditional practice&rdquo;.
+
+     <li>If you are an experienced user of one of the languages GCC supports, your
+suggestions for improvement of GCC are welcome in any case. 
+</ul>
+
+ </body></html>
+

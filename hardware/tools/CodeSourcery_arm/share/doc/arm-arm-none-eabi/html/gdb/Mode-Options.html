@@ -1,0 +1,198 @@
+<html lang="en">
+<head>
+<title>Mode Options - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Invoking-GDB.html#Invoking-GDB" title="Invoking GDB">
+<link rel="prev" href="File-Options.html#File-Options" title="File Options">
+<link rel="next" href="Startup.html#Startup" title="Startup">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Mode-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Startup.html#Startup">Startup</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="File-Options.html#File-Options">File Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Invoking-GDB.html#Invoking-GDB">Invoking GDB</a>
+<hr>
+</div>
+
+<h4 class="subsection">2.1.2 Choosing Modes</h4>
+
+<p>You can run <span class="sc">gdb</span> in various alternative modes&mdash;for example, in
+batch mode or quiet mode.
+
+     <dl>
+<dt><code>-nx</code><dt><code>-n</code><dd><a name="index-g_t_0040code_007b_002d_002dnx_007d-21"></a><a name="index-g_t_0040code_007b_002dn_007d-22"></a>Do not execute commands found in any initialization files.  Normally,
+<span class="sc">gdb</span> executes the commands in these files after all the command
+options and arguments have been processed.  See <a href="Command-Files.html#Command-Files">Command Files</a>.
+
+     <br><dt><code>-quiet</code><dt><code>-silent</code><dt><code>-q</code><dd><a name="index-g_t_0040code_007b_002d_002dquiet_007d-23"></a><a name="index-g_t_0040code_007b_002d_002dsilent_007d-24"></a><a name="index-g_t_0040code_007b_002dq_007d-25"></a>&ldquo;Quiet&rdquo;.  Do not print the introductory and copyright messages.  These
+messages are also suppressed in batch mode.
+
+     <br><dt><code>-batch</code><dd><a name="index-g_t_0040code_007b_002d_002dbatch_007d-26"></a>Run in batch mode.  Exit with status <code>0</code> after processing all the
+command files specified with &lsquo;<samp><span class="samp">-x</span></samp>&rsquo; (and all commands from
+initialization files, if not inhibited with &lsquo;<samp><span class="samp">-n</span></samp>&rsquo;).  Exit with
+nonzero status if an error occurs in executing the <span class="sc">gdb</span> commands
+in the command files.  Batch mode also disables pagination, sets unlimited
+terminal width and height see <a href="Screen-Size.html#Screen-Size">Screen Size</a>, and acts as if <kbd>set confirm
+off</kbd> were in effect (see <a href="Messages_002fWarnings.html#Messages_002fWarnings">Messages/Warnings</a>).
+
+     <p>Batch mode may be useful for running <span class="sc">gdb</span> as a filter, for
+example to download and run a program on another computer; in order to
+make this more useful, the message
+
+     <pre class="smallexample">          Program exited normally.
+</pre>
+     <p class="noindent">(which is ordinarily issued whenever a program running under
+<span class="sc">gdb</span> control terminates) is not issued when running in batch
+mode.
+
+     <br><dt><code>-batch-silent</code><dd><a name="index-g_t_0040code_007b_002d_002dbatch_002dsilent_007d-27"></a>Run in batch mode exactly like &lsquo;<samp><span class="samp">-batch</span></samp>&rsquo;, but totally silently.  All
+<span class="sc">gdb</span> output to <code>stdout</code> is prevented (<code>stderr</code> is
+unaffected).  This is much quieter than &lsquo;<samp><span class="samp">-silent</span></samp>&rsquo; and would be useless
+for an interactive session.
+
+     <p>This is particularly useful when using targets that give &lsquo;<samp><span class="samp">Loading section</span></samp>&rsquo;
+messages, for example.
+
+     <p>Note that targets that give their output via <span class="sc">gdb</span>, as opposed to
+writing directly to <code>stdout</code>, will also be made silent.
+
+     <br><dt><code>-return-child-result</code><dd><a name="index-g_t_0040code_007b_002d_002dreturn_002dchild_002dresult_007d-28"></a>The return code from <span class="sc">gdb</span> will be the return code from the child
+process (the process being debugged), with the following exceptions:
+
+          <ul>
+<li><span class="sc">gdb</span> exits abnormally.  E.g., due to an incorrect argument or an
+internal error.  In this case the exit code is the same as it would have been
+without &lsquo;<samp><span class="samp">-return-child-result</span></samp>&rsquo;. 
+<li>The user quits with an explicit value.  E.g., &lsquo;<samp><span class="samp">quit 1</span></samp>&rsquo;. 
+<li>The child process never runs, or is not allowed to terminate, in which case
+the exit code will be -1. 
+</ul>
+
+     <p>This option is useful in conjunction with &lsquo;<samp><span class="samp">-batch</span></samp>&rsquo; or &lsquo;<samp><span class="samp">-batch-silent</span></samp>&rsquo;,
+when <span class="sc">gdb</span> is being used as a remote program loader or simulator
+interface.
+
+     <br><dt><code>-nowindows</code><dt><code>-nw</code><dd><a name="index-g_t_0040code_007b_002d_002dnowindows_007d-29"></a><a name="index-g_t_0040code_007b_002dnw_007d-30"></a>&ldquo;No windows&rdquo;.  If <span class="sc">gdb</span> comes with a graphical user interface
+(GUI) built in, then this option tells <span class="sc">gdb</span> to only use the command-line
+interface.  If no GUI is available, this option has no effect.
+
+     <br><dt><code>-windows</code><dt><code>-w</code><dd><a name="index-g_t_0040code_007b_002d_002dwindows_007d-31"></a><a name="index-g_t_0040code_007b_002dw_007d-32"></a>If <span class="sc">gdb</span> includes a GUI, then this option requires it to be
+used if possible.
+
+     <br><dt><code>-cd </code><var>directory</var><dd><a name="index-g_t_0040code_007b_002d_002dcd_007d-33"></a>Run <span class="sc">gdb</span> using <var>directory</var> as its working directory,
+instead of the current directory.
+
+     <br><dt><code>-fullname</code><dt><code>-f</code><dd><a name="index-g_t_0040code_007b_002d_002dfullname_007d-34"></a><a name="index-g_t_0040code_007b_002df_007d-35"></a><span class="sc">gnu</span> Emacs sets this option when it runs <span class="sc">gdb</span> as a
+subprocess.  It tells <span class="sc">gdb</span> to output the full file name and line
+number in a standard, recognizable fashion each time a stack frame is
+displayed (which includes each time your program stops).  This
+recognizable format looks like two &lsquo;<samp><span class="samp">\032</span></samp>&rsquo; characters, followed by
+the file name, line number and character position separated by colons,
+and a newline.  The Emacs-to-<span class="sc">gdb</span> interface program uses the two
+&lsquo;<samp><span class="samp">\032</span></samp>&rsquo; characters as a signal to display the source code for the
+frame.
+
+     <br><dt><code>-epoch</code><dd><a name="index-g_t_0040code_007b_002d_002depoch_007d-36"></a>The Epoch Emacs-<span class="sc">gdb</span> interface sets this option when it runs
+<span class="sc">gdb</span> as a subprocess.  It tells <span class="sc">gdb</span> to modify its print
+routines so as to allow Epoch to display values of expressions in a
+separate window.
+
+     <br><dt><code>-annotate </code><var>level</var><dd><a name="index-g_t_0040code_007b_002d_002dannotate_007d-37"></a>This option sets the <dfn>annotation level</dfn> inside <span class="sc">gdb</span>.  Its
+effect is identical to using &lsquo;<samp><span class="samp">set annotate </span><var>level</var></samp>&rsquo;
+(see <a href="Annotations.html#Annotations">Annotations</a>).  The annotation <var>level</var> controls how much
+information <span class="sc">gdb</span> prints together with its prompt, values of
+expressions, source lines, and other types of output.  Level 0 is the
+normal, level 1 is for use when <span class="sc">gdb</span> is run as a subprocess of
+<span class="sc">gnu</span> Emacs, level 3 is the maximum annotation suitable for programs
+that control <span class="sc">gdb</span>, and level 2 has been deprecated.
+
+     <p>The annotation mechanism has largely been superseded by <span class="sc">gdb/mi</span>
+(see <a href="GDB_002fMI.html#GDB_002fMI">GDB/MI</a>).
+
+     <br><dt><code>--args</code><dd><a name="index-g_t_0040code_007b_002d_002dargs_007d-38"></a>Change interpretation of command line so that arguments following the
+executable file are passed as command line arguments to the inferior. 
+This option stops option processing.
+
+     <br><dt><code>-baud </code><var>bps</var><dt><code>-b </code><var>bps</var><dd><a name="index-g_t_0040code_007b_002d_002dbaud_007d-39"></a><a name="index-g_t_0040code_007b_002db_007d-40"></a>Set the line speed (baud rate or bits per second) of any serial
+interface used by <span class="sc">gdb</span> for remote debugging.
+
+     <br><dt><code>-l </code><var>timeout</var><dd><a name="index-g_t_0040code_007b_002dl_007d-41"></a>Set the timeout (in seconds) of any communication used by <span class="sc">gdb</span>
+for remote debugging.
+
+     <br><dt><code>-tty </code><var>device</var><dt><code>-t </code><var>device</var><dd><a name="index-g_t_0040code_007b_002d_002dtty_007d-42"></a><a name="index-g_t_0040code_007b_002dt_007d-43"></a>Run using <var>device</var> for your program's standard input and output. 
+<!-- FIXME: kingdon thinks there is more to -tty.  Investigate. -->
+
+     <!-- resolve the situation of these eventually -->
+     <br><dt><code>-tui</code><dd><a name="index-g_t_0040code_007b_002d_002dtui_007d-44"></a>Activate the <dfn>Text User Interface</dfn> when starting.  The Text User
+Interface manages several text windows on the terminal, showing
+source, assembly, registers and <span class="sc">gdb</span> command outputs
+(see <a href="TUI.html#TUI"><span class="sc">gdb</span> Text User Interface</a>).  Alternatively, the
+Text User Interface can be enabled by invoking the program
+&lsquo;<samp><span class="samp">gdbtui</span></samp>&rsquo;.  Do not use this option if you run <span class="sc">gdb</span> from
+Emacs (see <a href="Emacs.html#Emacs">Using <span class="sc">gdb</span> under <span class="sc">gnu</span> Emacs</a>).
+
+     <!-- @item -xdb -->
+     <!-- @cindex @code{-xdb} -->
+     <!-- Run in XDB compatibility mode, allowing the use of certain XDB commands. -->
+     <!-- For information, see the file @file{xdb_trans.html}, which is usually -->
+     <!-- installed in the directory @code{/opt/langtools/wdb/doc} on HP-UX -->
+     <!-- systems. -->
+     <br><dt><code>-interpreter </code><var>interp</var><dd><a name="index-g_t_0040code_007b_002d_002dinterpreter_007d-45"></a>Use the interpreter <var>interp</var> for interface with the controlling
+program or device.  This option is meant to be set by programs which
+communicate with <span class="sc">gdb</span> using it as a back end. 
+See <a href="Interpreters.html#Interpreters">Command Interpreters</a>.
+
+     <p>&lsquo;<samp><span class="samp">--interpreter=mi</span></samp>&rsquo; (or &lsquo;<samp><span class="samp">--interpreter=mi2</span></samp>&rsquo;) causes
+<span class="sc">gdb</span> to use the <span class="sc">gdb/mi</span><dfn> interface</dfn> (see <a href="GDB_002fMI.html#GDB_002fMI">The <span class="sc">gdb/mi</span> Interface</a>) included since <span class="sc">gdb</span> version 6.0.  The
+previous <span class="sc">gdb/mi</span> interface, included in <span class="sc">gdb</span> version 5.3 and
+selected with &lsquo;<samp><span class="samp">--interpreter=mi1</span></samp>&rsquo;, is deprecated.  Earlier
+<span class="sc">gdb/mi</span> interfaces are no longer supported.
+
+     <br><dt><code>-write</code><dd><a name="index-g_t_0040code_007b_002d_002dwrite_007d-46"></a>Open the executable and core files for both reading and writing.  This
+is equivalent to the &lsquo;<samp><span class="samp">set write on</span></samp>&rsquo; command inside <span class="sc">gdb</span>
+(see <a href="Patching.html#Patching">Patching</a>).
+
+     <br><dt><code>-statistics</code><dd><a name="index-g_t_0040code_007b_002d_002dstatistics_007d-47"></a>This option causes <span class="sc">gdb</span> to print statistics about time and
+memory usage after it completes each command and returns to the prompt.
+
+     <br><dt><code>-version</code><dd><a name="index-g_t_0040code_007b_002d_002dversion_007d-48"></a>This option causes <span class="sc">gdb</span> to print its version number and
+no-warranty blurb, and exit.
+
+   </dl>
+
+   </body></html>
+

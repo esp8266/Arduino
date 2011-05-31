@@ -1,0 +1,83 @@
+<html lang="en">
+<head>
+<title>Standard Libraries - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Trouble.html#Trouble" title="Trouble">
+<link rel="prev" href="Fixed-Headers.html#Fixed-Headers" title="Fixed Headers">
+<link rel="next" href="Disappointments.html#Disappointments" title="Disappointments">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Standard-Libraries"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Disappointments.html#Disappointments">Disappointments</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Fixed-Headers.html#Fixed-Headers">Fixed Headers</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Trouble.html#Trouble">Trouble</a>
+<hr>
+</div>
+
+<h3 class="section">11.6 Standard Libraries</h3>
+
+<p><a name="index-Wall-3225"></a>GCC by itself attempts to be a conforming freestanding implementation. 
+See <a href="Standards.html#Standards">Language Standards Supported by GCC</a>, for details of
+what this means.  Beyond the library facilities required of such an
+implementation, the rest of the C library is supplied by the vendor of
+the operating system.  If that C library doesn't conform to the C
+standards, then your programs might get warnings (especially when using
+<samp><span class="option">-Wall</span></samp>) that you don't expect.
+
+ <p>For example, the <code>sprintf</code> function on SunOS 4.1.3 returns
+<code>char *</code> while the C standard says that <code>sprintf</code> returns an
+<code>int</code>.  The <code>fixincludes</code> program could make the prototype for
+this function match the Standard, but that would be wrong, since the
+function will still return <code>char *</code>.
+
+ <p>If you need a Standard compliant library, then you need to find one, as
+GCC does not provide one.  The GNU C library (called <code>glibc</code>)
+provides ISO C, POSIX, BSD, SystemV and X/Open compatibility for
+GNU/Linux and HURD-based GNU systems; no recent version of it supports
+other systems, though some very old versions did.  Version 2.2 of the
+GNU C library includes nearly complete C99 support.  You could also ask
+your operating system vendor if newer libraries are available.
+
+ </body></html>
+

@@ -1,0 +1,125 @@
+<html lang="en">
+<head>
+<title>Hooks - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Sequences.html#Sequences" title="Sequences">
+<link rel="prev" href="Define.html#Define" title="Define">
+<link rel="next" href="Command-Files.html#Command-Files" title="Command Files">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Hooks"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Command-Files.html#Command-Files">Command Files</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Define.html#Define">Define</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Sequences.html#Sequences">Sequences</a>
+<hr>
+</div>
+
+<h4 class="subsection">23.1.2 User-defined Command Hooks</h4>
+
+<p><a name="index-command-hooks-1545"></a><a name="index-hooks_002c-for-commands-1546"></a><a name="index-hooks_002c-pre_002dcommand-1547"></a>
+<a name="index-hook-1548"></a>You may define <dfn>hooks</dfn>, which are a special kind of user-defined
+command.  Whenever you run the command &lsquo;<samp><span class="samp">foo</span></samp>&rsquo;, if the user-defined
+command &lsquo;<samp><span class="samp">hook-foo</span></samp>&rsquo; exists, it is executed (with no arguments)
+before that command.
+
+   <p><a name="index-hooks_002c-post_002dcommand-1549"></a><a name="index-hookpost-1550"></a>A hook may also be defined which is run after the command you executed. 
+Whenever you run the command &lsquo;<samp><span class="samp">foo</span></samp>&rsquo;, if the user-defined command
+&lsquo;<samp><span class="samp">hookpost-foo</span></samp>&rsquo; exists, it is executed (with no arguments) after
+that command.  Post-execution hooks may exist simultaneously with
+pre-execution hooks, for the same command.
+
+   <p>It is valid for a hook to call the command which it hooks.  If this
+occurs, the hook is not re-executed, thereby avoiding infinite recursion.
+
+<!-- It would be nice if hookpost could be passed a parameter indicating -->
+<!-- if the command it hooks executed properly or not.  FIXME! -->
+   <p><a name="index-stop_0040r_007b_002c-a-pseudo_002dcommand_007d-1551"></a>In addition, a pseudo-command, &lsquo;<samp><span class="samp">stop</span></samp>&rsquo; exists.  Defining
+(&lsquo;<samp><span class="samp">hook-stop</span></samp>&rsquo;) makes the associated commands execute every time
+execution stops in your program: before breakpoint commands are run,
+displays are printed, or the stack frame is printed.
+
+   <p>For example, to ignore <code>SIGALRM</code> signals while
+single-stepping, but treat them normally during normal execution,
+you could define:
+
+<pre class="smallexample">     define hook-stop
+     handle SIGALRM nopass
+     end
+     
+     define hook-run
+     handle SIGALRM pass
+     end
+     
+     define hook-continue
+     handle SIGALRM pass
+     end
+</pre>
+   <p>As a further example, to hook at the beginning and end of the <code>echo</code>
+command, and to add extra text to the beginning and end of the message,
+you could define:
+
+<pre class="smallexample">     define hook-echo
+     echo &lt;&lt;&lt;---
+     end
+     
+     define hookpost-echo
+     echo ---&gt;&gt;&gt;\n
+     end
+     
+     (gdb) echo Hello World
+     &lt;&lt;&lt;---Hello World---&gt;&gt;&gt;
+     (gdb)
+     
+</pre>
+   <p>You can define a hook for any single-word command in <span class="sc">gdb</span>, but
+not for command aliases; you should define a hook for the basic command
+name, e.g.  <code>backtrace</code> rather than <code>bt</code>. 
+<!-- FIXME!  So how does Joe User discover whether a command is an alias -->
+<!-- or not? -->
+You can hook a multi-word command by adding <code>hook-</code> or
+<code>hookpost-</code> to the last word of the command, e.g. 
+&lsquo;<samp><span class="samp">define target hook-remote</span></samp>&rsquo; to add a hook to &lsquo;<samp><span class="samp">target remote</span></samp>&rsquo;.
+
+   <p>If an error occurs during the execution of your hook, execution of
+<span class="sc">gdb</span> commands stops and <span class="sc">gdb</span> issues a prompt
+(before the command that you actually typed had a chance to run).
+
+   <p>If you try to define a hook which does not match any known command, you
+get a warning from the <code>define</code> command.
+
+   </body></html>
+

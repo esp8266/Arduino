@@ -1,0 +1,76 @@
+<html lang="en">
+<head>
+<title>strxfrm - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Strings.html#Strings" title="Strings">
+<link rel="prev" href="strupr.html#strupr" title="strupr">
+<link rel="next" href="swab.html#swab" title="swab">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="strxfrm"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="swab.html#swab">swab</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="strupr.html#strupr">strupr</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Strings.html#Strings">Strings</a>
+<hr>
+</div>
+
+<h3 class="section">5.40 <code>strxfrm</code>&mdash;transform string</h3>
+
+<p><a name="index-strxfrm-409"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;string.h&gt;
+     size_t strxfrm(char *<var>s1</var>, const char *<var>s2</var>, size_t <var>n</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+This function transforms the string pointed to by <var>s2</var> and
+places the resulting string into the array pointed to by
+<var>s1</var>. The transformation is such that if the <code>strcmp</code>
+function is applied to the two transformed strings, it returns
+a value greater than, equal to, or less than zero,
+correspoinding to the result of a <code>strcoll</code> function applied
+to the same two original strings.
+
+   <p>No more than <var>n</var> characters are placed into the resulting
+array pointed to by <var>s1</var>, including the terminating null
+character. If <var>n</var> is zero, <var>s1</var> may be a null pointer. If
+copying takes place between objects that overlap, the behavior
+is undefined.
+
+   <p>With a C locale, this function just copies.
+
+   <p><br>
+<strong>Returns</strong><br>
+The <code>strxfrm</code> function returns the length of the transformed string
+(not including the terminating null character). If the value returned
+is <var>n</var> or more, the contents of the array pointed to by
+<var>s1</var> are indeterminate.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>strxfrm</code> is ANSI C.
+
+   <p><code>strxfrm</code> requires no supporting OS subroutines.
+
+   <p><br>
+
+   </body></html>
+

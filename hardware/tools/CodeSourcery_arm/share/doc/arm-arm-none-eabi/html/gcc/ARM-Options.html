@@ -1,0 +1,324 @@
+<html lang="en">
+<head>
+<title>ARM Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Submodel-Options.html#Submodel-Options" title="Submodel Options">
+<link rel="prev" href="ARC-Options.html#ARC-Options" title="ARC Options">
+<link rel="next" href="AVR-Options.html#AVR-Options" title="AVR Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="ARM-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="AVR-Options.html#AVR-Options">AVR Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="ARC-Options.html#ARC-Options">ARC Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Submodel-Options.html#Submodel-Options">Submodel Options</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.17.2 ARM Options</h4>
+
+<p><a name="index-ARM-options-1000"></a>
+These &lsquo;<samp><span class="samp">-m</span></samp>&rsquo; options are defined for Advanced RISC Machines (ARM)
+architectures:
+
+     <dl>
+<dt><code>-mabi=</code><var>name</var><dd><a name="index-mabi-1001"></a>Generate code for the specified ABI.  Permissible values are: &lsquo;<samp><span class="samp">apcs-gnu</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">atpcs</span></samp>&rsquo;, &lsquo;<samp><span class="samp">aapcs</span></samp>&rsquo;, &lsquo;<samp><span class="samp">aapcs-linux</span></samp>&rsquo; and &lsquo;<samp><span class="samp">iwmmxt</span></samp>&rsquo;.
+
+     <br><dt><code>-mapcs-frame</code><dd><a name="index-mapcs_002dframe-1002"></a>Generate a stack frame that is compliant with the ARM Procedure Call
+Standard for all functions, even if this is not strictly necessary for
+correct execution of the code.  Specifying <samp><span class="option">-fomit-frame-pointer</span></samp>
+with this option will cause the stack frames not to be generated for
+leaf functions.  The default is <samp><span class="option">-mno-apcs-frame</span></samp>.
+
+     <br><dt><code>-mapcs</code><dd><a name="index-mapcs-1003"></a>This is a synonym for <samp><span class="option">-mapcs-frame</span></samp>.
+
+     <br><dt><code>-mthumb-interwork</code><dd><a name="index-mthumb_002dinterwork-1004"></a>Generate code which supports calling between the ARM and Thumb
+instruction sets.  Without this option the two instruction sets cannot
+be reliably used inside one program.  The default is
+<samp><span class="option">-mno-thumb-interwork</span></samp>, since slightly larger code is generated
+when <samp><span class="option">-mthumb-interwork</span></samp> is specified.
+
+     <br><dt><code>-mno-sched-prolog</code><dd><a name="index-mno_002dsched_002dprolog-1005"></a>Prevent the reordering of instructions in the function prolog, or the
+merging of those instruction with the instructions in the function's
+body.  This means that all functions will start with a recognizable set
+of instructions (or in fact one of a choice from a small set of
+different function prologues), and this information can be used to
+locate the start if functions inside an executable piece of code.  The
+default is <samp><span class="option">-msched-prolog</span></samp>.
+
+     <br><dt><code>-mfloat-abi=</code><var>name</var><dd><a name="index-mfloat_002dabi-1006"></a>Specifies which floating-point ABI to use.  Permissible values
+are: &lsquo;<samp><span class="samp">soft</span></samp>&rsquo;, &lsquo;<samp><span class="samp">softfp</span></samp>&rsquo; and &lsquo;<samp><span class="samp">hard</span></samp>&rsquo;.
+
+     <p>Specifying &lsquo;<samp><span class="samp">soft</span></samp>&rsquo; causes GCC to generate output containing
+library calls for floating-point operations. 
+&lsquo;<samp><span class="samp">softfp</span></samp>&rsquo; allows the generation of code using hardware floating-point
+instructions, but still uses the soft-float calling conventions. 
+&lsquo;<samp><span class="samp">hard</span></samp>&rsquo; allows generation of floating-point instructions
+and uses FPU-specific calling conventions.
+
+     <p>The default depends on the specific target configuration.  Note that
+the hard-float and soft-float ABIs are not link-compatible; you must
+compile your entire program with the same ABI, and link with a
+compatible set of libraries.
+
+     <br><dt><code>-mhard-float</code><dd><a name="index-mhard_002dfloat-1007"></a>Equivalent to <samp><span class="option">-mfloat-abi=hard</span></samp>.
+
+     <br><dt><code>-msoft-float</code><dd><a name="index-msoft_002dfloat-1008"></a>Equivalent to <samp><span class="option">-mfloat-abi=soft</span></samp>.
+
+     <br><dt><code>-mlittle-endian</code><dd><a name="index-mlittle_002dendian-1009"></a>Generate code for a processor running in little-endian mode.  This is
+the default for all standard configurations.
+
+     <br><dt><code>-mbig-endian</code><dd><a name="index-mbig_002dendian-1010"></a>Generate code for a processor running in big-endian mode; the default is
+to compile code for a little-endian processor.
+
+     <br><dt><code>-mwords-little-endian</code><dd><a name="index-mwords_002dlittle_002dendian-1011"></a>This option only applies when generating code for big-endian processors. 
+Generate code for a little-endian word order but a big-endian byte
+order.  That is, a byte order of the form &lsquo;<samp><span class="samp">32107654</span></samp>&rsquo;.  Note: this
+option should only be used if you require compatibility with code for
+big-endian ARM processors generated by versions of the compiler prior to
+2.8.
+
+     <br><dt><code>-mcpu=</code><var>name</var><dd><a name="index-mcpu-1012"></a>This specifies the name of the target ARM processor.  GCC uses this name
+to determine what kind of instructions it can emit when generating
+assembly code.  Permissible names are: &lsquo;<samp><span class="samp">arm2</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm250</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">arm3</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm6</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm60</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm600</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm610</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">arm620</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm7</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm7m</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm7d</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm7dm</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">arm7di</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm7dmi</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm70</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm700</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">arm700i</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm710</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm710c</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm7100</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">arm720</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">arm7500</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm7500fe</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm7tdmi</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm7tdmi-s</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">arm710t</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm720t</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm740t</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">strongarm</span></samp>&rsquo;, &lsquo;<samp><span class="samp">strongarm110</span></samp>&rsquo;, &lsquo;<samp><span class="samp">strongarm1100</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">strongarm1110</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">arm8</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm810</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm9</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm9e</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm920</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">arm920t</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm922t</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm946e-s</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm966e-s</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">arm968e-s</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm926ej-s</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm940t</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm9tdmi</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">arm10tdmi</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm1020t</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm1026ej-s</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">arm10e</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm1020e</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm1022e</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">arm1136j-s</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm1136jf-s</span></samp>&rsquo;, &lsquo;<samp><span class="samp">mpcore</span></samp>&rsquo;, &lsquo;<samp><span class="samp">mpcorenovfp</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">arm1156t2-s</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm1156t2f-s</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm1176jz-s</span></samp>&rsquo;, &lsquo;<samp><span class="samp">arm1176jzf-s</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">cortex-a5</span></samp>&rsquo;, &lsquo;<samp><span class="samp">cortex-a8</span></samp>&rsquo;, &lsquo;<samp><span class="samp">cortex-a9</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">cortex-r4</span></samp>&rsquo;, &lsquo;<samp><span class="samp">cortex-r4f</span></samp>&rsquo;, &lsquo;<samp><span class="samp">cortex-r5</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">cortex-m4</span></samp>&rsquo;, &lsquo;<samp><span class="samp">cortex-m3</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">cortex-m1</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">cortex-m0</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">xscale</span></samp>&rsquo;, &lsquo;<samp><span class="samp">iwmmxt</span></samp>&rsquo;, &lsquo;<samp><span class="samp">iwmmxt2</span></samp>&rsquo;, &lsquo;<samp><span class="samp">ep9312</span></samp>&rsquo;.
+
+     <br><dt><code>-mtune=</code><var>name</var><dd><a name="index-mtune-1013"></a>This option is very similar to the <samp><span class="option">-mcpu=</span></samp> option, except that
+instead of specifying the actual target processor type, and hence
+restricting which instructions can be used, it specifies that GCC should
+tune the performance of the code as if the target were of the type
+specified in this option, but still choosing the instructions that it
+will generate based on the cpu specified by a <samp><span class="option">-mcpu=</span></samp> option. 
+For some ARM implementations better performance can be obtained by using
+this option.
+
+     <br><dt><code>-march=</code><var>name</var><dd><a name="index-march-1014"></a>This specifies the name of the target ARM architecture.  GCC uses this
+name to determine what kind of instructions it can emit when generating
+assembly code.  This option can be used in conjunction with or instead
+of the <samp><span class="option">-mcpu=</span></samp> option.  Permissible names are: &lsquo;<samp><span class="samp">armv2</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">armv2a</span></samp>&rsquo;, &lsquo;<samp><span class="samp">armv3</span></samp>&rsquo;, &lsquo;<samp><span class="samp">armv3m</span></samp>&rsquo;, &lsquo;<samp><span class="samp">armv4</span></samp>&rsquo;, &lsquo;<samp><span class="samp">armv4t</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">armv5</span></samp>&rsquo;, &lsquo;<samp><span class="samp">armv5t</span></samp>&rsquo;, &lsquo;<samp><span class="samp">armv5e</span></samp>&rsquo;, &lsquo;<samp><span class="samp">armv5te</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">armv6</span></samp>&rsquo;, &lsquo;<samp><span class="samp">armv6j</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">armv6t2</span></samp>&rsquo;, &lsquo;<samp><span class="samp">armv6z</span></samp>&rsquo;, &lsquo;<samp><span class="samp">armv6zk</span></samp>&rsquo;, &lsquo;<samp><span class="samp">armv6-m</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">armv7</span></samp>&rsquo;, &lsquo;<samp><span class="samp">armv7-a</span></samp>&rsquo;, &lsquo;<samp><span class="samp">armv7-r</span></samp>&rsquo;, &lsquo;<samp><span class="samp">armv7-m</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">iwmmxt</span></samp>&rsquo;, &lsquo;<samp><span class="samp">iwmmxt2</span></samp>&rsquo;, &lsquo;<samp><span class="samp">ep9312</span></samp>&rsquo;.
+
+     <br><dt><code>-mfpu=</code><var>name</var><dt><code>-mfpe=</code><var>number</var><dt><code>-mfp=</code><var>number</var><dd><a name="index-mfpu-1015"></a><a name="index-mfpe-1016"></a><a name="index-mfp-1017"></a>This specifies what floating point hardware (or hardware emulation) is
+available on the target.  Permissible names are: &lsquo;<samp><span class="samp">fpa</span></samp>&rsquo;, &lsquo;<samp><span class="samp">fpe2</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">fpe3</span></samp>&rsquo;, &lsquo;<samp><span class="samp">maverick</span></samp>&rsquo;, &lsquo;<samp><span class="samp">vfp</span></samp>&rsquo;, &lsquo;<samp><span class="samp">vfpv3</span></samp>&rsquo;, &lsquo;<samp><span class="samp">vfpv3-fp16</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">vfpv3-d16</span></samp>&rsquo;, &lsquo;<samp><span class="samp">vfpv3-d16-fp16</span></samp>&rsquo;, &lsquo;<samp><span class="samp">vfpv3xd</span></samp>&rsquo;, &lsquo;<samp><span class="samp">vfpv3xd-fp16</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">neon</span></samp>&rsquo;, &lsquo;<samp><span class="samp">neon-fp16</span></samp>&rsquo;, &lsquo;<samp><span class="samp">vfpv4</span></samp>&rsquo;, &lsquo;<samp><span class="samp">vfpv4-d16</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">fpv4-sp-d16</span></samp>&rsquo; and &lsquo;<samp><span class="samp">neon-vfpv4</span></samp>&rsquo;. 
+<samp><span class="option">-mfp</span></samp> and <samp><span class="option">-mfpe</span></samp> are synonyms for
+<samp><span class="option">-mfpu</span></samp>=&lsquo;<samp><span class="samp">fpe</span></samp>&rsquo;<var>number</var>, for compatibility with older versions
+of GCC.
+
+     <p>If <samp><span class="option">-msoft-float</span></samp> is specified this specifies the format of
+floating point values.
+
+     <p>If the selected floating-point hardware includes the NEON extension
+(e.g. <samp><span class="option">-mfpu</span></samp>=&lsquo;<samp><span class="samp">neon</span></samp>&rsquo;), note that floating-point
+operations will not be used by GCC's auto-vectorization pass unless
+<samp><span class="option">-funsafe-math-optimizations</span></samp> is also specified.  This is
+because NEON hardware does not fully implement the IEEE 754 standard for
+floating-point arithmetic (in particular denormal values are treated as
+zero), so the use of NEON instructions may lead to a loss of precision.
+
+     <br><dt><code>-mfp16-format=</code><var>name</var><dd><a name="index-mfp16_002dformat-1018"></a>Specify the format of the <code>__fp16</code> half-precision floating-point type. 
+Permissible names are &lsquo;<samp><span class="samp">none</span></samp>&rsquo;, &lsquo;<samp><span class="samp">ieee</span></samp>&rsquo;, and &lsquo;<samp><span class="samp">alternative</span></samp>&rsquo;;
+the default is &lsquo;<samp><span class="samp">none</span></samp>&rsquo;, in which case the <code>__fp16</code> type is not
+defined.  See <a href="Half_002dPrecision.html#Half_002dPrecision">Half-Precision</a>, for more information.
+
+     <br><dt><code>-mstructure-size-boundary=</code><var>n</var><dd><a name="index-mstructure_002dsize_002dboundary-1019"></a>The size of all structures and unions will be rounded up to a multiple
+of the number of bits set by this option.  Permissible values are 8, 32
+and 64.  The default value varies for different toolchains.  For the COFF
+targeted toolchain the default value is 8.  A value of 64 is only allowed
+if the underlying ABI supports it.
+
+     <p>Specifying the larger number can produce faster, more efficient code, but
+can also increase the size of the program.  Different values are potentially
+incompatible.  Code compiled with one value cannot necessarily expect to
+work with code or libraries compiled with another value, if they exchange
+information using structures or unions.
+
+     <br><dt><code>-mabort-on-noreturn</code><dd><a name="index-mabort_002don_002dnoreturn-1020"></a>Generate a call to the function <code>abort</code> at the end of a
+<code>noreturn</code> function.  It will be executed if the function tries to
+return.
+
+     <br><dt><code>-mlong-calls</code><dt><code>-mno-long-calls</code><dd><a name="index-mlong_002dcalls-1021"></a><a name="index-mno_002dlong_002dcalls-1022"></a>Tells the compiler to perform function calls by first loading the
+address of the function into a register and then performing a subroutine
+call on this register.  This switch is needed if the target function
+will lie outside of the 64 megabyte addressing range of the offset based
+version of subroutine call instruction.
+
+     <p>Even if this switch is enabled, not all function calls will be turned
+into long calls.  The heuristic is that static functions, functions
+which have the &lsquo;<samp><span class="samp">short-call</span></samp>&rsquo; attribute, functions that are inside
+the scope of a &lsquo;<samp><span class="samp">#pragma no_long_calls</span></samp>&rsquo; directive and functions whose
+definitions have already been compiled within the current compilation
+unit, will not be turned into long calls.  The exception to this rule is
+that weak function definitions, functions with the &lsquo;<samp><span class="samp">long-call</span></samp>&rsquo;
+attribute or the &lsquo;<samp><span class="samp">section</span></samp>&rsquo; attribute, and functions that are within
+the scope of a &lsquo;<samp><span class="samp">#pragma long_calls</span></samp>&rsquo; directive, will always be
+turned into long calls.
+
+     <p>This feature is not enabled by default.  Specifying
+<samp><span class="option">-mno-long-calls</span></samp> will restore the default behavior, as will
+placing the function calls within the scope of a &lsquo;<samp><span class="samp">#pragma
+long_calls_off</span></samp>&rsquo; directive.  Note these switches have no effect on how
+the compiler generates code to handle function calls via function
+pointers.
+
+     <br><dt><code>-msingle-pic-base</code><dd><a name="index-msingle_002dpic_002dbase-1023"></a>Treat the register used for PIC addressing as read-only, rather than
+loading it in the prologue for each function.  The run-time system is
+responsible for initializing this register with an appropriate value
+before execution begins.
+
+     <br><dt><code>-mpic-register=</code><var>reg</var><dd><a name="index-mpic_002dregister-1024"></a>Specify the register to be used for PIC addressing.  The default is R10
+unless stack-checking is enabled, when R9 is used.
+
+     <br><dt><code>-mcirrus-fix-invalid-insns</code><dd><a name="index-mcirrus_002dfix_002dinvalid_002dinsns-1025"></a><a name="index-mno_002dcirrus_002dfix_002dinvalid_002dinsns-1026"></a>Insert NOPs into the instruction stream to in order to work around
+problems with invalid Maverick instruction combinations.  This option
+is only valid if the <samp><span class="option">-mcpu=ep9312</span></samp> option has been used to
+enable generation of instructions for the Cirrus Maverick floating
+point co-processor.  This option is not enabled by default, since the
+problem is only present in older Maverick implementations.  The default
+can be re-enabled by use of the <samp><span class="option">-mno-cirrus-fix-invalid-insns</span></samp>
+switch.
+
+     <br><dt><code>-mpoke-function-name</code><dd><a name="index-mpoke_002dfunction_002dname-1027"></a>Write the name of each function into the text section, directly
+preceding the function prologue.  The generated code is similar to this:
+
+     <pre class="smallexample">               t0
+                   .ascii "arm_poke_function_name", 0
+                   .align
+               t1
+                   .word 0xff000000 + (t1 - t0)
+               arm_poke_function_name
+                   mov     ip, sp
+                   stmfd   sp!, {fp, ip, lr, pc}
+                   sub     fp, ip, #4
+</pre>
+     <p>When performing a stack backtrace, code can inspect the value of
+<code>pc</code> stored at <code>fp + 0</code>.  If the trace function then looks at
+location <code>pc - 12</code> and the top 8 bits are set, then we know that
+there is a function name embedded immediately preceding this location
+and has length <code>((pc[-3]) &amp; 0xff000000)</code>.
+
+     <br><dt><code>-mthumb</code><dd><a name="index-mthumb-1028"></a>Generate code for the Thumb instruction set.  The default is to
+use the 32-bit ARM instruction set. 
+This option automatically enables either 16-bit Thumb-1 or
+mixed 16/32-bit Thumb-2 instructions based on the <samp><span class="option">-mcpu=</span><var>name</var></samp>
+and <samp><span class="option">-march=</span><var>name</var></samp> options.  This option is not passed to the
+assembler. If you want to force assembler files to be interpreted as Thumb code,
+either add a &lsquo;<samp><span class="samp">.thumb</span></samp>&rsquo; directive to the source or pass the <samp><span class="option">-mthumb</span></samp>
+option directly to the assembler by prefixing it with <samp><span class="option">-Wa</span></samp>.
+
+     <br><dt><code>-mtpcs-frame</code><dd><a name="index-mtpcs_002dframe-1029"></a>Generate a stack frame that is compliant with the Thumb Procedure Call
+Standard for all non-leaf functions.  (A leaf function is one that does
+not call any other functions.)  The default is <samp><span class="option">-mno-tpcs-frame</span></samp>.
+
+     <br><dt><code>-mtpcs-leaf-frame</code><dd><a name="index-mtpcs_002dleaf_002dframe-1030"></a>Generate a stack frame that is compliant with the Thumb Procedure Call
+Standard for all leaf functions.  (A leaf function is one that does
+not call any other functions.)  The default is <samp><span class="option">-mno-apcs-leaf-frame</span></samp>.
+
+     <br><dt><code>-mcallee-super-interworking</code><dd><a name="index-mcallee_002dsuper_002dinterworking-1031"></a>Gives all externally visible functions in the file being compiled an ARM
+instruction set header which switches to Thumb mode before executing the
+rest of the function.  This allows these functions to be called from
+non-interworking code.  This option is not valid in AAPCS configurations
+because interworking is enabled by default.
+
+     <br><dt><code>-mcaller-super-interworking</code><dd><a name="index-mcaller_002dsuper_002dinterworking-1032"></a>Allows calls via function pointers (including virtual functions) to
+execute correctly regardless of whether the target code has been
+compiled for interworking or not.  There is a small overhead in the cost
+of executing a function pointer if this option is enabled.  This option
+is not valid in AAPCS configurations because interworking is enabled
+by default.
+
+     <br><dt><code>-mtp=</code><var>name</var><dd><a name="index-mtp-1033"></a>Specify the access model for the thread local storage pointer.  The valid
+models are <samp><span class="option">soft</span></samp>, which generates calls to <code>__aeabi_read_tp</code>,
+<samp><span class="option">cp15</span></samp>, which fetches the thread pointer from <code>cp15</code> directly
+(supported in the arm6k architecture), and <samp><span class="option">auto</span></samp>, which uses the
+best available method for the selected processor.  The default setting is
+<samp><span class="option">auto</span></samp>.
+
+     <br><dt><code>-mtls-dialect=</code><var>dialect</var><dd><a name="index-mtls_002ddialect-1034"></a>Specify the dialect to use for accessing thread local storage.  Two
+dialects are supported - <samp><span class="option">arm</span></samp> and <samp><span class="option">gnu</span></samp>.  The
+<samp><span class="option">arm</span></samp> dialect selects the ARM EABI scheme for supporting local
+and global dynamic tls models.  The <samp><span class="option">gnu</span></samp> dialect selects the
+experimental GNU scheme.  The GNU scheme is compatible with the ARM
+scheme, but does require new assembler, linker and library
+support.  Initial and local exec TLS models are unaffected by this
+option and use the ARM EABI scheme.
+
+     <br><dt><code>-mword-relocations</code><dd><a name="index-mword_002drelocations-1035"></a>Only generate absolute relocations on word sized values (i.e. R_ARM_ABS32). 
+This is enabled by default on targets (uClinux, SymbianOS) where the runtime
+loader imposes this restriction, and when <samp><span class="option">-fpic</span></samp> or <samp><span class="option">-fPIC</span></samp>
+is specified.
+
+ </dl>
+
+ </body></html>
+

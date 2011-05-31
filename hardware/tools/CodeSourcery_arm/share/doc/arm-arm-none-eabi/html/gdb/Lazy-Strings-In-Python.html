@@ -1,0 +1,109 @@
+<html lang="en">
+<head>
+<title>Lazy Strings In Python - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Python-API.html#Python-API" title="Python API">
+<link rel="prev" href="Symbol-Tables-In-Python.html#Symbol-Tables-In-Python" title="Symbol Tables In Python">
+<link rel="next" href="Breakpoints-In-Python.html#Breakpoints-In-Python" title="Breakpoints In Python">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Lazy-Strings-In-Python"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Breakpoints-In-Python.html#Breakpoints-In-Python">Breakpoints In Python</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Symbol-Tables-In-Python.html#Symbol-Tables-In-Python">Symbol Tables In Python</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Python-API.html#Python-API">Python API</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">23.2.2.20 Python representation of lazy strings.</h5>
+
+<p><a name="index-lazy-strings-in-python-1937"></a><a name="index-gdb_002eLazyString-1938"></a>
+A <dfn>lazy string</dfn> is a string whose contents is not retrieved or
+encoded until it is needed.
+
+   <p>A <code>gdb.LazyString</code> is represented in <span class="sc">gdb</span> as an
+<code>address</code> that points to a region of memory, an <code>encoding</code>
+that will be used to encode that region of memory, and a <code>length</code>
+to delimit the region of memory that represents the string.  The
+difference between a <code>gdb.LazyString</code> and a string wrapped within
+a <code>gdb.Value</code> is that a <code>gdb.LazyString</code> will be treated
+differently by <span class="sc">gdb</span> when printing.  A <code>gdb.LazyString</code> is
+retrieved and encoded during printing, while a <code>gdb.Value</code>
+wrapping a string is immediately retrieved and encoded on creation.
+
+   <p>A <code>gdb.LazyString</code> object has the following functions:
+
+<div class="defun">
+&mdash; Method on LazyString: <b>value</b><var><a name="index-value-on-LazyString-1939"></a></var><br>
+<blockquote><p>Convert the <code>gdb.LazyString</code> to a <code>gdb.Value</code>.  This value
+will point to the string in memory, but will lose all the delayed
+retrieval, encoding and handling that <span class="sc">gdb</span> applies to a
+<code>gdb.LazyString</code>. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Instance Variable of LazyString: <b>address</b><var><a name="index-address-1940"></a></var><br>
+<blockquote><p>This attribute holds the address of the string.  This attribute is not
+writable. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Instance Variable of LazyString: <b>length</b><var><a name="index-length-1941"></a></var><br>
+<blockquote><p>This attribute holds the length of the string in characters.  If the
+length is -1, then the string will be fetched and encoded up to the
+first null of appropriate width.  This attribute is not writable. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Instance Variable of LazyString: <b>encoding</b><var><a name="index-encoding-1942"></a></var><br>
+<blockquote><p>This attribute holds the encoding that will be applied to the string
+when the string is printed by <span class="sc">gdb</span>.  If the encoding is not
+set, or contains an empty string,  then <span class="sc">gdb</span> will select the
+most appropriate encoding when the string is printed.  This attribute
+is not writable. 
+</p></blockquote></div>
+
+<div class="defun">
+&mdash; Instance Variable of LazyString: <b>type</b><var><a name="index-type-1943"></a></var><br>
+<blockquote><p>This attribute holds the type that is represented by the lazy string's
+type.  For a lazy string this will always be a pointer type.  To
+resolve this to the lazy string's character type, use the type's
+<code>target</code> method.  See <a href="Types-In-Python.html#Types-In-Python">Types In Python</a>.  This attribute is not
+writable. 
+</p></blockquote></div>
+
+   </body></html>
+

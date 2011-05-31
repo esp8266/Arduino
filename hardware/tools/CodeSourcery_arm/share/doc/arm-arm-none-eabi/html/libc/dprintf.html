@@ -1,0 +1,71 @@
+<html lang="en">
+<head>
+<title>dprintf - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="diprintf.html#diprintf" title="diprintf">
+<link rel="next" href="fclose.html#fclose" title="fclose">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="dprintf"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="fclose.html#fclose">fclose</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="diprintf.html#diprintf">diprintf</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.3 <code>dprintf</code>, <code>vdprintf</code>&mdash;print to a file descriptor</h3>
+
+<p><a name="index-dprintf-150"></a><a name="index-g_t_005fdprintf_005fr-151"></a><a name="index-vdprintf-152"></a><a name="index-g_t_005fvdprintf_005fr-153"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     #include &lt;stdarg.h&gt;
+     int dprintf(int <var>fd</var>, const char *<var>format</var>, ...);
+     int vdprintf(int <var>fd</var>, const char *<var>format</var>, va_list <var>ap</var>);
+     int _dprintf_r(struct _reent *<var>ptr</var>, int <var>fd</var>,
+         const char *<var>format</var>, ...);
+     int _vdprintf_r(struct _reent *<var>ptr</var>, int <var>fd</var>,
+         const char *<var>format</var>, va_list <var>ap</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>dprintf</code> and <code>vdprintf</code> allow printing a format, similarly to
+<code>printf</code>, but write to a file descriptor instead of to a <code>FILE</code>
+stream.
+
+   <p>The functions <code>_dprintf_r</code> and <code>_vdprintf_r</code> are simply
+reentrant versions of the functions above.
+
+   <p><br>
+<strong>Returns</strong><br>
+The return value and errors are exactly as for <code>write</code>, except that
+<code>errno</code> may also be set to <code>ENOMEM</code> if the heap is exhausted.
+
+   <p><br>
+<strong>Portability</strong><br>
+This function is originally a GNU extension in glibc and is not portable.
+
+   <p>Supporting OS subroutines required: <code>sbrk</code>, <code>write</code>.
+
+   <p><br>
+
+   </body></html>
+

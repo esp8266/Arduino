@@ -1,0 +1,152 @@
+<html lang="en">
+<head>
+<title>Macro Arguments - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Macros.html#Macros" title="Macros">
+<link rel="prev" href="Function_002dlike-Macros.html#Function_002dlike-Macros" title="Function-like Macros">
+<link rel="next" href="Stringification.html#Stringification" title="Stringification">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Macro-Arguments"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Stringification.html#Stringification">Stringification</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Function_002dlike-Macros.html#Function_002dlike-Macros">Function-like Macros</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Macros.html#Macros">Macros</a>
+<hr>
+</div>
+
+<h3 class="section">3.3 Macro Arguments</h3>
+
+<p><a name="index-arguments-46"></a><a name="index-macros-with-arguments-47"></a><a name="index-arguments-in-macro-definitions-48"></a>
+Function-like macros can take <dfn>arguments</dfn>, just like true functions. 
+To define a macro that uses arguments, you insert <dfn>parameters</dfn>
+between the pair of parentheses in the macro definition that make the
+macro function-like.  The parameters must be valid C identifiers,
+separated by commas and optionally whitespace.
+
+   <p>To invoke a macro that takes arguments, you write the name of the macro
+followed by a list of <dfn>actual arguments</dfn> in parentheses, separated
+by commas.  The invocation of the macro need not be restricted to a
+single logical line&mdash;it can cross as many lines in the source file as
+you wish.  The number of arguments you give must match the number of
+parameters in the macro definition.  When the macro is expanded, each
+use of a parameter in its body is replaced by the tokens of the
+corresponding argument.  (You need not use all of the parameters in the
+macro body.)
+
+   <p>As an example, here is a macro that computes the minimum of two numeric
+values, as it is defined in many C programs, and some uses.
+
+<pre class="smallexample">     #define min(X, Y)  ((X) &lt; (Y) ? (X) : (Y))
+       x = min(a, b);          ==&gt;  x = ((a) &lt; (b) ? (a) : (b));
+       y = min(1, 2);          ==&gt;  y = ((1) &lt; (2) ? (1) : (2));
+       z = min(a + 28, *p);    ==&gt;  z = ((a + 28) &lt; (*p) ? (a + 28) : (*p));
+</pre>
+   <p class="noindent">(In this small example you can already see several of the dangers of
+macro arguments.  See <a href="Macro-Pitfalls.html#Macro-Pitfalls">Macro Pitfalls</a>, for detailed explanations.)
+
+   <p>Leading and trailing whitespace in each argument is dropped, and all
+whitespace between the tokens of an argument is reduced to a single
+space.  Parentheses within each argument must balance; a comma within
+such parentheses does not end the argument.  However, there is no
+requirement for square brackets or braces to balance, and they do not
+prevent a comma from separating arguments.  Thus,
+
+<pre class="smallexample">     macro (array[x = y, x + 1])
+</pre>
+   <p class="noindent">passes two arguments to <code>macro</code>: <code>array[x = y</code> and <code>x +
+1]</code>.  If you want to supply <code>array[x = y, x + 1]</code> as an argument,
+you can write it as <code>array[(x = y, x + 1)]</code>, which is equivalent C
+code.
+
+   <p>All arguments to a macro are completely macro-expanded before they are
+substituted into the macro body.  After substitution, the complete text
+is scanned again for macros to expand, including the arguments.  This rule
+may seem strange, but it is carefully designed so you need not worry
+about whether any function call is actually a macro invocation.  You can
+run into trouble if you try to be too clever, though.  See <a href="Argument-Prescan.html#Argument-Prescan">Argument Prescan</a>, for detailed discussion.
+
+   <p>For example, <code>min (min (a, b), c)</code> is first expanded to
+
+<pre class="smallexample">       min (((a) &lt; (b) ? (a) : (b)), (c))
+</pre>
+   <p class="noindent">and then to
+
+<pre class="smallexample">     ((((a) &lt; (b) ? (a) : (b))) &lt; (c)
+      ? (((a) &lt; (b) ? (a) : (b)))
+      : (c))
+</pre>
+   <p class="noindent">(Line breaks shown here for clarity would not actually be generated.)
+
+   <p><a name="index-empty-macro-arguments-49"></a>You can leave macro arguments empty; this is not an error to the
+preprocessor (but many macros will then expand to invalid code). 
+You cannot leave out arguments entirely; if a macro takes two arguments,
+there must be exactly one comma at the top level of its argument list. 
+Here are some silly examples using <code>min</code>:
+
+<pre class="smallexample">     min(, b)        ==&gt; ((   ) &lt; (b) ? (   ) : (b))
+     min(a, )        ==&gt; ((a  ) &lt; ( ) ? (a  ) : ( ))
+     min(,)          ==&gt; ((   ) &lt; ( ) ? (   ) : ( ))
+     min((,),)       ==&gt; (((,)) &lt; ( ) ? ((,)) : ( ))
+     
+     min()      error--&gt; macro "min" requires 2 arguments, but only 1 given
+     min(,,)    error--&gt; macro "min" passed 3 arguments, but takes just 2
+</pre>
+   <p>Whitespace is not a preprocessing token, so if a macro <code>foo</code> takes
+one argument, <code>foo&nbsp;()<!-- /@w --></code> and <code>foo&nbsp;(&nbsp;)<!-- /@w --></code> both supply it an
+empty argument.  Previous GNU preprocessor implementations and
+documentation were incorrect on this point, insisting that a
+function-like macro that takes a single argument be passed a space if an
+empty argument was required.
+
+   <p>Macro parameters appearing inside string literals are not replaced by
+their corresponding actual arguments.
+
+<pre class="smallexample">     #define foo(x) x, "x"
+     foo(bar)        ==&gt; bar, "x"
+</pre>
+   </body></html>
+

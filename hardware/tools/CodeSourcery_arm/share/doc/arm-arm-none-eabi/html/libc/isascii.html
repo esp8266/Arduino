@@ -1,0 +1,64 @@
+<html lang="en">
+<head>
+<title>isascii - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Ctype.html#Ctype" title="Ctype">
+<link rel="prev" href="isalpha.html#isalpha" title="isalpha">
+<link rel="next" href="iscntrl.html#iscntrl" title="iscntrl">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="isascii"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="iscntrl.html#iscntrl">iscntrl</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="isalpha.html#isalpha">isalpha</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Ctype.html#Ctype">Ctype</a>
+<hr>
+</div>
+
+<h3 class="section">3.3 <code>isascii</code>&mdash;ASCII character predicate</h3>
+
+<p><a name="index-isascii-112"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;ctype.h&gt;
+     int isascii(int <var>c</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>isascii</code> is a macro which returns non-zero when <var>c</var> is an ASCII
+character, and 0 otherwise.  It is defined for all integer values.
+
+   <p>You can use a compiled subroutine instead of the macro definition by
+undefining the macro using `<code>#undef isascii</code>'.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>isascii</code> returns non-zero if the low order byte of <var>c</var> is in the range
+0 to 127 (<code>0x00</code>&ndash;<code>0x7F</code>).
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>isascii</code> is ANSI C.
+
+   <p>No supporting OS subroutines are required.
+
+   <p><br>
+
+   </body></html>
+

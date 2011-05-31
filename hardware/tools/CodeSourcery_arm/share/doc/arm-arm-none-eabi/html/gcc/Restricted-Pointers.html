@@ -1,0 +1,99 @@
+<html lang="en">
+<head>
+<title>Restricted Pointers - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C_002b_002b-Extensions.html#C_002b_002b-Extensions" title="C++ Extensions">
+<link rel="prev" href="Volatiles.html#Volatiles" title="Volatiles">
+<link rel="next" href="Vague-Linkage.html#Vague-Linkage" title="Vague Linkage">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Restricted-Pointers"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Vague-Linkage.html#Vague-Linkage">Vague Linkage</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Volatiles.html#Volatiles">Volatiles</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C_002b_002b-Extensions.html#C_002b_002b-Extensions">C++ Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">7.2 Restricting Pointer Aliasing</h3>
+
+<p><a name="index-restricted-pointers-3163"></a><a name="index-restricted-references-3164"></a><a name="index-restricted-this-pointer-3165"></a>
+As with the C front end, G++ understands the C99 feature of restricted pointers,
+specified with the <code>__restrict__</code>, or <code>__restrict</code> type
+qualifier.  Because you cannot compile C++ by specifying the <samp><span class="option">-std=c99</span></samp>
+language flag, <code>restrict</code> is not a keyword in C++.
+
+ <p>In addition to allowing restricted pointers, you can specify restricted
+references, which indicate that the reference is not aliased in the local
+context.
+
+<pre class="smallexample">     void fn (int *__restrict__ rptr, int &amp;__restrict__ rref)
+     {
+       /* <span class="roman">...</span> */
+     }
+</pre>
+ <p class="noindent">In the body of <code>fn</code>, <var>rptr</var> points to an unaliased integer and
+<var>rref</var> refers to a (different) unaliased integer.
+
+ <p>You may also specify whether a member function's <var>this</var> pointer is
+unaliased by using <code>__restrict__</code> as a member function qualifier.
+
+<pre class="smallexample">     void T::fn () __restrict__
+     {
+       /* <span class="roman">...</span> */
+     }
+</pre>
+ <p class="noindent">Within the body of <code>T::fn</code>, <var>this</var> will have the effective
+definition <code>T *__restrict__ const this</code>.  Notice that the
+interpretation of a <code>__restrict__</code> member function qualifier is
+different to that of <code>const</code> or <code>volatile</code> qualifier, in that it
+is applied to the pointer rather than the object.  This is consistent with
+other compilers which implement restricted pointers.
+
+ <p>As with all outermost parameter qualifiers, <code>__restrict__</code> is
+ignored in function definition matching.  This means you only need to
+specify <code>__restrict__</code> in a function definition, rather than
+in a function prototype as well.
+
+ </body></html>
+

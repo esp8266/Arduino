@@ -1,0 +1,189 @@
+<html lang="en">
+<head>
+<title>Signals - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stopping.html#Stopping" title="Stopping">
+<link rel="prev" href="Continuing-and-Stepping.html#Continuing-and-Stepping" title="Continuing and Stepping">
+<link rel="next" href="Thread-Stops.html#Thread-Stops" title="Thread Stops">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Signals"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Thread-Stops.html#Thread-Stops">Thread Stops</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Continuing-and-Stepping.html#Continuing-and-Stepping">Continuing and Stepping</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stopping.html#Stopping">Stopping</a>
+<hr>
+</div>
+
+<h3 class="section">5.3 Signals</h3>
+
+<p><a name="index-signals-307"></a>
+A signal is an asynchronous event that can happen in a program.  The
+operating system defines the possible kinds of signals, and gives each
+kind a name and a number.  For example, in Unix <code>SIGINT</code> is the
+signal a program gets when you type an interrupt character (often <kbd>Ctrl-c</kbd>);
+<code>SIGSEGV</code> is the signal a program gets from referencing a place in
+memory far away from all the areas in use; <code>SIGALRM</code> occurs when
+the alarm clock timer goes off (which happens only if your program has
+requested an alarm).
+
+   <p><a name="index-fatal-signals-308"></a>Some signals, including <code>SIGALRM</code>, are a normal part of the
+functioning of your program.  Others, such as <code>SIGSEGV</code>, indicate
+errors; these signals are <dfn>fatal</dfn> (they kill your program immediately) if the
+program has not specified in advance some other way to handle the signal. 
+<code>SIGINT</code> does not indicate an error in your program, but it is normally
+fatal so it can carry out the purpose of the interrupt: to kill the program.
+
+   <p><span class="sc">gdb</span> has the ability to detect any occurrence of a signal in your
+program.  You can tell <span class="sc">gdb</span> in advance what to do for each kind of
+signal.
+
+   <p><a name="index-handling-signals-309"></a>Normally, <span class="sc">gdb</span> is set up to let the non-erroneous signals like
+<code>SIGALRM</code> be silently passed to your program
+(so as not to interfere with their role in the program's functioning)
+but to stop your program immediately whenever an error signal happens. 
+You can change these settings with the <code>handle</code> command.
+
+     
+<a name="index-info-signals-310"></a>
+<a name="index-info-handle-311"></a>
+<dl><dt><code>info signals</code><dt><code>info handle</code><dd>Print a table of all the kinds of signals and how <span class="sc">gdb</span> has been told to
+handle each one.  You can use this to see the signal numbers of all
+the defined types of signals.
+
+     <br><dt><code>info signals </code><var>sig</var><dd>Similar, but print information only about the specified signal number.
+
+     <p><code>info handle</code> is an alias for <code>info signals</code>.
+
+     <p><a name="index-handle-312"></a><br><dt><code>handle </code><var>signal</var> <span class="roman">[</span><var>keywords</var><code>...</code><span class="roman">]</span><dd>Change the way <span class="sc">gdb</span> handles signal <var>signal</var>.  <var>signal</var>
+can be the number of a signal or its name (with or without the
+&lsquo;<samp><span class="samp">SIG</span></samp>&rsquo; at the beginning); a list of signal numbers of the form
+&lsquo;<samp><var>low</var><span class="samp">-</span><var>high</var></samp>&rsquo;; or the word &lsquo;<samp><span class="samp">all</span></samp>&rsquo;, meaning all the
+known signals.  Optional arguments <var>keywords</var>, described below,
+say what change to make. 
+</dl>
+
+<!-- @group -->
+   <p>The keywords allowed by the <code>handle</code> command can be abbreviated. 
+Their full names are:
+
+     <dl>
+<dt><code>nostop</code><dd><span class="sc">gdb</span> should not stop your program when this signal happens.  It may
+still print a message telling you that the signal has come in.
+
+     <br><dt><code>stop</code><dd><span class="sc">gdb</span> should stop your program when this signal happens.  This implies
+the <code>print</code> keyword as well.
+
+     <br><dt><code>print</code><dd><span class="sc">gdb</span> should print a message when this signal happens.
+
+     <br><dt><code>noprint</code><dd><span class="sc">gdb</span> should not mention the occurrence of the signal at all.  This
+implies the <code>nostop</code> keyword as well.
+
+     <br><dt><code>pass</code><dt><code>noignore</code><dd><span class="sc">gdb</span> should allow your program to see this signal; your program
+can handle the signal, or else it may terminate if the signal is fatal
+and not handled.  <code>pass</code> and <code>noignore</code> are synonyms.
+
+     <br><dt><code>nopass</code><dt><code>ignore</code><dd><span class="sc">gdb</span> should not allow your program to see this signal. 
+<code>nopass</code> and <code>ignore</code> are synonyms. 
+</dl>
+   <!-- @end group -->
+
+   <p>When a signal stops your program, the signal is not visible to the
+program until you
+continue.  Your program sees the signal then, if <code>pass</code> is in
+effect for the signal in question <em>at that time</em>.  In other words,
+after <span class="sc">gdb</span> reports a signal, you can use the <code>handle</code>
+command with <code>pass</code> or <code>nopass</code> to control whether your
+program sees that signal when you continue.
+
+   <p>The default is set to <code>nostop</code>, <code>noprint</code>, <code>pass</code> for
+non-erroneous signals such as <code>SIGALRM</code>, <code>SIGWINCH</code> and
+<code>SIGCHLD</code>, and to <code>stop</code>, <code>print</code>, <code>pass</code> for the
+erroneous signals.
+
+   <p>You can also use the <code>signal</code> command to prevent your program from
+seeing a signal, or cause it to see a signal it normally would not see,
+or to give it any signal at any time.  For example, if your program stopped
+due to some sort of memory reference error, you might store correct
+values into the erroneous variables and continue, hoping to see more
+execution; but your program would probably terminate immediately as
+a result of the fatal signal once it saw the signal.  To prevent this,
+you can continue with &lsquo;<samp><span class="samp">signal 0</span></samp>&rsquo;.  See <a href="Signaling.html#Signaling">Giving your Program a Signal</a>.
+
+   <p><a name="index-extra-signal-information-313"></a><a name="extra-signal-information"></a>On some targets, <span class="sc">gdb</span> can inspect extra signal information
+associated with the intercepted signal, before it is actually
+delivered to the program being debugged.  This information is exported
+by the convenience variable <code>$_siginfo</code>, and consists of data
+that is passed by the kernel to the signal handler at the time of the
+receipt of a signal.  The data type of the information itself is
+target dependent.  You can see the data type using the <code>ptype
+$_siginfo</code> command.  On Unix systems, it typically corresponds to the
+standard <code>siginfo_t</code> type, as defined in the <samp><span class="file">signal.h</span></samp>
+system header.
+
+   <p>Here's an example, on a <span class="sc">gnu</span>/Linux system, printing the stray
+referenced address that raised a segmentation fault.
+
+<pre class="smallexample">     (gdb) continue
+     Program received signal SIGSEGV, Segmentation fault.
+     0x0000000000400766 in main ()
+     69        *(int *)p = 0;
+     (gdb) ptype $_siginfo
+     type = struct {
+         int si_signo;
+         int si_errno;
+         int si_code;
+         union {
+             int _pad[28];
+             struct {...} _kill;
+             struct {...} _timer;
+             struct {...} _rt;
+             struct {...} _sigchld;
+             struct {...} _sigfault;
+             struct {...} _sigpoll;
+         } _sifields;
+     }
+     (gdb) ptype $_siginfo._sifields._sigfault
+     type = struct {
+         void *si_addr;
+     }
+     (gdb) p $_siginfo._sifields._sigfault.si_addr
+     $1 = (void *) 0x7ffff7ff7000
+</pre>
+   <p>Depending on target support, <code>$_siginfo</code> may also be writable.
+
+   </body></html>
+

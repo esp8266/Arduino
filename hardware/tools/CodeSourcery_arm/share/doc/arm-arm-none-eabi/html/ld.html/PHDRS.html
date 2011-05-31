@@ -1,0 +1,178 @@
+<html lang="en">
+<head>
+<title>PHDRS - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Scripts.html#Scripts" title="Scripts">
+<link rel="prev" href="MEMORY.html#MEMORY" title="MEMORY">
+<link rel="next" href="VERSION.html#VERSION" title="VERSION">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="PHDRS"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="VERSION.html#VERSION">VERSION</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="MEMORY.html#MEMORY">MEMORY</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Scripts.html#Scripts">Scripts</a>
+<hr>
+</div>
+
+<h3 class="section">3.8 PHDRS Command</h3>
+
+<p><a name="index-PHDRS-476"></a><a name="index-program-headers-477"></a><a name="index-ELF-program-headers-478"></a><a name="index-program-segments-479"></a><a name="index-segments_002c-ELF-480"></a>The ELF object file format uses <dfn>program headers</dfn>, also knows as
+<dfn>segments</dfn>.  The program headers describe how the program should be
+loaded into memory.  You can print them out by using the <code>objdump</code>
+program with the &lsquo;<samp><span class="samp">-p</span></samp>&rsquo; option.
+
+   <p>When you run an ELF program on a native ELF system, the system loader
+reads the program headers in order to figure out how to load the
+program.  This will only work if the program headers are set correctly. 
+This manual does not describe the details of how the system loader
+interprets program headers; for more information, see the ELF ABI.
+
+   <p>The linker will create reasonable program headers by default.  However,
+in some cases, you may need to specify the program headers more
+precisely.  You may use the <code>PHDRS</code> command for this purpose.  When
+the linker sees the <code>PHDRS</code> command in the linker script, it will
+not create any program headers other than the ones specified.
+
+   <p>The linker only pays attention to the <code>PHDRS</code> command when
+generating an ELF output file.  In other cases, the linker will simply
+ignore <code>PHDRS</code>.
+
+   <p>This is the syntax of the <code>PHDRS</code> command.  The words <code>PHDRS</code>,
+<code>FILEHDR</code>, <code>AT</code>, and <code>FLAGS</code> are keywords.
+
+<pre class="smallexample">     PHDRS
+     {
+       <var>name</var> <var>type</var> [ FILEHDR ] [ PHDRS ] [ AT ( <var>address</var> ) ]
+             [ FLAGS ( <var>flags</var> ) ] ;
+     }
+</pre>
+   <p>The <var>name</var> is used only for reference in the <code>SECTIONS</code> command
+of the linker script.  It is not put into the output file.  Program
+header names are stored in a separate name space, and will not conflict
+with symbol names, file names, or section names.  Each program header
+must have a distinct name.  The headers are processed in order and it
+is usual for them to map to sections in ascending load address order.
+
+   <p>Certain program header types describe segments of memory which the
+system loader will load from the file.  In the linker script, you
+specify the contents of these segments by placing allocatable output
+sections in the segments.  You use the &lsquo;<samp><span class="samp">:</span><var>phdr</var></samp>&rsquo; output section
+attribute to place a section in a particular segment.  See <a href="Output-Section-Phdr.html#Output-Section-Phdr">Output Section Phdr</a>.
+
+   <p>It is normal to put certain sections in more than one segment.  This
+merely implies that one segment of memory contains another.  You may
+repeat &lsquo;<samp><span class="samp">:</span><var>phdr</var></samp>&rsquo;, using it once for each segment which should
+contain the section.
+
+   <p>If you place a section in one or more segments using &lsquo;<samp><span class="samp">:</span><var>phdr</var></samp>&rsquo;,
+then the linker will place all subsequent allocatable sections which do
+not specify &lsquo;<samp><span class="samp">:</span><var>phdr</var></samp>&rsquo; in the same segments.  This is for
+convenience, since generally a whole set of contiguous sections will be
+placed in a single segment.  You can use <code>:NONE</code> to override the
+default segment and tell the linker to not put the section in any
+segment at all.
+
+   <p><a name="index-FILEHDR-481"></a><a name="index-PHDRS-482"></a>You may use the <code>FILEHDR</code> and <code>PHDRS</code> keywords after
+the program header type to further describe the contents of the segment. 
+The <code>FILEHDR</code> keyword means that the segment should include the ELF
+file header.  The <code>PHDRS</code> keyword means that the segment should
+include the ELF program headers themselves.  If applied to a loadable
+segment (<code>PT_LOAD</code>), all prior loadable segments must have one of
+these keywords.
+
+   <p>The <var>type</var> may be one of the following.  The numbers indicate the
+value of the keyword.
+
+     <dl>
+<dt><code>PT_NULL</code> (0)<dd>Indicates an unused program header.
+
+     <br><dt><code>PT_LOAD</code> (1)<dd>Indicates that this program header describes a segment to be loaded from
+the file.
+
+     <br><dt><code>PT_DYNAMIC</code> (2)<dd>Indicates a segment where dynamic linking information can be found.
+
+     <br><dt><code>PT_INTERP</code> (3)<dd>Indicates a segment where the name of the program interpreter may be
+found.
+
+     <br><dt><code>PT_NOTE</code> (4)<dd>Indicates a segment holding note information.
+
+     <br><dt><code>PT_SHLIB</code> (5)<dd>A reserved program header type, defined but not specified by the ELF
+ABI.
+
+     <br><dt><code>PT_PHDR</code> (6)<dd>Indicates a segment where the program headers may be found.
+
+     <br><dt><var>expression</var><dd>An expression giving the numeric type of the program header.  This may
+be used for types not defined above. 
+</dl>
+
+   <p>You can specify that a segment should be loaded at a particular address
+in memory by using an <code>AT</code> expression.  This is identical to the
+<code>AT</code> command used as an output section attribute (see <a href="Output-Section-LMA.html#Output-Section-LMA">Output Section LMA</a>).  The <code>AT</code> command for a program header overrides the
+output section attribute.
+
+   <p>The linker will normally set the segment flags based on the sections
+which comprise the segment.  You may use the <code>FLAGS</code> keyword to
+explicitly specify the segment flags.  The value of <var>flags</var> must be
+an integer.  It is used to set the <code>p_flags</code> field of the program
+header.
+
+   <p>Here is an example of <code>PHDRS</code>.  This shows a typical set of program
+headers used on a native ELF system.
+
+<pre class="example">     PHDRS
+     {
+       headers PT_PHDR PHDRS ;
+       interp PT_INTERP ;
+       text PT_LOAD FILEHDR PHDRS ;
+       data PT_LOAD ;
+       dynamic PT_DYNAMIC ;
+     }
+     
+     SECTIONS
+     {
+       . = SIZEOF_HEADERS;
+       .interp : { *(.interp) } :text :interp
+       .text : { *(.text) } :text
+       .rodata : { *(.rodata) } /* defaults to :text */
+       ...
+       . = . + 0x1000; /* move to a new page in memory */
+       .data : { *(.data) } :data
+       .dynamic : { *(.dynamic) } :data :dynamic
+       ...
+     }
+</pre>
+   </body></html>
+

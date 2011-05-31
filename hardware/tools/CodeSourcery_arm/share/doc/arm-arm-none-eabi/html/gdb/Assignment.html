@@ -1,0 +1,133 @@
+<html lang="en">
+<head>
+<title>Assignment - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Altering.html#Altering" title="Altering">
+<link rel="next" href="Jumping.html#Jumping" title="Jumping">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Assignment"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Jumping.html#Jumping">Jumping</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Altering.html#Altering">Altering</a>
+<hr>
+</div>
+
+<h3 class="section">17.1 Assignment to Variables</h3>
+
+<p><a name="index-assignment-924"></a><a name="index-setting-variables-925"></a>To alter the value of a variable, evaluate an assignment expression. 
+See <a href="Expressions.html#Expressions">Expressions</a>.  For example,
+
+<pre class="smallexample">     print x=4
+</pre>
+   <p class="noindent">stores the value 4 into the variable <code>x</code>, and then prints the
+value of the assignment expression (which is 4). 
+See <a href="Languages.html#Languages">Using <span class="sc">gdb</span> with Different Languages</a>, for more
+information on operators in supported languages.
+
+   <p><a name="index-set-variable-926"></a><a name="index-variables_002c-setting-927"></a>If you are not interested in seeing the value of the assignment, use the
+<code>set</code> command instead of the <code>print</code> command.  <code>set</code> is
+really the same as <code>print</code> except that the expression's value is
+not printed and is not put in the value history (see <a href="Value-History.html#Value-History">Value History</a>).  The expression is evaluated only for its effects.
+
+   <p>If the beginning of the argument string of the <code>set</code> command
+appears identical to a <code>set</code> subcommand, use the <code>set
+variable</code> command instead of just <code>set</code>.  This command is identical
+to <code>set</code> except for its lack of subcommands.  For example, if your
+program has a variable <code>width</code>, you get an error if you try to set
+a new value with just &lsquo;<samp><span class="samp">set width=13</span></samp>&rsquo;, because <span class="sc">gdb</span> has the
+command <code>set width</code>:
+
+<pre class="smallexample">     (gdb) whatis width
+     type = double
+     (gdb) p width
+     $4 = 13
+     (gdb) set width=47
+     Invalid syntax in expression.
+</pre>
+   <p class="noindent">The invalid expression, of course, is &lsquo;<samp><span class="samp">=47</span></samp>&rsquo;.  In
+order to actually set the program's variable <code>width</code>, use
+
+<pre class="smallexample">     (gdb) set var width=47
+</pre>
+   <p>Because the <code>set</code> command has many subcommands that can conflict
+with the names of program variables, it is a good idea to use the
+<code>set variable</code> command instead of just <code>set</code>.  For example, if
+your program has a variable <code>g</code>, you run into problems if you try
+to set a new value with just &lsquo;<samp><span class="samp">set g=4</span></samp>&rsquo;, because <span class="sc">gdb</span> has
+the command <code>set gnutarget</code>, abbreviated <code>set g</code>:
+
+<pre class="smallexample">     (gdb) whatis g
+     type = double
+     (gdb) p g
+     $1 = 1
+     (gdb) set g=4
+     (gdb) p g
+     $2 = 1
+     (gdb) r
+     The program being debugged has been started already.
+     Start it from the beginning? (y or n) y
+     Starting program: /home/smith/cc_progs/a.out
+     "/home/smith/cc_progs/a.out": can't open to read symbols:
+                                      Invalid bfd target.
+     (gdb) show g
+     The current BFD target is "=4".
+</pre>
+   <p class="noindent">The program variable <code>g</code> did not change, and you silently set the
+<code>gnutarget</code> to an invalid value.  In order to set the variable
+<code>g</code>, use
+
+<pre class="smallexample">     (gdb) set var g=4
+</pre>
+   <p><span class="sc">gdb</span> allows more implicit conversions in assignments than C; you can
+freely store an integer value into a pointer variable or vice versa,
+and you can convert any structure to any other structure that is the
+same length or shorter. 
+<!-- FIXME: how do structs align/pad in these conversions? -->
+<!-- /doc@cygnus.com 18dec1990 -->
+
+   <p>To store values into arbitrary places in memory, use the &lsquo;<samp><span class="samp">{...}</span></samp>&rsquo;
+construct to generate a value of specified type at a specified address
+(see <a href="Expressions.html#Expressions">Expressions</a>).  For example, <code>{int}0x83040</code> refers
+to memory location <code>0x83040</code> as an integer (which implies a certain size
+and representation in memory), and
+
+<pre class="smallexample">     set {int}0x83040 = 4
+</pre>
+   <p class="noindent">stores the value 4 into that memory location.
+
+   </body></html>
+

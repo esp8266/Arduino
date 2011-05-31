@@ -1,0 +1,74 @@
+<html lang="en">
+<head>
+<title>div - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdlib.html#Stdlib" title="Stdlib">
+<link rel="prev" href="calloc.html#calloc" title="calloc">
+<link rel="next" href="ecvtbuf.html#ecvtbuf" title="ecvtbuf">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="div"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="ecvtbuf.html#ecvtbuf">ecvtbuf</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="calloc.html#calloc">calloc</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdlib.html#Stdlib">Stdlib</a>
+<hr>
+</div>
+
+<h3 class="section">2.12 <code>div</code>&mdash;divide two integers</h3>
+
+<p><a name="index-div-19"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdlib.h&gt;
+     div_t div(int <var>n</var>, int <var>d</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+Divide
+<var>n</var>/<var>d</var>,
+returning quotient and remainder as two integers in a structure <code>div_t</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+The result is represented with the structure
+
+<pre class="smallexample">      typedef struct
+      {
+       int quot;
+       int rem;
+      } div_t;
+</pre>
+   <p>where the <code>quot</code> field represents the quotient, and <code>rem</code> the
+remainder.  For nonzero <var>d</var>, if `<var>r</var><code> = div(</code><var>n</var><code>,</code><var>d</var><code>);</code>' then
+<var>n</var> equals `<var>r</var><code>.rem + </code><var>d</var><code>*</code><var>r</var><code>.quot</code>'.
+
+   <p>To divide <code>long</code> rather than <code>int</code> values, use the similar
+function <code>ldiv</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>div</code> is ANSI.
+
+   <p>No supporting OS subroutines are required.
+
+   <p><br>
+
+   </body></html>
+

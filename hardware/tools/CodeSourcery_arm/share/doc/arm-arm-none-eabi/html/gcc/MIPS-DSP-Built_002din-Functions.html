@@ -1,0 +1,335 @@
+<html lang="en">
+<head>
+<title>MIPS DSP Built-in Functions - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Target-Builtins.html#Target-Builtins" title="Target Builtins">
+<link rel="prev" href="X86-Built_002din-Functions.html#X86-Built_002din-Functions" title="X86 Built-in Functions">
+<link rel="next" href="MIPS-Paired_002dSingle-Support.html#MIPS-Paired_002dSingle-Support" title="MIPS Paired-Single Support">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="MIPS-DSP-Built-in-Functions"></a>
+<a name="MIPS-DSP-Built_002din-Functions"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="MIPS-Paired_002dSingle-Support.html#MIPS-Paired_002dSingle-Support">MIPS Paired-Single Support</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="X86-Built_002din-Functions.html#X86-Built_002din-Functions">X86 Built-in Functions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Target-Builtins.html#Target-Builtins">Target Builtins</a>
+<hr>
+</div>
+
+<h4 class="subsection">6.52.7 MIPS DSP Built-in Functions</h4>
+
+<p>The MIPS DSP Application-Specific Extension (ASE) includes new
+instructions that are designed to improve the performance of DSP and
+media applications.  It provides instructions that operate on packed
+8-bit/16-bit integer data, Q7, Q15 and Q31 fractional data.
+
+ <p>GCC supports MIPS DSP operations using both the generic
+vector extensions (see <a href="Vector-Extensions.html#Vector-Extensions">Vector Extensions</a>) and a collection of
+MIPS-specific built-in functions.  Both kinds of support are
+enabled by the <samp><span class="option">-mdsp</span></samp> command-line option.
+
+ <p>Revision 2 of the ASE was introduced in the second half of 2006. 
+This revision adds extra instructions to the original ASE, but is
+otherwise backwards-compatible with it.  You can select revision 2
+using the command-line option <samp><span class="option">-mdspr2</span></samp>; this option implies
+<samp><span class="option">-mdsp</span></samp>.
+
+ <p>The SCOUNT and POS bits of the DSP control register are global.  The
+WRDSP, EXTPDP, EXTPDPV and MTHLIP instructions modify the SCOUNT and
+POS bits.  During optimization, the compiler will not delete these
+instructions and it will not delete calls to functions containing
+these instructions.
+
+ <p>At present, GCC only provides support for operations on 32-bit
+vectors.  The vector type associated with 8-bit integer data is
+usually called <code>v4i8</code>, the vector type associated with Q7
+is usually called <code>v4q7</code>, the vector type associated with 16-bit
+integer data is usually called <code>v2i16</code>, and the vector type
+associated with Q15 is usually called <code>v2q15</code>.  They can be
+defined in C as follows:
+
+<pre class="smallexample">     typedef signed char v4i8 __attribute__ ((vector_size(4)));
+     typedef signed char v4q7 __attribute__ ((vector_size(4)));
+     typedef short v2i16 __attribute__ ((vector_size(4)));
+     typedef short v2q15 __attribute__ ((vector_size(4)));
+</pre>
+ <p><code>v4i8</code>, <code>v4q7</code>, <code>v2i16</code> and <code>v2q15</code> values are
+initialized in the same way as aggregates.  For example:
+
+<pre class="smallexample">     v4i8 a = {1, 2, 3, 4};
+     v4i8 b;
+     b = (v4i8) {5, 6, 7, 8};
+     
+     v2q15 c = {0x0fcb, 0x3a75};
+     v2q15 d;
+     d = (v2q15) {0.1234 * 0x1.0p15, 0.4567 * 0x1.0p15};
+</pre>
+ <p><em>Note:</em> The CPU's endianness determines the order in which values
+are packed.  On little-endian targets, the first value is the least
+significant and the last value is the most significant.  The opposite
+order applies to big-endian targets.  For example, the code above will
+set the lowest byte of <code>a</code> to <code>1</code> on little-endian targets
+and <code>4</code> on big-endian targets.
+
+ <p><em>Note:</em> Q7, Q15 and Q31 values must be initialized with their integer
+representation.  As shown in this example, the integer representation
+of a Q7 value can be obtained by multiplying the fractional value by
+<code>0x1.0p7</code>.  The equivalent for Q15 values is to multiply by
+<code>0x1.0p15</code>.  The equivalent for Q31 values is to multiply by
+<code>0x1.0p31</code>.
+
+ <p>The table below lists the <code>v4i8</code> and <code>v2q15</code> operations for which
+hardware support exists.  <code>a</code> and <code>b</code> are <code>v4i8</code> values,
+and <code>c</code> and <code>d</code> are <code>v2q15</code> values.
+
+ <p><table summary=""><tr align="left"><td valign="top" width="50%">C code </td><td valign="top" width="50%">MIPS instruction
+<br></td></tr><tr align="left"><td valign="top" width="50%"><code>a + b</code> </td><td valign="top" width="50%"><code>addu.qb</code>
+<br></td></tr><tr align="left"><td valign="top" width="50%"><code>c + d</code> </td><td valign="top" width="50%"><code>addq.ph</code>
+<br></td></tr><tr align="left"><td valign="top" width="50%"><code>a - b</code> </td><td valign="top" width="50%"><code>subu.qb</code>
+<br></td></tr><tr align="left"><td valign="top" width="50%"><code>c - d</code> </td><td valign="top" width="50%"><code>subq.ph</code>
+ <br></td></tr></table>
+
+ <p>The table below lists the <code>v2i16</code> operation for which
+hardware support exists for the DSP ASE REV 2.  <code>e</code> and <code>f</code> are
+<code>v2i16</code> values.
+
+ <p><table summary=""><tr align="left"><td valign="top" width="50%">C code </td><td valign="top" width="50%">MIPS instruction
+<br></td></tr><tr align="left"><td valign="top" width="50%"><code>e * f</code> </td><td valign="top" width="50%"><code>mul.ph</code>
+ <br></td></tr></table>
+
+ <p>It is easier to describe the DSP built-in functions if we first define
+the following types:
+
+<pre class="smallexample">     typedef int q31;
+     typedef int i32;
+     typedef unsigned int ui32;
+     typedef long long a64;
+</pre>
+ <p><code>q31</code> and <code>i32</code> are actually the same as <code>int</code>, but we
+use <code>q31</code> to indicate a Q31 fractional value and <code>i32</code> to
+indicate a 32-bit integer value.  Similarly, <code>a64</code> is the same as
+<code>long long</code>, but we use <code>a64</code> to indicate values that will
+be placed in one of the four DSP accumulators (<code>$ac0</code>,
+<code>$ac1</code>, <code>$ac2</code> or <code>$ac3</code>).
+
+ <p>Also, some built-in functions prefer or require immediate numbers as
+parameters, because the corresponding DSP instructions accept both immediate
+numbers and register operands, or accept immediate numbers only.  The
+immediate parameters are listed as follows.
+
+<pre class="smallexample">     imm0_3: 0 to 3.
+     imm0_7: 0 to 7.
+     imm0_15: 0 to 15.
+     imm0_31: 0 to 31.
+     imm0_63: 0 to 63.
+     imm0_255: 0 to 255.
+     imm_n32_31: -32 to 31.
+     imm_n512_511: -512 to 511.
+</pre>
+ <p>The following built-in functions map directly to a particular MIPS DSP
+instruction.  Please refer to the architecture specification
+for details on what each instruction does.
+
+<pre class="smallexample">     v2q15 __builtin_mips_addq_ph (v2q15, v2q15)
+     v2q15 __builtin_mips_addq_s_ph (v2q15, v2q15)
+     q31 __builtin_mips_addq_s_w (q31, q31)
+     v4i8 __builtin_mips_addu_qb (v4i8, v4i8)
+     v4i8 __builtin_mips_addu_s_qb (v4i8, v4i8)
+     v2q15 __builtin_mips_subq_ph (v2q15, v2q15)
+     v2q15 __builtin_mips_subq_s_ph (v2q15, v2q15)
+     q31 __builtin_mips_subq_s_w (q31, q31)
+     v4i8 __builtin_mips_subu_qb (v4i8, v4i8)
+     v4i8 __builtin_mips_subu_s_qb (v4i8, v4i8)
+     i32 __builtin_mips_addsc (i32, i32)
+     i32 __builtin_mips_addwc (i32, i32)
+     i32 __builtin_mips_modsub (i32, i32)
+     i32 __builtin_mips_raddu_w_qb (v4i8)
+     v2q15 __builtin_mips_absq_s_ph (v2q15)
+     q31 __builtin_mips_absq_s_w (q31)
+     v4i8 __builtin_mips_precrq_qb_ph (v2q15, v2q15)
+     v2q15 __builtin_mips_precrq_ph_w (q31, q31)
+     v2q15 __builtin_mips_precrq_rs_ph_w (q31, q31)
+     v4i8 __builtin_mips_precrqu_s_qb_ph (v2q15, v2q15)
+     q31 __builtin_mips_preceq_w_phl (v2q15)
+     q31 __builtin_mips_preceq_w_phr (v2q15)
+     v2q15 __builtin_mips_precequ_ph_qbl (v4i8)
+     v2q15 __builtin_mips_precequ_ph_qbr (v4i8)
+     v2q15 __builtin_mips_precequ_ph_qbla (v4i8)
+     v2q15 __builtin_mips_precequ_ph_qbra (v4i8)
+     v2q15 __builtin_mips_preceu_ph_qbl (v4i8)
+     v2q15 __builtin_mips_preceu_ph_qbr (v4i8)
+     v2q15 __builtin_mips_preceu_ph_qbla (v4i8)
+     v2q15 __builtin_mips_preceu_ph_qbra (v4i8)
+     v4i8 __builtin_mips_shll_qb (v4i8, imm0_7)
+     v4i8 __builtin_mips_shll_qb (v4i8, i32)
+     v2q15 __builtin_mips_shll_ph (v2q15, imm0_15)
+     v2q15 __builtin_mips_shll_ph (v2q15, i32)
+     v2q15 __builtin_mips_shll_s_ph (v2q15, imm0_15)
+     v2q15 __builtin_mips_shll_s_ph (v2q15, i32)
+     q31 __builtin_mips_shll_s_w (q31, imm0_31)
+     q31 __builtin_mips_shll_s_w (q31, i32)
+     v4i8 __builtin_mips_shrl_qb (v4i8, imm0_7)
+     v4i8 __builtin_mips_shrl_qb (v4i8, i32)
+     v2q15 __builtin_mips_shra_ph (v2q15, imm0_15)
+     v2q15 __builtin_mips_shra_ph (v2q15, i32)
+     v2q15 __builtin_mips_shra_r_ph (v2q15, imm0_15)
+     v2q15 __builtin_mips_shra_r_ph (v2q15, i32)
+     q31 __builtin_mips_shra_r_w (q31, imm0_31)
+     q31 __builtin_mips_shra_r_w (q31, i32)
+     v2q15 __builtin_mips_muleu_s_ph_qbl (v4i8, v2q15)
+     v2q15 __builtin_mips_muleu_s_ph_qbr (v4i8, v2q15)
+     v2q15 __builtin_mips_mulq_rs_ph (v2q15, v2q15)
+     q31 __builtin_mips_muleq_s_w_phl (v2q15, v2q15)
+     q31 __builtin_mips_muleq_s_w_phr (v2q15, v2q15)
+     a64 __builtin_mips_dpau_h_qbl (a64, v4i8, v4i8)
+     a64 __builtin_mips_dpau_h_qbr (a64, v4i8, v4i8)
+     a64 __builtin_mips_dpsu_h_qbl (a64, v4i8, v4i8)
+     a64 __builtin_mips_dpsu_h_qbr (a64, v4i8, v4i8)
+     a64 __builtin_mips_dpaq_s_w_ph (a64, v2q15, v2q15)
+     a64 __builtin_mips_dpaq_sa_l_w (a64, q31, q31)
+     a64 __builtin_mips_dpsq_s_w_ph (a64, v2q15, v2q15)
+     a64 __builtin_mips_dpsq_sa_l_w (a64, q31, q31)
+     a64 __builtin_mips_mulsaq_s_w_ph (a64, v2q15, v2q15)
+     a64 __builtin_mips_maq_s_w_phl (a64, v2q15, v2q15)
+     a64 __builtin_mips_maq_s_w_phr (a64, v2q15, v2q15)
+     a64 __builtin_mips_maq_sa_w_phl (a64, v2q15, v2q15)
+     a64 __builtin_mips_maq_sa_w_phr (a64, v2q15, v2q15)
+     i32 __builtin_mips_bitrev (i32)
+     i32 __builtin_mips_insv (i32, i32)
+     v4i8 __builtin_mips_repl_qb (imm0_255)
+     v4i8 __builtin_mips_repl_qb (i32)
+     v2q15 __builtin_mips_repl_ph (imm_n512_511)
+     v2q15 __builtin_mips_repl_ph (i32)
+     void __builtin_mips_cmpu_eq_qb (v4i8, v4i8)
+     void __builtin_mips_cmpu_lt_qb (v4i8, v4i8)
+     void __builtin_mips_cmpu_le_qb (v4i8, v4i8)
+     i32 __builtin_mips_cmpgu_eq_qb (v4i8, v4i8)
+     i32 __builtin_mips_cmpgu_lt_qb (v4i8, v4i8)
+     i32 __builtin_mips_cmpgu_le_qb (v4i8, v4i8)
+     void __builtin_mips_cmp_eq_ph (v2q15, v2q15)
+     void __builtin_mips_cmp_lt_ph (v2q15, v2q15)
+     void __builtin_mips_cmp_le_ph (v2q15, v2q15)
+     v4i8 __builtin_mips_pick_qb (v4i8, v4i8)
+     v2q15 __builtin_mips_pick_ph (v2q15, v2q15)
+     v2q15 __builtin_mips_packrl_ph (v2q15, v2q15)
+     i32 __builtin_mips_extr_w (a64, imm0_31)
+     i32 __builtin_mips_extr_w (a64, i32)
+     i32 __builtin_mips_extr_r_w (a64, imm0_31)
+     i32 __builtin_mips_extr_s_h (a64, i32)
+     i32 __builtin_mips_extr_rs_w (a64, imm0_31)
+     i32 __builtin_mips_extr_rs_w (a64, i32)
+     i32 __builtin_mips_extr_s_h (a64, imm0_31)
+     i32 __builtin_mips_extr_r_w (a64, i32)
+     i32 __builtin_mips_extp (a64, imm0_31)
+     i32 __builtin_mips_extp (a64, i32)
+     i32 __builtin_mips_extpdp (a64, imm0_31)
+     i32 __builtin_mips_extpdp (a64, i32)
+     a64 __builtin_mips_shilo (a64, imm_n32_31)
+     a64 __builtin_mips_shilo (a64, i32)
+     a64 __builtin_mips_mthlip (a64, i32)
+     void __builtin_mips_wrdsp (i32, imm0_63)
+     i32 __builtin_mips_rddsp (imm0_63)
+     i32 __builtin_mips_lbux (void *, i32)
+     i32 __builtin_mips_lhx (void *, i32)
+     i32 __builtin_mips_lwx (void *, i32)
+     i32 __builtin_mips_bposge32 (void)
+     a64 __builtin_mips_madd (a64, i32, i32);
+     a64 __builtin_mips_maddu (a64, ui32, ui32);
+     a64 __builtin_mips_msub (a64, i32, i32);
+     a64 __builtin_mips_msubu (a64, ui32, ui32);
+     a64 __builtin_mips_mult (i32, i32);
+     a64 __builtin_mips_multu (ui32, ui32);
+</pre>
+ <p>The following built-in functions map directly to a particular MIPS DSP REV 2
+instruction.  Please refer to the architecture specification
+for details on what each instruction does.
+
+<pre class="smallexample">     v4q7 __builtin_mips_absq_s_qb (v4q7);
+     v2i16 __builtin_mips_addu_ph (v2i16, v2i16);
+     v2i16 __builtin_mips_addu_s_ph (v2i16, v2i16);
+     v4i8 __builtin_mips_adduh_qb (v4i8, v4i8);
+     v4i8 __builtin_mips_adduh_r_qb (v4i8, v4i8);
+     i32 __builtin_mips_append (i32, i32, imm0_31);
+     i32 __builtin_mips_balign (i32, i32, imm0_3);
+     i32 __builtin_mips_cmpgdu_eq_qb (v4i8, v4i8);
+     i32 __builtin_mips_cmpgdu_lt_qb (v4i8, v4i8);
+     i32 __builtin_mips_cmpgdu_le_qb (v4i8, v4i8);
+     a64 __builtin_mips_dpa_w_ph (a64, v2i16, v2i16);
+     a64 __builtin_mips_dps_w_ph (a64, v2i16, v2i16);
+     v2i16 __builtin_mips_mul_ph (v2i16, v2i16);
+     v2i16 __builtin_mips_mul_s_ph (v2i16, v2i16);
+     q31 __builtin_mips_mulq_rs_w (q31, q31);
+     v2q15 __builtin_mips_mulq_s_ph (v2q15, v2q15);
+     q31 __builtin_mips_mulq_s_w (q31, q31);
+     a64 __builtin_mips_mulsa_w_ph (a64, v2i16, v2i16);
+     v4i8 __builtin_mips_precr_qb_ph (v2i16, v2i16);
+     v2i16 __builtin_mips_precr_sra_ph_w (i32, i32, imm0_31);
+     v2i16 __builtin_mips_precr_sra_r_ph_w (i32, i32, imm0_31);
+     i32 __builtin_mips_prepend (i32, i32, imm0_31);
+     v4i8 __builtin_mips_shra_qb (v4i8, imm0_7);
+     v4i8 __builtin_mips_shra_r_qb (v4i8, imm0_7);
+     v4i8 __builtin_mips_shra_qb (v4i8, i32);
+     v4i8 __builtin_mips_shra_r_qb (v4i8, i32);
+     v2i16 __builtin_mips_shrl_ph (v2i16, imm0_15);
+     v2i16 __builtin_mips_shrl_ph (v2i16, i32);
+     v2i16 __builtin_mips_subu_ph (v2i16, v2i16);
+     v2i16 __builtin_mips_subu_s_ph (v2i16, v2i16);
+     v4i8 __builtin_mips_subuh_qb (v4i8, v4i8);
+     v4i8 __builtin_mips_subuh_r_qb (v4i8, v4i8);
+     v2q15 __builtin_mips_addqh_ph (v2q15, v2q15);
+     v2q15 __builtin_mips_addqh_r_ph (v2q15, v2q15);
+     q31 __builtin_mips_addqh_w (q31, q31);
+     q31 __builtin_mips_addqh_r_w (q31, q31);
+     v2q15 __builtin_mips_subqh_ph (v2q15, v2q15);
+     v2q15 __builtin_mips_subqh_r_ph (v2q15, v2q15);
+     q31 __builtin_mips_subqh_w (q31, q31);
+     q31 __builtin_mips_subqh_r_w (q31, q31);
+     a64 __builtin_mips_dpax_w_ph (a64, v2i16, v2i16);
+     a64 __builtin_mips_dpsx_w_ph (a64, v2i16, v2i16);
+     a64 __builtin_mips_dpaqx_s_w_ph (a64, v2q15, v2q15);
+     a64 __builtin_mips_dpaqx_sa_w_ph (a64, v2q15, v2q15);
+     a64 __builtin_mips_dpsqx_s_w_ph (a64, v2q15, v2q15);
+     a64 __builtin_mips_dpsqx_sa_w_ph (a64, v2q15, v2q15);
+</pre>
+ </body></html>
+

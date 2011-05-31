@@ -1,0 +1,95 @@
+<html lang="en">
+<head>
+<title>fmemopen - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="fileno.html#fileno" title="fileno">
+<link rel="next" href="fopen.html#fopen" title="fopen">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="fmemopen"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="fopen.html#fopen">fopen</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="fileno.html#fileno">fileno</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.16 <code>fmemopen</code>&mdash;open a stream around a fixed-length string</h3>
+
+<p><a name="index-fmemopen-177"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     FILE *fmemopen(void *restrict <var>buf</var>, size_t <var>size</var>,
+         const char *restrict <var>mode</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>fmemopen</code> creates a seekable <code>FILE</code> stream that wraps a
+fixed-length buffer of <var>size</var> bytes starting at <var>buf</var>.  The stream
+is opened with <var>mode</var> treated as in <code>fopen</code>, where append mode
+starts writing at the first NUL byte.  If <var>buf</var> is NULL, then
+<var>size</var> bytes are automatically provided as if by <code>malloc</code>, with
+the initial size of 0, and <var>mode</var> must contain <code>+</code> so that data
+can be read after it is written.
+
+   <p>The stream maintains a current position, which moves according to
+bytes read or written, and which can be one past the end of the array. 
+The stream also maintains a current file size, which is never greater
+than <var>size</var>.  If <var>mode</var> starts with <code>r</code>, the position starts at
+<code>0</code>, and file size starts at <var>size</var> if <var>buf</var> was provided.  If
+<var>mode</var> starts with <code>w</code>, the position and file size start at <code>0</code>,
+and if <var>buf</var> was provided, the first byte is set to NUL.  If
+<var>mode</var> starts with <code>a</code>, the position and file size start at the
+location of the first NUL byte, or else <var>size</var> if <var>buf</var> was
+provided.
+
+   <p>When reading, NUL bytes have no significance, and reads cannot exceed
+the current file size.  When writing, the file size can increase up to
+<var>size</var> as needed, and NUL bytes may be embedded in the stream (see
+<code>open_memstream</code> for an alternative that automatically enlarges the
+buffer).  When the stream is flushed or closed after a write that
+changed the file size, a NUL byte is written at the current position
+if there is still room; if the stream is not also open for reading, a
+NUL byte is additionally written at the last byte of <var>buf</var> when the
+stream has exceeded <var>size</var>, so that a write-only <var>buf</var> is always
+NUL-terminated when the stream is flushed or closed (and the initial
+<var>size</var> should take this into account).  It is not possible to seek
+outside the bounds of <var>size</var>.  A NUL byte written during a flush is
+restored to its previous value when seeking elsewhere in the string.
+
+   <p><br>
+<strong>Returns</strong><br>
+The return value is an open FILE pointer on success.  On error,
+<code>NULL</code> is returned, and <code>errno</code> will be set to EINVAL if <var>size</var>
+is zero or <var>mode</var> is invalid, ENOMEM if <var>buf</var> was NULL and memory
+could not be allocated, or EMFILE if too many streams are already
+open.
+
+   <p><br>
+<strong>Portability</strong><br>
+This function is being added to POSIX 200x, but is not in POSIX 2001.
+
+   <p>Supporting OS subroutines required: <code>sbrk</code>.
+
+   <p><br>
+
+   </body></html>
+

@@ -1,0 +1,97 @@
+<html lang="en">
+<head>
+<title>Numbers - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Controlling-GDB.html#Controlling-GDB" title="Controlling GDB">
+<link rel="prev" href="Screen-Size.html#Screen-Size" title="Screen Size">
+<link rel="next" href="ABI.html#ABI" title="ABI">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Numbers"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="ABI.html#ABI">ABI</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Screen-Size.html#Screen-Size">Screen Size</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Controlling-GDB.html#Controlling-GDB">Controlling GDB</a>
+<hr>
+</div>
+
+<h3 class="section">22.5 Numbers</h3>
+
+<p><a name="index-number-representation-1462"></a><a name="index-entering-numbers-1463"></a>
+You can always enter numbers in octal, decimal, or hexadecimal in
+<span class="sc">gdb</span> by the usual conventions: octal numbers begin with
+&lsquo;<samp><span class="samp">0</span></samp>&rsquo;, decimal numbers end with &lsquo;<samp><span class="samp">.</span></samp>&rsquo;, and hexadecimal numbers
+begin with &lsquo;<samp><span class="samp">0x</span></samp>&rsquo;.  Numbers that neither begin with &lsquo;<samp><span class="samp">0</span></samp>&rsquo; or
+&lsquo;<samp><span class="samp">0x</span></samp>&rsquo;, nor end with a &lsquo;<samp><span class="samp">.</span></samp>&rsquo; are, by default, entered in base
+10; likewise, the default display for numbers&mdash;when no particular
+format is specified&mdash;is base 10.  You can change the default base for
+both input and output with the commands described below.
+
+     
+<a name="index-set-input_002dradix-1464"></a>
+<dl><dt><code>set input-radix </code><var>base</var><dd>Set the default base for numeric input.  Supported choices
+for <var>base</var> are decimal 8, 10, or 16.  <var>base</var> must itself be
+specified either unambiguously or using the current input radix; for
+example, any of
+
+     <pre class="smallexample">          set input-radix 012
+          set input-radix 10.
+          set input-radix 0xa
+</pre>
+     <p class="noindent">sets the input base to decimal.  On the other hand, &lsquo;<samp><span class="samp">set input-radix 10</span></samp>&rsquo;
+leaves the input radix unchanged, no matter what it was, since
+&lsquo;<samp><span class="samp">10</span></samp>&rsquo;, being without any leading or trailing signs of its base, is
+interpreted in the current radix.  Thus, if the current radix is 16,
+&lsquo;<samp><span class="samp">10</span></samp>&rsquo; is interpreted in hex, i.e. as 16 decimal, which doesn't
+change the radix.
+
+     <p><a name="index-set-output_002dradix-1465"></a><br><dt><code>set output-radix </code><var>base</var><dd>Set the default base for numeric display.  Supported choices
+for <var>base</var> are decimal 8, 10, or 16.  <var>base</var> must itself be
+specified either unambiguously or using the current input radix.
+
+     <p><a name="index-show-input_002dradix-1466"></a><br><dt><code>show input-radix</code><dd>Display the current default base for numeric input.
+
+     <p><a name="index-show-output_002dradix-1467"></a><br><dt><code>show output-radix</code><dd>Display the current default base for numeric display.
+
+     <br><dt><code>set radix </code><span class="roman">[</span><var>base</var><span class="roman">]</span><dt><code>show radix</code><dd><a name="index-set-radix-1468"></a><a name="index-show-radix-1469"></a>These commands set and show the default base for both input and output
+of numbers.  <code>set radix</code> sets the radix of input and output to
+the same base; without an argument, it resets the radix back to its
+default value of 10.
+
+   </dl>
+
+   </body></html>
+

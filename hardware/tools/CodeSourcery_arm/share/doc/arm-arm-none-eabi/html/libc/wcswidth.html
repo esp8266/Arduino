@@ -1,0 +1,67 @@
+<html lang="en">
+<head>
+<title>wcswidth - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Wchar-strings.html#Wchar-strings" title="Wchar strings">
+<link rel="prev" href="wcstok.html#wcstok" title="wcstok">
+<link rel="next" href="wcsxfrm.html#wcsxfrm" title="wcsxfrm">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="wcswidth"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="wcsxfrm.html#wcsxfrm">wcsxfrm</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="wcstok.html#wcstok">wcstok</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Wchar-strings.html#Wchar-strings">Wchar strings</a>
+<hr>
+</div>
+
+<h3 class="section">6.27 <code>wcswidth</code>&mdash;number of column positions of a wide-character string</h3>
+
+<p><a name="index-wcswidth-419"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;wchar.h&gt;
+     int wcswidth(const wchar_t *<var>pwcs</var>, size_t <var>n</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+The <code>wcswidth</code> function shall determine the number of column
+positions required for <var>n</var> wide-character codes (or fewer than <var>n</var>
+wide-character codes if a null wide-character code is encountered
+before <var>n</var> wide-character codes are exhausted) in the string pointed
+to by <var>pwcs</var>.
+
+   <p><br>
+<strong>Returns</strong><br>
+The <code>wcswidth</code> function either shall return 0 (if <var>pwcs</var> points to a
+null wide-character code), or return the number of column positions
+to be occupied by the wide-character string pointed to by <var>pwcs</var>, or
+return -1 (if any of the first <var>n</var> wide-character codes in the
+wide-character string pointed to by <var>pwcs</var> is not a printable
+wide-character code).
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>wcswidth</code> has been introduced in the Single UNIX Specification Volume 2. 
+<code>wcswidth</code> has been marked as an extension in the Single UNIX Specification Volume 3.
+
+   <p><br>
+
+   </body></html>
+

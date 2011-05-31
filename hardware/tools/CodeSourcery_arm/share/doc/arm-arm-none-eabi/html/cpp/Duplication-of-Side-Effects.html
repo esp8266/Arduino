@@ -1,0 +1,118 @@
+<html lang="en">
+<head>
+<title>Duplication of Side Effects - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Macro-Pitfalls.html#Macro-Pitfalls" title="Macro Pitfalls">
+<link rel="prev" href="Swallowing-the-Semicolon.html#Swallowing-the-Semicolon" title="Swallowing the Semicolon">
+<link rel="next" href="Self_002dReferential-Macros.html#Self_002dReferential-Macros" title="Self-Referential Macros">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Duplication-of-Side-Effects"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Self_002dReferential-Macros.html#Self_002dReferential-Macros">Self-Referential Macros</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Swallowing-the-Semicolon.html#Swallowing-the-Semicolon">Swallowing the Semicolon</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Macro-Pitfalls.html#Macro-Pitfalls">Macro Pitfalls</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.10.4 Duplication of Side Effects</h4>
+
+<p><a name="index-side-effects-_0028in-macro-arguments_0029-76"></a><a name="index-unsafe-macros-77"></a>Many C programs define a macro <code>min</code>, for &ldquo;minimum&rdquo;, like this:
+
+<pre class="smallexample">     #define min(X, Y)  ((X) &lt; (Y) ? (X) : (Y))
+</pre>
+   <p>When you use this macro with an argument containing a side effect,
+as shown here,
+
+<pre class="smallexample">     next = min (x + y, foo (z));
+</pre>
+   <p class="noindent">it expands as follows:
+
+<pre class="smallexample">     next = ((x + y) &lt; (foo (z)) ? (x + y) : (foo (z)));
+</pre>
+   <p class="noindent">where <code>x + y</code> has been substituted for <code>X</code> and <code>foo (z)</code>
+for <code>Y</code>.
+
+   <p>The function <code>foo</code> is used only once in the statement as it appears
+in the program, but the expression <code>foo (z)</code> has been substituted
+twice into the macro expansion.  As a result, <code>foo</code> might be called
+two times when the statement is executed.  If it has side effects or if
+it takes a long time to compute, the results might not be what you
+intended.  We say that <code>min</code> is an <dfn>unsafe</dfn> macro.
+
+   <p>The best solution to this problem is to define <code>min</code> in a way that
+computes the value of <code>foo (z)</code> only once.  The C language offers
+no standard way to do this, but it can be done with GNU extensions as
+follows:
+
+<pre class="smallexample">     #define min(X, Y)                \
+     ({ typeof (X) x_ = (X);          \
+        typeof (Y) y_ = (Y);          \
+        (x_ &lt; y_) ? x_ : y_; })
+</pre>
+   <p>The &lsquo;<samp><span class="samp">({ ... })</span></samp>&rsquo; notation produces a compound statement that
+acts as an expression.  Its value is the value of its last statement. 
+This permits us to define local variables and assign each argument to
+one.  The local variables have underscores after their names to reduce
+the risk of conflict with an identifier of wider scope (it is impossible
+to avoid this entirely).  Now each argument is evaluated exactly once.
+
+   <p>If you do not wish to use GNU C extensions, the only solution is to be
+careful when <em>using</em> the macro <code>min</code>.  For example, you can
+calculate the value of <code>foo (z)</code>, save it in a variable, and use
+that variable in <code>min</code>:
+
+<pre class="smallexample">     #define min(X, Y)  ((X) &lt; (Y) ? (X) : (Y))
+     ...
+     {
+       int tem = foo (z);
+       next = min (x + y, tem);
+     }
+</pre>
+   <p class="noindent">(where we assume that <code>foo</code> returns type <code>int</code>).
+
+   </body></html>
+

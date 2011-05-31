@@ -1,0 +1,77 @@
+/* Insn note definitions.
+   Copyright (C) 2004, 2005, 2007 Free Software Foundation, Inc.
+
+This file is part of GCC.
+
+GCC is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 3, or (at your option) any later
+version.
+
+GCC is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with GCC; see the file COPYING3.  If not see
+<http://www.gnu.org/licenses/>.  */
+
+/* This file defines all the codes that may appear in the
+   NOTE_LINE_NUMBER field of a NOTE insn for kinds of notes that are
+   not line numbers.  Source files define DEF_INSN_NOTE appropriately
+   before including this file.
+
+   We are slowly removing the concept of insn-chain notes from the
+   compiler.  Adding new codes to this file is STRONGLY DISCOURAGED.
+   If you think you need one, look for other ways to express what you
+   mean, such as register notes or bits in the basic-block structure.  */
+
+/* Shorthand.  */
+#define INSN_NOTE(NAME) DEF_INSN_NOTE (NOTE_INSN_##NAME)
+
+/* This note is used to get rid of an insn when it isn't safe to patch
+   the insn out of the chain.  */
+INSN_NOTE (DELETED)
+
+/* Generated in place of user-declared labels when they are deleted.  */
+INSN_NOTE (DELETED_LABEL)
+
+/* These are used to mark the beginning and end of a lexical block.
+   See NOTE_BLOCK and reorder_blocks.  */
+INSN_NOTE (BLOCK_BEG)
+INSN_NOTE (BLOCK_END)
+
+/* This note indicates the start of the real body of the function,
+   i.e. the point just after all of the parms have been moved into
+   their homes, etc.  */
+INSN_NOTE (FUNCTION_BEG)
+
+/* This marks the point immediately after the last prologue insn.  */
+INSN_NOTE (PROLOGUE_END)
+
+/* This marks the point immediately prior to the first epilogue insn.  */
+INSN_NOTE (EPILOGUE_BEG)
+
+/* These note where exception handling regions begin and end.
+   Uses NOTE_EH_HANDLER to identify the region in question.  */
+INSN_NOTE (EH_REGION_BEG)
+INSN_NOTE (EH_REGION_END)
+
+/* The location of a variable.  */
+INSN_NOTE (VAR_LOCATION)
+
+/* Record the struct for the following basic block.  Uses
+   NOTE_BASIC_BLOCK.  FIXME: Redundant with the basic block pointer
+   now included in every insn.  */
+INSN_NOTE (BASIC_BLOCK)
+
+/* Mark the inflection point in the instruction stream where we switch
+   between hot and cold text sections.  */
+INSN_NOTE (SWITCH_TEXT_SECTIONS)
+
+/* Mark the restore point after an epilogue changed CFI data.  Used only
+   when an epilogue appears in the middle of a function.  */
+INSN_NOTE (CFA_RESTORE_STATE)
+
+#undef INSN_NOTE

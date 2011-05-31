@@ -1,0 +1,150 @@
+<html lang="en">
+<head>
+<title>windmc - GNU Binary Utilities</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GNU Binary Utilities">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="windres.html#windres" title="windres">
+<link rel="next" href="dlltool.html#dlltool" title="dlltool">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="windmc"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="dlltool.html#dlltool">dlltool</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="windres.html#windres">windres</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">12 windmc</h2>
+
+<p><samp><span class="command">windmc</span></samp> may be used to generator Windows message resources.
+
+   <blockquote>
+<em>Warning:</em> <samp><span class="command">windmc</span></samp> is not always built as part of the binary
+utilities, since it is only useful for Windows targets. 
+</blockquote>
+
+<!-- man title windmc generates Windows message resources. -->
+<pre class="smallexample">     <!-- man begin SYNOPSIS windmc -->
+     windmc [options] input-file
+     <!-- man end -->
+</pre>
+   <!-- man begin DESCRIPTION windmc -->
+   <p><samp><span class="command">windmc</span></samp> reads message definitions from an input file (.mc) and
+translate them into a set of output files.  The output files may be of
+four kinds:
+
+     <dl>
+<dt><code>h</code><dd>A C header file containing the message definitions.
+
+     <br><dt><code>rc</code><dd>A resource file compilable by the <samp><span class="command">windres</span></samp> tool.
+
+     <br><dt><code>bin</code><dd>One or more binary files containing the resource data for a specific
+message language.
+
+     <br><dt><code>dbg</code><dd>A C include file that maps message id's to their symbolic name. 
+</dl>
+
+   <p>The exact description of these different formats is available in
+documentation from Microsoft.
+
+   <p>When <samp><span class="command">windmc</span></samp> converts from the <code>mc</code> format to the <code>bin</code>
+format, <code>rc</code>, <code>h</code>, and optional <code>dbg</code> it is acting like the
+Windows Message Compiler.
+
+<!-- man end -->
+<!-- man begin OPTIONS windmc -->
+     <dl>
+<dt><samp><span class="env">-a</span></samp><dt><samp><span class="env">--ascii_in</span></samp><dd>Specifies that the input file specified is ASCII. This is the default
+behaviour.
+
+     <br><dt><samp><span class="env">-A</span></samp><dt><samp><span class="env">--ascii_out</span></samp><dd>Specifies that messages in the output <code>bin</code> files should be in ASCII
+format.
+
+     <br><dt><samp><span class="env">-b</span></samp><dt><samp><span class="env">--binprefix</span></samp><dd>Specifies that <code>bin</code> filenames should have to be prefixed by the
+basename of the source file.
+
+     <br><dt><samp><span class="env">-c</span></samp><dt><samp><span class="env">--customflag</span></samp><dd>Sets the customer bit in all message id's.
+
+     <br><dt><samp><span class="env">-C </span><var>codepage</var></samp><dt><samp><span class="env">--codepage_in </span><var>codepage</var></samp><dd>Sets the default codepage to be used to convert input file to UTF16. The
+default is ocdepage 1252.
+
+     <br><dt><samp><span class="env">-d</span></samp><dt><samp><span class="env">--decimal_values</span></samp><dd>Outputs the constants in the header file in decimal. Default is using
+hexadecimal output.
+
+     <br><dt><samp><span class="env">-e </span><var>ext</var></samp><dt><samp><span class="env">--extension </span><var>ext</var></samp><dd>The extension for the header file. The default is .h extension.
+
+     <br><dt><samp><span class="env">-F </span><var>target</var></samp><dt><samp><span class="env">--target </span><var>target</var></samp><dd>Specify the BFD format to use for a bin file as output.  This
+is a BFD target name; you can use the <samp><span class="option">--help</span></samp> option to see a list
+of supported targets.  Normally <samp><span class="command">windmc</span></samp> will use the default
+format, which is the first one listed by the <samp><span class="option">--help</span></samp> option. 
+<a href="Target-Selection.html#Target-Selection">Target Selection</a>.
+
+     <br><dt><samp><span class="env">-h </span><var>path</var></samp><dt><samp><span class="env">--headerdir </span><var>path</var></samp><dd>The target directory of the generated header file. The default is the
+current directory.
+
+     <br><dt><samp><span class="env">-H</span></samp><dt><samp><span class="env">--help</span></samp><dd>Displays a list of command line options and then exits.
+
+     <br><dt><samp><span class="env">-m </span><var>characters</var></samp><dt><samp><span class="env">--maxlength </span><var>characters</var></samp><dd>Instructs <samp><span class="command">windmc</span></samp> to generate a warning if the length
+of any message exceeds the number specified.
+
+     <br><dt><samp><span class="env">-n</span></samp><dt><samp><span class="env">--nullterminate</span></samp><dd>Terminate message text in <code>bin</code> files by zero. By default they are
+terminated by CR/LF.
+
+     <br><dt><samp><span class="env">-o</span></samp><dt><samp><span class="env">--hresult_use</span></samp><dd>Not yet implemented. Instructs <code>windmc</code> to generate an OLE2 header
+file, using HRESULT definitions. Status codes are used if the flag is not
+specified.
+
+     <br><dt><samp><span class="env">-O </span><var>codepage</var></samp><dt><samp><span class="env">--codepage_out </span><var>codepage</var></samp><dd>Sets the default codepage to be used to output text files. The default
+is ocdepage 1252.
+
+     <br><dt><samp><span class="env">-r </span><var>path</var></samp><dt><samp><span class="env">--rcdir </span><var>path</var></samp><dd>The target directory for the generated <code>rc</code> script and the generated
+<code>bin</code> files that the resource compiler script includes. The default
+is the current directory.
+
+     <br><dt><samp><span class="env">-u</span></samp><dt><samp><span class="env">--unicode_in</span></samp><dd>Specifies that the input file is UTF16.
+
+     <br><dt><samp><span class="env">-U</span></samp><dt><samp><span class="env">--unicode_out</span></samp><dd>Specifies that messages in the output <code>bin</code> file should be in UTF16
+format. This is the default behaviour.
+
+     <br><dt><samp><span class="env">-v</span></samp><br><dt><samp><span class="env">--verbose</span></samp><dd>Enable verbose mode.
+
+     <br><dt><samp><span class="env">-V</span></samp><br><dt><samp><span class="env">--version</span></samp><dd>Prints the version number for <samp><span class="command">windmc</span></samp>.
+
+     <br><dt><samp><span class="env">-x </span><var>path</var></samp><dt><samp><span class="env">--xdgb </span><var>path</var></samp><dd>The path of the <code>dbg</code> C include file that maps message id's to the
+symbolic name. No such file is generated without specifying the switch. 
+</dl>
+
+<!-- man end -->
+   </body></html>
+

@@ -1,0 +1,207 @@
+<html lang="en">
+<head>
+<title>Ada Tasks - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Ada.html#Ada" title="Ada">
+<link rel="prev" href="Stopping-Before-Main-Program.html#Stopping-Before-Main-Program" title="Stopping Before Main Program">
+<link rel="next" href="Ada-Tasks-and-Core-Files.html#Ada-Tasks-and-Core-Files" title="Ada Tasks and Core Files">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Ada-Tasks"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Ada-Tasks-and-Core-Files.html#Ada-Tasks-and-Core-Files">Ada Tasks and Core Files</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Stopping-Before-Main-Program.html#Stopping-Before-Main-Program">Stopping Before Main Program</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Ada.html#Ada">Ada</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">15.4.7.5 Extensions for Ada Tasks</h5>
+
+<p><a name="index-Ada_002c-tasking-868"></a>
+Support for Ada tasks is analogous to that for threads (see <a href="Threads.html#Threads">Threads</a>). 
+<span class="sc">gdb</span> provides the following task-related commands:
+
+     
+<a name="index-info-tasks-869"></a>
+<dl><dt><code>info tasks</code><dd>This command shows a list of current Ada tasks, as in the following example:
+
+     <pre class="smallexample">          (gdb) info tasks
+            ID       TID P-ID Pri State                 Name
+             1   8088000   0   15 Child Activation Wait main_task
+             2   80a4000   1   15 Accept Statement      b
+             3   809a800   1   15 Child Activation Wait a
+          *  4   80ae800   3   15 Runnable              c
+          
+</pre>
+     <p class="noindent">In this listing, the asterisk before the last task indicates it to be the
+task currently being inspected.
+
+          <dl>
+<dt>ID<dd>Represents <span class="sc">gdb</span>'s internal task number.
+
+          <br><dt>TID<dd>The Ada task ID.
+
+          <br><dt>P-ID<dd>The parent's task ID (<span class="sc">gdb</span>'s internal task number).
+
+          <br><dt>Pri<dd>The base priority of the task.
+
+          <br><dt>State<dd>Current state of the task.
+
+               <dl>
+<dt><code>Unactivated</code><dd>The task has been created but has not been activated.  It cannot be
+executing.
+
+               <br><dt><code>Runnable</code><dd>The task is not blocked for any reason known to Ada.  (It may be waiting
+for a mutex, though.) It is conceptually "executing" in normal mode.
+
+               <br><dt><code>Terminated</code><dd>The task is terminated, in the sense of ARM 9.3 (5).  Any dependents
+that were waiting on terminate alternatives have been awakened and have
+terminated themselves.
+
+               <br><dt><code>Child Activation Wait</code><dd>The task is waiting for created tasks to complete activation.
+
+               <br><dt><code>Accept Statement</code><dd>The task is waiting on an accept or selective wait statement.
+
+               <br><dt><code>Waiting on entry call</code><dd>The task is waiting on an entry call.
+
+               <br><dt><code>Async Select Wait</code><dd>The task is waiting to start the abortable part of an asynchronous
+select statement.
+
+               <br><dt><code>Delay Sleep</code><dd>The task is waiting on a select statement with only a delay
+alternative open.
+
+               <br><dt><code>Child Termination Wait</code><dd>The task is sleeping having completed a master within itself, and is
+waiting for the tasks dependent on that master to become terminated or
+waiting on a terminate Phase.
+
+               <br><dt><code>Wait Child in Term Alt</code><dd>The task is sleeping waiting for tasks on terminate alternatives to
+finish terminating.
+
+               <br><dt><code>Accepting RV with </code><var>taskno</var><dd>The task is accepting a rendez-vous with the task <var>taskno</var>. 
+</dl>
+
+          <br><dt>Name<dd>Name of the task in the program.
+
+     </dl>
+
+     <p><a name="index-info-task-_0040var_007btaskno_007d-870"></a><br><dt><code>info task </code><var>taskno</var><dd>This command shows detailled informations on the specified task, as in
+the following example:
+     <pre class="smallexample">          (gdb) info tasks
+            ID       TID P-ID Pri State                  Name
+             1   8077880    0  15 Child Activation Wait  main_task
+          *  2   807c468    1  15 Runnable               task_1
+          (gdb) info task 2
+          Ada Task: 0x807c468
+          Name: task_1
+          Thread: 0x807f378
+          Parent: 1 (main_task)
+          Base Priority: 15
+          State: Runnable
+</pre>
+     <br><dt><code>task</code><dd><a name="index-task_0040r_007b-_0028Ada_0029_007d-871"></a><a name="index-current-Ada-task-ID-872"></a>This command prints the ID of the current task.
+
+     <pre class="smallexample">          (gdb) info tasks
+            ID       TID P-ID Pri State                  Name
+             1   8077870    0  15 Child Activation Wait  main_task
+          *  2   807c458    1  15 Runnable               t
+          (gdb) task
+          [Current task is 2]
+</pre>
+     <br><dt><code>task </code><var>taskno</var><dd><a name="index-Ada-task-switching-873"></a>This command is like the <code>thread </code><var>threadno</var>
+command (see <a href="Threads.html#Threads">Threads</a>).  It switches the context of debugging
+from the current task to the given task.
+
+     <pre class="smallexample">          (gdb) info tasks
+            ID       TID P-ID Pri State                  Name
+             1   8077870    0  15 Child Activation Wait  main_task
+          *  2   807c458    1  15 Runnable               t
+          (gdb) task 1
+          [Switching to task 1]
+          #0  0x8067726 in pthread_cond_wait ()
+          (gdb) bt
+          #0  0x8067726 in pthread_cond_wait ()
+          #1  0x8056714 in system.os_interface.pthread_cond_wait ()
+          #2  0x805cb63 in system.task_primitives.operations.sleep ()
+          #3  0x806153e in system.tasking.stages.activate_tasks ()
+          #4  0x804aacc in un () at un.adb:5
+</pre>
+     <br><dt><code>break </code><var>linespec</var><code> task </code><var>taskno</var><dt><code>break </code><var>linespec</var><code> task </code><var>taskno</var><code> if ...</code><dd><a name="index-breakpoints-and-tasks_002c-in-Ada-874"></a><a name="index-task-breakpoints_002c-in-Ada-875"></a><a name="index-break-_0040dots_007b_007d-task-_0040var_007btaskno_007d_0040r_007b-_0028Ada_0029_007d-876"></a>These commands are like the <code>break ... thread ...</code>
+command (see <a href="Thread-Stops.html#Thread-Stops">Thread Stops</a>). 
+<var>linespec</var> specifies source lines, as described
+in <a href="Specify-Location.html#Specify-Location">Specify Location</a>.
+
+     <p>Use the qualifier &lsquo;<samp><span class="samp">task </span><var>taskno</var></samp>&rsquo; with a breakpoint command
+to specify that you only want <span class="sc">gdb</span> to stop the program when a
+particular Ada task reaches this breakpoint.  <var>taskno</var> is one of the
+numeric task identifiers assigned by <span class="sc">gdb</span>, shown in the first
+column of the &lsquo;<samp><span class="samp">info tasks</span></samp>&rsquo; display.
+
+     <p>If you do not specify &lsquo;<samp><span class="samp">task </span><var>taskno</var></samp>&rsquo; when you set a
+breakpoint, the breakpoint applies to <em>all</em> tasks of your
+program.
+
+     <p>You can use the <code>task</code> qualifier on conditional breakpoints as
+well; in this case, place &lsquo;<samp><span class="samp">task </span><var>taskno</var></samp>&rsquo; before the
+breakpoint condition (before the <code>if</code>).
+
+     <p>For example,
+
+     <pre class="smallexample">          (gdb) info tasks
+            ID       TID P-ID Pri State                 Name
+             1 140022020   0   15 Child Activation Wait main_task
+             2 140045060   1   15 Accept/Select Wait    t2
+             3 140044840   1   15 Runnable              t1
+          *  4 140056040   1   15 Runnable              t3
+          (gdb) b 15 task 2
+          Breakpoint 5 at 0x120044cb0: file test_task_debug.adb, line 15.
+          (gdb) cont
+          Continuing.
+          task # 1 running
+          task # 2 running
+          
+          Breakpoint 5, test_task_debug () at test_task_debug.adb:15
+          15               flush;
+          (gdb) info tasks
+            ID       TID P-ID Pri State                 Name
+             1 140022020   0   15 Child Activation Wait main_task
+          *  2 140045060   1   15 Runnable              t2
+             3 140044840   1   15 Runnable              t1
+             4 140056040   1   15 Delay Sleep           t3
+</pre>
+     </dl>
+
+   </body></html>
+

@@ -1,0 +1,85 @@
+<html lang="en">
+<head>
+<title>Solaris Pragmas - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Pragmas.html#Pragmas" title="Pragmas">
+<link rel="prev" href="Darwin-Pragmas.html#Darwin-Pragmas" title="Darwin Pragmas">
+<link rel="next" href="Symbol_002dRenaming-Pragmas.html#Symbol_002dRenaming-Pragmas" title="Symbol-Renaming Pragmas">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Solaris-Pragmas"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Symbol_002dRenaming-Pragmas.html#Symbol_002dRenaming-Pragmas">Symbol-Renaming Pragmas</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Darwin-Pragmas.html#Darwin-Pragmas">Darwin Pragmas</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Pragmas.html#Pragmas">Pragmas</a>
+<hr>
+</div>
+
+<h4 class="subsection">6.54.6 Solaris Pragmas</h4>
+
+<p>The Solaris target supports <code>#pragma redefine_extname</code>
+(see <a href="Symbol_002dRenaming-Pragmas.html#Symbol_002dRenaming-Pragmas">Symbol-Renaming Pragmas</a>).  It also supports additional
+<code>#pragma</code> directives for compatibility with the system compiler.
+
+     <dl>
+<dt><code>align </code><var>alignment</var><code> (</code><var>variable</var><code> [, </code><var>variable</var><code>]...)</code><dd><a name="index-pragma_002c-align-3134"></a>
+Increase the minimum alignment of each <var>variable</var> to <var>alignment</var>. 
+This is the same as GCC's <code>aligned</code> attribute see <a href="Variable-Attributes.html#Variable-Attributes">Variable Attributes</a>).  Macro expansion occurs on the arguments to this pragma
+when compiling C and Objective-C.  It does not currently occur when
+compiling C++, but this is a bug which may be fixed in a future
+release.
+
+     <br><dt><code>fini (</code><var>function</var><code> [, </code><var>function</var><code>]...)</code><dd><a name="index-pragma_002c-fini-3135"></a>
+This pragma causes each listed <var>function</var> to be called after
+main, or during shared module unloading, by adding a call to the
+<code>.fini</code> section.
+
+     <br><dt><code>init (</code><var>function</var><code> [, </code><var>function</var><code>]...)</code><dd><a name="index-pragma_002c-init-3136"></a>
+This pragma causes each listed <var>function</var> to be called during
+initialization (before <code>main</code>) or during shared module loading, by
+adding a call to the <code>.init</code> section.
+
+ </dl>
+
+ </body></html>
+

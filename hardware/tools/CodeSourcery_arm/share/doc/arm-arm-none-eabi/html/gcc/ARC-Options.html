@@ -1,0 +1,90 @@
+<html lang="en">
+<head>
+<title>ARC Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Submodel-Options.html#Submodel-Options" title="Submodel Options">
+<link rel="next" href="ARM-Options.html#ARM-Options" title="ARM Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="ARC-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="ARM-Options.html#ARM-Options">ARM Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Submodel-Options.html#Submodel-Options">Submodel Options</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.17.1 ARC Options</h4>
+
+<p><a name="index-ARC-Options-991"></a>
+These options are defined for ARC implementations:
+
+     <dl>
+<dt><code>-EL</code><dd><a name="index-EL-992"></a>Compile code for little endian mode.  This is the default.
+
+     <br><dt><code>-EB</code><dd><a name="index-EB-993"></a>Compile code for big endian mode.
+
+     <br><dt><code>-mmangle-cpu</code><dd><a name="index-mmangle_002dcpu-994"></a>Prepend the name of the cpu to all public symbol names. 
+In multiple-processor systems, there are many ARC variants with different
+instruction and register set characteristics.  This flag prevents code
+compiled for one cpu to be linked with code compiled for another. 
+No facility exists for handling variants that are &ldquo;almost identical&rdquo;. 
+This is an all or nothing option.
+
+     <br><dt><code>-mcpu=</code><var>cpu</var><dd><a name="index-mcpu-995"></a>Compile code for ARC variant <var>cpu</var>. 
+Which variants are supported depend on the configuration. 
+All variants support <samp><span class="option">-mcpu=base</span></samp>, this is the default.
+
+     <br><dt><code>-mtext=</code><var>text-section</var><dt><code>-mdata=</code><var>data-section</var><dt><code>-mrodata=</code><var>readonly-data-section</var><dd><a name="index-mtext-996"></a><a name="index-mdata-997"></a><a name="index-mrodata-998"></a>Put functions, data, and readonly data in <var>text-section</var>,
+<var>data-section</var>, and <var>readonly-data-section</var> respectively
+by default.  This can be overridden with the <code>section</code> attribute. 
+See <a href="Variable-Attributes.html#Variable-Attributes">Variable Attributes</a>.
+
+     <br><dt><code>-mfix-cortex-m3-ldrd</code><dd><a name="index-mfix_002dcortex_002dm3_002dldrd-999"></a>Some Cortex-M3 cores can cause data corruption when <code>ldrd</code> instructions
+with overlapping destination and base registers are used.  This option avoids
+generating these instructions.  This option is enabled by default when
+<samp><span class="option">-mcpu=cortex-m3</span></samp> is specified.
+
+ </dl>
+
+ </body></html>
+

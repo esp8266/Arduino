@@ -1,0 +1,119 @@
+<html lang="en">
+<head>
+<title>Invoking GDB - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Invocation.html#Invocation" title="Invocation">
+<link rel="next" href="Quitting-GDB.html#Quitting-GDB" title="Quitting GDB">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Invoking-GDB"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Quitting-GDB.html#Quitting-GDB">Quitting GDB</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Invocation.html#Invocation">Invocation</a>
+<hr>
+</div>
+
+<h3 class="section">2.1 Invoking <span class="sc">gdb</span></h3>
+
+<p>Invoke <span class="sc">gdb</span> by running the program <code>gdb</code>.  Once started,
+<span class="sc">gdb</span> reads commands from the terminal until you tell it to exit.
+
+   <p>You can also run <code>gdb</code> with a variety of arguments and options,
+to specify more of your debugging environment at the outset.
+
+   <p>The command-line options described here are designed
+to cover a variety of situations; in some environments, some of these
+options may effectively be unavailable.
+
+   <p>The most usual way to start <span class="sc">gdb</span> is with one argument,
+specifying an executable program:
+
+<pre class="smallexample">     gdb <var>program</var>
+</pre>
+   <p class="noindent">You can also start with both an executable program and a core file
+specified:
+
+<pre class="smallexample">     gdb <var>program</var> <var>core</var>
+</pre>
+   <p>You can, instead, specify a process ID as a second argument, if you want
+to debug a running process:
+
+<pre class="smallexample">     gdb <var>program</var> 1234
+</pre>
+   <p class="noindent">would attach <span class="sc">gdb</span> to process <code>1234</code> (unless you also have a file
+named <samp><span class="file">1234</span></samp>; <span class="sc">gdb</span> does check for a core file first).
+
+   <p>Taking advantage of the second command-line argument requires a fairly
+complete operating system; when you use <span class="sc">gdb</span> as a remote
+debugger attached to a bare board, there may not be any notion of
+&ldquo;process&rdquo;, and there is often no way to get a core dump.  <span class="sc">gdb</span>
+will warn you if it is unable to attach or to read core dumps.
+
+   <p>You can optionally have <code>gdb</code> pass any arguments after the
+executable file to the inferior using <code>--args</code>.  This option stops
+option processing.
+<pre class="smallexample">     gdb --args gcc -O2 -c foo.c
+</pre>
+   <p>This will cause <code>gdb</code> to debug <code>gcc</code>, and to set
+<code>gcc</code>'s command-line arguments (see <a href="Arguments.html#Arguments">Arguments</a>) to &lsquo;<samp><span class="samp">-O2 -c foo.c</span></samp>&rsquo;.
+
+   <p>You can run <code>gdb</code> without printing the front material, which describes
+<span class="sc">gdb</span>'s non-warranty, by specifying <code>-silent</code>:
+
+<pre class="smallexample">     gdb -silent
+</pre>
+   <p class="noindent">You can further control how <span class="sc">gdb</span> starts up by using command-line
+options.  <span class="sc">gdb</span> itself can remind you of the options available.
+
+<p class="noindent">Type
+
+<pre class="smallexample">     gdb -help
+</pre>
+   <p class="noindent">to display all available options and briefly describe their use
+(&lsquo;<samp><span class="samp">gdb -h</span></samp>&rsquo; is a shorter equivalent).
+
+   <p>All options and command line arguments you give are processed
+in sequential order.  The order makes a difference when the
+&lsquo;<samp><span class="samp">-x</span></samp>&rsquo; option is used.
+
+<ul class="menu">
+<li><a accesskey="1" href="File-Options.html#File-Options">File Options</a>:                 Choosing files
+<li><a accesskey="2" href="Mode-Options.html#Mode-Options">Mode Options</a>:                 Choosing modes
+<li><a accesskey="3" href="Startup.html#Startup">Startup</a>:                      What <span class="sc">gdb</span> does during startup
+</ul>
+
+   </body></html>
+

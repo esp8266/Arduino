@@ -1,0 +1,109 @@
+<html lang="en">
+<head>
+<title>Copy Assignment - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C_002b_002b-Misunderstandings.html#C_002b_002b-Misunderstandings" title="C++ Misunderstandings">
+<link rel="prev" href="Temporaries.html#Temporaries" title="Temporaries">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Copy-Assignment"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Temporaries.html#Temporaries">Temporaries</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C_002b_002b-Misunderstandings.html#C_002b_002b-Misunderstandings">C++ Misunderstandings</a>
+<hr>
+</div>
+
+<h4 class="subsection">11.8.4 Implicit Copy-Assignment for Virtual Bases</h4>
+
+<p>When a base class is virtual, only one subobject of the base class
+belongs to each full object.  Also, the constructors and destructors are
+invoked only once, and called from the most-derived class.  However, such
+objects behave unspecified when being assigned.  For example:
+
+<pre class="smallexample">     struct Base{
+       char *name;
+       Base(char *n) : name(strdup(n)){}
+       Base&amp; operator= (const Base&amp; other){
+        free (name);
+        name = strdup (other.name);
+       }
+     };
+     
+     struct A:virtual Base{
+       int val;
+       A():Base("A"){}
+     };
+     
+     struct B:virtual Base{
+       int bval;
+       B():Base("B"){}
+     };
+     
+     struct Derived:public A, public B{
+       Derived():Base("Derived"){}
+     };
+     
+     void func(Derived &amp;d1, Derived &amp;d2)
+     {
+       d1 = d2;
+     }
+</pre>
+ <p>The C++ standard specifies that &lsquo;<samp><span class="samp">Base::Base</span></samp>&rsquo; is only called once
+when constructing or copy-constructing a Derived object.  It is
+unspecified whether &lsquo;<samp><span class="samp">Base::operator=</span></samp>&rsquo; is called more than once when
+the implicit copy-assignment for Derived objects is invoked (as it is
+inside &lsquo;<samp><span class="samp">func</span></samp>&rsquo; in the example).
+
+ <p>G++ implements the &ldquo;intuitive&rdquo; algorithm for copy-assignment: assign all
+direct bases, then assign all members.  In that algorithm, the virtual
+base subobject can be encountered more than once.  In the example, copying
+proceeds in the following order: &lsquo;<samp><span class="samp">val</span></samp>&rsquo;, &lsquo;<samp><span class="samp">name</span></samp>&rsquo; (via
+<code>strdup</code>), &lsquo;<samp><span class="samp">bval</span></samp>&rsquo;, and &lsquo;<samp><span class="samp">name</span></samp>&rsquo; again.
+
+ <p>If application code relies on copy-assignment, a user-defined
+copy-assignment operator removes any uncertainties.  With such an
+operator, the application can define whether and how the virtual base
+subobject is assigned.
+
+ </body></html>
+

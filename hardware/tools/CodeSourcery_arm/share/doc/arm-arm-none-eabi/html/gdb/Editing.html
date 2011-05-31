@@ -1,0 +1,79 @@
+<html lang="en">
+<head>
+<title>Editing - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Controlling-GDB.html#Controlling-GDB" title="Controlling GDB">
+<link rel="prev" href="Prompt.html#Prompt" title="Prompt">
+<link rel="next" href="Command-History.html#Command-History" title="Command History">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Editing"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Command-History.html#Command-History">Command History</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Prompt.html#Prompt">Prompt</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Controlling-GDB.html#Controlling-GDB">Controlling GDB</a>
+<hr>
+</div>
+
+<h3 class="section">22.2 Command Editing</h3>
+
+<p><a name="index-readline-1432"></a><a name="index-command-line-editing-1433"></a>
+<span class="sc">gdb</span> reads its input commands via the <dfn>Readline</dfn> interface.  This
+<span class="sc">gnu</span> library provides consistent behavior for programs which provide a
+command line interface to the user.  Advantages are <span class="sc">gnu</span> Emacs-style
+or <dfn>vi</dfn>-style inline editing of commands, <code>csh</code>-like history
+substitution, and a storage and recall of command history across
+debugging sessions.
+
+   <p>You may control the behavior of command line editing in <span class="sc">gdb</span> with the
+command <code>set</code>.
+
+     
+<a name="index-set-editing-1434"></a>
+<a name="index-editing-1435"></a>
+<dl><dt><code>set editing</code><dt><code>set editing on</code><dd>Enable command line editing (enabled by default).
+
+     <br><dt><code>set editing off</code><dd>Disable command line editing.
+
+     <p><a name="index-show-editing-1436"></a><br><dt><code>show editing</code><dd>Show whether command line editing is enabled. 
+</dl>
+
+   <p>See <a href="Command-Line-Editing.html#Command-Line-Editing">Command Line Editing</a>, for more details about the Readline
+interface.  Users unfamiliar with <span class="sc">gnu</span> Emacs or <code>vi</code> are
+encouraged to read that chapter.
+
+   </body></html>
+

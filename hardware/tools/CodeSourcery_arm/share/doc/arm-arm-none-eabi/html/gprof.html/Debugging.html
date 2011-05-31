@@ -1,0 +1,77 @@
+<html lang="en">
+<head>
+<title>Debugging - GNU gprof</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GNU gprof">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Details.html#Details" title="Details">
+<link rel="prev" href="Internals.html#Internals" title="Internals">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the gprof profiler of the GNU system.
+
+Copyright (C) 1988, 1992, 1997, 1998, 1999, 2000, 2001, 2003,
+2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Debugging"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Internals.html#Internals">Internals</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Details.html#Details">Details</a>
+<hr>
+</div>
+
+<h3 class="section">9.4 Debugging <code>gprof</code></h3>
+
+<p>If <code>gprof</code> was compiled with debugging enabled,
+the &lsquo;<samp><span class="samp">-d</span></samp>&rsquo; option triggers debugging output
+(to stdout) which can be helpful in understanding its operation. 
+The debugging number specified is interpreted as a sum of the following
+options:
+
+     <dl>
+<dt>2 - Topological sort<dd>Monitor depth-first numbering of symbols during call graph analysis
+<br><dt>4 - Cycles<dd>Shows symbols as they are identified as cycle heads
+<br><dt>16 - Tallying<dd>As the call graph arcs are read, show each arc and how
+the total calls to each function are tallied
+<br><dt>32 - Call graph arc sorting<dd>Details sorting individual parents/children within each call graph entry
+<br><dt>64 - Reading histogram and call graph records<dd>Shows address ranges of histograms as they are read, and each
+call graph arc
+<br><dt>128 - Symbol table<dd>Reading, classifying, and sorting the symbol table from the object file. 
+For line-by-line profiling (&lsquo;<samp><span class="samp">-l</span></samp>&rsquo; option), also shows line numbers
+being assigned to memory addresses. 
+<br><dt>256 - Static call graph<dd>Trace operation of &lsquo;<samp><span class="samp">-c</span></samp>&rsquo; option
+<br><dt>512 - Symbol table and arc table lookups<dd>Detail operation of lookup routines
+<br><dt>1024 - Call graph propagation<dd>Shows how function times are propagated along the call graph
+<br><dt>2048 - Basic-blocks<dd>Shows basic-block records as they are read from profile data
+(only meaningful with &lsquo;<samp><span class="samp">-l</span></samp>&rsquo; option)
+<br><dt>4096 - Symspecs<dd>Shows symspec-to-symbol pattern matching operation
+<br><dt>8192 - Annotate source<dd>Tracks operation of &lsquo;<samp><span class="samp">-A</span></samp>&rsquo; option
+</dl>
+
+   </body></html>
+

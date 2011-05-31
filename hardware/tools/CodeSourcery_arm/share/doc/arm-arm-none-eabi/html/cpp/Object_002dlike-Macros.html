@@ -1,0 +1,161 @@
+<html lang="en">
+<head>
+<title>Object-like Macros - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Macros.html#Macros" title="Macros">
+<link rel="next" href="Function_002dlike-Macros.html#Function_002dlike-Macros" title="Function-like Macros">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Object-like-Macros"></a>
+<a name="Object_002dlike-Macros"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Function_002dlike-Macros.html#Function_002dlike-Macros">Function-like Macros</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Macros.html#Macros">Macros</a>
+<hr>
+</div>
+
+<h3 class="section">3.1 Object-like Macros</h3>
+
+<p><a name="index-object_002dlike-macro-41"></a><a name="index-symbolic-constants-42"></a><a name="index-manifest-constants-43"></a>
+An <dfn>object-like macro</dfn> is a simple identifier which will be replaced
+by a code fragment.  It is called object-like because it looks like a
+data object in code that uses it.  They are most commonly used to give
+symbolic names to numeric constants.
+
+   <p><a name="index-g_t_0023define-44"></a>You create macros with the &lsquo;<samp><span class="samp">#define</span></samp>&rsquo; directive.  &lsquo;<samp><span class="samp">#define</span></samp>&rsquo; is
+followed by the name of the macro and then the token sequence it should
+be an abbreviation for, which is variously referred to as the macro's
+<dfn>body</dfn>, <dfn>expansion</dfn> or <dfn>replacement list</dfn>.  For example,
+
+<pre class="smallexample">     #define BUFFER_SIZE 1024
+</pre>
+   <p class="noindent">defines a macro named <code>BUFFER_SIZE</code> as an abbreviation for the
+token <code>1024</code>.  If somewhere after this &lsquo;<samp><span class="samp">#define</span></samp>&rsquo; directive
+there comes a C statement of the form
+
+<pre class="smallexample">     foo = (char *) malloc (BUFFER_SIZE);
+</pre>
+   <p class="noindent">then the C preprocessor will recognize and <dfn>expand</dfn> the macro
+<code>BUFFER_SIZE</code>.  The C compiler will see the same tokens as it would
+if you had written
+
+<pre class="smallexample">     foo = (char *) malloc (1024);
+</pre>
+   <p>By convention, macro names are written in uppercase.  Programs are
+easier to read when it is possible to tell at a glance which names are
+macros.
+
+   <p>The macro's body ends at the end of the &lsquo;<samp><span class="samp">#define</span></samp>&rsquo; line.  You may
+continue the definition onto multiple lines, if necessary, using
+backslash-newline.  When the macro is expanded, however, it will all
+come out on one line.  For example,
+
+<pre class="smallexample">     #define NUMBERS 1, \
+                     2, \
+                     3
+     int x[] = { NUMBERS };
+          ==&gt; int x[] = { 1, 2, 3 };
+</pre>
+   <p class="noindent">The most common visible consequence of this is surprising line numbers
+in error messages.
+
+   <p>There is no restriction on what can go in a macro body provided it
+decomposes into valid preprocessing tokens.  Parentheses need not
+balance, and the body need not resemble valid C code.  (If it does not,
+you may get error messages from the C compiler when you use the macro.)
+
+   <p>The C preprocessor scans your program sequentially.  Macro definitions
+take effect at the place you write them.  Therefore, the following input
+to the C preprocessor
+
+<pre class="smallexample">     foo = X;
+     #define X 4
+     bar = X;
+</pre>
+   <p class="noindent">produces
+
+<pre class="smallexample">     foo = X;
+     bar = 4;
+</pre>
+   <p>When the preprocessor expands a macro name, the macro's expansion
+replaces the macro invocation, then the expansion is examined for more
+macros to expand.  For example,
+
+<pre class="smallexample">     #define TABLESIZE BUFSIZE
+     #define BUFSIZE 1024
+     TABLESIZE
+          ==&gt; BUFSIZE
+          ==&gt; 1024
+</pre>
+   <p class="noindent"><code>TABLESIZE</code> is expanded first to produce <code>BUFSIZE</code>, then that
+macro is expanded to produce the final result, <code>1024</code>.
+
+   <p>Notice that <code>BUFSIZE</code> was not defined when <code>TABLESIZE</code> was
+defined.  The &lsquo;<samp><span class="samp">#define</span></samp>&rsquo; for <code>TABLESIZE</code> uses exactly the
+expansion you specify&mdash;in this case, <code>BUFSIZE</code>&mdash;and does not
+check to see whether it too contains macro names.  Only when you
+<em>use</em> <code>TABLESIZE</code> is the result of its expansion scanned for
+more macro names.
+
+   <p>This makes a difference if you change the definition of <code>BUFSIZE</code>
+at some point in the source file.  <code>TABLESIZE</code>, defined as shown,
+will always expand using the definition of <code>BUFSIZE</code> that is
+currently in effect:
+
+<pre class="smallexample">     #define BUFSIZE 1020
+     #define TABLESIZE BUFSIZE
+     #undef BUFSIZE
+     #define BUFSIZE 37
+</pre>
+   <p class="noindent">Now <code>TABLESIZE</code> expands (in two stages) to <code>37</code>.
+
+   <p>If the expansion of a macro contains its own name, either directly or
+via intermediate macros, it is not expanded again when the expansion is
+examined for more macros.  This prevents infinite recursion. 
+See <a href="Self_002dReferential-Macros.html#Self_002dReferential-Macros">Self-Referential Macros</a>, for the precise details.
+
+   </body></html>
+

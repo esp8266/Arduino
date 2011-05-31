@@ -1,0 +1,284 @@
+<html lang="en">
+<head>
+<title>Objective-C and Objective-C++ Dialect Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Invoking-GCC.html#Invoking-GCC" title="Invoking GCC">
+<link rel="prev" href="C_002b_002b-Dialect-Options.html#C_002b_002b-Dialect-Options" title="C++ Dialect Options">
+<link rel="next" href="Language-Independent-Options.html#Language-Independent-Options" title="Language Independent Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Objective-C-and-Objective-C++-Dialect-Options"></a>
+<a name="Objective_002dC-and-Objective_002dC_002b_002b-Dialect-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Language-Independent-Options.html#Language-Independent-Options">Language Independent Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="C_002b_002b-Dialect-Options.html#C_002b_002b-Dialect-Options">C++ Dialect Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Invoking-GCC.html#Invoking-GCC">Invoking GCC</a>
+<hr>
+</div>
+
+<h3 class="section">3.6 Options Controlling Objective-C and Objective-C++ Dialects</h3>
+
+<p><a name="index-compiler-options_002c-Objective_002dC-and-Objective_002dC_002b_002b-187"></a><a name="index-Objective_002dC-and-Objective_002dC_002b_002b-options_002c-command-line-188"></a><a name="index-options_002c-Objective_002dC-and-Objective_002dC_002b_002b-189"></a>(NOTE: This manual does not describe the Objective-C and Objective-C++
+languages themselves.  See See <a href="Standards.html#Standards">Language Standards Supported by GCC</a>, for references.)
+
+ <p>This section describes the command-line options that are only meaningful
+for Objective-C and Objective-C++ programs, but you can also use most of
+the language-independent GNU compiler options. 
+For example, you might compile a file <code>some_class.m</code> like this:
+
+<pre class="smallexample">     gcc -g -fgnu-runtime -O -c some_class.m
+</pre>
+ <p class="noindent">In this example, <samp><span class="option">-fgnu-runtime</span></samp> is an option meant only for
+Objective-C and Objective-C++ programs; you can use the other options with
+any language supported by GCC.
+
+ <p>Note that since Objective-C is an extension of the C language, Objective-C
+compilations may also use options specific to the C front-end (e.g.,
+<samp><span class="option">-Wtraditional</span></samp>).  Similarly, Objective-C++ compilations may use
+C++-specific options (e.g., <samp><span class="option">-Wabi</span></samp>).
+
+ <p>Here is a list of options that are <em>only</em> for compiling Objective-C
+and Objective-C++ programs:
+
+     <dl>
+<dt><code>-fconstant-string-class=</code><var>class-name</var><dd><a name="index-fconstant_002dstring_002dclass-190"></a>Use <var>class-name</var> as the name of the class to instantiate for each
+literal string specified with the syntax <code>@"..."</code>.  The default
+class name is <code>NXConstantString</code> if the GNU runtime is being used, and
+<code>NSConstantString</code> if the NeXT runtime is being used (see below).  The
+<samp><span class="option">-fconstant-cfstrings</span></samp> option, if also present, will override the
+<samp><span class="option">-fconstant-string-class</span></samp> setting and cause <code>@"..."</code> literals
+to be laid out as constant CoreFoundation strings.
+
+     <br><dt><code>-fgnu-runtime</code><dd><a name="index-fgnu_002druntime-191"></a>Generate object code compatible with the standard GNU Objective-C
+runtime.  This is the default for most types of systems.
+
+     <br><dt><code>-fnext-runtime</code><dd><a name="index-fnext_002druntime-192"></a>Generate output compatible with the NeXT runtime.  This is the default
+for NeXT-based systems, including Darwin and Mac OS X.  The macro
+<code>__NEXT_RUNTIME__</code> is predefined if (and only if) this option is
+used.
+
+     <br><dt><code>-fno-nil-receivers</code><dd><a name="index-fno_002dnil_002dreceivers-193"></a>Assume that all Objective-C message dispatches (e.g.,
+<code>[receiver message:arg]</code>) in this translation unit ensure that the receiver
+is not <code>nil</code>.  This allows for more efficient entry points in the runtime
+to be used.  Currently, this option is only available in conjunction with
+the NeXT runtime on Mac OS X 10.3 and later.
+
+     <br><dt><code>-fobjc-call-cxx-cdtors</code><dd><a name="index-fobjc_002dcall_002dcxx_002dcdtors-194"></a>For each Objective-C class, check if any of its instance variables is a
+C++ object with a non-trivial default constructor.  If so, synthesize a
+special <code>- (id) .cxx_construct</code> instance method that will run
+non-trivial default constructors on any such instance variables, in order,
+and then return <code>self</code>.  Similarly, check if any instance variable
+is a C++ object with a non-trivial destructor, and if so, synthesize a
+special <code>- (void) .cxx_destruct</code> method that will run
+all such default destructors, in reverse order.
+
+     <p>The <code>- (id) .cxx_construct</code> and/or <code>- (void) .cxx_destruct</code> methods
+thusly generated will only operate on instance variables declared in the
+current Objective-C class, and not those inherited from superclasses.  It
+is the responsibility of the Objective-C runtime to invoke all such methods
+in an object's inheritance hierarchy.  The <code>- (id) .cxx_construct</code> methods
+will be invoked by the runtime immediately after a new object
+instance is allocated; the <code>- (void) .cxx_destruct</code> methods will
+be invoked immediately before the runtime deallocates an object instance.
+
+     <p>As of this writing, only the NeXT runtime on Mac OS X 10.4 and later has
+support for invoking the <code>- (id) .cxx_construct</code> and
+<code>- (void) .cxx_destruct</code> methods.
+
+     <br><dt><code>-fobjc-direct-dispatch</code><dd><a name="index-fobjc_002ddirect_002ddispatch-195"></a>Allow fast jumps to the message dispatcher.  On Darwin this is
+accomplished via the comm page.
+
+     <br><dt><code>-fobjc-exceptions</code><dd><a name="index-fobjc_002dexceptions-196"></a>Enable syntactic support for structured exception handling in Objective-C,
+similar to what is offered by C++ and Java.  This option is
+unavailable in conjunction with the NeXT runtime on Mac OS X 10.2 and
+earlier.
+
+     <pre class="smallexample">            @try {
+              ...
+                 @throw expr;
+              ...
+            }
+            @catch (AnObjCClass *exc) {
+              ...
+                @throw expr;
+              ...
+                @throw;
+              ...
+            }
+            @catch (AnotherClass *exc) {
+              ...
+            }
+            @catch (id allOthers) {
+              ...
+            }
+            @finally {
+              ...
+                @throw expr;
+              ...
+            }
+</pre>
+     <p>The <code>@throw</code> statement may appear anywhere in an Objective-C or
+Objective-C++ program; when used inside of a <code>@catch</code> block, the
+<code>@throw</code> may appear without an argument (as shown above), in which case
+the object caught by the <code>@catch</code> will be rethrown.
+
+     <p>Note that only (pointers to) Objective-C objects may be thrown and
+caught using this scheme.  When an object is thrown, it will be caught
+by the nearest <code>@catch</code> clause capable of handling objects of that type,
+analogously to how <code>catch</code> blocks work in C++ and Java.  A
+<code>@catch(id ...)</code> clause (as shown above) may also be provided to catch
+any and all Objective-C exceptions not caught by previous <code>@catch</code>
+clauses (if any).
+
+     <p>The <code>@finally</code> clause, if present, will be executed upon exit from the
+immediately preceding <code>@try ... @catch</code> section.  This will happen
+regardless of whether any exceptions are thrown, caught or rethrown
+inside the <code>@try ... @catch</code> section, analogously to the behavior
+of the <code>finally</code> clause in Java.
+
+     <p>There are several caveats to using the new exception mechanism:
+
+          <ul>
+<li>Although currently designed to be binary compatible with <code>NS_HANDLER</code>-style
+idioms provided by the <code>NSException</code> class, the new
+exceptions can only be used on Mac OS X 10.3 (Panther) and later
+systems, due to additional functionality needed in the (NeXT) Objective-C
+runtime.
+
+          <li>As mentioned above, the new exceptions do not support handling
+types other than Objective-C objects.   Furthermore, when used from
+Objective-C++, the Objective-C exception model does not interoperate with C++
+exceptions at this time.  This means you cannot <code>@throw</code> an exception
+from Objective-C and <code>catch</code> it in C++, or vice versa
+(i.e., <code>throw ... @catch</code>). 
+</ul>
+
+     <p>The <samp><span class="option">-fobjc-exceptions</span></samp> switch also enables the use of synchronization
+blocks for thread-safe execution:
+
+     <pre class="smallexample">            @synchronized (ObjCClass *guard) {
+              ...
+            }
+</pre>
+     <p>Upon entering the <code>@synchronized</code> block, a thread of execution shall
+first check whether a lock has been placed on the corresponding <code>guard</code>
+object by another thread.  If it has, the current thread shall wait until
+the other thread relinquishes its lock.  Once <code>guard</code> becomes available,
+the current thread will place its own lock on it, execute the code contained in
+the <code>@synchronized</code> block, and finally relinquish the lock (thereby
+making <code>guard</code> available to other threads).
+
+     <p>Unlike Java, Objective-C does not allow for entire methods to be marked
+<code>@synchronized</code>.  Note that throwing exceptions out of
+<code>@synchronized</code> blocks is allowed, and will cause the guarding object
+to be unlocked properly.
+
+     <br><dt><code>-fobjc-gc</code><dd><a name="index-fobjc_002dgc-197"></a>Enable garbage collection (GC) in Objective-C and Objective-C++ programs.
+
+     <br><dt><code>-freplace-objc-classes</code><dd><a name="index-freplace_002dobjc_002dclasses-198"></a>Emit a special marker instructing <samp><span class="command">ld(1)</span></samp> not to statically link in
+the resulting object file, and allow <samp><span class="command">dyld(1)</span></samp> to load it in at
+run time instead.  This is used in conjunction with the Fix-and-Continue
+debugging mode, where the object file in question may be recompiled and
+dynamically reloaded in the course of program execution, without the need
+to restart the program itself.  Currently, Fix-and-Continue functionality
+is only available in conjunction with the NeXT runtime on Mac OS X 10.3
+and later.
+
+     <br><dt><code>-fzero-link</code><dd><a name="index-fzero_002dlink-199"></a>When compiling for the NeXT runtime, the compiler ordinarily replaces calls
+to <code>objc_getClass("...")</code> (when the name of the class is known at
+compile time) with static class references that get initialized at load time,
+which improves run-time performance.  Specifying the <samp><span class="option">-fzero-link</span></samp> flag
+suppresses this behavior and causes calls to <code>objc_getClass("...")</code>
+to be retained.  This is useful in Zero-Link debugging mode, since it allows
+for individual class implementations to be modified during program execution.
+
+     <br><dt><code>-gen-decls</code><dd><a name="index-gen_002ddecls-200"></a>Dump interface declarations for all classes seen in the source file to a
+file named <samp><var>sourcename</var><span class="file">.decl</span></samp>.
+
+     <br><dt><code>-Wassign-intercept </code><span class="roman">(Objective-C and Objective-C++ only)</span><dd><a name="index-Wassign_002dintercept-201"></a><a name="index-Wno_002dassign_002dintercept-202"></a>Warn whenever an Objective-C assignment is being intercepted by the
+garbage collector.
+
+     <br><dt><code>-Wno-protocol </code><span class="roman">(Objective-C and Objective-C++ only)</span><dd><a name="index-Wno_002dprotocol-203"></a><a name="index-Wprotocol-204"></a>If a class is declared to implement a protocol, a warning is issued for
+every method in the protocol that is not implemented by the class.  The
+default behavior is to issue a warning for every method not explicitly
+implemented in the class, even if a method implementation is inherited
+from the superclass.  If you use the <samp><span class="option">-Wno-protocol</span></samp> option, then
+methods inherited from the superclass are considered to be implemented,
+and no warning is issued for them.
+
+     <br><dt><code>-Wselector </code><span class="roman">(Objective-C and Objective-C++ only)</span><dd><a name="index-Wselector-205"></a><a name="index-Wno_002dselector-206"></a>Warn if multiple methods of different types for the same selector are
+found during compilation.  The check is performed on the list of methods
+in the final stage of compilation.  Additionally, a check is performed
+for each selector appearing in a <code>@selector(...)</code>
+expression, and a corresponding method for that selector has been found
+during compilation.  Because these checks scan the method table only at
+the end of compilation, these warnings are not produced if the final
+stage of compilation is not reached, for example because an error is
+found during compilation, or because the <samp><span class="option">-fsyntax-only</span></samp> option is
+being used.
+
+     <br><dt><code>-Wstrict-selector-match </code><span class="roman">(Objective-C and Objective-C++ only)</span><dd><a name="index-Wstrict_002dselector_002dmatch-207"></a><a name="index-Wno_002dstrict_002dselector_002dmatch-208"></a>Warn if multiple methods with differing argument and/or return types are
+found for a given selector when attempting to send a message using this
+selector to a receiver of type <code>id</code> or <code>Class</code>.  When this flag
+is off (which is the default behavior), the compiler will omit such warnings
+if any differences found are confined to types which share the same size
+and alignment.
+
+     <br><dt><code>-Wundeclared-selector </code><span class="roman">(Objective-C and Objective-C++ only)</span><dd><a name="index-Wundeclared_002dselector-209"></a><a name="index-Wno_002dundeclared_002dselector-210"></a>Warn if a <code>@selector(...)</code> expression referring to an
+undeclared selector is found.  A selector is considered undeclared if no
+method with that name has been declared before the
+<code>@selector(...)</code> expression, either explicitly in an
+<code>@interface</code> or <code>@protocol</code> declaration, or implicitly in
+an <code>@implementation</code> section.  This option always performs its
+checks as soon as a <code>@selector(...)</code> expression is found,
+while <samp><span class="option">-Wselector</span></samp> only performs its checks in the final stage of
+compilation.  This also enforces the coding style convention
+that methods and selectors must be declared before being used.
+
+     <br><dt><code>-print-objc-runtime-info</code><dd><a name="index-print_002dobjc_002druntime_002dinfo-211"></a>Generate C header describing the largest structure that is passed by
+value, if any.
+
+ </dl>
+
+ </body></html>
+

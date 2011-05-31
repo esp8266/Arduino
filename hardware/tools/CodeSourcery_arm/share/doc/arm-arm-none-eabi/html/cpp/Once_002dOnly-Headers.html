@@ -1,0 +1,103 @@
+<html lang="en">
+<head>
+<title>Once-Only Headers - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Header-Files.html#Header-Files" title="Header Files">
+<link rel="prev" href="Search-Path.html#Search-Path" title="Search Path">
+<link rel="next" href="Alternatives-to-Wrapper-_0023ifndef.html#Alternatives-to-Wrapper-_0023ifndef" title="Alternatives to Wrapper #ifndef">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Once-Only-Headers"></a>
+<a name="Once_002dOnly-Headers"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Alternatives-to-Wrapper-_0023ifndef.html#Alternatives-to-Wrapper-_0023ifndef">Alternatives to Wrapper #ifndef</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Search-Path.html#Search-Path">Search Path</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Header-Files.html#Header-Files">Header Files</a>
+<hr>
+</div>
+
+<h3 class="section">2.4 Once-Only Headers</h3>
+
+<p><a name="index-repeated-inclusion-28"></a><a name="index-including-just-once-29"></a><a name="index-wrapper-_0040code_007b_0023ifndef_007d-30"></a>
+If a header file happens to be included twice, the compiler will process
+its contents twice.  This is very likely to cause an error, e.g. when the
+compiler sees the same structure definition twice.  Even if it does not,
+it will certainly waste time.
+
+   <p>The standard way to prevent this is to enclose the entire real contents
+of the file in a conditional, like this:
+
+<pre class="smallexample">     /* File foo.  */
+     #ifndef FILE_FOO_SEEN
+     #define FILE_FOO_SEEN
+     
+     <var>the entire file</var>
+     
+     #endif /* !FILE_FOO_SEEN */
+</pre>
+   <p>This construct is commonly known as a <dfn>wrapper #ifndef</dfn>. 
+When the header is included again, the conditional will be false,
+because <code>FILE_FOO_SEEN</code> is defined.  The preprocessor will skip
+over the entire contents of the file, and the compiler will not see it
+twice.
+
+   <p>CPP optimizes even further.  It remembers when a header file has a
+wrapper &lsquo;<samp><span class="samp">#ifndef</span></samp>&rsquo;.  If a subsequent &lsquo;<samp><span class="samp">#include</span></samp>&rsquo; specifies that
+header, and the macro in the &lsquo;<samp><span class="samp">#ifndef</span></samp>&rsquo; is still defined, it does
+not bother to rescan the file at all.
+
+   <p>You can put comments outside the wrapper.  They will not interfere with
+this optimization.
+
+   <p><a name="index-controlling-macro-31"></a><a name="index-guard-macro-32"></a>The macro <code>FILE_FOO_SEEN</code> is called the <dfn>controlling macro</dfn> or
+<dfn>guard macro</dfn>.  In a user header file, the macro name should not
+begin with &lsquo;<samp><span class="samp">_</span></samp>&rsquo;.  In a system header file, it should begin with
+&lsquo;<samp><span class="samp">__</span></samp>&rsquo; to avoid conflicts with user programs.  In any kind of header
+file, the macro name should contain the name of the file and some
+additional text, to avoid conflicts with other header files.
+
+   </body></html>
+

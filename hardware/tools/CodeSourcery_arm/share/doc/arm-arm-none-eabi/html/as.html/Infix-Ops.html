@@ -1,0 +1,131 @@
+<html lang="en">
+<head>
+<title>Infix Ops - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Integer-Exprs.html#Integer-Exprs" title="Integer Exprs">
+<link rel="prev" href="Prefix-Ops.html#Prefix-Ops" title="Prefix Ops">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Infix-Ops"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Prefix-Ops.html#Prefix-Ops">Prefix Ops</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Integer-Exprs.html#Integer-Exprs">Integer Exprs</a>
+<hr>
+</div>
+
+<h4 class="subsection">6.2.4 Infix Operators</h4>
+
+<p><a name="index-infix-operators-257"></a><a name="index-operators_002c-permitted-arguments-258"></a><dfn>Infix operators</dfn> take two arguments, one on either side.  Operators
+have precedence, but operations with equal precedence are performed left
+to right.  Apart from <code>+</code> or <samp><span class="option">-</span></samp>, both arguments must be
+absolute, and the result is absolute.
+
+     <ol type=1 start=1>
+<a name="index-operator-precedence-259"></a><a name="index-precedence-of-operators-260"></a>
+<li>Highest Precedence
+
+          <dl>
+<dt><code>*</code><dd><dfn>Multiplication</dfn>.
+
+          <br><dt><code>/</code><dd><dfn>Division</dfn>.  Truncation is the same as the C operator &lsquo;<samp><span class="samp">/</span></samp>&rsquo;
+
+          <br><dt><code>%</code><dd><dfn>Remainder</dfn>.
+
+          <br><dt><code>&lt;&lt;</code><dd><dfn>Shift Left</dfn>.  Same as the C operator &lsquo;<samp><span class="samp">&lt;&lt;</span></samp>&rsquo;.
+
+          <br><dt><code>&gt;&gt;</code><dd><dfn>Shift Right</dfn>.  Same as the C operator &lsquo;<samp><span class="samp">&gt;&gt;</span></samp>&rsquo;. 
+</dl>
+
+     <li>Intermediate precedence
+
+          <dl>
+<dt><code>|</code><dd>
+<dfn>Bitwise Inclusive Or</dfn>.
+
+          <br><dt><code>&amp;</code><dd><dfn>Bitwise And</dfn>.
+
+          <br><dt><code>^</code><dd><dfn>Bitwise Exclusive Or</dfn>.
+
+          <br><dt><code>!</code><dd><dfn>Bitwise Or Not</dfn>. 
+</dl>
+
+     <li>Low Precedence
+
+          
+<a name="index-addition_002c-permitted-arguments-261"></a>
+<a name="index-plus_002c-permitted-arguments-262"></a>
+<a name="index-arguments-for-addition-263"></a>
+<dl><dt><code>+</code><dd><dfn>Addition</dfn>.  If either argument is absolute, the result has the section of
+the other argument.  You may not add together arguments from different
+sections.
+
+          <p><a name="index-subtraction_002c-permitted-arguments-264"></a><a name="index-minus_002c-permitted-arguments-265"></a><a name="index-arguments-for-subtraction-266"></a><br><dt><code>-</code><dd><dfn>Subtraction</dfn>.  If the right argument is absolute, the
+result has the section of the left argument. 
+If both arguments are in the same section, the result is absolute. 
+You may not subtract arguments from different sections. 
+<!-- FIXME is there still something useful to say about undefined - undefined ? -->
+
+          <p><a name="index-comparison-expressions-267"></a><a name="index-expressions_002c-comparison-268"></a><br><dt><code>==</code><dd><dfn>Is Equal To</dfn>
+<br><dt><code>&lt;&gt;</code><dt><code>!=</code><dd><dfn>Is Not Equal To</dfn>
+<br><dt><code>&lt;</code><dd><dfn>Is Less Than</dfn>
+<br><dt><code>&gt;</code><dd><dfn>Is Greater Than</dfn>
+<br><dt><code>&gt;=</code><dd><dfn>Is Greater Than Or Equal To</dfn>
+<br><dt><code>&lt;=</code><dd><dfn>Is Less Than Or Equal To</dfn>
+
+          <p>The comparison operators can be used as infix operators.  A true results has a
+value of -1 whereas a false result has a value of 0.   Note, these operators
+perform signed comparisons. 
+</dl>
+
+     <li>Lowest Precedence
+
+          <dl>
+<dt><code>&amp;&amp;</code><dd><dfn>Logical And</dfn>.
+
+          <br><dt><code>||</code><dd><dfn>Logical Or</dfn>.
+
+          <p>These two logical operations can be used to combine the results of sub
+expressions.  Note, unlike the comparison operators a true result returns a
+value of 1 but a false results does still return 0.  Also note that the logical
+or operator has a slightly lower precedence than logical and.
+
+     </dl>
+     </ol>
+
+   <p>In short, it's only meaningful to add or subtract the <em>offsets</em> in an
+address; you can only have a defined section in one of the two arguments.
+
+   </body></html>
+

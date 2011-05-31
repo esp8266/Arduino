@@ -1,0 +1,73 @@
+<html lang="en">
+<head>
+<title>remove - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="putwchar.html#putwchar" title="putwchar">
+<link rel="next" href="rename.html#rename" title="rename">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="remove"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="rename.html#rename">rename</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="putwchar.html#putwchar">putwchar</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.51 <code>remove</code>&mdash;delete a file's name</h3>
+
+<p><a name="index-remove-257"></a><a name="index-g_t_005fremove_005fr-258"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     int remove(char *<var>filename</var>);
+     
+     int _remove_r(struct _reent *<var>reent</var>, char *<var>filename</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+Use <code>remove</code> to dissolve the association between a particular
+filename (the string at <var>filename</var>) and the file it represents. 
+After calling <code>remove</code> with a particular filename, you will no
+longer be able to open the file by that name.
+
+   <p>In this implementation, you may use <code>remove</code> on an open file without
+error; existing file descriptors for the file will continue to access
+the file's data until the program using them closes the file.
+
+   <p>The alternate function <code>_remove_r</code> is a reentrant version.  The
+extra argument <var>reent</var> is a pointer to a reentrancy structure.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>remove</code> returns <code>0</code> if it succeeds, <code>-1</code> if it fails.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C requires <code>remove</code>, but only specifies that the result on
+failure be nonzero.  The behavior of <code>remove</code> when you call it on an
+open file may vary among implementations.
+
+   <p>Supporting OS subroutine required: <code>unlink</code>.
+
+   <p><br>
+
+   </body></html>
+

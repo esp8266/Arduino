@@ -1,0 +1,64 @@
+<html lang="en">
+<head>
+<title>wcsnlen - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Wchar-strings.html#Wchar-strings" title="Wchar strings">
+<link rel="prev" href="wcpncpy.html#wcpncpy" title="wcpncpy">
+<link rel="next" href="wcspbrk.html#wcspbrk" title="wcspbrk">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="wcsnlen"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="wcspbrk.html#wcspbrk">wcspbrk</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="wcpncpy.html#wcpncpy">wcpncpy</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Wchar-strings.html#Wchar-strings">Wchar strings</a>
+<hr>
+</div>
+
+<h3 class="section">6.21 <code>wcsnlen</code>&mdash;get fixed-size wide-character string length</h3>
+
+<p><a name="index-wcsnlen-417"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;wchar.h&gt;
+     size_t wcsnlen(const wchar_t *<var>s</var>, size_t <var>maxlen</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+The <code>wcsnlen</code> function computes the number of wide-character codes
+in the wide-character string pointed to by <var>s</var> not including the
+terminating L'\0' wide character but at most <var>maxlen</var> wide
+characters.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>wcsnlen</code> returns the length of <var>s</var> if it is less then <var>maxlen</var>,
+or <var>maxlen</var> if there is no L'\0' wide character in first <var>maxlen</var>
+characters.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>wcsnlen</code> is a GNU extension.
+
+   <p><code>wcsnlen</code> requires no supporting OS subroutines.
+
+   <p><br>
+
+   </body></html>
+

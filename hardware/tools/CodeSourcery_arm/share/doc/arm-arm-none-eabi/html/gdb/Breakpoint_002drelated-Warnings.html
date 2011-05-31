@@ -1,0 +1,99 @@
+<html lang="en">
+<head>
+<title>Breakpoint-related Warnings - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Breakpoints.html#Breakpoints" title="Breakpoints">
+<link rel="prev" href="Error-in-Breakpoints.html#Error-in-Breakpoints" title="Error in Breakpoints">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Breakpoint-related-Warnings"></a>
+<a name="Breakpoint_002drelated-Warnings"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Error-in-Breakpoints.html#Error-in-Breakpoints">Error in Breakpoints</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Breakpoints.html#Breakpoints">Breakpoints</a>
+<hr>
+</div>
+
+<h4 class="subsection">5.1.10 &ldquo;Breakpoint address adjusted...&rdquo;</h4>
+
+<p><a name="index-breakpoint-address-adjusted-283"></a>
+Some processor architectures place constraints on the addresses at
+which breakpoints may be placed.  For architectures thus constrained,
+<span class="sc">gdb</span> will attempt to adjust the breakpoint's address to comply
+with the constraints dictated by the architecture.
+
+   <p>One example of such an architecture is the Fujitsu FR-V.  The FR-V is
+a VLIW architecture in which a number of RISC-like instructions may be
+bundled together for parallel execution.  The FR-V architecture
+constrains the location of a breakpoint instruction within such a
+bundle to the instruction with the lowest address.  <span class="sc">gdb</span>
+honors this constraint by adjusting a breakpoint's address to the
+first in the bundle.
+
+   <p>It is not uncommon for optimized code to have bundles which contain
+instructions from different source statements, thus it may happen that
+a breakpoint's address will be adjusted from one source statement to
+another.  Since this adjustment may significantly alter <span class="sc">gdb</span>'s
+breakpoint related behavior from what the user expects, a warning is
+printed when the breakpoint is first set and also when the breakpoint
+is hit.
+
+   <p>A warning like the one below is printed when setting a breakpoint
+that's been subject to address adjustment:
+
+<pre class="smallexample">     warning: Breakpoint address adjusted from 0x00010414 to 0x00010410.
+</pre>
+   <p>Such warnings are printed both for user settable and <span class="sc">gdb</span>'s
+internal breakpoints.  If you see one of these warnings, you should
+verify that a breakpoint set at the adjusted address will have the
+desired affect.  If not, the breakpoint in question may be removed and
+other breakpoints may be set which will have the desired behavior. 
+E.g., it may be sufficient to place the breakpoint at a later
+instruction.  A conditional breakpoint may also be useful in some
+cases to prevent the breakpoint from triggering too often.
+
+   <p><span class="sc">gdb</span> will also issue a warning when stopping at one of these
+adjusted breakpoints:
+
+<pre class="smallexample">     warning: Breakpoint 1 address previously adjusted from 0x00010414
+     to 0x00010410.
+</pre>
+   <p>When this warning is encountered, it may be too late to take remedial
+action except in cases where the breakpoint is hit earlier or more
+frequently than expected.
+
+   </body></html>
+

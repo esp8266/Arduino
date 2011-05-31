@@ -1,0 +1,126 @@
+<html lang="en">
+<head>
+<title>Variable Length - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Zero-Length.html#Zero-Length" title="Zero Length">
+<link rel="next" href="Empty-Structures.html#Empty-Structures" title="Empty Structures">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Variable-Length"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Empty-Structures.html#Empty-Structures">Empty Structures</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Zero-Length.html#Zero-Length">Zero Length</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.18 Arrays of Variable Length</h3>
+
+<p><a name="index-variable_002dlength-arrays-2290"></a><a name="index-arrays-of-variable-length-2291"></a><a name="index-VLAs-2292"></a>
+Variable-length automatic arrays are allowed in ISO C99, and as an
+extension GCC accepts them in C90 mode and in C++.  These arrays are
+declared like any other automatic arrays, but with a length that is not
+a constant expression.  The storage is allocated at the point of
+declaration and deallocated when the brace-level is exited.  For
+example:
+
+<pre class="smallexample">     FILE *
+     concat_fopen (char *s1, char *s2, char *mode)
+     {
+       char str[strlen (s1) + strlen (s2) + 1];
+       strcpy (str, s1);
+       strcat (str, s2);
+       return fopen (str, mode);
+     }
+</pre>
+ <p><a name="index-scope-of-a-variable-length-array-2293"></a><a name="index-variable_002dlength-array-scope-2294"></a><a name="index-deallocating-variable-length-arrays-2295"></a>Jumping or breaking out of the scope of the array name deallocates the
+storage.  Jumping into the scope is not allowed; you get an error
+message for it.
+
+ <p><a name="index-g_t_0040code_007balloca_007d-vs-variable_002dlength-arrays-2296"></a>You can use the function <code>alloca</code> to get an effect much like
+variable-length arrays.  The function <code>alloca</code> is available in
+many other C implementations (but not in all).  On the other hand,
+variable-length arrays are more elegant.
+
+ <p>There are other differences between these two methods.  Space allocated
+with <code>alloca</code> exists until the containing <em>function</em> returns. 
+The space for a variable-length array is deallocated as soon as the array
+name's scope ends.  (If you use both variable-length arrays and
+<code>alloca</code> in the same function, deallocation of a variable-length array
+will also deallocate anything more recently allocated with <code>alloca</code>.)
+
+ <p>You can also use variable-length arrays as arguments to functions:
+
+<pre class="smallexample">     struct entry
+     tester (int len, char data[len][len])
+     {
+       /* <span class="roman">...</span> */
+     }
+</pre>
+ <p>The length of an array is computed once when the storage is allocated
+and is remembered for the scope of the array in case you access it with
+<code>sizeof</code>.
+
+ <p>If you want to pass the array first and the length afterward, you can
+use a forward declaration in the parameter list&mdash;another GNU extension.
+
+<pre class="smallexample">     struct entry
+     tester (int len; char data[len][len], int len)
+     {
+       /* <span class="roman">...</span> */
+     }
+</pre>
+ <p><a name="index-parameter-forward-declaration-2297"></a>The &lsquo;<samp><span class="samp">int len</span></samp>&rsquo; before the semicolon is a <dfn>parameter forward
+declaration</dfn>, and it serves the purpose of making the name <code>len</code>
+known when the declaration of <code>data</code> is parsed.
+
+ <p>You can write any number of such parameter forward declarations in the
+parameter list.  They can be separated by commas or semicolons, but the
+last one must end with a semicolon, which is followed by the &ldquo;real&rdquo;
+parameter declarations.  Each forward declaration must match a &ldquo;real&rdquo;
+declaration in parameter name and data type.  ISO C99 does not support
+parameter forward declarations.
+
+ </body></html>
+

@@ -1,0 +1,118 @@
+<html lang="en">
+<head>
+<title>Reentrant Syscalls - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Syscalls.html#Syscalls" title="Syscalls">
+<link rel="prev" href="Stubs.html#Stubs" title="Stubs">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Reentrant-Syscalls"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Stubs.html#Stubs">Stubs</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Syscalls.html#Syscalls">Syscalls</a>
+<hr>
+</div>
+
+<h3 class="section">12.2 Reentrant covers for OS subroutines</h3>
+
+<p>Since the system subroutines are used by other library routines that
+require reentrancy, <samp><span class="file">libc.a</span></samp> provides cover routines (for example,
+the reentrant version of <code>fork</code> is <code>_fork_r</code>).  These cover
+routines are consistent with the other reentrant subroutines in this
+library, and achieve reentrancy by using a reserved global data block
+(see <a href="Reentrancy.html#Reentrancy">Reentrancy</a>).
+
+<!-- FIXME!!! The following ignored text specifies how this section ought -->
+<!-- to work;  however, both standalone info and Emacs info mode fail when -->
+<!-- confronted with nodes beginning `_' as of 24may93.  Restore when Info -->
+<!-- readers fixed! -->
+     <dl>
+<dt><code>_open_r</code><a name="index-g_t_005fopen_005fr-483"></a><dd>A reentrant version of <code>open</code>.  It takes a pointer
+to the global data block, which holds <code>errno</code>.
+
+     <pre class="example">          int _open_r(void *<var>reent</var>,
+              const char *<var>file</var>, int <var>flags</var>, int <var>mode</var>);
+</pre>
+     <br><dt><code>_close_r</code><a name="index-g_t_005fclose_005fr-484"></a><dd>A reentrant version of <code>close</code>.  It takes a pointer to the global
+data block, which holds <code>errno</code>.
+
+     <pre class="example">          int _close_r(void *<var>reent</var>, int <var>fd</var>);
+</pre>
+     <br><dt><code>_lseek_r</code><a name="index-g_t_005flseek_005fr-485"></a><dd>A reentrant version of <code>lseek</code>.  It takes a pointer to the global
+data block, which holds <code>errno</code>.
+
+     <pre class="example">          off_t _lseek_r(void *<var>reent</var>,
+              int <var>fd</var>, off_t <var>pos</var>, int <var>whence</var>);
+</pre>
+     <br><dt><code>_read_r</code><a name="index-g_t_005fread_005fr-486"></a><dd>A reentrant version of <code>read</code>.  It takes a pointer to the global
+data block, which holds <code>errno</code>.
+
+     <pre class="example">          long _read_r(void *<var>reent</var>,
+              int <var>fd</var>, void *<var>buf</var>, size_t <var>cnt</var>);
+</pre>
+     <br><dt><code>_write_r</code><a name="index-g_t_005fwrite_005fr-487"></a><dd>A reentrant version of <code>write</code>.  It takes a pointer to the global
+data block, which holds <code>errno</code>.
+
+     <pre class="example">          long _write_r(void *<var>reent</var>,
+              int <var>fd</var>, const void *<var>buf</var>, size_t <var>cnt</var>);
+</pre>
+     <br><dt><code>_fork_r</code><a name="index-g_t_005ffork_005fr-488"></a><dd>A reentrant version of <code>fork</code>.  It takes a pointer to the global
+data block, which holds <code>errno</code>.
+
+     <pre class="example">          int _fork_r(void *<var>reent</var>);
+</pre>
+     <br><dt><code>_wait_r</code><a name="index-g_t_005fwait_005fr-489"></a><dd>A reentrant version of <code>wait</code>.  It takes a pointer to the global
+data block, which holds <code>errno</code>.
+
+     <pre class="example">          int _wait_r(void *<var>reent</var>, int *<var>status</var>);
+</pre>
+     <br><dt><code>_stat_r</code><a name="index-g_t_005fstat_005fr-490"></a><dd>A reentrant version of <code>stat</code>.  It takes a pointer to the global
+data block, which holds <code>errno</code>.
+
+     <pre class="example">          int _stat_r(void *<var>reent</var>,
+              const char *<var>file</var>, struct stat *<var>pstat</var>);
+</pre>
+     <br><dt><code>_fstat_r</code><a name="index-g_t_005ffstat_005fr-491"></a><dd>A reentrant version of <code>fstat</code>.  It takes a pointer to the global
+data block, which holds <code>errno</code>.
+
+     <pre class="example">          int _fstat_r(void *<var>reent</var>,
+              int <var>fd</var>, struct stat *<var>pstat</var>);
+</pre>
+     <br><dt><code>_link_r</code><a name="index-g_t_005flink_005fr-492"></a><dd>A reentrant version of <code>link</code>.  It takes a pointer to the global
+data block, which holds <code>errno</code>.
+
+     <pre class="example">          int _link_r(void *<var>reent</var>,
+              const char *<var>old</var>, const char *<var>new</var>);
+</pre>
+     <br><dt><code>_unlink_r</code><a name="index-g_t_005funlink_005fr-493"></a><dd>A reentrant version of <code>unlink</code>.  It takes a pointer to the global
+data block, which holds <code>errno</code>.
+
+     <pre class="example">          int _unlink_r(void *<var>reent</var>, const char *<var>file</var>);
+</pre>
+     <br><dt><code>_sbrk_r</code><a name="index-g_t_005fsbrk_005fr-494"></a><dd>A reentrant version of <code>sbrk</code>.  It takes a pointer to the global
+data block, which holds <code>errno</code>.
+
+     <pre class="example">          char *_sbrk_r(void *<var>reent</var>, size_t <var>incr</var>);
+</pre>
+     </dl>
+
+   </body></html>
+

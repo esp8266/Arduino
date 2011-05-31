@@ -1,0 +1,78 @@
+<html lang="en">
+<head>
+<title>fwide - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="funopen.html#funopen" title="funopen">
+<link rel="next" href="fwrite.html#fwrite" title="fwrite">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="fwide"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="fwrite.html#fwrite">fwrite</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="funopen.html#funopen">funopen</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.30 <code>fwide</code>&mdash;set and determine the orientation of a FILE stream</h3>
+
+<p><a name="index-fwide-210"></a><a name="index-g_t_005ffwide_005fr-211"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;wchar.h&gt;
+     int fwide(FILE *<var>fp</var>, int <var>mode</var>)
+     
+     int _fwide_r(struct _reent *<var>ptr</var>, FILE *<var>fp</var>, int <var>mode</var>)
+     
+</pre>
+   <p><strong>Description</strong><br>
+When <var>mode</var> is zero, the <code>fwide</code> function determines the current
+orientation of <var>fp</var>. It returns a value &gt; 0 if <var>fp</var> is
+wide-character oriented, i.e. if wide character I/O is permitted but
+char I/O is disallowed. It returns a value &lt; 0 if <var>fp</var> is byte
+oriented, i.e. if char I/O is permitted but wide character I/O is
+disallowed. It returns zero if <var>fp</var> has no orientation yet; in
+this case the next I/O operation might change the orientation (to byte
+oriented if it is a char I/O operation, or to wide-character oriented
+if it is a wide character I/O operation).
+
+   <p>Once a stream has an orientation, it cannot be changed and persists
+until the stream is closed, unless the stream is re-opened with freopen,
+which removes the orientation of the stream.
+
+   <p>When <var>mode</var> is non-zero, the <code>fwide</code> function first attempts to set
+<var>fp</var>'s orientation (to wide-character oriented if <var>mode</var> &gt; 0, or to
+byte oriented if <var>mode</var> &lt; 0). It then returns a value denoting the
+current orientation, as above.
+
+   <p><br>
+<strong>Returns</strong><br>
+The <code>fwide</code> function returns <var>fp</var>'s orientation, after possibly
+changing it. A return value &gt; 0 means wide-character oriented. A return
+value &lt; 0 means byte oriented. A return value of zero means undecided.
+
+   <p><br>
+<strong>Portability</strong><br>
+C99, POSIX.1-2001.
+
+   <p><br>
+
+   </body></html>
+

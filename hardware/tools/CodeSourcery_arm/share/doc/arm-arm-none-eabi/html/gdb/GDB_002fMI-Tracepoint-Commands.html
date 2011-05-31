@@ -1,0 +1,285 @@
+<html lang="en">
+<head>
+<title>GDB/MI Tracepoint Commands - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="GDB_002fMI.html#GDB_002fMI" title="GDB/MI">
+<link rel="prev" href="GDB_002fMI-Data-Manipulation.html#GDB_002fMI-Data-Manipulation" title="GDB/MI Data Manipulation">
+<link rel="next" href="GDB_002fMI-Symbol-Query.html#GDB_002fMI-Symbol-Query" title="GDB/MI Symbol Query">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="GDB%2fMI-Tracepoint-Commands"></a>
+<a name="GDB_002fMI-Tracepoint-Commands"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="GDB_002fMI-Symbol-Query.html#GDB_002fMI-Symbol-Query">GDB/MI Symbol Query</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="GDB_002fMI-Data-Manipulation.html#GDB_002fMI-Data-Manipulation">GDB/MI Data Manipulation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="GDB_002fMI.html#GDB_002fMI">GDB/MI</a>
+<hr>
+</div>
+
+<h3 class="section">27.15 <span class="sc">gdb/mi</span> Tracepoint Commands</h3>
+
+<p>The commands defined in this section implement MI support for
+tracepoints.  For detailed introduction, see <a href="Tracepoints.html#Tracepoints">Tracepoints</a>.
+
+<h4 class="subheading">The <code>-trace-find</code> Command</h4>
+
+<p><a name="index-g_t_002dtrace_002dfind-2098"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -trace-find <var>mode</var> [<var>parameters</var>...]
+</pre>
+   <p>Find a trace frame using criteria defined by <var>mode</var> and
+<var>parameters</var>.  The following table lists permissible
+modes and their parameters.  For details of operation, see <a href="tfind.html#tfind">tfind</a>.
+
+     <dl>
+<dt>&lsquo;<samp><span class="samp">none</span></samp>&rsquo;<dd>No parameters are required.  Stops examining trace frames.
+
+     <br><dt>&lsquo;<samp><span class="samp">frame-number</span></samp>&rsquo;<dd>An integer is required as parameter.  Selects tracepoint frame with
+that index.
+
+     <br><dt>&lsquo;<samp><span class="samp">tracepoint-number</span></samp>&rsquo;<dd>An integer is required as parameter.  Finds next
+trace frame that corresponds to tracepoint with the specified number.
+
+     <br><dt>&lsquo;<samp><span class="samp">pc</span></samp>&rsquo;<dd>An address is required as parameter.  Finds
+next trace frame that corresponds to any tracepoint at the specified
+address.
+
+     <br><dt>&lsquo;<samp><span class="samp">pc-inside-range</span></samp>&rsquo;<dd>Two addresses are required as parameters.  Finds next trace
+frame that corresponds to a tracepoint at an address inside the
+specified range.  Both bounds are considered to be inside the range.
+
+     <br><dt>&lsquo;<samp><span class="samp">pc-outside-range</span></samp>&rsquo;<dd>Two addresses are required as parameters.  Finds
+next trace frame that corresponds to a tracepoint at an address outside
+the specified range.  Both bounds are considered to be inside the range.
+
+     <br><dt>&lsquo;<samp><span class="samp">line</span></samp>&rsquo;<dd>Line specification is required as parameter.  See <a href="Specify-Location.html#Specify-Location">Specify Location</a>. 
+Finds next trace frame that corresponds to a tracepoint at
+the specified location.
+
+   </dl>
+
+   <p>If &lsquo;<samp><span class="samp">none</span></samp>&rsquo; was passed as <var>mode</var>, the response does not
+have fields.  Otherwise, the response may have the following fields:
+
+     <dl>
+<dt>&lsquo;<samp><span class="samp">found</span></samp>&rsquo;<dd>This field has either &lsquo;<samp><span class="samp">0</span></samp>&rsquo; or &lsquo;<samp><span class="samp">1</span></samp>&rsquo; as the value, depending
+on whether a matching tracepoint was found.
+
+     <br><dt>&lsquo;<samp><span class="samp">traceframe</span></samp>&rsquo;<dd>The index of the found traceframe.  This field is present iff
+the &lsquo;<samp><span class="samp">found</span></samp>&rsquo; field has value of &lsquo;<samp><span class="samp">1</span></samp>&rsquo;.
+
+     <br><dt>&lsquo;<samp><span class="samp">tracepoint</span></samp>&rsquo;<dd>The index of the found tracepoint.  This field is present iff
+the &lsquo;<samp><span class="samp">found</span></samp>&rsquo; field has value of &lsquo;<samp><span class="samp">1</span></samp>&rsquo;.
+
+     <br><dt>&lsquo;<samp><span class="samp">frame</span></samp>&rsquo;<dd>The information about the frame corresponding to the found trace
+frame.  This field is present only if a trace frame was found. 
+See <a href="GDB_002fMI-Frame-Information.html#GDB_002fMI-Frame-Information">GDB/MI Frame Information</a>, for description of this field.
+
+   </dl>
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">tfind</span></samp>&rsquo;.
+
+<h4 class="subheading">-trace-define-variable</h4>
+
+<p><a name="index-g_t_002dtrace_002ddefine_002dvariable-2099"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -trace-define-variable <var>name</var> [ <var>value</var> ]
+</pre>
+   <p>Create trace variable <var>name</var> if it does not exist.  If
+<var>value</var> is specified, sets the initial value of the specified
+trace variable to that value.  Note that the <var>name</var> should start
+with the &lsquo;<samp><span class="samp">$</span></samp>&rsquo; character.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">tvariable</span></samp>&rsquo;.
+
+<h4 class="subheading">-trace-list-variables</h4>
+
+<p><a name="index-g_t_002dtrace_002dlist_002dvariables-2100"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -trace-list-variables
+</pre>
+   <p>Return a table of all defined trace variables.  Each element of the
+table has the following fields:
+
+     <dl>
+<dt>&lsquo;<samp><span class="samp">name</span></samp>&rsquo;<dd>The name of the trace variable.  This field is always present.
+
+     <br><dt>&lsquo;<samp><span class="samp">initial</span></samp>&rsquo;<dd>The initial value.  This is a 64-bit signed integer.  This
+field is always present.
+
+     <br><dt>&lsquo;<samp><span class="samp">current</span></samp>&rsquo;<dd>The value the trace variable has at the moment.  This is a 64-bit
+signed integer.  This field is absent iff current value is
+not defined, for example if the trace was never run, or is
+presently running.
+
+   </dl>
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">tvariables</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -trace-list-variables
+     ^done,trace-variables={nr_rows="1",nr_cols="3",
+     hdr=[{width="15",alignment="-1",col_name="name",colhdr="Name"},
+          {width="11",alignment="-1",col_name="initial",colhdr="Initial"},
+          {width="11",alignment="-1",col_name="current",colhdr="Current"}],
+     body=[variable={name="$trace_timestamp",initial="0"}
+           variable={name="$foo",initial="10",current="15"}]}
+     (gdb)
+</pre>
+<h4 class="subheading">-trace-save</h4>
+
+<p><a name="index-g_t_002dtrace_002dsave-2101"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -trace-save [-r ] <var>filename</var>
+</pre>
+   <p>Saves the collected trace data to <var>filename</var>.  Without the
+&lsquo;<samp><span class="samp">-r</span></samp>&rsquo; option, the data is downloaded from the target and saved
+in a local file.  With the &lsquo;<samp><span class="samp">-r</span></samp>&rsquo; option the target is asked
+to perform the save.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">tsave</span></samp>&rsquo;.
+
+<h4 class="subheading">-trace-start</h4>
+
+<p><a name="index-g_t_002dtrace_002dstart-2102"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -trace-start
+</pre>
+   <p>Starts a tracing experiments.  The result of this command does not
+have any fields.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">tstart</span></samp>&rsquo;.
+
+<h4 class="subheading">-trace-status</h4>
+
+<p><a name="index-g_t_002dtrace_002dstatus-2103"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -trace-status
+</pre>
+   <p>Obtains the status of a tracing experiment.  The result may include
+the following fields:
+
+     <dl>
+<dt>&lsquo;<samp><span class="samp">supported</span></samp>&rsquo;<dd>May have a value of either &lsquo;<samp><span class="samp">0</span></samp>&rsquo;, when no tracing operations are
+supported, &lsquo;<samp><span class="samp">1</span></samp>&rsquo;, when all tracing operations are supported, or
+&lsquo;<samp><span class="samp">file</span></samp>&rsquo; when examining trace file.  In the latter case, examining
+of trace frame is possible but new tracing experiement cannot be
+started.  This field is always present.
+
+     <br><dt>&lsquo;<samp><span class="samp">running</span></samp>&rsquo;<dd>May have a value of either &lsquo;<samp><span class="samp">0</span></samp>&rsquo; or &lsquo;<samp><span class="samp">1</span></samp>&rsquo; depending on whether
+tracing experiement is in progress on target.  This field is present
+if &lsquo;<samp><span class="samp">supported</span></samp>&rsquo; field is not &lsquo;<samp><span class="samp">0</span></samp>&rsquo;.
+
+     <br><dt>&lsquo;<samp><span class="samp">stop-reason</span></samp>&rsquo;<dd>Report the reason why the tracing was stopped last time.  This field
+may be absent iff tracing was never stopped on target yet.  The
+value of &lsquo;<samp><span class="samp">request</span></samp>&rsquo; means the tracing was stopped as result of
+the <code>-trace-stop</code> command.  The value of &lsquo;<samp><span class="samp">overflow</span></samp>&rsquo; means
+the tracing buffer is full.  The value of &lsquo;<samp><span class="samp">disconnection</span></samp>&rsquo; means
+tracing was automatically stopped when <span class="sc">gdb</span> has disconnected. 
+The value of &lsquo;<samp><span class="samp">passcount</span></samp>&rsquo; means tracing was stopped when a
+tracepoint was passed a maximal number of times for that tracepoint. 
+This field is present if &lsquo;<samp><span class="samp">supported</span></samp>&rsquo; field is not &lsquo;<samp><span class="samp">0</span></samp>&rsquo;.
+
+     <br><dt>&lsquo;<samp><span class="samp">stopping-tracepoint</span></samp>&rsquo;<dd>The number of tracepoint whose passcount as exceeded.  This field is
+present iff the &lsquo;<samp><span class="samp">stop-reason</span></samp>&rsquo; field has the value of
+&lsquo;<samp><span class="samp">passcount</span></samp>&rsquo;.
+
+     <br><dt>&lsquo;<samp><span class="samp">frames</span></samp>&rsquo;<dt>&lsquo;<samp><span class="samp">frames-created</span></samp>&rsquo;<dd>The &lsquo;<samp><span class="samp">frames</span></samp>&rsquo; field is a count of the total number of trace frames
+in the trace buffer, while &lsquo;<samp><span class="samp">frames-created</span></samp>&rsquo; is the total created
+during the run, including ones that were discarded, such as when a
+circular trace buffer filled up.  Both fields are optional.
+
+     <br><dt>&lsquo;<samp><span class="samp">buffer-size</span></samp>&rsquo;<dt>&lsquo;<samp><span class="samp">buffer-free</span></samp>&rsquo;<dd>These fields tell the current size of the tracing buffer and the
+remaining space.  These fields are optional.
+
+     <br><dt>&lsquo;<samp><span class="samp">circular</span></samp>&rsquo;<dd>The value of the circular trace buffer flag.  <code>1</code> means that the
+trace buffer is circular and old trace frames will be discarded if
+necessary to make room, <code>0</code> means that the trace buffer is linear
+and may fill up.
+
+     <br><dt>&lsquo;<samp><span class="samp">disconnected</span></samp>&rsquo;<dd>The value of the disconnected tracing flag.  <code>1</code> means that
+tracing will continue after <span class="sc">gdb</span> disconnects, <code>0</code> means
+that the trace run will stop.
+
+   </dl>
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">tstatus</span></samp>&rsquo;.
+
+<h4 class="subheading">-trace-stop</h4>
+
+<p><a name="index-g_t_002dtrace_002dstop-2104"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -trace-stop
+</pre>
+   <p>Stops a tracing experiment.  The result of this command has the same
+fields as <code>-trace-status</code>, except that the &lsquo;<samp><span class="samp">supported</span></samp>&rsquo; and
+&lsquo;<samp><span class="samp">running</span></samp>&rsquo; fields are not output.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">tstop</span></samp>&rsquo;.
+
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%% SECTION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+   </body></html>
+

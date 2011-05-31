@@ -1,0 +1,74 @@
+<html lang="en">
+<head>
+<title>ungetwc - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="ungetc.html#ungetc" title="ungetc">
+<link rel="next" href="vfprintf.html#vfprintf" title="vfprintf">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="ungetwc"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="vfprintf.html#vfprintf">vfprintf</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="ungetc.html#ungetc">ungetc</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.67 <code>ungetwc</code>&mdash;push wide character data back into a stream</h3>
+
+<p><a name="index-ungetwc-322"></a><a name="index-g_t_005fungetwc_005fr-323"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     #include &lt;wchar.h&gt;
+     wint_t ungetwc(wint_t <var>wc</var>, FILE *<var>stream</var>);
+     
+     wint_t _ungetwc_r(struct _reent *<var>reent</var>, wint_t <var>wc</var>, FILE *<var>stream</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>ungetwc</code> is used to return wide characters back to <var>stream</var> to be
+read again.  If <var>wc</var> is WEOF, the stream is unchanged.  Otherwise, the
+wide character <var>wc</var> is put back on the stream, and subsequent reads will see
+the wide chars pushed back in reverse order.  Pushed wide chars are lost if the
+stream is repositioned, such as by <code>fseek</code>, <code>fsetpos</code>, or
+<code>rewind</code>.
+
+   <p>The underlying file is not changed, but it is possible to push back
+something different than what was originally read.  Ungetting a
+character will clear the end-of-stream marker, and decrement the file
+position indicator.  Pushing back beyond the beginning of a file gives
+unspecified behavior.
+
+   <p>The alternate function <code>_ungetwc_r</code> is a reentrant version.  The
+extra argument <var>reent</var> is a pointer to a reentrancy structure.
+
+   <p><br>
+<strong>Returns</strong><br>
+The wide character pushed back, or <code>WEOF</code> on error.
+
+   <p><br>
+<strong>Portability</strong><br>
+C99
+
+   <p><br>
+
+   </body></html>
+

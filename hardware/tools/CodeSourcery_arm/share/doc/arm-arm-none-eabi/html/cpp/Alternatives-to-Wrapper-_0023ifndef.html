@@ -1,0 +1,97 @@
+<html lang="en">
+<head>
+<title>Alternatives to Wrapper #ifndef - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Header-Files.html#Header-Files" title="Header Files">
+<link rel="prev" href="Once_002dOnly-Headers.html#Once_002dOnly-Headers" title="Once-Only Headers">
+<link rel="next" href="Computed-Includes.html#Computed-Includes" title="Computed Includes">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Alternatives-to-Wrapper-%23ifndef"></a>
+<a name="Alternatives-to-Wrapper-_0023ifndef"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Computed-Includes.html#Computed-Includes">Computed Includes</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Once_002dOnly-Headers.html#Once_002dOnly-Headers">Once-Only Headers</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Header-Files.html#Header-Files">Header Files</a>
+<hr>
+</div>
+
+<h3 class="section">2.5 Alternatives to Wrapper #ifndef</h3>
+
+<p>CPP supports two more ways of indicating that a header file should be
+read only once.  Neither one is as portable as a wrapper &lsquo;<samp><span class="samp">#ifndef</span></samp>&rsquo;
+and we recommend you do not use them in new programs, with the caveat
+that &lsquo;<samp><span class="samp">#import</span></samp>&rsquo; is standard practice in Objective-C.
+
+   <p><a name="index-g_t_0023import-33"></a>CPP supports a variant of &lsquo;<samp><span class="samp">#include</span></samp>&rsquo; called &lsquo;<samp><span class="samp">#import</span></samp>&rsquo; which
+includes a file, but does so at most once.  If you use &lsquo;<samp><span class="samp">#import</span></samp>&rsquo;
+instead of &lsquo;<samp><span class="samp">#include</span></samp>&rsquo;, then you don't need the conditionals
+inside the header file to prevent multiple inclusion of the contents. 
+&lsquo;<samp><span class="samp">#import</span></samp>&rsquo; is standard in Objective-C, but is considered a
+deprecated extension in C and C++.
+
+   <p>&lsquo;<samp><span class="samp">#import</span></samp>&rsquo; is not a well designed feature.  It requires the users of
+a header file to know that it should only be included once.  It is much
+better for the header file's implementor to write the file so that users
+don't need to know this.  Using a wrapper &lsquo;<samp><span class="samp">#ifndef</span></samp>&rsquo; accomplishes
+this goal.
+
+   <p>In the present implementation, a single use of &lsquo;<samp><span class="samp">#import</span></samp>&rsquo; will
+prevent the file from ever being read again, by either &lsquo;<samp><span class="samp">#import</span></samp>&rsquo; or
+&lsquo;<samp><span class="samp">#include</span></samp>&rsquo;.  You should not rely on this; do not use both
+&lsquo;<samp><span class="samp">#import</span></samp>&rsquo; and &lsquo;<samp><span class="samp">#include</span></samp>&rsquo; to refer to the same header file.
+
+   <p>Another way to prevent a header file from being included more than once
+is with the &lsquo;<samp><span class="samp">#pragma once</span></samp>&rsquo; directive.  If &lsquo;<samp><span class="samp">#pragma once</span></samp>&rsquo; is
+seen when scanning a header file, that file will never be read again, no
+matter what.
+
+   <p>&lsquo;<samp><span class="samp">#pragma once</span></samp>&rsquo; does not have the problems that &lsquo;<samp><span class="samp">#import</span></samp>&rsquo; does,
+but it is not recognized by all preprocessors, so you cannot rely on it
+in a portable program.
+
+   </body></html>
+

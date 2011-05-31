@@ -1,0 +1,90 @@
+<html lang="en">
+<head>
+<title>tzset - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Timefns.html#Timefns" title="Timefns">
+<link rel="prev" href="_005f_005ftz_005flock.html#g_t_005f_005ftz_005flock" title="__tz_lock">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="tzset"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="_005f_005ftz_005flock.html#g_t_005f_005ftz_005flock">__tz_lock</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Timefns.html#Timefns">Timefns</a>
+<hr>
+</div>
+
+<h3 class="section">8.11 <code>tzset</code>&mdash;set timezone characteristics from TZ environment variable</h3>
+
+<p><a name="index-tzset-441"></a><a name="index-g_t_005ftzset_005fr-442"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;time.h&gt;
+     void tzset(void);
+     void _tzset_r (struct _reent *);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>tzset</code> examines the TZ environment variable and sets up the three
+external variables: <code>_timezone</code>, <code>_daylight</code>, and <code>tzname</code>.  The
+value of <code>_timezone</code> shall be the offset from the current time zone
+to GMT.  The value of <code>_daylight</code> shall be 0 if there is no daylight
+savings time for the current time zone, otherwise it will be non-zero. 
+The <code>tzname</code> array has two entries: the first is the name of the
+standard time zone, the second is the name of the daylight-savings time
+zone.
+
+   <p>The TZ environment variable is expected to be in the following POSIX
+format:
+
+   <p>stdoffset1[dst[offset2][,start[/time1],end[/time2]]]
+
+   <p>where: std is the name of the standard time-zone (minimum 3 chars)
+offset1 is the value to add to local time to arrive at Universal time
+it has the form:  hh[:mm[:ss]]
+dst is the name of the alternate (daylight-savings) time-zone (min 3 chars)
+offset2 is the value to add to local time to arrive at Universal time
+it has the same format as the std offset
+start is the day that the alternate time-zone starts
+time1 is the optional time that the alternate time-zone starts
+(this is in local time and defaults to 02:00:00 if not specified)
+end is the day that the alternate time-zone ends
+time2 is the time that the alternate time-zone ends
+(it is in local time and defaults to 02:00:00 if not specified)
+
+   <p>Note that there is no white-space padding between fields.  Also note that
+if TZ is null, the default is Universal GMT which has no daylight-savings
+time.  If TZ is empty, the default EST5EDT is used.
+
+   <p>The function <code>_tzset_r</code> is identical to <code>tzset</code> only it is reentrant
+and is used for applications that use multiple threads.
+
+   <p><br>
+<strong>Returns</strong><br>
+There is no return value.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>tzset</code> is part of the POSIX standard.
+
+   <p>Supporting OS subroutine required: None
+
+   <p><br>
+
+   </body></html>
+

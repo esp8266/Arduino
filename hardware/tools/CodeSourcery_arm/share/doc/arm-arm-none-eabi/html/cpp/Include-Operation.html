@@ -1,0 +1,116 @@
+<html lang="en">
+<head>
+<title>Include Operation - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Header-Files.html#Header-Files" title="Header Files">
+<link rel="prev" href="Include-Syntax.html#Include-Syntax" title="Include Syntax">
+<link rel="next" href="Search-Path.html#Search-Path" title="Search Path">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Include-Operation"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Search-Path.html#Search-Path">Search Path</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Include-Syntax.html#Include-Syntax">Include Syntax</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Header-Files.html#Header-Files">Header Files</a>
+<hr>
+</div>
+
+<h3 class="section">2.2 Include Operation</h3>
+
+<p>The &lsquo;<samp><span class="samp">#include</span></samp>&rsquo; directive works by directing the C preprocessor to
+scan the specified file as input before continuing with the rest of the
+current file.  The output from the preprocessor contains the output
+already generated, followed by the output resulting from the included
+file, followed by the output that comes from the text after the
+&lsquo;<samp><span class="samp">#include</span></samp>&rsquo; directive.  For example, if you have a header file
+<samp><span class="file">header.h</span></samp> as follows,
+
+<pre class="smallexample">     char *test (void);
+</pre>
+   <p class="noindent">and a main program called <samp><span class="file">program.c</span></samp> that uses the header file,
+like this,
+
+<pre class="smallexample">     int x;
+     #include "header.h"
+     
+     int
+     main (void)
+     {
+       puts (test ());
+     }
+</pre>
+   <p class="noindent">the compiler will see the same token stream as it would if
+<samp><span class="file">program.c</span></samp> read
+
+<pre class="smallexample">     int x;
+     char *test (void);
+     
+     int
+     main (void)
+     {
+       puts (test ());
+     }
+</pre>
+   <p>Included files are not limited to declarations and macro definitions;
+those are merely the typical uses.  Any fragment of a C program can be
+included from another file.  The include file could even contain the
+beginning of a statement that is concluded in the containing file, or
+the end of a statement that was started in the including file.  However,
+an included file must consist of complete tokens.  Comments and string
+literals which have not been closed by the end of an included file are
+invalid.  For error recovery, they are considered to end at the end of
+the file.
+
+   <p>To avoid confusion, it is best if header files contain only complete
+syntactic units&mdash;function declarations or definitions, type
+declarations, etc.
+
+   <p>The line following the &lsquo;<samp><span class="samp">#include</span></samp>&rsquo; directive is always treated as a
+separate line by the C preprocessor, even if the included file lacks a
+final newline.
+
+   </body></html>
+

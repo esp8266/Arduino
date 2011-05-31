@@ -1,0 +1,92 @@
+<html lang="en">
+<head>
+<title>Align - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Pseudo-Ops.html#Pseudo-Ops" title="Pseudo Ops">
+<link rel="prev" href="ABORT-_0028COFF_0029.html#ABORT-_0028COFF_0029" title="ABORT (COFF)">
+<link rel="next" href="Altmacro.html#Altmacro" title="Altmacro">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Align"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Altmacro.html#Altmacro">Altmacro</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="ABORT-_0028COFF_0029.html#ABORT-_0028COFF_0029">ABORT (COFF)</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Pseudo-Ops.html#Pseudo-Ops">Pseudo Ops</a>
+<hr>
+</div>
+
+<h3 class="section">7.3 <code>.align </code><var>abs-expr</var><code>, </code><var>abs-expr</var><code>, </code><var>abs-expr</var></h3>
+
+<p><a name="index-padding-the-location-counter-275"></a><a name="index-g_t_0040code_007balign_007d-directive-276"></a>Pad the location counter (in the current subsection) to a particular storage
+boundary.  The first expression (which must be absolute) is the alignment
+required, as described below.
+
+   <p>The second expression (also absolute) gives the fill value to be stored in the
+padding bytes.  It (and the comma) may be omitted.  If it is omitted, the
+padding bytes are normally zero.  However, on some systems, if the section is
+marked as containing code and the fill value is omitted, the space is filled
+with no-op instructions.
+
+   <p>The third expression is also absolute, and is also optional.  If it is present,
+it is the maximum number of bytes that should be skipped by this alignment
+directive.  If doing the alignment would require skipping more bytes than the
+specified maximum, then the alignment is not done at all.  You can omit the
+fill value (the second argument) entirely by simply using two commas after the
+required alignment; this can be useful if you want the alignment to be filled
+with no-op instructions when appropriate.
+
+   <p>The way the required alignment is specified varies from system to system. 
+For the arc, hppa, i386 using ELF, i860, iq2000, m68k, or32,
+s390, sparc, tic4x, tic80 and xtensa, the first expression is the
+alignment request in bytes.  For example &lsquo;<samp><span class="samp">.align 8</span></samp>&rsquo; advances
+the location counter until it is a multiple of 8.  If the location counter
+is already a multiple of 8, no change is needed.  For the tic54x, the
+first expression is the alignment request in words.
+
+   <p>For other systems, including ppc, i386 using a.out format, arm and
+strongarm, it is the
+number of low-order zero bits the location counter must have after
+advancement.  For example &lsquo;<samp><span class="samp">.align 3</span></samp>&rsquo; advances the location
+counter until it a multiple of 8.  If the location counter is already a
+multiple of 8, no change is needed.
+
+   <p>This inconsistency is due to the different behaviors of the various
+native assemblers for these systems which GAS must emulate. 
+GAS also provides <code>.balign</code> and <code>.p2align</code> directives,
+described later, which have a consistent behavior across all
+architectures (but are specific to GAS).
+
+   </body></html>
+

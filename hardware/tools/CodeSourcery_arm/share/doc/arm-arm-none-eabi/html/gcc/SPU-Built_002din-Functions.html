@@ -1,0 +1,103 @@
+<html lang="en">
+<head>
+<title>SPU Built-in Functions - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Target-Builtins.html#Target-Builtins" title="Target Builtins">
+<link rel="prev" href="SPARC-VIS-Built_002din-Functions.html#SPARC-VIS-Built_002din-Functions" title="SPARC VIS Built-in Functions">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="SPU-Built-in-Functions"></a>
+<a name="SPU-Built_002din-Functions"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="SPARC-VIS-Built_002din-Functions.html#SPARC-VIS-Built_002din-Functions">SPARC VIS Built-in Functions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Target-Builtins.html#Target-Builtins">Target Builtins</a>
+<hr>
+</div>
+
+<h4 class="subsection">6.52.15 SPU Built-in Functions</h4>
+
+<p>GCC provides extensions for the SPU processor as described in the
+Sony/Toshiba/IBM SPU Language Extensions Specification, which can be
+found at <a href="http://cell.scei.co.jp/">http://cell.scei.co.jp/</a> or
+<a href="http://www.ibm.com/developerworks/power/cell/">http://www.ibm.com/developerworks/power/cell/</a>.  GCC's
+implementation differs in several ways.
+
+     <ul>
+<li>The optional extension of specifying vector constants in parentheses is
+not supported.
+
+     <li>A vector initializer requires no cast if the vector constant is of the
+same type as the variable it is initializing.
+
+     <li>If <code>signed</code> or <code>unsigned</code> is omitted, the signedness of the
+vector type is the default signedness of the base type.  The default
+varies depending on the operating system, so a portable program should
+always specify the signedness.
+
+     <li>By default, the keyword <code>__vector</code> is added. The macro
+<code>vector</code> is defined in <code>&lt;spu_intrinsics.h&gt;</code> and can be
+undefined.
+
+     <li>GCC allows using a <code>typedef</code> name as the type specifier for a
+vector type.
+
+     <li>For C, overloaded functions are implemented with macros so the following
+does not work:
+
+     <pre class="smallexample">            spu_add ((vector signed int){1, 2, 3, 4}, foo);
+</pre>
+     <p>Since <code>spu_add</code> is a macro, the vector constant in the example
+is treated as four separate arguments.  Wrap the entire argument in
+parentheses for this to work.
+
+     <li>The extended version of <code>__builtin_expect</code> is not supported.
+
+ </ul>
+
+ <p><em>Note:</em> Only the interface described in the aforementioned
+specification is supported. Internally, GCC uses built-in functions to
+implement the required functionality, but these are not supported and
+are subject to change without notice.
+
+ </body></html>
+

@@ -1,0 +1,94 @@
+<html lang="en">
+<head>
+<title>Argument Types - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="FR_002dV-Built_002din-Functions.html#FR_002dV-Built_002din-Functions" title="FR-V Built-in Functions">
+<link rel="next" href="Directly_002dmapped-Integer-Functions.html#Directly_002dmapped-Integer-Functions" title="Directly-mapped Integer Functions">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Argument-Types"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Directly_002dmapped-Integer-Functions.html#Directly_002dmapped-Integer-Functions">Directly-mapped Integer Functions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="FR_002dV-Built_002din-Functions.html#FR_002dV-Built_002din-Functions">FR-V Built-in Functions</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">6.52.5.1 Argument Types</h5>
+
+<p>The arguments to the built-in functions can be divided into three groups:
+register numbers, compile-time constants and run-time values.  In order
+to make this classification clear at a glance, the arguments and return
+values are given the following pseudo types:
+
+ <p><table summary=""><tr align="left"><td valign="top" width="20%">Pseudo type </td><td valign="top" width="30%">Real C type </td><td valign="top" width="15%">Constant? </td><td valign="top" width="35%">Description
+<br></td></tr><tr align="left"><td valign="top" width="20%"><code>uh</code> </td><td valign="top" width="30%"><code>unsigned short</code> </td><td valign="top" width="15%">No </td><td valign="top" width="35%">an unsigned halfword
+<br></td></tr><tr align="left"><td valign="top" width="20%"><code>uw1</code> </td><td valign="top" width="30%"><code>unsigned int</code> </td><td valign="top" width="15%">No </td><td valign="top" width="35%">an unsigned word
+<br></td></tr><tr align="left"><td valign="top" width="20%"><code>sw1</code> </td><td valign="top" width="30%"><code>int</code> </td><td valign="top" width="15%">No </td><td valign="top" width="35%">a signed word
+<br></td></tr><tr align="left"><td valign="top" width="20%"><code>uw2</code> </td><td valign="top" width="30%"><code>unsigned long long</code> </td><td valign="top" width="15%">No
+</td><td valign="top" width="35%">an unsigned doubleword
+<br></td></tr><tr align="left"><td valign="top" width="20%"><code>sw2</code> </td><td valign="top" width="30%"><code>long long</code> </td><td valign="top" width="15%">No </td><td valign="top" width="35%">a signed doubleword
+<br></td></tr><tr align="left"><td valign="top" width="20%"><code>const</code> </td><td valign="top" width="30%"><code>int</code> </td><td valign="top" width="15%">Yes </td><td valign="top" width="35%">an integer constant
+<br></td></tr><tr align="left"><td valign="top" width="20%"><code>acc</code> </td><td valign="top" width="30%"><code>int</code> </td><td valign="top" width="15%">Yes </td><td valign="top" width="35%">an ACC register number
+<br></td></tr><tr align="left"><td valign="top" width="20%"><code>iacc</code> </td><td valign="top" width="30%"><code>int</code> </td><td valign="top" width="15%">Yes </td><td valign="top" width="35%">an IACC register number
+ <br></td></tr></table>
+
+ <p>These pseudo types are not defined by GCC, they are simply a notational
+convenience used in this manual.
+
+ <p>Arguments of type <code>uh</code>, <code>uw1</code>, <code>sw1</code>, <code>uw2</code>
+and <code>sw2</code> are evaluated at run time.  They correspond to
+register operands in the underlying FR-V instructions.
+
+ <p><code>const</code> arguments represent immediate operands in the underlying
+FR-V instructions.  They must be compile-time constants.
+
+ <p><code>acc</code> arguments are evaluated at compile time and specify the number
+of an accumulator register.  For example, an <code>acc</code> argument of 2
+will select the ACC2 register.
+
+ <p><code>iacc</code> arguments are similar to <code>acc</code> arguments but specify the
+number of an IACC register.  See see <a href="Other-Built_002din-Functions.html#Other-Built_002din-Functions">Other Built-in Functions</a>
+for more details.
+
+ </body></html>
+

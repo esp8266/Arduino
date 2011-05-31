@@ -1,0 +1,68 @@
+<html lang="en">
+<head>
+<title>Automatically - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Setting.html#Setting" title="Setting">
+<link rel="prev" href="Manually.html#Manually" title="Manually">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Automatically"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Manually.html#Manually">Manually</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Setting.html#Setting">Setting</a>
+<hr>
+</div>
+
+<h4 class="subsection">15.1.3 Having <span class="sc">gdb</span> Infer the Source Language</h4>
+
+<p>To have <span class="sc">gdb</span> set the working language automatically, use
+&lsquo;<samp><span class="samp">set language local</span></samp>&rsquo; or &lsquo;<samp><span class="samp">set language auto</span></samp>&rsquo;.  <span class="sc">gdb</span>
+then infers the working language.  That is, when your program stops in a
+frame (usually by encountering a breakpoint), <span class="sc">gdb</span> sets the
+working language to the language recorded for the function in that
+frame.  If the language for a frame is unknown (that is, if the function
+or block corresponding to the frame was defined in a source file that
+does not have a recognized extension), the current working language is
+not changed, and <span class="sc">gdb</span> issues a warning.
+
+   <p>This may not seem necessary for most programs, which are written
+entirely in one source language.  However, program modules and libraries
+written in one source language can be used by a main program written in
+a different source language.  Using &lsquo;<samp><span class="samp">set language auto</span></samp>&rsquo; in this
+case frees you from having to set the working language manually.
+
+   </body></html>
+

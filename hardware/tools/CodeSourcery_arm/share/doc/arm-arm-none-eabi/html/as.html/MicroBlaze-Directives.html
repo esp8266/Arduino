@@ -1,0 +1,88 @@
+<html lang="en">
+<head>
+<title>MicroBlaze Directives - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="MicroBlaze_002dDependent.html#MicroBlaze_002dDependent" title="MicroBlaze-Dependent">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="MicroBlaze-Directives"></a>
+<p>
+Up:&nbsp;<a rel="up" accesskey="u" href="MicroBlaze_002dDependent.html#MicroBlaze_002dDependent">MicroBlaze-Dependent</a>
+<hr>
+</div>
+
+<h4 class="subsection">9.23.1 Directives</h4>
+
+<p><a name="index-MicroBlaze-directives-1250"></a>A number of assembler directives are available for MicroBlaze.
+
+     <dl>
+<dt><code>.data8 </code><var>expression</var><code>,...</code><dd>This directive is an alias for <code>.byte</code>. Each expression is assembled
+into an eight-bit value.
+
+     <br><dt><code>.data16 </code><var>expression</var><code>,...</code><dd>This directive is an alias for <code>.hword</code>. Each expression is assembled
+into an 16-bit value.
+
+     <br><dt><code>.data32 </code><var>expression</var><code>,...</code><dd>This directive is an alias for <code>.word</code>. Each expression is assembled
+into an 32-bit value.
+
+     <br><dt><code>.ent </code><var>name</var><code>[,</code><var>label</var><code>]</code><dd>This directive is an alias for <code>.func</code> denoting the start of function
+<var>name</var> at (optional) <var>label</var>.
+
+     <br><dt><code>.end </code><var>name</var><code>[,</code><var>label</var><code>]</code><dd>This directive is an alias for <code>.endfunc</code> denoting the end of function
+<var>name</var>.
+
+     <br><dt><code>.gpword </code><var>label</var><code>,...</code><dd>This directive is an alias for <code>.rva</code>.  The resolved address of <var>label</var>
+is stored in the data section.
+
+     <br><dt><code>.weakext </code><var>label</var><dd>Declare that <var>label</var> is a weak external symbol.
+
+     <br><dt><code>.rodata</code><dd>Switch to .rodata section. Equivalent to <code>.section .rodata</code>
+
+     <br><dt><code>.sdata2</code><dd>Switch to .sdata2 section. Equivalent to <code>.section .sdata2</code>
+
+     <br><dt><code>.sdata</code><dd>Switch to .sdata section. Equivalent to <code>.section .sdata</code>
+
+     <br><dt><code>.bss</code><dd>Switch to .bss section. Equivalent to <code>.section .bss</code>
+
+     <br><dt><code>.sbss</code><dd>Switch to .sbss section. Equivalent to <code>.section .sbss</code>
+</dl>
+
+<!-- Copyright 1991, 1992, 1993, 1994, 1995, 1997, 1999, 2000, 2001, -->
+<!-- 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 -->
+<!-- Free Software Foundation, Inc. -->
+<!-- This is part of the GAS manual. -->
+<!-- For copying conditions, see the file as.texinfo. -->
+   </body></html>
+

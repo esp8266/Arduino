@@ -1,0 +1,76 @@
+<html lang="en">
+<head>
+<title>bsearch - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdlib.html#Stdlib" title="Stdlib">
+<link rel="prev" href="atoll.html#atoll" title="atoll">
+<link rel="next" href="calloc.html#calloc" title="calloc">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="bsearch"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="calloc.html#calloc">calloc</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="atoll.html#atoll">atoll</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdlib.html#Stdlib">Stdlib</a>
+<hr>
+</div>
+
+<h3 class="section">2.10 <code>bsearch</code>&mdash;binary search</h3>
+
+<p><a name="index-bsearch-16"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdlib.h&gt;
+     void *bsearch(const void *<var>key</var>, const void *<var>base</var>,
+         size_t <var>nmemb</var>, size_t <var>size</var>,
+         int (*<var>compar</var>)(const void *, const void *));
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>bsearch</code> searches an array beginning at <var>base</var> for any element
+that matches <var>key</var>, using binary search.  <var>nmemb</var> is the element
+count of the array; <var>size</var> is the size of each element.
+
+   <p>The array must be sorted in ascending order with respect to the
+comparison function <var>compar</var> (which you supply as the last argument of
+<code>bsearch</code>).
+
+   <p>You must define the comparison function <code>(*</code><var>compar</var><code>)</code> to have two
+arguments; its result must be negative if the first argument is
+less than the second, zero if the two arguments match, and
+positive if the first argument is greater than the second (where
+&ldquo;less than&rdquo; and &ldquo;greater than&rdquo; refer to whatever arbitrary
+ordering is appropriate).
+
+   <p><br>
+<strong>Returns</strong><br>
+Returns a pointer to an element of <var>array</var> that matches <var>key</var>.  If
+more than one matching element is available, the result may point to
+any of them.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>bsearch</code> is ANSI.
+
+   <p>No supporting OS subroutines are required.
+
+   <p><br>
+
+   </body></html>
+

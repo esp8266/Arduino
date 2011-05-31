@@ -1,0 +1,72 @@
+<html lang="en">
+<head>
+<title>String - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Pseudo-Ops.html#Pseudo-Ops" title="Pseudo Ops">
+<link rel="prev" href="Stab.html#Stab" title="Stab">
+<link rel="next" href="Struct.html#Struct" title="Struct">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="String"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Struct.html#Struct">Struct</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Stab.html#Stab">Stab</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Pseudo-Ops.html#Pseudo-Ops">Pseudo Ops</a>
+<hr>
+</div>
+
+<h3 class="section">7.105 <code>.string</code> "<var>str</var>", <code>.string8</code> "<var>str</var>", <code>.string16</code></h3>
+
+<p>"<var>str</var>", <code>.string32</code> "<var>str</var>", <code>.string64</code> "<var>str</var>"
+
+   <p><a name="index-string_002c-copying-to-object-file-462"></a><a name="index-string8_002c-copying-to-object-file-463"></a><a name="index-string16_002c-copying-to-object-file-464"></a><a name="index-string32_002c-copying-to-object-file-465"></a><a name="index-string64_002c-copying-to-object-file-466"></a><a name="index-g_t_0040code_007bstring_007d-directive-467"></a><a name="index-g_t_0040code_007bstring8_007d-directive-468"></a><a name="index-g_t_0040code_007bstring16_007d-directive-469"></a><a name="index-g_t_0040code_007bstring32_007d-directive-470"></a><a name="index-g_t_0040code_007bstring64_007d-directive-471"></a>
+Copy the characters in <var>str</var> to the object file.  You may specify more than
+one string to copy, separated by commas.  Unless otherwise specified for a
+particular machine, the assembler marks the end of each string with a 0 byte. 
+You can use any of the escape sequences described in <a href="Strings.html#Strings">Strings</a>.
+
+   <p>The variants <code>string16</code>, <code>string32</code> and <code>string64</code> differ from
+the <code>string</code> pseudo opcode in that each 8-bit character from <var>str</var> is
+copied and expanded to 16, 32 or 64 bits respectively.  The expanded characters
+are stored in target endianness byte order.
+
+   <p>Example:
+<pre class="smallexample">     	.string32 "BYE"
+     expands to:
+     	.string   "B\0\0\0Y\0\0\0E\0\0\0"  /* On little endian targets.  */
+     	.string   "\0\0\0B\0\0\0Y\0\0\0E"  /* On big endian targets.  */
+</pre>
+   </body></html>
+

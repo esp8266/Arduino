@@ -1,0 +1,205 @@
+<html lang="en">
+<head>
+<title>Forks - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Running.html#Running" title="Running">
+<link rel="prev" href="Threads.html#Threads" title="Threads">
+<link rel="next" href="Checkpoint_002fRestart.html#Checkpoint_002fRestart" title="Checkpoint/Restart">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Forks"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Checkpoint_002fRestart.html#Checkpoint_002fRestart">Checkpoint/Restart</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Threads.html#Threads">Threads</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Running.html#Running">Running</a>
+<hr>
+</div>
+
+<h3 class="section">4.11 Debugging Forks</h3>
+
+<p><a name="index-fork_002c-debugging-programs-which-call-179"></a><a name="index-multiple-processes-180"></a><a name="index-processes_002c-multiple-181"></a>On most systems, <span class="sc">gdb</span> has no special support for debugging
+programs which create additional processes using the <code>fork</code>
+function.  When a program forks, <span class="sc">gdb</span> will continue to debug the
+parent process and the child process will run unimpeded.  If you have
+set a breakpoint in any code which the child then executes, the child
+will get a <code>SIGTRAP</code> signal which (unless it catches the signal)
+will cause it to terminate.
+
+   <p>However, if you want to debug the child process there is a workaround
+which isn't too painful.  Put a call to <code>sleep</code> in the code which
+the child process executes after the fork.  It may be useful to sleep
+only if a certain environment variable is set, or a certain file exists,
+so that the delay need not occur when you don't want to run <span class="sc">gdb</span>
+on the child.  While the child is sleeping, use the <code>ps</code> program to
+get its process ID.  Then tell <span class="sc">gdb</span> (a new invocation of
+<span class="sc">gdb</span> if you are also debugging the parent process) to attach to
+the child process (see <a href="Attach.html#Attach">Attach</a>).  From that point on you can debug
+the child process just like any other process which you attached to.
+
+   <p>On some systems, <span class="sc">gdb</span> provides support for debugging programs that
+create additional processes using the <code>fork</code> or <code>vfork</code> functions. 
+Currently, the only platforms with this feature are HP-UX (11.x and later
+only?) and <span class="sc">gnu</span>/Linux (kernel version 2.5.60 and later).
+
+   <p>By default, when a program forks, <span class="sc">gdb</span> will continue to debug
+the parent process and the child process will run unimpeded.
+
+   <p>If you want to follow the child process instead of the parent process,
+use the command <code>set&nbsp;follow-fork-mode</code><!-- /@w -->.
+
+     
+<a name="index-set-follow_002dfork_002dmode-182"></a>
+<dl><dt><code>set follow-fork-mode </code><var>mode</var><dd>Set the debugger response to a program call of <code>fork</code> or
+<code>vfork</code>.  A call to <code>fork</code> or <code>vfork</code> creates a new
+process.  The <var>mode</var> argument can be:
+
+          <dl>
+<dt><code>parent</code><dd>The original process is debugged after a fork.  The child process runs
+unimpeded.  This is the default.
+
+          <br><dt><code>child</code><dd>The new process is debugged after a fork.  The parent process runs
+unimpeded.
+
+     </dl>
+
+     <p><a name="index-show-follow_002dfork_002dmode-183"></a><br><dt><code>show follow-fork-mode</code><dd>Display the current debugger response to a <code>fork</code> or <code>vfork</code> call. 
+</dl>
+
+   <p><a name="index-debugging-multiple-processes-184"></a>On Linux, if you want to debug both the parent and child processes, use the
+command <code>set&nbsp;detach-on-fork</code><!-- /@w -->.
+
+     
+<a name="index-set-detach_002don_002dfork-185"></a>
+<dl><dt><code>set detach-on-fork </code><var>mode</var><dd>Tells gdb whether to detach one of the processes after a fork, or
+retain debugger control over them both.
+
+          <dl>
+<dt><code>on</code><dd>The child process (or parent process, depending on the value of
+<code>follow-fork-mode</code>) will be detached and allowed to run
+independently.  This is the default.
+
+          <br><dt><code>off</code><dd>Both processes will be held under the control of <span class="sc">gdb</span>. 
+One process (child or parent, depending on the value of
+<code>follow-fork-mode</code>) is debugged as usual, while the other
+is held suspended.
+
+     </dl>
+
+     <p><a name="index-show-detach_002don_002dfork-186"></a><br><dt><code>show detach-on-fork</code><dd>Show whether detach-on-fork mode is on/off. 
+</dl>
+
+   <p>If you choose to set &lsquo;<samp><span class="samp">detach-on-fork</span></samp>&rsquo; mode off, then <span class="sc">gdb</span>
+will retain control of all forked processes (including nested forks). 
+You can list the forked processes under the control of <span class="sc">gdb</span> by
+using the <code>info&nbsp;inferiors</code><!-- /@w --> command, and switch from one fork
+to another by using the <code>inferior</code> command (see <a href="Inferiors-and-Programs.html#Inferiors-and-Programs">Debugging Multiple Inferiors and Programs</a>).
+
+   <p>To quit debugging one of the forked processes, you can either detach
+from it by using the <code>detach&nbsp;inferior</code><!-- /@w --> command (allowing it
+to run independently), or kill it using the <code>kill&nbsp;inferior</code><!-- /@w -->
+command.  See <a href="Inferiors-and-Programs.html#Inferiors-and-Programs">Debugging Multiple Inferiors and Programs</a>.
+
+   <p>If you ask to debug a child process and a <code>vfork</code> is followed by an
+<code>exec</code>, <span class="sc">gdb</span> executes the new target up to the first
+breakpoint in the new target.  If you have a breakpoint set on
+<code>main</code> in your original program, the breakpoint will also be set on
+the child process's <code>main</code>.
+
+   <p>On some systems, when a child process is spawned by <code>vfork</code>, you
+cannot debug the child or parent until an <code>exec</code> call completes.
+
+   <p>If you issue a <code>run</code> command to <span class="sc">gdb</span> after an <code>exec</code>
+call executes, the new target restarts.  To restart the parent
+process, use the <code>file</code> command with the parent executable name
+as its argument.  By default, after an <code>exec</code> call executes,
+<span class="sc">gdb</span> discards the symbols of the previous executable image. 
+You can change this behaviour with the <code>set&nbsp;follow-exec-mode</code><!-- /@w -->
+command.
+
+     
+<a name="index-set-follow_002dexec_002dmode-187"></a>
+<dl><dt><code>set follow-exec-mode </code><var>mode</var><dd>
+Set debugger response to a program call of <code>exec</code>.  An
+<code>exec</code> call replaces the program image of a process.
+
+     <p><code>follow-exec-mode</code> can be:
+
+          <dl>
+<dt><code>new</code><dd><span class="sc">gdb</span> creates a new inferior and rebinds the process to this
+new inferior.  The program the process was running before the
+<code>exec</code> call can be restarted afterwards by restarting the
+original inferior.
+
+          <p>For example:
+
+          <pre class="smallexample">               (gdb) info inferiors
+               (gdb) info inferior
+                 Id   Description   Executable
+               * 1    &lt;null&gt;        prog1
+               (gdb) run
+               process 12020 is executing new program: prog2
+               Program exited normally.
+               (gdb) info inferiors
+                 Id   Description   Executable
+               * 2    &lt;null&gt;        prog2
+                 1    &lt;null&gt;        prog1
+</pre>
+          <br><dt><code>same</code><dd><span class="sc">gdb</span> keeps the process bound to the same inferior.  The new
+executable image replaces the previous executable loaded in the
+inferior.  Restarting the inferior after the <code>exec</code> call, with
+e.g., the <code>run</code> command, restarts the executable the process was
+running after the <code>exec</code> call.  This is the default mode.
+
+          <p>For example:
+
+          <pre class="smallexample">               (gdb) info inferiors
+                 Id   Description   Executable
+               * 1    &lt;null&gt;        prog1
+               (gdb) run
+               process 12020 is executing new program: prog2
+               Program exited normally.
+               (gdb) info inferiors
+                 Id   Description   Executable
+               * 1    &lt;null&gt;        prog2
+</pre>
+          </dl>
+     </dl>
+
+   <p>You can use the <code>catch</code> command to make <span class="sc">gdb</span> stop whenever
+a <code>fork</code>, <code>vfork</code>, or <code>exec</code> call is made.  See <a href="Set-Catchpoints.html#Set-Catchpoints">Setting Catchpoints</a>.
+
+   </body></html>
+

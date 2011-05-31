@@ -1,0 +1,81 @@
+<html lang="en">
+<head>
+<title>assert - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdlib.html#Stdlib" title="Stdlib">
+<link rel="prev" href="abs.html#abs" title="abs">
+<link rel="next" href="atexit.html#atexit" title="atexit">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="assert"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="atexit.html#atexit">atexit</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="abs.html#abs">abs</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdlib.html#Stdlib">Stdlib</a>
+<hr>
+</div>
+
+<h3 class="section">2.5 <code>assert</code>&mdash;macro for debugging diagnostics</h3>
+
+<p><a name="index-assert-6"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;assert.h&gt;
+     void assert(int <var>expression</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+Use this macro to embed debuggging diagnostic statements in
+your programs.  The argument <var>expression</var> should be an
+expression which evaluates to true (nonzero) when your program
+is working as you intended.
+
+   <p>When <var>expression</var> evaluates to false (zero), <code>assert</code>
+calls <code>abort</code>, after first printing a message showing what
+failed and where:
+
+<pre class="smallexample">      Assertion failed: <var>expression</var>, file <var>filename</var>, line <var>lineno</var>, function: <var>func</var>
+</pre>
+   <p>If the name of the current function is not known (for example,
+when using a C89 compiler that does not understand __func__),
+the function location is omitted.
+
+   <p>The macro is defined to permit you to turn off all uses of
+<code>assert</code> at compile time by defining <code>NDEBUG</code> as a
+preprocessor variable.   If you do this, the <code>assert</code> macro
+expands to
+
+<pre class="smallexample">      (void(0))
+</pre>
+   <p><br>
+<strong>Returns</strong><br>
+<code>assert</code> does not return a value.
+
+   <p><br>
+<strong>Portability</strong><br>
+The <code>assert</code> macro is required by ANSI, as is the behavior
+when <code>NDEBUG</code> is defined.
+
+   <p>Supporting OS subroutines required (only if enabled): <code>close</code>, <code>fstat</code>,
+<code>getpid</code>, <code>isatty</code>, <code>kill</code>, <code>lseek</code>, <code>read</code>, <code>sbrk</code>, <code>write</code>.
+
+   <p><br>
+
+   </body></html>
+

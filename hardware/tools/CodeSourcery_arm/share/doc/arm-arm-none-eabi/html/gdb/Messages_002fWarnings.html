@@ -1,0 +1,127 @@
+<html lang="en">
+<head>
+<title>Messages/Warnings - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Controlling-GDB.html#Controlling-GDB" title="Controlling GDB">
+<link rel="prev" href="ABI.html#ABI" title="ABI">
+<link rel="next" href="Debugging-Output.html#Debugging-Output" title="Debugging Output">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Messages%2fWarnings"></a>
+<a name="Messages_002fWarnings"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Debugging-Output.html#Debugging-Output">Debugging Output</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="ABI.html#ABI">ABI</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Controlling-GDB.html#Controlling-GDB">Controlling GDB</a>
+<hr>
+</div>
+
+<h3 class="section">22.7 Optional Warnings and Messages</h3>
+
+<p><a name="index-verbose-operation-1478"></a><a name="index-optional-warnings-1479"></a>By default, <span class="sc">gdb</span> is silent about its inner workings.  If you are
+running on a slow machine, you may want to use the <code>set verbose</code>
+command.  This makes <span class="sc">gdb</span> tell you when it does a lengthy
+internal operation, so you will not think it has crashed.
+
+   <p>Currently, the messages controlled by <code>set verbose</code> are those
+which announce that the symbol table for a source file is being read;
+see <code>symbol-file</code> in <a href="Files.html#Files">Commands to Specify Files</a>.
+
+     
+<a name="index-set-verbose-1480"></a>
+<dl><dt><code>set verbose on</code><dd>Enables <span class="sc">gdb</span> output of certain informational messages.
+
+     <br><dt><code>set verbose off</code><dd>Disables <span class="sc">gdb</span> output of certain informational messages.
+
+     <p><a name="index-show-verbose-1481"></a><br><dt><code>show verbose</code><dd>Displays whether <code>set verbose</code> is on or off. 
+</dl>
+
+   <p>By default, if <span class="sc">gdb</span> encounters bugs in the symbol table of an
+object file, it is silent; but if you are debugging a compiler, you may
+find this information useful (see <a href="Symbol-Errors.html#Symbol-Errors">Errors Reading Symbol Files</a>).
+
+     
+<a name="index-set-complaints-1482"></a>
+<dl><dt><code>set complaints </code><var>limit</var><dd>Permits <span class="sc">gdb</span> to output <var>limit</var> complaints about each type of
+unusual symbols before becoming silent about the problem.  Set
+<var>limit</var> to zero to suppress all complaints; set it to a large number
+to prevent complaints from being suppressed.
+
+     <p><a name="index-show-complaints-1483"></a><br><dt><code>show complaints</code><dd>Displays how many symbol complaints <span class="sc">gdb</span> is permitted to produce.
+
+   </dl>
+
+   <p><a name="confirmation-requests"></a>By default, <span class="sc">gdb</span> is cautious, and asks what sometimes seems to be a
+lot of stupid questions to confirm certain commands.  For example, if
+you try to run a program which is already running:
+
+<pre class="smallexample">     (gdb) run
+     The program being debugged has been started already.
+     Start it from the beginning? (y or n)
+</pre>
+   <p>If you are willing to unflinchingly face the consequences of your own
+commands, you can disable this &ldquo;feature&rdquo;:
+
+     
+<a name="index-set-confirm-1484"></a>
+<a name="index-flinching-1485"></a>
+<a name="index-confirmation-1486"></a>
+<a name="index-stupid-questions-1487"></a>
+<dl><dt><code>set confirm off</code><dd>Disables confirmation requests.  Note that running <span class="sc">gdb</span> with
+the <samp><span class="option">--batch</span></samp> option (see <a href="Mode-Options.html#Mode-Options">-batch</a>) also
+automatically disables confirmation requests.
+
+     <br><dt><code>set confirm on</code><dd>Enables confirmation requests (the default).
+
+     <p><a name="index-show-confirm-1488"></a><br><dt><code>show confirm</code><dd>Displays state of confirmation requests.
+
+   </dl>
+
+   <p><a name="index-command-tracing-1489"></a>If you need to debug user-defined commands or sourced files you may find it
+useful to enable <dfn>command tracing</dfn>.  In this mode each command will be
+printed as it is executed, prefixed with one or more &lsquo;<samp><span class="samp">+</span></samp>&rsquo; symbols, the
+quantity denoting the call depth of each command.
+
+     
+<a name="index-set-trace_002dcommands-1490"></a>
+<a name="index-command-scripts_002c-debugging-1491"></a>
+<dl><dt><code>set trace-commands on</code><dd>Enable command tracing. 
+<br><dt><code>set trace-commands off</code><dd>Disable command tracing. 
+<br><dt><code>show trace-commands</code><dd>Display the current state of command tracing. 
+</dl>
+
+   </body></html>
+

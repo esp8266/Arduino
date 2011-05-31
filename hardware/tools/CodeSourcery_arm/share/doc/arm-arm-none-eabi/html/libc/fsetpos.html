@@ -1,0 +1,73 @@
+<html lang="en">
+<head>
+<title>fsetpos - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="fseek.html#fseek" title="fseek">
+<link rel="next" href="ftell.html#ftell" title="ftell">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="fsetpos"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="ftell.html#ftell">ftell</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="fseek.html#fseek">fseek</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.27 <code>fsetpos</code>&mdash;restore position of a stream or file</h3>
+
+<p><a name="index-fsetpos-201"></a><a name="index-g_t_005ffsetpos_005fr-202"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     int fsetpos(FILE *<var>fp</var>, const fpos_t *<var>pos</var>);
+     int _fsetpos_r(struct _reent *<var>ptr</var>, FILE *<var>fp</var>,
+         const fpos_t *<var>pos</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+Objects of type <code>FILE</code> can have a &ldquo;position&rdquo; that records how much
+of the file your program has already read.  Many of the <code>stdio</code> functions
+depend on this position, and many change it as a side effect.
+
+   <p>You can use <code>fsetpos</code> to return the file identified by <var>fp</var> to a previous
+position <code>*</code><var>pos</var> (after first recording it with <code>fgetpos</code>).
+
+   <p>See <code>fseek</code> for a similar facility.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>fgetpos</code> returns <code>0</code> when successful.  If <code>fgetpos</code> fails, the
+result is <code>1</code>.  The reason for failure is indicated in <code>errno</code>:
+either <code>ESPIPE</code> (the stream identified by <var>fp</var> doesn't support
+repositioning) or <code>EINVAL</code> (invalid file position).
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C requires <code>fsetpos</code>, but does not specify the nature of
+<code>*</code><var>pos</var> beyond identifying it as written by <code>fgetpos</code>.
+
+   <p>Supporting OS subroutines required: <code>close</code>, <code>fstat</code>, <code>isatty</code>,
+<code>lseek</code>, <code>read</code>, <code>sbrk</code>, <code>write</code>.
+
+   <p><br>
+
+   </body></html>
+

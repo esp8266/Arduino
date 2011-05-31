@@ -1,0 +1,136 @@
+<html lang="en">
+<head>
+<title>Stringification - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Macros.html#Macros" title="Macros">
+<link rel="prev" href="Macro-Arguments.html#Macro-Arguments" title="Macro Arguments">
+<link rel="next" href="Concatenation.html#Concatenation" title="Concatenation">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Stringification"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Concatenation.html#Concatenation">Concatenation</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Macro-Arguments.html#Macro-Arguments">Macro Arguments</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Macros.html#Macros">Macros</a>
+<hr>
+</div>
+
+<h3 class="section">3.4 Stringification</h3>
+
+<p><a name="index-stringification-50"></a><a name="index-g_t_0040samp_007b_0023_007d-operator-51"></a>
+Sometimes you may want to convert a macro argument into a string
+constant.  Parameters are not replaced inside string constants, but you
+can use the &lsquo;<samp><span class="samp">#</span></samp>&rsquo; preprocessing operator instead.  When a macro
+parameter is used with a leading &lsquo;<samp><span class="samp">#</span></samp>&rsquo;, the preprocessor replaces it
+with the literal text of the actual argument, converted to a string
+constant.  Unlike normal parameter replacement, the argument is not
+macro-expanded first.  This is called <dfn>stringification</dfn>.
+
+   <p>There is no way to combine an argument with surrounding text and
+stringify it all together.  Instead, you can write a series of adjacent
+string constants and stringified arguments.  The preprocessor will
+replace the stringified arguments with string constants.  The C
+compiler will then combine all the adjacent string constants into one
+long string.
+
+   <p>Here is an example of a macro definition that uses stringification:
+
+<pre class="smallexample">     #define WARN_IF(EXP) \
+     do { if (EXP) \
+             fprintf (stderr, "Warning: " #EXP "\n"); } \
+     while (0)
+     WARN_IF (x == 0);
+          ==&gt; do { if (x == 0)
+                fprintf (stderr, "Warning: " "x == 0" "\n"); } while (0);
+</pre>
+   <p class="noindent">The argument for <code>EXP</code> is substituted once, as-is, into the
+<code>if</code> statement, and once, stringified, into the argument to
+<code>fprintf</code>.  If <code>x</code> were a macro, it would be expanded in the
+<code>if</code> statement, but not in the string.
+
+   <p>The <code>do</code> and <code>while (0)</code> are a kludge to make it possible to
+write <code>WARN_IF (</code><var>arg</var><code>);</code>, which the resemblance of
+<code>WARN_IF</code> to a function would make C programmers want to do; see
+<a href="Swallowing-the-Semicolon.html#Swallowing-the-Semicolon">Swallowing the Semicolon</a>.
+
+   <p>Stringification in C involves more than putting double-quote characters
+around the fragment.  The preprocessor backslash-escapes the quotes
+surrounding embedded string constants, and all backslashes within string and
+character constants, in order to get a valid C string constant with the
+proper contents.  Thus, stringifying <code>p&nbsp;=&nbsp;"foo\n";<!-- /@w --></code> results in
+<tt>"p&nbsp;=&nbsp;\"foo\\n\";"<!-- /@w --></tt>.  However, backslashes that are not inside string
+or character constants are not duplicated: &lsquo;<samp><span class="samp">\n</span></samp>&rsquo; by itself
+stringifies to <tt>"\n"</tt>.
+
+   <p>All leading and trailing whitespace in text being stringified is
+ignored.  Any sequence of whitespace in the middle of the text is
+converted to a single space in the stringified result.  Comments are
+replaced by whitespace long before stringification happens, so they
+never appear in stringified text.
+
+   <p>There is no way to convert a macro argument into a character constant.
+
+   <p>If you want to stringify the result of expansion of a macro argument,
+you have to use two levels of macros.
+
+<pre class="smallexample">     #define xstr(s) str(s)
+     #define str(s) #s
+     #define foo 4
+     str (foo)
+          ==&gt; "foo"
+     xstr (foo)
+          ==&gt; xstr (4)
+          ==&gt; str (4)
+          ==&gt; "4"
+</pre>
+   <p><code>s</code> is stringified when it is used in <code>str</code>, so it is not
+macro-expanded first.  But <code>s</code> is an ordinary argument to
+<code>xstr</code>, so it is completely macro-expanded before <code>xstr</code>
+itself is expanded (see <a href="Argument-Prescan.html#Argument-Prescan">Argument Prescan</a>).  Therefore, by the time
+<code>str</code> gets to its argument, it has already been macro-expanded.
+
+   </body></html>
+

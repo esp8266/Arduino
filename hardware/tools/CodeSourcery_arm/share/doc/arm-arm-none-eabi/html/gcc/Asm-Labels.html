@@ -1,0 +1,98 @@
+<html lang="en">
+<head>
+<title>Asm Labels - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Extensions.html#C-Extensions" title="C Extensions">
+<link rel="prev" href="Constraints.html#Constraints" title="Constraints">
+<link rel="next" href="Explicit-Reg-Vars.html#Explicit-Reg-Vars" title="Explicit Reg Vars">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Asm-Labels"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Explicit-Reg-Vars.html#Explicit-Reg-Vars">Explicit Reg Vars</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Constraints.html#Constraints">Constraints</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Extensions.html#C-Extensions">C Extensions</a>
+<hr>
+</div>
+
+<h3 class="section">6.41 Controlling Names Used in Assembler Code</h3>
+
+<p><a name="index-assembler-names-for-identifiers-2583"></a><a name="index-names-used-in-assembler-code-2584"></a><a name="index-identifiers_002c-names-in-assembler-code-2585"></a>
+You can specify the name to be used in the assembler code for a C
+function or variable by writing the <code>asm</code> (or <code>__asm__</code>)
+keyword after the declarator as follows:
+
+<pre class="smallexample">     int foo asm ("myfoo") = 2;
+</pre>
+ <p class="noindent">This specifies that the name to be used for the variable <code>foo</code> in
+the assembler code should be &lsquo;<samp><span class="samp">myfoo</span></samp>&rsquo; rather than the usual
+&lsquo;<samp><span class="samp">_foo</span></samp>&rsquo;.
+
+ <p>On systems where an underscore is normally prepended to the name of a C
+function or variable, this feature allows you to define names for the
+linker that do not start with an underscore.
+
+ <p>It does not make sense to use this feature with a non-static local
+variable since such variables do not have assembler names.  If you are
+trying to put the variable in a particular register, see <a href="Explicit-Reg-Vars.html#Explicit-Reg-Vars">Explicit Reg Vars</a>.  GCC presently accepts such code with a warning, but will
+probably be changed to issue an error, rather than a warning, in the
+future.
+
+ <p>You cannot use <code>asm</code> in this way in a function <em>definition</em>; but
+you can get the same effect by writing a declaration for the function
+before its definition and putting <code>asm</code> there, like this:
+
+<pre class="smallexample">     extern func () asm ("FUNC");
+     
+     func (x, y)
+          int x, y;
+     /* <span class="roman">...</span> */
+</pre>
+ <p>It is up to you to make sure that the assembler names you choose do not
+conflict with any other assembler symbols.  Also, you must not use a
+register name; that would produce completely invalid assembler code.  GCC
+does not as yet have the ability to store static variables in registers. 
+Perhaps that will be added.
+
+ </body></html>
+

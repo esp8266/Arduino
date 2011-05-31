@@ -1,0 +1,101 @@
+<html lang="en">
+<head>
+<title>AVR Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Submodel-Options.html#Submodel-Options" title="Submodel Options">
+<link rel="prev" href="ARM-Options.html#ARM-Options" title="ARM Options">
+<link rel="next" href="Blackfin-Options.html#Blackfin-Options" title="Blackfin Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="AVR-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Blackfin-Options.html#Blackfin-Options">Blackfin Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="ARM-Options.html#ARM-Options">ARM Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Submodel-Options.html#Submodel-Options">Submodel Options</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.17.3 AVR Options</h4>
+
+<p><a name="index-AVR-Options-1036"></a>
+These options are defined for AVR implementations:
+
+     <dl>
+<dt><code>-mmcu=</code><var>mcu</var><dd><a name="index-mmcu-1037"></a>Specify ATMEL AVR instruction set or MCU type.
+
+     <p>Instruction set avr1 is for the minimal AVR core, not supported by the C
+compiler, only for assembler programs (MCU types: at90s1200, attiny10,
+attiny11, attiny12, attiny15, attiny28).
+
+     <p>Instruction set avr2 (default) is for the classic AVR core with up to
+8K program memory space (MCU types: at90s2313, at90s2323, attiny22,
+at90s2333, at90s2343, at90s4414, at90s4433, at90s4434, at90s8515,
+at90c8534, at90s8535).
+
+     <p>Instruction set avr3 is for the classic AVR core with up to 128K program
+memory space (MCU types: atmega103, atmega603, at43usb320, at76c711).
+
+     <p>Instruction set avr4 is for the enhanced AVR core with up to 8K program
+memory space (MCU types: atmega8, atmega83, atmega85).
+
+     <p>Instruction set avr5 is for the enhanced AVR core with up to 128K program
+memory space (MCU types: atmega16, atmega161, atmega163, atmega32, atmega323,
+atmega64, atmega128, at43usb355, at94k).
+
+     <br><dt><code>-mno-interrupts</code><dd><a name="index-mno_002dinterrupts-1038"></a>Generated code is not compatible with hardware interrupts. 
+Code size will be smaller.
+
+     <br><dt><code>-mcall-prologues</code><dd><a name="index-mcall_002dprologues-1039"></a>Functions prologues/epilogues expanded as call to appropriate
+subroutines.  Code size will be smaller.
+
+     <br><dt><code>-mtiny-stack</code><dd><a name="index-mtiny_002dstack-1040"></a>Change only the low 8 bits of the stack pointer.
+
+     <br><dt><code>-mint8</code><dd><a name="index-mint8-1041"></a>Assume int to be 8 bit integer.  This affects the sizes of all types: A
+char will be 1 byte, an int will be 1 byte, a long will be 2 bytes
+and long long will be 4 bytes.  Please note that this option does not
+comply to the C standards, but it will provide you with smaller code
+size. 
+</dl>
+
+ </body></html>
+

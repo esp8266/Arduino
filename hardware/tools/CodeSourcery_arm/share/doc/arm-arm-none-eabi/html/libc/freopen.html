@@ -1,0 +1,78 @@
+<html lang="en">
+<head>
+<title>freopen - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="fread.html#fread" title="fread">
+<link rel="next" href="fseek.html#fseek" title="fseek">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="freopen"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="fseek.html#fseek">fseek</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="fread.html#fread">fread</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.25 <code>freopen</code>&mdash;open a file using an existing file descriptor</h3>
+
+<p><a name="index-freopen-195"></a><a name="index-g_t_005ffreopen_005fr-196"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     FILE *freopen(const char *<var>file</var>, const char *<var>mode</var>,
+         FILE *<var>fp</var>);
+     FILE *_freopen_r(struct _reent *<var>ptr</var>, const char *<var>file</var>,
+         const char *<var>mode</var>, FILE *<var>fp</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+Use this variant of <code>fopen</code> if you wish to specify a particular file
+descriptor <var>fp</var> (notably <code>stdin</code>, <code>stdout</code>, or <code>stderr</code>) for
+the file.
+
+   <p>If <var>fp</var> was associated with another file or stream, <code>freopen</code>
+closes that other file or stream (but ignores any errors while closing
+it).
+
+   <p><var>file</var> and <var>mode</var> are used just as in <code>fopen</code>.
+
+   <p>If <var>file</var> is <code>NULL</code>, the underlying stream is modified rather than
+closed.  The file cannot be given a more permissive access mode (for
+example, a <var>mode</var> of "w" will fail on a read-only file descriptor),
+but can change status such as append or binary mode.  If modification
+is not possible, failure occurs.
+
+   <p><br>
+<strong>Returns</strong><br>
+If successful, the result is the same as the argument <var>fp</var>.  If the
+file cannot be opened as specified, the result is <code>NULL</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C requires <code>freopen</code>.
+
+   <p>Supporting OS subroutines required: <code>close</code>, <code>fstat</code>, <code>isatty</code>,
+<code>lseek</code>, <code>open</code>, <code>read</code>, <code>sbrk</code>, <code>write</code>.
+
+   <p><br>
+
+   </body></html>
+

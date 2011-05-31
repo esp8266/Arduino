@@ -1,0 +1,111 @@
+<html lang="en">
+<head>
+<title>Undefining and Redefining Macros - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Macros.html#Macros" title="Macros">
+<link rel="prev" href="Predefined-Macros.html#Predefined-Macros" title="Predefined Macros">
+<link rel="next" href="Directives-Within-Macro-Arguments.html#Directives-Within-Macro-Arguments" title="Directives Within Macro Arguments">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Undefining-and-Redefining-Macros"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Directives-Within-Macro-Arguments.html#Directives-Within-Macro-Arguments">Directives Within Macro Arguments</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Predefined-Macros.html#Predefined-Macros">Predefined Macros</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Macros.html#Macros">Macros</a>
+<hr>
+</div>
+
+<h3 class="section">3.8 Undefining and Redefining Macros</h3>
+
+<p><a name="index-undefining-macros-68"></a><a name="index-redefining-macros-69"></a><a name="index-g_t_0023undef-70"></a>
+If a macro ceases to be useful, it may be <dfn>undefined</dfn> with the
+&lsquo;<samp><span class="samp">#undef</span></samp>&rsquo; directive.  &lsquo;<samp><span class="samp">#undef</span></samp>&rsquo; takes a single argument, the
+name of the macro to undefine.  You use the bare macro name, even if the
+macro is function-like.  It is an error if anything appears on the line
+after the macro name.  &lsquo;<samp><span class="samp">#undef</span></samp>&rsquo; has no effect if the name is not a
+macro.
+
+<pre class="smallexample">     #define FOO 4
+     x = FOO;        ==&gt; x = 4;
+     #undef FOO
+     x = FOO;        ==&gt; x = FOO;
+</pre>
+   <p>Once a macro has been undefined, that identifier may be <dfn>redefined</dfn>
+as a macro by a subsequent &lsquo;<samp><span class="samp">#define</span></samp>&rsquo; directive.  The new definition
+need not have any resemblance to the old definition.
+
+   <p>However, if an identifier which is currently a macro is redefined, then
+the new definition must be <dfn>effectively the same</dfn> as the old one. 
+Two macro definitions are effectively the same if:
+     <ul>
+<li>Both are the same type of macro (object- or function-like). 
+<li>All the tokens of the replacement list are the same. 
+<li>If there are any parameters, they are the same. 
+<li>Whitespace appears in the same places in both.  It need not be
+exactly the same amount of whitespace, though.  Remember that comments
+count as whitespace. 
+</ul>
+
+<p class="noindent">These definitions are effectively the same:
+<pre class="smallexample">     #define FOUR (2 + 2)
+     #define FOUR         (2    +    2)
+     #define FOUR (2 /* <span class="roman">two</span> */ + 2)
+</pre>
+   <p class="noindent">but these are not:
+<pre class="smallexample">     #define FOUR (2 + 2)
+     #define FOUR ( 2+2 )
+     #define FOUR (2 * 2)
+     #define FOUR(score,and,seven,years,ago) (2 + 2)
+</pre>
+   <p>If a macro is redefined with a definition that is not effectively the
+same as the old one, the preprocessor issues a warning and changes the
+macro to use the new definition.  If the new definition is effectively
+the same, the redefinition is silently ignored.  This allows, for
+instance, two different headers to define a common macro.  The
+preprocessor will only complain if the definitions do not match.
+
+   </body></html>
+

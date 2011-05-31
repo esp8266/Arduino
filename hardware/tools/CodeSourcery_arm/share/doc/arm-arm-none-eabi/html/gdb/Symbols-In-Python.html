@@ -1,0 +1,186 @@
+<html lang="en">
+<head>
+<title>Symbols In Python - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Python-API.html#Python-API" title="Python API">
+<link rel="prev" href="Blocks-In-Python.html#Blocks-In-Python" title="Blocks In Python">
+<link rel="next" href="Symbol-Tables-In-Python.html#Symbol-Tables-In-Python" title="Symbol Tables In Python">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Symbols-In-Python"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Symbol-Tables-In-Python.html#Symbol-Tables-In-Python">Symbol Tables In Python</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Blocks-In-Python.html#Blocks-In-Python">Blocks In Python</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Python-API.html#Python-API">Python API</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">23.2.2.17 Python representation of Symbols.</h5>
+
+<p><a name="index-symbols-in-python-1841"></a><a name="index-gdb_002eSymbol-1842"></a>
+<span class="sc">gdb</span> represents every variable, function and type as an
+entry in a symbol table.  See <a href="Symbols.html#Symbols">Examining the Symbol Table</a>. 
+Similarly, Python represents these symbols in <span class="sc">gdb</span> with the
+<code>gdb.Symbol</code> object.
+
+   <p>The following symbol-related functions are available in the <code>gdb</code>
+module:
+
+   <p><a name="index-gdb_002elookup_005fsymbol-1843"></a>
+
+<div class="defun">
+&mdash; Function: <b>lookup_symbol</b><var> name </var>[<var>block</var>] [<var>domain</var>]<var><a name="index-lookup_005fsymbol-1844"></a></var><br>
+<blockquote><p>This function searches for a symbol by name.  The search scope can be
+restricted to the parameters defined in the optional domain and block
+arguments.
+
+        <p><var>name</var> is the name of the symbol.  It must be a string.  The
+optional <var>block</var> argument restricts the search to symbols visible
+in that <var>block</var>.  The <var>block</var> argument must be a
+<code>gdb.Block</code> object.  The optional <var>domain</var> argument restricts
+the search to the domain type.  The <var>domain</var> argument must be a
+domain constant defined in the <code>gdb</code> module and described later
+in this chapter. 
+</p></blockquote></div>
+
+   <p>A <code>gdb.Symbol</code> object has the following attributes:
+
+     <dl>
+
+     <div class="defun">
+&mdash; Instance Variable of Symbol: <b>symtab</b><var><a name="index-symtab-1845"></a></var><br>
+<blockquote> <p>The symbol table in which the symbol appears.  This attribute is
+represented as a <code>gdb.Symtab</code> object.  See <a href="Symbol-Tables-In-Python.html#Symbol-Tables-In-Python">Symbol Tables In Python</a>.  This attribute is not writable. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Instance Variable of Symbol: <b>name</b><var><a name="index-name-1846"></a></var><br>
+<blockquote> <p>The name of the symbol as a string.  This attribute is not writable. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Instance Variable of Symbol: <b>linkage_name</b><var><a name="index-linkage_005fname-1847"></a></var><br>
+<blockquote> <p>The name of the symbol, as used by the linker (i.e., may be mangled). 
+This attribute is not writable. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Instance Variable of Symbol: <b>print_name</b><var><a name="index-print_005fname-1848"></a></var><br>
+<blockquote> <p>The name of the symbol in a form suitable for output.  This is either
+<code>name</code> or <code>linkage_name</code>, depending on whether the user
+asked <span class="sc">gdb</span> to display demangled or mangled names. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Instance Variable of Symbol: <b>addr_class</b><var><a name="index-addr_005fclass-1849"></a></var><br>
+<blockquote> <p>The address class of the symbol.  This classifies how to find the value
+of a symbol.  Each address class is a constant defined in the
+<code>gdb</code> module and described later in this chapter. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Instance Variable of Symbol: <b>is_argument</b><var><a name="index-is_005fargument-1850"></a></var><br>
+<blockquote> <p><code>True</code> if the symbol is an argument of a function. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Instance Variable of Symbol: <b>is_constant</b><var><a name="index-is_005fconstant-1851"></a></var><br>
+<blockquote> <p><code>True</code> if the symbol is a constant. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Instance Variable of Symbol: <b>is_function</b><var><a name="index-is_005ffunction-1852"></a></var><br>
+<blockquote> <p><code>True</code> if the symbol is a function or a method. 
+</p></blockquote></div>
+
+     <div class="defun">
+&mdash; Instance Variable of Symbol: <b>is_variable</b><var><a name="index-is_005fvariable-1853"></a></var><br>
+<blockquote> <p><code>True</code> if the symbol is a variable. 
+</p></blockquote></div>
+     </dl>
+
+   <p>The available domain categories in <code>gdb.Symbol</code> are represented
+as constants in the <code>gdb</code> module:
+
+     
+<a name="index-SYMBOL_005fUNDEF_005fDOMAIN-1854"></a>
+<a name="index-gdb_002eSYMBOL_005fUNDEF_005fDOMAIN-1855"></a>
+<dl><dt><code>SYMBOL_UNDEF_DOMAIN</code><dd>This is used when a domain has not been discovered or none of the
+following domains apply.  This usually indicates an error either
+in the symbol information or in <span class="sc">gdb</span>'s handling of symbols. 
+<a name="index-SYMBOL_005fVAR_005fDOMAIN-1856"></a><a name="index-gdb_002eSYMBOL_005fVAR_005fDOMAIN-1857"></a><br><dt><code>SYMBOL_VAR_DOMAIN</code><dd>This domain contains variables, function names, typedef names and enum
+type values. 
+<a name="index-SYMBOL_005fSTRUCT_005fDOMAIN-1858"></a><a name="index-gdb_002eSYMBOL_005fSTRUCT_005fDOMAIN-1859"></a><br><dt><code>SYMBOL_STRUCT_DOMAIN</code><dd>This domain holds struct, union and enum type names. 
+<a name="index-SYMBOL_005fLABEL_005fDOMAIN-1860"></a><a name="index-gdb_002eSYMBOL_005fLABEL_005fDOMAIN-1861"></a><br><dt><code>SYMBOL_LABEL_DOMAIN</code><dd>This domain contains names of labels (for gotos). 
+<a name="index-SYMBOL_005fVARIABLES_005fDOMAIN-1862"></a><a name="index-gdb_002eSYMBOL_005fVARIABLES_005fDOMAIN-1863"></a><br><dt><code>SYMBOL_VARIABLES_DOMAIN</code><dd>This domain holds a subset of the <code>SYMBOLS_VAR_DOMAIN</code>; it
+contains everything minus functions and types. 
+<a name="index-SYMBOL_005fFUNCTIONS_005fDOMAIN-1864"></a><a name="index-gdb_002eSYMBOL_005fFUNCTIONS_005fDOMAIN-1865"></a><br><dt><code>SYMBOL_FUNCTION_DOMAIN</code><dd>This domain contains all functions. 
+<a name="index-SYMBOL_005fTYPES_005fDOMAIN-1866"></a><a name="index-gdb_002eSYMBOL_005fTYPES_005fDOMAIN-1867"></a><br><dt><code>SYMBOL_TYPES_DOMAIN</code><dd>This domain contains all types. 
+</dl>
+
+   <p>The available address class categories in <code>gdb.Symbol</code> are represented
+as constants in the <code>gdb</code> module:
+
+     
+<a name="index-SYMBOL_005fLOC_005fUNDEF-1868"></a>
+<a name="index-gdb_002eSYMBOL_005fLOC_005fUNDEF-1869"></a>
+<dl><dt><code>SYMBOL_LOC_UNDEF</code><dd>If this is returned by address class, it indicates an error either in
+the symbol information or in <span class="sc">gdb</span>'s handling of symbols. 
+<a name="index-SYMBOL_005fLOC_005fCONST-1870"></a><a name="index-gdb_002eSYMBOL_005fLOC_005fCONST-1871"></a><br><dt><code>SYMBOL_LOC_CONST</code><dd>Value is constant int. 
+<a name="index-SYMBOL_005fLOC_005fSTATIC-1872"></a><a name="index-gdb_002eSYMBOL_005fLOC_005fSTATIC-1873"></a><br><dt><code>SYMBOL_LOC_STATIC</code><dd>Value is at a fixed address. 
+<a name="index-SYMBOL_005fLOC_005fREGISTER-1874"></a><a name="index-gdb_002eSYMBOL_005fLOC_005fREGISTER-1875"></a><br><dt><code>SYMBOL_LOC_REGISTER</code><dd>Value is in a register. 
+<a name="index-SYMBOL_005fLOC_005fARG-1876"></a><a name="index-gdb_002eSYMBOL_005fLOC_005fARG-1877"></a><br><dt><code>SYMBOL_LOC_ARG</code><dd>Value is an argument.  This value is at the offset stored within the
+symbol inside the frame's argument list. 
+<a name="index-SYMBOL_005fLOC_005fREF_005fARG-1878"></a><a name="index-gdb_002eSYMBOL_005fLOC_005fREF_005fARG-1879"></a><br><dt><code>SYMBOL_LOC_REF_ARG</code><dd>Value address is stored in the frame's argument list.  Just like
+<code>LOC_ARG</code> except that the value's address is stored at the
+offset, not the value itself. 
+<a name="index-SYMBOL_005fLOC_005fREGPARM_005fADDR-1880"></a><a name="index-gdb_002eSYMBOL_005fLOC_005fREGPARM_005fADDR-1881"></a><br><dt><code>SYMBOL_LOC_REGPARM_ADDR</code><dd>Value is a specified register.  Just like <code>LOC_REGISTER</code> except
+the register holds the address of the argument instead of the argument
+itself. 
+<a name="index-SYMBOL_005fLOC_005fLOCAL-1882"></a><a name="index-gdb_002eSYMBOL_005fLOC_005fLOCAL-1883"></a><br><dt><code>SYMBOL_LOC_LOCAL</code><dd>Value is a local variable. 
+<a name="index-SYMBOL_005fLOC_005fTYPEDEF-1884"></a><a name="index-gdb_002eSYMBOL_005fLOC_005fTYPEDEF-1885"></a><br><dt><code>SYMBOL_LOC_TYPEDEF</code><dd>Value not used.  Symbols in the domain <code>SYMBOL_STRUCT_DOMAIN</code> all
+have this class. 
+<a name="index-SYMBOL_005fLOC_005fBLOCK-1886"></a><a name="index-gdb_002eSYMBOL_005fLOC_005fBLOCK-1887"></a><br><dt><code>SYMBOL_LOC_BLOCK</code><dd>Value is a block. 
+<a name="index-SYMBOL_005fLOC_005fCONST_005fBYTES-1888"></a><a name="index-gdb_002eSYMBOL_005fLOC_005fCONST_005fBYTES-1889"></a><br><dt><code>SYMBOL_LOC_CONST_BYTES</code><dd>Value is a byte-sequence. 
+<a name="index-SYMBOL_005fLOC_005fUNRESOLVED-1890"></a><a name="index-gdb_002eSYMBOL_005fLOC_005fUNRESOLVED-1891"></a><br><dt><code>SYMBOL_LOC_UNRESOLVED</code><dd>Value is at a fixed address, but the address of the variable has to be
+determined from the minimal symbol table whenever the variable is
+referenced. 
+<a name="index-SYMBOL_005fLOC_005fOPTIMIZED_005fOUT-1892"></a><a name="index-gdb_002eSYMBOL_005fLOC_005fOPTIMIZED_005fOUT-1893"></a><br><dt><code>SYMBOL_LOC_OPTIMIZED_OUT</code><dd>The value does not actually exist in the program. 
+<a name="index-SYMBOL_005fLOC_005fCOMPUTED-1894"></a><a name="index-gdb_002eSYMBOL_005fLOC_005fCOMPUTED-1895"></a><br><dt><code>SYMBOL_LOC_COMPUTED</code><dd>The value's address is a computed location. 
+</dl>
+
+   </body></html>
+

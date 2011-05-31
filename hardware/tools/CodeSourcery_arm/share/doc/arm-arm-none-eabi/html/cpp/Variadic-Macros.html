@@ -1,0 +1,166 @@
+<html lang="en">
+<head>
+<title>Variadic Macros - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Macros.html#Macros" title="Macros">
+<link rel="prev" href="Concatenation.html#Concatenation" title="Concatenation">
+<link rel="next" href="Predefined-Macros.html#Predefined-Macros" title="Predefined Macros">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Variadic-Macros"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Predefined-Macros.html#Predefined-Macros">Predefined Macros</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Concatenation.html#Concatenation">Concatenation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Macros.html#Macros">Macros</a>
+<hr>
+</div>
+
+<h3 class="section">3.6 Variadic Macros</h3>
+
+<p><a name="index-variable-number-of-arguments-56"></a><a name="index-macros-with-variable-arguments-57"></a><a name="index-variadic-macros-58"></a>
+A macro can be declared to accept a variable number of arguments much as
+a function can.  The syntax for defining the macro is similar to that of
+a function.  Here is an example:
+
+<pre class="smallexample">     #define eprintf(...) fprintf (stderr, __VA_ARGS__)
+</pre>
+   <p>This kind of macro is called <dfn>variadic</dfn>.  When the macro is invoked,
+all the tokens in its argument list after the last named argument (this
+macro has none), including any commas, become the <dfn>variable
+argument</dfn>.  This sequence of tokens replaces the identifier
+<code>__VA_ARGS__<!-- /@w --></code> in the macro body wherever it appears.  Thus, we
+have this expansion:
+
+<pre class="smallexample">     eprintf ("%s:%d: ", input_file, lineno)
+          ==&gt;  fprintf (stderr, "%s:%d: ", input_file, lineno)
+</pre>
+   <p>The variable argument is completely macro-expanded before it is inserted
+into the macro expansion, just like an ordinary argument.  You may use
+the &lsquo;<samp><span class="samp">#</span></samp>&rsquo; and &lsquo;<samp><span class="samp">##</span></samp>&rsquo; operators to stringify the variable argument
+or to paste its leading or trailing token with another token.  (But see
+below for an important special case for &lsquo;<samp><span class="samp">##</span></samp>&rsquo;.)
+
+   <p>If your macro is complicated, you may want a more descriptive name for
+the variable argument than <code>__VA_ARGS__<!-- /@w --></code>.  CPP permits
+this, as an extension.  You may write an argument name immediately
+before the &lsquo;<samp><span class="samp">...</span></samp>&rsquo;; that name is used for the variable argument. 
+The <code>eprintf</code> macro above could be written
+
+<pre class="smallexample">     #define eprintf(args...) fprintf (stderr, args)
+</pre>
+   <p class="noindent">using this extension.  You cannot use <code>__VA_ARGS__<!-- /@w --></code> and this
+extension in the same macro.
+
+   <p>You can have named arguments as well as variable arguments in a variadic
+macro.  We could define <code>eprintf</code> like this, instead:
+
+<pre class="smallexample">     #define eprintf(format, ...) fprintf (stderr, format, __VA_ARGS__)
+</pre>
+   <p class="noindent">This formulation looks more descriptive, but unfortunately it is less
+flexible: you must now supply at least one argument after the format
+string.  In standard C, you cannot omit the comma separating the named
+argument from the variable arguments.  Furthermore, if you leave the
+variable argument empty, you will get a syntax error, because
+there will be an extra comma after the format string.
+
+<pre class="smallexample">     eprintf("success!\n", );
+          ==&gt; fprintf(stderr, "success!\n", );
+</pre>
+   <p>GNU CPP has a pair of extensions which deal with this problem.  First,
+you are allowed to leave the variable argument out entirely:
+
+<pre class="smallexample">     eprintf ("success!\n")
+          ==&gt; fprintf(stderr, "success!\n", );
+</pre>
+   <p class="noindent">Second, the &lsquo;<samp><span class="samp">##</span></samp>&rsquo; token paste operator has a special meaning when
+placed between a comma and a variable argument.  If you write
+
+<pre class="smallexample">     #define eprintf(format, ...) fprintf (stderr, format, ##__VA_ARGS__)
+</pre>
+   <p class="noindent">and the variable argument is left out when the <code>eprintf</code> macro is
+used, then the comma before the &lsquo;<samp><span class="samp">##</span></samp>&rsquo; will be deleted.  This does
+<em>not</em> happen if you pass an empty argument, nor does it happen if
+the token preceding &lsquo;<samp><span class="samp">##</span></samp>&rsquo; is anything other than a comma.
+
+<pre class="smallexample">     eprintf ("success!\n")
+          ==&gt; fprintf(stderr, "success!\n");
+</pre>
+   <p class="noindent">The above explanation is ambiguous about the case where the only macro
+parameter is a variable arguments parameter, as it is meaningless to
+try to distinguish whether no argument at all is an empty argument or
+a missing argument.  In this case the C99 standard is clear that the
+comma must remain, however the existing GCC extension used to swallow
+the comma.  So CPP retains the comma when conforming to a specific C
+standard, and drops it otherwise.
+
+   <p>C99 mandates that the only place the identifier <code>__VA_ARGS__<!-- /@w --></code>
+can appear is in the replacement list of a variadic macro.  It may not
+be used as a macro name, macro argument name, or within a different type
+of macro.  It may also be forbidden in open text; the standard is
+ambiguous.  We recommend you avoid using it except for its defined
+purpose.
+
+   <p>Variadic macros are a new feature in C99.  GNU CPP has supported them
+for a long time, but only with a named variable argument
+(&lsquo;<samp><span class="samp">args...</span></samp>&rsquo;, not &lsquo;<samp><span class="samp">...</span></samp>&rsquo; and <code>__VA_ARGS__<!-- /@w --></code>).  If you are
+concerned with portability to previous versions of GCC, you should use
+only named variable arguments.  On the other hand, if you are concerned
+with portability to other conforming implementations of C99, you should
+use only <code>__VA_ARGS__<!-- /@w --></code>.
+
+   <p>Previous versions of CPP implemented the comma-deletion extension
+much more generally.  We have restricted it in this release to minimize
+the differences from C99.  To get the same effect with both this and
+previous versions of GCC, the token preceding the special &lsquo;<samp><span class="samp">##</span></samp>&rsquo; must
+be a comma, and there must be white space between that comma and
+whatever comes immediately before it:
+
+<pre class="smallexample">     #define eprintf(format, args...) fprintf (stderr, format , ##args)
+</pre>
+   <p class="noindent">See <a href="Differences-from-previous-versions.html#Differences-from-previous-versions">Differences from previous versions</a>, for the gory details.
+
+   </body></html>
+

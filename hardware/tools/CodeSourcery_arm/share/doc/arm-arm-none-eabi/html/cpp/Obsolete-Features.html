@@ -1,0 +1,132 @@
+<html lang="en">
+<head>
+<title>Obsolete Features - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Implementation-Details.html#Implementation-Details" title="Implementation Details">
+<link rel="prev" href="Implementation-limits.html#Implementation-limits" title="Implementation limits">
+<link rel="next" href="Differences-from-previous-versions.html#Differences-from-previous-versions" title="Differences from previous versions">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Obsolete-Features"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Differences-from-previous-versions.html#Differences-from-previous-versions">Differences from previous versions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Implementation-limits.html#Implementation-limits">Implementation limits</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Implementation-Details.html#Implementation-Details">Implementation Details</a>
+<hr>
+</div>
+
+<h3 class="section">11.3 Obsolete Features</h3>
+
+<p>CPP has some features which are present mainly for compatibility with
+older programs.  We discourage their use in new code.  In some cases,
+we plan to remove the feature in a future version of GCC.
+
+<h4 class="subsection">11.3.1 Assertions</h4>
+
+<p><a name="index-assertions-111"></a>
+<dfn>Assertions</dfn> are a deprecated alternative to macros in writing
+conditionals to test what sort of computer or system the compiled
+program will run on.  Assertions are usually predefined, but you can
+define them with preprocessing directives or command-line options.
+
+   <p>Assertions were intended to provide a more systematic way to describe
+the compiler's target system.  However, in practice they are just as
+unpredictable as the system-specific predefined macros.  In addition, they
+are not part of any standard, and only a few compilers support them. 
+Therefore, the use of assertions is <strong>less</strong> portable than the use
+of system-specific predefined macros.  We recommend you do not use them at
+all.
+
+   <p><a name="index-predicates-112"></a>An assertion looks like this:
+
+<pre class="smallexample">     #<var>predicate</var> (<var>answer</var>)
+</pre>
+   <p class="noindent"><var>predicate</var> must be a single identifier.  <var>answer</var> can be any
+sequence of tokens; all characters are significant except for leading
+and trailing whitespace, and differences in internal whitespace
+sequences are ignored.  (This is similar to the rules governing macro
+redefinition.)  Thus, <code>(x + y)</code> is different from <code>(x+y)</code> but
+equivalent to <code>(&nbsp;x&nbsp;+&nbsp;y&nbsp;)<!-- /@w --></code>.  Parentheses do not nest inside an
+answer.
+
+   <p><a name="index-testing-predicates-113"></a>To test an assertion, you write it in an &lsquo;<samp><span class="samp">#if</span></samp>&rsquo;.  For example, this
+conditional succeeds if either <code>vax</code> or <code>ns16000</code> has been
+asserted as an answer for <code>machine</code>.
+
+<pre class="smallexample">     #if #machine (vax) || #machine (ns16000)
+</pre>
+   <p class="noindent">You can test whether <em>any</em> answer is asserted for a predicate by
+omitting the answer in the conditional:
+
+<pre class="smallexample">     #if #machine
+</pre>
+   <p><a name="index-g_t_0023assert-114"></a>Assertions are made with the &lsquo;<samp><span class="samp">#assert</span></samp>&rsquo; directive.  Its sole
+argument is the assertion to make, without the leading &lsquo;<samp><span class="samp">#</span></samp>&rsquo; that
+identifies assertions in conditionals.
+
+<pre class="smallexample">     #assert <var>predicate</var> (<var>answer</var>)
+</pre>
+   <p class="noindent">You may make several assertions with the same predicate and different
+answers.  Subsequent assertions do not override previous ones for the
+same predicate.  All the answers for any given predicate are
+simultaneously true.
+
+   <p><a name="index-assertions_002c-canceling-115"></a><a name="index-g_t_0023unassert-116"></a>Assertions can be canceled with the &lsquo;<samp><span class="samp">#unassert</span></samp>&rsquo; directive.  It
+has the same syntax as &lsquo;<samp><span class="samp">#assert</span></samp>&rsquo;.  In that form it cancels only the
+answer which was specified on the &lsquo;<samp><span class="samp">#unassert</span></samp>&rsquo; line; other answers
+for that predicate remain true.  You can cancel an entire predicate by
+leaving out the answer:
+
+<pre class="smallexample">     #unassert <var>predicate</var>
+</pre>
+   <p class="noindent">In either form, if no such assertion has been made, &lsquo;<samp><span class="samp">#unassert</span></samp>&rsquo; has
+no effect.
+
+   <p>You can also make or cancel assertions using command line options. 
+See <a href="Invocation.html#Invocation">Invocation</a>.
+
+   </body></html>
+

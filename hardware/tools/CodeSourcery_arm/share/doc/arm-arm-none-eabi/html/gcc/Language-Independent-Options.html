@@ -1,0 +1,108 @@
+<html lang="en">
+<head>
+<title>Language Independent Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Invoking-GCC.html#Invoking-GCC" title="Invoking GCC">
+<link rel="prev" href="Objective_002dC-and-Objective_002dC_002b_002b-Dialect-Options.html#Objective_002dC-and-Objective_002dC_002b_002b-Dialect-Options" title="Objective-C and Objective-C++ Dialect Options">
+<link rel="next" href="Warning-Options.html#Warning-Options" title="Warning Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Language-Independent-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Warning-Options.html#Warning-Options">Warning Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Objective_002dC-and-Objective_002dC_002b_002b-Dialect-Options.html#Objective_002dC-and-Objective_002dC_002b_002b-Dialect-Options">Objective-C and Objective-C++ Dialect Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Invoking-GCC.html#Invoking-GCC">Invoking GCC</a>
+<hr>
+</div>
+
+<h3 class="section">3.7 Options to Control Diagnostic Messages Formatting</h3>
+
+<p><a name="index-options-to-control-diagnostics-formatting-212"></a><a name="index-diagnostic-messages-213"></a><a name="index-message-formatting-214"></a>
+Traditionally, diagnostic messages have been formatted irrespective of
+the output device's aspect (e.g. its width, <small class="dots">...</small>).  The options described
+below can be used to control the diagnostic messages formatting
+algorithm, e.g. how many characters per line, how often source location
+information should be reported.  Right now, only the C++ front end can
+honor these options.  However it is expected, in the near future, that
+the remaining front ends would be able to digest them correctly.
+
+     <dl>
+<dt><code>-fmessage-length=</code><var>n</var><dd><a name="index-fmessage_002dlength-215"></a>Try to format error messages so that they fit on lines of about <var>n</var>
+characters.  The default is 72 characters for <samp><span class="command">g++</span></samp> and 0 for the rest of
+the front ends supported by GCC.  If <var>n</var> is zero, then no
+line-wrapping will be done; each error message will appear on a single
+line.
+
+     <p><a name="index-fdiagnostics_002dshow_002dlocation-216"></a><br><dt><code>-fdiagnostics-show-location=once</code><dd>Only meaningful in line-wrapping mode.  Instructs the diagnostic messages
+reporter to emit <em>once</em> source location information; that is, in
+case the message is too long to fit on a single physical line and has to
+be wrapped, the source location won't be emitted (as prefix) again,
+over and over, in subsequent continuation lines.  This is the default
+behavior.
+
+     <br><dt><code>-fdiagnostics-show-location=every-line</code><dd>Only meaningful in line-wrapping mode.  Instructs the diagnostic
+messages reporter to emit the same source location information (as
+prefix) for physical lines that result from the process of breaking
+a message which is too long to fit on a single line.
+
+     <br><dt><code>-fdiagnostics-show-option</code><dd><a name="index-fdiagnostics_002dshow_002doption-217"></a>This option instructs the diagnostic machinery to add text to each
+diagnostic emitted, which indicates which command line option directly
+controls that diagnostic, when such an option is known to the
+diagnostic machinery.
+
+     <br><dt><code>-Wcoverage-mismatch</code><dd><a name="index-Wcoverage_002dmismatch-218"></a>Warn if feedback profiles do not match when using the
+<samp><span class="option">-fprofile-use</span></samp> option. 
+If a source file was changed between <samp><span class="option">-fprofile-gen</span></samp> and
+<samp><span class="option">-fprofile-use</span></samp>, the files with the profile feedback can fail
+to match the source file and GCC can not use the profile feedback
+information.  By default, GCC emits an error message in this case. 
+The option <samp><span class="option">-Wcoverage-mismatch</span></samp> emits a warning instead of an
+error.  GCC does not use appropriate feedback profiles, so using this
+option can result in poorly optimized code.  This option is useful
+only in the case of very minor changes such as bug fixes to an
+existing code-base.
+
+ </dl>
+
+ </body></html>
+

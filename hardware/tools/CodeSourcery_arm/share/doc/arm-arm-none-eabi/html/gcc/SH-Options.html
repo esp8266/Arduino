@@ -1,0 +1,268 @@
+<html lang="en">
+<head>
+<title>SH Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Submodel-Options.html#Submodel-Options" title="Submodel Options">
+<link rel="prev" href="Score-Options.html#Score-Options" title="Score Options">
+<link rel="next" href="SPARC-Options.html#SPARC-Options" title="SPARC Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="SH-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="SPARC-Options.html#SPARC-Options">SPARC Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Score-Options.html#Score-Options">Score Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Submodel-Options.html#Submodel-Options">Submodel Options</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.17.35 SH Options</h4>
+
+<p>These &lsquo;<samp><span class="samp">-m</span></samp>&rsquo; options are defined for the SH implementations:
+
+     <dl>
+<dt><code>-m1</code><dd><a name="index-m1-1940"></a>Generate code for the SH1.
+
+     <br><dt><code>-m2</code><dd><a name="index-m2-1941"></a>Generate code for the SH2.
+
+     <br><dt><code>-m2e</code><dd>Generate code for the SH2e.
+
+     <br><dt><code>-m2a-nofpu</code><dd><a name="index-m2a_002dnofpu-1942"></a>Generate code for the SH2a without FPU, or for a SH2a-FPU in such a way
+that the floating-point unit is not used.
+
+     <br><dt><code>-m2a-single-only</code><dd><a name="index-m2a_002dsingle_002donly-1943"></a>Generate code for the SH2a-FPU, in such a way that no double-precision
+floating point operations are used.
+
+     <br><dt><code>-m2a-single</code><dd><a name="index-m2a_002dsingle-1944"></a>Generate code for the SH2a-FPU assuming the floating-point unit is in
+single-precision mode by default.
+
+     <br><dt><code>-m2a</code><dd><a name="index-m2a-1945"></a>Generate code for the SH2a-FPU assuming the floating-point unit is in
+double-precision mode by default.
+
+     <br><dt><code>-m3</code><dd><a name="index-m3-1946"></a>Generate code for the SH3.
+
+     <br><dt><code>-m3e</code><dd><a name="index-m3e-1947"></a>Generate code for the SH3e.
+
+     <br><dt><code>-m4-nofpu</code><dd><a name="index-m4_002dnofpu-1948"></a>Generate code for the SH4 without a floating-point unit.
+
+     <br><dt><code>-m4-single-only</code><dd><a name="index-m4_002dsingle_002donly-1949"></a>Generate code for the SH4 with a floating-point unit that only
+supports single-precision arithmetic.
+
+     <br><dt><code>-m4-single</code><dd><a name="index-m4_002dsingle-1950"></a>Generate code for the SH4 assuming the floating-point unit is in
+single-precision mode by default.
+
+     <br><dt><code>-m4</code><dd><a name="index-m4-1951"></a>Generate code for the SH4.
+
+     <br><dt><code>-m4a-nofpu</code><dd><a name="index-m4a_002dnofpu-1952"></a>Generate code for the SH4al-dsp, or for a SH4a in such a way that the
+floating-point unit is not used.
+
+     <br><dt><code>-m4a-single-only</code><dd><a name="index-m4a_002dsingle_002donly-1953"></a>Generate code for the SH4a, in such a way that no double-precision
+floating point operations are used.
+
+     <br><dt><code>-m4a-single</code><dd><a name="index-m4a_002dsingle-1954"></a>Generate code for the SH4a assuming the floating-point unit is in
+single-precision mode by default.
+
+     <br><dt><code>-m4a</code><dd><a name="index-m4a-1955"></a>Generate code for the SH4a.
+
+     <br><dt><code>-m4al</code><dd><a name="index-m4al-1956"></a>Same as <samp><span class="option">-m4a-nofpu</span></samp>, except that it implicitly passes
+<samp><span class="option">-dsp</span></samp> to the assembler.  GCC doesn't generate any DSP
+instructions at the moment.
+
+     <br><dt><code>-mb</code><dd><a name="index-mb-1957"></a>Compile code for the processor in big endian mode.
+
+     <br><dt><code>-ml</code><dd><a name="index-ml-1958"></a>Compile code for the processor in little endian mode.
+
+     <br><dt><code>-mdalign</code><dd><a name="index-mdalign-1959"></a>Align doubles at 64-bit boundaries.  Note that this changes the calling
+conventions, and thus some functions from the standard C library will
+not work unless you recompile it first with <samp><span class="option">-mdalign</span></samp>.
+
+     <br><dt><code>-mrelax</code><dd><a name="index-mrelax-1960"></a>Shorten some address references at link time, when possible; uses the
+linker option <samp><span class="option">-relax</span></samp>.
+
+     <br><dt><code>-mbigtable</code><dd><a name="index-mbigtable-1961"></a>Use 32-bit offsets in <code>switch</code> tables.  The default is to use
+16-bit offsets.
+
+     <br><dt><code>-mbitops</code><dd><a name="index-mbitops-1962"></a>Enable the use of bit manipulation instructions on SH2A.
+
+     <br><dt><code>-mfmovd</code><dd><a name="index-mfmovd-1963"></a>Enable the use of the instruction <code>fmovd</code>.  Check <samp><span class="option">-mdalign</span></samp> for
+alignment constraints.
+
+     <br><dt><code>-mhitachi</code><dd><a name="index-mhitachi-1964"></a>Comply with the calling conventions defined by Renesas.
+
+     <br><dt><code>-mrenesas</code><dd><a name="index-mhitachi-1965"></a>Comply with the calling conventions defined by Renesas.
+
+     <br><dt><code>-mno-renesas</code><dd><a name="index-mhitachi-1966"></a>Comply with the calling conventions defined for GCC before the Renesas
+conventions were available.  This option is the default for all
+targets of the SH toolchain except for &lsquo;<samp><span class="samp">sh-symbianelf</span></samp>&rsquo;.
+
+     <br><dt><code>-mnomacsave</code><dd><a name="index-mnomacsave-1967"></a>Mark the <code>MAC</code> register as call-clobbered, even if
+<samp><span class="option">-mhitachi</span></samp> is given.
+
+     <br><dt><code>-mieee</code><dd><a name="index-mieee-1968"></a>Increase IEEE-compliance of floating-point code. 
+At the moment, this is equivalent to <samp><span class="option">-fno-finite-math-only</span></samp>. 
+When generating 16 bit SH opcodes, getting IEEE-conforming results for
+comparisons of NANs / infinities incurs extra overhead in every
+floating point comparison, therefore the default is set to
+<samp><span class="option">-ffinite-math-only</span></samp>.
+
+     <br><dt><code>-minline-ic_invalidate</code><dd><a name="index-minline_002dic_005finvalidate-1969"></a>Inline code to invalidate instruction cache entries after setting up
+nested function trampolines. 
+This option has no effect if -musermode is in effect and the selected
+code generation option (e.g. -m4) does not allow the use of the icbi
+instruction. 
+If the selected code generation option does not allow the use of the icbi
+instruction, and -musermode is not in effect, the inlined code will
+manipulate the instruction cache address array directly with an associative
+write.  This not only requires privileged mode, but it will also
+fail if the cache line had been mapped via the TLB and has become unmapped.
+
+     <br><dt><code>-misize</code><dd><a name="index-misize-1970"></a>Dump instruction size and location in the assembly code.
+
+     <br><dt><code>-mpadstruct</code><dd><a name="index-mpadstruct-1971"></a>This option is deprecated.  It pads structures to multiple of 4 bytes,
+which is incompatible with the SH ABI.
+
+     <br><dt><code>-mspace</code><dd><a name="index-mspace-1972"></a>Optimize for space instead of speed.  Implied by <samp><span class="option">-Os</span></samp>.
+
+     <br><dt><code>-mprefergot</code><dd><a name="index-mprefergot-1973"></a>When generating position-independent code, emit function calls using
+the Global Offset Table instead of the Procedure Linkage Table.
+
+     <br><dt><code>-musermode</code><dd><a name="index-musermode-1974"></a>Don't generate privileged mode only code; implies -mno-inline-ic_invalidate
+if the inlined code would not work in user mode. 
+This is the default when the target is <code>sh-*-linux*</code>.
+
+     <br><dt><code>-multcost=</code><var>number</var><dd><a name="index-multcost_003d_0040var_007bnumber_007d-1975"></a>Set the cost to assume for a multiply insn.
+
+     <br><dt><code>-mdiv=</code><var>strategy</var><dd><a name="index-mdiv_003d_0040var_007bstrategy_007d-1976"></a>Set the division strategy to use for SHmedia code.  <var>strategy</var> must be
+one of: call, call2, fp, inv, inv:minlat, inv20u, inv20l, inv:call,
+inv:call2, inv:fp . 
+"fp" performs the operation in floating point.  This has a very high latency,
+but needs only a few instructions, so it might be a good choice if
+your code has enough easily exploitable ILP to allow the compiler to
+schedule the floating point instructions together with other instructions. 
+Division by zero causes a floating point exception. 
+"inv" uses integer operations to calculate the inverse of the divisor,
+and then multiplies the dividend with the inverse.  This strategy allows
+cse and hoisting of the inverse calculation.  Division by zero calculates
+an unspecified result, but does not trap. 
+"inv:minlat" is a variant of "inv" where if no cse / hoisting opportunities
+have been found, or if the entire operation has been hoisted to the same
+place, the last stages of the inverse calculation are intertwined with the
+final multiply to reduce the overall latency, at the expense of using a few
+more instructions, and thus offering fewer scheduling opportunities with
+other code. 
+"call" calls a library function that usually implements the inv:minlat
+strategy. 
+This gives high code density for m5-*media-nofpu compilations. 
+"call2" uses a different entry point of the same library function, where it
+assumes that a pointer to a lookup table has already been set up, which
+exposes the pointer load to cse / code hoisting optimizations. 
+"inv:call", "inv:call2" and "inv:fp" all use the "inv" algorithm for initial
+code generation, but if the code stays unoptimized, revert to the "call",
+"call2", or "fp" strategies, respectively.  Note that the
+potentially-trapping side effect of division by zero is carried by a
+separate instruction, so it is possible that all the integer instructions
+are hoisted out, but the marker for the side effect stays where it is. 
+A recombination to fp operations or a call is not possible in that case. 
+"inv20u" and "inv20l" are variants of the "inv:minlat" strategy.  In the case
+that the inverse calculation was nor separated from the multiply, they speed
+up division where the dividend fits into 20 bits (plus sign where applicable),
+by inserting a test to skip a number of operations in this case; this test
+slows down the case of larger dividends.  inv20u assumes the case of a such
+a small dividend to be unlikely, and inv20l assumes it to be likely.
+
+     <br><dt><code>-mdivsi3_libfunc=</code><var>name</var><dd><a name="index-mdivsi3_005flibfunc_003d_0040var_007bname_007d-1977"></a>Set the name of the library function used for 32 bit signed division to
+<var>name</var>.  This only affect the name used in the call and inv:call
+division strategies, and the compiler will still expect the same
+sets of input/output/clobbered registers as if this option was not present.
+
+     <br><dt><code>-mfixed-range=</code><var>register-range</var><dd><a name="index-mfixed_002drange-1978"></a>Generate code treating the given register range as fixed registers. 
+A fixed register is one that the register allocator can not use.  This is
+useful when compiling kernel code.  A register range is specified as
+two registers separated by a dash.  Multiple register ranges can be
+specified separated by a comma.
+
+     <br><dt><code>-madjust-unroll</code><dd><a name="index-madjust_002dunroll-1979"></a>Throttle unrolling to avoid thrashing target registers. 
+This option only has an effect if the gcc code base supports the
+TARGET_ADJUST_UNROLL_MAX target hook.
+
+     <br><dt><code>-mindexed-addressing</code><dd><a name="index-mindexed_002daddressing-1980"></a>Enable the use of the indexed addressing mode for SHmedia32/SHcompact. 
+This is only safe if the hardware and/or OS implement 32 bit wrap-around
+semantics for the indexed addressing mode.  The architecture allows the
+implementation of processors with 64 bit MMU, which the OS could use to
+get 32 bit addressing, but since no current hardware implementation supports
+this or any other way to make the indexed addressing mode safe to use in
+the 32 bit ABI, the default is -mno-indexed-addressing.
+
+     <br><dt><code>-mgettrcost=</code><var>number</var><dd><a name="index-mgettrcost_003d_0040var_007bnumber_007d-1981"></a>Set the cost assumed for the gettr instruction to <var>number</var>. 
+The default is 2 if <samp><span class="option">-mpt-fixed</span></samp> is in effect, 100 otherwise.
+
+     <br><dt><code>-mpt-fixed</code><dd><a name="index-mpt_002dfixed-1982"></a>Assume pt* instructions won't trap.  This will generally generate better
+scheduled code, but is unsafe on current hardware.  The current architecture
+definition says that ptabs and ptrel trap when the target anded with 3 is 3. 
+This has the unintentional effect of making it unsafe to schedule ptabs /
+ptrel before a branch, or hoist it out of a loop.  For example,
+__do_global_ctors, a part of libgcc that runs constructors at program
+startup, calls functions in a list which is delimited by &minus;1.  With the
+-mpt-fixed option, the ptabs will be done before testing against &minus;1. 
+That means that all the constructors will be run a bit quicker, but when
+the loop comes to the end of the list, the program crashes because ptabs
+loads &minus;1 into a target register.  Since this option is unsafe for any
+hardware implementing the current architecture specification, the default
+is -mno-pt-fixed.  Unless the user specifies a specific cost with
+<samp><span class="option">-mgettrcost</span></samp>, -mno-pt-fixed also implies <samp><span class="option">-mgettrcost=100</span></samp>;
+this deters register allocation using target registers for storing
+ordinary integers.
+
+     <br><dt><code>-minvalid-symbols</code><dd><a name="index-minvalid_002dsymbols-1983"></a>Assume symbols might be invalid.  Ordinary function symbols generated by
+the compiler will always be valid to load with movi/shori/ptabs or
+movi/shori/ptrel, but with assembler and/or linker tricks it is possible
+to generate symbols that will cause ptabs / ptrel to trap. 
+This option is only meaningful when <samp><span class="option">-mno-pt-fixed</span></samp> is in effect. 
+It will then prevent cross-basic-block cse, hoisting and most scheduling
+of symbol loads.  The default is <samp><span class="option">-mno-invalid-symbols</span></samp>.
+
+     <br><dt><code>-mfdpic</code><dd><a name="index-fdpic-1984"></a>Generate code using the FDPIC ABI for uClinux, as documented at
+<a href="http://www.codesourcery.com/public/docs/sh-fdpic/sh-fdpic-abi.txt">http://www.codesourcery.com/public/docs/sh-fdpic/sh-fdpic-abi.txt</a><!-- /@w -->. 
+</dl>
+
+ </body></html>
+

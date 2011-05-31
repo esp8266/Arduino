@@ -1,0 +1,104 @@
+<html lang="en">
+<head>
+<title>Function-like Macros - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Macros.html#Macros" title="Macros">
+<link rel="prev" href="Object_002dlike-Macros.html#Object_002dlike-Macros" title="Object-like Macros">
+<link rel="next" href="Macro-Arguments.html#Macro-Arguments" title="Macro Arguments">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Function-like-Macros"></a>
+<a name="Function_002dlike-Macros"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Macro-Arguments.html#Macro-Arguments">Macro Arguments</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Object_002dlike-Macros.html#Object_002dlike-Macros">Object-like Macros</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Macros.html#Macros">Macros</a>
+<hr>
+</div>
+
+<h3 class="section">3.2 Function-like Macros</h3>
+
+<p><a name="index-function_002dlike-macros-45"></a>
+You can also define macros whose use looks like a function call.  These
+are called <dfn>function-like macros</dfn>.  To define a function-like macro,
+you use the same &lsquo;<samp><span class="samp">#define</span></samp>&rsquo; directive, but you put a pair of
+parentheses immediately after the macro name.  For example,
+
+<pre class="smallexample">     #define lang_init()  c_init()
+     lang_init()
+          ==&gt; c_init()
+</pre>
+   <p>A function-like macro is only expanded if its name appears with a pair
+of parentheses after it.  If you write just the name, it is left alone. 
+This can be useful when you have a function and a macro of the same
+name, and you wish to use the function sometimes.
+
+<pre class="smallexample">     extern void foo(void);
+     #define foo() /* <span class="roman">optimized inline version</span> */
+     ...
+       foo();
+       funcptr = foo;
+</pre>
+   <p>Here the call to <code>foo()</code> will use the macro, but the function
+pointer will get the address of the real function.  If the macro were to
+be expanded, it would cause a syntax error.
+
+   <p>If you put spaces between the macro name and the parentheses in the
+macro definition, that does not define a function-like macro, it defines
+an object-like macro whose expansion happens to begin with a pair of
+parentheses.
+
+<pre class="smallexample">     #define lang_init ()    c_init()
+     lang_init()
+          ==&gt; () c_init()()
+</pre>
+   <p>The first two pairs of parentheses in this expansion come from the
+macro.  The third is the pair that was originally after the macro
+invocation.  Since <code>lang_init</code> is an object-like macro, it does not
+consume those parentheses.
+
+   </body></html>
+

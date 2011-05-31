@@ -1,0 +1,71 @@
+<html lang="en">
+<head>
+<title>perror - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="open_005fmemstream.html#open_005fmemstream" title="open_memstream">
+<link rel="next" href="putc.html#putc" title="putc">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="perror"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="putc.html#putc">putc</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="open_005fmemstream.html#open_005fmemstream">open_memstream</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.43 <code>perror</code>&mdash;print an error message on standard error</h3>
+
+<p><a name="index-perror-243"></a><a name="index-g_t_005fperror_005fr-244"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     void perror(char *<var>prefix</var>);
+     
+     void _perror_r(struct _reent *<var>reent</var>, char *<var>prefix</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+Use <code>perror</code> to print (on standard error) an error message
+corresponding to the current value of the global variable <code>errno</code>. 
+Unless you use <code>NULL</code> as the value of the argument <var>prefix</var>, the
+error message will begin with the string at <var>prefix</var>, followed by a
+colon and a space (<code>: </code>). The remainder of the error message is one
+of the strings described for <code>strerror</code>.
+
+   <p>The alternate function <code>_perror_r</code> is a reentrant version.  The
+extra argument <var>reent</var> is a pointer to a reentrancy structure.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>perror</code> returns no result.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C requires <code>perror</code>, but the strings issued vary from one
+implementation to another.
+
+   <p>Supporting OS subroutines required: <code>close</code>, <code>fstat</code>, <code>isatty</code>,
+<code>lseek</code>, <code>read</code>, <code>sbrk</code>, <code>write</code>.
+
+   <p><br>
+
+   </body></html>
+

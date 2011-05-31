@@ -1,0 +1,153 @@
+<html lang="en">
+<head>
+<title>Checkpoint/Restart - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Running.html#Running" title="Running">
+<link rel="prev" href="Forks.html#Forks" title="Forks">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Checkpoint%2fRestart"></a>
+<a name="Checkpoint_002fRestart"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Forks.html#Forks">Forks</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Running.html#Running">Running</a>
+<hr>
+</div>
+
+<h3 class="section">4.12 Setting a <em>Bookmark</em> to Return to Later</h3>
+
+<p><a name="index-checkpoint-188"></a><a name="index-restart-189"></a><a name="index-bookmark-190"></a><a name="index-snapshot-of-a-process-191"></a><a name="index-rewind-program-state-192"></a>
+On certain operating systems<a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a>, <span class="sc">gdb</span> is able to save a <dfn>snapshot</dfn> of a
+program's state, called a <dfn>checkpoint</dfn>, and come back to it
+later.
+
+   <p>Returning to a checkpoint effectively undoes everything that has
+happened in the program since the <code>checkpoint</code> was saved.  This
+includes changes in memory, registers, and even (within some limits)
+system state.  Effectively, it is like going back in time to the
+moment when the checkpoint was saved.
+
+   <p>Thus, if you're stepping thru a program and you think you're
+getting close to the point where things go wrong, you can save
+a checkpoint.  Then, if you accidentally go too far and miss
+the critical statement, instead of having to restart your program
+from the beginning, you can just go back to the checkpoint and
+start again from there.
+
+   <p>This can be especially useful if it takes a lot of time or
+steps to reach the point where you think the bug occurs.
+
+   <p>To use the <code>checkpoint</code>/<code>restart</code> method of debugging:
+
+     
+<a name="index-checkpoint-193"></a>
+<dl><dt><code>checkpoint</code><dd>Save a snapshot of the debugged program's current execution state. 
+The <code>checkpoint</code> command takes no arguments, but each checkpoint
+is assigned a small integer id, similar to a breakpoint id.
+
+     <p><a name="index-info-checkpoints-194"></a><br><dt><code>info checkpoints</code><dd>List the checkpoints that have been saved in the current debugging
+session.  For each checkpoint, the following information will be
+listed:
+
+          <dl>
+<dt><code>Checkpoint ID</code><br><dt><code>Process ID</code><br><dt><code>Code Address</code><br><dt><code>Source line, or label</code><dd></dl>
+
+     <p><a name="index-restart-_0040var_007bcheckpoint_002did_007d-195"></a><br><dt><code>restart </code><var>checkpoint-id</var><dd>Restore the program state that was saved as checkpoint number
+<var>checkpoint-id</var>.  All program variables, registers, stack frames
+etc.  will be returned to the values that they had when the checkpoint
+was saved.  In essence, gdb will &ldquo;wind back the clock&rdquo; to the point
+in time when the checkpoint was saved.
+
+     <p>Note that breakpoints, <span class="sc">gdb</span> variables, command history etc. 
+are not affected by restoring a checkpoint.  In general, a checkpoint
+only restores things that reside in the program being debugged, not in
+the debugger.
+
+     <p><a name="index-delete-checkpoint-_0040var_007bcheckpoint_002did_007d-196"></a><br><dt><code>delete checkpoint </code><var>checkpoint-id</var><dd>Delete the previously-saved checkpoint identified by <var>checkpoint-id</var>.
+
+   </dl>
+
+   <p>Returning to a previously saved checkpoint will restore the user state
+of the program being debugged, plus a significant subset of the system
+(OS) state, including file pointers.  It won't &ldquo;un-write&rdquo; data from
+a file, but it will rewind the file pointer to the previous location,
+so that the previously written data can be overwritten.  For files
+opened in read mode, the pointer will also be restored so that the
+previously read data can be read again.
+
+   <p>Of course, characters that have been sent to a printer (or other
+external device) cannot be &ldquo;snatched back&rdquo;, and characters received
+from eg. a serial device can be removed from internal program buffers,
+but they cannot be &ldquo;pushed back&rdquo; into the serial pipeline, ready to
+be received again.  Similarly, the actual contents of files that have
+been changed cannot be restored (at this time).
+
+   <p>However, within those constraints, you actually can &ldquo;rewind&rdquo; your
+program to a previously saved point in time, and begin debugging it
+again &mdash; and you can change the course of events so as to debug a
+different execution path this time.
+
+   <p><a name="index-checkpoints-and-process-id-197"></a>Finally, there is one bit of internal program state that will be
+different when you return to a checkpoint &mdash; the program's process
+id.  Each checkpoint will have a unique process id (or <var>pid</var>),
+and each will be different from the program's original <var>pid</var>. 
+If your program has saved a local copy of its process id, this could
+potentially pose a problem.
+
+<h4 class="subsection">4.12.1 A Non-obvious Benefit of Using Checkpoints</h4>
+
+<p>On some systems such as <span class="sc">gnu</span>/Linux, address space randomization
+is performed on new processes for security reasons.  This makes it
+difficult or impossible to set a breakpoint, or watchpoint, on an
+absolute address if you have to restart the program, since the
+absolute location of a symbol will change from one execution to the
+next.
+
+   <p>A checkpoint, however, is an <em>identical</em> copy of a process. 
+Therefore if you create a checkpoint at (eg.) the start of main,
+and simply return to that checkpoint instead of restarting the
+process, you can avoid the effects of address randomization and
+your symbols will all stay in the same place.
+
+   <div class="footnote">
+<hr>
+<h4>Footnotes</h4><p class="footnote"><small>[<a name="fn-1" href="#fnd-1">1</a>]</small> Currently, only
+<span class="sc">gnu</span>/Linux.</p>
+
+   <hr></div>
+
+   </body></html>
+

@@ -1,0 +1,138 @@
+<html lang="en">
+<head>
+<title>Floating point implementation - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="C-Implementation.html#C-Implementation" title="C Implementation">
+<link rel="prev" href="Integers-implementation.html#Integers-implementation" title="Integers implementation">
+<link rel="next" href="Arrays-and-pointers-implementation.html#Arrays-and-pointers-implementation" title="Arrays and pointers implementation">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Floating-point-implementation"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Arrays-and-pointers-implementation.html#Arrays-and-pointers-implementation">Arrays and pointers implementation</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Integers-implementation.html#Integers-implementation">Integers implementation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="C-Implementation.html#C-Implementation">C Implementation</a>
+<hr>
+</div>
+
+<h3 class="section">4.6 Floating point</h3>
+
+     <ul>
+<li><cite>The accuracy of the floating-point operations and of the library
+functions in </cite><code>&lt;math.h&gt;</code><cite> and </cite><code>&lt;complex.h&gt;</code><cite> that return floating-point
+results (C90 and C99 5.2.4.2.2).</cite>
+
+     <p>The accuracy is unknown.
+
+     <li><cite>The rounding behaviors characterized by non-standard values
+of </cite><code>FLT_ROUNDS</code><cite> 
+(C90 and C99 5.2.4.2.2).</cite>
+
+     <p>GCC does not use such values.
+
+     <li><cite>The evaluation methods characterized by non-standard negative
+values of </cite><code>FLT_EVAL_METHOD</code><cite> (C99 5.2.4.2.2).</cite>
+
+     <p>GCC does not use such values.
+
+     <li><cite>The direction of rounding when an integer is converted to a
+floating-point number that cannot exactly represent the original
+value (C90 6.2.1.3, C99 6.3.1.4).</cite>
+
+     <p>C99 Annex F is followed.
+
+     <li><cite>The direction of rounding when a floating-point number is
+converted to a narrower floating-point number (C90 6.2.1.4, C99
+6.3.1.5).</cite>
+
+     <p>C99 Annex F is followed.
+
+     <li><cite>How the nearest representable value or the larger or smaller
+representable value immediately adjacent to the nearest representable
+value is chosen for certain floating constants (C90 6.1.3.1, C99
+6.4.4.2).</cite>
+
+     <p>C99 Annex F is followed.
+
+     <li><cite>Whether and how floating expressions are contracted when not
+disallowed by the </cite><code>FP_CONTRACT</code><cite> pragma (C99 6.5).</cite>
+
+     <p>Expressions are currently only contracted if
+<samp><span class="option">-funsafe-math-optimizations</span></samp> or <samp><span class="option">-ffast-math</span></samp> are used. 
+This is subject to change.
+
+     <li><cite>The default state for the </cite><code>FENV_ACCESS</code><cite> pragma (C99 7.6.1).</cite>
+
+     <p>This pragma is not implemented, but the default is to &ldquo;off&rdquo; unless
+<samp><span class="option">-frounding-math</span></samp> is used in which case it is &ldquo;on&rdquo;.
+
+     <li><cite>Additional floating-point exceptions, rounding modes, environments,
+and classifications, and their macro names (C99 7.6, C99 7.12).</cite>
+
+     <p>This is dependent on the implementation of the C library, and is not
+defined by GCC itself.
+
+     <li><cite>The default state for the </cite><code>FP_CONTRACT</code><cite> pragma (C99 7.12.2).</cite>
+
+     <p>This pragma is not implemented.  Expressions are currently only
+contracted if <samp><span class="option">-funsafe-math-optimizations</span></samp> or
+<samp><span class="option">-ffast-math</span></samp> are used.  This is subject to change.
+
+     <li><cite>Whether the &ldquo;inexact&rdquo; floating-point exception can be raised
+when the rounded result actually does equal the mathematical result
+in an IEC 60559 conformant implementation (C99 F.9).</cite>
+
+     <p>This is dependent on the implementation of the C library, and is not
+defined by GCC itself.
+
+     <li><cite>Whether the &ldquo;underflow&rdquo; (and &ldquo;inexact&rdquo;) floating-point
+exception can be raised when a result is tiny but not inexact in an
+IEC 60559 conformant implementation (C99 F.9).</cite>
+
+     <p>This is dependent on the implementation of the C library, and is not
+defined by GCC itself.
+
+</ul>
+
+ </body></html>
+

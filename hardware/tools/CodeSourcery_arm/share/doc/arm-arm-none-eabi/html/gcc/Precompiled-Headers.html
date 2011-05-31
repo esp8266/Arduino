@@ -1,0 +1,186 @@
+<html lang="en">
+<head>
+<title>Precompiled Headers - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Invoking-GCC.html#Invoking-GCC" title="Invoking GCC">
+<link rel="prev" href="Environment-Variables.html#Environment-Variables" title="Environment Variables">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Precompiled-Headers"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Environment-Variables.html#Environment-Variables">Environment Variables</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Invoking-GCC.html#Invoking-GCC">Invoking GCC</a>
+<hr>
+</div>
+
+<h3 class="section">3.20 Using Precompiled Headers</h3>
+
+<p><a name="index-precompiled-headers-2169"></a><a name="index-speed-of-compilation-2170"></a>
+Often large projects have many header files that are included in every
+source file.  The time the compiler takes to process these header files
+over and over again can account for nearly all of the time required to
+build the project.  To make builds faster, GCC allows users to
+`precompile' a header file; then, if builds can use the precompiled
+header file they will be much faster.
+
+ <p>To create a precompiled header file, simply compile it as you would any
+other file, if necessary using the <samp><span class="option">-x</span></samp> option to make the driver
+treat it as a C or C++ header file.  You will probably want to use a
+tool like <samp><span class="command">make</span></samp> to keep the precompiled header up-to-date when
+the headers it contains change.
+
+ <p>A precompiled header file will be searched for when <code>#include</code> is
+seen in the compilation.  As it searches for the included file
+(see <a href="../cpp/Search-Path.html#Search-Path">Search Path</a>) the
+compiler looks for a precompiled header in each directory just before it
+looks for the include file in that directory.  The name searched for is
+the name specified in the <code>#include</code> with &lsquo;<samp><span class="samp">.gch</span></samp>&rsquo; appended.  If
+the precompiled header file can't be used, it is ignored.
+
+ <p>For instance, if you have <code>#include "all.h"</code>, and you have
+<samp><span class="file">all.h.gch</span></samp> in the same directory as <samp><span class="file">all.h</span></samp>, then the
+precompiled header file will be used if possible, and the original
+header will be used otherwise.
+
+ <p>Alternatively, you might decide to put the precompiled header file in a
+directory and use <samp><span class="option">-I</span></samp> to ensure that directory is searched
+before (or instead of) the directory containing the original header. 
+Then, if you want to check that the precompiled header file is always
+used, you can put a file of the same name as the original header in this
+directory containing an <code>#error</code> command.
+
+ <p>This also works with <samp><span class="option">-include</span></samp>.  So yet another way to use
+precompiled headers, good for projects not designed with precompiled
+header files in mind, is to simply take most of the header files used by
+a project, include them from another header file, precompile that header
+file, and <samp><span class="option">-include</span></samp> the precompiled header.  If the header files
+have guards against multiple inclusion, they will be skipped because
+they've already been included (in the precompiled header).
+
+ <p>If you need to precompile the same header file for different
+languages, targets, or compiler options, you can instead make a
+<em>directory</em> named like <samp><span class="file">all.h.gch</span></samp>, and put each precompiled
+header in the directory, perhaps using <samp><span class="option">-o</span></samp>.  It doesn't matter
+what you call the files in the directory, every precompiled header in
+the directory will be considered.  The first precompiled header
+encountered in the directory that is valid for this compilation will
+be used; they're searched in no particular order.
+
+ <p>There are many other possibilities, limited only by your imagination,
+good sense, and the constraints of your build system.
+
+ <p>A precompiled header file can be used only when these conditions apply:
+
+     <ul>
+<li>Only one precompiled header can be used in a particular compilation.
+
+     <li>A precompiled header can't be used once the first C token is seen.  You
+can have preprocessor directives before a precompiled header; you can
+even include a precompiled header from inside another header, so long as
+there are no C tokens before the <code>#include</code>.
+
+     <li>The precompiled header file must be produced for the same language as
+the current compilation.  You can't use a C precompiled header for a C++
+compilation.
+
+     <li>The precompiled header file must have been produced by the same compiler
+binary as the current compilation is using.
+
+     <li>Any macros defined before the precompiled header is included must
+either be defined in the same way as when the precompiled header was
+generated, or must not affect the precompiled header, which usually
+means that they don't appear in the precompiled header at all.
+
+     <p>The <samp><span class="option">-D</span></samp> option is one way to define a macro before a
+precompiled header is included; using a <code>#define</code> can also do it. 
+There are also some options that define macros implicitly, like
+<samp><span class="option">-O</span></samp> and <samp><span class="option">-Wdeprecated</span></samp>; the same rule applies to macros
+defined this way.
+
+     <li>If debugging information is output when using the precompiled
+header, using <samp><span class="option">-g</span></samp> or similar, the same kind of debugging information
+must have been output when building the precompiled header.  However,
+a precompiled header built using <samp><span class="option">-g</span></samp> can be used in a compilation
+when no debugging information is being output.
+
+     <li>The same <samp><span class="option">-m</span></samp> options must generally be used when building
+and using the precompiled header.  See <a href="Submodel-Options.html#Submodel-Options">Submodel Options</a>,
+for any cases where this rule is relaxed.
+
+     <li>Each of the following options must be the same when building and using
+the precompiled header:
+
+     <pre class="smallexample">          -fexceptions
+</pre>
+     <li>Some other command-line options starting with <samp><span class="option">-f</span></samp>,
+<samp><span class="option">-p</span></samp>, or <samp><span class="option">-O</span></samp> must be defined in the same way as when
+the precompiled header was generated.  At present, it's not clear
+which options are safe to change and which are not; the safest choice
+is to use exactly the same options when generating and using the
+precompiled header.  The following are known to be safe:
+
+     <pre class="smallexample">          -fmessage-length=  -fpreprocessed  -fsched-interblock 
+          -fsched-spec  -fsched-spec-load  -fsched-spec-load-dangerous 
+          -fsched-verbose=&lt;number&gt;  -fschedule-insns  -fvisibility= 
+          -pedantic-errors
+</pre>
+     </ul>
+
+ <p>For all of these except the last, the compiler will automatically
+ignore the precompiled header if the conditions aren't met.  If you
+find an option combination that doesn't work and doesn't cause the
+precompiled header to be ignored, please consider filing a bug report,
+see <a href="Bugs.html#Bugs">Bugs</a>.
+
+ <p>If you do use differing options when generating and using the
+precompiled header, the actual behavior will be a mixture of the
+behavior for the options.  For instance, if you use <samp><span class="option">-g</span></samp> to
+generate the precompiled header but not when using it, you may or may
+not get debugging information for routines in the precompiled header.
+
+<!-- Copyright (C) 2001, 2002, 2003, 2004, 2006, 2008 -->
+<!-- Free Software Foundation, Inc. -->
+<!-- This is part of the GCC manual. -->
+<!-- For copying conditions, see the file gcc.texi. -->
+ </body></html>
+

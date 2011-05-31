@@ -1,0 +1,190 @@
+<html lang="en">
+<head>
+<title>CFI directives - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Pseudo-Ops.html#Pseudo-Ops" title="Pseudo Ops">
+<link rel="prev" href="Byte.html#Byte" title="Byte">
+<link rel="next" href="Comm.html#Comm" title="Comm">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="CFI-directives"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Comm.html#Comm">Comm</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Byte.html#Byte">Byte</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Pseudo-Ops.html#Pseudo-Ops">Pseudo Ops</a>
+<hr>
+</div>
+
+<h3 class="section">7.9 <code>.cfi_sections </code><var>section_list</var></h3>
+
+<p><a name="index-g_t_0040code_007bcfi_005fsections_007d-directive-292"></a><code>.cfi_sections</code> may be used to specify whether CFI directives
+should emit <code>.eh_frame</code> section and/or <code>.debug_frame</code> section. 
+If <var>section_list</var> is <code>.eh_frame</code>, <code>.eh_frame</code> is emitted,
+if <var>section_list</var> is <code>.debug_frame</code>, <code>.debug_frame</code> is emitted. 
+To emit both use <code>.eh_frame, .debug_frame</code>.  The default if this
+directive is not used is <code>.cfi_sections .eh_frame</code>.
+
+<h3 class="section">7.10 <code>.cfi_startproc [simple]</code></h3>
+
+<p><a name="index-g_t_0040code_007bcfi_005fstartproc_007d-directive-293"></a><code>.cfi_startproc</code> is used at the beginning of each function that
+should have an entry in <code>.eh_frame</code>. It initializes some internal
+data structures. Don't forget to close the function by
+<code>.cfi_endproc</code>.
+
+   <p>Unless <code>.cfi_startproc</code> is used along with parameter <code>simple</code>
+it also emits some architecture dependent initial CFI instructions.
+
+<h3 class="section">7.11 <code>.cfi_endproc</code></h3>
+
+<p><a name="index-g_t_0040code_007bcfi_005fendproc_007d-directive-294"></a><code>.cfi_endproc</code> is used at the end of a function where it closes its
+unwind entry previously opened by
+<code>.cfi_startproc</code>, and emits it to <code>.eh_frame</code>.
+
+<h3 class="section">7.12 <code>.cfi_personality </code><var>encoding</var><code> [, </code><var>exp</var><code>]</code></h3>
+
+<p><code>.cfi_personality</code> defines personality routine and its encoding. 
+<var>encoding</var> must be a constant determining how the personality
+should be encoded.  If it is 255 (<code>DW_EH_PE_omit</code>), second
+argument is not present, otherwise second argument should be
+a constant or a symbol name.  When using indirect encodings,
+the symbol provided should be the location where personality
+can be loaded from, not the personality routine itself. 
+The default after <code>.cfi_startproc</code> is <code>.cfi_personality 0xff</code>,
+no personality routine.
+
+<h3 class="section">7.13 <code>.cfi_lsda </code><var>encoding</var><code> [, </code><var>exp</var><code>]</code></h3>
+
+<p><code>.cfi_lsda</code> defines LSDA and its encoding. 
+<var>encoding</var> must be a constant determining how the LSDA
+should be encoded.  If it is 255 (<code>DW_EH_PE_omit</code>), second
+argument is not present, otherwise second argument should be a constant
+or a symbol name.  The default after <code>.cfi_startproc</code> is <code>.cfi_lsda 0xff</code>,
+no LSDA.
+
+<h3 class="section">7.14 <code>.cfi_def_cfa </code><var>register</var><code>, </code><var>offset</var></h3>
+
+<p><code>.cfi_def_cfa</code> defines a rule for computing CFA as: <i>take
+address from </i><var>register</var><i> and add </i><var>offset</var><i> to it</i>.
+
+<h3 class="section">7.15 <code>.cfi_def_cfa_register </code><var>register</var></h3>
+
+<p><code>.cfi_def_cfa_register</code> modifies a rule for computing CFA. From
+now on <var>register</var> will be used instead of the old one. Offset
+remains the same.
+
+<h3 class="section">7.16 <code>.cfi_def_cfa_offset </code><var>offset</var></h3>
+
+<p><code>.cfi_def_cfa_offset</code> modifies a rule for computing CFA. Register
+remains the same, but <var>offset</var> is new. Note that it is the
+absolute offset that will be added to a defined register to compute
+CFA address.
+
+<h3 class="section">7.17 <code>.cfi_adjust_cfa_offset </code><var>offset</var></h3>
+
+<p>Same as <code>.cfi_def_cfa_offset</code> but <var>offset</var> is a relative
+value that is added/substracted from the previous offset.
+
+<h3 class="section">7.18 <code>.cfi_offset </code><var>register</var><code>, </code><var>offset</var></h3>
+
+<p>Previous value of <var>register</var> is saved at offset <var>offset</var> from
+CFA.
+
+<h3 class="section">7.19 <code>.cfi_rel_offset </code><var>register</var><code>, </code><var>offset</var></h3>
+
+<p>Previous value of <var>register</var> is saved at offset <var>offset</var> from
+the current CFA register.  This is transformed to <code>.cfi_offset</code>
+using the known displacement of the CFA register from the CFA. 
+This is often easier to use, because the number will match the
+code it's annotating.
+
+<h3 class="section">7.20 <code>.cfi_register </code><var>register1</var><code>, </code><var>register2</var></h3>
+
+<p>Previous value of <var>register1</var> is saved in register <var>register2</var>.
+
+<h3 class="section">7.21 <code>.cfi_restore </code><var>register</var></h3>
+
+<p><code>.cfi_restore</code> says that the rule for <var>register</var> is now the
+same as it was at the beginning of the function, after all initial
+instruction added by <code>.cfi_startproc</code> were executed.
+
+<h3 class="section">7.22 <code>.cfi_undefined </code><var>register</var></h3>
+
+<p>From now on the previous value of <var>register</var> can't be restored anymore.
+
+<h3 class="section">7.23 <code>.cfi_same_value </code><var>register</var></h3>
+
+<p>Current value of <var>register</var> is the same like in the previous frame,
+i.e. no restoration needed.
+
+<h3 class="section">7.24 <code>.cfi_remember_state</code>,</h3>
+
+<p>First save all current rules for all registers by <code>.cfi_remember_state</code>,
+then totally screw them up by subsequent <code>.cfi_*</code> directives and when
+everything is hopelessly bad, use <code>.cfi_restore_state</code> to restore
+the previous saved state.
+
+<h3 class="section">7.25 <code>.cfi_return_column </code><var>register</var></h3>
+
+<p>Change return column <var>register</var>, i.e. the return address is either
+directly in <var>register</var> or can be accessed by rules for <var>register</var>.
+
+<h3 class="section">7.26 <code>.cfi_signal_frame</code></h3>
+
+<p>Mark current function as signal trampoline.
+
+<h3 class="section">7.27 <code>.cfi_window_save</code></h3>
+
+<p>SPARC register window has been saved.
+
+<h3 class="section">7.28 <code>.cfi_escape</code> <var>expression</var>[, <small class="dots">...</small>]</h3>
+
+<p>Allows the user to add arbitrary bytes to the unwind info.  One
+might use this to add OS-specific CFI opcodes, or generic CFI
+opcodes that GAS does not yet support.
+
+<h3 class="section">7.29 <code>.cfi_val_encoded_addr </code><var>register</var><code>, </code><var>encoding</var><code>, </code><var>label</var></h3>
+
+<p>The current value of <var>register</var> is <var>label</var>.  The value of <var>label</var>
+will be encoded in the output file according to <var>encoding</var>; see the
+description of <code>.cfi_personality</code> for details on this encoding.
+
+   <p>The usefulness of equating a register to a fixed label is probably
+limited to the return address register.  Here, it can be useful to
+mark a code segment that has only one return address which is reached
+by a direct branch and no copy of the return address exists in memory
+or another register.
+
+   </body></html>
+

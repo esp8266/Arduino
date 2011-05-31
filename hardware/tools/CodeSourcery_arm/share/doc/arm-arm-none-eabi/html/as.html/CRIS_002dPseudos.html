@@ -1,0 +1,108 @@
+<html lang="en">
+<head>
+<title>CRIS-Pseudos - Using as</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using as">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="CRIS_002dSyntax.html#CRIS_002dSyntax" title="CRIS-Syntax">
+<link rel="prev" href="CRIS_002dRegs.html#CRIS_002dRegs" title="CRIS-Regs">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU Assembler "as".
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+2000, 2001, 2002, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="CRIS-Pseudos"></a>
+<a name="CRIS_002dPseudos"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="CRIS_002dRegs.html#CRIS_002dRegs">CRIS-Regs</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="CRIS_002dSyntax.html#CRIS_002dSyntax">CRIS-Syntax</a>
+<hr>
+</div>
+
+<h5 class="subsubsection">9.7.4.4 Assembler Directives</h5>
+
+<p><a name="index-assembler-directives_002c-CRIS-733"></a><a name="index-pseudo_002dops_002c-CRIS-734"></a><a name="index-CRIS-assembler-directives-735"></a><a name="index-CRIS-pseudo_002dops-736"></a>
+There are a few CRIS-specific pseudo-directives in addition to
+the generic ones.  See <a href="Pseudo-Ops.html#Pseudo-Ops">Pseudo Ops</a>.  Constants emitted by
+pseudo-directives are in little-endian order for CRIS.  There is
+no support for floating-point-specific directives for CRIS.
+
+     <dl>
+<dt><code>.dword EXPRESSIONS</code><dd><a name="index-assembler-directive-_002edword_002c-CRIS-737"></a><a name="index-pseudo_002dop-_002edword_002c-CRIS-738"></a><a name="index-CRIS-assembler-directive-_002edword-739"></a><a name="index-CRIS-pseudo_002dop-_002edword-740"></a>
+The <code>.dword</code> directive is a synonym for <code>.int</code>,
+expecting zero or more EXPRESSIONS, separated by commas.  For
+each expression, a 32-bit little-endian constant is emitted.
+
+     <br><dt><code>.syntax ARGUMENT</code><dd><a name="index-assembler-directive-_002esyntax_002c-CRIS-741"></a><a name="index-pseudo_002dop-_002esyntax_002c-CRIS-742"></a><a name="index-CRIS-assembler-directive-_002esyntax-743"></a><a name="index-CRIS-pseudo_002dop-_002esyntax-744"></a>The <code>.syntax</code> directive takes as <var>ARGUMENT</var> one of the
+following case-sensitive choices.
+
+          <dl>
+<dt><code>no_register_prefix</code><dd>
+The <code>.syntax no_register_prefix</code> <a name="crisnous"></a>directive
+makes a &lsquo;<samp><span class="samp">$</span></samp>&rsquo; character prefix on all registers optional.  It
+overrides a previous setting, including the corresponding effect
+of the option <samp><span class="option">--no-underscore</span></samp>.  If this directive is
+used when ordinary symbols do not have a &lsquo;<samp><span class="samp">_</span></samp>&rsquo; character
+prefix, care must be taken to avoid ambiguities whether an
+operand is a register or a symbol; using symbols with names the
+same as general or special registers then invoke undefined
+behavior.
+
+          <br><dt><code>register_prefix</code><dd>
+This directive makes a &lsquo;<samp><span class="samp">$</span></samp>&rsquo; character prefix on all
+registers mandatory.  It overrides a previous setting, including
+the corresponding effect of the option <samp><span class="option">--underscore</span></samp>.
+
+          <br><dt><code>leading_underscore</code><dd>
+This is an assertion directive, emitting an error if the
+<samp><span class="option">--no-underscore</span></samp> option is in effect.
+
+          <br><dt><code>no_leading_underscore</code><dd>
+This is the opposite of the <code>.syntax leading_underscore</code>
+directive and emits an error if the option <samp><span class="option">--underscore</span></samp>
+is in effect. 
+</dl>
+
+     <br><dt><code>.arch ARGUMENT</code><dd><a name="index-assembler-directive-_002earch_002c-CRIS-745"></a><a name="index-pseudo_002dop-_002earch_002c-CRIS-746"></a><a name="index-CRIS-assembler-directive-_002earch-747"></a><a name="index-CRIS-pseudo_002dop-_002earch-748"></a>This is an assertion directive, giving an error if the specified
+<var>ARGUMENT</var> is not the same as the specified or default value
+for the <samp><span class="option">--march=</span><var>architecture</var></samp> option
+(see <a href="march_002doption.html#march_002doption">march-option</a>).
+
+     <!-- If you compare with md_pseudo_table, you see that we don't -->
+     <!-- document ".file" and ".loc" here.  This is because we're just -->
+     <!-- wrapping the corresponding ELF function and emitting an error for -->
+     <!-- a.out. -->
+   </dl>
+
+<!-- Copyright 1996, 2000, 2002 Free Software Foundation, Inc. -->
+<!-- This is part of the GAS manual. -->
+<!-- For copying conditions, see the file as.texinfo. -->
+   </body></html>
+

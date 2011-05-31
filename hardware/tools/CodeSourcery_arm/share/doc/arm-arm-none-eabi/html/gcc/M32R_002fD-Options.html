@@ -1,0 +1,143 @@
+<html lang="en">
+<head>
+<title>M32R/D Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Submodel-Options.html#Submodel-Options" title="Submodel Options">
+<link rel="prev" href="M32C-Options.html#M32C-Options" title="M32C Options">
+<link rel="next" href="M680x0-Options.html#M680x0-Options" title="M680x0 Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="M32R%2fD-Options"></a>
+<a name="M32R_002fD-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="M680x0-Options.html#M680x0-Options">M680x0 Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="M32C-Options.html#M32C-Options">M32C Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Submodel-Options.html#Submodel-Options">Submodel Options</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.17.20 M32R/D Options</h4>
+
+<p><a name="index-M32R_002fD-options-1433"></a>
+These <samp><span class="option">-m</span></samp> options are defined for Renesas M32R/D architectures:
+
+     <dl>
+<dt><code>-m32r2</code><dd><a name="index-m32r2-1434"></a>Generate code for the M32R/2.
+
+     <br><dt><code>-m32rx</code><dd><a name="index-m32rx-1435"></a>Generate code for the M32R/X.
+
+     <br><dt><code>-m32r</code><dd><a name="index-m32r-1436"></a>Generate code for the M32R.  This is the default.
+
+     <br><dt><code>-mmodel=small</code><dd><a name="index-mmodel_003dsmall-1437"></a>Assume all objects live in the lower 16MB of memory (so that their addresses
+can be loaded with the <code>ld24</code> instruction), and assume all subroutines
+are reachable with the <code>bl</code> instruction. 
+This is the default.
+
+     <p>The addressability of a particular object can be set with the
+<code>model</code> attribute.
+
+     <br><dt><code>-mmodel=medium</code><dd><a name="index-mmodel_003dmedium-1438"></a>Assume objects may be anywhere in the 32-bit address space (the compiler
+will generate <code>seth/add3</code> instructions to load their addresses), and
+assume all subroutines are reachable with the <code>bl</code> instruction.
+
+     <br><dt><code>-mmodel=large</code><dd><a name="index-mmodel_003dlarge-1439"></a>Assume objects may be anywhere in the 32-bit address space (the compiler
+will generate <code>seth/add3</code> instructions to load their addresses), and
+assume subroutines may not be reachable with the <code>bl</code> instruction
+(the compiler will generate the much slower <code>seth/add3/jl</code>
+instruction sequence).
+
+     <br><dt><code>-msdata=none</code><dd><a name="index-msdata_003dnone-1440"></a>Disable use of the small data area.  Variables will be put into
+one of &lsquo;<samp><span class="samp">.data</span></samp>&rsquo;, &lsquo;<samp><span class="samp">bss</span></samp>&rsquo;, or &lsquo;<samp><span class="samp">.rodata</span></samp>&rsquo; (unless the
+<code>section</code> attribute has been specified). 
+This is the default.
+
+     <p>The small data area consists of sections &lsquo;<samp><span class="samp">.sdata</span></samp>&rsquo; and &lsquo;<samp><span class="samp">.sbss</span></samp>&rsquo;. 
+Objects may be explicitly put in the small data area with the
+<code>section</code> attribute using one of these sections.
+
+     <br><dt><code>-msdata=sdata</code><dd><a name="index-msdata_003dsdata-1441"></a>Put small global and static data in the small data area, but do not
+generate special code to reference them.
+
+     <br><dt><code>-msdata=use</code><dd><a name="index-msdata_003duse-1442"></a>Put small global and static data in the small data area, and generate
+special instructions to reference them.
+
+     <br><dt><code>-G </code><var>num</var><dd><a name="index-G-1443"></a><a name="index-smaller-data-references-1444"></a>Put global and static objects less than or equal to <var>num</var> bytes
+into the small data or bss sections instead of the normal data or bss
+sections.  The default value of <var>num</var> is 8. 
+The <samp><span class="option">-msdata</span></samp> option must be set to one of &lsquo;<samp><span class="samp">sdata</span></samp>&rsquo; or &lsquo;<samp><span class="samp">use</span></samp>&rsquo;
+for this option to have any effect.
+
+     <p>All modules should be compiled with the same <samp><span class="option">-G </span><var>num</var></samp> value. 
+Compiling with different values of <var>num</var> may or may not work; if it
+doesn't the linker will give an error message&mdash;incorrect code will not be
+generated.
+
+     <br><dt><code>-mdebug</code><dd><a name="index-mdebug-1445"></a>Makes the M32R specific code in the compiler display some statistics
+that might help in debugging programs.
+
+     <br><dt><code>-malign-loops</code><dd><a name="index-malign_002dloops-1446"></a>Align all loops to a 32-byte boundary.
+
+     <br><dt><code>-mno-align-loops</code><dd><a name="index-mno_002dalign_002dloops-1447"></a>Do not enforce a 32-byte alignment for loops.  This is the default.
+
+     <br><dt><code>-missue-rate=</code><var>number</var><dd><a name="index-missue_002drate_003d_0040var_007bnumber_007d-1448"></a>Issue <var>number</var> instructions per cycle.  <var>number</var> can only be 1
+or 2.
+
+     <br><dt><code>-mbranch-cost=</code><var>number</var><dd><a name="index-mbranch_002dcost_003d_0040var_007bnumber_007d-1449"></a><var>number</var> can only be 1 or 2.  If it is 1 then branches will be
+preferred over conditional code, if it is 2, then the opposite will
+apply.
+
+     <br><dt><code>-mflush-trap=</code><var>number</var><dd><a name="index-mflush_002dtrap_003d_0040var_007bnumber_007d-1450"></a>Specifies the trap number to use to flush the cache.  The default is
+12.  Valid numbers are between 0 and 15 inclusive.
+
+     <br><dt><code>-mno-flush-trap</code><dd><a name="index-mno_002dflush_002dtrap-1451"></a>Specifies that the cache cannot be flushed by using a trap.
+
+     <br><dt><code>-mflush-func=</code><var>name</var><dd><a name="index-mflush_002dfunc_003d_0040var_007bname_007d-1452"></a>Specifies the name of the operating system function to call to flush
+the cache.  The default is <em>_flush_cache</em>, but a function call
+will only be used if a trap is not available.
+
+     <br><dt><code>-mno-flush-func</code><dd><a name="index-mno_002dflush_002dfunc-1453"></a>Indicates that there is no OS function for flushing the cache.
+
+ </dl>
+
+ </body></html>
+

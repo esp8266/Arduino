@@ -1,0 +1,128 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>2.6. Setting up the Environment</title><link rel="stylesheet" href="cs.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.74.0"><link rel="home" href="index.html" title="Sourcery G++ Lite"><link rel="up" href="chap-installation.html" title="Chapter 2. Installation and Configuration"><link rel="prev" href="sec-updating.html" title="2.5. Installing Sourcery G++ Lite Updates"><link rel="next" href="sec-uninstalling.html" title="2.7. Uninstalling Sourcery G++ Lite"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">2.6. Setting up the Environment</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="sec-updating.html">Prev</a> </td><th width="60%" align="center">Chapter 2. Installation and Configuration</th><td width="20%" align="right"> <a accesskey="n" href="sec-uninstalling.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec-setting-up-environment"></a>2.6. Setting up the Environment</h2></div></div></div><p>
+      As with the installation process itself, the steps required to set
+      up your environment depend on your host operating system.
+    </p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id276449"></a>2.6.1. Setting up the Environment on Microsoft Windows Hosts</h3></div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="id276458"></a>2.6.1.1. Setting the <code class="envar">PATH</code></h4></div></div></div><p>
+	  In order to use the Sourcery G++ tools from the command line, you
+	  should add them to your <code class="envar">PATH</code>.
+          
+          <span>
+	    You may
+	    
+	    skip this step if you used the graphical installer,
+            since the installer automatically adds Sourcery G++
+            to your <code class="envar">PATH</code>.
+          </span>
+	</p><p>
+          To set the <code class="envar">PATH</code> on a Microsoft Windows Vista system,
+          use the following command in a <code class="filename">cmd.exe</code> 
+          shell:
+          </p><pre class="screen">&gt; setx PATH "%PATH%;C:\Program Files\Sourcery G++\bin"</pre><p>
+          where <code class="filename">C:\Program Files\Sourcery G++</code> should 
+          be changed to the path of your Sourcery G++ Lite installation. 
+	</p><p>
+	  To set the <code class="envar">PATH</code> on a system running Microsoft Windows 7,
+	  from the desktop bring up the <code class="guimenu">Start</code> menu and
+          right click on <code class="guilabel">Computer</code>.
+          Select <code class="guimenuitem">Properties</code> and click on
+	  <code class="guilabel">Advanced system settings</code>.
+          Go to the <code class="guilabel">Advanced</code> tab,
+          then click on the <code class="guibutton">Environment Variables</code> button.
+          Select the <code class="envar">PATH</code> variable and click the
+          <code class="guibutton">Edit</code>.  
+          Add the string <code class="literal">;C:\Program Files\Sourcery G++\bin</code>
+          to the end, and click <code class="guibutton">OK</code>.  Be sure to
+          adjust the pathname to reflect your actual installation directory.
+        </p><p>
+          To set the <code class="envar">PATH</code> on older versions of Microsoft
+          Windows, from the desktop
+          bring up the <code class="guimenu">Start</code> menu and
+          right click on <code class="guilabel">My Computer</code>.
+          Select <code class="guimenuitem">Properties</code>,
+          go to the <code class="guilabel">Advanced</code> tab,
+          then click on the <code class="guibutton">Environment Variables</code> button.
+          Select the <code class="envar">PATH</code> variable and click the
+          <code class="guibutton">Edit</code>.  
+          Add the string <code class="literal">;C:\Program Files\Sourcery G++\bin</code>
+          to the end, and click <code class="guibutton">OK</code>.  Again, you must
+          adjust the pathname to reflect your installation directory.
+        </p><p>
+          You can verify that your <code class="envar">PATH</code> is set up correctly
+	  by starting a new <code class="filename">cmd.exe</code> shell and running:
+          </p><pre class="screen">&gt; arm-none-eabi-g++ -v</pre><p>
+          Verify that the last line of the output contains:
+          <code class="literal">Sourcery G++ Lite 2011.03-42</code>.
+        </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="sec-cygwin"></a>2.6.1.2. Working with Cygwin</h4></div></div></div><p>
+          Sourcery G++ Lite does not require Cygwin or any other UNIX emulation
+          environment.  You can use Sourcery G++ directly 
+          
+          from the Windows command shell.  You can also use Sourcery G++ from
+          within the Cygwin environment, if you prefer.
+        </p><p>
+          The Cygwin emulation environment translates Windows path names
+          into UNIX path names.  For example, the Cygwin path 
+          <code class="filename">/home/user/hello.c</code> corresponds to the 
+          Windows path <code class="filename">c:\cygwin\home\user\hello.c</code>.
+          Because Sourcery G++ is not a Cygwin application, it does not, by
+          default, recognize Cygwin paths.
+        </p><p>
+          If you are using Sourcery G++ from Cygwin, you should set the
+          <code class="envar">CYGPATH</code> environment variable.  If this environment
+          variable is set, Sourcery G++ Lite automatically translates Cygwin path
+          names into Windows path names.  To set this environment
+          variable, type the following command in a Cygwin shell:
+          </p><pre class="screen">&gt; export CYGPATH=cygpath</pre><p>
+
+          To resolve Cygwin path names, Sourcery G++ relies on the
+          <code class="command">cygpath</code> utility provided with Cygwin.  You
+          must provide Sourcery G++ with the full path to
+          <code class="filename">cygpath</code> if <code class="command">cygpath</code> is not
+          in your <code class="envar">PATH</code>.  For example: 
+          </p><pre class="screen">&gt; export CYGPATH=c:/cygwin/bin/cygpath</pre><p>
+          directs Sourcery G++ Lite to use <code class="filename">c:/cygwin/bin/cygpath</code>
+          as the path conversion utility.  The value of
+          <code class="envar">CYGPATH</code> must be an ordinary Windows path, not
+          a Cygwin path.
+        </p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id276758"></a>2.6.2. 
+	Setting up the Environment on
+	<span>
+	  GNU/Linux
+	  
+	</span>
+	
+	
+	Hosts
+      </h3></div></div></div><p>
+        If you installed Sourcery G++ Lite using the 
+        graphical installer then you may skip this step. The installer
+        does this setup for you.
+      </p><p>
+        Before using Sourcery G++ Lite you should add it to your
+        <code class="envar">PATH</code>.  The command you must use varies with the
+        particular command shell that you are using.  If you are using the
+        C Shell (<code class="command">csh</code> or <code class="command">tcsh</code>), use
+        the command:
+      </p><pre class="screen">&gt; setenv PATH $HOME/CodeSourcery/Sourcery_G++/bin:$PATH</pre><p>
+        If you are using Bourne Shell (<code class="command">sh</code>), the Korn
+        Shell (<code class="command">ksh</code>), or another shell, use:
+      </p><pre class="screen">&gt; PATH=$HOME/CodeSourcery/Sourcery_G++/bin:$PATH
+&gt; export PATH</pre><p>
+        If you are not sure which shell you are using, try both commands.
+        In both cases, if you have installed Sourcery G++ Lite in an alternate
+        location, you must replace the directory above with
+        <code class="filename">bin</code> subdirectory of the directory in which
+        you installed Sourcery G++ Lite.
+      </p><p>
+        You may also wish to set the <code class="envar">MANPATH</code> environment
+        variable so that you can access the Sourcery G++ manual pages, which
+        provide additional information about using Sourcery G++.  To set the
+        <code class="envar">MANPATH</code> environment variable, follow the same steps
+        shown above, replacing <code class="envar">PATH</code> with
+        <code class="envar">MANPATH</code>, and <code class="filename">bin</code> with
+        <code class="filename">share/doc/sourceryg++-arm-none-eabi/man</code>.
+      </p><p>
+        You can test that your <code class="envar">PATH</code> is set up correctly by
+        running the following command:
+        </p><pre class="screen">&gt; arm-none-eabi-g++ -v</pre><p>
+        Verify that the last line of the output contains:
+        <code class="literal">Sourcery G++ Lite 2011.03-42</code>.
+      </p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="sec-updating.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="chap-installation.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="sec-uninstalling.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">2.5. Installing Sourcery G++ Lite Updates </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 2.7. Uninstalling Sourcery G++ Lite</td></tr></table></div></body></html>

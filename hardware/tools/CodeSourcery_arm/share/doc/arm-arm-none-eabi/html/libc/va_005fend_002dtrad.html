@@ -1,0 +1,53 @@
+<html lang="en">
+<head>
+<title>va_end-trad - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Varargs.html#Varargs" title="Varargs">
+<link rel="prev" href="va_005farg_002dtrad.html#va_005farg_002dtrad" title="va_arg-trad">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="va_end-trad"></a>
+<a name="va_005fend_002dtrad"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="va_005farg_002dtrad.html#va_005farg_002dtrad">va_arg-trad</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Varargs.html#Varargs">Varargs</a>
+<hr>
+</div>
+
+<h4 class="subsection">13.2.4 Abandon a variable argument list</h4>
+
+<p><a name="index-va_005fend-502"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;varargs.h&gt;
+     va_end(va_list <var>ap</var>);
+</pre>
+   <p><strong>Description</strong><br>
+Use <code>va_end</code> to declare that your program will not use the variable
+argument list <var>ap</var> any further.
+
+   <p><strong>Returns</strong><br>
+<code>va_end</code> does not return a result.
+
+   <p><strong>Portability</strong><br>
+The <code>va_end</code> defined in <samp><span class="file">varargs.h</span></samp> has the same syntax and
+usage as the ANSI C version from <samp><span class="file">stdarg.h</span></samp>.
+
+   </body></html>
+

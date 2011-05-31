@@ -1,0 +1,83 @@
+<html lang="en">
+<head>
+<title>Incompatibilities - GNU gprof</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GNU gprof">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="How-do-I_003f.html#How-do-I_003f" title="How do I?">
+<link rel="next" href="Details.html#Details" title="Details">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the gprof profiler of the GNU system.
+
+Copyright (C) 1988, 1992, 1997, 1998, 1999, 2000, 2001, 2003,
+2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Incompatibilities"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Details.html#Details">Details</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="How-do-I_003f.html#How-do-I_003f">How do I?</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">8 Incompatibilities with Unix <code>gprof</code></h2>
+
+<p><span class="sc">gnu</span> <code>gprof</code> and Berkeley Unix <code>gprof</code> use the same data
+file <samp><span class="file">gmon.out</span></samp>, and provide essentially the same information.  But
+there are a few differences.
+
+     <ul>
+<li><span class="sc">gnu</span> <code>gprof</code> uses a new, generalized file format with support
+for basic-block execution counts and non-realtime histograms.  A magic
+cookie and version number allows <code>gprof</code> to easily identify
+new style files.  Old BSD-style files can still be read. 
+See <a href="File-Format.html#File-Format">Profiling Data File Format</a>.
+
+     <li>For a recursive function, Unix <code>gprof</code> lists the function as a
+parent and as a child, with a <code>calls</code> field that lists the number
+of recursive calls.  <span class="sc">gnu</span> <code>gprof</code> omits these lines and puts
+the number of recursive calls in the primary line.
+
+     <li>When a function is suppressed from the call graph with &lsquo;<samp><span class="samp">-e</span></samp>&rsquo;, <span class="sc">gnu</span>
+<code>gprof</code> still lists it as a subroutine of functions that call it.
+
+     <li><span class="sc">gnu</span> <code>gprof</code> accepts the &lsquo;<samp><span class="samp">-k</span></samp>&rsquo; with its argument
+in the form &lsquo;<samp><span class="samp">from/to</span></samp>&rsquo;, instead of &lsquo;<samp><span class="samp">from to</span></samp>&rsquo;.
+
+     <li>In the annotated source listing,
+if there are multiple basic blocks on the same line,
+<span class="sc">gnu</span> <code>gprof</code> prints all of their counts, separated by commas.
+
+     <li>The blurbs, field widths, and output formats are different.  <span class="sc">gnu</span>
+<code>gprof</code> prints blurbs after the tables, so that you can see the
+tables without skipping the blurbs. 
+</ul>
+
+   </body></html>
+

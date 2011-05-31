@@ -1,0 +1,62 @@
+<html lang="en">
+<head>
+<title>strnlen - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Strings.html#Strings" title="Strings">
+<link rel="prev" href="strncpy.html#strncpy" title="strncpy">
+<link rel="next" href="strpbrk.html#strpbrk" title="strpbrk">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="strnlen"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="strpbrk.html#strpbrk">strpbrk</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="strncpy.html#strncpy">strncpy</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Strings.html#Strings">Strings</a>
+<hr>
+</div>
+
+<h3 class="section">5.32 <code>strnlen</code>&mdash;character string length</h3>
+
+<p><a name="index-strnlen-399"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;string.h&gt;
+     size_t strnlen(const char *<var>str</var>, size_t <var>n</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+The <code>strnlen</code> function works out the length of the string
+starting at <code>*</code><var>str</var> by counting chararacters until it
+reaches a NUL character or the maximum: <var>n</var> number of
+characters have been inspected.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>strnlen</code> returns the character count or <var>n</var>.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>strnlen</code> is a GNU extension.
+
+   <p><code>strnlen</code> requires no supporting OS subroutines.
+
+   <p><br>
+
+   </body></html>
+

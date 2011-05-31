@@ -1,0 +1,106 @@
+<html lang="en">
+<head>
+<title>MeP Pragmas - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Pragmas.html#Pragmas" title="Pragmas">
+<link rel="prev" href="M32C-Pragmas.html#M32C-Pragmas" title="M32C Pragmas">
+<link rel="next" href="RS_002f6000-and-PowerPC-Pragmas.html#RS_002f6000-and-PowerPC-Pragmas" title="RS/6000 and PowerPC Pragmas">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="MeP-Pragmas"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="RS_002f6000-and-PowerPC-Pragmas.html#RS_002f6000-and-PowerPC-Pragmas">RS/6000 and PowerPC Pragmas</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="M32C-Pragmas.html#M32C-Pragmas">M32C Pragmas</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Pragmas.html#Pragmas">Pragmas</a>
+<hr>
+</div>
+
+<h4 class="subsection">6.54.3 MeP Pragmas</h4>
+
+     <dl>
+<dt><code>custom io_volatile (on|off)</code><dd><a name="index-pragma_002c-custom-io_005fvolatile-3123"></a>Overrides the command line option <code>-mio-volatile</code> for the current
+file.  Note that for compatibility with future GCC releases, this
+option should only be used once before any <code>io</code> variables in each
+file.
+
+     <br><dt><code>GCC coprocessor available </code><var>registers</var><dd><a name="index-pragma_002c-coprocessor-available-3124"></a>Specifies which coprocessor registers are available to the register
+allocator.  <var>registers</var> may be a single register, register range
+separated by ellipses, or comma-separated list of those.  Example:
+
+     <pre class="example">          #pragma GCC coprocessor available $c0...$c10, $c28
+</pre>
+     <br><dt><code>GCC coprocessor call_saved </code><var>registers</var><dd><a name="index-pragma_002c-coprocessor-call_005fsaved-3125"></a>Specifies which coprocessor registers are to be saved and restored by
+any function using them.  <var>registers</var> may be a single register,
+register range separated by ellipses, or comma-separated list of
+those.  Example:
+
+     <pre class="example">          #pragma GCC coprocessor call_saved $c4...$c6, $c31
+</pre>
+     <br><dt><code>GCC coprocessor subclass '(A|B|C|D)' = </code><var>registers</var><dd><a name="index-pragma_002c-coprocessor-subclass-3126"></a>Creates and defines a register class.  These register classes can be
+used by inline <code>asm</code> constructs.  <var>registers</var> may be a single
+register, register range separated by ellipses, or comma-separated
+list of those.  Example:
+
+     <pre class="example">          #pragma GCC coprocessor subclass 'B' = $c2, $c4, $c6
+          
+          asm ("cpfoo %0" : "=B" (x));
+</pre>
+     <br><dt><code>GCC disinterrupt </code><var>name</var><code> , </code><var>name</var><code> ...</code><dd><a name="index-pragma_002c-disinterrupt-3127"></a>For the named functions, the compiler adds code to disable interrupts
+for the duration of those functions.  Any functions so named, which
+are not encountered in the source, cause a warning that the pragma was
+not used.  Examples:
+
+     <pre class="example">          #pragma disinterrupt foo
+          #pragma disinterrupt bar, grill
+          int foo () { ... }
+</pre>
+     <br><dt><code>GCC call </code><var>name</var><code> , </code><var>name</var><code> ...</code><dd><a name="index-pragma_002c-call-3128"></a>For the named functions, the compiler always uses a register-indirect
+call model when calling the named functions.  Examples:
+
+     <pre class="example">          extern int foo ();
+          #pragma call foo
+</pre>
+     </dl>
+
+ </body></html>
+

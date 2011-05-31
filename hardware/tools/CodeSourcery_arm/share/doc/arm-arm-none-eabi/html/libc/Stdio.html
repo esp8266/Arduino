@@ -1,0 +1,133 @@
+<html lang="en">
+<head>
+<title>Stdio - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Ctype.html#Ctype" title="Ctype">
+<link rel="next" href="Strings.html#Strings" title="Strings">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Stdio"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Strings.html#Strings">Strings</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Ctype.html#Ctype">Ctype</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="chapter">4 Input and Output (<samp><span class="file">stdio.h</span></samp>)</h2>
+
+<p>This chapter comprises functions to manage files
+or other input/output streams. Among these functions are subroutines
+to generate or scan strings according to specifications from a format string.
+
+   <p>The underlying facilities for input and output depend on the host
+system, but these functions provide a uniform interface.
+
+   <p>The corresponding declarations are in <samp><span class="file">stdio.h</span></samp>.
+
+   <p>The reentrant versions of these functions use macros
+
+<pre class="example">     _stdin_r(<var>reent</var>)
+     _stdout_r(<var>reent</var>)
+     _stderr_r(<var>reent</var>)
+</pre>
+   <p class="noindent">instead of the globals <code>stdin</code>, <code>stdout</code>, and
+<code>stderr</code>.  The argument &lt;[reent]&gt; is a pointer to a reentrancy
+structure.
+
+<ul class="menu">
+<li><a accesskey="1" href="clearerr.html#clearerr">clearerr</a>:     Clear file or stream error indicator
+<li><a accesskey="2" href="diprintf.html#diprintf">diprintf</a>:     Print to a file descriptor (integer only)
+<li><a accesskey="3" href="dprintf.html#dprintf">dprintf</a>:      Print to a file descriptor
+<li><a accesskey="4" href="fclose.html#fclose">fclose</a>:       Close a file
+<li><a accesskey="5" href="fcloseall.html#fcloseall">fcloseall</a>:    Close all files
+<li><a accesskey="6" href="fdopen.html#fdopen">fdopen</a>:       Turn an open file into a stream
+<li><a accesskey="7" href="feof.html#feof">feof</a>:         Test for end of file
+<li><a accesskey="8" href="ferror.html#ferror">ferror</a>:       Test whether read/write error has occurred
+<li><a accesskey="9" href="fflush.html#fflush">fflush</a>:       Flush buffered file output
+<li><a href="fgetc.html#fgetc">fgetc</a>:        Get a character from a file or stream
+<li><a href="fgetpos.html#fgetpos">fgetpos</a>:      Record position in a stream or file
+<li><a href="fgets.html#fgets">fgets</a>:        Get character string from a file or stream
+<li><a href="fgetwc.html#fgetwc">fgetwc</a>:       Get a wide character from a file or stream
+<li><a href="fgetws.html#fgetws">fgetws</a>:       Get a wide character string from a file or stream
+<li><a href="fileno.html#fileno">fileno</a>:       Get file descriptor associated with stream
+<li><a href="fmemopen.html#fmemopen">fmemopen</a>:     Open a stream around a fixed-length buffer
+<li><a href="fopen.html#fopen">fopen</a>:        Open a file
+<li><a href="fopencookie.html#fopencookie">fopencookie</a>:  Open a stream with custom callbacks
+<li><a href="fpurge.html#fpurge">fpurge</a>:       Discard all pending I/O on a stream
+<li><a href="fputc.html#fputc">fputc</a>:        Write a character on a stream or file
+<li><a href="fputs.html#fputs">fputs</a>:        Write a character string in a file or stream
+<li><a href="fputwc.html#fputwc">fputwc</a>:       Write a wide character to a file or stream
+<li><a href="fputws.html#fputws">fputws</a>:       Write a wide character string to a file or stream
+<li><a href="fread.html#fread">fread</a>:        Read array elements from a file
+<li><a href="freopen.html#freopen">freopen</a>:      Open a file using an existing file descriptor
+<li><a href="fseek.html#fseek">fseek</a>:        Set file position
+<li><a href="fsetpos.html#fsetpos">fsetpos</a>:      Restore position of a stream or file
+<li><a href="ftell.html#ftell">ftell</a>:        Return position in a stream or file
+<li><a href="funopen.html#funopen">funopen</a>:      Open a stream with custom callbacks
+<li><a href="fwide.html#fwide">fwide</a>: 	Set and determine the orientation of a FILE stream
+<li><a href="fwrite.html#fwrite">fwrite</a>:       Write array elements from memory to a file or stream
+<li><a href="getc.html#getc">getc</a>:         Get a character from a file or stream (macro)
+<li><a href="getc_005funlocked.html#getc_005funlocked">getc_unlocked</a>: 	Get a character from a file or stream (macro)
+<li><a href="getchar.html#getchar">getchar</a>:      Get a character from standard input (macro)
+<li><a href="getchar_005funlocked.html#getchar_005funlocked">getchar_unlocked</a>: 	Get a character from standard input (macro)
+<li><a href="getdelim.html#getdelim">getdelim</a>:     Get character string from a file or stream
+<li><a href="getline.html#getline">getline</a>:      Get character string from a file or stream
+<li><a href="gets.html#gets">gets</a>:         Get character string from standard input (obsolete)
+<li><a href="getw.html#getw">getw</a>:         Get a word (int) from a file or stream
+<li><a href="getwchar.html#getwchar">getwchar</a>:     Get a wide character from standard input
+<li><a href="mktemp.html#mktemp">mktemp</a>:       Generate unused file name
+<li><a href="open_005fmemstream.html#open_005fmemstream">open_memstream</a>: 	Open a write stream around an arbitrary-length buffer
+<li><a href="perror.html#perror">perror</a>:       Print an error message on standard error
+<li><a href="putc.html#putc">putc</a>:         Write a character on a stream or file (macro)
+<li><a href="putc_005funlocked.html#putc_005funlocked">putc_unlocked</a>: 	Write a character on a stream or file (macro)
+<li><a href="putchar.html#putchar">putchar</a>:      Write a character on standard output (macro)
+<li><a href="putchar_005funlocked.html#putchar_005funlocked">putchar_unlocked</a>: 	Write a character on standard output (macro)
+<li><a href="puts.html#puts">puts</a>:         Write a character string on standard output
+<li><a href="putw.html#putw">putw</a>:         Write a word (int) to a file or stream
+<li><a href="putwchar.html#putwchar">putwchar</a>:     Write a wide character to standard output
+<li><a href="remove.html#remove">remove</a>:       Delete a file's name
+<li><a href="rename.html#rename">rename</a>:       Rename a file
+<li><a href="rewind.html#rewind">rewind</a>:       Reinitialize a file or stream
+<li><a href="setbuf.html#setbuf">setbuf</a>:       Specify full buffering for a file or stream
+<li><a href="setbuffer.html#setbuffer">setbuffer</a>:    Specify full buffering for a file or stream with size
+<li><a href="setlinebuf.html#setlinebuf">setlinebuf</a>:   Specify line buffering for a file or stream
+<li><a href="setvbuf.html#setvbuf">setvbuf</a>:      Specify buffering for a file or stream
+<li><a href="siprintf.html#siprintf">siprintf</a>:     Write formatted output (integer only)
+<li><a href="siscanf.html#siscanf">siscanf</a>:      Scan and format input (integer only)
+<li><a href="sprintf.html#sprintf">sprintf</a>:      Write formatted output
+<li><a href="sscanf.html#sscanf">sscanf</a>:       Scan and format input
+<li><a href="swprintf.html#swprintf">swprintf</a>:     Write formatted wide character output
+<li><a href="swscanf.html#swscanf">swscanf</a>:      Scan and format wide character input
+<li><a href="tmpfile.html#tmpfile">tmpfile</a>:      Create a temporary file
+<li><a href="tmpnam.html#tmpnam">tmpnam</a>:       Generate name for a temporary file
+<li><a href="ungetc.html#ungetc">ungetc</a>:       Push data back into a stream
+<li><a href="ungetwc.html#ungetwc">ungetwc</a>:      Push wide character data back into a stream
+<li><a href="vfprintf.html#vfprintf">vfprintf</a>:     Format variable argument list
+<li><a href="vfscanf.html#vfscanf">vfscanf</a>:      Scan variable argument list
+<li><a href="vfwprintf.html#vfwprintf">vfwprintf</a>:    Format variable wide character argument list
+<li><a href="vfwscanf.html#vfwscanf">vfwscanf</a>:     Scan and format argument list from wide character input
+<li><a href="viprintf.html#viprintf">viprintf</a>:     Format variable argument list (integer only)
+<li><a href="viscanf.html#viscanf">viscanf</a>:      Scan variable format list (integer only)
+</ul>
+
+   </body></html>
+

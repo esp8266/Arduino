@@ -1,0 +1,210 @@
+<html lang="en">
+<head>
+<title>Bug Reporting - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="GDB-Bugs.html#GDB-Bugs" title="GDB Bugs">
+<link rel="prev" href="Bug-Criteria.html#Bug-Criteria" title="Bug Criteria">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Bug-Reporting"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Bug-Criteria.html#Bug-Criteria">Bug Criteria</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="GDB-Bugs.html#GDB-Bugs">GDB Bugs</a>
+<hr>
+</div>
+
+<h3 class="section">30.2 How to Report Bugs</h3>
+
+<p><a name="index-bug-reports-2182"></a><a name="index-g_t_0040value_007bGDBN_007d-bugs_002c-reporting-2183"></a>
+A number of companies and individuals offer support for <span class="sc">gnu</span> products. 
+If you obtained <span class="sc">gdb</span> from a support organization, we recommend you
+contact that organization first.
+
+   <p>You can find contact information for many support companies and
+individuals in the file <samp><span class="file">etc/SERVICE</span></samp> in the <span class="sc">gnu</span> Emacs
+distribution. 
+<!-- should add a web page ref... -->
+
+   <p>In any event, we also recommend that you submit bug reports for
+<span class="sc">gdb</span> to <a href="https://support.codesourcery.com/GNUToolchain/">https://support.codesourcery.com/GNUToolchain/</a>.
+
+   <p>The fundamental principle of reporting bugs usefully is this:
+<strong>report all the facts</strong>.  If you are not sure whether to state a
+fact or leave it out, state it!
+
+   <p>Often people omit facts because they think they know what causes the
+problem and assume that some details do not matter.  Thus, you might
+assume that the name of the variable you use in an example does not matter. 
+Well, probably it does not, but one cannot be sure.  Perhaps the bug is a
+stray memory reference which happens to fetch from the location where that
+name is stored in memory; perhaps, if the name were different, the contents
+of that location would fool the debugger into doing the right thing despite
+the bug.  Play it safe and give a specific, complete example.  That is the
+easiest thing for you to do, and the most helpful.
+
+   <p>Keep in mind that the purpose of a bug report is to enable us to fix the
+bug.  It may be that the bug has been reported previously, but neither
+you nor we can know that unless your bug report is complete and
+self-contained.
+
+   <p>Sometimes people give a few sketchy facts and ask, &ldquo;Does this ring a
+bell?&rdquo;  Those bug reports are useless, and we urge everyone to
+<em>refuse to respond to them</em> except to chide the sender to report
+bugs properly.
+
+   <p>To enable us to fix the bug, you should include all these things:
+
+     <ul>
+<li>The version of <span class="sc">gdb</span>.  <span class="sc">gdb</span> announces it if you start
+with no arguments; you can also print it at any time using <code>show
+version</code>.
+
+     <p>Without this, we will not know whether there is any point in looking for
+the bug in the current version of <span class="sc">gdb</span>.
+
+     <li>The type of machine you are using, and the operating system name and
+version number.
+
+     <li>What compiler (and its version) was used to compile <span class="sc">gdb</span>&mdash;e.g. 
+&ldquo;gcc&ndash;2.8.1&rdquo;.
+
+     <li>What compiler (and its version) was used to compile the program you are
+debugging&mdash;e.g.  &ldquo;gcc&ndash;2.8.1&rdquo;, or &ldquo;HP92453-01 A.10.32.03 HP
+C Compiler&rdquo;.  For <span class="sc">gcc</span>, you can say <kbd>gcc --version</kbd>
+to get this information; for other compilers, see the documentation for
+those compilers.
+
+     <li>The command arguments you gave the compiler to compile your example and
+observe the bug.  For example, did you use &lsquo;<samp><span class="samp">-O</span></samp>&rsquo;?  To guarantee
+you will not omit something important, list them all.  A copy of the
+Makefile (or the output from make) is sufficient.
+
+     <p>If we were to try to guess the arguments, we would probably guess wrong
+and then we might not encounter the bug.
+
+     <li>A complete input script, and all necessary source files, that will
+reproduce the bug.
+
+     <li>A description of what behavior you observe that you believe is
+incorrect.  For example, &ldquo;It gets a fatal signal.&rdquo;
+
+     <p>Of course, if the bug is that <span class="sc">gdb</span> gets a fatal signal, then we
+will certainly notice it.  But if the bug is incorrect output, we might
+not notice unless it is glaringly wrong.  You might as well not give us
+a chance to make a mistake.
+
+     <p>Even if the problem you experience is a fatal signal, you should still
+say so explicitly.  Suppose something strange is going on, such as, your
+copy of <span class="sc">gdb</span> is out of synch, or you have encountered a bug in
+the C library on your system.  (This has happened!)  Your copy might
+crash and ours would not.  If you told us to expect a crash, then when
+ours fails to crash, we would know that the bug was not happening for
+us.  If you had not told us to expect a crash, then we would not be able
+to draw any conclusion from our observations.
+
+     <p><a name="index-script-2184"></a><a name="index-recording-a-session-script-2185"></a>To collect all this information, you can use a session recording program
+such as <samp><span class="command">script</span></samp>, which is available on many Unix systems. 
+Just run your <span class="sc">gdb</span> session inside <samp><span class="command">script</span></samp> and then
+include the <samp><span class="file">typescript</span></samp> file with your bug report.
+
+     <p>Another way to record a <span class="sc">gdb</span> session is to run <span class="sc">gdb</span>
+inside Emacs and then save the entire buffer to a file.
+
+     <li>If you wish to suggest changes to the <span class="sc">gdb</span> source, send us context
+diffs.  If you even discuss something in the <span class="sc">gdb</span> source, refer to
+it by context, not by line number.
+
+     <p>The line numbers in our development sources will not match those in your
+sources.  Your line numbers would convey no useful information to us.
+
+   </ul>
+
+   <p>Here are some things that are not necessary:
+
+     <ul>
+<li>A description of the envelope of the bug.
+
+     <p>Often people who encounter a bug spend a lot of time investigating
+which changes to the input file will make the bug go away and which
+changes will not affect it.
+
+     <p>This is often time consuming and not very useful, because the way we
+will find the bug is by running a single example under the debugger
+with breakpoints, not by pure deduction from a series of examples. 
+We recommend that you save your time for something else.
+
+     <p>Of course, if you can find a simpler example to report <em>instead</em>
+of the original one, that is a convenience for us.  Errors in the
+output will be easier to spot, running under the debugger will take
+less time, and so on.
+
+     <p>However, simplification is not vital; if you do not want to do this,
+report the bug anyway and send us the entire test case you used.
+
+     <li>A patch for the bug.
+
+     <p>A patch for the bug does help us if it is a good one.  But do not omit
+the necessary information, such as the test case, on the assumption that
+a patch is all we need.  We might see problems with your patch and decide
+to fix the problem another way, or we might not understand it at all.
+
+     <p>Sometimes with a program as complicated as <span class="sc">gdb</span> it is very hard to
+construct an example that will make the program follow a certain path
+through the code.  If you do not send us the example, we will not be able
+to construct one, so we will not be able to verify that the bug is fixed.
+
+     <p>And if we cannot understand what bug you are trying to fix, or why your
+patch should be an improvement, we will not install it.  A test case will
+help us to understand.
+
+     <li>A guess about what the bug is or what it depends on.
+
+     <p>Such guesses are usually wrong.  Even we cannot guess right about such
+things without first using the debugger to find the facts. 
+</ul>
+
+<!-- The readline documentation is distributed with the readline code -->
+<!-- and consists of the two following files: -->
+<!-- rluser.texinfo -->
+<!-- inc-hist.texinfo -->
+<!-- Use -I with makeinfo to point to the appropriate directory, -->
+<!-- environment var TEXINPUTS with TeX. -->
+<!-- %**start of header (This is for running Texinfo on a region.) -->
+<!-- %**end of header (This is for running Texinfo on a region.) -->
+<!-- If you are including this manual as an appendix, then set the -->
+<!-- variable readline-appendix. -->
+   </body></html>
+

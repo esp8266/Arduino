@@ -1,0 +1,67 @@
+<html lang="en">
+<head>
+<title>log - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Math.html#Math" title="Math">
+<link rel="prev" href="ldexp.html#ldexp" title="ldexp">
+<link rel="next" href="log10.html#log10" title="log10">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="log"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="log10.html#log10">log10</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="ldexp.html#ldexp">ldexp</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Math.html#Math">Math</a>
+<hr>
+</div>
+
+<h3 class="section">1.33 <code>log</code>, <code>logf</code>&mdash;natural logarithms</h3>
+
+<p><a name="index-log-98"></a><a name="index-logf-99"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double log(double <var>x</var>);
+     float logf(float <var>x</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+Return the natural logarithm of <var>x</var>, that is, its logarithm base e
+(where e is the base of the natural system of logarithms, 2.71828<small class="dots">...</small>). 
+<code>log</code> and <code>logf</code> are identical save for the return and argument types.
+
+   <p>You can use the (non-ANSI) function <code>matherr</code> to specify error
+handling for these functions.
+
+   <p><br>
+<strong>Returns</strong><br>
+Normally, returns the calculated value.  When <var>x</var> is zero, the
+returned value is <code>-HUGE_VAL</code> and <code>errno</code> is set to <code>ERANGE</code>. 
+When <var>x</var> is negative, the returned value is NaN (not a number) and
+<code>errno</code> is set to <code>EDOM</code>.  You can control the error behavior via
+<code>matherr</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>log</code> is ANSI. <code>logf</code> is an extension.
+
+   <p><br>
+
+   </body></html>
+

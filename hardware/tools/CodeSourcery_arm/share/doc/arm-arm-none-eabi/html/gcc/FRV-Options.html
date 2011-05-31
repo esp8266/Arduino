@@ -1,0 +1,276 @@
+<html lang="en">
+<head>
+<title>FRV Options - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Submodel-Options.html#Submodel-Options" title="Submodel Options">
+<link rel="prev" href="FR30-Options.html#FR30-Options" title="FR30 Options">
+<link rel="next" href="GNU_002fLinux-Options.html#GNU_002fLinux-Options" title="GNU/Linux Options">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="FRV-Options"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="GNU_002fLinux-Options.html#GNU_002fLinux-Options">GNU/Linux Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="FR30-Options.html#FR30-Options">FR30 Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Submodel-Options.html#Submodel-Options">Submodel Options</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.17.11 FRV Options</h4>
+
+<p><a name="index-FRV-Options-1214"></a>
+     <dl>
+<dt><code>-mgpr-32</code><dd><a name="index-mgpr_002d32-1215"></a>
+Only use the first 32 general purpose registers.
+
+     <br><dt><code>-mgpr-64</code><dd><a name="index-mgpr_002d64-1216"></a>
+Use all 64 general purpose registers.
+
+     <br><dt><code>-mfpr-32</code><dd><a name="index-mfpr_002d32-1217"></a>
+Use only the first 32 floating point registers.
+
+     <br><dt><code>-mfpr-64</code><dd><a name="index-mfpr_002d64-1218"></a>
+Use all 64 floating point registers
+
+     <br><dt><code>-mhard-float</code><dd><a name="index-mhard_002dfloat-1219"></a>
+Use hardware instructions for floating point operations.
+
+     <br><dt><code>-msoft-float</code><dd><a name="index-msoft_002dfloat-1220"></a>
+Use library routines for floating point operations.
+
+     <br><dt><code>-malloc-cc</code><dd><a name="index-malloc_002dcc-1221"></a>
+Dynamically allocate condition code registers.
+
+     <br><dt><code>-mfixed-cc</code><dd><a name="index-mfixed_002dcc-1222"></a>
+Do not try to dynamically allocate condition code registers, only
+use <code>icc0</code> and <code>fcc0</code>.
+
+     <br><dt><code>-mdword</code><dd><a name="index-mdword-1223"></a>
+Change ABI to use double word insns.
+
+     <br><dt><code>-mno-dword</code><dd><a name="index-mno_002ddword-1224"></a>
+Do not use double word instructions.
+
+     <br><dt><code>-mdouble</code><dd><a name="index-mdouble-1225"></a>
+Use floating point double instructions.
+
+     <br><dt><code>-mno-double</code><dd><a name="index-mno_002ddouble-1226"></a>
+Do not use floating point double instructions.
+
+     <br><dt><code>-mmedia</code><dd><a name="index-mmedia-1227"></a>
+Use media instructions.
+
+     <br><dt><code>-mno-media</code><dd><a name="index-mno_002dmedia-1228"></a>
+Do not use media instructions.
+
+     <br><dt><code>-mmuladd</code><dd><a name="index-mmuladd-1229"></a>
+Use multiply and add/subtract instructions.
+
+     <br><dt><code>-mno-muladd</code><dd><a name="index-mno_002dmuladd-1230"></a>
+Do not use multiply and add/subtract instructions.
+
+     <br><dt><code>-mfdpic</code><dd><a name="index-mfdpic-1231"></a>
+Select the FDPIC ABI, that uses function descriptors to represent
+pointers to functions.  Without any PIC/PIE-related options, it
+implies <samp><span class="option">-fPIE</span></samp>.  With <samp><span class="option">-fpic</span></samp> or <samp><span class="option">-fpie</span></samp>, it
+assumes GOT entries and small data are within a 12-bit range from the
+GOT base address; with <samp><span class="option">-fPIC</span></samp> or <samp><span class="option">-fPIE</span></samp>, GOT offsets
+are computed with 32 bits. 
+With a &lsquo;<samp><span class="samp">bfin-elf</span></samp>&rsquo; target, this option implies <samp><span class="option">-msim</span></samp>.
+
+     <br><dt><code>-minline-plt</code><dd><a name="index-minline_002dplt-1232"></a>
+Enable inlining of PLT entries in function calls to functions that are
+not known to bind locally.  It has no effect without <samp><span class="option">-mfdpic</span></samp>. 
+It's enabled by default if optimizing for speed and compiling for
+shared libraries (i.e., <samp><span class="option">-fPIC</span></samp> or <samp><span class="option">-fpic</span></samp>), or when an
+optimization option such as <samp><span class="option">-O3</span></samp> or above is present in the
+command line.
+
+     <br><dt><code>-mTLS</code><dd><a name="index-mTLS-1233"></a>
+Assume a large TLS segment when generating thread-local code.
+
+     <br><dt><code>-mtls</code><dd><a name="index-mtls-1234"></a>
+Do not assume a large TLS segment when generating thread-local code.
+
+     <br><dt><code>-mgprel-ro</code><dd><a name="index-mgprel_002dro-1235"></a>
+Enable the use of <code>GPREL</code> relocations in the FDPIC ABI for data
+that is known to be in read-only sections.  It's enabled by default,
+except for <samp><span class="option">-fpic</span></samp> or <samp><span class="option">-fpie</span></samp>: even though it may help
+make the global offset table smaller, it trades 1 instruction for 4. 
+With <samp><span class="option">-fPIC</span></samp> or <samp><span class="option">-fPIE</span></samp>, it trades 3 instructions for 4,
+one of which may be shared by multiple symbols, and it avoids the need
+for a GOT entry for the referenced symbol, so it's more likely to be a
+win.  If it is not, <samp><span class="option">-mno-gprel-ro</span></samp> can be used to disable it.
+
+     <br><dt><code>-multilib-library-pic</code><dd><a name="index-multilib_002dlibrary_002dpic-1236"></a>
+Link with the (library, not FD) pic libraries.  It's implied by
+<samp><span class="option">-mlibrary-pic</span></samp>, as well as by <samp><span class="option">-fPIC</span></samp> and
+<samp><span class="option">-fpic</span></samp> without <samp><span class="option">-mfdpic</span></samp>.  You should never have to use
+it explicitly.
+
+     <br><dt><code>-mlinked-fp</code><dd><a name="index-mlinked_002dfp-1237"></a>
+Follow the EABI requirement of always creating a frame pointer whenever
+a stack frame is allocated.  This option is enabled by default and can
+be disabled with <samp><span class="option">-mno-linked-fp</span></samp>.
+
+     <br><dt><code>-mlong-calls</code><dd><a name="index-mlong_002dcalls-1238"></a>
+Use indirect addressing to call functions outside the current
+compilation unit.  This allows the functions to be placed anywhere
+within the 32-bit address space.
+
+     <br><dt><code>-malign-labels</code><dd><a name="index-malign_002dlabels-1239"></a>
+Try to align labels to an 8-byte boundary by inserting nops into the
+previous packet.  This option only has an effect when VLIW packing
+is enabled.  It doesn't create new packets; it merely adds nops to
+existing ones.
+
+     <br><dt><code>-mlibrary-pic</code><dd><a name="index-mlibrary_002dpic-1240"></a>
+Generate position-independent EABI code.
+
+     <br><dt><code>-macc-4</code><dd><a name="index-macc_002d4-1241"></a>
+Use only the first four media accumulator registers.
+
+     <br><dt><code>-macc-8</code><dd><a name="index-macc_002d8-1242"></a>
+Use all eight media accumulator registers.
+
+     <br><dt><code>-mpack</code><dd><a name="index-mpack-1243"></a>
+Pack VLIW instructions.
+
+     <br><dt><code>-mno-pack</code><dd><a name="index-mno_002dpack-1244"></a>
+Do not pack VLIW instructions.
+
+     <br><dt><code>-mno-eflags</code><dd><a name="index-mno_002deflags-1245"></a>
+Do not mark ABI switches in e_flags.
+
+     <br><dt><code>-mcond-move</code><dd><a name="index-mcond_002dmove-1246"></a>
+Enable the use of conditional-move instructions (default).
+
+     <p>This switch is mainly for debugging the compiler and will likely be removed
+in a future version.
+
+     <br><dt><code>-mno-cond-move</code><dd><a name="index-mno_002dcond_002dmove-1247"></a>
+Disable the use of conditional-move instructions.
+
+     <p>This switch is mainly for debugging the compiler and will likely be removed
+in a future version.
+
+     <br><dt><code>-mscc</code><dd><a name="index-mscc-1248"></a>
+Enable the use of conditional set instructions (default).
+
+     <p>This switch is mainly for debugging the compiler and will likely be removed
+in a future version.
+
+     <br><dt><code>-mno-scc</code><dd><a name="index-mno_002dscc-1249"></a>
+Disable the use of conditional set instructions.
+
+     <p>This switch is mainly for debugging the compiler and will likely be removed
+in a future version.
+
+     <br><dt><code>-mcond-exec</code><dd><a name="index-mcond_002dexec-1250"></a>
+Enable the use of conditional execution (default).
+
+     <p>This switch is mainly for debugging the compiler and will likely be removed
+in a future version.
+
+     <br><dt><code>-mno-cond-exec</code><dd><a name="index-mno_002dcond_002dexec-1251"></a>
+Disable the use of conditional execution.
+
+     <p>This switch is mainly for debugging the compiler and will likely be removed
+in a future version.
+
+     <br><dt><code>-mvliw-branch</code><dd><a name="index-mvliw_002dbranch-1252"></a>
+Run a pass to pack branches into VLIW instructions (default).
+
+     <p>This switch is mainly for debugging the compiler and will likely be removed
+in a future version.
+
+     <br><dt><code>-mno-vliw-branch</code><dd><a name="index-mno_002dvliw_002dbranch-1253"></a>
+Do not run a pass to pack branches into VLIW instructions.
+
+     <p>This switch is mainly for debugging the compiler and will likely be removed
+in a future version.
+
+     <br><dt><code>-mmulti-cond-exec</code><dd><a name="index-mmulti_002dcond_002dexec-1254"></a>
+Enable optimization of <code>&amp;&amp;</code> and <code>||</code> in conditional execution
+(default).
+
+     <p>This switch is mainly for debugging the compiler and will likely be removed
+in a future version.
+
+     <br><dt><code>-mno-multi-cond-exec</code><dd><a name="index-mno_002dmulti_002dcond_002dexec-1255"></a>
+Disable optimization of <code>&amp;&amp;</code> and <code>||</code> in conditional execution.
+
+     <p>This switch is mainly for debugging the compiler and will likely be removed
+in a future version.
+
+     <br><dt><code>-mnested-cond-exec</code><dd><a name="index-mnested_002dcond_002dexec-1256"></a>
+Enable nested conditional execution optimizations (default).
+
+     <p>This switch is mainly for debugging the compiler and will likely be removed
+in a future version.
+
+     <br><dt><code>-mno-nested-cond-exec</code><dd><a name="index-mno_002dnested_002dcond_002dexec-1257"></a>
+Disable nested conditional execution optimizations.
+
+     <p>This switch is mainly for debugging the compiler and will likely be removed
+in a future version.
+
+     <br><dt><code>-moptimize-membar</code><dd><a name="index-moptimize_002dmembar-1258"></a>
+This switch removes redundant <code>membar</code> instructions from the
+compiler generated code.  It is enabled by default.
+
+     <br><dt><code>-mno-optimize-membar</code><dd><a name="index-mno_002doptimize_002dmembar-1259"></a>
+This switch disables the automatic removal of redundant <code>membar</code>
+instructions from the generated code.
+
+     <br><dt><code>-mtomcat-stats</code><dd><a name="index-mtomcat_002dstats-1260"></a>
+Cause gas to print out tomcat statistics.
+
+     <br><dt><code>-mcpu=</code><var>cpu</var><dd><a name="index-mcpu-1261"></a>
+Select the processor type for which to generate code.  Possible values are
+&lsquo;<samp><span class="samp">frv</span></samp>&rsquo;, &lsquo;<samp><span class="samp">fr550</span></samp>&rsquo;, &lsquo;<samp><span class="samp">tomcat</span></samp>&rsquo;, &lsquo;<samp><span class="samp">fr500</span></samp>&rsquo;, &lsquo;<samp><span class="samp">fr450</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">fr405</span></samp>&rsquo;, &lsquo;<samp><span class="samp">fr400</span></samp>&rsquo;, &lsquo;<samp><span class="samp">fr300</span></samp>&rsquo; and &lsquo;<samp><span class="samp">simple</span></samp>&rsquo;.
+
+ </dl>
+
+ </body></html>
+

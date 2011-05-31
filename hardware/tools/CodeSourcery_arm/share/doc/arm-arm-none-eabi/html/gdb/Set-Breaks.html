@@ -1,0 +1,373 @@
+<html lang="en">
+<head>
+<title>Set Breaks - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Breakpoints.html#Breakpoints" title="Breakpoints">
+<link rel="next" href="Set-Watchpoints.html#Set-Watchpoints" title="Set Watchpoints">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Set-Breaks"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Set-Watchpoints.html#Set-Watchpoints">Set Watchpoints</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Breakpoints.html#Breakpoints">Breakpoints</a>
+<hr>
+</div>
+
+<h4 class="subsection">5.1.1 Setting Breakpoints</h4>
+
+<!-- FIXME LMB what does GDB do if no code on line of breakpt? -->
+<!-- consider in particular declaration with/without initialization. -->
+<!-- FIXME 2 is there stuff on this already? break at fun start, already init? -->
+<p><a name="index-break-211"></a><a name="index-b-_0040r_007b_0028_0040code_007bbreak_007d_0029_007d-212"></a><a name="index-g_t_0024bpnum_0040r_007b_002c-convenience-variable_007d-213"></a><a name="index-latest-breakpoint-214"></a>Breakpoints are set with the <code>break</code> command (abbreviated
+<code>b</code>).  The debugger convenience variable &lsquo;<samp><span class="samp">$bpnum</span></samp>&rsquo; records the
+number of the breakpoint you've set most recently; see <a href="Convenience-Vars.html#Convenience-Vars">Convenience Variables</a>, for a discussion of what you can do with
+convenience variables.
+
+     <dl>
+<dt><code>break </code><var>location</var><dd>Set a breakpoint at the given <var>location</var>, which can specify a
+function name, a line number, or an address of an instruction. 
+(See <a href="Specify-Location.html#Specify-Location">Specify Location</a>, for a list of all the possible ways to
+specify a <var>location</var>.)  The breakpoint will stop your program just
+before it executes any of the code in the specified <var>location</var>.
+
+     <p>When using source languages that permit overloading of symbols, such as
+C<tt>++</tt>, a function name may refer to more than one possible place to break. 
+See <a href="Ambiguous-Expressions.html#Ambiguous-Expressions">Ambiguous Expressions</a>, for a discussion of
+that situation.
+
+     <p>It is also possible to insert a breakpoint that will stop the program
+only if a specific thread (see <a href="Thread_002dSpecific-Breakpoints.html#Thread_002dSpecific-Breakpoints">Thread-Specific Breakpoints</a>)
+or a specific task (see <a href="Ada-Tasks.html#Ada-Tasks">Ada Tasks</a>) hits that breakpoint.
+
+     <br><dt><code>break</code><dd>When called without any arguments, <code>break</code> sets a breakpoint at
+the next instruction to be executed in the selected stack frame
+(see <a href="Stack.html#Stack">Examining the Stack</a>).  In any selected frame but the
+innermost, this makes your program stop as soon as control
+returns to that frame.  This is similar to the effect of a
+<code>finish</code> command in the frame inside the selected frame&mdash;except
+that <code>finish</code> does not leave an active breakpoint.  If you use
+<code>break</code> without an argument in the innermost frame, <span class="sc">gdb</span> stops
+the next time it reaches the current location; this may be useful
+inside loops.
+
+     <p><span class="sc">gdb</span> normally ignores breakpoints when it resumes execution, until at
+least one instruction has been executed.  If it did not do this, you
+would be unable to proceed past a breakpoint without first disabling the
+breakpoint.  This rule applies whether or not the breakpoint already
+existed when your program stopped.
+
+     <br><dt><code>break ... if </code><var>cond</var><dd>Set a breakpoint with condition <var>cond</var>; evaluate the expression
+<var>cond</var> each time the breakpoint is reached, and stop only if the
+value is nonzero&mdash;that is, if <var>cond</var> evaluates as true. 
+&lsquo;<samp><span class="samp">...</span></samp>&rsquo; stands for one of the possible arguments described
+above (or no argument) specifying where to break.  See <a href="Conditions.html#Conditions">Break Conditions</a>, for more information on breakpoint conditions.
+
+     <p><a name="index-tbreak-215"></a><br><dt><code>tbreak </code><var>args</var><dd>Set a breakpoint enabled only for one stop.  <var>args</var> are the
+same as for the <code>break</code> command, and the breakpoint is set in the same
+way, but the breakpoint is automatically deleted after the first time your
+program stops there.  See <a href="Disabling.html#Disabling">Disabling Breakpoints</a>.
+
+     <p><a name="index-hbreak-216"></a><a name="index-hardware-breakpoints-217"></a><br><dt><code>hbreak </code><var>args</var><dd>Set a hardware-assisted breakpoint.  <var>args</var> are the same as for the
+<code>break</code> command and the breakpoint is set in the same way, but the
+breakpoint requires hardware support and some target hardware may not
+have this support.  The main purpose of this is EPROM/ROM code
+debugging, so you can set a breakpoint at an instruction without
+changing the instruction.  This can be used with the new trap-generation
+provided by SPARClite DSU and most x86-based targets.  These targets
+will generate traps when a program accesses some data or instruction
+address that is assigned to the debug registers.  However the hardware
+breakpoint registers can take a limited number of breakpoints.  For
+example, on the DSU, only two data breakpoints can be set at a time, and
+<span class="sc">gdb</span> will reject this command if more than two are used.  Delete
+or disable unused hardware breakpoints before setting new ones
+(see <a href="Disabling.html#Disabling">Disabling Breakpoints</a>). 
+See <a href="Conditions.html#Conditions">Break Conditions</a>. 
+For remote targets, you can restrict the number of hardware
+breakpoints <span class="sc">gdb</span> will use, see <a href="set-remote-hardware_002dbreakpoint_002dlimit.html#set-remote-hardware_002dbreakpoint_002dlimit">set remote hardware-breakpoint-limit</a>.
+
+     <p><a name="index-thbreak-218"></a><br><dt><code>thbreak </code><var>args</var><dd>Set a hardware-assisted breakpoint enabled only for one stop.  <var>args</var>
+are the same as for the <code>hbreak</code> command and the breakpoint is set in
+the same way.  However, like the <code>tbreak</code> command,
+the breakpoint is automatically deleted after the
+first time your program stops there.  Also, like the <code>hbreak</code>
+command, the breakpoint requires hardware support and some target hardware
+may not have this support.  See <a href="Disabling.html#Disabling">Disabling Breakpoints</a>. 
+See also <a href="Conditions.html#Conditions">Break Conditions</a>.
+
+     <p><a name="index-rbreak-219"></a><a name="index-regular-expression-220"></a><a name="index-breakpoints-at-functions-matching-a-regexp-221"></a><a name="index-set-breakpoints-in-many-functions-222"></a><br><dt><code>rbreak </code><var>regex</var><dd>Set breakpoints on all functions matching the regular expression
+<var>regex</var>.  This command sets an unconditional breakpoint on all
+matches, printing a list of all breakpoints it set.  Once these
+breakpoints are set, they are treated just like the breakpoints set with
+the <code>break</code> command.  You can delete them, disable them, or make
+them conditional the same way as any other breakpoint.
+
+     <p>The syntax of the regular expression is the standard one used with tools
+like <samp><span class="file">grep</span></samp>.  Note that this is different from the syntax used by
+shells, so for instance <code>foo*</code> matches all functions that include
+an <code>fo</code> followed by zero or more <code>o</code>s.  There is an implicit
+<code>.*</code> leading and trailing the regular expression you supply, so to
+match only functions that begin with <code>foo</code>, use <code>^foo</code>.
+
+     <p><a name="index-non_002dmember-C_0040t_007b_002b_002b_007d-functions_002c-set-breakpoint-in-223"></a>When debugging C<tt>++</tt> programs, <code>rbreak</code> is useful for setting
+breakpoints on overloaded functions that are not members of any special
+classes.
+
+     <p><a name="index-set-breakpoints-on-all-functions-224"></a>The <code>rbreak</code> command can be used to set breakpoints in
+<strong>all</strong> the functions in a program, like this:
+
+     <pre class="smallexample">          (gdb) rbreak .
+</pre>
+     <br><dt><code>rbreak </code><var>file</var><code>:</code><var>regex</var><dd>If <code>rbreak</code> is called with a filename qualification, it limits
+the search for functions matching the given regular expression to the
+specified <var>file</var>.  This can be used, for example, to set breakpoints on
+every function in a given file:
+
+     <pre class="smallexample">          (gdb) rbreak file.c:.
+</pre>
+     <p>The colon separating the filename qualifier from the regex may
+optionally be surrounded by spaces.
+
+     <p><a name="index-info-breakpoints-225"></a><a name="index-g_t_0040code_007b_0024_005f_007d-and-_0040code_007binfo-breakpoints_007d-226"></a><br><dt><code>info breakpoints </code><span class="roman">[</span><var>n</var><span class="roman">]</span><dt><code>info break </code><span class="roman">[</span><var>n</var><span class="roman">]</span><dd>Print a table of all breakpoints, watchpoints, and catchpoints set and
+not deleted.  Optional argument <var>n</var> means print information only
+about the specified breakpoint (or watchpoint or catchpoint).  For
+each breakpoint, following columns are printed:
+
+          <dl>
+<dt><em>Breakpoint Numbers</em><br><dt><em>Type</em><dd>Breakpoint, watchpoint, or catchpoint. 
+<br><dt><em>Disposition</em><dd>Whether the breakpoint is marked to be disabled or deleted when hit. 
+<br><dt><em>Enabled or Disabled</em><dd>Enabled breakpoints are marked with &lsquo;<samp><span class="samp">y</span></samp>&rsquo;.  &lsquo;<samp><span class="samp">n</span></samp>&rsquo; marks breakpoints
+that are not enabled. 
+<br><dt><em>Address</em><dd>Where the breakpoint is in your program, as a memory address.  For a
+pending breakpoint whose address is not yet known, this field will
+contain &lsquo;<samp><span class="samp">&lt;PENDING&gt;</span></samp>&rsquo;.  Such breakpoint won't fire until a shared
+library that has the symbol or line referred by breakpoint is loaded. 
+See below for details.  A breakpoint with several locations will
+have &lsquo;<samp><span class="samp">&lt;MULTIPLE&gt;</span></samp>&rsquo; in this field&mdash;see below for details. 
+<br><dt><em>What</em><dd>Where the breakpoint is in the source for your program, as a file and
+line number.  For a pending breakpoint, the original string passed to
+the breakpoint command will be listed as it cannot be resolved until
+the appropriate shared library is loaded in the future. 
+</dl>
+
+     <p class="noindent">If a breakpoint is conditional, <code>info break</code> shows the condition on
+the line following the affected breakpoint; breakpoint commands, if any,
+are listed after that.  A pending breakpoint is allowed to have a condition
+specified for it.  The condition is not parsed for validity until a shared
+library is loaded that allows the pending breakpoint to resolve to a
+valid location.
+
+     <p class="noindent"><code>info break</code> with a breakpoint
+number <var>n</var> as argument lists only that breakpoint.  The
+convenience variable <code>$_</code> and the default examining-address for
+the <code>x</code> command are set to the address of the last breakpoint
+listed (see <a href="Memory.html#Memory">Examining Memory</a>).
+
+     <p class="noindent"><code>info break</code> displays a count of the number of times the breakpoint
+has been hit.  This is especially useful in conjunction with the
+<code>ignore</code> command.  You can ignore a large number of breakpoint
+hits, look at the breakpoint info to see how many times the breakpoint
+was hit, and then run again, ignoring one less than that number.  This
+will get you quickly to the last hit of that breakpoint. 
+</dl>
+
+   <p><span class="sc">gdb</span> allows you to set any number of breakpoints at the same place in
+your program.  There is nothing silly or meaningless about this.  When
+the breakpoints are conditional, this is even useful
+(see <a href="Conditions.html#Conditions">Break Conditions</a>).
+
+   <p><a name="index-multiple-locations_002c-breakpoints-227"></a><a name="index-breakpoints_002c-multiple-locations-228"></a>It is possible that a breakpoint corresponds to several locations
+in your program.  Examples of this situation are:
+
+     <ul>
+<li>For a C<tt>++</tt> constructor, the <span class="sc">gcc</span> compiler generates several
+instances of the function body, used in different cases.
+
+     <li>For a C<tt>++</tt> template function, a given line in the function can
+correspond to any number of instantiations.
+
+     <li>For an inlined function, a given source line can correspond to
+several places where that function is inlined. 
+</ul>
+
+   <p>In all those cases, <span class="sc">gdb</span> will insert a breakpoint at all
+the relevant locations<a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a>.
+
+   <p>A breakpoint with multiple locations is displayed in the breakpoint
+table using several rows&mdash;one header row, followed by one row for
+each breakpoint location.  The header row has &lsquo;<samp><span class="samp">&lt;MULTIPLE&gt;</span></samp>&rsquo; in the
+address column.  The rows for individual locations contain the actual
+addresses for locations, and show the functions to which those
+locations belong.  The number column for a location is of the form
+<var>breakpoint-number</var>.<var>location-number</var>.
+
+   <p>For example:
+
+<pre class="smallexample">     Num     Type           Disp Enb  Address    What
+     1       breakpoint     keep y    &lt;MULTIPLE&gt;
+             stop only if i==1
+             breakpoint already hit 1 time
+     1.1                         y    0x080486a2 in void foo&lt;int&gt;() at t.cc:8
+     1.2                         y    0x080486ca in void foo&lt;double&gt;() at t.cc:8
+</pre>
+   <p>Each location can be individually enabled or disabled by passing
+<var>breakpoint-number</var>.<var>location-number</var> as argument to the
+<code>enable</code> and <code>disable</code> commands.  Note that you cannot
+delete the individual locations from the list, you can only delete the
+entire list of locations that belong to their parent breakpoint (with
+the <kbd>delete </kbd><var>num</var> command, where <var>num</var> is the number of
+the parent breakpoint, 1 in the above example).  Disabling or enabling
+the parent breakpoint (see <a href="Disabling.html#Disabling">Disabling</a>) affects all of the locations
+that belong to that breakpoint.
+
+   <p><a name="index-pending-breakpoints-229"></a>It's quite common to have a breakpoint inside a shared library. 
+Shared libraries can be loaded and unloaded explicitly,
+and possibly repeatedly, as the program is executed.  To support
+this use case, <span class="sc">gdb</span> updates breakpoint locations whenever
+any shared library is loaded or unloaded.  Typically, you would
+set a breakpoint in a shared library at the beginning of your
+debugging session, when the library is not loaded, and when the
+symbols from the library are not available.  When you try to set
+breakpoint, <span class="sc">gdb</span> will ask you if you want to set
+a so called <dfn>pending breakpoint</dfn>&mdash;breakpoint whose address
+is not yet resolved.
+
+   <p>After the program is run, whenever a new shared library is loaded,
+<span class="sc">gdb</span> reevaluates all the breakpoints.  When a newly loaded
+shared library contains the symbol or line referred to by some
+pending breakpoint, that breakpoint is resolved and becomes an
+ordinary breakpoint.  When a library is unloaded, all breakpoints
+that refer to its symbols or source lines become pending again.
+
+   <p>This logic works for breakpoints with multiple locations, too.  For
+example, if you have a breakpoint in a C<tt>++</tt> template function, and
+a newly loaded shared library has an instantiation of that template,
+a new location is added to the list of locations for the breakpoint.
+
+   <p>Except for having unresolved address, pending breakpoints do not
+differ from regular breakpoints.  You can set conditions or commands,
+enable and disable them and perform other breakpoint operations.
+
+   <p><span class="sc">gdb</span> provides some additional commands for controlling what
+happens when the &lsquo;<samp><span class="samp">break</span></samp>&rsquo; command cannot resolve breakpoint
+address specification to an address:
+
+   <p><a name="index-set-breakpoint-pending-230"></a><a name="index-show-breakpoint-pending-231"></a>
+     <dl>
+<dt><code>set breakpoint pending auto</code><dd>This is the default behavior.  When <span class="sc">gdb</span> cannot find the breakpoint
+location, it queries you whether a pending breakpoint should be created.
+
+     <br><dt><code>set breakpoint pending on</code><dd>This indicates that an unrecognized breakpoint location should automatically
+result in a pending breakpoint being created.
+
+     <br><dt><code>set breakpoint pending off</code><dd>This indicates that pending breakpoints are not to be created.  Any
+unrecognized breakpoint location results in an error.  This setting does
+not affect any pending breakpoints previously created.
+
+     <br><dt><code>show breakpoint pending</code><dd>Show the current behavior setting for creating pending breakpoints. 
+</dl>
+
+   <p>The settings above only affect the <code>break</code> command and its
+variants.  Once breakpoint is set, it will be automatically updated
+as shared libraries are loaded and unloaded.
+
+   <p><a name="index-automatic-hardware-breakpoints-232"></a>For some targets, <span class="sc">gdb</span> can automatically decide if hardware or
+software breakpoints should be used, depending on whether the
+breakpoint address is read-only or read-write.  This applies to
+breakpoints set with the <code>break</code> command as well as to internal
+breakpoints set by commands like <code>next</code> and <code>finish</code>.  For
+breakpoints set with <code>hbreak</code>, <span class="sc">gdb</span> will always use hardware
+breakpoints.
+
+   <p>You can control this automatic behaviour with the following commands::
+
+   <p><a name="index-set-breakpoint-auto_002dhw-233"></a><a name="index-show-breakpoint-auto_002dhw-234"></a>
+     <dl>
+<dt><code>set breakpoint auto-hw on</code><dd>This is the default behavior.  When <span class="sc">gdb</span> sets a breakpoint, it
+will try to use the target memory map to decide if software or hardware
+breakpoint must be used.
+
+     <br><dt><code>set breakpoint auto-hw off</code><dd>This indicates <span class="sc">gdb</span> should not automatically select breakpoint
+type.  If the target provides a memory map, <span class="sc">gdb</span> will warn when
+trying to set software breakpoint at a read-only address. 
+</dl>
+
+   <p><span class="sc">gdb</span> normally implements breakpoints by replacing the program code
+at the breakpoint address with a special instruction, which, when
+executed, given control to the debugger.  By default, the program
+code is so modified only when the program is resumed.  As soon as
+the program stops, <span class="sc">gdb</span> restores the original instructions.  This
+behaviour guards against leaving breakpoints inserted in the
+target should gdb abrubptly disconnect.  However, with slow remote
+targets, inserting and removing breakpoint can reduce the performance. 
+This behavior can be controlled with the following commands::
+
+   <p><a name="index-set-breakpoint-always_002dinserted-235"></a><a name="index-show-breakpoint-always_002dinserted-236"></a>
+     <dl>
+<dt><code>set breakpoint always-inserted off</code><dd>All breakpoints, including newly added by the user, are inserted in
+the target only when the target is resumed.  All breakpoints are
+removed from the target when it stops.
+
+     <br><dt><code>set breakpoint always-inserted on</code><dd>Causes all breakpoints to be inserted in the target at all times.  If
+the user adds a new breakpoint, or changes an existing breakpoint, the
+breakpoints in the target are updated immediately.  A breakpoint is
+removed from the target only when breakpoint itself is removed.
+
+     <p><a name="index-non_002dstop-mode_002c-and-_0040code_007bbreakpoint-always_002dinserted_007d-237"></a><br><dt><code>set breakpoint always-inserted auto</code><dd>This is the default mode.  If <span class="sc">gdb</span> is controlling the inferior
+in non-stop mode (see <a href="Non_002dStop-Mode.html#Non_002dStop-Mode">Non-Stop Mode</a>), gdb behaves as if
+<code>breakpoint always-inserted</code> mode is on.  If <span class="sc">gdb</span> is
+controlling the inferior in all-stop mode, <span class="sc">gdb</span> behaves as if
+<code>breakpoint always-inserted</code> mode is off. 
+</dl>
+
+   <p><a name="index-negative-breakpoint-numbers-238"></a><a name="index-internal-_0040value_007bGDBN_007d-breakpoints-239"></a><span class="sc">gdb</span> itself sometimes sets breakpoints in your program for
+special purposes, such as proper handling of <code>longjmp</code> (in C
+programs).  These internal breakpoints are assigned negative numbers,
+starting with <code>-1</code>; &lsquo;<samp><span class="samp">info breakpoints</span></samp>&rsquo; does not display them. 
+You can see these breakpoints with the <span class="sc">gdb</span> maintenance command
+&lsquo;<samp><span class="samp">maint info breakpoints</span></samp>&rsquo; (see <a href="maint-info-breakpoints.html#maint-info-breakpoints">maint info breakpoints</a>).
+
+   <div class="footnote">
+<hr>
+<h4>Footnotes</h4><p class="footnote"><small>[<a name="fn-1" href="#fnd-1">1</a>]</small> 
+As of this writing, multiple-location breakpoints work only if there's
+line number information for all the locations.  This means that they
+will generally not work in system libraries, unless you have debug
+info with line numbers for them.</p>
+
+   <hr></div>
+
+   </body></html>
+

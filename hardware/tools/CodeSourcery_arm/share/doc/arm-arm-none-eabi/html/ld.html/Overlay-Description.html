@@ -1,0 +1,144 @@
+<html lang="en">
+<head>
+<title>Overlay Description - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="SECTIONS.html#SECTIONS" title="SECTIONS">
+<link rel="prev" href="Output-Section-Attributes.html#Output-Section-Attributes" title="Output Section Attributes">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Overlay-Description"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Output-Section-Attributes.html#Output-Section-Attributes">Output Section Attributes</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="SECTIONS.html#SECTIONS">SECTIONS</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.6.9 Overlay Description</h4>
+
+<p><a name="index-OVERLAY-462"></a><a name="index-overlays-463"></a>An overlay description provides an easy way to describe sections which
+are to be loaded as part of a single memory image but are to be run at
+the same memory address.  At run time, some sort of overlay manager will
+copy the overlaid sections in and out of the runtime memory address as
+required, perhaps by simply manipulating addressing bits.  This approach
+can be useful, for example, when a certain region of memory is faster
+than another.
+
+   <p>Overlays are described using the <code>OVERLAY</code> command.  The
+<code>OVERLAY</code> command is used within a <code>SECTIONS</code> command, like an
+output section description.  The full syntax of the <code>OVERLAY</code>
+command is as follows:
+<pre class="smallexample">     OVERLAY [<var>start</var>] : [NOCROSSREFS] [AT ( <var>ldaddr</var> )]
+       {
+         <var>secname1</var>
+           {
+             <var>output-section-command</var>
+             <var>output-section-command</var>
+             ...
+           } [:<var>phdr</var>...] [=<var>fill</var>]
+         <var>secname2</var>
+           {
+             <var>output-section-command</var>
+             <var>output-section-command</var>
+             ...
+           } [:<var>phdr</var>...] [=<var>fill</var>]
+         ...
+       } [&gt;<var>region</var>] [:<var>phdr</var>...] [=<var>fill</var>]
+</pre>
+   <p>Everything is optional except <code>OVERLAY</code> (a keyword), and each
+section must have a name (<var>secname1</var> and <var>secname2</var> above).  The
+section definitions within the <code>OVERLAY</code> construct are identical to
+those within the general <code>SECTIONS</code> contruct (see <a href="SECTIONS.html#SECTIONS">SECTIONS</a>),
+except that no addresses and no memory regions may be defined for
+sections within an <code>OVERLAY</code>.
+
+   <p>The sections are all defined with the same starting address.  The load
+addresses of the sections are arranged such that they are consecutive in
+memory starting at the load address used for the <code>OVERLAY</code> as a
+whole (as with normal section definitions, the load address is optional,
+and defaults to the start address; the start address is also optional,
+and defaults to the current value of the location counter).
+
+   <p>If the <code>NOCROSSREFS</code> keyword is used, and there any references
+among the sections, the linker will report an error.  Since the sections
+all run at the same address, it normally does not make sense for one
+section to refer directly to another.  See <a href="Miscellaneous-Commands.html#Miscellaneous-Commands">NOCROSSREFS</a>.
+
+   <p>For each section within the <code>OVERLAY</code>, the linker automatically
+provides two symbols.  The symbol <code>__load_start_</code><var>secname</var> is
+defined as the starting load address of the section.  The symbol
+<code>__load_stop_</code><var>secname</var> is defined as the final load address of
+the section.  Any characters within <var>secname</var> which are not legal
+within C identifiers are removed.  C (or assembler) code may use these
+symbols to move the overlaid sections around as necessary.
+
+   <p>At the end of the overlay, the value of the location counter is set to
+the start address of the overlay plus the size of the largest section.
+
+   <p>Here is an example.  Remember that this would appear inside a
+<code>SECTIONS</code> construct.
+<pre class="smallexample">       OVERLAY 0x1000 : AT (0x4000)
+        {
+          .text0 { o1/*.o(.text) }
+          .text1 { o2/*.o(.text) }
+        }
+</pre>
+   <p class="noindent">This will define both &lsquo;<samp><span class="samp">.text0</span></samp>&rsquo; and &lsquo;<samp><span class="samp">.text1</span></samp>&rsquo; to start at
+address 0x1000.  &lsquo;<samp><span class="samp">.text0</span></samp>&rsquo; will be loaded at address 0x4000, and
+&lsquo;<samp><span class="samp">.text1</span></samp>&rsquo; will be loaded immediately after &lsquo;<samp><span class="samp">.text0</span></samp>&rsquo;.  The
+following symbols will be defined if referenced: <code>__load_start_text0</code>,
+<code>__load_stop_text0</code>, <code>__load_start_text1</code>,
+<code>__load_stop_text1</code>.
+
+   <p>C code to copy overlay <code>.text1</code> into the overlay area might look
+like the following.
+
+<pre class="smallexample">       extern char __load_start_text1, __load_stop_text1;
+       memcpy ((char *) 0x1000, &amp;__load_start_text1,
+               &amp;__load_stop_text1 - &amp;__load_start_text1);
+</pre>
+   <p>Note that the <code>OVERLAY</code> command is just syntactic sugar, since
+everything it does can be done using the more basic commands.  The above
+example could have been written identically as follows.
+
+<pre class="smallexample">       .text0 0x1000 : AT (0x4000) { o1/*.o(.text) }
+       PROVIDE (__load_start_text0 = LOADADDR (.text0));
+       PROVIDE (__load_stop_text0 = LOADADDR (.text0) + SIZEOF (.text0));
+       .text1 0x1000 : AT (0x4000 + SIZEOF (.text0)) { o2/*.o(.text) }
+       PROVIDE (__load_start_text1 = LOADADDR (.text1));
+       PROVIDE (__load_stop_text1 = LOADADDR (.text1) + SIZEOF (.text1));
+       . = 0x1000 + MAX (SIZEOF (.text0), SIZEOF (.text1));
+</pre>
+   </body></html>
+

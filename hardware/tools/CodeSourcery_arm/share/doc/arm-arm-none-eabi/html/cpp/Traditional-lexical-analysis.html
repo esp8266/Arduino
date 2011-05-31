@@ -1,0 +1,119 @@
+<html lang="en">
+<head>
+<title>Traditional lexical analysis - The C Preprocessor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The C Preprocessor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Traditional-Mode.html#Traditional-Mode" title="Traditional Mode">
+<link rel="next" href="Traditional-macros.html#Traditional-macros" title="Traditional macros">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1987, 1989, 1991, 1992, 1993, 1994, 1995, 1996,
+1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation.  A copy of
+the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+This manual contains no Invariant Sections.  The Front-Cover Texts are
+(a) (see below), and the Back-Cover Texts are (b) (see below).
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Traditional-lexical-analysis"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Traditional-macros.html#Traditional-macros">Traditional macros</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Traditional-Mode.html#Traditional-Mode">Traditional Mode</a>
+<hr>
+</div>
+
+<h3 class="section">10.1 Traditional lexical analysis</h3>
+
+<p>The traditional preprocessor does not decompose its input into tokens
+the same way a standards-conforming preprocessor does.  The input is
+simply treated as a stream of text with minimal internal form.
+
+   <p>This implementation does not treat trigraphs (see <a href="trigraphs.html#trigraphs">trigraphs</a>)
+specially since they were an invention of the standards committee.  It
+handles arbitrarily-positioned escaped newlines properly and splices
+the lines as you would expect; many traditional preprocessors did not
+do this.
+
+   <p>The form of horizontal whitespace in the input file is preserved in
+the output.  In particular, hard tabs remain hard tabs.  This can be
+useful if, for example, you are preprocessing a Makefile.
+
+   <p>Traditional CPP only recognizes C-style block comments, and treats the
+&lsquo;<samp><span class="samp">/*</span></samp>&rsquo; sequence as introducing a comment only if it lies outside
+quoted text.  Quoted text is introduced by the usual single and double
+quotes, and also by an initial &lsquo;<samp><span class="samp">&lt;</span></samp>&rsquo; in a <code>#include</code>
+directive.
+
+   <p>Traditionally, comments are completely removed and are not replaced
+with a space.  Since a traditional compiler does its own tokenization
+of the output of the preprocessor, this means that comments can
+effectively be used as token paste operators.  However, comments
+behave like separators for text handled by the preprocessor itself,
+since it doesn't re-lex its input.  For example, in
+
+<pre class="smallexample">     #if foo/**/bar
+</pre>
+   <p class="noindent">&lsquo;<samp><span class="samp">foo</span></samp>&rsquo; and &lsquo;<samp><span class="samp">bar</span></samp>&rsquo; are distinct identifiers and expanded
+separately if they happen to be macros.  In other words, this
+directive is equivalent to
+
+<pre class="smallexample">     #if foo bar
+</pre>
+   <p class="noindent">rather than
+
+<pre class="smallexample">     #if foobar
+</pre>
+   <p>Generally speaking, in traditional mode an opening quote need not have
+a matching closing quote.  In particular, a macro may be defined with
+replacement text that contains an unmatched quote.  Of course, if you
+attempt to compile preprocessed output containing an unmatched quote
+you will get a syntax error.
+
+   <p>However, all preprocessing directives other than <code>#define</code>
+require matching quotes.  For example:
+
+<pre class="smallexample">     #define m This macro's fine and has an unmatched quote
+     "/* This is not a comment.  */
+     /* <span class="roman">This is a comment.  The following #include directive
+        is ill-formed.</span>  */
+     #include &lt;stdio.h
+</pre>
+   <p>Just as for the ISO preprocessor, what would be a closing quote can be
+escaped with a backslash to prevent the quoted text from closing.
+
+   </body></html>
+

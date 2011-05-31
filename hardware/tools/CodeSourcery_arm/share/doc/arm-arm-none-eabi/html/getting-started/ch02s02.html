@@ -1,0 +1,70 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>2.2. System Requirements</title><link rel="stylesheet" href="cs.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.74.0"><link rel="home" href="index.html" title="Sourcery G++ Lite"><link rel="up" href="chap-installation.html" title="Chapter 2. Installation and Configuration"><link rel="prev" href="chap-installation.html" title="Chapter 2. Installation and Configuration"><link rel="next" href="ch02s03.html" title="2.3. Downloading an Installer"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">2.2. System Requirements</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="chap-installation.html">Prev</a> </td><th width="60%" align="center">Chapter 2. Installation and Configuration</th><td width="20%" align="right"> <a accesskey="n" href="ch02s03.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="id275731"></a>2.2. System Requirements</h2></div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id275736"></a>2.2.1. Host Operating System Requirements</h3></div></div></div><p>
+        This version of Sourcery G++ supports the following host operating
+        systems and architectures:
+        </p><div class="itemizedlist"><ul type="disc"><li><p>
+              Microsoft Windows 2000, Windows XP, Windows Vista, and
+              Windows 7 systems using IA32, AMD64, and Intel 64
+              processors.
+            </p></li><li><p>
+              GNU/Linux systems using IA32, AMD64, or Intel 64 processors,
+              including Debian 3.1 (and later), Red Hat Enterprise Linux 3
+              (and later), and SuSE Enterprise Linux 8 (and later).
+            </p></li></ul></div><p>
+      </p><p>
+        Sourcery G++ is built as a 32-bit application.  Therefore, even when
+        running on a 64-bit host system, Sourcery G++ requires 32-bit
+        host libraries.  If these libraries are not already installed on your
+        system, you must install them before installing and using Sourcery G++ Lite.  
+        Consult your operating system documentation for more information about 
+        obtaining these libraries.
+      </p><div class="caution" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Installing on Ubuntu and Debian GNU/Linux Hosts</h3><p>
+          The Sourcery G++ graphical installer is incompatible with the
+          <code class="command">dash</code> shell, which is the default
+          <code class="filename">/bin/sh</code> for recent releases of the
+          Ubuntu and Debian GNU/Linux distributions.  To install
+          Sourcery G++ Lite on these systems, you must make
+          <code class="filename">/bin/sh</code> a symbolic link to one of the
+          supported shells:  
+          <code class="command">bash</code>, 
+          <code class="command">csh</code>, 
+          <code class="command">tcsh</code>, 
+          <code class="command">zsh</code>,
+          or <code class="command">ksh</code>.
+        </p><p>
+          For example, on Ubuntu systems, the recommended way to do this
+          is:
+</p><pre class="screen">&gt; sudo dpkg-reconfigure -plow dash
+Install as /bin/sh? No</pre><p>
+        </p><p>
+          This is a limitation of the installer and uninstaller only,
+          not of the installed Sourcery G++ Lite toolchain.
+        </p></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id275852"></a>2.2.2. Host Hardware Requirements</h3></div></div></div><p>   
+        In order to install and use Sourcery G++ Lite, you must have at least 512MB
+        of available memory.  
+      </p><p>
+        The amount of disk space required for a complete Sourcery G++ Lite
+        installation directory depends on the host operating system 
+        and the number of target libraries included.
+	<span>
+	  When you start the graphical installer, it checks whether there is
+	  sufficient disk space before beginning to install.  Note that
+          the graphical installer also requires additional temporary
+	  disk space during the installation process.
+          <span>
+            On Microsoft Windows hosts, the installer uses the location
+            specified by the <code class="envar">TEMP</code> environment variable for
+            these temporary files.
+            If there is not enough free space on that volume, the installer
+            prompts for an alternate location.
+          </span>
+          <span>
+            On Linux hosts, the installer puts temporary files in the
+            directory specified by the <code class="envar">IATEMPDIR</code> environment
+            variable, or <code class="filename">/tmp</code> if that is not set.
+          </span>
+          
+	</span>
+      </p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="id275904"></a>2.2.3. Target System Requirements</h3></div></div></div><p>
+        See <a class="xref" href="chap-target.html" title="Chapter 3. Sourcery G++ Lite for ARM EABI">Chapter 3, &#8220;Sourcery G++ Lite for ARM EABI&#8221;</a> for requirements that apply to
+        the target system.
+      </p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="chap-installation.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="chap-installation.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch02s03.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter 2. Installation and Configuration </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 2.3. Downloading an Installer</td></tr></table></div></body></html>

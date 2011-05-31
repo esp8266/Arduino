@@ -1,0 +1,228 @@
+<html lang="en">
+<head>
+<title>Builtin Functions - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Expressions.html#Expressions" title="Expressions">
+<link rel="prev" href="Expression-Section.html#Expression-Section" title="Expression Section">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Builtin-Functions"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Expression-Section.html#Expression-Section">Expression Section</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Expressions.html#Expressions">Expressions</a>
+<hr>
+</div>
+
+<h4 class="subsection">3.10.9 Builtin Functions</h4>
+
+<p><a name="index-functions-in-expressions-523"></a>The linker script language includes a number of builtin functions for
+use in linker script expressions.
+
+     <dl>
+<dt><code>ABSOLUTE(</code><var>exp</var><code>)</code><dd><a name="index-ABSOLUTE_0028_0040var_007bexp_007d_0029-524"></a><a name="index-expression_002c-absolute-525"></a>Return the absolute (non-relocatable, as opposed to non-negative) value
+of the expression <var>exp</var>.  Primarily useful to assign an absolute
+value to a symbol within a section definition, where symbol values are
+normally section relative.  See <a href="Expression-Section.html#Expression-Section">Expression Section</a>.
+
+     <br><dt><code>ADDR(</code><var>section</var><code>)</code><dd><a name="index-ADDR_0028_0040var_007bsection_007d_0029-526"></a><a name="index-section-address-in-expression-527"></a>Return the absolute address (the VMA) of the named <var>section</var>.  Your
+script must previously have defined the location of that section.  In
+the following example, <code>symbol_1</code> and <code>symbol_2</code> are assigned
+identical values:
+     <pre class="smallexample">          SECTIONS { ...
+            .output1 :
+              {
+              start_of_output_1 = ABSOLUTE(.);
+              ...
+              }
+            .output :
+              {
+              symbol_1 = ADDR(.output1);
+              symbol_2 = start_of_output_1;
+              }
+          ... }
+</pre>
+     <br><dt><code>ALIGN(</code><var>align</var><code>)</code><dt><code>ALIGN(</code><var>exp</var><code>,</code><var>align</var><code>)</code><dd><a name="index-ALIGN_0028_0040var_007balign_007d_0029-528"></a><a name="index-ALIGN_0028_0040var_007bexp_007d_002c_0040var_007balign_007d_0029-529"></a><a name="index-round-up-location-counter-530"></a><a name="index-align-location-counter-531"></a><a name="index-round-up-expression-532"></a><a name="index-align-expression-533"></a>Return the location counter (<code>.</code>) or arbitrary expression aligned
+to the next <var>align</var> boundary.  The single operand <code>ALIGN</code>
+doesn't change the value of the location counter&mdash;it just does
+arithmetic on it.  The two operand <code>ALIGN</code> allows an arbitrary
+expression to be aligned upwards (<code>ALIGN(</code><var>align</var><code>)</code> is
+equivalent to <code>ALIGN(., </code><var>align</var><code>)</code>).
+
+     <p>Here is an example which aligns the output <code>.data</code> section to the
+next <code>0x2000</code> byte boundary after the preceding section and sets a
+variable within the section to the next <code>0x8000</code> boundary after the
+input sections:
+     <pre class="smallexample">          SECTIONS { ...
+            .data ALIGN(0x2000): {
+              *(.data)
+              variable = ALIGN(0x8000);
+            }
+          ... }
+</pre>
+     <p class="noindent">The first use of <code>ALIGN</code> in this example specifies the location of
+a section because it is used as the optional <var>address</var> attribute of
+a section definition (see <a href="Output-Section-Address.html#Output-Section-Address">Output Section Address</a>).  The second use
+of <code>ALIGN</code> is used to defines the value of a symbol.
+
+     <p>The builtin function <code>NEXT</code> is closely related to <code>ALIGN</code>.
+
+     <br><dt><code>ALIGNOF(</code><var>section</var><code>)</code><dd><a name="index-ALIGNOF_0028_0040var_007bsection_007d_0029-534"></a><a name="index-section-alignment-535"></a>Return the alignment in bytes of the named <var>section</var>, if that section has
+been allocated.  If the section has not been allocated when this is
+evaluated, the linker will report an error. In the following example,
+the alignment of the <code>.output</code> section is stored as the first
+value in that section.
+     <pre class="smallexample">          SECTIONS{ ...
+            .output {
+              LONG (ALIGNOF (.output))
+              ...
+              }
+          ... }
+</pre>
+     <br><dt><code>BLOCK(</code><var>exp</var><code>)</code><dd><a name="index-BLOCK_0028_0040var_007bexp_007d_0029-536"></a>This is a synonym for <code>ALIGN</code>, for compatibility with older linker
+scripts.  It is most often seen when setting the address of an output
+section.
+
+     <br><dt><code>DATA_SEGMENT_ALIGN(</code><var>maxpagesize</var><code>, </code><var>commonpagesize</var><code>)</code><dd><a name="index-DATA_005fSEGMENT_005fALIGN_0028_0040var_007bmaxpagesize_007d_002c-_0040var_007bcommonpagesize_007d_0029-537"></a>This is equivalent to either
+     <pre class="smallexample">          (ALIGN(<var>maxpagesize</var>) + (. &amp; (<var>maxpagesize</var> - 1)))
+</pre>
+     <p>or
+     <pre class="smallexample">          (ALIGN(<var>maxpagesize</var>) + (. &amp; (<var>maxpagesize</var> - <var>commonpagesize</var>)))
+</pre>
+     <p class="noindent">depending on whether the latter uses fewer <var>commonpagesize</var> sized pages
+for the data segment (area between the result of this expression and
+<code>DATA_SEGMENT_END</code>) than the former or not. 
+If the latter form is used, it means <var>commonpagesize</var> bytes of runtime
+memory will be saved at the expense of up to <var>commonpagesize</var> wasted
+bytes in the on-disk file.
+
+     <p>This expression can only be used directly in <code>SECTIONS</code> commands, not in
+any output section descriptions and only once in the linker script. 
+<var>commonpagesize</var> should be less or equal to <var>maxpagesize</var> and should
+be the system page size the object wants to be optimized for (while still
+working on system page sizes up to <var>maxpagesize</var>).
+
+     <p class="noindent">Example:
+     <pre class="smallexample">            . = DATA_SEGMENT_ALIGN(0x10000, 0x2000);
+</pre>
+     <br><dt><code>DATA_SEGMENT_END(</code><var>exp</var><code>)</code><dd><a name="index-DATA_005fSEGMENT_005fEND_0028_0040var_007bexp_007d_0029-538"></a>This defines the end of data segment for <code>DATA_SEGMENT_ALIGN</code>
+evaluation purposes.
+
+     <pre class="smallexample">            . = DATA_SEGMENT_END(.);
+</pre>
+     <br><dt><code>DATA_SEGMENT_RELRO_END(</code><var>offset</var><code>, </code><var>exp</var><code>)</code><dd><a name="index-DATA_005fSEGMENT_005fRELRO_005fEND_0028_0040var_007boffset_007d_002c-_0040var_007bexp_007d_0029-539"></a>This defines the end of the <code>PT_GNU_RELRO</code> segment when
+&lsquo;<samp><span class="samp">-z relro</span></samp>&rsquo; option is used.  Second argument is returned. 
+When &lsquo;<samp><span class="samp">-z relro</span></samp>&rsquo; option is not present, <code>DATA_SEGMENT_RELRO_END</code>
+does nothing, otherwise <code>DATA_SEGMENT_ALIGN</code> is padded so that
+<var>exp</var> + <var>offset</var> is aligned to the most commonly used page
+boundary for particular target.  If present in the linker script,
+it must always come in between <code>DATA_SEGMENT_ALIGN</code> and
+<code>DATA_SEGMENT_END</code>.
+
+     <pre class="smallexample">            . = DATA_SEGMENT_RELRO_END(24, .);
+</pre>
+     <br><dt><code>DEFINED(</code><var>symbol</var><code>)</code><dd><a name="index-DEFINED_0028_0040var_007bsymbol_007d_0029-540"></a><a name="index-symbol-defaults-541"></a>Return 1 if <var>symbol</var> is in the linker global symbol table and is
+defined before the statement using DEFINED in the script, otherwise
+return 0.  You can use this function to provide
+default values for symbols.  For example, the following script fragment
+shows how to set a global symbol &lsquo;<samp><span class="samp">begin</span></samp>&rsquo; to the first location in
+the &lsquo;<samp><span class="samp">.text</span></samp>&rsquo; section&mdash;but if a symbol called &lsquo;<samp><span class="samp">begin</span></samp>&rsquo; already
+existed, its value is preserved:
+
+     <pre class="smallexample">          SECTIONS { ...
+            .text : {
+              begin = DEFINED(begin) ? begin : . ;
+              ...
+            }
+            ...
+          }
+</pre>
+     <br><dt><code>LENGTH(</code><var>memory</var><code>)</code><dd><a name="index-LENGTH_0028_0040var_007bmemory_007d_0029-542"></a>Return the length of the memory region named <var>memory</var>.
+
+     <br><dt><code>LOADADDR(</code><var>section</var><code>)</code><dd><a name="index-LOADADDR_0028_0040var_007bsection_007d_0029-543"></a><a name="index-section-load-address-in-expression-544"></a>Return the absolute LMA of the named <var>section</var>.  This is normally
+the same as <code>ADDR</code>, but it may be different if the <code>AT</code>
+attribute is used in the output section definition (see <a href="Output-Section-LMA.html#Output-Section-LMA">Output Section LMA</a>).
+
+     <p><a name="index-MAX-545"></a><br><dt><code>MAX(</code><var>exp1</var><code>, </code><var>exp2</var><code>)</code><dd>Returns the maximum of <var>exp1</var> and <var>exp2</var>.
+
+     <p><a name="index-MIN-546"></a><br><dt><code>MIN(</code><var>exp1</var><code>, </code><var>exp2</var><code>)</code><dd>Returns the minimum of <var>exp1</var> and <var>exp2</var>.
+
+     <br><dt><code>NEXT(</code><var>exp</var><code>)</code><dd><a name="index-NEXT_0028_0040var_007bexp_007d_0029-547"></a><a name="index-unallocated-address_002c-next-548"></a>Return the next unallocated address that is a multiple of <var>exp</var>. 
+This function is closely related to <code>ALIGN(</code><var>exp</var><code>)</code>; unless you
+use the <code>MEMORY</code> command to define discontinuous memory for the
+output file, the two functions are equivalent.
+
+     <br><dt><code>ORIGIN(</code><var>memory</var><code>)</code><dd><a name="index-ORIGIN_0028_0040var_007bmemory_007d_0029-549"></a>Return the origin of the memory region named <var>memory</var>.
+
+     <br><dt><code>SEGMENT_START(</code><var>segment</var><code>, </code><var>default</var><code>)</code><dd><a name="index-SEGMENT_005fSTART_0028_0040var_007bsegment_007d_002c-_0040var_007bdefault_007d_0029-550"></a>Return the base address of the named <var>segment</var>.  If an explicit
+value has been given for this segment (with a command-line &lsquo;<samp><span class="samp">-T</span></samp>&rsquo;
+option) that value will be returned; otherwise the value will be
+<var>default</var>.  At present, the &lsquo;<samp><span class="samp">-T</span></samp>&rsquo; command-line option can only
+be used to set the base address for the &ldquo;text&rdquo;, &ldquo;data&rdquo;, and
+&ldquo;bss&rdquo; sections, but you use <code>SEGMENT_START</code> with any segment
+name.
+
+     <br><dt><code>SIZEOF(</code><var>section</var><code>)</code><dd><a name="index-SIZEOF_0028_0040var_007bsection_007d_0029-551"></a><a name="index-section-size-552"></a>Return the size in bytes of the named <var>section</var>, if that section has
+been allocated.  If the section has not been allocated when this is
+evaluated, the linker will report an error.  In the following example,
+<code>symbol_1</code> and <code>symbol_2</code> are assigned identical values:
+     <pre class="smallexample">          SECTIONS{ ...
+            .output {
+              .start = . ;
+              ...
+              .end = . ;
+              }
+            symbol_1 = .end - .start ;
+            symbol_2 = SIZEOF(.output);
+          ... }
+</pre>
+     <br><dt><code>SIZEOF_HEADERS</code><dt><code>sizeof_headers</code><dd><a name="index-SIZEOF_005fHEADERS-553"></a><a name="index-header-size-554"></a>Return the size in bytes of the output file's headers.  This is
+information which appears at the start of the output file.  You can use
+this number when setting the start address of the first section, if you
+choose, to facilitate paging.
+
+     <p><a name="index-not-enough-room-for-program-headers-555"></a><a name="index-program-headers_002c-not-enough-room-556"></a>When producing an ELF output file, if the linker script uses the
+<code>SIZEOF_HEADERS</code> builtin function, the linker must compute the
+number of program headers before it has determined all the section
+addresses and sizes.  If the linker later discovers that it needs
+additional program headers, it will report an error &lsquo;<samp><span class="samp">not enough
+room for program headers</span></samp>&rsquo;.  To avoid this error, you must avoid using
+the <code>SIZEOF_HEADERS</code> function, or you must rework your linker
+script to avoid forcing the linker to use additional program headers, or
+you must define the program headers yourself using the <code>PHDRS</code>
+command (see <a href="PHDRS.html#PHDRS">PHDRS</a>). 
+</dl>
+
+   </body></html>
+

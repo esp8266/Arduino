@@ -1,0 +1,160 @@
+<html lang="en">
+<head>
+<title>Implementation - GNU gprof</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GNU gprof">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Details.html#Details" title="Details">
+<link rel="next" href="File-Format.html#File-Format" title="File Format">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the gprof profiler of the GNU system.
+
+Copyright (C) 1988, 1992, 1997, 1998, 1999, 2000, 2001, 2003,
+2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.
+
+-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Implementation"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="File-Format.html#File-Format">File Format</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Details.html#Details">Details</a>
+<hr>
+</div>
+
+<h3 class="section">9.1 Implementation of Profiling</h3>
+
+<p>Profiling works by changing how every function in your program is compiled
+so that when it is called, it will stash away some information about where
+it was called from.  From this, the profiler can figure out what function
+called it, and can count how many times it was called.  This change is made
+by the compiler when your program is compiled with the &lsquo;<samp><span class="samp">-pg</span></samp>&rsquo; option,
+which causes every function to call <code>mcount</code>
+(or <code>_mcount</code>, or <code>__mcount</code>, depending on the OS and compiler)
+as one of its first operations.
+
+   <p>The <code>mcount</code> routine, included in the profiling library,
+is responsible for recording in an in-memory call graph table
+both its parent routine (the child) and its parent's parent.  This is
+typically done by examining the stack frame to find both
+the address of the child, and the return address in the original parent. 
+Since this is a very machine-dependent operation, <code>mcount</code>
+itself is typically a short assembly-language stub routine
+that extracts the required
+information, and then calls <code>__mcount_internal</code>
+(a normal C function) with two arguments&mdash;<code>frompc</code> and <code>selfpc</code>. 
+<code>__mcount_internal</code> is responsible for maintaining
+the in-memory call graph, which records <code>frompc</code>, <code>selfpc</code>,
+and the number of times each of these call arcs was traversed.
+
+   <p>GCC Version 2 provides a magical function (<code>__builtin_return_address</code>),
+which allows a generic <code>mcount</code> function to extract the
+required information from the stack frame.  However, on some
+architectures, most notably the SPARC, using this builtin can be
+very computationally expensive, and an assembly language version
+of <code>mcount</code> is used for performance reasons.
+
+   <p>Number-of-calls information for library routines is collected by using a
+special version of the C library.  The programs in it are the same as in
+the usual C library, but they were compiled with &lsquo;<samp><span class="samp">-pg</span></samp>&rsquo;.  If you
+link your program with &lsquo;<samp><span class="samp">gcc ... -pg</span></samp>&rsquo;, it automatically uses the
+profiling version of the library.
+
+   <p>Profiling also involves watching your program as it runs, and keeping a
+histogram of where the program counter happens to be every now and then. 
+Typically the program counter is looked at around 100 times per second of
+run time, but the exact frequency may vary from system to system.
+
+   <p>This is done is one of two ways.  Most UNIX-like operating systems
+provide a <code>profil()</code> system call, which registers a memory
+array with the kernel, along with a scale
+factor that determines how the program's address space maps
+into the array. 
+Typical scaling values cause every 2 to 8 bytes of address space
+to map into a single array slot. 
+On every tick of the system clock
+(assuming the profiled program is running), the value of the
+program counter is examined and the corresponding slot in
+the memory array is incremented.  Since this is done in the kernel,
+which had to interrupt the process anyway to handle the clock
+interrupt, very little additional system overhead is required.
+
+   <p>However, some operating systems, most notably Linux 2.0 (and earlier),
+do not provide a <code>profil()</code> system call.  On such a system,
+arrangements are made for the kernel to periodically deliver
+a signal to the process (typically via <code>setitimer()</code>),
+which then performs the same operation of examining the
+program counter and incrementing a slot in the memory array. 
+Since this method requires a signal to be delivered to
+user space every time a sample is taken, it uses considerably
+more overhead than kernel-based profiling.  Also, due to the
+added delay required to deliver the signal, this method is
+less accurate as well.
+
+   <p>A special startup routine allocates memory for the histogram and
+either calls <code>profil()</code> or sets up
+a clock signal handler. 
+This routine (<code>monstartup</code>) can be invoked in several ways. 
+On Linux systems, a special profiling startup file <code>gcrt0.o</code>,
+which invokes <code>monstartup</code> before <code>main</code>,
+is used instead of the default <code>crt0.o</code>. 
+Use of this special startup file is one of the effects
+of using &lsquo;<samp><span class="samp">gcc ... -pg</span></samp>&rsquo; to link. 
+On SPARC systems, no special startup files are used. 
+Rather, the <code>mcount</code> routine, when it is invoked for
+the first time (typically when <code>main</code> is called),
+calls <code>monstartup</code>.
+
+   <p>If the compiler's &lsquo;<samp><span class="samp">-a</span></samp>&rsquo; option was used, basic-block counting
+is also enabled.  Each object file is then compiled with a static array
+of counts, initially zero. 
+In the executable code, every time a new basic-block begins
+(i.e., when an <code>if</code> statement appears), an extra instruction
+is inserted to increment the corresponding count in the array. 
+At compile time, a paired array was constructed that recorded
+the starting address of each basic-block.  Taken together,
+the two arrays record the starting address of every basic-block,
+along with the number of times it was executed.
+
+   <p>The profiling library also includes a function (<code>mcleanup</code>) which is
+typically registered using <code>atexit()</code> to be called as the
+program exits, and is responsible for writing the file <samp><span class="file">gmon.out</span></samp>. 
+Profiling is turned off, various headers are output, and the histogram
+is written, followed by the call-graph arcs and the basic-block counts.
+
+   <p>The output from <code>gprof</code> gives no indication of parts of your program that
+are limited by I/O or swapping bandwidth.  This is because samples of the
+program counter are taken at fixed intervals of the program's run time. 
+Therefore, the
+time measurements in <code>gprof</code> output say nothing about time that your
+program was not running.  For example, a part of the program that creates
+so much data that it cannot all fit in physical memory at once may run very
+slowly due to thrashing, but <code>gprof</code> will say it uses little time.  On
+the other hand, sampling by run time has the advantage that the amount of
+load due to other users won't directly affect the output you get.
+
+   </body></html>
+

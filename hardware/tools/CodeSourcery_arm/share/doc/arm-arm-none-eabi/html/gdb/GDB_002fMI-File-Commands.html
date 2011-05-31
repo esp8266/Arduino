@@ -1,0 +1,185 @@
+<html lang="en">
+<head>
+<title>GDB/MI File Commands - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="GDB_002fMI.html#GDB_002fMI" title="GDB/MI">
+<link rel="prev" href="GDB_002fMI-Symbol-Query.html#GDB_002fMI-Symbol-Query" title="GDB/MI Symbol Query">
+<link rel="next" href="GDB_002fMI-Target-Manipulation.html#GDB_002fMI-Target-Manipulation" title="GDB/MI Target Manipulation">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="GDB%2fMI-File-Commands"></a>
+<a name="GDB_002fMI-File-Commands"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="GDB_002fMI-Target-Manipulation.html#GDB_002fMI-Target-Manipulation">GDB/MI Target Manipulation</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="GDB_002fMI-Symbol-Query.html#GDB_002fMI-Symbol-Query">GDB/MI Symbol Query</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="GDB_002fMI.html#GDB_002fMI">GDB/MI</a>
+<hr>
+</div>
+
+<h3 class="section">27.17 <span class="sc">gdb/mi</span> File Commands</h3>
+
+<p>This section describes the GDB/MI commands to specify executable file names
+and to read in and obtain symbol table information.
+
+<h4 class="subheading">The <code>-file-exec-and-symbols</code> Command</h4>
+
+<p><a name="index-g_t_002dfile_002dexec_002dand_002dsymbols-2106"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -file-exec-and-symbols <var>file</var>
+</pre>
+   <p>Specify the executable file to be debugged.  This file is the one from
+which the symbol table is also read.  If no file is specified, the
+command clears the executable and symbol information.  If breakpoints
+are set when using this command with no arguments, <span class="sc">gdb</span> will produce
+error messages.  Otherwise, no output is produced, except a completion
+notification.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">file</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -file-exec-and-symbols /kwikemart/marge/ezannoni/TRUNK/mbx/hello.mbx
+     ^done
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-file-exec-file</code> Command</h4>
+
+<p><a name="index-g_t_002dfile_002dexec_002dfile-2107"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -file-exec-file <var>file</var>
+</pre>
+   <p>Specify the executable file to be debugged.  Unlike
+&lsquo;<samp><span class="samp">-file-exec-and-symbols</span></samp>&rsquo;, the symbol table is <em>not</em> read
+from this file.  If used without argument, <span class="sc">gdb</span> clears the information
+about the executable file.  No output is produced, except a completion
+notification.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">exec-file</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -file-exec-file /kwikemart/marge/ezannoni/TRUNK/mbx/hello.mbx
+     ^done
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-file-list-exec-source-file</code> Command</h4>
+
+<p><a name="index-g_t_002dfile_002dlist_002dexec_002dsource_002dfile-2108"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -file-list-exec-source-file
+</pre>
+   <p>List the line number, the current source file, and the absolute path
+to the current source file for the current executable.  The macro
+information field has a value of &lsquo;<samp><span class="samp">1</span></samp>&rsquo; or &lsquo;<samp><span class="samp">0</span></samp>&rsquo; depending on
+whether or not the file includes preprocessor macro information.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The <span class="sc">gdb</span> equivalent is &lsquo;<samp><span class="samp">info source</span></samp>&rsquo;
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     123-file-list-exec-source-file
+     123^done,line="1",file="foo.c",fullname="/home/bar/foo.c,macro-info="1"
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-file-list-exec-source-files</code> Command</h4>
+
+<p><a name="index-g_t_002dfile_002dlist_002dexec_002dsource_002dfiles-2109"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -file-list-exec-source-files
+</pre>
+   <p>List the source files for the current executable.
+
+   <p>It will always output the filename, but only when <span class="sc">gdb</span> can find
+the absolute file name of a source file, will it output the fullname.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The <span class="sc">gdb</span> equivalent is &lsquo;<samp><span class="samp">info sources</span></samp>&rsquo;. 
+<code>gdbtk</code> has an analogous command &lsquo;<samp><span class="samp">gdb_listfiles</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -file-list-exec-source-files
+     ^done,files=[
+     {file=foo.c,fullname=/home/foo.c},
+     {file=/home/bar.c,fullname=/home/bar.c},
+     {file=gdb_could_not_find_fullpath.c}]
+     (gdb)
+</pre>
+<h4 class="subheading">The <code>-file-symbol-file</code> Command</h4>
+
+<p><a name="index-g_t_002dfile_002dsymbol_002dfile-2110"></a>
+
+<h5 class="subsubheading">Synopsis</h5>
+
+<pre class="smallexample">      -file-symbol-file <var>file</var>
+</pre>
+   <p>Read symbol table info from the specified <var>file</var> argument.  When
+used without arguments, clears <span class="sc">gdb</span>'s symbol table info.  No output is
+produced, except for a completion notification.
+
+<h5 class="subsubheading"><span class="sc">gdb</span> Command</h5>
+
+<p>The corresponding <span class="sc">gdb</span> command is &lsquo;<samp><span class="samp">symbol-file</span></samp>&rsquo;.
+
+<h5 class="subsubheading">Example</h5>
+
+<pre class="smallexample">     (gdb)
+     -file-symbol-file /kwikemart/marge/ezannoni/TRUNK/mbx/hello.mbx
+     ^done
+     (gdb)
+</pre>
+<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%% SECTION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% -->
+   </body></html>
+

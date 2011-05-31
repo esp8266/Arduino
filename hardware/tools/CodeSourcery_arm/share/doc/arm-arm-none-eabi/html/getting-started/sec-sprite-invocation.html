@@ -1,0 +1,47 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>6.3. Invoking Sourcery G++ Debug Sprite</title><link rel="stylesheet" href="cs.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.74.0"><link rel="home" href="index.html" title="Sourcery G++ Lite"><link rel="up" href="sprite.html" title="Chapter 6. Sourcery G++ Debug Sprite"><link rel="prev" href="ch06s02.html" title="6.2. Debug Sprite Example"><link rel="next" href="sec-sprite-options.html" title="6.4. Sourcery G++ Debug Sprite Options"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">6.3. Invoking Sourcery G++ Debug Sprite</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch06s02.html">Prev</a> </td><th width="60%" align="center">Chapter 6. Sourcery G++ Debug Sprite</th><td width="20%" align="right"> <a accesskey="n" href="sec-sprite-options.html">Next</a></td></tr></table><hr></div><div class="section" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="sec-sprite-invocation"></a>6.3. Invoking Sourcery G++ Debug Sprite</h2></div></div></div><p>The Debug Sprite is invoked as follows:
+
+    </p><pre class="screen">&gt; arm-none-eabi-sprite [<em class="replaceable"><code>options</code></em>] <em class="replaceable"><code>device-url</code></em> <em class="replaceable"><code>board-file</code></em></pre><p>
+    </p><p> The <em class="replaceable"><code>device-url</code></em> specifies the
+    debug device to use to communicate with the board.  It follows the
+    standard format:
+
+    </p><pre class="screen"><em class="replaceable"><code>scheme</code></em>:<em class="replaceable"><code>scheme-specific-part</code></em>[?<em class="replaceable"><code>device-options</code></em>]</pre><p>
+
+    Most device URL schemes also follow the regular format:
+
+    </p><pre class="screen"><em class="replaceable"><code>scheme</code></em>:[//<em class="replaceable"><code>hostname</code></em>:[<em class="replaceable"><code>port</code></em>]]/<em class="replaceable"><code>path</code></em>[?<em class="replaceable"><code>device-options</code></em>]</pre><p>
+
+    The meanings of <em class="replaceable"><code>hostname</code></em>,
+    <em class="replaceable"><code>port</code></em>, <em class="replaceable"><code>path</code></em>
+    and <em class="replaceable"><code>device-options</code></em> parts depend on the
+    <em class="replaceable"><code>scheme</code></em> and are described below.  The
+    following schemes are supported in Sourcery G++ Lite for ARM EABI:
+
+    </p><div class="variablelist"><dl><dt><span class="term"><code class="literal">rdi</code></span></dt><dd><p> Use an RDI  debugging device.  
+ Refer to <a class="xref" href="debug-sprite-rdi-url.html" title="6.5. Remote Debug Interface Devices">Section 6.5, &#8220;Remote Debug Interface Devices&#8221;</a>. </p></dd><dt><span class="term"><code class="literal">flashpro</code></span></dt><dd><p> Use a FlashPro  debugging device.  
+ Refer to <a class="xref" href="debug-sprite-flashpro-url.html" title="6.6. Actel FlashPro Devices">Section 6.6, &#8220;Actel FlashPro Devices&#8221;</a>. </p></dd><dt><span class="term"><code class="literal">altera</code></span></dt><dd><p> Use an Altera FPGA.
+ Refer to <a class="xref" href="debug-sprite-altera-url.html" title="6.7. Altera Devices">Section 6.7, &#8220;Altera Devices&#8221;</a>.</p></dd></dl></div><p>
+    </p><p>The optional
+    <code class="literal">?<em class="replaceable"><code>device-options</code></em></code> portion is
+    allowed in all schemes.  These allow additional device-specific
+    options of the form
+    <code class="literal"><em class="replaceable"><code>name</code></em>=<em class="replaceable"><code>value</code></em></code>.
+    Multiple options are concatenated using
+    <code class="literal">&amp;</code>.</p><p>The <em class="replaceable"><code>board-file</code></em> specifies an XML
+    file that describes how to initialize the target board, as well as
+    other properties of the board used by the debugger.  If
+    <em class="replaceable"><code>board-file</code></em> refers to a file (via a
+    relative or absolute pathname), it is read.  Otherwise,
+    <em class="replaceable"><code>board-file</code></em> can be a board name, and the
+    toolchain's board directory is searched for a matching file.  
+    See <a class="xref" href="sec-sprite-supported-boards.html" title="6.9. Supported Board Files">Section 6.9, &#8220;Supported Board Files&#8221;</a> for
+    the list of supported boards, or invoke the Sprite with the
+    <code class="option">-b</code> option to list the available board files.
+    
+    You can also write a custom board file; see 
+    <a class="xref" href="sec-sprite-board-file.html" title="6.10. Board File Syntax">Section 6.10, &#8220;Board File Syntax&#8221;</a> for more information about
+    the file format.</p><p>
+      Both the <em class="replaceable"><code>device-url</code></em> and
+     <em class="replaceable"><code>board-file</code></em> command-line arguments are
+     required to correctly connect the Sprite to a target board.
+    </p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch06s02.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="sprite.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="sec-sprite-options.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">6.2. Debug Sprite Example </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> 6.4. Sourcery G++ Debug Sprite Options</td></tr></table></div></body></html>

@@ -1,0 +1,93 @@
+<html lang="en">
+<head>
+<title>MIPS Paired-Single Support - Using the GNU Compiler Collection (GCC)</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Using the GNU Compiler Collection (GCC)">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Target-Builtins.html#Target-Builtins" title="Target Builtins">
+<link rel="prev" href="MIPS-DSP-Built_002din-Functions.html#MIPS-DSP-Built_002din-Functions" title="MIPS DSP Built-in Functions">
+<link rel="next" href="MIPS-Loongson-Built_002din-Functions.html#MIPS-Loongson-Built_002din-Functions" title="MIPS Loongson Built-in Functions">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
+1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Funding Free Software'', the Front-Cover
+Texts being (a) (see below), and with the Back-Cover Texts being (b)
+(see below).  A copy of the license is included in the section entitled
+``GNU Free Documentation License''.
+
+(a) The FSF's Front-Cover Text is:
+
+     A GNU Manual
+
+(b) The FSF's Back-Cover Text is:
+
+     You have freedom to copy and modify this GNU Manual, like GNU
+     software.  Copies published by the Free Software Foundation raise
+     funds for GNU development.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="MIPS-Paired-Single-Support"></a>
+<a name="MIPS-Paired_002dSingle-Support"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="MIPS-Loongson-Built_002din-Functions.html#MIPS-Loongson-Built_002din-Functions">MIPS Loongson Built-in Functions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="MIPS-DSP-Built_002din-Functions.html#MIPS-DSP-Built_002din-Functions">MIPS DSP Built-in Functions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Target-Builtins.html#Target-Builtins">Target Builtins</a>
+<hr>
+</div>
+
+<h4 class="subsection">6.52.8 MIPS Paired-Single Support</h4>
+
+<p>The MIPS64 architecture includes a number of instructions that
+operate on pairs of single-precision floating-point values. 
+Each pair is packed into a 64-bit floating-point register,
+with one element being designated the &ldquo;upper half&rdquo; and
+the other being designated the &ldquo;lower half&rdquo;.
+
+ <p>GCC supports paired-single operations using both the generic
+vector extensions (see <a href="Vector-Extensions.html#Vector-Extensions">Vector Extensions</a>) and a collection of
+MIPS-specific built-in functions.  Both kinds of support are
+enabled by the <samp><span class="option">-mpaired-single</span></samp> command-line option.
+
+ <p>The vector type associated with paired-single values is usually
+called <code>v2sf</code>.  It can be defined in C as follows:
+
+<pre class="smallexample">     typedef float v2sf __attribute__ ((vector_size (8)));
+</pre>
+ <p><code>v2sf</code> values are initialized in the same way as aggregates. 
+For example:
+
+<pre class="smallexample">     v2sf a = {1.5, 9.1};
+     v2sf b;
+     float e, f;
+     b = (v2sf) {e, f};
+</pre>
+ <p><em>Note:</em> The CPU's endianness determines which value is stored in
+the upper half of a register and which value is stored in the lower half. 
+On little-endian targets, the first value is the lower one and the second
+value is the upper one.  The opposite order applies to big-endian targets. 
+For example, the code above will set the lower half of <code>a</code> to
+<code>1.5</code> on little-endian targets and <code>9.1</code> on big-endian targets.
+
+ </body></html>
+

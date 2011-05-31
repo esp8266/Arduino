@@ -1,0 +1,75 @@
+<html lang="en">
+<head>
+<title>Super-H - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Embedded-Processors.html#Embedded-Processors" title="Embedded Processors">
+<link rel="prev" href="CRIS.html#CRIS" title="CRIS">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Super-H"></a>
+<a name="Super_002dH"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="CRIS.html#CRIS">CRIS</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Embedded-Processors.html#Embedded-Processors">Embedded Processors</a>
+<hr>
+</div>
+
+<h4 class="subsection">21.3.14 Renesas Super-H</h4>
+
+<p><a name="index-Super_002dH-1389"></a>
+For the Renesas Super-H processor, <span class="sc">gdb</span> provides these
+commands:
+
+     <dl>
+<dt><code>regs</code><dd><a name="index-regs_0040r_007b_002c-Super_002dH_007d-1390"></a>Show the values of all Super-H registers.
+
+     <br><dt><code>set sh calling-convention </code><var>convention</var><dd><a name="index-set-sh-calling_002dconvention-1391"></a>Set the calling-convention used when calling functions from <span class="sc">gdb</span>. 
+Allowed values are &lsquo;<samp><span class="samp">gcc</span></samp>&rsquo;, which is the default setting, and &lsquo;<samp><span class="samp">renesas</span></samp>&rsquo;. 
+With the &lsquo;<samp><span class="samp">gcc</span></samp>&rsquo; setting, functions are called using the <span class="sc">gcc</span> calling
+convention.  If the DWARF-2 information of the called function specifies
+that the function follows the Renesas calling convention, the function
+is called using the Renesas calling convention.  If the calling convention
+is set to &lsquo;<samp><span class="samp">renesas</span></samp>&rsquo;, the Renesas calling convention is always used,
+regardless of the DWARF-2 information.  This can be used to override the
+default of &lsquo;<samp><span class="samp">gcc</span></samp>&rsquo; if debug information is missing, or the compiler
+does not emit the DWARF-2 calling convention entry for a function.
+
+     <br><dt><code>show sh calling-convention</code><dd><a name="index-show-sh-calling_002dconvention-1392"></a>Show the current calling convention setting.
+
+   </dl>
+
+   </body></html>
+

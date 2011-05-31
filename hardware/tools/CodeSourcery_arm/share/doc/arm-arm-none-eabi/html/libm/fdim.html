@@ -1,0 +1,66 @@
+<html lang="en">
+<head>
+<title>fdim - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Math.html#Math" title="Math">
+<link rel="prev" href="fabs.html#fabs" title="fabs">
+<link rel="next" href="floor.html#floor" title="floor">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="fdim"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="floor.html#floor">floor</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="fabs.html#fabs">fabs</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Math.html#Math">Math</a>
+<hr>
+</div>
+
+<h3 class="section">1.19 <code>fdim</code>, <code>fdimf</code>&ndash;positive difference</h3>
+
+<p><a name="index-fdim-47"></a><a name="index-fdimf-48"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double fdim(double <var>x</var>, double <var>y</var>);
+     float fdimf(float <var>x</var>, float <var>y</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+The <code>fdim</code> functions determine the positive difference between their
+arguments, returning:
+<pre class="smallexample">     	<var>x</var> - <var>y</var>	if <var>x</var> &gt; <var>y</var>, or
+</pre>
+   <pre class="smallexample">     	+0	if <var>x</var> &lt;= <var>y</var>, or
+</pre>
+   <pre class="smallexample">     	NAN	if either argument is NAN.
+</pre>
+   <p>A range error may occur.
+
+   <p><br>
+<strong>Returns</strong><br>
+The <code>fdim</code> functions return the positive difference value.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C, POSIX.
+
+   <p><br>
+
+   </body></html>
+

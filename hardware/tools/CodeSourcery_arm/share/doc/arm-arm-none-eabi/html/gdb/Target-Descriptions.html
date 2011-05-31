@@ -1,0 +1,94 @@
+<html lang="en">
+<head>
+<title>Target Descriptions - Debugging with GDB</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Debugging with GDB">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="prev" href="Agent-Expressions.html#Agent-Expressions" title="Agent Expressions">
+<link rel="next" href="Operating-System-Information.html#Operating-System-Information" title="Operating System Information">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1996,
+1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``Free Software'' and ``Free Software Needs
+Free Documentation'', with the Front-Cover Texts being ``A GNU Manual,''
+and with the Back-Cover Texts as in (a) below.
+
+(a) The FSF's Back-Cover Text is: ``You are free to copy and modify
+this GNU Manual.  Buying copies from GNU Press supports the FSF in
+developing GNU and promoting software freedom.''-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Target-Descriptions"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Operating-System-Information.html#Operating-System-Information">Operating System Information</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Agent-Expressions.html#Agent-Expressions">Agent Expressions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="index.html#Top">Top</a>
+<hr>
+</div>
+
+<h2 class="appendix">Appendix G Target Descriptions</h2>
+
+<p><a name="index-target-descriptions-2535"></a>
+<strong>Warning:</strong> target descriptions are still under active development,
+and the contents and format may change between <span class="sc">gdb</span> releases. 
+The format is expected to stabilize in the future.
+
+   <p>One of the challenges of using <span class="sc">gdb</span> to debug embedded systems
+is that there are so many minor variants of each processor
+architecture in use.  It is common practice for vendors to start with
+a standard processor core &mdash; ARM, PowerPC, or MIPS, for example &mdash;
+and then make changes to adapt it to a particular market niche.  Some
+architectures have hundreds of variants, available from dozens of
+vendors.  This leads to a number of problems:
+
+     <ul>
+<li>With so many different customized processors, it is difficult for
+the <span class="sc">gdb</span> maintainers to keep up with the changes. 
+<li>Since individual variants may have short lifetimes or limited
+audiences, it may not be worthwhile to carry information about every
+variant in the <span class="sc">gdb</span> source tree. 
+<li>When <span class="sc">gdb</span> does support the architecture of the embedded system
+at hand, the task of finding the correct architecture name to give the
+<samp><span class="command">set architecture</span></samp> command can be error-prone. 
+</ul>
+
+   <p>To address these problems, the <span class="sc">gdb</span> remote protocol allows a
+target system to not only identify itself to <span class="sc">gdb</span>, but to
+actually describe its own features.  This lets <span class="sc">gdb</span> support
+processor variants it has never seen before &mdash; to the extent that the
+descriptions are accurate, and that <span class="sc">gdb</span> understands them.
+
+   <p><span class="sc">gdb</span> must be linked with the Expat library to support XML
+target descriptions.  See <a href="Expat.html#Expat">Expat</a>.
+
+<ul class="menu">
+<li><a accesskey="1" href="Retrieving-Descriptions.html#Retrieving-Descriptions">Retrieving Descriptions</a>:          How descriptions are fetched from a target. 
+<li><a accesskey="2" href="Target-Description-Format.html#Target-Description-Format">Target Description Format</a>:        The contents of a target description. 
+<li><a accesskey="3" href="Predefined-Target-Types.html#Predefined-Target-Types">Predefined Target Types</a>:          Standard types available for target
+                                    descriptions. 
+<li><a accesskey="4" href="Standard-Target-Features.html#Standard-Target-Features">Standard Target Features</a>:         Features <span class="sc">gdb</span> knows about. 
+</ul>
+
+   </body></html>
+

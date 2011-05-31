@@ -1,0 +1,378 @@
+   CODESOURCERY, INC. ("CODESOURCERY") IS WILLING TO LICENSE THE
+   SOFTWARE ONLY UPON THE CONDITION THAT YOU ACCEPT ALL OF THE
+   TERMS CONTAINED IN THIS SOFTWARE LICENSE AGREEMENT. PLEASE
+   READ THE TERMS CAREFULLY. BY CLICKING ON "I accept the terms
+   of the License Agreement", YOU WILL INDICATE YOUR AGREEMENT
+   WITH THEM. IF YOU ARE ENTERING INTO THIS AGREEMENT ON BEHALF
+   OF A COMPANY OR OTHER LEGAL ENTITY, YOUR ACCEPTANCE
+   REPRESENTS THAT YOU HAVE THE AUTHORITY TO BIND SUCH ENTITY TO
+   THESE TERMS, IN WHICH CASE "YOU" OR "YOUR" SHALL REFER TO
+   YOUR ENTITY. IF YOU DO NOT AGREE WITH THESE TERMS, OR IF YOU
+   DO NOT HAVE THE AUTHORITY TO BIND YOUR ENTITY, THEN
+   CODESOURCERY IS UNWILLING TO LICENSE THE SOFTWARE.
+   Sourcery G++ Software License Agreement
+    1. Parties.
+       The parties to this Agreement are you, the licensee (You
+       or Licensee) and CodeSourcery. If You are not acting on
+       behalf of Yourself as an individual, then You means Your
+       company or organization.
+    2. The Software
+       The Software licensed under this Agreement consists of
+       computer programs and documentation referred to as
+       Sourcery G++ Lite Edition (the Software).
+    3. Definitions.
+         1. CodeSourcery Proprietary Components.
+            The components of the Software that are owned and/or
+            licensed by CodeSourcery and are not subject to a
+            free software or open source license, such as the
+            GNU Public License. The CodeSourcery Proprietary
+            Components of the Software include, without
+            limitation, the Sourcery G++ Installer, any Sourcery
+            G++ Eclipse plug-ins, the CodeSourcery C Library
+            (CSLIBC), and any Sourcery G++ Debug Sprite. For a
+            complete list, refer to the Getting Started Guide
+            included with the distribution.
+         2. Open Source Software Components.
+            The components of the Software that are subject to a
+            free software or open source license, such as the
+            GNU Public License.
+         3. Proprietary Rights.
+            All rights in and to copyrights, rights to register
+            copyrights, trade secrets, inventions, patents,
+            patent rights, trademarks, trademark rights,
+            confidential and proprietary information protected
+            under contract or otherwise under law, and other
+            similar rights or interests in intellectual or
+            industrial property.
+         4. Redistributable Components.
+            The CodeSourcery Proprietary Components that are
+            intended to be incorporated or linked into Licensee
+            object code developed with the Software. The
+            Redistributable Components of the Software include,
+            without limitation, CSLIBC and the CodeSourcery
+            Common Startup Code Sequence (CS3). For a complete
+            list, refer to the Getting Started Guide included
+            with the distribution.
+    4. License Grant to Proprietary Components of the Software.
+       You are granted a non-exclusive, royalty-free license (a)
+       to install and use the CodeSourcery Proprietary
+       Components of the Software, (b) to transmit the
+       CodeSourcery Proprietary Components over an internal
+       computer network, (c) to copy the CodeSourcery
+       Proprietary Components for Your internal use only, and
+       (d) to distribute the Redistributable Component(s) in
+       binary form only and only as part of Licensee object code
+       developed with the Software that provides substantially
+       different functionality than the Redistributable
+       Component(s).
+    5. Restrictions.
+       You may not: (i) copy or permit others to use the
+       CodeSourcery Proprietary Components of the Software,
+       except as expressly provided above; (ii) distribute the
+       CodeSourcery Proprietary Components of the Software to
+       any third party, except as expressly provided above; or
+       (iii) reverse engineer, decompile, or disassemble the
+       CodeSourcery Proprietary Components of the Software,
+       except to the extent this restriction is expressly
+       prohibited by applicable law.
+         1. ARM Keil ULINK2 Drivers.
+            Sourcery G++ may include ULINK2 drivers from
+            ARM, Ltd. If these drivers are included, the
+            following additional terms and conditions apply:
+              1. You may use the ULINK2 drivers only in
+                 conjunction with a compatible ARM Keil ULINK2
+                 hardware unit manufactured by or under license
+                 from ARM and purchased from CodeSourcery, ARM,
+                 or a distributor authorized by ARM.
+              2. You may use the ULINK2 drivers only to connect
+                 to the GNU Debugger included in Sourcery G++.
+              3. The ULINK2 drivers are not supported by ARM,
+                 Ltd.; You should contact CodeSourcery for any
+                 support regarding the ULINK2 drivers.
+              4. You may not redistribute or transfer the ULINK2
+                 drivers.
+              5. You may not translate, adapt, arrange or
+                 otherwise alter the object code of the ULINK2
+                 drivers (including without limitation copying,
+                 adapting or reverse compiling the object code
+                 of the ULINK2 drivers for the purpose of error
+                 correction) except as allowed by applicable
+                 law.
+              6. You may not remove or obstruct any notice or
+                 marker incorporated into the ULINK2 drivers to
+                 protect ARM's or third parties' intellectual
+                 property or Proprietary Rights.
+              7. The ULINK2 drivers are licensed, not sold; all
+                 right, title and interest therein is reserved
+                 to CodeSourcery or its licensors, and You
+                 acquire no right, title or interest therein.
+         2. SEGGER J-Link Devices.
+            Sourcery G++ Lite includes proprietary software from
+            SEGGER Microcontroller GmbH & Co.KG that allows the
+            use of SEGGER J-Link debug devices with the Sourcery
+            G++ Lite Debug Sprite. You may use software from
+            SEGGER only under the SEGGER J-Link software terms
+            of use and license agreement.
+         3. Sourcery G++ Debug Sprite with ARM SWD.
+            The Sourcery G++ Debug Sprite for ARM and Stellaris
+            processors includes software for ARM SWD support
+            from ARM, Ltd. You may use the ARM SWD software only
+            in conjunction with a Cortex-M1 or Cortex-M3
+            microprocessor manufactured under license from ARM.
+         4. Sourcery G++ Debug Sprite for P&E Devices.
+            You may use the Sourcery G++ Debug Sprite for P&E
+            only in conjunction with ColdFire microprocessors
+            and with debugging devices produced by P&E
+            Microcomputer Systems.
+            Sourcery G++ Debug Sprite for P&E Devices.
+            This software application may include P&E NGS
+            Drivers version 120210 third-party software, which
+            is distributed on an "AS IS" basis, WITHOUT WARRANTY
+            OF ANY KIND, either express or implied. P&E NGS
+            Drivers version 120210 may be subject to the
+            following copyrights: © 1999-2003, Lukas Gebauer All
+            rights reserved. Redistribution and use in source
+            and binary forms, with or without modification, are
+            permitted provided that the following conditions are
+            met:
+         5. Redistributions of source code must retain the above
+            copyright notice, this list of conditions and the
+            following disclaimer.
+         6. Redistributions in binary form must reproduce the
+            above copyright notice, this list of conditions and
+            the following disclaimer in the documentation and/or
+            other materials provided with the distribution.
+         7. Neither the name of Lukas Gebauer nor the names of
+            its contributors may be used to endorse or promote
+            products derived from this software without specific
+            prior written permission.
+         8. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS
+            AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+            WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+            IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+            FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+            SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY
+            DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+            CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+            TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+            LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+            INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+            LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+            TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+            ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+            ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    6. Free Software or Open Source License to Certain
+       Components of the Software
+       This Agreement does not limit Your rights under, or grant
+       You rights that supersede, the license terms of any Open
+       Source Software Component delivered to You by
+       CodeSourcery. Sourcery G++ includes components provided
+       under various different licenses. The Getting Started
+       Guide provides an overview of which license applies to
+       different components, and, for components subject to the
+       Eclipse Public License, contains information on how to
+       obtain the source code. Definitive licensing information
+       for each free software or open source component is
+       available in the relevant source file.
+    7. CodeSourcery Trademarks.
+       Notwithstanding any provision in a free software or open
+       source license agreement applicable to a component of the
+       Software that permits You to distribute such component to
+       a third party in source or binary form, You may not use
+       any CodeSourcery trademark, whether registered or
+       unregistered, including without limitation, CodeSourcery,
+       Sourcery G++, the CodeSourcery crystal ball logo, or the
+       Sourcery G++ splash screen, or any confusingly similar
+       mark, in connection with such distribution, and You may
+       not recompile the Open Source Software Components with
+       the --with-pkgversion or --with-bugurl configuration
+       options that embed CodeSourcery trademarks in the
+       resulting binary.
+    8. Term and Termination.
+       This Agreement shall remain in effect unless terminated
+       pursuant to this provision. CodeSourcery may terminate
+       this Agreement upon seven (7) days written notice of a
+       material breach of this Agreement if such breach is not
+       cured; provided that the unauthorized use, copying, or
+       distribution of the CodeSourcery Proprietary Components
+       of the Software will be deemed a material breach that
+       cannot be cured.
+    9. Transfers.
+       You may not transfer any rights under this Agreement
+       without the prior written consent of CodeSourcery, which
+       consent shall not be unreasonably withheld. A condition
+       to any transfer or assignment shall be that the recipient
+       agrees to the terms of this Agreement. Any attempted
+       transfer or assignment in violation of this provision
+       shall be null and void.
+   10. Ownership.
+       CodeSourcery owns and/or has licensed the CodeSourcery
+       Proprietary Components of the Software and all
+       intellectual property rights embodied therein, including
+       copyrights and valuable trade secrets embodied in its
+       design and coding methodology. The CodeSourcery
+       Proprietary Components of the Software are protected by
+       United States copyright laws and international treaty
+       provisions. CodeSourcery also owns all rights, title and
+       interest in and with respect to its trade names, domain
+       names, trade dress, logos, trademarks, service marks, and
+       other similar rights or interests in intellectual
+       property. This Agreement provides You only a limited use
+       license, and no ownership of any intellectual property.
+   11. Warranty Disclaimer; Limitation of Liability.
+       CODESOURCERY AND ITS LICENSORS PROVIDE THE SOFTWARE AS-IS
+       AND PROVIDED WITH ALL FAULTS. CODESOURCERY DOES NOT MAKE
+       ANY WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.
+       CODESOURCERY SPECIFICALLY DISCLAIMS THE IMPLIED
+       WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY,
+       FITNESS FOR A PARTICULAR PURPOSE, SYSTEM INTEGRATION, AND
+       DATA ACCURACY. THERE IS NO WARRANTY OR GUARANTEE THAT THE
+       OPERATION OF THE SOFTWARE WILL BE UNINTERRUPTED,
+       ERROR-FREE, OR VIRUS-FREE, OR THAT THE SOFTWARE WILL MEET
+       ANY PARTICULAR CRITERIA OF PERFORMANCE, QUALITY,
+       ACCURACY, PURPOSE, OR NEED. YOU ASSUME THE ENTIRE RISK OF
+       SELECTION, INSTALLATION, AND USE OF THE SOFTWARE. THIS
+       DISCLAIMER OF WARRANTY CONSTITUTES AN ESSENTIAL PART OF
+       THIS AGREEMENT. NO USE OF THE SOFTWARE IS AUTHORIZED
+       HEREUNDER EXCEPT UNDER THIS DISCLAIMER.
+   12. Local Law.
+       If implied warranties may not be disclaimed under
+       applicable law, then ANY IMPLIED WARRANTIES ARE LIMITED
+       IN DURATION TO THE PERIOD REQUIRED BY APPLICABLE LAW.
+   13. Limitation of Liability.
+       INDEPENDENT OF THE FORGOING PROVISIONS, IN NO EVENT AND
+       UNDER NO LEGAL THEORY, INCLUDING WITHOUT LIMITATION,
+       TORT, CONTRACT, OR STRICT PRODUCTS LIABILITY, SHALL
+       CODESOURCERY BE LIABLE TO YOU OR ANY OTHER PERSON FOR ANY
+       INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES
+       OF ANY KIND, INCLUDING WITHOUT LIMITATION, DAMAGES FOR
+       LOSS OF GOODWILL, WORK STOPPAGE, COMPUTER MALFUNCTION, OR
+       ANY OTHER KIND OF COMMERCIAL DAMAGE, EVEN IF CODESOURCERY
+       HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. THIS
+       LIMITATION SHALL NOT APPLY TO LIABILITY FOR DEATH OR
+       PERSONAL INJURY TO THE EXTENT PROHIBITED BY APPLICABLE
+       LAW. IN NO EVENT SHALL CODESOURCERY'S LIABILITY FOR
+       ACTUAL DAMAGES FOR ANY CAUSE WHATSOEVER, AND REGARDLESS
+       OF THE FORM OF ACTION, EXCEED THE AMOUNT PAID BY YOU IN
+       FEES UNDER THIS AGREEMENT DURING THE PREVIOUS ONE YEAR
+       PERIOD.
+   14. Export Controls.
+       You agree to comply with all export laws and restrictions
+       and regulations of the United States or foreign agencies
+       or authorities, and not to export or re-export the
+       Software or any direct product thereof in violation of
+       any such restrictions, laws or regulations, or without
+       all necessary approvals. As applicable, each party shall
+       obtain and bear all expenses relating to any necessary
+       licenses and/or exemptions with respect to its own export
+       of the Software from the U.S. Neither the Software nor
+       the underlying information or technology may be
+       electronically transmitted or otherwise exported or
+       re-exported (i) into Cuba, Iran, Iraq, Libya, North
+       Korea, Sudan, Syria or any other country subject to U.S.
+       trade sanctions covering the Software, to individuals or
+       entities controlled by such countries, or to nationals or
+       residents of such countries other than nationals who are
+       lawfully admitted permanent residents of countries not
+       subject to such sanctions; or (ii) to anyone on the U.S.
+       Treasury Department's list of Specially Designated
+       Nationals and Blocked Persons or the U.S. Commerce
+       Department's Table of Denial Orders. By downloading or
+       using the Software, Licensee agrees to the foregoing and
+       represents and warrants that it complies with these
+       conditions.
+   15. U.S. Government End-Users.
+       The Software is a commercial item, as that term is
+       defined in 48 C.F.R. 2.101 (Oct. 1995), consisting of
+       commercial computer software and commercial computer
+       software documentation, as such terms are used in 48
+       C.F.R. 12.212 (Sept. 1995). Consistent with 48 C.F.R.
+       12.212 and 48 C.F.R. 227.7202-1 through 227.7202-4 (June
+       1995), all U.S. Government End Users acquire the Software
+       with only those rights set forth herein.
+   16. Licensee Outside The U.S.
+       If You are located outside the U.S., then the following
+       provisions shall apply: (i) Les parties aux presentes
+       confirment leur volonte que cette convention de meme que
+       tous les documents y compris tout avis qui siy rattache,
+       soient rediges en langue anglaise (translation: The
+       parties confirm that this Agreement and all related
+       documentation is and will be in the English language.);
+       and (ii) You are responsible for complying with any local
+       laws in your jurisdiction which might impact your right
+       to import, export or use the Software, and You represent
+       that You have complied with any regulations or
+       registration procedures required by applicable law to
+       make this license enforceable.
+   17. Severability.
+       If any provision of this Agreement is declared invalid or
+       unenforceable, such provision shall be deemed modified to
+       the extent necessary and possible to render it valid and
+       enforceable. In any event, the unenforceability or
+       invalidity of any provision shall not affect any other
+       provision of this Agreement, and this Agreement shall
+       continue in full force and effect, and be construed and
+       enforced, as if such provision had not been included, or
+       had been modified as above provided, as the case may be.
+   18. Arbitration.
+       Except for actions to protect intellectual property
+       rights and to enforce an arbitrator's decision hereunder,
+       all disputes, controversies, or claims arising out of or
+       relating to this Agreement or a breach thereof shall be
+       submitted to and finally resolved by arbitration under
+       the rules of the American Arbitration Association (AAA)
+       then in effect. There shall be one arbitrator, and such
+       arbitrator shall be chosen by mutual agreement of the
+       parties in accordance with AAA rules. The arbitration
+       shall take place in Granite Bay, California, and may be
+       conducted by telephone or online. The arbitrator shall
+       apply the laws of the State of California, USA to all
+       issues in dispute. The controversy or claim shall be
+       arbitrated on an individual basis, and shall not be
+       consolidated in any arbitration with any claim or
+       controversy of any other party. The findings of the
+       arbitrator shall be final and binding on the parties, and
+       may be entered in any court of competent jurisdiction for
+       enforcement. Enforcements of any award or judgment shall
+       be governed by the United Nations Convention on the
+       Recognition and Enforcement of Foreign Arbitral Awards.
+       Should either party file an action contrary to this
+       provision, the other party may recover attorney's fees
+       and costs up to $1000.00.
+   19. Jurisdiction And Venue.
+       The courts of Placer County in the State of California,
+       USA and the nearest U.S. District Court shall be the
+       exclusive jurisdiction and venue for all legal
+       proceedings that are not arbitrated under this Agreement.
+   20. Independent Contractors.
+       The relationship of the parties is that of independent
+       contractor, and nothing herein shall be construed to
+       create a partnership, joint venture, franchise,
+       employment, or agency relationship between the parties.
+       Licensee shall have no authority to enter into agreements
+       of any kind on behalf of CodeSourcery and shall not have
+       the power or authority to bind or obligate CodeSourcery
+       in any manner to any third party.
+   21. Force Majeure.
+       Neither CodeSourcery nor Licensee shall be liable for
+       damages for any delay or failure of delivery arising out
+       of causes beyond their reasonable control and without
+       their fault or negligence, including, but not limited to,
+       Acts of God, acts of civil or military authority, fires,
+       riots, wars, embargoes, or communications failure.
+   22. Miscellaneous.
+       This Agreement constitutes the entire understanding of
+       the parties with respect to the subject matter of this
+       Agreement and merges all prior communications,
+       representations, and agreements. This Agreement may be
+       modified only by a written agreement signed by the
+       parties. If any provision of this Agreement is held to be
+       unenforceable for any reason, such provision shall be
+       reformed only to the extent necessary to make it
+       enforceable. This Agreement shall be construed under the
+       laws of the State of California, USA, excluding rules
+       regarding conflicts of law. The application of the United
+       Nations Convention of Contracts for the International
+       Sale of Goods is expressly excluded. This license is
+       written in English, and English is its controlling
+       language.

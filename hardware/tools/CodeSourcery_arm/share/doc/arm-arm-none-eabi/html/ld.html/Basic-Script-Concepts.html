@@ -1,0 +1,99 @@
+<html lang="en">
+<head>
+<title>Basic Script Concepts - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Scripts.html#Scripts" title="Scripts">
+<link rel="next" href="Script-Format.html#Script-Format" title="Script Format">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents the GNU linker LD
+(Sourcery G++ Lite 2011.03-42)
+version 2.20.51.
+
+Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the
+section entitled ``GNU Free Documentation License''.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="Basic-Script-Concepts"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Script-Format.html#Script-Format">Script Format</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Scripts.html#Scripts">Scripts</a>
+<hr>
+</div>
+
+<h3 class="section">3.1 Basic Linker Script Concepts</h3>
+
+<p><a name="index-linker-script-concepts-337"></a>We need to define some basic concepts and vocabulary in order to
+describe the linker script language.
+
+   <p>The linker combines input files into a single output file.  The output
+file and each input file are in a special data format known as an
+<dfn>object file format</dfn>.  Each file is called an <dfn>object file</dfn>. 
+The output file is often called an <dfn>executable</dfn>, but for our
+purposes we will also call it an object file.  Each object file has,
+among other things, a list of <dfn>sections</dfn>.  We sometimes refer to a
+section in an input file as an <dfn>input section</dfn>; similarly, a section
+in the output file is an <dfn>output section</dfn>.
+
+   <p>Each section in an object file has a name and a size.  Most sections
+also have an associated block of data, known as the <dfn>section
+contents</dfn>.  A section may be marked as <dfn>loadable</dfn>, which mean that
+the contents should be loaded into memory when the output file is run. 
+A section with no contents may be <dfn>allocatable</dfn>, which means that an
+area in memory should be set aside, but nothing in particular should be
+loaded there (in some cases this memory must be zeroed out).  A section
+which is neither loadable nor allocatable typically contains some sort
+of debugging information.
+
+   <p>Every loadable or allocatable output section has two addresses.  The
+first is the <dfn>VMA</dfn>, or virtual memory address.  This is the address
+the section will have when the output file is run.  The second is the
+<dfn>LMA</dfn>, or load memory address.  This is the address at which the
+section will be loaded.  In most cases the two addresses will be the
+same.  An example of when they might be different is when a data section
+is loaded into ROM, and then copied into RAM when the program starts up
+(this technique is often used to initialize global variables in a ROM
+based system).  In this case the ROM address would be the LMA, and the
+RAM address would be the VMA.
+
+   <p>You can see the sections in an object file by using the <code>objdump</code>
+program with the &lsquo;<samp><span class="samp">-h</span></samp>&rsquo; option.
+
+   <p>Every object file also has a list of <dfn>symbols</dfn>, known as the
+<dfn>symbol table</dfn>.  A symbol may be defined or undefined.  Each symbol
+has a name, and each defined symbol has an address, among other
+information.  If you compile a C or C++ program into an object file, you
+will get a defined symbol for every defined function and global or
+static variable.  Every undefined function or global variable which is
+referenced in the input file will become an undefined symbol.
+
+   <p>You can see the symbols in an object file by using the <code>nm</code>
+program, or by using the <code>objdump</code> program with the &lsquo;<samp><span class="samp">-t</span></samp>&rsquo;
+option.
+
+   </body></html>
+

@@ -1,0 +1,78 @@
+<html lang="en">
+<head>
+<title>fputc - Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="start" href="index.html#Top">
+<link rel="up" href="Stdio.html#Stdio" title="Stdio">
+<link rel="prev" href="fpurge.html#fpurge" title="fpurge">
+<link rel="next" href="fputs.html#fputs" title="fputs">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+<link rel="stylesheet" type="text/css" href="../cs.css">
+</head>
+<body>
+<div class="node">
+<a name="fputc"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="fputs.html#fputs">fputs</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="fpurge.html#fpurge">fpurge</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Stdio.html#Stdio">Stdio</a>
+<hr>
+</div>
+
+<h3 class="section">4.20 <code>fputc</code>&mdash;write a character on a stream or file</h3>
+
+<p><a name="index-fputc-183"></a><a name="index-g_t_005ffputc_005fr-184"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;stdio.h&gt;
+     int fputc(int <var>ch</var>, FILE *<var>fp</var>);
+     
+     #include &lt;stdio.h&gt;
+     int _fputc_r(struct _rent *<var>ptr</var>, int <var>ch</var>, FILE *<var>fp</var>);
+     
+</pre>
+   <p><strong>Description</strong><br>
+<code>fputc</code> converts the argument <var>ch</var> from an <code>int</code> to an
+<code>unsigned char</code>, then writes it to the file or stream identified by
+<var>fp</var>.
+
+   <p>If the file was opened with append mode (or if the stream cannot
+support positioning), then the new character goes at the end of the
+file or stream.  Otherwise, the new character is written at the
+current value of the position indicator, and the position indicator
+oadvances by one.
+
+   <p>For a macro version of this function, see <code>putc</code>.
+
+   <p>The <code>_fputc_r</code> function is simply a reentrant version of <code>fputc</code>
+that takes an additional reentrant structure argument: <var>ptr</var>.
+
+   <p><br>
+<strong>Returns</strong><br>
+If successful, <code>fputc</code> returns its argument <var>ch</var>.  If an error
+intervenes, the result is <code>EOF</code>.  You can use `<code>ferror(</code><var>fp</var><code>)</code>' to
+query for errors.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>fputc</code> is required by ANSI C.
+
+   <p>Supporting OS subroutines required: <code>close</code>, <code>fstat</code>, <code>isatty</code>,
+<code>lseek</code>, <code>read</code>, <code>sbrk</code>, <code>write</code>.
+
+   <p><br>
+
+   </body></html>
+
