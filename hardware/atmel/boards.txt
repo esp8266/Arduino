@@ -1,0 +1,13 @@
+##############################################################
+
+sam3s_ek.name=Atmel SAM3S-EK
+sam3s_ek.upload.protocol=sam-ba
+sam3s_ek.upload.maximum_size=49152
+sam3s_ek.upload.speed=115200
+sam3s_ek.bootloader.path=sam3s_boot
+sam3s_ek.bootloader.file=sam3s_boot.bin
+sam3s_ek.build.mcu=sam3s4c
+sam3s_ek.build.f_cpu=64000000L
+sam3s_ek.build.core=at91
+
+

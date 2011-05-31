@@ -1,0 +1,135 @@
+
+WInterrupts.o:
+00000000 T attachInterrupt
+00000000 T detachInterrupt
+00000000 b intFunc
+
+wiring.o:
+         U GetTickCount
+         U LowLevelInit
+         U PIO_Configure
+00000000 T SysTick_Handler
+         U TimeTick_Increment
+         U WDT_Disable
+00000000 T Wait
+00000000 T delayMicroseconds
+00000000 T init
+00000000 T micros
+00000000 T millis
+00000004 B timer0_millis
+00000000 B timer0_overflow_count
+
+wiring_shift.o:
+         U digitalRead
+         U digitalWrite
+00000000 T shiftIn
+00000000 T shiftOut
+
+HardwareSerial.o:
+
+Print.o:
+00000000 T _ZN5Print10printFloatEdh
+00000000 T _ZN5Print11printNumberEmh
+00000000 T _ZN5Print5printEPKc
+00000000 T _ZN5Print5printERK6String
+00000000 T _ZN5Print5printEc
+00000000 T _ZN5Print5printEdi
+00000000 T _ZN5Print5printEhi
+00000000 T _ZN5Print5printEii
+00000000 T _ZN5Print5printEji
+00000000 T _ZN5Print5printEli
+00000000 T _ZN5Print5printEmi
+00000000 T _ZN5Print5writeEPKc
+00000000 T _ZN5Print5writeEPKhj
+00000000 T _ZN5Print7printlnEPKc
+00000000 T _ZN5Print7printlnERK6String
+00000000 T _ZN5Print7printlnEc
+00000000 T _ZN5Print7printlnEdi
+00000000 T _ZN5Print7printlnEhi
+00000000 T _ZN5Print7printlnEii
+00000000 T _ZN5Print7printlnEji
+00000000 T _ZN5Print7printlnEli
+00000000 T _ZN5Print7printlnEmi
+00000000 T _ZN5Print7printlnEv
+         U _ZNK6StringixEj
+0000001c R _ZTI5Print
+00000014 R _ZTS5Print
+00000000 R _ZTV5Print
+         U _ZTVN10__cxxabiv117__class_type_infoE
+         U __aeabi_d2iz
+         U __aeabi_d2uiz
+         U __aeabi_dadd
+         U __aeabi_dcmplt
+         U __aeabi_ddiv
+         U __aeabi_dmul
+         U __aeabi_dsub
+         U __aeabi_i2d
+         U __aeabi_ui2d
+         U __aeabi_unwind_cpp_pr0
+         U __aeabi_unwind_cpp_pr1
+         U __cxa_pure_virtual
+
+UART.o:
+         U PMC_DisablePeripheral
+         U PMC_EnablePeripheral
+         U _ZN5Print5writeEPKc
+         U _ZN5Print5writeEPKhj
+00000000 T _ZN9UARTClass10IrqHandlerEv
+00000000 T _ZN9UARTClass3endEv
+00000000 T _ZN9UARTClass4peekEv
+00000000 T _ZN9UARTClass4readEv
+00000000 T _ZN9UARTClass5beginEm
+00000000 T _ZN9UARTClass5flushEv
+00000000 T _ZN9UARTClass5writeEh
+00000000 T _ZN9UARTClass9availableEv
+00000000 T _ZN9UARTClassC1EP12_ring_bufferS1_P4Uart4IRQnm
+00000000 T _ZN9UARTClassC2EP12_ring_bufferS1_P4Uart4IRQnm
+00000000 V _ZTI14HardwareSerial
+         U _ZTI5Print
+00000000 V _ZTI6Stream
+00000038 R _ZTI9UARTClass
+00000000 V _ZTS14HardwareSerial
+00000000 V _ZTS6Stream
+0000002c R _ZTS9UARTClass
+00000000 V _ZTV14HardwareSerial
+00000000 V _ZTV6Stream
+00000000 R _ZTV9UARTClass
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U __aeabi_unwind_cpp_pr0
+         U __aeabi_unwind_cpp_pr1
+         U __cxa_pure_virtual
+
+USART.o:
+         U PMC_EnablePeripheral
+00000000 T _ZN10USARTClass10IrqHandlerEv
+00000000 T _ZN10USARTClass3endEv
+00000000 T _ZN10USARTClass4peekEv
+00000000 T _ZN10USARTClass4readEv
+00000000 T _ZN10USARTClass5beginEm
+00000000 T _ZN10USARTClass5flushEv
+00000000 T _ZN10USARTClass5writeEh
+00000000 T _ZN10USARTClass9availableEv
+00000000 T _ZN10USARTClassC1EP12_ring_bufferS1_P5Usart4IRQnm
+00000000 T _ZN10USARTClassC2EP12_ring_bufferS1_P5Usart4IRQnm
+         U _ZN5Print5writeEPKc
+         U _ZN5Print5writeEPKhj
+0000003c R _ZTI10USARTClass
+00000000 V _ZTI14HardwareSerial
+         U _ZTI5Print
+00000000 V _ZTI6Stream
+0000002c R _ZTS10USARTClass
+00000000 V _ZTS14HardwareSerial
+00000000 V _ZTS6Stream
+00000000 R _ZTV10USARTClass
+00000000 V _ZTV14HardwareSerial
+00000000 V _ZTV6Stream
+         U _ZTVN10__cxxabiv120__si_class_type_infoE
+         U __aeabi_unwind_cpp_pr0
+         U __cxa_pure_virtual
+
+main.o:
+         U __aeabi_unwind_cpp_pr1
+         U init
+         U loop
+00000000 T main
+         U setup
