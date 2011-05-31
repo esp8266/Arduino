@@ -1,0 +1,345 @@
+
+acc.o:
+00000000 T ACC_Configure
+00000000 T ACC_GetComparisionResult
+00000000 T ACC_SetComparisionPair
+00000030 r __FUNCTION__.5686
+         U __assert_func
+
+adc.o:
+00000000 T ADC_CfgChannelMode
+00000000 T ADC_CfgLowRes
+00000000 T ADC_CfgPowerSave
+00000000 T ADC_CfgTiming
+00000000 T ADC_CfgTrigering
+00000000 T ADC_GetConvertedData
+00000000 T ADC_Initialize
+00000000 T ADC_IsChannelInterruptStatusSet
+00000000 T ADC_IsInterruptMasked
+00000000 T ADC_IsStatusSet
+00000000 T ADC_ReadBuffer
+00000000 T ADC_SetCompareChannel
+00000000 T ADC_SetCompareMode
+00000000 T ADC_SetComparisonWindow
+00000000 T ADC_cfgFrequency
+00000098 r __FUNCTION__.5707
+00000080 r __FUNCTION__.5713
+00000068 r __FUNCTION__.5718
+         U __assert_func
+00000000 d adwValue.5706
+00000000 t calcul_startup
+
+async.o:
+00000000 T ASYNC_IsFinished
+
+crccu.o:
+00000000 T CRCCU_ComputeCrc
+00000000 T CRCCU_Configure
+00000000 T CRCCU_ResetCrcValue
+
+dacc.o:
+00000000 T DACC_Initialize
+00000000 T DACC_SetConversionData
+00000000 T DACC_WriteBuffer
+00000034 r __FUNCTION__.5690
+         U __assert_func
+
+efc.o:
+00000000 T EFC_ComputeAddress
+00000000 T EFC_DisableFrdyIt
+00000000 T EFC_EnableFrdyIt
+00000000 T EFC_GetResult
+00000000 T EFC_GetStatus
+00000000 T EFC_PerformCommand
+00000000 T EFC_SetWaitState
+00000000 T EFC_StartCommand
+00000000 T EFC_TranslateAddress
+00000000 b IAP_PerformCommand.6331
+00000134 r __FUNCTION__.6293
+00000120 r __FUNCTION__.6301
+0000010c r __FUNCTION__.6313
+         U __assert_func
+
+exceptions.o:
+
+flashd.o:
+00000000 t ComputeLockRange
+         U EFC_ComputeAddress
+         U EFC_DisableFrdyIt
+         U EFC_GetResult
+         U EFC_PerformCommand
+         U EFC_SetWaitState
+         U EFC_StartCommand
+         U EFC_TranslateAddress
+00000000 T FLASHD_ClearGPNVM
+00000000 T FLASHD_Erase
+00000000 T FLASHD_Initialize
+00000000 T FLASHD_IsGPNVMSet
+00000000 T FLASHD_IsLocked
+00000000 T FLASHD_Lock
+00000000 T FLASHD_ReadUniqueID
+00000000 T FLASHD_SetGPNVM
+00000000 T FLASHD_Unlock
+00000000 T FLASHD_Write
+00000198 r __FUNCTION__.6049
+00000188 r __FUNCTION__.6065
+00000178 r __FUNCTION__.6117
+00000164 r __FUNCTION__.6126
+00000154 r __FUNCTION__.6130
+00000140 r __FUNCTION__.6134
+0000012c r __FUNCTION__.6139
+         U __assert_func
+00000000 b _adwPageBuffer
+00000000 d _aucPageBuffer
+00000100 b _dwUseIAP
+         U memcpy
+
+pio.o:
+00000000 T PIO_Clear
+00000000 T PIO_Configure
+00000000 T PIO_DisableInterrupt
+00000000 T PIO_Get
+00000000 T PIO_GetOutputDataStatus
+00000000 T PIO_PullUp
+00000000 T PIO_Set
+00000000 T PIO_SetDebounceFilter
+00000000 T PIO_SetInput
+00000000 T PIO_SetOutput
+00000000 T PIO_SetPeripheral
+         U PMC_EnablePeripheral
+
+pio_capture.o:
+00000000 T PIO_CaptureDisable
+00000000 T PIO_CaptureDisableIt
+00000000 T PIO_CaptureEnable
+00000000 T PIO_CaptureEnableIt
+00000000 T PIO_CaptureHandler
+00000000 T PIO_CaptureInit
+         U PMC_EnablePeripheral
+00000000 b _PioCaptureCopy
+00000088 r __FUNCTION__.6287
+         U __assert_func
+
+pmc.o:
+00000000 T PMC_DisableAllPeripherals
+00000000 T PMC_DisablePeripheral
+00000000 T PMC_EnableAllPeripherals
+00000000 T PMC_EnablePeripheral
+00000000 T PMC_IsPeriphEnabled
+00000048 r __FUNCTION__.5680
+00000030 r __FUNCTION__.5684
+0000001c r __FUNCTION__.5706
+         U __assert_func
+
+pwmc.o:
+00000284 r C.2.6943
+00000000 t FindClockConfiguration
+00000000 T PWMC_ConfigureChannel
+00000000 T PWMC_ConfigureChannelExt
+00000000 T PWMC_ConfigureClocks
+00000000 T PWMC_ConfigureComparisonUnit
+00000000 T PWMC_ConfigureEventLineMode
+00000000 T PWMC_ConfigureSyncChannel
+00000000 T PWMC_DisableChannel
+00000000 T PWMC_DisableChannelIt
+00000000 T PWMC_DisableIt
+00000000 T PWMC_DisableOverrideOutput
+00000000 T PWMC_EnableChannel
+00000000 T PWMC_EnableChannelIt
+00000000 T PWMC_EnableFaultProtection
+00000000 T PWMC_EnableIt
+00000000 T PWMC_EnableOverrideOutput
+00000000 T PWMC_FaultClear
+00000000 T PWMC_SetDeadTime
+00000000 T PWMC_SetDutyCycle
+00000000 T PWMC_SetFaultMode
+00000000 T PWMC_SetFaultProtectionValue
+00000000 T PWMC_SetOverrideValue
+00000000 T PWMC_SetPeriod
+00000000 T PWMC_SetSyncChannelUpdatePeriod
+00000000 T PWMC_SetSyncChannelUpdateUnlock
+00000000 T PWMC_WriteBuffer
+000002b0 r __FUNCTION__.5684
+0000026c r __FUNCTION__.5695
+00000250 r __FUNCTION__.5710
+00000238 r __FUNCTION__.5721
+00000224 r __FUNCTION__.5732
+00000210 r __FUNCTION__.5739
+000001f0 r __FUNCTION__.5821
+000001d4 r __FUNCTION__.5827
+         U __assert_func
+
+rtc.o:
+00000000 T RTC_ClearSCCR
+00000000 T RTC_DisableIt
+00000000 T RTC_EnableIt
+00000000 T RTC_GetDate
+00000000 T RTC_GetHourMode
+00000000 T RTC_GetSR
+00000000 T RTC_GetTime
+00000000 T RTC_SetDate
+00000000 T RTC_SetDateAlarm
+00000000 T RTC_SetHourMode
+00000000 T RTC_SetTime
+00000000 T RTC_SetTimeAlarm
+00000074 r __FUNCTION__.5681
+00000064 r __FUNCTION__.5690
+00000054 r __FUNCTION__.5695
+         U __assert_func
+
+rtt.o:
+00000000 T RTT_EnableIT
+00000000 T RTT_GetStatus
+00000000 T RTT_GetTime
+00000000 T RTT_SetAlarm
+00000000 T RTT_SetPrescaler
+00000048 r __FUNCTION__.5688
+00000038 r __FUNCTION__.5696
+         U __assert_func
+
+spi.o:
+         U PMC_EnablePeripheral
+00000000 T SPI_Configure
+00000000 T SPI_ConfigureNPCS
+00000000 T SPI_Disable
+00000000 T SPI_DisableIt
+00000000 T SPI_Enable
+00000000 T SPI_EnableIt
+00000000 T SPI_GetStatus
+00000000 T SPI_IsFinished
+00000000 T SPI_PdcDisableRx
+00000000 T SPI_PdcDisableTx
+00000000 T SPI_PdcEnableRx
+00000000 T SPI_PdcEnableTx
+00000000 T SPI_PdcSetRx
+00000000 T SPI_PdcSetTx
+00000000 T SPI_Read
+00000000 T SPI_ReadBuffer
+00000000 T SPI_Write
+00000000 T SPI_WriteBuffer
+
+spi_pdc.o:
+         U PMC_DisablePeripheral
+         U PMC_EnablePeripheral
+00000000 T SPID_Configure
+00000000 T SPID_ConfigureCS
+00000000 T SPID_Handler
+00000000 T SPID_IsBusy
+00000000 T SPID_SendCommand
+         U SPI_Configure
+         U SPI_ConfigureNPCS
+         U SPI_DisableIt
+         U SPI_Enable
+         U SPI_EnableIt
+         U SPI_PdcDisableRx
+         U SPI_PdcDisableTx
+         U SPI_PdcEnableRx
+         U SPI_PdcEnableTx
+         U SPI_PdcSetRx
+         U SPI_PdcSetTx
+
+ssc.o:
+00000000 T SSC_Configure
+00000000 T SSC_ConfigureReceiver
+00000000 T SSC_ConfigureTransmitter
+00000000 T SSC_DisableInterrupts
+00000000 T SSC_DisableReceiver
+00000000 T SSC_DisableTransmitter
+00000000 T SSC_EnableInterrupts
+00000000 T SSC_EnableReceiver
+00000000 T SSC_EnableTransmitter
+00000000 T SSC_Read
+00000000 T SSC_ReadBuffer
+00000000 T SSC_Write
+00000000 T SSC_WriteBuffer
+
+tc.o:
+00000000 T TC_Configure
+00000000 T TC_FindMckDivisor
+00000000 T TC_Start
+00000000 T TC_Stop
+0000006c r __FUNCTION__.5683
+00000060 r __FUNCTION__.5689
+00000058 r __FUNCTION__.5695
+         U __assert_func
+
+twi.o:
+00000000 T TWI_ByteReceived
+00000000 T TWI_ByteSent
+00000000 T TWI_ConfigureMaster
+00000000 T TWI_ConfigureSlave
+00000000 T TWI_DisableIt
+00000000 T TWI_EnableIt
+00000000 T TWI_GetMaskedStatus
+00000000 T TWI_GetStatus
+00000000 T TWI_ReadByte
+00000000 T TWI_SendSTOPCondition
+00000000 T TWI_StartRead
+00000000 T TWI_StartWrite
+00000000 T TWI_Stop
+00000000 T TWI_TransferComplete
+00000000 T TWI_WriteByte
+00000180 r __FUNCTION__.6275
+0000016c r __FUNCTION__.6290
+00000160 r __FUNCTION__.6294
+00000150 r __FUNCTION__.6301
+00000140 r __FUNCTION__.6305
+00000130 r __FUNCTION__.6310
+00000120 r __FUNCTION__.6318
+00000110 r __FUNCTION__.6332
+00000100 r __FUNCTION__.6337
+000000f0 r __FUNCTION__.6341
+000000dc r __FUNCTION__.6346
+000000c4 r __FUNCTION__.6350
+         U __assert_func
+
+twid.o:
+00000000 T TWID_Handler
+00000000 T TWID_Initialize
+00000000 T TWID_Read
+00000000 T TWID_Write
+         U TWI_ByteReceived
+         U TWI_ByteSent
+         U TWI_DisableIt
+         U TWI_EnableIt
+         U TWI_GetMaskedStatus
+         U TWI_ReadByte
+         U TWI_SendSTOPCondition
+         U TWI_StartRead
+         U TWI_StartWrite
+         U TWI_Stop
+         U TWI_TransferComplete
+         U TWI_WriteByte
+000000b4 r __FUNCTION__.6280
+000000a4 r __FUNCTION__.6287
+00000098 r __FUNCTION__.6300
+0000008c r __FUNCTION__.6322
+         U __assert_func
+
+usart.o:
+00000000 T USART_Configure
+00000000 T USART_DisableIt
+00000000 T USART_EnableIt
+00000000 T USART_GetChar
+00000000 T USART_GetStatus
+00000000 T USART_IsDataAvailable
+00000000 T USART_IsRxReady
+00000000 T USART_PutChar
+00000000 T USART_Read
+00000000 T USART_ReadBuffer
+00000000 T USART_SetIrdaFilter
+00000000 T USART_SetReceiverEnabled
+00000000 T USART_SetTransmitterEnabled
+00000000 T USART_Write
+00000000 T USART_WriteBuffer
+00000024 r __FUNCTION__.6074
+         U __assert_func
+
+wdt.o:
+00000000 T WDT_Disable
+00000000 T WDT_Enable
+00000000 T WDT_GetPeriod
+00000000 T WDT_GetStatus
+00000000 T WDT_Restart
+
+core_cm3.o:
