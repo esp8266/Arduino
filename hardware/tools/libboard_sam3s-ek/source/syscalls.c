@@ -77,7 +77,7 @@ extern caddr_t _sbrk ( int incr )
     return (caddr_t) prev_heap ;
 }
 
-extern int link( char *old, char *new )
+extern int link( char *cOld, char *cNew )
 {
     return -1 ;
 }
