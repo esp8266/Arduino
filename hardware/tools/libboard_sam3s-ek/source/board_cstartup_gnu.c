@@ -62,54 +62,6 @@ extern int main( void ) ;
 void Reset_Handler( void ) ;
 extern void __libc_init_array( void ) ;
 
-/* Default empty handler */
-void Dummy_Handler( void ) ;
-
-/* Cortex-M3 core handlers */
-extern void NMI_Handler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void HardFault_Handler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void MemManage_Handler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void BusFault_Handler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void UsageFault_Handler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void SVC_Handler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void DebugMon_Handler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void PendSV_Handler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void SysTick_Handler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-
-/* Peripherals handlers */
-extern void ACC_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void ADC_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void CRCCU_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void DAC_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void EEFC_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void MCI_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void PIOA_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void PIOB_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void PIOC_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void PMC_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void PWM_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void RSTC_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void RTC_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void RTT_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void SMC_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void SPI_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void SSC_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void SUPC_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void TC0_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void TC1_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void TC2_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void TC3_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void TC4_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void TC5_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void TWI0_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void TWI1_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void UART0_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void UART1_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void USART0_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void USART1_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void USBD_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void WDT_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-
 /*------------------------------------------------------------------------------
  *         Exception Table
  *------------------------------------------------------------------------------*/
@@ -216,12 +168,4 @@ void Reset_Handler( void )
 
     /* Infinite loop */
     while ( 1 ) ;
-}
-
-/**
- * \brief Default interrupt handler for not used irq.
- */
-void Dummy_Handler( void )
-{
-  while ( 1 ) ;
 }
