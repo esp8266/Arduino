@@ -51,7 +51,7 @@ public:
     uint8_t* macAddress(uint8_t* mac);
 
     //Get the DHCP information related to IP
-    IPAddress localIp();
+    IPAddress localIP();
 
     //Get the DHCP information related to subnetMask
     IPAddress subnetMask();

@@ -121,7 +121,7 @@ uint8_t* WiFiClass::macAddress(uint8_t* mac)
     return mac;
 }
    
-IPAddress WiFiClass::localIp()
+IPAddress WiFiClass::localIP()
 {
 	IPAddress ret;
 	WiFiDrv::getIpAddress(ret);
