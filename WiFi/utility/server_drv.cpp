@@ -37,7 +37,6 @@ void ServerDrv::StartServer(uint16_t port, uint8_t sock)
 void ServerDrv::StartClient(uint32_t ipAddress, uint16_t port, uint8_t sock)
 {
 	WAIT_FOR_SLAVE_SELECT();
-	INFO2(ipAddress,port);
     // Send Command
     SpiDrv::sendCmd(START_CLIENT_TCP_CMD, PARAM_NUMS_3);
     SpiDrv::sendParam((uint8_t*)&ipAddress, sizeof(ipAddress));
