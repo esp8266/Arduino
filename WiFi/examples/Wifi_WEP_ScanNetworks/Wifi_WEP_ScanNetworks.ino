@@ -1,6 +1,6 @@
 /*
  
- WPA2 connection using the WiFi shield. Attempts to connect
+ WEP connection using the WiFi shield. Attempts to connect
  and prints out info about the network
  
  Circuit:
