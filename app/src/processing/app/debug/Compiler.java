@@ -229,6 +229,53 @@ public class Compiler implements MessageConsumer {
     execAsynchronously(commandObjcopy);
     
     return true;
+    /*
+    
+    		logger.debug("corePaths: " + this.corePath);
+
+		
+		this.objectFiles = new ArrayList<File>();
+				
+		// 0. include paths for core + all libraries
+		logger.debug("0. getIncludes");
+		this.includePaths =	getIncludes(this.corePath);
+		
+		// 1. compile the sketch (already in the buildPath)
+		logger.debug("1. compileSketch");
+		compileSketch(avrBasePath, buildPath, includePaths, configPreferences);
+
+		// 2. compile the libraries, outputting .o files to:
+		// <buildPath>/<library>/
+		//Doesn't really use configPreferences
+		logger.debug("2. compileLibraries");
+		compileLibraries(avrBasePath, buildPath, includePaths, configPreferences);
+
+		// 3. compile the core, outputting .o files to <buildPath> and then
+		// collecting them into the core.a library file.
+	    logger.debug("3. compileCore");
+ 		compileCore(avrBasePath, buildPath, this.corePath, configPreferences);
+		
+		// 4. link it all together into the .elf file
+	    logger.debug("4. compileLink");
+		compileLink(avrBasePath, buildPath, this.corePath, includePaths, configPreferences);
+
+		// 5. extract EEPROM data (from EEMEM directive) to .eep file.			
+	    logger.debug("5. compileEep");
+		compileEep(avrBasePath, buildPath, includePaths, configPreferences);
+		
+		// 6. build the .hex file
+	    logger.debug("6. compileHex");
+		compileHex(avrBasePath, buildPath, includePaths, configPreferences);
+		
+		//done
+	    logger.debug("7. compile done");
+		return true;
+
+    
+    
+    */
+    
+    
   }
 
 
@@ -531,4 +578,81 @@ public class Compiler implements MessageConsumer {
     
     return files;
   }
+  
+  
+  	//merge all the preferences file in the correct order of precedence
+	HashMap mergePreferences(Map Preferences,  Map platformPreferences, Map boardPreferences)
+	{
+		HashMap _map = new HashMap();
+		
+	    Iterator iterator = Preferences.entrySet().iterator();
+       
+        while(iterator.hasNext())
+  	    {
+  	    	Map.Entry pair = (Map.Entry)iterator.next();
+  	    	if (pair.getValue() == null)
+  	    	{
+  	    		_map.put(pair.getKey(), "");
+  	    	}
+  	    	else
+  	    	{
+  	    		_map.put(pair.getKey(), pair.getValue());
+  	    	}
+	    }
+	    
+		//logger.debug("Done: Preferences");
+		
+		iterator = platformPreferences.entrySet().iterator();
+       
+       while(iterator.hasNext())
+  	    {
+  	    	Map.Entry pair = (Map.Entry)iterator.next();
+  	    	
+  	    	if (pair.getValue() == null)
+  	    	{
+  	    		_map.put(pair.getKey(), "");
+  	    	}
+  	    	else
+  	    	{
+  	    		_map.put(pair.getKey(), pair.getValue());
+  	    	}
+            //System.out.println(pair.getKey() + " = " + pair.getValue());
+	    }
+
+		//System.out.println("Done: platformPreferences");
+		iterator = boardPreferences.entrySet().iterator();
+
+        while(iterator.hasNext())
+  	    {
+  	    	Map.Entry pair = (Map.Entry)iterator.next();
+  	    	
+  	    	if (pair.getValue() == null)
+  	    	{
+  	    		_map.put(pair.getKey(), "");
+  	    	}
+  	    	else
+  	    	{
+  	    		_map.put(pair.getKey(), pair.getValue());
+  	    	}
+            //System.out.println(pair.getKey() + " = " + pair.getValue());
+	    }
+		//System.out.println("Done: boardPreferences");
+        
+
+	return _map;
+	}
+	
+	private static String preparePaths(ArrayList<String> includePaths) {
+	//getIncludes to String
+		//logger.debug("Start: Prepare paths");
+		String includes = "";
+		for (int i = 0; i < includePaths.size(); i++) 
+		{
+			includes = includes + (" -I" + (String) includePaths.get(i)) + "::";
+		}
+		//logger.debug("Paths prepared: " + includes);
+		return includes;
+	}
+	
+  
 }
