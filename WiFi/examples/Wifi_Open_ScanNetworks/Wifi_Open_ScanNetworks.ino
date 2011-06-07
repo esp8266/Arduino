@@ -28,17 +28,17 @@ IPAddress subnet;                // the subnet mask
 void setup() {
   // initialize serial:
   Serial.begin(9600);
- 
+
+  // scan for existing networks:
+  Serial.println("Scanning available networks...");
+  scanNetworks();
+
   // attempt to connect using WEP encryption:
   Serial.println("Attempting to connect to open network...");
   status = WiFi.begin(ssid);
   
   Serial.print("SSID: ");
   Serial.println(ssid);
-
-  // scan for existing networks:
-  Serial.println("Scanning available networks...");
-  scanNetworks();
 
   // if you're not connected, stop here:
   if ( status != WL_CONNECTED) { 

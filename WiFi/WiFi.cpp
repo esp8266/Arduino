@@ -21,6 +21,8 @@ wl_status_t WiFiClass::_status;
 
 WiFiClass::WiFiClass()
 {
+	// Driver initialization
+	init();
 }
 
 void WiFiClass::init()
@@ -42,15 +44,14 @@ uint8_t WiFiClass::getSocket()
 
 int WiFiClass::begin()
 {
-	init();
+	// Add procedure to read the latest configuration from eeprom/dataflash
+	// and start the wifi connection
 }
 
 int WiFiClass::begin(char* ssid)
 {
 	uint8_t status = WL_IDLE_STATUS;
 	uint8_t attempts = WL_MAX_ATTEMPT_CONNECTION;
-
-	begin();
 
    if (WiFiDrv::wifiSetNetwork(ssid, strlen(ssid)) != WL_FAILURE)
    {
@@ -72,8 +73,7 @@ int WiFiClass::begin(char* ssid, uint8_t key_idx, const char *key)
 	uint8_t status = WL_IDLE_STATUS;
 	uint8_t attempts = WL_MAX_ATTEMPT_CONNECTION;
 
-	begin();
-    // set encryption key
+	// set encryption key
    if (WiFiDrv::wifiSetKey(ssid, strlen(ssid), key_idx, key, strlen(key)) != WL_FAILURE)
    {
 	   do
@@ -93,7 +93,6 @@ int WiFiClass::begin(char* ssid, const char *passphrase)
 	uint8_t status = WL_IDLE_STATUS;
 	uint8_t attempts = WL_MAX_ATTEMPT_CONNECTION;
 
-	begin();
     // set passphrase
     if (WiFiDrv::wifiSetPassphrase(ssid, strlen(ssid), passphrase, strlen(passphrase))!= WL_FAILURE)
     {

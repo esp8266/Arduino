@@ -21,7 +21,7 @@ private:
     static  char 		_passph[WL_WPA_KEY_MAX_LENGTH];
     static  wl_status_t _status;
 
-    void init();
+    static void init();
 public:
     static int16_t 	_state[MAX_SOCK_NUM];
     static uint16_t _server_port[MAX_SOCK_NUM];
