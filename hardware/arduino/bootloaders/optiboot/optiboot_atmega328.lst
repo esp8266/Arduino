@@ -13,15 +13,15 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
   4 .debug_abbrev 00000196  00000000  00000000  0000053d  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_line   000003db  00000000  00000000  000006d3  2**0
+  5 .debug_line   0000043f  00000000  00000000  000006d3  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_frame  00000090  00000000  00000000  00000ab0  2**2
+  6 .debug_frame  00000090  00000000  00000000  00000b14  2**2
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_str    00000124  00000000  00000000  00000b40  2**0
+  7 .debug_str    00000136  00000000  00000000  00000ba4  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_loc    000001d1  00000000  00000000  00000c64  2**0
+  8 .debug_loc    000001d1  00000000  00000000  00000cda  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_ranges 00000068  00000000  00000000  00000e35  2**0
+  9 .debug_ranges 00000068  00000000  00000000  00000eab  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -153,7 +153,7 @@ void watchdogReset() {
       // GET PARAMETER returns a generic 0x03 reply - enough to keep Avrdude happy
       getNch(1);
     7e5e:	81 e0       	ldi	r24, 0x01	; 1
-    7e60:	be d0       	rcall	.+380    	; 0x7fde <verifySpace+0xc>
+    7e60:	be d0       	rcall	.+380    	; 0x7fde <getNch>
       putch(0x03);
     7e62:	83 e0       	ldi	r24, 0x03	; 3
     7e64:	24 c0       	rjmp	.+72     	; 0x7eae <main+0xae>
@@ -172,7 +172,7 @@ void watchdogReset() {
       // SET DEVICE EXT is ignored
       getNch(5);
     7e72:	85 e0       	ldi	r24, 0x05	; 5
-    7e74:	b4 d0       	rcall	.+360    	; 0x7fde <verifySpace+0xc>
+    7e74:	b4 d0       	rcall	.+360    	; 0x7fde <getNch>
     7e76:	8a c0       	rjmp	.+276    	; 0x7f8c <main+0x18c>
     }
     else if(ch == STK_LOAD_ADDRESS) {
@@ -206,7 +206,7 @@ void watchdogReset() {
       // UNIVERSAL command is ignored
       getNch(4);
     7ea8:	84 e0       	ldi	r24, 0x04	; 4
-    7eaa:	99 d0       	rcall	.+306    	; 0x7fde <verifySpace+0xc>
+    7eaa:	99 d0       	rcall	.+306    	; 0x7fde <getNch>
       putch(0x00);
     7eac:	80 e0       	ldi	r24, 0x00	; 0
     7eae:	71 d0       	rcall	.+226    	; 0x7f92 <putch>
@@ -503,6 +503,8 @@ void verifySpace() {
     7fda:	84 e1       	ldi	r24, 0x14	; 20
 }
     7fdc:	da cf       	rjmp	.-76     	; 0x7f92 <putch>
+
+00007fde <getNch>:
     ::[count] "M" (UART_B_VALUE)
   );
 }
@@ -511,12 +513,10 @@ void verifySpace() {
 void getNch(uint8_t count) {
     7fde:	1f 93       	push	r17
     7fe0:	18 2f       	mov	r17, r24
-
-00007fe2 <getNch>:
   do getch(); while (--count);
     7fe2:	df df       	rcall	.-66     	; 0x7fa2 <getch>
     7fe4:	11 50       	subi	r17, 0x01	; 1
-    7fe6:	e9 f7       	brne	.-6      	; 0x7fe2 <getNch>
+    7fe6:	e9 f7       	brne	.-6      	; 0x7fe2 <getNch+0x4>
   verifySpace();
     7fe8:	f4 df       	rcall	.-24     	; 0x7fd2 <verifySpace>
 }
