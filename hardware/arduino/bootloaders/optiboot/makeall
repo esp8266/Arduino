@@ -6,8 +6,10 @@ make pro8
 make pro16
 make pro20
 make diecimila
-make ng
 make atmega328
 make atmega328_pro8
+make sanguino
+make mega
+make atmega8
+make atmega88
 make luminet
-
