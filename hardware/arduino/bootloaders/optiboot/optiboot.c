@@ -198,8 +198,8 @@ asm("  .section .version\n"
 #define WATCHDOG_1S     (_BV(WDP2) | _BV(WDP1) | _BV(WDE))
 #define WATCHDOG_2S     (_BV(WDP2) | _BV(WDP1) | _BV(WDP0) | _BV(WDE))
 #ifndef __AVR_ATmega8__
-#define WATCHDOG_4S     (_BV(WDE3) | _BV(WDE))
-#define WATCHDOG_8S     (_BV(WDE3) | _BV(WDE0) | _BV(WDE))
+#define WATCHDOG_4S     (_BV(WDP3) | _BV(WDE))
+#define WATCHDOG_8S     (_BV(WDP3) | _BV(WDP0) | _BV(WDE))
 #endif
 
 /* Function Prototypes */
@@ -244,8 +244,6 @@ void appStart() __attribute__ ((naked));
 /* These definitions are NOT zero initialised, but that doesn't matter */
 /* This allows us to drop the zero init code, saving us memory */
 #define buff    ((uint8_t*)(RAMSTART))
-#define address (*(uint16_t*)(RAMSTART+SPM_PAGESIZE*2))
-#define length  (*(uint8_t*)(RAMSTART+SPM_PAGESIZE*2+2))
 #ifdef VIRTUAL_BOOT_PARTITION
 #define rstVect (*(uint16_t*)(RAMSTART+SPM_PAGESIZE*2+4))
 #define wdtVect (*(uint16_t*)(RAMSTART+SPM_PAGESIZE*2+6))
@@ -254,6 +252,13 @@ void appStart() __attribute__ ((naked));
 /* main program starts here */
 int main(void) {
   uint8_t ch;
+
+  /*
+   * Making these local and in registers prevents the need for initializing
+   * them, and also saves space because code no longer stores to memory.
+   */
+  register uint16_t address;
+  register uint8_t  length;
 
   // After the zero init loop, this is the first code to run.
   //
@@ -350,7 +355,9 @@ int main(void) {
       uint8_t *bufPtr;
       uint16_t addrPtr;
 
-      getLen();
+      getch();			/* getlen() */
+      length = getch();
+      getch();
 
       // If we are in RWW section, immediately start page erase
       if (address < NRWWSTART) __boot_page_erase_short((uint16_t)(void*)address);
@@ -415,7 +422,10 @@ int main(void) {
     /* Read memory block mode, length is big endian.  */
     else if(ch == STK_READ_PAGE) {
       // READ PAGE - we only read flash
-      getLen();
+      getch();			/* getlen() */
+      length = getch();
+      getch();
+
       verifySpace();
 #ifdef VIRTUAL_BOOT_PARTITION
       do {
@@ -575,7 +585,11 @@ void getNch(uint8_t count) {
 }
 
 void verifySpace() {
-  if (getch() != CRC_EOP) appStart();
+  if (getch() != CRC_EOP) {
+    watchdogConfig(WATCHDOG_16MS);    // shorten WD timeout
+    while (1)			      // and busy-loop so that WD causes
+      ;				      //  a reset and app start.
+  }
   putch(STK_INSYNC);
 }
 
@@ -594,12 +608,6 @@ void flash_led(uint8_t count) {
   } while (--count);
 }
 #endif
-
-uint8_t getLen() {
-  getch();
-  length = getch();
-  return getch();
-}
 
 // Watchdog functions. These are only safe with interrupts turned off.
 void watchdogReset() {
