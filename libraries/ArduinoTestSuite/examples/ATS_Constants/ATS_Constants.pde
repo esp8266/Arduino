@@ -7,7 +7,6 @@
 //*	Oct 16,	2010	<ROA>  Test of Arduino Constants
 //************************************************************************
 
-#include	"WProgram.h"
 #include	"HardwareSerial.h"
 #include	<ArduinoTestSuite.h>
 

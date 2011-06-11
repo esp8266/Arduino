@@ -1,6 +1,6 @@
 #ifndef client_h
 #define client_h
-#include "WProgram.h"	
+#include "Arduino.h"	
 #include "Print.h"
 
 class Client : public Stream {
@@ -22,8 +22,6 @@ public:
   virtual void flush();
   void stop();
   uint8_t connected();
-  uint8_t operator==(int);
-  uint8_t operator!=(int);
   operator bool();
 
   friend class Server;

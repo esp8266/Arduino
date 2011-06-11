@@ -19,7 +19,7 @@
  */
 #include <SdFat.h>
 #include <avr/pgmspace.h>
-#include <WProgram.h>
+#include <Arduino.h>
 //------------------------------------------------------------------------------
 // callback function for date/time
 void (*SdFile::dateTime_)(uint16_t* date, uint16_t* time) = NULL;

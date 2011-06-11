@@ -25,8 +25,8 @@ void loop()
 {
   Wire.beginTransmission(44); // transmit to device #44 (0x2c)
                               // device address is specified in datasheet
-  Wire.send(0x00);            // sends instruction byte  
-  Wire.send(val);             // sends potentiometer value byte  
+  Wire.write(byte(0x00));            // sends instruction byte  
+  Wire.write(val);             // sends potentiometer value byte  
   Wire.endTransmission();     // stop transmitting
 
   val++;        // increment value

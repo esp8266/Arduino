@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include "wiring.h"
+#include "Arduino.h"
 
 #include "Print.h"
 
@@ -43,6 +43,16 @@ void Print::write(const uint8_t *buffer, size_t size)
     write(*buffer++);
 }
 
+void Print::print(const __FlashStringHelper *ifsh)
+{
+  const prog_char *p = (const prog_char *)ifsh;
+  while (1) {
+    unsigned char c = pgm_read_byte(p++);
+    if (c == 0) return;
+    write(c);
+  }
+}
+
 void Print::print(const String &s)
 {
   for (int i = 0; i < s.length(); i++) {
@@ -55,9 +65,9 @@ void Print::print(const char str[])
   write(str);
 }
 
-void Print::print(char c, int base)
+void Print::print(char c)
 {
-  print((long) c, base);
+  write(c);
 }
 
 void Print::print(unsigned char b, int base)
@@ -101,6 +111,12 @@ void Print::print(double n, int digits)
   printFloat(n, digits);
 }
 
+void Print::println(const __FlashStringHelper *ifsh)
+{
+  print(ifsh);
+  println();
+}
+
 void Print::print(const Printable& x)
 {
   x.printTo(*this);
@@ -109,7 +125,7 @@ void Print::print(const Printable& x)
 void Print::println(void)
 {
   print('\r');
-  print('\n');  
+  print('\n');
 }
 
 void Print::println(const String &s)
@@ -124,9 +140,9 @@ void Print::println(const char c[])
   println();
 }
 
-void Print::println(char c, int base)
+void Print::println(char c)
 {
-  print(c, base);
+  print(c);
   println();
 }
 
@@ -174,25 +190,23 @@ void Print::println(const Printable& x)
 
 // Private Methods /////////////////////////////////////////////////////////////
 
-void Print::printNumber(unsigned long n, uint8_t base)
-{
-  unsigned char buf[8 * sizeof(long)]; // Assumes 8-bit chars. 
-  unsigned long i = 0;
+void Print::printNumber(unsigned long n, uint8_t base) {
+  char buf[8 * sizeof(long) + 1]; // Assumes 8-bit chars plus zero byte.
+  char *str = &buf[sizeof(buf) - 1];
 
-  if (n == 0) {
-    print('0');
-    return;
-  } 
+  *str = '\0';
 
-  while (n > 0) {
-    buf[i++] = n % base;
+  // prevent crash if called with base == 1
+  if (base < 2) base = 10;
+
+  do {
+    unsigned long m = n;
     n /= base;
-  }
+    char c = m - base * n;
+    *--str = c < 10 ? c + '0' : c + 'A' - 10;
+  } while(n);
 
-  for (; i > 0; i--)
-    print((char) (buf[i - 1] < 10 ?
-      '0' + buf[i - 1] :
-      'A' + buf[i - 1] - 10));
+  write(str);
 }
 
 void Print::printFloat(double number, uint8_t digits) 

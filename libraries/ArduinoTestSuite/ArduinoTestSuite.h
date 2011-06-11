@@ -7,8 +7,8 @@
 	#include	<avr/io.h>
 #endif
 
-#ifndef WProgram_h
-	#include	"WProgram.h"
+#ifndef Arduino_h
+	#include	"Arduino.h"
 #endif
 #ifndef HardwareSerial_h
 	#include	"HardwareSerial.h"

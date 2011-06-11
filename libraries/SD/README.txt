@@ -9,3 +9,5 @@ License: GNU General Public License V3
 
 (C) Copyright 2010 SparkFun Electronics
 
+Now better than ever with optimization, multiple file support, directory handling, etc - ladyada!
+

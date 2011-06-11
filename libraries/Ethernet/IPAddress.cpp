@@ -1,5 +1,5 @@
 
-#include <WProgram.h>
+#include <Arduino.h>
 #include <IPAddress.h>
 
 IPAddress::IPAddress()

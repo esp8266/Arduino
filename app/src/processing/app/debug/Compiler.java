@@ -86,9 +86,25 @@ public class Compiler implements MessageConsumer {
       corePath = coreFolder.getAbsolutePath();
     } else {
       Target t = Base.targetsTable.get(core.substring(0, core.indexOf(':')));
-      File coresFolder = new File(t.getFolder(), "cores");
-      File coreFolder = new File(coresFolder, core.substring(core.indexOf(':') + 1));
+      File coreFolder = new File(t.getFolder(), "cores");
+      coreFolder = new File(coreFolder, core.substring(core.indexOf(':') + 1));
       corePath = coreFolder.getAbsolutePath();
+    }
+
+    String pins = boardPreferences.get("build.pins");
+    String pinsPath = null;
+    
+    if (pins != null) {
+      if (pins.indexOf(':') == -1) {
+	Target t = Base.getTarget();
+	File pinsFolder = new File(new File(t.getFolder(), "pins"), pins);
+	pinsPath = pinsFolder.getAbsolutePath();
+      } else {
+	Target t = Base.targetsTable.get(pins.substring(0, pins.indexOf(':')));
+	File pinsFolder = new File(t.getFolder(), "pins");
+	pinsFolder = new File(pinsFolder, pins.substring(pins.indexOf(':') + 1));
+	pinsPath = pinsFolder.getAbsolutePath();
+      }
     }
 
     List<File> objectFiles = new ArrayList<File>();
@@ -97,6 +113,7 @@ public class Compiler implements MessageConsumer {
 
    List includePaths = new ArrayList();
    includePaths.add(corePath);
+   if (pinsPath != null) includePaths.add(pinsPath);
    for (File file : sketch.getImportedLibraries()) {
      includePaths.add(file.getPath());
    }
@@ -141,6 +158,7 @@ public class Compiler implements MessageConsumer {
 
   includePaths.clear();
   includePaths.add(corePath);  // include path for core only
+  if (pinsPath != null) includePaths.add(pinsPath);
   List<File> coreObjectFiles =
     compileFiles(avrBasePath, buildPath, includePaths,
               findFilesInPath(corePath, "S", true),
@@ -367,7 +385,13 @@ public class Compiler implements MessageConsumer {
         e = new RunnerException("Please import the SPI library from the Sketch > Import Library menu.");
         s += "\nAs of Arduino 0019, the Ethernet library depends on the SPI library." +
              "\nYou appear to be using it or another library that depends on the SPI library.";
-      }        
+      }
+      
+      if (pieces[3].trim().equals("'BYTE' was not declared in this scope")) {
+        e = new RunnerException("The 'BYTE' keyword is no longer supported.");
+	s += "\nAs of Arduino 1.0, the 'BYTE' keyword is no longer supported." +
+	     "\nPlease use Serial.write() instead.";
+      }
       
       if (exception == null && e != null) {
         exception = e;

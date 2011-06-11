@@ -1,17 +1,23 @@
 <?xml version="1.0"?>
 <project name="Arduino" default="build">
+  <!--echo message="os.name = ${os.name}" /-->
+  <!--echo message="os.arch = ${os.arch}" /-->
+  <!--echo message="os.version = ${os.version}" /-->
   
   <!-- Sets properties for macosx/windows/linux depending on current system -->
   <condition property="macosx"><os family="mac" /></condition>
   <condition property="windows"><os family="windows" /></condition>
   <condition property="linux"><os family="unix" /></condition>
+  <condition property="linux64"><os family="unix" arch="amd64" /></condition>
   
   <condition property="platform" 
 	     value="macosx"><os family="mac" /></condition>
   <condition property="platform" 
 	     value="windows"><os family="windows" /></condition>
   <condition property="platform" 
-	     value="linux"><os family="unix" /></condition>
+	     value="linux"><os family="unix" arch="i386" /></condition>
+  <condition property="platform" 
+	     value="linux64"><os family="unix" arch="amd64" /></condition>
 
   <!-- Libraries required for running arduino -->
   <fileset dir=".." id="runtime.jars">
@@ -317,13 +323,23 @@
     <copy todir="linux/work" file="linux/dist/arduino" />
     <chmod perm="755" file="linux/work/arduino" />
   </target>
+
+  <target name="linux64-build" depends="linux-build" description="Build linux (64-bit) version">
+    <copy tofile="linux/work/hardware/tools/avrdude" file="linux/dist/tools/avrdude64" overwrite="true" />
+    <copy tofile="linux/work/lib/librxtxSerial.so" file="linux/dist/lib/librxtxSerial64.so" overwrite="true" />
+  </target>
   
   <target name="linux-run" depends="linux-build" 
-	  description="Run Linux version">
+	  description="Run Linux (32-bit) version">
     <exec executable="./linux/work/arduino" spawn="false"/>
   </target>
   
-  <target name="linux-dist" depends="linux-build" 
+  <target name="linux64-run" depends="linux64-build" 
+	  description="Run Linux (64-bit) version">
+    <exec executable="./linux/work/arduino" spawn="false"/>
+  </target>
+
+  <target name="linux-dist" depends="build" 
 	  description="Build .tar.gz of linux version">
 
     <!--get src="http://dev.processing.org/build/jre-tools-6u18-linux-i586.tgz" 
@@ -358,7 +374,10 @@
       =======================================================
     </echo>
   </target>
+
   
+  <target name="linux64-dist" depends="linux-dist" 
+	  description="Build .tar.gz of linux version" />
   
   <!-- - - - - - - - -->
   <!-- Windows       -->
