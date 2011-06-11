@@ -132,11 +132,13 @@
 /**********************************************************/
 /* Edit History:					  */
 /*							  */
+/* 4.2 WestfW: reduce code size, fix timeouts, change     */
+/*             verifySpace to use WDT instead of appstart */
 /* 4.1 WestfW: put version number in binary.		  */
 /**********************************************************/
 
 #define OPTIBOOT_MAJVER 4
-#define OPTIBOOT_MINVER 1
+#define OPTIBOOT_MINVER 2
 
 #define MAKESTR(a) #a
 #define MAKEVER(a, b) MAKESTR(a*256+b)
