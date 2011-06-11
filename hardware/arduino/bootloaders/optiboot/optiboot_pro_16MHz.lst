@@ -5,23 +5,25 @@ Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
   0 .text         000001fc  00003e00  00003e00  00000054  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .debug_aranges 00000028  00000000  00000000  00000250  2**0
+  1 .version      00000002  00003ffe  00003ffe  00000250  2**0
+                  CONTENTS, READONLY
+  2 .debug_aranges 00000028  00000000  00000000  00000252  2**0
                   CONTENTS, READONLY, DEBUGGING
-  2 .debug_pubnames 0000006a  00000000  00000000  00000278  2**0
+  3 .debug_pubnames 0000006a  00000000  00000000  0000027a  2**0
                   CONTENTS, READONLY, DEBUGGING
-  3 .debug_info   00000284  00000000  00000000  000002e2  2**0
+  4 .debug_info   00000285  00000000  00000000  000002e4  2**0
                   CONTENTS, READONLY, DEBUGGING
-  4 .debug_abbrev 000001ae  00000000  00000000  00000566  2**0
+  5 .debug_abbrev 0000019f  00000000  00000000  00000569  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_line   00000450  00000000  00000000  00000714  2**0
+  6 .debug_line   00000453  00000000  00000000  00000708  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_frame  00000090  00000000  00000000  00000b64  2**2
+  7 .debug_frame  00000090  00000000  00000000  00000b5c  2**2
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_str    00000141  00000000  00000000  00000bf4  2**0
+  8 .debug_str    00000141  00000000  00000000  00000bec  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_loc    000001e1  00000000  00000000  00000d35  2**0
+  9 .debug_loc    000001e1  00000000  00000000  00000d2d  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_ranges 00000068  00000000  00000000  00000f16  2**0
+ 10 .debug_ranges 00000068  00000000  00000000  00000f0e  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -135,7 +137,7 @@ void watchdogReset() {
         __boot_page_fill_short((uint16_t)(void*)addrPtr,a);
         addrPtr += 2;
       } while (--ch);
-      
+
       // Write from programming buffer
       __boot_page_write_short((uint16_t)(void*)address);
     3e50:	a5 e0       	ldi	r26, 0x05	; 5
@@ -249,7 +251,7 @@ void watchdogReset() {
     3ec6:	e8 95       	spm
     3ec8:	c0 e0       	ldi	r28, 0x00	; 0
     3eca:	d1 e0       	ldi	r29, 0x01	; 1
-      
+
       // While that is going on, read in page contents
       bufPtr = buff;
       do *bufPtr++ = getch();
@@ -278,7 +280,7 @@ void watchdogReset() {
       // Read command terminator, start reply
       verifySpace();
     3ef4:	75 d0       	rcall	.+234    	; 0x3fe0 <verifySpace>
-      
+
       // If only a partial page is to be programmed, the erase might not be complete.
       // So check that here
       boot_spm_busy_wait();
@@ -336,7 +338,7 @@ int main(void) {
     3f2e:	a0 38       	cpi	r26, 0x80	; 128
     3f30:	bf 07       	cpc	r27, r31
     3f32:	51 f7       	brne	.-44     	; 0x3f08 <main+0x108>
-      
+
       // Write from programming buffer
       __boot_page_write_short((uint16_t)(void*)address);
     3f34:	e0 91 00 02 	lds	r30, 0x0200
