@@ -129,7 +129,7 @@ virboot328: TARGET = atmega328
 virboot328: MCU_TARGET = atmega328p
 virboot328: CFLAGS += '-DLED_START_FLASHES=3' '-DBAUD_RATE=115200' '-DVIRTUAL_BOOT'
 virboot328: AVR_FREQ = 16000000L
-virboot328: LDSECTIONS  = --section-start=.text=0x7e00 -Wl,--section-start=.version=0x7ffe
+virboot328: LDSECTIONS  = -Wl,--section-start=.text=0x7e00 -Wl,--section-start=.version=0x7ffe
 virboot328: $(PROGRAM)_atmega328.hex
 virboot328: $(PROGRAM)_atmega328.lst
 
@@ -221,7 +221,7 @@ sanguino: TARGET = atmega644p
 sanguino: MCU_TARGET = atmega644p
 sanguino: CFLAGS += '-DLED_START_FLASHES=3' '-DBAUD_RATE=115200' '-DBIGBOOT'
 sanguino: AVR_FREQ = 16000000L
-sanguino: LDSECTION  = --section-start=.text=0xfc00
+sanguino: LDSECTIONS  = -Wl,--section-start=.text=0xfc00
 sanguino: $(PROGRAM)_atmega644p.hex
 sanguino: $(PROGRAM)_atmega644p.lst
 
@@ -241,7 +241,7 @@ sanguino_isp: isp
 mega: MCU_TARGET = atmega1280
 mega: CFLAGS += '-DLED_START_FLASHES=3' '-DBAUD_RATE=115200' '-DBIGBOOT'
 mega: AVR_FREQ = 16000000L
-mega: LDSECTION  = --section-start=.text=0x1fc00
+mega: LDSECTIONS  = -Wl,--section-start=.text=0x1fc00
 mega: $(PROGRAM)_atmega1280.hex
 mega: $(PROGRAM)_atmega1280.lst
 
@@ -262,7 +262,7 @@ atmega8: TARGET = atmega8
 atmega8: MCU_TARGET = atmega8
 atmega8: CFLAGS += '-DLED_START_FLASHES=3' '-DBAUD_RATE=115200'
 atmega8: AVR_FREQ = 16000000L 
-atmega8: LDSECTIONS  = --section-start=.text=0x1e00 -Wl,--section-start=.version=0x1ffe
+atmega8: LDSECTIONS  = -Wl,--section-start=.text=0x1e00 -Wl,--section-start=.version=0x1ffe
 atmega8: $(PROGRAM)_atmega8.hex
 atmega8: $(PROGRAM)_atmega8.lst
 
@@ -281,7 +281,7 @@ atmega88: TARGET = atmega88
 atmega88: MCU_TARGET = atmega88
 atmega88: CFLAGS += '-DLED_START_FLASHES=3' '-DBAUD_RATE=115200'
 atmega88: AVR_FREQ = 16000000L 
-atmega88: LDSECTIONS  = --section-start=.text=0x1e00 -Wl,--section-start=.version=0x1ffe
+atmega88: LDSECTIONS  = -Wl,--section-start=.text=0x1e00 -Wl,--section-start=.version=0x1ffe
 atmega88: $(PROGRAM)_atmega88.hex
 atmega88: $(PROGRAM)_atmega88.lst
 
@@ -357,7 +357,7 @@ atmega328_pro8: TARGET = atmega328_pro_8MHz
 atmega328_pro8: MCU_TARGET = atmega328p
 atmega328_pro8: CFLAGS += '-DLED_START_FLASHES=3' '-DBAUD_RATE=115200'
 atmega328_pro8: AVR_FREQ = 8000000L
-atmega328_pro8: LDSECTIONS = --section-start=.text=0x7e00 -Wl,--section-start=.version=0x7ffe
+atmega328_pro8: LDSECTIONS = -Wl,--section-start=.text=0x7e00 -Wl,--section-start=.version=0x7ffe
 atmega328_pro8: $(PROGRAM)_atmega328_pro_8MHz.hex
 atmega328_pro8: $(PROGRAM)_atmega328_pro_8MHz.lst
 
@@ -382,7 +382,7 @@ luminet: MCU_TARGET = attiny84
 luminet: CFLAGS += '-DLED_START_FLASHES=3' '-DSOFT_UART' '-DBAUD_RATE=9600'
 luminet: CFLAGS += '-DVIRTUAL_BOOT_PARTITION'
 luminet: AVR_FREQ = 1000000L
-luminet: LDSECTIONS = --section-start=.text=0x1d00 -Wl,--section-start=.version=0x1efe
+luminet: LDSECTIONS = -Wl,--section-start=.text=0x1d00 -Wl,--section-start=.version=0x1efe
 luminet: $(PROGRAM)_luminet.hex
 luminet: $(PROGRAM)_luminet.lst
 
