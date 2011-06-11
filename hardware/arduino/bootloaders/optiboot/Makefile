@@ -36,7 +36,7 @@ ISPPORT	   = usb
 ISPSPEED   = -b 115200
 
 MCU_TARGET = atmega168
-LDSECTION  = --section-start=.text=0x3e00
+LDSECTIONS  = -Wl,--section-start=.text=0x3e00 -Wl,--section-start=.version=0x3ffe
 
 # Build environments
 # Start of some ugly makefile-isms to allow optiboot to be built
@@ -88,7 +88,7 @@ endif
 # http://tinker.it/now/2007/02/24/the-tale-of-avrdude-atmega168-and-extended-bits-fuses/
 #
 # similarly, the lock bits should be 0xff instead of 0x3f (to
-# unlock the bootloader section) and 0xcf instead of 0x0f (to
+# unlock the bootloader section) and 0xcf instead of 0x2f (to
 # lock it), but since the high two bits of the lock byte are
 # unused, avrdude would get confused.
 
@@ -98,7 +98,7 @@ ISPFUSES    = $(GCCROOT)avrdude $(AVRDUDE_CONF) -c $(ISPTOOL) \
               -U hfuse:w:0x$(HFUSE):m -U lfuse:w:0x$(LFUSE):m
 ISPFLASH    = $(GCCROOT)avrdude $(AVRDUDE_CONF) -c $(ISPTOOL) \
               -p $(MCU_TARGET) -P $(ISPPORT) $(ISPSPEED) \
-              -U flash:w:$(PROGRAM)_$(TARGET).hex -U lock:w:0x0f:m
+              -U flash:w:$(PROGRAM)_$(TARGET).hex -U lock:w:0x2f:m
 
 STK500 = "C:\Program Files\Atmel\AVR Tools\STK500\Stk500.exe"
 STK500-1 = $(STK500) -e -d$(MCU_TARGET) -pf -vf -if$(PROGRAM)_$(TARGET).hex \
@@ -116,7 +116,7 @@ CC         = $(GCCROOT)avr-gcc
 # Override is only needed by avr-lib build system.
 
 override CFLAGS        = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) -DF_CPU=$(AVR_FREQ) $(DEFS)
-override LDFLAGS       = -Wl,$(LDSECTION) -Wl,--relax -Wl,--gc-sections -nostartfiles -nostdlib
+override LDFLAGS       = $(LDSECTIONS) -Wl,--relax -Wl,--gc-sections -nostartfiles -nostdlib
 
 OBJCOPY        = $(GCCROOT)avr-objcopy
 OBJDUMP        = $(call fixpath,$(GCCROOT)avr-objdump)
@@ -129,7 +129,7 @@ virboot328: TARGET = atmega328
 virboot328: MCU_TARGET = atmega328p
 virboot328: CFLAGS += '-DLED_START_FLASHES=3' '-DBAUD_RATE=115200' '-DVIRTUAL_BOOT'
 virboot328: AVR_FREQ = 16000000L
-virboot328: LDSECTION  = --section-start=.text=0x7e00
+virboot328: LDSECTIONS  = --section-start=.text=0x7e00 -Wl,--section-start=.version=0x7ffe
 virboot328: $(PROGRAM)_atmega328.hex
 virboot328: $(PROGRAM)_atmega328.lst
 
@@ -200,7 +200,7 @@ atmega328: TARGET = atmega328
 atmega328: MCU_TARGET = atmega328p
 atmega328: CFLAGS += '-DLED_START_FLASHES=3' '-DBAUD_RATE=115200'
 atmega328: AVR_FREQ = 16000000L
-atmega328: LDSECTION  = --section-start=.text=0x7e00
+atmega328: LDSECTIONS  = -Wl,--section-start=.text=0x7e00 -Wl,--section-start=.version=0x7ffe
 atmega328: $(PROGRAM)_atmega328.hex
 atmega328: $(PROGRAM)_atmega328.lst
 
@@ -262,7 +262,7 @@ atmega8: TARGET = atmega8
 atmega8: MCU_TARGET = atmega8
 atmega8: CFLAGS += '-DLED_START_FLASHES=3' '-DBAUD_RATE=115200'
 atmega8: AVR_FREQ = 16000000L 
-atmega8: LDSECTION  = --section-start=.text=0x1e00
+atmega8: LDSECTIONS  = --section-start=.text=0x1e00 -Wl,--section-start=.version=0x1ffe
 atmega8: $(PROGRAM)_atmega8.hex
 atmega8: $(PROGRAM)_atmega8.lst
 
@@ -281,7 +281,7 @@ atmega88: TARGET = atmega88
 atmega88: MCU_TARGET = atmega88
 atmega88: CFLAGS += '-DLED_START_FLASHES=3' '-DBAUD_RATE=115200'
 atmega88: AVR_FREQ = 16000000L 
-atmega88: LDSECTION  = --section-start=.text=0x1e00
+atmega88: LDSECTIONS  = --section-start=.text=0x1e00 -Wl,--section-start=.version=0x1ffe
 atmega88: $(PROGRAM)_atmega88.hex
 atmega88: $(PROGRAM)_atmega88.lst
 
@@ -357,7 +357,7 @@ atmega328_pro8: TARGET = atmega328_pro_8MHz
 atmega328_pro8: MCU_TARGET = atmega328p
 atmega328_pro8: CFLAGS += '-DLED_START_FLASHES=3' '-DBAUD_RATE=115200'
 atmega328_pro8: AVR_FREQ = 8000000L
-atmega328_pro8: LDSECTION  = --section-start=.text=0x7e00
+atmega328_pro8: LDSECTIONS = --section-start=.text=0x7e00 -Wl,--section-start=.version=0x7ffe
 atmega328_pro8: $(PROGRAM)_atmega328_pro_8MHz.hex
 atmega328_pro8: $(PROGRAM)_atmega328_pro_8MHz.lst
 
@@ -382,7 +382,7 @@ luminet: MCU_TARGET = attiny84
 luminet: CFLAGS += '-DLED_START_FLASHES=3' '-DSOFT_UART' '-DBAUD_RATE=9600'
 luminet: CFLAGS += '-DVIRTUAL_BOOT_PARTITION'
 luminet: AVR_FREQ = 1000000L
-luminet: LDSECTION  = --section-start=.text=0x1d00
+luminet: LDSECTIONS = --section-start=.text=0x1d00 -Wl,--section-start=.version=0x1efe
 luminet: $(PROGRAM)_luminet.hex
 luminet: $(PROGRAM)_luminet.lst
 
@@ -421,10 +421,10 @@ clean:
 	$(OBJDUMP) -h -S $< > $@
 
 %.hex: %.elf
-	$(OBJCOPY) -j .text -j .data -O ihex $< $@
+	$(OBJCOPY) -j .text -j .data -j .version --set-section-flags .version=alloc,load -O ihex $< $@
 
 %.srec: %.elf
-	$(OBJCOPY) -j .text -j .data -O srec $< $@
+	$(OBJCOPY) -j .text -j .data -j .version --set-section-flags .version=alloc,load -O srec $< $@
 
 %.bin: %.elf
-	$(OBJCOPY) -j .text -j .data -O binary $< $@
+	$(OBJCOPY) -j .text -j .data -j .version --set-section-flags .version=alloc,load -O binary $< $@

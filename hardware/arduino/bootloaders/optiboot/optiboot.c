@@ -114,7 +114,37 @@
 /* 500,1000,2000,4000,8000 supported.                     */
 /*                                                        */
 /**********************************************************/
+
+/**********************************************************/
+/* Version Numbers!                                       */
+/*                                                        */
+/* Arduino Optiboot now includes this Version number in   */
+/* the source and object code.                            */
+/*                                                        */
+/* Version 3 was released as zip from the optiboot        */
+/*  repository and was distributed with Arduino 0022.     */
+/* Version 4 starts with the arduino repository commit    */
+/*  that brought the arduino repository up-to-date with   */
+/* the optiboot source tree changes since v3.             */
+/*                                                        */
+/**********************************************************/
 
+/**********************************************************/
+/* Edit History:					  */
+/*							  */
+/* 4.1 WestfW: put version number in binary.		  */
+/**********************************************************/
+
+#define OPTIBOOT_MAJVER 4
+#define OPTIBOOT_MINVER 1
+
+#define MAKESTR(a) #a
+#define MAKEVER(a, b) MAKESTR(a*256+b)
+
+asm("  .section .version\n"
+    "optiboot_version:  .word " MAKEVER(OPTIBOOT_MAJVER, OPTIBOOT_MINVER) "\n"
+    "  .section .text\n");
+
 #include <inttypes.h>
 #include <avr/io.h>
 #include <avr/pgmspace.h>
@@ -324,7 +354,7 @@ int main(void) {
 
       // If we are in RWW section, immediately start page erase
       if (address < NRWWSTART) __boot_page_erase_short((uint16_t)(void*)address);
-      
+
       // While that is going on, read in page contents
       bufPtr = buff;
       do *bufPtr++ = getch();
@@ -336,7 +366,7 @@ int main(void) {
 
       // Read command terminator, start reply
       verifySpace();
-      
+
       // If only a partial page is to be programmed, the erase might not be complete.
       // So check that here
       boot_spm_busy_wait();
@@ -371,7 +401,7 @@ int main(void) {
         __boot_page_fill_short((uint16_t)(void*)addrPtr,a);
         addrPtr += 2;
       } while (--ch);
-      
+
       // Write from programming buffer
       __boot_page_write_short((uint16_t)(void*)address);
       boot_spm_busy_wait();
@@ -489,7 +519,7 @@ uint8_t getch(void) {
     "   rcall uartDelay\n"              // Wait 1 bit period
     "   clc\n"
     "   sbic  %[uartPin],%[uartBit]\n"
-    "   sec\n"                          
+    "   sec\n"
     "   dec   %[bitCnt]\n"
     "   breq  3f\n"
     "   ror   %[ch]\n"
