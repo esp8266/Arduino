@@ -776,4 +776,22 @@ public class Preferences {
 
     return new SyntaxStyle(color, italic, bold);
   }
+  
+  //get a Map of the Preferences
+  static public Map<String, String> getMap() 
+  {
+  	Map globalpreferences = new LinkedHashMap();
+    Enumeration e = table.keys();
+
+    while (e.hasMoreElements()) 
+    {
+		String key = (String) e.nextElement();
+		//System.out.println("Key: " + key + "Val: " + table.get(key));
+		String value = (String) table.get(key);
+        globalpreferences.put(key, value );              
+    }
+
+	return globalpreferences;	
+  }
+  
 }

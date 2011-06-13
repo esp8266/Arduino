@@ -956,8 +956,20 @@ public class Base {
     importToLibraryTable = new HashMap<String, File>();
 
     // Add from the "libraries" subfolder in the Processing directory
+    //Choose which library to add by chip platform
+    
     try {
-      addLibraries(importMenu, librariesFolder);
+			//Find the current target. Get the platform, and then select the correct name and core path.
+	    	String platformname = this.getBoardPreferences().get("platform");
+	    	String targetname = this.getPlatformPreferences(platformname).get("name");
+	        String libraryPath = this.getPlatformPreferences(platformname).get("library.core.path");
+
+		JMenuItem platformItem = new JMenuItem(targetname);
+		platformItem.setEnabled(false);
+		importMenu.add(platformItem);
+		importMenu.addSeparator();
+		addLibraries(importMenu, getCoreLibraries(libraryPath));
+    	
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -1005,6 +1017,8 @@ public class Base {
               //System.out.println("Switching to " + target + ":" + board);
               Preferences.set("target", (String) getValue("target"));
               Preferences.set("board", (String) getValue("board"));
+              //Debug: created new imports menu based on board
+              rebuildImportMenu(activeEditor.importMenu);
             }
           };
         action.putValue("target", target.getName());
@@ -1518,6 +1532,10 @@ public class Base {
     return getContentFile("hardware");
   }
   
+  //Get the core libraries
+  static public File getCoreLibraries(String path) {
+  	return getContentFile(path);	
+  }
   
   static public String getHardwarePath() {
     return getHardwareFolder().getAbsolutePath();
@@ -1538,7 +1556,32 @@ public class Base {
     return Base.targetsTable.get(Preferences.get("target"));
   }
   
-  
+ 
+static public Map<String, String> getPlatformPreferences() {
+    Target target = getTarget();
+    //if (target == null) return new LinkedHashMap();
+    Map map = target.getPlatforms();
+    /*
+    if (map == null)
+    {
+    	System.err.println("Error loading platforms preference from Target");
+    	System.exit(0);	
+    }
+    */
+    //if (map == null) return new LinkedHashMap();
+    map =  (Map) map.get(Preferences.get("platform"));
+    //if (map == null) return new LinkedHashMap();
+    return map;
+  }
+
+  //Get a specific platform
+  static public Map<String, String> getPlatformPreferences(String platformname) {
+  	Target target = getTarget();
+  	Map map = target.getPlatforms();
+    map =  (Map) map.get(platformname);
+    return map;
+  }
+ 
   static public Map<String, String> getBoardPreferences() {
     Target target = getTarget();
     if (target == null) return new LinkedHashMap();

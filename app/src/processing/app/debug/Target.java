@@ -29,18 +29,21 @@ import java.io.*;
 import java.util.*;
 
 import processing.app.Preferences;
+//import processing.app.Base;
 
 public class Target {
   private String name;
   private File folder;
   private Map boards;
   private Map programmers;
-  
+  private Map platforms;
+
   public Target(String name, File folder) {
     this.name = name;
     this.folder = folder;
     this.boards = new LinkedHashMap();
     this.programmers = new LinkedHashMap();
+    this.platforms = new LinkedHashMap();
     
     File boardsFile = new File(folder, "boards.txt");
     try {
@@ -59,6 +62,28 @@ public class Target {
     } catch (Exception e) {
       System.err.println("Error loading boards from " + boardsFile + ": " + e);
     }
+
+   File platformsFile = new File(folder,"platforms.txt");
+   try
+   {
+    if(platformsFile.exists()){
+       Map platformPreferences = new LinkedHashMap();
+       Preferences.load(new FileInputStream(platformsFile), platformPreferences);
+       for(Object k : platformPreferences.keySet())
+	{
+               String key=(String) k;
+               String platform=key.substring(0,key.indexOf('.'));
+               if (!platforms.containsKey(platform)) platforms.put(platform, new HashMap());
+          ((Map) platforms.get(platform)).put(key.substring(key.indexOf('.') + 1),platformPreferences.get(key));
+        }
+      }
+    } catch (Exception e) {
+      System.err.println("Error loading platforms from " + 
+                         platformsFile + ": " + e);                        
+     // System.exit(0);	
+    
+    }    
+   
 
     File programmersFile = new File(folder, "programmers.txt");
     try {
@@ -88,4 +113,8 @@ public class Target {
   public Map<String, Map<String, String>> getProgrammers() {
     return programmers;
   }
+  public Map<String, Map<String, String>> getPlatforms() {
+    return platforms;
+  }
+
 }
