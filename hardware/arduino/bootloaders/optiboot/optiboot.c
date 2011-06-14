@@ -132,6 +132,9 @@
 /**********************************************************/
 /* Edit History:					  */
 /*							  */
+/* 4.4 WestfW: add initialization of address to keep      */
+/*             the compiler happy.  Change SC'ed targets. */
+/*             Return the SW version via READ PARAM       */
 /* 4.3 WestfW: catch framing errors in getch(), so that   */
 /*             AVRISP works without HW kludges.           */
 /*  http://code.google.com/p/arduino/issues/detail?id=368n*/
@@ -141,7 +144,7 @@
 /**********************************************************/
 
 #define OPTIBOOT_MAJVER 4
-#define OPTIBOOT_MINVER 3
+#define OPTIBOOT_MINVER 4
 
 #define MAKESTR(a) #a
 #define MAKEVER(a, b) MAKESTR(a*256+b)
@@ -261,8 +264,10 @@ int main(void) {
   /*
    * Making these local and in registers prevents the need for initializing
    * them, and also saves space because code no longer stores to memory.
+   * (initializing address keeps the compiler happy, but isn't really
+   *  necessary, and uses 4 bytes of flash.)
    */
-  register uint16_t address;
+  register uint16_t address = 0;
   register uint8_t  length;
 
   // After the zero init loop, this is the first code to run.
@@ -324,9 +329,22 @@ int main(void) {
     ch = getch();
 
     if(ch == STK_GET_PARAMETER) {
-      // GET PARAMETER returns a generic 0x03 reply - enough to keep Avrdude happy
-      getNch(1);
-      putch(0x03);
+      unsigned char which = getch();
+      verifySpace();
+      if (which == 0x82) {
+	/*
+	 * Send optiboot version as "minor SW version"
+	 */
+	putch(OPTIBOOT_MINVER);
+      } else if (which == 0x81) {
+	  putch(OPTIBOOT_MAJVER);
+      } else {
+	/*
+	 * GET PARAMETER returns a generic 0x03 reply for
+         * other parameters - enough to keep Avrdude happy
+	 */
+	putch(0x03);
+      }
     }
     else if(ch == STK_SET_DEVICE) {
       // SET DEVICE is ignored

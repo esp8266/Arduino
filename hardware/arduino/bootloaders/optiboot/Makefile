@@ -177,8 +177,27 @@ pro16_isp: LFUSE = C6
 pro16_isp: EFUSE = 04
 pro16_isp: isp
 
-# Diecimila and NG use identical bootloaders
+# Diecimila, Duemilanove with m168, and NG use identical bootloaders
+# Call it "atmega168" for generality and clarity, keep "diecimila" for
+# backward compatibility of makefile
 #
+atmega168: TARGET = atmega168
+atmega168: MCU_TARGET = atmega168
+atmega168: CFLAGS += '-DLED_START_FLASHES=3' '-DBAUD_RATE=115200'
+atmega168: AVR_FREQ = 16000000L 
+atmega168: $(PROGRAM)_atmega168.hex
+atmega168: $(PROGRAM)_atmega168.lst
+
+atmega168_isp: atmega168
+atmega168_isp: TARGET = atmega168
+# 2.7V brownout
+atmega168_isp: HFUSE = DD
+# Low power xtal (16MHz) 16KCK/14CK+65ms
+atmega168_isp: LFUSE = FF
+# 512 byte boot
+atmega168_isp: EFUSE = 04
+atmega168_isp: isp
+
 diecimila: TARGET = diecimila
 diecimila: MCU_TARGET = atmega168
 diecimila: CFLAGS += '-DLED_START_FLASHES=3' '-DBAUD_RATE=115200'
