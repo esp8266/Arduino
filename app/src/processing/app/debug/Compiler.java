@@ -32,6 +32,7 @@ import processing.core.*;
 import java.io.*;
 import java.util.*;
 import java.util.zip.*;
+import java.text.MessageFormat;
 
 
 public class Compiler implements MessageConsumer {
@@ -43,9 +44,22 @@ public class Compiler implements MessageConsumer {
   Sketch sketch;
   String buildPath;
   String primaryClassName;
-  boolean verbose;
+  String platform;
+  String board;
 
+  boolean verbose;
+	
   RunnerException exception;
+	
+  HashMap<String, String> configPreferences;
+  HashMap<String, String> boardPreferences;
+  HashMap<String, String> platformPreferences;
+	
+  String avrBasePath;
+  String corePath;
+	
+  List<File> objectFiles;
+  ArrayList<String> includePaths;
 
   public Compiler() { }
 
@@ -70,9 +84,47 @@ public class Compiler implements MessageConsumer {
     // the pms object isn't used for anything but storage
     MessageStream pms = new MessageStream(this);
 
-    String avrBasePath = Base.getAvrBasePath();
     Map<String, String> boardPreferences = Base.getBoardPreferences();
-    String core = boardPreferences.get("build.core");
+    
+   	//Check for null platform, and use system default if not found
+	platform = boardPreferences.get("platform");
+	if (platform == null)
+	{
+	      platformPreferences = new HashMap(Base.getPlatformPreferences());
+	}
+	else
+	{
+		platformPreferences = new HashMap(Base.getPlatformPreferences(platform));
+	}
+   
+    
+	//Put all the global preference configuration into one Master configpreferences
+    configPreferences = mergePreferences( Preferences.getMap(), platformPreferences, boardPreferences);
+	avrBasePath = configPreferences.get("compiler.path");
+	if (avrBasePath == null) 
+	{
+		avrBasePath = Base.getAvrBasePath();
+	}
+	else
+	{
+		//Put in the system path in the compiler path if available
+		MessageFormat compileFormat = new MessageFormat(avrBasePath);	
+		String basePath = System.getProperty("user.dir");
+		if (Base.isMacOS()) {
+			//logger.debug("basePath: " + basePath);
+			basePath += "/Arduino.app/Contents/Resources/Java";
+		}
+		Object[] Args = {basePath};
+		avrBasePath = compileFormat.format(  Args );
+
+	}
+	this.board = configPreferences.get("board");
+	if (this.board == "")
+	{
+		this.board = "_UNKNOWN";
+	}    
+    
+	String core = configPreferences.get("build.core");
     if (core == null) {
     	RunnerException re = new RunnerException("No board selected; please choose a board from the Tools > Board menu.");
       re.hideStackTrace();
@@ -91,7 +143,7 @@ public class Compiler implements MessageConsumer {
       corePath = coreFolder.getAbsolutePath();
     }
 
-    String pins = boardPreferences.get("build.pins");
+    String pins = configPreferences.get("build.pins");
     String pinsPath = null;
     
     if (pins != null) {
@@ -111,7 +163,7 @@ public class Compiler implements MessageConsumer {
 
    // 0. include paths for core + all libraries
 
-   List includePaths = new ArrayList();
+    ArrayList<String> includePaths = new ArrayList();
    includePaths.add(corePath);
    if (pinsPath != null) includePaths.add(pinsPath);
    for (File file : sketch.getImportedLibraries()) {
@@ -119,13 +171,15 @@ public class Compiler implements MessageConsumer {
    }
 
    // 1. compile the sketch (already in the buildPath)
-
+   compileSketch(avrBasePath, buildPath, includePaths, configPreferences);
+/*
    objectFiles.addAll(
      compileFiles(avrBasePath, buildPath, includePaths,
                findFilesInPath(buildPath, "S", false),
                findFilesInPath(buildPath, "c", false),
                findFilesInPath(buildPath, "cpp", false),
                boardPreferences));
+               */
 
    // 2. compile the libraries, outputting .o files to: <buildPath>/<library>/
 
@@ -280,9 +334,9 @@ public class Compiler implements MessageConsumer {
 
 
   private List<File> compileFiles(String avrBasePath,
-                                  String buildPath, List<File> includePaths,
-                                  List<File> sSources, 
-                                  List<File> cSources, List<File> cppSources,
+                                  String buildPath, ArrayList<String> includePaths,
+                                  ArrayList<File> sSources, 
+                                  ArrayList<File> cSources, ArrayList<File> cppSources,
                                   Map<String, String> boardPreferences)
     throws RunnerException {
 
@@ -578,6 +632,171 @@ public class Compiler implements MessageConsumer {
     
     return files;
   }
+  
+  
+  	// 1. compile the sketch (already in the buildPath)
+	void compileSketch(String avrBasePath, String buildPath, ArrayList<String> includePaths, HashMap<String, String> configPreferences)
+	throws RunnerException 
+	{
+		//logger.debug("compileSketch: start");	
+		this.objectFiles.addAll(compileFiles(avrBasePath, buildPath, includePaths,
+				findFilesInPath(buildPath, "S", false),
+				findFilesInPath(buildPath, "c", false),
+				findFilesInPath(buildPath, "cpp", false), 
+				configPreferences));
+	}
+	
+	// 2. compile the libraries, outputting .o files to:
+	// <buildPath>/<library>/
+	void compileLibraries (String avrBasePath, String buildPath, ArrayList<String> includePaths, HashMap<String, String> configPreferences) 
+		throws RunnerException 
+	{
+		//logger.debug("compileLibraries: start");
+		for (File libraryFolder : sketch.getImportedLibraries()) 
+		{
+			File outputFolder = new File(buildPath, libraryFolder.getName());
+			File utilityFolder = new File(libraryFolder, "utility");
+			createFolder(outputFolder);
+			// this library can use includes in its utility/ folder
+			this.includePaths.add(utilityFolder.getAbsolutePath());
+			this.objectFiles.addAll(compileFiles(avrBasePath,
+					outputFolder.getAbsolutePath(), includePaths,
+					findFilesInFolder(libraryFolder, "S", false),
+					findFilesInFolder(libraryFolder, "c", false),
+					findFilesInFolder(libraryFolder, "cpp", false),
+					configPreferences));
+			outputFolder = new File(outputFolder, "utility");
+			createFolder(outputFolder);
+			this.objectFiles.addAll(compileFiles(avrBasePath,
+					outputFolder.getAbsolutePath(), includePaths,
+					findFilesInFolder(utilityFolder, "S", false),
+					findFilesInFolder(utilityFolder, "c", false),
+					findFilesInFolder(utilityFolder, "cpp", false),
+					configPreferences));
+			// other libraries should not see this library's utility/ folder
+			this.includePaths.remove(includePaths.size() - 1);
+		}
+	}
+	
+	// 3. compile the core, outputting .o files to <buildPath> and then
+	// collecting them into the core.a library file.
+	void compileCore (String avrBasePath, String buildPath, String corePath, HashMap<String, String> configPreferences) 
+		throws RunnerException 
+	{
+		//logger.debug("compileCore(...) start");
+
+		ArrayList<String>  includePaths =  new ArrayList();
+	    includePaths.add(corePath); //include core path only
+		String baseCommandString = configPreferences.get("recipe.ar.pattern");
+		String commandString = "";
+		MessageFormat compileFormat = new MessageFormat(baseCommandString);	
+		
+		List<File> coreObjectFiles	 = compileFiles(
+				avrBasePath, 
+				buildPath,
+				includePaths, 
+				findFilesInPath(corePath, "S", true),
+				findFilesInPath(corePath, "c", true),
+				findFilesInPath(corePath, "cpp", true), 
+				configPreferences);
+		
+		for (File file : coreObjectFiles) {
+			//List commandAR = new ArrayList(baseCommandAR);
+			//commandAR = commandAR +  file.getAbsolutePath();
+		
+			Object[] Args = {
+				avrBasePath,
+				configPreferences.get("compiler.ar.cmd"),
+				configPreferences.get("compiler.ar.flags"),
+				//corePath,
+				buildPath + File.separator,
+				"core.a",
+				//objectName
+				file.getAbsolutePath()
+			};
+			commandString = compileFormat.format(  Args );
+			execAsynchronously(commandString);
+		}
+	}
+			
+	// 4. link it all together into the .elf file
+	void compileLink(String avrBasePath, String buildPath, String corePath, ArrayList<String> includePaths, HashMap<String, String> configPreferences) 
+		throws RunnerException 
+	{	
+		//logger.debug("compileLink: start");
+		String baseCommandString = configPreferences.get("recipe.c.combine.pattern");
+		String commandString = "";
+		MessageFormat compileFormat = new MessageFormat(baseCommandString);	
+		String objectFileList = "";
+		
+		for (File file : objectFiles) {
+			objectFileList = objectFileList + file.getAbsolutePath() + "::";
+		}
+
+			Object[] Args = {
+				avrBasePath,
+				configPreferences.get("compiler.c.elf.cmd"),
+				configPreferences.get("compiler.c.elf.flags"),
+				configPreferences.get("compiler.cpudef"),
+				configPreferences.get("build.mcu"),				
+				buildPath + File.separator,
+				primaryClassName,
+				objectFileList,
+				buildPath + File.separator + "core.a",
+				buildPath,
+				corePath,	
+				configPreferences.get("ldscript"),	
+			};
+			commandString = compileFormat.format(  Args );
+			execAsynchronously(commandString);
+	}
+
+	// 5. extract EEPROM data (from EEMEM directive) to .eep file.
+	void compileEep (String avrBasePath, String buildPath, ArrayList<String> includePaths, HashMap<String, String> configPreferences) 
+		throws RunnerException 
+	{
+		//logger.debug("compileEep: start");
+		String baseCommandString = configPreferences.get("recipe.objcopy.eep.pattern");
+		String commandString = "";
+		MessageFormat compileFormat = new MessageFormat(baseCommandString);	
+		String objectFileList = "";
+		
+		Object[] Args = {
+			avrBasePath,
+			configPreferences.get("compiler.objcopy.cmd"),
+			configPreferences.get("compiler.objcopy.eep.flags"),
+			buildPath + File.separator + primaryClassName,
+			buildPath + File.separator + primaryClassName
+			};
+		commandString = compileFormat.format(  Args );		
+				
+		execAsynchronously(commandString);	
+	}
+	
+	// 6. build the .hex file
+	void compileHex (String avrBasePath, String buildPath, ArrayList<String> includePaths, HashMap<String, String> configPreferences) 
+		throws RunnerException 
+	{
+		//logger.debug("compileHex: start");
+		String baseCommandString = configPreferences.get("recipe.objcopy.hex.pattern");
+		String commandString = "";
+		MessageFormat compileFormat = new MessageFormat(baseCommandString);	
+		String objectFileList = "";
+	
+		Object[] Args = {
+			avrBasePath,
+			configPreferences.get("compiler.elf2hex.cmd"),
+			configPreferences.get("compiler.elf2hex.flags"),
+			buildPath + File.separator + primaryClassName,
+			buildPath + File.separator + primaryClassName
+			};
+		commandString = compileFormat.format(  Args );		
+				
+		execAsynchronously(commandString);	
+		
+	}
+
+  
   
   
   	//merge all the preferences file in the correct order of precedence
