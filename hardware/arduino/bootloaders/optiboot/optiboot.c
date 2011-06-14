@@ -132,13 +132,16 @@
 /**********************************************************/
 /* Edit History:					  */
 /*							  */
+/* 4.3 WestfW: catch framing errors in getch(), so that   */
+/*             AVRISP works without HW kludges.           */
+/*  http://code.google.com/p/arduino/issues/detail?id=368n*/
 /* 4.2 WestfW: reduce code size, fix timeouts, change     */
 /*             verifySpace to use WDT instead of appstart */
 /* 4.1 WestfW: put version number in binary.		  */
 /**********************************************************/
 
 #define OPTIBOOT_MAJVER 4
-#define OPTIBOOT_MINVER 2
+#define OPTIBOOT_MINVER 3
 
 #define MAKESTR(a) #a
 #define MAKEVER(a, b) MAKESTR(a*256+b)
@@ -512,8 +515,6 @@ void putch(char ch) {
 uint8_t getch(void) {
   uint8_t ch;
 
-  watchdogReset();
-
 #ifdef LED_DATA_FLASH
 #ifdef __AVR_ATmega8__
   LED_PORT ^= _BV(LED);
@@ -547,7 +548,20 @@ uint8_t getch(void) {
       "r25"
 );
 #else
-  while(!(UCSR0A & _BV(RXC0)));
+  while(!(UCSR0A & _BV(RXC0)))
+    ;
+  if (!(UCSR0A & _BV(FE0))) {
+      /*
+       * A Framing Error indicates (probably) that something is talking
+       * to us at the wrong bit rate.  Assume that this is because it
+       * expects to be talking to the application, and DON'T reset the
+       * watchdog.  This should cause the bootloader to abort and run
+       * the application "soon", if it keeps happening.  (Note that we
+       * don't care that an invalid char is returned...)
+       */
+    watchdogReset();
+  }
+  
   ch = UDR0;
 #endif
 

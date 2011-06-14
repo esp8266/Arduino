@@ -27,7 +27,7 @@ this may change if compiler versions drift apart between CrossPack and
 the Arduino IDE.)
 
 
-Building optiboot in the arduino IDE install.
+Building Optiboot in the Arduino IDE Install.
 
 Work in the .../hardware/arduino/bootloaders/optiboot/ and use the
 "omake <targets>" command, which just generates a command that uses
@@ -44,7 +44,7 @@ the programs it needs, so you need to work in the existing optiboot
 directory (or something created at the same "level") for it to work.
 
 
-Building optiboot in the arduino source development install.
+Building Optiboot in the Arduino Source Development Install.
 
 In this case, there is no special shell script, and you're assumed to
 have "make" installed somewhere in your path.
@@ -53,3 +53,18 @@ expected directory.
 Work in Arduino/hardware/arduino/bootloaders/optiboot and use
     make OS=windows ENV=arduinodev <targets>
 or  make OS=macosx ENV=arduinodev <targets>
+
+
+Programming Chips Using the _isp Targets
+
+The CPU targets have corresponding ISP targets that will actuall
+program the bootloader into a chip. "atmega328_isp" for the atmega328,
+for example.  These will set the fuses and lock bits as appropriate as
+well as uploading the bootloader code.
+
+The makefiles default to using a USB programmer, but you can use
+a serial programmer like ArduinoISP by changing the appropriate
+variables when you invoke make:
+
+   make ISPTOOL=stk500v1 ISPPORT=/dev/tty.usbserial-A20e1eAN  \
+        ISPSPEED=-b19200 atmega328_isp

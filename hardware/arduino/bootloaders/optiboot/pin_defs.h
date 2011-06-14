@@ -21,6 +21,7 @@
   #define UDR0 		UDR
   #define UDRE0 	UDRE
   #define RXC0		RXC
+  #define FE0           FE
   #define TIFR1 	TIFR
   #define WDTCSR	WDTCR
 #endif

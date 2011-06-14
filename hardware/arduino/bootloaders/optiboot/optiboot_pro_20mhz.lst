@@ -3,27 +3,27 @@ optiboot_pro_20mhz.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         000001da  00003e00  00003e00  00000054  2**1
+  0 .text         000001e2  00003e00  00003e00  00000054  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .version      00000002  00003ffe  00003ffe  0000022e  2**0
+  1 .version      00000002  00003ffe  00003ffe  00000236  2**0
                   CONTENTS, READONLY
-  2 .debug_aranges 00000028  00000000  00000000  00000230  2**0
+  2 .debug_aranges 00000028  00000000  00000000  00000238  2**0
                   CONTENTS, READONLY, DEBUGGING
-  3 .debug_pubnames 0000005f  00000000  00000000  00000258  2**0
+  3 .debug_pubnames 0000005f  00000000  00000000  00000260  2**0
                   CONTENTS, READONLY, DEBUGGING
-  4 .debug_info   0000028d  00000000  00000000  000002b7  2**0
+  4 .debug_info   0000028e  00000000  00000000  000002bf  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_abbrev 0000018a  00000000  00000000  00000544  2**0
+  5 .debug_abbrev 00000171  00000000  00000000  0000054d  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_line   00000456  00000000  00000000  000006ce  2**0
+  6 .debug_line   0000045e  00000000  00000000  000006be  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_frame  00000080  00000000  00000000  00000b24  2**2
+  7 .debug_frame  00000080  00000000  00000000  00000b1c  2**2
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_str    00000149  00000000  00000000  00000ba4  2**0
+  8 .debug_str    00000149  00000000  00000000  00000b9c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_loc    0000027e  00000000  00000000  00000ced  2**0
+  9 .debug_loc    0000027e  00000000  00000000  00000ce5  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_ranges 00000060  00000000  00000000  00000f6b  2**0
+ 10 .debug_ranges 00000060  00000000  00000000  00000f63  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -47,7 +47,7 @@ int main(void) {
     3e04:	14 be       	out	0x34, r1	; 52
   if (!(ch & _BV(EXTRF))) appStart();
     3e06:	81 ff       	sbrs	r24, 1
-    3e08:	e3 d0       	rcall	.+454    	; 0x3fd0 <appStart>
+    3e08:	e7 d0       	rcall	.+462    	; 0x3fd8 <appStart>
 
 #if LED_START_FLASHES > 0
   // Set up Timer 1 for timeout counter
@@ -77,7 +77,7 @@ int main(void) {
   // Set up watchdog to trigger after 500ms
   watchdogConfig(WATCHDOG_1S);
     3e28:	8e e0       	ldi	r24, 0x0E	; 14
-    3e2a:	bc d0       	rcall	.+376    	; 0x3fa4 <watchdogConfig>
+    3e2a:	c0 d0       	rcall	.+384    	; 0x3fac <watchdogConfig>
 
   /* Set LED pin as output */
   LED_DDR |= _BV(LED);
@@ -163,7 +163,7 @@ void watchdogReset() {
       // GET PARAMETER returns a generic 0x03 reply - enough to keep Avrdude happy
       getNch(1);
     3e5e:	81 e0       	ldi	r24, 0x01	; 1
-    3e60:	af d0       	rcall	.+350    	; 0x3fc0 <getNch>
+    3e60:	b3 d0       	rcall	.+358    	; 0x3fc8 <getNch>
       putch(0x03);
     3e62:	83 e0       	ldi	r24, 0x03	; 3
     3e64:	1f c0       	rjmp	.+62     	; 0x3ea4 <main+0xa4>
@@ -182,7 +182,7 @@ void watchdogReset() {
       // SET DEVICE EXT is ignored
       getNch(5);
     3e72:	85 e0       	ldi	r24, 0x05	; 5
-    3e74:	a5 d0       	rcall	.+330    	; 0x3fc0 <getNch>
+    3e74:	a9 d0       	rcall	.+338    	; 0x3fc8 <getNch>
     3e76:	83 c0       	rjmp	.+262    	; 0x3f7e <main+0x17e>
     }
     else if(ch == STK_LOAD_ADDRESS) {
@@ -211,7 +211,7 @@ void watchdogReset() {
     3e92:	11 1f       	adc	r17, r17
       address = newAddress;
       verifySpace();
-    3e94:	8d d0       	rcall	.+282    	; 0x3fb0 <verifySpace>
+    3e94:	91 d0       	rcall	.+290    	; 0x3fb8 <verifySpace>
     3e96:	68 01       	movw	r12, r16
     3e98:	72 c0       	rjmp	.+228    	; 0x3f7e <main+0x17e>
     }
@@ -221,7 +221,7 @@ void watchdogReset() {
       // UNIVERSAL command is ignored
       getNch(4);
     3e9e:	84 e0       	ldi	r24, 0x04	; 4
-    3ea0:	8f d0       	rcall	.+286    	; 0x3fc0 <getNch>
+    3ea0:	93 d0       	rcall	.+294    	; 0x3fc8 <getNch>
       putch(0x00);
     3ea2:	80 e0       	ldi	r24, 0x00	; 0
     3ea4:	6f d0       	rcall	.+222    	; 0x3f84 <putch>
@@ -282,7 +282,7 @@ void watchdogReset() {
 
       // Read command terminator, start reply
       verifySpace();
-    3ee6:	64 d0       	rcall	.+200    	; 0x3fb0 <verifySpace>
+    3ee6:	68 d0       	rcall	.+208    	; 0x3fb8 <verifySpace>
 
       // If only a partial page is to be programmed, the erase might not be complete.
       // So check that here
@@ -370,7 +370,7 @@ int main(void) {
     3f3c:	2b d0       	rcall	.+86     	; 0x3f94 <getch>
 
       verifySpace();
-    3f3e:	38 d0       	rcall	.+112    	; 0x3fb0 <verifySpace>
+    3f3e:	3c d0       	rcall	.+120    	; 0x3fb8 <verifySpace>
     3f40:	f6 01       	movw	r30, r12
     3f42:	ef 2c       	mov	r14, r15
         putch(result);
@@ -411,7 +411,7 @@ int main(void) {
     3f64:	39 f4       	brne	.+14     	; 0x3f74 <main+0x174>
       // READ SIGN - return what Avrdude wants to hear
       verifySpace();
-    3f66:	24 d0       	rcall	.+72     	; 0x3fb0 <verifySpace>
+    3f66:	28 d0       	rcall	.+80     	; 0x3fb8 <verifySpace>
       putch(SIGNATURE_0);
     3f68:	8e e1       	ldi	r24, 0x1E	; 30
     3f6a:	0c d0       	rcall	.+24     	; 0x3f84 <putch>
@@ -428,13 +428,13 @@ int main(void) {
       // Adaboot no-wait mod
       watchdogConfig(WATCHDOG_16MS);
     3f78:	88 e0       	ldi	r24, 0x08	; 8
-    3f7a:	14 d0       	rcall	.+40     	; 0x3fa4 <watchdogConfig>
+    3f7a:	18 d0       	rcall	.+48     	; 0x3fac <watchdogConfig>
       verifySpace();
     }
     else {
       // This covers the response to commands like STK_ENTER_PROGMODE
       verifySpace();
-    3f7c:	19 d0       	rcall	.+50     	; 0x3fb0 <verifySpace>
+    3f7c:	1d d0       	rcall	.+58     	; 0x3fb8 <verifySpace>
     }
     putch(STK_OK);
     3f7e:	80 e1       	ldi	r24, 0x10	; 16
@@ -463,99 +463,109 @@ void putch(char ch) {
     3f92:	08 95       	ret
 
 00003f94 <getch>:
+      [uartBit] "I" (UART_RX_BIT)
+    :
+      "r25"
+);
+#else
+  while(!(UCSR0A & _BV(RXC0)))
+    3f94:	80 91 c0 00 	lds	r24, 0x00C0
+    3f98:	87 ff       	sbrs	r24, 7
+    3f9a:	fc cf       	rjmp	.-8      	; 0x3f94 <getch>
+    ;
+  if (!(UCSR0A & _BV(FE0))) {
+    3f9c:	80 91 c0 00 	lds	r24, 0x00C0
+    3fa0:	84 fd       	sbrc	r24, 4
+    3fa2:	01 c0       	rjmp	.+2      	; 0x3fa6 <getch+0x12>
 }
 #endif
 
 // Watchdog functions. These are only safe with interrupts turned off.
 void watchdogReset() {
   __asm__ __volatile__ (
-    3f94:	a8 95       	wdr
-      [uartBit] "I" (UART_RX_BIT)
-    :
-      "r25"
-);
-#else
-  while(!(UCSR0A & _BV(RXC0)));
-    3f96:	80 91 c0 00 	lds	r24, 0x00C0
-    3f9a:	87 ff       	sbrs	r24, 7
-    3f9c:	fc cf       	rjmp	.-8      	; 0x3f96 <getch+0x2>
+    3fa4:	a8 95       	wdr
+       * don't care that an invalid char is returned...)
+       */
+    watchdogReset();
+  }
+  
   ch = UDR0;
-    3f9e:	80 91 c6 00 	lds	r24, 0x00C6
+    3fa6:	80 91 c6 00 	lds	r24, 0x00C6
   LED_PIN |= _BV(LED);
 #endif
 #endif
 
   return ch;
 }
-    3fa2:	08 95       	ret
+    3faa:	08 95       	ret
 
-00003fa4 <watchdogConfig>:
+00003fac <watchdogConfig>:
     "wdr\n"
   );
 }
 
 void watchdogConfig(uint8_t x) {
   WDTCSR = _BV(WDCE) | _BV(WDE);
-    3fa4:	e0 e6       	ldi	r30, 0x60	; 96
-    3fa6:	f0 e0       	ldi	r31, 0x00	; 0
-    3fa8:	98 e1       	ldi	r25, 0x18	; 24
-    3faa:	90 83       	st	Z, r25
+    3fac:	e0 e6       	ldi	r30, 0x60	; 96
+    3fae:	f0 e0       	ldi	r31, 0x00	; 0
+    3fb0:	98 e1       	ldi	r25, 0x18	; 24
+    3fb2:	90 83       	st	Z, r25
   WDTCSR = x;
-    3fac:	80 83       	st	Z, r24
+    3fb4:	80 83       	st	Z, r24
 }
-    3fae:	08 95       	ret
+    3fb6:	08 95       	ret
 
-00003fb0 <verifySpace>:
+00003fb8 <verifySpace>:
   do getch(); while (--count);
   verifySpace();
 }
 
 void verifySpace() {
   if (getch() != CRC_EOP) {
-    3fb0:	f1 df       	rcall	.-30     	; 0x3f94 <getch>
-    3fb2:	80 32       	cpi	r24, 0x20	; 32
-    3fb4:	19 f0       	breq	.+6      	; 0x3fbc <verifySpace+0xc>
+    3fb8:	ed df       	rcall	.-38     	; 0x3f94 <getch>
+    3fba:	80 32       	cpi	r24, 0x20	; 32
+    3fbc:	19 f0       	breq	.+6      	; 0x3fc4 <verifySpace+0xc>
     watchdogConfig(WATCHDOG_16MS);    // shorten WD timeout
-    3fb6:	88 e0       	ldi	r24, 0x08	; 8
-    3fb8:	f5 df       	rcall	.-22     	; 0x3fa4 <watchdogConfig>
-    3fba:	ff cf       	rjmp	.-2      	; 0x3fba <verifySpace+0xa>
+    3fbe:	88 e0       	ldi	r24, 0x08	; 8
+    3fc0:	f5 df       	rcall	.-22     	; 0x3fac <watchdogConfig>
+    3fc2:	ff cf       	rjmp	.-2      	; 0x3fc2 <verifySpace+0xa>
     while (1)			      // and busy-loop so that WD causes
       ;				      //  a reset and app start.
   }
   putch(STK_INSYNC);
-    3fbc:	84 e1       	ldi	r24, 0x14	; 20
+    3fc4:	84 e1       	ldi	r24, 0x14	; 20
 }
-    3fbe:	e2 cf       	rjmp	.-60     	; 0x3f84 <putch>
+    3fc6:	de cf       	rjmp	.-68     	; 0x3f84 <putch>
 
-00003fc0 <getNch>:
+00003fc8 <getNch>:
     ::[count] "M" (UART_B_VALUE)
   );
 }
 #endif
 
 void getNch(uint8_t count) {
-    3fc0:	1f 93       	push	r17
-    3fc2:	18 2f       	mov	r17, r24
+    3fc8:	1f 93       	push	r17
+    3fca:	18 2f       	mov	r17, r24
   do getch(); while (--count);
-    3fc4:	e7 df       	rcall	.-50     	; 0x3f94 <getch>
-    3fc6:	11 50       	subi	r17, 0x01	; 1
-    3fc8:	e9 f7       	brne	.-6      	; 0x3fc4 <getNch+0x4>
+    3fcc:	e3 df       	rcall	.-58     	; 0x3f94 <getch>
+    3fce:	11 50       	subi	r17, 0x01	; 1
+    3fd0:	e9 f7       	brne	.-6      	; 0x3fcc <getNch+0x4>
   verifySpace();
-    3fca:	f2 df       	rcall	.-28     	; 0x3fb0 <verifySpace>
+    3fd2:	f2 df       	rcall	.-28     	; 0x3fb8 <verifySpace>
 }
-    3fcc:	1f 91       	pop	r17
-    3fce:	08 95       	ret
+    3fd4:	1f 91       	pop	r17
+    3fd6:	08 95       	ret
 
-00003fd0 <appStart>:
+00003fd8 <appStart>:
   WDTCSR = _BV(WDCE) | _BV(WDE);
   WDTCSR = x;
 }
 
 void appStart() {
   watchdogConfig(WATCHDOG_OFF);
-    3fd0:	80 e0       	ldi	r24, 0x00	; 0
-    3fd2:	e8 df       	rcall	.-48     	; 0x3fa4 <watchdogConfig>
+    3fd8:	80 e0       	ldi	r24, 0x00	; 0
+    3fda:	e8 df       	rcall	.-48     	; 0x3fac <watchdogConfig>
   __asm__ __volatile__ (
-    3fd4:	ee 27       	eor	r30, r30
-    3fd6:	ff 27       	eor	r31, r31
-    3fd8:	09 94       	ijmp
+    3fdc:	ee 27       	eor	r30, r30
+    3fde:	ff 27       	eor	r31, r31
+    3fe0:	09 94       	ijmp
