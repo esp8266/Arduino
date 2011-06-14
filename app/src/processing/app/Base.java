@@ -959,7 +959,7 @@ public class Base {
     //Choose which library to add by chip platform
     
     try {
-			//Find the current target. Get the platform, and then select the correct name and core path.
+		//Find the current target. Get the platform, and then select the correct name and core path.
 	    	String platformname = this.getBoardPreferences().get("platform");
 	    	String targetname = this.getPlatformPreferences(platformname).get("name");
 	        String libraryPath = this.getPlatformPreferences(platformname).get("library.core.path");
@@ -1553,11 +1553,20 @@ public class Base {
   
   
   static public Target getTarget() {
-    return Base.targetsTable.get(Preferences.get("target"));
+  	System.out.println("Base.targetsTable.get(Preferences.get(\"target\"))" + Base.targetsTable.get(Preferences.get("target")));
+  	System.out.println("Preferences.get(\"target\")" + Preferences.get("target"));
+  	Target target = Base.targetsTable.get(Preferences.get("target"));
+  	if (target == null) {
+  		System.out.println("default target is not in list. Replace with default.");
+  		Preferences.set("target", "arduino");
+  		target = Base.targetsTable.get(Preferences.get("target"));
+  	}
+    return target;
   }
   
  
 static public Map<String, String> getPlatformPreferences() {
+	System.out.println("getPlatformPreferences() no arguments: start");
     Target target = getTarget();
     //if (target == null) return new LinkedHashMap();
     Map map = target.getPlatforms();
@@ -1576,22 +1585,73 @@ static public Map<String, String> getPlatformPreferences() {
 
   //Get a specific platform
   static public Map<String, String> getPlatformPreferences(String platformname) {
+	if (platformname == null) {
+		platformname = Preferences.get("platform");
+		
+	}
+	System.out.println("getlatformPreferences(String platformname)): start: platformname = " + platformname );
   	Target target = getTarget();
-  	Map map = target.getPlatforms();
-    map =  (Map) map.get(platformname);
+	if (target == null ) {
+		System.out.println("get target is null. trouble! ");
+	}
+        Map map = target.getPlatforms();
+        map =  (Map) map.get(platformname);
+
+	//What if null or defaults to nonexisent platform
+	System.out.println("PlatformName: " + platformname);
+	 if (map == null)
+    	{   
+        	System.err.println("Error loading platforms preference from Target");
+        	System.exit(0);
+    	}
+
+    	return map;
+  }
+ 
+  static public Map<String, String> bogusgetBoardPreferences() {
+    System.out.println("getBoardPrefences method: start");
+    Target target = getTarget();
+    if (target == null) {
+	    System.out.println("getBoardPrefereces  method: target == null");
+	 return new LinkedHashMap();
+	}
+    Map map = target.getBoards();
+    if (map == null) {
+	System.out.println("getBoardPrefereces  method: target.getBoards() == null");
+	return new LinkedHashMap();
+	}
+    map = (Map) map.get(Preferences.get("board"));
+    if (map == null) {
+	System.out.println("getBoardPrefereces  method: Preferences.get(board)  == null");
+	return new LinkedHashMap();
+	}
+   //Debug iterate the map
+   Iterator iterator = map.entrySet().iterator();
+   while(iterator.hasNext())
+  	    {
+  	    	Map.Entry pair = (Map.Entry)iterator.next();
+  	    	if (pair.getValue() == null)
+  	    	{
+  	    		System.out.println("KeyName: " + pair.getKey() + " val: null");
+  	    	}
+  	    	else
+  	    	{
+			System.out.println("KeyName: " + pair.getKey() + " val"  +  pair.getValue());
+  	    	}
+	    }
+
     return map;
   }
  
-  static public Map<String, String> getBoardPreferences() {
+static public Map<String, String> getBoardPreferences() {
     Target target = getTarget();
-    if (target == null) return new LinkedHashMap();
-    Map map = target.getBoards();
-    if (map == null) return new LinkedHashMap();
-    map = (Map) map.get(Preferences.get("board"));
-    if (map == null) return new LinkedHashMap();
+    Map map = new LinkedHashMap();
+	if (target != null) {
+	    map = target.getBoards();
+	    map = (Map) map.get(Preferences.get("board"));
+	}
     return map;
-  }
-  
+  } 
 
   static public File getSketchbookFolder() {
     return new File(Preferences.get("sketchbook.path"));

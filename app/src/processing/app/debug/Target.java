@@ -39,6 +39,7 @@ public class Target {
   private Map platforms;
 
   public Target(String name, File folder) {
+	System.out.println("Target: constructor start, name: " + name); 
     this.name = name;
     this.folder = folder;
     this.boards = new LinkedHashMap();
@@ -61,6 +62,7 @@ public class Target {
       }
     } catch (Exception e) {
       System.err.println("Error loading boards from " + boardsFile + ": " + e);
+
     }
 
    File platformsFile = new File(folder,"platforms.txt");
@@ -80,7 +82,7 @@ public class Target {
     } catch (Exception e) {
       System.err.println("Error loading platforms from " + 
                          platformsFile + ": " + e);                        
-     // System.exit(0);	
+     System.exit(0);	
     
     }    
    
