@@ -68,3 +68,14 @@ variables when you invoke make:
 
    make ISPTOOL=stk500v1 ISPPORT=/dev/tty.usbserial-A20e1eAN  \
         ISPSPEED=-b19200 atmega328_isp
+
+The "atmega8_isp" target does not currently work, because the mega8
+doesn't have the "extended" fuse that the generic ISP target wants to
+pass on to avrdude.  You'll need to run avrdude manually.
+
+
+Standard Targets
+
+I've reduced the pre-built and source-version-controlled targets
+(.hex and .lst files included in the git repository) to just the
+three basic 16MHz targets: atmega8, atmega16, atmega328.
