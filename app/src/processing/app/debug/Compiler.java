@@ -159,7 +159,7 @@ public class Compiler implements MessageConsumer {
       }
     }
 
-    List<File> objectFiles = new ArrayList<File>();
+    objectFiles = new ArrayList<File>();
 
    // 0. include paths for core + all libraries
 
@@ -966,7 +966,7 @@ public class Compiler implements MessageConsumer {
 		String includes = "";
 		for (int i = 0; i < includePaths.size(); i++) 
 		{
-			includes = includes + (" -I" + (String) includePaths.get(i)) + ",";
+			includes = includes + (i > 0 ? "," : "") + ("-I" + (String) includePaths.get(i));
 		}
 		//logger.debug("Paths prepared: " + includes);
 		return includes;

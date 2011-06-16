@@ -42,17 +42,17 @@ avr.name=Arduino
 #avr.compiler.path Official default is correct, only need to change this if you want to overide the initial default
 #avr.compiler.path={0}/hardware/tools/avr/bin/
 avr.compiler.c.cmd=avr-gcc
-avr.compiler.c.flags=,-c,-g,-Os,-w,-ffunction-sections,-fdata-sections
-avr.compiler.c.elf.flags=,-Os,-Wl,--gc-sections
+avr.compiler.c.flags=-c,-g,-Os,-w,-ffunction-sections,-fdata-sections
+avr.compiler.c.elf.flags=-Os,-Wl,--gc-sections
 avr.compiler.c.elf.cmd=avr-gcc
-avr.compiler.S.flags=,-c,-g,-assembler-with-cpp
+avr.compiler.S.flags=-c,-g,-assembler-with-cpp
 avr.compiler.cpp.cmd=avr-g++
-avr.compiler.cpp.flags=,-c,-g,-Os,-w,-fno-exceptions,-ffunction-sections,-fdata-sections
+avr.compiler.cpp.flags=-c,-g,-Os,-w,-fno-exceptions,-ffunction-sections,-fdata-sections
 avr.compiler.ar.cmd=avr-ar
 avr.compiler.ar.flags=rcs
 avr.compiler.objcopy.cmd=avr-objcopy
-avr.compiler.objcopy.eep.flags=,-O,ihex,-j,.eeprom,--set-section-flags=.eeprom=alloc,load,--no-change-warnings,--change-section-lma,.eeprom=0
-avr.compiler.elf2hex.flags=,-O,ihex,-R,.eeprom
+avr.compiler.objcopy.eep.flags=-O,ihex,-j,.eeprom,--set-section-flags=.eeprom=alloc,load,--no-change-warnings,--change-section-lma,.eeprom=0
+avr.compiler.elf2hex.flags=-O,ihex,-R,.eeprom
 avr.compiler.elf2hex.cmd=avr-objcopy
 avr.compiler.ldflags=
 avr.compiler.cpudef=-mmcu=
