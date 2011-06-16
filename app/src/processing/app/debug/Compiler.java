@@ -209,7 +209,7 @@ public class Compiler implements MessageConsumer {
 
    // 3. compile the core, outputting .o files to <buildPath> and then
    // collecting them into the core.a library file.
-
+/*
   includePaths.clear();
   includePaths.add(corePath);  // include path for core only
   if (pinsPath != null) includePaths.add(pinsPath);
@@ -231,9 +231,9 @@ public class Compiler implements MessageConsumer {
      commandAR.add(file.getAbsolutePath());
      execAsynchronously(commandAR);
    }
-
+*/
     // 4. link it all together into the .elf file
-
+/*
     List baseCommandLinker = new ArrayList(Arrays.asList(new String[] {
       avrBasePath + "avr-gcc",
       "-Os",
@@ -260,8 +260,10 @@ public class Compiler implements MessageConsumer {
     }));
     
     List commandObjcopy;
+*/
 
     // 5. extract EEPROM data (from EEMEM directive) to .eep file.
+/*
     commandObjcopy = new ArrayList(baseCommandObjcopy);
     commandObjcopy.add(2, "ihex");
     commandObjcopy.set(3, "-j");
@@ -281,6 +283,7 @@ public class Compiler implements MessageConsumer {
     commandObjcopy.add(buildPath + File.separator + primaryClassName + ".elf");
     commandObjcopy.add(buildPath + File.separator + primaryClassName + ".hex");
     execAsynchronously(commandObjcopy);
+*/
     
     return true;
     /*
@@ -348,7 +351,7 @@ public class Compiler implements MessageConsumer {
       execAsynchronously(getCommandCompilerS(avrBasePath, includePaths,
                                              file.getAbsolutePath(),
                                              objectPath,
-                                             boardPreferences));
+                                             configPreferences));
     }
  		
     for (File file : cSources) {
@@ -357,7 +360,7 @@ public class Compiler implements MessageConsumer {
         execAsynchronously(getCommandCompilerC(avrBasePath, includePaths,
                                                file.getAbsolutePath(),
                                                objectPath,
-                                               boardPreferences));
+                                               configPreferences));
     }
 
     for (File file : cppSources) {
@@ -366,7 +369,7 @@ public class Compiler implements MessageConsumer {
         execAsynchronously(getCommandCompilerCPP(avrBasePath, includePaths,
                                                  file.getAbsolutePath(),
                                                  objectPath,
-                                                 boardPreferences));
+                                                 configPreferences));
     }
     
     return objectPaths;
@@ -379,9 +382,9 @@ public class Compiler implements MessageConsumer {
   /**
    * Either succeeds or throws a RunnerException fit for public consumption.
    */
-  private void execAsynchronously(List commandList) throws RunnerException {
-    String[] command = new String[commandList.size()];
-    commandList.toArray(command);
+  private void execAsynchronously(String[] command) throws RunnerException {
+   // String[] command = new String[commandList.size()];
+    //commandList.toArray(command);
     int result = 0;
     
     if (verbose || Preferences.getBoolean("build.verbose")) {
@@ -504,7 +507,7 @@ public class Compiler implements MessageConsumer {
   }
 
   /////////////////////////////////////////////////////////////////////////////
-
+/*
   static private List getCommandCompilerS(String avrBasePath, List includePaths,
     String sourceName, String objectName, Map<String, String> boardPreferences) {
     List baseCommandCompiler = new ArrayList(Arrays.asList(new String[] {
@@ -526,7 +529,39 @@ public class Compiler implements MessageConsumer {
 
     return baseCommandCompiler;
   }
+*/
 
+	// ///////////////////////////////////////////////////////////////////////////
+	static private String[] getCommandCompilerS(String avrBasePath,
+			ArrayList<String> includePaths, String sourceName, String objectName,
+			HashMap<String, String> configPreferences) 
+			{
+		System.out.println("getCommandCompilerS: start");	
+		String baseCommandString = configPreferences.get("recipe.cpp.o.pattern");
+		MessageFormat compileFormat = new MessageFormat(baseCommandString);	
+		//getIncludes to String
+		
+		String includes = preparePaths(includePaths);
+		Object[] Args = {
+				avrBasePath,
+				configPreferences.get("compiler.cpp.cmd"),
+				configPreferences.get("compiler.S.flags"),
+				configPreferences.get("compiler.cpudef"),
+				configPreferences.get("build.mcu"),				
+				configPreferences.get("build.f_cpu"),
+				configPreferences.get("board"),
+				Base.REVISION,
+				includes,
+				sourceName,
+				objectName
+		};
+				
+		String command = compileFormat.format(  Args );	
+		String[] commandArray = command.split(",");	
+		return commandArray;
+	}
+
+/*
   
   static private List getCommandCompilerC(String avrBasePath, List includePaths,
     String sourceName, String objectName, Map<String, String> boardPreferences) {
@@ -553,7 +588,38 @@ public class Compiler implements MessageConsumer {
 
     return baseCommandCompiler;
   }
+	*/
 	
+	//removed static
+	private String[] getCommandCompilerC(String avrBasePath,
+			ArrayList<String> includePaths, String sourceName, String objectName,
+			HashMap<String, String> configPreferences) 
+			{
+		System.out.println("getCommandCompilerC: start");	
+		String baseCommandString = configPreferences.get("recipe.c.o.pattern");
+		MessageFormat compileFormat = new MessageFormat(baseCommandString);	
+		//getIncludes to String
+		String includes = preparePaths(includePaths);
+
+		Object[] Args = {
+				avrBasePath,
+				configPreferences.get("compiler.c.cmd"),
+				configPreferences.get("compiler.c.flags"),
+				configPreferences.get("compiler.cpudef"),
+				configPreferences.get("build.mcu"),				
+				configPreferences.get("build.f_cpu"),
+				configPreferences.get("board"),
+				Base.REVISION,
+				includes,
+				sourceName,
+				objectName
+		};
+						
+		String command = compileFormat.format(  Args );	
+		String[] commandArray = command.split(",");	
+		return commandArray;	
+	}
+/*
 	
   static private List getCommandCompilerCPP(String avrBasePath,
     List includePaths, String sourceName, String objectName,
@@ -582,7 +648,37 @@ public class Compiler implements MessageConsumer {
 
     return baseCommandCompilerCPP;
   }
+*/
 
+	static private String[] getCommandCompilerCPP(String avrBasePath,
+			ArrayList<String> includePaths, String sourceName, String objectName,
+			HashMap<String, String> configPreferences) 
+			{
+		System.out.println("getCommandCompilerCPP: start");	
+		String baseCommandString = configPreferences.get("recipe.cpp.o.pattern");
+		MessageFormat compileFormat = new MessageFormat(baseCommandString);	
+		//getIncludes to String
+		String includes = preparePaths(includePaths);
+
+		Object[] Args = {
+				avrBasePath,
+				configPreferences.get("compiler.cpp.cmd"),
+				configPreferences.get("compiler.cpp.flags"),
+				configPreferences.get("compiler.cpudef"),
+				configPreferences.get("build.mcu"),				
+				configPreferences.get("build.f_cpu"),
+				configPreferences.get("board"),
+				Base.REVISION,
+				includes,
+				sourceName,
+				objectName
+		};
+						
+		String command = compileFormat.format(  Args );	
+		System.out.println("command:" + command);
+		String[] commandArray = command.split(",");	
+		return commandArray;	
+	}
 
 
   /////////////////////////////////////////////////////////////////////////////
@@ -714,8 +810,12 @@ public class Compiler implements MessageConsumer {
 				//objectName
 				file.getAbsolutePath()
 			};
+
 			commandString = compileFormat.format(  Args );
-			execAsynchronously(commandString);
+		    String[] commandArray = commandString.split(",");	
+			execAsynchronously(commandArray);
+			
+			
 		}
 	}
 			
@@ -730,7 +830,7 @@ public class Compiler implements MessageConsumer {
 		String objectFileList = "";
 		
 		for (File file : objectFiles) {
-			objectFileList = objectFileList + file.getAbsolutePath() + "::";
+			objectFileList = objectFileList + file.getAbsolutePath() + ",";
 		}
 
 			Object[] Args = {
@@ -747,8 +847,8 @@ public class Compiler implements MessageConsumer {
 				corePath,	
 				configPreferences.get("ldscript"),	
 			};
-			commandString = compileFormat.format(  Args );
-			execAsynchronously(commandString);
+		    String[] commandArray = commandString.split(",");	
+			execAsynchronously(commandArray);
 	}
 
 	// 5. extract EEPROM data (from EEMEM directive) to .eep file.
@@ -769,8 +869,8 @@ public class Compiler implements MessageConsumer {
 			buildPath + File.separator + primaryClassName
 			};
 		commandString = compileFormat.format(  Args );		
-				
-		execAsynchronously(commandString);	
+		String[] commandArray = commandString.split(",");	
+	    execAsynchronously(commandArray);
 	}
 	
 	// 6. build the .hex file
@@ -790,10 +890,9 @@ public class Compiler implements MessageConsumer {
 			buildPath + File.separator + primaryClassName,
 			buildPath + File.separator + primaryClassName
 			};
-		commandString = compileFormat.format(  Args );		
-				
-		execAsynchronously(commandString);	
-		
+		commandString = compileFormat.format(  Args );						
+		String[] commandArray = commandString.split(",");	
+		execAsynchronously(commandArray);	
 	}
 
   
@@ -867,7 +966,7 @@ public class Compiler implements MessageConsumer {
 		String includes = "";
 		for (int i = 0; i < includePaths.size(); i++) 
 		{
-			includes = includes + (" -I" + (String) includePaths.get(i)) + "::";
+			includes = includes + (" -I" + (String) includePaths.get(i)) + ",";
 		}
 		//logger.debug("Paths prepared: " + includes);
 		return includes;
