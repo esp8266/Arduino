@@ -596,7 +596,7 @@ public class Compiler implements MessageConsumer {
 		};
 				
 		String command = compileFormat.format(  Args );	
-		String[] commandArray = command.split(",");	
+		String[] commandArray = command.split("\|");	
 		return commandArray;
 	}
 
@@ -655,7 +655,7 @@ public class Compiler implements MessageConsumer {
 		};
 						
 		String command = compileFormat.format(  Args );	
-		String[] commandArray = command.split(",");	
+		String[] commandArray = command.split("\|");	
 		return commandArray;	
 	}
 /*
@@ -714,7 +714,7 @@ public class Compiler implements MessageConsumer {
 		};
 						
 		String command = compileFormat.format(  Args );	
-		String[] commandArray = command.split(",");	
+		String[] commandArray = command.split("\|");	
 
 		/*
 		System.out.println("command:" + command);
@@ -863,7 +863,7 @@ public class Compiler implements MessageConsumer {
 		System.out.println("compileCore(...) substitute");
 
 			commandString = compileFormat.format(  Args );
-		    String[] commandArray = commandString.split(",");	
+		    String[] commandArray = commandString.split("\|");	
 			execAsynchronously(commandArray);
 			
 			
@@ -876,13 +876,12 @@ public class Compiler implements MessageConsumer {
 	{	
 		System.out.println("compileLink: start");
 		String baseCommandString = configPreferences.get("recipe.c.combine.pattern");
-		System.out.println("baseCommandstring: " + baseCommandString);
 		String commandString = "";
 		MessageFormat compileFormat = new MessageFormat(baseCommandString);	
 		String objectFileList = "";
 		
 		for (File file : objectFiles) {
-			objectFileList = objectFileList + file.getAbsolutePath() + ",";
+			objectFileList = objectFileList + file.getAbsolutePath() + "\|";
 		}
 		System.out.println("objectFileList: " + objectFileList);
 
@@ -901,13 +900,7 @@ public class Compiler implements MessageConsumer {
 				configPreferences.get("ldscript"),	
 			};
 			commandString = compileFormat.format(  Args );
-		    String[] commandArray = commandString.split(",");	
-		 System.out.println("commandString: " + commandString); 
-		for (int ii = 0; ii < commandArray.length; ii++)
-		{
-			System.out.println("'" + commandArray[ii] + "'");
-		} 
-		    System.out.println("4. compileLink:prexec");
+		    String[] commandArray = commandString.split("\|");	
 			execAsynchronously(commandArray);
 	}
 
@@ -929,7 +922,7 @@ public class Compiler implements MessageConsumer {
 			buildPath + File.separator + primaryClassName
 			};
 		commandString = compileFormat.format(  Args );		
-		String[] commandArray = commandString.split(",");	
+		String[] commandArray = commandString.split("\|");	
 	    execAsynchronously(commandArray);
 	}
 	
@@ -951,7 +944,7 @@ public class Compiler implements MessageConsumer {
 			buildPath + File.separator + primaryClassName
 			};
 		commandString = compileFormat.format(  Args );						
-		String[] commandArray = commandString.split(",");	
+		String[] commandArray = commandString.split("\|");	
 		execAsynchronously(commandArray);	
 	}
   
@@ -1023,7 +1016,7 @@ public class Compiler implements MessageConsumer {
 		String includes = "";
 		for (int i = 0; i < includePaths.size(); i++) 
 		{
-			includes = includes + (" -I" + (String) includePaths.get(i)) + ",";
+			includes = includes + (" -I" + (String) includePaths.get(i)) + "\|";
 		}
 		//logger.debug("Paths prepared: " + includes);
 		return includes;
