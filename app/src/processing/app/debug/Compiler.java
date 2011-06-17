@@ -900,6 +900,7 @@ public class Compiler implements MessageConsumer {
 				corePath,	
 				configPreferences.get("ldscript"),	
 			};
+			commandString = compileFormat.format(  Args );
 		    String[] commandArray = commandString.split(",");	
 		 System.out.println("commandString: " + commandString); 
 		for (int ii = 0; ii < commandArray.length; ii++)
