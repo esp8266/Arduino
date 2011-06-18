@@ -438,7 +438,7 @@ static int asn1_compare_dn_comp(const char *dn1, const char *dn2)
     if (dn1 == NULL && dn2 == NULL)
         ret = 0;
     else
-        ret = (dn1 && dn2) ? strcmp(dn1, dn2) : 0;
+        ret = (dn1 && dn2) ? strcmp(dn1, dn2) : 1;
 
     return ret;
 }
