@@ -51,7 +51,7 @@ avr.compiler.cpp.flags=|-c|-g|-Os|-w|-fno-exceptions|-ffunction-sections|-fdata-
 avr.compiler.ar.cmd=avr-ar
 avr.compiler.ar.flags=rcs
 avr.compiler.objcopy.cmd=avr-objcopy
-avr.compiler.objcopy.eep.flags=|-O|ihex|-j|.eeprom|--set-section-flags=.eeprom=alloc|load|--no-change-warnings|--change-section-lma|.eeprom=0
+avr.compiler.objcopy.eep.flags=|-O|ihex|-j|.eeprom|--set-section-flags=.eeprom=alloc,load|--no-change-warnings|--change-section-lma|.eeprom=0
 avr.compiler.elf2hex.flags=|-O|ihex|-R|.eeprom
 avr.compiler.elf2hex.cmd=avr-objcopy
 avr.compiler.ldflags=
