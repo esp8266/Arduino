@@ -178,21 +178,14 @@ public class Compiler implements MessageConsumer {
    // 1. compile the sketch (already in the buildPath)
    System.out.println("1. compileSketch");
    compileSketch(avrBasePath, buildPath, includePaths, configPreferences);
-/*
-   objectFiles.addAll(
-     compileFiles(avrBasePath, buildPath, includePaths,
-               findFilesInPath(buildPath, "S", false),
-               findFilesInPath(buildPath, "c", false),
-               findFilesInPath(buildPath, "cpp", false),
-               boardPreferences));
-               */
+
 
    // 2. compile the libraries, outputting .o files to: <buildPath>/<library>/
    		// 2. compile the libraries, outputting .o files to:
 		// <buildPath>/<library>/
 		//Doesn't really use configPreferences
-		System.out.println("2. compileLibraries");
-		compileLibraries(avrBasePath, buildPath, includePaths, configPreferences);
+	System.out.println("2. compileLibraries");
+	compileLibraries(avrBasePath, buildPath, includePaths, configPreferences);
 /*
 
    for (File libraryFolder : sketch.getImportedLibraries()) {
@@ -315,53 +308,6 @@ public class Compiler implements MessageConsumer {
 */
     
     return true;
-    /*
-    
-    		logger.debug("corePaths: " + this.corePath);
-
-		
-		this.objectFiles = new ArrayList<File>();
-				
-		// 0. include paths for core + all libraries
-		logger.debug("0. getIncludes");
-		this.includePaths =	getIncludes(this.corePath);
-		
-		// 1. compile the sketch (already in the buildPath)
-		logger.debug("1. compileSketch");
-		compileSketch(avrBasePath, buildPath, includePaths, configPreferences);
-
-		// 2. compile the libraries, outputting .o files to:
-		// <buildPath>/<library>/
-		//Doesn't really use configPreferences
-		logger.debug("2. compileLibraries");
-		compileLibraries(avrBasePath, buildPath, includePaths, configPreferences);
-
-		// 3. compile the core, outputting .o files to <buildPath> and then
-		// collecting them into the core.a library file.
-	    logger.debug("3. compileCore");
- 		compileCore(avrBasePath, buildPath, this.corePath, configPreferences);
-		
-		// 4. link it all together into the .elf file
-	    logger.debug("4. compileLink");
-		compileLink(avrBasePath, buildPath, this.corePath, includePaths, configPreferences);
-
-		// 5. extract EEPROM data (from EEMEM directive) to .eep file.			
-	    logger.debug("5. compileEep");
-		compileEep(avrBasePath, buildPath, includePaths, configPreferences);
-		
-		// 6. build the .hex file
-	    logger.debug("6. compileHex");
-		compileHex(avrBasePath, buildPath, includePaths, configPreferences);
-		
-		//done
-	    logger.debug("7. compile done");
-		return true;
-
-    
-    
-    */
-    
-    
   }
 
 
