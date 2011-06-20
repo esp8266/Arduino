@@ -1,0 +1,1 @@
+Makefile into build_gcc folder build the SAM peripheral library and put it into ../../../cores/sam Arduino API folder
