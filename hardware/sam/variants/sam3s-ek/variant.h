@@ -1,13 +1,53 @@
+#ifndef _BOARD_
+#define _BOARD_
 
-#include "Arduino.h"
+/*----------------------------------------------------------------------------
+ *        Headers
+ *----------------------------------------------------------------------------*/
 
-extern UARTClass Serial ;
-extern UARTClass UART2 ;
+#include "libsam/chip.h"
 
-extern USARTClass USART1 ;
-extern USARTClass USART2 ;
+#include "include/bitbanding.h"
+#include "include/board_lowlevel.h"
+#include "include/timetick.h"
 
-#if defined(USBCON)
-  #include "usb_api.h"
+/**
+ * Libc porting layers
+ */
+#if defined (  __GNUC__  ) /* GCC CS3 */
+#    include "include/syscalls.h" /** RedHat Newlib minimal stub */
 #endif
+
+/*----------------------------------------------------------------------------
+ *        Definitions
+ *----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*/
+
+/** Name of the board */
+#define BOARD_NAME "SAM3S-EK"
+
+/*
+#define BOARD_REV_A
+*/
+#define BOARD_REV_B
+
+/** Frequency of the board main oscillator */
+#define BOARD_MAINOSC           12000000
+
+/** Master clock frequency (when using board_lowlevel.c) */
+#define BOARD_MCK               64000000
+
+/*----------------------------------------------------------------------------
+ *        Arduino objects
+ *----------------------------------------------------------------------------*/
+
+extern UARTClass Serial1 ;
+extern UARTClass Serial2 ;
+
+extern USARTClass Serial3 ;
+extern USARTClass Serial4 ;
+
+
+#endif /* #ifndef _BOARD_ */
 
