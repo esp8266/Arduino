@@ -6,7 +6,7 @@
 #include <math.h>
 
 //! Include SAM3S-EK BSP headers
-#include "board.h"
+#include "variant.h"
 
 #include "binary.h"
 
