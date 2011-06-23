@@ -58,6 +58,7 @@ avr.compiler.ldflags=
 avr.compiler.cpudef=-mmcu=
 avr.compiler.upload.cmd=
 avr.compiler.upload.flags=
+avr.compiler.define=-DARDUINO=
 avr.library.path=./hardware/arduino/cores/arduino
 avr.library.core.path=./libraries
 

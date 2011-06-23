@@ -80,10 +80,10 @@ public class Compiler implements MessageConsumer {
     this.buildPath = buildPath;
     this.primaryClassName = primaryClassName;
     this.verbose = verbose;
+    objectFiles = new ArrayList<File>();
 
     // the pms object isn't used for anything but storage
     MessageStream pms = new MessageStream(this);
-
     Map<String, String> boardPreferences = Base.getBoardPreferences();
     
    	//Check for null platform, and use system default if not found
@@ -164,7 +164,6 @@ public class Compiler implements MessageConsumer {
       }
     }
 
-    objectFiles = new ArrayList<File>();
 
    // 0. include paths for core + all libraries
 
@@ -279,33 +278,10 @@ public class Compiler implements MessageConsumer {
     // 5. extract EEPROM data (from EEMEM directive) to .eep file.
     System.out.println("5. compileEep");
     compileEep(avrBasePath, buildPath, includePaths, configPreferences);
-
-/*
-    commandObjcopy = new ArrayList(baseCommandObjcopy);
-    commandObjcopy.add(2, "ihex");
-    commandObjcopy.set(3, "-j");
-    commandObjcopy.add(".eeprom");
-    commandObjcopy.add("--set-section-flags=.eeprom=alloc,load");
-    commandObjcopy.add("--no-change-warnings");
-    commandObjcopy.add("--change-section-lma");
-    commandObjcopy.add(".eeprom=0");
-    commandObjcopy.add(buildPath + File.separator + primaryClassName + ".elf");
-    commandObjcopy.add(buildPath + File.separator + primaryClassName + ".eep");
-    execAsynchronously(commandObjcopy);
-*/
     
     // 6. build the .hex file
     System.out.println("6. compileHex");
-     compileHex(avrBasePath, buildPath, includePaths, configPreferences);
-
-/*
-    commandObjcopy = new ArrayList(baseCommandObjcopy);
-    commandObjcopy.add(2, "ihex");
-    commandObjcopy.add(".eeprom"); // remove eeprom data
-    commandObjcopy.add(buildPath + File.separator + primaryClassName + ".elf");
-    commandObjcopy.add(buildPath + File.separator + primaryClassName + ".hex");
-    execAsynchronously(commandObjcopy);
-*/
+    compileHex(avrBasePath, buildPath, includePaths, configPreferences);
     
     return true;
   }
@@ -534,7 +510,7 @@ public class Compiler implements MessageConsumer {
 				configPreferences.get("compiler.cpudef"),
 				configPreferences.get("build.mcu"),				
 				configPreferences.get("build.f_cpu"),
-				configPreferences.get("board"),
+				configPreferences.get("software"),
 				Base.REVISION,
 				includes,
 				sourceName,
@@ -593,7 +569,7 @@ public class Compiler implements MessageConsumer {
 				configPreferences.get("compiler.cpudef"),
 				configPreferences.get("build.mcu"),				
 				configPreferences.get("build.f_cpu"),
-				configPreferences.get("board"),
+				configPreferences.get("software"),
 				Base.REVISION,
 				includes,
 				sourceName,
@@ -652,7 +628,7 @@ public class Compiler implements MessageConsumer {
 				configPreferences.get("compiler.cpudef"),
 				configPreferences.get("build.mcu"),				
 				configPreferences.get("build.f_cpu"),
-				configPreferences.get("board"),
+				configPreferences.get("software"),
 				Base.REVISION,
 				includes,
 				sourceName,
@@ -727,6 +703,12 @@ public class Compiler implements MessageConsumer {
 	void compileSketch(String avrBasePath, String buildPath, ArrayList<String> includePaths, HashMap<String, String> configPreferences)
 	throws RunnerException 
 	{
+		System.out.println("compileSketch: start");        
+		System.out.println("includePaths: ");
+		    for (int i = 0; i < includePaths.size(); i++) {
+     			System.out.println("-I" + (String) includePaths.get(i));
+    		}
+    		
 		//logger.debug("compileSketch: start");	
 		this.objectFiles.addAll(compileFiles(avrBasePath, buildPath, includePaths,
 				findFilesInPath(buildPath, "S", false),
@@ -741,7 +723,7 @@ public class Compiler implements MessageConsumer {
 		throws RunnerException 
 	{
 	System.out.println("compileLibraries: start");
-		
+	    
    for (File libraryFolder : sketch.getImportedLibraries()) {
    		System.out.println("libraryFolder: " + libraryFolder);
      File outputFolder = new File(buildPath, libraryFolder.getName());
@@ -749,6 +731,13 @@ public class Compiler implements MessageConsumer {
      createFolder(outputFolder);
      // this library can use includes in its utility/ folder
      includePaths.add(utilityFolder.getAbsolutePath());
+     //debug  includePaths
+     System.out.println("includePaths: ");
+     for (int i = 0; i < includePaths.size(); i++) {
+     	System.out.println("-I" + (String) includePaths.get(i));
+    }
+
+     
      objectFiles.addAll(
        compileFiles(avrBasePath, outputFolder.getAbsolutePath(), includePaths,
                findFilesInFolder(libraryFolder, "S", false),
@@ -778,6 +767,12 @@ public class Compiler implements MessageConsumer {
 		ArrayList<String>  includePaths =  new ArrayList();
 	    includePaths.add(corePath); //include core path only
         if (pinsPath != null) includePaths.add(pinsPath);
+        
+         //debug  includePaths
+        System.out.println("includePaths: ");
+     	for (int i = 0; i < includePaths.size(); i++) {
+     		System.out.println("-I" + (String) includePaths.get(i));
+    	}
 
 		String baseCommandString = configPreferences.get("recipe.ar.pattern");
 		String commandString = "";
