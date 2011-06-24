@@ -35,6 +35,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "os_port.h"
 #include "ssl.h"
 
 /**************************************************************************

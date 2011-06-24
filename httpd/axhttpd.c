@@ -266,6 +266,7 @@ int main(int argc, char *argv[])
     /* main loop */
     while (1)
     {
+        struct timeval tv = { 10, 0 };
         FD_ZERO(&rfds);
         FD_ZERO(&wfds);
         rnum = wnum = -1;
@@ -336,7 +337,11 @@ int main(int argc, char *argv[])
         active = select(wnum > rnum ? wnum+1 : rnum+1,
                 rnum != -1 ? &rfds : NULL, 
                 wnum != -1 ? &wfds : NULL,
-                NULL, NULL);
+                NULL, usedconns ? &tv : NULL);
+
+        /* timeout? */
+        if (active == 0)
+            continue;
 
         /* New connection? */
         sp = servers;
