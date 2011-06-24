@@ -1233,10 +1233,18 @@ int SSL_server_tests(void)
         goto cleanup;
 
     /*
-     * PKCS#8 key (unencrypted)
+     * PKCS#8 key (unencrypted DER format)
      */
-    if ((ret = SSL_server_test("pkcs#8 unencrypted", "-cipher RC4-SHA", 
+    if ((ret = SSL_server_test("pkcs#8 DER unencrypted", "-cipher RC4-SHA", 
                 DEFAULT_CERT, NULL, "../ssl/test/axTLS.unencrypted.p8", 
+                NULL, NULL, DEFAULT_SVR_OPTION)))
+        goto cleanup;
+
+    /*
+     * PKCS#8 key (unencrypted PEM format)
+     */
+    if ((ret = SSL_server_test("pkcs#8 PEM unencrypted", "-cipher RC4-SHA", 
+                DEFAULT_CERT, NULL, "../ssl/test/axTLS.unencrypted_pem.p8", 
                 NULL, NULL, DEFAULT_SVR_OPTION)))
         goto cleanup;
 

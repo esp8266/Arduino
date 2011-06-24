@@ -225,7 +225,6 @@ config CONFIG_SSL_USE_PKCS12
     bool "Use PKCS8/PKCS12"
     default n if !CONFIG_SSL_FULL_MODE
     default y if CONFIG_SSL_FULL_MODE
-#    depends on !CONFIG_SSL_SERVER_ONLY && !CONFIG_SSL_SKELETON_MODE
     help
         PKCS#12 certificates combine private keys and certificates together in
         one file.
