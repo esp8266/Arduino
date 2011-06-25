@@ -39,7 +39,7 @@ void loop() {
 
 /*
   SerialEvent occurs whenever a new byte comes in the
- hardware serial RX.  Don't do complex things here, as thge
+ hardware serial RX.  Don't do complex things here, as the
  processor halts the regular program to run this routine:
  */
 void serialEvent() {
