@@ -1558,7 +1558,7 @@ public class Base {
   	Target target = Base.targetsTable.get(Preferences.get("target"));
   	if (target == null) {
   		System.out.println("default target is not in list. Replace with default.");
-  		Preferences.set("target", "arduino");
+  		Preferences.set("target", "avr");
   		target = Base.targetsTable.get(Preferences.get("target"));
   	}
     return target;

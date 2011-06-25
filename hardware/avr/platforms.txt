@@ -38,12 +38,12 @@ avr.recipe.objcopy.hex.pattern={0}{1}|{2}|{3}.elf|{4}.hex
 
 
 ########################################################
-avr.name=Arduino
+avr.name=avr
 #avr.compiler.path Official default is correct, only need to change this if you want to overide the initial default
 #avr.compiler.path={0}/hardware/tools/avr/bin/
 avr.compiler.c.cmd=avr-gcc
 avr.compiler.c.flags=|-c|-g|-Os|-w|-ffunction-sections|-fdata-sections
-avr.compiler.c.elf.flags=|-Os|-Wl|--gc-sections
+avr.compiler.c.elf.flags=|-Os|-Wl,--gc-sections
 avr.compiler.c.elf.cmd=avr-gcc
 avr.compiler.S.flags=|-c|-g|-assembler-with-cpp
 avr.compiler.cpp.cmd=avr-g++
@@ -59,6 +59,6 @@ avr.compiler.cpudef=-mmcu=
 avr.compiler.upload.cmd=
 avr.compiler.upload.flags=
 avr.compiler.define=-DARDUINO=
-avr.library.path=./hardware/arduino/cores/arduino
+avr.library.path=./hardware/avr/cores/arduino
 avr.library.core.path=./libraries
 

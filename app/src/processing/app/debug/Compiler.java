@@ -135,17 +135,19 @@ public class Compiler implements MessageConsumer {
       re.hideStackTrace();
       throw re;
     }
-    String corePath;
+    String corePath, systemPath;
     
     if (core.indexOf(':') == -1) {
       Target t = Base.getTarget();
       File coreFolder = new File(new File(t.getFolder(), "cores"), core);
       corePath = coreFolder.getAbsolutePath();
+      systemPath = new File(t.getFolder(), "system").getAbsolutePath();
     } else {
       Target t = Base.targetsTable.get(core.substring(0, core.indexOf(':')));
       File coreFolder = new File(t.getFolder(), "cores");
       coreFolder = new File(coreFolder, core.substring(core.indexOf(':') + 1));
       corePath = coreFolder.getAbsolutePath();
+      systemPath = new File(t.getFolder(), "system").getAbsolutePath();
     }
 
     String pins = configPreferences.get("build.pins");
@@ -154,11 +156,11 @@ public class Compiler implements MessageConsumer {
     if (pins != null) {
       if (pins.indexOf(':') == -1) {
 	Target t = Base.getTarget();
-	File pinsFolder = new File(new File(t.getFolder(), "pins"), pins);
+	File pinsFolder = new File(new File(t.getFolder(), "variants"), pins);
 	pinsPath = pinsFolder.getAbsolutePath();
       } else {
 	Target t = Base.targetsTable.get(pins.substring(0, pins.indexOf(':')));
-	File pinsFolder = new File(t.getFolder(), "pins");
+	File pinsFolder = new File(t.getFolder(), "variants");
 	pinsFolder = new File(pinsFolder, pins.substring(pins.indexOf(':') + 1));
 	pinsPath = pinsFolder.getAbsolutePath();
       }
@@ -169,6 +171,7 @@ public class Compiler implements MessageConsumer {
 
     ArrayList<String> includePaths = new ArrayList();
    includePaths.add(corePath);
+   includePaths.add(systemPath);
    if (pinsPath != null) includePaths.add(pinsPath);
    for (File file : sketch.getImportedLibraries()) {
      includePaths.add(file.getPath());
