@@ -217,6 +217,10 @@
     <exec executable="macosx/work/Arduino.app/Contents/MacOS/JavaApplicationStub" spawn="true"/>
   </target>
 
+  <target name="macosx-debug" depends="macosx-build" description="Run Mac OS X version">
+    <exec executable="macosx/work/Arduino.app/Contents/MacOS/JavaApplicationStub" spawn="false"/>
+  </target>
+
   <target name="macosx-dist" if="macosx" depends="macosx-build" description="Create a .dmg of the Mac OS X version">
     <!-- now build the dmg -->
     <gunzip src="macosx/template.dmg.gz" dest="macosx/working.dmg" />
