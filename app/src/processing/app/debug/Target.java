@@ -82,7 +82,7 @@ public class Target {
     } catch (Exception e) {
       System.err.println("Error loading platforms from " + 
                          platformsFile + ": " + e);                        
-     System.exit(0);	
+     //System.exit(0);	
     
     }    
    
