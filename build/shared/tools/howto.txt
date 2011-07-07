@@ -71,9 +71,9 @@ regarding the usefulness of including (by default) a Tool that mangles code.)
 
 The folder should be called Mangler (note the capitalization), and contain:
 
-sketchbook/Mangler -> tool folder
-sketchbook/Mangler/tool -> location for code
-sketchbook/Mangler/tool/mangle.jar -> jar with one or more classes
+sketchbook/tools/Mangler -> tool folder
+sketchbook/tools/Mangler/tool -> location for code
+sketchbook/tools/Mangler/tool/mangle.jar -> jar with one or more classes
 
 The naming of jar and zip files in the tool/* directory doesn't matter.
 
