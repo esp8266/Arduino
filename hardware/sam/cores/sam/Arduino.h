@@ -1,18 +1,18 @@
 #ifndef Arduino_h
 #define Arduino_h
 
+#include <stdint.h>
+//#include <sys/types.h>
+
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-
-//! Include SAM3S-EK BSP headers
-#include "variant.h"
 
 #include "binary.h"
 
 #ifdef __cplusplus
 extern "C"{
-#endif
+#endif // __cplusplus
 
 #define HIGH 0x1
 #define LOW  0x0
@@ -45,7 +45,7 @@ extern "C"{
 // undefine stdlib's abs if encountered
 #ifdef abs
 #undef abs
-#endif
+#endif // abs
 
 #define min(a,b) ((a)<(b)?(a):(b))
 #define max(a,b) ((a)>(b)?(a):(b))
@@ -76,32 +76,33 @@ typedef unsigned int word;
 
 #define bit(b) (1UL << (b))
 
-typedef uint8_t boolean;
-typedef uint8_t byte;
+// TODO: to be checked
+typedef uint8_t boolean ;
+typedef uint8_t byte ;
 
-void init(void);
+void init( void ) ;
 
-void pinMode(uint8_t, uint8_t);
-void digitalWrite(uint8_t, uint8_t);
-int digitalRead(uint8_t);
-int analogRead(uint8_t);
-void analogReference(uint8_t mode);
-void analogWrite(uint8_t, int);
+void pinMode( uint8_t, uint8_t ) ;
+void digitalWrite( uint8_t, uint8_t ) ;
+int digitalRead( uint8_t ) ;
+int analogRead( uint8_t ) ;
+void analogReference( uint8_t mode ) ;
+void analogWrite( uint8_t, int ) ;
 
-unsigned long millis(void);
-unsigned long micros(void);
+unsigned long millis( void ) ;
+unsigned long micros( void ) ;
 //void delay(unsigned long);
 #define delay( dwMs ) Wait( dwMs )
-void delayMicroseconds(unsigned int us);
+void delayMicroseconds( unsigned int us ) ;
 
-void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val);
-uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder);
+void shiftOut( uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val ) ;
+uint8_t shiftIn( uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder ) ;
 
-void attachInterrupt(uint8_t, void (*)(void), int mode);
-void detachInterrupt(uint8_t);
+void attachInterrupt( uint8_t, void (*)(void), int mode ) ;
+void detachInterrupt( uint8_t ) ;
 
-void setup(void);
-void loop(void);
+void setup( void ) ;
+void loop( void ) ;
 
 // Get the bit location within the hardware port of the given virtual pin.
 // This comes from the pins_*.c file for the active board configuration.
@@ -125,31 +126,68 @@ void loop(void);
 
 #ifdef __cplusplus
 } // extern "C"
-#endif
+#endif // __cplusplus
 
 #ifdef __cplusplus
-#include "WCharacter.h"
-#include "WString.h"
-#include "HardwareSerial.h"
+#  include "WCharacter.h"
+#  include "WString.h"
+#  include "HardwareSerial.h"
 
-uint16_t makeWord(uint16_t w);
-uint16_t makeWord(byte h, byte l);
+uint16_t makeWord( uint16_t w ) ;
+uint16_t makeWord( byte h, byte l ) ;
 
 #define word(...) makeWord(__VA_ARGS__)
 
-unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout = 1000000L);
+unsigned long pulseIn( uint8_t pin, uint8_t state, unsigned long timeout = 1000000L ) ;
 
-void tone(uint8_t _pin, unsigned int frequency, unsigned long duration = 0);
-void noTone(uint8_t _pin);
+void tone( uint8_t _pin, unsigned int frequency, unsigned long duration = 0 ) ;
+void noTone( uint8_t _pin ) ;
 
 // WMath prototypes
-long random(long);
-long random(long, long);
-void randomSeed(unsigned int);
-long map(long, long, long, long, long);
+long random( long ) ;
+long random( long, long ) ;
+void randomSeed( unsigned int ) ;
+long map( long, long, long, long, long ) ;
 
-#endif
+#endif // __cplusplus
+
+//! Include variant header
+#include "variant.h"
+
+//! Definitions and types for pins
+typedef enum _EAnalogChannel
+{
+  ADC0,
+  ADC1,
+  ADC2,
+  ADC3,
+  ADC4,
+  ADC5,
+  ADC6,
+  ADC7,
+  ADC8,
+  ADC9,
+  ADC10,
+  ADC11,
+  ADC12,
+  ADC13,
+  ADC14,
+  ADC15,
+  DAC0,
+  DAC1
+} EAnalogChannel ;
+
+/* Types used for the tables below */
+typedef struct _PinDescription
+{
+  Pio* pPort ;
+  uint32_t dwPin ;
+  uint32_t dwPeripheralId ;
+  EPioType dwPinType ;
+  uint32_t dwPinAttribute ;
+  EAnalogChannel dwAnalogChannel ;
+} PinDescription ;
 
 #include "pins_arduino.h"
 
-#endif
+#endif // Arduino_h

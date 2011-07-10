@@ -39,7 +39,7 @@
  *----------------------------------------------------------------------------*/
 
 
-#include "board.h"
+#include "variant.h"
 
 #include <stdio.h>
 #include <stdarg.h>

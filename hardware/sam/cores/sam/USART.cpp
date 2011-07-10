@@ -5,10 +5,10 @@
 
 // Constructors ////////////////////////////////////////////////////////////////
 
-USARTClass::USARTClass( ring_buffer *rx_buffer, ring_buffer *tx_buffer, Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId )
+USARTClass::USARTClass( Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId, ring_buffer* pRx_buffer, ring_buffer *pTx_buffer )
 {
-  _rx_buffer = rx_buffer ;
-  _tx_buffer = tx_buffer ;
+  _rx_buffer = pRx_buffer ;
+  _tx_buffer = pTx_buffer ;
 
   _pUsart=pUsart ;
   _dwIrq=dwIrq ;
@@ -19,7 +19,7 @@ USARTClass::USARTClass( ring_buffer *rx_buffer, ring_buffer *tx_buffer, Usart* p
 
 void USARTClass::begin( const uint32_t dwBaudRate )
 {
-    /* Configure PMC */
+  /* Configure PMC */
   PMC_EnablePeripheral( _dwId ) ;
 
   /* Reset and disable receiver & transmitter */
@@ -31,7 +31,7 @@ void USARTClass::begin( const uint32_t dwBaudRate )
 
   /* Configure baudrate */
   /* Asynchronous, no oversampling */
-  _pUsart->US_BRGR = (BOARD_MCK / dwBaudRate) / 16 ;
+  _pUsart->US_BRGR = (VARIANT_MCK / dwBaudRate) / 16 ;
 
   /* Disable PDC channel */
   _pUsart->US_PTCR = US_PTCR_RXTDIS | US_PTCR_TXTDIS ;
@@ -42,32 +42,96 @@ void USARTClass::begin( const uint32_t dwBaudRate )
 
 void USARTClass::end()
 {
+  // wait for transmission of outgoing data
+  while ( _tx_buffer->head != _tx_buffer->tail )
+  {
+  }
+
+  // clear any received data
+  _rx_buffer->head = _rx_buffer->tail ;
+
+  PMC_DisablePeripheral( _dwId ) ;
 }
 
 int USARTClass::available( void )
 {
-  return 0 ;
+  return (unsigned int)(SERIAL_BUFFER_SIZE + _rx_buffer->head - _rx_buffer->tail) % SERIAL_BUFFER_SIZE ;
 }
 
 int USARTClass::peek( void )
 {
-  return 0 ;
+  if ( _rx_buffer->head == _rx_buffer->tail )
+  {
+    return -1 ;
+  }
+  else
+  {
+    return _rx_buffer->buffer[_rx_buffer->tail] ;
+  }
 }
 
 int USARTClass::read( void )
 {
-  return 0 ;
+  // if the head isn't ahead of the tail, we don't have any characters
+  if ( _rx_buffer->head == _rx_buffer->tail )
+  {
+    return -1 ;
+  }
+  else
+  {
+    unsigned char c = _rx_buffer->buffer[_rx_buffer->tail] ;
+
+    _rx_buffer->tail = (unsigned int)(_rx_buffer->tail + 1) % SERIAL_BUFFER_SIZE ;
+
+    return c ;
+  }
 }
 
 void USARTClass::flush( void )
 {
+  while ( _tx_buffer->head != _tx_buffer->tail )
+  {
+  }
 }
 
 void USARTClass::write( uint8_t c )
 {
+  int i = (_tx_buffer->head + 1) % SERIAL_BUFFER_SIZE ;
+
+  // If the output buffer is full, there's nothing for it other than to
+  // wait for the interrupt handler to empty it a bit
+  while ( i == _tx_buffer->tail )
+  {
+  }
+
+  _tx_buffer->buffer[_tx_buffer->head] = c ;
+  _tx_buffer->head = i ;
+
+  /* Wait for the transmitter to be ready */
+  while ( (_pUsart->US_CSR & US_CSR_TXEMPTY) == 0 ) ;
+
+  /* Send character */
+  _pUsart->US_THR=c ;
 }
 
 void USARTClass::IrqHandler( void )
 {
+  // RX char IT
+  unsigned char c = _pUsart->US_RHR ;
+  store_char( c, _rx_buffer ) ;
+
+  // TX FIFO empty IT
+  if ( _tx_buffer->head == _tx_buffer->tail )
+  {
+    // Buffer empty, so disable interrupts
+  }
+  else
+  {
+    // There is more data in the output buffer. Send the next byte
+    c = _tx_buffer->buffer[_tx_buffer->tail] ;
+    _tx_buffer->tail = (_tx_buffer->tail + 1) % SERIAL_BUFFER_SIZE ;
+	
+    _pUsart->US_THR = c ;
+  }
 }
 

@@ -31,7 +31,7 @@
  *        Headers
  *----------------------------------------------------------------------------*/
 
-#include "board.h"
+#include "Arduino.h"
 
 /*----------------------------------------------------------------------------
  *        Exported variables
@@ -130,8 +130,8 @@ void Reset_Handler( void )
 {
     uint32_t *pSrc, *pDest ;
 
-    /* Low level Initialize */
-    LowLevelInit() ;
+    /* Arduino board Low level Initialization */
+    init() ;
 
     /* Initialize the relocate segment */
     pSrc = &_etext ;

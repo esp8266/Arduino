@@ -1,8 +1,7 @@
 #ifndef HardwareSerial_h
 #define HardwareSerial_h
 
-#include <inttypes.h>
-
+#include <stdint.h>
 #include "Stream.h"
 
 // Define constants and variables for buffering incoming serial data.  We're
@@ -34,6 +33,9 @@ class HardwareSerial : public Stream
     virtual void write( const uint8_t c ) =0 ;
 
     using Print::write ; // pull in write(str) and write(buf, size) from Print
-};
+} ;
+
+// Complementary API
+extern void store_char( uint8_t c, ring_buffer* pBuffer ) ;
 
 #endif // HardwareSerial_h

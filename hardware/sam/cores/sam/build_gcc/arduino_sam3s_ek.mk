@@ -1,8 +1,8 @@
-# Makefile for compiling libboard
+# Makefile for compiling libArduino
 .SUFFIXES: .o .a .c .s
 
 CHIP=sam3s4
-BOARD=sam3s_ek
+VARIANT=sam3s_ek
 LIBNAME=arduino_sam3s_ek
 TOOLCHAIN=gcc
 
@@ -15,22 +15,27 @@ OUTPUT_BIN = ../lib
 
 # Libraries
 PROJECT_BASE_PATH = ..
-BSP_PATH = ../../../../tools
+SYSTEM_PATH = ../../../system
+CMSIS_PATH = $(SYSTEM_PATH)/CMSIS/CM3/CoreSupport
+VARIANT_PATH = ../../../variants/sam3s-ek
 
 #-------------------------------------------------------------------------------
 # Files
 #-------------------------------------------------------------------------------
 
-vpath %.h $(PROJECT_BASE_PATH) $(BSP_PATH)/libchip_sam3s $(BSP_PATH)/libboard_sam3s-ek
+vpath %.h $(PROJECT_BASE_PATH) $(SYSTEM_PATH) $(VARIANT_PATH)
 vpath %.c $(PROJECT_BASE_PATH)
-vpath %.cpp $(PROJECT_BASE_PATH) $(PROJECT_BASE_PATH)/sam3s_ek
+vpath %.cpp $(PROJECT_BASE_PATH) $(PROJECT_BASE_PATH)
 
 VPATH+=$(PROJECT_BASE_PATH)
 
 INCLUDES = -I$(PROJECT_BASE_PATH)
-INCLUDES = -I$(PROJECT_BASE_PATH)/sam3s_ek
-INCLUDES += -I$(BSP_PATH)/libchip_sam3s
-INCLUDES += -I$(BSP_PATH)/libboard_sam3s-ek
+INCLUDES = -I$(PROJECT_BASE_PATH)
+INCLUDES += -I$(SYSTEM_PATH)
+INCLUDES += -I$(SYSTEM_PATH)/libsam
+INCLUDES += -I$(VARIANT_PATH)
+INCLUDES += -I$(VARIANT_PATH)
+INCLUDES += -I$(CMSIS_PATH)
 
 #-------------------------------------------------------------------------------
 ifdef DEBUG
@@ -76,7 +81,8 @@ CPP_SRC=$(wildcard $(PROJECT_BASE_PATH)/*.cpp)
 CPP_OBJ_TEMP = $(patsubst %.cpp, %.o, $(notdir $(CPP_SRC)))
 
 # during development, remove some files
-CPP_OBJ_FILTER=Tone.o WMath.o WString.o
+CPP_OBJ_FILTER=Tone.o WMath.o
+#WString.o
 
 CPP_OBJ=$(filter-out $(CPP_OBJ_FILTER), $(CPP_OBJ_TEMP))
 
@@ -103,6 +109,8 @@ sam3s_ek: create_output $(OUTPUT_LIB)
 create_output:
 	@echo --- Preparing sam3s_ek files in $(OUTPUT_PATH) $(OUTPUT_BIN) 
 	@echo -------------------------
+	@echo *$(INCLUDES)
+	@echo -------------------------
 	@echo *$(C_SRC)
 	@echo -------------------------
 	@echo *$(C_OBJ)
@@ -127,7 +135,8 @@ $(addprefix $(OUTPUT_PATH)/,$(C_OBJ)): $(OUTPUT_PATH)/%.o: %.c
 	@$(CC) -c $(CFLAGS) $< -o $@
 
 $(addprefix $(OUTPUT_PATH)/,$(CPP_OBJ)): $(OUTPUT_PATH)/%.o: %.cpp
-	@$(CC) -c $(CPPFLAGS) $< -o $@
+#	@$(CC) -c $(CPPFLAGS) $< -o $@
+	$(CC) -xc++ -c $(CPPFLAGS) $< -o $@
 
 $(addprefix $(OUTPUT_PATH)/,$(A_OBJ)): $(OUTPUT_PATH)/%.o: %.s
 	@$(AS) -c $(ASFLAGS) $< -o $@
@@ -142,5 +151,5 @@ clean:
 	-@$(RM) $(OUTPUT_PATH) 1>NUL 2>&1
 	-@$(RM) $(OUTPUT_BIN)/$(OUTPUT_LIB) 1>NUL 2>&1
 
-#$(addprefix $(OUTPUT_PATH)/,$(C_OBJ)): $(OUTPUT_PATH)/%.o: $(PROJECT_BASE_PATH)/board.h $(wildcard $(PROJECT_BASE_PATH)/include/*.h)
-#$(addprefix $(OUTPUT_PATH)/,$(CPP_OBJ)): $(OUTPUT_PATH)/%.o: $(PROJECT_BASE_PATH)/board.h $(wildcard $(PROJECT_BASE_PATH)/include/*.h)
+#$(addprefix $(OUTPUT_PATH)/,$(C_OBJ)): $(OUTPUT_PATH)/%.o: $(PROJECT_BASE_PATH)/chip.h $(wildcard $(PROJECT_BASE_PATH)/include/*.h)
+#$(addprefix $(OUTPUT_PATH)/,$(CPP_OBJ)): $(OUTPUT_PATH)/%.o: $(PROJECT_BASE_PATH)/chip.h $(wildcard $(PROJECT_BASE_PATH)/include/*.h)

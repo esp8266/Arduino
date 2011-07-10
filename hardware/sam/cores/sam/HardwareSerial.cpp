@@ -1,8 +1,9 @@
-#include "wiring_private.h"
+//#include "wiring_private.h"
+#include <stdint.h>
 
 #include "HardwareSerial.h"
 
-inline void store_char( uint8_t c, ring_buffer *pBuffer )
+extern void store_char( uint8_t c, ring_buffer* pBuffer )
 {
   int i = (unsigned int)(pBuffer->head + 1) % SERIAL_BUFFER_SIZE;
 

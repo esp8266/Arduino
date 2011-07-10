@@ -59,4 +59,6 @@
 #include "include/usart.h"
 #include "include/wdt.h"
 
+#include "include/timetick.h"
+
 #endif /* _LIB_SAM3S_ */

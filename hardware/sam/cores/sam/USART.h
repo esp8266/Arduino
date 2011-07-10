@@ -1,7 +1,9 @@
 #ifndef _USART_
 #define _USART_
 
-#include <inttypes.h>
+// USART.cpp need this class to be predefined
+class USARTClass ;
+
 #include "wiring_private.h"
 
 class USARTClass : public HardwareSerial
@@ -12,7 +14,7 @@ class USARTClass : public HardwareSerial
     uint32_t _dwId ;
 
   public:
-    USARTClass( ring_buffer *rx_buffer, ring_buffer *tx_buffer, Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId ) ;
+    USARTClass( Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId, ring_buffer* pRx_buffer, ring_buffer *pTx_buffer ) ;
 
     void begin( const uint32_t dwBaudRate ) ;
     void end( void ) ;

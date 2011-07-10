@@ -25,6 +25,7 @@
 #ifndef WiringPrivate_h
 #define WiringPrivate_h
 
+#include <stdint.h>
 #include <stdio.h>
 #include <stdarg.h>
 

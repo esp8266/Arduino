@@ -17,39 +17,6 @@ const static uint8_t SCK  = 33 ;
 
 #define PINS_UART            (16u)
 
-typedef enum _EAnalogChannel
-{
-  ADC0,
-  ADC1,
-  ADC2,
-  ADC3,
-  ADC4,
-  ADC5,
-  ADC6,
-  ADC7,
-  ADC8,
-  ADC9,
-  ADC10,
-  ADC11,
-  ADC12,
-  ADC13,
-  ADC14,
-  ADC15,
-  DAC0,
-  DAC1
-} EAnalogChannel ;
-
-/* Types used for the tables below */
-typedef struct _PinDescription
-{
-  Pio* pPort ;
-  uint32_t dwPin ;
-  uint32_t dwPeripheralId ;
-  EPioType dwPinType ;
-  uint32_t dwPinAttribute ;
-  EAnalogChannel dwAnalogChannel ;
-} PinDescription ;
-
 static const PinDescription APinDescription[]=
 {
   // LEDS, 0..2

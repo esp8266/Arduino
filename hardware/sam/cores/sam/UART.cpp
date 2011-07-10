@@ -3,13 +3,12 @@
 #include <string.h>
 #include "UART.h"
 
-
 // Constructors ////////////////////////////////////////////////////////////////
 
-UARTClass::UARTClass( ring_buffer* rx_buffer, ring_buffer* tx_buffer, Uart* pUart, IRQn_Type dwIrq, uint32_t dwId )
+UARTClass::UARTClass( Uart* pUart, IRQn_Type dwIrq, uint32_t dwId, ring_buffer* pRx_buffer, ring_buffer *pTx_buffer )
 {
-  _rx_buffer = rx_buffer ;
-  _tx_buffer = tx_buffer ;
+  _rx_buffer = pRx_buffer ;
+  _tx_buffer = pTx_buffer ;
 
   _pUart=pUart ;
   _dwIrq=dwIrq ;
@@ -31,7 +30,7 @@ void UARTClass::begin( const uint32_t dwBaudRate )
 
   /* Configure baudrate */
   /* Asynchronous, no oversampling */
-  _pUart->UART_BRGR = (BOARD_MCK / dwBaudRate) / 16 ;
+  _pUart->UART_BRGR = (VARIANT_MCK / dwBaudRate) / 16 ;
 
   /* Disable PDC channel */
   _pUart->UART_PTCR = UART_PTCR_RXTDIS | UART_PTCR_TXTDIS ;
@@ -116,10 +115,9 @@ void UARTClass::write( const uint8_t c )
 
 void UARTClass::IrqHandler( void )
 {
-/*
   // RX char IT
   unsigned char c = _pUart->UART_RHR ;
-  store_char(c, &rx_buffer3);
+  store_char( c, _rx_buffer ) ;
 
   // TX FIFO empty IT
   if ( _tx_buffer->head == _tx_buffer->tail )
@@ -129,11 +127,10 @@ void UARTClass::IrqHandler( void )
   else
   {
     // There is more data in the output buffer. Send the next byte
-    unsigned char c = _tx_buffer->buffer[_tx_buffer->tail] ;
+    c = _tx_buffer->buffer[_tx_buffer->tail] ;
     _tx_buffer->tail = (_tx_buffer->tail + 1) % SERIAL_BUFFER_SIZE ;
 	
     _pUart->UART_THR = c ;
   }
-*/
 }
 

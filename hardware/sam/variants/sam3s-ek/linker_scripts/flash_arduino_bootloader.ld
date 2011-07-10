@@ -38,7 +38,7 @@ SEARCH_DIR(.)
 /* Memory Spaces Definitions */
 MEMORY
 {
-	rom (rx)  : ORIGIN = 0x00404000, LENGTH = 0x0003c000 /* flash, 240KB = 256K minus 16KB of bootloader */
+	rom (rx)  : ORIGIN = 0x00400000, LENGTH = 0x00004000 /* flash, 16KB */
 	ram (rwx) : ORIGIN = 0x20000000, LENGTH = 0x0000c000 /* sram, 48KB */
 }
 

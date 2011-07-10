@@ -1,7 +1,9 @@
 #ifndef _UART_
 #define _UART_
 
-#include <inttypes.h>
+// UART.cpp need this class to be predefined
+class UARTClass ;
+
 #include "wiring_private.h"
 
 class UARTClass : public HardwareSerial
@@ -12,7 +14,7 @@ class UARTClass : public HardwareSerial
     uint32_t _dwId ;
 
   public:
-    UARTClass( ring_buffer *rx_buffer, ring_buffer *tx_buffer, Uart* pUart, IRQn_Type dwIrq, uint32_t dwId ) ;
+    UARTClass( Uart* pUart, IRQn_Type dwIrq, uint32_t dwId, ring_buffer* pRx_buffer, ring_buffer *pTx_buffer ) ;
 
     void begin( const uint32_t dwBaudRate ) ;
     void end( void ) ;

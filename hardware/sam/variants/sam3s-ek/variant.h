@@ -1,5 +1,5 @@
-#ifndef _BOARD_
-#define _BOARD_
+#ifndef _VARIANT_
+#define _VARIANT_
 
 /*----------------------------------------------------------------------------
  *        Headers
@@ -7,15 +7,11 @@
 
 #include "libsam/chip.h"
 
-#include "include/bitbanding.h"
-#include "include/board_lowlevel.h"
-#include "include/timetick.h"
-
 /**
  * Libc porting layers
  */
 #if defined (  __GNUC__  ) /* GCC CS3 */
-#    include "include/syscalls.h" /** RedHat Newlib minimal stub */
+#    include <syscalls.h> /** RedHat Newlib minimal stub */
 #endif
 
 /*----------------------------------------------------------------------------
@@ -25,29 +21,34 @@
 /*----------------------------------------------------------------------------*/
 
 /** Name of the board */
-#define BOARD_NAME "SAM3S-EK"
+#define VARIANT_NAME "SAM3S-EK"
 
 /*
-#define BOARD_REV_A
+#define VARIANT_REV_A
 */
-#define BOARD_REV_B
+#define VARIANT_REV_B
 
 /** Frequency of the board main oscillator */
-#define BOARD_MAINOSC           12000000
+#define VARIANT_MAINOSC           12000000
 
-/** Master clock frequency (when using board_lowlevel.c) */
-#define BOARD_MCK               64000000
+/** Master clock frequency */
+#define VARIANT_MCK               64000000
 
 /*----------------------------------------------------------------------------
- *        Arduino objects
+ *        Arduino objects - C++ only
  *----------------------------------------------------------------------------*/
+
+#  ifdef __cplusplus
+#    include "UART.h"
+#    include "USART.h"
 
 extern UARTClass Serial1 ;
 extern UARTClass Serial2 ;
 
-extern USARTClass Serial3 ;
-extern USARTClass Serial4 ;
+//extern USARTClass Serial3 ;
+//extern USARTClass Serial4 ;
 
+#  endif
 
-#endif /* #ifndef _BOARD_ */
+#endif /* #ifndef _VARIANT_ */
 
