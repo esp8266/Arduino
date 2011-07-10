@@ -1,0 +1,103 @@
+/* ----------------------------------------------------------------------  
+* Copyright (C) 2010 ARM Limited. All rights reserved.  
+*  
+* $Date:        29. November 2010  
+* $Revision: 	V1.0.3  
+*  
+* Project: 	    CMSIS DSP Library  
+* Title:		arm_mean_q31.c  
+*  
+* Description:	Mean value of two Q31 arrays.  
+*  
+* Target Processor: Cortex-M4/Cortex-M3
+*  
+* Version 1.0.3 2010/11/29 
+*    Re-organized the CMSIS folders and updated documentation.  
+*   
+* Version 1.0.2 2010/11/11  
+*    Documentation updated.   
+*  
+* Version 1.0.1 2010/10/05   
+*    Production release and review comments incorporated.  
+*  
+* Version 1.0.0 2010/09/20   
+*    Production release and review comments incorporated.  
+* -------------------------------------------------------------------- */ 
+ 
+#include "arm_math.h" 
+ 
+/**  
+ * @ingroup groupStats  
+ */ 
+ 
+/**  
+ * @addtogroup mean  
+ * @{  
+ */ 
+ 
+/**  
+ * @brief Mean value of a Q31 vector.  
+ * @param[in]       *pSrc points to the input vector  
+ * @param[in]       blockSize length of the input vector  
+ * @param[out]      *pResult mean value returned here  
+ * @return none.  
+ *  
+ * @details  
+ * <b>Scaling and Overflow Behavior:</b>  
+ *\par  
+ * The function is implemented using a 64-bit internal accumulator.  
+ * The input is represented in 1.31 format and is accumulated in a 64-bit  
+ * accumulator in 33.31 format.  
+ * There is no risk of internal overflow with this approach, and the   
+ * full precision of intermediate result is preserved.   
+ * Finally, the accumulator is truncated to yield a result of 1.31 format.  
+ *  
+ */ 
+ 
+ 
+void arm_mean_q31( 
+  q31_t * pSrc, 
+  uint32_t blockSize, 
+  q31_t * pResult) 
+{ 
+  q63_t sum = 0;                                 /* Temporary result storage */ 
+  uint32_t blkCnt;                               /* loop counter */ 
+ 
+  /*loop Unrolling */ 
+  blkCnt = blockSize >> 2u; 
+ 
+  /* First part of the processing with loop unrolling.  Compute 4 outputs at a time.  
+   ** a second loop below computes the remaining 1 to 3 samples. */ 
+  while(blkCnt > 0u) 
+  { 
+    /* C = (A[0] + A[1] + A[2] + ... + A[blockSize-1]) */ 
+    sum += *pSrc++; 
+    sum += *pSrc++; 
+    sum += *pSrc++; 
+    sum += *pSrc++; 
+ 
+    /* Decrement the loop counter */ 
+    blkCnt--; 
+  } 
+ 
+  /* If the blockSize is not a multiple of 4, compute any remaining output samples here.  
+   ** No loop unrolling is used. */ 
+  blkCnt = blockSize % 0x4u; 
+ 
+  while(blkCnt > 0u) 
+  { 
+    /* C = (A[0] + A[1] + A[2] + ... + A[blockSize-1]) */ 
+    sum += *pSrc++; 
+ 
+    /* Decrement the loop counter */ 
+    blkCnt--; 
+  } 
+ 
+  /* C = (A[0] + A[1] + A[2] + ... + A[blockSize-1]) / blockSize  */ 
+  /* Store the result to the destination */ 
+  *pResult = (q31_t) (sum / (int32_t) blockSize); 
+} 
+ 
+/**  
+ * @} end of mean group  
+ */ 

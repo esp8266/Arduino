@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="qualified" version="1.0">
+  
+  <xs:simpleType name="registerNameType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[_A-Za-z][_A-Za-z0-9\[\]]*(%s)?[_A-Za-z0-9\[\]]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="dimIndexType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[0-9]+\-[0-9]+|[A-Z]-[A-Z]|[_0-9a-zA-Z]+(,\s*[_0-9a-zA-Z]+)+"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="scaledNonNegativeInteger">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[+]?(0x|0X|#)?[0-9a-fA-F]+[kmgtKMGT]?"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="enumeratedValueDataType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[+]?(0x|0X|#)?[0-9a-fxA-FX]+"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="accessType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="read-only"/>
+      <xs:enumeration value="write-only"/>
+      <xs:enumeration value="read-write"/>
+      <xs:enumeration value="writeOnce"/>
+      <xs:enumeration value="read-writeOnce"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="modifiedWriteValuesType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="oneToClear"/>
+      <xs:enumeration value="oneToSet"/>
+      <xs:enumeration value="oneToToggle"/>
+      <xs:enumeration value="zeroToClear"/>
+      <xs:enumeration value="zeroToSet"/>
+      <xs:enumeration value="zeroToToggle"/>
+      <xs:enumeration value="clear"/>
+      <xs:enumeration value="set"/>
+      <xs:enumeration value="modify"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="readActionType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="clear"/>
+      <xs:enumeration value="set"/>
+      <xs:enumeration value="modify"/>
+      <xs:enumeration value="modifyExternal"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="enumUsageType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="read"/>
+      <xs:enumeration value="write"/>
+      <xs:enumeration value="read-write"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="bitRangeType">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="\[([0-3])?[0-9]:([0-3])?[0-9]\]"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="writeConstraintType">
+    <xs:choice>
+      <xs:element name="writeAsRead" type="xs:boolean"/>
+      <xs:element name="useEnumeratedValues" type="xs:boolean"/>
+      <xs:element name="range">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="minimum" type="scaledNonNegativeInteger"/>
+            <xs:element name="maximum" type="scaledNonNegativeInteger"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:choice>
+  </xs:complexType>
+
+  <xs:complexType name="addressBlockType">
+    <xs:sequence>
+      <xs:element name="offset" type="scaledNonNegativeInteger"/>
+      <xs:element name="size" type="scaledNonNegativeInteger"/>
+      <xs:element name="usage">
+        <xs:simpleType>
+          <xs:restriction base="xs:token">
+            <xs:enumeration value="registers"/>
+            <xs:enumeration value="buffer"/>
+            <xs:enumeration value="reserved"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="interruptType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="value" type="xs:integer"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:group name="registerPropertiesGroup">
+    <xs:sequence>
+      <xs:element name="size" type="scaledNonNegativeInteger" minOccurs="0"/>
+      <xs:element name="access" type="accessType" minOccurs="0"/>
+      <xs:element name="resetValue" type="scaledNonNegativeInteger" minOccurs="0"/>
+      <xs:element name="resetMask" type="scaledNonNegativeInteger" minOccurs="0"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="bitRangeLsbMsbStyle">
+    <xs:sequence>
+      <xs:element name="lsb"  type="scaledNonNegativeInteger"/>
+      <xs:element name="msb"  type="scaledNonNegativeInteger"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:group name="bitRangeOffsetWidthStyle">
+    <xs:sequence>
+      <xs:element name="bitOffset" type="scaledNonNegativeInteger"/>
+      <xs:element name="bitWidth" type="scaledNonNegativeInteger" minOccurs="0"/>   
+    </xs:sequence> 
+  </xs:group>
+
+  <xs:group name="dimElementGroup">
+    <xs:sequence>
+      <xs:element name="dim" type="scaledNonNegativeInteger"/>
+      <xs:element name="dimIncrement" type="scaledNonNegativeInteger"/>
+      <xs:element name="dimIndex" type="dimIndexType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:group>
+
+  <xs:element name="device" nillable="true">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="name" type="xs:string"/>
+        <xs:element name="version" type="xs:string"/>
+        <xs:element name="description" type="xs:string"/>
+        <xs:element name="addressUnitBits" type="scaledNonNegativeInteger"/>
+        <xs:element name="width" type="scaledNonNegativeInteger"/>
+        <xs:group ref="registerPropertiesGroup" minOccurs="0"/>
+        <xs:element name="peripherals">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="peripheral" minOccurs="1" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="name" type="xs:Name"/>
+                    <xs:element name="version" type="xs:string" minOccurs="0"/>
+                    <xs:element name="description" type="xs:string" minOccurs="0"/>
+                    <xs:element name="groupName" type="xs:string" minOccurs="0"/>
+                    <xs:element name="prependToName" type="xs:string" minOccurs="0"/>
+                    <xs:element name="appendToName" type="xs:string" minOccurs="0"/>
+                    <xs:element name="disableCondition" type="xs:string" minOccurs="0"/>
+                    <xs:element name="baseAddress" type="scaledNonNegativeInteger"/>
+                    <xs:group ref="registerPropertiesGroup" minOccurs="0"/>
+                    <xs:element name="addressBlock" type="addressBlockType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="interrupt" type="interruptType" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="registers" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="register" minOccurs="1" maxOccurs="unbounded">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:group ref="dimElementGroup" minOccurs="0"/>
+                                <xs:element name="name" type="registerNameType"/> <!-- was xs:Name -->
+                                <xs:element name="displayName" type="xs:string" minOccurs="0"/>
+                                <xs:element name="description" type="xs:string" minOccurs="0"/>
+                                <xs:element name="alternateGroup" type="xs:Name" minOccurs="0"/>
+                                <xs:element name="addressOffset" type="scaledNonNegativeInteger"/>
+                                <xs:group ref="registerPropertiesGroup" minOccurs="0"/>
+                                <xs:element name="modifiedWriteValues" type="modifiedWriteValuesType" minOccurs="0"/>
+                                <xs:element name="writeConstraint" type="writeConstraintType" minOccurs="0"/>
+                                <xs:element name="readAction" type="readActionType" minOccurs="0"/>
+                                <xs:element name="fields" minOccurs="0" maxOccurs="1">
+                                  <xs:complexType>
+                                    <xs:sequence>
+                                      <xs:element name="field" minOccurs="1" maxOccurs="unbounded">
+                                      <xs:complexType>
+                                        <xs:sequence>
+                                          <xs:element name="name" type="xs:string"/>
+                                          <xs:element name="description" type="xs:string" minOccurs="0"/>
+                                          <xs:choice>
+                                            <xs:group ref="bitRangeLsbMsbStyle" minOccurs="0"/>
+                                            <xs:group ref="bitRangeOffsetWidthStyle" minOccurs="0"/>
+                                            <xs:element name="bitRange" type="bitRangeType" minOccurs="0"/>
+                                          </xs:choice>
+                                          <xs:element name="access" type="accessType" minOccurs="0"/>
+                                          <xs:element name="modifiedWriteValues" type="modifiedWriteValuesType" minOccurs="0"/>
+                                          <xs:element name="writeConstraint" type="writeConstraintType" minOccurs="0"/>
+                                          <xs:element name="readAction" type="readActionType" minOccurs="0"/>
+                                          <xs:element name="enumeratedValues" minOccurs="0" maxOccurs="2">
+                                            <xs:complexType>
+                                              <xs:sequence>
+                                                <xs:element name="name" type="xs:Name" minOccurs="0"/>
+                                                <xs:element name="usage" type="enumUsageType" minOccurs="0"/>
+                                                <xs:element name="enumeratedValue" minOccurs="1" maxOccurs="unbounded">
+                                                  <xs:complexType>
+                                                    <xs:sequence>
+                                                      <xs:element name="name" type="xs:string"/>
+                                                      <xs:element name="description" type="xs:string" minOccurs="0"/>
+                                                      <xs:choice>
+                                                        <xs:element name="value" type="enumeratedValueDataType"/>
+                                                        <xs:element name="isDefault" type="xs:boolean"/>
+                                                      </xs:choice>
+                                                    </xs:sequence>
+                                                  </xs:complexType>
+                                                </xs:element>
+                                              </xs:sequence>
+                                              <xs:attribute name="derivedFrom" type="xs:Name" use="optional"/>
+                                            </xs:complexType>
+                                          </xs:element>
+                                        </xs:sequence>
+                                        <xs:attribute name="derivedFrom" type="xs:Name" use="optional"/>
+                                      </xs:complexType>
+                                    </xs:element>
+                                    </xs:sequence>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                              <xs:attribute name="derivedFrom" type="xs:Name" use="optional"/>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attribute name="derivedFrom" type="xs:Name" use="optional"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="vendorExtensions" minOccurs="0" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded">
+              </xs:any>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="schemaVersion" type="xs:decimal" use="required" fixed="1.0"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
