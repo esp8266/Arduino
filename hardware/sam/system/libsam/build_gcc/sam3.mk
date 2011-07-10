@@ -18,21 +18,22 @@ OUTPUT_BIN = ../lib
 
 # Libraries
 PROJECT_BASE_PATH = ..
+CMSIS_BASE_PATH = $(PROJECT_BASE_PATH)/../CMSIS/CM3/CoreSupport
 
 #-------------------------------------------------------------------------------
 # Files
 #-------------------------------------------------------------------------------
 
 vpath %.h $(PROJECT_BASE_PATH)/include
-vpath %.c $(PROJECT_BASE_PATH)/source $(PROJECT_BASE_PATH)/cmsis
-vpath %.s $(PROJECT_BASE_PATH)/source $(PROJECT_BASE_PATH)/cmsis
+vpath %.c $(PROJECT_BASE_PATH)/source $(CMSIS_BASE_PATH)
+vpath %.s $(PROJECT_BASE_PATH)/source $(CMSIS_BASE_PATH)
 
 VPATH+=$(PROJECT_BASE_PATH)/source
-VPATH+=$(PROJECT_BASE_PATH)/cmsis
+VPATH+=$(CMSIS_BASE_PATH)
 
 INCLUDES = -I$(PROJECT_BASE_PATH)
 INCLUDES += -I$(PROJECT_BASE_PATH)/include
-INCLUDES += -I$(PROJECT_BASE_PATH)/cmsis
+INCLUDES += -I$(CMSIS_BASE_PATH)
 
 #-------------------------------------------------------------------------------
 ifdef DEBUG
@@ -62,7 +63,7 @@ OUTPUT_PATH=$(OUTPUT_OBJ)_$(CHIP)
 # C source files and objects
 #-------------------------------------------------------------------------------
 C_SRC=$(wildcard $(PROJECT_BASE_PATH)/source/*.c)
-C_SRC+=$(wildcard $(PROJECT_BASE_PATH)/cmsis/*.c)
+C_SRC+=$(wildcard $(CMSIS_BASE_PATH)/*.c)
 
 C_OBJ_TEMP=$(patsubst %.c, %.o, $(notdir $(C_SRC)))
 
@@ -75,7 +76,7 @@ C_OBJ=$(filter-out $(C_OBJ_FILTER), $(C_OBJ_TEMP))
 # Assembler source files and objects
 #-------------------------------------------------------------------------------
 A_SRC=$(wildcard $(PROJECT_BASE_PATH)/source/*.s)
-A_SRC+=$(wildcard $(PROJECT_BASE_PATH)/cmsis/*.s)
+A_SRC+=$(wildcard $(CMSIS_BASE_PATH)/*.s)
 
 A_OBJ_TEMP=$(patsubst %.s, %.o, $(notdir $(A_SRC)))
 
@@ -127,4 +128,4 @@ clean:
 	-@$(RM) $(subst /,$(SEP),$(OUTPUT_BIN)/$(OUTPUT_LIB)).txt 1>NUL 2>&1
 
 # dependencies
-$(addprefix $(OUTPUT_PATH)/,$(C_OBJ)): $(OUTPUT_PATH)/%.o: $(PROJECT_BASE_PATH)/chip.h $(wildcard $(PROJECT_BASE_PATH)/include/*.h) $(wildcard $(PROJECT_BASE_PATH)/cmsis/*.h)
+$(addprefix $(OUTPUT_PATH)/,$(C_OBJ)): $(OUTPUT_PATH)/%.o: $(PROJECT_BASE_PATH)/chip.h $(wildcard $(PROJECT_BASE_PATH)/include/*.h) $(wildcard $(CMSIS_BASE_PATH)/*.h)

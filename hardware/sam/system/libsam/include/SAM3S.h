@@ -129,7 +129,7 @@ typedef enum IRQn
  * \brief CMSIS includes
  */
 
-#include "cmsis/core_cm3.h"
+#include <core_cm3.h>
 
 /*@}*/
 
