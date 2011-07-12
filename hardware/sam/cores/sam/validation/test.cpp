@@ -1,3 +1,4 @@
+#include "../Arduino.h"
 
 void setup( void )
 {                
@@ -5,7 +6,7 @@ void setup( void )
   // Pin PIN_LED has an LED connected on most Arduino boards:
   pinMode( PIN_LED, OUTPUT ) ;     
 
-  Serial.begin( 19200 ) ;
+  Serial1.begin( 19200 ) ;
 }
 
 void loop( void )
@@ -15,7 +16,7 @@ void loop( void )
   digitalWrite( PIN_LED, LOW ) ;   // set the LED off
   delay( 1000 ) ;              // wait for a second
   
-  Serial.println( "test1" ) ;   // send an initial string
+  Serial1.println( "test1" ) ;   // send an initial string
   delay( 1000 ) ;               // wait for a second
-  Serial.println( "test2" ) ;   // send an initial string
+  Serial1.println( "test2" ) ;   // send an initial string
 }

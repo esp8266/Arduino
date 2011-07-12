@@ -6,7 +6,8 @@ SUBMAKE_OPTIONS=--no-builtin-rules --no-builtin-variables
 # Rules
 #-------------------------------------------------------------------------------
 
-all: libchip_sam3s4_gcc_dbg.a libchip_sam3s4_gcc_rel.a
+# libchip_sam3s4_gcc_rel.a
+all: libchip_sam3s4_gcc_dbg.a 
 
 libchip_sam3s4_gcc_dbg.a:
 	@echo --- Making $@

@@ -305,6 +305,16 @@ tc.o:
 00000058 r __FUNCTION__.5789
          U __assert_func
 
+timetick.o:
+00000000 T GetTickCount
+00000000 t NVIC_SetPriority
+00000000 T Sleep
+00000000 t SysTick_Config
+00000000 T TimeTick_Configure
+00000000 T TimeTick_Increment
+00000000 T Wait
+00000000 b _dwTickCount
+
 twi.o:
 00000000 T TWI_ByteReceived
 00000000 T TWI_ByteSent
@@ -385,13 +395,3 @@ wdt.o:
 00000000 T WDT_Restart
 
 core_cm3.o:
-
-timetick.o:
-00000000 T GetTickCount
-00000000 t NVIC_SetPriority
-00000000 T Sleep
-00000000 t SysTick_Config
-00000000 T TimeTick_Configure
-00000000 T TimeTick_Increment
-00000000 T Wait
-00000000 b _dwTickCount

@@ -116,8 +116,8 @@ $(addprefix $(OUTPUT_PATH)/,$(A_OBJ)): $(OUTPUT_PATH)/%.o: %.s
 	@"$(AS)" -c $(ASFLAGS) $< -o $@
 
 $(OUTPUT_LIB): $(addprefix $(OUTPUT_PATH)/, $(C_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(A_OBJ))
-	@"$(AR)" -r "../../../cores/sam/$@" $^
 	@"$(AR)" -r "$(OUTPUT_BIN)/$@" $^
+	@"$(AR)" -r "../../../cores/sam/$@" $^
 	@"$(NM)" "$(OUTPUT_BIN)/$@" > "$(OUTPUT_BIN)/$@.txt"
 
 .PHONY: clean
@@ -129,3 +129,4 @@ clean:
 
 # dependencies
 $(addprefix $(OUTPUT_PATH)/,$(C_OBJ)): $(OUTPUT_PATH)/%.o: $(PROJECT_BASE_PATH)/chip.h $(wildcard $(PROJECT_BASE_PATH)/include/*.h) $(wildcard $(CMSIS_BASE_PATH)/*.h)
+

@@ -1,4 +1,3 @@
-//#include "wiring_private.h"
 #include <stdint.h>
 
 #include "HardwareSerial.h"

@@ -59,9 +59,9 @@ extern "C"{
 #define interrupts() sei()
 #define noInterrupts() cli()
 
-#define clockCyclesPerMicrosecond() ( BOARD_MCK / 1000000L )
-#define clockCyclesToMicroseconds(a) ( ((a) * 1000L) / (BOARD_MCK / 1000L) )
-#define microsecondsToClockCycles(a) ( ((a) * (BOARD_MCK / 1000L)) / 1000L )
+#define clockCyclesPerMicrosecond() ( VARIANT_MCK / 1000000L )
+#define clockCyclesToMicroseconds(a) ( ((a) * 1000L) / (VARIANT_MCK / 1000L) )
+#define microsecondsToClockCycles(a) ( ((a) * (VARIANT_MCK / 1000L)) / 1000L )
 
 #define lowByte(w) ((uint8_t) ((w) & 0xff))
 #define highByte(w) ((uint8_t) ((w) >> 8))
@@ -71,7 +71,6 @@ extern "C"{
 #define bitClear(value, bit) ((value) &= ~(1UL << (bit)))
 #define bitWrite(value, bit, bitvalue) (bitvalue ? bitSet(value, bit) : bitClear(value, bit))
 
-
 typedef unsigned int word;
 
 #define bit(b) (1UL << (b))
@@ -80,29 +79,35 @@ typedef unsigned int word;
 typedef uint8_t boolean ;
 typedef uint8_t byte ;
 
-void init( void ) ;
 
-void pinMode( uint8_t, uint8_t ) ;
-void digitalWrite( uint8_t, uint8_t ) ;
-int digitalRead( uint8_t ) ;
-int analogRead( uint8_t ) ;
-void analogReference( uint8_t mode ) ;
-void analogWrite( uint8_t, int ) ;
+// wiring_digital.c
+extern void pinMode( uint32_t dwPin, uint32_t dwMode ) ;
+extern void digitalWrite( uint32_t dwPin, uint32_t dwVal ) ;
+extern int digitalRead( uint32_t dwPin ) ;
 
-unsigned long millis( void ) ;
-unsigned long micros( void ) ;
+// wiring_analog.c
+extern int analogRead( uint8_t ) ;
+extern void analogReference( uint8_t mode ) ;
+extern void analogWrite( uint8_t, int ) ;
+
+// wiring.c
+extern void init( void ) ;
+extern unsigned long millis( void ) ;
+extern unsigned long micros( void ) ;
 //void delay(unsigned long);
 #define delay( dwMs ) Wait( dwMs )
-void delayMicroseconds( unsigned int us ) ;
+extern void delayMicroseconds( unsigned int us ) ;
 
-void shiftOut( uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val ) ;
-uint8_t shiftIn( uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder ) ;
+// wiring_shift.c
+extern void shiftOut( uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val ) ;
+extern uint8_t shiftIn( uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder ) ;
 
-void attachInterrupt( uint8_t, void (*)(void), int mode ) ;
-void detachInterrupt( uint8_t ) ;
+extern void attachInterrupt( uint8_t, void (*)(void), int mode ) ;
+extern void detachInterrupt( uint8_t ) ;
 
-void setup( void ) ;
-void loop( void ) ;
+// sketch
+extern void setup( void ) ;
+extern void loop( void ) ;
 
 // Get the bit location within the hardware port of the given virtual pin.
 // This comes from the pins_*.c file for the active board configuration.
@@ -138,16 +143,16 @@ uint16_t makeWord( byte h, byte l ) ;
 
 #define word(...) makeWord(__VA_ARGS__)
 
-unsigned long pulseIn( uint8_t pin, uint8_t state, unsigned long timeout = 1000000L ) ;
+extern unsigned long pulseIn( uint8_t pin, uint8_t state, unsigned long timeout = 1000000L ) ;
 
-void tone( uint8_t _pin, unsigned int frequency, unsigned long duration = 0 ) ;
-void noTone( uint8_t _pin ) ;
+extern void tone( uint8_t _pin, unsigned int frequency, unsigned long duration = 0 ) ;
+extern void noTone( uint8_t _pin ) ;
 
 // WMath prototypes
-long random( long ) ;
-long random( long, long ) ;
-void randomSeed( unsigned int ) ;
-long map( long, long, long, long, long ) ;
+extern long random( long ) ;
+extern long random( long, long ) ;
+extern void randomSeed( unsigned int ) ;
+extern long map( long, long, long, long, long ) ;
 
 #endif // __cplusplus
 

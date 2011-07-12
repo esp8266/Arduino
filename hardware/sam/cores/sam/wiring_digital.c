@@ -25,141 +25,79 @@
 */
 
 #include "wiring_private.h"
-#include "pins_arduino.h"
+//#include "pins_arduino.h"
 
-void pinMode(uint8_t pin, uint8_t mode)
+/// \brief Configures the specified pin to behave either as an input or an output. See the description of digital pins for details.
+///
+/// \param dwPin the number of the pin whose mode you wish to set 
+/// \param dwMode either INPUT or OUTPUT
+///
+void pinMode( uint32_t dwPin, uint32_t dwMode )
 {
-	uint8_t bit = digitalPinToBitMask(pin);
-	uint8_t port = digitalPinToPort(pin);
-	volatile uint8_t *reg;
+	if ( APinDescription[dwPin].dwPinType == PIO_NOT_A_PIN )
+  { 
+    return ;
+  }
 
-	if (port == NOT_A_PIN) return;
+	switch ( dwMode )
+  { 
+    case INPUT:
+      PIO_Configure( APinDescription[dwPin].pPort, PIO_INPUT, APinDescription[dwPin].dwPin, 0 ) ;
+    break ;
 
-	// JWS: can I let the optimizer do this?
-	reg = portModeRegister(port);
+    case OUTPUT:
+      PIO_Configure( APinDescription[dwPin].pPort, PIO_OUTPUT_1, APinDescription[dwPin].dwPin, APinDescription[dwPin].dwPinAttribute ) ;
+    break ;
 
-	if (mode == INPUT) { 
-		uint8_t oldSREG = SREG;
-                cli();
-		*reg &= ~bit;
-		SREG = oldSREG;
-	} else {
-		uint8_t oldSREG = SREG;
-                cli();
-		*reg |= bit;
-		SREG = oldSREG;
+    default:
+    break ;
 	}
 }
 
-// Forcing this inline keeps the callers from having to push their own stuff
-// on the stack. It is a good performance win and only takes 1 more byte per
-// user than calling. (It will take more bytes on the 168.)
-//
-// But shouldn't this be moved into pinMode? Seems silly to check and do on
-// each digitalread or write.
-//
-// Mark Sproul:
-// - Removed inline. Save 170 bytes on atmega1280
-// - changed to a switch statment; added 32 bytes but much easier to read and maintain.
-// - Added more #ifdefs, now compiles for atmega645
-//
-//static inline void turnOffPWM(uint8_t timer) __attribute__ ((always_inline));
-//static inline void turnOffPWM(uint8_t timer)
-static void turnOffPWM(uint8_t timer)
+/// \brief Write a HIGH or a LOW value to a digital pin. 
+///
+/// \desc If the pin has been configured as an OUTPUT with pinMode(), its voltage will be set to the 
+/// corresponding value: 5V (or 3.3V on 3.3V boards) for HIGH, 0V (ground) for LOW.
+///
+/// If the pin is configured as an INPUT, writing a HIGH value with digitalWrite() will enable an internal
+/// 20K pullup resistor (see the tutorial on digital pins). Writing LOW will disable the pullup. The pullup 
+/// resistor is enough to light an LED dimly, so if LEDs appear to work, but very dimly, this is a likely 
+/// cause. The remedy is to set the pin to an output with the pinMode() function.
+///
+/// NOTE: Digital pin PIN_LED is harder to use as a digital input than the other digital pins because it has an LED
+/// and resistor attached to it that's soldered to the board on most boards. If you enable its internal 20k pull-up
+/// resistor, it will hang at around 1.7 V instead of the expected 5V because the onboard LED and series resistor 
+/// pull the voltage level down, meaning it always returns LOW. If you must use pin PIN_LED as a digital input, use an 
+/// external pull down resistor. 
+///
+/// \param dwPin the pin number
+/// \param dwVal HIGH or LOW
+///
+void digitalWrite( uint32_t dwPin, uint32_t dwVal )
 {
-	switch (timer)
-	{
-		#if defined(TCCR1A) && defined(COM1A1)
-		case TIMER1A:   cbi(TCCR1A, COM1A1);    break;
-		#endif
-		#if defined(TCCR1A) && defined(COM1B1)
-		case TIMER1B:   cbi(TCCR1A, COM1B1);    break;
-		#endif
-		
-		#if defined(TCCR2) && defined(COM21)
-		case  TIMER2:   cbi(TCCR2, COM21);      break;
-		#endif
-		
-		#if defined(TCCR0A) && defined(COM0A1)
-		case  TIMER0A:  cbi(TCCR0A, COM0A1);    break;
-		#endif
-		
-		#if defined(TIMER0B) && defined(COM0B1)
-		case  TIMER0B:  cbi(TCCR0A, COM0B1);    break;
-		#endif
-		#if defined(TCCR2A) && defined(COM2A1)
-		case  TIMER2A:  cbi(TCCR2A, COM2A1);    break;
-		#endif
-		#if defined(TCCR2A) && defined(COM2B1)
-		case  TIMER2B:  cbi(TCCR2A, COM2B1);    break;
-		#endif
-		
-		#if defined(TCCR3A) && defined(COM3A1)
-		case  TIMER3A:  cbi(TCCR3A, COM3A1);    break;
-		#endif
-		#if defined(TCCR3A) && defined(COM3B1)
-		case  TIMER3B:  cbi(TCCR3A, COM3B1);    break;
-		#endif
-		#if defined(TCCR3A) && defined(COM3C1)
-		case  TIMER3C:  cbi(TCCR3A, COM3C1);    break;
-		#endif
+	if ( APinDescription[dwPin].dwPinType == PIO_NOT_A_PIN )
+  { 
+    return ;
+  }
 
-		#if defined(TCCR4A) && defined(COM4A1)
-		case  TIMER4A:  cbi(TCCR4A, COM4A1);    break;
-		#endif
-		#if defined(TCCR4A) && defined(COM4B1)
-		case  TIMER4B:  cbi(TCCR4A, COM4B1);    break;
-		#endif
-		#if defined(TCCR4A) && defined(COM4C1)
-		case  TIMER4C:  cbi(TCCR4A, COM4C1);    break;
-		#endif
-		#if defined(TCCR5A)
-		case  TIMER5A:  cbi(TCCR5A, COM5A1);    break;
-		case  TIMER5B:  cbi(TCCR5A, COM5B1);    break;
-		case  TIMER5C:  cbi(TCCR5A, COM5C1);    break;
-		#endif
-	}
+  PIO_SetOutput( APinDescription[dwPin].pPort, APinDescription[dwPin].dwPin, dwVal, 0, PIO_PULLUP ) ;
 }
 
-void digitalWrite(uint8_t pin, uint8_t val)
+/// \brief Reads the value from a specified digital pin, either HIGH or LOW. 
+///
+/// \param dwPin the number of the digital pin you want to read (int) 
+///
+int digitalRead( uint32_t dwPin )
 {
-	uint8_t timer = digitalPinToTimer(pin);
-	uint8_t bit = digitalPinToBitMask(pin);
-	uint8_t port = digitalPinToPort(pin);
-	volatile uint8_t *out;
+	if ( APinDescription[dwPin].dwPinType == PIO_NOT_A_PIN )
+  { 
+    return LOW ;
+  }
 
-	if (port == NOT_A_PIN) return;
+	if ( PIO_Get( APinDescription[dwPin].pPort, PIO_INPUT, APinDescription[dwPin].dwPin ) == 1 )
+  {
+    return HIGH ;
+  }
 
-	// If the pin that support PWM output, we need to turn it off
-	// before doing a digital write.
-	if (timer != NOT_ON_TIMER) turnOffPWM(timer);
-
-	out = portOutputRegister(port);
-
-	uint8_t oldSREG = SREG;
-	cli();
-
-	if (val == LOW) {
-		*out &= ~bit;
-	} else {
-		*out |= bit;
-	}
-
-	SREG = oldSREG;
-}
-
-int digitalRead(uint8_t pin)
-{
-	uint8_t timer = digitalPinToTimer(pin);
-	uint8_t bit = digitalPinToBitMask(pin);
-	uint8_t port = digitalPinToPort(pin);
-
-	if (port == NOT_A_PIN) return LOW;
-
-	// If the pin that support PWM output, we need to turn it off
-	// before getting a digital reading.
-	if (timer != NOT_ON_TIMER) turnOffPWM(timer);
-
-	if (*portInputRegister(port) & bit) return HIGH;
-	return LOW;
+	return LOW ;
 }

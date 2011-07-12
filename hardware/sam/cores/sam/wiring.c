@@ -100,10 +100,10 @@ unsigned long micros( void )
   return 0 ;
 }
 
-void delay( uint32_t dwMs )
-{
-	Wait( dwMs ) ;
-}
+//void delay( uint32_t dwMs )
+//{
+//	Wait( dwMs ) ;
+//}
 
 /* Delay for the given number of microseconds.  Assumes a 64 MHz clock. */
 void delayMicroseconds(unsigned int us)

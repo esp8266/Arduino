@@ -3,7 +3,7 @@
 
 CHIP=sam3s4
 VARIANT=sam3s_ek
-LIBNAME=arduino_sam3s_ek
+LIBNAME=libarduino_$(VARIANT)
 TOOLCHAIN=gcc
 
 #-------------------------------------------------------------------------------
@@ -24,16 +24,14 @@ VARIANT_PATH = ../../../variants/sam3s-ek
 #-------------------------------------------------------------------------------
 
 vpath %.h $(PROJECT_BASE_PATH) $(SYSTEM_PATH) $(VARIANT_PATH)
-vpath %.c $(PROJECT_BASE_PATH)
+vpath %.c $(PROJECT_BASE_PATH) $(VARIANT_PATH)
 vpath %.cpp $(PROJECT_BASE_PATH) $(PROJECT_BASE_PATH)
 
 VPATH+=$(PROJECT_BASE_PATH)
 
 INCLUDES = -I$(PROJECT_BASE_PATH)
-INCLUDES = -I$(PROJECT_BASE_PATH)
 INCLUDES += -I$(SYSTEM_PATH)
 INCLUDES += -I$(SYSTEM_PATH)/libsam
-INCLUDES += -I$(VARIANT_PATH)
 INCLUDES += -I$(VARIANT_PATH)
 INCLUDES += -I$(CMSIS_PATH)
 
@@ -69,7 +67,7 @@ C_SRC=$(wildcard $(PROJECT_BASE_PATH)/*.c)
 C_OBJ_TEMP = $(patsubst %.c, %.o, $(notdir $(C_SRC)))
 
 # during development, remove some files
-C_OBJ_FILTER=wiring_analog.o wiring_digital.o wiring_pulse.o
+C_OBJ_FILTER=wiring_analog.o wiring_pulse.o
 
 C_OBJ=$(filter-out $(C_OBJ_FILTER), $(C_OBJ_TEMP))
 
@@ -81,8 +79,7 @@ CPP_SRC=$(wildcard $(PROJECT_BASE_PATH)/*.cpp)
 CPP_OBJ_TEMP = $(patsubst %.cpp, %.o, $(notdir $(CPP_SRC)))
 
 # during development, remove some files
-CPP_OBJ_FILTER=Tone.o WMath.o
-#WString.o
+CPP_OBJ_FILTER=Tone.o
 
 CPP_OBJ=$(filter-out $(CPP_OBJ_FILTER), $(CPP_OBJ_TEMP))
 
@@ -138,12 +135,18 @@ $(addprefix $(OUTPUT_PATH)/,$(CPP_OBJ)): $(OUTPUT_PATH)/%.o: %.cpp
 #	@$(CC) -c $(CPPFLAGS) $< -o $@
 	$(CC) -xc++ -c $(CPPFLAGS) $< -o $@
 
+$(OUTPUT_PATH)/variant.o: $(VARIANT_PATH)/variant.cpp
+#	@$(CC) -c $(CPPFLAGS) $< -o $@
+	@$(CC) -xc++ -c $(CPPFLAGS) $< -o $@
+
 $(addprefix $(OUTPUT_PATH)/,$(A_OBJ)): $(OUTPUT_PATH)/%.o: %.s
 	@$(AS) -c $(ASFLAGS) $< -o $@
 
-$(OUTPUT_LIB): $(addprefix $(OUTPUT_PATH)/, $(C_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(CPP_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(A_OBJ))
+$(OUTPUT_LIB): $(addprefix $(OUTPUT_PATH)/, $(C_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(CPP_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(A_OBJ)) $(OUTPUT_PATH)/variant.o
 	@$(AR) -v -r "$(OUTPUT_BIN)/$@" $^
+	@"$(AR)" -r "../$@" $^
 	@$(NM) "$(OUTPUT_BIN)/$@" > "$(OUTPUT_BIN)/$@.txt"
+
 
 .PHONY: clean
 clean:
