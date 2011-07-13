@@ -68,7 +68,7 @@ uint32_t millis( void )
 	return GetTickCount() ;
 }
 
-unsigned long micros( void )
+uint32_t micros( void )
 {
 /*
 	unsigned long m;
@@ -100,17 +100,17 @@ unsigned long micros( void )
   return 0 ;
 }
 
-//void delay( uint32_t dwMs )
-//{
-//	Wait( dwMs ) ;
-//}
+void delay( uint32_t dwMs )
+{
+	Wait( dwMs ) ;
+}
 
 /* Delay for the given number of microseconds.  Assumes a 64 MHz clock. */
-void delayMicroseconds(unsigned int us)
+void delayMicroseconds( uint32_t dwUs )
 {
-  unsigned long	startMicros	=	micros();
+  uint32_t dwStartMicros=micros() ;
 
-	while ((micros() - startMicros) < us)
+	while ( (micros() - dwStartMicros) < dwUs )
 	{
 		//*	do nothing
 	}

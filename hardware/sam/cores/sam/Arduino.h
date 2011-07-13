@@ -92,11 +92,10 @@ extern void analogWrite( uint8_t, int ) ;
 
 // wiring.c
 extern void init( void ) ;
-extern unsigned long millis( void ) ;
-extern unsigned long micros( void ) ;
-//void delay(unsigned long);
-#define delay( dwMs ) Wait( dwMs )
-extern void delayMicroseconds( unsigned int us ) ;
+extern uint32_t millis( void ) ;
+extern uint32_t micros( void ) ;
+extern void delay( uint32_t dwMs ) ;
+extern void delayMicroseconds( uint32_t dwUs ) ;
 
 // wiring_shift.c
 extern void shiftOut( uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val ) ;
@@ -143,15 +142,15 @@ uint16_t makeWord( byte h, byte l ) ;
 
 #define word(...) makeWord(__VA_ARGS__)
 
-extern unsigned long pulseIn( uint8_t pin, uint8_t state, unsigned long timeout = 1000000L ) ;
+extern uint32_t pulseIn( uint32_t pin, uint32_t state, uint32_t timeout = 1000000L ) ;
 
-extern void tone( uint8_t _pin, unsigned int frequency, unsigned long duration = 0 ) ;
-extern void noTone( uint8_t _pin ) ;
+extern void tone( uint32_t dwPin, uint32_t dwFrequency, uint32_t dwDuration = 0 ) ;
+extern void noTone( uint32_t dwPin ) ;
 
 // WMath prototypes
 extern long random( long ) ;
 extern long random( long, long ) ;
-extern void randomSeed( unsigned int ) ;
+extern void randomSeed( uint32_t dwSeed ) ;
 extern long map( long, long, long, long, long ) ;
 
 #endif // __cplusplus

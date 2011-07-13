@@ -105,6 +105,8 @@ wiring.o:
 00000000 T SysTick_Handler
          U TimeTick_Increment
          U WDT_Disable
+         U Wait
+00000000 T delay
 00000000 T delayMicroseconds
 00000000 T init
 00000000 T micros
@@ -256,12 +258,12 @@ USART.o:
          U __cxa_pure_virtual
 
 WMath.o:
-00000000 T _Z10randomSeedj
+00000000 T _Z10randomSeedm
 00000000 T _Z3maplllll
 00000000 T _Z6randoml
 00000000 T _Z6randomll
 00000000 T _Z8makeWordhh
-00000000 T _Z8makeWordj
+00000000 T _Z8makeWordm
          U rand
          U srand
 

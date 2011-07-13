@@ -3,7 +3,7 @@ Archive member included because of file (symbol)
 ./..\libarduino_sam3s_ek_gcc_dbg.a(board_cstartup_gnu_sam3.o)
                               (Reset_Handler)
 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
-                              ./..\libarduino_sam3s_ek_gcc_dbg.a(board_cstartup_gnu_sam3.o) (SysTick_Handler)
+                              test.o (delay)
 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring_digital.o)
                               test.o (pinMode)
 ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
@@ -529,7 +529,6 @@ Discarded input sections
                 0x00000000       0x3c ./..\libchip_sam3s4_gcc_dbg.a(timetick.o)
  .text.GetTickCount
                 0x00000000       0x14 ./..\libchip_sam3s4_gcc_dbg.a(timetick.o)
- .text.Wait     0x00000000       0x30 ./..\libchip_sam3s4_gcc_dbg.a(timetick.o)
  .text.Sleep    0x00000000       0x34 ./..\libchip_sam3s4_gcc_dbg.a(timetick.o)
  .text          0x00000000        0x0 ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
  .data          0x00000000        0x0 ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
@@ -633,7 +632,7 @@ END GROUP
 LOAD c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2/crtend.o
 LOAD c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2/crtn.o
 
-.text           0x00400000     0x6204
+.text           0x00400000     0x6254
                 0x00400000                . = ALIGN (0x4)
                 0x00400000                _sfixed = .
  *(.vectors .vectors.*)
@@ -652,413 +651,418 @@ LOAD c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2/crtn.o
                 0x00400248       0x58 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
  .text.SysTick_Config
                 0x004002a0       0x58 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
+ .text.delay    0x004002f8       0x1c ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
+                0x004002f8                delay
  .text.SysTick_Handler
-                0x004002f8       0x10 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
-                0x004002f8                SysTick_Handler
+                0x00400314       0x10 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
+                0x00400314                SysTick_Handler
  .text.LowLevelInit_sam3s_ek
-                0x00400308       0xb8 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
- .text.init     0x004003c0       0x4c ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
-                0x004003c0                init
- .text.pinMode  0x0040040c       0xd8 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring_digital.o)
-                0x0040040c                pinMode
+                0x00400324       0xb8 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
+ .text.init     0x004003dc       0x4c ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
+                0x004003dc                init
+ .text.pinMode  0x00400428       0xd8 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring_digital.o)
+                0x00400428                pinMode
  .text.digitalWrite
-                0x004004e4       0x7c ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring_digital.o)
-                0x004004e4                digitalWrite
+                0x00400500       0x7c ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring_digital.o)
+                0x00400500                digitalWrite
  .text._ZN5Print5writeEPKc
-                0x00400560       0x40 ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
-                0x00400560                Print::write(char const*)
+                0x0040057c       0x40 ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
+                0x0040057c                Print::write(char const*)
  .text._ZN5Print5writeEPKhj
-                0x004005a0       0x48 ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
-                0x004005a0                Print::write(unsigned char const*, unsigned int)
+                0x004005bc       0x48 ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
+                0x004005bc                Print::write(unsigned char const*, unsigned int)
  .text._ZN5Print5printEPKc
-                0x004005e8       0x24 ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
-                0x004005e8                Print::print(char const*)
+                0x00400604       0x24 ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
+                0x00400604                Print::print(char const*)
  .text._ZN5Print5printEc
-                0x0040060c       0x24 ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
-                0x0040060c                Print::print(char)
+                0x00400628       0x24 ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
+                0x00400628                Print::print(char)
  .text._ZN5Print7printlnEv
-                0x00400630       0x28 ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
-                0x00400630                Print::println()
+                0x0040064c       0x28 ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
+                0x0040064c                Print::println()
  .text._ZN5Print7printlnEPKc
-                0x00400658       0x28 ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
-                0x00400658                Print::println(char const*)
+                0x00400674       0x28 ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
+                0x00400674                Print::println(char const*)
  .text._ZN5PrintC2Ev
-                0x00400680       0x20 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
-                0x00400680                Print::Print()
-                0x00400680                Print::Print()
+                0x0040069c       0x20 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
+                0x0040069c                Print::Print()
+                0x0040069c                Print::Print()
  .text._ZN6StreamC2Ev
-                0x004006a0       0x2c ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
-                0x004006a0                Stream::Stream()
-                0x004006a0                Stream::Stream()
+                0x004006bc       0x2c ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
+                0x004006bc                Stream::Stream()
+                0x004006bc                Stream::Stream()
  .text._ZN14HardwareSerialC2Ev
-                0x004006cc       0x2c ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
-                0x004006cc                HardwareSerial::HardwareSerial()
-                0x004006cc                HardwareSerial::HardwareSerial()
+                0x004006e8       0x2c ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
+                0x004006e8                HardwareSerial::HardwareSerial()
+                0x004006e8                HardwareSerial::HardwareSerial()
  .text._ZN9UARTClassC2EP4Uart4IRQnmP12_ring_bufferS4_
-                0x004006f8       0x50 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
-                0x004006f8                UARTClass::UARTClass(Uart*, IRQn, unsigned long, _ring_buffer*, _ring_buffer*)
-                0x004006f8                UARTClass::UARTClass(Uart*, IRQn, unsigned long, _ring_buffer*, _ring_buffer*)
+                0x00400714       0x50 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
+                0x00400714                UARTClass::UARTClass(Uart*, IRQn, unsigned long, _ring_buffer*, _ring_buffer*)
+                0x00400714                UARTClass::UARTClass(Uart*, IRQn, unsigned long, _ring_buffer*, _ring_buffer*)
  .text._ZN9UARTClass5beginEm
-                0x00400748       0x5c ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
-                0x00400748                UARTClass::begin(unsigned long)
+                0x00400764       0x5c ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
+                0x00400764                UARTClass::begin(unsigned long)
  .text._ZN9UARTClass3endEv
-                0x004007a4       0x44 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
-                0x004007a4                UARTClass::end()
+                0x004007c0       0x44 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
+                0x004007c0                UARTClass::end()
  .text._ZN9UARTClass9availableEv
-                0x004007e8       0x2c ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
-                0x004007e8                UARTClass::available()
+                0x00400804       0x2c ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
+                0x00400804                UARTClass::available()
  .text._ZN9UARTClass4peekEv
-                0x00400814       0x40 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
-                0x00400814                UARTClass::peek()
+                0x00400830       0x40 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
+                0x00400830                UARTClass::peek()
  .text._ZN9UARTClass4readEv
-                0x00400854       0x58 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
-                0x00400854                UARTClass::read()
+                0x00400870       0x58 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
+                0x00400870                UARTClass::read()
  .text._ZN9UARTClass5flushEv
-                0x004008ac       0x2c ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
-                0x004008ac                UARTClass::flush()
+                0x004008c8       0x2c ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
+                0x004008c8                UARTClass::flush()
  .text._ZN9UARTClass5writeEh
-                0x004008d8       0x88 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
-                0x004008d8                UARTClass::write(unsigned char)
- .text.main     0x00400960       0x20 ./..\libarduino_sam3s_ek_gcc_dbg.a(main.o)
-                0x00400960                main
+                0x004008f4       0x88 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
+                0x004008f4                UARTClass::write(unsigned char)
+ .text.main     0x0040097c       0x20 ./..\libarduino_sam3s_ek_gcc_dbg.a(main.o)
+                0x0040097c                main
  .text._Z41__static_initialization_and_destruction_0ii
-                0x00400980       0x78 ./..\libarduino_sam3s_ek_gcc_dbg.a(variant.o)
+                0x0040099c       0x78 ./..\libarduino_sam3s_ek_gcc_dbg.a(variant.o)
  .text._GLOBAL__I_rx_buffer1
-                0x004009f8       0x18 ./..\libarduino_sam3s_ek_gcc_dbg.a(variant.o)
+                0x00400a14       0x18 ./..\libarduino_sam3s_ek_gcc_dbg.a(variant.o)
  .text.__cxa_pure_virtual
-                0x00400a10        0x8 ./..\libarduino_sam3s_ek_gcc_dbg.a(cxxabi-compat.o)
-                0x00400a10                __cxa_pure_virtual
- .text          0x00400a18       0x50 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-init.o)
-                0x00400a18                __libc_init_array
- .text          0x00400a68      0x57c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-mallocr.o)
-                0x00400a68                _malloc_r
- .text          0x00400fe4      0x150 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-memcpy.o)
-                0x00400fe4                memcpy
- .text          0x00401134       0xb4 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-memmove.o)
-                0x00401134                memmove
- .text          0x004011e8        0x8 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-mlock.o)
-                0x004011e8                __malloc_lock
-                0x004011ec                __malloc_unlock
- .text          0x004011f0      0x41c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-reallocr.o)
-                0x004011f0                _realloc_r
- .text          0x0040160c       0x28 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-sbrkr.o)
-                0x0040160c                _sbrk_r
- .text          0x00401634      0x1dc c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-strcmp.o)
-                0x00401634                strcmp
- .text          0x00401810       0x60 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-strlen.o)
-                0x00401810                strlen
- .text          0x00401870      0x240 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-freer.o)
-                0x00401870                _malloc_trim_r
-                0x00401918                _free_r
- .text          0x00401ab0       0x8c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-memchr.o)
-                0x00401ab0                memchr
+                0x00400a2c        0x8 ./..\libarduino_sam3s_ek_gcc_dbg.a(cxxabi-compat.o)
+                0x00400a2c                __cxa_pure_virtual
+ .text          0x00400a34       0x50 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-init.o)
+                0x00400a34                __libc_init_array
+ .text          0x00400a84      0x57c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-mallocr.o)
+                0x00400a84                _malloc_r
+ .text          0x00401000      0x150 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-memcpy.o)
+                0x00401000                memcpy
+ .text          0x00401150       0xb4 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-memmove.o)
+                0x00401150                memmove
+ .text          0x00401204        0x8 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-mlock.o)
+                0x00401204                __malloc_lock
+                0x00401208                __malloc_unlock
+ .text          0x0040120c      0x41c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-reallocr.o)
+                0x0040120c                _realloc_r
+ .text          0x00401628       0x28 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-sbrkr.o)
+                0x00401628                _sbrk_r
+ .text          0x00401650      0x1dc c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-strcmp.o)
+                0x00401650                strcmp
+ .text          0x0040182c       0x60 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-strlen.o)
+                0x0040182c                strlen
+ .text          0x0040188c      0x240 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-freer.o)
+                0x0040188c                _malloc_trim_r
+                0x00401934                _free_r
+ .text          0x00401acc       0x8c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-memchr.o)
+                0x00401acc                memchr
  .text.Dummy_Handler
-                0x00401b3c        0x8 ./..\libchip_sam3s4_gcc_dbg.a(exceptions.o)
-                0x00401b3c                DebugMon_Handler
-                0x00401b3c                UART0_IrqHandler
-                0x00401b3c                HardFault_Handler
-                0x00401b3c                TWI1_IrqHandler
-                0x00401b3c                SUPC_IrqHandler
-                0x00401b3c                PendSV_Handler
-                0x00401b3c                NMI_Handler
-                0x00401b3c                PIOC_IrqHandler
-                0x00401b3c                TC3_IrqHandler
-                0x00401b3c                WDT_IrqHandler
-                0x00401b3c                TC1_IrqHandler
-                0x00401b3c                ACC_IrqHandler
-                0x00401b3c                TC0_IrqHandler
-                0x00401b3c                UsageFault_Handler
-                0x00401b3c                USART1_IrqHandler
-                0x00401b3c                RTT_IrqHandler
-                0x00401b3c                SSC_IrqHandler
-                0x00401b3c                TC5_IrqHandler
-                0x00401b3c                TC4_IrqHandler
-                0x00401b3c                Dummy_Handler
-                0x00401b3c                PIOA_IrqHandler
-                0x00401b3c                USART0_IrqHandler
-                0x00401b3c                PIOB_IrqHandler
-                0x00401b3c                DAC_IrqHandler
-                0x00401b3c                TC2_IrqHandler
-                0x00401b3c                MCI_IrqHandler
-                0x00401b3c                USBD_IrqHandler
-                0x00401b3c                CRCCU_IrqHandler
-                0x00401b3c                MemManage_Handler
-                0x00401b3c                UART1_IrqHandler
-                0x00401b3c                SVC_Handler
-                0x00401b3c                SPI_IrqHandler
-                0x00401b3c                RTC_IrqHandler
-                0x00401b3c                EEFC_IrqHandler
-                0x00401b3c                RSTC_IrqHandler
-                0x00401b3c                SMC_IrqHandler
-                0x00401b3c                PMC_IrqHandler
-                0x00401b3c                BusFault_Handler
-                0x00401b3c                TWI0_IrqHandler
-                0x00401b3c                ADC_IrqHandler
-                0x00401b3c                PWM_IrqHandler
+                0x00401b58        0x8 ./..\libchip_sam3s4_gcc_dbg.a(exceptions.o)
+                0x00401b58                DebugMon_Handler
+                0x00401b58                UART0_IrqHandler
+                0x00401b58                HardFault_Handler
+                0x00401b58                TWI1_IrqHandler
+                0x00401b58                SUPC_IrqHandler
+                0x00401b58                PendSV_Handler
+                0x00401b58                NMI_Handler
+                0x00401b58                PIOC_IrqHandler
+                0x00401b58                TC3_IrqHandler
+                0x00401b58                WDT_IrqHandler
+                0x00401b58                TC1_IrqHandler
+                0x00401b58                ACC_IrqHandler
+                0x00401b58                TC0_IrqHandler
+                0x00401b58                UsageFault_Handler
+                0x00401b58                USART1_IrqHandler
+                0x00401b58                RTT_IrqHandler
+                0x00401b58                SSC_IrqHandler
+                0x00401b58                TC5_IrqHandler
+                0x00401b58                TC4_IrqHandler
+                0x00401b58                Dummy_Handler
+                0x00401b58                PIOA_IrqHandler
+                0x00401b58                USART0_IrqHandler
+                0x00401b58                PIOB_IrqHandler
+                0x00401b58                DAC_IrqHandler
+                0x00401b58                TC2_IrqHandler
+                0x00401b58                MCI_IrqHandler
+                0x00401b58                USBD_IrqHandler
+                0x00401b58                CRCCU_IrqHandler
+                0x00401b58                MemManage_Handler
+                0x00401b58                UART1_IrqHandler
+                0x00401b58                SVC_Handler
+                0x00401b58                SPI_IrqHandler
+                0x00401b58                RTC_IrqHandler
+                0x00401b58                EEFC_IrqHandler
+                0x00401b58                RSTC_IrqHandler
+                0x00401b58                SMC_IrqHandler
+                0x00401b58                PMC_IrqHandler
+                0x00401b58                BusFault_Handler
+                0x00401b58                TWI0_IrqHandler
+                0x00401b58                ADC_IrqHandler
+                0x00401b58                PWM_IrqHandler
  .text.PIO_DisableInterrupt
-                0x00401b44       0x1c ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
-                0x00401b44                PIO_DisableInterrupt
+                0x00401b60       0x1c ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
+                0x00401b60                PIO_DisableInterrupt
  .text.PIO_PullUp
-                0x00401b60       0x30 ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
-                0x00401b60                PIO_PullUp
+                0x00401b7c       0x30 ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
+                0x00401b7c                PIO_PullUp
  .text.PIO_SetPeripheral
-                0x00401b90      0x10c ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
-                0x00401b90                PIO_SetPeripheral
+                0x00401bac      0x10c ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
+                0x00401bac                PIO_SetPeripheral
  .text.PIO_SetInput
-                0x00401c9c       0x80 ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
-                0x00401c9c                PIO_SetInput
+                0x00401cb8       0x80 ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
+                0x00401cb8                PIO_SetInput
  .text.PIO_SetOutput
-                0x00401d1c       0x64 ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
-                0x00401d1c                PIO_SetOutput
+                0x00401d38       0x64 ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
+                0x00401d38                PIO_SetOutput
  .text.PIO_Configure
-                0x00401d80       0xf8 ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
-                0x00401d80                PIO_Configure
+                0x00401d9c       0xf8 ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
+                0x00401d9c                PIO_Configure
  .text.PMC_EnablePeripheral
-                0x00401e78       0xa4 ./..\libchip_sam3s4_gcc_dbg.a(pmc.o)
-                0x00401e78                PMC_EnablePeripheral
+                0x00401e94       0xa4 ./..\libchip_sam3s4_gcc_dbg.a(pmc.o)
+                0x00401e94                PMC_EnablePeripheral
  .text.PMC_DisablePeripheral
-                0x00401f1c       0xa4 ./..\libchip_sam3s4_gcc_dbg.a(pmc.o)
-                0x00401f1c                PMC_DisablePeripheral
+                0x00401f38       0xa4 ./..\libchip_sam3s4_gcc_dbg.a(pmc.o)
+                0x00401f38                PMC_DisablePeripheral
  .text.WDT_Disable
-                0x00401fc0       0x1c ./..\libchip_sam3s4_gcc_dbg.a(wdt.o)
-                0x00401fc0                WDT_Disable
+                0x00401fdc       0x1c ./..\libchip_sam3s4_gcc_dbg.a(wdt.o)
+                0x00401fdc                WDT_Disable
  .text.TimeTick_Increment
-                0x00401fdc       0x1c ./..\libchip_sam3s4_gcc_dbg.a(timetick.o)
-                0x00401fdc                TimeTick_Increment
- .text._sbrk    0x00401ff8       0x40 ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
-                0x00401ff8                _sbrk
- .text._close   0x00402038       0x18 ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
-                0x00402038                _close
- .text._fstat   0x00402050       0x24 ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
-                0x00402050                _fstat
- .text._isatty  0x00402074       0x18 ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
-                0x00402074                _isatty
- .text._lseek   0x0040208c       0x1c ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
-                0x0040208c                _lseek
- .text._read    0x004020a8       0x1c ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
-                0x004020a8                _read
- .text._write   0x004020c4       0x3c ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
-                0x004020c4                _write
- .text._exit    0x00402100       0x1c ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
-                0x00402100                _exit
- .text._kill    0x0040211c       0x14 ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
-                0x0040211c                _kill
- .text._getpid  0x00402130       0x10 ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
-                0x00402130                _getpid
- .text          0x00402140      0x278 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2\libgcc.a(_udivsi3.o)
-                0x00402140                __aeabi_uidiv
-                0x00402140                __udivsi3
-                0x0040239c                __aeabi_uidivmod
- .text          0x004023b8        0x4 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2\libgcc.a(_dvmd_tls.o)
-                0x004023b8                __aeabi_idiv0
-                0x004023b8                __aeabi_ldiv0
- .text          0x004023bc       0x54 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-assert.o)
-                0x004023bc                __assert_func
-                0x00402404                __assert
- .text          0x00402410       0x4c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fiprintf.o)
-                0x00402410                _fiprintf_r
-                0x00402430                fiprintf
- .text          0x0040245c       0x64 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-iprintf.o)
-                0x0040245c                iprintf
-                0x00402494                _iprintf_r
- .text          0x004024c0      0xdbc c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-vfiprintf.o)
-                0x004024c0                __sprint_r
-                0x00402544                _vfiprintf_r
-                0x00403260                vfiprintf
- .text          0x0040327c      0x104 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-wsetup.o)
-                0x0040327c                __swsetup_r
- .text          0x00403380       0x10 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-abort.o)
-                0x00403380                abort
- .text          0x00403390      0x1ec c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fflush.o)
-                0x00403390                _fflush_r
-                0x00403554                fflush
- .text          0x0040357c      0x220 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-findfp.o)
-                0x00403584                _cleanup_r
-                0x00403590                __sfmoreglue
-                0x004035c0                _cleanup
-                0x004035cc                __sinit
-                0x004036d4                __sfp
-                0x0040375c                __sfp_lock_acquire
-                0x00403760                __sfp_lock_release
-                0x00403764                __sinit_lock_acquire
-                0x00403768                __sinit_lock_release
-                0x0040376c                __fp_lock_all
-                0x00403784                __fp_unlock_all
- .text          0x0040379c      0x140 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fputwc.o)
-                0x0040379c                _fputwc_r
-                0x00403884                fputwc
- .text          0x004038dc      0x338 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fvwrite.o)
-                0x004038dc                __sfvwrite_r
- .text          0x00403c14       0xac c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fwalk.o)
-                0x00403c14                _fwalk
-                0x00403c68                _fwalk_reent
- .text          0x00403cc0       0xa0 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-locale.o)
-                0x00403cc0                _setlocale_r
-                0x00403d1c                __locale_charset
-                0x00403d28                __locale_mb_cur_max
-                0x00403d34                __locale_msgcharset
-                0x00403d3c                __locale_cjk_lang
-                0x00403d40                _localeconv_r
-                0x00403d48                setlocale
-                0x00403d58                localeconv
- .text          0x00403d60       0xec c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-makebuf.o)
-                0x00403d60                __smakebuf_r
- .text          0x00403e4c       0xb4 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-memset.o)
-                0x00403e4c                memset
- .text          0x00403f00      0x154 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-signal.o)
-                0x00403f00                _init_signal_r
-                0x00403f30                _signal_r
-                0x00403f6c                _raise_r
-                0x00403fc4                __sigtramp_r
-                0x00404018                raise
-                0x00404028                signal
-                0x00404038                _init_signal
-                0x00404044                __sigtramp
- .text          0x00404054       0x30 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-signalr.o)
-                0x00404054                _kill_r
-                0x00404080                _getpid_r
- .text          0x00404084       0x94 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-stdio.o)
-                0x00404084                __sread
-                0x004040a8                __seofread
-                0x004040ac                __swrite
-                0x004040e8                __sseek
-                0x00404110                __sclose
- .text          0x00404118       0xfc c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-wbuf.o)
-                0x00404118                __swbuf_r
-                0x00404204                __swbuf
- .text          0x00404214       0xd0 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-wcrtomb.o)
-                0x00404214                _wcrtomb_r
-                0x00404270                wcrtomb
- .text          0x004042e4       0x4c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-wctomb_r.o)
-                0x004042e4                __ascii_wctomb
-                0x00404300                _wctomb_r
- .text          0x00404330       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-writer.o)
-                0x00404330                _write_r
- .text          0x0040435c       0x28 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-closer.o)
-                0x0040435c                _close_r
- .text          0x00404384       0xc4 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fclose.o)
-                0x00404384                _fclose_r
-                0x00404438                fclose
- .text          0x00404448       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fstatr.o)
-                0x00404448                _fstat_r
- .text          0x00404474       0x28 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-isattyr.o)
-                0x00404474                _isatty_r
- .text          0x0040449c       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-lseekr.o)
-                0x0040449c                _lseek_r
- .text          0x004044c8       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-readr.o)
-                0x004044c8                _read_r
- .text          0x004044f4       0x2c c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2\libgcc.a(_aeabi_uldivmod.o)
-                0x004044f4                __aeabi_uldivmod
- .text          0x00404520       0x60 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2\libgcc.a(bpabi.o)
-                0x00404520                __gnu_ldivmod_helper
-                0x00404550                __gnu_uldivmod_helper
- .text          0x00404580      0x360 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2\libgcc.a(_divdi3.o)
-                0x00404580                __divdi3
- .text          0x004048e0      0x308 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2\libgcc.a(_udivdi3.o)
-                0x004048e0                __udivdi3
+                0x00401ff8       0x1c ./..\libchip_sam3s4_gcc_dbg.a(timetick.o)
+                0x00401ff8                TimeTick_Increment
+ .text.Wait     0x00402014       0x30 ./..\libchip_sam3s4_gcc_dbg.a(timetick.o)
+                0x00402014                Wait
+ .text._sbrk    0x00402044       0x40 ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
+                0x00402044                _sbrk
+ .text._close   0x00402084       0x18 ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
+                0x00402084                _close
+ .text._fstat   0x0040209c       0x24 ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
+                0x0040209c                _fstat
+ .text._isatty  0x004020c0       0x18 ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
+                0x004020c0                _isatty
+ .text._lseek   0x004020d8       0x1c ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
+                0x004020d8                _lseek
+ .text._read    0x004020f4       0x1c ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
+                0x004020f4                _read
+ .text._write   0x00402110       0x3c ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
+                0x00402110                _write
+ .text._exit    0x0040214c       0x1c ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
+                0x0040214c                _exit
+ .text._kill    0x00402168       0x14 ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
+                0x00402168                _kill
+ .text._getpid  0x0040217c       0x10 ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
+                0x0040217c                _getpid
+ *fill*         0x0040218c        0x4 00
+ .text          0x00402190      0x278 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2\libgcc.a(_udivsi3.o)
+                0x00402190                __aeabi_uidiv
+                0x00402190                __udivsi3
+                0x004023ec                __aeabi_uidivmod
+ .text          0x00402408        0x4 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2\libgcc.a(_dvmd_tls.o)
+                0x00402408                __aeabi_idiv0
+                0x00402408                __aeabi_ldiv0
+ .text          0x0040240c       0x54 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-assert.o)
+                0x0040240c                __assert_func
+                0x00402454                __assert
+ .text          0x00402460       0x4c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fiprintf.o)
+                0x00402460                _fiprintf_r
+                0x00402480                fiprintf
+ .text          0x004024ac       0x64 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-iprintf.o)
+                0x004024ac                iprintf
+                0x004024e4                _iprintf_r
+ .text          0x00402510      0xdbc c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-vfiprintf.o)
+                0x00402510                __sprint_r
+                0x00402594                _vfiprintf_r
+                0x004032b0                vfiprintf
+ .text          0x004032cc      0x104 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-wsetup.o)
+                0x004032cc                __swsetup_r
+ .text          0x004033d0       0x10 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-abort.o)
+                0x004033d0                abort
+ .text          0x004033e0      0x1ec c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fflush.o)
+                0x004033e0                _fflush_r
+                0x004035a4                fflush
+ .text          0x004035cc      0x220 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-findfp.o)
+                0x004035d4                _cleanup_r
+                0x004035e0                __sfmoreglue
+                0x00403610                _cleanup
+                0x0040361c                __sinit
+                0x00403724                __sfp
+                0x004037ac                __sfp_lock_acquire
+                0x004037b0                __sfp_lock_release
+                0x004037b4                __sinit_lock_acquire
+                0x004037b8                __sinit_lock_release
+                0x004037bc                __fp_lock_all
+                0x004037d4                __fp_unlock_all
+ .text          0x004037ec      0x140 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fputwc.o)
+                0x004037ec                _fputwc_r
+                0x004038d4                fputwc
+ .text          0x0040392c      0x338 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fvwrite.o)
+                0x0040392c                __sfvwrite_r
+ .text          0x00403c64       0xac c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fwalk.o)
+                0x00403c64                _fwalk
+                0x00403cb8                _fwalk_reent
+ .text          0x00403d10       0xa0 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-locale.o)
+                0x00403d10                _setlocale_r
+                0x00403d6c                __locale_charset
+                0x00403d78                __locale_mb_cur_max
+                0x00403d84                __locale_msgcharset
+                0x00403d8c                __locale_cjk_lang
+                0x00403d90                _localeconv_r
+                0x00403d98                setlocale
+                0x00403da8                localeconv
+ .text          0x00403db0       0xec c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-makebuf.o)
+                0x00403db0                __smakebuf_r
+ .text          0x00403e9c       0xb4 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-memset.o)
+                0x00403e9c                memset
+ .text          0x00403f50      0x154 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-signal.o)
+                0x00403f50                _init_signal_r
+                0x00403f80                _signal_r
+                0x00403fbc                _raise_r
+                0x00404014                __sigtramp_r
+                0x00404068                raise
+                0x00404078                signal
+                0x00404088                _init_signal
+                0x00404094                __sigtramp
+ .text          0x004040a4       0x30 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-signalr.o)
+                0x004040a4                _kill_r
+                0x004040d0                _getpid_r
+ .text          0x004040d4       0x94 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-stdio.o)
+                0x004040d4                __sread
+                0x004040f8                __seofread
+                0x004040fc                __swrite
+                0x00404138                __sseek
+                0x00404160                __sclose
+ .text          0x00404168       0xfc c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-wbuf.o)
+                0x00404168                __swbuf_r
+                0x00404254                __swbuf
+ .text          0x00404264       0xd0 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-wcrtomb.o)
+                0x00404264                _wcrtomb_r
+                0x004042c0                wcrtomb
+ .text          0x00404334       0x4c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-wctomb_r.o)
+                0x00404334                __ascii_wctomb
+                0x00404350                _wctomb_r
+ .text          0x00404380       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-writer.o)
+                0x00404380                _write_r
+ .text          0x004043ac       0x28 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-closer.o)
+                0x004043ac                _close_r
+ .text          0x004043d4       0xc4 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fclose.o)
+                0x004043d4                _fclose_r
+                0x00404488                fclose
+ .text          0x00404498       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fstatr.o)
+                0x00404498                _fstat_r
+ .text          0x004044c4       0x28 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-isattyr.o)
+                0x004044c4                _isatty_r
+ .text          0x004044ec       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-lseekr.o)
+                0x004044ec                _lseek_r
+ .text          0x00404518       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-readr.o)
+                0x00404518                _read_r
+ .text          0x00404544       0x2c c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2\libgcc.a(_aeabi_uldivmod.o)
+                0x00404544                __aeabi_uldivmod
+ .text          0x00404570       0x60 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2\libgcc.a(bpabi.o)
+                0x00404570                __gnu_ldivmod_helper
+                0x004045a0                __gnu_uldivmod_helper
+ .text          0x004045d0      0x360 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2\libgcc.a(_divdi3.o)
+                0x004045d0                __divdi3
+ .text          0x00404930      0x308 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2\libgcc.a(_udivdi3.o)
+                0x00404930                __udivdi3
  *(.glue_7t)
  .glue_7t       0x00000000        0x0 linker stubs
  *(.glue_7)
  .glue_7        0x00000000        0x0 linker stubs
  *(.rodata .rodata* .gnu.linkonce.r.*)
- .rodata        0x00404be8      0x404 test.o
- .rodata        0x00404fec      0x3f4 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
- .rodata        0x004053e0      0x3f4 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring_digital.o)
- *fill*         0x004057d4        0x4 00
- .rodata        0x004057d8      0x410 ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
-                0x004057e0                vtable for Print
- .rodata        0x00405be8      0x420 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
-                0x00405be8                vtable for UARTClass
+ .rodata        0x00404c38      0x404 test.o
+ .rodata        0x0040503c      0x3f4 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
+ .rodata        0x00405430      0x3f4 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring_digital.o)
+ *fill*         0x00405824        0x4 00
+ .rodata        0x00405828      0x410 ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
+                0x00405830                vtable for Print
+ .rodata        0x00405c38      0x420 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
+                0x00405c38                vtable for UARTClass
  .rodata._ZTV14HardwareSerial
-                0x00406008       0x30 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
-                0x00406008                vtable for HardwareSerial
+                0x00406058       0x30 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
+                0x00406058                vtable for HardwareSerial
  .rodata._ZTV6Stream
-                0x00406038       0x28 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
-                0x00406038                vtable for Stream
- .rodata        0x00406060        0x4 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-impure.o)
-                0x00406060                _global_impure_ptr
+                0x00406088       0x28 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
+                0x00406088                vtable for Stream
+ .rodata        0x004060b0        0x4 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-impure.o)
+                0x004060b0                _global_impure_ptr
  .rodata.str1.4
-                0x00406064        0x2 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-impure.o)
+                0x004060b4        0x2 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-impure.o)
                                   0x4 (size before relaxing)
- *fill*         0x00406066        0x2 00
- .rodata        0x00406068       0x60 ./..\libchip_sam3s4_gcc_dbg.a(pmc.o)
- .rodata        0x004060c8       0x1c ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
+ *fill*         0x004060b6        0x2 00
+ .rodata        0x004060b8       0x60 ./..\libchip_sam3s4_gcc_dbg.a(pmc.o)
+ .rodata        0x00406118       0x1c ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
  .rodata.str1.4
-                0x004060e4       0x3f c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-assert.o)
+                0x00406134       0x3f c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-assert.o)
                                  0x44 (size before relaxing)
- *fill*         0x00406123        0x1 00
- .rodata        0x00406124       0x20 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-vfiprintf.o)
- .rodata.str1.4
-                0x00406144       0x2f c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-vfiprintf.o)
-                                 0x30 (size before relaxing)
  *fill*         0x00406173        0x1 00
- .rodata        0x00406174       0x60 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-findfp.o)
-                0x00406174                __sf_fake_stdin
-                0x00406194                __sf_fake_stdout
-                0x004061b4                __sf_fake_stderr
+ .rodata        0x00406174       0x20 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-vfiprintf.o)
  .rodata.str1.4
-                0x004061d4        0xc c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-locale.o)
+                0x00406194       0x2f c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-vfiprintf.o)
+                                 0x30 (size before relaxing)
+ *fill*         0x004061c3        0x1 00
+ .rodata        0x004061c4       0x60 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-findfp.o)
+                0x004061c4                __sf_fake_stdin
+                0x004061e4                __sf_fake_stdout
+                0x00406204                __sf_fake_stderr
+ .rodata.str1.4
+                0x00406224        0xc c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-locale.o)
                                  0x14 (size before relaxing)
  *(.ARM.extab* .gnu.linkonce.armextab.*)
-                0x004061e0                . = ALIGN (0x4)
+                0x00406230                . = ALIGN (0x4)
  *(.init)
- .init          0x004061e0        0x4 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2/crti.o
-                0x004061e0                _init
- .init          0x004061e4        0x8 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2/crtn.o
-                0x004061ec                . = ALIGN (0x4)
-                0x004061ec                __preinit_array_start = .
+ .init          0x00406230        0x4 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2/crti.o
+                0x00406230                _init
+ .init          0x00406234        0x8 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2/crtn.o
+                0x0040623c                . = ALIGN (0x4)
+                0x0040623c                __preinit_array_start = .
  *(.preinit_array)
-                0x004061ec                __preinit_array_end = .
-                0x004061ec                . = ALIGN (0x4)
-                0x004061ec                __init_array_start = .
+                0x0040623c                __preinit_array_end = .
+                0x0040623c                . = ALIGN (0x4)
+                0x0040623c                __init_array_start = .
  *(SORT(.init_array.*))
  *(.init_array)
- .init_array    0x004061ec        0x4 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2/crtbegin.o
- .init_array    0x004061f0        0x4 ./..\libarduino_sam3s_ek_gcc_dbg.a(variant.o)
-                0x004061f4                __init_array_end = .
-                0x004061f4                . = ALIGN (0x4)
+ .init_array    0x0040623c        0x4 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2/crtbegin.o
+ .init_array    0x00406240        0x4 ./..\libarduino_sam3s_ek_gcc_dbg.a(variant.o)
+                0x00406244                __init_array_end = .
+                0x00406244                . = ALIGN (0x4)
  *crtbegin.o(.ctors)
  *(EXCLUDE_FILE(*crtend.o) .ctors)
  *(SORT(.ctors.*))
  *crtend.o(.ctors)
-                0x004061f4                . = ALIGN (0x4)
+                0x00406244                . = ALIGN (0x4)
  *(.fini)
- .fini          0x004061f4        0x4 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2/crti.o
-                0x004061f4                _fini
- .fini          0x004061f8        0x8 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2/crtn.o
-                0x00406200                . = ALIGN (0x4)
-                0x00406200                __fini_array_start = .
+ .fini          0x00406244        0x4 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2/crti.o
+                0x00406244                _fini
+ .fini          0x00406248        0x8 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2/crtn.o
+                0x00406250                . = ALIGN (0x4)
+                0x00406250                __fini_array_start = .
  *(.fini_array)
- .fini_array    0x00406200        0x4 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2/crtbegin.o
+ .fini_array    0x00406250        0x4 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2/crtbegin.o
  *(SORT(.fini_array.*))
-                0x00406204                __fini_array_end = .
+                0x00406254                __fini_array_end = .
  *crtbegin.o(.dtors)
  *(EXCLUDE_FILE(*crtend.o) .dtors)
  *(SORT(.dtors.*))
  *crtend.o(.dtors)
-                0x00406204                . = ALIGN (0x4)
-                0x00406204                _efixed = .
-                0x00406204                PROVIDE (__exidx_start, .)
+                0x00406254                . = ALIGN (0x4)
+                0x00406254                _efixed = .
+                0x00406254                PROVIDE (__exidx_start, .)
 
-.jcr            0x00406204        0x0
- .jcr           0x00406204        0x0 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2/crtbegin.o
+.jcr            0x00406254        0x0
+ .jcr           0x00406254        0x0 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2/crtbegin.o
 
-.vfp11_veneer   0x00406204        0x0
+.vfp11_veneer   0x00406254        0x0
  .vfp11_veneer  0x00000000        0x0 linker stubs
 
-.v4_bx          0x00406204        0x0
+.v4_bx          0x00406254        0x0
  .v4_bx         0x00000000        0x0 linker stubs
 
-.ARM.exidx      0x00406204        0x8
+.ARM.exidx      0x00406254        0x8
  *(.ARM.exidx* .gnu.linkonce.armexidx.*)
- .ARM.exidx     0x00406204        0x8 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2\libgcc.a(_divdi3.o)
- .ARM.exidx     0x0040620c        0x0 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2\libgcc.a(_udivdi3.o)
+ .ARM.exidx     0x00406254        0x8 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2\libgcc.a(_divdi3.o)
+ .ARM.exidx     0x0040625c        0x0 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2\libgcc.a(_udivdi3.o)
                                   0x8 (size before relaxing)
-                0x0040620c                PROVIDE (__exidx_end, .)
-                0x0040620c                . = ALIGN (0x4)
-                0x0040620c                _etext = .
+                0x0040625c                PROVIDE (__exidx_end, .)
+                0x0040625c                . = ALIGN (0x4)
+                0x0040625c                _etext = .
 
-.relocate       0x20000000      0x584 load address 0x0040620c
+.relocate       0x20000000      0x584 load address 0x0040625c
                 0x20000000                . = ALIGN (0x4)
                 0x20000000                _srelocate = .
  *(.ramfunc .ramfunc.*)
@@ -1076,7 +1080,7 @@ LOAD c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2/crtn.o
                 0x20000584                . = ALIGN (0x4)
                 0x20000584                _erelocate = .
 
-.bss            0x20000584      0x194 load address 0x00406790
+.bss            0x20000584      0x194 load address 0x004067e0
                 0x20000584                . = ALIGN (0x4)
                 0x20000584                _sbss = .
                 0x20000584                _szero = .
@@ -1104,7 +1108,7 @@ LOAD c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2/crtn.o
                 0x20000718                _ebss = .
                 0x20000718                _ezero = .
 
-.stack          0x20000718     0x2400 load address 0x00406924
+.stack          0x20000718     0x2400 load address 0x00406974
                 0x20000718                . = ALIGN (0x8)
  *(.stack .stack.*)
  .stack         0x20000718     0x2400 ./..\libarduino_sam3s_ek_gcc_dbg.a(board_cstartup_gnu_sam3.o)
@@ -1329,99 +1333,99 @@ OUTPUT(./test_gcc_dbg.elf elf32-littlearm)
  .debug_abbrev  0x00001439      0x1ce ./..\libchip_sam3s4_gcc_dbg.a(timetick.o)
  .debug_abbrev  0x00001607      0x10f ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
 
-.debug_info     0x00000000     0xa8f8
+.debug_info     0x00000000     0xa921
  .debug_info    0x00000000      0x7f9 test.o
  .debug_info    0x000007f9      0xaa5 ./..\libarduino_sam3s_ek_gcc_dbg.a(board_cstartup_gnu_sam3.o)
- .debug_info    0x0000129e     0x1042 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
- .debug_info    0x000022e0      0x85b ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring_digital.o)
- .debug_info    0x00002b3b     0x1b70 ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
- .debug_info    0x000046ab     0x11b1 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
- .debug_info    0x0000585c     0x206a ./..\libarduino_sam3s_ek_gcc_dbg.a(WString.o)
- .debug_info    0x000078c6      0x7d6 ./..\libarduino_sam3s_ek_gcc_dbg.a(main.o)
- .debug_info    0x0000809c      0xb53 ./..\libarduino_sam3s_ek_gcc_dbg.a(variant.o)
- .debug_info    0x00008bef       0x3e ./..\libarduino_sam3s_ek_gcc_dbg.a(cxxabi-compat.o)
- .debug_info    0x00008c2d      0x12c ./..\libarduino_sam3s_ek_gcc_dbg.a(HardwareSerial.o)
- .debug_info    0x00008d59       0xb8 ./..\libchip_sam3s4_gcc_dbg.a(exceptions.o)
- .debug_info    0x00008e11      0x96a ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
- .debug_info    0x0000977b      0x457 ./..\libchip_sam3s4_gcc_dbg.a(pmc.o)
- .debug_info    0x00009bd2      0x1df ./..\libchip_sam3s4_gcc_dbg.a(wdt.o)
- .debug_info    0x00009db1      0x66b ./..\libchip_sam3s4_gcc_dbg.a(timetick.o)
- .debug_info    0x0000a41c      0x4dc ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
+ .debug_info    0x0000129e     0x106b ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
+ .debug_info    0x00002309      0x85b ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring_digital.o)
+ .debug_info    0x00002b64     0x1b70 ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
+ .debug_info    0x000046d4     0x11b1 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
+ .debug_info    0x00005885     0x206a ./..\libarduino_sam3s_ek_gcc_dbg.a(WString.o)
+ .debug_info    0x000078ef      0x7d6 ./..\libarduino_sam3s_ek_gcc_dbg.a(main.o)
+ .debug_info    0x000080c5      0xb53 ./..\libarduino_sam3s_ek_gcc_dbg.a(variant.o)
+ .debug_info    0x00008c18       0x3e ./..\libarduino_sam3s_ek_gcc_dbg.a(cxxabi-compat.o)
+ .debug_info    0x00008c56      0x12c ./..\libarduino_sam3s_ek_gcc_dbg.a(HardwareSerial.o)
+ .debug_info    0x00008d82       0xb8 ./..\libchip_sam3s4_gcc_dbg.a(exceptions.o)
+ .debug_info    0x00008e3a      0x96a ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
+ .debug_info    0x000097a4      0x457 ./..\libchip_sam3s4_gcc_dbg.a(pmc.o)
+ .debug_info    0x00009bfb      0x1df ./..\libchip_sam3s4_gcc_dbg.a(wdt.o)
+ .debug_info    0x00009dda      0x66b ./..\libchip_sam3s4_gcc_dbg.a(timetick.o)
+ .debug_info    0x0000a445      0x4dc ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
 
-.debug_line     0x00000000     0x234e
+.debug_line     0x00000000     0x2362
  .debug_line    0x00000000      0x16d test.o
  .debug_line    0x0000016d      0x191 ./..\libarduino_sam3s_ek_gcc_dbg.a(board_cstartup_gnu_sam3.o)
- .debug_line    0x000002fe      0x22a ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
- .debug_line    0x00000528      0x193 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring_digital.o)
- .debug_line    0x000006bb      0x437 ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
- .debug_line    0x00000af2      0x2de ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
- .debug_line    0x00000dd0      0x809 ./..\libarduino_sam3s_ek_gcc_dbg.a(WString.o)
- .debug_line    0x000015d9      0x155 ./..\libarduino_sam3s_ek_gcc_dbg.a(main.o)
- .debug_line    0x0000172e      0x1a3 ./..\libarduino_sam3s_ek_gcc_dbg.a(variant.o)
- .debug_line    0x000018d1       0x47 ./..\libarduino_sam3s_ek_gcc_dbg.a(cxxabi-compat.o)
- .debug_line    0x00001918       0xcb ./..\libarduino_sam3s_ek_gcc_dbg.a(HardwareSerial.o)
- .debug_line    0x000019e3       0xe2 ./..\libchip_sam3s4_gcc_dbg.a(exceptions.o)
- .debug_line    0x00001ac5      0x1fb ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
- .debug_line    0x00001cc0      0x17b ./..\libchip_sam3s4_gcc_dbg.a(pmc.o)
- .debug_line    0x00001e3b      0x13f ./..\libchip_sam3s4_gcc_dbg.a(wdt.o)
- .debug_line    0x00001f7a      0x1a1 ./..\libchip_sam3s4_gcc_dbg.a(timetick.o)
- .debug_line    0x0000211b      0x233 ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
+ .debug_line    0x000002fe      0x23e ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
+ .debug_line    0x0000053c      0x193 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring_digital.o)
+ .debug_line    0x000006cf      0x437 ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
+ .debug_line    0x00000b06      0x2de ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
+ .debug_line    0x00000de4      0x809 ./..\libarduino_sam3s_ek_gcc_dbg.a(WString.o)
+ .debug_line    0x000015ed      0x155 ./..\libarduino_sam3s_ek_gcc_dbg.a(main.o)
+ .debug_line    0x00001742      0x1a3 ./..\libarduino_sam3s_ek_gcc_dbg.a(variant.o)
+ .debug_line    0x000018e5       0x47 ./..\libarduino_sam3s_ek_gcc_dbg.a(cxxabi-compat.o)
+ .debug_line    0x0000192c       0xcb ./..\libarduino_sam3s_ek_gcc_dbg.a(HardwareSerial.o)
+ .debug_line    0x000019f7       0xe2 ./..\libchip_sam3s4_gcc_dbg.a(exceptions.o)
+ .debug_line    0x00001ad9      0x1fb ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
+ .debug_line    0x00001cd4      0x17b ./..\libchip_sam3s4_gcc_dbg.a(pmc.o)
+ .debug_line    0x00001e4f      0x13f ./..\libchip_sam3s4_gcc_dbg.a(wdt.o)
+ .debug_line    0x00001f8e      0x1a1 ./..\libchip_sam3s4_gcc_dbg.a(timetick.o)
+ .debug_line    0x0000212f      0x233 ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
 
-.debug_loc      0x00000000     0x22a0
+.debug_loc      0x00000000     0x22d8
  .debug_loc     0x00000000       0x58 test.o
  .debug_loc     0x00000058       0x38 ./..\libarduino_sam3s_ek_gcc_dbg.a(board_cstartup_gnu_sam3.o)
- .debug_loc     0x00000090      0x184 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
- .debug_loc     0x00000214       0xa8 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring_digital.o)
- .debug_loc     0x000002bc      0x544 ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
- .debug_loc     0x00000800      0x2a0 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
- .debug_loc     0x00000aa0      0xe3c ./..\libarduino_sam3s_ek_gcc_dbg.a(WString.o)
- .debug_loc     0x000018dc       0x2c ./..\libarduino_sam3s_ek_gcc_dbg.a(main.o)
- .debug_loc     0x00001908       0xbc ./..\libarduino_sam3s_ek_gcc_dbg.a(variant.o)
- .debug_loc     0x000019c4       0x2c ./..\libarduino_sam3s_ek_gcc_dbg.a(cxxabi-compat.o)
- .debug_loc     0x000019f0       0x38 ./..\libarduino_sam3s_ek_gcc_dbg.a(HardwareSerial.o)
- .debug_loc     0x00001a28       0x2c ./..\libchip_sam3s4_gcc_dbg.a(exceptions.o)
- .debug_loc     0x00001a54      0x268 ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
- .debug_loc     0x00001cbc      0x100 ./..\libchip_sam3s4_gcc_dbg.a(pmc.o)
- .debug_loc     0x00001dbc      0x118 ./..\libchip_sam3s4_gcc_dbg.a(wdt.o)
- .debug_loc     0x00001ed4      0x170 ./..\libchip_sam3s4_gcc_dbg.a(timetick.o)
- .debug_loc     0x00002044      0x25c ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
+ .debug_loc     0x00000090      0x1bc ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
+ .debug_loc     0x0000024c       0xa8 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring_digital.o)
+ .debug_loc     0x000002f4      0x544 ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
+ .debug_loc     0x00000838      0x2a0 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
+ .debug_loc     0x00000ad8      0xe3c ./..\libarduino_sam3s_ek_gcc_dbg.a(WString.o)
+ .debug_loc     0x00001914       0x2c ./..\libarduino_sam3s_ek_gcc_dbg.a(main.o)
+ .debug_loc     0x00001940       0xbc ./..\libarduino_sam3s_ek_gcc_dbg.a(variant.o)
+ .debug_loc     0x000019fc       0x2c ./..\libarduino_sam3s_ek_gcc_dbg.a(cxxabi-compat.o)
+ .debug_loc     0x00001a28       0x38 ./..\libarduino_sam3s_ek_gcc_dbg.a(HardwareSerial.o)
+ .debug_loc     0x00001a60       0x2c ./..\libchip_sam3s4_gcc_dbg.a(exceptions.o)
+ .debug_loc     0x00001a8c      0x268 ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
+ .debug_loc     0x00001cf4      0x100 ./..\libchip_sam3s4_gcc_dbg.a(pmc.o)
+ .debug_loc     0x00001df4      0x118 ./..\libchip_sam3s4_gcc_dbg.a(wdt.o)
+ .debug_loc     0x00001f0c      0x170 ./..\libchip_sam3s4_gcc_dbg.a(timetick.o)
+ .debug_loc     0x0000207c      0x25c ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
 
 .debug_pubnames
-                0x00000000      0xd1d
+                0x00000000      0xd27
  .debug_pubnames
                 0x00000000       0x25 test.o
  .debug_pubnames
                 0x00000025       0x42 ./..\libarduino_sam3s_ek_gcc_dbg.a(board_cstartup_gnu_sam3.o)
  .debug_pubnames
-                0x00000067       0x87 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
+                0x00000067       0x91 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
  .debug_pubnames
-                0x000000ee       0x3f ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring_digital.o)
+                0x000000f8       0x3f ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring_digital.o)
  .debug_pubnames
-                0x0000012d      0x1cb ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
+                0x00000137      0x1cb ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
  .debug_pubnames
-                0x000002f8      0x11f ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
+                0x00000302      0x11f ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
  .debug_pubnames
-                0x00000417      0x524 ./..\libarduino_sam3s_ek_gcc_dbg.a(WString.o)
+                0x00000421      0x524 ./..\libarduino_sam3s_ek_gcc_dbg.a(WString.o)
  .debug_pubnames
-                0x0000093b       0x1b ./..\libarduino_sam3s_ek_gcc_dbg.a(main.o)
+                0x00000945       0x1b ./..\libarduino_sam3s_ek_gcc_dbg.a(main.o)
  .debug_pubnames
-                0x00000956       0x90 ./..\libarduino_sam3s_ek_gcc_dbg.a(variant.o)
+                0x00000960       0x90 ./..\libarduino_sam3s_ek_gcc_dbg.a(variant.o)
  .debug_pubnames
-                0x000009e6       0x29 ./..\libarduino_sam3s_ek_gcc_dbg.a(cxxabi-compat.o)
+                0x000009f0       0x29 ./..\libarduino_sam3s_ek_gcc_dbg.a(cxxabi-compat.o)
  .debug_pubnames
-                0x00000a0f       0x21 ./..\libarduino_sam3s_ek_gcc_dbg.a(HardwareSerial.o)
+                0x00000a19       0x21 ./..\libarduino_sam3s_ek_gcc_dbg.a(HardwareSerial.o)
  .debug_pubnames
-                0x00000a30       0x24 ./..\libchip_sam3s4_gcc_dbg.a(exceptions.o)
+                0x00000a3a       0x24 ./..\libchip_sam3s4_gcc_dbg.a(exceptions.o)
  .debug_pubnames
-                0x00000a54       0xe1 ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
+                0x00000a5e       0xe1 ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
  .debug_pubnames
-                0x00000b35       0x98 ./..\libchip_sam3s4_gcc_dbg.a(pmc.o)
+                0x00000b3f       0x98 ./..\libchip_sam3s4_gcc_dbg.a(pmc.o)
  .debug_pubnames
-                0x00000bcd       0x65 ./..\libchip_sam3s4_gcc_dbg.a(wdt.o)
+                0x00000bd7       0x65 ./..\libchip_sam3s4_gcc_dbg.a(wdt.o)
  .debug_pubnames
-                0x00000c32       0x64 ./..\libchip_sam3s4_gcc_dbg.a(timetick.o)
+                0x00000c3c       0x64 ./..\libchip_sam3s4_gcc_dbg.a(timetick.o)
  .debug_pubnames
-                0x00000c96       0x87 ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
+                0x00000ca0       0x87 ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
 
 .debug_pubtypes
                 0x00000000      0x93c
@@ -1458,172 +1462,172 @@ OUTPUT(./test_gcc_dbg.elf elf32-littlearm)
  .debug_pubtypes
                 0x00000886       0xb6 ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
 
-.debug_aranges  0x00000000      0x6a8
+.debug_aranges  0x00000000      0x6b0
  .debug_aranges
                 0x00000000       0x28 test.o
  .debug_aranges
                 0x00000028       0x20 ./..\libarduino_sam3s_ek_gcc_dbg.a(board_cstartup_gnu_sam3.o)
  .debug_aranges
-                0x00000048       0x58 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
+                0x00000048       0x60 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
  .debug_aranges
-                0x000000a0       0x30 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring_digital.o)
+                0x000000a8       0x30 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring_digital.o)
  .debug_aranges
-                0x000000d0       0xd8 ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
+                0x000000d8       0xd8 ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
  .debug_aranges
-                0x000001a8       0x78 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
+                0x000001b0       0x78 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
  .debug_aranges
-                0x00000220      0x220 ./..\libarduino_sam3s_ek_gcc_dbg.a(WString.o)
+                0x00000228      0x220 ./..\libarduino_sam3s_ek_gcc_dbg.a(WString.o)
  .debug_aranges
-                0x00000440       0x20 ./..\libarduino_sam3s_ek_gcc_dbg.a(main.o)
+                0x00000448       0x20 ./..\libarduino_sam3s_ek_gcc_dbg.a(main.o)
  .debug_aranges
-                0x00000460       0x38 ./..\libarduino_sam3s_ek_gcc_dbg.a(variant.o)
+                0x00000468       0x38 ./..\libarduino_sam3s_ek_gcc_dbg.a(variant.o)
  .debug_aranges
-                0x00000498       0x20 ./..\libarduino_sam3s_ek_gcc_dbg.a(cxxabi-compat.o)
+                0x000004a0       0x20 ./..\libarduino_sam3s_ek_gcc_dbg.a(cxxabi-compat.o)
  .debug_aranges
-                0x000004b8       0x20 ./..\libarduino_sam3s_ek_gcc_dbg.a(HardwareSerial.o)
+                0x000004c0       0x20 ./..\libarduino_sam3s_ek_gcc_dbg.a(HardwareSerial.o)
  .debug_aranges
-                0x000004d8       0x20 ./..\libchip_sam3s4_gcc_dbg.a(exceptions.o)
+                0x000004e0       0x20 ./..\libchip_sam3s4_gcc_dbg.a(exceptions.o)
  .debug_aranges
-                0x000004f8       0x70 ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
+                0x00000500       0x70 ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
  .debug_aranges
-                0x00000568       0x40 ./..\libchip_sam3s4_gcc_dbg.a(pmc.o)
+                0x00000570       0x40 ./..\libchip_sam3s4_gcc_dbg.a(pmc.o)
  .debug_aranges
-                0x000005a8       0x40 ./..\libchip_sam3s4_gcc_dbg.a(wdt.o)
+                0x000005b0       0x40 ./..\libchip_sam3s4_gcc_dbg.a(wdt.o)
  .debug_aranges
-                0x000005e8       0x50 ./..\libchip_sam3s4_gcc_dbg.a(timetick.o)
+                0x000005f0       0x50 ./..\libchip_sam3s4_gcc_dbg.a(timetick.o)
  .debug_aranges
-                0x00000638       0x70 ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
+                0x00000640       0x70 ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
 
-.debug_ranges   0x00000000      0x5b0
+.debug_ranges   0x00000000      0x5b8
  .debug_ranges  0x00000000       0x18 test.o
  .debug_ranges  0x00000018       0x10 ./..\libarduino_sam3s_ek_gcc_dbg.a(board_cstartup_gnu_sam3.o)
- .debug_ranges  0x00000028       0x48 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
- .debug_ranges  0x00000070       0x20 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring_digital.o)
- .debug_ranges  0x00000090       0xc8 ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
- .debug_ranges  0x00000158       0x68 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
- .debug_ranges  0x000001c0      0x228 ./..\libarduino_sam3s_ek_gcc_dbg.a(WString.o)
- .debug_ranges  0x000003e8       0x10 ./..\libarduino_sam3s_ek_gcc_dbg.a(main.o)
- .debug_ranges  0x000003f8       0x28 ./..\libarduino_sam3s_ek_gcc_dbg.a(variant.o)
- .debug_ranges  0x00000420       0x10 ./..\libarduino_sam3s_ek_gcc_dbg.a(cxxabi-compat.o)
- .debug_ranges  0x00000430       0x10 ./..\libarduino_sam3s_ek_gcc_dbg.a(HardwareSerial.o)
- .debug_ranges  0x00000440       0x10 ./..\libchip_sam3s4_gcc_dbg.a(exceptions.o)
- .debug_ranges  0x00000450       0x60 ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
- .debug_ranges  0x000004b0       0x30 ./..\libchip_sam3s4_gcc_dbg.a(pmc.o)
- .debug_ranges  0x000004e0       0x30 ./..\libchip_sam3s4_gcc_dbg.a(wdt.o)
- .debug_ranges  0x00000510       0x40 ./..\libchip_sam3s4_gcc_dbg.a(timetick.o)
- .debug_ranges  0x00000550       0x60 ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
+ .debug_ranges  0x00000028       0x50 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
+ .debug_ranges  0x00000078       0x20 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring_digital.o)
+ .debug_ranges  0x00000098       0xc8 ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
+ .debug_ranges  0x00000160       0x68 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
+ .debug_ranges  0x000001c8      0x228 ./..\libarduino_sam3s_ek_gcc_dbg.a(WString.o)
+ .debug_ranges  0x000003f0       0x10 ./..\libarduino_sam3s_ek_gcc_dbg.a(main.o)
+ .debug_ranges  0x00000400       0x28 ./..\libarduino_sam3s_ek_gcc_dbg.a(variant.o)
+ .debug_ranges  0x00000428       0x10 ./..\libarduino_sam3s_ek_gcc_dbg.a(cxxabi-compat.o)
+ .debug_ranges  0x00000438       0x10 ./..\libarduino_sam3s_ek_gcc_dbg.a(HardwareSerial.o)
+ .debug_ranges  0x00000448       0x10 ./..\libchip_sam3s4_gcc_dbg.a(exceptions.o)
+ .debug_ranges  0x00000458       0x60 ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
+ .debug_ranges  0x000004b8       0x30 ./..\libchip_sam3s4_gcc_dbg.a(pmc.o)
+ .debug_ranges  0x000004e8       0x30 ./..\libchip_sam3s4_gcc_dbg.a(wdt.o)
+ .debug_ranges  0x00000518       0x40 ./..\libchip_sam3s4_gcc_dbg.a(timetick.o)
+ .debug_ranges  0x00000558       0x60 ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
 
-.debug_str      0x00000000     0x1e93
+.debug_str      0x00000000     0x1ea0
  .debug_str     0x00000000      0x514 test.o
                                 0x574 (size before relaxing)
  .debug_str     0x00000514      0x115 ./..\libarduino_sam3s_ek_gcc_dbg.a(board_cstartup_gnu_sam3.o)
                                 0x61d (size before relaxing)
- .debug_str     0x00000629      0x40f ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
-                                0x9c3 (size before relaxing)
- .debug_str     0x00000a38       0x42 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring_digital.o)
+ .debug_str     0x00000629      0x421 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
+                                0x9d5 (size before relaxing)
+ .debug_str     0x00000a4a       0x42 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring_digital.o)
                                 0x58a (size before relaxing)
- .debug_str     0x00000a7a      0x9ac ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
+ .debug_str     0x00000a8c      0x9ac ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
                                 0xf1d (size before relaxing)
- .debug_str     0x00001426      0x309 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
+ .debug_str     0x00001438      0x309 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
                                 0xa97 (size before relaxing)
- .debug_str     0x0000172f      0x1a8 ./..\libarduino_sam3s_ek_gcc_dbg.a(WString.o)
+ .debug_str     0x00001741      0x1a8 ./..\libarduino_sam3s_ek_gcc_dbg.a(WString.o)
                                 0x9be (size before relaxing)
- .debug_str     0x000018d7       0x11 ./..\libarduino_sam3s_ek_gcc_dbg.a(main.o)
+ .debug_str     0x000018e9       0x11 ./..\libarduino_sam3s_ek_gcc_dbg.a(main.o)
                                 0x55e (size before relaxing)
- .debug_str     0x000018e8       0xf8 ./..\libarduino_sam3s_ek_gcc_dbg.a(variant.o)
+ .debug_str     0x000018fa       0xf8 ./..\libarduino_sam3s_ek_gcc_dbg.a(variant.o)
                                 0x8fa (size before relaxing)
- .debug_str     0x000019e0       0x28 ./..\libarduino_sam3s_ek_gcc_dbg.a(cxxabi-compat.o)
+ .debug_str     0x000019f2       0x28 ./..\libarduino_sam3s_ek_gcc_dbg.a(cxxabi-compat.o)
                                  0x6a (size before relaxing)
- .debug_str     0x00001a08       0x48 ./..\libarduino_sam3s_ek_gcc_dbg.a(HardwareSerial.o)
+ .debug_str     0x00001a1a       0x48 ./..\libarduino_sam3s_ek_gcc_dbg.a(HardwareSerial.o)
                                 0x145 (size before relaxing)
- .debug_str     0x00001a50       0x5d ./..\libchip_sam3s4_gcc_dbg.a(exceptions.o)
+ .debug_str     0x00001a62       0x5d ./..\libchip_sam3s4_gcc_dbg.a(exceptions.o)
                                 0x107 (size before relaxing)
- .debug_str     0x00001aad      0x11c ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
+ .debug_str     0x00001abf      0x11c ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
                                 0x54b (size before relaxing)
- .debug_str     0x00001bc9       0x8f ./..\libchip_sam3s4_gcc_dbg.a(pmc.o)
+ .debug_str     0x00001bdb       0x8f ./..\libchip_sam3s4_gcc_dbg.a(pmc.o)
                                 0x2bc (size before relaxing)
- .debug_str     0x00001c58       0x59 ./..\libchip_sam3s4_gcc_dbg.a(wdt.o)
+ .debug_str     0x00001c6a       0x54 ./..\libchip_sam3s4_gcc_dbg.a(wdt.o)
                                 0x160 (size before relaxing)
- .debug_str     0x00001cb1       0x82 ./..\libchip_sam3s4_gcc_dbg.a(timetick.o)
+ .debug_str     0x00001cbe       0x82 ./..\libchip_sam3s4_gcc_dbg.a(timetick.o)
                                 0x43b (size before relaxing)
- .debug_str     0x00001d33      0x160 ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
+ .debug_str     0x00001d40      0x160 ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
                                 0x265 (size before relaxing)
 
-.debug_frame    0x00000000     0x2328
+.debug_frame    0x00000000     0x2348
  .debug_frame   0x00000000       0x48 test.o
  .debug_frame   0x00000048       0x30 ./..\libarduino_sam3s_ek_gcc_dbg.a(board_cstartup_gnu_sam3.o)
- .debug_frame   0x00000078       0xf4 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
- .debug_frame   0x0000016c       0x70 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring_digital.o)
- .debug_frame   0x000001dc      0x310 ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
- .debug_frame   0x000004ec      0x178 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
- .debug_frame   0x00000664      0x820 ./..\libarduino_sam3s_ek_gcc_dbg.a(WString.o)
- .debug_frame   0x00000e84       0x2c ./..\libarduino_sam3s_ek_gcc_dbg.a(main.o)
- .debug_frame   0x00000eb0       0x84 ./..\libarduino_sam3s_ek_gcc_dbg.a(variant.o)
- .debug_frame   0x00000f34       0x28 ./..\libarduino_sam3s_ek_gcc_dbg.a(cxxabi-compat.o)
- .debug_frame   0x00000f5c       0x2c ./..\libarduino_sam3s_ek_gcc_dbg.a(HardwareSerial.o)
- .debug_frame   0x00000f88       0x30 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-atol.o)
- .debug_frame   0x00000fb8       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-init.o)
- .debug_frame   0x00000fe4       0x20 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-isspace.o)
- .debug_frame   0x00001004       0x30 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-malloc.o)
- .debug_frame   0x00001034       0x3c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-mallocr.o)
- .debug_frame   0x00001070       0x30 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-memcpy.o)
- .debug_frame   0x000010a0       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-memmove.o)
- .debug_frame   0x000010cc       0x30 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-mlock.o)
- .debug_frame   0x000010fc       0x20 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-realloc.o)
- .debug_frame   0x0000111c       0x3c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-reallocr.o)
- .debug_frame   0x00001158       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-sbrkr.o)
- .debug_frame   0x00001184       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-strchr.o)
- .debug_frame   0x000011b0       0x30 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-strcmp.o)
- .debug_frame   0x000011e0       0x20 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-strcpy.o)
- .debug_frame   0x00001200       0x20 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-strlen.o)
- .debug_frame   0x00001220       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-strncmp.o)
- .debug_frame   0x0000124c       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-strncpy.o)
- .debug_frame   0x00001278       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-strrchr.o)
- .debug_frame   0x000012a4       0x90 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-strstr.o)
- .debug_frame   0x00001334       0x54 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-strtol.o)
- .debug_frame   0x00001388       0x20 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-tolower.o)
- .debug_frame   0x000013a8       0x20 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-toupper.o)
- .debug_frame   0x000013c8       0x50 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-freer.o)
- .debug_frame   0x00001418       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-memchr.o)
- .debug_frame   0x00001444       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-memcmp.o)
- .debug_frame   0x00001470       0x68 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-reent.o)
- .debug_frame   0x000014d8       0x28 ./..\libchip_sam3s4_gcc_dbg.a(exceptions.o)
- .debug_frame   0x00001500      0x150 ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
- .debug_frame   0x00001650       0xa0 ./..\libchip_sam3s4_gcc_dbg.a(pmc.o)
- .debug_frame   0x000016f0       0x9c ./..\libchip_sam3s4_gcc_dbg.a(wdt.o)
- .debug_frame   0x0000178c       0xd4 ./..\libchip_sam3s4_gcc_dbg.a(timetick.o)
- .debug_frame   0x00001860      0x144 ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
- .debug_frame   0x000019a4       0x20 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2\libgcc.a(_udivsi3.o)
- .debug_frame   0x000019c4       0x44 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-assert.o)
- .debug_frame   0x00001a08       0x5c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fiprintf.o)
- .debug_frame   0x00001a64       0x5c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-iprintf.o)
- .debug_frame   0x00001ac0       0x7c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-vfiprintf.o)
- .debug_frame   0x00001b3c       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-wsetup.o)
- .debug_frame   0x00001b68       0x28 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-abort.o)
- .debug_frame   0x00001b90       0x40 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fflush.o)
- .debug_frame   0x00001bd0      0x114 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-findfp.o)
- .debug_frame   0x00001ce4       0x54 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fputwc.o)
- .debug_frame   0x00001d38       0x3c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fvwrite.o)
- .debug_frame   0x00001d74       0x58 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fwalk.o)
- .debug_frame   0x00001dcc       0x98 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-locale.o)
- .debug_frame   0x00001e64       0x34 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-makebuf.o)
- .debug_frame   0x00001e98       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-memset.o)
- .debug_frame   0x00001ec4       0xc0 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-signal.o)
- .debug_frame   0x00001f84       0x3c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-signalr.o)
- .debug_frame   0x00001fc0       0x80 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-stdio.o)
- .debug_frame   0x00002040       0x3c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-wbuf.o)
- .debug_frame   0x0000207c       0x5c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-wcrtomb.o)
- .debug_frame   0x000020d8       0x44 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-wctomb_r.o)
- .debug_frame   0x0000211c       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-writer.o)
- .debug_frame   0x00002148       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-closer.o)
- .debug_frame   0x00002174       0x3c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fclose.o)
- .debug_frame   0x000021b0       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fstatr.o)
- .debug_frame   0x000021dc       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-isattyr.o)
- .debug_frame   0x00002208       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-lseekr.o)
- .debug_frame   0x00002234       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-readr.o)
- .debug_frame   0x00002260       0x50 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2\libgcc.a(bpabi.o)
- .debug_frame   0x000022b0       0x3c c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2\libgcc.a(_divdi3.o)
- .debug_frame   0x000022ec       0x3c c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2\libgcc.a(_udivdi3.o)
+ .debug_frame   0x00000078      0x114 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
+ .debug_frame   0x0000018c       0x70 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring_digital.o)
+ .debug_frame   0x000001fc      0x310 ./..\libarduino_sam3s_ek_gcc_dbg.a(Print.o)
+ .debug_frame   0x0000050c      0x178 ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
+ .debug_frame   0x00000684      0x820 ./..\libarduino_sam3s_ek_gcc_dbg.a(WString.o)
+ .debug_frame   0x00000ea4       0x2c ./..\libarduino_sam3s_ek_gcc_dbg.a(main.o)
+ .debug_frame   0x00000ed0       0x84 ./..\libarduino_sam3s_ek_gcc_dbg.a(variant.o)
+ .debug_frame   0x00000f54       0x28 ./..\libarduino_sam3s_ek_gcc_dbg.a(cxxabi-compat.o)
+ .debug_frame   0x00000f7c       0x2c ./..\libarduino_sam3s_ek_gcc_dbg.a(HardwareSerial.o)
+ .debug_frame   0x00000fa8       0x30 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-atol.o)
+ .debug_frame   0x00000fd8       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-init.o)
+ .debug_frame   0x00001004       0x20 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-isspace.o)
+ .debug_frame   0x00001024       0x30 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-malloc.o)
+ .debug_frame   0x00001054       0x3c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-mallocr.o)
+ .debug_frame   0x00001090       0x30 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-memcpy.o)
+ .debug_frame   0x000010c0       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-memmove.o)
+ .debug_frame   0x000010ec       0x30 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-mlock.o)
+ .debug_frame   0x0000111c       0x20 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-realloc.o)
+ .debug_frame   0x0000113c       0x3c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-reallocr.o)
+ .debug_frame   0x00001178       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-sbrkr.o)
+ .debug_frame   0x000011a4       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-strchr.o)
+ .debug_frame   0x000011d0       0x30 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-strcmp.o)
+ .debug_frame   0x00001200       0x20 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-strcpy.o)
+ .debug_frame   0x00001220       0x20 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-strlen.o)
+ .debug_frame   0x00001240       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-strncmp.o)
+ .debug_frame   0x0000126c       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-strncpy.o)
+ .debug_frame   0x00001298       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-strrchr.o)
+ .debug_frame   0x000012c4       0x90 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-strstr.o)
+ .debug_frame   0x00001354       0x54 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-strtol.o)
+ .debug_frame   0x000013a8       0x20 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-tolower.o)
+ .debug_frame   0x000013c8       0x20 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-toupper.o)
+ .debug_frame   0x000013e8       0x50 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-freer.o)
+ .debug_frame   0x00001438       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-memchr.o)
+ .debug_frame   0x00001464       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-memcmp.o)
+ .debug_frame   0x00001490       0x68 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-reent.o)
+ .debug_frame   0x000014f8       0x28 ./..\libchip_sam3s4_gcc_dbg.a(exceptions.o)
+ .debug_frame   0x00001520      0x150 ./..\libchip_sam3s4_gcc_dbg.a(pio.o)
+ .debug_frame   0x00001670       0xa0 ./..\libchip_sam3s4_gcc_dbg.a(pmc.o)
+ .debug_frame   0x00001710       0x9c ./..\libchip_sam3s4_gcc_dbg.a(wdt.o)
+ .debug_frame   0x000017ac       0xd4 ./..\libchip_sam3s4_gcc_dbg.a(timetick.o)
+ .debug_frame   0x00001880      0x144 ./..\libarduino_sam3s_ek_gcc_dbg.a(syscalls_sam3.o)
+ .debug_frame   0x000019c4       0x20 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2\libgcc.a(_udivsi3.o)
+ .debug_frame   0x000019e4       0x44 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-assert.o)
+ .debug_frame   0x00001a28       0x5c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fiprintf.o)
+ .debug_frame   0x00001a84       0x5c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-iprintf.o)
+ .debug_frame   0x00001ae0       0x7c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-vfiprintf.o)
+ .debug_frame   0x00001b5c       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-wsetup.o)
+ .debug_frame   0x00001b88       0x28 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-abort.o)
+ .debug_frame   0x00001bb0       0x40 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fflush.o)
+ .debug_frame   0x00001bf0      0x114 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-findfp.o)
+ .debug_frame   0x00001d04       0x54 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fputwc.o)
+ .debug_frame   0x00001d58       0x3c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fvwrite.o)
+ .debug_frame   0x00001d94       0x58 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fwalk.o)
+ .debug_frame   0x00001dec       0x98 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-locale.o)
+ .debug_frame   0x00001e84       0x34 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-makebuf.o)
+ .debug_frame   0x00001eb8       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-memset.o)
+ .debug_frame   0x00001ee4       0xc0 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-signal.o)
+ .debug_frame   0x00001fa4       0x3c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-signalr.o)
+ .debug_frame   0x00001fe0       0x80 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-stdio.o)
+ .debug_frame   0x00002060       0x3c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-wbuf.o)
+ .debug_frame   0x0000209c       0x5c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-wcrtomb.o)
+ .debug_frame   0x000020f8       0x44 c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-wctomb_r.o)
+ .debug_frame   0x0000213c       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-writer.o)
+ .debug_frame   0x00002168       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-closer.o)
+ .debug_frame   0x00002194       0x3c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fclose.o)
+ .debug_frame   0x000021d0       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-fstatr.o)
+ .debug_frame   0x000021fc       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-isattyr.o)
+ .debug_frame   0x00002228       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-lseekr.o)
+ .debug_frame   0x00002254       0x2c c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-readr.o)
+ .debug_frame   0x00002280       0x50 c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2\libgcc.a(bpabi.o)
+ .debug_frame   0x000022d0       0x3c c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2\libgcc.a(_divdi3.o)
+ .debug_frame   0x0000230c       0x3c c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2\libgcc.a(_udivdi3.o)
 
 Cross Reference Table
 
@@ -1840,8 +1844,8 @@ UART1_IrqHandler()                                ./..\libarduino_sam3s_ek_gcc_d
 UARTClass::IrqHandler()                           ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
                                                   ./..\libarduino_sam3s_ek_gcc_dbg.a(variant.o)
 UARTClass::UARTClass(Uart*, IRQn, unsigned long, _ring_buffer*, _ring_buffer*) ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
-                                                  ./..\libarduino_sam3s_ek_gcc_dbg.a(variant.o)
 UARTClass::UARTClass(Uart*, IRQn, unsigned long, _ring_buffer*, _ring_buffer*) ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
+                                                  ./..\libarduino_sam3s_ek_gcc_dbg.a(variant.o)
 UARTClass::available()                            ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
 UARTClass::begin(unsigned long)                   ./..\libarduino_sam3s_ek_gcc_dbg.a(UART.o)
                                                   test.o
@@ -1867,7 +1871,7 @@ WDT_IrqHandler                                    ./..\libchip_sam3s4_gcc_dbg.a(
                                                   ./..\libarduino_sam3s_ek_gcc_dbg.a(board_cstartup_gnu_sam3.o)
 WDT_Restart                                       ./..\libchip_sam3s4_gcc_dbg.a(wdt.o)
 Wait                                              ./..\libchip_sam3s4_gcc_dbg.a(timetick.o)
-Wait(unsigned long)                               test.o
+                                                  ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
 _Jv_RegisterClasses                               c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2/crtbegin.o
 _PathLocale                                       c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-locale.o)
 __adddf3                                          c:/codesourcery_2011.03-42/bin/../lib/gcc/arm-none-eabi/4.5.2/thumb2\libgcc.a(_arm_addsubdf3.o)
@@ -2189,6 +2193,8 @@ abort                                             c:\codesourcery_2011.03-42\bin
 atol                                              c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-atol.o)
                                                   ./..\libarduino_sam3s_ek_gcc_dbg.a(WString.o)
 cleanup_glue                                      c:\codesourcery_2011.03-42\bin\../arm-none-eabi/lib/thumb2\libc.a(lib_a-reent.o)
+delay                                             ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
+                                                  test.o
 delayMicroseconds                                 ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring.o)
 digitalRead                                       ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring_digital.o)
 digitalWrite                                      ./..\libarduino_sam3s_ek_gcc_dbg.a(wiring_digital.o)
