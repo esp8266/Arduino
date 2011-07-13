@@ -56,8 +56,8 @@ extern "C"{
 #define degrees(rad) ((rad)*RAD_TO_DEG)
 #define sq(x) ((x)*(x))
 
-#define interrupts() sei()
-#define noInterrupts() cli()
+#define interrupts() __enable_irq()
+#define noInterrupts() __disable_irq()
 
 #define clockCyclesPerMicrosecond() ( VARIANT_MCK / 1000000L )
 #define clockCyclesToMicroseconds(a) ( ((a) * 1000L) / (VARIANT_MCK / 1000L) )

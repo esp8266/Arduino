@@ -111,9 +111,6 @@ wiring.o:
 00000000 T init
 00000000 T micros
 00000000 T millis
-00000008 b timer0_fract
-00000004 B timer0_millis
-00000000 B timer0_overflow_count
 
 wiring_digital.o:
 00000004 r APinDescription
