@@ -55,7 +55,7 @@ else
 OUTPUT_OBJ=release
 OUTPUT_BIN=test_$(TOOLCHAIN)_rel
 #LIBS=-L../libchip_$(CHIP)_$(TOOLCHAIN)_rel.a -L../arduino_$(VARIANT)_$(TOOLCHAIN)_rel.a
-LIBS=-Wl,--start-group -lgcc -lc -lchip_$(CHIP)_$(TOOLCHAIN)_rel -larduino_$(VARIANT)_$(TOOLCHAIN)_rel -Wl,--end-group
+LIBS=-Wl,--start-group -lgcc -lc -lchip_$(CHIP)_$(TOOLCHAIN)_rel -larduino_$(VARIANT)_$(TOOLCHAIN)_rel -lstdc++ -Wl,--end-group
 endif
 
 //OUTPUT_PATH=$(OUTPUT_OBJ)_test.elf
@@ -87,10 +87,10 @@ test: $(OUTPUT_BIN)
 
 $(addprefix $(OUTPUT_PATH)/,$(CPP_OBJ)): $(OUTPUT_PATH)/%.o: %.cpp
 #	@$(CC) -c $(CPPFLAGS) $< -o $@
-	@$(CC) -xc++ -c $(CPPFLAGS) $< -o $@
+	@$(CXX) -c $(CPPFLAGS) $< -o $@
 
 $(OUTPUT_BIN): $(addprefix $(OUTPUT_PATH)/, $(C_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(CPP_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(A_OBJ))
-	@$(CC) $(LIB_PATH) $(LDFLAGS) -T"$(VARIANT_PATH)/linker_scripts/flash.ld" -Wl,-Map,$(OUTPUT_PATH)/$@.map -o $(OUTPUT_PATH)/$@.elf $^ $(LIBS)
+	$(CC) $(LIB_PATH) $(LDFLAGS) -T"$(VARIANT_PATH)/linker_scripts/flash.ld" -Wl,-Map,$(OUTPUT_PATH)/$@.map -o $(OUTPUT_PATH)/$@.elf $^ $(LIBS)
 	$(NM) $(OUTPUT_PATH)/$@.elf >$(OUTPUT_PATH)/$@.elf.txt
 	$(OBJCOPY) -O binary $(OUTPUT_PATH)/$@.elf $(OUTPUT_PATH)/$@.bin
 	$(SIZE) $^ $(OUTPUT_PATH)/$@.elf

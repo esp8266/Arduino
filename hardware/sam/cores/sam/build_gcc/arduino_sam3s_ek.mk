@@ -137,7 +137,7 @@ $(addprefix $(OUTPUT_PATH)/,$(CPP_OBJ)): $(OUTPUT_PATH)/%.o: %.cpp
 
 $(OUTPUT_PATH)/variant.o: $(VARIANT_PATH)/variant.cpp
 #	@$(CC) -c $(CPPFLAGS) $< -o $@
-	@$(CC) -xc++ -c $(CPPFLAGS) $< -o $@
+	@$(CXX) -c $(CPPFLAGS) $< -o $@
 
 $(addprefix $(OUTPUT_PATH)/,$(A_OBJ)): $(OUTPUT_PATH)/%.o: %.s
 	@$(AS) -c $(ASFLAGS) $< -o $@
@@ -153,6 +153,3 @@ clean:
 	@echo --- Cleaning sam3s_ek files [$(OUTPUT_PATH)$(SEP)*.o]
 	-@$(RM) $(OUTPUT_PATH) 1>NUL 2>&1
 	-@$(RM) $(OUTPUT_BIN)/$(OUTPUT_LIB) 1>NUL 2>&1
-
-#$(addprefix $(OUTPUT_PATH)/,$(C_OBJ)): $(OUTPUT_PATH)/%.o: $(PROJECT_BASE_PATH)/chip.h $(wildcard $(PROJECT_BASE_PATH)/include/*.h)
-#$(addprefix $(OUTPUT_PATH)/,$(CPP_OBJ)): $(OUTPUT_PATH)/%.o: $(PROJECT_BASE_PATH)/chip.h $(wildcard $(PROJECT_BASE_PATH)/include/*.h)

@@ -6,6 +6,7 @@ CROSS_COMPILE = C:/CodeSourcery_2011.03-42/bin/arm-none-eabi-
 # Compilation tools
 AR = $(CROSS_COMPILE)ar
 CC = $(CROSS_COMPILE)gcc
+CXX = $(CROSS_COMPILE)g++
 AS = $(CROSS_COMPILE)as
 #LD = $(CROSS_COMPILE)ld
 SIZE = $(CROSS_COMPILE)size
@@ -29,7 +30,7 @@ CFLAGS += -Wpacked -Wredundant-decls -Wnested-externs -Winline -Wlong-long
 CFLAGS += -Wunreachable-code
 CFLAGS += -Wcast-align
 
-CFLAGS += --param max-inline-insns-single=500 -mcpu=cortex-m3 -mthumb -mlong-calls -ffunction-sections
+CFLAGS += --param max-inline-insns-single=500 -mcpu=cortex-m3 -mthumb -mlong-calls -ffunction-sections -nostdlib 
 CFLAGS += $(OPTIMIZATION) $(INCLUDES) -D$(CHIP) -D$(VARIANT)
 
 # To reduce application size use only integer printf function.
@@ -47,7 +48,7 @@ CPPFLAGS += -Wsign-compare -Waggregate-return -Wmissing-declarations
 CPPFLAGS += -Wformat -Wmissing-format-attribute -Wno-deprecated-declarations
 CPPFLAGS += -Wpacked -Wredundant-decls -Winline -Wlong-long
 
-CPPFLAGS += --param max-inline-insns-single=500 -mcpu=cortex-m3 -mthumb -mlong-calls -ffunction-sections
+CPPFLAGS += --param max-inline-insns-single=500 -mcpu=cortex-m3 -mthumb -mlong-calls -ffunction-sections -fno-rtti -fno-exceptions
 CPPFLAGS += $(OPTIMIZATION) $(INCLUDES) -D$(CHIP)
 
 # To reduce application size use only integer printf function.

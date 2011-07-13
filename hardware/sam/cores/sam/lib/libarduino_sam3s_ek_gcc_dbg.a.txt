@@ -141,11 +141,11 @@ HardwareSerial.o:
 00000000 T _Z10store_charhP12_ring_buffer
 
 Print.o:
-00000030 r _ZL15APinDescription
-0000002b r _ZL2SS
-0000002e r _ZL3SCK
-0000002d r _ZL4MISO
-0000002c r _ZL4MOSI
+00000020 r _ZL15APinDescription
+0000001c r _ZL2SS
+0000001f r _ZL3SCK
+0000001e r _ZL4MISO
+0000001d r _ZL4MOSI
 00000000 T _ZN5Print10printFloatEdh
 00000000 T _ZN5Print11printNumberEmh
 00000000 T _ZN5Print5printEPKc
@@ -171,10 +171,7 @@ Print.o:
 00000000 T _ZN5Print7printlnEv
 00000000 W _ZNK6String6lengthEv
          U _ZNK6StringixEj
-0000001c R _ZTI5Print
-00000024 R _ZTS5Print
 00000008 R _ZTV5Print
-         U _ZTVN10__cxxabiv117__class_type_infoE
          U __aeabi_d2iz
          U __aeabi_d2uiz
          U __aeabi_dadd
@@ -184,18 +181,17 @@ Print.o:
          U __aeabi_dsub
          U __aeabi_i2d
          U __aeabi_ui2d
-         U __aeabi_unwind_cpp_pr1
          U __cxa_pure_virtual
 
 UART.o:
          U PMC_DisablePeripheral
          U PMC_EnablePeripheral
          U _Z10store_charhP12_ring_buffer
-00000048 r _ZL15APinDescription
-00000043 r _ZL2SS
-00000046 r _ZL3SCK
-00000045 r _ZL4MISO
-00000044 r _ZL4MOSI
+00000030 r _ZL15APinDescription
+0000002c r _ZL2SS
+0000002f r _ZL3SCK
+0000002e r _ZL4MISO
+0000002d r _ZL4MOSI
 00000000 W _ZN14HardwareSerialC1Ev
 00000000 W _ZN14HardwareSerialC2Ev
 00000000 n _ZN14HardwareSerialC5Ev
@@ -217,30 +213,21 @@ UART.o:
 00000000 T _ZN9UARTClass9availableEv
 00000000 T _ZN9UARTClassC1EP4Uart4IRQnmP12_ring_bufferS4_
 00000000 T _ZN9UARTClassC2EP4Uart4IRQnmP12_ring_bufferS4_
-00000000 V _ZTI14HardwareSerial
-         U _ZTI5Print
-00000000 V _ZTI6Stream
-0000002c R _ZTI9UARTClass
-00000000 V _ZTS14HardwareSerial
-00000000 V _ZTS6Stream
-00000038 R _ZTS9UARTClass
 00000000 V _ZTV14HardwareSerial
          U _ZTV5Print
 00000000 V _ZTV6Stream
 00000000 R _ZTV9UARTClass
-         U _ZTVN10__cxxabiv120__si_class_type_infoE
-         U __aeabi_unwind_cpp_pr1
          U __cxa_pure_virtual
 
 USART.o:
          U PMC_DisablePeripheral
          U PMC_EnablePeripheral
          U _Z10store_charhP12_ring_buffer
-0000004c r _ZL15APinDescription
-00000045 r _ZL2SS
-00000048 r _ZL3SCK
-00000047 r _ZL4MISO
-00000046 r _ZL4MOSI
+00000030 r _ZL15APinDescription
+0000002c r _ZL2SS
+0000002f r _ZL3SCK
+0000002e r _ZL4MISO
+0000002d r _ZL4MOSI
 00000000 T _ZN10USARTClass10IrqHandlerEv
 00000000 T _ZN10USARTClass3endEv
 00000000 T _ZN10USARTClass4peekEv
@@ -262,19 +249,10 @@ USART.o:
 00000000 W _ZN6StreamC1Ev
 00000000 W _ZN6StreamC2Ev
 00000000 n _ZN6StreamC5Ev
-0000002c R _ZTI10USARTClass
-00000000 V _ZTI14HardwareSerial
-         U _ZTI5Print
-00000000 V _ZTI6Stream
-00000038 R _ZTS10USARTClass
-00000000 V _ZTS14HardwareSerial
-00000000 V _ZTS6Stream
 00000000 R _ZTV10USARTClass
 00000000 V _ZTV14HardwareSerial
          U _ZTV5Print
 00000000 V _ZTV6Stream
-         U _ZTVN10__cxxabiv120__si_class_type_infoE
-         U __aeabi_unwind_cpp_pr1
          U __cxa_pure_virtual
 
 WMath.o:
@@ -363,7 +341,6 @@ WString.o:
 00000000 T _ZplRK15StringSumHelperj
 00000000 T _ZplRK15StringSumHelperl
 00000000 T _ZplRK15StringSumHelperm
-         U __aeabi_unwind_cpp_pr1
          U atol
          U free
          U isspace
@@ -381,13 +358,15 @@ WString.o:
          U tolower
          U toupper
 
+cxxabi-compat.o:
+00000000 T __cxa_pure_virtual
+
 main.o:
 00000004 r _ZL15APinDescription
 00000000 r _ZL2SS
 00000003 r _ZL3SCK
 00000002 r _ZL4MISO
 00000001 r _ZL4MOSI
-         U __aeabi_unwind_cpp_pr0
          U init
          U loop
 00000000 T main
@@ -407,7 +386,6 @@ variant.o:
 00000001 r _ZL4MOSI
          U _ZN9UARTClass10IrqHandlerEv
          U _ZN9UARTClassC1EP4Uart4IRQnmP12_ring_bufferS4_
-         U __aeabi_unwind_cpp_pr0
 00000000 B rx_buffer1
 00000090 B rx_buffer2
 00000048 B tx_buffer1
