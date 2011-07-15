@@ -41,6 +41,7 @@
 #define HTTP_VERSION        "HTTP/1.1"
 
 static const char * index_file = "index.html";
+static const char * rfc1123_format = "%a, %d %b %Y %H:%M:%S GMT";
 
 static int special_read(struct connstruct *cn, void *buf, size_t count);
 static int special_write(struct connstruct *cn, 
@@ -373,8 +374,11 @@ void procsendhead(struct connstruct *cn)
 {
     char buf[MAXREQUESTLENGTH];
     struct stat stbuf;
-    time_t now = cn->timeout - CONFIG_HTTP_TIMEOUT;
+    time_t t_time;
+    struct tm *ptm;
     char date[32];
+    char last_modified[32];
+    char expires[32];
     int file_exists;
 
     /* are we trying to access a file over the HTTP connection instead of a
@@ -439,17 +443,26 @@ void procsendhead(struct connstruct *cn)
         return;
     }
 
-    strcpy(date, ctime(&now));
+
+    time(&t_time);
+    ptm = gmtime(&t_time);
+    strftime(date, sizeof(date), rfc1123_format, ptm);
 
     /* has the file been read before? */
-    if (cn->if_modified_since != -1 && (cn->if_modified_since == 0 || 
-                                       cn->if_modified_since >= stbuf.st_mtime))
+    if (cn->if_modified_since != -1)  
+                                       
     {
-        snprintf(buf, sizeof(buf), HTTP_VERSION" 304 Not Modified\nServer: "
-                "%s\nDate: %s\n", server_version, date);
-        special_write(cn, buf, strlen(buf));
-        cn->state = STATE_WANT_TO_READ_HEAD;
-        return;
+        ptm = gmtime(&stbuf.st_mtime);
+        t_time = mktime(ptm);
+
+        if (cn->if_modified_since >= t_time)
+        {
+            snprintf(buf, sizeof(buf), HTTP_VERSION" 304 Not Modified\nServer: "
+                "%s\nDate: %s\n\n", server_version, date);
+            special_write(cn, buf, strlen(buf));
+            cn->state = STATE_WANT_TO_READ_HEAD;
+            return;
+        }
     }
 
     if (cn->reqtype == TYPE_HEAD) 
@@ -471,11 +484,17 @@ void procsendhead(struct connstruct *cn)
             return;
         }
 
+        ptm = gmtime(&stbuf.st_mtime);
+        strftime(last_modified, sizeof(last_modified), rfc1123_format, ptm);
+        t_time += CONFIG_HTTP_TIMEOUT;
+        ptm = gmtime(&t_time);
+        strftime(expires, sizeof(expires), rfc1123_format, ptm);
+
         snprintf(buf, sizeof(buf), HTTP_VERSION" 200 OK\nServer: %s\n"
             "Content-Type: %s\nContent-Length: %ld\n"
-            "Date: %sLast-Modified: %s\n", server_version,
+            "Date: %s\nLast-Modified: %s\nExpires: %s\n\n", server_version,
             getmimetype(cn->actualfile), (long) stbuf.st_size,
-            date, ctime(&stbuf.st_mtime)); /* ctime() has a \n on the end */
+            date, last_modified, expires); 
 
         special_write(cn, buf, strlen(buf));
 

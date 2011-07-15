@@ -89,13 +89,9 @@ time_t tdate_parse(const char* str)
     memset(&tm, 0, sizeof(struct tm));
 
     /* wdy, DD mth YY HH:MM:SS GMT */
-    if ((sscanf(str, "%3[a-zA-Z], %d %3[a-zA-Z] %d %d:%d:%d GMT",
+    if (sscanf(str, "%3[a-zA-Z], %d %3[a-zA-Z] %d %d:%d:%d GMT",
                 str_wday, &tm_mday, str_mon, &tm_year, &tm_hour, &tm_min,
-                    &tm_sec) == 7) ||
-    /* wdy mth DD HH:MM:SS YY */
-        (sscanf(str, "%3[a-zA-Z] %3[a-zA-Z] %d %d:%d:%d %d",
-                str_wday, str_mon, &tm_mday, &tm_hour, &tm_min, &tm_sec,
-                    &tm_year) == 7))
+                    &tm_sec) == 7)
     {
         int8_t tm_wday = day_mon_map_search(str_wday, wday_tab, 
                         sizeof(wday_tab)/sizeof(struct day_mon_map));
