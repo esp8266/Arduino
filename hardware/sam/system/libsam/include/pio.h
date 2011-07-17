@@ -5,7 +5,7 @@
  *         Headers
  */
 
-#include "chip.h"
+#include "../chip.h"
 
 #include <stdint.h>
 

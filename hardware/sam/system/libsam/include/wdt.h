@@ -44,7 +44,7 @@
 #ifndef _WDT_
 #define _WDT_
 
-#include "chip.h"
+#include "../chip.h"
 
 #include <stdint.h>
 

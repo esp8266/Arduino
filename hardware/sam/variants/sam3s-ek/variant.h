@@ -20,6 +20,10 @@
 
 /*----------------------------------------------------------------------------*/
 
+#ifndef sam3s_ek
+#define sam3s_ek
+#endif
+
 /** Name of the board */
 #define VARIANT_NAME "SAM3S-EK"
 
