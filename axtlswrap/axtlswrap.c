@@ -41,6 +41,7 @@
 #include <string.h>
 #include <signal.h>
 #include <sys/poll.h>
+#include "os_port.h"
 #include "ssl.h"
 
 /* If nothing is received or sent in this many seconds, give up */

@@ -44,6 +44,7 @@ struct serverstruct *servers;
 struct connstruct *usedconns;
 struct connstruct *freeconns;
 const char * const server_version = "axhttpd/"AXTLS_VERSION;
+static const char *webroot = CONFIG_HTTP_WEBROOT;
 
 static void addtoservers(int sd);
 static int openlistener(char *address, int port);
@@ -182,9 +183,18 @@ int main(int argc, char *argv[])
             continue;
         }
 
-        printf("%s: [-p [address:]httpport] [-s [address:]httpsport]\n", 
-                                                        argv[0]);
-        exit(0);
+        if (strcmp(argv[i], "-w") == 0 && argv[i+1] != NULL)
+        {
+            webroot = argv[i+1];
+            i += 2;
+            continue;
+        }
+
+        printf("%s:\n"
+               "    [-p [address:]httpport]\n"
+               "    [-s [address:]httpsport]\n"
+               "    [-w webroot]\n", argv[0]);
+        exit(1);
     }
 
     for (i = 0; i < INITIAL_CONNECTION_SLOTS; i++) 
@@ -644,10 +654,9 @@ void removeconnection(struct connstruct *cn)
 /*
  * Change directories one way or the other.
  */
+
 static void ax_chdir(void)
 {
-    static char *webroot = CONFIG_HTTP_WEBROOT;
-
     if (chdir(webroot))
     {
 #ifdef CONFIG_HTTP_VERBOSE
