@@ -1,0 +1,240 @@
+<html>
+
+<head>
+<title>CMSIS Debug Support</title>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="GENERATOR" content="Microsoft FrontPage 12.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<style>
+<!--
+/*-----------------------------------------------------------
+Keil Software CHM Style Sheet
+-----------------------------------------------------------*/
+body         { color: #000000; background-color: #FFFFFF; font-size: 75%; font-family: 
+               Verdana, Arial, 'Sans Serif' }
+a:link       { color: #0000FF; text-decoration: underline }
+a:visited    { color: #0000FF; text-decoration: underline }
+a:active     { color: #FF0000; text-decoration: underline }
+a:hover      { color: #FF0000; text-decoration: underline }
+h1           { font-family: Verdana; font-size: 18pt; color: #000080; font-weight: bold; 
+               text-align: Center; margin-right: 3 }
+h2           { font-family: Verdana; font-size: 14pt; color: #000080; font-weight: bold; 
+               background-color: #CCCCCC; margin-top: 24; margin-bottom: 3; 
+               padding: 6 }
+h3           { font-family: Verdana; font-size: 10pt; font-weight: bold; background-color: 
+               #CCCCCC; margin-top: 24; margin-bottom: 3; padding: 6 }
+pre          { font-family: Courier New; font-size: 10pt; background-color: #CCFFCC; 
+               margin-left: 24; margin-right: 24 }
+ul           { list-style-type: square; margin-top: 6pt; margin-bottom: 0 }
+ol           { margin-top: 6pt; margin-bottom: 0 }
+li           { clear: both; margin-bottom: 6pt }
+table        { font-size: 100%; border-width: 0; padding: 0 }
+th           { color: #FFFFFF; background-color: #000080; text-align: left; vertical-align: 
+               bottom; padding-right: 6pt }
+tr           { text-align: left; vertical-align: top }
+td           { text-align: left; vertical-align: top; padding-right: 6pt }
+.ToolT       { font-size: 8pt; color: #808080 }
+.TinyT       { font-size: 8pt; text-align: Center }
+code         { color: #000000; background-color: #E0E0E0; font-family: 'Courier New', Courier; 
+               line-height: 120%; font-style: normal }
+/*-----------------------------------------------------------
+Notes
+-----------------------------------------------------------*/
+p.note       { font-weight: bold; clear: both; margin-bottom: 3pt; padding-top: 6pt }
+/*-----------------------------------------------------------
+Expanding/Contracting Divisions
+-----------------------------------------------------------*/
+#expand      { text-decoration: none; margin-bottom: 3pt }
+img.expand   { border-style: none; border-width: medium }
+div.expand   { display: none; margin-left: 9pt; margin-top: 0 }
+/*-----------------------------------------------------------
+Where List Tags
+-----------------------------------------------------------*/
+p.wh         { font-weight: bold; clear: both; margin-top: 6pt; margin-bottom: 3pt }
+table.wh     { width: 100% }
+td.whItem    { white-space: nowrap; font-style: italic; padding-right: 6pt; padding-bottom: 
+               6pt }
+td.whDesc    { padding-bottom: 6pt }
+/*-----------------------------------------------------------
+Keil Table Tags
+-----------------------------------------------------------*/
+table.kt     { border: 1pt solid #000000 }
+th.kt        { white-space: nowrap; border-bottom: 1pt solid #000000; padding-left: 6pt; 
+               padding-right: 6pt; padding-top: 4pt; padding-bottom: 4pt }
+tr.kt        {  }
+td.kt        { color: #000000; background-color: #E0E0E0; border-top: 1pt solid #A0A0A0; 
+               padding-left: 6pt; padding-right: 6pt; padding-top: 2pt; 
+               padding-bottom: 2pt }
+/*-----------------------------------------------------------
+-----------------------------------------------------------*/
+-->
+
+</style>
+</head>
+
+<body>
+
+<h1>CMSIS Debug Support</h1>
+<p align="center">This file describes the CMSIS Debug support available with CMSIS (starting V1.30).</p>
+<p align="center">Version: 1.02 - 25. July 2011</p>
+
+<p class="TinyT">Information in this file, the accompany manuals, and software is<br>
+                 Copyright © ARM Ltd.<br>All rights reserved.
+</p>
+
+<hr>
+
+<p><span style="FONT-WEIGHT: bold">Revision History</span></p>
+<ul>
+	<li>Version 1.00: Initial Release. </li>
+	<li>Version 1.01: Internal Review. </li>
+	<li>Version 1.02: Removed product specific information. </li>
+</ul>
+
+<hr>
+
+<h2>Contents</h2>
+
+<ol>
+  <li class="LI2"><a href="#About">About</a></li>
+  <li class="LI2"><a href="#ITM_DbgAcc">Cortex-M3 / Cortex-M4 ITM Debug Access</a></li>
+  <li class="LI2"><a href="#DbgIn_DbgOut">Debug IN / OUT functions</a></li>
+  <li class="LI2"><a href="#ITM_DbgSup">ITM Debug Support in Debugger</a></li>
+</ol>
+
+<p>&nbsp;</p>
+<h2><a name="About"></a>About</h2>
+<p>
+  CMSIS provides for Cortex-M3 / Cortex-M4 processor based microcontrollers debug support via the Instrumented Trace Macrocell (ITM).
+  This document describes the available CMSIS Debug functions and the used methods.
+</p>
+
+<p>&nbsp;</p>
+<h2><a name="ITM_DbgAcc"></a>Cortex-M3 / Cortex-M4 ITM Debug Access</h2>
+<p>
+  The Cortex-M3 incorporates the Instrumented Trace Macrocell (ITM) that provides together with 
+  the Serial Viewer Output trace capabilities for the microcontroller system. The ITM has 
+  32 communication channels which are able to transmit 32 / 16 / 8 bit values; two ITM 
+  communication channels are used by CMSIS to output the following information:
+</p>
+<ul>
+	<li>ITM Channel 0: used for printf-style output via the debug interface.</li>
+	<li>ITM Channel 31: is reserved for RTOS kernel awareness debugging.</li>
+</ul>
+
+<p>&nbsp;</p>
+<h2><a name="DbgIn_DbgOut"></a>Debug IN / OUT functions</h2>
+<p>CMSIS provides following debug functions:</p>
+<ul>
+	<li>ITM_SendChar (uses ITM channel 0)</li>
+	<li>ITM_ReceiveChar (uses global variable)</li>
+	<li>ITM_CheckChar (uses global variable)</li>
+</ul>
+
+<h3>ITM_SendChar</h3>
+<p>
+  <strong>ITM_SendChar</strong> is used to transmit a character over ITM channel 0 from 
+  the microcontroller system to the debug system. <br>
+  Only a 8 bit value is transmitted.
+</p>
+<pre>
+static __INLINE uint32_t ITM_SendChar (uint32_t ch)
+{
+  /* check if debugger connected and ITM channel enabled for tracing */
+  if ((CoreDebug->DEMCR & CoreDebug_DEMCR_TRCENA)  &amp;&amp;
+      (ITM-&gt;TCR & ITM_TCR_ITMENA)                  &amp;&amp;
+      (ITM-&gt;TER & (1UL &lt;&lt; 0))  ) 
+  {
+    while (ITM-&gt;PORT[0].u32 == 0);
+    ITM-&gt;PORT[0].u8 = (uint8_t)ch;
+  }  
+  return (ch);
+}</pre>
+
+<h3>ITM_ReceiveChar</h3>
+<p>
+  ITM communication channel is only capable for OUT direction. For IN direction
+  a global variable is used. A simple mechanism detects if a character is received.
+  The project to test need to be build with debug information.
+</p>
+
+<p>
+  The global variable <strong>ITM_RxBuffer</strong> is used to transmit a 8 bit value from debug system
+  to microcontroller system. <strong>ITM_RxBuffer</strong> is 32 bit wide to 
+	ensure a proper handshake.
+</p>
+<pre>
+extern volatile int32_t ITM_RxBuffer;                    /* variable to receive characters                             */
+</pre>
+<p>
+  A dedicated bit pattern is used to determine if <strong>ITM_RxBuffer</strong> is empty
+  or contains a valid value.
+</p>
+<pre>
+#define                 ITM_RXBUFFER_EMPTY    0x5AA55AA5 /* value identifying ITM_RxBuffer is ready for next character */
+</pre>
+<p>
+  <strong>ITM_ReceiveChar</strong> is used to receive a 8 bit value from the debug system. The function is nonblocking.
+  It returns the received character or '-1' if no character was available.
+</p>
+<pre>
+static __INLINE int32_t ITM_ReceiveChar (void) {
+  int32_t ch = -1;                               /* no character available */
+
+  if (ITM_RxBuffer != ITM_RXBUFFER_EMPTY) {
+    ch = ITM_RxBuffer;
+    ITM_RxBuffer = ITM_RXBUFFER_EMPTY;       /* ready for next character */
+  }
+  
+  return (ch); 
+}
+</pre>
+
+<h3>ITM_CheckChar</h3>
+<p>
+  <strong>ITM_CheckChar</strong> is used to check if a character is received.
+</p>
+<pre>
+static __INLINE int32_t ITM_CheckChar (void) {
+
+  if (ITM_RxBuffer == ITM_RXBUFFER_EMPTY) {
+    return (0);                                 /* no character available */
+  } else {
+    return (1);                                 /*    character available */
+  }
+}</pre>
+
+
+<p>&nbsp;</p>
+<h2><a name="ITM_DbgSup"></a>ITM Debug Support in a Debugger</h2>
+<p>
+  The Debugger shall offer a dedicated console window for printf style debug input and output using the CMSIS defined ITM methods described above.
+</p>
+<p>Direction: Microcontroller -&gt; Debugger:</p>
+<ul>
+  <li>
+    at the beginning of a debug session the debugger shall enable ITM trace on channel 0 and continuously snoop for channel 0 data on the ITM trace
+    stream it receives from the Microcontroller's CoreSight ITM unit
+  </li>
+  <li>
+    data received via the ITM communication channel 0 is interpreted as charater and gets redirected into the dedicated <strong>Console Window</strong>
+  </li>
+</ul>
+
+<p>Direction: Debugger -&gt; Microcontroller:</p>
+<ul>
+  <li>
+    at the beginning of a debug session the debugger shall seek for the presence of the global variable named <strong>ITM_RxBuffer</strong> in the debug
+    information of the application being loaded
+  </li>
+  <li>
+    strings entered into the <strong>Console Window</strong> are written by the debugger as a stream of char values via the variable <strong>ITM_RxBuffer</strong>.
+  </li>
+  <li>
+    the debugger writes the next character into the <strong>ITM_RxBuffer</strong> only once the value has been read and the <strong>ITM_RXBUFFER_EMPTY</strong> value being set.
+    (refer to: ITM_ReceiveChar()).
+</ul>
+
+</body>
+
+</html>
