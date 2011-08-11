@@ -1,5 +1,23 @@
 ##############################################################
 
+leonardo.name=Arduino Leonardo
+leonardo.upload.protocol=stk500
+leonardo.upload.maximum_size=30720
+leonardo.upload.speed=115200
+leonardo.bootloader.low_fuses=0xde
+leonardo.bootloader.high_fuses=0xd8
+leonardo.bootloader.extended_fuses=0xf3
+leonardo.bootloader.path=diskloader
+leonardo.bootloader.file=diskloader_atmega32u4.hex
+leonardo.bootloader.unlock_bits=0x3F
+leonardo.bootloader.lock_bits=0x0F
+leonardo.build.mcu=atmega32u4
+leonardo.build.f_cpu=16000000L
+leonardo.build.core=arduino
+leonardo.build.pins=leonardo
+
+##############################################################
+
 uno.name=Arduino Uno
 uno.upload.protocol=stk500
 uno.upload.maximum_size=32256
