@@ -129,31 +129,31 @@ const static uint8_t A7 = 21;
 const uint16_t PROGMEM port_to_mode_PGM[] = {
 	NOT_A_PORT,
 	NOT_A_PORT,
-	&DDRB,
-	&DDRC,
-	&DDRD,
-	&DDRE,
-	&DDRF,
+	(uint16_t) &DDRB,
+	(uint16_t) &DDRC,
+	(uint16_t) &DDRD,
+	(uint16_t) &DDRE,
+	(uint16_t) &DDRF,
 };
 
 const uint16_t PROGMEM port_to_output_PGM[] = {
 	NOT_A_PORT,
 	NOT_A_PORT,
-	&PORTB,
-	&PORTC,
-	&PORTD,
-	&PORTE,
-	&PORTF,
+	(uint16_t) &PORTB,
+	(uint16_t) &PORTC,
+	(uint16_t) &PORTD,
+	(uint16_t) &PORTE,
+	(uint16_t) &PORTF,
 };
 
 const uint16_t PROGMEM port_to_input_PGM[] = {
 	NOT_A_PORT,
 	NOT_A_PORT,
-	&PINB,
-	&PINC,
-	&PIND,
-	&PINE,
-	&PINF,
+	(uint16_t) &PINB,
+	(uint16_t) &PINC,
+	(uint16_t) &PIND,
+	(uint16_t) &PINE,
+	(uint16_t) &PINF,
 };
 
 const uint8_t PROGMEM digital_pin_to_port_PGM[18] = {
@@ -210,8 +210,8 @@ const uint8_t PROGMEM digital_pin_to_timer_PGM[18] = {
 	NOT_ON_TIMER,
 	TIMER0B,
 	NOT_ON_TIMER,
-	TIMER4D,
-	NOT_ON_TIMER,	// TIMER4D_NOT TODO. Complementary output of TIMER4D on Digital Pin 6. Not sure this was intended.
+	NOT_ON_TIMER,	// TIMER4D		TODO - ZE - Fix this when there's a decision on what to do about these PWM pins
+	NOT_ON_TIMER,	// TIMER4D_NOT	TODO - ZE - Complementary output of TIMER4D on Digital Pin 6. Not sure this was intended.
 	NOT_ON_TIMER,
 	
 	NOT_ON_TIMER,	/* 8 port B */
