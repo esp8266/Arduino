@@ -63,6 +63,7 @@ class HardwareSerial : public Stream
   extern HardwareSerial Serial;
 #elif defined(USBCON)
   #include "usb_api.h"
+  extern HardwareSerial Serial_;
 #endif
 #if defined(UBRR1H)
   extern HardwareSerial Serial1;

@@ -50,6 +50,10 @@ struct ring_buffer
   volatile int tail;
 };
 
+#if defined(USBCON)
+  ring_buffer rx_buffer = { { 0 }, 0, 0};
+  ring_buffer tx_buffer = { { 0 }, 0, 0};
+#endif
 #if defined(UBRRH) || defined(UBRR0H)
   ring_buffer rx_buffer  =  { { 0 }, 0, 0 };
   ring_buffer tx_buffer  =  { { 0 }, 0, 0 };
@@ -81,6 +85,15 @@ inline void store_char(unsigned char c, ring_buffer *buffer)
   }
 }
 
+#if defined(__AVR_ATmega32U4__)
+  void serialEvent() __attribute__((weak));
+  void serialEvent() {}
+  SIGNAL(USART1_RX_vect) {
+    unsigned char c = UDR1;
+    store_char(c, &rx_buffer);
+	  serialEvent();
+  }
+#else
 #if !defined(USART_RX_vect) && !defined(SIG_USART0_RECV) && \
     !defined(SIG_UART0_RECV) && !defined(USART0_RX_vect) && \
 	!defined(SIG_UART_RECV)
@@ -150,8 +163,19 @@ inline void store_char(unsigned char c, ring_buffer *buffer)
 #elif defined(SIG_USART3_RECV)
   #error SIG_USART3_RECV
 #endif
+#endif
 
-
+#if defined(__AVR_ATmega32U4__)
+ISR(USART1_UDRE_vect) {
+  if (tx_buffer.head == tx_buffer.tail) {
+    cbi(UCSR1B, UDRIE1);  
+  } else {
+	unsigned char c = tx_buffer.buffer[tx_buffer.tail];
+    tx_buffer.tail = (tx_buffer.tail + 1) % SERIAL_BUFFER_SIZE;  
+    UDR1 = c;
+  }
+}
+#else
 #if !defined(UART0_UDRE_vect) && !defined(UART_UDRE_vect) && !defined(USART0_UDRE_vect) && !defined(USART_UDRE_vect)
   #error Don't know what the Data Register Empty vector is called for the first UART
 #else
@@ -204,6 +228,7 @@ ISR(USART1_UDRE_vect)
     UDR1 = c;
   }
 }
+#endif
 #endif
 
 #ifdef USART2_UDRE_vect
