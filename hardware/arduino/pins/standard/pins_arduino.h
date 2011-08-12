@@ -27,6 +27,16 @@
 
 #include <avr/pgmspace.h>
 
+#define NUM_DIGITAL_PINS            20
+#define NUM_ANALOG_INPUTS           6
+#define analogInputToDigitalPin(p)  ((p < 6) ? (p) + 14 : -1)
+
+#if defined(__AVR_ATmega8__)
+#define digitalPinHasPWM(p)         ((p) == 9 || (p) == 10 || (p) == 11)
+#else
+#define digitalPinHasPWM(p)         ((p) == 3 || (p) == 5 || (p) == 6 || (p) == 9 || (p) == 10 || (p) == 11)
+#endif
+
 const static uint8_t SS   = 10;
 const static uint8_t MOSI = 11;
 const static uint8_t MISO = 12;

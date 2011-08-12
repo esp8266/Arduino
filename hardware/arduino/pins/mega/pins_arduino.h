@@ -27,6 +27,11 @@
 
 #include <avr/pgmspace.h>
 
+#define NUM_DIGITAL_PINS            70
+#define NUM_ANALOG_INPUTS           16
+#define analogInputToDigitalPin(p)  ((p < 16) ? (p) + 54 : -1)
+#define digitalPinHasPWM(p)         (((p) >= 2 && (p) <= 13) || ((p) >= 44 && (p)<= 46))
+
 const static uint8_t SS   = 53;
 const static uint8_t MOSI = 51;
 const static uint8_t MISO = 50;
