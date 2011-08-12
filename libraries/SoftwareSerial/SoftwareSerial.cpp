@@ -42,7 +42,6 @@ http://arduiniana.org.
 #include <avr/pgmspace.h>
 #include "Arduino.h"
 #include "SoftwareSerial.h"
-#include "icrmacros.h"
 //
 // Lookup table
 //

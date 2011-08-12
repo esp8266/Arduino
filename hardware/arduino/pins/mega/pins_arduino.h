@@ -53,6 +53,31 @@ const static uint8_t A13 = 67;
 const static uint8_t A14 = 68;
 const static uint8_t A15 = 69;
 
+// A majority of the pins are NOT PCINTs, SO BE WARNED (i.e. you cannot use them as receive pins)
+// Only pins available for RECEIVE (TRANSMIT can be on any pin):
+// (I've deliberately left out pin mapping to the Hardware USARTs - seems senseless to me)
+// Pins: 10, 11, 12, 13,  50, 51, 52, 53,  62, 63, 64, 65, 66, 67, 68, 69
+
+#define digitalPinToPCICR(p)    ( (((p) >= 10) && ((p) <= 13)) || \
+                                  (((p) >= 50) && ((p) <= 53)) || \
+                                  (((p) >= 62) && ((p) <= 69)) ? (&PCICR) : ((uint8_t *)0) )
+
+#define digitalPinToPCICRbit(p) ( (((p) >= 10) && ((p) <= 13)) || (((p) >= 50) && ((p) <= 53)) ? 0 : \
+                                ( (((p) >= 62) && ((p) <= 69)) ? 2 : \
+                                0 ) )
+
+#define digitalPinToPCMSK(p)    ( (((p) >= 10) && ((p) <= 13)) || (((p) >= 50) && ((p) <= 53)) ? (&PCMSK0) : \
+                                ( (((p) >= 62) && ((p) <= 69)) ? (&PCMSK2) : \
+                                ((uint8_t *)0) ) )
+
+#define digitalPinToPCMSKbit(p) ( (((p) >= 10) && ((p) <= 13)) ? ((p) - 6) : \
+                                ( ((p) == 50) ? 3 : \
+                                ( ((p) == 51) ? 2 : \
+                                ( ((p) == 52) ? 1 : \
+                                ( ((p) == 53) ? 0 : \
+                                ( (((p) >= 62) && ((p) <= 69)) ? ((p) - 62) : \
+                                0 ) ) ) ) ) )
+
 #ifdef ARDUINO_MAIN
 
 const uint16_t PROGMEM port_to_mode_PGM[] = {
