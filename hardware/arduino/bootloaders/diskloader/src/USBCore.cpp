@@ -86,23 +86,27 @@ static inline void ClearOUT(void)
 static
 void Send(volatile const u8* data, u8 count)
 {
+	TXLED1;					// light the TX LED
 	while (count--)
 		UEDATX = *data++;
 }
 
 void Recv(volatile u8* data, u8 count)
 {
+	RXLED1;					// light the RX LED
 	while (count--)
 		*data++ = UEDATX;
 }
 
 static inline u8 Recv8()
 {
+	RXLED1;					// light the RX LED
 	return UEDATX;
 }
 
 static inline void Send8(u8 d)
 {
+	TXLED1;					// light the TX LED
 	UEDATX = d;
 }
 
@@ -506,12 +510,17 @@ int USBGetChar()
 			u8 temp = 0;
 			for (temp=100; temp; temp--) 
 				asm volatile("nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t"::);			
+			RXLED0;		// we turn the RX and TX LEDs on in the relevant Send or Recv instruction
+			TXLED0;		// we turn them off here after some time has passed to ensure a minimum on time.  
 		}
 
-		if (!--_timeout)
+		if (!--_timeout) {
+			TXLED0;		// switch off the RX and TX LEDs before starting the user sketch
+			RXLED0;
 			Reboot();	// USB not connected, run firmware
+		}
 
-		LEDPulse();
+//		LEDPulse();
 	}
 	return -1;
 }

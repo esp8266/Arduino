@@ -119,6 +119,9 @@ int main(void) __attribute__ ((naked));
 //	STK500v1 main loop, very similar to optiboot in protocol and implementation
 int main()
 {
+	TXLED0;
+	RXLED0;
+	LED0;
 	BOARD_INIT();
 	USBInit();
 
@@ -236,6 +239,7 @@ void LEDPulse()
 
 void Reboot()
 {
+	/* TODO - ZE - this should probably be a WDT reset instead, right? */
 	UDCON = 1;		// Detatch USB
 	UDIEN = 0;
 	asm volatile (	// Reset vector to run firmware
