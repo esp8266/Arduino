@@ -26,30 +26,17 @@ typedef unsigned long u32;
 #define CPU_PRESCALE(n)	(CLKPR = 0x80, CLKPR = (n))
 #define DISABLE_JTAG()  MCUCR = (1 << JTD) | (1 << IVCE) | (0 << PUD); MCUCR = (1 << JTD) | (0 << IVSEL) | (0 << IVCE) | (0 << PUD);
 
-
-#ifdef MICROTOUCH
-
-#define USB_VID 0x239A	// Adafruit vid
-#define USB_PID 0x2001	// sorry dave sprach zarathustra
-
-#define FAT_OEM_NAME	'r','o','s','s','u','m','u','r'					// 8 chars
-#define BOARD_INIT() DDRC = 0xFF; CPU_PRESCALE(0); DISABLE_JTAG();
-#define LED0 PORTC &= ~(1<<7) 
-#define LED1 PORTC |= (1<<7)
-#define BACKLIGHT0 PORTC &= ~(1<<6)
-#define BACKLIGHT1 PORTC |= (1<<6)
-
-#else
-
 #define USB_VID 0x2341	// arduino LLC vid
 #define USB_PID 0x0020	// educated guess
 
 #define FAT_OEM_NAME	'l','e','o','n','a','r','d','o'					// 8 chars
-#define BOARD_INIT()	// etc
-#define LED0 
-#define LED1
-
-#endif
+#define BOARD_INIT()	DDRC |= (1<<7); DDRB |= (1<<0); DDRE |= (1<<6); CPU_PRESCALE(0); DISABLE_JTAG();
+#define LED0			PORTC &= ~(1<<7)
+#define LED1			PORTC |= (1<<7)
+#define TXLED0			PORTE &= ~(1<<6)
+#define TXLED1			PORTE |= (1<<6)
+#define RXLED0			PORTB &= ~(1<<0)
+#define RXLED1			PORTB |= (1<<0)
 
 #define TRANSFER_PGM		0x80
 #define TRANSFER_RELEASE	0x40
