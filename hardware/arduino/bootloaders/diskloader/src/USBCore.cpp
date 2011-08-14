@@ -502,6 +502,10 @@ int USBGetChar()
 			if (!ReadWriteAllowed())
 				ReleaseRX();
 			return c;
+		} else {
+			u8 temp = 0;
+			for (temp=100; temp; temp--) 
+				asm volatile("nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t"::);			
 		}
 
 		if (!--_timeout)
