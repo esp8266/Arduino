@@ -100,7 +100,8 @@ bool WEAK CDC_Setup(Setup& setup)
 		if (CDC_SET_CONTROL_LINE_STATE == r)
 		{
 			_usbLineInfo.lineState = setup.wValueL;
-			if (_usbLineInfo.dwDTERate == 115200 && _usbLineInfo.lineState == 0)	// Emulate DTR reset hack
+//			if (_usbLineInfo.dwDTERate == 115200 && _usbLineInfo.lineState == 0)	// Emulate DTR reset hack
+			if (_usbLineInfo.lineState == 0)
 				Reboot();
 			return true;
 		}
