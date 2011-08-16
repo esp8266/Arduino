@@ -40,6 +40,7 @@ public class EditorStatus extends JPanel /*implements ActionListener*/ {
   //static final int PROMPT = 2;
   //static final int EDIT   = 3;
   static final int EDIT   = 2;
+  static final int PROGRESS = 5;
 
   static final int YES    = 1;
   static final int NO     = 2;
@@ -66,6 +67,7 @@ public class EditorStatus extends JPanel /*implements ActionListener*/ {
   JButton cancelButton;
   JButton okButton;
   JTextField editField;
+  JProgressBar progressBar;
 
   //Thread promptThread;
   int response;
@@ -76,16 +78,22 @@ public class EditorStatus extends JPanel /*implements ActionListener*/ {
     empty();
 
     if (bgcolor == null) {
-      bgcolor = new Color[3]; //4];
+      bgcolor = new Color[6];
       bgcolor[0] = Theme.getColor("status.notice.bgcolor");
       bgcolor[1] = Theme.getColor("status.error.bgcolor");
       bgcolor[2] = Theme.getColor("status.edit.bgcolor");
+      bgcolor[3] = null;
+      bgcolor[4] = null;
+      bgcolor[5] = Theme.getColor("status.notice.bgcolor");
 
-      fgcolor = new Color[3]; //4];
+      fgcolor = new Color[6];
       fgcolor[0] = Theme.getColor("status.notice.fgcolor");
       fgcolor[1] = Theme.getColor("status.error.fgcolor");
       fgcolor[2] = Theme.getColor("status.edit.fgcolor");
-    }
+      fgcolor[3] = null;
+      fgcolor[4] = null;
+      fgcolor[5] = Theme.getColor("status.notice.fgcolor");
+}
   }
 
 
@@ -163,6 +171,54 @@ public class EditorStatus extends JPanel /*implements ActionListener*/ {
     empty();
   }
 
+  public void progress(String message)
+  {
+    mode = PROGRESS;
+    this.message = message;
+    progressBar.setIndeterminate(false);
+    progressBar.setVisible(true);
+    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    repaint();
+  }
+
+  
+  public void progressIndeterminate(String message)
+  {
+    mode = PROGRESS;
+    this.message = message;
+    progressBar.setIndeterminate(true);
+    progressBar.setValue(50);
+    progressBar.setVisible(true);
+    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    repaint();
+  }
+
+  
+  public void progressNotice(String message) {
+    //mode = NOTICE;
+    this.message = message;
+    //update();
+    repaint();
+  }
+  
+  
+  public void unprogress()
+  {
+    if (Preferences.getBoolean("editor.beep.compile")) {
+      Toolkit.getDefaultToolkit().beep();
+    }
+    progressBar.setVisible(false);
+    progressBar.setValue(0);
+    setCursor(null);
+    //empty();
+  }
+  
+  
+  public void progressUpdate(int value)
+  {
+    progressBar.setValue(value);
+    repaint();
+  }
 
   /*
   public void update() {
@@ -369,6 +425,19 @@ public class EditorStatus extends JPanel /*implements ActionListener*/ {
         });
       add(editField);
       editField.setVisible(false);
+
+      progressBar = new JProgressBar(JScrollBar.HORIZONTAL);
+      progressBar.setIndeterminate(false);
+      if (Base.isMacOS()) {
+        //progressBar.setBackground(bgcolor[PROGRESS]);
+        //progressBar.putClientProperty("JProgressBar.style", "circular");
+      }
+      progressBar.setValue(0);
+      progressBar.setBorderPainted(true);
+      //progressBar.setStringPainted(true);
+      add(progressBar);
+      progressBar.setVisible(false);
+      
     }
   }
 
@@ -385,11 +454,13 @@ public class EditorStatus extends JPanel /*implements ActionListener*/ {
     //noButton.setLocation(noLeft, top);
     cancelButton.setLocation(cancelLeft, top);
     okButton.setLocation(noLeft, top);
+    progressBar.setLocation(noLeft, top);
 
     //yesButton.setSize(Preferences.BUTTON_WIDTH, Preferences.BUTTON_HEIGHT);
     //noButton.setSize(Preferences.BUTTON_WIDTH, Preferences.BUTTON_HEIGHT);
     cancelButton.setSize(Preferences.BUTTON_WIDTH, Preferences.BUTTON_HEIGHT);
     okButton.setSize(Preferences.BUTTON_WIDTH, Preferences.BUTTON_HEIGHT);
+    progressBar.setSize(2*Preferences.BUTTON_WIDTH, Preferences.BUTTON_HEIGHT); 
 
     // edit field height is awkward, and very different between mac and pc,
     // so use at least the preferred height for now.
@@ -398,6 +469,7 @@ public class EditorStatus extends JPanel /*implements ActionListener*/ {
     int editTop = (1 + sizeH - editHeight) / 2;  // add 1 for ceil
     editField.setBounds(yesLeft - Preferences.BUTTON_WIDTH, editTop,
                         editWidth, editHeight);
+    progressBar.setBounds(noLeft, editTop, editWidth, editHeight);
   }
 
 
