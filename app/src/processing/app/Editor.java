@@ -99,6 +99,8 @@ public class Editor extends JFrame implements RunnerListener {
   static SerialMenuListener serialMenuListener;
   static SerialMonitor serialMonitor;
   
+  Schematics schematics;
+  
   EditorHeader header;
   EditorStatus status;
   EditorConsole console;
@@ -625,6 +627,16 @@ public class Editor extends JFrame implements RunnerListener {
 //        }
 //      });
 //    sketchMenu.add(item);
+    
+    sketchMenu.addSeparator();
+
+    item = new JMenuItem("Show schematics");
+    item.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          handleSchematics();
+        }
+      });
+    sketchMenu.add(item);
 
     sketchMenu.addSeparator();
 
@@ -1894,7 +1906,6 @@ public class Editor extends JFrame implements RunnerListener {
     return sketchWindowLocation;
   }
 
-
   /**
    * Implements Sketch &rarr; Stop, or pressing Stop on the toolbar.
    */
@@ -1908,6 +1919,19 @@ public class Editor extends JFrame implements RunnerListener {
 
     // focus the PDE again after quitting presentation mode [toxi 030903]
     toFront();
+  }
+
+
+  public void handleSchematics() {  // called by menu or buttons
+    //String s = sketch.getFolder().getAbsolutePath() + File.separator + sketch.getName() + ".png";
+    File file = new File(sketch.getFolder(), sketch.getName() + ".png");
+    if (file.exists()) {
+      if (schematics == null)
+        schematics = new Schematics(file);
+      schematics.showFrame(this);
+    } else {
+      statusNotice("This sketch doesn't include schematics");
+    }
   }
 
 
