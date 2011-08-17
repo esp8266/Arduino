@@ -23,7 +23,7 @@
 #include "Arduino.h"
 #include "Stream.h"
 
-#define PARSE_TIMEOUT 5  // default number of seconds to wait
+#define PARSE_TIMEOUT 1000  // default number of milli-seconds to wait
 #define NO_SKIP_CHAR  1  // a magic char not found in a valid ASCII numeric field
 
 // private method to read stream with timeout
@@ -31,7 +31,7 @@ int Stream::timedRead()
 {
   //Serial.println(_timeout);
   this->_startMillis = millis();
-  while(millis() - this->_startMillis < (this->_timeout * 1000L))
+  while(millis() - this->_startMillis < this->_timeout)
   {
     if (this->available() > 0) {
       return this->read();
@@ -58,7 +58,7 @@ return c;
 // Public Methods
 //////////////////////////////////////////////////////////////
 
-void Stream::setTimeout( long timeout)  // sets the maximum number of seconds to wait
+void Stream::setTimeout( long timeout)  // sets the maximum number of milliseconds to wait
 {
    this->_timeout = timeout;
 }
@@ -200,17 +200,17 @@ float Stream::parseFloat(char skipChar){
 // read characters from stream into buffer
 // terminates if length characters have been read, null is detected or timeout (see setTimeout)
 // returns the number of characters placed in the buffer (0 means no valid data found)
-int Stream::readChars( char *buffer, size_t length)
+int Stream::readBytes( char *buffer, size_t length)
 {
-   return readCharsUntil( 0, buffer, length);
+   return readBytesUntil( 0, buffer, length);
 }
 
 
-// as readChars with terminator character
+// as readBytes with terminator character
 // terminates if length characters have been read, timeout, or if the terminator character  detected
 // returns the number of characters placed in the buffer (0 means no valid data found)
 
-int Stream::readCharsUntil( char terminator, char *buffer, size_t length)
+int Stream::readBytesUntil( char terminator, char *buffer, size_t length)
 {
  int index = 0;
     *buffer = 0;
@@ -231,14 +231,3 @@ int Stream::readCharsUntil( char terminator, char *buffer, size_t length)
     return index; // here if buffer is full before detecting the terminator
 }
 
-
-// read characters found between pre_string and terminator into a buffer
-// terminated when the terminator character is matched or the buffer is full
-// returns the number of bytes placed in the buffer (0 means no valid data found)
-int Stream::readCharsBetween( char *pre_string, char terminator, char *buffer, size_t length)
-{
-  if( find( pre_string) ){
-    return readCharsUntil(terminator, buffer, length);
-  }
-  return 0;    //failed to find the prestring
-}

@@ -38,7 +38,7 @@ readBytesBetween( pre_string, terminator, buffer, length)
 class Stream : public Print
 {
   private:
-    long _timeout;      // number of seconds to wait for the next char before aborting timed read
+    long _timeout;      // number of milliseconds to wait for the next char before aborting timed read
     long _startMillis;  // used for timeout measurement
     int timedRead();    // private method to read stream with timeout
     int getNextDigit(); // returns the next numeric digit in the stream or -1 if timeout
@@ -49,11 +49,11 @@ class Stream : public Print
     virtual int peek() = 0;
     virtual void flush() = 0;
 
-    Stream() {_timeout=5;}
+    Stream() {_timeout=1000;}
 
 // parsing methods
 
-  void setTimeout(long timeout);  // sets maximum seconds to wait for stream data, default is 5 seconds
+  void setTimeout(long timeout);  // sets maximum milliseconds to wait for stream data, default is 1 second
 
   bool find(char *target);   // reads data from the stream until the target string is found
   // returns true if target string is found, false if timed out (see setTimeout)
@@ -78,19 +78,13 @@ class Stream : public Print
 
   float parseFloat(char skipChar);  // as above but the given skipChar is ignored
 
-  int readChars( char *buffer, size_t length); // read chars from stream into buffer
+  int readBytes( char *buffer, size_t length); // read chars from stream into buffer
   // terminates if length characters have been read or timeout (see setTimeout)
   // returns the number of characters placed in the buffer (0 means no valid data found)
 
-  int readCharsUntil( char terminator, char *buffer, size_t length); // as readChars with terminator character
+  int readBytesUntil( char terminator, char *buffer, size_t length); // as readBytes with terminator character
   // terminates if length characters have been read, timeout, or if the terminator character  detected
   // returns the number of characters placed in the buffer (0 means no valid data found)
-
-   int readCharsBetween( char *pre_string, char terminator, char *buffer, size_t length);
-  // read characters found between pre_string and terminator into a buffer
-  // terminated when the terminator character is matched or the buffer is full
-  // returns the number of bytes placed in the buffer (0 means no valid data found)
-
 
   // Arduino String functions to be added here
 
