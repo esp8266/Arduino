@@ -85,14 +85,8 @@ inline void store_char(unsigned char c, ring_buffer *buffer)
   }
 }
 
-#if defined(__AVR_ATmega32U4__)
-  void serialEvent() __attribute__((weak));
-  void serialEvent() {}
-  SIGNAL(USART1_RX_vect) {
-    unsigned char c = UDR1;
-    store_char(c, &rx_buffer);
-	  serialEvent();
-  }
+#if !defined(USART0_RX_vect) && defined(USART1_RX_vect)
+// do nothing - on the 32u4 the first USART is USART1
 #else
 #if !defined(USART_RX_vect) && !defined(SIG_USART0_RECV) && \
     !defined(SIG_UART0_RECV) && !defined(USART0_RX_vect) && \
@@ -123,6 +117,7 @@ inline void store_char(unsigned char c, ring_buffer *buffer)
     store_char(c, &rx_buffer);
 	serialEvent();
   }
+#endif
 #endif
 
 #if defined(USART1_RX_vect)
@@ -163,18 +158,9 @@ inline void store_char(unsigned char c, ring_buffer *buffer)
 #elif defined(SIG_USART3_RECV)
   #error SIG_USART3_RECV
 #endif
-#endif
 
-#if defined(__AVR_ATmega32U4__)
-ISR(USART1_UDRE_vect) {
-  if (tx_buffer.head == tx_buffer.tail) {
-    cbi(UCSR1B, UDRIE1);  
-  } else {
-	unsigned char c = tx_buffer.buffer[tx_buffer.tail];
-    tx_buffer.tail = (tx_buffer.tail + 1) % SERIAL_BUFFER_SIZE;  
-    UDR1 = c;
-  }
-}
+#if !defined(USART0_UDRE_vect) && defined(USART1_UDRE_vect)
+// do nothing - on the 32u4 the first USART is USART1
 #else
 #if !defined(UART0_UDRE_vect) && !defined(UART_UDRE_vect) && !defined(USART0_UDRE_vect) && !defined(USART_UDRE_vect)
   #error Don't know what the Data Register Empty vector is called for the first UART
@@ -212,6 +198,7 @@ ISR(USART_UDRE_vect)
   }
 }
 #endif
+#endif
 
 #ifdef USART1_UDRE_vect
 ISR(USART1_UDRE_vect)
@@ -228,7 +215,6 @@ ISR(USART1_UDRE_vect)
     UDR1 = c;
   }
 }
-#endif
 #endif
 
 #ifdef USART2_UDRE_vect
@@ -399,7 +385,7 @@ void HardwareSerial::write(uint8_t c)
 #elif defined(UBRR0H) && defined(UBRR0L)
   HardwareSerial Serial(&rx_buffer, &tx_buffer, &UBRR0H, &UBRR0L, &UCSR0A, &UCSR0B, &UDR0, RXEN0, TXEN0, RXCIE0, UDRIE0, U2X0);
 #elif defined(USBCON)
-  #warning no serial port defined  (port 0)
+  // do nothing - Serial object and buffers are initialized in CDC code
 #else
   #error no serial port defined  (port 0)
 #endif
