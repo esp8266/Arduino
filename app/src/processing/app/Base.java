@@ -436,17 +436,6 @@ public class Base {
   // .................................................................
 
 
-  /** Command on Mac OS X, Ctrl on Windows and Linux */
-  static final int SHORTCUT_KEY_MASK =
-    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-  /** Command-W on Mac OS X, Ctrl-W on Windows and Linux */
-  static final KeyStroke WINDOW_CLOSE_KEYSTROKE =
-    KeyStroke.getKeyStroke('W', SHORTCUT_KEY_MASK);
-  /** Command-Option on Mac OS X, Ctrl-Alt on Windows and Linux */
-  static final int SHORTCUT_ALT_KEY_MASK = ActionEvent.ALT_MASK |
-    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-
-  
   // Because of variations in native windowing systems, no guarantees about
   // changes to the focused and active Windows can be made. Developers must
   // never assume that this Window is the focused or active Window until this
