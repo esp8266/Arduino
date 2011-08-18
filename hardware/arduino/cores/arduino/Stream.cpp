@@ -214,7 +214,7 @@ int Stream::readBytesUntil( char terminator, char *buffer, size_t length)
 {
  int index = 0;
     *buffer = 0;
-    while(index < length ){
+    while(index < length-1 ){
       int c = timedRead();
       if( c <= 0 ){
         return 0;   // timeout returns 0 !
