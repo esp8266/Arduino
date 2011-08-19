@@ -104,6 +104,7 @@ public class SyntaxUtilities
     styles[Token.LITERAL2] = new SyntaxStyle(new Color(0x650099),false,true);
     styles[Token.LABEL] = new SyntaxStyle(new Color(0x990033),false,true);
     styles[Token.OPERATOR] = new SyntaxStyle(Color.black,false,true);
+    styles[Token.URL] = new SyntaxStyle(Color.blue,true,false);
     styles[Token.INVALID] = new SyntaxStyle(Color.red,false,true);
 
     return styles;
@@ -151,7 +152,7 @@ public class SyntaxUtilities
 
         line.count = length;
         if (id == Token.COMMENT1 || id == Token.COMMENT2)
-          x = drawTabbedCommentsText(line, x, y, gfx, expander);
+          x = drawTabbedCommentsText(line, x, y, gfx, expander, styles, styles[id]);
         else
           x = Utilities.drawTabbedText(line, x, y, gfx, expander, 0);        
         line.offset += length;
@@ -174,9 +175,7 @@ public class SyntaxUtilities
    *         the remaining part of the string.
    */
   public static String[] parseCommentUrls(String line) {
-    // Try to find pattern
-    Pattern schematics = Pattern.compile("@schematics\\s+([^\\s]+)");
-    Matcher m = schematics.matcher(line.toString());
+    Matcher m = urlPattern.matcher(line.toString());
     if (!m.find())
       return null;
 
@@ -188,12 +187,21 @@ public class SyntaxUtilities
     return res;
   }
 
+  static private Pattern urlPattern = Pattern.compile(
+      "((?:https?|ftp)://" +                // ( Protocol
+      "(?:(?:[\\w_\\-]+:)?[\\w_\\-]+@)?" +  // Username and password
+      "(?:[\\w_\\-]+\\.)+[\\w_\\-]+" +      // Domain name
+      "(?::[0-9]{1,5})?" +                  // Port 
+      "(?:/[\\w_\\-./?%&=+]*)?)" +          // Path ) 
+      "(?:\\s|$)");                         // whitespace or EOL
+
   public static Segment stringToSegment(String v) {
     return new Segment(v.toCharArray(), 0, v.length());
   }
 
   private static int drawTabbedCommentsText(Segment line, int x, int y,
-      Graphics gfx, TabExpander expander) {
+      Graphics gfx, TabExpander expander, SyntaxStyle[] styles, 
+      SyntaxStyle commentStyle) {
 
     String parse[] = parseCommentUrls(line.toString());
     if (parse == null)
@@ -203,14 +211,21 @@ public class SyntaxUtilities
     Segment tag = stringToSegment(parse[1]);
     Segment post = stringToSegment(parse[2]);
 
-    x = Utilities.drawTabbedText(pre, x, y, gfx, expander, 0);
+    if (pre.length()>0)
+      x = Utilities.drawTabbedText(pre, x, y, gfx, expander, 0);
+
+    Font f = gfx.getFont();
+    styles[Token.URL].setGraphicsFlags(gfx, f);
     x = Utilities.drawTabbedText(tag, x, y, gfx, expander, 0);
 
     // Draw arrow.
     FontMetrics metrics = gfx.getFontMetrics();
     int h = metrics.getHeight() - 2;
     drawArrow(gfx, x, y - h + metrics.getDescent() - 1, h, h);
-    x = Utilities.drawTabbedText(post, x, y, gfx, expander, 0);
+
+    commentStyle.setGraphicsFlags(gfx, f);
+    if (post.length()>0)
+      x = Utilities.drawTabbedText(post, x, y, gfx, expander, 0);
     return x;
   }
 
