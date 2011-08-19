@@ -11,6 +11,8 @@ package processing.app.syntax;
 
 import javax.swing.text.*;
 import java.awt.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -148,7 +150,10 @@ public class SyntaxUtilities
           styles[id].setGraphicsFlags(gfx,defaultFont);
 
         line.count = length;
-        x = Utilities.drawTabbedText(line,x,y,gfx,expander,0);
+        if (id == Token.COMMENT1 || id == Token.COMMENT2)
+          x = drawTabbedCommentsText(line, x, y, gfx, expander);
+        else
+          x = Utilities.drawTabbedText(line, x, y, gfx, expander, 0);        
         line.offset += length;
         offset += length;
 
@@ -158,6 +163,69 @@ public class SyntaxUtilities
     return x;
   }
 
+  /**
+   * Parse comments and identify "@schematics <b>&lt;something&gt;</b>" pattern.
+   * 
+   * @param line
+   *          A string to parse
+   * @return <b>null</b> if the pattern is not found, otherwise an array of
+   *         String is returned: the elements with index 0, 1 and 2 are
+   *         respectively the preamble, the <b>&lt;something&gt;</b> stuff, and
+   *         the remaining part of the string.
+   */
+  public static String[] parseCommentUrls(String line) {
+    // Try to find pattern
+    Pattern schematics = Pattern.compile("@schematics\\s+([^\\s]+)");
+    Matcher m = schematics.matcher(line.toString());
+    if (!m.find())
+      return null;
+
+    String res[] = new String[3];
+    res[0] = line.substring(0, m.start(1));
+    res[1] = line.substring(m.start(1), m.end(1));
+    res[2] = line.substring(m.end(1));
+    // System.out.println("0 =>"+res[0]+"<\n1 =>"+res[1]+"< \n2 =>"+res[2]+"<");
+    return res;
+  }
+
+  public static Segment stringToSegment(String v) {
+    return new Segment(v.toCharArray(), 0, v.length());
+  }
+
+  private static int drawTabbedCommentsText(Segment line, int x, int y,
+      Graphics gfx, TabExpander expander) {
+
+    String parse[] = parseCommentUrls(line.toString());
+    if (parse == null)
+      // Revert to plain writing.
+      return Utilities.drawTabbedText(line, x, y, gfx, expander, 0);
+    Segment pre = stringToSegment(parse[0]);
+    Segment tag = stringToSegment(parse[1]);
+    Segment post = stringToSegment(parse[2]);
+
+    x = Utilities.drawTabbedText(pre, x, y, gfx, expander, 0);
+    x = Utilities.drawTabbedText(tag, x, y, gfx, expander, 0);
+
+    // Draw arrow.
+    FontMetrics metrics = gfx.getFontMetrics();
+    int h = metrics.getHeight() - 2;
+    drawArrow(gfx, x, y - h + metrics.getDescent() - 1, h, h);
+    x = Utilities.drawTabbedText(post, x, y, gfx, expander, 0);
+    return x;
+  }
+
+  private static void drawArrow(Graphics gfx, int x, int y, int w, int h) {
+    int h2 = h / 2;
+    int h4 = h / 4;
+    gfx.drawLine(x, y+h2, x+h2, y);
+    gfx.drawLine(x+h2, y, x+h2, y+h4);
+    gfx.drawLine(x+h2, y+h4, x+h, y+h4);
+    gfx.drawLine(x+h, y+h4, x+h, y+h-h4);
+    gfx.drawLine(x+h, y+h-h4, x+h2, y+h-h4);
+    gfx.drawLine(x+h2,y+h-h4, x+h2, y+h);
+    gfx.drawLine(x, y+h2, x+h2, y+h);
+  }
+  
   // private members
   private SyntaxUtilities() {}
 }
