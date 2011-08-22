@@ -170,6 +170,10 @@ public class EditorToolbar extends JComponent implements MouseInputListener, Key
         x2[i] = x1[i] + BUTTON_WIDTH;
         offsetX = x2[i];
       }
+      
+      // Serial button must be on the right
+      x1[SERIAL] = width - BUTTON_WIDTH - 3;
+      x2[SERIAL] = width - 3;
     }
     Graphics g = offscreen.getGraphics();
     g.setColor(bgcolor); //getBackground());
