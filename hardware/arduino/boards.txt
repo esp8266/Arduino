@@ -18,7 +18,7 @@ uno.build.variant=standard
 
 ##############################################################
 
-atmega328.name=Arduino Duemilanove or Nano w/ ATmega328
+atmega328.name=Arduino Duemilanove w/ ATmega328
 
 atmega328.upload.protocol=stk500
 atmega328.upload.maximum_size=30720
@@ -39,7 +39,7 @@ atmega328.build.variant=standard
 
 ##############################################################
 
-diecimila.name=Arduino Diecimila, Duemilanove, or Nano w/ ATmega168
+diecimila.name=Arduino Diecimila or Duemilanove w/ ATmega168
 
 diecimila.upload.protocol=stk500
 diecimila.upload.maximum_size=14336
@@ -57,6 +57,48 @@ diecimila.build.mcu=atmega168
 diecimila.build.f_cpu=16000000L
 diecimila.build.core=arduino
 diecimila.build.variant=standard
+
+##############################################################
+
+nano328.name=Arduino Nano w/ ATmega328
+
+nano328.upload.protocol=stk500
+nano328.upload.maximum_size=30720
+nano328.upload.speed=57600
+
+nano328.bootloader.low_fuses=0xFF
+nano328.bootloader.high_fuses=0xDA
+nano328.bootloader.extended_fuses=0x05
+nano328.bootloader.path=atmega
+nano328.bootloader.file=ATmegaBOOT_168_atmega328.hex
+nano328.bootloader.unlock_bits=0x3F
+nano328.bootloader.lock_bits=0x0F
+
+nano328.build.mcu=atmega328p
+nano328.build.f_cpu=16000000L
+nano328.build.core=arduino
+nano328.build.variant=eightanaloginputs
+
+##############################################################
+
+nano.name=Arduino Nano w/ ATmega168
+
+nano.upload.protocol=stk500
+nano.upload.maximum_size=14336
+nano.upload.speed=19200
+
+nano.bootloader.low_fuses=0xff
+nano.bootloader.high_fuses=0xdd
+nano.bootloader.extended_fuses=0x00
+nano.bootloader.path=atmega
+nano.bootloader.file=ATmegaBOOT_168_diecimila.hex
+nano.bootloader.unlock_bits=0x3F
+nano.bootloader.lock_bits=0x0F
+
+nano.build.mcu=atmega168
+nano.build.f_cpu=16000000L
+nano.build.core=arduino
+nano.build.variant=eightanaloginputs
 
 ##############################################################
 
@@ -119,7 +161,7 @@ mini.bootloader.lock_bits=0x0F
 mini.build.mcu=atmega168
 mini.build.f_cpu=16000000L
 mini.build.core=arduino
-mini.build.variant=standard
+mini.build.variant=eightanaloginputs
 
 ##############################################################
 
@@ -140,7 +182,7 @@ fio.bootloader.lock_bits=0x0F
 fio.build.mcu=atmega328p
 fio.build.f_cpu=8000000L
 fio.build.core=arduino
-fio.build.variant=standard
+fio.build.variant=eightanaloginputs
 
 ##############################################################
 
@@ -162,7 +204,7 @@ bt328.bootloader.lock_bits=0x0F
 bt328.build.mcu=atmega328p
 bt328.build.f_cpu=16000000L
 bt328.build.core=arduino
-bt328.build.variant=standard
+bt328.build.variant=eightanaloginputs
 
 ##############################################################
 
@@ -184,7 +226,7 @@ bt.bootloader.lock_bits=0x0F
 bt.build.mcu=atmega168
 bt.build.f_cpu=16000000L
 bt.build.core=arduino
-bt.build.variant=standard
+bt.build.variant=eightanaloginputs
 
 ##############################################################
 
