@@ -218,29 +218,12 @@ public class SyntaxUtilities
     styles[Token.URL].setGraphicsFlags(gfx, f);
     x = Utilities.drawTabbedText(tag, x, y, gfx, expander, 0);
 
-    // Draw arrow.
-    FontMetrics metrics = gfx.getFontMetrics();
-    int h = metrics.getHeight() - 2;
-    drawArrow(gfx, x, y - h + metrics.getDescent() - 1, h, h);
-
     commentStyle.setGraphicsFlags(gfx, f);
     if (post.length()>0)
       x = Utilities.drawTabbedText(post, x, y, gfx, expander, 0);
     return x;
   }
 
-  private static void drawArrow(Graphics gfx, int x, int y, int w, int h) {
-    int h2 = h / 2;
-    int h4 = h / 4;
-    gfx.drawLine(x, y+h2, x+h2, y);
-    gfx.drawLine(x+h2, y, x+h2, y+h4);
-    gfx.drawLine(x+h2, y+h4, x+h, y+h4);
-    gfx.drawLine(x+h, y+h4, x+h, y+h-h4);
-    gfx.drawLine(x+h, y+h-h4, x+h2, y+h-h4);
-    gfx.drawLine(x+h2,y+h-h4, x+h2, y+h);
-    gfx.drawLine(x, y+h2, x+h2, y+h);
-  }
-  
   // private members
   private SyntaxUtilities() {}
 }
