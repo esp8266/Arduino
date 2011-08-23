@@ -91,19 +91,19 @@ public class Compiler implements MessageConsumer {
       corePath = coreFolder.getAbsolutePath();
     }
 
-    String pins = boardPreferences.get("build.pins");
-    String pinsPath = null;
+    String variant = boardPreferences.get("build.variant");
+    String variantPath = null;
     
-    if (pins != null) {
-      if (pins.indexOf(':') == -1) {
+    if (variant != null) {
+      if (variant.indexOf(':') == -1) {
 	Target t = Base.getTarget();
-	File pinsFolder = new File(new File(t.getFolder(), "pins"), pins);
-	pinsPath = pinsFolder.getAbsolutePath();
+	File variantFolder = new File(new File(t.getFolder(), "variants"), variant);
+	variantPath = variantFolder.getAbsolutePath();
       } else {
-	Target t = Base.targetsTable.get(pins.substring(0, pins.indexOf(':')));
-	File pinsFolder = new File(t.getFolder(), "pins");
-	pinsFolder = new File(pinsFolder, pins.substring(pins.indexOf(':') + 1));
-	pinsPath = pinsFolder.getAbsolutePath();
+	Target t = Base.targetsTable.get(variant.substring(0, variant.indexOf(':')));
+	File variantFolder = new File(t.getFolder(), "variants");
+	variantFolder = new File(variantFolder, variant.substring(variant.indexOf(':') + 1));
+	variantPath = variantFolder.getAbsolutePath();
       }
     }
 
@@ -114,7 +114,7 @@ public class Compiler implements MessageConsumer {
    sketch.setCompilingProgress(20);
    List includePaths = new ArrayList();
    includePaths.add(corePath);
-   if (pinsPath != null) includePaths.add(pinsPath);
+   if (variantPath != null) includePaths.add(variantPath);
    for (File file : sketch.getImportedLibraries()) {
      includePaths.add(file.getPath());
    }
@@ -162,7 +162,7 @@ public class Compiler implements MessageConsumer {
    sketch.setCompilingProgress(50);
   includePaths.clear();
   includePaths.add(corePath);  // include path for core only
-  if (pinsPath != null) includePaths.add(pinsPath);
+  if (variantPath != null) includePaths.add(variantPath);
   List<File> coreObjectFiles =
     compileFiles(avrBasePath, buildPath, includePaths,
               findFilesInPath(corePath, "S", true),
