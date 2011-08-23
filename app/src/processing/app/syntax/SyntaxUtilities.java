@@ -95,17 +95,17 @@ public class SyntaxUtilities
   {
     SyntaxStyle[] styles = new SyntaxStyle[Token.ID_COUNT];
 
-    styles[Token.COMMENT1] = new SyntaxStyle(Color.black,true,false);
-    styles[Token.COMMENT2] = new SyntaxStyle(new Color(0x990033),true,false);
-    styles[Token.KEYWORD1] = new SyntaxStyle(Color.black,false,true);
-    styles[Token.KEYWORD2] = new SyntaxStyle(Color.magenta,false,false);
-    styles[Token.KEYWORD3] = new SyntaxStyle(new Color(0x009600),false,false);
-    styles[Token.LITERAL1] = new SyntaxStyle(new Color(0x650099),false,false);
-    styles[Token.LITERAL2] = new SyntaxStyle(new Color(0x650099),false,true);
-    styles[Token.LABEL] = new SyntaxStyle(new Color(0x990033),false,true);
-    styles[Token.OPERATOR] = new SyntaxStyle(Color.black,false,true);
-    styles[Token.URL] = new SyntaxStyle(Color.blue,true,false);
-    styles[Token.INVALID] = new SyntaxStyle(Color.red,false,true);
+    styles[Token.COMMENT1] = new SyntaxStyle(Color.black,true,false,false);
+    styles[Token.COMMENT2] = new SyntaxStyle(new Color(0x990033),true,false,false);
+    styles[Token.KEYWORD1] = new SyntaxStyle(Color.black,false,true,false);
+    styles[Token.KEYWORD2] = new SyntaxStyle(Color.magenta,false,false,false);
+    styles[Token.KEYWORD3] = new SyntaxStyle(new Color(0x009600),false,false,false);
+    styles[Token.LITERAL1] = new SyntaxStyle(new Color(0x650099),false,false,false);
+    styles[Token.LITERAL2] = new SyntaxStyle(new Color(0x650099),false,true,false);
+    styles[Token.LABEL] = new SyntaxStyle(new Color(0x990033),false,true,false);
+    styles[Token.OPERATOR] = new SyntaxStyle(Color.black,false,true,false);
+    styles[Token.URL] = new SyntaxStyle(Color.blue,true,false,false);
+    styles[Token.INVALID] = new SyntaxStyle(Color.red,false,true,false);
 
     return styles;
   }

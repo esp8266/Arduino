@@ -2743,8 +2743,9 @@ public class Editor extends JFrame implements RunnerListener {
       String[] parse = SyntaxUtilities.parseCommentUrls(line);
       if (parse==null)
         return false;
-      int pos = parse[0].length()+parse[1].length();
-      if (offset<pos || offset>pos+2)
+      int start = parse[0].length();
+      int stop = start + parse[1].length();
+      if (offset<start|| offset>stop+2)
         return false;
       clickedURL = parse[1];
       return true;

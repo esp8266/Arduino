@@ -84,7 +84,7 @@ editor.literal1.style = #006699,plain
 editor.literal2.style = #006699,plain
 
 # http://arduino.cc/
-editor.url.style = #0000ff,italic
+editor.url.style = #0000ff,underlined
 
 # e.g. + - = /
 editor.operator.style = #000000,plain
