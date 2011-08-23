@@ -70,19 +70,18 @@ int Client::connect(IPAddress ip, uint16_t port) {
   return 1;
 }
 
-void Client::write(uint8_t b) {
-  if (_sock != MAX_SOCK_NUM)
-    send(_sock, &b, 1);
+long Client::write(uint8_t b) {
+  return write(&b, 1);
 }
 
-void Client::write(const char *str) {
-  if (_sock != MAX_SOCK_NUM)
-    send(_sock, (const uint8_t *)str, strlen(str));
+long Client::write(const char *str) {
+  return write((const uint8_t *) str, strlen(str));
 }
 
-void Client::write(const uint8_t *buf, size_t size) {
-  if (_sock != MAX_SOCK_NUM)
-    send(_sock, buf, size);
+long Client::write(const uint8_t *buf, size_t size) {
+  if (_sock == MAX_SOCK_NUM) return -1;
+  if (!send(_sock, buf, size)) return -2;
+  return size;
 }
 
 int Client::available() {

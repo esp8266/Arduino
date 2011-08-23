@@ -34,37 +34,37 @@
 class Print
 {
   private:
-    void printNumber(unsigned long, uint8_t);
-    void printFloat(double, uint8_t);
+    long printNumber(unsigned long, uint8_t);
+    long printFloat(double, uint8_t);
   public:
-    virtual void write(uint8_t) = 0;
-    virtual void write(const char *str);
-    virtual void write(const uint8_t *buffer, size_t size);
+    virtual long write(uint8_t) = 0;
+    virtual long write(const char *str);
+    virtual long write(const uint8_t *buffer, size_t size);
     
-    void print(const __FlashStringHelper *);
-    void print(const String &);
-    void print(const char[]);
-    void print(char);
-    void print(unsigned char, int = DEC);
-    void print(int, int = DEC);
-    void print(unsigned int, int = DEC);
-    void print(long, int = DEC);
-    void print(unsigned long, int = DEC);
-    void print(double, int = 2);
-    void print(const Printable&);
+    long print(const __FlashStringHelper *);
+    long print(const String &);
+    long print(const char[]);
+    long print(char);
+    long print(unsigned char, int = DEC);
+    long print(int, int = DEC);
+    long print(unsigned int, int = DEC);
+    long print(long, int = DEC);
+    long print(unsigned long, int = DEC);
+    long print(double, int = 2);
+    long print(const Printable&);
 
-    void println(const __FlashStringHelper *);
-    void println(const String &s);
-    void println(const char[]);
-    void println(char);
-    void println(unsigned char, int = DEC);
-    void println(int, int = DEC);
-    void println(unsigned int, int = DEC);
-    void println(long, int = DEC);
-    void println(unsigned long, int = DEC);
-    void println(double, int = 2);
-    void println(const Printable&);
-    void println(void);
+    long println(const __FlashStringHelper *);
+    long println(const String &s);
+    long println(const char[]);
+    long println(char);
+    long println(unsigned char, int = DEC);
+    long println(int, int = DEC);
+    long println(unsigned int, int = DEC);
+    long println(long, int = DEC);
+    long println(unsigned long, int = DEC);
+    long println(double, int = 2);
+    long println(const Printable&);
+    long println(void);
 };
 
 #endif

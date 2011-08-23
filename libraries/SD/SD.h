@@ -32,9 +32,9 @@ public:
   File(SdFile f, char *name);     // wraps an underlying SdFile
   File(void);      // 'empty' constructor
   ~File(void);     // destructor
-  virtual void write(uint8_t);
-  virtual void write(const char *str);
-  virtual void write(const uint8_t *buf, size_t size);
+  virtual long write(uint8_t);
+  virtual long write(const char *str);
+  virtual long write(const uint8_t *buf, size_t size);
   virtual int read();
   virtual int peek();
   virtual int available();

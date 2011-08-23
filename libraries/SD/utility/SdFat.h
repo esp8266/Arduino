@@ -283,9 +283,9 @@ class SdFile : public Print {
   }
   /** \return SdVolume that contains this file. */
   SdVolume* volume(void) const {return vol_;}
-  void write(uint8_t b);
-  int16_t write(const void* buf, uint16_t nbyte);
-  void write(const char* str);
+  long write(uint8_t b);
+  long write(const void* buf, uint16_t nbyte);
+  long write(const char* str);
   void write_P(PGM_P str);
   void writeln_P(PGM_P str);
 //------------------------------------------------------------------------------

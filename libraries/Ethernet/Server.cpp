@@ -67,18 +67,20 @@ Client Server::available()
   return Client(MAX_SOCK_NUM);
 }
 
-void Server::write(uint8_t b) 
+long Server::write(uint8_t b) 
 {
   write(&b, 1);
 }
 
-void Server::write(const char *str) 
+long Server::write(const char *str) 
 {
   write((const uint8_t *)str, strlen(str));
 }
 
-void Server::write(const uint8_t *buffer, size_t size) 
+long Server::write(const uint8_t *buffer, size_t size) 
 {
+  long n = 0;
+  
   accept();
 
   for (int sock = 0; sock < MAX_SOCK_NUM; sock++) {
@@ -86,7 +88,9 @@ void Server::write(const uint8_t *buffer, size_t size)
 
     if (EthernetClass::_server_port[sock] == _port &&
       client.status() == SnSR::ESTABLISHED) {
-      client.write(buffer, size);
+      n += client.write(buffer, size);
     }
   }
+  
+  return n;
 }

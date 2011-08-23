@@ -102,21 +102,22 @@ int UDP::endPacket()
   return sendUDP(_sock);
 }
 
-void UDP::write(uint8_t byte)
+long UDP::write(uint8_t byte)
 {
-  write(&byte, 1);
+  return write(&byte, 1);
 }
 
-void UDP::write(const char *str)
+long UDP::write(const char *str)
 {
   size_t len = strlen(str);
-  write((const uint8_t *)str, len);
+  return write((const uint8_t *)str, len);
 }
 
-void UDP::write(const uint8_t *buffer, size_t size)
+long UDP::write(const uint8_t *buffer, size_t size)
 {
   uint16_t bytes_written = bufferData(_sock, _offset, buffer, size);
   _offset += bytes_written;
+  return bytes_written;
 }
 
 int UDP::parsePacket()
