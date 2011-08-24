@@ -2317,6 +2317,7 @@ public class Editor extends JFrame implements RunnerListener {
                                   0);
     if (result == null) return false;
     selectSerialPort(result);
+    base.onBoardOrPortChange();
     return true;
   }
 
