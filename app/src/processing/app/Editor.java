@@ -196,8 +196,10 @@ public class Editor extends JFrame implements RunnerListener {
     //PdeKeywords keywords = new PdeKeywords();
     //sketchbook = new Sketchbook(this);
 
-    if (serialMonitor == null)
+    if (serialMonitor == null) {
       serialMonitor = new SerialMonitor(Preferences.get("serial.port"));
+      serialMonitor.setIconImage(getIconImage());
+    }
     
     buildMenuBar();
 
