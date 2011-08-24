@@ -2045,6 +2045,17 @@ public class JEditTextArea extends JComponent
     }
   }
 
+  public String checkClickedURL(String line, int offset) {
+    String[] parse = SyntaxUtilities.parseCommentUrls(line);
+    if (parse==null)
+      return null;
+    int start = parse[0].length();
+    int stop = start + parse[1].length();
+    if (offset<start|| offset>stop)
+      return null;
+    return parse[1];
+  }
+
   class MouseHandler extends MouseAdapter
   {
     public void mousePressed(MouseEvent evt)
@@ -2111,6 +2122,13 @@ public class JEditTextArea extends JComponent
       if (getLineLength(line) == 0)
         return;
 
+      // Check for click on urls
+      String clickedURL = checkClickedURL(getLineText(line), offset);
+      if (clickedURL != null) {
+        Base.openURL(clickedURL);
+        return;
+      }
+      
       try {
         int bracket = TextUtilities.findMatchingBracket(document,
                                                         Math.max(0,dot - 1));

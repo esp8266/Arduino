@@ -2739,22 +2739,13 @@ public class Editor extends JFrame implements RunnerListener {
       add(referenceItem);
     }
 
-    private boolean clickedURL(String line, int offset) {
-      String[] parse = SyntaxUtilities.parseCommentUrls(line);
-      if (parse==null)
-        return false;
-      int start = parse[0].length();
-      int stop = start + parse[1].length();
-      if (offset<start|| offset>stop+2)
-        return false;
-      clickedURL = parse[1];
-      return true;
-    }
-    
     // if no text is selected, disable copy and cut menu items
     public void show(Component component, int x, int y) {
-      int line = textarea.getLineOfOffset(textarea.xyToOffset(x, y));
-      if (clickedURL(textarea.getLineText(line), textarea.xToOffset(line, x))) {
+      int lineNo = textarea.getLineOfOffset(textarea.xyToOffset(x, y));
+      int offset = textarea.xToOffset(lineNo, x);
+      String line = textarea.getLineText(lineNo);
+      clickedURL = textarea.checkClickedURL(line, offset);
+      if (clickedURL != null) {
         openURLItem.setVisible(true);
         openURLItemSeparator.setVisible(true);
       } else {
