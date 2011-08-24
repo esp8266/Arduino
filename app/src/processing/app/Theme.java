@@ -196,7 +196,8 @@ public class Theme {
     s = st.nextToken();
     boolean bold = (s.indexOf("bold") != -1);
     boolean italic = (s.indexOf("italic") != -1);
+    boolean underlined = (s.indexOf("underlined") != -1);
 
-    return new SyntaxStyle(color, italic, bold);
+    return new SyntaxStyle(color, italic, bold, underlined);
   }
 }
