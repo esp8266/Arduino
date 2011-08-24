@@ -2106,6 +2106,13 @@ public class JEditTextArea extends JComponent
 
     private void doSingleClick(MouseEvent evt, int line,
                                int offset, int dot) {
+      // Check for click on urls
+      String clickedURL = checkClickedURL(getLineText(line), offset);
+      if (clickedURL != null) {
+        Base.openURL(clickedURL);
+        return;
+      }
+      
       if ((evt.getModifiers() & InputEvent.SHIFT_MASK) != 0) {
         rectSelect = (evt.getModifiers() & InputEvent.CTRL_MASK) != 0;
         select(getMarkPosition(),dot);
@@ -2122,13 +2129,6 @@ public class JEditTextArea extends JComponent
       if (getLineLength(line) == 0)
         return;
 
-      // Check for click on urls
-      String clickedURL = checkClickedURL(getLineText(line), offset);
-      if (clickedURL != null) {
-        Base.openURL(clickedURL);
-        return;
-      }
-      
       try {
         int bracket = TextUtilities.findMatchingBracket(document,
                                                         Math.max(0,dot - 1));
