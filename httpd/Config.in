@@ -65,7 +65,7 @@ config CONFIG_HTTP_HAS_CGI
 
 config CONFIG_HTTP_CGI_EXTENSIONS
     string "CGI File Extension(s)"
-    default ".lua,.lp"
+    default ".lua,.lp,.php"
     depends on CONFIG_HTTP_HAS_CGI
     help
         Tell axhhtpd what file extension(s) are used for CGI.
@@ -83,29 +83,26 @@ config CONFIG_HTTP_ENABLE_LUA
 
 config CONFIG_HTTP_LUA_PREFIX
     string "Lua's Installation Prefix"
-    default "/usr/local"
+    default "/usr"
     depends on CONFIG_HTTP_ENABLE_LUA
 
     help
-        The location of Lua's installation prefix. This is also necessary for
-        Lua's cgi launcher application.
-
-config CONFIG_HTTP_LUA_CGI_LAUNCHER
-    string "CGI launcher location"
-    default "/bin/cgi.exe" if CONFIG_PLATFORM_CYGWIN
-    default "/bin/cgi" if !CONFIG_PLATFORM_CYGWIN
-    depends on CONFIG_HTTP_ENABLE_LUA
-    help
-        The location of LUA's CGI launcher application (after
-        the CONFIG_HTTP_LUA_PREFIX)
+        The location of Lua's installation prefix.
 
 config CONFIG_HTTP_BUILD_LUA
     bool "Build Lua"
     default n
     depends on CONFIG_HTTP_ENABLE_LUA
     help
-        Build Lua and install in /usr/local/bin
+        Build Lua and install in /usr/bin by default.
 
+config CONFIG_HTTP_CGI_LAUNCHER
+    string "CGI launcher location"
+    default "/usr/bin/cgi.exe"
+    depends on CONFIG_HTTP_HAS_CGI
+    help
+        The location of the CGI launcher application (could be /usr/bin/php5).
+        The default is to use Lua's CGI launcher.
 endmenu
 
 config CONFIG_HTTP_DIRECTORIES

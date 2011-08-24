@@ -405,14 +405,7 @@ void procsendhead(struct connstruct *cn)
 #if defined(CONFIG_HTTP_HAS_CGI)
     if (file_exists != -1 && cn->is_cgi)
     {
-        if ((stbuf.st_mode & S_IEXEC) == 0 || isdir(cn->actualfile))
-        {
-            /* A non-executable file, or directory? */
-            send_error(cn, 403);
-        }
-        else
-            proccgi(cn);
-
+        proccgi(cn);
         return;
     }
 #endif
@@ -578,7 +571,7 @@ void procsendfile(struct connstruct *cn)
 static void proccgi(struct connstruct *cn) 
 {
     int tpipe[2], spipe[2];
-    char *myargs[2];
+    char *myargs[3];
     char cgienv[CGI_ARG_SIZE][MAXREQUESTLENGTH];
     char * cgiptr[CGI_ARG_SIZE+4];
     const char *type = "HEAD";
@@ -668,8 +661,9 @@ static void proccgi(struct connstruct *cn)
     } else    /* Otherwise we can shutdown the read side of the sock */
         shutdown(cn->networkdesc, 0);
 
-    myargs[0] = cn->actualfile;
-    myargs[1] = NULL;
+    myargs[0] = CONFIG_HTTP_CGI_LAUNCHER;
+    myargs[1] = cn->actualfile;
+    myargs[2] = NULL;
 
     /* 
      * set the cgi args. A url is defined by:
@@ -721,11 +715,6 @@ static void proccgi(struct connstruct *cn)
     if (cn->is_ssl)
         strcpy(cgienv[cgi_index++], "HTTPS=on");
 
-#ifdef CONFIG_PLATFORM_CYGWIN
-    /* TODO: find out why Lua needs this */
-    strcpy(cgienv[cgi_index++], "PATH=/usr/bin");
-#endif
-
     if (cgi_index >= CGI_ARG_SIZE)
     {
         printf("Content-type: text/plain\n\nToo many CGI args (%d, %d)\n",
@@ -761,14 +750,7 @@ static char * cgi_filetype_match(struct connstruct *cn, const char *fn)
             t += strlen(tp->ext);
 
             if (*t == '/' || *t == '\0')
-            {
-#ifdef CONFIG_HTTP_ENABLE_LUA
-                if (strcmp(tp->ext, ".lua") == 0 || strcmp(tp->ext, ".lp") == 0)
-                    cn->is_lua = 1;
-#endif
-
                 return t;
-            }
             else
                 return NULL;
 
@@ -786,9 +768,6 @@ static void decode_path_info(struct connstruct *cn, char *path_info)
 
 #if defined(CONFIG_HTTP_HAS_CGI)
     cn->is_cgi = 0;
-#endif
-#ifdef CONFIG_HTTP_ENABLE_LUA
-    cn->is_lua = 0;
 #endif
     *cn->uri_request = '\0';
     *cn->uri_path_info = '\0';
@@ -1004,16 +983,6 @@ static void buildactualfile(struct connstruct *cn)
         else
             *cp = 0;
     }
-#endif
-
-#if defined(CONFIG_HTTP_ENABLE_LUA)
-    /* 
-     * Use the lua launcher if this file has a lua extension. Put this at the
-     * end as we need the directory name.
-     */
-    if (cn->is_lua)
-        sprintf(cn->actualfile, "%s%s", CONFIG_HTTP_LUA_PREFIX, 
-                CONFIG_HTTP_LUA_CGI_LAUNCHER);
 #endif
 }
 
