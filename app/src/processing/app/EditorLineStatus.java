@@ -109,7 +109,7 @@ public class EditorLineStatus extends JComponent {
     g.drawString(text, 6, baseline);
 
     g.setColor(messageForeground);
-    String tmp = "board: " + name + " on " + serialport;
+    String tmp = name + " on " + serialport;
     
     Rectangle2D bounds = g.getFontMetrics().getStringBounds(tmp, null);
     
