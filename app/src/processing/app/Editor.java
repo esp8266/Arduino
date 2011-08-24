@@ -908,6 +908,7 @@ public class Editor extends JFrame implements RunnerListener {
 
     public void actionPerformed(ActionEvent e) {
       selectSerialPort(((JCheckBoxMenuItem)e.getSource()).getText());
+      base.onBoardOrPortChange();
     }
 
     /*
@@ -2624,7 +2625,14 @@ public class Editor extends JFrame implements RunnerListener {
 
   // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+  protected void onBoardOrPortChange() {
+    Map<String, String> boardPreferences =  Base.getBoardPreferences();
+    lineStatus.setBoardName(boardPreferences.get("name"));
+    lineStatus.setSerialPort(Preferences.get("serial.port"));
+    lineStatus.repaint();
+  }
 
+  
   /**
    * Returns the edit popup menu.
    */
