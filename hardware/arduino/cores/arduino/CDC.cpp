@@ -155,7 +155,17 @@ void Serial_::flush(void)
 
 void Serial_::write(uint8_t c)
 {
-	USB_Send(CDC_TX,&c,1);
+	/* only try to send bytes if the high-level CDC connection itself 
+	 is open (not just the pipe) - the OS should set lineState when the port
+	 is opened and clear lineState when the port is closed.
+	 bytes sent before the user opens the connection or after
+	 the connection is closed are lost - just like with a UART. */
+	
+	// TODO - ZE - check behavior on different OSes and test what happens if an
+	// open connection isn't broken cleanly (cable is yanked out, host dies
+	// or locks up, or host virtual serial port hangs)
+	if (_usbLineInfo.lineState > 0)	
+		USB_Send(CDC_TX,&c,1);
 }
 
 Serial_ Serial;
