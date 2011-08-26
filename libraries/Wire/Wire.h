@@ -52,9 +52,9 @@ class TwoWire : public Stream
     uint8_t endTransmission(void);
     uint8_t requestFrom(uint8_t, uint8_t);
     uint8_t requestFrom(int, int);
-    virtual ssize_t write(uint8_t);
-    virtual ssize_t write(const char *);
-    virtual ssize_t write(const uint8_t *, size_t);
+    virtual size_t write(uint8_t);
+    virtual size_t write(const char *);
+    virtual size_t write(const uint8_t *, size_t);
     virtual int available(void);
     virtual int read(void);
     virtual int peek(void);

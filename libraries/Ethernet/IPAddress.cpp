@@ -42,15 +42,15 @@ bool IPAddress::operator==(const uint8_t* addr)
     return memcmp(addr, _address, sizeof(_address)) == 0;
 }
 
-ssize_t IPAddress::printTo(Print& p) const
+size_t IPAddress::printTo(Print& p) const
 {
-    ssize_t n = 0, t;
+    size_t n = 0;
     for (int i =0; i < 3; i++)
     {
-        if ((t = p.print(_address[i], DEC)) > 0) n += t;
-        if ((t = p.print('.')) > 0) n+= t;
+        n += p.print(_address[i], DEC);
+        n += p.print('.');
     }
-    if ((t = p.print(_address[3], DEC)) > 0) n += t;
+    n += p.print(_address[3], DEC);
     return n;
 }
 

@@ -1121,7 +1121,7 @@ uint8_t SdFile::truncate(uint32_t length) {
  * for a read-only file, device is full, a corrupt file system or an I/O error.
  *
  */
-ssize_t SdFile::write(const void* buf, uint16_t nbyte) {
+size_t SdFile::write(const void* buf, uint16_t nbyte) {
   // convert void* to uint8_t*  -  must be before goto statements
   const uint8_t* src = reinterpret_cast<const uint8_t*>(buf);
 
@@ -1210,8 +1210,9 @@ ssize_t SdFile::write(const void* buf, uint16_t nbyte) {
 
  writeErrorReturn:
   // return for write error
-  writeError = true;
-  return -1;
+  //writeError = true;
+  setWriteError();
+  return 0;
 }
 //------------------------------------------------------------------------------
 /**
@@ -1219,7 +1220,7 @@ ssize_t SdFile::write(const void* buf, uint16_t nbyte) {
  *
  * Use SdFile::writeError to check for errors.
  */
-ssize_t SdFile::write(uint8_t b) {
+size_t SdFile::write(uint8_t b) {
   return write(&b, 1);
 }
 //------------------------------------------------------------------------------
@@ -1228,7 +1229,7 @@ ssize_t SdFile::write(uint8_t b) {
  *
  * Use SdFile::writeError to check for errors.
  */
-ssize_t SdFile::write(const char* str) {
+size_t SdFile::write(const char* str) {
   return write(str, strlen(str));
 }
 //------------------------------------------------------------------------------

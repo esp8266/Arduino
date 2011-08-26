@@ -141,7 +141,7 @@ class SdFile : public Print {
    * Set writeError to false before calling print() and/or write() and check
    * for true after calls to print() and/or write().
    */
-  bool writeError;
+  //bool writeError;
   /**
    * Cancel unbuffered reads for this file.
    * See setUnbufferedRead()
@@ -283,9 +283,9 @@ class SdFile : public Print {
   }
   /** \return SdVolume that contains this file. */
   SdVolume* volume(void) const {return vol_;}
-  ssize_t write(uint8_t b);
-  ssize_t write(const void* buf, uint16_t nbyte);
-  ssize_t write(const char* str);
+  size_t write(uint8_t b);
+  size_t write(const void* buf, uint16_t nbyte);
+  size_t write(const char* str);
   void write_P(PGM_P str);
   void writeln_P(PGM_P str);
 //------------------------------------------------------------------------------

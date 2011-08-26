@@ -70,17 +70,23 @@ int Client::connect(IPAddress ip, uint16_t port) {
   return 1;
 }
 
-ssize_t Client::write(uint8_t b) {
+size_t Client::write(uint8_t b) {
   return write(&b, 1);
 }
 
-ssize_t Client::write(const char *str) {
+size_t Client::write(const char *str) {
   return write((const uint8_t *) str, strlen(str));
 }
 
-ssize_t Client::write(const uint8_t *buf, size_t size) {
-  if (_sock == MAX_SOCK_NUM) return -1;
-  if (!send(_sock, buf, size)) return -2;
+size_t Client::write(const uint8_t *buf, size_t size) {
+  if (_sock == MAX_SOCK_NUM) {
+    setWriteError();
+    return 0;
+  }
+  if (!send(_sock, buf, size)) {
+    setWriteError();
+    return 0;
+  }
   return size;
 }
 
