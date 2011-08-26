@@ -124,7 +124,7 @@ uint8_t TwoWire::endTransmission(void)
 // must be called in:
 // slave tx event callback
 // or after beginTransmission(address)
-long TwoWire::write(uint8_t data)
+ssize_t TwoWire::write(uint8_t data)
 {
   if(transmitting){
   // in master transmitter mode
@@ -148,7 +148,7 @@ long TwoWire::write(uint8_t data)
 // must be called in:
 // slave tx event callback
 // or after beginTransmission(address)
-long TwoWire::write(const uint8_t *data, size_t quantity)
+ssize_t TwoWire::write(const uint8_t *data, size_t quantity)
 {
   if(transmitting){
   // in master transmitter mode
@@ -166,7 +166,7 @@ long TwoWire::write(const uint8_t *data, size_t quantity)
 // must be called in:
 // slave tx event callback
 // or after beginTransmission(address)
-long TwoWire::write(const char *data)
+ssize_t TwoWire::write(const char *data)
 {
   return write((uint8_t*)data, strlen(data));
 }

@@ -14,9 +14,9 @@ public:
   Server(uint16_t);
   Client available();
   void begin();
-  virtual long write(uint8_t);
-  virtual long write(const char *str);
-  virtual long write(const uint8_t *buf, size_t size);
+  virtual ssize_t write(uint8_t);
+  virtual ssize_t write(const char *str);
+  virtual ssize_t write(const uint8_t *buf, size_t size);
 };
 
 #endif

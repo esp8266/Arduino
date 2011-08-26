@@ -352,7 +352,7 @@ void HardwareSerial::flush()
     ;
 }
 
-long HardwareSerial::write(uint8_t c)
+ssize_t HardwareSerial::write(uint8_t c)
 {
   int i = (_tx_buffer->head + 1) % SERIAL_BUFFER_SIZE;
 	

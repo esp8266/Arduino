@@ -30,9 +30,9 @@
 // Public Methods //////////////////////////////////////////////////////////////
 
 /* default implementation: may be overridden */
-long Print::write(const char *str)
+ssize_t Print::write(const char *str)
 {
-  long n = 0;
+  ssize_t n = 0;
   while (*str) {
     if (write(*str++) <= 0) break;
     n++;
@@ -41,9 +41,9 @@ long Print::write(const char *str)
 }
 
 /* default implementation: may be overridden */
-long Print::write(const uint8_t *buffer, size_t size)
+ssize_t Print::write(const uint8_t *buffer, size_t size)
 {
-  long n = 0;
+  ssize_t n = 0;
   while (size--) {
     if (write(*buffer++) <= 0) break;
     n++;
@@ -51,10 +51,10 @@ long Print::write(const uint8_t *buffer, size_t size)
   return n;
 }
 
-long Print::print(const __FlashStringHelper *ifsh)
+ssize_t Print::print(const __FlashStringHelper *ifsh)
 {
   const prog_char *p = (const prog_char *)ifsh;
-  long n = 0;
+  ssize_t n = 0;
   while (1) {
     unsigned char c = pgm_read_byte(p++);
     if (c == 0) break;
@@ -64,9 +64,9 @@ long Print::print(const __FlashStringHelper *ifsh)
   return n;
 }
 
-long Print::print(const String &s)
+ssize_t Print::print(const String &s)
 {
-  long n = 0;
+  ssize_t n = 0;
   for (int i = 0; i < s.length(); i++) {
     if (write(s[i]) < 0) break;
     n++;
@@ -74,38 +74,38 @@ long Print::print(const String &s)
   return n;
 }
 
-long Print::print(const char str[])
+ssize_t Print::print(const char str[])
 {
   return write(str);
 }
 
-long Print::print(char c)
+ssize_t Print::print(char c)
 {
   return write(c);
 }
 
-long Print::print(unsigned char b, int base)
+ssize_t Print::print(unsigned char b, int base)
 {
   return print((unsigned long) b, base);
 }
 
-long Print::print(int n, int base)
+ssize_t Print::print(int n, int base)
 {
   return print((long) n, base);
 }
 
-long Print::print(unsigned int n, int base)
+ssize_t Print::print(unsigned int n, int base)
 {
   return print((unsigned long) n, base);
 }
 
-long Print::print(long n, int base)
+ssize_t Print::print(long n, int base)
 {
   if (base == 0) {
     return write(n);
   } else if (base == 10) {
     if (n < 0) {
-      long t = print('-');
+      int t = print('-');
       if (t <= 0) return t;
       n = -n;
       return printNumber(n, 10) + 1;
@@ -116,110 +116,110 @@ long Print::print(long n, int base)
   }
 }
 
-long Print::print(unsigned long n, int base)
+ssize_t Print::print(unsigned long n, int base)
 {
   if (base == 0) return write(n);
   else return printNumber(n, base);
 }
 
-long Print::print(double n, int digits)
+ssize_t Print::print(double n, int digits)
 {
   return printFloat(n, digits);
 }
 
-long Print::println(const __FlashStringHelper *ifsh)
+ssize_t Print::println(const __FlashStringHelper *ifsh)
 {
-  long n = print(ifsh);
+  ssize_t n = print(ifsh);
   if (n >= 0) n += println();
   return n;
 }
 
-long Print::print(const Printable& x)
+ssize_t Print::print(const Printable& x)
 {
   return x.printTo(*this);
 }
 
-long Print::println(void)
+ssize_t Print::println(void)
 {
-  long t = print('\r');
+  ssize_t t = print('\r');
   if (t <= 0) return t;
   if (print('\n') <= 0) return 1;
   return 2;
 }
 
-long Print::println(const String &s)
+ssize_t Print::println(const String &s)
 {
-  long n = print(s);
+  ssize_t n = print(s);
   if (n >= 0) n += println();
   return n;
 }
 
-long Print::println(const char c[])
+ssize_t Print::println(const char c[])
 {
-  long n = print(c);
+  ssize_t n = print(c);
   if (n >= 0) n += println();
   return n;
 }
 
-long Print::println(char c)
+ssize_t Print::println(char c)
 {
-  long n = print(c);
+  ssize_t n = print(c);
   if (n > 0) n += println();
   return n;
 }
 
-long Print::println(unsigned char b, int base)
+ssize_t Print::println(unsigned char b, int base)
 {
-  long n = print(b, base);
+  ssize_t n = print(b, base);
   if (n >= 0) n += println();
   return n;
 }
 
-long Print::println(int num, int base)
+ssize_t Print::println(int num, int base)
 {
-  long n = print(num, base);
+  ssize_t n = print(num, base);
   if (n >= 0) n += println();
   return n;
 }
 
-long Print::println(unsigned int num, int base)
+ssize_t Print::println(unsigned int num, int base)
 {
-  long n = print(num, base);
+  ssize_t n = print(num, base);
   if (n >= 0) n += println();
   return n;
 }
 
-long Print::println(long num, int base)
+ssize_t Print::println(long num, int base)
 {
-  long n = print(num, base);
+  ssize_t n = print(num, base);
   if (n >= 0) n += println();
   return n;
 }
 
-long Print::println(unsigned long num, int base)
+ssize_t Print::println(unsigned long num, int base)
 {
-  long n = print(num, base);
+  ssize_t n = print(num, base);
   if (n >= 0) n += println();
   return n;
 }
 
-long Print::println(double num, int digits)
+ssize_t Print::println(double num, int digits)
 {
-  long n = print(num, digits);
+  ssize_t n = print(num, digits);
   if (n >= 0) n += println();
   return n;
 }
 
-long Print::println(const Printable& x)
+ssize_t Print::println(const Printable& x)
 {
-  long n = print(x);
+  ssize_t n = print(x);
   if (n >= 0) n += println();
   return n;
 }
 
 // Private Methods /////////////////////////////////////////////////////////////
 
-long Print::printNumber(unsigned long n, uint8_t base) {
+ssize_t Print::printNumber(unsigned long n, uint8_t base) {
   char buf[8 * sizeof(long) + 1]; // Assumes 8-bit chars plus zero byte.
   char *str = &buf[sizeof(buf) - 1];
 
@@ -238,9 +238,9 @@ long Print::printNumber(unsigned long n, uint8_t base) {
   return write(str);
 }
 
-long Print::printFloat(double number, uint8_t digits) 
+ssize_t Print::printFloat(double number, uint8_t digits) 
 { 
-  long n = 0, t;
+  ssize_t n = 0, t;
   
   // Handle negative numbers
   if (number < 0.0)

@@ -67,19 +67,19 @@ Client Server::available()
   return Client(MAX_SOCK_NUM);
 }
 
-long Server::write(uint8_t b) 
+ssize_t Server::write(uint8_t b) 
 {
   write(&b, 1);
 }
 
-long Server::write(const char *str) 
+ssize_t Server::write(const char *str) 
 {
   write((const uint8_t *)str, strlen(str));
 }
 
-long Server::write(const uint8_t *buffer, size_t size) 
+ssize_t Server::write(const uint8_t *buffer, size_t size) 
 {
-  long n = 0;
+  ssize_t n = 0;
   
   accept();
 

@@ -12,9 +12,9 @@ public:
   uint8_t status();
   int connect(IPAddress ip, uint16_t port);
   int connect(const char *host, uint16_t port);
-  virtual long write(uint8_t);
-  virtual long write(const char *str);
-  virtual long write(const uint8_t *buf, size_t size);
+  virtual ssize_t write(uint8_t);
+  virtual ssize_t write(const char *str);
+  virtual ssize_t write(const uint8_t *buf, size_t size);
   virtual int available();
   virtual int read();
   virtual int read(uint8_t *buf, size_t size);

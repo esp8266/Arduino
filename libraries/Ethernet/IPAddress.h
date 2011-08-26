@@ -60,7 +60,7 @@ public:
     IPAddress& operator=(const uint8_t *address);
     IPAddress& operator=(uint32_t address);
 
-    virtual long printTo(Print& p) const;
+    virtual ssize_t printTo(Print& p) const;
 
     friend class EthernetClass;
     friend class UDP;

@@ -89,7 +89,7 @@ public:
   bool overflow() { bool ret = _buffer_overflow; _buffer_overflow = false; return ret; }
   int peek();
 
-  virtual long write(uint8_t byte);
+  virtual ssize_t write(uint8_t byte);
   virtual int read();
   virtual int available();
   virtual void flush();

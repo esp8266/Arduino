@@ -23,6 +23,8 @@
 #include <inttypes.h>
 #include <stdio.h> // for size_t
 
+typedef int ssize_t;
+
 #include "WString.h"
 #include "Printable.h"
 
@@ -34,37 +36,37 @@
 class Print
 {
   private:
-    long printNumber(unsigned long, uint8_t);
-    long printFloat(double, uint8_t);
+    ssize_t printNumber(unsigned long, uint8_t);
+    ssize_t printFloat(double, uint8_t);
   public:
-    virtual long write(uint8_t) = 0;
-    virtual long write(const char *str);
-    virtual long write(const uint8_t *buffer, size_t size);
+    virtual ssize_t write(uint8_t) = 0;
+    virtual ssize_t write(const char *str);
+    virtual ssize_t write(const uint8_t *buffer, size_t size);
     
-    long print(const __FlashStringHelper *);
-    long print(const String &);
-    long print(const char[]);
-    long print(char);
-    long print(unsigned char, int = DEC);
-    long print(int, int = DEC);
-    long print(unsigned int, int = DEC);
-    long print(long, int = DEC);
-    long print(unsigned long, int = DEC);
-    long print(double, int = 2);
-    long print(const Printable&);
+    ssize_t print(const __FlashStringHelper *);
+    ssize_t print(const String &);
+    ssize_t print(const char[]);
+    ssize_t print(char);
+    ssize_t print(unsigned char, int = DEC);
+    ssize_t print(int, int = DEC);
+    ssize_t print(unsigned int, int = DEC);
+    ssize_t print(long, int = DEC);
+    ssize_t print(unsigned long, int = DEC);
+    ssize_t print(double, int = 2);
+    ssize_t print(const Printable&);
 
-    long println(const __FlashStringHelper *);
-    long println(const String &s);
-    long println(const char[]);
-    long println(char);
-    long println(unsigned char, int = DEC);
-    long println(int, int = DEC);
-    long println(unsigned int, int = DEC);
-    long println(long, int = DEC);
-    long println(unsigned long, int = DEC);
-    long println(double, int = 2);
-    long println(const Printable&);
-    long println(void);
+    ssize_t println(const __FlashStringHelper *);
+    ssize_t println(const String &s);
+    ssize_t println(const char[]);
+    ssize_t println(char);
+    ssize_t println(unsigned char, int = DEC);
+    ssize_t println(int, int = DEC);
+    ssize_t println(unsigned int, int = DEC);
+    ssize_t println(long, int = DEC);
+    ssize_t println(unsigned long, int = DEC);
+    ssize_t println(double, int = 2);
+    ssize_t println(const Printable&);
+    ssize_t println(void);
 };
 
 #endif

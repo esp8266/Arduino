@@ -30,7 +30,7 @@ class Print;
 class Printable
 {
   public:
-    virtual long printTo(Print& p) const = 0;
+    virtual ssize_t printTo(Print& p) const = 0;
 };
 
 #endif
