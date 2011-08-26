@@ -211,7 +211,7 @@ public class SyntaxUtilities
     Segment tag = stringToSegment(parse[1]);
     Segment post = stringToSegment(parse[2]);
 
-    if (pre.length()>0)
+    if (pre.count>0)
       x = Utilities.drawTabbedText(pre, x, y, gfx, expander, 0);
 
     Font f = gfx.getFont();
@@ -219,7 +219,7 @@ public class SyntaxUtilities
     x = Utilities.drawTabbedText(tag, x, y, gfx, expander, 0);
 
     commentStyle.setGraphicsFlags(gfx, f);
-    if (post.length()>0)
+    if (post.count>0)
       x = Utilities.drawTabbedText(post, x, y, gfx, expander, 0);
     return x;
   }

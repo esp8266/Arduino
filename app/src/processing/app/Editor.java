@@ -2655,7 +2655,6 @@ public class Editor extends JFrame implements RunnerListener {
     public TextAreaPopup() {
       openURLItem = new JMenuItem("Open URL");
       openURLItem.addActionListener(new ActionListener() {
-        @Override
         public void actionPerformed(ActionEvent e) {
           Base.openURL(clickedURL);
         }
