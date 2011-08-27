@@ -218,6 +218,7 @@ int main()
 			if (cmd == 'Q')
 				break;
 		}
+		_timeout = 1;		// signal to exit the bootloader
 		_ejected = 1;
 	}
 }

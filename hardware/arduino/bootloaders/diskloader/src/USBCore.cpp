@@ -520,7 +520,7 @@ int USBGetChar()
 			Reboot();	// USB not connected, run firmware
 		}
 
-//		LEDPulse();
+		LEDPulse();
 	}
 	return -1;
 }
