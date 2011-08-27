@@ -33,8 +33,7 @@ class Print;
 class Printable
 {
   public:
-    virtual ~Printable() {};
-    virtual void printTo(Print& p) const =0;
+    virtual size_t printTo(Print& p) const = 0;
 };
 
 #endif

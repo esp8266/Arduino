@@ -42,7 +42,6 @@ http://arduiniana.org.
 #include <avr/pgmspace.h>
 #include "Arduino.h"
 #include "SoftwareSerial.h"
-#include "icrmacros.h"
 //
 // Lookup table
 //
@@ -441,10 +440,12 @@ int SoftwareSerial::available()
   return (_receive_buffer_tail + _SS_MAX_RX_BUFF - _receive_buffer_head) % _SS_MAX_RX_BUFF;
 }
 
-void SoftwareSerial::write(uint8_t b)
+size_t SoftwareSerial::write(uint8_t b)
 {
-  if (_tx_delay == 0)
-    return;
+  if (_tx_delay == 0) {
+    setWriteError();
+    return 0;
+  }
 
   uint8_t oldSREG = SREG;
   cli();  // turn off interrupts for a clean txmit
@@ -485,6 +486,8 @@ void SoftwareSerial::write(uint8_t b)
 
   SREG = oldSREG; // turn interrupts back on
   tunedDelay(_tx_delay);
+  
+  return 1;
 }
 
 void SoftwareSerial::flush()
