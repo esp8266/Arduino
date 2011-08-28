@@ -24,8 +24,6 @@ public:
   virtual void flush();
   virtual void stop();
   virtual uint8_t connected();
-  virtual uint8_t operator==(int);
-  virtual uint8_t operator!=(int);
   virtual operator bool();
 
   friend class Server;
