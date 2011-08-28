@@ -3,7 +3,7 @@
 leonardo.name=Arduino Leonardo
 leonardo.upload.protocol=stk500
 leonardo.upload.maximum_size=30720
-leonardo.upload.speed=1200
+leonardo.upload.speed=300
 leonardo.bootloader.low_fuses=0xde
 leonardo.bootloader.high_fuses=0xd8
 leonardo.bootloader.extended_fuses=0xf3
