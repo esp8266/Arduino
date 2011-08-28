@@ -1,5 +1,5 @@
 
-#include <WProgram.h>
+#include <Arduino.h>
 #include <IPAddress.h>
 
 IPAddress::IPAddress()
@@ -40,5 +40,17 @@ IPAddress& IPAddress::operator=(uint32_t address)
 bool IPAddress::operator==(const uint8_t* addr)
 {
     return memcmp(addr, _address, sizeof(_address)) == 0;
+}
+
+size_t IPAddress::printTo(Print& p) const
+{
+    size_t n = 0;
+    for (int i =0; i < 3; i++)
+    {
+        n += p.print(_address[i], DEC);
+        n += p.print('.');
+    }
+    n += p.print(_address[3], DEC);
+    return n;
 }
 

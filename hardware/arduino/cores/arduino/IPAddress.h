@@ -26,9 +26,11 @@
 #ifndef IPAddress_h
 #define IPAddress_h
 
+#include <Printable.h>
+
 // A class to make it easier to handle and pass around IP addresses
 
-class IPAddress {
+class IPAddress : public Printable {
 private:
     uint8_t _address[4];  // IPv4 address
     // Access the raw byte array containing the address.  Because this returns a pointer
@@ -57,6 +59,8 @@ public:
     // Overloaded copy operators to allow initialisation of IPAddress objects from other types
     IPAddress& operator=(const uint8_t *address);
     IPAddress& operator=(uint32_t address);
+
+    virtual size_t printTo(Print& p) const;
 
     friend class EthernetClass;
     friend class UDP;

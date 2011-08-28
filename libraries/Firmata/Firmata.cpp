@@ -14,7 +14,7 @@
 //* Includes
 //******************************************************************************
 
-#include "WProgram.h"
+#include "Arduino.h"
 #include "HardwareSerial.h"
 #include "Firmata.h"
 

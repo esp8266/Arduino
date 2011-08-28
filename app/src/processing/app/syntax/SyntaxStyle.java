@@ -10,6 +10,10 @@
 package processing.app.syntax;
 
 import java.awt.*;
+import java.awt.font.TextAttribute;
+import java.util.Hashtable;
+import java.util.Map;
+
 import javax.swing.JComponent;
 
 
@@ -27,11 +31,12 @@ public class SyntaxStyle
    * @param italic True if the text should be italics
    * @param bold True if the text should be bold
    */
-  public SyntaxStyle(Color color, boolean italic, boolean bold)
+  public SyntaxStyle(Color color, boolean italic, boolean bold, boolean underlined)
   {
     this.color = color;
     this.italic = italic;
     this.bold = bold;
+    this.underlined = underlined;
   }
 
   /**
@@ -47,7 +52,7 @@ public class SyntaxStyle
    */
   public boolean isPlain()
   {
-    return !(bold || italic);
+    return !(bold || italic || underlined);
   }
 
   /**
@@ -67,7 +72,14 @@ public class SyntaxStyle
   }
 
   /**
-   * Returns the specified font, but with the style's bold and
+   * @return true if underline is enabled for this style.
+   */
+  public boolean isUnderlined() {
+    return underlined;
+  }
+  
+  /**
+   * Returns the specified font, but with the style's bold, underline and
    * italic flags applied.
    */
   public Font getStyledFont(Font font)
@@ -78,10 +90,16 @@ public class SyntaxStyle
     if(font.equals(lastFont))
       return lastStyledFont;
     lastFont = font;
+    
     lastStyledFont = new Font(font.getFamily(),
                               (bold ? Font.BOLD : 0)
                               | (italic ? Font.ITALIC : 0),
                               font.getSize());
+    if (underlined) {
+      Map<TextAttribute, Object> attr = new Hashtable<TextAttribute, Object>();
+      attr.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+      lastStyledFont = lastStyledFont.deriveFont(attr);
+    }
     return lastStyledFont;
   }
 
@@ -100,6 +118,11 @@ public class SyntaxStyle
                               (bold ? Font.BOLD : 0)
                               | (italic ? Font.ITALIC : 0),
                               font.getSize());
+    if (underlined) {
+      Map<TextAttribute, Object> attr = new Hashtable<TextAttribute, Object>();
+      attr.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+      lastStyledFont = lastStyledFont.deriveFont(attr);
+    }
     //fontMetrics = Toolkit.getDefaultToolkit().getFontMetrics(lastStyledFont);
     fontMetrics = comp.getFontMetrics(lastStyledFont);
     return fontMetrics;
@@ -125,13 +148,16 @@ public class SyntaxStyle
   {
     return getClass().getName() + "[color=" + color +
       (italic ? ",italic" : "") +
-      (bold ? ",bold" : "") + "]";
+      (bold ? ",bold" : "") + 
+      (underlined ? ",underlined" : "") +
+      "]";
   }
 
   // private members
   private Color color;
   private boolean italic;
   private boolean bold;
+  private boolean underlined;
   private Font lastFont;
   private Font lastStyledFont;
   private FontMetrics fontMetrics;

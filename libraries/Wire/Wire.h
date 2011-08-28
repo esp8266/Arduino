@@ -21,10 +21,11 @@
 #define TwoWire_h
 
 #include <inttypes.h>
+#include "Stream.h"
 
 #define BUFFER_LENGTH 32
 
-class TwoWire
+class TwoWire : public Stream
 {
   private:
     static uint8_t rxBuffer[];
@@ -51,12 +52,13 @@ class TwoWire
     uint8_t endTransmission(void);
     uint8_t requestFrom(uint8_t, uint8_t);
     uint8_t requestFrom(int, int);
-    void send(uint8_t);
-    void send(uint8_t*, uint8_t);
-    void send(int);
-    void send(char*);
-    uint8_t available(void);
-    uint8_t receive(void);
+    virtual size_t write(uint8_t);
+    virtual size_t write(const char *);
+    virtual size_t write(const uint8_t *, size_t);
+    virtual int available(void);
+    virtual int read(void);
+    virtual int peek(void);
+	virtual void flush(void);
     void onReceive( void (*)(int) );
     void onRequest( void (*)(void) );
 };

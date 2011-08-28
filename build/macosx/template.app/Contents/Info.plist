@@ -7,11 +7,11 @@
 
     <!-- all these need to change for new releases -->
     <key>CFBundleGetInfoString</key>
-    <string>0022</string>
+    <string>1.0-beta2</string>
     <key>CFBundleVersion</key>
-    <string>0022</string>
+    <string>0100</string>
     <key>CFBundleShortVersionString</key>
-    <string>0022</string>
+    <string>1.0-beta2</string>
     <!-- now stop changing things and get outta here -->
 
     <key>CFBundleAllowMixedLocalizations</key>
@@ -35,13 +35,15 @@
       <dict>
         <key>CFBundleTypeExtensions</key>
         <array>
-          <string>pde</string>
-          <string>java</string>
+          <string>ino</string>
+          <string>c</string>
+          <string>cpp</string>
+          <string>h</string>
         </array>
         <key>CFBundleTypeIconFile</key>
         <string>pde.icns</string>
       	<key>CFBundleTypeName</key>
-        <string>Processing Source File</string>
+        <string>Arduino Source File</string>
         <key>CFBundleTypeMIMETypes</key>
         <array>
           <string>text/plain</string>

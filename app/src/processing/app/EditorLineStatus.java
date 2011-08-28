@@ -25,6 +25,9 @@ package processing.app;
 import processing.app.syntax.*;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
+import java.util.Map;
+
 import javax.swing.*;
 
 
@@ -39,10 +42,14 @@ public class EditorLineStatus extends JComponent {
 
   Color foreground;
   Color background;
+  Color messageForeground;
+  
   Font font;
   int high;
 
   String text = "";
+  String name = "";
+  String serialport = "";
 
 
   public EditorLineStatus(JEditTextArea textarea) {
@@ -87,6 +94,11 @@ public class EditorLineStatus extends JComponent {
 
 
   public void paintComponent(Graphics g) {
+    if (name=="" && serialport=="") {
+      Map<String, String> boardPreferences =  Base.getBoardPreferences();
+      setBoardName(boardPreferences.get("name"));
+      setSerialPort(Preferences.get("serial.port"));
+    }
     g.setColor(background);
     Dimension size = getSize();
     g.fillRect(0, 0, size.width, size.height);
@@ -96,11 +108,20 @@ public class EditorLineStatus extends JComponent {
     int baseline = (high + g.getFontMetrics().getAscent()) / 2;
     g.drawString(text, 6, baseline);
 
+    g.setColor(messageForeground);
+    String tmp = name + " on " + serialport;
+    
+    Rectangle2D bounds = g.getFontMetrics().getStringBounds(tmp, null);
+    
+    g.drawString(tmp, size.width - (int) bounds.getWidth() -20 , baseline);
+
     if (Base.isMacOS()) {
       g.drawImage(resize, size.width - 20, 0, this);
     }
   }
 
+  public void setBoardName(String name) { this.name = name; }
+  public void setSerialPort(String serialport) { this.serialport = serialport; }
 
   public Dimension getPreferredSize() {
     return new Dimension(300, high);

@@ -6,7 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "Dhcp.h"
-#include "wiring.h"
+#include "Arduino.h"
 #include "util.h"
 
 int DhcpClass::beginWithDHCP(uint8_t *mac, unsigned long timeout, unsigned long responseTimeout)
@@ -271,11 +271,19 @@ uint8_t DhcpClass::parseDHCPResponse(unsigned long responseTimeout, uint32_t& tr
                 case routersOnSubnet :
                     opt_len = _dhcpUdpSocket.read();
                     _dhcpUdpSocket.read(_dhcpGatewayIp, 4);
+                    for (int i = 0; i < opt_len-4; i++)
+                    {
+                        _dhcpUdpSocket.read();
+                    }
                     break;
                 
                 case dns :
                     opt_len = _dhcpUdpSocket.read();
                     _dhcpUdpSocket.read(_dhcpDnsServerIp, 4);
+                    for (int i = 0; i < opt_len-4; i++)
+                    {
+                        _dhcpUdpSocket.read();
+                    }
                     break;
                 
                 case dhcpServerIdentifier :

@@ -5,7 +5,7 @@ extern "C" {
   #include "string.h"
 }
 
-#include "WProgram.h"
+#include "Arduino.h"
 
 #include "Ethernet.h"
 #include "Client.h"
@@ -70,19 +70,24 @@ int Client::connect(IPAddress ip, uint16_t port) {
   return 1;
 }
 
-void Client::write(uint8_t b) {
-  if (_sock != MAX_SOCK_NUM)
-    send(_sock, &b, 1);
+size_t Client::write(uint8_t b) {
+  return write(&b, 1);
 }
 
-void Client::write(const char *str) {
-  if (_sock != MAX_SOCK_NUM)
-    send(_sock, (const uint8_t *)str, strlen(str));
+size_t Client::write(const char *str) {
+  return write((const uint8_t *) str, strlen(str));
 }
 
-void Client::write(const uint8_t *buf, size_t size) {
-  if (_sock != MAX_SOCK_NUM)
-    send(_sock, buf, size);
+size_t Client::write(const uint8_t *buf, size_t size) {
+  if (_sock == MAX_SOCK_NUM) {
+    setWriteError();
+    return 0;
+  }
+  if (!send(_sock, buf, size)) {
+    setWriteError();
+    return 0;
+  }
+  return size;
 }
 
 int Client::available() {
@@ -156,18 +161,8 @@ uint8_t Client::status() {
   return W5100.readSnSR(_sock);
 }
 
-// the next three functions are a hack so we can compare the client returned
-// by Server::available() to null, or use it as the condition in an
-// if-statement.  this lets us stay compatible with the Processing network
-// library.
-
-uint8_t Client::operator==(int p) {
-  return _sock == MAX_SOCK_NUM;
-}
-
-uint8_t Client::operator!=(int p) {
-  return _sock != MAX_SOCK_NUM;
-}
+// the next function allows us to use the client returned by
+// Server::available() as the condition in an if-statement.
 
 Client::operator bool() {
   return _sock != MAX_SOCK_NUM;

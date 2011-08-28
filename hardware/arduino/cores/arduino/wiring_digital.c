@@ -136,17 +136,16 @@ void digitalWrite(uint8_t pin, uint8_t val)
 
 	out = portOutputRegister(port);
 
+	uint8_t oldSREG = SREG;
+	cli();
+
 	if (val == LOW) {
-		uint8_t oldSREG = SREG;
-                cli();
 		*out &= ~bit;
-		SREG = oldSREG;
 	} else {
-		uint8_t oldSREG = SREG;
-                cli();
 		*out |= bit;
-		SREG = oldSREG;
 	}
+
+	SREG = oldSREG;
 }
 
 int digitalRead(uint8_t pin)

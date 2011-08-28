@@ -275,10 +275,10 @@ boolean callback_makeDirPath(SdFile& parentDir, char *filePathComponent,
 }
 
 
+  /*
 
 boolean callback_openPath(SdFile& parentDir, char *filePathComponent, 
 			  boolean isLastComponent, void *object) {
-  /*
 
     Callback used to open a file specified by a filepath that may
     specify one or more directories above it.
@@ -293,7 +293,6 @@ boolean callback_openPath(SdFile& parentDir, char *filePathComponent,
     Returns false once the file has been opened--to prevent the traversal
     from descending further. (This may be unnecessary.)
 
-  */
   if (isLastComponent) {
     SDClass *p_SD = static_cast<SDClass*>(object);
     p_SD->file.open(parentDir, filePathComponent, p_SD->fileOpenMode);
@@ -305,6 +304,8 @@ boolean callback_openPath(SdFile& parentDir, char *filePathComponent,
   }
   return true;
 }
+  */
+
 
 
 boolean callback_remove(SdFile& parentDir, char *filePathComponent, 
@@ -345,6 +346,64 @@ boolean SDClass::begin(uint8_t csPin) {
 }
 
 
+
+// this little helper is used to traverse paths
+SdFile SDClass::getParentDir(char *filepath, int *index) {
+  // get parent directory
+  SdFile d1 = root; // start with the mostparent, root!
+  SdFile d2;
+
+  // we'll use the pointers to swap between the two objects
+  SdFile *parent = &d1;
+  SdFile *subdir = &d2;
+  
+  char *origpath = filepath;
+
+  while (strchr(filepath, '/')) {
+
+    // get rid of leading /'s
+    if (filepath[0] == '/') {
+      filepath++;
+      continue;
+    }
+    
+    if (! strchr(filepath, '/')) {
+      // it was in the root directory, so leave now
+      break;
+    }
+
+    // extract just the name of the next subdirectory
+    uint8_t idx = strchr(filepath, '/') - filepath;
+    if (idx > 12)
+      idx = 12;    // dont let them specify long names
+    char subdirname[13];
+    strncpy(subdirname, filepath, idx);
+    subdirname[idx] = 0;
+
+    // close the subdir (we reuse them) if open
+    subdir->close();
+    if (! subdir->open(parent, subdirname, O_READ)) {
+      // failed to open one of the subdirectories
+      return SdFile();
+    }
+    // move forward to the next subdirectory
+    filepath += idx;
+
+    // we reuse the objects, close it.
+    parent->close();
+
+    // swap the pointers
+    SdFile *t = parent;
+    parent = subdir;
+    subdir = t;
+  }
+
+  *index = (int)(filepath - origpath);
+  // parent is now the parent diretory of the file!
+  return *parent;
+}
+
+
 File SDClass::open(char *filepath, uint8_t mode) {
   /*
 
@@ -369,6 +428,72 @@ File SDClass::open(char *filepath, uint8_t mode) {
 
    */
 
+  int pathidx;
+
+  // do the interative search
+  SdFile parentdir = getParentDir(filepath, &pathidx);
+  // no more subdirs!
+
+  filepath += pathidx;
+
+  if (! filepath[0]) {
+    // it was the directory itself!
+    return File(parentdir, "/");
+  }
+
+  // Open the file itself
+  SdFile file;
+
+  // failed to open a subdir!
+  if (!parentdir.isOpen())
+    return File();
+
+  // there is a special case for the Root directory since its a static dir
+  if (parentdir.isRoot()) {
+    if ( ! file.open(SD.root, filepath, mode)) {
+      // failed to open the file :(
+      return File();
+    }
+    // dont close the root!
+  } else {
+    if ( ! file.open(parentdir, filepath, mode)) {
+      return File();
+    }
+    // close the parent
+    parentdir.close();
+  }
+
+  if (mode & (O_APPEND | O_WRITE)) 
+    file.seekSet(file.fileSize());
+  return File(file, filepath);
+}
+
+
+/*
+File SDClass::open(char *filepath, uint8_t mode) {
+  //
+
+     Open the supplied file path for reading or writing.
+
+     The file content can be accessed via the `file` property of
+     the `SDClass` object--this property is currently
+     a standard `SdFile` object from `sdfatlib`.
+
+     Defaults to read only.
+
+     If `write` is true, default action (when `append` is true) is to
+     append data to the end of the file.
+
+     If `append` is false then the file will be truncated first.
+
+     If the file does not exist and it is opened for writing the file
+     will be created.
+
+     An attempt to open a file for reading that does not exist is an
+     error.
+
+   //
+
   // TODO: Allow for read&write? (Possibly not, as it requires seek.)
 
   fileOpenMode = mode;
@@ -377,6 +502,7 @@ File SDClass::open(char *filepath, uint8_t mode) {
   return File();
 
 }
+*/
 
 
 //boolean SDClass::close() {
@@ -434,6 +560,57 @@ boolean SDClass::rmdir(char *filepath) {
 
 boolean SDClass::remove(char *filepath) {
   return walkPath(filepath, root, callback_remove);
+}
+
+
+// allows you to recurse into a directory
+File File::openNextFile(uint8_t mode) {
+  dir_t p;
+
+  //Serial.print("\t\treading dir...");
+  while (_file->readDir(&p) > 0) {
+
+    // done if past last used entry
+    if (p.name[0] == DIR_NAME_FREE) {
+      //Serial.println("end");
+      return File();
+    }
+
+    // skip deleted entry and entries for . and  ..
+    if (p.name[0] == DIR_NAME_DELETED || p.name[0] == '.') {
+      //Serial.println("dots");
+      continue;
+    }
+
+    // only list subdirectories and files
+    if (!DIR_IS_FILE_OR_SUBDIR(&p)) {
+      //Serial.println("notafile");
+      continue;
+    }
+
+    // print file name with possible blank fill
+    SdFile f;
+    char name[13];
+    _file->dirName(p, name);
+    //Serial.print("try to open file ");
+    //Serial.println(name);
+
+    if (f.open(_file, name, mode)) {
+      //Serial.println("OK!");
+      return File(f, name);    
+    } else {
+      //Serial.println("ugh");
+      return File();
+    }
+  }
+
+  //Serial.println("nothing");
+  return File();
+}
+
+void File::rewindDirectory(void) {  
+  if (isDirectory())
+    _file->rewind();
 }
 
 SDClass SD;

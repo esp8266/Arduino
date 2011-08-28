@@ -27,6 +27,6 @@ void loop()
 // this function is registered as an event, see setup()
 void requestEvent()
 {
-  Wire.send("hello "); // respond with message of 6 bytes
+  Wire.write("hello "); // respond with message of 6 bytes
                        // as expected by master
 }

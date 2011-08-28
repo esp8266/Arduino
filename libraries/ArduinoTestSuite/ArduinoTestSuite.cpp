@@ -26,7 +26,7 @@
 #include	"ArduinoTestSuite.h"
 
 
-#include	"WProgram.h"
+#include	"Arduino.h"
 #include	"HardwareSerial.h"
 #include	"pins_arduino.h"
 
