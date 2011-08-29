@@ -1,18 +1,18 @@
-#ifndef server_h
-#define server_h
+#ifndef ethernetserver_h
+#define ethernetserver_h
 
-#include "NetServer.h"
+#include "Server.h"
 
-class Client;
+class EthernetClient;
 
-class Server : 
-public NetServer {
+class EthernetServer : 
+public Server {
 private:
   uint16_t _port;
   void accept();
 public:
-  Server(uint16_t);
-  Client available();
+  EthernetServer(uint16_t);
+  EthernetClient available();
   virtual void begin();
   virtual size_t write(uint8_t);
   virtual size_t write(const char *str);

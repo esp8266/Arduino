@@ -1,15 +1,15 @@
-#ifndef client_h
-#define client_h
+#ifndef ethernetclient_h
+#define ethernetclient_h
 #include "Arduino.h"	
 #include "Print.h"
-#include "NetClient.h"
+#include "Client.h"
 #include "IPAddress.h"
 
-class Client : public NetClient {
+class EthernetClient : public Client {
 
 public:
-  Client();
-  Client(uint8_t sock);
+  EthernetClient();
+  EthernetClient(uint8_t sock);
 
   uint8_t status();
   virtual int connect(IPAddress ip, uint16_t port);
@@ -26,7 +26,7 @@ public:
   virtual uint8_t connected();
   virtual operator bool();
 
-  friend class Server;
+  friend class EthernetServer;
 
 private:
   static uint16_t _srcport;

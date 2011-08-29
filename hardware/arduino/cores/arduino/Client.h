@@ -1,10 +1,10 @@
-#ifndef netclient_h
-#define netclient_h
+#ifndef client_h
+#define client_h
 #include "Print.h"
-#include "NetClient.h"
+#include "Stream.h"
 #include "IPAddress.h"
 
-class NetClient : public Stream {
+class Client : public Stream {
 
 public:
   virtual int connect(IPAddress ip, uint16_t port) =0;
@@ -20,6 +20,8 @@ public:
   virtual void stop() = 0;
   virtual uint8_t connected() = 0;
   virtual operator bool() = 0;
+protected:
+  uint8_t* rawIPAddress(IPAddress& addr) { return addr.raw_address(); };
 };
 
 #endif

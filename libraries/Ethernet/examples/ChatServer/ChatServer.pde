@@ -29,7 +29,7 @@ IPAddress gateway(192,168,1, 1);
 IPAddress subnet(255, 255, 0, 0);
 
 // telnet defaults to port 23
-Server server(23);
+EthernetServer server(23);
 boolean gotAMessage = false; // whether or not you got a message from the client yet
 
 void setup() {
@@ -43,7 +43,7 @@ void setup() {
 
 void loop() {
   // wait for a new client:
-  Client client = server.available();
+  EthernetClient client = server.available();
   
   // when the client sends the first byte, say hello:
   if (client) {

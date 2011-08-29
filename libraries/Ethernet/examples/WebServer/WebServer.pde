@@ -1,5 +1,5 @@
 /*
-  Web  Server
+  Web Server
  
  A simple web server that shows the value of the analog input pins.
  using an Arduino Wiznet Ethernet shield. 
@@ -26,7 +26,7 @@ IPAddress ip(192,168,1, 177);
 // Initialize the Ethernet server library
 // with the IP address and port you want to use 
 // (port 80 is default for HTTP):
-Server server(80);
+EthernetServer server(80);
 
 void setup()
 {
@@ -38,7 +38,7 @@ void setup()
 void loop()
 {
   // listen for incoming clients
-  Client client = server.available();
+  EthernetClient client = server.available();
   if (client) {
     // an http request ends with a blank line
     boolean currentLineIsBlank = true;

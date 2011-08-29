@@ -39,7 +39,7 @@ IPAddress subnet(255, 255, 255, 0);
 // Initialize the Ethernet server library
 // with the IP address and port you want to use 
 // (port 80 is default for HTTP):
-Server server(80);
+EthernetServer server(80);
 
 
 //Sensor's memory register addresses:
@@ -96,7 +96,7 @@ void loop() {
   }
 
   // listen for incoming Ethernet connections:
-  listenForClients();
+  listenForEthernetClients();
 }
 
 
@@ -124,9 +124,9 @@ void getData() {
   Serial.println(" Pa");
 }
 
-void listenForClients() {
+void listenForEthernetClients() {
   // listen for incoming clients
-  Client client = server.available();
+  EthernetClient client = server.available();
   if (client) {
     Serial.println("Got a client");
     // an http request ends with a blank line

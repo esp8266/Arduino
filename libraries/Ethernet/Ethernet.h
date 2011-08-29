@@ -4,8 +4,8 @@
 #include <inttypes.h>
 //#include "w5100.h"
 #include "IPAddress.h"
-#include "Client.h"
-#include "Server.h"
+#include "EthernetClient.h"
+#include "EthernetServer.h"
 
 #define MAX_SOCK_NUM 4
 
@@ -29,8 +29,8 @@ public:
   IPAddress gatewayIP();
   IPAddress dnsServerIP();
 
-  friend class Client;
-  friend class Server;
+  friend class EthernetClient;
+  friend class EthernetServer;
 };
 
 extern EthernetClass Ethernet;
