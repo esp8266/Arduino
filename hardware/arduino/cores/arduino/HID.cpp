@@ -398,11 +398,15 @@ size_t Keyboard_::write(uint8_t c)
 			_keyMap->charToKey(c,&keys);
 		else
 		{
-			if (c >= 128)
+			if (c >= 128) {
+				setWriteError();
 				return 0;
+			}
 			c = pgm_read_byte(_asciimap + c);
-			if (!c)
+			if (!c) {
+				setWriteError();
 				return 0;
+			}
 			if (c & 0x80)
 			{
 				keys.modifiers |= KEY_MODIFIER_LEFT_SHIFT;

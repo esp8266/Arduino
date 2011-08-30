@@ -166,9 +166,15 @@ size_t Serial_::write(uint8_t c)
 	// open connection isn't broken cleanly (cable is yanked out, host dies
 	// or locks up, or host virtual serial port hangs)
 	if (_usbLineInfo.lineState > 0)	{
-		USB_Send(CDC_TX,&c,1);
-		return 1;
+		int r = USB_Send(CDC_TX,&c,1);
+		if (r > 0) {
+			return r;
+		} else {
+			setWriteError();
+			return 0;
+		}
 	}
+	setWriteError();
 	return 0;
 }
 
