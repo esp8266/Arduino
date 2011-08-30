@@ -14,7 +14,7 @@ leonardo.bootloader.lock_bits=0x0F
 leonardo.build.mcu=atmega32u4
 leonardo.build.f_cpu=16000000L
 leonardo.build.core=arduino
-leonardo.build.pins=leonardo
+leonardo.build.variant=leonardo
 
 ##############################################################
 
