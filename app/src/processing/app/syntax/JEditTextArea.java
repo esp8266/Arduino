@@ -2045,6 +2045,17 @@ public class JEditTextArea extends JComponent
     }
   }
 
+  public String checkClickedURL(String line, int offset) {
+    String[] parse = SyntaxUtilities.parseCommentUrls(line);
+    if (parse==null)
+      return null;
+    int start = parse[0].length();
+    int stop = start + parse[1].length();
+    if (offset<start|| offset>stop)
+      return null;
+    return parse[1];
+  }
+
   class MouseHandler extends MouseAdapter
   {
     public void mousePressed(MouseEvent evt)
@@ -2095,6 +2106,13 @@ public class JEditTextArea extends JComponent
 
     private void doSingleClick(MouseEvent evt, int line,
                                int offset, int dot) {
+      // Check for click on urls
+      String clickedURL = checkClickedURL(getLineText(line), offset);
+      if (clickedURL != null) {
+        Base.openURL(clickedURL);
+        return;
+      }
+      
       if ((evt.getModifiers() & InputEvent.SHIFT_MASK) != 0) {
         rectSelect = (evt.getModifiers() & InputEvent.CTRL_MASK) != 0;
         select(getMarkPosition(),dot);

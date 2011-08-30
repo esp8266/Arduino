@@ -169,6 +169,9 @@ public class PdeTextAreaDefaults extends TextAreaDefaults {
     // ??
     styles[Token.LABEL] = Theme.getStyle("label");
 
+    // http://arduino.cc/
+    styles[Token.URL] = Theme.getStyle("url");
+
     // + - = /
     styles[Token.OPERATOR] = Theme.getStyle("operator");
 

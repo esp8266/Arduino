@@ -172,6 +172,13 @@ print	KEYWORD2	Serial_Print
 println	KEYWORD2	Serial_Println
 available	KEYWORD2	Serial_Available
 flush	KEYWORD2	Serial_Flush
+setTimeout	KEYWORD2
+find	KEYWORD2
+findUntil	KEYWORD2
+parseInt	KEYWORD2
+parseFloat	KEYWORD2
+readBytes	KEYWORD2
+readBytesUntil	KEYWORD2
 
 setup	KEYWORD3	Setup
 loop	KEYWORD3	Loop

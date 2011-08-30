@@ -363,12 +363,13 @@ void HardwareSerial::flush()
     ;
 }
 
-void HardwareSerial::write(uint8_t c)
+size_t HardwareSerial::write(uint8_t c)
 {
   int i = (_tx_buffer->head + 1) % SERIAL_BUFFER_SIZE;
 	
   // If the output buffer is full, there's nothing for it other than to 
   // wait for the interrupt handler to empty it a bit
+  // ???: return 0 here instead?
   while (i == _tx_buffer->tail)
     ;
 	
@@ -376,6 +377,8 @@ void HardwareSerial::write(uint8_t c)
   _tx_buffer->head = i;
 	
   sbi(*_ucsrb, _udrie);
+  
+  return 1;
 }
 
 // Preinstantiate Objects //////////////////////////////////////////////////////

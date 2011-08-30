@@ -993,6 +993,13 @@ public class Base {
   }
   
   
+  public void onBoardOrPortChange() {
+    for (Editor editor : editors) {
+      editor.onBoardOrPortChange();
+    }  
+  }
+
+  
   public void rebuildBoardsMenu(JMenu menu) {
     //System.out.println("rebuilding boards menu");
     menu.removeAll();      
@@ -1005,6 +1012,7 @@ public class Base {
               //System.out.println("Switching to " + target + ":" + board);
               Preferences.set("target", (String) getValue("target"));
               Preferences.set("board", (String) getValue("board"));
+              onBoardOrPortChange();
             }
           };
         action.putValue("target", target.getName());

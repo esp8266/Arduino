@@ -1507,6 +1507,7 @@ public class Sketch {
     throws RunnerException {
     
     // run the preprocessor
+    editor.status.progressUpdate(20);
     String primaryClassName = preprocess(buildPath);
 
     // compile the program. errors will happen as a RunnerException
@@ -1552,6 +1553,7 @@ public class Sketch {
     appletFolder.mkdirs();
 
     // build the sketch
+    editor.status.progressNotice("Compiling sketch...");
     String foundName = build(appletFolder.getPath(), false);
     // (already reported) error during export, exit this function
     if (foundName == null) return false;
@@ -1565,12 +1567,18 @@ public class Sketch {
 //      return false;
 //    }
 
+    editor.status.progressNotice("Uploading...");
     upload(appletFolder.getPath(), foundName, usingProgrammer);
-    
+    editor.status.progressUpdate(100);
     return true;
   }
 
+  
+  public void setCompilingProgress(int percent) {
+    editor.status.progressUpdate(percent);
+  }
 
+  
   protected void size(String buildPath, String suggestedClassName)
     throws RunnerException {
     long size = 0;

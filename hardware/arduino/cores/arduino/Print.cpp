@@ -30,167 +30,190 @@
 // Public Methods //////////////////////////////////////////////////////////////
 
 /* default implementation: may be overridden */
-void Print::write(const char *str)
+size_t Print::write(const char *str)
 {
-  while (*str)
-    write(*str++);
+  size_t n = 0;
+  while (*str) {
+    n += write(*str++);
+  }
+  return n;
 }
 
 /* default implementation: may be overridden */
-void Print::write(const uint8_t *buffer, size_t size)
+size_t Print::write(const uint8_t *buffer, size_t size)
 {
-  while (size--)
-    write(*buffer++);
+  size_t n = 0;
+  while (size--) {
+    n += write(*buffer++);
+  }
+  return n;
 }
 
-void Print::print(const __FlashStringHelper *ifsh)
+size_t Print::print(const __FlashStringHelper *ifsh)
 {
   const prog_char *p = (const prog_char *)ifsh;
+  size_t n = 0;
   while (1) {
     unsigned char c = pgm_read_byte(p++);
-    if (c == 0) return;
-    write(c);
+    if (c == 0) break;
+    n += write(c);
   }
+  return n;
 }
 
-void Print::print(const String &s)
+size_t Print::print(const String &s)
 {
+  size_t n = 0;
   for (int i = 0; i < s.length(); i++) {
-    write(s[i]);
+    n += write(s[i]);
   }
+  return n;
 }
 
-void Print::print(const char str[])
+size_t Print::print(const char str[])
 {
-  write(str);
+  return write(str);
 }
 
-void Print::print(char c)
+size_t Print::print(char c)
 {
-  write(c);
+  return write(c);
 }
 
-void Print::print(unsigned char b, int base)
+size_t Print::print(unsigned char b, int base)
 {
-  print((unsigned long) b, base);
+  return print((unsigned long) b, base);
 }
 
-void Print::print(int n, int base)
+size_t Print::print(int n, int base)
 {
-  print((long) n, base);
+  return print((long) n, base);
 }
 
-void Print::print(unsigned int n, int base)
+size_t Print::print(unsigned int n, int base)
 {
-  print((unsigned long) n, base);
+  return print((unsigned long) n, base);
 }
 
-void Print::print(long n, int base)
+size_t Print::print(long n, int base)
 {
   if (base == 0) {
-    write(n);
+    return write(n);
   } else if (base == 10) {
     if (n < 0) {
-      print('-');
+      int t = print('-');
       n = -n;
+      return printNumber(n, 10) + t;
     }
-    printNumber(n, 10);
+    return printNumber(n, 10);
   } else {
-    printNumber(n, base);
+    return printNumber(n, base);
   }
 }
 
-void Print::print(unsigned long n, int base)
+size_t Print::print(unsigned long n, int base)
 {
-  if (base == 0) write(n);
-  else printNumber(n, base);
+  if (base == 0) return write(n);
+  else return printNumber(n, base);
 }
 
-void Print::print(double n, int digits)
+size_t Print::print(double n, int digits)
 {
-  printFloat(n, digits);
+  return printFloat(n, digits);
 }
 
-void Print::println(const __FlashStringHelper *ifsh)
+size_t Print::println(const __FlashStringHelper *ifsh)
 {
-  print(ifsh);
-  println();
+  size_t n = print(ifsh);
+  n += println();
+  return n;
 }
 
-void Print::print(const Printable& x)
+size_t Print::print(const Printable& x)
 {
-  x.printTo(*this);
+  return x.printTo(*this);
 }
 
-void Print::println(void)
+size_t Print::println(void)
 {
-  print('\r');
-  print('\n');
+  size_t n = print('\r');
+  n += print('\n');
+  return n;
 }
 
-void Print::println(const String &s)
+size_t Print::println(const String &s)
 {
-  print(s);
-  println();
+  size_t n = print(s);
+  n += println();
+  return n;
 }
 
-void Print::println(const char c[])
+size_t Print::println(const char c[])
 {
-  print(c);
-  println();
+  size_t n = print(c);
+  n += println();
+  return n;
 }
 
-void Print::println(char c)
+size_t Print::println(char c)
 {
-  print(c);
-  println();
+  size_t n = print(c);
+  n += println();
+  return n;
 }
 
-void Print::println(unsigned char b, int base)
+size_t Print::println(unsigned char b, int base)
 {
-  print(b, base);
-  println();
+  size_t n = print(b, base);
+  n += println();
+  return n;
 }
 
-void Print::println(int n, int base)
+size_t Print::println(int num, int base)
 {
-  print(n, base);
-  println();
+  size_t n = print(num, base);
+  n += println();
+  return n;
 }
 
-void Print::println(unsigned int n, int base)
+size_t Print::println(unsigned int num, int base)
 {
-  print(n, base);
-  println();
+  size_t n = print(num, base);
+  n += println();
+  return n;
 }
 
-void Print::println(long n, int base)
+size_t Print::println(long num, int base)
 {
-  print(n, base);
-  println();
+  size_t n = print(num, base);
+  n += println();
+  return n;
 }
 
-void Print::println(unsigned long n, int base)
+size_t Print::println(unsigned long num, int base)
 {
-  print(n, base);
-  println();
+  size_t n = print(num, base);
+  n += println();
+  return n;
 }
 
-void Print::println(double n, int digits)
+size_t Print::println(double num, int digits)
 {
-  print(n, digits);
-  println();
+  size_t n = print(num, digits);
+  n += println();
+  return n;
 }
 
-void Print::println(const Printable& x)
+size_t Print::println(const Printable& x)
 {
-  print(x);
-  println();
+  size_t n = print(x);
+  n += println();
+  return n;
 }
 
 // Private Methods /////////////////////////////////////////////////////////////
 
-void Print::printNumber(unsigned long n, uint8_t base) {
+size_t Print::printNumber(unsigned long n, uint8_t base) {
   char buf[8 * sizeof(long) + 1]; // Assumes 8-bit chars plus zero byte.
   char *str = &buf[sizeof(buf) - 1];
 
@@ -206,15 +229,17 @@ void Print::printNumber(unsigned long n, uint8_t base) {
     *--str = c < 10 ? c + '0' : c + 'A' - 10;
   } while(n);
 
-  write(str);
+  return write(str);
 }
 
-void Print::printFloat(double number, uint8_t digits) 
+size_t Print::printFloat(double number, uint8_t digits) 
 { 
+  size_t n = 0;
+  
   // Handle negative numbers
   if (number < 0.0)
   {
-     print('-');
+     n += print('-');
      number = -number;
   }
 
@@ -228,18 +253,21 @@ void Print::printFloat(double number, uint8_t digits)
   // Extract the integer part of the number and print it
   unsigned long int_part = (unsigned long)number;
   double remainder = number - (double)int_part;
-  print(int_part);
+  n += print(int_part);
 
   // Print the decimal point, but only if there are digits beyond
-  if (digits > 0)
-    print("."); 
+  if (digits > 0) {
+    n += print("."); 
+  }
 
   // Extract digits from the remainder one at a time
   while (digits-- > 0)
   {
     remainder *= 10.0;
     int toPrint = int(remainder);
-    print(toPrint);
+    n += print(toPrint);
     remainder -= toPrint; 
   } 
+  
+  return n;
 }

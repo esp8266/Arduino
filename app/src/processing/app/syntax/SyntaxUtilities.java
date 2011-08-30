@@ -11,6 +11,8 @@ package processing.app.syntax;
 
 import javax.swing.text.*;
 import java.awt.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -93,16 +95,17 @@ public class SyntaxUtilities
   {
     SyntaxStyle[] styles = new SyntaxStyle[Token.ID_COUNT];
 
-    styles[Token.COMMENT1] = new SyntaxStyle(Color.black,true,false);
-    styles[Token.COMMENT2] = new SyntaxStyle(new Color(0x990033),true,false);
-    styles[Token.KEYWORD1] = new SyntaxStyle(Color.black,false,true);
-    styles[Token.KEYWORD2] = new SyntaxStyle(Color.magenta,false,false);
-    styles[Token.KEYWORD3] = new SyntaxStyle(new Color(0x009600),false,false);
-    styles[Token.LITERAL1] = new SyntaxStyle(new Color(0x650099),false,false);
-    styles[Token.LITERAL2] = new SyntaxStyle(new Color(0x650099),false,true);
-    styles[Token.LABEL] = new SyntaxStyle(new Color(0x990033),false,true);
-    styles[Token.OPERATOR] = new SyntaxStyle(Color.black,false,true);
-    styles[Token.INVALID] = new SyntaxStyle(Color.red,false,true);
+    styles[Token.COMMENT1] = new SyntaxStyle(Color.black,true,false,false);
+    styles[Token.COMMENT2] = new SyntaxStyle(new Color(0x990033),true,false,false);
+    styles[Token.KEYWORD1] = new SyntaxStyle(Color.black,false,true,false);
+    styles[Token.KEYWORD2] = new SyntaxStyle(Color.magenta,false,false,false);
+    styles[Token.KEYWORD3] = new SyntaxStyle(new Color(0x009600),false,false,false);
+    styles[Token.LITERAL1] = new SyntaxStyle(new Color(0x650099),false,false,false);
+    styles[Token.LITERAL2] = new SyntaxStyle(new Color(0x650099),false,true,false);
+    styles[Token.LABEL] = new SyntaxStyle(new Color(0x990033),false,true,false);
+    styles[Token.OPERATOR] = new SyntaxStyle(Color.black,false,true,false);
+    styles[Token.URL] = new SyntaxStyle(Color.blue,true,false,false);
+    styles[Token.INVALID] = new SyntaxStyle(Color.red,false,true,false);
 
     return styles;
   }
@@ -148,13 +151,76 @@ public class SyntaxUtilities
           styles[id].setGraphicsFlags(gfx,defaultFont);
 
         line.count = length;
-        x = Utilities.drawTabbedText(line,x,y,gfx,expander,0);
+        if (id == Token.COMMENT1 || id == Token.COMMENT2)
+          x = drawTabbedCommentsText(line, x, y, gfx, expander, styles, styles[id]);
+        else
+          x = Utilities.drawTabbedText(line, x, y, gfx, expander, 0);        
         line.offset += length;
         offset += length;
 
         tokens = tokens.next;
       }
 
+    return x;
+  }
+
+  /**
+   * Parse comments and identify "@schematics <b>&lt;something&gt;</b>" pattern.
+   * 
+   * @param line
+   *          A string to parse
+   * @return <b>null</b> if the pattern is not found, otherwise an array of
+   *         String is returned: the elements with index 0, 1 and 2 are
+   *         respectively the preamble, the <b>&lt;something&gt;</b> stuff, and
+   *         the remaining part of the string.
+   */
+  public static String[] parseCommentUrls(String line) {
+    Matcher m = urlPattern.matcher(line.toString());
+    if (!m.find())
+      return null;
+
+    String res[] = new String[3];
+    res[0] = line.substring(0, m.start(1));
+    res[1] = line.substring(m.start(1), m.end(1));
+    res[2] = line.substring(m.end(1));
+    // System.out.println("0 =>"+res[0]+"<\n1 =>"+res[1]+"< \n2 =>"+res[2]+"<");
+    return res;
+  }
+
+  static private Pattern urlPattern = Pattern.compile(
+      "((?:https?|ftp)://" +                // ( Protocol
+      "(?:(?:[\\w_\\-]+:)?[\\w_\\-]+@)?" +  // Username and password
+      "(?:[\\w_\\-]+\\.)+[\\w_\\-]+" +      // Domain name
+      "(?::[0-9]{1,5})?" +                  // Port 
+      "(?:/[\\w_\\-./?%&=+]*)?)" +          // Path ) 
+      "(?:\\s|$)");                         // whitespace or EOL
+
+  public static Segment stringToSegment(String v) {
+    return new Segment(v.toCharArray(), 0, v.length());
+  }
+
+  private static int drawTabbedCommentsText(Segment line, int x, int y,
+      Graphics gfx, TabExpander expander, SyntaxStyle[] styles, 
+      SyntaxStyle commentStyle) {
+
+    String parse[] = parseCommentUrls(line.toString());
+    if (parse == null)
+      // Revert to plain writing.
+      return Utilities.drawTabbedText(line, x, y, gfx, expander, 0);
+    Segment pre = stringToSegment(parse[0]);
+    Segment tag = stringToSegment(parse[1]);
+    Segment post = stringToSegment(parse[2]);
+
+    if (pre.count>0)
+      x = Utilities.drawTabbedText(pre, x, y, gfx, expander, 0);
+
+    Font f = gfx.getFont();
+    styles[Token.URL].setGraphicsFlags(gfx, f);
+    x = Utilities.drawTabbedText(tag, x, y, gfx, expander, 0);
+
+    commentStyle.setGraphicsFlags(gfx, f);
+    if (post.count>0)
+      x = Utilities.drawTabbedText(post, x, y, gfx, expander, 0);
     return x;
   }
 

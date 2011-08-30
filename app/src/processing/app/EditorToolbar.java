@@ -170,6 +170,10 @@ public class EditorToolbar extends JComponent implements MouseInputListener, Key
         x2[i] = x1[i] + BUTTON_WIDTH;
         offsetX = x2[i];
       }
+      
+      // Serial button must be on the right
+      x1[SERIAL] = width - BUTTON_WIDTH - 14;
+      x2[SERIAL] = width - 14;
     }
     Graphics g = offscreen.getGraphics();
     g.setColor(bgcolor); //getBackground());
@@ -194,9 +198,15 @@ public class EditorToolbar extends JComponent implements MouseInputListener, Key
     g2.drawString(status, statusX, statusY);
     */
     if (currentRollover != -1) {
-    int statusY = (BUTTON_HEIGHT + g.getFontMetrics().getAscent()) / 2;
+      int statusY = (BUTTON_HEIGHT + g.getFontMetrics().getAscent()) / 2;
       String status = shiftPressed ? titleShift[currentRollover] : title[currentRollover];
-    g.drawString(status, buttonCount * BUTTON_WIDTH + 3 * BUTTON_GAP, statusY);
+      if (currentRollover != SERIAL)
+        g.drawString(status, (buttonCount-1) * BUTTON_WIDTH + 3 * BUTTON_GAP, statusY);
+      else {
+        int statusX = x1[SERIAL] - BUTTON_GAP;
+        statusX -= g.getFontMetrics().stringWidth(status);
+        g.drawString(status, statusX, statusY);
+      }
     }
 
     screen.drawImage(offscreen, 0, 0, null);
