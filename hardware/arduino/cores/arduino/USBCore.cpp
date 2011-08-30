@@ -20,6 +20,8 @@
 #include "USBAPI.h"
 #include "USBDesc.h"
 
+#if defined(USBCON)
+
 #define EP_TYPE_CONTROL				0x00
 #define EP_TYPE_BULK_IN				0x81
 #define EP_TYPE_BULK_OUT			0x80
@@ -649,3 +651,5 @@ void USB_::poll()
 		MSC_Data(MSC_RX,MSC_TX);
 #endif
 }
+
+#endif /* if defined(USBCON) */

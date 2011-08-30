@@ -3,6 +3,8 @@
 #ifndef __USBAPI__
 #define __USBAPI__
 
+#if defined(USBCON)
+
 //================================================================================
 //================================================================================
 //	USB
@@ -154,3 +156,5 @@ int USB_Recv(uint8_t ep);							// non-blocking
 void USB_Flush(uint8_t ep);
 
 #endif
+
+#endif /* if defined(USBCON) */

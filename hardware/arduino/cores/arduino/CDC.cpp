@@ -20,6 +20,7 @@
 #include "USBAPI.h"
 #include <avr/wdt.h>
 
+#if defined(USBCON)
 #ifdef CDC_ENABLED
 
 //	TODO: Should really use the wdt here
@@ -174,3 +175,4 @@ size_t Serial_::write(uint8_t c)
 Serial_ Serial;
 
 #endif
+#endif /* if defined(USBCON) */
