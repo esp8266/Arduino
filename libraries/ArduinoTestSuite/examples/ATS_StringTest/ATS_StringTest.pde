@@ -7,7 +7,6 @@
 //*	Oct 16,	2010	<ROA> Started on String Test
 //************************************************************************
 
-#include	"HardwareSerial.h"
 #include	<ArduinoTestSuite.h>
 
 //************************************************************************
@@ -101,10 +100,14 @@ void setup()
   // or perhaps you want to ignore case:
   ATS_PrintTestStatus("11.  EqualsIgnoreCase() method equals", stringOne.equalsIgnoreCase(stringTwo));
 
+#if ARDUINO < 100 || defined(CORE_TEENSY)
+// David Mellis decided not to keep implicit string to number comparison operators
+// in Arduino 1.0.  Only run this test on older version, or if using Teensy
   // a numeric string compared to the number it represents:
   stringOne = "1";
   int numberOne = 1;
   ATS_PrintTestStatus("12.  A numeric string compared to the number it represents", stringOne == numberOne);
+#endif
 
   // two numeric strings compared:
   stringOne = "2";
@@ -129,18 +132,18 @@ void setup()
 
   ATS_PrintTestStatus("18.  The compareTo() operator also allows you to compare strings", stringOne.compareTo(stringTwo) < 0);
 
+ // These two tests assume the string compare parses numbers
+ // within strings, but it does not actually do any such thing
   // compareTo() String with numnber > String with number:
-  stringOne = "Sensor: 50";
-  stringTwo=  "Sensor: 150";
-  ATS_PrintTestStatus("19.  The compareTo() String with integers", stringOne.compareTo(stringTwo) < 0);
-
-  
+  //stringOne = "Sensor: 50";
+  //stringTwo=  "Sensor: 150";
+  //ATS_PrintTestStatus("19.  The compareTo() String with integers", stringOne.compareTo(stringTwo) < 0);
 // compareTo() String with numnber > String with number append integer, matches example code:
-   stringOne = "Sensor: ";
-   stringTwo=  "Sensor: ";
-   stringOne += 50;
-   stringTwo += 150;
-   ATS_PrintTestStatus("20.  The compareTo()  compare strings with appended integers", stringOne.compareTo(stringTwo) < 0);
+   //stringOne = "Sensor: ";
+   //stringTwo=  "Sensor: ";
+   //stringOne += 50;
+   //stringTwo += 150;
+   //ATS_PrintTestStatus("20.  The compareTo()  compare strings with appended integers", stringOne.compareTo(stringTwo) < 0);
    
 
   /*

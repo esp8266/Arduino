@@ -7,19 +7,12 @@
 //*	Oct 16,	2010	<ROA> Started on String Test
 //************************************************************************
 
-#include	"HardwareSerial.h"
 #include	<ArduinoTestSuite.h>
 
 //************************************************************************
-void setup()
+
+void do_string_operations(int startMemoryUsage)
 {
-  char testName[64];
-  int		startMemoryUsage;
-  /*
-    * Create variable for the tests. 
-   */
-
-
   String stringOne;
   int firstClosingBracket;
   int firstOpeningBracket;
@@ -31,67 +24,77 @@ void setup()
   int lastOpeningBracket;
   int lastListItem;
   int lastParagraph;
-  int secondLastGraf;
-
-  /*;
-   * initiate the test run
-   */
-  startMemoryUsage	=	ATS_GetFreeMemory();
-  ATS_begin("Arduino", "String Memory Test");
-  // indexOf() returns the position (i.e. index) of a particular character
-  // in a string. For example, if you were parsing HTML tags, you could use it:
+  int secondLastParagraph;
+  int thirdLastParagraph;
+  
+            //           1111111111
+            // 01234567890123456789
   stringOne = "<HTML><HEAD><BODY>";
   firstClosingBracket = stringOne.indexOf('>');
-  Serial.println("The index of > in the string " + stringOne + " is " + firstClosingBracket);
+  ATS_PrintTestStatus("firstClosingBracket", firstClosingBracket == 5);
 
+            //           1111111111
+            // 01234567890123456789
   stringOne = "<HTML><HEAD><BODY>";
   secondOpeningBracket = firstClosingBracket + 1;
   secondClosingBracket = stringOne.indexOf('>', secondOpeningBracket );
-  Serial.println("The index of  the second > in the string " + stringOne + " is " + secondClosingBracket);
+  ATS_PrintTestStatus("secondClosingBracket", secondClosingBracket == 11);
 
   // you can also use indexOf() to search for Strings:
+            //           1111111111
+            // 01234567890123456789
   stringOne = "<HTML><HEAD><BODY>";
   bodyTag = stringOne.indexOf("<BODY>");
-  Serial.println("The index of the body tag in the string " + stringOne + " is " + bodyTag);
+  ATS_PrintTestStatus("bodyTag", bodyTag == 12);
 
+            //           111111111122222222223333333333
+            // 0123456789012345678901234567890123456789
   stringOne = "<UL><LI>item<LI>item<LI>item</UL>";
   firstListItem = stringOne.indexOf("<LI>");
-  secondListItem = stringOne.indexOf("item", firstListItem + 1 );
-  Serial.println("The index of the second list item in the string " + stringOne + " is " + secondClosingBracket);
+  secondListItem = stringOne.indexOf("<LI>", firstListItem + 1 );
+  
+  ATS_PrintTestStatus("firstListItem", firstListItem == 4);
+  ATS_PrintTestStatus("secondListItem", secondListItem == 12);
 
   // lastIndexOf() gives you the last occurrence of a character or string:
   lastOpeningBracket = stringOne.lastIndexOf('<');
-  Serial.println("The index of the last < in the string " + stringOne + " is " + lastOpeningBracket);
-
+  ATS_PrintTestStatus("lastOpeningBracket", lastOpeningBracket == 28);
+  
   lastListItem  = stringOne.lastIndexOf("<LI>");
-  Serial.println("The index of the last list item in the string " + stringOne + " is " + lastListItem);
-
+  ATS_PrintTestStatus("lastListItem", lastListItem == 20);
 
   // lastIndexOf() can also search for a string:
+            //           11111111112222222222333333333344444444445555555555
+            // 012345678901234567890123456789012345678901234567890123456789
   stringOne = "<p>Lorem ipsum dolor sit amet</p><p>Ipsem</p><p>Quod</p>";
   lastParagraph = stringOne.lastIndexOf("<p");
-  secondLastGraf = stringOne.lastIndexOf("<p", lastParagraph - 1);
-  Serial.println("The index of the second last paragraph tag " + stringOne + " is " + secondLastGraf);
+  secondLastParagraph = stringOne.lastIndexOf("<p", lastParagraph - 1);
+  thirdLastParagraph = stringOne.lastIndexOf("<p", secondLastParagraph - 1);
+  ATS_PrintTestStatus("lastParagraph", lastParagraph == 45);
+  ATS_PrintTestStatus("secondLastParagraph", secondLastParagraph == 33);
+  ATS_PrintTestStatus("thirdLastParagraph", thirdLastParagraph == 0);
+}
 
+void setup()
+{
+  int startMemoryUsage=0;
 
+  startMemoryUsage = ATS_GetFreeMemory();
+  ATS_begin("Arduino", "String Memory Test");
   ATS_ReportMemoryUsage(startMemoryUsage);
   
-
-
-  /*
-   * Test complete
-   */
-
+  // Run all the string functions.  All string objects used are local variables,
+  // so they go out of scope upon return.  Memory used should be fully released.
+  do_string_operations(startMemoryUsage);
+  
+  ATS_ReportMemoryUsage(startMemoryUsage);
   ATS_end();
-
 }
 
 
 //************************************************************************
 void loop()
 {
-
-
 }
 
 

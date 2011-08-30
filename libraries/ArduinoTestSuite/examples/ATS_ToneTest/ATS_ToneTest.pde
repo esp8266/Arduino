@@ -22,11 +22,7 @@
 //*	Oct 23,	2010	<MLS> Started on ToneTest
 //************************************************************************
 
-
-
-
-
-#include	"HardwareSerial.h"
+#include	<ArduinoTestSuite.h>
 
 #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__)
 	#define	kBoard_PinCount		20
@@ -34,9 +30,10 @@
 #elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 	#define	kBoard_PinCount		70
 	#define	kBoard_AnalogCount	16
+#elif defined(CORE_TEENSY)
+	#define kBoard_PinCount		CORE_NUM_TOTAL_PINS
+	#define kBoard_AnalogCount	CORE_NUM_ANALOG
 #endif
-
-#include	<ArduinoTestSuite.h>
 
 //************************************************************************
 void	TestTonePin(uint8_t toneOutputPinNumber)
@@ -63,6 +60,7 @@ long			deltaFreq;
 		//*	if its ODD
 		helperpin	=	toneOutputPinNumber - 1;
 	}
+	if (helperpin >= kBoard_PinCount) return;
 
 	//*	dont set the mode of the OUTPUT pin, the tone command does that
 	
@@ -143,6 +141,7 @@ long			durationTime;
 		//*	if its ODD
 		helperpin	=	toneOutputPinNumber - 1;
 	}
+	if (helperpin >= kBoard_PinCount) return;
 
 	//*	dont set the mode of the OUTPUT pin, the tone command does that
 	
