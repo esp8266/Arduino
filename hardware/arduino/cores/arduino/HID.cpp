@@ -388,7 +388,7 @@ const uint8_t _asciimap[128] =
 };
 
 uint8_t USBPutChar(uint8_t c);
-void Keyboard_::write(uint8_t c)
+size_t Keyboard_::write(uint8_t c)
 {
 	// Keydown
 	{
@@ -398,10 +398,10 @@ void Keyboard_::write(uint8_t c)
 		else
 		{
 			if (c >= 128)
-				return;
+				return 0;
 			c = pgm_read_byte(_asciimap + c);
 			if (!c)
-				return;
+				return 0;
 			if (c & 0x80)
 			{
 				keys.modifiers |= KEY_MODIFIER_LEFT_SHIFT;
@@ -416,6 +416,7 @@ void Keyboard_::write(uint8_t c)
 		KeyReport keys = {0};
 		sendReport(&keys);
 	}
+	return 1;
 }
 
 #endif
