@@ -3,7 +3,7 @@
 // Released under Apache License, version 2.0
 
 #include "w5100.h"
-#include "Udp.h"
+#include "EthernetUdp.h"
 #include "util.h"
 
 #include "Dns.h"

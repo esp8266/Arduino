@@ -18,7 +18,7 @@
 
 #include <SPI.h>         
 #include <Ethernet.h>
-#include <Udp.h>
+#include <EthernetUdp.h>
 
 // Enter a MAC address for your controller below.
 // Newer Ethernet shields have a MAC address printed on a sticker on the shield
@@ -34,7 +34,7 @@ const int NTP_PACKET_SIZE= 48; // NTP time stamp is in the first 48 bytes of the
 byte packetBuffer[ NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing packets 
 
 // A UDP instance to let us send and receive packets over UDP
-UDP Udp;
+EthernetUDP Udp;
 
 void setup() 
 {

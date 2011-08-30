@@ -15,7 +15,7 @@
 
 #include <SPI.h>         // needed for Arduino versions later than 0018
 #include <Ethernet.h>
-#include <Udp.h>         // UDP library from: bjoern@cs.stanford.edu 12/30/2008
+#include <EthernetUdp.h>         // UDP library from: bjoern@cs.stanford.edu 12/30/2008
 
 
 // Enter a MAC address and IP address for your controller below.
@@ -30,8 +30,8 @@ unsigned int localPort = 8888;      // local port to listen on
 char packetBuffer[UDP_TX_PACKET_MAX_SIZE]; //buffer to hold incoming packet,
 char  ReplyBuffer[] = "acknowledged";       // a string to send back
 
-// A UDP instance to let us send and receive packets over UDP
-UDP Udp;
+// An EthernetUDP instance to let us send and receive packets over UDP
+EthernetUDP Udp;
 
 void setup() {
   // start the Ethernet and UDP:
