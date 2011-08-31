@@ -233,6 +233,16 @@ void Mouse_::buttons(uint8_t b)
 	}
 }
 
+void Mouse_::press(uint8_t b) 
+{
+	buttons(_buttons | b);
+}
+
+void Mouse_::release(uint8_t b)
+{
+	buttons(_buttons & ~b);
+}
+
 //================================================================================
 //================================================================================
 //	Keyboard

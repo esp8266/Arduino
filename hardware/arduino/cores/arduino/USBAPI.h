@@ -46,6 +46,7 @@ extern Serial_ Serial;
 #define MOUSE_LEFT 1
 #define MOUSE_MIDDLE 2
 #define MOUSE_RIGHT 4
+#define MOUSE_ALL (MOUSE_LEFT | MOUSE_MIDDLE | MOUSE_RIGHT)
 
 class Mouse_
 {
@@ -55,6 +56,8 @@ public:
 	void click(uint8_t b = MOUSE_LEFT);
 	void move(signed char x, signed char y, signed char wheel = 0);
 	void buttons(uint8_t b);
+	void press(uint8_t b = MOUSE_LEFT);		// press LEFT by default
+	void release(uint8_t b = MOUSE_LEFT);	// release LEFT by default		
 };
 extern Mouse_ Mouse;
 
