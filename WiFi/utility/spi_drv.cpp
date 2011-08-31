@@ -10,7 +10,7 @@ extern "C" {
 #define DATAOUT 11//MOSI
 #define DATAIN  12//MISO 
 #define SPICLOCK  13//sck
-#define SLAVESELECT 2//ss
+#define SLAVESELECT 10//ss
 #define SLAVEREADY 3
 
 #define DELAY_100NS asm volatile("nop")
