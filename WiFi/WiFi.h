@@ -8,8 +8,8 @@ extern "C" {
 }
   
 #include "IPAddress.h"
-#include "Client.h"
-#include "Server.h"
+#include "WiFiClient.h"
+#include "WiFiServer.h"
 
 class WiFiClass
 {
@@ -89,8 +89,8 @@ public:
     // function used for test
     uint8_t test();
 
-    friend class Client;
-    friend class Server;
+    friend class WiFiClient;
+    friend class WiFiServer;
 };
 
 extern WiFiClass WiFi;

@@ -7,7 +7,7 @@
  * WiFi shield attached
  
  created 13 July 2010
- by Domenico La Fauci
+ by dlf (Metodo2 srl)
  modified 5 June 2011
  by Tom Igoe
  */

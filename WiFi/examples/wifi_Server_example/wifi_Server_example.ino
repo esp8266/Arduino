@@ -6,10 +6,9 @@
  A simple server is setup to exchange data.
 
  created 13 July 2010
- by Domenico La Fauci
+ by dlf (Metodo2 srl)
  */
 #include <WiFi.h>
-#include <IPAddress.h>
 
 byte mac[6] = { 0 };
 IPAddress ip;
@@ -19,11 +18,11 @@ byte dataBuf[80] = { 0 };
 char ssid[32] = { 0 };
 int status = WL_IDLE_STATUS;
 
-Server server(23);
+WiFiServer server(23);
 
 void printIpData()
 {
-  ip = WiFi.localIp();
+  ip = WiFi.localIP();
        
   Serial.print("IP: ");
   Serial.print(ip[3],10);Serial.print(".");
@@ -136,7 +135,7 @@ void loop()
   if (status == WL_CONNECTED)
   {
       byte status = 0;
-      Client client = server.available(&status);
+      WiFiClient client = server.available(&status);
       if (client) {
         //Serial.print("Status: ");
         //Serial.println(status, 16);

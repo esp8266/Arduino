@@ -2,17 +2,17 @@
 #include "server_drv.h"
 
 #include "WiFi.h"
-#include "Client.h"
-#include "Server.h"
+#include "WiFiClient.h"
+#include "WiFiServer.h"
 
 
 
-Server::Server(uint16_t port)
+WiFiServer::WiFiServer(uint16_t port)
 {
     _port = port;
 }
 
-void Server::begin()
+void WiFiServer::begin()
 {
     uint8_t _sock = WiFiClass::getSocket();
     if (_sock != NO_SOCKET_AVAIL)
@@ -22,7 +22,7 @@ void Server::begin()
     }
 }
 
-Client Server::available(byte* status)
+WiFiClient WiFiServer::available(byte* status)
 {
     //accept();
 
@@ -30,7 +30,7 @@ Client Server::available(byte* status)
     {
         if (WiFiClass::_server_port[sock] != 0)
         {
-            Client client(sock);
+        	WiFiClient client(sock);
             int _status = client.status();
             if (status != NULL)
             	*status = _status;
@@ -43,26 +43,26 @@ Client Server::available(byte* status)
         }
     }
 
-    return Client(255);
+    return WiFiClient(255);
 }
 
-void Server::write(uint8_t b) 
+void WiFiServer::write(uint8_t b)
 {
     write(&b, 1);
 }
 
-void Server::write(const char *str) 
+void WiFiServer::write(const char *str)
 {
     write((const uint8_t *)str, strlen(str));
 }
 
-void Server::write(const uint8_t *buffer, size_t size) 
+void WiFiServer::write(const uint8_t *buffer, size_t size)
 {
     for (int sock = 0; sock < MAX_SOCK_NUM; sock++)
     {
         if (WiFiClass::_server_port[sock] != 0)
         {
-            Client client(sock);
+        	WiFiClient client(sock);
 
             if (WiFiClass::_server_port[sock] == _port &&
                 client.status() == ESTABLISHED)

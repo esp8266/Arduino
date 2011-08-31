@@ -2,7 +2,7 @@
 // 
 //  File:   debug.h
 // 
-//  Author:  Domenico La Fauci
+//  Author: dlf (Metodo2 srl)
 // 
 //********************************************/
 

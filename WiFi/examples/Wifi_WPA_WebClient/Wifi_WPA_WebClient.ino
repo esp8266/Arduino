@@ -9,7 +9,7 @@
  * WiFi shield attached
  
  created 13 July 2010
- by Domenico La Fauci
+ by dlf (Metodo2 srl)
  modified 21 May 2011
  by Tom Igoe
  */
@@ -17,7 +17,6 @@
 
 #include <SPI.h>
 #include <WiFi.h>
-#include <IPAddress.h>
 
 char ssid[] = "yourNetwork";
 char pass[] = "secretPassword";
@@ -27,7 +26,7 @@ IPAddress server(74,125,115,105);  // Google
 // Initialize the Ethernet client library
 // with the IP address and port of the server 
 // that you want to connect to (port 80 is default for HTTP):
-Client client;
+WiFiClient client;
 
 void setup() {
   Serial.begin(9600);

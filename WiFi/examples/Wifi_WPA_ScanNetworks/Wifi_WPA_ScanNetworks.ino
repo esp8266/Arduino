@@ -7,7 +7,7 @@
  * WiFi shield attached
  
  created 13 July 2010
- by Domenico La Fauci
+ by dlf (Metodo2 srl)
  modified 5 June 2011
  by Tom Igoe
  */
@@ -16,9 +16,8 @@
 #include <SPI.h>
 #include <WiFi.h>
 
-char ssid[] = "yourNetwork";     // the name of your network
-char pass[] = "secretPassword";  // the WPA2 password for your network
-
+char ssid[] = "yourNetwork";
+char pass[] = "secretpassword";
 int status = WL_IDLE_STATUS;     // the Wifi radio's status
 
 byte mac[6];                     // the MAC address of your Wifi shield
@@ -29,7 +28,11 @@ IPAddress subnet;                // the subnet mask
 void setup() {
   // initialize serial:
   Serial.begin(9600);
- 
+   // scan for existing networks:
+  Serial.println("Scanning available networks...");
+  //WiFi.begin();
+  scanNetworks();
+
   // attempt to connect using WEP encryption:
 //  Serial.println("Attempting to connect to WEP-128 network...");
 //  status = WiFi.begin(ssid, keyIndex, key);

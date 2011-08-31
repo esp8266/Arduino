@@ -24,7 +24,7 @@ char pass[] = "secretpassword";
 int status = WL_IDLE_STATUS;
 
 // initialize the library instance:
-Client client;
+WiFiClient client;
 
 const int requestInterval = 30*1000;    // delay between requests; 30 seconds
 

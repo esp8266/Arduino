@@ -9,7 +9,7 @@
  * Analog inputs attached to pins A0 through A5 (optional)
  
  created 13 July 2010
- by Domenico La Fauci
+ by dlf (Metodo2 srl)
  modified 5 June 2011
  by Tom Igoe
  */
@@ -22,7 +22,7 @@ char ssid[] = "yourNetwork";
 char pass[] = "secretpassword";
 int status = WL_IDLE_STATUS;
 
-Server server(80);
+WiFiServer server(80);
 
 void setup() {
   // initialize serial:
@@ -39,7 +39,7 @@ void setup() {
   else {
     server.begin();
     Serial.print("Connected to wifi. My address:");
-    IPAddress myAddress = WiFi.localIp();
+    IPAddress myAddress = WiFi.localIP();
     Serial.print(myAddress[0]);
     Serial.print(".");
     Serial.print(myAddress[1]);
@@ -53,7 +53,7 @@ void setup() {
 
 void loop() {
   // listen for incoming clients
-  Client client = server.available();
+  WiFiClient client = server.available();
   if (client) {
     // an http request ends with a blank line
     boolean currentLineIsBlank = true;

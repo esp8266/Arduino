@@ -7,19 +7,19 @@ extern "C" {
 }
 
 #include "WiFi.h"
-#include "Client.h"
-#include "Server.h"
+#include "WiFiClient.h"
+#include "WiFiServer.h"
 #include "server_drv.h"
 
-uint16_t Client::_srcport = 1024;
+uint16_t WiFiClient::_srcport = 1024;
 
-Client::Client() : _sock(MAX_SOCK_NUM) {
+WiFiClient::WiFiClient() : _sock(MAX_SOCK_NUM) {
 }
 
-Client::Client(uint8_t sock) : _sock(sock) {
+WiFiClient::WiFiClient(uint8_t sock) : _sock(sock) {
 }
 
-int Client::connect(const char* host, uint16_t port) {
+int WiFiClient::connect(const char* host, uint16_t port) {
 	/* TODO Add DNS wifi spi function to resolve DNS */
 #if 0
   // Look up the host first
@@ -37,7 +37,7 @@ int Client::connect(const char* host, uint16_t port) {
 #endif
 }
 
-int Client::connect(IPAddress ip, uint16_t port) {
+int WiFiClient::connect(IPAddress ip, uint16_t port) {
     _sock = getFirstSocket();
     if (_sock != NO_SOCKET_AVAIL)
     {
@@ -49,36 +49,40 @@ int Client::connect(IPAddress ip, uint16_t port) {
     return 1;
 }
 
-void Client::write(uint8_t b) {
+size_t WiFiClient::write(uint8_t b) {
   if (_sock != 255)
   {
 	  START();
       ServerDrv::sendData(_sock, &b, 1);
       while (!ServerDrv::isDataSent(_sock));
       END();
-
+      return 1;
   }
+  return 0;
 }
 
-void Client::write(const char *str) {
+size_t WiFiClient::write(const char *str) {
   if (_sock != 255)
   {
       unsigned int len = strlen(str);
       ServerDrv::sendData(_sock, (const uint8_t *)str, len);
       while (!ServerDrv::isDataSent(_sock));
+      return len;
   }
+  return 0;
 }
 
-void Client::write(const uint8_t *buf, size_t size) {
+size_t WiFiClient::write(const uint8_t *buf, size_t size) {
   if (_sock != 255)
   {
       ServerDrv::sendData(_sock, buf, size);
       while (!ServerDrv::isDataSent(_sock));
+      return size;
   }
-  
+  return 0;
 }
 
-int Client::available() {
+int WiFiClient::available() {
   if (_sock != 255)
   {
       return ServerDrv::availData(_sock);
@@ -87,7 +91,7 @@ int Client::available() {
   return 0;
 }
 
-int Client::read() {
+int WiFiClient::read() {
   uint8_t b;
   if (!available())
     return -1;
@@ -96,23 +100,23 @@ int Client::read() {
 }
 
 
-int Client::read(uint8_t* buf, size_t size) {
+int WiFiClient::read(uint8_t* buf, size_t size) {
   if (!ServerDrv::getDataBuf(_sock, buf, &size))
       return -1;
   return 0;
 }
 
-int Client::peek() {
+int WiFiClient::peek() {
 	//TODO to be implemented
 	return 0;
 }
 
-void Client::flush() {
+void WiFiClient::flush() {
   while (available())
     read();
 }
 
-void Client::stop() {
+void WiFiClient::stop() {
   if (_sock == 255)
     return;
   
@@ -132,7 +136,7 @@ void Client::stop() {
   _sock = 255;
 }
 
-uint8_t Client::connected() {
+uint8_t WiFiClient::connected() {
   if (_sock == 255) {
     return 0;
   } else {
@@ -142,7 +146,7 @@ uint8_t Client::connected() {
   }
 }
 
-uint8_t Client::status() {
+uint8_t WiFiClient::status() {
     if (_sock == 255) {
     return CLOSED;
   } else {
@@ -150,12 +154,12 @@ uint8_t Client::status() {
   }
 }
 
-Client::operator bool() {
+WiFiClient::operator bool() {
   return _sock != 255;
 }
 
 // Private Methods
-uint8_t Client::getFirstSocket()
+uint8_t WiFiClient::getFirstSocket()
 {
     for (int i = 0; i < MAX_SOCK_NUM; i++) {
       if (WiFiClass::_state[i] == 0)

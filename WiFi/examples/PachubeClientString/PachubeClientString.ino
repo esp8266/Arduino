@@ -22,16 +22,16 @@
  */
 
 #include <WiFi.h>
-#include <IPAddress.h>
 
-char ssid[32] = { 0 };
+char ssid[] = "yourNetwork";
+char pass[] = "secretPassword";
 int status = WL_IDLE_STATUS;
 
 //  The address of the server you want to connect to (pachube.com):
 IPAddress server(173,203,98,29);
 
 // initialize the library instance:
-Client client(server, 80);
+WiFiClient client;
 
 long lastConnectionTime = 0;        // last time you connected to the server, in milliseconds
 boolean lastConnected = false;      // state of the connection last time through the main loop
@@ -40,11 +40,10 @@ const int postingInterval = 10000;  //delay between updates to Pachube.com
 int startWiFiWpa()
 {
   Serial.println("\nSetup WiFi Wpa...");
-  //strcpy(ssid, "AndroidAP9647");
-  strcpy(ssid, "Cariddi");
+  strcpy(ssid, "tigoenet");
   Serial.print("SSID: ");
   Serial.println(ssid);
-  const char *pass = "1234567890";
+  const char *pass = "m30w-m30w";
   status = WiFi.begin(ssid, pass);
   if ( status != WL_CONNECTED)
   {
@@ -110,11 +109,11 @@ void loop() {
 // this method makes a HTTP connection to the server:
 void sendData(String thisData) {
   // if there's a successful connection:
-  if (client.connect()) {
+  if (client.connect(server, 80)) {
     Serial.println("connecting...");
     // send the HTTP PUT request. 
     // fill in your feed address here:
-    client.print("PUT /api/http://api.pachube.com/v2/feeds/24196.csv HTTP/1.1\n");
+    client.print("PUT /api/24196.csv HTTP/1.1\n");
     client.print("Host: www.pachube.com\n");
     // fill in your Pachube API key here:
     client.print("X-PachubeApiKey: gw0L2A-J5ACRGQccX59tCYt0IEzyecr-SoiuC47U1-8\n");

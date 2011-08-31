@@ -25,7 +25,7 @@ char pass[] = "secretPassword";  // the WPA2 password for your network
 int status = WL_IDLE_STATUS;     // the Wifi radio's status
 
 // telnet defaults to port 23
-Server server(23);
+WiFiServer server(23);
 
 boolean gotAMessage = false; // whether or not you got a message from the client yet
 
@@ -56,7 +56,7 @@ void setup() {
 
 void loop() {
   // wait for a new client:
-  Client client = server.available();
+  WiFiClient client = server.available();
 
   // when the client sends the first byte, say hello:
   if (client) {
