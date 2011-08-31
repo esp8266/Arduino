@@ -8,19 +8,19 @@ extern "C" {
 #include "Arduino.h"
 
 #include "Ethernet.h"
-#include "Client.h"
-#include "Server.h"
+#include "EthernetClient.h"
+#include "EthernetServer.h"
 #include "Dns.h"
 
-uint16_t Client::_srcport = 1024;
+uint16_t EthernetClient::_srcport = 1024;
 
-Client::Client() : _sock(MAX_SOCK_NUM) {
+EthernetClient::EthernetClient() : _sock(MAX_SOCK_NUM) {
 }
 
-Client::Client(uint8_t sock) : _sock(sock) {
+EthernetClient::EthernetClient(uint8_t sock) : _sock(sock) {
 }
 
-int Client::connect(const char* host, uint16_t port) {
+int EthernetClient::connect(const char* host, uint16_t port) {
   // Look up the host first
   int ret = 0;
   DNSClient dns;
@@ -35,7 +35,7 @@ int Client::connect(const char* host, uint16_t port) {
   }
 }
 
-int Client::connect(IPAddress ip, uint16_t port) {
+int EthernetClient::connect(IPAddress ip, uint16_t port) {
   if (_sock != MAX_SOCK_NUM)
     return 0;
 
@@ -54,7 +54,7 @@ int Client::connect(IPAddress ip, uint16_t port) {
   if (_srcport == 0) _srcport = 1024;
   socket(_sock, SnMR::TCP, _srcport, 0);
 
-  if (!::connect(_sock, ip.raw_address(), port)) {
+  if (!::connect(_sock, rawIPAddress(ip), port)) {
     _sock = MAX_SOCK_NUM;
     return 0;
   }
@@ -70,15 +70,15 @@ int Client::connect(IPAddress ip, uint16_t port) {
   return 1;
 }
 
-size_t Client::write(uint8_t b) {
+size_t EthernetClient::write(uint8_t b) {
   return write(&b, 1);
 }
 
-size_t Client::write(const char *str) {
+size_t EthernetClient::write(const char *str) {
   return write((const uint8_t *) str, strlen(str));
 }
 
-size_t Client::write(const uint8_t *buf, size_t size) {
+size_t EthernetClient::write(const uint8_t *buf, size_t size) {
   if (_sock == MAX_SOCK_NUM) {
     setWriteError();
     return 0;
@@ -90,13 +90,13 @@ size_t Client::write(const uint8_t *buf, size_t size) {
   return size;
 }
 
-int Client::available() {
+int EthernetClient::available() {
   if (_sock != MAX_SOCK_NUM)
     return W5100.getRXReceivedSize(_sock);
   return 0;
 }
 
-int Client::read() {
+int EthernetClient::read() {
   uint8_t b;
   if ( recv(_sock, &b, 1) > 0 )
   {
@@ -110,11 +110,11 @@ int Client::read() {
   }
 }
 
-int Client::read(uint8_t *buf, size_t size) {
+int EthernetClient::read(uint8_t *buf, size_t size) {
   return recv(_sock, buf, size);
 }
 
-int Client::peek() {
+int EthernetClient::peek() {
   uint8_t b;
   // Unlike recv, peek doesn't check to see if there's any data available, so we must
   if (!available())
@@ -123,12 +123,12 @@ int Client::peek() {
   return b;
 }
 
-void Client::flush() {
+void EthernetClient::flush() {
   while (available())
     read();
 }
 
-void Client::stop() {
+void EthernetClient::stop() {
   if (_sock == MAX_SOCK_NUM)
     return;
 
@@ -148,7 +148,7 @@ void Client::stop() {
   _sock = MAX_SOCK_NUM;
 }
 
-uint8_t Client::connected() {
+uint8_t EthernetClient::connected() {
   if (_sock == MAX_SOCK_NUM) return 0;
   
   uint8_t s = status();
@@ -156,14 +156,14 @@ uint8_t Client::connected() {
     (s == SnSR::CLOSE_WAIT && !available()));
 }
 
-uint8_t Client::status() {
+uint8_t EthernetClient::status() {
   if (_sock == MAX_SOCK_NUM) return SnSR::CLOSED;
   return W5100.readSnSR(_sock);
 }
 
 // the next function allows us to use the client returned by
-// Server::available() as the condition in an if-statement.
+// EthernetServer::available() as the condition in an if-statement.
 
-Client::operator bool() {
+EthernetClient::operator bool() {
   return _sock != MAX_SOCK_NUM;
 }

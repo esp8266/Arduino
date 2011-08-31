@@ -25,7 +25,7 @@ char serverName[] = "www.google.com";
 // Initialize the Ethernet client library
 // with the IP address and port of the server 
 // that you want to connect to (port 80 is default for HTTP):
-Client client;
+EthernetClient client;
 
 void setup() {
   // start the serial library:

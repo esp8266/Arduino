@@ -33,10 +33,10 @@
 #include "Dns.h"
 
 /* Constructor */
-UDP::UDP() : _sock(MAX_SOCK_NUM) {}
+EthernetUDP::EthernetUDP() : _sock(MAX_SOCK_NUM) {}
 
-/* Start UDP socket, listening at local port PORT */
-uint8_t UDP::begin(uint16_t port) {
+/* Start EthernetUDP socket, listening at local port PORT */
+uint8_t EthernetUDP::begin(uint16_t port) {
   if (_sock != MAX_SOCK_NUM)
     return 0;
 
@@ -59,12 +59,12 @@ uint8_t UDP::begin(uint16_t port) {
 
 /* Is data available in rx buffer? Returns 0 if no, number of available bytes if yes. 
  * returned value includes 8 byte UDP header!*/
-int UDP::available() {
+int EthernetUDP::available() {
   return W5100.getRXReceivedSize(_sock);
 }
 
-/* Release any resources being used by this UDP instance */
-void UDP::stop()
+/* Release any resources being used by this EthernetUDP instance */
+void EthernetUDP::stop()
 {
   if (_sock == MAX_SOCK_NUM)
     return;
@@ -75,7 +75,7 @@ void UDP::stop()
   _sock = MAX_SOCK_NUM;
 }
 
-int UDP::beginPacket(const char *host, uint16_t port)
+int EthernetUDP::beginPacket(const char *host, uint16_t port)
 {
   // Look up the host first
   int ret = 0;
@@ -91,36 +91,36 @@ int UDP::beginPacket(const char *host, uint16_t port)
   }
 }
 
-int UDP::beginPacket(IPAddress ip, uint16_t port)
+int EthernetUDP::beginPacket(IPAddress ip, uint16_t port)
 {
   _offset = 0;
-  return startUDP(_sock, ip.raw_address(), port);
+  return startUDP(_sock, rawIPAddress(ip), port);
 }
 
-int UDP::endPacket()
+int EthernetUDP::endPacket()
 {
   return sendUDP(_sock);
 }
 
-size_t UDP::write(uint8_t byte)
+size_t EthernetUDP::write(uint8_t byte)
 {
   return write(&byte, 1);
 }
 
-size_t UDP::write(const char *str)
+size_t EthernetUDP::write(const char *str)
 {
   size_t len = strlen(str);
   return write((const uint8_t *)str, len);
 }
 
-size_t UDP::write(const uint8_t *buffer, size_t size)
+size_t EthernetUDP::write(const uint8_t *buffer, size_t size)
 {
   uint16_t bytes_written = bufferData(_sock, _offset, buffer, size);
   _offset += bytes_written;
   return bytes_written;
 }
 
-int UDP::parsePacket()
+int EthernetUDP::parsePacket()
 {
   if (available() > 0)
   {
@@ -143,7 +143,7 @@ int UDP::parsePacket()
   return 0;
 }
 
-int UDP::read()
+int EthernetUDP::read()
 {
   uint8_t byte;
   if (recv(_sock, &byte, 1) > 0)
@@ -155,7 +155,7 @@ int UDP::read()
   return -1;
 }
 
-int UDP::read(unsigned char* buffer, size_t len)
+int EthernetUDP::read(unsigned char* buffer, size_t len)
 {
   /* In the readPacket that copes with truncating packets, the buffer was
      filled with this code.  Not sure why it loops round reading out a byte
@@ -169,7 +169,7 @@ int UDP::read(unsigned char* buffer, size_t len)
   return recv(_sock, buffer, len);
 }
 
-int UDP::peek()
+int EthernetUDP::peek()
 {
   uint8_t b;
   // Unlike recv, peek doesn't check to see if there's any data available, so we must
@@ -179,7 +179,7 @@ int UDP::peek()
   return b;
 }
 
-void UDP::flush()
+void EthernetUDP::flush()
 {
   while (available())
   {

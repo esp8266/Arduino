@@ -33,7 +33,7 @@ byte mac[] = {
 IPAddress ip(192,168,1,20);
 
 // initialize the library instance:
-Client client;
+EthernetClient client;
 
 const int requestInterval = 60000;  // delay between requests
 
