@@ -17,6 +17,7 @@ import javax.swing.event.*;
 import javax.swing.text.*;
 import javax.swing.undo.*;
 import javax.swing.*;
+
 import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.awt.*;
@@ -2025,7 +2026,19 @@ public class JEditTextArea extends JComponent
       select(getMarkPosition(),xyToOffset(evt.getX(),evt.getY()));
     }
 
-    public void mouseMoved(MouseEvent evt) {}
+    final Cursor normalCursor = new Cursor(Cursor.DEFAULT_CURSOR);
+    final Cursor handCursor = new Cursor(Cursor.HAND_CURSOR);
+    
+    public void mouseMoved(MouseEvent evt) {
+      int line = yToLine(evt.getY());
+      int offset = xToOffset(line, evt.getX());
+      boolean wantHandCursor = checkClickedURL(getLineText(line), offset) != null;
+      JComponent src = (JComponent) evt.getSource();
+      if (wantHandCursor)
+        src.setCursor(handCursor);
+      else
+        src.setCursor(normalCursor);
+    }
   }
 
   class FocusHandler implements FocusListener
