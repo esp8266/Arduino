@@ -3,15 +3,12 @@
 //*	Aug 31,	2010	<MLS> Started on TestArduino
 //************************************************************************
 
-#ifndef _AVR_IO_H_
-	#include	<avr/io.h>
-#endif
-
-#ifndef Arduino_h
-	#include	"Arduino.h"
-#endif
-#ifndef HardwareSerial_h
-	#include	"HardwareSerial.h"
+#if defined(ARDUINO) && ARDUINO >= 100
+#include "Arduino.h"
+#include "pins_arduino.h"
+#else
+#include "WProgram.h"
+#include "pins_arduino.h"
 #endif
 
 
@@ -37,9 +34,12 @@ short	ATS_TestSerialLoopback(HardwareSerial *theSerialPort, char *serialPortName
 
 
 int		ATS_GetFreeMemory();
+int		ATS_GetMaximumMemoryAllocated();
+
 
 //************************************************************************
 //*	this has to be an inline function because calling subroutines affects free memory
+inline void ATS_ReportMemoryUsage(int _memoryUsageAtStart) __attribute__((always_inline, unused));
 inline void ATS_ReportMemoryUsage(int _memoryUsageAtStart)
 {
 int		freeMemoryAtEnd;
