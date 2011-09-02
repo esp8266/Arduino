@@ -228,9 +228,7 @@
     </exec>
     
     <copy todir="macosx/working_dir">
-      <fileset dir="macosx/work">
-        <exclude name="**/ArduinoTestSuite/**" />
-      </fileset>
+      <fileset dir="macosx/work" />
     </copy>
 
     <!-- The ant copy command does not preserve permissions. -->
