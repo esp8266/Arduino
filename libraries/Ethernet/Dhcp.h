@@ -4,7 +4,7 @@
 #ifndef Dhcp_h
 #define Dhcp_h
 
-#include "Udp.h"
+#include "EthernetUdp.h"
 
 /* DHCP state machine. */
 #define STATE_DHCP_START 0
@@ -139,7 +139,7 @@ private:
   uint8_t  _dhcpGatewayIp[4];
   uint8_t  _dhcpDhcpServerIp[4];
   uint8_t  _dhcpDnsServerIp[4];
-  UDP _dhcpUdpSocket;
+  EthernetUDP _dhcpUdpSocket;
   
   void presend_DHCP();
   void send_DHCP_MESSAGE(uint8_t, uint16_t);

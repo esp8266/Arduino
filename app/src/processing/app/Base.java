@@ -1722,6 +1722,10 @@ public class Base {
    * Give this Frame a Processing icon.
    */
   static public void setIcon(Frame frame) {
+    // don't use the low-res icon on Mac OS X; the window should
+    // already have the right icon from the .app file.
+    if (Base.isMacOS()) return;
+    
     Image image = Toolkit.getDefaultToolkit().createImage(PApplet.ICON_IMAGE);
     frame.setIconImage(image);
   }

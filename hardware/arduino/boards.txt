@@ -102,7 +102,7 @@ nano.build.variant=eightanaloginputs
 
 ##############################################################
 
-mega2560.name=Arduino Mega 2560
+mega2560.name=Arduino Mega 2560 or Mega ADK
 
 mega2560.upload.protocol=stk500v2
 mega2560.upload.maximum_size=258048
@@ -162,6 +162,27 @@ mini.build.mcu=atmega168
 mini.build.f_cpu=16000000L
 mini.build.core=arduino
 mini.build.variant=eightanaloginputs
+
+##############################################################
+
+ethernet.name=Arduino Ethernet
+
+ethernet.upload.protocol=stk500
+ethernet.upload.maximum_size=32256
+ethernet.upload.speed=115200
+
+ethernet.bootloader.low_fuses=0xff
+ethernet.bootloader.high_fuses=0xde
+ethernet.bootloader.extended_fuses=0x05
+ethernet.bootloader.path=optiboot
+ethernet.bootloader.file=optiboot_atmega328.hex
+ethernet.bootloader.unlock_bits=0x3F
+ethernet.bootloader.lock_bits=0x0F
+
+ethernet.build.variant=standard
+ethernet.build.mcu=atmega328p
+ethernet.build.f_cpu=16000000L
+ethernet.build.core=arduino
 
 ##############################################################
 

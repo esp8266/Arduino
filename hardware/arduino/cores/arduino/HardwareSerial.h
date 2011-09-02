@@ -74,4 +74,6 @@ class HardwareSerial : public Stream
   extern HardwareSerial Serial3;
 #endif
 
+extern void serialEventRun(void);
+
 #endif
