@@ -56,7 +56,7 @@ void loop()
   byte i;
 
   for (i=0; i<TOTAL_PORTS; i++) {
-    sendPort(i, readPort(i));
+      sendPort(i, readPort(i, 0xff));
   }
   /* make sure that the FTDI buffer doesn't go over 60 bytes, otherwise you
      get long, random delays.  So only read analogs every 20ms or so */

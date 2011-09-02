@@ -14,12 +14,7 @@ void stringCallback(char *myString)
 
 void sysexCallback(byte command, byte argc, byte*argv)
 {
-    Serial.write(START_SYSEX);
-    Serial.write(command);
-    for(byte i=0; i<argc; i++) {
-        Serial.write(argv[i]);
-    }
-    Serial.write(END_SYSEX);
+    Firmata.sendSysex(command, argc, argv);
 }
 
 void setup()

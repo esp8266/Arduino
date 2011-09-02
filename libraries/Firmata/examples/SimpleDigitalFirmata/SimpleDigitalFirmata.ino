@@ -52,7 +52,7 @@ void loop()
     byte i;
 
     for (i=0; i<TOTAL_PORTS; i++) {
-        outputPort(i, readPort(i));
+        outputPort(i, readPort(i, 0xff));
     }
 
     while(Firmata.available()) {

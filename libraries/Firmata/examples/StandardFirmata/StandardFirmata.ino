@@ -323,7 +323,7 @@ void setup()
 {
   byte i;
 
-  Firmata.setFirmwareVersion(2, 2);
+  Firmata.setFirmwareVersion(FIRMATA_MAJOR_VERSION, FIRMATA_MINOR_VERSION);
 
   Firmata.attach(ANALOG_MESSAGE, analogWriteCallback);
   Firmata.attach(DIGITAL_MESSAGE, digitalWriteCallback);

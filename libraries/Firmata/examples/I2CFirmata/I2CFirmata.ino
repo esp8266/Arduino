@@ -48,7 +48,7 @@ void readAndReportData(byte address, int theRegister, byte numBytes)
 {
   if (theRegister != REGISTER_NOT_SPECIFIED) {
     Wire.beginTransmission(address);
-    Wire.send((byte)theRegister);
+    Wire.write((byte)theRegister);
     Wire.endTransmission();
     delayMicroseconds(i2cReadDelayTime);  // delay is necessary for some devices such as WiiNunchuck
   } 
@@ -63,7 +63,7 @@ void readAndReportData(byte address, int theRegister, byte numBytes)
     i2cRxData[0] = address;
     i2cRxData[1] = theRegister;
     for (int i = 0; i < numBytes; i++) {
-      i2cRxData[2 + i] = Wire.receive();
+      i2cRxData[2 + i] = Wire.read();
     }
     // send slave address, register and received bytes
     Firmata.sendSysex(I2C_REPLY, numBytes + 2, i2cRxData);
@@ -95,7 +95,7 @@ void sysexCallback(byte command, byte argc, byte *argv)
       Wire.beginTransmission(slaveAddress);
       for (byte i = 2; i < argc; i += 2) {
         data = argv[i] + (argv[i + 1] << 7);
-        Wire.send(data);
+        Wire.write(data);
       }
       Wire.endTransmission();
       delayMicroseconds(70); // TODO is this needed?
