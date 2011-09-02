@@ -1,7 +1,7 @@
 ##############################################################
 
 uno.name=Arduino Uno
-uno.upload.protocol=stk500
+uno.upload.protocol=arduino
 uno.upload.maximum_size=32256
 uno.upload.speed=115200
 uno.bootloader.low_fuses=0xff
@@ -20,7 +20,7 @@ uno.build.variant=standard
 
 atmega328.name=Arduino Duemilanove w/ ATmega328
 
-atmega328.upload.protocol=stk500
+atmega328.upload.protocol=arduino
 atmega328.upload.maximum_size=30720
 atmega328.upload.speed=57600
 
@@ -41,7 +41,7 @@ atmega328.build.variant=standard
 
 diecimila.name=Arduino Diecimila or Duemilanove w/ ATmega168
 
-diecimila.upload.protocol=stk500
+diecimila.upload.protocol=arduino
 diecimila.upload.maximum_size=14336
 diecimila.upload.speed=19200
 
@@ -62,7 +62,7 @@ diecimila.build.variant=standard
 
 nano328.name=Arduino Nano w/ ATmega328
 
-nano328.upload.protocol=stk500
+nano328.upload.protocol=arduino
 nano328.upload.maximum_size=30720
 nano328.upload.speed=57600
 
@@ -83,7 +83,7 @@ nano328.build.variant=eightanaloginputs
 
 nano.name=Arduino Nano w/ ATmega168
 
-nano.upload.protocol=stk500
+nano.upload.protocol=arduino
 nano.upload.maximum_size=14336
 nano.upload.speed=19200
 
@@ -125,7 +125,7 @@ mega2560.build.variant=mega
 
 mega.name=Arduino Mega (ATmega1280)
 
-mega.upload.protocol=stk500
+mega.upload.protocol=arduino
 mega.upload.maximum_size=126976
 mega.upload.speed=57600
 
@@ -146,7 +146,7 @@ mega.build.variant=mega
 
 mini.name=Arduino Mini
 
-mini.upload.protocol=stk500
+mini.upload.protocol=arduino
 mini.upload.maximum_size=14336
 mini.upload.speed=19200
 
@@ -167,7 +167,7 @@ mini.build.variant=eightanaloginputs
 
 fio.name=Arduino Fio
 
-fio.upload.protocol=stk500
+fio.upload.protocol=arduino
 fio.upload.maximum_size=30720
 fio.upload.speed=57600
 
@@ -188,7 +188,7 @@ fio.build.variant=eightanaloginputs
 
 bt328.name=Arduino BT w/ ATmega328
 
-bt328.upload.protocol=stk500
+bt328.upload.protocol=arduino
 bt328.upload.maximum_size=28672
 bt328.upload.speed=19200
 bt328.upload.disable_flushing=true
@@ -210,7 +210,7 @@ bt328.build.variant=eightanaloginputs
 
 bt.name=Arduino BT w/ ATmega168
 
-bt.upload.protocol=stk500
+bt.upload.protocol=arduino
 bt.upload.maximum_size=14336
 bt.upload.speed=19200
 bt.upload.disable_flushing=true
@@ -232,7 +232,7 @@ bt.build.variant=eightanaloginputs
 
 lilypad328.name=LilyPad Arduino w/ ATmega328
 
-lilypad328.upload.protocol=stk500
+lilypad328.upload.protocol=arduino
 lilypad328.upload.maximum_size=30720
 lilypad328.upload.speed=57600
 
@@ -253,7 +253,7 @@ lilypad328.build.variant=standard
 
 lilypad.name=LilyPad Arduino w/ ATmega168
 
-lilypad.upload.protocol=stk500
+lilypad.upload.protocol=arduino
 lilypad.upload.maximum_size=14336
 lilypad.upload.speed=19200
 
@@ -274,7 +274,7 @@ lilypad.build.variant=standard
 
 pro5v328.name=Arduino Pro or Pro Mini (5V, 16 MHz) w/ ATmega328
 
-pro5v328.upload.protocol=stk500
+pro5v328.upload.protocol=arduino
 pro5v328.upload.maximum_size=30720
 pro5v328.upload.speed=57600
 
@@ -295,7 +295,7 @@ pro5v328.build.variant=standard
 
 pro5v.name=Arduino Pro or Pro Mini (5V, 16 MHz) w/ ATmega168
 
-pro5v.upload.protocol=stk500
+pro5v.upload.protocol=arduino
 pro5v.upload.maximum_size=14336
 pro5v.upload.speed=19200
 
@@ -316,7 +316,7 @@ pro5v.build.variant=standard
 
 pro328.name=Arduino Pro or Pro Mini (3.3V, 8 MHz) w/ ATmega328
 
-pro328.upload.protocol=stk500
+pro328.upload.protocol=arduino
 pro328.upload.maximum_size=30720
 pro328.upload.speed=57600
 
@@ -337,7 +337,7 @@ pro328.build.variant=standard
 
 pro.name=Arduino Pro or Pro Mini (3.3V, 8 MHz) w/ ATmega168
 
-pro.upload.protocol=stk500
+pro.upload.protocol=arduino
 pro.upload.maximum_size=14336
 pro.upload.speed=19200
 
@@ -358,7 +358,7 @@ pro.build.variant=standard
 
 atmega168.name=Arduino NG or older w/ ATmega168
 
-atmega168.upload.protocol=stk500
+atmega168.upload.protocol=arduino
 atmega168.upload.maximum_size=14336
 atmega168.upload.speed=19200
 
@@ -379,7 +379,7 @@ atmega168.build.variant=standard
 
 atmega8.name=Arduino NG or older w/ ATmega8
 
-atmega8.upload.protocol=stk500
+atmega8.upload.protocol=arduino
 atmega8.upload.maximum_size=7168
 atmega8.upload.speed=19200
 
