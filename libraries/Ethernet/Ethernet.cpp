@@ -34,26 +34,36 @@ int EthernetClass::begin(uint8_t *mac_address)
 
 void EthernetClass::begin(uint8_t *mac_address, IPAddress local_ip)
 {
+  // Assume the DNS server will be the machine on the same network as the local IP
+  // but with last octet being '1'
+  IPAddress dns_server = local_ip;
+  dns_server[3] = 1;
+  begin(mac_address, local_ip, dns_server);
+}
+
+void EthernetClass::begin(uint8_t *mac_address, IPAddress local_ip, IPAddress dns_server)
+{
   // Assume the gateway will be the machine on the same network as the local IP
   // but with last octet being '1'
   IPAddress gateway = local_ip;
   gateway[3] = 1;
-  begin(mac_address, local_ip, gateway);
+  begin(mac_address, local_ip, dns_server, gateway);
 }
 
-void EthernetClass::begin(uint8_t *mac_address, IPAddress local_ip, IPAddress gateway)
+void EthernetClass::begin(uint8_t *mac_address, IPAddress local_ip, IPAddress dns_server, IPAddress gateway)
 {
   IPAddress subnet(255, 255, 255, 0);
-  begin(mac_address, local_ip, gateway, subnet);
+  begin(mac_address, local_ip, dns_server, gateway, subnet);
 }
 
-void EthernetClass::begin(uint8_t *mac, IPAddress local_ip, IPAddress gateway, IPAddress subnet)
+void EthernetClass::begin(uint8_t *mac, IPAddress local_ip, IPAddress dns_server, IPAddress gateway, IPAddress subnet)
 {
   W5100.init();
   W5100.setMACAddress(mac);
   W5100.setIPAddress(local_ip._address);
   W5100.setGatewayIp(gateway._address);
   W5100.setSubnetMask(subnet._address);
+  _dnsServerAddress = dns_server;
 }
 
 IPAddress EthernetClass::localIP()

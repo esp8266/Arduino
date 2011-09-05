@@ -11,8 +11,10 @@ int main(void)
 	
 	setup();
     
-	for (;;)
+	for (;;) {
 		loop();
+		serialEventRun();
+	}
         
 	return 0;
 }

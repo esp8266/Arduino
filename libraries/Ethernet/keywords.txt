@@ -7,8 +7,8 @@
 #######################################
 
 Ethernet	KEYWORD1
-Client	KEYWORD1
-Server	KEYWORD1
+EthernetClient	KEYWORD1
+EthernetServer	KEYWORD1
 IPAddress	KEYWORD1
 
 #######################################

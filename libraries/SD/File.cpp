@@ -74,7 +74,7 @@ size_t File::write(const uint8_t *buf, size_t size) {
   }
   _file->clearWriteError();
   t = _file->write(buf, size);
-  if (_file->writeError()) {
+  if (_file->getWriteError()) {
     setWriteError();
     return 0;
   }

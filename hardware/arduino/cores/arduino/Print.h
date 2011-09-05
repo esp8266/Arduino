@@ -42,7 +42,7 @@ class Print
   public:
     Print() : write_error(0) {}
   
-    int writeError() { return write_error; }
+    int getWriteError() { return write_error; }
     void clearWriteError() { setWriteError(0); }
   
     virtual size_t write(uint8_t) = 0;
