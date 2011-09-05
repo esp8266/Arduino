@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<workspace>
+  <project>
+    <path>$WS_DIR$\..\..\..\cores\sam\build_iar\libarduino.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\libsam.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\..\..\..\cores\sam\validation\build_iar\test.ewp</path>
+  </project>
+  <batchBuild/>
+</workspace>
+
+
