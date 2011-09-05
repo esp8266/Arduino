@@ -167,11 +167,6 @@ inline void store_char(unsigned char c, ring_buffer *buffer)
   #error SIG_USART3_RECV
 #endif
 
-<<<<<<< HEAD
-#if !defined(USART0_UDRE_vect) && defined(USART1_UDRE_vect)
-// do nothing - on the 32u4 the first USART is USART1
-#else
-=======
 void serialEventRun(void)
 {
   unsigned char flag, oldSREG;
@@ -210,7 +205,9 @@ void serialEventRun(void)
 }
 
 
->>>>>>> 0c92f230b5202b241de875a3baff9dfd1cf7a618
+#if !defined(USART0_UDRE_vect) && defined(USART1_UDRE_vect)
+// do nothing - on the 32u4 the first USART is USART1
+#else
 #if !defined(UART0_UDRE_vect) && !defined(UART_UDRE_vect) && !defined(USART0_UDRE_vect) && !defined(USART_UDRE_vect)
   #error Don't know what the Data Register Empty vector is called for the first UART
 #else

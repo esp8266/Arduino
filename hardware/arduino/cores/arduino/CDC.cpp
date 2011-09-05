@@ -95,7 +95,7 @@ bool WEAK CDC_Setup(Setup& setup)
 		if (CDC_SET_LINE_CODING == r)
 		{
 			USB_RecvControl((void*)&_usbLineInfo,7);
-			if (300 == _usbLineInfo.dwDTERate)		// auto-reset is triggered when avrdude opens the port at 1200 bps
+			if (1200 == _usbLineInfo.dwDTERate)		// auto-reset is triggered when avrdude opens the port at 1200 bps
 				Reboot();							
 
 			return true;
