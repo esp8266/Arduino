@@ -5,7 +5,7 @@
  *
  * \par Purpose
  *
- * This file provides basic support for Cortex-M processor based 
+ * This file provides basic support for Cortex-M processor based
  * microcontrollers.
  *
  * \author               Atmel Corporation: http://www.atmel.com \n
@@ -13,44 +13,41 @@
  *
  ******************************************************************************/
 
-// $asf_license$
+/* $asf_license$ */
 
 #ifndef __SYSTEM_SAM3S_
 #define __SYSTEM_SAM3S_
 
+/* @cond 0 */
+/**INDENT-OFF**/
 #ifdef __cplusplus
 extern "C" {
 #endif
+/**INDENT-ON**/
+/* @endcond */
 
 #include <stdint.h>
 
-extern uint32_t SystemCoreClock;     /*!< System Clock Frequency (Core Clock)  */
-
+extern uint32_t SystemCoreClock;     /* System Clock Frequency (Core Clock) */
 
 /**
- * Initialize the system
- *
- * @param  none
- * @return none
- *
- * @brief  Setup the microcontroller system.
- *         Initialize the System and update the SystemCoreClock variable.
+ * @brief Setup the microcontroller system.
+ * Initialize the System and update the SystemCoreClock variable.
  */
 extern void SystemInit (void);
 
 /**
- * Update SystemCoreClock variable
- *
- * @param  none
- * @return none
- *
- * @brief  Updates the SystemCoreClock with current core Clock 
- *         retrieved from cpu registers.
+ * @brief Updates the SystemCoreClock with current core Clock
+ * retrieved from cpu registers.
  */
 extern void SystemCoreClockUpdate (void);
 
+/* @cond 0 */
+/**INDENT-OFF**/
 #ifdef __cplusplus
 }
 #endif
+/**INDENT-ON**/
+/* @endcond */
 
 #endif /* __SYSTEM_SAM3S_ */

@@ -16,9 +16,8 @@
  *         Headers
  *------------------------------------------------------------------------------*/
 
-#include "..\exceptions.h"
-#include "..\..\..\include\sam3s.h"
-#include "..\..\..\include\system_sam3s.h"
+#include "../exceptions.h"
+#include "sam3.h"
 
 /*----------------------------------------------------------------------------
  *        Definitions

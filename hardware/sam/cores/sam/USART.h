@@ -26,7 +26,9 @@ class USARTClass : public HardwareSerial
 
     void IrqHandler( void ) ;
 
-    using Print::write ; // pull in write(str) and write(buf, size) from Print
+    void write( const char *str ) ;
+    void write( const uint8_t *buffer, size_t size ) ;
+//    using Print::write ; // pull in write(str) and write(buf, size) from Print
 };
 
 #endif // _USART_

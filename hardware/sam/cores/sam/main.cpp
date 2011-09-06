@@ -1,15 +1,19 @@
 #define ARDUINO_MAIN
 #include "Arduino.h"
 
-int main(void)
+/*
+ * \brief Main entry point of Arduino application
+ */
+int main( void )
 {
-	init();
+	init() ;
 
-	setup();
-    
-	for (;;)
-		loop();
-        
-	return 0;
+	setup() ;
+
+	for ( ; ; )
+    {
+		loop() ;
+    }
+
+//	return 0 ;
 }
-

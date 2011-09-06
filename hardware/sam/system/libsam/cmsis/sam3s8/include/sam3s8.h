@@ -1,20 +1,20 @@
-/* %ATMEL_LICENCE% */
+/* $asf_license$ */
 
 #ifndef _SAM3S8_
 #define _SAM3S8_
 
-#if defined __sam3sd8a__
-  #include "SAM3SD8A.h"
-#elif defined __sam3sd8b__
-  #include "SAM3SD8B.h"
-#elif defined __sam3sd8c__
-  #include "SAM3SD8C.h"
-#elif defined __sam3s8a__
-  #include "SAM3S8A.h"
-#elif defined __sam3s8b__
-  #include "SAM3S8B.h"
-#elif defined __sam3s8c__
-  #include "SAM3S8C.h"
+#if defined __SAM3SD8A__
+  #include "sam3sd8a.h"
+#elif defined __SAM3SD8B__
+  #include "sam3sd8b.h"
+#elif defined __SAM3SD8C__
+  #include "sam3sd8c.h"
+#elif defined __SAM3S8A__
+  #include "sam3s8a.h"
+#elif defined __SAM3S8B__
+  #include "sam3s8b.h"
+#elif defined __SAM3S8C__
+  #include "sam3s8c.h"
 #else
   #error Library does not support the specified device.
 #endif

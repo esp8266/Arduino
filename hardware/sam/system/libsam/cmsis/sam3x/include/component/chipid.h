@@ -1,4 +1,4 @@
-/* %ATMEL_LICENCE% */
+/* $asf_license$ */
 
 #ifndef _SAM3XA_CHIPID_COMPONENT_
 #define _SAM3XA_CHIPID_COMPONENT_

@@ -43,11 +43,13 @@
  *----------------------------------------------------------------------------*/
 
 #  ifdef __cplusplus
+#if 0
 #    include "UART.h"
 #    include "USART.h"
 
 extern UARTClass Serial1 ;
 extern UARTClass Serial2 ;
+#endif // 0
 
 //extern USARTClass Serial3 ;
 //extern USARTClass Serial4 ;

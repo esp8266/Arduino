@@ -79,32 +79,12 @@ typedef unsigned int word;
 typedef uint8_t boolean ;
 typedef uint8_t byte ;
 
+#include "wiring.h"
+#include "wiring_digital.h"
+#include "wiring_analog.h"
+#include "wiring_shift.h"
 
-// wiring_digital.c
-extern void pinMode( uint32_t dwPin, uint32_t dwMode ) ;
-extern void digitalWrite( uint32_t dwPin, uint32_t dwVal ) ;
-extern int digitalRead( uint32_t dwPin ) ;
-
-// wiring_analog.c
-extern int analogRead( uint8_t ) ;
-extern void analogReference( uint8_t mode ) ;
-extern void analogWrite( uint8_t, int ) ;
-
-// wiring.c
-extern void init( void ) ;
-extern uint32_t millis( void ) ;
-extern uint32_t micros( void ) ;
-extern void delay( uint32_t dwMs ) ;
-extern void delayMicroseconds( uint32_t dwUs ) ;
-
-// wiring_shift.c
-extern void shiftOut( uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val ) ;
-extern uint8_t shiftIn( uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder ) ;
-
-extern void attachInterrupt( uint8_t, void (*)(void), int mode ) ;
-extern void detachInterrupt( uint8_t ) ;
-
-// sketch
+/* sketch */
 extern void setup( void ) ;
 extern void loop( void ) ;
 
@@ -127,31 +107,24 @@ extern void loop( void ) ;
 #define NOT_ON_TIMER         0
 #define TIMER0               1
 
-
 #ifdef __cplusplus
 } // extern "C"
 #endif // __cplusplus
 
+
+
 #ifdef __cplusplus
-#  include "WCharacter.h"
-#  include "WString.h"
-#  include "HardwareSerial.h"
+#include "WCharacter.h"
+#include "WString.h"
+#include "HardwareSerial.h"
 
 uint16_t makeWord( uint16_t w ) ;
 uint16_t makeWord( byte h, byte l ) ;
 
 #define word(...) makeWord(__VA_ARGS__)
 
-extern uint32_t pulseIn( uint32_t pin, uint32_t state, uint32_t timeout = 1000000L ) ;
-
-extern void tone( uint32_t dwPin, uint32_t dwFrequency, uint32_t dwDuration = 0 ) ;
-extern void noTone( uint32_t dwPin ) ;
-
-// WMath prototypes
-extern long random( long ) ;
-extern long random( long, long ) ;
-extern void randomSeed( uint32_t dwSeed ) ;
-extern long map( long, long, long, long, long ) ;
+#include "Tone.h"
+#include "WMath.h"
 
 #endif // __cplusplus
 

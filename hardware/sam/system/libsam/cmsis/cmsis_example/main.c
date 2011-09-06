@@ -1,75 +1,95 @@
+/*
+ %atmel_license%
+*/
+
+/** \file cmsis example */
+
 #include <stdlib.h>
 #include <compiler.h>
 #include <board.h>
 #include "conf_board.h"
 
-volatile uint32_t msTicks = 0;                        /* counts 1ms timeTicks */
+//! counts 1ms timeTicks
+volatile uint32_t dw_ms_ticks = 0;
 
-/*----------------------------------------------------------------------------
-  SysTick_Handler
- *----------------------------------------------------------------------------*/
+/**
+ * \brief SysTick_Handler.
+ */
 void SysTick_Handler(void)
 {
-  msTicks++;                        /* increment counter necessary in Delay() */
+  // increment counter necessary in delay()
+  dw_ms_ticks++;
 }
 
-/*----------------------------------------------------------------------------
-  delays number of tick Systicks (happens every 1 ms)
- *----------------------------------------------------------------------------*/
-__INLINE static void Delay(uint32_t dlyTicks)
+/**
+ * \brief delays number of tick Systicks (happens every 1 ms)
+ */
+__INLINE static void delay_ms(uint32_t dw_dly_ticks)
 {
-  uint32_t curTicks;
+  uint32_t dw_cur_ticks;
 
-  curTicks = msTicks;
-  while ((msTicks - curTicks) < dlyTicks);
+  dw_cur_ticks = dw_ms_ticks;
+  while ((dw_ms_ticks - dw_cur_ticks) < dw_dly_ticks);
 }
 
-/*----------------------------------------------------------------------------
-  configer LED pins
- *----------------------------------------------------------------------------*/
-__INLINE static void LED_Config(void)
+ /**
+ * \brief configer LED pins
+ */
+__INLINE static void led_config(void)
 {
-  LED0_PIO->PIO_PER    =  LED0_MASK;          /* Setup Pin PA19 for LED */
+  // Setup LED Pin
+  LED0_PIO->PIO_PER    =  LED0_MASK;
   LED0_PIO->PIO_OER    =  LED0_MASK;
   LED0_PIO->PIO_PUDR   =  LED0_MASK;
 }
 
-/*----------------------------------------------------------------------------
-  Switch on LEDs
- *----------------------------------------------------------------------------*/
-__INLINE static void LED_On(uint32_t led)
+/**
+* \brief Switch on LED
+*/
+__INLINE static void led_on(uint32_t dw_led)
 {
-  LED0_PIO->PIO_CODR = led;              /* Turn On  LED */
+  // Turn On LED
+  LED0_PIO->PIO_CODR = dw_led;
 }
 
-
-/*----------------------------------------------------------------------------
-  Switch off LEDs
- *----------------------------------------------------------------------------*/
-__INLINE static void LED_Off(uint32_t led)
+/**
+* \brief Switch off LED
+*/ 
+__INLINE static void led_off(uint32_t dw_led)
 {
-  LED0_PIO->PIO_SODR = led;              /* Turn Off LED */
+  // Turn Off LED
+  LED0_PIO->PIO_SODR = dw_led;
 }
 
-/*----------------------------------------------------------------------------
-  MAIN function
- *----------------------------------------------------------------------------*/
+/**
+ * \brief Application entry point.
+ *
+ * \return Unused (ANSI-C compatibility).
+ */
 int main(void)
 {
-	SystemInit();
-  
-	WDT->WDT_MR = WDT_MR_WDDIS;
-  
-	if (SysTick_Config(SystemCoreClock / 1000)) { /* Setup SysTick Timer for 1 msec interrupts  */
-    	while (1);                                  /* Capture error */
-	}
-  
-	LED_Config();                             
- 
+  SystemInit();
+
+  WDT->WDT_MR = WDT_MR_WDDIS;
+
+  // Setup SysTick Timer for 1 msec interrupts
+  if (SysTick_Config(SystemCoreClock / 1000)) {
+    // Capture error
+    while (1);
+  }
+
+  led_config();
+
+  // Flash the LED
   while(1) {
-    LED_On (LED0_MASK);                              /* Turn on the LED. */
-    Delay (1000);                                /* delay  100 Msec */
-    LED_Off (LED0_MASK);                             /* Turn off the LED. */
-    Delay (1000);                                /* delay  100 Msec */
+    // Turn on the LED.
+    led_on (LED0_MASK);
+    // delay  1000 Msec.
+    delay_ms (1000);
+
+    // Turn off the LED.
+    led_off(LED0_MASK);
+    // delay  1000 Msec.
+    delay_ms (1000);
   }
 }

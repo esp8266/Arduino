@@ -9,6 +9,9 @@ ifeq ($(CHIP),)
 $(error CHIP not defined)
 endif
 
+#CHIP_NAME=$(subst __,,$(CHIP))
+#CHIP_NAME=$(subst __,,$(call lc,$(CHIP)))
+
 #-------------------------------------------------------------------------------
 # Path
 #-------------------------------------------------------------------------------
@@ -18,22 +21,43 @@ OUTPUT_BIN = ../lib
 
 # Libraries
 PROJECT_BASE_PATH = ..
-CMSIS_BASE_PATH = $(PROJECT_BASE_PATH)/../CMSIS/CM3/CoreSupport
+CMSIS_BASE_PATH = $(PROJECT_BASE_PATH)/../CMSIS/Include
+
+ifeq ($(CHIP), __SAM3S4C__)
+CHIP_NAME=sam3s4c
+CHIP_SERIE=sam3s
+else ifeq ($(CHIP), __SAM3U4E__)
+CHIP_NAME=sam3u4e
+CHIP_SERIE=sam3u
+else ifeq ($(CHIP), __SAM3N4C__)
+CHIP_NAME=sam3n4c
+CHIP_SERIE=sam3n
+else ifeq ($(CHIP), __SAM3X8H__)
+CHIP_NAME=sam3x8h
+CHIP_SERIE=sam3xa
+else
+endif
+
+CMSIS_CHIP_PATH=$(PROJECT_BASE_PATH)/../cmsis/$(CHIP_SERIE)
 
 #-------------------------------------------------------------------------------
 # Files
 #-------------------------------------------------------------------------------
 
-vpath %.h $(PROJECT_BASE_PATH)/include
-vpath %.c $(PROJECT_BASE_PATH)/source $(CMSIS_BASE_PATH)
-vpath %.s $(PROJECT_BASE_PATH)/source $(CMSIS_BASE_PATH)
+vpath %.h $(PROJECT_BASE_PATH)/include $(PROJECT_BASE_PATH)/../cmsis/$(CHIP_SERIE)/include
+vpath %.c $(PROJECT_BASE_PATH)/source $(CMSIS_BASE_PATH) $(CMSIS_CHIP_PATH)/source/templates $(CMSIS_CHIP_PATH)/source/templates
 
 VPATH+=$(PROJECT_BASE_PATH)/source
 VPATH+=$(CMSIS_BASE_PATH)
+VPATH+=$(CMSIS_CHIP_PATH)/include
+VPATH+=$(CMSIS_CHIP_PATH)/source/templates
+VPATH+=$(CMSIS_CHIP_PATH)/source/templates/gcc
 
 INCLUDES = -I$(PROJECT_BASE_PATH)
 INCLUDES += -I$(PROJECT_BASE_PATH)/include
 INCLUDES += -I$(CMSIS_BASE_PATH)
+INCLUDES += -I$(CMSIS_CHIP_PATH)/include
+INCLUDES += -I$(CMSIS_CHIP_PATH)/source/templates
 
 #-------------------------------------------------------------------------------
 ifdef DEBUG
@@ -51,19 +75,20 @@ include $(TOOLCHAIN).mk
 #-------------------------------------------------------------------------------
 ifdef DEBUG
 OUTPUT_OBJ=debug
-OUTPUT_LIB=$(LIBNAME)_$(CHIP)_$(TOOLCHAIN)_dbg.a
+OUTPUT_LIB=$(LIBNAME)_$(CHIP_NAME)_$(TOOLCHAIN)_dbg.a
 else
 OUTPUT_OBJ=release
-OUTPUT_LIB=$(LIBNAME)_$(CHIP)_$(TOOLCHAIN)_rel.a
+OUTPUT_LIB=$(LIBNAME)_$(CHIP_NAME)_$(TOOLCHAIN)_rel.a
 endif
 
-OUTPUT_PATH=$(OUTPUT_OBJ)_$(CHIP)
+OUTPUT_PATH=$(OUTPUT_OBJ)_$(CHIP_NAME)
 
 #-------------------------------------------------------------------------------
 # C source files and objects
 #-------------------------------------------------------------------------------
 C_SRC=$(wildcard $(PROJECT_BASE_PATH)/source/*.c)
-C_SRC+=$(wildcard $(CMSIS_BASE_PATH)/*.c)
+C_SRC+=$(wildcard $(CMSIS_CHIP_PATH)/*.c)
+C_SRC+=$(wildcard $(CMSIS_CHIP_PATH)/gcc*.c)
 
 C_OBJ_TEMP=$(patsubst %.c, %.o, $(notdir $(C_SRC)))
 

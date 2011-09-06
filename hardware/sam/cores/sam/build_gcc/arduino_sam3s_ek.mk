@@ -1,7 +1,7 @@
 # Makefile for compiling libArduino
 .SUFFIXES: .o .a .c .s
 
-CHIP=sam3s4
+CHIP=__SAM3S4C__
 VARIANT=sam3s_ek
 LIBNAME=libarduino_$(VARIANT)
 TOOLCHAIN=gcc
@@ -16,7 +16,7 @@ OUTPUT_BIN = ../lib
 # Libraries
 PROJECT_BASE_PATH = ..
 SYSTEM_PATH = ../../../system
-CMSIS_PATH = $(SYSTEM_PATH)/CMSIS/CM3/CoreSupport
+CMSIS_PATH = $(SYSTEM_PATH)/CMSIS/Include
 VARIANT_PATH = ../../../variants/sam3s-ek
 
 #-------------------------------------------------------------------------------

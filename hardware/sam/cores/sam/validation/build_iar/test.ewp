@@ -164,7 +164,7 @@
         <debug>1</debug>
         <option>
           <name>CCDefines</name>
-          <state>__sam3s4c__</state>
+          <state>__SAM3S4C__</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -200,7 +200,7 @@
         </option>
         <option>
           <name>CCEnableRemarks</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>CCDiagSuppress</name>
@@ -562,7 +562,7 @@
         <option>
           <name>OOCOutputFormat</name>
           <version>2</version>
-          <state>0</state>
+          <state>2</state>
         </option>
         <option>
           <name>OCOutputOverride</name>
@@ -570,7 +570,7 @@
         </option>
         <option>
           <name>OOCOutputFile</name>
-          <state></state>
+          <state>test.bin</state>
         </option>
         <option>
           <name>OOCCommandLineProducer</name>
@@ -578,7 +578,7 @@
         </option>
         <option>
           <name>OOCObjCopyEnable</name>
-          <state>0</state>
+          <state>1</state>
         </option>
       </data>
     </settings>
@@ -660,35 +660,35 @@
         </option>
         <option>
           <name>IlinkMapFile</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>IlinkLogFile</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>IlinkLogInitialization</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>IlinkLogModule</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>IlinkLogSection</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>IlinkLogVeneer</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>IlinkIcfOverride</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>IlinkIcfFile</name>
-          <state>$TOOLKIT_DIR$\CONFIG\generic_cortex.icf</state>
+          <state>$PROJ_DIR$\..\..\..\..\variants\sam3s-ek\linker_scripts\iar\sam3s_ek_flash.icf</state>
         </option>
         <option>
           <name>IlinkIcfFileSlave</name>
@@ -696,7 +696,7 @@
         </option>
         <option>
           <name>IlinkEnableRemarks</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>IlinkSuppressDiags</name>
@@ -823,15 +823,15 @@
         </option>
         <option>
           <name>IlinkLogAutoLibSelect</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>IlinkLogRedirSymbols</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>IlinkLogUnusedFragments</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>IlinkCrcReverseByteOrder</name>
@@ -1792,6 +1792,30 @@
       <data/>
     </settings>
   </configuration>
+  <group>
+    <name>resources</name>
+    <group>
+      <name>arduino_due</name>
+    </group>
+    <group>
+      <name>sam3s_ek</name>
+      <file>
+        <name>$PROJ_DIR$\..\..\..\..\variants\sam3s-ek\linker_scripts\iar\sam3s_ek_flash.icf</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\..\..\..\variants\sam3s-ek\debug_scripts\iar\sam3s_ek_flash.mac</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\..\..\..\variants\sam3s-ek\linker_scripts\iar\sam3s_ek_sram.icf</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\..\..\..\variants\sam3s-ek\debug_scripts\iar\sam3s_ek_sram.mac</name>
+      </file>
+    </group>
+    <group>
+      <name>sam3u_ek</name>
+    </group>
+  </group>
   <group>
     <name>variants</name>
     <group>

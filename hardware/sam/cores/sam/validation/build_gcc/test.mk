@@ -15,14 +15,31 @@ OUTPUT_PATH = .
 # Libraries
 PROJECT_BASE_PATH = .
 SYSTEM_PATH = ../../../system
-CMSIS_PATH = $(SYSTEM_PATH)/CMSIS/CM3/CoreSupport
+CMSIS_BASE_PATH = $(SYSTEM_PATH)/CMSIS/Include
 VARIANT_PATH = ../../../variants/sam3s-ek
+
+ifeq ($(CHIP), __SAM3S4C__)
+CHIP_NAME=sam3s4c
+CHIP_SERIE=sam3s
+else ifeq ($(CHIP), __SAM3U4E__)
+CHIP_NAME=sam3u4e
+CHIP_SERIE=sam3u
+else ifeq ($(CHIP), __SAM3N4C__)
+CHIP_NAME=sam3n4c
+CHIP_SERIE=sam3n
+else ifeq ($(CHIP), __SAM3X8H__)
+CHIP_NAME=sam3x8h
+CHIP_SERIE=sam3xa
+else
+endif
+
+CMSIS_CHIP_PATH=$(PROJECT_BASE_PATH)/../cmsis/$(CHIP_SERIE)
 
 #-------------------------------------------------------------------------------
 # Files
 #-------------------------------------------------------------------------------
 
-vpath %.h $(PROJECT_BASE_PATH)/.. $(VARIANT_PATH) $(SYSTEM_PATH)
+vpath %.h $(PROJECT_BASE_PATH)/.. $(VARIANT_PATH) $(SYSTEM_PATH) $(CMSIS_BASE_PATH)
 vpath %.cpp $(PROJECT_BASE_PATH)
 
 VPATH+=$(PROJECT_BASE_PATH)
@@ -31,7 +48,7 @@ INCLUDES = -I$(PROJECT_BASE_PATH)/..
 INCLUDES += -I$(VARIANT_PATH)
 INCLUDES += -I$(SYSTEM_PATH)
 INCLUDES += -I$(SYSTEM_PATH)/libsam
-INCLUDES += -I$(CMSIS_PATH)
+INCLUDES += -I$(CMSIS_BASE_PATH)
 
 #-------------------------------------------------------------------------------
 ifdef DEBUG
@@ -90,7 +107,7 @@ $(addprefix $(OUTPUT_PATH)/,$(CPP_OBJ)): $(OUTPUT_PATH)/%.o: %.cpp
 	@$(CXX) -c $(CPPFLAGS) $< -o $@
 
 $(OUTPUT_BIN): $(addprefix $(OUTPUT_PATH)/, $(C_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(CPP_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(A_OBJ))
-	$(CC) $(LIB_PATH) $(LDFLAGS) -T"$(VARIANT_PATH)/linker_scripts/flash.ld" -Wl,-Map,$(OUTPUT_PATH)/$@.map -o $(OUTPUT_PATH)/$@.elf $^ $(LIBS)
+	$(CC) $(LIB_PATH) $(LDFLAGS) -T"$(VARIANT_PATH)/linker_scripts/gcc/flash.ld" -Wl,-Map,$(OUTPUT_PATH)/$@.map -o $(OUTPUT_PATH)/$@.elf $^ $(LIBS)
 	$(NM) $(OUTPUT_PATH)/$@.elf >$(OUTPUT_PATH)/$@.elf.txt
 	$(OBJCOPY) -O binary $(OUTPUT_PATH)/$@.elf $(OUTPUT_PATH)/$@.bin
 	$(SIZE) $^ $(OUTPUT_PATH)/$@.elf
@@ -104,3 +121,6 @@ clean:
 	-@$(RM) $(OUTPUT_PATH)/$(OUTPUT_BIN).elf.txt 1>NUL 2>&1
 	-@$(RM) $(OUTPUT_PATH)/$(OUTPUT_BIN).bin 1>NUL 2>&1
 	-@$(RM) $(OUTPUT_PATH)/$(OUTPUT_BIN).map 1>NUL 2>&1
+
+debug: test
+	$(GDB) -x "$(VARIANT_PATH)/debug_scripts/gcc/flash.gdb" -ex "reset" -readnow -se $(OUTPUT_PATH)/$(OUTPUT_BIN).elf

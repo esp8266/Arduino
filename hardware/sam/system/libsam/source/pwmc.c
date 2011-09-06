@@ -1,31 +1,6 @@
-/* ----------------------------------------------------------------------------
- *         ATMEL Microcontroller Software Support
- * ----------------------------------------------------------------------------
- * Copyright (c) 2009, Atmel Corporation
- *
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * - Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the disclaimer below.
- *
- * Atmel's name may not be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * DISCLAIMER: THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
- * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * ----------------------------------------------------------------------------
- */
+/*
+ %atmel_license%
+*/
 
 /** \addtogroup pwm_module Working with PWM
  * The PWM driver provides the interface to configure and use the PWM
@@ -580,13 +555,13 @@ void PWMC_ConfigureComparisonUnit( Pwm* pPwm, uint32_t x, uint32_t value, uint32
 
     /* If channel is disabled, write to CMPxM & CMPxV */
     if ((pPwm->PWM_SR & (1 << 0)) == 0) {
-        pPwm->PWM_CMP[x].PWM_CMPxM = mode;
-        pPwm->PWM_CMP[x].PWM_CMPxV = value;
+        pPwm->PWM_CMP[x].PWM_CMPM = mode;
+        pPwm->PWM_CMP[x].PWM_CMPV = value;
     }
     /* Otherwise use update register */
     else {
-        pPwm->PWM_CMP[x].PWM_CMPxMUPD = mode;
-        pPwm->PWM_CMP[x].PWM_CMPxVUPD = value;
+        pPwm->PWM_CMP[x].PWM_CMPMUPD = mode;
+        pPwm->PWM_CMP[x].PWM_CMPVUPD = value;
     }
 }
 
@@ -600,9 +575,15 @@ void PWMC_ConfigureEventLineMode( Pwm* pPwm, uint32_t x, uint32_t mode)
 {
     assert(x < 2);
 
-    if (x == 0) {
-        pPwm->PWM_ELxMR[0] = mode;
-    } else if (x == 1) {
-        pPwm->PWM_ELxMR[1] = mode;
+    if (x == 0)
+    {
+        pPwm->PWM_ELMR[0] = mode;
+    }
+    else
+    {
+        if (x == 1)
+        {
+            pPwm->PWM_ELMR[1] = mode;
+        }
     }
 }

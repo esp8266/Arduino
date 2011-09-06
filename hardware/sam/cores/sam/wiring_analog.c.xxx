@@ -25,7 +25,11 @@
 */
 
 #include "wiring_private.h"
-#include "pins_arduino.h"
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 
 uint8_t analog_reference = DEFAULT;
 
@@ -257,3 +261,7 @@ void analogWrite(uint8_t pin, int val)
 		}
 	}
 }
+
+#ifdef __cplusplus
+}
+#endif

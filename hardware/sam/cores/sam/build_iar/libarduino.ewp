@@ -103,7 +103,7 @@
         </option>
         <option>
           <name>GenLowLevelInterface</name>
-          <state>1</state>
+          <state>0</state>
         </option>
         <option>
           <name>GEndianModeBE</name>
@@ -164,7 +164,7 @@
         <debug>1</debug>
         <option>
           <name>CCDefines</name>
-          <state>__sam3s4c__</state>
+          <state>__SAM3S4C__</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -2718,6 +2718,9 @@
   </file>
   <file>
     <name>$PROJ_DIR$\..\syscalls.h</name>
+    <excluded>
+      <configuration>Debug</configuration>
+    </excluded>
   </file>
   <file>
     <name>$PROJ_DIR$\..\syscalls_sam3.c</name>
@@ -2733,12 +2736,18 @@
   </file>
   <file>
     <name>$PROJ_DIR$\..\UART.cpp</name>
+    <excluded>
+      <configuration>Debug</configuration>
+    </excluded>
   </file>
   <file>
     <name>$PROJ_DIR$\..\UART.h</name>
   </file>
   <file>
     <name>$PROJ_DIR$\..\USART.cpp</name>
+    <excluded>
+      <configuration>Debug</configuration>
+    </excluded>
   </file>
   <file>
     <name>$PROJ_DIR$\..\USART.h</name>
@@ -2748,9 +2757,15 @@
   </file>
   <file>
     <name>$PROJ_DIR$\..\WInterrupts.c</name>
+    <excluded>
+      <configuration>Debug</configuration>
+    </excluded>
   </file>
   <file>
     <name>$PROJ_DIR$\..\wiring.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\..\wiring.h</name>
   </file>
   <file>
     <name>$PROJ_DIR$\..\wiring_analog.c</name>
@@ -2759,7 +2774,13 @@
     </excluded>
   </file>
   <file>
+    <name>$PROJ_DIR$\..\wiring_analog.h</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\..\wiring_digital.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\..\wiring_digital.h</name>
   </file>
   <file>
     <name>$PROJ_DIR$\..\wiring_private.h</name>
@@ -2771,10 +2792,19 @@
     </excluded>
   </file>
   <file>
+    <name>$PROJ_DIR$\..\wiring_pulse.h</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\..\wiring_shift.c</name>
   </file>
   <file>
+    <name>$PROJ_DIR$\..\wiring_shift.h</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\..\WMath.cpp</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\..\WMath.h</name>
   </file>
   <file>
     <name>$PROJ_DIR$\..\WString.cpp</name>

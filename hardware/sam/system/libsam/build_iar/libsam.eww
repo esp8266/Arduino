@@ -10,7 +10,23 @@
   <project>
     <path>$WS_DIR$\..\..\..\cores\sam\validation\build_iar\test.ewp</path>
   </project>
-  <batchBuild/>
+  <batchBuild>
+    <batchDefinition>
+      <name>all_debug_sam3s</name>
+      <member>
+        <project>libsam</project>
+        <configuration>Debug</configuration>
+      </member>
+      <member>
+        <project>libarduino</project>
+        <configuration>Debug</configuration>
+      </member>
+      <member>
+        <project>test</project>
+        <configuration>Debug</configuration>
+      </member>
+    </batchDefinition>
+  </batchBuild>
 </workspace>
 
 

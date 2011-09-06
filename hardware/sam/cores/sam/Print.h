@@ -39,7 +39,7 @@ class Print
     virtual void write(uint8_t) = 0;
     virtual void write(const char *str);
     virtual void write(const uint8_t *buffer, size_t size);
-    
+
     void print(const String &);
     void print(const char[]);
     void print(char);

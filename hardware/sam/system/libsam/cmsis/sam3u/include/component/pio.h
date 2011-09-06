@@ -1,4 +1,4 @@
-/* %ATMEL_LICENCE% */
+/* $asf_license$ */
 
 #ifndef _SAM3U_PIO_COMPONENT_
 #define _SAM3U_PIO_COMPONENT_

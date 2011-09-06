@@ -46,7 +46,7 @@
  *        Exported functions
  *----------------------------------------------------------------------------*/
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 extern caddr_t _sbrk( int incr ) ;

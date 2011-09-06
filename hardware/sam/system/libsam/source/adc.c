@@ -1,31 +1,6 @@
-/* ----------------------------------------------------------------------------
- *         ATMEL Microcontroller Software Support
- * ----------------------------------------------------------------------------
- * Copyright (c) 2009, Atmel Corporation
- *
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * - Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the disclaimer below.
- *
- * Atmel's name may not be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * DISCLAIMER: THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
- * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * ----------------------------------------------------------------------------
- */
+/*
+ %atmel_license%
+*/
 
 /** \addtogroup adc_module Working with ADC
  * The ADC driver provides the interface to configure and use the ADC peripheral.
@@ -91,7 +66,7 @@
 extern void ADC_Initialize( Adc* pAdc, uint32_t idAdc )
 {
     /* Enable peripheral clock*/
-    PMC->PMC_PCER0 = 1 << idAdc;
+    PMC_EnablePeripheral( idAdc ) ;
 
     /*  Reset the controller */
     pAdc->ADC_CR = ADC_CR_SWRST;
@@ -100,7 +75,7 @@ extern void ADC_Initialize( Adc* pAdc, uint32_t idAdc )
     /* TrackTime set to 0 */
     /* Transfer set to 1 */
     /* settling set to 3 */
-    pAdc->ADC_MR = ADC_MR_TRANSFER(1) | ADC_MR_TRACKTIM(0) | ADC_MR_SETTLING(3);
+    pAdc->ADC_MR = ADC_MR_TRANSFER(1) | ADC_MR_TRACKTIM(0) | ADC_MR_SETTLING_AST17 ;
 }
 
 /**
@@ -109,7 +84,7 @@ extern void ADC_Initialize( Adc* pAdc, uint32_t idAdc )
 extern void ADC_CfgTiming( Adc* pAdc, uint32_t tracking, uint32_t settling, uint32_t transfer )
 {
     pAdc->ADC_MR = ADC_MR_TRANSFER( transfer )
-                 | ADC_MR_SETTLING( settling )
+                 | settling
                  | ADC_MR_TRACKTIM( tracking ) ;
 }
 

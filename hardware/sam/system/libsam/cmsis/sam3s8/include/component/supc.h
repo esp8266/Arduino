@@ -1,4 +1,4 @@
-/* %ATMEL_LICENCE% */
+/* $asf_license$ */
 
 #ifndef _SAM3S8_SUPC_COMPONENT_
 #define _SAM3S8_SUPC_COMPONENT_

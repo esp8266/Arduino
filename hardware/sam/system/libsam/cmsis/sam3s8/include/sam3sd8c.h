@@ -1,4 +1,4 @@
-/* %ATMEL_LICENCE% */
+/* $asf_license$ */
 
 #ifndef _SAM3SD8C_
 #define _SAM3SD8C_
@@ -25,11 +25,6 @@ typedef volatile       uint32_t RoReg; /**< Read only 32-bit register (volatile 
 #endif
 typedef volatile       uint32_t WoReg; /**< Write only 32-bit register (volatile unsigned int) */
 typedef volatile       uint32_t RwReg; /**< Read-Write 32-bit register (volatile unsigned int) */
-#define CAST(type, value) (((type)*)(value))
-#define REG_ACCESS(type, address) (*((type)*)(address)) /**< C code: Register value */
-#else
-#define CAST(type, value) (value) 
-#define REG_ACCESS(type, address) (address) /**< Assembly code: Register address */
 #endif
 
 /* ************************************************************************** */
@@ -109,32 +104,32 @@ typedef enum IRQn
 /** \addtogroup SAM3SD8C_api Peripheral Software API */
 /*@{*/
 
-#include "component/ACC.h"
-#include "component/ADC.h"
-#include "component/CHIPID.h"
-#include "component/CRCCU.h"
-#include "component/DACC.h"
-#include "component/EFC.h"
-#include "component/GPBR.h"
-#include "component/HSMCI.h"
-#include "component/MATRIX.h"
-#include "component/PDC.h"
-#include "component/PIO.h"
-#include "component/PMC.h"
-#include "component/PWM.h"
-#include "component/RSTC.h"
-#include "component/RTC.h"
-#include "component/RTT.h"
-#include "component/SMC.h"
-#include "component/SPI.h"
-#include "component/SSC.h"
-#include "component/SUPC.h"
-#include "component/TC.h"
-#include "component/TWI.h"
-#include "component/UART.h"
-#include "component/UDP.h"
-#include "component/USART.h"
-#include "component/WDT.h"
+#include "component/acc.h"
+#include "component/adc.h"
+#include "component/chipid.h"
+#include "component/crccu.h"
+#include "component/dacc.h"
+#include "component/efc.h"
+#include "component/gpbr.h"
+#include "component/hsmci.h"
+#include "component/matrix.h"
+#include "component/pdc.h"
+#include "component/pio.h"
+#include "component/pmc.h"
+#include "component/pwm.h"
+#include "component/rstc.h"
+#include "component/rtc.h"
+#include "component/rtt.h"
+#include "component/smc.h"
+#include "component/spi.h"
+#include "component/ssc.h"
+#include "component/supc.h"
+#include "component/tc.h"
+#include "component/twi.h"
+#include "component/uart.h"
+#include "component/udp.h"
+#include "component/usart.h"
+#include "component/wdt.h"
 /*@}*/
 
 /* ************************************************************************** */
@@ -143,38 +138,38 @@ typedef enum IRQn
 /** \addtogroup SAM3SD8C_reg Registers Access Definitions */
 /*@{*/
 
-#include "instance/HSMCI.h"
-#include "instance/SSC.h"
-#include "instance/SPI.h"
-#include "instance/TC0.h"
-#include "instance/TC1.h"
-#include "instance/TWI0.h"
-#include "instance/TWI1.h"
-#include "instance/PWM.h"
-#include "instance/USART0.h"
-#include "instance/USART1.h"
-#include "instance/USART2.h"
-#include "instance/UDP.h"
-#include "instance/ADC.h"
-#include "instance/DACC.h"
-#include "instance/ACC.h"
-#include "instance/CRCCU.h"
-#include "instance/SMC.h"
-#include "instance/MATRIX.h"
-#include "instance/PMC.h"
-#include "instance/UART0.h"
-#include "instance/CHIPID.h"
-#include "instance/UART1.h"
-#include "instance/EFC.h"
-#include "instance/PIOA.h"
-#include "instance/PIOB.h"
-#include "instance/PIOC.h"
-#include "instance/RSTC.h"
-#include "instance/SUPC.h"
-#include "instance/RTT.h"
-#include "instance/WDT.h"
-#include "instance/RTC.h"
-#include "instance/GPBR.h"
+#include "instance/hsmci.h"
+#include "instance/ssc.h"
+#include "instance/spi.h"
+#include "instance/tc0.h"
+#include "instance/tc1.h"
+#include "instance/twi0.h"
+#include "instance/twi1.h"
+#include "instance/pwm.h"
+#include "instance/usart0.h"
+#include "instance/usart1.h"
+#include "instance/usart2.h"
+#include "instance/udp.h"
+#include "instance/adc.h"
+#include "instance/dacc.h"
+#include "instance/acc.h"
+#include "instance/crccu.h"
+#include "instance/smc.h"
+#include "instance/matrix.h"
+#include "instance/pmc.h"
+#include "instance/uart0.h"
+#include "instance/chipid.h"
+#include "instance/uart1.h"
+#include "instance/efc.h"
+#include "instance/pioa.h"
+#include "instance/piob.h"
+#include "instance/pioc.h"
+#include "instance/rstc.h"
+#include "instance/supc.h"
+#include "instance/rtt.h"
+#include "instance/wdt.h"
+#include "instance/rtc.h"
+#include "instance/gpbr.h"
 /*@}*/
 
 /* ************************************************************************** */
@@ -224,101 +219,101 @@ typedef enum IRQn
 /** \addtogroup SAM3SD8C_base Peripheral Base Address Definitions */
 /*@{*/
 
-#ifndef __ASSEMBLY__
-#define HSMCI ((Hsmci*)0x40000000U)
-#define PDC_HSMCI ((Pdc*)0x40000100U)
-#define SSC ((Ssc*)0x40004000U)
-#define PDC_SSC ((Pdc*)0x40004100U)
-#define SPI ((Spi*)0x40008000U)
-#define PDC_SPI ((Pdc*)0x40008100U)
-#define TC0 ((Tc*)0x40010000U)
-#define TC1 ((Tc*)0x40014000U)
-#define TWI0 ((Twi*)0x40018000U)
-#define PDC_TWI0 ((Pdc*)0x40018100U)
-#define TWI1 ((Twi*)0x4001C000U)
-#define PDC_TWI1 ((Pdc*)0x4001C100U)
-#define PWM ((Pwm*)0x40020000U)
-#define PDC_PWM ((Pdc*)0x40020100U)
-#define USART0 ((Usart*)0x40024000U)
-#define PDC_USART0 ((Pdc*)0x40024100U)
-#define USART1 ((Usart*)0x40028000U)
-#define PDC_USART1 ((Pdc*)0x40028100U)
-#define USART2 ((Usart*)0x4002C000U)
-#define PDC_USART2 ((Pdc*)0x4002C100U)
-#define UDP ((Udp*)0x40034000U)
-#define ADC ((Adc*)0x40038000U)
-#define PDC_ADC ((Pdc*)0x40038100U)
-#define DACC ((Dacc*)0x4003C000U)
-#define PDC_DACC ((Pdc*)0x4003C100U)
-#define ACC ((Acc*)0x40040000U)
-#define CRCCU ((Crccu*)0x40044000U)
-#define SMC ((Smc*)0x400E0000U)
-#define MATRIX ((Matrix*)0x400E0200U)
-#define PMC ((Pmc*)0x400E0400U)
-#define UART0 ((Uart*)0x400E0600U)
-#define PDC_UART0 ((Pdc*)0x400E0700U)
-#define CHIPID ((Chipid*)0x400E0740U)
-#define UART1 ((Uart*)0x400E0800U)
-#define PDC_UART1 ((Pdc*)0x400E0900U)
-#define EFC ((Efc*)0x400E0A00U)
-#define PIOA ((Pio*)0x400E0E00U)
-#define PDC_PIOA ((Pdc*)0x400E0F68U)
-#define PIOB ((Pio*)0x400E1000U)
-#define PIOC ((Pio*)0x400E1200U)
-#define RSTC ((Rstc*)0x400E1400U)
-#define SUPC ((Supc*)0x400E1410U)
-#define RTT ((Rtt*)0x400E1430U)
-#define WDT ((Wdt*)0x400E1450U)
-#define RTC ((Rtc*)0x400E1460U)
-#define GPBR ((Gpbr*)0x400E1490U)
+#ifdef __ASSEMBLY__
+#define HSMCI      (0x40000000U) /**< \brief (HSMCI     ) Base Address */
+#define PDC_HSMCI  (0x40000100U) /**< \brief (PDC_HSMCI ) Base Address */
+#define SSC        (0x40004000U) /**< \brief (SSC       ) Base Address */
+#define PDC_SSC    (0x40004100U) /**< \brief (PDC_SSC   ) Base Address */
+#define SPI        (0x40008000U) /**< \brief (SPI       ) Base Address */
+#define PDC_SPI    (0x40008100U) /**< \brief (PDC_SPI   ) Base Address */
+#define TC0        (0x40010000U) /**< \brief (TC0       ) Base Address */
+#define TC1        (0x40014000U) /**< \brief (TC1       ) Base Address */
+#define TWI0       (0x40018000U) /**< \brief (TWI0      ) Base Address */
+#define PDC_TWI0   (0x40018100U) /**< \brief (PDC_TWI0  ) Base Address */
+#define TWI1       (0x4001C000U) /**< \brief (TWI1      ) Base Address */
+#define PDC_TWI1   (0x4001C100U) /**< \brief (PDC_TWI1  ) Base Address */
+#define PWM        (0x40020000U) /**< \brief (PWM       ) Base Address */
+#define PDC_PWM    (0x40020100U) /**< \brief (PDC_PWM   ) Base Address */
+#define USART0     (0x40024000U) /**< \brief (USART0    ) Base Address */
+#define PDC_USART0 (0x40024100U) /**< \brief (PDC_USART0) Base Address */
+#define USART1     (0x40028000U) /**< \brief (USART1    ) Base Address */
+#define PDC_USART1 (0x40028100U) /**< \brief (PDC_USART1) Base Address */
+#define USART2     (0x4002C000U) /**< \brief (USART2    ) Base Address */
+#define PDC_USART2 (0x4002C100U) /**< \brief (PDC_USART2) Base Address */
+#define UDP        (0x40034000U) /**< \brief (UDP       ) Base Address */
+#define ADC        (0x40038000U) /**< \brief (ADC       ) Base Address */
+#define PDC_ADC    (0x40038100U) /**< \brief (PDC_ADC   ) Base Address */
+#define DACC       (0x4003C000U) /**< \brief (DACC      ) Base Address */
+#define PDC_DACC   (0x4003C100U) /**< \brief (PDC_DACC  ) Base Address */
+#define ACC        (0x40040000U) /**< \brief (ACC       ) Base Address */
+#define CRCCU      (0x40044000U) /**< \brief (CRCCU     ) Base Address */
+#define SMC        (0x400E0000U) /**< \brief (SMC       ) Base Address */
+#define MATRIX     (0x400E0200U) /**< \brief (MATRIX    ) Base Address */
+#define PMC        (0x400E0400U) /**< \brief (PMC       ) Base Address */
+#define UART0      (0x400E0600U) /**< \brief (UART0     ) Base Address */
+#define PDC_UART0  (0x400E0700U) /**< \brief (PDC_UART0 ) Base Address */
+#define CHIPID     (0x400E0740U) /**< \brief (CHIPID    ) Base Address */
+#define UART1      (0x400E0800U) /**< \brief (UART1     ) Base Address */
+#define PDC_UART1  (0x400E0900U) /**< \brief (PDC_UART1 ) Base Address */
+#define EFC        (0x400E0A00U) /**< \brief (EFC       ) Base Address */
+#define PIOA       (0x400E0E00U) /**< \brief (PIOA      ) Base Address */
+#define PDC_PIOA   (0x400E0F68U) /**< \brief (PDC_PIOA  ) Base Address */
+#define PIOB       (0x400E1000U) /**< \brief (PIOB      ) Base Address */
+#define PIOC       (0x400E1200U) /**< \brief (PIOC      ) Base Address */
+#define RSTC       (0x400E1400U) /**< \brief (RSTC      ) Base Address */
+#define SUPC       (0x400E1410U) /**< \brief (SUPC      ) Base Address */
+#define RTT        (0x400E1430U) /**< \brief (RTT       ) Base Address */
+#define WDT        (0x400E1450U) /**< \brief (WDT       ) Base Address */
+#define RTC        (0x400E1460U) /**< \brief (RTC       ) Base Address */
+#define GPBR       (0x400E1490U) /**< \brief (GPBR      ) Base Address */
 #else
-#define HSMCI		(0x40000000U)
-#define PDC_HSMCI		(0x40000100U)
-#define SSC		(0x40004000U)
-#define PDC_SSC		(0x40004100U)
-#define SPI		(0x40008000U)
-#define PDC_SPI		(0x40008100U)
-#define TC0		(0x40010000U)
-#define TC1		(0x40014000U)
-#define TWI0		(0x40018000U)
-#define PDC_TWI0		(0x40018100U)
-#define TWI1		(0x4001C000U)
-#define PDC_TWI1		(0x4001C100U)
-#define PWM		(0x40020000U)
-#define PDC_PWM		(0x40020100U)
-#define USART0		(0x40024000U)
-#define PDC_USART0		(0x40024100U)
-#define USART1		(0x40028000U)
-#define PDC_USART1		(0x40028100U)
-#define USART2		(0x4002C000U)
-#define PDC_USART2		(0x4002C100U)
-#define UDP		(0x40034000U)
-#define ADC		(0x40038000U)
-#define PDC_ADC		(0x40038100U)
-#define DACC		(0x4003C000U)
-#define PDC_DACC		(0x4003C100U)
-#define ACC		(0x40040000U)
-#define CRCCU		(0x40044000U)
-#define SMC		(0x400E0000U)
-#define MATRIX		(0x400E0200U)
-#define PMC		(0x400E0400U)
-#define UART0		(0x400E0600U)
-#define PDC_UART0		(0x400E0700U)
-#define CHIPID		(0x400E0740U)
-#define UART1		(0x400E0800U)
-#define PDC_UART1		(0x400E0900U)
-#define EFC		(0x400E0A00U)
-#define PIOA		(0x400E0E00U)
-#define PDC_PIOA		(0x400E0F68U)
-#define PIOB		(0x400E1000U)
-#define PIOC		(0x400E1200U)
-#define RSTC		(0x400E1400U)
-#define SUPC		(0x400E1410U)
-#define RTT		(0x400E1430U)
-#define WDT		(0x400E1450U)
-#define RTC		(0x400E1460U)
-#define GPBR		(0x400E1490U)
-#endif /* __ASSEMBLY__ */ 
+#define HSMCI      ((Hsmci  *)0x40000000U) /**< \brief (HSMCI     ) Base Address */
+#define PDC_HSMCI  ((Pdc    *)0x40000100U) /**< \brief (PDC_HSMCI ) Base Address */
+#define SSC        ((Ssc    *)0x40004000U) /**< \brief (SSC       ) Base Address */
+#define PDC_SSC    ((Pdc    *)0x40004100U) /**< \brief (PDC_SSC   ) Base Address */
+#define SPI        ((Spi    *)0x40008000U) /**< \brief (SPI       ) Base Address */
+#define PDC_SPI    ((Pdc    *)0x40008100U) /**< \brief (PDC_SPI   ) Base Address */
+#define TC0        ((Tc     *)0x40010000U) /**< \brief (TC0       ) Base Address */
+#define TC1        ((Tc     *)0x40014000U) /**< \brief (TC1       ) Base Address */
+#define TWI0       ((Twi    *)0x40018000U) /**< \brief (TWI0      ) Base Address */
+#define PDC_TWI0   ((Pdc    *)0x40018100U) /**< \brief (PDC_TWI0  ) Base Address */
+#define TWI1       ((Twi    *)0x4001C000U) /**< \brief (TWI1      ) Base Address */
+#define PDC_TWI1   ((Pdc    *)0x4001C100U) /**< \brief (PDC_TWI1  ) Base Address */
+#define PWM        ((Pwm    *)0x40020000U) /**< \brief (PWM       ) Base Address */
+#define PDC_PWM    ((Pdc    *)0x40020100U) /**< \brief (PDC_PWM   ) Base Address */
+#define USART0     ((Usart  *)0x40024000U) /**< \brief (USART0    ) Base Address */
+#define PDC_USART0 ((Pdc    *)0x40024100U) /**< \brief (PDC_USART0) Base Address */
+#define USART1     ((Usart  *)0x40028000U) /**< \brief (USART1    ) Base Address */
+#define PDC_USART1 ((Pdc    *)0x40028100U) /**< \brief (PDC_USART1) Base Address */
+#define USART2     ((Usart  *)0x4002C000U) /**< \brief (USART2    ) Base Address */
+#define PDC_USART2 ((Pdc    *)0x4002C100U) /**< \brief (PDC_USART2) Base Address */
+#define UDP        ((Udp    *)0x40034000U) /**< \brief (UDP       ) Base Address */
+#define ADC        ((Adc    *)0x40038000U) /**< \brief (ADC       ) Base Address */
+#define PDC_ADC    ((Pdc    *)0x40038100U) /**< \brief (PDC_ADC   ) Base Address */
+#define DACC       ((Dacc   *)0x4003C000U) /**< \brief (DACC      ) Base Address */
+#define PDC_DACC   ((Pdc    *)0x4003C100U) /**< \brief (PDC_DACC  ) Base Address */
+#define ACC        ((Acc    *)0x40040000U) /**< \brief (ACC       ) Base Address */
+#define CRCCU      ((Crccu  *)0x40044000U) /**< \brief (CRCCU     ) Base Address */
+#define SMC        ((Smc    *)0x400E0000U) /**< \brief (SMC       ) Base Address */
+#define MATRIX     ((Matrix *)0x400E0200U) /**< \brief (MATRIX    ) Base Address */
+#define PMC        ((Pmc    *)0x400E0400U) /**< \brief (PMC       ) Base Address */
+#define UART0      ((Uart   *)0x400E0600U) /**< \brief (UART0     ) Base Address */
+#define PDC_UART0  ((Pdc    *)0x400E0700U) /**< \brief (PDC_UART0 ) Base Address */
+#define CHIPID     ((Chipid *)0x400E0740U) /**< \brief (CHIPID    ) Base Address */
+#define UART1      ((Uart   *)0x400E0800U) /**< \brief (UART1     ) Base Address */
+#define PDC_UART1  ((Pdc    *)0x400E0900U) /**< \brief (PDC_UART1 ) Base Address */
+#define EFC        ((Efc    *)0x400E0A00U) /**< \brief (EFC       ) Base Address */
+#define PIOA       ((Pio    *)0x400E0E00U) /**< \brief (PIOA      ) Base Address */
+#define PDC_PIOA   ((Pdc    *)0x400E0F68U) /**< \brief (PDC_PIOA  ) Base Address */
+#define PIOB       ((Pio    *)0x400E1000U) /**< \brief (PIOB      ) Base Address */
+#define PIOC       ((Pio    *)0x400E1200U) /**< \brief (PIOC      ) Base Address */
+#define RSTC       ((Rstc   *)0x400E1400U) /**< \brief (RSTC      ) Base Address */
+#define SUPC       ((Supc   *)0x400E1410U) /**< \brief (SUPC      ) Base Address */
+#define RTT        ((Rtt    *)0x400E1430U) /**< \brief (RTT       ) Base Address */
+#define WDT        ((Wdt    *)0x400E1450U) /**< \brief (WDT       ) Base Address */
+#define RTC        ((Rtc    *)0x400E1460U) /**< \brief (RTC       ) Base Address */
+#define GPBR       ((Gpbr   *)0x400E1490U) /**< \brief (GPBR      ) Base Address */
+#endif /* __ASSEMBLY__ */
 /*@}*/
 
 /* ************************************************************************** */
@@ -327,7 +322,7 @@ typedef enum IRQn
 /** \addtogroup SAM3SD8C_pio Peripheral Pio Definitions */
 /*@{*/
 
-#include "pio/SAM3SD8C.h"
+#include "pio/sam3sd8c.h"
 /*@}*/
 
 /* ************************************************************************** */

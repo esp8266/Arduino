@@ -33,11 +33,11 @@
         </option>
         <option>
           <name>MacOverride</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>MacFile</name>
-          <state></state>
+          <state>$PROJ_DIR$\..\..\..\..\variants\sam3s-ek\debug_scripts\iar\sam3s_ek_flash.mac</state>
         </option>
         <option>
           <name>MemOverride</name>
@@ -45,7 +45,7 @@
         </option>
         <option>
           <name>MemFile</name>
-          <state></state>
+          <state>$TOOLKIT_DIR$\CONFIG\debugger\Atmel\iosam3s.ddf</state>
         </option>
         <option>
           <name>RunToEnable</name>
@@ -85,7 +85,7 @@
         </option>
         <option>
           <name>OCDynDriverList</name>
-          <state>ARMSIM_ID</state>
+          <state>JLINK_ID</state>
         </option>
         <option>
           <name>OCLastSavedByProductVersion</name>
@@ -117,7 +117,7 @@
         </option>
         <option>
           <name>FlashLoadersV3</name>
-          <state>$TOOLKIT_DIR$\config\flashloader\</state>
+          <state>$TOOLKIT_DIR$\config\flashloader\Atmel\SAM3S4\sam3s4-flash.board</state>
         </option>
         <option>
           <name>OCImagesSuppressCheck1</name>
@@ -366,7 +366,7 @@
         </option>
         <option>
           <name>CCJLinkSpeedRadioV2</name>
-          <state>0</state>
+          <state>2</state>
         </option>
         <option>
           <name>CCUSBDevice</name>
@@ -424,7 +424,7 @@
         <option>
           <name>CCJLinkResetList</name>
           <version>5</version>
-          <state>5</state>
+          <state>7</state>
         </option>
         <option>
           <name>CCJLinkInterfaceCmdLine</name>

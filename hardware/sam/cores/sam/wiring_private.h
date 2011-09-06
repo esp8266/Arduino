@@ -37,6 +37,16 @@ extern "C"{
 
 typedef void (*voidFuncPtr)( void ) ;
 
+/* Define attribute */
+#if defined   ( __CC_ARM   ) /* Keil µVision 4 */
+    #define WEAK __attribute__ ((weak))
+#elif defined ( __ICCARM__ ) /* IAR Ewarm 5.41+ */
+    #define WEAK __weak
+#elif defined (  __GNUC__  ) /* GCC CS */
+    #define WEAK __attribute__ ((weak))
+#endif
+
+
 #ifdef __cplusplus
 } // extern "C"
 #endif

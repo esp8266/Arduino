@@ -1,4 +1,4 @@
-/* %ATMEL_LICENCE% */
+/* $asf_license$ */
 
 #ifndef _SAM3X2H_PIO_
 #define _SAM3X2H_PIO_

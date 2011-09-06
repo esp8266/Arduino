@@ -103,7 +103,7 @@
         </option>
         <option>
           <name>GenLowLevelInterface</name>
-          <state>1</state>
+          <state>0</state>
         </option>
         <option>
           <name>GEndianModeBE</name>
@@ -164,7 +164,7 @@
         <debug>1</debug>
         <option>
           <name>CCDefines</name>
-          <state>__sam3s4c__</state>
+          <state>__SAM3S4C__</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -295,6 +295,7 @@
           <name>CCIncludePath2</name>
           <state>$PROJ_DIR$\..</state>
           <state>$PROJ_DIR$\..\include</state>
+          <state>$PROJ_DIR$\..\source\templates</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -3822,9 +3823,6 @@
         <file>
           <name>$PROJ_DIR$\..\cmsis\sam3s\include\sam3s4c.h</name>
         </file>
-        <file>
-          <name>$PROJ_DIR$\..\cmsis\sam3s\include\system_sam3s.h</name>
-        </file>
       </group>
       <group>
         <name>source</name>
@@ -3832,12 +3830,6 @@
           <name>templates</name>
           <group>
             <name>iar</name>
-            <file>
-              <name>$PROJ_DIR$\..\cmsis\sam3s\source\templates\iar\exceptions.c</name>
-              <excluded>
-                <configuration>Debug</configuration>
-              </excluded>
-            </file>
             <file>
               <name>$PROJ_DIR$\..\cmsis\sam3s\source\templates\iar\startup_sam3s.c</name>
             </file>
@@ -3850,6 +3842,9 @@
           </file>
           <file>
             <name>$PROJ_DIR$\..\cmsis\sam3s\source\templates\system_sam3s.c</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\cmsis\sam3s\source\templates\system_sam3s.h</name>
           </file>
         </group>
       </group>

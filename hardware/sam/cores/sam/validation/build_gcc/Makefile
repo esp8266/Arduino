@@ -19,4 +19,8 @@ clean:
 	@echo --- Cleaning test
 	@$(MAKE) DEBUG=1 $(SUBMAKE_OPTIONS) -f test.mk $@
 
+.PHONY: debug
+debug:
+	@echo --- Debugging test
+	@$(MAKE) DEBUG=1 $(SUBMAKE_OPTIONS) -f test.mk $@
 

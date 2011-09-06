@@ -1,3 +1,7 @@
+/*
+ %atmel_license%
+*/
+
 #ifndef _PIO_
 #define _PIO_
 
@@ -21,7 +25,7 @@ typedef enum _EPioType
   PIO_PERIPH_D, /* The pin is controlled by the associated signal of peripheral D. */
   PIO_INPUT, /* The pin is an input. */
   PIO_OUTPUT_0, /* The pin is an output and has a default level of 0. */
-  PIO_OUTPUT_1, /* The pin is an output and has a default level of 1. */
+  PIO_OUTPUT_1 /* The pin is an output and has a default level of 1. */
 } EPioType ;
 
 

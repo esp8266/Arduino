@@ -10,10 +10,10 @@
 
 #define PIN_DAC0             (u)
 
-const static uint8_t SS   = 34 ;
-const static uint8_t MOSI = 32 ;
-const static uint8_t MISO = 31 ;
-const static uint8_t SCK  = 33 ;
+static const uint8_t SS   = 34 ;
+static const uint8_t MOSI = 32 ;
+static const uint8_t MISO = 31 ;
+static const uint8_t SCK  = 33 ;
 
 #define PINS_UART            (16u)
 
@@ -118,7 +118,7 @@ static const PinDescription APinDescription[]=
   { PIOC, PIO_PC15, ID_PIOC, PIO_PERIPH_A, PIO_PULLUP }, // LCD CS
   { PIOC, PIO_PC19, ID_PIOC, PIO_PERIPH_A, PIO_PULLUP }, // LCD RS
   { PIOC, PIO_PC13, ID_PIOC, PIO_OUTPUT_0, PIO_DEFAULT }, // LCD BackLight
-  
+
   { NULL, 0, 0, PIO_NOT_A_PIN, PIO_DEFAULT } // END
 } ;
 

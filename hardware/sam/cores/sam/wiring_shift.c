@@ -1,5 +1,5 @@
 /*
-  wiring_shift.c - shiftOut() function
+  wiring_shift.c
   Part of Arduino - http://www.arduino.cc/
 
   Copyright (c) 2005-2006 David A. Mellis
@@ -24,32 +24,54 @@
 
 #include "wiring_private.h"
 
-uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder) {
-	uint8_t value = 0;
-	uint8_t i;
+#ifdef __cplusplus
+extern "C"{
+#endif
 
-	for (i = 0; i < 8; ++i) {
-		digitalWrite(clockPin, HIGH);
-		if (bitOrder == LSBFIRST)
-			value |= digitalRead(dataPin) << i;
-		else
-			value |= digitalRead(dataPin) << (7 - i);
-		digitalWrite(clockPin, LOW);
-	}
-	return value;
-}
-
-void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val)
+extern uint32_t shiftIn( uint32_t ulDataPin, uint32_t ulClockPin, uint32_t ulBitOrder )
 {
-	uint8_t i;
+	uint8_t value = 0 ;
+	uint8_t i ;
 
-	for (i = 0; i < 8; i++)  {
-		if (bitOrder == LSBFIRST)
-			digitalWrite(dataPin, !!(val & (1 << i)));
+	for ( i=0 ; i < 8 ; ++i )
+    {
+		digitalWrite( ulClockPin, HIGH ) ;
+
+		if ( ulBitOrder == LSBFIRST )
+        {
+			value |= digitalRead( ulDataPin ) << i ;
+        }
+		else
+        {
+			value |= digitalRead( ulDataPin ) << (7 - i) ;
+        }
+
+		digitalWrite( ulClockPin, LOW ) ;
+	}
+
+	return value ;
+}
+
+extern void shiftOut( uint32_t ulDataPin, uint32_t ulClockPin, uint32_t ulBitOrder, uint32_t ulVal )
+{
+	uint8_t i ;
+
+	for ( i=0 ; i < 8 ; i++ )
+    {
+		if ( ulBitOrder == LSBFIRST )
+        {
+			digitalWrite( ulDataPin, !!(ulVal & (1 << i)) ) ;
+        }
 		else	
-			digitalWrite(dataPin, !!(val & (1 << (7 - i))));
-			
-		digitalWrite(clockPin, HIGH);
-		digitalWrite(clockPin, LOW);		
+        {
+			digitalWrite( ulDataPin, !!(ulVal & (1 << (7 - i))) ) ;
+        }
+
+		digitalWrite( ulClockPin, HIGH ) ;
+		digitalWrite( ulClockPin, LOW ) ;		
 	}
 }
+
+#ifdef __cplusplus
+} // extern "C"
+#endif

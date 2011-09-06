@@ -1,46 +1,33 @@
-/* ----------------------------------------------------------------------------
- *         ATMEL Microcontroller Software Support
- * ----------------------------------------------------------------------------
- * Copyright (c) 2009, Atmel Corporation
+/*! \file *********************************************************************
  *
- * All rights reserved.
+ * \brief This file contains the default exception handlers.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * \par Purpose
  *
- * - Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the disclaimer below.
- *
- * Atmel's name may not be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * DISCLAIMER: THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
- * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * ----------------------------------------------------------------------------
- */
-
-/**
- * \file
- * This file contains the default exception handlers.
+ * This file provides basic support for Cortex-M processor based 
+ * microcontrollers.
  *
  * \note
  * The exception handler has weak aliases.
  * As they are weak aliases, any function with the same name will override
  * this definition.
- */
+ *
+ * \author               Atmel Corporation: http://www.atmel.com \n
+ *                       Support and FAQ: http://support.atmel.no/
+ *
+ ******************************************************************************/
+
+/* $asf_license$ */
+
 #include "exceptions.h"
 
-/*----------------------------------------------------------------------------
- *        Exported functions
- *----------------------------------------------------------------------------*/
+/* @cond 0 */
+/**INDENT-OFF**/
+#ifdef __cplusplus
+extern "C" {
+#endif
+/**INDENT-ON**/
+/* @endcond */
 
 #ifdef __GNUC__
 /* Cortex-M3 core handlers */
@@ -103,7 +90,7 @@ extern void USART1_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handle
 extern void USART2_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
 extern void USART3_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
 extern void WDT_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-#endif // __GNUC__
+#endif /* __GNUC__ */
 
 #ifdef __ICCARM__
 /* Cortex-M3 core handlers */
@@ -119,7 +106,6 @@ extern void WDT_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler")
 #pragma weak SysTick_Handler=Dummy_Handler
 
 /* Peripherals handlers */
-
 #pragma weak ACC_IrqHandler=Dummy_Handler
 #pragma weak ADC_IrqHandler=Dummy_Handler
 #pragma weak CAN0_IrqHandler=Dummy_Handler
@@ -167,12 +153,20 @@ extern void WDT_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler")
 #pragma weak USART2_IrqHandler=Dummy_Handler
 #pragma weak USART3_IrqHandler=Dummy_Handler
 #pragma weak WDT_IrqHandler=Dummy_Handler
-#endif // __ICCARM__
+#endif /* __ICCARM__ */
 
 /**
- * \brief Default interrupt handler for not used irq.
+ * \brief Default interrupt handler for unused IRQs.
  */
 void Dummy_Handler( void )
 {
-  while ( 1 ) ;
+  while ( 1 ) {}
 }
+
+/* @cond 0 */
+/**INDENT-OFF**/
+#ifdef __cplusplus
+}
+#endif
+/**INDENT-ON**/
+/* @endcond */

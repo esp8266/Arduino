@@ -1,9 +1,13 @@
-/* %ATMEL_LICENCE% */
+/* $asf_license$ */
 
 #ifndef _SAM3XA_GPBR_INSTANCE_
 #define _SAM3XA_GPBR_INSTANCE_
 
 /* ========== Register definition for GPBR peripheral ========== */
-#define REG_GPBR_GPBR   REG_ACCESS(RwReg, 0x400E1A90U) /**< \brief (GPBR) General Purpose Backup Register */
+#ifdef __ASSEMBLY__
+#define REG_GPBR_GPBR            (0x400E1A90U) /**< \brief (GPBR) General Purpose Backup Register */
+#else
+#define REG_GPBR_GPBR   (*(RwReg*)0x400E1A90U) /**< \brief (GPBR) General Purpose Backup Register */
+#endif /* __ASSEMBLY__ */
 
 #endif /* _SAM3XA_GPBR_INSTANCE_ */
