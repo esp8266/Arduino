@@ -92,16 +92,14 @@ extern void init( void )
     /* Disable watchdog, common to all SAM variants */
     WDT_Disable( WDT ) ;
 
-    SysTick_Config( VARIANT_MCK/1000 ) ;
-
     // Initialize Serial port UART0, common to all SAM3 variants
     PIO_Configure( APinDescription[PINS_UART].pPort, APinDescription[PINS_UART].dwPinType,
                  APinDescription[PINS_UART].dwPin, APinDescription[PINS_UART].dwPinAttribute ) ;
 
     // Switch off Power LED
+    PIO_Configure( APinDescription[PIN_LED_RED].pPort, APinDescription[PIN_LED_RED].dwPinType,
+                   APinDescription[PIN_LED_RED].dwPin, APinDescription[PIN_LED_RED].dwPinAttribute ) ;
     PIO_Clear( APinDescription[PIN_LED_RED].pPort, APinDescription[PIN_LED_RED].dwPin ) ;
-    //PIO_Configure( APinDescription[PIN_LED_RED].pPort, APinDescription[PIN_LED_RED].dwPinType,
-    //               APinDescription[PIN_LED_RED].dwPin, APinDescription[PIN_LED_RED].dwPinAttribute ) ;
 }
 
 /**

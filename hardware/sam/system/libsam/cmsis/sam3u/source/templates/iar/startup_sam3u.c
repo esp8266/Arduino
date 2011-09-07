@@ -100,6 +100,10 @@ const intvec_elem __vector_table[] =
     Dummy_Handler   	/* 30 not used */
 };
 
+/* TEMPORARY PATCH FOR SCB */
+#define SCB_VTOR_TBLBASE_Pos               29                                             /*!< SCB VTOR: TBLBASE Position */
+#define SCB_VTOR_TBLBASE_Msk               (1UL << SCB_VTOR_TBLBASE_Pos)                  /*!< SCB VTOR: TBLBASE Mask */
+
 /**------------------------------------------------------------------------------
  * This is the code that gets called on processor reset. To initialize the
  * device.
@@ -109,7 +113,7 @@ extern int __low_level_init( void )
     uint32_t* pSrc = __section_begin( ".intvec" ) ;
 
     SCB->VTOR = ( (uint32_t)pSrc & SCB_VTOR_TBLOFF_Msk ) ;
-    
+
     if ( ((uint32_t)pSrc >= IRAM0_ADDR) && ((uint32_t)pSrc < IRAM0_ADDR+IRAM_SIZE) )
     {
 	    SCB->VTOR |= 1 << SCB_VTOR_TBLBASE_Pos ;

@@ -87,7 +87,7 @@
         </option>
         <option>
           <name>OGLastSavedByProductVersion</name>
-          <state>6.21.1.52845</state>
+          <state>6.21.3.52923</state>
         </option>
         <option>
           <name>GeneralEnableMisra</name>
@@ -293,7 +293,7 @@
         </option>
         <option>
           <name>CCIncludePath2</name>
-          <state>$PROJ_DIR$/../../../variants/sam3s-ek</state>
+          <state>$PROJ_DIR$/../../../variants/sam3s_ek</state>
           <state>$PROJ_DIR$/../../../system</state>
         </option>
         <option>

@@ -104,6 +104,10 @@ const intvec_elem __vector_table[] =
     Dummy_Handler   	/* 35 not used */
 };
 
+/* TEMPORARY PATCH FOR SCB */
+#define SCB_VTOR_TBLBASE_Pos               29                                             /*!< SCB VTOR: TBLBASE Position */
+#define SCB_VTOR_TBLBASE_Msk               (1UL << SCB_VTOR_TBLBASE_Pos)                  /*!< SCB VTOR: TBLBASE Mask */
+
 /**------------------------------------------------------------------------------
  * This is the code that gets called on processor reset. To initialize the
  * device.

@@ -165,6 +165,8 @@ typedef struct _PinDescription
   EAnalogChannel dwAnalogChannel ;
 } PinDescription ;
 
+extern const PinDescription APinDescription[] ;
+
 #include "pins_arduino.h"
 
 #endif // Arduino_h

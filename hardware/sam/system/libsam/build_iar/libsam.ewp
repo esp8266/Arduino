@@ -87,7 +87,7 @@
         </option>
         <option>
           <name>OGLastSavedByProductVersion</name>
-          <state>6.21.1.52845</state>
+          <state>6.21.3.52923</state>
         </option>
         <option>
           <name>GeneralEnableMisra</name>
@@ -4082,12 +4082,6 @@
           <name>templates</name>
           <group>
             <name>iar</name>
-            <file>
-              <name>$PROJ_DIR$\..\cmsis\sam3u\source\templates\iar\exceptions.c</name>
-              <excluded>
-                <configuration>Debug</configuration>
-              </excluded>
-            </file>
             <file>
               <name>$PROJ_DIR$\..\cmsis\sam3u\source\templates\iar\startup_sam3u.c</name>
             </file>

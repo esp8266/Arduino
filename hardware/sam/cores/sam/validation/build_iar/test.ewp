@@ -87,7 +87,7 @@
         </option>
         <option>
           <name>OGLastSavedByProductVersion</name>
-          <state>6.21.1.52845</state>
+          <state>6.21.3.52923</state>
         </option>
         <option>
           <name>GeneralEnableMisra</name>
@@ -294,7 +294,7 @@
         <option>
           <name>CCIncludePath2</name>
           <state>$PROJ_DIR$\..\..</state>
-          <state>$PROJ_DIR$\..\..\..\..\variants\sam3s-ek</state>
+          <state>$PROJ_DIR$\..\..\..\..\variants\sam3s_ek</state>
           <state>$PROJ_DIR$\..\..\..\..\system</state>
         </option>
         <option>
@@ -688,7 +688,7 @@
         </option>
         <option>
           <name>IlinkIcfFile</name>
-          <state>$PROJ_DIR$\..\..\..\..\variants\sam3s-ek\linker_scripts\iar\sam3s_ek_flash.icf</state>
+          <state>$PROJ_DIR$\..\..\..\..\variants\sam3s_ek\linker_scripts\iar\sam3s_ek_flash.icf</state>
         </option>
         <option>
           <name>IlinkIcfFileSlave</name>
@@ -1800,16 +1800,16 @@
     <group>
       <name>sam3s_ek</name>
       <file>
-        <name>$PROJ_DIR$\..\..\..\..\variants\sam3s-ek\linker_scripts\iar\sam3s_ek_flash.icf</name>
+        <name>$PROJ_DIR$\..\..\..\..\variants\sam3s_ek\linker_scripts\iar\sam3s_ek_flash.icf</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\..\..\..\variants\sam3s-ek\debug_scripts\iar\sam3s_ek_flash.mac</name>
+        <name>$PROJ_DIR$\..\..\..\..\variants\sam3s_ek\debug_scripts\iar\sam3s_ek_flash.mac</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\..\..\..\variants\sam3s-ek\linker_scripts\iar\sam3s_ek_sram.icf</name>
+        <name>$PROJ_DIR$\..\..\..\..\variants\sam3s_ek\linker_scripts\iar\sam3s_ek_sram.icf</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\..\..\..\variants\sam3s-ek\debug_scripts\iar\sam3s_ek_sram.mac</name>
+        <name>$PROJ_DIR$\..\..\..\..\variants\sam3s_ek\debug_scripts\iar\sam3s_ek_sram.mac</name>
       </file>
     </group>
     <group>
@@ -1819,15 +1819,15 @@
   <group>
     <name>variants</name>
     <group>
-      <name>sam3s-ek</name>
+      <name>sam3s_ek</name>
       <file>
-        <name>$PROJ_DIR$\..\..\..\..\variants\sam3s-ek\pins_arduino.h</name>
+        <name>$PROJ_DIR$\..\..\..\..\variants\sam3s_ek\pins_arduino.h</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\..\..\..\variants\sam3s-ek\variant.cpp</name>
+        <name>$PROJ_DIR$\..\..\..\..\variants\sam3s_ek\variant.cpp</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\..\..\..\variants\sam3s-ek\variant.h</name>
+        <name>$PROJ_DIR$\..\..\..\..\variants\sam3s_ek\variant.h</name>
       </file>
     </group>
   </group>

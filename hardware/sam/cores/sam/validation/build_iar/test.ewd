@@ -37,7 +37,7 @@
         </option>
         <option>
           <name>MacFile</name>
-          <state>$PROJ_DIR$\..\..\..\..\variants\sam3s-ek\debug_scripts\iar\sam3s_ek_flash.mac</state>
+          <state>$PROJ_DIR$\..\..\..\..\variants\sam3s_ek\debug_scripts\iar\sam3s_ek_flash.mac</state>
         </option>
         <option>
           <name>MemOverride</name>
@@ -77,7 +77,7 @@
         </option>
         <option>
           <name>OCDownloadVerifyAll</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>OCProductVersion</name>
@@ -89,7 +89,7 @@
         </option>
         <option>
           <name>OCLastSavedByProductVersion</name>
-          <state>6.21.1.52845</state>
+          <state>6.21.3.52923</state>
         </option>
         <option>
           <name>OCDownloadAttachToProgram</name>
@@ -97,7 +97,7 @@
         </option>
         <option>
           <name>UseFlashLoader</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>CLowLevel</name>
@@ -423,7 +423,7 @@
         </option>
         <option>
           <name>CCJLinkResetList</name>
-          <version>5</version>
+          <version>6</version>
           <state>7</state>
         </option>
         <option>
@@ -821,6 +821,10 @@
       </data>
     </settings>
     <debuggerPlugins>
+      <plugin>
+        <file>$TOOLKIT_DIR$\plugins\rtos\AVIX\AVIX.ENU.ewplugin</file>
+        <loadFlag>0</loadFlag>
+      </plugin>
       <plugin>
         <file>$TOOLKIT_DIR$\plugins\rtos\CMX\CmxArmPlugin.ENU.ewplugin</file>
         <loadFlag>0</loadFlag>
@@ -1300,7 +1304,7 @@
         </option>
         <option>
           <name>CCJLinkResetList</name>
-          <version>5</version>
+          <version>6</version>
           <state>5</state>
         </option>
         <option>
@@ -1698,6 +1702,10 @@
       </data>
     </settings>
     <debuggerPlugins>
+      <plugin>
+        <file>$TOOLKIT_DIR$\plugins\rtos\AVIX\AVIX.ENU.ewplugin</file>
+        <loadFlag>0</loadFlag>
+      </plugin>
       <plugin>
         <file>$TOOLKIT_DIR$\plugins\rtos\CMX\CmxArmPlugin.ENU.ewplugin</file>
         <loadFlag>0</loadFlag>
