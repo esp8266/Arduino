@@ -1,7 +1,8 @@
 
 # Tool suffix when cross-compiling
 #CROSS_COMPILE = ../../CodeSourcery_arm/bin/arm-none-eabi-
-CROSS_COMPILE = C:/CodeSourcery_2011.03-42/bin/arm-none-eabi-
+#CROSS_COMPILE = C:/CodeSourcery_2011.03-42/bin/arm-none-eabi-
+CROSS_COMPILE = $(ARM_GCC_TOOLCHAIN)/arm-none-eabi-
 
 # Compilation tools
 AR = $(CROSS_COMPILE)ar

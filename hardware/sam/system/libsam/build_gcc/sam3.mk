@@ -17,7 +17,8 @@ endif
 #-------------------------------------------------------------------------------
 
 # Output directories
-OUTPUT_BIN = ../lib
+#OUTPUT_BIN = ../lib
+OUTPUT_BIN = ../../../cores/sam
 
 # Libraries
 PROJECT_BASE_PATH = ..
@@ -142,7 +143,6 @@ $(addprefix $(OUTPUT_PATH)/,$(A_OBJ)): $(OUTPUT_PATH)/%.o: %.s
 
 $(OUTPUT_LIB): $(addprefix $(OUTPUT_PATH)/, $(C_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(A_OBJ))
 	@"$(AR)" -r "$(OUTPUT_BIN)/$@" $^
-	@"$(AR)" -r "../../../cores/sam/$@" $^
 	@"$(NM)" "$(OUTPUT_BIN)/$@" > "$(OUTPUT_BIN)/$@.txt"
 
 .PHONY: clean

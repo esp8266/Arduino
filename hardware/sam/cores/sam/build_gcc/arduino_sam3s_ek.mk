@@ -11,13 +11,14 @@ TOOLCHAIN=gcc
 #-------------------------------------------------------------------------------
 
 # Output directories
-OUTPUT_BIN = ../lib
+#OUTPUT_BIN = ../lib
+OUTPUT_BIN = ..
 
 # Libraries
 PROJECT_BASE_PATH = ..
 SYSTEM_PATH = ../../../system
 CMSIS_PATH = $(SYSTEM_PATH)/CMSIS/Include
-VARIANT_PATH = ../../../variants/sam3s-ek
+VARIANT_PATH = ../../../variants/$(VARIANT)
 
 #-------------------------------------------------------------------------------
 # Files
@@ -57,7 +58,7 @@ OUTPUT_OBJ=release
 OUTPUT_LIB=$(LIBNAME)_$(TOOLCHAIN)_rel.a
 endif
 
-OUTPUT_PATH=$(OUTPUT_OBJ)_sam3s_ek
+OUTPUT_PATH=$(OUTPUT_OBJ)_$(VARIANT)
 
 #-------------------------------------------------------------------------------
 # C source files and objects
@@ -98,13 +99,13 @@ A_OBJ=$(filter-out $(A_OBJ_FILTER), $(A_OBJ_TEMP))
 #-------------------------------------------------------------------------------
 # Rules
 #-------------------------------------------------------------------------------
-all: sam3s_ek
+all: $(VARIANT)
 
-sam3s_ek: create_output $(OUTPUT_LIB)
+$(VARIANT): create_output $(OUTPUT_LIB)
 
 .PHONY: create_output
 create_output:
-	@echo --- Preparing sam3s_ek files in $(OUTPUT_PATH) $(OUTPUT_BIN) 
+	@echo --- Preparing $(VARIANT) files in $(OUTPUT_PATH) $(OUTPUT_BIN) 
 	@echo -------------------------
 	@echo *$(INCLUDES)
 	@echo -------------------------
@@ -144,12 +145,11 @@ $(addprefix $(OUTPUT_PATH)/,$(A_OBJ)): $(OUTPUT_PATH)/%.o: %.s
 
 $(OUTPUT_LIB): $(addprefix $(OUTPUT_PATH)/, $(C_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(CPP_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(A_OBJ)) $(OUTPUT_PATH)/variant.o
 	@$(AR) -v -r "$(OUTPUT_BIN)/$@" $^
-	@"$(AR)" -r "../$@" $^
 	@$(NM) "$(OUTPUT_BIN)/$@" > "$(OUTPUT_BIN)/$@.txt"
 
 
 .PHONY: clean
 clean:
-	@echo --- Cleaning sam3s_ek files [$(OUTPUT_PATH)$(SEP)*.o]
+	@echo --- Cleaning $(VARIANT) files [$(OUTPUT_PATH)$(SEP)*.o]
 	-@$(RM) $(OUTPUT_PATH) 1>NUL 2>&1
 	-@$(RM) $(OUTPUT_BIN)/$(OUTPUT_LIB) 1>NUL 2>&1
