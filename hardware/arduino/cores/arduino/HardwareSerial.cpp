@@ -88,7 +88,6 @@ inline void store_char(unsigned char c, ring_buffer *buffer)
 #else
   void serialEvent() __attribute__((weak));
   void serialEvent() {}
-  volatile static unsigned char serialEvent_flag = 0;
   #define serialEvent_implemented
 #if defined(USART_RX_vect)
   SIGNAL(USART_RX_vect)
@@ -110,20 +109,17 @@ inline void store_char(unsigned char c, ring_buffer *buffer)
     #error UDR not defined
   #endif
     store_char(c, &rx_buffer);
-    serialEvent_flag = 1;
   }
 #endif
 
 #if defined(USART1_RX_vect)
   void serialEvent1() __attribute__((weak));
   void serialEvent1() {}
-  volatile static unsigned char serialEvent1_flag = 0;
   #define serialEvent1_implemented
   SIGNAL(USART1_RX_vect)
   {
     unsigned char c = UDR1;
     store_char(c, &rx_buffer1);
-    serialEvent1_flag = 1;
   }
 #elif defined(SIG_USART1_RECV)
   #error SIG_USART1_RECV
@@ -132,13 +128,11 @@ inline void store_char(unsigned char c, ring_buffer *buffer)
 #if defined(USART2_RX_vect) && defined(UDR2)
   void serialEvent2() __attribute__((weak));
   void serialEvent2() {}
-  volatile static unsigned char serialEvent2_flag = 0;
   #define serialEvent2_implemented
   SIGNAL(USART2_RX_vect)
   {
     unsigned char c = UDR2;
     store_char(c, &rx_buffer2);
-    serialEvent2_flag = 1;
   }
 #elif defined(SIG_USART2_RECV)
   #error SIG_USART2_RECV
@@ -147,13 +141,11 @@ inline void store_char(unsigned char c, ring_buffer *buffer)
 #if defined(USART3_RX_vect) && defined(UDR3)
   void serialEvent3() __attribute__((weak));
   void serialEvent3() {}
-  volatile static unsigned char serialEvent3_flag = 0;
   #define serialEvent3_implemented
   SIGNAL(USART3_RX_vect)
   {
     unsigned char c = UDR3;
     store_char(c, &rx_buffer3);
-    serialEvent3_flag = 1;
   }
 #elif defined(SIG_USART3_RECV)
   #error SIG_USART3_RECV
@@ -161,38 +153,17 @@ inline void store_char(unsigned char c, ring_buffer *buffer)
 
 void serialEventRun(void)
 {
-  unsigned char flag, oldSREG;
 #ifdef serialEvent_implemented
-  oldSREG = SREG;
-  noInterrupts();
-  flag = serialEvent_flag;
-  serialEvent_flag = 0;
-  SREG = oldSREG;
-  if (flag) serialEvent();
+  if (Serial.available()) serialEvent();
 #endif
 #ifdef serialEvent1_implemented
-  oldSREG = SREG;
-  noInterrupts();
-  flag = serialEvent1_flag;
-  serialEvent1_flag = 0;
-  SREG = oldSREG;
-  if (flag) serialEvent1();
+  if (Serial1.available()) serialEvent1();
 #endif
 #ifdef serialEvent2_implemented
-  oldSREG = SREG;
-  noInterrupts();
-  flag = serialEvent2_flag;
-  serialEvent2_flag = 0;
-  SREG = oldSREG;
-  if (flag) serialEvent2();
+  if (Serial2.available()) serialEvent2();
 #endif
 #ifdef serialEvent3_implemented
-  oldSREG = SREG;
-  noInterrupts();
-  flag = serialEvent3_flag;
-  serialEvent3_flag = 0;
-  SREG = oldSREG;
-  if (flag) serialEvent3();
+  if (Serial3.available()) serialEvent3();
 #endif
 }
 
