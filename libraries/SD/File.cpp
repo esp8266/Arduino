@@ -62,10 +62,6 @@ size_t File::write(uint8_t val) {
   return write(&val, 1);
 }
 
-size_t File::write(const char *str) {
-  return write((const uint8_t *) str, strlen(str));
-}
-
 size_t File::write(const uint8_t *buf, size_t size) {
   size_t t;
   if (!_file) {

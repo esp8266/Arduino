@@ -93,6 +93,8 @@ public:
   virtual int read();
   virtual int available();
   virtual void flush();
+  
+  using Print::write;
 
   // public only for easy access by interrupt handlers
   static inline void handle_interrupt();

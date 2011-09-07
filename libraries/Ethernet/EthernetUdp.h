@@ -67,10 +67,10 @@ public:
   virtual int endPacket();
   // Write a single byte into the packet
   virtual size_t write(uint8_t);
-  // Write a string of characters into the packet
-  virtual size_t write(const char *str);
   // Write size bytes from buffer into the packet
   virtual size_t write(const uint8_t *buffer, size_t size);
+  
+  using Print::write;
 
   // Start processing the next available incoming packet
   // Returns the size of the packet in bytes, or 0 if no packets are available

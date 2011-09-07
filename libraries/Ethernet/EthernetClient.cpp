@@ -74,10 +74,6 @@ size_t EthernetClient::write(uint8_t b) {
   return write(&b, 1);
 }
 
-size_t EthernetClient::write(const char *str) {
-  return write((const uint8_t *) str, strlen(str));
-}
-
 size_t EthernetClient::write(const uint8_t *buf, size_t size) {
   if (_sock == MAX_SOCK_NUM) {
     setWriteError();

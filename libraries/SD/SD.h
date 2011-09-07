@@ -33,7 +33,6 @@ public:
   File(void);      // 'empty' constructor
   ~File(void);     // destructor
   virtual size_t write(uint8_t);
-  virtual size_t write(const char *str);
   virtual size_t write(const uint8_t *buf, size_t size);
   virtual int read();
   virtual int peek();
@@ -50,6 +49,8 @@ public:
   boolean isDirectory(void);
   File openNextFile(uint8_t mode = O_RDONLY);
   void rewindDirectory(void);
+  
+  using Print::write;
 };
 
 class SDClass {

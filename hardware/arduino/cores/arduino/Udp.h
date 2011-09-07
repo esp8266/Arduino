@@ -57,8 +57,6 @@ public:
   virtual int endPacket() =0;
   // Write a single byte into the packet
   virtual size_t write(uint8_t) =0;
-  // Write a string of characters into the packet
-  virtual size_t write(const char *str) =0;
   // Write size bytes from buffer into the packet
   virtual size_t write(const uint8_t *buffer, size_t size) =0;
 

@@ -165,14 +165,6 @@ size_t TwoWire::write(const uint8_t *data, size_t quantity)
 }
 
 // must be called in:
-// slave tx event callback
-// or after beginTransmission(address)
-size_t TwoWire::write(const char *data)
-{
-  return write((uint8_t*)data, strlen(data));
-}
-
-// must be called in:
 // slave rx event callback
 // or after requestFrom(address, numBytes)
 int TwoWire::available(void)
