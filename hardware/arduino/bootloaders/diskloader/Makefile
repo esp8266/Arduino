@@ -11,6 +11,12 @@ CC = avr-gcc
 MCU = atmega32u4
 AVR_FREQ   = 16000000L
 
+# Specify the Arduino model using the assigned PID.  This is used by Descriptors.c
+#   to set PID and product descriptor string
+# Arduino Leonardo PID
+ARDUINO_MODEL_PID = 0x0034
+# Arduino Micro PID
+#ARDUINO_MODEL_PID = 0x0035
 
 # Change if your programmer is different
 AVRDUDE_PROGRAMMER = avrispmkII
@@ -25,7 +31,7 @@ AVRDUDE_FLAGS = -p $(MCU) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER) -p $(MCU)
 ## Options common to compile, link and assembly rules
 COMMON = -mmcu=$(MCU)
 
-override CFLAGS = -g -Wall -Os -mmcu=$(MCU) -DF_CPU=$(AVR_FREQ) $(DEFS) -ffunction-sections -gdwarf-2 -fdata-sections -fno-split-wide-types
+override CFLAGS = -g -Wall -Os -mmcu=$(MCU) -DF_CPU=$(AVR_FREQ) -DARDUINO_MODEL_PID=$(ARDUINO_MODEL_PID) $(DEFS) -ffunction-sections -gdwarf-2 -fdata-sections -fno-split-wide-types
 
 ## Assembly specific flags
 ASMFLAGS = $(COMMON)

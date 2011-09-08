@@ -19,9 +19,9 @@ typedef unsigned long u32;
 #define DISABLE_JTAG()  MCUCR = (1 << JTD) | (1 << IVCE) | (0 << PUD); MCUCR = (1 << JTD) | (0 << IVSEL) | (0 << IVCE) | (0 << PUD);
 
 #define USB_VID 0x2341	// arduino LLC vid
-#define USB_PID 0x0020	// educated guess
+#define USB_PID ARDUINO_MODEL_PID	// passed in by Makefile - 0x0034 for Leonardo, 0x0035 for MIcro
 
-#define FAT_OEM_NAME	'l','e','o','n','a','r','d','o'					// 8 chars
+#define OEM_NAME		'l','e','o','n','a','r','d','o'					// 8 chars
 #define BOARD_INIT()	DDRC |= (1<<7); DDRB |= (1<<0); DDRE |= (1<<6); CPU_PRESCALE(0); DISABLE_JTAG();
 #define LED0			PORTC &= ~(1<<7)
 #define LED1			PORTC |= (1<<7)
