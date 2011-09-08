@@ -117,6 +117,7 @@ int main(void) __attribute__ ((naked));
 //	STK500v1 main loop, very similar to optiboot in protocol and implementation
 int main()
 {
+	wdt_disable();
 	TXLED0;
 	RXLED0;
 	LED0;

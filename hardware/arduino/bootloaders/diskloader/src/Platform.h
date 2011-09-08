@@ -5,6 +5,7 @@
 #include <avr/boot.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
+#include <avr/wdt.h>
 
 #include <stdio.h>
 #include <stdlib.h>
