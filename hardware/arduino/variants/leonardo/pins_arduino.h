@@ -27,6 +27,8 @@
 
 #include <avr/pgmspace.h>
 
+#define ARDUINO_MODEL_USB_PID	0x0034
+
 // Map SPI port to 'new' pins D14..D17
 // D14				PB0					RXLED,SS/PCINT0
 // D15				PB1					SCK,PCINT1
