@@ -380,28 +380,60 @@ public class Compiler implements MessageConsumer {
 //    }
     
     if (pieces != null) {
-      RunnerException e = sketch.placeException(pieces[3], pieces[1], PApplet.parseInt(pieces[2]) - 1);
+      String error = pieces[3], msg = "";
+      
+      if (pieces[3].trim().equals("SPI.h: No such file or directory")) {
+        error = "Please import the SPI library from the Sketch > Import Library menu.";
+        msg = "\nAs of Arduino 0019, the Ethernet library depends on the SPI library." +
+              "\nYou appear to be using it or another library that depends on the SPI library.\n\n";
+      }
+      
+      if (pieces[3].trim().equals("'BYTE' was not declared in this scope")) {
+        error = "The 'BYTE' keyword is no longer supported.";
+        msg = "\nAs of Arduino 1.0, the 'BYTE' keyword is no longer supported." +
+              "\nPlease use Serial.write() instead.\n\n";
+      }
+      
+      if (pieces[3].trim().equals("no matching function for call to 'Server::Server(int)'")) {
+        error = "The Server class has been renamed EthernetServer.";
+        msg = "\nAs of Arduino 1.0, the Server class in the Ethernet library " +
+              "has been renamed to EthernetServer.\n\n";
+      }
+      
+      if (pieces[3].trim().equals("no matching function for call to 'Client::Client(byte [4], int)'")) {
+        error = "The Client class has been renamed EthernetClient.";
+        msg = "\nAs of Arduino 1.0, the Client class in the Ethernet library " +
+              "has been renamed to EthernetClient.\n\n";
+      }
+      
+      if (pieces[3].trim().equals("'Udp' was not declared in this scope")) {
+        error = "The Udp class has been renamed EthernetUdp.";
+        msg = "\nAs of Arduino 1.0, the Udp class in the Ethernet library " +
+              "has been renamed to EthernetClient.\n\n";
+      }
+      
+      if (pieces[3].trim().equals("'class TwoWire' has no member named 'send'")) {
+        error = "Wire.send() has been renamed Wire.write().";
+        msg = "\nAs of Arduino 1.0, the Wire.send() function was renamed " +
+              "to Wire.write() for consistency with other libraries.\n\n";
+      }
+      
+      if (pieces[3].trim().equals("'class TwoWire' has no member named 'receive'")) {
+        error = "Wire.receive() has been renamed Wire.read().";
+        msg = "\nAs of Arduino 1.0, the Wire.receive() function was renamed " +
+              "to Wire.read() for consistency with other libraries.\n\n";
+      }
+
+      RunnerException e = sketch.placeException(error, pieces[1], PApplet.parseInt(pieces[2]) - 1);
 
       // replace full file path with the name of the sketch tab (unless we're
       // in verbose mode, in which case don't modify the compiler output)
       if (e != null && !verbose) {
         SketchCode code = sketch.getCode(e.getCodeIndex());
         String fileName = code.isExtension(sketch.getDefaultExtension()) ? code.getPrettyName() : code.getFileName();
-        s = fileName + ":" + e.getCodeLine() + ": error: " + e.getMessage();        
+        s = fileName + ":" + e.getCodeLine() + ": error: " + pieces[3] + msg;        
       }
-      
-      if (pieces[3].trim().equals("SPI.h: No such file or directory")) {
-        e = new RunnerException("Please import the SPI library from the Sketch > Import Library menu.");
-        s += "\nAs of Arduino 0019, the Ethernet library depends on the SPI library." +
-             "\nYou appear to be using it or another library that depends on the SPI library.";
-      }
-      
-      if (pieces[3].trim().equals("'BYTE' was not declared in this scope")) {
-        e = new RunnerException("The 'BYTE' keyword is no longer supported.");
-	s += "\nAs of Arduino 1.0, the 'BYTE' keyword is no longer supported." +
-	     "\nPlease use Serial.write() instead.";
-      }
-      
+            
       if (exception == null && e != null) {
         exception = e;
         exception.hideStackTrace();
