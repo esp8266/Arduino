@@ -192,7 +192,7 @@ public class Compiler implements MessageConsumer {
       "-mmcu=" + boardPreferences.get("build.mcu"),
       "-o",
       buildPath + File.separator + primaryClassName + ".elf"
-    }));	
+    }));
 
     for (File file : objectFiles) {
       baseCommandLinker.add(file.getAbsolutePath());
@@ -424,10 +424,6 @@ public class Compiler implements MessageConsumer {
       "-DF_CPU=" + boardPreferences.get("build.f_cpu"),
       "-DARDUINO=" + Base.REVISION,
     }));
-	   
-	if (boardPreferences.get("usb.pid") != null) {
-	  baseCommandCompiler.add("-DARDUINO_MODEL_PID=" + boardPreferences.get("usb.pid")); 
-	}
 
     for (int i = 0; i < includePaths.size(); i++) {
       baseCommandCompiler.add("-I" + (String) includePaths.get(i));
@@ -455,10 +451,6 @@ public class Compiler implements MessageConsumer {
       "-DF_CPU=" + boardPreferences.get("build.f_cpu"),
       "-DARDUINO=" + Base.REVISION,
     }));
-	  
-	if (boardPreferences.get("usb.pid") != null) {
-	  baseCommandCompiler.add("-DARDUINO_MODEL_PID=" + boardPreferences.get("usb.pid")); 
-	}
 		
     for (int i = 0; i < includePaths.size(); i++) {
       baseCommandCompiler.add("-I" + (String) includePaths.get(i));
@@ -488,10 +480,6 @@ public class Compiler implements MessageConsumer {
       "-DF_CPU=" + boardPreferences.get("build.f_cpu"),
       "-DARDUINO=" + Base.REVISION,
     }));
-	  
-	if (boardPreferences.get("usb.pid") != null) {
-	  baseCommandCompilerCPP.add("-DARDUINO_MODEL_PID=" + boardPreferences.get("usb.pid")); 
-	}  
 
     for (int i = 0; i < includePaths.size(); i++) {
       baseCommandCompilerCPP.add("-I" + (String) includePaths.get(i));

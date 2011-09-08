@@ -89,9 +89,19 @@
 #define FAT_FILE_NAME	'F','I','R','M','W','A','R','E','B','I','N'		// 11 chars
 #define MSC_DISK_SERIAL	'0','0','0','0','0','0','0','0','1','7','0','1'	// 12 chars
 
+#ifdef MICROTOUCH
+
+#define USB_VID 0x239A	// Adafruit vid
+#define USB_PID 0x2001	// sorry dave sprach zarathustra
+#define FAT_OEM_NAME	'r','o','s','s','u','m','u','r'					// 8 chars
+#define PRODUCT_NAME	'M','i','c','r','o','t','o','u','c','h'
+
+#else
+
 #define USB_VID 0x2341	// arduino LLC vid
-#define USB_PID ARDUINO_MODEL_PID	// passed in at compile time - 0x0034 for Leonardo, 0x0035 for MIcro
+#define USB_PID 0x0020	// educated guess
 #define FAT_OEM_NAME	'l','e','o','n','a','r','d','o'					// 8 chars
 #define PRODUCT_NAME	'A','r','d','u','i','n','o','l','l','c'			// 10
 
 
+#endif
