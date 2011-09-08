@@ -23,19 +23,11 @@
 #if defined(USBCON)
 #ifdef CDC_ENABLED
 
-//	TODO: Should really use the wdt here
-//	Not currently working for a non-obvious reason
-
-typedef void (*AppPtr_t)(void) __attribute__ ((noreturn)); 
-AppPtr_t Bootloader = (AppPtr_t)(30*1024); 
-
 void Reboot()
 {
 	USB.detach();
 	cli();
-	Bootloader();
-	//wdt_enable(WDTO_15MS);
-	//while(1);	// reboot
+	asm volatile("jmp 0x7800");		// jump to bootloader - DiskLoader takes up last 2 kB
 }
 
 typedef struct
