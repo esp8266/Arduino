@@ -43,10 +43,6 @@
 #define CDC_GET_LINE_CODING		0x21
 #define CDC_SET_CONTROL_LINE_STATE	0x22
 
-#define MSC_RESET		0xFF
-#define MSC_GET_MAX_LUN	0xFE
-
-
 //	Descriptors
 
 #define USB_DEVICE_DESC_SIZE 18
@@ -97,10 +93,6 @@
 #define CDC_CS_INTERFACE                        0x24
 #define CDC_CS_ENDPOINT                         0x25
 #define CDC_DATA_INTERFACE_CLASS                0x0A
-
-#define MSC_SUBCLASS_SCSI						0x06 
-#define MSC_PROTOCOL_BULK_ONLY					0x50 
-
 
 
 //	Device
@@ -209,13 +201,6 @@ typedef struct
 	EndpointDescriptor			in;
 	EndpointDescriptor			out;
 } CDCDescriptor;
-
-typedef struct 
-{
-	InterfaceDescriptor			msc;
-	EndpointDescriptor			in;
-	EndpointDescriptor			out;
-} MSCDescriptor;
 
 typedef struct
 {

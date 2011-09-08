@@ -14,14 +14,6 @@ typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned long u32;
 
-//#define MICROTOUCH
-
-//#define WRITABLE_DIRECTORY	// undef saved 56 + 512 RAM
-
-#define FAT_DISK_LABEL	'b','o','o','t','l','o','a','d','e','r',' '		// 11 chars (undef saves 12)
-#define FAT_FILE_NAME	'F','I','R','M','W','A','R','E','B','I','N'		// 11 chars
-#define MSC_DISK_SERIAL	'0','0','0','0','0','0','0','0','1','7','0','1'	// 12 chars
-
 
 #define CPU_PRESCALE(n)	(CLKPR = 0x80, CLKPR = (n))
 #define DISABLE_JTAG()  MCUCR = (1 << JTD) | (1 << IVCE) | (0 << PUD); MCUCR = (1 << JTD) | (0 << IVSEL) | (0 << IVCE) | (0 << PUD);
@@ -47,8 +39,6 @@ void Recv(u8 ep, u8* dst, u8 len);
 void Program(u8 ep, u16 page, u8 count);
 
 #define CDC_ENABLED
-//#define MSC_ENABLED
-//#define MSC_NO_MEDIA	// MSC is enabled but not media inserted
 
 #include "USBCore.h"
 #include "USBDesc.h"

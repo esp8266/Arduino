@@ -18,8 +18,6 @@
 
 #include "Platform.h"
 
-#define MSC_TX MSC_ENDPOINT_IN
-#define MSC_RX MSC_ENDPOINT_OUT
 #define CDC_TX CDC_ENDPOINT_IN
 #define CDC_RX CDC_ENDPOINT_OUT
 
@@ -255,11 +253,6 @@ const u8 _initEndpoints[] =
 #endif
 
 	EP_TYPE_INTERRUPT_IN,		// HID_ENDPOINT_INT
-
-#ifdef MSC_ENABLED
-	EP_TYPE_BULK_OUT,			// MSC_ENDPOINT_OUT
-	EP_TYPE_BULK_IN				// MSC_ENDPOINT_IN
-#endif
 };
 
 static void InitEndpoints()
@@ -309,19 +302,6 @@ bool USBHook()
 	{
 		_usbLineInfo.lineState = setup.wValueL;
 	}
-
-#ifdef MSC_ENABLED
-	//	MSC Requests
-	else if (MSC_GET_MAX_LUN == r)
-	{
-		Send8(0);
-	}
-	else if (MSC_RESET == r)
-	{
-		// MSC_Reset();
-	} else
-		return false;	// unhandled
-#endif
 
 	return true;
 }
@@ -385,8 +365,6 @@ bool SendDescriptor()
 	{
 		if (setup.wValueL == 0)
 			desc_addr = (const u8*)&STRING_LANGUAGE;
-		else if (setup.wValueL == ISERIAL)
-			desc_addr = (const u8*)&STRING_SERIAL;
 		else
 			return false;
 	} else 
@@ -484,8 +462,6 @@ void USBGeneralInterrupt()
 	}
 }
 
-void SCSITask();
-
 void LEDPulse();
 int USBGetChar()
 {
@@ -494,11 +470,6 @@ int USBGetChar()
 		USBSetupInterrupt();
 		USBGeneralInterrupt();
 
-#ifdef MSC_ENABLED
-		//	Service disk
-		if (HasData(MSC_RX))
-			SCSITask();
-#endif
 		//	Read a char
 		if (HasData(CDC_RX))
 		{

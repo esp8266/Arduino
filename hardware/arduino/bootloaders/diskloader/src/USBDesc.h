@@ -17,15 +17,7 @@
 */
 
 
-#ifndef CDC_ENABLED
-
-#define MSC_INTERFACE		0	// MSC Interface
-#define MSC_ENDPOINT_OUT	1
-#define MSC_ENDPOINT_IN		2
-
-#define INTERFACE_COUNT		1	// 1 for msc
-
-#else
+#ifdef CDC_ENABLED
 
 #define CDC_ACM_INTERFACE	0	// CDC ACM
 #define CDC_DATA_INTERFACE	1	// CDC Data
@@ -36,18 +28,14 @@
 #define HID_INTERFACE		2	// HID Interface
 #define HID_ENDPOINT_INT	4
 
-#ifdef MSC_ENABLED
-
-#define MSC_INTERFACE		3	// MSC Interface
-#define MSC_ENDPOINT_OUT	5
-#define MSC_ENDPOINT_IN		6
-#define INTERFACE_COUNT		4	// 2 for cdc + 1 for hid + 1 for msc
-
-#else
-
 #define INTERFACE_COUNT		3	// 2 for cdc + 1 for hid
 
-#endif
+#else 
+
+#define HID_INTERFACE		2	// HID Interface
+#define HID_ENDPOINT_INT	4
+
+#define INTERFACE_COUNT		1	// 1 for hid
 
 #endif
 
@@ -58,9 +46,6 @@ typedef struct
 	CDCDescriptor		cdc;
 #endif
 	HIDDescriptor		hid;
-#ifdef MSC_ENABLED
-	MSCDescriptor		msc;
-#endif
 } Config;
 
 extern Config USB_ConfigDescriptor PROGMEM;
@@ -74,8 +59,5 @@ extern const u16 STRING_SERIAL[13] PROGMEM;
 #define IPRODUCT		0
 #define ISERIAL			1	// Only need this for MSC
 
-
-#define MSC_TX MSC_ENDPOINT_IN
-#define MSC_RX MSC_ENDPOINT_OUT
 #define CDC_TX CDC_ENDPOINT_IN
 #define CDC_RX CDC_ENDPOINT_OUT

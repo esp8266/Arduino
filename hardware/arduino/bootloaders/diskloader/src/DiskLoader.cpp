@@ -112,8 +112,6 @@ const u8 _consts[] =
 
 
 void USBInit(void);
-extern u8 _sector3[512];
-
 int main(void) __attribute__ ((naked));
 
 //	STK500v1 main loop, very similar to optiboot in protocol and implementation
@@ -125,16 +123,12 @@ int main()
 	BOARD_INIT();
 	USBInit();
 
-#ifdef WRITABLE_DIRECTORY
-	_sector3[0] = 0;
-#endif
-
 	_inSync = STK_INSYNC;
 	_ok = STK_OK;
-#ifndef MSC_ENABLED
+
 	if (pgm_read_word(0) != -1)
 		_ejected = 1;
-#endif
+
 	for(;;)
 	{
 		u8* packet = _flashbuf;
@@ -153,9 +147,7 @@ int main()
 				if (c == cmd || c == 0)
 					break;
 			}
-#ifndef MSC_ENABLED
 			_timeout = 0;
-#endif
 			//	Read params
 			Recv(CDC_RX,packet,len);
 
