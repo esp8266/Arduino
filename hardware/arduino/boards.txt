@@ -8,33 +8,13 @@ leonardo.bootloader.low_fuses=0xde
 leonardo.bootloader.high_fuses=0xd8
 leonardo.bootloader.extended_fuses=0xf3
 leonardo.bootloader.path=diskloader
-leonardo.bootloader.file=DiskLoader-Leonardo.hex
+leonardo.bootloader.file=DiskLoader.hex
 leonardo.bootloader.unlock_bits=0x3F
 leonardo.bootloader.lock_bits=0x0F
 leonardo.build.mcu=atmega32u4
 leonardo.build.f_cpu=16000000L
 leonardo.build.core=arduino
 leonardo.build.variant=leonardo
-leonardo.usb.pid=0x0034
-
-##############################################################
-
-micro.name=Arduino Micro
-micro.upload.protocol=arduino
-micro.upload.maximum_size=30720
-micro.upload.speed=1200
-micro.bootloader.low_fuses=0xde
-micro.bootloader.high_fuses=0xd8
-micro.bootloader.extended_fuses=0xf3
-micro.bootloader.path=diskloader
-micro.bootloader.file=DiskLoader-Micro.hex
-micro.bootloader.unlock_bits=0x3F
-micro.bootloader.lock_bits=0x0F
-micro.build.mcu=atmega32u4
-micro.build.f_cpu=16000000L
-micro.build.core=arduino
-micro.build.variant=leonardo
-micro.usb.pid=0x0035
 
 ##############################################################
 
