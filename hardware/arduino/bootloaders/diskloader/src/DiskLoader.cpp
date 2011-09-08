@@ -210,7 +210,7 @@ int main()
 			if (cmd == 'Q')
 				break;
 		}
-		_timeout = 1;		// signal to exit the bootloader
+		_timeout = 1000;		// wait a moment before exiting the bootloader - may need to finish responding to 'Q' for example
 		_ejected = 1;
 	}
 }
@@ -232,7 +232,8 @@ void LEDPulse()
 
 void Reboot()
 {
-	/* TODO - ZE - this should probably be a WDT reset instead, right? */
+	TXLED0;		// switch off the RX and TX LEDs before starting the user sketch
+	RXLED0;
 	UDCON = 1;		// Detatch USB
 	UDIEN = 0;
 	asm volatile (	// Reset vector to run firmware

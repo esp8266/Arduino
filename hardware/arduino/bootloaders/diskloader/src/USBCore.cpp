@@ -29,6 +29,11 @@
 #define EP_TYPE_ISOCHRONOUS_IN		0x41
 #define EP_TYPE_ISOCHRONOUS_OUT		0x40
 
+/** Pulse generation counters to keep track of the number of milliseconds remaining for each pulse type */
+#define TX_RX_LED_PULSE_MS 100
+u8 TxLEDPulse; /**< Milliseconds remaining for data Tx LED pulse */
+u8 RxLEDPulse; /**< Milliseconds remaining for data Rx LED pulse */
+
 void Reboot();
 
 //==================================================================
@@ -85,6 +90,7 @@ static
 void Send(volatile const u8* data, u8 count)
 {
 	TXLED1;					// light the TX LED
+	TxLEDPulse = TX_RX_LED_PULSE_MS;
 	while (count--)
 		UEDATX = *data++;
 }
@@ -92,6 +98,7 @@ void Send(volatile const u8* data, u8 count)
 void Recv(volatile u8* data, u8 count)
 {
 	RXLED1;					// light the RX LED
+	RxLEDPulse = TX_RX_LED_PULSE_MS;
 	while (count--)
 		*data++ = UEDATX;
 }
@@ -99,12 +106,14 @@ void Recv(volatile u8* data, u8 count)
 static inline u8 Recv8()
 {
 	RXLED1;					// light the RX LED
+	RxLEDPulse = TX_RX_LED_PULSE_MS;
 	return UEDATX;
 }
 
 static inline void Send8(u8 d)
 {
 	TXLED1;					// light the TX LED
+	TxLEDPulse = TX_RX_LED_PULSE_MS;
 	UEDATX = d;
 }
 
@@ -451,12 +460,17 @@ void USBGeneralInterrupt()
 	{
 		InitEP(0,EP_TYPE_CONTROL,EP_SINGLE_64);	// init ep0
 		_usbConfiguration = 0;			// not configured yet
-		//UEIENX = 1 << RXSTPE;
 	}
 
-	//	Start of Frame
+	//	Start of Frame - happens every millisecond so we use it for TX and RX LED one-shot timing, too
 	if (udint & (1<<SOFI))
 	{
+		// check whether the one-shot period has elapsed.  if so, turn off the LED
+		if (TxLEDPulse && !(--TxLEDPulse))
+			TXLED0;
+		if (RxLEDPulse && !(--RxLEDPulse))
+			RXLED0;
+		
 		if (!_ejected)
 			_timeout = 0;
 	}
@@ -477,20 +491,13 @@ int USBGetChar()
 			if (!ReadWriteAllowed())
 				ReleaseRX();
 			return c;
-		} else {
-			u8 temp = 0;
-			for (temp=100; temp; temp--) 
-				asm volatile("nop\n\t" "nop\n\t" "nop\n\t" "nop\n\t"::);			
-			RXLED0;		// we turn the RX and TX LEDs on in the relevant Send or Recv instruction
-			TXLED0;		// we turn them off here after some time has passed to ensure a minimum on time.  
-		}
+		} 
 
 		if (!--_timeout) {
-			TXLED0;		// switch off the RX and TX LEDs before starting the user sketch
-			RXLED0;
 			Reboot();	// USB not connected, run firmware
 		}
-
+		
+		_delay_us(100);	// stretch out the bootloader period to about 5 seconds after enumeration
 		LEDPulse();
 	}
 	return -1;
