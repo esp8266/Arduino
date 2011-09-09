@@ -98,7 +98,7 @@ config CONFIG_HTTP_BUILD_LUA
 
 config CONFIG_HTTP_CGI_LAUNCHER
     string "CGI launcher location"
-    default "/usr/bin/cgi.exe"
+    default "/usr/bin/cgi"
     depends on CONFIG_HTTP_HAS_CGI
     help
         The location of the CGI launcher application (could be /usr/bin/php5).
