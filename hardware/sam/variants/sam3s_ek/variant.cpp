@@ -1,9 +1,13 @@
-#include "Arduino.h"
+/*
+ %atmel_license%
+*/
+
+#include "variant.h"
 
 /*
  * Pins descriptions
  */
-extern const PinDescription APinDescription[]=
+extern const PinDescription g_APinDescription[]=
 {
   // LEDS, 0..2
 #if defined VARIANT_REV_A
@@ -112,16 +116,15 @@ extern const PinDescription APinDescription[]=
   { NULL, 0, 0, PIO_NOT_A_PIN, PIO_DEFAULT } // END
 } ;
 
-#if 0
 /*
  * UART objects
  */
-ring_buffer rx_buffer1  =  { { 0 }, 0, 0 } ;
-ring_buffer tx_buffer1  =  { { 0 }, 0, 0 } ;
-ring_buffer rx_buffer2  =  { { 0 }, 0, 0 } ;
-ring_buffer tx_buffer2  =  { { 0 }, 0, 0 } ;
+RingBuffer rx_buffer1 ;
+RingBuffer tx_buffer1 ;
+RingBuffer rx_buffer2 ;
+RingBuffer tx_buffer2 ;
 
-UARTClass Serial1( UART0, UART0_IRQn, ID_UART0, &rx_buffer1, &tx_buffer1 ) ;
+UARTClass Serial( UART0, UART0_IRQn, ID_UART0, &rx_buffer1, &tx_buffer1 ) ;
 UARTClass Serial2( UART1, UART1_IRQn, ID_UART1, &rx_buffer2, &tx_buffer2 ) ;
 
 #ifdef __cplusplus
@@ -131,7 +134,7 @@ extern "C" {
 // IT handlers
 extern void UART0_IrqHandler( void )
 {
-  Serial1.IrqHandler() ;
+  Serial.IrqHandler() ;
 }
 
 extern void UART1_IrqHandler( void )
@@ -142,18 +145,15 @@ extern void UART1_IrqHandler( void )
 #ifdef __cplusplus
 }
 #endif
-#endif // 0
 
 // ----------------------------------------------------------------------------
-#if 0
-
 /*
  * USART objects
  */
-ring_buffer rx_buffer3  =  { { 0 }, 0, 0 } ;
-ring_buffer tx_buffer3  =  { { 0 }, 0, 0 } ;
-ring_buffer rx_buffer4  =  { { 0 }, 0, 0 } ;
-ring_buffer tx_buffer4  =  { { 0 }, 0, 0 } ;
+RingBuffer rx_buffer3 ;
+RingBuffer tx_buffer3 ;
+RingBuffer rx_buffer4 ;
+RingBuffer tx_buffer4 ;
 
 USARTClass Serial3( USART0, USART0_IRQn, ID_USART0, &rx_buffer3, &tx_buffer3 ) ;
 USARTClass Serial4( USART1, USART1_IRQn, ID_USART1, &rx_buffer4, &tx_buffer4 ) ;
@@ -177,6 +177,39 @@ extern void USART1_IrqHandler( void )
 }
 #endif
 
-#endif // 0
 // ----------------------------------------------------------------------------
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ *
+ */
+extern void init( void )
+{
+	SystemInit() ;
+
+    /* Set Systick to 1ms interval, common to all SAM3 variants */
+	if ( SysTick_Config( SystemCoreClock / 1000 ) )
+  {
+    /* Capture error */
+    while ( 1 ) ;
+	}
+
+  /* Disable watchdog, common to all SAM variants */
+  WDT_Disable( WDT ) ;
+
+  // Initialize Serial port UART0, common to all SAM3 variants
+  PIO_Configure( g_APinDescription[PINS_UART].pPort, g_APinDescription[PINS_UART].ulPinType,
+                 g_APinDescription[PINS_UART].ulPin, g_APinDescription[PINS_UART].ulPinAttribute ) ;
+
+  // Switch off Power LED
+  PIO_Configure( g_APinDescription[PIN_LED_RED].pPort, g_APinDescription[PIN_LED_RED].ulPinType,
+                 g_APinDescription[PIN_LED_RED].ulPin, g_APinDescription[PIN_LED_RED].ulPinAttribute ) ;
+  PIO_Clear( g_APinDescription[PIN_LED_RED].pPort, g_APinDescription[PIN_LED_RED].ulPin ) ;
+}
+#ifdef __cplusplus
+}
+#endif
 

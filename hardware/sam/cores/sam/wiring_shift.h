@@ -1,3 +1,7 @@
+/*
+ %atmel_license%
+*/
+
 #ifndef _WIRING_SHIFT_
 #define _WIRING_SHIFT_
 

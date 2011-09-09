@@ -888,7 +888,7 @@
         </option>
         <option>
           <name>IarchiveOutput</name>
-          <state>S:\projets\Arduino_project\github\arduino_arm_git\hardware\sam\system\libsam\build_iar\Debug\Exe\libsam_sam3s4c_ewarm_dbg.a</state>
+          <state>$PROJ_DIR$\..\..\..\cores\sam\libsam_sam3s4c_ewarm_dbg.a</state>
         </option>
       </data>
     </settings>

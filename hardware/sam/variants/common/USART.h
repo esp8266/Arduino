@@ -1,10 +1,10 @@
-#ifndef _USART_
-#define _USART_
+#ifndef _USART_CLASS_
+#define _USART_CLASS_
 
 // USART.cpp need this class to be predefined
-class USARTClass ;
+//class USARTClass ;
 
-#include "wiring_private.h"
+#include "Arduino.h"
 
 class USARTClass : public HardwareSerial
 {
@@ -14,7 +14,7 @@ class USARTClass : public HardwareSerial
     uint32_t _dwId ;
 
   public:
-    USARTClass( Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId, ring_buffer* pRx_buffer, ring_buffer *pTx_buffer ) ;
+    USARTClass( Usart* pUsart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer, RingBuffer* pTx_buffer ) ;
 
     void begin( const uint32_t dwBaudRate ) ;
     void end( void ) ;
@@ -26,9 +26,9 @@ class USARTClass : public HardwareSerial
 
     void IrqHandler( void ) ;
 
-    void write( const char *str ) ;
-    void write( const uint8_t *buffer, size_t size ) ;
+    virtual void write( const char *str ) ;
+    virtual void write( const uint8_t *buffer, size_t size ) ;
 //    using Print::write ; // pull in write(str) and write(buf, size) from Print
 };
 
-#endif // _USART_
+#endif // _USART_CLASS_

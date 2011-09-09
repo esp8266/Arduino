@@ -1,7 +1,7 @@
 # Makefile for compiling libArduino
 .SUFFIXES: .o .a .c .s
 
-CHIP=sam3s4
+CHIP=__SAM3S4C__
 VARIANT=sam3s_ek
 TOOLCHAIN=gcc
 
@@ -9,14 +9,11 @@ TOOLCHAIN=gcc
 # Path
 #-------------------------------------------------------------------------------
 
-# Output directories
-OUTPUT_PATH = .
-
 # Libraries
-PROJECT_BASE_PATH = .
-SYSTEM_PATH = ../../../system
+PROJECT_BASE_PATH = ./..
+SYSTEM_PATH = ../../../../system
 CMSIS_BASE_PATH = $(SYSTEM_PATH)/CMSIS/Include
-VARIANT_PATH = ../../../variants/sam3s-ek
+VARIANT_PATH = ../../../../variants/$(VARIANT)
 
 ifeq ($(CHIP), __SAM3S4C__)
 CHIP_NAME=sam3s4c
@@ -33,7 +30,10 @@ CHIP_SERIE=sam3xa
 else
 endif
 
-CMSIS_CHIP_PATH=$(PROJECT_BASE_PATH)/../cmsis/$(CHIP_SERIE)
+CMSIS_CHIP_PATH=$(SYSTEM_PATH)/libsam/cmsis/$(CHIP_SERIE)
+
+# Output directories
+OUTPUT_PATH = debug_$(VARIANT)
 
 #-------------------------------------------------------------------------------
 # Files
@@ -46,6 +46,7 @@ VPATH+=$(PROJECT_BASE_PATH)
 
 INCLUDES = -I$(PROJECT_BASE_PATH)/..
 INCLUDES += -I$(VARIANT_PATH)
+INCLUDES += -I$(VARIANT_PATH)/..
 INCLUDES += -I$(SYSTEM_PATH)
 INCLUDES += -I$(SYSTEM_PATH)/libsam
 INCLUDES += -I$(CMSIS_BASE_PATH)
@@ -66,16 +67,16 @@ include $(TOOLCHAIN).mk
 #-------------------------------------------------------------------------------
 ifdef DEBUG
 OUTPUT_OBJ=debug
-OUTPUT_BIN=test_$(TOOLCHAIN)_dbg
-LIBS=-Wl,--start-group -lgcc -lc -lchip_$(CHIP)_$(TOOLCHAIN)_dbg -larduino_$(VARIANT)_$(TOOLCHAIN)_dbg -Wl,--end-group
+LIBS_POSTFIX=dbg
 else
 OUTPUT_OBJ=release
-OUTPUT_BIN=test_$(TOOLCHAIN)_rel
-#LIBS=-L../libchip_$(CHIP)_$(TOOLCHAIN)_rel.a -L../arduino_$(VARIANT)_$(TOOLCHAIN)_rel.a
-LIBS=-Wl,--start-group -lgcc -lc -lchip_$(CHIP)_$(TOOLCHAIN)_rel -larduino_$(VARIANT)_$(TOOLCHAIN)_rel -lstdc++ -Wl,--end-group
+LIBS_POSTFIX=rel
 endif
 
-//OUTPUT_PATH=$(OUTPUT_OBJ)_test.elf
+OUTPUT_BIN=test_$(TOOLCHAIN)_$(LIBS_POSTFIX)
+#LIBS=-L../libsam_$(CHIP_NAME)_$(TOOLCHAIN)_rel.a -L../arduino_$(VARIANT)_$(TOOLCHAIN)_rel.a
+#-lstdc++ 
+LIBS=-Wl,--start-group -lgcc -lc -lsam_$(CHIP_NAME)_$(TOOLCHAIN)_$(LIBS_POSTFIX) -larduino_$(VARIANT)_$(TOOLCHAIN)_$(LIBS_POSTFIX) -lvariant_$(VARIANT)_$(TOOLCHAIN)_$(LIBS_POSTFIX) -Wl,--end-group
 
 LIB_PATH =-L$(PROJECT_BASE_PATH)/..
 LIB_PATH+=-L=/lib/thumb2
@@ -100,18 +101,41 @@ CPP_OBJ=$(filter-out $(CPP_OBJ_FILTER), $(CPP_OBJ_TEMP))
 #-------------------------------------------------------------------------------
 all: test
 
-test: $(OUTPUT_BIN)
+test: create_output $(OUTPUT_BIN)
+
+.PHONY: create_output
+create_output:
+	@echo --- Preparing $(VARIANT) files in $(OUTPUT_PATH) $(OUTPUT_BIN) 
+	@echo -------------------------
+	@echo *$(INCLUDES)
+	@echo -------------------------
+	@echo *$(C_SRC)
+	@echo -------------------------
+	@echo *$(C_OBJ)
+	@echo -------------------------
+	@echo *$(addprefix $(OUTPUT_PATH)/, $(C_OBJ))
+	@echo -------------------------
+	@echo *$(CPP_SRC)
+	@echo -------------------------
+	@echo *$(CPP_OBJ)
+	@echo -------------------------
+	@echo *$(addprefix $(OUTPUT_PATH)/, $(CPP_OBJ))
+	@echo -------------------------
+	@echo *$(A_SRC)
+	@echo -------------------------
+
+	-@mkdir $(OUTPUT_PATH) 1>NUL 2>&1
 
 $(addprefix $(OUTPUT_PATH)/,$(CPP_OBJ)): $(OUTPUT_PATH)/%.o: %.cpp
 #	@$(CC) -c $(CPPFLAGS) $< -o $@
-	@$(CXX) -c $(CPPFLAGS) $< -o $@
+#	@$(CXX) -c $(CPPFLAGS) $< -o $@
+	$(CXX) -v -c $(CPPFLAGS) $< -o $@
 
 $(OUTPUT_BIN): $(addprefix $(OUTPUT_PATH)/, $(C_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(CPP_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(A_OBJ))
 	$(CC) $(LIB_PATH) $(LDFLAGS) -T"$(VARIANT_PATH)/linker_scripts/gcc/flash.ld" -Wl,-Map,$(OUTPUT_PATH)/$@.map -o $(OUTPUT_PATH)/$@.elf $^ $(LIBS)
 	$(NM) $(OUTPUT_PATH)/$@.elf >$(OUTPUT_PATH)/$@.elf.txt
 	$(OBJCOPY) -O binary $(OUTPUT_PATH)/$@.elf $(OUTPUT_PATH)/$@.bin
 	$(SIZE) $^ $(OUTPUT_PATH)/$@.elf
-
 
 .PHONY: clean
 clean:
@@ -123,4 +147,4 @@ clean:
 	-@$(RM) $(OUTPUT_PATH)/$(OUTPUT_BIN).map 1>NUL 2>&1
 
 debug: test
-	$(GDB) -x "$(VARIANT_PATH)/debug_scripts/gcc/flash.gdb" -ex "reset" -readnow -se $(OUTPUT_PATH)/$(OUTPUT_BIN).elf
+	$(GDB) -x "$(VARIANT_PATH)/debug_scripts/gcc/$(VARIANT)_flash.gdb" -ex "reset" -readnow -se $(OUTPUT_PATH)/$(OUTPUT_BIN).elf

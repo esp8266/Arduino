@@ -1,83 +1,28 @@
+/*
+ %atmel_license%
+*/
+
 #ifndef Arduino_h
 #define Arduino_h
 
 #include <stdint.h>
-//#include <sys/types.h>
-
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
+#include "libsam/chip.h"
 #include "binary.h"
 
 #ifdef __cplusplus
 extern "C"{
 #endif // __cplusplus
 
-#define HIGH 0x1
-#define LOW  0x0
+#include "wiring_constants.h"
 
-#define INPUT 0x0
-#define OUTPUT 0x1
+#define clockCyclesPerMicrosecond() ( SystemCoreClock / 1000000L )
+#define clockCyclesToMicroseconds(a) ( ((a) * 1000L) / (SystemCoreClock / 1000L) )
+#define microsecondsToClockCycles(a) ( ((a) * (SystemCoreClock / 1000L)) / 1000L )
 
-#define true 0x1
-#define false 0x0
-
-#define PI 3.1415926535897932384626433832795
-#define HALF_PI 1.5707963267948966192313216916398
-#define TWO_PI 6.283185307179586476925286766559
-#define DEG_TO_RAD 0.017453292519943295769236907684886
-#define RAD_TO_DEG 57.295779513082320876798154814105
-
-#define SERIAL  0x0
-#define DISPLAY 0x1
-
-#define LSBFIRST 0
-#define MSBFIRST 1
-
-#define CHANGE 1
-#define FALLING 2
-#define RISING 3
-
-#define DEFAULT 1
-#define EXTERNAL 0
-
-// undefine stdlib's abs if encountered
-#ifdef abs
-#undef abs
-#endif // abs
-
-#define min(a,b) ((a)<(b)?(a):(b))
-#define max(a,b) ((a)>(b)?(a):(b))
-#define abs(x) ((x)>0?(x):-(x))
-#define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
-#define round(x)     ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
-#define radians(deg) ((deg)*DEG_TO_RAD)
-#define degrees(rad) ((rad)*RAD_TO_DEG)
-#define sq(x) ((x)*(x))
-
-#define interrupts() __enable_irq()
-#define noInterrupts() __disable_irq()
-
-#define clockCyclesPerMicrosecond() ( VARIANT_MCK / 1000000L )
-#define clockCyclesToMicroseconds(a) ( ((a) * 1000L) / (VARIANT_MCK / 1000L) )
-#define microsecondsToClockCycles(a) ( ((a) * (VARIANT_MCK / 1000L)) / 1000L )
-
-#define lowByte(w) ((uint8_t) ((w) & 0xff))
-#define highByte(w) ((uint8_t) ((w) >> 8))
-
-#define bitRead(value, bit) (((value) >> (bit)) & 0x01)
-#define bitSet(value, bit) ((value) |= (1UL << (bit)))
-#define bitClear(value, bit) ((value) &= ~(1UL << (bit)))
-#define bitWrite(value, bit, bitvalue) (bitvalue ? bitSet(value, bit) : bitClear(value, bit))
-
-typedef unsigned int word;
-
-#define bit(b) (1UL << (b))
-
-// TODO: to be checked
-typedef uint8_t boolean ;
-typedef uint8_t byte ;
 
 #include "wiring.h"
 #include "wiring_digital.h"
@@ -93,8 +38,8 @@ extern void loop( void ) ;
 //
 // These perform slightly better as macros compared to inline functions
 //
-#define digitalPinToPort( Pin )    ( APinDescription[Pin]->pPort )
-#define digitalPinToBitMask( Pin ) ( APinDescription[Pin]->dwPin )
+#define digitalPinToPort( ulPin )    ( g_APinDescription[ulPin]->pPort )
+#define digitalPinToBitMask( ulPin ) ( g_APinDescription[ulPin]->dwPin )
 #define digitalPinToTimer( P )   (  )
 #define analogInPinToBit( P )    ( P )
 #define portOutputRegister( P )  (  )
@@ -107,31 +52,18 @@ extern void loop( void ) ;
 #define NOT_ON_TIMER         0
 #define TIMER0               1
 
-#ifdef __cplusplus
-} // extern "C"
-#endif // __cplusplus
+typedef void (*voidFuncPtr)( void ) ;
 
+/* Define attribute */
+#if defined   ( __CC_ARM   ) /* Keil µVision 4 */
+    #define WEAK (__attribute__ ((weak)))
+#elif defined ( __ICCARM__ ) /* IAR Ewarm 5.41+ */
+    #define WEAK __weak
+#elif defined (  __GNUC__  ) /* GCC CS */
+    #define WEAK __attribute__ ((weak))
+#endif
 
-
-#ifdef __cplusplus
-#include "WCharacter.h"
-#include "WString.h"
-#include "HardwareSerial.h"
-
-uint16_t makeWord( uint16_t w ) ;
-uint16_t makeWord( byte h, byte l ) ;
-
-#define word(...) makeWord(__VA_ARGS__)
-
-#include "Tone.h"
-#include "WMath.h"
-
-#endif // __cplusplus
-
-//! Include variant header
-#include "variant.h"
-
-//! Definitions and types for pins
+/* Definitions and types for pins */
 typedef enum _EAnalogChannel
 {
   ADC0,
@@ -158,15 +90,23 @@ typedef enum _EAnalogChannel
 typedef struct _PinDescription
 {
   Pio* pPort ;
-  uint32_t dwPin ;
-  uint32_t dwPeripheralId ;
-  EPioType dwPinType ;
-  uint32_t dwPinAttribute ;
-  EAnalogChannel dwAnalogChannel ;
+  uint32_t ulPin ;
+  uint32_t ulPeripheralId ;
+  EPioType ulPinType ;
+  uint32_t ulPinAttribute ;
+  EAnalogChannel ulAnalogChannel ;
 } PinDescription ;
 
-extern const PinDescription APinDescription[] ;
+extern const PinDescription g_APinDescription[] ;
 
-#include "pins_arduino.h"
+#ifdef __cplusplus
+} // extern "C"
+
+#include "WCharacter.h"
+#include "WString.h"
+#include "Tone.h"
+#include "WMath.h"
+#include "HardwareSerial.h"
+#endif // __cplusplus
 
 #endif // Arduino_h

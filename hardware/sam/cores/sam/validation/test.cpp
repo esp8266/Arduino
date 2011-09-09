@@ -1,4 +1,8 @@
-#include "../Arduino.h"
+/*
+ %atmel_license%
+*/
+
+#include "variant.h"
 
 void setup( void )
 {
@@ -11,7 +15,7 @@ void setup( void )
   pinMode( PIN_LED_GREEN, OUTPUT ) ;
   digitalWrite( PIN_LED_GREEN, HIGH ) ;
 
-//  Serial1.begin( 19200 ) ;
+  Serial.begin( 19200 ) ;
 }
 
 void loop( void )
@@ -23,7 +27,8 @@ void loop( void )
   digitalWrite( PIN_LED_GREEN, HIGH ) ;  // set the red LED on
   delay( 1000 ) ;              // wait for a second
 
-  //Serial1.println( "test1" ) ;   // send an initial string
-  //delay( 1000 ) ;               // wait for a second
-  //Serial1.println( "test2" ) ;   // send an initial string
+//  Serial.write( '*' ) ;   // send an initial char
+//  Serial.println( "test1" ) ;   // send an initial string
+//  delay( 1000 ) ;               // wait for a second
+//  Serial.println( "test2" ) ;   // send an initial string
 }

@@ -4,7 +4,7 @@
  *
  * \par Purpose
  *
- * This file provides basic support for Cortex-M processor based 
+ * This file provides basic support for Cortex-M processor based
  * microcontrollers.
  *
  * \note
@@ -81,7 +81,7 @@ extern void WDT_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler")
 /* Cortex-M3 core handlers */
 #pragma weak Reset_Handler=Dummy_Handler
 #pragma weak NMI_Handler=Dummy_Handler
-#pragma weak HardFault_Handler=Dummy_Handler
+//#pragma weak HardFault_Handler=Dummy_Handler
 #pragma weak MemManage_Handler=Dummy_Handler
 #pragma weak BusFault_Handler=Dummy_Handler
 #pragma weak UsageFault_Handler=Dummy_Handler

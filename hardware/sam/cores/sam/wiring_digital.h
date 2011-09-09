@@ -1,3 +1,7 @@
+/*
+ %atmel_license%
+*/
+
 #ifndef _WIRING_DIGITAL_
 #define _WIRING_DIGITAL_
 
@@ -5,18 +9,18 @@
  extern "C" {
 #endif
 
-/*
+/**
  * \brief Configures the specified pin to behave either as an input or an output. See the description of digital pins for details.
  *
- * \param dwPin the number of the pin whose mode you wish to set
- * \param dwMode either INPUT or OUTPUT
+ * \param ulPin The number of the pin whose mode you wish to set
+ * \param ulMode Either INPUT or OUTPUT
  */
 extern void pinMode( uint32_t dwPin, uint32_t dwMode ) ;
 
-/*
+/**
  * \brief Write a HIGH or a LOW value to a digital pin.
  *
- * \desc If the pin has been configured as an OUTPUT with pinMode(), its voltage will be set to the
+ * If the pin has been configured as an OUTPUT with pinMode(), its voltage will be set to the
  * corresponding value: 5V (or 3.3V on 3.3V boards) for HIGH, 0V (ground) for LOW.
  *
  * If the pin is configured as an INPUT, writing a HIGH value with digitalWrite() will enable an internal
@@ -35,12 +39,14 @@ extern void pinMode( uint32_t dwPin, uint32_t dwMode ) ;
  */
 extern void digitalWrite( uint32_t dwPin, uint32_t dwVal ) ;
 
-/*
+/**
  * \brief Reads the value from a specified digital pin, either HIGH or LOW.
  *
- * \param dwPin the number of the digital pin you want to read (int)
+ * \param ulPin The number of the digital pin you want to read (int)
+ *
+ * \return HIGH or LOW
  */
-extern int digitalRead( uint32_t dwPin ) ;
+extern int digitalRead( uint32_t ulPin ) ;
 
 #ifdef __cplusplus
 }

@@ -30,7 +30,8 @@ vpath %.cpp $(PROJECT_BASE_PATH) $(PROJECT_BASE_PATH)
 
 VPATH+=$(PROJECT_BASE_PATH)
 
-INCLUDES = -I$(PROJECT_BASE_PATH)
+INCLUDES =
+INCLUDES += -I$(PROJECT_BASE_PATH)
 INCLUDES += -I$(SYSTEM_PATH)
 INCLUDES += -I$(SYSTEM_PATH)/libsam
 INCLUDES += -I$(VARIANT_PATH)
@@ -134,16 +135,12 @@ $(addprefix $(OUTPUT_PATH)/,$(C_OBJ)): $(OUTPUT_PATH)/%.o: %.c
 
 $(addprefix $(OUTPUT_PATH)/,$(CPP_OBJ)): $(OUTPUT_PATH)/%.o: %.cpp
 #	@$(CC) -c $(CPPFLAGS) $< -o $@
-	$(CC) -xc++ -c $(CPPFLAGS) $< -o $@
-
-$(OUTPUT_PATH)/variant.o: $(VARIANT_PATH)/variant.cpp
-#	@$(CC) -c $(CPPFLAGS) $< -o $@
-	@$(CXX) -c $(CPPFLAGS) $< -o $@
+	@$(CC) -xc++ -c $(CPPFLAGS) $< -o $@
 
 $(addprefix $(OUTPUT_PATH)/,$(A_OBJ)): $(OUTPUT_PATH)/%.o: %.s
 	@$(AS) -c $(ASFLAGS) $< -o $@
 
-$(OUTPUT_LIB): $(addprefix $(OUTPUT_PATH)/, $(C_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(CPP_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(A_OBJ)) $(OUTPUT_PATH)/variant.o
+$(OUTPUT_LIB): $(addprefix $(OUTPUT_PATH)/, $(C_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(CPP_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(A_OBJ))
 	@$(AR) -v -r "$(OUTPUT_BIN)/$@" $^
 	@$(NM) "$(OUTPUT_BIN)/$@" > "$(OUTPUT_BIN)/$@.txt"
 

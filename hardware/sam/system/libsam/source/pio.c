@@ -31,9 +31,6 @@ extern void PIO_DisableInterrupt( Pio *pPio, const uint32_t dwMask )
  */
 extern void PIO_PullUp( Pio *pPio, const uint32_t dwMask, const uint32_t dwPullUpEnable )
 {
-    /* Disable interrupts on the pin(s) */
-    pPio->PIO_IDR = dwMask ;
-
     /* Enable the pull-up(s) if necessary */
     if ( dwPullUpEnable )
     {
@@ -271,7 +268,11 @@ extern uint32_t PIO_Configure( Pio* pPio, const EPioType dwType, const uint32_t 
         case PIO_PERIPH_B :
         case PIO_PERIPH_C :
         case PIO_PERIPH_D :
+            /* Put the pin under control of peripheral */
             PIO_SetPeripheral( pPio, dwType, dwMask ) ;
+            /* Disable interrupts on the pin(s) */
+            PIO_DisableInterrupt( pPio, dwMask ) ;
+            /* Enable Pullup */
             PIO_PullUp( pPio, dwMask, (dwAttribute & PIO_PULLUP) ) ;
         break;
 
@@ -305,13 +306,16 @@ extern uint32_t PIO_Configure( Pio* pPio, const EPioType dwType, const uint32_t 
  */
 extern uint32_t PIO_GetOutputDataStatus( const Pio* pPio, const uint32_t dwMask )
 {
-    if ( (pPio->PIO_ODSR & dwMask) == 0 )
+  /* Test if pin is under control of PIO */
+  if ( (pPio->PIO_PSR & dwMask) != 0 )
+  {
+    /* Test if pin is configured as output */
+    if ( (pPio->PIO_OSR & dwMask) != 0 )
     {
-        return 0 ;
+      return 1 ;
     }
-    else
-    {
-        return 1 ;
-    }
+  }
+
+  return 0 ;
 }
 

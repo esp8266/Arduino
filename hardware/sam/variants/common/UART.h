@@ -1,10 +1,10 @@
-#ifndef _UART_
-#define _UART_
+#ifndef _UART_CLASS_
+#define _UART_CLASS_
 
 // UART.cpp need this class to be predefined
-class UARTClass ;
+//class UARTClass ;
 
-#include "wiring_private.h"
+#include "Arduino.h"
 
 class UARTClass : public HardwareSerial
 {
@@ -14,7 +14,7 @@ class UARTClass : public HardwareSerial
     uint32_t _dwId ;
 
   public:
-    UARTClass( Uart* pUart, IRQn_Type dwIrq, uint32_t dwId, ring_buffer* pRx_buffer, ring_buffer *pTx_buffer ) ;
+    UARTClass( Uart* pUart, IRQn_Type dwIrq, uint32_t dwId, RingBuffer* pRx_buffer, RingBuffer* pTx_buffer ) ;
 
     void begin( const uint32_t dwBaudRate ) ;
     void end( void ) ;
@@ -31,4 +31,4 @@ class UARTClass : public HardwareSerial
 //    using Print::write ; // pull in write(str) and write(buf, size) from Print
 };
 
-#endif // _UART_
+#endif // _UART_CLASS_

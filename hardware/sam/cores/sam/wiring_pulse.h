@@ -1,3 +1,7 @@
+/*
+ %atmel_license%
+*/
+
 #ifndef _WIRING_PULSE_
 #define _WIRING_PULSE_
 

@@ -2,7 +2,7 @@
 .SUFFIXES: .o .a .c .s
 SUB_MAKEFILES=debug.mk gcc.mk release.mk win.mk sam3s.mk
 
-LIBNAME=libchip
+LIBNAME=libsam
 TOOLCHAIN=gcc
 
 ifeq ($(CHIP),)
@@ -39,7 +39,7 @@ CHIP_SERIE=sam3xa
 else
 endif
 
-CMSIS_CHIP_PATH=$(PROJECT_BASE_PATH)/../cmsis/$(CHIP_SERIE)
+CMSIS_CHIP_PATH=$(PROJECT_BASE_PATH)/cmsis/$(CHIP_SERIE)
 
 #-------------------------------------------------------------------------------
 # Files
@@ -88,8 +88,8 @@ OUTPUT_PATH=$(OUTPUT_OBJ)_$(CHIP_NAME)
 # C source files and objects
 #-------------------------------------------------------------------------------
 C_SRC=$(wildcard $(PROJECT_BASE_PATH)/source/*.c)
-C_SRC+=$(wildcard $(CMSIS_CHIP_PATH)/*.c)
-C_SRC+=$(wildcard $(CMSIS_CHIP_PATH)/gcc*.c)
+C_SRC+=$(wildcard $(CMSIS_CHIP_PATH)/source/templates/*.c)
+C_SRC+=$(wildcard $(CMSIS_CHIP_PATH)/source/templates/gcc/*.c)
 
 C_OBJ_TEMP=$(patsubst %.c, %.o, $(notdir $(C_SRC)))
 
@@ -102,7 +102,6 @@ C_OBJ=$(filter-out $(C_OBJ_FILTER), $(C_OBJ_TEMP))
 # Assembler source files and objects
 #-------------------------------------------------------------------------------
 A_SRC=$(wildcard $(PROJECT_BASE_PATH)/source/*.s)
-A_SRC+=$(wildcard $(CMSIS_BASE_PATH)/*.s)
 
 A_OBJ_TEMP=$(patsubst %.s, %.o, $(notdir $(A_SRC)))
 
@@ -121,7 +120,7 @@ $(CHIP): create_output $(OUTPUT_LIB)
 .PHONY: create_output
 create_output:
 	@echo --- Preparing $(CHIP) files $(OUTPUT_PATH) $(OUTPUT_BIN)
-#	@echo -------------------------
+	@echo -------------------------
 #	@echo *$(C_SRC)
 #	@echo -------------------------
 #	@echo *$(C_OBJ)

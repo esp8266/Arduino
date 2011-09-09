@@ -20,7 +20,7 @@
 #ifndef Stream_h
 #define Stream_h
 
-#include <inttypes.h>
+#include <stdint.h>
 #include "Print.h"
 
 class Stream : public Print

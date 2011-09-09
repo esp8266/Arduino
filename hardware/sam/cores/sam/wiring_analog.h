@@ -1,3 +1,7 @@
+/*
+ %atmel_license%
+*/
+
 #ifndef _WIRING_ANALOG_
 #define _WIRING_ANALOG_
 

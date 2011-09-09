@@ -73,7 +73,7 @@ const intvec_elem __vector_table[] =
     WDT_IrqHandler,     /* 4  Watchdog Timer */
     PMC_IrqHandler,     /* 5  PMC */
     EEFC_IrqHandler,    /* 6  EEFC */
-    Dummy_Handler,  	/* 7  Reserved */
+    Dummy_Handler,   	  /* 7  Reserved */
     UART0_IrqHandler,   /* 8  UART0 */
     UART1_IrqHandler,   /* 9  UART1 */
     SMC_IrqHandler,     /* 10 SMC */
@@ -82,8 +82,8 @@ const intvec_elem __vector_table[] =
     PIOC_IrqHandler,    /* 13 Parallel IO Controller C */
     USART0_IrqHandler,  /* 14 USART 0 */
     USART1_IrqHandler,  /* 15 USART 1 */
-    Dummy_Handler,  	/* 16 Reserved */
-    Dummy_Handler,  	/* 17 Reserved */
+    Dummy_Handler,  	  /* 16 Reserved */
+    Dummy_Handler,  	  /* 17 Reserved */
     MCI_IrqHandler,     /* 18 MCI */
     TWI0_IrqHandler,    /* 19 TWI 0 */
     TWI1_IrqHandler,    /* 20 TWI 1 */
@@ -101,7 +101,7 @@ const intvec_elem __vector_table[] =
     CRCCU_IrqHandler,   /* 32 CRC Calculation Unit */
     ACC_IrqHandler,     /* 33 Analog Comparator */
     USBD_IrqHandler,    /* 34 USB Device Port */
-    Dummy_Handler   	/* 35 not used */
+    Dummy_Handler   	  /* 35 not used */
 };
 
 /* TEMPORARY PATCH FOR SCB */

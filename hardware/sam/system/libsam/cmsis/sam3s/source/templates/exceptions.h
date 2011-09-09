@@ -4,7 +4,7 @@
  *
  * \par Purpose
  *
- * This file provides basic support for Cortex-M processor based 
+ * This file provides basic support for Cortex-M processor based
  * microcontrollers.
  *
  * \author               Atmel Corporation: http://www.atmel.com \n
