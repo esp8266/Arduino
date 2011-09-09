@@ -211,7 +211,7 @@ int main()
 			if (cmd == 'Q')
 				break;
 		}
-		_timeout = 1000;		// wait a moment before exiting the bootloader - may need to finish responding to 'Q' for example
+		_timeout = 500;		// wait a moment before exiting the bootloader - may need to finish responding to 'Q' for example
 		_ejected = 1;
 	}
 }
