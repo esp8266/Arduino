@@ -28,7 +28,7 @@ buttons.status.font = SansSerif,plain,12
 buttons.status.color = #ffffff
 
 # GUI - LINESTATUS   
-linestatus.color = #17A1A5
+linestatus.color = #ffffff
 linestatus.bgcolor = #006468
 
 # EDITOR - DETAILS

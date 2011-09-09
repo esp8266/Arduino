@@ -114,17 +114,6 @@ public abstract class Uploader implements MessageConsumer  {
       String[] commandArray = new String[commandDownloader.size()];
       commandDownloader.toArray(commandArray);
       
-      String avrBasePath;
-      
-      if(Base.isLinux()) {
-        avrBasePath = new String(Base.getHardwarePath() + "/tools/"); 
-      }
-      else {
-        avrBasePath = new String(Base.getHardwarePath() + "/tools/avr/bin/"); 
-      }
-      
-      commandArray[0] = avrBasePath + commandArray[0];
-      
       if (verbose || Preferences.getBoolean("upload.verbose")) {
         for(int i = 0; i < commandArray.length; i++) {
           System.out.print(commandArray[i] + " ");

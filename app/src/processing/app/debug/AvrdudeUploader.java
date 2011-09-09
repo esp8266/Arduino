@@ -176,14 +176,17 @@ public class AvrdudeUploader extends Uploader  {
   
   public boolean avrdude(Collection params) throws RunnerException {
     List commandDownloader = new ArrayList();
-    commandDownloader.add("avrdude");
-
-    // Point avrdude at its config file since it's in a non-standard location.
-    if (Base.isLinux()) {
-      // ???: is it better to have Linux users install avrdude themselves, in
-      // a way that it can find its own configuration file?
-      commandDownloader.add("-C" + Base.getHardwarePath() + "/tools/avrdude.conf");
-    } else {
+      
+    if(Base.isLinux()) {
+      if ((new File(Base.getHardwarePath() + "/tools/" + "avrdude")).exists()) {
+        commandDownloader.add(Base.getHardwarePath() + "/tools/" + "avrdude");
+        commandDownloader.add("-C" + Base.getHardwarePath() + "/tools/avrdude.conf");
+      } else {
+        commandDownloader.add("avrdude");
+      }
+    }
+    else {
+      commandDownloader.add(Base.getHardwarePath() + "/tools/avr/bin/" + "avrdude");
       commandDownloader.add("-C" + Base.getHardwarePath() + "/tools/avr/etc/avrdude.conf");
     }
 

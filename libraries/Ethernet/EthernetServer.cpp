@@ -72,11 +72,6 @@ size_t EthernetServer::write(uint8_t b)
   write(&b, 1);
 }
 
-size_t EthernetServer::write(const char *str) 
-{
-  write((const uint8_t *)str, strlen(str));
-}
-
 size_t EthernetServer::write(const uint8_t *buffer, size_t size) 
 {
   size_t n = 0;

@@ -107,12 +107,6 @@ size_t EthernetUDP::write(uint8_t byte)
   return write(&byte, 1);
 }
 
-size_t EthernetUDP::write(const char *str)
-{
-  size_t len = strlen(str);
-  return write((const uint8_t *)str, len);
-}
-
 size_t EthernetUDP::write(const uint8_t *buffer, size_t size)
 {
   uint16_t bytes_written = bufferData(_sock, _offset, buffer, size);

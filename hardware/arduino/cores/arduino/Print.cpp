@@ -30,16 +30,6 @@
 // Public Methods //////////////////////////////////////////////////////////////
 
 /* default implementation: may be overridden */
-size_t Print::write(const char *str)
-{
-  size_t n = 0;
-  while (*str) {
-    n += write(*str++);
-  }
-  return n;
-}
-
-/* default implementation: may be overridden */
 size_t Print::write(const uint8_t *buffer, size_t size)
 {
   size_t n = 0;

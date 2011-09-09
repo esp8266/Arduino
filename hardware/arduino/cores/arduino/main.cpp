@@ -13,7 +13,7 @@ int main(void)
     
 	for (;;) {
 		loop();
-		serialEventRun();
+		if (serialEventRun) serialEventRun();
 	}
         
 	return 0;
