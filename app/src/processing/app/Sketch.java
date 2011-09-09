@@ -261,7 +261,6 @@ public class Sketch {
     }
   }
 
-
   boolean renamingCode;
 
   /**
@@ -709,13 +708,61 @@ public class Sketch {
       if (!saveAs()) return false;
     }
 
+    // rename .pde files to .ino
+    File mainFile = new File(getMainFilePath());
+    File mainFolder = mainFile.getParentFile();
+    File[] pdeFiles = mainFolder.listFiles(new FilenameFilter() {
+      public boolean accept(File dir, String name) {
+        return name.toLowerCase().endsWith(".pde");
+      }
+    });
+    
+    if (pdeFiles != null && pdeFiles.length > 0) {
+      Object[] options = { "YES", "NO, Cancel" };
+      String prompt = "From Arduino 1.0, the file extension for sketches changed\n"
+          + "from \".pde\" to \".ino\".  This version of the software only\n"
+          + "supports the new extension.\n\n" 
+          + "By clicking YES, the following files will be renamed changing the\n"
+          + "extension from \".pde\" to \".ino\":\n\n";
+      for (File f : pdeFiles)
+        prompt += f.getName() + "\n";
+      prompt += "\nContinue?";
+      int result = JOptionPane.showOptionDialog(editor,
+                                                prompt,
+                                                "New extension",
+                                                JOptionPane.YES_NO_OPTION,
+                                                JOptionPane.QUESTION_MESSAGE,
+                                                null,
+                                                options,
+                                                options[0]);
+      if (result != JOptionPane.YES_OPTION)
+        return false;
+      
+      for (File pdeFile : pdeFiles)
+        renameCodeToInoExtension(pdeFile);
+    }
+
     for (int i = 0; i < codeCount; i++) {
-      if (code[i].isModified()) code[i].save();
+      if (code[i].isModified()) 
+        code[i].save();
     }
     calcModified();
     return true;
   }
 
+  
+  protected boolean renameCodeToInoExtension(File pdeFile) {
+    for (SketchCode c : code) {
+      if (!c.getFile().equals(pdeFile))
+        continue;
+
+      String pdeName = pdeFile.getPath();
+      pdeName = pdeName.substring(0, pdeName.length() - 4) + ".ino";
+      return c.renameTo(new File(pdeName), "ino");
+    }
+    return false;
+  }
+  
 
   /**
    * Handles 'Save As' for a sketch.
@@ -1261,7 +1308,7 @@ public class Sketch {
     StringBuffer bigCode = new StringBuffer();
     int bigCount = 0;
     for (SketchCode sc : code) {
-      if (sc.isExtension("ino")) {
+      if (sc.isExtension("ino") || sc.isExtension("pde")) {
         sc.setPreprocOffset(bigCount);
         bigCode.append(sc.getProgram());
         bigCode.append('\n');
@@ -1807,7 +1854,7 @@ public class Sketch {
    * Returns a String[] array of proper extensions.
    */
   public String[] getExtensions() {
-    return new String[] { "ino", "c", "cpp", "h" };
+    return new String[] { "ino", "pde", "c", "cpp", "h" };
   }
 
 

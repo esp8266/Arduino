@@ -113,8 +113,8 @@ public class SketchCode {
   protected boolean renameTo(File what, String ext) {
     boolean success = file.renameTo(what);
     if (success) {
-      this.file = what;  // necessary?
-      this.extension = ext;
+      file = what;
+      extension = ext;
       makePrettyName();
     }
     return success;
