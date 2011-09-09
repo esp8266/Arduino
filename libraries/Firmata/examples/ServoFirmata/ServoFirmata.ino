@@ -1,3 +1,14 @@
+/*
+ * Firmata is a generic protocol for communicating with microcontrollers
+ * from software on a host computer. It is intended to work with
+ * any host computer software package.
+ *
+ * To download a host software package, please clink on the following link
+ * to open the download page in your default browser.
+ *
+ * http://firmata.org/wiki/Download
+ */
+
 /* This firmware supports as many servos as possible using the Servo library 
  * included in Arduino 0017
  *

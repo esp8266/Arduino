@@ -124,6 +124,10 @@ writePort(port, value, bitmask):  Write an 8 bit port.
  * Board Specific Configuration
  *============================================================================*/
 
+#ifndef digitalPinHasPWM
+#define digitalPinHasPWM(p)     IS_PIN_DIGITAL(p)
+#endif
+
 // Arduino Duemilanove, Diecimila, and NG
 #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__)
 #if defined(NUM_ANALOG_INPUTS) && NUM_ANALOG_INPUTS == 6
@@ -136,7 +140,7 @@ writePort(port, value, bitmask):  Write an 8 bit port.
 #define VERSION_BLINK_PIN       13
 #define IS_PIN_DIGITAL(p)       ((p) >= 2 && (p) <= 19)
 #define IS_PIN_ANALOG(p)        ((p) >= 14 && (p) < 14 + TOTAL_ANALOG_PINS)
-#define IS_PIN_PWM(p)           IS_PIN_DIGITAL(p)
+#define IS_PIN_PWM(p)           digitalPinHasPWM(p)
 #define IS_PIN_SERVO(p)         (IS_PIN_DIGITAL(p) && (p) - 2 < MAX_SERVOS)
 #define IS_PIN_I2C(p)           ((p) == 18 || (p) == 19)
 #define PIN_TO_DIGITAL(p)       (p)
@@ -151,7 +155,7 @@ writePort(port, value, bitmask):  Write an 8 bit port.
 #define VERSION_BLINK_PIN       WLED
 #define IS_PIN_DIGITAL(p)       ((p) >= 0 && (p) < TOTAL_PINS)
 #define IS_PIN_ANALOG(p)        ((p) >= FIRST_ANALOG_PIN && (p) < (FIRST_ANALOG_PIN+TOTAL_ANALOG_PINS))
-#define IS_PIN_PWM(p)           IS_PIN_DIGITAL(p)
+#define IS_PIN_PWM(p)           digitalPinHasPWM(p)
 #define IS_PIN_SERVO(p)         ((p) >= 0 && (p) < MAX_SERVOS)
 #define IS_PIN_I2C(p)           ((p) == SDA || (p) == SCL)
 #define PIN_TO_DIGITAL(p)       (p)
@@ -167,7 +171,7 @@ writePort(port, value, bitmask):  Write an 8 bit port.
 #define VERSION_BLINK_PIN       13
 #define IS_PIN_DIGITAL(p)       ((p) >= 2 && (p) <= 19)
 #define IS_PIN_ANALOG(p)        ((p) >= 14 && (p) <= 19)
-#define IS_PIN_PWM(p)           IS_PIN_DIGITAL(p)
+#define IS_PIN_PWM(p)           digitalPinHasPWM(p)
 #define IS_PIN_SERVO(p)         (IS_PIN_DIGITAL(p) && (p) - 2 < MAX_SERVOS)
 #define IS_PIN_I2C(p)           ((p) == 18 || (p) == 19)
 #define PIN_TO_DIGITAL(p)       (p)
@@ -178,13 +182,13 @@ writePort(port, value, bitmask):  Write an 8 bit port.
 
 
 // Arduino Mega
-#elif defined(__AVR_ATmega1280__)
+#elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 #define TOTAL_ANALOG_PINS       16
 #define TOTAL_PINS              70 // 54 digital + 16 analog
 #define VERSION_BLINK_PIN       13
 #define IS_PIN_DIGITAL(p)       ((p) >= 2 && (p) < TOTAL_PINS)
 #define IS_PIN_ANALOG(p)        ((p) >= 54 && (p) < TOTAL_PINS)
-#define IS_PIN_PWM(p)           IS_PIN_DIGITAL(p)
+#define IS_PIN_PWM(p)           digitalPinHasPWM(p)
 #define IS_PIN_SERVO(p)         ((p) >= 2 && (p) - 2 < MAX_SERVOS)
 #define IS_PIN_I2C(p)           ((p) == 20 || (p) == 21)
 #define PIN_TO_DIGITAL(p)       (p)
@@ -200,7 +204,7 @@ writePort(port, value, bitmask):  Write an 8 bit port.
 #define VERSION_BLINK_PIN       6
 #define IS_PIN_DIGITAL(p)       ((p) >= 0 && (p) < TOTAL_PINS)
 #define IS_PIN_ANALOG(p)        (0)
-#define IS_PIN_PWM(p)           IS_PIN_DIGITAL(p)
+#define IS_PIN_PWM(p)           digitalPinHasPWM(p)
 #define IS_PIN_SERVO(p)         ((p) >= 0 && (p) < MAX_SERVOS)
 #define IS_PIN_I2C(p)           (0)
 #define PIN_TO_DIGITAL(p)       (p)
@@ -216,7 +220,7 @@ writePort(port, value, bitmask):  Write an 8 bit port.
 #define VERSION_BLINK_PIN       11
 #define IS_PIN_DIGITAL(p)       ((p) >= 0 && (p) < TOTAL_PINS)
 #define IS_PIN_ANALOG(p)        ((p) >= 11 && (p) <= 22)
-#define IS_PIN_PWM(p)           IS_PIN_DIGITAL(p)
+#define IS_PIN_PWM(p)           digitalPinHasPWM(p)
 #define IS_PIN_SERVO(p)         ((p) >= 0 && (p) < MAX_SERVOS)
 #define IS_PIN_I2C(p)           ((p) == 5 || (p) == 6)
 #define PIN_TO_DIGITAL(p)       (p)
@@ -232,7 +236,7 @@ writePort(port, value, bitmask):  Write an 8 bit port.
 #define VERSION_BLINK_PIN       6
 #define IS_PIN_DIGITAL(p)       ((p) >= 0 && (p) < TOTAL_PINS)
 #define IS_PIN_ANALOG(p)        ((p) >= 38 && (p) < TOTAL_PINS)
-#define IS_PIN_PWM(p)           IS_PIN_DIGITAL(p)
+#define IS_PIN_PWM(p)           digitalPinHasPWM(p)
 #define IS_PIN_SERVO(p)         ((p) >= 0 && (p) < MAX_SERVOS)
 #define IS_PIN_I2C(p)           ((p) == 0 || (p) == 1)
 #define PIN_TO_DIGITAL(p)       (p)
@@ -248,7 +252,7 @@ writePort(port, value, bitmask):  Write an 8 bit port.
 #define VERSION_BLINK_PIN       0
 #define IS_PIN_DIGITAL(p)       ((p) >= 2 && (p) < TOTAL_PINS)
 #define IS_PIN_ANALOG(p)        ((p) >= 24 && (p) < TOTAL_PINS)
-#define IS_PIN_PWM(p)           IS_PIN_DIGITAL(p)
+#define IS_PIN_PWM(p)           digitalPinHasPWM(p)
 #define IS_PIN_SERVO(p)         ((p) >= 0 && (p) < MAX_SERVOS)
 #define IS_PIN_I2C(p)           ((p) == 16 || (p) == 17)
 #define PIN_TO_DIGITAL(p)       (p)
@@ -264,7 +268,7 @@ writePort(port, value, bitmask):  Write an 8 bit port.
 #define VERSION_BLINK_PIN       13
 #define IS_PIN_DIGITAL(p)       ((p) >= 2 && (p) < TOTAL_PINS)
 #define IS_PIN_ANALOG(p)        ((p) >= 36 && (p) < TOTAL_PINS)
-#define IS_PIN_PWM(p)           IS_PIN_DIGITAL(p)
+#define IS_PIN_PWM(p)           digitalPinHasPWM(p)
 #define IS_PIN_SERVO(p)         ((p) >= 0 && (p) < MAX_SERVOS)
 #define IS_PIN_I2C(p)           ((p) == 4 || (p) == 5)
 #define PIN_TO_DIGITAL(p)       (p)
