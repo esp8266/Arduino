@@ -73,7 +73,7 @@ IntFunc exception_table[] = {
 
     /* Configure Initial Stack Pointer, using linker-generated symbols */
     (IntFunc)(&pdwStack[STACK_SIZE-1]),
-    ResetException,
+    Reset_Handler,
 
     NMI_Handler,
     HardFault_Handler,
@@ -134,7 +134,7 @@ IntFunc exception_table[] = {
  * \brief This is the code that gets called on processor reset.
  * To initialize the device, and call the main() routine.
  */
-void ResetException( void )
+void Reset_Handler( void )
 {
     uint32_t *pSrc, *pDest ;
 

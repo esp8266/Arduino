@@ -31,9 +31,9 @@ extern "C" {
 
 #ifdef __GNUC__
 /* Cortex-M3 core handlers */
-extern void Reset_Handler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
+//extern void Reset_Handler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
 extern void NMI_Handler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void HardFault_Handler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
+//extern void HardFault_Handler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
 extern void MemManage_Handler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
 extern void BusFault_Handler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
 extern void UsageFault_Handler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;

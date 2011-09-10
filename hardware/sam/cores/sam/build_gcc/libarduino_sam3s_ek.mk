@@ -69,7 +69,7 @@ C_SRC=$(wildcard $(PROJECT_BASE_PATH)/*.c)
 C_OBJ_TEMP = $(patsubst %.c, %.o, $(notdir $(C_SRC)))
 
 # during development, remove some files
-C_OBJ_FILTER=wiring_analog.o wiring_pulse.o
+C_OBJ_FILTER=wiring_analog.o wiring_pulse.o dlib_lowlevel_sam3.o
 
 C_OBJ=$(filter-out $(C_OBJ_FILTER), $(C_OBJ_TEMP))
 

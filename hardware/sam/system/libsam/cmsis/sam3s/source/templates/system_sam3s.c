@@ -132,7 +132,7 @@ extern void SystemCoreClockUpdate( void )
 				break;
 			}
 		}
-		if (PMC->PMC_MCKR & PMC_MCKR_CSS_Msk == PMC_MCKR_CSS_PLLA_CLK) {
+		if ((PMC->PMC_MCKR & PMC_MCKR_CSS_Msk) == PMC_MCKR_CSS_PLLA_CLK) {
 			SystemCoreClock *= ((((PMC->CKGR_PLLAR) >> CKGR_PLLAR_MULA_Pos) & 0x7FF) + 1);
 			SystemCoreClock /= ((((PMC->CKGR_PLLAR) >> CKGR_PLLAR_DIVA_Pos) & 0x0FF));
 		}

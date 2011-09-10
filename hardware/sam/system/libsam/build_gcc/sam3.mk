@@ -121,10 +121,10 @@ $(CHIP): create_output $(OUTPUT_LIB)
 create_output:
 	@echo --- Preparing $(CHIP) files $(OUTPUT_PATH) $(OUTPUT_BIN)
 	@echo -------------------------
-#	@echo *$(C_SRC)
-#	@echo -------------------------
-#	@echo *$(C_OBJ)
-#	@echo -------------------------
+	@echo *$(C_SRC)
+	@echo -------------------------
+	@echo *$(C_OBJ)
+	@echo -------------------------
 #	@echo *$(addprefix $(OUTPUT_PATH)/, $(C_OBJ))
 #	@echo -------------------------
 #	@echo *$(A_SRC)

@@ -139,7 +139,7 @@ $(addprefix $(OUTPUT_PATH)/,$(C_OBJ)): $(OUTPUT_PATH)/%.o: %.c
 
 $(addprefix $(OUTPUT_PATH)/,$(CPP_OBJ)): $(OUTPUT_PATH)/%.o: %.cpp
 #	@$(CC) -c $(CPPFLAGS) $< -o $@
-	$(CC) -xc++ -c $(CPPFLAGS) $< -o $@
+	@$(CC) -xc++ -c $(CPPFLAGS) $< -o $@
 
 $(addprefix $(OUTPUT_PATH)/,$(A_OBJ)): $(OUTPUT_PATH)/%.o: %.s
 	@$(AS) -c $(ASFLAGS) $< -o $@

@@ -33,10 +33,10 @@
 /** Name of the board */
 #define VARIANT_NAME "SAM3S-EK"
 
-/*
 #define VARIANT_REV_A
-*/
+/*
 #define VARIANT_REV_B
+*/
 
 /** Frequency of the board main oscillator */
 #define VARIANT_MAINOSC           12000000
