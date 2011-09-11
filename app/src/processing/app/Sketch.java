@@ -36,6 +36,7 @@ import java.awt.event.*;
 import java.beans.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 import java.util.zip.*;
 
 import javax.swing.*;
@@ -718,26 +719,7 @@ public class Sketch {
     });
     
     if (pdeFiles != null && pdeFiles.length > 0) {
-      Object[] options = { "YES", "NO, Cancel" };
-      String prompt = "From Arduino 1.0, the file extension for sketches changed\n"
-          + "from \".pde\" to \".ino\".  This version of the software only\n"
-          + "supports the new extension.\n\n" 
-          + "By clicking YES, the following files will be renamed changing the\n"
-          + "extension from \".pde\" to \".ino\":\n\n";
-      for (File f : pdeFiles)
-        prompt += f.getName() + "\n";
-      prompt += "\nContinue?";
-      int result = JOptionPane.showOptionDialog(editor,
-                                                prompt,
-                                                "New extension",
-                                                JOptionPane.YES_NO_OPTION,
-                                                JOptionPane.QUESTION_MESSAGE,
-                                                null,
-                                                options,
-                                                options[0]);
-      if (result != JOptionPane.YES_OPTION)
-        return false;
-      
+      // Do rename of all .pde files to new .ino extension
       for (File pdeFile : pdeFiles)
         renameCodeToInoExtension(pdeFile);
     }
@@ -1404,7 +1386,7 @@ public class Sketch {
         }
 //        sc.setPreprocName(filename);
 
-      } else if (sc.isExtension("ino")) {
+      } else if (sc.isExtension("ino") || sc.isExtension("pde")) {
         // The compiler and runner will need this to have a proper offset
         sc.addPreprocOffset(headerOffset);
       }
@@ -1809,7 +1791,7 @@ public class Sketch {
    * For Processing, this is true for .pde files. (Broken out for subclasses.)
    */
   public boolean hideExtension(String what) {
-    return what.equals(getDefaultExtension());
+    return getHiddenExtensions().contains(what);
   }
 
 
@@ -1849,7 +1831,12 @@ public class Sketch {
     return "ino";
   }
 
+  static private List<String> hiddenExtensions = Arrays.asList("ino", "pde");
 
+  public List<String> getHiddenExtensions() {
+    return hiddenExtensions;
+  }
+  
   /**
    * Returns a String[] array of proper extensions.
    */
