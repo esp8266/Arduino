@@ -2,8 +2,8 @@
  %atmel_license%
 */
 
-#ifndef _VARIANT_
-#define _VARIANT_
+#ifndef _VARIANT_SAM3S_EK_
+#define _VARIANT_SAM3S_EK_
 
 /*----------------------------------------------------------------------------
  *        Headers
@@ -88,5 +88,5 @@ extern USARTClass Serial4 ;
 
 #endif
 
-#endif /* _VARIANT_ */
+#endif /* _VARIANT_SAM3S_EK_ */
 

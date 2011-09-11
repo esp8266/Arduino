@@ -3,6 +3,8 @@
 
 CHIP=__SAM3S4C__
 VARIANT=sam3s_ek
+#VARIANT=sam3u_ek
+#VARIANT=arduino_due
 TOOLCHAIN=gcc
 
 #-------------------------------------------------------------------------------
