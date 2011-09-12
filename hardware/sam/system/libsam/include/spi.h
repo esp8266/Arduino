@@ -70,6 +70,7 @@ extern void SPI_Write( Spi* spi, uint32_t dwNpcs, uint16_t wData ) ;
 extern uint32_t SPI_GetStatus( Spi* spi ) ;
 extern uint32_t SPI_IsFinished( Spi* pSpi ) ;
 
+#if (defined _SAM3S_) || (defined _SAM3S8_) || (defined _SAM3N_)
 extern void SPI_PdcEnableTx( Spi* spi ) ;
 extern void SPI_PdcDisableTx( Spi* spi ) ;
 extern void SPI_PdcEnableRx( Spi* spi ) ;
@@ -81,6 +82,7 @@ extern void SPI_PdcSetRx( Spi* spi, void* pvRxBuf, uint32_t dwRxCount, void* pvR
 extern uint32_t SPI_WriteBuffer( Spi* spi, void* pvBuffer, uint32_t dwLength ) ;
 
 extern uint32_t SPI_ReadBuffer( Spi* spi, void* pvBuffer, uint32_t dwLength ) ;
+#endif /* (defined _SAM3S_) || (defined _SAM3S8_) || (defined _SAM3N_) */
 
 #ifdef __cplusplus
 }

@@ -183,6 +183,7 @@ extern uint32_t SPI_IsFinished( Spi* spi )
     return ((spi->SPI_SR & SPI_SR_TXEMPTY) != 0) ;
 }
 
+#if (defined _SAM3S_) || (defined _SAM3S8_) || (defined _SAM3N_)
 /**
  * \brief Enable Spi PDC transmit
  * \param spi  Pointer to an Spi instance.
@@ -322,4 +323,5 @@ extern uint32_t SPI_ReadBuffer( Spi* spi, void *pvBuffer, uint32_t dwLength )
     return 0 ;
 }
 
+#endif /* (defined _SAM3S_) || (defined _SAM3S8_) || (defined _SAM3N_) */
 
