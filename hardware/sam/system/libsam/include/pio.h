@@ -21,8 +21,10 @@ typedef enum _EPioType
   PIO_NOT_A_PIN, /* The pin is controlled by the associated signal of peripheral A. */
   PIO_PERIPH_A, /* The pin is controlled by the associated signal of peripheral A. */
   PIO_PERIPH_B, /* The pin is controlled by the associated signal of peripheral B. */
+#if (defined _SAM3S_) || (defined _SAM3S8_) || (defined _SAM3N_)
   PIO_PERIPH_C, /* The pin is controlled by the associated signal of peripheral C. */
   PIO_PERIPH_D, /* The pin is controlled by the associated signal of peripheral D. */
+#endif /* (defined _SAM3S_) || (defined _SAM3S8_) || (defined _SAM3N_) */
   PIO_INPUT, /* The pin is an input. */
   PIO_OUTPUT_0, /* The pin is an output and has a default level of 0. */
   PIO_OUTPUT_1 /* The pin is an output and has a default level of 1. */

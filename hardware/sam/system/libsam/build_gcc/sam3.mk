@@ -94,7 +94,7 @@ C_SRC+=$(wildcard $(CMSIS_CHIP_PATH)/source/templates/gcc/*.c)
 C_OBJ_TEMP=$(patsubst %.c, %.o, $(notdir $(C_SRC)))
 
 # during development, remove some files
-C_OBJ_FILTER=pio_it.o
+C_OBJ_FILTER=pio_it.o adc.o
 
 C_OBJ=$(filter-out $(C_OBJ_FILTER), $(C_OBJ_TEMP))
 

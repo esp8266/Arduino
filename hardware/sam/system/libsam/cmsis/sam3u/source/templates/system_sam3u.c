@@ -15,9 +15,7 @@
 
 /* $asf_license$ */
 
-#include "system_sam3u.h"
-#include "sam3u.h"
-#include "sam3u_ek.h"
+#include "sam3.h"
 
 /* @cond 0 */
 /**INDENT-OFF**/

@@ -50,7 +50,13 @@ extern void PIO_PullUp( Pio *pPio, const uint32_t dwMask, const uint32_t dwPullU
  */
 extern void PIO_SetDebounceFilter( Pio* pPio, const uint32_t dwMask, const uint32_t dwCuttOff )
 {
+#if (defined _SAM3S_) || (defined _SAM3S8_) || (defined _SAM3N_)
     pPio->PIO_IFSCER = dwMask ; /* set Debouncing, 0 bit field no effect */
+#elif (defined _SAM3XA_) || (defined _SAM3U_)
+    pPio->PIO_DIFSR = dwMask ; /* set Debouncing, 0 bit field no effect */
+#else
+    #error "The specified chip is not supported."
+#endif
     pPio->PIO_SCDR = ((32678/(2*(dwCuttOff))) - 1) & 0x3FFF; /* the lowest 14 bits work */
 }
 
@@ -121,7 +127,7 @@ extern void PIO_Clear( Pio* pPio, const uint32_t dwMask )
  */
 extern void PIO_SetPeripheral( Pio* pPio, EPioType dwType, uint32_t dwMask )
 {
-    uint32_t dwABCDSR ;
+    uint32_t dwSR ;
 
     /* Disable interrupts on the pin(s) */
     pPio->PIO_IDR = dwMask ;
@@ -129,36 +135,52 @@ extern void PIO_SetPeripheral( Pio* pPio, EPioType dwType, uint32_t dwMask )
     switch ( dwType )
     {
         case PIO_PERIPH_A :
-            dwABCDSR = pPio->PIO_ABCDSR[0] ;
-            pPio->PIO_ABCDSR[0] &= (~dwMask & dwABCDSR) ;
+#if (defined _SAM3S_) || (defined _SAM3S8_) || (defined _SAM3N_)
+            dwSR = pPio->PIO_ABCDSR[0] ;
+            pPio->PIO_ABCDSR[0] &= (~dwMask & dwSR) ;
 
-            dwABCDSR = pPio->PIO_ABCDSR[1];
-            pPio->PIO_ABCDSR[1] &= (~dwMask & dwABCDSR) ;
+            dwSR = pPio->PIO_ABCDSR[1];
+            pPio->PIO_ABCDSR[1] &= (~dwMask & dwSR) ;
+#endif /* (defined _SAM3S_) || (defined _SAM3S8_) || (defined _SAM3N_) */
+
+#if (defined _SAM3U_) || (defined _SAM3XA_)
+            dwSR = pPio->PIO_ABSR ;
+            pPio->PIO_ABSR &= (~dwMask & dwSR) ;
+#endif /* (defined _SAM3U_) || (defined _SAM3XA_) */
         break ;
 
         case PIO_PERIPH_B :
-            dwABCDSR = pPio->PIO_ABCDSR[0] ;
-            pPio->PIO_ABCDSR[0] = (dwMask | dwABCDSR) ;
+#if (defined _SAM3S_) || (defined _SAM3S8_) || (defined _SAM3N_)
+            dwSR = pPio->PIO_ABCDSR[0] ;
+            pPio->PIO_ABCDSR[0] = (dwMask | dwSR) ;
 
-            dwABCDSR = pPio->PIO_ABCDSR[1] ;
-            pPio->PIO_ABCDSR[1] &= (~dwMask & dwABCDSR) ;
+            dwSR = pPio->PIO_ABCDSR[1] ;
+            pPio->PIO_ABCDSR[1] &= (~dwMask & dwSR) ;
+#endif /* (defined _SAM3S_) || (defined _SAM3S8_) || (defined _SAM3N_) */
+
+#if (defined _SAM3U_) || (defined _SAM3XA_)
+            dwSR = pPio->PIO_ABSR ;
+            pPio->PIO_ABSR = (dwMask | dwSR) ;
+#endif /* (defined _SAM3U_) || (defined _SAM3XA_) */
         break ;
 
+#if (defined _SAM3S_) || (defined _SAM3S8_) || (defined _SAM3N_)
         case PIO_PERIPH_C :
-            dwABCDSR = pPio->PIO_ABCDSR[0] ;
-            pPio->PIO_ABCDSR[0] &= (~dwMask & dwABCDSR) ;
+            dwSR = pPio->PIO_ABCDSR[0] ;
+            pPio->PIO_ABCDSR[0] &= (~dwMask & dwSR) ;
 
-            dwABCDSR = pPio->PIO_ABCDSR[1] ;
-            pPio->PIO_ABCDSR[1] = (dwMask | dwABCDSR) ;
+            dwSR = pPio->PIO_ABCDSR[1] ;
+            pPio->PIO_ABCDSR[1] = (dwMask | dwSR) ;
         break ;
 
         case PIO_PERIPH_D :
-            dwABCDSR = pPio->PIO_ABCDSR[0] ;
-            pPio->PIO_ABCDSR[0] = (dwMask | dwABCDSR) ;
+            dwSR = pPio->PIO_ABCDSR[0] ;
+            pPio->PIO_ABCDSR[0] = (dwMask | dwSR) ;
 
-            dwABCDSR = pPio->PIO_ABCDSR[1] ;
-            pPio->PIO_ABCDSR[1] = (dwMask | dwABCDSR) ;
+            dwSR = pPio->PIO_ABCDSR[1] ;
+            pPio->PIO_ABCDSR[1] = (dwMask | dwSR) ;
         break ;
+#endif /* (defined _SAM3S_) || (defined _SAM3S8_) || (defined _SAM3N_) */
 
         // other types are invalid in this function
         case PIO_INPUT :
@@ -196,6 +218,7 @@ extern void PIO_SetInput( Pio* pPio, uint32_t dwMask, uint32_t dwAttribute )
     }
 
     /* Enable de-glitch or de-bounce if necessary */
+#if (defined _SAM3S_) || (defined _SAM3S8_) || (defined _SAM3N_)
     if ( dwAttribute & PIO_DEGLITCH )
     {
         pPio->PIO_IFSCDR = dwMask ;
@@ -207,6 +230,21 @@ extern void PIO_SetInput( Pio* pPio, uint32_t dwMask, uint32_t dwAttribute )
             pPio->PIO_IFSCER = dwMask ;
         }
     }
+#elif (defined _SAM3U_) || (defined _SAM3XA_)
+    if ( dwAttribute & PIO_DEGLITCH )
+    {
+        pPio->PIO_SCIFSR = dwMask ;
+    }
+    else
+    {
+        if ( dwAttribute & PIO_DEBOUNCE )
+        {
+            pPio->PIO_SCIFSR = dwMask ;
+        }
+    }
+#else
+    #error "The specified chip is not supported."
+#endif
 
     /* Configure pin as input */
     pPio->PIO_ODR = dwMask ;
@@ -266,8 +304,10 @@ extern uint32_t PIO_Configure( Pio* pPio, const EPioType dwType, const uint32_t 
     {
         case PIO_PERIPH_A :
         case PIO_PERIPH_B :
+#if (defined _SAM3S_) || (defined _SAM3S8_) || (defined _SAM3N_)
         case PIO_PERIPH_C :
         case PIO_PERIPH_D :
+#endif /* (defined _SAM3S_) || (defined _SAM3S8_) || (defined _SAM3N_) */
             /* Put the pin under control of peripheral */
             PIO_SetPeripheral( pPio, dwType, dwMask ) ;
             /* Disable interrupts on the pin(s) */

@@ -1,8 +1,8 @@
 # Makefile for compiling libArduino
 .SUFFIXES: .o .a .c .s
 
-CHIP=__SAM3S4C__
-VARIANT=sam3s_ek
+CHIP=__SAM3U4E__
+VARIANT=arduino_due
 LIBNAME=libarduino_$(VARIANT)
 TOOLCHAIN=gcc
 
