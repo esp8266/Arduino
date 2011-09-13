@@ -27,6 +27,8 @@ public:
 
   friend class WiFiServer;
 
+  using Print::write;
+
 private:
   static uint16_t _srcport;
   uint8_t _sock;   //not used

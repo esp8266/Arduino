@@ -46,13 +46,15 @@ WiFiClient WiFiServer::available(byte* status)
     return WiFiClient(255);
 }
 
-void WiFiServer::write(uint8_t b)
+size_t WiFiServer::write(uint8_t b)
 {
-    write(&b, 1);
+    return write(&b, 1);
 }
 
-void WiFiServer::write(const uint8_t *buffer, size_t size)
+size_t WiFiServer::write(const uint8_t *buffer, size_t size)
 {
+	size_t n = 0;
+
     for (int sock = 0; sock < MAX_SOCK_NUM; sock++)
     {
         if (WiFiClass::_server_port[sock] != 0)
@@ -62,8 +64,9 @@ void WiFiServer::write(const uint8_t *buffer, size_t size)
             if (WiFiClass::_server_port[sock] == _port &&
                 client.status() == ESTABLISHED)
             {                
-                client.write(buffer, size);
+                n+=client.write(buffer, size);
             }
         }
     }
+    return n;
 }
