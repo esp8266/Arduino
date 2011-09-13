@@ -61,17 +61,6 @@ size_t WiFiClient::write(uint8_t b) {
   return 0;
 }
 
-size_t WiFiClient::write(const char *str) {
-  if (_sock != 255)
-  {
-      unsigned int len = strlen(str);
-      ServerDrv::sendData(_sock, (const uint8_t *)str, len);
-      while (!ServerDrv::isDataSent(_sock));
-      return len;
-  }
-  return 0;
-}
-
 size_t WiFiClient::write(const uint8_t *buf, size_t size) {
   if (_sock != 255)
   {
