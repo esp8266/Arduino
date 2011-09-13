@@ -152,9 +152,12 @@ RingBuffer rx_buffer2 ;
 RingBuffer tx_buffer2 ;
 RingBuffer rx_buffer3 ;
 RingBuffer tx_buffer3 ;
+RingBuffer rx_buffer4 ;
+RingBuffer tx_buffer4 ;
 
 USARTClass Serial2( USART0, USART0_IRQn, ID_USART0, &rx_buffer2, &tx_buffer2 ) ;
 USARTClass Serial3( USART1, USART1_IRQn, ID_USART1, &rx_buffer3, &tx_buffer3 ) ;
+USARTClass Serial4( USART2, USART2_IRQn, ID_USART2, &rx_buffer4, &tx_buffer4 ) ;
 
 #ifdef __cplusplus
 extern "C" {
@@ -169,6 +172,11 @@ extern void USART0_IrqHandler( void )
 extern void USART1_IrqHandler( void )
 {
   Serial3.IrqHandler() ;
+}
+
+extern void USART2_IrqHandler( void )
+{
+  Serial4.IrqHandler() ;
 }
 
 #ifdef __cplusplus
@@ -198,14 +206,9 @@ extern void init( void )
   /* Disable watchdog, common to all SAM variants */
   WDT_Disable( WDT ) ;
 
-  // Initialize Serial port UART0, common to all SAM3 variants
+  // Initialize Serial port UART, common to all SAM3 variants
   PIO_Configure( g_APinDescription[PINS_UART].pPort, g_APinDescription[PINS_UART].ulPinType,
                  g_APinDescription[PINS_UART].ulPin, g_APinDescription[PINS_UART].ulPinAttribute ) ;
-
-  // Switch off Power LED
-  PIO_Configure( g_APinDescription[PIN_LED_RED].pPort, g_APinDescription[PIN_LED_RED].ulPinType,
-                 g_APinDescription[PIN_LED_RED].ulPin, g_APinDescription[PIN_LED_RED].ulPinAttribute ) ;
-  PIO_Clear( g_APinDescription[PIN_LED_RED].pPort, g_APinDescription[PIN_LED_RED].ulPin ) ;
 }
 #ifdef __cplusplus
 }

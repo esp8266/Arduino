@@ -11,9 +11,9 @@ void setup( void )
   pinMode( PIN_LED, OUTPUT ) ;
   digitalWrite( PIN_LED, LOW ) ;
 
-  // Initialize the PIN_LED_GREEN digital pin as an output.
-  pinMode( PIN_LED_GREEN, OUTPUT ) ;
-  digitalWrite( PIN_LED_GREEN, HIGH ) ;
+  // Initialize the PIN_LED2 digital pin as an output.
+  pinMode( PIN_LED2, OUTPUT ) ;
+  digitalWrite( PIN_LED2, HIGH ) ;
 
   Serial.begin( 19200 ) ;
 }
@@ -21,10 +21,10 @@ void setup( void )
 void loop( void )
 {
   digitalWrite( PIN_LED, HIGH ) ;  // set the LED on
-  digitalWrite( PIN_LED_GREEN, LOW ) ;   // set the red LED off
+  digitalWrite( PIN_LED2, LOW ) ;   // set the red LED off
   delay( 1000 ) ;              // wait for a second
   digitalWrite( PIN_LED, LOW ) ;   // set the LED off
-  digitalWrite( PIN_LED_GREEN, HIGH ) ;  // set the red LED on
+  digitalWrite( PIN_LED2, HIGH ) ;  // set the red LED on
   delay( 1000 ) ;              // wait for a second
 
 //  Serial.write( '*' ) ;   // send an initial char

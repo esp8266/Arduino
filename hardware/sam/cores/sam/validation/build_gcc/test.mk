@@ -1,11 +1,21 @@
 # Makefile for compiling libArduino
 .SUFFIXES: .o .a .c .s
 
-#CHIP=__SAM3S4C__
-CHIP=__SAM3U4E__
+# putting default variant
+ifeq ("$(VARIANT)", "")
 #VARIANT=sam3s_ek
-VARIANT=sam3u_ek
-#VARIANT=arduino_due
+#VARIANT=sam3u_ek
+VARIANT=arduino_due
+endif
+
+ifeq ("$(VARIANT)", "sam3s_ek")
+CHIP=__SAM3S4C__
+else ifeq ("$(VARIANT)", "sam3u_ek")
+CHIP=__SAM3U4E__
+else ifeq ("$(VARIANT)", "arduino_due")
+CHIP=__SAM3U4E__
+endif
+
 TOOLCHAIN=gcc
 
 #-------------------------------------------------------------------------------

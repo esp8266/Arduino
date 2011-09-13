@@ -1,5 +1,5 @@
 #VARIANTS = sam3s_ek sam3u_ek arduino_due
-VARIANTS = sam3u_ek
+VARIANTS = arduino_due
 
 SUBMAKE_OPTIONS=--no-builtin-rules --no-builtin-variables
 

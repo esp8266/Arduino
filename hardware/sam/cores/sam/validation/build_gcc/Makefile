@@ -1,6 +1,3 @@
-# Makefile for compiling libboard
-BOARD = 
-
 SUBMAKE_OPTIONS=--no-builtin-rules --no-builtin-variables
 
 #-------------------------------------------------------------------------------

@@ -25,13 +25,13 @@ extern "C" {
 /**INDENT-ON**/
 /* @endcond */
 
-/* Clock settings (48MHz) */
+/* Clock settings (96MHz) */
 #define BOARD_OSCOUNT   (CKGR_MOR_MOSCXTST(0x8))
 #define BOARD_PLLAR     (CKGR_PLLAR_STUCKTO1 \
                        | CKGR_PLLAR_MULA(0x7) \
                        | CKGR_PLLAR_PLLACOUNT(0x3f) \
                        | CKGR_PLLAR_DIVA(0x1))
-#define BOARD_MCKR      (PMC_MCKR_PRES_CLK_2 | PMC_MCKR_CSS_PLLA_CLK)
+#define BOARD_MCKR      (PMC_MCKR_PRES_CLK | PMC_MCKR_CSS_PLLA_CLK)
 
 /* Clock Definitions */
 #define XTAL32      	(   32768UL)	/* 32k crystal frequency             */

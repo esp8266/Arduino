@@ -48,17 +48,23 @@
  *        Pins
  *----------------------------------------------------------------------------*/
 
-#define PIN_LED_BLUE         (0u)
-#define PIN_LED_GREEN        (1u)
-#define PIN_LED_RED          (2u)
-#define PIN_LED              PIN_LED_BLUE
+#define PIN_LED_13           (0u)
+#define PIN_LED_RXL          (1u)
+#define PIN_LED_TXL          (2u)
+#define PIN_LED              PIN_LED_13
+#define PIN_LED2             PIN_LED_RXL
+#define PIN_LED3             PIN_LED_TXL
 
-static const uint8_t SS   = 23 ;
-static const uint8_t MOSI = 21 ;
-static const uint8_t MISO = 20 ;
-static const uint8_t SCK  = 22 ;
+static const uint8_t SS   = 15 ;
+static const uint8_t MOSI = 13 ;
+static const uint8_t MISO = 12 ;
+static const uint8_t SCK  = 14 ;
 
-#define PINS_UART            (6u)
+#define PINS_UART            (5u)
+
+#define PINS_USART0          (5u)
+#define PINS_USART1          (5u)
+#define PINS_USART2          (5u)
 
 /*----------------------------------------------------------------------------
  *        Arduino objects - C++ only
@@ -70,6 +76,7 @@ extern UARTClass Serial ;
 
 extern USARTClass Serial2 ;
 extern USARTClass Serial3 ;
+extern USARTClass Serial4 ;
 
 #endif
 
