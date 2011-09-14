@@ -25,7 +25,7 @@ connected	KEYWORD2
 begin	KEYWORD2
 disconnect	KEYWORD2
 macAddress	KEYWORD2
-localIp	KEYWORD2
+localIP	KEYWORD2
 subnetMask	KEYWORD2
 gatewayIP	KEYWORD2
 SSID	KEYWORD2
@@ -34,7 +34,8 @@ RSSI	KEYWORD2
 encryptionType	KEYWORD2
 getResult	KEYWORD2
 getSocket	KEYWORD2
-
+WiFiClient	KEYWORD2
+WiFiServer	KEYWORD2
 
 #######################################
 # Constants (LITERAL1)
