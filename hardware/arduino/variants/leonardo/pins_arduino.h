@@ -48,6 +48,10 @@ const static uint8_t A5 = 19;
 const static uint8_t A6 = 20;
 const static uint8_t A7 = 21;
 
+//	__AVR_ATmega32U4__ has an unusual mapping of pins to channels
+extern const uint8_t PROGMEM analog_pin_to_channel_PGM[];
+#define analogPinToChannel(P)  ( pgm_read_byte( analog_pin_to_channel_PGM + (P) ) )
+
 #ifdef ARDUINO_MAIN
 
 // On the Arduino board, digital pins are also used
@@ -226,6 +230,35 @@ const uint8_t PROGMEM digital_pin_to_timer_PGM[18] = {
 	
 	NOT_ON_TIMER,	/* 14 port B */
 	NOT_ON_TIMER,
+};
+
+const uint8_t PROGMEM analog_pin_to_channel_PGM[11] = {
+	/*
+	 A0		PF7							ADC7
+	 A1		PF6							ADC6
+	 A2		PF5							ADC5
+	 A3		PF4							ADC4
+	 A4		PF1							ADC1
+	 A5		PF0							ADC0
+	 D4		A6		PD4					ADC8
+	 D5		A7		PD6		FastPWM		OC4D/ADC9
+	 D6		A8		PD7		FastPWM		#OC4D/ADC10
+	 D9		A9		PB5		PWM16		OC1A/#OC4B/ADC13/PCINT5
+	 D10	A10		PB6		PWM16		OC1B/0c4B/ADC12/PCINT6
+	 */
+	
+	7,
+	6,
+	5,
+	4,
+	1,
+	0,
+	8,
+	9,
+	
+	10,
+	13,
+	12
 };
 
 #endif
