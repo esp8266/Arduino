@@ -57,7 +57,7 @@ public:
 	void click(uint8_t b = MOUSE_LEFT);
 	void move(signed char x, signed char y, signed char wheel = 0);	
 	void press(uint8_t b = MOUSE_LEFT);		// press LEFT by default
-	void release(uint8_t b = MOUSE_LEFT);	// release LEFT by default		
+	void release(uint8_t b = MOUSE_LEFT);	// release LEFT by default
 };
 extern Mouse_ Mouse;
 
@@ -93,11 +93,12 @@ public:
 //	
 class Keyboard_ : public Print
 {
+private:
 	KeyMap* _keyMap;
+	void sendReport(KeyReport* keys);
+	void setKeyMap(KeyMap* keyMap);	
 public:
 	Keyboard_();
-	void sendReport(KeyReport* keys);
-	void setKeyMap(KeyMap* keyMap);
 	virtual size_t write(uint8_t);
 };
 extern Keyboard_ Keyboard;
