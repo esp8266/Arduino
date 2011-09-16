@@ -1,23 +1,5 @@
 ##############################################################
 
-leonardo.name=Arduino Leonardo
-leonardo.upload.protocol=arduino
-leonardo.upload.maximum_size=30720
-leonardo.upload.speed=1200
-leonardo.bootloader.low_fuses=0xde
-leonardo.bootloader.high_fuses=0xda
-leonardo.bootloader.extended_fuses=0xcb
-leonardo.bootloader.path=diskloader
-leonardo.bootloader.file=DiskLoader.hex
-leonardo.bootloader.unlock_bits=0x3F
-leonardo.bootloader.lock_bits=0x2F
-leonardo.build.mcu=atmega32u4
-leonardo.build.f_cpu=16000000L
-leonardo.build.core=arduino
-leonardo.build.variant=leonardo
-
-##############################################################
-
 uno.name=Arduino Uno
 uno.upload.protocol=arduino
 uno.upload.maximum_size=32256
@@ -33,6 +15,24 @@ uno.build.mcu=atmega328p
 uno.build.f_cpu=16000000L
 uno.build.core=arduino
 uno.build.variant=standard
+
+##############################################################
+
+leonardo.name=Arduino Leonardo
+leonardo.upload.protocol=arduino
+leonardo.upload.maximum_size=30720
+leonardo.upload.speed=1200
+leonardo.bootloader.low_fuses=0xde
+leonardo.bootloader.high_fuses=0xda
+leonardo.bootloader.extended_fuses=0xcb
+leonardo.bootloader.path=diskloader
+leonardo.bootloader.file=DiskLoader.hex
+leonardo.bootloader.unlock_bits=0x3F
+leonardo.bootloader.lock_bits=0x2F
+leonardo.build.mcu=atmega32u4
+leonardo.build.f_cpu=16000000L
+leonardo.build.core=arduino
+leonardo.build.variant=leonardo
 
 ##############################################################
 
