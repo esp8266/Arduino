@@ -27,9 +27,14 @@ const u16 STRING_LANGUAGE[2] = {
 	0x0409	// English
 };
 
-const u16 STRING_IPRODUCT[17] = {
-	(3<<8) | (2+2*16),
-	'A','r','d','u','i','n','o',' ','L','e','o','n','a','r','d','o'
+
+const u16 STRING_IPRODUCT[28] = {
+	(3<<8) | (2+2*27),
+#if USB_PID == USB_PID_LEONARDO	
+	'A','r','d','u','i','n','o',' ','L','e','o','n','a','r','d','o',' ','b','o','o','t','l','o','a','d','e','r'
+#elif USB_PID == USB_PID_MICRO
+	'A','r','d','u','i','n','o',' ','M','i','c','r','o',' ','b','o','o','t','l','o','a','d','e','r',' ',' ',' '
+#endif
 };
 
 const u16 STRING_IMANUFACTURER[12] = {

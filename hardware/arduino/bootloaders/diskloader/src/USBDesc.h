@@ -53,7 +53,7 @@ extern DeviceDescriptor USB_DeviceDescriptor PROGMEM;
 extern DeviceDescriptor USB_DeviceDescriptorA PROGMEM;
 
 extern const u16 STRING_LANGUAGE[2] PROGMEM;
-extern const u16 STRING_IPRODUCT[17] PROGMEM;
+extern const u16 STRING_IPRODUCT[28] PROGMEM;
 extern const u16 STRING_IMANUFACTURER[12] PROGMEM;
 
 #define IMANUFACTURER	1
