@@ -960,9 +960,9 @@ public class Base {
     
     try {
 		//Find the current target. Get the platform, and then select the correct name and core path.
-	    	String platformname = this.getBoardPreferences().get("platform");
-	    	String targetname = this.getPlatformPreferences(platformname).get("name");
-	        String libraryPath = this.getPlatformPreferences(platformname).get("library.core.path");
+	    	String platformname = getBoardPreferences().get("platform");
+	    	String targetname = getPlatformPreferences(platformname).get("name");
+	        String libraryPath = getPlatformPreferences(platformname).get("library.core.path");
 
 		JMenuItem platformItem = new JMenuItem(targetname);
 		platformItem.setEnabled(false);
@@ -1554,7 +1554,7 @@ public class Base {
   
   static public Target getTarget() {
   	System.out.println("Base.targetsTable.get(Preferences.get(\"target\"))" + Base.targetsTable.get(Preferences.get("target")));
-  	System.out.println("Preferences.get(\"target\")" + Preferences.get("target"));
+  	System.out.println("Preferences.get(\"target\") = " + Preferences.get("target"));
   	Target target = Base.targetsTable.get(Preferences.get("target"));
   	if (target == null) {
   		System.out.println("default target is not in list. Replace with default.");
@@ -1642,16 +1642,17 @@ static public Map<String, String> getPlatformPreferences() {
 
     return map;
   }
- 
-static public Map<String, String> getBoardPreferences() {
+
+  static public Map<String, String> getBoardPreferences() {
     Target target = getTarget();
-    Map map = new LinkedHashMap();
-	if (target != null) {
-	    map = target.getBoards();
-	    map = (Map) map.get(Preferences.get("board"));
-	}
-    return map;
-  } 
+    if (target != null) {
+      Map<String, Map<String, String>> map = target.getBoards();
+      Map<String, String> res = map.get(Preferences.get("board"));
+      if (res != null)
+        return res;
+    }
+    return new HashMap<String, String>();
+  }
 
   static public File getSketchbookFolder() {
     return new File(Preferences.get("sketchbook.path"));
