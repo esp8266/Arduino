@@ -374,6 +374,10 @@ bool SendDescriptor()
 	{
 		if (setup.wValueL == 0)
 			desc_addr = (const u8*)&STRING_LANGUAGE;
+		else if (setup.wValueL == IPRODUCT) 
+			desc_addr = (const u8*)&STRING_IPRODUCT;
+		else if (setup.wValueL == IMANUFACTURER)
+			desc_addr = (const u8*)&STRING_IMANUFACTURER;
 		else
 			return false;
 	} else 
