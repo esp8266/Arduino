@@ -225,6 +225,14 @@ void analogWrite(uint8_t pin, int val)
 				OCR4C = val; // set pwm duty
 				break;
 			#endif
+				
+			#if defined(TCCR4A) && defined(COM4D1)
+			case TIMER4D:
+				// connect pwm to pin on timer 4, channel D
+				sbi(TCCR4A, COM4D1);
+				OCR4D = val; // set pwm duty
+				break;
+			#endif
 
 			#if defined(TCCR5A) && defined(COM5A1)
 			case TIMER5A:
