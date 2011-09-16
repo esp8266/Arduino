@@ -243,6 +243,13 @@ void Mouse_::release(uint8_t b)
 	buttons(_buttons & ~b);
 }
 
+bool Mouse_::isPressed(uint8_t b)
+{
+	if (b & _buttons > 0) 
+		return true;
+	return false;
+}
+
 //================================================================================
 //================================================================================
 //	Keyboard
