@@ -34,7 +34,8 @@
 //==================================================================
 
 extern const u16 STRING_LANGUAGE[] PROGMEM;
-extern const u16 STRING_SERIAL[] PROGMEM;
+extern const u16 STRING_IPRODUCT[] PROGMEM;
+extern const u16 STRING_IMANUFACTURER[] PROGMEM;
 extern const DeviceDescriptor USB_DeviceDescriptor PROGMEM;
 extern const DeviceDescriptor USB_DeviceDescriptorA PROGMEM;
 
@@ -43,16 +44,18 @@ const u16 STRING_LANGUAGE[2] = {
 	0x0409	// English
 };
 
-#if 0
-const u16 STRING_PRODUCT[] = {
-	(3<<8) | (2+2*10),
-	PRODUCT_NAME
-};
+const u16 STRING_IPRODUCT[17] = {
+	(3<<8) | (2+2*16),
+#if USB_PID == USB_PID_LEONARDO	
+	'A','r','d','u','i','n','o',' ','L','e','o','n','a','r','d','o'
+#elif USB_PID == USB_PID_MICRO
+	'A','r','d','u','i','n','o',' ','M','i','c','r','o',' ',' ',' '
 #endif
+};
 
-const u16 STRING_SERIAL[13] = {
-	(3<<8) | (2+2*12),
-	MSC_DISK_SERIAL
+const u16 STRING_IMANUFACTURER[12] = {
+	(3<<8) | (2+2*11),
+	'A','r','d','u','i','n','o',' ','L','L','C'
 };
 
 #ifdef CDC_ENABLED
@@ -63,10 +66,10 @@ const u16 STRING_SERIAL[13] = {
 
 //	DEVICE DESCRIPTOR
 const DeviceDescriptor USB_DeviceDescriptor =
-	D_DEVICE(0x00,0x00,0x00,64,USB_VID,USB_PID,0x100,0,IPRODUCT,ISERIAL,1);
+	D_DEVICE(0x00,0x00,0x00,64,USB_VID,USB_PID,0x100,IMANUFACTURER,IPRODUCT,0,1);
 
 const DeviceDescriptor USB_DeviceDescriptorA =
-	D_DEVICE(DEVICE_CLASS,0x00,0x00,64,USB_VID,USB_PID,0x100,0,IPRODUCT,ISERIAL,1);
+	D_DEVICE(DEVICE_CLASS,0x00,0x00,64,USB_VID,USB_PID,0x100,IMANUFACTURER,IPRODUCT,0,1);
 
 //==================================================================
 //==================================================================
@@ -473,8 +476,12 @@ bool SendDescriptor(Setup& setup)
 	{
 		if (setup.wValueL == 0)
 			desc_addr = (const u8*)&STRING_LANGUAGE;
-		if (setup.wValueL == ISERIAL)
-			desc_addr = (const u8*)&STRING_SERIAL;
+		else if (setup.wValueL == IPRODUCT) 
+			desc_addr = (const u8*)&STRING_IPRODUCT;
+		else if (setup.wValueL == IMANUFACTURER)
+			desc_addr = (const u8*)&STRING_IMANUFACTURER;
+		else
+			return false;
 	}
 
 	if (desc_addr == 0)
