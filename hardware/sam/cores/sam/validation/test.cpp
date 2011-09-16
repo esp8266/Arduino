@@ -18,7 +18,7 @@ void setup( void )
   Serial.begin( 115200 ) ;
 }
 
-void led_step1( void )
+static void led_step1( void )
 {
 #if defined sam3s_ek
   digitalWrite( PIN_LED, HIGH ) ;  // set the LED on
@@ -36,7 +36,7 @@ void led_step1( void )
 #endif /* arduino_due */
 }
 
-void led_step2( void )
+static void led_step2( void )
 {
 #if defined sam3s_ek
   digitalWrite( PIN_LED, LOW ) ;   // set the LED off
@@ -61,8 +61,7 @@ void loop( void )
   led_step2() ;
   delay( 1000 ) ;              // wait for a second
 
-  Serial.write( '-' ) ;   // send an initial char
-  Serial.println( "test1\n" ) ;   // send an initial string
-//  delay( 1000 ) ;               // wait for a second
-//  Serial.println( "test2" ) ;   // send an initial string
+  Serial.write( '-' ) ;   // send a char
+  Serial.println( "test1\n" ) ;   // send a string
+  Serial.println( "test2" ) ;   // send another string
 }

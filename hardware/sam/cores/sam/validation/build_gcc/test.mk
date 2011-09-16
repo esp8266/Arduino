@@ -4,8 +4,8 @@
 # putting default variant
 ifeq ("$(VARIANT)", "")
 #VARIANT=sam3s_ek
-VARIANT=sam3u_ek
-#VARIANT=arduino_due
+#VARIANT=sam3u_ek
+VARIANT=arduino_due
 endif
 
 ifeq ("$(VARIANT)", "sam3s_ek")

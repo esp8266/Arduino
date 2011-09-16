@@ -69,7 +69,7 @@ C_SRC=$(wildcard $(PROJECT_BASE_PATH)/*.c)
 C_OBJ_TEMP = $(patsubst %.c, %.o, $(notdir $(C_SRC)))
 
 # during development, remove some files
-C_OBJ_FILTER=wiring_analog.o wiring_pulse.o dlib_lowlevel_sam3.o
+C_OBJ_FILTER=dlib_lowlevel_sam3.o
 
 C_OBJ=$(filter-out $(C_OBJ_FILTER), $(C_OBJ_TEMP))
 
@@ -81,7 +81,7 @@ CPP_SRC=$(wildcard $(PROJECT_BASE_PATH)/*.cpp)
 CPP_OBJ_TEMP = $(patsubst %.cpp, %.o, $(notdir $(CPP_SRC)))
 
 # during development, remove some files
-CPP_OBJ_FILTER=Tone.o
+CPP_OBJ_FILTER=
 
 CPP_OBJ=$(filter-out $(CPP_OBJ_FILTER), $(CPP_OBJ_TEMP))
 
