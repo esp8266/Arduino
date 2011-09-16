@@ -142,7 +142,7 @@ extern void init( void )
   /* Disable watchdog, common to all SAM variants */
   WDT_Disable( WDT ) ;
 
-  // Initialize Serial port UART0, common to all SAM3 variants
+  // Initialize UART Serial port 
   PIO_Configure( g_APinDescription[PINS_UART].pPort, g_APinDescription[PINS_UART].ulPinType,
                  g_APinDescription[PINS_UART].ulPin, g_APinDescription[PINS_UART].ulPinAttribute ) ;
 

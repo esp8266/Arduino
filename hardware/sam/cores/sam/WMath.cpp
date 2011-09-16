@@ -6,6 +6,7 @@ extern "C" {
   #include "stdlib.h"
   #include "stdint.h"
 }
+#include "WMath.h"
 
 extern void randomSeed( uint32_t dwSeed )
 {
@@ -42,7 +43,7 @@ extern long map(long x, long in_min, long in_max, long out_min, long out_max)
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-extern uint16_t makeWord( uint32_t w )
+extern uint16_t makeWord( uint16_t w )
 {
   return w ;
 }

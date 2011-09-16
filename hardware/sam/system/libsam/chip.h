@@ -10,9 +10,6 @@
  */
 #include "include/sam3.h"
 
-/** Define MAX number of Interrupts: (IRQn_Type+1) + 8 for CM3 core */
-#define EXTERNAL_NUM_INTERRUPTS (UDP_IRQn+1+8)
-
 /* Define attribute */
 #if defined (  __GNUC__  ) /* GCC CS3 */
     #define WEAK __attribute__ ((weak))

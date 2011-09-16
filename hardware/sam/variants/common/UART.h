@@ -1,13 +1,18 @@
+/*
+ %atmel_license%
+*/
+
 #ifndef _UART_CLASS_
 #define _UART_CLASS_
-
-// UART.cpp need this class to be predefined
-//class UARTClass ;
 
 #include "Arduino.h"
 
 class UARTClass : public HardwareSerial
 {
+  protected:
+    RingBuffer *_rx_buffer ;
+    RingBuffer *_tx_buffer ;
+
   protected:
     Uart* _pUart ;
     IRQn_Type _dwIrq ;
@@ -29,8 +34,8 @@ class UARTClass : public HardwareSerial
 #if defined __GNUC__ /* GCC CS3 */
     using Print::write ; // pull in write(str) and write(buf, size) from Print
 #elif defined __ICCARM__ /* IAR Ewarm 5.41+ */
-    virtual void write( const char *str ) ;
-    virtual void write( const uint8_t *buffer, size_t size ) ;
+//    virtual void write( const char *str ) ;
+//    virtual void write( const uint8_t *buffer, size_t size ) ;
 #endif
 };
 

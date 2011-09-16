@@ -8,12 +8,12 @@
  * published by the Free Software Foundation.
  */
 
-#include "pins_arduino.h"
 #include "SPI.h"
 
-SPIClass SPI;
+SPIClass SPI ;
 
-void SPIClass::begin() {
+void SPIClass::begin()
+{
   // Set direction register for SCK and MOSI pin.
   // MISO pin automatically overrides to INPUT.
   // When the SS pin is set as OUTPUT, it can be used as

@@ -27,5 +27,7 @@ set *0x80004 = *0x80004 & 0xFFFFFFFE
 mon reg pc=(0x80004)
 info reg
 
+break main
+
 # end of 'reset' command
 end

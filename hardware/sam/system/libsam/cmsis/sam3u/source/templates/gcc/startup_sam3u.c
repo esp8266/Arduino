@@ -4,13 +4,13 @@
  *
  * This file defines common SAM series.
  *
- * - Compiler:           Codesoucery
+ * - Compiler:           ARMGCC
  * - Supported devices:  All SAM3U devices can be used.
  * - AppNote:
  *
  ******************************************************************************/
 
-// $asf_license$
+/* $asf_license$ */
 
 /*----------------------------------------------------------------------------
  *        Headers

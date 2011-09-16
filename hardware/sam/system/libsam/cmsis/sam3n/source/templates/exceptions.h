@@ -4,7 +4,7 @@
  *
  * \par Purpose
  *
- * This file provides basic support for Cortex-M processor based 
+ * This file provides basic support for Cortex-M processor based
  * microcontrollers.
  *
  * \author               Atmel Corporation: http://www.atmel.com \n
@@ -26,7 +26,7 @@ extern "C" {
 /* @endcond */
 
 /* Function prototype for exception table items (interrupt handler). */
-typedef void( *IntFunc )( void ) ;
+typedef void (*IntFunc) (void);
 
 /* Default empty handler */
 extern void Dummy_Handler( void ) ;

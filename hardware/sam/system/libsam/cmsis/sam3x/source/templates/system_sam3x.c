@@ -16,7 +16,7 @@
 /* $asf_license$ */
 
 #include "system_sam3x.h"
-#include "sam3.h"
+#include "sam3xa.h"
 
 /* @cond 0 */
 /**INDENT-OFF**/
@@ -29,10 +29,10 @@ extern "C" {
 /* Clock settings (84MHz) */
 #define BOARD_OSCOUNT   (CKGR_MOR_MOSCXTST(0x8))
 #define BOARD_PLLAR     (CKGR_PLLAR_STUCKTO1 \
-                       | CKGR_PLLAR_MULA(0xd) \
+                       | CKGR_PLLAR_MULA(0x6) \
                        | CKGR_PLLAR_PLLACOUNT(0x3f) \
                        | CKGR_PLLAR_DIVA(0x1))
-#define BOARD_MCKR      (PMC_MCKR_PRES_CLK_2 | PMC_MCKR_CSS_PLLA_CLK)
+#define BOARD_MCKR      (PMC_MCKR_PRES_CLK_1 | PMC_MCKR_CSS_PLLA_CLK)
 
 /* Clock Definitions */
 #define XTAL32      	(   32768UL)	/* 32k crystal frequency             */
@@ -135,7 +135,7 @@ extern void SystemCoreClockUpdate( void )
 				break;
 			}
 		}
-		if (PMC->PMC_MCKR & PMC_MCKR_CSS_Msk == PMC_MCKR_CSS_PLLA_CLK) {
+		if ((PMC->PMC_MCKR & PMC_MCKR_CSS_Msk) == PMC_MCKR_CSS_PLLA_CLK) {
 		SystemCoreClock *= ((((PMC->CKGR_PLLAR) >> CKGR_PLLAR_MULA_Pos) & 0x7FF) + 1);
 		SystemCoreClock /= ((((PMC->CKGR_PLLAR) >> CKGR_PLLAR_DIVA_Pos) & 0x0FF));
 		}
