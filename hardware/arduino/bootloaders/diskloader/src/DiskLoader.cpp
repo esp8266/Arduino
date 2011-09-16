@@ -220,10 +220,10 @@ int main()
 u16 _pulse;
 void LEDPulse()
 {
-	_pulse++;
-	u8 p = _pulse >> 8;
-	if (p > 127)
-		p = 255-p;
+	_pulse += 4;
+	u8 p = _pulse >> 9;
+	if (p > 63)
+		p = 127-p;
 	p += p;
 	if (((u8)_pulse) > p)
 		LED0;
