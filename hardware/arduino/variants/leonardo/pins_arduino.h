@@ -28,9 +28,10 @@
 #include <avr/pgmspace.h>
 
 #define ARDUINO_MODEL_USB_PID	0x0034
-#define TX_RX_LED_INIT	DDRE |= (1<<6), DDRB |= (1<<0)
-#define TXLED0			PORTE |= (1<<6)
-#define TXLED1			PORTE &= ~(1<<6)
+
+#define TX_RX_LED_INIT	DDRD |= (1<<5), DDRB |= (1<<0)
+#define TXLED0			PORTD |= (1<<5)
+#define TXLED1			PORTD &= ~(1<<5)
 #define RXLED0			PORTB |= (1<<0)
 #define RXLED1			PORTB &= ~(1<<0)
 
@@ -52,6 +53,8 @@ const static uint8_t A4 = 18;
 const static uint8_t A5 = 19;
 const static uint8_t A6 = 20;
 const static uint8_t A7 = 21;
+const static uint8_t A8 = 22;
+const static uint8_t A9 = 23;
 
 //	__AVR_ATmega32U4__ has an unusual mapping of pins to channels
 extern const uint8_t PROGMEM analog_pin_to_channel_PGM[];
@@ -105,9 +108,9 @@ extern const uint8_t PROGMEM analog_pin_to_channel_PGM[];
 // D2				PD1		SDA			SDA/INT1
 // D3#				PD0		PWM8/SCL	OC0B/SCL/INT0
 // D4		A6		PD4					ADC8
-// D5#		A7		PD6		FastPWM		OC4D/ADC9
+// D5#				PC6					OC3A/#OC4A
 // D6#		A8		PD7		FastPWM		#OC4D/ADC10
-// D7				PD5					#CTS
+// D7				PE6					INT6/AIN0
 //
 // D8				PB4					ADC11/PCINT4
 // D9#		A9		PB5		PWM16		OC1A/#OC4B/ADC13/PCINT5
@@ -130,7 +133,8 @@ extern const uint8_t PROGMEM analog_pin_to_channel_PGM[];
 // D16				PB2					MOSI,PCINT2
 // D17				PB3					MISO,PCINT3
 //
-// TXLED			PE6					INT6
+// TXLED			PD5
+// RXLED		    PB0
 // HWB				PE2					HWB
 
 
@@ -173,9 +177,9 @@ const uint8_t PROGMEM digital_pin_to_port_PGM[18] = {
 	PD,
 	PD,
 	PD,
-	PD,
-	PD,
-	PD,
+	PC, /* 5 */
+	PD, /* 6 */
+	PE, /* 7 */
 	
 	PB, /* 8 */
 	PB,
@@ -197,9 +201,9 @@ const uint8_t PROGMEM digital_pin_to_bit_mask_PGM[18] = {
 	_BV(1),
 	_BV(0),
 	_BV(4),
-	_BV(6),
-	_BV(7),
-	_BV(5),
+	_BV(6), /* 5, port C */
+	_BV(7),	/* 6, port D */
+	_BV(6), /* 7, port E */
 	
 	_BV(4), /* 8, port B */
 	_BV(5),
@@ -216,22 +220,22 @@ const uint8_t PROGMEM digital_pin_to_bit_mask_PGM[18] = {
 };
 
 const uint8_t PROGMEM digital_pin_to_timer_PGM[18] = {
-	NOT_ON_TIMER,	/* 0, port D */
+	NOT_ON_TIMER,	
 	NOT_ON_TIMER,
 	NOT_ON_TIMER,
-	TIMER0B,
+	TIMER0B,		/* 3 */
 	NOT_ON_TIMER,
-	NOT_ON_TIMER,	// TIMER4D		TODO - ZE - Fix this when there's a decision on what to do about these PWM pins
-	NOT_ON_TIMER,	// TIMER4D_NOT	TODO - ZE - Complementary output of TIMER4D on Digital Pin 6. Not sure this was intended.
-	NOT_ON_TIMER,
+	TIMER3A,		/* 5 */
+	TIMER4D,		/* 6 */
+	NOT_ON_TIMER,	
 	
-	NOT_ON_TIMER,	/* 8 port B */
-	TIMER1A,
-	TIMER1B,
-	TIMER0A,
+	NOT_ON_TIMER,	
+	TIMER1A,		/* 9 */
+	TIMER1B,		/* 10 */
+	TIMER0A,		/* 11 */
 	
-	TIMER3A,		/* 12 port C */
-	TIMER4A,
+	TIMER3A,		/* 12 */
+	TIMER4A,		/* 13 */
 	
 	NOT_ON_TIMER,	/* 14 port B */
 	NOT_ON_TIMER,
@@ -245,11 +249,10 @@ const uint8_t PROGMEM analog_pin_to_channel_PGM[11] = {
 	 A3		PF4							ADC4
 	 A4		PF1							ADC1
 	 A5		PF0							ADC0
-	 D4		A6		PD4					ADC8
-	 D5		A7		PD6		FastPWM		OC4D/ADC9
-	 D6		A8		PD7		FastPWM		#OC4D/ADC10
-	 D9		A9		PB5		PWM16		OC1A/#OC4B/ADC13/PCINT5
-	 D10	A10		PB6		PWM16		OC1B/0c4B/ADC12/PCINT6
+	 D4		A6		PD4					ADC8	 
+	 D6		A7		PD7		FastPWM		#OC4D/ADC10
+	 D9		A8		PB5		PWM16		OC1A/#OC4B/ADC13/PCINT5
+	 D10	A9		PB6		PWM16		OC1B/0c4B/ADC12/PCINT6
 	 */
 	
 	7,
@@ -259,9 +262,8 @@ const uint8_t PROGMEM analog_pin_to_channel_PGM[11] = {
 	1,
 	0,
 	8,
-	9,
-	
 	10,
+
 	13,
 	12
 };
