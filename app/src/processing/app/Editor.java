@@ -2048,87 +2048,38 @@ public class Editor extends JFrame implements RunnerListener {
    * modifications (if any) to the previous sketch need to be saved.
    */
   protected boolean handleOpenInternal(String path) {
-    // rename .pde files to .ino
-    File[] oldFiles = (new File(path)).getParentFile().listFiles(new FilenameFilter() {
-      public boolean accept(File dir, String name) {
-        return (name.toLowerCase().endsWith(".pde"));
-      }
-    });
-    
-    if (oldFiles != null && oldFiles.length > 0) {
-      if (!Preferences.getBoolean("editor.update_extension")) {
-        Object[] options = { "OK", "Cancel" };
-        String prompt =
-          "In Arduino 1.0, the file extension for sketches changed\n" +
-          "from \".pde\" to \".ino\".  This version of the software only\n" +
-          "supports the new extension.  Rename the files in this sketch\n" +
-          "(and future sketches) and continue?";
-        
-        int result = JOptionPane.showOptionDialog(this,
-                                                  prompt,
-                                                  "New extension",
-                                                  JOptionPane.YES_NO_OPTION,
-                                                  JOptionPane.QUESTION_MESSAGE,
-                                                  null,
-                                                  options,
-                                                  options[0]);
-        if (result != JOptionPane.YES_OPTION) {
-          return false;
-        }
-        
-        Preferences.setBoolean("editor.update_extension", true);
-      }
-      
-      for (int i = 0; i < oldFiles.length; i++) {
-        String oldPath = oldFiles[i].getPath();
-        File newFile = new File(oldPath.substring(0, oldPath.length() - 4) + ".ino");
-        try {
-          Base.copyFile(oldFiles[i], newFile);
-        } catch (IOException e) {
-          Base.showWarning("Error", "Could not copy to a proper location.", e);
-          return false;
-        }
-
-        // remove the original file, so user doesn't get confused
-        oldFiles[i].delete();
-
-        // update with the new path
-        if (oldFiles[i].compareTo(new File(path)) == 0) {
-          path = newFile.getAbsolutePath();      	
-        }
-      }
-    }
-    
     // check to make sure that this .pde file is
     // in a folder of the same name
     File file = new File(path);
-    File parentFile = new File(file.getParent());
-    String parentName = parentFile.getName();
-    String pdeName = parentName + ".ino";
-    File altFile = new File(file.getParent(), pdeName);
+    String fileName = file.getName();
+    File parent = file.getParentFile();
+    String parentName = parent.getName();
+    String pdeName = parentName + ".pde";
+    File altPdeFile = new File(parent, pdeName);
+    String inoName = parentName + ".ino";
+    File altInoFile = new File(parent, pdeName);
     
-    if (pdeName.equals(file.getName())) {
+    if (pdeName.equals(fileName) || inoName.equals(fileName)) {
       // no beef with this guy
 
-    } else if (altFile.exists()) {
-      // user selected a .java from the same sketch,
-      // but open the .pde instead
-      path = altFile.getAbsolutePath();
-      //System.out.println("found alt file in same folder");
-
-    } else if (!path.endsWith(".ino")) {
+    } else if (altPdeFile.exists()) {
+      // user selected a .java from the same sketch, but open the .pde instead
+      path = altPdeFile.getAbsolutePath();
+    } else if (altInoFile.exists()) {
+      path = altInoFile.getAbsolutePath();
+    } else if (!path.endsWith(".ino") && !path.endsWith(".pde")) {
       Base.showWarning("Bad file selected",
                        "Processing can only open its own sketches\n" +
-                       "and other files ending in .ino", null);
+                       "and other files ending in .ino or .pde", null);
       return false;
 
     } else {
       String properParent =
-        file.getName().substring(0, file.getName().length() - 4);
+        fileName.substring(0, fileName.length() - 4);
 
       Object[] options = { "OK", "Cancel" };
       String prompt =
-        "The file \"" + file.getName() + "\" needs to be inside\n" +
+        "The file \"" + fileName + "\" needs to be inside\n" +
         "a sketch folder named \"" + properParent + "\".\n" +
         "Create this folder, move the file, and continue?";
 
@@ -2223,7 +2174,7 @@ public class Editor extends JFrame implements RunnerListener {
       // need to get the name, user might also cancel here
 
     } else if (immediately) {
-      handleSave2();
+      return handleSave2();
 
     } else {
       SwingUtilities.invokeLater(new Runnable() {
@@ -2236,15 +2187,16 @@ public class Editor extends JFrame implements RunnerListener {
   }
 
 
-  protected void handleSave2() {
+  protected boolean handleSave2() {
     toolbar.activate(EditorToolbar.SAVE);
     statusNotice("Saving...");
+    boolean saved = false;
     try {
-      if (sketch.save()) {
+      saved = sketch.save();
+      if (saved)
         statusNotice("Done Saving.");
-      } else {
+      else
         statusEmpty();
-      }
       // rebuild sketch menu in case a save-as was forced
       // Disabling this for 0125, instead rebuild the menu inside
       // the Save As method of the Sketch object, since that's the
@@ -2263,6 +2215,7 @@ public class Editor extends JFrame implements RunnerListener {
     }
     //toolbar.clear();
     toolbar.deactivate(EditorToolbar.SAVE);
+    return saved;
   }
 
 

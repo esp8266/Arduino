@@ -68,7 +68,6 @@ void FirmataClass::begin(long speed)
   Serial.begin(speed);
   FirmataSerial = Serial;
   blinkVersion();
-  delay(300);
   printVersion();
   printFirmwareVersion();
 }
@@ -92,11 +91,10 @@ void FirmataClass::blinkVersion(void)
 {
   // flash the pin with the protocol version
   pinMode(VERSION_BLINK_PIN,OUTPUT);
-  pin13strobe(FIRMATA_MAJOR_VERSION, 200, 400);
-  delay(300);
-  pin13strobe(2,1,4); // separator, a quick burst
-  delay(300);
-  pin13strobe(FIRMATA_MINOR_VERSION, 200, 400);
+  pin13strobe(FIRMATA_MAJOR_VERSION, 40, 210);
+  delay(250);
+  pin13strobe(FIRMATA_MINOR_VERSION, 40, 210);
+  delay(125);
 }
 
 void FirmataClass::printFirmwareVersion(void)

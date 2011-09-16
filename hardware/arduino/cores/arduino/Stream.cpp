@@ -29,30 +29,39 @@
 // private method to read stream with timeout
 int Stream::timedRead()
 {
-  //Serial.println(_timeout);
-  this->_startMillis = millis();
-  while(millis() - this->_startMillis < this->_timeout)
-  {
-    if (this->available() > 0) {
-      return this->read();
-    }
-  }
+  int c;
+  _startMillis = millis();
+  do {
+    c = read();
+    if (c >= 0) return c;
+  } while(millis() - _startMillis < _timeout);
   return -1;     // -1 indicates timeout
 }
 
-// returns the next digit in the stream or -1 if timeout
-// discards non-numeric characters
-int Stream::getNextDigit()
+// private method to peek stream with timeout
+int Stream::timedPeek()
 {
   int c;
-  do{
-    c = timedRead();
-    if( c < 0)
-      return c;  // timeout
-  }
-  while( c != '-' && (c < '0' || c > '9') ) ;
+  _startMillis = millis();
+  do {
+    c = peek();
+    if (c >= 0) return c;
+  } while(millis() - _startMillis < _timeout);
+  return -1;     // -1 indicates timeout
+}
 
-return c;
+// returns peek of the next digit in the stream or -1 if timeout
+// discards non-numeric characters
+int Stream::peekNextDigit()
+{
+  int c;
+  while (1) {
+    c = timedPeek();
+    if (c < 0) return c;  // timeout
+    if (c == '-') return c;
+    if (c >= '0' && c <= '9') return c;
+    read();  // discard non-numeric
+  }
 }
 
 // Public Methods
@@ -130,7 +139,7 @@ long Stream::parseInt(char skipChar)
   long value = 0;
   int c;
 
-  c = getNextDigit();
+  c = peekNextDigit();
   // ignore non numeric leading characters
   if(c < 0)
     return 0; // zero returned if timeout
@@ -142,9 +151,10 @@ long Stream::parseInt(char skipChar)
       isNegative = true;
     else if(c >= '0' && c <= '9')        // is c a digit?
       value = value * 10 + c - '0';
-    c = timedRead();
+    read();  // consume the character we got with peek
+    c = timedPeek();
   }
-  while( (c >= '0' && c <= '9')  || c == skipChar );
+  while( (c >= '0' && c <= '9') || c == skipChar );
 
   if(isNegative)
     value = -value;
@@ -168,7 +178,7 @@ float Stream::parseFloat(char skipChar){
   char c;
   float fraction = 1.0;
 
-  c = getNextDigit();
+  c = peekNextDigit();
     // ignore non numeric leading characters
   if(c < 0)
     return 0; // zero returned if timeout
@@ -185,7 +195,8 @@ float Stream::parseFloat(char skipChar){
       if(isFraction)
          fraction *= 0.1;
     }
-    c = timedRead();
+    read();  // consume the character we got with peek
+    c = timedPeek();
   }
   while( (c >= '0' && c <= '9')  || c == '.' || c == skipChar );
 
