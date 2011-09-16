@@ -707,21 +707,21 @@ public class Sketch {
                        "need to re-save this sketch to another location.");
       // if the user cancels, give up on the save()
       if (!saveAs()) return false;
-    }
-
-    // rename .pde files to .ino
-    File mainFile = new File(getMainFilePath());
-    File mainFolder = mainFile.getParentFile();
-    File[] pdeFiles = mainFolder.listFiles(new FilenameFilter() {
-      public boolean accept(File dir, String name) {
-        return name.toLowerCase().endsWith(".pde");
+    } else {
+      // rename .pde files to .ino
+      File mainFile = new File(getMainFilePath());
+      File mainFolder = mainFile.getParentFile();
+      File[] pdeFiles = mainFolder.listFiles(new FilenameFilter() {
+        public boolean accept(File dir, String name) {
+          return name.toLowerCase().endsWith(".pde");
+        }
+      });
+      
+      if (pdeFiles != null && pdeFiles.length > 0) {
+        // Do rename of all .pde files to new .ino extension
+        for (File pdeFile : pdeFiles)
+          renameCodeToInoExtension(pdeFile);
       }
-    });
-    
-    if (pdeFiles != null && pdeFiles.length > 0) {
-      // Do rename of all .pde files to new .ino extension
-      for (File pdeFile : pdeFiles)
-        renameCodeToInoExtension(pdeFile);
     }
 
     for (int i = 0; i < codeCount; i++) {
