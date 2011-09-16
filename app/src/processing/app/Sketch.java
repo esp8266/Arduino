@@ -718,9 +718,33 @@ public class Sketch {
       });
       
       if (pdeFiles != null && pdeFiles.length > 0) {
-        // Do rename of all .pde files to new .ino extension
-        for (File pdeFile : pdeFiles)
-          renameCodeToInoExtension(pdeFile);
+        if (Preferences.get("editor.update_extension") == null) {
+          Object[] options = { "OK", "Cancel" };
+          int result = JOptionPane.showOptionDialog(editor,
+                                                    "In Arduino 1.0, the default file extension has changed\n" +
+                                                    "from .pde to .ino.  New sketches (including those created\n" +
+                                                    "by \"Save-As\" will use the new extension.  The extension\n" +
+                                                    "of existing sketches will be updated on save, but you can\n" +
+                                                    "disable this in the Preferences dialog.\n" +
+                                                    "\n" +
+                                                    "Save sketch and update its extension?",
+                                                    ".pde -> .ino",
+                                                    JOptionPane.OK_CANCEL_OPTION,
+                                                    JOptionPane.QUESTION_MESSAGE,
+                                                    null,
+                                                    options,
+                                                    options[0]);
+          
+          if (result != JOptionPane.OK_OPTION) return false; // save cancelled
+          
+          Preferences.setBoolean("editor.update_extension", true);
+        }
+        
+        if (Preferences.getBoolean("editor.update_extension")) {
+          // Do rename of all .pde files to new .ino extension
+          for (File pdeFile : pdeFiles)
+            renameCodeToInoExtension(pdeFile);
+        }
       }
     }
 
