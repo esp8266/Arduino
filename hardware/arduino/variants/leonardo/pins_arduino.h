@@ -55,6 +55,7 @@ const static uint8_t A6 = 20;
 const static uint8_t A7 = 21;
 const static uint8_t A8 = 22;
 const static uint8_t A9 = 23;
+const static uint8_t A10 = 24;
 
 //	__AVR_ATmega32U4__ has an unusual mapping of pins to channels
 extern const uint8_t PROGMEM analog_pin_to_channel_PGM[];
@@ -108,15 +109,15 @@ extern const uint8_t PROGMEM analog_pin_to_channel_PGM[];
 // D2				PD1		SDA			SDA/INT1
 // D3#				PD0		PWM8/SCL	OC0B/SCL/INT0
 // D4		A6		PD4					ADC8
-// D5#				PC6					OC3A/#OC4A
-// D6#		A8		PD7		FastPWM		#OC4D/ADC10
+// D5#				PC6		???			OC3A/#OC4A
+// D6#		A7		PD7		FastPWM		#OC4D/ADC10
 // D7				PE6					INT6/AIN0
 //
 // D8				PB4					ADC11/PCINT4
-// D9#		A9		PB5		PWM16		OC1A/#OC4B/ADC13/PCINT5
-// D10#		A10		PB6		PWM16		OC1B/0c4B/ADC12/PCINT6
+// D9#		A8		PB5		PWM16		OC1A/#OC4B/ADC13/PCINT5
+// D10#		A9		PB6		PWM16		OC1B/0c4B/ADC12/PCINT6
 // D11#				PB7		PWM8/16		0C0A/OC1C/#RTS/PCINT7
-// D12#				PC6		PWM16		0C3A/#OC4A
+// D12		A10		PD6					T1/#OC4D/ADC9
 // D13#				PC7		PWM10		CLK0/OC4A
 //
 //			A0		PF7					ADC7
@@ -186,7 +187,7 @@ const uint8_t PROGMEM digital_pin_to_port_PGM[18] = {
 	PB,
 	PB,
 	
-	PC, /* 12 */
+	PD, /* 12 */
 	PC, /* 13 */
 	
 	PB,	/* 14 */
@@ -210,7 +211,7 @@ const uint8_t PROGMEM digital_pin_to_bit_mask_PGM[18] = {
 	_BV(6),
 	_BV(7),
 	
-	_BV(6),	/* 12 port C */
+	_BV(6),	/* 12 port D */
 	_BV(7),
 	
 	_BV(0), /* 14, port B */
@@ -234,10 +235,10 @@ const uint8_t PROGMEM digital_pin_to_timer_PGM[18] = {
 	TIMER1B,		/* 10 */
 	TIMER0A,		/* 11 */
 	
-	TIMER3A,		/* 12 */
+	NOT_ON_TIMER,	
 	TIMER4A,		/* 13 */
 	
-	NOT_ON_TIMER,	/* 14 port B */
+	NOT_ON_TIMER,	
 	NOT_ON_TIMER,
 };
 
@@ -253,6 +254,7 @@ const uint8_t PROGMEM analog_pin_to_channel_PGM[11] = {
 	 D6		A7		PD7		FastPWM		#OC4D/ADC10
 	 D9		A8		PB5		PWM16		OC1A/#OC4B/ADC13/PCINT5
 	 D10	A9		PB6		PWM16		OC1B/0c4B/ADC12/PCINT6
+	 D12	A10		PD6					T1/#OC4D/ADC9
 	 */
 	
 	7,
@@ -265,7 +267,8 @@ const uint8_t PROGMEM analog_pin_to_channel_PGM[11] = {
 	10,
 
 	13,
-	12
+	12,
+	9
 };
 
 #endif
