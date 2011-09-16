@@ -28,6 +28,11 @@
 #include <avr/pgmspace.h>
 
 #define ARDUINO_MODEL_USB_PID	0x0034
+#define TX_RX_LED_INIT	DDRE |= (1<<6), DDRB |= (1<<0)
+#define TXLED0			PORTE |= (1<<6)
+#define TXLED1			PORTE &= ~(1<<6)
+#define RXLED0			PORTB |= (1<<0)
+#define RXLED1			PORTB &= ~(1<<0)
 
 // Map SPI port to 'new' pins D14..D17
 // D14				PB0					RXLED,SS/PCINT0

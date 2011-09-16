@@ -30,6 +30,11 @@
 #define EP_TYPE_ISOCHRONOUS_IN		0x41
 #define EP_TYPE_ISOCHRONOUS_OUT		0x40
 
+/** Pulse generation counters to keep track of the number of milliseconds remaining for each pulse type */
+#define TX_RX_LED_PULSE_MS 100
+volatile u8 TxLEDPulse; /**< Milliseconds remaining for data Tx LED pulse */
+volatile u8 RxLEDPulse; /**< Milliseconds remaining for data Rx LED pulse */
+
 //==================================================================
 //==================================================================
 
@@ -108,11 +113,17 @@ void Recv(volatile u8* data, u8 count)
 {
 	while (count--)
 		*data++ = UEDATX;
+	
+	RXLED1;					// light the RX LED
+	RxLEDPulse = TX_RX_LED_PULSE_MS;	
 }
 
 static inline u8 Recv8()
 {
-	return UEDATX;
+	RXLED1;					// light the RX LED
+	RxLEDPulse = TX_RX_LED_PULSE_MS;
+
+	return UEDATX;	
 }
 
 static inline void Send8(u8 d)
@@ -206,13 +217,13 @@ u8 USB_Available(u8 ep)
 	return FifoByteCount();
 }
 
-//	Non Blocking recieve
+//	Non Blocking receive
 //	Return number of bytes read
 int USB_Recv(u8 ep, void* d, int len)
 {
 	if (!_usbConfiguration || len < 0)
 		return -1;
-
+	
 	LockEP lock(ep);
 	u8 n = FifoByteCount();
 	len = min(n,len);
@@ -222,7 +233,7 @@ int USB_Recv(u8 ep, void* d, int len)
 		*dst++ = Recv8();
 	if (len && !FifoByteCount())	// release empty buffer
 		ReleaseRX();
-
+	
 	return len;
 }
 
@@ -289,6 +300,8 @@ int USB_Send(u8 ep, const void* d, int len)
 				ReleaseTX();
 		}
 	}
+	TXLED1;					// light the TX LED
+	TxLEDPulse = TX_RX_LED_PULSE_MS;
 	return r;
 }
 
@@ -305,11 +318,6 @@ const u8 _initEndpoints[] =
 
 #ifdef HID_ENABLED
 	EP_TYPE_INTERRUPT_IN		// HID_ENDPOINT_INT
-#endif
-
-#ifdef MSC_ENABLED
-	EP_TYPE_BULK_OUT,			// MSC_ENDPOINT_OUT
-	EP_TYPE_BULK_IN,			// MSC_ENDPOINT_IN
 #endif
 };
 
@@ -348,11 +356,6 @@ bool ClassInterfaceRequest(Setup& setup)
 #ifdef CDC_ENABLED
 	if (CDC_ACM_INTERFACE == i)
 		return CDC_Setup(setup);
-#endif
-
-#ifdef MSC_ENABLED
-	if (MSC_INTERFACE == i)
-		return MSC_Setup(setup);
 #endif
 
 #ifdef HID_ENABLED
@@ -425,9 +428,6 @@ int SendInterfaces()
 	total += HID_GetInterface(&interfaces);
 #endif
 
-#ifdef MSC_ENABLED
-	total += MSC_GetInterface(&interfaces);
-#endif
 	return interfaces;
 }
 
@@ -503,8 +503,6 @@ ISR(USB_COM_vect)
 	Setup setup;
 	Recv((u8*)&setup,8);
 	ClearSetupInt();
-
-	//printHex((u8*)&setup,8);
 
 	u8 requestType = setup.bmRequestType;
 	if (requestType & REQUEST_DEVICETOHOST)
@@ -596,12 +594,18 @@ ISR(USB_GEN_vect)
 		UEIENX = 1 << RXSTPE;			// Enable interrupts for ep0
 	}
 
-	//	Start of Frame
+	//	Start of Frame - happens every millisecond so we use it for TX and RX LED one-shot timing, too
 	if (udint & (1<<SOFI))
 	{
 #ifdef CDC_ENABLED
 		USB_Flush(CDC_TX);				// Send a tx frame if found
 #endif
+		
+		// check whether the one-shot period has elapsed.  if so, turn off the LED
+		if (TxLEDPulse && !(--TxLEDPulse))
+			TXLED0;
+		if (RxLEDPulse && !(--RxLEDPulse))
+			RXLED0;
 	}
 }
 
@@ -634,6 +638,8 @@ void USB_::attach()
 	USBCON = ((1<<USBE)|(1<<OTGPADE));	// start USB clock
 	UDIEN = (1<<EORSTE)|(1<<SOFE);		// Enable interrupts for EOR (End of Reset) and SOF (start of frame)
 	UDCON = 0;							// enable attach resistor
+	
+	TX_RX_LED_INIT;
 }
 
 void USB_::detach()
@@ -649,14 +655,6 @@ bool USB_::configured()
 
 void USB_::poll()
 {
-#ifdef MSC_ENABLED
-	if (!_usbConfiguration)
-		return;
-
-	//	Service disk
-	if (USB_Available(MSC_RX))
-		MSC_Data(MSC_RX,MSC_TX);
-#endif
 }
 
 #endif /* if defined(USBCON) */
