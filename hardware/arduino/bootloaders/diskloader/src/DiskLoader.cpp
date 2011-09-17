@@ -2,15 +2,9 @@
 
 #include "Platform.h"
 
-//	This bootloader creates a composite Serial/Mass storage device
+//	This bootloader creates a composite Serial device
 //
 //	The serial interface supports a STK500v1 protocol that is very similar to optiboot
-//	The mass storage interface emulates a disk image that is used to read or write firmware.bin files
-//	Delete firmware.bin and copy a new binary (not .hex) file to flash the firmware i.e:
-//
-//	cp firmware.bin f:/. -f
-//
-//	Ejecting the disk will run the firmware
 //
 //	The bootloader will timeout and start the firmware after a few hundred milliseconds
 //	if a usb connection is not detected.
