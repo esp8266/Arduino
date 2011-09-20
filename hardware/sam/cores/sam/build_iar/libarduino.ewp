@@ -2745,9 +2745,9 @@
   </file>
   <file>
     <name>$PROJ_DIR$\..\WInterrupts.c</name>
-    <excluded>
-      <configuration>Debug</configuration>
-    </excluded>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\..\WInterrupts.h</name>
   </file>
   <file>
     <name>$PROJ_DIR$\..\wiring.c</name>

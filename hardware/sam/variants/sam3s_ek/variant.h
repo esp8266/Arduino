@@ -10,8 +10,8 @@
  *----------------------------------------------------------------------------*/
 
 #include "Arduino.h"
-#include "common/UART.h"
-#include "common/USART.h"
+#include "UART.h"
+#include "USART.h"
 
 /**
  * Libc porting layers

@@ -1,23 +1,29 @@
-#*************************************************
+#*******************************************************
 #
-#  Connect to J-Link and debug application in sram on SAM3U
+#  Connect to J-Link and debug application in flash.
 #
-# Note:
-#     First,users should do Step1 and Step2 according to your project,
-#     then do Step3.
 
-# Step1: Connect to the J-Link gdb server
-#target remote localhost:2331
-#mon reset
+# define 'reset' command
+define reset
 
-# Step2: Load file(eg. getting-started project)
-#load bin/basic-dhrystone-project-at91sam3u-ek-at91sam3u4-sram.elf
-#symbol-file bin/basic-dhrystone-project-at91sam3u-ek-at91sam3u4-sram.elf
+# Connect to the J-Link gdb server
+target remote localhost:2331
+# Reset the chip to get to a known state
+monitor reset
 
-# Step3: Initializing PC and stack pointer
-# Perpheral reset RSTC_CR
+# Load the program
+load
+
+# Reset peripheral  (RSTC_CR)
 set *0x400e1200 = 0xA5000004
-# Modify pc value to even before writing pc register
+
+# Initializing PC and stack pointer
 mon reg sp=(0x20000000)
 set *0x20000004 = *0x20000004 & 0xFFFFFFFE
 mon reg pc=(0x20000004)
+info reg
+
+break main
+
+# end of 'reset' command
+end

@@ -10,8 +10,8 @@
  *----------------------------------------------------------------------------*/
 
 #include "Arduino.h"
-#include "common/UART.h"
-#include "common/USART.h"
+#include "UART.h"
+#include "USART.h"
 
 /**
  * Libc porting layers
@@ -54,6 +54,7 @@
 #define PIN_LED_GREEN        (1u)
 #define PIN_LED_RED          (2u)
 #define PIN_LED              PIN_LED_BLUE
+#define PIN_LED2             PIN_LED_GREEN
 
 static const uint8_t SS   = 23 ;
 static const uint8_t MOSI = 21 ;

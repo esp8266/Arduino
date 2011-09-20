@@ -88,12 +88,12 @@ endif
 
 OUTPUT_BIN=test_$(TOOLCHAIN)_$(LIBS_POSTFIX)
 #LIBS=-L../libsam_$(CHIP_NAME)_$(TOOLCHAIN)_rel.a -L../arduino_$(VARIANT)_$(TOOLCHAIN)_rel.a
-#-lstdc++ 
-LIBS=-Wl,--start-group -lgcc -lc -lsam_$(CHIP_NAME)_$(TOOLCHAIN)_$(LIBS_POSTFIX) -larduino_$(VARIANT)_$(TOOLCHAIN)_$(LIBS_POSTFIX) -lvariant_$(VARIANT)_$(TOOLCHAIN)_$(LIBS_POSTFIX) -Wl,--end-group
+# 
+LIBS=-Wl,--start-group -lgcc -lc -lstdc++ -lsam_$(CHIP_NAME)_$(TOOLCHAIN)_$(LIBS_POSTFIX) -larduino_$(VARIANT)_$(TOOLCHAIN)_$(LIBS_POSTFIX) -lvariant_$(VARIANT)_$(TOOLCHAIN)_$(LIBS_POSTFIX) -Wl,--end-group
 
 LIB_PATH =-L$(PROJECT_BASE_PATH)/..
 LIB_PATH+=-L=/lib/thumb2
-LIB_PATH+=-L=/../lib/gcc/arm-none-eabi/4.4.1/thumb2
+#LIB_PATH+=-L=/../lib/gcc/arm-none-eabi/4.5.2/thumb2
 
 LDFLAGS= -mcpu=cortex-m3 -mthumb -Wl,--cref -Wl,--check-sections -Wl,--gc-sections -Wl,--entry=Reset_Handler -Wl,--unresolved-symbols=report-all -Wl,--warn-common -Wl,--warn-section-align -Wl,--warn-unresolved-symbols
 
@@ -141,13 +141,14 @@ create_output:
 
 $(addprefix $(OUTPUT_PATH)/,$(CPP_OBJ)): $(OUTPUT_PATH)/%.o: %.cpp
 #	@$(CC) -c $(CPPFLAGS) $< -o $@
-#	@$(CXX) -c $(CPPFLAGS) $< -o $@
-	$(CXX) -v -c $(CPPFLAGS) $< -o $@
+	@$(CXX) -c $(CPPFLAGS) $< -o $@
+#	@$(CXX) -v -c $(CPPFLAGS) $< -o $@
 
 $(OUTPUT_BIN): $(addprefix $(OUTPUT_PATH)/, $(C_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(CPP_OBJ)) $(addprefix $(OUTPUT_PATH)/, $(A_OBJ))
-	$(CC) $(LIB_PATH) $(LDFLAGS) -T"$(VARIANT_PATH)/linker_scripts/gcc/flash.ld" -Wl,-Map,$(OUTPUT_PATH)/$@.map -o $(OUTPUT_PATH)/$@.elf $^ $(LIBS)
-	$(NM) $(OUTPUT_PATH)/$@.elf >$(OUTPUT_PATH)/$@.elf.txt
-	$(OBJCOPY) -O binary $(OUTPUT_PATH)/$@.elf $(OUTPUT_PATH)/$@.bin
+	@$(CC) $(LIB_PATH) $(LDFLAGS) -T"$(VARIANT_PATH)/linker_scripts/gcc/flash.ld" -Wl,-Map,$(OUTPUT_PATH)/$@.map -o $(OUTPUT_PATH)/$@.elf $^ $(LIBS)
+#	@$(CC) $(LIB_PATH) $(LDFLAGS) -T"$(VARIANT_PATH)/linker_scripts/gcc/sram.ld" -Wl,-Map,$(OUTPUT_PATH)/$@.map -o $(OUTPUT_PATH)/$@.elf $^ $(LIBS)
+	@$(NM) $(OUTPUT_PATH)/$@.elf >$(OUTPUT_PATH)/$@.elf.txt
+	@$(OBJCOPY) -O binary $(OUTPUT_PATH)/$@.elf $(OUTPUT_PATH)/$@.bin
 	$(SIZE) $^ $(OUTPUT_PATH)/$@.elf
 
 .PHONY: clean
@@ -160,4 +161,5 @@ clean:
 	-@$(RM) $(OUTPUT_PATH)/$(OUTPUT_BIN).map 1>NUL 2>&1
 
 debug: test
-	$(GDB) -x "$(VARIANT_PATH)/debug_scripts/gcc/$(VARIANT)_flash.gdb" -ex "reset" -readnow -se $(OUTPUT_PATH)/$(OUTPUT_BIN).elf
+	@$(GDB) -x "$(VARIANT_PATH)/debug_scripts/gcc/$(VARIANT)_flash.gdb" -ex "reset" -readnow -se $(OUTPUT_PATH)/$(OUTPUT_BIN).elf
+#	@$(GDB) -w -x "$(VARIANT_PATH)/debug_scripts/gcc/$(VARIANT)_sram.gdb" -ex "reset" -readnow -se $(OUTPUT_PATH)/$(OUTPUT_BIN).elf

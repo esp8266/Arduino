@@ -10,7 +10,7 @@
  *
  ******************************************************************************/
 
-// $asf_license$
+/* $asf_license$ */
 
 /*------------------------------------------------------------------------------
  *         Headers
@@ -42,7 +42,6 @@ extern int __low_level_init( void ) ;
 #pragma language=extended
 #pragma segment="CSTACK"
 
-
 /*  The name "__vector_table" has special meaning for C-SPY: */
 /*  it is where the SP start value is found, and the NVIC vector */
 /*  table register (VTOR) is initialized to this address if != 0. */
@@ -65,7 +64,7 @@ const intvec_elem __vector_table[] =
     0,                  /*  Reserved */
     PendSV_Handler,
     SysTick_Handler,
-    
+
     /* Configurable interrupts */
     SUPC_IrqHandler,    /* 0  Supply Controller */
     RSTC_IrqHandler,    /* 1  Reset Controller */
@@ -80,7 +79,7 @@ const intvec_elem __vector_table[] =
     Dummy_Handler,		/* 10 Reserved */
     PIOA_IrqHandler,    /* 11 Parallel IO Controller A */
     PIOB_IrqHandler,    /* 12 Parallel IO Controller B */
-    PIOC_IrqHandler,    /* 13 Parallel IO Controller C */  
+    PIOC_IrqHandler,    /* 13 Parallel IO Controller C */
     USART0_IrqHandler,  /* 14 USART 0 */
     USART1_IrqHandler,  /* 15 USART 1 */
     Dummy_Handler,  	/* 16 Reserved */
@@ -88,14 +87,14 @@ const intvec_elem __vector_table[] =
     Dummy_Handler,  	/* 18 Reserved */
     TWI0_IrqHandler,    /* 19 TWI 0 */
     TWI1_IrqHandler,    /* 20 TWI 1 */
-    SPI_IrqHandler,     /* 21 SPI */  
+    SPI_IrqHandler,     /* 21 SPI */
     Dummy_Handler,		/* 22 Reserved */
     TC0_IrqHandler,     /* 23 Timer Counter 0 */
     TC1_IrqHandler,     /* 24 Timer Counter 1 */
     TC2_IrqHandler,     /* 25 Timer Counter 2 */
     TC3_IrqHandler,     /* 26 Timer Counter 3 */
     TC4_IrqHandler,     /* 27 Timer Counter 4 */
-    TC5_IrqHandler,     /* 28 Timer Counter 5 */  
+    TC5_IrqHandler,     /* 28 Timer Counter 5 */
     ADC_IrqHandler,     /* 29 ADC controller */
     DACC_IrqHandler,    /* 30 DAC controller */
     PWM_IrqHandler,		/* 31 PWM */
@@ -111,7 +110,7 @@ extern int __low_level_init( void )
     uint32_t* pSrc = __section_begin( ".intvec" ) ;
 
     SCB->VTOR = ( (uint32_t)pSrc & SCB_VTOR_TBLOFF_Msk ) ;
-    
+
     if ( ((uint32_t)pSrc >= IRAM_ADDR) && ((uint32_t)pSrc < IRAM_ADDR+IRAM_SIZE) )
     {
 	    SCB->VTOR |= 1 << SCB_VTOR_TBLBASE_Pos ;

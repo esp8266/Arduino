@@ -28,19 +28,19 @@ extern "C" {
 
 #include <stdint.h>
 
-extern uint32_t SystemCoreClock;     /* System Clock Frequency (Core Clock) */
+extern uint32_t SystemCoreClock;	/* System Clock Frequency (Core Clock) */
 
 /**
  * @brief Setup the microcontroller system.
  * Initialize the System and update the SystemCoreClock variable.
  */
-extern void SystemInit (void);
+extern void SystemInit(void);
 
 /**
  * @brief Updates the SystemCoreClock with current core Clock
  * retrieved from cpu registers.
  */
-extern void SystemCoreClockUpdate (void);
+extern void SystemCoreClockUpdate(void);
 
 /* @cond 0 */
 /**INDENT-OFF**/

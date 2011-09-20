@@ -24,9 +24,9 @@ class HardwareSerial : public Stream
     virtual void flush( void ) =0 ;
     virtual void write( const uint8_t c ) =0 ;
 
-    virtual void write( const char *str ) ;
-    virtual void write( const uint8_t *buffer, size_t size ) ;
-//    using Print::write ; // pull in write(str) and write(buf, size) from Print
+//    virtual void write( const char *str ) ;
+//    virtual void write( const uint8_t *buffer, size_t size ) ;
+    using Print::write ; // pull in write(str) and write(buf, size) from Print
 } ;
 
 #endif // HardwareSerial_h

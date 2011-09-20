@@ -53,7 +53,8 @@ CPPFLAGS += -Wpacked -Wredundant-decls -Winline -Wlong-long
 #CPPFLAGS += -Wmissing-noreturn
 #CPPFLAGS += -Wconversion
 
-CPPFLAGS += --param max-inline-insns-single=500 -mcpu=cortex-m3 -mthumb -mlong-calls -ffunction-sections -fno-rtti -fno-exceptions
+#-fno-rtti -fno-exceptions
+CPPFLAGS += --param max-inline-insns-single=500 -mcpu=cortex-m3 -mthumb -mlong-calls -ffunction-sections 
 CPPFLAGS += $(OPTIMIZATION) $(INCLUDES) -D$(CHIP)
 
 # To reduce application size use only integer printf function.

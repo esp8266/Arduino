@@ -1,27 +1,27 @@
 /*! \file *********************************************************************
  *
- * \brief Startup file for SAM3S.
+ * \brief Startup file for SAM3S8/SAM3SD.
  *
  * This file defines common SAM series.
  *
  * - Compiler:           IAR EWARM
- * - Supported devices:  All SAM3S devices can be used.
+ * - Supported devices:  All SAM3S8/SAM3SD devices can be used.
  * - AppNote:
  *
  ******************************************************************************/
 
-// $asf_license$
+/* $asf_license$ */
 
-/*------------------------------------------------------------------------------
- *         Headers
- *------------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------
+ *        Headers
+ *----------------------------------------------------------------------------*/
 
 #include "exceptions.h"
 #include "sam3s8.h"
 #include "system_sam3sd8.h"
 
 /*----------------------------------------------------------------------------
- *        Definitions
+ *        Exported variables
  *----------------------------------------------------------------------------*/
 
 /*------------------------------------------------------------------------------
@@ -114,7 +114,7 @@ extern int __low_level_init( void )
     uint32_t* pSrc = __section_begin( ".intvec" ) ;
 
     SCB->VTOR = ( (uint32_t)pSrc & SCB_VTOR_TBLOFF_Msk ) ;
-    
+
     if ( ((uint32_t)pSrc >= IRAM_ADDR) && ((uint32_t)pSrc < IRAM_ADDR+IRAM_SIZE) )
     {
 	    SCB->VTOR |= 1 << SCB_VTOR_TBLBASE_Pos ;

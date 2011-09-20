@@ -10,8 +10,8 @@
  *----------------------------------------------------------------------------*/
 
 #include "Arduino.h"
-#include "common/UART.h"
-#include "common/USART.h"
+#include "UART.h"
+#include "USART.h"
 
 /**
  * Libc porting layers
@@ -55,16 +55,16 @@
 #define PIN_LED2             PIN_LED_RXL
 #define PIN_LED3             PIN_LED_TXL
 
-static const uint8_t SS   = 15 ;
-static const uint8_t MOSI = 13 ;
-static const uint8_t MISO = 12 ;
-static const uint8_t SCK  = 14 ;
+#define PINS_UART            (3u)
 
-#define PINS_UART            (5u)
+#define PINS_USART0          (6u)
+#define PINS_USART1          (9u)
+#define PINS_USART2          (12u)
 
-#define PINS_USART0          (5u)
-#define PINS_USART1          (5u)
-#define PINS_USART2          (5u)
+static const uint8_t SS   = 18 ;
+static const uint8_t MOSI = 16 ;
+static const uint8_t MISO = 15 ;
+static const uint8_t SCK  = 17 ;
 
 /*----------------------------------------------------------------------------
  *        Arduino objects - C++ only

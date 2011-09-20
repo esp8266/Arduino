@@ -20,15 +20,17 @@ CMSIS_PATH = $(SYSTEM_PATH)/CMSIS/Include
 ARDUINO_PATH = ../../../cores/sam
 VARIANT_BASE_PATH = ../../../variants
 VARIANT_PATH = ../../../variants/$(VARIANT)
-VARIANT_COMMON_PATH = ../../common
+#VARIANT_COMMON_PATH = ../../common
 
 #-------------------------------------------------------------------------------
 # Files
 #-------------------------------------------------------------------------------
 
-vpath %.h $(PROJECT_BASE_PATH) $(SYSTEM_PATH) $(VARIANT_PATH) $(VARIANT_COMMON_PATH)
+vpath %.h $(PROJECT_BASE_PATH) $(SYSTEM_PATH) $(VARIANT_PATH) 
+#$(VARIANT_COMMON_PATH)
 #vpath %.c $(PROJECT_BASE_PATH) $(VARIANT_PATH)
-vpath %.cpp $(PROJECT_BASE_PATH) $(PROJECT_BASE_PATH) $(VARIANT_COMMON_PATH)
+vpath %.cpp $(PROJECT_BASE_PATH) $(PROJECT_BASE_PATH) 
+#$(VARIANT_COMMON_PATH)
 
 VPATH+=$(PROJECT_BASE_PATH)
 
@@ -74,7 +76,7 @@ C_SRC=$(wildcard $(PROJECT_BASE_PATH)/*.c)
 C_OBJ_TEMP = $(patsubst %.c, %.o, $(notdir $(C_SRC)))
 
 # during development, remove some files
-C_OBJ_FILTER=wiring_analog.o wiring_pulse.o
+C_OBJ_FILTER=
 
 C_OBJ=$(filter-out $(C_OBJ_FILTER), $(C_OBJ_TEMP))
 
@@ -82,12 +84,12 @@ C_OBJ=$(filter-out $(C_OBJ_FILTER), $(C_OBJ_TEMP))
 # CPP source files and objects
 #-------------------------------------------------------------------------------
 CPP_SRC=$(wildcard $(PROJECT_BASE_PATH)/*.cpp)
-CPP_SRC+=$(wildcard $(VARIANT_COMMON_PATH)/*.cpp)
+#CPP_SRC+=$(wildcard $(VARIANT_COMMON_PATH)/*.cpp)
 
 CPP_OBJ_TEMP = $(patsubst %.cpp, %.o, $(notdir $(CPP_SRC)))
 
 # during development, remove some files
-CPP_OBJ_FILTER=Tone.o
+CPP_OBJ_FILTER=
 
 CPP_OBJ=$(filter-out $(CPP_OBJ_FILTER), $(CPP_OBJ_TEMP))
 
