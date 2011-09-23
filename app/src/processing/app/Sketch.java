@@ -32,15 +32,11 @@ import processing.app.preproc.*;
 import processing.core.*;
 
 import java.awt.*;
-import java.awt.event.*;
-import java.beans.*;
 import java.io.*;
+import java.text.MessageFormat;
 import java.util.*;
-import java.util.zip.*;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
 
 
 /**
@@ -1512,17 +1508,50 @@ public class Sketch {
     // run the preprocessor
     String primaryClassName = preprocess(buildPath);
 
+    Map<String, String> config = new HashMap<String, String>();
+    mergeMapsAndRemoveNulls(Preferences.getMap(), config);
+    Map<String, String> boardPrefs = Base.getBoardPreferences();
+    // Check for null platform, and use system default if not found
+    String platform = boardPrefs.get("platform");
+    if (platform == null)
+      mergeMapsAndRemoveNulls(Base.getPlatformPreferences(), config);
+    else
+      mergeMapsAndRemoveNulls(Base.getPlatformPreferences(platform), config);
+    mergeMapsAndRemoveNulls(boardPrefs, config);
+    
+    String toolchainPath = config.get("compiler.path");
+    if (toolchainPath == null) {
+      toolchainPath = Base.getAvrBasePath();
+    } else {
+      // Put in the system path in the compiler path if available
+      String basePath = System.getProperty("user.dir");
+      if (Base.isMacOS())
+        basePath += "/Arduino.app/Contents/Resources/Java";
+      Object[] args = { basePath };
+      toolchainPath = new MessageFormat(toolchainPath).format(args);
+    }
+    config.put("compiler.path", toolchainPath);
+    
     // compile the program. errors will happen as a RunnerException
     // that will bubble up to whomever called build().
-    Compiler compiler = new Compiler();
+    Compiler compiler = new Compiler(config);
     if (compiler.compile(this, buildPath, primaryClassName, verbose)) {
-      size(buildPath, primaryClassName);
+      size(buildPath, primaryClassName, config);
       return primaryClassName;
     }
     return null;
+  }  
+  
+  private void mergeMapsAndRemoveNulls(Map<String, String> src,
+                                       Map<String, String> dst) {
+    for (String k : src.keySet()) {
+      String v = src.get(k);
+      if (v == null)
+        v = "";
+      dst.put(k, v);
+    }
   }
-  
-  
+
   protected boolean exportApplet(boolean usingProgrammer) throws Exception {
     return exportApplet(tempBuildFolder.getAbsolutePath(), usingProgrammer);
   }
@@ -1574,13 +1603,14 @@ public class Sketch {
   }
 
 
-  protected void size(String buildPath, String suggestedClassName)
-    throws RunnerException {
+  protected void size(String buildPath, String suggestedClassName,
+                      Map<String, String> prefs) throws RunnerException {
     long size = 0;
-    String maxsizeString = Base.getBoardPreferences().get("upload.maximum_size");
-    if (maxsizeString == null) return;
+    String maxsizeString = prefs.get("upload.maximum_size");
+    if (maxsizeString == null)
+      return;
     long maxsize = Integer.parseInt(maxsizeString);
-    Sizer sizer = new Sizer(buildPath, suggestedClassName);
+    Sizer sizer = new Sizer(buildPath, suggestedClassName, prefs);
       try {
       size = sizer.computeSize();
       System.out.println("Binary sketch size: " + size + " bytes (of a " +

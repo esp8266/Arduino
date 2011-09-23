@@ -28,14 +28,10 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import processing.app.Base;
-import processing.app.Preferences;
 import processing.app.Sketch;
 import processing.app.SketchCode;
 import processing.core.PApplet;
@@ -62,15 +58,15 @@ public class Compiler implements MessageConsumer {
 
   Map<String, String> configPreferences;
 
-  Map<String, String> boardPreferences;
-
-  Map<String, String> platformPreferences;
-
   String avrBasePath;
 
   List<File> objectFiles;
 
-  public Compiler() {
+  public Compiler(Map<String, String> preferences) {
+    // Merge all the preferences file in the correct order of precedence 
+    // into a new map.
+    configPreferences = preferences;
+    avrBasePath = configPreferences.get("compiler.path");
   }
 
   /**
@@ -95,40 +91,8 @@ public class Compiler implements MessageConsumer {
     this.verbose = verbose;
     objectFiles = new ArrayList<File>();
 
-    // the pms object isn't used for anything but storage
-    // MessageStream pms = new MessageStream(this);
-    Map<String, String> boardPreferences = Base.getBoardPreferences();
+    // System.out.println("-> compiler.java is doing stuff");
 
-    // Check for null platform, and use system default if not found
-    platform = boardPreferences.get("platform");
-    if (platform == null)
-      platformPreferences = new HashMap(Base.getPlatformPreferences());
-    else
-      platformPreferences = new HashMap(Base.getPlatformPreferences(platform));
-
-    System.out.println("-> compiler.java is doing stuff");
-    // Put all the global preference configuration into one Master
-    // configpreferences
-    configPreferences = mergePreferences(Preferences.getMap(),
-                                         platformPreferences, boardPreferences);
-
-    avrBasePath = configPreferences.get("compiler.path");
-    if (avrBasePath == null) {
-      avrBasePath = Base.getAvrBasePath();
-      // System.out.println("avrBasePath: " + avrBasePath);
-    } else {
-      // System.out.println("avrBasePath:exists: " + avrBasePath);
-
-      // Put in the system path in the compiler path if available
-      String basePath = System.getProperty("user.dir");
-      if (Base.isMacOS()) {
-        // logger.debug("basePath: " + basePath);
-        basePath += "/Arduino.app/Contents/Resources/Java";
-      }
-      Object[] Args = { basePath };
-      avrBasePath = new MessageFormat(avrBasePath).format(Args);
-      // System.out.println("avrBasePath:new: " + avrBasePath);
-    }
     board = configPreferences.get("board");
     if (board == "")
       board = "_UNKNOWN";
@@ -148,7 +112,6 @@ public class Compiler implements MessageConsumer {
       target = Base.getTarget();
       coreFolder = new File(new File(target.getFolder(), "cores"), core);
       corePath = coreFolder.getAbsolutePath();
-
       systemPath = new File(target.getFolder(), "system").getAbsolutePath();
     } else {
       target = Base.targetsTable.get(core.substring(0, core.indexOf(':')));
@@ -501,20 +464,24 @@ public class Compiler implements MessageConsumer {
                                               String objectName,
                                               Map<String, String> configPreferences) {
     System.out.println("getCommandCompilerS: start");
-    String baseCommandString = configPreferences.get("recipe.cpp.o.pattern");
-    MessageFormat compileFormat = new MessageFormat(baseCommandString);
+    String recipe = configPreferences.get("recipe.cpp.o.pattern");
+    MessageFormat compileFormat = new MessageFormat(recipe);
     // getIncludes to String
 
-    String includes = preparePaths(includePaths);
-    Object[] Args = { avrBasePath, configPreferences.get("compiler.cpp.cmd"),
-        configPreferences.get("compiler.S.flags"),
-        configPreferences.get("compiler.cpudef"),
-        configPreferences.get("build.mcu"),
-        configPreferences.get("build.f_cpu"),
-        configPreferences.get("software"), Base.REVISION, includes, sourceName,
-        objectName };
+    String args[] = new String[11];
+    args[0] = avrBasePath;
+    args[1] = configPreferences.get("compiler.cpp.cmd");
+    args[2] = configPreferences.get("compiler.S.flags");
+    args[3] = configPreferences.get("compiler.cpudef");
+    args[4] = configPreferences.get("build.mcu");
+    args[5] = configPreferences.get("build.f_cpu");
+    args[6] = configPreferences.get("software");
+    args[7] = "" + Base.REVISION;
+    args[8] = preparePaths(includePaths);
+    args[9] = sourceName;
+    args[10] = objectName;
 
-    String command = compileFormat.format(Args);
+    String command = compileFormat.format(args);
     String[] commandArray = command.split("\\|");
     return commandArray;
   }
@@ -553,21 +520,21 @@ public class Compiler implements MessageConsumer {
     // getIncludes to String
     String includes = preparePaths(includePaths);
 
-    Object[] Args = { avrBasePath, // 0
-        configPreferences.get("compiler.c.cmd"), // 1
-        configPreferences.get("compiler.c.flags"), // 2
-        configPreferences.get("compiler.cpudef"), // 3
-        configPreferences.get("build.mcu"), // 4
-        configPreferences.get("build.f_cpu"), // 5
-        configPreferences.get("software"), // 6
-        Base.REVISION, // 7
-        includes, // 8
-        sourceName, // 9
-        objectName, // 10
-        configPreferences.get("build.extra_flags") // 11
-    };
+    String[] args = new String[12];
+    args[0] = avrBasePath;
+    args[1] = configPreferences.get("compiler.c.cmd");
+    args[2] = configPreferences.get("compiler.c.flags");
+    args[3] = configPreferences.get("compiler.cpudef");
+    args[4] = configPreferences.get("build.mcu");
+    args[5] = configPreferences.get("build.f_cpu");
+    args[6] = configPreferences.get("software");
+    args[7] = "" + Base.REVISION;
+    args[8] = includes;
+    args[9] = sourceName;
+    args[10] = objectName;
+    args[11] = configPreferences.get("build.extra_flags");
 
-    String command = compileFormat.format(Args);
+    String command = compileFormat.format(args);
     String[] commandArray = command.split("\\|");
     return commandArray;
   }
@@ -607,21 +574,21 @@ public class Compiler implements MessageConsumer {
     // getIncludes to String
     String includes = preparePaths(includePaths);
 
-    Object[] Args = { avrBasePath, // 0
-        configPreferences.get("compiler.cpp.cmd"), // 1
-        configPreferences.get("compiler.cpp.flags"), // 2
-        configPreferences.get("compiler.cpudef"), // 3
-        configPreferences.get("build.mcu"), // 4
-        configPreferences.get("build.f_cpu"), // 5
-        configPreferences.get("software"), // 6
-        Base.REVISION, // 7
-        includes, // 8
-        sourceName, // 9
-        objectName, // 10
-        configPreferences.get("build.extra_flags") // 11
-    };
+    String[] args = new String[12];
+    args[0] = avrBasePath;
+    args[1] = configPreferences.get("compiler.cpp.cmd");
+    args[2] = configPreferences.get("compiler.cpp.flags");
+    args[3] = configPreferences.get("compiler.cpudef");
+    args[4] = configPreferences.get("build.mcu");
+    args[5] = configPreferences.get("build.f_cpu");
+    args[6] = configPreferences.get("software");
+    args[7] = "" + Base.REVISION;
+    args[8] = includes;
+    args[9] = sourceName;
+    args[10] = objectName;
+    args[11] = configPreferences.get("build.extra_flags");
 
-    String command = compileFormat.format(Args);
+    String command = compileFormat.format(args);
     String[] commandArray = command.split("\\|");
 
     // System.out.println("command:" + command);
@@ -658,7 +625,7 @@ public class Compiler implements MessageConsumer {
 
   static public ArrayList<File> findFilesInPath(String path, String extension,
                                                 boolean recurse) {
-    System.out.println("findFilesInPath: " + path);
+    // System.out.println("findFilesInPath: " + path);
     return findFilesInFolder(new File(path), extension, recurse);
   }
 
@@ -690,11 +657,10 @@ public class Compiler implements MessageConsumer {
                      List<String> includePaths,
                      Map<String, String> configPreferences)
       throws RunnerException {
-    System.out.println("compileSketch: start");
-    System.out.println("includePaths: ");
-    for (int i = 0; i < includePaths.size(); i++) {
-      System.out.println("-I" + (String) includePaths.get(i));
-    }
+    // System.out.println("compileSketch: start");
+    // System.out.println("includePaths: ");
+    // for (int i = 0; i < includePaths.size(); i++)
+    // System.out.println("-I" + (String) includePaths.get(i));
 
     // logger.debug("compileSketch: start");
     objectFiles.addAll(compileFiles(avrBasePath, buildPath, includePaths,
@@ -732,7 +698,7 @@ public class Compiler implements MessageConsumer {
                                                         false),
                                       findFilesInFolder(libraryFolder, "cpp",
                                                         false),
-                                      boardPreferences));
+                                      configPreferences));
       outputFolder = new File(outputFolder, "utility");
       createFolder(outputFolder);
       objectFiles.addAll(compileFiles(avrBasePath, outputFolder
@@ -742,7 +708,7 @@ public class Compiler implements MessageConsumer {
                                                         false),
                                       findFilesInFolder(utilityFolder, "cpp",
                                                         false),
-                                      boardPreferences));
+                                      configPreferences));
       // other libraries should not see this library's utility/ folder
       includePaths.remove(includePaths.size() - 1);
     }
@@ -762,7 +728,6 @@ public class Compiler implements MessageConsumer {
     // for (int i = 0; i < includePaths.size(); i++)
     // System.out.println("-I" + includePaths.get(i));
 
-    String commandString = "";
     // System.out.println("corePath: " + corePath);
     List<String> srcDirs = new ArrayList<String>();
     srcDirs.add(corePath);
@@ -771,32 +736,29 @@ public class Compiler implements MessageConsumer {
     srcDirs.addAll(variantExtraSrc);
 
     List<File> objects = new ArrayList<File>();
-
-    for (String dir : srcDirs) {
+    for (String dir : srcDirs)
       objects.addAll(compileFiles(avrBasePath, buildPath, includePaths,
                                   findFilesInPath(dir, "S", false),
                                   findFilesInPath(dir, "c", false),
                                   findFilesInPath(dir, "cpp", false),
                                   configPreferences));
-    }
 
     for (File file : objects) {
       // List commandAR = new ArrayList(baseCommandAR);
       // commandAR = commandAR + file.getAbsolutePath();
 
-      Object[] Args = { avrBasePath, // 0
-          configPreferences.get("compiler.ar.cmd"), // 1
-          configPreferences.get("compiler.ar.flags"), // 2
-          // corePath,
-          buildPath + File.separator, "core.a", // 3
-          // objectName
-          file.getAbsolutePath() // 4
-      };
+      String[] args = new String[6];
+      args[0] = avrBasePath;
+      args[1] = configPreferences.get("compiler.ar.cmd");
+      args[2] = configPreferences.get("compiler.ar.flags");
+      args[3] = buildPath + File.separator;
+      args[4] = "core.a";
+      args[5] = file.getAbsolutePath();
       // System.out.println("compileCore(...) substitute");
 
       String baseCommandString = configPreferences.get("recipe.ar.pattern");
       MessageFormat compileFormat = new MessageFormat(baseCommandString);
-      commandString = compileFormat.format(Args);
+      String commandString = compileFormat.format(args);
 
       String[] commandArray = commandString.split("\\|");
       execAsynchronously(commandArray);
@@ -808,32 +770,31 @@ public class Compiler implements MessageConsumer {
                    List<String> includePaths, String pinsPath,
                    Map<String, String> configPreferences)
       throws RunnerException {
-    System.out.println("compileLink: start");
-    String baseCommandString = configPreferences
-        .get("recipe.c.combine.pattern");
-    String commandString = "";
-    MessageFormat compileFormat = new MessageFormat(baseCommandString);
-    String objectFileList = "";
+    // System.out.println("compileLink: start");
+    String recipe = configPreferences.get("recipe.c.combine.pattern");
+    MessageFormat compileFormat = new MessageFormat(recipe);
 
-    for (File file : objectFiles) {
+    String objectFileList = "";
+    for (File file : objectFiles)
       objectFileList = objectFileList + file.getAbsolutePath() + "|";
-    }
     System.out.println("objectFileList: " + objectFileList);
 
-    Object[] Args = { avrBasePath, // 0
-        configPreferences.get("compiler.c.elf.cmd"), // 1
-        configPreferences.get("compiler.c.elf.flags"), // 2
-        configPreferences.get("compiler.cpudef"), // 3
-        configPreferences.get("build.mcu"), // 4
-        buildPath + File.separator, // 5
-        primaryClassName, // 6
-        objectFileList, // 7
-        buildPath + File.separator + "core.a", // 8
-        buildPath, // 9
-        corePath, // 10
-        pinsPath + File.separator + configPreferences.get("build.ldscript") // 11
-    };
-    commandString = compileFormat.format(Args);
+    String args[] = new String[12];
+    args[0] = avrBasePath;
+    args[1] = configPreferences.get("compiler.c.elf.cmd");
+    args[2] = configPreferences.get("compiler.c.elf.flags");
+    args[3] = configPreferences.get("compiler.cpudef");
+    args[4] = configPreferences.get("build.mcu");
+    args[5] = buildPath + File.separator;
+    args[6] = primaryClassName;
+    args[7] = objectFileList;
+    args[8] = buildPath + File.separator + "core.a";
+    args[9] = buildPath;
+    args[10] = corePath;
+    args[11] = pinsPath + File.separator
+               + configPreferences.get("build.ldscript");
+
+    String commandString = compileFormat.format(args);
     String[] commandArray = commandString.split("\\|");
     execAsynchronously(commandArray);
   }
@@ -843,18 +804,19 @@ public class Compiler implements MessageConsumer {
                   List<String> includePaths,
                   Map<String, String> configPreferences) throws RunnerException {
     // logger.debug("compileEep: start");
-    String baseCommandString = configPreferences
-        .get("recipe.objcopy.eep.pattern");
-    String commandString = "";
-    MessageFormat compileFormat = new MessageFormat(baseCommandString);
-    String objectFileList = "";
+    String recipe = configPreferences.get("recipe.objcopy.eep.pattern");
+    if (recipe.trim().isEmpty())
+      return;
+    MessageFormat compileFormat = new MessageFormat(recipe);
 
-    Object[] Args = { avrBasePath,
-        configPreferences.get("compiler.objcopy.cmd"),
-        configPreferences.get("compiler.objcopy.eep.flags"),
-        buildPath + File.separator + primaryClassName,
-        buildPath + File.separator + primaryClassName };
-    commandString = compileFormat.format(Args);
+    String[] args = new String[5];
+    args[0] = avrBasePath;
+    args[1] = configPreferences.get("compiler.objcopy.cmd");
+    args[2] = configPreferences.get("compiler.objcopy.eep.flags");
+    args[3] = buildPath + File.separator + primaryClassName;
+    args[4] = buildPath + File.separator + primaryClassName;
+
+    String commandString = compileFormat.format(args);
     String[] commandArray = commandString.split("\\|");
     execAsynchronously(commandArray);
   }
@@ -864,69 +826,19 @@ public class Compiler implements MessageConsumer {
                   List<String> includePaths,
                   Map<String, String> configPreferences) throws RunnerException {
     // logger.debug("compileHex: start");
-    String baseCommandString = configPreferences
-        .get("recipe.objcopy.hex.pattern");
-    String commandString = "";
-    MessageFormat compileFormat = new MessageFormat(baseCommandString);
-    String objectFileList = "";
+    String recipe = configPreferences.get("recipe.objcopy.hex.pattern");
+    MessageFormat compileFormat = new MessageFormat(recipe);
 
-    Object[] Args = { avrBasePath,
-        configPreferences.get("compiler.elf2hex.cmd"),
-        configPreferences.get("compiler.elf2hex.flags"),
-        buildPath + File.separator + primaryClassName,
-        buildPath + File.separator + primaryClassName };
-    commandString = compileFormat.format(Args);
+    String[] args = new String[5];
+    args[0] = avrBasePath;
+    args[1] = configPreferences.get("compiler.elf2hex.cmd");
+    args[2] = configPreferences.get("compiler.elf2hex.flags");
+    args[3] = buildPath + File.separator + primaryClassName;
+    args[4] = buildPath + File.separator + primaryClassName;
+
+    String commandString = compileFormat.format(args);
     String[] commandArray = commandString.split("\\|");
     execAsynchronously(commandArray);
-  }
-
-  // merge all the preferences file in the correct order of precedence
-  HashMap mergePreferences(Map Preferences, Map platformPreferences,
-                           Map boardPreferences) {
-    HashMap _map = new HashMap();
-
-    Iterator iterator = Preferences.entrySet().iterator();
-
-    while (iterator.hasNext()) {
-      Map.Entry pair = (Map.Entry) iterator.next();
-      if (pair.getValue() == null) {
-        _map.put(pair.getKey(), "");
-      } else {
-        _map.put(pair.getKey(), pair.getValue());
-      }
-    }
-
-    // logger.debug("Done: Preferences");
-
-    iterator = platformPreferences.entrySet().iterator();
-
-    while (iterator.hasNext()) {
-      Map.Entry pair = (Map.Entry) iterator.next();
-
-      if (pair.getValue() == null) {
-        _map.put(pair.getKey(), "");
-      } else {
-        _map.put(pair.getKey(), pair.getValue());
-      }
-      // System.out.println(pair.getKey() + " = " + pair.getValue());
-    }
-
-    // System.out.println("Done: platformPreferences");
-    iterator = boardPreferences.entrySet().iterator();
-
-    while (iterator.hasNext()) {
-      Map.Entry pair = (Map.Entry) iterator.next();
-
-      if (pair.getValue() == null) {
-        _map.put(pair.getKey(), "");
-      } else {
-        _map.put(pair.getKey(), pair.getValue());
-      }
-      // System.out.println(pair.getKey() + " = " + pair.getValue());
-    }
-    // System.out.println("Done: boardPreferences");
-
-    return _map;
   }
 
   // getIncludes to String

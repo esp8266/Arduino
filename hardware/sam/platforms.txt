@@ -29,12 +29,16 @@ sam.recipe.c.combine.pattern={0}{1}|{2}|{3}{4}|-T{11}|-Wl,-Map,{5}{6}.map|-o|{5}
 
 ##create eeprom
 #sam.recipe.objcopy.eep.pattern={0=compiler.path}{1=compiler.objcopy.cmd}{2=compiler.objcopy.eep.flags} {3=BUILD_PATH}{4=SOURCE_NAME}.elf {5=BUILD_PATH}{6=SOURCE_NAME}.eep
-sam.recipe.objcopy.eep.pattern={0}{1}|{2}|{3}.elf|{4}.eep
+#sam.recipe.objcopy.eep.pattern={0}{1}|{2}|{3}.elf|{4}.eep
+sam.recipe.objcopy.eep.pattern=
 
 ##create hex
 #sam.recipe.objcopy.hex.pattern={0=compiler.path}{1=compiler.objcopy.cmd}{2=compiler.objcopy.elf.flags} {3=BUILD_PATH}{4=SOURCE_NAME}.elf {5=BUILD_PATH}{6=SOURCE_NAME}.hex
-sam.recipe.objcopy.hex.pattern={0}{1}|{2}|{3}.elf|{4}.hex
+sam.recipe.objcopy.hex.pattern={0}{1}|{2}|{3}.elf|{4}.bin
 
+
+##compute size
+sam.recipe.size.pattern={0}{1}|{2}.elf
 
 
 ########################################################
@@ -56,6 +60,7 @@ sam.compiler.elf2hex.flags=|-O|binary
 sam.compiler.elf2hex.cmd=arm-none-eabi-objcopy
 sam.compiler.ldflags=
 sam.compiler.cpudef=-mcpu=
+sam.compiler.size.cmd=arm-none-eabi-size
 sam.compiler.upload.cmd=
 sam.compiler.upload.flags=
 sam.compiler.define=-DARDUINO=

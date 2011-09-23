@@ -1841,7 +1841,7 @@ public class Editor extends JFrame implements RunnerListener {
     public void run() {
       try {
         sketch.prepare();
-        String appletClassName = sketch.build(false);
+        sketch.build(false);
         statusNotice("Done compiling.");
       } catch (Exception e) {
         statusError(e);
@@ -1856,7 +1856,7 @@ public class Editor extends JFrame implements RunnerListener {
     public void run() {
       try {
         sketch.prepare();
-        String appletClassName = sketch.build(true);
+        sketch.build(true);
         statusNotice("Done compiling.");
       } catch (Exception e) {
         statusError(e);
