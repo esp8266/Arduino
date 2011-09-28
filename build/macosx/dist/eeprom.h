@@ -196,7 +196,7 @@ __ATTR_PURE__ static __inline__ uint8_t eeprom_read_byte (const uint8_t *__p)
 {
     do {} while (!eeprom_is_ready ());
 #if E2END <= 0xFF
-    EEARL = (uint8_t)__p;
+    EEARL = (uint8_t)(uint16_t)__p;
 #else
     EEAR = (uint16_t)__p;
 #endif
