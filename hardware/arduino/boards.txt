@@ -203,7 +203,7 @@ mini.build.variant=eightanaloginputs
 
 ethernet.name=Arduino Ethernet
 
-ethernet.upload.protocol=stk500
+ethernet.upload.protocol=arduino
 ethernet.upload.maximum_size=32256
 ethernet.upload.speed=115200
 
