@@ -1203,6 +1203,8 @@ static const char *getmimetype(const char *name)
         return "text/html";
     else if (strstr(name, ".css"))
         return "text/css"; 
+    else if (strstr(name, ".php"))
+        return "application/x-http-php"; 
     else
         return "application/octet-stream";
 }

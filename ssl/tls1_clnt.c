@@ -158,9 +158,10 @@ int do_client_connect(SSL *ssl)
             if (ret < SSL_OK)
                 break;
         }
+
+        ssl->hs_status = ret;            /* connected? */    
     }
 
-    ssl->hs_status = ret;            /* connected? */
     return ret;
 }
 
