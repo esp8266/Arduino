@@ -476,7 +476,7 @@ public class Compiler implements MessageConsumer {
       "-c", // compile, don't link
       "-g", // include debugging info (so errors include line numbers)
       "-Os", // optimize for size
-      "-w", // surpress all warnings
+      Preferences.getBoolean("build.verbose") ? "-Wall" : "-w", // show warnings if verbose
       "-ffunction-sections", // place each function in its own section
       "-fdata-sections",
       "-mmcu=" + boardPreferences.get("build.mcu"),
@@ -504,7 +504,7 @@ public class Compiler implements MessageConsumer {
       "-c", // compile, don't link
       "-g", // include debugging info (so errors include line numbers)
       "-Os", // optimize for size
-      "-w", // surpress all warnings
+      Preferences.getBoolean("build.verbose") ? "-Wall" : "-w", // show warnings if verbose
       "-fno-exceptions",
       "-ffunction-sections", // place each function in its own section
       "-fdata-sections",
