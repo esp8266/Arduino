@@ -69,7 +69,7 @@ EthernetClient EthernetServer::available()
 
 size_t EthernetServer::write(uint8_t b) 
 {
-  write(&b, 1);
+  return write(&b, 1);
 }
 
 size_t EthernetServer::write(const uint8_t *buffer, size_t size) 

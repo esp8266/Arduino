@@ -31,7 +31,7 @@ public:
 
 protected:
     uint16_t BuildRequest(const char* aName);
-    uint16_t ProcessResponse(int aTimeout, IPAddress& aAddress);
+    uint16_t ProcessResponse(uint16_t aTimeout, IPAddress& aAddress);
 
     IPAddress iDNSServer;
     uint16_t iRequestId;

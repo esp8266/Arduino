@@ -22,7 +22,7 @@
 #define SPI_CLOCK_DIV2 0x04
 #define SPI_CLOCK_DIV8 0x05
 #define SPI_CLOCK_DIV32 0x06
-#define SPI_CLOCK_DIV64 0x07
+//#define SPI_CLOCK_DIV64 0x07
 
 #define SPI_MODE0 0x00
 #define SPI_MODE1 0x04

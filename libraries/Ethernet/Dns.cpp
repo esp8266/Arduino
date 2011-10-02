@@ -252,7 +252,7 @@ uint16_t DNSClient::BuildRequest(const char* aName)
 }
 
 
-uint16_t DNSClient::ProcessResponse(int aTimeout, IPAddress& aAddress)
+uint16_t DNSClient::ProcessResponse(uint16_t aTimeout, IPAddress& aAddress)
 {
     uint32_t startTime = millis();
 
@@ -285,7 +285,7 @@ uint16_t DNSClient::ProcessResponse(int aTimeout, IPAddress& aAddress)
     uint16_t header_flags = htons(*((uint16_t*)&header[2]));
     // Check that it's a response to this request
     if ( ( iRequestId != (*((uint16_t*)&header[0])) ) ||
-        (header_flags & QUERY_RESPONSE_MASK != RESPONSE_FLAG) )
+        ((header_flags & QUERY_RESPONSE_MASK) != (uint16_t)RESPONSE_FLAG) )
     {
         // Mark the entire packet as read
         iUdp.flush();
@@ -310,7 +310,7 @@ uint16_t DNSClient::ProcessResponse(int aTimeout, IPAddress& aAddress)
     }
 
     // Skip over any questions
-    for (int i =0; i < htons(*((uint16_t*)&header[4])); i++)
+    for (uint16_t i =0; i < htons(*((uint16_t*)&header[4])); i++)
     {
         // Skip over the name
         uint8_t len;
@@ -340,7 +340,7 @@ uint16_t DNSClient::ProcessResponse(int aTimeout, IPAddress& aAddress)
     // type A answer) and some authority and additional resource records but
     // we're going to ignore all of them.
 
-    for (int i =0; i < answerCount; i++)
+    for (uint16_t i =0; i < answerCount; i++)
     {
         // Skip the name
         uint8_t len;
@@ -407,7 +407,7 @@ uint16_t DNSClient::ProcessResponse(int aTimeout, IPAddress& aAddress)
         else
         {
             // This isn't an answer type we're after, move onto the next one
-            for (int i =0; i < htons(header_flags); i++)
+            for (uint16_t i =0; i < htons(header_flags); i++)
             {
                 iUdp.read(); // we don't care about the returned byte
             }

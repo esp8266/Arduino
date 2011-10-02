@@ -140,7 +140,7 @@ uint8_t W5100Class::write(uint16_t _addr, uint8_t _data)
 
 uint16_t W5100Class::write(uint16_t _addr, const uint8_t *_buf, uint16_t _len)
 {
-  for (int i=0; i<_len; i++)
+  for (uint16_t i=0; i<_len; i++)
   {
     setSS();    
     SPI.transfer(0xF0);
@@ -166,7 +166,7 @@ uint8_t W5100Class::read(uint16_t _addr)
 
 uint16_t W5100Class::read(uint16_t _addr, uint8_t *_buf, uint16_t _len)
 {
-  for (int i=0; i<_len; i++)
+  for (uint16_t i=0; i<_len; i++)
   {
     setSS();
     SPI.transfer(0x0F);

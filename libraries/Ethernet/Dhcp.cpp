@@ -243,7 +243,7 @@ uint8_t DhcpClass::parseDHCPResponse(unsigned long responseTimeout, uint32_t& tr
         // Skip to the option part
         // Doing this a byte at a time so we don't have to put a big buffer
         // on the stack (as we don't have lots of memory lying around)
-        for (int i =0; i < (240 - sizeof(RIP_MSG_FIXED)); i++)
+        for (int i =0; i < (240 - (int)sizeof(RIP_MSG_FIXED)); i++)
         {
             _dhcpUdpSocket.read(); // we don't care about the returned byte
         }
