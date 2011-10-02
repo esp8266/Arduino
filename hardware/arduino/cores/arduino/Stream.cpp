@@ -67,9 +67,9 @@ int Stream::peekNextDigit()
 // Public Methods
 //////////////////////////////////////////////////////////////
 
-void Stream::setTimeout( long timeout)  // sets the maximum number of milliseconds to wait
+void Stream::setTimeout(unsigned long timeout)  // sets the maximum number of milliseconds to wait
 {
-   this->_timeout = timeout;
+  _timeout = timeout;
 }
 
  // find returns true if the target string is found
@@ -165,7 +165,7 @@ long Stream::parseInt(char skipChar)
 // as parseInt but returns a floating point value
 float Stream::parseFloat()
 {
-  parseFloat(NO_SKIP_CHAR);
+  return parseFloat(NO_SKIP_CHAR);
 }
 
 // as above but the given skipChar is ignored
@@ -174,7 +174,6 @@ float Stream::parseFloat(char skipChar){
   boolean isNegative = false;
   boolean isFraction = false;
   long value = 0;
-  float fValue;
   char c;
   float fraction = 1.0;
 
@@ -223,7 +222,7 @@ int Stream::readBytes( char *buffer, size_t length)
 
 int Stream::readBytesUntil( char terminator, char *buffer, size_t length)
 {
- int index = 0;
+    unsigned int index = 0;
     *buffer = 0;
     while(index < length-1 ){
       int c = timedRead();
