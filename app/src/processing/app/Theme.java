@@ -29,6 +29,7 @@ import java.util.*;
 
 import processing.app.syntax.*;
 import processing.core.*;
+import static processing.app.I18n._;
 
 
 /**
@@ -48,8 +49,8 @@ public class Theme {
     try {
       load(Base.getLibStream("theme/theme.txt"));
     } catch (Exception te) {
-      Base.showError(null, "Could not read color theme settings.\n" +
-                           "You'll need to reinstall Processing.", te);
+      Base.showError(null, _("Could not read color theme settings.\n" +
+                             "You'll need to reinstall Processing."), te);
     }
 
     // check for platform-specific properties in the defaults

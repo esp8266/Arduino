@@ -30,6 +30,7 @@ import java.io.IOException;
 import javax.swing.JOptionPane;
 
 import processing.app.*;
+import static processing.app.I18n._;
 
 
 public class FixEncoding implements Tool {
@@ -37,7 +38,7 @@ public class FixEncoding implements Tool {
 
 
   public String getMenuTitle() {
-    return "Fix Encoding & Reload";
+    return _("Fix Encoding & Reload");
   }
   
   
@@ -53,8 +54,8 @@ public class FixEncoding implements Tool {
     if (sketch.isModified()) {
       int result = 
         JOptionPane.showConfirmDialog(editor, 
-                                      "Discard all changes and reload sketch?", 
-                                      "Fix Encoding & Reload",
+                                      _("Discard all changes and reload sketch?"), 
+                                      _("Fix Encoding & Reload"),
                                       JOptionPane.YES_NO_OPTION,
                                       JOptionPane.QUESTION_MESSAGE);
 
@@ -73,11 +74,9 @@ public class FixEncoding implements Tool {
       
     } catch (IOException e) {
       String msg = 
-        "An error occurred while trying to fix the file encoding.\n" +
-        "Do not attempt to save this sketch as it may overwrite\n" +
-        "the old version. Use Open to re-open the sketch and try again.\n" +
+        _("An error occurred while trying to fix the file encoding.\nDo not attempt to save this sketch as it may overwrite\nthe old version. Use Open to re-open the sketch and try again.\n") +
         e.getMessage();
-      Base.showWarning("Fix Encoding & Reload", msg, e); 
+      Base.showWarning(_("Fix Encoding & Reload"), msg, e); 
     }
   }
 

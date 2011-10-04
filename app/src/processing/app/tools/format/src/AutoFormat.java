@@ -24,6 +24,7 @@ package processing.app.tools;
 
 import processing.app.*;
 import processing.core.*;
+import static processing.app.I18n._;
 
 import java.io.*;
 
@@ -50,7 +51,7 @@ public class AutoFormat {
 
     String formattedText = null; //strOut.toString();
     if (formattedText.equals(originalText)) {
-      editor.message("No changes necessary for Auto Format.");
+      editor.message(_("No changes necessary for Auto Format."));
 
     } else {
       // replace with new bootiful text

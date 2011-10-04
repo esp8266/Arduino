@@ -20,6 +20,7 @@ package processing.app;
 
 import processing.app.debug.MessageConsumer;
 import processing.core.*;
+import static processing.app.I18n._;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -89,7 +90,7 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
         textField.setText("");
       }});
 
-    sendButton = new JButton("Send");
+    sendButton = new JButton(_("Send"));
     sendButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         send(textField.getText());
@@ -106,9 +107,9 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
     pane.setLayout(new BoxLayout(pane, BoxLayout.X_AXIS));
     pane.setBorder(new EmptyBorder(4, 4, 4, 4));
     
-    autoscrollBox = new JCheckBox("Autoscroll", true);
+    autoscrollBox = new JCheckBox(_("Autoscroll"), true);
     
-    lineEndings = new JComboBox(new String[] { "No line ending", "Newline", "Carriage return", "Both NL & CR" });
+    lineEndings = new JComboBox(new String[] { _("No line ending"), _("Newline"), _("Carriage return"), _("Both NL & CR") });
     lineEndings.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
       	Preferences.setInteger("serial.line_ending", lineEndings.getSelectedIndex());
@@ -126,10 +127,10 @@ public class SerialMonitor extends JFrame implements MessageConsumer {
     
     serialRates = new JComboBox();
     for (int i = 0; i < serialRateStrings.length; i++)
-      serialRates.addItem(serialRateStrings[i] + " baud");
+      serialRates.addItem(serialRateStrings[i] + _(" baud"));
 
     serialRate = Preferences.getInteger("serial.debug_rate");
-    serialRates.setSelectedItem(serialRate + " baud");
+    serialRates.setSelectedItem(serialRate + _(" baud"));
     serialRates.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         String wholeString = (String) serialRates.getSelectedItem();

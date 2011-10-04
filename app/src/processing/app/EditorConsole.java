@@ -22,6 +22,7 @@
 */
 
 package processing.app;
+import static processing.app.I18n._;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -145,9 +146,8 @@ public class EditorConsole extends JScrollPane {
           stderrFile = new FileOutputStream(errFile);
         }
       } catch (IOException e) {
-        Base.showWarning("Console Error",
-                         "A problem occurred while trying to open the\n" +
-                         "files used to store the console output.", e);
+        Base.showWarning(_("Console Error"),
+                         _("A problem occurred while trying to open the\nfiles used to store the console output."), e);
       }
       consoleOut = new PrintStream(new EditorConsoleStream(false));
       consoleErr = new PrintStream(new EditorConsoleStream(true));

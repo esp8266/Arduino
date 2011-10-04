@@ -21,6 +21,7 @@
 */
 
 package processing.app;
+import static processing.app.I18n._;
 
 import java.io.File;
 
@@ -163,10 +164,8 @@ public class Platform {
 
 
   protected void showLauncherWarning() {
-    Base.showWarning("No launcher available", 
-                     "Unspecified platform, no launcher available.\n" + 
-                     "To enable opening URLs or folders, add a \n" +
-                     "\"launcher=/path/to/app\" line to preferences.txt", 
+    Base.showWarning(_("No launcher available"), 
+                     _("Unspecified platform, no launcher available.\nTo enable opening URLs or folders, add a \n\"launcher=/path/to/app\" line to preferences.txt"),
                      null);
   }
 }

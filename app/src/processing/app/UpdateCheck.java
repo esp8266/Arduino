@@ -32,6 +32,7 @@ import java.util.Random;
 import javax.swing.JOptionPane;
 
 import processing.core.PApplet;
+import static processing.app.I18n._;
 
 
 /**
@@ -49,7 +50,7 @@ import processing.core.PApplet;
  */
 public class UpdateCheck implements Runnable {
   Base base;
-  String downloadURL = "http://www.arduino.cc/latest.txt";
+  String downloadURL = _("http://www.arduino.cc/latest.txt");
 
   static final long ONE_DAY = 24 * 60 * 60 * 1000;
 
@@ -99,22 +100,22 @@ public class UpdateCheck implements Runnable {
       Preferences.set("update.last", String.valueOf(now));
 
       String prompt =
-        "A new version of Arduino is available,\n" +
-        "would you like to visit the Arduino download page?";
+        _("A new version of Arduino is available,\n" +
+          "would you like to visit the Arduino download page?");
         
       if (base.activeEditor != null) {
         if (latest > Base.REVISION) {
-          Object[] options = { "Yes", "No" };
+          Object[] options = { _("Yes"), _("No") };
           int result = JOptionPane.showOptionDialog(base.activeEditor,
                                                     prompt,
-                                                    "Update",
+                                                    _("Update"),
                                                     JOptionPane.YES_NO_OPTION,
                                                     JOptionPane.QUESTION_MESSAGE,
                                                     null,
                                                     options,
                                                     options[0]);
           if (result == JOptionPane.YES_OPTION) {
-            Base.openURL("http://www.arduino.cc/en/Main/Software");
+            Base.openURL(_("http://www.arduino.cc/en/Main/Software"));
           }
         }
       }

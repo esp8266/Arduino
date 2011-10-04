@@ -28,6 +28,8 @@ import processing.app.Preferences;
 import processing.app.Sketch;
 import processing.app.SketchCode;
 import processing.core.*;
+import processing.app.I18n;
+import static processing.app.I18n._;
 
 import java.io.*;
 import java.util.*;
@@ -36,9 +38,9 @@ import java.util.zip.*;
 
 public class Compiler implements MessageConsumer {
   static final String BUGS_URL =
-    "http://code.google.com/p/arduino/issues/list";
+    _("http://code.google.com/p/arduino/issues/list");
   static final String SUPER_BADNESS =
-    "Compiler error, please submit this code to " + BUGS_URL;
+    I18n.format(_("Compiler error, please submit this code to {0}"), BUGS_URL);
 
   Sketch sketch;
   String buildPath;
@@ -74,7 +76,7 @@ public class Compiler implements MessageConsumer {
     Map<String, String> boardPreferences = Base.getBoardPreferences();
     String core = boardPreferences.get("build.core");
     if (core == null) {
-    	RunnerException re = new RunnerException("No board selected; please choose a board from the Tools > Board menu.");
+    	RunnerException re = new RunnerException(_("No board selected; please choose a board from the Tools > Board menu."));
       re.hideStackTrace();
       throw re;
     }
@@ -346,11 +348,12 @@ public class Compiler implements MessageConsumer {
 
     if (result > 1) {
       // a failure in the tool (e.g. unable to locate a sub-executable)
-      System.err.println(command[0] + " returned " + result);
+      System.err.println(
+	  I18n.format(_("{0} returned {1}"), command[0], result));
     }
 
     if (result != 0) {
-      RunnerException re = new RunnerException("Error compiling.");
+      RunnerException re = new RunnerException(_("Error compiling."));
       re.hideStackTrace();
       throw re;
     }
@@ -389,45 +392,45 @@ public class Compiler implements MessageConsumer {
       String error = pieces[3], msg = "";
       
       if (pieces[3].trim().equals("SPI.h: No such file or directory")) {
-        error = "Please import the SPI library from the Sketch > Import Library menu.";
-        msg = "\nAs of Arduino 0019, the Ethernet library depends on the SPI library." +
-              "\nYou appear to be using it or another library that depends on the SPI library.\n\n";
+        error = _("Please import the SPI library from the Sketch > Import Library menu.");
+        msg = _("\nAs of Arduino 0019, the Ethernet library depends on the SPI library." +
+              "\nYou appear to be using it or another library that depends on the SPI library.\n\n");
       }
       
       if (pieces[3].trim().equals("'BYTE' was not declared in this scope")) {
-        error = "The 'BYTE' keyword is no longer supported.";
-        msg = "\nAs of Arduino 1.0, the 'BYTE' keyword is no longer supported." +
-              "\nPlease use Serial.write() instead.\n\n";
+        error = _("The 'BYTE' keyword is no longer supported.");
+        msg = _("\nAs of Arduino 1.0, the 'BYTE' keyword is no longer supported." +
+              "\nPlease use Serial.write() instead.\n\n");
       }
       
       if (pieces[3].trim().equals("no matching function for call to 'Server::Server(int)'")) {
-        error = "The Server class has been renamed EthernetServer.";
-        msg = "\nAs of Arduino 1.0, the Server class in the Ethernet library " +
-              "has been renamed to EthernetServer.\n\n";
+        error = _("The Server class has been renamed EthernetServer.");
+        msg = _("\nAs of Arduino 1.0, the Server class in the Ethernet library " +
+              "has been renamed to EthernetServer.\n\n");
       }
       
       if (pieces[3].trim().equals("no matching function for call to 'Client::Client(byte [4], int)'")) {
-        error = "The Client class has been renamed EthernetClient.";
-        msg = "\nAs of Arduino 1.0, the Client class in the Ethernet library " +
-              "has been renamed to EthernetClient.\n\n";
+        error = _("The Client class has been renamed EthernetClient.");
+        msg = _("\nAs of Arduino 1.0, the Client class in the Ethernet library " +
+              "has been renamed to EthernetClient.\n\n");
       }
       
       if (pieces[3].trim().equals("'Udp' was not declared in this scope")) {
-        error = "The Udp class has been renamed EthernetUdp.";
-        msg = "\nAs of Arduino 1.0, the Udp class in the Ethernet library " +
-              "has been renamed to EthernetClient.\n\n";
+        error = _("The Udp class has been renamed EthernetUdp.");
+        msg = _("\nAs of Arduino 1.0, the Udp class in the Ethernet library " +
+              "has been renamed to EthernetClient.\n\n");
       }
       
       if (pieces[3].trim().equals("'class TwoWire' has no member named 'send'")) {
-        error = "Wire.send() has been renamed Wire.write().";
-        msg = "\nAs of Arduino 1.0, the Wire.send() function was renamed " +
-              "to Wire.write() for consistency with other libraries.\n\n";
+        error = _("Wire.send() has been renamed Wire.write().");
+        msg = _("\nAs of Arduino 1.0, the Wire.send() function was renamed " +
+              "to Wire.write() for consistency with other libraries.\n\n");
       }
       
       if (pieces[3].trim().equals("'class TwoWire' has no member named 'receive'")) {
-        error = "Wire.receive() has been renamed Wire.read().";
-        msg = "\nAs of Arduino 1.0, the Wire.receive() function was renamed " +
-              "to Wire.read() for consistency with other libraries.\n\n";
+        error = _("Wire.receive() has been renamed Wire.read().");
+        msg = _("\nAs of Arduino 1.0, the Wire.receive() function was renamed " +
+              "to Wire.read() for consistency with other libraries.\n\n");
       }
 
       RunnerException e = sketch.placeException(error, pieces[1], PApplet.parseInt(pieces[2]) - 1);

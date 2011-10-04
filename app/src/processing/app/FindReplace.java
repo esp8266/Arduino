@@ -22,6 +22,7 @@
 */
 
 package processing.app;
+import static processing.app.I18n._;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -75,9 +76,9 @@ public class FindReplace extends JFrame implements ActionListener {
     Container pain = getContentPane();
     pain.setLayout(null);
 
-    JLabel findLabel = new JLabel("Find:");
+    JLabel findLabel = new JLabel(_("Find:"));
     Dimension d0 = findLabel.getPreferredSize();
-    JLabel replaceLabel = new JLabel("Replace with:");
+    JLabel replaceLabel = new JLabel(_("Replace with:"));
     Dimension d1 = replaceLabel.getPreferredSize();
 
     pain.add(findLabel);
@@ -117,7 +118,7 @@ public class FindReplace extends JFrame implements ActionListener {
                            d1.width, d1.height);
 
     //ignoreCase = true;
-    ignoreCaseBox = new JCheckBox("Ignore Case");
+    ignoreCaseBox = new JCheckBox(_("Ignore Case"));
     ignoreCaseBox.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           ignoreCase = ignoreCaseBox.isSelected();
@@ -133,16 +134,16 @@ public class FindReplace extends JFrame implements ActionListener {
 
     // ordering is different on mac versus pc
     if (Base.isMacOS()) {
-      buttons.add(replaceAllButton = new JButton("Replace All"));
-      buttons.add(replaceButton = new JButton("Replace"));
-      buttons.add(replaceFindButton = new JButton("Replace & Find"));
-      buttons.add(findButton = new JButton("Find"));
+      buttons.add(replaceAllButton = new JButton(_("Replace All")));
+      buttons.add(replaceButton = new JButton(_("Replace")));
+      buttons.add(replaceFindButton = new JButton(_("Replace & Find")));
+      buttons.add(findButton = new JButton(_("Find")));
 
     } else {
-      buttons.add(findButton = new JButton("Find"));
-      buttons.add(replaceFindButton = new JButton("Replace & Find"));
-      buttons.add(replaceButton = new JButton("Replace"));
-      buttons.add(replaceAllButton = new JButton("Replace All"));
+      buttons.add(findButton = new JButton(_("Find")));
+      buttons.add(replaceFindButton = new JButton(_("Replace & Find")));
+      buttons.add(replaceButton = new JButton(_("Replace")));
+      buttons.add(replaceAllButton = new JButton(_("Replace All")));
     }
     pain.add(buttons);
 

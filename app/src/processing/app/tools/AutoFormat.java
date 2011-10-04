@@ -26,6 +26,7 @@ package processing.app.tools;
 
 import processing.app.*;
 import processing.core.PApplet;
+import static processing.app.I18n._;
 
 import java.io.*;
 
@@ -87,7 +88,7 @@ public class AutoFormat implements Tool {
 
   
   public String getMenuTitle() {
-    return "Auto Format";
+    return _("Auto Format");
   }
 
   public void comment() throws IOException {
@@ -909,18 +910,26 @@ public class AutoFormat implements Tool {
 
       String formattedText = strOut.toString();
       if (formattedText.equals(originalText)) {
-        editor.statusNotice("No changes necessary for Auto Format.");
+        editor.statusNotice(_("No changes necessary for Auto Format."));
 
       } else if (paren != 0) {
         // warn user if there are too many parens in either direction
-        editor.statusError("Auto Format Canceled: Too many " +
-                     ((paren < 0) ? "right" : "left") +
-                     " parentheses.");
+	if (paren < 0) {
+	  editor.statusError(
+	    _("Auto Format Canceled: Too many right parentheses."));
+	} else {
+	  editor.statusError(
+	    _("Auto Format Canceled: Too many left parentheses."));
+	}
 
       } else if (c_level != 0) {  // check braces only if parens are ok
-        editor.statusError("Auto Format Canceled: Too many " +
-                     ((c_level < 0) ? "right" : "left") +
-                     " curly braces.");
+	if (c_level < 0) {
+	  editor.statusError(
+	    _("Auto Format Canceled: Too many right curly braces."));
+	} else {
+	  editor.statusError(
+	    _("Auto Format Canceled: Too many left curly braces."));
+	}
 
       } else {
         // replace with new bootiful text
@@ -929,7 +938,7 @@ public class AutoFormat implements Tool {
         editor.setSelection(selectionEnd, selectionEnd);
         editor.getSketch().setModified(true);
         // mark as finished
-        editor.statusNotice("Auto Format finished.");
+        editor.statusNotice(_("Auto Format finished."));
       }
 
     } catch (Exception e) {

@@ -22,6 +22,7 @@
 */
 
 package processing.app;
+import static processing.app.I18n._;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -288,7 +289,7 @@ public class EditorHeader extends JComponent {
     */
 
     //item = new JMenuItem("New Tab");
-    item = Editor.newJMenuItemShift("New Tab", 'N');
+    item = Editor.newJMenuItemShift(_("New Tab"), 'N');
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           editor.getSketch().handleNewCode();
@@ -296,7 +297,7 @@ public class EditorHeader extends JComponent {
       });
     menu.add(item);
 
-    item = new JMenuItem("Rename");
+    item = new JMenuItem(_("Rename"));
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           editor.getSketch().handleRenameCode();
@@ -310,7 +311,7 @@ public class EditorHeader extends JComponent {
       });
     menu.add(item);
 
-    item = new JMenuItem("Delete");
+    item = new JMenuItem(_("Delete"));
     item.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           editor.getSketch().handleDeleteCode();
@@ -322,7 +323,7 @@ public class EditorHeader extends JComponent {
 
     //  KeyEvent.VK_LEFT and VK_RIGHT will make Windows beep
 
-    item = new JMenuItem("Previous Tab");
+    item = new JMenuItem(_("Previous Tab"));
     KeyStroke ctrlAltLeft =
       KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, Editor.SHORTCUT_ALT_KEY_MASK);
     item.setAccelerator(ctrlAltLeft);
@@ -336,7 +337,7 @@ public class EditorHeader extends JComponent {
     */
     menu.add(item);
 
-    item = new JMenuItem("Next Tab");
+    item = new JMenuItem(_("Next Tab"));
     KeyStroke ctrlAltRight =
       KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, Editor.SHORTCUT_ALT_KEY_MASK);
     item.setAccelerator(ctrlAltRight);

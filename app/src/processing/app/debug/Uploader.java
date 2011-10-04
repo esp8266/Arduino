@@ -31,6 +31,8 @@ import processing.app.Preferences;
 import processing.app.Serial;
 import processing.app.SerialException;
 import processing.app.SerialNotFoundException;
+import processing.app.I18n;
+import static processing.app.I18n._;
 
 import java.io.*;
 import java.util.*;
@@ -47,9 +49,9 @@ import gnu.io.*;
 
 public abstract class Uploader implements MessageConsumer  {
   static final String BUGS_URL =
-    "https://developer.berlios.de/bugs/?group_id=3590";
+    _("https://developer.berlios.de/bugs/?group_id=3590");
   static final String SUPER_BADNESS =
-    "Compiler error, please submit this code to " + BUGS_URL;
+    I18n.format(_("Compiler error, please submit this code to {0}"), BUGS_URL);
 
   RunnerException exception;
   //PdePreferences preferences;
@@ -194,21 +196,21 @@ public abstract class Uploader implements MessageConsumer  {
     }
     if(notFoundError) {
       //System.out.println("throwing something");
-      exception = new RunnerException("the selected serial port "+s+" does not exist or your board is not connected");
+      exception = new RunnerException(I18n.format(_("the selected serial port {0} does not exist or your board is not connected"), s));
       return;
     }
     if (s.indexOf("Device is not responding") != -1 ) {
-      exception =  new RunnerException("Device is not responding, check the right serial port is selected or RESET the board right before exporting");
+      exception =  new RunnerException(_("Device is not responding, check the right serial port is selected or RESET the board right before exporting"));
       return;
     }
     if (s.indexOf("Programmer is not responding") != -1 ||
         s.indexOf("programmer is not responding") != -1 ||
         s.indexOf("protocol error") != -1) {
-      exception = new RunnerException("Problem uploading to board.  See http://www.arduino.cc/en/Guide/Troubleshooting#upload for suggestions.");
+      exception = new RunnerException(_("Problem uploading to board.  See http://www.arduino.cc/en/Guide/Troubleshooting#upload for suggestions."));
       return;
     }
     if (s.indexOf("Expected signature") != -1) {
-      exception = new RunnerException("Wrong microcontroller found.  Did you select the right board from the Tools > Board menu?");
+      exception = new RunnerException(_("Wrong microcontroller found.  Did you select the right board from the Tools > Board menu?"));
       return;
     }
   }

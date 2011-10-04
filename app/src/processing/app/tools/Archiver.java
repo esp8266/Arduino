@@ -24,6 +24,7 @@
 package processing.app.tools;
 
 import processing.app.*;
+import static processing.app.I18n._;
 
 import java.awt.FileDialog;
 import java.io.*;
@@ -44,7 +45,7 @@ public class Archiver implements Tool {
 
 
   public String getMenuTitle() {
-    return "Archive Sketch";
+    return _("Archive Sketch");
   }
   
   
@@ -55,7 +56,7 @@ public class Archiver implements Tool {
     numberFormat.setGroupingUsed(false); // no commas
     numberFormat.setMinimumIntegerDigits(digits);
 
-    dateFormat = new SimpleDateFormat("yyMMdd");
+    dateFormat = new SimpleDateFormat(_("yyMMdd"));
   }
 
 
@@ -70,9 +71,8 @@ public class Archiver implements Tool {
       e.printStackTrace();
     }
     if (!success) {
-      Base.showWarning("Couldn't archive sketch",
-                       "Archiving the sketch has been canceled because\n" +
-                       "the sketch couldn't save properly.", null);
+      Base.showWarning(_("Couldn't archive sketch"),
+                       _("Archiving the sketch has been canceled because\nthe sketch couldn't save properly."), null);
       return;
     }
 
@@ -106,7 +106,7 @@ public class Archiver implements Tool {
 
     // open up a prompt for where to save this fella
     FileDialog fd =
-      new FileDialog(editor, "Archive sketch as:", FileDialog.SAVE);
+      new FileDialog(editor, _("Archive sketch as:"), FileDialog.SAVE);
     fd.setDirectory(parent.getAbsolutePath());
     fd.setFile(newbie.getName());
     fd.setVisible(true);
@@ -136,7 +136,7 @@ public class Archiver implements Tool {
         e.printStackTrace();
       }
     } else {
-      editor.statusNotice("Archive sketch canceled.");
+      editor.statusNotice(_("Archive sketch canceled."));
     }
   }
 

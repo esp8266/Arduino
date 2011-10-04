@@ -26,6 +26,7 @@ package processing.app;
 //import processing.core.*;
 
 import processing.app.debug.MessageConsumer;
+import static processing.app.I18n._;
 
 import gnu.io.*;
 
@@ -141,16 +142,32 @@ public class Serial implements SerialPortEventListener {
         }
       }
     } catch (PortInUseException e) {
-      throw new SerialException("Serial port '" + iname + "' already in use.  Try quiting any programs that may be using it.");
+      throw new SerialException(
+        I18n.format(
+          _("Serial port ''{0}'' already in use. Try quiting any programs that may be using it."),
+          iname
+        )
+      );
     } catch (Exception e) {
-      throw new SerialException("Error opening serial port '" + iname + "'.", e);
+      throw new SerialException(
+        I18n.format(
+          _("Error opening serial port ''{0}''."),
+          iname
+        ),
+        e
+      );
 //      //errorMessage("<init>", e);
 //      //exception = e;
 //      //e.printStackTrace();
     }
     
     if (port == null) {
-      throw new SerialNotFoundException("Serial port '" + iname + "' not found.  Did you select the right one from the Tools > Serial Port menu?");
+      throw new SerialNotFoundException(
+        I18n.format(
+          _("Serial port ''{0}'' not found. Did you select the right one from the Tools > Serial Port menu?"),
+          iname
+        )
+      );
     }
   }
 
@@ -402,9 +419,14 @@ public class Serial implements SerialPortEventListener {
 
       int length = found - bufferIndex + 1;
       if (length > outgoing.length) {
-        System.err.println("readBytesUntil() byte buffer is" +
-                           " too small for the " + length + 
-                           " bytes up to and including char " + interesting);
+        System.err.println(
+          I18n.format(
+            _("readBytesUntil() byte buffer is too small for the {0}" +
+              " bytes up to and including char {1}"),
+            length,
+            interesting
+          )
+        );
         return -1;
       }
       //byte outgoing[] = new byte[length];
@@ -542,7 +564,7 @@ public class Serial implements SerialPortEventListener {
    * I think of something slightly more intelligent to do.
    */
   static public void errorMessage(String where, Throwable e) {
-    System.err.println("Error inside Serial." + where + "()");
+    System.err.println(I18n.format(_("Error inside Serial.{0}()"), where));
     e.printStackTrace();
   }
 }

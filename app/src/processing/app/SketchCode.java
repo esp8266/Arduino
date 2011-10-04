@@ -28,6 +28,7 @@ import java.io.*;
 
 import javax.swing.text.Document;
 import javax.swing.undo.*;
+import static processing.app.I18n._;
 
 
 /**
@@ -78,7 +79,8 @@ public class SketchCode {
     try {
       load();
     } catch (IOException e) {
-      System.err.println("Error while loading code " + file.getName());
+      System.err.println(
+        I18n.format(_("Error while loading code {0}"), file.getName()));
     }
   }
 
@@ -251,11 +253,16 @@ public class SketchCode {
     program = Base.loadFile(file);
 
     if (program.indexOf('\uFFFD') != -1) {
-      System.err.println(file.getName() + " contains unrecognized characters."); 
-      System.err.println("If this code was created with an older version of Processing,");
-      System.err.println("you may need to use Tools -> Fix Encoding & Reload to update");
-      System.err.println("the sketch to use UTF-8 encoding. If not, you may need to");
-      System.err.println("delete the bad characters to get rid of this warning.");
+      System.err.println(
+        I18n.format(
+          _("\"{0}\" contains unrecognized characters." +
+            "If this code was created with an older version of Processing," +
+            "you may need to use Tools -> Fix Encoding & Reload to update" +
+            "the sketch to use UTF-8 encoding. If not, you may need to" +
+            "delete the bad characters to get rid of this warning."),
+          file.getName()
+        )
+      );
       System.err.println();
     }
     

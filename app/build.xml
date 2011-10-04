@@ -45,6 +45,9 @@
 	   includeAntRuntime="false"
 	   debug="true"
 	   classpath="../core/core.jar; ${env.JAVA_HOME}/lib/tools.jar; lib/ant.jar; lib/ant-launcher.jar; lib/apple.jar; lib/ecj.jar; lib/jna.jar; lib/RXTXcomm.jar" />
+    <copy todir="bin" overwrite="true" verbose="true">
+      <fileset dir="src" includes="**/*.properties" />
+    </copy>
   </target>
   
   <target name="build" depends="compile" description="Build PDE">
