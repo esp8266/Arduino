@@ -1,6 +1,4 @@
-/*
- %atmel_license%
-*/
+/* %arduino_license% */
 
 #ifndef Arduino_h
 #define Arduino_h

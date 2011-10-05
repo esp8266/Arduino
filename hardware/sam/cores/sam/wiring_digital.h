@@ -1,6 +1,4 @@
-/*
- %atmel_license%
-*/
+/* %arduino_license% */
 
 #ifndef _WIRING_DIGITAL_
 #define _WIRING_DIGITAL_

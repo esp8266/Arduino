@@ -1,6 +1,4 @@
-/*
- %atmel_license%
-*/
+/* %arduino_license% */
 
 #ifndef _WIRING_CONSTANTS_
 #define _WIRING_CONSTANTS_

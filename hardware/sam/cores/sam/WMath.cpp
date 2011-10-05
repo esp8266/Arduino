@@ -1,6 +1,4 @@
-/*
- %atmel_license%
-*/
+/* %arduino_license% */
 
 extern "C" {
   #include "stdlib.h"

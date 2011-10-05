@@ -1,6 +1,5 @@
-/*
- %atmel_license%
-*/
+/* %arduino_license% */
+
 #include "WInterrupts.h"
 
 #ifdef __cplusplus

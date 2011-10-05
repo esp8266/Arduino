@@ -1,6 +1,4 @@
-/*
- %atmel_license%
-*/
+/* %arduino_license% */
 
 #ifndef HardwareSerial_h
 #define HardwareSerial_h

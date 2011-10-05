@@ -1,6 +1,4 @@
-/*
- %atmel_license%
-*/
+/* %arduino_license% */
 
 #ifndef _UART_CLASS_
 #define _UART_CLASS_

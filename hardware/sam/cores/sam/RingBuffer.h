@@ -1,6 +1,4 @@
-/*
- %atmel_license%
-*/
+/* %arduino_license% */
 
 #ifndef _RING_BUFFER_
 #define _RING_BUFFER_
