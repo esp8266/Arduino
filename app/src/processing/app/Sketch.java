@@ -24,6 +24,7 @@
 package processing.app;
 
 import processing.app.debug.AvrdudeUploader;
+import processing.app.debug.BossaCUploader;
 import processing.app.debug.Compiler;
 import processing.app.debug.RunnerException;
 import processing.app.debug.Sizer;
@@ -1625,14 +1626,19 @@ public class Sketch {
   }
 
 
-  protected String upload(String buildPath, String suggestedClassName, boolean usingProgrammer)
-    throws RunnerException, SerialException {
+  protected String upload(String buildPath, String suggestedClassName,
+                          boolean usingProgrammer) throws RunnerException,
+      SerialException {
+
+    // upload the program
+    Map<String, String> boardPreferences = Base.getBoardPreferences();
+    String uploaderName = boardPreferences.get("uploader");
 
     Uploader uploader;
-
-    // download the program
-    //
-    uploader = new AvrdudeUploader();
+    if (uploaderName != null && uploaderName.equals("bossac"))
+      uploader = new BossaCUploader();
+    else
+      uploader = new AvrdudeUploader();
     boolean success = uploader.uploadUsingPreferences(buildPath,
                                                       suggestedClassName,
                                                       usingProgrammer);

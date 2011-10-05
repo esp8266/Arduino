@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import processing.app.Base;
+import processing.app.Preferences;
 import processing.app.Sketch;
 import processing.app.SketchCode;
 import processing.core.PApplet;
@@ -63,7 +64,7 @@ public class Compiler implements MessageConsumer {
   List<File> objectFiles;
 
   public Compiler(Map<String, String> preferences) {
-    // Merge all the preferences file in the correct order of precedence 
+    // Merge all the preferences file in the correct order of precedence
     // into a new map.
     configPreferences = preferences;
     avrBasePath = configPreferences.get("compiler.path");
@@ -309,12 +310,12 @@ public class Compiler implements MessageConsumer {
 
     int result = 0;
 
-    // if (verbose || Preferences.getBoolean("build.verbose")) {
-    System.out.print("EXEC: ");
-    for (String c : command)
-      System.out.print(c + " ");
-    System.out.println();
-    // }
+    if (verbose || Preferences.getBoolean("build.verbose")) {
+      System.out.print("EXEC: ");
+      for (String c : command)
+        System.out.print(c + " ");
+      System.out.println();
+    }
 
     firstErrorFound = false; // haven't found any errors yet
     secondErrorFound = false;
