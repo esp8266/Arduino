@@ -57,8 +57,10 @@ AVRDUDE_CONF = -C$(TOOLROOT)/avr/etc/avrdude.conf
 ifeq ($(OS), windows)
 # On windows, SOME of the tool paths will need to have backslashes instead
 # of forward slashes (because they use windows cmd.exe for execution instead
-# of a unix/mingw shell?)
+# of a unix/mingw shell?)  We also have to ensure that a consistent shell
+# is used even if a unix shell is installed (ie as part of WINAVR)
 fixpath = $(subst /,\,$1)
+SHELL = cmd.exe
 endif
 
 else ifeq ($(ENV), arduinodev)
