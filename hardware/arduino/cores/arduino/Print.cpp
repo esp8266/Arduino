@@ -54,7 +54,7 @@ size_t Print::print(const __FlashStringHelper *ifsh)
 size_t Print::print(const String &s)
 {
   size_t n = 0;
-  for (int i = 0; i < s.length(); i++) {
+  for (uint16_t i = 0; i < s.length(); i++) {
     n += write(s[i]);
   }
   return n;

@@ -498,7 +498,7 @@ int String::lastIndexOf( char theChar ) const
 	return lastIndexOf(theChar, len - 1);
 }
 
-int String::lastIndexOf(char ch, int fromIndex) const
+int String::lastIndexOf(char ch, unsigned int fromIndex) const
 {
 	if (fromIndex >= len || fromIndex < 0) return -1;
 	char tempchar = buffer[fromIndex + 1];
@@ -514,7 +514,7 @@ int String::lastIndexOf(const String &s2) const
 	return lastIndexOf(s2, len - s2.len);
 }
 
-int String::lastIndexOf(const String &s2, int fromIndex) const
+int String::lastIndexOf(const String &s2, unsigned int fromIndex) const
 {
   	if (s2.len == 0 || len == 0 || s2.len > len || fromIndex < 0) return -1;
 	if (fromIndex >= len) fromIndex = len - 1;
@@ -522,7 +522,7 @@ int String::lastIndexOf(const String &s2, int fromIndex) const
 	for (char *p = buffer; p <= buffer + fromIndex; p++) {
 		p = strstr(p, s2.buffer);
 		if (!p) break;
-		if (p - buffer <= fromIndex) found = p - buffer;
+		if ((unsigned int)(p - buffer) <= fromIndex) found = p - buffer;
 	}
 	return found;
 }

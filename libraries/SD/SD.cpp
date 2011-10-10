@@ -348,7 +348,7 @@ boolean SDClass::begin(uint8_t csPin) {
 
 
 // this little helper is used to traverse paths
-SdFile SDClass::getParentDir(char *filepath, int *index) {
+SdFile SDClass::getParentDir(const char *filepath, int *index) {
   // get parent directory
   SdFile d1 = root; // start with the mostparent, root!
   SdFile d2;
@@ -357,7 +357,7 @@ SdFile SDClass::getParentDir(char *filepath, int *index) {
   SdFile *parent = &d1;
   SdFile *subdir = &d2;
   
-  char *origpath = filepath;
+  const char *origpath = filepath;
 
   while (strchr(filepath, '/')) {
 
@@ -404,7 +404,7 @@ SdFile SDClass::getParentDir(char *filepath, int *index) {
 }
 
 
-File SDClass::open(char *filepath, uint8_t mode) {
+File SDClass::open(const char *filepath, uint8_t mode) {
   /*
 
      Open the supplied file path for reading or writing.

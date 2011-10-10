@@ -18,7 +18,7 @@
    uint8_t nfilecount=0;
 */
 
-File::File(SdFile f, char *n) {
+File::File(SdFile f, const char *n) {
   // oh man you are kidding me, new() doesnt exist? Ok we do it by hand!
   _file = (SdFile *)malloc(sizeof(SdFile)); 
   if (_file) {
