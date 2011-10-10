@@ -9,6 +9,10 @@ avrispmkii.protocol=stk500v2
 usbtinyisp.name=USBtinyISP
 usbtinyisp.protocol=usbtiny
 
+usbasp.name=USBasp
+usbasp.communication=usb
+usbasp.protocol=usbasp
+
 parallel.name=Parallel Programmer
 parallel.protocol=dapa
 parallel.force=true
@@ -18,7 +22,3 @@ arduinoisp.name=Arduino as ISP
 arduinoisp.communication=serial
 arduinoisp.protocol=stk500v1
 arduinoisp.speed=19200
-
-usbasp.name=USBasp
-usbasp.communication=usb
-usbasp.protocol=usbasp
