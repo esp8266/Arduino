@@ -173,14 +173,14 @@
     <mkdir dir="macosx/work" />
     
     <!-- assemble the pde -->
-    <copy todir="macosx/work">
-      <fileset dir="macosx/" includes="template.app/**"/>
+    <copy todir="macosx/work/Arduino.app">
+      <fileset dir="macosx/template.app" includes="**"/>
     </copy>
     
 <!--    <rename src="macosx/work/template.app" 
-	    dest="macosx/work/Arduino.app" />-->
+	    dest="macosx/work/Arduino.app" />
     <move file="macosx/work/template.app" 
-	  tofile="macosx/work/Arduino.app" />
+	  tofile="macosx/work/Arduino.app" />-->
 
     <chmod file="macosx/work/Arduino.app/Contents/MacOS/JavaApplicationStub" perm="755" />
     
