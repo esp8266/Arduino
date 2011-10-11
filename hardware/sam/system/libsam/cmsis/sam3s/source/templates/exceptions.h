@@ -2,6 +2,8 @@
  *
  * \brief This file contains the interface for default exception handlers.
  *
+ * $asf_license$
+ *
  * \par Purpose
  *
  * This file provides basic support for Cortex-M processor based
@@ -12,10 +14,8 @@
  *
  ******************************************************************************/
 
-/* $asf_license$ */
-
-#ifndef _EXCEPTIONS_
-#define _EXCEPTIONS_
+#ifndef EXCEPTIONS_H_INCLUDED
+#define EXCEPTIONS_H_INCLUDED
 
 /* @cond 0 */
 /**INDENT-OFF**/
@@ -85,4 +85,5 @@ extern void WDT_IrqHandler( void ) ;
 /**INDENT-ON**/
 /* @endcond */
 
-#endif /* _EXCEPTIONS_ */
+#endif /* EXCEPTIONS_H_INCLUDED */
+

@@ -98,6 +98,15 @@ typedef enum _EAnalogChannel
   DAC1
 } EAnalogChannel ;
 
+/**
+ * Pin Attributes to be OR-ed
+ */
+#define PIN_ATTR_COMBO         (1UL<<0)
+#define PIN_ATTR_ANALOG        (1UL<<1)
+#define PIN_ATTR_DIGITAL       (1UL<<2)
+#define PIN_ATTR_PWM           (1UL<<3)
+#define PIN_ATTR_TIMER         (1UL<<4)
+
 /* Types used for the tables below */
 typedef struct _PinDescription
 {
@@ -105,6 +114,7 @@ typedef struct _PinDescription
   uint32_t ulPin ;
   uint32_t ulPeripheralId ;
   EPioType ulPinType ;
+  uint32_t ulPinConfiguration ;
   uint32_t ulPinAttribute ;
   EAnalogChannel ulAnalogChannel ;
 } PinDescription ;

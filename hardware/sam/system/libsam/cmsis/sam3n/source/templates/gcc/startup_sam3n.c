@@ -2,6 +2,8 @@
  *
  * \brief Startup file for SAM3N.
  *
+ * $asf_license$
+ *
  * This file defines common SAM series.
  *
  * - Compiler:           ARMGCC
@@ -10,19 +12,9 @@
  *
  ******************************************************************************/
 
-/* $asf_license$ */
-
-/*----------------------------------------------------------------------------
- *        Headers
- *----------------------------------------------------------------------------*/
-
 #include "exceptions.h"
 #include "sam3n.h"
 #include "system_sam3n.h"
-
-/*----------------------------------------------------------------------------
- *        Exported variables
- *----------------------------------------------------------------------------*/
 
 /* Initialize segments */
 extern uint32_t _sfixed;
@@ -35,10 +27,6 @@ extern uint32_t _ezero;
 extern uint32_t _sstack;
 extern uint32_t _estack;
 
-/*----------------------------------------------------------------------------
- *        ProtoTypes
- *----------------------------------------------------------------------------*/
-
 /** \cond DOXYGEN_SHOULD_SKIP_THIS */
 extern int main(void);
 /** \endcond */
@@ -46,16 +34,13 @@ extern int main(void);
 void ResetException( void ) ;
 extern void __libc_init_array( void ) ;
 
-/*----------------------------------------------------------------------------
- *         Exception Table
- *----------------------------------------------------------------------------*/
-
+/* Exception Table */
 __attribute__((section(".vectors")))
 IntFunc exception_table[] = {
 
     /* Configure Initial Stack Pointer, using linker-generated symbols */
     (IntFunc)(&_estack),
-    ResetException,
+    Reset_Handler,
 
     NMI_Handler,
     HardFault_Handler,
@@ -113,7 +98,7 @@ IntFunc exception_table[] = {
  * \brief This is the code that gets called on processor reset.
  * To initialize the device, and call the main() routine.
  */
-void ResetException( void )
+void Reset_Handler( void )
 {
     uint32_t *pSrc, *pDest ;
 

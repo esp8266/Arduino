@@ -2,6 +2,8 @@
  *
  * \brief Startup file for SAM3X.
  *
+ * $asf_license$
+ *
  * This file defines common SAM series.
  *
  * - Compiler:           ARMGCC
@@ -10,19 +12,9 @@
  *
  ******************************************************************************/
 
-/* $asf_license$ */
-
-/*----------------------------------------------------------------------------
- *        Headers
- *----------------------------------------------------------------------------*/
-
 #include "exceptions.h"
 #include "sam3xa.h"
 #include "system_sam3x.h"
-
-/*----------------------------------------------------------------------------
- *        Exported variables
- *----------------------------------------------------------------------------*/
 
 /* Stack Configuration */
 #define STACK_SIZE       0x900     /** Stack size (in DWords) */
@@ -38,21 +30,13 @@ extern uint32_t _erelocate;
 extern uint32_t _szero;
 extern uint32_t _ezero;
 
-
-/*----------------------------------------------------------------------------
- *        ProtoTypes
- *----------------------------------------------------------------------------*/
-
 /** \cond DOXYGEN_SHOULD_SKIP_THIS */
 extern int main( void ) ;
 /** \endcond */
 void ResetException( void ) ;
 extern void __libc_init_array( void ) ;
 
-/*----------------------------------------------------------------------------
- *         Exception Table
- *----------------------------------------------------------------------------*/
-
+/* Exception Table */
 __attribute__((section(".vectors")))
 IntFunc exception_table[] = {
 

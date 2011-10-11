@@ -81,9 +81,10 @@ typedef enum IRQn
  * \brief Configuration of the Cortex-M3 Processor and Core Peripherals 
  */
 
-#define __MPU_PRESENT          1 /**< SAM3U4C does provide a MPU */
-#define __NVIC_PRIO_BITS       4 /**< SAM3U4C uses 4 Bits for the Priority Levels */
-#define __Vendor_SysTickConfig 0 /**< Set to 1 if different SysTick Config is used */
+#define __CM3_REV              0x0200 /**< SAM3U4C core revision number ([15:8] revision number, [7:0] patch number) */
+#define __MPU_PRESENT          1      /**< SAM3U4C does provide a MPU */
+#define __NVIC_PRIO_BITS       4      /**< SAM3U4C uses 4 Bits for the Priority Levels */
+#define __Vendor_SysTickConfig 0      /**< Set to 1 if different SysTick Config is used */
 
 /*
  * \brief CMSIS includes
@@ -299,16 +300,16 @@ typedef enum IRQn
 /*   MEMORY MAPPING DEFINITIONS FOR SAM3U4C */
 /* ************************************************************************** */
 
-#define IFLASH0_SIZE             0x20000
-#define IFLASH0_PAGE_SIZE        256
-#define IFLASH0_LOCK_REGION_SIZE 8192
-#define IFLASH0_NB_OF_PAGES      64
-#define IFLASH1_SIZE             0x20000
-#define IFLASH1_PAGE_SIZE        256
-#define IFLASH1_LOCK_REGION_SIZE 8192
-#define IFLASH1_NB_OF_PAGES      64
-#define IRAM_SIZE                0xD000
-#define IFLASH_SIZE              0x40000
+#define IFLASH0_SIZE             (0x20000u)
+#define IFLASH0_PAGE_SIZE        (256u)
+#define IFLASH0_LOCK_REGION_SIZE (8192u)
+#define IFLASH0_NB_OF_PAGES      (64u)
+#define IFLASH1_SIZE             (0x20000u)
+#define IFLASH1_PAGE_SIZE        (256u)
+#define IFLASH1_LOCK_REGION_SIZE (8192u)
+#define IFLASH1_NB_OF_PAGES      (64u)
+#define IRAM_SIZE                (0xD000u)
+#define IFLASH_SIZE              (0x40000u)
 
 #define IFLASH0_ADDR   (0x00080000u) /**< Internal Flash 0 base address */
 #if defined IFLASH0_SIZE

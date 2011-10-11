@@ -78,9 +78,10 @@ typedef enum IRQn
  * \brief Configuration of the Cortex-M3 Processor and Core Peripherals 
  */
 
-#define __MPU_PRESENT          1 /**< SAM3SD8A does provide a MPU */
-#define __NVIC_PRIO_BITS       4 /**< SAM3SD8A uses 4 Bits for the Priority Levels */
-#define __Vendor_SysTickConfig 0 /**< Set to 1 if different SysTick Config is used */
+#define __CM3_REV              0x0200 /**< SAM3SD8A core revision number ([15:8] revision number, [7:0] patch number) */
+#define __MPU_PRESENT          1      /**< SAM3SD8A does provide a MPU */
+#define __NVIC_PRIO_BITS       4      /**< SAM3SD8A uses 4 Bits for the Priority Levels */
+#define __Vendor_SysTickConfig 0      /**< Set to 1 if different SysTick Config is used */
 
 /*
  * \brief CMSIS includes
@@ -289,12 +290,12 @@ typedef enum IRQn
 
 #define IFLASH0_SIZE             0x40000
 #define IFLASH0_PAGE_SIZE        256
-#define IFLASH0_LOCK_REGION_SIZE 32768
+#define IFLASH0_LOCK_REGION_SIZE 16384
 #define IFLASH0_NB_OF_PAGES      1024
 #define IFLASH0_NB_OF_LOCK_BITS  16
 #define IFLASH1_SIZE             0x40000
 #define IFLASH1_PAGE_SIZE        256
-#define IFLASH1_LOCK_REGION_SIZE 32768
+#define IFLASH1_LOCK_REGION_SIZE 16384
 #define IFLASH1_NB_OF_PAGES      1024
 #define IFLASH1_NB_OF_LOCK_BITS  16
 #define IRAM_SIZE                0x10000
@@ -302,10 +303,10 @@ typedef enum IRQn
 
 #define IFLASH_ADDR  (0x00400000u) /**< Internal Flash base address */
 #define IFLASH0_ADDR (0x00400000u) /**< Internal Flash 0 base address */
+#define IROM_ADDR    (0x00800000u) /**< Internal ROM base address */
 #if defined IFLASH0_SIZE
 #define IFLASH1_ADDR (IFLASH0_ADDR+IFLASH0_SIZE) /**< Internal Flash 1 base address */
 #endif
-#define IROM_ADDR    (0x00800000u) /**< Internal ROM base address */
 #define IRAM_ADDR    (0x20000000u) /**< Internal RAM base address */
 #define EBI_CS0_ADDR (0x60000000u) /**< EBI Chip Select 0 base address */
 #define EBI_CS1_ADDR (0x61000000u) /**< EBI Chip Select 1 base address */

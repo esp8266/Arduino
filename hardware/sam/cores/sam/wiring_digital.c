@@ -27,7 +27,7 @@ extern void pinMode( uint32_t ulPin, uint32_t ulMode )
             {
                 PMC_DisablePeripheral( g_APinDescription[ulPin].ulPeripheralId ) ;
             }
-            PIO_Configure( g_APinDescription[ulPin].pPort, PIO_OUTPUT_1, g_APinDescription[ulPin].ulPin, g_APinDescription[ulPin].ulPinAttribute ) ;
+            PIO_Configure( g_APinDescription[ulPin].pPort, PIO_OUTPUT_1, g_APinDescription[ulPin].ulPin, g_APinDescription[ulPin].ulPinConfiguration ) ;
         break ;
 
         default:

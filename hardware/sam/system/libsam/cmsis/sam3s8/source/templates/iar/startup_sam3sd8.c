@@ -2,6 +2,8 @@
  *
  * \brief Startup file for SAM3S8/SAM3SD.
  *
+ * $asf_license$
+ *
  * This file defines common SAM series.
  *
  * - Compiler:           IAR EWARM
@@ -10,38 +12,19 @@
  *
  ******************************************************************************/
 
-/* $asf_license$ */
-
-/*----------------------------------------------------------------------------
- *        Headers
- *----------------------------------------------------------------------------*/
-
 #include "exceptions.h"
 #include "sam3s8.h"
 #include "system_sam3sd8.h"
 
-/*----------------------------------------------------------------------------
- *        Exported variables
- *----------------------------------------------------------------------------*/
-
-/*------------------------------------------------------------------------------
- *         Types
- *------------------------------------------------------------------------------*/
 typedef void( *intfunc )( void );
 typedef union { intfunc __fun; void * __ptr; } intvec_elem;
 
-/*------------------------------------------------------------------------------
- *         Prototypes
- *------------------------------------------------------------------------------*/
 extern void __iar_program_start( void ) ;
 extern int __low_level_init( void ) ;
 
-/*------------------------------------------------------------------------------
- *         Exception Table
- *------------------------------------------------------------------------------*/
+/* Exception Table */
 #pragma language=extended
 #pragma segment="CSTACK"
-
 
 /*  The name "__vector_table" has special meaning for C-SPY: */
 /*  it is where the SP start value is found, and the NVIC vector */

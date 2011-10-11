@@ -18,9 +18,7 @@ typedef struct {
   RwReg       DMAC_CTRLA;     /**< \brief (DmacCh_num Offset: 0xC) DMAC Channel Control A Register */
   RwReg       DMAC_CTRLB;     /**< \brief (DmacCh_num Offset: 0x10) DMAC Channel Control B Register */
   RwReg       DMAC_CFG;       /**< \brief (DmacCh_num Offset: 0x14) DMAC Channel Configuration Register */
-  RwReg       DMAC_SPIP;      /**< \brief (DmacCh_num Offset: 0x18) DMAC Channel Source Picture in Picture Configuration Register */
-  RwReg       DMAC_DPIP;      /**< \brief (DmacCh_num Offset: 0x1C) DMAC Channel Destination Picture in Picture Configuration Register */
-  RoReg       Reserved1[2];
+  RoReg       Reserved1[4];
 } DmacCh_num;
 /** \brief Dmac hardware registers */
 #define DMACCH_NUM_NUMBER 4
@@ -30,7 +28,7 @@ typedef struct {
   RwReg       DMAC_SREQ;      /**< \brief (Dmac Offset: 0x008) DMAC Software Single Request Register */
   RwReg       DMAC_CREQ;      /**< \brief (Dmac Offset: 0x00C) DMAC Software Chunk Transfer Request Register */
   RwReg       DMAC_LAST;      /**< \brief (Dmac Offset: 0x010) DMAC Software Last Transfer Flag Register */
-  RwReg       DMAC_SYNC;      /**< \brief (Dmac Offset: 0x014) DMAC Request Synchronization Register */
+  RoReg       Reserved1[1];
   WoReg       DMAC_EBCIER;    /**< \brief (Dmac Offset: 0x018) DMAC Error, Chained Buffer transfer completed and Buffer transfer completed Interrupt Enable register. */
   WoReg       DMAC_EBCIDR;    /**< \brief (Dmac Offset: 0x01C) DMAC Error, Chained Buffer transfer completed and Buffer transfer completed Interrupt Disable register. */
   RoReg       DMAC_EBCIMR;    /**< \brief (Dmac Offset: 0x020) DMAC Error, Chained Buffer transfer completed and Buffer transfer completed Mask Register. */
@@ -38,12 +36,11 @@ typedef struct {
   WoReg       DMAC_CHER;      /**< \brief (Dmac Offset: 0x028) DMAC Channel Handler Enable Register */
   WoReg       DMAC_CHDR;      /**< \brief (Dmac Offset: 0x02C) DMAC Channel Handler Disable Register */
   RoReg       DMAC_CHSR;      /**< \brief (Dmac Offset: 0x030) DMAC Channel Handler Status Register */
-  RoReg       Reserved1[2];
+  RoReg       Reserved2[2];
   DmacCh_num  DMAC_CH_NUM[DMACCH_NUM_NUMBER]; /**< \brief (Dmac Offset: 0x3C) ch_num = 0 .. 3 */
 } Dmac;
 #endif /* __ASSEMBLY__ */
 /* -------- DMAC_GCFG : (DMAC Offset: 0x000) DMAC Global Configuration Register -------- */
-#define DMAC_GCFG_IF0_BIGEND (0x1u << 0) /**< \brief (DMAC_GCFG)  */
 #define DMAC_GCFG_ARB_CFG (0x1u << 4) /**< \brief (DMAC_GCFG)  */
 /* -------- DMAC_EN : (DMAC Offset: 0x004) DMAC Enable Register -------- */
 #define DMAC_EN_ENABLE (0x1u << 0) /**< \brief (DMAC_EN)  */
@@ -52,8 +49,6 @@ typedef struct {
 #define DMAC_SREQ_DSREQ0 (0x1u << 1) /**< \brief (DMAC_SREQ)  */
 #define DMAC_SREQ_SSREQ1 (0x1u << 2) /**< \brief (DMAC_SREQ)  */
 #define DMAC_SREQ_DSREQ1 (0x1u << 3) /**< \brief (DMAC_SREQ)  */
-#define DMAC_SREQ_SSREQ2 (0x1u << 4) /**< \brief (DMAC_SREQ)  */
-#define DMAC_SREQ_DSREQ2 (0x1u << 5) /**< \brief (DMAC_SREQ)  */
 #define DMAC_SREQ_SSREQ3 (0x1u << 6) /**< \brief (DMAC_SREQ)  */
 #define DMAC_SREQ_DSREQ3 (0x1u << 7) /**< \brief (DMAC_SREQ)  */
 /* -------- DMAC_CREQ : (DMAC Offset: 0x00C) DMAC Software Chunk Transfer Request Register -------- */
@@ -61,8 +56,6 @@ typedef struct {
 #define DMAC_CREQ_DCREQ0 (0x1u << 1) /**< \brief (DMAC_CREQ)  */
 #define DMAC_CREQ_SCREQ1 (0x1u << 2) /**< \brief (DMAC_CREQ)  */
 #define DMAC_CREQ_DCREQ1 (0x1u << 3) /**< \brief (DMAC_CREQ)  */
-#define DMAC_CREQ_SCREQ2 (0x1u << 4) /**< \brief (DMAC_CREQ)  */
-#define DMAC_CREQ_DCREQ2 (0x1u << 5) /**< \brief (DMAC_CREQ)  */
 #define DMAC_CREQ_SCREQ3 (0x1u << 6) /**< \brief (DMAC_CREQ)  */
 #define DMAC_CREQ_DCREQ3 (0x1u << 7) /**< \brief (DMAC_CREQ)  */
 /* -------- DMAC_LAST : (DMAC Offset: 0x010) DMAC Software Last Transfer Flag Register -------- */
@@ -74,15 +67,6 @@ typedef struct {
 #define DMAC_LAST_DLAST2 (0x1u << 5) /**< \brief (DMAC_LAST)  */
 #define DMAC_LAST_SLAST3 (0x1u << 6) /**< \brief (DMAC_LAST)  */
 #define DMAC_LAST_DLAST3 (0x1u << 7) /**< \brief (DMAC_LAST)  */
-/* -------- DMAC_SYNC : (DMAC Offset: 0x014) DMAC Request Synchronization Register -------- */
-#define DMAC_SYNC_SYR0 (0x1u << 0) /**< \brief (DMAC_SYNC)  */
-#define DMAC_SYNC_SYR1 (0x1u << 1) /**< \brief (DMAC_SYNC)  */
-#define DMAC_SYNC_SYR2 (0x1u << 2) /**< \brief (DMAC_SYNC)  */
-#define DMAC_SYNC_SYR3 (0x1u << 3) /**< \brief (DMAC_SYNC)  */
-#define DMAC_SYNC_SYR4 (0x1u << 4) /**< \brief (DMAC_SYNC)  */
-#define DMAC_SYNC_SYR5 (0x1u << 5) /**< \brief (DMAC_SYNC)  */
-#define DMAC_SYNC_SYR6 (0x1u << 6) /**< \brief (DMAC_SYNC)  */
-#define DMAC_SYNC_SYR7 (0x1u << 7) /**< \brief (DMAC_SYNC)  */
 /* -------- DMAC_EBCIER : (DMAC Offset: 0x018) DMAC Error, Chained Buffer transfer completed and Buffer transfer completed Interrupt Enable register. -------- */
 #define DMAC_EBCIER_BTC0 (0x1u << 0) /**< \brief (DMAC_EBCIER)  */
 #define DMAC_EBCIER_BTC1 (0x1u << 1) /**< \brief (DMAC_EBCIER)  */
@@ -183,22 +167,15 @@ typedef struct {
 #define DMAC_DADDR_DADDRx_Msk (0xffffffffu << DMAC_DADDR_DADDRx_Pos) /**< \brief (DMAC_DADDR)  */
 #define DMAC_DADDR_DADDRx(value) ((DMAC_DADDR_DADDRx_Msk & ((value) << DMAC_DADDR_DADDRx_Pos)))
 /* -------- DMAC_DSCR : (DMAC Offset: N/A) DMAC Channel Descriptor Address Register -------- */
-#define DMAC_DSCR_DSCRx_IF_Pos 0
-#define DMAC_DSCR_DSCRx_IF_Msk (0x3u << DMAC_DSCR_DSCRx_IF_Pos) /**< \brief (DMAC_DSCR)  */
-#define DMAC_DSCR_DSCRx_IF(value) ((DMAC_DSCR_DSCRx_IF_Msk & ((value) << DMAC_DSCR_DSCRx_IF_Pos)))
 #define DMAC_DSCR_DSCRx_Pos 2
 #define DMAC_DSCR_DSCRx_Msk (0x3fffffffu << DMAC_DSCR_DSCRx_Pos) /**< \brief (DMAC_DSCR)  */
 #define DMAC_DSCR_DSCRx(value) ((DMAC_DSCR_DSCRx_Msk & ((value) << DMAC_DSCR_DSCRx_Pos)))
 /* -------- DMAC_CTRLA : (DMAC Offset: N/A) DMAC Channel Control A Register -------- */
 #define DMAC_CTRLA_BTSIZE_Pos 0
-#define DMAC_CTRLA_BTSIZE_Msk (0xffffu << DMAC_CTRLA_BTSIZE_Pos) /**< \brief (DMAC_CTRLA)  */
+#define DMAC_CTRLA_BTSIZE_Msk (0xfffu << DMAC_CTRLA_BTSIZE_Pos) /**< \brief (DMAC_CTRLA)  */
 #define DMAC_CTRLA_BTSIZE(value) ((DMAC_CTRLA_BTSIZE_Msk & ((value) << DMAC_CTRLA_BTSIZE_Pos)))
-#define DMAC_CTRLA_SCSIZE_Pos 16
-#define DMAC_CTRLA_SCSIZE_Msk (0x7u << DMAC_CTRLA_SCSIZE_Pos) /**< \brief (DMAC_CTRLA)  */
-#define DMAC_CTRLA_SCSIZE(value) ((DMAC_CTRLA_SCSIZE_Msk & ((value) << DMAC_CTRLA_SCSIZE_Pos)))
-#define DMAC_CTRLA_DCSIZE_Pos 20
-#define DMAC_CTRLA_DCSIZE_Msk (0x7u << DMAC_CTRLA_DCSIZE_Pos) /**< \brief (DMAC_CTRLA)  */
-#define DMAC_CTRLA_DCSIZE(value) ((DMAC_CTRLA_DCSIZE_Msk & ((value) << DMAC_CTRLA_DCSIZE_Pos)))
+#define DMAC_CTRLA_SCSIZE (0x1u << 16) /**< \brief (DMAC_CTRLA)  */
+#define DMAC_CTRLA_DCSIZE (0x1u << 20) /**< \brief (DMAC_CTRLA)  */
 #define DMAC_CTRLA_SRC_WIDTH_Pos 24
 #define DMAC_CTRLA_SRC_WIDTH_Msk (0x3u << DMAC_CTRLA_SRC_WIDTH_Pos) /**< \brief (DMAC_CTRLA)  */
 #define DMAC_CTRLA_SRC_WIDTH(value) ((DMAC_CTRLA_SRC_WIDTH_Msk & ((value) << DMAC_CTRLA_SRC_WIDTH_Pos)))
@@ -207,18 +184,10 @@ typedef struct {
 #define DMAC_CTRLA_DST_WIDTH(value) ((DMAC_CTRLA_DST_WIDTH_Msk & ((value) << DMAC_CTRLA_DST_WIDTH_Pos)))
 #define DMAC_CTRLA_DONE (0x1u << 31) /**< \brief (DMAC_CTRLA)  */
 /* -------- DMAC_CTRLB : (DMAC Offset: N/A) DMAC Channel Control B Register -------- */
-#define DMAC_CTRLB_SIF_Pos 0
-#define DMAC_CTRLB_SIF_Msk (0x3u << DMAC_CTRLB_SIF_Pos) /**< \brief (DMAC_CTRLB) Source Interface Selection Field */
-#define DMAC_CTRLB_SIF(value) ((DMAC_CTRLB_SIF_Msk & ((value) << DMAC_CTRLB_SIF_Pos)))
-#define DMAC_CTRLB_DIF_Pos 4
-#define DMAC_CTRLB_DIF_Msk (0x3u << DMAC_CTRLB_DIF_Pos) /**< \brief (DMAC_CTRLB) Destination Interface Selection Field */
-#define DMAC_CTRLB_DIF(value) ((DMAC_CTRLB_DIF_Msk & ((value) << DMAC_CTRLB_DIF_Pos)))
-#define DMAC_CTRLB_SRC_PIP (0x1u << 8) /**< \brief (DMAC_CTRLB)  */
-#define DMAC_CTRLB_DST_PIP (0x1u << 12) /**< \brief (DMAC_CTRLB)  */
 #define DMAC_CTRLB_SRC_DSCR (0x1u << 16) /**< \brief (DMAC_CTRLB)  */
 #define DMAC_CTRLB_DST_DSCR (0x1u << 20) /**< \brief (DMAC_CTRLB)  */
 #define DMAC_CTRLB_FC_Pos 21
-#define DMAC_CTRLB_FC_Msk (0x7u << DMAC_CTRLB_FC_Pos) /**< \brief (DMAC_CTRLB)  */
+#define DMAC_CTRLB_FC_Msk (0x3u << DMAC_CTRLB_FC_Pos) /**< \brief (DMAC_CTRLB)  */
 #define DMAC_CTRLB_FC(value) ((DMAC_CTRLB_FC_Msk & ((value) << DMAC_CTRLB_FC_Pos)))
 #define DMAC_CTRLB_SRC_INCR_Pos 24
 #define DMAC_CTRLB_SRC_INCR_Msk (0x3u << DMAC_CTRLB_SRC_INCR_Pos) /**< \brief (DMAC_CTRLB)  */
@@ -227,7 +196,6 @@ typedef struct {
 #define DMAC_CTRLB_DST_INCR_Msk (0x3u << DMAC_CTRLB_DST_INCR_Pos) /**< \brief (DMAC_CTRLB)  */
 #define DMAC_CTRLB_DST_INCR(value) ((DMAC_CTRLB_DST_INCR_Msk & ((value) << DMAC_CTRLB_DST_INCR_Pos)))
 #define DMAC_CTRLB_IEN (0x1u << 30) /**< \brief (DMAC_CTRLB)  */
-#define DMAC_CTRLB_AUTO (0x1u << 31) /**< \brief (DMAC_CTRLB)  */
 /* -------- DMAC_CFG : (DMAC Offset: N/A) DMAC Channel Configuration Register -------- */
 #define DMAC_CFG_SRC_PER_Pos 0
 #define DMAC_CFG_SRC_PER_Msk (0xfu << DMAC_CFG_SRC_PER_Pos) /**< \brief (DMAC_CFG)  */
@@ -235,9 +203,7 @@ typedef struct {
 #define DMAC_CFG_DST_PER_Pos 4
 #define DMAC_CFG_DST_PER_Msk (0xfu << DMAC_CFG_DST_PER_Pos) /**< \brief (DMAC_CFG)  */
 #define DMAC_CFG_DST_PER(value) ((DMAC_CFG_DST_PER_Msk & ((value) << DMAC_CFG_DST_PER_Pos)))
-#define DMAC_CFG_SRC_REP (0x1u << 8) /**< \brief (DMAC_CFG)  */
 #define DMAC_CFG_SRC_H2SEL (0x1u << 9) /**< \brief (DMAC_CFG)  */
-#define DMAC_CFG_DST_REP (0x1u << 12) /**< \brief (DMAC_CFG)  */
 #define DMAC_CFG_DST_H2SEL (0x1u << 13) /**< \brief (DMAC_CFG)  */
 #define DMAC_CFG_SOD (0x1u << 16) /**< \brief (DMAC_CFG)  */
 #define DMAC_CFG_LOCK_IF (0x1u << 20) /**< \brief (DMAC_CFG)  */
@@ -249,20 +215,6 @@ typedef struct {
 #define DMAC_CFG_FIFOCFG_Pos 28
 #define DMAC_CFG_FIFOCFG_Msk (0x3u << DMAC_CFG_FIFOCFG_Pos) /**< \brief (DMAC_CFG)  */
 #define DMAC_CFG_FIFOCFG(value) ((DMAC_CFG_FIFOCFG_Msk & ((value) << DMAC_CFG_FIFOCFG_Pos)))
-/* -------- DMAC_SPIP : (DMAC Offset: N/A) DMAC Channel Source Picture in Picture Configuration Register -------- */
-#define DMAC_SPIP_SPIP_HOLE_Pos 0
-#define DMAC_SPIP_SPIP_HOLE_Msk (0xffffu << DMAC_SPIP_SPIP_HOLE_Pos) /**< \brief (DMAC_SPIP)  */
-#define DMAC_SPIP_SPIP_HOLE(value) ((DMAC_SPIP_SPIP_HOLE_Msk & ((value) << DMAC_SPIP_SPIP_HOLE_Pos)))
-#define DMAC_SPIP_SPIP_BOUNDARY_Pos 16
-#define DMAC_SPIP_SPIP_BOUNDARY_Msk (0x3ffu << DMAC_SPIP_SPIP_BOUNDARY_Pos) /**< \brief (DMAC_SPIP)  */
-#define DMAC_SPIP_SPIP_BOUNDARY(value) ((DMAC_SPIP_SPIP_BOUNDARY_Msk & ((value) << DMAC_SPIP_SPIP_BOUNDARY_Pos)))
-/* -------- DMAC_DPIP : (DMAC Offset: N/A) DMAC Channel Destination Picture in Picture Configuration Register -------- */
-#define DMAC_DPIP_DPIP_HOLE_Pos 0
-#define DMAC_DPIP_DPIP_HOLE_Msk (0xffffu << DMAC_DPIP_DPIP_HOLE_Pos) /**< \brief (DMAC_DPIP)  */
-#define DMAC_DPIP_DPIP_HOLE(value) ((DMAC_DPIP_DPIP_HOLE_Msk & ((value) << DMAC_DPIP_DPIP_HOLE_Pos)))
-#define DMAC_DPIP_DPIP_BOUNDARY_Pos 16
-#define DMAC_DPIP_DPIP_BOUNDARY_Msk (0x3ffu << DMAC_DPIP_DPIP_BOUNDARY_Pos) /**< \brief (DMAC_DPIP)  */
-#define DMAC_DPIP_DPIP_BOUNDARY(value) ((DMAC_DPIP_DPIP_BOUNDARY_Msk & ((value) << DMAC_DPIP_DPIP_BOUNDARY_Pos)))
 
 /*@}*/
 

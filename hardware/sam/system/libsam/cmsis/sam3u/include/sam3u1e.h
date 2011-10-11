@@ -83,9 +83,10 @@ typedef enum IRQn
  * \brief Configuration of the Cortex-M3 Processor and Core Peripherals 
  */
 
-#define __MPU_PRESENT          1 /**< SAM3U1E does provide a MPU */
-#define __NVIC_PRIO_BITS       4 /**< SAM3U1E uses 4 Bits for the Priority Levels */
-#define __Vendor_SysTickConfig 0 /**< Set to 1 if different SysTick Config is used */
+#define __CM3_REV              0x0200 /**< SAM3U1E core revision number ([15:8] revision number, [7:0] patch number) */
+#define __MPU_PRESENT          1      /**< SAM3U1E does provide a MPU */
+#define __NVIC_PRIO_BITS       4      /**< SAM3U1E uses 4 Bits for the Priority Levels */
+#define __Vendor_SysTickConfig 0      /**< Set to 1 if different SysTick Config is used */
 
 /*
  * \brief CMSIS includes
@@ -311,11 +312,11 @@ typedef enum IRQn
 /*   MEMORY MAPPING DEFINITIONS FOR SAM3U1E */
 /* ************************************************************************** */
 
-#define IFLASH_SIZE             0x10000
-#define IFLASH_PAGE_SIZE        256
-#define IFLASH_LOCK_REGION_SIZE 8192
-#define IFLASH_NB_OF_PAGES      32
-#define IRAM_SIZE               0x5000
+#define IFLASH_SIZE             (0x10000u)
+#define IFLASH_PAGE_SIZE        (256u)
+#define IFLASH_LOCK_REGION_SIZE (8192u)
+#define IFLASH_NB_OF_PAGES      (32u)
+#define IRAM_SIZE               (0x5000u)
 
 #define IFLASH0_ADDR   (0x00080000u) /**< Internal Flash 0 base address */
 #if defined IFLASH0_SIZE

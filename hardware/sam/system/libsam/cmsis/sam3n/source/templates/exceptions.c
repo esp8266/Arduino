@@ -2,9 +2,11 @@
  *
  * \brief This file contains the default exception handlers.
  *
+ * $asf_license$
+ *
  * \par Purpose
  *
- * This file provides basic support for Cortex-M processor based 
+ * This file provides basic support for Cortex-M processor based
  * microcontrollers.
  *
  * \note
@@ -16,8 +18,6 @@
  *                       Support and FAQ: http://support.atmel.no/
  *
  ******************************************************************************/
-
-/* $asf_license$ */
 
 #include "exceptions.h"
 

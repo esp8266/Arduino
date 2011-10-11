@@ -2,6 +2,8 @@
  *
  * \brief Startup file for SAM3S8/SAM3SD.
  *
+ * $asf_license$
+ *
  * This file defines common SAM series.
  *
  * - Compiler:           ARMGCC
@@ -10,19 +12,9 @@
  *
  ******************************************************************************/
 
-/* $asf_license$ */
-
-/*----------------------------------------------------------------------------
- *        Headers
- *----------------------------------------------------------------------------*/
-
 #include "exceptions.h"
 #include "sam3s8.h"
 #include "system_sam3sd8.h"
-
-/*----------------------------------------------------------------------------
- *        Exported variables
- *----------------------------------------------------------------------------*/
 
 /* Stack Configuration */
 #define STACK_SIZE       0x900     /** Stack size (in DWords) */
@@ -38,27 +30,18 @@ extern uint32_t _erelocate;
 extern uint32_t _szero;
 extern uint32_t _ezero;
 
-
-/*----------------------------------------------------------------------------
- *        ProtoTypes
- *----------------------------------------------------------------------------*/
-
 /** \cond DOXYGEN_SHOULD_SKIP_THIS */
 extern int main( void ) ;
 /** \endcond */
-void ResetException( void ) ;
 extern void __libc_init_array( void ) ;
 
-/*----------------------------------------------------------------------------
- *         Exception Table
- *----------------------------------------------------------------------------*/
-
+/* Exception Table */
 __attribute__((section(".vectors")))
 IntFunc exception_table[] = {
 
     /* Configure Initial Stack Pointer, using linker-generated symbols */
     (IntFunc)(&pdwStack[STACK_SIZE-1]),
-    ResetException,
+    Reset_Handler,
 
     NMI_Handler,
     HardFault_Handler,
@@ -119,7 +102,7 @@ IntFunc exception_table[] = {
  * \brief This is the code that gets called on processor reset.
  * To initialize the device, and call the main() routine.
  */
-void ResetException( void )
+void Reset_Handler( void )
 {
     uint32_t *pSrc, *pDest ;
 

@@ -98,9 +98,10 @@ typedef enum IRQn
  * \brief Configuration of the Cortex-M3 Processor and Core Peripherals 
  */
 
-#define __MPU_PRESENT          1 /**< SAM3X8G does provide a MPU */
-#define __NVIC_PRIO_BITS       4 /**< SAM3X8G uses 4 Bits for the Priority Levels */
-#define __Vendor_SysTickConfig 0 /**< Set to 1 if different SysTick Config is used */
+#define __CM3_REV              0x0200 /**< SAM3X8G core revision number ([15:8] revision number, [7:0] patch number) */
+#define __MPU_PRESENT          1      /**< SAM3X8G does provide a MPU */
+#define __NVIC_PRIO_BITS       4      /**< SAM3X8G uses 4 Bits for the Priority Levels */
+#define __Vendor_SysTickConfig 0      /**< Set to 1 if different SysTick Config is used */
 
 /*
  * \brief CMSIS includes
@@ -378,19 +379,19 @@ typedef enum IRQn
 /*   MEMORY MAPPING DEFINITIONS FOR SAM3X8G */
 /* ************************************************************************** */
 
-#define IFLASH0_SIZE             0x40000
-#define IFLASH0_PAGE_SIZE        256
-#define IFLASH0_LOCK_REGION_SIZE 16384
-#define IFLASH0_NB_OF_PAGES      1024
-#define IFLASH1_SIZE             0x40000
-#define IFLASH1_PAGE_SIZE        256
-#define IFLASH1_LOCK_REGION_SIZE 16384
-#define IFLASH1_NB_OF_PAGES      1024
-#define IRAM0_SIZE               0x10000
-#define IRAM1_SIZE               0x8000
-#define NFCRAM_SIZE              0x1000
-#define IFLASH_SIZE              0x80000
-#define IRAM_SIZE                0x18000
+#define IFLASH0_SIZE             (0x40000u)
+#define IFLASH0_PAGE_SIZE        (256u)
+#define IFLASH0_LOCK_REGION_SIZE (16384u)
+#define IFLASH0_NB_OF_PAGES      (1024u)
+#define IFLASH1_SIZE             (0x40000u)
+#define IFLASH1_PAGE_SIZE        (256u)
+#define IFLASH1_LOCK_REGION_SIZE (16384u)
+#define IFLASH1_NB_OF_PAGES      (1024u)
+#define IRAM0_SIZE               (0x10000u)
+#define IRAM1_SIZE               (0x8000u)
+#define NFCRAM_SIZE              (0x1000u)
+#define IFLASH_SIZE              (0x80000u)
+#define IRAM_SIZE                (0x18000u)
 
 #define IFLASH0_ADDR    (0x00080000u) /**< Internal Flash 0 base address */
 #if defined IFLASH0_SIZE

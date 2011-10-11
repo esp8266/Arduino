@@ -169,11 +169,11 @@ extern void init( void )
 
   // Initialize UART Serial port 
   PIO_Configure( g_APinDescription[PINS_UART].pPort, g_APinDescription[PINS_UART].ulPinType,
-                 g_APinDescription[PINS_UART].ulPin, g_APinDescription[PINS_UART].ulPinAttribute ) ;
+                 g_APinDescription[PINS_UART].ulPin, g_APinDescription[PINS_UART].ulPinConfiguration ) ;
 
   // Switch off Power LED
   PIO_Configure( g_APinDescription[PIN_LED_RED].pPort, g_APinDescription[PIN_LED_RED].ulPinType,
-                 g_APinDescription[PIN_LED_RED].ulPin, g_APinDescription[PIN_LED_RED].ulPinAttribute ) ;
+                 g_APinDescription[PIN_LED_RED].ulPin, g_APinDescription[PIN_LED_RED].ulPinConfiguration ) ;
   PIO_Clear( g_APinDescription[PIN_LED_RED].pPort, g_APinDescription[PIN_LED_RED].ulPin ) ;
 }
 #ifdef __cplusplus

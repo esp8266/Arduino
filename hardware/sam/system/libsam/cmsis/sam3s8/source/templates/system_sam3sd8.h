@@ -3,6 +3,8 @@
  * \brief CMSIS Cortex-M# Device Peripheral Access Layer Header File
  *           for SAM3 devices.
  *
+ * $asf_license$
+ *
  * \par Purpose
  *
  * This file provides basic support for Cortex-M processor based
@@ -13,10 +15,8 @@
  *
  ******************************************************************************/
 
-/* $asf_license$ */
-
-#ifndef __SYSTEM_SAM3SD8_
-#define __SYSTEM_SAM3SD8_
+#ifndef SYSTEM_SAM3SD8_H_INCLUDED
+#define SYSTEM_SAM3SD8_H_INCLUDED
 
 /* @cond 0 */
 /**INDENT-OFF**/
@@ -50,4 +50,5 @@ extern void SystemCoreClockUpdate(void);
 /**INDENT-ON**/
 /* @endcond */
 
-#endif /* __SYSTEM_SAM3SD8_ */
+#endif /* SYSTEM_SAM3SD8_H_INCLUDED */
+

@@ -3,6 +3,8 @@
  * \brief Provides the low-level initialization functions that called
  * on chip startup.
  *
+ * $asf_license$
+ *
  * \par Purpose
  *
  * This file provides basic support for Cortex-M processor based
@@ -13,8 +15,7 @@
  *
  ******************************************************************************/
 
-/* $asf_license$ */
-
+#include "system_sam3u.h"
 #include "sam3.h"
 
 /* @cond 0 */
@@ -89,14 +90,17 @@ extern void SystemCoreClockUpdate( void )
 	/* Determine clock frequency according to clock register values */
 	switch (PMC->PMC_MCKR & PMC_MCKR_CSS_Msk) {
 	case PMC_MCKR_CSS_SLOW_CLK:                             /* Slow clock */
-		if (SUPC->SUPC_SR & SUPC_SR_OSCSEL)
+		if (SUPC->SUPC_SR & SUPC_SR_OSCSEL) {
 			SystemCoreClock = OSC32_CLK;
-		else
+        }
+		else {
 			SystemCoreClock = ERC_OSC;
+        }
 		break;
 	case PMC_MCKR_CSS_MAIN_CLK:                             /* Main clock */
-		if (PMC->CKGR_MOR & CKGR_MOR_MOSCSEL)
+		if (PMC->CKGR_MOR & CKGR_MOR_MOSCSEL) {
 			SystemCoreClock = MAINCK_XTAL_HZ;
+        }
 		else {
 			SystemCoreClock = EFRC_OSC;
 
@@ -116,8 +120,9 @@ extern void SystemCoreClockUpdate( void )
 		break;
 	case PMC_MCKR_CSS_PLLA_CLK:                             /* PLLA clock */
 	case PMC_MCKR_CSS_UPLL_CLK:                             /* UPLL clock */
-		if (PMC->CKGR_MOR & CKGR_MOR_MOSCSEL)
+		if (PMC->CKGR_MOR & CKGR_MOR_MOSCSEL) {
 			SystemCoreClock = MAINCK_XTAL_HZ;
+        }
 		else {
 			SystemCoreClock = EFRC_OSC;
 
@@ -144,10 +149,12 @@ extern void SystemCoreClockUpdate( void )
 		break;
 	}
 
-	if ((PMC->PMC_MCKR & PMC_MCKR_PRES_Msk) == PMC_MCKR_PRES_CLK_3)
+	if ((PMC->PMC_MCKR & PMC_MCKR_PRES_Msk) == PMC_MCKR_PRES_CLK_3) {
 		SystemCoreClock /= 3;
-	else
+    }
+	else {
 		SystemCoreClock >>= ((PMC->PMC_MCKR & PMC_MCKR_PRES_Msk) >> PMC_MCKR_PRES_Pos);
+    }
 }
 
 /* @cond 0 */
@@ -157,3 +164,4 @@ extern void SystemCoreClockUpdate( void )
 #endif
 /**INDENT-ON**/
 /* @endcond */
+

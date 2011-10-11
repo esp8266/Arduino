@@ -3,6 +3,8 @@
  * \brief Provides the low-level initialization functions that called
  * on chip startup.
  *
+ * $asf_license$
+ *
  * \par Purpose
  *
  * This file provides basic support for Cortex-M processor based
@@ -12,8 +14,6 @@
  *                       Support and FAQ: http://support.atmel.no/
  *
  ******************************************************************************/
-
-/* $asf_license$ */
 
 #include "sam3.h"
 
@@ -51,33 +51,33 @@ uint32_t SystemCoreClock = EFRC_OSC;
 extern void SystemInit( void )
 {
     /* Set 3 FWS for Embedded Flash Access */
-    EFC->EEFC_FMR = EEFC_FMR_FWS(3);
+    EFC->EEFC_FMR = EEFC_FMR_FWS(3U);
 
     /* Initialize main oscillator */
     if ( !(PMC->CKGR_MOR & CKGR_MOR_MOSCSEL) )
     {
-        PMC->CKGR_MOR = CKGR_MOR_KEY(0x37) | BOARD_OSCOUNT | CKGR_MOR_MOSCRCEN | CKGR_MOR_MOSCXTEN;
-        while (!(PMC->PMC_SR & PMC_SR_MOSCXTS));
+        PMC->CKGR_MOR = CKGR_MOR_KEY(0x37U) | BOARD_OSCOUNT | CKGR_MOR_MOSCRCEN | CKGR_MOR_MOSCXTEN;
+        while (!(PMC->PMC_SR & PMC_SR_MOSCXTS)) {}
     }
 
     /* Switch to 3-20MHz Xtal oscillator */
-    PMC->CKGR_MOR = CKGR_MOR_KEY(0x37) | BOARD_OSCOUNT | CKGR_MOR_MOSCRCEN | CKGR_MOR_MOSCXTEN | CKGR_MOR_MOSCSEL;
+    PMC->CKGR_MOR = CKGR_MOR_KEY(0x37U) | BOARD_OSCOUNT | CKGR_MOR_MOSCRCEN | CKGR_MOR_MOSCXTEN | CKGR_MOR_MOSCSEL;
 
-    while (!(PMC->PMC_SR & PMC_SR_MOSCSELS));
+    while (!(PMC->PMC_SR & PMC_SR_MOSCSELS)) {}
     PMC->PMC_MCKR = (PMC->PMC_MCKR & ~(uint32_t)PMC_MCKR_CSS_Msk) | PMC_MCKR_CSS_MAIN_CLK;
-    while (!(PMC->PMC_SR & PMC_SR_MCKRDY));
+    while (!(PMC->PMC_SR & PMC_SR_MCKRDY)) {}
 
     /* Initialize PLLA */
     PMC->CKGR_PLLAR = BOARD_PLLAR;
-    while (!(PMC->PMC_SR & PMC_SR_LOCKA));
+    while (!(PMC->PMC_SR & PMC_SR_LOCKA)) {}
 
     /* Switch to main clock */
     PMC->PMC_MCKR = (BOARD_MCKR & ~PMC_MCKR_CSS_Msk) | PMC_MCKR_CSS_MAIN_CLK;
-    while (!(PMC->PMC_SR & PMC_SR_MCKRDY));
+    while (!(PMC->PMC_SR & PMC_SR_MCKRDY)) {}
 
     /* Switch to PLLA */
     PMC->PMC_MCKR = BOARD_MCKR ;
-    while (!(PMC->PMC_SR & PMC_SR_MCKRDY));
+    while (!(PMC->PMC_SR & PMC_SR_MCKRDY)) {}
 
 	SystemCoreClock = MCK_HZ;
 }
@@ -85,16 +85,19 @@ extern void SystemInit( void )
 extern void SystemCoreClockUpdate( void )
 {
 	/* Determine clock frequency according to clock register values */
-	switch (PMC->PMC_MCKR & PMC_MCKR_CSS_Msk) {
+	switch (PMC->PMC_MCKR & (uint32_t)PMC_MCKR_CSS_Msk) {
 	case PMC_MCKR_CSS_SLOW_CLK:                             /* Slow clock */
-		if (SUPC->SUPC_SR & SUPC_SR_OSCSEL)
+	  if (SUPC->SUPC_SR & SUPC_SR_OSCSEL) {
 			SystemCoreClock = OSC32_CLK;
-		else
+	  }
+	  else {
 			SystemCoreClock = ERC_OSC;
+	  }
 		break;
 	case PMC_MCKR_CSS_MAIN_CLK:                             /* Main clock */
-		if (PMC->CKGR_MOR & CKGR_MOR_MOSCSEL)
+	  if (PMC->CKGR_MOR & CKGR_MOR_MOSCSEL) {
 			SystemCoreClock = MAINCK_XTAL_HZ;
+	  }
 		else {
 			SystemCoreClock = EFRC_OSC;
 
@@ -102,20 +105,21 @@ extern void SystemCoreClockUpdate( void )
 			case CKGR_MOR_MOSCRCF_4MHz:
 				break;
 			case CKGR_MOR_MOSCRCF_8MHz:
-				SystemCoreClock *= 2;
+				SystemCoreClock *= 2U;
 				break;
 			case CKGR_MOR_MOSCRCF_12MHz:
-				SystemCoreClock *= 3;
+				SystemCoreClock *= 3U;
 				break;
-			case 3:
+			default:
 				break;
 			}
 		}
 		break;
 	case PMC_MCKR_CSS_PLLA_CLK:                             /* PLLA clock */
 	case PMC_MCKR_CSS_PLLB_CLK:                             /* PLLB clock */
-		if (PMC->CKGR_MOR & CKGR_MOR_MOSCSEL)
+		if (PMC->CKGR_MOR & CKGR_MOR_MOSCSEL) {
 			SystemCoreClock = MAINCK_XTAL_HZ;
+		}
 		else {
 			SystemCoreClock = EFRC_OSC;
 
@@ -123,30 +127,34 @@ extern void SystemCoreClockUpdate( void )
 			case CKGR_MOR_MOSCRCF_4MHz:
 				break;
 			case CKGR_MOR_MOSCRCF_8MHz:
-				SystemCoreClock *= 2;
+				SystemCoreClock *= 2U;
 				break;
 			case CKGR_MOR_MOSCRCF_12MHz:
-				SystemCoreClock *= 3;
+				SystemCoreClock *= 3U;
 				break;
-			case 3:
+			default:
 				break;
 			}
 		}
-		if ((PMC->PMC_MCKR & PMC_MCKR_CSS_Msk) == PMC_MCKR_CSS_PLLA_CLK) {
-			SystemCoreClock *= ((((PMC->CKGR_PLLAR) >> CKGR_PLLAR_MULA_Pos) & 0x7FF) + 1);
-			SystemCoreClock /= ((((PMC->CKGR_PLLAR) >> CKGR_PLLAR_DIVA_Pos) & 0x0FF));
+		if ((uint32_t)(PMC->PMC_MCKR & (uint32_t)PMC_MCKR_CSS_Msk) == PMC_MCKR_CSS_PLLA_CLK) {
+			SystemCoreClock *= ((((PMC->CKGR_PLLAR) >> CKGR_PLLAR_MULA_Pos) & 0x7FFU) + 1U);
+			SystemCoreClock /= ((((PMC->CKGR_PLLAR) >> CKGR_PLLAR_DIVA_Pos) & 0x0FFU));
 		}
 		else {
-			SystemCoreClock *= ((((PMC->CKGR_PLLBR) >> CKGR_PLLBR_MULB_Pos) & 0x7FF) + 1);
-			SystemCoreClock /= ((((PMC->CKGR_PLLBR) >> CKGR_PLLBR_DIVB_Pos) & 0x0FF));
+			SystemCoreClock *= ((((PMC->CKGR_PLLBR) >> CKGR_PLLBR_MULB_Pos) & 0x7FFU) + 1U);
+			SystemCoreClock /= ((((PMC->CKGR_PLLBR) >> CKGR_PLLBR_DIVB_Pos) & 0x0FFU));
 		}
+		break;
+	default:
 		break;
 	}
 
-	if ((PMC->PMC_MCKR & PMC_MCKR_PRES_Msk) == PMC_MCKR_PRES_CLK_3)
-		SystemCoreClock /= 3;
-	else
+	if ((PMC->PMC_MCKR & PMC_MCKR_PRES_Msk) == PMC_MCKR_PRES_CLK_3) {
+		SystemCoreClock /= 3U;
+	}
+	else {
 		SystemCoreClock >>= ((PMC->PMC_MCKR & PMC_MCKR_PRES_Msk) >> PMC_MCKR_PRES_Pos);
+	}
 }
 
 /* @cond 0 */
@@ -156,5 +164,4 @@ extern void SystemCoreClockUpdate( void )
 #endif
 /**INDENT-ON**/
 /* @endcond */
-
 

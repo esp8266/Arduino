@@ -3,6 +3,8 @@
  * \brief Provides the low-level initialization functions that called
  * on chip startup.
  *
+ * $asf_license$
+ *
  * \par Purpose
  *
  * This file provides basic support for Cortex-M processor based
@@ -12,8 +14,6 @@
  *                       Support and FAQ: http://support.atmel.no/
  *
  ******************************************************************************/
-
-/* $asf_license$ */
 
 #include "system_sam3x.h"
 #include "sam3xa.h"
@@ -117,8 +117,9 @@ extern void SystemCoreClockUpdate( void )
 		break;
 	case PMC_MCKR_CSS_PLLA_CLK:                             /* PLLA clock */
 	case PMC_MCKR_CSS_UPLL_CLK:                             /* UPLL clock */
-		if (PMC->CKGR_MOR & CKGR_MOR_MOSCSEL)
+		if (PMC->CKGR_MOR & CKGR_MOR_MOSCSEL) {
 			SystemCoreClock = MAINCK_XTAL_HZ;
+        }
 		else {
 			SystemCoreClock = EFRC_OSC;
 
@@ -145,10 +146,12 @@ extern void SystemCoreClockUpdate( void )
 		break;
 	}
 
-	if ((PMC->PMC_MCKR & PMC_MCKR_PRES_Msk) == PMC_MCKR_PRES_CLK_3)
+	if ((PMC->PMC_MCKR & PMC_MCKR_PRES_Msk) == PMC_MCKR_PRES_CLK_3) {
 		SystemCoreClock /= 3;
-	else
+    }
+	else {
 		SystemCoreClock >>= ((PMC->PMC_MCKR & PMC_MCKR_PRES_Msk) >> PMC_MCKR_PRES_Pos);
+    }
 }
 
 /* @cond 0 */

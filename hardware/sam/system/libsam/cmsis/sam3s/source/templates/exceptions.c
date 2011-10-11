@@ -2,6 +2,8 @@
  *
  * \brief This file contains the default exception handlers.
  *
+ * $asf_license$
+ *
  * \par Purpose
  *
  * This file provides basic support for Cortex-M processor based
@@ -16,8 +18,6 @@
  *                       Support and FAQ: http://support.atmel.no/
  *
  ******************************************************************************/
-
-/* $asf_license$ */
 
 #include "exceptions.h"
 
@@ -140,3 +140,4 @@ void Dummy_Handler( void )
 #endif
 /**INDENT-ON**/
 /* @endcond */
+
