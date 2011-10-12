@@ -47,8 +47,8 @@ public class BossaCUploader extends Uploader {
                           + port);
     commandDownloader.add("-e");
     commandDownloader.add("-w");
-    commandDownloader.add("-v");
-    commandDownloader.add("-b");
+    commandDownloader.add("-s");
+    commandDownloader.add("-l");
     commandDownloader.add(buildPath + File.separator + className + ".bin");
 
     return bossac(commandDownloader);
