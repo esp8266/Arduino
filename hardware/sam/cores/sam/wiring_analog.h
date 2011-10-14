@@ -8,19 +8,35 @@
 #endif
 
 /*
- * \brief
+ * \brief SAM3 products have only one reference for ADC
  */
-extern void analogReference( uint8_t mode ) ;
+typedef enum _eAnalogReference
+{
+  AR_DEFAULT,
+} eAnalogReference ;
 
 /*
- * \brief
+ * \brief Configures the reference voltage used for analog input (i.e. the value used as the top of the input range).
+ * This function is kept only for compatibility with existing AVR based API.
+ *
+ * \param ulMmode Should be set to AR_DEFAULT.
  */
-extern void analogWrite( uint8_t, int ) ;
+extern void analogReference( eAnalogReference ulMode ) ;
 
 /*
- * \brief
+ * \brief Writes an analog value (PWM wave) to a pin.
+ *
+ * \param ulPin
+ * \param ulValue
  */
-extern int analogRead( uint8_t ) ;
+extern void analogWrite( uint32_t ulPin, uint32_t ulValue ) ;
+
+/*
+ * \brief Reads the value from the specified analog pin.
+ *
+ * \param ulValue
+ */
+extern uint32_t analogRead( uint32_t ulPin ) ;
 
 
 #ifdef __cplusplus

@@ -78,7 +78,8 @@ typedef void (*voidFuncPtr)( void ) ;
 /* Definitions and types for pins */
 typedef enum _EAnalogChannel
 {
-  ADC0,
+  NONE=-1,
+  ADC0=0,
   ADC1,
   ADC2,
   ADC3,
@@ -119,6 +120,7 @@ typedef struct _PinDescription
   EAnalogChannel ulAnalogChannel ;
 } PinDescription ;
 
+/* Pins table to be instanciated into variant.cpp */
 extern const PinDescription g_APinDescription[] ;
 
 #ifdef __cplusplus

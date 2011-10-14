@@ -198,7 +198,7 @@ extern void ADC_SetCompareMode( Adc* pAdc, uint32_t dwMode )
     pAdc->ADC_EMR |= (dwMode & ADC_EMR_CMPMODE_Msk) ;
 }
 /**
- * Set comparsion window,one thereshold each time
+ * Set comparison window, one threshold each time
  *
  * \param pAdc Pointer to an Adc instance.
  * \param hi_lo Comparison Window

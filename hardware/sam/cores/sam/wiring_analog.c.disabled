@@ -31,17 +31,14 @@
 #endif
 
 
-uint8_t analog_reference = DEFAULT;
+eAnalogReference analog_reference = AR_DEFAULT ;
 
-void analogReference(uint8_t mode)
+void analogReference( eAnalogReference ulMode )
 {
-	// can't actually set the register here because the default setting
-	// will connect AVCC and the AREF pin, which would cause a short if
-	// there's something connected to AREF.
-	analog_reference = mode;
+	analog_reference = ulMode ;
 }
 
-int analogRead(uint8_t pin)
+uint32_t analogRead( uint32_t ulPin )
 {
 	uint8_t low, high;
 
@@ -94,7 +91,7 @@ int analogRead(uint8_t pin)
 // hardware support.  These are defined in the appropriate
 // pins_*.c file.  For the rest of the pins, we default
 // to digital output.
-void analogWrite(uint8_t pin, int val)
+void analogWrite( uint32_t ulPin, uint32_t ulValue )
 {
 	// We need to make sure the PWM output is enabled for those pins
 	// that support it, as we turn it off when digitally reading or
