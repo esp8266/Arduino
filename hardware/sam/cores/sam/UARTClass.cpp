@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "UART.h"
+#include "UARTClass.h"
 
 // Constructors ////////////////////////////////////////////////////////////////
 

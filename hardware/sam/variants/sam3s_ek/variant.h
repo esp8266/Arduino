@@ -35,8 +35,8 @@
  *----------------------------------------------------------------------------*/
 
 #include "Arduino.h"
-#include "UART.h"
-#include "USART.h"
+#include "UARTClass.h"
+#include "USARTClass.h"
 
 /**
  * Libc porting layers

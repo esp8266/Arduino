@@ -1798,16 +1798,16 @@
       <name>$PROJ_DIR$\..\..\common\cortex_handlers.cpp</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\common\UART.cpp</name>
+      <name>$PROJ_DIR$\..\..\common\UARTClass.cpp</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\common\UART.h</name>
+      <name>$PROJ_DIR$\..\..\common\UARTClass.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\common\USART.cpp</name>
+      <name>$PROJ_DIR$\..\..\common\USARTClass.cpp</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\common\USART.h</name>
+      <name>$PROJ_DIR$\..\..\common\USARTClass.h</name>
     </file>
   </group>
   <file>

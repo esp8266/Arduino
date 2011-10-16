@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "USART.h"
+#include "USARTClass.h"
 
 // Constructors ////////////////////////////////////////////////////////////////
 
