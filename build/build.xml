@@ -445,6 +445,10 @@
       <fileset file="windows/eeprom.h" />
     </copy>
 
+    <copy todir="windows/work/hardware/tools">
+      <fileset file="windows/bossac.exe" />
+    </copy>
+
     <antcall target="assemble">
       <param name="target.path" value="windows/work" />
     </antcall>

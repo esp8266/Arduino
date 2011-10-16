@@ -43,8 +43,7 @@ public class BossaCUploader extends Uploader {
     String port = Preferences.get("serial.port");
     if (port.startsWith("/dev/"))
       port = port.substring(5);
-    commandDownloader.add("--port=" + (Base.isWindows() ? "\\\\.\\" : "")
-                          + port);
+    commandDownloader.add("--port=" + port);
     commandDownloader.add("-e");
     commandDownloader.add("-w");
     commandDownloader.add("-s");
@@ -76,8 +75,6 @@ public class BossaCUploader extends Uploader {
 
     try {
       String avrBasePath = Base.getHardwarePath() + "/tools/";
-      if (!Base.isLinux())
-        avrBasePath += "avr/bin/";
 
       String[] cmdArray = cmdParams.toArray(new String[0]);
       cmdArray[0] = avrBasePath + cmdArray[0];
