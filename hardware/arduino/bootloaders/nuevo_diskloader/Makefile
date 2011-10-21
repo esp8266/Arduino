@@ -40,8 +40,11 @@ ASMFLAGS += -x assembler-with-cpp -Wa,-gdwarf2
 
 ## Linker flags
 LDFLAGS = $(COMMON)
-LDFLAGS += -Wl,-gc-sections,-Map=DiskLoader.map,--section-start=.text=0x7800,--relax
-LDFLAGS += -nodefaultlibs -nostartfiles
+LDFLAGS += -Wl,-gc-sections,-Map=DiskLoader.map,--cref
+LDFLAGS += -Wl,--section-start=.text=0x7800,--relax
+LDFLAGS += -Wl,--gc-sections
+#LDFLAGS += -nodefaultlibs -nostartfiles
+#LDFLAGS += -nostartfiles
 
 
 ## Intel Hex file production flags
@@ -102,4 +105,4 @@ size: $(TARGET)
 #	@avr-size -C --mcu=${MCU} ${TARGET}.elf
 
 program: $(TARGET).hex
-	$(AVRDUDE) $(AVRDUDE_FLAGS) -B 5 -u -U flash:w:$(TARGET).hex
+	$(AVRDUDE) $(AVRDUDE_FLAGS) -B 1 -u -U flash:w:$(TARGET).hex

@@ -27,9 +27,16 @@ typedef unsigned long u32;
 
 #define CDC_ENABLED
 
+#define USB_PID_LEONARDO 0x0034
+#define USB_PID_MICRO 0x0035
+#define USB_VID 0x2341	// arduino LLC vid
+#define USB_PID ARDUINO_MODEL_PID	// passed in by Makefile - 0x0034 for Leonardo, 0x0035 for MIcro
+
 //#include "USBDesc.h"
 //#include "../../../cores/arduino/USBCore.h"
-#include "USBAPI.h"
+
+
+#define min(a,b) ((a)<(b)?(a):(b))
 
 #define CPU_PRESCALE(n)	(CLKPR = 0x80, CLKPR = (n))
 #define DISABLE_JTAG()  MCUCR = (1 << JTD) | (1 << IVCE) | (0 << PUD); MCUCR = (1 << JTD) | (0 << IVSEL) | (0 << IVCE) | (0 << PUD)
@@ -44,6 +51,7 @@ typedef unsigned long u32;
 #define RX_LED_ON()			PORTB &= ~(1<<0)
 #define L_LED_OFF()			PORTC &= ~(1<<7)
 #define L_LED_ON()			PORTC |= (1<<7)
+#define L_LED_TOGGLE()		PORTC ^= (1<<7)
 
 // these for non-XXX boards
 //#define LED0			PORTC &= ~(1<<7)
@@ -56,5 +64,9 @@ typedef unsigned long u32;
 #ifdef __cplusplus
 }	/* extern "C"{ */
 #endif 
+
+#include "USBDesc.h"
+#include "USBCore.h"	
+#include "USBAPI.h"
 
 #endif /* __PLATFORM_H__ */

@@ -41,72 +41,6 @@ extern Serial_ Serial;
 
 //================================================================================
 //================================================================================
-//	Mouse
-
-#define MOUSE_LEFT 1
-#define MOUSE_RIGHT 2
-#define MOUSE_MIDDLE 4
-#define MOUSE_ALL (MOUSE_LEFT | MOUSE_RIGHT | MOUSE_MIDDLE)
-
-class Mouse_
-{
-private:
-	uint8_t _buttons;
-	void buttons(uint8_t b);
-public:
-	Mouse_();
-	void click(uint8_t b = MOUSE_LEFT);
-	void move(signed char x, signed char y, signed char wheel = 0);	
-	void press(uint8_t b = MOUSE_LEFT);		// press LEFT by default
-	void release(uint8_t b = MOUSE_LEFT);	// release LEFT by default
-	bool isPressed(uint8_t b = MOUSE_ALL);	// check all buttons by default
-};
-extern Mouse_ Mouse;
-
-//================================================================================
-//================================================================================
-//	Keyboard
-
-#define KEY_MODIFIER_LEFT_CTRL		0x01
-#define KEY_MODIFIER_LEFT_SHIFT		0x02
-#define KEY_MODIFIER_LEFT_ALT		0x04
-#define KEY_MODIFIER_LEFT_GUI		0x08
-#define KEY_MODIFIER_RIGHT_CTRL		0x010
-#define KEY_MODIFIER_RIGHT_SHIFT	0x020
-#define KEY_MODIFIER_RIGHT_ALT		0x040
-#define KEY_MODIFIER_RIGHT_GUI		0x080
-
-//	Low level key report: up to 6 keys and shift, ctrl etc at once
-typedef struct
-{
-	uint8_t modifiers;
-	uint8_t reserved;
-	uint8_t keys[6];
-} KeyReport;
-
-//	Map a character into a key report
-//	Called from Print to map text to keycodes
-class KeyMap
-{
-public:
-	virtual void charToKey(int c, KeyReport* keyReport) = 0;
-};
-
-//	
-class Keyboard_ 
-{
-private:
-	KeyMap* _keyMap;
-	void sendReport(KeyReport* keys);
-	void setKeyMap(KeyMap* keyMap);	
-public:
-	Keyboard_();
-	virtual size_t write(uint8_t);
-};
-extern Keyboard_ Keyboard;
-
-//================================================================================
-//================================================================================
 //	Low level API
 
 typedef struct
@@ -121,25 +55,7 @@ typedef struct
 
 //================================================================================
 //================================================================================
-//	HID 'Driver'
-
-int		HID_GetInterface(uint8_t* interfaceNum);
-int		HID_GetDescriptor(int i);
-bool	HID_Setup(Setup& setup);
-void	HID_SendReport(uint8_t id, const void* data, int len);
-
-//================================================================================
-//================================================================================
-//	MSC 'Driver'
-
-int		MSC_GetInterface(uint8_t* interfaceNum);
-int		MSC_GetDescriptor(int i);
-bool	MSC_Setup(Setup& setup);
-bool	MSC_Data(uint8_t rx,uint8_t tx);
-
-//================================================================================
-//================================================================================
-//	CSC 'Driver'
+//	CDC 'Driver'
 
 int		CDC_GetInterface(uint8_t* interfaceNum);
 int		CDC_GetDescriptor(int i);
