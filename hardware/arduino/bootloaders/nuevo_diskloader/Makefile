@@ -14,7 +14,7 @@ AVR_FREQ   = 16000000L
 # Specify the Arduino model using the assigned PID.  This is used by Descriptors.c
 #   to set PID and product descriptor string
 # Arduino Leonardo PID
-ARDUINO_MODEL_PID = 0x0034
+ARDUINO_MODEL_PID = 0x0088
 # Arduino Micro PID
 #ARDUINO_MODEL_PID = 0x0035
 

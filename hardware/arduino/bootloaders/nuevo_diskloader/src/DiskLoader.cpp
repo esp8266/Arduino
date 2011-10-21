@@ -20,6 +20,7 @@ void entrypoint(void)
 }
 
 u8 _flashbuf[128];
+volatile u16 _timeout;
 
 void Program(u8 ep, u16 page, u8 count)
 {
@@ -45,6 +46,34 @@ void Program(u8 ep, u16 page, u8 count)
     boot_rww_enable ();
 }
 
+#define STK_OK              0x10
+#define STK_INSYNC          0x14  // ' '
+#define CRC_EOP             0x20  // 'SPACE'
+#define STK_GET_SYNC        0x30  // '0'
+
+#define STK_GET_PARAMETER   0x41  // 'A'
+#define STK_SET_DEVICE      0x42  // 'B'
+#define STK_SET_DEVICE_EXT  0x45  // 'E'
+#define STK_LOAD_ADDRESS    0x55  // 'U'
+#define STK_UNIVERSAL       0x56  // 'V'
+#define STK_PROG_PAGE       0x64  // 'd'
+#define STK_READ_PAGE       0x74  // 't'
+#define STK_READ_SIGN       0x75  // 'u'
+
+extern const u8 _readSize[] PROGMEM;
+const u8 _readSize[] = 
+{
+	STK_GET_PARAMETER,	1,
+	STK_SET_DEVICE,		20,
+	STK_SET_DEVICE_EXT,	5,
+	STK_UNIVERSAL,		4,
+	STK_LOAD_ADDRESS,	2,
+	STK_PROG_PAGE,		3,
+	STK_READ_PAGE,		3,
+	0,0
+};
+
+
 int main(void) __attribute__ ((naked));
 int main() 
 {		
@@ -68,21 +97,26 @@ int main()
 	
 	for (;;) 
 	{
-//		L_LED_ON();
-//		_delay_ms(250);
-//		L_LED_OFF();
-//		_delay_ms(250);
 		u8* packet = _flashbuf;
 		u16 address = 0;
 		for (;;)
 		{
-//			u8 cmd = getch();
 			if (Serial.available() > 0) {
 				u8 cmd = Serial.read();
-				if (cmd == '0')
-					L_LED_OFF();
-				if (cmd == '1')
-					L_LED_ON();
+				// Read packet contents
+				u8 len;
+				const u8* rs = _readSize;
+				for (;;) 
+				{
+					u8 c = pgm_read_byte(rs++);
+					len = pgm_read_byte(rs++);
+					if (c == cmd || c == 0)
+						break;
+				}
+				_timeout = 0;
+				// Read params
+				USB_Recv(CDC_RX, packet, len);
+				
 			}
 		}
 	}
