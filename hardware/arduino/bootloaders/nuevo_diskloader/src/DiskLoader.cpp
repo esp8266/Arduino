@@ -27,13 +27,15 @@ ISR(BADISR_vect)
 int main(void) __attribute__ ((naked));
 int main() 
 {
-	/* Enable change of interrupt vectors */ 
-	MCUCR = (1<<IVCE); 
-	/* Move interrupts to boot flash section */ 
-	MCUCR = (1<<IVSEL); 
-	
+		
 	wdt_disable();
 	BOARD_INIT();
+	asm volatile (
+				  "ldi r16,	  0x01\n"		// (1<<IVCE)	/* Enable change of interrupt vectors */
+				  "out 0x35,  r16\n"		// MCUCR
+				  "ldi r16,	  0x02\n"		// (1<<IVSEL)	/* Move interrupts to boot flash section */
+				  "out 0x35,  r16\n"		// MCUCR				  
+				  );	
 	TX_LED_OFF();
 	RX_LED_OFF();
 	L_LED_OFF();	
