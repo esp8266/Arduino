@@ -19,17 +19,15 @@ void entrypoint(void)
 				  ::);
 }
 
-ISR(BADISR_vect)
-{
-	L_LED_ON();
-}
-
 int main(void) __attribute__ ((naked));
 int main() 
-{
-		
+{		
 	wdt_disable();
 	BOARD_INIT();
+	/* move interrupts to boot section:
+	 * uses inline assembly because the procedure must be completed in four cycles.
+	 * seems to fail if called before disabling WDT and calling BOARD_INIT()
+	 */
 	asm volatile (
 				  "ldi r16,	  0x01\n"		// (1<<IVCE)	/* Enable change of interrupt vectors */
 				  "out 0x35,  r16\n"		// MCUCR
