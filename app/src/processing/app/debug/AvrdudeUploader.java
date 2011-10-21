@@ -132,7 +132,8 @@ public class AvrdudeUploader extends Uploader  {
     Map<String, String> boardPreferences = Base.getBoardPreferences();
     List fuses = new ArrayList();
     fuses.add("-e"); // erase the chip
-    fuses.add("-Ulock:w:" + boardPreferences.get("bootloader.unlock_bits") + ":m");
+    if (boardPreferences.get("bootloader.unlock_bits") != null)
+      fuses.add("-Ulock:w:" + boardPreferences.get("bootloader.unlock_bits") + ":m");
     if (boardPreferences.get("bootloader.extended_fuses") != null)
       fuses.add("-Uefuse:w:" + boardPreferences.get("bootloader.extended_fuses") + ":m");
     fuses.add("-Uhfuse:w:" + boardPreferences.get("bootloader.high_fuses") + ":m");
@@ -146,26 +147,32 @@ public class AvrdudeUploader extends Uploader  {
     } catch (InterruptedException e) {}
     
     Target t;
+    List bootloader = new ArrayList();
     String bootloaderPath = boardPreferences.get("bootloader.path");
     
-    if (bootloaderPath.indexOf(':') == -1) {
-      t = Base.getTarget(); // the current target (associated with the board)
-    } else {
-      String targetName = bootloaderPath.substring(0, bootloaderPath.indexOf(':'));
-      t = Base.targetsTable.get(targetName);
-      bootloaderPath = bootloaderPath.substring(bootloaderPath.indexOf(':') + 1);
+    if (bootloaderPath != null) {
+      if (bootloaderPath.indexOf(':') == -1) {
+        t = Base.getTarget(); // the current target (associated with the board)
+      } else {
+        String targetName = bootloaderPath.substring(0, bootloaderPath.indexOf(':'));
+        t = Base.targetsTable.get(targetName);
+        bootloaderPath = bootloaderPath.substring(bootloaderPath.indexOf(':') + 1);
+      }
+      
+      File bootloadersFile = new File(t.getFolder(), "bootloaders");
+      File bootloaderFile = new File(bootloadersFile, bootloaderPath);
+      bootloaderPath = bootloaderFile.getAbsolutePath();
+      
+      bootloader.add("-Uflash:w:" + bootloaderPath + File.separator +
+                     boardPreferences.get("bootloader.file") + ":i");
     }
-    
-    File bootloadersFile = new File(t.getFolder(), "bootloaders");
-    File bootloaderFile = new File(bootloadersFile, bootloaderPath);
-    bootloaderPath = bootloaderFile.getAbsolutePath();
-    
-    List bootloader = new ArrayList();
-    bootloader.add("-Uflash:w:" + bootloaderPath + File.separator +
-                   boardPreferences.get("bootloader.file") + ":i");
-    bootloader.add("-Ulock:w:" + boardPreferences.get("bootloader.lock_bits") + ":m");
+    if (boardPreferences.get("bootloader.lock_bits") != null)
+      bootloader.add("-Ulock:w:" + boardPreferences.get("bootloader.lock_bits") + ":m");
 
-    return avrdude(params, bootloader);
+    if (bootloader.size() > 0)
+      return avrdude(params, bootloader);
+    
+    return true;
   }
   
   public boolean avrdude(Collection p1, Collection p2) throws RunnerException {
