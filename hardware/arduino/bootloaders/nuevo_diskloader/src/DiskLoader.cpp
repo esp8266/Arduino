@@ -68,9 +68,22 @@ int main()
 	
 	for (;;) 
 	{
-		L_LED_ON();
-		_delay_ms(250);
-		L_LED_OFF();
-		_delay_ms(250);
+//		L_LED_ON();
+//		_delay_ms(250);
+//		L_LED_OFF();
+//		_delay_ms(250);
+		u8* packet = _flashbuf;
+		u16 address = 0;
+		for (;;)
+		{
+//			u8 cmd = getch();
+			if (Serial.available() > 0) {
+				u8 cmd = Serial.read();
+				if (cmd == '0')
+					L_LED_OFF();
+				if (cmd == '1')
+					L_LED_ON();
+			}
+		}
 	}
 }
