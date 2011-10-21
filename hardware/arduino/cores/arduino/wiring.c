@@ -221,10 +221,14 @@ void init()
 
 	// set timer 1 prescale factor to 64
 	sbi(TCCR1B, CS11);
+#if F_CPU >= 8000000L
 	sbi(TCCR1B, CS10);
+#endif
 #elif defined(TCCR1) && defined(CS11) && defined(CS10)
 	sbi(TCCR1, CS11);
+#if F_CPU >= 8000000L
 	sbi(TCCR1, CS10);
+#endif
 #endif
 	// put timer 1 in 8-bit phase correct pwm mode
 #if defined(TCCR1A) && defined(WGM10)
