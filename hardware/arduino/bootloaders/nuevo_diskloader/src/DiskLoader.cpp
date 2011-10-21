@@ -20,6 +20,8 @@ void entrypoint(void)
 }
 
 u8 _flashbuf[128];
+u8 _inSync;
+u8 _ok;
 volatile u16 _timeout;
 
 void Program(u8 ep, u16 page, u8 count)
@@ -45,6 +47,10 @@ void Program(u8 ep, u16 page, u8 count)
     boot_spm_busy_wait();
     boot_rww_enable ();
 }
+
+#define HW_VER	 0x02
+#define SW_MAJOR 0x01
+#define SW_MINOR 0x10
 
 #define STK_OK              0x10
 #define STK_INSYNC          0x14  // ' '
@@ -73,6 +79,18 @@ const u8 _readSize[] =
 	0,0
 };
 
+extern const u8 _consts[] PROGMEM;
+const u8 _consts[] = 
+{
+	SIGNATURE_0,
+	SIGNATURE_1,
+	SIGNATURE_2,
+	HW_VER,		// Hardware version
+	SW_MAJOR,	// Software major version
+	SW_MINOR,	// Software minor version
+	0x03,		// Unknown but seems to be required by avr studio 3.56
+	0x00,		// 
+};
 
 int main(void) __attribute__ ((naked));
 int main() 
@@ -95,13 +113,20 @@ int main()
 	USB.attach();
 	sei();
 	
+	_inSync = STK_INSYNC;
+	_ok = STK_OK;
+	
 	for (;;) 
 	{
 		u8* packet = _flashbuf;
 		u16 address = 0;
 		for (;;)
 		{
-			if (Serial.available() > 0) {
+			
+//			if (Serial.available() > 0) {
+				while (Serial.available() <= 0)
+					;
+			
 				u8 cmd = Serial.read();
 				// Read packet contents
 				u8 len;
@@ -117,7 +142,60 @@ int main()
 				// Read params
 				USB_Recv(CDC_RX, packet, len);
 				
-			}
+				// Send a response
+				u8 send = 0;
+				const u8* pgm = _consts+7;
+				if (STK_GET_PARAMETER == cmd)
+				{
+					u8 i = packet[0] - 0x80;
+					if (i > 2)
+						i = (i==0x18) ? 3 : 4;	// 0x80:HW_VER,0x81:SW_MAJOR,0x82:SW_MINOR,0x18:3 or 0
+					pgm = _consts + i + 3;
+					send = 1;
+				} 
+				else if (STK_UNIVERSAL == cmd) 
+				{
+					if (packet[0] == 0x30)
+						pgm = _consts + packet[2];	
+					send = 1;
+				}
+				else if (STK_READ_SIGN == cmd)
+				{ 
+					pgm = _consts;
+					send = 3;
+				}
+				else if (STK_LOAD_ADDRESS == cmd) 
+				{
+					address = *((u16*)packet);	// word address
+					address += address;
+				}
+				else if (STK_PROG_PAGE == cmd)
+				{
+					Program(CDC_RX, address, packet[1]);
+				}
+				else if (STK_READ_PAGE == cmd)
+				{
+					send = packet[1];
+					pgm = (const u8*)address;
+					address += send;
+				}
+				
+				// Check sync
+				if (Serial.available() > 0 && Serial.read() != ' ')
+					break;
+				Serial.write(STK_INSYNC);
+				
+//				u8 i;
+//				for (i=0; i<send; i++) {
+//					Serial.write(pgm[i]);
+//				}
+				
+				// Send ok
+				Serial.write(STK_OK);
+				
+				if ('Q' == cmd)
+					break;
+//			}			 
 		}
 	}
 }
