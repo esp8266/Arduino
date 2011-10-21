@@ -19,6 +19,32 @@ void entrypoint(void)
 				  ::);
 }
 
+u8 _flashbuf[128];
+
+void Program(u8 ep, u16 page, u8 count)
+{
+	u8 write = page < 30*1024;		// Don't write over firmware please
+	if (write)
+		boot_page_erase(page);
+	
+	USB_Recv(ep,_flashbuf,count);	// Read while page is erasing
+	
+	if (!write)
+		return;
+	
+	boot_spm_busy_wait();			// Wait until the memory is erased.
+	
+	count >>= 1;
+	u16* p = (u16*)page;
+	u16* b = (u16*)_flashbuf;
+	for (u8 i = 0; i < count; i++)
+		boot_page_fill(p++, b[i]);
+	
+    boot_page_write(page);
+    boot_spm_busy_wait();
+    boot_rww_enable ();
+}
+
 int main(void) __attribute__ ((naked));
 int main() 
 {		
