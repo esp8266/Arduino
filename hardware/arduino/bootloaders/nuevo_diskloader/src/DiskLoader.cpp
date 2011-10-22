@@ -123,9 +123,9 @@ int main()
 		for (;;)
 		{
 			while (Serial.available() <= 0)
-				;
-		
+				;		
 			u8 cmd = Serial.read();
+			
 			// Read packet contents
 			u8 len;
 			const u8* rs = _readSize;
@@ -184,28 +184,14 @@ int main()
 //			Serial.write(STK_INSYNC);
 			USB_Send(CDC_TX, &_inSync, 1);
 			
-//				u8 i;
-//				for (i=0; i<send; i++) {
-//					Serial.write(pgm[i]);
-//				}
-//			Serial.write(0x01);
-//			u8 i;
-//			for (i=0; i<send; i++) {				
-//				Serial.write();
-//			}
-
-//			if (send > 0) 
-//				USB_Send(CDC_TX, pgm, send);
-			
-//			if (send) {
-////				USB_Send(CDC_TX|TRANSFER_PGM, pgm, send);
-//				u8 _foo;
-//				_foo = 0x01;
-//				USB_Send(CDC_TX|TRANSFER_PGM, &_foo, 1);
-//						 
-//			}
-			if (send) 	
-				Serial.write(0x01);
+			if (send) {
+				u8 i;
+				for (i=0; i<send; i++) {
+//					Serial.write(0xFF);		// this works
+//					Serial.write(*pgm + i);	// this doesn't
+					Serial.write(pgm[i]);
+				}
+			}
 			
 			// Send ok
 //			Serial.write(STK_OK);
