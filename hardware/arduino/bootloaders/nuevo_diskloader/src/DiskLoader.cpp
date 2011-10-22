@@ -122,80 +122,97 @@ int main()
 		u16 address = 0;
 		for (;;)
 		{
-			
-//			if (Serial.available() > 0) {
-				while (Serial.available() <= 0)
-					;
-			
-				u8 cmd = Serial.read();
-				// Read packet contents
-				u8 len;
-				const u8* rs = _readSize;
-				for (;;) 
-				{
-					u8 c = pgm_read_byte(rs++);
-					len = pgm_read_byte(rs++);
-					if (c == cmd || c == 0)
-						break;
-				}
-				_timeout = 0;
-				// Read params
-				USB_Recv(CDC_RX, packet, len);
-				
-				// Send a response
-				u8 send = 0;
-				const u8* pgm = _consts+7;
-				if (STK_GET_PARAMETER == cmd)
-				{
-					u8 i = packet[0] - 0x80;
-					if (i > 2)
-						i = (i==0x18) ? 3 : 4;	// 0x80:HW_VER,0x81:SW_MAJOR,0x82:SW_MINOR,0x18:3 or 0
-					pgm = _consts + i + 3;
-					send = 1;
-				} 
-				else if (STK_UNIVERSAL == cmd) 
-				{
-					if (packet[0] == 0x30)
-						pgm = _consts + packet[2];	
-					send = 1;
-				}
-				else if (STK_READ_SIGN == cmd)
-				{ 
-					pgm = _consts;
-					send = 3;
-				}
-				else if (STK_LOAD_ADDRESS == cmd) 
-				{
-					address = *((u16*)packet);	// word address
-					address += address;
-				}
-				else if (STK_PROG_PAGE == cmd)
-				{
-					Program(CDC_RX, address, packet[1]);
-				}
-				else if (STK_READ_PAGE == cmd)
-				{
-					send = packet[1];
-					pgm = (const u8*)address;
-					address += send;
-				}
-				
-				// Check sync
-				if (Serial.available() > 0 && Serial.read() != ' ')
+			while (Serial.available() <= 0)
+				;
+		
+			u8 cmd = Serial.read();
+			// Read packet contents
+			u8 len;
+			const u8* rs = _readSize;
+			for (;;) 
+			{
+				u8 c = pgm_read_byte(rs++);
+				len = pgm_read_byte(rs++);
+				if (c == cmd || c == 0)
 					break;
-				Serial.write(STK_INSYNC);
-				
+			}
+			_timeout = 0;
+			// Read params
+			USB_Recv(CDC_RX, packet, len);
+			
+			// Send a response
+			u8 send = 0;
+			const u8* pgm = _consts+7;
+			if (STK_GET_PARAMETER == cmd)
+			{
+				u8 i = packet[0] - 0x80;
+				if (i > 2)
+					i = (i==0x18) ? 3 : 4;	// 0x80:HW_VER,0x81:SW_MAJOR,0x82:SW_MINOR,0x18:3 or 0
+				pgm = _consts + i + 3;
+				send = 1;
+			} 
+			else if (STK_UNIVERSAL == cmd) 
+			{
+				if (packet[0] == 0x30)
+					pgm = _consts + packet[2];	
+				send = 1;
+			}
+			else if (STK_READ_SIGN == cmd)
+			{ 
+				pgm = _consts;
+				send = 3;
+			}
+			else if (STK_LOAD_ADDRESS == cmd) 
+			{
+				address = *((u16*)packet);	// word address
+				address += address;
+			}
+			else if (STK_PROG_PAGE == cmd)
+			{
+				Program(CDC_RX, address, packet[1]);
+			}
+			else if (STK_READ_PAGE == cmd)
+			{
+				send = packet[1];
+				pgm = (const u8*)address;
+				address += send;
+			}
+			
+			// Check sync
+			if (Serial.available() > 0 && Serial.read() != ' ')
+				break;
+//			Serial.write(STK_INSYNC);
+			USB_Send(CDC_TX, &_inSync, 1);
+			
 //				u8 i;
 //				for (i=0; i<send; i++) {
 //					Serial.write(pgm[i]);
 //				}
-				
-				// Send ok
-				Serial.write(STK_OK);
-				
-				if ('Q' == cmd)
-					break;
-//			}			 
+//			Serial.write(0x01);
+//			u8 i;
+//			for (i=0; i<send; i++) {				
+//				Serial.write();
+//			}
+
+//			if (send > 0) 
+//				USB_Send(CDC_TX, pgm, send);
+			
+//			if (send) {
+////				USB_Send(CDC_TX|TRANSFER_PGM, pgm, send);
+//				u8 _foo;
+//				_foo = 0x01;
+//				USB_Send(CDC_TX|TRANSFER_PGM, &_foo, 1);
+//						 
+//			}
+			if (send) 	
+				Serial.write(0x01);
+			
+			// Send ok
+//			Serial.write(STK_OK);
+			USB_Send(CDC_TX|TRANSFER_RELEASE, &_ok, 1);
+			
+			if ('Q' == cmd)
+				break; 
 		}
 	}
 }

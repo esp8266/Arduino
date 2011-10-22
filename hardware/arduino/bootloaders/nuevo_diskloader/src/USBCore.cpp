@@ -268,14 +268,14 @@ int USB_Send(u8 ep, const void* d, int len)
 	while (len)
 	{
 		u8 n = USB_SendSpace(ep);
-		if (n == 0)
-		{
-			if (!(--timeout))
-				return -1;
+//		if (n == 0)
+//		{
+//			if (!(--timeout))
+//				return -1;
 //			delay(1);
-			_delay_ms(1);
-			continue;
-		}
+//			_delay_ms(1);
+//			continue;
+//		}
 
 		if (n > len)
 			n = len;
