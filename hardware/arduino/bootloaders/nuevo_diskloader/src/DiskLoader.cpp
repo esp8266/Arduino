@@ -116,13 +116,14 @@ int main()
 	_inSync = STK_INSYNC;
 	_ok = STK_OK;
 	
+
 	for (;;) 
 	{
 		u8* packet = _flashbuf;
 		u16 address = 0;
 		for (;;)
 		{
-			while (Serial.available() <= 0)
+			while (Serial.available() < 1)
 				;		
 			u8 cmd = Serial.read();
 			
@@ -185,20 +186,42 @@ int main()
 			USB_Send(CDC_TX, &_inSync, 1);
 			
 			if (send) {
-				u8 i;
-				for (i=0; i<send; i++) {
-//					Serial.write(0xFF);		// this works
-//					Serial.write(*pgm + i);	// this doesn't
-					Serial.write(pgm[i]);
-				}
+//				u8 i;
+//				for (i=0; i<send; i++) {
+////					Serial.write(0xFF);		// this works
+////					Serial.write(*pgm + i);	// this doesn't
+//					Serial.write(pgm[i]);
+//				}
+				USB_Send(CDC_TX|TRANSFER_PGM, pgm, send);
 			}
 			
 			// Send ok
 //			Serial.write(STK_OK);
 			USB_Send(CDC_TX|TRANSFER_RELEASE, &_ok, 1);
 			
-			if ('Q' == cmd)
-				break; 
+//			if ('Q' == cmd)
+//				break; 
 		}
 	}
+
+	/*
+	for (;;) 
+	{
+		for (;;) 
+		{
+			while (Serial.available() < 1)
+				;		
+			u8 cmd = Serial.read();
+
+			if (cmd == '1') 
+			{
+				L_LED_ON();
+			}
+			
+//			USB_Send(CDC_TX, &_inSync, 1);			
+//
+//			USB_Send(CDC_TX|TRANSFER_RELEASE, &_ok, 1);
+		}
+	}
+	*/
 }
