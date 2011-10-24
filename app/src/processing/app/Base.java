@@ -959,17 +959,20 @@ public class Base {
     //Choose which library to add by chip platform
     
     try {
-		//Find the current target. Get the platform, and then select the correct name and core path.
-	    	String platformname = getBoardPreferences().get("platform");
-	    	String targetname = getPlatformPreferences(platformname).get("name");
-	        String libraryPath = getPlatformPreferences(platformname).get("library.core.path");
+      // Find the current target. Get the platform, and then select the correct
+      // name and core path.
+      String platformname = getBoardPreferences().get("platform");
+      Map<String, String> platformPrefs = getPlatformPreferences(platformname);
+      String targetname = platformPrefs.get("name");
+      String libraryPath = platformPrefs.get("library.core.path");
 
-		JMenuItem platformItem = new JMenuItem(targetname);
-		platformItem.setEnabled(false);
-		importMenu.add(platformItem);
-		importMenu.addSeparator();
-		addLibraries(importMenu, getCoreLibraries(libraryPath));
-    	
+      JMenuItem platformItem = new JMenuItem(targetname);
+      platformItem.setEnabled(false);
+      importMenu.add(platformItem);
+      importMenu.addSeparator();
+      for (String p : libraryPath.split(";"))
+        addLibraries(importMenu, getCoreLibraries(p));
+
     } catch (IOException e) {
       e.printStackTrace();
     }

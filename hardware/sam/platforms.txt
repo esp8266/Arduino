@@ -65,5 +65,5 @@ sam.compiler.upload.cmd=
 sam.compiler.upload.flags=
 sam.compiler.define=-DARDUINO=
 sam.library.path=./hardware/sam/cores/sam
-sam.library.core.path=./libraries
+sam.library.core.path=./libraries;./hardware/sam/libraries
 
