@@ -6,7 +6,7 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-NewSoftSerial	KEYWORD1
+SoftwareSerial	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
