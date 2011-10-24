@@ -148,6 +148,7 @@ extern const uint8_t PROGMEM digital_pin_to_timer_PGM[];
 #define NOT_A_PIN 0
 #define NOT_A_PORT 0
 
+#ifdef ARDUINO_MAIN
 #define PA 1
 #define PB 2
 #define PC 3
@@ -159,6 +160,7 @@ extern const uint8_t PROGMEM digital_pin_to_timer_PGM[];
 #define PJ 10
 #define PK 11
 #define PL 12
+#endif
 
 #define NOT_ON_TIMER 0
 #define TIMER0A 1
