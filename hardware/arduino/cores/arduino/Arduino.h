@@ -40,6 +40,11 @@ extern "C"{
 #define FALLING 2
 #define RISING 3
 
+#if defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__)
+#define DEFAULT 0
+#define EXTERNAL 1
+#define INTERNAL 2
+#else  
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 #define INTERNAL1V1 2
 #define INTERNAL2V56 3
@@ -48,6 +53,7 @@ extern "C"{
 #endif
 #define DEFAULT 1
 #define EXTERNAL 0
+#endif
 
 // undefine stdlib's abs if encountered
 #ifdef abs
