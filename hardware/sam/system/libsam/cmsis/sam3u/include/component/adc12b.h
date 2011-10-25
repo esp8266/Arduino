@@ -49,6 +49,8 @@ typedef struct {
 #define ADC12B_MR_TRGSEL_Msk (0x7u << ADC12B_MR_TRGSEL_Pos) /**< \brief (ADC12B_MR) Trigger Selection */
 #define ADC12B_MR_TRGSEL(value) ((ADC12B_MR_TRGSEL_Msk & ((value) << ADC12B_MR_TRGSEL_Pos)))
 #define ADC12B_MR_LOWRES (0x1u << 4) /**< \brief (ADC12B_MR) Resolution */
+#define ADC12B_MR_LOWRES_BITS_12 (0x0u << 4) /**< \brief (ADC_MR) 12-bit resolution */
+#define ADC12B_MR_LOWRES_BITS_10 (0x1u << 4) /**< \brief (ADC_MR) 10-bit resolution */
 #define ADC12B_MR_SLEEP (0x1u << 5) /**< \brief (ADC12B_MR) Sleep Mode */
 #define ADC12B_MR_PRESCAL_Pos 8
 #define ADC12B_MR_PRESCAL_Msk (0xffu << ADC12B_MR_PRESCAL_Pos) /**< \brief (ADC12B_MR) Prescaler Rate Selection */
