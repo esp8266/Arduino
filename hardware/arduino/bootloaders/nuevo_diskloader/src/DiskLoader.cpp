@@ -3,7 +3,8 @@
  */
 
 #include "Platform.h"
-#include "USBCore.h"
+//#include "USBCore.h"
+
 
 //extern "C"
 void entrypoint(void) __attribute__ ((naked)) __attribute__ ((section (".vectors")));
@@ -12,10 +13,10 @@ void entrypoint(void)
 	asm volatile (
 				  "eor	r1,		r1\n"	// Zero register
 				  "out	0x3F,	r1\n"	// SREG
-				  "ldi	r28,	0xFF\n"
-				  "ldi	r29,	0x0A\n"
-				  "out	0x3E,	r29\n"	// SPH
-				  "out	0x3D,	r28\n"	// SPL
+				  "ldi	r28,	0xFF\n" // Y-register
+				  "ldi	r29,	0x0A\n"	// Y-register
+//				  "out	0x3E,	r29\n"	// SPH
+//				  "out	0x3D,	r28\n"	// SPL
 				  "rjmp	main"			// Stack is all set up, start the main code
 				  ::);
 }
@@ -27,11 +28,11 @@ volatile u16 _timeout;
 
 void Program(u8 ep, u16 page, u8 count)
 {
-	u8 write = page < 28*1024;		// Don't write over firmware please
+	u8 write = page < 30*1024;		// Don't write over firmware please
 	if (write)
 		boot_page_erase(page);
 	
-	USB_Recv(ep,_flashbuf,count);	// Read while page is erasing
+	USB_Recv_block(ep,_flashbuf,count);	// Read while page is erasing
 	
 	if (!write)
 		return;
@@ -93,6 +94,20 @@ const u8 _consts[] =
 	0x00,		// 
 };
 
+int getch(void) 
+{
+	u16 timeout;
+	u8 c;
+	for (timeout = 0; timeout; timeout--) 
+	{
+		c = USB_Recv(CDC_RX);
+		if (c != -1)
+			return c;
+	}
+	return -1;
+}
+	
+
 int main(void) __attribute__ ((naked));
 int main() 
 {		
@@ -110,14 +125,18 @@ int main()
 				  );	
 	TX_LED_OFF();
 	RX_LED_OFF();
-	L_LED_OFF();	
-	USB.attach();
+	L_LED_OFF();
+	
+	/* UART setup stuff */
+	
+	/* end UART setup stuff */
+	
+	USB.attach();	
 	sei();
 	
 	_inSync = STK_INSYNC;
 	_ok = STK_OK;
 	
-
 	for (;;) 
 	{
 		u8* packet = _flashbuf;
@@ -143,7 +162,8 @@ int main()
 			}
 			_timeout = 0;
 			// Read params
-			USB_Recv(CDC_RX, packet, len);
+//			USB_Recv(CDC_RX, packet, len);
+			USB_Recv_block(CDC_RX, packet, len);
 			
 			// Send a response
 			u8 send = 0;
@@ -187,8 +207,40 @@ int main()
 //			if (Serial.available() > 0 && Serial.read() != ' ')
 //				break;			
 //			if (USB_Available(CDC_RX) && USB_Recv(CDC_RX) != ' ')
+			
+//			u8 countdown = 10;
+//			while (!USB_Available(CDC_RX))
+//			{
+//				if (countdown-- == 0)
+//					break;
+//			}
+//			u8 x = USB_Recv(CDC_RX);
+//			if (x != -1 && x != ' ')
+//			{
+//				L_LED_ON();
+//				break;
+//			}
+			
+//			if (getch() != ' ')
+//				break;
+			
+//			while (!USB_Available(CDC_RX)) 
+//				;
+//
+//			int x = USB_Recv(CDC_RX);
+//			if (x == -1)
+//			{
+//				UEINTX = 0x6B;
+//				break;
+//			}
+//			else if (x != ' ')
+//			{
+////				UEINTX = 0x6B;
+//				break;
+//			}
+			
 			u16 countdown = 5000;
-			while (!USB_Available(CDC_RX) && countdown-- > 10)
+			while (countdown-- > 10 && !USB_Available(CDC_RX)) 
 				;
 			if (USB_Recv(CDC_RX) != ' ')
 				break;

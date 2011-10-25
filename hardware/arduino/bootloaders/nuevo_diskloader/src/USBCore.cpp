@@ -217,6 +217,19 @@ u8 USB_Available(u8 ep)
 	return FifoByteCount();
 }
 
+void USB_Recv_block(u8 ep, u8* dst, int len)
+{
+	SetEP(ep);
+	while (len--)
+	{
+		while (!ReadWriteAllowed())
+			;
+		*dst++ = Recv8();
+		if (!ReadWriteAllowed())	// release empty buffer
+			ReleaseRX();
+	}	
+}
+
 //	Non Blocking receive
 //	Return number of bytes read
 int USB_Recv(u8 ep, void* d, int len)

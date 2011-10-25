@@ -74,6 +74,7 @@ int USB_RecvControl(void* d, int len);
 uint8_t	USB_Available(uint8_t ep);
 int USB_Send(uint8_t ep, const void* data, int len);	// blocking
 int USB_Recv(uint8_t ep, void* data, int len);		// non-blocking
+void USB_Recv_block(u8 ep, u8* dst, int len);		// blocking
 int USB_Recv(uint8_t ep);							// non-blocking
 void USB_Flush(uint8_t ep);
 
