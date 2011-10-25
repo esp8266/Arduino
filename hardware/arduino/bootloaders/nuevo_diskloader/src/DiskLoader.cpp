@@ -242,7 +242,8 @@ int main()
 			u16 countdown = 5000;
 			while (countdown-- > 10 && !USB_Available(CDC_RX)) 
 				;
-			if (USB_Recv(CDC_RX) != ' ')
+			int x = USB_Recv(CDC_RX);
+			if (x != -1 && x != ' ')
 				break;
 			
 			USB_Send(CDC_TX, &_inSync, 1);
