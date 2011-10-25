@@ -9,12 +9,12 @@ void entrypoint(void) __attribute__ ((naked)) __attribute__ ((section (".vectors
 void entrypoint(void)
 {
 	asm volatile (
-//				  "eor	r1,		r1\n"	// Zero register
-//				  "out	0x3F,	r1\n"	// SREG
-//				  "ldi	r28,	0xFF\n"
-//				  "ldi	r29,	0x0A\n"
-//				  "out	0x3E,	r29\n"	// SPH
-//				  "out	0x3D,	r28\n"	// SPL
+				  "eor	r1,		r1\n"	// Zero register
+				  "out	0x3F,	r1\n"	// SREG
+				  "ldi	r28,	0xFF\n"
+				  "ldi	r29,	0x0A\n"
+				  "out	0x3E,	r29\n"	// SPH
+				  "out	0x3D,	r28\n"	// SPL
 				  "rjmp	main"			// Stack is all set up, start the main code
 				  ::);
 }
@@ -26,7 +26,7 @@ volatile u16 _timeout;
 
 void Program(u8 ep, u16 page, u8 count)
 {
-	u8 write = page < 30*1024;		// Don't write over firmware please
+	u8 write = page < 28*1024;		// Don't write over firmware please
 	if (write)
 		boot_page_erase(page);
 	
@@ -182,46 +182,16 @@ int main()
 			// Check sync
 			if (Serial.available() > 0 && Serial.read() != ' ')
 				break;
-//			Serial.write(STK_INSYNC);
 			USB_Send(CDC_TX, &_inSync, 1);
 			
-			if (send) {
-//				u8 i;
-//				for (i=0; i<send; i++) {
-////					Serial.write(0xFF);		// this works
-////					Serial.write(*pgm + i);	// this doesn't
-//					Serial.write(pgm[i]);
-//				}
+			if (send) 
 				USB_Send(CDC_TX|TRANSFER_PGM, pgm, send);
-			}
 			
 			// Send ok
-//			Serial.write(STK_OK);
 			USB_Send(CDC_TX|TRANSFER_RELEASE, &_ok, 1);
 			
-//			if ('Q' == cmd)
-//				break; 
+			if ('Q' == cmd)
+				break; 
 		}
 	}
-
-	/*
-	for (;;) 
-	{
-		for (;;) 
-		{
-			while (Serial.available() < 1)
-				;		
-			u8 cmd = Serial.read();
-
-			if (cmd == '1') 
-			{
-				L_LED_ON();
-			}
-			
-//			USB_Send(CDC_TX, &_inSync, 1);			
-//
-//			USB_Send(CDC_TX|TRANSFER_RELEASE, &_ok, 1);
-		}
-	}
-	*/
 }

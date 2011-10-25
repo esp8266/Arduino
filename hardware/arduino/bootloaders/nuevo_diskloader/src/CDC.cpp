@@ -140,6 +140,8 @@ int Serial_::read(void)
 	return c;
 }
 
+
+
 void Serial_::flush(void)
 {
 	USB_Flush(CDC_TX);
