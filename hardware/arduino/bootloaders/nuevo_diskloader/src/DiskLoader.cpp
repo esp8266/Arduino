@@ -3,6 +3,7 @@
  */
 
 #include "Platform.h"
+#include "USBCore.h"
 
 //extern "C"
 void entrypoint(void) __attribute__ ((naked)) __attribute__ ((section (".vectors")));
@@ -123,9 +124,12 @@ int main()
 		u16 address = 0;
 		for (;;)
 		{
-			while (Serial.available() < 1)
-				;		
-			u8 cmd = Serial.read();
+//			while (Serial.available() < 1)
+//				;		
+//			u8 cmd = Serial.read();
+			while (!USB_Available(CDC_RX))
+				;
+			u8 cmd = USB_Recv(CDC_RX);
 			
 			// Read packet contents
 			u8 len;
@@ -180,8 +184,15 @@ int main()
 			}
 			
 			// Check sync
-			if (Serial.available() > 0 && Serial.read() != ' ')
+//			if (Serial.available() > 0 && Serial.read() != ' ')
+//				break;			
+//			if (USB_Available(CDC_RX) && USB_Recv(CDC_RX) != ' ')
+			u16 countdown = 5000;
+			while (!USB_Available(CDC_RX) && countdown-- > 10)
+				;
+			if (USB_Recv(CDC_RX) != ' ')
 				break;
+			
 			USB_Send(CDC_TX, &_inSync, 1);
 			
 			if (send) 

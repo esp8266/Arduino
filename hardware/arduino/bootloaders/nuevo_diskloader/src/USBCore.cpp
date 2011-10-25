@@ -273,7 +273,7 @@ int USB_Send(u8 ep, const void* d, int len)
 //			if (!(--timeout))
 //				return -1;
 //			delay(1);
-			_delay_ms(3);
+			_delay_ms(1);
 			continue;
 		}
 

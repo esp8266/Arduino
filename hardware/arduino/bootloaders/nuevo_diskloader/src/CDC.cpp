@@ -101,7 +101,7 @@ bool WEAK CDC_Setup(Setup& setup)
 	return false;
 }
 
-
+/*
 int _serialPeek = -1;
 void Serial_::begin(uint16_t baud_count)
 {
@@ -149,11 +149,6 @@ void Serial_::flush(void)
 
 size_t Serial_::write(uint8_t c)
 {
-	/* only try to send bytes if the high-level CDC connection itself 
-	 is open (not just the pipe) - the OS should set lineState when the port
-	 is opened and clear lineState when the port is closed.
-	 bytes sent before the user opens the connection or after
-	 the connection is closed are lost - just like with a UART. */
 	
 	// TODO - ZE - check behavior on different OSes and test what happens if an
 	// open connection isn't broken cleanly (cable is yanked out, host dies
@@ -172,6 +167,7 @@ size_t Serial_::write(uint8_t c)
 }
 
 Serial_ Serial;
+*/
 
 #endif
 #endif /* if defined(USBCON) */
