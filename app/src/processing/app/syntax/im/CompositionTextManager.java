@@ -54,6 +54,18 @@ public class CompositionTextManager {
   public boolean getIsInputProcess() {
     return isInputProcess;
   }
+  /**
+   * Insert full width space
+   */
+  public void insertFullWidthSpace() {
+    initialCaretPosition = textArea.getCaretPosition();
+    int layoutCaretPosition = initialCaretPosition;
+    try {
+      textArea.getDocument().insertString(layoutCaretPosition, "\u3000", null);
+    } catch (BadLocationException e) {
+      e.printStackTrace();
+    }
+  }
 
   /**
    * Called when a user begins input from input method.
@@ -115,7 +127,6 @@ public class CompositionTextManager {
    * @param commited_count Numbers of committed characters in text. 
    */
   public void endCompositionText(AttributedCharacterIterator text, int committed_count) {
-    isInputProcess = false;
     /*
      * If there are no committed characters, remove it all from textarea.
      * This case will happen if a user delete all composing characters by backspace or delete key. 

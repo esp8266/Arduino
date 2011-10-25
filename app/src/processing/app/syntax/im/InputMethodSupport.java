@@ -73,6 +73,11 @@ public class InputMethodSupport implements InputMethodRequests,
   public void inputMethodTextChanged(InputMethodEvent event) {
     AttributedCharacterIterator text = event.getText();
     committed_count = event.getCommittedCharacterCount();
+    if(isFullWidthSpaceInput(text)){
+      textManager.insertFullWidthSpace();
+      caretPositionChanged(event);
+      return;
+    }
     if(isBeginInputProcess(text, textManager)){
       textManager.beginCompositionText(text, committed_count);
       caretPositionChanged(event);
@@ -86,11 +91,21 @@ public class InputMethodSupport implements InputMethodRequests,
     textManager.endCompositionText(text, committed_count);
     caretPositionChanged(event);
   }
-
+  
+  private boolean isFullWidthSpaceInput(AttributedCharacterIterator text){
+    if(text == null)
+      return false;
+    if(textManager.getIsInputProcess())
+      return false;
+    return (String.valueOf(text.first()).equals("\u3000"));
+  }
+  
   private boolean isBeginInputProcess(AttributedCharacterIterator text, CompositionTextManager textManager){
     if(text == null)
       return false;
-    return (isInputProcess(text) && !textManager.getIsInputProcess());
+    if(textManager.getIsInputProcess())
+      return false;
+    return (isInputProcess(text));
   }
 
   private boolean isInputProcess(AttributedCharacterIterator text){
