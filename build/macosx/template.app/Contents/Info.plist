@@ -7,11 +7,11 @@
 
     <!-- all these need to change for new releases -->
     <key>CFBundleGetInfoString</key>
-    <string>1.0-rc1</string>
+    <string>1.0-rc2</string>
     <key>CFBundleVersion</key>
     <string>0100</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0-rc1</string>
+    <string>1.0-rc2</string>
     <!-- now stop changing things and get outta here -->
 
     <key>CFBundleAllowMixedLocalizations</key>
