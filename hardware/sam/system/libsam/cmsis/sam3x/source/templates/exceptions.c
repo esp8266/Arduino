@@ -6,7 +6,7 @@
  *
  * \par Purpose
  *
- * This file provides basic support for Cortex-M processor based
+ * This file provides basic support for Cortex-M processor based 
  * microcontrollers.
  *
  * \note
@@ -31,72 +31,72 @@ extern "C" {
 
 #ifdef __GNUC__
 /* Cortex-M3 core handlers */
-extern void Reset_Handler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void NMI_Handler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void HardFault_Handler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void MemManage_Handler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void BusFault_Handler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void UsageFault_Handler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void SVC_Handler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void DebugMon_Handler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void PendSV_Handler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void SysTick_Handler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
+//void Reset_Handler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void NMI_Handler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+//void HardFault_Handler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void MemManage_Handler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void BusFault_Handler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void UsageFault_Handler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void SVC_Handler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void DebugMon_Handler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void PendSV_Handler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void SysTick_Handler(void) __attribute__ ((weak, alias("Dummy_Handler")));
 
 /* Peripherals handlers */
-extern void ACC_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void ADC_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void CAN0_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void CAN1_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void CRCCU_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void DACC_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void DMAC_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void EFC0_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void EFC1_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void EMAC_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void HSMCI_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void PIOA_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void PIOB_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void PIOC_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void PIOD_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void PIOE_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void PIOF_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void PMC_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void PWM_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void RSTC_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void RTC_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void RTT_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void SDRAMC_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void SMC_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void SPI0_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void SPI1_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void SSC_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void SUPC_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void TC0_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void TC1_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void TC2_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void TC3_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void TC4_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void TC5_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void TC6_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void TC7_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void TC8_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void TRNG_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void TWI0_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void TWI1_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void UART_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void UOTGHS_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void USART0_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void USART1_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void USART2_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void USART3_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
-extern void WDT_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler"))) ;
+void ACC_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void ADC_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void CAN0_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void CAN1_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void CRCCU_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void DACC_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void DMAC_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void EFC0_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void EFC1_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void EMAC_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void HSMCI_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void PIOA_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void PIOB_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void PIOC_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void PIOD_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void PIOE_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void PIOF_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void PMC_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void PWM_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void RSTC_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void RTC_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void RTT_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void SDRAMC_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void SMC_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void SPI0_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void SPI1_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void SSC_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void SUPC_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void TC0_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void TC1_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void TC2_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void TC3_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void TC4_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void TC5_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void TC6_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void TC7_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void TC8_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void TRNG_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void TWI0_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void TWI1_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void UART_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void UOTGHS_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void USART0_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void USART1_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void USART2_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void USART3_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
+void WDT_IrqHandler(void) __attribute__ ((weak, alias("Dummy_Handler")));
 #endif /* __GNUC__ */
 
 #ifdef __ICCARM__
 /* Cortex-M3 core handlers */
-#pragma weak Reset_Handler=Dummy_Handler
+//#pragma weak Reset_Handler=Dummy_Handler
 #pragma weak NMI_Handler=Dummy_Handler
-#pragma weak HardFault_Handler=Dummy_Handler
+//#pragma weak HardFault_Handler=Dummy_Handler
 #pragma weak MemManage_Handler=Dummy_Handler
 #pragma weak BusFault_Handler=Dummy_Handler
 #pragma weak UsageFault_Handler=Dummy_Handler
@@ -158,9 +158,10 @@ extern void WDT_IrqHandler( void ) __attribute__ ((weak, alias ("Dummy_Handler")
 /**
  * \brief Default interrupt handler for unused IRQs.
  */
-void Dummy_Handler( void )
+void Dummy_Handler(void)
 {
-  while ( 1 ) {}
+	while (1) {
+	}
 }
 
 /* @cond 0 */
