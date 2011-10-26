@@ -6,7 +6,7 @@
 //#include "USBCore.h"
 
 
-//extern "C"
+extern "C"
 void entrypoint(void) __attribute__ ((naked)) __attribute__ ((section (".vectors")));
 void entrypoint(void)
 {
@@ -15,8 +15,8 @@ void entrypoint(void)
 				  "out	0x3F,	r1\n"	// SREG
 				  "ldi	r28,	0xFF\n" // Y-register
 				  "ldi	r29,	0x0A\n"	// Y-register
-//				  "out	0x3E,	r29\n"	// SPH
-//				  "out	0x3D,	r28\n"	// SPL
+				  "out	0x3E,	r29\n"	// SPH
+				  "out	0x3D,	r28\n"	// SPL
 				  "rjmp	main"			// Stack is all set up, start the main code
 				  ::);
 }
@@ -28,7 +28,7 @@ volatile u16 _timeout;
 
 void Program(u8 ep, u16 page, u8 count)
 {
-	u8 write = page < 30*1024;		// Don't write over firmware please
+	u8 write = page < 28*1024;		// Don't write over firmware please
 	if (write)
 		boot_page_erase(page);
 	
@@ -126,11 +126,6 @@ int main()
 	TX_LED_OFF();
 	RX_LED_OFF();
 	L_LED_OFF();
-	
-	/* UART setup stuff */
-	
-	/* end UART setup stuff */
-	
 	USB.attach();	
 	sei();
 	
@@ -143,9 +138,6 @@ int main()
 		u16 address = 0;
 		for (;;)
 		{
-//			while (Serial.available() < 1)
-//				;		
-//			u8 cmd = Serial.read();
 			while (!USB_Available(CDC_RX))
 				;
 			u8 cmd = USB_Recv(CDC_RX);
@@ -162,7 +154,6 @@ int main()
 			}
 			_timeout = 0;
 			// Read params
-//			USB_Recv(CDC_RX, packet, len);
 			USB_Recv_block(CDC_RX, packet, len);
 			
 			// Send a response
