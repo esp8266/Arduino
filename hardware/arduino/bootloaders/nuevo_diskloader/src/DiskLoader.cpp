@@ -109,6 +109,17 @@ const u8 _consts[] =
 //}
 	
 
+void start_sketch()
+{
+	UDCON = 1;		// Detatch USB
+	UDIEN = 0;
+	asm volatile (	// Reset vector to run firmware
+				  "clr r30\n"
+				  "clr r31\n"
+				  "ijmp\n"
+				  ::);
+}
+
 int main(void) __attribute__ ((naked));
 int main() 
 {		
@@ -139,117 +150,130 @@ int main()
 		u16 address = 0;
 		for (;;)
 		{
-			while (!USB_Available(CDC_RX))
-				;
-			u8 cmd = USB_Recv(CDC_RX);
-			
-			// Read packet contents
-			u8 len;
-			const u8* rs = _readSize;
-			for (;;) 
-			{
-				u8 c = pgm_read_byte(rs++);
-				len = pgm_read_byte(rs++);
-				if (c == cmd || c == 0)
-					break;
-			}
-			_timeout = 0;
-			// Read params
-			USB_Recv_block(CDC_RX, packet, len);
-			
-			// Send a response
-			u8 send = 0;
-			const u8* pgm = _consts+7;
-			if (STK_GET_PARAMETER == cmd)
-			{
-				u8 i = packet[0] - 0x80;
-				if (i > 2)
-					i = (i==0x18) ? 3 : 4;	// 0x80:HW_VER,0x81:SW_MAJOR,0x82:SW_MINOR,0x18:3 or 0
-				pgm = _consts + i + 3;
-				send = 1;
-			} 
-			else if (STK_UNIVERSAL == cmd) 
-			{
-				if (packet[0] == 0x30)
-					pgm = _consts + packet[2];	
-				send = 1;
-			}
-			else if (STK_READ_SIGN == cmd)
-			{ 
-				pgm = _consts;
-				send = 3;
-			}
-			else if (STK_LOAD_ADDRESS == cmd) 
-			{
-				address = *((u16*)packet);	// word address
-				address += address;
-			}
-			else if (STK_PROG_PAGE == cmd)
-			{
-				Program(CDC_RX, address, packet[1]);
-			}
-			else if (STK_READ_PAGE == cmd)
-			{
-				send = packet[1];
-				pgm = (const u8*)address;
-				address += send;
-			}
-			
-			// Check sync
-//			if (Serial.available() > 0 && Serial.read() != ' ')
-//				break;			
-//			if (USB_Available(CDC_RX) && USB_Recv(CDC_RX) != ' ')
-			
-//			u8 countdown = 10;
 //			while (!USB_Available(CDC_RX))
-//			{
-//				if (countdown-- == 0)
-//					break;
-//			}
-//			u8 x = USB_Recv(CDC_RX);
-//			if (x != -1 && x != ' ')
-//			{
-//				L_LED_ON();
-//				break;
-//			}
-			
-//			if (getch() != ' ')
-//				break;
-			
-//			while (!USB_Available(CDC_RX)) 
 //				;
-//
-//			int x = USB_Recv(CDC_RX);
-//			if (x == -1)
-//			{
-//				UEINTX = 0x6B;
-//				break;
-//			}
-//			else if (x != ' ')
-//			{
-////				UEINTX = 0x6B;
-//				break;
-//			}
-			
-			u16 countdown = 5000;
-			while (countdown-- > 10 && !USB_Available(CDC_RX)) 
-				;
-			int x = USB_Recv(CDC_RX);
-			if (x != -1 && x != ' ')
-				break;
-			
-			USB_Send(CDC_TX, &_inSync, 1);
-			
-			if (send) 
-				USB_Send(CDC_TX|TRANSFER_PGM, pgm, send);
-			
-			// Send ok
-			USB_Send(CDC_TX|TRANSFER_RELEASE, &_ok, 1);
-			
-			if ('Q' == cmd) 
+			if (USB_Available(CDC_RX)) 
 			{
-				do_reset = 500;
-				break; 
+				u8 cmd = USB_Recv(CDC_RX);
+				
+				// Read packet contents
+				u8 len;
+				const u8* rs = _readSize;
+				for (;;) 
+				{
+					u8 c = pgm_read_byte(rs++);
+					len = pgm_read_byte(rs++);
+					if (c == cmd || c == 0)
+						break;
+				}
+				_timeout = 0;
+				// Read params
+				USB_Recv_block(CDC_RX, packet, len);
+				
+				// Send a response
+				u8 send = 0;
+				const u8* pgm = _consts+7;
+				if (STK_GET_PARAMETER == cmd)
+				{
+					u8 i = packet[0] - 0x80;
+					if (i > 2)
+						i = (i==0x18) ? 3 : 4;	// 0x80:HW_VER,0x81:SW_MAJOR,0x82:SW_MINOR,0x18:3 or 0
+					pgm = _consts + i + 3;
+					send = 1;
+				} 
+				else if (STK_UNIVERSAL == cmd) 
+				{
+					if (packet[0] == 0x30)
+						pgm = _consts + packet[2];	
+					send = 1;
+				}
+				else if (STK_READ_SIGN == cmd)
+				{ 
+					pgm = _consts;
+					send = 3;
+				}
+				else if (STK_LOAD_ADDRESS == cmd) 
+				{
+					address = *((u16*)packet);	// word address
+					address += address;
+				}
+				else if (STK_PROG_PAGE == cmd)
+				{
+					Program(CDC_RX, address, packet[1]);
+				}
+				else if (STK_READ_PAGE == cmd)
+				{
+					send = packet[1];
+					pgm = (const u8*)address;
+					address += send;
+				}
+				
+				// Check sync
+	//			if (Serial.available() > 0 && Serial.read() != ' ')
+	//				break;			
+	//			if (USB_Available(CDC_RX) && USB_Recv(CDC_RX) != ' ')
+				
+	//			u8 countdown = 10;
+	//			while (!USB_Available(CDC_RX))
+	//			{
+	//				if (countdown-- == 0)
+	//					break;
+	//			}
+	//			u8 x = USB_Recv(CDC_RX);
+	//			if (x != -1 && x != ' ')
+	//			{
+	//				L_LED_ON();
+	//				break;
+	//			}
+				
+	//			if (getch() != ' ')
+	//				break;
+				
+	//			while (!USB_Available(CDC_RX)) 
+	//				;
+	//
+	//			int x = USB_Recv(CDC_RX);
+	//			if (x == -1)
+	//			{
+	//				UEINTX = 0x6B;
+	//				break;
+	//			}
+	//			else if (x != ' ')
+	//			{
+	////				UEINTX = 0x6B;
+	//				break;
+	//			}
+				
+				u16 countdown = 5000;
+				while (countdown-- > 10 && !USB_Available(CDC_RX)) 
+					;
+				int x = USB_Recv(CDC_RX);
+				if (x != -1 && x != ' ')
+					break;
+				
+				USB_Send(CDC_TX, &_inSync, 1);
+				
+				if (send) 
+					USB_Send(CDC_TX|TRANSFER_PGM, pgm, send);
+				
+				// Send ok
+				USB_Send(CDC_TX|TRANSFER_RELEASE, &_ok, 1);
+				
+				if ('Q' == cmd) 
+				{
+					_delay_ms(100);
+					/* move interrupts to application section:
+					 * uses inline assembly because the procedure must be completed in four cycles.
+					 */
+					asm volatile (
+								  "ldi r16,	  0x01\n"		// (1<<IVCE)	/* Enable change of interrupt vectors */
+								  "out 0x35,  r16\n"		// MCUCR
+								  "ldi r16,	  0x00\n"		// (1<<IVSEL)	/* Move interrupts to application flash section */
+								  "out 0x35,  r16\n"		// MCUCR				  
+								  );						
+					start_sketch();
+	//				break;
+				}
 			}
 		}
 	}

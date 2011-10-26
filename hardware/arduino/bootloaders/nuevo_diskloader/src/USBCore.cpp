@@ -607,9 +607,9 @@ ISR(USB_GEN_vect)
 	//	Start of Frame - happens every millisecond so we use it for TX and RX LED one-shot timing, too
 	if (udint & (1<<SOFI))
 	{
-#ifdef CDC_ENABLED
+//#ifdef CDC_ENABLED
 		USB_Flush(CDC_TX);				// Send a tx frame if found
-#endif
+//#endif
 		
 		// check whether the one-shot period has elapsed.  if so, turn off the LED
 		if (TxLEDPulse && !(--TxLEDPulse))
