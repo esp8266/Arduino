@@ -219,7 +219,8 @@ u8 USB_Available(u8 ep)
 
 void USB_Recv_block(u8 ep, u8* dst, int len)
 {
-	SetEP(ep);
+//	SetEP(ep & 7);
+	LockEP lock(ep);
 	while (len--)
 	{
 		while (!ReadWriteAllowed())
@@ -314,6 +315,9 @@ int USB_Send(u8 ep, const void* d, int len)
 				ReleaseTX();
 		}
 	}
+	if (ep & TRANSFER_RELEASE)
+		ReleaseTX();
+	
 	TX_LED_ON();
 	TxLEDPulse = TX_RX_LED_PULSE_MS;
 	return r;

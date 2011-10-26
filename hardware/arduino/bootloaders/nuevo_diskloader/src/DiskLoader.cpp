@@ -24,11 +24,12 @@ void entrypoint(void)
 u8 _flashbuf[128];
 u8 _inSync;
 u8 _ok;
+u16 do_reset = 0;
 volatile u16 _timeout;
 
 void Program(u8 ep, u16 page, u8 count)
 {
-	u8 write = page < 28*1024;		// Don't write over firmware please
+	u8 write = page < 28*1024;		// Don't write over bootloader please
 	if (write)
 		boot_page_erase(page);
 	
@@ -94,18 +95,18 @@ const u8 _consts[] =
 	0x00,		// 
 };
 
-int getch(void) 
-{
-	u16 timeout;
-	u8 c;
-	for (timeout = 0; timeout; timeout--) 
-	{
-		c = USB_Recv(CDC_RX);
-		if (c != -1)
-			return c;
-	}
-	return -1;
-}
+//int getch(void) 
+//{
+//	u16 timeout;
+//	u8 c;
+//	for (timeout = 0; timeout; timeout--) 
+//	{
+//		c = USB_Recv(CDC_RX);
+//		if (c != -1)
+//			return c;
+//	}
+//	return -1;
+//}
 	
 
 int main(void) __attribute__ ((naked));
@@ -245,8 +246,11 @@ int main()
 			// Send ok
 			USB_Send(CDC_TX|TRANSFER_RELEASE, &_ok, 1);
 			
-			if ('Q' == cmd)
+			if ('Q' == cmd) 
+			{
+				do_reset = 500;
 				break; 
+			}
 		}
 	}
 }

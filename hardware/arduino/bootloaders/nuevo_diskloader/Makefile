@@ -40,11 +40,12 @@ ASMFLAGS += -x assembler-with-cpp -Wa,-gdwarf2
 
 ## Linker flags
 LDFLAGS = $(COMMON)
-LDFLAGS += -Wl,-gc-sections,-Map=DiskLoader.map,--cref
-LDFLAGS += -Wl,--section-start=.text=0x7000,--relax
-LDFLAGS += -Wl,--gc-sections
+#LDFLAGS += -Wl,-gc-sections,-Map=DiskLoader.map,--cref
+#LDFLAGS += -Wl,--section-start=.text=0x7000,--relax
+#LDFLAGS += -Wl,--gc-sections
 #LDFLAGS += -nodefaultlibs -nostartfiles
 #LDFLAGS += -nostartfiles
+LDFLAGS += -Wl,-gc-sections,-Map=DiskLoader.map,--section-start=.text=0x7000,--relax
 
 
 ## Intel Hex file production flags
