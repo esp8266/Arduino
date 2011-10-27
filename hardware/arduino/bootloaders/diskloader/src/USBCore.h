@@ -18,30 +18,53 @@
 #ifndef __USBCORE_H__
 #define __USBCORE_H__
 
+//	Standard requests
 #define GET_STATUS			0
 #define CLEAR_FEATURE		1
 #define SET_FEATURE			3
 #define SET_ADDRESS			5
 #define GET_DESCRIPTOR		6
+#define SET_DESCRIPTOR		7
 #define GET_CONFIGURATION	8
 #define SET_CONFIGURATION	9
 #define GET_INTERFACE		10
 #define SET_INTERFACE		11
 
-// bmRequestType
-#define HOSTTODEVICE	0x00
-#define DEVICETOHOST	0x80
-#define STANDARD		0x00
-#define CLASS			0x20
-#define VENDOR			0x40
-#define DEVICE			0x00
-#define INTERFACE		0x01
-#define ENDPOINT		0x02
-#define OTHER			0x03
 
-#define CDC_SET_LINE_CODING		0x20
-#define CDC_GET_LINE_CODING		0x21
+// bmRequestType
+#define REQUEST_HOSTTODEVICE	0x00
+#define REQUEST_DEVICETOHOST	0x80
+#define REQUEST_DIRECTION		0x80
+
+#define REQUEST_STANDARD		0x00
+#define REQUEST_CLASS			0x20
+#define REQUEST_VENDOR			0x40
+#define REQUEST_TYPE			0x60
+
+#define REQUEST_DEVICE			0x00
+#define REQUEST_INTERFACE		0x01
+#define REQUEST_ENDPOINT		0x02
+#define REQUEST_OTHER			0x03
+#define REQUEST_RECIPIENT		0x03
+
+#define REQUEST_DEVICETOHOST_CLASS_INTERFACE  (REQUEST_DEVICETOHOST + REQUEST_CLASS + REQUEST_INTERFACE)
+#define REQUEST_HOSTTODEVICE_CLASS_INTERFACE  (REQUEST_HOSTTODEVICE + REQUEST_CLASS + REQUEST_INTERFACE)
+
+//	Class requests
+
+#define CDC_SET_LINE_CODING			0x20
+#define CDC_GET_LINE_CODING			0x21
 #define CDC_SET_CONTROL_LINE_STATE	0x22
+
+#define MSC_RESET					0xFF
+#define MSC_GET_MAX_LUN				0xFE
+
+#define HID_GET_REPORT				0x01
+#define HID_GET_IDLE				0x02
+#define HID_GET_PROTOCOL			0x03
+#define HID_SET_REPORT				0x09
+#define HID_SET_IDLE				0x0A
+#define HID_SET_PROTOCOL			0x0B
 
 //	Descriptors
 
@@ -93,6 +116,13 @@
 #define CDC_CS_INTERFACE                        0x24
 #define CDC_CS_ENDPOINT                         0x25
 #define CDC_DATA_INTERFACE_CLASS                0x0A
+
+#define MSC_SUBCLASS_SCSI						0x06 
+#define MSC_PROTOCOL_BULK_ONLY					0x50 
+
+#define HID_HID_DESCRIPTOR_TYPE					0x21
+#define HID_REPORT_DESCRIPTOR_TYPE				0x22
+#define HID_PHYSICAL_DESCRIPTOR_TYPE			0x23
 
 
 //	Device
@@ -186,14 +216,32 @@ typedef struct
 
 typedef struct 
 {
+    u8	len;
+    u8 	dtype;		// 0x24
+    u8 	subtype;	// 1
+    u8 	bmCapabilities;
+    u8 	bDataInterface;
+} CMFunctionalDescriptor;
+	
+typedef struct 
+{
+    u8	len;
+    u8 	dtype;		// 0x24
+    u8 	subtype;	// 1
+    u8 	bmCapabilities;
+} ACMFunctionalDescriptor;
+
+typedef struct 
+{
+	//	IAD
 	IADDescriptor				iad;	// Only needed on compound device
 
 	//	Control
 	InterfaceDescriptor			cif;	// 
 	CDCCSInterfaceDescriptor	header;
-	CDCCSInterfaceDescriptor	callManagement;
-	CDCCSInterfaceDescriptor4	controlManagement;
-	CDCCSInterfaceDescriptor	functionalDescriptor;
+	CMFunctionalDescriptor		callManagement;			// Call Management
+	ACMFunctionalDescriptor		controlManagement;		// ACM
+	CDCCSInterfaceDescriptor	functionalDescriptor;	// CDC_UNION
 	EndpointDescriptor			cifin;
 
 	//	Data
@@ -201,6 +249,13 @@ typedef struct
 	EndpointDescriptor			in;
 	EndpointDescriptor			out;
 } CDCDescriptor;
+
+typedef struct 
+{
+	InterfaceDescriptor			msc;
+	EndpointDescriptor			in;
+	EndpointDescriptor			out;
+} MSCDescriptor;
 
 typedef struct
 {
@@ -222,11 +277,12 @@ typedef struct
 	EndpointDescriptor			in;
 } HIDDescriptor;
 
+
 #define D_DEVICE(_class,_subClass,_proto,_packetSize0,_vid,_pid,_version,_im,_ip,_is,_configs) \
 	{ 18, 1, 0x200, _class,_subClass,_proto,_packetSize0,_vid,_pid,_version,_im,_ip,_is,_configs }
 
 #define D_CONFIG(_totalLength,_interfaces) \
-	{ 9, 2, _totalLength,_interfaces, 1, 0, USB_CONFIG_BUS_POWERED, USB_CONFIG_POWER_MA(100) }
+	{ 9, 2, _totalLength,_interfaces, 1, 0, USB_CONFIG_BUS_POWERED, USB_CONFIG_POWER_MA(500) }
 
 #define D_INTERFACE(_n,_numEndpoints,_class,_subClass,_protocol) \
 	{ 9, 4, _n, 0, _numEndpoints, _class,_subClass, _protocol, 0 }
@@ -242,5 +298,6 @@ typedef struct
 
 #define D_CDCCS(_subtype,_d0,_d1)	{ 5, 0x24, _subtype, _d0, _d1 }
 #define D_CDCCS4(_subtype,_d0)		{ 4, 0x24, _subtype, _d0 }
+
 
 #endif
