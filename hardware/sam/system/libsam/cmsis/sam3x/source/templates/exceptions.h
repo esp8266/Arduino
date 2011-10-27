@@ -6,7 +6,7 @@
  *
  * \par Purpose
  *
- * This file provides basic support for Cortex-M processor based
+ * This file provides basic support for Cortex-M processor based 
  * microcontrollers.
  *
  * \author               Atmel Corporation: http://www.atmel.com \n
@@ -26,71 +26,71 @@ extern "C" {
 /* @endcond */
 
 /* Function prototype for exception table items (interrupt handler). */
-typedef void( *IntFunc )( void ) ;
+typedef void (*IntFunc) (void);
 
 /* Default empty handler */
-extern void Dummy_Handler( void ) ;
+void Dummy_Handler(void);
 
 /* Cortex-M3 core handlers */
-extern void Reset_Handler( void ) ;
-extern void NMI_Handler( void ) ;
-extern void HardFault_Handler( void ) ;
-extern void MemManage_Handler( void ) ;
-extern void BusFault_Handler( void ) ;
-extern void UsageFault_Handler( void ) ;
-extern void SVC_Handler( void ) ;
-extern void DebugMon_Handler( void ) ;
-extern void PendSV_Handler( void ) ;
-extern void SysTick_Handler( void ) ;
+void Reset_Handler(void);
+void NMI_Handler(void);
+void HardFault_Handler(void);
+void MemManage_Handler(void);
+void BusFault_Handler(void);
+void UsageFault_Handler(void);
+void SVC_Handler(void);
+void DebugMon_Handler(void);
+void PendSV_Handler(void);
+void SysTick_Handler(void);
 
 /* Peripherals handlers */
-extern void ACC_IrqHandler( void ) ;
-extern void ADC_IrqHandler( void ) ;
-extern void CAN0_IrqHandler( void ) ;
-extern void CAN1_IrqHandler( void ) ;
-extern void CRCCU_IrqHandler( void ) ;
-extern void DACC_IrqHandler( void ) ;
-extern void DMAC_IrqHandler( void ) ;
-extern void EFC0_IrqHandler( void ) ;
-extern void EFC1_IrqHandler( void ) ;
-extern void EMAC_IrqHandler( void ) ;
-extern void HSMCI_IrqHandler( void ) ;
-extern void PIOA_IrqHandler( void ) ;
-extern void PIOB_IrqHandler( void ) ;
-extern void PIOC_IrqHandler( void ) ;
-extern void PIOD_IrqHandler( void ) ;
-extern void PIOE_IrqHandler( void ) ;
-extern void PIOF_IrqHandler( void ) ;
-extern void PMC_IrqHandler( void ) ;
-extern void PWM_IrqHandler( void ) ;
-extern void RSTC_IrqHandler( void ) ;
-extern void RTC_IrqHandler( void ) ;
-extern void RTT_IrqHandler( void ) ;
-extern void SDRAMC_IrqHandler( void ) ;
-extern void SMC_IrqHandler( void ) ;
-extern void SPI0_IrqHandler( void ) ;
-extern void SPI1_IrqHandler( void ) ;
-extern void SSC_IrqHandler( void ) ;
-extern void SUPC_IrqHandler( void ) ;
-extern void TC0_IrqHandler( void ) ;
-extern void TC1_IrqHandler( void ) ;
-extern void TC2_IrqHandler( void ) ;
-extern void TC3_IrqHandler( void ) ;
-extern void TC4_IrqHandler( void ) ;
-extern void TC5_IrqHandler( void ) ;
-extern void TC6_IrqHandler( void ) ;
-extern void TC7_IrqHandler( void ) ;
-extern void TC8_IrqHandler( void ) ;
-extern void TRNG_IrqHandler( void ) ;
-extern void TWI0_IrqHandler( void ) ;
-extern void TWI1_IrqHandler( void ) ;
-extern void UART_IrqHandler( void ) ;
-extern void UOTGHS_IrqHandler( void ) ;
-extern void USART0_IrqHandler( void ) ;
-extern void USART1_IrqHandler( void ) ;
-extern void USART2_IrqHandler( void ) ;
-extern void USART3_IrqHandler( void ) ;
-extern void WDT_IrqHandler( void ) ;
+void ACC_IrqHandler(void);
+void ADC_IrqHandler(void);
+void CAN0_IrqHandler(void);
+void CAN1_IrqHandler(void);
+void CRCCU_IrqHandler(void);
+void DACC_IrqHandler(void);
+void DMAC_IrqHandler(void);
+void EFC0_IrqHandler(void);
+void EFC1_IrqHandler(void);
+void EMAC_IrqHandler(void);
+void HSMCI_IrqHandler(void);
+void PIOA_IrqHandler(void);
+void PIOB_IrqHandler(void);
+void PIOC_IrqHandler(void);
+void PIOD_IrqHandler(void);
+void PIOE_IrqHandler(void);
+void PIOF_IrqHandler(void);
+void PMC_IrqHandler(void);
+void PWM_IrqHandler(void);
+void RSTC_IrqHandler(void);
+void RTC_IrqHandler(void);
+void RTT_IrqHandler(void);
+void SDRAMC_IrqHandler(void);
+void SMC_IrqHandler(void);
+void SPI0_IrqHandler(void);
+void SPI1_IrqHandler(void);
+void SSC_IrqHandler(void);
+void SUPC_IrqHandler(void);
+void TC0_IrqHandler(void);
+void TC1_IrqHandler(void);
+void TC2_IrqHandler(void);
+void TC3_IrqHandler(void);
+void TC4_IrqHandler(void);
+void TC5_IrqHandler(void);
+void TC6_IrqHandler(void);
+void TC7_IrqHandler(void);
+void TC8_IrqHandler(void);
+void TRNG_IrqHandler(void);
+void TWI0_IrqHandler(void);
+void TWI1_IrqHandler(void);
+void UART_IrqHandler(void);
+void UOTGHS_IrqHandler(void);
+void USART0_IrqHandler(void);
+void USART1_IrqHandler(void);
+void USART2_IrqHandler(void);
+void USART3_IrqHandler(void);
+void WDT_IrqHandler(void);
 
 /* @cond 0 */
 /**INDENT-OFF**/
@@ -101,4 +101,3 @@ extern void WDT_IrqHandler( void ) ;
 /* @endcond */
 
 #endif /* EXCEPTIONS_H_INCLUDED */
-
