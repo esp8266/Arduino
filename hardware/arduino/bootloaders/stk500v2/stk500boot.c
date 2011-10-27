@@ -95,8 +95,7 @@ LICENSE:
 #include	"command.h"
 
 
-//#if defined(_MEGA_BOARD_) || defined(_BOARD_AMBER128_) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) || defined(__AVR_ATmega2561__)
-#if 0
+#if defined(_MEGA_BOARD_) || defined(_BOARD_AMBER128_) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) || defined(__AVR_ATmega2561__)
 	#define		ENABLE_MONITOR
 	static void	RunMonitor(void);
 #endif

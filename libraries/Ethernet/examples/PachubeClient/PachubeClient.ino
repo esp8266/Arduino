@@ -41,6 +41,13 @@ const int postingInterval = 10000;  //delay between updates to Pachube.com
 void setup() {
   // start serial port:
   Serial.begin(9600);
+  // start the Ethernet connection:
+  if (Ethernet.begin(mac) == 0) {
+    Serial.println("Failed to configure Ethernet using DHCP");
+    // no point in carrying on, so do nothing forevermore:
+    for(;;)
+      ;
+  }
   // give the ethernet module time to boot up:
   delay(1000);
   // start the Ethernet connection:

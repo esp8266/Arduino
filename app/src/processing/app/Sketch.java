@@ -36,6 +36,7 @@ import java.awt.event.*;
 import java.beans.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 import java.util.zip.*;
 
 import javax.swing.*;
@@ -261,7 +262,6 @@ public class Sketch {
     }
   }
 
-
   boolean renamingCode;
 
   /**
@@ -315,7 +315,7 @@ public class Sketch {
     renamingCode = true;
     String prompt = (currentIndex == 0) ?
       "New name for sketch:" : "New name for file:";
-    String oldName = (current.isExtension("pde")) ?
+    String oldName = (current.isExtension("ino")) ?
       current.getPrettyName() : current.getFileName();
     editor.status.edit(prompt, oldName);
   }
@@ -495,7 +495,7 @@ public class Sketch {
         }
         // if successful, set base properties for the sketch
 
-        File newMainFile = new File(newFolder, newName + ".pde");
+        File newMainFile = new File(newFolder, newName + ".ino");
         String newMainFilePath = newMainFile.getAbsolutePath();
 
         // having saved everything and renamed the folder and the main .pde,
@@ -707,15 +707,68 @@ public class Sketch {
                        "need to re-save this sketch to another location.");
       // if the user cancels, give up on the save()
       if (!saveAs()) return false;
+    } else {
+      // rename .pde files to .ino
+      File mainFile = new File(getMainFilePath());
+      File mainFolder = mainFile.getParentFile();
+      File[] pdeFiles = mainFolder.listFiles(new FilenameFilter() {
+        public boolean accept(File dir, String name) {
+          return name.toLowerCase().endsWith(".pde");
+        }
+      });
+      
+      if (pdeFiles != null && pdeFiles.length > 0) {
+        if (Preferences.get("editor.update_extension") == null) {
+          Object[] options = { "OK", "Cancel" };
+          int result = JOptionPane.showOptionDialog(editor,
+                                                    "In Arduino 1.0, the default file extension has changed\n" +
+                                                    "from .pde to .ino.  New sketches (including those created\n" +
+                                                    "by \"Save-As\" will use the new extension.  The extension\n" +
+                                                    "of existing sketches will be updated on save, but you can\n" +
+                                                    "disable this in the Preferences dialog.\n" +
+                                                    "\n" +
+                                                    "Save sketch and update its extension?",
+                                                    ".pde -> .ino",
+                                                    JOptionPane.OK_CANCEL_OPTION,
+                                                    JOptionPane.QUESTION_MESSAGE,
+                                                    null,
+                                                    options,
+                                                    options[0]);
+          
+          if (result != JOptionPane.OK_OPTION) return false; // save cancelled
+          
+          Preferences.setBoolean("editor.update_extension", true);
+        }
+        
+        if (Preferences.getBoolean("editor.update_extension")) {
+          // Do rename of all .pde files to new .ino extension
+          for (File pdeFile : pdeFiles)
+            renameCodeToInoExtension(pdeFile);
+        }
+      }
     }
 
     for (int i = 0; i < codeCount; i++) {
-      if (code[i].isModified()) code[i].save();
+      if (code[i].isModified()) 
+        code[i].save();
     }
     calcModified();
     return true;
   }
 
+  
+  protected boolean renameCodeToInoExtension(File pdeFile) {
+    for (SketchCode c : code) {
+      if (!c.getFile().equals(pdeFile))
+        continue;
+
+      String pdeName = pdeFile.getPath();
+      pdeName = pdeName.substring(0, pdeName.length() - 4) + ".ino";
+      return c.renameTo(new File(pdeName), "ino");
+    }
+    return false;
+  }
+  
 
   /**
    * Handles 'Save As' for a sketch.
@@ -860,7 +913,7 @@ public class Sketch {
     }
 
     // save the main tab with its new name
-    File newFile = new File(newFolder, newName + ".pde");
+    File newFile = new File(newFolder, newName + ".ino");
     code[0].saveAs(newFile);
 
     editor.handleOpenUnchecked(newFile.getPath(),
@@ -1261,7 +1314,7 @@ public class Sketch {
     StringBuffer bigCode = new StringBuffer();
     int bigCount = 0;
     for (SketchCode sc : code) {
-      if (sc.isExtension("pde")) {
+      if (sc.isExtension("ino") || sc.isExtension("pde")) {
         sc.setPreprocOffset(bigCount);
         bigCode.append(sc.getProgram());
         bigCode.append('\n');
@@ -1357,7 +1410,7 @@ public class Sketch {
         }
 //        sc.setPreprocName(filename);
 
-      } else if (sc.isExtension("pde")) {
+      } else if (sc.isExtension("ino") || sc.isExtension("pde")) {
         // The compiler and runner will need this to have a proper offset
         sc.addPreprocOffset(headerOffset);
       }
@@ -1386,7 +1439,7 @@ public class Sketch {
 //    SketchCode errorCode = null;
 //    if (filename.equals(appletJavaFile)) {
 //      for (SketchCode code : getCode()) {
-//        if (code.isExtension("pde")) {
+//        if (code.isExtension("ino")) {
 //          if (line >= code.getPreprocOffset()) {
 //            errorCode = code;
 //          }
@@ -1507,6 +1560,7 @@ public class Sketch {
     throws RunnerException {
     
     // run the preprocessor
+    editor.status.progressUpdate(20);
     String primaryClassName = preprocess(buildPath);
 
     // compile the program. errors will happen as a RunnerException
@@ -1520,15 +1574,15 @@ public class Sketch {
   }
   
   
-  protected boolean exportApplet(boolean verbose) throws Exception {
-    return exportApplet(tempBuildFolder.getAbsolutePath(), verbose);
+  protected boolean exportApplet(boolean usingProgrammer) throws Exception {
+    return exportApplet(tempBuildFolder.getAbsolutePath(), usingProgrammer);
   }
 
 
   /**
    * Handle export to applet.
    */
-  public boolean exportApplet(String appletPath, boolean verbose)
+  public boolean exportApplet(String appletPath, boolean usingProgrammer)
     throws RunnerException, IOException, SerialException {
     
     // Make sure the user didn't hide the sketch folder
@@ -1552,6 +1606,7 @@ public class Sketch {
     appletFolder.mkdirs();
 
     // build the sketch
+    editor.status.progressNotice("Compiling sketch...");
     String foundName = build(appletFolder.getPath(), false);
     // (already reported) error during export, exit this function
     if (foundName == null) return false;
@@ -1565,12 +1620,18 @@ public class Sketch {
 //      return false;
 //    }
 
-    upload(appletFolder.getPath(), foundName, verbose);
-    
+    editor.status.progressNotice("Uploading...");
+    upload(appletFolder.getPath(), foundName, usingProgrammer);
+    editor.status.progressUpdate(100);
     return true;
   }
 
+  
+  public void setCompilingProgress(int percent) {
+    editor.status.progressUpdate(percent);
+  }
 
+  
   protected void size(String buildPath, String suggestedClassName)
     throws RunnerException {
     long size = 0;
@@ -1592,7 +1653,7 @@ public class Sketch {
   }
 
 
-  protected String upload(String buildPath, String suggestedClassName, boolean verbose)
+  protected String upload(String buildPath, String suggestedClassName, boolean usingProgrammer)
     throws RunnerException, SerialException {
 
     Uploader uploader;
@@ -1602,7 +1663,7 @@ public class Sketch {
     uploader = new AvrdudeUploader();
     boolean success = uploader.uploadUsingPreferences(buildPath,
                                                       suggestedClassName,
-                                                      verbose);
+                                                      usingProgrammer);
 
     return success ? suggestedClassName : null;
   }
@@ -1754,7 +1815,7 @@ public class Sketch {
    * For Processing, this is true for .pde files. (Broken out for subclasses.)
    */
   public boolean hideExtension(String what) {
-    return what.equals(getDefaultExtension());
+    return getHiddenExtensions().contains(what);
   }
 
 
@@ -1791,15 +1852,20 @@ public class Sketch {
    * Returns the default extension for this editor setup.
    */
   public String getDefaultExtension() {
-    return "pde";
+    return "ino";
   }
 
+  static private List<String> hiddenExtensions = Arrays.asList("ino", "pde");
 
+  public List<String> getHiddenExtensions() {
+    return hiddenExtensions;
+  }
+  
   /**
    * Returns a String[] array of proper extensions.
    */
   public String[] getExtensions() {
-    return new String[] { "pde", "c", "cpp", "h" };
+    return new String[] { "ino", "pde", "c", "cpp", "h" };
   }
 
 
