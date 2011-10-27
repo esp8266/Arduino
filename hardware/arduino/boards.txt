@@ -146,10 +146,10 @@ mega.build.variant=mega
 
 leonardo.name=Arduino Leonardo
 leonardo.upload.protocol=arduino
-leonardo.upload.maximum_size=30720
+leonardo.upload.maximum_size=28672
 leonardo.upload.speed=1200
 leonardo.bootloader.low_fuses=0xde
-leonardo.bootloader.high_fuses=0xda
+leonardo.bootloader.high_fuses=0xd8
 leonardo.bootloader.extended_fuses=0xcb
 leonardo.bootloader.path=nuevo_diskloader
 leonardo.bootloader.file=DiskLoader.hex
