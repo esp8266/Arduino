@@ -62,11 +62,7 @@ const u16 STRING_IMANUFACTURER[12] = {
 	'A','r','d','u','i','n','o',' ','L','L','C'
 };
 
-#ifdef CDC_ENABLED
 #define DEVICE_CLASS 0x02
-#else
-#define DEVICE_CLASS 0x00
-#endif
 
 //	DEVICE DESCRIPTOR
 const DeviceDescriptor USB_DeviceDescriptor =
@@ -320,12 +316,9 @@ extern const u8 _initEndpoints[] PROGMEM;
 const u8 _initEndpoints[] = 
 {
 	0,
-	
-#ifdef CDC_ENABLED
 	EP_TYPE_INTERRUPT_IN,		// CDC_ENDPOINT_ACM
 	EP_TYPE_BULK_OUT,			// CDC_ENDPOINT_OUT
 	EP_TYPE_BULK_IN,			// CDC_ENDPOINT_IN
-#endif
 };
 
 #define EP_SINGLE_64 0x32	// EP0
@@ -360,10 +353,8 @@ bool ClassInterfaceRequest(Setup& setup)
 {
 	u8 i = setup.wIndex;
 
-#ifdef CDC_ENABLED
 	if (CDC_ACM_INTERFACE == i)
 		return CDC_Setup(setup);
-#endif
 
 	return false;
 }
@@ -422,11 +413,7 @@ int SendInterfaces()
 {
 	int total = 0;
 	u8 interfaces = 0;
-
-#ifdef CDC_ENABLED
 	total = CDC_GetInterface(&interfaces);
-#endif
-
 	return interfaces;
 }
 

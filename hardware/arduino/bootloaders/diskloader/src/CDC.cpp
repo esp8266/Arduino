@@ -21,7 +21,6 @@
 #include <avr/wdt.h>
 
 #if defined(USBCON)
-#ifdef CDC_ENABLED
 
 typedef struct
 {
@@ -91,6 +90,4 @@ bool WEAK CDC_Setup(Setup& setup)
 	}
 	return false;
 }
-
-#endif
 #endif /* if defined(USBCON) */

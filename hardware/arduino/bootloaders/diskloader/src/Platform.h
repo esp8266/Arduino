@@ -25,8 +25,6 @@ typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned long u32;
 
-#define CDC_ENABLED
-
 #define USB_PID_LEONARDO 0x0034
 #define USB_PID_MICRO 0x0035
 #define USB_VID 0x2341	// arduino LLC vid
