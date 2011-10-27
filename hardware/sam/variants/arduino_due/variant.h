@@ -69,11 +69,11 @@
 #define PIN_LED2             PIN_LED_RXL
 #define PIN_LED3             PIN_LED_TXL
 
-#define PINS_UART            (0u)
+#define PINS_UART            (80u)
 
-#define PINS_USART0          (18u)
-#define PINS_USART1          (16u)
-#define PINS_USART2          (14u)
+#define PINS_USART0          (81u)
+#define PINS_USART1          (82u)
+#define PINS_USART2          (83u)
 
 static const uint8_t SS   = 4 ;
 static const uint8_t MOSI = 76 ;
