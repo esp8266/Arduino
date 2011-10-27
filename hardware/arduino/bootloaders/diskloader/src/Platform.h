@@ -32,10 +32,6 @@ typedef unsigned long u32;
 #define USB_VID 0x2341	// arduino LLC vid
 #define USB_PID ARDUINO_MODEL_PID	// passed in by Makefile - 0x0034 for Leonardo, 0x0035 for MIcro
 
-//#include "USBDesc.h"
-//#include "../../../cores/arduino/USBCore.h"
-
-
 #define min(a,b) ((a)<(b)?(a):(b))
 
 #define CPU_PRESCALE(n)	(CLKPR = 0x80, CLKPR = (n))

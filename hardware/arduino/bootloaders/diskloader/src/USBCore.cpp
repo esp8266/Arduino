@@ -1,5 +1,4 @@
 
-
 /* Copyright (c) 2010, Peter Barrett  
 **  
 ** Permission to use, copy, modify, and/or distribute this software for  
@@ -219,7 +218,6 @@ u8 USB_Available(u8 ep)
 
 void USB_Recv_block(u8 ep, u8* dst, int len)
 {
-//	SetEP(ep & 7);
 	LockEP lock(ep);
 	while (len--)
 	{
@@ -277,16 +275,11 @@ int USB_Send(u8 ep, const void* d, int len)
 
 	int r = len;
 	const u8* data = (const u8*)d;
-//	u8 zero = ep & TRANSFER_ZERO;
-	u8 timeout = 250;		// 250ms timeout on send? TODO
 	while (len)
 	{
 		u8 n = USB_SendSpace(ep);
 		if (n == 0)
 		{
-//			if (!(--timeout))
-//				return -1;
-//			delay(1);
 			_delay_ms(1);
 			continue;
 		}
@@ -332,10 +325,6 @@ const u8 _initEndpoints[] =
 	EP_TYPE_INTERRUPT_IN,		// CDC_ENDPOINT_ACM
 	EP_TYPE_BULK_OUT,			// CDC_ENDPOINT_OUT
 	EP_TYPE_BULK_IN,			// CDC_ENDPOINT_IN
-#endif
-
-#ifdef HID_ENABLED
-	EP_TYPE_INTERRUPT_IN		// HID_ENDPOINT_INT
 #endif
 };
 
@@ -469,10 +458,6 @@ bool SendDescriptor(Setup& setup)
 		return SendConfiguration(setup.wLength);
 
 	InitControl(setup.wLength);
-#ifdef HID_ENABLED
-	if (HID_REPORT_DESCRIPTOR_TYPE == t)
-		return HID_GetDescriptor(t);
-#endif
 
 	u8 desc_length = 0;
 	const u8* desc_addr = 0;
@@ -607,9 +592,7 @@ ISR(USB_GEN_vect)
 	//	Start of Frame - happens every millisecond so we use it for TX and RX LED one-shot timing, too
 	if (udint & (1<<SOFI))
 	{
-//#ifdef CDC_ENABLED
 		USB_Flush(CDC_TX);				// Send a tx frame if found
-//#endif
 		
 		// check whether the one-shot period has elapsed.  if so, turn off the LED
 		if (TxLEDPulse && !(--TxLEDPulse))

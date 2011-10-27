@@ -56,16 +56,6 @@
 #define CDC_GET_LINE_CODING			0x21
 #define CDC_SET_CONTROL_LINE_STATE	0x22
 
-#define MSC_RESET					0xFF
-#define MSC_GET_MAX_LUN				0xFE
-
-#define HID_GET_REPORT				0x01
-#define HID_GET_IDLE				0x02
-#define HID_GET_PROTOCOL			0x03
-#define HID_SET_REPORT				0x09
-#define HID_SET_IDLE				0x0A
-#define HID_SET_PROTOCOL			0x0B
-
 //	Descriptors
 
 #define USB_DEVICE_DESC_SIZE 18
@@ -116,14 +106,6 @@
 #define CDC_CS_INTERFACE                        0x24
 #define CDC_CS_ENDPOINT                         0x25
 #define CDC_DATA_INTERFACE_CLASS                0x0A
-
-#define MSC_SUBCLASS_SCSI						0x06 
-#define MSC_PROTOCOL_BULK_ONLY					0x50 
-
-#define HID_HID_DESCRIPTOR_TYPE					0x21
-#define HID_REPORT_DESCRIPTOR_TYPE				0x22
-#define HID_PHYSICAL_DESCRIPTOR_TYPE			0x23
-
 
 //	Device
 typedef struct {
@@ -250,34 +232,6 @@ typedef struct
 	EndpointDescriptor			out;
 } CDCDescriptor;
 
-typedef struct 
-{
-	InterfaceDescriptor			msc;
-	EndpointDescriptor			in;
-	EndpointDescriptor			out;
-} MSCDescriptor;
-
-typedef struct
-{
-	u8 len;			// 9
-	u8 dtype;		// 0x21
-	u8 addr;
-	u8	versionL;	// 0x101
-	u8	versionH;	// 0x101
-	u8	country;
-	u8	desctype;	// 0x22 report
-	u8	descLenL;
-	u8	descLenH;
-} HIDDescDescriptor;
-
-typedef struct 
-{
-	InterfaceDescriptor			hid;
-	HIDDescDescriptor			desc;
-	EndpointDescriptor			in;
-} HIDDescriptor;
-
-
 #define D_DEVICE(_class,_subClass,_proto,_packetSize0,_vid,_pid,_version,_im,_ip,_is,_configs) \
 	{ 18, 1, 0x200, _class,_subClass,_proto,_packetSize0,_vid,_pid,_version,_im,_ip,_is,_configs }
 
@@ -292,9 +246,6 @@ typedef struct
 
 #define D_IAD(_firstInterface, _count, _class, _subClass, _protocol) \
 	{ 8, 11, _firstInterface, _count, _class, _subClass, _protocol, 0 }
-
-#define D_HIDREPORT(_descriptorLength) \
-	{ 9, 0x21, 0x1, 0x1, 0, 1, 0x22, _descriptorLength, 0 }
 
 #define D_CDCCS(_subtype,_d0,_d1)	{ 5, 0x24, _subtype, _d0, _d1 }
 #define D_CDCCS4(_subtype,_d0)		{ 4, 0x24, _subtype, _d0 }

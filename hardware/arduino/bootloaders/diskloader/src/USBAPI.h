@@ -23,24 +23,6 @@ extern USB_ USB;
 
 //================================================================================
 //================================================================================
-//	Serial over CDC (Serial1 is the physical port)
-
-class Serial_
-{
-public:
-	void begin(uint16_t baud_count);
-	void end(void);
-
-	virtual int available(void);
-	virtual int peek(void);
-	virtual int read(void);
-	virtual void flush(void);
-	virtual size_t write(uint8_t);
-};
-extern Serial_ Serial;
-
-//================================================================================
-//================================================================================
 //	Low level API
 
 typedef struct
@@ -79,5 +61,4 @@ int USB_Recv(uint8_t ep);							// non-blocking
 void USB_Flush(uint8_t ep);
 
 #endif
-
 #endif /* if defined(USBCON) */
