@@ -62,23 +62,40 @@
  *        Pins
  *----------------------------------------------------------------------------*/
 
-#define PIN_LED_13           (0u)
-#define PIN_LED_RXL          (1u)
-#define PIN_LED_TXL          (2u)
+#define PIN_LED_13           (13u)
+#define PIN_LED_RXL          (73u)
+#define PIN_LED_TXL          (74u)
 #define PIN_LED              PIN_LED_13
 #define PIN_LED2             PIN_LED_RXL
 #define PIN_LED3             PIN_LED_TXL
 
-#define PINS_UART            (3u)
+#define PINS_UART            (0u)
 
-#define PINS_USART0          (6u)
-#define PINS_USART1          (9u)
-#define PINS_USART2          (12u)
+#define PINS_USART0          (18u)
+#define PINS_USART1          (16u)
+#define PINS_USART2          (14u)
 
-static const uint8_t SS   = 18 ;
-static const uint8_t MOSI = 16 ;
-static const uint8_t MISO = 15 ;
-static const uint8_t SCK  = 17 ;
+static const uint8_t SS   = 4 ;
+static const uint8_t MOSI = 76 ;
+static const uint8_t MISO = 75 ;
+static const uint8_t SCK  = 77 ;
+
+static const uint8_t A0  = 54;
+static const uint8_t A1  = 55;
+static const uint8_t A2  = 56;
+static const uint8_t A3  = 57;
+static const uint8_t A4  = 58;
+static const uint8_t A5  = 59;
+static const uint8_t A6  = 60;
+static const uint8_t A7  = 61;
+static const uint8_t A8  = 62;
+static const uint8_t A9  = 63;
+static const uint8_t A10 = 64;
+static const uint8_t A11 = 65;
+static const uint8_t A12 = 66;
+static const uint8_t A13 = 67;
+// static const uint8_t A14 = ;
+// static const uint8_t A15 = ;
 
 /*----------------------------------------------------------------------------
  *        Arduino objects - C++ only
