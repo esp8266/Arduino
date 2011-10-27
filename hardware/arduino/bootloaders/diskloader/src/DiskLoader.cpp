@@ -3,8 +3,6 @@
  */
 
 #include "Platform.h"
-//#include "USBCore.h"
-
 
 extern "C"
 void entrypoint(void) __attribute__ ((naked)) __attribute__ ((section (".vectors")));
@@ -95,20 +93,6 @@ const u8 _consts[] =
 	0x00,		// 
 };
 
-//int getch(void) 
-//{
-//	u16 timeout;
-//	u8 c;
-//	for (timeout = 0; timeout; timeout--) 
-//	{
-//		c = USB_Recv(CDC_RX);
-//		if (c != -1)
-//			return c;
-//	}
-//	return -1;
-//}
-	
-
 void start_sketch()
 {
 	UDCON = 1;		// Detatch USB
@@ -150,8 +134,6 @@ int main()
 		u16 address = 0;
 		for (;;)
 		{
-//			while (!USB_Available(CDC_RX))
-//				;
 			if (USB_Available(CDC_RX)) 
 			{
 				u8 cmd = USB_Recv(CDC_RX);
@@ -177,7 +159,7 @@ int main()
 				{
 					u8 i = packet[0] - 0x80;
 					if (i > 2)
-						i = (i==0x18) ? 3 : 4;	// 0x80:HW_VER,0x81:SW_MAJOR,0x82:SW_MINOR,0x18:3 or 0
+						i = (i==0x18) ? 3 : 4;	
 					pgm = _consts + i + 3;
 					send = 1;
 				} 
@@ -208,42 +190,6 @@ int main()
 					address += send;
 				}
 				
-				// Check sync
-	//			if (Serial.available() > 0 && Serial.read() != ' ')
-	//				break;			
-	//			if (USB_Available(CDC_RX) && USB_Recv(CDC_RX) != ' ')
-				
-	//			u8 countdown = 10;
-	//			while (!USB_Available(CDC_RX))
-	//			{
-	//				if (countdown-- == 0)
-	//					break;
-	//			}
-	//			u8 x = USB_Recv(CDC_RX);
-	//			if (x != -1 && x != ' ')
-	//			{
-	//				L_LED_ON();
-	//				break;
-	//			}
-				
-	//			if (getch() != ' ')
-	//				break;
-				
-	//			while (!USB_Available(CDC_RX)) 
-	//				;
-	//
-	//			int x = USB_Recv(CDC_RX);
-	//			if (x == -1)
-	//			{
-	//				UEINTX = 0x6B;
-	//				break;
-	//			}
-	//			else if (x != ' ')
-	//			{
-	////				UEINTX = 0x6B;
-	//				break;
-	//			}
-				
 				u16 countdown = 5000;
 				while (countdown-- > 10 && !USB_Available(CDC_RX)) 
 					;
@@ -265,6 +211,7 @@ int main()
 					/* move interrupts to application section:
 					 * uses inline assembly because the procedure must be completed in four cycles.
 					 */
+					cli();	// disable interrupts
 					asm volatile (
 								  "ldi r16,	  0x01\n"		// (1<<IVCE)	/* Enable change of interrupt vectors */
 								  "out 0x35,  r16\n"		// MCUCR
@@ -272,7 +219,6 @@ int main()
 								  "out 0x35,  r16\n"		// MCUCR				  
 								  );						
 					start_sketch();
-	//				break;
 				}
 			}
 		}
