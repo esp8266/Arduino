@@ -240,8 +240,6 @@ run.present.exclusive.macosx = true
 board = uno
 target = arduino
 
-programmer = arduino:avrispmkii
-
 upload.using = bootloader
 
 serial.port=COM1

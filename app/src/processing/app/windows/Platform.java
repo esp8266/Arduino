@@ -44,8 +44,8 @@ public class Platform extends processing.app.Platform {
 
   static final String openCommand =
     System.getProperty("user.dir").replace('/', '\\') +
-    "\\arduino.exe \"%1\"";
-  static final String DOC = "Arduino.Document";
+    "\\processing.exe \"%1\"";
+  static final String DOC = "Processing.Document";
 
   public void init(Base base) {
     super.init(base);
@@ -86,13 +86,13 @@ public class Platform extends processing.app.Platform {
    */
   protected void setAssociations() throws UnsupportedEncodingException {
     if (Registry.createKey(REGISTRY_ROOT_KEY.CLASSES_ROOT,
-                           "", ".ino") &&
+                           "", ".pde") &&
         Registry.setStringValue(REGISTRY_ROOT_KEY.CLASSES_ROOT,
-                                ".ino", "", DOC) &&
+                                ".pde", "", DOC) &&
 
         Registry.createKey(REGISTRY_ROOT_KEY.CLASSES_ROOT, "", DOC) &&
         Registry.setStringValue(REGISTRY_ROOT_KEY.CLASSES_ROOT, DOC, "",
-                                "Arduino Source Code") &&
+                                "Processing Source Code") &&
 
         Registry.createKey(REGISTRY_ROOT_KEY.CLASSES_ROOT,
                            DOC, "shell") &&

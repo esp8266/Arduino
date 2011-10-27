@@ -42,28 +42,33 @@ public class AvrdudeUploader extends Uploader  {
   public AvrdudeUploader() {
   }
 
-  public boolean uploadUsingPreferences(String buildPath, String className, boolean usingProgrammer)
+  // XXX: add support for uploading sketches using a programmer
+  public boolean uploadUsingPreferences(String buildPath, String className, boolean verbose)
   throws RunnerException, SerialException {
     this.verbose = verbose;
     Map<String, String> boardPreferences = Base.getBoardPreferences();
+    String uploadUsing = boardPreferences.get("upload.using");
+    if (uploadUsing == null) {
+      // fall back on global preference
+      uploadUsing = Preferences.get("upload.using");
+    }
+    if (uploadUsing.equals("bootloader")) {
+      return uploadViaBootloader(buildPath, className);
+    } else {
+      Target t;
 
-    // if no protocol is specified for this board, assume it lacks a 
-    // bootloader and upload using the selected programmer.
-    if (usingProgrammer || boardPreferences.get("upload.protocol") == null) {
-      String programmer = Preferences.get("programmer");
-      Target target = Base.getTarget();
-
-      if (programmer.indexOf(":") != -1) {
-        target = Base.targetsTable.get(programmer.substring(0, programmer.indexOf(":")));
-        programmer = programmer.substring(programmer.indexOf(":") + 1);
+      if (uploadUsing.indexOf(':') == -1) {
+        t = Base.getTarget(); // the current target (associated with the board)
+      } else {
+        String targetName = uploadUsing.substring(0, uploadUsing.indexOf(':'));
+        t = Base.targetsTable.get(targetName);
+        uploadUsing = uploadUsing.substring(uploadUsing.indexOf(':') + 1);
       }
-      
-      Collection params = getProgrammerCommands(target, programmer);
+
+      Collection params = getProgrammerCommands(t, uploadUsing);
       params.add("-Uflash:w:" + buildPath + File.separator + className + ".hex:i");
       return avrdude(params);
     }
-
-    return uploadViaBootloader(buildPath, className);
   }
   
   private boolean uploadViaBootloader(String buildPath, String className)
@@ -91,14 +96,8 @@ public class AvrdudeUploader extends Uploader  {
     return avrdude(commandDownloader);
   }
   
-  public boolean burnBootloader() throws RunnerException {
-    String programmer = Preferences.get("programmer");
-    Target target = Base.getTarget();
-    if (programmer.indexOf(":") != -1) {
-      target = Base.targetsTable.get(programmer.substring(0, programmer.indexOf(":")));
-      programmer = programmer.substring(programmer.indexOf(":") + 1);
-    }
-    return burnBootloader(getProgrammerCommands(target, programmer));
+  public boolean burnBootloader(String targetName, String programmer) throws RunnerException {
+    return burnBootloader(getProgrammerCommands(Base.targetsTable.get(targetName), programmer));
   }
   
   private Collection getProgrammerCommands(Target target, String programmer) {

@@ -28,9 +28,20 @@
 // fill in your address here:
 byte mac[] = { 
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED};
+// assign an IP address for the controller:
+byte ip[] = { 
+  192,168,1,20 };
+byte gateway[] = {
+  192,168,1,1};	
+byte subnet[] = { 
+  255, 255, 255, 0 };
+
+//  The address of the server you want to connect to (pachube.com):
+byte server[] = { 
+  173,203,98,29 }; 
 
 // initialize the library instance:
-EthernetClient client;
+Client client(server, 80);
 
 long lastConnectionTime = 0;        // last time you connected to the server, in milliseconds
 boolean lastConnected = false;      // state of the connection last time through the main loop
@@ -38,13 +49,8 @@ const int postingInterval = 10000;  //delay between updates to Pachube.com
 
 void setup() {
   // start the ethernet connection and serial port:
+  Ethernet.begin(mac, ip);
   Serial.begin(9600);
-  if (Ethernet.begin(mac) == 0) {
-    Serial.println("Failed to configure Ethernet using DHCP");
-    // no point in carrying on, so do nothing forevermore:
-    for(;;)
-      ;
-  }
   // give the ethernet module time to boot up:
   delay(1000);
 }
@@ -90,7 +96,7 @@ void loop() {
 // this method makes a HTTP connection to the server:
 void sendData(String thisData) {
   // if there's a successful connection:
-  if (client.connect("www.pachube.com", 80)) {
+  if (client.connect()) {
     Serial.println("connecting...");
     // send the HTTP PUT request. 
     // fill in your feed address here:

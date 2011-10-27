@@ -35,15 +35,13 @@
       <dict>
         <key>CFBundleTypeExtensions</key>
         <array>
-          <string>ino</string>
-          <string>c</string>
-          <string>cpp</string>
-          <string>h</string>
+          <string>pde</string>
+          <string>java</string>
         </array>
         <key>CFBundleTypeIconFile</key>
         <string>pde.icns</string>
       	<key>CFBundleTypeName</key>
-        <string>Arduino Source File</string>
+        <string>Processing Source File</string>
         <key>CFBundleTypeMIMETypes</key>
         <array>
           <string>text/plain</string>
