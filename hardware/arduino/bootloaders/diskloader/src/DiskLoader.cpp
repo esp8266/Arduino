@@ -23,7 +23,7 @@ u8 _flashbuf[128];
 u8 _inSync;
 u8 _ok;
 u16 do_reset = 0;
-volatile u16 _timeout;
+volatile u16 _timeout = 0;
 
 void Program(u8 ep, u16 page, u8 count)
 {
@@ -47,6 +47,20 @@ void Program(u8 ep, u16 page, u8 count)
     boot_page_write(page);
     boot_spm_busy_wait();
     boot_rww_enable ();
+}
+
+u16 _pulse;
+void LEDPulse() 
+{
+	_pulse += 1;
+	u8 p = _pulse >> 9;
+	if (p > 63)
+		p = 127-p;
+	p += p;
+	if (((u8)_pulse) > p)
+		L_LED_OFF();
+	else
+		L_LED_ON();
 }
 
 #define HW_VER	 0x02
@@ -95,6 +109,19 @@ const u8 _consts[] =
 
 void start_sketch()
 {
+	L_LED_OFF();
+	RX_LED_OFF();
+	TX_LED_OFF();
+	/* move interrupts to application section:
+	 * uses inline assembly because the procedure must be completed in four cycles.
+	 */
+	cli();	// disable interrupts first
+	asm volatile (
+				  "ldi r16,	  0x01\n"		// (1<<IVCE)	/* Enable change of interrupt vectors */
+				  "out 0x35,  r16\n"		// MCUCR
+				  "ldi r16,	  0x00\n"		// (1<<IVSEL)	/* Move interrupts to application flash section */
+				  "out 0x35,  r16\n"		// MCUCR				  
+				  );							
 	UDCON = 1;		// Detatch USB
 	UDIEN = 0;
 	asm volatile (	// Reset vector to run firmware
@@ -133,7 +160,7 @@ int main()
 		u8* packet = _flashbuf;
 		u16 address = 0;
 		for (;;)
-		{
+		{		
 			if (USB_Available(CDC_RX)) 
 			{
 				u8 cmd = USB_Recv(CDC_RX);
@@ -208,18 +235,15 @@ int main()
 				if ('Q' == cmd) 
 				{
 					_delay_ms(100);
-					/* move interrupts to application section:
-					 * uses inline assembly because the procedure must be completed in four cycles.
-					 */
-					cli();	// disable interrupts
-					asm volatile (
-								  "ldi r16,	  0x01\n"		// (1<<IVCE)	/* Enable change of interrupt vectors */
-								  "out 0x35,  r16\n"		// MCUCR
-								  "ldi r16,	  0x00\n"		// (1<<IVSEL)	/* Move interrupts to application flash section */
-								  "out 0x35,  r16\n"		// MCUCR				  
-								  );						
 					start_sketch();
 				}
+			}
+			else 
+			{
+				LEDPulse();
+				_delay_us(100);
+				if (_timeout-- == 1)
+					start_sketch();
 			}
 		}
 	}
