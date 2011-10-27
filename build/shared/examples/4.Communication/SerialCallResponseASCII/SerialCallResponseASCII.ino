@@ -19,7 +19,7 @@
  
  Created 26 Sept. 2005
  by Tom Igoe
- modified 30 Aug 2011
+ modified 26 Oct 2011
  by Tom Igoe and Scott Fitzgerald
  
  This example code is in the public domain.
@@ -47,12 +47,10 @@ void loop()
   if (Serial.available() > 0) {
     // get incoming byte:
     inByte = Serial.read();
-    // read first analog input, divide by 4 to make the range 0-255:
-    firstSensor = analogRead(A0)/4;
-    // delay 10ms to let the ADC recover:
-    delay(10);
-    // read second analog input, divide by 4 to make the range 0-255:
-    secondSensor = analogRead(A1)/4;
+    // read first analog input:
+    firstSensor = analogRead(A0);
+    // read second analog input:
+    secondSensor = analogRead(A1);
     // read  switch, map it to 0 or 255L
     thirdSensor = map(digitalRead(2), 0, 1, 0, 255);  
     // send sensor values:

@@ -40,6 +40,11 @@ extern "C"{
 #define FALLING 2
 #define RISING 3
 
+#if defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__) || defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__)
+#define DEFAULT 0
+#define EXTERNAL 1
+#define INTERNAL 2
+#else  
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 #define INTERNAL1V1 2
 #define INTERNAL2V56 3
@@ -48,6 +53,7 @@ extern "C"{
 #endif
 #define DEFAULT 1
 #define EXTERNAL 0
+#endif
 
 // undefine stdlib's abs if encountered
 #ifdef abs
@@ -142,6 +148,7 @@ extern const uint8_t PROGMEM digital_pin_to_timer_PGM[];
 #define NOT_A_PIN 0
 #define NOT_A_PORT 0
 
+#ifdef ARDUINO_MAIN
 #define PA 1
 #define PB 2
 #define PC 3
@@ -153,6 +160,7 @@ extern const uint8_t PROGMEM digital_pin_to_timer_PGM[];
 #define PJ 10
 #define PK 11
 #define PL 12
+#endif
 
 #define NOT_ON_TIMER 0
 #define TIMER0A 1

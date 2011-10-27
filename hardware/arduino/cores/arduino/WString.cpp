@@ -593,7 +593,7 @@ void String::replace(const String& find, const String& replace)
 		if (size == len) return;
 		if (size > capacity && !changeBuffer(size)) return; // XXX: tell user!
 		int index = len - 1;
-		while ((index = lastIndexOf(find, index)) >= 0) {
+		while (index >= 0 && (index = lastIndexOf(find, index)) >= 0) {
 			readFrom = buffer + index + find.len;
 			memmove(readFrom + diff, readFrom, len - (readFrom - buffer));
 			len += diff;

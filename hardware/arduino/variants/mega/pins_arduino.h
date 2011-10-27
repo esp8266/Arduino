@@ -1,8 +1,8 @@
 /*
-  pins_arduino.c - pin definitions for the Arduino board
-  Part of Arduino / Wiring Lite
+  pins_arduino.h - Pin definition functions for Arduino
+  Part of Arduino - http://www.arduino.cc/
 
-  Copyright (c) 2005 David A. Mellis
+  Copyright (c) 2007 David A. Mellis
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -19,66 +19,72 @@
   Free Software Foundation, Inc., 59 Temple Place, Suite 330,
   Boston, MA  02111-1307  USA
 
-  $Id$
+  $Id: wiring.h 249 2007-02-03 16:52:51Z mellis $
 */
 
-#include <avr/io.h>
-#include "wiring_private.h"
-#include "pins_arduino.h"
+#ifndef Pins_Arduino_h
+#define Pins_Arduino_h
 
-// On the Arduino board, digital pins are also used
-// for the analog output (software PWM).  Analog input
-// pins are a separate set.
+#include <avr/pgmspace.h>
 
-// ATMEL ATMEGA8 & 168 / ARDUINO
-//
-//                  +-\/-+
-//            PC6  1|    |28  PC5 (AI 5)
-//      (D 0) PD0  2|    |27  PC4 (AI 4)
-//      (D 1) PD1  3|    |26  PC3 (AI 3)
-//      (D 2) PD2  4|    |25  PC2 (AI 2)
-// PWM+ (D 3) PD3  5|    |24  PC1 (AI 1)
-//      (D 4) PD4  6|    |23  PC0 (AI 0)
-//            VCC  7|    |22  GND
-//            GND  8|    |21  AREF
-//            PB6  9|    |20  AVCC
-//            PB7 10|    |19  PB5 (D 13)
-// PWM+ (D 5) PD5 11|    |18  PB4 (D 12)
-// PWM+ (D 6) PD6 12|    |17  PB3 (D 11) PWM
-//      (D 7) PD7 13|    |16  PB2 (D 10) PWM
-//      (D 8) PB0 14|    |15  PB1 (D 9) PWM
-//                  +----+
-//
-// (PWM+ indicates the additional PWM pins on the ATmega168.)
+#define NUM_DIGITAL_PINS            70
+#define NUM_ANALOG_INPUTS           16
+#define analogInputToDigitalPin(p)  ((p < 16) ? (p) + 54 : -1)
+#define digitalPinHasPWM(p)         (((p) >= 2 && (p) <= 13) || ((p) >= 44 && (p)<= 46))
 
-// ATMEL ATMEGA1280 / ARDUINO
-//
-// 0-7 PE0-PE7   works
-// 8-13 PB0-PB5  works
-// 14-21 PA0-PA7 works 
-// 22-29 PH0-PH7 works
-// 30-35 PG5-PG0 works
-// 36-43 PC7-PC0 works
-// 44-51 PJ7-PJ0 works
-// 52-59 PL7-PL0 works
-// 60-67 PD7-PD0 works
-// A0-A7 PF0-PF7
-// A8-A15 PK0-PK7
+const static uint8_t SS   = 53;
+const static uint8_t MOSI = 51;
+const static uint8_t MISO = 50;
+const static uint8_t SCK  = 52;
 
-#define PA 1
-#define PB 2
-#define PC 3
-#define PD 4
-#define PE 5
-#define PF 6
-#define PG 7
-#define PH 8
-#define PJ 10
-#define PK 11
-#define PL 12
+const static uint8_t SDA = 20;
+const static uint8_t SCL = 21;
+const static uint8_t LED_BUILTIN = 13;
 
+const static uint8_t A0 = 54;
+const static uint8_t A1 = 55;
+const static uint8_t A2 = 56;
+const static uint8_t A3 = 57;
+const static uint8_t A4 = 58;
+const static uint8_t A5 = 59;
+const static uint8_t A6 = 60;
+const static uint8_t A7 = 61;
+const static uint8_t A8 = 62;
+const static uint8_t A9 = 63;
+const static uint8_t A10 = 64;
+const static uint8_t A11 = 65;
+const static uint8_t A12 = 66;
+const static uint8_t A13 = 67;
+const static uint8_t A14 = 68;
+const static uint8_t A15 = 69;
 
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+// A majority of the pins are NOT PCINTs, SO BE WARNED (i.e. you cannot use them as receive pins)
+// Only pins available for RECEIVE (TRANSMIT can be on any pin):
+// (I've deliberately left out pin mapping to the Hardware USARTs - seems senseless to me)
+// Pins: 10, 11, 12, 13,  50, 51, 52, 53,  62, 63, 64, 65, 66, 67, 68, 69
+
+#define digitalPinToPCICR(p)    ( (((p) >= 10) && ((p) <= 13)) || \
+                                  (((p) >= 50) && ((p) <= 53)) || \
+                                  (((p) >= 62) && ((p) <= 69)) ? (&PCICR) : ((uint8_t *)0) )
+
+#define digitalPinToPCICRbit(p) ( (((p) >= 10) && ((p) <= 13)) || (((p) >= 50) && ((p) <= 53)) ? 0 : \
+                                ( (((p) >= 62) && ((p) <= 69)) ? 2 : \
+                                0 ) )
+
+#define digitalPinToPCMSK(p)    ( (((p) >= 10) && ((p) <= 13)) || (((p) >= 50) && ((p) <= 53)) ? (&PCMSK0) : \
+                                ( (((p) >= 62) && ((p) <= 69)) ? (&PCMSK2) : \
+                                ((uint8_t *)0) ) )
+
+#define digitalPinToPCMSKbit(p) ( (((p) >= 10) && ((p) <= 13)) ? ((p) - 6) : \
+                                ( ((p) == 50) ? 3 : \
+                                ( ((p) == 51) ? 2 : \
+                                ( ((p) == 52) ? 1 : \
+                                ( ((p) == 53) ? 0 : \
+                                ( (((p) >= 62) && ((p) <= 69)) ? ((p) - 62) : \
+                                0 ) ) ) ) ) )
+
+#ifdef ARDUINO_MAIN
+
 const uint16_t PROGMEM port_to_mode_PGM[] = {
 	NOT_A_PORT,
 	(uint16_t) &DDRA,
@@ -351,115 +357,7 @@ const uint8_t PROGMEM digital_pin_to_timer_PGM[] = {
 	NOT_ON_TIMER	, // PK 6 ** 68 ** A14	
 	NOT_ON_TIMER	, // PK 7 ** 69 ** A15	
 };
-#else
-// these arrays map port names (e.g. port B) to the
-// appropriate addresses for various functions (e.g. reading
-// and writing)
-const uint16_t PROGMEM port_to_mode_PGM[] = {
-	NOT_A_PORT,
-	NOT_A_PORT,
-	(uint16_t) &DDRB,
-	(uint16_t) &DDRC,
-	(uint16_t) &DDRD,
-};
 
-const uint16_t PROGMEM port_to_output_PGM[] = {
-	NOT_A_PORT,
-	NOT_A_PORT,
-	(uint16_t) &PORTB,
-	(uint16_t) &PORTC,
-	(uint16_t) &PORTD,
-};
-
-const uint16_t PROGMEM port_to_input_PGM[] = {
-	NOT_A_PORT,
-	NOT_A_PORT,
-	(uint16_t) &PINB,
-	(uint16_t) &PINC,
-	(uint16_t) &PIND,
-};
-
-const uint8_t PROGMEM digital_pin_to_port_PGM[] = {
-	PD, /* 0 */
-	PD,
-	PD,
-	PD,
-	PD,
-	PD,
-	PD,
-	PD,
-	PB, /* 8 */
-	PB,
-	PB,
-	PB,
-	PB,
-	PB,
-	PC, /* 14 */
-	PC,
-	PC,
-	PC,
-	PC,
-	PC,
-};
-
-const uint8_t PROGMEM digital_pin_to_bit_mask_PGM[] = {
-	_BV(0), /* 0, port D */
-	_BV(1),
-	_BV(2),
-	_BV(3),
-	_BV(4),
-	_BV(5),
-	_BV(6),
-	_BV(7),
-	_BV(0), /* 8, port B */
-	_BV(1),
-	_BV(2),
-	_BV(3),
-	_BV(4),
-	_BV(5),
-	_BV(0), /* 14, port C */
-	_BV(1),
-	_BV(2),
-	_BV(3),
-	_BV(4),
-	_BV(5),
-};
-
-const uint8_t PROGMEM digital_pin_to_timer_PGM[] = {
-	NOT_ON_TIMER, /* 0 - port D */
-	NOT_ON_TIMER,
-	NOT_ON_TIMER,
-	// on the ATmega168, digital pin 3 has hardware pwm
-#if defined(__AVR_ATmega8__)
-	NOT_ON_TIMER,
-#else
-	TIMER2B,
 #endif
-	NOT_ON_TIMER,
-	// on the ATmega168, digital pins 5 and 6 have hardware pwm
-#if defined(__AVR_ATmega8__)
-	NOT_ON_TIMER,
-	NOT_ON_TIMER,
-#else
-	TIMER0B,
-	TIMER0A,
-#endif
-	NOT_ON_TIMER,
-	NOT_ON_TIMER, /* 8 - port B */
-	TIMER1A,
-	TIMER1B,
-#if defined(__AVR_ATmega8__)
-	TIMER2,
-#else
-	TIMER2A,
-#endif
-	NOT_ON_TIMER,
-	NOT_ON_TIMER,
-	NOT_ON_TIMER,
-	NOT_ON_TIMER, /* 14 - port C */
-	NOT_ON_TIMER,
-	NOT_ON_TIMER,
-	NOT_ON_TIMER,
-	NOT_ON_TIMER,
-};
+
 #endif
