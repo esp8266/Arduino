@@ -25,10 +25,10 @@ typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned long u32;
 
-#define USB_PID_LEONARDO 0x0034
-#define USB_PID_MICRO 0x0035
+#define USB_PID_LEONARDO 0x0032
+#define USB_PID_MICRO 0x0033
 #define USB_VID 0x2341	// arduino LLC vid
-#define USB_PID ARDUINO_MODEL_PID	// passed in by Makefile - 0x0034 for Leonardo, 0x0035 for MIcro
+#define USB_PID ARDUINO_MODEL_PID	// passed in by Makefile - 0x0032 for Leonardo, 0x0033 for Micro
 
 #define min(a,b) ((a)<(b)?(a):(b))
 
