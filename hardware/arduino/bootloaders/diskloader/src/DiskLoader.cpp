@@ -109,6 +109,9 @@ const u8 _consts[] =
 
 void start_sketch()
 {
+	if (pgm_read_word(0) == -1)		// no sketch has been uploaded yet - stay in bootloader
+		return;
+	
 	L_LED_OFF();
 	RX_LED_OFF();
 	TX_LED_OFF();
