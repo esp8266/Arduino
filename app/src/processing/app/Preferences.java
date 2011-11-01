@@ -340,7 +340,7 @@ public class Preferences {
 
     if (Base.isWindows()) {
       autoAssociateBox =
-        new JCheckBox("Automatically associate .pde files with Arduino");
+        new JCheckBox("Automatically associate .ino files with Arduino");
       pain.add(autoAssociateBox);
       d = autoAssociateBox.getPreferredSize();
       autoAssociateBox.setBounds(left, top, d.width + 10, d.height);

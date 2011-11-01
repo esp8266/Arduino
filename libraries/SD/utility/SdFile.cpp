@@ -590,7 +590,7 @@ void SdFile::printDirName(const dir_t& dir, uint8_t width) {
       Serial.print('.');
       w++;
     }
-    Serial.print(dir.name[i]);
+    Serial.write(dir.name[i]);
     w++;
   }
   if (DIR_IS_SUBDIR(&dir)) {

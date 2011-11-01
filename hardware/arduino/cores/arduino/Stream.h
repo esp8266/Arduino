@@ -71,13 +71,7 @@ class Stream : public Print
   // initial characters that are not digits (or the minus sign) are skipped
   // integer is terminated by the first character that is not a digit.
 
-  long parseInt(char skipChar); // as above but the given skipChar is ignored
-  // as above but the given skipChar is ignored
-  // this allows format characters (typically commas) in values to be ignored
-
   float parseFloat();               // float version of parseInt
-
-  float parseFloat(char skipChar);  // as above but the given skipChar is ignored
 
   int readBytes( char *buffer, size_t length); // read chars from stream into buffer
   // terminates if length characters have been read or timeout (see setTimeout)
@@ -89,6 +83,12 @@ class Stream : public Print
 
   // Arduino String functions to be added here
 
+  protected:
+  long parseInt(char skipChar); // as above but the given skipChar is ignored
+  // as above but the given skipChar is ignored
+  // this allows format characters (typically commas) in values to be ignored
+
+  float parseFloat(char skipChar);  // as above but the given skipChar is ignored
 };
 
 #endif
