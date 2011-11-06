@@ -21,15 +21,15 @@
 #ifndef DueWire_h
 #define DueWire_h
 
-#include <inttypes.h>
 #include "Stream.h"
 #include "twi.h"
+#include "variant.h"
 
 #define BUFFER_LENGTH 32
 
 class DueWire: public Stream {
 public:
-	DueWire(Twi *);
+	DueWire(Twi *twi, void(*begin_cb)(void));
 	void begin();
 	void begin(uint8_t);
 	void begin(int);
@@ -70,22 +70,38 @@ private:
 	void (*onRequestCallback)(void);
 	void (*onReceiveCallback)(int);
 
+	// Called before initialization
+	void (*onBeginCallback)(void);
+
 	// TWI instance
 	Twi *twi;
 
 	// TWI state
-	static const uint8_t UNINITIALIZED = 0;
-	static const uint8_t MASTER_IDLE = 1;
-	static const uint8_t MASTER_SEND = 2;
-	static const uint8_t MASTER_RECV = 3;
-	static const uint8_t SLAVE_IDLE = 4;
-	static const uint8_t SLAVE_RECV = 5;
-	static const uint8_t SLAVE_SEND = 6;
-	uint8_t status;
+	enum DueWireStatus {
+		UNINITIALIZED,
+		MASTER_IDLE,
+		MASTER_SEND,
+		MASTER_RECV,
+		SLAVE_IDLE,
+		SLAVE_RECV,
+		SLAVE_SEND
+	};
+	DueWireStatus status;
+
+	// TWI clock frequency
+	static const uint32_t TWI_CLOCK = 100000;
+
+	// Timeouts (
+	static const uint32_t RECV_TIMEOUT = 100000;
+	static const uint32_t XMIT_TIMEOUT = 100000;
 };
 
+#if WIRE_INTERFACES_COUNT > 0
 extern DueWire Wire;
-extern DueWire Wire2;
+#endif
+#if WIRE_INTERFACES_COUNT > 1
+extern DueWire Wire1;
+#endif
 
 #endif
 

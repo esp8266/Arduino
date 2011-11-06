@@ -19,45 +19,66 @@
 
 extern "C" {
 #include <string.h>
-#include <inttypes.h>
 #include "twi.h"
 }
 
 #include "Wire.h"
 
-static inline void TWI_WaitTransferComplete(Twi *_twi) {
-	while (!TWI_TransferComplete(_twi))
-		;
+static inline bool TWI_FailedAcknowledge(Twi *pTwi) {
+	return pTwi->TWI_SR & TWI_SR_NACK;
 }
 
-static inline void TWI_WaitByteSent(Twi *_twi) {
-	while (!TWI_ByteSent(_twi))
-		;
+static inline bool TWI_WaitTransferComplete(Twi *_twi, uint32_t _timeout) {
+	while (!TWI_TransferComplete(_twi)) {
+		if (TWI_FailedAcknowledge(_twi))
+			return false;
+		if (--_timeout == 0)
+			return false;
+	}
+	return true;
 }
 
-static inline void TWI_WaitByteReceived(Twi *_twi) {
-	while (!TWI_ByteReceived(_twi))
-		;
+static inline bool TWI_WaitByteSent(Twi *_twi, uint32_t _timeout) {
+	while (!TWI_ByteSent(_twi)) {
+		if (TWI_FailedAcknowledge(_twi))
+			return false;
+		if (--_timeout == 0)
+			return false;
+	}
+	return true;
+}
+
+static inline bool TWI_WaitByteReceived(Twi *_twi, uint32_t _timeout) {
+	while (!TWI_ByteReceived(_twi)) {
+		if (TWI_FailedAcknowledge(_twi))
+			return false;
+		if (--_timeout == 0)
+			return false;
+	}
+	return true;
 }
 
 static inline bool TWI_STATUS_SVREAD(uint32_t status) {
 	return (status & TWI_SR_SVREAD) == TWI_SR_SVREAD;
 }
 
-DueWire::DueWire(Twi *_twi) :
+DueWire::DueWire(Twi *_twi, void(*_beginCb)(void)) :
 	twi(_twi), rxBufferIndex(0), rxBufferLength(0), txAddress(0),
 			txBufferLength(0), srvBufferIndex(0), srvBufferLength(0), status(
-					UNINITIALIZED) {
+					UNINITIALIZED), onBeginCallback(_beginCb) {
 	// Empty
 }
 
 void DueWire::begin(void) {
-	// TODO: correct clock values
-	TWI_ConfigureMaster(twi, 200000, 200000);
+	if (onBeginCallback)
+		onBeginCallback();
+	TWI_ConfigureMaster(twi, TWI_CLOCK, VARIANT_MCK);
 	status = MASTER_IDLE;
 }
 
 void DueWire::begin(uint8_t address) {
+	if (onBeginCallback)
+		onBeginCallback();
 	TWI_ConfigureSlave(twi, address);
 	status = SLAVE_IDLE;
 	TWI_EnableIt(twi, TWI_IER_RXRDY | TWI_IER_TXRDY | TWI_IER_TXCOMP);
@@ -75,14 +96,14 @@ uint8_t DueWire::requestFrom(uint8_t address, uint8_t quantity) {
 	int readed = 0;
 	TWI_StartRead(twi, address, 0, 0);
 	do {
-		// Stop condition must be set during the receprion of last byte
+		// Stop condition must be set during the reception of last byte
 		if (readed + 1 == quantity)
 			TWI_SendSTOPCondition( twi);
 
-		TWI_WaitByteReceived( twi);
+		TWI_WaitByteReceived(twi, RECV_TIMEOUT);
 		rxBuffer[readed++] = TWI_ReadByte(twi);
 	} while (readed < quantity);
-	TWI_WaitTransferComplete( twi);
+	TWI_WaitTransferComplete(twi, RECV_TIMEOUT);
 
 	// set rx buffer iterator vars
 	rxBufferIndex = 0;
@@ -110,14 +131,14 @@ void DueWire::beginTransmission(int address) {
 uint8_t DueWire::endTransmission(void) {
 	// transmit buffer (blocking)
 	TWI_StartWrite(twi, txAddress, 0, 0, txBuffer[0]);
-	TWI_WaitByteSent( twi);
+	TWI_WaitByteSent(twi, XMIT_TIMEOUT);
 	int sent = 1;
 	while (sent < txBufferLength) {
 		TWI_WriteByte(twi, txBuffer[sent++]);
-		TWI_WaitByteSent(twi);
+		TWI_WaitByteSent(twi, XMIT_TIMEOUT);
 	}
-	TWI_Stop(twi);
-	TWI_WaitTransferComplete(twi);
+	TWI_Stop( twi);
+	TWI_WaitTransferComplete(twi, XMIT_TIMEOUT);
 
 	// empty buffer
 	txBufferLength = 0;
@@ -175,7 +196,8 @@ int DueWire::peek(void) {
 }
 
 void DueWire::flush(void) {
-	// XXX: to be implemented.
+	// Do nothing, use endTransmission(..) to force
+	// data transfer.
 }
 
 void DueWire::onReceive(void(*function)(int)) {
@@ -190,8 +212,9 @@ void DueWire::onService(void) {
 	// Retrieve interrupt status
 	uint32_t sr = TWI_GetMaskedStatus(twi);
 
-	// Detect if we should go into RECV or SEND status
+	// SLAVE_IDLE status
 	if (status == SLAVE_IDLE) {
+		// Detect if we should go into RECV or SEND status
 		srvBufferLength = 0;
 		if (TWI_STATUS_SVREAD(sr)) {
 			status = SLAVE_RECV;
@@ -200,15 +223,15 @@ void DueWire::onService(void) {
 			status = SLAVE_SEND;
 
 			// Alert calling program to generate a response ASAP
-			if (onRequestCallback != NULL)
+			if (onRequestCallback)
 				onRequestCallback();
 			else
-				// default response
+				// create a default 1-byte response
 				write((uint8_t) 0);
 		}
 	}
 
-	// Receive packet
+	// SLAVE_RECV status: receiving packet
 	if (status == SLAVE_RECV) {
 		if (TWI_STATUS_RXRDY(sr)) {
 			if (srvBufferLength < BUFFER_LENGTH)
@@ -219,7 +242,7 @@ void DueWire::onService(void) {
 			status = SLAVE_IDLE;
 
 			// Alert calling program
-			if (onReceiveCallback != NULL) {
+			if (onReceiveCallback) {
 				// Copy data into rxBuffer
 				// (allows to receive another packet while
 				// the main application reads actual data)
@@ -233,7 +256,7 @@ void DueWire::onService(void) {
 		}
 	}
 
-	// Send packet
+	// SLAVE_SEND status: sending packet
 	if (status == SLAVE_SEND) {
 		if (TWI_STATUS_TXRDY(sr)) {
 			uint8_t c = 0;
@@ -249,13 +272,42 @@ void DueWire::onService(void) {
 	}
 }
 
-DueWire Wire = DueWire(TWI0);
-DueWire Wire2 = DueWire(TWI1);
-
-void TWI0_IrqHandler(void) {
-	Wire.onService();
+#if WIRE_INTERFACES_COUNT > 0
+static void Wire_Init(void) {
+	PMC_EnablePeripheral( WIRE_INTERFACE_ID);
+	PIO_Configure(g_APinDescription[PIN_WIRE_SDA].pPort,
+			g_APinDescription[PIN_WIRE_SDA].ulPinType,
+			g_APinDescription[PIN_WIRE_SDA].ulPin,
+			g_APinDescription[PIN_WIRE_SDA].ulPinConfiguration);
+	PIO_Configure(g_APinDescription[PIN_WIRE_SCL].pPort,
+			g_APinDescription[PIN_WIRE_SCL].ulPinType,
+			g_APinDescription[PIN_WIRE_SCL].ulPin,
+			g_APinDescription[PIN_WIRE_SCL].ulPinConfiguration);
 }
+
+DueWire Wire = DueWire(WIRE_INTERFACE, Wire_Init);
 
 void TWI1_IrqHandler(void) {
-	Wire2.onService();
+	Wire.onService();
 }
+#endif
+
+#if WIRE_INTERFACES_COUNT > 1
+static void Wire1_Init(void) {
+	PMC_EnablePeripheral( WIRE1_INTERFACE_ID);
+	PIO_Configure(g_APinDescription[PIN_WIRE1_SDA].pPort,
+			g_APinDescription[PIN_WIRE1_SDA].ulPinType,
+			g_APinDescription[PIN_WIRE1_SDA].ulPin,
+			g_APinDescription[PIN_WIRE1_SDA].ulPinConfiguration);
+	PIO_Configure(g_APinDescription[PIN_WIRE1_SCL].pPort,
+			g_APinDescription[PIN_WIRE1_SCL].ulPinType,
+			g_APinDescription[PIN_WIRE1_SCL].ulPin,
+			g_APinDescription[PIN_WIRE1_SCL].ulPinConfiguration);
+}
+
+DueWire Wire1 = DueWire(WIRE1_INTERFACE, Wire1_Init);
+
+void TWI0_IrqHandler(void) {
+	Wire1.onService();
+}
+#endif

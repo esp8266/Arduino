@@ -24,8 +24,10 @@
  *----------------------------------------------------------------------------*/
 
 #include "Arduino.h"
+#ifdef __cplusplus
 #include "UARTClass.h"
 #include "USARTClass.h"
+#endif
 
 /**
  * Libc porting layers
@@ -68,6 +70,18 @@
 #define PIN_LED              PIN_LED_13
 #define PIN_LED2             PIN_LED_RXL
 #define PIN_LED3             PIN_LED_TXL
+
+#define WIRE_INTERFACES_COUNT 2
+
+#define PIN_WIRE_SDA         (20u)
+#define PIN_WIRE_SCL         (21u)
+#define WIRE_INTERFACE       TWI1
+#define WIRE_INTERFACE_ID    ID_TWI1
+
+#define PIN_WIRE1_SDA        (68u)
+#define PIN_WIRE1_SCL        (69u)
+#define WIRE1_INTERFACE      TWI0
+#define WIRE1_INTERFACE_ID   ID_TWI0
 
 #define PINS_UART            (80u)
 
