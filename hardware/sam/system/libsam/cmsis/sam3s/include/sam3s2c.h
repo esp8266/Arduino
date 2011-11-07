@@ -1,4 +1,31 @@
-/* $asf_license$ */
+/* ----------------------------------------------------------------------------
+ *         SAM Software Package License 
+ * ----------------------------------------------------------------------------
+ * Copyright (c) 2011, Atmel Corporation
+ *
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the disclaimer below.
+ *
+ * Atmel's name may not be used to endorse or promote products derived from
+ * this software without specific prior written permission.
+ *
+ * DISCLAIMER: THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
+ * DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+ * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+ * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * ----------------------------------------------------------------------------
+ */
 
 #ifndef _SAM3S2C_
 #define _SAM3S2C_
@@ -104,32 +131,32 @@ typedef enum IRQn
 /** \addtogroup SAM3S2C_api Peripheral Software API */
 /*@{*/
 
-#include "component/acc.h"
-#include "component/adc.h"
-#include "component/chipid.h"
-#include "component/crccu.h"
-#include "component/dacc.h"
-#include "component/efc.h"
-#include "component/gpbr.h"
-#include "component/hsmci.h"
-#include "component/matrix.h"
-#include "component/pdc.h"
-#include "component/pio.h"
-#include "component/pmc.h"
-#include "component/pwm.h"
-#include "component/rstc.h"
-#include "component/rtc.h"
-#include "component/rtt.h"
-#include "component/smc.h"
-#include "component/spi.h"
-#include "component/ssc.h"
-#include "component/supc.h"
-#include "component/tc.h"
-#include "component/twi.h"
-#include "component/uart.h"
-#include "component/udp.h"
-#include "component/usart.h"
-#include "component/wdt.h"
+#include "component/component_acc.h"
+#include "component/component_adc.h"
+#include "component/component_chipid.h"
+#include "component/component_crccu.h"
+#include "component/component_dacc.h"
+#include "component/component_efc.h"
+#include "component/component_gpbr.h"
+#include "component/component_hsmci.h"
+#include "component/component_matrix.h"
+#include "component/component_pdc.h"
+#include "component/component_pio.h"
+#include "component/component_pmc.h"
+#include "component/component_pwm.h"
+#include "component/component_rstc.h"
+#include "component/component_rtc.h"
+#include "component/component_rtt.h"
+#include "component/component_smc.h"
+#include "component/component_spi.h"
+#include "component/component_ssc.h"
+#include "component/component_supc.h"
+#include "component/component_tc.h"
+#include "component/component_twi.h"
+#include "component/component_uart.h"
+#include "component/component_udp.h"
+#include "component/component_usart.h"
+#include "component/component_wdt.h"
 /*@}*/
 
 /* ************************************************************************** */
@@ -138,37 +165,37 @@ typedef enum IRQn
 /** \addtogroup SAM3S2C_reg Registers Access Definitions */
 /*@{*/
 
-#include "instance/hsmci.h"
-#include "instance/ssc.h"
-#include "instance/spi.h"
-#include "instance/tc0.h"
-#include "instance/tc1.h"
-#include "instance/twi0.h"
-#include "instance/twi1.h"
-#include "instance/pwm.h"
-#include "instance/usart0.h"
-#include "instance/usart1.h"
-#include "instance/udp.h"
-#include "instance/adc.h"
-#include "instance/dacc.h"
-#include "instance/acc.h"
-#include "instance/crccu.h"
-#include "instance/smc.h"
-#include "instance/matrix.h"
-#include "instance/pmc.h"
-#include "instance/uart0.h"
-#include "instance/chipid.h"
-#include "instance/uart1.h"
-#include "instance/efc.h"
-#include "instance/pioa.h"
-#include "instance/piob.h"
-#include "instance/pioc.h"
-#include "instance/rstc.h"
-#include "instance/supc.h"
-#include "instance/rtt.h"
-#include "instance/wdt.h"
-#include "instance/rtc.h"
-#include "instance/gpbr.h"
+#include "instance/instance_hsmci.h"
+#include "instance/instance_ssc.h"
+#include "instance/instance_spi.h"
+#include "instance/instance_tc0.h"
+#include "instance/instance_tc1.h"
+#include "instance/instance_twi0.h"
+#include "instance/instance_twi1.h"
+#include "instance/instance_pwm.h"
+#include "instance/instance_usart0.h"
+#include "instance/instance_usart1.h"
+#include "instance/instance_udp.h"
+#include "instance/instance_adc.h"
+#include "instance/instance_dacc.h"
+#include "instance/instance_acc.h"
+#include "instance/instance_crccu.h"
+#include "instance/instance_smc.h"
+#include "instance/instance_matrix.h"
+#include "instance/instance_pmc.h"
+#include "instance/instance_uart0.h"
+#include "instance/instance_chipid.h"
+#include "instance/instance_uart1.h"
+#include "instance/instance_efc.h"
+#include "instance/instance_pioa.h"
+#include "instance/instance_piob.h"
+#include "instance/instance_pioc.h"
+#include "instance/instance_rstc.h"
+#include "instance/instance_supc.h"
+#include "instance/instance_rtt.h"
+#include "instance/instance_wdt.h"
+#include "instance/instance_rtc.h"
+#include "instance/instance_gpbr.h"
 /*@}*/
 
 /* ************************************************************************** */
@@ -316,7 +343,7 @@ typedef enum IRQn
 /** \addtogroup SAM3S2C_pio Peripheral Pio Definitions */
 /*@{*/
 
-#include "pio/sam3s2c.h"
+#include "pio/pio_sam3s2c.h"
 /*@}*/
 
 /* ************************************************************************** */
@@ -337,6 +364,21 @@ typedef enum IRQn
 #define EBI_CS1_ADDR (0x61000000u) /**< EBI Chip Select 1 base address */
 #define EBI_CS2_ADDR (0x62000000u) /**< EBI Chip Select 2 base address */
 #define EBI_CS3_ADDR (0x63000000u) /**< EBI Chip Select 3 base address */
+
+/* ************************************************************************** */
+/*   ELECTRICAL DEFINITIONS FOR SAM3S2C */
+/* ************************************************************************** */
+
+/* Device characteristics */
+
+#define CHIP_FREQ_SLCK_RC_MIN               (20000U)
+#define CHIP_FREQ_SLCK_RC                   (32000U)
+#define CHIP_FREQ_SLCK_RC_MAX               (44000U)
+#define CHIP_FREQ_MAINCK_RC_4MHZ            (4000000U)
+#define CHIP_FREQ_MAINCK_RC_8MHZ            (8000000U)
+#define CHIP_FREQ_MAINCK_RC_12MHZ           (12000000U)
+#define CHIP_FREQ_CPU_MAX                   (64000000U)
+#define CHIP_FLASH_WAIT_STATE               (3U)
 
 #ifdef __cplusplus
 }
