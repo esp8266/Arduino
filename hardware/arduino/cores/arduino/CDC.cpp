@@ -27,7 +27,7 @@ void Reboot()
 {
 	USB.detach();
 	cli();
-	asm volatile("jmp 0x7000");		// jump to bootloader - DiskLoader lives in the last 4kB of Flash
+	asm volatile("jmp 0x7800");		// jump to bootloader - DiskLoader takes up last 2 kB
 }
 
 typedef struct

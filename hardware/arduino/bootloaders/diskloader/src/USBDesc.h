@@ -16,19 +16,48 @@
 ** SOFTWARE.  
 */
 
-#define CDC_INTERFACE_COUNT	2
-#define CDC_ENPOINT_COUNT	3
+
+#ifdef CDC_ENABLED
 
 #define CDC_ACM_INTERFACE	0	// CDC ACM
 #define CDC_DATA_INTERFACE	1	// CDC Data
-#define CDC_FIRST_ENDPOINT	1
-#define CDC_ENDPOINT_ACM	(CDC_FIRST_ENDPOINT)							// CDC First
-#define CDC_ENDPOINT_OUT	(CDC_FIRST_ENDPOINT+1)
-#define CDC_ENDPOINT_IN		(CDC_FIRST_ENDPOINT+2)
+#define CDC_ENDPOINT_ACM	1
+#define CDC_ENDPOINT_OUT	2
+#define CDC_ENDPOINT_IN		3
 
-#define CDC_RX CDC_ENDPOINT_OUT
-#define CDC_TX CDC_ENDPOINT_IN
+#define HID_INTERFACE		2	// HID Interface
+#define HID_ENDPOINT_INT	4
+
+#define INTERFACE_COUNT		3	// 2 for cdc + 1 for hid
+
+#else 
+
+#define HID_INTERFACE		2	// HID Interface
+#define HID_ENDPOINT_INT	4
+
+#define INTERFACE_COUNT		1	// 1 for hid
+
+#endif
+
+typedef struct
+{
+	ConfigDescriptor	config;
+#ifdef CDC_ENABLED
+	CDCDescriptor		cdc;
+#endif
+	HIDDescriptor		hid;
+} Config;
+
+extern Config USB_ConfigDescriptor PROGMEM;
+extern DeviceDescriptor USB_DeviceDescriptor PROGMEM;
+extern DeviceDescriptor USB_DeviceDescriptorA PROGMEM;
+
+extern const u16 STRING_LANGUAGE[2] PROGMEM;
+extern const u16 STRING_IPRODUCT[28] PROGMEM;
+extern const u16 STRING_IMANUFACTURER[12] PROGMEM;
 
 #define IMANUFACTURER	1
 #define IPRODUCT		2
 
+#define CDC_TX CDC_ENDPOINT_IN
+#define CDC_RX CDC_ENDPOINT_OUT

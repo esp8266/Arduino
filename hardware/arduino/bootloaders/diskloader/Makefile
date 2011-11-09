@@ -14,9 +14,9 @@ AVR_FREQ   = 16000000L
 # Specify the Arduino model using the assigned PID.  This is used by Descriptors.c
 #   to set PID and product descriptor string
 # Arduino Leonardo PID
-ARDUINO_MODEL_PID = 0x0032
+ARDUINO_MODEL_PID = 0x0034
 # Arduino Micro PID
-#ARDUINO_MODEL_PID = 0x0033
+#ARDUINO_MODEL_PID = 0x0035
 
 # Change if your programmer is different
 AVRDUDE_PROGRAMMER = avrispmkII
@@ -40,7 +40,9 @@ ASMFLAGS += -x assembler-with-cpp -Wa,-gdwarf2
 
 ## Linker flags
 LDFLAGS = $(COMMON)
-LDFLAGS += -Wl,-gc-sections,-Map=DiskLoader.map,--section-start=.text=0x7000,--relax
+LDFLAGS += -Wl,-gc-sections,-Map=DiskLoader.map,--section-start=.text=0x7800,--relax
+LDFLAGS += -nodefaultlibs -nostartfiles
+
 
 ## Intel Hex file production flags
 HEX_EEPROM_FLAGS = -j .eeprom
@@ -100,4 +102,4 @@ size: $(TARGET)
 #	@avr-size -C --mcu=${MCU} ${TARGET}.elf
 
 program: $(TARGET).hex
-	$(AVRDUDE) $(AVRDUDE_FLAGS) -B 1 -u -U flash:w:$(TARGET).hex
+	$(AVRDUDE) $(AVRDUDE_FLAGS) -B 5 -u -U flash:w:$(TARGET).hex
