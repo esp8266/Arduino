@@ -86,10 +86,10 @@ ServiceBinary=%12%\%DRIVERFILENAME%.sys
 [SourceDisksFiles]
 [SourceDisksNames]
 [DeviceList]
-%DESCRIPTION%=DriverInstall, USB\VID_2341&PID_0042
+%DESCRIPTION%=DriverInstall, USB\VID_2341&PID_003F
 
 [DeviceList.NTamd64]
-%DESCRIPTION%=DriverInstall, USB\VID_2341&PID_0042
+%DESCRIPTION%=DriverInstall, USB\VID_2341&PID_003F
 
 
 ;------------------------------------------------------------------------------
@@ -101,6 +101,6 @@ ServiceBinary=%12%\%DRIVERFILENAME%.sys
 MFGFILENAME="CDC_vista"
 DRIVERFILENAME ="usbser"
 MFGNAME="Arduino LLC (www.arduino.cc)"
-INSTDISK="Arduino Mega 2560 R3 Driver Installer"
-DESCRIPTION="Arduino Mega 2560 R3"
+INSTDISK="Arduino Mega ADK Driver Installer"
+DESCRIPTION="Arduino Mega ADK"
 SERVICE="USB RS-232 Emulation Driver"
