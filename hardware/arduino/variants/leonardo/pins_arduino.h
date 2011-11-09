@@ -35,28 +35,29 @@
 #define RXLED0			PORTB |= (1<<0)
 #define RXLED1			PORTB &= ~(1<<0)
 
+const static uint8_t SDA = 2;
+const static uint8_t SCL = 3;
+
 // Map SPI port to 'new' pins D14..D17
-// D14				PB0					RXLED,SS/PCINT0
-// D15				PB1					SCK,PCINT1
-// D16				PB2					MOSI,PCINT2
-// D17				PB3					MISO,PCINT3
 const static uint8_t SS   = 14;
 const static uint8_t MOSI = 16;
 const static uint8_t MISO = 17;
 const static uint8_t SCK  = 15;
 
+// Mapping of analog pins as digital I/O
+// A6-A11 are already shared with digital pins
 const static uint8_t A0 = 14;
 const static uint8_t A1 = 15;
 const static uint8_t A2 = 16;
 const static uint8_t A3 = 17;
 const static uint8_t A4 = 18;
 const static uint8_t A5 = 19;
-const static uint8_t A6 = 20;
-const static uint8_t A7 = 21;
-const static uint8_t A8 = 22;
-const static uint8_t A9 = 23;
-const static uint8_t A10 = 24;
-const static uint8_t A11 = 25;
+const static uint8_t A6 = 4;
+const static uint8_t A7 = 6;
+const static uint8_t A8 = 9;
+const static uint8_t A9 = 10;
+const static uint8_t A10 = 12;
+const static uint8_t A11 = 8;
 
 //	__AVR_ATmega32U4__ has an unusual mapping of pins to channels
 extern const uint8_t PROGMEM analog_pin_to_channel_PGM[];
@@ -76,14 +77,14 @@ extern const uint8_t PROGMEM analog_pin_to_channel_PGM[];
 // D3#				PD0		PWM8/SCL	OC0B/SCL/INT0
 // D4		A6		PD4					ADC8
 // D5#				PC6		???			OC3A/#OC4A
-// D6#		A8		PD7		FastPWM		#OC4D/ADC10
+// D6#		A7		PD7		FastPWM		#OC4D/ADC10
 // D7		Ain0	PE6					INT6/AIN0
 //
-// D8		A9		PB4					ADC11/PCINT4
-// D9#		A10		PB5		PWM16		OC1A/#OC4B/ADC12/PCINT5
-// D10#		A11		PB6		PWM16		OC1B/0c4B/ADC13/PCINT6
+// D8		A11		PB4					ADC11/PCINT4
+// D9#		A8		PB5		PWM16		OC1A/#OC4B/ADC12/PCINT5
+// D10#		A9		PB6		PWM16		OC1B/0c4B/ADC13/PCINT6
 // D11#				PB7		PWM8/16		0C0A/OC1C/#RTS/PCINT7
-// D12		A7		PD6					T1/#OC4D/ADC9
+// D12		A10		PD6					T1/#OC4D/ADC9
 // D13#				PC7		PWM10		CLK0/OC4A
 //
 //			A0		PF7					ADC7
@@ -208,18 +209,18 @@ const uint8_t PROGMEM digital_pin_to_timer_PGM[18] = {
 };
 
 const uint8_t PROGMEM analog_pin_to_channel_PGM[12] = {
-	7,	//			A0		PF7					ADC7
-	6,	//			A1		PF6					ADC6
-	5,	//			A2		PF5					ADC5
-	4,	//			A3		PF4					ADC4
-	1,	//			A4		PF1					ADC1
-	0,	//			A5		PF0					ADC0
-	8,	// D4		A6		PD4					ADC8
-	9,	// D12		A7		PD6					T1/#OC4D/ADC9
-	10,	// D6#		A8		PD7		FastPWM		#OC4D/ADC10
-	11,	// D8		A9		PB4					ADC11/PCINT4
-	12,	// D9#		A10		PB5		PWM16		OC1A/#OC4B/ADC12/PCINT5
-	13	// D10#		A11		PB6		PWM16		OC1B/0c4B/ADC13/PCINT6	
+	7,	// A0				PF7					ADC7
+	6,	// A1				PF6					ADC6	
+	5,	// A2				PF5					ADC5	
+	4,	// A3				PF4					ADC4
+	1,	// A4				PF1					ADC1	
+	0,	// A5				PF0					ADC0	
+	8,	// A6		D4		PD4					ADC8
+	10,	// A7		D6		PD7					ADC10
+	12,	// A8		D9		PB5					ADC12
+	13,	// A9		D10		PB6					ADC13
+	9,	// A10		D12		PD6					ADC9
+	11	// A11		D8		PB4					ADC11
 };
 
 #endif /* ARDUINO_MAIN */
