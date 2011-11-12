@@ -1,6 +1,7 @@
 /*
- * DueWire.cpp - TWI/I2C library Arduino Due
- * Copyright (c) 2011 Cristian Maglie.  All right reserved.
+ * TwoWire.h - TWI/I2C library for Arduino Due
+ * Copyright (c) 2011 Cristian Maglie <c.maglie@bug.st>.
+ * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -62,33 +63,50 @@ static inline bool TWI_STATUS_SVREAD(uint32_t status) {
 	return (status & TWI_SR_SVREAD) == TWI_SR_SVREAD;
 }
 
-DueWire::DueWire(Twi *_twi, void(*_beginCb)(void)) :
+static inline bool TWI_STATUS_SVACC(uint32_t status) {
+	return (status & TWI_SR_SVACC) == TWI_SR_SVACC;
+}
+
+static inline bool TWI_STATUS_GACC(uint32_t status) {
+	return (status & TWI_SR_GACC) == TWI_SR_GACC;
+}
+
+static inline bool TWI_STATUS_EOSACC(uint32_t status) {
+	return (status & TWI_SR_EOSACC) == TWI_SR_EOSACC;
+}
+
+static inline bool TWI_STATUS_NACK(uint32_t status) {
+	return (status & TWI_SR_NACK) == TWI_SR_NACK;
+}
+
+TwoWire::TwoWire(Twi *_twi, void(*_beginCb)(void)) :
 	twi(_twi), rxBufferIndex(0), rxBufferLength(0), txAddress(0),
 			txBufferLength(0), srvBufferIndex(0), srvBufferLength(0), status(
 					UNINITIALIZED), onBeginCallback(_beginCb) {
 	// Empty
 }
 
-void DueWire::begin(void) {
+void TwoWire::begin(void) {
 	if (onBeginCallback)
 		onBeginCallback();
 	TWI_ConfigureMaster(twi, TWI_CLOCK, VARIANT_MCK);
 	status = MASTER_IDLE;
 }
 
-void DueWire::begin(uint8_t address) {
+void TwoWire::begin(uint8_t address) {
 	if (onBeginCallback)
 		onBeginCallback();
 	TWI_ConfigureSlave(twi, address);
 	status = SLAVE_IDLE;
-	TWI_EnableIt(twi, TWI_IER_RXRDY | TWI_IER_TXRDY | TWI_IER_TXCOMP);
+	TWI_EnableIt(twi, TWI_IER_SVACC);
+	//| TWI_IER_RXRDY | TWI_IER_TXRDY	| TWI_IER_TXCOMP);
 }
 
-void DueWire::begin(int address) {
+void TwoWire::begin(int address) {
 	begin((uint8_t) address);
 }
 
-uint8_t DueWire::requestFrom(uint8_t address, uint8_t quantity) {
+uint8_t TwoWire::requestFrom(uint8_t address, uint8_t quantity) {
 	if (quantity > BUFFER_LENGTH)
 		quantity = BUFFER_LENGTH;
 
@@ -112,11 +130,11 @@ uint8_t DueWire::requestFrom(uint8_t address, uint8_t quantity) {
 	return readed;
 }
 
-uint8_t DueWire::requestFrom(int address, int quantity) {
+uint8_t TwoWire::requestFrom(int address, int quantity) {
 	return requestFrom((uint8_t) address, (uint8_t) quantity);
 }
 
-void DueWire::beginTransmission(uint8_t address) {
+void TwoWire::beginTransmission(uint8_t address) {
 	status = MASTER_SEND;
 
 	// save address of target and empty buffer
@@ -124,11 +142,11 @@ void DueWire::beginTransmission(uint8_t address) {
 	txBufferLength = 0;
 }
 
-void DueWire::beginTransmission(int address) {
+void TwoWire::beginTransmission(int address) {
 	beginTransmission((uint8_t) address);
 }
 
-uint8_t DueWire::endTransmission(void) {
+uint8_t TwoWire::endTransmission(void) {
 	// transmit buffer (blocking)
 	TWI_StartWrite(twi, txAddress, 0, 0, txBuffer[0]);
 	TWI_WaitByteSent(twi, XMIT_TIMEOUT);
@@ -147,7 +165,7 @@ uint8_t DueWire::endTransmission(void) {
 	return sent;
 }
 
-void DueWire::write(uint8_t data) {
+void TwoWire::write(uint8_t data) {
 	if (status == MASTER_SEND) {
 		if (txBufferLength >= BUFFER_LENGTH)
 			return;
@@ -155,11 +173,11 @@ void DueWire::write(uint8_t data) {
 	} else {
 		if (srvBufferLength >= BUFFER_LENGTH)
 			return;
-		srvBuffer[srvBufferIndex++] = data;
+		srvBuffer[srvBufferLength++] = data;
 	}
 }
 
-void DueWire::write(const uint8_t *data, size_t quantity) {
+void TwoWire::write(const uint8_t *data, size_t quantity) {
 	if (status == MASTER_SEND) {
 		for (size_t i = 0; i < quantity; ++i) {
 			if (txBufferLength >= BUFFER_LENGTH)
@@ -175,51 +193,56 @@ void DueWire::write(const uint8_t *data, size_t quantity) {
 	}
 }
 
-void DueWire::write(const char *data) {
+void TwoWire::write(const char *data) {
 	write((uint8_t*) data, strlen(data));
 }
 
-int DueWire::available(void) {
+int TwoWire::available(void) {
 	return rxBufferLength - rxBufferIndex;
 }
 
-int DueWire::read(void) {
+int TwoWire::read(void) {
 	if (rxBufferIndex < rxBufferLength)
 		return rxBuffer[rxBufferIndex++];
 	return -1;
 }
 
-int DueWire::peek(void) {
+int TwoWire::peek(void) {
 	if (rxBufferIndex < rxBufferLength)
 		return rxBuffer[rxBufferIndex];
 	return -1;
 }
 
-void DueWire::flush(void) {
+void TwoWire::flush(void) {
 	// Do nothing, use endTransmission(..) to force
 	// data transfer.
 }
 
-void DueWire::onReceive(void(*function)(int)) {
+void TwoWire::onReceive(void(*function)(int)) {
 	onReceiveCallback = function;
 }
 
-void DueWire::onRequest(void(*function)(void)) {
+void TwoWire::onRequest(void(*function)(void)) {
 	onRequestCallback = function;
 }
 
-void DueWire::onService(void) {
+void TwoWire::onService(void) {
 	// Retrieve interrupt status
-	uint32_t sr = TWI_GetMaskedStatus(twi);
+	uint32_t sr = TWI_GetStatus(twi);
 
-	// SLAVE_IDLE status
-	if (status == SLAVE_IDLE) {
-		// Detect if we should go into RECV or SEND status
+	if (status == SLAVE_IDLE && TWI_STATUS_SVACC(sr)) {
+		TWI_DisableIt(twi, TWI_IDR_SVACC);
+		TWI_EnableIt(twi, TWI_IER_RXRDY | TWI_IER_GACC | TWI_IER_NACK
+				| TWI_IER_EOSACC | TWI_IER_SCL_WS | TWI_IER_TXCOMP);
+
 		srvBufferLength = 0;
-		if (TWI_STATUS_SVREAD(sr)) {
+		srvBufferIndex = 0;
+
+		// Detect if we should go into RECV or SEND status
+		// SVREAD==1 means *master* reading -> SLAVE_SEND
+		if (!TWI_STATUS_SVREAD(sr)) {
 			status = SLAVE_RECV;
 		} else {
-			srvBufferIndex = 0;
 			status = SLAVE_SEND;
 
 			// Alert calling program to generate a response ASAP
@@ -231,43 +254,42 @@ void DueWire::onService(void) {
 		}
 	}
 
-	// SLAVE_RECV status: receiving packet
-	if (status == SLAVE_RECV) {
-		if (TWI_STATUS_RXRDY(sr)) {
-			if (srvBufferLength < BUFFER_LENGTH)
-				srvBuffer[srvBufferLength++] = TWI_ReadByte(twi);
-		}
-		if (TWI_STATUS_TXCOMP(sr)) {
-			// Receive completed
-			status = SLAVE_IDLE;
-
-			// Alert calling program
-			if (onReceiveCallback) {
+	if (status != SLAVE_IDLE) {
+		if (TWI_STATUS_TXCOMP(sr) && TWI_STATUS_EOSACC(sr)) {
+			if (status == SLAVE_RECV && onReceiveCallback) {
 				// Copy data into rxBuffer
-				// (allows to receive another packet while
-				// the main application reads actual data)
+				// (allows to receive another packet while the
+				// user program reads actual data)
 				for (uint8_t i = 0; i < srvBufferLength; ++i)
 					rxBuffer[i] = srvBuffer[i];
 				rxBufferIndex = 0;
 				rxBufferLength = srvBufferLength;
 
+				// Alert calling program
 				onReceiveCallback( rxBufferLength);
 			}
+
+			// Transfer completed
+			TWI_EnableIt(twi, TWI_SR_SVACC);
+			TWI_DisableIt(twi, TWI_IDR_RXRDY | TWI_IDR_GACC | TWI_IDR_NACK
+					| TWI_IDR_EOSACC | TWI_IDR_SCL_WS | TWI_IER_TXCOMP);
+			status = SLAVE_IDLE;
 		}
 	}
 
-	// SLAVE_SEND status: sending packet
+	if (status == SLAVE_RECV) {
+		if (TWI_STATUS_RXRDY(sr)) {
+			if (srvBufferLength < BUFFER_LENGTH)
+				srvBuffer[srvBufferLength++] = TWI_ReadByte(twi);
+		}
+	}
+
 	if (status == SLAVE_SEND) {
-		if (TWI_STATUS_TXRDY(sr)) {
-			uint8_t c = 0;
+		if (TWI_STATUS_TXRDY(sr) && !TWI_STATUS_NACK(sr)) {
+			uint8_t c = 'x';
 			if (srvBufferIndex < srvBufferLength)
 				c = srvBuffer[srvBufferIndex++];
 			TWI_WriteByte(twi, c);
-		}
-
-		if (TWI_STATUS_TXCOMP(sr)) {
-			// Transmission complete
-			status = SLAVE_IDLE;
 		}
 	}
 }
@@ -283,11 +305,16 @@ static void Wire_Init(void) {
 			g_APinDescription[PIN_WIRE_SCL].ulPinType,
 			g_APinDescription[PIN_WIRE_SCL].ulPin,
 			g_APinDescription[PIN_WIRE_SCL].ulPinConfiguration);
+
+	NVIC_DisableIRQ(TWI1_IRQn);
+	NVIC_ClearPendingIRQ(TWI1_IRQn);
+	NVIC_SetPriority(TWI1_IRQn, 0);
+	NVIC_EnableIRQ(TWI1_IRQn);
 }
 
-DueWire Wire = DueWire(WIRE_INTERFACE, Wire_Init);
+TwoWire Wire = TwoWire(WIRE_INTERFACE, Wire_Init);
 
-void TWI1_IrqHandler(void) {
+void WIRE_ISR_HANDLER(void) {
 	Wire.onService();
 }
 #endif
@@ -305,9 +332,9 @@ static void Wire1_Init(void) {
 			g_APinDescription[PIN_WIRE1_SCL].ulPinConfiguration);
 }
 
-DueWire Wire1 = DueWire(WIRE1_INTERFACE, Wire1_Init);
+TwoWire Wire1 = TwoWire(WIRE1_INTERFACE, Wire1_Init);
 
-void TWI0_IrqHandler(void) {
+void WIRE1_ISR_HANDLER(void) {
 	Wire1.onService();
 }
 #endif

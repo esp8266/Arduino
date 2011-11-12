@@ -77,11 +77,13 @@
 #define PIN_WIRE_SCL         (21u)
 #define WIRE_INTERFACE       TWI1
 #define WIRE_INTERFACE_ID    ID_TWI1
+#define WIRE_ISR_HANDLER     TWI1_IrqHandler
 
 #define PIN_WIRE1_SDA        (68u)
 #define PIN_WIRE1_SCL        (69u)
 #define WIRE1_INTERFACE      TWI0
 #define WIRE1_INTERFACE_ID   ID_TWI0
+#define WIRE1_ISR_HANDLER    TWI0_IrqHandler
 
 #define PINS_UART            (80u)
 

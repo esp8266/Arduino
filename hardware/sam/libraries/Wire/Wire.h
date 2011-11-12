@@ -1,7 +1,7 @@
 /*
- * DueWire.h - TWI/I2C library for Arduino Due
+ * TwoWire.h - TWI/I2C library for Arduino Due
  * Copyright (c) 2011 Cristian Maglie <c.maglie@bug.st>.
- * All right reserved.
+ * All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,8 +18,8 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef DueWire_h
-#define DueWire_h
+#ifndef TwoWire_h
+#define TwoWire_h
 
 #include "Stream.h"
 #include "twi.h"
@@ -27,9 +27,9 @@
 
 #define BUFFER_LENGTH 32
 
-class DueWire: public Stream {
+class TwoWire: public Stream {
 public:
-	DueWire(Twi *twi, void(*begin_cb)(void));
+	TwoWire(Twi *twi, void(*begin_cb)(void));
 	void begin();
 	void begin(uint8_t);
 	void begin(int);
@@ -77,7 +77,7 @@ private:
 	Twi *twi;
 
 	// TWI state
-	enum DueWireStatus {
+	enum TwoWireStatus {
 		UNINITIALIZED,
 		MASTER_IDLE,
 		MASTER_SEND,
@@ -86,7 +86,7 @@ private:
 		SLAVE_RECV,
 		SLAVE_SEND
 	};
-	DueWireStatus status;
+	TwoWireStatus status;
 
 	// TWI clock frequency
 	static const uint32_t TWI_CLOCK = 100000;
@@ -97,10 +97,10 @@ private:
 };
 
 #if WIRE_INTERFACES_COUNT > 0
-extern DueWire Wire;
+extern TwoWire Wire;
 #endif
 #if WIRE_INTERFACES_COUNT > 1
-extern DueWire Wire1;
+extern TwoWire Wire1;
 #endif
 
 #endif
