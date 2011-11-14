@@ -120,10 +120,8 @@ void UARTClass::flush( void )
 void UARTClass::write( const uint8_t uc_data )
 {
   /* Check if the transmitter is ready */
-  if ( (_pUart->UART_SR & UART_SR_TXRDY) != UART_SR_TXRDY )
-  {
-      return ;
-  }
+  while ( (_pUart->UART_SR & UART_SR_TXRDY) != UART_SR_TXRDY )
+    ;
 
   /* Send character */
   _pUart->UART_THR = uc_data ;
