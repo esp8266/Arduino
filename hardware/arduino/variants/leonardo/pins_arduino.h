@@ -54,10 +54,10 @@ const static uint8_t A4 = 18;
 const static uint8_t A5 = 19;
 const static uint8_t A6 = 4;
 const static uint8_t A7 = 6;
-const static uint8_t A8 = 9;
-const static uint8_t A9 = 10;
-const static uint8_t A10 = 12;
-const static uint8_t A11 = 8;
+const static uint8_t A8 = 8;
+const static uint8_t A9 = 9;
+const static uint8_t A10 = 10;
+const static uint8_t A11 = 12;
 
 //	__AVR_ATmega32U4__ has an unusual mapping of pins to channels
 extern const uint8_t PROGMEM analog_pin_to_channel_PGM[];
@@ -217,10 +217,10 @@ const uint8_t PROGMEM analog_pin_to_channel_PGM[12] = {
 	0,	// A5				PF0					ADC0	
 	8,	// A6		D4		PD4					ADC8
 	10,	// A7		D6		PD7					ADC10
-	12,	// A8		D9		PB5					ADC12
-	13,	// A9		D10		PB6					ADC13
-	9,	// A10		D12		PD6					ADC9
-	11	// A11		D8		PB4					ADC11
+	11,	// A8		D8		PB4					ADC11
+	12,	// A9		D9		PB5					ADC12
+	13,	// A10		D10		PB6					ADC13
+	9	// A11		D12		PD6					ADC9
 };
 
 #endif /* ARDUINO_MAIN */
