@@ -45,19 +45,19 @@ const static uint8_t MISO = 17;
 const static uint8_t SCK  = 15;
 
 // Mapping of analog pins as digital I/O
-// A6-A11 are already shared with digital pins
-const static uint8_t A0 = 14;
-const static uint8_t A1 = 15;
-const static uint8_t A2 = 16;
-const static uint8_t A3 = 17;
-const static uint8_t A4 = 18;
-const static uint8_t A5 = 19;
-const static uint8_t A6 = 4;
-const static uint8_t A7 = 6;
-const static uint8_t A8 = 8;
-const static uint8_t A9 = 9;
-const static uint8_t A10 = 10;
-const static uint8_t A11 = 12;
+// A6-A11 share with digital pins
+const static uint8_t A0 = 18;
+const static uint8_t A1 = 19;
+const static uint8_t A2 = 20;
+const static uint8_t A3 = 21;
+const static uint8_t A4 = 22;
+const static uint8_t A5 = 23;
+const static uint8_t A6 = 24;	// D4
+const static uint8_t A7 = 25;	// D6
+const static uint8_t A8 = 26;	// D8
+const static uint8_t A9 = 27;	// D9
+const static uint8_t A10 = 28;	// D10
+const static uint8_t A11 = 29;	// D12
 
 //	__AVR_ATmega32U4__ has an unusual mapping of pins to channels
 extern const uint8_t PROGMEM analog_pin_to_channel_PGM[];
