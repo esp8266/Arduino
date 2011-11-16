@@ -55,9 +55,11 @@ extern DeviceDescriptor USB_DeviceDescriptorA PROGMEM;
 extern const u16 STRING_LANGUAGE[2] PROGMEM;
 extern const u16 STRING_IPRODUCT[28] PROGMEM;
 extern const u16 STRING_IMANUFACTURER[12] PROGMEM;
+extern const u16 STRING_SERIAL[13] PROGMEM;
 
 #define IMANUFACTURER	1
 #define IPRODUCT		2
+#define ISERIAL			3
 
 #define CDC_TX CDC_ENDPOINT_IN
 #define CDC_RX CDC_ENDPOINT_OUT

@@ -24,6 +24,8 @@ typedef unsigned long u32;
 #define USB_VID 0x2341	// arduino LLC vid
 #define USB_PID ARDUINO_MODEL_PID	// passed in by Makefile - 0x0034 for Leonardo, 0x0035 for MIcro
 
+#define USB_SERIAL_STRING	'0','0','0','0','0','0','0','0','1','7','0','1'
+
 #define OEM_NAME		'l','e','o','n','a','r','d','o'					// 8 chars
 #define BOARD_INIT()	DDRC |= (1<<7); DDRB |= (1<<0); DDRD |= (1<<5); CPU_PRESCALE(0); DISABLE_JTAG();
 #define LED0			PORTC &= ~(1<<7)

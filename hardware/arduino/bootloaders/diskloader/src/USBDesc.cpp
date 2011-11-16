@@ -27,6 +27,10 @@ const u16 STRING_LANGUAGE[2] = {
 	0x0409	// English
 };
 
+const u16 STRING_SERIAL[13] = {
+	(3<<8) | (2+2*12),
+	USB_SERIAL_STRING
+};
 
 const u16 STRING_IPRODUCT[28] = {
 	(3<<8) | (2+2*27),
@@ -44,10 +48,11 @@ const u16 STRING_IMANUFACTURER[12] = {
 
 
 //#ifdef CDC_ENABLED
-DeviceDescriptor USB_DeviceDescriptorA = D_DEVICE(0X02,0X00,0X00,64,USB_VID,USB_PID,0x100,IMANUFACTURER,IPRODUCT,0,1);
+DeviceDescriptor USB_DeviceDescriptorA = D_DEVICE(0X02,0X00,0X00,64,USB_VID,USB_PID,0x100,0,IPRODUCT,ISERIAL,1);
 //#else
-DeviceDescriptor USB_DeviceDescriptor = D_DEVICE(0x00,0x00,0x00,64,USB_VID,USB_PID,0x100,IMANUFACTURER,IPRODUCT,0,1);
+DeviceDescriptor USB_DeviceDescriptor = D_DEVICE(0x00,0x00,0x00,64,USB_VID,USB_PID,0x100,0,IPRODUCT,ISERIAL,1);
 //#endif
+
 
 Config USB_ConfigDescriptor =
 {
