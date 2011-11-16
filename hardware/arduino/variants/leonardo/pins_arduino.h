@@ -39,9 +39,9 @@ const static uint8_t SDA = 2;
 const static uint8_t SCL = 3;
 
 // Map SPI port to 'new' pins D14..D17
-const static uint8_t SS   = 14;
+const static uint8_t SS   = 17;
 const static uint8_t MOSI = 16;
-const static uint8_t MISO = 17;
+const static uint8_t MISO = 14;
 const static uint8_t SCK  = 15;
 
 // Mapping of analog pins as digital I/O
@@ -78,28 +78,28 @@ extern const uint8_t PROGMEM analog_pin_to_channel_PGM[];
 // D4		A6		PD4					ADC8
 // D5#				PC6		???			OC3A/#OC4A
 // D6#		A7		PD7		FastPWM		#OC4D/ADC10
-// D7		Ain0	PE6					INT6/AIN0
+// D7				PE6					INT6/AIN0
 //
-// D8		A11		PB4					ADC11/PCINT4
-// D9#		A8		PB5		PWM16		OC1A/#OC4B/ADC12/PCINT5
-// D10#		A9		PB6		PWM16		OC1B/0c4B/ADC13/PCINT6
+// D8		A8		PB4					ADC11/PCINT4
+// D9#		A9		PB5		PWM16		OC1A/#OC4B/ADC12/PCINT5
+// D10#		A10		PB6		PWM16		OC1B/0c4B/ADC13/PCINT6
 // D11#				PB7		PWM8/16		0C0A/OC1C/#RTS/PCINT7
-// D12		A10		PD6					T1/#OC4D/ADC9
+// D12		A11		PD6					T1/#OC4D/ADC9
 // D13#				PC7		PWM10		CLK0/OC4A
 //
-//			A0		PF7					ADC7
-//			A1		PF6					ADC6
-//			A2		PF5					ADC5
-//			A3		PF4					ADC4
-//			A4		PF1					ADC1
-//			A5		PF0					ADC0
+// A0		D18		PF7					ADC7
+// A1		D19		PF6					ADC6
+// A2		D20 	PF5					ADC5
+// A3		D21 	PF4					ADC4
+// A4		D22		PF1					ADC1
+// A5		D23 	PF0					ADC0
 //
 // New pins D14..D17 to map SPI port to digitial pins
 //
-// D14				PB0					RXLED,SS/PCINT0
-// D15				PB1					SCK,PCINT1
-// D16				PB2					MOSI,PCINT2
-// D17				PB3					MISO,PCINT3
+// MISO		D14		PB3					MISO,PCINT3
+// SCK		D15		PB1					SCK,PCINT1
+// MOSI		D16		PB2					MOSI,PCINT2
+// SS		D17		PB0					RXLED,SS/PCINT0
 //
 // TXLED			PD5
 // RXLED		    PB0
