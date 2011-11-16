@@ -35,7 +35,7 @@ extern "C"{
 
 #define clockCyclesPerMicrosecond() ( SystemCoreClock / 1000000L )
 #define clockCyclesToMicroseconds(a) ( ((a) * 1000L) / (SystemCoreClock / 1000L) )
-#define microsecondsToClockCycles(a) ( ((a) * (SystemCoreClock / 1000L)) / 1000L )
+#define microsecondsToClockCycles(a) ( (a) * (SystemCoreClock / 1000000L) )
 
 
 #include "wiring.h"
@@ -53,7 +53,7 @@ extern void loop( void ) ;
 //
 // These perform slightly better as macros compared to inline functions
 //
-#define digitalPinToPort( ulPin )    ( g_APinDescription[ulPin]->pPort )
+#define digitalPinToPort( ulPin )    ( g_APinDescription[ulPin]->pPort->PIO_PDSR )
 #define digitalPinToBitMask( ulPin ) ( g_APinDescription[ulPin]->dwPin )
 #define digitalPinToTimer( P )   (  )
 #define analogInPinToBit( P )    ( P )
@@ -83,7 +83,7 @@ typedef enum _EExt_Interrupts
 typedef void (*voidFuncPtr)( void ) ;
 
 /* Define attribute */
-#if defined   ( __CC_ARM   ) /* Keil µVision 4 */
+#if defined   ( __CC_ARM   ) /* Keil Vision 4 */
     #define WEAK (__attribute__ ((weak)))
 #elif defined ( __ICCARM__ ) /* IAR Ewarm 5.41+ */
     #define WEAK __weak
@@ -147,6 +147,7 @@ extern const PinDescription g_APinDescription[] ;
 #include "Tone.h"
 #include "WMath.h"
 #include "HardwareSerial.h"
+#include "wiring_pulse.h"
 #endif // __cplusplus
 
 #endif // Arduino_h
