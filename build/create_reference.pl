@@ -9,10 +9,14 @@
 use strict;
 use warnings;
 
-my $verbose = 1;
-my $CURL_OPTIONS = '--silent --show-error';
+print "username: "; my $user = <STDIN>; chomp($user);
+print "password: "; my $pass = <STDIN>; chomp($pass);
 
-my $ARDUINO = 'http://arduino.cc/en'; # base url for arduino site
+my $verbose = 1;
+my $CURL_OPTIONS = "--silent --show-error -u $user:$pass"; 
+
+my $ARDUINO = 'http://edit.arduino.cc/en_ref'; # base url for reference site
+my $PUBLIC = 'http://arduino.cc/en'; # base url for public site
 
 my %downloaded = ();  # keep track of the pages we download
 
@@ -21,6 +25,8 @@ my $guide = create_page('Guide_index.html', "$ARDUINO/Guide/HomePage");
 my $faq = create_page('FAQ.html', "$ARDUINO/Main/FAQ");
 my $env = create_page('environment.html', "$ARDUINO/Main/Environment");
 my $css = create_page('arduinoUno.css', "$ARDUINO/pub/skins/arduinoUno/arduinoUno.css");
+my $css2 = create_page('arduinoWide.css', "$ARDUINO/pub/skins/arduinoWide/arduinoWide.css");
+my $css2 = create_page('arduinoWideRender.css', "$ARDUINO/pub/skins/arduinoWideRender/arduinoWideRender.css");
 my $eeprom = create_page('EEPROM.html', "$ARDUINO/Reference/EEPROM");
 my $stepper = create_page('Stepper.html', "$ARDUINO/Reference/Stepper");
 my $softser = create_page('SoftwareSerial.html', "$ARDUINO/Reference/SoftwareSerial");
@@ -109,11 +115,20 @@ sub localize_page {
   # direct pages to the local style file
   $text =~ s!$ARDUINO/pub/skins/arduinoUno/arduinoUno.css!arduinoUno.css!xg;
 
+  # direct pages to the local style file
+  $text =~ s!$ARDUINO/pub/skins/arduinoWide/arduinoWide.css!arduinoWide.css!xg;
+
+  # direct pages to the local style file
+  $text =~ s!$ARDUINO/pub/skins/arduinoWideRender/arduinoWideRender.css!arduinoWideRender.css!xg;
+
   # change links to Main/FAQ to go to FAQ.html 
   $text =~ s!$ARDUINO/Main/FAQ!FAQ.html!xg;
 
   # change links to the reference HomePage to go to index.html 
   $text =~ s!HomePage.html!index.html!xg;
+
+  # change links to the reference edit site to go to the public site 
+  $text =~ s!$ARDUINO!$PUBLIC!xg;
 
   # change links to the root directory to go to the Arduino home page
   $text =~ s!href="/"!href="http://www.arduino.cc"/!xg;
