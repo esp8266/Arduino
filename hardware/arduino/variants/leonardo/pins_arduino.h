@@ -175,7 +175,7 @@ const uint8_t PROGMEM digital_pin_to_port_PGM[30] = {
 	PD, // D29 / D12 - A11 - PD6
 };
 
-const uint8_t PROGMEM digital_pin_to_bit_mask_PGM[18] = {
+const uint8_t PROGMEM digital_pin_to_bit_mask_PGM[30] = {
 	_BV(2), // D0 - PD2
 	_BV(3),	// D1 - PD3
 	_BV(1), // D2 - PD1
